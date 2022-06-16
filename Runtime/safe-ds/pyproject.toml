@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "safe-ds"
-version = "0.0.1"
+version = "1.0.0"
 description = "The Safe-DS standard library."
 authors = ["Lars Reimann <mail@larsreimann.com>"]
 license = "MIT"
