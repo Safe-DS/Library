@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import pandas as pd
-from safe_ds.data import Row
+from safe_ds.data import Column, Row
 from safe_ds.exceptions import ColumnNameDuplicateError, ColumnNameError
 
 
@@ -120,3 +120,26 @@ class Table:
             raise ColumnNameDuplicateError(new_name)
 
         return Table(self._data.rename(columns={old_name: new_name}))
+
+    def get_column_by_name(self, column_name: str):
+        """
+        Returns a new instance of Column with the data of the described column of the Table.
+
+        Parameters
+        ----------
+        column_name : str
+            The name of the column you want to get in return
+
+        Returns
+        -------
+        column : Column
+            A new instance of Column by the given name
+
+        Raises
+        ------
+        ColumnNameError
+            If the specified target column name doesn't exist
+        """
+        if column_name in self._data.columns:
+            return Column(self._data[column_name].copy(deep=True))
+        raise ColumnNameError(column_name)
