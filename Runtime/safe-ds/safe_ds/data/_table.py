@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import pandas as pd
+from safe_ds.exceptions import ColumnNameDuplicateError, ColumnNameError
 
 
 class Table:
@@ -9,8 +10,7 @@ class Table:
 
     @staticmethod
     def from_json(path: str) -> Table:
-        """
-        Reads data from a JSON file into a Table
+        """Reads data from a JSON file into a Table
 
         Parameters
         ----------
@@ -41,8 +41,7 @@ class Table:
 
     @staticmethod
     def from_csv(path: str) -> Table:
-        """
-        Reads data from a CSV file into a Table.
+        """Reads data from a CSV file into a Table.
 
         Parameters
         ----------
@@ -68,3 +67,36 @@ class Table:
             raise FileNotFoundError(f'File "{path}" does not exist') from exception
         except Exception as exception:
             raise ValueError(f'Could not read file from "{path}" as CSV') from exception
+
+    def rename_column(self, old_name: str, new_name: str) -> Table:
+        """Rename a single column by providing the previous name and the future name of it.
+
+        Parameters
+        ----------
+        old_name : str
+            Old name of the target column
+        new_name : str
+            New name of the target column
+
+        Returns
+        -------
+        table : Table
+            The Table with the renamed column
+
+        Raises
+        ------
+        ColumnNameError
+            If the specified old target column name doesn't exist
+        ColumnNameDuplicateError
+            If the specified new target column name already exists
+        """
+        columns: list[str] = self._data.columns
+
+        if old_name not in columns:
+            raise ColumnNameError(old_name)
+        if old_name == new_name:
+            return self
+        if new_name in columns:
+            raise ColumnNameDuplicateError(new_name)
+
+        return Table(self._data.rename(columns={old_name: new_name}))
