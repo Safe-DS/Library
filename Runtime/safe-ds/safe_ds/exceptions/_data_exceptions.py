@@ -3,12 +3,12 @@ class ColumnNameError(Exception):
 
     Parameters
     ----------
-    column_name: str
+    column_names: list[str]
         Name of the column that was tried to be accessed
     """
 
-    def __init__(self, column_name):
-        super().__init__(f"Could not find column '{column_name}'.")
+    def __init__(self, column_names: list[str]):
+        super().__init__(f"Could not find column(s) '{', '.join(column_names)}'")
 
 
 class ColumnNameDuplicateError(Exception):
@@ -20,5 +20,5 @@ class ColumnNameDuplicateError(Exception):
         Name of the column that resulted in a duplicate
     """
 
-    def __init__(self, column_name):
+    def __init__(self, column_name: str):
         super().__init__(f"Column '{column_name}' already exists.")
