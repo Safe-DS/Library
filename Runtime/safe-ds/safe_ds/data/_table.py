@@ -12,7 +12,7 @@ from safe_ds.exceptions import (
 
 from ._column import Column
 from ._row import Row
-from ._tableSchema import TableSchema
+from ._table_schema import TableSchema
 
 
 class Table:
