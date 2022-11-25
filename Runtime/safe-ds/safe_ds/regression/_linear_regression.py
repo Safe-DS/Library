@@ -1,18 +1,18 @@
 # noinspection PyProtectedMember
 import safe_ds._util._util_sklearn
 from safe_ds.data import SupervisedDataset, Table
-from sklearn.linear_model import LogisticRegression as sk_LogisticRegression
+from sklearn.linear_model import LinearRegression as sk_LinearRegression
 
 
 # noinspection PyProtectedMember
-class LogisticRegression:
+class LinearRegression:
     """
-    This class implements regularized logistic regression. It is used as a classifier model.
+    This class implements linear regression. It is used as a regression model.
     It can only be trained on a supervised dataset.
     """
 
     def __init__(self):
-        self._clf = sk_LogisticRegression(n_jobs=-1)
+        self._regression = sk_LinearRegression(n_jobs=-1)
 
     def fit(self, supervised_dataset: SupervisedDataset):
         """
@@ -28,7 +28,7 @@ class LogisticRegression:
         LearningError
             if the supervised dataset contains invalid values or if the training failed
         """
-        safe_ds._util._util_sklearn.fit(self._clf, supervised_dataset)
+        safe_ds._util._util_sklearn.fit(self._regression, supervised_dataset)
 
     def predict(self, dataset: Table) -> Table:
         """
@@ -49,4 +49,4 @@ class LogisticRegression:
         PredictionError
             if predicting with the given dataset failed
         """
-        return safe_ds._util._util_sklearn.predict(self._clf, dataset)
+        return safe_ds._util._util_sklearn.predict(self._regression, dataset)
