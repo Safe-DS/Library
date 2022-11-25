@@ -4,13 +4,19 @@ import os.path
 from pathlib import Path
 
 import pandas as pd
-from safe_ds.data import Column, Row
 from safe_ds.exceptions import ColumnNameDuplicateError, ColumnNameError
+
+from ._column import Column
+from ._row import Row
+from ._tableSchema import TableSchema
 
 
 class Table:
     def __init__(self, data: pd.DataFrame):
         self._data: pd.DataFrame = data
+        self.schema: TableSchema = TableSchema(
+            column_names=self._data.columns, data_types=self._data.dtypes.to_list()
+        )
 
     def get_row_by_index(self, index: int) -> Row:
         """
