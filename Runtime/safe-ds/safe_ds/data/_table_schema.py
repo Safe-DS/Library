@@ -65,3 +65,18 @@ class TableSchema:
         if not self.has_column(column_name):
             raise ColumnNameError([column_name])
         return self._schema[column_name]
+
+    def _get_column_index_by_name(self, column_name: str):
+        """
+        Returns the index of the column with the given column_name
+
+        Parameters
+        ----------
+        column_name: str
+            The column_name you want the index for
+
+        Returns
+        -------
+        The index of the column
+        """
+        return list(self._schema.keys()).index(column_name)
