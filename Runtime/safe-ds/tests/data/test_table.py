@@ -3,7 +3,11 @@ from tempfile import NamedTemporaryFile
 import pandas as pd
 import pytest
 from safe_ds.data import Column, Table
-from safe_ds.exceptions import ColumnNameDuplicateError, ColumnNameError
+from safe_ds.exceptions import (
+    ColumnNameDuplicateError,
+    ColumnNameError,
+    IndexOutOfBoundsError,
+)
 
 
 def test_read_csv_valid():
@@ -49,13 +53,13 @@ def test_get_row_by_index():
 
 def test_get_row_by_index_negative_index():
     table = Table.from_csv("tests/resources/test_table_read_csv.csv")
-    with pytest.raises(KeyError):
+    with pytest.raises(IndexOutOfBoundsError):
         table.get_row_by_index(-1)
 
 
 def test_get_row_by_index_out_of_bounds_index():
     table = Table.from_csv("tests/resources/test_table_read_csv.csv")
-    with pytest.raises(KeyError):
+    with pytest.raises(IndexOutOfBoundsError):
         table.get_row_by_index(5)
 
 
