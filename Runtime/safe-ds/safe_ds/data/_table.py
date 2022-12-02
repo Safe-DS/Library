@@ -30,7 +30,7 @@ class Table:
             ),
         )
 
-    def get_row_by_index(self, index: int) -> Row:
+    def get_row(self, index: int) -> Row:
         """
         returns the row of the Table for a given Index
         Parameters
@@ -199,7 +199,7 @@ class Table:
 
         return Table(self._data.rename(columns={old_name: new_name}))
 
-    def get_column_by_name(self, column_name: str):
+    def get_column(self, column_name: str):
         """Returns a new instance of Column with the data of the described column of the Table.
 
         Parameters

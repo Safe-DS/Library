@@ -1,3 +1,5 @@
+from typing import Any
+
 import pandas as pd
 from safe_ds.exceptions import ColumnNameError
 
@@ -9,7 +11,10 @@ class Row:
         self._data: pd.Series = data
         self.schema: TableSchema = schema
 
-    def get_value_by_column_name(self, column_name: str):
+    def __getitem__(self, column_name: str) -> Any:
+        return self.get_value(column_name)
+
+    def get_value(self, column_name: str) -> Any:
         """
         Returns the value of the column of the row.
 

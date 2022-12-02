@@ -1,8 +1,9 @@
 from __future__ import annotations
 
+from typing import Any
+
 import pandas as pd
-from safe_ds.exceptions import IndexOutOfBoundsError
-from safe_ds.exceptions._data_exceptions import ColumnSizeError
+from safe_ds.exceptions import ColumnSizeError, IndexOutOfBoundsError
 
 from ._column_type import ColumnType
 
@@ -37,7 +38,10 @@ class Column:
         """
         return self._type
 
-    def get_value_by_position(self, index: int):
+    def __getitem__(self, index: int) -> Any:
+        return self.get_value(index)
+
+    def get_value(self, index: int) -> Any:
         """
         Returns column value at specified index, starting at 0.
 
