@@ -1,4 +1,4 @@
-from ._column import Column
+from ._column import Column, ColumnStatistics
 from ._column_type import ColumnType
 from ._row import Row
 from ._supervised_dataset import SupervisedDataset

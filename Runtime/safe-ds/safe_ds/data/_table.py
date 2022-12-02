@@ -217,7 +217,11 @@ class Table:
             If the specified target column name doesn't exist
         """
         if column_name in self._data.columns:
-            return Column(self._data[column_name].copy(deep=True))
+            return Column(
+                self._data[column_name].copy(deep=True),
+                column_name,
+                ColumnType.from_numpy_dtype(self._data[column_name].dtype),
+            )
         raise ColumnNameError([column_name])
 
     def drop_columns(self, column_names: list[str]) -> Table:
