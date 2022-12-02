@@ -4,10 +4,12 @@ import os.path
 from pathlib import Path
 
 import pandas as pd
+from pandas import DataFrame, Series
 from safe_ds.exceptions import (
     ColumnNameDuplicateError,
     ColumnNameError,
     IndexOutOfBoundsError,
+    SchemaMismatchError,
 )
 
 from ._column import Column
@@ -15,6 +17,7 @@ from ._row import Row
 from ._table_schema import TableSchema
 
 
+# noinspection PyProtectedMember
 class Table:
     def __init__(self, data: pd.DataFrame):
         self._data: pd.DataFrame = data
@@ -102,6 +105,37 @@ class Table:
             raise FileNotFoundError(f'File "{path}" does not exist') from exception
         except Exception as exception:
             raise ValueError(f'Could not read file from "{path}" as CSV') from exception
+
+    @staticmethod
+    def from_rows(rows: list[Row]) -> Table:
+        """
+        Returns a table combined from a list of given rows.
+
+        Parameters
+        ----------
+        rows : list[Row]
+            Rows to be combined. Should have a matching schema.
+
+        Returns
+        -------
+        table : Table
+            The generated table.
+
+        Raises
+        ------
+        SchemaMismatchError
+            If one of the schemas of the rows does not match.
+        """
+        schema_compare: TableSchema = rows[0].schema
+        row_array: list[Series] = []
+
+        for row in rows:
+            if schema_compare != row.schema:
+                raise SchemaMismatchError()
+            row_array.append(row._data)
+
+        dataframe: DataFrame = pd.DataFrame(row_array)
+        return Table(dataframe)
 
     def to_json(self, path_to_file: str):
         """
@@ -235,3 +269,16 @@ class Table:
             raise ColumnNameError(invalid_columns)
         transformed_data = self._data[column_names]
         return Table(transformed_data)
+
+    def to_rows(self) -> list[Row]:
+        """
+        Returns a list of Rows from the current table.
+
+        Returns
+        -------
+        rows : list[Row]
+            List of Row objects
+        """
+        return [
+            Row(series_row, self.schema) for (_, series_row) in self._data.iterrows()
+        ]

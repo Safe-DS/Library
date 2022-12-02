@@ -35,3 +35,12 @@ class IndexOutOfBoundsError(Exception):
 
     def __init__(self, index):
         super().__init__(f"There is no element at index '{index}'.")
+
+
+class SchemaMismatchError(Exception):
+    """
+    Exception raised when schemas aren't equal.
+    """
+
+    def __init__(self):
+        super().__init__("Failed because at least two schemas didn't match.")
