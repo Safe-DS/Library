@@ -3,8 +3,9 @@ from __future__ import annotations
 from collections import OrderedDict
 from dataclasses import dataclass
 
-import numpy as np
 from safe_ds.exceptions import ColumnNameError
+
+from ._column_type import ColumnType
 
 
 @dataclass
@@ -15,14 +16,14 @@ class TableSchema:
     ----------
     column_names: list[str]
         Column names as an array
-    data_types: list[numpy.dtype]
-        Dataypes as an array using the numpy dtpye class
+    data_types: list[ColumnType]
+        Datatypes as an array using ColumnTypes
 
     """
 
     _schema: OrderedDict
 
-    def __init__(self, column_names: list[str], data_types: list[np.dtype]):
+    def __init__(self, column_names: list[str], data_types: list[ColumnType]):
         self._schema = OrderedDict()
         for column_name, data_type in zip(column_names, data_types):
             self._schema[column_name] = data_type
@@ -43,7 +44,7 @@ class TableSchema:
         """
         return column_name in self._schema
 
-    def get_type_of_column(self, column_name: str) -> np.dtype:
+    def get_type_of_column(self, column_name: str) -> ColumnType:
         """
         Returns the type of the given column
 
@@ -54,7 +55,7 @@ class TableSchema:
 
         Returns
         -------
-        type: np.dtype
+        type: ColumnType
             The type of the column
 
         Raises
