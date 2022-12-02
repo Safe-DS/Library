@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import os.path
 from pathlib import Path
+from typing import Callable
 
 import pandas as pd
 from pandas import DataFrame, Series
@@ -290,3 +291,26 @@ class Table:
         return [
             Row(series_row, self.schema) for (_, series_row) in self._data.iterrows()
         ]
+
+    def filter_rows(self, query: Callable[[Row], bool]) -> Table:
+        """Returns a Table with rows filtered by applied lambda function
+
+        Parameters
+        ----------
+        query : lambda function
+            A lambda function that is applied to all rows
+
+        Returns
+        -------
+        table : Table
+            A Table containing only the rows filtered by the query lambda function
+
+        Raises
+        ------
+        TypeError
+           If the entered query is not a lambda function
+        """
+
+        rows: list[Row] = [row for row in self.to_rows() if query(row)]
+        result_table: Table = self.from_rows(rows)
+        return Table(result_table._data.reset_index(drop=True))
