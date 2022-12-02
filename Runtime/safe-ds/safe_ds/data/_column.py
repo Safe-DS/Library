@@ -93,6 +93,16 @@ class Column:
         """
         return self._data.isna().sum()
 
+    def __eq__(self, other):
+        if not isinstance(other, Column):
+            return NotImplemented
+        if self is other:
+            return True
+        return self._data.equals(other._data) and self.name == other.name
+
+    def __hash__(self):
+        return hash((self._data, self.name))
+
 
 class ColumnStatistics:
     def __init__(self, column: Column):

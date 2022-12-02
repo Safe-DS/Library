@@ -66,3 +66,12 @@ class SchemaMismatchError(Exception):
 
     def __init__(self):
         super().__init__("Failed because at least two schemas didn't match.")
+
+
+class ColumnLengthMismatchError(Exception):
+    """
+    Exception raised when the lengths of columns aren't equal.
+    """
+
+    def __init__(self, column_info):
+        super().__init__(f"The length of at least one column differs: \n{column_info}")

@@ -1,4 +1,5 @@
 from ._data_exceptions import (
+    ColumnLengthMismatchError,
     ColumnNameDuplicateError,
     ColumnNameError,
     ColumnSizeError,

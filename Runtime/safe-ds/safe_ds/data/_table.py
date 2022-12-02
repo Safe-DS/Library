@@ -7,6 +7,7 @@ from typing import Callable
 import pandas as pd
 from pandas import DataFrame, Series
 from safe_ds.exceptions import (
+    ColumnLengthMismatchError,
     ColumnNameDuplicateError,
     ColumnNameError,
     IndexOutOfBoundsError,
@@ -140,6 +141,39 @@ class Table:
             row_array.append(row._data)
 
         dataframe: DataFrame = pd.DataFrame(row_array)
+        return Table(dataframe)
+
+    @staticmethod
+    def from_columns(columns: list[Column]) -> Table:
+        """
+        Returns a table combined from a list of given columns.
+
+        Parameters
+        ----------
+        columns : list[Column]
+            Columns to be combined. Each column should be the same size.
+
+        Returns
+        -------
+        table : Table
+            The generated table.
+
+        Raises
+        ------
+        ColumnLengthMismatchError
+            If at least one of the columns has a different length than at least one other column
+        """
+        dataframe: DataFrame = pd.DataFrame()
+
+        for column in columns:
+            if column._data.size != columns[0]._data.size:
+                raise ColumnLengthMismatchError(
+                    "\n".join(
+                        [f"{column.name}: {column._data.size}" for column in columns]
+                    )
+                )
+            dataframe[column.name] = column._data
+
         return Table(dataframe)
 
     def to_json(self, path_to_file: str):
@@ -325,3 +359,24 @@ class Table:
             Number of rows
         """
         return self._data.shape[0]
+
+    def to_columns(self) -> list[Column]:
+        """
+        Returns a list of Columns from the current table.
+
+        Returns
+        -------
+        columns : list[Columns]
+            List of Columns objects
+        """
+        return [self.get_column(name) for name in self._data.columns]
+
+    def __eq__(self, other):
+        if not isinstance(other, Table):
+            return NotImplemented
+        if self is other:
+            return True
+        return self._data.equals(other._data)
+
+    def __hash__(self):
+        return hash((self._data))
