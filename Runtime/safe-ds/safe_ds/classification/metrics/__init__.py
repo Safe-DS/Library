@@ -1,1 +1,1 @@
-from ._accuracy import accuracy
+from ._module_level_functions import accuracy
