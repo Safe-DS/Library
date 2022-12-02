@@ -54,6 +54,17 @@ class Column:
     def statistics(self) -> ColumnStatistics:
         return ColumnStatistics(self)
 
+    def count_null_values(self) -> int:
+        """
+        Returns the number of null values in the column.
+
+        Returns
+        -------
+        count : int
+            Number of null values
+        """
+        return self._data.isna().sum()
+
 
 class ColumnStatistics:
     def __init__(self, column: Column):
