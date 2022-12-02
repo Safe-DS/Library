@@ -1,5 +1,6 @@
 class ColumnNameError(Exception):
-    """Exception raised for trying to access an invalid column name.
+    """
+    Exception raised for trying to access an invalid column name.
 
     Parameters
     ----------
@@ -12,7 +13,8 @@ class ColumnNameError(Exception):
 
 
 class ColumnNameDuplicateError(Exception):
-    """Exception raised for trying to modify a table, resulting in a duplicate column name.
+    """
+    Exception raised for trying to modify a table, resulting in a duplicate column name.
 
     Parameters
     ----------
@@ -25,7 +27,8 @@ class ColumnNameDuplicateError(Exception):
 
 
 class IndexOutOfBoundsError(Exception):
-    """Exception raised for trying to access an element by an index that does not exist in the underlying data.
+    """
+    Exception raised for trying to access an element by an index that does not exist in the underlying data.
 
     Parameters
     ----------
@@ -35,6 +38,25 @@ class IndexOutOfBoundsError(Exception):
 
     def __init__(self, index):
         super().__init__(f"There is no element at index '{index}'.")
+
+
+class ColumnSizeError(Exception):
+    """
+    Exception raised for trying to use a column of unsupported size.
+
+    Parameters
+    ----------
+    expected_size: str
+        The expected size of the column as an expression (e.g. 2, >0, !=0)
+
+    actual_size: str
+        The actual size of the column as an expression (e.g. 2, >0, !=0)
+    """
+
+    def __init__(self, expected_size: str, actual_size: str):
+        super().__init__(
+            f"Expected a column of size {expected_size} but got column of size {actual_size}."
+        )
 
 
 class SchemaMismatchError(Exception):
