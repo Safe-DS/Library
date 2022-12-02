@@ -36,13 +36,13 @@ class IndexOutOfBoundsError(Exception):
         Wrongly used index
     """
 
-    def __init__(self, index):
+    def __init__(self, index: int):
         super().__init__(f"There is no element at index '{index}'.")
 
 
 class ColumnSizeError(Exception):
     """
-    Exception raised for trying to use a column of unsupported size.
+    Exception raised for trying to use a single column of unsupported size.
 
     Parameters
     ----------
@@ -64,14 +64,14 @@ class SchemaMismatchError(Exception):
     Exception raised when schemas aren't equal.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__("Failed because at least two schemas didn't match.")
 
 
 class ColumnLengthMismatchError(Exception):
     """
-    Exception raised when the lengths of columns aren't equal.
+    Exception raised when the lengths of two or more columns don't match when they should.
     """
 
-    def __init__(self, column_info):
+    def __init__(self, column_info: str):
         super().__init__(f"The length of at least one column differs: \n{column_info}")
