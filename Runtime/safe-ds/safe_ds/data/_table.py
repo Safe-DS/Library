@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os.path
+import typing
 from pathlib import Path
 from typing import Callable
 
@@ -176,7 +177,7 @@ class Table:
 
         return Table(dataframe)
 
-    def to_json(self, path_to_file: str):
+    def to_json(self, path_to_file: str) -> None:
         """
         Write the data from the table into a json file.
         If the file and/or the directories do not exist they will be created. If the file does already exist it will be overwritten.
@@ -188,7 +189,7 @@ class Table:
         Path(os.path.dirname(path_to_file)).mkdir(parents=True, exist_ok=True)
         self._data.to_json(path_to_file)
 
-    def to_csv(self, path_to_file: str):
+    def to_csv(self, path_to_file: str) -> None:
         """
         Write the data from the table into a csv file.
         If the file and/or the directories do not exist they will be created. If the file does already exist it will be overwritten.
@@ -233,7 +234,7 @@ class Table:
 
         return Table(self._data.rename(columns={old_name: new_name}))
 
-    def get_column(self, column_name: str):
+    def get_column(self, column_name: str) -> Column:
         """Returns a new instance of Column with the data of the described column of the Table.
 
         Parameters
@@ -371,12 +372,24 @@ class Table:
         """
         return [self.get_column(name) for name in self._data.columns]
 
-    def __eq__(self, other):
+    def drop_duplicate_rows(self) -> Table:
+        """
+        Returns a copy of the Table with every duplicate row removed.
+
+        Returns
+        -------
+        result: Table
+            The table with the duplicate rows removed
+
+        """
+        return Table(self._data.drop_duplicates(ignore_index=True))
+
+    def __eq__(self, other: typing.Any) -> bool:
         if not isinstance(other, Table):
             return NotImplemented
         if self is other:
             return True
         return self._data.equals(other._data)
 
-    def __hash__(self):
-        return hash((self._data))
+    def __hash__(self) -> int:
+        return hash(self._data)
