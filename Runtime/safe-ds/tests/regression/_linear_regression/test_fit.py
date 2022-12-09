@@ -4,7 +4,7 @@ from safe_ds.exceptions import LearningError
 from safe_ds.regression import LinearRegression
 
 
-def test_linear_regression_fit():
+def test_linear_regression_fit() -> None:
     table = Table.from_csv("tests/resources/test_linear_regression.csv")
     supervised_dataset = SupervisedDataset(table, "T")
     log_regression = LinearRegression()
@@ -12,7 +12,7 @@ def test_linear_regression_fit():
     assert True  # This asserts that the fit method succeeds
 
 
-def test_linear_regression_fit_invalid():
+def test_linear_regression_fit_invalid() -> None:
     table = Table.from_csv("tests/resources/test_linear_regression_invalid.csv")
     supervised_dataset = SupervisedDataset(table, "T")
     log_regression = LinearRegression()

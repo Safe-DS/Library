@@ -3,7 +3,7 @@ from safe_ds.data import Table
 from safe_ds.exceptions import ColumnNameError
 
 
-def test_table_column_keep():
+def test_table_column_keep() -> None:
     table = Table.from_csv("tests/resources/test_table_read_csv.csv")
     transformed_table = table.keep_columns(["A"])
     assert (
@@ -12,7 +12,7 @@ def test_table_column_keep():
     )
 
 
-def test_table_column_keep_warning():
+def test_table_column_keep_warning() -> None:
     table = Table.from_csv("tests/resources/test_table_read_csv.csv")
     with pytest.raises(ColumnNameError):
         table.keep_columns(["C"])

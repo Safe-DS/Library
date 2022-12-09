@@ -1,7 +1,6 @@
-import numpy as np
 import pandas as pd
 import pytest
-from safe_ds.data import Column, ColumnType
+from safe_ds.data import Column
 from safe_ds.regression.metrics import mean_squared_error
 
 
@@ -12,10 +11,6 @@ from safe_ds.regression.metrics import mean_squared_error
 def test_mean_squared_error_valid(
     actual: list[float], expected: list[float], result: float
 ) -> None:
-    actual_column: Column = Column(
-        pd.Series(actual), "actual", ColumnType.from_numpy_dtype(np.dtype(float))
-    )
-    expected_column: Column = Column(
-        pd.Series(expected), "expected", ColumnType.from_numpy_dtype(np.dtype(float))
-    )
+    actual_column: Column = Column(pd.Series(actual), "actual")
+    expected_column: Column = Column(pd.Series(expected), "expected")
     assert mean_squared_error(actual_column, expected_column) == result

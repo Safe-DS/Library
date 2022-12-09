@@ -2,27 +2,19 @@
 
 import pandas as pd
 import pytest
-from safe_ds.data import Column, ColumnType
+from safe_ds.data import Column
 from safe_ds.exceptions import IndexOutOfBoundsError
 
 
-def test_getitem_valid():
-    column = Column(
-        pd.Series([0, "1"]),
-        "testColumn",
-        ColumnType.from_numpy_dtype(pd.Series([0, "1"]).dtype),
-    )
+def test_getitem_valid() -> None:
+    column = Column(pd.Series([0, "1"]), "testColumn")
     assert column[0] == 0
     assert column[1] == "1"
 
 
 # noinspection PyStatementEffect
-def test_getitem_invalid():
-    column = Column(
-        pd.Series([0, "1"]),
-        "testColumn",
-        ColumnType.from_numpy_dtype(pd.Series([0, "1"]).dtype),
-    )
+def test_getitem_invalid() -> None:
+    column = Column(pd.Series([0, "1"]), "testColumn")
     with pytest.raises(IndexOutOfBoundsError):
         column[-1]
 

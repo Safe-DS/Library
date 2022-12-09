@@ -3,7 +3,7 @@ import pandas as pd
 from safe_ds.data import Table
 
 
-def test_count_null_values_valid():
+def test_count_null_values_valid() -> None:
     table = Table(
         pd.DataFrame(
             data={"col1": [1, 2, 3, 4, 5], "col2": [None, None, 1, np.nan, np.nan]}

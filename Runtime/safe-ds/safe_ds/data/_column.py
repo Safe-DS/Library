@@ -9,10 +9,10 @@ from ._column_type import ColumnType
 
 
 class Column:
-    def __init__(self, data: pd.Series, name: str, column_type: ColumnType):
+    def __init__(self, data: pd.Series, name: str) -> None:
         self._data: pd.Series = data
         self._name: str = name
-        self._type: ColumnType = column_type
+        self._type: ColumnType = ColumnType.from_numpy_dtype(self._data.dtype)
 
     @property
     def name(self) -> str:
@@ -93,15 +93,15 @@ class Column:
         """
         return self._data.isna().sum()
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
         if not isinstance(other, Column):
             return NotImplemented
         if self is other:
             return True
         return self._data.equals(other._data) and self.name == other.name
 
-    def __hash__(self):
-        return hash((self._data, self.name))
+    def __hash__(self) -> int:
+        return hash(self._data)
 
 
 class ColumnStatistics:
@@ -162,7 +162,7 @@ class ColumnStatistics:
             raise TypeError("The column contains non numerical data.")
         return self.column._data.mean()
 
-    def mode(self):
+    def mode(self) -> Any:
         """
         Returns the mode of the column.
 

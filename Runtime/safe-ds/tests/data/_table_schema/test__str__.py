@@ -2,7 +2,7 @@ import pandas as pd
 from safe_ds.data import Table
 
 
-def test__str__():
+def test__str__() -> None:
     table = Table(pd.DataFrame(data={"col1": ["col1_1"], "col2": [1]}))
     assert (
         str(table.schema)
