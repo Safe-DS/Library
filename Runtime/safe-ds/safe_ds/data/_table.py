@@ -11,12 +11,12 @@ from safe_ds.exceptions import (
     ColumnLengthMismatchError,
     ColumnNameDuplicateError,
     ColumnNameError,
+    ColumnSizeError,
     IndexOutOfBoundsError,
     SchemaMismatchError,
 )
 
 from ._column import Column
-from ._column_type import ColumnType
 from ._row import Row
 from ._table_schema import TableSchema
 
@@ -25,12 +25,7 @@ from ._table_schema import TableSchema
 class Table:
     def __init__(self, data: pd.DataFrame):
         self._data: pd.DataFrame = data
-        self.schema: TableSchema = TableSchema(
-            column_names=self._data.columns,
-            data_types=list(
-                map(ColumnType.from_numpy_dtype, self._data.dtypes.to_list())
-            ),
-        )
+        self.schema: TableSchema = TableSchema._from_dataframe(self._data)
 
     def get_row(self, index: int) -> Row:
         """
@@ -379,6 +374,26 @@ class Table:
 
         """
         return Table(self._data.drop_duplicates(ignore_index=True))
+
+    def add_column(self, column: Column) -> Table:
+        """
+        Returns the original table with the provided column attached at the end.
+
+        Returns
+        -------
+        result: Table
+            The table with the column attached
+
+        """
+        if column.name in self._data.columns:
+            raise ColumnNameDuplicateError(column.name)
+
+        if column._data.size != self.count_rows():
+            raise ColumnSizeError(str(self.count_rows()), str(column._data.size))
+
+        result = self._data.copy()
+        result[column.name] = column._data
+        return Table(result)
 
     def __eq__(self, other: typing.Any) -> bool:
         if not isinstance(other, Table):

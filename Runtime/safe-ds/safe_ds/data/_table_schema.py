@@ -3,6 +3,7 @@ from __future__ import annotations
 from collections import OrderedDict
 from dataclasses import dataclass
 
+import pandas as pd
 from safe_ds.exceptions import ColumnNameError
 
 from ._column_type import ColumnType
@@ -67,7 +68,7 @@ class TableSchema:
             raise ColumnNameError([column_name])
         return self._schema[column_name]
 
-    def _get_column_index_by_name(self, column_name: str):
+    def _get_column_index_by_name(self, column_name: str) -> int:
         """
         Returns the index of the column with the given column_name
 
@@ -81,6 +82,29 @@ class TableSchema:
         The index of the column
         """
         return list(self._schema.keys()).index(column_name)
+
+    @staticmethod
+    def _from_dataframe(dataframe: pd.DataFrame) -> TableSchema:
+        """
+        Constructs a TableSchema from a Dataframe. This function is not supposed to be exposed to the user.
+
+        Parameters
+        ----------
+        dataframe: pd.Dataframe
+            The Dataframe to construct the TableSchema from.
+
+        Returns
+        -------
+        _from_dataframe: TableSchema
+            The constructed TableSchema
+
+        """
+        return TableSchema(
+            column_names=dataframe.columns,
+            data_types=list(
+                map(ColumnType.from_numpy_dtype, dataframe.dtypes.to_list())
+            ),
+        )
 
     def __str__(self) -> str:
         """
