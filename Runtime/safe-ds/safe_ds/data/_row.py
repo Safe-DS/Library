@@ -1,7 +1,8 @@
+import typing
 from typing import Any
 
 import pandas as pd
-from safe_ds.exceptions import ColumnNameError
+from safe_ds.exceptions import UnknownColumnNameError
 
 from ._table_schema import TableSchema
 
@@ -28,15 +29,15 @@ class Row:
         The value of the column
         """
         if not self.schema.has_column(column_name):
-            raise ColumnNameError([column_name])
+            raise UnknownColumnNameError([column_name])
         return self._data[self.schema._get_column_index_by_name(column_name)]
 
-    def __eq__(self, other):
+    def __eq__(self, other: typing.Any) -> bool:
         if not isinstance(other, Row):
             return NotImplemented
         if self is other:
             return True
         return self._data.equals(other._data)
 
-    def __hash__(self):
-        return hash((self._data))
+    def __hash__(self) -> int:
+        return hash(self._data)

@@ -1,4 +1,4 @@
-class ColumnNameError(Exception):
+class UnknownColumnNameError(Exception):
     """
     Exception raised for trying to access an invalid column name.
 
@@ -12,7 +12,7 @@ class ColumnNameError(Exception):
         super().__init__(f"Could not find column(s) '{', '.join(column_names)}'")
 
 
-class ColumnNameDuplicateError(Exception):
+class DuplicateColumnNameError(Exception):
     """
     Exception raised for trying to modify a table, resulting in a duplicate column name.
 

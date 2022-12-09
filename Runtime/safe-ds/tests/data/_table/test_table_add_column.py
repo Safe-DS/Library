@@ -1,7 +1,7 @@
 import pandas as pd
 import pytest
 from safe_ds.data import Column, Table
-from safe_ds.exceptions import ColumnNameDuplicateError, ColumnSizeError
+from safe_ds.exceptions import ColumnSizeError, DuplicateColumnNameError
 
 
 def test_table_add_column_valid() -> None:
@@ -18,7 +18,7 @@ def test_table_add_column_valid() -> None:
 @pytest.mark.parametrize(
     "column_values, column_name, error",
     [
-        (["a", "b", "c"], "B", ColumnNameDuplicateError),
+        (["a", "b", "c"], "B", DuplicateColumnNameError),
         (["a", "b"], "C", ColumnSizeError),
     ],
 )
