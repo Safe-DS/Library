@@ -106,7 +106,7 @@ class Column:
 
 class ColumnStatistics:
     def __init__(self, column: Column):
-        self.column = column
+        self._column = column
 
     def max(self) -> float:
         """
@@ -122,9 +122,9 @@ class ColumnStatistics:
         TypeError
             If the data contains non-numerical data.
         """
-        if not self.column._type.is_numeric():
+        if not self._column._type.is_numeric():
             raise TypeError("The column contains non numerical data.")
-        return self.column._data.max()
+        return self._column._data.max()
 
     def min(self) -> float:
         """
@@ -140,9 +140,9 @@ class ColumnStatistics:
         TypeError
             If the data contains non-numerical data.
         """
-        if not self.column._type.is_numeric():
+        if not self._column._type.is_numeric():
             raise TypeError("The column contains non numerical data.")
-        return self.column._data.min()
+        return self._column._data.min()
 
     def mean(self) -> float:
         """
@@ -158,9 +158,9 @@ class ColumnStatistics:
         TypeError
             If the data contains non-numerical data.
         """
-        if not self.column._type.is_numeric():
+        if not self._column._type.is_numeric():
             raise TypeError("The column contains non numerical data.")
-        return self.column._data.mean()
+        return self._column._data.mean()
 
     def mode(self) -> Any:
         """
@@ -171,7 +171,7 @@ class ColumnStatistics:
         mode:
             the mode
         """
-        return self.column._data.mode()[0]
+        return self._column._data.mode()[0]
 
     def median(self) -> float:
         """
@@ -187,6 +187,6 @@ class ColumnStatistics:
         TypeError
             If the data contains non-numerical data.
         """
-        if not self.column._type.is_numeric():
+        if not self._column._type.is_numeric():
             raise TypeError("The column contains non numerical data.")
-        return self.column._data.median()
+        return self._column._data.median()
