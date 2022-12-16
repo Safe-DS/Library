@@ -331,11 +331,6 @@ class Table:
         -------
         table : Table
             A Table containing only the rows filtered by the query lambda function
-
-        Raises
-        ------
-        TypeError
-           If the entered query is not a lambda function
         """
 
         rows: list[Row] = [row for row in self.to_rows() if query(row)]

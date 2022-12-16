@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, Callable
 
 import pandas as pd
 from safe_ds.exceptions import (
@@ -96,6 +96,66 @@ class Column:
             Number of null values
         """
         return self._data.isna().sum()
+
+    def all(self, predicate: Callable[[Any], bool]) -> bool:
+        """
+        Checks if all values have a given property
+
+        Parameters
+        ----------
+        predicate: Callable[[Any], bool])
+            Callable that is used to find matches
+
+        Returns
+        -------
+        result: bool
+            True if all match
+
+        """
+        for value in self._data:
+            if not predicate(value):
+                return False
+        return True
+
+    def any(self, predicate: Callable[[Any], bool]) -> bool:
+        """
+        Checks if any value has a given property
+
+        Parameters
+        ----------
+        predicate: Callable[[Any], bool])
+            Callable that is used to find matches
+
+        Returns
+        -------
+        result: bool
+            True if any match
+
+        """
+        for value in self._data:
+            if predicate(value):
+                return True
+        return False
+
+    def none(self, predicate: Callable[[Any], bool]) -> bool:
+        """
+        Checks if no values has a given property
+
+        Parameters
+        ----------
+        predicate: Callable[[Any], bool])
+            Callable that is used to find matches
+
+        Returns
+        -------
+        result: bool
+            True if none match
+
+        """
+        for value in self._data:
+            if predicate(value):
+                return False
+        return True
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, Column):
