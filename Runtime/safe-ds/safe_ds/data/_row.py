@@ -32,6 +32,22 @@ class Row:
             raise UnknownColumnNameError([column_name])
         return self._data[self.schema._get_column_index_by_name(column_name)]
 
+    def has_column(self, column_name: str) -> bool:
+        """
+        Returns if the row contains a given column
+
+        Parameters
+        ----------
+        column_name : str
+            The name of the column
+
+        Returns
+        -------
+        contains: bool
+            If it contains the column
+        """
+        return self.schema.has_column(column_name)
+
     def __eq__(self, other: typing.Any) -> bool:
         if not isinstance(other, Row):
             return NotImplemented
