@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Any, Callable
 
+import numpy as np
 import pandas as pd
 from safe_ds.exceptions import (
     ColumnSizeError,
@@ -91,7 +92,7 @@ class Column:
     def statistics(self) -> ColumnStatistics:
         return ColumnStatistics(self)
 
-    def count_null_values(self) -> int:
+    def _count_missing_values(self) -> int:
         """
         Returns the number of null values in the column.
 
@@ -161,6 +162,30 @@ class Column:
             if predicate(value):
                 return False
         return True
+
+    def missing_value_ratio(self) -> float:
+        """
+        Returns the ratio of null values to the total number of elements in the column
+
+        Returns
+        -------
+        ratio: float
+            the ratio of null values to the total number of elements in the column
+        """
+        if self._data.size == 0:
+            raise ColumnSizeError("> 0", "0")
+        return self._count_missing_values() / self._data.size
+
+    def has_missing_values(self) -> bool:
+        """
+        Returns True if the column has missing values
+
+        Returns
+        -------
+        : bool
+            True if missing values exist, False else
+        """
+        return self.any(lambda value: value is None or np.isnan(value))
 
     def stability(self) -> float:
         """

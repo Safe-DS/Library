@@ -14,7 +14,7 @@ def test_count_null_values_valid() -> None:
     column2 = table.get_column("col2")
     empty_column = empty_table.get_column("col1")
     assert (
-        column1.count_null_values() == 0
-        and column2.count_null_values() == 4
-        and empty_column.count_null_values() == 0
+        column1._count_missing_values() == 0
+        and column2._count_missing_values() == 4
+        and empty_column._count_missing_values() == 0
     )
