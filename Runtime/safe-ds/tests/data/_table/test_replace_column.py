@@ -15,7 +15,7 @@ from safe_ds.exceptions import (
         ("D", "tests/resources/test_table_replace_column_output_same_name.csv"),
     ],
 )
-def test_rename_valid(column_name: str, path: str) -> None:
+def test_replace_valid(column_name: str, path: str) -> None:
     input_table: Table = Table.from_csv(
         "tests/resources/test_table_replace_column_input.csv"
     )
@@ -36,7 +36,7 @@ def test_rename_valid(column_name: str, path: str) -> None:
         ("C", ["d", "e"], "D", ColumnSizeError),
     ],
 )
-def test_rename_invalid(
+def test_replace_invalid(
     old_column_name: str,
     column_values: list[str],
     column_name: str,

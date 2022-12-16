@@ -244,7 +244,7 @@ class Table:
 
         Raises
         ------
-        ColumnNameError
+        UnknownColumnNameError
             If the specified target column name doesn't exist
         """
         if column_name in self._data.columns:
@@ -492,3 +492,25 @@ class Table:
 
     def __hash__(self) -> int:
         return hash(self._data)
+
+    def transform_column(
+        self, name: str, transformer: Callable[[Row], typing.Any]
+    ) -> Table:
+        """
+        Transform provided column by calling provided transformer
+
+        Returns
+        -------
+        result: Table
+            The table with the transformed column
+
+        Raises
+        ------
+        UnknownColumnNameError
+            If the old column does not exist
+
+        """
+        column: Column = self.get_column(name)
+        items: list = [transformer(item) for item in self.to_rows()]
+        result: Column = Column(pd.Series(items), column.name)
+        return self.replace_column(name, result)
