@@ -3,6 +3,7 @@ from ._data_exceptions import (
     ColumnSizeError,
     DuplicateColumnNameError,
     IndexOutOfBoundsError,
+    NonNumericColumnError,
     SchemaMismatchError,
     UnknownColumnNameError,
 )

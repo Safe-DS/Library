@@ -12,6 +12,19 @@ class UnknownColumnNameError(Exception):
         super().__init__(f"Could not find column(s) '{', '.join(column_names)}'")
 
 
+class NonNumericColumnError(Exception):
+    """
+    Exception raised for trying to do numerical operations on a non numerical column.
+
+
+    """
+
+    def __init__(self) -> None:
+        super().__init__(
+            "Tried to do a numerical operation on one or multiple non numerical Columns"
+        )
+
+
 class DuplicateColumnNameError(Exception):
     """
     Exception raised for trying to modify a table, resulting in a duplicate column name.

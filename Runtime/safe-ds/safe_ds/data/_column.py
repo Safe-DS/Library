@@ -3,7 +3,11 @@ from __future__ import annotations
 from typing import Any
 
 import pandas as pd
-from safe_ds.exceptions import ColumnSizeError, IndexOutOfBoundsError
+from safe_ds.exceptions import (
+    ColumnSizeError,
+    IndexOutOfBoundsError,
+    NonNumericColumnError,
+)
 
 from ._column_type import ColumnType
 
@@ -106,7 +110,7 @@ class Column:
 
 class ColumnStatistics:
     def __init__(self, column: Column):
-        self._column = column
+        self.column = column
 
     def max(self) -> float:
         """
@@ -122,9 +126,9 @@ class ColumnStatistics:
         TypeError
             If the data contains non-numerical data.
         """
-        if not self._column._type.is_numeric():
+        if not self.column._type.is_numeric():
             raise TypeError("The column contains non numerical data.")
-        return self._column._data.max()
+        return self.column._data.max()
 
     def min(self) -> float:
         """
@@ -140,9 +144,9 @@ class ColumnStatistics:
         TypeError
             If the data contains non-numerical data.
         """
-        if not self._column._type.is_numeric():
+        if not self.column._type.is_numeric():
             raise TypeError("The column contains non numerical data.")
-        return self._column._data.min()
+        return self.column._data.min()
 
     def mean(self) -> float:
         """
@@ -158,9 +162,9 @@ class ColumnStatistics:
         TypeError
             If the data contains non-numerical data.
         """
-        if not self._column._type.is_numeric():
+        if not self.column._type.is_numeric():
             raise TypeError("The column contains non numerical data.")
-        return self._column._data.mean()
+        return self.column._data.mean()
 
     def mode(self) -> Any:
         """
@@ -171,7 +175,7 @@ class ColumnStatistics:
         mode:
             the mode
         """
-        return self._column._data.mode()[0]
+        return self.column._data.mode()[0]
 
     def median(self) -> float:
         """
@@ -187,6 +191,66 @@ class ColumnStatistics:
         TypeError
             If the data contains non-numerical data.
         """
-        if not self._column._type.is_numeric():
+        if not self.column._type.is_numeric():
             raise TypeError("The column contains non numerical data.")
-        return self._column._data.median()
+        return self.column._data.median()
+
+    def sum(self) -> float:
+        """
+        Returns the sum of a numerical Column
+
+        Returns
+        -------
+        sum:
+            the sum of all values
+
+        Raises
+        ---
+        NonNumericalColumnError
+            If the data is non numerical
+
+        """
+        if not self.column.type.is_numeric():
+            raise NonNumericColumnError
+        return self.column._data.sum()
+
+    def variance(self) -> float:
+
+        """
+        Returns the variance of a numerical Column
+
+        Returns
+        -------
+        sum:
+            the variance of all values
+
+        Raises
+        ---
+        NonNumericalColumnError
+            If the data is non numerical
+
+        """
+        if not self.column.type.is_numeric():
+            raise NonNumericColumnError
+
+        return self.column._data.var()
+
+    def standard_deviation(self) -> float:
+
+        """
+        Returns the standard deviation of a numerical Column
+
+        Returns
+        -------
+        sum:
+            the standard deviation of all values
+
+        Raises
+        ---
+        NonNumericalColumnError
+            If the data is non numerical
+
+        """
+        if not self.column.type.is_numeric():
+            raise NonNumericColumnError
+        return self.column._data.std()
