@@ -14,14 +14,14 @@ class UnknownColumnNameError(Exception):
 
 class NonNumericColumnError(Exception):
     """
-    Exception raised for trying to do numerical operations on a non numerical column.
+    Exception raised for trying to do numerical operations on a non-numerical column.
 
 
     """
 
-    def __init__(self) -> None:
+    def __init__(self, column_info: str) -> None:
         super().__init__(
-            "Tried to do a numerical operation on one or multiple non numerical Columns"
+            f"Tried to do a numerical operation on one or multiple non numerical Columns: \n{column_info}"
         )
 
 
