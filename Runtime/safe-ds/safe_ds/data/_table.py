@@ -353,6 +353,17 @@ class Table:
         """
         return self._data.shape[0]
 
+    def count_columns(self) -> int:
+        """
+        Returns the number of columns in the table
+
+        Returns
+        -------
+        count : int
+            Number of columns
+        """
+        return self._data.shape[1]
+
     def to_columns(self) -> list[Column]:
         """
         Returns a list of Columns from the current table.
