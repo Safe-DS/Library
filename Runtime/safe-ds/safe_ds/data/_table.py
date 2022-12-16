@@ -494,6 +494,22 @@ class Table:
         """
         return self.schema.has_column(column_name)
 
+    def list_columns_with_missing_values(self) -> list[Column]:
+        """
+        Returns a list of all the columns, that have at least one missing value or an empty list, if there are none.
+
+        Returns
+        -------
+        columns_with_missing_values: list[Column]
+            The list of columns with missing values
+        """
+        columns = self.to_columns()
+        columns_with_missing_values = []
+        for column in columns:
+            if column.has_missing_values():
+                columns_with_missing_values.append(column)
+        return columns_with_missing_values
+
     def list_columns_with_non_numerical_values(self) -> list[Column]:
         """
         Get a list of Columns only containing non-numerical values

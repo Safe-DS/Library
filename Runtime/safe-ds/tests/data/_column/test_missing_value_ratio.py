@@ -1,3 +1,4 @@
+import numpy as np
 import pandas as pd
 import pytest
 from safe_ds.data import Column
@@ -15,6 +16,6 @@ def test_missing_value_ratio(values: list, expected: float) -> None:
 
 
 def test_missing_value_ratio_empty() -> None:
-    column = Column(pd.Series(), "A")
+    column = Column(pd.Series([], dtype=np.dtype("float64")), "A")
     with pytest.raises(ColumnSizeError):
         column.missing_value_ratio()

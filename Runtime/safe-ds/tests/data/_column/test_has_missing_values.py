@@ -1,3 +1,4 @@
+import numpy as np
 import pandas as pd
 import pytest
 from safe_ds.data import Column
@@ -13,5 +14,8 @@ from safe_ds.data import Column
     ],
 )
 def test_has_missing_values(values: list, expected: bool) -> None:
-    column = Column(pd.Series(values), "A")
+    if len(values) == 0:
+        column = Column(pd.Series(values, dtype=np.dtype("float64")), "A")
+    else:
+        column = Column(pd.Series(values), "A")
     assert column.has_missing_values() == expected

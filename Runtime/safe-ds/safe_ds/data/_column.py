@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from numbers import Number
 from typing import Any, Callable
 
 import numpy as np
@@ -186,7 +187,10 @@ class Column:
         : bool
             True if missing values exist, False else
         """
-        return self.any(lambda value: value is None or np.isnan(value))
+        return self.any(
+            lambda value: value is None
+            or (isinstance(value, Number) and np.isnan(value))
+        )
 
     def stability(self) -> float:
         """
