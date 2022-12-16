@@ -1,17 +1,15 @@
-import numpy as np
 import pandas as pd
-from safe_ds.data import ColumnType, Row, StringColumnType, Table, TableSchema
+from safe_ds.data import IntColumnType, Row, StringColumnType, Table, TableSchema
 
 
 def test_to_rows() -> None:
     table = Table.from_csv("tests/resources/test_row_table.csv")
     expected_schema: TableSchema = TableSchema(
-        ["A", "B", "D"],
-        [
-            ColumnType.from_numpy_dtype(np.dtype("int64")),
-            ColumnType.from_numpy_dtype(np.dtype("int64")),
-            StringColumnType(),
-        ],
+        {
+            "A": IntColumnType(),
+            "B": IntColumnType(),
+            "D": StringColumnType(),
+        }
     )
     rows_expected: list[Row] = [
         Row(pd.Series([1, 4, "d"], index=["A", "B", "D"], name=0), expected_schema),

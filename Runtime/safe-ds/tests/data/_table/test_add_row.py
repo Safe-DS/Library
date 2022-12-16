@@ -18,6 +18,6 @@ def test_add_row_invalid() -> None:
         table1 = Table(pd.DataFrame(data={"col1": [1, 2, 1], "col2": [1, 2, 4]}))
         row = Row(
             pd.Series(data=[5, "Hallo"]),
-            TableSchema(["col1", "col2"], [IntColumnType(), StringColumnType()]),
+            TableSchema({"col1": IntColumnType(), "col2": StringColumnType()}),
         )
         table1 = table1.add_row(row)

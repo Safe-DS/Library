@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from collections import OrderedDict
 from dataclasses import dataclass
 
 import pandas as pd
@@ -15,19 +14,14 @@ class TableSchema:
 
     Parameters
     ----------
-    column_names: list[str]
-        Column names as an array
-    data_types: list[ColumnType]
-        Datatypes as an array using ColumnTypes
-
+    schema: dict[str, ColumnType]
+        Map from column names to data types
     """
 
-    _schema: OrderedDict
+    _schema: dict[str, ColumnType]
 
-    def __init__(self, column_names: list[str], data_types: list[ColumnType]):
-        self._schema = OrderedDict()
-        for column_name, data_type in zip(column_names, data_types):
-            self._schema[column_name] = data_type
+    def __init__(self, schema: dict[str, ColumnType]):
+        self._schema = dict(schema)  # Defensive copy
 
     def has_column(self, column_name: str) -> bool:
         """
@@ -81,6 +75,7 @@ class TableSchema:
         -------
         The index of the column
         """
+
         return list(self._schema.keys()).index(column_name)
 
     @staticmethod
@@ -99,12 +94,11 @@ class TableSchema:
             The constructed TableSchema
 
         """
-        return TableSchema(
-            column_names=dataframe.columns,
-            data_types=list(
-                map(ColumnType.from_numpy_dtype, dataframe.dtypes.to_list())
-            ),
-        )
+
+        names = dataframe.columns
+        types = (ColumnType.from_numpy_dtype(dtype) for dtype in dataframe.dtypes)
+
+        return TableSchema(dict(zip(names, types)))
 
     def __str__(self) -> str:
         """
