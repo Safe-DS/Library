@@ -1,19 +1,22 @@
 import numpy as np
 import pandas as pd
-from safe_ds.data import ColumnType, Row, Table, TableSchema
+from safe_ds.data import ColumnType, Row, StringColumnType, Table, TableSchema
 
 
 def test_to_rows() -> None:
-    table = Table.from_json("tests/resources/test_row_table.json")
+    table = Table.from_csv("tests/resources/test_row_table.csv")
     expected_schema: TableSchema = TableSchema(
-        ["A", "B"],
+        ["A", "B", "D"],
         [
             ColumnType.from_numpy_dtype(np.dtype("int64")),
             ColumnType.from_numpy_dtype(np.dtype("int64")),
+            StringColumnType(),
         ],
     )
     rows_expected: list[Row] = [
-        Row(pd.Series([1, 2], index=["A", "B"], name=0), expected_schema)
+        Row(pd.Series([1, 4, "d"], index=["A", "B", "D"], name=0), expected_schema),
+        Row(pd.Series([2, 5, "e"], index=["A", "B", "D"], name=0), expected_schema),
+        Row(pd.Series([3, 6, "f"], index=["A", "B", "D"], name=0), expected_schema),
     ]
 
     rows_is: list[Row] = table.to_rows()

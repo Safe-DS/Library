@@ -457,12 +457,38 @@ class Table:
         result[column.name] = column._data
         return Table(result)
 
+    def add_row(self, row: Row) -> Table:
+        """
+        Add a row to an existing table
+
+        Parameters
+        ----------
+        row: Row
+            the row you want to add
+
+        Returns
+        -------
+        table: Table
+            a new table with the added row at the end
+
+        """
+        if self.schema != row.schema:
+            raise SchemaMismatchError()
+        df = row._data.to_frame().T
+        df.columns = list(self.schema._schema.keys())
+        return Table(pd.concat([self._data, df], ignore_index=True))
+
     def __eq__(self, other: typing.Any) -> bool:
         if not isinstance(other, Table):
             return NotImplemented
         if self is other:
             return True
-        return self._data.equals(other._data)
+        return (
+            self._data.reset_index(drop=True, inplace=False).equals(
+                other._data.reset_index(drop=True, inplace=False)
+            )
+            and self.schema == other.schema
+        )
 
     def __hash__(self) -> int:
         return hash(self._data)
