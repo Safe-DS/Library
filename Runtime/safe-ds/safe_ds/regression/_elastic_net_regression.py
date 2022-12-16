@@ -1,18 +1,18 @@
 # noinspection PyProtectedMember
 import safe_ds._util._util_sklearn
 from safe_ds.data import SupervisedDataset, Table
-from sklearn.linear_model import LinearRegression as sk_LinearRegression
+from sklearn.linear_model import ElasticNet as sk_ElasticNet
 
 
 # noinspection PyProtectedMember
-class LinearRegression:
+class ElasticNetRegression:
     """
-    This class implements linear regression. It is used as a regression model.
+    This class implements elastic net regression. It is used as a regression model.
     It can only be trained on a supervised dataset.
     """
 
     def __init__(self) -> None:
-        self._regression = sk_LinearRegression(n_jobs=-1)
+        self._regression = sk_ElasticNet()
 
     def fit(self, supervised_dataset: SupervisedDataset) -> None:
         """

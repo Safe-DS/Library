@@ -1,1 +1,2 @@
+from ._elastic_net_regression import ElasticNetRegression
 from ._linear_regression import LinearRegression
