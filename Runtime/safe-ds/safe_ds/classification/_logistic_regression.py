@@ -11,7 +11,7 @@ class LogisticRegression:
     """
 
     def __init__(self) -> None:
-        self._clf = sk_LogisticRegression(n_jobs=-1)
+        self._classification = sk_LogisticRegression(n_jobs=-1)
 
     def fit(self, supervised_dataset: SupervisedDataset) -> None:
         """
@@ -27,7 +27,7 @@ class LogisticRegression:
         LearningError
             if the supervised dataset contains invalid values or if the training failed
         """
-        safe_ds._util._util_sklearn.fit(self._clf, supervised_dataset)
+        safe_ds._util._util_sklearn.fit(self._classification, supervised_dataset)
 
     def predict(self, dataset: Table) -> Table:
         """
@@ -48,4 +48,4 @@ class LogisticRegression:
         PredictionError
             if predicting with the given dataset failed
         """
-        return safe_ds._util._util_sklearn.predict(self._clf, dataset)
+        return safe_ds._util._util_sklearn.predict(self._classification, dataset)

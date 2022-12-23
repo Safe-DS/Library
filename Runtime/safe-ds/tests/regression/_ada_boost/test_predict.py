@@ -7,18 +7,18 @@ from safe_ds.regression import AdaBoost
 def test_ada_boost_predict() -> None:
     table = Table.from_csv("tests/resources/test_ada_boost.csv")
     supervised_dataset = SupervisedDataset(table, "T")
-    log_regression = AdaBoost()
-    log_regression.fit(supervised_dataset)
-    log_regression.predict(supervised_dataset.feature_vectors)
+    ada_boost = AdaBoost()
+    ada_boost.fit(supervised_dataset)
+    ada_boost.predict(supervised_dataset.feature_vectors)
     assert True  # This asserts that the predict method succeeds
 
 
 def test_ada_boost_predict_not_fitted() -> None:
     table = Table.from_csv("tests/resources/test_ada_boost.csv")
     supervised_dataset = SupervisedDataset(table, "T")
-    log_regression = AdaBoost()
+    ada_boost = AdaBoost()
     with pytest.raises(PredictionError):
-        log_regression.predict(supervised_dataset.feature_vectors)
+        ada_boost.predict(supervised_dataset.feature_vectors)
 
 
 def test_ada_boost_predict_invalid() -> None:
@@ -26,10 +26,10 @@ def test_ada_boost_predict_invalid() -> None:
     invalid_table = Table.from_csv("tests/resources/test_ada_boost_invalid.csv")
     supervised_dataset = SupervisedDataset(table, "T")
     invalid_supervised_dataset = SupervisedDataset(invalid_table, "T")
-    log_regression = AdaBoost()
-    log_regression.fit(supervised_dataset)
+    ada_boost = AdaBoost()
+    ada_boost.fit(supervised_dataset)
     with pytest.raises(PredictionError):
-        log_regression.predict(invalid_supervised_dataset.feature_vectors)
+        ada_boost.predict(invalid_supervised_dataset.feature_vectors)
 
 
 def test_ada_boost_predict_invalid_target_predictions() -> None:
@@ -37,7 +37,7 @@ def test_ada_boost_predict_invalid_target_predictions() -> None:
         "tests/resources/test_ada_boost_invalid_target_predictions.csv"
     )
     supervised_dataset = SupervisedDataset(table, "T")
-    log_regression = AdaBoost()
-    log_regression.fit(supervised_dataset)
+    ada_boost = AdaBoost()
+    ada_boost.fit(supervised_dataset)
     with pytest.raises(PredictionError):
-        log_regression.predict(supervised_dataset.feature_vectors)
+        ada_boost.predict(supervised_dataset.feature_vectors)

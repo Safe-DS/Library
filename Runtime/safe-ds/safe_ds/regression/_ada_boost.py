@@ -1,7 +1,7 @@
 # noinspection PyProtectedMember
 import safe_ds._util._util_sklearn
 from safe_ds.data import SupervisedDataset, Table
-from sklearn.ensemble import AdaBoostRegressor as sk_AdaBoost
+from sklearn.ensemble import AdaBoostRegressor as sk_AdaBoostRegressor
 
 
 # noinspection PyProtectedMember
@@ -12,7 +12,7 @@ class AdaBoost:
     """
 
     def __init__(self) -> None:
-        self._regression = sk_AdaBoost()
+        self._regression = sk_AdaBoostRegressor()
 
     def fit(self, supervised_dataset: SupervisedDataset) -> None:
         """
