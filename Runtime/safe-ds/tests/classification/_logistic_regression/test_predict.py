@@ -4,7 +4,7 @@ from safe_ds.data import SupervisedDataset, Table
 from safe_ds.exceptions import PredictionError
 
 
-def test_logistic_regression_predict():
+def test_logistic_regression_predict() -> None:
     table = Table.from_csv("tests/resources/test_logistic_regression.csv")
     supervised_dataset = SupervisedDataset(table, "T")
     log_regression = LogisticRegression()
@@ -13,7 +13,7 @@ def test_logistic_regression_predict():
     assert True  # This asserts that the predict method succeeds
 
 
-def test_logistic_regression_predict_not_fitted():
+def test_logistic_regression_predict_not_fitted() -> None:
     table = Table.from_csv("tests/resources/test_logistic_regression.csv")
     supervised_dataset = SupervisedDataset(table, "T")
     log_regression = LogisticRegression()
@@ -21,7 +21,7 @@ def test_logistic_regression_predict_not_fitted():
         log_regression.predict(supervised_dataset.feature_vectors)
 
 
-def test_logistic_regression_predict_invalid():
+def test_logistic_regression_predict_invalid() -> None:
     table = Table.from_csv("tests/resources/test_logistic_regression.csv")
     invalid_table = Table.from_csv(
         "tests/resources/test_logistic_regression_invalid.csv"
@@ -34,7 +34,7 @@ def test_logistic_regression_predict_invalid():
         log_regression.predict(invalid_supervised_dataset.feature_vectors)
 
 
-def test_logistic_regression_predict_invalid_target_predictions():
+def test_logistic_regression_predict_invalid_target_predictions() -> None:
     table = Table.from_csv(
         "tests/resources/test_logistic_regression_invalid_target_predictions.csv"
     )
