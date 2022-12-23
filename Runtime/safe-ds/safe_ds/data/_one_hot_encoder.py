@@ -88,7 +88,7 @@ class OneHotEncoder:
         Returns
         ----------
         table: Table
-            the resettet table
+            the reset table
         """
         try:
             data = self.encoder.inverse_transform(
