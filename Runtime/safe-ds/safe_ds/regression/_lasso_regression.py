@@ -1,7 +1,7 @@
 # noinspection PyProtectedMember
 import safe_ds._util._util_sklearn
 from safe_ds.data import SupervisedDataset, Table
-from sklearn.linear_model import Lasso as sk_LassoRegression
+from sklearn.linear_model import Lasso as sk_Lasso
 
 
 # noinspection PyProtectedMember
@@ -12,7 +12,7 @@ class LassoRegression:
     """
 
     def __init__(self) -> None:
-        self._regression = sk_LassoRegression()
+        self._regression = sk_Lasso()
 
     def fit(self, supervised_dataset: SupervisedDataset) -> None:
         """

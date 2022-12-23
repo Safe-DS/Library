@@ -7,14 +7,14 @@ from safe_ds.regression import RidgeRegression
 def test_ridge_regression_fit() -> None:
     table = Table.from_csv("tests/resources/test_ridge_regression.csv")
     supervised_dataset = SupervisedDataset(table, "T")
-    log_regression = RidgeRegression()
-    log_regression.fit(supervised_dataset)
+    ridge_regression = RidgeRegression()
+    ridge_regression.fit(supervised_dataset)
     assert True  # This asserts that the fit method succeeds
 
 
 def test_ridge_regression_fit_invalid() -> None:
     table = Table.from_csv("tests/resources/test_ridge_regression_invalid.csv")
     supervised_dataset = SupervisedDataset(table, "T")
-    log_regression = RidgeRegression()
+    ridge_regression = RidgeRegression()
     with pytest.raises(LearningError):
-        log_regression.fit(supervised_dataset)
+        ridge_regression.fit(supervised_dataset)
