@@ -1,17 +1,18 @@
 # noinspection PyProtectedMember
 import safe_ds._util._util_sklearn
 from safe_ds.data import SupervisedDataset, Table
-from sklearn.ensemble import RandomForestClassifier
+from sklearn.tree import DecisionTreeClassifier as sk_DecisionTreeClassifier
 
 
 # noinspection PyProtectedMember
-class RandomForest:
+class DecisionTree:
     """
-    This class implements the Random Forest classification. It can only be trained on a supervised dataset.
+    This class implements Decision Tree regression. It is used as a classifier model.
+    It can only be trained on a supervised dataset.
     """
 
     def __init__(self) -> None:
-        self._classification = RandomForestClassifier(n_jobs=-1)
+        self._classification = sk_DecisionTreeClassifier()
 
     def fit(self, supervised_dataset: SupervisedDataset) -> None:
         """
