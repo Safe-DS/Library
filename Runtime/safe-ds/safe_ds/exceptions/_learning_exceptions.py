@@ -28,3 +28,11 @@ class PredictionError(Exception):
             super().__init__("Error occurred while predicting")
         else:
             super().__init__(f"Error occurred while predicting: {reason}")
+
+
+class NotFittedError(Exception):
+    """
+    Exception raised when a model is used before fitting it."""
+
+    def __init__(self) -> None:
+        super().__init__("Model is not fitted, please fit it before using it")
