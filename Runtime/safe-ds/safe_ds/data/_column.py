@@ -95,6 +95,17 @@ class Column:
     def statistics(self) -> ColumnStatistics:
         return ColumnStatistics(self)
 
+    def count(self) -> int:
+        """
+        Returns the number of elements in the column
+
+        Returns
+        -------
+        count: int
+            the count
+        """
+        return len(self._data)
+
     def _count_missing_values(self) -> int:
         """
         Returns the number of null values in the column.
