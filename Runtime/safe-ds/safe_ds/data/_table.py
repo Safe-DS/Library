@@ -507,8 +507,7 @@ class Table:
         """
         if self.schema != row.schema:
             raise SchemaMismatchError()
-        df = row._data.to_frame().T
-        new_df = pd.concat([self._data, df], ignore_index=True)
+        new_df = self._data.append(row._data, ignore_index=True)
         new_df.columns = self.schema.get_column_names()
         return Table(new_df)
 
