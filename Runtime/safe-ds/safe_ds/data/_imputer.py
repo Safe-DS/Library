@@ -115,5 +115,5 @@ class Imputer:
             a dataset that is equal to the given dataset, with missing values imputed to the given strategy
         """
         self._imp.fit(table._data)
-        names = table._data.columns
+        names = table.schema.get_column_names()
         return Table(pd.DataFrame(self._imp.transform(table._data), columns=names))

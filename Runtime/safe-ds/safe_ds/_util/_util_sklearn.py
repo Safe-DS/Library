@@ -55,9 +55,11 @@ def predict(model: Any, dataset: Table) -> Table:
     PredictionError
         if predicting with the given dataset failed
     """
+    dataset_df = dataset._data
+    dataset_df.columns = dataset.schema.get_column_names()
     try:
-        predicted_target_vector = model.predict(dataset._data)
-        result_set = dataset._data.copy(deep=True)
+        predicted_target_vector = model.predict(dataset_df)
+        result_set = dataset_df.copy(deep=True)
         if "target_predictions" in result_set.columns:
             raise ValueError(
                 "Dataset already contains 'target_predictions' column. Please rename this column"

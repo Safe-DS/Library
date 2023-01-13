@@ -11,6 +11,7 @@ class Row:
     def __init__(self, data: typing.Iterable, schema: TableSchema):
         self._data: pd.Series = data if isinstance(data, pd.Series) else pd.Series(data)
         self.schema: TableSchema = schema
+        self._data = self._data.reset_index(drop=True)
 
     def __getitem__(self, column_name: str) -> Any:
         return self.get_value(column_name)
@@ -53,12 +54,7 @@ class Row:
             return NotImplemented
         if self is other:
             return True
-        return (
-            self._data.reset_index(drop=True, inplace=False).equals(
-                other._data.reset_index(drop=True, inplace=False)
-            )
-            and self.schema == other.schema
-        )
+        return self._data.equals(other._data) and self.schema == other.schema
 
     def __hash__(self) -> int:
         return hash(self._data)

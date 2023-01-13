@@ -28,6 +28,8 @@ class Table:
             data if isinstance(data, pd.DataFrame) else pd.DataFrame(data)
         )
         self.schema: TableSchema = TableSchema._from_dataframe(self._data)
+        self._data = self._data.reset_index(drop=True)
+        self._data.columns = list(range(self.count_columns()))
 
     def get_row(self, index: int) -> Row:
         """
@@ -139,6 +141,7 @@ class Table:
             row_array.append(row._data)
 
         dataframe: DataFrame = pd.DataFrame(row_array)
+        dataframe.columns = schema_compare.get_column_names()
         return Table(dataframe)
 
     @staticmethod
@@ -184,7 +187,9 @@ class Table:
         path_to_file : The path as String to the output file.
         """
         Path(os.path.dirname(path_to_file)).mkdir(parents=True, exist_ok=True)
-        self._data.to_json(path_to_file)
+        data_to_json = self._data.copy()
+        data_to_json.columns = self.schema.get_column_names()
+        data_to_json.to_json(path_to_file)
 
     def to_csv(self, path_to_file: str) -> None:
         """
@@ -196,7 +201,9 @@ class Table:
         path_to_file : The path as String to the output file.
         """
         Path(os.path.dirname(path_to_file)).mkdir(parents=True, exist_ok=True)
-        self._data.to_csv(path_to_file, index=False)
+        data_to_csv = self._data.copy()
+        data_to_csv.columns = self.schema.get_column_names()
+        data_to_csv.to_csv(path_to_file, index=False)
 
     def rename_column(self, old_name: str, new_name: str) -> Table:
         """Rename a single column by providing the previous name and the future name of it.
@@ -220,16 +227,16 @@ class Table:
         DuplicateColumnNameError
             If the specified new target column name already exists
         """
-        columns: list[str] = self._data.columns
-
-        if old_name not in columns:
+        if old_name not in self.schema.get_column_names():
             raise UnknownColumnNameError([old_name])
         if old_name == new_name:
             return self
-        if new_name in columns:
+        if new_name in self.schema.get_column_names():
             raise DuplicateColumnNameError(new_name)
 
-        return Table(self._data.rename(columns={old_name: new_name}))
+        new_df = self._data.copy()
+        new_df.columns = self.schema.get_column_names()
+        return Table(new_df.rename(columns={old_name: new_name}))
 
     def get_column(self, column_name: str) -> Column:
         """Returns a new instance of Column with the data of the described column of the Table.
@@ -249,8 +256,13 @@ class Table:
         UnknownColumnNameError
             If the specified target column name doesn't exist
         """
-        if column_name in self._data.columns:
-            return Column(self._data[column_name].copy(deep=True), column_name)
+        if self.schema.has_column(column_name):
+            return Column(
+                self._data.iloc[
+                    :, [self.schema._get_column_index_by_name(column_name)]
+                ].squeeze(),
+                column_name,
+            )
 
         raise UnknownColumnNameError([column_name])
 
@@ -273,12 +285,18 @@ class Table:
             If any of the given columns does not exist
         """
         invalid_columns = []
+        column_indices = []
         for name in column_names:
-            if name not in self._data.columns:
+            if not self.schema.has_column(name):
                 invalid_columns.append(name)
+            else:
+                column_indices.append(self.schema._get_column_index_by_name(name))
         if len(invalid_columns) != 0:
             raise UnknownColumnNameError(invalid_columns)
-        transformed_data = self._data.drop(labels=column_names, axis="columns")
+        transformed_data = self._data.drop(labels=column_indices, axis="columns")
+        transformed_data.columns = list(
+            name for name in self.schema.get_column_names() if name not in column_names
+        )
         return Table(transformed_data)
 
     def keep_columns(self, column_names: list[str]) -> Table:
@@ -300,12 +318,18 @@ class Table:
             If any of the given columns does not exist
         """
         invalid_columns = []
+        column_indices = []
         for name in column_names:
-            if name not in self._data.columns:
+            if not self.schema.has_column(name):
                 invalid_columns.append(name)
+            else:
+                column_indices.append(self.schema._get_column_index_by_name(name))
         if len(invalid_columns) != 0:
             raise UnknownColumnNameError(invalid_columns)
-        transformed_data = self._data[column_names]
+        transformed_data = self._data[column_indices]
+        transformed_data.columns = list(
+            name for name in self.schema.get_column_names() if name in column_names
+        )
         return Table(transformed_data)
 
     def to_rows(self) -> list[Row]:
@@ -337,7 +361,7 @@ class Table:
 
         rows: list[Row] = [row for row in self.to_rows() if query(row)]
         result_table: Table = self.from_rows(rows)
-        return Table(result_table._data.reset_index(drop=True))
+        return result_table
 
     def count_rows(self) -> int:
         """
@@ -370,7 +394,7 @@ class Table:
         columns : list[Columns]
             List of Columns objects
         """
-        return [self.get_column(name) for name in self._data.columns]
+        return [self.get_column(name) for name in self.schema.get_column_names()]
 
     def drop_duplicate_rows(self) -> Table:
         """
@@ -382,7 +406,9 @@ class Table:
             The table with the duplicate rows removed
 
         """
-        return Table(self._data.drop_duplicates(ignore_index=True))
+        df = self._data.drop_duplicates(ignore_index=True)
+        df.columns = self.schema.get_column_names()
+        return Table(df)
 
     def replace_column(self, old_column_name: str, new_column: Column) -> Table:
         """
@@ -412,21 +438,25 @@ class Table:
         ColumnSizeError
             If the size of the column does not match the amount of rows
         """
-        columns = self._data.columns
-
-        if old_column_name not in columns:
+        if old_column_name not in self.schema.get_column_names():
             raise UnknownColumnNameError([old_column_name])
 
-        if new_column.name in columns and new_column.name != old_column_name:
+        if (
+            new_column.name in self.schema.get_column_names()
+            and new_column.name != old_column_name
+        ):
             raise DuplicateColumnNameError(new_column.name)
 
         if self.count_rows() != new_column._data.size:
             raise ColumnSizeError(str(self.count_rows()), str(new_column._data.size))
 
         if old_column_name != new_column.name:
-            result = self.rename_column(old_column_name, new_column.name)._data
+            renamed_table = self.rename_column(old_column_name, new_column.name)
+            result = renamed_table._data
+            result.columns = renamed_table.schema.get_column_names()
         else:
             result = self._data.copy()
+            result.columns = self.schema.get_column_names()
 
         result[new_column.name] = new_column._data
         return Table(result)
@@ -449,13 +479,14 @@ class Table:
             If the size of the column does not match the amount of rows
 
         """
-        if column.name in self._data.columns:
+        if self.schema.has_column(column.name):
             raise DuplicateColumnNameError(column.name)
 
         if column._data.size != self.count_rows():
             raise ColumnSizeError(str(self.count_rows()), str(column._data.size))
 
         result = self._data.copy()
+        result.columns = self.schema.get_column_names()
         result[column.name] = column._data
         return Table(result)
 
@@ -477,8 +508,9 @@ class Table:
         if self.schema != row.schema:
             raise SchemaMismatchError()
         df = row._data.to_frame().T
-        df.columns = list(self.schema._schema.keys())
-        return Table(pd.concat([self._data, df], ignore_index=True))
+        new_df = pd.concat([self._data, df], ignore_index=True)
+        new_df.columns = self.schema.get_column_names()
+        return Table(new_df)
 
     def has_column(self, column_name: str) -> bool:
         """
@@ -532,12 +564,7 @@ class Table:
             return NotImplemented
         if self is other:
             return True
-        return (
-            self._data.reset_index(drop=True, inplace=False).equals(
-                other._data.reset_index(drop=True, inplace=False)
-            )
-            and self.schema == other.schema
-        )
+        return self._data.equals(other._data) and self.schema == other.schema
 
     def __hash__(self) -> int:
         return hash(self._data)
