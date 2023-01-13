@@ -4,6 +4,7 @@ import pandas as pd
 import pytest
 from safe_ds import plotting
 from safe_ds.data import Table
+from safe_ds.exceptions import NonNumericColumnError
 
 
 def test_plot_boxplot_complex() -> None:
@@ -13,7 +14,7 @@ def test_plot_boxplot_complex() -> None:
 
 
 def test_plot_boxplot_non_numeric() -> None:
-    with pytest.raises(TypeError):
+    with pytest.raises(NonNumericColumnError):
         table = Table(pd.DataFrame(data={"A": [1, 2, "A"]}))
         plotting.plot_boxplot(table.get_column("A"))
 
