@@ -1,7 +1,6 @@
 import pandas as pd
 import pytest
-from safe_ds.data import Table
-from safe_ds.data._one_hot_encoder import OneHotEncoder
+from safe_ds.data import OneHotEncoder, Table
 from safe_ds.exceptions import NotFittedError
 
 
