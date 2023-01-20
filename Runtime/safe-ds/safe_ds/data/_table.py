@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import functools
 import os.path
 import typing
 from pathlib import Path
@@ -225,7 +226,8 @@ class Table:
         data_to_csv.to_csv(path_to_file, index=False)
 
     def rename_column(self, old_name: str, new_name: str) -> Table:
-        """Rename a single column by providing the previous name and the future name of it.
+        """
+        Rename a single column by providing the previous name and the future name of it.
 
         Parameters
         ----------
@@ -258,7 +260,8 @@ class Table:
         return Table(new_df.rename(columns={old_name: new_name}))
 
     def get_column(self, column_name: str) -> Column:
-        """Returns a new instance of Column with the data of the described column of the Table.
+        """
+        Returns a new instance of column with the data of the described column of the table.
 
         Parameters
         ----------
@@ -286,7 +289,8 @@ class Table:
         raise UnknownColumnNameError([column_name])
 
     def drop_columns(self, column_names: list[str]) -> Table:
-        """Returns a Table without the given columns
+        """
+        Returns a table without the given columns
 
         Parameters
         ----------
@@ -319,7 +323,8 @@ class Table:
         return Table(transformed_data)
 
     def keep_columns(self, column_names: list[str]) -> Table:
-        """Returns a Table with exactly the given columns
+        """
+        Returns a table with exactly the given columns
 
         Parameters
         ----------
@@ -365,7 +370,8 @@ class Table:
         ]
 
     def filter_rows(self, query: Callable[[Row], bool]) -> Table:
-        """Returns a Table with rows filtered by applied lambda function
+        """
+        Returns a table with rows filtered by applied lambda function
 
         Parameters
         ----------
@@ -631,12 +637,44 @@ class Table:
                 cols.append(self.get_column(column_name))
         return cols
 
+    def sort_columns(
+        self,
+        query: Callable[[Column, Column], int] = lambda col1, col2: (
+            col1.name > col2.name
+        )
+        - (col1.name < col2.name),
+    ) -> Table:
+        """
+        Sort a table with the given lambda function.
+        If no function is given the columns will be sorted alphabetically.
+        This function uses the default python sort algorithm.
+        The query should return:
+            0, if both columns are equal
+            < 0, if the first column should be ordered after the second column
+            > 0, if the first column should be ordered before the second column
+
+        Parameters
+        ----------
+        query: a lambda function
+            a lambda function that is used to sort the columns
+
+        Returns
+        -------
+        new_table: Table
+            a new table with the sorted columns
+        """
+        columns = self.to_columns()
+        columns.sort(key=functools.cmp_to_key(query))
+        return Table.from_columns(columns)
+
     def __eq__(self, other: typing.Any) -> bool:
         if not isinstance(other, Table):
             return NotImplemented
         if self is other:
             return True
-        return self._data.equals(other._data) and self.schema == other.schema
+        table1 = self.sort_columns()
+        table2 = other.sort_columns()
+        return table1._data.equals(table2._data) and table1.schema == table2.schema
 
     def __hash__(self) -> int:
         return hash(self._data)
