@@ -3,7 +3,7 @@ from __future__ import annotations
 import os.path
 import typing
 from pathlib import Path
-from typing import Callable
+from typing import Callable, Union
 
 import pandas as pd
 from pandas import DataFrame, Series
@@ -490,6 +490,34 @@ class Table:
         result[column.name] = column._data
         return Table(result)
 
+    def add_columns(self, columns: Union[list[Column], Table]) -> Table:
+        """
+        Add multiple columns to a table
+
+        Parameters
+        ----------
+        columns: list[Column] or Table
+            the columns you want to add
+
+        Returns
+        -------
+        result: Table
+            A new table which combines the original table and the given columns
+        """
+        if isinstance(columns, Table):
+            columns = columns.to_columns()
+        result = self._data.copy()
+        result.columns = self.schema.get_column_names()
+        for column in columns:
+            if column.name in result.columns:
+                raise DuplicateColumnNameError(column.name)
+
+            if column._data.size != self.count_rows():
+                raise ColumnSizeError(str(self.count_rows()), str(column._data.size))
+
+            result[column.name] = column._data
+        return Table(result)
+
     def add_row(self, row: Row) -> Table:
         """
         Add a row to an existing table
@@ -507,9 +535,35 @@ class Table:
         """
         if self.schema != row.schema:
             raise SchemaMismatchError()
-        new_df = self._data.append(row._data, ignore_index=True)
+        new_df = pd.concat([self._data, row._data.to_frame().T]).infer_objects()
         new_df.columns = self.schema.get_column_names()
         return Table(new_df)
+
+    def add_rows(self, rows: Union[list[Row], Table]) -> Table:
+        """
+        Add multiple rows to a table
+
+        Parameters
+        ----------
+        rows: list[Row] or Table
+            the rows you want to add
+
+        Returns
+        -------
+        result: Table
+            A new table which combines the original table and the given rows
+        """
+        if isinstance(rows, Table):
+            rows = rows.to_rows()
+        result = self._data
+        for row in rows:
+            if self.schema != row.schema:
+                raise SchemaMismatchError()
+        result = pd.concat(
+            [result, *[row._data.to_frame().T for row in rows]]
+        ).infer_objects()
+        result.columns = self.schema.get_column_names()
+        return Table(result)
 
     def has_column(self, column_name: str) -> bool:
         """
