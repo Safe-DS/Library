@@ -701,3 +701,87 @@ class Table:
             result: Column = Column(pd.Series(items), name)
             return self.replace_column(name, result)
         raise UnknownColumnNameError([name])
+
+    def slice(
+        self,
+        start: typing.Optional[int] = None,
+        end: typing.Optional[int] = None,
+        step: int = 1,
+    ) -> Table:
+        """
+        slices the Table into a new Table
+
+        Parameters
+        ----------
+        start : int
+            first index of the range to be copied into a new table, None by default
+        end : int
+            last index of the range to be copied into a new table, None by default
+        step : int
+            the step size to be iterated through the table, 1 by default
+
+        Returns
+        -------
+        result : Table
+            the sliced Table
+
+        Raises
+        -------
+        ValueError
+            raises a ValueError if the index is out of bounds
+        """
+
+        if start is None:
+            start = 0
+
+        if end is None:
+            end = self.count_rows()
+
+        if (
+            start < 0
+            or end < 0
+            or start >= self.count_rows()
+            or end > self.count_rows()
+            or end < start
+        ):
+            raise ValueError("the given index is out of bounds")
+
+        new_df = self._data.iloc[start:end:step]
+        new_df.columns = self.schema.get_column_names()
+        return Table(new_df)
+
+    def split(self, percentage_in_first: float) -> typing.Tuple[Table, Table]:
+        """
+        splits the Table into two new Tables
+
+        Parameters
+        -------
+        percentage_in_first : float
+            the size of the first returned table in percentage to the given Table
+
+        Returns
+        -------
+        result: (Table, Table)
+            tuple of the splitted Tables
+
+
+        """
+        if percentage_in_first <= 0 or percentage_in_first >= 1:
+            raise ValueError("the given percentage is not in range")
+        return (
+            self.slice(0, round(percentage_in_first * self.count_rows())),
+            self.slice(round(percentage_in_first * self.count_rows())),
+        )
+
+    def shuffle(self) -> Table:
+        """
+        shuffles the table randomly
+        Returns
+        -------
+        result : Table
+            the shuffled Table
+
+        """
+        new_df = self._data.sample(frac=1.0)
+        new_df.columns = self.schema.get_column_names()
+        return Table(new_df)
