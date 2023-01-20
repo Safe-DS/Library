@@ -3,7 +3,7 @@ from __future__ import annotations
 import os.path
 import typing
 from pathlib import Path
-from typing import Callable, Union
+from typing import Callable, Optional, Union
 
 import pandas as pd
 from pandas import DataFrame, Series
@@ -12,6 +12,7 @@ from safe_ds.exceptions import (
     ColumnSizeError,
     DuplicateColumnNameError,
     IndexOutOfBoundsError,
+    MissingSchemaError,
     SchemaMismatchError,
     UnknownColumnNameError,
 )
@@ -23,11 +24,29 @@ from ._table_schema import TableSchema
 
 # noinspection PyProtectedMember
 class Table:
-    def __init__(self, data: typing.Iterable):
+    def __init__(self, data: typing.Iterable, schema: Optional[TableSchema] = None):
+        """
+        Create a new Table
+
+        Parameters
+        ----------
+        data: typing.Iterable
+            the data you want to save in the table
+        schema: TableSchema
+            the schema for the table
+            None by default, if None the schema will be provided by the data that is given
+            If a schema is set, there is no check if this schema is compatible with the data!
+        """
         self._data: pd.Dataframe = (
             data if isinstance(data, pd.DataFrame) else pd.DataFrame(data)
         )
-        self.schema: TableSchema = TableSchema._from_dataframe(self._data)
+        if schema is None:
+            if self.count_columns() == 0:
+                raise MissingSchemaError()
+            self.schema: TableSchema = TableSchema._from_dataframe(self._data)
+        else:
+            self.schema = schema
+
         self._data = self._data.reset_index(drop=True)
         self._data.columns = list(range(self.count_columns()))
 

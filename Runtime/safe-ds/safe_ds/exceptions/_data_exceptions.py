@@ -81,6 +81,15 @@ class SchemaMismatchError(Exception):
         super().__init__("Failed because at least two schemas didn't match.")
 
 
+class MissingSchemaError(Exception):
+    """
+    Exception raised when a required schema is missing.
+    """
+
+    def __init__(self) -> None:
+        super().__init__("Failed because a required schema is missing.")
+
+
 class ColumnLengthMismatchError(Exception):
     """
     Exception raised when the lengths of two or more columns don't match when they should.
