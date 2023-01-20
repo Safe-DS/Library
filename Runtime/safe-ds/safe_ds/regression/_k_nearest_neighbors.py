@@ -1,3 +1,5 @@
+from typing import Optional
+
 # noinspection PyProtectedMember
 import safe_ds._util._util_sklearn
 from safe_ds.data import SupervisedDataset, Table
@@ -17,6 +19,7 @@ class KNearestNeighbors:
 
     def __init__(self, n_neighbors: int) -> None:
         self._regression = KNeighborsRegressor(n_neighbors)
+        self.target_name = ""
 
     def fit(self, supervised_dataset: SupervisedDataset) -> None:
         """
@@ -32,9 +35,11 @@ class KNearestNeighbors:
         LearningError
             if the supervised dataset contains invalid values or if the training failed
         """
-        safe_ds._util._util_sklearn.fit(self._regression, supervised_dataset)
+        self.target_name = safe_ds._util._util_sklearn.fit(
+            self._regression, supervised_dataset
+        )
 
-    def predict(self, dataset: Table) -> Table:
+    def predict(self, dataset: Table, target_name: Optional[str] = None) -> Table:
         """
         Predict a target vector using a dataset containing feature vectors. The model has to be trained first
 
@@ -42,6 +47,8 @@ class KNearestNeighbors:
         ----------
         dataset: Table
             the dataset containing the feature vectors
+        target_name: Optional[str]
+            the name of the target vector, the name of the target column inferred from fit is used by default
 
         Returns
         -------
@@ -53,4 +60,8 @@ class KNearestNeighbors:
         PredictionError
             if predicting with the given dataset failed
         """
-        return safe_ds._util._util_sklearn.predict(self._regression, dataset)
+        return safe_ds._util._util_sklearn.predict(
+            self._regression,
+            dataset,
+            target_name if target_name is not None else self.target_name,
+        )

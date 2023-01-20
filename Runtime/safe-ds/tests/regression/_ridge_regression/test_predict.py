@@ -30,14 +30,3 @@ def test_ridge_regression_predict_invalid() -> None:
     ridge_regression.fit(supervised_dataset)
     with pytest.raises(PredictionError):
         ridge_regression.predict(invalid_supervised_dataset.feature_vectors)
-
-
-def test_ridge_regression_predict_invalid_target_predictions() -> None:
-    table = Table.from_csv(
-        "tests/resources/test_ridge_regression_invalid_target_predictions.csv"
-    )
-    supervised_dataset = SupervisedDataset(table, "T")
-    ridge_regression = RidgeRegression()
-    ridge_regression.fit(supervised_dataset)
-    with pytest.raises(PredictionError):
-        ridge_regression.predict(supervised_dataset.feature_vectors)

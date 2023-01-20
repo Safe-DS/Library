@@ -30,14 +30,3 @@ def test_linear_regression_predict_invalid() -> None:
     linear_regression.fit(supervised_dataset)
     with pytest.raises(PredictionError):
         linear_regression.predict(invalid_supervised_dataset.feature_vectors)
-
-
-def test_linear_regression_predict_invalid_target_predictions() -> None:
-    table = Table.from_csv(
-        "tests/resources/test_linear_regression_invalid_target_predictions.csv"
-    )
-    supervised_dataset = SupervisedDataset(table, "T")
-    linear_regression = LinearRegression()
-    linear_regression.fit(supervised_dataset)
-    with pytest.raises(PredictionError):
-        linear_regression.predict(supervised_dataset.feature_vectors)

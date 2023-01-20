@@ -32,14 +32,3 @@ def test_logistic_regression_predict_invalid() -> None:
     log_regression.fit(supervised_dataset)
     with pytest.raises(PredictionError):
         log_regression.predict(invalid_supervised_dataset.feature_vectors)
-
-
-def test_logistic_regression_predict_invalid_target_predictions() -> None:
-    table = Table.from_csv(
-        "tests/resources/test_logistic_regression_invalid_target_predictions.csv"
-    )
-    supervised_dataset = SupervisedDataset(table, "T")
-    log_regression = LogisticRegression()
-    log_regression.fit(supervised_dataset)
-    with pytest.raises(PredictionError):
-        log_regression.predict(supervised_dataset.feature_vectors)

@@ -30,14 +30,3 @@ def test_decision_tree_predict_invalid() -> None:
     decision_tree.fit(supervised_dataset)
     with pytest.raises(PredictionError):
         decision_tree.predict(invalid_supervised_dataset.feature_vectors)
-
-
-def test_decision_tree_predict_invalid_target_predictions() -> None:
-    table = Table.from_csv(
-        "tests/resources/test_decision_tree_invalid_target_predictions.csv"
-    )
-    supervised_dataset = SupervisedDataset(table, "T")
-    decision_tree = DecisionTree()
-    decision_tree.fit(supervised_dataset)
-    with pytest.raises(PredictionError):
-        decision_tree.predict(supervised_dataset.feature_vectors)

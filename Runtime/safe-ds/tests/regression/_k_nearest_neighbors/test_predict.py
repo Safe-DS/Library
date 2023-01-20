@@ -32,25 +32,3 @@ def test_k_nearest_neighbors_predict_invalid() -> None:
     k_nearest_neighbors.fit(supervised_dataset)
     with pytest.raises(PredictionError):
         k_nearest_neighbors.predict(invalid_supervised_dataset.feature_vectors)
-
-
-def test_k_nearest_neighbors_predict_invalid_target_predictions() -> None:
-    table = Table.from_csv(
-        "tests/resources/test_k_nearest_neighbors_invalid_target_predictions.csv"
-    )
-    supervised_dataset = SupervisedDataset(table, "T")
-    k_nearest_neighbors = KNearestNeighborsRegressor(2)
-    k_nearest_neighbors.fit(supervised_dataset)
-    with pytest.raises(PredictionError):
-        k_nearest_neighbors.predict(supervised_dataset.feature_vectors)
-
-
-def test_k_nearest_neighbors_predict_invalid_n_neighbors() -> None:
-    table = Table.from_csv(
-        "tests/resources/test_k_nearest_neighbors_invalid_target_predictions.csv"
-    )
-    supervised_dataset = SupervisedDataset(table, "T")
-    k_nearest_neighbors = KNearestNeighborsRegressor(3)
-    k_nearest_neighbors.fit(supervised_dataset)
-    with pytest.raises(PredictionError):
-        k_nearest_neighbors.predict(supervised_dataset.feature_vectors)

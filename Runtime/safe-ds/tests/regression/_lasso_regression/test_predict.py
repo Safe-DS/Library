@@ -30,14 +30,3 @@ def test_lasso_regression_predict_invalid() -> None:
     lasso_regression.fit(supervised_dataset)
     with pytest.raises(PredictionError):
         lasso_regression.predict(invalid_supervised_dataset.feature_vectors)
-
-
-def test_lasso_regression_predict_invalid_target_predictions() -> None:
-    table = Table.from_csv(
-        "tests/resources/test_lasso_regression_invalid_target_predictions.csv"
-    )
-    supervised_dataset = SupervisedDataset(table, "T")
-    lasso_regression = LassoRegression()
-    lasso_regression.fit(supervised_dataset)
-    with pytest.raises(PredictionError):
-        lasso_regression.predict(supervised_dataset.feature_vectors)

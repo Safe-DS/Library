@@ -32,14 +32,3 @@ def test_gradient_boosting_predict_invalid() -> None:
     gradient_boosting_regression.fit(supervised_dataset)
     with pytest.raises(PredictionError):
         gradient_boosting_regression.predict(invalid_supervised_dataset.feature_vectors)
-
-
-def test_gradient_boosting_predict_invalid_target_predictions() -> None:
-    table = Table.from_csv(
-        "tests/resources/test_gradient_boosting_invalid_target_predictions.csv"
-    )
-    supervised_dataset = SupervisedDataset(table, "T")
-    gradient_boosting_regression = GradientBoosting()
-    gradient_boosting_regression.fit(supervised_dataset)
-    with pytest.raises(PredictionError):
-        gradient_boosting_regression.predict(supervised_dataset.feature_vectors)

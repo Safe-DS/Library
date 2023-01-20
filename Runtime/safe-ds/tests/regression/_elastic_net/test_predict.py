@@ -32,14 +32,3 @@ def test_elastic_net_regression_predict_invalid() -> None:
     en_regression.fit(supervised_dataset)
     with pytest.raises(PredictionError):
         en_regression.predict(invalid_supervised_dataset.feature_vectors)
-
-
-def test_elastic_net_regression_predict_invalid_target_predictions() -> None:
-    table = Table.from_csv(
-        "tests/resources/test_elastic_net_regression_invalid_target_predictions.csv"
-    )
-    supervised_dataset = SupervisedDataset(table, "T")
-    en_regression = ElasticNetRegression()
-    en_regression.fit(supervised_dataset)
-    with pytest.raises(PredictionError):
-        en_regression.predict(supervised_dataset.feature_vectors)

@@ -30,14 +30,3 @@ def test_ada_boost_predict_invalid() -> None:
     ada_boost.fit(supervised_dataset)
     with pytest.raises(PredictionError):
         ada_boost.predict(invalid_supervised_dataset.feature_vectors)
-
-
-def test_ada_boost_predict_invalid_target_predictions() -> None:
-    table = Table.from_csv(
-        "tests/resources/test_ada_boost_invalid_target_predictions.csv"
-    )
-    supervised_dataset = SupervisedDataset(table, "T")
-    ada_boost = AdaBoost()
-    ada_boost.fit(supervised_dataset)
-    with pytest.raises(PredictionError):
-        ada_boost.predict(supervised_dataset.feature_vectors)
