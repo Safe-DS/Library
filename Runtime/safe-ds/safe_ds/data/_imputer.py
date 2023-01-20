@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import Any
+from typing import Any, Optional
 
 import pandas as pd
 from sklearn.impute import SimpleImputer
@@ -71,8 +71,9 @@ class Imputer:
     def __init__(self, strategy: ImputerStrategy):
         self._imp = SimpleImputer()
         strategy._augment_imputer(self._imp)
+        self.column_names: list[str] = []
 
-    def fit(self, table: Table) -> None:
+    def fit(self, table: Table, column_names: Optional[list[str]] = None) -> None:
         """
         Fit the imputer on the given dataset.
 
@@ -80,8 +81,17 @@ class Imputer:
         ----------
         table: Table
             the table to learn the new value to impute
+        column_names: Optional[list[str]]
+            if the imputer should only run on specific columns, these columns can be specified here
         """
-        self._imp.fit(table._data)
+        if column_names is None:
+            column_names = table.schema.get_column_names()
+
+        self.column_names = column_names
+        indices = [
+            table.schema._get_column_index_by_name(name) for name in self.column_names
+        ]
+        self._imp.fit(table._data[indices])
 
     def transform(self, table: Table) -> Table:
         """
@@ -97,10 +107,20 @@ class Imputer:
         table : Table
             a dataset that is equal to the given dataset, with missing values imputed to the given strategy
         """
-        names = table._data.columns
-        return Table(pd.DataFrame(self._imp.transform(table._data), columns=names))
+        data = table._data.copy()
+        indices = [
+            table.schema._get_column_index_by_name(name) for name in self.column_names
+        ]
+        data[indices] = pd.DataFrame(
+            self._imp.transform(data[indices]), columns=indices
+        )
+        table_imputed = Table(data)
+        table_imputed.schema = table.schema
+        return table_imputed
 
-    def fit_transform(self, table: Table) -> Table:
+    def fit_transform(
+        self, table: Table, column_names: Optional[list[str]] = None
+    ) -> Table:
         """
         Fit the imputer on the given dataset and impute the missing values
 
@@ -108,12 +128,13 @@ class Imputer:
         ----------
         table: Table
             the dataset to learn the new value to impute and to actually impute
+        column_names: Optional[list[str]]
+            if the imputer should only run on specific columns, these columns can be specified here
 
         Returns
         -------
         table : Table
             a dataset that is equal to the given dataset, with missing values imputed to the given strategy
         """
-        self._imp.fit(table._data)
-        names = table.schema.get_column_names()
-        return Table(pd.DataFrame(self._imp.transform(table._data), columns=names))
+        self.fit(table, column_names)
+        return self.transform(table)
