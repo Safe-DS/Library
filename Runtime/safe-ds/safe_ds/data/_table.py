@@ -6,6 +6,7 @@ import typing
 from pathlib import Path
 from typing import Callable, Optional, Union
 
+import numpy as np
 import pandas as pd
 from IPython.core.display_functions import DisplayHandle, display
 from pandas import DataFrame, Series
@@ -19,6 +20,7 @@ from safe_ds.exceptions import (
     SchemaMismatchError,
     UnknownColumnNameError,
 )
+from scipy import stats
 
 from ._column import Column
 from ._column_type import ColumnType
@@ -641,6 +643,21 @@ class Table:
                 cols.append(self.get_column(column_name))
         return cols
 
+    def list_columns_with_numerical_values(self) -> list[Column]:
+        """
+        Get a list of columns only containing numerical values
+
+        Returns
+        -------
+        cols: list[Column]
+            the list with only numerical columns
+        """
+        cols = []
+        for column_name, data_type in self.schema._schema.items():
+            if data_type.is_numeric():
+                cols.append(self.get_column(column_name))
+        return cols
+
     def get_column_names(self) -> list[str]:
         """
         Alias for self.schema.get_column_names() -> list[str].
@@ -704,6 +721,42 @@ class Table:
         columns = self.to_columns()
         columns.sort(key=functools.cmp_to_key(query))
         return Table.from_columns(columns)
+
+    def remove_outliers(self) -> Table:
+        """
+        Removes all rows from the table that contain at least one outlier defined as having a value that has a distance of
+        more than 3 standard deviations from the column average.
+
+        Returns
+        -------
+        new_table: Table
+            a new table where the outliers have been removed
+        """
+        result = self._data.copy(deep=True)
+
+        table_without_nonnumericals = Table.from_columns(
+            self.list_columns_with_numerical_values()
+        )
+
+        result = result[
+            (np.absolute(stats.zscore(table_without_nonnumericals._data)) < 3).all(
+                axis=1
+            )
+        ]
+
+        return Table(result)
+
+    def __eq__(self, other: typing.Any) -> bool:
+        if not isinstance(other, Table):
+            return NotImplemented
+        if self is other:
+            return True
+        table1 = self.sort_columns()
+        table2 = other.sort_columns()
+        return table1._data.equals(table2._data) and table1.schema == table2.schema
+
+    def __hash__(self) -> int:
+        return hash(self._data)
 
     def transform_column(
         self, name: str, transformer: Callable[[Row], typing.Any]
@@ -770,18 +823,6 @@ class Table:
         result.columns = [""] + self.get_column_names()
 
         return Table(result)
-
-    def __eq__(self, other: typing.Any) -> bool:
-        if not isinstance(other, Table):
-            return NotImplemented
-        if self is other:
-            return True
-        table1 = self.sort_columns()
-        table2 = other.sort_columns()
-        return table1._data.equals(table2._data) and table1.schema == table2.schema
-
-    def __hash__(self) -> int:
-        return hash(self._data)
 
     def __repr__(self) -> str:
         tmp = self._data.copy(deep=True)
