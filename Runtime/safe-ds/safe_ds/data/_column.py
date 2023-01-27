@@ -6,6 +6,7 @@ from typing import Any, Callable
 
 import numpy as np
 import pandas as pd
+from IPython.core.display_functions import DisplayHandle, display
 from safe_ds.exceptions import (
     ColumnLengthMismatchError,
     ColumnSizeError,
@@ -72,24 +73,6 @@ class Column:
             raise IndexOutOfBoundsError(index)
 
         return self._data[index]
-
-    def idness(self) -> float:
-        """
-        Calculates the idness of this column (number of unique values / number of rows).
-
-        Returns
-        -------
-        idness: float
-            The idness of the column
-
-        Raises
-        ------
-        ColumnSizeError
-            If this column is empty
-        """
-        if self._data.size == 0:
-            raise ColumnSizeError("> 0", "0")
-        return self._data.nunique() / self._data.size
 
     @property
     def statistics(self) -> ColumnStatistics:
@@ -204,25 +187,6 @@ class Column:
             or (isinstance(value, Number) and np.isnan(value))
         )
 
-    def stability(self) -> float:
-        """
-        Calculates the stability of this column.
-        The value is calculated as the ratio between the number of mode values and the number of non-null-values.
-
-        Returns
-        -------
-        stability: float
-            Stability of this column
-
-        Raises
-        ------
-        ColumnSizeError
-            If this column is empty
-        """
-        if self._data.size == 0:
-            raise ColumnSizeError("> 0", "0")
-        return self._data.value_counts()[self.statistics.mode()] / self._data.count()
-
     def correlation_with(self, other_column: Column) -> float:
         """
         Calculates Pearson correlation between this and another column, if both are numerical
@@ -270,6 +234,33 @@ class Column:
     def __hash__(self) -> int:
         return hash(self._data)
 
+    def __str__(self) -> str:
+        tmp = self._data.to_frame()
+        tmp.columns = [self.name]
+        return tmp.__str__()
+
+    def __repr__(self) -> str:
+        tmp = self._data.to_frame()
+        tmp.columns = [self.name]
+        return tmp.__repr__()
+
+    def _ipython_display_(self) -> DisplayHandle:
+        """
+        Returns a pretty display object for the Column to be used in Jupyter Notebooks
+
+        Returns
+        -------
+        output: DisplayHandle
+            Output object
+        """
+        tmp = self._data.to_frame()
+        tmp.columns = [self.name]
+
+        with pd.option_context(
+            "display.max_rows", tmp.shape[0], "display.max_columns", tmp.shape[1]
+        ):
+            return display(tmp)
+
 
 class ColumnStatistics:
     def __init__(self, column: Column):
@@ -286,11 +277,13 @@ class ColumnStatistics:
 
         Raises
         ------
-        TypeError
+        NonNumericColumnError
             If the data contains non-numerical data.
         """
         if not self.column._type.is_numeric():
-            raise TypeError("The column contains non numerical data.")
+            raise NonNumericColumnError(
+                f"{self.column.name} is of type {self.column._type}."
+            )
         return self.column._data.max()
 
     def min(self) -> float:
@@ -304,11 +297,13 @@ class ColumnStatistics:
 
         Raises
         ------
-        TypeError
+        NonNumericColumnError
             If the data contains non-numerical data.
         """
         if not self.column._type.is_numeric():
-            raise TypeError("The column contains non numerical data.")
+            raise NonNumericColumnError(
+                f"{self.column.name} is of type {self.column._type}."
+            )
         return self.column._data.min()
 
     def mean(self) -> float:
@@ -322,11 +317,13 @@ class ColumnStatistics:
 
         Raises
         ------
-        TypeError
+        NonNumericColumnError
             If the data contains non-numerical data.
         """
         if not self.column._type.is_numeric():
-            raise TypeError("The column contains non numerical data.")
+            raise NonNumericColumnError(
+                f"{self.column.name} is of type {self.column._type}."
+            )
         return self.column._data.mean()
 
     def mode(self) -> Any:
@@ -351,11 +348,13 @@ class ColumnStatistics:
 
         Raises
         ------
-        TypeError
+        NonNumericColumnError
             If the data contains non-numerical data.
         """
         if not self.column._type.is_numeric():
-            raise TypeError("The column contains non numerical data.")
+            raise NonNumericColumnError(
+                f"{self.column.name} is of type {self.column._type}."
+            )
         return self.column._data.median()
 
     def sum(self) -> float:
@@ -369,7 +368,7 @@ class ColumnStatistics:
 
         Raises
         ---
-        NonNumericalColumnError
+        NonNumericColumnError
             If the data is non numerical
 
         """
@@ -391,7 +390,7 @@ class ColumnStatistics:
 
         Raises
         ---
-        NonNumericalColumnError
+        NonNumericColumnError
             If the data is non numerical
 
         """
@@ -414,7 +413,7 @@ class ColumnStatistics:
 
         Raises
         ---
-        NonNumericalColumnError
+        NonNumericColumnError
             If the data is non numerical
 
         """
@@ -423,3 +422,43 @@ class ColumnStatistics:
                 f"{self.column.name} is of type {self.column._type}."
             )
         return self.column._data.std()
+
+    def stability(self) -> float:
+        """
+        Calculates the stability of this column.
+        The value is calculated as the ratio between the number of mode values and the number of non-null-values.
+
+        Returns
+        -------
+        stability: float
+            Stability of this column
+
+        Raises
+        ------
+        ColumnSizeError
+            If this column is empty
+        """
+        if self.column._data.size == 0:
+            raise ColumnSizeError("> 0", "0")
+        return (
+            self.column._data.value_counts()[self.column.statistics.mode()]
+            / self.column._data.count()
+        )
+
+    def idness(self) -> float:
+        """
+        Calculates the idness of this column (number of unique values / number of rows).
+
+        Returns
+        -------
+        idness: float
+            The idness of the column
+
+        Raises
+        ------
+        ColumnSizeError
+            If this column is empty
+        """
+        if self.column._data.size == 0:
+            raise ColumnSizeError("> 0", "0")
+        return self.column._data.nunique() / self.column._data.size

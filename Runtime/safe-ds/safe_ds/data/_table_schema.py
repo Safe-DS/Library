@@ -123,5 +123,8 @@ class TableSchema:
         column_count = len(self._schema)
         output_string = f"TableSchema:\nColumn Count: {column_count}\nColumns:\n"
         for column_name, data_type in self._schema.items():
-            output_string += f"    {column_name}, {data_type}\n"
+            output_string += f"    {column_name}: {data_type}\n"
         return output_string
+
+    def __repr__(self) -> str:
+        return self.__str__()

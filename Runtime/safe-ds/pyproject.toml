@@ -10,6 +10,7 @@ python = "^3.10"
 pandas = "^1.5.3"
 scikit-learn = "^1.2.0"
 seaborn = "^0.12.2"
+ipython = "^8.8.0"
 matplotlib = "^3.6.3"
 
 [tool.poetry.dev-dependencies]

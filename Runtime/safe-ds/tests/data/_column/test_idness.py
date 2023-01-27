@@ -10,11 +10,11 @@ from safe_ds.exceptions import ColumnSizeError
 )
 def test_idness_valid(values: list[str], result: float) -> None:
     column: Column = Column(pd.Series(values), "test_idness_valid")
-    idness = column.idness()
+    idness = column.statistics.idness()
     assert idness == result
 
 
 def test_idness_invalid() -> None:
     column = Column(pd.Series([], dtype=int), "test_idness_invalid")
     with pytest.raises(ColumnSizeError):
-        column.idness()
+        column.statistics.idness()

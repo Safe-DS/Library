@@ -1,10 +1,11 @@
 import pandas as pd
 import pytest
 from safe_ds.data import Table
+from safe_ds.exceptions import NonNumericColumnError
 
 
 def test_median_invalid() -> None:
-    with pytest.raises(TypeError):
+    with pytest.raises(NonNumericColumnError):
         table = Table(pd.DataFrame(data={"col1": ["col1_1", 2]}))
         column = table.get_column("col1")
         column.statistics.median()

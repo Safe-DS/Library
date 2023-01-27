@@ -15,14 +15,14 @@ from safe_ds.exceptions import ColumnSizeError
         (["b", "a", "abc", "abc", "abc"], 3 / 5),
     ],
 )
-def test_table_stability(values: list[typing.Any], expected: float) -> None:
+def test_stability(values: list[typing.Any], expected: float) -> None:
     column = Column(pd.Series(values), "A")
-    assert column.stability() == expected
+    assert column.statistics.stability() == expected
 
 
-def test_table_error() -> None:
+def test_stability_error() -> None:
     column = Column(
         pd.Series([], dtype=np.dtype("float64")), "A"
     )  # Fix warning against unknown type
     with pytest.raises(ColumnSizeError):
-        column.stability()
+        column.statistics.stability()
