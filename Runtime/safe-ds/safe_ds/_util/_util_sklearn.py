@@ -13,19 +13,19 @@ def fit(model: Any, supervised_dataset: SupervisedDataset) -> str:
     Parameters
     ----------
     model
-        Classifier or Regression from scikit-learn
-    supervised_dataset: SupervisedDataset
-        the supervised dataset containing the feature and target vectors
+        Classifier or Regression from scikit-learn.
+    supervised_dataset : SupervisedDataset
+        The supervised dataset containing the feature and target vectors.
 
     Returns
     -------
-    target_name: str
-        The target column name, inferred from the supervised dataset
+    target_name : str
+        The target column name, inferred from the supervised dataset.
 
     Raises
     ------
     LearningError
-        if the supervised dataset contains invalid values or if the training failed
+        If the supervised dataset contains invalid values or if the training failed.
     """
     try:
         model.fit(
@@ -42,26 +42,26 @@ def fit(model: Any, supervised_dataset: SupervisedDataset) -> str:
 # noinspection PyProtectedMember
 def predict(model: Any, dataset: Table, target_name: str) -> Table:
     """
-    Predict a target vector using a dataset containing feature vectors. The model has to be trained first
+    Predict a target vector using a dataset containing feature vectors. The model has to be trained first.
 
     Parameters
     ----------
     model
-        Classifier or Regression from scikit-learn
-    dataset: Table
-        the dataset containing the feature vectors
-    target_name: str
-        the name of the target vector, the name of the target column inferred from fit is used by default
+        Classifier or Regression from scikit-learn.
+    dataset : Table
+        The dataset containing the feature vectors.
+    target_name : str
+        The name of the target vector, the name of the target column inferred from fit is used by default.
 
     Returns
     -------
     table : Table
-        a dataset containing the given feature vectors and the predicted target vector
+        A dataset containing the given feature vectors and the predicted target vector.
 
     Raises
     ------
     PredictionError
-        if predicting with the given dataset failed
+        If predicting with the given dataset failed.
     """
     dataset_df = dataset._data
     dataset_df.columns = dataset.schema.get_column_names()

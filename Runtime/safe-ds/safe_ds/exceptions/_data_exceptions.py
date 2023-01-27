@@ -4,8 +4,8 @@ class UnknownColumnNameError(Exception):
 
     Parameters
     ----------
-    column_names: list[str]
-        Name of the column that was tried to be accessed
+    column_names : list[str]
+        The name of the column that was tried to be accessed.
     """
 
     def __init__(self, column_names: list[str]):
@@ -15,8 +15,6 @@ class UnknownColumnNameError(Exception):
 class NonNumericColumnError(Exception):
     """
     Exception raised for trying to do numerical operations on a non-numerical column.
-
-
     """
 
     def __init__(self, column_info: str) -> None:
@@ -27,12 +25,12 @@ class NonNumericColumnError(Exception):
 
 class DuplicateColumnNameError(Exception):
     """
-    Exception raised for trying to modify a table, resulting in a duplicate column name.
+    Exception raised for trying to modify a table resulting in a duplicate column name.
 
     Parameters
     ----------
-    column_name: str
-        Name of the column that resulted in a duplicate
+    column_name : str
+        The name of the column that resulted in a duplicate.
     """
 
     def __init__(self, column_name: str):
@@ -45,8 +43,8 @@ class IndexOutOfBoundsError(Exception):
 
     Parameters
     ----------
-    index: int
-        Wrongly used index
+    index : int
+        The wrongly used index.
     """
 
     def __init__(self, index: int):
@@ -55,15 +53,15 @@ class IndexOutOfBoundsError(Exception):
 
 class ColumnSizeError(Exception):
     """
-    Exception raised for trying to use a single column of unsupported size.
+    Exception raised for trying to use a column of unsupported size.
 
     Parameters
     ----------
-    expected_size: str
-        The expected size of the column as an expression (e.g. 2, >0, !=0)
+    expected_size : str
+        The expected size of the column as an expression (e.g. 2, >0, !=0).
 
-    actual_size: str
-        The actual size of the column as an expression (e.g. 2, >0, !=0)
+    actual_size : str
+        The actual size of the column as an expression (e.g. 2, >0, !=0).
     """
 
     def __init__(self, expected_size: str, actual_size: str):
@@ -74,7 +72,7 @@ class ColumnSizeError(Exception):
 
 class SchemaMismatchError(Exception):
     """
-    Exception raised when schemas aren't equal.
+    Exception raised when schemas are unequal.
     """
 
     def __init__(self) -> None:
@@ -92,7 +90,7 @@ class MissingSchemaError(Exception):
 
 class ColumnLengthMismatchError(Exception):
     """
-    Exception raised when the lengths of two or more columns don't match when they should.
+    Exception raised when the lengths of two or more columns do not match.
     """
 
     def __init__(self, column_info: str):

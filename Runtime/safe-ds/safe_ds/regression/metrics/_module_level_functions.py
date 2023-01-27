@@ -10,15 +10,15 @@ def mean_squared_error(actual: Column, expected: Column) -> float:
 
     Parameters
     ----------
-    actual: Column
-        Estimated values column
-    expected: Column
-        Ground truth column
+    actual : Column
+        The column containing estimated values.
+    expected : Column
+        The column containing ground truth.
 
     Returns
     -------
-    mean_squared_error: float
-        The calculated mean squared error. The average of the distance of each individual row squared.
+    mean_squared_error : float
+        The calculated mean squared error (the average of the distance of each individual row squared).
     """
     _check_metrics_preconditions(actual, expected)
     return mean_squared_error_sklearn(expected._data.tolist(), actual._data.tolist())
@@ -31,14 +31,13 @@ def mean_absolute_error(actual: Column, expected: Column) -> float:
     Parameters
     ----------
     actual: Column
-        Estimated values column
+        The column containing estimated values.
     expected: Column
-        Ground truth column
-
+        The column containing ground truth.
     Returns
     -------
-    mean_absolute_error: float
-        The calculated mean absolute error. The average of the distance of each individual row.
+    mean_absolute_error : float
+        The calculated mean absolute error (the average of the distance of each individual row).
     """
     _check_metrics_preconditions(actual, expected)
     return mean_absolute_error_sklearn(expected._data.tolist(), actual._data.tolist())

@@ -10,12 +10,13 @@ from ._column_type import ColumnType
 
 @dataclass
 class TableSchema:
-    """Stores column names and corresponding data types for a table
+    """
+    Store column names and corresponding data types for a table.
 
     Parameters
     ----------
-    schema: dict[str, ColumnType]
-        Map from column names to data types
+    schema : dict[str, ColumnType]
+        Map from column names to data types.
     """
 
     _schema: dict[str, ColumnType]
@@ -25,38 +26,38 @@ class TableSchema:
 
     def has_column(self, column_name: str) -> bool:
         """
-        Returns if the schema contains a given column
+        Return whether the schema contains a given column.
 
         Parameters
         ----------
         column_name : str
-            The name of the column you want to look for
+            The name of the column.
 
         Returns
         -------
-        contains: bool
-            If it contains the column
+        contains : bool
+            True if the schema contains the column.
         """
         return column_name in self._schema
 
     def get_type_of_column(self, column_name: str) -> ColumnType:
         """
-        Returns the type of the given column
+        Return the type of the given column.
 
         Parameters
         ----------
         column_name : str
-            The name of the column you want the type of
+            The name of the column.
 
         Returns
         -------
-        type: ColumnType
-            The type of the column
+        type : ColumnType
+            The type of the column.
 
         Raises
         ------
         ColumnNameError
-            If the specified target column name doesn't exist
+            If the specified target column name does not exist.
         """
         if not self.has_column(column_name):
             raise UnknownColumnNameError([column_name])
@@ -64,16 +65,17 @@ class TableSchema:
 
     def _get_column_index_by_name(self, column_name: str) -> int:
         """
-        Returns the index of the column with the given column_name
+         Return the index of the column with specified column name.
 
-        Parameters
-        ----------
-        column_name: str
-            The column_name you want the index for
+         Parameters
+         ----------
+         column_name : str
+             The name of the column.
 
-        Returns
-        -------
-        The index of the column
+         Returns
+         -------
+        index : int
+             The index of the column.
         """
 
         return list(self._schema.keys()).index(column_name)
@@ -81,17 +83,17 @@ class TableSchema:
     @staticmethod
     def _from_dataframe(dataframe: pd.DataFrame) -> TableSchema:
         """
-        Constructs a TableSchema from a Dataframe. This function is not supposed to be exposed to the user.
+        Construct a TableSchema from a Dataframe. This function is not supposed to be exposed to the user.
 
         Parameters
         ----------
-        dataframe: pd.Dataframe
-            The Dataframe to construct the TableSchema from.
+        dataframe : pd.Dataframe
+            The Dataframe used to construct the TableSchema.
 
         Returns
         -------
         _from_dataframe: TableSchema
-            The constructed TableSchema
+            The constructed TableSchema.
 
         """
 
@@ -102,23 +104,23 @@ class TableSchema:
 
     def get_column_names(self) -> list[str]:
         """
-        Returns a list of all column names saved in this schema
+        Return a list of all column names saved in this schema.
 
         Returns
         -------
-        column_names: list[str]
-            the column names
+        column_names : list[str]
+            The column names.
         """
         return list(self._schema.keys())
 
     def __str__(self) -> str:
         """
-        Returns a pretty print String for the TableSchema
+        Return a print-string for the TableSchema.
 
         Returns
         -------
-        output_string: str
-            the pretty String
+        output_string : str
+            The string.
         """
         column_count = len(self._schema)
         output_string = f"TableSchema:\nColumn Count: {column_count}\nColumns:\n"

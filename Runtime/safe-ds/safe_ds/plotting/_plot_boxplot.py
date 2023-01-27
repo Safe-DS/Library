@@ -6,17 +6,17 @@ from safe_ds.exceptions import NonNumericColumnError
 
 def plot_boxplot(column: Column) -> None:
     """
-    Plot a column in a boxplot. This function can only plot real numerical data
+    Plot a column in a boxplot. This function can only plot real numerical data.
 
     Parameters
     ----------
     column : Column
-                The column you want to plot
+        The column to be plotted.
 
     Raises
     -------
     TypeError
-        if the column contains non-numerical data or complex data
+        If the column contains non-numerical data or complex data.
     """
     # noinspection PyProtectedMember
     for data in column._data:

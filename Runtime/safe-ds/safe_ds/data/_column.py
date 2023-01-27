@@ -26,24 +26,24 @@ class Column:
     @property
     def name(self) -> str:
         """
-        Get the name of the Column
+        Return the name of the column.
 
         Returns
         -------
-        name: str
-            The name of the column
+        name : str
+            The name of the column.
         """
         return self._name
 
     @property
     def type(self) -> ColumnType:
         """
-        Get the type of the Column
+        Return the type of the column.
 
         Returns
         -------
-        type: ColumnType
-            The type of the column
+        type : ColumnType
+            The type of the column.
         """
         return self._type
 
@@ -52,12 +52,12 @@ class Column:
 
     def get_value(self, index: int) -> Any:
         """
-        Returns column value at specified index, starting at 0.
+        Return column value at specified index, starting at 0.
 
         Parameters
         ----------
         index : int
-            Index of requested element as integer.
+            Index of requested element.
 
         Returns
         -------
@@ -80,39 +80,39 @@ class Column:
 
     def count(self) -> int:
         """
-        Returns the number of elements in the column
+        Return the number of elements in the column.
 
         Returns
         -------
-        count: int
-            the count
+        count : int
+            The number of elements.
         """
         return len(self._data)
 
     def _count_missing_values(self) -> int:
         """
-        Returns the number of null values in the column.
+        Return the number of null values in the column.
 
         Returns
         -------
         count : int
-            Number of null values
+            The number of null values.
         """
         return self._data.isna().sum()
 
     def all(self, predicate: Callable[[Any], bool]) -> bool:
         """
-        Checks if all values have a given property
+        Check if all values have a given property.
 
         Parameters
         ----------
-        predicate: Callable[[Any], bool])
-            Callable that is used to find matches
+        predicate : Callable[[Any], bool])
+            Callable that is used to find matches.
 
         Returns
         -------
-        result: bool
-            True if all match
+        result : bool
+            True if all match.
 
         """
         for value in self._data:
@@ -122,17 +122,17 @@ class Column:
 
     def any(self, predicate: Callable[[Any], bool]) -> bool:
         """
-        Checks if any value has a given property
+        Check if any value has a given property.
 
         Parameters
         ----------
-        predicate: Callable[[Any], bool])
-            Callable that is used to find matches
+        predicate : Callable[[Any], bool])
+            Callable that is used to find matches.
 
         Returns
         -------
-        result: bool
-            True if any match
+        result : bool
+            True if any match.
 
         """
         for value in self._data:
@@ -142,17 +142,17 @@ class Column:
 
     def none(self, predicate: Callable[[Any], bool]) -> bool:
         """
-        Checks if no values has a given property
+        Check if no values has a given property.
 
         Parameters
         ----------
-        predicate: Callable[[Any], bool])
-            Callable that is used to find matches
+        predicate : Callable[[Any], bool])
+            Callable that is used to find matches.
 
         Returns
         -------
-        result: bool
-            True if none match
+        result : bool
+            True if none match.
 
         """
         for value in self._data:
@@ -162,12 +162,12 @@ class Column:
 
     def missing_value_ratio(self) -> float:
         """
-        Returns the ratio of null values to the total number of elements in the column
+        Return the ratio of null values to the total number of elements in the column
 
         Returns
         -------
-        ratio: float
-            the ratio of null values to the total number of elements in the column
+        ratio : float
+            The ratio of null values to the total number of elements in the column.
         """
         if self._data.size == 0:
             raise ColumnSizeError("> 0", "0")
@@ -175,12 +175,12 @@ class Column:
 
     def has_missing_values(self) -> bool:
         """
-        Returns True if the column has missing values
+        Return whether the column has missing values.
 
         Returns
         -------
-        : bool
-            True if missing values exist, False else
+        missing_values_exist : bool
+            True if missing values exist.
         """
         return self.any(
             lambda value: value is None
@@ -189,17 +189,17 @@ class Column:
 
     def correlation_with(self, other_column: Column) -> float:
         """
-        Calculates Pearson correlation between this and another column, if both are numerical
+        Calculate Pearson correlation between this and another column. Both columns have to be numerical.
 
         Returns
         -------
-        correlation: float
-            Correlation between the two columns
+        correlation : float
+            Correlation between the two columns.
 
         Raises
         ------
         TypeError
-            If one of the columns is not numerical
+            If one of the columns is not numerical.
         """
         if not self._type.is_numeric() or not other_column._type.is_numeric():
             raise NonNumericColumnError(
@@ -215,12 +215,12 @@ class Column:
 
     def get_unique_values(self) -> list[typing.Any]:
         """
-        Returns a list of all unique values in the column.
+        Return a list of all unique values in the column.
 
         Returns
         -------
-        unique_values: list[any]
-            List of unique values of this column
+        unique_values : list[any]
+            List of unique values in the column.
         """
         return list(self._data.unique())
 
@@ -246,12 +246,12 @@ class Column:
 
     def _ipython_display_(self) -> DisplayHandle:
         """
-        Returns a pretty display object for the Column to be used in Jupyter Notebooks
+        Return a display object for the column to be used in Jupyter Notebooks.
 
         Returns
         -------
-        output: DisplayHandle
-            Output object
+        output : DisplayHandle
+            Output object.
         """
         tmp = self._data.to_frame()
         tmp.columns = [self.name]
@@ -268,12 +268,12 @@ class ColumnStatistics:
 
     def max(self) -> float:
         """
-        Returns the maximum value of the column.
+        Return the maximum value of the column. The column has to be numerical.
 
         Returns
         -------
-        max:
-            the maximum value
+        max : float
+            The maximum value.
 
         Raises
         ------
@@ -288,12 +288,12 @@ class ColumnStatistics:
 
     def min(self) -> float:
         """
-        Returns the minimum value of the column.
+        Return the minimum value of the column. The column has to be numerical.
 
         Returns
         -------
-        min:
-            the minimum value
+        min : float
+            The minimum value.
 
         Raises
         ------
@@ -308,12 +308,12 @@ class ColumnStatistics:
 
     def mean(self) -> float:
         """
-        Returns the mean value of the column.
+        Return the mean value of the column. The column has to be numerical.
 
         Returns
         -------
-        mean:
-            the mean value
+        mean : float
+            The mean value.
 
         Raises
         ------
@@ -328,23 +328,23 @@ class ColumnStatistics:
 
     def mode(self) -> Any:
         """
-        Returns the mode of the column.
+        Return the mode of the column.
 
         Returns
         -------
-        mode:
-            the mode
+        mode :
+            The mode value.
         """
         return self.column._data.mode()[0]
 
     def median(self) -> float:
         """
-        Returns the median value of the column.
+        Return the median value of the column. The column has to be numerical.
 
         Returns
         -------
-        median:
-            the median value
+        median : float
+            The median value.
 
         Raises
         ------
@@ -359,17 +359,17 @@ class ColumnStatistics:
 
     def sum(self) -> float:
         """
-        Returns the sum of a numerical Column
+        Return the sum of the column. The column has to be numerical.
 
         Returns
         -------
-        sum:
-            the sum of all values
+        sum : float
+            The sum of all values.
 
         Raises
         ---
         NonNumericColumnError
-            If the data is non numerical
+            If the data contains non-numerical data.
 
         """
         if not self.column.type.is_numeric():
@@ -381,17 +381,17 @@ class ColumnStatistics:
     def variance(self) -> float:
 
         """
-        Returns the variance of a numerical Column
+        Return the variance of the column. The column has to be numerical.
 
         Returns
         -------
-        sum:
-            the variance of all values
+        sum : float
+            The variance of all values.
 
         Raises
         ---
         NonNumericColumnError
-            If the data is non numerical
+            If the data contains non-numerical data.
 
         """
         if not self.column.type.is_numeric():
@@ -404,17 +404,17 @@ class ColumnStatistics:
     def standard_deviation(self) -> float:
 
         """
-        Returns the standard deviation of a numerical Column
+        Return the standard deviation of the column. The column has to be numerical.
 
         Returns
         -------
-        sum:
-            the standard deviation of all values
+        sum : float
+            The standard deviation of all values.
 
         Raises
         ---
         NonNumericColumnError
-            If the data is non numerical
+            If the data contains non-numerical data.
 
         """
         if not self.column.type.is_numeric():
@@ -425,18 +425,18 @@ class ColumnStatistics:
 
     def stability(self) -> float:
         """
-        Calculates the stability of this column.
+        Calculate the stability of this column.
         The value is calculated as the ratio between the number of mode values and the number of non-null-values.
 
         Returns
         -------
-        stability: float
-            Stability of this column
+        stability : float
+            The stability of the column.
 
         Raises
         ------
         ColumnSizeError
-            If this column is empty
+            If the column is empty.
         """
         if self.column._data.size == 0:
             raise ColumnSizeError("> 0", "0")
@@ -447,17 +447,17 @@ class ColumnStatistics:
 
     def idness(self) -> float:
         """
-        Calculates the idness of this column (number of unique values / number of rows).
+        Calculate the idness of this column (number of unique values / number of rows).
 
         Returns
         -------
-        idness: float
-            The idness of the column
+        idness : float
+            The idness of the column.
 
         Raises
         ------
         ColumnSizeError
-            If this column is empty
+            If this column is empty.
         """
         if self.column._data.size == 0:
             raise ColumnSizeError("> 0", "0")

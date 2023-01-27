@@ -20,16 +20,17 @@ class Row:
 
     def get_value(self, column_name: str) -> Any:
         """
-        Returns the value of the column of the row.
+        Return the value of a specified column.
 
         Parameters
         ----------
-        column_name: str
-            The column name
+        column_name : str
+            The column name.
 
         Returns
         -------
-        The value of the column
+        value :
+            The value of the column.
         """
         if not self.schema.has_column(column_name):
             raise UnknownColumnNameError([column_name])
@@ -37,52 +38,52 @@ class Row:
 
     def has_column(self, column_name: str) -> bool:
         """
+        Return whether the row contains a given column.
         Alias for self.schema.hasColumn(column_name: str) -> bool.
-        Returns if the row contains a given column.
 
         Parameters
         ----------
         column_name : str
-            The name of the column
+            The name of the column.
 
         Returns
         -------
-        contains: bool
-            If it contains the column
+        contains : bool
+            True, if row contains the column.
         """
         return self.schema.has_column(column_name)
 
     def get_column_names(self) -> list[str]:
         """
+        Return a list of all column names saved in this schema.
         Alias for self.schema.get_column_names() -> list[str].
-        Returns a list of all column names saved in this schema
 
         Returns
         -------
-        column_names: list[str]
-            the column names
+        column_names : list[str]
+            The column names.
         """
         return self.schema.get_column_names()
 
     def get_type_of_column(self, column_name: str) -> ColumnType:
         """
+        Return the type of a specified column.
         Alias for self.schema.get_type_of_column(column_name: str) -> ColumnType.
-        Returns the type of the given column.
 
         Parameters
         ----------
         column_name : str
-            The name of the column you want the type of
+            The name of the column.
 
         Returns
         -------
-        type: ColumnType
-            The type of the column
+        type : ColumnType
+            The type of the column.
 
         Raises
         ------
         ColumnNameError
-            If the specified target column name doesn't exist
+            If the specified target column name does not exist.
         """
         return self.schema.get_type_of_column(column_name)
 
@@ -108,12 +109,12 @@ class Row:
 
     def _ipython_display_(self) -> DisplayHandle:
         """
-        Returns a pretty display object for the Row to be used in Jupyter Notebooks
+        Return a display object for the column to be used in Jupyter Notebooks.
 
         Returns
         -------
-        output: DisplayHandle
-            Output object
+        output : DisplayHandle
+            Output object.
         """
         tmp = self._data.to_frame().T
         tmp.columns = self.get_column_names()

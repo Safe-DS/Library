@@ -8,30 +8,37 @@ import numpy as np
 
 class ColumnType(ABC):
     """
-    Base Type for Columns, stored in TableSchema
+    Base type for Column, stored in TableSchema.
     """
 
     @abstractmethod
     def is_numeric(self) -> bool:
         """
-        tells if the given column type is numeric
+        Return whether the given column type is numeric.
         Returns
         -------
-        bool
+        is_numeric : bool
+            True if the column is numeric.
         """
         return False
 
     @staticmethod
     def from_numpy_dtype(_type: np.dtype) -> ColumnType:
         """
-        return the column type for a given numpy dtype
+        Return the column type for a given numpy dtype.
         Parameters
         ----------
         _type : numpy.dtype
 
         Returns
         -------
-        ColumnType
+        column_type : ColumnType
+            The ColumnType.
+
+        Raises
+        -------
+        TypeError
+            If an unexpected column type is parsed.
 
         """
         if _type.kind in ("u", "i"):
@@ -50,7 +57,7 @@ class IntColumnType(ColumnType):
     def is_numeric(self) -> bool:
         return True
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "int"
 
 
@@ -59,7 +66,7 @@ class BooleanColumnType(ColumnType):
     def is_numeric(self) -> bool:
         return False
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "bool"
 
 
@@ -68,7 +75,7 @@ class FloatColumnType(ColumnType):
     def is_numeric(self) -> bool:
         return True
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "float"
 
 
@@ -77,7 +84,7 @@ class StringColumnType(ColumnType):
     def is_numeric(self) -> bool:
         return False
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "string"
 
 
@@ -88,5 +95,5 @@ class OptionalColumnType(ColumnType):
     def is_numeric(self) -> bool:
         return self._type.is_numeric()
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"optional({self._type.__repr__()})"

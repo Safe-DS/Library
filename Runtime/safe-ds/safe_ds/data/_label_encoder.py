@@ -22,7 +22,7 @@ warnings.warn = warn
 
 class LabelEncoder:
     """
-    This LabelEncoder encodes one or more given columns into labels.
+    The LabelEncoder encodes one or more given columns into labels.
     """
 
     def __init__(self) -> None:
@@ -31,15 +31,15 @@ class LabelEncoder:
 
     def fit(self, table: Table, column: str) -> None:
         """
-        Fit the label encoder with the values in the given table.
+        Fit the label encoder with the values in the table.
 
         Parameters
         ----------
         table : Table
-            The table containing the data to fit the label encoder with.
+            The table containing the data used to fit the label encoder.
 
         column : str
-            The list of columns which should be label encoded
+            The list of columns supposed to be label-encoded.
 
         Returns
         -------
@@ -48,7 +48,8 @@ class LabelEncoder:
 
         Raises
         -------
-            LearningError if the Model couldn't be fitted correctly
+        LearningError
+            If the model fitting was unsuccessful.
         """
         try:
 
@@ -58,21 +59,24 @@ class LabelEncoder:
 
     def transform(self, table: Table, column: str) -> Table:
         """
-        Transform the given Table to a normalized encoded table.
+        Transform the given table to a normalized encoded table.
 
         Parameters
          ----------
-         table:
-                 table with target values
-         column:
-                 name of column as string
+         table : Table
+                 The table with target values.
+         column : str
+                 The name of the column.
+
          Returns
          -------
+         result : Table
              Table with normalized encodings.
 
          Raises
          ------
-             a NotFittedError if the Model wasn't fitted before transforming
+         NotFittedError
+            If the Model wasn't fitted before transforming.
         """
         p_df = table._data
         p_df.columns = table.schema.get_column_names()
@@ -84,20 +88,24 @@ class LabelEncoder:
 
     def fit_transform(self, table: Table, columns: list[str]) -> Table:
         """
-        Lable encodes a given Table with the given Lable encoder
+        Label-encode the table with the label encoder.
 
         Parameters
         ----------
-            table: the table which will be transformed
-            columns: list of column names to be considered while encoding
+        table : Table
+            The table to be transformed.
+        columns : list[str]
+            The list of column names to be encoded.
 
         Returns
         -------
-            table: a new Table object which is label encoded
+        table : Table
+            The label-encoded table.
 
         Raises
         -------
-            NotFittedError if the encoder wasn't fitted before transforming.
+        NotFittedError
+            If the encoder wasn't fitted before transforming.
 
         """
         p_df = table._data
@@ -115,20 +123,24 @@ class LabelEncoder:
 
     def inverse_transform(self, table: Table, column: str) -> Table:
         """
-        Inverse transform Table back to original encodings.
+        Inverse-transform the table back to its original encodings.
 
         Parameters
         ----------
-            table:  The Table to be inverse tranformed.
-            column: The list of columns which should be lable encoded
+        table : Table
+            The table to be inverse-transformed.
+        column : str
+            The column to be inverse-transformed.
 
         Returns
         -------
-            table: inverse transformed table.
+        table : Table
+            The inverse-transformed table.
 
         Raises
         -------
-            NotFittedError if the encoder wasn't fitted before transforming.
+        NotFittedError
+            If the encoder wasn't fitted before transforming.
         """
 
         try:

@@ -8,7 +8,7 @@ from ._table import Table
 
 class OneHotEncoder:
     """
-    This OneHotEncoder encodes columns in numerical columns that represent the existance for each value [0,1]
+    The OneHotEncoder encodes categorical columns to numerical features [0,1] that represent the existence for each value.
     """
 
     def __init__(self) -> None:
@@ -16,14 +16,19 @@ class OneHotEncoder:
 
     def fit(self, table: Table, columns: list[str]) -> None:
         """
-        Fit the encoder to the data
+        Fit the encoder to a table.
 
         Parameters
         ----------
-        table: Table
-            the data to fit
-        columns: list[str]:
-            a list of columns you want to fit
+        table : Table
+            The table used to fit the encoder.
+        columns : list[str]:
+            The list of columns from the table used to fit the encoder.
+
+        Raises
+        ----------
+        LearningError
+            If there was an error during fitting.
         """
         try:
             table_k_columns = table.keep_columns(column_names=columns)
@@ -35,17 +40,22 @@ class OneHotEncoder:
 
     def transform(self, table: Table) -> Table:
         """
-        Transform the data with the trained encoder
+        Transform the data with the trained encoder.
 
         Parameters
         ----------
-        table: Table
-            the data to transform
+        table : Table
+            The data to be transformed.
 
         Returns
         ----------
-        table: Table
-            the transformed table
+        table : Table
+            The transformed table.
+
+        Raises
+        ----------
+        NotFittedError
+            If the encoder wasn't fitted before transforming.
         """
         try:
             table_k_columns = table.keep_columns(self.encoder.feature_names_in_)
@@ -64,36 +74,43 @@ class OneHotEncoder:
 
     def fit_transform(self, table: Table, columns: list[str]) -> Table:
         """
-        Fit and transform the data with a OneHotEncoder
+        Fit and transform data with a OneHotEncoder.
 
         Parameters
         ----------
-        table: Table
-            the data you want to fit and transform
-        columns: list[str]:
-            a list of columns you want to transform and fit
+        table : Table
+            The table used to fit the encoder and subsequently to be transformed
+        columns : list[str]:
+            The list of columns from the table used to fit the encoder and subsequently to be transformed.
 
         Returns
         ----------
-        table: Table
-            the transformed table
+        table : Table
+            The transformed table.
+
         """
         self.fit(table, columns)
         return self.transform(table)
 
     def inverse_transform(self, table: Table) -> Table:
         """
-        Reset a transformed Table to its original state
+        Reset a transformed table to its original state.
 
         Parameters
         ----------
-        table: Table
-            the Table you want to reset
+        table : Table
+            The table to be inverse-transformed.
 
         Returns
         ----------
-        table: Table
-            the reset table
+        table : Table
+            The inverse-transformed table.
+
+        Raises
+        ----------
+        NotFittedError
+            If the encoder wasn't fitted before transforming.
+
         """
         try:
             data = self.encoder.inverse_transform(

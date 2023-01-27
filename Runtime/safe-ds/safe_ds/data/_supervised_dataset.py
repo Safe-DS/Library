@@ -11,10 +11,10 @@ class SupervisedDataset:
 
     Parameters
     ----------
-    table: Table
-        The table used to derive the feature and target vectors
-    target_column: str
-        Name of the target feature column
+    table : Table
+        The table used to derive the feature and target vectors.
+    target_column : str
+        Name of the target feature column.
     """
 
     def __init__(self, table: Table, target_column: str):
@@ -41,12 +41,12 @@ class SupervisedDataset:
 
     def _ipython_display_(self) -> DisplayHandle:
         """
-        Returns a pretty display object for the Table to be used in Jupyter Notebooks
+        Return a display object for the column to be used in Jupyter Notebooks.
 
         Returns
         -------
-        output: DisplayHandle
-            Output object
+        output : DisplayHandle
+            Output object.
         """
         tmp = self._X.add_column(self._y)
         header_info = "Target Column is '" + self._y.name + "'\n"

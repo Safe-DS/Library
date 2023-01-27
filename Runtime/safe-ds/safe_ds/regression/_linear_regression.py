@@ -23,13 +23,13 @@ class LinearRegression:
 
         Parameters
         ----------
-        supervised_dataset: SupervisedDataset
-            the supervised dataset containing the feature and target vectors
+        supervised_dataset : SupervisedDataset
+            The supervised dataset containing the feature and target vectors.
 
         Raises
         ------
         LearningError
-            if the supervised dataset contains invalid values or if the training failed
+            If the supervised dataset contains invalid values or if the training failed.
         """
         self.target_name = safe_ds._util._util_sklearn.fit(
             self._regression, supervised_dataset
@@ -37,24 +37,24 @@ class LinearRegression:
 
     def predict(self, dataset: Table, target_name: Optional[str] = None) -> Table:
         """
-        Predict a target vector using a dataset containing feature vectors. The model has to be trained first
+        Predict a target vector using a dataset containing feature vectors. The model has to be trained first.
 
         Parameters
         ----------
-        dataset: Table
-            the dataset containing the feature vectors
+        dataset : Table
+            The dataset containing the feature vectors.
         target_name: Optional[str]
-            the name of the target vector, the name of the target column inferred from fit is used by default
+            The name of the target vector. The name of the target column inferred from fit is used by default.
 
         Returns
         -------
         table : Table
-            a dataset containing the given feature vectors and the predicted target vector
+            A dataset containing the given feature vectors and the predicted target vector.
 
         Raises
         ------
         PredictionError
-            if predicting with the given dataset failed
+            If prediction with the given dataset failed.
         """
         return safe_ds._util._util_sklearn.predict(
             self._regression,

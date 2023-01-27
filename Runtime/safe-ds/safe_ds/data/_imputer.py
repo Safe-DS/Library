@@ -18,23 +18,23 @@ class ImputerStrategy(ABC):
 # noinspection PyProtectedMember
 class Imputer:
     """
-    Imputes the data for a given Table.
+    Impute the data for a given Table.
 
     Parameters
     ----------
-    strategy: ImputerStrategy
-        The strategy to impute missing values
+    strategy : ImputerStrategy
+        The strategy used to impute missing values.
     """
 
     class Strategy:
         class Constant(ImputerStrategy):
             """
-            An Imputer-Strategy for imputing the missing data with given constant values
+            An imputation strategy for imputing missing data with given constant values.
 
             Parameters
             ----------
-            value
-                The given values to impute missing values
+            value :
+                The given value to impute missing values.
             """
 
             def __init__(self, value: Any):
@@ -46,7 +46,7 @@ class Imputer:
 
         class Mean(ImputerStrategy):
             """
-            An Imputer-Strategy for imputing the missing data with mean values
+            An imputation strategy for imputing missing data with mean values.
             """
 
             def _augment_imputer(self, imputer: SimpleImputer) -> None:
@@ -54,7 +54,7 @@ class Imputer:
 
         class Median(ImputerStrategy):
             """
-            An Imputer-Strategy for imputing the missing data with median values
+            An imputation strategy for imputing missing data with median values.
             """
 
             def _augment_imputer(self, imputer: SimpleImputer) -> None:
@@ -62,7 +62,7 @@ class Imputer:
 
         class Mode(ImputerStrategy):
             """
-            An Imputer-Strategy for imputing the missing data with mode values
+            An imputation strategy for imputing missing data with mode values.
             """
 
             def _augment_imputer(self, imputer: SimpleImputer) -> None:
@@ -75,14 +75,14 @@ class Imputer:
 
     def fit(self, table: Table, column_names: Optional[list[str]] = None) -> None:
         """
-        Fit the imputer on the given dataset.
+        Fit the imputer on the dataset.
 
         Parameters
         ----------
-        table: Table
-            the table to learn the new value to impute
-        column_names: Optional[list[str]]
-            if the imputer should only run on specific columns, these columns can be specified here
+        table : Table
+            The table used to learn the imputation values.
+        column_names : Optional[list[str]]
+            An optional list of column names, if the imputer is only supposed to run on specific columns.
         """
         if column_names is None:
             column_names = table.schema.get_column_names()
@@ -95,17 +95,17 @@ class Imputer:
 
     def transform(self, table: Table) -> Table:
         """
-        Impute the missing values on the given dataset
+        Impute the missing values on the dataset.
 
         Parameters
         ----------
-        table: Table
-            the dataset to be imputed
+        table : Table
+            The dataset to be imputed.
 
         Returns
         -------
         table : Table
-            a dataset that is equal to the given dataset, with missing values imputed to the given strategy
+            The dataset with missing values imputed by the given strategy.
         """
         data = table._data.copy()
         indices = [
@@ -122,19 +122,19 @@ class Imputer:
         self, table: Table, column_names: Optional[list[str]] = None
     ) -> Table:
         """
-        Fit the imputer on the given dataset and impute the missing values
+        Fit the imputer on the dataset and impute the missing values.
 
         Parameters
         ----------
-        table: Table
-            the dataset to learn the new value to impute and to actually impute
-        column_names: Optional[list[str]]
-            if the imputer should only run on specific columns, these columns can be specified here
+        table : Table
+            The table used to learn the imputation values.
+        column_names : Optional[list[str]]
+            An optional list of column names, if the imputer is only supposed to run on specific columns.
 
         Returns
         -------
         table : Table
-            a dataset that is equal to the given dataset, with missing values imputed to the given strategy
+            The dataset with missing values imputed by the given strategy.
         """
         self.fit(table, column_names)
         return self.transform(table)

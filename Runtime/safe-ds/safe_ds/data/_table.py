@@ -32,16 +32,21 @@ from ._table_schema import TableSchema
 class Table:
     def __init__(self, data: typing.Iterable, schema: Optional[TableSchema] = None):
         """
-        Create a new Table
+        Create a new table.
 
         Parameters
         ----------
-        data: typing.Iterable
-            the data you want to save in the table
-        schema: TableSchema
-            the schema for the table
-            None by default, if None the schema will be provided by the data that is given
-            If a schema is set, there is no check if this schema is compatible with the data!
+        data : typing.Iterable
+            The data to be saved in the table.
+        schema : TableSchema
+            The schema for the table.
+            None by default. If None, the schema will be provided by the data that is given.
+            If a schema is set, there is no check if this schema is compatible with the data.
+
+        Raises
+        ----------
+        MissingSchemaError
+            If the schema is missing.
         """
         self._data: pd.Dataframe = (
             data if isinstance(data, pd.DataFrame) else pd.DataFrame(data)
@@ -60,18 +65,22 @@ class Table:
 
     def get_row(self, index: int) -> Row:
         """
-        returns the row of the Table for a given Index
+        Return the row at a specified index.
+
         Parameters
         ----------
         index : int
+            The index.
 
         Returns
         -------
-        a Row of the Table
+        row : Row
+            The row of the table at the index.
+
         Raises
         ------
         IndexOutOfBoundsError
-            if the index doesn't exist
+            If no row at the specified index exists in this table.
         """
         if len(self._data.index) - 1 < index or index < 0:
             raise IndexOutOfBoundsError(index)
@@ -80,24 +89,24 @@ class Table:
     @staticmethod
     def from_json(path: str) -> Table:
         """
-        Reads data from a JSON file into a Table
+        Read data from a JSON file into a table.
 
         Parameters
         ----------
         path : str
-            Path to the file as String
+            The path to the JSON file.
 
         Returns
         -------
         table : Table
-            The Table read from the file
+            The table created from the JSON file.
 
         Raises
         ------
         FileNotFoundError
-            If the specified file does not exist
+            If the specified file does not exist.
         ValueError
-            If the file could not be read
+            If the file could not be read.
         """
 
         try:
@@ -112,24 +121,24 @@ class Table:
     @staticmethod
     def from_csv(path: str) -> Table:
         """
-        Reads data from a CSV file into a Table.
+        Read data from a CSV file into a table.
 
         Parameters
         ----------
         path : str
-            Path to the file as String
+            The path to the CSV file.
 
         Returns
         -------
         table : Table
-            The Table read from the file
+            The table created from the CSV file.
 
         Raises
         ------
         FileNotFoundError
-            If the specified file does not exist
+            If the specified file does not exist.
         ValueError
-            If the file could not be read
+            If the file could not be read.
         """
 
         try:
@@ -142,12 +151,12 @@ class Table:
     @staticmethod
     def from_rows(rows: list[Row]) -> Table:
         """
-        Returns a table combined from a list of given rows.
+        Return a table created from a list of rows.
 
         Parameters
         ----------
         rows : list[Row]
-            Rows to be combined. Should have a matching schema.
+            The rows to be combined. They need to have a matching schema.
 
         Returns
         -------
@@ -157,7 +166,7 @@ class Table:
         Raises
         ------
         SchemaMismatchError
-            If one of the schemas of the rows does not match.
+            If any of the row schemas does not match with the others.
         """
         schema_compare: TableSchema = rows[0].schema
         row_array: list[Series] = []
@@ -174,12 +183,12 @@ class Table:
     @staticmethod
     def from_columns(columns: list[Column]) -> Table:
         """
-        Returns a table combined from a list of given columns.
+        Return a table created from a list of columns.
 
         Parameters
         ----------
         columns : list[Column]
-            Columns to be combined. Each column should be the same size.
+            The columns to be combined. They need to have the same size.
 
         Returns
         -------
@@ -189,7 +198,7 @@ class Table:
         Raises
         ------
         ColumnLengthMismatchError
-            If at least one of the columns has a different length than at least one other column
+            If any of the column sizes does not match with the others.
         """
         dataframe: DataFrame = pd.DataFrame()
 
@@ -206,12 +215,14 @@ class Table:
 
     def to_json(self, path_to_file: str) -> None:
         """
-        Write the data from the table into a json file.
-        If the file and/or the directories do not exist they will be created. If the file does already exist it will be overwritten.
+        Write the data from the table into a JSON file.
+        If the file and/or the directories do not exist, they will be created.
+        If the file already exists it will be overwritten.
 
         Parameters
         ----------
-        path_to_file : The path as String to the output file.
+        path_to_file : str
+            The path to the output file.
         """
         Path(os.path.dirname(path_to_file)).mkdir(parents=True, exist_ok=True)
         data_to_json = self._data.copy()
@@ -220,12 +231,14 @@ class Table:
 
     def to_csv(self, path_to_file: str) -> None:
         """
-        Write the data from the table into a csv file.
-        If the file and/or the directories do not exist they will be created. If the file does already exist it will be overwritten.
+        Write the data from the table into a CSV file.
+        If the file and/or the directories do not exist they will be created.
+        If the file already exists it will be overwritten.
 
         Parameters
         ----------
-        path_to_file : The path as String to the output file.
+        path_to_file : str
+            The path to the output file.
         """
         Path(os.path.dirname(path_to_file)).mkdir(parents=True, exist_ok=True)
         data_to_csv = self._data.copy()
@@ -234,26 +247,26 @@ class Table:
 
     def rename_column(self, old_name: str, new_name: str) -> Table:
         """
-        Rename a single column by providing the previous name and the future name of it.
+        Rename a single column.
 
         Parameters
         ----------
         old_name : str
-            Old name of the target column
+            The old name of the target column
         new_name : str
-            New name of the target column
+            The new name of the target column
 
         Returns
         -------
         table : Table
-            The Table with the renamed column
+            The Table with the renamed column.
 
         Raises
         ------
         ColumnNameError
-            If the specified old target column name doesn't exist
+            If the specified old target column name does not exist.
         DuplicateColumnNameError
-            If the specified new target column name already exists
+            If the specified new target column name already exists.
         """
         if old_name not in self.schema.get_column_names():
             raise UnknownColumnNameError([old_name])
@@ -268,22 +281,22 @@ class Table:
 
     def get_column(self, column_name: str) -> Column:
         """
-        Returns a new instance of column with the data of the described column of the table.
+        Return a column with the data of the specified column.
 
         Parameters
         ----------
         column_name : str
-            The name of the column you want to get in return
+            The name of the column.
 
         Returns
         -------
         column : Column
-            A new instance of Column by the given name
+            The column.
 
         Raises
         ------
         UnknownColumnNameError
-            If the specified target column name doesn't exist
+            If the specified target column name does not exist.
         """
         if self.schema.has_column(column_name):
             output_column = Column(
@@ -299,22 +312,22 @@ class Table:
 
     def drop_columns(self, column_names: list[str]) -> Table:
         """
-        Returns a table without the given columns
+        Return a table without the given column(s).
 
         Parameters
         ----------
         column_names : list[str]
-            A List containing all columns to be dropped
+            A list containing all columns to be dropped.
 
         Returns
         -------
         table : Table
-            A Table without the given columns
+            A table without the given columns.
 
         Raises
         ------
         ColumnNameError
-            If any of the given columns does not exist
+            If any of the given columns do not exist.
         """
         invalid_columns = []
         column_indices = []
@@ -333,22 +346,22 @@ class Table:
 
     def keep_columns(self, column_names: list[str]) -> Table:
         """
-        Returns a table with exactly the given columns
+        Return a table with only the given column(s).
 
         Parameters
         ----------
         column_names : list[str]
-            A List containing only the columns to be kept
+            A list containing only the columns to be kept.
 
         Returns
         -------
         table : Table
-            A Table containing only the given columns
+            A table containing only the given column(s).
 
         Raises
         ------
         ColumnNameError
-            If any of the given columns does not exist
+            If any of the given columns do not exist.
         """
         invalid_columns = []
         column_indices = []
@@ -367,12 +380,12 @@ class Table:
 
     def to_rows(self) -> list[Row]:
         """
-        Returns a list of Rows from the current table.
+        Return a list of the rows.
 
         Returns
         -------
         rows : list[Row]
-            List of Row objects
+            List of rows.
         """
         return [
             Row(series_row, self.schema) for (_, series_row) in self._data.iterrows()
@@ -380,17 +393,17 @@ class Table:
 
     def filter_rows(self, query: Callable[[Row], bool]) -> Table:
         """
-        Returns a table with rows filtered by applied lambda function
+        Return a table with rows filtered by Callable (e.g. lambda function).
 
         Parameters
         ----------
         query : lambda function
-            A lambda function that is applied to all rows
+            A Callable that is applied to all rows.
 
         Returns
         -------
         table : Table
-            A Table containing only the rows filtered by the query lambda function
+            A table containing only the rows filtered by the query.
         """
 
         rows: list[Row] = [row for row in self.to_rows() if query(row)]
@@ -399,45 +412,45 @@ class Table:
 
     def count_rows(self) -> int:
         """
-        Returns the number of rows in the table
+        Return the number of rows.
 
         Returns
         -------
         count : int
-            Number of rows
+            The number of rows.
         """
         return self._data.shape[0]
 
     def count_columns(self) -> int:
         """
-        Returns the number of columns in the table
+        Return the number of columns.
 
         Returns
         -------
         count : int
-            Number of columns
+            The number of columns.
         """
         return self._data.shape[1]
 
     def to_columns(self) -> list[Column]:
         """
-        Returns a list of Columns from the current table.
+        Return a list of the columns.
 
         Returns
         -------
         columns : list[Columns]
-            List of Columns objects
+            List of columns.
         """
         return [self.get_column(name) for name in self.schema.get_column_names()]
 
     def drop_duplicate_rows(self) -> Table:
         """
-        Returns a copy of the Table with every duplicate row removed.
+        Return a copy of the table with every duplicate row removed.
 
         Returns
         -------
-        result: Table
-            The table with the duplicate rows removed
+        result : Table
+            The table with the duplicate rows removed.
 
         """
         df = self._data.drop_duplicates(ignore_index=True)
@@ -446,31 +459,31 @@ class Table:
 
     def replace_column(self, old_column_name: str, new_column: Column) -> Table:
         """
-        Returns a copy of the Table with the specified old column replaced by a new column. Keeps the order of columns.
+        Return a copy of the table with the specified old column replaced by a new column. Keeps the order of columns.
 
         Parameters
         ----------
-        old_column_name: str
-            Name of the old column, to be replaced
+        old_column_name : str
+            The name of the column to be replaced.
 
-        new_column: Column
-            New column, to replace the old column
+        new_column : Column
+            The new column replacing the old column.
 
         Returns
         -------
-        result: Table
-            Table where the old column is replaced by the new column
+        result : Table
+            A table with the old column replaced by the new column.
 
         Raises
         ------
         UnknownColumnNameError
-            If the old column does not exist
+            If the old column does not exist.
 
         DuplicateColumnNameError
-            If the new column already exists and the existing column is not affected by the replacement
+            If the new column already exists and the existing column is not affected by the replacement.
 
         ColumnSizeError
-            If the size of the column does not match the amount of rows
+            If the size of the column does not match the amount of rows.
         """
         if old_column_name not in self.schema.get_column_names():
             raise UnknownColumnNameError([old_column_name])
@@ -497,20 +510,20 @@ class Table:
 
     def add_column(self, column: Column) -> Table:
         """
-        Returns the original table with the provided column attached at the end.
+        Return the original table with the provided column attached at the end.
 
         Returns
         -------
-        result: Table
-            The table with the column attached
+        result : Table
+            The table with the column attached.
 
         Raises
         ------
         DuplicateColumnNameError
-            If the new column already exists
+            If the new column already exists.
 
         ColumnSizeError
-            If the size of the column does not match the amount of rows
+            If the size of the column does not match the amount of rows.
 
         """
         if self.schema.has_column(column.name):
@@ -526,17 +539,24 @@ class Table:
 
     def add_columns(self, columns: Union[list[Column], Table]) -> Table:
         """
-        Add multiple columns to a table
+        Add multiple columns to the table.
 
         Parameters
         ----------
-        columns: list[Column] or Table
-            the columns you want to add
+        columns : list[Column] or Table
+            The columns to be added.
 
         Returns
         -------
         result: Table
-            A new table which combines the original table and the given columns
+            A new table combining the original table and the given columns.
+
+        Raises
+        --------
+        ColumnSizeError
+            If at least one of the column sizes from the provided column list does not match the table.
+        DuplicateColumnNameError
+            If at least one column name from the provided column list already exists in the table.
         """
         if isinstance(columns, Table):
             columns = columns.to_columns()
@@ -554,17 +574,17 @@ class Table:
 
     def add_row(self, row: Row) -> Table:
         """
-        Add a row to an existing table
+        Add a row to the table.
 
         Parameters
         ----------
-        row: Row
-            the row you want to add
+        row : Row
+            The row to be added.
 
         Returns
         -------
-        table: Table
-            a new table with the added row at the end
+        table : Table
+            A new table with the added row at the end.
 
         """
         if self.schema != row.schema:
@@ -575,17 +595,17 @@ class Table:
 
     def add_rows(self, rows: Union[list[Row], Table]) -> Table:
         """
-        Add multiple rows to a table
+        Add multiple rows to a table.
 
         Parameters
         ----------
-        rows: list[Row] or Table
-            the rows you want to add
+        rows : list[Row] or Table
+            The rows to be added.
 
         Returns
         -------
-        result: Table
-            A new table which combines the original table and the given rows
+        result : Table
+            A new table which combines the original table and the given rows.
         """
         if isinstance(rows, Table):
             rows = rows.to_rows()
@@ -601,29 +621,29 @@ class Table:
 
     def has_column(self, column_name: str) -> bool:
         """
+        Return whether the table contains a given column.
         Alias for self.schema.hasColumn(column_name: str) -> bool.
-        Returns if the table contains a given column.
 
         Parameters
         ----------
         column_name : str
-            The name of the column
+            The name of the column.
 
         Returns
         -------
-        contains: bool
-            If it contains the column
+        contains : bool
+            True if the column exists.
         """
         return self.schema.has_column(column_name)
 
     def list_columns_with_missing_values(self) -> list[Column]:
         """
-        Returns a list of all the columns, that have at least one missing value or an empty list, if there are none.
+        Return a list of all the columns that have at least one missing value. Returns an empty list if there are none.
 
         Returns
         -------
         columns_with_missing_values: list[Column]
-            The list of columns with missing values
+            The list of columns with missing values.
         """
         columns = self.to_columns()
         columns_with_missing_values = []
@@ -634,12 +654,12 @@ class Table:
 
     def list_columns_with_non_numerical_values(self) -> list[Column]:
         """
-        Get a list of Columns only containing non-numerical values
+        Return a list of columns only containing non-numerical values.
 
         Returns
         -------
-        cols: list[Column]
-            the list with only non-numerical Columns
+        cols : list[Column]
+            The list with only non-numerical columns.
         """
         cols = []
         for column_name, data_type in self.schema._schema.items():
@@ -649,12 +669,12 @@ class Table:
 
     def list_columns_with_numerical_values(self) -> list[Column]:
         """
-        Get a list of columns only containing numerical values
+        Return a list of columns only containing numerical values.
 
         Returns
         -------
-        cols: list[Column]
-            the list with only numerical columns
+        cols : list[Column]
+            The list with only numerical columns.
         """
         cols = []
         for column_name, data_type in self.schema._schema.items():
@@ -664,35 +684,35 @@ class Table:
 
     def get_column_names(self) -> list[str]:
         """
+        Return a list of all column names in this table.
         Alias for self.schema.get_column_names() -> list[str].
-        Returns a list of all column names saved in this schema
 
         Returns
         -------
-        column_names: list[str]
-            the column names
+        column_names : list[str]
+            The list of the column names.
         """
         return self.schema.get_column_names()
 
     def get_type_of_column(self, column_name: str) -> ColumnType:
         """
+        Return the type of the given column.
         Alias for self.schema.get_type_of_column(column_name: str) -> ColumnType.
-        Returns the type of the given column.
 
         Parameters
         ----------
         column_name : str
-            The name of the column you want the type of
+            The name of the column to be queried.
 
         Returns
         -------
-        type: ColumnType
-            The type of the column
+        type : ColumnType
+            The type of the column.
 
         Raises
         ------
         ColumnNameError
-            If the specified target column name doesn't exist
+            If the specified target column name does not exist.
         """
         return self.schema.get_type_of_column(column_name)
 
@@ -707,20 +727,20 @@ class Table:
         Sort a table with the given lambda function.
         If no function is given the columns will be sorted alphabetically.
         This function uses the default python sort algorithm.
-        The query should return:
-            0, if both columns are equal
-            < 0, if the first column should be ordered after the second column
-            > 0, if the first column should be ordered before the second column
+        The query returns
+        0, if both columns are equal.
+        < 0, if the first column should be ordered after the second column.
+        > 0, if the first column should be ordered before the second column.
 
         Parameters
         ----------
-        query: a lambda function
-            a lambda function that is used to sort the columns
+        query : a lambda function
+            The lambda function used to sort the columns.
 
         Returns
         -------
-        new_table: Table
-            a new table with the sorted columns
+        new_table : Table
+            A new table with sorted columns.
         """
         columns = self.to_columns()
         columns.sort(key=functools.cmp_to_key(query))
@@ -728,13 +748,13 @@ class Table:
 
     def remove_outliers(self) -> Table:
         """
-        Removes all rows from the table that contain at least one outlier defined as having a value that has a distance of
+        Remove all rows from the table that contain at least one outlier defined as having a value that has a distance of
         more than 3 standard deviations from the column average.
 
         Returns
         -------
-        new_table: Table
-            a new table where the outliers have been removed
+        new_table : Table
+            A new table without rows containing outliers.
         """
         result = self._data.copy(deep=True)
 
@@ -766,17 +786,17 @@ class Table:
         self, name: str, transformer: Callable[[Row], typing.Any]
     ) -> Table:
         """
-        Transform provided column by calling provided transformer
+        Transform provided column by calling provided transformer.
 
         Returns
         -------
-        result: Table
-            The table with the transformed column
+        result : Table
+            The table with the transformed column.
 
         Raises
         ------
         UnknownColumnNameError
-            If the old column does not exist
+            If the column does not exist.
 
         """
         if self.has_column(name):
@@ -787,12 +807,12 @@ class Table:
 
     def summary(self) -> Table:
         """
-        Returns a Table with a number of statistical key values for a table
+        Return a table with a number of statistical key values.
 
         Returns
         -------
-        result: Table
-            Table with statistics
+        result : Table
+            The table with statistics.
         """
 
         columns = self.to_columns()
@@ -840,12 +860,12 @@ class Table:
 
     def _ipython_display_(self) -> DisplayHandle:
         """
-        Returns a pretty display object for the Table to be used in Jupyter Notebooks
+        Return a display object for the column to be used in Jupyter Notebooks.
 
         Returns
         -------
-        output: DisplayHandle
-            Output object
+        output : DisplayHandle
+            Output object.
         """
         tmp = self._data.copy(deep=True)
         tmp.columns = self.get_column_names()
@@ -862,26 +882,26 @@ class Table:
         step: int = 1,
     ) -> Table:
         """
-        slices the Table into a new Table
+        Slice a part of the table into a new table.
 
         Parameters
         ----------
         start : int
-            first index of the range to be copied into a new table, None by default
+            The first index of the range to be copied into a new table, None by default.
         end : int
-            last index of the range to be copied into a new table, None by default
+            The last index of the range to be copied into a new table, None by default.
         step : int
-            the step size to be iterated through the table, 1 by default
+            The step size used to iterate through the table, 1 by default.
 
         Returns
         -------
         result : Table
-            the sliced Table
+            The resulting table.
 
         Raises
         -------
         ValueError
-            raises a ValueError if the index is out of bounds
+            If the index is out of bounds.
         """
 
         if start is None:
@@ -905,17 +925,17 @@ class Table:
 
     def split(self, percentage_in_first: float) -> typing.Tuple[Table, Table]:
         """
-        splits the Table into two new Tables
+        Split the table into two new tables.
 
         Parameters
         -------
         percentage_in_first : float
-            the size of the first returned table in percentage to the given Table
+            The desired size of the first table in percentage to the given table.
 
         Returns
         -------
-        result: (Table, Table)
-            tuple of the splitted Tables
+        result : (Table, Table)
+            A tuple containing the two resulting tables. The first table has the specified size, the second table contains the rest of the data.
 
 
         """
@@ -928,11 +948,12 @@ class Table:
 
     def shuffle(self) -> Table:
         """
-        shuffles the table randomly
+        Shuffle the table randomly.
+
         Returns
         -------
         result : Table
-            the shuffled Table
+            The shuffled Table.
 
         """
         new_df = self._data.sample(frac=1.0)

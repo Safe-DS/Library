@@ -10,7 +10,7 @@ def plot_histogram(column: Column) -> None:
     Parameters
     ----------
     column : Column
-        The column you want to plot
+        The column to be plotted.
     """
     # noinspection PyProtectedMember
     ax = sns.histplot(data=column._data)

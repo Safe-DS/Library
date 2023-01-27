@@ -6,16 +6,23 @@ from safe_ds.exceptions import UnknownColumnNameError
 
 def plot_lineplot(table: Table, x: str, y: str) -> None:
     """
-    Plot two columns against each other in a lineplot.
+    Plot two columns against each other in a lineplot. If there are multiple x-values for a y-value,
+    the resulting plot will consist of a line representing the mean and the lower-transparency area around the line
+    representing the 95% confidence interval.
 
     Parameters
     ----------
-    table: Table
-        The table containing the data to plot.
-    x: str
+    table : Table
+        The table containing the data to be plotted.
+    x : str
         The column name of the column to be plotted on the x-Axis.
-    y str
+    y : str
         The column name of the column to be plotted on the y-Axis.
+
+    Raises
+    ---------
+    UnknownColumnNameError
+        If either of the columns do not exist.
     """
     # noinspection PyProtectedMember
     if not table.has_column(x):
