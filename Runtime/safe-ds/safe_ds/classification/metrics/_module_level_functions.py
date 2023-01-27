@@ -4,14 +4,14 @@ from sklearn.metrics import accuracy_score
 
 def accuracy(actual: Column, expected: Column) -> float:
     """
-    Compares the expected column and the predicted column and returns the accuracy.
+    Compare the expected column and the predicted column and returns the accuracy.
 
     Parameters
     ----------
     actual : Column
-        The estimated values column.
+        The column containing estimated values.
     expected : Column
-        The expected values column.
+        The column containing expected values.
 
     Returns
     -------

@@ -11,7 +11,7 @@ class OrdinalEncoder:
     Parameters
     --------
     order : list[str]
-        The order in which the ordinal encoder encodes the values
+        The order in which the ordinal encoder encodes the values.
     """
 
     def __init__(self, order: list[str]) -> None:
@@ -26,10 +26,10 @@ class OrdinalEncoder:
         Parameters
         ----------
         table : Table
-            The table containing the data to fit the ordinal encoder with.
+            The table containing the data used to fit the ordinal encoder.
 
         column_name : str
-            The column which should be ordinal-encoded
+            The column which should be ordinal-encoded.
 
         Returns
         -------
@@ -38,7 +38,8 @@ class OrdinalEncoder:
 
         Raises
         -------
-            LearningError if the Model couldn't be fitted correctly
+        LearningError
+            If the model could not be fitted correctly.
         """
 
         p_df = table._data
@@ -54,18 +55,19 @@ class OrdinalEncoder:
 
         Parameters
         ----------
-        table:
-                table with target values
-        column_name:
-                name of column as string
+        table : Table
+            The table with target values.
+        column_name : str
+            The name of the column.
         Returns
         -------
-        table: Table
-            Table with ordinal encodings.
+        table : Table
+            The table with ordinal encodings.
 
         Raises
         ------
-            a NotFittedError if the Model wasn't fitted before transforming
+        NotFittedError
+            If the model was not fitted before transforming.
         """
         p_df = table._data.copy()
         p_df.columns = table.schema.get_column_names()
@@ -78,23 +80,27 @@ class OrdinalEncoder:
 
     def fit_transform(self, table: Table, columns: list[str]) -> Table:
         """
-        Oridnal-encodes a given table with the given ordinal encoder.
-        The order is provided in the constructor, a new order will not be inferred from other columns.
+        Oridnal-encode a given table with the given ordinal encoder.
+        The order is provided in the constructor. A new order will not be inferred from other columns.
 
         Parameters
         ----------
-            table: the table which will be transformed
-            columns: list of column names to be considered while encoding
+        table : Table
+            The table which will be transformed.
+        columns : list[str]
+            The list of column names to be considered while encoding.
 
         Returns
         -------
-        table: Table
-            a new Table object which is ordinal-encoded
+        table : Table
+            A new Table object which is ordinal-encoded.
 
         Raises
         -------
-            NotFittedError if the encoder wasn't fitted before transforming.
-            KeyError if the column doesn`t exist
+        NotFittedError
+            If the encoder was not fitted before transforming.
+        KeyError
+            If the column does not exist.
 
         """
         try:
@@ -113,17 +119,20 @@ class OrdinalEncoder:
 
         Parameters
         ----------
-            table:  The table to be inverse transformed.
-            column_name: The column which should be ordinal-encoded
+        table : Table
+            The table to be inverse-transformed.
+        column_name : str
+            The column which should be inverse-transformed.
 
         Returns
         -------
-        table: Table
-            inverse transformed table.
+        table : Table
+            The inverse-transformed table.
 
         Raises
         -------
-            NotFittedError if the encoder wasn't fitted before transforming.
+        NotFittedError
+            If the encoder was not fitted before transforming.
         """
 
         p_df = table._data.copy()
