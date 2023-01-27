@@ -32,6 +32,7 @@ def plot_boxplot(column: Column) -> None:
                 "data. Please provide a Column with only real numbers"
             )
     # noinspection PyProtectedMember
-    sns.boxplot(data=column._data)
+    ax = sns.boxplot(data=column._data)
+    ax.set(xlabel=column.name)
     plt.tight_layout()
     plt.show()
