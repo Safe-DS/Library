@@ -17,6 +17,9 @@ def warn(*_: Any, **__: Any) -> None:
 warnings.warn = warn
 
 
+# noinspection PyProtectedMember
+
+
 class LabelEncoder:
     """
     This LabelEncoder encodes one or more given columns into labels.

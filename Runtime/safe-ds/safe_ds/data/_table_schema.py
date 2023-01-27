@@ -128,3 +128,10 @@ class TableSchema:
 
     def __repr__(self) -> str:
         return self.__str__()
+
+    def __eq__(self, o: object) -> bool:
+        if not isinstance(o, TableSchema):
+            return NotImplemented
+        if self is o:
+            return True
+        return self._schema == o._schema
