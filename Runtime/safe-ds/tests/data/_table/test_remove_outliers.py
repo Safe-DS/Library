@@ -13,9 +13,11 @@ def test_remove_outliers_no_outliers() -> None:
             }
         )
     )
+    names = table.get_column_names()
     result = table.remove_outliers()
     assert result.count_rows() == 3
     assert result.count_columns() == 3
+    assert names == table.get_column_names()
 
 
 def test_remove_outliers_with_outliers() -> None:

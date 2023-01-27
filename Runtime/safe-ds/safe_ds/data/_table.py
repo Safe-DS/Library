@@ -744,7 +744,7 @@ class Table:
             )
         ]
 
-        return Table(result)
+        return Table(result, self.schema)
 
     def __eq__(self, other: typing.Any) -> bool:
         if not isinstance(other, Table):
