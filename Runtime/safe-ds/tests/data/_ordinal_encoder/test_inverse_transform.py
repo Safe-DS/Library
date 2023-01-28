@@ -1,5 +1,7 @@
 import pandas as pd
-from safeds.data import OrdinalEncoder, StringColumnType, Table
+from safeds.data import OrdinalEncoder
+from safeds.data.tabular import Table
+from safeds.data.tabular.typing import StringColumnType
 
 
 def test_inverse_transform() -> None:

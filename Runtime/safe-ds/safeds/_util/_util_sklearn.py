@@ -1,6 +1,7 @@
 from typing import Any
 
-from safeds.data import SupervisedDataset, Table
+from safeds.data import SupervisedDataset
+from safeds.data.tabular import Table
 from safeds.exceptions import LearningError, PredictionError
 from sklearn.exceptions import NotFittedError
 

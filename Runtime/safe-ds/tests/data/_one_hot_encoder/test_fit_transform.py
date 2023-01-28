@@ -1,5 +1,6 @@
 import pandas as pd
-from safeds.data import OneHotEncoder, Table
+from safeds.data import OneHotEncoder
+from safeds.data.tabular import Table
 
 
 def test_fit_transform() -> None:

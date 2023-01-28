@@ -4,10 +4,9 @@ import warnings
 from typing import Any
 
 import pandas
+from safeds.data.tabular import Table
 from safeds.exceptions import LearningError, NotFittedError
 from sklearn import exceptions, preprocessing
-
-from ._table import Table
 
 
 def warn(*_: Any, **__: Any) -> None:

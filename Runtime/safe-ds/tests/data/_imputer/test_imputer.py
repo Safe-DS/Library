@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
-from safeds.data import Table
-from safeds.data._imputer import Imputer
+from safeds.data import Imputer
+from safeds.data.tabular import Table
 
 
 def test_imputer_mean() -> None:

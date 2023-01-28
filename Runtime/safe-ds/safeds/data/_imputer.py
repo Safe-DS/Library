@@ -4,9 +4,8 @@ from abc import ABC, abstractmethod
 from typing import Any, Optional
 
 import pandas as pd
+from safeds.data.tabular import Table
 from sklearn.impute import SimpleImputer
-
-from ._table import Table
 
 
 class ImputerStrategy(ABC):

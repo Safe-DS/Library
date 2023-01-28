@@ -1,7 +1,5 @@
 from IPython.core.display_functions import DisplayHandle
-
-from ._column import Column
-from ._table import Table
+from safeds.data.tabular import Column, Table
 
 
 class SupervisedDataset:

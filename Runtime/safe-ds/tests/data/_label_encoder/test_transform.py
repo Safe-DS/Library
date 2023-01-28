@@ -1,6 +1,7 @@
 import pandas as pd
 import pytest
-from safeds.data import LabelEncoder, Table
+from safeds.data import LabelEncoder
+from safeds.data.tabular import Table
 from safeds.exceptions import NotFittedError
 
 
