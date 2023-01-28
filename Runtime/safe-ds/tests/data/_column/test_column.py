@@ -1,5 +1,5 @@
 import pandas as pd
-from safe_ds.data import Column
+from safeds.data import Column
 
 
 def test_from_columns() -> None:

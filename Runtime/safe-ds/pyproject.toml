@@ -4,6 +4,9 @@ version = "0.1.0"
 description = "The Safe-DS standard library."
 authors = ["Lars Reimann <mail@larsreimann.com>"]
 license = "MIT"
+packages = [
+    { include = "safeds" },
+]
 
 [tool.poetry.dependencies]
 python = "^3.10"

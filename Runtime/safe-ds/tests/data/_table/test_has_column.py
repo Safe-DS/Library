@@ -1,4 +1,4 @@
-from safe_ds.data import Table
+from safeds.data import Table
 
 
 def test_has_column_positive() -> None:

@@ -1,7 +1,7 @@
 import pandas as pd
 import pytest
-from safe_ds.data import OneHotEncoder, Table
-from safe_ds.exceptions import NotFittedError
+from safeds.data import OneHotEncoder, Table
+from safeds.exceptions import NotFittedError
 
 
 def test_fit_transform() -> None:

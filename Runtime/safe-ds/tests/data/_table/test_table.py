@@ -1,5 +1,5 @@
 import numpy as np
-from safe_ds.data import ColumnType, Table, TableSchema
+from safeds.data import ColumnType, Table, TableSchema
 
 
 def test_create_empty_table() -> None:

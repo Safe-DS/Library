@@ -2,9 +2,9 @@ import _pytest
 import matplotlib.pyplot as plt
 import pandas as pd
 import pytest
-from safe_ds import plotting
-from safe_ds.data import Table
-from safe_ds.exceptions import NonNumericColumnError
+from safeds import plotting
+from safeds.data import Table
+from safeds.exceptions import NonNumericColumnError
 
 
 def test_plot_correlation_heatmap_non_numeric() -> None:

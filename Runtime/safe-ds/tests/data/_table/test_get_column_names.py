@@ -1,5 +1,5 @@
 import pandas as pd
-from safe_ds.data import Table, TableSchema
+from safeds.data import Table, TableSchema
 
 
 def test_get_column_names() -> None:

@@ -1,5 +1,5 @@
 import pandas as pd
-from safe_ds.data import OrdinalEncoder, StringColumnType, Table
+from safeds.data import OrdinalEncoder, StringColumnType, Table
 
 
 def test_inverse_transform() -> None:

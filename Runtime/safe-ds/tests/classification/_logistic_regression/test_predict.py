@@ -1,7 +1,7 @@
 import pytest
-from safe_ds.classification import LogisticRegression
-from safe_ds.data import SupervisedDataset, Table
-from safe_ds.exceptions import PredictionError
+from safeds.classification import LogisticRegression
+from safeds.data import SupervisedDataset, Table
+from safeds.exceptions import PredictionError
 
 
 def test_logistic_regression_predict() -> None:

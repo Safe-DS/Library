@@ -1,7 +1,7 @@
 import pandas as pd
 import pytest
-from safe_ds.data import Column
-from safe_ds.regression.metrics import mean_squared_error
+from safeds.data import Column
+from safeds.regression.metrics import mean_squared_error
 
 
 @pytest.mark.parametrize(

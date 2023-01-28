@@ -1,5 +1,5 @@
 import pandas as pd
-from safe_ds.data import IntColumnType, Row, StringColumnType, Table, TableSchema
+from safeds.data import IntColumnType, Row, StringColumnType, Table, TableSchema
 
 
 def test_to_rows() -> None:

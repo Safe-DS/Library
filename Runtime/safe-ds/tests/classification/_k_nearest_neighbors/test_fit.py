@@ -1,7 +1,7 @@
 import pytest
-from safe_ds.classification import KNearestNeighbors as KNearestNeighborsClassifier
-from safe_ds.data import SupervisedDataset, Table
-from safe_ds.exceptions import LearningError
+from safeds.classification import KNearestNeighbors as KNearestNeighborsClassifier
+from safeds.data import SupervisedDataset, Table
+from safeds.exceptions import LearningError
 
 
 def test_k_nearest_neighbors_fit() -> None:

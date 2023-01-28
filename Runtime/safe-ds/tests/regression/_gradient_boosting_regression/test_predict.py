@@ -1,7 +1,7 @@
 import pytest
-from safe_ds.data import SupervisedDataset, Table
-from safe_ds.exceptions import PredictionError
-from safe_ds.regression import GradientBoosting
+from safeds.data import SupervisedDataset, Table
+from safeds.exceptions import PredictionError
+from safeds.regression import GradientBoosting
 
 
 def test_gradient_boosting_predict() -> None:

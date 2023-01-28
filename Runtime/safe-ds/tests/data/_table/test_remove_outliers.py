@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-from safe_ds.data import ColumnType, Table, TableSchema
+from safeds.data import ColumnType, Table, TableSchema
 
 
 def test_remove_outliers_no_outliers() -> None:

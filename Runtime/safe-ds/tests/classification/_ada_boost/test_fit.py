@@ -1,7 +1,7 @@
 import pytest
-from safe_ds.classification import AdaBoost
-from safe_ds.data import SupervisedDataset, Table
-from safe_ds.exceptions import LearningError
+from safeds.classification import AdaBoost
+from safeds.data import SupervisedDataset, Table
+from safeds.exceptions import LearningError
 
 
 def test_ada_boost_fit() -> None:

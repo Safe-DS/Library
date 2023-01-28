@@ -1,7 +1,7 @@
 import pytest
-from safe_ds.data import SupervisedDataset, Table
-from safe_ds.exceptions import PredictionError
-from safe_ds.regression import LassoRegression
+from safeds.data import SupervisedDataset, Table
+from safeds.exceptions import PredictionError
+from safeds.regression import LassoRegression
 
 
 def test_lasso_regression_predict() -> None:

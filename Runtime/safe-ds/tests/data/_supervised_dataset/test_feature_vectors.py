@@ -1,4 +1,4 @@
-from safe_ds.data import SupervisedDataset, Table
+from safeds.data import SupervisedDataset, Table
 
 
 def test_supervised_dataset_feature_vectors() -> None:

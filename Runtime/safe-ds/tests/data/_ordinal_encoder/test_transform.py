@@ -1,7 +1,7 @@
 import pandas as pd
 import pytest
-from safe_ds.data import OrdinalEncoder, Table
-from safe_ds.exceptions import NotFittedError
+from safeds.data import OrdinalEncoder, Table
+from safeds.exceptions import NotFittedError
 
 
 def test_transform_invalid() -> None:

@@ -1,7 +1,7 @@
 import pytest
-from safe_ds.data import SupervisedDataset, Table
-from safe_ds.exceptions import PredictionError
-from safe_ds.regression import ElasticNetRegression
+from safeds.data import SupervisedDataset, Table
+from safeds.exceptions import PredictionError
+from safeds.regression import ElasticNetRegression
 
 
 def test_elastic_net_regression_predict() -> None:

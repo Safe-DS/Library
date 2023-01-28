@@ -1,7 +1,7 @@
 import pytest
-from safe_ds.data import SupervisedDataset, Table
-from safe_ds.exceptions import PredictionError
-from safe_ds.regression import RidgeRegression
+from safeds.data import SupervisedDataset, Table
+from safeds.exceptions import PredictionError
+from safeds.regression import RidgeRegression
 
 
 def test_ridge_regression_predict() -> None:

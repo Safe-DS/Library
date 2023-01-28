@@ -1,4 +1,4 @@
-from safe_ds.data import FloatColumnType, IntColumnType, Table, TableSchema
+from safeds.data import FloatColumnType, IntColumnType, Table, TableSchema
 
 
 def test_table_equals_valid() -> None:

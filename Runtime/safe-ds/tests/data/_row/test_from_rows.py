@@ -1,4 +1,4 @@
-from safe_ds.data import Row, Table
+from safeds.data import Row, Table
 
 
 def test_from_rows() -> None:

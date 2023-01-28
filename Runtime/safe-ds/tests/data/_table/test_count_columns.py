@@ -1,5 +1,5 @@
 import pandas as pd
-from safe_ds.data import Table
+from safeds.data import Table
 
 
 def test_count_columns() -> None:

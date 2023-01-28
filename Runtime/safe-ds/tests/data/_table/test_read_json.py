@@ -1,5 +1,5 @@
 import pytest
-from safe_ds.data import Table
+from safeds.data import Table
 
 
 def test_read_json_valid() -> None:

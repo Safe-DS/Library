@@ -1,6 +1,6 @@
 import pytest
-from safe_ds.data import Table
-from safe_ds.exceptions import UnknownColumnNameError
+from safeds.data import Table
+from safeds.exceptions import UnknownColumnNameError
 
 
 def test_table_column_drop() -> None:

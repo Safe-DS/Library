@@ -1,5 +1,5 @@
 import pandas as pd
-from safe_ds.data import Table
+from safeds.data import Table
 
 
 def test_get_column_index_by_name() -> None:

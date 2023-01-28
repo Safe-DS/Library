@@ -1,7 +1,7 @@
 import pandas as pd
 import pytest
-from safe_ds.data import Table
-from safe_ds.exceptions import NonNumericColumnError
+from safeds.data import Table
+from safeds.exceptions import NonNumericColumnError
 
 
 def test_mean_invalid() -> None:

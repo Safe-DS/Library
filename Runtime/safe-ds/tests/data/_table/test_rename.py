@@ -1,6 +1,6 @@
 import pytest
-from safe_ds.data import Table
-from safe_ds.exceptions import DuplicateColumnNameError, UnknownColumnNameError
+from safeds.data import Table
+from safeds.exceptions import DuplicateColumnNameError, UnknownColumnNameError
 
 
 @pytest.mark.parametrize(

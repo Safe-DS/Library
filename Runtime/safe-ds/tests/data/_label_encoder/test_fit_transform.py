@@ -1,5 +1,5 @@
 import pandas as pd
-from safe_ds.data import LabelEncoder, Table
+from safeds.data import LabelEncoder, Table
 
 
 def test_fit_transform_valid() -> None:

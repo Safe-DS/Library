@@ -1,6 +1,6 @@
 import pytest
-from safe_ds.data import Table
-from safe_ds.exceptions import IndexOutOfBoundsError
+from safeds.data import Table
+from safeds.exceptions import IndexOutOfBoundsError
 
 
 def test_get_row() -> None:

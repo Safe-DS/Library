@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-from safe_ds.data import ColumnType, Row, TableSchema
+from safeds.data import ColumnType, Row, TableSchema
 
 
 def test_get_column_names() -> None:

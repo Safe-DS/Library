@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 import pytest
-from safe_ds.data import Column
+from safeds.data import Column
 
 
 @pytest.mark.parametrize(

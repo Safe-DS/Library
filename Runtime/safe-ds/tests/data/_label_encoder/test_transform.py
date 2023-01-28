@@ -1,7 +1,7 @@
 import pandas as pd
 import pytest
-from safe_ds.data import LabelEncoder, Table
-from safe_ds.exceptions import NotFittedError
+from safeds.data import LabelEncoder, Table
+from safeds.exceptions import NotFittedError
 
 
 def test_transform_valid() -> None:

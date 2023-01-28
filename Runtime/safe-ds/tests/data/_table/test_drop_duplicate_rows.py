@@ -1,6 +1,6 @@
 import pandas as pd
 import pytest
-from safe_ds.data import Table
+from safeds.data import Table
 
 
 @pytest.mark.parametrize(

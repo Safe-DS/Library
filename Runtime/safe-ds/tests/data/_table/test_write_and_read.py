@@ -1,7 +1,7 @@
 from tempfile import NamedTemporaryFile
 
 import pandas as pd
-from safe_ds.data import Table
+from safeds.data import Table
 
 
 def test_write_and_read_json_valid() -> None:

@@ -1,5 +1,5 @@
 import numpy as np
-from safe_ds.data import ColumnType, Table
+from safeds.data import ColumnType, Table
 
 
 def test_get_type_of_column() -> None:

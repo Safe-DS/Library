@@ -1,7 +1,7 @@
 import pandas as pd
 import pytest
-from safe_ds.data import Column, Table
-from safe_ds.exceptions import (
+from safeds.data import Column, Table
+from safeds.exceptions import (
     ColumnSizeError,
     DuplicateColumnNameError,
     UnknownColumnNameError,

@@ -1,7 +1,7 @@
 import pytest
-from safe_ds.data import SupervisedDataset, Table
-from safe_ds.exceptions import LearningError
-from safe_ds.regression import DecisionTree
+from safeds.data import SupervisedDataset, Table
+from safeds.exceptions import LearningError
+from safeds.regression import DecisionTree
 
 
 def test_decision_tree_fit() -> None:

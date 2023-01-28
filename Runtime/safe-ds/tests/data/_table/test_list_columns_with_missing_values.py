@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-from safe_ds.data import Table
+from safeds.data import Table
 
 
 def test_list_columns_with_missing_values() -> None:

@@ -1,7 +1,7 @@
 import pandas as pd
 import pytest
-from safe_ds.data import Column
-from safe_ds.exceptions import ColumnLengthMismatchError, NonNumericColumnError
+from safeds.data import Column
+from safeds.exceptions import ColumnLengthMismatchError, NonNumericColumnError
 
 
 def test_correlation_with() -> None:

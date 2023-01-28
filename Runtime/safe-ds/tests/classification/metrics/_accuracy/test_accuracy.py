@@ -1,6 +1,6 @@
 import pandas as pd
-from safe_ds.classification.metrics import accuracy
-from safe_ds.data import Column
+from safeds.classification.metrics import accuracy
+from safeds.data import Column
 
 
 def test_accuracy() -> None:

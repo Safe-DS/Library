@@ -1,8 +1,8 @@
 import _pytest
 import matplotlib.pyplot as plt
 import pandas as pd
-from safe_ds import plotting
-from safe_ds.data import Table
+from safeds import plotting
+from safeds.data import Table
 
 
 def test_plot_histogram(monkeypatch: _pytest.monkeypatch) -> None:

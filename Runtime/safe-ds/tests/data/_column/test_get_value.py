@@ -1,7 +1,7 @@
 import pandas as pd
 import pytest
-from safe_ds.data import Column
-from safe_ds.exceptions import IndexOutOfBoundsError
+from safeds.data import Column
+from safeds.exceptions import IndexOutOfBoundsError
 
 
 def test_get_value_valid() -> None:
