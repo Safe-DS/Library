@@ -11,7 +11,7 @@ class OneHotEncoder:
     """
 
     def __init__(self) -> None:
-        self.encoder = OHE_sklearn()
+        self._encoder = OHE_sklearn()
 
     def fit(self, table: Table, columns: list[str]) -> None:
         """
@@ -33,7 +33,7 @@ class OneHotEncoder:
             table_k_columns = table.keep_columns(column_names=columns)
             df = table_k_columns._data
             df.columns = table_k_columns.schema.get_column_names()
-            self.encoder.fit(df)
+            self._encoder.fit(df)
         except exceptions.NotFittedError as exc:
             raise LearningError("") from exc
 
@@ -57,15 +57,15 @@ class OneHotEncoder:
             If the encoder wasn't fitted before transforming.
         """
         try:
-            table_k_columns = table.keep_columns(self.encoder.feature_names_in_)
+            table_k_columns = table.keep_columns(self._encoder.feature_names_in_)
             df_k_columns = table_k_columns._data
             df_k_columns.columns = table_k_columns.schema.get_column_names()
-            df_new = pd.DataFrame(self.encoder.transform(df_k_columns).toarray())
-            df_new.columns = self.encoder.get_feature_names_out()
+            df_new = pd.DataFrame(self._encoder.transform(df_k_columns).toarray())
+            df_new.columns = self._encoder.get_feature_names_out()
             df_concat = table._data.copy()
             df_concat.columns = table.schema.get_column_names()
             data_new = pd.concat([df_concat, df_new], axis=1).drop(
-                self.encoder.feature_names_in_, axis=1
+                self._encoder.feature_names_in_, axis=1
             )
             return Table(data_new)
         except Exception as exc:
@@ -112,14 +112,14 @@ class OneHotEncoder:
 
         """
         try:
-            data = self.encoder.inverse_transform(
-                table.keep_columns(self.encoder.get_feature_names_out())._data
+            data = self._encoder.inverse_transform(
+                table.keep_columns(self._encoder.get_feature_names_out())._data
             )
             df = pd.DataFrame(data)
-            df.columns = self.encoder.feature_names_in_
+            df.columns = self._encoder.feature_names_in_
             new_table = Table(df)
             for col in table.drop_columns(
-                self.encoder.get_feature_names_out()
+                self._encoder.get_feature_names_out()
             ).to_columns():
                 new_table = new_table.add_column(col)
             return new_table

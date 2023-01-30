@@ -25,8 +25,8 @@ class LabelEncoder:
     """
 
     def __init__(self) -> None:
-        self.is_fitted = 0
-        self.le = preprocessing.LabelEncoder()
+        self._is_fitted = 0
+        self._le = preprocessing.LabelEncoder()
 
     def fit(self, table: Table, column: str) -> None:
         """
@@ -36,7 +36,6 @@ class LabelEncoder:
         ----------
         table : Table
             The table containing the data used to fit the label encoder.
-
         column : str
             The list of columns supposed to be label-encoded.
 
@@ -52,7 +51,7 @@ class LabelEncoder:
         """
         try:
 
-            self.le.fit(table.keep_columns([column])._data)
+            self._le.fit(table.keep_columns([column])._data)
         except exceptions.NotFittedError as exc:
             raise LearningError("") from exc
 
@@ -80,7 +79,7 @@ class LabelEncoder:
         p_df = table._data
         p_df.columns = table.schema.get_column_names()
         try:
-            p_df[column] = self.le.transform(p_df[column])
+            p_df[column] = self._le.transform(p_df[column])
             return Table(p_df)
         except Exception as exc:
             raise NotFittedError from exc
@@ -112,10 +111,10 @@ class LabelEncoder:
         try:
             for col in columns:
                 # Fit the LabelEncoder on the Column
-                self.le.fit(p_df[col])
+                self._le.fit(p_df[col])
 
                 # transform the column using the trained Label Encoder
-                p_df[col] = self.le.transform(p_df[col])
+                p_df[col] = self._le.transform(p_df[col])
             return Table(pandas.DataFrame(p_df))
         except exceptions.NotFittedError as exc:
             raise NotFittedError from exc
@@ -145,7 +144,7 @@ class LabelEncoder:
         try:
             p_df = table._data
             p_df.columns = table.schema.get_column_names()
-            p_df[column] = self.le.inverse_transform(p_df[column])
+            p_df[column] = self._le.inverse_transform(p_df[column])
             return Table(p_df)
         except exceptions.NotFittedError as exc:
             raise NotFittedError from exc

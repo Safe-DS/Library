@@ -59,7 +59,6 @@ class ColumnSizeError(Exception):
     ----------
     expected_size : str
         The expected size of the column as an expression (e.g. 2, >0, !=0).
-
     actual_size : str
         The actual size of the column as an expression (e.g. 2, >0, !=0).
     """

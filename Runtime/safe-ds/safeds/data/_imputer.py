@@ -37,11 +37,11 @@ class Imputer:
             """
 
             def __init__(self, value: Any):
-                self.value = value
+                self._value = value
 
             def _augment_imputer(self, imputer: SimpleImputer) -> None:
                 imputer.strategy = "constant"
-                imputer.fill_value = self.value
+                imputer.fill_value = self._value
 
         class Mean(ImputerStrategy):
             """
@@ -70,7 +70,7 @@ class Imputer:
     def __init__(self, strategy: ImputerStrategy):
         self._imp = SimpleImputer()
         strategy._augment_imputer(self._imp)
-        self.column_names: list[str] = []
+        self._column_names: list[str] = []
 
     def fit(self, table: Table, column_names: Optional[list[str]] = None) -> None:
         """
@@ -86,9 +86,9 @@ class Imputer:
         if column_names is None:
             column_names = table.schema.get_column_names()
 
-        self.column_names = column_names
+        self._column_names = column_names
         indices = [
-            table.schema._get_column_index_by_name(name) for name in self.column_names
+            table.schema._get_column_index_by_name(name) for name in self._column_names
         ]
         self._imp.fit(table._data[indices])
 
@@ -108,7 +108,7 @@ class Imputer:
         """
         data = table._data.copy()
         indices = [
-            table.schema._get_column_index_by_name(name) for name in self.column_names
+            table.schema._get_column_index_by_name(name) for name in self._column_names
         ]
         data[indices] = pd.DataFrame(
             self._imp.transform(data[indices]), columns=indices
