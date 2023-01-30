@@ -1,6 +1,6 @@
 import pandas as pd
-from safeds.data import OrdinalEncoder
 from safeds.data.tabular import Table
+from safeds.data.tabular.transformation import OrdinalEncoder
 from safeds.data.tabular.typing import StringColumnType
 
 

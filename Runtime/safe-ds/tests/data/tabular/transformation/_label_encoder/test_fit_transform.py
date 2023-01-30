@@ -1,6 +1,6 @@
 import pandas as pd
-from safeds.data import LabelEncoder
 from safeds.data.tabular import Table
+from safeds.data.tabular.transformation import LabelEncoder
 
 
 def test_fit_transform_valid() -> None:
