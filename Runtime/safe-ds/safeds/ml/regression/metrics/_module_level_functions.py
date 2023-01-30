@@ -34,6 +34,7 @@ def mean_absolute_error(actual: Column, expected: Column) -> float:
         The column containing estimated values.
     expected: Column
         The column containing ground truth.
+
     Returns
     -------
     mean_absolute_error : float

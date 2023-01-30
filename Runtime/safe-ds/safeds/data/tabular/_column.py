@@ -424,8 +424,11 @@ class ColumnStatistics:
 
     def stability(self) -> float:
         """
-        Calculate the stability of this column.
-        The value is calculated as the ratio between the number of mode values and the number of non-null-values.
+        Calculate the stability of this column, which we define as
+
+        $$
+        \\frac{\\text{number of occurrences of most common non-null value}}{\\text{number of non-null values}}
+        $$
 
         Returns
         -------
@@ -446,7 +449,11 @@ class ColumnStatistics:
 
     def idness(self) -> float:
         """
-        Calculate the idness of this column (number of unique values / number of rows).
+        Calculate the idness of this column, which we define as
+
+        $$
+        \\frac{\\text{number of different values}}{\\text{number of rows}}
+        $$
 
         Returns
         -------

@@ -59,6 +59,7 @@ class OrdinalEncoder:
             The table with target values.
         column_name : str
             The name of the column.
+
         Returns
         -------
         table : Table

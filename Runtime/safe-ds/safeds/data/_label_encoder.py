@@ -61,20 +61,20 @@ class LabelEncoder:
         Transform the given table to a normalized encoded table.
 
         Parameters
-         ----------
-         table : Table
-                 The table with target values.
-         column : str
-                 The name of the column.
+        ----------
+        table : Table
+                The table with target values.
+        column : str
+                The name of the column.
 
-         Returns
-         -------
-         result : Table
-             Table with normalized encodings.
+        Returns
+        -------
+        result : Table
+            Table with normalized encodings.
 
-         Raises
-         ------
-         NotFittedError
+        Raises
+        ------
+        NotFittedError
             If the Model wasn't fitted before transforming.
         """
         p_df = table._data
