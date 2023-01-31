@@ -8,7 +8,7 @@ def test_summary() -> None:
     truth = Table(
         pd.DataFrame(
             data={
-                "": [
+                "metrics": [
                     "max",
                     "min",
                     "mean",
