@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+import pytest
 from safeds.data.tabular import Table
 from safeds.data.tabular.transformation import Imputer
 
@@ -23,12 +24,19 @@ def test_imputer_median() -> None:
 
 
 def test_imputer_mode() -> None:
-    table = Table(pd.DataFrame(data={"col1": [np.nan, 2, 3, 4, 5]}))
+    table = Table(pd.DataFrame(data={"col1": [np.nan, 2, 2, 4, 5]}))
     column = table.get_column("col1")
     imp = Imputer(Imputer.Strategy.Mode())
     new_table = imp.fit_transform(table)
 
-    assert new_table.get_column("col1")._data[0] == column.statistics.mode()
+    assert new_table.get_column("col1")._data[0] == column.statistics.mode()[0]
+
+
+def test_imputer_mode_invalid() -> None:
+    table = Table(pd.DataFrame(data={"col1": [np.nan, 2, 3, 4, 5]}))
+    imp = Imputer(Imputer.Strategy.Mode())
+    with pytest.raises(IndexError):
+        imp.fit_transform(table)
 
 
 def test_imputer_constant() -> None:

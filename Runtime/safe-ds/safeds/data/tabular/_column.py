@@ -331,10 +331,10 @@ class ColumnStatistics:
 
         Returns
         -------
-        mode :
-            The mode value.
+        List :
+            Returns a list with the most common values.
         """
-        return self._column._data.mode()[0]
+        return self._column._data.mode().tolist()
 
     def median(self) -> float:
         """
@@ -443,7 +443,7 @@ class ColumnStatistics:
         if self._column._data.size == 0:
             raise ColumnSizeError("> 0", "0")
         return (
-            self._column._data.value_counts()[self._column.statistics.mode()]
+            self._column._data.value_counts()[self._column.statistics.mode()[0]]
             / self._column._data.count()
         )
 
