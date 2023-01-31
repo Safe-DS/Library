@@ -835,14 +835,14 @@ class Table:
 
             for function in statistics.values():
                 try:
-                    values.append(function())
+                    values.append(str(function()))
                 except NonNumericColumnError:
                     values.append("-")
 
             result = pd.concat([result, pd.DataFrame(values)], axis=1)
 
         result = pd.concat([pd.DataFrame(list(statistics.keys())), result], axis=1)
-        result.columns = [""] + self.get_column_names()
+        result.columns = ["metrics"] + self.get_column_names()
 
         return Table(result)
 
