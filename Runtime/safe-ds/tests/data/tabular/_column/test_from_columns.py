@@ -1,5 +1,7 @@
 import pandas as pd
+import pytest
 from safeds.data.tabular import Column, Table
+from safeds.exceptions import MissingDataError
 
 
 def test_from_columns() -> None:
@@ -11,3 +13,8 @@ def test_from_columns() -> None:
     table_restored: Table = Table.from_columns(columns_table)
 
     assert table_restored == table_expected
+
+
+def test_from_columns_invalid() -> None:
+    with pytest.raises(MissingDataError):
+        Table.from_columns([])
