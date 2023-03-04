@@ -11,6 +11,8 @@ nav:
 
 theme:
   name: material
+  logo: assets/logo.svg
+  favicon: assets/logo.svg
   palette:
     # Palette toggle for light mode
     - scheme: default
