@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ./Runtime/safe-ds
+        working-directory: src
     strategy:
       matrix:
         python-version: [ "3.10" ]
@@ -55,5 +55,5 @@ jobs:
         uses: codecov/codecov-action@v3
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          directory: Runtime/safe-ds
+          directory: src
           files: coverage.xml

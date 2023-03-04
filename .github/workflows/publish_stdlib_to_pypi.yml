@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ./Runtime/safe-ds
+        working-directory: src
     strategy:
       matrix:
         python-version: [ "3.10" ]
