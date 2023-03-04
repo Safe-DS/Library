@@ -1,4 +1,4 @@
-name: Add Issues to General Project
+name: Add Issues to Stdlib Project
 
 on:
   issues:
@@ -11,5 +11,5 @@ jobs:
     steps:
       - uses: actions/add-to-project@v0.4.0
         with:
-          project-url: https://github.com/users/lars-reimann/projects/1
+          project-url: https://github.com/orgs/Safe-DS/projects/2
           github-token: ${{ secrets.ADD_TO_PROJECT_PAT }}
