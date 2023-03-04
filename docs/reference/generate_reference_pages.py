@@ -20,10 +20,11 @@ def list_class_and_function_names_in_module(module_name: str) -> list[str]:
 
 
 nav = mkdocs_gen_files.Nav()
+root = "src"
 
-for path in sorted(Path("Runtime/safe-ds").rglob("__init__.py")):
-    module_path = path.relative_to("Runtime/safe-ds").with_suffix("")
-    doc_path = path.relative_to("Runtime/safe-ds").with_suffix(".md")
+for path in sorted(Path(root).rglob("__init__.py")):
+    module_path = path.relative_to(root).with_suffix("")
+    doc_path = path.relative_to(root).with_suffix(".md")
     full_doc_path = Path("reference", doc_path)
 
     # Skip demos, tests, etc.

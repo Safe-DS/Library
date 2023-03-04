@@ -16,18 +16,18 @@ data = Table.from_csv("path/to/your/data.csv")
 Now we want to have a look at what our dataset looks like. For this, we use Jupyter Notebooks native display function.
 
 ```python
-data    # calls display(data)
+data # calls display(data)
 ```
 
-![Table](./Resources/Table.png)
+![Table](resources/table.png)
 
 Next some statistics.
 
 ```python
-data.summary()  # returns a table with various statistics for each column
+data.summary() # returns a table with various statistics for each column
 ```
 
-![Summary](./Resources/Summary.png)
+![Summary](resources/summary.png)
 
 As you can see here, the **idness** of the column _PassengerId_ is 1. This means, that every row has a unique value for
 this column. Since this isn't helpful for our usecase we can drop it.
@@ -48,7 +48,7 @@ data_only_numerics = Table.from_columns(data_cleaned.list_columns_with_numerical
 correlation_heatmap(data_only_numerics)
 ```
 
-![Heatmap](./Resources/Heatmap.png)
+![Heatmap](resources/heatmap.png)
 
 As you can see, the columns _Fare_ and _Pclass_ (Passenger Class) seem to heavily correlate. Let's have another look at that.
 ## Lineplot
@@ -59,7 +59,7 @@ from safeds.plotting import lineplot
 lineplot(data_cleaned, "Pclass", "Fare")
 ```
 
-![Lineplot](./Resources/Lineplot.png)
+![Lineplot](resources/lineplot.png)
 
 The line itself represents the central tendency and the hued area around it a confidence interval for that estimate.
 
@@ -75,14 +75,14 @@ from safeds.plotting import boxplot
 boxplot(data_cleaned.get_column("Age"))
 ```
 
-![Boxplot](./Resources/Boxplot.png)
+![Boxplot](resources/boxplot.png)
 
 ```python
 from safeds.plotting import histogram
 
 histogram(data_cleaned.get_column("Fare"))
 ```
-![Histogram](./Resources/Histogram.png)
+![Histogram](resources/histogram.png)
 
 ```python
 from safeds.plotting import scatterplot
@@ -90,4 +90,4 @@ from safeds.plotting import scatterplot
 scatterplot(data_cleaned, "Age", "Fare")
 ```
 
-![Scatterplot](./Resources/Scatterplot.png)
+![Scatterplot](resources/scatterplot.png)
