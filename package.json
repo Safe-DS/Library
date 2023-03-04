@@ -1,5 +1,5 @@
 {
-    "name": "safe-data-science",
+    "name": "safe-ds-stdlib",
     "version": "0.0.1",
     "private": true,
     "prettier": "@lars-reimann/prettier-config",
