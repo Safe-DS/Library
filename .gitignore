@@ -1,8 +1,3 @@
-# Eclipse (also used by Gradle support in VS Code)
-.settings/
-.classpath
-.project
-
 # IntelliJ
 .idea/
 *.iml
@@ -14,9 +9,6 @@
 build/
 dist/
 out/
-
-# Gradle
-.gradle/
 
 # Node
 .npm/

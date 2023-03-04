@@ -1,6 +1,6 @@
-site_name: Safe-DS
-repo_url: https://github.com/lars-reimann/Safe-DS
-repo_name: Safe-DS
+site_name: Safe-DS Python Library
+repo_url: https://github.com/Safe-DS/Stdlib
+repo_name: Safe-DS/Stdlib
 
 nav:
   - Home: README.md
@@ -38,7 +38,7 @@ plugins:
       handlers:
         python:
           paths:
-            - Runtime/safe-ds
+            - src
           options:
             docstring_style: numpy
             show_if_no_docstring: true
@@ -53,7 +53,7 @@ plugins:
   - search
 
 watch:
-  - Runtime/safe-ds
+  - src
 
 markdown_extensions:
   # Admonitions
