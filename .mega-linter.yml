@@ -3,7 +3,7 @@
 EXTENDS: https://raw.githubusercontent.com/lars-reimann/.github/main/.mega-linter.yml
 
 # Config
-FILTER_REGEX_EXCLUDE: (\.github/workflows/|DSL/com\.larsreimann\.safeds/src/test/resources/|mkdocs.yml)
+FILTER_REGEX_EXCLUDE: (\.github/workflows/|mkdocs.yml)
 
 # Workaround to also run prettier on other supported file types. We deactivate it for Markdown compared to the extended
 # configuration since it breaks admonitions of Material for MkDocs.
@@ -17,5 +17,5 @@ JSON_PRETTIER_FILE_EXTENSIONS:
 
 # Commands
 PRE_COMMANDS:
-  - command: npm install @lars-reimann/eslint-config @lars-reimann/prettier-config
+  - command: npm install @lars-reimann/prettier-config
     cwd: workspace
