@@ -4,7 +4,6 @@
     "private": true,
     "prettier": "@lars-reimann/prettier-config",
     "devDependencies": {
-        "@lars-reimann/eslint-config": "^4.3.1",
         "@lars-reimann/prettier-config": "^5.0.0"
     }
 }
