@@ -44,7 +44,7 @@ plugins:
             show_if_no_docstring: true
   - gen-files:
       scripts:
-        - docs/Reference/generate_reference_pages.py
+        - docs/reference/generate_reference_pages.py
   - literate-nav:
       nav_file: SUMMARY.md
   - section-index
