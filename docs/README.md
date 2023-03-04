@@ -1,14 +1,6 @@
-# Safe-DS Documentation
+# Safe-DS Python Library
 
-## For Users
+* [Tutorials][tutorials]: Detailed explanations how to use specific parts of the library.
+* API Reference (link in navigation bar): An overview of the API of this library.
 
-* [DSL][dsl]: Documentation of the Safe-DS DSL.
-* [Stdlib][stdlib]: Overview of the elements in the Safe-DS standard library.
-
-## For Developers
-
-* [Development Guides][developers]
-
-[dsl]: DSL/README.md
-[stdlib]: Stdlib/API/README.md
-[developers]: Development/README.md
+[tutorials]: tutorials/README.md

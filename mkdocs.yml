@@ -4,8 +4,8 @@ repo_name: Safe-DS/Stdlib
 
 nav:
   - Home: README.md
+  - Tutorials: tutorials/README.md
   - API Reference: reference/
-  - Tutorials: Tutorials/README.md
 
 # Configuration of MkDocs & Material for MkDocs --------------------------------
 
