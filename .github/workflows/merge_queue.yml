@@ -1,12 +1,7 @@
-name: Pull Request
+name: Merge Queue
 
 on:
-  pull_request:
-    branches: [ main ]
-
-concurrency:
-  group: ${{ github.head_ref }}-${{ github.workflow }}
-  cancel-in-progress: true
+  merge_group:
 
 jobs:
   poetry-with-codecov:
