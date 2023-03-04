@@ -1,12 +1,11 @@
-# Safe-DS
+# Safe-DS Stdlib
 
-[![Main](https://github.com/lars-reimann/Safe-DS/actions/workflows/main.yml/badge.svg)](https://github.com/lars-reimann/Safe-DS/actions/workflows/main.yml)
-[![Documentation Status](https://readthedocs.org/projects/safe-ds/badge/?version=latest)](https://safe-ds.readthedocs.io/en/latest/?badge=latest)
+[![Main](https://github.com/lars-reimann/Safe-DS/actions/workflows/main.yml/badge.svg)](https://github.com/Safe-DS/Stdlib/actions/workflows/main.yml)
+[![codecov](https://codecov.io/gh/Safe-DS/Stdlib/branch/main/graph/badge.svg?token=HVRP1633B1)](https://codecov.io/gh/Safe-DS/Stdlib)
+[![Documentation Status](https://readthedocs.org/projects/safe-ds-stdlib/badge/?version=latest)](https://safe-ds-stdlib.readthedocs.io/en/latest/?badge=latest)
 
-Safely develop Data Science programs with a statically checked [DSL][dsl] or call our user-friendly [standard library][stdlib] (WIP) directly from Python.
+A user-friendly library for Data Science in Python.
 
 You can find the full documentation [here][docs].
 
-[dsl]: docs/DSL/README.md
-[stdlib]: docs/Stdlib/API/README.md
-[docs]: https://safe-ds.readthedocs.io/en/latest/
+[docs]: https://safe-ds-stdlib.readthedocs.io/en/latest/
