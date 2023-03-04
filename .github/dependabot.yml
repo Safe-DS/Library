@@ -1,0 +1,36 @@
+# To get started with Dependabot version updates, you'll need to specify which
+# package ecosystems to update and where the package manifests are located.
+# Please see the documentation for all configuration options:
+# https://help.github.com/github/administering-a-repository/configuration-options-for-dependency-updates
+
+version: 2
+updates:
+  # Root
+  - package-ecosystem: 'github-actions'
+    directory: '/'
+    schedule:
+      interval: 'monthly'
+
+  # DSL
+  - package-ecosystem: 'gradle'
+    directory: '/DSL'
+    schedule:
+      interval: 'monthly'
+  - package-ecosystem: 'npm'
+    directory: '/DSL/com.larsreimann.safeds.vscode'
+    schedule:
+      interval: 'monthly'
+
+  # Runtime
+  - package-ecosystem: 'pip'
+    directory: '/docs'
+    schedule:
+      interval: 'monthly'
+  - package-ecosystem: 'pip'
+    directory: '/Runtime/safe-ds'
+    schedule:
+      interval: 'monthly'
+  - package-ecosystem: 'pip'
+    directory: '/Runtime/safe-ds-runner'
+    schedule:
+      interval: 'monthly'
