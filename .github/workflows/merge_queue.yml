@@ -13,3 +13,4 @@ jobs:
       working-directory: src
       python-version: ${{ matrix.python-version }}
       module-name: safeds
+      coverage: false
