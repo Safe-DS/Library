@@ -27,8 +27,8 @@ theme:
       toggle:
         icon: material/weather-night
         name: Switch to light mode
-      primary: orange
-      accent: orange
+      primary: indigo
+      accent: indigo
   features:
     - content.code.copy
     - navigation.tabs
