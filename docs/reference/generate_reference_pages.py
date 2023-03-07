@@ -7,6 +7,9 @@ from pathlib import Path
 
 import mkdocs_gen_files
 
+root = "src"
+package = "safeds"
+
 
 def list_class_and_function_names_in_module(module_name: str) -> list[str]:
     """
@@ -20,7 +23,6 @@ def list_class_and_function_names_in_module(module_name: str) -> list[str]:
 
 
 nav = mkdocs_gen_files.Nav()
-root = "src"
 
 for path in sorted(Path(root).rglob("__init__.py")):
     module_path = path.relative_to(root).with_suffix("")
@@ -29,7 +31,7 @@ for path in sorted(Path(root).rglob("__init__.py")):
 
     # Skip demos, tests, etc.
     parts = tuple(module_path.parts)
-    if parts[0] != "safeds":
+    if parts[0] != package:
         continue
 
     # Remove the final "__init__" part

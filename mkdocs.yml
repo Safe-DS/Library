@@ -1,4 +1,4 @@
-site_name: Safe-DS Python Library
+site_name: Safe-DS Stdlib
 repo_url: https://github.com/Safe-DS/Stdlib
 repo_name: Safe-DS/Stdlib
 
@@ -11,8 +11,8 @@ nav:
 
 theme:
   name: material
-  logo: assets/logo.svg
-  favicon: assets/logo.svg
+  logo: https://raw.githubusercontent.com/Safe-DS/.github/main/branding/logo_rounded.svg
+  favicon: https://raw.githubusercontent.com/Safe-DS/.github/main/branding/logo_rounded.svg
   palette:
     # Palette toggle for light mode
     - scheme: default
