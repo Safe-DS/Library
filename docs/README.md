@@ -1,4 +1,4 @@
-# Safe-DS Stdlib
+# Safe-DS Python Library
 
 [![PyPI](https://img.shields.io/pypi/v/safe-ds)](https://pypi.org/project/safe-ds/)
 [![Main](https://github.com/Safe-DS/Stdlib/actions/workflows/main.yml/badge.svg)](https://github.com/Safe-DS/Stdlib/actions/workflows/main.yml)
