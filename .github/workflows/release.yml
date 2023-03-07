@@ -1,16 +1,13 @@
-name: Publish Stdlib to PyPI
+name: Release to PyPI
 
 on:
   workflow_dispatch
 
 jobs:
-  poetry-with-codecov:
-    strategy:
-      matrix:
-        python-version: [ "3.10" ]
+  release:
     uses: lars-reimann/.github/.github/workflows/poetry-pypi-reusable.yml@main
     with:
       working-directory: src
-      python-version: ${{ matrix.python-version }}
+      python-version: "3.10"
     secrets:
       PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
