@@ -1,9 +1,13 @@
 [tool.poetry]
 name = "safe-ds"
-version = "0.1.0"
-description = "The Safe-DS standard library."
+version = "0.2.0"
+description = "A user-friendly library for Data Science in Python."
 authors = ["Lars Reimann <mail@larsreimann.com>"]
 license = "MIT"
+readme = "../README.md"
+repository = "https://github.com/Safe-DS/Stdlib"
+documentation = "https://safe-ds-stdlib.readthedocs.io"
+keywords = ["data science", "machine learning", "usability", "learnability"]
 packages = [
     { include = "safeds" },
 ]
