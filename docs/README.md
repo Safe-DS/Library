@@ -9,4 +9,4 @@ A user-friendly library for Data Science in Python.
 
 You can find the full documentation [here][docs].
 
-[docs]: https://safe-ds-stdlib.readthedocs.io/en/latest/
+[docs]: https://safe-ds-stdlib.readthedocs.io
