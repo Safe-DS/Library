@@ -39,8 +39,3 @@ mkdocs-section-index = "^0.3.5"
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
-
-[tool.mypy]
-disallow_incomplete_defs = true
-disallow_untyped_defs = true
-ignore_missing_imports = true
