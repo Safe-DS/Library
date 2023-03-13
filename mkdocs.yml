@@ -4,7 +4,10 @@ repo_name: Safe-DS/Stdlib
 
 nav:
   - Home: README.md
-  - Tutorials: tutorials/README.md
+  - Tutorials:
+    - Data Processing: tutorials/data_processing.md
+    - Data Visualization: tutorials/data_visualization.md
+    - Machine Learning: tutorials/machine_learning.md
   - API Reference: reference/
 
 # Configuration of MkDocs & Material for MkDocs --------------------------------
