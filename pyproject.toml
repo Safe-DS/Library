@@ -44,36 +44,3 @@ build-backend = "poetry.core.masonry.api"
 disallow_incomplete_defs = true
 disallow_untyped_defs = true
 ignore_missing_imports = true
-
-[tool.pylint.messages_control]
-disable = [
-    # Default
-    "bad-inline-option",
-    "deprecated-pragma",
-    "file-ignored",
-    "locally-disabled",
-    "raw-checker-failed",
-    "suppressed-message",
-    "useless-suppression",
-    "use-symbolic-message-instead",
-    # Disabled in pylint repo
-    "attribute-defined-outside-init",
-    "fixme",
-    "invalid-name",
-    "missing-docstring",
-    "protected-access",
-    "too-few-public-methods",
-    # Handled by black
-    "format",
-    # Handled by isort
-    "wrong-import-order",
-    # False positives
-    "import-error",
-    # Unwanted
-    "design",
-    "duplicate-code",
-    "metrics",
-    "logging-fstring-interpolation",
-    "too-many-nested-blocks",
-    "useless-return"
-]
