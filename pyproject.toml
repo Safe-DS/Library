@@ -9,7 +9,7 @@ repository = "https://github.com/Safe-DS/Stdlib"
 documentation = "https://safe-ds-stdlib.readthedocs.io"
 keywords = ["data science", "machine learning", "usability", "learnability"]
 packages = [
-    { include = "src/safeds" },
+    { include = "safeds", from = "src"},
 ]
 
 [tool.poetry.dependencies]
