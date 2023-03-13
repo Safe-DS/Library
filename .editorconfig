@@ -10,9 +10,3 @@ insert_final_newline = true
 
 [{*.yaml,*.yml}]
 indent_size = 2
-
-[*.{kt,kts}]
-ktlint_standard_filename = disabled
-kltint_experimental_property-naming = disabled
-ij_kotlin_allow_trailing_comma = true
-ij_kotlin_allow_trailing_comma_on_call_site = true

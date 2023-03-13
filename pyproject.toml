@@ -4,12 +4,12 @@ version = "0.2.0"
 description = "A user-friendly library for Data Science in Python."
 authors = ["Lars Reimann <mail@larsreimann.com>"]
 license = "MIT"
-readme = "README.md"
+readme = "docs/README.md"
 repository = "https://github.com/Safe-DS/Stdlib"
 documentation = "https://safe-ds-stdlib.readthedocs.io"
 keywords = ["data science", "machine learning", "usability", "learnability"]
 packages = [
-    { include = "safeds" },
+    { include = "safeds", from = "src"},
 ]
 
 [tool.poetry.dependencies]
@@ -20,10 +20,27 @@ seaborn = "^0.12.2"
 ipython = "^8.8.0"
 matplotlib = "^3.6.3"
 
-[tool.poetry.dev-dependencies]
+[tool.poetry.group.dev.dependencies]
 pytest = "^7.2.1"
 pytest-cov = "^4.0.0"
+
+[tool.poetry.group.docs.dependencies]
+jupyter = "^1.0.0"
+mkdocs = "^1.4.2"
+mkdocstrings = "^0.20.0"
+mkdocstrings-python = "^0.8.3"
+mkdocs-autorefs = "^0.4.1"
+mkdocs-gen-files = "^0.4.0"
+mkdocs-glightbox = "^0.3.1"
+mkdocs-literate-nav = "^0.6.0"
+mkdocs-material = "^9.1.2"
+mkdocs-section-index = "^0.3.5"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.mypy]
+disallow_incomplete_defs = true
+disallow_untyped_defs = true
+ignore_missing_imports = true

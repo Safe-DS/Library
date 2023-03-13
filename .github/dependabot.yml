@@ -14,15 +14,7 @@ updates:
     directory: '/'
     schedule:
       interval: 'monthly'
-
-  # docs
   - package-ecosystem: 'pip'
-    directory: '/docs'
-    schedule:
-      interval: 'monthly'
-
-  # src
-  - package-ecosystem: 'pip'
-    directory: '/src'
+    directory: '/'
     schedule:
       interval: 'monthly'

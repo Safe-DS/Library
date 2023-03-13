@@ -11,6 +11,6 @@ jobs:
         python-version: [ "3.10" ]
     uses: lars-reimann/.github/.github/workflows/poetry-codecov-reusable.yml@main
     with:
-      working-directory: src
+      working-directory: .
       python-version: ${{ matrix.python-version }}
       module-name: safeds
