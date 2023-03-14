@@ -1,4 +1,4 @@
-# Visualization
+# Data Visualization
 
 The following code will use a Jupyter Notebook environment.
 

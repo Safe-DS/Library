@@ -10,6 +10,7 @@ nav:
     - Machine Learning: tutorials/machine_learning.md
   - API Reference: reference/
   - Development:
+    - Environment: development/environment.md
     - Guidelines: development/guidelines.md
 
 # Configuration of MkDocs & Material for MkDocs --------------------------------
