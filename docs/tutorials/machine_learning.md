@@ -2,7 +2,7 @@
 
 ## Create SupervisedDataset
 
-Here is a short introduction to train and predict with a machine learning model in safe-ds.
+Here is a short introduction to train and predict with a machine learning model in Safe-DS.
 
 First we need to create a [SupervisedDataset][safeds.data.SupervisedDataset] from the training data.
 
@@ -24,7 +24,7 @@ to_be_predicted_table = Table({
 sup_dataset = SupervisedDataset(table, target_column="target")
 ```
 
-[SupervisedDatasets][safeds.data.SupervisedDataset] are used in safe-DS to train supervised machine learning models
+[SupervisedDatasets][safeds.data.SupervisedDataset] are used in Safe-DS to train supervised machine learning models
 (e.g. [RandomForest][safeds.ml.classification.RandomForest] for classification and
 [LinearRegression][safeds.ml.regression.LinearRegression] as a regression model), because they keep track of the target
 vector. A [SupervisedDataset][safeds.data.SupervisedDataset] can be created from a [Table][safeds.data.tabular.Table] and
@@ -37,7 +37,7 @@ train with (the sum of the rows). The `to_predicted_table` is the table we want 
 does not contain a target vector.
 
 In order to train the [LinearRegression][safeds.ml.regression.LinearRegression]-model we need to make the following calls
-in safe-DS:
+in Safe-DS:
 
 ```python
 linear_reg_model = LinearRegression()
@@ -46,7 +46,7 @@ linear_reg_model.fit(sup_dataset)
 
 As we can see, a [LinearRegression][safeds.ml.regression.LinearRegression]-object is created.
 
-In safe-DS machine learning models are separated in different classes where the different fit and predictions methods
+In Safe-DS machine learning models are separated in different classes where the different fit and predictions methods
 are implemented for the given machine learning model.
 
 ## Predicting new values
