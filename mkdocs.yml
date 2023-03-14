@@ -3,7 +3,9 @@ repo_url: https://github.com/Safe-DS/Stdlib
 repo_name: Safe-DS/Stdlib
 
 nav:
-  - Home: README.md
+  - Home:
+    - README: README.md
+    - Changelog: CHANGELOG.md
   - Tutorials:
     - Data Processing: tutorials/data_processing.md
     - Data Visualization: tutorials/data_visualization.md
