@@ -7,7 +7,6 @@ nav:
   - Tutorials:
     - Data Processing: tutorials/data_processing.md
     - Data Visualization: tutorials/data_visualization.md
-    - Data Visualization Notebook: tutorials/data_visualization_notebook.ipynb
     - Machine Learning: tutorials/machine_learning.md
   - API Reference: reference/
 
