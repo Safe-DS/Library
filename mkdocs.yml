@@ -9,6 +9,8 @@ nav:
     - Data Visualization: tutorials/data_visualization.md
     - Machine Learning: tutorials/machine_learning.md
   - API Reference: reference/
+  - Development:
+    - Guidelines: development/guidelines.md
 
 # Configuration of MkDocs & Material for MkDocs --------------------------------
 
@@ -57,6 +59,7 @@ plugins:
   - glightbox
   - search
   - mkdocs-jupyter:
+      include: ["*.ipynb"]
       execute: true
       allow_errors: false
       include_source: true
