@@ -1614,14 +1614,14 @@ mkdocs = ">=1.0.3"
 
 [[package]]
 name = "mkdocs-material"
-version = "9.1.2"
+version = "9.1.3"
 description = "Documentation that simply works"
 category = "dev"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "mkdocs_material-9.1.2-py3-none-any.whl", hash = "sha256:344a1c66f0e217e5ceaf67739d274e51c61ac9f9d7af55a5b4805a4a2ab54184"},
-    {file = "mkdocs_material-9.1.2.tar.gz", hash = "sha256:9ca8c980c30aab3b70e3bfbec691f9ffcbea8319873911c86e8af145147e2a9d"},
+    {file = "mkdocs_material-9.1.3-py3-none-any.whl", hash = "sha256:a8d14d03569008afb0f5a5785c253249b5ff038e3a5509f96a393b8596bf5062"},
+    {file = "mkdocs_material-9.1.3.tar.gz", hash = "sha256:0be1b5d76c00efc9b2ecbd2d71014be950351e710f5947f276264878afc82ca0"},
 ]
 
 [package.dependencies]
@@ -1764,14 +1764,14 @@ test = ["ipykernel", "ipython", "ipywidgets", "nbconvert (>=7.0.0)", "pytest (>=
 
 [[package]]
 name = "nbconvert"
-version = "7.2.9"
+version = "7.2.10"
 description = "Converting Jupyter Notebooks"
 category = "dev"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "nbconvert-7.2.9-py3-none-any.whl", hash = "sha256:495638c5e06005f4a5ce828d8a81d28e34f95c20f4384d5d7a22254b443836e7"},
-    {file = "nbconvert-7.2.9.tar.gz", hash = "sha256:a42c3ac137c64f70cbe4d763111bf358641ea53b37a01a5c202ed86374af5234"},
+    {file = "nbconvert-7.2.10-py3-none-any.whl", hash = "sha256:e41118f81698d3d59b3c7c2887937446048f741aba6c367c1c1a77810b3e2d08"},
+    {file = "nbconvert-7.2.10.tar.gz", hash = "sha256:8eed67bd8314f3ec87c4351c2f674af3a04e5890ab905d6bd927c05aec1cf27d"},
 ]
 
 [package.dependencies]
@@ -2813,14 +2813,14 @@ files = [
 
 [[package]]
 name = "safe-ds-examples"
-version = "0.1.0"
+version = "0.2.0"
 description = "Ready-to-use examples for the Safe-DS Python library."
 category = "dev"
 optional = false
 python-versions = ">=3.10,<4.0"
 files = [
-    {file = "safe_ds_examples-0.1.0-py3-none-any.whl", hash = "sha256:4daf35e358cca0280883ab9b604f82a4596b87a11f784c26389d296dea8d3e18"},
-    {file = "safe_ds_examples-0.1.0.tar.gz", hash = "sha256:76b7d3fe02d769a99fbed8a54e7a4e76b36ce78470dc4f8bfbedc5b79ed899ff"},
+    {file = "safe_ds_examples-0.2.0-py3-none-any.whl", hash = "sha256:a5b37858a1e17abf7e9b694481cd23bc2e51e725cb152277ff006b3f33eded12"},
+    {file = "safe_ds_examples-0.2.0.tar.gz", hash = "sha256:61fd7d2edeb3bd2e978a313629c7cc5154b67bd8e71a5f749120cfe726218df2"},
 ]
 
 [package.dependencies]
@@ -3257,4 +3257,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "99405e9c42d2838d17ff0e20238574d8f1072a8fcecee8c0af4e6153b0cf7613"
+content-hash = "d9215f24f299cd9d159ab03e93109c8f202e3fbd5b783d66327eeaf01adf7935"

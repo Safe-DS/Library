@@ -37,6 +37,10 @@ for path in sorted(Path(root).rglob("__init__.py")):
     # Remove the final "__init__" part
     parts = parts[:-1]
 
+    # Skip private modules
+    if any(part.startswith("_") for part in parts):
+        continue
+
     qualified_name = ".".join(parts)
 
     for name in list_class_and_function_names_in_module(qualified_name):
