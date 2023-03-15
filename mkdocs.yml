@@ -116,7 +116,7 @@ markdown_extensions:
 
   # Permalinks
   - toc:
-      permalink: "#"
+      permalink: true
 
 extra_javascript:
   - javascript/mathjax.js
