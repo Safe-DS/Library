@@ -4,7 +4,7 @@ repo_name: Safe-DS/Stdlib
 
 nav:
   - Home:
-    - README: README.md
+    - README.md
     - Changelog: CHANGELOG.md
   - Tutorials:
     - Data Processing: tutorials/data_processing.md
@@ -40,8 +40,10 @@ theme:
   features:
     - content.code.copy
     - navigation.tabs
+    - navigation.indexes
     - navigation.instant
     - navigation.sections
+    - navigation.top
 
 plugins:
   - mkdocstrings:
