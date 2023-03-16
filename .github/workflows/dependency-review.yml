@@ -1,0 +1,9 @@
+name: Dependency Review
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  dependency-review:
+    uses: lars-reimann/.github/.github/workflows/dependency-review-reusable.yml@main
