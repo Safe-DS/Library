@@ -1,0 +1,13 @@
+name: Pull Request Format
+
+on:
+  pull_request_target:
+    types:
+      - opened
+      - edited
+      - synchronize
+      - reopened
+
+jobs:
+  check-format:
+    uses: lars-reimann/.github/.github/workflows/pr-format-reusable.yml@main
