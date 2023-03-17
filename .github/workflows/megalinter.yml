@@ -2,7 +2,7 @@ name: MegaLinter
 
 on:
   pull_request:
-    branches: [main]
+    branches: [ main ]
 
 jobs:
   megalinter:

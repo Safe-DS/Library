@@ -26,7 +26,7 @@ module.exports = {
             },
         ],
         [
-            'semantic-release-github-pullrequest',
+            '@semantic-release/git',
             {
                 assets: ['pyproject.toml', 'docs/CHANGELOG.md'],
             },

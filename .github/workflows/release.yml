@@ -10,8 +10,5 @@ jobs:
       working-directory: .
       python-version: "3.10"
     secrets:
+      GITHUB_PAT: ${{ secrets.PAT }}
       PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
-    permissions:
-      contents: write
-      issues: write
-      pull-requests: write
