@@ -8,7 +8,7 @@ nav:
     - Changelog: CHANGELOG.md
   - Tutorials:
     - Data Processing: tutorials/data_processing.md
-    - Data Visualization: tutorials/data_visualization.md
+    - Data Visualization: tutorials/data_visualization.ipynb
     - Machine Learning: tutorials/machine_learning.md
   - API Reference: reference/
   - Development:
@@ -67,7 +67,6 @@ plugins:
       include: ["*.ipynb"]
       execute: true
       allow_errors: false
-      include_source: true
 
 watch:
   - src
