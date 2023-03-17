@@ -67,6 +67,10 @@ plugins:
       include: ["*.ipynb"]
       execute: true
       allow_errors: false
+  - exclude:
+      glob:
+        - "*.csv"
+        - "*.py"
 
 watch:
   - src

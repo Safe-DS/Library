@@ -1546,6 +1546,20 @@ Markdown = ">=3.3"
 mkdocs = ">=1.1"
 
 [[package]]
+name = "mkdocs-exclude"
+version = "1.0.2"
+description = "A mkdocs plugin that lets you exclude files or trees."
+category = "dev"
+optional = false
+python-versions = "*"
+files = [
+    {file = "mkdocs-exclude-1.0.2.tar.gz", hash = "sha256:ba6fab3c80ddbe3fd31d3e579861fd3124513708271180a5f81846da8c7e2a51"},
+]
+
+[package.dependencies]
+mkdocs = "*"
+
+[[package]]
 name = "mkdocs-gen-files"
 version = "0.4.0"
 description = "MkDocs plugin to programmatically generate documentation pages during the build"
@@ -3257,4 +3271,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "f1b63cd44fdd9add450be4dbb101021932dea57686971a4d86885c5ddfecb785"
+content-hash = "878cb9ffee3ece43f1fceac599fece3076149e0ce9120d8c59e631f7b142d52a"
