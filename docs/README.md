@@ -7,6 +7,14 @@
 
 A user-friendly library for Data Science in Python.
 
-You can find the full documentation [here][docs].
+## Documentation
 
-[docs]: https://safe-ds-stdlib.readthedocs.io
+You can find the full documentation [here](https://stdlib.safe-ds.com).
+
+## Installation
+
+Get the latest version from [PyPI](https://pypi.org/project/safe-ds):
+
+```shell
+pip install safe-ds
+```
