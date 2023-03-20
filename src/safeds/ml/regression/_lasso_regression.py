@@ -1,7 +1,7 @@
 from typing import Optional
 
 # noinspection PyProtectedMember
-import safeds._util._util_sklearn
+import safeds.ml._util_sklearn
 from safeds.data import SupervisedDataset
 from safeds.data.tabular import Table
 from sklearn.linear_model import Lasso as sk_Lasso
@@ -32,7 +32,7 @@ class LassoRegression:
         LearningError
             If the supervised dataset contains invalid values or if the training failed.
         """
-        self.target_name = safeds._util._util_sklearn.fit(
+        self.target_name = safeds.ml._util_sklearn.fit(
             self._regression, supervised_dataset
         )
 
@@ -57,7 +57,7 @@ class LassoRegression:
         PredictionError
             If prediction with the given dataset failed.
         """
-        return safeds._util._util_sklearn.predict(
+        return safeds.ml._util_sklearn.predict(
             self._regression,
             dataset,
             target_name if target_name is not None else self.target_name,
