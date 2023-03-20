@@ -7,9 +7,9 @@ nav:
     - README.md
     - Changelog: CHANGELOG.md
   - Tutorials:
-    - Data Processing: tutorials/data_processing.md
-    - Data Visualization: tutorials/data_visualization.md
-    - Machine Learning: tutorials/machine_learning.md
+    - Data Processing: tutorials/data_processing.ipynb
+    - Data Visualization: tutorials/data_visualization.ipynb
+    - Machine Learning: tutorials/machine_learning.ipynb
   - API Reference: reference/
   - Development:
     - Environment: development/environment.md
@@ -67,7 +67,10 @@ plugins:
       include: ["*.ipynb"]
       execute: true
       allow_errors: false
-      include_source: true
+  - exclude:
+      glob:
+        - "*.csv"
+        - "*.py"
 
 watch:
   - src
@@ -117,6 +120,9 @@ markdown_extensions:
   # Permalinks
   - toc:
       permalink: true
+
+extra_css:
+  - stylesheets/jupyter.css
 
 extra_javascript:
   - javascript/mathjax.js
