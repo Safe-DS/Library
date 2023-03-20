@@ -1,7 +1,7 @@
 from typing import Optional
 
 # noinspection PyProtectedMember
-import safeds._util._util_sklearn
+import safeds.ml._util_sklearn
 from safeds.data import SupervisedDataset
 from safeds.data.tabular import Table
 from sklearn.linear_model import LogisticRegression as sk_LogisticRegression
@@ -32,7 +32,7 @@ class LogisticRegression:
         LearningError
             If the supervised dataset contains invalid values or if the training failed.
         """
-        self.target_name = safeds._util._util_sklearn.fit(
+        self.target_name = safeds.ml._util_sklearn.fit(
             self._classification, supervised_dataset
         )
 
@@ -57,7 +57,7 @@ class LogisticRegression:
         PredictionError
             If prediction with the given dataset failed.
         """
-        return safeds._util._util_sklearn.predict(
+        return safeds.ml._util_sklearn.predict(
             self._classification,
             dataset,
             target_name if target_name is not None else self.target_name,

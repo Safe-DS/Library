@@ -1,7 +1,7 @@
 from typing import Optional
 
 # noinspection PyProtectedMember
-import safeds._util._util_sklearn
+import safeds.ml._util_sklearn
 from safeds.data import SupervisedDataset
 from safeds.data.tabular import Table
 from sklearn.ensemble import GradientBoostingClassifier
@@ -32,7 +32,7 @@ class GradientBoosting:
         LearningError
             If the supervised dataset contains invalid values or if the training failed.
         """
-        self.target_name = safeds._util._util_sklearn.fit(
+        self.target_name = safeds.ml._util_sklearn.fit(
             self._classification, supervised_dataset
         )
 
@@ -58,7 +58,7 @@ class GradientBoosting:
         PredictionError
             If prediction with the given dataset failed.
         """
-        return safeds._util._util_sklearn.predict(
+        return safeds.ml._util_sklearn.predict(
             self._classification,
             dataset,
             target_name if target_name is not None else self.target_name,
