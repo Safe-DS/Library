@@ -9,7 +9,7 @@ nav:
   - Tutorials:
     - Data Processing: tutorials/data_processing.ipynb
     - Data Visualization: tutorials/data_visualization.ipynb
-    - Machine Learning: tutorials/machine_learning.md
+    - Machine Learning: tutorials/machine_learning.ipynb
   - API Reference: reference/
   - Development:
     - Environment: development/environment.md
