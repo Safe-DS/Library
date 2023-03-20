@@ -11,19 +11,13 @@ def test_predict_should_not_warn_about_feature_names() -> None:
     """
 
     training_set = SupervisedDataset(
-        Table({
-            "a": [1, 2, 3],
-            "b": [2, 4, 6]
-        }),
-        target_column="b"
+        Table({"a": [1, 2, 3], "b": [2, 4, 6]}), target_column="b"
     )
 
     model = LinearRegression()
     model.fit(training_set)
 
-    test_set = Table({
-        "a": [4, 5, 6]
-    })
+    test_set = Table({"a": [4, 5, 6]})
 
     # No warning should be emitted
     with warnings.catch_warnings():
