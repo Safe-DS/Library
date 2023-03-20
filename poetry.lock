@@ -2826,21 +2826,6 @@ files = [
 ]
 
 [[package]]
-name = "safe-ds-examples"
-version = "0.4.0"
-description = "Ready-to-use examples for the Safe-DS Python library."
-category = "dev"
-optional = false
-python-versions = ">=3.10,<4.0"
-files = [
-    {file = "safe_ds_examples-0.4.0-py3-none-any.whl", hash = "sha256:ada5cd5333a05b52b37e3b71c323d2a09959e349fa41f054cccdaec18477e2ee"},
-    {file = "safe_ds_examples-0.4.0.tar.gz", hash = "sha256:834413ab8c7adb9b7950aad5b6be848cf883856e8a733737037255f39ffd8755"},
-]
-
-[package.dependencies]
-safe-ds = ">=0.2.0,<0.3.0"
-
-[[package]]
 name = "scikit-learn"
 version = "1.2.2"
 description = "A set of python modules for machine learning and data mining"
@@ -3271,4 +3256,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "878cb9ffee3ece43f1fceac599fece3076149e0ce9120d8c59e631f7b142d52a"
+content-hash = "b76f2ec4282b27c31f0e864862a02c44afb6c2aacdb0eb949774c49aac060607"
