@@ -67,7 +67,7 @@ def predict(model: Any, dataset: Table, target_name: str) -> Table:
     dataset_df = dataset._data
     dataset_df.columns = dataset.schema.get_column_names()
     try:
-        predicted_target_vector = model.predict(dataset_df)
+        predicted_target_vector = model.predict(dataset_df.values)
         result_set = dataset_df.copy(deep=True)
         if target_name in result_set.columns:
             raise ValueError(
