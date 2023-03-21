@@ -7,4 +7,4 @@ def test_iter() -> None:
         [0, "1"],
         TableSchema({"testColumn1": IntColumnType(), "testColumn2": StringColumnType()})
     )
-    assert list(row) == [0, "1"]
+    assert list(row) == ["testColumn1", "testColumn2"]
