@@ -16,6 +16,9 @@ class Row:
     def __getitem__(self, column_name: str) -> Any:
         return self.get_value(column_name)
 
+    def __iter__(self) -> typing.Iterator[Any]:
+        return iter(self._data)
+
     def get_value(self, column_name: str) -> Any:
         """
         Return the value of a specified column.

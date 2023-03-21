@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import typing
 from numbers import Number
-from typing import Any, Callable
+from typing import Any, Callable, Iterator
 
 import numpy as np
 import pandas as pd
@@ -48,6 +48,9 @@ class Column:
 
     def __getitem__(self, index: int) -> Any:
         return self.get_value(index)
+
+    def __iter__(self) -> Iterator[Any]:
+        return iter(self._data)
 
     def get_value(self, index: int) -> Any:
         """
