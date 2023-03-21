@@ -11,10 +11,14 @@ concurrency:
 jobs:
   poetry-with-codecov:
     strategy:
+      fail-fast: false
       matrix:
-        python-version: [ "3.10" ]
+        python-version:
+          - "3.10"
+          - "3.11"
     uses: lars-reimann/.github/.github/workflows/poetry-codecov-reusable.yml@main
     with:
       working-directory: .
       python-version: ${{ matrix.python-version }}
       module-name: safeds
+      coverage: ${{ matrix.python-version == '3.10' }}
