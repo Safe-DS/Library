@@ -16,6 +16,12 @@ class Row:
     def __getitem__(self, column_name: str) -> Any:
         return self.get_value(column_name)
 
+    def __iter__(self) -> typing.Iterator[Any]:
+        return iter(self.get_column_names())
+
+    def __len__(self) -> int:
+        return len(self._data)
+
     def get_value(self, column_name: str) -> Any:
         """
         Return the value of a specified column.
@@ -33,6 +39,17 @@ class Row:
         if not self.schema.has_column(column_name):
             raise UnknownColumnNameError([column_name])
         return self._data[self.schema._get_column_index_by_name(column_name)]
+
+    def count(self) -> int:
+        """
+        Return the number of columns in this row.
+
+        Returns
+        -------
+        count : int
+            The number of columns.
+        """
+        return len(self._data)
 
     def has_column(self, column_name: str) -> bool:
         """

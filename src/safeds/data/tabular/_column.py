@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import typing
 from numbers import Number
-from typing import Any, Callable
+from typing import Any, Callable, Iterator
 
 import numpy as np
 import pandas as pd
@@ -35,6 +35,10 @@ class Column:
         return self._name
 
     @property
+    def statistics(self) -> ColumnStatistics:
+        return ColumnStatistics(self)
+
+    @property
     def type(self) -> ColumnType:
         """
         Return the type of the column.
@@ -46,8 +50,34 @@ class Column:
         """
         return self._type
 
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, Column):
+            return NotImplemented
+        if self is other:
+            return True
+        return self._data.equals(other._data) and self.name == other.name
+
     def __getitem__(self, index: int) -> Any:
         return self.get_value(index)
+
+    def __hash__(self) -> int:
+        return hash(self._data)
+
+    def __iter__(self) -> Iterator[Any]:
+        return iter(self._data)
+
+    def __len__(self) -> int:
+        return len(self._data)
+
+    def __repr__(self) -> str:
+        tmp = self._data.to_frame()
+        tmp.columns = [self.name]
+        return tmp.__repr__()
+
+    def __str__(self) -> str:
+        tmp = self._data.to_frame()
+        tmp.columns = [self.name]
+        return tmp.__str__()
 
     def get_value(self, index: int) -> Any:
         """
@@ -72,10 +102,6 @@ class Column:
             raise IndexOutOfBoundsError(index)
 
         return self._data[index]
-
-    @property
-    def statistics(self) -> ColumnStatistics:
-        return ColumnStatistics(self)
 
     def count(self) -> int:
         """
@@ -223,26 +249,6 @@ class Column:
         """
         return list(self._data.unique())
 
-    def __eq__(self, other: object) -> bool:
-        if not isinstance(other, Column):
-            return NotImplemented
-        if self is other:
-            return True
-        return self._data.equals(other._data) and self.name == other.name
-
-    def __hash__(self) -> int:
-        return hash(self._data)
-
-    def __str__(self) -> str:
-        tmp = self._data.to_frame()
-        tmp.columns = [self.name]
-        return tmp.__str__()
-
-    def __repr__(self) -> str:
-        tmp = self._data.to_frame()
-        tmp.columns = [self.name]
-        return tmp.__repr__()
-
     def _ipython_display_(self) -> DisplayHandle:
         """
         Return a display object for the column to be used in Jupyter Notebooks.
@@ -378,7 +384,6 @@ class ColumnStatistics:
         return self._column._data.sum()
 
     def variance(self) -> float:
-
         """
         Return the variance of the column. The column has to be numerical.
 
@@ -401,7 +406,6 @@ class ColumnStatistics:
         return self._column._data.var()
 
     def standard_deviation(self) -> float:
-
         """
         Return the standard deviation of the column. The column has to be numerical.
 

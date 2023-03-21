@@ -1,4 +1,4 @@
-class UnknownColumnNameError(Exception):
+class UnknownColumnNameError(KeyError):
     """
     Exception raised for trying to access an invalid column name.
 
@@ -37,7 +37,7 @@ class DuplicateColumnNameError(Exception):
         super().__init__(f"Column '{column_name}' already exists.")
 
 
-class IndexOutOfBoundsError(Exception):
+class IndexOutOfBoundsError(IndexError):
     """
     Exception raised for trying to access an element by an index that does not exist in the underlying data.
 
