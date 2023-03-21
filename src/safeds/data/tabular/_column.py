@@ -384,7 +384,6 @@ class ColumnStatistics:
         return self._column._data.sum()
 
     def variance(self) -> float:
-
         """
         Return the variance of the column. The column has to be numerical.
 
@@ -407,7 +406,6 @@ class ColumnStatistics:
         return self._column._data.var()
 
     def standard_deviation(self) -> float:
-
         """
         Return the standard deviation of the column. The column has to be numerical.
 
