@@ -1,6 +1,6 @@
 import pytest
-from safeds.data.tabular import TaggedTable
-from safeds.data.tabular import Table
+from safeds.data.tabular.containers import TaggedTable
+from safeds.data.tabular.containers import Table
 from safeds.exceptions import PredictionError
 from safeds.ml.classification import DecisionTree
 

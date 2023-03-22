@@ -1,7 +1,7 @@
 import _pytest
 import matplotlib.pyplot as plt
 import pandas as pd
-from safeds.data.tabular import Table
+from safeds.data.tabular.containers import Table
 from safeds.plotting import histogram
 
 

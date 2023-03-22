@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 from typing import Any, Optional
 
 import pandas as pd
-from safeds.data.tabular import ColumnStatistics, Table
+from safeds.data.tabular.containers import ColumnStatistics, Table
 from sklearn.impute import SimpleImputer
 
 

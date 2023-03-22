@@ -1,5 +1,5 @@
 import pandas as pd
-from safeds.data.tabular import Table
+from safeds.data.tabular.containers import Table
 
 
 def test_get_column_index_by_name() -> None:

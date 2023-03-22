@@ -1,6 +1,6 @@
 import pandas as pd
 import pytest
-from safeds.data.tabular import Column
+from safeds.data.tabular.containers import Column
 from safeds.exceptions import ColumnLengthMismatchError
 from safeds.ml.regression.metrics._module_level_functions import (
     _check_metrics_preconditions,

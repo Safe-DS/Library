@@ -1,4 +1,4 @@
-from safeds.data.tabular import Column
+from safeds.data.tabular.containers import Column
 from safeds.exceptions import ColumnLengthMismatchError
 from sklearn.metrics import mean_absolute_error as mean_absolute_error_sklearn
 from sklearn.metrics import mean_squared_error as mean_squared_error_sklearn

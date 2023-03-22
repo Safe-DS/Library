@@ -1,5 +1,5 @@
 from safeds import exceptions
-from safeds.data.tabular import Table
+from safeds.data.tabular.containers import Table
 from sklearn import preprocessing
 
 

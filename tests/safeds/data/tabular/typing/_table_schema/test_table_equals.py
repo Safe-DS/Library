@@ -1,4 +1,4 @@
-from safeds.data.tabular import Table
+from safeds.data.tabular.containers import Table
 from safeds.data.tabular.typing import FloatColumnType, IntColumnType, TableSchema
 
 

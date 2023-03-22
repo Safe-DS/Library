@@ -1,6 +1,6 @@
 import pandas as pd
 import pytest
-from safeds.data.tabular import Column
+from safeds.data.tabular.containers import Column
 from safeds.ml.regression.metrics import mean_absolute_error
 
 
