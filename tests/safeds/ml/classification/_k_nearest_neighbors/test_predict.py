@@ -1,6 +1,5 @@
 import pytest
-from safeds.data.tabular.containers import TaggedTable
-from safeds.data.tabular.containers import Table
+from safeds.data.tabular.containers import Table, TaggedTable
 from safeds.exceptions import PredictionError
 from safeds.ml.classification import KNearestNeighbors as KNearestNeighborsClassifier
 

@@ -1,5 +1,4 @@
-from safeds.data.tabular.containers import TaggedTable
-from safeds.data.tabular.containers import Table
+from safeds.data.tabular.containers import Table, TaggedTable
 
 
 def test_tagged_table_feature_vectors() -> None:

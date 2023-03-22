@@ -50,7 +50,6 @@ class LabelEncoder:
             If the model fitting was unsuccessful.
         """
         try:
-
             self._le.fit(table.keep_columns([column])._data)
         except exceptions.NotFittedError as exc:
             raise LearningError("") from exc

@@ -1,7 +1,6 @@
 from typing import Any
 
-from safeds.data.tabular.containers import TaggedTable
-from safeds.data.tabular.containers import Table
+from safeds.data.tabular.containers import Table, TaggedTable
 from safeds.exceptions import LearningError, PredictionError
 from sklearn.exceptions import NotFittedError
 

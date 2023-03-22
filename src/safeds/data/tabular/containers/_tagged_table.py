@@ -1,4 +1,5 @@
 from IPython.core.display_functions import DisplayHandle
+
 from ._column import Column
 from ._table import Table
 

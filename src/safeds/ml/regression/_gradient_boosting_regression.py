@@ -2,8 +2,7 @@ from typing import Optional
 
 # noinspection PyProtectedMember
 import safeds.ml._util_sklearn
-from safeds.data.tabular.containers import TaggedTable
-from safeds.data.tabular.containers import Table
+from safeds.data.tabular.containers import Table, TaggedTable
 from sklearn.ensemble import GradientBoostingRegressor
 
 
@@ -33,9 +32,7 @@ class GradientBoosting:
         LearningError
             If the tagged table contains invalid values or if the training failed.
         """
-        self.target_name = safeds.ml._util_sklearn.fit(
-            self._regression, tagged_table
-        )
+        self.target_name = safeds.ml._util_sklearn.fit(self._regression, tagged_table)
 
     # noinspection PyProtectedMember
     def predict(self, dataset: Table, target_name: Optional[str] = None) -> Table:

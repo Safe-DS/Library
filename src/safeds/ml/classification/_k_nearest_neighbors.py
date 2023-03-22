@@ -2,8 +2,7 @@ from typing import Optional
 
 # noinspection PyProtectedMember
 import safeds.ml._util_sklearn
-from safeds.data.tabular.containers import TaggedTable
-from safeds.data.tabular.containers import Table
+from safeds.data.tabular.containers import Table, TaggedTable
 from sklearn.neighbors import KNeighborsClassifier
 
 
