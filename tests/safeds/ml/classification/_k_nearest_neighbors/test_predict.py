@@ -1,5 +1,5 @@
 import pytest
-from safeds.data import SupervisedDataset
+from safeds.data import TaggedTable
 from safeds.data.tabular import Table
 from safeds.exceptions import PredictionError
 from safeds.ml.classification import KNearestNeighbors as KNearestNeighborsClassifier
@@ -7,19 +7,19 @@ from safeds.ml.classification import KNearestNeighbors as KNearestNeighborsClass
 
 def test_k_nearest_neighbors_predict() -> None:
     table = Table.from_csv("tests/resources/test_k_nearest_neighbors.csv")
-    supervised_dataset = SupervisedDataset(table, "T")
+    tagged_table = TaggedTable(table, "T")
     k_nearest_neighbors = KNearestNeighborsClassifier(2)
-    k_nearest_neighbors.fit(supervised_dataset)
-    k_nearest_neighbors.predict(supervised_dataset.feature_vectors)
+    k_nearest_neighbors.fit(tagged_table)
+    k_nearest_neighbors.predict(tagged_table.feature_vectors)
     assert True  # This asserts that the predict method succeeds
 
 
 def test_k_nearest_neighbors_predict_not_fitted() -> None:
     table = Table.from_csv("tests/resources/test_k_nearest_neighbors.csv")
-    supervised_dataset = SupervisedDataset(table, "T")
+    tagged_table = TaggedTable(table, "T")
     k_nearest_neighbors = KNearestNeighborsClassifier(2)
     with pytest.raises(PredictionError):
-        k_nearest_neighbors.predict(supervised_dataset.feature_vectors)
+        k_nearest_neighbors.predict(tagged_table.feature_vectors)
 
 
 def test_k_nearest_neighbors_predict_invalid() -> None:
@@ -27,9 +27,9 @@ def test_k_nearest_neighbors_predict_invalid() -> None:
     invalid_table = Table.from_csv(
         "tests/resources/test_k_nearest_neighbors_invalid.csv"
     )
-    supervised_dataset = SupervisedDataset(table, "T")
-    invalid_supervised_dataset = SupervisedDataset(invalid_table, "T")
+    tagged_table = TaggedTable(table, "T")
+    invalid_tagged_table = TaggedTable(invalid_table, "T")
     k_nearest_neighbors = KNearestNeighborsClassifier(2)
-    k_nearest_neighbors.fit(supervised_dataset)
+    k_nearest_neighbors.fit(tagged_table)
     with pytest.raises(PredictionError):
-        k_nearest_neighbors.predict(invalid_supervised_dataset.feature_vectors)
+        k_nearest_neighbors.predict(invalid_tagged_table.feature_vectors)

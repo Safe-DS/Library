@@ -2,7 +2,7 @@ from typing import Optional
 
 # noinspection PyProtectedMember
 import safeds.ml._util_sklearn
-from safeds.data import SupervisedDataset
+from safeds.data import TaggedTable
 from safeds.data.tabular import Table
 from sklearn.linear_model import Ridge as sk_Ridge
 
@@ -11,29 +11,29 @@ from sklearn.linear_model import Ridge as sk_Ridge
 class RidgeRegression:
     """
     This class implements ridge regression. It is used as a regression model.
-    It can only be trained on a supervised dataset.
+    It can only be trained on a tagged table.
     """
 
     def __init__(self) -> None:
         self._regression = sk_Ridge()
         self.target_name = ""
 
-    def fit(self, supervised_dataset: SupervisedDataset) -> None:
+    def fit(self, tagged_table: TaggedTable) -> None:
         """
-        Fit this model given a supervised dataset.
+        Fit this model given a tagged table.
 
         Parameters
         ----------
-        supervised_dataset : SupervisedDataset
-            The supervised dataset containing the feature and target vectors.
+        tagged_table : TaggedTable
+            The tagged table containing the feature and target vectors.
 
         Raises
         ------
         LearningError
-            If the supervised dataset contains invalid values or if the training failed.
+            If the tagged table contains invalid values or if the training failed.
         """
         self.target_name = safeds.ml._util_sklearn.fit(
-            self._regression, supervised_dataset
+            self._regression, tagged_table
         )
 
     def predict(self, dataset: Table, target_name: Optional[str] = None) -> Table:

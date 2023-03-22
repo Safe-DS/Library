@@ -1,5 +1,5 @@
 import pytest
-from safeds.data import SupervisedDataset
+from safeds.data import TaggedTable
 from safeds.data.tabular import Table
 from safeds.exceptions import PredictionError
 from safeds.ml.classification import RandomForest as RandomForestClassifier
@@ -7,27 +7,27 @@ from safeds.ml.classification import RandomForest as RandomForestClassifier
 
 def test_random_forest_predict() -> None:
     table = Table.from_csv("tests/resources/test_random_forest.csv")
-    supervised_dataset = SupervisedDataset(table, "T")
+    tagged_table = TaggedTable(table, "T")
     random_forest = RandomForestClassifier()
-    random_forest.fit(supervised_dataset)
-    random_forest.predict(supervised_dataset.feature_vectors)
+    random_forest.fit(tagged_table)
+    random_forest.predict(tagged_table.feature_vectors)
     assert True  # This asserts that the predict method succeeds
 
 
 def test_random_forest_predict_not_fitted() -> None:
     table = Table.from_csv("tests/resources/test_random_forest.csv")
-    supervised_dataset = SupervisedDataset(table, "T")
+    tagged_table = TaggedTable(table, "T")
     random_forest = RandomForestClassifier()
     with pytest.raises(PredictionError):
-        random_forest.predict(supervised_dataset.feature_vectors)
+        random_forest.predict(tagged_table.feature_vectors)
 
 
 def test_random_forest_predict_invalid() -> None:
     table = Table.from_csv("tests/resources/test_random_forest.csv")
     invalid_table = Table.from_csv("tests/resources/test_random_forest_invalid.csv")
-    supervised_dataset = SupervisedDataset(table, "T")
-    invalid_supervised_dataset = SupervisedDataset(invalid_table, "T")
+    tagged_table = TaggedTable(table, "T")
+    invalid_tagged_table = TaggedTable(invalid_table, "T")
     random_forest = RandomForestClassifier()
-    random_forest.fit(supervised_dataset)
+    random_forest.fit(tagged_table)
     with pytest.raises(PredictionError):
-        random_forest.predict(invalid_supervised_dataset.feature_vectors)
+        random_forest.predict(invalid_tagged_table.feature_vectors)

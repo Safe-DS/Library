@@ -1,1 +1,1 @@
-from ._supervised_dataset import SupervisedDataset
+from ._tagged_table import TaggedTable

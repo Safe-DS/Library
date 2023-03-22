@@ -2,9 +2,9 @@ from IPython.core.display_functions import DisplayHandle
 from safeds.data.tabular import Column, Table
 
 
-class SupervisedDataset:
+class TaggedTable:
     """
-    A supervised dataset is split in feature and target vectors from a table for a specific column name.
+    A tagged table is split in feature and target vectors from a table for a specific column name.
     It can be used for training models.
 
     Parameters
