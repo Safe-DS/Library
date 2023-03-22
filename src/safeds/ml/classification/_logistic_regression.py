@@ -2,7 +2,7 @@ from typing import Optional
 
 # noinspection PyProtectedMember
 import safeds.ml._util_sklearn
-from safeds.data import TaggedTable
+from safeds.data.tabular import TaggedTable
 from safeds.data.tabular import Table
 from sklearn.linear_model import LogisticRegression as sk_LogisticRegression
 

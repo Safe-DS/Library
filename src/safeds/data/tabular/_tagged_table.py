@@ -2,20 +2,21 @@ from IPython.core.display_functions import DisplayHandle
 from safeds.data.tabular import Column, Table
 
 
-class TaggedTable:
+class TaggedTable(Table):
     """
-    A tagged table is split in feature and target vectors from a table for a specific column name.
-    It can be used for training models.
+    A tagged table is a table that additionally knows which columns are features and which are the target to predict.
 
     Parameters
     ----------
     table : Table
         The table used to derive the feature and target vectors.
     target_column : str
-        Name of the target feature column.
+        Name of the target column.
     """
 
     def __init__(self, table: Table, target_column: str):
+        super().__init__(table._data)
+
         self._y: Column = table.get_column(target_column)
         self._X: Table = table.drop_columns([target_column])
 
