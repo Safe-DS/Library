@@ -4,7 +4,7 @@ import warnings
 from typing import Any
 
 import pandas
-from safeds.data.tabular import Table
+from safeds.data.tabular.containers import Table
 from safeds.exceptions import LearningError, NotFittedError
 from sklearn import exceptions, preprocessing
 
@@ -50,7 +50,6 @@ class LabelEncoder:
             If the model fitting was unsuccessful.
         """
         try:
-
             self._le.fit(table.keep_columns([column])._data)
         except exceptions.NotFittedError as exc:
             raise LearningError("") from exc

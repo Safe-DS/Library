@@ -2,8 +2,7 @@ from typing import Optional
 
 # noinspection PyProtectedMember
 import safeds.ml._util_sklearn
-from safeds.data import SupervisedDataset
-from safeds.data.tabular import Table
+from safeds.data.tabular.containers import Table, TaggedTable
 from sklearn.ensemble import GradientBoostingRegressor
 
 
@@ -11,31 +10,29 @@ from sklearn.ensemble import GradientBoostingRegressor
 class GradientBoosting:
     """
     This class implements gradient boosting regression. It is used as a regression model.
-    It can only be trained on a supervised dataset.
+    It can only be trained on a tagged table.
     """
 
     def __init__(self) -> None:
         self._regression = GradientBoostingRegressor()
         self.target_name = ""
 
-    def fit(self, supervised_dataset: SupervisedDataset) -> None:
+    def fit(self, tagged_table: TaggedTable) -> None:
         """
-        Fit this model given a supervised dataset.
+        Fit this model given a tagged table.
 
         Parameters
 
         ----------
-        supervised_dataset : SupervisedDataset
-            The supervised dataset containing the feature and target vectors.
+        tagged_table : SupervisedDataset
+            The tagged table containing the feature and target vectors.
 
         Raises
         ------
         LearningError
-            If the supervised dataset contains invalid values or if the training failed.
+            If the tagged table contains invalid values or if the training failed.
         """
-        self.target_name = safeds.ml._util_sklearn.fit(
-            self._regression, supervised_dataset
-        )
+        self.target_name = safeds.ml._util_sklearn.fit(self._regression, tagged_table)
 
     # noinspection PyProtectedMember
     def predict(self, dataset: Table, target_name: Optional[str] = None) -> Table:

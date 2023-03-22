@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 import seaborn as sns
-from safeds.data.tabular import Table
+from safeds.data.tabular.containers import Table
 from safeds.exceptions import UnknownColumnNameError
 
 

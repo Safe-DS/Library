@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import pytest
 from safeds import plotting
-from safeds.data.tabular import Table
+from safeds.data.tabular.containers import Table
 from safeds.exceptions import UnknownColumnNameError
 
 

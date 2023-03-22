@@ -1,39 +1,38 @@
 from typing import Any
 
-from safeds.data import SupervisedDataset
-from safeds.data.tabular import Table
+from safeds.data.tabular.containers import Table, TaggedTable
 from safeds.exceptions import LearningError, PredictionError
 from sklearn.exceptions import NotFittedError
 
 
 # noinspection PyProtectedMember
-def fit(model: Any, supervised_dataset: SupervisedDataset) -> str:
+def fit(model: Any, tagged_table: TaggedTable) -> str:
     """
-    Fit a model for a given supervised dataset.
+    Fit a model for a given tagged table.
 
     Parameters
     ----------
     model
         Classifier or Regression from scikit-learn.
-    supervised_dataset : SupervisedDataset
-        The supervised dataset containing the feature and target vectors.
+    tagged_table : TaggedTable
+        The tagged table containing the feature and target vectors.
 
     Returns
     -------
     target_name : str
-        The target column name, inferred from the supervised dataset.
+        The target column name, inferred from the tagged table.
 
     Raises
     ------
     LearningError
-        If the supervised dataset contains invalid values or if the training failed.
+        If the tagged table contains invalid values or if the training failed.
     """
     try:
         model.fit(
-            supervised_dataset.feature_vectors._data,
-            supervised_dataset.target_values._data,
+            tagged_table.feature_vectors._data,
+            tagged_table.target_values._data,
         )
-        return supervised_dataset.target_values.name
+        return tagged_table.target_values.name
     except ValueError as exception:
         raise LearningError(str(exception)) from exception
     except Exception as exception:

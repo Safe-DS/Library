@@ -1,4 +1,4 @@
-from safeds.data.tabular import Table
+from safeds.data.tabular.containers import Table
 
 
 def test_has_column_true() -> None:

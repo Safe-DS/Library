@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 import seaborn as sns
-from safeds.data.tabular import Column
+from safeds.data.tabular.containers import Column
 
 
 def histogram(column: Column) -> None:

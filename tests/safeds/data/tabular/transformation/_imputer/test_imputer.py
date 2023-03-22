@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 import pytest
-from safeds.data.tabular import Table
+from safeds.data.tabular.containers import Table
 from safeds.data.tabular.transformation import Imputer
 
 

@@ -1,5 +1,5 @@
 import pandas as pd
-from safeds.data.tabular import Column
+from safeds.data.tabular.containers import Column
 from safeds.ml.classification.metrics import accuracy
 
 

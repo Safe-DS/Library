@@ -2,15 +2,14 @@ from typing import Optional
 
 # noinspection PyProtectedMember
 import safeds.ml._util_sklearn
-from safeds.data import SupervisedDataset
-from safeds.data.tabular import Table
+from safeds.data.tabular.containers import Table, TaggedTable
 from sklearn.neighbors import KNeighborsRegressor
 
 
 # noinspection PyProtectedMember
 class KNearestNeighbors:
     """
-    This class implements K-nearest-neighbors regressor. It can only be trained on a supervised dataset.
+    This class implements K-nearest-neighbors regressor. It can only be trained on a tagged table.
 
     Parameters
     ----------
@@ -22,23 +21,21 @@ class KNearestNeighbors:
         self._regression = KNeighborsRegressor(n_neighbors)
         self.target_name = ""
 
-    def fit(self, supervised_dataset: SupervisedDataset) -> None:
+    def fit(self, tagged_table: TaggedTable) -> None:
         """
-        Fit this model given a supervised dataset.
+        Fit this model given a tagged table.
 
         Parameters
         ----------
-        supervised_dataset : SupervisedDataset
-            The supervised dataset containing the feature and target vectors.
+        tagged_table : TaggedTable
+            The tagged table containing the feature and target vectors.
 
         Raises
         ------
         LearningError
-            If the supervised dataset contains invalid values or if the training failed.
+            If the tagged table contains invalid values or if the training failed.
         """
-        self.target_name = safeds.ml._util_sklearn.fit(
-            self._regression, supervised_dataset
-        )
+        self.target_name = safeds.ml._util_sklearn.fit(self._regression, tagged_table)
 
     def predict(self, dataset: Table, target_name: Optional[str] = None) -> Table:
         """
