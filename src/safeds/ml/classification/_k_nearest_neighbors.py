@@ -5,9 +5,11 @@ import safeds.ml._util_sklearn
 from safeds.data.tabular.containers import Table, TaggedTable
 from sklearn.neighbors import KNeighborsClassifier
 
+from ._classifier import Classifier
+
 
 # noinspection PyProtectedMember
-class KNearestNeighbors:
+class KNearestNeighbors(Classifier):
     """
     This class implements K-nearest-neighbors classifier. It can only be trained on a tagged table.
 

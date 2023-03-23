@@ -1,4 +1,5 @@
 from ._ada_boost import AdaBoost
+from ._classifier import Classifier
 from ._decision_tree import DecisionTree
 from ._gradient_boosting_classification import GradientBoosting
 from ._k_nearest_neighbors import KNearestNeighbors

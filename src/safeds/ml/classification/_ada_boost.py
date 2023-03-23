@@ -5,9 +5,11 @@ import safeds.ml._util_sklearn
 from safeds.data.tabular.containers import Table, TaggedTable
 from sklearn.ensemble import AdaBoostClassifier as sk_AdaBoostClassifier
 
+from ._classifier import Classifier
+
 
 # noinspection PyProtectedMember
-class AdaBoost:
+class AdaBoost(Classifier):
     """
     This class implements Ada Boost classification. It is used as a classifier model.
     It can only be trained on a tagged table.

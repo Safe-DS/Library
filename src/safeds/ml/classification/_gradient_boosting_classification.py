@@ -5,9 +5,11 @@ import safeds.ml._util_sklearn
 from safeds.data.tabular.containers import Table, TaggedTable
 from sklearn.ensemble import GradientBoostingClassifier
 
+from ._classifier import Classifier
+
 
 # noinspection PyProtectedMember
-class GradientBoosting:
+class GradientBoosting(Classifier):
     """
     This class implements gradient boosting classification. It is used as a classifier model.
     It can only be trained on a tagged table.
