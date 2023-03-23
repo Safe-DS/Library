@@ -2,10 +2,11 @@ import pytest
 from safeds.data.tabular.containers import Table, TaggedTable
 from safeds.exceptions import LearningError
 from safeds.ml.regression import RandomForest as RandomForestRegressor
+from tests.fixtures import resolve_resource_path
 
 
 def test_random_forest_fit() -> None:
-    table = Table.from_csv("tests/resources/test_random_forest.csv")
+    table = Table.from_csv(resolve_resource_path("test_random_forest.csv"))
     tagged_table = TaggedTable(table, "T")
     random_forest = RandomForestRegressor()
     random_forest.fit(tagged_table)
@@ -13,7 +14,7 @@ def test_random_forest_fit() -> None:
 
 
 def test_random_forest_fit_invalid() -> None:
-    table = Table.from_csv("tests/resources/test_random_forest_invalid.csv")
+    table = Table.from_csv(resolve_resource_path("test_random_forest_invalid.csv"))
     tagged_table = TaggedTable(table, "T")
     random_forest = RandomForestRegressor()
     with pytest.raises(LearningError):

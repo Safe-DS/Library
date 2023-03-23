@@ -6,20 +6,21 @@ from safeds.exceptions import (
     DuplicateColumnNameError,
     UnknownColumnNameError,
 )
+from tests.fixtures import resolve_resource_path
 
 
 @pytest.mark.parametrize(
     "column_name, path",
     [
-        ("C", "tests/resources/test_table_replace_column_output_different_name.csv"),
-        ("D", "tests/resources/test_table_replace_column_output_same_name.csv"),
+        ("C", "test_table_replace_column_output_different_name.csv"),
+        ("D", "test_table_replace_column_output_same_name.csv"),
     ],
 )
 def test_replace_valid(column_name: str, path: str) -> None:
     input_table: Table = Table.from_csv(
-        "tests/resources/test_table_replace_column_input.csv"
+        resolve_resource_path("test_table_replace_column_input.csv")
     )
-    expected: Table = Table.from_csv(path)
+    expected: Table = Table.from_csv(resolve_resource_path(path))
 
     column = Column(pd.Series(["d", "e", "f"]), column_name)
 
@@ -43,7 +44,7 @@ def test_replace_invalid(
     error: type[Exception],
 ) -> None:
     input_table: Table = Table.from_csv(
-        "tests/resources/test_table_replace_column_input.csv"
+        resolve_resource_path("test_table_replace_column_input.csv")
     )
     column = Column(pd.Series(column_values), column_name)
 

@@ -2,10 +2,11 @@ import pytest
 from safeds.data.tabular.containers import Table, TaggedTable
 from safeds.exceptions import PredictionError
 from safeds.ml.regression import AdaBoost
+from tests.fixtures import resolve_resource_path
 
 
 def test_ada_boost_predict() -> None:
-    table = Table.from_csv("tests/resources/test_ada_boost.csv")
+    table = Table.from_csv(resolve_resource_path("test_ada_boost.csv"))
     tagged_table = TaggedTable(table, "T")
     ada_boost = AdaBoost()
     ada_boost.fit(tagged_table)
@@ -14,7 +15,7 @@ def test_ada_boost_predict() -> None:
 
 
 def test_ada_boost_predict_not_fitted() -> None:
-    table = Table.from_csv("tests/resources/test_ada_boost.csv")
+    table = Table.from_csv(resolve_resource_path("test_ada_boost.csv"))
     tagged_table = TaggedTable(table, "T")
     ada_boost = AdaBoost()
     with pytest.raises(PredictionError):
@@ -22,8 +23,8 @@ def test_ada_boost_predict_not_fitted() -> None:
 
 
 def test_ada_boost_predict_invalid() -> None:
-    table = Table.from_csv("tests/resources/test_ada_boost.csv")
-    invalid_table = Table.from_csv("tests/resources/test_ada_boost_invalid.csv")
+    table = Table.from_csv(resolve_resource_path("test_ada_boost.csv"))
+    invalid_table = Table.from_csv(resolve_resource_path("test_ada_boost_invalid.csv"))
     tagged_table = TaggedTable(table, "T")
     invalid_tagged_table = TaggedTable(invalid_table, "T")
     ada_boost = AdaBoost()

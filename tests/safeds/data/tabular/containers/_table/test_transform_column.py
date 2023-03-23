@@ -1,11 +1,12 @@
 import pytest
 from safeds.data.tabular.containers import Table
 from safeds.exceptions import UnknownColumnNameError
+from tests.fixtures import resolve_resource_path
 
 
 def test_transform_column_valid() -> None:
     input_table: Table = Table.from_csv(
-        "tests/resources/test_table_transform_column.csv"
+        resolve_resource_path("test_table_transform_column.csv")
     )
 
     result: Table = input_table.transform_column(
@@ -13,13 +14,13 @@ def test_transform_column_valid() -> None:
     )
 
     assert result == Table.from_csv(
-        "tests/resources/test_table_transform_column_output.csv"
+        resolve_resource_path("test_table_transform_column_output.csv")
     )
 
 
 def test_transform_column_invalid() -> None:
     input_table: Table = Table.from_csv(
-        "tests/resources/test_table_transform_column.csv"
+        resolve_resource_path("test_table_transform_column.csv")
     )
 
     with pytest.raises(UnknownColumnNameError):

@@ -2,10 +2,11 @@ import pytest
 from safeds.data.tabular.containers import Table, TaggedTable
 from safeds.exceptions import PredictionError
 from safeds.ml.classification import KNearestNeighbors as KNearestNeighborsClassifier
+from tests.fixtures import resolve_resource_path
 
 
 def test_k_nearest_neighbors_predict() -> None:
-    table = Table.from_csv("tests/resources/test_k_nearest_neighbors.csv")
+    table = Table.from_csv(resolve_resource_path("test_k_nearest_neighbors.csv"))
     tagged_table = TaggedTable(table, "T")
     k_nearest_neighbors = KNearestNeighborsClassifier(2)
     k_nearest_neighbors.fit(tagged_table)
@@ -14,7 +15,7 @@ def test_k_nearest_neighbors_predict() -> None:
 
 
 def test_k_nearest_neighbors_predict_not_fitted() -> None:
-    table = Table.from_csv("tests/resources/test_k_nearest_neighbors.csv")
+    table = Table.from_csv(resolve_resource_path("test_k_nearest_neighbors.csv"))
     tagged_table = TaggedTable(table, "T")
     k_nearest_neighbors = KNearestNeighborsClassifier(2)
     with pytest.raises(PredictionError):
@@ -22,9 +23,9 @@ def test_k_nearest_neighbors_predict_not_fitted() -> None:
 
 
 def test_k_nearest_neighbors_predict_invalid() -> None:
-    table = Table.from_csv("tests/resources/test_k_nearest_neighbors.csv")
+    table = Table.from_csv(resolve_resource_path("test_k_nearest_neighbors.csv"))
     invalid_table = Table.from_csv(
-        "tests/resources/test_k_nearest_neighbors_invalid.csv"
+        resolve_resource_path("test_k_nearest_neighbors_invalid.csv")
     )
     tagged_table = TaggedTable(table, "T")
     invalid_tagged_table = TaggedTable(invalid_table, "T")

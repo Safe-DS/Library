@@ -1,10 +1,11 @@
 import pytest
 from safeds.data.tabular.containers import Row, Table
 from safeds.exceptions import MissingDataError
+from tests.fixtures import resolve_resource_path
 
 
 def test_from_rows() -> None:
-    table_expected = Table.from_csv("tests/resources/test_row_table.csv")
+    table_expected = Table.from_csv(resolve_resource_path("test_row_table.csv"))
     rows_is: list[Row] = table_expected.to_rows()
     table_is: Table = Table.from_rows(rows_is)
 
