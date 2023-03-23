@@ -5,9 +5,11 @@ import safeds.ml._util_sklearn
 from safeds.data.tabular.containers import Table, TaggedTable
 from sklearn.ensemble import AdaBoostRegressor as sk_AdaBoostRegressor
 
+from ._regressor import Regressor
+
 
 # noinspection PyProtectedMember
-class AdaBoost:
+class AdaBoost(Regressor):
     """
     This class implements Ada Boost regression. It is used as a regression model.
     It can only be trained on a tagged table.

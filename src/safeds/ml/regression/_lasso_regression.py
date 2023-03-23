@@ -5,9 +5,11 @@ import safeds.ml._util_sklearn
 from safeds.data.tabular.containers import Table, TaggedTable
 from sklearn.linear_model import Lasso as sk_Lasso
 
+from ._regressor import Regressor
+
 
 # noinspection PyProtectedMember
-class LassoRegression:
+class LassoRegression(Regressor):
     """
     This class implements lasso regression. It is used as a regression model.
     It can only be trained on a tagged table.
