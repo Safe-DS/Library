@@ -1,4 +1,6 @@
 import pytest
+
+from tests.fixtures import resolve_resource_path
 from safeds.data.tabular.containers import Table
 from safeds.exceptions import DuplicateColumnNameError, UnknownColumnNameError
 
@@ -10,7 +12,7 @@ from safeds.exceptions import DuplicateColumnNameError, UnknownColumnNameError
 def test_rename_valid(
     name_from: str, name_to: str, column_one: str, column_two: str
 ) -> None:
-    table: Table = Table.from_csv("tests/resources/test_table_read_csv.csv")
+    table: Table = Table.from_csv(resolve_resource_path("test_table_read_csv.csv"))
     renamed_table = table.rename_column(name_from, name_to)
     assert renamed_table.schema.has_column(column_one)
     assert renamed_table.schema.has_column(column_two)
@@ -26,6 +28,6 @@ def test_rename_valid(
     ],
 )
 def test_rename_invalid(name_from: str, name_to: str, error: Exception) -> None:
-    table: Table = Table.from_csv("tests/resources/test_table_read_csv.csv")
+    table: Table = Table.from_csv(resolve_resource_path("test_table_read_csv.csv"))
     with pytest.raises(error):
         table.rename_column(name_from, name_to)

@@ -1,11 +1,13 @@
 import pytest
+
+from tests.fixtures import resolve_resource_path
 from safeds.data.tabular.containers import Table, TaggedTable
 from safeds.exceptions import PredictionError
 from safeds.ml.regression import RandomForest as RandomForestRegressor
 
 
 def test_random_forest_predict() -> None:
-    table = Table.from_csv("tests/resources/test_random_forest.csv")
+    table = Table.from_csv(resolve_resource_path("test_random_forest.csv"))
     tagged_table = TaggedTable(table, "T")
     random_forest = RandomForestRegressor()
     random_forest.fit(tagged_table)
@@ -14,7 +16,7 @@ def test_random_forest_predict() -> None:
 
 
 def test_random_forest_predict_not_fitted() -> None:
-    table = Table.from_csv("tests/resources/test_random_forest.csv")
+    table = Table.from_csv(resolve_resource_path("test_random_forest.csv"))
     tagged_table = TaggedTable(table, "T")
     random_forest = RandomForestRegressor()
     with pytest.raises(PredictionError):
@@ -22,8 +24,8 @@ def test_random_forest_predict_not_fitted() -> None:
 
 
 def test_random_forest_predict_invalid() -> None:
-    table = Table.from_csv("tests/resources/test_random_forest.csv")
-    invalid_table = Table.from_csv("tests/resources/test_random_forest_invalid.csv")
+    table = Table.from_csv(resolve_resource_path("test_random_forest.csv"))
+    invalid_table = Table.from_csv(resolve_resource_path("test_random_forest_invalid.csv"))
     tagged_table = TaggedTable(table, "T")
     invalid_tagged_table = TaggedTable(invalid_table, "T")
     random_forest = RandomForestRegressor()

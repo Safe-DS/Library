@@ -1,9 +1,10 @@
+from tests.fixtures import resolve_resource_path
 from safeds.data.tabular.containers import Table
 from safeds.data.tabular.typing import FloatColumnType, IntColumnType, TableSchema
 
 
 def test_table_equals_valid() -> None:
-    table = Table.from_json("tests/resources/test_schema_table.json")
+    table = Table.from_json(resolve_resource_path("test_schema_table.json"))
     schema_expected = TableSchema(
         {
             "A": IntColumnType(),
@@ -15,7 +16,7 @@ def test_table_equals_valid() -> None:
 
 
 def test_table_equals_invalid() -> None:
-    table = Table.from_json("tests/resources/test_schema_table.json")
+    table = Table.from_json(resolve_resource_path("test_schema_table.json"))
     schema_not_expected = TableSchema(
         {
             "A": FloatColumnType(),
