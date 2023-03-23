@@ -21,7 +21,6 @@ class Classifier(ABC):
         LearningError
             If the tagged table contains invalid values or if the training failed.
         """
-        pass
 
     @abstractmethod
     def predict(self, dataset: Table, target_name: Optional[str] = None) -> Table:
@@ -45,4 +44,3 @@ class Classifier(ABC):
         PredictionError
             If prediction with the given dataset failed.
         """
-        pass
