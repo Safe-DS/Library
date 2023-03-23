@@ -35,7 +35,7 @@ theme:
       toggle:
         icon: material/weather-night
         name: Switch to light mode
-      primary: indigo
+      primary: black
       accent: indigo
   features:
     - content.code.copy
