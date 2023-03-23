@@ -1,11 +1,10 @@
 from abc import ABC, abstractmethod
 from typing import Optional
 
-from safeds.data.tabular.containers import TaggedTable, Table
+from safeds.data.tabular.containers import Table, TaggedTable
 
 
 class Classifier(ABC):
-
     @abstractmethod
     def fit(self, tagged_table: TaggedTable) -> None:
         """
