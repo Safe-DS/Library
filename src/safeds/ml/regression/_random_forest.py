@@ -5,9 +5,11 @@ import safeds.ml._util_sklearn
 from safeds.data.tabular.containers import Table, TaggedTable
 from sklearn.ensemble import RandomForestRegressor
 
+from ._regressor import Regressor
+
 
 # noinspection PyProtectedMember
-class RandomForest:
+class RandomForest(Regressor):
     """
     This class implements Random Forest regression. It can only be trained on a tagged table.
     """

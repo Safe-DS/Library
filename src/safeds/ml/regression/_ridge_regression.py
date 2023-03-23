@@ -5,9 +5,11 @@ import safeds.ml._util_sklearn
 from safeds.data.tabular.containers import Table, TaggedTable
 from sklearn.linear_model import Ridge as sk_Ridge
 
+from ._regressor import Regressor
+
 
 # noinspection PyProtectedMember
-class RidgeRegression:
+class RidgeRegression(Regressor):
     """
     This class implements ridge regression. It is used as a regression model.
     It can only be trained on a tagged table.

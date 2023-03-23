@@ -1,24 +1,11 @@
+from abc import ABC, abstractmethod
 from typing import Optional
 
-# noinspection PyProtectedMember
-import safeds.ml._util_sklearn
 from safeds.data.tabular.containers import Table, TaggedTable
-from sklearn.ensemble import AdaBoostRegressor as sk_AdaBoostRegressor
-
-from ._regressor import Regressor
 
 
-# noinspection PyProtectedMember
-class AdaBoost(Regressor):
-    """
-    This class implements Ada Boost regression. It is used as a regression model.
-    It can only be trained on a tagged table.
-    """
-
-    def __init__(self) -> None:
-        self._regression = sk_AdaBoostRegressor()
-        self.target_name = ""
-
+class Classifier(ABC):
+    @abstractmethod
     def fit(self, tagged_table: TaggedTable) -> None:
         """
         Fit this model given a tagged table.
@@ -33,8 +20,8 @@ class AdaBoost(Regressor):
         LearningError
             If the tagged table contains invalid values or if the training failed.
         """
-        self.target_name = safeds.ml._util_sklearn.fit(self._regression, tagged_table)
 
+    @abstractmethod
     def predict(self, dataset: Table, target_name: Optional[str] = None) -> Table:
         """
         Predict a target vector using a dataset containing feature vectors. The model has to be trained first.
@@ -56,8 +43,3 @@ class AdaBoost(Regressor):
         PredictionError
             If prediction with the given dataset failed.
         """
-        return safeds.ml._util_sklearn.predict(
-            self._regression,
-            dataset,
-            target_name if target_name is not None else self.target_name,
-        )
