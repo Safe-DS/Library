@@ -1,9 +1,8 @@
 import pytest
-
-from tests.fixtures import resolve_resource_path
 from safeds.data.tabular.containers import Table, TaggedTable
 from safeds.exceptions import LearningError
 from safeds.ml.classification import RandomForest as RandomForestClassifier
+from tests.fixtures import resolve_resource_path
 
 
 def test_logistic_regression_fit() -> None:

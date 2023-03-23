@@ -1,8 +1,7 @@
 import pytest
-
-from tests.fixtures import resolve_resource_path
 from safeds.data.tabular.containers import Row, Table
 from safeds.exceptions import MissingDataError
+from tests.fixtures import resolve_resource_path
 
 
 def test_from_rows() -> None:

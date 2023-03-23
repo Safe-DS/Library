@@ -1,9 +1,8 @@
 import pytest
-
-from tests.fixtures import resolve_resource_path
 from safeds.data.tabular.containers import Table, TaggedTable
 from safeds.exceptions import PredictionError
 from safeds.ml.regression import KNearestNeighbors as KNearestNeighborsRegressor
+from tests.fixtures import resolve_resource_path
 
 
 def test_k_nearest_neighbors_predict() -> None:

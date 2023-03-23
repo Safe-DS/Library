@@ -1,8 +1,7 @@
 import pandas as pd
 import pytest
-
-from tests.fixtures import resolve_resource_path
 from safeds.data.tabular.containers import Column, Table
+from tests.fixtures import resolve_resource_path
 
 
 @pytest.mark.parametrize(

@@ -1,6 +1,6 @@
 import os
 
-_resources_root = os.path.join(os.path.dirname(__file__), '..', 'resources')
+_resources_root = os.path.join(os.path.dirname(__file__), "..", "resources")
 
 
 def resolve_resource_path(resource_path: str) -> str:

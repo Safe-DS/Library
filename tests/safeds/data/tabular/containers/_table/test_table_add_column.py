@@ -1,16 +1,17 @@
 import pandas as pd
 import pytest
-
-from tests.fixtures import resolve_resource_path
 from safeds.data.tabular.containers import Column, Table
 from safeds.exceptions import ColumnSizeError, DuplicateColumnNameError
+from tests.fixtures import resolve_resource_path
 
 
 def test_table_add_column_valid() -> None:
     input_table = Table.from_csv(
         resolve_resource_path("test_table_add_column_valid_input.csv")
     )
-    expected = Table.from_csv(resolve_resource_path("test_table_add_column_valid_output.csv"))
+    expected = Table.from_csv(
+        resolve_resource_path("test_table_add_column_valid_output.csv")
+    )
     column = Column(pd.Series(["a", "b", "c"]), "C")
 
     result = input_table.add_column(column)

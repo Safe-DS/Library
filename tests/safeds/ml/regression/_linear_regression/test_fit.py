@@ -1,9 +1,8 @@
 import pytest
-
-from tests.fixtures import resolve_resource_path
 from safeds.data.tabular.containers import Table, TaggedTable
 from safeds.exceptions import LearningError
 from safeds.ml.regression import LinearRegression
+from tests.fixtures import resolve_resource_path
 
 
 def test_linear_regression_fit() -> None:

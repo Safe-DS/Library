@@ -1,5 +1,5 @@
-from tests.fixtures import resolve_resource_path
 from safeds.data.tabular.containers import Table, TaggedTable
+from tests.fixtures import resolve_resource_path
 
 
 def test_tagged_table_feature_vectors() -> None:

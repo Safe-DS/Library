@@ -1,13 +1,14 @@
 import pytest
-
-from tests.fixtures import resolve_resource_path
 from safeds.data.tabular.containers import Table, TaggedTable
 from safeds.exceptions import LearningError
 from safeds.ml.regression import GradientBoosting
+from tests.fixtures import resolve_resource_path
 
 
 def test_gradient_boosting_regression_fit() -> None:
-    table = Table.from_csv(resolve_resource_path("test_gradient_boosting_regression.csv"))
+    table = Table.from_csv(
+        resolve_resource_path("test_gradient_boosting_regression.csv")
+    )
     tagged_table = TaggedTable(table, "T")
     gradient_boosting = GradientBoosting()
     gradient_boosting.fit(tagged_table)

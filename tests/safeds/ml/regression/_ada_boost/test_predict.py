@@ -1,9 +1,8 @@
 import pytest
-
-from tests.fixtures import resolve_resource_path
 from safeds.data.tabular.containers import Table, TaggedTable
 from safeds.exceptions import PredictionError
 from safeds.ml.regression import AdaBoost
+from tests.fixtures import resolve_resource_path
 
 
 def test_ada_boost_predict() -> None:

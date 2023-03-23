@@ -1,6 +1,6 @@
-from tests.fixtures import resolve_resource_path
 from safeds.data.tabular.containers import Table
 from safeds.data.tabular.typing import FloatColumnType, IntColumnType, TableSchema
+from tests.fixtures import resolve_resource_path
 
 
 def test_table_equals_valid() -> None:

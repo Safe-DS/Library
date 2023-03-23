@@ -1,8 +1,7 @@
 import pytest
-
-from tests.fixtures import resolve_resource_path
 from safeds.data.tabular.containers import Table
 from safeds.exceptions import UnknownColumnNameError
+from tests.fixtures import resolve_resource_path
 
 
 def test_table_column_keep() -> None:

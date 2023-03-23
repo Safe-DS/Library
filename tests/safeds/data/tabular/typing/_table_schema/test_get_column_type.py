@@ -1,8 +1,7 @@
 import numpy as np
-
-from tests.fixtures import resolve_resource_path
 from safeds.data.tabular.containers import Table
 from safeds.data.tabular.typing import ColumnType
+from tests.fixtures import resolve_resource_path
 
 
 def test_get_type_of_column() -> None:

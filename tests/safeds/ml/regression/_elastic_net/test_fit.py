@@ -1,9 +1,8 @@
 import pytest
-
-from tests.fixtures import resolve_resource_path
 from safeds.data.tabular.containers import Table, TaggedTable
 from safeds.exceptions import LearningError
 from safeds.ml.regression import ElasticNetRegression
+from tests.fixtures import resolve_resource_path
 
 
 def test_elastic_net_regression_fit() -> None:
@@ -15,7 +14,9 @@ def test_elastic_net_regression_fit() -> None:
 
 
 def test_elastic_net_regression_fit_invalid() -> None:
-    table = Table.from_csv(resolve_resource_path("test_elastic_net_regression_invalid.csv"))
+    table = Table.from_csv(
+        resolve_resource_path("test_elastic_net_regression_invalid.csv")
+    )
     tagged_table = TaggedTable(table, "T")
     en_regression = ElasticNetRegression()
     with pytest.raises(LearningError):

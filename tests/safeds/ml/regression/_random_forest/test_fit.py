@@ -1,9 +1,8 @@
 import pytest
-
-from tests.fixtures import resolve_resource_path
 from safeds.data.tabular.containers import Table, TaggedTable
 from safeds.exceptions import LearningError
 from safeds.ml.regression import RandomForest as RandomForestRegressor
+from tests.fixtures import resolve_resource_path
 
 
 def test_random_forest_fit() -> None:
