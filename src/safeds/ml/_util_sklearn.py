@@ -6,7 +6,7 @@ from sklearn.exceptions import NotFittedError
 
 
 # noinspection PyProtectedMember
-def fit(model: Any, tagged_table: TaggedTable) -> str:
+def fit(model: Any, tagged_table: TaggedTable) -> None:
     """
     Fit a model for a given tagged table.
 
@@ -16,11 +16,6 @@ def fit(model: Any, tagged_table: TaggedTable) -> str:
         Classifier or Regression from scikit-learn.
     tagged_table : TaggedTable
         The tagged table containing the feature and target vectors.
-
-    Returns
-    -------
-    target_name : str
-        The target column name, inferred from the tagged table.
 
     Raises
     ------
@@ -32,7 +27,6 @@ def fit(model: Any, tagged_table: TaggedTable) -> str:
             tagged_table.feature_vectors._data,
             tagged_table.target_values._data,
         )
-        return tagged_table.target_values.name
     except ValueError as exception:
         raise LearningError(str(exception)) from exception
     except Exception as exception:
@@ -40,7 +34,7 @@ def fit(model: Any, tagged_table: TaggedTable) -> str:
 
 
 # noinspection PyProtectedMember
-def predict(model: Any, dataset: Table, target_name: str) -> Table:
+def predict(model: Any, dataset: Table, target_name: str) -> TaggedTable:
     """
     Predict a target vector using a dataset containing feature vectors. The model has to be trained first.
 
@@ -73,7 +67,7 @@ def predict(model: Any, dataset: Table, target_name: str) -> Table:
                 f"Dataset already contains '{target_name}' column. Please rename this column"
             )
         result_set[target_name] = predicted_target_vector
-        return Table(result_set)
+        return TaggedTable(Table(result_set), target_column=target_name)
     except NotFittedError as exception:
         raise PredictionError("The model was not trained") from exception
     except ValueError as exception:

@@ -1,7 +1,7 @@
 # noinspection PyProtectedMember
-import safeds.ml._util_sklearn
 from safeds.data.tabular.containers import Table, TaggedTable
-from sklearn.neighbors import KNeighborsClassifier
+from safeds.ml._util_sklearn import fit, predict
+from sklearn.neighbors import KNeighborsClassifier as sk_KNeighborsClassifier
 
 from ._classifier import Classifier
 
@@ -18,8 +18,10 @@ class KNearestNeighbors(Classifier):
     """
 
     def __init__(self, n_neighbors: int) -> None:
-        self._classification = KNeighborsClassifier(n_jobs=-1, n_neighbors=n_neighbors)
-        self.target_name = ""
+        self._wrapped_classifier = sk_KNeighborsClassifier(
+            n_jobs=-1, n_neighbors=n_neighbors
+        )
+        self._target_name = ""
 
     def fit(self, training_set: TaggedTable) -> None:
         """
@@ -35,11 +37,10 @@ class KNearestNeighbors(Classifier):
         LearningError
             If the tagged table contains invalid values or if the training failed.
         """
-        self.target_name = safeds.ml._util_sklearn.fit(
-            self._classification, training_set
-        )
+        fit(self._wrapped_classifier, training_set)
+        self._target_name = training_set.target_values.name
 
-    def predict(self, dataset: Table) -> Table:
+    def predict(self, dataset: Table) -> TaggedTable:
         """
         Predict a target vector using a dataset containing feature vectors. The model has to be trained first
 
@@ -50,7 +51,7 @@ class KNearestNeighbors(Classifier):
 
         Returns
         -------
-        table : Table
+        table : TaggedTable
             A dataset containing the given feature vectors and the predicted target vector.
 
         Raises
@@ -58,8 +59,8 @@ class KNearestNeighbors(Classifier):
         PredictionError
             If prediction with the given dataset failed.
         """
-        return safeds.ml._util_sklearn.predict(
-            self._classification,
+        return predict(
+            self._wrapped_classifier,
             dataset,
-            self.target_name,
+            self._target_name,
         )

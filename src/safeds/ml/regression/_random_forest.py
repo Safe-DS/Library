@@ -1,7 +1,7 @@
 # noinspection PyProtectedMember
-import safeds.ml._util_sklearn
 from safeds.data.tabular.containers import Table, TaggedTable
-from sklearn.ensemble import RandomForestRegressor
+from safeds.ml._util_sklearn import fit, predict
+from sklearn.ensemble import RandomForestRegressor as sk_RandomForestRegressor
 
 from ._regressor import Regressor
 
@@ -13,8 +13,8 @@ class RandomForest(Regressor):
     """
 
     def __init__(self) -> None:
-        self._regression = RandomForestRegressor(n_jobs=-1)
-        self.target_name = ""
+        self._wrapped_regressor = sk_RandomForestRegressor(n_jobs=-1)
+        self._target_name = ""
 
     def fit(self, training_set: TaggedTable) -> None:
         """
@@ -30,9 +30,10 @@ class RandomForest(Regressor):
         LearningError
             If the tagged table contains invalid values or if the training failed.
         """
-        self.target_name = safeds.ml._util_sklearn.fit(self._regression, training_set)
+        fit(self._wrapped_regressor, training_set)
+        self._target_name = training_set.target_values.name
 
-    def predict(self, dataset: Table) -> Table:
+    def predict(self, dataset: Table) -> TaggedTable:
         """
         Predict a target vector using a dataset containing feature vectors. The model has to be trained first.
 
@@ -43,7 +44,7 @@ class RandomForest(Regressor):
 
         Returns
         -------
-        table : Table
+        table : TaggedTable
             A dataset containing the given feature vectors and the predicted target vector.
 
         Raises
@@ -51,8 +52,4 @@ class RandomForest(Regressor):
         PredictionError
             If prediction with the given dataset failed.
         """
-        return safeds.ml._util_sklearn.predict(
-            self._regression,
-            dataset,
-            self.target_name,
-        )
+        return predict(self._wrapped_regressor, dataset, self._target_name)

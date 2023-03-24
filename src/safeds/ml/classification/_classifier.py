@@ -4,6 +4,10 @@ from safeds.data.tabular.containers import Table, TaggedTable
 
 
 class Classifier(ABC):
+    """
+    Abstract base class for all classifiers.
+    """
+
     @abstractmethod
     def fit(self, training_set: TaggedTable) -> None:
         """
@@ -21,7 +25,7 @@ class Classifier(ABC):
         """
 
     @abstractmethod
-    def predict(self, dataset: Table) -> Table:
+    def predict(self, dataset: Table) -> TaggedTable:
         """
         Predict a target vector using a dataset containing feature vectors. The model has to be trained first.
 
@@ -32,7 +36,7 @@ class Classifier(ABC):
 
         Returns
         -------
-        table : Table
+        table : TaggedTable
             A dataset containing the given feature vectors and the predicted target vector.
 
         Raises
