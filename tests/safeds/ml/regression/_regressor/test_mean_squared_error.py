@@ -1,6 +1,6 @@
 import pytest
+from safeds.data.tabular.containers import Column, Table, TaggedTable
 
-from safeds.data.tabular.containers import Column, TaggedTable, Table
 from ._dummy_regressor import DummyRegressor
 
 
@@ -13,6 +13,8 @@ def test_mean_squared_error_valid(
 ) -> None:
     predicted_column = Column(predicted, "predicted")
     expected_column = Column(expected, "expected")
-    table = TaggedTable(Table.from_columns([predicted_column, expected_column]), target_name="expected")
+    table = TaggedTable(
+        Table.from_columns([predicted_column, expected_column]), target_name="expected"
+    )
 
     assert DummyRegressor().mean_squared_error(table) == result

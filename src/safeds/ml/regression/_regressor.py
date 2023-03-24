@@ -1,10 +1,9 @@
 from abc import ABC, abstractmethod
 
-from safeds.data.tabular.containers import Table, TaggedTable, Column
+from safeds.data.tabular.containers import Column, Table, TaggedTable
 from safeds.exceptions import ColumnLengthMismatchError
-
-from sklearn.metrics import mean_squared_error as sk_mean_squared_error
 from sklearn.metrics import mean_absolute_error as sk_mean_absolute_error
+from sklearn.metrics import mean_squared_error as sk_mean_squared_error
 
 
 class Regressor(ABC):
@@ -69,7 +68,6 @@ class Regressor(ABC):
 
         _check_metrics_preconditions(predicted, expected)
         return sk_mean_squared_error(expected._data, predicted._data)
-
 
     def mean_absolute_error(self, validation_or_test_set: TaggedTable) -> float:
         """

@@ -1,4 +1,4 @@
-from safeds.data.tabular.containers import TaggedTable, Table
+from safeds.data.tabular.containers import Table, TaggedTable
 from safeds.ml.classification import Classifier
 
 

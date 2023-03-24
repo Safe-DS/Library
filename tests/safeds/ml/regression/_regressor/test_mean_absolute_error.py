@@ -1,7 +1,7 @@
 import pytest
-from ._dummy_regressor import DummyRegressor
+from safeds.data.tabular.containers import Column, Table, TaggedTable
 
-from safeds.data.tabular.containers import Column, TaggedTable, Table
+from ._dummy_regressor import DummyRegressor
 
 
 @pytest.mark.parametrize(
@@ -19,6 +19,8 @@ def test_mean_absolute_error_valid(
 ) -> None:
     predicted_column = Column(predicted, "predicted")
     expected_column = Column(expected, "expected")
-    table = TaggedTable(Table.from_columns([predicted_column, expected_column]), target_name="expected")
+    table = TaggedTable(
+        Table.from_columns([predicted_column, expected_column]), target_name="expected"
+    )
 
     assert DummyRegressor().mean_absolute_error(table) == result

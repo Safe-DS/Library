@@ -1,8 +1,7 @@
 from abc import ABC, abstractmethod
 
-from sklearn.metrics import accuracy_score as sk_accuracy_score
-
 from safeds.data.tabular.containers import Table, TaggedTable
+from sklearn.metrics import accuracy_score as sk_accuracy_score
 
 
 class Classifier(ABC):

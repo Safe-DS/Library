@@ -1,8 +1,8 @@
 import pandas as pd
 import pytest
-
 from safeds.data.tabular.containers import Column
 from safeds.exceptions import ColumnLengthMismatchError
+
 # noinspection PyProtectedMember
 from safeds.ml.regression._regressor import _check_metrics_preconditions
 

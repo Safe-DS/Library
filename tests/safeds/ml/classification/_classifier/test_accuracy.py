@@ -1,5 +1,6 @@
 import pandas as pd
 from safeds.data.tabular.containers import Column, Table, TaggedTable
+
 from ._dummy_classifier import DummyClassifier
 
 
