@@ -25,7 +25,7 @@ def fit(model: Any, tagged_table: TaggedTable) -> None:
     try:
         model.fit(
             tagged_table.features._data,
-            tagged_table.target_values._data,
+            tagged_table.target._data,
         )
     except ValueError as exception:
         raise LearningError(str(exception)) from exception
@@ -67,7 +67,7 @@ def predict(model: Any, dataset: Table, target_name: str) -> TaggedTable:
                 f"Dataset already contains '{target_name}' column. Please rename this column"
             )
         result_set[target_name] = predicted_target_vector
-        return TaggedTable(Table(result_set), target_column=target_name)
+        return TaggedTable(Table(result_set), target_name=target_name)
     except NotFittedError as exception:
         raise PredictionError("The model was not trained") from exception
     except ValueError as exception:

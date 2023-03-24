@@ -10,7 +10,7 @@ def test_predict_should_not_warn_about_feature_names() -> None:
     """
 
     training_set = TaggedTable(
-        Table({"a": [1, 2, 3], "b": [2, 4, 6]}), target_column="b"
+        Table({"a": [1, 2, 3], "b": [2, 4, 6]}), target_name="b"
     )
 
     model = LinearRegression()

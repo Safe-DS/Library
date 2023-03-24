@@ -11,23 +11,23 @@ class TaggedTable(Table):
     Parameters
     ----------
     table : Table
-        The table used to derive the feature and target vectors.
-    target_column : str
+        The table used to derive the features and target.
+    target_name : str
         Name of the target column.
     """
 
-    def __init__(self, table: Table, target_column: str):
+    def __init__(self, table: Table, target_name: str):
         super().__init__(table._data)
 
-        self._y: Column = table.get_column(target_column)
-        self._X: Table = table.drop_columns([target_column])
+        self._y: Column = table.get_column(target_name)
+        self._X: Table = table.drop_columns([target_name])
 
     @property
     def features(self) -> Table:
         return self._X
 
     @property
-    def target_values(self) -> Column:
+    def target(self) -> Column:
         return self._y
 
     def __repr__(self) -> str:
