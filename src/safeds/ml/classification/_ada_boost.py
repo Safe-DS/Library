@@ -1,10 +1,8 @@
-from typing import Optional
+from sklearn.ensemble import AdaBoostClassifier as sk_AdaBoostClassifier
 
 # noinspection PyProtectedMember
 import safeds.ml._util_sklearn
 from safeds.data.tabular.containers import Table, TaggedTable
-from sklearn.ensemble import AdaBoostClassifier as sk_AdaBoostClassifier
-
 from ._classifier import Classifier
 
 
