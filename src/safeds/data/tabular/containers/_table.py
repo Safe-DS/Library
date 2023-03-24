@@ -833,8 +833,8 @@ class Table:
 
         for column in columns:
             statistics = {
-                "max": column.statistics.max,
-                "min": column.statistics.min,
+                "maximum": column.statistics.maximum,
+                "minimum": column.statistics.minimum,
                 "mean": column.statistics.mean,
                 "mode": column.statistics.mode,
                 "median": column.statistics.median,

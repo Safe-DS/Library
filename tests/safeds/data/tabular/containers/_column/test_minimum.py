@@ -4,14 +4,14 @@ from safeds.data.tabular.containers import Table
 from safeds.exceptions import NonNumericColumnError
 
 
-def test_min_invalid() -> None:
+def test_minimum_invalid() -> None:
     with pytest.raises(NonNumericColumnError):
         table = Table(pd.DataFrame(data={"col1": ["col1_1", 2]}))
         column = table.get_column("col1")
-        column.statistics.min()
+        column.statistics.minimum()
 
 
-def test_min_valid() -> None:
+def test_minimum_valid() -> None:
     table = Table(pd.DataFrame(data={"col1": [1, 2, 3, 4]}))
     column = table.get_column("col1")
-    assert column.statistics.min() == 1
+    assert column.statistics.minimum() == 1

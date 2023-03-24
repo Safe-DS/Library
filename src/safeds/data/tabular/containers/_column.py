@@ -271,7 +271,7 @@ class ColumnStatistics:
     def __init__(self, column: Column):
         self._column = column
 
-    def max(self) -> float:
+    def maximum(self) -> float:
         """
         Return the maximum value of the column. The column has to be numerical.
 
@@ -291,7 +291,7 @@ class ColumnStatistics:
             )
         return self._column._data.max()
 
-    def min(self) -> float:
+    def minimum(self) -> float:
         """
         Return the minimum value of the column. The column has to be numerical.
 
