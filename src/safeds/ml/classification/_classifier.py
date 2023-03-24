@@ -4,6 +4,10 @@ from safeds.data.tabular.containers import Table, TaggedTable
 
 
 class Classifier(ABC):
+    """
+    Abstract base class for all classifiers.
+    """
+
     @abstractmethod
     def fit(self, training_set: TaggedTable) -> None:
         """

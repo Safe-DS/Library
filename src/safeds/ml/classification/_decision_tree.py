@@ -1,5 +1,5 @@
 # noinspection PyProtectedMember
-import safeds.ml._util_sklearn
+from safeds.ml._util_sklearn import fit, predict
 from safeds.data.tabular.containers import Table, TaggedTable
 from sklearn.tree import DecisionTreeClassifier as sk_DecisionTreeClassifier
 
@@ -14,8 +14,8 @@ class DecisionTree(Classifier):
     """
 
     def __init__(self) -> None:
-        self._classification = sk_DecisionTreeClassifier()
-        self.target_name = ""
+        self._wrapped_classifier = sk_DecisionTreeClassifier()
+        self._target_name = ""
 
     def fit(self, training_set: TaggedTable) -> None:
         """
@@ -31,9 +31,8 @@ class DecisionTree(Classifier):
         LearningError
             If the tagged table contains invalid values or if the training failed.
         """
-        self.target_name = safeds.ml._util_sklearn.fit(
-            self._classification, training_set
-        )
+        fit(self._wrapped_classifier, training_set)
+        self._target_name = training_set.target_values.name
 
     def predict(self, dataset: Table) -> Table:
         """
@@ -54,8 +53,4 @@ class DecisionTree(Classifier):
         PredictionError
             If prediction with the given dataset failed.
         """
-        return safeds.ml._util_sklearn.predict(
-            self._classification,
-            dataset,
-            self.target_name,
-        )
+        return predict(self._wrapped_classifier, dataset, self._target_name)

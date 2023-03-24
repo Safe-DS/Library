@@ -1,5 +1,5 @@
 # noinspection PyProtectedMember
-import safeds.ml._util_sklearn
+from safeds.ml._util_sklearn import fit, predict
 from safeds.data.tabular.containers import Table, TaggedTable
 from sklearn.ensemble import AdaBoostRegressor as sk_AdaBoostRegressor
 
@@ -14,8 +14,8 @@ class AdaBoost(Regressor):
     """
 
     def __init__(self) -> None:
-        self._regression = sk_AdaBoostRegressor()
-        self.target_name = ""
+        self._wrapped_regressor = sk_AdaBoostRegressor()
+        self._target_name = ""
 
     def fit(self, training_set: TaggedTable) -> None:
         """
@@ -31,7 +31,8 @@ class AdaBoost(Regressor):
         LearningError
             If the tagged table contains invalid values or if the training failed.
         """
-        self.target_name = safeds.ml._util_sklearn.fit(self._regression, training_set)
+        fit(self._wrapped_regressor, training_set)
+        self._target_name = training_set.target_values.name
 
     def predict(self, dataset: Table) -> Table:
         """
@@ -52,8 +53,4 @@ class AdaBoost(Regressor):
         PredictionError
             If prediction with the given dataset failed.
         """
-        return safeds.ml._util_sklearn.predict(
-            self._regression,
-            dataset,
-            self.target_name,
-        )
+        return predict(self._wrapped_regressor, dataset, self._target_name)

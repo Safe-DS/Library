@@ -6,7 +6,7 @@ from sklearn.exceptions import NotFittedError
 
 
 # noinspection PyProtectedMember
-def fit(model: Any, tagged_table: TaggedTable) -> str:
+def fit(model: Any, tagged_table: TaggedTable) -> None:
     """
     Fit a model for a given tagged table.
 
@@ -16,11 +16,6 @@ def fit(model: Any, tagged_table: TaggedTable) -> str:
         Classifier or Regression from scikit-learn.
     tagged_table : TaggedTable
         The tagged table containing the feature and target vectors.
-
-    Returns
-    -------
-    target_name : str
-        The target column name, inferred from the tagged table.
 
     Raises
     ------
@@ -32,7 +27,6 @@ def fit(model: Any, tagged_table: TaggedTable) -> str:
             tagged_table.feature_vectors._data,
             tagged_table.target_values._data,
         )
-        return tagged_table.target_values.name
     except ValueError as exception:
         raise LearningError(str(exception)) from exception
     except Exception as exception:

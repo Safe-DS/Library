@@ -4,6 +4,10 @@ from safeds.data.tabular.containers import Table, TaggedTable
 
 
 class Regressor(ABC):
+    """
+    Abstract base class for all regressors.
+    """
+
     @abstractmethod
     def fit(self, training_set: TaggedTable) -> None:
         """

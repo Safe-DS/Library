@@ -1,7 +1,7 @@
 # noinspection PyProtectedMember
-import safeds.ml._util_sklearn
+from safeds.ml._util_sklearn import fit, predict
 from safeds.data.tabular.containers import Table, TaggedTable
-from sklearn.ensemble import GradientBoostingRegressor
+from sklearn.ensemble import GradientBoostingRegressor as sk_GradientBoostingRegressor
 
 from ._regressor import Regressor
 
@@ -14,8 +14,8 @@ class GradientBoosting(Regressor):
     """
 
     def __init__(self) -> None:
-        self._regression = GradientBoostingRegressor()
-        self.target_name = ""
+        self._wrapped_regressor = sk_GradientBoostingRegressor()
+        self._target_name = ""
 
     def fit(self, training_set: TaggedTable) -> None:
         """
@@ -32,9 +32,10 @@ class GradientBoosting(Regressor):
         LearningError
             If the tagged table contains invalid values or if the training failed.
         """
-        self.target_name = safeds.ml._util_sklearn.fit(self._regression, training_set)
+        fit(self._wrapped_regressor, training_set)
+        self._target_name = training_set.target_values.name
 
-    # noinspection PyProtectedMember
+        # noinspection PyProtectedMember
     def predict(self, dataset: Table) -> Table:
         """
         Predict a target vector using a dataset containing feature vectors. The model has to be trained first.
@@ -54,8 +55,4 @@ class GradientBoosting(Regressor):
         PredictionError
             If prediction with the given dataset failed.
         """
-        return safeds.ml._util_sklearn.predict(
-            self._regression,
-            dataset,
-            self.target_name,
-        )
+        return predict(self._wrapped_regressor, dataset, self._target_name)

@@ -1,7 +1,7 @@
 # noinspection PyProtectedMember
-import safeds.ml._util_sklearn
+from safeds.ml._util_sklearn import fit, predict
 from safeds.data.tabular.containers import Table, TaggedTable
-from sklearn.ensemble import GradientBoostingClassifier
+from sklearn.ensemble import GradientBoostingClassifier as sk_GradientBoostingClassifier
 
 from ._classifier import Classifier
 
@@ -14,8 +14,8 @@ class GradientBoosting(Classifier):
     """
 
     def __init__(self) -> None:
-        self._classification = GradientBoostingClassifier()
-        self.target_name = ""
+        self._wrapped_classifier = sk_GradientBoostingClassifier()
+        self._target_name = ""
 
     def fit(self, training_set: TaggedTable) -> None:
         """
@@ -31,9 +31,8 @@ class GradientBoosting(Classifier):
         LearningError
             If the tagged table contains invalid values or if the training failed.
         """
-        self.target_name = safeds.ml._util_sklearn.fit(
-            self._classification, training_set
-        )
+        fit(self._wrapped_classifier, training_set)
+        self._target_name = training_set.target_values.name
 
     # noinspection PyProtectedMember
     def predict(self, dataset: Table) -> Table:
@@ -55,8 +54,4 @@ class GradientBoosting(Classifier):
         PredictionError
             If prediction with the given dataset failed.
         """
-        return safeds.ml._util_sklearn.predict(
-            self._classification,
-            dataset,
-            self.target_name,
-        )
+        return predict(self._wrapped_classifier, dataset, self._target_name)
