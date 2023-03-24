@@ -121,6 +121,22 @@ class Column:
         """
         return self._data.isna().sum()
 
+    def rename(self, new_name: str) -> Column:
+        """
+        Return a new column with a new name.
+
+        Parameters
+        ----------
+        new_name : str
+            The new name of the column.
+
+        Returns
+        -------
+        column : Column
+            A new column with the new name.
+        """
+        return Column(self._data, new_name)
+
     def all(self, predicate: Callable[[Any], bool]) -> bool:
         """
         Check if all values have a given property.
