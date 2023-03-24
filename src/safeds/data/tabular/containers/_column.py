@@ -277,9 +277,7 @@ class Column:
             If the data contains non-numerical data.
         """
         if not self._type.is_numeric():
-            raise NonNumericColumnError(
-                f"{self.name} is of type {self._type}."
-            )
+            raise NonNumericColumnError(f"{self.name} is of type {self._type}.")
         return self._data.max()
 
     def minimum(self) -> float:
@@ -297,9 +295,7 @@ class Column:
             If the data contains non-numerical data.
         """
         if not self._type.is_numeric():
-            raise NonNumericColumnError(
-                f"{self.name} is of type {self._type}."
-            )
+            raise NonNumericColumnError(f"{self.name} is of type {self._type}.")
         return self._data.min()
 
     def mean(self) -> float:
@@ -317,9 +313,7 @@ class Column:
             If the data contains non-numerical data.
         """
         if not self._type.is_numeric():
-            raise NonNumericColumnError(
-                f"{self.name} is of type {self._type}."
-            )
+            raise NonNumericColumnError(f"{self.name} is of type {self._type}.")
         return self._data.mean()
 
     def mode(self) -> Any:
@@ -348,9 +342,7 @@ class Column:
             If the data contains non-numerical data.
         """
         if not self._type.is_numeric():
-            raise NonNumericColumnError(
-                f"{self.name} is of type {self._type}."
-            )
+            raise NonNumericColumnError(f"{self.name} is of type {self._type}.")
         return self._data.median()
 
     def sum(self) -> float:
@@ -369,9 +361,7 @@ class Column:
 
         """
         if not self.type.is_numeric():
-            raise NonNumericColumnError(
-                f"{self.name} is of type {self._type}."
-            )
+            raise NonNumericColumnError(f"{self.name} is of type {self._type}.")
         return self._data.sum()
 
     def variance(self) -> float:
@@ -390,9 +380,7 @@ class Column:
 
         """
         if not self.type.is_numeric():
-            raise NonNumericColumnError(
-                f"{self.name} is of type {self._type}."
-            )
+            raise NonNumericColumnError(f"{self.name} is of type {self._type}.")
 
         return self._data.var()
 
@@ -412,9 +400,7 @@ class Column:
 
         """
         if not self.type.is_numeric():
-            raise NonNumericColumnError(
-                f"{self.name} is of type {self._type}."
-            )
+            raise NonNumericColumnError(f"{self.name} is of type {self._type}.")
         return self._data.std()
 
     def stability(self) -> float:
@@ -437,10 +423,7 @@ class Column:
         """
         if self._data.size == 0:
             raise ColumnSizeError("> 0", "0")
-        return (
-            self._data.value_counts()[self.mode()[0]]
-            / self._data.count()
-        )
+        return self._data.value_counts()[self.mode()[0]] / self._data.count()
 
     def idness(self) -> float:
         """
