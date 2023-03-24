@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 from typing import Any, Optional
 
 import pandas as pd
-from safeds.data.tabular.containers import ColumnStatistics, Table
+from safeds.data.tabular.containers import Table
 from sklearn.impute import SimpleImputer
 
 
@@ -88,7 +88,7 @@ class Imputer:
 
         if self._imp.strategy == "most_frequent":
             for name in column_names:
-                if 1 < len(ColumnStatistics(table.get_column(name)).mode()):
+                if 1 < len(table.get_column(name).mode()):
                     raise IndexError(
                         "There are multiple frequent values in a column given for the Imputer"
                     )

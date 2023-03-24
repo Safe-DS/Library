@@ -35,10 +35,6 @@ class Column:
         return self._name
 
     @property
-    def statistics(self) -> ColumnStatistics:
-        return ColumnStatistics(self)
-
-    @property
     def type(self) -> ColumnType:
         """
         Return the type of the column.
@@ -442,7 +438,7 @@ class Column:
         if self._data.size == 0:
             raise ColumnSizeError("> 0", "0")
         return (
-            self._data.value_counts()[self.statistics.mode()[0]]
+            self._data.value_counts()[self.mode()[0]]
             / self._data.count()
         )
 
@@ -467,38 +463,3 @@ class Column:
         if self._data.size == 0:
             raise ColumnSizeError("> 0", "0")
         return self._data.nunique() / self._data.size
-
-
-class ColumnStatistics:
-    def __init__(self, column: Column):
-        self._column = column
-
-    def maximum(self) -> float:
-        return self._column.maximum()
-
-    def minimum(self) -> float:
-        return self._column.minimum()
-
-    def mean(self) -> float:
-        return self._column.mean()
-
-    def mode(self) -> Any:
-        return self._column.mode()
-
-    def median(self) -> float:
-        return self._column.median()
-
-    def sum(self) -> float:
-        return self._column.sum()
-
-    def variance(self) -> float:
-        return self._column.variance()
-
-    def standard_deviation(self) -> float:
-        return self._column.standard_deviation()
-
-    def stability(self) -> float:
-        return self._column.stability()
-
-    def idness(self) -> float:
-        return self._column.idness()

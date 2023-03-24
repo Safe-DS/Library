@@ -11,7 +11,7 @@ def test_imputer_mean() -> None:
     imp = Imputer(Imputer.Strategy.Mean())
     new_table = imp.fit_transform(table)
 
-    assert new_table.get_column("col1")._data[0] == column.statistics.mean()
+    assert new_table.get_column("col1")._data[0] == column.mean()
 
 
 def test_imputer_median() -> None:
@@ -20,7 +20,7 @@ def test_imputer_median() -> None:
     imp = Imputer(Imputer.Strategy.Median())
     new_table = imp.fit_transform(table)
 
-    assert new_table.get_column("col1")._data[0] == column.statistics.median()
+    assert new_table.get_column("col1")._data[0] == column.median()
 
 
 def test_imputer_mode() -> None:
@@ -29,7 +29,7 @@ def test_imputer_mode() -> None:
     imp = Imputer(Imputer.Strategy.Mode())
     new_table = imp.fit_transform(table)
 
-    assert new_table.get_column("col1")._data[0] == column.statistics.mode()[0]
+    assert new_table.get_column("col1")._data[0] == column.mode()[0]
 
 
 def test_imputer_mode_invalid() -> None:
