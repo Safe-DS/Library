@@ -9,9 +9,7 @@ def test_predict_should_not_warn_about_feature_names() -> None:
     See https://github.com/Safe-DS/Stdlib/issues/51.
     """
 
-    training_set = TaggedTable(
-        Table({"a": [1, 2, 3], "b": [2, 4, 6]}), target_column="b"
-    )
+    training_set = TaggedTable(Table({"a": [1, 2, 3], "b": [2, 4, 6]}), target_name="b")
 
     model = LinearRegression()
     model.fit(training_set)

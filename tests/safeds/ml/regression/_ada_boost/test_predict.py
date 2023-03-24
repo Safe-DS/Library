@@ -10,7 +10,7 @@ def test_ada_boost_predict() -> None:
     tagged_table = TaggedTable(table, "T")
     ada_boost = AdaBoost()
     ada_boost.fit(tagged_table)
-    ada_boost.predict(tagged_table.feature_vectors)
+    ada_boost.predict(tagged_table.features)
     assert True  # This asserts that the predict method succeeds
 
 
@@ -19,7 +19,7 @@ def test_ada_boost_predict_not_fitted() -> None:
     tagged_table = TaggedTable(table, "T")
     ada_boost = AdaBoost()
     with pytest.raises(PredictionError):
-        ada_boost.predict(tagged_table.feature_vectors)
+        ada_boost.predict(tagged_table.features)
 
 
 def test_ada_boost_predict_invalid() -> None:
@@ -30,4 +30,4 @@ def test_ada_boost_predict_invalid() -> None:
     ada_boost = AdaBoost()
     ada_boost.fit(tagged_table)
     with pytest.raises(PredictionError):
-        ada_boost.predict(invalid_tagged_table.feature_vectors)
+        ada_boost.predict(invalid_tagged_table.features)

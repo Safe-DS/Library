@@ -10,7 +10,7 @@ def test_random_forest_predict() -> None:
     tagged_table = TaggedTable(table, "T")
     random_forest = RandomForestClassifier()
     random_forest.fit(tagged_table)
-    random_forest.predict(tagged_table.feature_vectors)
+    random_forest.predict(tagged_table.features)
     assert True  # This asserts that the predict method succeeds
 
 
@@ -19,7 +19,7 @@ def test_random_forest_predict_not_fitted() -> None:
     tagged_table = TaggedTable(table, "T")
     random_forest = RandomForestClassifier()
     with pytest.raises(PredictionError):
-        random_forest.predict(tagged_table.feature_vectors)
+        random_forest.predict(tagged_table.features)
 
 
 def test_random_forest_predict_invalid() -> None:
@@ -32,4 +32,4 @@ def test_random_forest_predict_invalid() -> None:
     random_forest = RandomForestClassifier()
     random_forest.fit(tagged_table)
     with pytest.raises(PredictionError):
-        random_forest.predict(invalid_tagged_table.feature_vectors)
+        random_forest.predict(invalid_tagged_table.features)

@@ -32,7 +32,7 @@ class GradientBoosting(Classifier):
             If the tagged table contains invalid values or if the training failed.
         """
         fit(self._wrapped_classifier, training_set)
-        self._target_name = training_set.target_values.name
+        self._target_name = training_set.target.name
 
     # noinspection PyProtectedMember
     def predict(self, dataset: Table) -> TaggedTable:

@@ -31,7 +31,7 @@ class RandomForest(Regressor):
             If the tagged table contains invalid values or if the training failed.
         """
         fit(self._wrapped_regressor, training_set)
-        self._target_name = training_set.target_values.name
+        self._target_name = training_set.target.name
 
     def predict(self, dataset: Table) -> TaggedTable:
         """
