@@ -17,7 +17,7 @@ class GradientBoosting(Regressor):
         self._regression = GradientBoostingRegressor()
         self.target_name = ""
 
-    def fit(self, tagged_table: TaggedTable) -> None:
+    def fit(self, training_set: TaggedTable) -> None:
         """
         Fit this model given a tagged table.
 
@@ -32,7 +32,7 @@ class GradientBoosting(Regressor):
         LearningError
             If the tagged table contains invalid values or if the training failed.
         """
-        self.target_name = safeds.ml._util_sklearn.fit(self._regression, tagged_table)
+        self.target_name = safeds.ml._util_sklearn.fit(self._regression, training_set)
 
     # noinspection PyProtectedMember
     def predict(self, dataset: Table) -> Table:

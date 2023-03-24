@@ -17,13 +17,13 @@ class LinearRegression(Regressor):
         self._regression = sk_LinearRegression(n_jobs=-1)
         self.target_name = ""
 
-    def fit(self, tagged_table: TaggedTable) -> None:
+    def fit(self, training_set: TaggedTable) -> None:
         """
         Fit this model given a tagged table.
 
         Parameters
         ----------
-        tagged_table : TaggedTable
+        training_set : TaggedTable
             The tagged table containing the feature and target vectors.
 
         Raises
@@ -31,7 +31,7 @@ class LinearRegression(Regressor):
         LearningError
             If the tagged table contains invalid values or if the training failed.
         """
-        self.target_name = safeds.ml._util_sklearn.fit(self._regression, tagged_table)
+        self.target_name = safeds.ml._util_sklearn.fit(self._regression, training_set)
 
     def predict(self, dataset: Table) -> Table:
         """

@@ -5,13 +5,13 @@ from safeds.data.tabular.containers import Table, TaggedTable
 
 class Classifier(ABC):
     @abstractmethod
-    def fit(self, tagged_table: TaggedTable) -> None:
+    def fit(self, training_set: TaggedTable) -> None:
         """
         Fit this model given a tagged table.
 
         Parameters
         ----------
-        tagged_table : TaggedTable
+        training_set : TaggedTable
             The tagged table containing the feature and target vectors.
 
         Raises
