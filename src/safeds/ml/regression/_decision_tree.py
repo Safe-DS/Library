@@ -35,7 +35,7 @@ class DecisionTree(Regressor):
         """
         self.target_name = safeds.ml._util_sklearn.fit(self._regression, tagged_table)
 
-    def predict(self, dataset: Table, target_name: Optional[str] = None) -> Table:
+    def predict(self, dataset: Table) -> Table:
         """
         Predict a target vector using a dataset containing feature vectors. The model has to be trained first.
 
@@ -43,8 +43,6 @@ class DecisionTree(Regressor):
         ----------
         dataset : Table
             The dataset containing the feature vectors.
-        target_name:  Optional[str]
-            The name of the target vector. The name of the target column inferred from fit is used by default.
 
         Returns
         -------
@@ -59,5 +57,5 @@ class DecisionTree(Regressor):
         return safeds.ml._util_sklearn.predict(
             self._regression,
             dataset,
-            target_name if target_name is not None else self.target_name,
+            self.target_name,
         )

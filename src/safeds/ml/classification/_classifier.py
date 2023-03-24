@@ -22,7 +22,7 @@ class Classifier(ABC):
         """
 
     @abstractmethod
-    def predict(self, dataset: Table, target_name: Optional[str] = None) -> Table:
+    def predict(self, dataset: Table) -> Table:
         """
         Predict a target vector using a dataset containing feature vectors. The model has to be trained first.
 
@@ -30,8 +30,6 @@ class Classifier(ABC):
         ----------
         dataset : Table
             The dataset containing the feature vectors.
-        target_name : Optional[str]
-            The name of the target vector. The name of the target column inferred from fit is used by default.
 
         Returns
         -------
