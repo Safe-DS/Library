@@ -10,7 +10,7 @@ def test_linear_regression_predict() -> None:
     tagged_table = TaggedTable(table, "T")
     linear_regression = LinearRegression()
     linear_regression.fit(tagged_table)
-    linear_regression.predict(tagged_table.feature_vectors)
+    linear_regression.predict(tagged_table.features)
     assert True  # This asserts that the predict method succeeds
 
 
@@ -19,7 +19,7 @@ def test_linear_regression_predict_not_fitted() -> None:
     tagged_table = TaggedTable(table, "T")
     linear_regression = LinearRegression()
     with pytest.raises(PredictionError):
-        linear_regression.predict(tagged_table.feature_vectors)
+        linear_regression.predict(tagged_table.features)
 
 
 def test_linear_regression_predict_invalid() -> None:
@@ -32,4 +32,4 @@ def test_linear_regression_predict_invalid() -> None:
     linear_regression = LinearRegression()
     linear_regression.fit(tagged_table)
     with pytest.raises(PredictionError):
-        linear_regression.predict(invalid_tagged_table.feature_vectors)
+        linear_regression.predict(invalid_tagged_table.features)

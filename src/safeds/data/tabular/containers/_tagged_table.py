@@ -23,7 +23,7 @@ class TaggedTable(Table):
         self._X: Table = table.drop_columns([target_column])
 
     @property
-    def feature_vectors(self) -> Table:
+    def features(self) -> Table:
         return self._X
 
     @property

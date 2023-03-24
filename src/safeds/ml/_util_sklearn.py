@@ -24,7 +24,7 @@ def fit(model: Any, tagged_table: TaggedTable) -> None:
     """
     try:
         model.fit(
-            tagged_table.feature_vectors._data,
+            tagged_table.features._data,
             tagged_table.target_values._data,
         )
     except ValueError as exception:

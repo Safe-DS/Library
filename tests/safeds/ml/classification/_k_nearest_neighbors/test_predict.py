@@ -10,7 +10,7 @@ def test_k_nearest_neighbors_predict() -> None:
     tagged_table = TaggedTable(table, "T")
     k_nearest_neighbors = KNearestNeighborsClassifier(2)
     k_nearest_neighbors.fit(tagged_table)
-    k_nearest_neighbors.predict(tagged_table.feature_vectors)
+    k_nearest_neighbors.predict(tagged_table.features)
     assert True  # This asserts that the predict method succeeds
 
 
@@ -19,7 +19,7 @@ def test_k_nearest_neighbors_predict_not_fitted() -> None:
     tagged_table = TaggedTable(table, "T")
     k_nearest_neighbors = KNearestNeighborsClassifier(2)
     with pytest.raises(PredictionError):
-        k_nearest_neighbors.predict(tagged_table.feature_vectors)
+        k_nearest_neighbors.predict(tagged_table.features)
 
 
 def test_k_nearest_neighbors_predict_invalid() -> None:
@@ -32,4 +32,4 @@ def test_k_nearest_neighbors_predict_invalid() -> None:
     k_nearest_neighbors = KNearestNeighborsClassifier(2)
     k_nearest_neighbors.fit(tagged_table)
     with pytest.raises(PredictionError):
-        k_nearest_neighbors.predict(invalid_tagged_table.feature_vectors)
+        k_nearest_neighbors.predict(invalid_tagged_table.features)

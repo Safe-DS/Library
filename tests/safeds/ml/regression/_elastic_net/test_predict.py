@@ -10,7 +10,7 @@ def test_elastic_net_regression_predict() -> None:
     tagged_table = TaggedTable(table, "T")
     en_regression = ElasticNetRegression()
     en_regression.fit(tagged_table)
-    en_regression.predict(tagged_table.feature_vectors)
+    en_regression.predict(tagged_table.features)
     assert True  # This asserts that the predict method succeeds
 
 
@@ -19,7 +19,7 @@ def test_elastic_net_regression_predict_not_fitted() -> None:
     tagged_table = TaggedTable(table, "T")
     en_regression = ElasticNetRegression()
     with pytest.raises(PredictionError):
-        en_regression.predict(tagged_table.feature_vectors)
+        en_regression.predict(tagged_table.features)
 
 
 def test_elastic_net_regression_predict_invalid() -> None:
@@ -32,4 +32,4 @@ def test_elastic_net_regression_predict_invalid() -> None:
     en_regression = ElasticNetRegression()
     en_regression.fit(tagged_table)
     with pytest.raises(PredictionError):
-        en_regression.predict(invalid_tagged_table.feature_vectors)
+        en_regression.predict(invalid_tagged_table.features)

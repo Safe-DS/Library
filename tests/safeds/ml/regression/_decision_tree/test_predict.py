@@ -10,7 +10,7 @@ def test_decision_tree_predict() -> None:
     tagged_table = TaggedTable(table, "T")
     decision_tree = DecisionTree()
     decision_tree.fit(tagged_table)
-    decision_tree.predict(tagged_table.feature_vectors)
+    decision_tree.predict(tagged_table.features)
     assert True  # This asserts that the predict method succeeds
 
 
@@ -19,7 +19,7 @@ def test_decision_tree_predict_not_fitted() -> None:
     tagged_table = TaggedTable(table, "T")
     decision_tree = DecisionTree()
     with pytest.raises(PredictionError):
-        decision_tree.predict(tagged_table.feature_vectors)
+        decision_tree.predict(tagged_table.features)
 
 
 def test_decision_tree_predict_invalid() -> None:
@@ -32,4 +32,4 @@ def test_decision_tree_predict_invalid() -> None:
     decision_tree = DecisionTree()
     decision_tree.fit(tagged_table)
     with pytest.raises(PredictionError):
-        decision_tree.predict(invalid_tagged_table.feature_vectors)
+        decision_tree.predict(invalid_tagged_table.features)

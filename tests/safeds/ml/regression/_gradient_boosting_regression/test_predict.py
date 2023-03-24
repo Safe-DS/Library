@@ -12,7 +12,7 @@ def test_gradient_boosting_predict() -> None:
     tagged_table = TaggedTable(table, "T")
     gradient_boosting_regression = GradientBoosting()
     gradient_boosting_regression.fit(tagged_table)
-    gradient_boosting_regression.predict(tagged_table.feature_vectors)
+    gradient_boosting_regression.predict(tagged_table.features)
     assert True  # This asserts that the predict method succeeds
 
 
@@ -23,7 +23,7 @@ def test_gradient_boosting_predict_not_fitted() -> None:
     tagged_table = TaggedTable(table, "T")
     gradient_boosting_regression = GradientBoosting()
     with pytest.raises(PredictionError):
-        gradient_boosting_regression.predict(tagged_table.feature_vectors)
+        gradient_boosting_regression.predict(tagged_table.features)
 
 
 def test_gradient_boosting_predict_invalid() -> None:
@@ -38,4 +38,4 @@ def test_gradient_boosting_predict_invalid() -> None:
     gradient_boosting_regression = GradientBoosting()
     gradient_boosting_regression.fit(tagged_table)
     with pytest.raises(PredictionError):
-        gradient_boosting_regression.predict(invalid_tagged_table.feature_vectors)
+        gradient_boosting_regression.predict(invalid_tagged_table.features)

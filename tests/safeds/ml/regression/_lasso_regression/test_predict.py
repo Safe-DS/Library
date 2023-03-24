@@ -10,7 +10,7 @@ def test_lasso_regression_predict() -> None:
     tagged_table = TaggedTable(table, "T")
     lasso_regression = LassoRegression()
     lasso_regression.fit(tagged_table)
-    lasso_regression.predict(tagged_table.feature_vectors)
+    lasso_regression.predict(tagged_table.features)
     assert True  # This asserts that the predict method succeeds
 
 
@@ -19,7 +19,7 @@ def test_lasso_regression_predict_not_fitted() -> None:
     tagged_table = TaggedTable(table, "T")
     lasso_regression = LassoRegression()
     with pytest.raises(PredictionError):
-        lasso_regression.predict(tagged_table.feature_vectors)
+        lasso_regression.predict(tagged_table.features)
 
 
 def test_lasso_regression_predict_invalid() -> None:
@@ -32,4 +32,4 @@ def test_lasso_regression_predict_invalid() -> None:
     lasso_regression = LassoRegression()
     lasso_regression.fit(tagged_table)
     with pytest.raises(PredictionError):
-        lasso_regression.predict(invalid_tagged_table.feature_vectors)
+        lasso_regression.predict(invalid_tagged_table.features)
