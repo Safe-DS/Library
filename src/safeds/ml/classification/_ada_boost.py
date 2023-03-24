@@ -17,13 +17,13 @@ class AdaBoost(Classifier):
         self._classification = sk_AdaBoostClassifier()
         self.target_name = ""
 
-    def fit(self, tagged_table: TaggedTable) -> None:
+    def fit(self, training_set: TaggedTable) -> None:
         """
         Fit this model given a tagged table.
 
         Parameters
         ----------
-        tagged_table : TaggedTable
+        training_set : TaggedTable
             The tagged table containing the feature and target vectors.
 
         Raises
@@ -32,7 +32,7 @@ class AdaBoost(Classifier):
             If the tagged table contains invalid values or if the training failed.
         """
         self.target_name = safeds.ml._util_sklearn.fit(
-            self._classification, tagged_table
+            self._classification, training_set
         )
 
     def predict(self, dataset: Table) -> Table:
