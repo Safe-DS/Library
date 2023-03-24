@@ -34,7 +34,7 @@ class LinearRegression(Regressor):
         fit(self._wrapped_regressor, training_set)
         self._target_name = training_set.target_values.name
 
-    def predict(self, dataset: Table) -> Table:
+    def predict(self, dataset: Table) -> TaggedTable:
         """
         Predict a target vector using a dataset containing feature vectors. The model has to be trained first.
 
@@ -45,7 +45,7 @@ class LinearRegression(Regressor):
 
         Returns
         -------
-        table : Table
+        table : TaggedTable
             A dataset containing the given feature vectors and the predicted target vector.
 
         Raises

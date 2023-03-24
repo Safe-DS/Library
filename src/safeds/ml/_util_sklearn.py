@@ -34,7 +34,7 @@ def fit(model: Any, tagged_table: TaggedTable) -> None:
 
 
 # noinspection PyProtectedMember
-def predict(model: Any, dataset: Table, target_name: str) -> Table:
+def predict(model: Any, dataset: Table, target_name: str) -> TaggedTable:
     """
     Predict a target vector using a dataset containing feature vectors. The model has to be trained first.
 
@@ -67,7 +67,7 @@ def predict(model: Any, dataset: Table, target_name: str) -> Table:
                 f"Dataset already contains '{target_name}' column. Please rename this column"
             )
         result_set[target_name] = predicted_target_vector
-        return Table(result_set)
+        return TaggedTable(Table(result_set), target_column=target_name)
     except NotFittedError as exception:
         raise PredictionError("The model was not trained") from exception
     except ValueError as exception:
