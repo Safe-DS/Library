@@ -1,6 +1,6 @@
 # noinspection PyProtectedMember
-from safeds.ml._util_sklearn import fit, predict
 from safeds.data.tabular.containers import Table, TaggedTable
+from safeds.ml._util_sklearn import fit, predict
 from sklearn.ensemble import GradientBoostingRegressor as sk_GradientBoostingRegressor
 
 from ._regressor import Regressor
@@ -36,6 +36,7 @@ class GradientBoosting(Regressor):
         self._target_name = training_set.target_values.name
 
         # noinspection PyProtectedMember
+
     def predict(self, dataset: Table) -> TaggedTable:
         """
         Predict a target vector using a dataset containing feature vectors. The model has to be trained first.

@@ -1,6 +1,6 @@
 # noinspection PyProtectedMember
-from safeds.ml._util_sklearn import fit, predict
 from safeds.data.tabular.containers import Table, TaggedTable
+from safeds.ml._util_sklearn import fit, predict
 from sklearn.ensemble import RandomForestRegressor as sk_RandomForestRegressor
 
 from ._regressor import Regressor

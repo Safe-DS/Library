@@ -1,6 +1,6 @@
 # noinspection PyProtectedMember
-from safeds.ml._util_sklearn import fit, predict
 from safeds.data.tabular.containers import Table, TaggedTable
+from safeds.ml._util_sklearn import fit, predict
 from sklearn.ensemble import AdaBoostClassifier as sk_AdaBoostClassifier
 
 from ._classifier import Classifier

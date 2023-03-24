@@ -1,6 +1,6 @@
 # noinspection PyProtectedMember
-from safeds.ml._util_sklearn import fit, predict
 from safeds.data.tabular.containers import Table, TaggedTable
+from safeds.ml._util_sklearn import fit, predict
 from sklearn.neighbors import KNeighborsClassifier as sk_KNeighborsClassifier
 
 from ._classifier import Classifier
@@ -18,7 +18,9 @@ class KNearestNeighbors(Classifier):
     """
 
     def __init__(self, n_neighbors: int) -> None:
-        self._wrapped_classifier = sk_KNeighborsClassifier(n_jobs=-1, n_neighbors=n_neighbors)
+        self._wrapped_classifier = sk_KNeighborsClassifier(
+            n_jobs=-1, n_neighbors=n_neighbors
+        )
         self._target_name = ""
 
     def fit(self, training_set: TaggedTable) -> None:
