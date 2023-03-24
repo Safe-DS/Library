@@ -41,16 +41,16 @@ def predict(model: Any, dataset: Table, target_name: str) -> TaggedTable:
     Parameters
     ----------
     model
-        Classifier or Regression from scikit-learn.
+        Classifier or regressor from scikit-learn.
     dataset : Table
-        The dataset containing the feature vectors.
+        The dataset containing the features.
     target_name : str
-        The name of the target vector, the name of the target column inferred from fit is used by default.
+        The name of the target column.
 
     Returns
     -------
     table : Table
-        A dataset containing the given feature vectors and the predicted target vector.
+        A dataset containing the given features and the predicted target.
 
     Raises
     ------
