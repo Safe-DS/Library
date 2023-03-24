@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 
 from safeds.data.tabular.containers import Table, TaggedTable
+from sklearn.metrics import accuracy_score as sk_accuracy_score
 
 
 class Classifier(ABC):
@@ -44,3 +45,25 @@ class Classifier(ABC):
         PredictionError
             If prediction with the given dataset failed.
         """
+
+    def accuracy(self, validation_or_test_set: TaggedTable) -> float:
+        """
+        Predicts the target values for the features in the validation or test set and compares it to the expected
+        results.
+
+        Parameters
+        ----------
+        validation_or_test_set : TaggedTable
+            The validation or test set.
+
+        Returns
+        -------
+        accuracy : float
+            The calculated accuracy score, i.e. the percentage of equal data.
+        """
+
+        expected = validation_or_test_set.target
+        predicted = self.predict(validation_or_test_set.features).target
+
+        # noinspection PyProtectedMember
+        return sk_accuracy_score(expected._data, predicted._data)
