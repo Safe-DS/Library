@@ -35,10 +35,6 @@ class Column:
         return self._name
 
     @property
-    def statistics(self) -> ColumnStatistics:
-        return ColumnStatistics(self)
-
-    @property
     def type(self) -> ColumnType:
         """
         Return the type of the column.
@@ -266,12 +262,7 @@ class Column:
         ):
             return display(tmp)
 
-
-class ColumnStatistics:
-    def __init__(self, column: Column):
-        self._column = column
-
-    def max(self) -> float:
+    def maximum(self) -> float:
         """
         Return the maximum value of the column. The column has to be numerical.
 
@@ -285,13 +276,11 @@ class ColumnStatistics:
         NonNumericColumnError
             If the data contains non-numerical data.
         """
-        if not self._column._type.is_numeric():
-            raise NonNumericColumnError(
-                f"{self._column.name} is of type {self._column._type}."
-            )
-        return self._column._data.max()
+        if not self._type.is_numeric():
+            raise NonNumericColumnError(f"{self.name} is of type {self._type}.")
+        return self._data.max()
 
-    def min(self) -> float:
+    def minimum(self) -> float:
         """
         Return the minimum value of the column. The column has to be numerical.
 
@@ -305,11 +294,9 @@ class ColumnStatistics:
         NonNumericColumnError
             If the data contains non-numerical data.
         """
-        if not self._column._type.is_numeric():
-            raise NonNumericColumnError(
-                f"{self._column.name} is of type {self._column._type}."
-            )
-        return self._column._data.min()
+        if not self._type.is_numeric():
+            raise NonNumericColumnError(f"{self.name} is of type {self._type}.")
+        return self._data.min()
 
     def mean(self) -> float:
         """
@@ -325,11 +312,9 @@ class ColumnStatistics:
         NonNumericColumnError
             If the data contains non-numerical data.
         """
-        if not self._column._type.is_numeric():
-            raise NonNumericColumnError(
-                f"{self._column.name} is of type {self._column._type}."
-            )
-        return self._column._data.mean()
+        if not self._type.is_numeric():
+            raise NonNumericColumnError(f"{self.name} is of type {self._type}.")
+        return self._data.mean()
 
     def mode(self) -> Any:
         """
@@ -340,7 +325,7 @@ class ColumnStatistics:
         List :
             Returns a list with the most common values.
         """
-        return self._column._data.mode().tolist()
+        return self._data.mode().tolist()
 
     def median(self) -> float:
         """
@@ -356,11 +341,9 @@ class ColumnStatistics:
         NonNumericColumnError
             If the data contains non-numerical data.
         """
-        if not self._column._type.is_numeric():
-            raise NonNumericColumnError(
-                f"{self._column.name} is of type {self._column._type}."
-            )
-        return self._column._data.median()
+        if not self._type.is_numeric():
+            raise NonNumericColumnError(f"{self.name} is of type {self._type}.")
+        return self._data.median()
 
     def sum(self) -> float:
         """
@@ -377,11 +360,9 @@ class ColumnStatistics:
             If the data contains non-numerical data.
 
         """
-        if not self._column.type.is_numeric():
-            raise NonNumericColumnError(
-                f"{self._column.name} is of type {self._column._type}."
-            )
-        return self._column._data.sum()
+        if not self.type.is_numeric():
+            raise NonNumericColumnError(f"{self.name} is of type {self._type}.")
+        return self._data.sum()
 
     def variance(self) -> float:
         """
@@ -398,12 +379,10 @@ class ColumnStatistics:
             If the data contains non-numerical data.
 
         """
-        if not self._column.type.is_numeric():
-            raise NonNumericColumnError(
-                f"{self._column.name} is of type {self._column._type}."
-            )
+        if not self.type.is_numeric():
+            raise NonNumericColumnError(f"{self.name} is of type {self._type}.")
 
-        return self._column._data.var()
+        return self._data.var()
 
     def standard_deviation(self) -> float:
         """
@@ -420,11 +399,9 @@ class ColumnStatistics:
             If the data contains non-numerical data.
 
         """
-        if not self._column.type.is_numeric():
-            raise NonNumericColumnError(
-                f"{self._column.name} is of type {self._column._type}."
-            )
-        return self._column._data.std()
+        if not self.type.is_numeric():
+            raise NonNumericColumnError(f"{self.name} is of type {self._type}.")
+        return self._data.std()
 
     def stability(self) -> float:
         """
@@ -444,12 +421,9 @@ class ColumnStatistics:
         ColumnSizeError
             If the column is empty.
         """
-        if self._column._data.size == 0:
+        if self._data.size == 0:
             raise ColumnSizeError("> 0", "0")
-        return (
-            self._column._data.value_counts()[self._column.statistics.mode()[0]]
-            / self._column._data.count()
-        )
+        return self._data.value_counts()[self.mode()[0]] / self._data.count()
 
     def idness(self) -> float:
         """
@@ -469,6 +443,6 @@ class ColumnStatistics:
         ColumnSizeError
             If this column is empty.
         """
-        if self._column._data.size == 0:
+        if self._data.size == 0:
             raise ColumnSizeError("> 0", "0")
-        return self._column._data.nunique() / self._column._data.size
+        return self._data.nunique() / self._data.size

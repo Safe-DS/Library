@@ -4,14 +4,14 @@ from safeds.data.tabular.containers import Table
 from safeds.exceptions import NonNumericColumnError
 
 
-def test_max_invalid() -> None:
+def test_maximum_invalid() -> None:
     with pytest.raises(NonNumericColumnError):
         table = Table(pd.DataFrame(data={"col1": ["col1_1", 2]}))
         column = table.get_column("col1")
-        column.statistics.max()
+        column.maximum()
 
 
-def test_max_valid() -> None:
+def test_maximum_valid() -> None:
     table = Table(pd.DataFrame(data={"col1": [1, 2, 3, 4]}))
     column = table.get_column("col1")
-    assert column.statistics.max() == 4
+    assert column.maximum() == 4

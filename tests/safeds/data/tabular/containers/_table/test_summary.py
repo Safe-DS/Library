@@ -9,8 +9,8 @@ def test_summary() -> None:
         pd.DataFrame(
             data={
                 "metrics": [
-                    "max",
-                    "min",
+                    "maximum",
+                    "minimum",
                     "mean",
                     "mode",
                     "median",

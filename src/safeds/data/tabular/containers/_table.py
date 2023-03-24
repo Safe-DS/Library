@@ -833,16 +833,16 @@ class Table:
 
         for column in columns:
             statistics = {
-                "max": column.statistics.max,
-                "min": column.statistics.min,
-                "mean": column.statistics.mean,
-                "mode": column.statistics.mode,
-                "median": column.statistics.median,
-                "sum": column.statistics.sum,
-                "variance": column.statistics.variance,
-                "standard deviation": column.statistics.standard_deviation,
-                "idness": column.statistics.idness,
-                "stability": column.statistics.stability,
+                "maximum": column.maximum,
+                "minimum": column.minimum,
+                "mean": column.mean,
+                "mode": column.mode,
+                "median": column.median,
+                "sum": column.sum,
+                "variance": column.variance,
+                "standard deviation": column.standard_deviation,
+                "idness": column.idness,
+                "stability": column.stability,
                 "row count": column.count,
             }
             values = []
