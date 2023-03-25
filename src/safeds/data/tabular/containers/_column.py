@@ -1,12 +1,13 @@
 from __future__ import annotations
 
-import typing
 from numbers import Number
 from typing import Any, Callable, Iterator
+from typing import Iterable, Optional
 
 import numpy as np
 import pandas as pd
 from IPython.core.display_functions import DisplayHandle, display
+
 from safeds.data.tabular.typing import ColumnType
 from safeds.exceptions import (
     ColumnLengthMismatchError,
@@ -17,10 +18,28 @@ from safeds.exceptions import (
 
 
 class Column:
-    def __init__(self, data: typing.Iterable, name: str) -> None:
+    """
+    A column of data.
+
+    Parameters
+    ----------
+    data : Iterable
+        The data.
+    name : str
+        The name of the column.
+    type : Optional[ColumnType]
+        The type of the column. If not specified, the type will be inferred from the data.
+    """
+
+    def __init__(
+        self,
+        data: Iterable,
+        name: str,
+        type: Optional[ColumnType] = None,
+    ) -> None:
         self._data: pd.Series = data if isinstance(data, pd.Series) else pd.Series(data)
         self._name: str = name
-        self._type: ColumnType = ColumnType.from_numpy_dtype(self._data.dtype)
+        self._type: ColumnType = type if type is not None else ColumnType.from_numpy_dtype(self._data.dtype)
 
     @property
     def name(self) -> str:
@@ -221,7 +240,7 @@ class Column:
         """
         return self.any(
             lambda value: value is None
-            or (isinstance(value, Number) and np.isnan(value))
+                          or (isinstance(value, Number) and np.isnan(value))
         )
 
     def correlation_with(self, other_column: Column) -> float:
@@ -250,7 +269,7 @@ class Column:
             )
         return self._data.corr(other_column._data)
 
-    def get_unique_values(self) -> list[typing.Any]:
+    def get_unique_values(self) -> list[Any]:
         """
         Return a list of all unique values in the column.
 
