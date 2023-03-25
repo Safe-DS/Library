@@ -1,13 +1,11 @@
 from __future__ import annotations
 
 from numbers import Number
-from typing import Any, Callable, Iterator
-from typing import Iterable, Optional
+from typing import Any, Callable, Iterable, Iterator, Optional
 
 import numpy as np
 import pandas as pd
 from IPython.core.display_functions import DisplayHandle, display
-
 from safeds.data.tabular.typing import ColumnType
 from safeds.exceptions import (
     ColumnLengthMismatchError,
@@ -39,7 +37,11 @@ class Column:
     ) -> None:
         self._data: pd.Series = data if isinstance(data, pd.Series) else pd.Series(data)
         self._name: str = name
-        self._type: ColumnType = type_ if type_ is not None else ColumnType.from_numpy_dtype(self._data.dtype)
+        self._type: ColumnType = (
+            type_
+            if type_ is not None
+            else ColumnType.from_numpy_dtype(self._data.dtype)
+        )
 
     @property
     def name(self) -> str:
@@ -240,7 +242,7 @@ class Column:
         """
         return self.any(
             lambda value: value is None
-                          or (isinstance(value, Number) and np.isnan(value))
+            or (isinstance(value, Number) and np.isnan(value))
         )
 
     def correlation_with(self, other_column: Column) -> float:
