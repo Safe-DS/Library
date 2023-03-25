@@ -27,7 +27,7 @@ class Column:
         The data.
     name : str
         The name of the column.
-    type : Optional[ColumnType]
+    type_ : Optional[ColumnType]
         The type of the column. If not specified, the type will be inferred from the data.
     """
 
@@ -35,11 +35,11 @@ class Column:
         self,
         data: Iterable,
         name: str,
-        type: Optional[ColumnType] = None,
+        type_: Optional[ColumnType] = None,
     ) -> None:
         self._data: pd.Series = data if isinstance(data, pd.Series) else pd.Series(data)
         self._name: str = name
-        self._type: ColumnType = type if type is not None else ColumnType.from_numpy_dtype(self._data.dtype)
+        self._type: ColumnType = type_ if type_ is not None else ColumnType.from_numpy_dtype(self._data.dtype)
 
     @property
     def name(self) -> str:
