@@ -313,8 +313,8 @@ class Table:
                     :, [self.schema._get_column_index_by_name(column_name)]
                 ].squeeze(),
                 column_name,
+                self.schema.get_type_of_column(column_name)
             )
-            output_column._type = self.schema.get_type_of_column(column_name)
             return output_column
 
         raise UnknownColumnNameError([column_name])

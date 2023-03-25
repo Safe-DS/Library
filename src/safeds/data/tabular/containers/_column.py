@@ -154,7 +154,7 @@ class Column:
         column : Column
             A new column with the new name.
         """
-        return Column(self._data, new_name)
+        return Column(self._data, new_name, self._type)
 
     def all(self, predicate: Callable[[Any], bool]) -> bool:
         """
