@@ -32,6 +32,7 @@ disable=
     wrong-import-order,
     # False positives
     import-error,
+    redefined-outer-name,
     # Unwanted
     design,
     duplicate-code,
