@@ -1576,14 +1576,14 @@ mkdocs = ">=1.0.3,<2.0.0"
 
 [[package]]
 name = "mkdocs-glightbox"
-version = "0.3.1"
+version = "0.3.2"
 description = "MkDocs plugin supports image lightbox with GLightbox."
 category = "dev"
 optional = false
 python-versions = "*"
 files = [
-    {file = "mkdocs-glightbox-0.3.1.tar.gz", hash = "sha256:ac85e2d4d422cc4a670fa276840f0aa3064a1ec4ad25ccb6d6e82d11bb11e513"},
-    {file = "mkdocs_glightbox-0.3.1-py3-none-any.whl", hash = "sha256:1974f505e3272b617b5e7552fd09d8d918d267631ed991772b4bd103dc74bea2"},
+    {file = "mkdocs-glightbox-0.3.2.tar.gz", hash = "sha256:aec32193fa367f83a5159a10ef0a0e501e595860f4399fb860ca1c5d95fd099d"},
+    {file = "mkdocs_glightbox-0.3.2-py3-none-any.whl", hash = "sha256:ef168717e0d6f5e3b33afa8a62837e9ea3b8754fbf073760db169650edbcb866"},
 ]
 
 [package.dependencies]
