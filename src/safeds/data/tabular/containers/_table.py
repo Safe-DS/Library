@@ -25,6 +25,9 @@ from safeds.exceptions import (
     UnknownColumnNameError,
 )
 from scipy import stats
+import matplotlib.pyplot as plt
+import seaborn as sns
+from safeds.exceptions import NonNumericColumnError
 
 
 # noinspection PyProtectedMember
@@ -309,7 +312,7 @@ class Table:
         if self.schema.has_column(column_name):
             output_column = Column(
                 self._data.iloc[
-                    :, [self.schema._get_column_index_by_name(column_name)]
+                :, [self.schema._get_column_index_by_name(column_name)]
                 ].squeeze(),
                 column_name,
                 self.schema.get_type_of_column(column_name),
@@ -730,9 +733,9 @@ class Table:
     def sort_columns(
         self,
         query: Callable[[Column, Column], int] = lambda col1, col2: (
-            col1.name > col2.name
-        )
-        - (col1.name < col2.name),
+                                                                        col1.name > col2.name
+                                                                    )
+                                                                    - (col1.name < col2.name),
     ) -> Table:
         """
         Sort a table with the given lambda function.
@@ -970,3 +973,96 @@ class Table:
         new_df = self._data.sample(frac=1.0)
         new_df.columns = self.schema.get_column_names()
         return Table(new_df)
+
+    def correlation_heatmap(self) -> None:
+        """
+        Plot a correlation heatmap of an entire table. This function can only plot real numerical data.
+
+        Raises
+        -------
+        TypeError
+            If the table contains non-numerical data or complex data.
+        """
+        for column in self.to_columns():
+            if not column.type.is_numeric():
+                raise NonNumericColumnError(column.name)
+        sns.heatmap(
+            data=self._data.corr(),
+            vmin=-1,
+            vmax=1,
+            xticklabels=self.get_column_names(),
+            yticklabels=self.get_column_names(),
+            cmap="vlag",
+        )
+        plt.tight_layout()
+        plt.show()
+
+    def lineplot(self, x_column_name: str, y_column_name: str) -> None:
+        """
+        Plot two columns against each other in a lineplot. If there are multiple x-values for a y-value,
+        the resulting plot will consist of a line representing the mean and the lower-transparency area around the line
+        representing the 95% confidence interval.
+
+        Parameters
+        ----------
+        x_column_name : str
+            The column name of the column to be plotted on the x-Axis.
+        y_column_name : str
+            The column name of the column to be plotted on the y-Axis.
+
+        Raises
+        ---------
+        UnknownColumnNameError
+            If either of the columns do not exist.
+        """
+        if not self.has_column(x_column_name):
+            raise UnknownColumnNameError([x_column_name])
+        if not self.has_column(y_column_name):
+            raise UnknownColumnNameError([y_column_name])
+
+        ax = sns.lineplot(
+            data=self._data,
+            x=self.schema._get_column_index_by_name(x_column_name),
+            y=self.schema._get_column_index_by_name(y_column_name),
+        )
+        ax.set(xlabel=x_column_name, ylabel=y_column_name)
+        ax.set_xticks(ax.get_xticks())
+        ax.set_xticklabels(
+            ax.get_xticklabels(), rotation=45, horizontalalignment="right"
+        )  # rotate the labels of the x Axis to prevent the chance of overlapping of the labels
+        plt.tight_layout()
+        plt.show()
+
+    def scatterplot(self, x_column_name: str, y_column_name: str) -> None:
+        """
+        Plot two columns against each other in a scatterplot.
+
+        Parameters
+        ----------
+        x_column_name : str
+            The column name of the column to be plotted on the x-Axis.
+        y_column_name : str
+            The column name of the column to be plotted on the y-Axis.
+
+        Raises
+        ---------
+        UnknownColumnNameError
+            If either of the columns do not exist.
+        """
+        if not self.has_column(x_column_name):
+            raise UnknownColumnNameError([x_column_name])
+        if not self.has_column(y_column_name):
+            raise UnknownColumnNameError([y_column_name])
+
+        ax = sns.scatterplot(
+            data=self._data,
+            x=self.schema._get_column_index_by_name(x_column_name),
+            y=self.schema._get_column_index_by_name(y_column_name),
+        )
+        ax.set(xlabel=x_column_name, ylabel=y_column_name)
+        ax.set_xticks(ax.get_xticks())
+        ax.set_xticklabels(
+            ax.get_xticklabels(), rotation=45, horizontalalignment="right"
+        )  # rotate the labels of the x Axis to prevent the chance of overlapping of the labels
+        plt.tight_layout()
+        plt.show()
