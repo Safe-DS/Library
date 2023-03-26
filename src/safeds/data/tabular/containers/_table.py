@@ -6,8 +6,10 @@ import typing
 from pathlib import Path
 from typing import Callable, Optional, Union
 
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import seaborn as sns
 from IPython.core.display_functions import DisplayHandle, display
 from pandas import DataFrame, Series
 from safeds.data.tabular.containers._column import Column
@@ -25,9 +27,6 @@ from safeds.exceptions import (
     UnknownColumnNameError,
 )
 from scipy import stats
-import matplotlib.pyplot as plt
-import seaborn as sns
-from safeds.exceptions import NonNumericColumnError
 
 
 # noinspection PyProtectedMember
@@ -312,7 +311,7 @@ class Table:
         if self.schema.has_column(column_name):
             output_column = Column(
                 self._data.iloc[
-                :, [self.schema._get_column_index_by_name(column_name)]
+                    :, [self.schema._get_column_index_by_name(column_name)]
                 ].squeeze(),
                 column_name,
                 self.schema.get_type_of_column(column_name),
@@ -733,9 +732,9 @@ class Table:
     def sort_columns(
         self,
         query: Callable[[Column, Column], int] = lambda col1, col2: (
-                                                                        col1.name > col2.name
-                                                                    )
-                                                                    - (col1.name < col2.name),
+            col1.name > col2.name
+        )
+        - (col1.name < col2.name),
     ) -> Table:
         """
         Sort a table with the given lambda function.

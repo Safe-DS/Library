@@ -8,14 +8,13 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 from IPython.core.display_functions import DisplayHandle, display
-
 from safeds.data.tabular.typing import ColumnType
 from safeds.exceptions import (
     ColumnLengthMismatchError,
     ColumnSizeError,
     IndexOutOfBoundsError,
+    NonNumericColumnError,
 )
-from safeds.exceptions import NonNumericColumnError
 
 
 class Column:
@@ -245,7 +244,7 @@ class Column:
         """
         return self.any(
             lambda value: value is None
-                          or (isinstance(value, Number) and np.isnan(value))
+            or (isinstance(value, Number) and np.isnan(value))
         )
 
     def correlation_with(self, other_column: Column) -> float:
