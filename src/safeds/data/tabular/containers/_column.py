@@ -3,16 +3,19 @@ from __future__ import annotations
 from numbers import Number
 from typing import Any, Callable, Iterable, Iterator, Optional
 
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import seaborn as sns
 from IPython.core.display_functions import DisplayHandle, display
+
 from safeds.data.tabular.typing import ColumnType
 from safeds.exceptions import (
     ColumnLengthMismatchError,
     ColumnSizeError,
     IndexOutOfBoundsError,
-    NonNumericColumnError,
 )
+from safeds.exceptions import NonNumericColumnError
 
 
 class Column:
@@ -242,7 +245,7 @@ class Column:
         """
         return self.any(
             lambda value: value is None
-            or (isinstance(value, Number) and np.isnan(value))
+                          or (isinstance(value, Number) and np.isnan(value))
         )
 
     def correlation_with(self, other_column: Column) -> float:
@@ -483,3 +486,43 @@ class Column:
         if self._data.size == 0:
             raise ColumnSizeError("> 0", "0")
         return self._data.nunique() / self._data.size
+
+    def boxplot(self) -> None:
+        """
+        Plot this column in a boxplot. This function can only plot real numerical data.
+
+        Raises
+        -------
+        TypeError
+            If the column contains non-numerical data or complex data.
+        """
+        for data in self._data:
+            if (
+                not isinstance(data, int)
+                and not isinstance(data, float)
+                and not isinstance(data, complex)
+            ):
+                raise NonNumericColumnError(self.name)
+            if isinstance(data, complex):
+                raise TypeError(
+                    "The column contains complex data. Boxplots cannot plot the imaginary part of complex "
+                    "data. Please provide a Column with only real numbers"
+                )
+        ax = sns.boxplot(data=self._data)
+        ax.set(xlabel=self.name)
+        plt.tight_layout()
+        plt.show()
+
+    def histogram(self) -> None:
+        """
+        Plot a column in a histogram.
+        """
+
+        ax = sns.histplot(data=self._data)
+        ax.set_xticks(ax.get_xticks())
+        ax.set(xlabel=self.name)
+        ax.set_xticklabels(
+            ax.get_xticklabels(), rotation=45, horizontalalignment="right"
+        )  # rotate the labels of the x Axis to prevent the chance of overlapping of the labels
+        plt.tight_layout()
+        plt.show()
