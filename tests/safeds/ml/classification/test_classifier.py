@@ -1,4 +1,5 @@
-from safeds.data.tabular.containers import Table, TaggedTable
+import pandas as pd
+from safeds.data.tabular.containers import Column, Table, TaggedTable
 from safeds.ml.classification import Classifier
 
 
@@ -24,3 +25,19 @@ class DummyClassifier(Classifier):
         dataset = Table.from_columns([feature, predicted])
 
         return TaggedTable(dataset, target_name="predicted")
+
+
+class TestAccuracy:
+    def test_with_same_type(self) -> None:
+        c1 = Column(pd.Series(data=[1, 2, 3, 4]), "predicted")
+        c2 = Column(pd.Series(data=[1, 2, 3, 3]), "expected")
+        table = TaggedTable(Table.from_columns([c1, c2]), target_name="expected")
+
+        assert DummyClassifier().accuracy(table) == 0.75
+
+    def test_with_different_types(self) -> None:
+        c1 = Column(pd.Series(data=["1", "2", "3", "4"]), "predicted")
+        c2 = Column(pd.Series(data=[1, 2, 3, 3]), "expected")
+        table = TaggedTable(Table.from_columns([c1, c2]), target_name="expected")
+
+        assert DummyClassifier().accuracy(table) == 0.0
