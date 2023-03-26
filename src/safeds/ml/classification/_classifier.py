@@ -46,6 +46,7 @@ class Classifier(ABC):
             If prediction with the given dataset failed.
         """
 
+    # noinspection PyProtectedMember
     def accuracy(self, validation_or_test_set: TaggedTable) -> float:
         """
         Predicts the target values for the features in the validation or test set and compares it to the expected
@@ -65,5 +66,4 @@ class Classifier(ABC):
         expected = validation_or_test_set.target
         predicted = self.predict(validation_or_test_set.features).target
 
-        # noinspection PyProtectedMember
         return sk_accuracy_score(expected._data, predicted._data)

@@ -1,4 +1,3 @@
-# noinspection PyProtectedMember
 from safeds.data.tabular.containers import Table, TaggedTable
 from safeds.ml._util_sklearn import fit, predict
 from sklearn.ensemble import RandomForestClassifier as sk_RandomForestClassifier
@@ -6,7 +5,6 @@ from sklearn.ensemble import RandomForestClassifier as sk_RandomForestClassifier
 from ._classifier import Classifier
 
 
-# noinspection PyProtectedMember
 class RandomForest(Classifier):
     """
     This class implements the Random Forest classification. It can only be trained on a tagged table.

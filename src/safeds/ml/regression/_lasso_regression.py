@@ -1,4 +1,3 @@
-# noinspection PyProtectedMember
 from safeds.data.tabular.containers import Table, TaggedTable
 from safeds.ml._util_sklearn import fit, predict
 from sklearn.linear_model import Lasso as sk_Lasso
@@ -6,7 +5,6 @@ from sklearn.linear_model import Lasso as sk_Lasso
 from ._regressor import Regressor
 
 
-# noinspection PyProtectedMember
 class LassoRegression(Regressor):
     """
     This class implements lasso regression. It is used as a regression model.

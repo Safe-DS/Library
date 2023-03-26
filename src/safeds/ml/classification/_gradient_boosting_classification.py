@@ -1,4 +1,3 @@
-# noinspection PyProtectedMember
 from safeds.data.tabular.containers import Table, TaggedTable
 from safeds.ml._util_sklearn import fit, predict
 from sklearn.ensemble import GradientBoostingClassifier as sk_GradientBoostingClassifier
@@ -6,7 +5,6 @@ from sklearn.ensemble import GradientBoostingClassifier as sk_GradientBoostingCl
 from ._classifier import Classifier
 
 
-# noinspection PyProtectedMember
 class GradientBoosting(Classifier):
     """
     This class implements gradient boosting classification. It is used as a classifier model.

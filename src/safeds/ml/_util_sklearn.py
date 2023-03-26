@@ -49,7 +49,7 @@ def predict(model: Any, dataset: Table, target_name: str) -> TaggedTable:
 
     Returns
     -------
-    table : Table
+    table : TaggedTable
         A dataset containing the given features and the predicted target.
 
     Raises

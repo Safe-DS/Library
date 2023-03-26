@@ -1,4 +1,3 @@
-# noinspection PyProtectedMember
 from safeds.data.tabular.containers import Table, TaggedTable
 from safeds.ml._util_sklearn import fit, predict
 from sklearn.ensemble import GradientBoostingRegressor as sk_GradientBoostingRegressor
@@ -6,7 +5,6 @@ from sklearn.ensemble import GradientBoostingRegressor as sk_GradientBoostingReg
 from ._regressor import Regressor
 
 
-# noinspection PyProtectedMember
 class GradientBoosting(Regressor):
     """
     This class implements gradient boosting regression. It is used as a regression model.

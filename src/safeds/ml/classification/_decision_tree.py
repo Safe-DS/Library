@@ -1,4 +1,3 @@
-# noinspection PyProtectedMember
 from safeds.data.tabular.containers import Table, TaggedTable
 from safeds.ml._util_sklearn import fit, predict
 from sklearn.tree import DecisionTreeClassifier as sk_DecisionTreeClassifier
@@ -6,7 +5,6 @@ from sklearn.tree import DecisionTreeClassifier as sk_DecisionTreeClassifier
 from ._classifier import Classifier
 
 
-# noinspection PyProtectedMember
 class DecisionTree(Classifier):
     """
     This class implements decision tree regression. It is used as a classifier model.

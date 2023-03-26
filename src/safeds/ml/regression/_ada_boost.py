@@ -1,4 +1,3 @@
-# noinspection PyProtectedMember
 from safeds.data.tabular.containers import Table, TaggedTable
 from safeds.ml._util_sklearn import fit, predict
 from sklearn.ensemble import AdaBoostRegressor as sk_AdaBoostRegressor
@@ -6,7 +5,6 @@ from sklearn.ensemble import AdaBoostRegressor as sk_AdaBoostRegressor
 from ._regressor import Regressor
 
 
-# noinspection PyProtectedMember
 class AdaBoost(Regressor):
     """
     This class implements Ada Boost regression. It is used as a regression model.

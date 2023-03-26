@@ -48,6 +48,7 @@ class Regressor(ABC):
             If prediction with the given dataset failed.
         """
 
+    # noinspection PyProtectedMember
     def mean_squared_error(self, validation_or_test_set: TaggedTable) -> float:
         """
         Return the mean squared error, calculated from a given known truth and a column to compare.
@@ -69,6 +70,7 @@ class Regressor(ABC):
         _check_metrics_preconditions(predicted, expected)
         return sk_mean_squared_error(expected._data, predicted._data)
 
+    # noinspection PyProtectedMember
     def mean_absolute_error(self, validation_or_test_set: TaggedTable) -> float:
         """
         Return the mean absolute error, calculated from a given known truth and a column to compare.
@@ -91,6 +93,7 @@ class Regressor(ABC):
         return sk_mean_absolute_error(expected._data, predicted._data)
 
 
+# noinspection PyProtectedMember
 def _check_metrics_preconditions(actual: Column, expected: Column) -> None:
     if not actual.type.is_numeric():
         raise TypeError(f"Column 'actual' is not numerical but {actual.type}.")

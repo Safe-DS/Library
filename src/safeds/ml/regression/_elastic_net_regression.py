@@ -1,4 +1,3 @@
-# noinspection PyProtectedMember
 from safeds.data.tabular.containers import Table, TaggedTable
 from safeds.ml._util_sklearn import fit, predict
 from sklearn.linear_model import ElasticNet as sk_ElasticNet
@@ -6,7 +5,6 @@ from sklearn.linear_model import ElasticNet as sk_ElasticNet
 from ._regressor import Regressor
 
 
-# noinspection PyProtectedMember
 class ElasticNetRegression(Regressor):
     """
     This class implements elastic net regression. It is used as a regression model.

@@ -1,4 +1,3 @@
-# noinspection PyProtectedMember
 from safeds.data.tabular.containers import Table, TaggedTable
 from safeds.ml._util_sklearn import fit, predict
 from sklearn.neighbors import KNeighborsRegressor as sk_KNeighborsRegressor
@@ -6,7 +5,6 @@ from sklearn.neighbors import KNeighborsRegressor as sk_KNeighborsRegressor
 from ._regressor import Regressor
 
 
-# noinspection PyProtectedMember
 class KNearestNeighbors(Regressor):
     """
     This class implements K-nearest-neighbors regressor. It can only be trained on a tagged table.

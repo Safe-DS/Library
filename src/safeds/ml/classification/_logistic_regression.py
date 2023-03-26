@@ -1,4 +1,3 @@
-# noinspection PyProtectedMember
 from safeds.data.tabular.containers import Table, TaggedTable
 from safeds.ml._util_sklearn import fit, predict
 from sklearn.linear_model import LogisticRegression as sk_LogisticRegression
@@ -6,7 +5,6 @@ from sklearn.linear_model import LogisticRegression as sk_LogisticRegression
 from ._classifier import Classifier
 
 
-# noinspection PyProtectedMember
 class LogisticRegression(Classifier):
     """
     This class implements regularized logistic regression. It is used as a classifier model.
