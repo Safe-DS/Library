@@ -1,10 +1,9 @@
 import pandas as pd
 import pytest
-
-from safeds.data.tabular.containers import Column
-from safeds.data.tabular.containers import Table, TaggedTable
+from safeds.data.tabular.containers import Column, Table, TaggedTable
 from safeds.exceptions import ColumnLengthMismatchError
 from safeds.ml.regression import Regressor
+
 # noinspection PyProtectedMember
 from safeds.ml.regression._regressor import _check_metrics_preconditions
 
@@ -50,7 +49,8 @@ class TestMeanAbsoluteError:
         predicted_column = Column(predicted, "predicted")
         expected_column = Column(expected, "expected")
         table = TaggedTable(
-            Table.from_columns([predicted_column, expected_column]), target_name="expected"
+            Table.from_columns([predicted_column, expected_column]),
+            target_name="expected",
         )
 
         assert DummyRegressor().mean_absolute_error(table) == result
@@ -67,7 +67,8 @@ class TestMeanSquaredError:
         predicted_column = Column(predicted, "predicted")
         expected_column = Column(expected, "expected")
         table = TaggedTable(
-            Table.from_columns([predicted_column, expected_column]), target_name="expected"
+            Table.from_columns([predicted_column, expected_column]),
+            target_name="expected",
         )
 
         assert DummyRegressor().mean_squared_error(table) == result
