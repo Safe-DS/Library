@@ -3,60 +3,48 @@ import pytest
 from safeds.data.tabular.containers import Table, TaggedTable
 from safeds.exceptions import LearningError
 from safeds.exceptions import PredictionError
-from safeds.ml.classification import GradientBoosting
+from safeds.ml.classification import GradientBoosting, Classifier
 from tests.fixtures import resolve_resource_path
 
 
+@pytest.fixture()
+def classifier() -> Classifier:
+    return GradientBoosting()
+
+
+@pytest.fixture()
+def valid_data() -> TaggedTable:
+    table = Table.from_csv(resolve_resource_path("test_gradient_boosting_classification.csv"))
+    return TaggedTable(table, "T")
+
+
+@pytest.fixture()
+def invalid_data() -> TaggedTable:
+    table = Table.from_csv(resolve_resource_path("test_gradient_boosting_classification_invalid.csv"))
+    return TaggedTable(table, "T")
+
+
 class TestFit:
-    def test_gradient_boosting_classification_fit(self) -> None:
-        table = Table.from_csv(
-            resolve_resource_path("test_gradient_boosting_classification.csv")
-        )
-        tagged_table = TaggedTable(table, "T")
-        gradient_boosting_classification = GradientBoosting()
-        gradient_boosting_classification.fit(tagged_table)
+    def test_should_succeed_on_valid_data(self, classifier: Classifier, valid_data: TaggedTable) -> None:
+        classifier.fit(valid_data)
         assert True  # This asserts that the fit method succeeds
 
-    def test_gradient_boosting_classification_fit_invalid(self) -> None:
-        table = Table.from_csv(
-            resolve_resource_path("test_gradient_boosting_classification_invalid.csv")
-        )
-        tagged_table = TaggedTable(table, "T")
-        gradient_boosting_classification = GradientBoosting()
+    def test_should_raise_on_invalid_data(self, classifier: Classifier, invalid_data: TaggedTable) -> None:
         with pytest.raises(LearningError):
-            gradient_boosting_classification.fit(tagged_table)
+            classifier.fit(invalid_data)
 
 
 class TestPredict:
-    def test_gradient_boosting_predict(self) -> None:
-        table = Table.from_csv(
-            resolve_resource_path("test_gradient_boosting_classification.csv")
-        )
-        tagged_table = TaggedTable(table, "T")
-        gradient_boosting_classification = GradientBoosting()
-        gradient_boosting_classification.fit(tagged_table)
-        gradient_boosting_classification.predict(tagged_table.features)
+    def test_should_succeed_on_valid_data(self, classifier: Classifier, valid_data: TaggedTable) -> None:
+        classifier.fit(valid_data)
+        classifier.predict(valid_data.features)
         assert True  # This asserts that the predict method succeeds
 
-    def test_gradient_boosting_predict_not_fitted(self) -> None:
-        table = Table.from_csv(
-            resolve_resource_path("test_gradient_boosting_classification.csv")
-        )
-        tagged_table = TaggedTable(table, "T")
-        gradient_boosting = GradientBoosting()
+    def test_should_raise_when_not_fitted(self, classifier: Classifier, valid_data: TaggedTable) -> None:
         with pytest.raises(PredictionError):
-            gradient_boosting.predict(tagged_table.features)
+            classifier.predict(valid_data.features)
 
-    def test_gradient_boosting_predict_invalid(self) -> None:
-        table = Table.from_csv(
-            resolve_resource_path("test_gradient_boosting_classification.csv")
-        )
-        invalid_table = Table.from_csv(
-            resolve_resource_path("test_gradient_boosting_classification_invalid.csv")
-        )
-        tagged_table = TaggedTable(table, "T")
-        invalid_tagged_table = TaggedTable(invalid_table, "T")
-        gradient_boosting = GradientBoosting()
-        gradient_boosting.fit(tagged_table)
+    def test_should_raise_on_invalid_data(self, classifier: Classifier, valid_data: TaggedTable, invalid_data: TaggedTable) -> None:
+        classifier.fit(valid_data)
         with pytest.raises(PredictionError):
-            gradient_boosting.predict(invalid_tagged_table.features)
+            classifier.predict(invalid_data.features)
