@@ -29,24 +29,23 @@ from scipy import stats
 
 # noinspection PyProtectedMember
 class Table:
+    """
+    A table is a two-dimensional collection of data. It can either be seen as a list of rows or as a list of columns.
+
+    Parameters
+    ----------
+    data : typing.Iterable
+        The data.
+    schema : Optional[TableSchema]
+        The schema of the table. If not specified, the schema will be inferred from the data.
+
+    Raises
+    ----------
+    MissingSchemaError
+        If the table is empty and no schema is specified.
+    """
+
     def __init__(self, data: typing.Iterable, schema: Optional[TableSchema] = None):
-        """
-        Create a new table.
-
-        Parameters
-        ----------
-        data : typing.Iterable
-            The data to be saved in the table.
-        schema : TableSchema
-            The schema for the table.
-            None by default. If None, the schema will be provided by the data that is given.
-            If a schema is set, there is no check if this schema is compatible with the data.
-
-        Raises
-        ----------
-        MissingSchemaError
-            If the schema is missing.
-        """
         self._data: pd.Dataframe = (
             data if isinstance(data, pd.DataFrame) else pd.DataFrame(data)
         )
