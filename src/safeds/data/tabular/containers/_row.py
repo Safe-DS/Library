@@ -8,6 +8,17 @@ from safeds.exceptions import UnknownColumnNameError
 
 
 class Row:
+    """
+    A row is a collection of values, where each value is associated with a column name.
+
+    Parameters
+    ----------
+    data : typing.Iterable
+        The data.
+    schema : TableSchema
+        The schema of the row.
+    """
+
     def __init__(self, data: typing.Iterable, schema: TableSchema):
         self._data: pd.Series = data if isinstance(data, pd.Series) else pd.Series(data)
         self.schema: TableSchema = schema

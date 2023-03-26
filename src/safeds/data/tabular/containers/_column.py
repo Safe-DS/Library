@@ -17,7 +17,7 @@ from safeds.exceptions import (
 
 class Column:
     """
-    A column of data.
+    A column is a named collection of values.
 
     Parameters
     ----------
