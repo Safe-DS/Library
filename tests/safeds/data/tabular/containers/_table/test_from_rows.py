@@ -5,7 +5,7 @@ from tests.fixtures import resolve_resource_path
 
 
 def test_from_rows() -> None:
-    table_expected = Table.from_csv(resolve_resource_path("test_row_table.csv"))
+    table_expected = Table.from_csv_file(resolve_resource_path("test_row_table.csv"))
     rows_is: list[Row] = table_expected.to_rows()
     table_is: Table = Table.from_rows(rows_is)
 

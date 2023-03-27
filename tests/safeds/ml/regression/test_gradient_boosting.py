@@ -12,7 +12,7 @@ def regressor() -> Regressor:
 
 @pytest.fixture()
 def valid_data() -> TaggedTable:
-    table = Table.from_csv(
+    table = Table.from_csv_file(
         resolve_resource_path("test_gradient_boosting_regression.csv")
     )
     return TaggedTable(table, "T")
@@ -20,7 +20,7 @@ def valid_data() -> TaggedTable:
 
 @pytest.fixture()
 def invalid_data() -> TaggedTable:
-    table = Table.from_csv(
+    table = Table.from_csv_file(
         resolve_resource_path("test_gradient_boosting_regression_invalid.csv")
     )
     return TaggedTable(table, "T")

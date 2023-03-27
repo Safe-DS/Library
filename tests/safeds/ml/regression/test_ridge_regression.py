@@ -12,13 +12,15 @@ def regressor() -> Regressor:
 
 @pytest.fixture()
 def valid_data() -> TaggedTable:
-    table = Table.from_csv(resolve_resource_path("test_ridge_regression.csv"))
+    table = Table.from_csv_file(resolve_resource_path("test_ridge_regression.csv"))
     return TaggedTable(table, "T")
 
 
 @pytest.fixture()
 def invalid_data() -> TaggedTable:
-    table = Table.from_csv(resolve_resource_path("test_ridge_regression_invalid.csv"))
+    table = Table.from_csv_file(
+        resolve_resource_path("test_ridge_regression_invalid.csv")
+    )
     return TaggedTable(table, "T")
 
 

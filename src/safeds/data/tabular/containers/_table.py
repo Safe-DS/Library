@@ -52,7 +52,7 @@ class Table:
     # ------------------------------------------------------------------------------------------------------------------
 
     @staticmethod
-    def from_csv(path: str) -> Table:
+    def from_csv_file(path: str) -> Table:
         """
         Read data from a CSV file into a table.
 
@@ -82,7 +82,7 @@ class Table:
             raise ValueError(f'Could not read file from "{path}" as CSV') from exception
 
     @staticmethod
-    def from_json(path: str) -> Table:
+    def from_json_file(path: str) -> Table:
         """
         Read data from a JSON file into a table.
 
@@ -1023,7 +1023,7 @@ class Table:
     # Conversion
     # ------------------------------------------------------------------------------------------------------------------
 
-    def to_csv(self, path_to_file: str) -> None:
+    def to_csv_file(self, path: str) -> None:
         """
         Write the data from the table into a CSV file.
         If the file and/or the directories do not exist they will be created.
@@ -1031,15 +1031,15 @@ class Table:
 
         Parameters
         ----------
-        path_to_file : str
+        path : str
             The path to the output file.
         """
-        Path(os.path.dirname(path_to_file)).mkdir(parents=True, exist_ok=True)
+        Path(os.path.dirname(path)).mkdir(parents=True, exist_ok=True)
         data_to_csv = self._data.copy()
         data_to_csv.columns = self._schema.get_column_names()
-        data_to_csv.to_csv(path_to_file, index=False)
+        data_to_csv.to_csv(path, index=False)
 
-    def to_json(self, path_to_file: str) -> None:
+    def to_json_file(self, path: str) -> None:
         """
         Write the data from the table into a JSON file.
         If the file and/or the directories do not exist, they will be created.
@@ -1047,13 +1047,13 @@ class Table:
 
         Parameters
         ----------
-        path_to_file : str
+        path : str
             The path to the output file.
         """
-        Path(os.path.dirname(path_to_file)).mkdir(parents=True, exist_ok=True)
+        Path(os.path.dirname(path)).mkdir(parents=True, exist_ok=True)
         data_to_json = self._data.copy()
         data_to_json.columns = self._schema.get_column_names()
-        data_to_json.to_json(path_to_file)
+        data_to_json.to_json(path)
 
     def to_columns(self) -> list[Column]:
         """

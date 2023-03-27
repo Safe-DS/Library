@@ -12,13 +12,13 @@ def classifier() -> Classifier:
 
 @pytest.fixture()
 def valid_data() -> TaggedTable:
-    table = Table.from_csv(resolve_resource_path("test_random_forest.csv"))
+    table = Table.from_csv_file(resolve_resource_path("test_random_forest.csv"))
     return TaggedTable(table, "T")
 
 
 @pytest.fixture()
 def invalid_data() -> TaggedTable:
-    table = Table.from_csv(resolve_resource_path("test_random_forest_invalid.csv"))
+    table = Table.from_csv_file(resolve_resource_path("test_random_forest_invalid.csv"))
     return TaggedTable(table, "T")
 
 
