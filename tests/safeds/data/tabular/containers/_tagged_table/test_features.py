@@ -3,7 +3,7 @@ from tests.fixtures import resolve_resource_path
 
 
 def test_tagged_table_features() -> None:
-    table = Table.from_csv(resolve_resource_path("test_tagged_table.csv"))
+    table = Table.from_csv_file(resolve_resource_path("test_tagged_table.csv"))
     tagged_table = TaggedTable(table, "T")
     assert "T" not in tagged_table.features._data
     assert tagged_table.features.schema.has_column("A")

@@ -3,14 +3,14 @@ from safeds.data.tabular.containers import Table
 from tests.fixtures import resolve_resource_path
 
 
-def test_read_csv_valid() -> None:
-    table = Table.from_csv(resolve_resource_path("test_table_read_csv.csv"))
+def test_from_json_file_valid() -> None:
+    table = Table.from_json_file(resolve_resource_path("test_table_from_json_file.json"))
     assert (
         table.get_column("A").get_value(0) == 1
         and table.get_column("B").get_value(0) == 2
     )
 
 
-def test_read_csv_invalid() -> None:
+def test_from_json_file_invalid() -> None:
     with pytest.raises(FileNotFoundError):
-        Table.from_csv(resolve_resource_path("test_table_read_csv_invalid.csv"))
+        Table.from_json_file(resolve_resource_path("test_table_from_json_file_invalid.json"))

@@ -5,7 +5,7 @@ from tests.fixtures import resolve_resource_path
 
 
 def test_keep_columns() -> None:
-    table = Table.from_csv(resolve_resource_path("test_table_read_csv.csv"))
+    table = Table.from_csv_file(resolve_resource_path("test_table_from_csv_file.csv"))
     transformed_table = table.keep_only_columns(["A"])
     assert transformed_table.schema.has_column(
         "A"
@@ -13,6 +13,6 @@ def test_keep_columns() -> None:
 
 
 def test_keep_columns_warning() -> None:
-    table = Table.from_csv(resolve_resource_path("test_table_read_csv.csv"))
+    table = Table.from_csv_file(resolve_resource_path("test_table_from_csv_file.csv"))
     with pytest.raises(UnknownColumnNameError):
         table.keep_only_columns(["C"])
