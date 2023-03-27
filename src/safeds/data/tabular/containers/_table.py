@@ -271,10 +271,10 @@ class Table:
         """
         if self._schema.has_column(column_name):
             output_column = Column(
+                column_name,
                 self._data.iloc[
                     :, [self._schema._get_column_index_by_name(column_name)]
                 ].squeeze(),
-                column_name,
                 self._schema.get_type_of_column(column_name),
             )
             return output_column
@@ -952,7 +952,7 @@ class Table:
         """
         if self.has_column(name):
             items: list = [transformer(item) for item in self.to_rows()]
-            result: Column = Column(pd.Series(items), name)
+            result: Column = Column(name, pd.Series(items))
             return self.replace_column(name, result)
         raise UnknownColumnNameError([name])
 

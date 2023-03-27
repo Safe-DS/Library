@@ -15,9 +15,9 @@ class TestSortRows:
             #     Table.from_columns([Column([], "col1")]),
             # ),
             (
-                Table.from_columns([Column([3, 2, 1], "col1")]),
+                Table.from_columns([Column("col1", [3, 2, 1])]),
                 lambda row1, row2: row1["col1"] - row2["col1"],
-                Table.from_columns([Column([1, 2, 3], "col1")]),
+                Table.from_columns([Column("col1", [1, 2, 3])]),
             ),
         ],
     )
@@ -36,9 +36,9 @@ class TestSortRows:
             #     Table.from_columns([Column([], "col1")])
             # ),
             (
-                Table.from_columns([Column([3, 2, 1], "col1")]),
+                Table.from_columns([Column("col1", [3, 2, 1])]),
                 lambda row1, row2: row1["col1"] - row2["col1"],
-                Table.from_columns([Column([3, 2, 1], "col1")]),
+                Table.from_columns([Column("col1", [3, 2, 1])]),
             ),
         ],
     )

@@ -5,11 +5,11 @@ from safeds.exceptions import NonNumericColumnError
 
 
 def test_sum_valid() -> None:
-    c1 = Column(pd.Series([1, 2]), "test")
+    c1 = Column("test", pd.Series([1, 2]))
     assert c1.sum() == 3
 
 
 def test_sum_invalid() -> None:
-    c1 = Column(pd.Series([1, "a"]), "test")
+    c1 = Column("test", pd.Series([1, "a"]))
     with pytest.raises(NonNumericColumnError):
         c1.sum()

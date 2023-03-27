@@ -5,8 +5,8 @@ from safeds.data.tabular.typing import IntColumnType, StringColumnType
 
 def test_add_columns_valid() -> None:
     table1 = Table(pd.DataFrame(data={"col1": [1, 2, 1], "col2": [1, 2, 4]}))
-    col3 = Column(pd.Series(data=[0, -1, -2]), "col3")
-    col4 = Column(pd.Series(data=["a", "b", "c"]), "col4")
+    col3 = Column("col3", pd.Series(data=[0, -1, -2]))
+    col4 = Column("col4", pd.Series(data=["a", "b", "c"]))
     table1 = table1.add_columns([col3, col4])
     assert table1.count_columns() == 4
     assert table1.get_column("col3") == col3
@@ -19,8 +19,8 @@ def test_add_columns_valid() -> None:
 
 def test_add_columns_table_valid() -> None:
     table1 = Table(pd.DataFrame(data={"col1": [1, 2, 1], "col2": [1, 2, 4]}))
-    col3 = Column(pd.Series(data=[0, -1, -2]), "col3")
-    col4 = Column(pd.Series(data=["a", "b", "c"]), "col4")
+    col3 = Column("col3", pd.Series(data=[0, -1, -2]))
+    col4 = Column("col4", pd.Series(data=["a", "b", "c"]))
     table2 = Table.from_columns([col3, col4])
     table1 = table1.add_columns(table2)
     assert table1.count_columns() == 4
