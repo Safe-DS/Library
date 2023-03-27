@@ -23,6 +23,7 @@ class DummyRegressor(Regressor):
     """
 
     def fit(self, training_set: TaggedTable) -> DummyRegressor:
+        # pylint: disable=unused-argument
         return self
 
     def predict(self, dataset: Table) -> TaggedTable:

@@ -19,6 +19,7 @@ class DummyClassifier(Classifier):
     """
 
     def fit(self, training_set: TaggedTable) -> DummyClassifier:
+        # pylint: disable=unused-argument
         return self
 
     def predict(self, dataset: Table) -> TaggedTable:
