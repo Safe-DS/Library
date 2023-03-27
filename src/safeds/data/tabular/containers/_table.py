@@ -596,7 +596,7 @@ class Table:
             A table without the columns that contain non-numerical values.
 
         """
-        return Table.from_columns(self.list_columns_with_numerical_values())
+        return Table.from_columns(self._list_columns_with_numerical_values())
 
     def drop_duplicate_rows(self) -> Table:
         """
@@ -637,7 +637,7 @@ class Table:
         result = self._data.copy(deep=True)
 
         table_without_nonnumericals = Table.from_columns(
-            self.list_columns_with_numerical_values()
+            self._list_columns_with_numerical_values()
         )
 
         result = result[
@@ -662,7 +662,6 @@ class Table:
         table : Table
             A table containing only the rows filtered by the query.
         """
-
         rows: list[Row] = [row for row in self.to_rows() if query(row)]
         if len(rows) == 0:
             result_table = Table([], self._schema)
@@ -936,7 +935,7 @@ class Table:
         """
         Plot a correlation heatmap for all numerical columns of this `Table`.
         """
-        only_numerical = Table.from_columns(self.list_columns_with_numerical_values())
+        only_numerical = self.drop_columns_with_non_numerical_values()
 
         sns.heatmap(
             data=only_numerical._data.corr(),
@@ -1100,38 +1099,7 @@ class Table:
         ):
             return display(tmp)
 
-    def list_columns_with_missing_values(self) -> list[Column]:
-        """
-        Return a list of all the columns that have at least one missing value. Returns an empty list if there are none.
-
-        Returns
-        -------
-        columns_with_missing_values: list[Column]
-            The list of columns with missing values.
-        """
-        columns = self.to_columns()
-        columns_with_missing_values = []
-        for column in columns:
-            if column.has_missing_values():
-                columns_with_missing_values.append(column)
-        return columns_with_missing_values
-
-    def list_columns_with_non_numerical_values(self) -> list[Column]:
-        """
-        Return a list of columns only containing non-numerical values.
-
-        Returns
-        -------
-        cols : list[Column]
-            The list with only non-numerical columns.
-        """
-        cols = []
-        for column_name, data_type in self._schema._schema.items():
-            if not data_type.is_numeric():
-                cols.append(self.get_column(column_name))
-        return cols
-
-    def list_columns_with_numerical_values(self) -> list[Column]:
+    def _list_columns_with_numerical_values(self) -> list[Column]:
         """
         Return a list of columns only containing numerical values.
 
