@@ -630,25 +630,24 @@ class Table:
 
     def drop_rows_with_outliers(self) -> Table:
         """
-        Remove all rows from the table that contain at least one outlier defined as having a value that has a distance
-        of more than 3 standard deviations from the column average.
+        Remove all rows from the table that contain at least one outlier.
+
+        We define an outlier as a value that has a distance of more than 3 standard deviations from the column mean.
+        Missing values are not considered outliers. They are also ignored during the calculation of the standard
+        deviation.
 
         Returns
         -------
         new_table : Table
             A new table without rows containing outliers.
         """
-        result = self._data.copy(deep=True)
+        copy = self._data.copy(deep=True)
 
         table_without_nonnumericals = self.drop_columns_with_non_numerical_values()
+        z_scores = np.absolute(stats.zscore(table_without_nonnumericals._data, nan_policy="omit"))
+        filter_ = ((z_scores < 3) | np.isnan(z_scores)).all(axis=1)
 
-        result = result[
-            (np.absolute(stats.zscore(table_without_nonnumericals._data)) < 3).all(
-                axis=1
-            )
-        ]
-
-        return Table(result, self._schema)
+        return Table(copy[filter_], self._schema)
 
     def filter_rows(self, query: Callable[[Row], bool]) -> Table:
         """
