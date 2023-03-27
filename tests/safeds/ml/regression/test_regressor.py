@@ -23,6 +23,7 @@ class DummyRegressor(Regressor):
     """
 
     def fit(self, training_set: TaggedTable) -> DummyRegressor:
+        # pylint: disable=unused-argument
         return self
 
     def predict(self, dataset: Table) -> TaggedTable:
@@ -45,9 +46,7 @@ class TestMeanAbsoluteError:
             ([0.5, 0.5], [1.5, 1.5], 1),
         ],
     )
-    def test_valid_data(
-        self, predicted: list[float], expected: list[float], result: float
-    ) -> None:
+    def test_valid_data(self, predicted: list[float], expected: list[float], result: float) -> None:
         predicted_column = Column("predicted", predicted)
         expected_column = Column("expected", expected)
         table = TaggedTable(
@@ -63,9 +62,7 @@ class TestMeanSquaredError:
         "predicted, expected, result",
         [([1, 2], [1, 2], 0), ([0, 0], [1, 1], 1), ([1, 1, 1], [2, 2, 11], 34)],
     )
-    def test_valid_data(
-        self, predicted: list[float], expected: list[float], result: float
-    ) -> None:
+    def test_valid_data(self, predicted: list[float], expected: list[float], result: float) -> None:
         predicted_column = Column("predicted", predicted)
         expected_column = Column("expected", expected)
         table = TaggedTable(
