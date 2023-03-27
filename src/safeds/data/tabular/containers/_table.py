@@ -853,24 +853,25 @@ class Table:
 
     def sort_columns(
         self,
-        sorter: Callable[[Column, Column], int] =
+        comparator: Callable[[Column, Column], int] =
         lambda col1, col2: (col1.name > col2.name) - (col1.name < col2.name),
     ) -> Table:
         """
-        Sort the columns of a `Table` with the given sorter and return a new `Table`. The original table is not
+        Sort the columns of a `Table` with the given comparator and return a new `Table`. The original table is not
         modified.
 
-        The sorter is a function that takes two columns `col1` and `col2` and returns an integer. If `col1` should be
-        ordered before `col2`, the function should return a negative number. If `col1` should be ordered after `col2`,
-        the function should return a positive number. If the original order of `col1` and `col2` should be kept, the
-        function should return 0.
+        The comparator is a function that takes two columns `col1` and `col2` and returns an integer:
 
-        If no sorter is given, the columns will be sorted alphabetically by their name.
+        * If `col1` should be ordered before `col2`, the function should return a negative number.
+        * If `col1` should be ordered after `col2`, the function should return a positive number.
+        * If the original order of `col1` and `col2` should be kept, the function should return 0.
+
+        If no comparator is given, the columns will be sorted alphabetically by their name.
 
         Parameters
         ----------
-        sorter : Callable[[Column, Column], int]
-            The function used to sort the columns.
+        comparator : Callable[[Column, Column], int]
+            The function used to compare two columns.
 
         Returns
         -------
@@ -878,22 +879,24 @@ class Table:
             A new table with sorted columns.
         """
         columns = self.to_columns()
-        columns.sort(key=functools.cmp_to_key(sorter))
+        columns.sort(key=functools.cmp_to_key(comparator))
         return Table.from_columns(columns)
 
-    def sort_rows(self, sorter: Callable[[Row, Row], int]) -> Table:
+    def sort_rows(self, comparator: Callable[[Row, Row], int]) -> Table:
         """
-        Sort the rows of a `Table` with the given sorter and return a new `Table`. The original table is not modified.
+        Sort the rows of a `Table` with the given comparator and return a new `Table`. The original table is not
+        modified.
 
-        The sorter is a function that takes two rows `row1` and `row2` and returns an integer. If `row1` should be
-        ordered before `row2`, the function should return a negative number. If `row1` should be ordered after `row2`,
-        the function should return a positive number. If the original order of `row1` and `row2` should be kept, the
-        function should return 0.
+        The comparator is a function that takes two rows `row1` and `row2` and returns an integer:
+
+        * If `col1` should be ordered before `col2`, the function should return a negative number.
+        * If `col1` should be ordered after `col2`, the function should return a positive number.
+        * If the original order of `col1` and `col2` should be kept, the function should return 0.
 
         Parameters
         ----------
-        sorter : Callable[[Row, Row], int]
-            The function used to sort the rows.
+        comparator : Callable[[Row, Row], int]
+            The function used to compare two rows.
 
         Returns
         -------
@@ -901,7 +904,7 @@ class Table:
             A new table with sorted rows.
         """
         rows = self.to_rows()
-        rows.sort(key=functools.cmp_to_key(sorter))
+        rows.sort(key=functools.cmp_to_key(comparator))
         return Table.from_rows(rows)
 
     def split(self, percentage_in_first: float) -> typing.Tuple[Table, Table]:
