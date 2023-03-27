@@ -573,6 +573,19 @@ class Table:
         )
         return Table(transformed_data)
 
+    def drop_columns_with_missing_values(self) -> Table:
+        """
+        Return a table without the columns that contain missing values.
+
+        Returns
+        -------
+        table : Table
+            A table without the columns that contain missing values.
+        """
+        return Table.from_columns(
+            [column for column in self.to_columns() if not column.has_missing_values()]
+        )
+
     def drop_columns_with_non_numerical_values(self) -> Table:
         """
         Return a table without the columns that contain non-numerical values.
@@ -593,11 +606,23 @@ class Table:
         -------
         result : Table
             The table with the duplicate rows removed.
-
         """
         df = self._data.drop_duplicates(ignore_index=True)
         df.columns = self._schema.get_column_names()
         return Table(df)
+
+    def drop_rows_with_missing_values(self) -> Table:
+        """
+        Return a table without the rows that contain missing values.
+
+        Returns
+        -------
+        table : Table
+            A table without the rows that contain missing values.
+        """
+        result = self._data.copy(deep=True)
+        result = result.dropna(axis="index")
+        return Table(result, self._schema)
 
     def drop_rows_with_outliers(self) -> Table:
         """
@@ -868,7 +893,8 @@ class Table:
         Returns
         -------
         result : (Table, Table)
-            A tuple containing the two resulting tables. The first table has the specified size, the second table contains the rest of the data.
+            A tuple containing the two resulting tables. The first table has the specified size, the second table
+            contains the rest of the data.
 
 
         """
