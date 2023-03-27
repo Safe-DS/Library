@@ -1,5 +1,6 @@
 import pytest
-from safeds.data.tabular.containers import Table, TaggedTable, Column
+
+from safeds.data.tabular.containers import Table, TaggedTable
 from safeds.exceptions import LearningError, PredictionError
 from safeds.ml.classification import AdaBoost, Classifier
 from tests.fixtures import resolve_resource_path
