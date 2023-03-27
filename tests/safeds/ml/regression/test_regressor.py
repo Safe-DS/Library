@@ -2,10 +2,10 @@ from __future__ import annotations
 
 import pandas as pd
 import pytest
-
 from safeds.data.tabular.containers import Column, Table, TaggedTable
 from safeds.exceptions import ColumnLengthMismatchError
 from safeds.ml.regression import Regressor
+
 # noinspection PyProtectedMember
 from safeds.ml.regression._regressor import _check_metrics_preconditions
 
@@ -46,9 +46,7 @@ class TestMeanAbsoluteError:
             ([0.5, 0.5], [1.5, 1.5], 1),
         ],
     )
-    def test_valid_data(
-        self, predicted: list[float], expected: list[float], result: float
-    ) -> None:
+    def test_valid_data(self, predicted: list[float], expected: list[float], result: float) -> None:
         predicted_column = Column("predicted", predicted)
         expected_column = Column("expected", expected)
         table = TaggedTable(
@@ -64,9 +62,7 @@ class TestMeanSquaredError:
         "predicted, expected, result",
         [([1, 2], [1, 2], 0), ([0, 0], [1, 1], 1), ([1, 1, 1], [2, 2, 11], 34)],
     )
-    def test_valid_data(
-        self, predicted: list[float], expected: list[float], result: float
-    ) -> None:
+    def test_valid_data(self, predicted: list[float], expected: list[float], result: float) -> None:
         predicted_column = Column("predicted", predicted)
         expected_column = Column("expected", expected)
         table = TaggedTable(

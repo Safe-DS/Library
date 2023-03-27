@@ -1,5 +1,4 @@
 import pytest
-
 from safeds.data.tabular.containers import Table, TaggedTable
 from safeds.exceptions import LearningError, PredictionError
 from safeds.ml.classification import AdaBoost, Classifier
@@ -24,15 +23,11 @@ def invalid_data() -> TaggedTable:
 
 
 class TestFit:
-    def test_should_succeed_on_valid_data(
-        self, classifier: Classifier, valid_data: TaggedTable
-    ) -> None:
+    def test_should_succeed_on_valid_data(self, classifier: Classifier, valid_data: TaggedTable) -> None:
         classifier.fit(valid_data)
         assert True  # This asserts that the fit method succeeds
 
-    def test_should_raise_on_invalid_data(
-        self, classifier: Classifier, invalid_data: TaggedTable
-    ) -> None:
+    def test_should_raise_on_invalid_data(self, classifier: Classifier, invalid_data: TaggedTable) -> None:
         with pytest.raises(LearningError):
             classifier.fit(invalid_data)
 
@@ -53,10 +48,7 @@ class TestPredict:
             classifier.predict(valid_data.features)
 
     def test_should_raise_on_invalid_data(
-        self,
-        classifier: Classifier,
-        valid_data: TaggedTable,
-        invalid_data: TaggedTable
+        self, classifier: Classifier, valid_data: TaggedTable, invalid_data: TaggedTable
     ) -> None:
         fitted_classifier = classifier.fit(valid_data)
         with pytest.raises(PredictionError):

@@ -1,5 +1,4 @@
 import pytest
-
 from safeds.data.tabular.containers import Table, TaggedTable
 from safeds.exceptions import LearningError, PredictionError
 from safeds.ml.classification import Classifier, DecisionTree
@@ -24,15 +23,11 @@ def invalid_data() -> TaggedTable:
 
 
 class TestFit:
-    def test_should_succeed_on_valid_data(
-        self, classifier: Classifier, valid_data: TaggedTable
-    ) -> None:
+    def test_should_succeed_on_valid_data(self, classifier: Classifier, valid_data: TaggedTable) -> None:
         classifier.fit(valid_data)
         assert True  # This asserts that the fit method succeeds
 
-    def test_should_raise_on_invalid_data(
-        self, classifier: Classifier, invalid_data: TaggedTable
-    ) -> None:
+    def test_should_raise_on_invalid_data(self, classifier: Classifier, invalid_data: TaggedTable) -> None:
         with pytest.raises(LearningError):
             classifier.fit(invalid_data)
 
@@ -48,9 +43,7 @@ class TestPredict:
         prediction = fitted_classifier.predict(valid_data.features)
         assert prediction.target.name == "T"
 
-    def test_should_raise_when_not_fitted(
-        self, classifier: Classifier, valid_data: TaggedTable
-    ) -> None:
+    def test_should_raise_when_not_fitted(self, classifier: Classifier, valid_data: TaggedTable) -> None:
         with pytest.raises(PredictionError):
             classifier.predict(valid_data.features)
 
