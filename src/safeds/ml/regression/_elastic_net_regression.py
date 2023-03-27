@@ -1,3 +1,7 @@
+from __future__ import annotations
+
+from typing import Optional
+
 from safeds.data.tabular.containers import Table, TaggedTable
 from safeds.ml._util_sklearn import fit, predict
 from sklearn.linear_model import ElasticNet as sk_ElasticNet
@@ -12,10 +16,10 @@ class ElasticNetRegression(Regressor):
     """
 
     def __init__(self) -> None:
-        self._wrapped_regressor = sk_ElasticNet()
-        self._target_name = ""
+        self._wrapped_regressor: Optional[sk_ElasticNet] = None
+        self._target_name: Optional[str] = None
 
-    def fit(self, training_set: TaggedTable) -> None:
+    def fit(self, training_set: TaggedTable) -> ElasticNetRegression:
         """
         Fit this model given a tagged table.
 
@@ -29,8 +33,14 @@ class ElasticNetRegression(Regressor):
         LearningError
             If the tagged table contains invalid values or if the training failed.
         """
-        fit(self._wrapped_regressor, training_set)
-        self._target_name = training_set.target.name
+        wrapped_regressor = sk_ElasticNet()
+        fit(wrapped_regressor, training_set)
+
+        result = ElasticNetRegression()
+        result._wrapped_regressor = wrapped_regressor
+        result._target_name = training_set.target.name
+
+        return result
 
     def predict(self, dataset: Table) -> TaggedTable:
         """

@@ -1,3 +1,7 @@
+from __future__ import annotations
+
+from typing import Optional
+
 from safeds.data.tabular.containers import Table, TaggedTable
 from safeds.ml._util_sklearn import fit, predict
 from sklearn.linear_model import LinearRegression as sk_LinearRegression
@@ -12,10 +16,10 @@ class LinearRegression(Regressor):
     """
 
     def __init__(self) -> None:
-        self._wrapped_regressor = sk_LinearRegression(n_jobs=-1)
-        self._target_name = ""
+        self._wrapped_regressor: Optional[sk_LinearRegression] = None
+        self._target_name: Optional[str] = None
 
-    def fit(self, training_set: TaggedTable) -> None:
+    def fit(self, training_set: TaggedTable) -> LinearRegression:
         """
         Fit this model given a tagged table.
 
@@ -29,8 +33,14 @@ class LinearRegression(Regressor):
         LearningError
             If the tagged table contains invalid values or if the training failed.
         """
-        fit(self._wrapped_regressor, training_set)
-        self._target_name = training_set.target.name
+        wrapped_regressor = sk_LinearRegression(n_jobs=-1)
+        fit(wrapped_regressor, training_set)
+
+        result = LinearRegression()
+        result._wrapped_regressor = wrapped_regressor
+        result._target_name = training_set.target.name
+
+        return result
 
     def predict(self, dataset: Table) -> TaggedTable:
         """

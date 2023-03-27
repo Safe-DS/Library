@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from abc import ABC, abstractmethod
 
 from safeds.data.tabular.containers import Column, Table, TaggedTable
@@ -12,7 +14,7 @@ class Regressor(ABC):
     """
 
     @abstractmethod
-    def fit(self, training_set: TaggedTable) -> None:
+    def fit(self, training_set: TaggedTable) -> Regressor:
         """
         Fit this model given a tagged table.
 
