@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import pandas as pd
 from safeds.data.tabular.containers import Column, Table, TaggedTable
 from safeds.ml.classification import Classifier
@@ -15,8 +17,8 @@ class DummyClassifier(Classifier):
     `target_name` must be set to `"expected"`.
     """
 
-    def fit(self, training_set: TaggedTable) -> None:
-        pass
+    def fit(self, training_set: TaggedTable) -> DummyClassifier:
+        return self
 
     def predict(self, dataset: Table) -> TaggedTable:
         # Needed until https://github.com/Safe-DS/Stdlib/issues/75 is fixed

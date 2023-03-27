@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import pandas as pd
 import pytest
 from safeds.data.tabular.containers import Column, Table, TaggedTable
@@ -20,8 +22,8 @@ class DummyRegressor(Regressor):
     `target_name` must be set to `"expected"`.
     """
 
-    def fit(self, training_set: TaggedTable) -> None:
-        pass
+    def fit(self, training_set: TaggedTable) -> DummyRegressor:
+        return self
 
     def predict(self, dataset: Table) -> TaggedTable:
         # Needed until https://github.com/Safe-DS/Stdlib/issues/75 is fixed
