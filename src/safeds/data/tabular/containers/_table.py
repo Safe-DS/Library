@@ -574,6 +574,18 @@ class Table:
         )
         return Table(transformed_data)
 
+    def drop_columns_with_non_numerical_values(self) -> Table:
+        """
+        Return a table without the columns that contain non-numerical values.
+
+        Returns
+        -------
+        table : Table
+            A table without the columns that contain non-numerical values.
+
+        """
+        return Table.from_columns(self.list_columns_with_numerical_values())
+
     def drop_duplicate_rows(self) -> Table:
         """
         Return a copy of the table with every duplicate row removed.

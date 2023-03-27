@@ -15,16 +15,13 @@ def test_drop_columns_with_non_numerical_values_valid() -> None:
             }
         )
     )
-    columns = table.drop_columns_with_non_numerical_values()
-    assert columns[0] == table.get_column("col3")
-    assert columns[1] == table.get_column("col4")
-    assert len(columns) == 2
+    updated_table = table.drop_columns_with_non_numerical_values()
+    assert updated_table.get_column_names() == ["col3", "col4"]
 
 
-def test_drop_columns_with_non_numerical_values_invalid() -> None:
+def test_drop_columns_with_non_numerical_values_empty() -> None:
     table = Table(
         [], TableSchema({"col1": ColumnType.from_numpy_dtype(np.dtype(float))})
     )
-    columns = table.drop_columns_with_non_numerical_values()
-    assert columns[0] == table.get_column("col1")
-    assert len(columns) == 1
+    updated_table = table.drop_columns_with_non_numerical_values()
+    assert updated_table.get_column_names() == ["col1"]
