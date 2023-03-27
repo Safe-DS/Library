@@ -272,7 +272,7 @@ class Table:
         if self._schema.has_column(column_name):
             output_column = Column(
                 self._data.iloc[
-                :, [self._schema._get_column_index_by_name(column_name)]
+                    :, [self._schema._get_column_index_by_name(column_name)]
                 ].squeeze(),
                 column_name,
                 self._schema.get_type_of_column(column_name),
@@ -853,8 +853,10 @@ class Table:
 
     def sort_columns(
         self,
-        comparator: Callable[[Column, Column], int] =
-        lambda col1, col2: (col1.name > col2.name) - (col1.name < col2.name),
+        comparator: Callable[[Column, Column], int] = lambda col1, col2: (
+            col1.name > col2.name
+        )
+        - (col1.name < col2.name),
     ) -> Table:
         """
         Sort the columns of a `Table` with the given comparator and return a new `Table`. The original table is not
