@@ -2,10 +2,10 @@ from __future__ import annotations
 
 from typing import Optional
 
-from sklearn.tree import DecisionTreeClassifier as sk_DecisionTreeClassifier
-
 from safeds.data.tabular.containers import Table, TaggedTable
 from safeds.ml._util_sklearn import fit, predict
+from sklearn.tree import DecisionTreeClassifier as sk_DecisionTreeClassifier
+
 from ._classifier import Classifier
 
 
