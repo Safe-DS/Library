@@ -13,4 +13,6 @@ def test_from_csv_file_valid() -> None:
 
 def test_from_csv_file_invalid() -> None:
     with pytest.raises(FileNotFoundError):
-        Table.from_csv_file(resolve_resource_path("test_table_from_csv_file_invalid.csv"))
+        Table.from_csv_file(
+            resolve_resource_path("test_table_from_csv_file_invalid.csv")
+        )

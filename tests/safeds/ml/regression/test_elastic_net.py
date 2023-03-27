@@ -12,7 +12,9 @@ def regressor() -> Regressor:
 
 @pytest.fixture()
 def valid_data() -> TaggedTable:
-    table = Table.from_csv_file(resolve_resource_path("test_elastic_net_regression.csv"))
+    table = Table.from_csv_file(
+        resolve_resource_path("test_elastic_net_regression.csv")
+    )
     return TaggedTable(table, "T")
 
 
