@@ -22,7 +22,7 @@ def test_drop_rows_with_outliers_no_outliers() -> None:
 
 
 def test_drop_rows_with_outliers_with_outliers() -> None:
-    table = Table(
+    input_ = Table(
         pd.DataFrame(
             data={
                 "col1": [
@@ -41,12 +41,24 @@ def test_drop_rows_with_outliers_with_outliers() -> None:
                 ],
                 "col2": [1.0, 2.0, 3.0, 4.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
                 "col3": [2, 3, 1, 1_000_000_000, 1, 1, 1, 1, 1, 1, 1, 1],
+                "col4": ["s", 3, 1, 4, 1, 1, 1, 1, 1, 1, 1, 1],
             }
         )
     )
-    result = table.drop_rows_with_outliers()
-    assert result.count_rows() == 11
-    assert result.count_columns() == 3
+    result = input_.drop_rows_with_outliers()
+
+    expected = Table(
+        pd.DataFrame(
+            data={
+                "col1": ["A", "B", "C", "a", "a", "a", "a", "a", "a", "a", "a"],
+                "col2": [1.0, 2.0, 3.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
+                "col3": [2, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+                "col4": ["s", 3, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+            }
+        )
+    )
+
+    assert result == expected
 
 
 def test_drop_rows_with_outliers_no_rows() -> None:
