@@ -57,6 +57,10 @@ def predict(model: Any, dataset: Table, target_name: str) -> TaggedTable:
     PredictionError
         If predicting with the given dataset failed.
     """
+
+    if model is None:
+        raise PredictionError("The model was not trained")
+
     dataset_df = dataset._data
     dataset_df.columns = dataset.schema.get_column_names()
     try:

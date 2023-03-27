@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from abc import ABC, abstractmethod
 
 from safeds.data.tabular.containers import Table, TaggedTable
@@ -10,14 +12,19 @@ class Classifier(ABC):
     """
 
     @abstractmethod
-    def fit(self, training_set: TaggedTable) -> None:
+    def fit(self, training_set: TaggedTable) -> Classifier:
         """
-        Fit this model given a tagged table.
+        Fit this classifier given a tagged table and return the fitted classifier.
 
         Parameters
         ----------
         training_set : TaggedTable
             The tagged table containing the feature and target vectors.
+
+        Returns
+        -------
+        fitted_classifier : Classifier
+            The fitted classifier.
 
         Raises
         ------
