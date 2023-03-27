@@ -759,10 +759,10 @@ class Table:
         columns.sort(key=functools.cmp_to_key(query))
         return Table.from_columns(columns)
 
-    def remove_outliers(self) -> Table:
+    def drop_rows_with_outliers(self) -> Table:
         """
-        Remove all rows from the table that contain at least one outlier defined as having a value that has a distance of
-        more than 3 standard deviations from the column average.
+        Remove all rows from the table that contain at least one outlier defined as having a value that has a distance
+        of more than 3 standard deviations from the column average.
 
         Returns
         -------
