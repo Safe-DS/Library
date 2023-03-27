@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Optional
 
 from safeds.data.tabular.containers import Table, TaggedTable
 from safeds.exceptions import LearningError, PredictionError
@@ -34,7 +34,7 @@ def fit(model: Any, tagged_table: TaggedTable) -> None:
 
 
 # noinspection PyProtectedMember
-def predict(model: Any, dataset: Table, target_name: str) -> TaggedTable:
+def predict(model: Any, dataset: Table, target_name: Optional[str]) -> TaggedTable:
     """
     Predict a target vector using a dataset containing feature vectors. The model has to be trained first.
 
@@ -57,6 +57,10 @@ def predict(model: Any, dataset: Table, target_name: str) -> TaggedTable:
     PredictionError
         If predicting with the given dataset failed.
     """
+
+    if model is None or target_name is None:
+        raise PredictionError("The model was not trained")
+
     dataset_df = dataset._data
     dataset_df.columns = dataset.schema.get_column_names()
     try:

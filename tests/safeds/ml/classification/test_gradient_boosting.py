@@ -44,8 +44,8 @@ class TestPredict:
     def test_should_succeed_on_valid_data(
         self, classifier: Classifier, valid_data: TaggedTable
     ) -> None:
-        classifier.fit(valid_data)
-        classifier.predict(valid_data.features)
+        fitted_classifier = classifier.fit(valid_data)
+        fitted_classifier.predict(valid_data.features)
         assert True  # This asserts that the predict method succeeds
 
     def test_should_raise_when_not_fitted(
@@ -57,6 +57,6 @@ class TestPredict:
     def test_should_raise_on_invalid_data(
         self, classifier: Classifier, valid_data: TaggedTable, invalid_data: TaggedTable
     ) -> None:
-        classifier.fit(valid_data)
+        fitted_classifier = classifier.fit(valid_data)
         with pytest.raises(PredictionError):
-            classifier.predict(invalid_data.features)
+            fitted_classifier.predict(invalid_data.features)

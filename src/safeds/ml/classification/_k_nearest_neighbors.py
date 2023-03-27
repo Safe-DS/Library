@@ -1,3 +1,7 @@
+from __future__ import annotations
+
+from typing import Optional
+
 from safeds.data.tabular.containers import Table, TaggedTable
 from safeds.ml._util_sklearn import fit, predict
 from sklearn.neighbors import KNeighborsClassifier as sk_KNeighborsClassifier
@@ -16,27 +20,39 @@ class KNearestNeighbors(Classifier):
     """
 
     def __init__(self, n_neighbors: int) -> None:
-        self._wrapped_classifier = sk_KNeighborsClassifier(
-            n_jobs=-1, n_neighbors=n_neighbors
-        )
-        self._target_name = ""
+        self._n_neighbors = n_neighbors
 
-    def fit(self, training_set: TaggedTable) -> None:
+        self._wrapped_classifier: Optional[sk_KNeighborsClassifier] = None
+        self._target_name: Optional[str] = None
+
+    def fit(self, training_set: TaggedTable) -> KNearestNeighbors:
         """
-        Fit this model given a tagged table.
+        Create a new classifier based on this one and fit it with the given training data. This classifier is not
+        modified.
 
         Parameters
         ----------
         training_set : TaggedTable
-            The tagged table containing the feature and target vectors.
+            The training data containing the feature and target vectors.
+
+        Returns
+        -------
+        fitted_classifier : KNearestNeighbors
+            The fitted classifier.
 
         Raises
         ------
         LearningError
-            If the tagged table contains invalid values or if the training failed.
+            If the training data contains invalid values or if the training failed.
         """
-        fit(self._wrapped_classifier, training_set)
-        self._target_name = training_set.target.name
+        wrapped_classifier = sk_KNeighborsClassifier(self._n_neighbors, n_jobs=-1)
+        fit(wrapped_classifier, training_set)
+
+        result = KNearestNeighbors(self._n_neighbors)
+        result._wrapped_classifier = wrapped_classifier
+        result._target_name = training_set.target.name
+
+        return result
 
     def predict(self, dataset: Table) -> TaggedTable:
         """

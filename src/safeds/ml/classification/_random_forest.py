@@ -1,3 +1,7 @@
+from __future__ import annotations
+
+from typing import Optional
+
 from safeds.data.tabular.containers import Table, TaggedTable
 from safeds.ml._util_sklearn import fit, predict
 from sklearn.ensemble import RandomForestClassifier as sk_RandomForestClassifier
@@ -11,25 +15,38 @@ class RandomForest(Classifier):
     """
 
     def __init__(self) -> None:
-        self._wrapped_classifier = sk_RandomForestClassifier(n_jobs=-1)
-        self._target_name = ""
+        self._wrapped_classifier: Optional[sk_RandomForestClassifier] = None
+        self._target_name: Optional[str] = None
 
-    def fit(self, training_set: TaggedTable) -> None:
+    def fit(self, training_set: TaggedTable) -> RandomForest:
         """
-        Fit this model given a tagged table.
+        Create a new classifier based on this one and fit it with the given training data. This classifier is not
+        modified.
 
         Parameters
         ----------
         training_set : TaggedTable
-            The tagged table containing the feature and target vectors.
+            The training data containing the feature and target vectors.
+
+        Returns
+        -------
+        fitted_classifier : RandomForest
+            The fitted classifier.
 
         Raises
         ------
         LearningError
-            If the tagged table contains invalid values or if the training failed.
+            If the training data contains invalid values or if the training failed.
         """
-        fit(self._wrapped_classifier, training_set)
-        self._target_name = training_set.target.name
+
+        wrapped_classifier = sk_RandomForestClassifier(n_jobs=-1)
+        fit(wrapped_classifier, training_set)
+
+        result = RandomForest()
+        result._wrapped_classifier = wrapped_classifier
+        result._target_name = training_set.target.name
+
+        return result
 
     def predict(self, dataset: Table) -> TaggedTable:
         """
