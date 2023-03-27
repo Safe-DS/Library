@@ -596,11 +596,9 @@ class Table:
             A table without the columns that contain non-numerical values.
 
         """
-        return Table.from_columns([
-            column
-            for column in self.to_columns()
-            if column.type.is_numeric()
-        ])
+        return Table.from_columns(
+            [column for column in self.to_columns() if column.type.is_numeric()]
+        )
 
     def drop_duplicate_rows(self) -> Table:
         """
@@ -644,7 +642,9 @@ class Table:
         copy = self._data.copy(deep=True)
 
         table_without_nonnumericals = self.drop_columns_with_non_numerical_values()
-        z_scores = np.absolute(stats.zscore(table_without_nonnumericals._data, nan_policy="omit"))
+        z_scores = np.absolute(
+            stats.zscore(table_without_nonnumericals._data, nan_policy="omit")
+        )
         filter_ = ((z_scores < 3) | np.isnan(z_scores)).all(axis=1)
 
         return Table(copy[filter_], self._schema)
