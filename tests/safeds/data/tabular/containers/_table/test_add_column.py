@@ -9,8 +9,8 @@ from safeds.exceptions import ColumnSizeError, DuplicateColumnNameError
 @pytest.mark.parametrize(
     "column, col_type",
     [
-        (Column(["a", "b", "c"], "col3"), StringColumnType()),
-        (Column([0, -1, -2], "col3"), IntColumnType()),
+        (Column("col3", ["a", "b", "c"]), StringColumnType()),
+        (Column("col3", [0, -1, -2]), IntColumnType()),
     ],
 )
 def test_add_column_valid(column: Column, col_type: ColumnType) -> None:
@@ -26,10 +26,10 @@ def test_add_column_valid(column: Column, col_type: ColumnType) -> None:
 def test_add_column_invalid_duplicate_column_name_error() -> None:
     with raises(DuplicateColumnNameError):
         table1 = Table(pd.DataFrame(data={"col1": [1, 2, 1], "col2": [1, 2, 4]}))
-        table1 = table1.add_column(Column(["a", "b", "c"], "col1"))
+        table1 = table1.add_column(Column("col1", ["a", "b", "c"]))
 
 
 def test_add_column_invalid_column_size_error() -> None:
     with raises(ColumnSizeError):
         table1 = Table(pd.DataFrame(data={"col1": [1, 2, 1], "col2": [1, 2, 4]}))
-        table1 = table1.add_column(Column(["a", "b", "c", "d"], "col3"))
+        table1 = table1.add_column(Column("col3", ["a", "b", "c", "d"]))

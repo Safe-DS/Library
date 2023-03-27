@@ -29,15 +29,15 @@ class DummyClassifier(Classifier):
 
 class TestAccuracy:
     def test_with_same_type(self) -> None:
-        c1 = Column(pd.Series(data=[1, 2, 3, 4]), "predicted")
-        c2 = Column(pd.Series(data=[1, 2, 3, 3]), "expected")
+        c1 = Column("predicted", pd.Series(data=[1, 2, 3, 4]))
+        c2 = Column("expected", pd.Series(data=[1, 2, 3, 3]))
         table = TaggedTable(Table.from_columns([c1, c2]), target_name="expected")
 
         assert DummyClassifier().accuracy(table) == 0.75
 
     def test_with_different_types(self) -> None:
-        c1 = Column(pd.Series(data=["1", "2", "3", "4"]), "predicted")
-        c2 = Column(pd.Series(data=[1, 2, 3, 3]), "expected")
+        c1 = Column("predicted", pd.Series(data=["1", "2", "3", "4"]))
+        c2 = Column("expected", pd.Series(data=[1, 2, 3, 3]))
         table = TaggedTable(Table.from_columns([c1, c2]), target_name="expected")
 
         assert DummyClassifier().accuracy(table) == 0.0

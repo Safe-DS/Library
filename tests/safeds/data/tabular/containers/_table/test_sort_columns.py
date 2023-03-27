@@ -22,10 +22,10 @@ def test_sort_columns_valid(
     query: Callable[[Column, Column], int], col1: int, col2: int, col3: int, col4: int
 ) -> None:
     columns = [
-        Column(pd.Series(data=["A", "B", "C", "A", "D"]), "col1"),
-        Column(pd.Series(data=["Test1", "Test1", "Test3", "Test1", "Test4"]), "col2"),
-        Column(pd.Series(data=[1, 2, 3, 4, 5]), "col3"),
-        Column(pd.Series(data=[2, 3, 1, 4, 6]), "col4"),
+        Column("col1", pd.Series(data=["A", "B", "C", "A", "D"])),
+        Column("col2", pd.Series(data=["Test1", "Test1", "Test3", "Test1", "Test4"])),
+        Column("col3", pd.Series(data=[1, 2, 3, 4, 5])),
+        Column("col4", pd.Series(data=[2, 3, 1, 4, 6])),
     ]
     table1 = Table(
         pd.DataFrame(

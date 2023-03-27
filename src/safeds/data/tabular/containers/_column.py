@@ -23,22 +23,17 @@ class Column:
 
     Parameters
     ----------
-    data : Iterable
-        The data.
     name : str
         The name of the column.
+    data : Iterable
+        The data.
     type_ : Optional[ColumnType]
         The type of the column. If not specified, the type will be inferred from the data.
     """
 
-    def __init__(
-        self,
-        data: Iterable,
-        name: str,
-        type_: Optional[ColumnType] = None,
-    ) -> None:
-        self._data: pd.Series = data if isinstance(data, pd.Series) else pd.Series(data)
+    def __init__(self, name: str, data: Iterable, type_: Optional[ColumnType] = None) -> None:
         self._name: str = name
+        self._data: pd.Series = data if isinstance(data, pd.Series) else pd.Series(data)
         self._type: ColumnType = (
             type_
             if type_ is not None
@@ -158,7 +153,7 @@ class Column:
         column : Column
             A new column with the new name.
         """
-        return Column(self._data, new_name, self._type)
+        return Column(new_name, self._data, self._type)
 
     def all(self, predicate: Callable[[Any], bool]) -> bool:
         """

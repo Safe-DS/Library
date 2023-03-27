@@ -46,8 +46,8 @@ class TestMeanAbsoluteError:
     def test_valid_data(
         self, predicted: list[float], expected: list[float], result: float
     ) -> None:
-        predicted_column = Column(predicted, "predicted")
-        expected_column = Column(expected, "expected")
+        predicted_column = Column("predicted", predicted)
+        expected_column = Column("expected", expected)
         table = TaggedTable(
             Table.from_columns([predicted_column, expected_column]),
             target_name="expected",
@@ -64,8 +64,8 @@ class TestMeanSquaredError:
     def test_valid_data(
         self, predicted: list[float], expected: list[float], result: float
     ) -> None:
-        predicted_column = Column(predicted, "predicted")
-        expected_column = Column(expected, "expected")
+        predicted_column = Column("predicted", predicted)
+        expected_column = Column("expected", expected)
         table = TaggedTable(
             Table.from_columns([predicted_column, expected_column]),
             target_name="expected",
@@ -86,13 +86,7 @@ class TestCheckMetricsPreconditions:
     def test_should_raise_if_validation_fails(
         self, actual: list[str | int], expected: list[str | int], error: type[Exception]
     ) -> None:
-        actual_column = Column(
-            pd.Series(actual),
-            "actual",
-        )
-        expected_column = Column(
-            pd.Series(expected),
-            "expected",
-        )
+        actual_column = Column("actual", pd.Series(actual))
+        expected_column = Column("expected", pd.Series(expected))
         with pytest.raises(error):
             _check_metrics_preconditions(actual_column, expected_column)

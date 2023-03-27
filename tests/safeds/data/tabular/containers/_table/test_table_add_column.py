@@ -12,7 +12,7 @@ def test_table_add_column_valid() -> None:
     expected = Table.from_csv_file(
         resolve_resource_path("test_table_add_column_valid_output.csv")
     )
-    column = Column(pd.Series(["a", "b", "c"]), "C")
+    column = Column("C", pd.Series(["a", "b", "c"]))
 
     result = input_table.add_column(column)
     assert expected == result
@@ -31,7 +31,7 @@ def test_table_add_column_(
     input_table = Table.from_csv_file(
         resolve_resource_path("test_table_add_column_valid_input.csv")
     )
-    column = Column(pd.Series(column_values), column_name)
+    column = Column(column_name, pd.Series(column_values))
 
     with pytest.raises(error):
         input_table.add_column(column)

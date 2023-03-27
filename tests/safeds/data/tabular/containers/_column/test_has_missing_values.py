@@ -15,7 +15,7 @@ from safeds.data.tabular.containers import Column
 )
 def test_has_missing_values(values: list, expected: bool) -> None:
     if len(values) == 0:
-        column = Column(pd.Series(values, dtype=np.dtype("float64")), "A")
+        column = Column("A", pd.Series(values, dtype=np.dtype("float64")))
     else:
-        column = Column(pd.Series(values), "A")
+        column = Column("A", pd.Series(values))
     assert column.has_missing_values() == expected

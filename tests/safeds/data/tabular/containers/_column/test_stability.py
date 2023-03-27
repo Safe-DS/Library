@@ -16,13 +16,11 @@ from safeds.exceptions import ColumnSizeError
     ],
 )
 def test_stability(values: list[typing.Any], expected: float) -> None:
-    column = Column(pd.Series(values), "A")
+    column = Column("A", pd.Series(values))
     assert column.stability() == expected
 
 
 def test_stability_error() -> None:
-    column = Column(
-        pd.Series([], dtype=np.dtype("float64")), "A"
-    )  # Fix warning against unknown type
+    column = Column("A", pd.Series([], dtype=np.dtype("float64")))  # Fix warning against unknown type
     with pytest.raises(ColumnSizeError):
         column.stability()

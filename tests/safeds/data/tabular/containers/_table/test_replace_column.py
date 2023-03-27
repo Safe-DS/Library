@@ -22,7 +22,7 @@ def test_replace_valid(column_name: str, path: str) -> None:
     )
     expected: Table = Table.from_csv_file(resolve_resource_path(path))
 
-    column = Column(pd.Series(["d", "e", "f"]), column_name)
+    column = Column(column_name, pd.Series(["d", "e", "f"]))
 
     result = input_table.replace_column("C", column)
 
@@ -46,7 +46,7 @@ def test_replace_invalid(
     input_table: Table = Table.from_csv_file(
         resolve_resource_path("test_table_replace_column_input.csv")
     )
-    column = Column(pd.Series(column_values), column_name)
+    column = Column(column_name, pd.Series(column_values))
 
     with pytest.raises(error):
         input_table.replace_column(old_column_name, column)
