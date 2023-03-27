@@ -1,1 +1,9 @@
-* @lars-reimann
+*                       @lars-reimann
+
+# Documentation
+/docs/                  @Safe-DS/Stdlib
+/mkdocs.yml             @Safe-DS/Stdlib
+
+# Code
+/src/                   @Safe-DS/Stdlib
+/tests/                 @Safe-DS/Stdlib
