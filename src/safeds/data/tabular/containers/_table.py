@@ -272,7 +272,7 @@ class Table:
         if self._schema.has_column(column_name):
             output_column = Column(
                 self._data.iloc[
-                :, [self._schema._get_column_index_by_name(column_name)]
+                    :, [self._schema._get_column_index_by_name(column_name)]
                 ].squeeze(),
                 column_name,
                 self._schema.get_type_of_column(column_name),
@@ -582,11 +582,9 @@ class Table:
         table : Table
             A table without the columns that contain missing values.
         """
-        return Table.from_columns([
-            column
-            for column in self.to_columns()
-            if not column.has_missing_values()
-        ])
+        return Table.from_columns(
+            [column for column in self.to_columns() if not column.has_missing_values()]
+        )
 
     def drop_columns_with_non_numerical_values(self) -> Table:
         """
@@ -855,7 +853,10 @@ class Table:
 
     def sort_columns(
         self,
-        query: Callable[[Column, Column], int] = lambda col1, col2: (col1.name > col2.name) - (col1.name < col2.name),
+        query: Callable[[Column, Column], int] = lambda col1, col2: (
+            col1.name > col2.name
+        )
+        - (col1.name < col2.name),
     ) -> Table:
         """
         Sort a table with the given lambda function.
