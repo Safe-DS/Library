@@ -21,19 +21,25 @@ class GradientBoosting(Regressor):
 
     def fit(self, training_set: TaggedTable) -> GradientBoosting:
         """
-        Fit this model given a tagged table.
+        Create a new regressor based on this one and fit it with the given training data. This regressor is not
+        modified.
 
         Parameters
-
         ----------
-        tagged_table : SupervisedDataset
-            The tagged table containing the feature and target vectors.
+        training_set : TaggedTable
+            The training data containing the feature and target vectors.
+
+        Returns
+        -------
+        fitted_regressor : GradientBoosting
+            The fitted regressor.
 
         Raises
         ------
         LearningError
-            If the tagged table contains invalid values or if the training failed.
+            If the training data contains invalid values or if the training failed.
         """
+
         wrapped_regressor = sk_GradientBoostingRegressor()
         fit(wrapped_regressor, training_set)
 

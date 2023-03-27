@@ -21,18 +21,25 @@ class RidgeRegression(Regressor):
 
     def fit(self, training_set: TaggedTable) -> RidgeRegression:
         """
-        Fit this model given a tagged table.
+        Create a new regressor based on this one and fit it with the given training data. This regressor is not
+        modified.
 
         Parameters
         ----------
         training_set : TaggedTable
-            The tagged table containing the feature and target vectors.
+            The training data containing the feature and target vectors.
+
+        Returns
+        -------
+        fitted_regressor : RidgeRegression
+            The fitted regressor.
 
         Raises
         ------
         LearningError
-            If the tagged table contains invalid values or if the training failed.
+            If the training data contains invalid values or if the training failed.
         """
+
         wrapped_regressor = sk_Ridge()
         fit(wrapped_regressor, training_set)
 
