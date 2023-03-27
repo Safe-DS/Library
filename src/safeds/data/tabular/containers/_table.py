@@ -12,8 +12,6 @@ import pandas as pd
 import seaborn as sns
 from IPython.core.display_functions import DisplayHandle, display
 from pandas import DataFrame, Series
-from scipy import stats
-
 from safeds.data.tabular.containers._column import Column
 from safeds.data.tabular.containers._row import Row
 from safeds.data.tabular.typing import ColumnType, TableSchema
@@ -28,6 +26,7 @@ from safeds.exceptions import (
     SchemaMismatchError,
     UnknownColumnNameError,
 )
+from scipy import stats
 
 
 # noinspection PyProtectedMember
@@ -273,7 +272,7 @@ class Table:
         if self._schema.has_column(column_name):
             output_column = Column(
                 self._data.iloc[
-                :, [self._schema._get_column_index_by_name(column_name)]
+                    :, [self._schema._get_column_index_by_name(column_name)]
                 ].squeeze(),
                 column_name,
                 self._schema.get_type_of_column(column_name),
@@ -830,9 +829,9 @@ class Table:
     def sort_columns(
         self,
         query: Callable[[Column, Column], int] = lambda col1, col2: (
-                                                                        col1.name > col2.name
-                                                                    )
-                                                                    - (col1.name < col2.name),
+            col1.name > col2.name
+        )
+        - (col1.name < col2.name),
     ) -> Table:
         """
         Sort a table with the given lambda function.
