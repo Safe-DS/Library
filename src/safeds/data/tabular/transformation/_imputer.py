@@ -120,9 +120,7 @@ class Imputer:
         data[indices] = pd.DataFrame(
             self._imp.transform(data[indices]), columns=indices
         )
-        table_imputed = Table(data)
-        table_imputed.schema = table.schema
-        return table_imputed
+        return Table(data, table.schema)
 
     def fit_transform(
         self, table: Table, column_names: Optional[list[str]] = None
