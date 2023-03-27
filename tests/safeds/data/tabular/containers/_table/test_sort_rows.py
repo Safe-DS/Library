@@ -6,7 +6,7 @@ from safeds.data.tabular.containers import Column, Row, Table
 
 class TestSortRows:
     @pytest.mark.parametrize(
-        ("table", "sorter", "expected"),
+        ("table", "comparator", "expected"),
         [
             # Activate when https://github.com/Safe-DS/Stdlib/issues/75 is fixed.
             # (
@@ -21,11 +21,11 @@ class TestSortRows:
             ),
         ],
     )
-    def test_should_return_sorted_table(self, table: Table, sorter: Callable[[Row, Row], int], expected: Table) -> None:
-        assert table.sort_rows(sorter) == expected
+    def test_should_return_sorted_table(self, table: Table, comparator: Callable[[Row, Row], int], expected: Table) -> None:
+        assert table.sort_rows(comparator) == expected
 
     @pytest.mark.parametrize(
-        ("table", "sorter", "expected"),
+        ("table", "comparator", "expected"),
         [
             # Activate when https://github.com/Safe-DS/Stdlib/issues/75 is fixed.
             # (
@@ -40,6 +40,6 @@ class TestSortRows:
             ),
         ]
     )
-    def test_should_not_modify_original_table(self, table: Table, sorter: Callable[[Row, Row], int], expected: Table) -> None:
-        table.sort_rows(sorter)
+    def test_should_not_modify_original_table(self, table: Table, comparator: Callable[[Row, Row], int], expected: Table) -> None:
+        table.sort_rows(comparator)
         assert table == expected
