@@ -21,7 +21,9 @@ class TestSortRows:
             ),
         ],
     )
-    def test_should_return_sorted_table(self, table: Table, comparator: Callable[[Row, Row], int], expected: Table) -> None:
+    def test_should_return_sorted_table(
+        self, table: Table, comparator: Callable[[Row, Row], int], expected: Table
+    ) -> None:
         assert table.sort_rows(comparator) == expected
 
     @pytest.mark.parametrize(
@@ -38,8 +40,10 @@ class TestSortRows:
                 lambda row1, row2: row1["col1"] - row2["col1"],
                 Table.from_columns([Column([3, 2, 1], "col1")]),
             ),
-        ]
+        ],
     )
-    def test_should_not_modify_original_table(self, table: Table, comparator: Callable[[Row, Row], int], expected: Table) -> None:
+    def test_should_not_modify_original_table(
+        self, table: Table, comparator: Callable[[Row, Row], int], expected: Table
+    ) -> None:
         table.sort_rows(comparator)
         assert table == expected
