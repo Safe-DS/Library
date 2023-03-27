@@ -670,7 +670,7 @@ class Table:
             result_table = self.from_rows(rows)
         return result_table
 
-    def keep_columns(self, column_names: list[str]) -> Table:
+    def keep_only_columns(self, column_names: list[str]) -> Table:
         """
         Return a table with only the given column(s).
 

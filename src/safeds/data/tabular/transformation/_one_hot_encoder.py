@@ -30,7 +30,7 @@ class OneHotEncoder:
             If there was an error during fitting.
         """
         try:
-            table_k_columns = table.keep_columns(column_names=columns)
+            table_k_columns = table.keep_only_columns(column_names=columns)
             df = table_k_columns._data
             df.columns = table_k_columns.schema.get_column_names()
             self._encoder.fit(df)
@@ -57,7 +57,7 @@ class OneHotEncoder:
             If the encoder wasn't fitted before transforming.
         """
         try:
-            table_k_columns = table.keep_columns(self._encoder.feature_names_in_)
+            table_k_columns = table.keep_only_columns(self._encoder.feature_names_in_)
             df_k_columns = table_k_columns._data
             df_k_columns.columns = table_k_columns.schema.get_column_names()
             df_new = pd.DataFrame(self._encoder.transform(df_k_columns).toarray())
@@ -113,7 +113,7 @@ class OneHotEncoder:
         """
         try:
             data = self._encoder.inverse_transform(
-                table.keep_columns(self._encoder.get_feature_names_out())._data
+                table.keep_only_columns(self._encoder.get_feature_names_out())._data
             )
             df = pd.DataFrame(data)
             df.columns = self._encoder.feature_names_in_
