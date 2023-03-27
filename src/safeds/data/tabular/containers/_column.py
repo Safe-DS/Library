@@ -31,7 +31,9 @@ class Column:
         The type of the column. If not specified, the type will be inferred from the data.
     """
 
-    def __init__(self, name: str, data: Iterable, type_: Optional[ColumnType] = None) -> None:
+    def __init__(
+        self, name: str, data: Iterable, type_: Optional[ColumnType] = None
+    ) -> None:
         self._name: str = name
         self._data: pd.Series = data if isinstance(data, pd.Series) else pd.Series(data)
         self._type: ColumnType = (

@@ -270,9 +270,13 @@ class Table:
             If the specified target column name does not exist.
         """
         if self._schema.has_column(column_name):
-            output_column = Column(column_name, self._data.iloc[
-                                                :, [self._schema._get_column_index_by_name(column_name)]
-                                                ].squeeze(), self._schema.get_type_of_column(column_name))
+            output_column = Column(
+                column_name,
+                self._data.iloc[
+                    :, [self._schema._get_column_index_by_name(column_name)]
+                ].squeeze(),
+                self._schema.get_type_of_column(column_name),
+            )
             return output_column
 
         raise UnknownColumnNameError([column_name])
