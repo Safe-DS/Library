@@ -596,7 +596,11 @@ class Table:
             A table without the columns that contain non-numerical values.
 
         """
-        return Table.from_columns(self._list_columns_with_numerical_values())
+        return Table.from_columns([
+            column
+            for column in self.to_columns()
+            if column.type.is_numeric()
+        ])
 
     def drop_duplicate_rows(self) -> Table:
         """
@@ -636,9 +640,7 @@ class Table:
         """
         result = self._data.copy(deep=True)
 
-        table_without_nonnumericals = Table.from_columns(
-            self._list_columns_with_numerical_values()
-        )
+        table_without_nonnumericals = self.drop_columns_with_non_numerical_values()
 
         result = result[
             (np.absolute(stats.zscore(table_without_nonnumericals._data)) < 3).all(
@@ -1098,18 +1100,3 @@ class Table:
             "display.max_rows", tmp.shape[0], "display.max_columns", tmp.shape[1]
         ):
             return display(tmp)
-
-    def _list_columns_with_numerical_values(self) -> list[Column]:
-        """
-        Return a list of columns only containing numerical values.
-
-        Returns
-        -------
-        cols : list[Column]
-            The list with only numerical columns.
-        """
-        cols = []
-        for column_name, data_type in self._schema._schema.items():
-            if data_type.is_numeric():
-                cols.append(self.get_column(column_name))
-        return cols
