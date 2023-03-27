@@ -311,7 +311,7 @@ class Table:
         if self.schema.has_column(column_name):
             output_column = Column(
                 self._data.iloc[
-                    :, [self.schema._get_column_index_by_name(column_name)]
+                :, [self.schema._get_column_index_by_name(column_name)]
                 ].squeeze(),
                 column_name,
                 self.schema.get_type_of_column(column_name),
@@ -732,9 +732,9 @@ class Table:
     def sort_columns(
         self,
         query: Callable[[Column, Column], int] = lambda col1, col2: (
-            col1.name > col2.name
-        )
-        - (col1.name < col2.name),
+                                                                        col1.name > col2.name
+                                                                    )
+                                                                    - (col1.name < col2.name),
     ) -> Table:
         """
         Sort a table with the given lambda function.
@@ -975,22 +975,16 @@ class Table:
 
     def correlation_heatmap(self) -> None:
         """
-        Plot a correlation heatmap of an entire table. This function can only plot real numerical data.
-
-        Raises
-        -------
-        TypeError
-            If the table contains non-numerical data or complex data.
+        Plot a correlation heatmap for all numerical columns of this `Table`.
         """
-        for column in self.to_columns():
-            if not column.type.is_numeric():
-                raise NonNumericColumnError(column.name)
+        only_numerical = Table.from_columns(self.list_columns_with_numerical_values())
+
         sns.heatmap(
-            data=self._data.corr(),
+            data=only_numerical._data.corr(),
             vmin=-1,
             vmax=1,
-            xticklabels=self.get_column_names(),
-            yticklabels=self.get_column_names(),
+            xticklabels=only_numerical.get_column_names(),
+            yticklabels=only_numerical.get_column_names(),
             cmap="vlag",
         )
         plt.tight_layout()
