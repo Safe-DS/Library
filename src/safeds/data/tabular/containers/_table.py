@@ -272,7 +272,7 @@ class Table:
         if self._schema.has_column(column_name):
             output_column = Column(
                 self._data.iloc[
-                    :, [self._schema._get_column_index_by_name(column_name)]
+                :, [self._schema._get_column_index_by_name(column_name)]
                 ].squeeze(),
                 column_name,
                 self._schema.get_type_of_column(column_name),
@@ -853,24 +853,24 @@ class Table:
 
     def sort_columns(
         self,
-        query: Callable[[Column, Column], int] = lambda col1, col2: (
-            col1.name > col2.name
-        )
-        - (col1.name < col2.name),
+        sorter: Callable[[Column, Column], int] =
+        lambda col1, col2: (col1.name > col2.name) - (col1.name < col2.name),
     ) -> Table:
         """
-        Sort a table with the given lambda function.
-        If no function is given the columns will be sorted alphabetically.
-        This function uses the default python sort algorithm.
-        The query returns
-        0, if both columns are equal.
-        < 0, if the first column should be ordered after the second column.
-        > 0, if the first column should be ordered before the second column.
+        Sort the columns of a `Table` with the given sorter and return a new `Table`. The original table is not
+        modified.
+
+        The sorter is a function that takes two columns `col1` and `col2` and returns an integer. If `col1` should be
+        ordered before `col2`, the function should return a negative number. If `col1` should be ordered after `col2`,
+        the function should return a positive number. If the original order of `col1` and `col2` should be kept, the
+        function should return 0.
+
+        If no sorter is given, the columns will be sorted alphabetically by their name.
 
         Parameters
         ----------
-        query : a lambda function
-            The lambda function used to sort the columns.
+        sorter : Callable[[Column, Column], int]
+            The function used to sort the columns.
 
         Returns
         -------
@@ -878,8 +878,31 @@ class Table:
             A new table with sorted columns.
         """
         columns = self.to_columns()
-        columns.sort(key=functools.cmp_to_key(query))
+        columns.sort(key=functools.cmp_to_key(sorter))
         return Table.from_columns(columns)
+
+    def sort_rows(self, sorter: Callable[[Row, Row], int]) -> Table:
+        """
+        Sort the rows of a `Table` with the given sorter and return a new `Table`. The original table is not modified.
+
+        The sorter is a function that takes two rows `row1` and `row2` and returns an integer. If `row1` should be
+        ordered before `row2`, the function should return a negative number. If `row1` should be ordered after `row2`,
+        the function should return a positive number. If the original order of `row1` and `row2` should be kept, the
+        function should return 0.
+
+        Parameters
+        ----------
+        sorter : Callable[[Row, Row], int]
+            The function used to sort the rows.
+
+        Returns
+        -------
+        new_table : Table
+            A new table with sorted rows.
+        """
+        rows = self.to_rows()
+        rows.sort(key=functools.cmp_to_key(sorter))
+        return Table.from_rows(rows)
 
     def split(self, percentage_in_first: float) -> typing.Tuple[Table, Table]:
         """
