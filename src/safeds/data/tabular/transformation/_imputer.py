@@ -4,9 +4,9 @@ from abc import ABC, abstractmethod
 from typing import Any, Optional
 
 import pandas as pd
-from safeds.data.tabular.containers import Table
 from sklearn.impute import SimpleImputer as sk_SimpleImputer
 
+from safeds.data.tabular.containers import Table
 from safeds.data.tabular.transformation._table_transformer import TableTransformer
 from safeds.exceptions import NotFittedError, UnknownColumnNameError
 

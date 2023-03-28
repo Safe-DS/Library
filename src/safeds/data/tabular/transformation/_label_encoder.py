@@ -3,8 +3,6 @@ from __future__ import annotations
 import warnings
 from typing import Any, Optional
 
-import pandas as pd
-from sklearn.exceptions import NotFittedError as sk_NotFittedError
 from sklearn.preprocessing import OrdinalEncoder as sk_OrdinalEncoder
 
 from safeds.data.tabular.containers import Table
