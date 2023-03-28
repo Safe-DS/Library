@@ -28,7 +28,7 @@ class LabelEncoder:
         self._is_fitted = 0
         self._le = preprocessing.LabelEncoder()
 
-    def fit(self, table: Table, column: str) -> None:
+    def fit(self, table: Table, column: str) -> LabelEncoder:
         """
         Fit the label encoder with the values in the table.
 
@@ -83,7 +83,7 @@ class LabelEncoder:
         except Exception as exc:
             raise NotFittedError from exc
 
-    def fit_transform(self, table: Table, columns: list[str]) -> Table:
+    def fit_transform(self, table: Table, column_names: list[str]) -> tuple[Table, LabelEncoder]:
         """
         Label-encode the table with the label encoder.
 
@@ -103,8 +103,11 @@ class LabelEncoder:
         -------
         NotFittedError
             If the encoder wasn't fitted before transforming.
-
         """
+        fitted_transformer = self.fit(table, column_names)
+        transformed_table = fitted_transformer.transform(table)
+        return transformed_table, fitted_transformer
+
         p_df = table._data
         p_df.columns = table.schema.get_column_names()
         try:

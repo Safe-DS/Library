@@ -72,7 +72,7 @@ class Imputer:
         strategy._augment_imputer(self._imp)
         self._column_names: list[str] = []
 
-    def fit(self, table: Table, column_names: Optional[list[str]] = None) -> None:
+    def fit(self, table: Table, column_names: Optional[list[str]] = None) -> Imputer:
         """
         Fit the imputer on the dataset.
 
@@ -84,11 +84,11 @@ class Imputer:
             An optional list of column names, if the imputer is only supposed to run on specific columns.
         """
         if column_names is None:
-            column_names = table.schema.get_column_names()
+            column_names = table.get_column_names()
 
         if self._imp.strategy == "most_frequent":
             for name in column_names:
-                if 1 < len(table.get_column(name).mode()):
+                if len(table.get_column(name).mode()) > 1:
                     raise IndexError(
                         "There are multiple frequent values in a column given for the Imputer"
                     )
@@ -124,7 +124,7 @@ class Imputer:
 
     def fit_transform(
         self, table: Table, column_names: Optional[list[str]] = None
-    ) -> Table:
+    ) -> tuple[Table, Imputer]:
         """
         Fit the imputer on the dataset and impute the missing values.
 
@@ -140,5 +140,6 @@ class Imputer:
         table : Table
             The dataset with missing values imputed by the given strategy.
         """
-        self.fit(table, column_names)
-        return self.transform(table)
+        fitted_transformer = self.fit(table, column_names)
+        transformed_table = fitted_transformer.transform(table)
+        return transformed_table, fitted_transformer

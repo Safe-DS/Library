@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import pandas as pd
 from safeds.data.tabular.containers import Table
 from safeds.exceptions import LearningError, NotFittedError
@@ -13,7 +15,7 @@ class OneHotEncoder:
     def __init__(self) -> None:
         self._encoder = OHE_sklearn()
 
-    def fit(self, table: Table, columns: list[str]) -> None:
+    def fit(self, table: Table, columns: list[str]) -> OneHotEncoder:
         """
         Fit the encoder to a table.
 
@@ -71,7 +73,7 @@ class OneHotEncoder:
         except Exception as exc:
             raise NotFittedError from exc
 
-    def fit_transform(self, table: Table, columns: list[str]) -> Table:
+    def fit_transform(self, table: Table, columns: list[str]) -> tuple[Table, OneHotEncoder]:
         """
         Fit and transform data with a OneHotEncoder.
 
