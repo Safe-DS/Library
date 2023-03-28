@@ -43,14 +43,14 @@ class TestTransform:
             transformer.transform(table_to_transform)
 
     def test_should_raise_if_not_fitted(self) -> None:
-        table_to_transform = Table.from_columns([
-            Column("b", [1, 3, None]),
+        table = Table.from_columns([
+            Column("a", [1, 3, None]),
         ])
 
         transformer = Imputer(Imputer.Strategy.Constant(0))
 
         with pytest.raises(NotFittedError):
-            transformer.transform(table_to_transform)
+            transformer.transform(table)
 
 
 class TestFitTransform:
