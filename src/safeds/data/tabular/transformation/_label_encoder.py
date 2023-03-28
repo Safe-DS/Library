@@ -1,12 +1,14 @@
 from __future__ import annotations
 
 import warnings
-from typing import Any
+from typing import Any, Optional
 
-import pandas
 from safeds.data.tabular.containers import Table
-from safeds.exceptions import LearningError, NotFittedError
-from sklearn import exceptions, preprocessing
+from safeds.data.tabular.transformation._table_transformer import (
+    InvertibleTableTransformer,
+)
+from safeds.exceptions import NotFittedError, UnknownColumnNameError
+from sklearn.preprocessing import OrdinalEncoder as sk_OrdinalEncoder
 
 
 def warn(*_: Any, **__: Any) -> None:
@@ -17,133 +19,108 @@ warnings.warn = warn
 
 
 # noinspection PyProtectedMember
-
-
-class LabelEncoder:
+class LabelEncoder(InvertibleTableTransformer):
     """
     The LabelEncoder encodes one or more given columns into labels.
     """
 
     def __init__(self) -> None:
-        self._is_fitted = 0
-        self._le = preprocessing.LabelEncoder()
+        self._wrapped_transformer: Optional[sk_OrdinalEncoder] = None
+        self._column_names: Optional[list[str]] = None
 
-    def fit(self, table: Table, column: str) -> None:
+    def fit(self, table: Table, column_names: Optional[list[str]] = None) -> LabelEncoder:
         """
-        Fit the label encoder with the values in the table.
+        Learn a transformation for a set of columns in a table.
 
         Parameters
         ----------
         table : Table
-            The table containing the data used to fit the label encoder.
-        column : str
-            The list of columns supposed to be label-encoded.
+            The table used to fit the transformer.
+        column_names : Optional[list[str]]
+            The list of columns from the table used to fit the transformer. If `None`, all columns are used.
 
         Returns
         -------
-        None
-            This function does not return any value. It updates the internal state of the label encoder object.
-
-        Raises
-        -------
-        LearningError
-            If the model fitting was unsuccessful.
+        fitted_transformer : TableTransformer
+            The fitted transformer.
         """
-        try:
-            self._le.fit(table.keep_only_columns([column])._data)
-        except exceptions.NotFittedError as exc:
-            raise LearningError("") from exc
+        if column_names is None:
+            column_names = table.get_column_names()
+        else:
+            missing_columns = set(column_names) - set(table.get_column_names())
+            if len(missing_columns) > 0:
+                raise UnknownColumnNameError(list(missing_columns))
 
-    def transform(self, table: Table, column: str) -> Table:
+        indices = [table.schema._get_column_index_by_name(name) for name in column_names]
+
+        wrapped_transformer = sk_OrdinalEncoder()
+        wrapped_transformer.fit(table._data[indices])
+
+        result = LabelEncoder()
+        result._wrapped_transformer = wrapped_transformer
+        result._column_names = column_names
+
+        return result
+
+    def transform(self, table: Table) -> Table:
         """
-        Transform the given table to a normalized encoded table.
+        Apply the learned transformation to a table.
 
         Parameters
         ----------
         table : Table
-                The table with target values.
-        column : str
-                The name of the column.
+            The table to which the learned transformation is applied.
 
         Returns
         -------
-        result : Table
-            Table with normalized encodings.
+        transformed_table : Table
+            The transformed table.
 
         Raises
-        ------
+        ----------
         NotFittedError
-            If the Model wasn't fitted before transforming.
+            If the transformer has not been fitted yet.
         """
-        p_df = table._data
-        p_df.columns = table.schema.get_column_names()
-        try:
-            p_df[column] = self._le.transform(p_df[column])
-            return Table(p_df)
-        except Exception as exc:
-            raise NotFittedError from exc
 
-    def fit_transform(self, table: Table, columns: list[str]) -> Table:
+        # Transformer has not been fitted yet
+        if self._wrapped_transformer is None or self._column_names is None:
+            raise NotFittedError()
+
+        # Input table does not contain all columns used to fit the transformer
+        missing_columns = set(self._column_names) - set(table.get_column_names())
+        if len(missing_columns) > 0:
+            raise UnknownColumnNameError(list(missing_columns))
+
+        data = table._data.copy()
+        data.columns = table.get_column_names()
+        data[self._column_names] = self._wrapped_transformer.transform(data[self._column_names])
+        return Table(data)
+
+    def inverse_transform(self, transformed_table: Table) -> Table:
         """
-        Label-encode the table with the label encoder.
+        Undo the learned transformation.
 
         Parameters
         ----------
-        table : Table
-            The table to be transformed.
-        columns : list[str]
-            The list of column names to be encoded.
+        transformed_table : Table
+            The table to be transformed back to the original version.
 
         Returns
         -------
         table : Table
-            The label-encoded table.
+            The original table.
 
         Raises
-        -------
-        NotFittedError
-            If the encoder wasn't fitted before transforming.
-
-        """
-        p_df = table._data
-        p_df.columns = table.schema.get_column_names()
-        try:
-            for col in columns:
-                # Fit the LabelEncoder on the Column
-                self._le.fit(p_df[col])
-
-                # transform the column using the trained Label Encoder
-                p_df[col] = self._le.transform(p_df[col])
-            return Table(pandas.DataFrame(p_df))
-        except exceptions.NotFittedError as exc:
-            raise NotFittedError from exc
-
-    def inverse_transform(self, table: Table, column: str) -> Table:
-        """
-        Inverse-transform the table back to its original encodings.
-
-        Parameters
         ----------
-        table : Table
-            The table to be inverse-transformed.
-        column : str
-            The column to be inverse-transformed.
-
-        Returns
-        -------
-        table : Table
-            The inverse-transformed table.
-
-        Raises
-        -------
         NotFittedError
-            If the encoder wasn't fitted before transforming.
+            If the transformer has not been fitted yet.
         """
 
-        try:
-            p_df = table._data
-            p_df.columns = table.schema.get_column_names()
-            p_df[column] = self._le.inverse_transform(p_df[column])
-            return Table(p_df)
-        except exceptions.NotFittedError as exc:
-            raise NotFittedError from exc
+        # Transformer has not been fitted yet
+        if self._wrapped_transformer is None or self._column_names is None:
+            raise NotFittedError()
+
+        data = transformed_table._data.copy()
+        data.columns = transformed_table.get_column_names()
+        data[self._column_names] = self._wrapped_transformer.inverse_transform(data[self._column_names])
+        return Table(data)
