@@ -109,9 +109,7 @@ class Table:
         except FileNotFoundError as exception:
             raise FileNotFoundError(f'File "{path}" does not exist') from exception
         except Exception as exception:
-            raise ValueError(
-                f'Could not read file from "{path}" as JSON'
-            ) from exception
+            raise ValueError(f'Could not read file from "{path}" as JSON') from exception
 
     @staticmethod
     def from_columns(columns: list[Column]) -> Table:
@@ -143,9 +141,7 @@ class Table:
         for column in columns:
             if column._data.size != columns[0]._data.size:
                 raise ColumnLengthMismatchError(
-                    "\n".join(
-                        [f"{column.name}: {column._data.size}" for column in columns]
-                    )
+                    "\n".join([f"{column.name}: {column._data.size}" for column in columns])
                 )
             dataframe[column.name] = column._data
 
@@ -193,9 +189,7 @@ class Table:
     # ------------------------------------------------------------------------------------------------------------------
 
     def __init__(self, data: typing.Iterable, schema: Optional[TableSchema] = None):
-        self._data: pd.Dataframe = (
-            data if isinstance(data, pd.DataFrame) else pd.DataFrame(data)
-        )
+        self._data: pd.Dataframe = data if isinstance(data, pd.DataFrame) else pd.DataFrame(data)
         if schema is None:
             if self.count_columns() == 0:
                 raise MissingSchemaError()
@@ -272,9 +266,7 @@ class Table:
         if self._schema.has_column(column_name):
             output_column = Column(
                 column_name,
-                self._data.iloc[
-                    :, [self._schema._get_column_index_by_name(column_name)]
-                ].squeeze(),
+                self._data.iloc[:, [self._schema._get_column_index_by_name(column_name)]].squeeze(),
                 self._schema.get_type_of_column(column_name),
             )
             return output_column
@@ -533,9 +525,7 @@ class Table:
         for row in rows:
             if self._schema != row.schema:
                 raise SchemaMismatchError()
-        result = pd.concat(
-            [result, *[row._data.to_frame().T for row in rows]]
-        ).infer_objects()
+        result = pd.concat([result, *[row._data.to_frame().T for row in rows]]).infer_objects()
         result.columns = self._schema.get_column_names()
         return Table(result)
 
@@ -568,9 +558,7 @@ class Table:
         if len(invalid_columns) != 0:
             raise UnknownColumnNameError(invalid_columns)
         transformed_data = self._data.drop(labels=column_indices, axis="columns")
-        transformed_data.columns = list(
-            name for name in self._schema.get_column_names() if name not in column_names
-        )
+        transformed_data.columns = list(name for name in self._schema.get_column_names() if name not in column_names)
         return Table(transformed_data)
 
     def drop_columns_with_missing_values(self) -> Table:
@@ -582,9 +570,7 @@ class Table:
         table : Table
             A table without the columns that contain missing values.
         """
-        return Table.from_columns(
-            [column for column in self.to_columns() if not column.has_missing_values()]
-        )
+        return Table.from_columns([column for column in self.to_columns() if not column.has_missing_values()])
 
     def drop_columns_with_non_numerical_values(self) -> Table:
         """
@@ -596,9 +582,7 @@ class Table:
             A table without the columns that contain non-numerical values.
 
         """
-        return Table.from_columns(
-            [column for column in self.to_columns() if column.type.is_numeric()]
-        )
+        return Table.from_columns([column for column in self.to_columns() if column.type.is_numeric()])
 
     def drop_duplicate_rows(self) -> Table:
         """
@@ -642,9 +626,7 @@ class Table:
         copy = self._data.copy(deep=True)
 
         table_without_nonnumericals = self.drop_columns_with_non_numerical_values()
-        z_scores = np.absolute(
-            stats.zscore(table_without_nonnumericals._data, nan_policy="omit")
-        )
+        z_scores = np.absolute(stats.zscore(table_without_nonnumericals._data, nan_policy="omit"))
         filter_ = ((z_scores < 3) | np.isnan(z_scores)).all(axis=1)
 
         return Table(copy[filter_], self._schema)
@@ -699,9 +681,7 @@ class Table:
         if len(invalid_columns) != 0:
             raise UnknownColumnNameError(invalid_columns)
         transformed_data = self._data[column_indices]
-        transformed_data.columns = list(
-            name for name in self._schema.get_column_names() if name in column_names
-        )
+        transformed_data.columns = list(name for name in self._schema.get_column_names() if name in column_names)
         return Table(transformed_data)
 
     def rename_column(self, old_name: str, new_name: str) -> Table:
@@ -769,10 +749,7 @@ class Table:
         if old_column_name not in self._schema.get_column_names():
             raise UnknownColumnNameError([old_column_name])
 
-        if (
-            new_column.name in self._schema.get_column_names()
-            and new_column.name != old_column_name
-        ):
+        if new_column.name in self._schema.get_column_names() and new_column.name != old_column_name:
             raise DuplicateColumnNameError(new_column.name)
 
         if self.count_rows() != new_column._data.size:
@@ -838,13 +815,7 @@ class Table:
         if end is None:
             end = self.count_rows()
 
-        if (
-            start < 0
-            or end < 0
-            or start >= self.count_rows()
-            or end > self.count_rows()
-            or end < start
-        ):
+        if start < 0 or end < 0 or start >= self.count_rows() or end > self.count_rows() or end < start:
             raise ValueError("the given index is out of bounds")
 
         new_df = self._data.iloc[start:end:step]
@@ -853,9 +824,7 @@ class Table:
 
     def sort_columns(
         self,
-        comparator: Callable[[Column, Column], int] = lambda col1, col2: (
-            col1.name > col2.name
-        )
+        comparator: Callable[[Column, Column], int] = lambda col1, col2: (col1.name > col2.name)
         - (col1.name < col2.name),
     ) -> Table:
         """
@@ -891,9 +860,9 @@ class Table:
 
         The comparator is a function that takes two rows `row1` and `row2` and returns an integer:
 
-        * If `col1` should be ordered before `col2`, the function should return a negative number.
-        * If `col1` should be ordered after `col2`, the function should return a positive number.
-        * If the original order of `col1` and `col2` should be kept, the function should return 0.
+        * If `row1` should be ordered before `row2`, the function should return a negative number.
+        * If `row1` should be ordered after `row2`, the function should return a positive number.
+        * If the original order of `row1` and `row2` should be kept, the function should return 0.
 
         Parameters
         ----------
@@ -933,9 +902,7 @@ class Table:
             self.slice(round(percentage_in_first * self.count_rows())),
         )
 
-    def transform_column(
-        self, name: str, transformer: Callable[[Row], typing.Any]
-    ) -> Table:
+    def transform_column(self, name: str, transformer: Callable[[Row], typing.Any]) -> Table:
         """
         Transform provided column by calling provided transformer.
 
@@ -1103,9 +1070,7 @@ class Table:
         rows : list[Row]
             List of rows.
         """
-        return [
-            Row(series_row, self._schema) for (_, series_row) in self._data.iterrows()
-        ]
+        return [Row(series_row, self._schema) for (_, series_row) in self._data.iterrows()]
 
     # ------------------------------------------------------------------------------------------------------------------
     # Other
@@ -1123,7 +1088,5 @@ class Table:
         tmp = self._data.copy(deep=True)
         tmp.columns = self.get_column_names()
 
-        with pd.option_context(
-            "display.max_rows", tmp.shape[0], "display.max_columns", tmp.shape[1]
-        ):
+        with pd.option_context("display.max_rows", tmp.shape[0], "display.max_columns", tmp.shape[1]):
             return display(tmp)
