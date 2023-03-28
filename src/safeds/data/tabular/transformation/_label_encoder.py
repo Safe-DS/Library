@@ -3,11 +3,12 @@ from __future__ import annotations
 import warnings
 from typing import Any, Optional
 
-from sklearn.preprocessing import OrdinalEncoder as sk_OrdinalEncoder
-
 from safeds.data.tabular.containers import Table
-from safeds.data.tabular.transformation._table_transformer import InvertibleTableTransformer
+from safeds.data.tabular.transformation._table_transformer import (
+    InvertibleTableTransformer,
+)
 from safeds.exceptions import NotFittedError, UnknownColumnNameError
+from sklearn.preprocessing import OrdinalEncoder as sk_OrdinalEncoder
 
 
 def warn(*_: Any, **__: Any) -> None:
@@ -50,9 +51,7 @@ class LabelEncoder(InvertibleTableTransformer):
             if len(missing_columns) > 0:
                 raise UnknownColumnNameError(list(missing_columns))
 
-        indices = [
-            table.schema._get_column_index_by_name(name) for name in column_names
-        ]
+        indices = [table.schema._get_column_index_by_name(name) for name in column_names]
 
         wrapped_transformer = sk_OrdinalEncoder()
         wrapped_transformer.fit(table._data[indices])

@@ -4,11 +4,10 @@ from abc import ABC, abstractmethod
 from typing import Any, Optional
 
 import pandas as pd
-from sklearn.impute import SimpleImputer as sk_SimpleImputer
-
 from safeds.data.tabular.containers import Table
 from safeds.data.tabular.transformation._table_transformer import TableTransformer
 from safeds.exceptions import NotFittedError, UnknownColumnNameError
+from sklearn.impute import SimpleImputer as sk_SimpleImputer
 
 
 class ImputerStrategy(ABC):
@@ -114,13 +113,9 @@ class Imputer(TableTransformer):
         if isinstance(self._strategy, Imputer.Strategy.Mode):
             for name in column_names:
                 if len(table.get_column(name).mode()) > 1:
-                    raise IndexError(
-                        "There are multiple most frequent values in a column given for the Imputer"
-                    )
+                    raise IndexError("There are multiple most frequent values in a column given for the Imputer")
 
-        indices = [
-            table.schema._get_column_index_by_name(name) for name in column_names
-        ]
+        indices = [table.schema._get_column_index_by_name(name) for name in column_names]
 
         wrapped_transformer = sk_SimpleImputer()
         self._strategy._augment_imputer(wrapped_transformer)
@@ -163,10 +158,6 @@ class Imputer(TableTransformer):
             raise UnknownColumnNameError(list(missing_columns))
 
         data = table._data.copy()
-        indices = [
-            table.schema._get_column_index_by_name(name) for name in self._column_names
-        ]
-        data[indices] = pd.DataFrame(
-            self._wrapped_transformer.transform(data[indices]), columns=indices
-        )
+        indices = [table.schema._get_column_index_by_name(name) for name in self._column_names]
+        data[indices] = pd.DataFrame(self._wrapped_transformer.transform(data[indices]), columns=indices)
         return Table(data, table.schema)
