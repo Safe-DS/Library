@@ -86,29 +86,17 @@ class OneHotEncoder(InvertibleTableTransformer):
         if len(missing_columns) > 0:
             raise UnknownColumnNameError(list(missing_columns))
 
-        data = table._data.copy()
-        indices = [
-            table.schema._get_column_index_by_name(name) for name in self._column_names
-        ]
-        data[indices] = pd.DataFrame(
-            self._wrapped_transformer.transform(data[indices]), columns=indices
-        )
-        return Table(data, table.schema)
+        original = table._data.copy()
+        original.columns = table.schema.get_column_names()
 
-        try:
-            table_k_columns = table.keep_only_columns(self._encoder.feature_names_in_)
-            df_k_columns = table_k_columns._data
-            df_k_columns.columns = table_k_columns.schema.get_column_names()
-            df_new = pd.DataFrame(self._encoder.transform(df_k_columns).toarray())
-            df_new.columns = self._encoder.get_feature_names_out()
-            df_concat = table._data.copy()
-            df_concat.columns = table.schema.get_column_names()
-            data_new = pd.concat([df_concat, df_new], axis=1).drop(
-                self._encoder.feature_names_in_, axis=1
-            )
-            return Table(data_new)
-        except Exception as exc:
-            raise NotFittedError from exc
+        one_hot_encoded = pd.DataFrame(self._wrapped_transformer.transform(original[self._column_names]).toarray())
+        one_hot_encoded.columns = self._wrapped_transformer.get_feature_names_out()
+
+        unchanged = original.drop(self._column_names, axis=1)
+
+        return Table(
+            pd.concat([unchanged, one_hot_encoded], axis=1)
+        )
 
     # noinspection PyProtectedMember
     def inverse_transform(self, transformed_table: Table) -> Table:
