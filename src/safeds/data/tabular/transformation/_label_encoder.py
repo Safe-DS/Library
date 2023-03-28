@@ -95,7 +95,7 @@ class LabelEncoder(InvertibleTableTransformer):
             raise UnknownColumnNameError(list(missing_columns))
 
         data = table._data.copy()
-        data.columns = table.schema.get_column_names()
+        data.columns = table.get_column_names()
         data[self._column_names] = self._wrapped_transformer.transform(data[self._column_names])
         return Table(data)
 

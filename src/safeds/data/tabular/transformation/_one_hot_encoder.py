@@ -43,12 +43,11 @@ class OneHotEncoder(InvertibleTableTransformer):
             if len(missing_columns) > 0:
                 raise UnknownColumnNameError(list(missing_columns))
 
-        indices = [
-            table.schema._get_column_index_by_name(name) for name in column_names
-        ]
+        data = table._data.copy()
+        data.columns = table.get_column_names()
 
         wrapped_transformer = sk_OneHotEncoder()
-        wrapped_transformer.fit(table._data[indices])
+        wrapped_transformer.fit(data[column_names])
 
         result = OneHotEncoder()
         result._wrapped_transformer = wrapped_transformer
