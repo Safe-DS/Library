@@ -4,11 +4,11 @@ import warnings
 from typing import Any, Optional
 
 from sklearn.exceptions import NotFittedError as sk_NotFittedError
-from sklearn.preprocessing import LabelEncoder as sk_LabelEncoder
+from sklearn.preprocessing import OrdinalEncoder as sk_OrdinalEncoder
 
 from safeds.data.tabular.containers import Table
 from safeds.data.tabular.transformation._table_transformer import InvertibleTableTransformer
-from safeds.exceptions import LearningError, NotFittedError
+from safeds.exceptions import NotFittedError, UnknownColumnNameError
 
 
 def warn(*_: Any, **__: Any) -> None:
@@ -21,16 +21,16 @@ warnings.warn = warn
 # noinspection PyProtectedMember
 
 
-class LabelEncoder(InvertibleTableTransformer):
+class OrdinalEncoder(InvertibleTableTransformer):
     """
-    The LabelEncoder encodes one or more given columns into labels.
+    The OrdinalEncoder encodes one or more given columns into labels.
     """
 
     def __init__(self) -> None:
-        self._wrapped_transformer: Optional[sk_LabelEncoder] = None
+        self._wrapped_transformer: Optional[sk_OrdinalEncoder] = None
         self._column_names: Optional[list[str]] = None
 
-    def fit(self, table: Table, column_names: Optional[list[str]] = None) -> LabelEncoder:
+    def fit(self, table: Table, column_names: Optional[list[str]] = None) -> OrdinalEncoder:
         """
         Learn a transformation for a set of columns in a table.
 
@@ -46,10 +46,15 @@ class LabelEncoder(InvertibleTableTransformer):
         fitted_transformer : TableTransformer
             The fitted transformer.
         """
-        try:
-            self._wrapped_transformer.fit(table.keep_only_columns(column_names)._data)
-        except sk_NotFittedError as exc:
-            raise LearningError("") from exc
+        if column_names is None:
+            column_names = table.get_column_names()
+        else:
+            missing_columns = set(column_names) - set(table.get_column_names())
+            if len(missing_columns) > 0:
+                raise UnknownColumnNameError(list(missing_columns))
+
+        self._wrapped_transformer.fit(table.keep_only_columns(column_names)._data)
+
 
     def transform(self, table: Table) -> Table:
         """

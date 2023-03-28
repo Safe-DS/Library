@@ -3,7 +3,7 @@ from typing import Optional
 import pytest
 
 from safeds.data.tabular.containers import Table, Column
-from safeds.data.tabular.transformation import LabelEncoder
+from safeds.data.tabular.transformation import OrdinalEncoder
 from safeds.exceptions import UnknownColumnNameError, NotFittedError
 
 
@@ -14,14 +14,14 @@ class TestFit:
         ])
 
         with pytest.raises(UnknownColumnNameError):
-            LabelEncoder().fit(table, ["col2"])
+            OrdinalEncoder().fit(table, ["col2"])
 
     def test_should_not_change_original_transformer(self) -> None:
         table = Table.from_columns([
             Column("col1", ["a", "b", "c"]),
         ])
 
-        transformer = LabelEncoder()
+        transformer = OrdinalEncoder()
         transformer.fit(table)
 
         assert transformer._wrapped_transformer is None
@@ -33,7 +33,7 @@ class TestTransform:
             Column("col1", ["a", "b", "c"]),
         ])
 
-        transformer = LabelEncoder().fit(table_to_fit)
+        transformer = OrdinalEncoder().fit(table_to_fit)
 
         table_to_transform = Table.from_columns([
             Column("col2", ["a", "b", "c"]),
@@ -47,7 +47,7 @@ class TestTransform:
             Column("col1", ["a", "b", "c"]),
         ])
 
-        transformer = LabelEncoder()
+        transformer = OrdinalEncoder()
 
         with pytest.raises(NotFittedError):
             transformer.transform(table)
@@ -85,14 +85,14 @@ class TestFitTransform:
     )
     def test_should_return_transformed_table(self, table: Table, column_names: Optional[list[str]],
                                              expected: Table) -> None:
-        assert LabelEncoder().fit_transform(table, column_names) == expected
+        assert OrdinalEncoder().fit_transform(table, column_names) == expected
 
     def test_should_not_change_original_table(self) -> None:
         table = Table.from_columns([
             Column("col1", ["a", "b", "c"]),
         ])
 
-        LabelEncoder().fit_transform(table)
+        OrdinalEncoder().fit_transform(table)
 
         expected = Table.from_columns([
             Column("col1", ["a", "b", "c"]),
@@ -113,6 +113,6 @@ class TestInverseTransform:
         ]
     )
     def test_should_return_original_table(self, table: Table) -> None:
-        transformer = LabelEncoder().fit(table)
+        transformer = OrdinalEncoder().fit(table)
 
         assert transformer.inverse_transform(transformer.transform(table)) == table

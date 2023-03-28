@@ -39,7 +39,7 @@ class OneHotEncoder(InvertibleTableTransformer):
             table_k_columns = table.keep_only_columns(column_names)
             df = table_k_columns._data
             df.columns = table_k_columns.schema.get_column_names()
-            self._encoder.fit(df)
+            self._wrapped_transformer.fit(df)
         except exceptions.NotFittedError as exc:
             raise LearningError("") from exc
 
