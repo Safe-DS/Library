@@ -5,17 +5,20 @@ from typing import Any, Optional
 
 import pandas as pd
 from safeds.data.tabular.containers import Table
-from sklearn.impute import SimpleImputer
+from sklearn.impute import SimpleImputer as sk_SimpleImputer
+
+from safeds.data.tabular.transformation._table_transformer import TableTransformer
+from safeds.exceptions import NotFittedError, UnknownColumnNameError
 
 
 class ImputerStrategy(ABC):
     @abstractmethod
-    def _augment_imputer(self, imputer: SimpleImputer) -> None:
+    def _augment_imputer(self, imputer: sk_SimpleImputer) -> None:
         pass
 
 
 # noinspection PyProtectedMember
-class Imputer:
+class Imputer(TableTransformer):
     """
     Impute the data for a given Table.
 
@@ -39,7 +42,10 @@ class Imputer:
             def __init__(self, value: Any):
                 self._value = value
 
-            def _augment_imputer(self, imputer: SimpleImputer) -> None:
+            def __str__(self) -> str:
+                return f"Constant({self._value})"
+
+            def _augment_imputer(self, imputer: sk_SimpleImputer) -> None:
                 imputer.strategy = "constant"
                 imputer.fill_value = self._value
 
@@ -48,7 +54,10 @@ class Imputer:
             An imputation strategy for imputing missing data with mean values.
             """
 
-            def _augment_imputer(self, imputer: SimpleImputer) -> None:
+            def __str__(self) -> str:
+                return "Mean"
+
+            def _augment_imputer(self, imputer: sk_SimpleImputer) -> None:
                 imputer.strategy = "mean"
 
         class Median(ImputerStrategy):
@@ -56,7 +65,10 @@ class Imputer:
             An imputation strategy for imputing missing data with median values.
             """
 
-            def _augment_imputer(self, imputer: SimpleImputer) -> None:
+            def __str__(self) -> str:
+                return "Median"
+
+            def _augment_imputer(self, imputer: sk_SimpleImputer) -> None:
                 imputer.strategy = "median"
 
         class Mode(ImputerStrategy):
@@ -64,82 +76,96 @@ class Imputer:
             An imputation strategy for imputing missing data with mode values.
             """
 
-            def _augment_imputer(self, imputer: SimpleImputer) -> None:
+            def __str__(self) -> str:
+                return "Mode"
+
+            def _augment_imputer(self, imputer: sk_SimpleImputer) -> None:
                 imputer.strategy = "most_frequent"
 
     def __init__(self, strategy: ImputerStrategy):
-        self._imp = SimpleImputer()
-        strategy._augment_imputer(self._imp)
-        self._column_names: list[str] = []
+        self._strategy = strategy
+
+        self._wrapped_transformer: Optional[sk_SimpleImputer] = None
+        self._column_names: Optional[list[str]] = None
 
     def fit(self, table: Table, column_names: Optional[list[str]] = None) -> Imputer:
         """
-        Fit the imputer on the dataset.
+        Learn a transformation for a set of columns in a table.
 
         Parameters
         ----------
         table : Table
-            The table used to learn the imputation values.
+            The table used to fit the transformer.
         column_names : Optional[list[str]]
-            An optional list of column names, if the imputer is only supposed to run on specific columns.
-        """
-        if column_names is None:
-            column_names = table.get_column_names()
-
-        if self._imp.strategy == "most_frequent":
-            for name in column_names:
-                if len(table.get_column(name).mode()) > 1:
-                    raise IndexError(
-                        "There are multiple frequent values in a column given for the Imputer"
-                    )
-
-        self._column_names = column_names
-        indices = [
-            table.schema._get_column_index_by_name(name) for name in self._column_names
-        ]
-        self._imp.fit(table._data[indices])
-
-    def transform(self, table: Table) -> Table:
-        """
-        Impute the missing values on the dataset.
-
-        Parameters
-        ----------
-        table : Table
-            The dataset to be imputed.
+            The list of columns from the table used to fit the transformer. If `None`, all columns are used.
 
         Returns
         -------
-        table : Table
-            The dataset with missing values imputed by the given strategy.
+        fitted_transformer : TableTransformer
+            The fitted transformer.
         """
+        if column_names is None:
+            column_names = table.get_column_names()
+        else:
+            missing_columns = set(column_names) - set(table.get_column_names())
+            if len(missing_columns) > 0:
+                raise UnknownColumnNameError(list(missing_columns))
+
+        if isinstance(self._strategy, Imputer.Strategy.Mode):
+            for name in column_names:
+                if len(table.get_column(name).mode()) > 1:
+                    raise IndexError(
+                        "There are multiple most frequent values in a column given for the Imputer"
+                    )
+
+        indices = [
+            table.schema._get_column_index_by_name(name) for name in column_names
+        ]
+
+        wrapped_transformer = sk_SimpleImputer()
+        self._strategy._augment_imputer(wrapped_transformer)
+        wrapped_transformer.fit(table._data[indices])
+
+        result = Imputer(self._strategy)
+        result._column_names = column_names
+        result._wrapped_transformer = wrapped_transformer
+
+        return result
+
+    def transform(self, table: Table) -> Table:
+        """
+        Apply the learned transformation to a table.
+
+        Parameters
+        ----------
+        table : Table
+            The table to which the learned transformation is applied.
+
+        Returns
+        -------
+        transformed_table : Table
+            The transformed table.
+
+        Raises
+        ----------
+        NotFittedError
+            If the transformer has not been fitted yet.
+        """
+
+        # Transformer has not been fitted yet
+        if self._wrapped_transformer is None or self._column_names is None:
+            raise NotFittedError()
+
+        # Input table does not contain all columns used to fit the transformer
+        missing_columns = set(self._column_names) - set(table.get_column_names())
+        if len(missing_columns) > 0:
+            raise UnknownColumnNameError(list(missing_columns))
+
         data = table._data.copy()
         indices = [
             table.schema._get_column_index_by_name(name) for name in self._column_names
         ]
         data[indices] = pd.DataFrame(
-            self._imp.transform(data[indices]), columns=indices
+            self._wrapped_transformer.transform(data[indices]), columns=indices
         )
         return Table(data, table.schema)
-
-    def fit_transform(
-        self, table: Table, column_names: Optional[list[str]] = None
-    ) -> tuple[Table, Imputer]:
-        """
-        Fit the imputer on the dataset and impute the missing values.
-
-        Parameters
-        ----------
-        table : Table
-            The table used to learn the imputation values.
-        column_names : Optional[list[str]]
-            An optional list of column names, if the imputer is only supposed to run on specific columns.
-
-        Returns
-        -------
-        table : Table
-            The dataset with missing values imputed by the given strategy.
-        """
-        fitted_transformer = self.fit(table, column_names)
-        transformed_table = fitted_transformer.transform(table)
-        return transformed_table, fitted_transformer

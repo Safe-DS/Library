@@ -1,38 +1,42 @@
 from __future__ import annotations
 
+from typing import Optional
+
 import pandas as pd
 from safeds.data.tabular.containers import Table
+from safeds.data.tabular.transformation._table_transformer import InvertibleTableTransformer
 from safeds.exceptions import LearningError, NotFittedError
 from sklearn import exceptions
-from sklearn.preprocessing import OneHotEncoder as OHE_sklearn
+from sklearn.preprocessing import OneHotEncoder as sk_OneHotEncoder
 
 
-class OneHotEncoder:
+class OneHotEncoder(InvertibleTableTransformer):
     """
     The OneHotEncoder encodes categorical columns to numerical features [0,1] that represent the existence for each value.
     """
 
     def __init__(self) -> None:
-        self._encoder = OHE_sklearn()
+        self._wrapped_transformer: Optional[sk_OneHotEncoder] = None
+        self._column_names: Optional[list[str]] = None
 
-    def fit(self, table: Table, columns: list[str]) -> OneHotEncoder:
+    def fit(self, table: Table, column_names: Optional[list[str]] = None) -> OneHotEncoder:
         """
-        Fit the encoder to a table.
+        Learn a transformation for a set of columns in a table.
 
         Parameters
         ----------
         table : Table
-            The table used to fit the encoder.
-        columns : list[str]:
-            The list of columns from the table used to fit the encoder.
+            The table used to fit the transformer.
+        column_names : Optional[list[str]]
+            The list of columns from the table used to fit the transformer. If `None`, all columns are used.
 
-        Raises
-        ----------
-        LearningError
-            If there was an error during fitting.
+        Returns
+        -------
+        fitted_transformer : TableTransformer
+            The fitted transformer.
         """
         try:
-            table_k_columns = table.keep_only_columns(column_names=columns)
+            table_k_columns = table.keep_only_columns(column_names)
             df = table_k_columns._data
             df.columns = table_k_columns.schema.get_column_names()
             self._encoder.fit(df)
@@ -41,22 +45,22 @@ class OneHotEncoder:
 
     def transform(self, table: Table) -> Table:
         """
-        Transform the data with the trained encoder.
+        Apply the learned transformation to a table.
 
         Parameters
         ----------
         table : Table
-            The data to be transformed.
+            The table to which the learned transformation is applied.
 
         Returns
-        ----------
-        table : Table
+        -------
+        transformed_table : Table
             The transformed table.
 
         Raises
         ----------
         NotFittedError
-            If the encoder wasn't fitted before transforming.
+            If the transformer has not been fitted yet.
         """
         try:
             table_k_columns = table.keep_only_columns(self._encoder.feature_names_in_)
@@ -73,54 +77,33 @@ class OneHotEncoder:
         except Exception as exc:
             raise NotFittedError from exc
 
-    def fit_transform(self, table: Table, columns: list[str]) -> tuple[Table, OneHotEncoder]:
+    def inverse_transform(self, transformed_table: Table) -> Table:
         """
-        Fit and transform data with a OneHotEncoder.
+        Undo the learned transformation.
 
         Parameters
         ----------
-        table : Table
-            The table used to fit the encoder and subsequently to be transformed
-        columns : list[str]:
-            The list of columns from the table used to fit the encoder and subsequently to be transformed.
+        transformed_table : Table
+            The table to be transformed back to the original version.
 
         Returns
-        ----------
+        -------
         table : Table
-            The transformed table.
-
-        """
-        self.fit(table, columns)
-        return self.transform(table)
-
-    def inverse_transform(self, table: Table) -> Table:
-        """
-        Reset a transformed table to its original state.
-
-        Parameters
-        ----------
-        table : Table
-            The table to be inverse-transformed.
-
-        Returns
-        ----------
-        table : Table
-            The inverse-transformed table.
+            The original table.
 
         Raises
         ----------
         NotFittedError
-            If the encoder wasn't fitted before transforming.
-
+            If the transformer has not been fitted yet.
         """
         try:
             data = self._encoder.inverse_transform(
-                table.keep_only_columns(self._encoder.get_feature_names_out())._data
+                transformed_table.keep_only_columns(self._encoder.get_feature_names_out())._data
             )
             df = pd.DataFrame(data)
             df.columns = self._encoder.feature_names_in_
             new_table = Table(df)
-            for col in table.drop_columns(
+            for col in transformed_table.drop_columns(
                 self._encoder.get_feature_names_out()
             ).to_columns():
                 new_table = new_table.add_column(col)

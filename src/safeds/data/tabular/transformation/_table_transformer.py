@@ -51,9 +51,10 @@ class TableTransformer(ABC):
             If the transformer has not been fitted yet.
         """
 
-    def fit_transform(self, table: Table, column_names: Optional[list[str]] = None) -> tuple[Table, TableTransformer]:
+    def fit_transform(self, table: Table, column_names: Optional[list[str]] = None) -> Table:
         """
         Learn a transformation for a set of columns in a table and apply the learned transformation to the same table.
+        If you also need the fitted transformer, use `fit` and `transform` separately.
 
         Parameters
         ----------
@@ -66,15 +67,11 @@ class TableTransformer(ABC):
         -------
         transformed_table : Table
             The transformed table.
-        fitted_transformer : TableTransformer
-            The fitted transformer.
         """
-        fitted_transformer = self.fit(table, column_names)
-        transformed_table = fitted_transformer.transform(table)
-        return transformed_table, fitted_transformer
+        return self.fit(table, column_names).transform(table)
 
 
-class InvertibleTableTransformer(ABC, TableTransformer):
+class InvertibleTableTransformer(TableTransformer):
     """
     An `InvertibleTableTransformer` is a `TableTransformer` that can also undo the learned transformation after it has
     been applied.
