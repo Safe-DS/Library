@@ -5,7 +5,7 @@ from typing import Optional
 import pandas as pd
 from safeds.data.tabular.containers import Table
 from safeds.data.tabular.transformation._table_transformer import InvertibleTableTransformer
-from safeds.exceptions import LearningError, NotFittedError
+from safeds.exceptions import LearningError, NotFittedError, UnknownColumnNameError
 from sklearn import exceptions
 from sklearn.preprocessing import OneHotEncoder as sk_OneHotEncoder
 
@@ -19,6 +19,7 @@ class OneHotEncoder(InvertibleTableTransformer):
         self._wrapped_transformer: Optional[sk_OneHotEncoder] = None
         self._column_names: Optional[list[str]] = None
 
+    # noinspection PyProtectedMember
     def fit(self, table: Table, column_names: Optional[list[str]] = None) -> OneHotEncoder:
         """
         Learn a transformation for a set of columns in a table.
@@ -35,14 +36,27 @@ class OneHotEncoder(InvertibleTableTransformer):
         fitted_transformer : TableTransformer
             The fitted transformer.
         """
-        try:
-            table_k_columns = table.keep_only_columns(column_names)
-            df = table_k_columns._data
-            df.columns = table_k_columns.schema.get_column_names()
-            self._wrapped_transformer.fit(df)
-        except exceptions.NotFittedError as exc:
-            raise LearningError("") from exc
+        if column_names is None:
+            column_names = table.get_column_names()
+        else:
+            missing_columns = set(column_names) - set(table.get_column_names())
+            if len(missing_columns) > 0:
+                raise UnknownColumnNameError(list(missing_columns))
 
+        indices = [
+            table.schema._get_column_index_by_name(name) for name in column_names
+        ]
+
+        wrapped_transformer = sk_OneHotEncoder()
+        wrapped_transformer.fit(table._data[indices])
+
+        result = OneHotEncoder()
+        result._wrapped_transformer = wrapped_transformer
+        result._column_names = column_names
+
+        return result
+
+    # noinspection PyProtectedMember
     def transform(self, table: Table) -> Table:
         """
         Apply the learned transformation to a table.
@@ -62,6 +76,25 @@ class OneHotEncoder(InvertibleTableTransformer):
         NotFittedError
             If the transformer has not been fitted yet.
         """
+
+        # Transformer has not been fitted yet
+        if self._wrapped_transformer is None or self._column_names is None:
+            raise NotFittedError()
+
+        # Input table does not contain all columns used to fit the transformer
+        missing_columns = set(self._column_names) - set(table.get_column_names())
+        if len(missing_columns) > 0:
+            raise UnknownColumnNameError(list(missing_columns))
+
+        data = table._data.copy()
+        indices = [
+            table.schema._get_column_index_by_name(name) for name in self._column_names
+        ]
+        data[indices] = pd.DataFrame(
+            self._wrapped_transformer.transform(data[indices]), columns=indices
+        )
+        return Table(data, table.schema)
+
         try:
             table_k_columns = table.keep_only_columns(self._encoder.feature_names_in_)
             df_k_columns = table_k_columns._data
@@ -77,6 +110,7 @@ class OneHotEncoder(InvertibleTableTransformer):
         except Exception as exc:
             raise NotFittedError from exc
 
+    # noinspection PyProtectedMember
     def inverse_transform(self, transformed_table: Table) -> Table:
         """
         Undo the learned transformation.
@@ -96,15 +130,19 @@ class OneHotEncoder(InvertibleTableTransformer):
         NotFittedError
             If the transformer has not been fitted yet.
         """
+        # Transformer has not been fitted yet
+        if self._wrapped_transformer is None or self._column_names is None:
+            raise NotFittedError()
+
         try:
-            data = self._encoder.inverse_transform(
-                transformed_table.keep_only_columns(self._encoder.get_feature_names_out())._data
+            data = self._wrapped_transformer.inverse_transform(
+                transformed_table.keep_only_columns(self._wrapped_transformer.get_feature_names_out())._data
             )
             df = pd.DataFrame(data)
-            df.columns = self._encoder.feature_names_in_
+            df.columns = self._wrapped_transformer.feature_names_in_
             new_table = Table(df)
             for col in transformed_table.drop_columns(
-                self._encoder.get_feature_names_out()
+                self._wrapped_transformer.get_feature_names_out()
             ).to_columns():
                 new_table = new_table.add_column(col)
             return new_table

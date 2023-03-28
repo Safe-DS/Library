@@ -25,6 +25,7 @@ class TestFit:
         transformer.fit(table)
 
         assert transformer._wrapped_transformer is None
+        assert transformer._column_names is None
 
 
 class TestTransform:

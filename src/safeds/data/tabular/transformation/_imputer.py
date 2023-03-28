@@ -17,7 +17,6 @@ class ImputerStrategy(ABC):
         pass
 
 
-# noinspection PyProtectedMember
 class Imputer(TableTransformer):
     """
     Impute the data for a given Table.
@@ -88,6 +87,7 @@ class Imputer(TableTransformer):
         self._wrapped_transformer: Optional[sk_SimpleImputer] = None
         self._column_names: Optional[list[str]] = None
 
+    # noinspection PyProtectedMember
     def fit(self, table: Table, column_names: Optional[list[str]] = None) -> Imputer:
         """
         Learn a transformation for a set of columns in a table.
@@ -127,11 +127,12 @@ class Imputer(TableTransformer):
         wrapped_transformer.fit(table._data[indices])
 
         result = Imputer(self._strategy)
-        result._column_names = column_names
         result._wrapped_transformer = wrapped_transformer
+        result._column_names = column_names
 
         return result
 
+    # noinspection PyProtectedMember
     def transform(self, table: Table) -> Table:
         """
         Apply the learned transformation to a table.
