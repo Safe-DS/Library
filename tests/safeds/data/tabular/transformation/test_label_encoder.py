@@ -123,7 +123,7 @@ class TestInverseTransform:
 
         expected = Table.from_columns([
             Column("col1", [0.0, 1.0, 2.0]),
-        ]),
+        ])
 
         assert transformed_table == expected
 

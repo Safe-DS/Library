@@ -95,12 +95,8 @@ class LabelEncoder(InvertibleTableTransformer):
             raise UnknownColumnNameError(list(missing_columns))
 
         data = table._data.copy()
-        indices = [
-            table.schema._get_column_index_by_name(name) for name in self._column_names
-        ]
-        data[indices] = pd.DataFrame(
-            self._wrapped_transformer.transform(data[indices]), columns=indices
-        )
+        data.columns = table.schema.get_column_names()
+        data[self._column_names] = self._wrapped_transformer.transform(data[self._column_names])
         return Table(data)
 
     def inverse_transform(self, transformed_table: Table) -> Table:
@@ -127,10 +123,7 @@ class LabelEncoder(InvertibleTableTransformer):
         if self._wrapped_transformer is None or self._column_names is None:
             raise NotFittedError()
 
-        try:
-            p_df = transformed_table._data.copy()
-            p_df.columns = transformed_table.schema.get_column_names()
-            p_df[self._column_names] = self._wrapped_transformer.inverse_transform(p_df[self._column_names])
-            return Table(p_df)
-        except sk_NotFittedError as exc:
-            raise NotFittedError from exc
+        data = transformed_table._data.copy()
+        data.columns = transformed_table.get_column_names()
+        data[self._column_names] = self._wrapped_transformer.inverse_transform(data[self._column_names])
+        return Table(data)
