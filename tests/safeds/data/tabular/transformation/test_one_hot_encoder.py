@@ -126,10 +126,10 @@ class TestInverseTransform:
         transformer.inverse_transform(transformed_table)
 
         expected = Table.from_columns([
-            Column("a", [1.0, 0.0, 0.0, 0.0]),
-            Column("b", [0.0, 1.0, 1.0, 0.0]),
-            Column("c", [0.0, 0.0, 0.0, 1.0]),
-        ]),
+            Column("x0_a", [1.0, 0.0, 0.0, 0.0]),
+            Column("x0_b", [0.0, 1.0, 1.0, 0.0]),
+            Column("x0_c", [0.0, 0.0, 0.0, 1.0]),
+        ])
 
         assert transformed_table == expected
 

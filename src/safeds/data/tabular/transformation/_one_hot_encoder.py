@@ -122,17 +122,15 @@ class OneHotEncoder(InvertibleTableTransformer):
         if self._wrapped_transformer is None or self._column_names is None:
             raise NotFittedError()
 
-        try:
-            data = self._wrapped_transformer.inverse_transform(
-                transformed_table.keep_only_columns(self._wrapped_transformer.get_feature_names_out())._data
-            )
-            df = pd.DataFrame(data)
-            df.columns = self._wrapped_transformer.feature_names_in_
-            new_table = Table(df)
-            for col in transformed_table.drop_columns(
-                self._wrapped_transformer.get_feature_names_out()
-            ).to_columns():
-                new_table = new_table.add_column(col)
-            return new_table
-        except exceptions.NotFittedError as exc:
-            raise NotFittedError from exc
+        data = transformed_table._data.copy()
+        data.columns = transformed_table.get_column_names()
+
+        decoded = pd.DataFrame(
+            self._wrapped_transformer.inverse_transform(transformed_table._data),
+            columns=self._column_names
+        )
+        unchanged = data.drop(self._wrapped_transformer.get_feature_names_out(), axis=1)
+
+        return Table(
+            pd.concat([unchanged, decoded], axis=1)
+        )
