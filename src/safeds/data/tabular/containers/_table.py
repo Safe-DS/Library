@@ -891,9 +891,9 @@ class Table:
 
         The comparator is a function that takes two rows `row1` and `row2` and returns an integer:
 
-        * If `col1` should be ordered before `col2`, the function should return a negative number.
-        * If `col1` should be ordered after `col2`, the function should return a positive number.
-        * If the original order of `col1` and `col2` should be kept, the function should return 0.
+        * If `row1` should be ordered before `row2`, the function should return a negative number.
+        * If `row1` should be ordered after `row2`, the function should return a positive number.
+        * If the original order of `row1` and `row2` should be kept, the function should return 0.
 
         Parameters
         ----------
