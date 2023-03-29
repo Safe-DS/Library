@@ -1,9 +1,10 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
 
-from safeds.data.tabular.containers import Table
+if TYPE_CHECKING:
+    from safeds.data.tabular.containers import Table
 
 
 class TableTransformer(ABC):

@@ -1,7 +1,7 @@
 import pytest
 from safeds.data.tabular.containers import Table
 from safeds.exceptions import IndexOutOfBoundsError
-from tests.fixtures import resolve_resource_path
+from tests.helpers import resolve_resource_path
 
 
 def test_get_row() -> None:

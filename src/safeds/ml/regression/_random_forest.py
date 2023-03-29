@@ -16,6 +16,7 @@ class RandomForest(Regressor):
 
     def __init__(self) -> None:
         self._wrapped_regressor: Optional[sk_RandomForestRegressor] = None
+        self._feature_names: Optional[list[str]] = None
         self._target_name: Optional[str] = None
 
     def fit(self, training_set: TaggedTable) -> RandomForest:
@@ -44,6 +45,7 @@ class RandomForest(Regressor):
 
         result = RandomForest()
         result._wrapped_regressor = wrapped_regressor
+        result._feature_names = training_set.features.get_column_names()
         result._target_name = training_set.target.name
 
         return result
@@ -67,4 +69,4 @@ class RandomForest(Regressor):
         PredictionError
             If prediction with the given dataset failed.
         """
-        return predict(self._wrapped_regressor, dataset, self._target_name)
+        return predict(self._wrapped_regressor, dataset, self._feature_names, self._target_name)

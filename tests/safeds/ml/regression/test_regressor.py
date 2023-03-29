@@ -32,7 +32,7 @@ class DummyRegressor(Regressor):
         feature = predicted.rename("feature")
         dataset = Table.from_columns([feature, predicted])
 
-        return TaggedTable(dataset, target_name="predicted")
+        return dataset.tag_columns(target_name="predicted")
 
 
 class TestMeanAbsoluteError:
@@ -49,8 +49,7 @@ class TestMeanAbsoluteError:
     def test_valid_data(self, predicted: list[float], expected: list[float], result: float) -> None:
         predicted_column = Column("predicted", predicted)
         expected_column = Column("expected", expected)
-        table = TaggedTable(
-            Table.from_columns([predicted_column, expected_column]),
+        table = Table.from_columns([predicted_column, expected_column]).tag_columns(
             target_name="expected",
         )
 
@@ -65,8 +64,7 @@ class TestMeanSquaredError:
     def test_valid_data(self, predicted: list[float], expected: list[float], result: float) -> None:
         predicted_column = Column("predicted", predicted)
         expected_column = Column("expected", expected)
-        table = TaggedTable(
-            Table.from_columns([predicted_column, expected_column]),
+        table = Table.from_columns([predicted_column, expected_column]).tag_columns(
             target_name="expected",
         )
 

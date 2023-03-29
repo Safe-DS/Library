@@ -1,7 +1,8 @@
-from IPython.core.display_functions import DisplayHandle
+from typing import Iterable, Optional
 
-from ._column import Column
-from ._table import Table
+from IPython.core.display_functions import DisplayHandle
+from safeds.data.tabular.containers import Column, Table
+from safeds.data.tabular.typing import TableSchema
 
 
 class TaggedTable(Table):
@@ -10,34 +11,56 @@ class TaggedTable(Table):
 
     Parameters
     ----------
-    table : Table
-        The table used to derive the features and target.
+    data : Iterable
+        The data.
     target_name : str
         Name of the target column.
+    feature_names : Optional[list[str]]
+        Names of the feature columns. If None, all columns except the target column are used.
+    schema : Optional[TableSchema]
+        The schema of the table. If not specified, the schema will be inferred from the data.
     """
 
-    def __init__(self, table: Table, target_name: str):
-        super().__init__(table._data)
+    def __init__(
+        self,
+        data: Iterable,
+        target_name: str,
+        feature_names: Optional[list[str]] = None,
+        schema: Optional[TableSchema] = None,
+    ):
+        super().__init__(data, schema)
 
-        self._y: Column = table.get_column(target_name)
-        self._X: Table = table.drop_columns([target_name])
+        # If no feature names are specified, use all columns except the target column
+        if feature_names is None:
+            feature_names = self.get_column_names()
+            if target_name in feature_names:
+                feature_names.remove(target_name)
+
+        # Validate inputs
+        if target_name in feature_names:
+            raise ValueError(f"Column '{target_name}' cannot be both feature and target.")
+        if len(feature_names) == 0:
+            raise ValueError("At least one feature column must be specified.")
+
+        self._features: Table = self.keep_only_columns(feature_names)
+        self._target: Column = self.get_column(target_name)
 
     @property
     def features(self) -> Table:
-        return self._X
+        return self._features
 
     @property
     def target(self) -> Column:
-        return self._y
+        return self._target
 
     def __repr__(self) -> str:
-        tmp = self._X.add_column(self._y)
-        header_info = "Target Column is '" + self._y.name + "'\n"
+        tmp = self._features.add_column(self._target)
+        header_info = "Target Column is '" + self._target.name + "'\n"
         return header_info + tmp.__repr__()
 
     def __str__(self) -> str:
-        tmp = self._X.add_column(self._y)
-        header_info = "Target Column is '" + self._y.name + "'\n"
+        tmp = self._features.add_column(self._target)
+        header_info = "Target Column is '" + self._target.name + "'\n"
         return header_info + tmp.__str__()
 
     def _ipython_display_(self) -> DisplayHandle:
@@ -49,7 +72,7 @@ class TaggedTable(Table):
         output : DisplayHandle
             Output object.
         """
-        tmp = self._X.add_column(self._y)
-        header_info = "Target Column is '" + self._y.name + "'\n"
+        tmp = self._features.add_column(self._target)
+        header_info = "Target Column is '" + self._target.name + "'\n"
         print(header_info)
         return tmp._ipython_display_()

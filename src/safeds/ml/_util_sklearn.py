@@ -29,12 +29,10 @@ def fit(model: Any, tagged_table: TaggedTable) -> None:
         )
     except ValueError as exception:
         raise LearningError(str(exception)) from exception
-    except Exception as exception:
-        raise LearningError(None) from exception
 
 
 # noinspection PyProtectedMember
-def predict(model: Any, dataset: Table, target_name: Optional[str]) -> TaggedTable:
+def predict(model: Any, dataset: Table, feature_names: Optional[list[str]], target_name: Optional[str]) -> TaggedTable:
     """
     Predict a target vector using a dataset containing feature vectors. The model has to be trained first.
 
@@ -44,8 +42,10 @@ def predict(model: Any, dataset: Table, target_name: Optional[str]) -> TaggedTab
         Classifier or regressor from scikit-learn.
     dataset : Table
         The dataset containing the features.
-    target_name : str
+    target_name : Optional[str]
         The name of the target column.
+    feature_names : Optional[list[str]]
+        The names of the feature columns.
 
     Returns
     -------
@@ -58,23 +58,20 @@ def predict(model: Any, dataset: Table, target_name: Optional[str]) -> TaggedTab
         If predicting with the given dataset failed.
     """
 
-    if model is None or target_name is None:
+    if model is None or target_name is None or feature_names is None:
         raise PredictionError("The model was not trained")
 
-    dataset_df = dataset._data
-    dataset_df.columns = dataset.schema.get_column_names()
+    dataset_df = dataset.keep_only_columns(feature_names)._data
+    dataset_df.columns = feature_names
     try:
         predicted_target_vector = model.predict(dataset_df.values)
-        result_set = dataset_df.copy(deep=True)
+        result_set = dataset._data.copy(deep=True)
+        result_set.columns = dataset.get_column_names()
         if target_name in result_set.columns:
-            raise ValueError(
-                f"Dataset already contains '{target_name}' column. Please rename this column"
-            )
+            raise ValueError(f"Dataset already contains '{target_name}' column. Please rename this column")
         result_set[target_name] = predicted_target_vector
-        return TaggedTable(Table(result_set), target_name=target_name)
+        return Table(result_set).tag_columns(target_name=target_name, feature_names=feature_names)
     except NotFittedError as exception:
         raise PredictionError("The model was not trained") from exception
     except ValueError as exception:
         raise PredictionError(str(exception)) from exception
-    except Exception as exception:
-        raise PredictionError(None) from exception

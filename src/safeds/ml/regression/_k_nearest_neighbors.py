@@ -23,6 +23,7 @@ class KNearestNeighbors(Regressor):
         self._n_neighbors = n_neighbors
 
         self._wrapped_regressor: Optional[sk_KNeighborsRegressor] = None
+        self._feature_names: Optional[list[str]] = None
         self._target_name: Optional[str] = None
 
     def fit(self, training_set: TaggedTable) -> KNearestNeighbors:
@@ -51,6 +52,7 @@ class KNearestNeighbors(Regressor):
 
         result = KNearestNeighbors(self._n_neighbors)
         result._wrapped_regressor = wrapped_regressor
+        result._feature_names = training_set.features.get_column_names()
         result._target_name = training_set.target.name
 
         return result
@@ -74,4 +76,4 @@ class KNearestNeighbors(Regressor):
         PredictionError
             If prediction with the given dataset failed.
         """
-        return predict(self._wrapped_regressor, dataset, self._target_name)
+        return predict(self._wrapped_regressor, dataset, self._feature_names, self._target_name)

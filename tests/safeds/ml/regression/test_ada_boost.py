@@ -1,8 +1,7 @@
 import pytest
-from safeds.data.tabular.containers import Table, TaggedTable
+from safeds.data.tabular.containers import Column, Table, TaggedTable
 from safeds.exceptions import LearningError, PredictionError
 from safeds.ml.regression import AdaBoost, Regressor
-from tests.fixtures import resolve_resource_path
 
 
 @pytest.fixture()
@@ -12,14 +11,26 @@ def regressor() -> Regressor:
 
 @pytest.fixture()
 def valid_data() -> TaggedTable:
-    table = Table.from_csv_file(resolve_resource_path("test_ada_boost.csv"))
-    return TaggedTable(table, "T")
+    return Table.from_columns(
+        [
+            Column("id", [1, 4]),
+            Column("feat1", [2, 5]),
+            Column("feat2", [3, 6]),
+            Column("target", [0, 1]),
+        ]
+    ).tag_columns(target_name="target", feature_names=["feat1", "feat2"])
 
 
 @pytest.fixture()
 def invalid_data() -> TaggedTable:
-    table = Table.from_csv_file(resolve_resource_path("test_ada_boost_invalid.csv"))
-    return TaggedTable(table, "T")
+    return Table.from_columns(
+        [
+            Column("id", [1, 4]),
+            Column("feat1", ["a", 5]),
+            Column("feat2", [3, 6]),
+            Column("target", [0, 1]),
+        ]
+    ).tag_columns(target_name="target", feature_names=["feat1", "feat2"])
 
 
 class TestFit:
@@ -38,10 +49,15 @@ class TestPredict:
         prediction = fitted_regressor.predict(valid_data.features)
         assert prediction.features == valid_data.features
 
+    def test_should_include_complete_prediction_input(self, regressor: Regressor, valid_data: TaggedTable) -> None:
+        fitted_regressor = regressor.fit(valid_data)
+        prediction = fitted_regressor.predict(valid_data.drop_columns(["target"]))
+        assert prediction.drop_columns(["target"]) == valid_data.drop_columns(["target"])
+
     def test_should_set_correct_target_name(self, regressor: Regressor, valid_data: TaggedTable) -> None:
         fitted_regressor = regressor.fit(valid_data)
         prediction = fitted_regressor.predict(valid_data.features)
-        assert prediction.target.name == "T"
+        assert prediction.target.name == "target"
 
     def test_should_raise_when_not_fitted(self, regressor: Regressor, valid_data: TaggedTable) -> None:
         with pytest.raises(PredictionError):

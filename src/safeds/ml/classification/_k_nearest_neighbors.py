@@ -23,6 +23,7 @@ class KNearestNeighbors(Classifier):
         self._n_neighbors = n_neighbors
 
         self._wrapped_classifier: Optional[sk_KNeighborsClassifier] = None
+        self._feature_names: Optional[list[str]] = None
         self._target_name: Optional[str] = None
 
     def fit(self, training_set: TaggedTable) -> KNearestNeighbors:
@@ -50,6 +51,7 @@ class KNearestNeighbors(Classifier):
 
         result = KNearestNeighbors(self._n_neighbors)
         result._wrapped_classifier = wrapped_classifier
+        result._feature_names = training_set.features.get_column_names()
         result._target_name = training_set.target.name
 
         return result
@@ -73,8 +75,4 @@ class KNearestNeighbors(Classifier):
         PredictionError
             If prediction with the given dataset failed.
         """
-        return predict(
-            self._wrapped_classifier,
-            dataset,
-            self._target_name,
-        )
+        return predict(self._wrapped_classifier, dataset, self._feature_names, self._target_name)

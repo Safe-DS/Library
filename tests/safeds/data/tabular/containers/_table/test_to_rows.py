@@ -1,7 +1,7 @@
 import pandas as pd
 from safeds.data.tabular.containers import Row, Table
 from safeds.data.tabular.typing import IntColumnType, StringColumnType, TableSchema
-from tests.fixtures import resolve_resource_path
+from tests.helpers import resolve_resource_path
 
 
 def test_to_rows() -> None:
