@@ -2,7 +2,7 @@ import pandas as pd
 import pytest
 from safeds.data.tabular.containers import Column, Table
 from safeds.exceptions import ColumnSizeError, DuplicateColumnNameError
-from tests.fixtures import resolve_resource_path
+from tests.helpers import resolve_resource_path
 
 
 def test_table_add_column_valid() -> None:

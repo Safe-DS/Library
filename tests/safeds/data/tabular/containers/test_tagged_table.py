@@ -33,9 +33,15 @@ class TestInit:
         with pytest.raises(ValueError):
             table.tag_columns(target_name="A", feature_names=["A", "B", "C"])
 
-    def test_should_raise_if_features_are_empty(self, table: Table) -> None:
+    def test_should_raise_if_features_are_empty_explicitly(self, table: Table) -> None:
         with pytest.raises(ValueError):
             table.tag_columns(target_name="A", feature_names=[])
+
+    def test_should_raise_if_features_are_empty_implicitly(self, table: Table) -> None:
+        table = Table.from_columns([Column("A", [1, 4])])
+
+        with pytest.raises(ValueError):
+            table.tag_columns(target_name="A")
 
 
 class TestFeatures:

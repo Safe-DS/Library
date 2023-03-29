@@ -28,18 +28,21 @@ class TaggedTable(Table):
         feature_names: Optional[list[str]] = None,
         schema: Optional[TableSchema] = None,
     ):
-        # Validate input
-        if feature_names is not None:
-            if target_name in feature_names:
-                raise ValueError(f"Column '{target_name}' cannot be both feature and target.")
-            if len(feature_names) == 0:
-                raise ValueError("At least one feature column must be specified.")
-
         super().__init__(data, schema)
 
-        self._features: Table = (
-            self.drop_columns([target_name]) if feature_names is None else self.keep_only_columns(feature_names)
-        )
+        # If no feature names are specified, use all columns except the target column
+        if feature_names is None:
+            feature_names = self.get_column_names()
+            if target_name in feature_names:
+                feature_names.remove(target_name)
+
+        # Validate inputs
+        if target_name in feature_names:
+            raise ValueError(f"Column '{target_name}' cannot be both feature and target.")
+        if len(feature_names) == 0:
+            raise ValueError("At least one feature column must be specified.")
+
+        self._features: Table = self.keep_only_columns(feature_names)
         self._target: Column = self.get_column(target_name)
 
     @property

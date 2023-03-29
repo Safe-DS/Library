@@ -1,5 +1,5 @@
 from safeds.data.tabular.containers import Table
-from tests.fixtures import resolve_resource_path
+from tests.helpers import resolve_resource_path
 
 
 def test_has_column_true() -> None:

@@ -19,4 +19,4 @@ def test_predict_should_not_warn_about_feature_names() -> None:
     # No warning should be emitted
     with warnings.catch_warnings():
         warnings.filterwarnings("error", message="X has feature names")
-        fitted_model.predict(dataset=test_set)
+        fitted_model.predict(test_set)

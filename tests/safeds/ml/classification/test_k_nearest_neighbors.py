@@ -2,7 +2,7 @@ import pytest
 from safeds.data.tabular.containers import Table, TaggedTable
 from safeds.exceptions import LearningError, PredictionError
 from safeds.ml.classification import Classifier, KNearestNeighbors
-from tests.fixtures import resolve_resource_path
+from tests.helpers import resolve_resource_path
 
 
 @pytest.fixture()

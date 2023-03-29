@@ -6,7 +6,7 @@ from safeds.exceptions import (
     DuplicateColumnNameError,
     UnknownColumnNameError,
 )
-from tests.fixtures import resolve_resource_path
+from tests.helpers import resolve_resource_path
 
 
 @pytest.mark.parametrize(
