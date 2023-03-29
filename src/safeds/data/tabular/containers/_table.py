@@ -2,9 +2,8 @@ from __future__ import annotations
 
 import functools
 import os.path
-import typing
 from pathlib import Path
-from typing import Callable, Optional, Union
+from typing import Callable, Optional, Union, Iterable, Any, TYPE_CHECKING
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -12,8 +11,13 @@ import pandas as pd
 import seaborn as sns
 from IPython.core.display_functions import DisplayHandle, display
 from pandas import DataFrame, Series
-from safeds.data.tabular.containers._column import Column
-from safeds.data.tabular.containers._row import Row
+from scipy import stats
+
+if TYPE_CHECKING:
+    from ._tagged_table import TaggedTable
+
+from ._column import Column
+from ._row import Row
 from safeds.data.tabular.typing import ColumnType, TableSchema
 from safeds.exceptions import (
     ColumnLengthMismatchError,
@@ -26,7 +30,6 @@ from safeds.exceptions import (
     SchemaMismatchError,
     UnknownColumnNameError,
 )
-from scipy import stats
 
 
 # noinspection PyProtectedMember
@@ -188,7 +191,7 @@ class Table:
     # Dunder methods
     # ------------------------------------------------------------------------------------------------------------------
 
-    def __init__(self, data: typing.Iterable, schema: Optional[TableSchema] = None):
+    def __init__(self, data: Iterable, schema: Optional[TableSchema] = None):
         self._data: pd.Dataframe = data if isinstance(data, pd.DataFrame) else pd.DataFrame(data)
         if schema is None:
             if self.count_columns() == 0:
@@ -202,7 +205,7 @@ class Table:
         self._data = self._data.reset_index(drop=True)
         self._data.columns = list(range(self.count_columns()))
 
-    def __eq__(self, other: typing.Any) -> bool:
+    def __eq__(self, other: Any) -> bool:
         if not isinstance(other, Table):
             return NotImplemented
         if self is other:
@@ -782,8 +785,8 @@ class Table:
 
     def slice(
         self,
-        start: typing.Optional[int] = None,
-        end: typing.Optional[int] = None,
+        start: Optional[int] = None,
+        end: Optional[int] = None,
         step: int = 1,
     ) -> Table:
         """
@@ -825,7 +828,7 @@ class Table:
     def sort_columns(
         self,
         comparator: Callable[[Column, Column], int] = lambda col1, col2: (col1.name > col2.name)
-        - (col1.name < col2.name),
+                                                                         - (col1.name < col2.name),
     ) -> Table:
         """
         Sort the columns of a `Table` with the given comparator and return a new `Table`. The original table is not
@@ -878,7 +881,7 @@ class Table:
         rows.sort(key=functools.cmp_to_key(comparator))
         return Table.from_rows(rows)
 
-    def split(self, percentage_in_first: float) -> typing.Tuple[Table, Table]:
+    def split(self, percentage_in_first: float) -> tuple[Table, Table]:
         """
         Split the table into two new tables.
 
@@ -902,7 +905,26 @@ class Table:
             self.slice(round(percentage_in_first * self.count_rows())),
         )
 
-    def transform_column(self, name: str, transformer: Callable[[Row], typing.Any]) -> Table:
+    def tag_columns(self, target_name: str, feature_names: Optional[list[str]] = None) -> TaggedTable:
+        """
+        Mark the columns of the table as target column or feature columns. The original table is not modified.
+
+        Parameters
+        ----------
+        target_name : str
+            Name of the target column.
+        feature_names : Optional[list[str]]
+            Names of the feature columns. If None, all columns except the target column are used.
+
+        Returns
+        -------
+        tagged_table : TaggedTable
+            A new tagged table with the given target and feature names.
+        """
+        from ._tagged_table import TaggedTable
+        return TaggedTable(self._data, target_name, feature_names, self._schema)
+
+    def transform_column(self, name: str, transformer: Callable[[Row], Any]) -> Table:
         """
         Transform provided column by calling provided transformer.
 
