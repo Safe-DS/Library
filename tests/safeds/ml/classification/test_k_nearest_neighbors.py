@@ -3,7 +3,6 @@ import pytest
 from safeds.data.tabular.containers import Table, TaggedTable, Column
 from safeds.exceptions import LearningError, PredictionError
 from safeds.ml.classification import Classifier, KNearestNeighbors
-from tests.helpers import resolve_resource_path
 
 
 @pytest.fixture()
@@ -50,6 +49,11 @@ class TestPredict:
         fitted_classifier = classifier.fit(valid_data)
         prediction = fitted_classifier.predict(valid_data.features)
         assert prediction.features == valid_data.features
+
+    def test_should_include_complete_prediction_input(self, classifier: Classifier, valid_data: TaggedTable) -> None:
+        fitted_regressor = classifier.fit(valid_data)
+        prediction = fitted_regressor.predict(valid_data.drop_columns(["target"]))
+        assert prediction.drop_columns(["target"]) == valid_data.drop_columns(["target"])
 
     def test_should_set_correct_target_name(self, classifier: Classifier, valid_data: TaggedTable) -> None:
         fitted_classifier = classifier.fit(valid_data)

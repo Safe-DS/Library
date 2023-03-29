@@ -50,6 +50,11 @@ class TestPredict:
         prediction = fitted_regressor.predict(valid_data.features)
         assert prediction.features == valid_data.features
 
+    def test_should_include_complete_prediction_input(self, regressor: Regressor, valid_data: TaggedTable) -> None:
+        fitted_regressor = regressor.fit(valid_data)
+        prediction = fitted_regressor.predict(valid_data.drop_columns(["target"]))
+        assert prediction.drop_columns(["target"]) == valid_data.drop_columns(["target"])
+
     def test_should_set_correct_target_name(self, regressor: Regressor, valid_data: TaggedTable) -> None:
         fitted_regressor = regressor.fit(valid_data)
         prediction = fitted_regressor.predict(valid_data.features)

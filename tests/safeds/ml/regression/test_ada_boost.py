@@ -50,18 +50,15 @@ class TestPredict:
         prediction = fitted_regressor.predict(valid_data.features)
         assert prediction.features == valid_data.features
 
+    def test_should_include_complete_prediction_input(self, regressor: Regressor, valid_data: TaggedTable) -> None:
+        fitted_regressor = regressor.fit(valid_data)
+        prediction = fitted_regressor.predict(valid_data.drop_columns(["target"]))
+        assert prediction.drop_columns(["target"]) == valid_data.drop_columns(["target"])
+
     def test_should_set_correct_target_name(self, regressor: Regressor, valid_data: TaggedTable) -> None:
         fitted_regressor = regressor.fit(valid_data)
         prediction = fitted_regressor.predict(valid_data.features)
         assert prediction.target.name == "target"
-
-    def test_should_include_other_columns_of_prediction_input(self, regressor: Regressor, valid_data: TaggedTable) -> None:
-        fitted_regressor = regressor.fit(valid_data)
-        prediction = fitted_regressor.predict(valid_data.drop_columns(["target"]))
-        other_column_names = list(
-            set(valid_data.get_column_names()) - set(valid_data.features.get_column_names()) - {valid_data.target.name}
-        )
-        assert prediction.keep_only_columns(other_column_names) == valid_data.keep_only_columns(other_column_names)
 
     def test_should_raise_when_not_fitted(self, regressor: Regressor, valid_data: TaggedTable) -> None:
         with pytest.raises(PredictionError):
