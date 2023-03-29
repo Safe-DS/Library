@@ -1,6 +1,5 @@
 import pytest
-
-from safeds.data.tabular.containers import Table, TaggedTable, Column
+from safeds.data.tabular.containers import Column, Table, TaggedTable
 from safeds.exceptions import UnknownColumnNameError
 
 

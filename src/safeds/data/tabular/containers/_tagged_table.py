@@ -1,8 +1,7 @@
 from typing import Iterable, Optional
 
 from IPython.core.display_functions import DisplayHandle
-
-from safeds.data.tabular.containers import Table, Column
+from safeds.data.tabular.containers import Column, Table
 from safeds.data.tabular.typing import TableSchema
 
 
@@ -27,7 +26,7 @@ class TaggedTable(Table):
         data: Iterable,
         target_name: str,
         feature_names: Optional[list[str]] = None,
-        schema: Optional[TableSchema] = None
+        schema: Optional[TableSchema] = None,
     ):
         # Validate input
         if feature_names is not None:
@@ -38,7 +37,9 @@ class TaggedTable(Table):
 
         super().__init__(data, schema)
 
-        self._features: Table = self.drop_columns([target_name]) if feature_names is None else self.keep_only_columns(feature_names)
+        self._features: Table = (
+            self.drop_columns([target_name]) if feature_names is None else self.keep_only_columns(feature_names)
+        )
         self._target: Column = self.get_column(target_name)
 
     @property
