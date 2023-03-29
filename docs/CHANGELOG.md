@@ -1,3 +1,15 @@
+## [0.7.0](https://github.com/Safe-DS/Stdlib/compare/v0.6.0...v0.7.0) (2023-03-29)
+
+
+### Features
+
+* `sort_rows` of a `Table` ([#104](https://github.com/Safe-DS/Stdlib/issues/104)) ([20aaf5e](https://github.com/Safe-DS/Stdlib/commit/20aaf5eb276a0c756bb5414d4b268894d58a47e6)), closes [#14](https://github.com/Safe-DS/Stdlib/issues/14)
+* add `_file` suffix to methods interacting with files ([#103](https://github.com/Safe-DS/Stdlib/issues/103)) ([ec011e4](https://github.com/Safe-DS/Stdlib/commit/ec011e47d8a595ac6aa1c40d911b1b3da8cf5bd4))
+* improve transformers for tabular data ([#108](https://github.com/Safe-DS/Stdlib/issues/108)) ([b18a06d](https://github.com/Safe-DS/Stdlib/commit/b18a06dce090a1bb9b6e3c858b83cd8b6277e280)), closes [#61](https://github.com/Safe-DS/Stdlib/issues/61) [#90](https://github.com/Safe-DS/Stdlib/issues/90)
+* remove `OrdinalEncoder` ([#107](https://github.com/Safe-DS/Stdlib/issues/107)) ([b92bba5](https://github.com/Safe-DS/Stdlib/commit/b92bba551146586d510da03cc581037dc4c4c05e)), closes [#61](https://github.com/Safe-DS/Stdlib/issues/61)
+* specify features and target when creating a `TaggedTable` ([#114](https://github.com/Safe-DS/Stdlib/issues/114)) ([95e1fc7](https://github.com/Safe-DS/Stdlib/commit/95e1fc7b58dedda18f7fda43c9f6c45a57695f53)), closes [#27](https://github.com/Safe-DS/Stdlib/issues/27)
+* swap `name` and `data` parameters of `Column` ([#105](https://github.com/Safe-DS/Stdlib/issues/105)) ([c2f8da5](https://github.com/Safe-DS/Stdlib/commit/c2f8da537d1857bf89ec4417c1ba4f09ce5b8d49))
+
 ## [0.6.0](https://github.com/Safe-DS/Stdlib/compare/v0.5.0...v0.6.0) (2023-03-27)
 
 
