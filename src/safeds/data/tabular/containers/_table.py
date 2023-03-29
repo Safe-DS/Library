@@ -13,11 +13,6 @@ from IPython.core.display_functions import DisplayHandle, display
 from pandas import DataFrame, Series
 from scipy import stats
 
-if TYPE_CHECKING:
-    from ._tagged_table import TaggedTable
-
-from ._column import Column
-from ._row import Row
 from safeds.data.tabular.typing import ColumnType, TableSchema
 from safeds.exceptions import (
     ColumnLengthMismatchError,
@@ -30,6 +25,11 @@ from safeds.exceptions import (
     SchemaMismatchError,
     UnknownColumnNameError,
 )
+from ._column import Column
+from ._row import Row
+
+if TYPE_CHECKING:
+    from ._tagged_table import TaggedTable
 
 
 # noinspection PyProtectedMember
@@ -921,6 +921,7 @@ class Table:
         tagged_table : TaggedTable
             A new tagged table with the given target and feature names.
         """
+        # pylint: disable=import-outside-toplevel
         from ._tagged_table import TaggedTable
         return TaggedTable(self._data, target_name, feature_names, self._schema)
 

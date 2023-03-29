@@ -33,16 +33,12 @@ class TaggedTable(Table):
         if feature_names is not None:
             if target_name in feature_names:
                 raise ValueError(f"Column '{target_name}' cannot be both feature and target.")
-            elif len(feature_names) == 0:
+            if len(feature_names) == 0:
                 raise ValueError("At least one feature column must be specified.")
 
         super().__init__(data, schema)
 
-        if feature_names is None:
-            self._features: Table = self.drop_columns([target_name])
-        else:
-            self._features: Table = self.keep_only_columns(feature_names)
-
+        self._features: Table = self.drop_columns([target_name]) if feature_names is None else self.keep_only_columns(feature_names)
         self._target: Column = self.get_column(target_name)
 
     @property
