@@ -66,6 +66,7 @@ def predict(model: Any, dataset: Table, feature_names: Optional[list[str]], targ
     try:
         predicted_target_vector = model.predict(dataset_df.values)
         result_set = dataset._data.copy(deep=True)
+        result_set.columns = dataset.get_column_names()
         if target_name in result_set.columns:
             raise ValueError(f"Dataset already contains '{target_name}' column. Please rename this column")
         result_set[target_name] = predicted_target_vector
