@@ -17,9 +17,7 @@ from tests.helpers import resolve_resource_path
     ],
 )
 def test_replace_valid(column_name: str, path: str) -> None:
-    input_table: Table = Table.from_csv_file(
-        resolve_resource_path("test_table_replace_column_input.csv")
-    )
+    input_table: Table = Table.from_csv_file(resolve_resource_path("test_table_replace_column_input.csv"))
     expected: Table = Table.from_csv_file(resolve_resource_path(path))
 
     column = Column(column_name, pd.Series(["d", "e", "f"]))
@@ -43,9 +41,7 @@ def test_replace_invalid(
     column_name: str,
     error: type[Exception],
 ) -> None:
-    input_table: Table = Table.from_csv_file(
-        resolve_resource_path("test_table_replace_column_input.csv")
-    )
+    input_table: Table = Table.from_csv_file(resolve_resource_path("test_table_replace_column_input.csv"))
     column = Column(column_name, pd.Series(column_values))
 
     with pytest.raises(error):

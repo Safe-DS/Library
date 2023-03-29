@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import pandas as pd
-
 from safeds.data.tabular.containers import Column, Table, TaggedTable
 from safeds.ml.classification import Classifier
 

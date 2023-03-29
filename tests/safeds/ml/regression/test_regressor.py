@@ -2,10 +2,10 @@ from __future__ import annotations
 
 import pandas as pd
 import pytest
-
 from safeds.data.tabular.containers import Column, Table, TaggedTable
 from safeds.exceptions import ColumnLengthMismatchError
 from safeds.ml.regression import Regressor
+
 # noinspection PyProtectedMember
 from safeds.ml.regression._regressor import _check_metrics_preconditions
 
