@@ -71,7 +71,7 @@ def predict(model: Any, dataset: Table, target_name: Optional[str]) -> TaggedTab
                 f"Dataset already contains '{target_name}' column. Please rename this column"
             )
         result_set[target_name] = predicted_target_vector
-        return TaggedTable(Table(result_set), target_name=target_name)
+        return Table(result_set).tag_columns(target_name=target_name)
     except NotFittedError as exception:
         raise PredictionError("The model was not trained") from exception
     except ValueError as exception:

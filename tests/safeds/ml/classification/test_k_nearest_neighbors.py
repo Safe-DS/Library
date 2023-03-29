@@ -13,13 +13,13 @@ def classifier() -> Classifier:
 @pytest.fixture()
 def valid_data() -> TaggedTable:
     table = Table.from_csv_file(resolve_resource_path("test_k_nearest_neighbors.csv"))
-    return TaggedTable(table, "T")
+    return table.tag_columns(target_name="T")
 
 
 @pytest.fixture()
 def invalid_data() -> TaggedTable:
     table = Table.from_csv_file(resolve_resource_path("test_k_nearest_neighbors_invalid.csv"))
-    return TaggedTable(table, "T")
+    return table.tag_columns(target_name="T")
 
 
 class TestFit:

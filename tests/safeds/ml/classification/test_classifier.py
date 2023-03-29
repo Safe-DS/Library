@@ -27,20 +27,20 @@ class DummyClassifier(Classifier):
         feature = predicted.rename("feature")
         dataset = Table.from_columns([feature, predicted])
 
-        return TaggedTable(dataset, target_name="predicted")
+        return dataset.tag_columns(target_name="predicted")
 
 
 class TestAccuracy:
     def test_with_same_type(self) -> None:
-        c1 = Column("predicted", pd.Series(data=[1, 2, 3, 4]))
-        c2 = Column("expected", pd.Series(data=[1, 2, 3, 3]))
-        table = TaggedTable(Table.from_columns([c1, c2]), target_name="expected")
+        c1 = Column("predicted", [1, 2, 3, 4])
+        c2 = Column("expected", [1, 2, 3, 3])
+        table = Table.from_columns([c1, c2]).tag_columns(target_name="expected")
 
         assert DummyClassifier().accuracy(table) == 0.75
 
     def test_with_different_types(self) -> None:
         c1 = Column("predicted", pd.Series(data=["1", "2", "3", "4"]))
         c2 = Column("expected", pd.Series(data=[1, 2, 3, 3]))
-        table = TaggedTable(Table.from_columns([c1, c2]), target_name="expected")
+        table = Table.from_columns([c1, c2]).tag_columns(target_name="expected")
 
         assert DummyClassifier().accuracy(table) == 0.0
