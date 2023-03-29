@@ -1,8 +1,8 @@
 import pytest
+
 from safeds.data.tabular.containers import Table, TaggedTable, Column
 from safeds.exceptions import LearningError, PredictionError
 from safeds.ml.classification import AdaBoost, Classifier
-from tests.helpers import resolve_resource_path
 
 
 @pytest.fixture()
