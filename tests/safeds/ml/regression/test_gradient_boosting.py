@@ -1,8 +1,8 @@
 import pytest
-from safeds.data.tabular.containers import Table, TaggedTable
+
+from safeds.data.tabular.containers import Table, TaggedTable, Column
 from safeds.exceptions import LearningError, PredictionError
 from safeds.ml.regression import GradientBoosting, Regressor
-from tests.helpers import resolve_resource_path
 
 
 @pytest.fixture()
@@ -12,14 +12,26 @@ def regressor() -> Regressor:
 
 @pytest.fixture()
 def valid_data() -> TaggedTable:
-    table = Table.from_csv_file(resolve_resource_path("test_gradient_boosting_regression.csv"))
-    return table.tag_columns(target_name="T")
+    return Table.from_columns(
+        [
+            Column("id", [1, 4]),
+            Column("feat1", [2, 5]),
+            Column("feat2", [3, 6]),
+            Column("target", [0, 1]),
+        ]
+    ).tag_columns(target_name="target", feature_names=["feat1", "feat2"])
 
 
 @pytest.fixture()
 def invalid_data() -> TaggedTable:
-    table = Table.from_csv_file(resolve_resource_path("test_gradient_boosting_regression_invalid.csv"))
-    return table.tag_columns(target_name="T")
+    return Table.from_columns(
+        [
+            Column("id", [1, 4]),
+            Column("feat1", ["a", 5]),
+            Column("feat2", [3, 6]),
+            Column("target", [0, 1]),
+        ]
+    ).tag_columns(target_name="target", feature_names=["feat1", "feat2"])
 
 
 class TestFit:
@@ -41,7 +53,7 @@ class TestPredict:
     def test_should_set_correct_target_name(self, regressor: Regressor, valid_data: TaggedTable) -> None:
         fitted_regressor = regressor.fit(valid_data)
         prediction = fitted_regressor.predict(valid_data.features)
-        assert prediction.target.name == "T"
+        assert prediction.target.name == "target"
 
     def test_should_raise_when_not_fitted(self, regressor: Regressor, valid_data: TaggedTable) -> None:
         with pytest.raises(PredictionError):
