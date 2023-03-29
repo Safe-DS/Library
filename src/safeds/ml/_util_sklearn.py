@@ -67,9 +67,7 @@ def predict(model: Any, dataset: Table, target_name: Optional[str]) -> TaggedTab
         predicted_target_vector = model.predict(dataset_df.values)
         result_set = dataset_df.copy(deep=True)
         if target_name in result_set.columns:
-            raise ValueError(
-                f"Dataset already contains '{target_name}' column. Please rename this column"
-            )
+            raise ValueError(f"Dataset already contains '{target_name}' column. Please rename this column")
         result_set[target_name] = predicted_target_vector
         return Table(result_set).tag_columns(target_name=target_name)
     except NotFittedError as exception:
