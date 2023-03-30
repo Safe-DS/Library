@@ -3,12 +3,13 @@ from __future__ import annotations
 import warnings
 from typing import Any, Optional
 
+from sklearn.preprocessing import OrdinalEncoder as sk_OrdinalEncoder
+
 from safeds.data.tabular.containers import Table
 from safeds.data.tabular.transformation._table_transformer import (
     InvertibleTableTransformer,
 )
 from safeds.exceptions import NotFittedError, UnknownColumnNameError
-from sklearn.preprocessing import OrdinalEncoder as sk_OrdinalEncoder
 
 
 def warn(*_: Any, **__: Any) -> None:
@@ -124,3 +125,14 @@ class LabelEncoder(InvertibleTableTransformer):
         data.columns = transformed_table.get_column_names()
         data[self._column_names] = self._wrapped_transformer.inverse_transform(data[self._column_names])
         return Table(data)
+
+    def is_fitted(self) -> bool:
+        """
+        Check if the transformer is fitted.
+
+        Returns
+        -------
+        is_fitted : bool
+            Whether the transformer is fitted.
+        """
+        return self._wrapped_transformer is not None

@@ -1,6 +1,7 @@
 from typing import Optional
 
 import pytest
+
 from safeds.data.tabular.containers import Column, Table
 from safeds.data.tabular.transformation import Imputer, ImputerStrategy
 from safeds.exceptions import NotFittedError, UnknownColumnNameError
@@ -61,6 +62,23 @@ class TestTransform:
 
         with pytest.raises(NotFittedError):
             transformer.transform(table)
+
+
+class TestIsFitted:
+    def test_should_return_false_before_fitting(self) -> None:
+        transformer = Imputer(Imputer.Strategy.Mean())
+        assert not transformer.is_fitted()
+
+    def test_should_return_true_after_fitting(self) -> None:
+        table = Table.from_columns(
+            [
+                Column("a", [1, 3, None]),
+            ]
+        )
+
+        transformer = Imputer(Imputer.Strategy.Mean())
+        fitted_transformer = transformer.fit(table)
+        assert fitted_transformer.is_fitted()
 
 
 class TestFitAndTransform:

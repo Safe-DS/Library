@@ -3,12 +3,13 @@ from __future__ import annotations
 from typing import Optional
 
 import pandas as pd
+from sklearn.preprocessing import OneHotEncoder as sk_OneHotEncoder
+
 from safeds.data.tabular.containers import Table
 from safeds.data.tabular.transformation._table_transformer import (
     InvertibleTableTransformer,
 )
 from safeds.exceptions import NotFittedError, UnknownColumnNameError
-from sklearn.preprocessing import OneHotEncoder as sk_OneHotEncoder
 
 
 class OneHotEncoder(InvertibleTableTransformer):
@@ -129,3 +130,14 @@ class OneHotEncoder(InvertibleTableTransformer):
         unchanged = data.drop(self._wrapped_transformer.get_feature_names_out(), axis=1)
 
         return Table(pd.concat([unchanged, decoded], axis=1))
+
+    def is_fitted(self) -> bool:
+        """
+        Check if the transformer is fitted.
+
+        Returns
+        -------
+        is_fitted : bool
+            Whether the transformer is fitted.
+        """
+        return self._wrapped_transformer is not None

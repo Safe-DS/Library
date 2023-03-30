@@ -4,10 +4,11 @@ from abc import ABC, abstractmethod
 from typing import Any, Optional
 
 import pandas as pd
+from sklearn.impute import SimpleImputer as sk_SimpleImputer
+
 from safeds.data.tabular.containers import Table
 from safeds.data.tabular.transformation._table_transformer import TableTransformer
 from safeds.exceptions import NotFittedError, UnknownColumnNameError
-from sklearn.impute import SimpleImputer as sk_SimpleImputer
 
 
 class ImputerStrategy(ABC):
@@ -161,3 +162,14 @@ class Imputer(TableTransformer):
         indices = [table.schema._get_column_index_by_name(name) for name in self._column_names]
         data[indices] = pd.DataFrame(self._wrapped_transformer.transform(data[indices]), columns=indices)
         return Table(data, table.schema)
+
+    def is_fitted(self) -> bool:
+        """
+        Check if the transformer is fitted.
+
+        Returns
+        -------
+        is_fitted : bool
+            Whether the transformer is fitted.
+        """
+        return self._wrapped_transformer is not None
