@@ -11,8 +11,6 @@ import pandas as pd
 import seaborn as sns
 from IPython.core.display_functions import DisplayHandle, display
 from pandas import DataFrame, Series
-from scipy import stats
-
 from safeds.data.tabular.typing import ColumnType, TableSchema
 from safeds.exceptions import (
     ColumnLengthMismatchError,
@@ -24,6 +22,8 @@ from safeds.exceptions import (
     SchemaMismatchError,
     UnknownColumnNameError,
 )
+from scipy import stats
+
 from ._column import Column
 from ._row import Row
 
@@ -823,7 +823,7 @@ class Table:
     def sort_columns(
         self,
         comparator: Callable[[Column, Column], int] = lambda col1, col2: (col1.name > col2.name)
-                                                                         - (col1.name < col2.name),
+        - (col1.name < col2.name),
     ) -> Table:
         """
         Sort the columns of a `Table` with the given comparator and return a new `Table`. The original table is not
