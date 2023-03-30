@@ -1,7 +1,6 @@
 from typing import Optional
 
 import pytest
-
 from safeds.data.tabular.containers import Column, Table
 from safeds.data.tabular.transformation import LabelEncoder
 from safeds.exceptions import NotFittedError, UnknownColumnNameError
