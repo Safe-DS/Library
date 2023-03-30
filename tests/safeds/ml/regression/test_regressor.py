@@ -3,11 +3,21 @@ from __future__ import annotations
 import pandas as pd
 import pytest
 from _pytest.fixtures import FixtureRequest
-
 from safeds.data.tabular.containers import Column, Table, TaggedTable
 from safeds.exceptions import ColumnLengthMismatchError, LearningError, PredictionError
-from safeds.ml.regression import Regressor, AdaBoost, DecisionTree, ElasticNetRegression, GradientBoosting, \
-    KNearestNeighbors, LassoRegression, LinearRegression, RandomForest, RidgeRegression
+from safeds.ml.regression import (
+    AdaBoost,
+    DecisionTree,
+    ElasticNetRegression,
+    GradientBoosting,
+    KNearestNeighbors,
+    LassoRegression,
+    LinearRegression,
+    RandomForest,
+    Regressor,
+    RidgeRegression,
+)
+
 # noinspection PyProtectedMember
 from safeds.ml.regression._regressor import _check_metrics_preconditions
 
@@ -62,11 +72,7 @@ def invalid_data() -> TaggedTable:
     ).tag_columns(target_name="target", feature_names=["feat1", "feat2"])
 
 
-@pytest.mark.parametrize(
-    "regressor",
-    regressors(),
-    ids=lambda x: x.__class__.__name__
-)
+@pytest.mark.parametrize("regressor", regressors(), ids=lambda x: x.__class__.__name__)
 class TestFit:
     def test_should_succeed_on_valid_data(self, regressor: Regressor, valid_data: TaggedTable) -> None:
         regressor.fit(valid_data)
@@ -83,11 +89,7 @@ class TestFit:
             regressor.fit(invalid_data)
 
 
-@pytest.mark.parametrize(
-    "regressor",
-    regressors(),
-    ids=lambda x: x.__class__.__name__
-)
+@pytest.mark.parametrize("regressor", regressors(), ids=lambda x: x.__class__.__name__)
 class TestPredict:
     def test_should_include_features_of_input_table(self, regressor: Regressor, valid_data: TaggedTable) -> None:
         fitted_regressor = regressor.fit(valid_data)

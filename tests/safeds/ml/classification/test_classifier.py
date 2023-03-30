@@ -3,11 +3,17 @@ from __future__ import annotations
 import pandas as pd
 import pytest
 from _pytest.fixtures import FixtureRequest
-
 from safeds.data.tabular.containers import Column, Table, TaggedTable
 from safeds.exceptions import LearningError, PredictionError
-from safeds.ml.classification import Classifier, AdaBoost, DecisionTree, GradientBoosting, KNearestNeighbors, \
-    LogisticRegression, RandomForest
+from safeds.ml.classification import (
+    AdaBoost,
+    Classifier,
+    DecisionTree,
+    GradientBoosting,
+    KNearestNeighbors,
+    LogisticRegression,
+    RandomForest,
+)
 
 
 def classifiers() -> list[Classifier]:
@@ -23,14 +29,7 @@ def classifiers() -> list[Classifier]:
         The list of classifiers to test.
     """
 
-    return [
-        AdaBoost(),
-        DecisionTree(),
-        GradientBoosting(),
-        KNearestNeighbors(2),
-        LogisticRegression(),
-        RandomForest()
-    ]
+    return [AdaBoost(), DecisionTree(), GradientBoosting(), KNearestNeighbors(2), LogisticRegression(), RandomForest()]
 
 
 @pytest.fixture()
@@ -57,11 +56,7 @@ def invalid_data() -> TaggedTable:
     ).tag_columns(target_name="target", feature_names=["feat1", "feat2"])
 
 
-@pytest.mark.parametrize(
-    "classifier",
-    classifiers(),
-    ids=lambda x: x.__class__.__name__
-)
+@pytest.mark.parametrize("classifier", classifiers(), ids=lambda x: x.__class__.__name__)
 class TestFit:
     def test_should_succeed_on_valid_data(self, classifier: Classifier, valid_data: TaggedTable) -> None:
         classifier.fit(valid_data)
@@ -78,11 +73,7 @@ class TestFit:
             classifier.fit(invalid_data)
 
 
-@pytest.mark.parametrize(
-    "classifier",
-    classifiers(),
-    ids=lambda x: x.__class__.__name__
-)
+@pytest.mark.parametrize("classifier", classifiers(), ids=lambda x: x.__class__.__name__)
 class TestPredict:
     def test_should_include_features_of_input_table(self, classifier: Classifier, valid_data: TaggedTable) -> None:
         fitted_classifier = classifier.fit(valid_data)
