@@ -828,7 +828,7 @@ class Table:
     def sort_columns(
         self,
         comparator: Callable[[Column, Column], int] = lambda col1, col2: (col1.name > col2.name)
-                                                                         - (col1.name < col2.name),
+        - (col1.name < col2.name),
     ) -> Table:
         """
         Sort the columns of a `Table` with the given comparator and return a new `Table`. The original table is not

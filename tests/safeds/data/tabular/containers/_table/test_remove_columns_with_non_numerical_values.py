@@ -20,8 +20,6 @@ def test_remove_columns_with_non_numerical_values_valid() -> None:
 
 
 def test_remove_columns_with_non_numerical_values_empty() -> None:
-    table = Table(
-        [], TableSchema({"col1": ColumnType.from_numpy_dtype(np.dtype(float))})
-    )
+    table = Table([], TableSchema({"col1": ColumnType.from_numpy_dtype(np.dtype(float))}))
     updated_table = table.remove_columns_with_non_numerical_values()
     assert updated_table.get_column_names() == ["col1"]

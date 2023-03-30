@@ -60,9 +60,7 @@ def test_remove_rows_with_outliers_with_outliers() -> None:
 
 
 def test_remove_rows_with_outliers_no_rows() -> None:
-    table = Table(
-        [], TableSchema({"col1": ColumnType.from_numpy_dtype(np.dtype(float))})
-    )
+    table = Table([], TableSchema({"col1": ColumnType.from_numpy_dtype(np.dtype(float))}))
     result = table.remove_rows_with_outliers()
     assert result.count_rows() == 0
     assert result.count_columns() == 1
