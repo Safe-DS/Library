@@ -99,6 +99,13 @@ class TestPredict:
         prediction = fitted_classifier.predict(valid_data.features)
         assert prediction.target.name == "target"
 
+    def test_should_not_change_input_table(self, classifier: Classifier, request: FixtureRequest) -> None:
+        valid_data = request.getfixturevalue("valid_data")
+        valid_data_copy = request.getfixturevalue("valid_data")
+        fitted_classifier = classifier.fit(valid_data)
+        fitted_classifier.predict(valid_data.features)
+        assert valid_data == valid_data_copy
+
     def test_should_raise_when_not_fitted(self, classifier: Classifier, valid_data: TaggedTable) -> None:
         with pytest.raises(PredictionError):
             classifier.predict(valid_data.features)
