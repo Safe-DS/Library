@@ -63,7 +63,7 @@ class TestTransform:
             transformer.transform(table)
 
 
-class TestFitTransform:
+class TestFitAndTransform:
     @pytest.mark.parametrize(
         ("table", "column_names", "strategy", "expected"),
         [
