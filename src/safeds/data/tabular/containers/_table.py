@@ -769,7 +769,7 @@ class Table:
         result[new_column.name] = new_column._data
         return Table(result)
 
-    def shuffle(self) -> Table:
+    def shuffle_rows(self) -> Table:
         """
         Shuffle the table randomly.
 
