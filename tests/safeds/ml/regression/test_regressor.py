@@ -3,7 +3,6 @@ from __future__ import annotations
 import pandas as pd
 import pytest
 from _pytest.fixtures import FixtureRequest
-
 from safeds.data.tabular.containers import Column, Table, TaggedTable
 from safeds.exceptions import ColumnLengthMismatchError, LearningError, PredictionError
 from safeds.ml.regression import (
@@ -18,6 +17,7 @@ from safeds.ml.regression import (
     Regressor,
     RidgeRegression,
 )
+
 # noinspection PyProtectedMember
 from safeds.ml.regression._regressor import _check_metrics_preconditions
 

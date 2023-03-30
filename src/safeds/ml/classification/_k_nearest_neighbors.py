@@ -2,10 +2,10 @@ from __future__ import annotations
 
 from typing import Optional
 
-from sklearn.neighbors import KNeighborsClassifier as sk_KNeighborsClassifier
-
 from safeds.data.tabular.containers import Table, TaggedTable
 from safeds.ml._util_sklearn import fit, predict
+from sklearn.neighbors import KNeighborsClassifier as sk_KNeighborsClassifier
+
 from ._classifier import Classifier
 
 

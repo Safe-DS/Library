@@ -121,7 +121,5 @@ def _check_metrics_preconditions(actual: Column, expected: Column) -> None:
 
     if actual._data.size != expected._data.size:
         raise ColumnLengthMismatchError(
-            "\n".join(
-                [f"{column.name}: {column._data.size}" for column in [actual, expected]]
-            )
+            "\n".join([f"{column.name}: {column._data.size}" for column in [actual, expected]])
         )
