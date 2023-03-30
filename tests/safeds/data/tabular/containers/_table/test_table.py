@@ -11,3 +11,8 @@ def test_create_empty_table() -> None:
     assert col.count() == 0
     assert isinstance(col.type, type(ColumnType.from_numpy_dtype(np.dtype(float))))
     assert col.name == "col1"
+
+
+def test_create_empty_table_without_schema() -> None:
+    table = Table([])
+    assert table.schema == TableSchema({})
