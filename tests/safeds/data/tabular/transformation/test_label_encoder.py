@@ -63,7 +63,7 @@ class TestTransform:
             transformer.transform(table)
 
 
-class TestFitTransform:
+class TestFitAndTransform:
     @pytest.mark.parametrize(
         ("table", "column_names", "expected"),
         [
@@ -100,7 +100,7 @@ class TestFitTransform:
     def test_should_return_transformed_table(
         self, table: Table, column_names: Optional[list[str]], expected: Table
     ) -> None:
-        assert LabelEncoder().fit_transform(table, column_names) == expected
+        assert LabelEncoder().fit_and_transform(table, column_names) == expected
 
     def test_should_not_change_original_table(self) -> None:
         table = Table.from_columns(
@@ -109,7 +109,7 @@ class TestFitTransform:
             ]
         )
 
-        LabelEncoder().fit_transform(table)
+        LabelEncoder().fit_and_transform(table)
 
         expected = Table.from_columns(
             [
