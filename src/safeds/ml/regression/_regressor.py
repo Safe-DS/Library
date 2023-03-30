@@ -56,6 +56,17 @@ class Regressor(ABC):
             If prediction with the given dataset failed.
         """
 
+    @abstractmethod
+    def is_fitted(self) -> bool:
+        """
+        Checks if the regressor is fitted.
+
+        Returns
+        -------
+        is_fitted : bool
+            Whether the regressor is fitted.
+        """
+
     # noinspection PyProtectedMember
     def mean_squared_error(self, validation_or_test_set: TaggedTable) -> float:
         """

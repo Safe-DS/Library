@@ -2,8 +2,9 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 
-from safeds.data.tabular.containers import Table, TaggedTable
 from sklearn.metrics import accuracy_score as sk_accuracy_score
+
+from safeds.data.tabular.containers import Table, TaggedTable
 
 
 class Classifier(ABC):
@@ -52,6 +53,17 @@ class Classifier(ABC):
         ------
         PredictionError
             If prediction with the given dataset failed.
+        """
+
+    @abstractmethod
+    def is_fitted(self) -> bool:
+        """
+        Checks if the classifier is fitted.
+
+        Returns
+        -------
+        is_fitted : bool
+            Whether the classifier is fitted.
         """
 
     # noinspection PyProtectedMember

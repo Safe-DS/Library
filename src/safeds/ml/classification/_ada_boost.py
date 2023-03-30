@@ -2,10 +2,10 @@ from __future__ import annotations
 
 from typing import Optional
 
-from safeds.data.tabular.containers import Table, TaggedTable
-from safeds.ml._util_sklearn import fit, predict
 from sklearn.ensemble import AdaBoostClassifier as sk_AdaBoostClassifier
 
+from safeds.data.tabular.containers import Table, TaggedTable
+from safeds.ml._util_sklearn import fit, predict
 from ._classifier import Classifier
 
 
@@ -71,3 +71,14 @@ class AdaBoost(Classifier):
             If prediction with the given dataset failed.
         """
         return predict(self._wrapped_classifier, dataset, self._feature_names, self._target_name)
+
+    def is_fitted(self) -> bool:
+        """
+        Checks if the classifier is fitted.
+
+        Returns
+        -------
+        is_fitted : bool
+            Whether the classifier is fitted.
+        """
+        return self._wrapped_classifier is not None

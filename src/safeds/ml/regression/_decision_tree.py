@@ -2,10 +2,10 @@ from __future__ import annotations
 
 from typing import Optional
 
-from safeds.data.tabular.containers import Table, TaggedTable
-from safeds.ml._util_sklearn import fit, predict
 from sklearn.tree import DecisionTreeRegressor as sk_DecisionTreeRegressor
 
+from safeds.data.tabular.containers import Table, TaggedTable
+from safeds.ml._util_sklearn import fit, predict
 from ._regressor import Regressor
 
 
@@ -71,3 +71,14 @@ class DecisionTree(Regressor):
             If prediction with the given dataset failed.
         """
         return predict(self._wrapped_regressor, dataset, self._feature_names, self._target_name)
+
+    def is_fitted(self) -> bool:
+        """
+        Check if the regressor is fitted.
+
+        Returns
+        -------
+        is_fitted : bool
+            Whether the regressor is fitted.
+        """
+        return self._wrapped_regressor is not None
