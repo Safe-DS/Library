@@ -145,7 +145,7 @@ class TestFitTransform:
     def test_should_return_transformed_table(
         self, table: Table, column_names: Optional[list[str]], strategy: ImputerStrategy, expected: Table
     ) -> None:
-        assert Imputer(strategy).fit_transform(table, column_names) == expected
+        assert Imputer(strategy).fit_and_transform(table, column_names) == expected
 
     def test_should_raise_if_strategy_is_mode_but_multiple_values_are_most_frequent(self) -> None:
         table = Table.from_columns(
@@ -155,7 +155,7 @@ class TestFitTransform:
         )
 
         with pytest.raises(IndexError):
-            Imputer(Imputer.Strategy.Mode()).fit_transform(table)
+            Imputer(Imputer.Strategy.Mode()).fit_and_transform(table)
 
     def test_should_not_change_original_table(self) -> None:
         table = Table.from_columns(
@@ -164,7 +164,7 @@ class TestFitTransform:
             ]
         )
 
-        Imputer(strategy=Imputer.Strategy.Constant(1)).fit_transform(table)
+        Imputer(strategy=Imputer.Strategy.Constant(1)).fit_and_transform(table)
 
         expected = Table.from_columns(
             [
