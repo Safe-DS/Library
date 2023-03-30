@@ -54,6 +54,17 @@ class Classifier(ABC):
             If prediction with the given dataset failed.
         """
 
+    @abstractmethod
+    def is_fitted(self) -> bool:
+        """
+        Checks if the classifier is fitted.
+
+        Returns
+        -------
+        is_fitted : bool
+            Whether the classifier is fitted.
+        """
+
     # noinspection PyProtectedMember
     def accuracy(self, validation_or_test_set: TaggedTable) -> float:
         """

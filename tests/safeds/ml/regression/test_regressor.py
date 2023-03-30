@@ -78,6 +78,10 @@ class TestFit:
         regressor.fit(valid_data)
         assert True  # This asserts that the fit method succeeds
 
+    def test_should_not_change_input_regressor(self, regressor: Regressor, valid_data: TaggedTable) -> None:
+        regressor.fit(valid_data)
+        assert not regressor.is_fitted()
+
     def test_should_not_change_input_table(self, regressor: Regressor, request: FixtureRequest) -> None:
         valid_data = request.getfixturevalue("valid_data")
         valid_data_copy = request.getfixturevalue("valid_data")
@@ -125,6 +129,16 @@ class TestPredict:
             fitted_regressor.predict(invalid_data.features)
 
 
+@pytest.mark.parametrize("regressor", regressors(), ids=lambda x: x.__class__.__name__)
+class TestIsFitted:
+    def test_should_return_false_before_fitting(self, regressor: Regressor) -> None:
+        assert not regressor.is_fitted()
+
+    def test_should_return_true_after_fitting(self, regressor: Regressor, valid_data: TaggedTable) -> None:
+        fitted_regressor = regressor.fit(valid_data)
+        assert fitted_regressor.is_fitted()
+
+
 class DummyRegressor(Regressor):
     """
     Dummy regressor to test metrics.
@@ -148,6 +162,9 @@ class DummyRegressor(Regressor):
         dataset = Table.from_columns([feature, predicted])
 
         return dataset.tag_columns(target_name="predicted")
+
+    def is_fitted(self) -> bool:
+        return True
 
 
 class TestMeanAbsoluteError:

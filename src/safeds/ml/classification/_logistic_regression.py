@@ -71,3 +71,14 @@ class LogisticRegression(Classifier):
             If prediction with the given dataset failed.
         """
         return predict(self._wrapped_classifier, dataset, self._feature_names, self._target_name)
+
+    def is_fitted(self) -> bool:
+        """
+        Checks if the classifier is fitted.
+
+        Returns
+        -------
+        is_fitted : bool
+            Whether the classifier is fitted.
+        """
+        return self._wrapped_classifier is not None

@@ -62,6 +62,10 @@ class TestFit:
         classifier.fit(valid_data)
         assert True  # This asserts that the fit method succeeds
 
+    def test_should_not_change_input_classifier(self, classifier: Classifier, valid_data: TaggedTable) -> None:
+        classifier.fit(valid_data)
+        assert not classifier.is_fitted()
+
     def test_should_not_change_input_table(self, classifier: Classifier, request: FixtureRequest) -> None:
         valid_data = request.getfixturevalue("valid_data")
         valid_data_copy = request.getfixturevalue("valid_data")
@@ -109,6 +113,16 @@ class TestPredict:
             fitted_classifier.predict(invalid_data.features)
 
 
+@pytest.mark.parametrize("classifier", classifiers(), ids=lambda x: x.__class__.__name__)
+class TestIsFitted:
+    def test_should_return_false_before_fitting(self, classifier: Classifier) -> None:
+        assert not classifier.is_fitted()
+
+    def test_should_return_true_after_fitting(self, classifier: Classifier, valid_data: TaggedTable) -> None:
+        fitted_classifier = classifier.fit(valid_data)
+        assert fitted_classifier.is_fitted()
+
+
 class DummyClassifier(Classifier):
     """
     Dummy classifier to test metrics.
@@ -132,6 +146,9 @@ class DummyClassifier(Classifier):
         dataset = Table.from_columns([feature, predicted])
 
         return dataset.tag_columns(target_name="predicted")
+
+    def is_fitted(self) -> bool:
+        return True
 
 
 class TestAccuracy:
