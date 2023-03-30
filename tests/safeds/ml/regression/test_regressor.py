@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import pandas as pd
 import pytest
+from _pytest.fixtures import FixtureRequest
 
 from safeds.data.tabular.containers import Column, Table, TaggedTable
 from safeds.exceptions import ColumnLengthMismatchError, LearningError, PredictionError
@@ -70,6 +71,12 @@ class TestFit:
     def test_should_succeed_on_valid_data(self, regressor: Regressor, valid_data: TaggedTable) -> None:
         regressor.fit(valid_data)
         assert True  # This asserts that the fit method succeeds
+
+    def test_should_not_change_input_table(self, regressor: Regressor, request: FixtureRequest) -> None:
+        valid_data = request.getfixturevalue("valid_data")
+        valid_data_copy = request.getfixturevalue("valid_data")
+        regressor.fit(valid_data)
+        assert valid_data == valid_data_copy
 
     def test_should_raise_on_invalid_data(self, regressor: Regressor, invalid_data: TaggedTable) -> None:
         with pytest.raises(LearningError):
