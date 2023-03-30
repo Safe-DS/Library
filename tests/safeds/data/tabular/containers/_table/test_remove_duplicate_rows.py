@@ -11,8 +11,8 @@ from tests.helpers import resolve_resource_path
         "test_table_duplicate_rows_no_duplicates.csv",
     ],
 )
-def test_drop_duplicate_rows(path: str) -> None:
+def test_remove_duplicate_rows(path: str) -> None:
     expected_table = Table(pd.DataFrame(data={"A": [1, 4], "B": [2, 5]}))
     table = Table.from_csv_file(resolve_resource_path(path))
-    result_table = table.drop_duplicate_rows()
+    result_table = table.remove_duplicate_rows()
     assert expected_table == result_table

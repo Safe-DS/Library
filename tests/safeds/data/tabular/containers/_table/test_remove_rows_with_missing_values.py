@@ -4,7 +4,7 @@ from safeds.data.tabular.containers import Table
 from safeds.data.tabular.typing import ColumnType, TableSchema
 
 
-def test_drop_rows_with_missing_values_valid() -> None:
+def test_remove_rows_with_missing_values_valid() -> None:
     table = Table(
         pd.DataFrame(
             data={
@@ -15,13 +15,13 @@ def test_drop_rows_with_missing_values_valid() -> None:
             }
         )
     )
-    updated_table = table.drop_rows_with_missing_values()
+    updated_table = table.remove_rows_with_missing_values()
     assert updated_table.count_rows() == 2
 
 
-def test_drop_rows_with_missing_values_empty() -> None:
+def test_remove_rows_with_missing_values_empty() -> None:
     table = Table(
         [], TableSchema({"col1": ColumnType.from_numpy_dtype(np.dtype(float))})
     )
-    updated_table = table.drop_rows_with_missing_values()
+    updated_table = table.remove_rows_with_missing_values()
     assert updated_table.get_column_names() == ["col1"]

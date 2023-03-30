@@ -4,7 +4,7 @@ from safeds.data.tabular.containers import Table
 from safeds.data.tabular.typing import ColumnType, TableSchema
 
 
-def test_drop_rows_with_outliers_no_outliers() -> None:
+def test_remove_rows_with_outliers_no_outliers() -> None:
     table = Table(
         pd.DataFrame(
             data={
@@ -15,13 +15,13 @@ def test_drop_rows_with_outliers_no_outliers() -> None:
         )
     )
     names = table.get_column_names()
-    result = table.drop_rows_with_outliers()
+    result = table.remove_rows_with_outliers()
     assert result.count_rows() == 3
     assert result.count_columns() == 3
     assert names == table.get_column_names()
 
 
-def test_drop_rows_with_outliers_with_outliers() -> None:
+def test_remove_rows_with_outliers_with_outliers() -> None:
     input_ = Table(
         pd.DataFrame(
             data={
@@ -44,7 +44,7 @@ def test_drop_rows_with_outliers_with_outliers() -> None:
             }
         )
     )
-    result = input_.drop_rows_with_outliers()
+    result = input_.remove_rows_with_outliers()
 
     expected = Table(
         pd.DataFrame(
@@ -59,10 +59,10 @@ def test_drop_rows_with_outliers_with_outliers() -> None:
     assert result == expected
 
 
-def test_drop_rows_with_outliers_no_rows() -> None:
+def test_remove_rows_with_outliers_no_rows() -> None:
     table = Table(
         [], TableSchema({"col1": ColumnType.from_numpy_dtype(np.dtype(float))})
     )
-    result = table.drop_rows_with_outliers()
+    result = table.remove_rows_with_outliers()
     assert result.count_rows() == 0
     assert result.count_columns() == 1
