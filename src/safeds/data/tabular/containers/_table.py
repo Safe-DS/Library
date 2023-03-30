@@ -18,7 +18,6 @@ from safeds.exceptions import (
     DuplicateColumnNameError,
     IndexOutOfBoundsError,
     MissingDataError,
-    MissingSchemaError,
     NonNumericColumnError,
     SchemaMismatchError,
     UnknownColumnNameError,
@@ -193,14 +192,10 @@ class Table:
 
     def __init__(self, data: Iterable, schema: Optional[TableSchema] = None):
         self._data: pd.Dataframe = data if isinstance(data, pd.DataFrame) else pd.DataFrame(data)
-        if schema is None:
-            if self.count_columns() == 0:
-                raise MissingSchemaError()
-            self._schema: TableSchema = TableSchema._from_dataframe(self._data)
-        else:
-            self._schema = schema
-            if self._data.empty:
-                self._data = pd.DataFrame(columns=self._schema.get_column_names())
+        self._schema: TableSchema = TableSchema._from_dataframe(self._data) if schema is None else schema
+
+        if self._data.empty:
+            self._data = pd.DataFrame(columns=self._schema.get_column_names())
 
         self._data = self._data.reset_index(drop=True)
         self._data.columns = list(range(self.count_columns()))
