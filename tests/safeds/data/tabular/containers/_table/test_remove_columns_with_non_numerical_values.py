@@ -4,7 +4,7 @@ from safeds.data.tabular.containers import Table
 from safeds.data.tabular.typing import ColumnType, TableSchema
 
 
-def test_drop_columns_with_non_numerical_values_valid() -> None:
+def test_remove_columns_with_non_numerical_values_valid() -> None:
     table = Table(
         pd.DataFrame(
             data={
@@ -15,13 +15,11 @@ def test_drop_columns_with_non_numerical_values_valid() -> None:
             }
         )
     )
-    updated_table = table.drop_columns_with_non_numerical_values()
+    updated_table = table.remove_columns_with_non_numerical_values()
     assert updated_table.get_column_names() == ["col3", "col4"]
 
 
-def test_drop_columns_with_non_numerical_values_empty() -> None:
-    table = Table(
-        [], TableSchema({"col1": ColumnType.from_numpy_dtype(np.dtype(float))})
-    )
-    updated_table = table.drop_columns_with_non_numerical_values()
+def test_remove_columns_with_non_numerical_values_empty() -> None:
+    table = Table([], TableSchema({"col1": ColumnType.from_numpy_dtype(np.dtype(float))}))
+    updated_table = table.remove_columns_with_non_numerical_values()
     assert updated_table.get_column_names() == ["col1"]

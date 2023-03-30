@@ -532,108 +532,6 @@ class Table:
         result.columns = self._schema.get_column_names()
         return Table(result)
 
-    def drop_columns(self, column_names: list[str]) -> Table:
-        """
-        Return a table without the given column(s).
-
-        Parameters
-        ----------
-        column_names : list[str]
-            A list containing all columns to be dropped.
-
-        Returns
-        -------
-        table : Table
-            A table without the given columns.
-
-        Raises
-        ------
-        ColumnNameError
-            If any of the given columns do not exist.
-        """
-        invalid_columns = []
-        column_indices = []
-        for name in column_names:
-            if not self._schema.has_column(name):
-                invalid_columns.append(name)
-            else:
-                column_indices.append(self._schema._get_column_index_by_name(name))
-        if len(invalid_columns) != 0:
-            raise UnknownColumnNameError(invalid_columns)
-        transformed_data = self._data.drop(labels=column_indices, axis="columns")
-        transformed_data.columns = list(name for name in self._schema.get_column_names() if name not in column_names)
-        return Table(transformed_data)
-
-    def drop_columns_with_missing_values(self) -> Table:
-        """
-        Return a table without the columns that contain missing values.
-
-        Returns
-        -------
-        table : Table
-            A table without the columns that contain missing values.
-        """
-        return Table.from_columns([column for column in self.to_columns() if not column.has_missing_values()])
-
-    def drop_columns_with_non_numerical_values(self) -> Table:
-        """
-        Return a table without the columns that contain non-numerical values.
-
-        Returns
-        -------
-        table : Table
-            A table without the columns that contain non-numerical values.
-
-        """
-        return Table.from_columns([column for column in self.to_columns() if column.type.is_numeric()])
-
-    def drop_duplicate_rows(self) -> Table:
-        """
-        Return a copy of the table with every duplicate row removed.
-
-        Returns
-        -------
-        result : Table
-            The table with the duplicate rows removed.
-        """
-        df = self._data.drop_duplicates(ignore_index=True)
-        df.columns = self._schema.get_column_names()
-        return Table(df)
-
-    def drop_rows_with_missing_values(self) -> Table:
-        """
-        Return a table without the rows that contain missing values.
-
-        Returns
-        -------
-        table : Table
-            A table without the rows that contain missing values.
-        """
-        result = self._data.copy(deep=True)
-        result = result.dropna(axis="index")
-        return Table(result, self._schema)
-
-    def drop_rows_with_outliers(self) -> Table:
-        """
-        Remove all rows from the table that contain at least one outlier.
-
-        We define an outlier as a value that has a distance of more than 3 standard deviations from the column mean.
-        Missing values are not considered outliers. They are also ignored during the calculation of the standard
-        deviation.
-
-        Returns
-        -------
-        new_table : Table
-            A new table without rows containing outliers.
-        """
-        copy = self._data.copy(deep=True)
-
-        table_without_nonnumericals = self.drop_columns_with_non_numerical_values()
-        z_scores = np.absolute(stats.zscore(table_without_nonnumericals._data, nan_policy="omit"))
-        filter_ = ((z_scores < 3) | np.isnan(z_scores)).all(axis=1)
-
-        return Table(copy[filter_], self._schema)
-
     def filter_rows(self, query: Callable[[Row], bool]) -> Table:
         """
         Return a table with rows filtered by Callable (e.g. lambda function).
@@ -686,6 +584,108 @@ class Table:
         transformed_data = self._data[column_indices]
         transformed_data.columns = list(name for name in self._schema.get_column_names() if name in column_names)
         return Table(transformed_data)
+
+    def remove_columns(self, column_names: list[str]) -> Table:
+        """
+        Return a table without the given column(s).
+
+        Parameters
+        ----------
+        column_names : list[str]
+            A list containing all columns to be dropped.
+
+        Returns
+        -------
+        table : Table
+            A table without the given columns.
+
+        Raises
+        ------
+        ColumnNameError
+            If any of the given columns do not exist.
+        """
+        invalid_columns = []
+        column_indices = []
+        for name in column_names:
+            if not self._schema.has_column(name):
+                invalid_columns.append(name)
+            else:
+                column_indices.append(self._schema._get_column_index_by_name(name))
+        if len(invalid_columns) != 0:
+            raise UnknownColumnNameError(invalid_columns)
+        transformed_data = self._data.drop(labels=column_indices, axis="columns")
+        transformed_data.columns = list(name for name in self._schema.get_column_names() if name not in column_names)
+        return Table(transformed_data)
+
+    def remove_columns_with_missing_values(self) -> Table:
+        """
+        Return a table without the columns that contain missing values.
+
+        Returns
+        -------
+        table : Table
+            A table without the columns that contain missing values.
+        """
+        return Table.from_columns([column for column in self.to_columns() if not column.has_missing_values()])
+
+    def remove_columns_with_non_numerical_values(self) -> Table:
+        """
+        Return a table without the columns that contain non-numerical values.
+
+        Returns
+        -------
+        table : Table
+            A table without the columns that contain non-numerical values.
+
+        """
+        return Table.from_columns([column for column in self.to_columns() if column.type.is_numeric()])
+
+    def remove_duplicate_rows(self) -> Table:
+        """
+        Return a copy of the table with every duplicate row removed.
+
+        Returns
+        -------
+        result : Table
+            The table with the duplicate rows removed.
+        """
+        df = self._data.drop_duplicates(ignore_index=True)
+        df.columns = self._schema.get_column_names()
+        return Table(df)
+
+    def remove_rows_with_missing_values(self) -> Table:
+        """
+        Return a table without the rows that contain missing values.
+
+        Returns
+        -------
+        table : Table
+            A table without the rows that contain missing values.
+        """
+        result = self._data.copy(deep=True)
+        result = result.dropna(axis="index")
+        return Table(result, self._schema)
+
+    def remove_rows_with_outliers(self) -> Table:
+        """
+        Remove all rows from the table that contain at least one outlier.
+
+        We define an outlier as a value that has a distance of more than 3 standard deviations from the column mean.
+        Missing values are not considered outliers. They are also ignored during the calculation of the standard
+        deviation.
+
+        Returns
+        -------
+        new_table : Table
+            A new table without rows containing outliers.
+        """
+        copy = self._data.copy(deep=True)
+
+        table_without_nonnumericals = self.remove_columns_with_non_numerical_values()
+        z_scores = np.absolute(stats.zscore(table_without_nonnumericals._data, nan_policy="omit"))
+        filter_ = ((z_scores < 3) | np.isnan(z_scores)).all(axis=1)
+
+        return Table(copy[filter_], self._schema)
 
     def rename_column(self, old_name: str, new_name: str) -> Table:
         """
@@ -955,7 +955,7 @@ class Table:
         """
         Plot a correlation heatmap for all numerical columns of this `Table`.
         """
-        only_numerical = self.drop_columns_with_non_numerical_values()
+        only_numerical = self.remove_columns_with_non_numerical_values()
 
         sns.heatmap(
             data=only_numerical._data.corr(),
