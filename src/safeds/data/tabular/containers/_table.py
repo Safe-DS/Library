@@ -11,6 +11,8 @@ import pandas as pd
 import seaborn as sns
 from IPython.core.display_functions import DisplayHandle, display
 from pandas import DataFrame, Series
+from scipy import stats
+
 from safeds.data.tabular.typing import ColumnType, TableSchema
 from safeds.exceptions import (
     ColumnLengthMismatchError,
@@ -18,13 +20,10 @@ from safeds.exceptions import (
     DuplicateColumnNameError,
     IndexOutOfBoundsError,
     MissingDataError,
-    MissingSchemaError,
     NonNumericColumnError,
     SchemaMismatchError,
     UnknownColumnNameError,
 )
-from scipy import stats
-
 from ._column import Column
 from ._row import Row
 
@@ -193,12 +192,10 @@ class Table:
 
     def __init__(self, data: Iterable, schema: Optional[TableSchema] = None):
         self._data: pd.Dataframe = data if isinstance(data, pd.DataFrame) else pd.DataFrame(data)
-        if schema is None:
-            self._schema: TableSchema = TableSchema._from_dataframe(self._data)
-        else:
-            self._schema: TableSchema = schema
-            if self._data.empty:
-                self._data = pd.DataFrame(columns=self._schema.get_column_names())
+        self._schema: TableSchema = TableSchema._from_dataframe(self._data) if schema is None else schema
+
+        if self._data.empty:
+            self._data = pd.DataFrame(columns=self._schema.get_column_names())
 
         self._data = self._data.reset_index(drop=True)
         self._data.columns = list(range(self.count_columns()))
@@ -826,7 +823,7 @@ class Table:
     def sort_columns(
         self,
         comparator: Callable[[Column, Column], int] = lambda col1, col2: (col1.name > col2.name)
-        - (col1.name < col2.name),
+                                                                         - (col1.name < col2.name),
     ) -> Table:
         """
         Sort the columns of a `Table` with the given comparator and return a new `Table`. The original table is not
