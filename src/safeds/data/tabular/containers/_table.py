@@ -783,7 +783,7 @@ class Table:
         new_df.columns = self._schema.get_column_names()
         return Table(new_df)
 
-    def slice(
+    def slice_rows(
         self,
         start: Optional[int] = None,
         end: Optional[int] = None,
@@ -901,8 +901,8 @@ class Table:
         if percentage_in_first <= 0 or percentage_in_first >= 1:
             raise ValueError("the given percentage is not in range")
         return (
-            self.slice(0, round(percentage_in_first * self.count_rows())),
-            self.slice(round(percentage_in_first * self.count_rows())),
+            self.slice_rows(0, round(percentage_in_first * self.count_rows())),
+            self.slice_rows(round(percentage_in_first * self.count_rows())),
         )
 
     def tag_columns(self, target_name: str, feature_names: Optional[list[str]] = None) -> TaggedTable:
