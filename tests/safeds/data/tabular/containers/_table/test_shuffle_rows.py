@@ -2,7 +2,7 @@ import pandas as pd
 from safeds.data.tabular.containers import Table
 
 
-def test_shuffle_valid() -> None:
+def test_shuffle_rows_valid() -> None:
     table = Table(pd.DataFrame(data={"col1": [1], "col2": [1]}))
-    result_table = table.shuffle()
+    result_table = table.shuffle_rows()
     assert table == result_table
