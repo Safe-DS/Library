@@ -52,6 +52,17 @@ class TableTransformer(ABC):
             If the transformer has not been fitted yet.
         """
 
+    @abstractmethod
+    def is_fitted(self) -> bool:
+        """
+        Check if the transformer is fitted.
+
+        Returns
+        -------
+        is_fitted : bool
+            Whether the transformer is fitted.
+        """
+
     def fit_and_transform(self, table: Table, column_names: Optional[list[str]] = None) -> Table:
         """
         Learn a transformation for a set of columns in a table and apply the learned transformation to the same table.

@@ -129,3 +129,14 @@ class OneHotEncoder(InvertibleTableTransformer):
         unchanged = data.drop(self._wrapped_transformer.get_feature_names_out(), axis=1)
 
         return Table(pd.concat([unchanged, decoded], axis=1))
+
+    def is_fitted(self) -> bool:
+        """
+        Check if the transformer is fitted.
+
+        Returns
+        -------
+        is_fitted : bool
+            Whether the transformer is fitted.
+        """
+        return self._wrapped_transformer is not None

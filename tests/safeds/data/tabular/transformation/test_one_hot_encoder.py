@@ -63,6 +63,23 @@ class TestTransform:
             transformer.transform(table)
 
 
+class TestIsFitted:
+    def test_should_return_false_before_fitting(self) -> None:
+        transformer = OneHotEncoder()
+        assert not transformer.is_fitted()
+
+    def test_should_return_true_after_fitting(self) -> None:
+        table = Table.from_columns(
+            [
+                Column("col1", ["a", "b", "c"]),
+            ]
+        )
+
+        transformer = OneHotEncoder()
+        fitted_transformer = transformer.fit(table)
+        assert fitted_transformer.is_fitted()
+
+
 class TestFitAndTransform:
     @pytest.mark.parametrize(
         ("table", "column_names", "expected"),
