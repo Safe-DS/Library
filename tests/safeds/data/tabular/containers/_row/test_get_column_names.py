@@ -1,7 +1,7 @@
-import numpy as np
 import pandas as pd
+
 from safeds.data.tabular.containers import Row
-from safeds.data.tabular.typing import ColumnType, TableSchema
+from safeds.data.tabular.typing import TableSchema, Float
 
 
 def test_get_column_names() -> None:
@@ -9,8 +9,8 @@ def test_get_column_names() -> None:
         pd.Series(data=[1, 2]),
         TableSchema(
             {
-                "col1": ColumnType._from_numpy_dtype(np.dtype(float)),
-                "col2": ColumnType._from_numpy_dtype(np.dtype(float)),
+                "col1": Float(),
+                "col2": Float(),
             }
         ),
     )

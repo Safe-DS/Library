@@ -1,7 +1,7 @@
-import numpy as np
 import pandas as pd
+
 from safeds.data.tabular.containers import Table
-from safeds.data.tabular.typing import ColumnType, TableSchema
+from safeds.data.tabular.typing import TableSchema, Float
 
 
 def test_remove_columns_with_missing_values_valid() -> None:
@@ -20,6 +20,6 @@ def test_remove_columns_with_missing_values_valid() -> None:
 
 
 def test_remove_columns_with_missing_values_empty() -> None:
-    table = Table([], TableSchema({"col1": ColumnType._from_numpy_dtype(np.dtype(float))}))
+    table = Table([], TableSchema({"col1": Float()}))
     updated_table = table.remove_columns_with_missing_values()
     assert updated_table.get_column_names() == ["col1"]

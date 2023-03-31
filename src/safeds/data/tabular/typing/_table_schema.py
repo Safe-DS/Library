@@ -97,6 +97,7 @@ class TableSchema:
         """
 
         names = dataframe.columns
+        # noinspection PyProtectedMember
         types = (ColumnType._from_numpy_dtype(dtype) for dtype in dataframe.dtypes)
 
         return TableSchema(dict(zip(names, types)))

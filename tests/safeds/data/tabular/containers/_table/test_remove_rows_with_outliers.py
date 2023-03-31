@@ -1,7 +1,7 @@
-import numpy as np
 import pandas as pd
+
 from safeds.data.tabular.containers import Table
-from safeds.data.tabular.typing import ColumnType, TableSchema
+from safeds.data.tabular.typing import TableSchema, Float
 
 
 def test_remove_rows_with_outliers_no_outliers() -> None:
@@ -60,7 +60,7 @@ def test_remove_rows_with_outliers_with_outliers() -> None:
 
 
 def test_remove_rows_with_outliers_no_rows() -> None:
-    table = Table([], TableSchema({"col1": ColumnType._from_numpy_dtype(np.dtype(float))}))
+    table = Table([], TableSchema({"col1": Float()}))
     result = table.remove_rows_with_outliers()
     assert result.count_rows() == 0
     assert result.count_columns() == 1

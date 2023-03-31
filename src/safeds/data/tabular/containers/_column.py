@@ -36,6 +36,7 @@ class Column:
     ) -> None:
         self._name: str = name
         self._data: pd.Series = data if isinstance(data, pd.Series) else pd.Series(data)
+        # noinspection PyProtectedMember
         self._type: ColumnType = (
             type_
             if type_ is not None
