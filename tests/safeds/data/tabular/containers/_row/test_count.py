@@ -1,5 +1,5 @@
 from safeds.data.tabular.containers import Row
-from safeds.data.tabular.typing import Integer, String, Schema
+from safeds.data.tabular.typing import Integer, Schema, String
 
 
 def test_count() -> None:

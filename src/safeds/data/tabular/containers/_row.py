@@ -145,7 +145,5 @@ class Row:
         tmp = self._data.to_frame().T
         tmp.columns = self.get_column_names()
 
-        with pd.option_context(
-            "display.max_rows", tmp.shape[0], "display.max_columns", tmp.shape[1]
-        ):
+        with pd.option_context("display.max_rows", tmp.shape[0], "display.max_columns", tmp.shape[1]):
             return display(tmp)
