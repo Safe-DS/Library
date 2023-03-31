@@ -59,7 +59,7 @@ class ColumnType(ABC):
             return Boolean()
         if dtype.kind == "f":
             return Number()
-        if dtype.kind in ("S", "U", "O"):
+        if dtype.kind in ("S", "U", "O", "M", "m"):
             return String()
         raise TypeError("Unexpected column type")
 
