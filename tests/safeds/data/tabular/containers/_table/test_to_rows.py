@@ -1,6 +1,6 @@
 import pandas as pd
 from safeds.data.tabular.containers import Row, Table
-from safeds.data.tabular.typing import IntColumnType, StringColumnType, TableSchema
+from safeds.data.tabular.typing import Int, String, TableSchema
 from tests.helpers import resolve_resource_path
 
 
@@ -8,9 +8,9 @@ def test_to_rows() -> None:
     table = Table.from_csv_file(resolve_resource_path("test_row_table.csv"))
     expected_schema: TableSchema = TableSchema(
         {
-            "A": IntColumnType(),
-            "B": IntColumnType(),
-            "D": StringColumnType(),
+            "A": Int(),
+            "B": Int(),
+            "D": String(),
         }
     )
     rows_expected: list[Row] = [

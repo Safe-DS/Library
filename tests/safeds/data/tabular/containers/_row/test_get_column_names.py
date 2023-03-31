@@ -9,8 +9,8 @@ def test_get_column_names() -> None:
         pd.Series(data=[1, 2]),
         TableSchema(
             {
-                "col1": ColumnType.from_numpy_dtype(np.dtype(float)),
-                "col2": ColumnType.from_numpy_dtype(np.dtype(float)),
+                "col1": ColumnType._from_numpy_dtype(np.dtype(float)),
+                "col2": ColumnType._from_numpy_dtype(np.dtype(float)),
             }
         ),
     )

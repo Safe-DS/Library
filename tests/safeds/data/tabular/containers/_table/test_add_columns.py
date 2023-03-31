@@ -1,6 +1,6 @@
 import pandas as pd
 from safeds.data.tabular.containers import Column, Table
-from safeds.data.tabular.typing import IntColumnType, StringColumnType
+from safeds.data.tabular.typing import Int, String
 
 
 def test_add_columns_valid() -> None:
@@ -11,10 +11,10 @@ def test_add_columns_valid() -> None:
     assert table1.count_columns() == 4
     assert table1.get_column("col3") == col3
     assert table1.get_column("col4") == col4
-    assert isinstance(table1.schema.get_type_of_column("col1"), IntColumnType)
-    assert isinstance(table1.schema.get_type_of_column("col2"), IntColumnType)
-    assert isinstance(table1.schema.get_type_of_column("col3"), IntColumnType)
-    assert isinstance(table1.schema.get_type_of_column("col4"), StringColumnType)
+    assert isinstance(table1.schema.get_type_of_column("col1"), Int)
+    assert isinstance(table1.schema.get_type_of_column("col2"), Int)
+    assert isinstance(table1.schema.get_type_of_column("col3"), Int)
+    assert isinstance(table1.schema.get_type_of_column("col4"), String)
 
 
 def test_add_columns_table_valid() -> None:
@@ -26,7 +26,7 @@ def test_add_columns_table_valid() -> None:
     assert table1.count_columns() == 4
     assert table1.get_column("col3") == col3
     assert table1.get_column("col4") == col4
-    assert isinstance(table1.schema.get_type_of_column("col1"), IntColumnType)
-    assert isinstance(table1.schema.get_type_of_column("col2"), IntColumnType)
-    assert isinstance(table1.schema.get_type_of_column("col3"), IntColumnType)
-    assert isinstance(table1.schema.get_type_of_column("col4"), StringColumnType)
+    assert isinstance(table1.schema.get_type_of_column("col1"), Int)
+    assert isinstance(table1.schema.get_type_of_column("col2"), Int)
+    assert isinstance(table1.schema.get_type_of_column("col3"), Int)
+    assert isinstance(table1.schema.get_type_of_column("col4"), String)

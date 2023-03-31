@@ -1,9 +1,9 @@
 from ._column_type import (
-    BooleanColumnType,
+    Boolean,
     ColumnType,
-    FloatColumnType,
-    IntColumnType,
-    OptionalColumnType,
-    StringColumnType,
+    Float,
+    Int,
+    Mixed,
+    String,
 )
 from ._table_schema import TableSchema

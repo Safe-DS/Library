@@ -39,7 +39,7 @@ class Column:
         self._type: ColumnType = (
             type_
             if type_ is not None
-            else ColumnType.from_numpy_dtype(self._data.dtype)
+            else ColumnType._from_numpy_dtype(self._data.dtype)
         )
 
     @property
