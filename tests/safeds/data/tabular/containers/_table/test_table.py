@@ -1,5 +1,5 @@
 from safeds.data.tabular.containers import Table
-from safeds.data.tabular.typing import TableSchema, RealNumber
+from safeds.data.tabular.typing import RealNumber, TableSchema
 
 
 def test_create_empty_table() -> None:

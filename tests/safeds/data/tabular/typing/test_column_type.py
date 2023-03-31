@@ -1,11 +1,16 @@
 import numpy as np
 import pytest
-
-from safeds.data.tabular.typing import ColumnType, Anything, Boolean, String, Integer, RealNumber
+from safeds.data.tabular.typing import (
+    Anything,
+    Boolean,
+    ColumnType,
+    Integer,
+    RealNumber,
+    String,
+)
 
 
 class TestColumnType:
-
     @pytest.mark.parametrize(
         ("column_type", "expected"),
         [
@@ -20,7 +25,7 @@ class TestColumnType:
             (String(is_nullable=False), "String"),
             (String(is_nullable=True), "String?"),
         ],
-        ids=repr
+        ids=repr,
     )
     def test_repr(self, column_type: ColumnType, expected: str) -> None:
         assert repr(column_type) == expected
@@ -39,7 +44,7 @@ class TestColumnType:
             (String(is_nullable=False), False),
             (String(is_nullable=True), True),
         ],
-        ids=repr
+        ids=repr,
     )
     def test_is_nullable(self, column_type: ColumnType, expected: bool) -> None:
         assert column_type.is_nullable() == expected
@@ -58,7 +63,7 @@ class TestColumnType:
             (String(is_nullable=False), False),
             (String(is_nullable=True), False),
         ],
-        ids=repr
+        ids=repr,
     )
     def test_is_numeric(self, column_type: ColumnType, expected: bool) -> None:
         assert column_type.is_numeric() == expected
@@ -69,13 +74,11 @@ class TestColumnType:
         [
             # Boolean
             (np.dtype(np.bool_), Boolean()),
-
             # Number
             (np.dtype(np.half), RealNumber()),
             (np.dtype(np.single), RealNumber()),
             (np.dtype(np.float_), RealNumber()),
             (np.dtype(np.longfloat), RealNumber()),
-
             # Int
             (np.dtype(np.byte), Integer()),
             (np.dtype(np.short), Integer()),
@@ -87,7 +90,6 @@ class TestColumnType:
             (np.dtype(np.uintc), Integer()),
             (np.dtype(np.uint), Integer()),
             (np.dtype(np.ulonglong), Integer()),
-
             # String
             (np.dtype(np.str_), String()),
             (np.dtype(np.unicode_), String()),
@@ -95,7 +97,7 @@ class TestColumnType:
             (np.dtype(np.datetime64), String()),
             (np.dtype(np.timedelta64), String()),
         ],
-        ids=repr
+        ids=repr,
     )
     def test_from_numpy_dtype(self, dtype: np.dtype, expected: ColumnType) -> None:
         assert ColumnType._from_numpy_dtype(dtype) == expected

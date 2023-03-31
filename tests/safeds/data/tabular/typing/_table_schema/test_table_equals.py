@@ -1,5 +1,5 @@
 from safeds.data.tabular.containers import Table
-from safeds.data.tabular.typing import RealNumber, Integer, TableSchema
+from safeds.data.tabular.typing import Integer, RealNumber, TableSchema
 from tests.helpers import resolve_resource_path
 
 

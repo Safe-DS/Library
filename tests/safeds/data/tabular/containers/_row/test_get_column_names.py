@@ -1,7 +1,6 @@
 import pandas as pd
-
 from safeds.data.tabular.containers import Row
-from safeds.data.tabular.typing import TableSchema, RealNumber
+from safeds.data.tabular.typing import RealNumber, TableSchema
 
 
 def test_get_column_names() -> None:

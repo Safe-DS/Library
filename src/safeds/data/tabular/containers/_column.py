@@ -31,17 +31,11 @@ class Column:
         The type of the column. If not specified, the type will be inferred from the data.
     """
 
-    def __init__(
-        self, name: str, data: Iterable, type_: Optional[ColumnType] = None
-    ) -> None:
+    def __init__(self, name: str, data: Iterable, type_: Optional[ColumnType] = None) -> None:
         self._name: str = name
         self._data: pd.Series = data if isinstance(data, pd.Series) else pd.Series(data)
         # noinspection PyProtectedMember
-        self._type: ColumnType = (
-            type_
-            if type_ is not None
-            else ColumnType._from_numpy_dtype(self._data.dtype)
-        )
+        self._type: ColumnType = type_ if type_ is not None else ColumnType._from_numpy_dtype(self._data.dtype)
 
     @property
     def name(self) -> str:
@@ -240,10 +234,7 @@ class Column:
         missing_values_exist : bool
             True if missing values exist.
         """
-        return self.any(
-            lambda value: value is None
-            or (isinstance(value, Number) and np.isnan(value))
-        )
+        return self.any(lambda value: value is None or (isinstance(value, Number) and np.isnan(value)))
 
     def correlation_with(self, other_column: Column) -> float:
         """
@@ -294,9 +285,7 @@ class Column:
         tmp = self._data.to_frame()
         tmp.columns = [self.name]
 
-        with pd.option_context(
-            "display.max_rows", tmp.shape[0], "display.max_columns", tmp.shape[1]
-        ):
+        with pd.option_context("display.max_rows", tmp.shape[0], "display.max_columns", tmp.shape[1]):
             return display(tmp)
 
     def maximum(self) -> float:
@@ -494,11 +483,7 @@ class Column:
             If the column contains non-numerical data or complex data.
         """
         for data in self._data:
-            if (
-                not isinstance(data, int)
-                and not isinstance(data, float)
-                and not isinstance(data, complex)
-            ):
+            if not isinstance(data, int) and not isinstance(data, float) and not isinstance(data, complex):
                 raise NonNumericColumnError(self.name)
             if isinstance(data, complex):
                 raise TypeError(
