@@ -1,6 +1,6 @@
 import pandas as pd
 from safeds.data.tabular.containers import Table
-from safeds.data.tabular.typing import TableSchema
+from safeds.data.tabular.typing import Schema
 
 
 def test_get_column_names() -> None:
@@ -9,5 +9,5 @@ def test_get_column_names() -> None:
 
 
 def test_get_column_names_empty() -> None:
-    table = Table(pd.DataFrame(), TableSchema({}))
+    table = Table(pd.DataFrame(), Schema({}))
     assert not table.get_column_names()

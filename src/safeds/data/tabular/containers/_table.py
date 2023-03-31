@@ -11,7 +11,7 @@ import pandas as pd
 import seaborn as sns
 from IPython.core.display_functions import DisplayHandle, display
 from pandas import DataFrame, Series
-from safeds.data.tabular.typing import ColumnType, TableSchema
+from safeds.data.tabular.typing import ColumnType, Schema
 from safeds.exceptions import (
     ColumnLengthMismatchError,
     ColumnSizeError,
@@ -40,7 +40,7 @@ class Table:
     ----------
     data : typing.Iterable
         The data.
-    schema : Optional[TableSchema]
+    schema : Optional[Schema]
         The schema of the table. If not specified, the schema will be inferred from the data.
 
     Raises
@@ -174,7 +174,7 @@ class Table:
         if len(rows) == 0:
             raise MissingDataError("This function requires at least one row.")
 
-        schema_compare: TableSchema = rows[0].schema
+        schema_compare: Schema = rows[0].schema
         row_array: list[Series] = []
 
         for row in rows:
@@ -190,9 +190,9 @@ class Table:
     # Dunder methods
     # ------------------------------------------------------------------------------------------------------------------
 
-    def __init__(self, data: Iterable, schema: Optional[TableSchema] = None):
+    def __init__(self, data: Iterable, schema: Optional[Schema] = None):
         self._data: pd.Dataframe = data if isinstance(data, pd.DataFrame) else pd.DataFrame(data)
-        self._schema: TableSchema = TableSchema._from_dataframe(self._data) if schema is None else schema
+        self._schema: Schema = Schema._from_dataframe(self._data) if schema is None else schema
 
         if self._data.empty:
             self._data = pd.DataFrame(columns=self._schema.get_column_names())
@@ -227,13 +227,13 @@ class Table:
     # ------------------------------------------------------------------------------------------------------------------
 
     @property
-    def schema(self) -> TableSchema:
+    def schema(self) -> Schema:
         """
         Return the schema of the table.
 
         Returns
         -------
-        schema : TableSchema
+        schema : Schema
             The schema.
         """
         return self._schema

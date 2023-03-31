@@ -1,10 +1,10 @@
 from safeds.data.tabular.containers import Row
-from safeds.data.tabular.typing import Integer, String, TableSchema
+from safeds.data.tabular.typing import Integer, String, Schema
 
 
 def test_count() -> None:
     row = Row(
         [0, "1"],
-        TableSchema({"testColumn1": Integer(), "testColumn2": String()}),
+        Schema({"testColumn1": Integer(), "testColumn2": String()}),
     )
     assert row.count() == 2

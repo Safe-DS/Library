@@ -2,7 +2,7 @@ from typing import Iterable, Optional
 
 from IPython.core.display_functions import DisplayHandle
 from safeds.data.tabular.containers import Column, Table
-from safeds.data.tabular.typing import TableSchema
+from safeds.data.tabular.typing import Schema
 
 
 class TaggedTable(Table):
@@ -17,7 +17,7 @@ class TaggedTable(Table):
         Name of the target column.
     feature_names : Optional[list[str]]
         Names of the feature columns. If None, all columns except the target column are used.
-    schema : Optional[TableSchema]
+    schema : Optional[Schema]
         The schema of the table. If not specified, the schema will be inferred from the data.
     """
 
@@ -26,7 +26,7 @@ class TaggedTable(Table):
         data: Iterable,
         target_name: str,
         feature_names: Optional[list[str]] = None,
-        schema: Optional[TableSchema] = None,
+        schema: Optional[Schema] = None,
     ):
         super().__init__(data, schema)
 

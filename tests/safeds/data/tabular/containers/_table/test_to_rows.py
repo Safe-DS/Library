@@ -1,12 +1,12 @@
 import pandas as pd
 from safeds.data.tabular.containers import Row, Table
-from safeds.data.tabular.typing import Integer, String, TableSchema
+from safeds.data.tabular.typing import Integer, String, Schema
 from tests.helpers import resolve_resource_path
 
 
 def test_to_rows() -> None:
     table = Table.from_csv_file(resolve_resource_path("test_row_table.csv"))
-    expected_schema: TableSchema = TableSchema(
+    expected_schema: Schema = Schema(
         {
             "A": Integer(),
             "B": Integer(),

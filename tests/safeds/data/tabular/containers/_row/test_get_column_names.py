@@ -1,12 +1,12 @@
 import pandas as pd
 from safeds.data.tabular.containers import Row
-from safeds.data.tabular.typing import RealNumber, TableSchema
+from safeds.data.tabular.typing import RealNumber, Schema
 
 
 def test_get_column_names() -> None:
     row = Row(
         pd.Series(data=[1, 2]),
-        TableSchema(
+        Schema(
             {
                 "col1": RealNumber(),
                 "col2": RealNumber(),
@@ -17,5 +17,5 @@ def test_get_column_names() -> None:
 
 
 def test_get_column_names_empty() -> None:
-    row = Row(pd.Series(data=[]), TableSchema({}))
+    row = Row(pd.Series(data=[]), Schema({}))
     assert not row.get_column_names()
