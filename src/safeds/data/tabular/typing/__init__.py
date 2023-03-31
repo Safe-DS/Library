@@ -1,7 +1,7 @@
 from ._column_type import (
     Boolean,
     ColumnType,
-    Float,
+    Number,
     Int,
     Mixed,
     String,

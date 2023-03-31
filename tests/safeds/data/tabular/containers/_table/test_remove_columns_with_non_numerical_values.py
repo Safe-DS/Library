@@ -1,7 +1,7 @@
 import pandas as pd
 
 from safeds.data.tabular.containers import Table
-from safeds.data.tabular.typing import TableSchema, Float
+from safeds.data.tabular.typing import TableSchema, Number
 
 
 def test_remove_columns_with_non_numerical_values_valid() -> None:
@@ -20,6 +20,6 @@ def test_remove_columns_with_non_numerical_values_valid() -> None:
 
 
 def test_remove_columns_with_non_numerical_values_empty() -> None:
-    table = Table([], TableSchema({"col1": Float()}))
+    table = Table([], TableSchema({"col1": Number()}))
     updated_table = table.remove_columns_with_non_numerical_values()
     assert updated_table.get_column_names() == ["col1"]
