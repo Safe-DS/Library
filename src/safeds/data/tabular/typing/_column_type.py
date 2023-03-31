@@ -58,16 +58,16 @@ class ColumnType(ABC):
         if dtype.kind == "b":
             return Boolean()
         if dtype.kind == "f":
-            return Real()
+            return RealNumber()
         if dtype.kind in ("S", "U", "O", "M", "m"):
             return String()
         raise TypeError("Unexpected column type")
 
 
 @dataclass
-class Mixed(ColumnType):
+class Anything(ColumnType):
     """
-    Type for a column that contains values of different types.
+    Type for a column that contains anything.
 
     Parameters
     ----------
@@ -81,7 +81,7 @@ class Mixed(ColumnType):
         self._is_nullable = is_nullable
 
     def __repr__(self) -> str:
-        result = "Mixed"
+        result = "Anything"
         if self._is_nullable:
             result += "?"
         return result
@@ -155,7 +155,7 @@ class Boolean(ColumnType):
 
 
 @dataclass
-class Real(ColumnType):
+class RealNumber(ColumnType):
     """
     Type for a column that only contains real numbers.
 
@@ -171,7 +171,7 @@ class Real(ColumnType):
         self._is_nullable = is_nullable
 
     def __repr__(self) -> str:
-        result = "Real"
+        result = "RealNumber"
         if self._is_nullable:
             result += "?"
         return result
@@ -216,7 +216,7 @@ class Integer(ColumnType):
         self._is_nullable = is_nullable
 
     def __repr__(self) -> str:
-        result = "Int"
+        result = "Integer"
         if self._is_nullable:
             result += "?"
         return result

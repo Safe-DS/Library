@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from safeds.data.tabular.typing import ColumnType, Mixed, Boolean, String, Integer, Real
+from safeds.data.tabular.typing import ColumnType, Anything, Boolean, String, Integer, RealNumber
 
 
 class TestColumnType:
@@ -9,14 +9,14 @@ class TestColumnType:
     @pytest.mark.parametrize(
         ("column_type", "expected"),
         [
-            (Mixed(is_nullable=False), "Mixed"),
-            (Mixed(is_nullable=True), "Mixed?"),
+            (Anything(is_nullable=False), "Anything"),
+            (Anything(is_nullable=True), "Anything?"),
             (Boolean(is_nullable=False), "Boolean"),
             (Boolean(is_nullable=True), "Boolean?"),
-            (Real(is_nullable=False), "Real"),
-            (Real(is_nullable=True), "Real?"),
-            (Integer(is_nullable=False), "Int"),
-            (Integer(is_nullable=True), "Int?"),
+            (RealNumber(is_nullable=False), "RealNumber"),
+            (RealNumber(is_nullable=True), "RealNumber?"),
+            (Integer(is_nullable=False), "Integer"),
+            (Integer(is_nullable=True), "Integer?"),
             (String(is_nullable=False), "String"),
             (String(is_nullable=True), "String?"),
         ],
@@ -28,12 +28,12 @@ class TestColumnType:
     @pytest.mark.parametrize(
         ("column_type", "expected"),
         [
-            (Mixed(is_nullable=False), False),
-            (Mixed(is_nullable=True), True),
+            (Anything(is_nullable=False), False),
+            (Anything(is_nullable=True), True),
             (Boolean(is_nullable=False), False),
             (Boolean(is_nullable=True), True),
-            (Real(is_nullable=False), False),
-            (Real(is_nullable=True), True),
+            (RealNumber(is_nullable=False), False),
+            (RealNumber(is_nullable=True), True),
             (Integer(is_nullable=False), False),
             (Integer(is_nullable=True), True),
             (String(is_nullable=False), False),
@@ -47,12 +47,12 @@ class TestColumnType:
     @pytest.mark.parametrize(
         ("column_type", "expected"),
         [
-            (Mixed(is_nullable=False), False),
-            (Mixed(is_nullable=True), False),
+            (Anything(is_nullable=False), False),
+            (Anything(is_nullable=True), False),
             (Boolean(is_nullable=False), False),
             (Boolean(is_nullable=True), False),
-            (Real(is_nullable=False), True),
-            (Real(is_nullable=True), True),
+            (RealNumber(is_nullable=False), True),
+            (RealNumber(is_nullable=True), True),
             (Integer(is_nullable=False), True),
             (Integer(is_nullable=True), True),
             (String(is_nullable=False), False),
@@ -71,10 +71,10 @@ class TestColumnType:
             (np.dtype(np.bool_), Boolean()),
 
             # Number
-            (np.dtype(np.half), Real()),
-            (np.dtype(np.single), Real()),
-            (np.dtype(np.float_), Real()),
-            (np.dtype(np.longfloat), Real()),
+            (np.dtype(np.half), RealNumber()),
+            (np.dtype(np.single), RealNumber()),
+            (np.dtype(np.float_), RealNumber()),
+            (np.dtype(np.longfloat), RealNumber()),
 
             # Int
             (np.dtype(np.byte), Integer()),

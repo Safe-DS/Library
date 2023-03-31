@@ -1,7 +1,7 @@
 import pandas as pd
 
 from safeds.data.tabular.containers import Row
-from safeds.data.tabular.typing import TableSchema, Real
+from safeds.data.tabular.typing import TableSchema, RealNumber
 
 
 def test_get_column_names() -> None:
@@ -9,8 +9,8 @@ def test_get_column_names() -> None:
         pd.Series(data=[1, 2]),
         TableSchema(
             {
-                "col1": Real(),
-                "col2": Real(),
+                "col1": RealNumber(),
+                "col2": RealNumber(),
             }
         ),
     )

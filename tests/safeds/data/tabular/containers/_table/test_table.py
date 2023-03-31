@@ -1,12 +1,12 @@
 from safeds.data.tabular.containers import Table
-from safeds.data.tabular.typing import TableSchema, Real
+from safeds.data.tabular.typing import TableSchema, RealNumber
 
 
 def test_create_empty_table() -> None:
-    table = Table([], TableSchema({"col1": Real()}))
+    table = Table([], TableSchema({"col1": RealNumber()}))
     col = table.get_column("col1")
     assert col.count() == 0
-    assert isinstance(col.type, Real)
+    assert isinstance(col.type, RealNumber)
     assert col.name == "col1"
 
 
