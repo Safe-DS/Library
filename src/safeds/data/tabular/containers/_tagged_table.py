@@ -21,6 +21,10 @@ class TaggedTable(Table):
         The schema of the table. If not specified, the schema will be inferred from the data.
     """
 
+    # ------------------------------------------------------------------------------------------------------------------
+    # Dunder methods
+    # ------------------------------------------------------------------------------------------------------------------
+
     def __init__(
         self,
         data: Iterable,
@@ -45,14 +49,6 @@ class TaggedTable(Table):
         self._features: Table = self.keep_only_columns(feature_names)
         self._target: Column = self.get_column(target_name)
 
-    @property
-    def features(self) -> Table:
-        return self._features
-
-    @property
-    def target(self) -> Column:
-        return self._target
-
     def __repr__(self) -> str:
         tmp = self._features.add_column(self._target)
         header_info = "Target Column is '" + self._target.name + "'\n"
@@ -62,6 +58,22 @@ class TaggedTable(Table):
         tmp = self._features.add_column(self._target)
         header_info = "Target Column is '" + self._target.name + "'\n"
         return header_info + tmp.__str__()
+
+    # ------------------------------------------------------------------------------------------------------------------
+    # Properties
+    # ------------------------------------------------------------------------------------------------------------------
+
+    @property
+    def features(self) -> Table:
+        return self._features
+
+    @property
+    def target(self) -> Column:
+        return self._target
+
+    # ------------------------------------------------------------------------------------------------------------------
+    # Other
+    # ------------------------------------------------------------------------------------------------------------------
 
     def _ipython_display_(self) -> DisplayHandle:
         """

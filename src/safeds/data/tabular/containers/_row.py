@@ -1,8 +1,9 @@
-import typing
-from typing import Any
+from hashlib import md5
+from typing import Any, Iterable, Iterator, Optional
 
 import pandas as pd
 from IPython.core.display_functions import DisplayHandle, display
+from pandas.core.util.hashing import hash_pandas_object
 from safeds.data.tabular.typing import ColumnType, Schema
 from safeds.exceptions import UnknownColumnNameError
 
@@ -13,25 +14,65 @@ class Row:
 
     Parameters
     ----------
-    data : typing.Iterable
+    data : Iterable
         The data.
     schema : Schema
         The schema of the row.
     """
 
-    def __init__(self, data: typing.Iterable, schema: Schema):
+    # ------------------------------------------------------------------------------------------------------------------
+    # Dunder methods
+    # ------------------------------------------------------------------------------------------------------------------
+
+    def __init__(self, data: Iterable, schema: Optional[Schema] = None):
         self._data: pd.Series = data if isinstance(data, pd.Series) else pd.Series(data)
-        self.schema: Schema = schema
         self._data = self._data.reset_index(drop=True)
+
+        self.schema: Schema
+        if schema is not None:
+            self.schema = schema
+        else:
+            column_names = [f"column_{i}" for i in range(len(self._data))]
+            dataframe = self._data.to_frame().T
+            dataframe.columns = column_names
+            # noinspection PyProtectedMember
+            self.schema = Schema._from_dataframe(dataframe)
+
+    def __eq__(self, other: Any) -> bool:
+        if not isinstance(other, Row):
+            return NotImplemented
+        if self is other:
+            return True
+        return self.schema == other.schema and self._data.equals(other._data)
 
     def __getitem__(self, column_name: str) -> Any:
         return self.get_value(column_name)
 
-    def __iter__(self) -> typing.Iterator[Any]:
+    def __hash__(self) -> int:
+        data_hash_string = md5(hash_pandas_object(self._data, index=True).values).hexdigest()
+        column_names_frozenset = frozenset(self.get_column_names())
+
+        return hash((data_hash_string, column_names_frozenset))
+
+    def __iter__(self) -> Iterator[Any]:
         return iter(self.get_column_names())
 
     def __len__(self) -> int:
         return len(self._data)
+
+    def __repr__(self) -> str:
+        tmp = self._data.to_frame().T
+        tmp.columns = self.get_column_names()
+        return tmp.__repr__()
+
+    def __str__(self) -> str:
+        tmp = self._data.to_frame().T
+        tmp.columns = self.get_column_names()
+        return tmp.__str__()
+
+    # ------------------------------------------------------------------------------------------------------------------
+    # Getters
+    # ------------------------------------------------------------------------------------------------------------------
 
     def get_value(self, column_name: str) -> Any:
         """
@@ -49,18 +90,8 @@ class Row:
         """
         if not self.schema.has_column(column_name):
             raise UnknownColumnNameError([column_name])
+        # noinspection PyProtectedMember
         return self._data[self.schema._get_column_index_by_name(column_name)]
-
-    def count(self) -> int:
-        """
-        Return the number of columns in this row.
-
-        Returns
-        -------
-        count : int
-            The number of columns.
-        """
-        return len(self._data)
 
     def has_column(self, column_name: str) -> bool:
         """
@@ -113,25 +144,24 @@ class Row:
         """
         return self.schema.get_type_of_column(column_name)
 
-    def __eq__(self, other: typing.Any) -> bool:
-        if not isinstance(other, Row):
-            return NotImplemented
-        if self is other:
-            return True
-        return self._data.equals(other._data) and self.schema == other.schema
+    # ------------------------------------------------------------------------------------------------------------------
+    # Information
+    # ------------------------------------------------------------------------------------------------------------------
 
-    def __hash__(self) -> int:
-        return hash(self._data)
+    def count(self) -> int:
+        """
+        Return the number of columns in this row.
 
-    def __str__(self) -> str:
-        tmp = self._data.to_frame().T
-        tmp.columns = self.get_column_names()
-        return tmp.__str__()
+        Returns
+        -------
+        count : int
+            The number of columns.
+        """
+        return len(self._data)
 
-    def __repr__(self) -> str:
-        tmp = self._data.to_frame().T
-        tmp.columns = self.get_column_names()
-        return tmp.__repr__()
+    # ------------------------------------------------------------------------------------------------------------------
+    # Other
+    # ------------------------------------------------------------------------------------------------------------------
 
     def _ipython_display_(self) -> DisplayHandle:
         """
