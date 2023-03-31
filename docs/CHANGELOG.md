@@ -1,3 +1,19 @@
+## [0.8.0](https://github.com/Safe-DS/Stdlib/compare/v0.7.0...v0.8.0) (2023-03-31)
+
+
+### Features
+
+* create empty `Table` without schema ([#128](https://github.com/Safe-DS/Stdlib/issues/128)) ([ddd3f59](https://github.com/Safe-DS/Stdlib/commit/ddd3f59cf4f0173327511593ea4dc0b5b938fce1)), closes [#127](https://github.com/Safe-DS/Stdlib/issues/127)
+* improve `ColumnType`s ([#132](https://github.com/Safe-DS/Stdlib/issues/132)) ([1786a87](https://github.com/Safe-DS/Stdlib/commit/1786a872f9fe713b952e75c190245200082ac80d)), closes [#113](https://github.com/Safe-DS/Stdlib/issues/113)
+* infer schema of row if not passed explicitly ([#134](https://github.com/Safe-DS/Stdlib/issues/134)) ([c5869bb](https://github.com/Safe-DS/Stdlib/commit/c5869bbc215d884c48726b3c8f6b3556763d986d)), closes [#15](https://github.com/Safe-DS/Stdlib/issues/15)
+* new method `is_fitted` to check whether a model is fitted ([#130](https://github.com/Safe-DS/Stdlib/issues/130)) ([8e1c3ea](https://github.com/Safe-DS/Stdlib/commit/8e1c3ea22c3b422b65340f6fc25a87d0d7fb8869))
+* new method `is_fitted` to check whether a transformer is fitted ([#131](https://github.com/Safe-DS/Stdlib/issues/131)) ([e20954f](https://github.com/Safe-DS/Stdlib/commit/e20954feb0f9191596aac93672b67361e1aa4ef8))
+* rename `drop_XY` methods of `Table` to `remove_XY` ([#122](https://github.com/Safe-DS/Stdlib/issues/122)) ([98d76a4](https://github.com/Safe-DS/Stdlib/commit/98d76a46a56d4f78cb30d3ea8c4916b69f738674))
+* rename `fit_transform` to `fit_and_transform` ([#119](https://github.com/Safe-DS/Stdlib/issues/119)) ([76a7112](https://github.com/Safe-DS/Stdlib/commit/76a71126b6ca21f9082dd2d3a2248bf65716b73f)), closes [#112](https://github.com/Safe-DS/Stdlib/issues/112)
+* rename `shuffle` to `shuffle_rows` ([#125](https://github.com/Safe-DS/Stdlib/issues/125)) ([ea21928](https://github.com/Safe-DS/Stdlib/commit/ea219285e869d0362339f8b87c310096cc001793))
+* rename `slice` to `slice_rows` ([#126](https://github.com/Safe-DS/Stdlib/issues/126)) ([20d21c2](https://github.com/Safe-DS/Stdlib/commit/20d21c2fed8f85cfdcb6480b9f1f96ebafab64f9))
+* rename `TableSchema` to `Schema` ([#133](https://github.com/Safe-DS/Stdlib/issues/133)) ([1419d25](https://github.com/Safe-DS/Stdlib/commit/1419d25113a28ed8ab76345a047eaf7dd4a3feb1))
+
 ## [0.7.0](https://github.com/Safe-DS/Stdlib/compare/v0.6.0...v0.7.0) (2023-03-29)
 
 
