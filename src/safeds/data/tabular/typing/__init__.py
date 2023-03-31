@@ -1,8 +1,8 @@
 from ._column_type import (
     Boolean,
     ColumnType,
-    Number,
-    Int,
+    Real,
+    Integer,
     Mixed,
     String,
 )

@@ -2,7 +2,7 @@ import pandas as pd
 import pytest
 from _pytest.python_api import raises
 from safeds.data.tabular.containers import Column, Table
-from safeds.data.tabular.typing import ColumnType, Int, String
+from safeds.data.tabular.typing import ColumnType, Integer, String
 from safeds.exceptions import ColumnSizeError, DuplicateColumnNameError
 
 
@@ -10,7 +10,7 @@ from safeds.exceptions import ColumnSizeError, DuplicateColumnNameError
     "column, col_type",
     [
         (Column("col3", ["a", "b", "c"]), String()),
-        (Column("col3", [0, -1, -2]), Int()),
+        (Column("col3", [0, -1, -2]), Integer()),
     ],
 )
 def test_add_column_valid(column: Column, col_type: ColumnType) -> None:
@@ -18,8 +18,8 @@ def test_add_column_valid(column: Column, col_type: ColumnType) -> None:
     table1 = table1.add_column(column)
     assert table1.count_columns() == 3
     assert table1.get_column("col3") == column
-    assert isinstance(table1.schema.get_type_of_column("col1"), Int)
-    assert isinstance(table1.schema.get_type_of_column("col2"), Int)
+    assert isinstance(table1.schema.get_type_of_column("col1"), Integer)
+    assert isinstance(table1.schema.get_type_of_column("col2"), Integer)
     assert isinstance(table1.schema.get_type_of_column("col3"), type(col_type))
 
 

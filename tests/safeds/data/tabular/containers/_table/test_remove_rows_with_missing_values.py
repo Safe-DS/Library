@@ -1,7 +1,7 @@
 import pandas as pd
 
 from safeds.data.tabular.containers import Table
-from safeds.data.tabular.typing import TableSchema, Number
+from safeds.data.tabular.typing import TableSchema, Real
 
 
 def test_remove_rows_with_missing_values_valid() -> None:
@@ -20,6 +20,6 @@ def test_remove_rows_with_missing_values_valid() -> None:
 
 
 def test_remove_rows_with_missing_values_empty() -> None:
-    table = Table([], TableSchema({"col1": Number()}))
+    table = Table([], TableSchema({"col1": Real()}))
     updated_table = table.remove_rows_with_missing_values()
     assert updated_table.get_column_names() == ["col1"]

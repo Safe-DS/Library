@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from safeds.data.tabular.typing import ColumnType, Mixed, Boolean, String, Int, Number
+from safeds.data.tabular.typing import ColumnType, Mixed, Boolean, String, Integer, Real
 
 
 class TestColumnType:
@@ -13,10 +13,10 @@ class TestColumnType:
             (Mixed(is_nullable=True), "Mixed?"),
             (Boolean(is_nullable=False), "Boolean"),
             (Boolean(is_nullable=True), "Boolean?"),
-            (Number(is_nullable=False), "Number"),
-            (Number(is_nullable=True), "Number?"),
-            (Int(is_nullable=False), "Int"),
-            (Int(is_nullable=True), "Int?"),
+            (Real(is_nullable=False), "Real"),
+            (Real(is_nullable=True), "Real?"),
+            (Integer(is_nullable=False), "Int"),
+            (Integer(is_nullable=True), "Int?"),
             (String(is_nullable=False), "String"),
             (String(is_nullable=True), "String?"),
         ],
@@ -32,10 +32,10 @@ class TestColumnType:
             (Mixed(is_nullable=True), True),
             (Boolean(is_nullable=False), False),
             (Boolean(is_nullable=True), True),
-            (Number(is_nullable=False), False),
-            (Number(is_nullable=True), True),
-            (Int(is_nullable=False), False),
-            (Int(is_nullable=True), True),
+            (Real(is_nullable=False), False),
+            (Real(is_nullable=True), True),
+            (Integer(is_nullable=False), False),
+            (Integer(is_nullable=True), True),
             (String(is_nullable=False), False),
             (String(is_nullable=True), True),
         ],
@@ -51,10 +51,10 @@ class TestColumnType:
             (Mixed(is_nullable=True), False),
             (Boolean(is_nullable=False), False),
             (Boolean(is_nullable=True), False),
-            (Number(is_nullable=False), True),
-            (Number(is_nullable=True), True),
-            (Int(is_nullable=False), True),
-            (Int(is_nullable=True), True),
+            (Real(is_nullable=False), True),
+            (Real(is_nullable=True), True),
+            (Integer(is_nullable=False), True),
+            (Integer(is_nullable=True), True),
             (String(is_nullable=False), False),
             (String(is_nullable=True), False),
         ],
@@ -71,22 +71,22 @@ class TestColumnType:
             (np.dtype(np.bool_), Boolean()),
 
             # Number
-            (np.dtype(np.half), Number()),
-            (np.dtype(np.single), Number()),
-            (np.dtype(np.float_), Number()),
-            (np.dtype(np.longfloat), Number()),
+            (np.dtype(np.half), Real()),
+            (np.dtype(np.single), Real()),
+            (np.dtype(np.float_), Real()),
+            (np.dtype(np.longfloat), Real()),
 
             # Int
-            (np.dtype(np.byte), Int()),
-            (np.dtype(np.short), Int()),
-            (np.dtype(np.intc), Int()),
-            (np.dtype(np.int_), Int()),
-            (np.dtype(np.longlong), Int()),
-            (np.dtype(np.ubyte), Int()),
-            (np.dtype(np.ushort), Int()),
-            (np.dtype(np.uintc), Int()),
-            (np.dtype(np.uint), Int()),
-            (np.dtype(np.ulonglong), Int()),
+            (np.dtype(np.byte), Integer()),
+            (np.dtype(np.short), Integer()),
+            (np.dtype(np.intc), Integer()),
+            (np.dtype(np.int_), Integer()),
+            (np.dtype(np.longlong), Integer()),
+            (np.dtype(np.ubyte), Integer()),
+            (np.dtype(np.ushort), Integer()),
+            (np.dtype(np.uintc), Integer()),
+            (np.dtype(np.uint), Integer()),
+            (np.dtype(np.ulonglong), Integer()),
 
             # String
             (np.dtype(np.str_), String()),

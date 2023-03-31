@@ -54,11 +54,11 @@ class ColumnType(ABC):
             If the given dtype is not supported.
         """
         if dtype.kind in ("u", "i"):
-            return Int()
+            return Integer()
         if dtype.kind == "b":
             return Boolean()
         if dtype.kind == "f":
-            return Number()
+            return Real()
         if dtype.kind in ("S", "U", "O", "M", "m"):
             return String()
         raise TypeError("Unexpected column type")
@@ -112,7 +112,7 @@ class Mixed(ColumnType):
 @dataclass
 class Boolean(ColumnType):
     """
-    Type for a column that only contains boolean values.
+    Type for a column that only contains booleans.
 
     Parameters
     ----------
@@ -155,9 +155,9 @@ class Boolean(ColumnType):
 
 
 @dataclass
-class Number(ColumnType):
+class Real(ColumnType):
     """
-    Type for a column that only contains numbers. This includes integers and floats.
+    Type for a column that only contains real numbers.
 
     Parameters
     ----------
@@ -171,7 +171,7 @@ class Number(ColumnType):
         self._is_nullable = is_nullable
 
     def __repr__(self) -> str:
-        result = "Number"
+        result = "Real"
         if self._is_nullable:
             result += "?"
         return result
@@ -200,9 +200,9 @@ class Number(ColumnType):
 
 
 @dataclass
-class Int(ColumnType):
+class Integer(ColumnType):
     """
-    Type for a column that only contains integer values.
+    Type for a column that only contains integers.
 
     Parameters
     ----------
@@ -247,7 +247,7 @@ class Int(ColumnType):
 @dataclass
 class String(ColumnType):
     """
-    Type for a column that only contains string values.
+    Type for a column that only contains strings.
 
     Parameters
     ----------
