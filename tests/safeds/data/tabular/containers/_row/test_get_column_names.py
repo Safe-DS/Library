@@ -1,7 +1,6 @@
-import numpy as np
 import pandas as pd
 from safeds.data.tabular.containers import Row
-from safeds.data.tabular.typing import ColumnType, TableSchema
+from safeds.data.tabular.typing import RealNumber, TableSchema
 
 
 def test_get_column_names() -> None:
@@ -9,8 +8,8 @@ def test_get_column_names() -> None:
         pd.Series(data=[1, 2]),
         TableSchema(
             {
-                "col1": ColumnType.from_numpy_dtype(np.dtype(float)),
-                "col2": ColumnType.from_numpy_dtype(np.dtype(float)),
+                "col1": RealNumber(),
+                "col2": RealNumber(),
             }
         ),
     )

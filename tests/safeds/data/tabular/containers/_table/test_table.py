@@ -1,13 +1,12 @@
-import numpy as np
 from safeds.data.tabular.containers import Table
-from safeds.data.tabular.typing import ColumnType, TableSchema
+from safeds.data.tabular.typing import RealNumber, TableSchema
 
 
 def test_create_empty_table() -> None:
-    table = Table([], TableSchema({"col1": ColumnType.from_numpy_dtype(np.dtype(float))}))
+    table = Table([], TableSchema({"col1": RealNumber()}))
     col = table.get_column("col1")
     assert col.count() == 0
-    assert isinstance(col.type, type(ColumnType.from_numpy_dtype(np.dtype(float))))
+    assert isinstance(col.type, RealNumber)
     assert col.name == "col1"
 
 

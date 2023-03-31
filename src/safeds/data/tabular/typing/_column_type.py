@@ -8,27 +8,40 @@ import numpy as np
 
 class ColumnType(ABC):
     """
-    Base type for Column, stored in TableSchema.
+    Abstract base class for column types.
     """
+
+    @abstractmethod
+    def is_nullable(self) -> bool:
+        """
+        Return whether the given column type is nullable.
+
+        Returns
+        -------
+        is_nullable : bool
+            True if the column is nullable.
+        """
 
     @abstractmethod
     def is_numeric(self) -> bool:
         """
         Return whether the given column type is numeric.
+
         Returns
         -------
         is_numeric : bool
             True if the column is numeric.
         """
-        return False
 
     @staticmethod
-    def from_numpy_dtype(_type: np.dtype) -> ColumnType:
+    def _from_numpy_dtype(dtype: np.dtype) -> ColumnType:
         """
         Return the column type for a given numpy dtype.
+
         Parameters
         ----------
-        _type : numpy.dtype
+        dtype : numpy.dtype
+            The numpy dtype.
 
         Returns
         -------
@@ -38,62 +51,239 @@ class ColumnType(ABC):
         Raises
         -------
         TypeError
-            If an unexpected column type is parsed.
-
+            If the given dtype is not supported.
         """
-        if _type.kind in ("u", "i"):
-            return IntColumnType()
-        if _type.kind == "b":
-            return BooleanColumnType()
-        if _type.kind == "f":
-            return FloatColumnType()
-        if _type.kind in ("S", "U", "O"):
-            return StringColumnType()
+        if dtype.kind in ("u", "i"):
+            return Integer()
+        if dtype.kind == "b":
+            return Boolean()
+        if dtype.kind == "f":
+            return RealNumber()
+        if dtype.kind in ("S", "U", "O", "M", "m"):
+            return String()
         raise TypeError("Unexpected column type")
 
 
 @dataclass
-class IntColumnType(ColumnType):
-    def is_numeric(self) -> bool:
-        return True
+class Anything(ColumnType):
+    """
+    Type for a column that contains anything.
+
+    Parameters
+    ----------
+    is_nullable : bool
+        Whether the type also allows null values.
+    """
+
+    _is_nullable: bool
+
+    def __init__(self, is_nullable: bool = False):
+        self._is_nullable = is_nullable
 
     def __repr__(self) -> str:
-        return "int"
+        result = "Anything"
+        if self._is_nullable:
+            result += "?"
+        return result
 
+    def is_nullable(self) -> bool:
+        """
+        Return whether the given column type is nullable.
 
-@dataclass
-class BooleanColumnType(ColumnType):
+        Returns
+        -------
+        is_nullable : bool
+            True if the column is nullable.
+        """
+        return self._is_nullable
+
     def is_numeric(self) -> bool:
+        """
+        Return whether the given column type is numeric.
+
+        Returns
+        -------
+        is_numeric : bool
+            True if the column is numeric.
+        """
         return False
 
-    def __repr__(self) -> str:
-        return "bool"
-
 
 @dataclass
-class FloatColumnType(ColumnType):
-    def is_numeric(self) -> bool:
-        return True
+class Boolean(ColumnType):
+    """
+    Type for a column that only contains booleans.
+
+    Parameters
+    ----------
+    is_nullable : bool
+        Whether the type also allows null values.
+    """
+
+    _is_nullable: bool
+
+    def __init__(self, is_nullable: bool = False):
+        self._is_nullable = is_nullable
 
     def __repr__(self) -> str:
-        return "float"
+        result = "Boolean"
+        if self._is_nullable:
+            result += "?"
+        return result
 
+    def is_nullable(self) -> bool:
+        """
+        Return whether the given column type is nullable.
 
-@dataclass
-class StringColumnType(ColumnType):
+        Returns
+        -------
+        is_nullable : bool
+            True if the column is nullable.
+        """
+        return self._is_nullable
+
     def is_numeric(self) -> bool:
+        """
+        Return whether the given column type is numeric.
+
+        Returns
+        -------
+        is_numeric : bool
+            True if the column is numeric.
+        """
         return False
 
+
+@dataclass
+class RealNumber(ColumnType):
+    """
+    Type for a column that only contains real numbers.
+
+    Parameters
+    ----------
+    is_nullable : bool
+        Whether the type also allows null values.
+    """
+
+    _is_nullable: bool
+
+    def __init__(self, is_nullable: bool = False):
+        self._is_nullable = is_nullable
+
     def __repr__(self) -> str:
-        return "string"
+        result = "RealNumber"
+        if self._is_nullable:
+            result += "?"
+        return result
+
+    def is_nullable(self) -> bool:
+        """
+        Return whether the given column type is nullable.
+
+        Returns
+        -------
+        is_nullable : bool
+            True if the column is nullable.
+        """
+        return self._is_nullable
+
+    def is_numeric(self) -> bool:
+        """
+        Return whether the given column type is numeric.
+
+        Returns
+        -------
+        is_numeric : bool
+            True if the column is numeric.
+        """
+        return True
 
 
 @dataclass
-class OptionalColumnType(ColumnType):
-    _type: ColumnType
+class Integer(ColumnType):
+    """
+    Type for a column that only contains integers.
 
-    def is_numeric(self) -> bool:
-        return self._type.is_numeric()
+    Parameters
+    ----------
+    is_nullable : bool
+        Whether the type also allows null values.
+    """
+
+    _is_nullable: bool
+
+    def __init__(self, is_nullable: bool = False):
+        self._is_nullable = is_nullable
 
     def __repr__(self) -> str:
-        return f"optional({self._type.__repr__()})"
+        result = "Integer"
+        if self._is_nullable:
+            result += "?"
+        return result
+
+    def is_nullable(self) -> bool:
+        """
+        Return whether the given column type is nullable.
+
+        Returns
+        -------
+        is_nullable : bool
+            True if the column is nullable.
+        """
+        return self._is_nullable
+
+    def is_numeric(self) -> bool:
+        """
+        Return whether the given column type is numeric.
+
+        Returns
+        -------
+        is_numeric : bool
+            True if the column is numeric.
+        """
+        return True
+
+
+@dataclass
+class String(ColumnType):
+    """
+    Type for a column that only contains strings.
+
+    Parameters
+    ----------
+    is_nullable : bool
+        Whether the type also allows null values.
+    """
+
+    _is_nullable: bool
+
+    def __init__(self, is_nullable: bool = False):
+        self._is_nullable = is_nullable
+
+    def __repr__(self) -> str:
+        result = "String"
+        if self._is_nullable:
+            result += "?"
+        return result
+
+    def is_nullable(self) -> bool:
+        """
+        Return whether the given column type is nullable.
+
+        Returns
+        -------
+        is_nullable : bool
+            True if the column is nullable.
+        """
+        return self._is_nullable
+
+    def is_numeric(self) -> bool:
+        """
+        Return whether the given column type is numeric.
+
+        Returns
+        -------
+        is_numeric : bool
+            True if the column is numeric.
+        """
+        return False

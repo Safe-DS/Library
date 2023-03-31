@@ -1,7 +1,6 @@
-import numpy as np
 import pandas as pd
 from safeds.data.tabular.containers import Table
-from safeds.data.tabular.typing import ColumnType, TableSchema
+from safeds.data.tabular.typing import RealNumber, TableSchema
 
 
 def test_remove_columns_with_missing_values_valid() -> None:
@@ -20,6 +19,6 @@ def test_remove_columns_with_missing_values_valid() -> None:
 
 
 def test_remove_columns_with_missing_values_empty() -> None:
-    table = Table([], TableSchema({"col1": ColumnType.from_numpy_dtype(np.dtype(float))}))
+    table = Table([], TableSchema({"col1": RealNumber()}))
     updated_table = table.remove_columns_with_missing_values()
     assert updated_table.get_column_names() == ["col1"]
