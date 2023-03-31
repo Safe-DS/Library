@@ -20,9 +20,9 @@ class TestColumnType:
             (String(is_nullable=False), "String"),
             (String(is_nullable=True), "String?"),
         ],
-        ids=lambda x: repr(x)
+        ids=repr
     )
-    def test_repr(self, column_type: ColumnType, expected: str):
+    def test_repr(self, column_type: ColumnType, expected: str) -> None:
         assert repr(column_type) == expected
 
     @pytest.mark.parametrize(
@@ -39,9 +39,9 @@ class TestColumnType:
             (String(is_nullable=False), False),
             (String(is_nullable=True), True),
         ],
-        ids=lambda x: repr(x)
+        ids=repr
     )
-    def test_is_nullable(self, column_type: ColumnType, expected: bool):
+    def test_is_nullable(self, column_type: ColumnType, expected: bool) -> None:
         assert column_type.is_nullable() == expected
 
     @pytest.mark.parametrize(
@@ -58,9 +58,9 @@ class TestColumnType:
             (String(is_nullable=False), False),
             (String(is_nullable=True), False),
         ],
-        ids=lambda x: repr(x)
+        ids=repr
     )
-    def test_is_numeric(self, column_type: ColumnType, expected: bool):
+    def test_is_numeric(self, column_type: ColumnType, expected: bool) -> None:
         assert column_type.is_numeric() == expected
 
     # Test cases taken from https://numpy.org/doc/stable/reference/arrays.scalars.html#scalars
@@ -95,7 +95,7 @@ class TestColumnType:
             (np.dtype(np.datetime64), String()),
             (np.dtype(np.timedelta64), String()),
         ],
-        ids=lambda x: repr(x)
+        ids=repr
     )
-    def test_from_numpy_dtype(self, dtype: np.dtype, expected: ColumnType):
+    def test_from_numpy_dtype(self, dtype: np.dtype, expected: ColumnType) -> None:
         assert ColumnType._from_numpy_dtype(dtype) == expected
