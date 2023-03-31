@@ -40,10 +40,11 @@ class Column:
     ) -> None:
         self._name: str = name
         self._data: pd.Series = data if isinstance(data, pd.Series) else pd.Series(data)
+        # noinspection PyProtectedMember
         self._type: ColumnType = (
             type_
             if type_ is not None
-            else ColumnType.from_numpy_dtype(self._data.dtype)
+            else ColumnType._from_numpy_dtype(self._data.dtype)
         )
 
     def __eq__(self, other: object) -> bool:
@@ -51,7 +52,7 @@ class Column:
             return NotImplemented
         if self is other:
             return True
-        return self._data.equals(other._data) and self.name == other.name
+        return self.name == other.name and  self._data.equals(other._data)
 
     def __getitem__(self, index: int) -> Any:
         return self.get_value(index)

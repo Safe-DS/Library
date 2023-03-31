@@ -1,9 +1,11 @@
-import typing
-from typing import Any
+from hashlib import md5
+from typing import Any, Optional, Iterable, Iterator
 
 import pandas as pd
 from IPython.core.display_functions import DisplayHandle, display
-from safeds.data.tabular.typing import ColumnType, TableSchema
+from pandas.core.util.hashing import hash_pandas_object
+
+from safeds.data.tabular.typing import ColumnType, Schema
 from safeds.exceptions import UnknownColumnNameError
 
 
@@ -13,9 +15,9 @@ class Row:
 
     Parameters
     ----------
-    data : typing.Iterable
+    data : Iterable
         The data.
-    schema : TableSchema
+    schema : Schema
         The schema of the row.
     """
 
@@ -23,25 +25,28 @@ class Row:
     # Dunder methods
     # ------------------------------------------------------------------------------------------------------------------
 
-    def __init__(self, data: typing.Iterable, schema: TableSchema):
+    def __init__(self, data: Iterable, schema: Optional[Schema] = None):
         self._data: pd.Series = data if isinstance(data, pd.Series) else pd.Series(data)
-        self.schema: TableSchema = schema
+        self.schema: Schema = schema if schema is not None else Schema({})
         self._data = self._data.reset_index(drop=True)
 
-    def __eq__(self, other: typing.Any) -> bool:
+    def __eq__(self, other: Any) -> bool:
         if not isinstance(other, Row):
             return NotImplemented
         if self is other:
             return True
-        return self._data.equals(other._data) and self.schema == other.schema
+        return self.schema == other.schema and self._data.equals(other._data)
 
     def __getitem__(self, column_name: str) -> Any:
         return self.get_value(column_name)
 
     def __hash__(self) -> int:
-        return hash(self._data)
+        data_hash_string = md5(hash_pandas_object(self._data, index=True).values).hexdigest()
+        column_names_frozenset = frozenset(self.get_column_names())
 
-    def __iter__(self) -> typing.Iterator[Any]:
+        return hash((data_hash_string, column_names_frozenset))
+
+    def __iter__(self) -> Iterator[Any]:
         return iter(self.get_column_names())
 
     def __len__(self) -> int:
@@ -77,6 +82,7 @@ class Row:
         """
         if not self.schema.has_column(column_name):
             raise UnknownColumnNameError([column_name])
+        # noinspection PyProtectedMember
         return self._data[self.schema._get_column_index_by_name(column_name)]
 
     def has_column(self, column_name: str) -> bool:
