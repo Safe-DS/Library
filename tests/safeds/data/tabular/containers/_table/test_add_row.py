@@ -1,7 +1,7 @@
 import pandas as pd
 from _pytest.python_api import raises
 from safeds.data.tabular.containers import Row, Table
-from safeds.data.tabular.typing import Integer, String, TableSchema
+from safeds.data.tabular.typing import Integer, Schema, String
 from safeds.exceptions import SchemaMismatchError
 
 
@@ -19,6 +19,6 @@ def test_add_row_invalid() -> None:
         table1 = Table(pd.DataFrame(data={"col1": [1, 2, 1], "col2": [1, 2, 4]}))
         row = Row(
             pd.Series(data=[5, "Hallo"]),
-            TableSchema({"col1": Integer(), "col2": String()}),
+            Schema({"col1": Integer(), "col2": String()}),
         )
         table1 = table1.add_row(row)

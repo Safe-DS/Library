@@ -3,7 +3,7 @@ from typing import Any
 
 import pandas as pd
 from IPython.core.display_functions import DisplayHandle, display
-from safeds.data.tabular.typing import ColumnType, TableSchema
+from safeds.data.tabular.typing import ColumnType, Schema
 from safeds.exceptions import UnknownColumnNameError
 
 
@@ -15,13 +15,13 @@ class Row:
     ----------
     data : typing.Iterable
         The data.
-    schema : TableSchema
+    schema : Schema
         The schema of the row.
     """
 
-    def __init__(self, data: typing.Iterable, schema: TableSchema):
+    def __init__(self, data: typing.Iterable, schema: Schema):
         self._data: pd.Series = data if isinstance(data, pd.Series) else pd.Series(data)
-        self.schema: TableSchema = schema
+        self.schema: Schema = schema
         self._data = self._data.reset_index(drop=True)
 
     def __getitem__(self, column_name: str) -> Any:
@@ -145,7 +145,5 @@ class Row:
         tmp = self._data.to_frame().T
         tmp.columns = self.get_column_names()
 
-        with pd.option_context(
-            "display.max_rows", tmp.shape[0], "display.max_columns", tmp.shape[1]
-        ):
+        with pd.option_context("display.max_rows", tmp.shape[0], "display.max_columns", tmp.shape[1]):
             return display(tmp)

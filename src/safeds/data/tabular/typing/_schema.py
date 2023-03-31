@@ -8,9 +8,9 @@ from safeds.exceptions import UnknownColumnNameError
 
 
 @dataclass
-class TableSchema:
+class Schema:
     """
-    Store column names and corresponding data types for a table.
+    Store column names and corresponding data types for a `Table` or `Row`.
 
     Parameters
     ----------
@@ -80,7 +80,7 @@ class TableSchema:
         return list(self._schema.keys()).index(column_name)
 
     @staticmethod
-    def _from_dataframe(dataframe: pd.DataFrame) -> TableSchema:
+    def _from_dataframe(dataframe: pd.DataFrame) -> Schema:
         """
         Construct a TableSchema from a Dataframe. This function is not supposed to be exposed to the user.
 
@@ -91,7 +91,7 @@ class TableSchema:
 
         Returns
         -------
-        _from_dataframe: TableSchema
+        _from_dataframe: Schema
             The constructed TableSchema.
 
         """
@@ -100,7 +100,7 @@ class TableSchema:
         # noinspection PyProtectedMember
         types = (ColumnType._from_numpy_dtype(dtype) for dtype in dataframe.dtypes)
 
-        return TableSchema(dict(zip(names, types)))
+        return Schema(dict(zip(names, types)))
 
     def get_column_names(self) -> list[str]:
         """
@@ -132,7 +132,7 @@ class TableSchema:
         return self.__str__()
 
     def __eq__(self, o: object) -> bool:
-        if not isinstance(o, TableSchema):
+        if not isinstance(o, Schema):
             return NotImplemented
         if self is o:
             return True
