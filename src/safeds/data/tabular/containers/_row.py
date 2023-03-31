@@ -3,7 +3,7 @@ from typing import Any
 
 import pandas as pd
 from IPython.core.display_functions import DisplayHandle, display
-from safeds.data.tabular.typing import ColumnType, Schema
+from safeds.data.tabular.typing import ColumnType, TableSchema
 from safeds.exceptions import UnknownColumnNameError
 
 
@@ -15,23 +15,51 @@ class Row:
     ----------
     data : typing.Iterable
         The data.
-    schema : Schema
+    schema : TableSchema
         The schema of the row.
     """
 
-    def __init__(self, data: typing.Iterable, schema: Schema):
+    # ------------------------------------------------------------------------------------------------------------------
+    # Dunder methods
+    # ------------------------------------------------------------------------------------------------------------------
+
+    def __init__(self, data: typing.Iterable, schema: TableSchema):
         self._data: pd.Series = data if isinstance(data, pd.Series) else pd.Series(data)
-        self.schema: Schema = schema
+        self.schema: TableSchema = schema
         self._data = self._data.reset_index(drop=True)
+
+    def __eq__(self, other: typing.Any) -> bool:
+        if not isinstance(other, Row):
+            return NotImplemented
+        if self is other:
+            return True
+        return self._data.equals(other._data) and self.schema == other.schema
 
     def __getitem__(self, column_name: str) -> Any:
         return self.get_value(column_name)
+
+    def __hash__(self) -> int:
+        return hash(self._data)
 
     def __iter__(self) -> typing.Iterator[Any]:
         return iter(self.get_column_names())
 
     def __len__(self) -> int:
         return len(self._data)
+
+    def __repr__(self) -> str:
+        tmp = self._data.to_frame().T
+        tmp.columns = self.get_column_names()
+        return tmp.__repr__()
+
+    def __str__(self) -> str:
+        tmp = self._data.to_frame().T
+        tmp.columns = self.get_column_names()
+        return tmp.__str__()
+
+    # ------------------------------------------------------------------------------------------------------------------
+    # Getters
+    # ------------------------------------------------------------------------------------------------------------------
 
     def get_value(self, column_name: str) -> Any:
         """
@@ -50,17 +78,6 @@ class Row:
         if not self.schema.has_column(column_name):
             raise UnknownColumnNameError([column_name])
         return self._data[self.schema._get_column_index_by_name(column_name)]
-
-    def count(self) -> int:
-        """
-        Return the number of columns in this row.
-
-        Returns
-        -------
-        count : int
-            The number of columns.
-        """
-        return len(self._data)
 
     def has_column(self, column_name: str) -> bool:
         """
@@ -113,25 +130,24 @@ class Row:
         """
         return self.schema.get_type_of_column(column_name)
 
-    def __eq__(self, other: typing.Any) -> bool:
-        if not isinstance(other, Row):
-            return NotImplemented
-        if self is other:
-            return True
-        return self._data.equals(other._data) and self.schema == other.schema
+    # ------------------------------------------------------------------------------------------------------------------
+    # Information
+    # ------------------------------------------------------------------------------------------------------------------
 
-    def __hash__(self) -> int:
-        return hash(self._data)
+    def count(self) -> int:
+        """
+        Return the number of columns in this row.
 
-    def __str__(self) -> str:
-        tmp = self._data.to_frame().T
-        tmp.columns = self.get_column_names()
-        return tmp.__str__()
+        Returns
+        -------
+        count : int
+            The number of columns.
+        """
+        return len(self._data)
 
-    def __repr__(self) -> str:
-        tmp = self._data.to_frame().T
-        tmp.columns = self.get_column_names()
-        return tmp.__repr__()
+    # ------------------------------------------------------------------------------------------------------------------
+    # Other
+    # ------------------------------------------------------------------------------------------------------------------
 
     def _ipython_display_(self) -> DisplayHandle:
         """
@@ -145,5 +161,7 @@ class Row:
         tmp = self._data.to_frame().T
         tmp.columns = self.get_column_names()
 
-        with pd.option_context("display.max_rows", tmp.shape[0], "display.max_columns", tmp.shape[1]):
+        with pd.option_context(
+            "display.max_rows", tmp.shape[0], "display.max_columns", tmp.shape[1]
+        ):
             return display(tmp)

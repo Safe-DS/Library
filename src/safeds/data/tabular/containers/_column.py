@@ -31,35 +31,20 @@ class Column:
         The type of the column. If not specified, the type will be inferred from the data.
     """
 
-    def __init__(self, name: str, data: Iterable, type_: Optional[ColumnType] = None) -> None:
+    # ------------------------------------------------------------------------------------------------------------------
+    # Dunder methods
+    # ------------------------------------------------------------------------------------------------------------------
+
+    def __init__(
+        self, name: str, data: Iterable, type_: Optional[ColumnType] = None
+    ) -> None:
         self._name: str = name
         self._data: pd.Series = data if isinstance(data, pd.Series) else pd.Series(data)
-        # noinspection PyProtectedMember
-        self._type: ColumnType = type_ if type_ is not None else ColumnType._from_numpy_dtype(self._data.dtype)
-
-    @property
-    def name(self) -> str:
-        """
-        Return the name of the column.
-
-        Returns
-        -------
-        name : str
-            The name of the column.
-        """
-        return self._name
-
-    @property
-    def type(self) -> ColumnType:
-        """
-        Return the type of the column.
-
-        Returns
-        -------
-        type : ColumnType
-            The type of the column.
-        """
-        return self._type
+        self._type: ColumnType = (
+            type_
+            if type_ is not None
+            else ColumnType.from_numpy_dtype(self._data.dtype)
+        )
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, Column):
@@ -90,6 +75,49 @@ class Column:
         tmp.columns = [self.name]
         return tmp.__str__()
 
+    # ------------------------------------------------------------------------------------------------------------------
+    # Properties
+    # ------------------------------------------------------------------------------------------------------------------
+
+    @property
+    def name(self) -> str:
+        """
+        Return the name of the column.
+
+        Returns
+        -------
+        name : str
+            The name of the column.
+        """
+        return self._name
+
+    @property
+    def type(self) -> ColumnType:
+        """
+        Return the type of the column.
+
+        Returns
+        -------
+        type : ColumnType
+            The type of the column.
+        """
+        return self._type
+
+    # ------------------------------------------------------------------------------------------------------------------
+    # Getters
+    # ------------------------------------------------------------------------------------------------------------------
+
+    def get_unique_values(self) -> list[Any]:
+        """
+        Return a list of all unique values in the column.
+
+        Returns
+        -------
+        unique_values : list[any]
+            List of unique values in the column.
+        """
+        return list(self._data.unique())
+
     def get_value(self, index: int) -> Any:
         """
         Return column value at specified index, starting at 0.
@@ -114,6 +142,10 @@ class Column:
 
         return self._data[index]
 
+    # ------------------------------------------------------------------------------------------------------------------
+    # Information
+    # ------------------------------------------------------------------------------------------------------------------
+
     def count(self) -> int:
         """
         Return the number of elements in the column.
@@ -124,33 +156,6 @@ class Column:
             The number of elements.
         """
         return len(self._data)
-
-    def _count_missing_values(self) -> int:
-        """
-        Return the number of null values in the column.
-
-        Returns
-        -------
-        count : int
-            The number of null values.
-        """
-        return self._data.isna().sum()
-
-    def rename(self, new_name: str) -> Column:
-        """
-        Return a new column with a new name.
-
-        Parameters
-        ----------
-        new_name : str
-            The new name of the column.
-
-        Returns
-        -------
-        column : Column
-            A new column with the new name.
-        """
-        return Column(new_name, self._data, self._type)
 
     def all(self, predicate: Callable[[Any], bool]) -> bool:
         """
@@ -212,19 +217,6 @@ class Column:
                 return False
         return True
 
-    def missing_value_ratio(self) -> float:
-        """
-        Return the ratio of null values to the total number of elements in the column
-
-        Returns
-        -------
-        ratio : float
-            The ratio of null values to the total number of elements in the column.
-        """
-        if self._data.size == 0:
-            raise ColumnSizeError("> 0", "0")
-        return self._count_missing_values() / self._data.size
-
     def has_missing_values(self) -> bool:
         """
         Return whether the column has missing values.
@@ -234,7 +226,33 @@ class Column:
         missing_values_exist : bool
             True if missing values exist.
         """
-        return self.any(lambda value: value is None or (isinstance(value, Number) and np.isnan(value)))
+        return self.any(
+            lambda value: value is None or (isinstance(value, Number) and np.isnan(value))
+        )
+
+    # ------------------------------------------------------------------------------------------------------------------
+    # Transformations
+    # ------------------------------------------------------------------------------------------------------------------
+
+    def rename(self, new_name: str) -> Column:
+        """
+        Return a new column with a new name.
+
+        Parameters
+        ----------
+        new_name : str
+            The new name of the column.
+
+        Returns
+        -------
+        column : Column
+            A new column with the new name.
+        """
+        return Column(new_name, self._data, self._type)
+
+    # ------------------------------------------------------------------------------------------------------------------
+    # Statistics
+    # ------------------------------------------------------------------------------------------------------------------
 
     def correlation_with(self, other_column: Column) -> float:
         """
@@ -262,31 +280,27 @@ class Column:
             )
         return self._data.corr(other_column._data)
 
-    def get_unique_values(self) -> list[Any]:
+    def idness(self) -> float:
         """
-        Return a list of all unique values in the column.
+        Calculate the idness of this column, which we define as
+
+        $$
+        \\frac{\\text{number of different values}}{\\text{number of rows}}
+        $$
 
         Returns
         -------
-        unique_values : list[any]
-            List of unique values in the column.
-        """
-        return list(self._data.unique())
+        idness : float
+            The idness of the column.
 
-    def _ipython_display_(self) -> DisplayHandle:
+        Raises
+        ------
+        ColumnSizeError
+            If this column is empty.
         """
-        Return a display object for the column to be used in Jupyter Notebooks.
-
-        Returns
-        -------
-        output : DisplayHandle
-            Output object.
-        """
-        tmp = self._data.to_frame()
-        tmp.columns = [self.name]
-
-        with pd.option_context("display.max_rows", tmp.shape[0], "display.max_columns", tmp.shape[1]):
-            return display(tmp)
+        if self._data.size == 0:
+            raise ColumnSizeError("> 0", "0")
+        return self._data.nunique() / self._data.size
 
     def maximum(self) -> float:
         """
@@ -306,24 +320,6 @@ class Column:
             raise NonNumericColumnError(f"{self.name} is of type {self._type}.")
         return self._data.max()
 
-    def minimum(self) -> float:
-        """
-        Return the minimum value of the column. The column has to be numerical.
-
-        Returns
-        -------
-        min : float
-            The minimum value.
-
-        Raises
-        ------
-        NonNumericColumnError
-            If the data contains non-numerical data.
-        """
-        if not self._type.is_numeric():
-            raise NonNumericColumnError(f"{self.name} is of type {self._type}.")
-        return self._data.min()
-
     def mean(self) -> float:
         """
         Return the mean value of the column. The column has to be numerical.
@@ -342,17 +338,6 @@ class Column:
             raise NonNumericColumnError(f"{self.name} is of type {self._type}.")
         return self._data.mean()
 
-    def mode(self) -> Any:
-        """
-        Return the mode of the column.
-
-        Returns
-        -------
-        List :
-            Returns a list with the most common values.
-        """
-        return self._data.mode().tolist()
-
     def median(self) -> float:
         """
         Return the median value of the column. The column has to be numerical.
@@ -370,6 +355,89 @@ class Column:
         if not self._type.is_numeric():
             raise NonNumericColumnError(f"{self.name} is of type {self._type}.")
         return self._data.median()
+
+    def minimum(self) -> float:
+        """
+        Return the minimum value of the column. The column has to be numerical.
+
+        Returns
+        -------
+        min : float
+            The minimum value.
+
+        Raises
+        ------
+        NonNumericColumnError
+            If the data contains non-numerical data.
+        """
+        if not self._type.is_numeric():
+            raise NonNumericColumnError(f"{self.name} is of type {self._type}.")
+        return self._data.min()
+
+    def missing_value_ratio(self) -> float:
+        """
+        Return the ratio of null values to the total number of elements in the column
+
+        Returns
+        -------
+        ratio : float
+            The ratio of null values to the total number of elements in the column.
+        """
+        if self._data.size == 0:
+            raise ColumnSizeError("> 0", "0")
+        return self._count_missing_values() / self._data.size
+
+    def mode(self) -> Any:
+        """
+        Return the mode of the column.
+
+        Returns
+        -------
+        List :
+            Returns a list with the most common values.
+        """
+        return self._data.mode().tolist()
+
+    def stability(self) -> float:
+        """
+        Calculate the stability of this column, which we define as
+
+        $$
+        \\frac{\\text{number of occurrences of most common non-null value}}{\\text{number of non-null values}}
+        $$
+
+        Returns
+        -------
+        stability : float
+            The stability of the column.
+
+        Raises
+        ------
+        ColumnSizeError
+            If the column is empty.
+        """
+        if self._data.size == 0:
+            raise ColumnSizeError("> 0", "0")
+        return self._data.value_counts()[self.mode()[0]] / self._data.count()
+
+    def standard_deviation(self) -> float:
+        """
+        Return the standard deviation of the column. The column has to be numerical.
+
+        Returns
+        -------
+        sum : float
+            The standard deviation of all values.
+
+        Raises
+        ---
+        NonNumericColumnError
+            If the data contains non-numerical data.
+
+        """
+        if not self.type.is_numeric():
+            raise NonNumericColumnError(f"{self.name} is of type {self._type}.")
+        return self._data.std()
 
     def sum(self) -> float:
         """
@@ -410,68 +478,9 @@ class Column:
 
         return self._data.var()
 
-    def standard_deviation(self) -> float:
-        """
-        Return the standard deviation of the column. The column has to be numerical.
-
-        Returns
-        -------
-        sum : float
-            The standard deviation of all values.
-
-        Raises
-        ---
-        NonNumericColumnError
-            If the data contains non-numerical data.
-
-        """
-        if not self.type.is_numeric():
-            raise NonNumericColumnError(f"{self.name} is of type {self._type}.")
-        return self._data.std()
-
-    def stability(self) -> float:
-        """
-        Calculate the stability of this column, which we define as
-
-        $$
-        \\frac{\\text{number of occurrences of most common non-null value}}{\\text{number of non-null values}}
-        $$
-
-        Returns
-        -------
-        stability : float
-            The stability of the column.
-
-        Raises
-        ------
-        ColumnSizeError
-            If the column is empty.
-        """
-        if self._data.size == 0:
-            raise ColumnSizeError("> 0", "0")
-        return self._data.value_counts()[self.mode()[0]] / self._data.count()
-
-    def idness(self) -> float:
-        """
-        Calculate the idness of this column, which we define as
-
-        $$
-        \\frac{\\text{number of different values}}{\\text{number of rows}}
-        $$
-
-        Returns
-        -------
-        idness : float
-            The idness of the column.
-
-        Raises
-        ------
-        ColumnSizeError
-            If this column is empty.
-        """
-        if self._data.size == 0:
-            raise ColumnSizeError("> 0", "0")
-        return self._data.nunique() / self._data.size
+    # ------------------------------------------------------------------------------------------------------------------
+    # Plotting
+    # ------------------------------------------------------------------------------------------------------------------
 
     def boxplot(self) -> None:
         """
@@ -483,7 +492,11 @@ class Column:
             If the column contains non-numerical data or complex data.
         """
         for data in self._data:
-            if not isinstance(data, int) and not isinstance(data, float) and not isinstance(data, complex):
+            if (
+                not isinstance(data, int)
+                and not isinstance(data, float)
+                and not isinstance(data, complex)
+            ):
                 raise NonNumericColumnError(self.name)
             if isinstance(data, complex):
                 raise TypeError(
@@ -508,3 +521,35 @@ class Column:
         )  # rotate the labels of the x Axis to prevent the chance of overlapping of the labels
         plt.tight_layout()
         plt.show()
+
+    # ------------------------------------------------------------------------------------------------------------------
+    # Other
+    # ------------------------------------------------------------------------------------------------------------------
+
+    def _count_missing_values(self) -> int:
+        """
+        Return the number of null values in the column.
+
+        Returns
+        -------
+        count : int
+            The number of null values.
+        """
+        return self._data.isna().sum()
+
+    def _ipython_display_(self) -> DisplayHandle:
+        """
+        Return a display object for the column to be used in Jupyter Notebooks.
+
+        Returns
+        -------
+        output : DisplayHandle
+            Output object.
+        """
+        tmp = self._data.to_frame()
+        tmp.columns = [self.name]
+
+        with pd.option_context(
+            "display.max_rows", tmp.shape[0], "display.max_columns", tmp.shape[1]
+        ):
+            return display(tmp)
