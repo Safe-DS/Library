@@ -1,9 +1,8 @@
 from typing import Any
 
 import pytest
-
 from safeds.data.tabular.containers import Row, Table
-from safeds.data.tabular.typing import Integer, Schema, String, ColumnType
+from safeds.data.tabular.typing import ColumnType, Integer, Schema, String
 from safeds.exceptions import UnknownColumnNameError
 
 
@@ -13,7 +12,10 @@ class TestInit:
         [
             (Row([], Schema({})), Schema({})),
             (Row([0], Schema({"col1": Integer()})), Schema({"col1": Integer()})),
-            (Row([0, "a"], Schema({"col1": Integer(), "col2": String()})), Schema({"col1": Integer(), "col2": String()})),
+            (
+                Row([0, "a"], Schema({"col1": Integer(), "col2": String()})),
+                Schema({"col1": Integer(), "col2": String()}),
+            ),
         ],
     )
     def test_should_use_the_schema_if_passed(self, row: Row, expected: Schema) -> None:

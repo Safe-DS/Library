@@ -35,24 +35,18 @@ class Column:
     # Dunder methods
     # ------------------------------------------------------------------------------------------------------------------
 
-    def __init__(
-        self, name: str, data: Iterable, type_: Optional[ColumnType] = None
-    ) -> None:
+    def __init__(self, name: str, data: Iterable, type_: Optional[ColumnType] = None) -> None:
         self._name: str = name
         self._data: pd.Series = data if isinstance(data, pd.Series) else pd.Series(data)
         # noinspection PyProtectedMember
-        self._type: ColumnType = (
-            type_
-            if type_ is not None
-            else ColumnType._from_numpy_dtype(self._data.dtype)
-        )
+        self._type: ColumnType = type_ if type_ is not None else ColumnType._from_numpy_dtype(self._data.dtype)
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, Column):
             return NotImplemented
         if self is other:
             return True
-        return self.name == other.name and  self._data.equals(other._data)
+        return self.name == other.name and self._data.equals(other._data)
 
     def __getitem__(self, index: int) -> Any:
         return self.get_value(index)
@@ -227,9 +221,7 @@ class Column:
         missing_values_exist : bool
             True if missing values exist.
         """
-        return self.any(
-            lambda value: value is None or (isinstance(value, Number) and np.isnan(value))
-        )
+        return self.any(lambda value: value is None or (isinstance(value, Number) and np.isnan(value)))
 
     # ------------------------------------------------------------------------------------------------------------------
     # Transformations
@@ -493,11 +485,7 @@ class Column:
             If the column contains non-numerical data or complex data.
         """
         for data in self._data:
-            if (
-                not isinstance(data, int)
-                and not isinstance(data, float)
-                and not isinstance(data, complex)
-            ):
+            if not isinstance(data, int) and not isinstance(data, float) and not isinstance(data, complex):
                 raise NonNumericColumnError(self.name)
             if isinstance(data, complex):
                 raise TypeError(
@@ -550,7 +538,5 @@ class Column:
         tmp = self._data.to_frame()
         tmp.columns = [self.name]
 
-        with pd.option_context(
-            "display.max_rows", tmp.shape[0], "display.max_columns", tmp.shape[1]
-        ):
+        with pd.option_context("display.max_rows", tmp.shape[0], "display.max_columns", tmp.shape[1]):
             return display(tmp)
