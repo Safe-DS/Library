@@ -27,8 +27,17 @@ class Row:
 
     def __init__(self, data: Iterable, schema: Optional[Schema] = None):
         self._data: pd.Series = data if isinstance(data, pd.Series) else pd.Series(data)
-        self.schema: Schema = schema if schema is not None else Schema({})
         self._data = self._data.reset_index(drop=True)
+
+        self.schema: Schema
+        if schema is not None:
+            self.schema = schema
+        else:
+            column_names = [f"column_{i}" for i in range(len(self._data))]
+            dataframe = self._data.to_frame().T
+            dataframe.columns = column_names
+            # noinspection PyProtectedMember
+            self.schema = Schema._from_dataframe(dataframe)
 
     def __eq__(self, other: Any) -> bool:
         if not isinstance(other, Row):

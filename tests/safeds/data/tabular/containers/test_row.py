@@ -8,7 +8,26 @@ from safeds.exceptions import UnknownColumnNameError
 
 
 class TestInit:
-    pass
+    @pytest.mark.parametrize(
+        ("row", "expected"),
+        [
+            (Row([], Schema({})), Schema({})),
+            (Row([0], Schema({"col1": Integer()})), Schema({"col1": Integer()})),
+            (Row([0, "a"], Schema({"col1": Integer(), "col2": String()})), Schema({"col1": Integer(), "col2": String()})),
+        ],
+    )
+    def test_should_use_the_schema_if_passed(self, row: Row, expected: Schema) -> None:
+        assert row.schema == expected
+
+    @pytest.mark.parametrize(
+        ("row", "expected"),
+        [
+            (Row([]), Schema({})),
+            (Row([0]), Schema({"column_0": Integer()})),
+        ],
+    )
+    def test_should_infer_the_schema_if_not_passed(self, row: Row, expected: Schema) -> None:
+        assert row.schema == expected
 
 
 class TestEq:
