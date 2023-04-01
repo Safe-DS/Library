@@ -62,7 +62,7 @@ class Regressor(ABC):
     @abstractmethod
     def is_fitted(self) -> bool:
         """
-        Checks if the regressor is fitted.
+        Check if the classifier is fitted.
 
         Returns
         -------
@@ -73,7 +73,7 @@ class Regressor(ABC):
     # noinspection PyProtectedMember
     def mean_squared_error(self, validation_or_test_set: TaggedTable) -> float:
         """
-        Computes the mean squared error (MSE) on the given data.
+        Compute the mean squared error (MSE) on the given data.
 
         Parameters
         ----------
@@ -94,7 +94,7 @@ class Regressor(ABC):
     # noinspection PyProtectedMember
     def mean_absolute_error(self, validation_or_test_set: TaggedTable) -> float:
         """
-        Computes the mean absolute error (MAE) of the regressor on the given data.
+        Compute the mean absolute error (MAE) of the regressor on the given data.
 
         Parameters
         ----------

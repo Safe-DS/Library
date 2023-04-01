@@ -28,7 +28,7 @@ if TYPE_CHECKING:
 
 def regressors() -> list[Regressor]:
     """
-    Returns the list of regressors to test.
+    Return the list of regressors to test.
 
     After you implemented a new regressor, add it to this list to ensure its `fit` and `predict` method work as
     expected. Place tests of methods that are specific to your regressor in a separate test file.

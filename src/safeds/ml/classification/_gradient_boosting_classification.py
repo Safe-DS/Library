@@ -75,7 +75,7 @@ class GradientBoosting(Classifier):
 
     def is_fitted(self) -> bool:
         """
-        Checks if the classifier is fitted.
+        Check if the classifier is fitted.
 
         Returns
         -------

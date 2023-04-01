@@ -12,7 +12,7 @@ package = "safeds"
 
 
 def list_class_and_function_names_in_module(module_name: str) -> list[str]:
-    """Returns a list with the names of all classes and function names in the given module."""
+    """Return a list with the names of all classes and function names in the given module."""
     import_module(module_name)
     module = sys.modules[module_name]
 

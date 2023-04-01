@@ -21,7 +21,7 @@ if TYPE_CHECKING:
 
 def classifiers() -> list[Classifier]:
     """
-    Returns the list of classifiers to test.
+    Return the list of classifiers to test.
 
     After you implemented a new classifier, add it to this list to ensure its `fit` and `predict` method work as
     expected. Place tests of methods that are specific to your classifier in a separate test file.

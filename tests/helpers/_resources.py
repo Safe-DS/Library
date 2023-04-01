@@ -5,7 +5,7 @@ _resources_root = Path(__file__).parent / ".." / "resources"
 
 def resolve_resource_path(resource_path: str) -> str:
     """
-    Resolves a path relative to the `resources` directory to an absolute path.
+    Resolve a path relative to the `resources` directory to an absolute path.
 
     Parameters
     ----------

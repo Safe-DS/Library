@@ -59,7 +59,7 @@ class Classifier(ABC):
     @abstractmethod
     def is_fitted(self) -> bool:
         """
-        Checks if the classifier is fitted.
+        Check if the classifier is fitted.
 
         Returns
         -------
@@ -70,7 +70,7 @@ class Classifier(ABC):
     # noinspection PyProtectedMember
     def accuracy(self, validation_or_test_set: TaggedTable) -> float:
         """
-        Computes the accuracy of the classifier on the given data.
+        Compute the accuracy of the classifier on the given data.
 
         Parameters
         ----------
