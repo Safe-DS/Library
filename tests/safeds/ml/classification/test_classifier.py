@@ -140,8 +140,7 @@ class DummyClassifier(Classifier):
     `target_name` must be set to `"expected"`.
     """
 
-    def fit(self, training_set: TaggedTable) -> DummyClassifier:
-        # pylint: disable=unused-argument
+    def fit(self, training_set: TaggedTable) -> DummyClassifier: # noqa: ARG002
         return self
 
     def predict(self, dataset: Table) -> TaggedTable:

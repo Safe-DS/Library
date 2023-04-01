@@ -157,8 +157,7 @@ class DummyRegressor(Regressor):
     `target_name` must be set to `"expected"`.
     """
 
-    def fit(self, training_set: TaggedTable) -> DummyRegressor:
-        # pylint: disable=unused-argument
+    def fit(self, training_set: TaggedTable) -> DummyRegressor:  # noqa: ARG002
         return self
 
     def predict(self, dataset: Table) -> TaggedTable:
