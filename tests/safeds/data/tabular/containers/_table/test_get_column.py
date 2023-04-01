@@ -12,6 +12,6 @@ def test_get_column_valid() -> None:
 
 
 def test_get_column_invalid() -> None:
+    table = Table(pd.DataFrame(data={"col1": ["col1_1"], "col2": ["col2_1"]}))
     with pytest.raises(UnknownColumnNameError):
-        table = Table(pd.DataFrame(data={"col1": ["col1_1"], "col2": ["col2_1"]}))
         table.get_column("col3")

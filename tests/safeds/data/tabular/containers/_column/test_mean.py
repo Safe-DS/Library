@@ -5,9 +5,9 @@ from safeds.exceptions import NonNumericColumnError
 
 
 def test_mean_invalid() -> None:
+    table = Table(pd.DataFrame(data={"col1": ["col1_1", 2]}))
+    column = table.get_column("col1")
     with pytest.raises(NonNumericColumnError):
-        table = Table(pd.DataFrame(data={"col1": ["col1_1", 2]}))
-        column = table.get_column("col1")
         column.mean()
 
 
