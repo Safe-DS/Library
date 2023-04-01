@@ -32,6 +32,9 @@ htmlcov/
 .coverage
 coverage.xml
 
+# ruff
+.ruff_cache/
+
 # mkdocs
 /site/
 /docs/reference/safeds/
