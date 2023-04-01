@@ -5,7 +5,7 @@ from safeds.exceptions import ColumnSizeError
 
 
 @pytest.mark.parametrize(
-    "values, result",
+    ("values", "result"),
     [(["A", "B"], 1), (["A", "A", "A", "B"], 0.5)],
 )
 def test_idness_valid(values: list[str], result: float) -> None:

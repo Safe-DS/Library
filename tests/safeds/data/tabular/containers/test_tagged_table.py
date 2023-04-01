@@ -3,7 +3,7 @@ from safeds.data.tabular.containers import Column, Table, TaggedTable
 from safeds.exceptions import UnknownColumnNameError
 
 
-@pytest.fixture
+@pytest.fixture()
 def table() -> Table:
     return Table.from_columns(
         [
@@ -11,11 +11,11 @@ def table() -> Table:
             Column("B", [2, 5]),
             Column("C", [3, 6]),
             Column("T", [0, 1]),
-        ]
+        ],
     )
 
 
-@pytest.fixture
+@pytest.fixture()
 def tagged_table(table: Table) -> TaggedTable:
     return table.tag_columns(target_name="T")
 
@@ -51,7 +51,7 @@ class TestFeatures:
                 Column("A", [1, 4]),
                 Column("B", [2, 5]),
                 Column("C", [3, 6]),
-            ]
+            ],
         )
 
 

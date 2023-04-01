@@ -1,11 +1,12 @@
 import pytest
 from safeds.data.tabular.containers import Table
 from safeds.exceptions import DuplicateColumnNameError, UnknownColumnNameError
+
 from tests.helpers import resolve_resource_path
 
 
 @pytest.mark.parametrize(
-    "name_from, name_to, column_one, column_two",
+    ("name_from", "name_to", "column_one", "column_two"),
     [("A", "D", "D", "B"), ("A", "A", "A", "B")],
 )
 def test_rename_valid(name_from: str, name_to: str, column_one: str, column_two: str) -> None:
@@ -17,7 +18,7 @@ def test_rename_valid(name_from: str, name_to: str, column_one: str, column_two:
 
 
 @pytest.mark.parametrize(
-    "name_from, name_to, error",
+    ("name_from", "name_to", "error"),
     [
         ("C", "D", UnknownColumnNameError),
         ("A", "B", DuplicateColumnNameError),

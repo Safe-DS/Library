@@ -17,5 +17,4 @@ def resolve_resource_path(resource_path: str) -> str:
     absolute_path : str
         The absolute path to the resource.
     """
-
     return os.path.join(_resources_root, resource_path)

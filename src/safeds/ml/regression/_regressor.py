@@ -2,16 +2,15 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 
-from safeds.data.tabular.containers import Column, Table, TaggedTable
-from safeds.exceptions import ColumnLengthMismatchError
 from sklearn.metrics import mean_absolute_error as sk_mean_absolute_error
 from sklearn.metrics import mean_squared_error as sk_mean_squared_error
 
+from safeds.data.tabular.containers import Column, Table, TaggedTable
+from safeds.exceptions import ColumnLengthMismatchError
+
 
 class Regressor(ABC):
-    """
-    Abstract base class for all regressors.
-    """
+    """Abstract base class for all regressors."""
 
     @abstractmethod
     def fit(self, training_set: TaggedTable) -> Regressor:
@@ -82,7 +81,6 @@ class Regressor(ABC):
         mean_squared_error : float
             The calculated mean squared error (the average of the distance of each individual row squared).
         """
-
         expected = validation_or_test_set.target
         predicted = self.predict(validation_or_test_set.features).target
 
@@ -104,7 +102,6 @@ class Regressor(ABC):
         mean_absolute_error : float
             The calculated mean absolute error (the average of the distance of each individual row).
         """
-
         expected = validation_or_test_set.target
         predicted = self.predict(validation_or_test_set.features).target
 
@@ -121,5 +118,5 @@ def _check_metrics_preconditions(actual: Column, expected: Column) -> None:
 
     if actual._data.size != expected._data.size:
         raise ColumnLengthMismatchError(
-            "\n".join([f"{column.name}: {column._data.size}" for column in [actual, expected]])
+            "\n".join([f"{column.name}: {column._data.size}" for column in [actual, expected]]),
         )

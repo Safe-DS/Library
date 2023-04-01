@@ -1,6 +1,7 @@
-from typing import Iterable, Optional
+from collections.abc import Iterable
 
 from IPython.core.display_functions import DisplayHandle
+
 from safeds.data.tabular.containers import Column, Table
 from safeds.data.tabular.typing import Schema
 
@@ -29,8 +30,8 @@ class TaggedTable(Table):
         self,
         data: Iterable,
         target_name: str,
-        feature_names: Optional[list[str]] = None,
-        schema: Optional[Schema] = None,
+        feature_names: list[str] | None = None,
+        schema: Schema | None = None,
     ):
         super().__init__(data, schema)
 

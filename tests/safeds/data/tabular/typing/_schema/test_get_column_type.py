@@ -1,5 +1,6 @@
 from safeds.data.tabular.containers import Table
 from safeds.data.tabular.typing import Integer
+
 from tests.helpers import resolve_resource_path
 
 

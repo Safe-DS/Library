@@ -1,5 +1,6 @@
 from safeds.data.tabular.containers import Table
 from safeds.data.tabular.typing import Integer, RealNumber, Schema
+
 from tests.helpers import resolve_resource_path
 
 
@@ -9,7 +10,7 @@ def test_table_equals_valid() -> None:
         {
             "A": Integer(),
             "B": Integer(),
-        }
+        },
     )
 
     assert table.schema == schema_expected
@@ -21,7 +22,7 @@ def test_table_equals_invalid() -> None:
         {
             "A": RealNumber(),
             "C": Integer(),
-        }
+        },
     )
 
     assert table.schema != schema_not_expected

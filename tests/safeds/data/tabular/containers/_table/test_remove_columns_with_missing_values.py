@@ -11,8 +11,8 @@ def test_remove_columns_with_missing_values_valid() -> None:
                 "col2": [1, 2, 3, None],
                 "col3": [1, 2, 3, 4],
                 "col4": [2, 3, 1, 4],
-            }
-        )
+            },
+        ),
     )
     updated_table = table.remove_columns_with_missing_values()
     assert updated_table.get_column_names() == ["col3", "col4"]

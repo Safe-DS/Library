@@ -1,5 +1,3 @@
-from typing import Optional
-
 import pytest
 from safeds.data.tabular.containers import Column, Table
 from safeds.data.tabular.transformation import Imputer, ImputerStrategy
@@ -11,7 +9,7 @@ class TestFit:
         table = Table.from_columns(
             [
                 Column("a", [1, 3, None]),
-            ]
+            ],
         )
 
         with pytest.raises(UnknownColumnNameError):
@@ -21,7 +19,7 @@ class TestFit:
         table = Table.from_columns(
             [
                 Column("a", [1, 3, None]),
-            ]
+            ],
         )
 
         transformer = Imputer(Imputer.Strategy.Constant(0))
@@ -36,7 +34,7 @@ class TestTransform:
         table_to_fit = Table.from_columns(
             [
                 Column("a", [1, 3, None]),
-            ]
+            ],
         )
 
         transformer = Imputer(Imputer.Strategy.Constant(0)).fit(table_to_fit)
@@ -44,7 +42,7 @@ class TestTransform:
         table_to_transform = Table.from_columns(
             [
                 Column("b", [1, 3, None]),
-            ]
+            ],
         )
 
         with pytest.raises(UnknownColumnNameError):
@@ -54,7 +52,7 @@ class TestTransform:
         table = Table.from_columns(
             [
                 Column("a", [1, 3, None]),
-            ]
+            ],
         )
 
         transformer = Imputer(Imputer.Strategy.Constant(0))
@@ -72,7 +70,7 @@ class TestIsFitted:
         table = Table.from_columns(
             [
                 Column("a", [1, 3, None]),
-            ]
+            ],
         )
 
         transformer = Imputer(Imputer.Strategy.Mean())
@@ -88,35 +86,35 @@ class TestFitAndTransform:
                 Table.from_columns(
                     [
                         Column("a", [1.0, 3.0, None]),
-                    ]
+                    ],
                 ),
                 None,
                 Imputer.Strategy.Constant(0.0),
                 Table.from_columns(
                     [
                         Column("a", [1.0, 3.0, 0.0]),
-                    ]
+                    ],
                 ),
             ),
             (
                 Table.from_columns(
                     [
                         Column("a", [1.0, 3.0, None]),
-                    ]
+                    ],
                 ),
                 None,
                 Imputer.Strategy.Mean(),
                 Table.from_columns(
                     [
                         Column("a", [1.0, 3.0, 2.0]),
-                    ]
+                    ],
                 ),
             ),
             (
                 Table.from_columns(
                     [
                         Column("a", [1.0, 3.0, 1.0, None]),
-                    ]
+                    ],
                 ),
                 None,
                 Imputer.Strategy.Median(),
@@ -124,21 +122,21 @@ class TestFitAndTransform:
                     [
                         Column("a", [1.0, 3.0, 1.0, 1.0]),
                         Column("a", [1.0, 3.0, 1.0, 1.0]),
-                    ]
+                    ],
                 ),
             ),
             (
                 Table.from_columns(
                     [
                         Column("a", [1.0, 3.0, 3.0, None]),
-                    ]
+                    ],
                 ),
                 None,
                 Imputer.Strategy.Mode(),
                 Table.from_columns(
                     [
                         Column("a", [1.0, 3.0, 3.0, 3.0]),
-                    ]
+                    ],
                 ),
             ),
             (
@@ -146,7 +144,7 @@ class TestFitAndTransform:
                     [
                         Column("a", [1.0, 3.0, None]),
                         Column("b", [1.0, 3.0, None]),
-                    ]
+                    ],
                 ),
                 ["a"],
                 Imputer.Strategy.Constant(0.0),
@@ -154,13 +152,17 @@ class TestFitAndTransform:
                     [
                         Column("a", [1.0, 3.0, 0.0]),
                         Column("b", [1.0, 3.0, None]),
-                    ]
+                    ],
                 ),
             ),
         ],
     )
     def test_should_return_transformed_table(
-        self, table: Table, column_names: Optional[list[str]], strategy: ImputerStrategy, expected: Table
+        self,
+        table: Table,
+        column_names: list[str] | None,
+        strategy: ImputerStrategy,
+        expected: Table,
     ) -> None:
         assert Imputer(strategy).fit_and_transform(table, column_names) == expected
 
@@ -168,7 +170,7 @@ class TestFitAndTransform:
         table = Table.from_columns(
             [
                 Column("a", [1, 2, 3, None]),
-            ]
+            ],
         )
 
         with pytest.raises(IndexError):
@@ -178,7 +180,7 @@ class TestFitAndTransform:
         table = Table.from_columns(
             [
                 Column("a", [1, None, None]),
-            ]
+            ],
         )
 
         Imputer(strategy=Imputer.Strategy.Constant(1)).fit_and_transform(table)
@@ -186,7 +188,7 @@ class TestFitAndTransform:
         expected = Table.from_columns(
             [
                 Column("a", [1, None, None]),
-            ]
+            ],
         )
 
         assert table == expected

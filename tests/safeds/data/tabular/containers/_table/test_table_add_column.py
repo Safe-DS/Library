@@ -2,6 +2,7 @@ import pandas as pd
 import pytest
 from safeds.data.tabular.containers import Column, Table
 from safeds.exceptions import ColumnSizeError, DuplicateColumnNameError
+
 from tests.helpers import resolve_resource_path
 
 
@@ -15,7 +16,7 @@ def test_table_add_column_valid() -> None:
 
 
 @pytest.mark.parametrize(
-    "column_values, column_name, error",
+    ("column_values", "column_name", "error"),
     [
         (["a", "b", "c"], "B", DuplicateColumnNameError),
         (["a", "b"], "C", ColumnSizeError),

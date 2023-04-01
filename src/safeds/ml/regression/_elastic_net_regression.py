@@ -1,10 +1,9 @@
 from __future__ import annotations
 
-from typing import Optional
+from sklearn.linear_model import ElasticNet as sk_ElasticNet
 
 from safeds.data.tabular.containers import Table, TaggedTable
 from safeds.ml._util_sklearn import fit, predict
-from sklearn.linear_model import ElasticNet as sk_ElasticNet
 
 from ._regressor import Regressor
 
@@ -16,9 +15,9 @@ class ElasticNetRegression(Regressor):
     """
 
     def __init__(self) -> None:
-        self._wrapped_regressor: Optional[sk_ElasticNet] = None
-        self._feature_names: Optional[list[str]] = None
-        self._target_name: Optional[str] = None
+        self._wrapped_regressor: sk_ElasticNet | None = None
+        self._feature_names: list[str] | None = None
+        self._target_name: str | None = None
 
     def fit(self, training_set: TaggedTable) -> ElasticNetRegression:
         """
@@ -40,7 +39,6 @@ class ElasticNetRegression(Regressor):
         LearningError
             If the training data contains invalid values or if the training failed.
         """
-
         wrapped_regressor = sk_ElasticNet()
         fit(wrapped_regressor, training_set)
 

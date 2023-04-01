@@ -11,8 +11,8 @@ def test_remove_columns_with_non_numerical_values_valid() -> None:
                 "col2": ["Test1", "Test1", "Test3", "Test1"],
                 "col3": [1, 2, 3, 4],
                 "col4": [2, 3, 1, 4],
-            }
-        )
+            },
+        ),
     )
     updated_table = table.remove_columns_with_non_numerical_values()
     assert updated_table.get_column_names() == ["col3", "col4"]

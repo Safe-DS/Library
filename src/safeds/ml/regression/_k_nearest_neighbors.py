@@ -1,10 +1,9 @@
 from __future__ import annotations
 
-from typing import Optional
+from sklearn.neighbors import KNeighborsRegressor as sk_KNeighborsRegressor
 
 from safeds.data.tabular.containers import Table, TaggedTable
 from safeds.ml._util_sklearn import fit, predict
-from sklearn.neighbors import KNeighborsRegressor as sk_KNeighborsRegressor
 
 from ._regressor import Regressor
 
@@ -22,9 +21,9 @@ class KNearestNeighbors(Regressor):
     def __init__(self, n_neighbors: int) -> None:
         self._n_neighbors = n_neighbors
 
-        self._wrapped_regressor: Optional[sk_KNeighborsRegressor] = None
-        self._feature_names: Optional[list[str]] = None
-        self._target_name: Optional[str] = None
+        self._wrapped_regressor: sk_KNeighborsRegressor | None = None
+        self._feature_names: list[str] | None = None
+        self._target_name: str | None = None
 
     def fit(self, training_set: TaggedTable) -> KNearestNeighbors:
         """
@@ -46,7 +45,6 @@ class KNearestNeighbors(Regressor):
         LearningError
             If the training data contains invalid values or if the training failed.
         """
-
         wrapped_regressor = sk_KNeighborsRegressor(self._n_neighbors, n_jobs=-1)
         fit(wrapped_regressor, training_set)
 

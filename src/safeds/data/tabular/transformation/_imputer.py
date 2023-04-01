@@ -1,13 +1,14 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import Any, Optional
+from typing import Any
 
 import pandas as pd
+from sklearn.impute import SimpleImputer as sk_SimpleImputer
+
 from safeds.data.tabular.containers import Table
 from safeds.data.tabular.transformation._table_transformer import TableTransformer
 from safeds.exceptions import NotFittedError, UnknownColumnNameError
-from sklearn.impute import SimpleImputer as sk_SimpleImputer
 
 
 class ImputerStrategy(ABC):
@@ -48,9 +49,7 @@ class Imputer(TableTransformer):
                 imputer.fill_value = self._value
 
         class Mean(ImputerStrategy):
-            """
-            An imputation strategy for imputing missing data with mean values.
-            """
+            """An imputation strategy for imputing missing data with mean values."""
 
             def __str__(self) -> str:
                 return "Mean"
@@ -59,9 +58,7 @@ class Imputer(TableTransformer):
                 imputer.strategy = "mean"
 
         class Median(ImputerStrategy):
-            """
-            An imputation strategy for imputing missing data with median values.
-            """
+            """An imputation strategy for imputing missing data with median values."""
 
             def __str__(self) -> str:
                 return "Median"
@@ -70,9 +67,7 @@ class Imputer(TableTransformer):
                 imputer.strategy = "median"
 
         class Mode(ImputerStrategy):
-            """
-            An imputation strategy for imputing missing data with mode values.
-            """
+            """An imputation strategy for imputing missing data with mode values."""
 
             def __str__(self) -> str:
                 return "Mode"
@@ -83,11 +78,11 @@ class Imputer(TableTransformer):
     def __init__(self, strategy: ImputerStrategy):
         self._strategy = strategy
 
-        self._wrapped_transformer: Optional[sk_SimpleImputer] = None
-        self._column_names: Optional[list[str]] = None
+        self._wrapped_transformer: sk_SimpleImputer | None = None
+        self._column_names: list[str] | None = None
 
     # noinspection PyProtectedMember
-    def fit(self, table: Table, column_names: Optional[list[str]] = None) -> Imputer:
+    def fit(self, table: Table, column_names: list[str] | None = None) -> Imputer:
         """
         Learn a transformation for a set of columns in a table.
 
@@ -143,14 +138,13 @@ class Imputer(TableTransformer):
             The transformed table.
 
         Raises
-        ----------
+        ------
         NotFittedError
             If the transformer has not been fitted yet.
         """
-
         # Transformer has not been fitted yet
         if self._wrapped_transformer is None or self._column_names is None:
-            raise NotFittedError()
+            raise NotFittedError
 
         # Input table does not contain all columns used to fit the transformer
         missing_columns = set(self._column_names) - set(table.get_column_names())

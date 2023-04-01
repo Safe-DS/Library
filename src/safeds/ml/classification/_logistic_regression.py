@@ -1,10 +1,9 @@
 from __future__ import annotations
 
-from typing import Optional
+from sklearn.linear_model import LogisticRegression as sk_LogisticRegression
 
 from safeds.data.tabular.containers import Table, TaggedTable
 from safeds.ml._util_sklearn import fit, predict
-from sklearn.linear_model import LogisticRegression as sk_LogisticRegression
 
 from ._classifier import Classifier
 
@@ -16,9 +15,9 @@ class LogisticRegression(Classifier):
     """
 
     def __init__(self) -> None:
-        self._wrapped_classifier: Optional[sk_LogisticRegression] = None
-        self._feature_names: Optional[list[str]] = None
-        self._target_name: Optional[str] = None
+        self._wrapped_classifier: sk_LogisticRegression | None = None
+        self._feature_names: list[str] | None = None
+        self._target_name: str | None = None
 
     def fit(self, training_set: TaggedTable) -> LogisticRegression:
         """
@@ -40,7 +39,6 @@ class LogisticRegression(Classifier):
         LearningError
             If the training data contains invalid values or if the training failed.
         """
-
         wrapped_classifier = sk_LogisticRegression(n_jobs=-1)
         fit(wrapped_classifier, training_set)
 

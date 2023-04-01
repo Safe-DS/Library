@@ -1,10 +1,9 @@
 from __future__ import annotations
 
-from typing import Optional
+from sklearn.linear_model import LinearRegression as sk_LinearRegression
 
 from safeds.data.tabular.containers import Table, TaggedTable
 from safeds.ml._util_sklearn import fit, predict
-from sklearn.linear_model import LinearRegression as sk_LinearRegression
 
 from ._regressor import Regressor
 
@@ -16,9 +15,9 @@ class LinearRegression(Regressor):
     """
 
     def __init__(self) -> None:
-        self._wrapped_regressor: Optional[sk_LinearRegression] = None
-        self._feature_names: Optional[list[str]] = None
-        self._target_name: Optional[str] = None
+        self._wrapped_regressor: sk_LinearRegression | None = None
+        self._feature_names: list[str] | None = None
+        self._target_name: str | None = None
 
     def fit(self, training_set: TaggedTable) -> LinearRegression:
         """
@@ -40,7 +39,6 @@ class LinearRegression(Regressor):
         LearningError
             If the training data contains invalid values or if the training failed.
         """
-
         wrapped_regressor = sk_LinearRegression(n_jobs=-1)
         fit(wrapped_regressor, training_set)
 

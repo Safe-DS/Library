@@ -1,8 +1,9 @@
-from typing import Any, Optional
+from typing import Any
+
+from sklearn.exceptions import NotFittedError
 
 from safeds.data.tabular.containers import Table, TaggedTable
 from safeds.exceptions import LearningError, PredictionError
-from sklearn.exceptions import NotFittedError
 
 
 # noinspection PyProtectedMember
@@ -32,7 +33,7 @@ def fit(model: Any, tagged_table: TaggedTable) -> None:
 
 
 # noinspection PyProtectedMember
-def predict(model: Any, dataset: Table, feature_names: Optional[list[str]], target_name: Optional[str]) -> TaggedTable:
+def predict(model: Any, dataset: Table, feature_names: list[str] | None, target_name: str | None) -> TaggedTable:
     """
     Predict a target vector using a dataset containing feature vectors. The model has to be trained first.
 
@@ -57,7 +58,6 @@ def predict(model: Any, dataset: Table, feature_names: Optional[list[str]], targ
     PredictionError
         If predicting with the given dataset failed.
     """
-
     if model is None or target_name is None or feature_names is None:
         raise PredictionError("The model was not trained")
 

@@ -34,7 +34,6 @@ def regressors() -> list[Regressor]:
     regressors : list[Regressor]
         The list of regressors to test.
     """
-
     return [
         AdaBoost(),
         DecisionTree(),
@@ -56,7 +55,7 @@ def valid_data() -> TaggedTable:
             Column("feat1", [2, 5]),
             Column("feat2", [3, 6]),
             Column("target", [0, 1]),
-        ]
+        ],
     ).tag_columns(target_name="target", feature_names=["feat1", "feat2"])
 
 
@@ -68,7 +67,7 @@ def invalid_data() -> TaggedTable:
             Column("feat1", ["a", 5]),
             Column("feat2", [3, 6]),
             Column("target", [0, 1]),
-        ]
+        ],
     ).tag_columns(target_name="target", feature_names=["feat1", "feat2"])
 
 
@@ -122,7 +121,10 @@ class TestPredict:
             regressor.predict(valid_data.features)
 
     def test_should_raise_on_invalid_data(
-        self, regressor: Regressor, valid_data: TaggedTable, invalid_data: TaggedTable
+        self,
+        regressor: Regressor,
+        valid_data: TaggedTable,
+        invalid_data: TaggedTable,
     ) -> None:
         fitted_regressor = regressor.fit(valid_data)
         with pytest.raises(PredictionError):
@@ -169,7 +171,7 @@ class DummyRegressor(Regressor):
 
 class TestMeanAbsoluteError:
     @pytest.mark.parametrize(
-        "predicted, expected, result",
+        ("predicted", "expected", "result"),
         [
             ([1, 2], [1, 2], 0),
             ([0, 0], [1, 1], 1),
@@ -190,7 +192,7 @@ class TestMeanAbsoluteError:
 
 class TestMeanSquaredError:
     @pytest.mark.parametrize(
-        "predicted, expected, result",
+        ("predicted", "expected", "result"),
         [([1, 2], [1, 2], 0), ([0, 0], [1, 1], 1), ([1, 1, 1], [2, 2, 11], 34)],
     )
     def test_valid_data(self, predicted: list[float], expected: list[float], result: float) -> None:
@@ -205,7 +207,7 @@ class TestMeanSquaredError:
 
 class TestCheckMetricsPreconditions:
     @pytest.mark.parametrize(
-        "actual, expected, error",
+        ("actual", "expected", "error"),
         [
             (["A", "B"], [1, 2], TypeError),
             ([1, 2], ["A", "B"], TypeError),
@@ -213,7 +215,10 @@ class TestCheckMetricsPreconditions:
         ],
     )
     def test_should_raise_if_validation_fails(
-        self, actual: list[str | int], expected: list[str | int], error: type[Exception]
+        self,
+        actual: list[str | int],
+        expected: list[str | int],
+        error: type[Exception],
     ) -> None:
         actual_column = Column("actual", pd.Series(actual))
         expected_column = Column("expected", pd.Series(expected))

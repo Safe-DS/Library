@@ -1,23 +1,20 @@
 from __future__ import annotations
 
-from typing import Optional
+from sklearn.ensemble import RandomForestClassifier as sk_RandomForestClassifier
 
 from safeds.data.tabular.containers import Table, TaggedTable
 from safeds.ml._util_sklearn import fit, predict
-from sklearn.ensemble import RandomForestClassifier as sk_RandomForestClassifier
 
 from ._classifier import Classifier
 
 
 class RandomForest(Classifier):
-    """
-    This class implements the Random Forest classification. It can only be trained on a tagged table.
-    """
+    """This class implements the Random Forest classification. It can only be trained on a tagged table."""
 
     def __init__(self) -> None:
-        self._wrapped_classifier: Optional[sk_RandomForestClassifier] = None
-        self._feature_names: Optional[list[str]] = None
-        self._target_name: Optional[str] = None
+        self._wrapped_classifier: sk_RandomForestClassifier | None = None
+        self._feature_names: list[str] | None = None
+        self._target_name: str | None = None
 
     def fit(self, training_set: TaggedTable) -> RandomForest:
         """
@@ -39,7 +36,6 @@ class RandomForest(Classifier):
         LearningError
             If the training data contains invalid values or if the training failed.
         """
-
         wrapped_classifier = sk_RandomForestClassifier(n_jobs=-1)
         fit(wrapped_classifier, training_set)
 

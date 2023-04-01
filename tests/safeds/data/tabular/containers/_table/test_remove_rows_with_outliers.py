@@ -10,8 +10,8 @@ def test_remove_rows_with_outliers_no_outliers() -> None:
                 "col1": ["A", "B", "C"],
                 "col2": [1.0, 2.0, 3.0],
                 "col3": [2, 3, 1],
-            }
-        )
+            },
+        ),
     )
     names = table.get_column_names()
     result = table.remove_rows_with_outliers()
@@ -40,8 +40,8 @@ def test_remove_rows_with_outliers_with_outliers() -> None:
                 ],
                 "col2": [1.0, 2.0, 3.0, 4.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, None],
                 "col3": [2, 3, 1, 1_000_000_000, 1, 1, 1, 1, 1, 1, 1, 1],
-            }
-        )
+            },
+        ),
     )
     result = input_.remove_rows_with_outliers()
 
@@ -51,8 +51,8 @@ def test_remove_rows_with_outliers_with_outliers() -> None:
                 "col1": ["A", "B", "C", "a", "a", "a", "a", "a", "a", "a", "a"],
                 "col2": [1.0, 2.0, 3.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, None],
                 "col3": [2, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-            }
-        )
+            },
+        ),
     )
 
     assert result == expected

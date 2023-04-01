@@ -28,7 +28,6 @@ def classifiers() -> list[Classifier]:
     classifiers : list[Classifier]
         The list of classifiers to test.
     """
-
     return [AdaBoost(), DecisionTree(), GradientBoosting(), KNearestNeighbors(2), LogisticRegression(), RandomForest()]
 
 
@@ -40,7 +39,7 @@ def valid_data() -> TaggedTable:
             Column("feat1", [2, 5]),
             Column("feat2", [3, 6]),
             Column("target", [0, 1]),
-        ]
+        ],
     ).tag_columns(target_name="target", feature_names=["feat1", "feat2"])
 
 
@@ -52,7 +51,7 @@ def invalid_data() -> TaggedTable:
             Column("feat1", ["a", 5]),
             Column("feat2", [3, 6]),
             Column("target", [0, 1]),
-        ]
+        ],
     ).tag_columns(target_name="target", feature_names=["feat1", "feat2"])
 
 
@@ -106,7 +105,10 @@ class TestPredict:
             classifier.predict(valid_data.features)
 
     def test_should_raise_on_invalid_data(
-        self, classifier: Classifier, valid_data: TaggedTable, invalid_data: TaggedTable
+        self,
+        classifier: Classifier,
+        valid_data: TaggedTable,
+        invalid_data: TaggedTable,
     ) -> None:
         fitted_classifier = classifier.fit(valid_data)
         with pytest.raises(PredictionError):

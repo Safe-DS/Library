@@ -18,6 +18,4 @@ def test_filter_rows_valid() -> None:
 def test_filter_rows_invalid() -> None:
     table = Table(pd.DataFrame(data={"col1": [1, 2, 3], "col2": [1, 1, 4]}))
     with pytest.raises(TypeError):
-        table.filter_rows(
-            table.get_column("col1")._data > table.get_column("col2")._data
-        )
+        table.filter_rows(table.get_column("col1")._data > table.get_column("col2")._data)

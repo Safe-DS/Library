@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from safeds.data.tabular.containers import Table
@@ -14,7 +14,7 @@ class TableTransformer(ABC):
     """
 
     @abstractmethod
-    def fit(self, table: Table, column_names: Optional[list[str]] = None) -> TableTransformer:
+    def fit(self, table: Table, column_names: list[str] | None = None) -> TableTransformer:
         """
         Learn a transformation for a set of columns in a table.
 
@@ -47,7 +47,7 @@ class TableTransformer(ABC):
             The transformed table.
 
         Raises
-        ----------
+        ------
         NotFittedError
             If the transformer has not been fitted yet.
         """
@@ -63,7 +63,7 @@ class TableTransformer(ABC):
             Whether the transformer is fitted.
         """
 
-    def fit_and_transform(self, table: Table, column_names: Optional[list[str]] = None) -> Table:
+    def fit_and_transform(self, table: Table, column_names: list[str] | None = None) -> Table:
         """
         Learn a transformation for a set of columns in a table and apply the learned transformation to the same table.
         If you also need the fitted transformer, use `fit` and `transform` separately.
@@ -105,7 +105,7 @@ class InvertibleTableTransformer(TableTransformer):
             The original table.
 
         Raises
-        ----------
+        ------
         NotFittedError
             If the transformer has not been fitted yet.
         """

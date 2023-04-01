@@ -1,13 +1,15 @@
 from __future__ import annotations
 
+from collections.abc import Callable, Iterable, Iterator
 from numbers import Number
-from typing import Any, Callable, Iterable, Iterator, Optional
+from typing import Any
 
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import seaborn as sns
 from IPython.core.display_functions import DisplayHandle, display
+
 from safeds.data.tabular.typing import ColumnType
 from safeds.exceptions import (
     ColumnLengthMismatchError,
@@ -35,7 +37,7 @@ class Column:
     # Dunder methods
     # ------------------------------------------------------------------------------------------------------------------
 
-    def __init__(self, name: str, data: Iterable, type_: Optional[ColumnType] = None) -> None:
+    def __init__(self, name: str, data: Iterable, type_: ColumnType | None = None) -> None:
         self._name: str = name
         self._data: pd.Series = data if isinstance(data, pd.Series) else pd.Series(data)
         # noinspection PyProtectedMember
@@ -264,18 +266,18 @@ class Column:
         if not self._type.is_numeric() or not other_column._type.is_numeric():
             raise NonNumericColumnError(
                 f"Columns must be numerical. {self.name} is {self._type}, "
-                f"{other_column.name} is {other_column._type}."
+                f"{other_column.name} is {other_column._type}.",
             )
         if self._data.size != other_column._data.size:
             raise ColumnLengthMismatchError(
                 f"{self.name} is of size {self._data.size}, "
-                f"{other_column.name} is of size {other_column._data.size}."
+                f"{other_column.name} is of size {other_column._data.size}.",
             )
         return self._data.corr(other_column._data)
 
     def idness(self) -> float:
         """
-        Calculate the idness of this column, which we define as
+        Calculate the idness of this column, which we define as.
 
         $$
         \\frac{\\text{number of different values}}{\\text{number of rows}}
@@ -369,7 +371,7 @@ class Column:
 
     def missing_value_ratio(self) -> float:
         """
-        Return the ratio of null values to the total number of elements in the column
+        Return the ratio of null values to the total number of elements in the column.
 
         Returns
         -------
@@ -393,7 +395,7 @@ class Column:
 
     def stability(self) -> float:
         """
-        Calculate the stability of this column, which we define as
+        Calculate the stability of this column, which we define as.
 
         $$
         \\frac{\\text{number of occurrences of most common non-null value}}{\\text{number of non-null values}}
@@ -423,7 +425,7 @@ class Column:
             The standard deviation of all values.
 
         Raises
-        ---
+        ------
         NonNumericColumnError
             If the data contains non-numerical data.
 
@@ -442,7 +444,7 @@ class Column:
             The sum of all values.
 
         Raises
-        ---
+        ------
         NonNumericColumnError
             If the data contains non-numerical data.
 
@@ -461,7 +463,7 @@ class Column:
             The variance of all values.
 
         Raises
-        ---
+        ------
         NonNumericColumnError
             If the data contains non-numerical data.
 
@@ -480,7 +482,7 @@ class Column:
         Plot this column in a boxplot. This function can only plot real numerical data.
 
         Raises
-        -------
+        ------
         TypeError
             If the column contains non-numerical data or complex data.
         """
@@ -490,7 +492,7 @@ class Column:
             if isinstance(data, complex):
                 raise TypeError(
                     "The column contains complex data. Boxplots cannot plot the imaginary part of complex "
-                    "data. Please provide a Column with only real numbers"
+                    "data. Please provide a Column with only real numbers",
                 )
         ax = sns.boxplot(data=self._data)
         ax.set(xlabel=self.name)
@@ -498,15 +500,14 @@ class Column:
         plt.show()
 
     def histogram(self) -> None:
-        """
-        Plot a column in a histogram.
-        """
-
+        """Plot a column in a histogram."""
         ax = sns.histplot(data=self._data)
         ax.set_xticks(ax.get_xticks())
         ax.set(xlabel=self.name)
         ax.set_xticklabels(
-            ax.get_xticklabels(), rotation=45, horizontalalignment="right"
+            ax.get_xticklabels(),
+            rotation=45,
+            horizontalalignment="right",
         )  # rotate the labels of the x Axis to prevent the chance of overlapping of the labels
         plt.tight_layout()
         plt.show()

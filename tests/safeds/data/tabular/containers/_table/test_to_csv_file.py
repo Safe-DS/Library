@@ -10,6 +10,6 @@ def test_to_csv_file() -> None:
         tmp_table_file.close()
         with open(tmp_table_file.name, "w", encoding="utf-8") as tmp_file:
             table.to_csv_file(tmp_file.name)
-        with open(tmp_table_file.name, "r", encoding="utf-8") as tmp_file:
+        with open(tmp_table_file.name, encoding="utf-8") as tmp_file:
             table_r = Table.from_csv_file(tmp_file.name)
     assert table == table_r

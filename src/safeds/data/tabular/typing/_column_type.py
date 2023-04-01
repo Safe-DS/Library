@@ -7,9 +7,7 @@ import numpy as np
 
 
 class ColumnType(ABC):
-    """
-    Abstract base class for column types.
-    """
+    """Abstract base class for column types."""
 
     @abstractmethod
     def is_nullable(self) -> bool:
@@ -49,7 +47,7 @@ class ColumnType(ABC):
             The ColumnType.
 
         Raises
-        -------
+        ------
         TypeError
             If the given dtype is not supported.
         """
