@@ -1,8 +1,7 @@
 from __future__ import annotations
 
-from collections.abc import Callable, Iterable, Iterator
 from numbers import Number
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -17,6 +16,9 @@ from safeds.exceptions import (
     IndexOutOfBoundsError,
     NonNumericColumnError,
 )
+
+if TYPE_CHECKING:
+    from collections.abc import Callable, Iterable, Iterator
 
 
 class Column:

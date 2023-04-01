@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import functools
-from collections.abc import Callable, Iterable
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
@@ -29,6 +28,8 @@ from ._column import Column
 from ._row import Row
 
 if TYPE_CHECKING:
+    from collections.abc import Callable, Iterable
+
     from ._tagged_table import TaggedTable
 
 
