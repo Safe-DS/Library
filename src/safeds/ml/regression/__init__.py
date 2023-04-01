@@ -8,3 +8,16 @@ from ._linear_regression import LinearRegression
 from ._random_forest import RandomForest
 from ._regressor import Regressor
 from ._ridge_regression import RidgeRegression
+
+__all__ = [
+    "AdaBoost",
+    "DecisionTree",
+    "ElasticNetRegression",
+    "GradientBoosting",
+    "KNearestNeighbors",
+    "LassoRegression",
+    "LinearRegression",
+    "RandomForest",
+    "Regressor",
+    "RidgeRegression",
+]
