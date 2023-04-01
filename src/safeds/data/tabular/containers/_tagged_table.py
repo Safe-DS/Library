@@ -87,5 +87,5 @@ class TaggedTable(Table):
         """
         tmp = self._features.add_column(self._target)
         header_info = "Target Column is '" + self._target.name + "'\n"
-        print(header_info)
+        print(header_info)  # noqa: T201
         return tmp._ipython_display_()
