@@ -13,7 +13,7 @@ if TYPE_CHECKING:
 
 
 class DecisionTree(Regressor):
-    """This class implements decision tree regression."""
+    """Decision tree regression."""
 
     def __init__(self) -> None:
         self._wrapped_regressor: sk_DecisionTreeRegressor | None = None

@@ -13,7 +13,7 @@ if TYPE_CHECKING:
 
 
 class LinearRegression(Regressor):
-    """This class implements linear regression."""
+    """Linear regression."""
 
     def __init__(self) -> None:
         self._wrapped_regressor: sk_LinearRegression | None = None

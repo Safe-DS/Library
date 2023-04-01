@@ -13,7 +13,7 @@ if TYPE_CHECKING:
 
 
 class ElasticNetRegression(Regressor):
-    """This class implements elastic net regression."""
+    """Elastic net regression."""
 
     def __init__(self) -> None:
         self._wrapped_regressor: sk_ElasticNet | None = None

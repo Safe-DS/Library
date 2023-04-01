@@ -13,7 +13,7 @@ if TYPE_CHECKING:
 
 
 class GradientBoosting(Regressor):
-    """This class implements gradient boosting regression."""
+    """Gradient boosting regression."""
 
     def __init__(self) -> None:
         self._wrapped_regressor: sk_GradientBoostingRegressor | None = None

@@ -13,7 +13,7 @@ if TYPE_CHECKING:
 
 
 class LassoRegression(Regressor):
-    """This class implements lasso regression."""
+    """Lasso regression."""
 
     def __init__(self) -> None:
         self._wrapped_regressor: sk_Lasso | None = None

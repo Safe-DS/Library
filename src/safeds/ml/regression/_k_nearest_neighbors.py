@@ -14,7 +14,7 @@ if TYPE_CHECKING:
 
 class KNearestNeighbors(Regressor):
     """
-    This class implements K-nearest-neighbors regressor.
+    K-nearest-neighbors regression.
 
     Parameters
     ----------

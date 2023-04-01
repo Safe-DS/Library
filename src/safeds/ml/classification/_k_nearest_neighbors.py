@@ -14,7 +14,7 @@ if TYPE_CHECKING:
 
 class KNearestNeighbors(Classifier):
     """
-    This class implements K-nearest-neighbors classification.
+    K-nearest-neighbors classification.
 
     Parameters
     ----------

@@ -13,7 +13,7 @@ if TYPE_CHECKING:
 
 
 class GradientBoosting(Classifier):
-    """This class implements gradient boosting classification."""
+    """Gradient boosting classification."""
 
     def __init__(self) -> None:
         self._wrapped_classifier: sk_GradientBoostingClassifier | None = None

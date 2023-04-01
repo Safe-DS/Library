@@ -13,7 +13,7 @@ if TYPE_CHECKING:
 
 
 class RidgeRegression(Regressor):
-    """This class implements ridge regression."""
+    """Ridge regression."""
 
     def __init__(self) -> None:
         self._wrapped_regressor: sk_Ridge | None = None

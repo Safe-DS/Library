@@ -13,7 +13,7 @@ if TYPE_CHECKING:
 
 
 class DecisionTree(Classifier):
-    """This class implements decision tree classification."""
+    """Decision tree classification."""
 
     def __init__(self) -> None:
         self._wrapped_classifier: sk_DecisionTreeClassifier | None = None

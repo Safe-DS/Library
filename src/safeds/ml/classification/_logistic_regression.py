@@ -13,7 +13,7 @@ if TYPE_CHECKING:
 
 
 class LogisticRegression(Classifier):
-    """This class implements regularized logistic regression."""
+    """Regularized logistic regression."""
 
     def __init__(self) -> None:
         self._wrapped_classifier: sk_LogisticRegression | None = None

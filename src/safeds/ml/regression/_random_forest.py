@@ -13,7 +13,7 @@ if TYPE_CHECKING:
 
 
 class RandomForest(Regressor):
-    """This class implements Random Forest regression."""
+    """Random forest regression."""
 
     def __init__(self) -> None:
         self._wrapped_regressor: sk_RandomForestRegressor | None = None

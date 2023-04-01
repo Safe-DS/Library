@@ -13,7 +13,7 @@ if TYPE_CHECKING:
 
 
 class AdaBoost(Regressor):
-    """This class implements Ada Boost regression."""
+    """Ada Boost regression."""
 
     def __init__(self) -> None:
         self._wrapped_regressor: sk_AdaBoostRegressor | None = None

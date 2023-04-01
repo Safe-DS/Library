@@ -13,7 +13,7 @@ if TYPE_CHECKING:
 
 
 class AdaBoost(Classifier):
-    """This class implements Ada Boost classification."""
+    """Ada Boost classification."""
 
     def __init__(self) -> None:
         self._wrapped_classifier: sk_AdaBoostClassifier | None = None

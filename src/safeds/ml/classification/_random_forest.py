@@ -13,7 +13,7 @@ if TYPE_CHECKING:
 
 
 class RandomForest(Classifier):
-    """This class implements the Random Forest classification."""
+    """Random forest classification."""
 
     def __init__(self) -> None:
         self._wrapped_classifier: sk_RandomForestClassifier | None = None
