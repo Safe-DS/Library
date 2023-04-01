@@ -1,12 +1,13 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-
-import pandas as pd
+from typing import TYPE_CHECKING
 
 from safeds.data.tabular.typing._column_type import ColumnType
 from safeds.exceptions import UnknownColumnNameError
 
+if TYPE_CHECKING:
+    import pandas as pd
 
 @dataclass
 class Schema:

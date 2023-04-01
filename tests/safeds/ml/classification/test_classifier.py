@@ -1,8 +1,9 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pandas as pd
 import pytest
-from _pytest.fixtures import FixtureRequest
 from safeds.data.tabular.containers import Column, Table, TaggedTable
 from safeds.exceptions import LearningError, PredictionError
 from safeds.ml.classification import (
@@ -15,6 +16,8 @@ from safeds.ml.classification import (
     RandomForest,
 )
 
+if TYPE_CHECKING:
+    from _pytest.fixtures import FixtureRequest
 
 def classifiers() -> list[Classifier]:
     """

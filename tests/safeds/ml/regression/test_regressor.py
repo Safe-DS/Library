@@ -1,8 +1,9 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pandas as pd
 import pytest
-from _pytest.fixtures import FixtureRequest
 from safeds.data.tabular.containers import Column, Table, TaggedTable
 from safeds.exceptions import ColumnLengthMismatchError, LearningError, PredictionError
 from safeds.ml.regression import (
@@ -20,6 +21,9 @@ from safeds.ml.regression import (
 
 # noinspection PyProtectedMember
 from safeds.ml.regression._regressor import _check_metrics_preconditions
+
+if TYPE_CHECKING:
+    from _pytest.fixtures import FixtureRequest
 
 
 def regressors() -> list[Regressor]:
