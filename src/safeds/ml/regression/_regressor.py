@@ -1,12 +1,15 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
+from typing import TYPE_CHECKING
 
 from sklearn.metrics import mean_absolute_error as sk_mean_absolute_error
 from sklearn.metrics import mean_squared_error as sk_mean_squared_error
 
-from safeds.data.tabular.containers import Column, Table, TaggedTable
 from safeds.exceptions import ColumnLengthMismatchError
+
+if TYPE_CHECKING:
+    from safeds.data.tabular.containers import Column, Table, TaggedTable
 
 
 class Regressor(ABC):

@@ -2,7 +2,6 @@ from pathlib import Path
 from tempfile import NamedTemporaryFile
 
 import pandas as pd
-
 from safeds.data.tabular.containers import Table
 
 

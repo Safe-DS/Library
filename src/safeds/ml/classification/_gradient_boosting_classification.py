@@ -1,11 +1,15 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 from sklearn.ensemble import GradientBoostingClassifier as sk_GradientBoostingClassifier
 
-from safeds.data.tabular.containers import Table, TaggedTable
 from safeds.ml._util_sklearn import fit, predict
 
 from ._classifier import Classifier
+
+if TYPE_CHECKING:
+    from safeds.data.tabular.containers import Table, TaggedTable
 
 
 class GradientBoosting(Classifier):

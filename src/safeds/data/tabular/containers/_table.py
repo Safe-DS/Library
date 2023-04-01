@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import functools
-import os.path
 from collections.abc import Callable, Iterable
 from pathlib import Path
 from typing import TYPE_CHECKING, Any

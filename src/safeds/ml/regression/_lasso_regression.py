@@ -1,11 +1,15 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 from sklearn.linear_model import Lasso as sk_Lasso
 
-from safeds.data.tabular.containers import Table, TaggedTable
 from safeds.ml._util_sklearn import fit, predict
 
 from ._regressor import Regressor
+
+if TYPE_CHECKING:
+    from safeds.data.tabular.containers import Table, TaggedTable
 
 
 class LassoRegression(Regressor):
