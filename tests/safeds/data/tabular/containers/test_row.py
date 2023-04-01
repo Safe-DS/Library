@@ -54,7 +54,6 @@ class TestEq:
         ],
     )
     def test_should_return_not_implemented_if_other_is_not_row(self, row: Row, other: Any) -> None:
-        # pylint: disable=unnecessary-dunder-call
         assert (row.__eq__(other)) is NotImplemented
 
 
@@ -78,7 +77,6 @@ class TestGetitem:
     )
     def test_should_raise_if_column_does_not_exist(self, row: Row, column_name: str) -> None:
         with pytest.raises(UnknownColumnNameError):
-            # pylint: disable=pointless-statement
             # noinspection PyStatementEffect
             row[column_name]
 

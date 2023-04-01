@@ -917,7 +917,6 @@ class Table:
         tagged_table : TaggedTable
             A new tagged table with the given target and feature names.
         """
-        # pylint: disable=import-outside-toplevel
         from ._tagged_table import TaggedTable
 
         return TaggedTable(self._data, target_name, feature_names, self._schema)
