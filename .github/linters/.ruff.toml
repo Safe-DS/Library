@@ -1,0 +1,96 @@
+ignore-init-module-imports = true
+line-length = 120
+target-version = "py310"
+
+select = [
+    "F",
+    "E",
+    "W",
+    "C90",
+    "I",
+    "N",
+    "D",
+    "UP",
+    "YTT",
+    "BLE",
+    "FBT",
+    "B",
+    "A",
+    "COM",
+    "C4",
+    "DTZ",
+    "T10",
+    "ISC",
+    "ICN",
+    "G",
+    "INP",
+    "PIE",
+    "T20",
+    "PYI",
+    "PT",
+    "Q",
+    "RSE",
+    "RET",
+    "SLF",
+    "SIM",
+    "TID",
+    "TCH",
+    "INT",
+    "ARG",
+    "PTH",
+    "ERA",
+    "PD",
+    "PGH",
+    "PL",
+    "TRY",
+    "NPY",
+    "RUF"
+]
+ignore = [
+    # line-too-long (handled by black)
+    "E501",
+    # tab-indentation (handled by black)
+    "W191",
+    # trailing-whitespace (handled by black)
+    "W291",
+    # missing-newline-at-end-of-file (handled by black)
+    "W292",
+    # blank-line-with-witespace (handled by black)
+    "W293",
+    # boolean-positional-arg-in-function-definition (we leave it to the call-site)
+    "FBT001",
+    # boolean-default-value-in-function-definition (we leave it to the call-site)
+    "FBT002",
+    # builtin-attribute-shadowing (not an issue)
+    "A003",
+    # private-member-access (we cannot always avoid it if we want a clean API)
+    "SLF001",
+    # if-else-block-instead-of-if-exp (an if-else block can be more readable)
+    "SIM108",
+    # too-many-return-statements
+    "PLR0912",
+    # too-many-branches
+    "PLR0912",
+    # too-many-arguments
+    "PLR0913",
+    # too-many-statements
+    "PLR0915",
+    # magic-value-comparison
+    "PLR2004",
+]
+
+[per-file-ignores]
+"*test*.py" = [
+    # Undocumented declarations
+    "D100",
+    "D101",
+    "D102",
+    "D103",
+    "D104",
+    "D105",
+    "D106",
+    "D107",
+]
+
+[pydocstyle]
+convention = "numpy"
