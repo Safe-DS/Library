@@ -1048,7 +1048,7 @@ class Table:
         path : str
             The path to the output file.
         """
-        Path(os.path.dirname(path)).mkdir(parents=True, exist_ok=True)
+        Path(path).parent.mkdir(parents=True, exist_ok=True)
         data_to_csv = self._data.copy()
         data_to_csv.columns = self._schema.get_column_names()
         data_to_csv.to_csv(path, index=False)
@@ -1064,7 +1064,7 @@ class Table:
         path : str
             The path to the output file.
         """
-        Path(os.path.dirname(path)).mkdir(parents=True, exist_ok=True)
+        Path(path).parent.mkdir(parents=True, exist_ok=True)
         data_to_json = self._data.copy()
         data_to_json.columns = self._schema.get_column_names()
         data_to_json.to_json(path)

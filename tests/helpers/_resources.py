@@ -1,6 +1,6 @@
-import os
+from pathlib import Path
 
-_resources_root = os.path.join(os.path.dirname(__file__), "..", "resources")
+_resources_root = Path(__file__).parent / ".." / "resources"
 
 
 def resolve_resource_path(resource_path: str) -> str:
@@ -17,4 +17,4 @@ def resolve_resource_path(resource_path: str) -> str:
     absolute_path : str
         The absolute path to the resource.
     """
-    return os.path.join(_resources_root, resource_path)
+    return str(_resources_root / resource_path)
