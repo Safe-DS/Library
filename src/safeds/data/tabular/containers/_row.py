@@ -98,6 +98,7 @@ class Row:
     def has_column(self, column_name: str) -> bool:
         """
         Return whether the row contains a given column.
+
         Alias for self.schema.hasColumn(column_name: str) -> bool.
 
         Parameters
@@ -115,6 +116,7 @@ class Row:
     def get_column_names(self) -> list[str]:
         """
         Return a list of all column names saved in this schema.
+
         Alias for self.schema.get_column_names() -> list[str].
 
         Returns
@@ -127,6 +129,7 @@ class Row:
     def get_type_of_column(self, column_name: str) -> ColumnType:
         """
         Return the type of a specified column.
+
         Alias for self.schema.get_type_of_column(column_name: str) -> ColumnType.
 
         Parameters

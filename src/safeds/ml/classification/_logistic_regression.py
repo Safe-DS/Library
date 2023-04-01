@@ -13,10 +13,7 @@ if TYPE_CHECKING:
 
 
 class LogisticRegression(Classifier):
-    """
-    This class implements regularized logistic regression. It is used as a classifier model.
-    It can only be trained on a tagged table.
-    """
+    """This class implements regularized logistic regression."""
 
     def __init__(self) -> None:
         self._wrapped_classifier: sk_LogisticRegression | None = None
@@ -25,8 +22,9 @@ class LogisticRegression(Classifier):
 
     def fit(self, training_set: TaggedTable) -> LogisticRegression:
         """
-        Create a new classifier based on this one and fit it with the given training data. This classifier is not
-        modified.
+        Create a copy of this classifier and fit it with the given training data.
+
+        This classifier is not modified.
 
         Parameters
         ----------

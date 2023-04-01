@@ -13,10 +13,7 @@ if TYPE_CHECKING:
 
 
 class AdaBoost(Classifier):
-    """
-    This class implements Ada Boost classification. It is used as a classifier model.
-    It can only be trained on a tagged table.
-    """
+    """This class implements Ada Boost classification."""
 
     def __init__(self) -> None:
         self._wrapped_classifier: sk_AdaBoostClassifier | None = None
@@ -25,8 +22,9 @@ class AdaBoost(Classifier):
 
     def fit(self, training_set: TaggedTable) -> AdaBoost:
         """
-        Create a new classifier based on this one and fit it with the given training data. This classifier is not
-        modified.
+        Create a copy of this classifier and fit it with the given training data.
+
+        This classifier is not modified.
 
         Parameters
         ----------

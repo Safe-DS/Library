@@ -18,8 +18,9 @@ class Regressor(ABC):
     @abstractmethod
     def fit(self, training_set: TaggedTable) -> Regressor:
         """
-        Create a new regressor based on this one and fit it with the given training data. This regressor is not
-        modified.
+        Create a copy of this regressor and fit it with the given training data.
+
+        This regressor is not modified.
 
         Parameters
         ----------
@@ -72,7 +73,7 @@ class Regressor(ABC):
     # noinspection PyProtectedMember
     def mean_squared_error(self, validation_or_test_set: TaggedTable) -> float:
         """
-        Return the mean squared error, calculated from a given known truth and a column to compare.
+        Computes the mean squared error (MSE) on the given data.
 
         Parameters
         ----------
@@ -93,7 +94,7 @@ class Regressor(ABC):
     # noinspection PyProtectedMember
     def mean_absolute_error(self, validation_or_test_set: TaggedTable) -> float:
         """
-        Return the mean absolute error, calculated from a given known truth and a column to compare.
+        Computes the mean absolute error (MAE) of the regressor on the given data.
 
         Parameters
         ----------

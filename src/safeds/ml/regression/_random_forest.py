@@ -13,7 +13,7 @@ if TYPE_CHECKING:
 
 
 class RandomForest(Regressor):
-    """This class implements Random Forest regression. It can only be trained on a tagged table."""
+    """This class implements Random Forest regression."""
 
     def __init__(self) -> None:
         self._wrapped_regressor: sk_RandomForestRegressor | None = None
@@ -22,8 +22,9 @@ class RandomForest(Regressor):
 
     def fit(self, training_set: TaggedTable) -> RandomForest:
         """
-        Create a new regressor based on this one and fit it with the given training data. This regressor is not
-        modified.
+        Create a copy of this regressor and fit it with the given training data.
+
+        This regressor is not modified.
 
         Parameters
         ----------

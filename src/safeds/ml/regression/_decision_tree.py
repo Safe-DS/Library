@@ -13,10 +13,7 @@ if TYPE_CHECKING:
 
 
 class DecisionTree(Regressor):
-    """
-    This class implements Decision Tree regression. It is used as a regression model.
-    It can only be trained on a tagged table.
-    """
+    """This class implements decision tree regression."""
 
     def __init__(self) -> None:
         self._wrapped_regressor: sk_DecisionTreeRegressor | None = None
@@ -25,8 +22,9 @@ class DecisionTree(Regressor):
 
     def fit(self, training_set: TaggedTable) -> DecisionTree:
         """
-        Create a new regressor based on this one and fit it with the given training data. This regressor is not
-        modified.
+        Create a copy of this regressor and fit it with the given training data.
+
+        This regressor is not modified.
 
         Parameters
         ----------

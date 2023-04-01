@@ -13,7 +13,7 @@ if TYPE_CHECKING:
 
 
 class RandomForest(Classifier):
-    """This class implements the Random Forest classification. It can only be trained on a tagged table."""
+    """This class implements the Random Forest classification."""
 
     def __init__(self) -> None:
         self._wrapped_classifier: sk_RandomForestClassifier | None = None
@@ -22,8 +22,9 @@ class RandomForest(Classifier):
 
     def fit(self, training_set: TaggedTable) -> RandomForest:
         """
-        Create a new classifier based on this one and fit it with the given training data. This classifier is not
-        modified.
+        Create a copy of this classifier and fit it with the given training data.
+
+        This classifier is not modified.
 
         Parameters
         ----------

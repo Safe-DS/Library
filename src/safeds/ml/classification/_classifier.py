@@ -15,8 +15,9 @@ class Classifier(ABC):
     @abstractmethod
     def fit(self, training_set: TaggedTable) -> Classifier:
         """
-        Create a new classifier based on this one and fit it with the given training data. This classifier is not
-        modified.
+        Create a copy of this classifier and fit it with the given training data.
+
+        This classifier is not modified.
 
         Parameters
         ----------
@@ -69,8 +70,7 @@ class Classifier(ABC):
     # noinspection PyProtectedMember
     def accuracy(self, validation_or_test_set: TaggedTable) -> float:
         """
-        Predicts the target values for the features in the validation or test set and compares it to the expected
-        results.
+        Computes the accuracy of the classifier on the given data.
 
         Parameters
         ----------

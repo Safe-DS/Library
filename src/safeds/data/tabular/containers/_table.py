@@ -273,6 +273,7 @@ class Table:
     def has_column(self, column_name: str) -> bool:
         """
         Return whether the table contains a given column.
+
         Alias for self.schema.hasColumn(column_name: str) -> bool.
 
         Parameters
@@ -290,6 +291,7 @@ class Table:
     def get_column_names(self) -> list[str]:
         """
         Return a list of all column names in this table.
+
         Alias for self.schema.get_column_names() -> list[str].
 
         Returns
@@ -302,6 +304,7 @@ class Table:
     def get_type_of_column(self, column_name: str) -> ColumnType:
         """
         Return the type of the given column.
+
         Alias for self.schema.get_type_of_column(column_name: str) -> ColumnType.
 
         Parameters
@@ -823,10 +826,10 @@ class Table:
         - (col1.name < col2.name),
     ) -> Table:
         """
-        Sort the columns of a `Table` with the given comparator and return a new `Table`. The original table is not
-        modified.
+        Sort the columns of a `Table` with the given comparator and return a new `Table`.
 
-        The comparator is a function that takes two columns `col1` and `col2` and returns an integer:
+        The original table is not modified. The comparator is a function that takes two columns `col1` and `col2` and
+        returns an integer:
 
         * If `col1` should be ordered before `col2`, the function should return a negative number.
         * If `col1` should be ordered after `col2`, the function should return a positive number.
@@ -850,10 +853,10 @@ class Table:
 
     def sort_rows(self, comparator: Callable[[Row, Row], int]) -> Table:
         """
-        Sort the rows of a `Table` with the given comparator and return a new `Table`. The original table is not
-        modified.
+        Sort the rows of a `Table` with the given comparator and return a new `Table`.
 
-        The comparator is a function that takes two rows `row1` and `row2` and returns an integer:
+        The original table is not modified. The comparator is a function that takes two rows `row1` and `row2` and
+        returns an integer:
 
         * If `row1` should be ordered before `row2`, the function should return a negative number.
         * If `row1` should be ordered after `row2`, the function should return a positive number.
@@ -960,9 +963,10 @@ class Table:
 
     def lineplot(self, x_column_name: str, y_column_name: str) -> None:
         """
-        Plot two columns against each other in a lineplot. If there are multiple x-values for a y-value,
-        the resulting plot will consist of a line representing the mean and the lower-transparency area around the line
-        representing the 95% confidence interval.
+        Plot two columns against each other in a lineplot.
+
+        If there are multiple x-values for a y-value, the resulting plot will consist of a line representing the mean
+        and the lower-transparency area around the line representing the 95% confidence interval.
 
         Parameters
         ----------
@@ -1039,8 +1043,9 @@ class Table:
     def to_csv_file(self, path: str) -> None:
         """
         Write the data from the table into a CSV file.
-        If the file and/or the directories do not exist they will be created.
-        If the file already exists it will be overwritten.
+
+        If the file and/or the directories do not exist they will be created. If the file already exists it will be
+        overwritten.
 
         Parameters
         ----------
@@ -1055,8 +1060,9 @@ class Table:
     def to_json_file(self, path: str) -> None:
         """
         Write the data from the table into a JSON file.
-        If the file and/or the directories do not exist, they will be created.
-        If the file already exists it will be overwritten.
+
+        If the file and/or the directories do not exist, they will be created. If the file already exists it will be
+        overwritten.
 
         Parameters
         ----------

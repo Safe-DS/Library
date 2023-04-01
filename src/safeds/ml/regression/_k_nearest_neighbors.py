@@ -14,7 +14,7 @@ if TYPE_CHECKING:
 
 class KNearestNeighbors(Regressor):
     """
-    This class implements K-nearest-neighbors regressor. It can only be trained on a tagged table.
+    This class implements K-nearest-neighbors regressor.
 
     Parameters
     ----------
@@ -31,8 +31,9 @@ class KNearestNeighbors(Regressor):
 
     def fit(self, training_set: TaggedTable) -> KNearestNeighbors:
         """
-        Create a new regressor based on this one and fit it with the given training data. This regressor is not
-        modified.
+        Create a copy of this regressor and fit it with the given training data.
+
+        This regressor is not modified.
 
         Parameters
         ----------

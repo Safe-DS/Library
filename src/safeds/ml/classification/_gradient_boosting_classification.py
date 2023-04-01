@@ -13,10 +13,7 @@ if TYPE_CHECKING:
 
 
 class GradientBoosting(Classifier):
-    """
-    This class implements gradient boosting classification. It is used as a classifier model.
-    It can only be trained on a tagged table.
-    """
+    """This class implements gradient boosting classification."""
 
     def __init__(self) -> None:
         self._wrapped_classifier: sk_GradientBoostingClassifier | None = None
@@ -25,8 +22,9 @@ class GradientBoosting(Classifier):
 
     def fit(self, training_set: TaggedTable) -> GradientBoosting:
         """
-        Create a new classifier based on this one and fit it with the given training data. This classifier is not
-        modified.
+        Create a copy of this classifier and fit it with the given training data.
+
+        This classifier is not modified.
 
         Parameters
         ----------
