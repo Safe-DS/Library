@@ -11,18 +11,26 @@ from ._data_exceptions import (
     SchemaMismatchError,
     UnknownColumnNameError,
 )
-from ._learning_exceptions import LearningError, NotFittedError, PredictionError
+from ._ml_exceptions import (
+    DatasetContainsTargetError,
+    DatasetMissesFeaturesError,
+    LearningError,
+    ModelNotFittedError,
+    PredictionError,
+)
 
 __all__ = [
     "ColumnLengthMismatchError",
     "ColumnSizeError",
+    "DatasetContainsTargetError",
+    "DatasetMissesFeaturesError",
     "DuplicateColumnNameError",
     "IndexOutOfBoundsError",
     "LearningError",
     "MissingDataError",
     "MissingSchemaError",
+    "ModelNotFittedError",
     "NonNumericColumnError",
-    "NotFittedError",
     "PredictionError",
     "SchemaMismatchError",
     "UnknownColumnNameError",

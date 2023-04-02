@@ -7,7 +7,7 @@ from safeds.data.tabular.containers import Table
 from safeds.data.tabular.transformation._table_transformer import (
     InvertibleTableTransformer,
 )
-from safeds.exceptions import NotFittedError, UnknownColumnNameError
+from safeds.exceptions import ModelNotFittedError, UnknownColumnNameError
 
 
 class OneHotEncoder(InvertibleTableTransformer):
@@ -75,7 +75,7 @@ class OneHotEncoder(InvertibleTableTransformer):
         """
         # Transformer has not been fitted yet
         if self._wrapped_transformer is None or self._column_names is None:
-            raise NotFittedError
+            raise ModelNotFittedError
 
         # Input table does not contain all columns used to fit the transformer
         missing_columns = set(self._column_names) - set(table.get_column_names())
@@ -114,7 +114,7 @@ class OneHotEncoder(InvertibleTableTransformer):
         """
         # Transformer has not been fitted yet
         if self._wrapped_transformer is None or self._column_names is None:
-            raise NotFittedError
+            raise ModelNotFittedError
 
         data = transformed_table._data.copy()
         data.columns = transformed_table.get_column_names()

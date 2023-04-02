@@ -5,7 +5,13 @@ from typing import TYPE_CHECKING
 import pandas as pd
 import pytest
 from safeds.data.tabular.containers import Column, Table, TaggedTable
-from safeds.exceptions import LearningError, PredictionError
+from safeds.exceptions import (
+    DatasetContainsTargetError,
+    DatasetMissesFeaturesError,
+    LearningError,
+    ModelNotFittedError,
+    PredictionError,
+)
 from safeds.ml.classification import (
     AdaBoost,
     Classifier,
@@ -104,9 +110,19 @@ class TestPredict:
         fitted_classifier.predict(valid_data.features)
         assert valid_data == valid_data_copy
 
-    def test_should_raise_when_not_fitted(self, classifier: Classifier, valid_data: TaggedTable) -> None:
-        with pytest.raises(PredictionError):
+    def test_should_raise_if_not_fitted(self, classifier: Classifier, valid_data: TaggedTable) -> None:
+        with pytest.raises(ModelNotFittedError):
             classifier.predict(valid_data.features)
+
+    def test_should_raise_if_dataset_contains_target(self, classifier: Classifier, valid_data: TaggedTable) -> None:
+        fitted_classifier = classifier.fit(valid_data)
+        with pytest.raises(DatasetContainsTargetError, match="target"):
+            fitted_classifier.predict(valid_data)
+
+    def test_should_raise_if_dataset_misses_features(self, classifier: Classifier, valid_data: TaggedTable) -> None:
+        fitted_classifier = classifier.fit(valid_data)
+        with pytest.raises(DatasetMissesFeaturesError, match="[feat1, feat2]"):
+            fitted_classifier.predict(valid_data.remove_columns(["feat1", "feat2", "target"]))
 
     def test_should_raise_on_invalid_data(
         self,

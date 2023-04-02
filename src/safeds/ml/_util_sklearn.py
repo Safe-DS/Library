@@ -1,9 +1,13 @@
 from typing import Any
 
-from sklearn.exceptions import NotFittedError
-
 from safeds.data.tabular.containers import Table, TaggedTable
-from safeds.exceptions import LearningError, PredictionError
+from safeds.exceptions import (
+    DatasetContainsTargetError,
+    DatasetMissesFeaturesError,
+    LearningError,
+    ModelNotFittedError,
+    PredictionError,
+)
 
 
 # noinspection PyProtectedMember
@@ -55,13 +59,23 @@ def predict(model: Any, dataset: Table, feature_names: list[str] | None, target_
 
     Raises
     ------
+    ModelNotFittedError
+        If the model has not been fitted yet.
+    DatasetContainsTargetError
+        If the dataset contains the target column already.
+    DatasetMissesFeaturesError
+        If the dataset misses feature columns.
     PredictionError
         If predicting with the given dataset failed.
     """
+    # Validation
     if model is None or target_name is None or feature_names is None:
-        raise PredictionError("The model has not been trained yet.")
+        raise ModelNotFittedError
     if dataset.has_column(target_name):
-        raise ValueError(f"Dataset already contains the target column '{target_name}'.")
+        raise DatasetContainsTargetError(target_name)
+    missing_feature_names = [feature_name for feature_name in feature_names if not dataset.has_column(feature_name)]
+    if missing_feature_names:
+        raise DatasetMissesFeaturesError(missing_feature_names)
 
     dataset_df = dataset.keep_only_columns(feature_names)._data
     dataset_df.columns = feature_names
@@ -73,7 +87,5 @@ def predict(model: Any, dataset: Table, feature_names: list[str] | None, target_
         predicted_target_vector = model.predict(dataset_df.values)
         result_set[target_name] = predicted_target_vector
         return Table(result_set).tag_columns(target_name=target_name, feature_names=feature_names)
-    except NotFittedError as exception:
-        raise PredictionError("The model was not trained") from exception
     except ValueError as exception:
         raise PredictionError(str(exception)) from exception
