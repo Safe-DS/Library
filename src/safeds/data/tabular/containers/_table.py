@@ -646,9 +646,9 @@ class Table:
         result : Table
             The table with the duplicate rows removed.
         """
-        df = self._data.drop_duplicates(ignore_index=True)
-        df.columns = self._schema.get_column_names()
-        return Table(df)
+        result = self._data.drop_duplicates(ignore_index=True)
+        result.columns = self._schema.get_column_names()
+        return Table(result)
 
     def remove_rows_with_missing_values(self) -> Table:
         """
