@@ -9,6 +9,7 @@ from ._data_exceptions import (
     MissingSchemaError,
     NonNumericColumnError,
     SchemaMismatchError,
+    TransformerNotFittedError,
     UnknownColumnNameError,
 )
 from ._ml_exceptions import (
@@ -33,5 +34,6 @@ __all__ = [
     "NonNumericColumnError",
     "PredictionError",
     "SchemaMismatchError",
+    "TransformerNotFittedError",
     "UnknownColumnNameError",
 ]

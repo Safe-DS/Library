@@ -1,7 +1,7 @@
 import pytest
 from safeds.data.tabular.containers import Column, Table
 from safeds.data.tabular.transformation import Imputer, ImputerStrategy
-from safeds.exceptions import ModelNotFittedError, UnknownColumnNameError
+from safeds.exceptions import TransformerNotFittedError, UnknownColumnNameError
 
 
 class TestFit:
@@ -57,7 +57,7 @@ class TestTransform:
 
         transformer = Imputer(Imputer.Strategy.Constant(0))
 
-        with pytest.raises(ModelNotFittedError):
+        with pytest.raises(TransformerNotFittedError):
             transformer.transform(table)
 
 

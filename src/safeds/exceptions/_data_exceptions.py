@@ -89,3 +89,10 @@ class MissingDataError(Exception):
 
     def __init__(self, missing_data_info: str):
         super().__init__(f"The function is missing data: \n{missing_data_info}")
+
+
+class TransformerNotFittedError(Exception):
+    """Raised when a transformer is used before fitting it."""
+
+    def __init__(self) -> None:
+        super().__init__("The transformer has not been fitted yet.")
