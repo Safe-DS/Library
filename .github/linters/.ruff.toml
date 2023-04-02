@@ -6,7 +6,6 @@ select = [
     "F",
     "E",
     "W",
-    "C90",
     "I",
     "N",
     "D",
@@ -70,7 +69,7 @@ ignore = [
     # compare-to-empty-string (sometimes it's better to be explicit)
     "PLC1901",
     # too-many-return-statements
-    "PLR0912",
+    "PLR0911",
     # too-many-branches
     "PLR0912",
     # too-many-arguments
