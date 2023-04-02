@@ -9,6 +9,7 @@ from safeds.exceptions import UnknownColumnNameError
 if TYPE_CHECKING:
     import pandas as pd
 
+
 @dataclass
 class Schema:
     """

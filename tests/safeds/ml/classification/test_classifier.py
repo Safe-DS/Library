@@ -19,6 +19,7 @@ from safeds.ml.classification import (
 if TYPE_CHECKING:
     from _pytest.fixtures import FixtureRequest
 
+
 def classifiers() -> list[Classifier]:
     """
     Return the list of classifiers to test.
@@ -140,7 +141,7 @@ class DummyClassifier(Classifier):
     `target_name` must be set to `"expected"`.
     """
 
-    def fit(self, training_set: TaggedTable) -> DummyClassifier: # noqa: ARG002
+    def fit(self, training_set: TaggedTable) -> DummyClassifier:  # noqa: ARG002
         return self
 
     def predict(self, dataset: Table) -> TaggedTable:
