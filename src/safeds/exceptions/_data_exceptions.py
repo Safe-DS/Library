@@ -13,14 +13,10 @@ class UnknownColumnNameError(KeyError):
 
 
 class NonNumericColumnError(Exception):
-    """
-    Exception raised for trying to do numerical operations on a non-numerical column.
-    """
+    """Exception raised for trying to do numerical operations on a non-numerical column."""
 
     def __init__(self, column_info: str) -> None:
-        super().__init__(
-            f"Tried to do a numerical operation on one or multiple non numerical Columns: \n{column_info}"
-        )
+        super().__init__(f"Tried to do a numerical operation on one or multiple non numerical Columns: \n{column_info}")
 
 
 class DuplicateColumnNameError(Exception):
@@ -64,42 +60,32 @@ class ColumnSizeError(Exception):
     """
 
     def __init__(self, expected_size: str, actual_size: str):
-        super().__init__(
-            f"Expected a column of size {expected_size} but got column of size {actual_size}."
-        )
+        super().__init__(f"Expected a column of size {expected_size} but got column of size {actual_size}.")
 
 
 class SchemaMismatchError(Exception):
-    """
-    Exception raised when schemas are unequal.
-    """
+    """Exception raised when schemas are unequal."""
 
     def __init__(self) -> None:
         super().__init__("Failed because at least two schemas didn't match.")
 
 
 class MissingSchemaError(Exception):
-    """
-    Exception raised when a required schema is missing.
-    """
+    """Exception raised when a required schema is missing."""
 
     def __init__(self) -> None:
         super().__init__("Failed because a required schema is missing.")
 
 
 class ColumnLengthMismatchError(Exception):
-    """
-    Exception raised when the lengths of two or more columns do not match.
-    """
+    """Exception raised when the lengths of two or more columns do not match."""
 
     def __init__(self, column_info: str):
         super().__init__(f"The length of at least one column differs: \n{column_info}")
 
 
 class MissingDataError(Exception):
-    """
-    Exception raised if a function is not given enough data to succeed.
-    """
+    """Exception raised if a function is not given enough data to succeed."""
 
     def __init__(self, missing_data_info: str):
         super().__init__(f"The function is missing data: \n{missing_data_info}")

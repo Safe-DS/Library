@@ -1,8 +1,9 @@
-from typing import Any, Optional
+from typing import Any
+
+from sklearn.exceptions import NotFittedError
 
 from safeds.data.tabular.containers import Table, TaggedTable
 from safeds.exceptions import LearningError, PredictionError
-from sklearn.exceptions import NotFittedError
 
 
 # noinspection PyProtectedMember
@@ -32,7 +33,7 @@ def fit(model: Any, tagged_table: TaggedTable) -> None:
 
 
 # noinspection PyProtectedMember
-def predict(model: Any, dataset: Table, feature_names: Optional[list[str]], target_name: Optional[str]) -> TaggedTable:
+def predict(model: Any, dataset: Table, feature_names: list[str] | None, target_name: str | None) -> TaggedTable:
     """
     Predict a target vector using a dataset containing feature vectors. The model has to be trained first.
 
@@ -57,18 +58,19 @@ def predict(model: Any, dataset: Table, feature_names: Optional[list[str]], targ
     PredictionError
         If predicting with the given dataset failed.
     """
-
     if model is None or target_name is None or feature_names is None:
-        raise PredictionError("The model was not trained")
+        raise PredictionError("The model has not been trained yet.")
+    if dataset.has_column(target_name):
+        raise ValueError(f"Dataset already contains the target column '{target_name}'.")
 
     dataset_df = dataset.keep_only_columns(feature_names)._data
     dataset_df.columns = feature_names
+
+    result_set = dataset._data.copy(deep=True)
+    result_set.columns = dataset.get_column_names()
+
     try:
         predicted_target_vector = model.predict(dataset_df.values)
-        result_set = dataset._data.copy(deep=True)
-        result_set.columns = dataset.get_column_names()
-        if target_name in result_set.columns:
-            raise ValueError(f"Dataset already contains '{target_name}' column. Please rename this column")
         result_set[target_name] = predicted_target_vector
         return Table(result_set).tag_columns(target_name=target_name, feature_names=feature_names)
     except NotFittedError as exception:

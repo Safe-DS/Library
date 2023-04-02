@@ -7,14 +7,14 @@ from safeds.exceptions import NonNumericColumnError
 
 
 def test_boxplot_complex() -> None:
-    with pytest.raises(TypeError):
+    with pytest.raises(TypeError):  # noqa: PT012
         table = Table(pd.DataFrame(data={"A": [1, 2, complex(1, -2)]}))
         table.get_column("A").boxplot()
 
 
 def test_boxplot_non_numeric() -> None:
+    table = Table(pd.DataFrame(data={"A": [1, 2, "A"]}))
     with pytest.raises(NonNumericColumnError):
-        table = Table(pd.DataFrame(data={"A": [1, 2, "A"]}))
         table.get_column("A").boxplot()
 
 

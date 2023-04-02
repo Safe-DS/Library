@@ -1,6 +1,7 @@
 import pytest
 from safeds.data.tabular.containers import Row, Table
 from safeds.exceptions import MissingDataError
+
 from tests.helpers import resolve_resource_path
 
 

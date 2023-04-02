@@ -1,3 +1,5 @@
+"""Classes for classification tasks."""
+
 from ._ada_boost import AdaBoost
 from ._classifier import Classifier
 from ._decision_tree import DecisionTree
@@ -5,3 +7,13 @@ from ._gradient_boosting_classification import GradientBoosting
 from ._k_nearest_neighbors import KNearestNeighbors
 from ._logistic_regression import LogisticRegression
 from ._random_forest import RandomForest
+
+__all__ = [
+    "AdaBoost",
+    "Classifier",
+    "DecisionTree",
+    "GradientBoosting",
+    "KNearestNeighbors",
+    "LogisticRegression",
+    "RandomForest",
+]

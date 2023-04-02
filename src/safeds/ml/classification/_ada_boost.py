@@ -1,29 +1,30 @@
 from __future__ import annotations
 
-from typing import Optional
+from typing import TYPE_CHECKING
 
-from safeds.data.tabular.containers import Table, TaggedTable
-from safeds.ml._util_sklearn import fit, predict
 from sklearn.ensemble import AdaBoostClassifier as sk_AdaBoostClassifier
+
+from safeds.ml._util_sklearn import fit, predict
 
 from ._classifier import Classifier
 
+if TYPE_CHECKING:
+    from safeds.data.tabular.containers import Table, TaggedTable
+
 
 class AdaBoost(Classifier):
-    """
-    This class implements Ada Boost classification. It is used as a classifier model.
-    It can only be trained on a tagged table.
-    """
+    """Ada Boost classification."""
 
     def __init__(self) -> None:
-        self._wrapped_classifier: Optional[sk_AdaBoostClassifier] = None
-        self._feature_names: Optional[list[str]] = None
-        self._target_name: Optional[str] = None
+        self._wrapped_classifier: sk_AdaBoostClassifier | None = None
+        self._feature_names: list[str] | None = None
+        self._target_name: str | None = None
 
     def fit(self, training_set: TaggedTable) -> AdaBoost:
         """
-        Create a new classifier based on this one and fit it with the given training data. This classifier is not
-        modified.
+        Create a copy of this classifier and fit it with the given training data.
+
+        This classifier is not modified.
 
         Parameters
         ----------
@@ -40,7 +41,6 @@ class AdaBoost(Classifier):
         LearningError
             If the training data contains invalid values or if the training failed.
         """
-
         wrapped_classifier = sk_AdaBoostClassifier()
         fit(wrapped_classifier, training_set)
 
@@ -74,7 +74,7 @@ class AdaBoost(Classifier):
 
     def is_fitted(self) -> bool:
         """
-        Checks if the classifier is fitted.
+        Check if the classifier is fitted.
 
         Returns
         -------

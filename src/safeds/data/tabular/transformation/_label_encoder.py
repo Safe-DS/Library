@@ -1,14 +1,15 @@
 from __future__ import annotations
 
 import warnings
-from typing import Any, Optional
+from typing import Any
+
+from sklearn.preprocessing import OrdinalEncoder as sk_OrdinalEncoder
 
 from safeds.data.tabular.containers import Table
 from safeds.data.tabular.transformation._table_transformer import (
     InvertibleTableTransformer,
 )
 from safeds.exceptions import NotFittedError, UnknownColumnNameError
-from sklearn.preprocessing import OrdinalEncoder as sk_OrdinalEncoder
 
 
 def warn(*_: Any, **__: Any) -> None:
@@ -20,15 +21,13 @@ warnings.warn = warn
 
 # noinspection PyProtectedMember
 class LabelEncoder(InvertibleTableTransformer):
-    """
-    The LabelEncoder encodes one or more given columns into labels.
-    """
+    """The LabelEncoder encodes one or more given columns into labels."""
 
     def __init__(self) -> None:
-        self._wrapped_transformer: Optional[sk_OrdinalEncoder] = None
-        self._column_names: Optional[list[str]] = None
+        self._wrapped_transformer: sk_OrdinalEncoder | None = None
+        self._column_names: list[str] | None = None
 
-    def fit(self, table: Table, column_names: Optional[list[str]] = None) -> LabelEncoder:
+    def fit(self, table: Table, column_names: list[str] | None = None) -> LabelEncoder:
         """
         Learn a transformation for a set of columns in a table.
 
@@ -77,14 +76,13 @@ class LabelEncoder(InvertibleTableTransformer):
             The transformed table.
 
         Raises
-        ----------
+        ------
         NotFittedError
             If the transformer has not been fitted yet.
         """
-
         # Transformer has not been fitted yet
         if self._wrapped_transformer is None or self._column_names is None:
-            raise NotFittedError()
+            raise NotFittedError
 
         # Input table does not contain all columns used to fit the transformer
         missing_columns = set(self._column_names) - set(table.get_column_names())
@@ -111,14 +109,13 @@ class LabelEncoder(InvertibleTableTransformer):
             The original table.
 
         Raises
-        ----------
+        ------
         NotFittedError
             If the transformer has not been fitted yet.
         """
-
         # Transformer has not been fitted yet
         if self._wrapped_transformer is None or self._column_names is None:
-            raise NotFittedError()
+            raise NotFittedError
 
         data = transformed_table._data.copy()
         data.columns = transformed_table.get_column_names()

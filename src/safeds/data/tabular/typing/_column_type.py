@@ -2,14 +2,14 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
+from typing import TYPE_CHECKING
 
-import numpy as np
+if TYPE_CHECKING:
+    import numpy as np
 
 
 class ColumnType(ABC):
-    """
-    Abstract base class for column types.
-    """
+    """Abstract base class for column types."""
 
     @abstractmethod
     def is_nullable(self) -> bool:
@@ -49,7 +49,7 @@ class ColumnType(ABC):
             The ColumnType.
 
         Raises
-        -------
+        ------
         TypeError
             If the given dtype is not supported.
         """

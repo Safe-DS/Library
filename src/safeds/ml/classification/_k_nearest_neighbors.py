@@ -1,17 +1,20 @@
 from __future__ import annotations
 
-from typing import Optional
+from typing import TYPE_CHECKING
 
-from safeds.data.tabular.containers import Table, TaggedTable
-from safeds.ml._util_sklearn import fit, predict
 from sklearn.neighbors import KNeighborsClassifier as sk_KNeighborsClassifier
 
+from safeds.ml._util_sklearn import fit, predict
+
 from ._classifier import Classifier
+
+if TYPE_CHECKING:
+    from safeds.data.tabular.containers import Table, TaggedTable
 
 
 class KNearestNeighbors(Classifier):
     """
-    This class implements K-nearest-neighbors classifier. It can only be trained on a tagged table.
+    K-nearest-neighbors classification.
 
     Parameters
     ----------
@@ -22,14 +25,15 @@ class KNearestNeighbors(Classifier):
     def __init__(self, n_neighbors: int) -> None:
         self._n_neighbors = n_neighbors
 
-        self._wrapped_classifier: Optional[sk_KNeighborsClassifier] = None
-        self._feature_names: Optional[list[str]] = None
-        self._target_name: Optional[str] = None
+        self._wrapped_classifier: sk_KNeighborsClassifier | None = None
+        self._feature_names: list[str] | None = None
+        self._target_name: str | None = None
 
     def fit(self, training_set: TaggedTable) -> KNearestNeighbors:
         """
-        Create a new classifier based on this one and fit it with the given training data. This classifier is not
-        modified.
+        Create a copy of this classifier and fit it with the given training data.
+
+        This classifier is not modified.
 
         Parameters
         ----------
@@ -58,7 +62,7 @@ class KNearestNeighbors(Classifier):
 
     def predict(self, dataset: Table) -> TaggedTable:
         """
-        Predict a target vector using a dataset containing feature vectors. The model has to be trained first
+        Predict a target vector using a dataset containing feature vectors. The model has to be trained first.
 
         Parameters
         ----------
@@ -79,7 +83,7 @@ class KNearestNeighbors(Classifier):
 
     def is_fitted(self) -> bool:
         """
-        Checks if the classifier is fitted.
+        Check if the classifier is fitted.
 
         Returns
         -------

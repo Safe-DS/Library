@@ -1,9 +1,8 @@
 from __future__ import annotations
 
 import functools
-import os.path
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Callable, Iterable, Optional, Union
+from typing import TYPE_CHECKING, Any
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -11,6 +10,8 @@ import pandas as pd
 import seaborn as sns
 from IPython.core.display_functions import DisplayHandle, display
 from pandas import DataFrame, Series
+from scipy import stats
+
 from safeds.data.tabular.typing import ColumnType, Schema
 from safeds.exceptions import (
     ColumnLengthMismatchError,
@@ -22,12 +23,13 @@ from safeds.exceptions import (
     SchemaMismatchError,
     UnknownColumnNameError,
 )
-from scipy import stats
 
 from ._column import Column
 from ._row import Row
 
 if TYPE_CHECKING:
+    from collections.abc import Callable, Iterable
+
     from ._tagged_table import TaggedTable
 
 
@@ -44,7 +46,7 @@ class Table:
         The schema of the table. If not specified, the schema will be inferred from the data.
 
     Raises
-    ----------
+    ------
     MissingSchemaError
         If the table is empty and no schema is specified.
     """
@@ -75,13 +77,10 @@ class Table:
         ValueError
             If the file could not be read.
         """
-
         try:
             return Table(pd.read_csv(path))
         except FileNotFoundError as exception:
             raise FileNotFoundError(f'File "{path}" does not exist') from exception
-        except Exception as exception:
-            raise ValueError(f'Could not read file from "{path}" as CSV') from exception
 
     @staticmethod
     def from_json_file(path: str) -> Table:
@@ -105,13 +104,10 @@ class Table:
         ValueError
             If the file could not be read.
         """
-
         try:
             return Table(pd.read_json(path))
         except FileNotFoundError as exception:
             raise FileNotFoundError(f'File "{path}" does not exist') from exception
-        except Exception as exception:
-            raise ValueError(f'Could not read file from "{path}" as JSON') from exception
 
     @staticmethod
     def from_columns(columns: list[Column]) -> Table:
@@ -143,7 +139,7 @@ class Table:
         for column in columns:
             if column._data.size != columns[0]._data.size:
                 raise ColumnLengthMismatchError(
-                    "\n".join([f"{column.name}: {column._data.size}" for column in columns])
+                    "\n".join([f"{column.name}: {column._data.size}" for column in columns]),
                 )
             dataframe[column.name] = column._data
 
@@ -179,7 +175,7 @@ class Table:
 
         for row in rows:
             if schema_compare != row.schema:
-                raise SchemaMismatchError()
+                raise SchemaMismatchError
             row_array.append(row._data)
 
         dataframe: DataFrame = pd.DataFrame(row_array)
@@ -190,7 +186,7 @@ class Table:
     # Dunder methods
     # ------------------------------------------------------------------------------------------------------------------
 
-    def __init__(self, data: Iterable, schema: Optional[Schema] = None):
+    def __init__(self, data: Iterable, schema: Schema | None = None):
         self._data: pd.Dataframe = data if isinstance(data, pd.DataFrame) else pd.DataFrame(data)
         self._schema: Schema = Schema._from_dataframe(self._data) if schema is None else schema
 
@@ -274,6 +270,7 @@ class Table:
     def has_column(self, column_name: str) -> bool:
         """
         Return whether the table contains a given column.
+
         Alias for self.schema.hasColumn(column_name: str) -> bool.
 
         Parameters
@@ -291,6 +288,7 @@ class Table:
     def get_column_names(self) -> list[str]:
         """
         Return a list of all column names in this table.
+
         Alias for self.schema.get_column_names() -> list[str].
 
         Returns
@@ -303,6 +301,7 @@ class Table:
     def get_type_of_column(self, column_name: str) -> ColumnType:
         """
         Return the type of the given column.
+
         Alias for self.schema.get_type_of_column(column_name: str) -> ColumnType.
 
         Parameters
@@ -380,7 +379,6 @@ class Table:
         result : Table
             The table with statistics.
         """
-
         columns = self.to_columns()
         result = pd.DataFrame()
         statistics = {}
@@ -410,7 +408,7 @@ class Table:
             result = pd.concat([result, pd.DataFrame(values)], axis=1)
 
         result = pd.concat([pd.DataFrame(list(statistics.keys())), result], axis=1)
-        result.columns = ["metrics"] + self.get_column_names()
+        result.columns = ["metrics", *self.get_column_names()]
 
         return Table(result)
 
@@ -447,7 +445,7 @@ class Table:
         result[column.name] = column._data
         return Table(result)
 
-    def add_columns(self, columns: Union[list[Column], Table]) -> Table:
+    def add_columns(self, columns: list[Column] | Table) -> Table:
         """
         Add multiple columns to the table.
 
@@ -462,7 +460,7 @@ class Table:
             A new table combining the original table and the given columns.
 
         Raises
-        --------
+        ------
         ColumnSizeError
             If at least one of the column sizes from the provided column list does not match the table.
         DuplicateColumnNameError
@@ -498,12 +496,12 @@ class Table:
 
         """
         if self._schema != row.schema:
-            raise SchemaMismatchError()
+            raise SchemaMismatchError
         new_df = pd.concat([self._data, row._data.to_frame().T]).infer_objects()
         new_df.columns = self._schema.get_column_names()
         return Table(new_df)
 
-    def add_rows(self, rows: Union[list[Row], Table]) -> Table:
+    def add_rows(self, rows: list[Row] | Table) -> Table:
         """
         Add multiple rows to a table.
 
@@ -522,7 +520,7 @@ class Table:
         result = self._data
         for row in rows:
             if self._schema != row.schema:
-                raise SchemaMismatchError()
+                raise SchemaMismatchError
         result = pd.concat([result, *[row._data.to_frame().T for row in rows]]).infer_objects()
         result.columns = self._schema.get_column_names()
         return Table(result)
@@ -577,7 +575,7 @@ class Table:
         if len(invalid_columns) != 0:
             raise UnknownColumnNameError(invalid_columns)
         transformed_data = self._data[column_indices]
-        transformed_data.columns = list(name for name in self._schema.get_column_names() if name in column_names)
+        transformed_data.columns = [name for name in self._schema.get_column_names() if name in column_names]
         return Table(transformed_data)
 
     def remove_columns(self, column_names: list[str]) -> Table:
@@ -609,7 +607,7 @@ class Table:
         if len(invalid_columns) != 0:
             raise UnknownColumnNameError(invalid_columns)
         transformed_data = self._data.drop(labels=column_indices, axis="columns")
-        transformed_data.columns = list(name for name in self._schema.get_column_names() if name not in column_names)
+        transformed_data.columns = [name for name in self._schema.get_column_names() if name not in column_names]
         return Table(transformed_data)
 
     def remove_columns_with_missing_values(self) -> Table:
@@ -644,9 +642,9 @@ class Table:
         result : Table
             The table with the duplicate rows removed.
         """
-        df = self._data.drop_duplicates(ignore_index=True)
-        df.columns = self._schema.get_column_names()
-        return Table(df)
+        result = self._data.drop_duplicates(ignore_index=True)
+        result.columns = self._schema.get_column_names()
+        return Table(result)
 
     def remove_rows_with_missing_values(self) -> Table:
         """
@@ -780,8 +778,8 @@ class Table:
 
     def slice_rows(
         self,
-        start: Optional[int] = None,
-        end: Optional[int] = None,
+        start: int | None = None,
+        end: int | None = None,
         step: int = 1,
     ) -> Table:
         """
@@ -802,11 +800,10 @@ class Table:
             The resulting table.
 
         Raises
-        -------
+        ------
         ValueError
             If the index is out of bounds.
         """
-
         if start is None:
             start = 0
 
@@ -814,7 +811,7 @@ class Table:
             end = self.count_rows()
 
         if start < 0 or end < 0 or start >= self.count_rows() or end > self.count_rows() or end < start:
-            raise ValueError("the given index is out of bounds")
+            raise ValueError("The given index is out of bounds")
 
         new_df = self._data.iloc[start:end:step]
         new_df.columns = self._schema.get_column_names()
@@ -826,10 +823,10 @@ class Table:
         - (col1.name < col2.name),
     ) -> Table:
         """
-        Sort the columns of a `Table` with the given comparator and return a new `Table`. The original table is not
-        modified.
+        Sort the columns of a `Table` with the given comparator and return a new `Table`.
 
-        The comparator is a function that takes two columns `col1` and `col2` and returns an integer:
+        The original table is not modified. The comparator is a function that takes two columns `col1` and `col2` and
+        returns an integer:
 
         * If `col1` should be ordered before `col2`, the function should return a negative number.
         * If `col1` should be ordered after `col2`, the function should return a positive number.
@@ -853,10 +850,10 @@ class Table:
 
     def sort_rows(self, comparator: Callable[[Row, Row], int]) -> Table:
         """
-        Sort the rows of a `Table` with the given comparator and return a new `Table`. The original table is not
-        modified.
+        Sort the rows of a `Table` with the given comparator and return a new `Table`.
 
-        The comparator is a function that takes two rows `row1` and `row2` and returns an integer:
+        The original table is not modified. The comparator is a function that takes two rows `row1` and `row2` and
+        returns an integer:
 
         * If `row1` should be ordered before `row2`, the function should return a negative number.
         * If `row1` should be ordered after `row2`, the function should return a positive number.
@@ -881,7 +878,7 @@ class Table:
         Split the table into two new tables.
 
         Parameters
-        -------
+        ----------
         percentage_in_first : float
             The desired size of the first table in percentage to the given table.
 
@@ -900,7 +897,7 @@ class Table:
             self.slice_rows(round(percentage_in_first * self.count_rows())),
         )
 
-    def tag_columns(self, target_name: str, feature_names: Optional[list[str]] = None) -> TaggedTable:
+    def tag_columns(self, target_name: str, feature_names: list[str] | None = None) -> TaggedTable:
         """
         Mark the columns of the table as target column or feature columns. The original table is not modified.
 
@@ -916,7 +913,6 @@ class Table:
         tagged_table : TaggedTable
             A new tagged table with the given target and feature names.
         """
-        # pylint: disable=import-outside-toplevel
         from ._tagged_table import TaggedTable
 
         return TaggedTable(self._data, target_name, feature_names, self._schema)
@@ -947,9 +943,7 @@ class Table:
     # ------------------------------------------------------------------------------------------------------------------
 
     def correlation_heatmap(self) -> None:
-        """
-        Plot a correlation heatmap for all numerical columns of this `Table`.
-        """
+        """Plot a correlation heatmap for all numerical columns of this `Table`."""
         only_numerical = self.remove_columns_with_non_numerical_values()
 
         sns.heatmap(
@@ -965,9 +959,10 @@ class Table:
 
     def lineplot(self, x_column_name: str, y_column_name: str) -> None:
         """
-        Plot two columns against each other in a lineplot. If there are multiple x-values for a y-value,
-        the resulting plot will consist of a line representing the mean and the lower-transparency area around the line
-        representing the 95% confidence interval.
+        Plot two columns against each other in a lineplot.
+
+        If there are multiple x-values for a y-value, the resulting plot will consist of a line representing the mean
+        and the lower-transparency area around the line representing the 95% confidence interval.
 
         Parameters
         ----------
@@ -977,7 +972,7 @@ class Table:
             The column name of the column to be plotted on the y-Axis.
 
         Raises
-        ---------
+        ------
         UnknownColumnNameError
             If either of the columns do not exist.
         """
@@ -994,7 +989,9 @@ class Table:
         ax.set(xlabel=x_column_name, ylabel=y_column_name)
         ax.set_xticks(ax.get_xticks())
         ax.set_xticklabels(
-            ax.get_xticklabels(), rotation=45, horizontalalignment="right"
+            ax.get_xticklabels(),
+            rotation=45,
+            horizontalalignment="right",
         )  # rotate the labels of the x Axis to prevent the chance of overlapping of the labels
         plt.tight_layout()
         plt.show()
@@ -1011,7 +1008,7 @@ class Table:
             The column name of the column to be plotted on the y-Axis.
 
         Raises
-        ---------
+        ------
         UnknownColumnNameError
             If either of the columns do not exist.
         """
@@ -1028,7 +1025,9 @@ class Table:
         ax.set(xlabel=x_column_name, ylabel=y_column_name)
         ax.set_xticks(ax.get_xticks())
         ax.set_xticklabels(
-            ax.get_xticklabels(), rotation=45, horizontalalignment="right"
+            ax.get_xticklabels(),
+            rotation=45,
+            horizontalalignment="right",
         )  # rotate the labels of the x Axis to prevent the chance of overlapping of the labels
         plt.tight_layout()
         plt.show()
@@ -1040,15 +1039,16 @@ class Table:
     def to_csv_file(self, path: str) -> None:
         """
         Write the data from the table into a CSV file.
-        If the file and/or the directories do not exist they will be created.
-        If the file already exists it will be overwritten.
+
+        If the file and/or the directories do not exist they will be created. If the file already exists it will be
+        overwritten.
 
         Parameters
         ----------
         path : str
             The path to the output file.
         """
-        Path(os.path.dirname(path)).mkdir(parents=True, exist_ok=True)
+        Path(path).parent.mkdir(parents=True, exist_ok=True)
         data_to_csv = self._data.copy()
         data_to_csv.columns = self._schema.get_column_names()
         data_to_csv.to_csv(path, index=False)
@@ -1056,15 +1056,16 @@ class Table:
     def to_json_file(self, path: str) -> None:
         """
         Write the data from the table into a JSON file.
-        If the file and/or the directories do not exist, they will be created.
-        If the file already exists it will be overwritten.
+
+        If the file and/or the directories do not exist, they will be created. If the file already exists it will be
+        overwritten.
 
         Parameters
         ----------
         path : str
             The path to the output file.
         """
-        Path(os.path.dirname(path)).mkdir(parents=True, exist_ok=True)
+        Path(path).parent.mkdir(parents=True, exist_ok=True)
         data_to_json = self._data.copy()
         data_to_json.columns = self._schema.get_column_names()
         data_to_json.to_json(path)

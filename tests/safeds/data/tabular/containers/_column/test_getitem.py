@@ -1,5 +1,3 @@
-# pylint: disable=pointless-statement
-
 import pandas as pd
 import pytest
 from safeds.data.tabular.containers import Column

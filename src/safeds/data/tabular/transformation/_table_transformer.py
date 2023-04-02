@@ -1,20 +1,17 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from safeds.data.tabular.containers import Table
 
 
 class TableTransformer(ABC):
-    """
-    A `TableTransformer` learns a transformation for a set of columns in a `Table` and can then apply the learned
-    transformation to another `Table` with the same columns.
-    """
+    """Learn a transformation for a set of columns in a `Table` and transform another `Table` with the same columns."""
 
     @abstractmethod
-    def fit(self, table: Table, column_names: Optional[list[str]] = None) -> TableTransformer:
+    def fit(self, table: Table, column_names: list[str] | None = None) -> TableTransformer:
         """
         Learn a transformation for a set of columns in a table.
 
@@ -47,7 +44,7 @@ class TableTransformer(ABC):
             The transformed table.
 
         Raises
-        ----------
+        ------
         NotFittedError
             If the transformer has not been fitted yet.
         """
@@ -63,9 +60,10 @@ class TableTransformer(ABC):
             Whether the transformer is fitted.
         """
 
-    def fit_and_transform(self, table: Table, column_names: Optional[list[str]] = None) -> Table:
+    def fit_and_transform(self, table: Table, column_names: list[str] | None = None) -> Table:
         """
         Learn a transformation for a set of columns in a table and apply the learned transformation to the same table.
+
         If you also need the fitted transformer, use `fit` and `transform` separately.
 
         Parameters
@@ -84,10 +82,7 @@ class TableTransformer(ABC):
 
 
 class InvertibleTableTransformer(TableTransformer):
-    """
-    An `InvertibleTableTransformer` is a `TableTransformer` that can also undo the learned transformation after it has
-    been applied.
-    """
+    """A `TableTransformer` that can also undo the learned transformation after it has been applied."""
 
     @abstractmethod
     def inverse_transform(self, transformed_table: Table) -> Table:
@@ -105,7 +100,7 @@ class InvertibleTableTransformer(TableTransformer):
             The original table.
 
         Raises
-        ----------
+        ------
         NotFittedError
             If the transformer has not been fitted yet.
         """

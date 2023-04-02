@@ -13,6 +13,6 @@ def test_lineplot(monkeypatch: _pytest.monkeypatch) -> None:
 
 
 def test_lineplot_wrong_column_name() -> None:
+    table = Table(pd.DataFrame(data={"A": [1, 2, 3], "B": [2, 4, 7]}))
     with pytest.raises(UnknownColumnNameError):
-        table = Table(pd.DataFrame(data={"A": [1, 2, 3], "B": [2, 4, 7]}))
         table.lineplot("C", "A")

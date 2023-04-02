@@ -1,9 +1,11 @@
+from collections.abc import Iterable, Iterator
 from hashlib import md5
-from typing import Any, Iterable, Iterator, Optional
+from typing import Any
 
 import pandas as pd
 from IPython.core.display_functions import DisplayHandle, display
 from pandas.core.util.hashing import hash_pandas_object
+
 from safeds.data.tabular.typing import ColumnType, Schema
 from safeds.exceptions import UnknownColumnNameError
 
@@ -24,7 +26,7 @@ class Row:
     # Dunder methods
     # ------------------------------------------------------------------------------------------------------------------
 
-    def __init__(self, data: Iterable, schema: Optional[Schema] = None):
+    def __init__(self, data: Iterable, schema: Schema | None = None):
         self._data: pd.Series = data if isinstance(data, pd.Series) else pd.Series(data)
         self._data = self._data.reset_index(drop=True)
 
@@ -96,6 +98,7 @@ class Row:
     def has_column(self, column_name: str) -> bool:
         """
         Return whether the row contains a given column.
+
         Alias for self.schema.hasColumn(column_name: str) -> bool.
 
         Parameters
@@ -113,6 +116,7 @@ class Row:
     def get_column_names(self) -> list[str]:
         """
         Return a list of all column names saved in this schema.
+
         Alias for self.schema.get_column_names() -> list[str].
 
         Returns
@@ -125,6 +129,7 @@ class Row:
     def get_type_of_column(self, column_name: str) -> ColumnType:
         """
         Return the type of a specified column.
+
         Alias for self.schema.get_type_of_column(column_name: str) -> ColumnType.
 
         Parameters

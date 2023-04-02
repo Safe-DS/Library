@@ -1,29 +1,30 @@
 from __future__ import annotations
 
-from typing import Optional
+from typing import TYPE_CHECKING
 
-from safeds.data.tabular.containers import Table, TaggedTable
-from safeds.ml._util_sklearn import fit, predict
 from sklearn.linear_model import Lasso as sk_Lasso
+
+from safeds.ml._util_sklearn import fit, predict
 
 from ._regressor import Regressor
 
+if TYPE_CHECKING:
+    from safeds.data.tabular.containers import Table, TaggedTable
+
 
 class LassoRegression(Regressor):
-    """
-    This class implements lasso regression. It is used as a regression model.
-    It can only be trained on a tagged table.
-    """
+    """Lasso regression."""
 
     def __init__(self) -> None:
-        self._wrapped_regressor: Optional[sk_Lasso] = None
-        self._feature_names: Optional[list[str]] = None
-        self._target_name: Optional[str] = None
+        self._wrapped_regressor: sk_Lasso | None = None
+        self._feature_names: list[str] | None = None
+        self._target_name: str | None = None
 
     def fit(self, training_set: TaggedTable) -> LassoRegression:
         """
-        Create a new regressor based on this one and fit it with the given training data. This regressor is not
-        modified.
+        Create a copy of this regressor and fit it with the given training data.
+
+        This regressor is not modified.
 
         Parameters
         ----------
@@ -40,7 +41,6 @@ class LassoRegression(Regressor):
         LearningError
             If the training data contains invalid values or if the training failed.
         """
-
         wrapped_regressor = sk_Lasso()
         fit(wrapped_regressor, training_set)
 

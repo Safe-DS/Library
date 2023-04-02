@@ -1,10 +1,13 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from typing import TYPE_CHECKING
 
-import pandas as pd
 from safeds.data.tabular.typing._column_type import ColumnType
 from safeds.exceptions import UnknownColumnNameError
+
+if TYPE_CHECKING:
+    import pandas as pd
 
 
 @dataclass
@@ -66,17 +69,16 @@ class Schema:
         """
          Return the index of the column with specified column name.
 
-         Parameters
-         ----------
+        Parameters
+        ----------
          column_name : str
              The name of the column.
 
-         Returns
-         -------
+        Returns
+        -------
         index : int
              The index of the column.
         """
-
         return list(self._schema.keys()).index(column_name)
 
     @staticmethod
@@ -95,12 +97,11 @@ class Schema:
             The constructed TableSchema.
 
         """
-
         names = dataframe.columns
         # noinspection PyProtectedMember
         types = (ColumnType._from_numpy_dtype(dtype) for dtype in dataframe.dtypes)
 
-        return Schema(dict(zip(names, types)))
+        return Schema(dict(zip(names, types, strict=True)))
 
     def get_column_names(self) -> list[str]:
         """

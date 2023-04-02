@@ -1,4 +1,4 @@
-from typing import Callable
+from collections.abc import Callable
 
 import pandas as pd
 import pytest
@@ -6,7 +6,7 @@ from safeds.data.tabular.containers import Column, Table
 
 
 @pytest.mark.parametrize(
-    "query, col1, col2, col3, col4",
+    ("query", "col1", "col2", "col3", "col4"),
     [
         (None, 0, 1, 2, 3),
         (
@@ -18,9 +18,7 @@ from safeds.data.tabular.containers import Column, Table
         ),
     ],
 )
-def test_sort_columns_valid(
-    query: Callable[[Column, Column], int], col1: int, col2: int, col3: int, col4: int
-) -> None:
+def test_sort_columns_valid(query: Callable[[Column, Column], int], col1: int, col2: int, col3: int, col4: int) -> None:
     columns = [
         Column("col1", pd.Series(data=["A", "B", "C", "A", "D"])),
         Column("col2", pd.Series(data=["Test1", "Test1", "Test3", "Test1", "Test4"])),
@@ -34,8 +32,8 @@ def test_sort_columns_valid(
                 "col3": [1, 2, 3, 4, 5],
                 "col4": [2, 3, 1, 4, 6],
                 "col1": ["A", "B", "C", "A", "D"],
-            }
-        )
+            },
+        ),
     )
     if query is not None:
         table_sorted = table1.sort_columns(query)

@@ -5,7 +5,7 @@ from safeds.data.tabular.containers import Column
 
 
 @pytest.mark.parametrize(
-    "values, expected",
+    ("values", "expected"),
     [
         ([1, 2, 3], False),
         ([1, 2, 3, None], True),

@@ -7,7 +7,7 @@ from safeds.exceptions import ColumnSizeError, DuplicateColumnNameError
 
 
 @pytest.mark.parametrize(
-    "column, col_type",
+    ("column", "col_type"),
     [
         (Column("col3", ["a", "b", "c"]), String()),
         (Column("col3", [0, -1, -2]), Integer()),

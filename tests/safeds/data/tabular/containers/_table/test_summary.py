@@ -47,7 +47,7 @@ def test_summary() -> None:
                     str(1.0 / 3),
                     "3",
                 ],
-            }
-        )
+            },
+        ),
     )
     assert truth == table.summary()

@@ -1,21 +1,23 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
+from typing import TYPE_CHECKING
 
-from safeds.data.tabular.containers import Table, TaggedTable
 from sklearn.metrics import accuracy_score as sk_accuracy_score
+
+if TYPE_CHECKING:
+    from safeds.data.tabular.containers import Table, TaggedTable
 
 
 class Classifier(ABC):
-    """
-    Abstract base class for all classifiers.
-    """
+    """Abstract base class for all classifiers."""
 
     @abstractmethod
     def fit(self, training_set: TaggedTable) -> Classifier:
         """
-        Create a new classifier based on this one and fit it with the given training data. This classifier is not
-        modified.
+        Create a copy of this classifier and fit it with the given training data.
+
+        This classifier is not modified.
 
         Parameters
         ----------
@@ -57,7 +59,7 @@ class Classifier(ABC):
     @abstractmethod
     def is_fitted(self) -> bool:
         """
-        Checks if the classifier is fitted.
+        Check if the classifier is fitted.
 
         Returns
         -------
@@ -68,8 +70,7 @@ class Classifier(ABC):
     # noinspection PyProtectedMember
     def accuracy(self, validation_or_test_set: TaggedTable) -> float:
         """
-        Predicts the target values for the features in the validation or test set and compares it to the expected
-        results.
+        Compute the accuracy of the classifier on the given data.
 
         Parameters
         ----------
@@ -81,7 +82,6 @@ class Classifier(ABC):
         accuracy : float
             The calculated accuracy score, i.e. the percentage of equal data.
         """
-
         expected = validation_or_test_set.target
         predicted = self.predict(validation_or_test_set.features).target
 

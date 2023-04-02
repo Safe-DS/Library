@@ -1,4 +1,8 @@
-# Inspired by https://mkdocstrings.github.io/recipes/#bind-pages-to-sections-themselves
+"""
+Automatically generate reference pages for all public classes and functions in the package.
+
+Inspired by https://mkdocstrings.github.io/recipes/#bind-pages-to-sections-themselves.
+"""
 
 import sys
 from importlib import import_module
@@ -12,10 +16,7 @@ package = "safeds"
 
 
 def list_class_and_function_names_in_module(module_name: str) -> list[str]:
-    """
-    Returns a list with the names of all classes and function names in the given module.
-    """
-
+    """Return a list with the names of all classes and function names in the given module."""
     import_module(module_name)
     module = sys.modules[module_name]
 
@@ -47,7 +48,7 @@ for path in sorted(Path(root).rglob("__init__.py")):
         doc_path = doc_path.with_name(f"{name}.md")
         full_doc_path = full_doc_path.with_name(f"{name}.md")
 
-        nav[parts + (name,)] = doc_path.as_posix()
+        nav[(*parts, name)] = doc_path.as_posix()
 
         # Create one file containing the documentation for the current class or function
         with mkdocs_gen_files.open(full_doc_path, "w") as fd:

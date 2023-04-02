@@ -6,11 +6,12 @@ from safeds.exceptions import (
     DuplicateColumnNameError,
     UnknownColumnNameError,
 )
+
 from tests.helpers import resolve_resource_path
 
 
 @pytest.mark.parametrize(
-    "column_name, path",
+    ("column_name", "path"),
     [
         ("C", "test_table_replace_column_output_different_name.csv"),
         ("D", "test_table_replace_column_output_same_name.csv"),
@@ -28,7 +29,7 @@ def test_replace_valid(column_name: str, path: str) -> None:
 
 
 @pytest.mark.parametrize(
-    "old_column_name, column_values, column_name, error",
+    ("old_column_name", "column_values", "column_name", "error"),
     [
         ("D", ["d", "e", "f"], "C", UnknownColumnNameError),
         ("C", ["d", "e", "f"], "B", DuplicateColumnNameError),

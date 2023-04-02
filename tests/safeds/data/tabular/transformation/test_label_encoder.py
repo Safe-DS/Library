@@ -1,5 +1,3 @@
-from typing import Optional
-
 import pytest
 from safeds.data.tabular.containers import Column, Table
 from safeds.data.tabular.transformation import LabelEncoder
@@ -11,7 +9,7 @@ class TestFit:
         table = Table.from_columns(
             [
                 Column("col1", ["a", "b", "c"]),
-            ]
+            ],
         )
 
         with pytest.raises(UnknownColumnNameError):
@@ -21,7 +19,7 @@ class TestFit:
         table = Table.from_columns(
             [
                 Column("col1", ["a", "b", "c"]),
-            ]
+            ],
         )
 
         transformer = LabelEncoder()
@@ -36,7 +34,7 @@ class TestTransform:
         table_to_fit = Table.from_columns(
             [
                 Column("col1", ["a", "b", "c"]),
-            ]
+            ],
         )
 
         transformer = LabelEncoder().fit(table_to_fit)
@@ -44,7 +42,7 @@ class TestTransform:
         table_to_transform = Table.from_columns(
             [
                 Column("col2", ["a", "b", "c"]),
-            ]
+            ],
         )
 
         with pytest.raises(UnknownColumnNameError):
@@ -54,7 +52,7 @@ class TestTransform:
         table = Table.from_columns(
             [
                 Column("col1", ["a", "b", "c"]),
-            ]
+            ],
         )
 
         transformer = LabelEncoder()
@@ -72,7 +70,7 @@ class TestIsFitted:
         table = Table.from_columns(
             [
                 Column("col1", ["a", "b", "c"]),
-            ]
+            ],
         )
 
         transformer = LabelEncoder()
@@ -88,13 +86,13 @@ class TestFitAndTransform:
                 Table.from_columns(
                     [
                         Column("col1", ["a", "b", "b", "c"]),
-                    ]
+                    ],
                 ),
                 None,
                 Table.from_columns(
                     [
                         Column("col1", [0.0, 1.0, 1.0, 2.0]),
-                    ]
+                    ],
                 ),
             ),
             (
@@ -102,20 +100,23 @@ class TestFitAndTransform:
                     [
                         Column("col1", ["a", "b", "b", "c"]),
                         Column("col2", ["a", "b", "b", "c"]),
-                    ]
+                    ],
                 ),
                 ["col1"],
                 Table.from_columns(
                     [
                         Column("col1", [0.0, 1.0, 1.0, 2.0]),
                         Column("col2", ["a", "b", "b", "c"]),
-                    ]
+                    ],
                 ),
             ),
         ],
     )
     def test_should_return_transformed_table(
-        self, table: Table, column_names: Optional[list[str]], expected: Table
+        self,
+        table: Table,
+        column_names: list[str] | None,
+        expected: Table,
     ) -> None:
         assert LabelEncoder().fit_and_transform(table, column_names) == expected
 
@@ -123,7 +124,7 @@ class TestFitAndTransform:
         table = Table.from_columns(
             [
                 Column("col1", ["a", "b", "c"]),
-            ]
+            ],
         )
 
         LabelEncoder().fit_and_transform(table)
@@ -131,7 +132,7 @@ class TestFitAndTransform:
         expected = Table.from_columns(
             [
                 Column("col1", ["a", "b", "c"]),
-            ]
+            ],
         )
 
         assert table == expected
@@ -144,7 +145,7 @@ class TestInverseTransform:
             Table.from_columns(
                 [
                     Column("col1", ["a", "b", "b", "c"]),
-                ]
+                ],
             ),
         ],
     )
@@ -157,7 +158,7 @@ class TestInverseTransform:
         table = Table.from_columns(
             [
                 Column("col1", ["a", "b", "c"]),
-            ]
+            ],
         )
 
         transformer = LabelEncoder().fit(table)
@@ -167,7 +168,7 @@ class TestInverseTransform:
         expected = Table.from_columns(
             [
                 Column("col1", [0.0, 1.0, 2.0]),
-            ]
+            ],
         )
 
         assert transformed_table == expected
@@ -176,7 +177,7 @@ class TestInverseTransform:
         table = Table.from_columns(
             [
                 Column("col1", [0.0, 1.0, 1.0, 2.0]),
-            ]
+            ],
         )
 
         transformer = LabelEncoder()

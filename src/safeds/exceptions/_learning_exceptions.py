@@ -33,9 +33,7 @@ class PredictionError(Exception):
 
 
 class NotFittedError(Exception):
-    """
-    Exception raised when a model is used before fitting it.
-    """
+    """Exception raised when a model is used before fitting it."""
 
     def __init__(self) -> None:
         super().__init__("Model is not fitted, please fit it before using it")

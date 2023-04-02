@@ -1,6 +1,7 @@
 import pytest
 from safeds.data.tabular.containers import Table
 from safeds.exceptions import UnknownColumnNameError
+
 from tests.helpers import resolve_resource_path
 
 

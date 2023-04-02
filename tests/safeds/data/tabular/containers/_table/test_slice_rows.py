@@ -15,19 +15,18 @@ def test_slice_rows_valid() -> None:
     assert third_new_table == table
 
 
-def test_slice_rows_invalid() -> None:
+@pytest.mark.parametrize(
+    ("start", "end", "step"),
+    [
+        (3, 2, 1),
+        (4, 0, 1),
+        (0, 4, 1),
+        (-4, 0, 1),
+        (0, -4, 1),
+    ],
+)
+def test_slice_rows_invalid(start: int, end: int, step: int) -> None:
     table = Table(pd.DataFrame(data={"col1": [1, 2, 1], "col2": [1, 2, 4]}))
 
-    with pytest.raises(ValueError):
-        table.slice_rows(3, 2, 1)
-    with pytest.raises(ValueError):
-        table.slice_rows(4, 0, 1)
-
-    with pytest.raises(ValueError):
-        table.slice_rows(0, 4, 1)
-
-    with pytest.raises(ValueError):
-        table.slice_rows(-4, 0, 1)
-
-    with pytest.raises(ValueError):
-        table.slice_rows(0, -4, 1)
+    with pytest.raises(ValueError, match="The given index is out of bounds"):
+        table.slice_rows(start, end, step)

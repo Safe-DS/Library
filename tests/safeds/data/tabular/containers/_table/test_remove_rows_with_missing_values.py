@@ -11,8 +11,8 @@ def test_remove_rows_with_missing_values_valid() -> None:
                 "col2": [None, "Test1", "Test3", "Test1"],
                 "col3": [None, 2, 3, 4],
                 "col4": [None, 3, 1, 4],
-            }
-        )
+            },
+        ),
     )
     updated_table = table.remove_rows_with_missing_values()
     assert updated_table.count_rows() == 2
