@@ -1,3 +1,5 @@
+"""Custom exceptions that can be raised by the `safe-ds` package."""
+
 from ._data_exceptions import (
     ColumnLengthMismatchError,
     ColumnSizeError,

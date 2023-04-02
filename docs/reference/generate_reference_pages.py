@@ -1,4 +1,8 @@
-# Inspired by https://mkdocstrings.github.io/recipes/#bind-pages-to-sections-themselves
+"""
+Automatically generate reference pages for all public classes and functions in the package.
+
+Inspired by https://mkdocstrings.github.io/recipes/#bind-pages-to-sections-themselves.
+"""
 
 import sys
 from importlib import import_module

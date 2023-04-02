@@ -1,3 +1,5 @@
+"""Models for regression tasks."""
+
 from ._ada_boost import AdaBoost
 from ._decision_tree import DecisionTree
 from ._elastic_net_regression import ElasticNetRegression

@@ -1,3 +1,5 @@
+"""Classes for classification tasks."""
+
 from ._ada_boost import AdaBoost
 from ._classifier import Classifier
 from ._decision_tree import DecisionTree
