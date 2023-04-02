@@ -81,8 +81,6 @@ class Table:
             return Table(pd.read_csv(path))
         except FileNotFoundError as exception:
             raise FileNotFoundError(f'File "{path}" does not exist') from exception
-        except Exception as exception:
-            raise ValueError(f'Could not read file from "{path}" as CSV') from exception
 
     @staticmethod
     def from_json_file(path: str) -> Table:
@@ -110,8 +108,6 @@ class Table:
             return Table(pd.read_json(path))
         except FileNotFoundError as exception:
             raise FileNotFoundError(f'File "{path}" does not exist') from exception
-        except Exception as exception:
-            raise ValueError(f'Could not read file from "{path}" as JSON') from exception
 
     @staticmethod
     def from_columns(columns: list[Column]) -> Table:
@@ -824,7 +820,7 @@ class Table:
     def sort_columns(
         self,
         comparator: Callable[[Column, Column], int] = lambda col1, col2: (col1.name > col2.name)
-        - (col1.name < col2.name),
+                                                                         - (col1.name < col2.name),
     ) -> Table:
         """
         Sort the columns of a `Table` with the given comparator and return a new `Table`.
