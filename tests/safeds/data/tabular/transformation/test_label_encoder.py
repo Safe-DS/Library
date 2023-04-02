@@ -1,7 +1,7 @@
 import pytest
 from safeds.data.tabular.containers import Column, Table
 from safeds.data.tabular.transformation import LabelEncoder
-from safeds.exceptions import NotFittedError, UnknownColumnNameError
+from safeds.exceptions import TransformerNotFittedError, UnknownColumnNameError
 
 
 class TestFit:
@@ -57,7 +57,7 @@ class TestTransform:
 
         transformer = LabelEncoder()
 
-        with pytest.raises(NotFittedError):
+        with pytest.raises(TransformerNotFittedError):
             transformer.transform(table)
 
 
@@ -182,5 +182,5 @@ class TestInverseTransform:
 
         transformer = LabelEncoder()
 
-        with pytest.raises(NotFittedError):
+        with pytest.raises(TransformerNotFittedError):
             transformer.inverse_transform(table)

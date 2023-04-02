@@ -67,8 +67,14 @@ class RidgeRegression(Regressor):
 
         Raises
         ------
+        ModelNotFittedError
+            If the model has not been fitted yet.
+        DatasetContainsTargetError
+            If the dataset contains the target column already.
+        DatasetMissesFeaturesError
+            If the dataset misses feature columns.
         PredictionError
-            If prediction with the given dataset failed.
+            If predicting with the given dataset failed.
         """
         return predict(self._wrapped_regressor, dataset, self._feature_names, self._target_name)
 

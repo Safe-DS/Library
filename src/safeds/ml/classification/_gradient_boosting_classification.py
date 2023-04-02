@@ -51,7 +51,6 @@ class GradientBoosting(Classifier):
 
         return result
 
-    # noinspection PyProtectedMember
     def predict(self, dataset: Table) -> TaggedTable:
         """
         Predict a target vector using a dataset containing feature vectors. The model has to be trained first.
@@ -68,8 +67,14 @@ class GradientBoosting(Classifier):
 
         Raises
         ------
+        ModelNotFittedError
+            If the model has not been fitted yet.
+        DatasetContainsTargetError
+            If the dataset contains the target column already.
+        DatasetMissesFeaturesError
+            If the dataset misses feature columns.
         PredictionError
-            If prediction with the given dataset failed.
+            If predicting with the given dataset failed.
         """
         return predict(self._wrapped_classifier, dataset, self._feature_names, self._target_name)
 

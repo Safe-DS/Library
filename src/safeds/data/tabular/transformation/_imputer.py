@@ -8,7 +8,7 @@ from sklearn.impute import SimpleImputer as sk_SimpleImputer
 
 from safeds.data.tabular.containers import Table
 from safeds.data.tabular.transformation._table_transformer import TableTransformer
-from safeds.exceptions import NotFittedError, UnknownColumnNameError
+from safeds.exceptions import TransformerNotFittedError, UnknownColumnNameError
 
 
 class ImputerStrategy(ABC):
@@ -139,12 +139,12 @@ class Imputer(TableTransformer):
 
         Raises
         ------
-        NotFittedError
+        TransformerNotFittedError
             If the transformer has not been fitted yet.
         """
         # Transformer has not been fitted yet
         if self._wrapped_transformer is None or self._column_names is None:
-            raise NotFittedError
+            raise TransformerNotFittedError
 
         # Input table does not contain all columns used to fit the transformer
         missing_columns = set(self._column_names) - set(table.get_column_names())

@@ -7,11 +7,11 @@ from safeds.data.tabular.containers import Table
 from safeds.data.tabular.transformation._table_transformer import (
     InvertibleTableTransformer,
 )
-from safeds.exceptions import NotFittedError, UnknownColumnNameError
+from safeds.exceptions import TransformerNotFittedError, UnknownColumnNameError
 
 
 class OneHotEncoder(InvertibleTableTransformer):
-    """The OneHotEncoder encodes categorical columns to numerical features [0,1] that represent the existence for each value."""
+    """Encodes categorical columns to numerical features [0,1] that represent the existence for each value."""
 
     def __init__(self) -> None:
         self._wrapped_transformer: sk_OneHotEncoder | None = None
@@ -70,12 +70,12 @@ class OneHotEncoder(InvertibleTableTransformer):
 
         Raises
         ------
-        NotFittedError
+        TransformerNotFittedError
             If the transformer has not been fitted yet.
         """
         # Transformer has not been fitted yet
         if self._wrapped_transformer is None or self._column_names is None:
-            raise NotFittedError
+            raise TransformerNotFittedError
 
         # Input table does not contain all columns used to fit the transformer
         missing_columns = set(self._column_names) - set(table.get_column_names())
@@ -109,12 +109,12 @@ class OneHotEncoder(InvertibleTableTransformer):
 
         Raises
         ------
-        NotFittedError
+        TransformerNotFittedError
             If the transformer has not been fitted yet.
         """
         # Transformer has not been fitted yet
         if self._wrapped_transformer is None or self._column_names is None:
-            raise NotFittedError
+            raise TransformerNotFittedError
 
         data = transformed_table._data.copy()
         data.columns = transformed_table.get_column_names()

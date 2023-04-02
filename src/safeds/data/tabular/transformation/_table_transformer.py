@@ -45,7 +45,7 @@ class TableTransformer(ABC):
 
         Raises
         ------
-        NotFittedError
+        TransformerNotFittedError
             If the transformer has not been fitted yet.
         """
 
@@ -101,6 +101,6 @@ class InvertibleTableTransformer(TableTransformer):
 
         Raises
         ------
-        NotFittedError
+        TransformerNotFittedError
             If the transformer has not been fitted yet.
         """
