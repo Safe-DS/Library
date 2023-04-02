@@ -278,11 +278,11 @@ class Column:
         return self._data.corr(other_column._data)
 
     def idness(self) -> float:
-        """
+        r"""
         Calculate the idness of this column, which we define as.
 
         $$
-        \\frac{\\text{number of different values}}{\\text{number of rows}}
+        \frac{\text{number of different values}}{\text{number of rows}}
         $$
 
         Returns
@@ -396,11 +396,11 @@ class Column:
         return self._data.mode().tolist()
 
     def stability(self) -> float:
-        """
+        r"""
         Calculate the stability of this column, which we define as.
 
         $$
-        \\frac{\\text{number of occurrences of most common non-null value}}{\\text{number of non-null values}}
+        \frac{\text{number of occurrences of most common non-null value}}{\text{number of non-null values}}
         $$
 
         Returns
