@@ -100,7 +100,7 @@ class Schema:
         # noinspection PyProtectedMember
         types = (ColumnType._from_numpy_dtype(dtype) for dtype in dataframe.dtypes)
 
-        return Schema(dict(zip(names, types)))
+        return Schema(dict(zip(names, types, strict=True)))
 
     def get_column_names(self) -> list[str]:
         """
