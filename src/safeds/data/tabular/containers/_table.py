@@ -811,7 +811,7 @@ class Table:
             end = self.count_rows()
 
         if start < 0 or end < 0 or start >= self.count_rows() or end > self.count_rows() or end < start:
-            raise ValueError("the given index is out of bounds")
+            raise ValueError("The given index is out of bounds")
 
         new_df = self._data.iloc[start:end:step]
         new_df.columns = self._schema.get_column_names()

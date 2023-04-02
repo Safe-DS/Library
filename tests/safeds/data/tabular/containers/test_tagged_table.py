@@ -30,17 +30,17 @@ class TestInit:
             table.tag_columns(target_name="D")
 
     def test_should_raise_if_features_and_target_overlap(self, table: Table) -> None:
-        with pytest.raises(ValueError):
+        with pytest.raises(ValueError, match="Column 'A' cannot be both feature and target."):
             table.tag_columns(target_name="A", feature_names=["A", "B", "C"])
 
     def test_should_raise_if_features_are_empty_explicitly(self, table: Table) -> None:
-        with pytest.raises(ValueError):
+        with pytest.raises(ValueError, match="At least one feature column must be specified."):
             table.tag_columns(target_name="A", feature_names=[])
 
     def test_should_raise_if_features_are_empty_implicitly(self, table: Table) -> None:
         table = Table.from_columns([Column("A", [1, 4])])
 
-        with pytest.raises(ValueError):
+        with pytest.raises(ValueError, match="At least one feature column must be specified."):
             table.tag_columns(target_name="A")
 
 

@@ -12,17 +12,17 @@ def test_split_valid() -> None:
     assert result_train_table == train_table
 
 
-def test_split_invalid() -> None:
+@pytest.mark.parametrize(
+    "percentage_in_first",
+    [
+        0.0,
+        1.0,
+        -1.0,
+        2.0,
+    ],
+)
+def test_split_invalid(percentage_in_first: float) -> None:
     table = Table(pd.DataFrame(data={"col1": [1, 2, 1], "col2": [1, 2, 4]}))
 
-    with pytest.raises(ValueError):
-        table.split(0.0)
-
-    with pytest.raises(ValueError):
-        table.split(1.0)
-
-    with pytest.raises(ValueError):
-        table.split(-1.0)
-
-    with pytest.raises(ValueError):
-        table.split(2.0)
+    with pytest.raises(ValueError, match="the given percentage is not in range"):
+        table.split(percentage_in_first)
