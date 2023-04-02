@@ -62,6 +62,14 @@ ignore = [
     "FBT002",
     # builtin-attribute-shadowing (not an issue)
     "A003",
+    # superfluous-else-return (sometimes it's more readable)
+    "RET505",
+    # superfluous-else-raise (sometimes it's more readable)
+    "RET506",
+    # superfluous-else-continue (sometimes it's more readable)
+    "RET507",
+    # superfluous-else-break (sometimes it's more readable)
+    "RET508",
     # private-member-access (we cannot always avoid it if we want a clean API)
     "SLF001",
     # if-else-block-instead-of-if-exp (an if-else block can be more readable)
