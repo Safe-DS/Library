@@ -67,6 +67,8 @@ ignore = [
     "SLF001",
     # if-else-block-instead-of-if-exp (an if-else block can be more readable)
     "SIM108",
+    # compare-to-empty-string (sometimes it's better to be explicit)
+    "PLC1901",
     # too-many-return-statements
     "PLR0912",
     # too-many-branches
