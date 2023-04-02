@@ -171,10 +171,7 @@ class Column:
             True if all match.
 
         """
-        for value in self._data:
-            if not predicate(value):
-                return False
-        return True
+        return all(predicate(value) for value in self._data)
 
     def any(self, predicate: Callable[[Any], bool]) -> bool:
         """
@@ -191,10 +188,7 @@ class Column:
             True if any match.
 
         """
-        for value in self._data:
-            if predicate(value):
-                return True
-        return False
+        return any(predicate(value) for value in self._data)
 
     def none(self, predicate: Callable[[Any], bool]) -> bool:
         """
@@ -211,10 +205,7 @@ class Column:
             True if none match.
 
         """
-        for value in self._data:
-            if predicate(value):
-                return False
-        return True
+        return all(not predicate(value) for value in self._data)
 
     def has_missing_values(self) -> bool:
         """
