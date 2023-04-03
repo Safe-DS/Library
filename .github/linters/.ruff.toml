@@ -37,7 +37,6 @@ select = [
     "INT",
     "ARG",
     "PTH",
-    "ERA",
     "PD",
     "PGH",
     "PL",
