@@ -32,7 +32,7 @@ class Imputer(TableTransformer):
     ...     ],
     ... )
     >>> transformer = Imputer(Imputer.Strategy.Constant(0))
-    >>> transformer.fit_and_transform(table)
+    >>> transformed_table = transformer.fit_and_transform(table)
     """
 
     class Strategy:
