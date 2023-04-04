@@ -4,7 +4,8 @@ import io
 from pathlib import Path
 from typing import BinaryIO
 
-from PIL.Image import open as open_image, Image as PillowImage
+from PIL.Image import Image as PillowImage
+from PIL.Image import open as open_image
 
 from safeds.data.image.typing import ImageFormat
 

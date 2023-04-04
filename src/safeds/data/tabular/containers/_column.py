@@ -497,14 +497,13 @@ class Column:
         plt.tight_layout()
 
         buffer = io.BytesIO()
-        fig.savefig(buffer, format='png')
+        fig.savefig(buffer, format="png")
         plt.close()  # Prevents the figure from being displayed directly
         buffer.seek(0)
         return Image(buffer, ImageFormat.PNG)
 
     def histogram(self) -> Image:
         """Plot a column in a histogram."""
-
         fig = plt.figure()
         ax = sns.histplot(data=self._data)
         ax.set_xticks(ax.get_xticks())
@@ -517,7 +516,7 @@ class Column:
         plt.tight_layout()
 
         buffer = io.BytesIO()
-        fig.savefig(buffer, format='png')
+        fig.savefig(buffer, format="png")
         plt.close()  # Prevents the figure from being displayed directly
         buffer.seek(0)
         return Image(buffer, ImageFormat.PNG)

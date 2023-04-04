@@ -14,6 +14,7 @@ from pandas import DataFrame, Series
 from scipy import stats
 
 from safeds.data.image.containers import Image
+from safeds.data.image.typing import ImageFormat
 from safeds.data.tabular.typing import ColumnType, Schema
 from safeds.exceptions import (
     ColumnLengthMismatchError,
@@ -25,9 +26,9 @@ from safeds.exceptions import (
     SchemaMismatchError,
     UnknownColumnNameError,
 )
+
 from ._column import Column
 from ._row import Row
-from ...image.typing import ImageFormat
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterable
@@ -822,7 +823,7 @@ class Table:
     def sort_columns(
         self,
         comparator: Callable[[Column, Column], int] = lambda col1, col2: (col1.name > col2.name)
-                                                                         - (col1.name < col2.name),
+        - (col1.name < col2.name),
     ) -> Table:
         """
         Sort the columns of a `Table` with the given comparator and return a new `Table`.
@@ -960,7 +961,7 @@ class Table:
         plt.tight_layout()
 
         buffer = io.BytesIO()
-        fig.savefig(buffer, format='png')
+        fig.savefig(buffer, format="png")
         plt.close()  # Prevents the figure from being displayed directly
         buffer.seek(0)
         return Image(buffer, format_=ImageFormat.PNG)
@@ -1005,7 +1006,7 @@ class Table:
         plt.tight_layout()
 
         buffer = io.BytesIO()
-        fig.savefig(buffer, format='png')
+        fig.savefig(buffer, format="png")
         plt.close()  # Prevents the figure from being displayed directly
         buffer.seek(0)
         return Image(buffer, format_=ImageFormat.PNG)
@@ -1047,7 +1048,7 @@ class Table:
         plt.tight_layout()
 
         buffer = io.BytesIO()
-        fig.savefig(buffer, format='png')
+        fig.savefig(buffer, format="png")
         plt.close()  # Prevents the figure from being displayed directly
         buffer.seek(0)
         return Image(buffer, format_=ImageFormat.PNG)

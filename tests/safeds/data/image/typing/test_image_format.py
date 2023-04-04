@@ -1,12 +1,10 @@
 import pytest
-
 from safeds.data.image.typing import ImageFormat
 
 
 class TestValue:
-
     @pytest.mark.parametrize(
-        "image_format, expected_value",
+        ("image_format", "expected_value"),
         [
             (ImageFormat.JPEG, "jpeg"),
             (ImageFormat.PNG, "png"),
