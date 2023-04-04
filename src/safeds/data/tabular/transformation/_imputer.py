@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from abc import ABC, abstractmethod
 from typing import Any
 
 import pandas as pd
@@ -8,29 +7,32 @@ from sklearn.impute import SimpleImputer as sk_SimpleImputer
 
 from safeds.data.tabular.containers import Table
 from safeds.data.tabular.transformation._table_transformer import TableTransformer
+from safeds.data.tabular.typing import ImputerStrategy
 from safeds.exceptions import TransformerNotFittedError, UnknownColumnNameError
-
-
-class ImputerStrategy(ABC):
-    """
-    The abstract base class of the different imputation strategies supported by the `Imputer`.
-
-    This class is only needed for type annotations. Use the subclasses nested inside `Imputer.Strategy` instead.
-    """
-
-    @abstractmethod
-    def _augment_imputer(self, imputer: sk_SimpleImputer) -> None:
-        pass
 
 
 class Imputer(TableTransformer):
     """
-    Impute the data for a given Table.
+    Replace missing values with the given strategy.
 
     Parameters
     ----------
     strategy : ImputerStrategy
         The strategy used to impute missing values. Use the classes nested inside `Imputer.Strategy` to specify it.
+
+    Examples
+    --------
+    >>> from safeds.data.tabular.containers import Column, Table
+    >>> from safeds.data.tabular.transformation import Imputer
+    >>>
+    >>> table = Table.from_columns(
+    ...     [
+    ...         Column("a", [1, 3, None]),
+    ...         Column("b", [None, 2, 3]),
+    ...     ],
+    ... )
+    >>> transformer = Imputer(Imputer.Strategy.Constant(0))
+    >>> transformer.fit_and_transform(table)
     """
 
     class Strategy:
