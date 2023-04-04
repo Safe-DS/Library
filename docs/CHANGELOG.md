@@ -1,3 +1,18 @@
+## [0.9.0](https://github.com/Safe-DS/Stdlib/compare/v0.8.0...v0.9.0) (2023-04-04)
+
+
+### Features
+
+* container for images ([#159](https://github.com/Safe-DS/Stdlib/issues/159)) ([ed7ae34](https://github.com/Safe-DS/Stdlib/commit/ed7ae341c4546ec32efe46e22dccc4d770126695)), closes [#158](https://github.com/Safe-DS/Stdlib/issues/158)
+* improve error handling for `predict` ([#145](https://github.com/Safe-DS/Stdlib/issues/145)) ([a5ff11c](https://github.com/Safe-DS/Stdlib/commit/a5ff11c2795e8e814b6a6565a9a331e1662d39c6)), closes [#9](https://github.com/Safe-DS/Stdlib/issues/9)
+* move `ImputerStrategy` to `safeds.data.tabular.typing` ([#174](https://github.com/Safe-DS/Stdlib/issues/174)) ([205c8e2](https://github.com/Safe-DS/Stdlib/commit/205c8e20ddcc76da57b895a23c0221da4dcf2508))
+* rename `n_neighbors` to `number_of_neighbors` ([#162](https://github.com/Safe-DS/Stdlib/issues/162)) ([526b96e](https://github.com/Safe-DS/Stdlib/commit/526b96e3877299eb6bf6adea2882065fd29b52cf))
+
+
+### Bug Fixes
+
+* export `TableTransformer` and `InvertibleTableTransformer` ([#135](https://github.com/Safe-DS/Stdlib/issues/135)) ([81c3695](https://github.com/Safe-DS/Stdlib/commit/81c369556e8ca3bf800f843598efab29b0ac957b))
+
 ## [0.8.0](https://github.com/Safe-DS/Stdlib/compare/v0.7.0...v0.8.0) (2023-03-31)
 
 
