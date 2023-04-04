@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import functools
+import io
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
@@ -12,6 +13,8 @@ from IPython.core.display_functions import DisplayHandle, display
 from pandas import DataFrame, Series
 from scipy import stats
 
+from safeds.data.image.containers import Image
+from safeds.data.image.typing import ImageFormat
 from safeds.data.tabular.typing import ColumnType, Schema
 from safeds.exceptions import (
     ColumnLengthMismatchError,
@@ -942,10 +945,18 @@ class Table:
     # Plotting
     # ------------------------------------------------------------------------------------------------------------------
 
-    def correlation_heatmap(self) -> None:
-        """Plot a correlation heatmap for all numerical columns of this `Table`."""
+    def correlation_heatmap(self) -> Image:
+        """
+        Plot a correlation heatmap for all numerical columns of this `Table`.
+
+        Returns
+        -------
+        plot: Image
+            The plot as an image.
+        """
         only_numerical = self.remove_columns_with_non_numerical_values()
 
+        fig = plt.figure()
         sns.heatmap(
             data=only_numerical._data.corr(),
             vmin=-1,
@@ -955,9 +966,14 @@ class Table:
             cmap="vlag",
         )
         plt.tight_layout()
-        plt.show()
 
-    def lineplot(self, x_column_name: str, y_column_name: str) -> None:
+        buffer = io.BytesIO()
+        fig.savefig(buffer, format="png")
+        plt.close()  # Prevents the figure from being displayed directly
+        buffer.seek(0)
+        return Image(buffer, format_=ImageFormat.PNG)
+
+    def lineplot(self, x_column_name: str, y_column_name: str) -> Image:
         """
         Plot two columns against each other in a lineplot.
 
@@ -971,6 +987,11 @@ class Table:
         y_column_name : str
             The column name of the column to be plotted on the y-Axis.
 
+        Returns
+        -------
+        plot: Image
+            The plot as an image.
+
         Raises
         ------
         UnknownColumnNameError
@@ -981,6 +1002,7 @@ class Table:
         if not self.has_column(y_column_name):
             raise UnknownColumnNameError([y_column_name])
 
+        fig = plt.figure()
         ax = sns.lineplot(
             data=self._data,
             x=self._schema._get_column_index_by_name(x_column_name),
@@ -994,9 +1016,14 @@ class Table:
             horizontalalignment="right",
         )  # rotate the labels of the x Axis to prevent the chance of overlapping of the labels
         plt.tight_layout()
-        plt.show()
 
-    def scatterplot(self, x_column_name: str, y_column_name: str) -> None:
+        buffer = io.BytesIO()
+        fig.savefig(buffer, format="png")
+        plt.close()  # Prevents the figure from being displayed directly
+        buffer.seek(0)
+        return Image(buffer, format_=ImageFormat.PNG)
+
+    def scatterplot(self, x_column_name: str, y_column_name: str) -> Image:
         """
         Plot two columns against each other in a scatterplot.
 
@@ -1006,6 +1033,11 @@ class Table:
             The column name of the column to be plotted on the x-Axis.
         y_column_name : str
             The column name of the column to be plotted on the y-Axis.
+
+        Returns
+        -------
+        plot: Image
+            The plot as an image.
 
         Raises
         ------
@@ -1017,6 +1049,7 @@ class Table:
         if not self.has_column(y_column_name):
             raise UnknownColumnNameError([y_column_name])
 
+        fig = plt.figure()
         ax = sns.scatterplot(
             data=self._data,
             x=self._schema._get_column_index_by_name(x_column_name),
@@ -1030,7 +1063,12 @@ class Table:
             horizontalalignment="right",
         )  # rotate the labels of the x Axis to prevent the chance of overlapping of the labels
         plt.tight_layout()
-        plt.show()
+
+        buffer = io.BytesIO()
+        fig.savefig(buffer, format="png")
+        plt.close()  # Prevents the figure from being displayed directly
+        buffer.seek(0)
+        return Image(buffer, format_=ImageFormat.PNG)
 
     # ------------------------------------------------------------------------------------------------------------------
     # Conversion
@@ -1093,7 +1131,7 @@ class Table:
         return [Row(series_row, self._schema) for (_, series_row) in self._data.iterrows()]
 
     # ------------------------------------------------------------------------------------------------------------------
-    # Other
+    # IPython integration
     # ------------------------------------------------------------------------------------------------------------------
 
     def _ipython_display_(self) -> DisplayHandle:

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import io
 from numbers import Number
 from typing import TYPE_CHECKING, Any
 
@@ -9,6 +10,8 @@ import pandas as pd
 import seaborn as sns
 from IPython.core.display_functions import DisplayHandle, display
 
+from safeds.data.image.containers import Image
+from safeds.data.image.typing import ImageFormat
 from safeds.data.tabular.typing import ColumnType
 from safeds.exceptions import (
     ColumnLengthMismatchError,
@@ -470,9 +473,14 @@ class Column:
     # Plotting
     # ------------------------------------------------------------------------------------------------------------------
 
-    def boxplot(self) -> None:
+    def boxplot(self) -> Image:
         """
         Plot this column in a boxplot. This function can only plot real numerical data.
+
+        Returns
+        -------
+        plot: Image
+            The plot as an image.
 
         Raises
         ------
@@ -487,13 +495,28 @@ class Column:
                     "The column contains complex data. Boxplots cannot plot the imaginary part of complex "
                     "data. Please provide a Column with only real numbers",
                 )
+
+        fig = plt.figure()
         ax = sns.boxplot(data=self._data)
         ax.set(xlabel=self.name)
         plt.tight_layout()
-        plt.show()
 
-    def histogram(self) -> None:
-        """Plot a column in a histogram."""
+        buffer = io.BytesIO()
+        fig.savefig(buffer, format="png")
+        plt.close()  # Prevents the figure from being displayed directly
+        buffer.seek(0)
+        return Image(buffer, ImageFormat.PNG)
+
+    def histogram(self) -> Image:
+        """
+        Plot a column in a histogram.
+
+        Returns
+        -------
+        plot: Image
+            The plot as an image.
+        """
+        fig = plt.figure()
         ax = sns.histplot(data=self._data)
         ax.set_xticks(ax.get_xticks())
         ax.set(xlabel=self.name)
@@ -503,22 +526,16 @@ class Column:
             horizontalalignment="right",
         )  # rotate the labels of the x Axis to prevent the chance of overlapping of the labels
         plt.tight_layout()
-        plt.show()
+
+        buffer = io.BytesIO()
+        fig.savefig(buffer, format="png")
+        plt.close()  # Prevents the figure from being displayed directly
+        buffer.seek(0)
+        return Image(buffer, ImageFormat.PNG)
 
     # ------------------------------------------------------------------------------------------------------------------
-    # Other
+    # IPython integration
     # ------------------------------------------------------------------------------------------------------------------
-
-    def _count_missing_values(self) -> int:
-        """
-        Return the number of null values in the column.
-
-        Returns
-        -------
-        count : int
-            The number of null values.
-        """
-        return self._data.isna().sum()
 
     def _ipython_display_(self) -> DisplayHandle:
         """
@@ -534,3 +551,18 @@ class Column:
 
         with pd.option_context("display.max_rows", tmp.shape[0], "display.max_columns", tmp.shape[1]):
             return display(tmp)
+
+    # ------------------------------------------------------------------------------------------------------------------
+    # Other
+    # ------------------------------------------------------------------------------------------------------------------
+
+    def _count_missing_values(self) -> int:
+        """
+        Return the number of null values in the column.
+
+        Returns
+        -------
+        count : int
+            The number of null values.
+        """
+        return self._data.isna().sum()
