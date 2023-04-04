@@ -2,7 +2,7 @@ from pathlib import Path
 from tempfile import NamedTemporaryFile
 
 import pytest
-from helpers import resolve_resource_path
+from tests.helpers import resolve_resource_path
 from safeds.data.image.containers import Image
 from safeds.data.image.typing import ImageFormat
 
