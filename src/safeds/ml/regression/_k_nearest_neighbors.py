@@ -18,12 +18,12 @@ class KNearestNeighbors(Regressor):
 
     Parameters
     ----------
-    n_neighbors : int
+    number_of_neighbors : int
         The number of neighbors to be interpolated with. Has to be less than or equal than the sample size.
     """
 
-    def __init__(self, n_neighbors: int) -> None:
-        self._n_neighbors = n_neighbors
+    def __init__(self, number_of_neighbors: int) -> None:
+        self._number_of_neighbors = number_of_neighbors
 
         self._wrapped_regressor: sk_KNeighborsRegressor | None = None
         self._feature_names: list[str] | None = None
@@ -50,10 +50,10 @@ class KNearestNeighbors(Regressor):
         LearningError
             If the training data contains invalid values or if the training failed.
         """
-        wrapped_regressor = sk_KNeighborsRegressor(self._n_neighbors, n_jobs=-1)
+        wrapped_regressor = sk_KNeighborsRegressor(self._number_of_neighbors, n_jobs=-1)
         fit(wrapped_regressor, training_set)
 
-        result = KNearestNeighbors(self._n_neighbors)
+        result = KNearestNeighbors(self._number_of_neighbors)
         result._wrapped_regressor = wrapped_regressor
         result._feature_names = training_set.features.get_column_names()
         result._target_name = training_set.target.name
