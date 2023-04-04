@@ -12,6 +12,12 @@ from safeds.exceptions import TransformerNotFittedError, UnknownColumnNameError
 
 
 class ImputerStrategy(ABC):
+    """
+    The abstract base class of the different imputation strategies supported by the `Imputer`.
+
+    This class is only needed for type annotations. Use the subclasses nested inside `Imputer.Strategy` instead.
+    """
+
     @abstractmethod
     def _augment_imputer(self, imputer: sk_SimpleImputer) -> None:
         pass
@@ -24,7 +30,7 @@ class Imputer(TableTransformer):
     Parameters
     ----------
     strategy : ImputerStrategy
-        The strategy used to impute missing values.
+        The strategy used to impute missing values. Use the classes nested inside `Imputer.Strategy` to specify it.
     """
 
     class Strategy:
