@@ -946,7 +946,14 @@ class Table:
     # ------------------------------------------------------------------------------------------------------------------
 
     def correlation_heatmap(self) -> Image:
-        """Plot a correlation heatmap for all numerical columns of this `Table`."""
+        """
+        Plot a correlation heatmap for all numerical columns of this `Table`.
+
+        Returns
+        -------
+        plot: Image
+            The plot as an image.
+        """
         only_numerical = self.remove_columns_with_non_numerical_values()
 
         fig = plt.figure()
@@ -979,6 +986,11 @@ class Table:
             The column name of the column to be plotted on the x-Axis.
         y_column_name : str
             The column name of the column to be plotted on the y-Axis.
+
+        Returns
+        -------
+        plot: Image
+            The plot as an image.
 
         Raises
         ------
@@ -1021,6 +1033,11 @@ class Table:
             The column name of the column to be plotted on the x-Axis.
         y_column_name : str
             The column name of the column to be plotted on the y-Axis.
+
+        Returns
+        -------
+        plot: Image
+            The plot as an image.
 
         Raises
         ------

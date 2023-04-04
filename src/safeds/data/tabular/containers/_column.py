@@ -477,6 +477,11 @@ class Column:
         """
         Plot this column in a boxplot. This function can only plot real numerical data.
 
+        Returns
+        -------
+        plot: Image
+            The plot as an image.
+
         Raises
         ------
         TypeError
@@ -503,7 +508,14 @@ class Column:
         return Image(buffer, ImageFormat.PNG)
 
     def histogram(self) -> Image:
-        """Plot a column in a histogram."""
+        """
+        Plot a column in a histogram.
+
+        Returns
+        -------
+        plot: Image
+            The plot as an image.
+        """
         fig = plt.figure()
         ax = sns.histplot(data=self._data)
         ax.set_xticks(ax.get_xticks())
