@@ -1,6 +1,7 @@
 site_name: Safe-DS Python Library
 repo_url: https://github.com/Safe-DS/Stdlib
 repo_name: Safe-DS/Stdlib
+site_url: !ENV READTHEDOCS_CANONICAL_URL
 
 nav:
   - Home:
