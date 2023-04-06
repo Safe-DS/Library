@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 import pytest
 from safeds.data.tabular.containers import Column
-from safeds.exceptions import ColumnSizeError
+from safeds.data.tabular.exceptions import ColumnSizeError
 
 
 @pytest.mark.parametrize(

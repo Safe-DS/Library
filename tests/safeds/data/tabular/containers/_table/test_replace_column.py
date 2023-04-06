@@ -1,7 +1,7 @@
 import pandas as pd
 import pytest
 from safeds.data.tabular.containers import Column, Table
-from safeds.exceptions import (
+from safeds.data.tabular.exceptions import (
     ColumnSizeError,
     DuplicateColumnNameError,
     UnknownColumnNameError,

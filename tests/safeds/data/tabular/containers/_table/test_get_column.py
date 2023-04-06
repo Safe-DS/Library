@@ -1,7 +1,7 @@
 import pandas as pd
 import pytest
 from safeds.data.tabular.containers import Column, Table
-from safeds.exceptions import UnknownColumnNameError
+from safeds.data.tabular.exceptions import UnknownColumnNameError
 
 
 def test_get_column_valid() -> None:

@@ -7,7 +7,7 @@ from IPython.core.display_functions import DisplayHandle, display
 from pandas.core.util.hashing import hash_pandas_object
 
 from safeds.data.tabular.typing import ColumnType, Schema
-from safeds.exceptions import UnknownColumnNameError
+from safeds.data.tabular.exceptions import UnknownColumnNameError
 
 
 class Row:

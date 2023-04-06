@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING
 import pandas as pd
 import pytest
 from safeds.data.tabular.containers import Column, Table, TaggedTable
-from safeds.exceptions import (
+from safeds.ml.exceptions import (
     DatasetContainsTargetError,
     DatasetMissesFeaturesError,
     LearningError,

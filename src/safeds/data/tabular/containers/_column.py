@@ -13,7 +13,7 @@ from IPython.core.display_functions import DisplayHandle, display
 from safeds.data.image.containers import Image
 from safeds.data.image.typing import ImageFormat
 from safeds.data.tabular.typing import ColumnType
-from safeds.exceptions import (
+from safeds.data.tabular.exceptions import (
     ColumnLengthMismatchError,
     ColumnSizeError,
     IndexOutOfBoundsError,

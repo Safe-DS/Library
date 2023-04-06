@@ -1,7 +1,7 @@
 import pandas as pd
 import pytest
 from safeds.data.tabular.containers import Column
-from safeds.exceptions import IndexOutOfBoundsError
+from safeds.data.tabular.exceptions import IndexOutOfBoundsError
 
 
 def test_getitem_valid() -> None:

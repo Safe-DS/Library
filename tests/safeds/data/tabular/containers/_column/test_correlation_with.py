@@ -1,7 +1,7 @@
 import pandas as pd
 import pytest
 from safeds.data.tabular.containers import Column
-from safeds.exceptions import ColumnLengthMismatchError, NonNumericColumnError
+from safeds.data.tabular.exceptions import ColumnLengthMismatchError, NonNumericColumnError
 
 
 def test_correlation_with() -> None:

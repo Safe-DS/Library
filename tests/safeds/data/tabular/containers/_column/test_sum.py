@@ -1,7 +1,7 @@
 import pandas as pd
 import pytest
 from safeds.data.tabular.containers import Column
-from safeds.exceptions import NonNumericColumnError
+from safeds.data.tabular.exceptions import NonNumericColumnError
 
 
 def test_sum_valid() -> None:

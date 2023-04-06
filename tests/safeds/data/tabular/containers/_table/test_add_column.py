@@ -3,7 +3,7 @@ import pytest
 from _pytest.python_api import raises
 from safeds.data.tabular.containers import Column, Table
 from safeds.data.tabular.typing import ColumnType, Integer, String
-from safeds.exceptions import ColumnSizeError, DuplicateColumnNameError
+from safeds.data.tabular.exceptions import ColumnSizeError, DuplicateColumnNameError
 
 
 @pytest.mark.parametrize(

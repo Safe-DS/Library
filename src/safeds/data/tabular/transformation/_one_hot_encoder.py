@@ -7,7 +7,7 @@ from safeds.data.tabular.containers import Table
 from safeds.data.tabular.transformation._table_transformer import (
     InvertibleTableTransformer,
 )
-from safeds.exceptions import TransformerNotFittedError, UnknownColumnNameError
+from safeds.data.tabular.exceptions import TransformerNotFittedError, UnknownColumnNameError
 
 
 class OneHotEncoder(InvertibleTableTransformer):
