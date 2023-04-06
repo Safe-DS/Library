@@ -1,7 +1,7 @@
 from typing import Any
 
 from safeds.data.tabular.containers import Table, TaggedTable
-from safeds.exceptions import (
+from safeds.ml.exceptions import (
     DatasetContainsTargetError,
     DatasetMissesFeaturesError,
     LearningError,

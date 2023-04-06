@@ -1,7 +1,7 @@
 import pandas as pd
 import pytest
 from safeds.data.tabular.containers import Table
-from safeds.exceptions import NonNumericColumnError
+from safeds.data.tabular.exceptions import NonNumericColumnError
 
 
 def test_maximum_invalid() -> None:

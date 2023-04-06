@@ -6,9 +6,9 @@ import pandas as pd
 from sklearn.impute import SimpleImputer as sk_SimpleImputer
 
 from safeds.data.tabular.containers import Table
+from safeds.data.tabular.exceptions import TransformerNotFittedError, UnknownColumnNameError
 from safeds.data.tabular.transformation._table_transformer import TableTransformer
 from safeds.data.tabular.typing import ImputerStrategy
-from safeds.exceptions import TransformerNotFittedError, UnknownColumnNameError
 
 
 class Imputer(TableTransformer):

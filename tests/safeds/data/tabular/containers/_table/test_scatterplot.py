@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import pytest
 from safeds.data.tabular.containers import Table
-from safeds.exceptions import UnknownColumnNameError
+from safeds.data.tabular.exceptions import UnknownColumnNameError
 
 
 def test_scatterplot(monkeypatch: _pytest.monkeypatch) -> None:

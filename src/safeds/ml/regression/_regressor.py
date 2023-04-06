@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 from sklearn.metrics import mean_absolute_error as sk_mean_absolute_error
 from sklearn.metrics import mean_squared_error as sk_mean_squared_error
 
-from safeds.exceptions import ColumnLengthMismatchError
+from safeds.data.tabular.exceptions import ColumnLengthMismatchError
 
 if TYPE_CHECKING:
     from safeds.data.tabular.containers import Column, Table, TaggedTable

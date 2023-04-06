@@ -1,6 +1,6 @@
-"""Custom exceptions that can be raised by the `safe-ds` package."""
+"""Custom exceptions that can be raised when working with tabular data."""
 
-from ._data_exceptions import (
+from ._exceptions import (
     ColumnLengthMismatchError,
     ColumnSizeError,
     DuplicateColumnNameError,
@@ -12,27 +12,15 @@ from ._data_exceptions import (
     TransformerNotFittedError,
     UnknownColumnNameError,
 )
-from ._ml_exceptions import (
-    DatasetContainsTargetError,
-    DatasetMissesFeaturesError,
-    LearningError,
-    ModelNotFittedError,
-    PredictionError,
-)
 
 __all__ = [
     "ColumnLengthMismatchError",
     "ColumnSizeError",
-    "DatasetContainsTargetError",
-    "DatasetMissesFeaturesError",
     "DuplicateColumnNameError",
     "IndexOutOfBoundsError",
-    "LearningError",
     "MissingDataError",
     "MissingSchemaError",
-    "ModelNotFittedError",
     "NonNumericColumnError",
-    "PredictionError",
     "SchemaMismatchError",
     "TransformerNotFittedError",
     "UnknownColumnNameError",
