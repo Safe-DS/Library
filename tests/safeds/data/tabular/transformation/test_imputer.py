@@ -1,8 +1,8 @@
 import pytest
 from safeds.data.tabular.containers import Column, Table
+from safeds.data.tabular.exceptions import TransformerNotFittedError, UnknownColumnNameError
 from safeds.data.tabular.transformation import Imputer
 from safeds.data.tabular.typing import ImputerStrategy
-from safeds.data.tabular.exceptions import TransformerNotFittedError, UnknownColumnNameError
 
 
 class TestFit:

@@ -2,8 +2,8 @@ from typing import Any
 
 import pytest
 from safeds.data.tabular.containers import Row, Table
-from safeds.data.tabular.typing import ColumnType, Integer, Schema, String
 from safeds.data.tabular.exceptions import UnknownColumnNameError
+from safeds.data.tabular.typing import ColumnType, Integer, Schema, String
 
 
 class TestInit:
