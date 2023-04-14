@@ -88,7 +88,7 @@ class Schema:
 
         Parameters
         ----------
-        dataframe : pd.Dataframe
+        dataframe : pd.DataFrame
             The Dataframe used to construct the TableSchema.
 
         Returns
