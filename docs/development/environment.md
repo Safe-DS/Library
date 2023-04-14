@@ -9,7 +9,7 @@ This document describes how to configure and use your development environment.
 ## Initial setup
 
 1. Install [Python 3.10](https://www.python.org/downloads/).
-2. Install [poetry](https://python-poetry.org/docs/master/#installation) with the official installer.
+2. Install [poetry](https://python-poetry.org/docs/master/#installing-with-the-official-installer) with the official installer.
 3. Install dependencies of this project by running this command:
     ```shell
     poetry install
