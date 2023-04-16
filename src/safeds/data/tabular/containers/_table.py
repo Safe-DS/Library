@@ -566,7 +566,7 @@ class Table:
         Raises
         ------
         ColumnNameError
-            If any of the given columns do not exist.
+            If any of the given columns does not exist.
         """
         invalid_columns = []
         column_indices = []
@@ -578,7 +578,7 @@ class Table:
         if len(invalid_columns) != 0:
             raise UnknownColumnNameError(invalid_columns)
         transformed_data = self._data[column_indices]
-        transformed_data.columns = [name for name in self._schema.get_column_names() if name in column_names]
+        transformed_data.columns = [self._schema.get_column_names()[i] for i in column_indices]
         return Table(transformed_data)
 
     def remove_columns(self, column_names: list[str]) -> Table:
@@ -598,7 +598,7 @@ class Table:
         Raises
         ------
         ColumnNameError
-            If any of the given columns do not exist.
+            If any of the given columns does not exist.
         """
         invalid_columns = []
         column_indices = []
