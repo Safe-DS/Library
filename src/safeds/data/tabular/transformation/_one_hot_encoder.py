@@ -51,7 +51,6 @@ class OneHotEncoder(InvertibleTableTransformer):
         result = OneHotEncoder()
         result._wrapped_transformer = wrapped_transformer
         result._column_names = column_names
-        result._original_schema = table.schema
 
         return result
 
