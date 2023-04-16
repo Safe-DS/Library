@@ -12,7 +12,7 @@ def test_keep_columns() -> None:
     assert not transformed_table.schema.has_column("B")
 
 
-def test_keep_columns_order() -> None:
+def test_keep_only_columns_order() -> None:
     table = Table.from_csv_file(resolve_resource_path("test_table_from_csv_file.csv"))
     transformed_table = table.keep_only_columns(["B", "A"])
     assert table.to_columns()[0] == transformed_table.to_columns()[1]
@@ -21,7 +21,7 @@ def test_keep_columns_order() -> None:
     assert table.get_column("B") == transformed_table.get_column("B")
 
 
-def test_keep_columns_warning() -> None:
+def test_keep_only_columns_warning() -> None:
     table = Table.from_csv_file(resolve_resource_path("test_table_from_csv_file.csv"))
     with pytest.raises(UnknownColumnNameError):
         table.keep_only_columns(["C"])

@@ -578,7 +578,7 @@ class Table:
         if len(invalid_columns) != 0:
             raise UnknownColumnNameError(invalid_columns)
         transformed_data = self._data[column_indices]
-        transformed_data.columns = [self._schema.get_column_names()[i] for i in column_indices]
+        transformed_data.columns = column_names
         return Table(transformed_data)
 
     def remove_columns(self, column_names: list[str]) -> Table:
