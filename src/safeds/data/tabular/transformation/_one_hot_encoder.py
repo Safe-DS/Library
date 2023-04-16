@@ -8,6 +8,7 @@ from safeds.data.tabular.exceptions import TransformerNotFittedError, UnknownCol
 from safeds.data.tabular.transformation._table_transformer import (
     InvertibleTableTransformer,
 )
+from safeds.data.tabular.typing import Schema
 
 
 class OneHotEncoder(InvertibleTableTransformer):
@@ -16,6 +17,7 @@ class OneHotEncoder(InvertibleTableTransformer):
     def __init__(self) -> None:
         self._wrapped_transformer: sk_OneHotEncoder | None = None
         self._column_names: list[str] | None = None
+        self._original_schema: Schema | None = None
 
     # noinspection PyProtectedMember
     def fit(self, table: Table, column_names: list[str] | None = None) -> OneHotEncoder:
@@ -50,6 +52,7 @@ class OneHotEncoder(InvertibleTableTransformer):
         result = OneHotEncoder()
         result._wrapped_transformer = wrapped_transformer
         result._column_names = column_names
+        result._original_schema = table.schema
 
         return result
 
@@ -120,12 +123,16 @@ class OneHotEncoder(InvertibleTableTransformer):
         data.columns = transformed_table.get_column_names()
 
         decoded = pd.DataFrame(
-            self._wrapped_transformer.inverse_transform(transformed_table._data),
+            self._wrapped_transformer.inverse_transform(transformed_table.keep_only_columns(self._wrapped_transformer.get_feature_names_out())._data),
             columns=self._column_names,
         )
         unchanged = data.drop(self._wrapped_transformer.get_feature_names_out(), axis=1)
 
-        return Table(pd.concat([unchanged, decoded], axis=1))
+        res = Table(pd.concat([unchanged, decoded], axis=1))
+        column_names = self._original_schema.get_column_names()
+        res = res.sort_columns(lambda col1, col2: column_names.index(col1.name) - column_names.index(col2.name))
+
+        return res
 
     def is_fitted(self) -> bool:
         """

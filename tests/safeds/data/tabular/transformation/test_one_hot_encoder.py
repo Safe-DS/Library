@@ -192,3 +192,17 @@ class TestInverseTransform:
 
         with pytest.raises(TransformerNotFittedError):
             transformer.inverse_transform(table)
+
+    def test_inverse_transform_not_complete_table(self) -> None:
+        table = Table.from_columns(
+            [
+                Column("a", [1.0, 0.0, 0.0, 0.0]),
+                Column("b", [0.0, 1.0, 1.0, 0.0]),
+                Column("c", [0.0, 0.0, 0.0, 1.0]),
+            ],
+        )
+        transformer = OneHotEncoder().fit(table, ["b"])
+        inverse_transformed_table = transformer.inverse_transform(transformer.transform(table))
+        assert table.get_column_names() == inverse_transformed_table.get_column_names()
+        assert table == inverse_transformed_table
+
