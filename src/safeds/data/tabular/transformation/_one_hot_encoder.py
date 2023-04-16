@@ -1,26 +1,24 @@
 from __future__ import annotations
 
-from typing import Callable
-
 import pandas as pd
 from sklearn.preprocessing import OneHotEncoder as sk_OneHotEncoder
 
-from safeds.data.tabular.containers import Table, Column
+from safeds.data.tabular.containers import Table
 from safeds.data.tabular.exceptions import TransformerNotFittedError, \
     UnknownColumnNameError
 from safeds.data.tabular.transformation._table_transformer import (
     InvertibleTableTransformer,
 )
-from safeds.data.tabular.typing import Schema
 
 
 class OneHotEncoder(InvertibleTableTransformer):
     """Encodes categorical columns to numerical features [0,1] that represent the existence for each value."""
 
+    _original_schema = None
+
     def __init__(self) -> None:
         self._wrapped_transformer: sk_OneHotEncoder | None = None
         self._column_names: list[str] | None = None
-        self._original_schema: Schema | None = None
 
     # noinspection PyProtectedMember
     def fit(self, table: Table, column_names: list[str] | None = None) -> OneHotEncoder:
@@ -133,8 +131,7 @@ class OneHotEncoder(InvertibleTableTransformer):
 
         res = Table(pd.concat([unchanged, decoded], axis=1))
         column_names = self._original_schema.get_column_names()
-        sort_func: Callable[[Column, Column], int] = lambda col1, col2: column_names.index(col1.name) - column_names.index(col2.name)
-        res = res.sort_columns(sort_func)
+        res = res.sort_columns(lambda col1, col2: column_names.index(col1.name) - column_names.index(col2.name))
 
         return res
 
