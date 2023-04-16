@@ -1,6 +1,5 @@
 import pytest
-
-from safeds.data.tabular.containers import Table, Column
+from safeds.data.tabular.containers import Column, Table
 from safeds.data.tabular.exceptions import UnknownColumnNameError
 
 
@@ -34,7 +33,7 @@ class TestKeepOnlyColumns:
                 ["C", "A"],
                 Table.from_columns([Column("C", [3]), Column("A", [1])]),
             ),
-        ]
+        ],
     )
     def test_should_keep_only_listed_columns(self, table: Table, column_names: list[str], expected: Table) -> None:
         transformed_table = table.keep_only_columns(column_names)
