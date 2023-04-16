@@ -1,10 +1,13 @@
 from __future__ import annotations
 
+from typing import Callable
+
 import pandas as pd
 from sklearn.preprocessing import OneHotEncoder as sk_OneHotEncoder
 
-from safeds.data.tabular.containers import Table
-from safeds.data.tabular.exceptions import TransformerNotFittedError, UnknownColumnNameError
+from safeds.data.tabular.containers import Table, Column
+from safeds.data.tabular.exceptions import TransformerNotFittedError, \
+    UnknownColumnNameError
 from safeds.data.tabular.transformation._table_transformer import (
     InvertibleTableTransformer,
 )
@@ -130,7 +133,8 @@ class OneHotEncoder(InvertibleTableTransformer):
 
         res = Table(pd.concat([unchanged, decoded], axis=1))
         column_names = self._original_schema.get_column_names()
-        res = res.sort_columns(lambda col1, col2: column_names.index(col1.name) - column_names.index(col2.name))
+        sort_func: Callable[[Column, Column], int] = lambda col1, col2: column_names.index(col1.name) - column_names.index(col2.name)
+        res = res.sort_columns(sort_func)
 
         return res
 
