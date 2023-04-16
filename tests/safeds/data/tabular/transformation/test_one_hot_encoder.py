@@ -107,10 +107,10 @@ class TestFitAndTransform:
                 ["col1"],
                 Table.from_columns(
                     [
-                        Column("col2", ["a", "b", "b", "c"]),
                         Column("col1_a", [1.0, 0.0, 0.0, 0.0]),
                         Column("col1_b", [0.0, 1.0, 1.0, 0.0]),
                         Column("col1_c", [0.0, 0.0, 0.0, 1.0]),
+                        Column("col2", ["a", "b", "b", "c"]),
                     ],
                 ),
             ),
@@ -205,3 +205,22 @@ class TestInverseTransform:
         inverse_transformed_table = transformer.inverse_transform(transformer.transform(table))
         assert table.get_column_names() == inverse_transformed_table.get_column_names()
         assert table == inverse_transformed_table
+
+    def test_inverse_transform_different_order(self) -> None:
+        table = Table.from_columns(
+            [
+                Column("c", [0.0, 0.0, 0.0, 1.0]),
+                Column("b", [0.0, 1.0, 1.0, 0.0]),
+                Column("a", [1.0, 0.0, 0.0, 0.0]),
+            ],
+        )
+        table_different_order = table.sort_columns()
+        transformer = OneHotEncoder().fit(table, ["b"])
+
+        inverse_transformed_table = transformer.inverse_transform(
+            transformer.transform(table))
+        inverse_transformed_table_different_order = transformer.inverse_transform(
+            transformer.transform(table_different_order))
+        assert inverse_transformed_table == inverse_transformed_table_different_order
+        assert inverse_transformed_table.get_column_names() == ["c", "b", "a"]
+        assert inverse_transformed_table_different_order.get_column_names() == ["a", "b", "c"]
