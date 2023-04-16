@@ -9,16 +9,16 @@ from safeds.data.tabular.exceptions import TransformerNotFittedError, \
 from safeds.data.tabular.transformation._table_transformer import (
     InvertibleTableTransformer,
 )
+from safeds.data.tabular.typing import Schema
 
 
 class OneHotEncoder(InvertibleTableTransformer):
     """Encodes categorical columns to numerical features [0,1] that represent the existence for each value."""
 
-    _original_schema = None
-
     def __init__(self) -> None:
         self._wrapped_transformer: sk_OneHotEncoder | None = None
         self._column_names: list[str] | None = None
+        self._original_schema: Schema | None = None
 
     # noinspection PyProtectedMember
     def fit(self, table: Table, column_names: list[str] | None = None) -> OneHotEncoder:
@@ -117,7 +117,7 @@ class OneHotEncoder(InvertibleTableTransformer):
             If the transformer has not been fitted yet.
         """
         # Transformer has not been fitted yet
-        if self._wrapped_transformer is None or self._column_names is None:
+        if self._wrapped_transformer is None or self._column_names is None or self._original_schema is None:
             raise TransformerNotFittedError
 
         data = transformed_table._data.copy()
