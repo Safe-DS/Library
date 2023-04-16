@@ -129,14 +129,9 @@ class Table:
 
         Raises
         ------
-        MissingDataError
-            If an empty list is given.
         ColumnLengthMismatchError
             If any of the column sizes does not match with the others.
         """
-        if len(columns) == 0:
-            raise MissingDataError("This function requires at least one column.")
-
         dataframe: DataFrame = pd.DataFrame()
 
         for column in columns:
@@ -566,7 +561,7 @@ class Table:
         Raises
         ------
         ColumnNameError
-            If any of the given columns do not exist.
+            If any of the given columns does not exist.
         """
         invalid_columns = []
         column_indices = []
@@ -578,7 +573,7 @@ class Table:
         if len(invalid_columns) != 0:
             raise UnknownColumnNameError(invalid_columns)
         transformed_data = self._data[column_indices]
-        transformed_data.columns = [name for name in self._schema.get_column_names() if name in column_names]
+        transformed_data.columns = column_names
         return Table(transformed_data)
 
     def remove_columns(self, column_names: list[str]) -> Table:
@@ -598,7 +593,7 @@ class Table:
         Raises
         ------
         ColumnNameError
-            If any of the given columns do not exist.
+            If any of the given columns does not exist.
         """
         invalid_columns = []
         column_indices = []
