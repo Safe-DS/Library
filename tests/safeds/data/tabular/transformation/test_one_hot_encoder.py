@@ -217,10 +217,10 @@ class TestInverseTransform:
         table_different_order = table.sort_columns()
         transformer = OneHotEncoder().fit(table, ["b"])
 
-        inverse_transformed_table = transformer.inverse_transform(
-            transformer.transform(table))
+        inverse_transformed_table = transformer.inverse_transform(transformer.transform(table))
         inverse_transformed_table_different_order = transformer.inverse_transform(
-            transformer.transform(table_different_order))
+            transformer.transform(table_different_order),
+        )
         assert inverse_transformed_table == inverse_transformed_table_different_order
         assert inverse_transformed_table.get_column_names() == ["c", "b", "a"]
         assert inverse_transformed_table_different_order.get_column_names() == ["a", "b", "c"]

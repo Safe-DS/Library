@@ -4,8 +4,7 @@ import pandas as pd
 from sklearn.preprocessing import OneHotEncoder as sk_OneHotEncoder
 
 from safeds.data.tabular.containers import Table
-from safeds.data.tabular.exceptions import TransformerNotFittedError, \
-    UnknownColumnNameError
+from safeds.data.tabular.exceptions import TransformerNotFittedError, UnknownColumnNameError
 from safeds.data.tabular.transformation._table_transformer import (
     InvertibleTableTransformer,
 )
@@ -92,13 +91,15 @@ class OneHotEncoder(InvertibleTableTransformer):
         unchanged = original.drop(self._column_names, axis=1)
 
         res = Table(pd.concat([unchanged, one_hot_encoded], axis=1))
-        column_names = list()
+        column_names = []
 
         for name in table.get_column_names():
             if name not in self._column_names:
                 column_names.append(name)
             else:
-                column_names.extend([f_name for f_name in self._wrapped_transformer.get_feature_names_out() if f_name.startswith(name)])
+                column_names.extend(
+                    [f_name for f_name in self._wrapped_transformer.get_feature_names_out() if f_name.startswith(name)],
+                )
         res = res.sort_columns(lambda col1, col2: column_names.index(col1.name) - column_names.index(col2.name))
 
         return res
@@ -139,7 +140,12 @@ class OneHotEncoder(InvertibleTableTransformer):
         unchanged = data.drop(self._wrapped_transformer.get_feature_names_out(), axis=1)
 
         res = Table(pd.concat([unchanged, decoded], axis=1))
-        column_names = [name if name not in self._wrapped_transformer.get_feature_names_out() else [col for col in self._column_names if name.startswith(col)][0] for name in transformed_table.get_column_names()]
+        column_names = [
+            name
+            if name not in self._wrapped_transformer.get_feature_names_out()
+            else [col for col in self._column_names if name.startswith(col)][0]
+            for name in transformed_table.get_column_names()
+        ]
         res = res.sort_columns(lambda col1, col2: column_names.index(col1.name) - column_names.index(col2.name))
 
         return res
