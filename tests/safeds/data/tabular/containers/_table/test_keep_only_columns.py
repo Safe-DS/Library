@@ -36,11 +36,11 @@ class TestKeepOnlyColumns:
             ),
         ]
     )
-    def test_should_keep_only_listed_columns(self, table: Table, column_names: list[str], expected: Table):
+    def test_should_keep_only_listed_columns(self, table: Table, column_names: list[str], expected: Table) -> None:
         transformed_table = table.keep_only_columns(column_names)
         assert transformed_table == expected
 
-    def test_raise_if_column_does_no_exist(self):
+    def test_should_raise_if_column_does_no_exist(self) -> None:
         table = Table.from_columns([Column("A", [1]), Column("B", [2])])
         with pytest.raises(UnknownColumnNameError):
             table.keep_only_columns(["C"])
