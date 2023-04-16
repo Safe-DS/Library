@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pandas as pd
 from sklearn.preprocessing import OneHotEncoder as sk_OneHotEncoder
 
@@ -9,7 +11,9 @@ from safeds.data.tabular.exceptions import TransformerNotFittedError, \
 from safeds.data.tabular.transformation._table_transformer import (
     InvertibleTableTransformer,
 )
-from safeds.data.tabular.typing import Schema
+
+if TYPE_CHECKING:
+    from safeds.data.tabular.typing import Schema
 
 
 class OneHotEncoder(InvertibleTableTransformer):
