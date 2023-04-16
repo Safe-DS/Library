@@ -205,4 +205,3 @@ class TestInverseTransform:
         inverse_transformed_table = transformer.inverse_transform(transformer.transform(table))
         assert table.get_column_names() == inverse_transformed_table.get_column_names()
         assert table == inverse_transformed_table
-

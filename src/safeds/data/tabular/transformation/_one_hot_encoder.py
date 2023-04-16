@@ -6,8 +6,7 @@ import pandas as pd
 from sklearn.preprocessing import OneHotEncoder as sk_OneHotEncoder
 
 from safeds.data.tabular.containers import Table
-from safeds.data.tabular.exceptions import TransformerNotFittedError, \
-    UnknownColumnNameError
+from safeds.data.tabular.exceptions import TransformerNotFittedError, UnknownColumnNameError
 from safeds.data.tabular.transformation._table_transformer import (
     InvertibleTableTransformer,
 )
@@ -128,7 +127,9 @@ class OneHotEncoder(InvertibleTableTransformer):
         data.columns = transformed_table.get_column_names()
 
         decoded = pd.DataFrame(
-            self._wrapped_transformer.inverse_transform(transformed_table.keep_only_columns(self._wrapped_transformer.get_feature_names_out())._data),
+            self._wrapped_transformer.inverse_transform(
+                transformed_table.keep_only_columns(self._wrapped_transformer.get_feature_names_out())._data,
+            ),
             columns=self._column_names,
         )
         unchanged = data.drop(self._wrapped_transformer.get_feature_names_out(), axis=1)
