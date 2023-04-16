@@ -1,5 +1,5 @@
 import pytest
-from safeds.data.tabular.containers import Table
+from safeds.data.tabular.containers import Table, Column
 from safeds.data.tabular.exceptions import UnknownColumnNameError
 
 from tests.helpers import resolve_resource_path
@@ -15,10 +15,12 @@ def test_keep_only_columns() -> None:
 def test_keep_only_columns_order() -> None:
     table = Table.from_csv_file(resolve_resource_path("test_table_from_csv_file.csv"))
     transformed_table = table.keep_only_columns(["B", "A"])
-    assert table.to_columns()[0] == transformed_table.to_columns()[1]
-    assert table.to_columns()[1] == transformed_table.to_columns()[0]
-    assert table.get_column("A") == transformed_table.get_column("A")
-    assert table.get_column("B") == transformed_table.get_column("B")
+    assert transformed_table == Table.from_columns(
+        [
+            Column("B", [2]),
+            Column("A", [1])
+        ]
+    )
 
 
 def test_keep_only_columns_warning() -> None:
