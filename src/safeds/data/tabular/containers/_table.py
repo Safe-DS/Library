@@ -129,14 +129,9 @@ class Table:
 
         Raises
         ------
-        MissingDataError
-            If an empty list is given.
         ColumnLengthMismatchError
             If any of the column sizes does not match with the others.
         """
-        if len(columns) == 0:
-            raise MissingDataError("This function requires at least one column.")
-
         dataframe: DataFrame = pd.DataFrame()
 
         for column in columns:
