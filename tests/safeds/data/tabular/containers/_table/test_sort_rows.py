@@ -1,7 +1,6 @@
 from collections.abc import Callable
 
 import pytest
-
 from safeds.data.tabular.containers import Row, Table
 
 
