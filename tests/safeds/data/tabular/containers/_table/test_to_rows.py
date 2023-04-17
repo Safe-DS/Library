@@ -1,4 +1,3 @@
-import pandas as pd
 from safeds.data.tabular.containers import Row, Table
 from safeds.data.tabular.typing import Integer, Schema, String
 

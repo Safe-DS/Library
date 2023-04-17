@@ -1,11 +1,11 @@
 import pytest
-
 from safeds.data.tabular.containers import Column, Table
 from safeds.data.tabular.exceptions import (
     ColumnSizeError,
     DuplicateColumnNameError,
     UnknownColumnNameError,
 )
+
 from tests.helpers import resolve_resource_path
 
 

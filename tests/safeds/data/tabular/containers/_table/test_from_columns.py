@@ -1,5 +1,4 @@
 import pytest
-
 from safeds.data.tabular.containers import Column, Table
 from safeds.data.tabular.typing import Integer, Schema
 
@@ -12,7 +11,7 @@ from safeds.data.tabular.typing import Integer, Schema
                 Column("A", [1, 4]),
                 Column("B", [2, 5]),
             ],
-            Table([[1, 2], [4, 5]], Schema({"A": Integer(), "B": Integer()}))
+            Table([[1, 2], [4, 5]], Schema({"A": Integer(), "B": Integer()})),
         ),
     ],
 )

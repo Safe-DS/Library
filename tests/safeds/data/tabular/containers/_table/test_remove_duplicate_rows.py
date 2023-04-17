@@ -1,6 +1,6 @@
 import pytest
-
 from safeds.data.tabular.containers import Table
+
 from tests.helpers import resolve_resource_path
 
 

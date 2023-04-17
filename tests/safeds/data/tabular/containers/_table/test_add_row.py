@@ -1,5 +1,4 @@
 from _pytest.python_api import raises
-
 from safeds.data.tabular.containers import Row, Table
 from safeds.data.tabular.exceptions import SchemaMismatchError
 from safeds.data.tabular.typing import Integer, Schema, String
