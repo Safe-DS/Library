@@ -2,7 +2,6 @@ from typing import Any
 
 import pytest
 from pandas.core.interchange.from_dataframe import from_dataframe
-
 from safeds.data.tabular.containers import Table
 from safeds.data.tabular.exceptions import ColumnLengthMismatchError
 from safeds.data.tabular.typing import Integer, Schema
@@ -64,7 +63,7 @@ class TestDataframe:
         ids=[
             "empty",
             "non-empty",
-        ]
+        ],
     )
     def test_can_restore_table_from_exchange_object(self, table: Table) -> None:
         exchange_object = table.__dataframe__()
