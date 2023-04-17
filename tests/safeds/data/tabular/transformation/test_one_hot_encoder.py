@@ -144,19 +144,71 @@ class TestFitAndTransform:
 
 class TestInverseTransform:
     @pytest.mark.parametrize(
-        "table",
+        ("table_to_fit", "table_to_transform", "column_names"),
         [
-            Table.from_dict(
-                {
-                    "col1": ["a", "b", "b", "c"],
-                },
+            (
+                Table.from_dict(
+                    {
+                        "col1": ["a", "b", "b", "c"],
+                    },
+                ),
+                Table.from_dict(
+                    {
+                        "col1": ["a", "b", "b", "c"],
+                    },
+                ),
+                None
+            ),
+            (
+                Table.from_dict(
+                    {
+                        "a": [1.0, 0.0, 0.0, 0.0],
+                        "b": ["a", "b", "b", "c"],
+                        "c": [0.0, 0.0, 0.0, 1.0],
+                    },
+                ),
+                Table.from_dict(
+                    {
+                        "a": [1.0, 0.0, 0.0, 0.0],
+                        "b": ["a", "b", "b", "c"],
+                        "c": [0.0, 0.0, 0.0, 1.0],
+                    },
+                ),
+                ["b"],
+            ),
+            (
+                Table.from_dict(
+                    {
+                        "a": [1.0, 0.0, 0.0, 0.0],
+                        "b": ["a", "b", "b", "c"],
+                        "c": [0.0, 0.0, 0.0, 1.0],
+                    },
+                ),
+                Table.from_dict(
+                    {
+                        "c": [0.0, 0.0, 0.0, 1.0],
+                        "b": ["a", "b", "b", "c"],
+                        "a": [1.0, 0.0, 0.0, 0.0],
+                    },
+                ),
+                ["b"],
             ),
         ],
+        ids=[
+            "one column",
+            "same table to fit and transform (issue #109)",
+            "different tables to fit and transform (issue #109)"
+        ]
     )
-    def test_should_return_original_table(self, table: Table) -> None:
-        transformer = OneHotEncoder().fit(table)
+    def test_should_return_original_table(
+        self,
+        table_to_fit: Table,
+        table_to_transform: Table,
+        column_names: list[str]
+    ) -> None:
+        transformer = OneHotEncoder().fit(table_to_fit, column_names)
 
-        assert transformer.inverse_transform(transformer.transform(table)) == table
+        assert transformer.inverse_transform(transformer.transform(table_to_transform)) == table_to_transform
 
     def test_should_not_change_transformed_table(self) -> None:
         table = Table.from_dict(
@@ -192,35 +244,3 @@ class TestInverseTransform:
 
         with pytest.raises(TransformerNotFittedError):
             transformer.inverse_transform(table)
-
-    def test_inverse_transform_not_complete_table(self) -> None:
-        table = Table.from_dict(
-            {
-                "a": [1.0, 0.0, 0.0, 0.0],
-                "b": [0.0, 1.0, 1.0, 0.0],
-                "c": [0.0, 0.0, 0.0, 1.0],
-            },
-        )
-        transformer = OneHotEncoder().fit(table, ["b"])
-        inverse_transformed_table = transformer.inverse_transform(transformer.transform(table))
-        assert table.get_column_names() == inverse_transformed_table.get_column_names()
-        assert table == inverse_transformed_table
-
-    def test_inverse_transform_different_order(self) -> None:
-        table = Table.from_dict(
-            {
-                "c": [0.0, 0.0, 0.0, 1.0],
-                "b": [0.0, 1.0, 1.0, 0.0],
-                "a": [1.0, 0.0, 0.0, 0.0],
-            },
-        )
-        table_different_order = table.sort_columns()
-        transformer = OneHotEncoder().fit(table, ["b"])
-
-        inverse_transformed_table = transformer.inverse_transform(transformer.transform(table))
-        inverse_transformed_table_different_order = transformer.inverse_transform(
-            transformer.transform(table_different_order),
-        )
-        assert inverse_transformed_table == inverse_transformed_table_different_order
-        assert inverse_transformed_table.get_column_names() == ["c", "b", "a"]
-        assert inverse_transformed_table_different_order.get_column_names() == ["a", "b", "c"]
