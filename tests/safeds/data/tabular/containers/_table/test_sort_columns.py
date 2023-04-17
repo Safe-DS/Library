@@ -1,7 +1,7 @@
 from collections.abc import Callable
 
-import pandas as pd
 import pytest
+
 from safeds.data.tabular.containers import Column, Table
 
 
@@ -20,20 +20,18 @@ from safeds.data.tabular.containers import Column, Table
 )
 def test_sort_columns_valid(query: Callable[[Column, Column], int], col1: int, col2: int, col3: int, col4: int) -> None:
     columns = [
-        Column("col1", pd.Series(data=["A", "B", "C", "A", "D"])),
-        Column("col2", pd.Series(data=["Test1", "Test1", "Test3", "Test1", "Test4"])),
-        Column("col3", pd.Series(data=[1, 2, 3, 4, 5])),
-        Column("col4", pd.Series(data=[2, 3, 1, 4, 6])),
+        Column("col1", ["A", "B", "C", "A", "D"]),
+        Column("col2", ["Test1", "Test1", "Test3", "Test1", "Test4"]),
+        Column("col3", [1, 2, 3, 4, 5]),
+        Column("col4", [2, 3, 1, 4, 6]),
     ]
-    table1 = Table(
-        pd.DataFrame(
-            data={
-                "col2": ["Test1", "Test1", "Test3", "Test1", "Test4"],
-                "col3": [1, 2, 3, 4, 5],
-                "col4": [2, 3, 1, 4, 6],
-                "col1": ["A", "B", "C", "A", "D"],
-            },
-        ),
+    table1 = Table.from_dict(
+        {
+            "col2": ["Test1", "Test1", "Test3", "Test1", "Test4"],
+            "col3": [1, 2, 3, 4, 5],
+            "col4": [2, 3, 1, 4, 6],
+            "col1": ["A", "B", "C", "A", "D"],
+        },
     )
     if query is not None:
         table_sorted = table1.sort_columns(query)

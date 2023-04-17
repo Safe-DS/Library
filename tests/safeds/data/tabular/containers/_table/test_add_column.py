@@ -1,6 +1,5 @@
-import pandas as pd
 import pytest
-from _pytest.python_api import raises
+
 from safeds.data.tabular.containers import Column, Table
 from safeds.data.tabular.exceptions import ColumnSizeError, DuplicateColumnNameError
 from safeds.data.tabular.typing import ColumnType, Integer, String
@@ -14,7 +13,7 @@ from safeds.data.tabular.typing import ColumnType, Integer, String
     ],
 )
 def test_add_column_valid(column: Column, col_type: ColumnType) -> None:
-    table1 = Table(pd.DataFrame(data={"col1": [1, 2, 1], "col2": [1, 2, 4]}))
+    table1 = Table.from_dict({"col1": [1, 2, 1], "col2": [1, 2, 4]})
     table1 = table1.add_column(column)
     assert table1.count_columns() == 3
     assert table1.get_column("col3") == column
@@ -24,12 +23,12 @@ def test_add_column_valid(column: Column, col_type: ColumnType) -> None:
 
 
 def test_add_column_invalid_duplicate_column_name_error() -> None:
-    with raises(DuplicateColumnNameError):
-        table1 = Table(pd.DataFrame(data={"col1": [1, 2, 1], "col2": [1, 2, 4]}))
+    table1 = Table.from_dict({"col1": [1, 2, 1], "col2": [1, 2, 4]})
+    with pytest.raises(DuplicateColumnNameError):
         table1 = table1.add_column(Column("col1", ["a", "b", "c"]))
 
 
 def test_add_column_invalid_column_size_error() -> None:
-    with raises(ColumnSizeError):
-        table1 = Table(pd.DataFrame(data={"col1": [1, 2, 1], "col2": [1, 2, 4]}))
+    table1 = Table.from_dict({"col1": [1, 2, 1], "col2": [1, 2, 4]})
+    with pytest.raises(ColumnSizeError):
         table1 = table1.add_column(Column("col3", ["a", "b", "c", "d"]))

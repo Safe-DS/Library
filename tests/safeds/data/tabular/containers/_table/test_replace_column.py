@@ -1,12 +1,11 @@
-import pandas as pd
 import pytest
+
 from safeds.data.tabular.containers import Column, Table
 from safeds.data.tabular.exceptions import (
     ColumnSizeError,
     DuplicateColumnNameError,
     UnknownColumnNameError,
 )
-
 from tests.helpers import resolve_resource_path
 
 
@@ -21,7 +20,7 @@ def test_replace_valid(column_name: str, path: str) -> None:
     input_table: Table = Table.from_csv_file(resolve_resource_path("test_table_replace_column_input.csv"))
     expected: Table = Table.from_csv_file(resolve_resource_path(path))
 
-    column = Column(column_name, pd.Series(["d", "e", "f"]))
+    column = Column(column_name, ["d", "e", "f"])
 
     result = input_table.replace_column("C", column)
 
@@ -43,7 +42,7 @@ def test_replace_invalid(
     error: type[Exception],
 ) -> None:
     input_table: Table = Table.from_csv_file(resolve_resource_path("test_table_replace_column_input.csv"))
-    column = Column(column_name, pd.Series(column_values))
+    column = Column(column_name, column_values)
 
     with pytest.raises(error):
         input_table.replace_column(old_column_name, column)

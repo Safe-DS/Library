@@ -27,8 +27,7 @@ class TestSortRows:
     @pytest.mark.parametrize(
         ("table", "comparator", "expected"),
         [
-            # Activate when https://github.com/Safe-DS/Stdlib/issues/75 is fixed.
-            # ),
+            # Check that it works with an empty table when https://github.com/Safe-DS/Stdlib/issues/75 is fixed.
             (
                 Table.from_dict({"col1": [3, 2, 1]}),
                 lambda row1, row2: row1["col1"] - row2["col1"],

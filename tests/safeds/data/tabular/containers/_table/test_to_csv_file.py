@@ -1,12 +1,11 @@
 from pathlib import Path
 from tempfile import NamedTemporaryFile
 
-import pandas as pd
 from safeds.data.tabular.containers import Table
 
 
 def test_to_csv_file() -> None:
-    table = Table(pd.DataFrame(data={"col1": ["col1_1"], "col2": ["col2_1"]}))
+    table = Table.from_dict({"col1": ["col1_1"], "col2": ["col2_1"]})
     with NamedTemporaryFile() as tmp_table_file:
         tmp_table_file.close()
         with Path(tmp_table_file.name).open("w", encoding="utf-8") as tmp_file:
