@@ -854,7 +854,7 @@ class Table:
     def sort_columns(
         self,
         comparator: Callable[[Column, Column], int] = lambda col1, col2: (col1.name > col2.name)
-        - (col1.name < col2.name),
+                                                                         - (col1.name < col2.name),
     ) -> Table:
         """
         Sort the columns of a `Table` with the given comparator and return a new `Table`.
@@ -1190,3 +1190,40 @@ class Table:
 
         with pd.option_context("display.max_rows", tmp.shape[0], "display.max_columns", tmp.shape[1]):
             return display(tmp)
+
+    # ------------------------------------------------------------------------------------------------------------------
+    # Dataframe interchange protocol
+    # ------------------------------------------------------------------------------------------------------------------
+
+    def __dataframe__(self, nan_as_null: bool = False, allow_copy: bool = True):
+        """
+        Returns a DataFrame exchange object that conforms to the dataframe interchange protocol.
+
+        Generally, there is no reason to call this method directly. The dataframe interchange protocol is designed to
+        allow libraries to consume tabular data from different sources, such as `pandas` or `polars`. If you still
+        decide to call this method, you should not rely on any capabilities of the returned object beyond the dataframe
+        interchange protocol.
+
+        Parameters
+        ----------
+        nan_as_null : bool
+            Whether to replace missing values in the data with `NaN`.
+        allow_copy : bool
+            Whether memory may be copied to create the DataFrame exchange object.
+
+        Returns
+        -------
+        dataframe
+            A DataFrame object that conforms to the dataframe interchange protocol.
+
+        Notes
+        -----
+        The specification of the dataframe interchange protocol can be found at
+        https://github.com/data-apis/dataframe-api.
+        """
+        if not allow_copy:
+            raise NotImplementedError("For the moment we need to copy the data, so `allow_copy` must be True.")
+
+        data_copy = self._data.copy()
+        data_copy.columns = self.get_column_names()
+        return data_copy.__dataframe__(nan_as_null, allow_copy)
