@@ -1195,9 +1195,9 @@ class Table:
     # Dataframe interchange protocol
     # ------------------------------------------------------------------------------------------------------------------
 
-    def __dataframe__(self, nan_as_null: bool = False, allow_copy: bool = True):
+    def __dataframe__(self, nan_as_null: bool = False, allow_copy: bool = True):  # type: ignore[no-untyped-def]
         """
-        Returns a DataFrame exchange object that conforms to the dataframe interchange protocol.
+        Return a DataFrame exchange object that conforms to the dataframe interchange protocol.
 
         Generally, there is no reason to call this method directly. The dataframe interchange protocol is designed to
         allow libraries to consume tabular data from different sources, such as `pandas` or `polars`. If you still
