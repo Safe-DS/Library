@@ -105,13 +105,13 @@ class TestFitAndTransform:
                     },
                 ),
                 ["col1"],
-                Table.from_columns(
-                    [
-                        Column("col1_a", [1.0, 0.0, 0.0, 0.0]),
-                        Column("col1_b", [0.0, 1.0, 1.0, 0.0]),
-                        Column("col1_c", [0.0, 0.0, 0.0, 1.0]),
-                        Column("col2", ["a", "b", "b", "c"]),
-                    ],
+                Table.from_dict(
+                    {
+                        "col1_a": [1.0, 0.0, 0.0, 0.0],
+                        "col1_b": [0.0, 1.0, 1.0, 0.0],
+                        "col1_c": [0.0, 0.0, 0.0, 1.0],
+                        "col2": ["a", "b", "b", "c"],
+                    },
                 ),
             ),
         ],
@@ -194,12 +194,12 @@ class TestInverseTransform:
             transformer.inverse_transform(table)
 
     def test_inverse_transform_not_complete_table(self) -> None:
-        table = Table.from_columns(
-            [
-                Column("a", [1.0, 0.0, 0.0, 0.0]),
-                Column("b", [0.0, 1.0, 1.0, 0.0]),
-                Column("c", [0.0, 0.0, 0.0, 1.0]),
-            ],
+        table = Table.from_dict(
+            {
+                "a": [1.0, 0.0, 0.0, 0.0],
+                "b": [0.0, 1.0, 1.0, 0.0],
+                "c": [0.0, 0.0, 0.0, 1.0],
+            },
         )
         transformer = OneHotEncoder().fit(table, ["b"])
         inverse_transformed_table = transformer.inverse_transform(transformer.transform(table))
@@ -207,12 +207,12 @@ class TestInverseTransform:
         assert table == inverse_transformed_table
 
     def test_inverse_transform_different_order(self) -> None:
-        table = Table.from_columns(
-            [
-                Column("c", [0.0, 0.0, 0.0, 1.0]),
-                Column("b", [0.0, 1.0, 1.0, 0.0]),
-                Column("a", [1.0, 0.0, 0.0, 0.0]),
-            ],
+        table = Table.from_dict(
+            {
+                "c": [0.0, 0.0, 0.0, 1.0],
+                "b": [0.0, 1.0, 1.0, 0.0],
+                "a": [1.0, 0.0, 0.0, 0.0],
+            },
         )
         table_different_order = table.sort_columns()
         transformer = OneHotEncoder().fit(table, ["b"])
