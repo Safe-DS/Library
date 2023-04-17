@@ -60,25 +60,25 @@ def regressors() -> list[Regressor]:
 
 @pytest.fixture()
 def valid_data() -> TaggedTable:
-    return Table.from_columns(
-        [
-            Column("id", [1, 4]),
-            Column("feat1", [2, 5]),
-            Column("feat2", [3, 6]),
-            Column("target", [0, 1]),
-        ],
+    return Table.from_dict(
+        {
+            "id": [1, 4],
+            "feat1": [2, 5],
+            "feat2": [3, 6],
+            "target": [0, 1],
+        },
     ).tag_columns(target_name="target", feature_names=["feat1", "feat2"])
 
 
 @pytest.fixture()
 def invalid_data() -> TaggedTable:
-    return Table.from_columns(
-        [
-            Column("id", [1, 4]),
-            Column("feat1", ["a", 5]),
-            Column("feat2", [3, 6]),
-            Column("target", [0, 1]),
-        ],
+    return Table.from_dict(
+        {
+            "id": [1, 4],
+            "feat1": ["a", 5],
+            "feat2": [3, 6],
+            "target": [0, 1],
+        },
     ).tag_columns(target_name="target", feature_names=["feat1", "feat2"])
 
 
@@ -201,11 +201,12 @@ class TestMeanAbsoluteError:
         ],
     )
     def test_valid_data(self, predicted: list[float], expected: list[float], result: float) -> None:
-        predicted_column = Column("predicted", predicted)
-        expected_column = Column("expected", expected)
-        table = Table.from_columns([predicted_column, expected_column]).tag_columns(
-            target_name="expected",
-        )
+        table = Table.from_dict(
+            {
+                "predicted": predicted,
+                "expected": expected,
+            }
+        ).tag_columns(target_name="expected",)
 
         assert DummyRegressor().mean_absolute_error(table) == result
 
@@ -216,11 +217,12 @@ class TestMeanSquaredError:
         [([1, 2], [1, 2], 0), ([0, 0], [1, 1], 1), ([1, 1, 1], [2, 2, 11], 34)],
     )
     def test_valid_data(self, predicted: list[float], expected: list[float], result: float) -> None:
-        predicted_column = Column("predicted", predicted)
-        expected_column = Column("expected", expected)
-        table = Table.from_columns([predicted_column, expected_column]).tag_columns(
-            target_name="expected",
-        )
+        table = Table.from_dict(
+            {
+                "predicted": predicted,
+                "expected": expected
+            }
+        ).tag_columns(target_name="expected",)
 
         assert DummyRegressor().mean_squared_error(table) == result
 
