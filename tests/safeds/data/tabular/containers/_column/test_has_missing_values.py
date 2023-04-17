@@ -1,5 +1,3 @@
-import numpy as np
-import pandas as pd
 import pytest
 from safeds.data.tabular.containers import Column
 
@@ -15,7 +13,7 @@ from safeds.data.tabular.containers import Column
 )
 def test_has_missing_values(values: list, expected: bool) -> None:
     if len(values) == 0:
-        column = Column("A", pd.Series(values, dtype=np.dtype("float64")))
+        column = Column("A", values)
     else:
-        column = Column("A", pd.Series(values))
+        column = Column("A", values)
     assert column.has_missing_values() == expected

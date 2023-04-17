@@ -1,4 +1,3 @@
-import pandas as pd
 import pytest
 from safeds.data.tabular.containers import Column, Table
 
@@ -13,6 +12,6 @@ def test_to_columns(values: list[int], name: str, index: int) -> None:
     table = Table.from_csv_file(resolve_resource_path("test_column_table.csv"))
     columns_list: list[Column] = table.to_columns()
 
-    column_expected: Column = Column(name, pd.Series(values, name=name))
+    column_expected: Column = Column(name, values)
 
     assert column_expected == columns_list[index]

@@ -2,9 +2,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-import pandas as pd
 import pytest
-from safeds.data.tabular.containers import Column, Table, TaggedTable
+from safeds.data.tabular.containers import Table, TaggedTable
 from safeds.ml.classification import (
     AdaBoost,
     Classifier,
@@ -43,25 +42,25 @@ def classifiers() -> list[Classifier]:
 
 @pytest.fixture()
 def valid_data() -> TaggedTable:
-    return Table.from_columns(
-        [
-            Column("id", [1, 4]),
-            Column("feat1", [2, 5]),
-            Column("feat2", [3, 6]),
-            Column("target", [0, 1]),
-        ],
+    return Table.from_dict(
+        {
+            "id": [1, 4],
+            "feat1": [2, 5],
+            "feat2": [3, 6],
+            "target": [0, 1],
+        },
     ).tag_columns(target_name="target", feature_names=["feat1", "feat2"])
 
 
 @pytest.fixture()
 def invalid_data() -> TaggedTable:
-    return Table.from_columns(
-        [
-            Column("id", [1, 4]),
-            Column("feat1", ["a", 5]),
-            Column("feat2", [3, 6]),
-            Column("target", [0, 1]),
-        ],
+    return Table.from_dict(
+        {
+            "id": [1, 4],
+            "feat1": ["a", 5],
+            "feat2": [3, 6],
+            "target": [0, 1],
+        },
     ).tag_columns(target_name="target", feature_names=["feat1", "feat2"])
 
 
@@ -174,15 +173,21 @@ class DummyClassifier(Classifier):
 
 class TestAccuracy:
     def test_with_same_type(self) -> None:
-        c1 = Column("predicted", [1, 2, 3, 4])
-        c2 = Column("expected", [1, 2, 3, 3])
-        table = Table.from_columns([c1, c2]).tag_columns(target_name="expected")
+        table = Table.from_dict(
+            {
+                "predicted": [1, 2, 3, 4],
+                "expected": [1, 2, 3, 3],
+            },
+        ).tag_columns(target_name="expected")
 
         assert DummyClassifier().accuracy(table) == 0.75
 
     def test_with_different_types(self) -> None:
-        c1 = Column("predicted", pd.Series(data=["1", "2", "3", "4"]))
-        c2 = Column("expected", pd.Series(data=[1, 2, 3, 3]))
-        table = Table.from_columns([c1, c2]).tag_columns(target_name="expected")
+        table = Table.from_dict(
+            {
+                "predicted": ["1", "2", "3", "4"],
+                "expected": [1, 2, 3, 3],
+            },
+        ).tag_columns(target_name="expected")
 
         assert DummyClassifier().accuracy(table) == 0.0

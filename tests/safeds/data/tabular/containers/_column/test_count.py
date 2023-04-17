@@ -1,6 +1,12 @@
+import pytest
 from safeds.data.tabular.containers import Column
 
 
-def test_count_valid() -> None:
-    column = Column("col1", [1, 2, 3, 4, 5])
-    assert column.count() == 5
+@pytest.mark.parametrize(
+    ("column", "expected"),
+    [
+        (Column("col1", [1, 2, 3, 4, 5]), 5),
+    ],
+)
+def test_count_valid(column: Column, expected: int) -> None:
+    assert column.count() == expected

@@ -1,4 +1,3 @@
-import pandas as pd
 from safeds.data.tabular.containers import Row, Table
 from safeds.data.tabular.typing import Integer, Schema, String
 
@@ -15,9 +14,9 @@ def test_to_rows() -> None:
         },
     )
     rows_expected: list[Row] = [
-        Row(pd.Series([1, 4, "d"], index=["A", "B", "D"], name=0), expected_schema),
-        Row(pd.Series([2, 5, "e"], index=["A", "B", "D"], name=0), expected_schema),
-        Row(pd.Series([3, 6, "f"], index=["A", "B", "D"], name=0), expected_schema),
+        Row([1, 4, "d"], expected_schema),
+        Row([2, 5, "e"], expected_schema),
+        Row([3, 6, "f"], expected_schema),
     ]
 
     rows_is: list[Row] = table.to_rows()
