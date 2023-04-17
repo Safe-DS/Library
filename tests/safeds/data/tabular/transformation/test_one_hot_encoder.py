@@ -134,11 +134,7 @@ class TestFitAndTransform:
                 ),
             ),
         ],
-        ids=[
-            "all columns",
-            "one column",
-            "multiple columns"
-        ]
+        ids=["all columns", "one column", "multiple columns"],
     )
     def test_should_return_transformed_table(
         self,
@@ -185,7 +181,7 @@ class TestInverseTransform:
                         "b": ["a", "b", "b", "c"],
                         "c": [0.0, 0.0, 0.0, 1.0],
                     },
-                )
+                ),
             ),
             (
                 Table.from_dict(
@@ -202,7 +198,7 @@ class TestInverseTransform:
                         "b": ["a", "b", "b", "c"],
                         "a": [1.0, 0.0, 0.0, 0.0],
                     },
-                )
+                ),
             ),
             (
                 Table.from_dict(
@@ -219,7 +215,7 @@ class TestInverseTransform:
                         "b": ["a", "b", "b", "c"],
                         "bb": ["a", "b", "b", "c"],
                     },
-                )
+                ),
             ),
         ],
         ids=[
