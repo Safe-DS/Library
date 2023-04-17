@@ -113,6 +113,42 @@ class Table:
             raise FileNotFoundError(f'File "{path}" does not exist') from exception
 
     @staticmethod
+    def from_dict(data: dict[str, list[Any]]) -> Table:
+        """
+        Create a table from a dictionary that maps column names to column values.
+
+        Parameters
+        ----------
+        data : dict[str, list[Any]]
+            The data.
+
+        Returns
+        -------
+        table : Table
+            The generated table.
+
+        Raises
+        ------
+        ColumnLengthMismatchError
+            If columns have different lengths.
+        """
+        # Validation
+        expected_length: int | None = None
+        for column_values in data.values():
+            if expected_length is None:
+                expected_length = len(column_values)
+            elif len(column_values) != expected_length:
+                raise ColumnLengthMismatchError(
+                    "\n".join(f"{column_name}: {len(column_values)}" for column_name, column_values in data.items()),
+                )
+
+        # Implementation
+        dataframe: DataFrame = pd.DataFrame()
+        for column_name, column_values in data.items():
+            dataframe[column_name] = column_values
+        return Table(dataframe)
+
+    @staticmethod
     def from_columns(columns: list[Column]) -> Table:
         """
         Return a table created from a list of columns.
@@ -137,7 +173,7 @@ class Table:
         for column in columns:
             if column._data.size != columns[0]._data.size:
                 raise ColumnLengthMismatchError(
-                    "\n".join([f"{column.name}: {column._data.size}" for column in columns]),
+                    "\n".join(f"{column.name}: {column._data.size}" for column in columns),
                 )
             dataframe[column.name] = column._data
 
@@ -1102,6 +1138,17 @@ class Table:
         data_to_json = self._data.copy()
         data_to_json.columns = self._schema.get_column_names()
         data_to_json.to_json(path)
+
+    def to_dict(self) -> dict[str, list[Any]]:
+        """
+        Return a dictionary that maps column names to column values.
+
+        Returns
+        -------
+        data : dict[str, list[Any]]
+            Dictionary representation of the table.
+        """
+        return {column_name: list(self.get_column(column_name)) for column_name in self.get_column_names()}
 
     def to_columns(self) -> list[Column]:
         """

@@ -1,3 +1,6 @@
+from __future__ import annotations
+
+
 class UnknownColumnNameError(KeyError):
     """
     Exception raised for trying to access an invalid column name.
