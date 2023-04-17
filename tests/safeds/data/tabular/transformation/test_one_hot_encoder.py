@@ -201,7 +201,10 @@ class TestInverseTransform:
         ],
     )
     def test_should_return_original_table(
-        self, table_to_fit: Table, table_to_transform: Table, column_names: list[str],
+        self,
+        table_to_fit: Table,
+        table_to_transform: Table,
+        column_names: list[str],
     ) -> None:
         transformer = OneHotEncoder().fit(table_to_fit, column_names)
 
