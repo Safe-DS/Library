@@ -157,7 +157,7 @@ class TestInverseTransform:
                         "col1": ["a", "b", "b", "c"],
                     },
                 ),
-                None
+                None,
             ),
             (
                 Table.from_dict(
@@ -197,14 +197,11 @@ class TestInverseTransform:
         ids=[
             "one column",
             "same table to fit and transform (issue #109)",
-            "different tables to fit and transform (issue #109)"
-        ]
+            "different tables to fit and transform (issue #109)",
+        ],
     )
     def test_should_return_original_table(
-        self,
-        table_to_fit: Table,
-        table_to_transform: Table,
-        column_names: list[str]
+        self, table_to_fit: Table, table_to_transform: Table, column_names: list[str],
     ) -> None:
         transformer = OneHotEncoder().fit(table_to_fit, column_names)
 
