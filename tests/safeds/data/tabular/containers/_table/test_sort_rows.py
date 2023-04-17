@@ -1,19 +1,19 @@
 from collections.abc import Callable
 
 import pytest
-from safeds.data.tabular.containers import Column, Row, Table
+
+from safeds.data.tabular.containers import Row, Table
 
 
 class TestSortRows:
     @pytest.mark.parametrize(
         ("table", "comparator", "expected"),
         [
-            # Activate when https://github.com/Safe-DS/Stdlib/issues/75 is fixed.
-            # ),
+            # Check that it works with an empty table when https://github.com/Safe-DS/Stdlib/issues/75 is fixed.
             (
-                Table.from_columns([Column("col1", [3, 2, 1])]),
+                Table.from_dict({"col1": [3, 2, 1]}),
                 lambda row1, row2: row1["col1"] - row2["col1"],
-                Table.from_columns([Column("col1", [1, 2, 3])]),
+                Table.from_dict({"col1": [1, 2, 3]}),
             ),
         ],
     )
@@ -31,9 +31,9 @@ class TestSortRows:
             # Activate when https://github.com/Safe-DS/Stdlib/issues/75 is fixed.
             # ),
             (
-                Table.from_columns([Column("col1", [3, 2, 1])]),
+                Table.from_dict({"col1": [3, 2, 1]}),
                 lambda row1, row2: row1["col1"] - row2["col1"],
-                Table.from_columns([Column("col1", [3, 2, 1])]),
+                Table.from_dict({"col1": [3, 2, 1]}),
             ),
         ],
     )
