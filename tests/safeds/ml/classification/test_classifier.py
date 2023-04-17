@@ -3,7 +3,6 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 import pytest
-
 from safeds.data.tabular.containers import Table, TaggedTable
 from safeds.ml.classification import (
     AdaBoost,
@@ -178,7 +177,7 @@ class TestAccuracy:
             {
                 "predicted": [1, 2, 3, 4],
                 "expected": [1, 2, 3, 3],
-            }
+            },
         ).tag_columns(target_name="expected")
 
         assert DummyClassifier().accuracy(table) == 0.75
@@ -188,8 +187,7 @@ class TestAccuracy:
             {
                 "predicted": ["1", "2", "3", "4"],
                 "expected": [1, 2, 3, 3],
-            }
-        ).tag_columns(
-            target_name="expected")
+            },
+        ).tag_columns(target_name="expected")
 
         assert DummyClassifier().accuracy(table) == 0.0

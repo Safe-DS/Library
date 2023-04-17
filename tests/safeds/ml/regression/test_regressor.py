@@ -205,8 +205,10 @@ class TestMeanAbsoluteError:
             {
                 "predicted": predicted,
                 "expected": expected,
-            }
-        ).tag_columns(target_name="expected",)
+            },
+        ).tag_columns(
+            target_name="expected",
+        )
 
         assert DummyRegressor().mean_absolute_error(table) == result
 
@@ -217,12 +219,9 @@ class TestMeanSquaredError:
         [([1, 2], [1, 2], 0), ([0, 0], [1, 1], 1), ([1, 1, 1], [2, 2, 11], 34)],
     )
     def test_valid_data(self, predicted: list[float], expected: list[float], result: float) -> None:
-        table = Table.from_dict(
-            {
-                "predicted": predicted,
-                "expected": expected
-            }
-        ).tag_columns(target_name="expected",)
+        table = Table.from_dict({"predicted": predicted, "expected": expected}).tag_columns(
+            target_name="expected",
+        )
 
         assert DummyRegressor().mean_squared_error(table) == result
 
