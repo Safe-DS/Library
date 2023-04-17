@@ -49,7 +49,9 @@ class OneHotEncoder(InvertibleTableTransformer):
 
         result = OneHotEncoder()
         result._wrapped_transformer = wrapped_transformer
-        result._column_names = {column:[column + "_" + element for element in table.get_column(column)] for column in column_names}
+        result._column_names = {
+            column: [column + "_" + element for element in table.get_column(column)] for column in column_names
+        }
 
         return result
 
@@ -85,7 +87,9 @@ class OneHotEncoder(InvertibleTableTransformer):
         original = table._data.copy()
         original.columns = table.schema.get_column_names()
 
-        one_hot_encoded = pd.DataFrame(self._wrapped_transformer.transform(original[self._column_names.keys()]).toarray())
+        one_hot_encoded = pd.DataFrame(
+            self._wrapped_transformer.transform(original[self._column_names.keys()]).toarray(),
+        )
         one_hot_encoded.columns = self._wrapped_transformer.get_feature_names_out()
 
         unchanged = original.drop(self._column_names.keys(), axis=1)
@@ -140,7 +144,18 @@ class OneHotEncoder(InvertibleTableTransformer):
         unchanged = data.drop(self._wrapped_transformer.get_feature_names_out(), axis=1)
 
         res = Table(pd.concat([unchanged, decoded], axis=1))
-        column_names = [name if name not in [value for value_list in list(self._column_names.values()) for value in value_list] else list(self._column_names.keys())[[list(self._column_names.values()).index(value) for value in list(self._column_names.values()) if name in value][0]] for name in transformed_table.get_column_names()]
+        column_names = [
+            name
+            if name not in [value for value_list in list(self._column_names.values()) for value in value_list]
+            else list(self._column_names.keys())[
+                [
+                    list(self._column_names.values()).index(value)
+                    for value in list(self._column_names.values())
+                    if name in value
+                ][0]
+            ]
+            for name in transformed_table.get_column_names()
+        ]
         res = res.sort_columns(lambda col1, col2: column_names.index(col1.name) - column_names.index(col2.name))
 
         return res
