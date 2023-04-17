@@ -132,7 +132,6 @@ class Table:
         ColumnLengthMismatchError
             If columns have different lengths.
         """
-
         # Validation
         expected_length: int | None = None
         for column_values in data.values():
@@ -855,7 +854,7 @@ class Table:
     def sort_columns(
         self,
         comparator: Callable[[Column, Column], int] = lambda col1, col2: (col1.name > col2.name)
-                                                                         - (col1.name < col2.name),
+        - (col1.name < col2.name),
     ) -> Table:
         """
         Sort the columns of a `Table` with the given comparator and return a new `Table`.
@@ -1149,10 +1148,7 @@ class Table:
         data : dict[str, list[Any]]
             Dictionary representation of the table.
         """
-        return {
-            column_name: list(self.get_column(column_name))
-            for column_name in self.get_column_names()
-        }
+        return {column_name: list(self.get_column(column_name)) for column_name in self.get_column_names()}
 
     def to_columns(self) -> list[Column]:
         """
