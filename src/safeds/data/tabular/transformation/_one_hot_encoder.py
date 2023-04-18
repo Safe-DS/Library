@@ -50,7 +50,7 @@ class OneHotEncoder(InvertibleTableTransformer):
         result = OneHotEncoder()
         result._wrapped_transformer = wrapped_transformer
         result._column_names = {
-            column: [column + "_" + element for element in table.get_column(column)] for column in column_names
+            column: [f"{column}_{element}" for element in table.get_column(column)] for column in column_names
         }
 
         return result
