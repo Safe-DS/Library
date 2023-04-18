@@ -234,10 +234,11 @@ class TestInverseTransform:
 
         result = transformer.inverse_transform(transformer.transform(table_to_transform))
 
+        # This checks whether the columns are in the same order
+        assert result.get_column_names() == table_to_transform.get_column_names()
         # This is subsumed by the next assertion, but we get a better error message
         assert result.schema == table_to_transform.schema
         assert result == table_to_transform
-        assert result.get_column_names() == table_to_transform.get_column_names()
 
     def test_should_not_change_transformed_table(self) -> None:
         table = Table.from_dict(
