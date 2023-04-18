@@ -1,13 +1,23 @@
 import pytest
+
 from safeds.data.tabular.containers import Column, Table
 from safeds.data.tabular.exceptions import ColumnSizeError, DuplicateColumnNameError
 
-from tests.helpers import resolve_resource_path
-
 
 def test_table_add_column_valid() -> None:
-    input_table = Table.from_csv_file(resolve_resource_path("test_table_add_column_valid_input.csv"))
-    expected = Table.from_csv_file(resolve_resource_path("test_table_add_column_valid_output.csv"))
+    input_table = Table.from_dict(
+        {
+            "A": [1, 3, 5],
+            "B": [2, 4, 6],
+        }
+    )
+    expected = Table.from_dict(
+        {
+            "A": [1, 3, 5],
+            "B": [2, 4, 6],
+            "C": ["a", "b", "c"],
+        }
+    )
     column = Column("C", ["a", "b", "c"])
 
     result = input_table.add_column(column)
@@ -22,7 +32,12 @@ def test_table_add_column_valid() -> None:
     ],
 )
 def test_table_add_column_(column_values: list[str], column_name: str, error: type[Exception]) -> None:
-    input_table = Table.from_csv_file(resolve_resource_path("test_table_add_column_valid_input.csv"))
+    input_table = Table.from_dict(
+        {
+            "A": [1, 3, 5],
+            "B": [2, 4, 6],
+        }
+    )
     column = Column(column_name, column_values)
 
     with pytest.raises(error):

@@ -5,6 +5,11 @@ from tests.helpers import resolve_resource_path
 
 
 def test_get_type_of_column() -> None:
-    table = Table.from_json_file(resolve_resource_path("test_schema_table.json"))
+    table = Table.from_dict(
+        {
+            "A": [1],
+            "B": [2]
+        }
+    )
     table_column_type = table.schema.get_type_of_column("A")
     assert table_column_type == Integer()
