@@ -1,8 +1,11 @@
-from polars import PolarsDataType, INTEGER_DTYPES as POLARS_INTEGER_DTYPES, FLOAT_DTYPES as POLARS_FLOAT_DTYPES
-from polars.datatypes import Boolean as PolarsBoolean, Decimal as PolarsDecimal, Utf8 as PolarsUtf8
-
 import numpy as np
 import pytest
+from polars import FLOAT_DTYPES as POLARS_FLOAT_DTYPES
+from polars import INTEGER_DTYPES as POLARS_INTEGER_DTYPES
+from polars import PolarsDataType
+from polars.datatypes import Boolean as PolarsBoolean
+from polars.datatypes import Decimal as PolarsDecimal
+from polars.datatypes import Utf8 as PolarsUtf8
 from safeds.data.tabular.typing import (
     Anything,
     Boolean,
@@ -110,20 +113,11 @@ class TestColumnType:
         [
             # Boolean
             (PolarsBoolean, Boolean()),
-
             # Float
-            *(
-                (data_type, RealNumber())
-                for data_type in POLARS_FLOAT_DTYPES
-            ),
+            *((data_type, RealNumber()) for data_type in POLARS_FLOAT_DTYPES),
             (PolarsDecimal, RealNumber()),
-
             # Int
-            *(
-                (data_type, Integer())
-                for data_type in POLARS_INTEGER_DTYPES
-            ),
-
+            *((data_type, Integer()) for data_type in POLARS_INTEGER_DTYPES),
             # String
             (PolarsUtf8, String()),
         ],
