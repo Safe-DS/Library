@@ -5,7 +5,7 @@ from tests.helpers import resolve_resource_path
 
 
 def test_from_json_file_valid() -> None:
-    table = Table.from_json_file(resolve_resource_path("test_table_from_json_file.json"))
+    table = Table.from_json_file(resolve_resource_path("table.json"))
     assert table.get_column("A").get_value(0) == 1
     assert table.get_column("B").get_value(0) == 2
 

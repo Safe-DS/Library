@@ -6,24 +6,50 @@ from safeds.data.tabular.exceptions import (
     UnknownColumnNameError,
 )
 
-from tests.helpers import resolve_resource_path
-
 
 @pytest.mark.parametrize(
-    ("column_name", "path"),
+    ("table", "column_name", "column", "expected"),
     [
-        ("C", "test_table_replace_column_output_different_name.csv"),
-        ("D", "test_table_replace_column_output_same_name.csv"),
+        (
+            Table.from_dict(
+                {
+                    "A": [1, 2, 3],
+                    "B": [4, 5, 6],
+                    "C": ["a", "b", "c"],
+                },
+            ),
+            "C",
+            Column("C", ["d", "e", "f"]),
+            Table.from_dict(
+                {
+                    "A": [1, 2, 3],
+                    "B": [4, 5, 6],
+                    "C": ["d", "e", "f"],
+                },
+            ),
+        ),
+        (
+            Table.from_dict(
+                {
+                    "A": [1, 2, 3],
+                    "B": [4, 5, 6],
+                    "C": ["a", "b", "c"],
+                },
+            ),
+            "C",
+            Column("D", ["d", "e", "f"]),
+            Table.from_dict(
+                {
+                    "A": [1, 2, 3],
+                    "B": [4, 5, 6],
+                    "D": ["d", "e", "f"],
+                },
+            ),
+        ),
     ],
 )
-def test_replace_valid(column_name: str, path: str) -> None:
-    input_table: Table = Table.from_csv_file(resolve_resource_path("test_table_replace_column_input.csv"))
-    expected: Table = Table.from_csv_file(resolve_resource_path(path))
-
-    column = Column(column_name, ["d", "e", "f"])
-
-    result = input_table.replace_column("C", column)
-
+def test_replace_valid(table: Table, column_name: str, column: Column, expected: Table) -> None:
+    result = table.replace_column(column_name, column)
     assert result == expected
 
 
@@ -41,7 +67,13 @@ def test_replace_invalid(
     column_name: str,
     error: type[Exception],
 ) -> None:
-    input_table: Table = Table.from_csv_file(resolve_resource_path("test_table_replace_column_input.csv"))
+    input_table: Table = Table.from_dict(
+        {
+            "A": [1, 2, 3],
+            "B": [4, 5, 6],
+            "C": ["a", "b", "c"],
+        },
+    )
     column = Column(column_name, column_values)
 
     with pytest.raises(error):

@@ -1,11 +1,9 @@
 from safeds.data.tabular.containers import Table
 from safeds.data.tabular.typing import Integer, RealNumber, Schema
 
-from tests.helpers import resolve_resource_path
-
 
 def test_table_equals_valid() -> None:
-    table = Table.from_json_file(resolve_resource_path("test_schema_table.json"))
+    table = Table.from_dict({"A": [1], "B": [2]})
     schema_expected = Schema(
         {
             "A": Integer(),
@@ -17,7 +15,7 @@ def test_table_equals_valid() -> None:
 
 
 def test_table_equals_invalid() -> None:
-    table = Table.from_json_file(resolve_resource_path("test_schema_table.json"))
+    table = Table.from_dict({"A": [1], "B": [2]})
     schema_not_expected = Schema(
         {
             "A": RealNumber(),
