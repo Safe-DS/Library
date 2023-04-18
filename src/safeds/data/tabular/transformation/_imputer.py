@@ -118,11 +118,9 @@ class Imputer(TableTransformer):
                 if len(table.get_column(name).mode()) > 1:
                     raise IndexError("There are multiple most frequent values in a column given for the Imputer")
 
-        indices = [table.schema._get_column_index_by_name(name) for name in column_names]
-
         wrapped_transformer = sk_SimpleImputer()
         self._strategy._augment_imputer(wrapped_transformer)
-        wrapped_transformer.fit(table._data[indices])
+        wrapped_transformer.fit(table._data[column_names])
 
         result = Imputer(self._strategy)
         result._wrapped_transformer = wrapped_transformer
@@ -160,8 +158,10 @@ class Imputer(TableTransformer):
             raise UnknownColumnNameError(list(missing_columns))
 
         data = table._data.copy()
-        indices = [table.schema._get_column_index_by_name(name) for name in self._column_names]
-        data[indices] = pd.DataFrame(self._wrapped_transformer.transform(data[indices]), columns=indices)
+        data[self._column_names] = pd.DataFrame(
+            self._wrapped_transformer.transform(data[self._column_names]),
+            columns=self._column_names
+        )
         return Table(data, table.schema)
 
     def is_fitted(self) -> bool:

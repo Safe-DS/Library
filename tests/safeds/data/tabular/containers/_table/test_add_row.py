@@ -10,7 +10,7 @@ def test_add_row_valid() -> None:
     table1 = table1.add_row(row)
     assert table1.count_rows() == 4
     assert table1.get_row(3) == row
-    assert table1.schema == row.schema
+    assert table1.schema == row._schema
 
 
 def test_add_row_invalid() -> None:

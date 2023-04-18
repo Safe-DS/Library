@@ -9,8 +9,8 @@ def test_add_rows_valid() -> None:
     assert table1.count_rows() == 5
     assert table1.get_row(3) == row1
     assert table1.get_row(4) == row2
-    assert table1.schema == row1.schema
-    assert table1.schema == row2.schema
+    assert table1.schema == row1._schema
+    assert table1.schema == row2._schema
 
 
 def test_add_rows_table_valid() -> None:
@@ -22,5 +22,5 @@ def test_add_rows_table_valid() -> None:
     assert table1.count_rows() == 5
     assert table1.get_row(3) == row1
     assert table1.get_row(4) == row2
-    assert table1.schema == row1.schema
-    assert table1.schema == row2.schema
+    assert table1.schema == row1._schema
+    assert table1.schema == row2._schema
