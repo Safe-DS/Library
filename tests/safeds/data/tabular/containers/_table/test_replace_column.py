@@ -6,8 +6,6 @@ from safeds.data.tabular.exceptions import (
     UnknownColumnNameError,
 )
 
-from tests.helpers import resolve_resource_path
-
 
 @pytest.mark.parametrize(
     ("table", "column_name", "column", "expected"),
@@ -18,7 +16,7 @@ from tests.helpers import resolve_resource_path
                     "A": [1, 2, 3],
                     "B": [4, 5, 6],
                     "C": ["a", "b", "c"],
-                }
+                },
             ),
             "C",
             Column("C", ["d", "e", "f"]),
@@ -27,8 +25,8 @@ from tests.helpers import resolve_resource_path
                     "A": [1, 2, 3],
                     "B": [4, 5, 6],
                     "C": ["d", "e", "f"],
-                }
-            )
+                },
+            ),
         ),
         (
             Table.from_dict(
@@ -36,7 +34,7 @@ from tests.helpers import resolve_resource_path
                     "A": [1, 2, 3],
                     "B": [4, 5, 6],
                     "C": ["a", "b", "c"],
-                }
+                },
             ),
             "C",
             Column("D", ["d", "e", "f"]),
@@ -45,8 +43,8 @@ from tests.helpers import resolve_resource_path
                     "A": [1, 2, 3],
                     "B": [4, 5, 6],
                     "D": ["d", "e", "f"],
-                }
-            )
+                },
+            ),
         ),
     ],
 )
@@ -74,7 +72,7 @@ def test_replace_invalid(
             "A": [1, 2, 3],
             "B": [4, 5, 6],
             "C": ["a", "b", "c"],
-        }
+        },
     )
     column = Column(column_name, column_values)
 

@@ -1,7 +1,5 @@
 import pytest
-
 from safeds.data.tabular.containers import Table
-from tests.helpers import resolve_resource_path
 
 
 @pytest.mark.parametrize(
@@ -12,18 +10,18 @@ from tests.helpers import resolve_resource_path
                 {
                     "A": [1, 1, 1, 4],
                     "B": [2, 2, 2, 5],
-                }
+                },
             ),
-            Table.from_dict({"A": [1, 4], "B": [2, 5]})
+            Table.from_dict({"A": [1, 4], "B": [2, 5]}),
         ),
         (
             Table.from_dict(
                 {
                     "A": [1, 4],
                     "B": [2, 5],
-                }
+                },
             ),
-            Table.from_dict({"A": [1, 4], "B": [2, 5]})
+            Table.from_dict({"A": [1, 4], "B": [2, 5]}),
         ),
     ],
 )

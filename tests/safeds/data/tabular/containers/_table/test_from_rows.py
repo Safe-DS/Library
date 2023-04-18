@@ -1,5 +1,4 @@
 import pytest
-
 from safeds.data.tabular.containers import Table
 from safeds.data.tabular.exceptions import MissingDataError
 
@@ -10,7 +9,7 @@ def test_from_rows() -> None:
             "A": [1, 2, 3],
             "B": [4, 5, 6],
             "D": ["d", "e", "f"],
-        }
+        },
     )
     rows_is = table_expected.to_rows()
     table_is = Table.from_rows(rows_is)

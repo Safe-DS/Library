@@ -1,8 +1,6 @@
 from safeds.data.tabular.containers import Row, Table
 from safeds.data.tabular.typing import Integer, Schema, String
 
-from tests.helpers import resolve_resource_path
-
 
 def test_to_rows() -> None:
     table = Table.from_dict(
@@ -10,7 +8,7 @@ def test_to_rows() -> None:
             "A": [1, 2, 3],
             "B": [4, 5, 6],
             "D": ["d", "e", "f"],
-        }
+        },
     )
 
     expected_schema = Schema(

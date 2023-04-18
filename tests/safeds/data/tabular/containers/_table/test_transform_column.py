@@ -1,5 +1,4 @@
 import pytest
-
 from safeds.data.tabular.containers import Table
 from safeds.data.tabular.exceptions import UnknownColumnNameError
 
@@ -10,7 +9,7 @@ def test_transform_column_valid() -> None:
             "A": [1, 2, 3],
             "B": [4, 5, 6],
             "C": ["a", "b", "c"],
-        }
+        },
     )
 
     result = input_table.transform_column("A", lambda row: row.get_value("A") * 2)
@@ -20,7 +19,7 @@ def test_transform_column_valid() -> None:
             "A": [2, 4, 6],
             "B": [4, 5, 6],
             "C": ["a", "b", "c"],
-        }
+        },
     )
 
 
@@ -30,7 +29,7 @@ def test_transform_column_invalid() -> None:
             "A": [1, 2, 3],
             "B": [4, 5, 6],
             "C": ["a", "b", "c"],
-        }
+        },
     )
 
     with pytest.raises(UnknownColumnNameError):

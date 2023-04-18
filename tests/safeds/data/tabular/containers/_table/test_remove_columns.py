@@ -2,8 +2,6 @@ import pytest
 from safeds.data.tabular.containers import Table
 from safeds.data.tabular.exceptions import UnknownColumnNameError
 
-from tests.helpers import resolve_resource_path
-
 
 def test_table_remove_columns() -> None:
     table = Table.from_dict({"A": [1], "B": [2]})

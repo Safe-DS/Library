@@ -1,5 +1,4 @@
 import pytest
-
 from safeds.data.tabular.containers import Column, Table
 from safeds.data.tabular.exceptions import ColumnSizeError, DuplicateColumnNameError
 
@@ -9,14 +8,14 @@ def test_table_add_column_valid() -> None:
         {
             "A": [1, 3, 5],
             "B": [2, 4, 6],
-        }
+        },
     )
     expected = Table.from_dict(
         {
             "A": [1, 3, 5],
             "B": [2, 4, 6],
             "C": ["a", "b", "c"],
-        }
+        },
     )
     column = Column("C", ["a", "b", "c"])
 
@@ -36,7 +35,7 @@ def test_table_add_column_(column_values: list[str], column_name: str, error: ty
         {
             "A": [1, 3, 5],
             "B": [2, 4, 6],
-        }
+        },
     )
     column = Column(column_name, column_values)
 
