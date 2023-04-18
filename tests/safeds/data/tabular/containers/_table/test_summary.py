@@ -27,7 +27,7 @@ def test_summary() -> None:
                 "1.0",
                 "4",
                 str(1.0 / 3),
-                str(table._data[0].std()),
+                str(table._data["col1"].std()),
                 str(2.0 / 3),
                 str(2.0 / 3),
                 "3",

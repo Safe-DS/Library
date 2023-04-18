@@ -204,11 +204,11 @@ class Table:
         if len(rows) == 0:
             raise MissingDataError("This function requires at least one row.")
 
-        schema_compare: Schema = rows[0].schema
+        schema_compare: Schema = rows[0]._schema
         row_array: list[Series] = []
 
         for row in rows:
-            if schema_compare != row.schema:
+            if schema_compare != row._schema:
                 raise SchemaMismatchError
             row_array.append(row._data)
 
@@ -228,7 +228,7 @@ class Table:
             self._data = pd.DataFrame(columns=self._schema.get_column_names())
 
         self._data = self._data.reset_index(drop=True)
-        self._data.columns = list(range(self.count_columns()))
+        self._data.columns = self._schema.get_column_names()
 
     def __eq__(self, other: Any) -> bool:
         if not isinstance(other, Table):
@@ -468,7 +468,7 @@ class Table:
             If the size of the column does not match the amount of rows.
 
         """
-        if self._schema.has_column(column.name):
+        if self.has_column(column.name):
             raise DuplicateColumnNameError(column.name)
 
         if column._data.size != self.count_rows():
@@ -531,8 +531,12 @@ class Table:
         """
         if self._schema != row.schema:
             raise SchemaMismatchError
-        new_df = pd.concat([self._data, row._data.to_frame().T]).infer_objects()
-        new_df.columns = self._schema.get_column_names()
+
+        row_frame = row._data.to_frame().T
+        row_frame.columns = self.get_column_names()
+
+        new_df = pd.concat([self._data, row_frame]).infer_objects()
+        new_df.columns = self.get_column_names()
         return Table(new_df)
 
     def add_rows(self, rows: list[Row] | Table) -> Table:
@@ -555,8 +559,13 @@ class Table:
         for row in rows:
             if self._schema != row.schema:
                 raise SchemaMismatchError
-        result = pd.concat([result, *[row._data.to_frame().T for row in rows]]).infer_objects()
-        result.columns = self._schema.get_column_names()
+
+        row_frames = [row._data.to_frame().T for row in rows]
+        for row_frame in row_frames:
+            row_frame.columns = self.get_column_names()
+
+        result = pd.concat([result, *row_frames]).infer_objects()
+        result.columns = self.get_column_names()
         return Table(result)
 
     def filter_rows(self, query: Callable[[Row], bool]) -> Table:
@@ -600,15 +609,13 @@ class Table:
             If any of the given columns does not exist.
         """
         invalid_columns = []
-        column_indices = []
         for name in column_names:
             if not self._schema.has_column(name):
                 invalid_columns.append(name)
-            else:
-                column_indices.append(self._schema._get_column_index_by_name(name))
         if len(invalid_columns) != 0:
             raise UnknownColumnNameError(invalid_columns)
-        transformed_data = self._data[column_indices]
+
+        transformed_data = self._data[column_names]
         transformed_data.columns = column_names
         return Table(transformed_data)
 
@@ -632,15 +639,13 @@ class Table:
             If any of the given columns does not exist.
         """
         invalid_columns = []
-        column_indices = []
         for name in column_names:
             if not self._schema.has_column(name):
                 invalid_columns.append(name)
-            else:
-                column_indices.append(self._schema._get_column_index_by_name(name))
         if len(invalid_columns) != 0:
             raise UnknownColumnNameError(invalid_columns)
-        transformed_data = self._data.drop(labels=column_indices, axis="columns")
+
+        transformed_data = self._data.drop(labels=column_names, axis="columns")
         transformed_data.columns = [name for name in self._schema.get_column_names() if name not in column_names]
         return Table(transformed_data)
 
@@ -1036,8 +1041,8 @@ class Table:
         fig = plt.figure()
         ax = sns.lineplot(
             data=self._data,
-            x=self._schema._get_column_index_by_name(x_column_name),
-            y=self._schema._get_column_index_by_name(y_column_name),
+            x=x_column_name,
+            y=y_column_name,
         )
         ax.set(xlabel=x_column_name, ylabel=y_column_name)
         ax.set_xticks(ax.get_xticks())
@@ -1083,8 +1088,8 @@ class Table:
         fig = plt.figure()
         ax = sns.scatterplot(
             data=self._data,
-            x=self._schema._get_column_index_by_name(x_column_name),
-            y=self._schema._get_column_index_by_name(y_column_name),
+            x=x_column_name,
+            y=y_column_name,
         )
         ax.set(xlabel=x_column_name, ylabel=y_column_name)
         ax.set_xticks(ax.get_xticks())

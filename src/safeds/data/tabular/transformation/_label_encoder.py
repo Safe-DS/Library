@@ -50,10 +50,8 @@ class LabelEncoder(InvertibleTableTransformer):
             if len(missing_columns) > 0:
                 raise UnknownColumnNameError(list(missing_columns))
 
-        indices = [table.schema._get_column_index_by_name(name) for name in column_names]
-
         wrapped_transformer = sk_OrdinalEncoder()
-        wrapped_transformer.fit(table._data[indices])
+        wrapped_transformer.fit(table._data[column_names])
 
         result = LabelEncoder()
         result._wrapped_transformer = wrapped_transformer
