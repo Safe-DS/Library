@@ -3,13 +3,12 @@ import pytest
 from polars import FLOAT_DTYPES as POLARS_FLOAT_DTYPES
 from polars import INTEGER_DTYPES as POLARS_INTEGER_DTYPES
 from polars import PolarsDataType
+from polars.datatypes import TEMPORAL_DTYPES as POLARS_TEMPORAL_DTYPES
 from polars.datatypes import Boolean as PolarsBoolean
 from polars.datatypes import Decimal as PolarsDecimal
-from polars.datatypes import Utf8 as PolarsUtf8
-from polars.datatypes import Unknown as PolarsUnknown
 from polars.datatypes import Object as PolarsObject
-from polars.datatypes import TEMPORAL_DTYPES as POLARS_TEMPORAL_DTYPES
-
+from polars.datatypes import Unknown as PolarsUnknown
+from polars.datatypes import Utf8 as PolarsUtf8
 from safeds.data.tabular.typing import (
     Anything,
     Boolean,
@@ -79,9 +78,7 @@ class TestFromPolarsDataType:
         ids=repr,
     )
     def test_should_create_column_type_from_polars_data_type(
-        self,
-        data_type: PolarsDataType,
-        expected: ColumnType
+        self, data_type: PolarsDataType, expected: ColumnType,
     ) -> None:
         assert ColumnType._from_polars_data_type(data_type) == expected
 
