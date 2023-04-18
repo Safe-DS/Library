@@ -69,6 +69,38 @@ class Schema:
     def __init__(self, schema: dict[str, ColumnType]):
         self._schema = dict(schema)  # Defensive copy
 
+    def __hash__(self) -> int:
+        """
+        Return a hash value for the schema.
+
+        Returns
+        -------
+        hash : int
+            The hash value.
+        """
+        column_names = self._schema.keys()
+        column_types = map(repr, self._schema.values())
+        return hash(tuple(zip(column_names, column_types, strict=True)))
+
+    def __str__(self) -> str:
+        """
+        Return a user-friendly string representation of the schema.
+
+        Returns
+        -------
+        string : str
+            The string representation.
+        """
+        match len(self._schema):
+            case 0:
+                return "{}"
+            case 1:
+                return str(self._schema)
+            case _:
+                lines = (f"    {name!r}: {type_}" for name, type_ in self._schema.items())
+                joined = ",\n".join(lines)
+                return f"{{\n{joined}\n}}"
+
     def has_column(self, column_name: str) -> bool:
         """
         Return whether the schema contains a given column.
@@ -142,22 +174,3 @@ class Schema:
             The column names.
         """
         return list(self._schema.keys())
-
-    def __str__(self) -> str:
-        """
-        Return a user-friendly string representation of the schema.
-
-        Returns
-        -------
-        string : str
-            The string representation.
-        """
-        match len(self._schema):
-            case 0:
-                return "{}"
-            case 1:
-                return str(self._schema)
-            case _:
-                lines = (f"    {name!r}: {type_}" for name, type_ in self._schema.items())
-                joined = ",\n".join(lines)
-                return f"{{\n{joined}\n}}"

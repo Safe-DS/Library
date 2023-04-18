@@ -65,7 +65,7 @@ class TestEq:
         ],
     )
     def test_should_return_whether_two_rows_are_equal(self, row1: Row, row2: Row, expected: bool) -> None:
-        assert (row1 == row2) == expected
+        assert (row1.__eq__(row2)) == expected
 
     @pytest.mark.parametrize(
         ("row", "other"),
