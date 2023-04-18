@@ -5,9 +5,8 @@ from typing import TYPE_CHECKING
 import pandas as pd
 import polars as pl
 import pytest
-
 from safeds.data.tabular.exceptions import UnknownColumnNameError
-from safeds.data.tabular.typing import Integer, RealNumber, Schema, ColumnType, String, Boolean
+from safeds.data.tabular.typing import Boolean, ColumnType, Integer, RealNumber, Schema, String
 
 if TYPE_CHECKING:
     from typing import Any
@@ -201,8 +200,9 @@ class TestGetTypeOfColumn:
             "two columns",
         ],
     )
-    def test_should_return_type_of_existing_column(self, schema: Schema, column_name: str,
-                                                   expected: ColumnType) -> None:
+    def test_should_return_type_of_existing_column(
+        self, schema: Schema, column_name: str, expected: ColumnType,
+    ) -> None:
         assert schema.get_type_of_column(column_name) == expected
 
     def test_should_raise_if_column_does_not_exist(self) -> None:
