@@ -136,7 +136,7 @@ class Row:
         if not self._schema.has_column(column_name):
             raise UnknownColumnNameError([column_name])
         # noinspection PyProtectedMember
-        return self._data[self._schema._get_column_index_by_name(column_name)]
+        return self._data[self._schema._get_column_index(column_name)]
 
     def has_column(self, column_name: str) -> bool:
         """

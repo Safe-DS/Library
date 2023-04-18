@@ -102,13 +102,13 @@ class Schema:
         Raises
         ------
         ColumnNameError
-            If the specified target column name does not exist.
+            If the specified column name does not exist.
         """
         if not self.has_column(column_name):
             raise UnknownColumnNameError([column_name])
         return self._schema[column_name]
 
-    def _get_column_index_by_name(self, column_name: str) -> int:
+    def _get_column_index(self, column_name: str) -> int:
         """
          Return the index of the column with specified column name.
 
@@ -121,7 +121,15 @@ class Schema:
         -------
         index : int
              The index of the column.
+
+        Raises
+        ------
+        ColumnNameError
+            If the specified column name does not exist.
         """
+        if not self.has_column(column_name):
+            raise UnknownColumnNameError([column_name])
+
         return list(self._schema.keys()).index(column_name)
 
     def get_column_names(self) -> list[str]:
@@ -137,25 +145,19 @@ class Schema:
 
     def __str__(self) -> str:
         """
-        Return a print-string for the TableSchema.
+        Return a user-friendly string representation of the schema.
 
         Returns
         -------
-        output_string : str
-            The string.
+        string : str
+            The string representation.
         """
-        column_count = len(self._schema)
-        output_string = f"TableSchema:\nColumn Count: {column_count}\nColumns:\n"
-        for column_name, data_type in self._schema.items():
-            output_string += f"    {column_name}: {data_type}\n"
-        return output_string
-
-    def __repr__(self) -> str:
-        return self.__str__()
-
-    def __eq__(self, o: object) -> bool:
-        if not isinstance(o, Schema):
-            return NotImplemented
-        if self is o:
-            return True
-        return self._schema == o._schema
+        match len(self._schema):
+            case 0:
+                return "{}"
+            case 1:
+                return str(self._schema)
+            case _:
+                lines = (f"    {name!r}: {type_}" for name, type_ in self._schema.items())
+                joined = ",\n".join(lines)
+                return f"{{\n{joined}\n}}"
