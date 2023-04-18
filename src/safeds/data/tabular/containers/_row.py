@@ -47,7 +47,7 @@ class Row:
         """
         row_frame = pd.DataFrame([data.values()], columns=list(data.keys()))
         # noinspection PyProtectedMember
-        return Row(data.values(), Schema._from_dataframe(row_frame))
+        return Row(data.values(), Schema._from_pandas_dataframe(row_frame))
 
     # ------------------------------------------------------------------------------------------------------------------
     # Dunder methods
@@ -65,7 +65,7 @@ class Row:
             dataframe = self._data.to_frame().T
             dataframe.columns = column_names
             # noinspection PyProtectedMember
-            self._schema = Schema._from_dataframe(dataframe)
+            self._schema = Schema._from_pandas_dataframe(dataframe)
 
     def __eq__(self, other: Any) -> bool:
         if not isinstance(other, Row):
@@ -136,7 +136,7 @@ class Row:
         if not self._schema.has_column(column_name):
             raise UnknownColumnNameError([column_name])
         # noinspection PyProtectedMember
-        return self._data[self._schema._get_column_index_by_name(column_name)]
+        return self._data[self._schema._get_column_index(column_name)]
 
     def has_column(self, column_name: str) -> bool:
         """
