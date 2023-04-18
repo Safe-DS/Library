@@ -41,17 +41,15 @@ class Table:
     """
     A table is a two-dimensional collection of data. It can either be seen as a list of rows or as a list of columns.
 
-    Parameters
-    ----------
-    data : typing.Iterable
-        The data.
-    schema : Optional[Schema]
-        The schema of the table. If not specified, the schema will be inferred from the data.
+    To create a `Table`, use one of the following static methods:
 
-    Raises
-    ------
-    MissingSchemaError
-        If the table is empty and no schema is specified.
+    | Method                                                                       | Description                            |
+    | ---------------------------------------------------------------------------- | -------------------------------------- |
+    | [from_csv_file][safeds.data.tabular.containers._table.Table.from_csv_file]   | Create a table from a CSV file.        |
+    | [from_json_file][safeds.data.tabular.containers._table.Table.from_json_file] | Create a table from a JSON file.       |
+    | [from_dict][safeds.data.tabular.containers._table.Table.from_dict]           | Create a table from a dictionary.      |
+    | [from_columns][safeds.data.tabular.containers._table.Table.from_columns]     | Create a table from a list of columns. |
+    | [from_rows][safeds.data.tabular.containers._table.Table.from_rows]           | Create a table from a list of rows.    |
     """
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -221,6 +219,19 @@ class Table:
     # ------------------------------------------------------------------------------------------------------------------
 
     def __init__(self, data: Iterable, schema: Schema | None = None):
+        """
+        Create a table from a `DataFrame`.
+
+        You should not use this constructor directly. Instead, use one of the following static methods:
+
+        | Method                                                                       | Description                            |
+        | ---------------------------------------------------------------------------- | -------------------------------------- |
+        | [from_csv_file][safeds.data.tabular.containers._table.Table.from_csv_file]   | Create a table from a CSV file.        |
+        | [from_json_file][safeds.data.tabular.containers._table.Table.from_json_file] | Create a table from a JSON file.       |
+        | [from_dict][safeds.data.tabular.containers._table.Table.from_dict]           | Create a table from a dictionary.      |
+        | [from_columns][safeds.data.tabular.containers._table.Table.from_columns]     | Create a table from a list of columns. |
+        | [from_rows][safeds.data.tabular.containers._table.Table.from_rows]           | Create a table from a list of rows.    |
+        """
         self._data: pd.DataFrame = data if isinstance(data, pd.DataFrame) else pd.DataFrame(data)
         self._schema: Schema = Schema._from_pandas_dataframe(self._data) if schema is None else schema
 
@@ -1209,6 +1220,9 @@ class Table:
         decide to call this method, you should not rely on any capabilities of the returned object beyond the dataframe
         interchange protocol.
 
+        The specification of the dataframe interchange protocol can be found on
+        [GitHub](https://github.com/data-apis/dataframe-api).
+
         Parameters
         ----------
         nan_as_null : bool
@@ -1220,11 +1234,6 @@ class Table:
         -------
         dataframe
             A DataFrame object that conforms to the dataframe interchange protocol.
-
-        Notes
-        -----
-        The specification of the dataframe interchange protocol can be found at
-        https://github.com/data-apis/dataframe-api.
         """
         if not allow_copy:
             raise NotImplementedError("For the moment we need to copy the data, so `allow_copy` must be True.")
