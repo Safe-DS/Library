@@ -4,24 +4,12 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
-from polars import (
-    FLOAT_DTYPES as POLARS_FLOAT_DTYPES,
-)
-from polars import (
-    INTEGER_DTYPES as POLARS_INTEGER_DTYPES,
-)
-from polars import (
-    Boolean as PolarsBoolean,
-)
-from polars import (
-    Decimal as PolarsDecimal,
-)
-from polars import (
-    PolarsDataType,
-)
-from polars import (
-    Utf8 as PolarsUtf8,
-)
+from polars import Boolean as PolarsBoolean
+from polars import Decimal as PolarsDecimal
+from polars import FLOAT_DTYPES as POLARS_FLOAT_DTYPES
+from polars import INTEGER_DTYPES as POLARS_INTEGER_DTYPES
+from polars import PolarsDataType
+from polars import Utf8 as PolarsUtf8
 
 if TYPE_CHECKING:
     import numpy as np
