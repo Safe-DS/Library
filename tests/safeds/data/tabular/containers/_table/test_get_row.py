@@ -1,6 +1,6 @@
 import pytest
 from safeds.data.tabular.containers import Table
-from safeds.exceptions import IndexOutOfBoundsError
+from safeds.data.tabular.exceptions import IndexOutOfBoundsError
 
 from tests.helpers import resolve_resource_path
 

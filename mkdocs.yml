@@ -40,10 +40,11 @@ theme:
       accent: indigo
   features:
     - content.code.copy
-    - navigation.tabs
+    - content.tabs.link
     - navigation.indexes
     - navigation.instant
     - navigation.sections
+    - navigation.tabs
     - navigation.top
 
 plugins:
@@ -121,6 +122,10 @@ markdown_extensions:
   # Permalinks
   - toc:
       permalink: true
+
+  # Tabs
+  - pymdownx.tabbed:
+      alternate_style: true
 
 extra_css:
   - stylesheets/jupyter.css

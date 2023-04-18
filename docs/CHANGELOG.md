@@ -1,3 +1,10 @@
+## [0.10.0](https://github.com/Safe-DS/Stdlib/compare/v0.9.0...v0.10.0) (2023-04-13)
+
+
+### Features
+
+* move exceptions into subpackages ([#177](https://github.com/Safe-DS/Stdlib/issues/177)) ([10b17fd](https://github.com/Safe-DS/Stdlib/commit/10b17fddca6518dd0d62da0a791c508659c994c4))
+
 ## [0.9.0](https://github.com/Safe-DS/Stdlib/compare/v0.8.0...v0.9.0) (2023-04-04)
 
 

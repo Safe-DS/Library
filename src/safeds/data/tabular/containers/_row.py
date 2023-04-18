@@ -6,8 +6,8 @@ import pandas as pd
 from IPython.core.display_functions import DisplayHandle, display
 from pandas.core.util.hashing import hash_pandas_object
 
+from safeds.data.tabular.exceptions import UnknownColumnNameError
 from safeds.data.tabular.typing import ColumnType, Schema
-from safeds.exceptions import UnknownColumnNameError
 
 
 class Row:
@@ -30,22 +30,22 @@ class Row:
         self._data: pd.Series = data if isinstance(data, pd.Series) else pd.Series(data)
         self._data = self._data.reset_index(drop=True)
 
-        self.schema: Schema
+        self._schema: Schema
         if schema is not None:
-            self.schema = schema
+            self._schema = schema
         else:
             column_names = [f"column_{i}" for i in range(len(self._data))]
             dataframe = self._data.to_frame().T
             dataframe.columns = column_names
             # noinspection PyProtectedMember
-            self.schema = Schema._from_dataframe(dataframe)
+            self._schema = Schema._from_dataframe(dataframe)
 
     def __eq__(self, other: Any) -> bool:
         if not isinstance(other, Row):
             return NotImplemented
         if self is other:
             return True
-        return self.schema == other.schema and self._data.equals(other._data)
+        return self._schema == other._schema and self._data.equals(other._data)
 
     def __getitem__(self, column_name: str) -> Any:
         return self.get_value(column_name)
@@ -73,6 +73,22 @@ class Row:
         return tmp.__str__()
 
     # ------------------------------------------------------------------------------------------------------------------
+    # Properties
+    # ------------------------------------------------------------------------------------------------------------------
+
+    @property
+    def schema(self) -> Schema:
+        """
+        Return the schema of the row.
+
+        Returns
+        -------
+        schema : Schema
+            The schema.
+        """
+        return self._schema
+
+    # ------------------------------------------------------------------------------------------------------------------
     # Getters
     # ------------------------------------------------------------------------------------------------------------------
 
@@ -90,10 +106,10 @@ class Row:
         value :
             The value of the column.
         """
-        if not self.schema.has_column(column_name):
+        if not self._schema.has_column(column_name):
             raise UnknownColumnNameError([column_name])
         # noinspection PyProtectedMember
-        return self._data[self.schema._get_column_index_by_name(column_name)]
+        return self._data[self._schema._get_column_index_by_name(column_name)]
 
     def has_column(self, column_name: str) -> bool:
         """
@@ -111,7 +127,7 @@ class Row:
         contains : bool
             True, if row contains the column.
         """
-        return self.schema.has_column(column_name)
+        return self._schema.has_column(column_name)
 
     def get_column_names(self) -> list[str]:
         """
@@ -124,7 +140,7 @@ class Row:
         column_names : list[str]
             The column names.
         """
-        return self.schema.get_column_names()
+        return self._schema.get_column_names()
 
     def get_type_of_column(self, column_name: str) -> ColumnType:
         """
@@ -147,7 +163,7 @@ class Row:
         ColumnNameError
             If the specified target column name does not exist.
         """
-        return self.schema.get_type_of_column(column_name)
+        return self._schema.get_type_of_column(column_name)
 
     # ------------------------------------------------------------------------------------------------------------------
     # Information

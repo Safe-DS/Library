@@ -1,9 +1,14 @@
-import pandas as pd
+import pytest
 from safeds.data.tabular.containers import Table
 
 
-def test_count_rows() -> None:
-    table1 = Table(pd.DataFrame(data={"col1": [1, 2, 1], "col2": [1, 2, 4]}))
-    table2 = Table(pd.DataFrame(data={"col1": []}))
-    assert table1.count_rows() == 3
-    assert table2.count_rows() == 0
+@pytest.mark.parametrize(
+    ("table", "expected"),
+    [
+        (Table.from_dict({}), 0),
+        (Table.from_dict({"col1": [1]}), 1),
+        (Table.from_dict({"col1": [1, 2], "col2": [3, 4]}), 2),
+    ],
+)
+def test_count_rows(table: Table, expected: int) -> None:
+    assert table.count_rows() == expected

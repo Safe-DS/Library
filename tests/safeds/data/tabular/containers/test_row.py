@@ -2,8 +2,8 @@ from typing import Any
 
 import pytest
 from safeds.data.tabular.containers import Row, Table
+from safeds.data.tabular.exceptions import UnknownColumnNameError
 from safeds.data.tabular.typing import ColumnType, Integer, Schema, String
-from safeds.exceptions import UnknownColumnNameError
 
 
 class TestInit:
@@ -19,7 +19,7 @@ class TestInit:
         ],
     )
     def test_should_use_the_schema_if_passed(self, row: Row, expected: Schema) -> None:
-        assert row.schema == expected
+        assert row._schema == expected
 
     @pytest.mark.parametrize(
         ("row", "expected"),
@@ -29,7 +29,7 @@ class TestInit:
         ],
     )
     def test_should_infer_the_schema_if_not_passed(self, row: Row, expected: Schema) -> None:
-        assert row.schema == expected
+        assert row._schema == expected
 
 
 class TestEq:

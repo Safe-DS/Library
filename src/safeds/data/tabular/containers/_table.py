@@ -15,8 +15,7 @@ from scipy import stats
 
 from safeds.data.image.containers import Image
 from safeds.data.image.typing import ImageFormat
-from safeds.data.tabular.typing import ColumnType, Schema
-from safeds.exceptions import (
+from safeds.data.tabular.exceptions import (
     ColumnLengthMismatchError,
     ColumnSizeError,
     DuplicateColumnNameError,
@@ -26,6 +25,7 @@ from safeds.exceptions import (
     SchemaMismatchError,
     UnknownColumnNameError,
 )
+from safeds.data.tabular.typing import ColumnType, Schema
 
 from ._column import Column
 from ._row import Row
@@ -113,6 +113,42 @@ class Table:
             raise FileNotFoundError(f'File "{path}" does not exist') from exception
 
     @staticmethod
+    def from_dict(data: dict[str, list[Any]]) -> Table:
+        """
+        Create a table from a dictionary that maps column names to column values.
+
+        Parameters
+        ----------
+        data : dict[str, list[Any]]
+            The data.
+
+        Returns
+        -------
+        table : Table
+            The generated table.
+
+        Raises
+        ------
+        ColumnLengthMismatchError
+            If columns have different lengths.
+        """
+        # Validation
+        expected_length: int | None = None
+        for column_values in data.values():
+            if expected_length is None:
+                expected_length = len(column_values)
+            elif len(column_values) != expected_length:
+                raise ColumnLengthMismatchError(
+                    "\n".join(f"{column_name}: {len(column_values)}" for column_name, column_values in data.items()),
+                )
+
+        # Implementation
+        dataframe: DataFrame = pd.DataFrame()
+        for column_name, column_values in data.items():
+            dataframe[column_name] = column_values
+        return Table(dataframe)
+
+    @staticmethod
     def from_columns(columns: list[Column]) -> Table:
         """
         Return a table created from a list of columns.
@@ -129,20 +165,15 @@ class Table:
 
         Raises
         ------
-        MissingDataError
-            If an empty list is given.
         ColumnLengthMismatchError
             If any of the column sizes does not match with the others.
         """
-        if len(columns) == 0:
-            raise MissingDataError("This function requires at least one column.")
-
         dataframe: DataFrame = pd.DataFrame()
 
         for column in columns:
             if column._data.size != columns[0]._data.size:
                 raise ColumnLengthMismatchError(
-                    "\n".join([f"{column.name}: {column._data.size}" for column in columns]),
+                    "\n".join(f"{column.name}: {column._data.size}" for column in columns),
                 )
             dataframe[column.name] = column._data
 
@@ -173,11 +204,11 @@ class Table:
         if len(rows) == 0:
             raise MissingDataError("This function requires at least one row.")
 
-        schema_compare: Schema = rows[0].schema
+        schema_compare: Schema = rows[0]._schema
         row_array: list[Series] = []
 
         for row in rows:
-            if schema_compare != row.schema:
+            if schema_compare != row._schema:
                 raise SchemaMismatchError
             row_array.append(row._data)
 
@@ -190,14 +221,14 @@ class Table:
     # ------------------------------------------------------------------------------------------------------------------
 
     def __init__(self, data: Iterable, schema: Schema | None = None):
-        self._data: pd.Dataframe = data if isinstance(data, pd.DataFrame) else pd.DataFrame(data)
+        self._data: pd.DataFrame = data if isinstance(data, pd.DataFrame) else pd.DataFrame(data)
         self._schema: Schema = Schema._from_dataframe(self._data) if schema is None else schema
 
         if self._data.empty:
             self._data = pd.DataFrame(columns=self._schema.get_column_names())
 
         self._data = self._data.reset_index(drop=True)
-        self._data.columns = list(range(self.count_columns()))
+        self._data.columns = self._schema.get_column_names()
 
     def __eq__(self, other: Any) -> bool:
         if not isinstance(other, Table):
@@ -437,7 +468,7 @@ class Table:
             If the size of the column does not match the amount of rows.
 
         """
-        if self._schema.has_column(column.name):
+        if self.has_column(column.name):
             raise DuplicateColumnNameError(column.name)
 
         if column._data.size != self.count_rows():
@@ -500,8 +531,12 @@ class Table:
         """
         if self._schema != row.schema:
             raise SchemaMismatchError
-        new_df = pd.concat([self._data, row._data.to_frame().T]).infer_objects()
-        new_df.columns = self._schema.get_column_names()
+
+        row_frame = row._data.to_frame().T
+        row_frame.columns = self.get_column_names()
+
+        new_df = pd.concat([self._data, row_frame]).infer_objects()
+        new_df.columns = self.get_column_names()
         return Table(new_df)
 
     def add_rows(self, rows: list[Row] | Table) -> Table:
@@ -524,8 +559,13 @@ class Table:
         for row in rows:
             if self._schema != row.schema:
                 raise SchemaMismatchError
-        result = pd.concat([result, *[row._data.to_frame().T for row in rows]]).infer_objects()
-        result.columns = self._schema.get_column_names()
+
+        row_frames = [row._data.to_frame().T for row in rows]
+        for row_frame in row_frames:
+            row_frame.columns = self.get_column_names()
+
+        result = pd.concat([result, *row_frames]).infer_objects()
+        result.columns = self.get_column_names()
         return Table(result)
 
     def filter_rows(self, query: Callable[[Row], bool]) -> Table:
@@ -566,19 +606,17 @@ class Table:
         Raises
         ------
         ColumnNameError
-            If any of the given columns do not exist.
+            If any of the given columns does not exist.
         """
         invalid_columns = []
-        column_indices = []
         for name in column_names:
             if not self._schema.has_column(name):
                 invalid_columns.append(name)
-            else:
-                column_indices.append(self._schema._get_column_index_by_name(name))
         if len(invalid_columns) != 0:
             raise UnknownColumnNameError(invalid_columns)
-        transformed_data = self._data[column_indices]
-        transformed_data.columns = [name for name in self._schema.get_column_names() if name in column_names]
+
+        transformed_data = self._data[column_names]
+        transformed_data.columns = column_names
         return Table(transformed_data)
 
     def remove_columns(self, column_names: list[str]) -> Table:
@@ -598,18 +636,16 @@ class Table:
         Raises
         ------
         ColumnNameError
-            If any of the given columns do not exist.
+            If any of the given columns does not exist.
         """
         invalid_columns = []
-        column_indices = []
         for name in column_names:
             if not self._schema.has_column(name):
                 invalid_columns.append(name)
-            else:
-                column_indices.append(self._schema._get_column_index_by_name(name))
         if len(invalid_columns) != 0:
             raise UnknownColumnNameError(invalid_columns)
-        transformed_data = self._data.drop(labels=column_indices, axis="columns")
+
+        transformed_data = self._data.drop(labels=column_names, axis="columns")
         transformed_data.columns = [name for name in self._schema.get_column_names() if name not in column_names]
         return Table(transformed_data)
 
@@ -1005,8 +1041,8 @@ class Table:
         fig = plt.figure()
         ax = sns.lineplot(
             data=self._data,
-            x=self._schema._get_column_index_by_name(x_column_name),
-            y=self._schema._get_column_index_by_name(y_column_name),
+            x=x_column_name,
+            y=y_column_name,
         )
         ax.set(xlabel=x_column_name, ylabel=y_column_name)
         ax.set_xticks(ax.get_xticks())
@@ -1052,8 +1088,8 @@ class Table:
         fig = plt.figure()
         ax = sns.scatterplot(
             data=self._data,
-            x=self._schema._get_column_index_by_name(x_column_name),
-            y=self._schema._get_column_index_by_name(y_column_name),
+            x=x_column_name,
+            y=y_column_name,
         )
         ax.set(xlabel=x_column_name, ylabel=y_column_name)
         ax.set_xticks(ax.get_xticks())
@@ -1108,6 +1144,17 @@ class Table:
         data_to_json.columns = self._schema.get_column_names()
         data_to_json.to_json(path)
 
+    def to_dict(self) -> dict[str, list[Any]]:
+        """
+        Return a dictionary that maps column names to column values.
+
+        Returns
+        -------
+        data : dict[str, list[Any]]
+            Dictionary representation of the table.
+        """
+        return {column_name: list(self.get_column(column_name)) for column_name in self.get_column_names()}
+
     def to_columns(self) -> list[Column]:
         """
         Return a list of the columns.
@@ -1148,3 +1195,40 @@ class Table:
 
         with pd.option_context("display.max_rows", tmp.shape[0], "display.max_columns", tmp.shape[1]):
             return display(tmp)
+
+    # ------------------------------------------------------------------------------------------------------------------
+    # Dataframe interchange protocol
+    # ------------------------------------------------------------------------------------------------------------------
+
+    def __dataframe__(self, nan_as_null: bool = False, allow_copy: bool = True):  # type: ignore[no-untyped-def]
+        """
+        Return a DataFrame exchange object that conforms to the dataframe interchange protocol.
+
+        Generally, there is no reason to call this method directly. The dataframe interchange protocol is designed to
+        allow libraries to consume tabular data from different sources, such as `pandas` or `polars`. If you still
+        decide to call this method, you should not rely on any capabilities of the returned object beyond the dataframe
+        interchange protocol.
+
+        Parameters
+        ----------
+        nan_as_null : bool
+            Whether to replace missing values in the data with `NaN`.
+        allow_copy : bool
+            Whether memory may be copied to create the DataFrame exchange object.
+
+        Returns
+        -------
+        dataframe
+            A DataFrame object that conforms to the dataframe interchange protocol.
+
+        Notes
+        -----
+        The specification of the dataframe interchange protocol can be found at
+        https://github.com/data-apis/dataframe-api.
+        """
+        if not allow_copy:
+            raise NotImplementedError("For the moment we need to copy the data, so `allow_copy` must be True.")
+
+        data_copy = self._data.copy()
+        data_copy.columns = self.get_column_names()
+        return data_copy.__dataframe__(nan_as_null, allow_copy)

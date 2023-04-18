@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "safe-ds"
-version = "0.9.0"
+version = "0.10.0"
 description = "A user-friendly library for Data Science in Python."
 authors = ["Lars Reimann <mail@larsreimann.com>"]
 license = "MIT"
@@ -16,7 +16,7 @@ packages = [
 python = "^3.10"
 ipython = "^8.8.0"
 matplotlib = "^3.6.3"
-pandas = "^1.5.3"
+pandas = "^2.0.0"
 pillow = "^9.5.0"
 scikit-learn = "^1.2.0"
 seaborn = "^0.12.2"
@@ -42,6 +42,11 @@ mkdocs-exclude = "^1.0.2"
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.pytest.ini_options]
+filterwarnings = [
+    "ignore:Jupyter is migrating its paths to use standard platformdirs"
+]
 
 [tool.black]
 line-length = 120

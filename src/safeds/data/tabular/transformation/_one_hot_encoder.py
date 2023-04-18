@@ -4,10 +4,10 @@ import pandas as pd
 from sklearn.preprocessing import OneHotEncoder as sk_OneHotEncoder
 
 from safeds.data.tabular.containers import Table
+from safeds.data.tabular.exceptions import TransformerNotFittedError, UnknownColumnNameError
 from safeds.data.tabular.transformation._table_transformer import (
     InvertibleTableTransformer,
 )
-from safeds.exceptions import TransformerNotFittedError, UnknownColumnNameError
 
 
 class OneHotEncoder(InvertibleTableTransformer):
@@ -15,7 +15,7 @@ class OneHotEncoder(InvertibleTableTransformer):
 
     def __init__(self) -> None:
         self._wrapped_transformer: sk_OneHotEncoder | None = None
-        self._column_names: list[str] | None = None
+        self._column_names: dict[str, list[str]] | None = None
 
     # noinspection PyProtectedMember
     def fit(self, table: Table, column_names: list[str] | None = None) -> OneHotEncoder:
@@ -49,7 +49,10 @@ class OneHotEncoder(InvertibleTableTransformer):
 
         result = OneHotEncoder()
         result._wrapped_transformer = wrapped_transformer
-        result._column_names = column_names
+        result._column_names = {
+            column: [f"{column}_{element}" for element in table.get_column(column).get_unique_values()]
+            for column in column_names
+        }
 
         return result
 
@@ -78,19 +81,33 @@ class OneHotEncoder(InvertibleTableTransformer):
             raise TransformerNotFittedError
 
         # Input table does not contain all columns used to fit the transformer
-        missing_columns = set(self._column_names) - set(table.get_column_names())
+        missing_columns = set(self._column_names.keys()) - set(table.get_column_names())
         if len(missing_columns) > 0:
             raise UnknownColumnNameError(list(missing_columns))
 
         original = table._data.copy()
         original.columns = table.schema.get_column_names()
 
-        one_hot_encoded = pd.DataFrame(self._wrapped_transformer.transform(original[self._column_names]).toarray())
+        one_hot_encoded = pd.DataFrame(
+            self._wrapped_transformer.transform(original[self._column_names.keys()]).toarray(),
+        )
         one_hot_encoded.columns = self._wrapped_transformer.get_feature_names_out()
 
-        unchanged = original.drop(self._column_names, axis=1)
+        unchanged = original.drop(self._column_names.keys(), axis=1)
 
-        return Table(pd.concat([unchanged, one_hot_encoded], axis=1))
+        res = Table(pd.concat([unchanged, one_hot_encoded], axis=1))
+        column_names = []
+
+        for name in table.get_column_names():
+            if name not in self._column_names.keys():
+                column_names.append(name)
+            else:
+                column_names.extend(
+                    [f_name for f_name in self._wrapped_transformer.get_feature_names_out() if f_name.startswith(name)],
+                )
+        res = res.sort_columns(lambda col1, col2: column_names.index(col1.name) - column_names.index(col2.name))
+
+        return res
 
     # noinspection PyProtectedMember
     def inverse_transform(self, transformed_table: Table) -> Table:
@@ -120,12 +137,29 @@ class OneHotEncoder(InvertibleTableTransformer):
         data.columns = transformed_table.get_column_names()
 
         decoded = pd.DataFrame(
-            self._wrapped_transformer.inverse_transform(transformed_table._data),
-            columns=self._column_names,
+            self._wrapped_transformer.inverse_transform(
+                transformed_table.keep_only_columns(self._wrapped_transformer.get_feature_names_out())._data,
+            ),
+            columns=list(self._column_names.keys()),
         )
         unchanged = data.drop(self._wrapped_transformer.get_feature_names_out(), axis=1)
 
-        return Table(pd.concat([unchanged, decoded], axis=1))
+        res = Table(pd.concat([unchanged, decoded], axis=1))
+        column_names = [
+            name
+            if name not in [value for value_list in list(self._column_names.values()) for value in value_list]
+            else list(self._column_names.keys())[
+                [
+                    list(self._column_names.values()).index(value)
+                    for value in list(self._column_names.values())
+                    if name in value
+                ][0]
+            ]
+            for name in transformed_table.get_column_names()
+        ]
+        res = res.sort_columns(lambda col1, col2: column_names.index(col1.name) - column_names.index(col2.name))
+
+        return res
 
     def is_fitted(self) -> bool:
         """
