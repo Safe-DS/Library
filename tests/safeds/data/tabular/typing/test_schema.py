@@ -201,7 +201,10 @@ class TestGetTypeOfColumn:
         ],
     )
     def test_should_return_type_of_existing_column(
-        self, schema: Schema, column_name: str, expected: ColumnType,
+        self,
+        schema: Schema,
+        column_name: str,
+        expected: ColumnType,
     ) -> None:
         assert schema.get_type_of_column(column_name) == expected
 
