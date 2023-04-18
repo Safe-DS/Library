@@ -78,7 +78,9 @@ class TestFromPolarsDataType:
         ids=repr,
     )
     def test_should_create_column_type_from_polars_data_type(
-        self, data_type: PolarsDataType, expected: ColumnType,
+        self,
+        data_type: PolarsDataType,
+        expected: ColumnType,
     ) -> None:
         assert ColumnType._from_polars_data_type(data_type) == expected
 
