@@ -1,6 +1,7 @@
-from collections.abc import Iterable, Iterator
+from __future__ import annotations
+
 from hashlib import md5
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import pandas as pd
 from IPython.core.display_functions import DisplayHandle, display
@@ -8,6 +9,9 @@ from pandas.core.util.hashing import hash_pandas_object
 
 from safeds.data.tabular.exceptions import UnknownColumnNameError
 from safeds.data.tabular.typing import ColumnType, Schema
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable, Iterator
 
 
 class Row:
@@ -21,6 +25,29 @@ class Row:
     schema : Schema
         The schema of the row.
     """
+
+    # ------------------------------------------------------------------------------------------------------------------
+    # Creation
+    # ------------------------------------------------------------------------------------------------------------------
+
+    @staticmethod
+    def from_dict(data: dict[str, Any]) -> Row:
+        """
+        Create a row from a dictionary that maps column names to column values.
+
+        Parameters
+        ----------
+        data : dict[str, Any]
+            The data.
+
+        Returns
+        -------
+        row : Row
+            The generated row.
+        """
+        row_frame = pd.DataFrame([data.values()], columns=list(data.keys()))
+        # noinspection PyProtectedMember
+        return Row(data.values(), Schema._from_dataframe(row_frame))
 
     # ------------------------------------------------------------------------------------------------------------------
     # Dunder methods
@@ -179,6 +206,21 @@ class Row:
             The number of columns.
         """
         return len(self._data)
+
+    # ------------------------------------------------------------------------------------------------------------------
+    # Conversion
+    # ------------------------------------------------------------------------------------------------------------------
+
+    def to_dict(self) -> dict[str, Any]:
+        """
+        Return a dictionary that maps column names to column values.
+
+        Returns
+        -------
+        data : dict[str, Any]
+            Dictionary representation of the row.
+        """
+        return {column_name: self.get_value(column_name) for column_name in self.get_column_names()}
 
     # ------------------------------------------------------------------------------------------------------------------
     # IPython integration

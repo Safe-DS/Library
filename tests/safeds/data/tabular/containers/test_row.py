@@ -6,6 +6,27 @@ from safeds.data.tabular.exceptions import UnknownColumnNameError
 from safeds.data.tabular.typing import ColumnType, Integer, Schema, String
 
 
+class TestFromDict:
+    @pytest.mark.parametrize(
+        ("data", "expected"),
+        [
+            (
+                {},
+                Row([]),
+            ),
+            (
+                {
+                    "a": 1,
+                    "b": 2,
+                },
+                Row([1, 2], schema=Schema({"a": Integer(), "b": Integer()})),
+            ),
+        ],
+    )
+    def test_should_create_row_from_dict(self, data: dict[str, Any], expected: Row) -> None:
+        assert Row.from_dict(data) == expected
+
+
 class TestInit:
     @pytest.mark.parametrize(
         ("row", "expected"),
@@ -36,11 +57,11 @@ class TestEq:
     @pytest.mark.parametrize(
         ("row1", "row2", "expected"),
         [
-            (Row([]), Row([]), True),
-            (Row([0], Schema({"col1": Integer()})), Row([0], Schema({"col1": Integer()})), True),
-            (Row([0], Schema({"col1": Integer()})), Row([1], Schema({"col1": Integer()})), False),
-            (Row([0], Schema({"col1": Integer()})), Row([0], Schema({"col2": Integer()})), False),
-            (Row([0], Schema({"col1": Integer()})), Row(["a"], Schema({"col1": String()})), False),
+            (Row.from_dict({}), Row.from_dict({}), True),
+            (Row.from_dict({"col1": 0}), Row.from_dict({"col1": 0}), True),
+            (Row.from_dict({"col1": 0}), Row.from_dict({"col1": 1}), False),
+            (Row.from_dict({"col1": 0}), Row.from_dict({"col2": 0}), False),
+            (Row.from_dict({"col1": 0}), Row.from_dict({"col1": "a"}), False),
         ],
     )
     def test_should_return_whether_two_rows_are_equal(self, row1: Row, row2: Row, expected: bool) -> None:
@@ -49,8 +70,8 @@ class TestEq:
     @pytest.mark.parametrize(
         ("row", "other"),
         [
-            (Row([0], Schema({"col1": Integer()})), None),
-            (Row([0], Schema({"col1": Integer()})), Table([])),
+            (Row.from_dict({"col1": 0}), None),
+            (Row.from_dict({"col1": 0}), Table([])),
         ],
     )
     def test_should_return_not_implemented_if_other_is_not_row(self, row: Row, other: Any) -> None:
@@ -61,8 +82,8 @@ class TestGetitem:
     @pytest.mark.parametrize(
         ("row", "column_name", "expected"),
         [
-            (Row([0], Schema({"col1": Integer()})), "col1", 0),
-            (Row([0, "a"], Schema({"col1": Integer(), "col2": String()})), "col2", "a"),
+            (Row.from_dict({"col1": 0}), "col1", 0),
+            (Row.from_dict({"col1": 0, "col2": "a"}), "col2", "a"),
         ],
     )
     def test_should_return_the_value_in_the_column(self, row: Row, column_name: str, expected: Any) -> None:
@@ -71,8 +92,8 @@ class TestGetitem:
     @pytest.mark.parametrize(
         ("row", "column_name"),
         [
-            (Row([], Schema({})), "col1"),
-            (Row([0], Schema({"col1": Integer()})), "col2"),
+            (Row.from_dict({}), "col1"),
+            (Row.from_dict({"col1": 0}), "col2"),
         ],
     )
     def test_should_raise_if_column_does_not_exist(self, row: Row, column_name: str) -> None:
@@ -85,8 +106,8 @@ class TestHash:
     @pytest.mark.parametrize(
         ("row1", "row2"),
         [
-            (Row([]), Row([])),
-            (Row([0], Schema({"col1": Integer()})), Row([0], Schema({"col1": Integer()}))),
+            (Row.from_dict({}), Row.from_dict({})),
+            (Row.from_dict({"col1": 0}), Row.from_dict({"col1": 0})),
         ],
     )
     def test_should_return_same_hash_for_equal_rows(self, row1: Row, row2: Row) -> None:
@@ -95,9 +116,9 @@ class TestHash:
     @pytest.mark.parametrize(
         ("row1", "row2"),
         [
-            (Row([0], Schema({"col1": Integer()})), Row([1], Schema({"col1": Integer()}))),
-            (Row([0], Schema({"col1": Integer()})), Row([0], Schema({"col2": Integer()}))),
-            (Row([0], Schema({"col1": Integer()})), Row(["a"], Schema({"col1": String()}))),
+            (Row.from_dict({"col1": 0}), Row.from_dict({"col1": 1})),
+            (Row.from_dict({"col1": 0}), Row.from_dict({"col2": 0})),
+            (Row.from_dict({"col1": 0}), Row.from_dict({"col1": "a"})),
         ],
     )
     def test_should_return_different_hash_for_unequal_rows(self, row1: Row, row2: Row) -> None:
@@ -108,8 +129,8 @@ class TestIter:
     @pytest.mark.parametrize(
         ("row", "expected"),
         [
-            (Row([], Schema({})), []),
-            (Row([0], Schema({"col1": Integer()})), ["col1"]),
+            (Row.from_dict({}), []),
+            (Row.from_dict({"col1": 0}), ["col1"]),
         ],
     )
     def test_should_return_an_iterator_for_the_column_names(self, row: Row, expected: list[str]) -> None:
@@ -120,8 +141,8 @@ class TestLen:
     @pytest.mark.parametrize(
         ("row", "expected"),
         [
-            (Row([]), 0),
-            (Row([0, "a"]), 2),
+            (Row.from_dict({}), 0),
+            (Row.from_dict({"col1": 0, "col2": "a"}), 2),
         ],
     )
     def test_should_return_the_number_of_columns(self, row: Row, expected: int) -> None:
@@ -132,8 +153,8 @@ class TestGetValue:
     @pytest.mark.parametrize(
         ("row", "column_name", "expected"),
         [
-            (Row([0], Schema({"col1": Integer()})), "col1", 0),
-            (Row([0, "a"], Schema({"col1": Integer(), "col2": String()})), "col2", "a"),
+            (Row.from_dict({"col1": 0}), "col1", 0),
+            (Row.from_dict({"col1": 0, "col2": "a"}), "col2", "a"),
         ],
     )
     def test_should_return_the_value_in_the_column(self, row: Row, column_name: str, expected: Any) -> None:
@@ -142,8 +163,8 @@ class TestGetValue:
     @pytest.mark.parametrize(
         ("row", "column_name"),
         [
-            (Row([], Schema({})), "col1"),
-            (Row([0], Schema({"col1": Integer()})), "col2"),
+            (Row.from_dict({}), "col1"),
+            (Row.from_dict({"col1": 0}), "col2"),
         ],
     )
     def test_should_raise_if_column_does_not_exist(self, row: Row, column_name: str) -> None:
@@ -155,9 +176,9 @@ class TestHasColumn:
     @pytest.mark.parametrize(
         ("row", "column_name", "expected"),
         [
-            (Row([], Schema({})), "col1", False),
-            (Row([0], Schema({"col1": Integer()})), "col1", True),
-            (Row([0], Schema({"col1": Integer()})), "col2", False),
+            (Row.from_dict({}), "col1", False),
+            (Row.from_dict({"col1": 0}), "col1", True),
+            (Row.from_dict({"col1": 0}), "col2", False),
         ],
     )
     def test_should_return_whether_the_row_has_the_column(self, row: Row, column_name: str, expected: bool) -> None:
@@ -168,8 +189,8 @@ class TestGetColumnNames:
     @pytest.mark.parametrize(
         ("row", "expected"),
         [
-            (Row([], Schema({})), []),
-            (Row([0], Schema({"col1": Integer()})), ["col1"]),
+            (Row.from_dict({}), []),
+            (Row.from_dict({"col1": 0}), ["col1"]),
         ],
     )
     def test_should_return_the_column_names(self, row: Row, expected: list[str]) -> None:
@@ -180,8 +201,8 @@ class TestGetTypeOfColumn:
     @pytest.mark.parametrize(
         ("row", "column_name", "expected"),
         [
-            (Row([0], Schema({"col1": Integer()})), "col1", Integer()),
-            (Row([0, "a"], Schema({"col1": Integer(), "col2": String()})), "col2", String()),
+            (Row.from_dict({"col1": 0}), "col1", Integer()),
+            (Row.from_dict({"col1": 0, "col2": "a"}), "col2", String()),
         ],
     )
     def test_should_return_the_type_of_the_column(self, row: Row, column_name: str, expected: ColumnType) -> None:
@@ -190,8 +211,8 @@ class TestGetTypeOfColumn:
     @pytest.mark.parametrize(
         ("row", "column_name"),
         [
-            (Row([], Schema({})), "col1"),
-            (Row([0], Schema({"col1": Integer()})), "col2"),
+            (Row.from_dict({}), "col1"),
+            (Row.from_dict({"col1": 0}), "col2"),
         ],
     )
     def test_should_raise_if_column_does_not_exist(self, row: Row, column_name: str) -> None:
@@ -203,9 +224,30 @@ class TestCount:
     @pytest.mark.parametrize(
         ("row", "expected"),
         [
-            (Row([]), 0),
-            (Row([0, "a"]), 2),
+            (Row.from_dict({}), 0),
+            (Row.from_dict({"col1": 0, "col2": "a"}), 2),
         ],
     )
     def test_should_return_the_number_of_columns(self, row: Row, expected: int) -> None:
         assert row.count() == expected
+
+
+class TestToDict:
+    @pytest.mark.parametrize(
+        ("row", "expected"),
+        [
+            (
+                Row([]),
+                {},
+            ),
+            (
+                Row([1, 2], schema=Schema({"a": Integer(), "b": Integer()})),
+                {
+                    "a": 1,
+                    "b": 2,
+                },
+            ),
+        ],
+    )
+    def test_should_return_dict_for_table(self, row: Row, expected: dict[str, Any]) -> None:
+        assert row.to_dict() == expected

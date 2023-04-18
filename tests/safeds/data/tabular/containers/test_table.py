@@ -24,7 +24,7 @@ class TestFromDict:
             ),
         ],
     )
-    def test_should_create_table_from_dict(self, data: dict[str, Any], expected: Table) -> None:
+    def test_should_create_table_from_dict(self, data: dict[str, list[Any]], expected: Table) -> None:
         assert Table.from_dict(data) == expected
 
     def test_should_raise_if_columns_have_different_lengths(self) -> None:
@@ -49,7 +49,7 @@ class TestToDict:
             ),
         ],
     )
-    def test_should_return_dict_for_table(self, table: Table, expected: dict[str, Any]) -> None:
+    def test_should_return_dict_for_table(self, table: Table, expected: dict[str, list[Any]]) -> None:
         assert table.to_dict() == expected
 
 
