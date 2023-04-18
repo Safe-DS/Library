@@ -6,7 +6,7 @@ from safeds.data.tabular.exceptions import NonNumericColumnError
 
 
 def test_boxplot_complex() -> None:
-    with pytest.raises(TypeError):  # noqa: PT012
+    with pytest.raises(NotImplementedError):  # noqa: PT012
         table = Table.from_dict({"A": [1, 2, complex(1, -2)]})
         table.get_column("A").boxplot()
 

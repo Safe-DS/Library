@@ -222,7 +222,7 @@ class Table:
 
     def __init__(self, data: Iterable, schema: Schema | None = None):
         self._data: pd.DataFrame = data if isinstance(data, pd.DataFrame) else pd.DataFrame(data)
-        self._schema: Schema = Schema._from_dataframe(self._data) if schema is None else schema
+        self._schema: Schema = Schema._from_pandas_dataframe(self._data) if schema is None else schema
 
         if self._data.empty:
             self._data = pd.DataFrame(columns=self._schema.get_column_names())

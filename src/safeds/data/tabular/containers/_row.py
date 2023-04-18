@@ -47,7 +47,7 @@ class Row:
         """
         row_frame = pd.DataFrame([data.values()], columns=list(data.keys()))
         # noinspection PyProtectedMember
-        return Row(data.values(), Schema._from_dataframe(row_frame))
+        return Row(data.values(), Schema._from_pandas_dataframe(row_frame))
 
     # ------------------------------------------------------------------------------------------------------------------
     # Dunder methods
@@ -65,7 +65,7 @@ class Row:
             dataframe = self._data.to_frame().T
             dataframe.columns = column_names
             # noinspection PyProtectedMember
-            self._schema = Schema._from_dataframe(dataframe)
+            self._schema = Schema._from_pandas_dataframe(dataframe)
 
     def __eq__(self, other: Any) -> bool:
         if not isinstance(other, Row):

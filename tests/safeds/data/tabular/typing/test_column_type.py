@@ -1,3 +1,6 @@
+from polars import PolarsDataType, INTEGER_DTYPES as POLARS_INTEGER_DTYPES, FLOAT_DTYPES as POLARS_FLOAT_DTYPES
+from polars.datatypes import Boolean as PolarsBoolean, Decimal as PolarsDecimal, Utf8 as PolarsUtf8
+
 import numpy as np
 import pytest
 from safeds.data.tabular.typing import (
@@ -99,5 +102,32 @@ class TestColumnType:
         ],
         ids=repr,
     )
-    def test_from_numpy_dtype(self, dtype: np.dtype, expected: ColumnType) -> None:
-        assert ColumnType._from_numpy_dtype(dtype) == expected
+    def test_from_numpy_data_type(self, dtype: np.dtype, expected: ColumnType) -> None:
+        assert ColumnType._from_numpy_data_type(dtype) == expected
+
+    @pytest.mark.parametrize(
+        ("data_type", "expected"),
+        [
+            # Boolean
+            (PolarsBoolean, Boolean()),
+
+            # Float
+            *(
+                (data_type, RealNumber())
+                for data_type in POLARS_FLOAT_DTYPES
+            ),
+            (PolarsDecimal, RealNumber()),
+
+            # Int
+            *(
+                (data_type, Integer())
+                for data_type in POLARS_INTEGER_DTYPES
+            ),
+
+            # String
+            (PolarsUtf8, String()),
+        ],
+        ids=repr,
+    )
+    def test_from_polars_data_type(self, data_type: PolarsDataType, expected: ColumnType) -> None:
+        assert ColumnType._from_polars_data_type(data_type) == expected

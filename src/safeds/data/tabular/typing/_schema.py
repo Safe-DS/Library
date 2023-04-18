@@ -8,6 +8,7 @@ from safeds.data.tabular.typing._column_type import ColumnType
 
 if TYPE_CHECKING:
     import pandas as pd
+    import polars as pl
 
 
 @dataclass
@@ -22,6 +23,48 @@ class Schema:
     """
 
     _schema: dict[str, ColumnType]
+
+    @staticmethod
+    def _from_pandas_dataframe(dataframe: pd.DataFrame) -> Schema:
+        """
+        Create a schema from a `pandas.DataFrame`.
+
+        Parameters
+        ----------
+        dataframe : pd.DataFrame
+            The dataframe.
+
+        Returns
+        -------
+        schema : Schema
+            The schema.
+        """
+        names = dataframe.columns
+        # noinspection PyProtectedMember
+        types = (ColumnType._from_numpy_data_type(data_type) for data_type in dataframe.dtypes)
+
+        return Schema(dict(zip(names, types, strict=True)))
+
+    @staticmethod
+    def _from_polars_dataframe(dataframe: pl.DataFrame) -> Schema:
+        """
+        Create a schema from a `polars.Dataframe`.
+
+        Parameters
+        ----------
+        dataframe : pl.DataFrame
+            The dataframe.
+
+        Returns
+        -------
+        schema : Schema
+            The schema.
+        """
+        names = dataframe.columns
+        # noinspection PyProtectedMember
+        types = (ColumnType._from_polars_data_type(data_type) for data_type in dataframe.dtypes)
+
+        return Schema(dict(zip(names, types, strict=True)))
 
     def __init__(self, schema: dict[str, ColumnType]):
         self._schema = dict(schema)  # Defensive copy
@@ -80,28 +123,6 @@ class Schema:
              The index of the column.
         """
         return list(self._schema.keys()).index(column_name)
-
-    @staticmethod
-    def _from_dataframe(dataframe: pd.DataFrame) -> Schema:
-        """
-        Construct a TableSchema from a Dataframe. This function is not supposed to be exposed to the user.
-
-        Parameters
-        ----------
-        dataframe : pd.DataFrame
-            The Dataframe used to construct the TableSchema.
-
-        Returns
-        -------
-        _from_dataframe: Schema
-            The constructed TableSchema.
-
-        """
-        names = dataframe.columns
-        # noinspection PyProtectedMember
-        types = (ColumnType._from_numpy_dtype(dtype) for dtype in dataframe.dtypes)
-
-        return Schema(dict(zip(names, types, strict=True)))
 
     def get_column_names(self) -> list[str]:
         """
