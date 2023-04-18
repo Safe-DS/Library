@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from hashlib import md5
-from typing import Any, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 import pandas as pd
 from IPython.core.display_functions import DisplayHandle, display
