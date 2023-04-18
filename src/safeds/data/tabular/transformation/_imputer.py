@@ -159,7 +159,8 @@ class Imputer(TableTransformer):
 
         data = table._data.copy()
         data[self._column_names] = pd.DataFrame(
-            self._wrapped_transformer.transform(data[self._column_names]), columns=self._column_names,
+            self._wrapped_transformer.transform(data[self._column_names]),
+            columns=self._column_names,
         )
         return Table(data, table.schema)
 
