@@ -149,6 +149,42 @@ class TestLen:
         assert len(row) == expected
 
 
+class TestStr:
+    @pytest.mark.parametrize(
+        ("row", "expected"),
+        [
+            (Row.from_dict({}), "{}"),
+            (Row.from_dict({"col1": 0}), "{'col1': 0}"),
+            (Row.from_dict({"col1": 0, "col2": "a"}), "{\n    'col1': 0,\n    'col2': 'a'\n}"),
+        ],
+        ids=[
+            "empty",
+            "single column",
+            "multiple columns",
+        ]
+    )
+    def test_should_return_a_string_representation(self, row: Row, expected: str) -> None:
+        assert str(row) == expected
+
+
+class TestRepr:
+    @pytest.mark.parametrize(
+        ("row", "expected"),
+        [
+            (Row.from_dict({}), "Row({})"),
+            (Row.from_dict({"col1": 0}), "Row({'col1': 0})"),
+            (Row.from_dict({"col1": 0, "col2": "a"}), "Row({\n    'col1': 0,\n    'col2': 'a'\n})"),
+        ],
+        ids=[
+            "empty",
+            "single column",
+            "multiple columns",
+        ]
+    )
+    def test_should_return_a_string_representation(self, row: Row, expected: str) -> None:
+        assert repr(row) == expected
+
+
 class TestGetValue:
     @pytest.mark.parametrize(
         ("row", "column_name", "expected"),

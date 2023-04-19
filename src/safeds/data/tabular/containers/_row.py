@@ -90,14 +90,18 @@ class Row:
         return len(self._data)
 
     def __repr__(self) -> str:
-        tmp = self._data.to_frame().T
-        tmp.columns = self.get_column_names()
-        return tmp.__repr__()
+        return f"Row({str(self)})"
 
     def __str__(self) -> str:
-        tmp = self._data.to_frame().T
-        tmp.columns = self.get_column_names()
-        return tmp.__str__()
+        match len(self):
+            case 0:
+                return "{}"
+            case 1:
+                return str(self.to_dict())
+            case _:
+                lines = (f"    {name!r}: {value!r}" for name, value in self.to_dict().items())
+                joined = ",\n".join(lines)
+                return f"{{\n{joined}\n}}"
 
     # ------------------------------------------------------------------------------------------------------------------
     # Properties
