@@ -358,3 +358,19 @@ class TestToDict:
     )
     def test_should_return_dict_for_table(self, row: Row, expected: dict[str, Any]) -> None:
         assert row.to_dict() == expected
+
+
+class TestReprHtml:
+    @pytest.mark.parametrize(
+        "row",
+        [
+            Row(pl.DataFrame({})),
+            Row(pl.DataFrame({"a": 1, "b": 2})),
+        ],
+        ids=[
+            "empty",
+            "non-empty",
+        ],
+    )
+    def test_should_contain_table_element(self, row: Row) -> None:
+        assert "<table" in row._repr_html_()

@@ -2,9 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
-import pandas as pd
 import polars as pl
-from IPython.core.display_functions import DisplayHandle, display
 
 from safeds.data.tabular.exceptions import UnknownColumnNameError
 from safeds.data.tabular.typing import ColumnType, Schema
@@ -211,16 +209,14 @@ class Row:
     # IPython integration
     # ------------------------------------------------------------------------------------------------------------------
 
-    def _ipython_display_(self) -> DisplayHandle:
+    def _repr_html_(self) -> str:
         """
-        Return a display object for the column to be used in Jupyter Notebooks.
+        Return an HTML representation of the row.
 
         Returns
         -------
-        output : DisplayHandle
-            Output object.
+        output : str
+            The generated HTML.
         """
-        tmp = self._data.to_pandas()
-
-        with pd.option_context("display.max_rows", tmp.shape[0], "display.max_columns", tmp.shape[1]):
-            return display(tmp)
+        # noinspection PyProtectedMember
+        return self._data._repr_html_()
