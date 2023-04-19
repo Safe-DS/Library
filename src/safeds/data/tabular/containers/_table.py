@@ -992,7 +992,7 @@ class Table:
     # Plotting
     # ------------------------------------------------------------------------------------------------------------------
 
-    def correlation_heatmap(self) -> Image:
+    def plot_correlation_heatmap(self) -> Image:
         """
         Plot a correlation heatmap for all numerical columns of this `Table`.
 
@@ -1020,7 +1020,7 @@ class Table:
         buffer.seek(0)
         return Image(buffer, format_=ImageFormat.PNG)
 
-    def lineplot(self, x_column_name: str, y_column_name: str) -> Image:
+    def plot_lineplot(self, x_column_name: str, y_column_name: str) -> Image:
         """
         Plot two columns against each other in a lineplot.
 
@@ -1070,7 +1070,7 @@ class Table:
         buffer.seek(0)
         return Image(buffer, format_=ImageFormat.PNG)
 
-    def scatterplot(self, x_column_name: str, y_column_name: str) -> Image:
+    def plot_scatterplot(self, x_column_name: str, y_column_name: str) -> Image:
         """
         Plot two columns against each other in a scatterplot.
 
