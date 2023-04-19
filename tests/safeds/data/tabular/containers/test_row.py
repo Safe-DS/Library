@@ -1,10 +1,10 @@
 from typing import Any
 
+import polars as pl
 import pytest
 from safeds.data.tabular.containers import Row, Table
 from safeds.data.tabular.exceptions import UnknownColumnNameError
 from safeds.data.tabular.typing import ColumnType, Integer, Schema, String
-import polars as pl
 
 
 class TestFromDict:
@@ -90,7 +90,7 @@ class TestEq:
         ids=[
             "Row vs. None",
             "Row vs. Table",
-        ]
+        ],
     )
     def test_should_return_not_implemented_if_other_is_not_row(self, row: Row, other: Any) -> None:
         assert (row.__eq__(other)) is NotImplemented
@@ -156,7 +156,7 @@ class TestStr:
             "empty",
             "single column",
             "multiple columns",
-        ]
+        ],
     )
     def test_should_return_a_string_representation(self, row: Row, expected: str) -> None:
         assert str(row) == expected
@@ -174,7 +174,7 @@ class TestRepr:
             "empty",
             "single column",
             "multiple columns",
-        ]
+        ],
     )
     def test_should_return_a_string_representation(self, row: Row, expected: str) -> None:
         assert repr(row) == expected

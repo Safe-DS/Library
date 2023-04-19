@@ -1,6 +1,7 @@
+import polars as pl
 from safeds.data.tabular.containers import Row, Table
 from safeds.data.tabular.typing import Integer, Schema, String
-import polars as pl
+
 
 def test_to_rows() -> None:
     table = Table.from_dict(

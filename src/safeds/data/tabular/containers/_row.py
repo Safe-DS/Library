@@ -14,9 +14,7 @@ if TYPE_CHECKING:
 
 
 class Row:
-    """
-    A row is a collection of values, where each value is associated with a column name.
-    """
+    """A row is a collection of values, where each value is associated with a column name."""
 
     # ------------------------------------------------------------------------------------------------------------------
     # Creation

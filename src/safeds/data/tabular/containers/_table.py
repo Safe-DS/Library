@@ -27,6 +27,7 @@ from safeds.data.tabular.exceptions import (
     UnknownColumnNameError,
 )
 from safeds.data.tabular.typing import ColumnType, Schema
+
 from ._column import Column
 from ._row import Row
 
