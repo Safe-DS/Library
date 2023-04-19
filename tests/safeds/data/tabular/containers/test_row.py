@@ -23,6 +23,10 @@ class TestFromDict:
                 Row(pl.DataFrame({"a": 1, "b": 2})),
             ),
         ],
+        ids=[
+            "empty",
+            "non-empty",
+        ]
     )
     def test_should_create_row_from_dict(self, data: dict[str, Any], expected: Row) -> None:
         assert Row.from_dict(data) == expected
@@ -45,6 +49,11 @@ class TestInit:
                 Schema({"col1": Integer(), "col2": String()}),
             ),
         ],
+        ids=[
+            "empty",
+            "one column",
+            "two columns",
+        ]
     )
     def test_should_use_the_schema_if_passed(self, row: Row, expected: Schema) -> None:
         assert row._schema == expected
@@ -55,6 +64,10 @@ class TestInit:
             (Row(pl.DataFrame()), Schema({})),
             (Row(pl.DataFrame({"col1": 0})), Schema({"col1": Integer()})),
         ],
+        ids=[
+            "empty",
+            "one column",
+        ]
     )
     def test_should_infer_the_schema_if_not_passed(self, row: Row, expected: Schema) -> None:
         assert row._schema == expected
@@ -82,6 +95,20 @@ class TestEq:
         assert (row1.__eq__(row2)) == expected
 
     @pytest.mark.parametrize(
+        "row",
+        [
+            Row.from_dict({}),
+            Row.from_dict({"col1": 0}),
+        ],
+        ids=[
+            "empty",
+            "non-empty",
+        ],
+    )
+    def test_should_return_true_if_objects_are_identical(self, row: Row) -> None:
+        assert (row.__eq__(row)) is True
+
+    @pytest.mark.parametrize(
         ("row", "other"),
         [
             (Row.from_dict({"col1": 0}), None),
@@ -103,6 +130,10 @@ class TestGetitem:
             (Row.from_dict({"col1": 0}), "col1", 0),
             (Row.from_dict({"col1": 0, "col2": "a"}), "col2", "a"),
         ],
+        ids=[
+            "one column",
+            "two columns",
+        ],
     )
     def test_should_return_the_value_in_the_column(self, row: Row, column_name: str, expected: Any) -> None:
         assert row[column_name] == expected
@@ -112,6 +143,10 @@ class TestGetitem:
         [
             (Row.from_dict({}), "col1"),
             (Row.from_dict({"col1": 0}), "col2"),
+        ],
+        ids=[
+            "empty row",
+            "column does not exist",
         ],
     )
     def test_should_raise_if_column_does_not_exist(self, row: Row, column_name: str) -> None:
@@ -127,6 +162,10 @@ class TestIter:
             (Row.from_dict({}), []),
             (Row.from_dict({"col1": 0}), ["col1"]),
         ],
+        ids=[
+            "empty",
+            "non-empty",
+        ],
     )
     def test_should_return_an_iterator_for_the_column_names(self, row: Row, expected: list[str]) -> None:
         assert list(row) == expected
@@ -138,6 +177,10 @@ class TestLen:
         [
             (Row.from_dict({}), 0),
             (Row.from_dict({"col1": 0, "col2": "a"}), 2),
+        ],
+        ids=[
+            "empty",
+            "non-empty",
         ],
     )
     def test_should_return_the_number_of_columns(self, row: Row, expected: int) -> None:
@@ -187,6 +230,10 @@ class TestGetValue:
             (Row.from_dict({"col1": 0}), "col1", 0),
             (Row.from_dict({"col1": 0, "col2": "a"}), "col2", "a"),
         ],
+        ids=[
+            "one column",
+            "two columns",
+        ],
     )
     def test_should_return_the_value_in_the_column(self, row: Row, column_name: str, expected: Any) -> None:
         assert row.get_value(column_name) == expected
@@ -196,6 +243,10 @@ class TestGetValue:
         [
             (Row.from_dict({}), "col1"),
             (Row.from_dict({"col1": 0}), "col2"),
+        ],
+        ids=[
+            "empty row",
+            "column does not exist",
         ],
     )
     def test_should_raise_if_column_does_not_exist(self, row: Row, column_name: str) -> None:
@@ -211,6 +262,11 @@ class TestHasColumn:
             (Row.from_dict({"col1": 0}), "col1", True),
             (Row.from_dict({"col1": 0}), "col2", False),
         ],
+        ids=[
+            "empty row",
+            "column exists",
+            "column does not exist",
+        ],
     )
     def test_should_return_whether_the_row_has_the_column(self, row: Row, column_name: str, expected: bool) -> None:
         assert row.has_column(column_name) == expected
@@ -222,6 +278,10 @@ class TestGetColumnNames:
         [
             (Row.from_dict({}), []),
             (Row.from_dict({"col1": 0}), ["col1"]),
+        ],
+        ids=[
+            "empty",
+            "non-empty",
         ],
     )
     def test_should_return_the_column_names(self, row: Row, expected: list[str]) -> None:
@@ -235,6 +295,10 @@ class TestGetTypeOfColumn:
             (Row.from_dict({"col1": 0}), "col1", Integer()),
             (Row.from_dict({"col1": 0, "col2": "a"}), "col2", String()),
         ],
+        ids=[
+            "one column",
+            "two columns",
+        ],
     )
     def test_should_return_the_type_of_the_column(self, row: Row, column_name: str, expected: ColumnType) -> None:
         assert row.get_type_of_column(column_name) == expected
@@ -244,6 +308,10 @@ class TestGetTypeOfColumn:
         [
             (Row.from_dict({}), "col1"),
             (Row.from_dict({"col1": 0}), "col2"),
+        ],
+        ids=[
+            "empty row",
+            "column does not exist",
         ],
     )
     def test_should_raise_if_column_does_not_exist(self, row: Row, column_name: str) -> None:
@@ -257,6 +325,10 @@ class TestCount:
         [
             (Row.from_dict({}), 0),
             (Row.from_dict({"col1": 0, "col2": "a"}), 2),
+        ],
+        ids=[
+            "empty",
+            "non-empty",
         ],
     )
     def test_should_return_the_number_of_columns(self, row: Row, expected: int) -> None:
@@ -278,6 +350,10 @@ class TestToDict:
                     "b": 2,
                 },
             ),
+        ],
+        ids=[
+            "empty",
+            "non-empty",
         ],
     )
     def test_should_return_dict_for_table(self, row: Row, expected: dict[str, Any]) -> None:
