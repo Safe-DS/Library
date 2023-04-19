@@ -12,7 +12,16 @@ if TYPE_CHECKING:
 
 
 class Row:
-    """A row is a collection of values, where each value is associated with a column name."""
+    """
+    A row is a collection of values, where each value is associated with a column name.
+
+    To create a row manually, use the static method [from_dict][safeds.data.tabular.containers._row.Row.from_dict].
+
+    Examples
+    --------
+    >>> from safeds.data.tabular.containers import Row
+    >>> row = Row.from_dict({"a": 1, "b": 2})
+    """
 
     # ------------------------------------------------------------------------------------------------------------------
     # Creation
@@ -32,6 +41,11 @@ class Row:
         -------
         row : Row
             The generated row.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Row
+        >>> row = Row.from_dict({"a": 1, "b": 2})
         """
         return Row(pl.DataFrame(data))
 
@@ -40,6 +54,20 @@ class Row:
     # ------------------------------------------------------------------------------------------------------------------
 
     def __init__(self, data: pl.DataFrame, schema: Schema | None = None):
+        """
+        Initialize a row from a `polars.DataFrame`.
+
+        **Do not use this method directly.** It is not part of the public interface and may change in the future
+        without a major version bump. Use the static method
+        [from_dict][safeds.data.tabular.containers._row.Row.from_dict] instead.
+
+        Parameters
+        ----------
+        data : polars.DataFrame
+            The data.
+        schema : Schema | None
+            The schema. If None, the schema is inferred from the data.
+        """
         self._data: pl.DataFrame = data
 
         self._schema: Schema
@@ -57,12 +85,53 @@ class Row:
         return self._schema == other._schema and self._data.frame_equal(other._data)
 
     def __getitem__(self, column_name: str) -> Any:
+        """
+        Return the value of a specified column.
+
+        Parameters
+        ----------
+        column_name : str
+            The column name.
+
+        Returns
+        -------
+        value : Any
+            The value of the column.
+
+        Raises
+        ------
+        UnknownColumnNameError
+            If the row does not contain the specified column.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Row
+        >>> row = Row.from_dict({"a": 1, "b": 2})
+        >>> row["a"]
+        1
+        """
+
         return self.get_value(column_name)
 
     def __iter__(self) -> Iterator[Any]:
         return iter(self.get_column_names())
 
     def __len__(self) -> int:
+        """
+        Return the number of columns in this row.
+
+        Returns
+        -------
+        count : int
+            The number of columns.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Row
+        >>> row = Row.from_dict({"a": 1, "b": 2})
+        >>> len(row)
+        2
+        """
         return self._data.shape[1]
 
     def __repr__(self) -> str:
@@ -92,6 +161,12 @@ class Row:
         -------
         schema : Schema
             The schema.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Row
+        >>> row = Row.from_dict({"a": 1, "b": 2})
+        >>> schema = row.schema
         """
         return self._schema
 
@@ -110,13 +185,20 @@ class Row:
 
         Returns
         -------
-        value :
+        value : Any
             The value of the column.
 
         Raises
         ------
         UnknownColumnNameError
             If the row does not contain the specified column.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Row
+        >>> row = Row.from_dict({"a": 1, "b": 2})
+        >>> row.get_value("a")
+        1
         """
         if not self.has_column(column_name):
             raise UnknownColumnNameError([column_name])
@@ -127,8 +209,6 @@ class Row:
         """
         Return whether the row contains a given column.
 
-        Alias for self.schema.hasColumn(column_name: str) -> bool.
-
         Parameters
         ----------
         column_name : str
@@ -136,21 +216,36 @@ class Row:
 
         Returns
         -------
-        contains : bool
+        has_column : bool
             True, if row contains the column.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Row
+        >>> row = Row.from_dict({"a": 1, "b": 2})
+        >>> row.has_column("a")
+        True
+
+        >>> row.has_column("c")
+        False
         """
         return self._schema.has_column(column_name)
 
     def get_column_names(self) -> list[str]:
         """
-        Return a list of all column names saved in this schema.
-
-        Alias for self.schema.get_column_names() -> list[str].
+        Return a list of all column names in the row.
 
         Returns
         -------
         column_names : list[str]
             The column names.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Row
+        >>> row = Row.from_dict({"a": 1, "b": 2})
+        >>> row.get_column_names()
+        ['a', 'b']
         """
         return self._schema.get_column_names()
 
@@ -170,8 +265,15 @@ class Row:
 
         Raises
         ------
-        ColumnNameError
-            If the specified target column name does not exist.
+        UnknownColumnNameError
+            If the row does not contain the specified column.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Row
+        >>> row = Row.from_dict({"a": 1, "b": 2})
+        >>> row.get_type_of_column("a")
+        Integer
         """
         return self._schema.get_type_of_column(column_name)
 
@@ -187,6 +289,13 @@ class Row:
         -------
         count : int
             The number of columns.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Row
+        >>> row = Row.from_dict({"a": 1, "b": 2})
+        >>> row.count()
+        2
         """
         return self._data.shape[1]
 
@@ -202,6 +311,13 @@ class Row:
         -------
         data : dict[str, Any]
             Dictionary representation of the row.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Row
+        >>> row = Row.from_dict({"a": 1, "b": 2})
+        >>> row.to_dict()
+        {'a': 1, 'b': 2}
         """
         return {column_name: self.get_value(column_name) for column_name in self.get_column_names()}
 
