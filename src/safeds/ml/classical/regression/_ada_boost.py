@@ -2,9 +2,9 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from sklearn.linear_model import Ridge as sk_Ridge
+from sklearn.ensemble import AdaBoostRegressor as sk_AdaBoostRegressor
 
-from safeds.ml._util_sklearn import fit, predict
+from safeds.ml.classical._util_sklearn import fit, predict
 
 from ._regressor import Regressor
 
@@ -12,15 +12,15 @@ if TYPE_CHECKING:
     from safeds.data.tabular.containers import Table, TaggedTable
 
 
-class RidgeRegression(Regressor):
-    """Ridge regression."""
+class AdaBoost(Regressor):
+    """Ada Boost regression."""
 
     def __init__(self) -> None:
-        self._wrapped_regressor: sk_Ridge | None = None
+        self._wrapped_regressor: sk_AdaBoostRegressor | None = None
         self._feature_names: list[str] | None = None
         self._target_name: str | None = None
 
-    def fit(self, training_set: TaggedTable) -> RidgeRegression:
+    def fit(self, training_set: TaggedTable) -> AdaBoost:
         """
         Create a copy of this regressor and fit it with the given training data.
 
@@ -33,7 +33,7 @@ class RidgeRegression(Regressor):
 
         Returns
         -------
-        fitted_regressor : RidgeRegression
+        fitted_regressor : AdaBoost
             The fitted regressor.
 
         Raises
@@ -41,10 +41,10 @@ class RidgeRegression(Regressor):
         LearningError
             If the training data contains invalid values or if the training failed.
         """
-        wrapped_regressor = sk_Ridge()
+        wrapped_regressor = sk_AdaBoostRegressor()
         fit(wrapped_regressor, training_set)
 
-        result = RidgeRegression()
+        result = AdaBoost()
         result._wrapped_regressor = wrapped_regressor
         result._feature_names = training_set.features.get_column_names()
         result._target_name = training_set.target.name

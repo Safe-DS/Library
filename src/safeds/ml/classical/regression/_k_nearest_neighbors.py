@@ -2,29 +2,38 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from sklearn.tree import DecisionTreeClassifier as sk_DecisionTreeClassifier
+from sklearn.neighbors import KNeighborsRegressor as sk_KNeighborsRegressor
 
-from safeds.ml._util_sklearn import fit, predict
+from safeds.ml.classical._util_sklearn import fit, predict
 
-from ._classifier import Classifier
+from ._regressor import Regressor
 
 if TYPE_CHECKING:
     from safeds.data.tabular.containers import Table, TaggedTable
 
 
-class DecisionTree(Classifier):
-    """Decision tree classification."""
+class KNearestNeighbors(Regressor):
+    """
+    K-nearest-neighbors regression.
 
-    def __init__(self) -> None:
-        self._wrapped_classifier: sk_DecisionTreeClassifier | None = None
+    Parameters
+    ----------
+    number_of_neighbors : int
+        The number of neighbors to be interpolated with. Has to be less than or equal than the sample size.
+    """
+
+    def __init__(self, number_of_neighbors: int) -> None:
+        self._number_of_neighbors = number_of_neighbors
+
+        self._wrapped_regressor: sk_KNeighborsRegressor | None = None
         self._feature_names: list[str] | None = None
         self._target_name: str | None = None
 
-    def fit(self, training_set: TaggedTable) -> DecisionTree:
+    def fit(self, training_set: TaggedTable) -> KNearestNeighbors:
         """
-        Create a copy of this classifier and fit it with the given training data.
+        Create a copy of this regressor and fit it with the given training data.
 
-        This classifier is not modified.
+        This regressor is not modified.
 
         Parameters
         ----------
@@ -33,19 +42,19 @@ class DecisionTree(Classifier):
 
         Returns
         -------
-        fitted_classifier : DecisionTree
-            The fitted classifier.
+        fitted_regressor : KNearestNeighbors
+            The fitted regressor.
 
         Raises
         ------
         LearningError
             If the training data contains invalid values or if the training failed.
         """
-        wrapped_classifier = sk_DecisionTreeClassifier()
-        fit(wrapped_classifier, training_set)
+        wrapped_regressor = sk_KNeighborsRegressor(self._number_of_neighbors, n_jobs=-1)
+        fit(wrapped_regressor, training_set)
 
-        result = DecisionTree()
-        result._wrapped_classifier = wrapped_classifier
+        result = KNearestNeighbors(self._number_of_neighbors)
+        result._wrapped_regressor = wrapped_regressor
         result._feature_names = training_set.features.get_column_names()
         result._target_name = training_set.target.name
 
@@ -76,15 +85,15 @@ class DecisionTree(Classifier):
         PredictionError
             If predicting with the given dataset failed.
         """
-        return predict(self._wrapped_classifier, dataset, self._feature_names, self._target_name)
+        return predict(self._wrapped_regressor, dataset, self._feature_names, self._target_name)
 
     def is_fitted(self) -> bool:
         """
-        Check if the classifier is fitted.
+        Check if the regressor is fitted.
 
         Returns
         -------
         is_fitted : bool
-            Whether the classifier is fitted.
+            Whether the regressor is fitted.
         """
-        return self._wrapped_classifier is not None
+        return self._wrapped_regressor is not None

@@ -2,9 +2,9 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from sklearn.linear_model import LogisticRegression as sk_LogisticRegression
+from sklearn.neighbors import KNeighborsClassifier as sk_KNeighborsClassifier
 
-from safeds.ml._util_sklearn import fit, predict
+from safeds.ml.classical._util_sklearn import fit, predict
 
 from ._classifier import Classifier
 
@@ -12,15 +12,24 @@ if TYPE_CHECKING:
     from safeds.data.tabular.containers import Table, TaggedTable
 
 
-class LogisticRegression(Classifier):
-    """Regularized logistic regression."""
+class KNearestNeighbors(Classifier):
+    """
+    K-nearest-neighbors classification.
 
-    def __init__(self) -> None:
-        self._wrapped_classifier: sk_LogisticRegression | None = None
+    Parameters
+    ----------
+    number_of_neighbors : int
+        The number of neighbors to be interpolated with. Has to be less than or equal to the sample size.
+    """
+
+    def __init__(self, number_of_neighbors: int) -> None:
+        self._number_of_neighbors = number_of_neighbors
+
+        self._wrapped_classifier: sk_KNeighborsClassifier | None = None
         self._feature_names: list[str] | None = None
         self._target_name: str | None = None
 
-    def fit(self, training_set: TaggedTable) -> LogisticRegression:
+    def fit(self, training_set: TaggedTable) -> KNearestNeighbors:
         """
         Create a copy of this classifier and fit it with the given training data.
 
@@ -33,7 +42,7 @@ class LogisticRegression(Classifier):
 
         Returns
         -------
-        fitted_classifier : LogisticRegression
+        fitted_classifier : KNearestNeighbors
             The fitted classifier.
 
         Raises
@@ -41,10 +50,10 @@ class LogisticRegression(Classifier):
         LearningError
             If the training data contains invalid values or if the training failed.
         """
-        wrapped_classifier = sk_LogisticRegression(n_jobs=-1)
+        wrapped_classifier = sk_KNeighborsClassifier(self._number_of_neighbors, n_jobs=-1)
         fit(wrapped_classifier, training_set)
 
-        result = LogisticRegression()
+        result = KNearestNeighbors(self._number_of_neighbors)
         result._wrapped_classifier = wrapped_classifier
         result._feature_names = training_set.features.get_column_names()
         result._target_name = training_set.target.name

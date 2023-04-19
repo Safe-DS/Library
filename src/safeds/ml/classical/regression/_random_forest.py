@@ -2,9 +2,9 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from sklearn.linear_model import LinearRegression as sk_LinearRegression
+from sklearn.ensemble import RandomForestRegressor as sk_RandomForestRegressor
 
-from safeds.ml._util_sklearn import fit, predict
+from safeds.ml.classical._util_sklearn import fit, predict
 
 from ._regressor import Regressor
 
@@ -12,15 +12,15 @@ if TYPE_CHECKING:
     from safeds.data.tabular.containers import Table, TaggedTable
 
 
-class LinearRegression(Regressor):
-    """Linear regression."""
+class RandomForest(Regressor):
+    """Random forest regression."""
 
     def __init__(self) -> None:
-        self._wrapped_regressor: sk_LinearRegression | None = None
+        self._wrapped_regressor: sk_RandomForestRegressor | None = None
         self._feature_names: list[str] | None = None
         self._target_name: str | None = None
 
-    def fit(self, training_set: TaggedTable) -> LinearRegression:
+    def fit(self, training_set: TaggedTable) -> RandomForest:
         """
         Create a copy of this regressor and fit it with the given training data.
 
@@ -33,7 +33,7 @@ class LinearRegression(Regressor):
 
         Returns
         -------
-        fitted_regressor : LinearRegression
+        fitted_regressor : RandomForest
             The fitted regressor.
 
         Raises
@@ -41,10 +41,10 @@ class LinearRegression(Regressor):
         LearningError
             If the training data contains invalid values or if the training failed.
         """
-        wrapped_regressor = sk_LinearRegression(n_jobs=-1)
+        wrapped_regressor = sk_RandomForestRegressor(n_jobs=-1)
         fit(wrapped_regressor, training_set)
 
-        result = LinearRegression()
+        result = RandomForest()
         result._wrapped_regressor = wrapped_regressor
         result._feature_names = training_set.features.get_column_names()
         result._target_name = training_set.target.name

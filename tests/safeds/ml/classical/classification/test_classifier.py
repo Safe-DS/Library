@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 
 import pytest
 from safeds.data.tabular.containers import Table, TaggedTable
-from safeds.ml.classification import (
+from safeds.ml.classical.classification import (
     AdaBoost,
     Classifier,
     DecisionTree,

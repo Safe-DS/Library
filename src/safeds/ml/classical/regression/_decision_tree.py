@@ -2,9 +2,9 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from sklearn.ensemble import GradientBoostingRegressor as sk_GradientBoostingRegressor
+from sklearn.tree import DecisionTreeRegressor as sk_DecisionTreeRegressor
 
-from safeds.ml._util_sklearn import fit, predict
+from safeds.ml.classical._util_sklearn import fit, predict
 
 from ._regressor import Regressor
 
@@ -12,15 +12,15 @@ if TYPE_CHECKING:
     from safeds.data.tabular.containers import Table, TaggedTable
 
 
-class GradientBoosting(Regressor):
-    """Gradient boosting regression."""
+class DecisionTree(Regressor):
+    """Decision tree regression."""
 
     def __init__(self) -> None:
-        self._wrapped_regressor: sk_GradientBoostingRegressor | None = None
+        self._wrapped_regressor: sk_DecisionTreeRegressor | None = None
         self._feature_names: list[str] | None = None
         self._target_name: str | None = None
 
-    def fit(self, training_set: TaggedTable) -> GradientBoosting:
+    def fit(self, training_set: TaggedTable) -> DecisionTree:
         """
         Create a copy of this regressor and fit it with the given training data.
 
@@ -33,7 +33,7 @@ class GradientBoosting(Regressor):
 
         Returns
         -------
-        fitted_regressor : GradientBoosting
+        fitted_regressor : DecisionTree
             The fitted regressor.
 
         Raises
@@ -41,10 +41,10 @@ class GradientBoosting(Regressor):
         LearningError
             If the training data contains invalid values or if the training failed.
         """
-        wrapped_regressor = sk_GradientBoostingRegressor()
+        wrapped_regressor = sk_DecisionTreeRegressor()
         fit(wrapped_regressor, training_set)
 
-        result = GradientBoosting()
+        result = DecisionTree()
         result._wrapped_regressor = wrapped_regressor
         result._feature_names = training_set.features.get_column_names()
         result._target_name = training_set.target.name
