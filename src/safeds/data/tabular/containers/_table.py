@@ -1070,7 +1070,7 @@ class Table:
         buffer.seek(0)
         return Image(buffer, format_=ImageFormat.PNG)
 
-    def scatterplot(self, x_column_name: str, y_column_name: str) -> Image:
+    def plot_scatterplot(self, x_column_name: str, y_column_name: str) -> Image:
         """
         Plot two columns against each other in a scatterplot.
 
