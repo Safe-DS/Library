@@ -992,7 +992,7 @@ class Table:
     # Plotting
     # ------------------------------------------------------------------------------------------------------------------
 
-    def correlation_heatmap(self) -> Image:
+    def plot_correlation_heatmap(self) -> Image:
         """
         Plot a correlation heatmap for all numerical columns of this `Table`.
 
