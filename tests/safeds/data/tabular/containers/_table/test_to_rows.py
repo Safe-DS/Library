@@ -1,6 +1,6 @@
 from safeds.data.tabular.containers import Row, Table
 from safeds.data.tabular.typing import Integer, Schema, String
-
+import polars as pl
 
 def test_to_rows() -> None:
     table = Table.from_dict(
@@ -19,9 +19,9 @@ def test_to_rows() -> None:
         },
     )
     rows_expected = [
-        Row([1, 4, "d"], expected_schema),
-        Row([2, 5, "e"], expected_schema),
-        Row([3, 6, "f"], expected_schema),
+        Row(pl.DataFrame({"A": 1, "B": 4, "D": "d"}), expected_schema),
+        Row(pl.DataFrame({"A": 2, "B": 5, "D": "e"}), expected_schema),
+        Row(pl.DataFrame({"A": 3, "B": 6, "D": "f"}), expected_schema),
     ]
 
     rows_is = table.to_rows()

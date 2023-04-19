@@ -8,9 +8,10 @@ from typing import TYPE_CHECKING, Any
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import polars as pl
 import seaborn as sns
 from IPython.core.display_functions import DisplayHandle, display
-from pandas import DataFrame, Series
+from pandas import DataFrame
 from scipy import stats
 
 from safeds.data.image.containers import Image
@@ -26,7 +27,6 @@ from safeds.data.tabular.exceptions import (
     UnknownColumnNameError,
 )
 from safeds.data.tabular.typing import ColumnType, Schema
-
 from ._column import Column
 from ._row import Row
 
@@ -203,14 +203,14 @@ class Table:
             raise MissingDataError("This function requires at least one row.")
 
         schema_compare: Schema = rows[0]._schema
-        row_array: list[Series] = []
+        row_array: list[pd.DataFrame] = []
 
         for row in rows:
             if schema_compare != row._schema:
                 raise SchemaMismatchError
-            row_array.append(row._data)
+            row_array.append(row._data.to_pandas())
 
-        dataframe: DataFrame = pd.DataFrame(row_array)
+        dataframe: DataFrame = pd.concat(row_array, ignore_index=True)
         dataframe.columns = schema_compare.get_column_names()
         return Table(dataframe)
 
@@ -387,7 +387,8 @@ class Table:
         """
         if len(self._data.index) - 1 < index or index < 0:
             raise IndexOutOfBoundsError(index)
-        return Row(self._data.iloc[[index]].squeeze(), self._schema)
+
+        return Row(pl.DataFrame(self._data.iloc[[index]]), self._schema)
 
     # ------------------------------------------------------------------------------------------------------------------
     # Information
@@ -543,8 +544,7 @@ class Table:
         if self._schema != row.schema:
             raise SchemaMismatchError
 
-        row_frame = row._data.to_frame().T
-        row_frame.columns = self.get_column_names()
+        row_frame = row._data.to_pandas()
 
         new_df = pd.concat([self._data, row_frame]).infer_objects()
         new_df.columns = self.get_column_names()
@@ -571,7 +571,7 @@ class Table:
             if self._schema != row.schema:
                 raise SchemaMismatchError
 
-        row_frames = [row._data.to_frame().T for row in rows]
+        row_frames = [row._data.to_pandas() for row in rows]
         for row_frame in row_frames:
             row_frame.columns = self.get_column_names()
 
@@ -1186,7 +1186,10 @@ class Table:
         rows : list[Row]
             List of rows.
         """
-        return [Row(series_row, self._schema) for (_, series_row) in self._data.iterrows()]
+        return [
+            Row(pl.DataFrame([list(series_row)], schema=self._schema.get_column_names()), self._schema)
+            for (_, series_row) in self._data.iterrows()
+        ]
 
     # ------------------------------------------------------------------------------------------------------------------
     # IPython integration
