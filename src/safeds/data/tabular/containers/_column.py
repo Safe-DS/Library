@@ -473,7 +473,7 @@ class Column:
     # Plotting
     # ------------------------------------------------------------------------------------------------------------------
 
-    def boxplot(self) -> Image:
+    def plot_boxplot(self) -> Image:
         """
         Plot this column in a boxplot. This function can only plot real numerical data.
 
