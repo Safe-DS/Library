@@ -507,7 +507,7 @@ class Column:
         buffer.seek(0)
         return Image(buffer, ImageFormat.PNG)
 
-    def histogram(self) -> Image:
+    def plot_histogram(self) -> Image:
         """
         Plot a column in a histogram.
 
