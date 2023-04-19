@@ -26,7 +26,7 @@ class TestFromDict:
         ids=[
             "empty",
             "non-empty",
-        ]
+        ],
     )
     def test_should_create_row_from_dict(self, data: dict[str, Any], expected: Row) -> None:
         assert Row.from_dict(data) == expected
@@ -53,7 +53,7 @@ class TestInit:
             "empty",
             "one column",
             "two columns",
-        ]
+        ],
     )
     def test_should_use_the_schema_if_passed(self, row: Row, expected: Schema) -> None:
         assert row._schema == expected
@@ -67,7 +67,7 @@ class TestInit:
         ids=[
             "empty",
             "one column",
-        ]
+        ],
     )
     def test_should_infer_the_schema_if_not_passed(self, row: Row, expected: Schema) -> None:
         assert row._schema == expected
