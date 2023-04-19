@@ -13,7 +13,7 @@ from safeds.ml.exceptions import (
     ModelNotFittedError,
     PredictionError,
 )
-from safeds.ml.regression import (
+from safeds.ml.classical.regression import (
     AdaBoost,
     DecisionTree,
     ElasticNetRegression,
@@ -27,7 +27,7 @@ from safeds.ml.regression import (
 )
 
 # noinspection PyProtectedMember
-from safeds.ml.regression._regressor import _check_metrics_preconditions
+from safeds.ml.classical.regression._regressor import _check_metrics_preconditions
 
 if TYPE_CHECKING:
     from _pytest.fixtures import FixtureRequest

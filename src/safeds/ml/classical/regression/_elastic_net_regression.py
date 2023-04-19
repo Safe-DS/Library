@@ -2,9 +2,9 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from sklearn.linear_model import Lasso as sk_Lasso
+from sklearn.linear_model import ElasticNet as sk_ElasticNet
 
-from safeds.ml._util_sklearn import fit, predict
+from safeds.ml.classical._util_sklearn import fit, predict
 
 from ._regressor import Regressor
 
@@ -12,15 +12,15 @@ if TYPE_CHECKING:
     from safeds.data.tabular.containers import Table, TaggedTable
 
 
-class LassoRegression(Regressor):
-    """Lasso regression."""
+class ElasticNetRegression(Regressor):
+    """Elastic net regression."""
 
     def __init__(self) -> None:
-        self._wrapped_regressor: sk_Lasso | None = None
+        self._wrapped_regressor: sk_ElasticNet | None = None
         self._feature_names: list[str] | None = None
         self._target_name: str | None = None
 
-    def fit(self, training_set: TaggedTable) -> LassoRegression:
+    def fit(self, training_set: TaggedTable) -> ElasticNetRegression:
         """
         Create a copy of this regressor and fit it with the given training data.
 
@@ -33,7 +33,7 @@ class LassoRegression(Regressor):
 
         Returns
         -------
-        fitted_regressor : LassoRegression
+        fitted_regressor : ElasticNetRegression
             The fitted regressor.
 
         Raises
@@ -41,10 +41,10 @@ class LassoRegression(Regressor):
         LearningError
             If the training data contains invalid values or if the training failed.
         """
-        wrapped_regressor = sk_Lasso()
+        wrapped_regressor = sk_ElasticNet()
         fit(wrapped_regressor, training_set)
 
-        result = LassoRegression()
+        result = ElasticNetRegression()
         result._wrapped_regressor = wrapped_regressor
         result._feature_names = training_set.features.get_column_names()
         result._target_name = training_set.target.name

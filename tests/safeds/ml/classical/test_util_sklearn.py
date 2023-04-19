@@ -1,7 +1,7 @@
 import warnings
 
 from safeds.data.tabular.containers import Table
-from safeds.ml.regression import LinearRegression
+from safeds.ml.classical.regression import LinearRegression
 
 
 def test_predict_should_not_warn_about_feature_names() -> None:

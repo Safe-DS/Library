@@ -2,9 +2,9 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from sklearn.neighbors import KNeighborsRegressor as sk_KNeighborsRegressor
+from sklearn.linear_model import Lasso as sk_Lasso
 
-from safeds.ml._util_sklearn import fit, predict
+from safeds.ml.classical._util_sklearn import fit, predict
 
 from ._regressor import Regressor
 
@@ -12,24 +12,15 @@ if TYPE_CHECKING:
     from safeds.data.tabular.containers import Table, TaggedTable
 
 
-class KNearestNeighbors(Regressor):
-    """
-    K-nearest-neighbors regression.
+class LassoRegression(Regressor):
+    """Lasso regression."""
 
-    Parameters
-    ----------
-    number_of_neighbors : int
-        The number of neighbors to be interpolated with. Has to be less than or equal than the sample size.
-    """
-
-    def __init__(self, number_of_neighbors: int) -> None:
-        self._number_of_neighbors = number_of_neighbors
-
-        self._wrapped_regressor: sk_KNeighborsRegressor | None = None
+    def __init__(self) -> None:
+        self._wrapped_regressor: sk_Lasso | None = None
         self._feature_names: list[str] | None = None
         self._target_name: str | None = None
 
-    def fit(self, training_set: TaggedTable) -> KNearestNeighbors:
+    def fit(self, training_set: TaggedTable) -> LassoRegression:
         """
         Create a copy of this regressor and fit it with the given training data.
 
@@ -42,7 +33,7 @@ class KNearestNeighbors(Regressor):
 
         Returns
         -------
-        fitted_regressor : KNearestNeighbors
+        fitted_regressor : LassoRegression
             The fitted regressor.
 
         Raises
@@ -50,10 +41,10 @@ class KNearestNeighbors(Regressor):
         LearningError
             If the training data contains invalid values or if the training failed.
         """
-        wrapped_regressor = sk_KNeighborsRegressor(self._number_of_neighbors, n_jobs=-1)
+        wrapped_regressor = sk_Lasso()
         fit(wrapped_regressor, training_set)
 
-        result = KNearestNeighbors(self._number_of_neighbors)
+        result = LassoRegression()
         result._wrapped_regressor = wrapped_regressor
         result._feature_names = training_set.features.get_column_names()
         result._target_name = training_set.target.name

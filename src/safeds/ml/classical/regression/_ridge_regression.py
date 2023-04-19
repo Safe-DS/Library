@@ -2,29 +2,29 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from sklearn.ensemble import RandomForestClassifier as sk_RandomForestClassifier
+from sklearn.linear_model import Ridge as sk_Ridge
 
-from safeds.ml._util_sklearn import fit, predict
+from safeds.ml.classical._util_sklearn import fit, predict
 
-from ._classifier import Classifier
+from ._regressor import Regressor
 
 if TYPE_CHECKING:
     from safeds.data.tabular.containers import Table, TaggedTable
 
 
-class RandomForest(Classifier):
-    """Random forest classification."""
+class RidgeRegression(Regressor):
+    """Ridge regression."""
 
     def __init__(self) -> None:
-        self._wrapped_classifier: sk_RandomForestClassifier | None = None
+        self._wrapped_regressor: sk_Ridge | None = None
         self._feature_names: list[str] | None = None
         self._target_name: str | None = None
 
-    def fit(self, training_set: TaggedTable) -> RandomForest:
+    def fit(self, training_set: TaggedTable) -> RidgeRegression:
         """
-        Create a copy of this classifier and fit it with the given training data.
+        Create a copy of this regressor and fit it with the given training data.
 
-        This classifier is not modified.
+        This regressor is not modified.
 
         Parameters
         ----------
@@ -33,19 +33,19 @@ class RandomForest(Classifier):
 
         Returns
         -------
-        fitted_classifier : RandomForest
-            The fitted classifier.
+        fitted_regressor : RidgeRegression
+            The fitted regressor.
 
         Raises
         ------
         LearningError
             If the training data contains invalid values or if the training failed.
         """
-        wrapped_classifier = sk_RandomForestClassifier(n_jobs=-1)
-        fit(wrapped_classifier, training_set)
+        wrapped_regressor = sk_Ridge()
+        fit(wrapped_regressor, training_set)
 
-        result = RandomForest()
-        result._wrapped_classifier = wrapped_classifier
+        result = RidgeRegression()
+        result._wrapped_regressor = wrapped_regressor
         result._feature_names = training_set.features.get_column_names()
         result._target_name = training_set.target.name
 
@@ -76,15 +76,15 @@ class RandomForest(Classifier):
         PredictionError
             If predicting with the given dataset failed.
         """
-        return predict(self._wrapped_classifier, dataset, self._feature_names, self._target_name)
+        return predict(self._wrapped_regressor, dataset, self._feature_names, self._target_name)
 
     def is_fitted(self) -> bool:
         """
-        Check if the classifier is fitted.
+        Check if the regressor is fitted.
 
         Returns
         -------
         is_fitted : bool
-            Whether the classifier is fitted.
+            Whether the regressor is fitted.
         """
-        return self._wrapped_classifier is not None
+        return self._wrapped_regressor is not None
