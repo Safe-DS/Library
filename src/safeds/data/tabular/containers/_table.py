@@ -1020,7 +1020,7 @@ class Table:
         buffer.seek(0)
         return Image(buffer, format_=ImageFormat.PNG)
 
-    def lineplot(self, x_column_name: str, y_column_name: str) -> Image:
+    def plot_lineplot(self, x_column_name: str, y_column_name: str) -> Image:
         """
         Plot two columns against each other in a lineplot.
 
