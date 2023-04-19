@@ -110,7 +110,6 @@ class Row:
         >>> row["a"]
         1
         """
-
         return self.get_value(column_name)
 
     def __iter__(self) -> Iterator[Any]:
