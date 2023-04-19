@@ -4,6 +4,7 @@ import pytest
 from safeds.data.tabular.containers import Row, Table
 from safeds.data.tabular.exceptions import UnknownColumnNameError
 from safeds.data.tabular.typing import ColumnType, Integer, Schema, String
+import polars as pl
 
 
 class TestFromDict:
@@ -12,14 +13,14 @@ class TestFromDict:
         [
             (
                 {},
-                Row([]),
+                Row(pl.DataFrame()),
             ),
             (
                 {
                     "a": 1,
                     "b": 2,
                 },
-                Row([1, 2], schema=Schema({"a": Integer(), "b": Integer()})),
+                Row(pl.DataFrame({"a": 1, "b": 2})),
             ),
         ],
     )
@@ -31,10 +32,16 @@ class TestInit:
     @pytest.mark.parametrize(
         ("row", "expected"),
         [
-            (Row([], Schema({})), Schema({})),
-            (Row([0], Schema({"col1": Integer()})), Schema({"col1": Integer()})),
             (
-                Row([0, "a"], Schema({"col1": Integer(), "col2": String()})),
+                Row(pl.DataFrame(), Schema({})),
+                Schema({}),
+            ),
+            (
+                Row(pl.DataFrame({"col1": 0}), Schema({"col1": Integer()})),
+                Schema({"col1": Integer()}),
+            ),
+            (
+                Row(pl.DataFrame({"col1": 0, "col2": "a"}), Schema({"col1": Integer(), "col2": String()})),
                 Schema({"col1": Integer(), "col2": String()}),
             ),
         ],
@@ -45,8 +52,8 @@ class TestInit:
     @pytest.mark.parametrize(
         ("row", "expected"),
         [
-            (Row([]), Schema({})),
-            (Row([0]), Schema({"column_0": Integer()})),
+            (Row(pl.DataFrame()), Schema({})),
+            (Row(pl.DataFrame({"col1": 0})), Schema({"col1": Integer()})),
         ],
     )
     def test_should_infer_the_schema_if_not_passed(self, row: Row, expected: Schema) -> None:
@@ -63,6 +70,13 @@ class TestEq:
             (Row.from_dict({"col1": 0}), Row.from_dict({"col2": 0}), False),
             (Row.from_dict({"col1": 0}), Row.from_dict({"col1": "a"}), False),
         ],
+        ids=[
+            "empty rows",
+            "equal rows",
+            "different values",
+            "different columns",
+            "different types",
+        ],
     )
     def test_should_return_whether_two_rows_are_equal(self, row1: Row, row2: Row, expected: bool) -> None:
         assert (row1.__eq__(row2)) == expected
@@ -73,6 +87,10 @@ class TestEq:
             (Row.from_dict({"col1": 0}), None),
             (Row.from_dict({"col1": 0}), Table([])),
         ],
+        ids=[
+            "Row vs. None",
+            "Row vs. Table",
+        ]
     )
     def test_should_return_not_implemented_if_other_is_not_row(self, row: Row, other: Any) -> None:
         assert (row.__eq__(other)) is NotImplemented
@@ -100,29 +118,6 @@ class TestGetitem:
         with pytest.raises(UnknownColumnNameError):
             # noinspection PyStatementEffect
             row[column_name]
-
-
-class TestHash:
-    @pytest.mark.parametrize(
-        ("row1", "row2"),
-        [
-            (Row.from_dict({}), Row.from_dict({})),
-            (Row.from_dict({"col1": 0}), Row.from_dict({"col1": 0})),
-        ],
-    )
-    def test_should_return_same_hash_for_equal_rows(self, row1: Row, row2: Row) -> None:
-        assert hash(row1) == hash(row2)
-
-    @pytest.mark.parametrize(
-        ("row1", "row2"),
-        [
-            (Row.from_dict({"col1": 0}), Row.from_dict({"col1": 1})),
-            (Row.from_dict({"col1": 0}), Row.from_dict({"col2": 0})),
-            (Row.from_dict({"col1": 0}), Row.from_dict({"col1": "a"})),
-        ],
-    )
-    def test_should_return_different_hash_for_unequal_rows(self, row1: Row, row2: Row) -> None:
-        assert hash(row1) != hash(row2)
 
 
 class TestIter:
@@ -273,11 +268,11 @@ class TestToDict:
         ("row", "expected"),
         [
             (
-                Row([]),
+                Row(pl.DataFrame({})),
                 {},
             ),
             (
-                Row([1, 2], schema=Schema({"a": Integer(), "b": Integer()})),
+                Row(pl.DataFrame({"a": 1, "b": 2})),
                 {
                     "a": 1,
                     "b": 2,
