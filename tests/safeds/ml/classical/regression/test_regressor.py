@@ -6,13 +6,6 @@ import pandas as pd
 import pytest
 from safeds.data.tabular.containers import Column, Table, TaggedTable
 from safeds.data.tabular.exceptions import ColumnLengthMismatchError
-from safeds.ml.exceptions import (
-    DatasetContainsTargetError,
-    DatasetMissesFeaturesError,
-    LearningError,
-    ModelNotFittedError,
-    PredictionError,
-)
 from safeds.ml.classical.regression import (
     AdaBoost,
     DecisionTree,
@@ -28,6 +21,13 @@ from safeds.ml.classical.regression import (
 
 # noinspection PyProtectedMember
 from safeds.ml.classical.regression._regressor import _check_metrics_preconditions
+from safeds.ml.exceptions import (
+    DatasetContainsTargetError,
+    DatasetMissesFeaturesError,
+    LearningError,
+    ModelNotFittedError,
+    PredictionError,
+)
 
 if TYPE_CHECKING:
     from _pytest.fixtures import FixtureRequest
