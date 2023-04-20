@@ -223,7 +223,7 @@ class Row(Mapping[str, Any]):
 
         Returns
         -------
-        length : int
+        n_columns : int
             The number of columns.
 
         Examples
