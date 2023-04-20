@@ -114,7 +114,7 @@ class Row(Mapping[str, Any]):
 
     def __contains__(self, column_name: str) -> bool:
         """
-        Check whether the row contains the specified column.
+        Check whether the row contains a given column.
 
         Parameters
         ----------
@@ -123,8 +123,8 @@ class Row(Mapping[str, Any]):
 
         Returns
         -------
-        contains : bool
-            True if the row contains the column, False otherwise.
+        has_column : bool
+            True, if the row contains the column, False otherwise.
 
         Examples
         --------
@@ -132,6 +132,9 @@ class Row(Mapping[str, Any]):
         >>> row = Row({"a": 1, "b": 2})
         >>> "a" in row
         True
+
+        >>> "c" in row
+        False
         """
         return self.has_column(column_name)
 
@@ -156,6 +159,10 @@ class Row(Mapping[str, Any]):
         >>> row2 = Row({"a": 1, "b": 2})
         >>> row1 == row2
         True
+
+        >>> row3 = Row({"a": 1, "b": 3})
+        >>> row1 == row3
+        False
         """
         if not isinstance(other, Row):
             return NotImplemented
@@ -175,7 +182,7 @@ class Row(Mapping[str, Any]):
         Returns
         -------
         value : Any
-            The value of the column.
+            The column value.
 
         Raises
         ------
@@ -208,7 +215,7 @@ class Row(Mapping[str, Any]):
         ['a', 'b']
         """
 
-        return iter(self.get_column_names())
+        return iter(self.column_names)
 
     def __len__(self) -> int:
         """
@@ -216,7 +223,7 @@ class Row(Mapping[str, Any]):
 
         Returns
         -------
-        count : int
+        length : int
             The number of columns.
 
         Examples
@@ -229,9 +236,39 @@ class Row(Mapping[str, Any]):
         return self._data.shape[1]
 
     def __repr__(self) -> str:
+        """
+        Return an unambiguous string representation of this row.
+
+        Returns
+        -------
+        representation : str
+            The string representation.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Row
+        >>> row = Row({"a": 1})
+        >>> repr(row)
+        "Row({'a': 1})"
+        """
         return f"Row({str(self)})"
 
     def __str__(self) -> str:
+        """
+        Return a user-friendly string representation of this row.
+
+        Returns
+        -------
+        representation : str
+            The string representation.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Row
+        >>> row = Row({"a": 1})
+        >>> str(row)
+        "{'a': 1}"
+        """
         match len(self):
             case 0:
                 return "{}"
@@ -245,6 +282,44 @@ class Row(Mapping[str, Any]):
     # ------------------------------------------------------------------------------------------------------------------
     # Properties
     # ------------------------------------------------------------------------------------------------------------------
+
+    @property
+    def column_names(self) -> list[str]:
+        """
+        Return a list of all column names in the row.
+
+        Returns
+        -------
+        column_names : list[str]
+            The column names.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Row
+        >>> row = Row({"a": 1, "b": 2})
+        >>> row.column_names
+        ['a', 'b']
+        """
+        return self._schema.get_column_names()
+
+    @property
+    def n_columns(self) -> int:
+        """
+        Return the number of columns in this row.
+
+        Returns
+        -------
+        n_columns : int
+            The number of columns.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Row
+        >>> row = Row({"a": 1, "b": 2})
+        >>> row.n_columns
+        2
+        """
+        return self._data.shape[1]
 
     @property
     def schema(self) -> Schema:
@@ -280,7 +355,7 @@ class Row(Mapping[str, Any]):
         Returns
         -------
         value : Any
-            The value of the column.
+            The column value.
 
         Raises
         ------
@@ -301,17 +376,17 @@ class Row(Mapping[str, Any]):
 
     def has_column(self, column_name: str) -> bool:
         """
-        Return whether the row contains a given column.
+        Check whether the row contains a given column.
 
         Parameters
         ----------
         column_name : str
-            The name of the column.
+            The column name.
 
         Returns
         -------
         has_column : bool
-            True, if row contains the column.
+            True, if the row contains the column, False otherwise.
 
         Examples
         --------
@@ -325,32 +400,14 @@ class Row(Mapping[str, Any]):
         """
         return self._schema.has_column(column_name)
 
-    def get_column_names(self) -> list[str]:
-        """
-        Return a list of all column names in the row.
-
-        Returns
-        -------
-        column_names : list[str]
-            The column names.
-
-        Examples
-        --------
-        >>> from safeds.data.tabular.containers import Row
-        >>> row = Row({"a": 1, "b": 2})
-        >>> row.get_column_names()
-        ['a', 'b']
-        """
-        return self._schema.get_column_names()
-
-    def get_type_of_column(self, column_name: str) -> ColumnType:
+    def get_column_type(self, column_name: str) -> ColumnType:
         """
         Return the type of the specified column.
 
         Parameters
         ----------
         column_name : str
-            The name of the column.
+            The column name.
 
         Returns
         -------
@@ -366,32 +423,10 @@ class Row(Mapping[str, Any]):
         --------
         >>> from safeds.data.tabular.containers import Row
         >>> row = Row({"a": 1, "b": 2})
-        >>> row.get_type_of_column("a")
+        >>> row.get_column_type("a")
         Integer
         """
         return self._schema.get_type_of_column(column_name)
-
-    # ------------------------------------------------------------------------------------------------------------------
-    # Information
-    # ------------------------------------------------------------------------------------------------------------------
-
-    def count(self) -> int:
-        """
-        Return the number of columns in this row.
-
-        Returns
-        -------
-        count : int
-            The number of columns.
-
-        Examples
-        --------
-        >>> from safeds.data.tabular.containers import Row
-        >>> row = Row({"a": 1, "b": 2})
-        >>> row.count()
-        2
-        """
-        return self._data.shape[1]
 
     # ------------------------------------------------------------------------------------------------------------------
     # Conversion
@@ -413,7 +448,7 @@ class Row(Mapping[str, Any]):
         >>> row.to_dict()
         {'a': 1, 'b': 2}
         """
-        return {column_name: self.get_value(column_name) for column_name in self.get_column_names()}
+        return {column_name: self.get_value(column_name) for column_name in self.column_names}
 
     # ------------------------------------------------------------------------------------------------------------------
     # IPython integration
