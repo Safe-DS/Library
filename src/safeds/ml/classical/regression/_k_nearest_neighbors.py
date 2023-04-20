@@ -55,7 +55,7 @@ class KNearestNeighbors(Regressor):
 
         result = KNearestNeighbors(self._number_of_neighbors)
         result._wrapped_regressor = wrapped_regressor
-        result._feature_names = training_set.features.get_column_names()
+        result._feature_names = training_set.features.column_names
         result._target_name = training_set.target.name
 
         return result

@@ -12,7 +12,7 @@ def test_rename_valid(name_from: str, name_to: str, column_one: str, column_two:
     renamed_table = table.rename_column(name_from, name_to)
     assert renamed_table.schema.has_column(column_one)
     assert renamed_table.schema.has_column(column_two)
-    assert renamed_table.count_columns() == 2
+    assert renamed_table.n_columns == 2
 
 
 @pytest.mark.parametrize(

@@ -11,4 +11,4 @@ from safeds.data.tabular.containers import Table
     ],
 )
 def test_count_columns(table: Table, expected: int) -> None:
-    assert table.count_columns() == expected
+    assert table.n_columns == expected

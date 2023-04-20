@@ -11,4 +11,4 @@ from safeds.data.tabular.containers import Table
     ],
 )
 def test_count_rows(table: Table, expected: int) -> None:
-    assert table.count_rows() == expected
+    assert table.n_rows == expected

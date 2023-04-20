@@ -300,7 +300,7 @@ class Row(Mapping[str, Any]):
         >>> row.column_names
         ['a', 'b']
         """
-        return self._schema.get_column_names()
+        return self._schema.column_names
 
     @property
     def n_columns(self) -> int:
@@ -426,7 +426,7 @@ class Row(Mapping[str, Any]):
         >>> row.get_column_type("a")
         Integer
         """
-        return self._schema.get_type_of_column(column_name)
+        return self._schema.get_column_type(column_name)
 
     # ------------------------------------------------------------------------------------------------------------------
     # Conversion

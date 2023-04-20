@@ -35,14 +35,14 @@ class OneHotEncoder(InvertibleTableTransformer):
             The fitted transformer.
         """
         if column_names is None:
-            column_names = table.get_column_names()
+            column_names = table.column_names
         else:
-            missing_columns = set(column_names) - set(table.get_column_names())
+            missing_columns = set(column_names) - set(table.column_names)
             if len(missing_columns) > 0:
                 raise UnknownColumnNameError(list(missing_columns))
 
         data = table._data.copy()
-        data.columns = table.get_column_names()
+        data.columns = table.column_names
 
         wrapped_transformer = sk_OneHotEncoder()
         wrapped_transformer.fit(data[column_names])
@@ -81,12 +81,12 @@ class OneHotEncoder(InvertibleTableTransformer):
             raise TransformerNotFittedError
 
         # Input table does not contain all columns used to fit the transformer
-        missing_columns = set(self._column_names.keys()) - set(table.get_column_names())
+        missing_columns = set(self._column_names.keys()) - set(table.column_names)
         if len(missing_columns) > 0:
             raise UnknownColumnNameError(list(missing_columns))
 
         original = table._data.copy()
-        original.columns = table.schema.get_column_names()
+        original.columns = table.schema.column_names
 
         one_hot_encoded = pd.DataFrame(
             self._wrapped_transformer.transform(original[self._column_names.keys()]).toarray(),
@@ -98,7 +98,7 @@ class OneHotEncoder(InvertibleTableTransformer):
         res = Table(pd.concat([unchanged, one_hot_encoded], axis=1))
         column_names = []
 
-        for name in table.get_column_names():
+        for name in table.column_names:
             if name not in self._column_names.keys():
                 column_names.append(name)
             else:
@@ -134,7 +134,7 @@ class OneHotEncoder(InvertibleTableTransformer):
             raise TransformerNotFittedError
 
         data = transformed_table._data.copy()
-        data.columns = transformed_table.get_column_names()
+        data.columns = transformed_table.column_names
 
         decoded = pd.DataFrame(
             self._wrapped_transformer.inverse_transform(
@@ -155,7 +155,7 @@ class OneHotEncoder(InvertibleTableTransformer):
                     if name in value
                 ][0]
             ]
-            for name in transformed_table.get_column_names()
+            for name in transformed_table.column_names
         ]
         res = res.sort_columns(lambda col1, col2: column_names.index(col1.name) - column_names.index(col2.name))
 

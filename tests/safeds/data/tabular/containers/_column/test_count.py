@@ -9,4 +9,4 @@ from safeds.data.tabular.containers import Column
     ],
 )
 def test_count_valid(column: Column, expected: int) -> None:
-    assert column.count() == expected
+    assert column.n_rows == expected

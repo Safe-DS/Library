@@ -94,6 +94,18 @@ class Column:
         return self._name
 
     @property
+    def n_rows(self) -> int:
+        """
+        Return the number of elements in the column.
+
+        Returns
+        -------
+        n_rows : int
+            The number of elements.
+        """
+        return len(self._data)
+
+    @property
     def type(self) -> ColumnType:
         """
         Return the type of the column.
@@ -147,17 +159,6 @@ class Column:
     # ------------------------------------------------------------------------------------------------------------------
     # Information
     # ------------------------------------------------------------------------------------------------------------------
-
-    def count(self) -> int:
-        """
-        Return the number of elements in the column.
-
-        Returns
-        -------
-        count : int
-            The number of elements.
-        """
-        return len(self._data)
 
     def all(self, predicate: Callable[[Any], bool]) -> bool:
         """

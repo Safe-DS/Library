@@ -81,7 +81,7 @@ def predict(model: Any, dataset: Table, feature_names: list[str] | None, target_
     dataset_df.columns = feature_names
 
     result_set = dataset._data.copy(deep=True)
-    result_set.columns = dataset.get_column_names()
+    result_set.columns = dataset.column_names
 
     try:
         predicted_target_vector = model.predict(dataset_df.values)
