@@ -101,6 +101,18 @@ class Schema:
                 joined = ",\n".join(lines)
                 return f"{{\n{joined}\n}}"
 
+    @property
+    def column_names(self) -> list[str]:
+        """
+        Return a list of all column names saved in this schema.
+
+        Returns
+        -------
+        column_names : list[str]
+            The column names.
+        """
+        return list(self._schema.keys())
+
     def has_column(self, column_name: str) -> bool:
         """
         Return whether the schema contains a given column.
@@ -117,7 +129,7 @@ class Schema:
         """
         return column_name in self._schema
 
-    def get_type_of_column(self, column_name: str) -> ColumnType:
+    def get_column_type(self, column_name: str) -> ColumnType:
         """
         Return the type of the given column.
 
@@ -163,14 +175,3 @@ class Schema:
             raise UnknownColumnNameError([column_name])
 
         return list(self._schema.keys()).index(column_name)
-
-    def get_column_names(self) -> list[str]:
-        """
-        Return a list of all column names saved in this schema.
-
-        Returns
-        -------
-        column_names : list[str]
-            The column names.
-        """
-        return list(self._schema.keys())

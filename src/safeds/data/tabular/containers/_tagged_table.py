@@ -37,7 +37,7 @@ class TaggedTable(Table):
 
         # If no feature names are specified, use all columns except the target column
         if feature_names is None:
-            feature_names = self.get_column_names()
+            feature_names = self.column_names
             if target_name in feature_names:
                 feature_names.remove(target_name)
 

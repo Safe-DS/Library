@@ -7,13 +7,13 @@ def test_add_columns_valid() -> None:
     col3 = Column("col3", [0, -1, -2])
     col4 = Column("col4", ["a", "b", "c"])
     table1 = table1.add_columns([col3, col4])
-    assert table1.count_columns() == 4
+    assert table1.n_columns == 4
     assert table1.get_column("col3") == col3
     assert table1.get_column("col4") == col4
-    assert isinstance(table1.schema.get_type_of_column("col1"), Integer)
-    assert isinstance(table1.schema.get_type_of_column("col2"), Integer)
-    assert isinstance(table1.schema.get_type_of_column("col3"), Integer)
-    assert isinstance(table1.schema.get_type_of_column("col4"), String)
+    assert isinstance(table1.schema.get_column_type("col1"), Integer)
+    assert isinstance(table1.schema.get_column_type("col2"), Integer)
+    assert isinstance(table1.schema.get_column_type("col3"), Integer)
+    assert isinstance(table1.schema.get_column_type("col4"), String)
 
 
 def test_add_columns_table_valid() -> None:
@@ -22,10 +22,10 @@ def test_add_columns_table_valid() -> None:
     col4 = Column("col4", ["a", "b", "c"])
     table2 = Table.from_columns([col3, col4])
     table1 = table1.add_columns(table2)
-    assert table1.count_columns() == 4
+    assert table1.n_columns == 4
     assert table1.get_column("col3") == col3
     assert table1.get_column("col4") == col4
-    assert isinstance(table1.schema.get_type_of_column("col1"), Integer)
-    assert isinstance(table1.schema.get_type_of_column("col2"), Integer)
-    assert isinstance(table1.schema.get_type_of_column("col3"), Integer)
-    assert isinstance(table1.schema.get_type_of_column("col4"), String)
+    assert isinstance(table1.schema.get_column_type("col1"), Integer)
+    assert isinstance(table1.schema.get_column_type("col2"), Integer)
+    assert isinstance(table1.schema.get_column_type("col3"), Integer)
+    assert isinstance(table1.schema.get_column_type("col4"), String)

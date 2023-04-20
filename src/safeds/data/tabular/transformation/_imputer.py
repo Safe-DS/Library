@@ -107,9 +107,9 @@ class Imputer(TableTransformer):
             The fitted transformer.
         """
         if column_names is None:
-            column_names = table.get_column_names()
+            column_names = table.column_names
         else:
-            missing_columns = set(column_names) - set(table.get_column_names())
+            missing_columns = set(column_names) - set(table.column_names)
             if len(missing_columns) > 0:
                 raise UnknownColumnNameError(list(missing_columns))
 
@@ -153,7 +153,7 @@ class Imputer(TableTransformer):
             raise TransformerNotFittedError
 
         # Input table does not contain all columns used to fit the transformer
-        missing_columns = set(self._column_names) - set(table.get_column_names())
+        missing_columns = set(self._column_names) - set(table.column_names)
         if len(missing_columns) > 0:
             raise UnknownColumnNameError(list(missing_columns))
 

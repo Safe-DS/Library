@@ -12,10 +12,10 @@ def test_remove_columns_with_missing_values_valid() -> None:
         },
     )
     updated_table = table.remove_columns_with_missing_values()
-    assert updated_table.get_column_names() == ["col3", "col4"]
+    assert updated_table.column_names == ["col3", "col4"]
 
 
 def test_remove_columns_with_missing_values_empty() -> None:
     table = Table([], Schema({"col1": RealNumber()}))
     updated_table = table.remove_columns_with_missing_values()
-    assert updated_table.get_column_names() == ["col1"]
+    assert updated_table.column_names == ["col1"]

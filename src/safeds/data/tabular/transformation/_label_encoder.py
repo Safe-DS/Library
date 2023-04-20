@@ -44,9 +44,9 @@ class LabelEncoder(InvertibleTableTransformer):
             The fitted transformer.
         """
         if column_names is None:
-            column_names = table.get_column_names()
+            column_names = table.column_names
         else:
-            missing_columns = set(column_names) - set(table.get_column_names())
+            missing_columns = set(column_names) - set(table.column_names)
             if len(missing_columns) > 0:
                 raise UnknownColumnNameError(list(missing_columns))
 
@@ -83,12 +83,12 @@ class LabelEncoder(InvertibleTableTransformer):
             raise TransformerNotFittedError
 
         # Input table does not contain all columns used to fit the transformer
-        missing_columns = set(self._column_names) - set(table.get_column_names())
+        missing_columns = set(self._column_names) - set(table.column_names)
         if len(missing_columns) > 0:
             raise UnknownColumnNameError(list(missing_columns))
 
         data = table._data.copy()
-        data.columns = table.get_column_names()
+        data.columns = table.column_names
         data[self._column_names] = self._wrapped_transformer.transform(data[self._column_names])
         return Table(data)
 
@@ -116,7 +116,7 @@ class LabelEncoder(InvertibleTableTransformer):
             raise TransformerNotFittedError
 
         data = transformed_table._data.copy()
-        data.columns = transformed_table.get_column_names()
+        data.columns = transformed_table.column_names
         data[self._column_names] = self._wrapped_transformer.inverse_transform(data[self._column_names])
         return Table(data)
 

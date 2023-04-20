@@ -206,12 +206,12 @@ class TestGetTypeOfColumn:
         column_name: str,
         expected: ColumnType,
     ) -> None:
-        assert schema.get_type_of_column(column_name) == expected
+        assert schema.get_column_type(column_name) == expected
 
     def test_should_raise_if_column_does_not_exist(self) -> None:
         schema = Schema({"A": Integer()})
         with pytest.raises(UnknownColumnNameError):
-            schema.get_type_of_column("B")
+            schema.get_column_type("B")
 
 
 class TestGetColumnNames:
@@ -229,7 +229,7 @@ class TestGetColumnNames:
         ],
     )
     def test_should_return_column_names(self, schema: Schema, expected: list[str]) -> None:
-        assert schema.get_column_names() == expected
+        assert schema.column_names == expected
 
 
 class TestGetColumnIndex:

@@ -17,7 +17,6 @@ def test_summary() -> None:
                 "standard deviation",
                 "idness",
                 "stability",
-                "row count",
             ],
             "col1": [
                 "2",
@@ -30,7 +29,6 @@ def test_summary() -> None:
                 str(table._data["col1"].std()),
                 str(2.0 / 3),
                 str(2.0 / 3),
-                "3",
             ],
             "col2": [
                 "-",
@@ -43,7 +41,6 @@ def test_summary() -> None:
                 "-",
                 "1.0",
                 str(1.0 / 3),
-                "3",
             ],
         },
     )

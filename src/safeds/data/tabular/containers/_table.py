@@ -212,7 +212,7 @@ class Table:
             row_array.append(row._data.to_pandas())
 
         dataframe: DataFrame = pd.concat(row_array, ignore_index=True)
-        dataframe.columns = schema_compare.get_column_names()
+        dataframe.columns = schema_compare.column_names
         return Table(dataframe)
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -237,10 +237,10 @@ class Table:
         self._schema: Schema = Schema._from_pandas_dataframe(self._data) if schema is None else schema
 
         if self._data.empty:
-            self._data = pd.DataFrame(columns=self._schema.get_column_names())
+            self._data = pd.DataFrame(columns=self._schema.column_names)
 
         self._data = self._data.reset_index(drop=True)
-        self._data.columns = self._schema.get_column_names()
+        self._data.columns = self._schema.column_names
 
     def __eq__(self, other: Any) -> bool:
         if not isinstance(other, Table):
@@ -256,17 +256,55 @@ class Table:
 
     def __repr__(self) -> str:
         tmp = self._data.copy(deep=True)
-        tmp.columns = self.get_column_names()
+        tmp.columns = self.column_names
         return tmp.__repr__()
 
     def __str__(self) -> str:
         tmp = self._data.copy(deep=True)
-        tmp.columns = self.get_column_names()
+        tmp.columns = self.column_names
         return tmp.__str__()
 
     # ------------------------------------------------------------------------------------------------------------------
     # Properties
     # ------------------------------------------------------------------------------------------------------------------
+
+    @property
+    def column_names(self) -> list[str]:
+        """
+        Return a list of all column names in this table.
+
+        Alias for self.schema.column_names -> list[str].
+
+        Returns
+        -------
+        column_names : list[str]
+            The list of the column names.
+        """
+        return self._schema.column_names
+
+    @property
+    def n_columns(self) -> int:
+        """
+        Return the number of columns.
+
+        Returns
+        -------
+        n_columns : int
+            The number of columns.
+        """
+        return self._data.shape[1]
+
+    @property
+    def n_rows(self) -> int:
+        """
+        Return the number of rows.
+
+        Returns
+        -------
+        n_rows : int
+            The number of rows.
+        """
+        return self._data.shape[0]
 
     @property
     def schema(self) -> Schema:
@@ -307,7 +345,7 @@ class Table:
             output_column = Column(
                 column_name,
                 self._data.iloc[:, [self._schema._get_column_index(column_name)]].squeeze(),
-                self._schema.get_type_of_column(column_name),
+                self._schema.get_column_type(column_name),
             )
             return output_column
 
@@ -331,20 +369,7 @@ class Table:
         """
         return self._schema.has_column(column_name)
 
-    def get_column_names(self) -> list[str]:
-        """
-        Return a list of all column names in this table.
-
-        Alias for self.schema.get_column_names() -> list[str].
-
-        Returns
-        -------
-        column_names : list[str]
-            The list of the column names.
-        """
-        return self._schema.get_column_names()
-
-    def get_type_of_column(self, column_name: str) -> ColumnType:
+    def get_column_type(self, column_name: str) -> ColumnType:
         """
         Return the type of the given column.
 
@@ -365,7 +390,7 @@ class Table:
         ColumnNameError
             If the specified target column name does not exist.
         """
-        return self._schema.get_type_of_column(column_name)
+        return self._schema.get_column_type(column_name)
 
     def get_row(self, index: int) -> Row:
         """
@@ -395,28 +420,6 @@ class Table:
     # Information
     # ------------------------------------------------------------------------------------------------------------------
 
-    def count_rows(self) -> int:
-        """
-        Return the number of rows.
-
-        Returns
-        -------
-        count : int
-            The number of rows.
-        """
-        return self._data.shape[0]
-
-    def count_columns(self) -> int:
-        """
-        Return the number of columns.
-
-        Returns
-        -------
-        count : int
-            The number of columns.
-        """
-        return self._data.shape[1]
-
     def summary(self) -> Table:
         """
         Return a table with a number of statistical key values.
@@ -442,7 +445,6 @@ class Table:
                 "standard deviation": column.standard_deviation,
                 "idness": column.idness,
                 "stability": column.stability,
-                "row count": column.count,
             }
             values = []
 
@@ -455,7 +457,7 @@ class Table:
             result = pd.concat([result, pd.DataFrame(values)], axis=1)
 
         result = pd.concat([pd.DataFrame(list(statistics.keys())), result], axis=1)
-        result.columns = ["metrics", *self.get_column_names()]
+        result.columns = ["metrics", *self.column_names]
 
         return Table(result)
 
@@ -484,11 +486,11 @@ class Table:
         if self.has_column(column.name):
             raise DuplicateColumnNameError(column.name)
 
-        if column._data.size != self.count_rows():
-            raise ColumnSizeError(str(self.count_rows()), str(column._data.size))
+        if column._data.size != self.n_rows:
+            raise ColumnSizeError(str(self.n_rows), str(column._data.size))
 
         result = self._data.copy()
-        result.columns = self._schema.get_column_names()
+        result.columns = self._schema.column_names
         result[column.name] = column._data
         return Table(result)
 
@@ -516,13 +518,13 @@ class Table:
         if isinstance(columns, Table):
             columns = columns.to_columns()
         result = self._data.copy()
-        result.columns = self._schema.get_column_names()
+        result.columns = self._schema.column_names
         for column in columns:
             if column.name in result.columns:
                 raise DuplicateColumnNameError(column.name)
 
-            if column._data.size != self.count_rows():
-                raise ColumnSizeError(str(self.count_rows()), str(column._data.size))
+            if column._data.size != self.n_rows:
+                raise ColumnSizeError(str(self.n_rows), str(column._data.size))
 
             result[column.name] = column._data
         return Table(result)
@@ -548,7 +550,7 @@ class Table:
         row_frame = row._data.to_pandas()
 
         new_df = pd.concat([self._data, row_frame]).infer_objects()
-        new_df.columns = self.get_column_names()
+        new_df.columns = self.column_names
         return Table(new_df)
 
     def add_rows(self, rows: list[Row] | Table) -> Table:
@@ -574,10 +576,10 @@ class Table:
 
         row_frames = [row._data.to_pandas() for row in rows]
         for row_frame in row_frames:
-            row_frame.columns = self.get_column_names()
+            row_frame.columns = self.column_names
 
         result = pd.concat([result, *row_frames]).infer_objects()
-        result.columns = self.get_column_names()
+        result.columns = self.column_names
         return Table(result)
 
     def filter_rows(self, query: Callable[[Row], bool]) -> Table:
@@ -658,7 +660,7 @@ class Table:
             raise UnknownColumnNameError(invalid_columns)
 
         transformed_data = self._data.drop(labels=column_names, axis="columns")
-        transformed_data.columns = [name for name in self._schema.get_column_names() if name not in column_names]
+        transformed_data.columns = [name for name in self._schema.column_names if name not in column_names]
         return Table(transformed_data)
 
     def remove_columns_with_missing_values(self) -> Table:
@@ -694,7 +696,7 @@ class Table:
             The table with the duplicate rows removed.
         """
         result = self._data.drop_duplicates(ignore_index=True)
-        result.columns = self._schema.get_column_names()
+        result.columns = self._schema.column_names
         return Table(result)
 
     def remove_rows_with_missing_values(self) -> Table:
@@ -754,15 +756,15 @@ class Table:
         DuplicateColumnNameError
             If the specified new target column name already exists.
         """
-        if old_name not in self._schema.get_column_names():
+        if old_name not in self._schema.column_names:
             raise UnknownColumnNameError([old_name])
         if old_name == new_name:
             return self
-        if new_name in self._schema.get_column_names():
+        if new_name in self._schema.column_names:
             raise DuplicateColumnNameError(new_name)
 
         new_df = self._data.copy()
-        new_df.columns = self._schema.get_column_names()
+        new_df.columns = self._schema.column_names
         return Table(new_df.rename(columns={old_name: new_name}))
 
     def replace_column(self, old_column_name: str, new_column: Column) -> Table:
@@ -793,22 +795,22 @@ class Table:
         ColumnSizeError
             If the size of the column does not match the amount of rows.
         """
-        if old_column_name not in self._schema.get_column_names():
+        if old_column_name not in self._schema.column_names:
             raise UnknownColumnNameError([old_column_name])
 
-        if new_column.name in self._schema.get_column_names() and new_column.name != old_column_name:
+        if new_column.name in self._schema.column_names and new_column.name != old_column_name:
             raise DuplicateColumnNameError(new_column.name)
 
-        if self.count_rows() != new_column._data.size:
-            raise ColumnSizeError(str(self.count_rows()), str(new_column._data.size))
+        if self.n_rows != new_column._data.size:
+            raise ColumnSizeError(str(self.n_rows), str(new_column._data.size))
 
         if old_column_name != new_column.name:
             renamed_table = self.rename_column(old_column_name, new_column.name)
             result = renamed_table._data
-            result.columns = renamed_table._schema.get_column_names()
+            result.columns = renamed_table._schema.column_names
         else:
             result = self._data.copy()
-            result.columns = self._schema.get_column_names()
+            result.columns = self._schema.column_names
 
         result[new_column.name] = new_column._data
         return Table(result)
@@ -824,7 +826,7 @@ class Table:
 
         """
         new_df = self._data.sample(frac=1.0)
-        new_df.columns = self._schema.get_column_names()
+        new_df.columns = self._schema.column_names
         return Table(new_df)
 
     def slice_rows(
@@ -859,13 +861,13 @@ class Table:
             start = 0
 
         if end is None:
-            end = self.count_rows()
+            end = self.n_rows
 
-        if start < 0 or end < 0 or start >= self.count_rows() or end > self.count_rows() or end < start:
+        if start < 0 or end < 0 or start >= self.n_rows or end > self.n_rows or end < start:
             raise ValueError("The given index is out of bounds")
 
         new_df = self._data.iloc[start:end:step]
-        new_df.columns = self._schema.get_column_names()
+        new_df.columns = self._schema.column_names
         return Table(new_df)
 
     def sort_columns(
@@ -944,8 +946,8 @@ class Table:
         if percentage_in_first <= 0 or percentage_in_first >= 1:
             raise ValueError("the given percentage is not in range")
         return (
-            self.slice_rows(0, round(percentage_in_first * self.count_rows())),
-            self.slice_rows(round(percentage_in_first * self.count_rows())),
+            self.slice_rows(0, round(percentage_in_first * self.n_rows)),
+            self.slice_rows(round(percentage_in_first * self.n_rows)),
         )
 
     def tag_columns(self, target_name: str, feature_names: list[str] | None = None) -> TaggedTable:
@@ -1009,8 +1011,8 @@ class Table:
             data=only_numerical._data.corr(),
             vmin=-1,
             vmax=1,
-            xticklabels=only_numerical.get_column_names(),
-            yticklabels=only_numerical.get_column_names(),
+            xticklabels=only_numerical.column_names,
+            yticklabels=only_numerical.column_names,
             cmap="vlag",
         )
         plt.tight_layout()
@@ -1136,7 +1138,7 @@ class Table:
         """
         Path(path).parent.mkdir(parents=True, exist_ok=True)
         data_to_csv = self._data.copy()
-        data_to_csv.columns = self._schema.get_column_names()
+        data_to_csv.columns = self._schema.column_names
         data_to_csv.to_csv(path, index=False)
 
     def to_json_file(self, path: str) -> None:
@@ -1153,7 +1155,7 @@ class Table:
         """
         Path(path).parent.mkdir(parents=True, exist_ok=True)
         data_to_json = self._data.copy()
-        data_to_json.columns = self._schema.get_column_names()
+        data_to_json.columns = self._schema.column_names
         data_to_json.to_json(path)
 
     def to_dict(self) -> dict[str, list[Any]]:
@@ -1165,7 +1167,7 @@ class Table:
         data : dict[str, list[Any]]
             Dictionary representation of the table.
         """
-        return {column_name: list(self.get_column(column_name)) for column_name in self.get_column_names()}
+        return {column_name: list(self.get_column(column_name)) for column_name in self.column_names}
 
     def to_columns(self) -> list[Column]:
         """
@@ -1176,7 +1178,7 @@ class Table:
         columns : list[Columns]
             List of columns.
         """
-        return [self.get_column(name) for name in self._schema.get_column_names()]
+        return [self.get_column(name) for name in self._schema.column_names]
 
     def to_rows(self) -> list[Row]:
         """
@@ -1189,7 +1191,7 @@ class Table:
         """
         return [
             Row._from_polars_dataframe(
-                pl.DataFrame([list(series_row)], schema=self._schema.get_column_names()),
+                pl.DataFrame([list(series_row)], schema=self._schema.column_names),
                 self._schema,
             )
             for (_, series_row) in self._data.iterrows()
@@ -1209,7 +1211,7 @@ class Table:
             Output object.
         """
         tmp = self._data.copy(deep=True)
-        tmp.columns = self.get_column_names()
+        tmp.columns = self.column_names
 
         with pd.option_context("display.max_rows", tmp.shape[0], "display.max_columns", tmp.shape[1]):
             return display(tmp)
@@ -1246,5 +1248,5 @@ class Table:
             raise NotImplementedError("For the moment we need to copy the data, so `allow_copy` must be True.")
 
         data_copy = self._data.copy()
-        data_copy.columns = self.get_column_names()
+        data_copy.columns = self.column_names
         return data_copy.__dataframe__(nan_as_null, allow_copy)
