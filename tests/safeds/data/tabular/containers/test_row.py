@@ -94,6 +94,24 @@ class TestInit:
         assert row._schema == expected
 
 
+class TestContains:
+    @pytest.mark.parametrize(
+        ("row", "column_name", "expected"),
+        [
+            (Row.from_dict({}), "col1", False),
+            (Row.from_dict({"col1": 0}), "col1", True),
+            (Row.from_dict({"col1": 0}), "col2", False),
+        ],
+        ids=[
+            "empty row",
+            "column exists",
+            "column does not exist",
+        ],
+    )
+    def test_should_return_whether_the_row_has_the_column(self, row: Row, column_name: str, expected: bool) -> None:
+        assert row.has_column(column_name) == expected
+
+
 class TestEq:
     @pytest.mark.parametrize(
         ("row1", "row2", "expected"),

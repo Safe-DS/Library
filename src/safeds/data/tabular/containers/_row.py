@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections.abc import Mapping
 from typing import TYPE_CHECKING, Any
 
 import polars as pl
@@ -11,13 +12,13 @@ if TYPE_CHECKING:
     from collections.abc import Iterator
 
 
-class Row:
+class Row(Mapping[str, Any]):
     """
-    A row is a collection of values, where each value is associated with a column name.
+    A row is a collection of named values.
 
     Parameters
     ----------
-    data : dict[str, Any] | None
+    data : Mapping[str, Any] | None
         The data. If None, an empty row is created.
 
     Examples
@@ -75,7 +76,7 @@ class Row:
         >>> from safeds.data.tabular.containers import Row
         >>> row = Row._from_polars_dataframe(pl.DataFrame({"a": [1], "b": [2]}))
         """
-        result = Row.__new__(Row)
+        result = object.__new__(Row)
         result._data = data
 
         if schema is None:
@@ -90,13 +91,13 @@ class Row:
     # Dunder methods
     # ------------------------------------------------------------------------------------------------------------------
 
-    def __init__(self, data: dict[str, Any] | None = None):
+    def __init__(self, data: Mapping[str, Any] | None = None):
         """
-        Initialize a row.
+        Create a row from a mapping of column names to column values.
 
         Parameters
         ----------
-        data : dict[str, Any] | None
+        data : Mapping[str, Any] | None
             The data. If None, an empty row is created.
 
         Examples
@@ -111,7 +112,51 @@ class Row:
         # noinspection PyProtectedMember
         self._schema: Schema = Schema._from_polars_dataframe(self._data)
 
+    def __contains__(self, column_name: str) -> bool:
+        """
+        Check whether the row contains the specified column.
+
+        Parameters
+        ----------
+        column_name : str
+            The column name.
+
+        Returns
+        -------
+        contains : bool
+            True if the row contains the column, False otherwise.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Row
+        >>> row = Row({"a": 1, "b": 2})
+        >>> "a" in row
+        True
+        """
+        return self.has_column(column_name)
+
     def __eq__(self, other: Any) -> bool:
+        """
+        Check whether this row is equal to another row.
+
+        Parameters
+        ----------
+        other : Any
+            The other row.
+
+        Returns
+        -------
+        equal : bool
+            True if the rows are equal, False otherwise.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Row
+        >>> row1 = Row({"a": 1, "b": 2})
+        >>> row2 = Row({"a": 1, "b": 2})
+        >>> row1 == row2
+        True
+        """
         if not isinstance(other, Row):
             return NotImplemented
         if self is other:
@@ -140,13 +185,29 @@ class Row:
         Examples
         --------
         >>> from safeds.data.tabular.containers import Row
-        >>> row = Row.from_dict({"a": 1, "b": 2})
+        >>> row = Row({"a": 1, "b": 2})
         >>> row["a"]
         1
         """
         return self.get_value(column_name)
 
     def __iter__(self) -> Iterator[Any]:
+        """
+        Create an iterator for the column names of this row.
+
+        Returns
+        -------
+        iterator : Iterator[Any]
+            The iterator.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Row
+        >>> row = Row({"a": 1, "b": 2})
+        >>> list(row)
+        ['a', 'b']
+        """
+
         return iter(self.get_column_names())
 
     def __len__(self) -> int:
@@ -161,7 +222,7 @@ class Row:
         Examples
         --------
         >>> from safeds.data.tabular.containers import Row
-        >>> row = Row.from_dict({"a": 1, "b": 2})
+        >>> row = Row({"a": 1, "b": 2})
         >>> len(row)
         2
         """
@@ -198,7 +259,7 @@ class Row:
         Examples
         --------
         >>> from safeds.data.tabular.containers import Row
-        >>> row = Row.from_dict({"a": 1, "b": 2})
+        >>> row = Row({"a": 1, "b": 2})
         >>> schema = row.schema
         """
         return self._schema
@@ -229,7 +290,7 @@ class Row:
         Examples
         --------
         >>> from safeds.data.tabular.containers import Row
-        >>> row = Row.from_dict({"a": 1, "b": 2})
+        >>> row = Row({"a": 1, "b": 2})
         >>> row.get_value("a")
         1
         """
@@ -255,7 +316,7 @@ class Row:
         Examples
         --------
         >>> from safeds.data.tabular.containers import Row
-        >>> row = Row.from_dict({"a": 1, "b": 2})
+        >>> row = Row({"a": 1, "b": 2})
         >>> row.has_column("a")
         True
 
@@ -276,7 +337,7 @@ class Row:
         Examples
         --------
         >>> from safeds.data.tabular.containers import Row
-        >>> row = Row.from_dict({"a": 1, "b": 2})
+        >>> row = Row({"a": 1, "b": 2})
         >>> row.get_column_names()
         ['a', 'b']
         """
@@ -304,7 +365,7 @@ class Row:
         Examples
         --------
         >>> from safeds.data.tabular.containers import Row
-        >>> row = Row.from_dict({"a": 1, "b": 2})
+        >>> row = Row({"a": 1, "b": 2})
         >>> row.get_type_of_column("a")
         Integer
         """
@@ -326,7 +387,7 @@ class Row:
         Examples
         --------
         >>> from safeds.data.tabular.containers import Row
-        >>> row = Row.from_dict({"a": 1, "b": 2})
+        >>> row = Row({"a": 1, "b": 2})
         >>> row.count()
         2
         """
@@ -348,7 +409,7 @@ class Row:
         Examples
         --------
         >>> from safeds.data.tabular.containers import Row
-        >>> row = Row.from_dict({"a": 1, "b": 2})
+        >>> row = Row({"a": 1, "b": 2})
         >>> row.to_dict()
         {'a': 1, 'b': 2}
         """
