@@ -112,19 +112,19 @@ class Row(Mapping[str, Any]):
         # noinspection PyProtectedMember
         self._schema: Schema = Schema._from_polars_dataframe(self._data)
 
-    def __contains__(self, column_name: str) -> bool:
+    def __contains__(self, obj: Any) -> bool:
         """
-        Check whether the row contains a given column.
+        Check whether the row contains an object as key.
 
         Parameters
         ----------
-        column_name : str
-            The column name.
+        obj : Any
+            The object.
 
         Returns
         -------
         has_column : bool
-            True, if the row contains the column, False otherwise.
+            True, if the row contains the object as key, False otherwise.
 
         Examples
         --------
@@ -136,21 +136,22 @@ class Row(Mapping[str, Any]):
         >>> "c" in row
         False
         """
-        return self.has_column(column_name)
+        return isinstance(obj, str) and self.has_column(obj)
 
     def __eq__(self, other: Any) -> bool:
         """
-        Check whether this row is equal to another row.
+        Check whether this row is equal to another object.
 
         Parameters
         ----------
         other : Any
-            The other row.
+            The other object.
 
         Returns
         -------
         equal : bool
-            True if the rows are equal, False otherwise.
+            True if the other object is an identical row. False if the other object is a different row. NotImplemented
+            if the other object is not a row.
 
         Examples
         --------
@@ -233,7 +234,7 @@ class Row(Mapping[str, Any]):
         >>> len(row)
         2
         """
-        return self._data.shape[1]
+        return self._data.width
 
     def __repr__(self) -> str:
         """
@@ -319,7 +320,7 @@ class Row(Mapping[str, Any]):
         >>> row.n_columns
         2
         """
-        return self._data.shape[1]
+        return self._data.width
 
     @property
     def schema(self) -> Schema:

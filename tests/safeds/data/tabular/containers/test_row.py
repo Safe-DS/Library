@@ -101,15 +101,17 @@ class TestContains:
             (Row({}), "col1", False),
             (Row({"col1": 0}), "col1", True),
             (Row({"col1": 0}), "col2", False),
+            (Row({"col1": 0}), 1, False),
         ],
         ids=[
             "empty row",
             "column exists",
             "column does not exist",
+            "not a string",
         ],
     )
     def test_should_return_whether_the_row_has_the_column(self, row: Row, column_name: str, expected: bool) -> None:
-        assert row.has_column(column_name) == expected
+        assert (column_name in row) == expected
 
 
 class TestEq:
