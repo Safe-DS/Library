@@ -13,14 +13,14 @@ class TestFromDict:
         [
             (
                 {},
-                Row(pl.DataFrame()),
+                Row({}),
             ),
             (
                 {
                     "a": 1,
                     "b": 2,
                 },
-                Row(pl.DataFrame({"a": 1, "b": 2})),
+                Row({"a": 1, "b": 2}),
             ),
         ],
         ids=[
@@ -32,20 +32,23 @@ class TestFromDict:
         assert Row.from_dict(data) == expected
 
 
-class TestInit:
+class TestFromPolarsDataFrame:
     @pytest.mark.parametrize(
         ("row", "expected"),
         [
             (
-                Row(pl.DataFrame(), Schema({})),
+                Row._from_polars_dataframe(pl.DataFrame(), Schema({})),
                 Schema({}),
             ),
             (
-                Row(pl.DataFrame({"col1": 0}), Schema({"col1": Integer()})),
+                Row._from_polars_dataframe(pl.DataFrame({"col1": 0}), Schema({"col1": Integer()})),
                 Schema({"col1": Integer()}),
             ),
             (
-                Row(pl.DataFrame({"col1": 0, "col2": "a"}), Schema({"col1": Integer(), "col2": String()})),
+                Row._from_polars_dataframe(
+                    pl.DataFrame({"col1": 0, "col2": "a"}),
+                    Schema({"col1": Integer(), "col2": String()}),
+                ),
                 Schema({"col1": Integer(), "col2": String()}),
             ),
         ],
@@ -61,8 +64,8 @@ class TestInit:
     @pytest.mark.parametrize(
         ("row", "expected"),
         [
-            (Row(pl.DataFrame()), Schema({})),
-            (Row(pl.DataFrame({"col1": 0})), Schema({"col1": Integer()})),
+            (Row._from_polars_dataframe(pl.DataFrame()), Schema({})),
+            (Row._from_polars_dataframe(pl.DataFrame({"col1": 0})), Schema({"col1": Integer()})),
         ],
         ids=[
             "empty",
@@ -73,15 +76,53 @@ class TestInit:
         assert row._schema == expected
 
 
+class TestInit:
+    @pytest.mark.parametrize(
+        ("row", "expected"),
+        [
+            (Row(), Schema({})),
+            (Row({}), Schema({})),
+            (Row({"col1": 0}), Schema({"col1": Integer()})),
+        ],
+        ids=[
+            "empty",
+            "empty (explicit)",
+            "one column",
+        ],
+    )
+    def test_should_infer_the_schema(self, row: Row, expected: Schema) -> None:
+        assert row._schema == expected
+
+
+class TestContains:
+    @pytest.mark.parametrize(
+        ("row", "column_name", "expected"),
+        [
+            (Row({}), "col1", False),
+            (Row({"col1": 0}), "col1", True),
+            (Row({"col1": 0}), "col2", False),
+            (Row({"col1": 0}), 1, False),
+        ],
+        ids=[
+            "empty row",
+            "column exists",
+            "column does not exist",
+            "not a string",
+        ],
+    )
+    def test_should_return_whether_the_row_has_the_column(self, row: Row, column_name: str, expected: bool) -> None:
+        assert (column_name in row) == expected
+
+
 class TestEq:
     @pytest.mark.parametrize(
         ("row1", "row2", "expected"),
         [
-            (Row.from_dict({}), Row.from_dict({}), True),
-            (Row.from_dict({"col1": 0}), Row.from_dict({"col1": 0}), True),
-            (Row.from_dict({"col1": 0}), Row.from_dict({"col1": 1}), False),
-            (Row.from_dict({"col1": 0}), Row.from_dict({"col2": 0}), False),
-            (Row.from_dict({"col1": 0}), Row.from_dict({"col1": "a"}), False),
+            (Row(), Row(), True),
+            (Row({"col1": 0}), Row({"col1": 0}), True),
+            (Row({"col1": 0}), Row({"col1": 1}), False),
+            (Row({"col1": 0}), Row({"col2": 0}), False),
+            (Row({"col1": 0}), Row({"col1": "a"}), False),
         ],
         ids=[
             "empty rows",
@@ -97,8 +138,8 @@ class TestEq:
     @pytest.mark.parametrize(
         "row",
         [
-            Row.from_dict({}),
-            Row.from_dict({"col1": 0}),
+            Row(),
+            Row({"col1": 0}),
         ],
         ids=[
             "empty",
@@ -111,8 +152,8 @@ class TestEq:
     @pytest.mark.parametrize(
         ("row", "other"),
         [
-            (Row.from_dict({"col1": 0}), None),
-            (Row.from_dict({"col1": 0}), Table([])),
+            (Row({"col1": 0}), None),
+            (Row({"col1": 0}), Table([])),
         ],
         ids=[
             "Row vs. None",
@@ -127,8 +168,8 @@ class TestGetitem:
     @pytest.mark.parametrize(
         ("row", "column_name", "expected"),
         [
-            (Row.from_dict({"col1": 0}), "col1", 0),
-            (Row.from_dict({"col1": 0, "col2": "a"}), "col2", "a"),
+            (Row({"col1": 0}), "col1", 0),
+            (Row({"col1": 0, "col2": "a"}), "col2", "a"),
         ],
         ids=[
             "one column",
@@ -141,8 +182,8 @@ class TestGetitem:
     @pytest.mark.parametrize(
         ("row", "column_name"),
         [
-            (Row.from_dict({}), "col1"),
-            (Row.from_dict({"col1": 0}), "col2"),
+            (Row(), "col1"),
+            (Row({"col1": 0}), "col2"),
         ],
         ids=[
             "empty row",
@@ -159,8 +200,8 @@ class TestIter:
     @pytest.mark.parametrize(
         ("row", "expected"),
         [
-            (Row.from_dict({}), []),
-            (Row.from_dict({"col1": 0}), ["col1"]),
+            (Row(), []),
+            (Row({"col1": 0}), ["col1"]),
         ],
         ids=[
             "empty",
@@ -175,8 +216,8 @@ class TestLen:
     @pytest.mark.parametrize(
         ("row", "expected"),
         [
-            (Row.from_dict({}), 0),
-            (Row.from_dict({"col1": 0, "col2": "a"}), 2),
+            (Row(), 0),
+            (Row({"col1": 0, "col2": "a"}), 2),
         ],
         ids=[
             "empty",
@@ -187,31 +228,13 @@ class TestLen:
         assert len(row) == expected
 
 
-class TestStr:
-    @pytest.mark.parametrize(
-        ("row", "expected"),
-        [
-            (Row.from_dict({}), "{}"),
-            (Row.from_dict({"col1": 0}), "{'col1': 0}"),
-            (Row.from_dict({"col1": 0, "col2": "a"}), "{\n    'col1': 0,\n    'col2': 'a'\n}"),
-        ],
-        ids=[
-            "empty",
-            "single column",
-            "multiple columns",
-        ],
-    )
-    def test_should_return_a_string_representation(self, row: Row, expected: str) -> None:
-        assert str(row) == expected
-
-
 class TestRepr:
     @pytest.mark.parametrize(
         ("row", "expected"),
         [
-            (Row.from_dict({}), "Row({})"),
-            (Row.from_dict({"col1": 0}), "Row({'col1': 0})"),
-            (Row.from_dict({"col1": 0, "col2": "a"}), "Row({\n    'col1': 0,\n    'col2': 'a'\n})"),
+            (Row(), "Row({})"),
+            (Row({"col1": 0}), "Row({'col1': 0})"),
+            (Row({"col1": 0, "col2": "a"}), "Row({\n    'col1': 0,\n    'col2': 'a'\n})"),
         ],
         ids=[
             "empty",
@@ -223,12 +246,62 @@ class TestRepr:
         assert repr(row) == expected
 
 
+class TestStr:
+    @pytest.mark.parametrize(
+        ("row", "expected"),
+        [
+            (Row(), "{}"),
+            (Row({"col1": 0}), "{'col1': 0}"),
+            (Row({"col1": 0, "col2": "a"}), "{\n    'col1': 0,\n    'col2': 'a'\n}"),
+        ],
+        ids=[
+            "empty",
+            "single column",
+            "multiple columns",
+        ],
+    )
+    def test_should_return_a_string_representation(self, row: Row, expected: str) -> None:
+        assert str(row) == expected
+
+
+class TestColumnNames:
+    @pytest.mark.parametrize(
+        ("row", "expected"),
+        [
+            (Row(), []),
+            (Row({"col1": 0}), ["col1"]),
+        ],
+        ids=[
+            "empty",
+            "non-empty",
+        ],
+    )
+    def test_should_return_the_column_names(self, row: Row, expected: list[str]) -> None:
+        assert row.column_names == expected
+
+
+class TestNColumns:
+    @pytest.mark.parametrize(
+        ("row", "expected"),
+        [
+            (Row(), 0),
+            (Row({"col1": 0, "col2": "a"}), 2),
+        ],
+        ids=[
+            "empty",
+            "non-empty",
+        ],
+    )
+    def test_should_return_the_number_of_columns(self, row: Row, expected: int) -> None:
+        assert row.n_columns == expected
+
+
 class TestGetValue:
     @pytest.mark.parametrize(
         ("row", "column_name", "expected"),
         [
-            (Row.from_dict({"col1": 0}), "col1", 0),
-            (Row.from_dict({"col1": 0, "col2": "a"}), "col2", "a"),
+            (Row({"col1": 0}), "col1", 0),
+            (Row({"col1": 0, "col2": "a"}), "col2", "a"),
         ],
         ids=[
             "one column",
@@ -241,8 +314,8 @@ class TestGetValue:
     @pytest.mark.parametrize(
         ("row", "column_name"),
         [
-            (Row.from_dict({}), "col1"),
-            (Row.from_dict({"col1": 0}), "col2"),
+            (Row({}), "col1"),
+            (Row({"col1": 0}), "col2"),
         ],
         ids=[
             "empty row",
@@ -258,9 +331,9 @@ class TestHasColumn:
     @pytest.mark.parametrize(
         ("row", "column_name", "expected"),
         [
-            (Row.from_dict({}), "col1", False),
-            (Row.from_dict({"col1": 0}), "col1", True),
-            (Row.from_dict({"col1": 0}), "col2", False),
+            (Row(), "col1", False),
+            (Row({"col1": 0}), "col1", True),
+            (Row({"col1": 0}), "col2", False),
         ],
         ids=[
             "empty row",
@@ -272,28 +345,12 @@ class TestHasColumn:
         assert row.has_column(column_name) == expected
 
 
-class TestGetColumnNames:
-    @pytest.mark.parametrize(
-        ("row", "expected"),
-        [
-            (Row.from_dict({}), []),
-            (Row.from_dict({"col1": 0}), ["col1"]),
-        ],
-        ids=[
-            "empty",
-            "non-empty",
-        ],
-    )
-    def test_should_return_the_column_names(self, row: Row, expected: list[str]) -> None:
-        assert row.get_column_names() == expected
-
-
-class TestGetTypeOfColumn:
+class TestGetColumnType:
     @pytest.mark.parametrize(
         ("row", "column_name", "expected"),
         [
-            (Row.from_dict({"col1": 0}), "col1", Integer()),
-            (Row.from_dict({"col1": 0, "col2": "a"}), "col2", String()),
+            (Row({"col1": 0}), "col1", Integer()),
+            (Row({"col1": 0, "col2": "a"}), "col2", String()),
         ],
         ids=[
             "one column",
@@ -301,13 +358,13 @@ class TestGetTypeOfColumn:
         ],
     )
     def test_should_return_the_type_of_the_column(self, row: Row, column_name: str, expected: ColumnType) -> None:
-        assert row.get_type_of_column(column_name) == expected
+        assert row.get_column_type(column_name) == expected
 
     @pytest.mark.parametrize(
         ("row", "column_name"),
         [
-            (Row.from_dict({}), "col1"),
-            (Row.from_dict({"col1": 0}), "col2"),
+            (Row(), "col1"),
+            (Row({"col1": 0}), "col2"),
         ],
         ids=[
             "empty row",
@@ -316,23 +373,7 @@ class TestGetTypeOfColumn:
     )
     def test_should_raise_if_column_does_not_exist(self, row: Row, column_name: str) -> None:
         with pytest.raises(UnknownColumnNameError):
-            row.get_type_of_column(column_name)
-
-
-class TestCount:
-    @pytest.mark.parametrize(
-        ("row", "expected"),
-        [
-            (Row.from_dict({}), 0),
-            (Row.from_dict({"col1": 0, "col2": "a"}), 2),
-        ],
-        ids=[
-            "empty",
-            "non-empty",
-        ],
-    )
-    def test_should_return_the_number_of_columns(self, row: Row, expected: int) -> None:
-        assert row.count() == expected
+            row.get_column_type(column_name)
 
 
 class TestToDict:
@@ -340,11 +381,11 @@ class TestToDict:
         ("row", "expected"),
         [
             (
-                Row(pl.DataFrame({})),
+                Row(),
                 {},
             ),
             (
-                Row(pl.DataFrame({"a": 1, "b": 2})),
+                Row({"a": 1, "b": 2}),
                 {
                     "a": 1,
                     "b": 2,
@@ -364,8 +405,8 @@ class TestReprHtml:
     @pytest.mark.parametrize(
         "row",
         [
-            Row(pl.DataFrame({})),
-            Row(pl.DataFrame({"a": 1, "b": 2})),
+            Row(),
+            Row({"a": 1, "b": 2}),
         ],
         ids=[
             "empty",

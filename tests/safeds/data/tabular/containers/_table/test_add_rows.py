@@ -4,7 +4,7 @@ from safeds.data.tabular.containers import Row, Table
 
 def test_add_rows_valid() -> None:
     table1 = Table.from_dict({"col1": ["a", "b", "c"], "col2": [1, 2, 4]})
-    row1 = Row(
+    row1 = Row._from_polars_dataframe(
         pl.DataFrame(
             {
                 "col1": "d",
@@ -13,7 +13,7 @@ def test_add_rows_valid() -> None:
         ),
         table1.schema,
     )
-    row2 = Row(
+    row2 = Row._from_polars_dataframe(
         pl.DataFrame(
             {
                 "col1": "e",
@@ -32,7 +32,7 @@ def test_add_rows_valid() -> None:
 
 def test_add_rows_table_valid() -> None:
     table1 = Table.from_dict({"col1": [1, 2, 1], "col2": [1, 2, 4]})
-    row1 = Row(
+    row1 = Row._from_polars_dataframe(
         pl.DataFrame(
             {
                 "col1": 5,
@@ -41,7 +41,7 @@ def test_add_rows_table_valid() -> None:
         ),
         table1.schema,
     )
-    row2 = Row(
+    row2 = Row._from_polars_dataframe(
         pl.DataFrame(
             {
                 "col1": 7,
