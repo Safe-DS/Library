@@ -13,14 +13,14 @@ class TestFromDict:
         [
             (
                 {},
-                Row(pl.DataFrame()),
+                Row({}),
             ),
             (
                 {
                     "a": 1,
                     "b": 2,
                 },
-                Row(pl.DataFrame({"a": 1, "b": 2})),
+                Row({"a": 1, "b": 2}),
             ),
         ],
         ids=[
@@ -32,20 +32,20 @@ class TestFromDict:
         assert Row.from_dict(data) == expected
 
 
-class TestInit:
+class TestFromPolarsDataFrame:
     @pytest.mark.parametrize(
         ("row", "expected"),
         [
             (
-                Row(pl.DataFrame(), Schema({})),
+                Row._from_polars_dataframe(pl.DataFrame(), Schema({})),
                 Schema({}),
             ),
             (
-                Row(pl.DataFrame({"col1": 0}), Schema({"col1": Integer()})),
+                Row._from_polars_dataframe(pl.DataFrame({"col1": 0}), Schema({"col1": Integer()})),
                 Schema({"col1": Integer()}),
             ),
             (
-                Row(pl.DataFrame({"col1": 0, "col2": "a"}), Schema({"col1": Integer(), "col2": String()})),
+                Row._from_polars_dataframe(pl.DataFrame({"col1": 0, "col2": "a"}), Schema({"col1": Integer(), "col2": String()})),
                 Schema({"col1": Integer(), "col2": String()}),
             ),
         ],
@@ -61,8 +61,8 @@ class TestInit:
     @pytest.mark.parametrize(
         ("row", "expected"),
         [
-            (Row(pl.DataFrame()), Schema({})),
-            (Row(pl.DataFrame({"col1": 0})), Schema({"col1": Integer()})),
+            (Row._from_polars_dataframe(pl.DataFrame()), Schema({})),
+            (Row._from_polars_dataframe(pl.DataFrame({"col1": 0})), Schema({"col1": Integer()})),
         ],
         ids=[
             "empty",
@@ -70,6 +70,24 @@ class TestInit:
         ],
     )
     def test_should_infer_the_schema_if_not_passed(self, row: Row, expected: Schema) -> None:
+        assert row._schema == expected
+
+
+class TestInit:
+    @pytest.mark.parametrize(
+        ("row", "expected"),
+        [
+            (Row(), Schema({})),
+            (Row({}), Schema({})),
+            (Row({"col1": 0}), Schema({"col1": Integer()})),
+        ],
+        ids=[
+            "empty",
+            "empty (explicit)",
+            "one column",
+        ],
+    )
+    def test_should_infer_the_schema(self, row: Row, expected: Schema) -> None:
         assert row._schema == expected
 
 
@@ -340,11 +358,11 @@ class TestToDict:
         ("row", "expected"),
         [
             (
-                Row(pl.DataFrame({})),
+                Row(),
                 {},
             ),
             (
-                Row(pl.DataFrame({"a": 1, "b": 2})),
+                Row({"a": 1, "b": 2}),
                 {
                     "a": 1,
                     "b": 2,
@@ -364,8 +382,8 @@ class TestReprHtml:
     @pytest.mark.parametrize(
         "row",
         [
-            Row(pl.DataFrame({})),
-            Row(pl.DataFrame({"a": 1, "b": 2})),
+            Row(),
+            Row({"a": 1, "b": 2}),
         ],
         ids=[
             "empty",

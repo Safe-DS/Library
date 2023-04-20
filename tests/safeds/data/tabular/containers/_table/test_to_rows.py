@@ -20,9 +20,9 @@ def test_to_rows() -> None:
         },
     )
     rows_expected = [
-        Row(pl.DataFrame({"A": 1, "B": 4, "D": "d"}), expected_schema),
-        Row(pl.DataFrame({"A": 2, "B": 5, "D": "e"}), expected_schema),
-        Row(pl.DataFrame({"A": 3, "B": 6, "D": "f"}), expected_schema),
+        Row._from_polars_dataframe(pl.DataFrame({"A": 1, "B": 4, "D": "d"}), expected_schema),
+        Row._from_polars_dataframe(pl.DataFrame({"A": 2, "B": 5, "D": "e"}), expected_schema),
+        Row._from_polars_dataframe(pl.DataFrame({"A": 3, "B": 6, "D": "f"}), expected_schema),
     ]
 
     rows_is = table.to_rows()

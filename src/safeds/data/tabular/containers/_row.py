@@ -15,12 +15,15 @@ class Row:
     """
     A row is a collection of values, where each value is associated with a column name.
 
-    To create a row manually, use the static method [from_dict][safeds.data.tabular.containers._row.Row.from_dict].
+    Parameters
+    ----------
+    data : dict[str, Any] | None
+        The data. If None, an empty row is created.
 
     Examples
     --------
     >>> from safeds.data.tabular.containers import Row
-    >>> row = Row.from_dict({"a": 1, "b": 2})
+    >>> row = Row({"a": 1, "b": 2})
     """
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -40,26 +43,19 @@ class Row:
         Returns
         -------
         row : Row
-            The generated row.
+            The created row.
 
         Examples
         --------
         >>> from safeds.data.tabular.containers import Row
         >>> row = Row.from_dict({"a": 1, "b": 2})
         """
-        return Row(pl.DataFrame(data))
+        return Row(data)
 
-    # ------------------------------------------------------------------------------------------------------------------
-    # Dunder methods
-    # ------------------------------------------------------------------------------------------------------------------
-
-    def __init__(self, data: pl.DataFrame, schema: Schema | None = None):
+    @staticmethod
+    def _from_polars_dataframe(data: pl.DataFrame, schema: Schema | None = None) -> Row:
         """
-        Initialize a row from a `polars.DataFrame`.
-
-        **Do not use this method directly.** It is not part of the public interface and may change in the future
-        without a major version bump. Use the static method
-        [from_dict][safeds.data.tabular.containers._row.Row.from_dict] instead.
+        Create a row from a `polars.DataFrame`.
 
         Parameters
         ----------
@@ -67,15 +63,53 @@ class Row:
             The data.
         schema : Schema | None
             The schema. If None, the schema is inferred from the data.
-        """
-        self._data: pl.DataFrame = data
 
-        self._schema: Schema
-        if schema is not None:
-            self._schema = schema
-        else:
+        Returns
+        -------
+        row : Row
+            The created row.
+
+        Examples
+        --------
+        >>> import polars as pl
+        >>> from safeds.data.tabular.containers import Row
+        >>> row = Row._from_polars_dataframe(pl.DataFrame({"a": [1], "b": [2]}))
+        """
+        result = Row.__new__(Row)
+        result._data = data
+
+        if schema is None:
             # noinspection PyProtectedMember
-            self._schema = Schema._from_polars_dataframe(self._data)
+            result._schema = Schema._from_polars_dataframe(data)
+        else:
+            result._schema = schema
+
+        return result
+
+    # ------------------------------------------------------------------------------------------------------------------
+    # Dunder methods
+    # ------------------------------------------------------------------------------------------------------------------
+
+    def __init__(self, data: dict[str, Any] | None = None):
+        """
+        Initialize a row.
+
+        Parameters
+        ----------
+        data : dict[str, Any] | None
+            The data. If None, an empty row is created.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Row
+        >>> row = Row({"a": 1, "b": 2})
+        """
+        if data is None:
+            data = {}
+
+        self._data: pl.DataFrame = pl.DataFrame(data)
+        # noinspection PyProtectedMember
+        self._schema: Schema = Schema._from_polars_dataframe(self._data)
 
     def __eq__(self, other: Any) -> bool:
         if not isinstance(other, Row):

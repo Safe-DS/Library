@@ -389,7 +389,7 @@ class Table:
         if len(self._data.index) - 1 < index or index < 0:
             raise IndexOutOfBoundsError(index)
 
-        return Row(pl.DataFrame(self._data.iloc[[index]]), self._schema)
+        return Row._from_polars_dataframe(pl.DataFrame(self._data.iloc[[index]]), self._schema)
 
     # ------------------------------------------------------------------------------------------------------------------
     # Information
@@ -1188,7 +1188,7 @@ class Table:
             List of rows.
         """
         return [
-            Row(pl.DataFrame([list(series_row)], schema=self._schema.get_column_names()), self._schema)
+            Row._from_polars_dataframe(pl.DataFrame([list(series_row)], schema=self._schema.get_column_names()), self._schema)
             for (_, series_row) in self._data.iterrows()
         ]
 
