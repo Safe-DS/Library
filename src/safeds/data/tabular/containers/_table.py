@@ -445,7 +445,6 @@ class Table:
                 "standard deviation": column.standard_deviation,
                 "idness": column.idness,
                 "stability": column.stability,
-                "row count": lambda: column.n_rows,
             }
             values = []
 
