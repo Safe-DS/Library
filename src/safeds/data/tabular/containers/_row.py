@@ -215,7 +215,6 @@ class Row(Mapping[str, Any]):
         >>> list(row)
         ['a', 'b']
         """
-
         return iter(self.column_names)
 
     def __len__(self) -> int:
