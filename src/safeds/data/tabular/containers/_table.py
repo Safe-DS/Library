@@ -1188,7 +1188,9 @@ class Table:
             List of rows.
         """
         return [
-            Row._from_polars_dataframe(pl.DataFrame([list(series_row)], schema=self._schema.get_column_names()), self._schema)
+            Row._from_polars_dataframe(
+                pl.DataFrame([list(series_row)], schema=self._schema.get_column_names()), self._schema,
+            )
             for (_, series_row) in self._data.iterrows()
         ]
 

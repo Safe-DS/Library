@@ -45,7 +45,9 @@ class TestFromPolarsDataFrame:
                 Schema({"col1": Integer()}),
             ),
             (
-                Row._from_polars_dataframe(pl.DataFrame({"col1": 0, "col2": "a"}), Schema({"col1": Integer(), "col2": String()})),
+                Row._from_polars_dataframe(
+                    pl.DataFrame({"col1": 0, "col2": "a"}), Schema({"col1": Integer(), "col2": String()}),
+                ),
                 Schema({"col1": Integer(), "col2": String()}),
             ),
         ],
