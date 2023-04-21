@@ -1,7 +1,6 @@
 import pytest
-
 from safeds.data.tabular.containers import Table
-from safeds.data.tabular.exceptions import UnknownColumnNameError, TransformerNotFittedError
+from safeds.data.tabular.exceptions import TransformerNotFittedError, UnknownColumnNameError
 from safeds.data.tabular.transformation import OneHotEncoder
 
 
@@ -35,4 +34,3 @@ class TestTransform:
 
         with pytest.raises(TransformerNotFittedError):
             table.transform_table(transformer)
-

@@ -31,11 +31,13 @@ from safeds.data.tabular.typing import ColumnType, Schema
 from ._column import Column
 from ._row import Row
 
-
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterable
+
+    from safeds.data.tabular.transformation import TableTransformer
+
     from ._tagged_table import TaggedTable
-    from ..transformation import TableTransformer
+
 
 # noinspection PyProtectedMember
 class Table:
@@ -991,28 +993,26 @@ class Table:
             return self.replace_column(name, result)
         raise UnknownColumnNameError([name])
 
-
     def transform_table(self, transformer: TableTransformer) -> Table:
         """
-                Apply a learned transformation onto this table.
+        Apply a learned transformation onto this table.
 
-                Parameters
-                ----------
-                transformer : TableTransformer
-                    The transformer which transforms the given table
+        Parameters
+        ----------
+        transformer : TableTransformer
+            The transformer which transforms the given table
 
-                Returns
-                -------
-                transformed_table : Table
-                    The transformed table.
+        Returns
+        -------
+        transformed_table : Table
+            The transformed table.
 
-                Raises
-                ------
-                TransformerNotFittedError
-                    If the transformer has not been fitted yet.
-                """
+        Raises
+        ------
+        TransformerNotFittedError
+            If the transformer has not been fitted yet.
+        """
         return transformer.transform(self)
-
 
     # ------------------------------------------------------------------------------------------------------------------
     # Plotting
