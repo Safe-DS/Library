@@ -75,7 +75,7 @@ class TestToJpegFile:
         "path",
         ["image/white_square.jpg"],
     )
-    def test_should_save_jpeg_file_by_path(self, path: Path) -> None:
+    def test_should_save_jpeg_file_by_path(self, path: str) -> None:
         image = Image.from_jpeg_file(resolve_resource_path(path))
 
         with NamedTemporaryFile() as tmp_file:
