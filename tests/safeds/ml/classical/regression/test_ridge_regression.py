@@ -21,8 +21,3 @@ def test_ridge_regression() -> None:
     fitted_regression = regression.fit(
         Table.from_dict({"A": [1, 2, 4], "B": [1, 2, 3]}).tag_columns("B"))
     assert regression.alpha == fitted_regression.alpha
-
-
-def test_warning() -> None:
-    with pytest.warns(UserWarning):
-        warnings.warn(UserWarning("Test"))

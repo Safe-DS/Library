@@ -30,9 +30,6 @@ class RidgeRegression(Regressor):
         self.alpha = alpha
         if self.alpha < 0:
             raise ValueError("The alpha parameter should not be below 0")
-        print(self.alpha)  # TODO Remove before merge
-        print(alpha)  # TODO Remove before merge
-        print(self.alpha == 0.0)  # TODO Remove before merge
         if self.alpha == 0.0:
             warnings.warn(
                 "RidgeRegression with alpha 0 performs the exact way as LinearRegression. Please use LinearRegression instead.")
