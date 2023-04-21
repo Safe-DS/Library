@@ -1011,6 +1011,19 @@ class Table:
         ------
         TransformerNotFittedError
             If the transformer has not been fitted yet.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.transformation import OneHotEncoder
+        >>> from safeds.data.tabular.containers import Table
+        >>> transformer = OneHotEncoder()
+        >>> table = Table.from_dict({"col1": [1, 2, 1], "col2": [1, 2, 4]})
+        >>> transformer = transformer.fit(table, None)
+        >>> table.transform_table(transformer)
+           col1_1  col1_2  col2_1  col2_2  col2_4
+        0     1.0     0.0     1.0     0.0     0.0
+        1     0.0     1.0     0.0     1.0     0.0
+        2     1.0     0.0     0.0     0.0     1.0
         """
         return transformer.transform(self)
 
