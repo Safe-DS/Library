@@ -34,6 +34,8 @@ from ._row import Row
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterable
 
+    from safeds.data.tabular.transformation import InvertibleTableTransformer
+
     from ._tagged_table import TaggedTable
 
 
@@ -990,6 +992,46 @@ class Table:
             result: Column = Column(name, pd.Series(items))
             return self.replace_column(name, result)
         raise UnknownColumnNameError([name])
+
+    def inverse_transform_table(self, transformer: InvertibleTableTransformer) -> Table:
+        """
+        Invert the transformation applied by the given transformer.
+
+        Parameters
+        ----------
+        transformer : InvertibleTableTransformer
+            A transformer that was fitted with columns, which are all present in the table.
+
+        Returns
+        -------
+        table : Table
+            The original table
+
+        Raises
+        ------
+        TransformerNotFittedError
+            If the transformer has not been fitted yet.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.transformation import OneHotEncoder
+        >>> from safeds.data.tabular.containers import Table
+        >>> transformer = OneHotEncoder()
+        >>> table = Table.from_dict({"col1": [1, 2, 1], "col2": [1, 2, 4]})
+        >>> transformer = transformer.fit(table, None)
+        >>> transformed_table = transformer.transform(table)
+        >>> transformed_table.inverse_transform_table(transformer)
+           col1  col2
+        0     1     1
+        1     2     2
+        2     1     4
+        >>> transformer.inverse_transform(transformed_table)
+           col1  col2
+        0     1     1
+        1     2     2
+        2     1     4
+        """
+        return transformer.inverse_transform(self)
 
     # ------------------------------------------------------------------------------------------------------------------
     # Plotting
