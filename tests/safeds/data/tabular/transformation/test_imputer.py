@@ -24,7 +24,7 @@ class TestFit:
         )
 
         transformer = Imputer(Imputer.Strategy.Constant(0))
-        transformer.fit(table)
+        transformer.fit(table, None)
 
         assert transformer._wrapped_transformer is None
         assert transformer._column_names is None
@@ -38,7 +38,7 @@ class TestTransform:
             },
         )
 
-        transformer = Imputer(Imputer.Strategy.Constant(0)).fit(table_to_fit)
+        transformer = Imputer(Imputer.Strategy.Constant(0)).fit(table_to_fit, None)
 
         table_to_transform = Table.from_dict(
             {
@@ -75,7 +75,7 @@ class TestIsFitted:
         )
 
         transformer = Imputer(Imputer.Strategy.Mean())
-        fitted_transformer = transformer.fit(table)
+        fitted_transformer = transformer.fit(table, None)
         assert fitted_transformer.is_fitted()
 
 
