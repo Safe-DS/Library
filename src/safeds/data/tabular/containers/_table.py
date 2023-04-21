@@ -64,7 +64,7 @@ class Table:
 
         Parameters
         ----------
-        path : str/Path
+        path : str | Path
             The path to the CSV file.
 
         Returns
@@ -91,7 +91,7 @@ class Table:
 
         Parameters
         ----------
-        path : str/Path
+        path : str | Path
             The path to the JSON file.
 
         Returns
@@ -1133,7 +1133,7 @@ class Table:
 
         Parameters
         ----------
-        path : str/Path
+        path : str | Path
             The path to the output file.
         """
         Path(path).parent.mkdir(parents=True, exist_ok=True)
@@ -1150,7 +1150,7 @@ class Table:
 
         Parameters
         ----------
-        path : str/Path
+        path : str | Path
             The path to the output file.
         """
         Path(path).parent.mkdir(parents=True, exist_ok=True)
