@@ -7,7 +7,7 @@ from safeds.ml.classical.regression import RidgeRegression
 
 
 def test_ridge_regression_invalid() -> None:
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="The alpha parameter should not be below 0"):
         RidgeRegression(alpha=-1.0)
 
 

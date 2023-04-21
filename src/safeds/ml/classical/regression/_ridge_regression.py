@@ -32,7 +32,7 @@ class RidgeRegression(Regressor):
             raise ValueError("The alpha parameter should not be below 0")
         if self.alpha == 0.0:
             warnings.warn(
-                "RidgeRegression with alpha 0 performs the exact way as LinearRegression. Please use LinearRegression instead.")
+                "RidgeRegression with alpha 0 performs the exact way as LinearRegression. Please use LinearRegression instead.", stacklevel=2)
 
     def fit(self, training_set: TaggedTable) -> RidgeRegression:
         """
