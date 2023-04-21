@@ -35,4 +35,4 @@ def test_fit_raises_untagged_table_error() -> None:
     )
 
     with pytest.raises(UntaggedTableError):
-        _util_sklearn.fit(sk_AdaBoostRegressor(), table)
+        _util_sklearn.fit(sk_AdaBoostRegressor(), table)  # type: ignore[no-untyped-call]
