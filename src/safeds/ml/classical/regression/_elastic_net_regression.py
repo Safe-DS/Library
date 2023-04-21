@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from warnings import  warn
 from typing import TYPE_CHECKING
 
 from sklearn.linear_model import ElasticNet as sk_ElasticNet
@@ -15,7 +16,13 @@ if TYPE_CHECKING:
 class ElasticNetRegression(Regressor):
     """Elastic net regression."""
 
-    def __init__(self) -> None:
+    def __init__(self, alpha: float = 1.0) -> None:
+        if alpha < 0:
+            raise ValueError("alpha must be positive")
+        if alpha == 0:
+            warn("alpha=0 is equivalent to LinearRegression. Use it instead.", UserWarning)
+
+        self._alpha = alpha
         self._wrapped_regressor: sk_ElasticNet | None = None
         self._feature_names: list[str] | None = None
         self._target_name: str | None = None
@@ -41,10 +48,10 @@ class ElasticNetRegression(Regressor):
         LearningError
             If the training data contains invalid values or if the training failed.
         """
-        wrapped_regressor = sk_ElasticNet()
+        wrapped_regressor = sk_ElasticNet(alpha=self._alpha)
         fit(wrapped_regressor, training_set)
 
-        result = ElasticNetRegression()
+        result = ElasticNetRegression(alpha=self._alpha)
         result._wrapped_regressor = wrapped_regressor
         result._feature_names = training_set.features.column_names
         result._target_name = training_set.target.name
