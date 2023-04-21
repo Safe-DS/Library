@@ -1,4 +1,5 @@
 from pathlib import Path
+
 import pytest
 from safeds.data.tabular.containers import Table
 
