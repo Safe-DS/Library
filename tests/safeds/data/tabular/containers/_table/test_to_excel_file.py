@@ -18,4 +18,4 @@ def test_to_excel_file() -> None:
             table_r = Table.from_excel_file(path)
         assert table == table_r
     finally:
-        os.remove(path)
+        Path(path).unlink()

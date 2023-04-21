@@ -20,7 +20,7 @@ def test_from_excel_file_valid() -> None:
         assert table.get_column("A").get_value(0) == 1
         assert table.get_column("B").get_value(0) == 2
     finally:
-        os.remove(path)
+        Path(path).unlink()
 
 
 
