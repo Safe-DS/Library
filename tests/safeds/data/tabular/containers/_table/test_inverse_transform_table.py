@@ -91,7 +91,7 @@ class TestInverseTransformTableOnOneHotEncoder:
             },
         )
 
-        transformer = OneHotEncoder().fit(table, ["col1"])
+        transformer = OneHotEncoder().fit(table, None)
         transformed_table = transformer.transform(table)
         transformed_table.inverse_transform_table(transformer)
 
