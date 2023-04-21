@@ -1,8 +1,5 @@
 from __future__ import annotations
 
-import warnings
-from typing import Any
-
 from sklearn.preprocessing import OrdinalEncoder as sk_OrdinalEncoder
 
 from safeds.data.tabular.containers import Table
@@ -10,13 +7,6 @@ from safeds.data.tabular.exceptions import TransformerNotFittedError, UnknownCol
 from safeds.data.tabular.transformation._table_transformer import (
     InvertibleTableTransformer,
 )
-
-
-def warn(*_: Any, **__: Any) -> None:
-    pass
-
-
-warnings.warn = warn
 
 
 # noinspection PyProtectedMember
