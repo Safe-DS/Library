@@ -20,7 +20,7 @@ class ElasticNetRegression(Regressor):
         if alpha < 0:
             raise ValueError("alpha must be positive")
         if alpha == 0:
-            warn("alpha=0 is equivalent to LinearRegression. Use it instead.", UserWarning)
+            warn("alpha=0 is equivalent to LinearRegression. Use it instead.", UserWarning, stacklevel=1)
 
         self._alpha = alpha
         self._wrapped_regressor: sk_ElasticNet | None = None
