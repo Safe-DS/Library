@@ -1,3 +1,25 @@
+## [0.11.0](https://github.com/Safe-DS/Stdlib/compare/v0.10.0...v0.11.0) (2023-04-21)
+
+
+### Features
+
+* `OneHotEncoder.inverse_transform` now maintains the column order from the original table ([#195](https://github.com/Safe-DS/Stdlib/issues/195)) ([3ec0041](https://github.com/Safe-DS/Stdlib/commit/3ec0041669ffe97640f96db345f3f43720d5c3f7)), closes [#109](https://github.com/Safe-DS/Stdlib/issues/109) [#109](https://github.com/Safe-DS/Stdlib/issues/109)
+* add `plot_` prefix back to plotting methods ([#212](https://github.com/Safe-DS/Stdlib/issues/212)) ([e50c3b0](https://github.com/Safe-DS/Stdlib/commit/e50c3b0118825e33eef0e2a7073673603e316ee5)), closes [#211](https://github.com/Safe-DS/Stdlib/issues/211)
+* adjust `Column`, `Schema` and `Table` to changes in `Row` ([#216](https://github.com/Safe-DS/Stdlib/issues/216)) ([ca3eebb](https://github.com/Safe-DS/Stdlib/commit/ca3eebbe2166f08d76cdcb89a012518ae8ff8e4e))
+* back `Row` by a `polars.DataFrame` ([#214](https://github.com/Safe-DS/Stdlib/issues/214)) ([62ca34d](https://github.com/Safe-DS/Stdlib/commit/62ca34dd399da8b4e34b89bad408311707b53f41)), closes [#196](https://github.com/Safe-DS/Stdlib/issues/196) [#149](https://github.com/Safe-DS/Stdlib/issues/149)
+* clean up `Row` class ([#215](https://github.com/Safe-DS/Stdlib/issues/215)) ([b12fc68](https://github.com/Safe-DS/Stdlib/commit/b12fc68c9b914446c1ea3aca5dacfab969680ae8))
+* convert between `Row` and `dict` ([#206](https://github.com/Safe-DS/Stdlib/issues/206)) ([e98b653](https://github.com/Safe-DS/Stdlib/commit/e98b6536a2c50e64772fc7aeb29c03c850ebd570)), closes [#204](https://github.com/Safe-DS/Stdlib/issues/204)
+* convert between a `dict` and a `Table` ([#198](https://github.com/Safe-DS/Stdlib/issues/198)) ([2a5089e](https://github.com/Safe-DS/Stdlib/commit/2a5089e408a1eeb078aa77ce7c3e5ae8c4bc0201)), closes [#197](https://github.com/Safe-DS/Stdlib/issues/197)
+* create column types for `polars` data types ([#208](https://github.com/Safe-DS/Stdlib/issues/208)) ([e18b362](https://github.com/Safe-DS/Stdlib/commit/e18b36250ac170e3364106ba1c59649e0b4aff21)), closes [#196](https://github.com/Safe-DS/Stdlib/issues/196)
+* dataframe interchange protocol ([#200](https://github.com/Safe-DS/Stdlib/issues/200)) ([bea976a](https://github.com/Safe-DS/Stdlib/commit/bea976a72a28698a29145a3ad501d8af59e7e5d8)), closes [#199](https://github.com/Safe-DS/Stdlib/issues/199)
+* move existing ML solutions into `safeds.ml.classical` package ([#213](https://github.com/Safe-DS/Stdlib/issues/213)) ([655f07f](https://github.com/Safe-DS/Stdlib/commit/655f07f7f8f02b8fc92b469daf15a2384a81534f)), closes [#210](https://github.com/Safe-DS/Stdlib/issues/210)
+
+
+### Bug Fixes
+
+* `table.keep_only_columns` now maps column names to correct data ([#194](https://github.com/Safe-DS/Stdlib/issues/194)) ([459ab75](https://github.com/Safe-DS/Stdlib/commit/459ab7570c7c7b79304f78cab4f6bff82fc026a3)), closes [#115](https://github.com/Safe-DS/Stdlib/issues/115)
+* typo in type hint ([#184](https://github.com/Safe-DS/Stdlib/issues/184)) ([e79727d](https://github.com/Safe-DS/Stdlib/commit/e79727d5d91090bc5cd6d3a81acc2a1393b3e5eb)), closes [#180](https://github.com/Safe-DS/Stdlib/issues/180)
+
 ## [0.10.0](https://github.com/Safe-DS/Stdlib/compare/v0.9.0...v0.10.0) (2023-04-13)
 
 
