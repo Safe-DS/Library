@@ -3,13 +3,13 @@ from pathlib import Path
 _resources_root = Path(__file__).parent / ".." / "resources"
 
 
-def resolve_resource_path(resource_path: str) -> str:
+def resolve_resource_path(resource_path: str | Path) -> str:
     """
     Resolve a path relative to the `resources` directory to an absolute path.
 
     Parameters
     ----------
-    resource_path : str
+    resource_path : str | Path
         The path to the resource relative to the `resources` directory.
 
     Returns

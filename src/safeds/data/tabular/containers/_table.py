@@ -60,13 +60,13 @@ class Table:
     # ------------------------------------------------------------------------------------------------------------------
 
     @staticmethod
-    def from_csv_file(path: str) -> Table:
+    def from_csv_file(path: str | Path) -> Table:
         """
         Read data from a CSV file into a table.
 
         Parameters
         ----------
-        path : str
+        path : str | Path
             The path to the CSV file.
 
         Returns
@@ -87,13 +87,13 @@ class Table:
             raise FileNotFoundError(f'File "{path}" does not exist') from exception
 
     @staticmethod
-    def from_json_file(path: str) -> Table:
+    def from_json_file(path: str | Path) -> Table:
         """
         Read data from a JSON file into a table.
 
         Parameters
         ----------
-        path : str
+        path : str | Path
             The path to the JSON file.
 
         Returns
@@ -1200,7 +1200,7 @@ class Table:
     # Conversion
     # ------------------------------------------------------------------------------------------------------------------
 
-    def to_csv_file(self, path: str) -> None:
+    def to_csv_file(self, path: str | Path) -> None:
         """
         Write the data from the table into a CSV file.
 
@@ -1209,7 +1209,7 @@ class Table:
 
         Parameters
         ----------
-        path : str
+        path : str | Path
             The path to the output file.
         """
         Path(path).parent.mkdir(parents=True, exist_ok=True)
@@ -1217,7 +1217,7 @@ class Table:
         data_to_csv.columns = self._schema.column_names
         data_to_csv.to_csv(path, index=False)
 
-    def to_json_file(self, path: str) -> None:
+    def to_json_file(self, path: str | Path) -> None:
         """
         Write the data from the table into a JSON file.
 
@@ -1226,7 +1226,7 @@ class Table:
 
         Parameters
         ----------
-        path : str
+        path : str | Path
             The path to the output file.
         """
         Path(path).parent.mkdir(parents=True, exist_ok=True)
