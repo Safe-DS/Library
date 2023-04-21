@@ -4,7 +4,7 @@ from safeds.data.tabular.exceptions import TransformerNotFittedError
 from safeds.data.tabular.transformation import OneHotEncoder
 
 
-class TestInverseTransformTableOnOneHotEncoder:
+class TestInverseTransformTable:
     @pytest.mark.parametrize(
         ("table_to_fit", "column_names", "table_to_transform"),
         [
