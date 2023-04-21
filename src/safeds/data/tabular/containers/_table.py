@@ -1000,7 +1000,7 @@ class Table:
         Parameters
         ----------
         transformer : InvertibleTableTransformer
-            The transformer which is fitted on this table
+            A transformer that was fitted with columns, which are all present in the table.
 
         Returns
         -------
