@@ -31,7 +31,7 @@ class LassoRegression(Regressor):
         if alpha < 0:
             raise ValueError("alpha must be non-negative")
         if alpha == 0:
-            warn("alpha is zero, you should use LinearRegression instead", UserWarning)
+            warn("alpha is zero, you should use LinearRegression instead", UserWarning, stacklevel=1)
         self._alpha = alpha
         self._wrapped_regressor: sk_Lasso | None = None
         self._feature_names: list[str] | None = None
