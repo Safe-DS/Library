@@ -30,7 +30,7 @@ def fit(model: Any, tagged_table: TaggedTable) -> None:
         If the tagged table contains invalid values or if the training failed.
     """
     if not isinstance(tagged_table, TaggedTable) and isinstance(tagged_table, Table):
-        raise UntaggedTableError()
+        raise UntaggedTableError
     try:
         model.fit(
             tagged_table.features._data,

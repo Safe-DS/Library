@@ -68,12 +68,11 @@ class PredictionError(Exception):
 
 
 class UntaggedTableError(Exception):
-    """
-    Raised when an untagged table is used instead of a TaggedTable in a regression or classification
-    """
+    """Raised when an untagged table is used instead of a TaggedTable in a regression or classification."""
 
     def __init__(self) -> None:
         super().__init__(
             "This method needs a tagged table.\n"
             "A tagged table is a table that additionally knows which columns are features and which are the target to predict.\n"
-            "Use Table.tag_column() to create a tagged table.")
+            "Use Table.tag_column() to create a tagged table.",
+        )
