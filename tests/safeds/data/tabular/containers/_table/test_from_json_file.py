@@ -21,4 +21,4 @@ def test_from_json_file_valid(path: str | Path) -> None:
 )
 def test_from_json_file_invalid(path: str | Path) -> None:
     with pytest.raises(FileNotFoundError):
-        Table.from_json_file(resolve_resource_path("test_table_from_json_file_invalid.json"))
+        Table.from_json_file(resolve_resource_path(path))
