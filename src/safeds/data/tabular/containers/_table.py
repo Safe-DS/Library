@@ -1294,5 +1294,3 @@ class Table:
         data_copy = self._data.copy()
         data_copy.columns = self.column_names
         return data_copy.__dataframe__(nan_as_null, allow_copy)
-
-

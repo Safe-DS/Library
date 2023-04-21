@@ -1,9 +1,8 @@
 from pathlib import Path
 
 import openpyxl
-
 from safeds.data.tabular.containers import Table
-import os
+
 
 def test_to_excel_file() -> None:
     table = Table.from_dict({"col1": ["col1_1"], "col2": ["col2_1"]})

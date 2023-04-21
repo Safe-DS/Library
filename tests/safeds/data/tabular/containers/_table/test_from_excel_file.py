@@ -1,8 +1,8 @@
-import os
+
+from pathlib import Path
 
 import openpyxl
 import pytest
-from pathlib import Path
 from safeds.data.tabular.containers import Table
 
 from tests.helpers import resolve_resource_path
@@ -21,7 +21,6 @@ def test_from_excel_file_valid() -> None:
         assert table.get_column("B").get_value(0) == 2
     finally:
         Path(path).unlink()
-
 
 
 def test_from_excel_file_invalid() -> None:
