@@ -4,7 +4,7 @@ from tempfile import NamedTemporaryFile
 from safeds.data.tabular.containers import Table
 
 
-def test_to_csv_file() -> None:
+def test_to_csv_file_by_str() -> None:
     table = Table.from_dict({"col1": ["col1_1"], "col2": ["col2_1"]})
     with NamedTemporaryFile() as tmp_table_file:
         tmp_table_file.close()
@@ -15,7 +15,7 @@ def test_to_csv_file() -> None:
     assert table == table_r
 
 
-def test_to_csv_file_from_path() -> None:
+def test_to_csv_file_by_path() -> None:
     table = Table.from_dict({"col1": ["col1_1"], "col2": ["col2_1"]})
     with NamedTemporaryFile() as tmp_table_file:
         tmp_table_file.close()

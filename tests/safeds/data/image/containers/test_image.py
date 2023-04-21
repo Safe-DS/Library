@@ -57,9 +57,9 @@ class TestFormat:
 class TestToJpegFile:
     @pytest.mark.parametrize(
         "path",
-        ["image/white_square.jpg", Path("image/white_square.jpg")],
+        ["image/white_square.jpg"],
     )
-    def test_should_save_jpeg_file(self, path: str | Path) -> None:
+    def test_should_save_jpeg_file_by_str(self, path: str) -> None:
         image = Image.from_jpeg_file(resolve_resource_path(path))
 
         with NamedTemporaryFile() as tmp_file:
@@ -71,19 +71,51 @@ class TestToJpegFile:
 
         assert image._image.tobytes() == image_read_back._image.tobytes()
 
+    @pytest.mark.parametrize(
+        "path",
+        ["image/white_square.jpg"],
+    )
+    def test_should_save_jpeg_file_by_path(self, path: Path) -> None:
+        image = Image.from_jpeg_file(resolve_resource_path(path))
+
+        with NamedTemporaryFile() as tmp_file:
+            tmp_file.close()
+        with Path(tmp_file.name).open("wb") as tmp_write_file:
+            image.to_jpeg_file(Path(tmp_write_file.name))
+        with Path(tmp_file.name).open("rb") as tmp_read_file:
+            image_read_back = Image.from_jpeg_file(tmp_read_file.name)
+
+        assert image._image.tobytes() == image_read_back._image.tobytes()
+
 
 class TestToPngFile:
     @pytest.mark.parametrize(
         "path",
-        ["image/white_square.png", Path("image/white_square.png")],
+        ["image/white_square.png"],
     )
-    def test_should_save_png_file(self, path: str | Path) -> None:
+    def test_should_save_png_file_by_str(self, path: str) -> None:
         image = Image.from_png_file(resolve_resource_path(path))
 
         with NamedTemporaryFile() as tmp_file:
             tmp_file.close()
         with Path(tmp_file.name).open("wb") as tmp_write_file:
             image.to_png_file(tmp_write_file.name)
+        with Path(tmp_file.name).open("rb") as tmp_read_file:
+            image_read_back = Image.from_png_file(tmp_read_file.name)
+
+        assert image._image.tobytes() == image_read_back._image.tobytes()
+
+    @pytest.mark.parametrize(
+        "path",
+        ["image/white_square.png"],
+    )
+    def test_should_save_png_file_by_path(self, path: str) -> None:
+        image = Image.from_png_file(resolve_resource_path(path))
+
+        with NamedTemporaryFile() as tmp_file:
+            tmp_file.close()
+        with Path(tmp_file.name).open("wb") as tmp_write_file:
+            image.to_png_file(Path(tmp_write_file.name))
         with Path(tmp_file.name).open("rb") as tmp_read_file:
             image_read_back = Image.from_png_file(tmp_read_file.name)
 
