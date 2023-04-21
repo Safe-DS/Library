@@ -12,18 +12,18 @@ from safeds.data.image.typing import ImageFormat
 
 class Image:
     """
-    A container for image data.
+    A container for image.png data.
 
     Parameters
     ----------
     data : BinaryIO
-        The image data as bytes.
+        The image.png data as bytes.
     """
 
     @staticmethod
     def from_jpeg_file(path: str) -> Image:
         """
-        Create an image from a JPEG file.
+        Create an image.png from a JPEG file.
 
         Parameters
         ----------
@@ -32,8 +32,8 @@ class Image:
 
         Returns
         -------
-        image : Image
-            The image.
+        image.png : Image
+            The image.png.
         """
         return Image(
             data=Path(path).open("rb"),
@@ -43,7 +43,7 @@ class Image:
     @staticmethod
     def from_png_file(path: str) -> Image:
         """
-        Create an image from a PNG file.
+        Create an image.png from a PNG file.
 
         Parameters
         ----------
@@ -52,8 +52,8 @@ class Image:
 
         Returns
         -------
-        image : Image
-            The image.
+        image.png : Image
+            The image.png.
         """
         return Image(
             data=Path(path).open("rb"),
@@ -73,12 +73,12 @@ class Image:
     @property
     def format(self) -> ImageFormat:
         """
-        Get the image format.
+        Get the image.png format.
 
         Returns
         -------
         format : ImageFormat
-            The image format.
+            The image.png format.
         """
         return self._format
 
@@ -88,7 +88,7 @@ class Image:
 
     def to_jpeg_file(self, path: str) -> None:
         """
-        Save the image as a JPEG file.
+        Save the image.png as a JPEG file.
 
         Parameters
         ----------
@@ -100,7 +100,7 @@ class Image:
 
     def to_png_file(self, path: str) -> None:
         """
-        Save the image as a PNG file.
+        Save the image.png as a PNG file.
 
         Parameters
         ----------
@@ -116,14 +116,14 @@ class Image:
 
     def _repr_jpeg_(self) -> bytes | None:
         """
-        Return a JPEG image as bytes.
+        Return a JPEG image.png as bytes.
 
-        If the image is not a JPEG, return None.
+        If the image.png is not a JPEG, return None.
 
         Returns
         -------
         jpeg : bytes
-            The image as JPEG.
+            The image.png as JPEG.
         """
         if self._format != ImageFormat.JPEG:
             return None
@@ -135,14 +135,14 @@ class Image:
 
     def _repr_png_(self) -> bytes | None:
         """
-        Return a PNG image as bytes.
+        Return a PNG image.png as bytes.
 
-        If the image is not a PNG, return None.
+        If the image.png is not a PNG, return None.
 
         Returns
         -------
         png : bytes
-            The image as PNG.
+            The image.png as PNG.
         """
         if self._format != ImageFormat.PNG:
             return None

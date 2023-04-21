@@ -481,7 +481,7 @@ class Column:
         Returns
         -------
         plot: Image
-            The plot as an image.
+            The plot as an image.png.
 
         Raises
         ------
@@ -515,7 +515,7 @@ class Column:
         Returns
         -------
         plot: Image
-            The plot as an image.
+            The plot as an image.png.
         """
         fig = plt.figure()
         ax = sns.histplot(data=self._data)
