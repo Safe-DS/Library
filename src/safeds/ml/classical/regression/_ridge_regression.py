@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import warnings
 from typing import TYPE_CHECKING
 
 from sklearn.linear_model import Ridge as sk_Ridge
@@ -13,12 +14,28 @@ if TYPE_CHECKING:
 
 
 class RidgeRegression(Regressor):
-    """Ridge regression."""
+    """
+    Ridge regression.
 
-    def __init__(self) -> None:
+    Parameters
+    ----------
+    alpha : float
+        Controls the regularization strength. Has to be greater than or equal to 0.
+    """
+
+    def __init__(self, alpha: float = 1.0) -> None:
         self._wrapped_regressor: sk_Ridge | None = None
         self._feature_names: list[str] | None = None
         self._target_name: str | None = None
+        self.alpha = alpha
+        if self.alpha < 0:
+            raise ValueError("The alpha parameter should not be below 0")
+        print(self.alpha)  # TODO Remove before merge
+        print(alpha)  # TODO Remove before merge
+        print(self.alpha == 0.0)  # TODO Remove before merge
+        if self.alpha == 0.0:
+            warnings.warn(
+                "RidgeRegression with alpha 0 performs the exact way as LinearRegression. Please use LinearRegression instead.")
 
     def fit(self, training_set: TaggedTable) -> RidgeRegression:
         """
@@ -41,10 +58,10 @@ class RidgeRegression(Regressor):
         LearningError
             If the training data contains invalid values or if the training failed.
         """
-        wrapped_regressor = sk_Ridge()
+        wrapped_regressor = sk_Ridge(alpha=self.alpha)
         fit(wrapped_regressor, training_set)
 
-        result = RidgeRegression()
+        result = RidgeRegression(alpha=self.alpha)
         result._wrapped_regressor = wrapped_regressor
         result._feature_names = training_set.features.column_names
         result._target_name = training_set.target.name
@@ -76,7 +93,8 @@ class RidgeRegression(Regressor):
         PredictionError
             If predicting with the given dataset failed.
         """
-        return predict(self._wrapped_regressor, dataset, self._feature_names, self._target_name)
+        return predict(self._wrapped_regressor, dataset, self._feature_names,
+                       self._target_name)
 
     def is_fitted(self) -> bool:
         """
