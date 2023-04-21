@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import warnings
 from typing import TYPE_CHECKING
 
 from sklearn.linear_model import ElasticNet as sk_ElasticNet
@@ -15,7 +16,16 @@ if TYPE_CHECKING:
 class ElasticNetRegression(Regressor):
     """Elastic net regression."""
 
-    def __init__(self) -> None:
+    def __init__(self, lasso_ratio: float = .5) -> None:
+        if lasso_ratio < 0 or lasso_ratio > 1:
+            raise ValueError("lasso_ratio must be between 0 and 1.")
+        elif lasso_ratio == 0:
+            warnings.warn("ElasticNetRegression with lasso_ratio = 0 is essentially RidgeRegression."
+                          " Use RidgeRegression instead for better numerical stability.")
+        elif lasso_ratio == 1:
+            warnings.warn("ElasticNetRegression with lasso_ratio = 0 is essentially LassoRegression."
+                          " Use LassoRegression instead for better numerical stability.")
+        self.lasso_ratio = lasso_ratio
         self._wrapped_regressor: sk_ElasticNet | None = None
         self._feature_names: list[str] | None = None
         self._target_name: str | None = None
@@ -41,10 +51,10 @@ class ElasticNetRegression(Regressor):
         LearningError
             If the training data contains invalid values or if the training failed.
         """
-        wrapped_regressor = sk_ElasticNet()
+        wrapped_regressor = sk_ElasticNet(l1_ratio=self.lasso_ratio)
         fit(wrapped_regressor, training_set)
 
-        result = ElasticNetRegression()
+        result = ElasticNetRegression(self.lasso_ratio)
         result._wrapped_regressor = wrapped_regressor
         result._feature_names = training_set.features.column_names
         result._target_name = training_set.target.name
