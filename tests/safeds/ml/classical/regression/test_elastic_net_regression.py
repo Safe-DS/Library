@@ -1,11 +1,6 @@
-import warnings
-
 import pytest
 from safeds.data.tabular.containers import Table
 from safeds.ml.classical.regression._elastic_net_regression import ElasticNetRegression
-
-
-# def test_lasso_ratio_default() -> None: is in test_regressor.py
 
 
 def test_lasso_ratio_valid() -> None:
@@ -33,3 +28,7 @@ def test_lasso_ratio_one() -> None:
     with pytest.warns(UserWarning, match="ElasticNetRegression with lasso_ratio = 0 is essentially LassoRegression."
                                          " Use LassoRegression instead for better numerical stability."):
         ElasticNetRegression(1)
+
+
+# (Default parameter is tested in `test_regressor.py`.)
+
