@@ -995,7 +995,7 @@ class Table:
 
     def inverse_transform_table(self, transformer: InvertibleTableTransformer) -> Table:
         """
-        Use a transformer to inverse the transformation of this table.
+        Invert the transformation applied by the given transformer.
 
         Parameters
         ----------
