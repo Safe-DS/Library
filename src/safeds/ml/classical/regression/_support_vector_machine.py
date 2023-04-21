@@ -41,7 +41,7 @@ class SupportVectorMachine(Regressor):
         LearningError
             If the training data contains invalid values or if the training failed.
         """
-        wrapped_regressor = sk_SVR(n_jobs=-1)
+        wrapped_regressor = sk_SVR()
         fit(wrapped_regressor, training_set)
 
         result = SupportVectorMachine()

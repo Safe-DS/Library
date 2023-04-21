@@ -40,7 +40,7 @@ class SupportVectorMachine(Classifier):
         LearningError
             If the training data contains invalid values or if the training failed.
         """
-        wrapped_classifier = sk_SVC(n_jobs=-1)
+        wrapped_classifier = sk_SVC()
         fit(wrapped_classifier, training_set)
 
         result = SupportVectorMachine()
