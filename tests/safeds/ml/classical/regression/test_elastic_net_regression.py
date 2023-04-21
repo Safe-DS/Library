@@ -1,5 +1,4 @@
 import pytest
-
 from safeds.data.tabular.containers import Table
 from safeds.ml.classical.regression import ElasticNetRegression
 
@@ -21,7 +20,3 @@ def test_alpha_valid() -> None:
     elastic_net_regression = ElasticNetRegression(alpha=1.0).fit(tagged_training_set)
     assert elastic_net_regression._wrapped_regressor is not None
     assert elastic_net_regression._wrapped_regressor.alpha == elastic_net_regression._alpha
-
-
-
-
