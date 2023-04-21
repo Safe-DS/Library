@@ -23,7 +23,7 @@ class TestFit:
         )
 
         transformer = LabelEncoder()
-        transformer.fit(table)
+        transformer.fit(table, None)
 
         assert transformer._wrapped_transformer is None
         assert transformer._column_names is None
@@ -37,7 +37,7 @@ class TestTransform:
             },
         )
 
-        transformer = LabelEncoder().fit(table_to_fit)
+        transformer = LabelEncoder().fit(table_to_fit, None)
 
         table_to_transform = Table.from_dict(
             {
@@ -74,7 +74,7 @@ class TestIsFitted:
         )
 
         transformer = LabelEncoder()
-        fitted_transformer = transformer.fit(table)
+        fitted_transformer = transformer.fit(table, None)
         assert fitted_transformer.is_fitted()
 
 
@@ -150,7 +150,7 @@ class TestInverseTransform:
         ],
     )
     def test_should_return_original_table(self, table: Table) -> None:
-        transformer = LabelEncoder().fit(table)
+        transformer = LabelEncoder().fit(table, None)
 
         assert transformer.inverse_transform(transformer.transform(table)) == table
 
@@ -161,7 +161,7 @@ class TestInverseTransform:
             },
         )
 
-        transformer = LabelEncoder().fit(table)
+        transformer = LabelEncoder().fit(table, None)
         transformed_table = transformer.transform(table)
         transformer.inverse_transform(transformed_table)
 
