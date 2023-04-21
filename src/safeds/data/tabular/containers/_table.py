@@ -34,8 +34,9 @@ from ._row import Row
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterable
 
+    from safeds.data.tabular.transformation import InvertibleTableTransformer
+
     from ._tagged_table import TaggedTable
-    from ..transformation import InvertibleTableTransformer
 
 
 # noinspection PyProtectedMember
