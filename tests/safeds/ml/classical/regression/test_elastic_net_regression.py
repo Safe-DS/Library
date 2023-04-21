@@ -9,6 +9,11 @@ def test_alpha_invalid() -> None:
         ElasticNetRegression(alpha=-1.0)
 
 
+def test_alpha_warning() -> None:
+    with pytest.warns(UserWarning, match="alpha=0 is equivalent to LinearRegression. Use it instead."):
+        ElasticNetRegression(alpha=0.0)
+
+
 def test_alpha_valid() -> None:
     training_set = Table.from_dict({"col1": [1, 2, 3, 4], "col2": [1, 2, 3, 4]})
     tagged_training_set = training_set.tag_columns(target_name="col1", feature_names=["col2"])
