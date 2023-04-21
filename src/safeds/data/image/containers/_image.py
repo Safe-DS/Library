@@ -27,7 +27,7 @@ class Image:
 
         Parameters
         ----------
-        path : str | Path
+        path : str/Path
             The path to the JPEG file.
 
         Returns
@@ -47,7 +47,7 @@ class Image:
 
         Parameters
         ----------
-        path : str | Path
+        path : str/Path
             The path to the PNG file.
 
         Returns
@@ -92,7 +92,7 @@ class Image:
 
         Parameters
         ----------
-        path : str | Path
+        path : str/Path
             The path to the JPEG file.
         """
         Path(path).parent.mkdir(parents=True, exist_ok=True)
@@ -104,7 +104,7 @@ class Image:
 
         Parameters
         ----------
-        path : str | Path
+        path : str/Path
             The path to the PNG file.
         """
         Path(path).parent.mkdir(parents=True, exist_ok=True)
