@@ -35,6 +35,7 @@ if TYPE_CHECKING:
     from collections.abc import Callable, Iterable
 
     from ._tagged_table import TaggedTable
+    from ..transformation import InvertibleTableTransformer
 
 
 # noinspection PyProtectedMember
@@ -990,6 +991,27 @@ class Table:
             result: Column = Column(name, pd.Series(items))
             return self.replace_column(name, result)
         raise UnknownColumnNameError([name])
+
+    def inverse_transform_table(self, transformer: InvertibleTableTransformer) -> Table:
+        """
+        Use a transformer to inverse the transformation of this table.
+
+        Parameters
+        ----------
+        transformer : InvertibleTableTransformer
+            The transformer which is fitted on this table
+
+        Returns
+        -------
+        table : Table
+            The original table
+
+        Raises
+        ------
+        TransformerNotFittedError
+            If the transformer has not been fitted yet.
+        """
+        return transformer.inverse_transform(self)
 
     # ------------------------------------------------------------------------------------------------------------------
     # Plotting
