@@ -13,9 +13,23 @@ if TYPE_CHECKING:
 
 
 class RandomForest(Regressor):
-    """Random forest regression."""
+    """Random forest regression.
 
-    def __init__(self) -> None:
+    Parameters
+    ----------
+    number_of_trees : int
+        The number of trees to be used in the random forest. Has to be greater than 0.
+
+    Raises
+    ------
+    ValueError
+        If the number of trees is less than 1.
+    """
+
+    def __init__(self, number_of_trees: int = 100) -> None:
+        if number_of_trees < 1:
+            raise ValueError("The number of trees has to be greater than 0.")
+        self.number_of_trees = number_of_trees
         self._wrapped_regressor: sk_RandomForestRegressor | None = None
         self._feature_names: list[str] | None = None
         self._target_name: str | None = None
@@ -41,10 +55,10 @@ class RandomForest(Regressor):
         LearningError
             If the training data contains invalid values or if the training failed.
         """
-        wrapped_regressor = sk_RandomForestRegressor(n_jobs=-1)
+        wrapped_regressor = sk_RandomForestRegressor(self.number_of_trees, n_jobs=-1)
         fit(wrapped_regressor, training_set)
 
-        result = RandomForest()
+        result = RandomForest(self.number_of_trees)
         result._wrapped_regressor = wrapped_regressor
         result._feature_names = training_set.features.column_names
         result._target_name = training_set.target.name
