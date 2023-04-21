@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from sklearn.svm import SVC as sk_SVC
+from sklearn.svm import SVC as sk_SVC # noqa: N811
 
 from safeds.ml.classical._util_sklearn import fit, predict
 from ._classifier import Classifier

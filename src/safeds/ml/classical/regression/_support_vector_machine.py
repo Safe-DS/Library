@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from sklearn.svm import SVR as sk_SVR
+from sklearn.svm import SVR as sk_SVR # noqa: N811
 
 from safeds.ml.classical._util_sklearn import fit, predict
 

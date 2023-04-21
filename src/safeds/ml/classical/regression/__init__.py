@@ -10,7 +10,7 @@ from ._linear_regression import LinearRegression
 from ._random_forest import RandomForest
 from ._regressor import Regressor
 from ._ridge_regression import RidgeRegression
-from ..classification import SupportVectorMachine
+from ._support_vector_machine import SupportVectorMachine
 
 
 __all__ = [
