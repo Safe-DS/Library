@@ -9,7 +9,6 @@ from ._logistic_regression import LogisticRegression
 from ._random_forest import RandomForest
 from ._support_vector_machine import SupportVectorMachine
 
-
 __all__ = [
     "AdaBoost",
     "Classifier",
@@ -20,4 +19,3 @@ __all__ = [
     "RandomForest",
     "SupportVectorMachine",
 ]
-

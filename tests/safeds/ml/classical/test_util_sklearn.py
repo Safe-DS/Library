@@ -1,12 +1,9 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
-
-import pytest
 import warnings
+
 from safeds.data.tabular.containers import Table
 from safeds.ml.classical.regression import SupportVectorMachine
-
 
 
 def test_predict_should_not_warn_about_feature_names() -> None:

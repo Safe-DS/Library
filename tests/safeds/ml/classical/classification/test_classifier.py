@@ -38,8 +38,15 @@ def classifiers() -> list[Classifier]:
     classifiers : list[Classifier]
         The list of classifiers to test.
     """
-    return [AdaBoost(), DecisionTree(), GradientBoosting(), KNearestNeighbors(2), LogisticRegression(),
-            RandomForest(), SupportVectorMachine()]
+    return [
+        AdaBoost(),
+        DecisionTree(),
+        GradientBoosting(),
+        KNearestNeighbors(2),
+        LogisticRegression(),
+        RandomForest(),
+        SupportVectorMachine(),
+    ]
 
 
 @pytest.fixture()

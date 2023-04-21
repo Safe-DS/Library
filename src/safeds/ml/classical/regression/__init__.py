@@ -12,7 +12,6 @@ from ._regressor import Regressor
 from ._ridge_regression import RidgeRegression
 from ._support_vector_machine import SupportVectorMachine
 
-
 __all__ = [
     "AdaBoost",
     "DecisionTree",
@@ -26,4 +25,3 @@ __all__ = [
     "RidgeRegression",
     "SupportVectorMachine",
 ]
-
