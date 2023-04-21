@@ -1,5 +1,4 @@
 import pytest
-
 from safeds.data.tabular.containers import Table
 from safeds.ml.classical.classification import RandomForest
 
