@@ -1,3 +1,4 @@
+import warnings
 from typing import Any
 
 from safeds.data.tabular.containers import Table, TaggedTable
@@ -87,7 +88,9 @@ def predict(model: Any, dataset: Table, feature_names: list[str] | None, target_
     result_set.columns = dataset.column_names
 
     try:
-        predicted_target_vector = model.predict(dataset_df.values)
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", message="X does not have valid feature names")
+            predicted_target_vector = model.predict(dataset_df.values)
         result_set[target_name] = predicted_target_vector
         return Table(result_set).tag_columns(target_name=target_name, feature_names=feature_names)
     except ValueError as exception:
