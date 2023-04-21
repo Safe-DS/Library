@@ -1000,7 +1000,7 @@ class Table:
         Parameters
         ----------
         transformer : TableTransformer
-            The transformer which transforms the given table
+            The transformer which transforms the given table.
 
         Returns
         -------
@@ -1039,7 +1039,7 @@ class Table:
         Returns
         -------
         table : Table
-            The original table
+            The original table.
 
         Raises
         ------
