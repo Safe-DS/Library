@@ -7,6 +7,8 @@ from ._gradient_boosting_classification import GradientBoosting
 from ._k_nearest_neighbors import KNearestNeighbors
 from ._logistic_regression import LogisticRegression
 from ._random_forest import RandomForest
+from ._support_vector_machine import SupportVectorMachine
+
 
 __all__ = [
     "AdaBoost",
@@ -16,4 +18,6 @@ __all__ = [
     "KNearestNeighbors",
     "LogisticRegression",
     "RandomForest",
+    "SupportVectorMachine",
 ]
+
