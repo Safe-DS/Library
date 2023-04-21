@@ -5,7 +5,7 @@ from safeds.ml.classical.regression import LassoRegression
 
 
 def test_alpha_invalid() -> None:
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="alpha must be non-negative"):
         LassoRegression(alpha=-1)
 
 
