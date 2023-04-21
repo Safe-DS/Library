@@ -11,16 +11,16 @@ from tests.helpers import resolve_resource_path
 class TestFromJpegFile:
     @pytest.mark.parametrize(
         "path",
-        ["image/white_square.jpg"],
+        ["image/white_square.jpg", Path("image/white_square.jpg")],
     )
-    def test_should_load_jpeg_file(self, path: str) -> None:
+    def test_should_load_jpeg_file(self, path: str | Path) -> None:
         Image.from_jpeg_file(resolve_resource_path(path))
 
     @pytest.mark.parametrize(
         "path",
-        ["image/missing_file.jpg"],
+        ["image/missing_file.jpg", Path("image/missing_file.jpg")],
     )
-    def test_should_raise_if_file_not_found(self, path: str) -> None:
+    def test_should_raise_if_file_not_found(self, path: str | Path) -> None:
         with pytest.raises(FileNotFoundError):
             Image.from_jpeg_file(resolve_resource_path(path))
 
@@ -28,16 +28,16 @@ class TestFromJpegFile:
 class TestFromPngFile:
     @pytest.mark.parametrize(
         "path",
-        ["image/white_square.png"],
+        ["image/white_square.png", Path("image/white_square.png")],
     )
-    def test_should_load_png_file(self, path: str) -> None:
+    def test_should_load_png_file(self, path: str | Path) -> None:
         Image.from_png_file(resolve_resource_path(path))
 
     @pytest.mark.parametrize(
         "path",
-        ["image/missing_file.png"],
+        ["image/missing_file.png", Path("image/missing_file.png")],
     )
-    def test_should_raise_if_file_not_found(self, path: str) -> None:
+    def test_should_raise_if_file_not_found(self, path: str | Path) -> None:
         with pytest.raises(FileNotFoundError):
             Image.from_png_file(resolve_resource_path(path))
 
@@ -57,9 +57,9 @@ class TestFormat:
 class TestToJpegFile:
     @pytest.mark.parametrize(
         "path",
-        ["image/white_square.jpg"],
+        ["image/white_square.jpg", Path("image/white_square.jpg")],
     )
-    def test_should_save_jpeg_file(self, path: str) -> None:
+    def test_should_save_jpeg_file(self, path: str | Path) -> None:
         image = Image.from_jpeg_file(resolve_resource_path(path))
 
         with NamedTemporaryFile() as tmp_file:
@@ -75,9 +75,9 @@ class TestToJpegFile:
 class TestToPngFile:
     @pytest.mark.parametrize(
         "path",
-        ["image/white_square.png"],
+        ["image/white_square.png", Path("image/white_square.png")],
     )
-    def test_should_save_png_file(self, path: str) -> None:
+    def test_should_save_png_file(self, path: str | Path) -> None:
         image = Image.from_png_file(resolve_resource_path(path))
 
         with NamedTemporaryFile() as tmp_file:
