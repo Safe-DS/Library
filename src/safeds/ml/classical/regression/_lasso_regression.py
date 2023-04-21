@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from warnings import warn
 from typing import TYPE_CHECKING
 
 from sklearn.linear_model import Lasso as sk_Lasso
@@ -13,9 +14,25 @@ if TYPE_CHECKING:
 
 
 class LassoRegression(Regressor):
-    """Lasso regression."""
+    """Lasso regression.
 
-    def __init__(self) -> None:
+    Parameters
+    ----------
+    alpha : float, default=1.0
+        Constant that multiplies the L1 term. Defaults to 1.0.
+
+    Raises
+    ------
+    ValueError
+        If alpha is negative.
+    """
+
+    def __init__(self, alpha: float = 1.0) -> None:
+        if alpha < 0:
+            raise ValueError("alpha must be non-negative")
+        if alpha == 0:
+            warn("alpha is zero, you should use LinearRegression instead", UserWarning)
+        self._alpha = alpha
         self._wrapped_regressor: sk_Lasso | None = None
         self._feature_names: list[str] | None = None
         self._target_name: str | None = None
@@ -41,10 +58,10 @@ class LassoRegression(Regressor):
         LearningError
             If the training data contains invalid values or if the training failed.
         """
-        wrapped_regressor = sk_Lasso()
+        wrapped_regressor = sk_Lasso(alpha=self._alpha)
         fit(wrapped_regressor, training_set)
 
-        result = LassoRegression()
+        result = LassoRegression(alpha=self._alpha)
         result._wrapped_regressor = wrapped_regressor
         result._feature_names = training_set.features.column_names
         result._target_name = training_set.target.name
