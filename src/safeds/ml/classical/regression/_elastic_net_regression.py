@@ -21,10 +21,10 @@ class ElasticNetRegression(Regressor):
             raise ValueError("lasso_ratio must be between 0 and 1.")
         elif lasso_ratio == 0:
             warnings.warn("ElasticNetRegression with lasso_ratio = 0 is essentially RidgeRegression."
-                          " Use RidgeRegression instead for better numerical stability.")
+                          " Use RidgeRegression instead for better numerical stability.", stacklevel=1)
         elif lasso_ratio == 1:
             warnings.warn("ElasticNetRegression with lasso_ratio = 0 is essentially LassoRegression."
-                          " Use LassoRegression instead for better numerical stability.")
+                          " Use LassoRegression instead for better numerical stability.", stacklevel=1)
         self.lasso_ratio = lasso_ratio
         self._wrapped_regressor: sk_ElasticNet | None = None
         self._feature_names: list[str] | None = None
