@@ -9,7 +9,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import seaborn as sns
-from IPython.core.display_functions import DisplayHandle, display
 from pandas import DataFrame
 from scipy import stats
 
@@ -26,7 +25,6 @@ from safeds.data.tabular.exceptions import (
     UnknownColumnNameError,
 )
 from safeds.data.tabular.typing import ColumnType, Schema
-
 from ._column import Column
 from ._row import Row
 
@@ -1269,20 +1267,16 @@ class Table:
     # IPython integration
     # ------------------------------------------------------------------------------------------------------------------
 
-    def _ipython_display_(self) -> DisplayHandle:
+    def _repr_html_(self) -> str:
         """
-        Return a display object for the column to be used in Jupyter Notebooks.
+        Return an HTML representation of the table.
 
         Returns
         -------
-        output : DisplayHandle
-            Output object.
+        output : str
+            The generated HTML.
         """
-        tmp = self._data.copy(deep=True)
-        tmp.columns = self.column_names
-
-        with pd.option_context("display.max_rows", tmp.shape[0], "display.max_columns", tmp.shape[1]):
-            return display(tmp)
+        return self._data.to_html(max_rows=self._data.shape[0], max_cols=self._data.shape[1], notebook=True)
 
     # ------------------------------------------------------------------------------------------------------------------
     # Dataframe interchange protocol

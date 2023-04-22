@@ -53,6 +53,22 @@ class TestToDict:
         assert table.to_dict() == expected
 
 
+class TestReprHtml:
+    @pytest.mark.parametrize(
+        "table",
+        [
+            Table.from_dict({}),
+            Table.from_dict({"a": [1, 2], "b": [3, 4]}),
+        ],
+        ids=[
+            "empty",
+            "non-empty",
+        ],
+    )
+    def test_should_contain_table_element(self, table: Table) -> None:
+        assert "<table" in table._repr_html_()
+
+
 class TestDataframe:
     @pytest.mark.parametrize(
         "table",

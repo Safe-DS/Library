@@ -8,7 +8,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import seaborn as sns
-from IPython.core.display_functions import DisplayHandle, display
 
 from safeds.data.image.containers import Image
 from safeds.data.image.typing import ImageFormat
@@ -535,20 +534,16 @@ class Column:
     # IPython integration
     # ------------------------------------------------------------------------------------------------------------------
 
-    def _ipython_display_(self) -> DisplayHandle:
+    def _repr_html_(self) -> str:
         """
-        Return a display object for the column to be used in Jupyter Notebooks.
+        Return an HTML representation of the column.
 
         Returns
         -------
-        output : DisplayHandle
-            Output object.
+        output : str
+            The generated HTML.
         """
-        tmp = self._data.to_frame()
-        tmp.columns = [self.name]
-
-        with pd.option_context("display.max_rows", tmp.shape[0], "display.max_columns", tmp.shape[1]):
-            return display(tmp)
+        return self._data.to_frame().to_html(max_rows=self._data.size, max_cols=1, notebook=True)
 
     # ------------------------------------------------------------------------------------------------------------------
     # Other
