@@ -23,7 +23,7 @@ class RandomForest(Regressor):
     Raises
     ------
     ValueError
-        If the number of trees is less than 1.
+        If the number of trees is less than or equal to 0.
     """
 
     def __init__(self, number_of_trees: int = 100) -> None:
