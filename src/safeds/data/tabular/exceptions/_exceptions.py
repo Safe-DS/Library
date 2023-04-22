@@ -42,11 +42,11 @@ class IndexOutOfBoundsError(IndexError):
 
     Parameters
     ----------
-    index : int
+    index : int | slice
         The wrongly used index.
     """
 
-    def __init__(self, index: int):
+    def __init__(self, index: int | slice):
         super().__init__(f"There is no element at index '{index}'.")
 
 

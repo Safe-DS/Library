@@ -113,8 +113,19 @@ class Column(Sequence[_T]):
             return True
         return self.name == other.name and self._data.equals(other._data)
 
-    def __getitem__(self, index: int) -> _T:
-        return self.get_value(index)
+    def __getitem__(self, index: int | slice) -> _T:
+        if isinstance(index, int):
+            if index < 0 or index >= self._data.size:
+                raise IndexOutOfBoundsError(index)
+            return self._data[index]
+
+        if isinstance(index, slice):
+            if index.start < 0 or index.start > self._data.size:
+                raise IndexOutOfBoundsError(index)
+            if index.stop < 0 or index.stop > self._data.size:
+                raise IndexOutOfBoundsError(index)
+            data = self._data[index].reset_index(drop=True).rename(self.name)
+            return Column._from_pandas_series(data, self._type)
 
     def __iter__(self) -> Iterator[_T]:
         return iter(self._data)
