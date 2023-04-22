@@ -1,3 +1,4 @@
+import re
 from typing import Any
 
 import pytest
@@ -51,6 +52,54 @@ class TestToDict:
     )
     def test_should_return_dict_for_table(self, table: Table, expected: dict[str, list[Any]]) -> None:
         assert table.to_dict() == expected
+
+
+class TestReprHtml:
+    @pytest.mark.parametrize(
+        "table",
+        [
+            Table.from_dict({}),
+            Table.from_dict({"a": [1, 2], "b": [3, 4]}),
+        ],
+        ids=[
+            "empty",
+            "non-empty",
+        ],
+    )
+    def test_should_contain_table_element(self, table: Table) -> None:
+        pattern = r"<table.*?>.*?</table>"
+        assert re.search(pattern, table._repr_html_(), flags=re.S) is not None
+
+    @pytest.mark.parametrize(
+        "table",
+        [
+            Table.from_dict({}),
+            Table.from_dict({"a": [1, 2], "b": [3, 4]}),
+        ],
+        ids=[
+            "empty",
+            "non-empty",
+        ],
+    )
+    def test_should_contain_th_element_for_each_column_name(self, table: Table) -> None:
+        for column_name in table.column_names:
+            assert f"<th>{column_name}</th>" in table._repr_html_()
+
+    @pytest.mark.parametrize(
+        "table",
+        [
+            Table.from_dict({}),
+            Table.from_dict({"a": [1, 2], "b": [3, 4]}),
+        ],
+        ids=[
+            "empty",
+            "non-empty",
+        ],
+    )
+    def test_should_contain_td_element_for_each_value(self, table: Table) -> None:
+        for column in table.to_columns():
+            for value in column:
+                assert f"<td>{value}</td>" in table._repr_html_()
 
 
 class TestDataframe:

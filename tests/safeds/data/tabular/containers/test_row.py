@@ -1,3 +1,4 @@
+import re
 from typing import Any
 
 import pandas as pd
@@ -414,4 +415,35 @@ class TestReprHtml:
         ],
     )
     def test_should_contain_table_element(self, row: Row) -> None:
-        assert "<table" in row._repr_html_()
+        pattern = r"<table.*?>.*?</table>"
+        assert re.search(pattern, row._repr_html_(), flags=re.S) is not None
+
+    @pytest.mark.parametrize(
+        "row",
+        [
+            Row(),
+            Row({"a": 1, "b": 2}),
+        ],
+        ids=[
+            "empty",
+            "non-empty",
+        ],
+    )
+    def test_should_contain_th_element_for_each_column_name(self, row: Row) -> None:
+        for column_name in row.column_names:
+            assert f"<th>{column_name}</th>" in row._repr_html_()
+
+    @pytest.mark.parametrize(
+        "row",
+        [
+            Row(),
+            Row({"a": 1, "b": 2}),
+        ],
+        ids=[
+            "empty",
+            "non-empty",
+        ],
+    )
+    def test_should_contain_td_element_for_each_value(self, row: Row) -> None:
+        for value in row.values():
+            assert f"<td>{value}</td>" in row._repr_html_()
