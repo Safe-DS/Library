@@ -3,7 +3,7 @@ from __future__ import annotations
 import io
 from collections.abc import Sequence
 from numbers import Number
-from typing import TYPE_CHECKING, Any, TypeVar
+from typing import TYPE_CHECKING, Any, TypeVar, overload
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -82,7 +82,7 @@ class Column(Sequence[_T]):
     # Dunder methods
     # ------------------------------------------------------------------------------------------------------------------
 
-    def __init__(self, name: str, data: Sequence) -> None:
+    def __init__(self, name: str, data: Sequence[_T]) -> None:
         """
         Create a column.
 
@@ -113,7 +113,15 @@ class Column(Sequence[_T]):
             return True
         return self.name == other.name and self._data.equals(other._data)
 
-    def __getitem__(self, index: int | slice) -> _T:
+    @overload
+    def __getitem__(self, index: int) -> _T:
+        ...
+
+    @overload
+    def __getitem__(self, index: slice) -> Column[_T]:
+        ...
+
+    def __getitem__(self, index: int | slice) -> _T | Column[_T]:
         if isinstance(index, int):
             if index < 0 or index >= self._data.size:
                 raise IndexOutOfBoundsError(index)
