@@ -48,6 +48,24 @@ class TestFromPandasDataFrame:
         assert Schema._from_pandas_dataframe(dataframe) == expected
 
 
+class TestRepr:
+    @pytest.mark.parametrize(
+        ("schema", "expected"),
+        [
+            (Schema({}), "Schema({})"),
+            (Schema({"A": Integer()}), "Schema({'A': Integer})"),
+            (Schema({"A": Integer(), "B": String()}), "Schema({\n    'A': Integer,\n    'B': String\n})"),
+        ],
+        ids=[
+            "empty",
+            "single column",
+            "multiple columns",
+        ],
+    )
+    def test_should_create_a_string_representation(self, schema: Schema, expected: str) -> None:
+        assert repr(schema) == expected
+
+
 class TestStr:
     @pytest.mark.parametrize(
         ("schema", "expected"),
@@ -62,7 +80,7 @@ class TestStr:
             "multiple columns",
         ],
     )
-    def test_should_create_a_printable_representation(self, schema: Schema, expected: str) -> None:
+    def test_should_create_a_string_representation(self, schema: Schema, expected: str) -> None:
         assert str(schema) == expected
 
 
@@ -213,3 +231,42 @@ class TestGetColumnIndex:
         schema = Schema({"A": Integer()})
         with pytest.raises(UnknownColumnNameError):
             schema._get_column_index("B")
+
+
+class TestToDict:
+    @pytest.mark.parametrize(
+        ("schema", "expected"),
+        [
+            (Schema({}), {}),
+            (Schema({"A": Integer()}), {"A": Integer()}),
+            (Schema({"A": Integer(), "B": String()}), {"A": Integer(), "B": String()}),
+        ],
+        ids=[
+            "empty",
+            "single column",
+            "multiple columns",
+        ],
+    )
+    def test_should_return_dict_for_schema(self, schema: Schema, expected: str) -> None:
+        assert schema.to_dict() == expected
+
+
+class TestReprMarkdown:
+    @pytest.mark.parametrize(
+        ("schema", "expected"),
+        [
+            (Schema({}), "Empty Schema"),
+            (Schema({"A": Integer()}), "| Column Name | Column Type |\n| --- | --- |\n| A | Integer |"),
+            (
+                Schema({"A": Integer(), "B": String()}),
+                "| Column Name | Column Type |\n| --- | --- |\n| A | Integer |\n| B | String |",
+            ),
+        ],
+        ids=[
+            "empty",
+            "single column",
+            "multiple columns",
+        ],
+    )
+    def test_should_create_a_string_representation(self, schema: Schema, expected: str) -> None:
+        assert schema._repr_markdown_() == expected
