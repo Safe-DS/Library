@@ -32,6 +32,10 @@ class TestFromPandasDataFrame:
                 Schema({"A": String()}),
             ),
             (
+                pd.DataFrame({"A": [1, 2.0, "a", True]}),
+                Schema({"A": String()}),
+            ),
+            (
                 pd.DataFrame({"A": [1, 2, 3], "B": ["a", "b", "c"]}),
                 Schema({"A": Integer(), "B": String()}),
             ),
@@ -41,6 +45,7 @@ class TestFromPandasDataFrame:
             "real number",
             "string",
             "boolean",
+            "mixed",
             "multiple columns",
         ],
     )
@@ -210,27 +215,6 @@ class TestGetColumnNames:
     )
     def test_should_return_column_names(self, schema: Schema, expected: list[str]) -> None:
         assert schema.column_names == expected
-
-
-class TestGetColumnIndex:
-    @pytest.mark.parametrize(
-        ("schema", "column_name", "expected"),
-        [
-            (Schema({"A": Integer()}), "A", 0),
-            (Schema({"A": Integer(), "B": RealNumber()}), "B", 1),
-        ],
-        ids=[
-            "single column",
-            "multiple columns",
-        ],
-    )
-    def test_should_return_column_index(self, schema: Schema, column_name: str, expected: int) -> None:
-        assert schema._get_column_index(column_name) == expected
-
-    def test_should_raise_if_column_does_not_exist(self) -> None:
-        schema = Schema({"A": Integer()})
-        with pytest.raises(UnknownColumnNameError):
-            schema._get_column_index("B")
 
 
 class TestToDict:

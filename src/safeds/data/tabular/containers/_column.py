@@ -1,8 +1,9 @@
 from __future__ import annotations
 
 import io
+from collections.abc import Sequence
 from numbers import Number
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, TypeVar, overload
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -20,10 +21,12 @@ from safeds.data.tabular.exceptions import (
 from safeds.data.tabular.typing import ColumnType
 
 if TYPE_CHECKING:
-    from collections.abc import Callable, Iterable, Iterator
+    from collections.abc import Callable, Iterator
+
+_T = TypeVar("_T")
 
 
-class Column:
+class Column(Sequence[_T]):
     """
     A column is a named collection of values.
 
@@ -31,21 +34,77 @@ class Column:
     ----------
     name : str
         The name of the column.
-    data : Iterable
+    data : Sequence[_T]
         The data.
-    type_ : Optional[ColumnType]
-        The type of the column. If not specified, the type will be inferred from the data.
+
+    Examples
+    --------
+    >>> from safeds.data.tabular.containers import Column
+    >>> column = Column("test", [1, 2, 3])
     """
+
+    # ------------------------------------------------------------------------------------------------------------------
+    # Creation
+    # ------------------------------------------------------------------------------------------------------------------
+
+    @staticmethod
+    def _from_pandas_series(data: pd.Series, type_: ColumnType | None = None) -> Column:
+        """
+        Create a column from a `pandas.Series`.
+
+        Parameters
+        ----------
+        data : pd.Series
+            The data.
+        type_ : ColumnType | None
+            The type. If None, the type is inferred from the data.
+
+        Returns
+        -------
+        column : Column
+            The created column.
+
+        Examples
+        --------
+        >>> import pandas as pd
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column._from_pandas_series(pd.Series([1, 2, 3], name="test"))
+        """
+        result = object.__new__(Column)
+        result._name = data.name
+        result._data = data
+        # noinspection PyProtectedMember
+        result._type = type_ if type_ is not None else ColumnType._from_numpy_data_type(data.dtype)
+
+        return result
 
     # ------------------------------------------------------------------------------------------------------------------
     # Dunder methods
     # ------------------------------------------------------------------------------------------------------------------
 
-    def __init__(self, name: str, data: Iterable, type_: ColumnType | None = None) -> None:
+    def __init__(self, name: str, data: Sequence[_T]) -> None:
+        """
+        Create a column.
+
+        Parameters
+        ----------
+        name : str
+            The name of the column.
+        data : Sequence[_T]
+            The data.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("test", [1, 2, 3])
+        """
         self._name: str = name
         self._data: pd.Series = data if isinstance(data, pd.Series) else pd.Series(data)
         # noinspection PyProtectedMember
-        self._type: ColumnType = type_ if type_ is not None else ColumnType._from_numpy_data_type(self._data.dtype)
+        self._type: ColumnType = ColumnType._from_numpy_data_type(self._data.dtype)
+
+    def __contains__(self, item: Any) -> bool:
+        return item in self._data
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, Column):
@@ -54,10 +113,29 @@ class Column:
             return True
         return self.name == other.name and self._data.equals(other._data)
 
-    def __getitem__(self, index: int) -> Any:
-        return self.get_value(index)
+    @overload
+    def __getitem__(self, index: int) -> _T:
+        ...
 
-    def __iter__(self) -> Iterator[Any]:
+    @overload
+    def __getitem__(self, index: slice) -> Column[_T]:
+        ...
+
+    def __getitem__(self, index: int | slice) -> _T | Column[_T]:
+        if isinstance(index, int):
+            if index < 0 or index >= self._data.size:
+                raise IndexOutOfBoundsError(index)
+            return self._data[index]
+
+        if isinstance(index, slice):
+            if index.start < 0 or index.start > self._data.size:
+                raise IndexOutOfBoundsError(index)
+            if index.stop < 0 or index.stop > self._data.size:
+                raise IndexOutOfBoundsError(index)
+            data = self._data[index].reset_index(drop=True).rename(self.name)
+            return Column._from_pandas_series(data, self._type)
+
+    def __iter__(self) -> Iterator[_T]:
         return iter(self._data)
 
     def __len__(self) -> int:
@@ -117,18 +195,18 @@ class Column:
     # Getters
     # ------------------------------------------------------------------------------------------------------------------
 
-    def get_unique_values(self) -> list[Any]:
+    def get_unique_values(self) -> list[_T]:
         """
         Return a list of all unique values in the column.
 
         Returns
         -------
-        unique_values : list[any]
+        unique_values : list[_T]
             List of unique values in the column.
         """
         return list(self._data.unique())
 
-    def get_value(self, index: int) -> Any:
+    def get_value(self, index: int) -> _T:
         """
         Return column value at specified index, starting at 0.
 
@@ -156,13 +234,13 @@ class Column:
     # Information
     # ------------------------------------------------------------------------------------------------------------------
 
-    def all(self, predicate: Callable[[Any], bool]) -> bool:
+    def all(self, predicate: Callable[[_T], bool]) -> bool:
         """
         Check if all values have a given property.
 
         Parameters
         ----------
-        predicate : Callable[[Any], bool])
+        predicate : Callable[[_T], bool])
             Callable that is used to find matches.
 
         Returns
@@ -173,13 +251,13 @@ class Column:
         """
         return all(predicate(value) for value in self._data)
 
-    def any(self, predicate: Callable[[Any], bool]) -> bool:
+    def any(self, predicate: Callable[[_T], bool]) -> bool:
         """
         Check if any value has a given property.
 
         Parameters
         ----------
-        predicate : Callable[[Any], bool])
+        predicate : Callable[[_T], bool])
             Callable that is used to find matches.
 
         Returns
@@ -190,13 +268,13 @@ class Column:
         """
         return any(predicate(value) for value in self._data)
 
-    def none(self, predicate: Callable[[Any], bool]) -> bool:
+    def none(self, predicate: Callable[[_T], bool]) -> bool:
         """
         Check if no values has a given property.
 
         Parameters
         ----------
-        predicate : Callable[[Any], bool])
+        predicate : Callable[[_T], bool])
             Callable that is used to find matches.
 
         Returns
@@ -236,7 +314,7 @@ class Column:
         column : Column
             A new column with the new name.
         """
-        return Column(new_name, self._data, self._type)
+        return Column._from_pandas_series(self._data.rename(new_name), self._type)
 
     # ------------------------------------------------------------------------------------------------------------------
     # Statistics
@@ -375,7 +453,7 @@ class Column:
             raise ColumnSizeError("> 0", "0")
         return self._count_missing_values() / self._data.size
 
-    def mode(self) -> Any:
+    def mode(self) -> list[_T]:
         """
         Return the mode of the column.
 

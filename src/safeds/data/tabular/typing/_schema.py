@@ -239,31 +239,3 @@ class Schema:
         lines = (f"| {name} | {type_} |" for name, type_ in self._schema.items())
         joined = "\n".join(lines)
         return f"| Column Name | Column Type |\n| --- | --- |\n{joined}"
-
-    # ------------------------------------------------------------------------------------------------------------------
-    # Other
-    # ------------------------------------------------------------------------------------------------------------------
-
-    def _get_column_index(self, column_name: str) -> int:
-        """
-         Return the index of the column with specified column name.
-
-        Parameters
-        ----------
-         column_name : str
-             The name of the column.
-
-        Returns
-        -------
-        index : int
-             The index of the column.
-
-        Raises
-        ------
-        ColumnNameError
-            If the specified column name does not exist.
-        """
-        if not self.has_column(column_name):
-            raise UnknownColumnNameError([column_name])
-
-        return list(self._schema.keys()).index(column_name)
