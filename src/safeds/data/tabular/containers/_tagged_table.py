@@ -71,21 +71,3 @@ class TaggedTable(Table):
     @property
     def target(self) -> Column:
         return self._target
-
-    # ------------------------------------------------------------------------------------------------------------------
-    # IPython integration
-    # ------------------------------------------------------------------------------------------------------------------
-
-    def _ipython_display_(self) -> DisplayHandle:
-        """
-        Return a display object for the column to be used in Jupyter Notebooks.
-
-        Returns
-        -------
-        output : DisplayHandle
-            Output object.
-        """
-        tmp = self._features.add_column(self._target)
-        header_info = "Target Column is '" + self._target.name + "'\n"
-        print(header_info)  # noqa: T201
-        return tmp._ipython_display_()
