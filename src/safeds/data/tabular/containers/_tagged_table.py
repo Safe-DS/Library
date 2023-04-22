@@ -1,7 +1,5 @@
 from collections.abc import Iterable
 
-from IPython.core.display_functions import DisplayHandle
-
 from safeds.data.tabular.containers import Column, Table
 from safeds.data.tabular.typing import Schema
 
