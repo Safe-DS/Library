@@ -21,13 +21,13 @@ class Image:
     """
 
     @staticmethod
-    def from_jpeg_file(path: str) -> Image:
+    def from_jpeg_file(path: str | Path) -> Image:
         """
         Create an image from a JPEG file.
 
         Parameters
         ----------
-        path : str
+        path : str | Path
             The path to the JPEG file.
 
         Returns
@@ -41,13 +41,13 @@ class Image:
         )
 
     @staticmethod
-    def from_png_file(path: str) -> Image:
+    def from_png_file(path: str | Path) -> Image:
         """
         Create an image from a PNG file.
 
         Parameters
         ----------
-        path : str
+        path : str | Path
             The path to the PNG file.
 
         Returns
@@ -86,25 +86,25 @@ class Image:
     # Conversion
     # ------------------------------------------------------------------------------------------------------------------
 
-    def to_jpeg_file(self, path: str) -> None:
+    def to_jpeg_file(self, path: str | Path) -> None:
         """
         Save the image as a JPEG file.
 
         Parameters
         ----------
-        path : str
+        path : str | Path
             The path to the JPEG file.
         """
         Path(path).parent.mkdir(parents=True, exist_ok=True)
         self._image.save(path, format="jpeg")
 
-    def to_png_file(self, path: str) -> None:
+    def to_png_file(self, path: str | Path) -> None:
         """
         Save the image as a PNG file.
 
         Parameters
         ----------
-        path : str
+        path : str | Path
             The path to the PNG file.
         """
         Path(path).parent.mkdir(parents=True, exist_ok=True)

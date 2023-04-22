@@ -8,7 +8,6 @@ from safeds.data.tabular.typing._column_type import ColumnType
 
 if TYPE_CHECKING:
     import pandas as pd
-    import polars as pl
 
 
 @dataclass
@@ -42,27 +41,6 @@ class Schema:
         names = dataframe.columns
         # noinspection PyProtectedMember
         types = (ColumnType._from_numpy_data_type(data_type) for data_type in dataframe.dtypes)
-
-        return Schema(dict(zip(names, types, strict=True)))
-
-    @staticmethod
-    def _from_polars_dataframe(dataframe: pl.DataFrame) -> Schema:
-        """
-        Create a schema from a `polars.Dataframe`.
-
-        Parameters
-        ----------
-        dataframe : pl.DataFrame
-            The dataframe.
-
-        Returns
-        -------
-        schema : Schema
-            The schema.
-        """
-        names = dataframe.columns
-        # noinspection PyProtectedMember
-        types = (ColumnType._from_polars_data_type(data_type) for data_type in dataframe.dtypes)
 
         return Schema(dict(zip(names, types, strict=True)))
 

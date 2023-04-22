@@ -23,7 +23,7 @@ class TestFit:
         )
 
         transformer = OneHotEncoder()
-        transformer.fit(table)
+        transformer.fit(table, None)
 
         assert transformer._wrapped_transformer is None
         assert transformer._column_names is None
@@ -37,7 +37,7 @@ class TestTransform:
             },
         )
 
-        transformer = OneHotEncoder().fit(table_to_fit)
+        transformer = OneHotEncoder().fit(table_to_fit, None)
 
         table_to_transform = Table.from_dict(
             {
@@ -74,7 +74,7 @@ class TestIsFitted:
         )
 
         transformer = OneHotEncoder()
-        fitted_transformer = transformer.fit(table)
+        fitted_transformer = transformer.fit(table, None)
         assert fitted_transformer.is_fitted()
 
 
@@ -247,7 +247,7 @@ class TestInverseTransform:
             },
         )
 
-        transformer = OneHotEncoder().fit(table)
+        transformer = OneHotEncoder().fit(table, None)
         transformed_table = transformer.transform(table)
         transformer.inverse_transform(transformed_table)
 

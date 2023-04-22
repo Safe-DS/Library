@@ -18,7 +18,7 @@ class OneHotEncoder(InvertibleTableTransformer):
         self._column_names: dict[str, list[str]] | None = None
 
     # noinspection PyProtectedMember
-    def fit(self, table: Table, column_names: list[str] | None = None) -> OneHotEncoder:
+    def fit(self, table: Table, column_names: list[str] | None) -> OneHotEncoder:
         """
         Learn a transformation for a set of columns in a table.
 
