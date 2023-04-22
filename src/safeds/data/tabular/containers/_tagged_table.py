@@ -50,16 +50,6 @@ class TaggedTable(Table):
         self._features: Table = self.keep_only_columns(feature_names)
         self._target: Column = self.get_column(target_name)
 
-    def __repr__(self) -> str:
-        tmp = self._features.add_column(self._target)
-        header_info = "Target Column is '" + self._target.name + "'\n"
-        return header_info + tmp.__repr__()
-
-    def __str__(self) -> str:
-        tmp = self._features.add_column(self._target)
-        header_info = "Target Column is '" + self._target.name + "'\n"
-        return header_info + tmp.__str__()
-
     # ------------------------------------------------------------------------------------------------------------------
     # Properties
     # ------------------------------------------------------------------------------------------------------------------
