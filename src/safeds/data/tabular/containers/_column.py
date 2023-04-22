@@ -531,6 +531,30 @@ class Column:
         return Image(buffer, ImageFormat.PNG)
 
     # ------------------------------------------------------------------------------------------------------------------
+    # Conversion
+    # ------------------------------------------------------------------------------------------------------------------
+
+    def to_html(self) -> str:
+        """
+        Return an HTML representation of the column.
+
+        Returns
+        -------
+        output : str
+            The generated HTML.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("test", [1, 2, 3])
+        >>> html = column.to_html()
+        """
+        frame = self._data.to_frame()
+        frame.columns = [self.name]
+
+        return frame.to_html(max_rows=self._data.size, max_cols=1)
+
+    # ------------------------------------------------------------------------------------------------------------------
     # IPython integration
     # ------------------------------------------------------------------------------------------------------------------
 
