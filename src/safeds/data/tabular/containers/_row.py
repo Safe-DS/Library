@@ -467,5 +467,4 @@ class Row(Mapping[str, Any]):
         output : str
             The generated HTML.
         """
-        # noinspection PyProtectedMember
-        return self._data._repr_html_()
+        return self._data.to_html(max_rows=1, max_cols=self._data.shape[1], notebook=True)
