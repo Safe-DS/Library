@@ -978,7 +978,7 @@ class Table:
         """
         if self.has_column(name):
             items: list = [transformer(item) for item in self.to_rows()]
-            result: Column = Column._from_pandas_series(pd.Series(items, name=name))
+            result: Column = Column(name, items)
             return self.replace_column(name, result)
         raise UnknownColumnNameError([name])
 

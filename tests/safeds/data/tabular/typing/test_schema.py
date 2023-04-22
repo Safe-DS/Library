@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING
 import pandas as pd
 import pytest
 from safeds.data.tabular.exceptions import UnknownColumnNameError
-from safeds.data.tabular.typing import Boolean, ColumnType, Integer, RealNumber, Schema, String
+from safeds.data.tabular.typing import Boolean, ColumnType, Integer, RealNumber, Schema, String, Anything
 
 if TYPE_CHECKING:
     from typing import Any
@@ -32,6 +32,10 @@ class TestFromPandasDataFrame:
                 Schema({"A": String()}),
             ),
             (
+                pd.DataFrame({"A": [1, 2.0, "a", True]}),
+                Schema({"A": String()}),
+            ),
+            (
                 pd.DataFrame({"A": [1, 2, 3], "B": ["a", "b", "c"]}),
                 Schema({"A": Integer(), "B": String()}),
             ),
@@ -41,6 +45,7 @@ class TestFromPandasDataFrame:
             "real number",
             "string",
             "boolean",
+            "mixed",
             "multiple columns",
         ],
     )
