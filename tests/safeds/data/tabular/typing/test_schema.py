@@ -259,16 +259,11 @@ class TestReprMarkdown:
             (Schema({}), "Empty Schema"),
             (
                 Schema({"A": Integer()}),
-                "| Column Name | Column Type |\n"
-                "| --- | --- |\n"
-                "| A | Integer |"
+                "| Column Name | Column Type |\n| --- | --- |\n| A | Integer |"
             ),
             (
                 Schema({"A": Integer(), "B": String()}),
-                "| Column Name | Column Type |\n"
-                "| --- | --- |\n"
-                "| A | Integer |\n"
-                "| B | String |"
+                "| Column Name | Column Type |\n| --- | --- |\n| A | Integer |\n| B | String |"
             ),
         ],
         ids=[
