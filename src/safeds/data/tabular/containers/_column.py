@@ -1,8 +1,9 @@
 from __future__ import annotations
 
 import io
+from collections.abc import Sequence
 from numbers import Number
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, TypeVar
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -20,10 +21,12 @@ from safeds.data.tabular.exceptions import (
 from safeds.data.tabular.typing import ColumnType
 
 if TYPE_CHECKING:
-    from collections.abc import Callable, Iterable, Iterator
+    from collections.abc import Callable, Iterator
+
+_T = TypeVar("_T")
 
 
-class Column:
+class Column(Sequence[_T]):
     """
     A column is a named collection of values.
 
@@ -31,21 +34,77 @@ class Column:
     ----------
     name : str
         The name of the column.
-    data : Iterable
+    data : Sequence
         The data.
-    type_ : Optional[ColumnType]
-        The type of the column. If not specified, the type will be inferred from the data.
+
+    Examples
+    --------
+    >>> from safeds.data.tabular.containers import Column
+    >>> column = Column("test", [1, 2, 3])
     """
+
+    # ------------------------------------------------------------------------------------------------------------------
+    # Creation
+    # ------------------------------------------------------------------------------------------------------------------
+
+    @staticmethod
+    def _from_pandas_series(data: pd.Series, type_: ColumnType | None = None) -> Column:
+        """
+        Create a column from a `pandas.Series`.
+
+        Parameters
+        ----------
+        data : pd.Series
+            The data.
+        type_ : ColumnType | None
+            The type. If None, the type is inferred from the data.
+
+        Returns
+        -------
+        column : Column
+            The created column.
+
+        Examples
+        --------
+        >>> import pandas as pd
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column._from_pandas_series(pd.Series([1, 2, 3], name="test"))
+        """
+        result = object.__new__(Column)
+        result._name = data.name
+        result._data = data
+        # noinspection PyProtectedMember
+        result._type = type_ if type_ is not None else ColumnType._from_numpy_data_type(data.dtype)
+
+        return result
 
     # ------------------------------------------------------------------------------------------------------------------
     # Dunder methods
     # ------------------------------------------------------------------------------------------------------------------
 
-    def __init__(self, name: str, data: Iterable, type_: ColumnType | None = None) -> None:
+    def __init__(self, name: str, data: Sequence) -> None:
+        """
+        Create a column.
+
+        Parameters
+        ----------
+        name
+            The name of the column.
+        data
+            The data.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("test", [1, 2, 3])
+        """
         self._name: str = name
         self._data: pd.Series = data if isinstance(data, pd.Series) else pd.Series(data)
         # noinspection PyProtectedMember
-        self._type: ColumnType = type_ if type_ is not None else ColumnType._from_numpy_data_type(self._data.dtype)
+        self._type: ColumnType = ColumnType._from_numpy_data_type(self._data.dtype)
+
+    def __contains__(self, item: Any) -> bool:
+        return item in self._data
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, Column):
@@ -236,7 +295,7 @@ class Column:
         column : Column
             A new column with the new name.
         """
-        return Column(new_name, self._data, self._type)
+        return Column._from_pandas_series(self._data.rename(new_name), self._type)
 
     # ------------------------------------------------------------------------------------------------------------------
     # Statistics

@@ -338,15 +338,13 @@ class Table:
         UnknownColumnNameError
             If the specified target column name does not exist.
         """
-        if self._schema.has_column(column_name):
-            output_column = Column(
-                column_name,
-                self._data.iloc[:, [self._schema._get_column_index(column_name)]].squeeze(),
-                self._schema.get_column_type(column_name),
-            )
-            return output_column
+        if not self.has_column(column_name):
+            raise UnknownColumnNameError([column_name])
 
-        raise UnknownColumnNameError([column_name])
+        return Column._from_pandas_series(
+            self._data[column_name],
+            self.get_column_type(column_name),
+        )
 
     def has_column(self, column_name: str) -> bool:
         """
@@ -866,7 +864,7 @@ class Table:
     def sort_columns(
         self,
         comparator: Callable[[Column, Column], int] = lambda col1, col2: (col1.name > col2.name)
-        - (col1.name < col2.name),
+                                                                         - (col1.name < col2.name),
     ) -> Table:
         """
         Sort the columns of a `Table` with the given comparator and return a new `Table`.
@@ -980,7 +978,7 @@ class Table:
         """
         if self.has_column(name):
             items: list = [transformer(item) for item in self.to_rows()]
-            result: Column = Column(name, pd.Series(items))
+            result: Column = Column._from_pandas_series(pd.Series(items, name=name))
             return self.replace_column(name, result)
         raise UnknownColumnNameError([name])
 
