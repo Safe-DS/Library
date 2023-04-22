@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from warnings import warn
 from typing import TYPE_CHECKING
+from warnings import warn
 
 from sklearn.linear_model import Lasso as sk_Lasso
 
