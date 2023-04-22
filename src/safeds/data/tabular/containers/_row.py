@@ -467,5 +467,6 @@ class Row(Mapping[str, Any]):
         output : str
             The generated HTML.
         """
-        # noinspection PyProtectedMember
-        return self._data._repr_html_()
+        with pd.option_context("display.max_rows", self._data.shape[0], "display.max_columns", self._data.shape[1]):
+            # noinspection PyProtectedMember
+            return self._data._repr_html_()

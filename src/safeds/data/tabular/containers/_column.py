@@ -58,9 +58,6 @@ class Column:
     def __getitem__(self, index: int) -> Any:
         return self.get_value(index)
 
-    def __hash__(self) -> int:
-        return hash(self._data)
-
     def __iter__(self) -> Iterator[Any]:
         return iter(self._data)
 
