@@ -1,8 +1,6 @@
 import pytest
-
-from safeds.data.tabular.containers import Column
-
 import regex as re
+from safeds.data.tabular.containers import Column
 
 
 class TestReprHtml:
