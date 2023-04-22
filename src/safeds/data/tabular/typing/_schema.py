@@ -3,8 +3,6 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
-from IPython.lib.pretty import PrettyPrinter
-
 from safeds.data.tabular.exceptions import UnknownColumnNameError
 from safeds.data.tabular.typing._column_type import ColumnType
 
@@ -199,6 +197,28 @@ class Schema:
         if not self.has_column(column_name):
             raise UnknownColumnNameError([column_name])
         return self._schema[column_name]
+
+    # ------------------------------------------------------------------------------------------------------------------
+    # Conversion
+    # ------------------------------------------------------------------------------------------------------------------
+
+    def to_dict(self) -> dict[str, ColumnType]:
+        """
+        Return a dictionary that maps column names to column types.
+
+        Returns
+        -------
+        data : dict[str, ColumnType]
+            Dictionary representation of the schema.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.typing import Integer, Schema, String
+        >>> schema = Schema({"A": Integer(), "B": String()})
+        >>> schema.to_dict()
+        {'A': Integer, 'B': String}
+        """
+        return dict(self._schema)  # defensive copy
 
     # ------------------------------------------------------------------------------------------------------------------
     # IPython Integration

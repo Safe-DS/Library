@@ -234,6 +234,24 @@ class TestGetColumnIndex:
             schema._get_column_index("B")
 
 
+class TestToDict:
+    @pytest.mark.parametrize(
+        ("schema", "expected"),
+        [
+            (Schema({}), {}),
+            (Schema({"A": Integer()}), {"A": Integer()}),
+            (Schema({"A": Integer(), "B": String()}), {"A": Integer(), "B": String()}),
+        ],
+        ids=[
+            "empty",
+            "single column",
+            "multiple columns",
+        ],
+    )
+    def test_should_return_dict_for_schema(self, schema: Schema, expected: str) -> None:
+        assert schema.to_dict() == expected
+
+
 class TestReprMarkdown:
     @pytest.mark.parametrize(
         ("schema", "expected"),
