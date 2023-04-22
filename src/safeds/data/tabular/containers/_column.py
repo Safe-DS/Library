@@ -134,7 +134,6 @@ class Column(Sequence[_T]):
                 raise IndexOutOfBoundsError(index)
             data = self._data[index].reset_index(drop=True).rename(self.name)
             return Column._from_pandas_series(data, self._type)
-        return None
 
     def __iter__(self) -> Iterator[_T]:
         return iter(self._data)
