@@ -8,7 +8,6 @@ from typing import TYPE_CHECKING, Any
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import polars as pl
 import seaborn as sns
 from IPython.core.display_functions import DisplayHandle, display
 from pandas import DataFrame
@@ -34,6 +33,8 @@ from ._row import Row
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterable
 
+    from safeds.data.tabular.transformation import InvertibleTableTransformer, TableTransformer
+
     from ._tagged_table import TaggedTable
 
 
@@ -58,13 +59,13 @@ class Table:
     # ------------------------------------------------------------------------------------------------------------------
 
     @staticmethod
-    def from_csv_file(path: str) -> Table:
+    def from_csv_file(path: str | Path) -> Table:
         """
         Read data from a CSV file into a table.
 
         Parameters
         ----------
-        path : str
+        path : str | Path
             The path to the CSV file.
 
         Returns
@@ -85,13 +86,13 @@ class Table:
             raise FileNotFoundError(f'File "{path}" does not exist') from exception
 
     @staticmethod
-    def from_json_file(path: str) -> Table:
+    def from_json_file(path: str | Path) -> Table:
         """
         Read data from a JSON file into a table.
 
         Parameters
         ----------
-        path : str
+        path : str | Path
             The path to the JSON file.
 
         Returns
@@ -209,7 +210,7 @@ class Table:
         for row in rows:
             if schema_compare != row._schema:
                 raise SchemaMismatchError
-            row_array.append(row._data.to_pandas())
+            row_array.append(row._data)
 
         dataframe: DataFrame = pd.concat(row_array, ignore_index=True)
         dataframe.columns = schema_compare.column_names
@@ -249,10 +250,7 @@ class Table:
             return True
         table1 = self.sort_columns()
         table2 = other.sort_columns()
-        return table1._data.equals(table2._data) and table1._schema == table2._schema
-
-    def __hash__(self) -> int:
-        return hash(self._data)
+        return table1._schema == table2._schema and table1._data.equals(table2._data)
 
     def __repr__(self) -> str:
         tmp = self._data.copy(deep=True)
@@ -414,7 +412,7 @@ class Table:
         if len(self._data.index) - 1 < index or index < 0:
             raise IndexOutOfBoundsError(index)
 
-        return Row._from_polars_dataframe(pl.DataFrame(self._data.iloc[[index]]), self._schema)
+        return Row._from_pandas_dataframe(self._data.iloc[[index]], self._schema)
 
     # ------------------------------------------------------------------------------------------------------------------
     # Information
@@ -547,9 +545,7 @@ class Table:
         if self._schema != row.schema:
             raise SchemaMismatchError
 
-        row_frame = row._data.to_pandas()
-
-        new_df = pd.concat([self._data, row_frame]).infer_objects()
+        new_df = pd.concat([self._data, row._data]).infer_objects()
         new_df.columns = self.column_names
         return Table(new_df)
 
@@ -574,9 +570,7 @@ class Table:
             if self._schema != row.schema:
                 raise SchemaMismatchError
 
-        row_frames = [row._data.to_pandas() for row in rows]
-        for row_frame in row_frames:
-            row_frame.columns = self.column_names
+        row_frames = (row._data for row in rows)
 
         result = pd.concat([result, *row_frames]).infer_objects()
         result.columns = self.column_names
@@ -991,6 +985,80 @@ class Table:
             return self.replace_column(name, result)
         raise UnknownColumnNameError([name])
 
+    def transform_table(self, transformer: TableTransformer) -> Table:
+        """
+        Apply a learned transformation onto this table.
+
+        Parameters
+        ----------
+        transformer : TableTransformer
+            The transformer which transforms the given table.
+
+        Returns
+        -------
+        transformed_table : Table
+            The transformed table.
+
+        Raises
+        ------
+        TransformerNotFittedError
+            If the transformer has not been fitted yet.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.transformation import OneHotEncoder
+        >>> from safeds.data.tabular.containers import Table
+        >>> transformer = OneHotEncoder()
+        >>> table = Table.from_dict({"col1": [1, 2, 1], "col2": [1, 2, 4]})
+        >>> transformer = transformer.fit(table, None)
+        >>> table.transform_table(transformer)
+           col1_1  col1_2  col2_1  col2_2  col2_4
+        0     1.0     0.0     1.0     0.0     0.0
+        1     0.0     1.0     0.0     1.0     0.0
+        2     1.0     0.0     0.0     0.0     1.0
+        """
+        return transformer.transform(self)
+
+    def inverse_transform_table(self, transformer: InvertibleTableTransformer) -> Table:
+        """
+        Invert the transformation applied by the given transformer.
+
+        Parameters
+        ----------
+        transformer : InvertibleTableTransformer
+            A transformer that was fitted with columns, which are all present in the table.
+
+        Returns
+        -------
+        table : Table
+            The original table.
+
+        Raises
+        ------
+        TransformerNotFittedError
+            If the transformer has not been fitted yet.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.transformation import OneHotEncoder
+        >>> from safeds.data.tabular.containers import Table
+        >>> transformer = OneHotEncoder()
+        >>> table = Table.from_dict({"col1": [1, 2, 1], "col2": [1, 2, 4]})
+        >>> transformer = transformer.fit(table, None)
+        >>> transformed_table = transformer.transform(table)
+        >>> transformed_table.inverse_transform_table(transformer)
+           col1  col2
+        0     1     1
+        1     2     2
+        2     1     4
+        >>> transformer.inverse_transform(transformed_table)
+           col1  col2
+        0     1     1
+        1     2     2
+        2     1     4
+        """
+        return transformer.inverse_transform(self)
+
     # ------------------------------------------------------------------------------------------------------------------
     # Plotting
     # ------------------------------------------------------------------------------------------------------------------
@@ -1124,7 +1192,7 @@ class Table:
     # Conversion
     # ------------------------------------------------------------------------------------------------------------------
 
-    def to_csv_file(self, path: str) -> None:
+    def to_csv_file(self, path: str | Path) -> None:
         """
         Write the data from the table into a CSV file.
 
@@ -1133,7 +1201,7 @@ class Table:
 
         Parameters
         ----------
-        path : str
+        path : str | Path
             The path to the output file.
         """
         Path(path).parent.mkdir(parents=True, exist_ok=True)
@@ -1141,7 +1209,7 @@ class Table:
         data_to_csv.columns = self._schema.column_names
         data_to_csv.to_csv(path, index=False)
 
-    def to_json_file(self, path: str) -> None:
+    def to_json_file(self, path: str | Path) -> None:
         """
         Write the data from the table into a JSON file.
 
@@ -1150,7 +1218,7 @@ class Table:
 
         Parameters
         ----------
-        path : str
+        path : str | Path
             The path to the output file.
         """
         Path(path).parent.mkdir(parents=True, exist_ok=True)
@@ -1190,8 +1258,8 @@ class Table:
             List of rows.
         """
         return [
-            Row._from_polars_dataframe(
-                pl.DataFrame([list(series_row)], schema=self._schema.column_names),
+            Row._from_pandas_dataframe(
+                pd.DataFrame([list(series_row)], columns=self._schema.column_names),
                 self._schema,
             )
             for (_, series_row) in self._data.iterrows()

@@ -1,46 +1,30 @@
 from __future__ import annotations
 
-import warnings
 from typing import TYPE_CHECKING
 
-from sklearn.linear_model import ElasticNet as sk_ElasticNet
+from sklearn.svm import SVC as sk_SVC  # noqa: N811
 
 from safeds.ml.classical._util_sklearn import fit, predict
 
-from ._regressor import Regressor
+from ._classifier import Classifier
 
 if TYPE_CHECKING:
     from safeds.data.tabular.containers import Table, TaggedTable
 
 
-class ElasticNetRegression(Regressor):
-    """Elastic net regression."""
+class SupportVectorMachine(Classifier):
+    """Support vector machine."""
 
-    def __init__(self, lasso_ratio: float = 0.5) -> None:
-        if lasso_ratio < 0 or lasso_ratio > 1:
-            raise ValueError("lasso_ratio must be between 0 and 1.")
-        elif lasso_ratio == 0:
-            warnings.warn(
-                "ElasticNetRegression with lasso_ratio = 0 is essentially RidgeRegression."
-                " Use RidgeRegression instead for better numerical stability.",
-                stacklevel=1,
-            )
-        elif lasso_ratio == 1:
-            warnings.warn(
-                "ElasticNetRegression with lasso_ratio = 0 is essentially LassoRegression."
-                " Use LassoRegression instead for better numerical stability.",
-                stacklevel=1,
-            )
-        self.lasso_ratio = lasso_ratio
-        self._wrapped_regressor: sk_ElasticNet | None = None
+    def __init__(self) -> None:
+        self._wrapped_classifier: sk_SVC | None = None
         self._feature_names: list[str] | None = None
         self._target_name: str | None = None
 
-    def fit(self, training_set: TaggedTable) -> ElasticNetRegression:
+    def fit(self, training_set: TaggedTable) -> SupportVectorMachine:
         """
-        Create a copy of this regressor and fit it with the given training data.
+        Create a copy of this classifier and fit it with the given training data.
 
-        This regressor is not modified.
+        This classifier is not modified.
 
         Parameters
         ----------
@@ -49,19 +33,19 @@ class ElasticNetRegression(Regressor):
 
         Returns
         -------
-        fitted_regressor : ElasticNetRegression
-            The fitted regressor.
+        fitted_classifier : SupportVectorMachine
+            The fitted classifier.
 
         Raises
         ------
         LearningError
             If the training data contains invalid values or if the training failed.
         """
-        wrapped_regressor = sk_ElasticNet(l1_ratio=self.lasso_ratio)
-        fit(wrapped_regressor, training_set)
+        wrapped_classifier = sk_SVC()
+        fit(wrapped_classifier, training_set)
 
-        result = ElasticNetRegression(self.lasso_ratio)
-        result._wrapped_regressor = wrapped_regressor
+        result = SupportVectorMachine()
+        result._wrapped_classifier = wrapped_classifier
         result._feature_names = training_set.features.column_names
         result._target_name = training_set.target.name
 
@@ -92,15 +76,15 @@ class ElasticNetRegression(Regressor):
         PredictionError
             If predicting with the given dataset failed.
         """
-        return predict(self._wrapped_regressor, dataset, self._feature_names, self._target_name)
+        return predict(self._wrapped_classifier, dataset, self._feature_names, self._target_name)
 
     def is_fitted(self) -> bool:
         """
-        Check if the regressor is fitted.
+        Check if the classifier is fitted.
 
         Returns
         -------
         is_fitted : bool
-            Whether the regressor is fitted.
+            Whether the classifier is fitted.
         """
-        return self._wrapped_regressor is not None
+        return self._wrapped_classifier is not None
