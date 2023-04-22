@@ -1,6 +1,6 @@
 from typing import Any
 
-import polars as pl
+import pandas as pd
 import pytest
 from safeds.data.tabular.containers import Row, Table
 from safeds.data.tabular.exceptions import UnknownColumnNameError
@@ -32,21 +32,21 @@ class TestFromDict:
         assert Row.from_dict(data) == expected
 
 
-class TestFromPolarsDataFrame:
+class TestFromPandasDataFrame:
     @pytest.mark.parametrize(
         ("row", "expected"),
         [
             (
-                Row._from_polars_dataframe(pl.DataFrame(), Schema({})),
+                Row._from_pandas_dataframe(pd.DataFrame(), Schema({})),
                 Schema({}),
             ),
             (
-                Row._from_polars_dataframe(pl.DataFrame({"col1": 0}), Schema({"col1": Integer()})),
+                Row._from_pandas_dataframe(pd.DataFrame({"col1": [0]}), Schema({"col1": Integer()})),
                 Schema({"col1": Integer()}),
             ),
             (
-                Row._from_polars_dataframe(
-                    pl.DataFrame({"col1": 0, "col2": "a"}),
+                Row._from_pandas_dataframe(
+                    pd.DataFrame({"col1": [0], "col2": ["a"]}),
                     Schema({"col1": Integer(), "col2": String()}),
                 ),
                 Schema({"col1": Integer(), "col2": String()}),
@@ -64,8 +64,8 @@ class TestFromPolarsDataFrame:
     @pytest.mark.parametrize(
         ("row", "expected"),
         [
-            (Row._from_polars_dataframe(pl.DataFrame()), Schema({})),
-            (Row._from_polars_dataframe(pl.DataFrame({"col1": 0})), Schema({"col1": Integer()})),
+            (Row._from_pandas_dataframe(pd.DataFrame()), Schema({})),
+            (Row._from_pandas_dataframe(pd.DataFrame({"col1": [0]})), Schema({"col1": Integer()})),
         ],
         ids=[
             "empty",
