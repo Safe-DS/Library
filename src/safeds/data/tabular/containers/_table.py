@@ -8,7 +8,6 @@ from typing import TYPE_CHECKING, Any
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import polars as pl
 import seaborn as sns
 from IPython.core.display_functions import DisplayHandle, display
 from pandas import DataFrame
@@ -211,7 +210,7 @@ class Table:
         for row in rows:
             if schema_compare != row._schema:
                 raise SchemaMismatchError
-            row_array.append(row._data.to_pandas())
+            row_array.append(row._data)
 
         dataframe: DataFrame = pd.concat(row_array, ignore_index=True)
         dataframe.columns = schema_compare.column_names
@@ -251,10 +250,7 @@ class Table:
             return True
         table1 = self.sort_columns()
         table2 = other.sort_columns()
-        return table1._data.equals(table2._data) and table1._schema == table2._schema
-
-    def __hash__(self) -> int:
-        return hash(self._data)
+        return table1._schema == table2._schema and table1._data.equals(table2._data)
 
     def __repr__(self) -> str:
         tmp = self._data.copy(deep=True)
@@ -416,7 +412,7 @@ class Table:
         if len(self._data.index) - 1 < index or index < 0:
             raise IndexOutOfBoundsError(index)
 
-        return Row._from_polars_dataframe(pl.DataFrame(self._data.iloc[[index]]), self._schema)
+        return Row._from_pandas_dataframe(self._data.iloc[[index]], self._schema)
 
     # ------------------------------------------------------------------------------------------------------------------
     # Information
@@ -549,9 +545,7 @@ class Table:
         if self._schema != row.schema:
             raise SchemaMismatchError
 
-        row_frame = row._data.to_pandas()
-
-        new_df = pd.concat([self._data, row_frame]).infer_objects()
+        new_df = pd.concat([self._data, row._data]).infer_objects()
         new_df.columns = self.column_names
         return Table(new_df)
 
@@ -576,9 +570,7 @@ class Table:
             if self._schema != row.schema:
                 raise SchemaMismatchError
 
-        row_frames = [row._data.to_pandas() for row in rows]
-        for row_frame in row_frames:
-            row_frame.columns = self.column_names
+        row_frames = (row._data for row in rows)
 
         result = pd.concat([result, *row_frames]).infer_objects()
         result.columns = self.column_names
@@ -1266,8 +1258,8 @@ class Table:
             List of rows.
         """
         return [
-            Row._from_polars_dataframe(
-                pl.DataFrame([list(series_row)], schema=self._schema.column_names),
+            Row._from_pandas_dataframe(
+                pd.DataFrame([list(series_row)], columns=self._schema.column_names),
                 self._schema,
             )
             for (_, series_row) in self._data.iterrows()

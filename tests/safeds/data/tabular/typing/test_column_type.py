@@ -1,14 +1,6 @@
 import numpy as np
 import pytest
-from polars import FLOAT_DTYPES as POLARS_FLOAT_DTYPES
-from polars import INTEGER_DTYPES as POLARS_INTEGER_DTYPES
-from polars import PolarsDataType
-from polars.datatypes import TEMPORAL_DTYPES as POLARS_TEMPORAL_DTYPES
-from polars.datatypes import Boolean as PolarsBoolean
-from polars.datatypes import Decimal as PolarsDecimal
-from polars.datatypes import Object as PolarsObject
-from polars.datatypes import Unknown as PolarsUnknown
-from polars.datatypes import Utf8 as PolarsUtf8
+
 from safeds.data.tabular.typing import (
     Anything,
     Boolean,
@@ -57,36 +49,6 @@ class TestFromNumpyDataType:
     def test_should_raise_if_data_type_is_not_supported(self) -> None:
         with pytest.raises(NotImplementedError):
             ColumnType._from_numpy_data_type(np.dtype(np.void))
-
-
-class TestFromPolarsDataType:
-    @pytest.mark.parametrize(
-        ("data_type", "expected"),
-        [
-            # Boolean
-            (PolarsBoolean, Boolean()),
-            # Float
-            *((data_type, RealNumber()) for data_type in POLARS_FLOAT_DTYPES),
-            (PolarsDecimal, RealNumber()),
-            # Int
-            *((data_type, Integer()) for data_type in POLARS_INTEGER_DTYPES),
-            # String
-            (PolarsUtf8, String()),
-            (PolarsObject, String()),
-            *((data_type, String()) for data_type in POLARS_TEMPORAL_DTYPES),
-        ],
-        ids=repr,
-    )
-    def test_should_create_column_type_from_polars_data_type(
-        self,
-        data_type: PolarsDataType,
-        expected: ColumnType,
-    ) -> None:
-        assert ColumnType._from_polars_data_type(data_type) == expected
-
-    def test_should_raise_if_data_type_is_not_supported(self) -> None:
-        with pytest.raises(NotImplementedError):
-            ColumnType._from_polars_data_type(PolarsUnknown)
 
 
 class TestRepr:

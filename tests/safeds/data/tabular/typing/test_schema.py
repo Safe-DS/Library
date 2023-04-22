@@ -3,8 +3,8 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 import pandas as pd
-import polars as pl
 import pytest
+
 from safeds.data.tabular.exceptions import UnknownColumnNameError
 from safeds.data.tabular.typing import Boolean, ColumnType, Integer, RealNumber, Schema, String
 
@@ -47,43 +47,6 @@ class TestFromPandasDataFrame:
     )
     def test_should_create_schema_from_pandas_dataframe(self, dataframe: pd.DataFrame, expected: Schema) -> None:
         assert Schema._from_pandas_dataframe(dataframe) == expected
-
-
-class TestFromPolarsDataFrame:
-    @pytest.mark.parametrize(
-        ("dataframe", "expected"),
-        [
-            (
-                pl.DataFrame({"A": [True, False, True]}),
-                Schema({"A": Boolean()}),
-            ),
-            (
-                pl.DataFrame({"A": [1, 2, 3]}),
-                Schema({"A": Integer()}),
-            ),
-            (
-                pl.DataFrame({"A": [1.0, 2.0, 3.0]}),
-                Schema({"A": RealNumber()}),
-            ),
-            (
-                pl.DataFrame({"A": ["a", "b", "c"]}),
-                Schema({"A": String()}),
-            ),
-            (
-                pl.DataFrame({"A": [1, 2, 3], "B": ["a", "b", "c"]}),
-                Schema({"A": Integer(), "B": String()}),
-            ),
-        ],
-        ids=[
-            "integer",
-            "real number",
-            "string",
-            "boolean",
-            "multiple columns",
-        ],
-    )
-    def test_should_create_schema_from_polars_dataframe(self, dataframe: pl.DataFrame, expected: Schema) -> None:
-        assert Schema._from_polars_dataframe(dataframe) == expected
 
 
 class TestStr:

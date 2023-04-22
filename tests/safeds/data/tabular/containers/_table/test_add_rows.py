@@ -1,23 +1,23 @@
-import polars as pl
+import pandas as pd
 from safeds.data.tabular.containers import Row, Table
 
 
 def test_add_rows_valid() -> None:
     table1 = Table.from_dict({"col1": ["a", "b", "c"], "col2": [1, 2, 4]})
-    row1 = Row._from_polars_dataframe(
-        pl.DataFrame(
+    row1 = Row._from_pandas_dataframe(
+        pd.DataFrame(
             {
-                "col1": "d",
-                "col2": 6,
+                "col1": ["d"],
+                "col2": [6],
             },
         ),
         table1.schema,
     )
-    row2 = Row._from_polars_dataframe(
-        pl.DataFrame(
+    row2 = Row._from_pandas_dataframe(
+        pd.DataFrame(
             {
-                "col1": "e",
-                "col2": 8,
+                "col1": ["e"],
+                "col2": [8],
             },
         ),
         table1.schema,
@@ -32,20 +32,20 @@ def test_add_rows_valid() -> None:
 
 def test_add_rows_table_valid() -> None:
     table1 = Table.from_dict({"col1": [1, 2, 1], "col2": [1, 2, 4]})
-    row1 = Row._from_polars_dataframe(
-        pl.DataFrame(
+    row1 = Row._from_pandas_dataframe(
+        pd.DataFrame(
             {
-                "col1": 5,
-                "col2": 6,
+                "col1": [5],
+                "col2": [6],
             },
         ),
         table1.schema,
     )
-    row2 = Row._from_polars_dataframe(
-        pl.DataFrame(
+    row2 = Row._from_pandas_dataframe(
+        pd.DataFrame(
             {
-                "col1": 7,
-                "col2": 8,
+                "col1": [7],
+                "col2": [8],
             },
         ),
         table1.schema,
