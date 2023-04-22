@@ -402,6 +402,53 @@ class TestToDict:
         assert row.to_dict() == expected
 
 
+class TestToHtml:
+    @pytest.mark.parametrize(
+        "row",
+        [
+            Row(),
+            Row({"a": 1, "b": 2}),
+        ],
+        ids=[
+            "empty",
+            "non-empty",
+        ],
+    )
+    def test_should_contain_table_element(self, row: Row) -> None:
+        pattern = r"<table.*?>.*?</table>"
+        assert re.search(pattern, row.to_html(), flags=re.S) is not None
+
+    @pytest.mark.parametrize(
+        "row",
+        [
+            Row(),
+            Row({"a": 1, "b": 2}),
+        ],
+        ids=[
+            "empty",
+            "non-empty",
+        ],
+    )
+    def test_should_contain_th_element_for_each_column_name(self, row: Row) -> None:
+        for column_name in row.column_names:
+            assert f"<th>{column_name}</th>" in row.to_html()
+
+    @pytest.mark.parametrize(
+        "row",
+        [
+            Row(),
+            Row({"a": 1, "b": 2}),
+        ],
+        ids=[
+            "empty",
+            "non-empty",
+        ],
+    )
+    def test_should_contain_td_element_for_each_value(self, row: Row) -> None:
+        for value in row.values():
+            assert f"<td>{value}</td>" in row.to_html()
+
+
 class TestReprHtml:
     @pytest.mark.parametrize(
         "row",

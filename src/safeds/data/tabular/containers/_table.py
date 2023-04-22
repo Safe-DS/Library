@@ -1236,6 +1236,23 @@ class Table:
         """
         return {column_name: list(self.get_column(column_name)) for column_name in self.column_names}
 
+    def to_html(self) -> str:
+        """
+        Return an HTML representation of the table.
+
+        Returns
+        -------
+        output : str
+            The generated HTML.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table
+        >>> table = Table.from_dict({"a": [1, 2, 3], "b": [4, 5, 6]})
+        >>> html = table.to_html()
+        """
+        return self._data.to_html(max_rows=self._data.shape[0], max_cols=self._data.shape[1])
+
     def to_columns(self) -> list[Column]:
         """
         Return a list of the columns.
