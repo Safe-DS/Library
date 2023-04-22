@@ -543,7 +543,10 @@ class Column:
         output : str
             The generated HTML.
         """
-        return self._data.to_frame().to_html(max_rows=self._data.size, max_cols=1, notebook=True)
+        frame = self._data.to_frame()
+        frame.columns = [self.name]
+
+        return frame.to_html(max_rows=self._data.size, max_cols=1, notebook=True)
 
     # ------------------------------------------------------------------------------------------------------------------
     # Other
