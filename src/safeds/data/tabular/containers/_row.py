@@ -379,7 +379,7 @@ class Row(Mapping[str, Any]):
         if not self.has_column(column_name):
             raise UnknownColumnNameError([column_name])
 
-        return self._data.at[0, column_name]
+        return self._data.loc[0, column_name]
 
     def has_column(self, column_name: str) -> bool:
         """
