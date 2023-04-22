@@ -4,7 +4,6 @@ from typing import TYPE_CHECKING
 
 import pandas as pd
 import pytest
-
 from safeds.data.tabular.exceptions import UnknownColumnNameError
 from safeds.data.tabular.typing import Boolean, ColumnType, Integer, RealNumber, Schema, String
 
@@ -257,13 +256,10 @@ class TestReprMarkdown:
         ("schema", "expected"),
         [
             (Schema({}), "Empty Schema"),
-            (
-                Schema({"A": Integer()}),
-                "| Column Name | Column Type |\n| --- | --- |\n| A | Integer |"
-            ),
+            (Schema({"A": Integer()}), "| Column Name | Column Type |\n| --- | --- |\n| A | Integer |"),
             (
                 Schema({"A": Integer(), "B": String()}),
-                "| Column Name | Column Type |\n| --- | --- |\n| A | Integer |\n| B | String |"
+                "| Column Name | Column Type |\n| --- | --- |\n| A | Integer |\n| B | String |",
             ),
         ],
         ids=[
