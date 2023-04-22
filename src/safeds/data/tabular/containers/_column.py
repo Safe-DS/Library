@@ -113,10 +113,10 @@ class Column(Sequence[_T]):
             return True
         return self.name == other.name and self._data.equals(other._data)
 
-    def __getitem__(self, index: int) -> Any:
+    def __getitem__(self, index: int) -> _T:
         return self.get_value(index)
 
-    def __iter__(self) -> Iterator[Any]:
+    def __iter__(self) -> Iterator[_T]:
         return iter(self._data)
 
     def __len__(self) -> int:
@@ -176,18 +176,18 @@ class Column(Sequence[_T]):
     # Getters
     # ------------------------------------------------------------------------------------------------------------------
 
-    def get_unique_values(self) -> list[Any]:
+    def get_unique_values(self) -> list[_T]:
         """
         Return a list of all unique values in the column.
 
         Returns
         -------
-        unique_values : list[any]
+        unique_values : list[_T]
             List of unique values in the column.
         """
         return list(self._data.unique())
 
-    def get_value(self, index: int) -> Any:
+    def get_value(self, index: int) -> _T:
         """
         Return column value at specified index, starting at 0.
 
@@ -215,13 +215,13 @@ class Column(Sequence[_T]):
     # Information
     # ------------------------------------------------------------------------------------------------------------------
 
-    def all(self, predicate: Callable[[Any], bool]) -> bool:
+    def all(self, predicate: Callable[[_T], bool]) -> bool:
         """
         Check if all values have a given property.
 
         Parameters
         ----------
-        predicate : Callable[[Any], bool])
+        predicate : Callable[[_T], bool])
             Callable that is used to find matches.
 
         Returns
@@ -232,13 +232,13 @@ class Column(Sequence[_T]):
         """
         return all(predicate(value) for value in self._data)
 
-    def any(self, predicate: Callable[[Any], bool]) -> bool:
+    def any(self, predicate: Callable[[_T], bool]) -> bool:
         """
         Check if any value has a given property.
 
         Parameters
         ----------
-        predicate : Callable[[Any], bool])
+        predicate : Callable[[_T], bool])
             Callable that is used to find matches.
 
         Returns
@@ -249,13 +249,13 @@ class Column(Sequence[_T]):
         """
         return any(predicate(value) for value in self._data)
 
-    def none(self, predicate: Callable[[Any], bool]) -> bool:
+    def none(self, predicate: Callable[[_T], bool]) -> bool:
         """
         Check if no values has a given property.
 
         Parameters
         ----------
-        predicate : Callable[[Any], bool])
+        predicate : Callable[[_T], bool])
             Callable that is used to find matches.
 
         Returns
@@ -434,7 +434,7 @@ class Column(Sequence[_T]):
             raise ColumnSizeError("> 0", "0")
         return self._count_missing_values() / self._data.size
 
-    def mode(self) -> Any:
+    def mode(self) -> list[_T]:
         """
         Return the mode of the column.
 
