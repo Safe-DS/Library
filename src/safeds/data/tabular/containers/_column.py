@@ -88,9 +88,9 @@ class Column(Sequence[_T]):
 
         Parameters
         ----------
-        name
+        name : str
             The name of the column.
-        data
+        data : Sequence[_T]
             The data.
 
         Examples
