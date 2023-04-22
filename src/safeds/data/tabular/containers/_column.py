@@ -34,7 +34,7 @@ class Column(Sequence[_T]):
     ----------
     name : str
         The name of the column.
-    data : Sequence
+    data : Sequence[_T]
         The data.
 
     Examples
