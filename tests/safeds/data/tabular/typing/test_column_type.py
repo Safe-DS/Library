@@ -1,6 +1,5 @@
 import numpy as np
 import pytest
-
 from safeds.data.tabular.typing import (
     Anything,
     Boolean,

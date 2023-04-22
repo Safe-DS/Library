@@ -76,7 +76,7 @@ class Row(Mapping[str, Any]):
         >>> from safeds.data.tabular.containers import Row
         >>> row = Row._from_pandas_dataframe(pd.DataFrame({"a": [1], "b": [2]}))
         """
-        data.reset_index(drop=True, inplace=True)
+        data = data.reset_index(drop=True)
 
         result = object.__new__(Row)
         result._data = data
@@ -110,10 +110,7 @@ class Row(Mapping[str, Any]):
         if data is None:
             data = {}
 
-        data = {
-            key: [value]
-            for key, value in data.items()
-        }
+        data = {key: [value] for key, value in data.items()}
 
         self._data: pd.DataFrame = pd.DataFrame(data)
         # noinspection PyProtectedMember
