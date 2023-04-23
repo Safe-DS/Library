@@ -25,7 +25,7 @@ def test_should_get_the_item_at_index(column: Column, index: int, expected: Any)
         "out of bounds",
     ],
 )
-def test_should_raise_if_index_is_out_of_bounds(index: int | slice) -> None:
+def test_should_raise_if_index_is_out_of_bounds(index: int) -> None:
     column = Column("a", [0, "1"])
 
     with pytest.raises(IndexOutOfBoundsError):

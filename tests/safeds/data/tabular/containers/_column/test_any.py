@@ -1,3 +1,5 @@
+from collections.abc import Callable
+
 import pytest
 
 from safeds.data.tabular.containers import Column
@@ -17,6 +19,6 @@ from safeds.data.tabular.containers import Column
     ],
 )
 def test_should_return_true_if_any_values_satisfy_the_predicate(
-    column: Column, predicate: callable, expected: bool
+    column: Column, predicate: Callable, expected: bool
 ) -> None:
     assert column.any(predicate) == expected

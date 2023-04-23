@@ -563,17 +563,11 @@ class Column(Sequence[_T]):
 
         Raises
         ------
-        TypeError
-            If the column contains non-numerical data or complex data.
+        NonNumericColumnError
+            If the data contains non-numerical data.
         """
-        for data in self._data:
-            if not isinstance(data, int) and not isinstance(data, float) and not isinstance(data, complex):
-                raise NonNumericColumnError(self.name)
-            if isinstance(data, complex):
-                raise TypeError(
-                    "The column contains complex data. Boxplots cannot plot the imaginary part of complex "
-                    "data. Please provide a Column with only real numbers",
-                )
+        if not self.type.is_numeric():
+            raise NonNumericColumnError(f"{self.name} is of type {self._type}.")
 
         fig = plt.figure()
         ax = sns.boxplot(data=self._data)
