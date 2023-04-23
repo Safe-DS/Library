@@ -1,19 +1,26 @@
-from safeds.data.tabular.containers import Table
+import pytest
+from safeds.data.tabular.containers import Column
 
 
-def test_mode_valid() -> None:
-    table = Table.from_dict({"col1": [1, 2, 3, 4, 3]})
-    column = table.get_column("col1")
-    assert column.mode() == [3]
-
-
-def test_mode_valid_str() -> None:
-    table = Table.from_dict({"col1": ["1", "2", "3", "4", "3"]})
-    column = table.get_column("col1")
-    assert column.mode() == ["3"]
-
-
-def test_mode_valid_list() -> None:
-    table = Table.from_dict({"col1": ["1", "4", "3", "4", "3"]})
-    column = table.get_column("col1")
-    assert column.mode() == ["3", "4"]
+@pytest.mark.parametrize(
+    ("values", "expected"),
+    [
+        ([], []),
+        ([None, None, None], []),
+        ([1, 2, 2], [2]),
+        (["a", "a", "b"], ["a"]),
+        ([1, 2, 2, None], [2]),
+        ([1, 2], [1, 2]),
+    ],
+    ids=[
+        "empty",
+        "all missing values",
+        "numeric",
+        "non-numeric",
+        "some missing values",
+        "multiple values with same frequency"
+    ],
+)
+def test_should_return_the_mode_value(values: list, expected: list) -> None:
+    column = Column("A", values)
+    assert column.mode() == expected

@@ -16,7 +16,7 @@ from safeds.data.tabular.exceptions import ColumnSizeError
         "all same values",
     ],
 )
-def test_idness_valid(values: list[str], result: float) -> None:
+def test_should_return_idness_of_column(values: list[str], result: float) -> None:
     column = Column("A", values)
     assert column.idness() == result
 

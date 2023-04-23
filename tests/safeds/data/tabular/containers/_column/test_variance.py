@@ -8,19 +8,17 @@ from safeds.data.tabular.exceptions import NonNumericColumnError
     ("values", "expected"),
     [
 
-        ([1, 2, 3], 6),
-        ([1, 2, 3, 4], 10),
-        ([1, 2, 3, None], 6),
+        ([1, 2, 3], 1),
+        ([1, 2, 3, None], 1),
     ],
     ids=[
-        "odd number of values",
-        "even number of values",
+        "no missing values",
         "some missing values",
     ],
 )
-def test_should_return_sum_of_values(values: list, expected: int) -> None:
+def test_should_return_variance(values: list, expected: int) -> None:
     column = Column("A", values)
-    assert column.sum() == expected
+    assert column.variance() == expected
 
 
 @pytest.mark.parametrize(
@@ -39,4 +37,4 @@ def test_should_return_sum_of_values(values: list, expected: int) -> None:
 def test_should_raise_if_column_is_not_numeric(values: list) -> None:
     column = Column("A", values)
     with pytest.raises(NonNumericColumnError):
-        column.sum()
+        column.variance()

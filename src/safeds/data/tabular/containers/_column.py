@@ -346,7 +346,9 @@ class Column(Sequence[_T]):
 
     def idness(self) -> float:
         r"""
-        Calculate the idness of this column, which we define as.
+        Calculate the idness of this column.
+
+        We define the idness as follows:
 
         $$
         \frac{\text{number of different values}}{\text{number of rows}}
@@ -440,12 +442,17 @@ class Column(Sequence[_T]):
 
     def missing_value_ratio(self) -> float:
         """
-        Return the ratio of null values to the total number of elements in the column.
+        Return the ratio of missing values to the total number of elements in the column.
 
         Returns
         -------
         ratio : float
-            The ratio of null values to the total number of elements in the column.
+            The ratio of missing values to the total number of elements in the column.
+
+        Raises
+        ------
+        ColumnSizeError
+            If the column is empty.
         """
         if self._data.size == 0:
             raise ColumnSizeError("> 0", "0")
@@ -457,14 +464,16 @@ class Column(Sequence[_T]):
 
         Returns
         -------
-        List :
+        mode: list[_T]
             Returns a list with the most common values.
         """
         return self._data.mode().tolist()
 
     def stability(self) -> float:
         r"""
-        Calculate the stability of this column, which we define as.
+        Calculate the stability of this column.
+
+        We define the stability as follows:
 
         $$
         \frac{\text{number of occurrences of most common non-null value}}{\text{number of non-null values}}
@@ -497,7 +506,6 @@ class Column(Sequence[_T]):
         ------
         NonNumericColumnError
             If the data contains non-numerical data.
-
         """
         if not self.type.is_numeric():
             raise NonNumericColumnError(f"{self.name} is of type {self._type}.")
@@ -516,7 +524,6 @@ class Column(Sequence[_T]):
         ------
         NonNumericColumnError
             If the data contains non-numerical data.
-
         """
         if not self.type.is_numeric():
             raise NonNumericColumnError(f"{self.name} is of type {self._type}.")
@@ -535,7 +542,6 @@ class Column(Sequence[_T]):
         ------
         NonNumericColumnError
             If the data contains non-numerical data.
-
         """
         if not self.type.is_numeric():
             raise NonNumericColumnError(f"{self.name} is of type {self._type}.")
