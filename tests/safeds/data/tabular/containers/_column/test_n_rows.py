@@ -1,5 +1,4 @@
 import pytest
-
 from safeds.data.tabular.containers import Column
 
 
@@ -17,4 +16,4 @@ from safeds.data.tabular.containers import Column
     ],
 )
 def test_should_return_the_number_of_rows(column: Column, expected: int) -> None:
-    assert len(column) == expected
+    assert column.n_rows == expected

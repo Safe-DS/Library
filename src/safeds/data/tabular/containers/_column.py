@@ -82,7 +82,7 @@ class Column(Sequence[_T]):
     # Dunder methods
     # ------------------------------------------------------------------------------------------------------------------
 
-    def __init__(self, name: str, data: Sequence[_T]) -> None:
+    def __init__(self, name: str, data: Sequence[_T] | None = None) -> None:
         """
         Create a column.
 
@@ -90,14 +90,17 @@ class Column(Sequence[_T]):
         ----------
         name : str
             The name of the column.
-        data : Sequence[_T]
-            The data.
+        data : Sequence[_T] | None
+            The data. If None, an empty column is created.
 
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
         >>> column = Column("test", [1, 2, 3])
         """
+        if data is None:
+            data = []
+
         self._name: str = name
         self._data: pd.Series = data if isinstance(data, pd.Series) else pd.Series(data)
         # noinspection PyProtectedMember
@@ -142,14 +145,10 @@ class Column(Sequence[_T]):
         return len(self._data)
 
     def __repr__(self) -> str:
-        tmp = self._data.to_frame()
-        tmp.columns = [self.name]
-        return tmp.__repr__()
+        return f"Column({self._name!r}, {list(self._data)!r})"
 
     def __str__(self) -> str:
-        tmp = self._data.to_frame()
-        tmp.columns = [self.name]
-        return tmp.__str__()
+        return f"{self._name!r}: {list(self._data)!r}"
 
     # ------------------------------------------------------------------------------------------------------------------
     # Properties
