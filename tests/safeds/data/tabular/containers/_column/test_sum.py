@@ -1,5 +1,4 @@
 import pytest
-
 from safeds.data.tabular.containers import Column
 from safeds.data.tabular.exceptions import NonNumericColumnError
 
@@ -7,7 +6,6 @@ from safeds.data.tabular.exceptions import NonNumericColumnError
 @pytest.mark.parametrize(
     ("values", "expected"),
     [
-
         ([1, 2, 3], 6),
         ([1, 2, 3, 4], 10),
         ([1, 2, 3, None], 6),

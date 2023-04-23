@@ -9,14 +9,9 @@ from safeds.data.tabular.exceptions import ColumnLengthMismatchError, NonNumeric
         (Column("A", [0, 1, 2]), Column("B", [0, 1, 2]), 1.0),
         (Column("A", [0, 1, 2]), Column("B", [0, -1, -2]), -1.0),
     ],
-    ids=[
-        "positive correlation",
-        "negative correlation"
-    ],
+    ids=["positive correlation", "negative correlation"],
 )
-def test_should_return_correlation_between_two_columns(
-    column1: Column, column2: Column, expected: float
-) -> None:
+def test_should_return_correlation_between_two_columns(column1: Column, column2: Column, expected: float) -> None:
     assert column1.correlation_with(column2) == expected
 
 

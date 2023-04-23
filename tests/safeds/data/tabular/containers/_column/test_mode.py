@@ -18,7 +18,7 @@ from safeds.data.tabular.containers import Column
         "numeric",
         "non-numeric",
         "some missing values",
-        "multiple values with same frequency"
+        "multiple values with same frequency",
     ],
 )
 def test_should_return_the_mode_value(values: list, expected: list) -> None:

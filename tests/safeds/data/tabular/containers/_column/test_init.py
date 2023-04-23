@@ -2,9 +2,8 @@ from typing import Any
 
 import pandas as pd
 import pytest
-
 from safeds.data.tabular.containers import Column
-from safeds.data.tabular.typing import String, Boolean, Integer, RealNumber, ColumnType
+from safeds.data.tabular.typing import Boolean, ColumnType, Integer, RealNumber, String
 
 
 def test_should_store_the_name() -> None:
@@ -18,10 +17,7 @@ def test_should_store_the_name() -> None:
         (Column("A", []), "A"),
         (Column("A", pd.Series()), "A"),
     ],
-    ids=[
-        "data as list",
-        "data as series"
-    ],
+    ids=["data as list", "data as series"],
 )
 def test_should_set_the_name_of_internal_series(column: Column, expected: str) -> None:
     assert column._data.name == expected
