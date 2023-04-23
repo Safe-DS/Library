@@ -82,7 +82,7 @@ class Column(Sequence[_T]):
     # Dunder methods
     # ------------------------------------------------------------------------------------------------------------------
 
-    def __init__(self, name: str, data: Sequence[_T]) -> None:
+    def __init__(self, name: str, data: Sequence[_T] | None = None) -> None:
         """
         Create a column.
 
@@ -90,16 +90,19 @@ class Column(Sequence[_T]):
         ----------
         name : str
             The name of the column.
-        data : Sequence[_T]
-            The data.
+        data : Sequence[_T] | None
+            The data. If None, an empty column is created.
 
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
         >>> column = Column("test", [1, 2, 3])
         """
+        if data is None:
+            data = []
+
         self._name: str = name
-        self._data: pd.Series = data if isinstance(data, pd.Series) else pd.Series(data)
+        self._data: pd.Series = data.rename(name) if isinstance(data, pd.Series) else pd.Series(data, name=name)
         # noinspection PyProtectedMember
         self._type: ColumnType = ColumnType._from_numpy_data_type(self._data.dtype)
 
@@ -142,14 +145,10 @@ class Column(Sequence[_T]):
         return len(self._data)
 
     def __repr__(self) -> str:
-        tmp = self._data.to_frame()
-        tmp.columns = [self.name]
-        return tmp.__repr__()
+        return f"Column({self._name!r}, {list(self._data)!r})"
 
     def __str__(self) -> str:
-        tmp = self._data.to_frame()
-        tmp.columns = [self.name]
-        return tmp.__str__()
+        return f"{self._name!r}: {list(self._data)!r}"
 
     # ------------------------------------------------------------------------------------------------------------------
     # Properties
@@ -247,7 +246,6 @@ class Column(Sequence[_T]):
         -------
         result : bool
             True if all match.
-
         """
         return all(predicate(value) for value in self._data)
 
@@ -264,7 +262,6 @@ class Column(Sequence[_T]):
         -------
         result : bool
             True if any match.
-
         """
         return any(predicate(value) for value in self._data)
 
@@ -281,7 +278,6 @@ class Column(Sequence[_T]):
         -------
         result : bool
             True if none match.
-
         """
         return all(not predicate(value) for value in self._data)
 
@@ -331,8 +327,10 @@ class Column(Sequence[_T]):
 
         Raises
         ------
-        TypeError
+        NonNumericColumnError
             If one of the columns is not numerical.
+        ColumnLengthMismatchError
+            If the columns have different lengths.
         """
         if not self._type.is_numeric() or not other_column._type.is_numeric():
             raise NonNumericColumnError(
@@ -348,7 +346,9 @@ class Column(Sequence[_T]):
 
     def idness(self) -> float:
         r"""
-        Calculate the idness of this column, which we define as.
+        Calculate the idness of this column.
+
+        We define the idness as follows:
 
         $$
         \frac{\text{number of different values}}{\text{number of rows}}
@@ -442,12 +442,17 @@ class Column(Sequence[_T]):
 
     def missing_value_ratio(self) -> float:
         """
-        Return the ratio of null values to the total number of elements in the column.
+        Return the ratio of missing values to the total number of elements in the column.
 
         Returns
         -------
         ratio : float
-            The ratio of null values to the total number of elements in the column.
+            The ratio of missing values to the total number of elements in the column.
+
+        Raises
+        ------
+        ColumnSizeError
+            If the column is empty.
         """
         if self._data.size == 0:
             raise ColumnSizeError("> 0", "0")
@@ -459,14 +464,16 @@ class Column(Sequence[_T]):
 
         Returns
         -------
-        List :
+        mode: list[_T]
             Returns a list with the most common values.
         """
         return self._data.mode().tolist()
 
     def stability(self) -> float:
         r"""
-        Calculate the stability of this column, which we define as.
+        Calculate the stability of this column.
+
+        We define the stability as follows:
 
         $$
         \frac{\text{number of occurrences of most common non-null value}}{\text{number of non-null values}}
@@ -499,7 +506,6 @@ class Column(Sequence[_T]):
         ------
         NonNumericColumnError
             If the data contains non-numerical data.
-
         """
         if not self.type.is_numeric():
             raise NonNumericColumnError(f"{self.name} is of type {self._type}.")
@@ -518,7 +524,6 @@ class Column(Sequence[_T]):
         ------
         NonNumericColumnError
             If the data contains non-numerical data.
-
         """
         if not self.type.is_numeric():
             raise NonNumericColumnError(f"{self.name} is of type {self._type}.")
@@ -537,7 +542,6 @@ class Column(Sequence[_T]):
         ------
         NonNumericColumnError
             If the data contains non-numerical data.
-
         """
         if not self.type.is_numeric():
             raise NonNumericColumnError(f"{self.name} is of type {self._type}.")
@@ -559,17 +563,11 @@ class Column(Sequence[_T]):
 
         Raises
         ------
-        TypeError
-            If the column contains non-numerical data or complex data.
+        NonNumericColumnError
+            If the data contains non-numerical data.
         """
-        for data in self._data:
-            if not isinstance(data, int) and not isinstance(data, float) and not isinstance(data, complex):
-                raise NonNumericColumnError(self.name)
-            if isinstance(data, complex):
-                raise TypeError(
-                    "The column contains complex data. Boxplots cannot plot the imaginary part of complex "
-                    "data. Please provide a Column with only real numbers",
-                )
+        if not self.type.is_numeric():
+            raise NonNumericColumnError(f"{self.name} is of type {self._type}.")
 
         fig = plt.figure()
         ax = sns.boxplot(data=self._data)
