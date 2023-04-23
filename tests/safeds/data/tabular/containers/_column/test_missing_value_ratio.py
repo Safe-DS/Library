@@ -1,3 +1,5 @@
+from typing import Any
+
 import pytest
 from safeds.data.tabular.containers import Column
 from safeds.data.tabular.exceptions import ColumnSizeError
@@ -14,6 +16,6 @@ def test_should_return_ratio_of_null_values_to_number_of_elements(values: list, 
 
 
 def test_should_raise_if_column_is_empty() -> None:
-    column = Column("A", [])
+    column: Column[Any] = Column("A", [])
     with pytest.raises(ColumnSizeError):
         column.missing_value_ratio()

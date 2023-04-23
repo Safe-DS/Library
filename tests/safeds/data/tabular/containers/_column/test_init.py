@@ -1,3 +1,5 @@
+from typing import Any
+
 import pandas as pd
 import pytest
 
@@ -6,7 +8,7 @@ from safeds.data.tabular.typing import String, Boolean, Integer, RealNumber, Col
 
 
 def test_should_store_the_name() -> None:
-    column = Column("A", [])
+    column: Column[Any] = Column("A", [])
     assert column.name == "A"
 
 
@@ -22,7 +24,7 @@ def test_should_store_the_name() -> None:
     ],
 )
 def test_should_set_the_name_of_internal_series(column: Column, expected: str) -> None:
-    assert column._data.name == "A"
+    assert column._data.name == expected
 
 
 @pytest.mark.parametrize(

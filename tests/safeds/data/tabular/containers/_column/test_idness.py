@@ -1,3 +1,5 @@
+from typing import Any
+
 import pytest
 from safeds.data.tabular.containers import Column
 from safeds.data.tabular.exceptions import ColumnSizeError
@@ -22,6 +24,6 @@ def test_should_return_idness_of_column(values: list[str], result: float) -> Non
 
 
 def test_should_raise_if_column_is_empty() -> None:
-    column = Column("A", [])
+    column: Column[Any] = Column("A", [])
     with pytest.raises(ColumnSizeError):
         column.idness()

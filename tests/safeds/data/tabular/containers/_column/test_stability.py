@@ -26,6 +26,6 @@ def test_should_return_stability_of_column(values: list[Any], expected: float) -
 
 
 def test_should_raise_if_column_is_empty() -> None:
-    column = Column("A", [])
+    column: Column[Any] = Column("A", [])
     with pytest.raises(ColumnSizeError):
         column.stability()
