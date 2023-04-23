@@ -1,20 +1,28 @@
+import pandas as pd
 import pytest
 
 from safeds.data.tabular.containers import Column
 from safeds.data.tabular.typing import String, Boolean, Integer, RealNumber, ColumnType
 
 
+def test_should_store_the_name() -> None:
+    column = Column("A", [])
+    assert column.name == "A"
+
+
 @pytest.mark.parametrize(
     ("column", "expected"),
     [
         (Column("A", []), "A"),
+        (Column("A", pd.Series()), "A"),
     ],
     ids=[
-        "name A"
+        "data as list",
+        "data as series"
     ],
 )
-def test_should_store_the_name(column: Column, expected: str) -> None:
-    assert column.name == expected
+def test_should_set_the_name_of_internal_series(column: Column, expected: str) -> None:
+    assert column._data.name == "A"
 
 
 @pytest.mark.parametrize(

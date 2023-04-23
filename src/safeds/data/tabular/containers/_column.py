@@ -102,7 +102,7 @@ class Column(Sequence[_T]):
             data = []
 
         self._name: str = name
-        self._data: pd.Series = data if isinstance(data, pd.Series) else pd.Series(data)
+        self._data: pd.Series = data.rename(name) if isinstance(data, pd.Series) else pd.Series(data, name=name)
         # noinspection PyProtectedMember
         self._type: ColumnType = ColumnType._from_numpy_data_type(self._data.dtype)
 
@@ -246,7 +246,6 @@ class Column(Sequence[_T]):
         -------
         result : bool
             True if all match.
-
         """
         return all(predicate(value) for value in self._data)
 
@@ -263,7 +262,6 @@ class Column(Sequence[_T]):
         -------
         result : bool
             True if any match.
-
         """
         return any(predicate(value) for value in self._data)
 
@@ -280,7 +278,6 @@ class Column(Sequence[_T]):
         -------
         result : bool
             True if none match.
-
         """
         return all(not predicate(value) for value in self._data)
 
@@ -330,8 +327,10 @@ class Column(Sequence[_T]):
 
         Raises
         ------
-        TypeError
+        NonNumericColumnError
             If one of the columns is not numerical.
+        ColumnLengthMismatchError
+            If the columns have different lengths.
         """
         if not self._type.is_numeric() or not other_column._type.is_numeric():
             raise NonNumericColumnError(
