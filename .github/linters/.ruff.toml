@@ -61,6 +61,8 @@ ignore = [
     "FBT002",
     # builtin-attribute-shadowing (not an issue)
     "A003",
+    # implicit-return (can add a return even though all cases are covered)
+    "RET503",
     # superfluous-else-return (sometimes it's more readable)
     "RET505",
     # superfluous-else-raise (sometimes it's more readable)

@@ -13,9 +13,23 @@ if TYPE_CHECKING:
 
 
 class RandomForest(Classifier):
-    """Random forest classification."""
+    """Random forest classification.
 
-    def __init__(self) -> None:
+    Parameters
+    ----------
+    number_of_trees : int
+        The number of trees to be used in the random forest. Has to be greater than 0.
+
+    Raises
+    ------
+    ValueError
+        If the number of trees is less than or equal to 0.
+    """
+
+    def __init__(self, number_of_trees: int = 100) -> None:
+        if number_of_trees < 1:
+            raise ValueError("The number of trees has to be greater than 0.")
+        self.number_of_trees = number_of_trees
         self._wrapped_classifier: sk_RandomForestClassifier | None = None
         self._feature_names: list[str] | None = None
         self._target_name: str | None = None
@@ -41,10 +55,10 @@ class RandomForest(Classifier):
         LearningError
             If the training data contains invalid values or if the training failed.
         """
-        wrapped_classifier = sk_RandomForestClassifier(n_jobs=-1)
+        wrapped_classifier = sk_RandomForestClassifier(self.number_of_trees, n_jobs=-1)
         fit(wrapped_classifier, training_set)
 
-        result = RandomForest()
+        result = RandomForest(self.number_of_trees)
         result._wrapped_classifier = wrapped_classifier
         result._feature_names = training_set.features.column_names
         result._target_name = training_set.target.name

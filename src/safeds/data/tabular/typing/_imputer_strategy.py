@@ -12,4 +12,11 @@ class ImputerStrategy(ABC):
 
     @abstractmethod
     def _augment_imputer(self, imputer: sk_SimpleImputer) -> None:
-        pass
+        """
+        Set the imputer strategy of the given imputer.
+
+        Parameters
+        ----------
+        imputer: SimpleImputer
+            The imputer to augment.
+        """

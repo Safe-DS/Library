@@ -42,11 +42,11 @@ class IndexOutOfBoundsError(IndexError):
 
     Parameters
     ----------
-    index : int
+    index : int | slice
         The wrongly used index.
     """
 
-    def __init__(self, index: int):
+    def __init__(self, index: int | slice):
         super().__init__(f"There is no element at index '{index}'.")
 
 
@@ -71,13 +71,6 @@ class SchemaMismatchError(Exception):
 
     def __init__(self) -> None:
         super().__init__("Failed because at least two schemas didn't match.")
-
-
-class MissingSchemaError(Exception):
-    """Exception raised when a required schema is missing."""
-
-    def __init__(self) -> None:
-        super().__init__("Failed because a required schema is missing.")
 
 
 class ColumnLengthMismatchError(Exception):

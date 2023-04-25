@@ -1,6 +1,7 @@
+import re
 from typing import Any
 
-import polars as pl
+import pandas as pd
 import pytest
 from safeds.data.tabular.containers import Row, Table
 from safeds.data.tabular.exceptions import UnknownColumnNameError
@@ -32,21 +33,21 @@ class TestFromDict:
         assert Row.from_dict(data) == expected
 
 
-class TestFromPolarsDataFrame:
+class TestFromPandasDataFrame:
     @pytest.mark.parametrize(
         ("row", "expected"),
         [
             (
-                Row._from_polars_dataframe(pl.DataFrame(), Schema({})),
+                Row._from_pandas_dataframe(pd.DataFrame(), Schema({})),
                 Schema({}),
             ),
             (
-                Row._from_polars_dataframe(pl.DataFrame({"col1": 0}), Schema({"col1": Integer()})),
+                Row._from_pandas_dataframe(pd.DataFrame({"col1": [0]}), Schema({"col1": Integer()})),
                 Schema({"col1": Integer()}),
             ),
             (
-                Row._from_polars_dataframe(
-                    pl.DataFrame({"col1": 0, "col2": "a"}),
+                Row._from_pandas_dataframe(
+                    pd.DataFrame({"col1": [0], "col2": ["a"]}),
                     Schema({"col1": Integer(), "col2": String()}),
                 ),
                 Schema({"col1": Integer(), "col2": String()}),
@@ -64,8 +65,8 @@ class TestFromPolarsDataFrame:
     @pytest.mark.parametrize(
         ("row", "expected"),
         [
-            (Row._from_polars_dataframe(pl.DataFrame()), Schema({})),
-            (Row._from_polars_dataframe(pl.DataFrame({"col1": 0})), Schema({"col1": Integer()})),
+            (Row._from_pandas_dataframe(pd.DataFrame()), Schema({})),
+            (Row._from_pandas_dataframe(pd.DataFrame({"col1": [0]})), Schema({"col1": Integer()})),
         ],
         ids=[
             "empty",
@@ -401,6 +402,53 @@ class TestToDict:
         assert row.to_dict() == expected
 
 
+class TestToHtml:
+    @pytest.mark.parametrize(
+        "row",
+        [
+            Row(),
+            Row({"a": 1, "b": 2}),
+        ],
+        ids=[
+            "empty",
+            "non-empty",
+        ],
+    )
+    def test_should_contain_table_element(self, row: Row) -> None:
+        pattern = r"<table.*?>.*?</table>"
+        assert re.search(pattern, row.to_html(), flags=re.S) is not None
+
+    @pytest.mark.parametrize(
+        "row",
+        [
+            Row(),
+            Row({"a": 1, "b": 2}),
+        ],
+        ids=[
+            "empty",
+            "non-empty",
+        ],
+    )
+    def test_should_contain_th_element_for_each_column_name(self, row: Row) -> None:
+        for column_name in row.column_names:
+            assert f"<th>{column_name}</th>" in row.to_html()
+
+    @pytest.mark.parametrize(
+        "row",
+        [
+            Row(),
+            Row({"a": 1, "b": 2}),
+        ],
+        ids=[
+            "empty",
+            "non-empty",
+        ],
+    )
+    def test_should_contain_td_element_for_each_value(self, row: Row) -> None:
+        for value in row.values():
+            assert f"<td>{value}</td>" in row.to_html()
+
+
 class TestReprHtml:
     @pytest.mark.parametrize(
         "row",
@@ -414,4 +462,35 @@ class TestReprHtml:
         ],
     )
     def test_should_contain_table_element(self, row: Row) -> None:
-        assert "<table" in row._repr_html_()
+        pattern = r"<table.*?>.*?</table>"
+        assert re.search(pattern, row._repr_html_(), flags=re.S) is not None
+
+    @pytest.mark.parametrize(
+        "row",
+        [
+            Row(),
+            Row({"a": 1, "b": 2}),
+        ],
+        ids=[
+            "empty",
+            "non-empty",
+        ],
+    )
+    def test_should_contain_th_element_for_each_column_name(self, row: Row) -> None:
+        for column_name in row.column_names:
+            assert f"<th>{column_name}</th>" in row._repr_html_()
+
+    @pytest.mark.parametrize(
+        "row",
+        [
+            Row(),
+            Row({"a": 1, "b": 2}),
+        ],
+        ids=[
+            "empty",
+            "non-empty",
+        ],
+    )
+    def test_should_contain_td_element_for_each_value(self, row: Row) -> None:
+        for value in row.values():
+            assert f"<td>{value}</td>" in row._repr_html_()

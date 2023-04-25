@@ -3,7 +3,6 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 import pandas as pd
-import polars as pl
 import pytest
 from safeds.data.tabular.exceptions import UnknownColumnNameError
 from safeds.data.tabular.typing import Boolean, ColumnType, Integer, RealNumber, Schema, String
@@ -33,6 +32,10 @@ class TestFromPandasDataFrame:
                 Schema({"A": String()}),
             ),
             (
+                pd.DataFrame({"A": [1, 2.0, "a", True]}),
+                Schema({"A": String()}),
+            ),
+            (
                 pd.DataFrame({"A": [1, 2, 3], "B": ["a", "b", "c"]}),
                 Schema({"A": Integer(), "B": String()}),
             ),
@@ -42,6 +45,7 @@ class TestFromPandasDataFrame:
             "real number",
             "string",
             "boolean",
+            "mixed",
             "multiple columns",
         ],
     )
@@ -49,41 +53,22 @@ class TestFromPandasDataFrame:
         assert Schema._from_pandas_dataframe(dataframe) == expected
 
 
-class TestFromPolarsDataFrame:
+class TestRepr:
     @pytest.mark.parametrize(
-        ("dataframe", "expected"),
+        ("schema", "expected"),
         [
-            (
-                pl.DataFrame({"A": [True, False, True]}),
-                Schema({"A": Boolean()}),
-            ),
-            (
-                pl.DataFrame({"A": [1, 2, 3]}),
-                Schema({"A": Integer()}),
-            ),
-            (
-                pl.DataFrame({"A": [1.0, 2.0, 3.0]}),
-                Schema({"A": RealNumber()}),
-            ),
-            (
-                pl.DataFrame({"A": ["a", "b", "c"]}),
-                Schema({"A": String()}),
-            ),
-            (
-                pl.DataFrame({"A": [1, 2, 3], "B": ["a", "b", "c"]}),
-                Schema({"A": Integer(), "B": String()}),
-            ),
+            (Schema({}), "Schema({})"),
+            (Schema({"A": Integer()}), "Schema({'A': Integer})"),
+            (Schema({"A": Integer(), "B": String()}), "Schema({\n    'A': Integer,\n    'B': String\n})"),
         ],
         ids=[
-            "integer",
-            "real number",
-            "string",
-            "boolean",
+            "empty",
+            "single column",
             "multiple columns",
         ],
     )
-    def test_should_create_schema_from_polars_dataframe(self, dataframe: pl.DataFrame, expected: Schema) -> None:
-        assert Schema._from_polars_dataframe(dataframe) == expected
+    def test_should_create_a_string_representation(self, schema: Schema, expected: str) -> None:
+        assert repr(schema) == expected
 
 
 class TestStr:
@@ -100,7 +85,7 @@ class TestStr:
             "multiple columns",
         ],
     )
-    def test_should_create_a_printable_representation(self, schema: Schema, expected: str) -> None:
+    def test_should_create_a_string_representation(self, schema: Schema, expected: str) -> None:
         assert str(schema) == expected
 
 
@@ -232,22 +217,40 @@ class TestGetColumnNames:
         assert schema.column_names == expected
 
 
-class TestGetColumnIndex:
+class TestToDict:
     @pytest.mark.parametrize(
-        ("schema", "column_name", "expected"),
+        ("schema", "expected"),
         [
-            (Schema({"A": Integer()}), "A", 0),
-            (Schema({"A": Integer(), "B": RealNumber()}), "B", 1),
+            (Schema({}), {}),
+            (Schema({"A": Integer()}), {"A": Integer()}),
+            (Schema({"A": Integer(), "B": String()}), {"A": Integer(), "B": String()}),
         ],
         ids=[
+            "empty",
             "single column",
             "multiple columns",
         ],
     )
-    def test_should_return_column_index(self, schema: Schema, column_name: str, expected: int) -> None:
-        assert schema._get_column_index(column_name) == expected
+    def test_should_return_dict_for_schema(self, schema: Schema, expected: str) -> None:
+        assert schema.to_dict() == expected
 
-    def test_should_raise_if_column_does_not_exist(self) -> None:
-        schema = Schema({"A": Integer()})
-        with pytest.raises(UnknownColumnNameError):
-            schema._get_column_index("B")
+
+class TestReprMarkdown:
+    @pytest.mark.parametrize(
+        ("schema", "expected"),
+        [
+            (Schema({}), "Empty Schema"),
+            (Schema({"A": Integer()}), "| Column Name | Column Type |\n| --- | --- |\n| A | Integer |"),
+            (
+                Schema({"A": Integer(), "B": String()}),
+                "| Column Name | Column Type |\n| --- | --- |\n| A | Integer |\n| B | String |",
+            ),
+        ],
+        ids=[
+            "empty",
+            "single column",
+            "multiple columns",
+        ],
+    )
+    def test_should_create_a_string_representation(self, schema: Schema, expected: str) -> None:
+        assert schema._repr_markdown_() == expected

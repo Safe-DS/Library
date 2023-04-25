@@ -1,14 +1,14 @@
 from __future__ import annotations
 
 import io
+from collections.abc import Sequence
 from numbers import Number
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, TypeVar, overload
 
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import seaborn as sns
-from IPython.core.display_functions import DisplayHandle, display
 
 from safeds.data.image.containers import Image
 from safeds.data.image.typing import ImageFormat
@@ -21,10 +21,12 @@ from safeds.data.tabular.exceptions import (
 from safeds.data.tabular.typing import ColumnType
 
 if TYPE_CHECKING:
-    from collections.abc import Callable, Iterable, Iterator
+    from collections.abc import Callable, Iterator
+
+_T = TypeVar("_T")
 
 
-class Column:
+class Column(Sequence[_T]):
     """
     A column is a named collection of values.
 
@@ -32,21 +34,80 @@ class Column:
     ----------
     name : str
         The name of the column.
-    data : Iterable
+    data : Sequence[_T]
         The data.
-    type_ : Optional[ColumnType]
-        The type of the column. If not specified, the type will be inferred from the data.
+
+    Examples
+    --------
+    >>> from safeds.data.tabular.containers import Column
+    >>> column = Column("test", [1, 2, 3])
     """
+
+    # ------------------------------------------------------------------------------------------------------------------
+    # Creation
+    # ------------------------------------------------------------------------------------------------------------------
+
+    @staticmethod
+    def _from_pandas_series(data: pd.Series, type_: ColumnType | None = None) -> Column:
+        """
+        Create a column from a `pandas.Series`.
+
+        Parameters
+        ----------
+        data : pd.Series
+            The data.
+        type_ : ColumnType | None
+            The type. If None, the type is inferred from the data.
+
+        Returns
+        -------
+        column : Column
+            The created column.
+
+        Examples
+        --------
+        >>> import pandas as pd
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column._from_pandas_series(pd.Series([1, 2, 3], name="test"))
+        """
+        result = object.__new__(Column)
+        result._name = data.name
+        result._data = data
+        # noinspection PyProtectedMember
+        result._type = type_ if type_ is not None else ColumnType._from_numpy_data_type(data.dtype)
+
+        return result
 
     # ------------------------------------------------------------------------------------------------------------------
     # Dunder methods
     # ------------------------------------------------------------------------------------------------------------------
 
-    def __init__(self, name: str, data: Iterable, type_: ColumnType | None = None) -> None:
+    def __init__(self, name: str, data: Sequence[_T] | None = None) -> None:
+        """
+        Create a column.
+
+        Parameters
+        ----------
+        name : str
+            The name of the column.
+        data : Sequence[_T] | None
+            The data. If None, an empty column is created.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("test", [1, 2, 3])
+        """
+        if data is None:
+            data = []
+
         self._name: str = name
-        self._data: pd.Series = data if isinstance(data, pd.Series) else pd.Series(data)
+        self._data: pd.Series = data.rename(name) if isinstance(data, pd.Series) else pd.Series(data, name=name)
         # noinspection PyProtectedMember
-        self._type: ColumnType = type_ if type_ is not None else ColumnType._from_numpy_data_type(self._data.dtype)
+        self._type: ColumnType = ColumnType._from_numpy_data_type(self._data.dtype)
+
+    def __contains__(self, item: Any) -> bool:
+        return item in self._data
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, Column):
@@ -55,27 +116,39 @@ class Column:
             return True
         return self.name == other.name and self._data.equals(other._data)
 
-    def __getitem__(self, index: int) -> Any:
-        return self.get_value(index)
+    @overload
+    def __getitem__(self, index: int) -> _T:
+        ...
 
-    def __hash__(self) -> int:
-        return hash(self._data)
+    @overload
+    def __getitem__(self, index: slice) -> Column[_T]:
+        ...
 
-    def __iter__(self) -> Iterator[Any]:
+    def __getitem__(self, index: int | slice) -> _T | Column[_T]:
+        if isinstance(index, int):
+            if index < 0 or index >= self._data.size:
+                raise IndexOutOfBoundsError(index)
+            return self._data[index]
+
+        if isinstance(index, slice):
+            if index.start < 0 or index.start > self._data.size:
+                raise IndexOutOfBoundsError(index)
+            if index.stop < 0 or index.stop > self._data.size:
+                raise IndexOutOfBoundsError(index)
+            data = self._data[index].reset_index(drop=True).rename(self.name)
+            return Column._from_pandas_series(data, self._type)
+
+    def __iter__(self) -> Iterator[_T]:
         return iter(self._data)
 
     def __len__(self) -> int:
         return len(self._data)
 
     def __repr__(self) -> str:
-        tmp = self._data.to_frame()
-        tmp.columns = [self.name]
-        return tmp.__repr__()
+        return f"Column({self._name!r}, {list(self._data)!r})"
 
     def __str__(self) -> str:
-        tmp = self._data.to_frame()
-        tmp.columns = [self.name]
-        return tmp.__str__()
+        return f"{self._name!r}: {list(self._data)!r}"
 
     # ------------------------------------------------------------------------------------------------------------------
     # Properties
@@ -121,18 +194,18 @@ class Column:
     # Getters
     # ------------------------------------------------------------------------------------------------------------------
 
-    def get_unique_values(self) -> list[Any]:
+    def get_unique_values(self) -> list[_T]:
         """
         Return a list of all unique values in the column.
 
         Returns
         -------
-        unique_values : list[any]
+        unique_values : list[_T]
             List of unique values in the column.
         """
         return list(self._data.unique())
 
-    def get_value(self, index: int) -> Any:
+    def get_value(self, index: int) -> _T:
         """
         Return column value at specified index, starting at 0.
 
@@ -160,54 +233,51 @@ class Column:
     # Information
     # ------------------------------------------------------------------------------------------------------------------
 
-    def all(self, predicate: Callable[[Any], bool]) -> bool:
+    def all(self, predicate: Callable[[_T], bool]) -> bool:
         """
         Check if all values have a given property.
 
         Parameters
         ----------
-        predicate : Callable[[Any], bool])
+        predicate : Callable[[_T], bool])
             Callable that is used to find matches.
 
         Returns
         -------
         result : bool
             True if all match.
-
         """
         return all(predicate(value) for value in self._data)
 
-    def any(self, predicate: Callable[[Any], bool]) -> bool:
+    def any(self, predicate: Callable[[_T], bool]) -> bool:
         """
         Check if any value has a given property.
 
         Parameters
         ----------
-        predicate : Callable[[Any], bool])
+        predicate : Callable[[_T], bool])
             Callable that is used to find matches.
 
         Returns
         -------
         result : bool
             True if any match.
-
         """
         return any(predicate(value) for value in self._data)
 
-    def none(self, predicate: Callable[[Any], bool]) -> bool:
+    def none(self, predicate: Callable[[_T], bool]) -> bool:
         """
         Check if no values has a given property.
 
         Parameters
         ----------
-        predicate : Callable[[Any], bool])
+        predicate : Callable[[_T], bool])
             Callable that is used to find matches.
 
         Returns
         -------
         result : bool
             True if none match.
-
         """
         return all(not predicate(value) for value in self._data)
 
@@ -240,7 +310,7 @@ class Column:
         column : Column
             A new column with the new name.
         """
-        return Column(new_name, self._data, self._type)
+        return Column._from_pandas_series(self._data.rename(new_name), self._type)
 
     # ------------------------------------------------------------------------------------------------------------------
     # Statistics
@@ -257,8 +327,10 @@ class Column:
 
         Raises
         ------
-        TypeError
+        NonNumericColumnError
             If one of the columns is not numerical.
+        ColumnLengthMismatchError
+            If the columns have different lengths.
         """
         if not self._type.is_numeric() or not other_column._type.is_numeric():
             raise NonNumericColumnError(
@@ -274,7 +346,9 @@ class Column:
 
     def idness(self) -> float:
         r"""
-        Calculate the idness of this column, which we define as.
+        Calculate the idness of this column.
+
+        We define the idness as follows:
 
         $$
         \frac{\text{number of different values}}{\text{number of rows}}
@@ -368,31 +442,38 @@ class Column:
 
     def missing_value_ratio(self) -> float:
         """
-        Return the ratio of null values to the total number of elements in the column.
+        Return the ratio of missing values to the total number of elements in the column.
 
         Returns
         -------
         ratio : float
-            The ratio of null values to the total number of elements in the column.
+            The ratio of missing values to the total number of elements in the column.
+
+        Raises
+        ------
+        ColumnSizeError
+            If the column is empty.
         """
         if self._data.size == 0:
             raise ColumnSizeError("> 0", "0")
         return self._count_missing_values() / self._data.size
 
-    def mode(self) -> Any:
+    def mode(self) -> list[_T]:
         """
         Return the mode of the column.
 
         Returns
         -------
-        List :
+        mode: list[_T]
             Returns a list with the most common values.
         """
         return self._data.mode().tolist()
 
     def stability(self) -> float:
         r"""
-        Calculate the stability of this column, which we define as.
+        Calculate the stability of this column.
+
+        We define the stability as follows:
 
         $$
         \frac{\text{number of occurrences of most common non-null value}}{\text{number of non-null values}}
@@ -425,7 +506,6 @@ class Column:
         ------
         NonNumericColumnError
             If the data contains non-numerical data.
-
         """
         if not self.type.is_numeric():
             raise NonNumericColumnError(f"{self.name} is of type {self._type}.")
@@ -444,7 +524,6 @@ class Column:
         ------
         NonNumericColumnError
             If the data contains non-numerical data.
-
         """
         if not self.type.is_numeric():
             raise NonNumericColumnError(f"{self.name} is of type {self._type}.")
@@ -463,7 +542,6 @@ class Column:
         ------
         NonNumericColumnError
             If the data contains non-numerical data.
-
         """
         if not self.type.is_numeric():
             raise NonNumericColumnError(f"{self.name} is of type {self._type}.")
@@ -485,17 +563,11 @@ class Column:
 
         Raises
         ------
-        TypeError
-            If the column contains non-numerical data or complex data.
+        NonNumericColumnError
+            If the data contains non-numerical data.
         """
-        for data in self._data:
-            if not isinstance(data, int) and not isinstance(data, float) and not isinstance(data, complex):
-                raise NonNumericColumnError(self.name)
-            if isinstance(data, complex):
-                raise TypeError(
-                    "The column contains complex data. Boxplots cannot plot the imaginary part of complex "
-                    "data. Please provide a Column with only real numbers",
-                )
+        if not self.type.is_numeric():
+            raise NonNumericColumnError(f"{self.name} is of type {self._type}.")
 
         fig = plt.figure()
         ax = sns.boxplot(data=self._data)
@@ -535,23 +607,46 @@ class Column:
         return Image(buffer, ImageFormat.PNG)
 
     # ------------------------------------------------------------------------------------------------------------------
-    # IPython integration
+    # Conversion
     # ------------------------------------------------------------------------------------------------------------------
 
-    def _ipython_display_(self) -> DisplayHandle:
+    def to_html(self) -> str:
         """
-        Return a display object for the column to be used in Jupyter Notebooks.
+        Return an HTML representation of the column.
 
         Returns
         -------
-        output : DisplayHandle
-            Output object.
-        """
-        tmp = self._data.to_frame()
-        tmp.columns = [self.name]
+        output : str
+            The generated HTML.
 
-        with pd.option_context("display.max_rows", tmp.shape[0], "display.max_columns", tmp.shape[1]):
-            return display(tmp)
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("test", [1, 2, 3])
+        >>> html = column.to_html()
+        """
+        frame = self._data.to_frame()
+        frame.columns = [self.name]
+
+        return frame.to_html(max_rows=self._data.size, max_cols=1)
+
+    # ------------------------------------------------------------------------------------------------------------------
+    # IPython integration
+    # ------------------------------------------------------------------------------------------------------------------
+
+    def _repr_html_(self) -> str:
+        """
+        Return an HTML representation of the column.
+
+        Returns
+        -------
+        output : str
+            The generated HTML.
+        """
+        frame = self._data.to_frame()
+        frame.columns = [self.name]
+
+        return frame.to_html(max_rows=self._data.size, max_cols=1, notebook=True)
 
     # ------------------------------------------------------------------------------------------------------------------
     # Other
