@@ -7,7 +7,7 @@ license = "MIT"
 readme = "docs/README.md"
 repository = "https://github.com/Safe-DS/Stdlib"
 documentation = "https://safe-ds-stdlib.readthedocs.io"
-keywords = ["data science", "machine learning", "usability", "learnability"]
+keywords = ["data-science", "machine-learning", "usability", "learnability"]
 packages = [
     { include = "safeds", from = "src"},
 ]
@@ -45,6 +45,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.pytest.ini_options]
 filterwarnings = [
+    "ignore:Deprecated call to `pkg_resources.declare_namespace",
     "ignore:Jupyter is migrating its paths to use standard platformdirs"
 ]
 

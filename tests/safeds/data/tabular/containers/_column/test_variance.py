@@ -6,19 +6,17 @@ from safeds.data.tabular.exceptions import NonNumericColumnError
 @pytest.mark.parametrize(
     ("values", "expected"),
     [
-        ([1, 2, 3], 2),
-        ([1, 2, 3, 4], 2.5),
-        ([1, 2, 3, None], 2),
+        ([1, 2, 3], 1),
+        ([1, 2, 3, None], 1),
     ],
     ids=[
-        "odd number of values",
-        "even number of values",
+        "no missing values",
         "some missing values",
     ],
 )
-def test_should_return_the_median_value(values: list, expected: int) -> None:
+def test_should_return_variance(values: list, expected: int) -> None:
     column = Column("A", values)
-    assert column.median() == expected
+    assert column.variance() == expected
 
 
 @pytest.mark.parametrize(
@@ -37,4 +35,4 @@ def test_should_return_the_median_value(values: list, expected: int) -> None:
 def test_should_raise_if_column_is_not_numeric(values: list) -> None:
     column = Column("A", values)
     with pytest.raises(NonNumericColumnError):
-        column.median()
+        column.variance()

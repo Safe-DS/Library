@@ -32,6 +32,10 @@ class TestFromPandasDataFrame:
                 Schema({"A": String()}),
             ),
             (
+                pd.DataFrame({"A": [1, 2.0, "a", True]}),
+                Schema({"A": String()}),
+            ),
+            (
                 pd.DataFrame({"A": [1, 2, 3], "B": ["a", "b", "c"]}),
                 Schema({"A": Integer(), "B": String()}),
             ),
@@ -41,11 +45,30 @@ class TestFromPandasDataFrame:
             "real number",
             "string",
             "boolean",
+            "mixed",
             "multiple columns",
         ],
     )
     def test_should_create_schema_from_pandas_dataframe(self, dataframe: pd.DataFrame, expected: Schema) -> None:
         assert Schema._from_pandas_dataframe(dataframe) == expected
+
+
+class TestRepr:
+    @pytest.mark.parametrize(
+        ("schema", "expected"),
+        [
+            (Schema({}), "Schema({})"),
+            (Schema({"A": Integer()}), "Schema({'A': Integer})"),
+            (Schema({"A": Integer(), "B": String()}), "Schema({\n    'A': Integer,\n    'B': String\n})"),
+        ],
+        ids=[
+            "empty",
+            "single column",
+            "multiple columns",
+        ],
+    )
+    def test_should_create_a_string_representation(self, schema: Schema, expected: str) -> None:
+        assert repr(schema) == expected
 
 
 class TestStr:
@@ -62,7 +85,7 @@ class TestStr:
             "multiple columns",
         ],
     )
-    def test_should_create_a_printable_representation(self, schema: Schema, expected: str) -> None:
+    def test_should_create_a_string_representation(self, schema: Schema, expected: str) -> None:
         assert str(schema) == expected
 
 
@@ -194,22 +217,40 @@ class TestGetColumnNames:
         assert schema.column_names == expected
 
 
-class TestGetColumnIndex:
+class TestToDict:
     @pytest.mark.parametrize(
-        ("schema", "column_name", "expected"),
+        ("schema", "expected"),
         [
-            (Schema({"A": Integer()}), "A", 0),
-            (Schema({"A": Integer(), "B": RealNumber()}), "B", 1),
+            (Schema({}), {}),
+            (Schema({"A": Integer()}), {"A": Integer()}),
+            (Schema({"A": Integer(), "B": String()}), {"A": Integer(), "B": String()}),
         ],
         ids=[
+            "empty",
             "single column",
             "multiple columns",
         ],
     )
-    def test_should_return_column_index(self, schema: Schema, column_name: str, expected: int) -> None:
-        assert schema._get_column_index(column_name) == expected
+    def test_should_return_dict_for_schema(self, schema: Schema, expected: str) -> None:
+        assert schema.to_dict() == expected
 
-    def test_should_raise_if_column_does_not_exist(self) -> None:
-        schema = Schema({"A": Integer()})
-        with pytest.raises(UnknownColumnNameError):
-            schema._get_column_index("B")
+
+class TestReprMarkdown:
+    @pytest.mark.parametrize(
+        ("schema", "expected"),
+        [
+            (Schema({}), "Empty Schema"),
+            (Schema({"A": Integer()}), "| Column Name | Column Type |\n| --- | --- |\n| A | Integer |"),
+            (
+                Schema({"A": Integer(), "B": String()}),
+                "| Column Name | Column Type |\n| --- | --- |\n| A | Integer |\n| B | String |",
+            ),
+        ],
+        ids=[
+            "empty",
+            "single column",
+            "multiple columns",
+        ],
+    )
+    def test_should_create_a_string_representation(self, schema: Schema, expected: str) -> None:
+        assert schema._repr_markdown_() == expected

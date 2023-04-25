@@ -5,6 +5,21 @@ from safeds.data.tabular.transformation import Imputer
 from safeds.data.tabular.typing import ImputerStrategy
 
 
+class TestStrategy:
+    class TestStr:
+        @pytest.mark.parametrize(
+            ("strategy", "expected"),
+            [
+                (Imputer.Strategy.Constant(0), "Constant(0)"),
+                (Imputer.Strategy.Mean(), "Mean"),
+                (Imputer.Strategy.Median(), "Median"),
+                (Imputer.Strategy.Mode(), "Mode"),
+            ],
+        )
+        def test_should_return_correct_string_representation(self, strategy: ImputerStrategy, expected: str) -> None:
+            assert str(strategy) == expected
+
+
 class TestFit:
     def test_should_raise_if_column_not_found(self) -> None:
         table = Table.from_dict(

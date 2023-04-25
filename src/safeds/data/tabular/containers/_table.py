@@ -9,7 +9,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import seaborn as sns
-from IPython.core.display_functions import DisplayHandle, display
 from pandas import DataFrame
 from scipy import stats
 
@@ -339,15 +338,13 @@ class Table:
         UnknownColumnNameError
             If the specified target column name does not exist.
         """
-        if self._schema.has_column(column_name):
-            output_column = Column(
-                column_name,
-                self._data.iloc[:, [self._schema._get_column_index(column_name)]].squeeze(),
-                self._schema.get_column_type(column_name),
-            )
-            return output_column
+        if not self.has_column(column_name):
+            raise UnknownColumnNameError([column_name])
 
-        raise UnknownColumnNameError([column_name])
+        return Column._from_pandas_series(
+            self._data[column_name],
+            self.get_column_type(column_name),
+        )
 
     def has_column(self, column_name: str) -> bool:
         """
@@ -981,7 +978,7 @@ class Table:
         """
         if self.has_column(name):
             items: list = [transformer(item) for item in self.to_rows()]
-            result: Column = Column(name, pd.Series(items))
+            result: Column = Column(name, items)
             return self.replace_column(name, result)
         raise UnknownColumnNameError([name])
 
@@ -1237,6 +1234,23 @@ class Table:
         """
         return {column_name: list(self.get_column(column_name)) for column_name in self.column_names}
 
+    def to_html(self) -> str:
+        """
+        Return an HTML representation of the table.
+
+        Returns
+        -------
+        output : str
+            The generated HTML.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table
+        >>> table = Table.from_dict({"a": [1, 2, 3], "b": [4, 5, 6]})
+        >>> html = table.to_html()
+        """
+        return self._data.to_html(max_rows=self._data.shape[0], max_cols=self._data.shape[1])
+
     def to_columns(self) -> list[Column]:
         """
         Return a list of the columns.
@@ -1269,20 +1283,16 @@ class Table:
     # IPython integration
     # ------------------------------------------------------------------------------------------------------------------
 
-    def _ipython_display_(self) -> DisplayHandle:
+    def _repr_html_(self) -> str:
         """
-        Return a display object for the column to be used in Jupyter Notebooks.
+        Return an HTML representation of the table.
 
         Returns
         -------
-        output : DisplayHandle
-            Output object.
+        output : str
+            The generated HTML.
         """
-        tmp = self._data.copy(deep=True)
-        tmp.columns = self.column_names
-
-        with pd.option_context("display.max_rows", tmp.shape[0], "display.max_columns", tmp.shape[1]):
-            return display(tmp)
+        return self._data.to_html(max_rows=self._data.shape[0], max_cols=self._data.shape[1], notebook=True)
 
     # ------------------------------------------------------------------------------------------------------------------
     # Dataframe interchange protocol
