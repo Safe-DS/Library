@@ -334,13 +334,11 @@ class Column(Sequence[_T]):
         """
         if not self._type.is_numeric() or not other_column._type.is_numeric():
             raise NonNumericColumnError(
-                f"Columns must be numerical. {self.name} is {self._type}, "
-                f"{other_column.name} is {other_column._type}.",
+                f"Columns must be numerical. {self.name} is {self._type}, {other_column.name} is {other_column._type}.",
             )
         if self._data.size != other_column._data.size:
             raise ColumnLengthMismatchError(
-                f"{self.name} is of size {self._data.size}, "
-                f"{other_column.name} is of size {other_column._data.size}.",
+                f"{self.name} is of size {self._data.size}, {other_column.name} is of size {other_column._data.size}.",
             )
         return self._data.corr(other_column._data)
 
