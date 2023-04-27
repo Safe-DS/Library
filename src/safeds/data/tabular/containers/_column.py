@@ -110,6 +110,32 @@ class Column(Sequence[_T]):
         return item in self._data
 
     def __eq__(self, other: object) -> bool:
+        """
+        Check whether this column is equal to another object.
+
+        Parameters
+        ----------
+        other : object
+            The other object.
+
+        Returns
+        -------
+        equal : bool
+            True if the other object is an identical column. False if the other object is a different column.
+            NotImplemented if the other object is not a column.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> column1 = Column("test", [1, 2, 3])
+        >>> column2 = Column("test", [1, 2, 3])
+        >>> column1 == column2
+        True
+
+        >>> column3 = Column("test2", [3, 4, 5])
+        >>> column1 == column3
+        False
+        """
         if not isinstance(other, Column):
             return NotImplemented
         if self is other:
