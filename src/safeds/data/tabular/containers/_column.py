@@ -167,13 +167,13 @@ class Column(Sequence[_T]):
         return self._name
 
     @property
-    def n_rows(self) -> int:
+    def number_of_rows(self) -> int:
         """
         Return the number of elements in the column.
 
         Returns
         -------
-        n_rows : int
+        number_of_rows : int
             The number of elements.
         """
         return len(self._data)

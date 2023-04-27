@@ -10,5 +10,5 @@ from safeds.data.tabular.containers import Table
         (Table.from_dict({"col1": [], "col2": []}), 2),
     ],
 )
-def test_count_columns(table: Table, expected: int) -> None:
-    assert table.n_columns == expected
+def test_number_of_columns(table: Table, expected: int) -> None:
+    assert table.number_of_columns == expected
