@@ -132,7 +132,7 @@ class Column(Sequence[_T]):
         >>> column1 == column2
         True
 
-        >>> column3 = Column("test2", [3, 4, 5])
+        >>> column3 = Column("test", [3, 4, 5])
         >>> column1 == column3
         False
         """
@@ -151,6 +151,31 @@ class Column(Sequence[_T]):
         ...
 
     def __getitem__(self, index: int | slice) -> _T | Column[_T]:
+        """
+        Return the value of the specified row or rows.
+
+        Parameters
+        ----------
+        index : int | slice
+            The index of the row, or a slice indicing the rows.
+
+        Returns
+        -------
+        value : Any
+            The single row's value, or rows' values.
+
+        Raises
+        -------
+        IndexOutOfBoundsError
+            If the given index or idices do not exist in the column.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("test", [1, 2, 3])
+        >>> column[0]
+        1
+        """
         if isinstance(index, int):
             if index < 0 or index >= self._data.size:
                 raise IndexOutOfBoundsError(index)
@@ -165,15 +190,81 @@ class Column(Sequence[_T]):
             return Column._from_pandas_series(data, self._type)
 
     def __iter__(self) -> Iterator[_T]:
+        """
+        Create an iterator for the data of this column.
+
+        Returns
+        -------
+        iterator : Iterator[Any]
+            The iterator.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("test", [1, 2, 3])
+        >>> list(column)
+        [1, 2, 3]
+        """
         return iter(self._data)
 
     def __len__(self) -> int:
+        """
+        Return the size of the column.
+
+        Returns
+        -------
+        n_rows : int
+            The size of the column.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("test", [1, 2, 3])
+        >>> len(column)
+        3
+        """
         return len(self._data)
 
     def __repr__(self) -> str:
+        """
+        Return an unambiguous string representation of this column.
+
+        Returns
+        -------
+        representation : str
+            The string representation.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("test", [1, 2, 3])
+        >>> repr(column)
+                test
+            0     1
+            1     2
+            2     3
+        """
         return f"Column({self._name!r}, {list(self._data)!r})"
 
     def __str__(self) -> str:
+        """
+        Return a user-friendly string representation of this column.
+
+        Returns
+        -------
+        representation : str
+            The string representation.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("test", [1, 2, 3])
+        >>> str(column)
+                test
+            0     1
+            1     2
+            2     3
+        """
         return f"{self._name!r}: {list(self._data)!r}"
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -189,6 +280,13 @@ class Column(Sequence[_T]):
         -------
         name : str
             The name of the column.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("test", [1, 2, 3])
+        >>> column.name
+        test
         """
         return self._name
 
@@ -213,6 +311,17 @@ class Column(Sequence[_T]):
         -------
         type : ColumnType
             The type of the column.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("test", [1, 2, 3])
+        >>> column.type
+        Integer
+
+        >>> column = Column("test", ['a', 'b', 'c'])
+        >>> column.type
+        String
         """
         return self._type
 
@@ -228,6 +337,13 @@ class Column(Sequence[_T]):
         -------
         unique_values : list[_T]
             List of unique values in the column.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("test", [1, 2, 3, 2, 4, 3])
+        >>> column.get_unique_values()
+        [1, 2, 3, 4]
         """
         return list(self._data.unique())
 
@@ -249,6 +365,13 @@ class Column(Sequence[_T]):
         ------
         IndexOutOfBoundsError
             If the given index does not exist in the column.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("test", [1, 2, 3])
+        >>> column.get_value(1)
+        2
         """
         if index < 0 or index >= self._data.size:
             raise IndexOutOfBoundsError(index)
@@ -272,6 +395,16 @@ class Column(Sequence[_T]):
         -------
         result : bool
             True if all match.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("test", [1, 2, 3])
+        >>> column.all(lambda x: x < 4)
+        True
+
+        >>> column.all(lambda x: x < 2)
+        False
         """
         return all(predicate(value) for value in self._data)
 
@@ -288,6 +421,16 @@ class Column(Sequence[_T]):
         -------
         result : bool
             True if any match.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("test", [1, 2, 3])
+        >>> column.any(lambda x: x < 2)
+        True
+
+        >>> column.any(lambda x: x < 1)
+        False
         """
         return any(predicate(value) for value in self._data)
 
@@ -304,6 +447,17 @@ class Column(Sequence[_T]):
         -------
         result : bool
             True if none match.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> column1 = Column("test", [1, 2, 3])
+        >>> column1.none(lambda x: x < 1)
+        True
+
+        >>> column2 = Column("test", [1, 2, 3])
+        >>> column2.none(lambda x: x > 1)
+        False
         """
         return all(not predicate(value) for value in self._data)
 
@@ -315,6 +469,17 @@ class Column(Sequence[_T]):
         -------
         missing_values_exist : bool
             True if missing values exist.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> column1 = Column("test", [1, 2, 3, None])
+        >>> column1.has_missing_values()
+        True
+
+        >>> column2 = Column("test", [1, 2, 3])
+        >>> column2.has_missing_values()
+        False
         """
         return self.any(lambda value: value is None or (isinstance(value, Number) and np.isnan(value)))
 
@@ -335,6 +500,16 @@ class Column(Sequence[_T]):
         -------
         column : Column
             A new column with the new name.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("test", [1, 2, 3])
+        >>> new_column = column.rename("new name")
+            new name
+        0         1
+        1         2
+        2         3
         """
         return Column._from_pandas_series(self._data.rename(new_name), self._type)
 
@@ -357,6 +532,21 @@ class Column(Sequence[_T]):
             If one of the columns is not numerical.
         ColumnLengthMismatchError
             If the columns have different lengths.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> column1 = Column("test", [1, 2, 3])
+        >>> column2 = Column("test", [2, 4, 6])
+        >>> column1.correlation_with(column2)
+        >>> print(pearson)
+        1.0
+
+        >>> column1 = Column("test", [1, 2, 3])
+        >>> column2 = Column("test", [0.5, 4, -6])
+        >>> pearson = column1.correlation_with(column2)
+        >>> print(pearson)
+        -0.6404640308067906
         """
         if not self._type.is_numeric() or not other_column._type.is_numeric():
             raise NonNumericColumnError(
@@ -389,6 +579,17 @@ class Column(Sequence[_T]):
         ------
         ColumnSizeError
             If this column is empty.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> column1 = Column("test", [1, 2, 3])
+        >>> column1.idness()
+        1.0
+
+        >>> column2 = Column("test", [1, 2, 3, 2])
+        >>> column2.idness()
+        0.75
         """
         if self._data.size == 0:
             raise ColumnSizeError("> 0", "0")
@@ -407,6 +608,13 @@ class Column(Sequence[_T]):
         ------
         NonNumericColumnError
             If the data contains non-numerical data.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("test", [1, 2, 3])
+        >>> column.maximum()
+        3
         """
         if not self._type.is_numeric():
             raise NonNumericColumnError(f"{self.name} is of type {self._type}.")
@@ -425,6 +633,13 @@ class Column(Sequence[_T]):
         ------
         NonNumericColumnError
             If the data contains non-numerical data.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("test", [1, 2, 3])
+        >>> column.mean()
+        2.0
         """
         if not self._type.is_numeric():
             raise NonNumericColumnError(f"{self.name} is of type {self._type}.")
@@ -443,6 +658,18 @@ class Column(Sequence[_T]):
         ------
         NonNumericColumnError
             If the data contains non-numerical data.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("test", [1, 2, 3, 4])
+        >>> column.mean()
+        2.5
+
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("test", [1, 2, 3, 4, 5])
+        >>> column.mean()
+        3.0
         """
         if not self._type.is_numeric():
             raise NonNumericColumnError(f"{self.name} is of type {self._type}.")
@@ -461,6 +688,13 @@ class Column(Sequence[_T]):
         ------
         NonNumericColumnError
             If the data contains non-numerical data.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("test", [1, 2, 3, 4])
+        >>> column.minimum()
+        1
         """
         if not self._type.is_numeric():
             raise NonNumericColumnError(f"{self.name} is of type {self._type}.")
@@ -479,6 +713,17 @@ class Column(Sequence[_T]):
         ------
         ColumnSizeError
             If the column is empty.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> column1 = Column("test", [1, 2, 3, 4])
+        >>> column1.missing_value_ratio()
+        0.0
+
+        >>> column2 = Column("test", [1, 2, 3, None])
+        >>> column2.missing_value_ratio()
+        0.25
         """
         if self._data.size == 0:
             raise ColumnSizeError("> 0", "0")
@@ -492,6 +737,17 @@ class Column(Sequence[_T]):
         -------
         mode: list[_T]
             Returns a list with the most common values.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> column1 = Column("test", [1, 2, 3, 3, 4])
+        >>> column1.mode()
+        [3]
+
+        >>> column2 = Column("test", [1, 2, 3, 3, 4, 4])
+        >>> column2.mode()
+        [3, 4]
         """
         return self._data.mode().tolist()
 
@@ -514,6 +770,17 @@ class Column(Sequence[_T]):
         ------
         ColumnSizeError
             If the column is empty.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> column1 = Column("test", [1, 1, 2, 3])
+        >>> column1.stability()
+        0.5
+
+        >>> column2 = Column("test", [1, 2, 2, 2, 3])
+        >>> column2.stability()
+        0.6
         """
         if self._data.size == 0:
             raise ColumnSizeError("> 0", "0")
@@ -532,6 +799,17 @@ class Column(Sequence[_T]):
         ------
         NonNumericColumnError
             If the data contains non-numerical data.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> column1 = Column("test", [1, 2, 3])
+        >>> column1.standard_deviation()
+        1.0
+
+        >>> column2 = Column("test", [1, 2, 4, 8, 16])
+        >>> column2.standard_deviation()
+        6.099180272790763
         """
         if not self.type.is_numeric():
             raise NonNumericColumnError(f"{self.name} is of type {self._type}.")
@@ -550,6 +828,13 @@ class Column(Sequence[_T]):
         ------
         NonNumericColumnError
             If the data contains non-numerical data.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("test", [1, 2, 3])
+        >>> column.sum()
+        6
         """
         if not self.type.is_numeric():
             raise NonNumericColumnError(f"{self.name} is of type {self._type}.")
@@ -568,6 +853,13 @@ class Column(Sequence[_T]):
         ------
         NonNumericColumnError
             If the data contains non-numerical data.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("test", [1, 2, 3, 4, 5])
+        >>> column.variance()
+        2.5
         """
         if not self.type.is_numeric():
             raise NonNumericColumnError(f"{self.name} is of type {self._type}.")
