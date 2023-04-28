@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from collections import defaultdict
+
 import pandas as pd
 from sklearn.preprocessing import OneHotEncoder as sk_OneHotEncoder
 
@@ -53,6 +55,15 @@ class OneHotEncoder(InvertibleTableTransformer):
             column: [f"{column}_{element}" for element in table.get_column(column).get_unique_values()]
             for column in column_names
         }
+
+        orig_names_dict = defaultdict(list)
+        for original_column_name, new_column_names in result._column_names.items():
+            for new_column_name in new_column_names:
+                orig_names_dict[new_column_name] += [original_column_name]
+
+        for new_column_name, original_column_names in orig_names_dict.items():
+            if len(original_column_names) > 1:
+                []
 
         return result
 
