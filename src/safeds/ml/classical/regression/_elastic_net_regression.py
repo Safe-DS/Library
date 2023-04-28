@@ -35,7 +35,7 @@ class ElasticNetRegression(Regressor):
 
     def __init__(self, alpha: float = 1.0, lasso_ratio: float = 0.5) -> None:
         if alpha < 0:
-            raise ValueError("alpha must be positive")
+            raise ValueError("alpha must be non-negative")
         if alpha == 0:
             warn(
                 (
