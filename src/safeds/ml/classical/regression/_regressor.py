@@ -92,7 +92,7 @@ class Regressor(ABC):
         Raises
         ------
         UntaggedTableError
-            If the table is untagged
+            If the table is untagged.
         """
         if not isinstance(validation_or_test_set, TaggedTable) and isinstance(validation_or_test_set, Table):
             raise UntaggedTableError
@@ -120,7 +120,7 @@ class Regressor(ABC):
         Raises
         ------
         UntaggedTableError
-            If the table is untagged
+            If the table is untagged.
         """
         if not isinstance(validation_or_test_set, TaggedTable) and isinstance(validation_or_test_set, Table):
             raise UntaggedTableError
