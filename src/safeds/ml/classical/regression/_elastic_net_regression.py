@@ -21,11 +21,9 @@ class ElasticNetRegression(Regressor):
     ----------
     alpha : float
         Controls the regularization of the model. The higher the value, the more regularized it becomes.
-
     lasso_ratio: float
-        Number between 0 and 1 that controls the ratio between Lasso- and Ridge regularization.
-        lasso_ratio=0 is essentially RidgeRegression
-        lasso_ratio=1 is essentially LassoRegression
+        Number between 0 and 1 that controls the ratio between Lasso and Ridge regularization. If 0, only Ridge
+        regularization is used. If 1, only Lasso regularization is used.
 
     Raises
     ------
