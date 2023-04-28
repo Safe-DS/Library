@@ -23,7 +23,7 @@ class ElasticNetRegression(Regressor):
         Controls the regularization of the model. The higher the value, the more regularized it becomes.
 
     lasso_ratio: float
-        Number between 0 and 1 that controls the ratio between Lasso- and Ridge Regression.
+        Number between 0 and 1 that controls the ratio between Lasso- and Ridge regularization.
         lasso_ratio=0 is essentially RidgeRegression
         lasso_ratio=1 is essentially LassoRegression
 
@@ -56,7 +56,7 @@ class ElasticNetRegression(Regressor):
                     "ElasticNetRegression with lasso_ratio = 0 is essentially RidgeRegression."
                     " Use RidgeRegression instead for better numerical stability."
                 ),
-                stacklevel=1,
+                stacklevel=2,
             )
         elif lasso_ratio == 1:
             warnings.warn(
@@ -64,7 +64,7 @@ class ElasticNetRegression(Regressor):
                     "ElasticNetRegression with lasso_ratio = 0 is essentially LassoRegression."
                     " Use LassoRegression instead for better numerical stability."
                 ),
-                stacklevel=1,
+                stacklevel=2,
             )
         self.lasso_ratio = lasso_ratio
 
