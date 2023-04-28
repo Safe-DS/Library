@@ -13,12 +13,22 @@ if TYPE_CHECKING:
 
 
 class AdaBoost(Classifier):
-    """Ada Boost classification."""
+    """Ada Boost classification.
 
-    def __init__(self) -> None:
+    Parameters
+    ----------
+    learning_rate : float
+        Weight applied to each classifier at each boosting iteration.
+        A higher learning rate increases the contribution of each classifier.
+    """
+
+    def __init__(self, learning_rate=1.0) -> None:
         self._wrapped_classifier: sk_AdaBoostClassifier | None = None
         self._feature_names: list[str] | None = None
         self._target_name: str | None = None
+        if learning_rate <= 0:
+            raise ValueError("learning_rate must be positive.")
+        self._learning_rate = learning_rate
 
     def fit(self, training_set: TaggedTable) -> AdaBoost:
         """
@@ -41,10 +51,10 @@ class AdaBoost(Classifier):
         LearningError
             If the training data contains invalid values or if the training failed.
         """
-        wrapped_classifier = sk_AdaBoostClassifier()
+        wrapped_classifier = sk_AdaBoostClassifier(learning_rate=self._learning_rate)
         fit(wrapped_classifier, training_set)
 
-        result = AdaBoost()
+        result = AdaBoost(learning_rate=self._learning_rate)
         result._wrapped_classifier = wrapped_classifier
         result._feature_names = training_set.features.column_names
         result._target_name = training_set.target.name
