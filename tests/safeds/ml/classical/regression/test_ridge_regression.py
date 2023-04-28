@@ -11,7 +11,10 @@ def test_ridge_regression_invalid() -> None:
 def test_ridge_regression_warning() -> None:
     with pytest.warns(
         UserWarning,
-        match=("Setting alpha to zero makes this model equivalent to LinearRegression. You should use LinearRegression instead for better numerical stability."),
+        match=(
+            "Setting alpha to zero makes this model equivalent to LinearRegression. You should use LinearRegression"
+            " instead for better numerical stability."
+        ),
     ):
         RidgeRegression(alpha=0.0)
 

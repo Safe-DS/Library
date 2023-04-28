@@ -36,7 +36,14 @@ class RidgeRegression(Regressor):
         if self.alpha < 0:
             raise ValueError("alpha must be positive")
         if self.alpha == 0.0:
-            warnings.warn("Setting alpha to zero makes this model equivalent to LinearRegression. You should use LinearRegression instead for better numerical stability.", UserWarning, stacklevel=2)
+            warnings.warn(
+                (
+                    "Setting alpha to zero makes this model equivalent to LinearRegression. You should use"
+                    " LinearRegression instead for better numerical stability."
+                ),
+                UserWarning,
+                stacklevel=2,
+            )
 
     def fit(self, training_set: TaggedTable) -> RidgeRegression:
         """
