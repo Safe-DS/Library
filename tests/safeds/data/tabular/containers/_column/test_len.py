@@ -1,6 +1,19 @@
+import pytest
 from safeds.data.tabular.containers import Column
 
 
-def test_count_valid() -> None:
-    column = Column("col1", [1, 2, 3, 4, 5])
-    assert len(column) == 5
+@pytest.mark.parametrize(
+    ("column", "expected"),
+    [
+        (Column("a", []), 0),
+        (Column("a", [0]), 1),
+        (Column("a", [0, "1"]), 2),
+    ],
+    ids=[
+        "empty",
+        "one row",
+        "multiple rows",
+    ],
+)
+def test_should_return_the_number_of_rows(column: Column, expected: int) -> None:
+    assert len(column) == expected

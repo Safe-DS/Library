@@ -12,7 +12,7 @@ def test_remove_rows_with_missing_values_valid() -> None:
         },
     )
     updated_table = table.remove_rows_with_missing_values()
-    assert updated_table.n_rows == 2
+    assert updated_table.number_of_rows == 2
 
 
 def test_remove_rows_with_missing_values_empty() -> None:

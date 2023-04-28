@@ -3,7 +3,7 @@ from __future__ import annotations
 from collections.abc import Mapping
 from typing import TYPE_CHECKING, Any
 
-import polars as pl
+import pandas as pd
 
 from safeds.data.tabular.exceptions import UnknownColumnNameError
 from safeds.data.tabular.typing import ColumnType, Schema
@@ -54,13 +54,13 @@ class Row(Mapping[str, Any]):
         return Row(data)
 
     @staticmethod
-    def _from_polars_dataframe(data: pl.DataFrame, schema: Schema | None = None) -> Row:
+    def _from_pandas_dataframe(data: pd.DataFrame, schema: Schema | None = None) -> Row:
         """
-        Create a row from a `polars.DataFrame`.
+        Create a row from a `pandas.DataFrame`.
 
         Parameters
         ----------
-        data : polars.DataFrame
+        data : pd.DataFrame
             The data.
         schema : Schema | None
             The schema. If None, the schema is inferred from the data.
@@ -72,16 +72,18 @@ class Row(Mapping[str, Any]):
 
         Examples
         --------
-        >>> import polars as pl
+        >>> import pandas as pd
         >>> from safeds.data.tabular.containers import Row
-        >>> row = Row._from_polars_dataframe(pl.DataFrame({"a": [1], "b": [2]}))
+        >>> row = Row._from_pandas_dataframe(pd.DataFrame({"a": [1], "b": [2]}))
         """
+        data = data.reset_index(drop=True)
+
         result = object.__new__(Row)
         result._data = data
 
         if schema is None:
             # noinspection PyProtectedMember
-            result._schema = Schema._from_polars_dataframe(data)
+            result._schema = Schema._from_pandas_dataframe(data)
         else:
             result._schema = schema
 
@@ -108,9 +110,11 @@ class Row(Mapping[str, Any]):
         if data is None:
             data = {}
 
-        self._data: pl.DataFrame = pl.DataFrame(data)
+        data = {key: [value] for key, value in data.items()}
+
+        self._data: pd.DataFrame = pd.DataFrame(data)
         # noinspection PyProtectedMember
-        self._schema: Schema = Schema._from_polars_dataframe(self._data)
+        self._schema: Schema = Schema._from_pandas_dataframe(self._data)
 
     def __contains__(self, obj: Any) -> bool:
         """
@@ -169,7 +173,7 @@ class Row(Mapping[str, Any]):
             return NotImplemented
         if self is other:
             return True
-        return self._schema == other._schema and self._data.frame_equal(other._data)
+        return self._schema == other._schema and self._data.equals(other._data)
 
     def __getitem__(self, column_name: str) -> Any:
         """
@@ -223,7 +227,7 @@ class Row(Mapping[str, Any]):
 
         Returns
         -------
-        n_columns : int
+        number_of_columns : int
             The number of columns.
 
         Examples
@@ -233,7 +237,7 @@ class Row(Mapping[str, Any]):
         >>> len(row)
         2
         """
-        return self._data.width
+        return self._data.shape[1]
 
     def __repr__(self) -> str:
         """
@@ -303,23 +307,23 @@ class Row(Mapping[str, Any]):
         return self._schema.column_names
 
     @property
-    def n_columns(self) -> int:
+    def number_of_column(self) -> int:
         """
         Return the number of columns in this row.
 
         Returns
         -------
-        n_columns : int
+        number_of_column : int
             The number of columns.
 
         Examples
         --------
         >>> from safeds.data.tabular.containers import Row
         >>> row = Row({"a": 1, "b": 2})
-        >>> row.n_columns
+        >>> row.number_of_column
         2
         """
-        return self._data.width
+        return self._data.shape[1]
 
     @property
     def schema(self) -> Schema:
@@ -372,7 +376,7 @@ class Row(Mapping[str, Any]):
         if not self.has_column(column_name):
             raise UnknownColumnNameError([column_name])
 
-        return self._data[0, column_name]
+        return self._data.loc[0, column_name]
 
     def has_column(self, column_name: str) -> bool:
         """
@@ -450,6 +454,23 @@ class Row(Mapping[str, Any]):
         """
         return {column_name: self.get_value(column_name) for column_name in self.column_names}
 
+    def to_html(self) -> str:
+        """
+        Return an HTML representation of the row.
+
+        Returns
+        -------
+        output : str
+            The generated HTML.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Row
+        >>> row = Row({"a": 1, "b": 2})
+        >>> html = row.to_html()
+        """
+        return self._data.to_html(max_rows=1, max_cols=self._data.shape[1])
+
     # ------------------------------------------------------------------------------------------------------------------
     # IPython integration
     # ------------------------------------------------------------------------------------------------------------------
@@ -463,5 +484,4 @@ class Row(Mapping[str, Any]):
         output : str
             The generated HTML.
         """
-        # noinspection PyProtectedMember
-        return self._data._repr_html_()
+        return self._data.to_html(max_rows=1, max_cols=self._data.shape[1], notebook=True)
