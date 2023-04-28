@@ -22,6 +22,6 @@ def test_should_create_table_from_json_file(path: str | Path) -> None:
     ["test_table_from_json_file_invalid.json", Path("test_table_from_json_file_invalid.json")],
     ids=["by string", "by path"]
 )
-def test_raise_FileNotFoundError(path: str | Path) -> None:
+def test_should_raise_FileNotFoundError(path: str | Path) -> None:
     with pytest.raises(FileNotFoundError):
         Table.from_json_file(resolve_resource_path(path))

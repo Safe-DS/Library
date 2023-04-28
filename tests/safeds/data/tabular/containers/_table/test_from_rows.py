@@ -14,13 +14,13 @@ from safeds.data.tabular.typing import Schema, Integer, String
     ],
     ids=["empty"]
 )
-def test_from_rows(table: Table, expected: Table) -> None:
+def test_should_create_table_from_rows(table: Table, expected: Table) -> None:
     rows_is = expected.to_rows()
     table_is = Table.from_rows(rows_is)
 
     assert table_is == expected
 
 
-def test_from_rows_invalid() -> None:
+def test_should_raise_MissingDataError() -> None:
     with pytest.raises(MissingDataError):
         Table.from_rows([])
