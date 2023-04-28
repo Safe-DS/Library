@@ -1,3 +1,5 @@
+from typing import Any
+
 import pytest
 from safeds.data.tabular.containers import Column
 from safeds.data.tabular.exceptions import ColumnSizeError
@@ -5,15 +7,23 @@ from safeds.data.tabular.exceptions import ColumnSizeError
 
 @pytest.mark.parametrize(
     ("values", "result"),
-    [(["A", "B"], 1), (["A", "A", "A", "B"], 0.5)],
+    [
+        (["A", "B"], 1),
+        (["A", "A", "A", "B"], 0.5),
+        (["A", "A", "A", "A"], 0.25),
+    ],
+    ids=[
+        "all unique values",
+        "some unique values",
+        "all same values",
+    ],
 )
-def test_idness_valid(values: list[str], result: float) -> None:
-    column = Column("test_idness_valid", values)
-    idness = column.idness()
-    assert idness == result
+def test_should_return_idness_of_column(values: list[str], result: float) -> None:
+    column = Column("A", values)
+    assert column.idness() == result
 
 
-def test_idness_invalid() -> None:
-    column = Column("test_idness_invalid", [])
+def test_should_raise_if_column_is_empty() -> None:
+    column: Column[Any] = Column("A", [])
     with pytest.raises(ColumnSizeError):
         column.idness()

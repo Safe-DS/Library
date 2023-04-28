@@ -17,6 +17,7 @@ from safeds.ml.classical.regression import (
     RandomForest,
     Regressor,
     RidgeRegression,
+    SupportVectorMachine,
 )
 
 # noinspection PyProtectedMember
@@ -55,6 +56,7 @@ def regressors() -> list[Regressor]:
         LinearRegression(),
         RandomForest(),
         RidgeRegression(),
+        SupportVectorMachine(),
     ]
 
 

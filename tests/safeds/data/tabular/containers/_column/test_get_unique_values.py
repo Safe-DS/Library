@@ -11,10 +11,19 @@ if TYPE_CHECKING:
 
 @pytest.mark.parametrize(
     ("values", "unique_values"),
-    [([1, 1, 2, 3], [1, 2, 3]), (["a", "b", "b", "c"], ["a", "b", "c"]), ([], [])],
+    [
+        ([], []),
+        ([1, 2, 3], [1, 2, 3]),
+        ([1, 1, 2, 3], [1, 2, 3]),
+        (["a", "b", "b", "c"], ["a", "b", "c"]),
+    ],
+    ids=[
+        "empty",
+        "no duplicates",
+        "integer duplicates",
+        "string duplicates",
+    ],
 )
-def test_get_unique_values(values: list[Any], unique_values: list[Any]) -> None:
+def test_should_list_unique_values(values: list[Any], unique_values: list[Any]) -> None:
     column: Column = Column("", values)
-    extracted_unique_values = column.get_unique_values()
-
-    assert extracted_unique_values == unique_values
+    assert column.get_unique_values() == unique_values
