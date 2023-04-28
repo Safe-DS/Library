@@ -32,8 +32,13 @@ class LassoRegression(Regressor):
             raise ValueError("alpha must be non-negative")
         if alpha == 0:
             warn(
-                "Setting alpha to zero makes this model equivalent to LinearRegression. You should use "
-                "LinearRegression instead for better numerical stability.", UserWarning, stacklevel=1)
+                (
+                    "Setting alpha to zero makes this model equivalent to LinearRegression. You should use "
+                    "LinearRegression instead for better numerical stability."
+                ),
+                UserWarning,
+                stacklevel=1,
+            )
         self._alpha = alpha
         self._wrapped_regressor: sk_Lasso | None = None
         self._feature_names: list[str] | None = None
