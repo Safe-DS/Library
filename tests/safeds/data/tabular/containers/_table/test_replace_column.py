@@ -48,7 +48,7 @@ from safeds.data.tabular.exceptions import (
         ),
     ],
 )
-def test_replace_valid(table: Table, column_name: str, column: Column, expected: Table) -> None:
+def test_should_replace_column(table: Table, column_name: str, column: Column, expected: Table) -> None:
     result = table.replace_column(column_name, column)
     assert result == expected
 
@@ -60,8 +60,9 @@ def test_replace_valid(table: Table, column_name: str, column: Column, expected:
         ("C", ["d", "e", "f"], "B", DuplicateColumnNameError),
         ("C", ["d", "e"], "D", ColumnSizeError),
     ],
+    ids=["UnknownColumnNameError", "DuplicateColumnNameError", "ColumnSizeError"],
 )
-def test_replace_invalid(
+def test_should_raise_error(
     old_column_name: str,
     column_values: list[str],
     column_name: str,
