@@ -96,13 +96,15 @@ class TestFit:
 
     @pytest.mark.parametrize(
         "table",
-        [Table.from_dict(
-            {
-                "a": [1.0, 0.0, 0.0, 0.0],
-                "b": [0.0, 1.0, 1.0, 0.0],
-                "c": [0.0, 0.0, 0.0, 1.0],
-            },
-        )],
+        [
+            Table.from_dict(
+                {
+                    "a": [1.0, 0.0, 0.0, 0.0],
+                    "b": [0.0, 1.0, 1.0, 0.0],
+                    "c": [0.0, 0.0, 0.0, 1.0],
+                },
+            ),
+        ],
         ids=["untagged_table"],
     )
     def test_should_raise_if_table_is_not_tagged(self, classifier: Classifier, table: Table) -> None:
@@ -219,13 +221,15 @@ class TestAccuracy:
 
     @pytest.mark.parametrize(
         "table",
-        [Table.from_dict(
-            {
-                "a": [1.0, 0.0, 0.0, 0.0],
-                "b": [0.0, 1.0, 1.0, 0.0],
-                "c": [0.0, 0.0, 0.0, 1.0],
-            },
-        )],
+        [
+            Table.from_dict(
+                {
+                    "a": [1.0, 0.0, 0.0, 0.0],
+                    "b": [0.0, 1.0, 1.0, 0.0],
+                    "c": [0.0, 0.0, 0.0, 1.0],
+                },
+            ),
+        ],
         ids=["untagged_table"],
     )
     def test_should_raise_if_table_is_not_tagged(self, table: Table) -> None:
