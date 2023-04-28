@@ -169,8 +169,8 @@ class Table:
 
         Examples
         --------
-        from safeds.data.tabular.containers import Table
-        from safeds.data.tabular.containers import Column
+        >>> from safeds.data.tabular.containers import Table
+        >>> from safeds.data.tabular.containers import Column
         >>> column1 = Column("column1", [1, 2, 3])
         >>> column2 = Column("column2", ['a', 'b', 'c'])
         >>> table = Table.from_columns([column1, column2])
