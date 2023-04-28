@@ -13,12 +13,27 @@ if TYPE_CHECKING:
 
 
 class GradientBoosting(Classifier):
-    """Gradient boosting classification."""
+    """Gradient boosting classification.
 
-    def __init__(self) -> None:
+    Parameters
+    ----------
+    learning_rate : float
+        The larger the value, the more the model is influenced by each additional tree. If the learning rate is too
+        low, the model might underfit. If the learning rate is too high, the model might overfit.
+
+    Raises
+    ------
+    ValueError
+        If `learning_rate` is non-positive.
+    """
+
+    def __init__(self, learning_rate: float = 0.1) -> None:
         self._wrapped_classifier: sk_GradientBoostingClassifier | None = None
         self._feature_names: list[str] | None = None
         self._target_name: str | None = None
+        if learning_rate <= 0:
+            raise ValueError("learning_rate must be positive.")
+        self._learning_rate = learning_rate
 
     def fit(self, training_set: TaggedTable) -> GradientBoosting:
         """
@@ -41,10 +56,10 @@ class GradientBoosting(Classifier):
         LearningError
             If the training data contains invalid values or if the training failed.
         """
-        wrapped_classifier = sk_GradientBoostingClassifier()
+        wrapped_classifier = sk_GradientBoostingClassifier(learning_rate=self._learning_rate)
         fit(wrapped_classifier, training_set)
 
-        result = GradientBoosting()
+        result = GradientBoosting(learning_rate=self._learning_rate)
         result._wrapped_classifier = wrapped_classifier
         result._feature_names = training_set.features.column_names
         result._target_name = training_set.target.name
