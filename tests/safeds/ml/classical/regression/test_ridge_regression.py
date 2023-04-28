@@ -9,7 +9,7 @@ def test_ridge_regression_invalid() -> None:
 
 
 def test_ridge_regression_warning() -> None:
-    with pytest.warns():
+    with pytest.warns(UserWarning, match="RidgeRegression with alpha 0 performs the exact way as LinearRegression. Please use LinearRegression instead."):
         RidgeRegression(alpha=0.0)
 
 
