@@ -37,5 +37,5 @@ def test_plot_boxplot_legacy() -> None:
     # table.get_column("A").plot_boxplot().to_png_file(resolve_resource_path("./image/snapshot_boxplot.png"))
     table.get_column("A").plot_boxplot()
     current = table.get_column("A").plot_boxplot()
-    legacy = Image.from_png_file(resolve_resource_path("./image/snapshot_boxplot.png"))
+    snapshot = Image.from_png_file(resolve_resource_path("./image/snapshot_boxplot.png"))
     assert legacy._image.tobytes() == current._image.tobytes()
