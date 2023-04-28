@@ -12,6 +12,7 @@ from safeds.ml.classical.classification import (
     KNearestNeighbors,
     LogisticRegression,
     RandomForest,
+    SupportVectorMachine,
 )
 from safeds.ml.exceptions import (
     DatasetContainsTargetError,
@@ -38,7 +39,15 @@ def classifiers() -> list[Classifier]:
     classifiers : list[Classifier]
         The list of classifiers to test.
     """
-    return [AdaBoost(), DecisionTree(), GradientBoosting(), KNearestNeighbors(2), LogisticRegression(), RandomForest()]
+    return [
+        AdaBoost(),
+        DecisionTree(),
+        GradientBoosting(),
+        KNearestNeighbors(2),
+        LogisticRegression(),
+        RandomForest(),
+        SupportVectorMachine(),
+    ]
 
 
 @pytest.fixture()

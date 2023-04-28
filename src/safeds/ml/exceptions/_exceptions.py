@@ -32,15 +32,12 @@ class LearningError(Exception):
 
     Parameters
     ----------
-    reason: str | None
+    reason: str
         The reason for the error.
     """
 
-    def __init__(self, reason: str | None):
-        if reason is None:
-            super().__init__("Error occurred while learning")
-        else:
-            super().__init__(f"Error occurred while learning: {reason}")
+    def __init__(self, reason: str):
+        super().__init__(f"Error occurred while learning: {reason}")
 
 
 class ModelNotFittedError(Exception):
@@ -56,15 +53,12 @@ class PredictionError(Exception):
 
     Parameters
     ----------
-    reason: str | None
+    reason: str
         The reason for the error.
     """
 
-    def __init__(self, reason: str | None):
-        if reason is None:
-            super().__init__("Error occurred while predicting")
-        else:
-            super().__init__(f"Error occurred while predicting: {reason}")
+    def __init__(self, reason: str):
+        super().__init__(f"Error occurred while predicting: {reason}")
 
 
 class UntaggedTableError(Exception):
