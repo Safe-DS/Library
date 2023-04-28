@@ -19,7 +19,14 @@ def test_should_warn_if_alpha_is_zero() -> None:
         RidgeRegression(alpha=0.0)
 
 
-def test_should_pass_if_alpha_is_passed_to_fitted_regressor() -> None:
-    regression = RidgeRegression(alpha=1.0)
-    fitted_regression = regression.fit(Table.from_dict({"A": [1, 2, 4], "B": [1, 2, 3]}).tag_columns("B"))
-    assert regression.alpha == fitted_regression.alpha
+def test_should_pass_alpha_to_fitted_regressor() -> None:
+    regressor = RidgeRegression(alpha=1.0)
+    fitted_regressor = regressor.fit(Table.from_dict({"A": [1, 2, 4], "B": [1, 2, 3]}).tag_columns("B"))
+    assert regressor.alpha == fitted_regressor.alpha
+
+
+def test_should_pass_alpha_to_sklearn() -> None:
+    regressor = RidgeRegression(alpha=1.0)
+    fitted_regressor = regressor.fit(Table.from_dict({"A": [1, 2, 4], "B": [1, 2, 3]}).tag_columns("B"))
+    assert fitted_regressor._wrapped_regressor is not None
+    assert fitted_regressor._wrapped_regressor.alpha == fitted_regressor.alpha
