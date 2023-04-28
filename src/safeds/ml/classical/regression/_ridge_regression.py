@@ -20,7 +20,7 @@ class RidgeRegression(Regressor):
     Parameters
     ----------
     alpha : float
-        Controls the regularization strength. Has to be greater than or equal to 0.
+        Controls the regularization of the model. The higher the value, the more regularized it becomes.
 
     Raises
     ------
@@ -34,12 +34,12 @@ class RidgeRegression(Regressor):
         self._target_name: str | None = None
         self.alpha = alpha
         if self.alpha < 0:
-            raise ValueError("alpha must be positive")
+            raise ValueError("alpha must be non-negative")
         if self.alpha == 0.0:
             warnings.warn(
                 (
-                    "Setting alpha to zero makes this model equivalent to LinearRegression. You should use"
-                    " LinearRegression instead for better numerical stability."
+                    "Setting alpha to zero makes this model equivalent to LinearRegression. You should use "
+                    "LinearRegression instead for better numerical stability."
                 ),
                 UserWarning,
                 stacklevel=2,
