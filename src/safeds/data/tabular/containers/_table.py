@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING, Any
 
 import matplotlib.pyplot as plt
 import numpy as np
+import openpyxl
 import pandas as pd
 import polars as pl
 import seaborn as sns
@@ -87,13 +88,13 @@ class Table:
             raise FileNotFoundError(f'File "{path}" does not exist') from exception
 
     @staticmethod
-    def from_excel_file(path: str) -> Table:
+    def from_excel_file(path: str | Path) -> Table:
         """
         Read data from an Excel file into a table.
 
         Parameters
         ----------
-        path : str
+        path : str | Path
             The path to the Excel file.
 
         Returns
@@ -1235,26 +1236,30 @@ class Table:
         data_to_csv.columns = self._schema.column_names
         data_to_csv.to_csv(path, index=False)
 
-    def to_excel_file(self, path: str) -> None:
+    def to_excel_file(self, path: str | Path) -> None:
         """
-        Write the data from the table into a Excel file.
+        Write the data from the table into an Excel file.
 
         If the file and/or the directories do not exist, they will be created. If the file already exists it will be
         overwritten.
 
         Parameters
         ----------
-        path : str
+        path : str | Path
             The path to the output file.
         """
+        #Create Excel metadata in the file
+        tmp_table_file = openpyxl.Workbook()
+        tmp_table_file.save(path)
+
         Path(path).parent.mkdir(parents=True, exist_ok=True)
         data_to_excel = self._data.copy()
         data_to_excel.columns = self._schema.column_names
         data_to_excel.to_excel(path)
 
-    def to_excel_file(self, path: str) -> None:
+    def to_excel_file(self, path: str | Path) -> None:
         """
-        Write the data from the table into a Excel file.
+        Write the data from the table into an Excel file.
 
         If the file and/or the directories do not exist, they will be created. If the file already exists it will be
         overwritten.

@@ -1,15 +1,20 @@
 from pathlib import Path
 
 import openpyxl
+import pytest
 from safeds.data.tabular.containers import Table
 
 
-def test_to_excel_file() -> None:
+@pytest.mark.parametrize(
+    ("path"),
+    [
+        "./temp_excel_file.xlsx",
+        Path("./temp_excel_file.xlsx")
+    ],
+    ids=["string path", "object path"],
+)
+def test_to_excel_file(path) -> None:
     table = Table.from_dict({"col1": ["col1_1"], "col2": ["col2_1"]})
-    path = "./test.xlsx"
-
-    tmp_table_file = openpyxl.Workbook()
-    tmp_table_file.save(path)
     try:
         with Path(path).open("w", encoding="utf-8") as _:
             table.to_excel_file(path)
