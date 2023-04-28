@@ -1,7 +1,8 @@
 import _pytest
 import matplotlib.pyplot as plt
-from safeds.data.tabular.containers import Table
 from safeds.data.image.containers import Image
+from safeds.data.tabular.containers import Table
+
 from tests.helpers import resolve_resource_path
 
 
