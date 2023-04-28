@@ -173,7 +173,7 @@ class Table:
         >>> from safeds.data.tabular.containers import Column
         >>> column1 = Column("column1", [1, 2, 3])
         >>> column2 = Column("column2", ['a', 'b', 'c'])
-        >>> table = Table.from_columns([column1, column2])
+        >>> Table.from_columns([column1, column2])
             column1 column2
         0      1     a
         1      2     b
@@ -211,6 +211,17 @@ class Table:
             If an empty list is given.
         SchemaMismatchError
             If any of the row schemas does not match with the others.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table
+        >>> from safeds.data.tabular.containers import Row
+        >>> row1 = Row({"a": 1, "b": 2})
+        >>> row2 = Row({"a": 3, "b": 4})
+        >>> Table.from_rows([row1, row2])
+                column_0  column_1
+        0         1         2
+        1         3         4
         """
         if len(rows) == 0:
             raise MissingDataError("This function requires at least one row.")
@@ -255,6 +266,25 @@ class Table:
         self._data.columns = self._schema.column_names
 
     def __eq__(self, other: Any) -> bool:
+        """
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table
+        >>> from safeds.data.tabular.containers import Row
+        >>> row1 = Row({"a": 1, "b": 2})
+        >>> row2 = Row({"a": 3, "b": 4})
+        >>> row3 = Row({"a": 5, "b": 6})
+        >>> row4 = Row({"a": 7, "b": 8})
+
+        >>> table1 = Table.from_rows([row1, row2])
+        >>> table2 = Table.from_rows([row1, row2])
+        >>> table3 = Table.from_rows([row3, row4])
+        >>> table1 == table2
+        True
+
+        >>> table1 == table3
+        False
+        """
         if not isinstance(other, Table):
             return NotImplemented
         if self is other:
@@ -263,7 +293,24 @@ class Table:
         table2 = other.sort_columns()
         return table1._schema == table2._schema and table1._data.equals(table2._data)
 
+
     def __repr__(self) -> str:
+        """
+
+        Returns
+        -------
+        Examples
+        -------
+        >>> from safeds.data.tabular.containers import Table
+        >>> from safeds.data.tabular.containers import Row
+        >>> row1 = Row({"a": 1, "b": 2})
+        >>> row2 = Row({"a": 3, "b": 4})
+        >>> table = Table.from_rows([row1, row2])
+        >>> repr(table)
+            column_0  column_1
+        0         1         2
+        1         3         4
+        """
         tmp = self._data.copy(deep=True)
         tmp.columns = self.column_names
         return tmp.__repr__()
