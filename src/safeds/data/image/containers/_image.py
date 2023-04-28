@@ -17,7 +17,7 @@ class Image:
     Parameters
     ----------
     data : BinaryIO
-        The image.png data as bytes.
+        The image data as bytes.
     """
 
     @staticmethod
@@ -116,7 +116,7 @@ class Image:
 
     def _repr_jpeg_(self) -> bytes | None:
         """
-        Return a JPEG image.png as bytes.
+        Return a JPEG image as bytes.
 
         If the image is not a JPEG, return None.
 

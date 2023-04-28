@@ -1,4 +1,4 @@
-"""Types used to distinguish different image.png formats."""
+"""Types used to distinguish different image formats."""
 
 from ._image_format import ImageFormat
 
