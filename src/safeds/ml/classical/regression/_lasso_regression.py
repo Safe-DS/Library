@@ -18,8 +18,8 @@ class LassoRegression(Regressor):
 
     Parameters
     ----------
-    alpha : float, default=1.0
-        Constant that multiplies the L1 term. Defaults to 1.0.
+    alpha : float
+        Controls the regularization of the model. The higher the value, the more regularized it becomes.
 
     Raises
     ------
@@ -31,7 +31,9 @@ class LassoRegression(Regressor):
         if alpha < 0:
             raise ValueError("alpha must be non-negative")
         if alpha == 0:
-            warn("alpha is zero, you should use LinearRegression instead", UserWarning, stacklevel=1)
+            warn(
+                "Setting alpha to zero makes this model equivalent to LinearRegression. You should use "
+                "LinearRegression instead for better numerical stability.", UserWarning, stacklevel=1)
         self._alpha = alpha
         self._wrapped_regressor: sk_Lasso | None = None
         self._feature_names: list[str] | None = None
