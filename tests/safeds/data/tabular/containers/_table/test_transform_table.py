@@ -59,8 +59,21 @@ class TestTransform:
                     },
                 ),
             ),
+            (
+                Table.from_dict(
+                    {
+                        "col1": ["a", "b", "c"],
+                    },
+                ),
+                [],
+                Table.from_dict(
+                    {
+                        "col1": ["a", "b", "c"],
+                    },
+                ),
+            )
         ],
-        ids=["all columns", "one column", "multiple columns"],
+        ids=["all columns", "one column", "multiple columns", "none"],
     )
     def test_should_return_transformed_table(
         self,
@@ -71,25 +84,8 @@ class TestTransform:
         transformer = OneHotEncoder().fit(table, column_names)
         assert table.transform_table(transformer) == expected
 
-    def test_should_not_change_original_table(self) -> None:
-        table = Table.from_dict(
-            {
-                "col1": ["a", "b", "c"],
-            },
-        )
 
-        transformer = OneHotEncoder().fit(table, None)
-        table.transform_table(transformer)
-
-        expected = Table.from_dict(
-            {
-                "col1": ["a", "b", "c"],
-            },
-        )
-
-        assert table == expected
-
-    def test_should_raise_if_column_not_found(self) -> None:
+    def test_should_raise_UnknownColumnNameError(self) -> None:
         table_to_fit = Table.from_dict(
             {
                 "col1": ["a", "b", "c"],
@@ -107,7 +103,7 @@ class TestTransform:
         with pytest.raises(UnknownColumnNameError):
             table_to_transform.transform_table(transformer)
 
-    def test_should_raise_if_not_fitted(self) -> None:
+    def test_should_raise_TransformerNotFittedError(self) -> None:
         table = Table.from_dict(
             {
                 "col1": ["a", "b", "c"],
