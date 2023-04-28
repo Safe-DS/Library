@@ -5,21 +5,22 @@ from safeds.data.tabular.typing import ColumnType, Integer, String
 
 
 @pytest.mark.parametrize(
-    ("column", "col_type"),
+    ("table1", "column", "col_type", "expected"),
     [
-        (Column("col3", ["a", "b", "c"]), String()),
-        (Column("col3", [0, -1, -2]), Integer()),
+        (Table.from_dict({"col1": [1, 2, 1], "col2": [1, 2, 4]}),
+         Column("col3", ["a", "b", "c"]),
+         String(),
+         Table.from_dict({"col1": [1, 2, 1], "col2": [1, 2, 4], "col3": ["a", "b", "c"]})),
+        (Table.from_dict({"col1": [1, 2, 1], "col2": [1, 2, 4]}),
+         Column("col3", [0, -1, -2]),
+         Integer(),
+         Table.from_dict({"col1": [1, 2, 1], "col2": [1, 2, 4], "col3": [0, -1, -2]})),
     ],
     ids=["String", "Integer"],
 )
-def test_should_add_column(column: Column, col_type: ColumnType) -> None:
-    table1 = Table.from_dict({"col1": [1, 2, 1], "col2": [1, 2, 4]})
+def test_should_add_column(table1: Table, column: Column, col_type: ColumnType, expected: Table) -> None:
     table1 = table1.add_column(column)
-    assert table1.number_of_columns == 3
-    assert table1.get_column("col3") == column
-    assert isinstance(table1.schema.get_column_type("col1"), Integer)
-    assert isinstance(table1.schema.get_column_type("col2"), Integer)
-    assert isinstance(table1.schema.get_column_type("col3"), type(col_type))
+    assert table1 == expected
 
 
 def test_should_raise_DuplicateColumnNameError() -> None:
