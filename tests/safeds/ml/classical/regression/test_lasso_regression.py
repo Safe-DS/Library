@@ -3,12 +3,12 @@ from safeds.data.tabular.containers import Table
 from safeds.ml.classical.regression import LassoRegression
 
 
-def test_alpha_invalid() -> None:
+def test_should_throw_value_error() -> None:
     with pytest.raises(ValueError, match="alpha must be non-negative"):
         LassoRegression(alpha=-1)
 
 
-def test_alpha_warning() -> None:
+def test_should_throw_warning() -> None:
     with pytest.warns(
         UserWarning,
         match=(
@@ -19,7 +19,7 @@ def test_alpha_warning() -> None:
         LassoRegression(alpha=0)
 
 
-def test_alpha_valid() -> None:
+def test_should_give_alpha_to_sklearn() -> None:
     training_set = Table.from_dict({"col1": [1, 2, 3, 4], "col2": [1, 2, 3, 4]})
     tagged_table = training_set.tag_columns("col1")
 
