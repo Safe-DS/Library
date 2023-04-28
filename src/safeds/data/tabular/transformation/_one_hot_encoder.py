@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from collections import defaultdict
+from collections import Counter
 
 import pandas as pd
 from sklearn.preprocessing import OneHotEncoder as sk_OneHotEncoder
@@ -51,19 +51,22 @@ class OneHotEncoder(InvertibleTableTransformer):
 
         result = OneHotEncoder()
         result._wrapped_transformer = wrapped_transformer
-        result._column_names = {
-            column: [f"{column}_{element}" for element in table.get_column(column).get_unique_values()]
-            for column in column_names
-        }
 
-        orig_names_dict = defaultdict(list)
-        for original_column_name, new_column_names in result._column_names.items():
-            for new_column_name in new_column_names:
-                orig_names_dict[new_column_name] += [original_column_name]
+        result._column_names = {}
 
-        for new_column_name, original_column_names in orig_names_dict.items():
-            if len(original_column_names) > 1:
-                []
+        # Remember all existing column names:
+        name_counter = Counter(data.columns)
+
+        for column in column_names:
+            result._column_names[column] = []
+            for element in table.get_column(column).get_unique_values():
+                base_name = f"{column}_{element}"
+                name_counter[base_name] += 1
+                new_column_name = base_name
+                # Check if newly created name matches some other existing column name:
+                if name_counter[base_name] > 1:
+                    new_column_name += f"#{name_counter[base_name]}"
+                result._column_names[column] += new_column_name
 
         return result
 
