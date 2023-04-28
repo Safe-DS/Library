@@ -88,6 +88,11 @@ class Regressor(ABC):
         -------
         mean_squared_error : float
             The calculated mean squared error (the average of the distance of each individual row squared).
+
+        Raises
+        ------
+        UntaggedTableError
+            If the table is untagged
         """
         if not isinstance(validation_or_test_set, TaggedTable) and isinstance(validation_or_test_set, Table):
             raise UntaggedTableError
@@ -111,6 +116,11 @@ class Regressor(ABC):
         -------
         mean_absolute_error : float
             The calculated mean absolute error (the average of the distance of each individual row).
+
+        Raises
+        ------
+        UntaggedTableError
+            If the table is untagged
         """
         if not isinstance(validation_or_test_set, TaggedTable) and isinstance(validation_or_test_set, Table):
             raise UntaggedTableError

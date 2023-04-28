@@ -86,6 +86,11 @@ class Classifier(ABC):
         -------
         accuracy : float
             The calculated accuracy score, i.e. the percentage of equal data.
+
+        Raises
+        ------
+        UntaggedTableError
+            If the table is untagged
         """
         if not isinstance(validation_or_test_set, TaggedTable) and isinstance(validation_or_test_set, Table):
             raise UntaggedTableError

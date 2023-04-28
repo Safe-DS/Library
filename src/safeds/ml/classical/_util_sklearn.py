@@ -28,6 +28,8 @@ def fit(model: Any, tagged_table: TaggedTable) -> None:
     ------
     LearningError
         If the tagged table contains invalid values or if the training failed.
+    UntaggedTableError
+        If the table is untagged
     """
     if not isinstance(tagged_table, TaggedTable) and isinstance(tagged_table, Table):
         raise UntaggedTableError
