@@ -9,8 +9,13 @@ def test_alpha_invalid() -> None:
 
 
 def test_alpha_warning() -> None:
-    with pytest.warns(UserWarning, match="Setting alpha to zero makes this model equivalent to LinearRegression. You "
-                                         "should use LinearRegression instead for better numerical stability."):
+    with pytest.warns(
+        UserWarning,
+        match=(
+            "Setting alpha to zero makes this model equivalent to LinearRegression. You "
+            "should use LinearRegression instead for better numerical stability."
+        ),
+    ):
         LassoRegression(alpha=0)
 
 
