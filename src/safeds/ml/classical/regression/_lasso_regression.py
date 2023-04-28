@@ -37,7 +37,7 @@ class LassoRegression(Regressor):
                     "LinearRegression instead for better numerical stability."
                 ),
                 UserWarning,
-                stacklevel=1,
+                stacklevel=2,
             )
         self._alpha = alpha
         self._wrapped_regressor: sk_Lasso | None = None
