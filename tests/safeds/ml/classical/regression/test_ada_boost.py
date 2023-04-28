@@ -3,7 +3,7 @@ from safeds.data.tabular.containers import Table
 from safeds.ml.classical.regression import AdaBoost
 
 
-def test_should_throw_value_error() -> None:
+def test_should_throw_value_error_if_learning_rate_is_non_positive() -> None:
     with pytest.raises(ValueError, match="learning_rate must be positive."):
         AdaBoost(learning_rate=-1)
 
