@@ -57,6 +57,7 @@ class OneHotEncoder(InvertibleTableTransformer):
         # Remember all existing column names:
         name_counter = Counter(data.columns)
 
+        result._column_names = {}
         for column in column_names:
             result._column_names[column] = []
             for element in table.get_column(column).get_unique_values():
@@ -66,7 +67,7 @@ class OneHotEncoder(InvertibleTableTransformer):
                 # Check if newly created name matches some other existing column name:
                 if name_counter[base_name] > 1:
                     new_column_name += f"#{name_counter[base_name]}"
-                result._column_names[column] += new_column_name
+                result._column_names[column].append(new_column_name)
 
         return result
 
