@@ -21,6 +21,11 @@ class RidgeRegression(Regressor):
     ----------
     alpha : float
         Controls the regularization strength. Has to be greater than or equal to 0.
+
+    Raises
+    ------
+    ValueError
+        If the parameter is below 0
     """
 
     def __init__(self, alpha: float = 1.0) -> None:
