@@ -11,7 +11,7 @@ class TableTransformer(ABC):
     """Learn a transformation for a set of columns in a `Table` and transform another `Table` with the same columns."""
 
     @abstractmethod
-    def fit(self, table: Table, column_names: list[str] | None = None) -> TableTransformer:
+    def fit(self, table: Table, column_names: list[str] | None) -> TableTransformer:
         """
         Learn a transformation for a set of columns in a table.
 

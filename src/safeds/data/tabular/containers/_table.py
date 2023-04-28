@@ -34,6 +34,8 @@ from ._row import Row
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterable
 
+    from safeds.data.tabular.transformation import InvertibleTableTransformer, TableTransformer
+
     from ._tagged_table import TaggedTable
 
 
@@ -58,13 +60,13 @@ class Table:
     # ------------------------------------------------------------------------------------------------------------------
 
     @staticmethod
-    def from_csv_file(path: str) -> Table:
+    def from_csv_file(path: str | Path) -> Table:
         """
         Read data from a CSV file into a table.
 
         Parameters
         ----------
-        path : str
+        path : str | Path
             The path to the CSV file.
 
         Returns
@@ -112,13 +114,13 @@ class Table:
             raise FileNotFoundError(f'File "{path}" does not exist') from exception
 
     @staticmethod
-    def from_json_file(path: str) -> Table:
+    def from_json_file(path: str | Path) -> Table:
         """
         Read data from a JSON file into a table.
 
         Parameters
         ----------
-        path : str
+        path : str | Path
             The path to the JSON file.
 
         Returns
@@ -236,7 +238,7 @@ class Table:
         for row in rows:
             if schema_compare != row._schema:
                 raise SchemaMismatchError
-            row_array.append(row._data.to_pandas())
+            row_array.append(row._data)
 
         dataframe: DataFrame = pd.concat(row_array, ignore_index=True)
         dataframe.columns = schema_compare.column_names
@@ -276,10 +278,7 @@ class Table:
             return True
         table1 = self.sort_columns()
         table2 = other.sort_columns()
-        return table1._data.equals(table2._data) and table1._schema == table2._schema
-
-    def __hash__(self) -> int:
-        return hash(self._data)
+        return table1._schema == table2._schema and table1._data.equals(table2._data)
 
     def __repr__(self) -> str:
         tmp = self._data.copy(deep=True)
@@ -310,25 +309,25 @@ class Table:
         return self._schema.column_names
 
     @property
-    def n_columns(self) -> int:
+    def number_of_columns(self) -> int:
         """
         Return the number of columns.
 
         Returns
         -------
-        n_columns : int
+        number_of_columns : int
             The number of columns.
         """
         return self._data.shape[1]
 
     @property
-    def n_rows(self) -> int:
+    def number_of_rows(self) -> int:
         """
         Return the number of rows.
 
         Returns
         -------
-        n_rows : int
+        number_of_rows : int
             The number of rows.
         """
         return self._data.shape[0]
@@ -368,15 +367,13 @@ class Table:
         UnknownColumnNameError
             If the specified target column name does not exist.
         """
-        if self._schema.has_column(column_name):
-            output_column = Column(
-                column_name,
-                self._data.iloc[:, [self._schema._get_column_index(column_name)]].squeeze(),
-                self._schema.get_column_type(column_name),
-            )
-            return output_column
+        if not self.has_column(column_name):
+            raise UnknownColumnNameError([column_name])
 
-        raise UnknownColumnNameError([column_name])
+        return Column._from_pandas_series(
+            self._data[column_name],
+            self.get_column_type(column_name),
+        )
 
     def has_column(self, column_name: str) -> bool:
         """
@@ -441,7 +438,7 @@ class Table:
         if len(self._data.index) - 1 < index or index < 0:
             raise IndexOutOfBoundsError(index)
 
-        return Row._from_polars_dataframe(pl.DataFrame(self._data.iloc[[index]]), self._schema)
+        return Row._from_pandas_dataframe(self._data.iloc[[index]], self._schema)
 
     # ------------------------------------------------------------------------------------------------------------------
     # Information
@@ -513,8 +510,8 @@ class Table:
         if self.has_column(column.name):
             raise DuplicateColumnNameError(column.name)
 
-        if column._data.size != self.n_rows:
-            raise ColumnSizeError(str(self.n_rows), str(column._data.size))
+        if column._data.size != self.number_of_rows:
+            raise ColumnSizeError(str(self.number_of_rows), str(column._data.size))
 
         result = self._data.copy()
         result.columns = self._schema.column_names
@@ -550,8 +547,8 @@ class Table:
             if column.name in result.columns:
                 raise DuplicateColumnNameError(column.name)
 
-            if column._data.size != self.n_rows:
-                raise ColumnSizeError(str(self.n_rows), str(column._data.size))
+            if column._data.size != self.number_of_rows:
+                raise ColumnSizeError(str(self.number_of_rows), str(column._data.size))
 
             result[column.name] = column._data
         return Table(result)
@@ -574,9 +571,7 @@ class Table:
         if self._schema != row.schema:
             raise SchemaMismatchError
 
-        row_frame = row._data.to_pandas()
-
-        new_df = pd.concat([self._data, row_frame]).infer_objects()
+        new_df = pd.concat([self._data, row._data]).infer_objects()
         new_df.columns = self.column_names
         return Table(new_df)
 
@@ -601,9 +596,7 @@ class Table:
             if self._schema != row.schema:
                 raise SchemaMismatchError
 
-        row_frames = [row._data.to_pandas() for row in rows]
-        for row_frame in row_frames:
-            row_frame.columns = self.column_names
+        row_frames = (row._data for row in rows)
 
         result = pd.concat([result, *row_frames]).infer_objects()
         result.columns = self.column_names
@@ -828,8 +821,8 @@ class Table:
         if new_column.name in self._schema.column_names and new_column.name != old_column_name:
             raise DuplicateColumnNameError(new_column.name)
 
-        if self.n_rows != new_column._data.size:
-            raise ColumnSizeError(str(self.n_rows), str(new_column._data.size))
+        if self.number_of_rows != new_column._data.size:
+            raise ColumnSizeError(str(self.number_of_rows), str(new_column._data.size))
 
         if old_column_name != new_column.name:
             renamed_table = self.rename_column(old_column_name, new_column.name)
@@ -888,9 +881,9 @@ class Table:
             start = 0
 
         if end is None:
-            end = self.n_rows
+            end = self.number_of_rows
 
-        if start < 0 or end < 0 or start >= self.n_rows or end > self.n_rows or end < start:
+        if start < 0 or end < 0 or start >= self.number_of_rows or end > self.number_of_rows or end < start:
             raise ValueError("The given index is out of bounds")
 
         new_df = self._data.iloc[start:end:step]
@@ -973,8 +966,8 @@ class Table:
         if percentage_in_first <= 0 or percentage_in_first >= 1:
             raise ValueError("the given percentage is not in range")
         return (
-            self.slice_rows(0, round(percentage_in_first * self.n_rows)),
-            self.slice_rows(round(percentage_in_first * self.n_rows)),
+            self.slice_rows(0, round(percentage_in_first * self.number_of_rows)),
+            self.slice_rows(round(percentage_in_first * self.number_of_rows)),
         )
 
     def tag_columns(self, target_name: str, feature_names: list[str] | None = None) -> TaggedTable:
@@ -1014,9 +1007,83 @@ class Table:
         """
         if self.has_column(name):
             items: list = [transformer(item) for item in self.to_rows()]
-            result: Column = Column(name, pd.Series(items))
+            result: Column = Column(name, items)
             return self.replace_column(name, result)
         raise UnknownColumnNameError([name])
+
+    def transform_table(self, transformer: TableTransformer) -> Table:
+        """
+        Apply a learned transformation onto this table.
+
+        Parameters
+        ----------
+        transformer : TableTransformer
+            The transformer which transforms the given table.
+
+        Returns
+        -------
+        transformed_table : Table
+            The transformed table.
+
+        Raises
+        ------
+        TransformerNotFittedError
+            If the transformer has not been fitted yet.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.transformation import OneHotEncoder
+        >>> from safeds.data.tabular.containers import Table
+        >>> transformer = OneHotEncoder()
+        >>> table = Table.from_dict({"col1": [1, 2, 1], "col2": [1, 2, 4]})
+        >>> transformer = transformer.fit(table, None)
+        >>> table.transform_table(transformer)
+           col1_1  col1_2  col2_1  col2_2  col2_4
+        0     1.0     0.0     1.0     0.0     0.0
+        1     0.0     1.0     0.0     1.0     0.0
+        2     1.0     0.0     0.0     0.0     1.0
+        """
+        return transformer.transform(self)
+
+    def inverse_transform_table(self, transformer: InvertibleTableTransformer) -> Table:
+        """
+        Invert the transformation applied by the given transformer.
+
+        Parameters
+        ----------
+        transformer : InvertibleTableTransformer
+            A transformer that was fitted with columns, which are all present in the table.
+
+        Returns
+        -------
+        table : Table
+            The original table.
+
+        Raises
+        ------
+        TransformerNotFittedError
+            If the transformer has not been fitted yet.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.transformation import OneHotEncoder
+        >>> from safeds.data.tabular.containers import Table
+        >>> transformer = OneHotEncoder()
+        >>> table = Table.from_dict({"col1": [1, 2, 1], "col2": [1, 2, 4]})
+        >>> transformer = transformer.fit(table, None)
+        >>> transformed_table = transformer.transform(table)
+        >>> transformed_table.inverse_transform_table(transformer)
+           col1  col2
+        0     1     1
+        1     2     2
+        2     1     4
+        >>> transformer.inverse_transform(transformed_table)
+           col1  col2
+        0     1     1
+        1     2     2
+        2     1     4
+        """
+        return transformer.inverse_transform(self)
 
     # ------------------------------------------------------------------------------------------------------------------
     # Plotting
@@ -1151,7 +1218,7 @@ class Table:
     # Conversion
     # ------------------------------------------------------------------------------------------------------------------
 
-    def to_csv_file(self, path: str) -> None:
+    def to_csv_file(self, path: str | Path) -> None:
         """
         Write the data from the table into a CSV file.
 
@@ -1160,7 +1227,7 @@ class Table:
 
         Parameters
         ----------
-        path : str
+        path : str | Path
             The path to the output file.
         """
         Path(path).parent.mkdir(parents=True, exist_ok=True)
@@ -1185,7 +1252,24 @@ class Table:
         data_to_excel.columns = self._schema.column_names
         data_to_excel.to_excel(path)
 
-    def to_json_file(self, path: str) -> None:
+    def to_excel_file(self, path: str) -> None:
+        """
+        Write the data from the table into a Excel file.
+
+        If the file and/or the directories do not exist, they will be created. If the file already exists it will be
+        overwritten.
+
+        Parameters
+        ----------
+        path : str
+            The path to the output file.
+        """
+        Path(path).parent.mkdir(parents=True, exist_ok=True)
+        data_to_excel = self._data.copy()
+        data_to_excel.columns = self._schema.column_names
+        data_to_excel.to_excel(path)
+
+    def to_json_file(self, path: str | Path) -> None:
         """
         Write the data from the table into a JSON file.
 
@@ -1194,7 +1278,7 @@ class Table:
 
         Parameters
         ----------
-        path : str
+        path : str | Path
             The path to the output file.
         """
         Path(path).parent.mkdir(parents=True, exist_ok=True)
@@ -1212,6 +1296,23 @@ class Table:
             Dictionary representation of the table.
         """
         return {column_name: list(self.get_column(column_name)) for column_name in self.column_names}
+
+    def to_html(self) -> str:
+        """
+        Return an HTML representation of the table.
+
+        Returns
+        -------
+        output : str
+            The generated HTML.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table
+        >>> table = Table.from_dict({"a": [1, 2, 3], "b": [4, 5, 6]})
+        >>> html = table.to_html()
+        """
+        return self._data.to_html(max_rows=self._data.shape[0], max_cols=self._data.shape[1])
 
     def to_columns(self) -> list[Column]:
         """
@@ -1234,8 +1335,8 @@ class Table:
             List of rows.
         """
         return [
-            Row._from_polars_dataframe(
-                pl.DataFrame([list(series_row)], schema=self._schema.column_names),
+            Row._from_pandas_dataframe(
+                pd.DataFrame([list(series_row)], columns=self._schema.column_names),
                 self._schema,
             )
             for (_, series_row) in self._data.iterrows()
@@ -1245,20 +1346,16 @@ class Table:
     # IPython integration
     # ------------------------------------------------------------------------------------------------------------------
 
-    def _ipython_display_(self) -> DisplayHandle:
+    def _repr_html_(self) -> str:
         """
-        Return a display object for the column to be used in Jupyter Notebooks.
+        Return an HTML representation of the table.
 
         Returns
         -------
-        output : DisplayHandle
-            Output object.
+        output : str
+            The generated HTML.
         """
-        tmp = self._data.copy(deep=True)
-        tmp.columns = self.column_names
-
-        with pd.option_context("display.max_rows", tmp.shape[0], "display.max_columns", tmp.shape[1]):
-            return display(tmp)
+        return self._data.to_html(max_rows=self._data.shape[0], max_cols=self._data.shape[1], notebook=True)
 
     # ------------------------------------------------------------------------------------------------------------------
     # Dataframe interchange protocol

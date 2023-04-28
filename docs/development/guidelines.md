@@ -8,21 +8,113 @@ It's more important to provide a user-friendly API to many people than to save s
 
 ## Document API elements
 
+The docstrings **should** use the [numpydoc](https://numpydoc.readthedocs.io/en/latest/format.html) format. The descriptions **should not** start with "this" and **should** use imperative mood. Refer to the subsections below for more details on how to document specific API elements.
+
+!!! success "**DO** (library code):"
+
+    ```py
+    def add_ints(a: int, b: int) -> int:
+        """Add two integers."""
+        return a + b
+    ```
+
+!!! failure "**DON'T** (library code):"
+
+    ```py
+    def add_ints(a: int, b: int) -> int:
+        """This function adds two integers."""
+        return a + b
+    ```
+
+!!! failure "**DON'T** (library code):"
+
+    ```py
+    def add_ints(a: int, b: int) -> int:
+        """Adds two integers."""
+        return a + b
+    ```
+
+### Modules
+
+All modules should have
+
+* a one-line description ([short summary][short-summary-section]),
+* a longer description if needed ([extended summary][extended-summary-section]).
+
+Example:
+
+```py
+"""Containers for tabular data."""
+```
+
+### Classes
+
 All classes should have
 
-* a short description,
-* examples that show how to use them correctly,
-* a description of their attributes.
+* a one-line description ([short summary][short-summary-section]),
+* a longer description if needed ([extended summary][extended-summary-section])
+* a description of the parameters of their `__init__` method ([`Parameters` section][parameters-section]),
+* examples that show how to use them correctly ([`Examples` section][examples-section]).
+
+Example:
+
+```py
+"""
+A row is a collection of named values.
+
+Parameters
+----------
+data : Mapping[str, Any] | None
+    The data. If None, an empty row is created.
+
+Examples
+--------
+>>> from safeds.data.tabular.containers import Row
+>>> row = Row({"a": 1, "b": 2})
+"""
+```
+
+### Functions
 
 All functions should have
 
-* a short description,
-* examples that show how to use them correctly,
-* a description of their parameters,
-* a description of their results,
-* a description of any exceptions that are raised.
+* a one-line description ([short summary][short-summary-section]),
+* a longer description if needed ([extended summary][extended-summary-section])
+* a description of their parameters ([`Parameters` section][parameters-section]),
+* a description of their results ([`Returns` section][returns-section]),
+* a description of any exceptions that may be raised and under which conditions that may happen ([`Raises` section][raises-section]),
+* a description of any warnings that may be issued and under which conditions that may happen ([`Warns` section][warns-section]),
+* examples that show how to use them correctly ([`Examples` section][examples-section]).
 
-The documentation should follow the [numpydoc](https://numpydoc.readthedocs.io/en/latest/format.html) format.
+Example:
+
+```py
+"""
+Return the value of a specified column.
+
+Parameters
+----------
+column_name : str
+    The column name.
+
+Returns
+-------
+value : Any
+    The column value.
+
+Raises
+------
+UnknownColumnNameError
+    If the row does not contain the specified column.
+
+Examples
+--------
+>>> from safeds.data.tabular.containers import Row
+>>> row = Row({"a": 1, "b": 2})
+>>> row.get_value("a")
+1
+"""
+```
 
 ## Test non-trivial functions
 
@@ -202,3 +294,11 @@ Passing values that are commonly used together around separately is tedious, ver
 
 [src-folder]: https://github.com/Safe-DS/Stdlib/tree/main/src
 [tests-folder]: https://github.com/Safe-DS/Stdlib/tree/main/tests
+
+[short-summary-section]: https://numpydoc.readthedocs.io/en/latest/format.html#short-summary
+[extended-summary-section]: https://numpydoc.readthedocs.io/en/latest/format.html#extended-summary
+[parameters-section]: https://numpydoc.readthedocs.io/en/latest/format.html#parameters
+[returns-section]: https://numpydoc.readthedocs.io/en/latest/format.html#returns
+[raises-section]: https://numpydoc.readthedocs.io/en/latest/format.html#raises
+[warns-section]: https://numpydoc.readthedocs.io/en/latest/format.html#warns
+[examples-section]: https://numpydoc.readthedocs.io/en/latest/format.html#examples

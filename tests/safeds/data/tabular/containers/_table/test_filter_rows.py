@@ -7,8 +7,8 @@ def test_filter_rows_valid() -> None:
     result_table = table.filter_rows(lambda row: row.get_value("col1") == 1)
     assert result_table.get_column("col1").get_value(0) == 1
     assert result_table.get_column("col2").get_value(1) == 4
-    assert result_table.n_columns == 2
-    assert result_table.n_rows == 2
+    assert result_table.number_of_columns == 2
+    assert result_table.number_of_rows == 2
 
 
 # noinspection PyTypeChecker
