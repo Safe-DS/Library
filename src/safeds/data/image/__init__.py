@@ -1,1 +1,1 @@
-"""Work with image.png data."""
+"""Work with image data."""

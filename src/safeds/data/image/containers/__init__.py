@@ -1,4 +1,4 @@
-"""Classes that can store image.png data."""
+"""Classes that can store image data."""
 
 from ._image import Image
 

@@ -19,7 +19,7 @@ def test_plot_correlation_heatmap(monkeypatch: _pytest.monkeypatch) -> None:
 
 def test_plot_heatmap_legacy_check() -> None:
     table = Table.from_dict({"A": [1, 2, 3.5], "B": [0.2, 4, 77]})
-    #table.plot_correlation_heatmap().to_png_file(resolve_resource_path("./image/legacy_heatmap.png"))
+    #table.plot_correlation_heatmap().to_png_file(resolve_resource_path("./image/snapshot_heatmap.png"))
     current = table.plot_correlation_heatmap()
-    legacy = Image.from_png_file(resolve_resource_path("./image/legacy_heatmap.png"))
+    legacy = Image.from_png_file(resolve_resource_path("./image/snapshot_heatmap.png"))
     assert legacy._image.tobytes() == current._image.tobytes()

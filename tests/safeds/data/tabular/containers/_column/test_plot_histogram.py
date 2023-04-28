@@ -13,14 +13,14 @@ def test_plot_histogram(monkeypatch: _pytest.monkeypatch) -> None:
 
 def test_plot_histogram_legacy_check_str() -> None:
     table = Table.from_dict({"A": ["A", "B", "Apple"]})
-    #table.get_column("A").plot_histogram().to_png_file(resolve_resource_path("./image/legacy_histogram_str.png"))
+    #table.get_column("A").plot_histogram().to_png_file(resolve_resource_path("./image/snapshot_histogram_str.png"))
     current = table.get_column("A").plot_histogram()
-    legacy = Image.from_png_file(resolve_resource_path("./image/legacy_histogram_str.png"))
+    legacy = Image.from_png_file(resolve_resource_path("./image/snapshot_histogram_str.png"))
     assert legacy._image.tobytes() == current._image.tobytes()
 
 def test_plot_histogram_legacy_check_numeric() -> None:
     table = Table.from_dict({"A": [1, 2, 3]})
-    #table.get_column("A").plot_histogram().to_png_file(resolve_resource_path("./image/legacy_histogram_numeric.png"))
+    #table.get_column("A").plot_histogram().to_png_file(resolve_resource_path("./image/snapshot_histogram_numeric.png"))
     current = table.get_column("A").plot_histogram()
-    legacy = Image.from_png_file(resolve_resource_path("./image/legacy_histogram_numeric.png"))
+    legacy = Image.from_png_file(resolve_resource_path("./image/snapshot_histogram_numeric.png"))
     assert legacy._image.tobytes() == current._image.tobytes()

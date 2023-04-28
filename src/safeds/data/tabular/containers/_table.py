@@ -1002,7 +1002,7 @@ class Table:
         Returns
         -------
         plot: Image
-            The plot as an image.png.
+            The plot as an image.
         """
         only_numerical = self.remove_columns_with_non_numerical_values()
 
@@ -1040,7 +1040,7 @@ class Table:
         Returns
         -------
         plot: Image
-            The plot as an image.png.
+            The plot as an image.
 
         Raises
         ------
@@ -1087,7 +1087,7 @@ class Table:
         Returns
         -------
         plot: Image
-            The plot as an image.png.
+            The plot as an image.
 
         Raises
         ------
