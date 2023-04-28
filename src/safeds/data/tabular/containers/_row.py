@@ -227,7 +227,7 @@ class Row(Mapping[str, Any]):
 
         Returns
         -------
-        n_columns : int
+        number_of_columns : int
             The number of columns.
 
         Examples
@@ -307,20 +307,20 @@ class Row(Mapping[str, Any]):
         return self._schema.column_names
 
     @property
-    def n_columns(self) -> int:
+    def number_of_column(self) -> int:
         """
         Return the number of columns in this row.
 
         Returns
         -------
-        n_columns : int
+        number_of_column : int
             The number of columns.
 
         Examples
         --------
         >>> from safeds.data.tabular.containers import Row
         >>> row = Row({"a": 1, "b": 2})
-        >>> row.n_columns
+        >>> row.number_of_column
         2
         """
         return self._data.shape[1]
