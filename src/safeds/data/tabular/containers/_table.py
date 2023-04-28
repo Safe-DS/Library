@@ -280,25 +280,25 @@ class Table:
         return self._schema.column_names
 
     @property
-    def n_columns(self) -> int:
+    def number_of_columns(self) -> int:
         """
         Return the number of columns.
 
         Returns
         -------
-        n_columns : int
+        number_of_columns : int
             The number of columns.
         """
         return self._data.shape[1]
 
     @property
-    def n_rows(self) -> int:
+    def number_of_rows(self) -> int:
         """
         Return the number of rows.
 
         Returns
         -------
-        n_rows : int
+        number_of_rows : int
             The number of rows.
         """
         return self._data.shape[0]
@@ -481,8 +481,8 @@ class Table:
         if self.has_column(column.name):
             raise DuplicateColumnNameError(column.name)
 
-        if column._data.size != self.n_rows:
-            raise ColumnSizeError(str(self.n_rows), str(column._data.size))
+        if column._data.size != self.number_of_rows:
+            raise ColumnSizeError(str(self.number_of_rows), str(column._data.size))
 
         result = self._data.copy()
         result.columns = self._schema.column_names
@@ -518,8 +518,8 @@ class Table:
             if column.name in result.columns:
                 raise DuplicateColumnNameError(column.name)
 
-            if column._data.size != self.n_rows:
-                raise ColumnSizeError(str(self.n_rows), str(column._data.size))
+            if column._data.size != self.number_of_rows:
+                raise ColumnSizeError(str(self.number_of_rows), str(column._data.size))
 
             result[column.name] = column._data
         return Table(result)
@@ -792,8 +792,8 @@ class Table:
         if new_column.name in self._schema.column_names and new_column.name != old_column_name:
             raise DuplicateColumnNameError(new_column.name)
 
-        if self.n_rows != new_column._data.size:
-            raise ColumnSizeError(str(self.n_rows), str(new_column._data.size))
+        if self.number_of_rows != new_column._data.size:
+            raise ColumnSizeError(str(self.number_of_rows), str(new_column._data.size))
 
         if old_column_name != new_column.name:
             renamed_table = self.rename_column(old_column_name, new_column.name)
@@ -852,9 +852,9 @@ class Table:
             start = 0
 
         if end is None:
-            end = self.n_rows
+            end = self.number_of_rows
 
-        if start < 0 or end < 0 or start >= self.n_rows or end > self.n_rows or end < start:
+        if start < 0 or end < 0 or start >= self.number_of_rows or end > self.number_of_rows or end < start:
             raise ValueError("The given index is out of bounds")
 
         new_df = self._data.iloc[start:end:step]
@@ -937,8 +937,8 @@ class Table:
         if percentage_in_first <= 0 or percentage_in_first >= 1:
             raise ValueError("the given percentage is not in range")
         return (
-            self.slice_rows(0, round(percentage_in_first * self.n_rows)),
-            self.slice_rows(round(percentage_in_first * self.n_rows)),
+            self.slice_rows(0, round(percentage_in_first * self.number_of_rows)),
+            self.slice_rows(round(percentage_in_first * self.number_of_rows)),
         )
 
     def tag_columns(self, target_name: str, feature_names: list[str] | None = None) -> TaggedTable:

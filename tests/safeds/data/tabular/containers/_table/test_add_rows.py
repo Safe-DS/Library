@@ -23,7 +23,7 @@ def test_add_rows_valid() -> None:
         table1.schema,
     )
     table1 = table1.add_rows([row1, row2])
-    assert table1.n_rows == 5
+    assert table1.number_of_rows == 5
     assert table1.get_row(3) == row1
     assert table1.get_row(4) == row2
     assert table1.schema == row1._schema
@@ -52,7 +52,7 @@ def test_add_rows_table_valid() -> None:
     )
     table2 = Table.from_rows([row1, row2])
     table1 = table1.add_rows(table2)
-    assert table1.n_rows == 5
+    assert table1.number_of_rows == 5
     assert table1.get_row(3) == row1
     assert table1.get_row(4) == row2
     assert table1.schema == row1._schema
