@@ -7,7 +7,7 @@ license = "MIT"
 readme = "docs/README.md"
 repository = "https://github.com/Safe-DS/Stdlib"
 documentation = "https://safe-ds-stdlib.readthedocs.io"
-keywords = ["data science", "machine learning", "usability", "learnability"]
+keywords = ["data-science", "machine-learning", "usability", "learnability"]
 packages = [
     { include = "safeds", from = "src"},
 ]
@@ -20,7 +20,6 @@ pandas = "^2.0.0"
 pillow = "^9.5.0"
 scikit-learn = "^1.2.0"
 seaborn = "^0.12.2"
-polars = {extras = ["pandas", "pyarrow", "xlsx2csv"], version = "^0.17.5"}
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.2.1"
@@ -46,6 +45,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.pytest.ini_options]
 filterwarnings = [
+    "ignore:Deprecated call to `pkg_resources.declare_namespace",
     "ignore:Jupyter is migrating its paths to use standard platformdirs"
 ]
 

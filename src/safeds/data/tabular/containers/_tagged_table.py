@@ -1,7 +1,5 @@
 from collections.abc import Iterable
 
-from IPython.core.display_functions import DisplayHandle
-
 from safeds.data.tabular.containers import Column, Table
 from safeds.data.tabular.typing import Schema
 
@@ -50,16 +48,6 @@ class TaggedTable(Table):
         self._features: Table = self.keep_only_columns(feature_names)
         self._target: Column = self.get_column(target_name)
 
-    def __repr__(self) -> str:
-        tmp = self._features.add_column(self._target)
-        header_info = "Target Column is '" + self._target.name + "'\n"
-        return header_info + tmp.__repr__()
-
-    def __str__(self) -> str:
-        tmp = self._features.add_column(self._target)
-        header_info = "Target Column is '" + self._target.name + "'\n"
-        return header_info + tmp.__str__()
-
     # ------------------------------------------------------------------------------------------------------------------
     # Properties
     # ------------------------------------------------------------------------------------------------------------------
@@ -71,21 +59,3 @@ class TaggedTable(Table):
     @property
     def target(self) -> Column:
         return self._target
-
-    # ------------------------------------------------------------------------------------------------------------------
-    # IPython integration
-    # ------------------------------------------------------------------------------------------------------------------
-
-    def _ipython_display_(self) -> DisplayHandle:
-        """
-        Return a display object for the column to be used in Jupyter Notebooks.
-
-        Returns
-        -------
-        output : DisplayHandle
-            Output object.
-        """
-        tmp = self._features.add_column(self._target)
-        header_info = "Target Column is '" + self._target.name + "'\n"
-        print(header_info)  # noqa: T201
-        return tmp._ipython_display_()

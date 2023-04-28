@@ -12,8 +12,8 @@ def test_remove_rows_with_outliers_no_outliers() -> None:
     )
     names = table.column_names
     result = table.remove_rows_with_outliers()
-    assert result.n_rows == 3
-    assert result.n_columns == 3
+    assert result.number_of_rows == 3
+    assert result.number_of_columns == 3
     assert names == table.column_names
 
 
@@ -54,5 +54,5 @@ def test_remove_rows_with_outliers_with_outliers() -> None:
 def test_remove_rows_with_outliers_no_rows() -> None:
     table = Table([], Schema({"col1": RealNumber()}))
     result = table.remove_rows_with_outliers()
-    assert result.n_rows == 0
-    assert result.n_columns == 1
+    assert result.number_of_rows == 0
+    assert result.number_of_columns == 1

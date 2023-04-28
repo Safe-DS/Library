@@ -17,6 +17,7 @@ def test_plot_histogram_legacy_check_str() -> None:
     snapshot = Image.from_png_file(resolve_resource_path("./image/snapshot_histogram_str.png"))
     assert snapshot._image.tobytes() == current._image.tobytes()
 
+
 def test_plot_histogram_legacy_check_numeric() -> None:
     table = Table.from_dict({"A": [1, 2, 3]})
     current = table.get_column("A").plot_histogram()

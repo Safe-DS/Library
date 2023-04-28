@@ -32,7 +32,7 @@ def test_plot_boxplot_int(monkeypatch: _pytest.monkeypatch) -> None:
     table.get_column("A").plot_boxplot()
 
 
-def test_plot_boxplot_legacy() -> None:
+def test_should_match_snapshot() -> None:
     table = Table.from_dict({"A": [1, 2, 3]})
     table.get_column("A").plot_boxplot()
     current = table.get_column("A").plot_boxplot()
