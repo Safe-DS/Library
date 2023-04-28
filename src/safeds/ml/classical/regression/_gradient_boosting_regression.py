@@ -13,12 +13,27 @@ if TYPE_CHECKING:
 
 
 class GradientBoosting(Regressor):
-    """Gradient boosting regression."""
+    """Gradient boosting regression.
 
-    def __init__(self) -> None:
+    Parameters
+    ----------
+    learning_rate : float
+        Learning rate shrinks the contribution of each tree by `learning_rate`.
+
+
+    Raises
+    ------
+    ValueError
+        If `learning_rate` is non-positive.
+    """
+
+    def __init__(self, learning_rate: float = 0.1) -> None:
         self._wrapped_regressor: sk_GradientBoostingRegressor | None = None
         self._feature_names: list[str] | None = None
         self._target_name: str | None = None
+        if learning_rate <= 0:
+            raise ValueError("learning_rate must be non-negative.")
+        self._learning_rate = learning_rate
 
     def fit(self, training_set: TaggedTable) -> GradientBoosting:
         """
@@ -41,10 +56,10 @@ class GradientBoosting(Regressor):
         LearningError
             If the training data contains invalid values or if the training failed.
         """
-        wrapped_regressor = sk_GradientBoostingRegressor()
+        wrapped_regressor = sk_GradientBoostingRegressor(learning_rate=self._learning_rate)
         fit(wrapped_regressor, training_set)
 
-        result = GradientBoosting()
+        result = GradientBoosting(learning_rate=self._learning_rate)
         result._wrapped_regressor = wrapped_regressor
         result._feature_names = training_set.features.column_names
         result._target_name = training_set.target.name
