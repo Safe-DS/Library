@@ -22,7 +22,7 @@ class AdaBoost(Classifier):
         A higher learning rate increases the contribution of each classifier.
     """
 
-    def __init__(self, learning_rate=1.0) -> None:
+    def __init__(self, learning_rate: float = 1.0) -> None:
         self._wrapped_classifier: sk_AdaBoostClassifier | None = None
         self._feature_names: list[str] | None = None
         self._target_name: str | None = None
