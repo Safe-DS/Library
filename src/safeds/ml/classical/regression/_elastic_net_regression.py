@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import warnings
 from typing import TYPE_CHECKING
+from warnings import warn
 
 from sklearn.linear_model import ElasticNet as sk_ElasticNet
 
@@ -14,24 +15,59 @@ if TYPE_CHECKING:
 
 
 class ElasticNetRegression(Regressor):
-    """Elastic net regression."""
+    """Elastic net regression.
 
-    def __init__(self, lasso_ratio: float = 0.5) -> None:
+    Parameters
+    ----------
+    alpha : float
+        Controls the regularization of the model. The higher the value, the more regularized it becomes.
+
+    lasso_ratio: float
+        Number between 0 and 1 that controls the ratio between Lasso- and Ridge regularization.
+        lasso_ratio=0 is essentially RidgeRegression
+        lasso_ratio=1 is essentially LassoRegression
+
+    Raises
+    ------
+    ValueError
+        If alpha is negative.
+    """
+
+    def __init__(self, alpha: float = 1.0, lasso_ratio: float = 0.5) -> None:
+        if alpha < 0:
+            raise ValueError("alpha must be non-negative")
+        if alpha == 0:
+            warn(
+                (
+                    "Setting alpha to zero makes this model equivalent to LinearRegression. You should use "
+                    "LinearRegression instead for better numerical stability."
+                ),
+                UserWarning,
+                stacklevel=2,
+            )
+
+        self._alpha = alpha
+
         if lasso_ratio < 0 or lasso_ratio > 1:
             raise ValueError("lasso_ratio must be between 0 and 1.")
         elif lasso_ratio == 0:
             warnings.warn(
-                "ElasticNetRegression with lasso_ratio = 0 is essentially RidgeRegression."
-                " Use RidgeRegression instead for better numerical stability.",
-                stacklevel=1,
+                (
+                    "ElasticNetRegression with lasso_ratio = 0 is essentially RidgeRegression."
+                    " Use RidgeRegression instead for better numerical stability."
+                ),
+                stacklevel=2,
             )
         elif lasso_ratio == 1:
             warnings.warn(
-                "ElasticNetRegression with lasso_ratio = 0 is essentially LassoRegression."
-                " Use LassoRegression instead for better numerical stability.",
-                stacklevel=1,
+                (
+                    "ElasticNetRegression with lasso_ratio = 0 is essentially LassoRegression."
+                    " Use LassoRegression instead for better numerical stability."
+                ),
+                stacklevel=2,
             )
         self.lasso_ratio = lasso_ratio
+
         self._wrapped_regressor: sk_ElasticNet | None = None
         self._feature_names: list[str] | None = None
         self._target_name: str | None = None
@@ -57,10 +93,10 @@ class ElasticNetRegression(Regressor):
         LearningError
             If the training data contains invalid values or if the training failed.
         """
-        wrapped_regressor = sk_ElasticNet(l1_ratio=self.lasso_ratio)
+        wrapped_regressor = sk_ElasticNet(alpha=self._alpha, l1_ratio=self.lasso_ratio)
         fit(wrapped_regressor, training_set)
 
-        result = ElasticNetRegression(self.lasso_ratio)
+        result = ElasticNetRegression(alpha=self._alpha, lasso_ratio=self.lasso_ratio)
         result._wrapped_regressor = wrapped_regressor
         result._feature_names = training_set.features.column_names
         result._target_name = training_set.target.name
