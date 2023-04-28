@@ -289,7 +289,7 @@ class TestCheckMetricsPreconditions:
         expected: list[str | int],
         error: type[Exception],
     ) -> None:
-        actual_column = Column("actual", pd.Series(actual))
-        expected_column = Column("expected", pd.Series(expected))
+        actual_column: Column = Column("actual", pd.Series(actual))
+        expected_column: Column = Column("expected", pd.Series(expected))
         with pytest.raises(error):
             _check_metrics_preconditions(actual_column, expected_column)
