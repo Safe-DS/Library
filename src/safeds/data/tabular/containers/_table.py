@@ -166,6 +166,18 @@ class Table:
         ------
         ColumnLengthMismatchError
             If any of the column sizes does not match with the others.
+
+        Examples
+        --------
+        from safeds.data.tabular.containers import Table
+        from safeds.data.tabular.containers import Column
+        >>> column1 = Column("column1", [1, 2, 3])
+        >>> column2 = Column("column2", ['a', 'b', 'c'])
+        >>> table = Table.from_columns([column1, column2])
+            column1 column2
+        0      1     a
+        1      2     b
+        2      3     c
         """
         dataframe: DataFrame = pd.DataFrame()
 
