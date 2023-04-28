@@ -1,15 +1,13 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING
 
 from sklearn.metrics import mean_absolute_error as sk_mean_absolute_error
 from sklearn.metrics import mean_squared_error as sk_mean_squared_error
 
+from safeds.data.tabular.containers import Column, Table, TaggedTable
 from safeds.data.tabular.exceptions import ColumnLengthMismatchError
-
-if TYPE_CHECKING:
-    from safeds.data.tabular.containers import Column, Table, TaggedTable
+from safeds.ml.exceptions import UntaggedTableError
 
 
 class Regressor(ABC):
@@ -91,6 +89,8 @@ class Regressor(ABC):
         mean_squared_error : float
             The calculated mean squared error (the average of the distance of each individual row squared).
         """
+        if not isinstance(validation_or_test_set, TaggedTable) and isinstance(validation_or_test_set, Table):
+            raise UntaggedTableError
         expected = validation_or_test_set.target
         predicted = self.predict(validation_or_test_set.features).target
 
@@ -112,6 +112,8 @@ class Regressor(ABC):
         mean_absolute_error : float
             The calculated mean absolute error (the average of the distance of each individual row).
         """
+        if not isinstance(validation_or_test_set, TaggedTable) and isinstance(validation_or_test_set, Table):
+            raise UntaggedTableError
         expected = validation_or_test_set.target
         predicted = self.predict(validation_or_test_set.features).target
 
