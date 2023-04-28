@@ -1202,7 +1202,7 @@ class Table:
         grid.set_ylabels("")
         grid.set_titles("{col_name}")
         for axes in grid.axes.flat:
-            axes.set_xticks(axes.get_xticks()[1:-1])
+            axes.set_xticks(axes.get_xticks())
             axes.set_xticklabels(axes.get_xticklabels(), rotation=45, horizontalalignment="right")
         grid.tight_layout()
 

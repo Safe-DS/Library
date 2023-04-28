@@ -589,7 +589,7 @@ class Column(Sequence[_T]):
         """
         fig = plt.figure()
         ax = sns.histplot(data=self._data)
-        ax.set_xticks(ax.get_xticks()[1:-1])
+        ax.set_xticks(ax.get_xticks())
         ax.set(xlabel=self.name)
         ax.set_xticklabels(
             ax.get_xticklabels(),
