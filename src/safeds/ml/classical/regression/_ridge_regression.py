@@ -32,10 +32,10 @@ class RidgeRegression(Regressor):
         self._wrapped_regressor: sk_Ridge | None = None
         self._feature_names: list[str] | None = None
         self._target_name: str | None = None
-        self.alpha = alpha
-        if self.alpha < 0:
+        self._alpha = alpha
+        if self._alpha < 0:
             raise ValueError("alpha must be non-negative")
-        if self.alpha == 0.0:
+        if self._alpha == 0.0:
             warnings.warn(
                 (
                     "Setting alpha to zero makes this model equivalent to LinearRegression. You should use "
@@ -66,10 +66,10 @@ class RidgeRegression(Regressor):
         LearningError
             If the training data contains invalid values or if the training failed.
         """
-        wrapped_regressor = sk_Ridge(alpha=self.alpha)
+        wrapped_regressor = sk_Ridge(alpha=self._alpha)
         fit(wrapped_regressor, training_set)
 
-        result = RidgeRegression(alpha=self.alpha)
+        result = RidgeRegression(alpha=self._alpha)
         result._wrapped_regressor = wrapped_regressor
         result._feature_names = training_set.features.column_names
         result._target_name = training_set.target.name
