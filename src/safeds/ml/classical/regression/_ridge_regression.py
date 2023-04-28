@@ -25,7 +25,7 @@ class RidgeRegression(Regressor):
     Raises
     ------
     ValueError
-        If the parameter is below 0
+        If alpha is negative.
     """
 
     def __init__(self, alpha: float = 1.0) -> None:
@@ -34,15 +34,9 @@ class RidgeRegression(Regressor):
         self._target_name: str | None = None
         self.alpha = alpha
         if self.alpha < 0:
-            raise ValueError("The alpha parameter should not be below 0")
+            raise ValueError("alpha must be positive")
         if self.alpha == 0.0:
-            warnings.warn(
-                (
-                    "RidgeRegression with alpha 0 performs the exact way as LinearRegression. Please use"
-                    " LinearRegression instead."
-                ),
-                stacklevel=2,
-            )
+            warnings.warn("Setting alpha to zero makes this model equivalent to LinearRegression. You should use LinearRegression instead for better numerical stability.", UserWarning, stacklevel=2)
 
     def fit(self, training_set: TaggedTable) -> RidgeRegression:
         """

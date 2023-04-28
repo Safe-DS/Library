@@ -4,17 +4,14 @@ from safeds.ml.classical.regression import RidgeRegression
 
 
 def test_ridge_regression_invalid() -> None:
-    with pytest.raises(ValueError, match="The alpha parameter should not be below 0"):
+    with pytest.raises(ValueError, match="alpha must be positive"):
         RidgeRegression(alpha=-1.0)
 
 
 def test_ridge_regression_warning() -> None:
     with pytest.warns(
         UserWarning,
-        match=(
-            "RidgeRegression with alpha 0 performs the exact way as LinearRegression. Please use LinearRegression"
-            " instead."
-        ),
+        match=("Setting alpha to zero makes this model equivalent to LinearRegression. You should use LinearRegression instead for better numerical stability."),
     ):
         RidgeRegression(alpha=0.0)
 
