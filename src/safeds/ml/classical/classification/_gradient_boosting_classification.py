@@ -18,8 +18,7 @@ class GradientBoosting(Classifier):
     Parameters
     ----------
     learning_rate : float
-        Learning rate shrinks the contribution of each tree by `learning_rate`.
-
+        The contribution of each tree shrinks by `learning_rate`.
 
     Raises
     ------
@@ -32,7 +31,7 @@ class GradientBoosting(Classifier):
         self._feature_names: list[str] | None = None
         self._target_name: str | None = None
         if learning_rate <= 0:
-            raise ValueError("learning_rate must be non-negative.")
+            raise ValueError("learning_rate must be positive.")
         self._learning_rate = learning_rate
 
     def fit(self, training_set: TaggedTable) -> GradientBoosting:

@@ -4,7 +4,7 @@ from safeds.ml.classical.regression import GradientBoosting
 
 
 def test_should_throw_value_error_if_learning_rate_is_non_positive() -> None:
-    with pytest.raises(ValueError, match="learning_rate must be non-negative."):
+    with pytest.raises(ValueError, match="learning_rate must be positive."):
         GradientBoosting(learning_rate=-1)
 
 
