@@ -10,7 +10,8 @@ def test_alpha_invalid() -> None:
 
 
 def test_alpha_warning() -> None:
-    with pytest.warns(UserWarning, match="alpha=0 is equivalent to LinearRegression. Use it instead."):
+    with pytest.warns(UserWarning, match="Setting alpha to zero makes this model equivalent to LinearRegression. You "
+                                         "should use LinearRegression instead for better numerical stability."):
         ElasticNetRegression(alpha=0.0)
 
 

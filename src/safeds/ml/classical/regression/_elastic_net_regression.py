@@ -14,13 +14,25 @@ if TYPE_CHECKING:
 
 
 class ElasticNetRegression(Regressor):
-    """Elastic net regression."""
+    """Elastic net regression.
+
+    Parameters
+    ----------
+    alpha : float
+        Controls the regularization of the model. The higher the value, the more regularized it becomes.
+
+    Raises
+    ------
+    ValueError
+        If alpha is negative.
+    """
 
     def __init__(self, alpha: float = 1.0) -> None:
         if alpha < 0:
             raise ValueError("alpha must be positive")
         if alpha == 0:
-            warn("alpha=0 is equivalent to LinearRegression. Use it instead.", UserWarning, stacklevel=1)
+            warn("Setting alpha to zero makes this model equivalent to LinearRegression. You should use "
+                 "LinearRegression instead for better numerical stability.", UserWarning, stacklevel=1)
 
         self._alpha = alpha
         self._wrapped_regressor: sk_ElasticNet | None = None
