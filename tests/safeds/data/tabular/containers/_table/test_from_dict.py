@@ -21,6 +21,7 @@ from safeds.data.tabular.typing import Integer, Schema
             Table([[1, 2]], schema=Schema({"a": Integer(), "b": Integer()})),
         ),
     ],
+    ids=["empty", "with values"]
 )
 def test_should_create_table_from_dict(data: dict[str, list[Any]], expected: Table) -> None:
     assert Table.from_dict(data) == expected
