@@ -18,7 +18,8 @@ class GradientBoosting(Classifier):
     Parameters
     ----------
     learning_rate : float
-        The contribution of each tree shrinks by `learning_rate`.
+        The larger the value, the more the model is influenced by each additional tree. If the learning rate is too
+        low, the model might underfit. If the learning rate is too high, the model might overfit.
 
     Raises
     ------
