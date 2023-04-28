@@ -13,12 +13,22 @@ if TYPE_CHECKING:
 
 
 class AdaBoost(Regressor):
-    """Ada Boost regression."""
+    """Ada Boost regression.
 
-    def __init__(self) -> None:
+    Parameters
+    ----------
+    learning_rate : float
+        Weight applied to each regressor at each boosting iteration.
+        A higher learning rate increases the contribution of each regressor.
+    """
+
+    def __init__(self, learning_rate: float = 1.0) -> None:
         self._wrapped_regressor: sk_AdaBoostRegressor | None = None
         self._feature_names: list[str] | None = None
         self._target_name: str | None = None
+        if learning_rate <= 0:
+            raise ValueError("learning_rate must be positive.")
+        self.learning_rate = learning_rate
 
     def fit(self, training_set: TaggedTable) -> AdaBoost:
         """
@@ -41,10 +51,10 @@ class AdaBoost(Regressor):
         LearningError
             If the training data contains invalid values or if the training failed.
         """
-        wrapped_regressor = sk_AdaBoostRegressor()
+        wrapped_regressor = sk_AdaBoostRegressor(learning_rate=self.learning_rate)
         fit(wrapped_regressor, training_set)
 
-        result = AdaBoost()
+        result = AdaBoost(learning_rate=self.learning_rate)
         result._wrapped_regressor = wrapped_regressor
         result._feature_names = training_set.features.column_names
         result._target_name = training_set.target.name
