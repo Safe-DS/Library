@@ -4,7 +4,7 @@ from safeds.ml.classical.regression import ElasticNetRegression
 
 
 def test_should_throw_value_error_alpha() -> None:
-    with pytest.raises(ValueError, match="alpha must be positive"):
+    with pytest.raises(ValueError, match="alpha must be non-negative"):
         ElasticNetRegression(alpha=-1.0)
 
 
