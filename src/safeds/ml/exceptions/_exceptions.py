@@ -66,7 +66,8 @@ class UntaggedTableError(Exception):
 
     def __init__(self) -> None:
         super().__init__(
-            "This method needs a tagged table.\n"
-            "A tagged table is a table that additionally knows which columns are features and which are the target to predict.\n"
-            "Use Table.tag_column() to create a tagged table.",
+            (
+                "This method needs a tagged table.\nA tagged table is a table that additionally knows which columns are"
+                " features and which are the target to predict.\nUse Table.tag_column() to create a tagged table."
+            ),
         )
