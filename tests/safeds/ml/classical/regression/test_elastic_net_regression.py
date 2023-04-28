@@ -9,8 +9,13 @@ def test_alpha_invalid() -> None:
 
 
 def test_alpha_warning() -> None:
-    with pytest.warns(UserWarning, match="Setting alpha to zero makes this model equivalent to LinearRegression. You "
-                                         "should use LinearRegression instead for better numerical stability."):
+    with pytest.warns(
+        UserWarning,
+        match=(
+            "Setting alpha to zero makes this model equivalent to LinearRegression. You "
+            "should use LinearRegression instead for better numerical stability."
+        ),
+    ):
         ElasticNetRegression(alpha=0.0)
 
 
@@ -41,8 +46,10 @@ def test_lasso_ratio_invalid() -> None:
 def test_lasso_ratio_zero() -> None:
     with pytest.warns(
         UserWarning,
-        match="ElasticNetRegression with lasso_ratio = 0 is essentially RidgeRegression."
-        " Use RidgeRegression instead for better numerical stability.",
+        match=(
+            "ElasticNetRegression with lasso_ratio = 0 is essentially RidgeRegression."
+            " Use RidgeRegression instead for better numerical stability."
+        ),
     ):
         ElasticNetRegression(lasso_ratio=0)
 
@@ -50,8 +57,10 @@ def test_lasso_ratio_zero() -> None:
 def test_lasso_ratio_one() -> None:
     with pytest.warns(
         UserWarning,
-        match="ElasticNetRegression with lasso_ratio = 0 is essentially LassoRegression."
-        " Use LassoRegression instead for better numerical stability.",
+        match=(
+            "ElasticNetRegression with lasso_ratio = 0 is essentially LassoRegression."
+            " Use LassoRegression instead for better numerical stability."
+        ),
     ):
         ElasticNetRegression(lasso_ratio=1)
 

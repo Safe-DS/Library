@@ -37,8 +37,14 @@ class ElasticNetRegression(Regressor):
         if alpha < 0:
             raise ValueError("alpha must be positive")
         if alpha == 0:
-            warn("Setting alpha to zero makes this model equivalent to LinearRegression. You should use "
-                 "LinearRegression instead for better numerical stability.", UserWarning, stacklevel=2)
+            warn(
+                (
+                    "Setting alpha to zero makes this model equivalent to LinearRegression. You should use "
+                    "LinearRegression instead for better numerical stability."
+                ),
+                UserWarning,
+                stacklevel=2,
+            )
 
         self._alpha = alpha
 
@@ -46,14 +52,18 @@ class ElasticNetRegression(Regressor):
             raise ValueError("lasso_ratio must be between 0 and 1.")
         elif lasso_ratio == 0:
             warnings.warn(
-                "ElasticNetRegression with lasso_ratio = 0 is essentially RidgeRegression."
-                " Use RidgeRegression instead for better numerical stability.",
+                (
+                    "ElasticNetRegression with lasso_ratio = 0 is essentially RidgeRegression."
+                    " Use RidgeRegression instead for better numerical stability."
+                ),
                 stacklevel=1,
             )
         elif lasso_ratio == 1:
             warnings.warn(
-                "ElasticNetRegression with lasso_ratio = 0 is essentially LassoRegression."
-                " Use LassoRegression instead for better numerical stability.",
+                (
+                    "ElasticNetRegression with lasso_ratio = 0 is essentially LassoRegression."
+                    " Use LassoRegression instead for better numerical stability."
+                ),
                 stacklevel=1,
             )
         self.lasso_ratio = lasso_ratio
