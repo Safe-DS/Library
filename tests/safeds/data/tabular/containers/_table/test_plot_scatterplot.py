@@ -21,7 +21,6 @@ def test_plot_scatterplot_wrong_column_name() -> None:
 
 def test_plot_scatterplot_legacy_check() -> None:
     table = Table.from_dict({"A": [1, 2, 3], "B": [2, 4, 7]})
-    #table.plot_scatterplot("A", "B").to_png_file(resolve_resource_path("./image/snapshot_scatterplot.png"))
     current = table.plot_scatterplot("A", "B")
-    legacy = Image.from_png_file(resolve_resource_path("./image/snapshot_scatterplot.png"))
-    assert legacy._image.tobytes() == current._image.tobytes()
+    snapshot = Image.from_png_file(resolve_resource_path("./image/snapshot_scatterplot.png"))
+    assert snapshot._image.tobytes() == current._image.tobytes()
