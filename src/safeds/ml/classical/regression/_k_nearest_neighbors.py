@@ -66,8 +66,10 @@ class KNearestNeighbors(Regressor):
         """
         if self._number_of_neighbors > training_set.number_of_rows:
             raise ValueError(
-                f"The number of neighbors ({self._number_of_neighbors}) has to be less than or equal to the sample "
-                f"size ({training_set.number_of_rows}).",
+                (
+                    f"The number of neighbors ({self._number_of_neighbors}) has to be less than or equal to the sample "
+                    f"size ({training_set.number_of_rows})."
+                ),
             )
 
         wrapped_regressor = sk_KNeighborsRegressor(self._number_of_neighbors, n_jobs=-1)
