@@ -28,7 +28,7 @@ class AdaBoost(Regressor):
             raise ValueError("learning_rate must be positive.")
 
         # Hyperparameters
-        self.learning_rate = learning_rate
+        self._learning_rate = learning_rate
 
         # Internal state
         self._wrapped_regressor: sk_AdaBoostRegressor | None = None
@@ -56,10 +56,10 @@ class AdaBoost(Regressor):
         LearningError
             If the training data contains invalid values or if the training failed.
         """
-        wrapped_regressor = sk_AdaBoostRegressor(learning_rate=self.learning_rate)
+        wrapped_regressor = sk_AdaBoostRegressor(learning_rate=self._learning_rate)
         fit(wrapped_regressor, training_set)
 
-        result = AdaBoost(learning_rate=self.learning_rate)
+        result = AdaBoost(learning_rate=self._learning_rate)
         result._wrapped_regressor = wrapped_regressor
         result._feature_names = training_set.features.column_names
         result._target_name = training_set.target.name

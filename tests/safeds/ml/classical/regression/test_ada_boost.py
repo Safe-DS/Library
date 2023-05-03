@@ -14,4 +14,4 @@ def test_should_give_learning_rate_to_sklearn() -> None:
 
     regressor = AdaBoost(learning_rate=2).fit(tagged_table)
     assert regressor._wrapped_regressor is not None
-    assert regressor._wrapped_regressor.learning_rate == regressor.learning_rate
+    assert regressor._wrapped_regressor.learning_rate == regressor._learning_rate

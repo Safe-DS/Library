@@ -32,7 +32,7 @@ class RandomForest(Regressor):
             raise ValueError("The number of trees has to be greater than 0.")
 
         # Hyperparameters
-        self.number_of_trees = number_of_trees
+        self._number_of_trees = number_of_trees
 
         # Internal state
         self._wrapped_regressor: sk_RandomForestRegressor | None = None
@@ -60,10 +60,10 @@ class RandomForest(Regressor):
         LearningError
             If the training data contains invalid values or if the training failed.
         """
-        wrapped_regressor = sk_RandomForestRegressor(self.number_of_trees, n_jobs=-1)
+        wrapped_regressor = sk_RandomForestRegressor(self._number_of_trees, n_jobs=-1)
         fit(wrapped_regressor, training_set)
 
-        result = RandomForest(self.number_of_trees)
+        result = RandomForest(self._number_of_trees)
         result._wrapped_regressor = wrapped_regressor
         result._feature_names = training_set.features.column_names
         result._target_name = training_set.target.name

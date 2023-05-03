@@ -65,7 +65,7 @@ class ElasticNetRegression(Regressor):
 
         # Hyperparameters
         self._alpha = alpha
-        self.lasso_ratio = lasso_ratio
+        self._lasso_ratio = lasso_ratio
 
         # Internal state
         self._wrapped_regressor: sk_ElasticNet | None = None
@@ -93,10 +93,10 @@ class ElasticNetRegression(Regressor):
         LearningError
             If the training data contains invalid values or if the training failed.
         """
-        wrapped_regressor = sk_ElasticNet(alpha=self._alpha, l1_ratio=self.lasso_ratio)
+        wrapped_regressor = sk_ElasticNet(alpha=self._alpha, l1_ratio=self._lasso_ratio)
         fit(wrapped_regressor, training_set)
 
-        result = ElasticNetRegression(alpha=self._alpha, lasso_ratio=self.lasso_ratio)
+        result = ElasticNetRegression(alpha=self._alpha, lasso_ratio=self._lasso_ratio)
         result._wrapped_regressor = wrapped_regressor
         result._feature_names = training_set.features.column_names
         result._target_name = training_set.target.name
