@@ -23,8 +23,10 @@ class KNearestNeighbors(Classifier):
     """
 
     def __init__(self, number_of_neighbors: int) -> None:
+        # Hyperparameters
         self._number_of_neighbors = number_of_neighbors
 
+        # Internal state
         self._wrapped_classifier: sk_KNeighborsClassifier | None = None
         self._feature_names: list[str] | None = None
         self._target_name: str | None = None

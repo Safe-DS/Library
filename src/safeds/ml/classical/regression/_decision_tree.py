@@ -16,6 +16,7 @@ class DecisionTree(Regressor):
     """Decision tree regression."""
 
     def __init__(self) -> None:
+        # Internal state
         self._wrapped_regressor: sk_DecisionTreeRegressor | None = None
         self._feature_names: list[str] | None = None
         self._target_name: str | None = None

@@ -23,8 +23,10 @@ class KNearestNeighbors(Regressor):
     """
 
     def __init__(self, number_of_neighbors: int) -> None:
+        # Hyperparameters
         self._number_of_neighbors = number_of_neighbors
 
+        # Internal state
         self._wrapped_regressor: sk_KNeighborsRegressor | None = None
         self._feature_names: list[str] | None = None
         self._target_name: str | None = None

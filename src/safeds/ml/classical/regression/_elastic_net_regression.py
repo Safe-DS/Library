@@ -32,6 +32,7 @@ class ElasticNetRegression(Regressor):
     """
 
     def __init__(self, alpha: float = 1.0, lasso_ratio: float = 0.5) -> None:
+        # Validation
         if alpha < 0:
             raise ValueError("alpha must be non-negative")
         if alpha == 0:
@@ -62,9 +63,11 @@ class ElasticNetRegression(Regressor):
                 stacklevel=2,
             )
 
+        # Hyperparameters
         self._alpha = alpha
         self.lasso_ratio = lasso_ratio
 
+        # Internal state
         self._wrapped_regressor: sk_ElasticNet | None = None
         self._feature_names: list[str] | None = None
         self._target_name: str | None = None

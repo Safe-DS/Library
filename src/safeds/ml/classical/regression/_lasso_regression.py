@@ -28,6 +28,7 @@ class LassoRegression(Regressor):
     """
 
     def __init__(self, alpha: float = 1.0) -> None:
+        # Validation
         if alpha < 0:
             raise ValueError("alpha must be non-negative")
         if alpha == 0:
@@ -40,7 +41,10 @@ class LassoRegression(Regressor):
                 stacklevel=2,
             )
 
+        # Hyperparameters
         self._alpha = alpha
+
+        # Internal state
         self._wrapped_regressor: sk_Lasso | None = None
         self._feature_names: list[str] | None = None
         self._target_name: str | None = None
