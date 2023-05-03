@@ -2,18 +2,18 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from sklearn.ensemble import GradientBoostingClassifier as sk_GradientBoostingClassifier
+from sklearn.ensemble import GradientBoostingRegressor as sk_GradientBoostingRegressor
 
 from safeds.ml.classical._util_sklearn import fit, predict
 
-from ._classifier import Classifier
+from ._regressor import Regressor
 
 if TYPE_CHECKING:
     from safeds.data.tabular.containers import Table, TaggedTable
 
 
-class GradientBoosting(Classifier):
-    """Gradient boosting classification.
+class GradientBoosting(Regressor):
+    """Gradient boosting regression.
 
     Parameters
     ----------
@@ -30,21 +30,21 @@ class GradientBoosting(Classifier):
     def __init__(self, learning_rate: float = 0.1) -> None:
         # Validation
         if learning_rate <= 0:
-            raise ValueError("learning_rate must be positive.")
+            raise ValueError("The learning rate has to be greater than 0.")
 
         # Hyperparameters
         self._learning_rate = learning_rate
 
         # Internal state
-        self._wrapped_classifier: sk_GradientBoostingClassifier | None = None
+        self._wrapped_regressor: sk_GradientBoostingRegressor | None = None
         self._feature_names: list[str] | None = None
         self._target_name: str | None = None
 
     def fit(self, training_set: TaggedTable) -> GradientBoosting:
         """
-        Create a copy of this classifier and fit it with the given training data.
+        Create a copy of this regressor and fit it with the given training data.
 
-        This classifier is not modified.
+        This regressor is not modified.
 
         Parameters
         ----------
@@ -53,19 +53,19 @@ class GradientBoosting(Classifier):
 
         Returns
         -------
-        fitted_classifier : GradientBoosting
-            The fitted classifier.
+        fitted_regressor : GradientBoosting
+            The fitted regressor.
 
         Raises
         ------
         LearningError
             If the training data contains invalid values or if the training failed.
         """
-        wrapped_classifier = sk_GradientBoostingClassifier(learning_rate=self._learning_rate)
-        fit(wrapped_classifier, training_set)
+        wrapped_regressor = sk_GradientBoostingRegressor(learning_rate=self._learning_rate)
+        fit(wrapped_regressor, training_set)
 
         result = GradientBoosting(learning_rate=self._learning_rate)
-        result._wrapped_classifier = wrapped_classifier
+        result._wrapped_regressor = wrapped_regressor
         result._feature_names = training_set.features.column_names
         result._target_name = training_set.target.name
 
@@ -96,15 +96,15 @@ class GradientBoosting(Classifier):
         PredictionError
             If predicting with the given dataset failed.
         """
-        return predict(self._wrapped_classifier, dataset, self._feature_names, self._target_name)
+        return predict(self._wrapped_regressor, dataset, self._feature_names, self._target_name)
 
     def is_fitted(self) -> bool:
         """
-        Check if the classifier is fitted.
+        Check if the regressor is fitted.
 
         Returns
         -------
         is_fitted : bool
-            Whether the classifier is fitted.
+            Whether the regressor is fitted.
         """
-        return self._wrapped_classifier is not None
+        return self._wrapped_regressor is not None
