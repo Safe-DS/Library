@@ -43,9 +43,6 @@ class ElasticNetRegression(Regressor):
                 UserWarning,
                 stacklevel=2,
             )
-
-        self._alpha = alpha
-
         if lasso_ratio < 0 or lasso_ratio > 1:
             raise ValueError("lasso_ratio must be between 0 and 1.")
         elif lasso_ratio == 0:
@@ -64,6 +61,8 @@ class ElasticNetRegression(Regressor):
                 ),
                 stacklevel=2,
             )
+
+        self._alpha = alpha
         self.lasso_ratio = lasso_ratio
 
         self._wrapped_regressor: sk_ElasticNet | None = None

@@ -39,6 +39,7 @@ class LassoRegression(Regressor):
                 UserWarning,
                 stacklevel=2,
             )
+
         self._alpha = alpha
         self._wrapped_regressor: sk_Lasso | None = None
         self._feature_names: list[str] | None = None

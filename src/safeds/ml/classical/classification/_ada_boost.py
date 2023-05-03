@@ -23,11 +23,12 @@ class AdaBoost(Classifier):
     """
 
     def __init__(self, learning_rate: float = 1.0) -> None:
+        if learning_rate <= 0:
+            raise ValueError("learning_rate must be positive.")
+
         self._wrapped_classifier: sk_AdaBoostClassifier | None = None
         self._feature_names: list[str] | None = None
         self._target_name: str | None = None
-        if learning_rate <= 0:
-            raise ValueError("learning_rate must be positive.")
         self._learning_rate = learning_rate
 
     def fit(self, training_set: TaggedTable) -> AdaBoost:

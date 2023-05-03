@@ -29,6 +29,7 @@ class RandomForest(Classifier):
     def __init__(self, number_of_trees: int = 100) -> None:
         if number_of_trees < 1:
             raise ValueError("The number of trees has to be greater than 0.")
+
         self._number_of_trees = number_of_trees
         self._wrapped_classifier: sk_RandomForestClassifier | None = None
         self._feature_names: list[str] | None = None

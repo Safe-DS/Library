@@ -29,13 +29,9 @@ class RidgeRegression(Regressor):
     """
 
     def __init__(self, alpha: float = 1.0) -> None:
-        self._wrapped_regressor: sk_Ridge | None = None
-        self._feature_names: list[str] | None = None
-        self._target_name: str | None = None
-        self._alpha = alpha
-        if self._alpha < 0:
+        if alpha < 0:
             raise ValueError("alpha must be non-negative")
-        if self._alpha == 0.0:
+        if alpha == 0.0:
             warnings.warn(
                 (
                     "Setting alpha to zero makes this model equivalent to LinearRegression. You should use "
@@ -44,6 +40,11 @@ class RidgeRegression(Regressor):
                 UserWarning,
                 stacklevel=2,
             )
+
+        self._wrapped_regressor: sk_Ridge | None = None
+        self._feature_names: list[str] | None = None
+        self._target_name: str | None = None
+        self._alpha = alpha
 
     def fit(self, training_set: TaggedTable) -> RidgeRegression:
         """
