@@ -1,17 +1,24 @@
 import pytest
-from safeds.data.tabular.containers import Table
+from safeds.data.tabular.containers import Table, TaggedTable
 from safeds.ml.classical.regression import AdaBoost
 
 
-def test_should_throw_value_error_if_learning_rate_is_non_positive() -> None:
-    with pytest.raises(ValueError, match="learning_rate must be positive."):
-        AdaBoost(learning_rate=-1)
+@pytest.fixture()
+def training_set() -> TaggedTable:
+    table = Table.from_dict({"col1": [1, 2, 3, 4], "col2": [1, 2, 3, 4]})
+    return table.tag_columns(target_name="col1", feature_names=["col2"])
 
 
-def test_should_give_learning_rate_to_sklearn() -> None:
-    training_set = Table.from_dict({"col1": [1, 2, 3, 4], "col2": [1, 2, 3, 4]})
-    tagged_table = training_set.tag_columns("col1")
+class TestLearningRate:
+    def test_should_be_passed_to_fitted_model(self, training_set: TaggedTable) -> None:
+        fitted_model = AdaBoost(learning_rate=2).fit(training_set)
+        assert fitted_model._learning_rate == 2
 
-    regressor = AdaBoost(learning_rate=2).fit(tagged_table)
-    assert regressor._wrapped_regressor is not None
-    assert regressor._wrapped_regressor.learning_rate == regressor._learning_rate
+    def test_should_be_passed_to_sklearn(self, training_set: TaggedTable) -> None:
+        fitted_model = AdaBoost(learning_rate=2).fit(training_set)
+        assert fitted_model._wrapped_regressor is not None
+        assert fitted_model._wrapped_regressor.learning_rate == 2
+
+    def test_should_raise_if_less_than_or_equal_to_0(self) -> None:
+        with pytest.raises(ValueError, match="has to be greater than 0"):
+            AdaBoost(learning_rate=-1)

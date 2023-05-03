@@ -18,14 +18,19 @@ class AdaBoost(Classifier):
     Parameters
     ----------
     learning_rate : float
-        Weight applied to each classifier at each boosting iteration.
-        A higher learning rate increases the contribution of each classifier.
+        Weight applied to each classifier at each boosting iteration. A higher learning rate increases the contribution
+        of each classifier. Has to be greater than 0.
+
+    Raises
+    ------
+    ValueError
+        If the learning rate is less than or equal to 0.
     """
 
     def __init__(self, learning_rate: float = 1.0) -> None:
         # Validation
         if learning_rate <= 0:
-            raise ValueError("learning_rate must be positive.")
+            raise ValueError("The learning rate has to be greater than 0.")
 
         # Hyperparameters
         self._learning_rate = learning_rate
