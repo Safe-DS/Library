@@ -35,46 +35,63 @@ class TestFromDict:
 
 class TestFromPandasDataFrame:
     @pytest.mark.parametrize(
-        ("row", "expected"),
+        ("dataframe", "schema", "expected"),
         [
             (
-                Row._from_pandas_dataframe(pd.DataFrame(), Schema({})),
-                Schema({}),
+                pd.DataFrame({"col1": [0]}),
+                Schema({"col1": String()}),
+                Schema({"col1": String()}),
             ),
             (
-                Row._from_pandas_dataframe(pd.DataFrame({"col1": [0]}), Schema({"col1": Integer()})),
-                Schema({"col1": Integer()}),
-            ),
-            (
-                Row._from_pandas_dataframe(
-                    pd.DataFrame({"col1": [0], "col2": ["a"]}),
-                    Schema({"col1": Integer(), "col2": String()}),
-                ),
-                Schema({"col1": Integer(), "col2": String()}),
+                pd.DataFrame({"col1": [0], "col2": ["a"]}),
+                Schema({"col1": String(), "col2": String()}),
+                Schema({"col1": String(), "col2": String()}),
             ),
         ],
         ids=[
-            "empty",
             "one column",
             "two columns",
         ],
     )
-    def test_should_use_the_schema_if_passed(self, row: Row, expected: Schema) -> None:
+    def test_should_use_the_schema_if_passed(self, dataframe: pd.DataFrame, schema: Schema, expected: Schema) -> None:
+        row = Row._from_pandas_dataframe(dataframe, schema)
         assert row._schema == expected
 
     @pytest.mark.parametrize(
-        ("row", "expected"),
+        ("dataframe", "expected"),
         [
-            (Row._from_pandas_dataframe(pd.DataFrame()), Schema({})),
-            (Row._from_pandas_dataframe(pd.DataFrame({"col1": [0]})), Schema({"col1": Integer()})),
+            (
+                pd.DataFrame({"col1": [0]}),
+                Schema({"col1": Integer()}),
+            ),
+            (
+                pd.DataFrame({"col1": [0], "col2": ["a"]}),
+                Schema({"col1": Integer(), "col2": String()}),
+            ),
+        ],
+        ids=[
+            "one column",
+            "two columns",
+        ],
+    )
+    def test_should_infer_the_schema_if_not_passed(self, dataframe: pd.DataFrame, expected: Schema) -> None:
+        row = Row._from_pandas_dataframe(dataframe)
+        assert row._schema == expected
+
+    @pytest.mark.parametrize(
+        "dataframe",
+        [
+            pd.DataFrame(),
+            pd.DataFrame({"col1": [0, 1]}),
         ],
         ids=[
             "empty",
-            "one column",
+            "two rows",
         ],
     )
-    def test_should_infer_the_schema_if_not_passed(self, row: Row, expected: Schema) -> None:
-        assert row._schema == expected
+    def test_should_raise_if_dataframe_does_not_contain_exactly_one_row(self, dataframe: pd.DataFrame) -> None:
+        with pytest.raises(ValueError, match=re.escape("The dataframe has to contain exactly one row.")):
+            Row._from_pandas_dataframe(dataframe)
 
 
 class TestInit:
