@@ -13,10 +13,14 @@ if TYPE_CHECKING:
 
 
 class GradientBoosting(Regressor):
-    """Gradient boosting regression.
+    """
+    Gradient boosting regression.
 
     Parameters
     ----------
+    number_of_trees: int
+        The number of boosting stages to perform. Gradient boosting is fairly robust to over-fitting so a large
+        number usually results in better performance.
     learning_rate : float
         The larger the value, the more the model is influenced by each additional tree. If the learning rate is too
         low, the model might underfit. If the learning rate is too high, the model might overfit.
@@ -24,15 +28,18 @@ class GradientBoosting(Regressor):
     Raises
     ------
     ValueError
-        If `learning_rate` is non-positive.
+        If `learning_rate` is non-positive or the `number_of_trees` is less than or equal to 0.
     """
 
-    def __init__(self, learning_rate: float = 0.1) -> None:
+    def __init__(self, number_of_trees: int = 100, learning_rate: float = 0.1) -> None:
         # Validation
+        if number_of_trees <= 0:
+            raise ValueError("The number of boosting stages to perform has to be greater than 0.")
         if learning_rate <= 0:
             raise ValueError("The learning rate has to be greater than 0.")
 
         # Hyperparameters
+        self._number_of_trees = number_of_trees
         self._learning_rate = learning_rate
 
         # Internal state
@@ -61,10 +68,13 @@ class GradientBoosting(Regressor):
         LearningError
             If the training data contains invalid values or if the training failed.
         """
-        wrapped_regressor = sk_GradientBoostingRegressor(learning_rate=self._learning_rate)
+        wrapped_regressor = sk_GradientBoostingRegressor(
+            n_estimators=self._number_of_trees,
+            learning_rate=self._learning_rate,
+        )
         fit(wrapped_regressor, training_set)
 
-        result = GradientBoosting(learning_rate=self._learning_rate)
+        result = GradientBoosting(number_of_trees=self._number_of_trees, learning_rate=self._learning_rate)
         result._wrapped_regressor = wrapped_regressor
         result._feature_names = training_set.features.column_names
         result._target_name = training_set.target.name
