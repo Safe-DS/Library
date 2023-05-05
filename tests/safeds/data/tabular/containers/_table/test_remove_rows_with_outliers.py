@@ -2,7 +2,7 @@ import pytest
 from safeds.data.tabular.containers import Table
 
 
-pytest.mark.parametrize(
+@pytest.mark.parametrize(
     ("table", "expected"),
     [(Table.from_dict(
         {
@@ -43,11 +43,7 @@ pytest.mark.parametrize(
     ],
     ids=["no outliers", "with outliers", "no rows"],
 )
-
-
 def test_should_remove_rows_with_no_outliers(table: Table, expected: int) -> None:
     updated_table = table.remove_rows_with_outliers()
     print(updated_table)
     assert updated_table.number_of_rows == expected
-
-

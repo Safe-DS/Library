@@ -1,24 +1,21 @@
 import pytest
 from safeds.data.tabular.containers import Column, Table
 from safeds.data.tabular.exceptions import ColumnSizeError, DuplicateColumnNameError
-from safeds.data.tabular.typing import ColumnType, Integer, String
 
 
 @pytest.mark.parametrize(
-    ("table1", "column", "col_type", "expected"),
+    ("table1", "column", "expected"),
     [
         (Table.from_dict({"col1": [1, 2, 1], "col2": [1, 2, 4]}),
          Column("col3", ["a", "b", "c"]),
-         String(),
          Table.from_dict({"col1": [1, 2, 1], "col2": [1, 2, 4], "col3": ["a", "b", "c"]})),
         (Table.from_dict({"col1": [1, 2, 1], "col2": [1, 2, 4]}),
          Column("col3", [0, -1, -2]),
-         Integer(),
          Table.from_dict({"col1": [1, 2, 1], "col2": [1, 2, 4], "col3": [0, -1, -2]})),
     ],
     ids=["String", "Integer"],
 )
-def test_should_add_column(table1: Table, column: Column, col_type: ColumnType, expected: Table) -> None:
+def test_should_add_column(table1: Table, column: Column, expected: Table) -> None:
     table1 = table1.add_column(column)
     assert table1 == expected
 
