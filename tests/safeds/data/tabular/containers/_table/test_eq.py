@@ -1,55 +1,55 @@
 from typing import Any
 
 import pytest
-from safeds.data.tabular.containers import Column, Row
+from safeds.data.tabular.containers import Table, Row
 
 
 @pytest.mark.parametrize(
-    ("row1", "row2", "expected"),
+    ("table1", "table2", "expected"),
     [
-        (Row({}), Row({}), True),
-        (Row({"A": 1}), Row({"A": 1}), True),
-        (Row({"A": 1}), Row({"A": 2}), False),
-        (Row({"A": 1, "B": 2, "C": 3}), Row({"A": 2, "B": 4, "C": 3}), False),
-        (Row({"A": 1, "B": 2, "C": 3}), Row({"A": "1", "B": "2", "C": "3"}), False),
+        (Table.from_dict({}), Table.from_dict({}), True),
+        (Table.from_dict({"col1": [1]}), Table.from_dict({"col1": [1]}), True),
+        (Table.from_dict({"col1": [1]}), Table.from_dict({"col2": [1]}), False),
+        (Table.from_dict({"col1": [1, 2, 3]}), Table.from_dict({"col1": [1, 1, 3]}), False),
+        (Table.from_dict({"col1": [1, 2, 3]}), Table.from_dict({"col1": ["1", "2", "3"]}), False),
     ],
     ids=[
-        "empty Row",
-        "equal Row",
-        "different names",
+        "empty Table"
+        "equal Tables",
+        "different column names",
         "different values",
         "different types",
     ],
 )
-def test_should_return_whether_two_columns_are_equal(row1: Row, row2: Row, expected: bool) -> None:
-    assert (row1.__eq__(row2)) == expected
+def test_should_return_whether_two_tables_are_equal(table1: Table, table2: Table, expected: bool) -> None:
+    assert (table1.__eq__(table1)) == expected
 
 
 @pytest.mark.parametrize(
-    "row",
+    "table",
     [
-        Row({}),
-        Row({"A": 1, "B": 2, "C": 3}),
+        Table.from_dict({}),
+        Table.from_dict({"col1": [1]})
     ],
     ids=[
-        "empty",
+        "empty"
         "non-empty",
     ],
 )
-def test_should_return_true_if_objects_are_identical(row: Row) -> None:
-    assert (row.__eq__(row)) is True
+def test_should_return_true_if_objects_are_identical(table: Table) -> None:
+    assert (table.__eq__(table)) is True
 
 
 @pytest.mark.parametrize(
     ("row", "other"),
     [
-        (Row({}), None),
-        (Row({"A": 1}), Column("col1")),
+        (Table.from_dict({"col1": [1]}), None),
+        (Table.from_dict({"col1": [1]}), Row()),
     ],
     ids=[
-        "Row vs. None",
-        "Row vs. Column",
+        "Table vs. None",
+        "Table vs. Row",
     ],
 )
-def test_should_return_not_implemented_if_other_is_not_column(row: Row, other: Any) -> None:
-    assert (row.__eq__(other)) is NotImplemented
+def test_should_return_not_implemented_if_other_is_not_table(table: Table, other: Any) -> None:
+    assert (table.__eq__(other)) is NotImplemented
