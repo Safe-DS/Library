@@ -7,6 +7,10 @@ from sklearn.metrics import accuracy_score as sk_accuracy_score
 from safeds.data.tabular.containers import Table, TaggedTable
 from safeds.ml.exceptions import UntaggedTableError
 
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from typing import Any
 
 class Classifier(ABC):
     """Abstract base class for all classifiers."""
@@ -100,7 +104,7 @@ class Classifier(ABC):
 
         return sk_accuracy_score(expected_values._data, predicted_values._data)
 
-    def precision(self, validation_or_test_set: TaggedTable, positive_class: int = 1) -> float:
+    def precision(self, validation_or_test_set: TaggedTable, positive_class: Any = 1) -> float:
         """
         Compute the classifier's precision on the given data.
 
