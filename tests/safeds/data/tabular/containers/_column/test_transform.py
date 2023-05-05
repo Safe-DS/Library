@@ -16,5 +16,5 @@ from safeds.data.tabular.containers import Column
         "empty series"
     ]
 )
-def test_should_transform_column(column, expected) -> None:
+def test_should_transform_column(column: Column, expected: Column) -> None:
     assert column.transform(lambda it: it + 1) == expected
