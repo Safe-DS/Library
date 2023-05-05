@@ -562,7 +562,8 @@ class Column(Sequence[T]):
 
         Returns
         -------
-        The transformed column.
+        transformed_column: Column
+            The transformed column.
         """
         return self._data.copy(deep=True).apply(transformer, convert_dtype=True)
 
