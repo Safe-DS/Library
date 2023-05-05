@@ -21,6 +21,6 @@ def test_should_match_snapshot() -> None:
     ],
     ids=["First argument doesn't exist", "Second argument doesn't exist"],
 )
-def test_should_raise_if_column_does_not_exist(table:Table, col1:str, col2:str) -> None:
+def test_should_raise_if_column_does_not_exist(table: Table, col1: str, col2: str) -> None:
     with pytest.raises(UnknownColumnNameError):
         table.plot_scatterplot(col1, col2)

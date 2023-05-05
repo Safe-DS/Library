@@ -3,7 +3,6 @@ from safeds.data.tabular.containers import Row, Table
 from safeds.data.tabular.exceptions import SchemaMismatchError
 
 
-
 @pytest.mark.parametrize(
     ("table1", "row1", "row2", "table2"),
     [
@@ -39,9 +38,6 @@ def test_should_add_rows_from_table(table1: Table, table2: Table, expected: Tabl
 
 def test_should_raise_error_if_row_schema_invalid() -> None:
     table1 = Table.from_dict({"col1": [1, 2, 1], "col2": [1, 2, 4]})
-    row = [
-        Row({"col1": 2, "col2": 4}),
-        Row({"col1": 5, "col2": "Hallo"})
-    ]
+    row = [Row({"col1": 2, "col2": 4}), Row({"col1": 5, "col2": "Hallo"})]
     with pytest.raises(SchemaMismatchError):
         table1 = table1.add_rows(row)
