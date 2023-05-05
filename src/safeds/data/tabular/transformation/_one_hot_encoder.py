@@ -101,14 +101,8 @@ class OneHotEncoder(InvertibleTableTransformer):
         if len(missing_columns) > 0:
             raise UnknownColumnNameError(list(missing_columns))
 
-        # Make a copy of the old table:
-
-        # (This should really be refactored into its own method:)
-        new_table = table._data.copy()
-        new_table.columns = table._schema.column_names
-        new_table = Table(new_table)  # this does probably not maintain tagging
-
-        new_table = new_table.remove_columns(list(self._column_names.keys()))
+        # Drop those column names affected by the OneHotEncoder:
+        new_table = table.remove_columns(list(self._column_names.keys()))
 
         encoded_values = {}
         for new_column_name in self._value_to_column.values():
@@ -121,7 +115,9 @@ class OneHotEncoder(InvertibleTableTransformer):
                 encoded_values[new_column_name][i] = 1
 
             for new_column in self._column_names[old_column_name]:
+                print(f"DEBUG: column name: {new_column}, data: {encoded_values[new_column]}")
                 new_table.add_column(Column(new_column, encoded_values[new_column]))
+                print(f"DEBUG: column name: {new_column}, data: {encoded_values[new_column]}")
 
         column_names = []
 
@@ -159,6 +155,7 @@ class OneHotEncoder(InvertibleTableTransformer):
         # Transformer has not been fitted yet
         if self._column_names is None:
             raise TransformerNotFittedError
+        raise NotImplementedError("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
 
         data = transformed_table._data.copy()
         data.columns = transformed_table.column_names
