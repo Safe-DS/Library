@@ -68,10 +68,14 @@ class AdaBoost(Classifier):
         LearningError
             If the training data contains invalid values or if the training failed.
         """
-        wrapped_classifier = sk_AdaBoostClassifier(learning_rate=self._learning_rate, n_estimators=self._maximum_number_of_learners)
+        wrapped_classifier = sk_AdaBoostClassifier(
+            learning_rate=self._learning_rate, n_estimators=self._maximum_number_of_learners,
+        )
         fit(wrapped_classifier, training_set)
 
-        result = AdaBoost(learning_rate=self._learning_rate, maximum_number_of_learners=self._maximum_number_of_learners)
+        result = AdaBoost(
+            learning_rate=self._learning_rate, maximum_number_of_learners=self._maximum_number_of_learners,
+        )
         result._wrapped_classifier = wrapped_classifier
         result._feature_names = training_set.features.column_names
         result._target_name = training_set.target.name
