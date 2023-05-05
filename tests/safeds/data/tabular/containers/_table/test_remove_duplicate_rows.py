@@ -13,7 +13,7 @@ from safeds.data.tabular.containers import Table
                 },
             ),
             Table.from_dict({"A": [1, 4], "B": [2, 5]}),
-        )
+        ),
     ],
     ids=["duplicate rows"],
 )

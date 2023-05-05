@@ -1,8 +1,9 @@
-from safeds.data.tabular.containers import Table
 import pytest
+from safeds.data.tabular.containers import Table
+
 
 @pytest.mark.parametrize(
-    ("table"),
+    "table",
     [
         (Table.from_dict({"col1": [1], "col2": [1]})),
     ],

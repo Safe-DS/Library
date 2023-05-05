@@ -14,12 +14,9 @@ from safeds.data.tabular.typing import Integer, Schema
             ],
             Table([[1, 2], [4, 5]], Schema({"A": Integer(), "B": Integer()})),
         ),
-        (
-            [],
-            Table([])
-        )
+        ([], Table([])),
     ],
-    ids=["2 Columns", "empty"]
+    ids=["2 Columns", "empty"],
 )
 def test_should_create_table_from_list_of_columns(columns: list[Column], expected: Table) -> None:
     assert Table.from_columns(columns) == expected
