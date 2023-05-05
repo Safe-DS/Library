@@ -1,6 +1,5 @@
 from pathlib import Path
 
-import openpyxl
 import pytest
 from safeds.data.tabular.containers import Table
 

@@ -9,9 +9,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import openpyxl
 import pandas as pd
-import polars as pl
 import seaborn as sns
-from IPython.core.display_functions import DisplayHandle, display
 from pandas import DataFrame
 from scipy import stats
 
