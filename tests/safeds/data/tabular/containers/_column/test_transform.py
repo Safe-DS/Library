@@ -3,7 +3,7 @@ from typing import Mapping
 from safeds.data.tabular.containers import Column, Row
 
 
-def test_should_transform_column():
+def test_should_transform_column() -> None:
     column = Column("test", [1, 2])
     column = column.transform(lambda it: it + 1)
 
