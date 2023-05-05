@@ -1,5 +1,6 @@
 import pytest
 from safeds.data.tabular.containers import Column, Table
+from safeds.data.tabular.exceptions import DuplicateColumnNameError
 
 
 @pytest.mark.parametrize(
@@ -30,3 +31,9 @@ def test_should_add_columns(table1: Table, column1: Column,
 def test_should_add_columns_from_table(table1: Table, table2: Table, expected: Table) -> None:
     table1 = table1.add_columns(table2)
     assert table1 == expected
+
+
+def test_should_raise_duplicate_column_name_error() -> None:
+    table1 = Table.from_dict({"col1": [1, 2, 1], "col2": [1, 2, 4]})
+    with pytest.raises(DuplicateColumnNameError):
+        table1 = table1.add_column(Column("col1", ["a", "b", "c"]))
