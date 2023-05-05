@@ -558,7 +558,7 @@ class Column(Sequence[T]):
 
         Parameters
         ----------
-        transformer : (...) -> Any.
+        transformer : Callable[[T], R]
 
         Returns
         -------
