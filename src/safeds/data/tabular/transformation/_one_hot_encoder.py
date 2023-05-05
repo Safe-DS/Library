@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 from collections import Counter
+from typing import Tuple
 
 import pandas as pd
-from sklearn.preprocessing import OneHotEncoder as sk_OneHotEncoder
 
 from safeds.data.tabular.containers import Table
 from safeds.data.tabular.exceptions import TransformerNotFittedError, UnknownColumnNameError
@@ -16,8 +16,10 @@ class OneHotEncoder(InvertibleTableTransformer):
     """Encodes categorical columns to numerical features [0,1] that represent the existence for each value."""
 
     def __init__(self) -> None:
-        self._wrapped_transformer: sk_OneHotEncoder | None = None
+        # Maps old to new column names (useful for reversing the transformation):
         self._column_names: dict[str, list[str]] | None = None
+        # Maps concrete values to new column names:
+        self._value_to_column: dict[tuple[str, any], str] | None = None
 
     # noinspection PyProtectedMember
     def fit(self, table: Table, column_names: list[str] | None) -> OneHotEncoder:
@@ -46,18 +48,16 @@ class OneHotEncoder(InvertibleTableTransformer):
         data = table._data.copy()
         data.columns = table.column_names
 
-        wrapped_transformer = sk_OneHotEncoder()
-        wrapped_transformer.fit(data[column_names])
-
         result = OneHotEncoder()
-        result._wrapped_transformer = wrapped_transformer
 
         result._column_names = {}
+        result._value_to_column = {}
 
-        # Remember all existing column names:
+        # Keep track of number of occurrences of column names;
+        # initially all old column names appear exactly ones:
         name_counter = Counter(data.columns)
 
-        result._column_names = {}
+        # Iterate through all columns to-be-changed:
         for column in column_names:
             result._column_names[column] = []
             for element in table.get_column(column).get_unique_values():
@@ -68,6 +68,7 @@ class OneHotEncoder(InvertibleTableTransformer):
                 if name_counter[base_name] > 1:
                     new_column_name += f"#{name_counter[base_name]}"
                 result._column_names[column].append(new_column_name)
+                result._value_to_column[(column, element)] = new_column_name
 
         return result
 
@@ -92,7 +93,8 @@ class OneHotEncoder(InvertibleTableTransformer):
             If the transformer has not been fitted yet.
         """
         # Transformer has not been fitted yet
-        if self._wrapped_transformer is None or self._column_names is None:
+        # ~zzril: may change this to a call to is_fitted() ?
+        if self._column_names is None:
             raise TransformerNotFittedError
 
         # Input table does not contain all columns used to fit the transformer
@@ -103,14 +105,17 @@ class OneHotEncoder(InvertibleTableTransformer):
         original = table._data.copy()
         original.columns = table.schema.column_names
 
-        one_hot_encoded = pd.DataFrame(
-            self._wrapped_transformer.transform(original[self._column_names.keys()]).toarray(),
-        )
-        one_hot_encoded.columns = self._wrapped_transformer.get_feature_names_out()
+        #one_hot_encoded = pd.DataFrame(
+        #    self._wrapped_transformer.transform(original[self._column_names.keys()]).toarray(),
+        #)
+        #one_hot_encoded.columns = self._wrapped_transformer.get_feature_names_out()
 
         unchanged = original.drop(self._column_names.keys(), axis=1)
 
-        res = Table(pd.concat([unchanged, one_hot_encoded], axis=1))
+        #res = Table(pd.concat([unchanged, one_hot_encoded], axis=1))
+
+
+
         column_names = []
 
         for name in table.column_names:
@@ -185,4 +190,4 @@ class OneHotEncoder(InvertibleTableTransformer):
         is_fitted : bool
             Whether the transformer is fitted.
         """
-        return self._wrapped_transformer is not None
+        return self._column_names is not None
