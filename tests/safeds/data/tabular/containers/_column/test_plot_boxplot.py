@@ -1,5 +1,3 @@
-import _pytest
-import matplotlib.pyplot as plt
 import pytest
 from safeds.data.image.containers import Image
 from safeds.data.tabular.containers import Table
@@ -18,19 +16,6 @@ def test_plot_boxplot_non_numeric() -> None:
     table = Table.from_dict({"A": [1, 2, "A"]})
     with pytest.raises(NonNumericColumnError):
         table.get_column("A").plot_boxplot()
-
-
-def test_plot_boxplot_float(monkeypatch: _pytest.monkeypatch) -> None:
-    monkeypatch.setattr(plt, "show", lambda: None)
-    table = Table.from_dict({"A": [1, 2, 3.5]})
-    table.get_column("A").plot_boxplot()
-
-
-def test_plot_boxplot_int(monkeypatch: _pytest.monkeypatch) -> None:
-    monkeypatch.setattr(plt, "show", lambda: None)
-    table = Table.from_dict({"A": [1, 2, 3]})
-    table.get_column("A").plot_boxplot()
-
 
 def test_should_match_snapshot() -> None:
     table = Table.from_dict({"A": [1, 2, 3]})
