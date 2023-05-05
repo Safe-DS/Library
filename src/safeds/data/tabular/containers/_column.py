@@ -328,7 +328,7 @@ class Column(Sequence[T]):
             The transformed column.
 
         Examples
-        -------
+        --------
         column.transform(lambda value: value + 1)
         will add one to each element in the column
         """
