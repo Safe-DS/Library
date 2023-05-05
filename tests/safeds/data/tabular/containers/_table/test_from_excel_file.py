@@ -11,17 +11,21 @@ from tests.helpers import resolve_resource_path
     [
         (
             resolve_resource_path("./dummy_excel_file.xlsx"),
-            Table.from_dict({
-                "A": [1],
-                "B": [2],
-            }),
+            Table.from_dict(
+                {
+                    "A": [1],
+                    "B": [2],
+                },
+            ),
         ),
         (
             Path(resolve_resource_path("./dummy_excel_file.xlsx")),
-            Table.from_dict({
-                "A": [1],
-                "B": [2],
-            }),
+            Table.from_dict(
+                {
+                    "A": [1],
+                    "B": [2],
+                },
+            ),
         ),
     ],
     ids=["string path", "object path"],
