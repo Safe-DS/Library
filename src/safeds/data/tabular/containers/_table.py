@@ -1274,7 +1274,7 @@ class Table:
         """
         Write the data from the table into an Excel file.
 
-        If the file and/or the directories do not exist, they will be created. If the file already exists it will be
+        If the file and/or the directories do not exist, they will be created. If the file already exists, it will be
         overwritten.
 
         Parameters
