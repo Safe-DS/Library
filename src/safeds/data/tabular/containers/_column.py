@@ -300,6 +300,8 @@ class Column(Sequence[T]):
         """
         Return a new column with a new name.
 
+        This column is not modified.
+
         Parameters
         ----------
         new_name : str
