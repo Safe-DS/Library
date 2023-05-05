@@ -25,6 +25,7 @@ from safeds.ml.exceptions import (
 
 if TYPE_CHECKING:
     from _pytest.fixtures import FixtureRequest
+    from sklearn.base import ClassifierMixin
 
 
 def classifiers() -> list[Classifier]:
@@ -196,6 +197,9 @@ class DummyClassifier(Classifier):
 
     def is_fitted(self) -> bool:
         return True
+
+    def _get_sklearn_classifier(self) -> ClassifierMixin:
+        pass
 
 
 class TestAccuracy:

@@ -20,7 +20,7 @@ class TestAlpha:
         assert fitted_model._wrapped_regressor.alpha == 1
 
     def test_should_raise_if_less_than_0(self) -> None:
-        with pytest.raises(ValueError, match="alpha must be non-negative"):
+        with pytest.raises(ValueError, match="The parameter 'alpha' must be non-negative"):
             RidgeRegression(alpha=-1)
 
     def test_should_warn_if_equal_to_0(self) -> None:
