@@ -1,17 +1,23 @@
 import pytest
 from safeds.data.tabular.containers import Table
-from safeds.data.tabular.typing import ColumnType, String, Schema, Integer
+from safeds.data.tabular.typing import ColumnType, Integer, Schema, String
 
 
 @pytest.mark.parametrize(
     ("table1", "filter_column", "filter_value", "table2"),
     [
-        (Table.from_dict({"col1": [1, 2, 1], "col2": [1, 2, 4]}),
-         "col1", 1,
-         Table.from_dict({"col1": [1, 1], "col2": [1, 4]})),
-        (Table.from_dict({"col1": [3, 2, 4], "col2": [1, 2, 4]}),
-         "col1", 1,
-         Table([], Schema({"col1": Integer(), "col2": Integer()})))
+        (
+            Table.from_dict({"col1": [1, 2, 1], "col2": [1, 2, 4]}),
+            "col1",
+            1,
+            Table.from_dict({"col1": [1, 1], "col2": [1, 4]}),
+        ),
+        (
+            Table.from_dict({"col1": [3, 2, 4], "col2": [1, 2, 4]}),
+            "col1",
+            1,
+            Table([], Schema({"col1": Integer(), "col2": Integer()})),
+        ),
     ],
     ids=["filter for col1 = 1", "empty table"],
 )
