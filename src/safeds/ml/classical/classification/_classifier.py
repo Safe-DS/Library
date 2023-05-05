@@ -137,7 +137,7 @@ class Classifier(ABC):
             return 1.0
         return n_true_positives / (n_true_positives + n_false_positives)
 
-    def recall(self, validation_or_test_set: TaggedTable, positive_class: int = 1) -> float:
+    def recall(self, validation_or_test_set: TaggedTable, positive_class: Any = 1) -> float:
         """
         Compute the classifier's recall on the given data.
 
@@ -174,7 +174,7 @@ class Classifier(ABC):
             return 1.0
         return n_true_positives / (n_true_positives + n_false_negatives)
 
-    def f1_score(self, validation_or_test_set: TaggedTable, positive_class: int = 1) -> float:
+    def f1_score(self, validation_or_test_set: TaggedTable, positive_class: Any = 1) -> float:
         """
         Compute the classifier's $F_1$-score on the given data.
 
