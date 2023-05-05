@@ -284,3 +284,101 @@ class TestPrecision:
     def test_should_raise_if_table_is_not_tagged(self, table: Table) -> None:
         with pytest.raises(UntaggedTableError):
             DummyClassifier().precision(table)  # type: ignore[arg-type]
+
+
+class TestRecall:
+    def test_should_compare_result(self) -> None:
+        table = Table.from_dict(
+            {
+                "predicted": [1, 1, 0, 2],
+                "expected": [1, 0, 1, 2],
+            },
+        ).tag_columns(target_name="expected")
+
+        assert DummyClassifier().recall(table, 1) == 0.5
+
+    def test_should_compare_result_with_different_types(self) -> None:
+        table = Table.from_dict(
+            {
+                "predicted": [1, "1", "0", "2"],
+                "expected": [1, 0, 1, 2],
+            },
+        ).tag_columns(target_name="expected")
+
+        assert DummyClassifier().recall(table, 1) == 0.5
+
+    def test_should_return_1_if_never_expected_to_be_positive(self) -> None:
+        table = Table.from_dict(
+            {
+                "predicted": ["lol", "1", "0", "2"],
+                "expected": [2, 0, 5, 2],
+            },
+        ).tag_columns(target_name="expected")
+
+        assert DummyClassifier().recall(table, 1) == 1.0
+
+    @pytest.mark.parametrize(
+        "table",
+        [
+            Table.from_dict(
+                {
+                    "a": [1.0, 0.0, 0.0, 0.0],
+                    "b": [0.0, 1.0, 1.0, 0.0],
+                    "c": [0.0, 0.0, 0.0, 1.0],
+                },
+            ),
+        ],
+        ids=["untagged_table"],
+    )
+    def test_should_raise_if_table_is_not_tagged(self, table: Table) -> None:
+        with pytest.raises(UntaggedTableError):
+            DummyClassifier().recall(table)  # type: ignore[arg-type]
+
+
+class TestF1Score:
+    def test_should_compare_result(self) -> None:
+        table = Table.from_dict(
+            {
+                "predicted": [1, 1, 0, 2],
+                "expected": [1, 0, 1, 2],
+            },
+        ).tag_columns(target_name="expected")
+
+        assert DummyClassifier().f1_score(table, 1) == 0.5
+
+    def test_should_compare_result_with_different_types(self) -> None:
+        table = Table.from_dict(
+            {
+                "predicted": [1, "1", "0", "2"],
+                "expected": [1, 0, 1, 2],
+            },
+        ).tag_columns(target_name="expected")
+
+        assert DummyClassifier().f1_score(table, 1) == pytest.approx(0.6666667)
+
+    def test_should_return_1_if_never_expected_or_predicted_to_be_positive(self) -> None:
+        table = Table.from_dict(
+            {
+                "predicted": ["lol", "1", "0", "2"],
+                "expected": [2, 0, 2, 2],
+            },
+        ).tag_columns(target_name="expected")
+
+        assert DummyClassifier().f1_score(table, 1) == 1.0
+
+    @pytest.mark.parametrize(
+        "table",
+        [
+            Table.from_dict(
+                {
+                    "a": [1.0, 0.0, 0.0, 0.0],
+                    "b": [0.0, 1.0, 1.0, 0.0],
+                    "c": [0.0, 0.0, 0.0, 1.0],
+                },
+            ),
+        ],
+        ids=["untagged_table"],
+    )
+    def test_should_raise_if_table_is_not_tagged(self, table: Table) -> None:
+        with pytest.raises(UntaggedTableError):
+            DummyClassifier().f1_score(table)  # type: ignore[arg-type]
