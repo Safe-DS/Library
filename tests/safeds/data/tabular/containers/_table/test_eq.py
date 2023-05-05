@@ -7,7 +7,7 @@ from safeds.data.tabular.containers import Table, Row
 @pytest.mark.parametrize(
     ("table1", "table2", "expected"),
     [
-        (Table.from_dict({}), Table.from_dict({}), True),
+        (Table({}), Table({}), True),
         (Table.from_dict({"col1": [1]}), Table.from_dict({"col1": [1]}), True),
         (Table.from_dict({"col1": [1]}), Table.from_dict({"col2": [1]}), False),
         (Table.from_dict({"col1": [1, 2, 3]}), Table.from_dict({"col1": [1, 1, 3]}), False),
@@ -22,7 +22,7 @@ from safeds.data.tabular.containers import Table, Row
     ],
 )
 def test_should_return_whether_two_tables_are_equal(table1: Table, table2: Table, expected: bool) -> None:
-    assert (table1.__eq__(table1)) == expected
+    assert (table1.__eq__(table2)) == expected
 
 
 @pytest.mark.parametrize(
@@ -41,7 +41,7 @@ def test_should_return_true_if_objects_are_identical(table: Table) -> None:
 
 
 @pytest.mark.parametrize(
-    ("row", "other"),
+    ("table", "other"),
     [
         (Table.from_dict({"col1": [1]}), None),
         (Table.from_dict({"col1": [1]}), Row()),
