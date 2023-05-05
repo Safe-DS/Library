@@ -328,7 +328,7 @@ class Column(Sequence[T]):
             The transformed column.
 
         Examples
-        -------
+        --------
         >>> from safeds.data.tabular.containers import Column
         >>> price = Column("price", [4.99, 5.99, 2.49])
         >>> sale = price.transform(lambda amount: amount * 0.8)
