@@ -3,7 +3,6 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 
 from sklearn.metrics import accuracy_score as sk_accuracy_score
-from sklearn.metrics import precision_score as sk_precision_score
 
 from safeds.data.tabular.containers import Table, TaggedTable
 from safeds.data.tabular.exceptions import ColumnLengthMismatchError
@@ -103,14 +102,14 @@ class Classifier(ABC):
 
     def precision(self, validation_or_test_set: TaggedTable, positive_class=1) -> float:
         """
-        Compute the classifier's precision of the on the given data.
+        Compute the classifier's precision on the given data.
 
         Parameters
         ----------
         validation_or_test_set : TaggedTable
             The validation or test set.
         positive_class : int | str
-            The classification to be considered positive
+            The class to be considered positive. All other classes are considered negative.
 
         Returns
         -------
