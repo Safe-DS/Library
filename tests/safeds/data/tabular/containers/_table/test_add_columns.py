@@ -1,6 +1,6 @@
 import pytest
 from safeds.data.tabular.containers import Column, Table
-from safeds.data.tabular.exceptions import ColumnSizeError
+from safeds.data.tabular.exceptions import ColumnSizeError, DuplicateColumnNameError
 
 
 @pytest.mark.parametrize(
@@ -47,3 +47,17 @@ def test_should_add_columns_from_table(table1: Table, table2: Table, expected: T
 def test_should_raise_error_if_column_size_invalid(table, columns) -> None:
     with pytest.raises(ColumnSizeError):
         table = table.add_columns(columns)
+
+
+@pytest.mark.parametrize(
+    ("table", "columns"),
+    [
+        (Table.from_dict({"col1": [1, 2, 1], "col2": [1, 2, 4]}),
+         ["col2"]),
+    ],
+    ids=["Column already exists"]
+)
+def test_should_raise_error_if_column_name_in_result_column(table, columns) -> None:
+    table = Table.from_dict({"col1": [1, 2, 1], "col2": [1, 2, 4]})
+    with pytest.raises(DuplicateColumnNameError):
+        table = table.add_column(Column("col2", ["a", "b", "c", "d"]))
