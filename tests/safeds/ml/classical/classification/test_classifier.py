@@ -201,8 +201,9 @@ class TestAccuracy:
 
         assert DummyClassifier().accuracy(table) == 0.0
 
+
 class TestPrecision:
-    def test_with_same_type(self) -> None:
+    def test_should_compare_result(self) -> None:
         table = Table.from_dict(
             {
                 "predicted": [1, 1, 0, 2],
@@ -210,15 +211,25 @@ class TestPrecision:
             },
         ).tag_columns(target_name="expected")
 
-        print(DummyClassifier().precision(table, 1))
         assert DummyClassifier().precision(table, 1) == 0.5
 
-    def test_with_different_types(self) -> None:
+    def test_should_compare_result_with_different_types(self) -> None:
         table = Table.from_dict(
             {
-                "predicted": ["1", "1", "0", "2"],
+                "predicted": [1, "1", "0", "2"],
                 "expected": [1, 0, 1, 2],
             },
         ).tag_columns(target_name="expected")
 
-        assert DummyClassifier().precision(table, 1) == 0.5
+        assert DummyClassifier().precision(table, 1) == 1.0
+
+    def test_should_raise_zero_division(self) -> None:
+        table = Table.from_dict(
+            {
+                "predicted": ["lol", "1", "0", "2"],
+                "expected": [1, 0, 1, 2],
+            },
+        ).tag_columns(target_name="expected")
+
+        with pytest.raises(ZeroDivisionError):
+            DummyClassifier().precision(table, 1)

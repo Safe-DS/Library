@@ -94,9 +94,9 @@ class Classifier(ABC):
 
         return sk_accuracy_score(expected._data, predicted._data)
 
-    def precision(self, validation_or_test_set: TaggedTable, positive_class = 1) -> float:
+    def precision(self, validation_or_test_set: TaggedTable, positive_class=1) -> float:
         """
-        Compute the precision of the classifier on the given data.
+        Compute the classifier's precision of the on the given data.
 
         Parameters
         ----------
@@ -113,8 +113,18 @@ class Classifier(ABC):
         expected = validation_or_test_set.target
         predicted = self.predict(validation_or_test_set.features).target
 
-        try:
-            return sk_precision_score(expected._data, predicted._data, average=None, labels=[positive_class])
-        except ValueError:
-            return
+        if len(expected) != len(predicted):
+            raise AssertionError("Different length of 'expected' and 'predicted' vectors.")
 
+        true_positive, false_positive = 0, 0
+
+        for i in range(len(expected)):
+            if predicted[i] == positive_class:
+                if expected[i] == predicted[i]:
+                    true_positive += 1
+                else:
+                    false_positive += 1
+
+        if (true_positive+false_positive) == 0:
+            raise ZeroDivisionError("No positive predictions")
+        return true_positive / (true_positive + false_positive)
