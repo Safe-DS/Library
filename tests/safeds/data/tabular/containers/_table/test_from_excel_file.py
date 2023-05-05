@@ -7,14 +7,28 @@ from tests.helpers import resolve_resource_path
 
 
 @pytest.mark.parametrize(
-    "path",
-    [resolve_resource_path("./dummy_excel_file.xlsx"), Path(resolve_resource_path("./dummy_excel_file.xlsx"))],
+    ("path", "expected"),
+    [
+        (
+            resolve_resource_path("./dummy_excel_file.xlsx"),
+            Table.from_dict({
+                "A": [1],
+                "B": [2],
+            }),
+        ),
+        (
+            Path(resolve_resource_path("./dummy_excel_file.xlsx")),
+            Table.from_dict({
+                "A": [1],
+                "B": [2],
+            }),
+        ),
+    ],
     ids=["string path", "object path"],
 )
-def test_should_find_equal_values(path: str | Path) -> None:
+def test_should_create_table_from_excel_file(path: str | Path, expected: Table) -> None:
     table = Table.from_excel_file(path)
-    assert table.get_column("A").get_value(0) == 1
-    assert table.get_column("B").get_value(0) == 2
+    assert table == expected
 
 
 def test_should_raise_file_not_found() -> None:
