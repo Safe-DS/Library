@@ -1,6 +1,6 @@
 import pytest
 from safeds.data.tabular.containers import Table
-from safeds.data.tabular.typing import ColumnType, String
+from safeds.data.tabular.typing import ColumnType, String, Schema, Integer
 
 
 @pytest.mark.parametrize(
@@ -9,8 +9,11 @@ from safeds.data.tabular.typing import ColumnType, String
         (Table.from_dict({"col1": [1, 2, 1], "col2": [1, 2, 4]}),
          "col1", 1,
          Table.from_dict({"col1": [1, 1], "col2": [1, 4]})),
+        (Table.from_dict({"col1": [3, 2, 4], "col2": [1, 2, 4]}),
+         "col1", 1,
+         Table([], Schema({"col1": Integer(), "col2": Integer()})))
     ],
-    ids=["filter for col1 = 1"],
+    ids=["filter for col1 = 1", "empty table"],
 )
 def test_should_filter_rows(table1: Table, filter_column: String, filter_value: ColumnType, table2: Table) -> None:
     table1 = table1.filter_rows(lambda row: row.get_value(filter_column) == filter_value)
