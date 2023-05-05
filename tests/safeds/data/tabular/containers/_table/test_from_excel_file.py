@@ -15,7 +15,7 @@ from tests.helpers import resolve_resource_path
     ],
     ids=["string path", "object path"],
 )
-def test_should_find_equal_values(path) -> None:
+def test_should_find_equal_values(path: str | Path) -> None:
     table = Table.from_excel_file(path)
     assert table.get_column("A").get_value(0) == 1
     assert table.get_column("B").get_value(0) == 2

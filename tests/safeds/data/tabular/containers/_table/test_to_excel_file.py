@@ -14,7 +14,7 @@ from tests.helpers import resolve_resource_path
     ],
     ids=["string path", "object path"],
 )
-def test_should_read_created_file(path) -> None:
+def test_should_read_created_file(path: str | Path) -> None:
     table = Table.from_dict({"col1": ["col1_1"], "col2": ["col2_1"]})
     try:
         with Path(path).open("w", encoding="utf-8") as _:
