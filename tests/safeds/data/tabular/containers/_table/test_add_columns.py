@@ -44,7 +44,7 @@ def test_should_add_columns_from_table(table1: Table, table2: Table, expected: T
     ],
     ids=["Two Columns with too many values"]
 )
-def test_should_raise_error_if_column_size_invalid(table, columns) -> None:
+def test_should_raise_error_if_column_size_invalid(table: Table, columns: list[Column] | Table) -> None:
     with pytest.raises(ColumnSizeError):
         table = table.add_columns(columns)
 
@@ -57,6 +57,6 @@ def test_should_raise_error_if_column_size_invalid(table, columns) -> None:
     ],
     ids=["Column already exists"]
 )
-def test_should_raise_error_if_column_name_in_result_column(table, columns) -> None:
+def test_should_raise_error_if_column_name_in_result_column(table: Table, columns: list[Column] | Table) -> None:
     with pytest.raises(DuplicateColumnNameError):
         table = table.add_columns(columns)
