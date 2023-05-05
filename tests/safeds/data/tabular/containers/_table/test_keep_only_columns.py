@@ -39,7 +39,7 @@ class TestKeepOnlyColumns:
         transformed_table = table.keep_only_columns(column_names)
         assert transformed_table == expected
 
-    def test_should_raise_if_column_does_no_exist(self) -> None:
+    def test_should_raise_unknown_column_name_error(self) -> None:
         table = Table.from_dict({"A": [1], "B": [2]})
         with pytest.raises(UnknownColumnNameError):
             table.keep_only_columns(["C"])
