@@ -1,23 +1,26 @@
 from pathlib import Path
+from tempfile import NamedTemporaryFile
 
-import pytest
 from safeds.data.tabular.containers import Table
 
-from tests.helpers import resolve_resource_path
 
-
-@pytest.mark.parametrize(
-    "path",
-    [resolve_resource_path("./dummy_excel_file.xlsx"), Path(resolve_resource_path("./dummy_excel_file.xlsx"))],
-    ids=["string path", "object path"],
-)
-def test_should_read_created_file(path: str | Path) -> None:
+def test_should_create_csv_file_from_table_by_str() -> None:
     table = Table.from_dict({"col1": ["col1_1"], "col2": ["col2_1"]})
-    try:
-        with Path(path).open("w", encoding="utf-8") as _:
-            table.to_excel_file(path)
-        with Path(path).open("r", encoding="utf-8") as _:
-            table_r = Table.from_excel_file(path)
-        assert table == table_r
-    finally:
-        Path(path).unlink()
+    with NamedTemporaryFile(suffix=".xlsx") as tmp_table_file:
+        tmp_table_file.close()
+        with Path(tmp_table_file.name).open("w", encoding="utf-8") as tmp_file:
+            table.to_excel_file(tmp_file.name)
+        with Path(tmp_table_file.name).open("r", encoding="utf-8") as tmp_file:
+            table_r = Table.from_excel_file(tmp_file.name)
+    assert table == table_r
+
+
+def test_should_create_csv_file_from_table_by_path() -> None:
+    table = Table.from_dict({"col1": ["col1_1"], "col2": ["col2_1"]})
+    with NamedTemporaryFile(suffix=".xlsx") as tmp_table_file:
+        tmp_table_file.close()
+        with Path(tmp_table_file.name).open("w", encoding="utf-8") as tmp_file:
+            table.to_excel_file(Path(tmp_file.name))
+        with Path(tmp_table_file.name).open("r", encoding="utf-8") as tmp_file:
+            table_r = Table.from_excel_file(Path(tmp_file.name))
+    assert table == table_r
