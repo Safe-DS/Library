@@ -1257,23 +1257,6 @@ class Table:
         data_to_excel.columns = self._schema.column_names
         data_to_excel.to_excel(path)
 
-    def to_excel_file(self, path: str | Path) -> None:
-        """
-        Write the data from the table into an Excel file.
-
-        If the file and/or the directories do not exist, they will be created. If the file already exists it will be
-        overwritten.
-
-        Parameters
-        ----------
-        path : str
-            The path to the output file.
-        """
-        Path(path).parent.mkdir(parents=True, exist_ok=True)
-        data_to_excel = self._data.copy()
-        data_to_excel.columns = self._schema.column_names
-        data_to_excel.to_excel(path)
-
     def to_json_file(self, path: str | Path) -> None:
         """
         Write the data from the table into a JSON file.
