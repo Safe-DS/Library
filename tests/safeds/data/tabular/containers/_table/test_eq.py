@@ -27,10 +27,7 @@ def test_should_return_whether_two_tables_are_equal(table1: Table, table2: Table
 
 @pytest.mark.parametrize(
     "table",
-    [
-        Table.from_dict({}),
-        Table.from_dict({"col1": [1]})
-    ],
+    [Table.from_dict({}), Table.from_dict({"col1": [1]})],
     ids=[
         "empty",
         "non-empty",
