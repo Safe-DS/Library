@@ -27,6 +27,6 @@ def test_should_create_table_from_dict(data: dict[str, list[Any]], expected: Tab
     assert Table.from_dict(data) == expected
 
 
-def test_should_raise_if_columns_have_different_lengths() -> None:
+def test_should_raise_error_if_columns_have_different_lengths() -> None:
     with pytest.raises(ColumnLengthMismatchError):
         Table.from_dict({"a": [1, 2], "b": [3]})
