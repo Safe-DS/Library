@@ -8,6 +8,7 @@ from typing import TYPE_CHECKING, Any, TypeVar, overload
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import pandas.core.apply
 import seaborn as sns
 
 from safeds.data.image.containers import Image
@@ -660,3 +661,17 @@ class Column(Sequence[_T]):
             The number of null values.
         """
         return self._data.isna().sum()
+
+    def transform(self, transformer):
+        """
+        Apply a transform method to every data point.
+        Parameters
+        ----------
+        transformer : (...) -> Any
+
+        Returns
+        -------
+        The transformed column.
+        """
+        self._data.apply(transformer, True)
+
