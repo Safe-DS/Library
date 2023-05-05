@@ -549,6 +549,24 @@ class Column(Sequence[T]):
         return self._data.var()
 
     # ------------------------------------------------------------------------------------------------------------------
+    # Transformations
+    # ------------------------------------------------------------------------------------------------------------------
+
+    def transform(self, transformer: Callable[[T], R]) -> Column[R]:
+        """
+        Apply a transform method to every data point.
+
+        Parameters
+        ----------
+        transformer : (...) -> Any.
+
+        Returns
+        -------
+        The transformed column.
+        """
+        return self._data.copy(deep=True).apply(transformer, convert_dtype=True)
+
+    # ------------------------------------------------------------------------------------------------------------------
     # Plotting
     # ------------------------------------------------------------------------------------------------------------------
 
@@ -662,17 +680,3 @@ class Column(Sequence[T]):
             The number of null values.
         """
         return self._data.isna().sum()
-
-    def transform(self, transformer: Callable[[T], R]) -> Column[R]:
-        """
-        Apply a transform method to every data point.
-
-        Parameters
-        ----------
-        transformer : (...) -> Any.
-
-        Returns
-        -------
-        The transformed column.
-        """
-        return self._data.copy(deep=True).apply(transformer, convert_dtype=True)
