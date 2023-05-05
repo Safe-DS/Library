@@ -5,6 +5,7 @@ from safeds.data.tabular.transformation import OneHotEncoder
 
 
 class TestInverseTransformTable:
+
     @pytest.mark.parametrize(
         ("table_to_fit", "column_names", "table_to_transform"),
         [
@@ -104,7 +105,7 @@ class TestInverseTransformTable:
 
         assert transformed_table == expected
 
-    def test_should_raise_if_not_fitted(self) -> None:
+    def test_should_raise_error_if_not_fitted(self) -> None:
         table = Table.from_dict(
             {
                 "a": [1.0, 0.0, 0.0, 0.0],
