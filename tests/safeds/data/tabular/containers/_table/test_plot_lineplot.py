@@ -2,6 +2,7 @@ import pytest
 from safeds.data.image.containers import Image
 from safeds.data.tabular.containers import Table
 from safeds.data.tabular.exceptions import UnknownColumnNameError
+from safeds.data.tabular.typing import ColumnType
 
 from tests.helpers import resolve_resource_path
 
@@ -13,7 +14,15 @@ def test_should_match_snapshot() -> None:
     assert snapshot._image.tobytes() == current._image.tobytes()
 
 
-def test_should_raise_if_column_does_not_exist() -> None:
+@pytest.mark.parametrize(
+    ("x", "y"),
+    [
+        ("C", "A"),
+        ("A", "C")
+    ],
+    ids=["x column", "y column"],
+)
+def test_should_raise_if_column_does_not_exist(x: ColumnType, y: ColumnType) -> None:
     table = Table.from_dict({"A": [1, 2, 3], "B": [2, 4, 7]})
     with pytest.raises(UnknownColumnNameError):
-        table.plot_lineplot("C", "A")
+        table.plot_lineplot(x, y)
