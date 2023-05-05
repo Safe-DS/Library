@@ -34,7 +34,7 @@ class AdaBoost(Regressor):
         If `maximum_number_of_learners` or `learning_rate` are less than or equal to 0
     """
 
-    def __init__(self, learner: Regressor = None, maximum_number_of_learners: int = 50, learning_rate: float = 1.0) -> None:
+    def __init__(self, learner: Regressor | None = None, maximum_number_of_learners: int = 50, learning_rate: float = 1.0) -> None:
         # Validation
         if maximum_number_of_learners <= 0:
             raise ValueError("The parameter 'maximum_number_of_learners' has to be grater than 0.")
