@@ -1258,7 +1258,6 @@ class Table:
         plot: Image
             The plot as an image.
         """
-        fig = plt.figure()
         numerical_table = self.remove_columns_with_non_numerical_values()
         data = pd.melt(numerical_table._data, value_vars=numerical_table.column_names)
         grid = sns.FacetGrid(data, col="variable", sharey=False, sharex=False)
@@ -1268,13 +1267,14 @@ class Table:
         grid.set_titles("{col_name}")
         for axes in grid.axes.flat:
             axes.set_xticks([])
-        grid.tight_layout()
+        plt.tight_layout()
+        fig = grid.fig
 
         buffer = io.BytesIO()
         fig.savefig(buffer, format="png")
-        plt.show()  # Prevents the figure from being displayed directly
+        plt.close()  # Prevents the figure from being displayed directly
         buffer.seek(0)
-        return Image(buffer, ImageFormat.PNG)
+        return Image(buffer, format_=ImageFormat.PNG)
 
     # ------------------------------------------------------------------------------------------------------------------
     # Conversion
