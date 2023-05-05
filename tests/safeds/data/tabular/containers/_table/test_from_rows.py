@@ -7,12 +7,12 @@ from safeds.data.tabular.typing import Integer, Schema, String
 @pytest.mark.parametrize(
     ("table", "expected"),
     [
-        (Table([[1, 4, "d"], [2, 5, "e"], [3, 6, "f"]],
-               Schema({"A": Integer(), "B": Integer(), "D": String()})),
-         Table([[1, 4, "d"], [2, 5, "e"], [3, 6, "f"]],
-               Schema({"A": Integer(), "B": Integer(), "D": String()}))),
+        (
+            Table([[1, 4, "d"], [2, 5, "e"], [3, 6, "f"]], Schema({"A": Integer(), "B": Integer(), "D": String()})),
+            Table([[1, 4, "d"], [2, 5, "e"], [3, 6, "f"]], Schema({"A": Integer(), "B": Integer(), "D": String()})),
+        ),
     ],
-    ids=["empty"]
+    ids=["empty"],
 )
 def test_should_create_table_from_rows(table: Table, expected: Table) -> None:
     rows_is = table.to_rows()

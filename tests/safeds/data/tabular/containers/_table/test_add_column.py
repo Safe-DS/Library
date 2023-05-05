@@ -6,12 +6,16 @@ from safeds.data.tabular.exceptions import ColumnSizeError, DuplicateColumnNameE
 @pytest.mark.parametrize(
     ("table1", "column", "expected"),
     [
-        (Table.from_dict({"col1": [1, 2, 1], "col2": [1, 2, 4]}),
-         Column("col3", ["a", "b", "c"]),
-         Table.from_dict({"col1": [1, 2, 1], "col2": [1, 2, 4], "col3": ["a", "b", "c"]})),
-        (Table.from_dict({"col1": [1, 2, 1], "col2": [1, 2, 4]}),
-         Column("col3", [0, -1, -2]),
-         Table.from_dict({"col1": [1, 2, 1], "col2": [1, 2, 4], "col3": [0, -1, -2]})),
+        (
+            Table.from_dict({"col1": [1, 2, 1], "col2": [1, 2, 4]}),
+            Column("col3", ["a", "b", "c"]),
+            Table.from_dict({"col1": [1, 2, 1], "col2": [1, 2, 4], "col3": ["a", "b", "c"]}),
+        ),
+        (
+            Table.from_dict({"col1": [1, 2, 1], "col2": [1, 2, 4]}),
+            Column("col3", [0, -1, -2]),
+            Table.from_dict({"col1": [1, 2, 1], "col2": [1, 2, 4], "col3": [0, -1, -2]}),
+        ),
     ],
     ids=["String", "Integer"],
 )

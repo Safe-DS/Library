@@ -6,10 +6,8 @@ from safeds.data.tabular.exceptions import UnknownColumnNameError
 @pytest.mark.parametrize(
     ("table1", "expected"),
     [
-        (Table.from_dict({"col1": [1, 2, 1], "col2": ["a", "b", "c"]}),
-         Table.from_dict({"col1": [1, 2, 1]})),
-        (Table.from_dict({"col1": [1, 2, 1], "col2": [1, 2, 4]}),
-         Table.from_dict({"col1": [1, 2, 1]})),
+        (Table.from_dict({"col1": [1, 2, 1], "col2": ["a", "b", "c"]}), Table.from_dict({"col1": [1, 2, 1]})),
+        (Table.from_dict({"col1": [1, 2, 1], "col2": [1, 2, 4]}), Table.from_dict({"col1": [1, 2, 1]})),
     ],
     ids=["String", "Integer"],
 )

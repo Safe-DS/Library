@@ -71,7 +71,7 @@ class TestTransform:
                         "col1": ["a", "b", "c"],
                     },
                 ),
-            )
+            ),
         ],
         ids=["all columns", "one column", "multiple columns", "none"],
     )
