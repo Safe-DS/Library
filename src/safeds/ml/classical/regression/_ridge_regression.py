@@ -10,6 +10,8 @@ from safeds.ml.classical._util_sklearn import fit, predict
 from ._regressor import Regressor
 
 if TYPE_CHECKING:
+    from sklearn.base import RegressorMixin
+
     from safeds.data.tabular.containers import Table, TaggedTable
 
 
@@ -25,13 +27,13 @@ class RidgeRegression(Regressor):
     Raises
     ------
     ValueError
-        If alpha is negative.
+        If `alpha` is negative.
     """
 
     def __init__(self, alpha: float = 1.0) -> None:
         # Validation
         if alpha < 0:
-            raise ValueError("alpha must be non-negative")
+            raise ValueError("The parameter 'alpha' must be non-negative")
         if alpha == 0.0:
             warnings.warn(
                 (
@@ -71,7 +73,7 @@ class RidgeRegression(Regressor):
         LearningError
             If the training data contains invalid values or if the training failed.
         """
-        wrapped_regressor = sk_Ridge(alpha=self._alpha)
+        wrapped_regressor = self._get_sklearn_regressor()
         fit(wrapped_regressor, training_set)
 
         result = RidgeRegression(alpha=self._alpha)
@@ -118,3 +120,14 @@ class RidgeRegression(Regressor):
             Whether the regressor is fitted.
         """
         return self._wrapped_regressor is not None
+
+    def _get_sklearn_regressor(self) -> RegressorMixin:
+        """
+        Return a new wrapped Regressor from sklearn.
+
+        Returns
+        -------
+        wrapped_regressor: RegressorMixin
+            The sklearn Regressor.
+        """
+        return sk_Ridge(alpha=self._alpha)

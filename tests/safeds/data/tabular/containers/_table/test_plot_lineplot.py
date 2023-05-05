@@ -13,7 +13,12 @@ def test_should_match_snapshot() -> None:
     assert snapshot._image.tobytes() == current._image.tobytes()
 
 
-def test_should_raise_if_column_does_not_exist() -> None:
+@pytest.mark.parametrize(
+    ("x", "y"),
+    [("C", "A"), ("A", "C")],
+    ids=["x column", "y column"],
+)
+def test_should_raise_if_column_does_not_exist(x: str, y: str) -> None:
     table = Table.from_dict({"A": [1, 2, 3], "B": [2, 4, 7]})
     with pytest.raises(UnknownColumnNameError):
-        table.plot_lineplot("C", "A")
+        table.plot_lineplot(x, y)
