@@ -266,4 +266,4 @@ class TestPrecision:
     )
     def test_should_raise_if_table_is_not_tagged(self, table: Table) -> None:
         with pytest.raises(UntaggedTableError):
-            DummyClassifier().precision(table)  # type: ignore[arg-type]
+            DummyClassifier().accuracy(table)  # type: ignore[arg-type]
