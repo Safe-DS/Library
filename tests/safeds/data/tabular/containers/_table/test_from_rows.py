@@ -1,7 +1,7 @@
 import pytest
 from safeds.data.tabular.containers import Table
 from safeds.data.tabular.exceptions import MissingDataError
-from safeds.data.tabular.typing import Schema, Integer, String
+from safeds.data.tabular.typing import Integer, Schema, String
 
 
 @pytest.mark.parametrize(
@@ -15,12 +15,12 @@ from safeds.data.tabular.typing import Schema, Integer, String
     ids=["empty"]
 )
 def test_should_create_table_from_rows(table: Table, expected: Table) -> None:
-    rows_is = expected.to_rows()
+    rows_is = table.to_rows()
     table_is = Table.from_rows(rows_is)
 
     assert table_is == expected
 
 
-def test_should_raise_MissingDataError() -> None:
+def test_should_raise_error_if_data_missing() -> None:
     with pytest.raises(MissingDataError):
         Table.from_rows([])

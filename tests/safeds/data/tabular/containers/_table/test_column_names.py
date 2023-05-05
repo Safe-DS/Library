@@ -1,6 +1,6 @@
 import pytest
-
 from safeds.data.tabular.containers import Table
+
 
 @pytest.mark.parametrize(
     ("table", "expected"),

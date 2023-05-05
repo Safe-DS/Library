@@ -22,7 +22,7 @@ def test_should_get_row(table1: Table, expected: Row) -> None:
     ],
     ids=["<0", "too high"],
 )
-def test_should_raise_index_out_of_bounds_error(index: int) -> None:
+def test_should_raise_error_if_index_out_of_bounds(index: int) -> None:
     table = Table.from_dict({"A": [1], "B": [2]})
     with pytest.raises(IndexOutOfBoundsError):
         table.get_row(index)

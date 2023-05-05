@@ -25,6 +25,6 @@ def test_should_create_table_from_list_of_columns(columns: list[Column], expecte
     assert Table.from_columns(columns) == expected
 
 
-def test_should_raise_column_length_mismatch_error() -> None:
+def test_should_raise_error_if_column_length_mismatch() -> None:
     with pytest.raises(ColumnLengthMismatchError):
         Table.from_columns([Column("col1", [5, 2, 3]), Column("col2", [5, 3, 4, 1])])

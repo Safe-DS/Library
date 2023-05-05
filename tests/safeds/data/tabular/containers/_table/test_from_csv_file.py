@@ -22,6 +22,6 @@ def test_should_create_table_from_csv_file(path: str | Path) -> None:
     ["test_table_from_csv_file_invalid.csv", Path("test_table_from_csv_file_invalid.csv")],
     ids=["by String", "by path"]
 )
-def test_should_raise_FileNotFoundError(path: str | Path) -> None:
+def test_should_raise_error_if_file_not_found(path: str | Path) -> None:
     with pytest.raises(FileNotFoundError):
         Table.from_csv_file(resolve_resource_path(path))
