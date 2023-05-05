@@ -1,23 +1,19 @@
-import _pytest
-import matplotlib.pyplot as plt
 import pytest
+from safeds.data.image.containers import Image
 from safeds.data.tabular.containers import Table
 from safeds.data.tabular.exceptions import UnknownColumnNameError
 
-
-@pytest.mark.parametrize(
-    "table",
-    [
-        Table.from_dict({"A": [1, 2, 3], "B": [2, 4, 7]}),
-    ],
-    ids=["numerical"]
-)
-def test_should_plot_line(table: Table, monkeypatch: _pytest.monkeypatch) -> None:
-    monkeypatch.setattr(plt, "show", lambda: None)
-    table.plot_lineplot("A", "B")
+from tests.helpers import resolve_resource_path
 
 
-def test_should_raise_error_if_column_name_unknown() -> None:
+def test_should_match_snapshot() -> None:
+    table = Table.from_dict({"A": [1, 2, 3], "B": [2, 4, 7]})
+    current = table.plot_lineplot("A", "B")
+    snapshot = Image.from_png_file(resolve_resource_path("./image/snapshot_lineplot.png"))
+    assert snapshot._image.tobytes() == current._image.tobytes()
+
+
+def test_should_raise_if_column_does_not_exist() -> None:
     table = Table.from_dict({"A": [1, 2, 3], "B": [2, 4, 7]})
     with pytest.raises(UnknownColumnNameError):
         table.plot_lineplot("C", "A")
