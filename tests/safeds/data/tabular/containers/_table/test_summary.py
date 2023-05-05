@@ -47,7 +47,8 @@ from statistics import stdev
          },
          )
          )
-    ]
+    ],
+    ids=["Column of integers and Column of characters"]
 )
 def test_should_make_summary(table, truth) -> None:
     assert truth == table.summary()
