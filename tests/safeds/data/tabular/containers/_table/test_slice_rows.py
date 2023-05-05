@@ -2,10 +2,16 @@ import pytest
 from safeds.data.tabular.containers import Table
 
 
-def test_slice_rows_valid() -> None:
-    table = Table.from_dict({"col1": [1, 2, 1], "col2": [1, 2, 4]})
-    test_table = Table.from_dict({"col1": [1, 2], "col2": [1, 2]})
-    second_test_table = Table.from_dict({"col1": [1, 1], "col2": [1, 4]})
+@pytest.mark.parametrize(
+    ("table", "test_table", "second_test_table"),
+    [
+        (Table.from_dict({"col1": [1, 2, 1], "col2": [1, 2, 4]}),
+         Table.from_dict({"col1": [1, 2], "col2": [1, 2]}),
+         Table.from_dict({"col1": [1, 1], "col2": [1, 4]})),
+    ],
+    ids=["Table with three rows"]
+)
+def test_should_slice_rows(table: Table, test_table: Table, second_test_table: Table) -> None:
     new_table = table.slice_rows(0, 2, 1)
     second_new_table = table.slice_rows(0, 3, 2)
     third_new_table = table.slice_rows()
@@ -24,7 +30,7 @@ def test_slice_rows_valid() -> None:
         (0, -4, 1),
     ],
 )
-def test_slice_rows_invalid(start: int, end: int, step: int) -> None:
+def test_should_raise_if_index_out_of_bounds(start: int, end: int, step: int) -> None:
     table = Table.from_dict({"col1": [1, 2, 1], "col2": [1, 2, 4]})
 
     with pytest.raises(ValueError, match="The given index is out of bounds"):

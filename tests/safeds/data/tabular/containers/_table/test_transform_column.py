@@ -16,7 +16,7 @@ def test_should_transform_column(table: Table, table_transformed: Table) -> None
     assert result == table_transformed
 
 
-def test_should_raise_UnknownColumnNameError() -> None:
+def test_should_raise_if_column_not_found() -> None:
     input_table = Table.from_dict(
         {
             "A": [1, 2, 3],

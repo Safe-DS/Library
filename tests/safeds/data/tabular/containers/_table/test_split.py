@@ -27,7 +27,7 @@ def test_should_split_table(table, result_test_table, result_train_table) -> Non
     ],
     ids=["0.0%", "1.0%", "-1.0%", "2.0%"]
 )
-def test_should_raise_error(percentage_in_first: float) -> None:
+def test_should_raise_if_value_not_in_range(percentage_in_first: float) -> None:
     table = Table.from_dict({"col1": [1, 2, 1], "col2": [1, 2, 4]})
 
     with pytest.raises(ValueError, match="the given percentage is not in range"):
