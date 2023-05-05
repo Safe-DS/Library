@@ -666,9 +666,10 @@ class Column(Sequence[T]):
     def transform(self, transformer: Callable[[T], R]) -> Column[R]:
         """
         Apply a transform method to every data point.
+
         Parameters
         ----------
-        transformer : (...) -> Any
+        transformer : (...) -> Any.
 
         Returns
         -------

@@ -1,6 +1,5 @@
-from typing import Mapping
 
-from safeds.data.tabular.containers import Column, Row
+from safeds.data.tabular.containers import Column
 
 
 def test_should_transform_column() -> None:
