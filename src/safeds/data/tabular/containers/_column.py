@@ -8,7 +8,6 @@ from typing import TYPE_CHECKING, Any, TypeVar, overload
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import pandas.core.apply
 import seaborn as sns
 
 from safeds.data.image.containers import Image
@@ -314,6 +313,27 @@ class Column(Sequence[T]):
         """
         return Column._from_pandas_series(self._data.rename(new_name), self._type)
 
+    def transform(self, transformer: Callable[[T], R]) -> Column[R]:
+        """
+        Apply a transform method to every data point.
+
+        Parameters
+        ----------
+        transformer : Callable[[T], R]
+            Lambda function that will be applied to all data points.
+
+        Returns
+        -------
+        transformed_column: Column
+            The transformed column.
+
+        Examples
+        -------
+        column.transform(lambda value: value + 1)
+        will add one to each element in the column
+        """
+        return Column(self.name, self._data.apply(transformer, convert_dtype=True))
+
     # ------------------------------------------------------------------------------------------------------------------
     # Statistics
     # ------------------------------------------------------------------------------------------------------------------
@@ -547,25 +567,6 @@ class Column(Sequence[T]):
             raise NonNumericColumnError(f"{self.name} is of type {self._type}.")
 
         return self._data.var()
-
-    # ------------------------------------------------------------------------------------------------------------------
-    # Transformations
-    # ------------------------------------------------------------------------------------------------------------------
-
-    def transform(self, transformer: Callable[[T], R]) -> Column[R]:
-        """
-        Apply a transform method to every data point.
-
-        Parameters
-        ----------
-        transformer : Callable[[T], R]
-
-        Returns
-        -------
-        transformed_column: Column
-            The transformed column.
-        """
-        return self._data.copy(deep=True).apply(transformer, convert_dtype=True)
 
     # ------------------------------------------------------------------------------------------------------------------
     # Plotting
