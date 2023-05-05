@@ -14,6 +14,7 @@ nav:
   - Development:
     - Environment: development/environment.md
     - Guidelines: development/guidelines.md
+    - Contributing: https://github.com/Safe-DS/Stdlib/contribute
 
 # Configuration of MkDocs & Material for MkDocs --------------------------------
 

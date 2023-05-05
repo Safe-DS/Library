@@ -19,12 +19,24 @@ class KNearestNeighbors(Regressor):
     Parameters
     ----------
     number_of_neighbors : int
-        The number of neighbors to be interpolated with. Has to be less than or equal than the sample size.
+        The number of neighbors to use for interpolation. Has to be greater than 0 (validated in the constructor) and
+        less than or equal to the sample size (validated when calling `fit`).
+
+    Raises
+    ------
+    ValueError
+        If the number of neighbors is less than or equal to 0.
     """
 
     def __init__(self, number_of_neighbors: int) -> None:
+        # Validation
+        if number_of_neighbors <= 0:
+            raise ValueError("The number of neighbors has to be greater than 0.")
+
+        # Hyperparameters
         self._number_of_neighbors = number_of_neighbors
 
+        # Internal state
         self._wrapped_regressor: sk_KNeighborsRegressor | None = None
         self._feature_names: list[str] | None = None
         self._target_name: str | None = None
@@ -47,9 +59,19 @@ class KNearestNeighbors(Regressor):
 
         Raises
         ------
+        ValueError
+            If the number of neighbors is greater than the sample size.
         LearningError
             If the training data contains invalid values or if the training failed.
         """
+        if self._number_of_neighbors > training_set.number_of_rows:
+            raise ValueError(
+                (
+                    f"The number of neighbors ({self._number_of_neighbors}) has to be less than or equal to the sample "
+                    f"size ({training_set.number_of_rows})."
+                ),
+            )
+
         wrapped_regressor = sk_KNeighborsRegressor(self._number_of_neighbors, n_jobs=-1)
         fit(wrapped_regressor, training_set)
 
