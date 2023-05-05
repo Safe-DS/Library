@@ -334,7 +334,8 @@ class TestRecall:
         with pytest.raises(UntaggedTableError):
             DummyClassifier().recall(table)  # type: ignore[arg-type]
 
-class TestF1_score:
+
+class TestF1Score:
     def test_should_compare_result(self) -> None:
         table = Table.from_dict(
             {
@@ -353,9 +354,8 @@ class TestF1_score:
             },
         ).tag_columns(target_name="expected")
 
-        f1 = DummyClassifier().f1_score(table, 1)
-        assert f1 <= 0.667
-        assert f1 > 0.666
+        assert DummyClassifier().f1_score(table, 1) == pytest.approx(0.6666667)
+
 
     def test_should_return_1_if_never_expected_or_predicted_to_be_positive(self) -> None:
         table = Table.from_dict(

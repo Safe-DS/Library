@@ -108,7 +108,7 @@ class Classifier(ABC):
         ----------
         validation_or_test_set : TaggedTable
             The validation or test set.
-        positive_class : int | str
+        positive_class : Any
             The class to be considered positive. All other classes are considered negative.
 
         Returns
@@ -145,7 +145,7 @@ class Classifier(ABC):
         ----------
         validation_or_test_set : TaggedTable
             The validation or test set.
-        positive_class : int | str
+        positive_class : Any
             The class to be considered positive. All other classes are considered negative.
 
         Returns
@@ -182,12 +182,12 @@ class Classifier(ABC):
         ----------
         validation_or_test_set : TaggedTable
             The validation or test set.
-        positive_class : int | str
+        positive_class : Any
             The class to be considered positive. All other classes are considered negative.
 
         Returns
         -------
-        $F_1$-score : float
+        f1_score : float
             The calculated $F_1$-score, i.e. the harmonic mean between precision and recall.
             Return 1 if there are no positive expectations and predictions.
         """
