@@ -101,23 +101,27 @@ class OneHotEncoder(InvertibleTableTransformer):
         if len(missing_columns) > 0:
             raise UnknownColumnNameError(list(missing_columns))
 
-        # Drop those column names affected by the OneHotEncoder:
-        new_table = table.remove_columns(list(self._column_names.keys()))
+        # Make a copy of the table:
+        # TODO: change to copy method once implemented
+        # (Can also instead call remove_columns already here once #276 is fixed)
+        new_table = table.remove_columns([])
 
         encoded_values = {}
         for new_column_name in self._value_to_column.values():
-            encoded_values[new_column_name] = [0 for i in range(table.number_of_rows)]
+            encoded_values[new_column_name] = [0.0 for i in range(table.number_of_rows)]
 
         for old_column_name in self._column_names:
             for i in range(table.number_of_rows):
                 value = table.get_column(old_column_name).get_value(i)
                 new_column_name = self._value_to_column[(old_column_name, value)]
-                encoded_values[new_column_name][i] = 1
+                encoded_values[new_column_name][i] = 1.0
 
             for new_column in self._column_names[old_column_name]:
-                print(f"DEBUG: column name: {new_column}, data: {encoded_values[new_column]}")
-                new_table.add_column(Column(new_column, encoded_values[new_column]))
-                print(f"DEBUG: column name: {new_column}, data: {encoded_values[new_column]}")
+                newly_constructed_column = Column(new_column, encoded_values[new_column])
+                new_table = new_table.add_column(Column(new_column, encoded_values[new_column]))
+
+        # Drop those column names affected by the OneHotEncoder:
+        new_table = new_table.remove_columns(list(self._column_names.keys()))
 
         column_names = []
 
@@ -152,10 +156,10 @@ class OneHotEncoder(InvertibleTableTransformer):
         TransformerNotFittedError
             If the transformer has not been fitted yet.
         """
+        raise NotImplementedError
         # Transformer has not been fitted yet
         if self._column_names is None:
             raise TransformerNotFittedError
-        raise NotImplementedError("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
 
         data = transformed_table._data.copy()
         data.columns = transformed_table.column_names
