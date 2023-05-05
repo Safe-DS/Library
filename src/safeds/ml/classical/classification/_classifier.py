@@ -102,7 +102,7 @@ class Classifier(ABC):
 
     def precision(self, validation_or_test_set: TaggedTable, positive_class=1) -> float:
         """
-        Compute the classifier's precision of the on the given data.
+        Compute the classifier's precision on the given data.
 
         Parameters
         ----------
