@@ -19,7 +19,11 @@ from safeds.data.tabular.containers import Column, Table
     ids=["no query", "with query"],
 )
 def test_should_return_sorted_table(
-    query: Callable[[Column, Column], int], col1: int, col2: int, col3: int, col4: int,
+    query: Callable[[Column, Column], int],
+    col1: int,
+    col2: int,
+    col3: int,
+    col4: int,
 ) -> None:
     columns = [
         Column("col1", ["A", "B", "C", "A", "D"]),
