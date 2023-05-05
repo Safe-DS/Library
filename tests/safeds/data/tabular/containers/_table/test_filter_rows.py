@@ -6,9 +6,12 @@ from safeds.data.tabular.typing import ColumnType, String
 @pytest.mark.parametrize(
     ("table1", "filter_column", "filter_value", "table2"),
     [
-        (Table.from_dict({"col1": [1, 2, 1], "col2": [1, 2, 4]}),
-         "col1", 1,
-         Table.from_dict({"col1": [1, 1], "col2": [1, 4]})),
+        (
+            Table.from_dict({"col1": [1, 2, 1], "col2": [1, 2, 4]}),
+            "col1",
+            1,
+            Table.from_dict({"col1": [1, 1], "col2": [1, 4]}),
+        ),
     ],
     ids=["filter for col1 = 1"],
 )
