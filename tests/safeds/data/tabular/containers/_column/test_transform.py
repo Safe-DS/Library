@@ -1,4 +1,3 @@
-
 from safeds.data.tabular.containers import Column
 
 
