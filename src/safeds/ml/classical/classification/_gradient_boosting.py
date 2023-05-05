@@ -9,6 +9,8 @@ from safeds.ml.classical._util_sklearn import fit, predict
 from ._classifier import Classifier
 
 if TYPE_CHECKING:
+    from sklearn.base import ClassifierMixin
+
     from safeds.data.tabular.containers import Table, TaggedTable
 
 
@@ -28,15 +30,15 @@ class GradientBoosting(Classifier):
     Raises
     ------
     ValueError
-        If `learning_rate` is non-positive or the `number_of_trees` is less than or equal to 0.
+        If `number_of_trees` is less than or equal to 0 or `learning_rate` is non-positive.
     """
 
     def __init__(self, number_of_trees: int = 100, learning_rate: float = 0.1) -> None:
         # Validation
         if number_of_trees <= 0:
-            raise ValueError("The number of boosting stages to perform has to be greater than 0.")
+            raise ValueError("The parameter 'number_of_trees' has to be greater than 0.")
         if learning_rate <= 0:
-            raise ValueError("The learning rate has to be greater than 0.")
+            raise ValueError("The parameter 'learning_rate' has to be greater than 0.")
 
         # Hyperparameters
         self._number_of_trees = number_of_trees
@@ -68,10 +70,7 @@ class GradientBoosting(Classifier):
         LearningError
             If the training data contains invalid values or if the training failed.
         """
-        wrapped_classifier = sk_GradientBoostingClassifier(
-            n_estimators=self._number_of_trees,
-            learning_rate=self._learning_rate,
-        )
+        wrapped_classifier = self._get_sklearn_classifier()
         fit(wrapped_classifier, training_set)
 
         result = GradientBoosting(number_of_trees=self._number_of_trees, learning_rate=self._learning_rate)
@@ -118,3 +117,14 @@ class GradientBoosting(Classifier):
             Whether the classifier is fitted.
         """
         return self._wrapped_classifier is not None
+
+    def _get_sklearn_classifier(self) -> ClassifierMixin:
+        """
+        Return a new wrapped Classifier from sklearn.
+
+        Returns
+        -------
+        wrapped_classifier: ClassifierMixin
+            The sklearn Classifier.
+        """
+        return sk_GradientBoostingClassifier(n_estimators=self._number_of_trees, learning_rate=self._learning_rate)

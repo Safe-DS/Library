@@ -11,6 +11,8 @@ from safeds.ml.classical._util_sklearn import fit, predict
 from ._regressor import Regressor
 
 if TYPE_CHECKING:
+    from sklearn.base import RegressorMixin
+
     from safeds.data.tabular.containers import Table, TaggedTable
 
 
@@ -28,13 +30,13 @@ class ElasticNetRegression(Regressor):
     Raises
     ------
     ValueError
-        If alpha is negative.
+        If `alpha` is negative or `lasso_ratio` is not between 0 and 1.
     """
 
     def __init__(self, alpha: float = 1.0, lasso_ratio: float = 0.5) -> None:
         # Validation
         if alpha < 0:
-            raise ValueError("alpha must be non-negative")
+            raise ValueError("The parameter 'alpha' must be non-negative")
         if alpha == 0:
             warn(
                 (
@@ -45,7 +47,7 @@ class ElasticNetRegression(Regressor):
                 stacklevel=2,
             )
         if lasso_ratio < 0 or lasso_ratio > 1:
-            raise ValueError("lasso_ratio must be between 0 and 1.")
+            raise ValueError("The parameter 'lasso_ratio' must be between 0 and 1.")
         elif lasso_ratio == 0:
             warnings.warn(
                 (
@@ -93,7 +95,7 @@ class ElasticNetRegression(Regressor):
         LearningError
             If the training data contains invalid values or if the training failed.
         """
-        wrapped_regressor = sk_ElasticNet(alpha=self._alpha, l1_ratio=self._lasso_ratio)
+        wrapped_regressor = self._get_sklearn_regressor()
         fit(wrapped_regressor, training_set)
 
         result = ElasticNetRegression(alpha=self._alpha, lasso_ratio=self._lasso_ratio)
@@ -140,3 +142,14 @@ class ElasticNetRegression(Regressor):
             Whether the regressor is fitted.
         """
         return self._wrapped_regressor is not None
+
+    def _get_sklearn_regressor(self) -> RegressorMixin:
+        """
+        Return a new wrapped Regressor from sklearn.
+
+        Returns
+        -------
+        wrapped_regressor: RegressorMixin
+            The sklearn Regressor.
+        """
+        return sk_ElasticNet(alpha=self._alpha, l1_ratio=self._lasso_ratio)

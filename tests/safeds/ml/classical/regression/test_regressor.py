@@ -33,6 +33,7 @@ from safeds.ml.exceptions import (
 
 if TYPE_CHECKING:
     from _pytest.fixtures import FixtureRequest
+    from sklearn.base import RegressorMixin
 
 
 def regressors() -> list[Regressor]:
@@ -207,6 +208,9 @@ class DummyRegressor(Regressor):
 
     def is_fitted(self) -> bool:
         return True
+
+    def _get_sklearn_regressor(self) -> RegressorMixin:
+        pass
 
 
 class TestMeanAbsoluteError:

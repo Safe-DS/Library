@@ -20,7 +20,7 @@ class TestAlpha:
         assert fitted_model._wrapped_regressor.alpha == 1
 
     def test_should_raise_if_less_than_0(self) -> None:
-        with pytest.raises(ValueError, match="alpha must be non-negative"):
+        with pytest.raises(ValueError, match="The parameter 'alpha' must be non-negative"):
             ElasticNetRegression(alpha=-1)
 
     def test_should_warn_if_equal_to_0(self) -> None:
@@ -45,11 +45,11 @@ class TestLassoRatio:
         assert fitted_model._wrapped_regressor.l1_ratio == 0.3
 
     def test_should_raise_if_less_than_0(self) -> None:
-        with pytest.raises(ValueError, match="lasso_ratio must be between 0 and 1."):
+        with pytest.raises(ValueError, match="The parameter 'lasso_ratio' must be between 0 and 1."):
             ElasticNetRegression(lasso_ratio=-1.0)
 
     def test_should_raise_if_greater_than_1(self) -> None:
-        with pytest.raises(ValueError, match="lasso_ratio must be between 0 and 1."):
+        with pytest.raises(ValueError, match="The parameter 'lasso_ratio' must be between 0 and 1."):
             ElasticNetRegression(lasso_ratio=2.0)
 
     def test_should_warn_if_0(self) -> None:
