@@ -34,12 +34,13 @@ class TestKeepOnlyColumns:
                 Table.from_dict({"C": [3], "A": [1]}),
             ),
         ],
+        ids=["No Column Name", "First Column", "Second Column", "All columns", "Last and first columns"]
     )
     def test_should_keep_only_listed_columns(self, table: Table, column_names: list[str], expected: Table) -> None:
         transformed_table = table.keep_only_columns(column_names)
         assert transformed_table == expected
 
-    def test_should_raise_unknown_column_name_error(self) -> None:
+    def test_should_raise_error_if_column_name_unknown(self) -> None:
         table = Table.from_dict({"A": [1], "B": [2]})
         with pytest.raises(UnknownColumnNameError):
             table.keep_only_columns(["C"])
