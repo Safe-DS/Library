@@ -1,6 +1,6 @@
 import pytest
 from safeds.data.tabular.containers import Table, TaggedTable
-from safeds.ml.classical.regression import LassoRegression
+from safeds.ml.classical.regression import RidgeRegression
 
 
 @pytest.fixture()
@@ -11,17 +11,17 @@ def training_set() -> TaggedTable:
 
 class TestAlpha:
     def test_should_be_passed_to_fitted_model(self, training_set: TaggedTable) -> None:
-        fitted_model = LassoRegression(alpha=1).fit(training_set)
+        fitted_model = RidgeRegression(alpha=1).fit(training_set)
         assert fitted_model._alpha == 1
 
     def test_should_be_passed_to_sklearn(self, training_set: TaggedTable) -> None:
-        fitted_model = LassoRegression(alpha=1).fit(training_set)
+        fitted_model = RidgeRegression(alpha=1).fit(training_set)
         assert fitted_model._wrapped_regressor is not None
         assert fitted_model._wrapped_regressor.alpha == 1
 
     def test_should_raise_if_less_than_0(self) -> None:
         with pytest.raises(ValueError, match="alpha must be non-negative"):
-            LassoRegression(alpha=-1)
+            RidgeRegression(alpha=-1)
 
     def test_should_warn_if_equal_to_0(self) -> None:
         with pytest.warns(
@@ -31,4 +31,4 @@ class TestAlpha:
                 "should use LinearRegression instead for better numerical stability."
             ),
         ):
-            LassoRegression(alpha=0)
+            RidgeRegression(alpha=0)

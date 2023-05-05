@@ -6,6 +6,7 @@ from ._exceptions import (
     LearningError,
     ModelNotFittedError,
     PredictionError,
+    UntaggedTableError,
 )
 
 __all__ = [
@@ -14,4 +15,5 @@ __all__ = [
     "LearningError",
     "ModelNotFittedError",
     "PredictionError",
+    "UntaggedTableError",
 ]

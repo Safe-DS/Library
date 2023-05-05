@@ -1,6 +1,6 @@
 import pytest
 from safeds.data.tabular.containers import Table, TaggedTable
-from safeds.ml.classical.classification import AdaBoost
+from safeds.ml.classical.classification import GradientBoosting
 
 
 @pytest.fixture()
@@ -11,14 +11,14 @@ def training_set() -> TaggedTable:
 
 class TestLearningRate:
     def test_should_be_passed_to_fitted_model(self, training_set: TaggedTable) -> None:
-        fitted_model = AdaBoost(learning_rate=2).fit(training_set)
+        fitted_model = GradientBoosting(learning_rate=2).fit(training_set)
         assert fitted_model._learning_rate == 2
 
     def test_should_be_passed_to_sklearn(self, training_set: TaggedTable) -> None:
-        fitted_model = AdaBoost(learning_rate=2).fit(training_set)
+        fitted_model = GradientBoosting(learning_rate=2).fit(training_set)
         assert fitted_model._wrapped_classifier is not None
         assert fitted_model._wrapped_classifier.learning_rate == 2
 
     def test_should_raise_if_less_than_or_equal_to_0(self) -> None:
         with pytest.raises(ValueError, match="has to be greater than 0"):
-            AdaBoost(learning_rate=-1)
+            GradientBoosting(learning_rate=-1)
