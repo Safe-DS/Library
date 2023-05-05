@@ -27,7 +27,7 @@ class SupportVectorMachine(Classifier):
         If the strength of regularization is less than or equal to 0.
     """
 
-    def __init__(self, c: float = 1.) -> None:
+    def __init__(self, c: float = 1.0) -> None:
         # Internal state
         self._wrapped_classifier: sk_SVC | None = None
         self._feature_names: list[str] | None = None
