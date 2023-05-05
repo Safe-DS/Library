@@ -115,6 +115,7 @@ class Classifier(ABC):
         -------
         precision : float
             The calculated precision score, i.e. the ratio of correctly predicted positives to all predicted positives.
+            Returns 1 if no predictions are made.
         """
         expected = validation_or_test_set.target
         predicted = self.predict(validation_or_test_set.features).target
@@ -132,5 +133,5 @@ class Classifier(ABC):
                     false_positive += 1
 
         if (true_positive+false_positive) == 0:
-            raise ZeroDivisionError("No positive predictions")
+            return 1.0
         return true_positive / (true_positive + false_positive)

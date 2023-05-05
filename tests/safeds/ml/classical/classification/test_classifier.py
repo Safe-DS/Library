@@ -241,7 +241,7 @@ class TestPrecision:
 
         assert DummyClassifier().precision(table, 1) == 1.0
 
-    def test_should_raise_zero_division(self) -> None:
+    def test_should_return_1(self) -> None:
         table = Table.from_dict(
             {
                 "predicted": ["lol", "1", "0", "2"],
@@ -249,8 +249,7 @@ class TestPrecision:
             },
         ).tag_columns(target_name="expected")
 
-        with pytest.raises(ZeroDivisionError):
-            DummyClassifier().precision(table, 1)
+        assert DummyClassifier().precision(table, 1) == 1.0
 
     @pytest.mark.parametrize(
         "table",
