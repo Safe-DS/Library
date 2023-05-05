@@ -245,6 +245,42 @@ class Table:
         dataframe.columns = schema_compare.column_names
         return Table(dataframe)
 
+    @staticmethod
+    def _from_pandas_dataframe(data: pd.DataFrame, schema: Schema | None = None) -> Table:
+        """
+        Create a table from a `pandas.DataFrame`.
+
+        Parameters
+        ----------
+        data : pd.DataFrame
+            The data.
+        schema : Schema | None
+            The schema. If None, the schema is inferred from the data.
+
+        Returns
+        -------
+        table : Table
+            The created table.
+
+        Examples
+        --------
+        >>> import pandas as pd
+        >>> from safeds.data.tabular.containers import Table
+        >>> table = Table._from_pandas_dataframe(pd.DataFrame({"a": [1], "b": [2]}))
+        """
+        data = data.reset_index(drop=True)
+
+        result = object.__new__(Table)
+        result._data = data
+
+        if schema is None:
+            # noinspection PyProtectedMember
+            result._schema = Schema._from_pandas_dataframe(data)
+        else:
+            result._schema = schema
+
+        return result
+
     # ------------------------------------------------------------------------------------------------------------------
     # Dunder methods
     # ------------------------------------------------------------------------------------------------------------------
