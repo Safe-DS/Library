@@ -69,7 +69,8 @@ class GradientBoosting(Classifier):
             If the training data contains invalid values or if the training failed.
         """
         wrapped_classifier = sk_GradientBoostingClassifier(
-            learning_rate=self._learning_rate, n_estimators=self._number_of_trees,
+            learning_rate=self._learning_rate,
+            n_estimators=self._number_of_trees,
         )
         fit(wrapped_classifier, training_set)
 

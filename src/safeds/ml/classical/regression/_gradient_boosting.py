@@ -69,7 +69,8 @@ class GradientBoosting(Regressor):
             If the training data contains invalid values or if the training failed.
         """
         wrapped_regressor = sk_GradientBoostingRegressor(
-            learning_rate=self._learning_rate, n_estimators=self._number_of_trees,
+            learning_rate=self._learning_rate,
+            n_estimators=self._number_of_trees,
         )
         fit(wrapped_regressor, training_set)
 
