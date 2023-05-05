@@ -9,6 +9,8 @@ from safeds.ml.classical._util_sklearn import fit, predict
 from ._classifier import Classifier
 
 if TYPE_CHECKING:
+    from sklearn.base import ClassifierMixin
+
     from safeds.data.tabular.containers import Table, TaggedTable
 
 
@@ -42,7 +44,7 @@ class LogisticRegression(Classifier):
         LearningError
             If the training data contains invalid values or if the training failed.
         """
-        wrapped_classifier = sk_LogisticRegression(n_jobs=-1)
+        wrapped_classifier = self._get_sklearn_classifier()
         fit(wrapped_classifier, training_set)
 
         result = LogisticRegression()
@@ -89,3 +91,14 @@ class LogisticRegression(Classifier):
             Whether the classifier is fitted.
         """
         return self._wrapped_classifier is not None
+
+    def _get_sklearn_classifier(self) -> ClassifierMixin:
+        """
+        Return a new wrapped Classifier from sklearn.
+
+        Returns
+        -------
+        wrapped_classifier: ClassifierMixin
+            The sklearn Classifier.
+        """
+        return sk_LogisticRegression(n_jobs=-1)

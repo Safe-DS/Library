@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
+from typing import TYPE_CHECKING
 
 from sklearn.metrics import mean_absolute_error as sk_mean_absolute_error
 from sklearn.metrics import mean_squared_error as sk_mean_squared_error
@@ -8,6 +9,9 @@ from sklearn.metrics import mean_squared_error as sk_mean_squared_error
 from safeds.data.tabular.containers import Column, Table, TaggedTable
 from safeds.data.tabular.exceptions import ColumnLengthMismatchError
 from safeds.ml.exceptions import UntaggedTableError
+
+if TYPE_CHECKING:
+    from sklearn.base import RegressorMixin
 
 
 class Regressor(ABC):
@@ -72,6 +76,17 @@ class Regressor(ABC):
         -------
         is_fitted : bool
             Whether the regressor is fitted.
+        """
+
+    @abstractmethod
+    def _get_sklearn_regressor(self) -> RegressorMixin:
+        """
+        Return a new wrapped Regressor from sklearn.
+
+        Returns
+        -------
+        wrapped_regressor: RegressorMixin
+            The sklearn Regressor.
         """
 
     # noinspection PyProtectedMember
