@@ -47,7 +47,7 @@ def test_should_add_columns_from_table(table1: Table, table2: Table, expected: T
 )
 def test_should_raise_error_if_column_size_invalid(table: Table, columns: list[Column] | Table) -> None:
     with pytest.raises(ColumnSizeError):
-        table = table.add_columns(columns)
+        table.add_columns(columns)
 
 
 @pytest.mark.parametrize(
@@ -62,4 +62,4 @@ def test_should_raise_error_if_column_size_invalid(table: Table, columns: list[C
 )
 def test_should_raise_error_if_column_name_in_result_column(table: Table, columns: list[Column] | Table) -> None:
     with pytest.raises(DuplicateColumnNameError):
-        table = table.add_columns(columns)
+        table.add_columns(columns)
