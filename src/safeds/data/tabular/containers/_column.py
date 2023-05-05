@@ -329,8 +329,9 @@ class Column(Sequence[T]):
 
         Examples
         -------
-        column.transform(lambda value: value + 1)
-        will add one to each element in the column
+        >>> from safeds.data.tabular.containers import Column
+        >>> price = Column("price", [4.99, 5.99, 2.49])
+        >>> sale = price.transform(lambda amount: amount * 0.8)
         """
         return Column(self.name, self._data.apply(transformer, convert_dtype=True))
 

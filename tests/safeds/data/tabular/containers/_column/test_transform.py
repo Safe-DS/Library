@@ -1,8 +1,20 @@
+import pytest
+
 from safeds.data.tabular.containers import Column
 
 
-def test_should_transform_column() -> None:
-    column1 = Column("test", [1, 2]).transform(lambda it: it + 1)
-    column2 = Column("test", [2, 3])
-
-    assert column1 == column2
+@pytest.mark.parametrize(
+    ("column", "expected"),
+    [
+        (Column("test", [1, 2]), Column("test", [2, 3])),
+        (Column("test", [-0.5, 0, 4]), Column("test", [0.5, 1, 5])),
+        (Column("test", []), Column("test", []))
+    ],
+    ids=[
+        "series1",
+        "series2",
+        "empty series"
+    ]
+)
+def test_should_transform_column(column, expected) -> None:
+    assert column.transform(lambda it: it + 1) == expected
