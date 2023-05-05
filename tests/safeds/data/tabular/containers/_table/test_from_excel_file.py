@@ -1,6 +1,5 @@
 from pathlib import Path
 
-import openpyxl
 import pytest
 from safeds.data.tabular.containers import Table
 
@@ -8,14 +7,11 @@ from tests.helpers import resolve_resource_path
 
 
 @pytest.mark.parametrize(
-    ("path"),
-    [
-        resolve_resource_path("./dummy_excel_file.xlsx"),
-        Path(resolve_resource_path("./dummy_excel_file.xlsx"))
-    ],
+    "path",
+    [resolve_resource_path("./dummy_excel_file.xlsx"), Path(resolve_resource_path("./dummy_excel_file.xlsx"))],
     ids=["string path", "object path"],
 )
-def test_should_find_equal_values(path) -> None:
+def test_should_find_equal_values(path: str | Path) -> None:
     table = Table.from_excel_file(path)
     assert table.get_column("A").get_value(0) == 1
     assert table.get_column("B").get_value(0) == 2

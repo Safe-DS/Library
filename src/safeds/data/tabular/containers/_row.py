@@ -70,12 +70,20 @@ class Row(Mapping[str, Any]):
         row : Row
             The created row.
 
+        Raises
+        ------
+        ValueError
+            If the dataframe does not contain exactly one row.
+
         Examples
         --------
         >>> import pandas as pd
         >>> from safeds.data.tabular.containers import Row
         >>> row = Row._from_pandas_dataframe(pd.DataFrame({"a": [1], "b": [2]}))
         """
+        if data.shape[0] != 1:
+            raise ValueError("The dataframe has to contain exactly one row.")
+
         data = data.reset_index(drop=True)
 
         result = object.__new__(Row)
