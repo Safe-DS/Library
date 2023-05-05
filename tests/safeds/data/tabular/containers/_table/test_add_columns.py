@@ -53,11 +53,10 @@ def test_should_raise_error_if_column_size_invalid(table, columns) -> None:
     ("table", "columns"),
     [
         (Table.from_dict({"col1": [1, 2, 1], "col2": [1, 2, 4]}),
-         ["col2"]),
+         [Column("col2", ["a", "b", "c"]), Column("col3", [2, 3, 4])]),
     ],
     ids=["Column already exists"]
 )
 def test_should_raise_error_if_column_name_in_result_column(table, columns) -> None:
-    table = Table.from_dict({"col1": [1, 2, 1], "col2": [1, 2, 4]})
     with pytest.raises(DuplicateColumnNameError):
-        table = table.add_column(Column("col2", ["a", "b", "c", "d"]))
+        table = table.add_column(columns)
