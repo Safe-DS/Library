@@ -35,6 +35,6 @@ def test_should_create_table_from_excel_file(path: str | Path, expected: Table) 
     assert table == expected
 
 
-def test_should_raise_file_not_found() -> None:
+def test_should_raise_if_file_not_found() -> None:
     with pytest.raises(FileNotFoundError):
         Table.from_excel_file(resolve_resource_path("test_table_from_excel_file_invalid.xls"))
