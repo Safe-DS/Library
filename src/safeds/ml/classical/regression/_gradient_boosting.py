@@ -20,7 +20,7 @@ class GradientBoosting(Regressor):
     ----------
     number_of_trees: int
         The number of boosting stages to perform. Gradient boosting is fairly robust to over-fitting so a large
-        number usually results on better performance.
+        number usually results in better performance.
     learning_rate : float
         The larger the value, the more the model is influenced by each additional tree. If the learning rate is too
         low, the model might underfit. If the learning rate is too high, the model might overfit.
