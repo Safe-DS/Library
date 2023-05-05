@@ -100,7 +100,7 @@ class Classifier(ABC):
 
         return sk_accuracy_score(expected._data, predicted._data)
 
-    def precision(self, validation_or_test_set: TaggedTable, positive_class: int =1) -> float:
+    def precision(self, validation_or_test_set: TaggedTable, positive_class: int = 1) -> float:
         """
         Compute the classifier's precision on the given data.
 
@@ -135,6 +135,6 @@ class Classifier(ABC):
                 else:
                     false_positive += 1
 
-        if (true_positive+false_positive) == 0:
+        if (true_positive + false_positive) == 0:
             return 1.0
         return true_positive / (true_positive + false_positive)
