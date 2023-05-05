@@ -14,13 +14,29 @@ if TYPE_CHECKING:
 
 
 class SupportVectorMachine(Regressor):
-    """Support vector machine."""
+    """
+    Support vector machine.
 
-    def __init__(self) -> None:
+    Parameters
+    ----------
+    c: float
+        The strength of regularization. Must be strictly positive.
+
+    Raises
+    ------
+    ValueError
+        If `c` is less than or equal to 0.
+    """
+
+    def __init__(self, c: float = 1.0) -> None:
         # Internal state
         self._wrapped_regressor: sk_SVR | None = None
         self._feature_names: list[str] | None = None
         self._target_name: str | None = None
+
+        if c <= 0:
+            raise ValueError("The parameter 'c' has to be strictly positive.")
+        self._c = c
 
     def fit(self, training_set: TaggedTable) -> SupportVectorMachine:
         """
@@ -46,7 +62,7 @@ class SupportVectorMachine(Regressor):
         wrapped_regressor = self._get_sklearn_regressor()
         fit(wrapped_regressor, training_set)
 
-        result = SupportVectorMachine()
+        result = SupportVectorMachine(self._c)
         result._wrapped_regressor = wrapped_regressor
         result._feature_names = training_set.features.column_names
         result._target_name = training_set.target.name
@@ -100,4 +116,4 @@ class SupportVectorMachine(Regressor):
         wrapped_regressor: RegressorMixin
             The sklearn Regressor.
         """
-        return sk_SVR()
+        return sk_SVR(C=self._c)
