@@ -19,12 +19,12 @@ class SupportVectorMachine(Classifier):
     Parameters
     ----------
     c: float
-        The strength of regularization
+        The strength of regularization. Must be strictly positive.
 
     Raises
     ------
     ValueError
-        If the strength of regularization is less than or equal to 0.
+        If `c` is less than or equal to 0.
     """
 
     def __init__(self, c: float = 1.0) -> None:
@@ -34,7 +34,7 @@ class SupportVectorMachine(Classifier):
         self._target_name: str | None = None
 
         if c <= 0:
-            raise ValueError("The strength of regularization must be strictly positive.")
+            raise ValueError("The strength of regularization given by the c parameter must be strictly positive.")
         self._c = c
 
     def fit(self, training_set: TaggedTable) -> SupportVectorMachine:
