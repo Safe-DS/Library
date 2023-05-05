@@ -23,13 +23,13 @@ def test_should_add_column(table1: Table, column: Column, col_type: ColumnType, 
     assert table1 == expected
 
 
-def test_should_raise_DuplicateColumnNameError() -> None:
+def test_should_raise_duplicate_column_name_error() -> None:
     table1 = Table.from_dict({"col1": [1, 2, 1], "col2": [1, 2, 4]})
     with pytest.raises(DuplicateColumnNameError):
         table1 = table1.add_column(Column("col1", ["a", "b", "c"]))
 
 
-def test_should_raise_ColumnSizeError() -> None:
+def test_should_raise_column_size_error() -> None:
     table1 = Table.from_dict({"col1": [1, 2, 1], "col2": [1, 2, 4]})
     with pytest.raises(ColumnSizeError):
         table1 = table1.add_column(Column("col3", ["a", "b", "c", "d"]))
