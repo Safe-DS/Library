@@ -109,7 +109,7 @@ class Classifier(ABC):
         validation_or_test_set : TaggedTable
             The validation or test set.
         positive_class : int | str
-            The classification to be considered positive
+            The class to be considered positive. All other classes are considered negative.
 
         Returns
         -------
