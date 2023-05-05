@@ -21,7 +21,7 @@ def test_should_restore_table_from_exchange_object(table: Table) -> None:
     assert restored == table
 
 
-def test_should_raise_NotImplementedError_if_allow_copy_is_false() -> None:
+def test_should_raise_error_if_allow_copy_is_false() -> None:
     table = Table.from_dict({})
     with pytest.raises(NotImplementedError, match="`allow_copy` must be True"):
         table.__dataframe__(allow_copy=False)
