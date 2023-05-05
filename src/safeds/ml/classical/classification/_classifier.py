@@ -1,11 +1,15 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
+from typing import TYPE_CHECKING
 
 from sklearn.metrics import accuracy_score as sk_accuracy_score
 
 from safeds.data.tabular.containers import Table, TaggedTable
 from safeds.ml.exceptions import UntaggedTableError
+
+if TYPE_CHECKING:
+    from sklearn.base import ClassifierMixin
 
 
 class Classifier(ABC):
@@ -70,6 +74,17 @@ class Classifier(ABC):
         -------
         is_fitted : bool
             Whether the classifier is fitted.
+        """
+
+    @abstractmethod
+    def _get_sklearn_classifier(self) -> ClassifierMixin:
+        """
+        Return a new wrapped Classifier from sklearn.
+
+        Returns
+        -------
+        wrapped_classifier: ClassifierMixin
+            The sklearn Classifier.
         """
 
     # noinspection PyProtectedMember

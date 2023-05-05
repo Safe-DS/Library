@@ -9,6 +9,7 @@ from safeds.ml.classical._util_sklearn import fit, predict
 from ._regressor import Regressor
 
 if TYPE_CHECKING:
+    from sklearn.base import RegressorMixin
     from safeds.data.tabular.containers import Table, TaggedTable
 
 
@@ -119,3 +120,14 @@ class KNearestNeighbors(Regressor):
             Whether the regressor is fitted.
         """
         return self._wrapped_regressor is not None
+
+    def _get_sklearn_regressor(self) -> RegressorMixin:
+        """
+        Return a new wrapped Regressor from sklearn.
+
+        Returns
+        -------
+        wrapped_regressor: RegressorMixin
+            The sklearn Regressor.
+        """
+        return sk_KNeighborsRegressor(self._number_of_neighbors, n_jobs=-1)

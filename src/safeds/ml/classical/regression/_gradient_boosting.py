@@ -9,6 +9,7 @@ from safeds.ml.classical._util_sklearn import fit, predict
 from ._regressor import Regressor
 
 if TYPE_CHECKING:
+    from sklearn.base import RegressorMixin
     from safeds.data.tabular.containers import Table, TaggedTable
 
 
@@ -108,3 +109,14 @@ class GradientBoosting(Regressor):
             Whether the regressor is fitted.
         """
         return self._wrapped_regressor is not None
+
+    def _get_sklearn_regressor(self) -> RegressorMixin:
+        """
+        Return a new wrapped Regressor from sklearn.
+
+        Returns
+        -------
+        wrapped_regressor: RegressorMixin
+            The sklearn Regressor.
+        """
+        return sk_GradientBoostingRegressor(learning_rate=self._learning_rate)

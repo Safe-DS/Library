@@ -9,6 +9,7 @@ from safeds.ml.classical._util_sklearn import fit, predict
 from ._classifier import Classifier
 
 if TYPE_CHECKING:
+    from sklearn.base import ClassifierMixin
     from safeds.data.tabular.containers import Table, TaggedTable
 
 
@@ -18,12 +19,14 @@ class AdaBoost(Classifier):
 
     Parameters
     ----------
-    learning_rate : float
-        Weight applied to each classifier at each boosting iteration. A higher learning rate increases the contribution
-        of each classifier. Has to be greater than 0.
+    learner: Classifier
+        The learner from which the boosted ensemble is built.
     maximum_number_of_learners: int
         The maximum number of learners at which boosting is terminated. In case of perfect fit, the learning procedure
         is stopped early. Has to be greater than 0.
+    learning_rate : float
+        Weight applied to each classifier at each boosting iteration. A higher learning rate increases the contribution
+        of each classifier. Has to be greater than 0.
 
     Raises
     ------
@@ -31,16 +34,17 @@ class AdaBoost(Classifier):
         If the learning rate or maximum_number_of_learners are less than or equal to 0
     """
 
-    def __init__(self, learning_rate: float = 1.0, maximum_number_of_learners: int = 50) -> None:
+    def __init__(self, learner: Classifier = None, maximum_number_of_learners: int = 50, learning_rate: float = 1.0) -> None:
         # Validation
-        if learning_rate <= 0:
-            raise ValueError("The learning rate has to be greater than 0.")
         if maximum_number_of_learners <= 0:
             raise ValueError("The maximum_number_of_learners has to be grater than 0.")
+        if learning_rate <= 0:
+            raise ValueError("The learning rate has to be greater than 0.")
 
         # Hyperparameters
-        self._learning_rate = learning_rate
+        self._learner = learner
         self._maximum_number_of_learners = maximum_number_of_learners
+        self._learning_rate = learning_rate
 
         # Internal state
         self._wrapped_classifier: sk_AdaBoostClassifier | None = None
@@ -68,10 +72,10 @@ class AdaBoost(Classifier):
         LearningError
             If the training data contains invalid values or if the training failed.
         """
-        wrapped_classifier = sk_AdaBoostClassifier(learning_rate=self._learning_rate, n_estimators=self._maximum_number_of_learners)
+        wrapped_classifier = self._get_sklearn_classifier()
         fit(wrapped_classifier, training_set)
 
-        result = AdaBoost(learning_rate=self._learning_rate, maximum_number_of_learners=self._maximum_number_of_learners)
+        result = AdaBoost(learner=self._learner, maximum_number_of_learners=self._maximum_number_of_learners, learning_rate=self._learning_rate)
         result._wrapped_classifier = wrapped_classifier
         result._feature_names = training_set.features.column_names
         result._target_name = training_set.target.name
@@ -115,3 +119,15 @@ class AdaBoost(Classifier):
             Whether the classifier is fitted.
         """
         return self._wrapped_classifier is not None
+
+    def _get_sklearn_classifier(self) -> ClassifierMixin:
+        """
+        Return a new wrapped Classifier from sklearn.
+
+        Returns
+        -------
+        wrapped_classifier: ClassifierMixin
+            The sklearn Classifier.
+        """
+        learner = self._learner._get_sklearn_classifier() if self._learner is not None else None
+        return sk_AdaBoostClassifier(estimator=learner, n_estimators=self._maximum_number_of_learners, learning_rate=self._learning_rate)
