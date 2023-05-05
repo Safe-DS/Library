@@ -20,6 +20,7 @@ from safeds.ml.exceptions import (
     LearningError,
     ModelNotFittedError,
     PredictionError,
+    UntaggedTableError,
 )
 
 if TYPE_CHECKING:
@@ -92,6 +93,23 @@ class TestFit:
     def test_should_raise_on_invalid_data(self, classifier: Classifier, invalid_data: TaggedTable) -> None:
         with pytest.raises(LearningError):
             classifier.fit(invalid_data)
+
+    @pytest.mark.parametrize(
+        "table",
+        [
+            Table.from_dict(
+                {
+                    "a": [1.0, 0.0, 0.0, 0.0],
+                    "b": [0.0, 1.0, 1.0, 0.0],
+                    "c": [0.0, 0.0, 0.0, 1.0],
+                },
+            ),
+        ],
+        ids=["untagged_table"],
+    )
+    def test_should_raise_if_table_is_not_tagged(self, classifier: Classifier, table: Table) -> None:
+        with pytest.raises(UntaggedTableError):
+            classifier.fit(table)  # type: ignore[arg-type]
 
 
 @pytest.mark.parametrize("classifier", classifiers(), ids=lambda x: x.__class__.__name__)
@@ -233,3 +251,20 @@ class TestPrecision:
 
         with pytest.raises(ZeroDivisionError):
             DummyClassifier().precision(table, 1)
+
+    @pytest.mark.parametrize(
+        "table",
+        [
+            Table.from_dict(
+                {
+                    "a": [1.0, 0.0, 0.0, 0.0],
+                    "b": [0.0, 1.0, 1.0, 0.0],
+                    "c": [0.0, 0.0, 0.0, 1.0],
+                },
+            ),
+        ],
+        ids=["untagged_table"],
+    )
+    def test_should_raise_if_table_is_not_tagged(self, table: Table) -> None:
+        with pytest.raises(UntaggedTableError):
+            DummyClassifier().accuracy(table)  # type:

@@ -1,13 +1,12 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING
 
 from sklearn.metrics import accuracy_score as sk_accuracy_score
 from sklearn.metrics import precision_score as sk_precision_score
 
-if TYPE_CHECKING:
-    from safeds.data.tabular.containers import Table, TaggedTable
+from safeds.data.tabular.containers import Table, TaggedTable
+from safeds.ml.exceptions import UntaggedTableError
 
 
 class Classifier(ABC):
@@ -88,7 +87,14 @@ class Classifier(ABC):
         -------
         accuracy : float
             The calculated accuracy score, i.e. the percentage of equal data.
+
+        Raises
+        ------
+        UntaggedTableError
+            If the table is untagged.
         """
+        if not isinstance(validation_or_test_set, TaggedTable) and isinstance(validation_or_test_set, Table):
+            raise UntaggedTableError
         expected = validation_or_test_set.target
         predicted = self.predict(validation_or_test_set.features).target
 

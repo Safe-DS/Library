@@ -16,6 +16,7 @@ class SupportVectorMachine(Regressor):
     """Support vector machine."""
 
     def __init__(self) -> None:
+        # Internal state
         self._wrapped_regressor: sk_SVR | None = None
         self._feature_names: list[str] | None = None
         self._target_name: str | None = None
