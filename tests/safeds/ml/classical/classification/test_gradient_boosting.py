@@ -20,5 +20,5 @@ class TestLearningRate:
         assert fitted_model._wrapped_classifier.learning_rate == 2
 
     def test_should_raise_if_less_than_or_equal_to_0(self) -> None:
-        with pytest.raises(ValueError, match="has to be greater than 0"):
+        with pytest.raises(ValueError, match="The parameter 'learning_rate' has to be greater than 0."):
             GradientBoosting(learning_rate=-1)

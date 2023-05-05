@@ -26,13 +26,13 @@ class KNearestNeighbors(Regressor):
     Raises
     ------
     ValueError
-        If the number of neighbors is less than or equal to 0.
+        If `number_of_neighbors` is less than or equal to 0.
     """
 
     def __init__(self, number_of_neighbors: int) -> None:
         # Validation
         if number_of_neighbors <= 0:
-            raise ValueError("The number of neighbors has to be greater than 0.")
+            raise ValueError("The parameter 'number_of_neighbors' has to be greater than 0.")
 
         # Hyperparameters
         self._number_of_neighbors = number_of_neighbors
@@ -61,14 +61,14 @@ class KNearestNeighbors(Regressor):
         Raises
         ------
         ValueError
-            If the number of neighbors is greater than the sample size.
+            If `number_of_neighbors` is greater than the sample size.
         LearningError
             If the training data contains invalid values or if the training failed.
         """
         if self._number_of_neighbors > training_set.number_of_rows:
             raise ValueError(
                 (
-                    f"The number of neighbors ({self._number_of_neighbors}) has to be less than or equal to the sample "
+                    f"The parameter 'number_of_neighbors' ({self._number_of_neighbors}) has to be less than or equal to the sample "
                     f"size ({training_set.number_of_rows})."
                 ),
             )

@@ -31,7 +31,7 @@ class GradientBoosting(Regressor):
     def __init__(self, learning_rate: float = 0.1) -> None:
         # Validation
         if learning_rate <= 0:
-            raise ValueError("The learning rate has to be greater than 0.")
+            raise ValueError("The parameter 'learning_rate' has to be greater than 0.")
 
         # Hyperparameters
         self._learning_rate = learning_rate

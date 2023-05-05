@@ -26,13 +26,13 @@ class RidgeRegression(Regressor):
     Raises
     ------
     ValueError
-        If alpha is negative.
+        If `alpha` is negative.
     """
 
     def __init__(self, alpha: float = 1.0) -> None:
         # Validation
         if alpha < 0:
-            raise ValueError("alpha must be non-negative")
+            raise ValueError("The parameter 'alpha' must be non-negative")
         if alpha == 0.0:
             warnings.warn(
                 (

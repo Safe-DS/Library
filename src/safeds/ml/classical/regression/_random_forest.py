@@ -24,13 +24,13 @@ class RandomForest(Regressor):
     Raises
     ------
     ValueError
-        If the number of trees is less than or equal to 0.
+        If `number_of_trees` is less than or equal to 0.
     """
 
     def __init__(self, number_of_trees: int = 100) -> None:
         # Validation
         if number_of_trees < 1:
-            raise ValueError("The number of trees has to be greater than 0.")
+            raise ValueError("The parameter 'number_of_trees' has to be greater than 0.")
 
         # Hyperparameters
         self._number_of_trees = number_of_trees
