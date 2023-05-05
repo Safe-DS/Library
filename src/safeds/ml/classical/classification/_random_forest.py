@@ -9,6 +9,8 @@ from safeds.ml.classical._util_sklearn import fit, predict
 from ._classifier import Classifier
 
 if TYPE_CHECKING:
+    from sklearn.base import ClassifierMixin
+
     from safeds.data.tabular.containers import Table, TaggedTable
 
 
@@ -23,13 +25,18 @@ class RandomForest(Classifier):
     Raises
     ------
     ValueError
-        If the number of trees is less than or equal to 0.
+        If `number_of_trees` is less than or equal to 0.
     """
 
     def __init__(self, number_of_trees: int = 100) -> None:
+        # Validation
         if number_of_trees < 1:
-            raise ValueError("The number of trees has to be greater than 0.")
-        self.number_of_trees = number_of_trees
+            raise ValueError("The parameter 'number_of_trees' has to be greater than 0.")
+
+        # Hyperparameters
+        self._number_of_trees = number_of_trees
+
+        # Internal state
         self._wrapped_classifier: sk_RandomForestClassifier | None = None
         self._feature_names: list[str] | None = None
         self._target_name: str | None = None
@@ -55,10 +62,10 @@ class RandomForest(Classifier):
         LearningError
             If the training data contains invalid values or if the training failed.
         """
-        wrapped_classifier = sk_RandomForestClassifier(self.number_of_trees, n_jobs=-1)
+        wrapped_classifier = self._get_sklearn_classifier()
         fit(wrapped_classifier, training_set)
 
-        result = RandomForest(self.number_of_trees)
+        result = RandomForest(self._number_of_trees)
         result._wrapped_classifier = wrapped_classifier
         result._feature_names = training_set.features.column_names
         result._target_name = training_set.target.name
@@ -102,3 +109,14 @@ class RandomForest(Classifier):
             Whether the classifier is fitted.
         """
         return self._wrapped_classifier is not None
+
+    def _get_sklearn_classifier(self) -> ClassifierMixin:
+        """
+        Return a new wrapped Classifier from sklearn.
+
+        Returns
+        -------
+        wrapped_classifier: ClassifierMixin
+            The sklearn Classifier.
+        """
+        return sk_RandomForestClassifier(self._number_of_trees, n_jobs=-1)

@@ -28,10 +28,12 @@ from safeds.ml.exceptions import (
     LearningError,
     ModelNotFittedError,
     PredictionError,
+    UntaggedTableError,
 )
 
 if TYPE_CHECKING:
     from _pytest.fixtures import FixtureRequest
+    from sklearn.base import RegressorMixin
 
 
 def regressors() -> list[Regressor]:
@@ -103,6 +105,23 @@ class TestFit:
     def test_should_raise_on_invalid_data(self, regressor: Regressor, invalid_data: TaggedTable) -> None:
         with pytest.raises(LearningError):
             regressor.fit(invalid_data)
+
+    @pytest.mark.parametrize(
+        "table",
+        [
+            Table.from_dict(
+                {
+                    "a": [1.0, 0.0, 0.0, 0.0],
+                    "b": [0.0, 1.0, 1.0, 0.0],
+                    "c": [0.0, 0.0, 0.0, 1.0],
+                },
+            ),
+        ],
+        ids=["untagged_table"],
+    )
+    def test_should_raise_if_table_is_not_tagged(self, regressor: Regressor, table: Table) -> None:
+        with pytest.raises(UntaggedTableError):
+            regressor.fit(table)  # type: ignore[arg-type]
 
 
 @pytest.mark.parametrize("regressor", regressors(), ids=lambda x: x.__class__.__name__)
@@ -190,6 +209,9 @@ class DummyRegressor(Regressor):
     def is_fitted(self) -> bool:
         return True
 
+    def _get_sklearn_regressor(self) -> RegressorMixin:
+        pass
+
 
 class TestMeanAbsoluteError:
     @pytest.mark.parametrize(
@@ -214,6 +236,23 @@ class TestMeanAbsoluteError:
 
         assert DummyRegressor().mean_absolute_error(table) == result
 
+    @pytest.mark.parametrize(
+        "table",
+        [
+            Table.from_dict(
+                {
+                    "a": [1.0, 0.0, 0.0, 0.0],
+                    "b": [0.0, 1.0, 1.0, 0.0],
+                    "c": [0.0, 0.0, 0.0, 1.0],
+                },
+            ),
+        ],
+        ids=["untagged_table"],
+    )
+    def test_should_raise_if_table_is_not_tagged(self, table: Table) -> None:
+        with pytest.raises(UntaggedTableError):
+            DummyRegressor().mean_absolute_error(table)  # type: ignore[arg-type]
+
 
 class TestMeanSquaredError:
     @pytest.mark.parametrize(
@@ -226,6 +265,23 @@ class TestMeanSquaredError:
         )
 
         assert DummyRegressor().mean_squared_error(table) == result
+
+    @pytest.mark.parametrize(
+        "table",
+        [
+            Table.from_dict(
+                {
+                    "a": [1.0, 0.0, 0.0, 0.0],
+                    "b": [0.0, 1.0, 1.0, 0.0],
+                    "c": [0.0, 0.0, 0.0, 1.0],
+                },
+            ),
+        ],
+        ids=["untagged_table"],
+    )
+    def test_should_raise_if_table_is_not_tagged(self, table: Table) -> None:
+        with pytest.raises(UntaggedTableError):
+            DummyRegressor().mean_squared_error(table)  # type: ignore[arg-type]
 
 
 class TestCheckMetricsPreconditions:
@@ -243,7 +299,7 @@ class TestCheckMetricsPreconditions:
         expected: list[str | int],
         error: type[Exception],
     ) -> None:
-        actual_column = Column("actual", pd.Series(actual))
-        expected_column = Column("expected", pd.Series(expected))
+        actual_column: Column = Column("actual", pd.Series(actual))
+        expected_column: Column = Column("expected", pd.Series(expected))
         with pytest.raises(error):
             _check_metrics_preconditions(actual_column, expected_column)

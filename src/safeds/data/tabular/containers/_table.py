@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING, Any
 
 import matplotlib.pyplot as plt
 import numpy as np
+import openpyxl
 import pandas as pd
 import seaborn as sns
 from pandas import DataFrame
@@ -81,6 +82,33 @@ class Table:
         """
         try:
             return Table(pd.read_csv(path))
+        except FileNotFoundError as exception:
+            raise FileNotFoundError(f'File "{path}" does not exist') from exception
+
+    @staticmethod
+    def from_excel_file(path: str | Path) -> Table:
+        """
+        Read data from an Excel file into a table.
+
+        Parameters
+        ----------
+        path : str | Path
+            The path to the Excel file.
+
+        Returns
+        -------
+        table : Table
+            The table created from the Excel file.
+
+        Raises
+        ------
+        FileNotFoundError
+            If the specified file does not exist.
+        ValueError
+            If the file could not be read.
+        """
+        try:
+            return Table(pd.read_excel(path, engine="openpyxl", usecols=lambda colname: "Unnamed" not in colname))
         except FileNotFoundError as exception:
             raise FileNotFoundError(f'File "{path}" does not exist') from exception
 
@@ -215,6 +243,42 @@ class Table:
         dataframe.columns = schema_compare.column_names
         return Table(dataframe)
 
+    @staticmethod
+    def _from_pandas_dataframe(data: pd.DataFrame, schema: Schema | None = None) -> Table:
+        """
+        Create a table from a `pandas.DataFrame`.
+
+        Parameters
+        ----------
+        data : pd.DataFrame
+            The data.
+        schema : Schema | None
+            The schema. If None, the schema is inferred from the data.
+
+        Returns
+        -------
+        table : Table
+            The created table.
+
+        Examples
+        --------
+        >>> import pandas as pd
+        >>> from safeds.data.tabular.containers import Table
+        >>> table = Table._from_pandas_dataframe(pd.DataFrame({"a": [1], "b": [2]}))
+        """
+        data = data.reset_index(drop=True)
+
+        result = object.__new__(Table)
+        result._data = data
+
+        if schema is None:
+            # noinspection PyProtectedMember
+            result._schema = Schema._from_pandas_dataframe(data)
+        else:
+            result._schema = schema
+
+        return result
+
     # ------------------------------------------------------------------------------------------------------------------
     # Dunder methods
     # ------------------------------------------------------------------------------------------------------------------
@@ -280,25 +344,25 @@ class Table:
         return self._schema.column_names
 
     @property
-    def n_columns(self) -> int:
+    def number_of_columns(self) -> int:
         """
         Return the number of columns.
 
         Returns
         -------
-        n_columns : int
+        number_of_columns : int
             The number of columns.
         """
         return self._data.shape[1]
 
     @property
-    def n_rows(self) -> int:
+    def number_of_rows(self) -> int:
         """
         Return the number of rows.
 
         Returns
         -------
-        n_rows : int
+        number_of_rows : int
             The number of rows.
         """
         return self._data.shape[0]
@@ -481,8 +545,8 @@ class Table:
         if self.has_column(column.name):
             raise DuplicateColumnNameError(column.name)
 
-        if column._data.size != self.n_rows:
-            raise ColumnSizeError(str(self.n_rows), str(column._data.size))
+        if column._data.size != self.number_of_rows:
+            raise ColumnSizeError(str(self.number_of_rows), str(column._data.size))
 
         result = self._data.copy()
         result.columns = self._schema.column_names
@@ -518,8 +582,8 @@ class Table:
             if column.name in result.columns:
                 raise DuplicateColumnNameError(column.name)
 
-            if column._data.size != self.n_rows:
-                raise ColumnSizeError(str(self.n_rows), str(column._data.size))
+            if column._data.size != self.number_of_rows:
+                raise ColumnSizeError(str(self.number_of_rows), str(column._data.size))
 
             result[column.name] = column._data
         return Table(result)
@@ -792,8 +856,8 @@ class Table:
         if new_column.name in self._schema.column_names and new_column.name != old_column_name:
             raise DuplicateColumnNameError(new_column.name)
 
-        if self.n_rows != new_column._data.size:
-            raise ColumnSizeError(str(self.n_rows), str(new_column._data.size))
+        if self.number_of_rows != new_column._data.size:
+            raise ColumnSizeError(str(self.number_of_rows), str(new_column._data.size))
 
         if old_column_name != new_column.name:
             renamed_table = self.rename_column(old_column_name, new_column.name)
@@ -852,9 +916,9 @@ class Table:
             start = 0
 
         if end is None:
-            end = self.n_rows
+            end = self.number_of_rows
 
-        if start < 0 or end < 0 or start >= self.n_rows or end > self.n_rows or end < start:
+        if start < 0 or end < 0 or start >= self.number_of_rows or end > self.number_of_rows or end < start:
             raise ValueError("The given index is out of bounds")
 
         new_df = self._data.iloc[start:end:step]
@@ -937,8 +1001,8 @@ class Table:
         if percentage_in_first <= 0 or percentage_in_first >= 1:
             raise ValueError("the given percentage is not in range")
         return (
-            self.slice_rows(0, round(percentage_in_first * self.n_rows)),
-            self.slice_rows(round(percentage_in_first * self.n_rows)),
+            self.slice_rows(0, round(percentage_in_first * self.number_of_rows)),
+            self.slice_rows(round(percentage_in_first * self.number_of_rows)),
         )
 
     def tag_columns(self, target_name: str, feature_names: list[str] | None = None) -> TaggedTable:
@@ -1205,6 +1269,27 @@ class Table:
         data_to_csv = self._data.copy()
         data_to_csv.columns = self._schema.column_names
         data_to_csv.to_csv(path, index=False)
+
+    def to_excel_file(self, path: str | Path) -> None:
+        """
+        Write the data from the table into an Excel file.
+
+        If the file and/or the directories do not exist, they will be created. If the file already exists, it will be
+        overwritten.
+
+        Parameters
+        ----------
+        path : str | Path
+            The path to the output file.
+        """
+        # Create Excel metadata in the file
+        tmp_table_file = openpyxl.Workbook()
+        tmp_table_file.save(path)
+
+        Path(path).parent.mkdir(parents=True, exist_ok=True)
+        data_to_excel = self._data.copy()
+        data_to_excel.columns = self._schema.column_names
+        data_to_excel.to_excel(path)
 
     def to_json_file(self, path: str | Path) -> None:
         """

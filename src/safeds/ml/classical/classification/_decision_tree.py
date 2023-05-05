@@ -9,6 +9,8 @@ from safeds.ml.classical._util_sklearn import fit, predict
 from ._classifier import Classifier
 
 if TYPE_CHECKING:
+    from sklearn.base import ClassifierMixin
+
     from safeds.data.tabular.containers import Table, TaggedTable
 
 
@@ -16,6 +18,7 @@ class DecisionTree(Classifier):
     """Decision tree classification."""
 
     def __init__(self) -> None:
+        # Internal state
         self._wrapped_classifier: sk_DecisionTreeClassifier | None = None
         self._feature_names: list[str] | None = None
         self._target_name: str | None = None
@@ -41,7 +44,7 @@ class DecisionTree(Classifier):
         LearningError
             If the training data contains invalid values or if the training failed.
         """
-        wrapped_classifier = sk_DecisionTreeClassifier()
+        wrapped_classifier = self._get_sklearn_classifier()
         fit(wrapped_classifier, training_set)
 
         result = DecisionTree()
@@ -88,3 +91,6 @@ class DecisionTree(Classifier):
             Whether the classifier is fitted.
         """
         return self._wrapped_classifier is not None
+
+    def _get_sklearn_classifier(self) -> ClassifierMixin:
+        return sk_DecisionTreeClassifier()
