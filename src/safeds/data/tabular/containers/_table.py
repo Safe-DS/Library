@@ -9,9 +9,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import openpyxl
 import pandas as pd
-import polars as pl
 import seaborn as sns
-from IPython.core.display_functions import DisplayHandle, display
 from pandas import DataFrame
 from scipy import stats
 
@@ -1284,7 +1282,7 @@ class Table:
         path : str | Path
             The path to the output file.
         """
-        #Create Excel metadata in the file
+        # Create Excel metadata in the file
         tmp_table_file = openpyxl.Workbook()
         tmp_table_file.save(path)
 

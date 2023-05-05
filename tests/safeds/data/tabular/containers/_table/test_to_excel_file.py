@@ -1,17 +1,14 @@
 from pathlib import Path
 
-import openpyxl
 import pytest
 from safeds.data.tabular.containers import Table
+
 from tests.helpers import resolve_resource_path
 
 
 @pytest.mark.parametrize(
-    ("path"),
-    [
-        resolve_resource_path("./dummy_excel_file.xlsx"),
-        Path(resolve_resource_path("./dummy_excel_file.xlsx"))
-    ],
+    "path",
+    [resolve_resource_path("./dummy_excel_file.xlsx"), Path(resolve_resource_path("./dummy_excel_file.xlsx"))],
     ids=["string path", "object path"],
 )
 def test_should_read_created_file(path: str | Path) -> None:
