@@ -13,13 +13,29 @@ if TYPE_CHECKING:
 
 
 class SupportVectorMachine(Classifier):
-    """Support vector machine."""
+    """
+    Support vector machine.
 
-    def __init__(self) -> None:
+    Parameters
+    ----------
+    c: float
+        The strength of regularization. Must be strictly positive.
+
+    Raises
+    ------
+    ValueError
+        If `c` is less than or equal to 0.
+    """
+
+    def __init__(self, c: float = 1.0) -> None:
         # Internal state
         self._wrapped_classifier: sk_SVC | None = None
         self._feature_names: list[str] | None = None
         self._target_name: str | None = None
+
+        if c <= 0:
+            raise ValueError("The strength of regularization given by the c parameter must be strictly positive.")
+        self._c = c
 
     def fit(self, training_set: TaggedTable) -> SupportVectorMachine:
         """
@@ -42,10 +58,10 @@ class SupportVectorMachine(Classifier):
         LearningError
             If the training data contains invalid values or if the training failed.
         """
-        wrapped_classifier = sk_SVC()
+        wrapped_classifier = sk_SVC(C=self._c)
         fit(wrapped_classifier, training_set)
 
-        result = SupportVectorMachine()
+        result = SupportVectorMachine(self._c)
         result._wrapped_classifier = wrapped_classifier
         result._feature_names = training_set.features.column_names
         result._target_name = training_set.target.name

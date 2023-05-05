@@ -94,7 +94,45 @@ class Classifier(ABC):
         """
         if not isinstance(validation_or_test_set, TaggedTable) and isinstance(validation_or_test_set, Table):
             raise UntaggedTableError
-        expected = validation_or_test_set.target
-        predicted = self.predict(validation_or_test_set.features).target
 
-        return sk_accuracy_score(expected._data, predicted._data)
+        expected_values = validation_or_test_set.target
+        predicted_values = self.predict(validation_or_test_set.features).target
+
+        return sk_accuracy_score(expected_values._data, predicted_values._data)
+
+    def precision(self, validation_or_test_set: TaggedTable, positive_class: int = 1) -> float:
+        """
+        Compute the classifier's precision on the given data.
+
+        Parameters
+        ----------
+        validation_or_test_set : TaggedTable
+            The validation or test set.
+        positive_class : int | str
+            The class to be considered positive. All other classes are considered negative.
+
+        Returns
+        -------
+        precision : float
+            The calculated precision score, i.e. the ratio of correctly predicted positives to all predicted positives.
+            Return 1 if no positive predictions are made.
+        """
+        if not isinstance(validation_or_test_set, TaggedTable) and isinstance(validation_or_test_set, Table):
+            raise UntaggedTableError
+
+        expected_values = validation_or_test_set.target
+        predicted_values = self.predict(validation_or_test_set.features).target
+
+        n_true_positives = 0
+        n_false_positives = 0
+
+        for expected_value, predicted_value in zip(expected_values, predicted_values, strict=True):
+            if predicted_value == positive_class:
+                if expected_value == positive_class:
+                    n_true_positives += 1
+                else:
+                    n_false_positives += 1
+
+        if (n_true_positives + n_false_positives) == 0:
+            return 1.0
+        return n_true_positives / (n_true_positives + n_false_positives)
