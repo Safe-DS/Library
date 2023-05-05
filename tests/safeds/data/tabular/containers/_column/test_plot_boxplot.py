@@ -6,13 +6,13 @@ from safeds.data.tabular.exceptions import NonNumericColumnError
 from tests.helpers import resolve_resource_path
 
 
-def test_plot_boxplot_complex() -> None:
+def test_should_raise_NotImplementedError() -> None:
     with pytest.raises(NotImplementedError):  # noqa: PT012
         table = Table.from_dict({"A": [1, 2, complex(1, -2)]})
         table.get_column("A").plot_boxplot()
 
 
-def test_plot_boxplot_non_numeric() -> None:
+def test_should_raise_NonNumericError() -> None:
     table = Table.from_dict({"A": [1, 2, "A"]})
     with pytest.raises(NonNumericColumnError):
         table.get_column("A").plot_boxplot()
