@@ -1,5 +1,6 @@
 import pytest
 from safeds.data.tabular.containers import Column, Table
+from safeds.data.tabular.exceptions import ColumnLengthMismatchError
 from safeds.data.tabular.typing import Integer, Schema
 
 
@@ -22,3 +23,8 @@ from safeds.data.tabular.typing import Integer, Schema
 )
 def test_should_create_table_from_list_of_columns(columns: list[Column], expected: Table) -> None:
     assert Table.from_columns(columns) == expected
+
+
+def test_should_raise_column_length_mismatch_error() -> None:
+    with pytest.raises(ColumnLengthMismatchError):
+        Table.from_columns([Column("col1", [5, 2, 3]), Column("col2", [5, 3, 4, 1])])
