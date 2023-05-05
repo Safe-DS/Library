@@ -13,7 +13,7 @@ from safeds.data.tabular.exceptions import ColumnSizeError, DuplicateColumnNameE
     ],
     ids=["Column with characters"],
 )
-def test_should_add_column(input_table, expected, column) -> None:
+def test_should_add_column(input_table: Table, expected: Table, column: Column) -> None:
     result = input_table.add_column(column)
     assert expected == result
 
