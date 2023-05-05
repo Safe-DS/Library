@@ -1,5 +1,4 @@
 import pytest
-
 from safeds.data.tabular.containers import Column, Table
 
 
@@ -17,6 +16,7 @@ def test_should_add_columns(table1: Table, column1: Column,
     table1 = table1.add_columns([column1, column2])
     assert table1 == expected
 
+
 @pytest.mark.parametrize(
     ("table1", "table2", "expected"),
     [
@@ -28,5 +28,5 @@ def test_should_add_columns(table1: Table, column1: Column,
     ids=["add a table with 2 columns"],
 )
 def test_should_add_columns_from_table(table1: Table, table2: Table, expected: Table) -> None:
-   table1 = table1.add_columns(table2)
-   assert table1 == expected
+    table1 = table1.add_columns(table2)
+    assert table1 == expected
