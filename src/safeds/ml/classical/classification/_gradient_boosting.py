@@ -13,27 +13,34 @@ if TYPE_CHECKING:
 
 
 class GradientBoosting(Classifier):
-    """Gradient boosting classification.
+    """
+    Gradient boosting classification.
 
     Parameters
     ----------
     learning_rate : float
         The larger the value, the more the model is influenced by each additional tree. If the learning rate is too
         low, the model might underfit. If the learning rate is too high, the model might overfit.
+    number_of_trees: int
+        The number of boosting stages to perform. Gradient boosting is fairly robust to over-fitting so a large
+        number usually results on better performance.
 
     Raises
     ------
     ValueError
-        If `learning_rate` is non-positive.
+        If `learning_rate` is non-positive or the `number_of_trees` is below 1.
     """
 
-    def __init__(self, learning_rate: float = 0.1) -> None:
+    def __init__(self, learning_rate: float = 0.1, number_of_trees: int = 100) -> None:
         # Validation
         if learning_rate <= 0:
             raise ValueError("The learning rate has to be greater than 0.")
+        if number_of_trees < 1:
+            raise ValueError("The number of boosting stages to perform has to be larger than 0.")
 
         # Hyperparameters
         self._learning_rate = learning_rate
+        self._number_of_trees = number_of_trees
 
         # Internal state
         self._wrapped_classifier: sk_GradientBoostingClassifier | None = None
@@ -61,10 +68,10 @@ class GradientBoosting(Classifier):
         LearningError
             If the training data contains invalid values or if the training failed.
         """
-        wrapped_classifier = sk_GradientBoostingClassifier(learning_rate=self._learning_rate)
+        wrapped_classifier = sk_GradientBoostingClassifier(learning_rate=self._learning_rate, n_estimators=self._number_of_trees)
         fit(wrapped_classifier, training_set)
 
-        result = GradientBoosting(learning_rate=self._learning_rate)
+        result = GradientBoosting(learning_rate=self._learning_rate, number_of_trees=self._number_of_trees)
         result._wrapped_classifier = wrapped_classifier
         result._feature_names = training_set.features.column_names
         result._target_name = training_set.target.name
