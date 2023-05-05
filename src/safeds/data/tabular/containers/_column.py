@@ -25,6 +25,7 @@ if TYPE_CHECKING:
     from collections.abc import Callable, Iterator
 
 T = TypeVar("T")
+O = TypeVar("O")
 
 
 class Column(Sequence[T]):
@@ -662,7 +663,7 @@ class Column(Sequence[T]):
         """
         return self._data.isna().sum()
 
-    def transform(self, transformer):
+    def transform(self, transformer: Callable[[T], O]) -> Column[O]:
         """
         Apply a transform method to every data point.
         Parameters
@@ -673,5 +674,4 @@ class Column(Sequence[T]):
         -------
         The transformed column.
         """
-        return self._data.apply(transformer, True)
-
+        return self._data.copy(True).apply(transformer, True)
