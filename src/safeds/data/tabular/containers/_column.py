@@ -23,10 +23,10 @@ from safeds.data.tabular.typing import ColumnType
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterator
 
-_T = TypeVar("_T")
+T = TypeVar("T")
 
 
-class Column(Sequence[_T]):
+class Column(Sequence[T]):
     """
     A column is a named collection of values.
 
@@ -34,7 +34,7 @@ class Column(Sequence[_T]):
     ----------
     name : str
         The name of the column.
-    data : Sequence[_T]
+    data : Sequence[T]
         The data.
 
     Examples
@@ -82,7 +82,7 @@ class Column(Sequence[_T]):
     # Dunder methods
     # ------------------------------------------------------------------------------------------------------------------
 
-    def __init__(self, name: str, data: Sequence[_T] | None = None) -> None:
+    def __init__(self, name: str, data: Sequence[T] | None = None) -> None:
         """
         Create a column.
 
@@ -90,7 +90,7 @@ class Column(Sequence[_T]):
         ----------
         name : str
             The name of the column.
-        data : Sequence[_T] | None
+        data : Sequence[T] | None
             The data. If None, an empty column is created.
 
         Examples
@@ -117,14 +117,14 @@ class Column(Sequence[_T]):
         return self.name == other.name and self._data.equals(other._data)
 
     @overload
-    def __getitem__(self, index: int) -> _T:
+    def __getitem__(self, index: int) -> T:
         ...
 
     @overload
-    def __getitem__(self, index: slice) -> Column[_T]:
+    def __getitem__(self, index: slice) -> Column[T]:
         ...
 
-    def __getitem__(self, index: int | slice) -> _T | Column[_T]:
+    def __getitem__(self, index: int | slice) -> T | Column[T]:
         if isinstance(index, int):
             if index < 0 or index >= self._data.size:
                 raise IndexOutOfBoundsError(index)
@@ -138,7 +138,7 @@ class Column(Sequence[_T]):
             data = self._data[index].reset_index(drop=True).rename(self.name)
             return Column._from_pandas_series(data, self._type)
 
-    def __iter__(self) -> Iterator[_T]:
+    def __iter__(self) -> Iterator[T]:
         return iter(self._data)
 
     def __len__(self) -> int:
@@ -194,18 +194,18 @@ class Column(Sequence[_T]):
     # Getters
     # ------------------------------------------------------------------------------------------------------------------
 
-    def get_unique_values(self) -> list[_T]:
+    def get_unique_values(self) -> list[T]:
         """
         Return a list of all unique values in the column.
 
         Returns
         -------
-        unique_values : list[_T]
+        unique_values : list[T]
             List of unique values in the column.
         """
         return list(self._data.unique())
 
-    def get_value(self, index: int) -> _T:
+    def get_value(self, index: int) -> T:
         """
         Return column value at specified index, starting at 0.
 
@@ -233,13 +233,13 @@ class Column(Sequence[_T]):
     # Information
     # ------------------------------------------------------------------------------------------------------------------
 
-    def all(self, predicate: Callable[[_T], bool]) -> bool:
+    def all(self, predicate: Callable[[T], bool]) -> bool:
         """
         Check if all values have a given property.
 
         Parameters
         ----------
-        predicate : Callable[[_T], bool])
+        predicate : Callable[[T], bool])
             Callable that is used to find matches.
 
         Returns
@@ -249,13 +249,13 @@ class Column(Sequence[_T]):
         """
         return all(predicate(value) for value in self._data)
 
-    def any(self, predicate: Callable[[_T], bool]) -> bool:
+    def any(self, predicate: Callable[[T], bool]) -> bool:
         """
         Check if any value has a given property.
 
         Parameters
         ----------
-        predicate : Callable[[_T], bool])
+        predicate : Callable[[T], bool])
             Callable that is used to find matches.
 
         Returns
@@ -265,13 +265,13 @@ class Column(Sequence[_T]):
         """
         return any(predicate(value) for value in self._data)
 
-    def none(self, predicate: Callable[[_T], bool]) -> bool:
+    def none(self, predicate: Callable[[T], bool]) -> bool:
         """
         Check if no values has a given property.
 
         Parameters
         ----------
-        predicate : Callable[[_T], bool])
+        predicate : Callable[[T], bool])
             Callable that is used to find matches.
 
         Returns
@@ -456,13 +456,13 @@ class Column(Sequence[_T]):
             raise ColumnSizeError("> 0", "0")
         return self._count_missing_values() / self._data.size
 
-    def mode(self) -> list[_T]:
+    def mode(self) -> list[T]:
         """
         Return the mode of the column.
 
         Returns
         -------
-        mode: list[_T]
+        mode: list[T]
             Returns a list with the most common values.
         """
         return self._data.mode().tolist()
