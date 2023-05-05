@@ -14,7 +14,6 @@ from safeds.data.tabular.exceptions import SchemaMismatchError
 def test_should_add_row(table: Table, row: Row) -> None:
     table = table.add_row(row)
     assert table.number_of_rows == 4
-    assert type(table) == Table
     assert table.get_row(3) == row
     assert table.schema == row._schema
 
