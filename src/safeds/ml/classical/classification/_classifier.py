@@ -6,6 +6,7 @@ from sklearn.metrics import accuracy_score as sk_accuracy_score
 from sklearn.metrics import precision_score as sk_precision_score
 
 from safeds.data.tabular.containers import Table, TaggedTable
+from safeds.data.tabular.exceptions import ColumnLengthMismatchError
 from safeds.ml.exceptions import UntaggedTableError
 
 
@@ -121,13 +122,13 @@ class Classifier(ABC):
         predicted = self.predict(validation_or_test_set.features).target
 
         if len(expected) != len(predicted):
-            raise AssertionError("Different length of 'expected' and 'predicted' vectors.")
+            raise ColumnLengthMismatchError("expected, predicted")
 
         true_positive, false_positive = 0, 0
 
-        for i in range(len(expected)):
-            if predicted[i] == positive_class:
-                if expected[i] == predicted[i]:
+        for pair in zip(expected, predicted, strict=True):
+            if pair[1] == positive_class:
+                if pair[0] == positive_class:
                     true_positive += 1
                 else:
                     false_positive += 1
