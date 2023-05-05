@@ -673,5 +673,5 @@ class Column(Sequence[_T]):
         -------
         The transformed column.
         """
-        self._data.apply(transformer, True)
+        return self._data.apply(transformer, True)
 
