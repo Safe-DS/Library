@@ -17,7 +17,7 @@ pytest.mark.parametrize(
                     "col1": [
                         "A",
                         "B",
-                        "C",
+                        "A",
                         "outlier",
                         "a",
                         "a",
