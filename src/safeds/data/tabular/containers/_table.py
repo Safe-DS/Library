@@ -30,7 +30,7 @@ from ._column import Column
 from ._row import Row
 
 if TYPE_CHECKING:
-    from collections.abc import Callable, Iterable
+    from collections.abc import Callable, Mapping, Sequence
 
     from safeds.data.tabular.transformation import InvertibleTableTransformer, TableTransformer
 
@@ -42,7 +42,7 @@ class Table:
     """
     A table is a two-dimensional collection of data. It can either be seen as a list of rows or as a list of columns.
 
-    To create a `Table`, use one of the following static methods:
+    To create a `Table` call the constructor or use one of the following static methods:
 
     | Method                                                                       | Description                            |
     | ---------------------------------------------------------------------------- | -------------------------------------- |
@@ -159,21 +159,7 @@ class Table:
         ColumnLengthMismatchError
             If columns have different lengths.
         """
-        # Validation
-        expected_length: int | None = None
-        for column_values in data.values():
-            if expected_length is None:
-                expected_length = len(column_values)
-            elif len(column_values) != expected_length:
-                raise ColumnLengthMismatchError(
-                    "\n".join(f"{column_name}: {len(column_values)}" for column_name, column_values in data.items()),
-                )
-
-        # Implementation
-        dataframe: DataFrame = pd.DataFrame()
-        for column_name, column_values in data.items():
-            dataframe[column_name] = column_values
-        return Table._from_pandas_dataframe(dataframe)
+        return Table(data)
 
     @staticmethod
     def from_columns(columns: list[Column]) -> Table:
@@ -283,28 +269,42 @@ class Table:
     # Dunder methods
     # ------------------------------------------------------------------------------------------------------------------
 
-    def __init__(self, data: Iterable, schema: Schema | None = None):
+    def __init__(self, data: Mapping[str, Sequence[Any]] | None = None) -> None:
         """
-        Create a table from a `DataFrame`.
+        Create a table from a mapping of column names to their values.
 
-        You should not use this constructor directly. Instead, use one of the following static methods:
+        Parameters
+        ----------
+        data : Mapping[str, Sequence[Any]] | None
+            The data. If None, an empty table is created.
 
-        | Method                                                                       | Description                            |
-        | ---------------------------------------------------------------------------- | -------------------------------------- |
-        | [from_csv_file][safeds.data.tabular.containers._table.Table.from_csv_file]   | Create a table from a CSV file.        |
-        | [from_json_file][safeds.data.tabular.containers._table.Table.from_json_file] | Create a table from a JSON file.       |
-        | [from_dict][safeds.data.tabular.containers._table.Table.from_dict]           | Create a table from a dictionary.      |
-        | [from_columns][safeds.data.tabular.containers._table.Table.from_columns]     | Create a table from a list of columns. |
-        | [from_rows][safeds.data.tabular.containers._table.Table.from_rows]           | Create a table from a list of rows.    |
+        Raises
+        ------
+        ColumnLengthMismatchError
+            If columns have different lengths.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table
+        >>> table = Table({"a": [1, 2, 3], "b": [4, 5, 6]})
         """
-        self._data: pd.DataFrame = data if isinstance(data, pd.DataFrame) else pd.DataFrame(data)
-        self._schema: Schema = Schema._from_pandas_dataframe(self._data) if schema is None else schema
+        if data is None:
+            data = {}
 
-        if self._data.empty:
-            self._data = pd.DataFrame(columns=self._schema.column_names)
+        # Validation
+        expected_length: int | None = None
+        for column_values in data.values():
+            if expected_length is None:
+                expected_length = len(column_values)
+            elif len(column_values) != expected_length:
+                raise ColumnLengthMismatchError(
+                    "\n".join(f"{column_name}: {len(column_values)}" for column_name, column_values in data.items()),
+                )
 
+        # Implementation
+        self._data: pd.DataFrame = pd.DataFrame(data)
         self._data = self._data.reset_index(drop=True)
-        self._data.columns = self._schema.column_names
+        self._schema: Schema = Schema._from_pandas_dataframe(self._data)
 
     def __eq__(self, other: Any) -> bool:
         if not isinstance(other, Table):
@@ -1023,7 +1023,7 @@ class Table:
         """
         from ._tagged_table import TaggedTable
 
-        return TaggedTable(self._data, target_name, feature_names, self._schema)
+        return TaggedTable(self._data, self._schema, target_name, feature_names)
 
     def transform_column(self, name: str, transformer: Callable[[Row], Any]) -> Table:
         """
