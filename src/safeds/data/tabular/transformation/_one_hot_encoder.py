@@ -117,7 +117,6 @@ class OneHotEncoder(InvertibleTableTransformer):
                 encoded_values[new_column_name][i] = 1.0
 
             for new_column in self._column_names[old_column_name]:
-                newly_constructed_column = Column(new_column, encoded_values[new_column])
                 new_table = new_table.add_column(Column(new_column, encoded_values[new_column]))
 
         # Drop those column names affected by the OneHotEncoder:
@@ -156,23 +155,32 @@ class OneHotEncoder(InvertibleTableTransformer):
         TransformerNotFittedError
             If the transformer has not been fitted yet.
         """
-        raise NotImplementedError
+        #raise NotImplementedError
         # Transformer has not been fitted yet
         if self._column_names is None:
             raise TransformerNotFittedError
 
-        data = transformed_table._data.copy()
-        data.columns = transformed_table.column_names
+        # Make a copy of the table:
+        # TODO: change to copy method once implemented
+        # (Can also instead call remove_columns already here once #276 is fixed)
+        new_table = transformed_table.remove_columns([])
 
-        decoded = pd.DataFrame(
-            self._wrapped_transformer.inverse_transform(
-                transformed_table.keep_only_columns(self._wrapped_transformer.get_feature_names_out())._data,
-            ),
-            columns=list(self._column_names.keys()),
-        )
-        unchanged = data.drop(self._wrapped_transformer.get_feature_names_out(), axis=1)
+        original_columns = {}
+        for original_column_name in self._column_names:
+            original_columns[original_column_name] = [None for i in range(transformed_table.number_of_rows)]
 
-        res = Table(pd.concat([unchanged, decoded], axis=1))
+        for (original_column_name, value) in self._value_to_column:
+            constructed_column = self._value_to_column[(original_column_name, value)]
+            for i in range(transformed_table.number_of_rows):
+                if transformed_table.get_column(constructed_column)[i] == 1.0:
+                    original_columns[original_column_name][i] = value
+
+        for column_name, encoded_column in original_columns.items():
+            new_table = new_table.add_column(Column(column_name, encoded_column))
+
+        # Drop those column names affected by the OneHotEncoder:
+        new_table = new_table.remove_columns(list(self._value_to_column.values()))
+
         column_names = [
             name
             if name not in [value for value_list in list(self._column_names.values()) for value in value_list]
@@ -185,9 +193,7 @@ class OneHotEncoder(InvertibleTableTransformer):
             ]
             for name in transformed_table.column_names
         ]
-        res = res.sort_columns(lambda col1, col2: column_names.index(col1.name) - column_names.index(col2.name))
-
-        return res
+        return new_table.sort_columns(lambda col1, col2: column_names.index(col1.name) - column_names.index(col2.name))
 
     def is_fitted(self) -> bool:
         """
