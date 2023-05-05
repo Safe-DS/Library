@@ -311,7 +311,7 @@ class TestRecall:
         table = Table.from_dict(
             {
                 "predicted": ["lol", "1", "0", "2"],
-                "expected": [1, 0, 1, 2],
+                "expected": [2, 0, 5, 2],
             },
         ).tag_columns(target_name="expected")
 
@@ -343,9 +343,7 @@ class TestF1_score:
             },
         ).tag_columns(target_name="expected")
 
-        f1 = DummyClassifier().f1_score(table, 1)
-        assert f1 <= 0.667
-        assert f1 > 0.666
+        assert DummyClassifier().f1_score(table, 1) == 0.5
 
     def test_should_compare_result_with_different_types(self) -> None:
         table = Table.from_dict(
