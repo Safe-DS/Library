@@ -28,15 +28,15 @@ class GradientBoosting(Regressor):
     Raises
     ------
     ValueError
-        If `learning_rate` is non-positive or the `number_of_trees` is below 1.
+        If `learning_rate` is non-positive or the `number_of_trees` is less than or equal to 0.
     """
 
     def __init__(self, learning_rate: float = 0.1, number_of_trees: int = 100) -> None:
         # Validation
         if learning_rate <= 0:
             raise ValueError("The learning rate has to be greater than 0.")
-        if number_of_trees < 1:
-            raise ValueError("The number of boosting stages to perform has to be larger than 0.")
+        if number_of_trees <= 0:
+            raise ValueError("The number of boosting stages to perform has to be greater than 0.")
 
         # Hyperparameters
         self._learning_rate = learning_rate
