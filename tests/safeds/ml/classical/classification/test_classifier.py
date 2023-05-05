@@ -241,7 +241,7 @@ class TestPrecision:
 
         assert DummyClassifier().precision(table, 1) == 1.0
 
-    def test_should_return_1(self) -> None:
+    def test_should_return_1_if_never_expected_to_be_positive(self) -> None:
         table = Table.from_dict(
             {
                 "predicted": ["lol", "1", "0", "2"],
