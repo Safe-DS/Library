@@ -1,16 +1,16 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
+from typing import TYPE_CHECKING
 
 from sklearn.metrics import accuracy_score as sk_accuracy_score
 
 from safeds.data.tabular.containers import Table, TaggedTable
 from safeds.ml.exceptions import UntaggedTableError
 
-from typing import TYPE_CHECKING
-
 if TYPE_CHECKING:
     from typing import Any
+
 
 class Classifier(ABC):
     """Abstract base class for all classifiers."""

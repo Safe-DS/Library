@@ -356,7 +356,6 @@ class TestF1Score:
 
         assert DummyClassifier().f1_score(table, 1) == pytest.approx(0.6666667)
 
-
     def test_should_return_1_if_never_expected_or_predicted_to_be_positive(self) -> None:
         table = Table.from_dict(
             {
