@@ -6,7 +6,7 @@ from safeds.data.tabular.typing import Integer, Schema, String
 
 
 @pytest.mark.parametrize(
-    ("table", "expected"),
+    ("table", "row_expected"),
     [
         (Table([[1, 4, "d"], [2, 5, "e"], [3, 6, "f"]],
                Schema({"A": Integer(), "B": Integer(), "D": String()})),
@@ -21,8 +21,8 @@ from safeds.data.tabular.typing import Integer, Schema, String
     ],
     ids=[""]
 )
-def test_should_return_list_of_rows(table: Table, expected: list) -> None:
+def test_should_return_list_of_rows(table: Table, row_expected: list) -> None:
     rows_is = table.to_rows()
 
-    for row_is, expected in zip(rows_is, expected, strict=True):
-        assert row_is == expected
+    for row_is, row_expected in zip(rows_is, row_expected, strict=True):
+        assert row_is == row_expected
