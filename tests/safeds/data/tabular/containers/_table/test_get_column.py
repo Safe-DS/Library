@@ -16,7 +16,7 @@ def test_should_get_column(table1: Table, expected: Column) -> None:
 
 
 
-def test_should_raise_UnknownColumnNameError() -> None:
+def test_should_raise_error_if_column_name_unknown() -> None:
     table = Table.from_dict({"col1": ["col1_1"], "col2": ["col2_1"]})
     with pytest.raises(UnknownColumnNameError):
         table.get_column("col3")
