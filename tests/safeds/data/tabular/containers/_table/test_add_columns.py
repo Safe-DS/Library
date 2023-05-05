@@ -59,4 +59,4 @@ def test_should_raise_error_if_column_size_invalid(table, columns) -> None:
 )
 def test_should_raise_error_if_column_name_in_result_column(table, columns) -> None:
     with pytest.raises(DuplicateColumnNameError):
-        table = table.add_column(columns)
+        table = table.add_columns(columns)
