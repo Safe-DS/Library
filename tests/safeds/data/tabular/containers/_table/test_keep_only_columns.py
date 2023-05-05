@@ -34,7 +34,7 @@ class TestKeepOnlyColumns:
                 Table.from_dict({"C": [3], "A": [1]}),
             ),
         ],
-        ids=["No Column Name", "First Column", "Second Column", "All columns", "Last and first columns"]
+        ids=["No Column Name", "First Column", "Second Column", "All columns", "Last and first columns"],
     )
     def test_should_keep_only_listed_columns(self, table: Table, column_names: list[str], expected: Table) -> None:
         transformed_table = table.keep_only_columns(column_names)
