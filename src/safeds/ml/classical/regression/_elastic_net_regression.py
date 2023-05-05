@@ -94,7 +94,7 @@ class ElasticNetRegression(Regressor):
         LearningError
             If the training data contains invalid values or if the training failed.
         """
-        wrapped_regressor = sk_ElasticNet(alpha=self._alpha, l1_ratio=self._lasso_ratio)
+        wrapped_regressor = self._get_sklearn_regressor()
         fit(wrapped_regressor, training_set)
 
         result = ElasticNetRegression(alpha=self._alpha, lasso_ratio=self._lasso_ratio)

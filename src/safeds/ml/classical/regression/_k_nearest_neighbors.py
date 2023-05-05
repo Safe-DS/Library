@@ -73,7 +73,7 @@ class KNearestNeighbors(Regressor):
                 ),
             )
 
-        wrapped_regressor = sk_KNeighborsRegressor(self._number_of_neighbors, n_jobs=-1)
+        wrapped_regressor = self._get_sklearn_regressor()
         fit(wrapped_regressor, training_set)
 
         result = KNearestNeighbors(self._number_of_neighbors)

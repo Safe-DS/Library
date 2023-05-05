@@ -71,7 +71,7 @@ class LassoRegression(Regressor):
         LearningError
             If the training data contains invalid values or if the training failed.
         """
-        wrapped_regressor = sk_Lasso(alpha=self._alpha)
+        wrapped_regressor = self._get_sklearn_regressor()
         fit(wrapped_regressor, training_set)
 
         result = LassoRegression(alpha=self._alpha)

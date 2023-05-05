@@ -61,7 +61,7 @@ class RandomForest(Regressor):
         LearningError
             If the training data contains invalid values or if the training failed.
         """
-        wrapped_regressor = sk_RandomForestRegressor(self._number_of_trees, n_jobs=-1)
+        wrapped_regressor = self._get_sklearn_regressor()
         fit(wrapped_regressor, training_set)
 
         result = RandomForest(self._number_of_trees)

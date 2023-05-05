@@ -43,7 +43,7 @@ class DecisionTree(Regressor):
         LearningError
             If the training data contains invalid values or if the training failed.
         """
-        wrapped_regressor = sk_DecisionTreeRegressor()
+        wrapped_regressor = self._get_sklearn_regressor()
         fit(wrapped_regressor, training_set)
 
         result = DecisionTree()
