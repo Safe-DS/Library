@@ -13,6 +13,7 @@ from safeds.ml.exceptions import UntaggedTableError
 if TYPE_CHECKING:
     from sklearn.base import RegressorMixin
 
+
 class Regressor(ABC):
     """Abstract base class for all regressors."""
 

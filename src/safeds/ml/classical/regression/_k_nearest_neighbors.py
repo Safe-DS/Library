@@ -10,6 +10,7 @@ from ._regressor import Regressor
 
 if TYPE_CHECKING:
     from sklearn.base import RegressorMixin
+
     from safeds.data.tabular.containers import Table, TaggedTable
 
 
@@ -68,8 +69,8 @@ class KNearestNeighbors(Regressor):
         if self._number_of_neighbors > training_set.number_of_rows:
             raise ValueError(
                 (
-                    f"The parameter 'number_of_neighbors' ({self._number_of_neighbors}) has to be less than or equal to the sample "
-                    f"size ({training_set.number_of_rows})."
+                    f"The parameter 'number_of_neighbors' ({self._number_of_neighbors}) has to be less than or equal to"
+                    f" the sample size ({training_set.number_of_rows})."
                 ),
             )
 

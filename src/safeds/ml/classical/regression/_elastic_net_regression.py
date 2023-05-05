@@ -12,6 +12,7 @@ from ._regressor import Regressor
 
 if TYPE_CHECKING:
     from sklearn.base import RegressorMixin
+
     from safeds.data.tabular.containers import Table, TaggedTable
 
 
@@ -152,4 +153,3 @@ class ElasticNetRegression(Regressor):
             The sklearn Regressor.
         """
         return sk_ElasticNet(alpha=self._alpha, l1_ratio=self._lasso_ratio)
-

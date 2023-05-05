@@ -10,6 +10,7 @@ from ._classifier import Classifier
 
 if TYPE_CHECKING:
     from sklearn.base import ClassifierMixin
+
     from safeds.data.tabular.containers import Table, TaggedTable
 
 
@@ -34,7 +35,9 @@ class AdaBoost(Classifier):
         If `maximum_number_of_learners` or `learning_rate` are less than or equal to 0
     """
 
-    def __init__(self, learner: Classifier | None = None, maximum_number_of_learners: int = 50, learning_rate: float = 1.0) -> None:
+    def __init__(
+        self, learner: Classifier | None = None, maximum_number_of_learners: int = 50, learning_rate: float = 1.0,
+    ) -> None:
         # Validation
         if maximum_number_of_learners <= 0:
             raise ValueError("The parameter 'maximum_number_of_learners' has to be grater than 0.")
@@ -75,7 +78,11 @@ class AdaBoost(Classifier):
         wrapped_classifier = self._get_sklearn_classifier()
         fit(wrapped_classifier, training_set)
 
-        result = AdaBoost(learner=self._learner, maximum_number_of_learners=self._maximum_number_of_learners, learning_rate=self._learning_rate)
+        result = AdaBoost(
+            learner=self._learner,
+            maximum_number_of_learners=self._maximum_number_of_learners,
+            learning_rate=self._learning_rate,
+        )
         result._wrapped_classifier = wrapped_classifier
         result._feature_names = training_set.features.column_names
         result._target_name = training_set.target.name
@@ -130,4 +137,6 @@ class AdaBoost(Classifier):
             The sklearn Classifier.
         """
         learner = self._learner._get_sklearn_classifier() if self._learner is not None else None
-        return sk_AdaBoostClassifier(estimator=learner, n_estimators=self._maximum_number_of_learners, learning_rate=self._learning_rate)
+        return sk_AdaBoostClassifier(
+            estimator=learner, n_estimators=self._maximum_number_of_learners, learning_rate=self._learning_rate,
+        )

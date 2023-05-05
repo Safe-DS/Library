@@ -10,6 +10,7 @@ from ._regressor import Regressor
 
 if TYPE_CHECKING:
     from sklearn.base import RegressorMixin
+
     from safeds.data.tabular.containers import Table, TaggedTable
 
 
@@ -101,4 +102,3 @@ class DecisionTree(Regressor):
             The sklearn Regressor.
         """
         return sk_DecisionTreeRegressor()
-

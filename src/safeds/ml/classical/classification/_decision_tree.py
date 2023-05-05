@@ -10,6 +10,7 @@ from ._classifier import Classifier
 
 if TYPE_CHECKING:
     from sklearn.base import ClassifierMixin
+
     from safeds.data.tabular.containers import Table, TaggedTable
 
 
@@ -93,4 +94,3 @@ class DecisionTree(Classifier):
 
     def _get_sklearn_classifier(self) -> ClassifierMixin:
         return sk_DecisionTreeClassifier()
-

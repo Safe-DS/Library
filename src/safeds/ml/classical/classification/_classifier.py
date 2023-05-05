@@ -10,6 +10,7 @@ from safeds.ml.exceptions import UntaggedTableError
 
 if TYPE_CHECKING:
     from typing import Any
+
     from sklearn.base import ClassifierMixin
 
 

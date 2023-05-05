@@ -32,8 +32,8 @@ from safeds.ml.exceptions import (
 )
 
 if TYPE_CHECKING:
-    from sklearn.base import RegressorMixin
     from _pytest.fixtures import FixtureRequest
+    from sklearn.base import RegressorMixin
 
 
 def regressors() -> list[Regressor]:

@@ -24,8 +24,8 @@ from safeds.ml.exceptions import (
 )
 
 if TYPE_CHECKING:
-    from sklearn.base import ClassifierMixin
     from _pytest.fixtures import FixtureRequest
+    from sklearn.base import ClassifierMixin
 
 
 def classifiers() -> list[Classifier]:
