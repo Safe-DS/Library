@@ -219,6 +219,23 @@ class TestAccuracy:
 
         assert DummyClassifier().accuracy(table) == 0.0
 
+    @pytest.mark.parametrize(
+        "table",
+        [
+            Table.from_dict(
+                {
+                    "a": [1.0, 0.0, 0.0, 0.0],
+                    "b": [0.0, 1.0, 1.0, 0.0],
+                    "c": [0.0, 0.0, 0.0, 1.0],
+                },
+            ),
+        ],
+        ids=["untagged_table"],
+    )
+    def test_should_raise_if_table_is_not_tagged(self, table: Table) -> None:
+        with pytest.raises(UntaggedTableError):
+            DummyClassifier().accuracy(table)  # type: ignore[arg-type]
+
 
 class TestPrecision:
     def test_should_compare_result(self) -> None:
@@ -266,4 +283,4 @@ class TestPrecision:
     )
     def test_should_raise_if_table_is_not_tagged(self, table: Table) -> None:
         with pytest.raises(UntaggedTableError):
-            DummyClassifier().accuracy(table)  # type: ignore[arg-type]
+            DummyClassifier().precision(table)  # type: ignore[arg-type]

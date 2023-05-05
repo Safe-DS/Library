@@ -117,6 +117,9 @@ class Classifier(ABC):
             The calculated precision score, i.e. the ratio of correctly predicted positives to all predicted positives.
             Returns 1 if no predictions are made.
         """
+        if not isinstance(validation_or_test_set, TaggedTable) and isinstance(validation_or_test_set, Table):
+            raise UntaggedTableError
+
         expected = validation_or_test_set.target
         predicted = self.predict(validation_or_test_set.features).target
 
