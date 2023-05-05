@@ -14,7 +14,7 @@ from safeds.data.tabular.containers import Table
             ),
             2,
         ),
-        (Table([]), 0),
+        (Table.from_dict({}), 0),
     ],
     ids=["some missing values", "empty"],
 )

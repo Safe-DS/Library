@@ -80,7 +80,7 @@ class LabelEncoder(InvertibleTableTransformer):
         data = table._data.copy()
         data.columns = table.column_names
         data[self._column_names] = self._wrapped_transformer.transform(data[self._column_names])
-        return Table(data)
+        return Table._from_pandas_dataframe(data)
 
     def inverse_transform(self, transformed_table: Table) -> Table:
         """
@@ -108,7 +108,7 @@ class LabelEncoder(InvertibleTableTransformer):
         data = transformed_table._data.copy()
         data.columns = transformed_table.column_names
         data[self._column_names] = self._wrapped_transformer.inverse_transform(data[self._column_names])
-        return Table(data)
+        return Table._from_pandas_dataframe(data)
 
     def is_fitted(self) -> bool:
         """

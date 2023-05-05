@@ -1,26 +1,35 @@
 import pytest
+
 from safeds.data.tabular.containers import Row, Table
-from safeds.data.tabular.exceptions import MissingDataError, SchemaMismatchError
-from safeds.data.tabular.typing import Integer, Schema, String
+from safeds.data.tabular.exceptions import SchemaMismatchError
 
 
 @pytest.mark.parametrize(
-    "table",
+    ("rows", "expected"),
     [
-        (Table([[1, 4, "d"], [2, 5, "e"], [3, 6, "f"]], Schema({"A": Integer(), "B": Integer(), "D": String()}))),
+        (
+            [],
+            Table.from_dict({}),
+        ),
+        (
+            [
+                Row({"A": 1, "B": 4, "C": "d"}),
+                Row({"A": 2, "B": 5, "C": "e"}),
+                Row({"A": 3, "B": 6, "C": "f"}),
+            ],
+            Table.from_dict(
+                {
+                    "A": [1, 2, 3],
+                    "B": [4, 5, 6],
+                    "C": ["d", "e", "f"],
+                },
+            ),
+        ),
     ],
-    ids=["empty"],
+    ids=["empty", "non-empty"],
 )
-def test_should_create_table_from_rows(table: Table) -> None:
-    rows_is = table.to_rows()
-    table_is = Table.from_rows(rows_is)
-
-    assert table_is == table
-
-
-def test_should_raise_error_if_data_missing() -> None:
-    with pytest.raises(MissingDataError):
-        Table.from_rows([])
+def test_should_create_table_from_rows(rows: list[Row], expected: Table) -> None:
+    assert Table.from_rows(rows) == expected
 
 
 def test_should_raise_error_if_mismatching_schema() -> None:

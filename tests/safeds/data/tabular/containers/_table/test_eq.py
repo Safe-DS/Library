@@ -7,7 +7,7 @@ from safeds.data.tabular.containers import Row, Table
 @pytest.mark.parametrize(
     ("table1", "table2", "expected"),
     [
-        (Table({}), Table({}), True),
+        (Table.from_dict({}), Table.from_dict({}), True),
         (Table.from_dict({"col1": [1]}), Table.from_dict({"col1": [1]}), True),
         (Table.from_dict({"col1": [1]}), Table.from_dict({"col2": [1]}), False),
         (Table.from_dict({"col1": [1, 2, 3]}), Table.from_dict({"col1": [1, 1, 3]}), False),

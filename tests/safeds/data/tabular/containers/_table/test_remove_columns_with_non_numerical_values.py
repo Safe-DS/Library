@@ -14,7 +14,7 @@ from safeds.data.tabular.containers import Table
             ),
             ["col3"],
         ),
-        (Table([]), []),
+        (Table.from_dict({}), []),
     ],
     ids=["numerical values", "empty"],
 )

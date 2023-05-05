@@ -8,7 +8,7 @@ from safeds.data.tabular.typing import Integer, Schema, String
     ("table", "rows_expected"),
     [
         (
-            Table([[1, 4, "d"], [2, 5, "e"], [3, 6, "f"]], Schema({"A": Integer(), "B": Integer(), "D": String()})),
+            Table._from_pandas_dataframe(pd.DataFrame([[1, 4, "d"], [2, 5, "e"], [3, 6, "f"]]), Schema({"A": Integer(), "B": Integer(), "D": String()})),
             [
                 Row._from_pandas_dataframe(
                     pd.DataFrame({"A": [1], "B": [4], "D": ["d"]}),

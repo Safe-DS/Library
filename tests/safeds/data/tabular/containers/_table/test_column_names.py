@@ -6,7 +6,7 @@ from safeds.data.tabular.containers import Table
     ("table", "expected"),
     [
         (Table.from_dict({"col1": [1], "col2": [1]}), ["col1", "col2"]),
-        (Table([]), []),
+        (Table.from_dict({}), []),
     ],
     ids=["Integer", "empty"],
 )

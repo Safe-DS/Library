@@ -6,7 +6,7 @@ from safeds.data.tabular.containers import Table
 @pytest.mark.parametrize(
     "table",
     [
-        Table([]),
+        Table.from_dict({}),
         Table.from_dict({"a": [1, 2], "b": [3, 4]}),
     ],
     ids=[
@@ -16,7 +16,7 @@ from safeds.data.tabular.containers import Table
 )
 def test_should_restore_table_from_exchange_object(table: Table) -> None:
     exchange_object = table.__dataframe__()
-    restored = Table(from_dataframe(exchange_object))
+    restored = Table._from_pandas_dataframe(from_dataframe(exchange_object))
 
     assert restored == table
 

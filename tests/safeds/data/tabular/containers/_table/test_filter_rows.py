@@ -1,3 +1,4 @@
+import pandas as pd
 import pytest
 from safeds.data.tabular.containers import Table
 from safeds.data.tabular.typing import ColumnType, Integer, Schema, String
@@ -16,7 +17,7 @@ from safeds.data.tabular.typing import ColumnType, Integer, Schema, String
             Table.from_dict({"col1": [3, 2, 4], "col2": [1, 2, 4]}),
             "col1",
             1,
-            Table([], Schema({"col1": Integer(), "col2": Integer()})),
+            Table._from_pandas_dataframe(pd.DataFrame(), Schema({"col1": Integer(), "col2": Integer()})),
         ),
     ],
     ids=["filter for col1 = 1", "empty table"],

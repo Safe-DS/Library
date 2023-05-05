@@ -1,7 +1,6 @@
 import pytest
 from safeds.data.tabular.containers import Column, Table
 from safeds.data.tabular.exceptions import ColumnLengthMismatchError
-from safeds.data.tabular.typing import Integer, Schema
 
 
 @pytest.mark.parametrize(
@@ -12,9 +11,14 @@ from safeds.data.tabular.typing import Integer, Schema
                 Column("A", [1, 4]),
                 Column("B", [2, 5]),
             ],
-            Table([[1, 2], [4, 5]], Schema({"A": Integer(), "B": Integer()})),
+            Table.from_dict(
+                {
+                    "A": [1, 4],
+                    "B": [2, 5],
+                },
+            ),
         ),
-        ([], Table([])),
+        ([], Table.from_dict({})),
     ],
     ids=["2 Columns", "empty"],
 )

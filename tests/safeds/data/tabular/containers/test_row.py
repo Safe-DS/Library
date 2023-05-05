@@ -171,7 +171,7 @@ class TestEq:
         ("row", "other"),
         [
             (Row({"col1": 0}), None),
-            (Row({"col1": 0}), Table([])),
+            (Row({"col1": 0}), Table.from_dict({})),
         ],
         ids=[
             "Row vs. None",

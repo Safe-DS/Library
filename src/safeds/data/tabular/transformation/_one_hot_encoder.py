@@ -95,7 +95,7 @@ class OneHotEncoder(InvertibleTableTransformer):
 
         unchanged = original.drop(self._column_names.keys(), axis=1)
 
-        res = Table(pd.concat([unchanged, one_hot_encoded], axis=1))
+        res = Table._from_pandas_dataframe(pd.concat([unchanged, one_hot_encoded], axis=1))
         column_names = []
 
         for name in table.column_names:
@@ -144,7 +144,7 @@ class OneHotEncoder(InvertibleTableTransformer):
         )
         unchanged = data.drop(self._wrapped_transformer.get_feature_names_out(), axis=1)
 
-        res = Table(pd.concat([unchanged, decoded], axis=1))
+        res = Table._from_pandas_dataframe(pd.concat([unchanged, decoded], axis=1))
         column_names = [
             name
             if name not in [value for value_list in list(self._column_names.values()) for value in value_list]

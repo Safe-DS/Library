@@ -20,7 +20,6 @@ from safeds.data.tabular.exceptions import (
     ColumnSizeError,
     DuplicateColumnNameError,
     IndexOutOfBoundsError,
-    MissingDataError,
     NonNumericColumnError,
     SchemaMismatchError,
     UnknownColumnNameError,
@@ -81,7 +80,7 @@ class Table:
             If the file could not be read.
         """
         try:
-            return Table(pd.read_csv(path))
+            return Table._from_pandas_dataframe(pd.read_csv(path))
         except FileNotFoundError as exception:
             raise FileNotFoundError(f'File "{path}" does not exist') from exception
 
@@ -108,7 +107,8 @@ class Table:
             If the file could not be read.
         """
         try:
-            return Table(pd.read_excel(path, engine="openpyxl", usecols=lambda colname: "Unnamed" not in colname))
+            return Table._from_pandas_dataframe(
+                pd.read_excel(path, engine="openpyxl", usecols=lambda colname: "Unnamed" not in colname))
         except FileNotFoundError as exception:
             raise FileNotFoundError(f'File "{path}" does not exist') from exception
 
@@ -135,7 +135,7 @@ class Table:
             If the file could not be read.
         """
         try:
-            return Table(pd.read_json(path))
+            return Table._from_pandas_dataframe(pd.read_json(path))
         except FileNotFoundError as exception:
             raise FileNotFoundError(f'File "{path}" does not exist') from exception
 
@@ -173,7 +173,7 @@ class Table:
         dataframe: DataFrame = pd.DataFrame()
         for column_name, column_values in data.items():
             dataframe[column_name] = column_values
-        return Table(dataframe)
+        return Table._from_pandas_dataframe(dataframe)
 
     @staticmethod
     def from_columns(columns: list[Column]) -> Table:
@@ -204,7 +204,7 @@ class Table:
                 )
             dataframe[column.name] = column._data
 
-        return Table(dataframe)
+        return Table._from_pandas_dataframe(dataframe)
 
     @staticmethod
     def from_rows(rows: list[Row]) -> Table:
@@ -223,13 +223,11 @@ class Table:
 
         Raises
         ------
-        MissingDataError
-            If an empty list is given.
         SchemaMismatchError
             If any of the row schemas does not match with the others.
         """
         if len(rows) == 0:
-            raise MissingDataError("This function requires at least one row.")
+            return Table._from_pandas_dataframe(pd.DataFrame())
 
         schema_compare: Schema = rows[0]._schema
         row_array: list[pd.DataFrame] = []
@@ -241,7 +239,7 @@ class Table:
 
         dataframe: DataFrame = pd.concat(row_array, ignore_index=True)
         dataframe.columns = schema_compare.column_names
-        return Table(dataframe)
+        return Table._from_pandas_dataframe(dataframe)
 
     @staticmethod
     def _from_pandas_dataframe(data: pd.DataFrame, schema: Schema | None = None) -> Table:
@@ -276,6 +274,8 @@ class Table:
             result._schema = Schema._from_pandas_dataframe(data)
         else:
             result._schema = schema
+            if result._data.empty:
+                result._data = pd.DataFrame(columns=schema.column_names)
 
         return result
 
@@ -518,7 +518,7 @@ class Table:
         result = pd.concat([pd.DataFrame(list(statistics.keys())), result], axis=1)
         result.columns = ["metrics", *self.column_names]
 
-        return Table(result)
+        return Table._from_pandas_dataframe(result)
 
     # ------------------------------------------------------------------------------------------------------------------
     # Transformations
@@ -551,7 +551,7 @@ class Table:
         result = self._data.copy()
         result.columns = self._schema.column_names
         result[column.name] = column._data
-        return Table(result)
+        return Table._from_pandas_dataframe(result)
 
     def add_columns(self, columns: list[Column] | Table) -> Table:
         """
@@ -586,7 +586,7 @@ class Table:
                 raise ColumnSizeError(str(self.number_of_rows), str(column._data.size))
 
             result[column.name] = column._data
-        return Table(result)
+        return Table._from_pandas_dataframe(result)
 
     def add_row(self, row: Row) -> Table:
         """
@@ -608,7 +608,7 @@ class Table:
 
         new_df = pd.concat([self._data, row._data]).infer_objects()
         new_df.columns = self.column_names
-        return Table(new_df)
+        return Table._from_pandas_dataframe(new_df)
 
     def add_rows(self, rows: list[Row] | Table) -> Table:
         """
@@ -635,7 +635,7 @@ class Table:
 
         result = pd.concat([result, *row_frames]).infer_objects()
         result.columns = self.column_names
-        return Table(result)
+        return Table._from_pandas_dataframe(result)
 
     def filter_rows(self, query: Callable[[Row], bool]) -> Table:
         """
@@ -653,7 +653,7 @@ class Table:
         """
         rows: list[Row] = [row for row in self.to_rows() if query(row)]
         if len(rows) == 0:
-            result_table = Table([], self._schema)
+            result_table = Table._from_pandas_dataframe(pd.DataFrame(), self._schema)
         else:
             result_table = self.from_rows(rows)
         return result_table
@@ -686,7 +686,7 @@ class Table:
 
         transformed_data = self._data[column_names]
         transformed_data.columns = column_names
-        return Table(transformed_data)
+        return Table._from_pandas_dataframe(transformed_data)
 
     def remove_columns(self, column_names: list[str]) -> Table:
         """
@@ -716,7 +716,7 @@ class Table:
 
         transformed_data = self._data.drop(labels=column_names, axis="columns")
         transformed_data.columns = [name for name in self._schema.column_names if name not in column_names]
-        return Table(transformed_data)
+        return Table._from_pandas_dataframe(transformed_data)
 
     def remove_columns_with_missing_values(self) -> Table:
         """
@@ -752,7 +752,7 @@ class Table:
         """
         result = self._data.drop_duplicates(ignore_index=True)
         result.columns = self._schema.column_names
-        return Table(result)
+        return Table._from_pandas_dataframe(result)
 
     def remove_rows_with_missing_values(self) -> Table:
         """
@@ -765,7 +765,7 @@ class Table:
         """
         result = self._data.copy(deep=True)
         result = result.dropna(axis="index")
-        return Table(result, self._schema)
+        return Table._from_pandas_dataframe(result, self._schema)
 
     def remove_rows_with_outliers(self) -> Table:
         """
@@ -786,7 +786,7 @@ class Table:
         z_scores = np.absolute(stats.zscore(table_without_nonnumericals._data, nan_policy="omit"))
         filter_ = ((z_scores < 3) | np.isnan(z_scores)).all(axis=1)
 
-        return Table(copy[filter_], self._schema)
+        return Table._from_pandas_dataframe(copy[filter_], self._schema)
 
     def rename_column(self, old_name: str, new_name: str) -> Table:
         """
@@ -820,7 +820,7 @@ class Table:
 
         new_df = self._data.copy()
         new_df.columns = self._schema.column_names
-        return Table(new_df.rename(columns={old_name: new_name}))
+        return Table._from_pandas_dataframe(new_df.rename(columns={old_name: new_name}))
 
     def replace_column(self, old_column_name: str, new_column: Column) -> Table:
         """
@@ -868,7 +868,7 @@ class Table:
             result.columns = self._schema.column_names
 
         result[new_column.name] = new_column._data
-        return Table(result)
+        return Table._from_pandas_dataframe(result)
 
     def shuffle_rows(self) -> Table:
         """
@@ -882,7 +882,7 @@ class Table:
         """
         new_df = self._data.sample(frac=1.0)
         new_df.columns = self._schema.column_names
-        return Table(new_df)
+        return Table._from_pandas_dataframe(new_df)
 
     def slice_rows(
         self,
@@ -923,12 +923,12 @@ class Table:
 
         new_df = self._data.iloc[start:end:step]
         new_df.columns = self._schema.column_names
-        return Table(new_df)
+        return Table._from_pandas_dataframe(new_df)
 
     def sort_columns(
         self,
         comparator: Callable[[Column, Column], int] = lambda col1, col2: (col1.name > col2.name)
-        - (col1.name < col2.name),
+                                                                         - (col1.name < col2.name),
     ) -> Table:
         """
         Sort the columns of a `Table` with the given comparator and return a new `Table`.

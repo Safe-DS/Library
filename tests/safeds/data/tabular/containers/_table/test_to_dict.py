@@ -2,18 +2,22 @@ from typing import Any
 
 import pytest
 from safeds.data.tabular.containers import Table
-from safeds.data.tabular.typing import Integer, Schema
 
 
 @pytest.mark.parametrize(
     ("table", "expected"),
     [
         (
-            Table([]),
+            Table.from_dict({}),
             {},
         ),
         (
-            Table([[1, 2]], schema=Schema({"a": Integer(), "b": Integer()})),
+            Table.from_dict(
+                {
+                    "a": [1],
+                    "b": [2],
+                },
+            ),
             {
                 "a": [1],
                 "b": [2],
