@@ -30,7 +30,7 @@ class GradientBoosting(Classifier):
     Raises
     ------
     ValueError
-        If `learning_rate` is non-positive or `number_of_trees` is less than or equal to 0.
+        If `number_of_trees` is less than or equal to 0 or `learning_rate` is non-positive.
     """
 
     def __init__(self, number_of_trees: int = 100, learning_rate: float = 0.1) -> None:
