@@ -6,14 +6,14 @@ from safeds.data.tabular.exceptions import UnknownColumnNameError
 from tests.helpers import resolve_resource_path
 
 
-def test_should_raise_UnknownColumnNameError() -> None:
-    table = Table.from_dict({"A": [1, 2, 3], "B": [2, 4, 7]})
-    with pytest.raises(UnknownColumnNameError):
-        table.plot_scatterplot("C", "A")
-
-
 def test_should_match_snapshot() -> None:
     table = Table.from_dict({"A": [1, 2, 3], "B": [2, 4, 7]})
     current = table.plot_scatterplot("A", "B")
     snapshot = Image.from_png_file(resolve_resource_path("./image/snapshot_scatterplot.png"))
     assert snapshot._image.tobytes() == current._image.tobytes()
+
+
+def test_should_raise_if_column_does_not_exist() -> None:
+    table = Table.from_dict({"A": [1, 2, 3], "B": [2, 4, 7]})
+    with pytest.raises(UnknownColumnNameError):
+        table.plot_scatterplot("C", "A")
