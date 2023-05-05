@@ -1,7 +1,6 @@
 import _pytest
 import matplotlib.pyplot as plt
 import pytest
-
 from safeds.data.tabular.containers import Table
 
 
