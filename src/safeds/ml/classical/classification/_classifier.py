@@ -4,6 +4,7 @@ from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
 from sklearn.metrics import accuracy_score as sk_accuracy_score
+from sklearn.metrics import precision_score as sk_precision_score
 
 if TYPE_CHECKING:
     from safeds.data.tabular.containers import Table, TaggedTable
@@ -92,3 +93,28 @@ class Classifier(ABC):
         predicted = self.predict(validation_or_test_set.features).target
 
         return sk_accuracy_score(expected._data, predicted._data)
+
+    def precision(self, validation_or_test_set: TaggedTable, positive_class = 1) -> float:
+        """
+        Compute the precision of the classifier on the given data.
+
+        Parameters
+        ----------
+        validation_or_test_set : TaggedTable
+            The validation or test set.
+        positive_class : int | str
+            The classification to be considered positive
+
+        Returns
+        -------
+        precision : float
+            The calculated precision score, i.e. the ratio of correctly predicted positives to all predicted positives.
+        """
+        expected = validation_or_test_set.target
+        predicted = self.predict(validation_or_test_set.features).target
+
+        try:
+            return sk_precision_score(expected._data, predicted._data, average=None, labels=[positive_class])
+        except ValueError:
+            return
+
