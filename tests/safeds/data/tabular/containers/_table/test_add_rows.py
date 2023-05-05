@@ -4,19 +4,18 @@ from safeds.data.tabular.exceptions import SchemaMismatchError
 
 
 @pytest.mark.parametrize(
-    ("table1", "row1", "row2", "table2"),
+    ("table1", "rows", "table2"),
     [
         (
             Table.from_dict({"col1": ["a", "b", "c"], "col2": [1, 2, 4]}),
-            Row({"col1": "d", "col2": 6}),
-            Row({"col1": "e", "col2": 8}),
+            [Row({"col1": "d", "col2": 6}), Row({"col1": "e", "col2": 8})],
             Table.from_dict({"col1": ["a", "b", "c", "d", "e"], "col2": [1, 2, 4, 6, 8]}),
         ),
     ],
     ids=["Rows with string and integer values"],
 )
-def test_should_add_rows(table1: Table, row1: Row, row2: Row, table2: Table) -> None:
-    table1 = table1.add_rows([row1, row2])
+def test_should_add_rows(table1: Table, rows: list[Row], table2: Table) -> None:
+    table1 = table1.add_rows(rows)
     assert table1 == table2
 
 

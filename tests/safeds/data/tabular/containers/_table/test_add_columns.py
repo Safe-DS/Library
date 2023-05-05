@@ -4,19 +4,18 @@ from safeds.data.tabular.exceptions import ColumnSizeError, DuplicateColumnNameE
 
 
 @pytest.mark.parametrize(
-    ("table1", "column1", "column2", "expected"),
+    ("table1", "columns", "expected"),
     [
         (
             Table.from_dict({"col1": [1, 2, 1], "col2": [1, 2, 4]}),
-            Column("col3", [0, -1, -2]),
-            Column("col4", ["a", "b", "c"]),
+            [Column("col3", [0, -1, -2]), Column("col4", ["a", "b", "c"])],
             Table.from_dict({"col1": [1, 2, 1], "col2": [1, 2, 4], "col3": [0, -1, -2], "col4": ["a", "b", "c"]}),
         ),
     ],
     ids=["add 2 columns"],
 )
-def test_should_add_columns(table1: Table, column1: Column, column2: Column, expected: Table) -> None:
-    table1 = table1.add_columns([column1, column2])
+def test_should_add_columns(table1: Table, columns: list[Column], expected: Table) -> None:
+    table1 = table1.add_columns(columns)
     assert table1 == expected
 
 
