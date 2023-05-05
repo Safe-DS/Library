@@ -20,5 +20,7 @@ class TestC:
         assert fitted_model._wrapped_regressor.C == 2
 
     def test_should_raise_if_less_than_or_equal_to_0(self) -> None:
-        with pytest.raises(ValueError, match="The strength of regularization given by the c parameter must be strictly positive."):
+        with pytest.raises(
+            ValueError, match="The strength of regularization given by the c parameter must be strictly positive.",
+        ):
             SupportVectorMachine(c=-1)
