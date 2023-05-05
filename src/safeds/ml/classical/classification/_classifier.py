@@ -123,9 +123,6 @@ class Classifier(ABC):
         expected = validation_or_test_set.target
         predicted = self.predict(validation_or_test_set.features).target
 
-        if len(expected) != len(predicted):
-            raise ColumnLengthMismatchError("expected, predicted")
-
         true_positive, false_positive = 0, 0
 
         for pair in zip(expected, predicted, strict=True):
