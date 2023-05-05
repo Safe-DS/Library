@@ -68,7 +68,9 @@ class GradientBoosting(Regressor):
         LearningError
             If the training data contains invalid values or if the training failed.
         """
-        wrapped_regressor = sk_GradientBoostingRegressor(learning_rate=self._learning_rate, n_estimators=self._number_of_trees)
+        wrapped_regressor = sk_GradientBoostingRegressor(
+            learning_rate=self._learning_rate, n_estimators=self._number_of_trees,
+        )
         fit(wrapped_regressor, training_set)
 
         result = GradientBoosting(learning_rate=self._learning_rate, number_of_trees=self._number_of_trees)

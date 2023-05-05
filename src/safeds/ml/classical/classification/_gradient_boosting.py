@@ -68,7 +68,9 @@ class GradientBoosting(Classifier):
         LearningError
             If the training data contains invalid values or if the training failed.
         """
-        wrapped_classifier = sk_GradientBoostingClassifier(learning_rate=self._learning_rate, n_estimators=self._number_of_trees)
+        wrapped_classifier = sk_GradientBoostingClassifier(
+            learning_rate=self._learning_rate, n_estimators=self._number_of_trees,
+        )
         fit(wrapped_classifier, training_set)
 
         result = GradientBoosting(learning_rate=self._learning_rate, number_of_trees=self._number_of_trees)
