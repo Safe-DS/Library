@@ -36,7 +36,10 @@ class AdaBoost(Regressor):
     """
 
     def __init__(
-        self, learner: Regressor | None = None, maximum_number_of_learners: int = 50, learning_rate: float = 1.0,
+        self,
+        learner: Regressor | None = None,
+        maximum_number_of_learners: int = 50,
+        learning_rate: float = 1.0,
     ) -> None:
         # Validation
         if maximum_number_of_learners <= 0:
@@ -138,5 +141,7 @@ class AdaBoost(Regressor):
         """
         learner = self._learner._get_sklearn_regressor() if self._learner is not None else None
         return sk_AdaBoostRegressor(
-            estimator=learner, n_estimators=self._maximum_number_of_learners, learning_rate=self._learning_rate,
+            estimator=learner,
+            n_estimators=self._maximum_number_of_learners,
+            learning_rate=self._learning_rate,
         )
