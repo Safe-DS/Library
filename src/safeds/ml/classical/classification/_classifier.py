@@ -127,7 +127,7 @@ class Classifier(ABC):
 
         for i in range(len(expected)):
             if predicted[i] == positive_class:
-                if expected[i] == predicted[i]:
+                if expected[i] == positive_class:
                     true_positive += 1
                 else:
                     false_positive += 1
