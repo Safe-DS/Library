@@ -21,7 +21,7 @@ from safeds.data.tabular.exceptions import ColumnLengthMismatchError
                 {
                     "a": [1],
                     "b": [2],
-                }
+                },
             ),
         ),
     ],

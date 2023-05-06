@@ -112,7 +112,8 @@ class Table:
         """
         try:
             return Table._from_pandas_dataframe(
-                pd.read_excel(path, engine="openpyxl", usecols=lambda colname: "Unnamed" not in colname))
+                pd.read_excel(path, engine="openpyxl", usecols=lambda colname: "Unnamed" not in colname),
+            )
         except FileNotFoundError as exception:
             raise FileNotFoundError(f'File "{path}" does not exist') from exception
 
@@ -976,7 +977,7 @@ class Table:
     def sort_columns(
         self,
         comparator: Callable[[Column, Column], int] = lambda col1, col2: (col1.name > col2.name)
-                                                                         - (col1.name < col2.name),
+        - (col1.name < col2.name),
     ) -> Table:
         """
         Sort the columns of a `Table` with the given comparator and return a new `Table`.
