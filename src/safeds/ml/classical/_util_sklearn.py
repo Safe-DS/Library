@@ -95,7 +95,8 @@ def predict(model: Any, dataset: Table, feature_names: list[str] | None, target_
             predicted_target_vector = model.predict(dataset_df.values)
         result_set[target_name] = predicted_target_vector
         return Table._from_pandas_dataframe(result_set).tag_columns(
-            target_name=target_name, feature_names=feature_names,
+            target_name=target_name,
+            feature_names=feature_names,
         )
     except ValueError as exception:
         raise PredictionError(str(exception)) from exception
