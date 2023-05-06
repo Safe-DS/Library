@@ -14,6 +14,7 @@ from safeds.data.tabular.containers import Column
 def test_should_transform_column(column: Column, expected: Column) -> None:
     assert column.transform(lambda it: it + 1) == expected
 
+
 @pytest.mark.parametrize(
     ("column", "original"),
     [
