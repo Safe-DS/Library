@@ -89,6 +89,24 @@ class InvertibleTableTransformer(TableTransformer):
     """A `TableTransformer` that can also undo the learned transformation after it has been applied."""
 
     @abstractmethod
+    def fit(self, table: Table, column_names: list[str] | None) -> InvertibleTableTransformer:
+        """
+        Learn a transformation for a set of columns in a table.
+
+        Parameters
+        ----------
+        table : Table
+            The table used to fit the transformer.
+        column_names : Optional[list[str]]
+            The list of columns from the table used to fit the transformer. If `None`, all columns are used.
+
+        Returns
+        -------
+        fitted_transformer : InvertibleTableTransformer
+            The fitted transformer.
+        """
+
+    @abstractmethod
     def inverse_transform(self, transformed_table: Table) -> Table:
         """
         Undo the learned transformation.

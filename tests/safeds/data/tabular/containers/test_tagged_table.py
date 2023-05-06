@@ -5,7 +5,7 @@ from safeds.data.tabular.exceptions import UnknownColumnNameError
 
 @pytest.fixture()
 def table() -> Table:
-    return Table.from_dict(
+    return Table(
         {
             "A": [1, 4],
             "B": [2, 5],
@@ -38,7 +38,7 @@ class TestInit:
             table.tag_columns(target_name="A", feature_names=[])
 
     def test_should_raise_if_features_are_empty_implicitly(self, table: Table) -> None:
-        table = Table.from_dict({"A": [1, 4]})
+        table = Table({"A": [1, 4]})
 
         with pytest.raises(ValueError, match="At least one feature column must be specified."):
             table.tag_columns(target_name="A")
@@ -46,7 +46,7 @@ class TestInit:
 
 class TestFeatures:
     def test_should_return_features(self, tagged_table: TaggedTable) -> None:
-        assert tagged_table.features == Table.from_dict(
+        assert tagged_table.features == Table(
             {
                 "A": [1, 4],
                 "B": [2, 5],

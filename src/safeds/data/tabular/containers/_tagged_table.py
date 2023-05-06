@@ -1,4 +1,4 @@
-from collections.abc import Iterable
+import pandas as pd
 
 from safeds.data.tabular.containers import Column, Table
 from safeds.data.tabular.typing import Schema
@@ -24,14 +24,16 @@ class TaggedTable(Table):
     # Dunder methods
     # ------------------------------------------------------------------------------------------------------------------
 
+    # noinspection PyMissingConstructor
     def __init__(
         self,
-        data: Iterable,
+        data: pd.DataFrame,
+        schema: Schema,
         target_name: str,
         feature_names: list[str] | None = None,
-        schema: Schema | None = None,
     ):
-        super().__init__(data, schema)
+        self._data = data
+        self._schema = schema
 
         # If no feature names are specified, use all columns except the target column
         if feature_names is None:

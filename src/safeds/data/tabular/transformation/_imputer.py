@@ -166,7 +166,7 @@ class Imputer(TableTransformer):
             self._wrapped_transformer.transform(data[self._column_names]),
             columns=self._column_names,
         )
-        return Table(data, table.schema)
+        return Table._from_pandas_dataframe(data, table.schema)
 
     def is_fitted(self) -> bool:
         """

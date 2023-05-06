@@ -101,7 +101,7 @@ class Row(Mapping[str, Any]):
     # Dunder methods
     # ------------------------------------------------------------------------------------------------------------------
 
-    def __init__(self, data: Mapping[str, Any] | None = None):
+    def __init__(self, data: Mapping[str, Any] | None = None) -> None:
         """
         Create a row from a mapping of column names to column values.
 

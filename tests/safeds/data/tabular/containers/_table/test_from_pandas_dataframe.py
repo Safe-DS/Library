@@ -70,3 +70,8 @@ def test_should_use_the_schema_if_passed(dataframe: pd.DataFrame, schema: Schema
 def test_should_infer_the_schema_if_not_passed(dataframe: pd.DataFrame, expected: Schema) -> None:
     table = Table._from_pandas_dataframe(dataframe)
     assert table._schema == expected
+
+
+def test_should_be_able_to_handle_empty_dataframe_with_given_schema() -> None:
+    table = Table._from_pandas_dataframe(pd.DataFrame(), Schema({"col1": Integer(), "col2": Integer()}))
+    table.get_column("col1")

@@ -64,7 +64,7 @@ def regressors() -> list[Regressor]:
 
 @pytest.fixture()
 def valid_data() -> TaggedTable:
-    return Table.from_dict(
+    return Table(
         {
             "id": [1, 4],
             "feat1": [2, 5],
@@ -76,7 +76,7 @@ def valid_data() -> TaggedTable:
 
 @pytest.fixture()
 def invalid_data() -> TaggedTable:
-    return Table.from_dict(
+    return Table(
         {
             "id": [1, 4],
             "feat1": ["a", 5],
@@ -109,7 +109,7 @@ class TestFit:
     @pytest.mark.parametrize(
         "table",
         [
-            Table.from_dict(
+            Table(
                 {
                     "a": [1.0, 0.0, 0.0, 0.0],
                     "b": [0.0, 1.0, 1.0, 0.0],
@@ -225,7 +225,7 @@ class TestMeanAbsoluteError:
         ],
     )
     def test_valid_data(self, predicted: list[float], expected: list[float], result: float) -> None:
-        table = Table.from_dict(
+        table = Table(
             {
                 "predicted": predicted,
                 "expected": expected,
@@ -239,7 +239,7 @@ class TestMeanAbsoluteError:
     @pytest.mark.parametrize(
         "table",
         [
-            Table.from_dict(
+            Table(
                 {
                     "a": [1.0, 0.0, 0.0, 0.0],
                     "b": [0.0, 1.0, 1.0, 0.0],
@@ -260,7 +260,7 @@ class TestMeanSquaredError:
         [([1, 2], [1, 2], 0), ([0, 0], [1, 1], 1), ([1, 1, 1], [2, 2, 11], 34)],
     )
     def test_valid_data(self, predicted: list[float], expected: list[float], result: float) -> None:
-        table = Table.from_dict({"predicted": predicted, "expected": expected}).tag_columns(
+        table = Table({"predicted": predicted, "expected": expected}).tag_columns(
             target_name="expected",
         )
 
@@ -269,7 +269,7 @@ class TestMeanSquaredError:
     @pytest.mark.parametrize(
         "table",
         [
-            Table.from_dict(
+            Table(
                 {
                     "a": [1.0, 0.0, 0.0, 0.0],
                     "b": [0.0, 1.0, 1.0, 0.0],

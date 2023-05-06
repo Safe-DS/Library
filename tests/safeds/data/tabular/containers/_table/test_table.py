@@ -1,9 +1,10 @@
+import pandas as pd
 from safeds.data.tabular.containers import Table
 from safeds.data.tabular.typing import RealNumber, Schema
 
 
 def test_should_create_empty_table() -> None:
-    table = Table([], Schema({"col1": RealNumber()}))
+    table = Table._from_pandas_dataframe(pd.DataFrame(), Schema({"col1": RealNumber()}))
     col = table.get_column("col1")
     assert col.number_of_rows == 0
     assert isinstance(col.type, RealNumber)
@@ -11,5 +12,5 @@ def test_should_create_empty_table() -> None:
 
 
 def test_should_create_empty_table_without_schema() -> None:
-    table = Table([])
+    table = Table()
     assert table.schema == Schema({})

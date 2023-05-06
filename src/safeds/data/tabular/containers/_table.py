@@ -20,7 +20,6 @@ from safeds.data.tabular.exceptions import (
     ColumnSizeError,
     DuplicateColumnNameError,
     IndexOutOfBoundsError,
-    MissingDataError,
     NonNumericColumnError,
     SchemaMismatchError,
     UnknownColumnNameError,
@@ -31,7 +30,7 @@ from ._column import Column
 from ._row import Row
 
 if TYPE_CHECKING:
-    from collections.abc import Callable, Iterable
+    from collections.abc import Callable, Mapping, Sequence
 
     from safeds.data.tabular.transformation import InvertibleTableTransformer, TableTransformer
 
@@ -43,7 +42,7 @@ class Table:
     """
     A table is a two-dimensional collection of data. It can either be seen as a list of rows or as a list of columns.
 
-    To create a `Table`, use one of the following static methods:
+    To create a `Table` call the constructor or use one of the following static methods:
 
     | Method                                                                       | Description                            |
     | ---------------------------------------------------------------------------- | -------------------------------------- |
@@ -83,7 +82,7 @@ class Table:
             If the file could not be read.
         """
         try:
-            return Table(pd.read_csv(path))
+            return Table._from_pandas_dataframe(pd.read_csv(path))
         except FileNotFoundError as exception:
             raise FileNotFoundError(f'File "{path}" does not exist') from exception
 
@@ -112,7 +111,9 @@ class Table:
             If the file could not be read.
         """
         try:
-            return Table(pd.read_excel(path, engine="openpyxl", usecols=lambda colname: "Unnamed" not in colname))
+            return Table._from_pandas_dataframe(
+                pd.read_excel(path, engine="openpyxl", usecols=lambda colname: "Unnamed" not in colname),
+            )
         except FileNotFoundError as exception:
             raise FileNotFoundError(f'File "{path}" does not exist') from exception
 
@@ -141,7 +142,7 @@ class Table:
             If the file could not be read.
         """
         try:
-            return Table(pd.read_json(path))
+            return Table._from_pandas_dataframe(pd.read_json(path))
         except FileNotFoundError as exception:
             raise FileNotFoundError(f'File "{path}" does not exist') from exception
 
@@ -167,21 +168,7 @@ class Table:
         ColumnLengthMismatchError
             If columns have different lengths.
         """
-        # Validation
-        expected_length: int | None = None
-        for column_values in data.values():
-            if expected_length is None:
-                expected_length = len(column_values)
-            elif len(column_values) != expected_length:
-                raise ColumnLengthMismatchError(
-                    "\n".join(f"{column_name}: {len(column_values)}" for column_name, column_values in data.items()),
-                )
-
-        # Implementation
-        dataframe: DataFrame = pd.DataFrame()
-        for column_name, column_values in data.items():
-            dataframe[column_name] = column_values
-        return Table(dataframe)
+        return Table(data)
 
     @staticmethod
     def from_columns(columns: list[Column]) -> Table:
@@ -214,7 +201,7 @@ class Table:
                 )
             dataframe[column.name] = column._data
 
-        return Table(dataframe)
+        return Table._from_pandas_dataframe(dataframe)
 
     @staticmethod
     def from_rows(rows: list[Row]) -> Table:
@@ -235,13 +222,11 @@ class Table:
 
         Raises
         ------
-        MissingDataError
-            If an empty list is given.
         SchemaMismatchError
             If any of the row schemas does not match with the others.
         """
         if len(rows) == 0:
-            raise MissingDataError("This function requires at least one row.")
+            return Table._from_pandas_dataframe(pd.DataFrame())
 
         schema_compare: Schema = rows[0]._schema
         row_array: list[pd.DataFrame] = []
@@ -253,7 +238,7 @@ class Table:
 
         dataframe: DataFrame = pd.concat(row_array, ignore_index=True)
         dataframe.columns = schema_compare.column_names
-        return Table(dataframe)
+        return Table._from_pandas_dataframe(dataframe)
 
     @staticmethod
     def _from_pandas_dataframe(data: pd.DataFrame, schema: Schema | None = None) -> Table:
@@ -290,6 +275,8 @@ class Table:
             result._schema = Schema._from_pandas_dataframe(data)
         else:
             result._schema = schema
+            if result._data.empty:
+                result._data = pd.DataFrame(columns=schema.column_names)
 
         return result
 
@@ -297,28 +284,42 @@ class Table:
     # Dunder methods
     # ------------------------------------------------------------------------------------------------------------------
 
-    def __init__(self, data: Iterable, schema: Schema | None = None):
+    def __init__(self, data: Mapping[str, Sequence[Any]] | None = None) -> None:
         """
-        Create a table from a `DataFrame`.
+        Create a table from a mapping of column names to their values.
 
-        You should not use this constructor directly. Instead, use one of the following static methods:
+        Parameters
+        ----------
+        data : Mapping[str, Sequence[Any]] | None
+            The data. If None, an empty table is created.
 
-        | Method                                                                       | Description                            |
-        | ---------------------------------------------------------------------------- | -------------------------------------- |
-        | [from_csv_file][safeds.data.tabular.containers._table.Table.from_csv_file]   | Create a table from a CSV file.        |
-        | [from_json_file][safeds.data.tabular.containers._table.Table.from_json_file] | Create a table from a JSON file.       |
-        | [from_dict][safeds.data.tabular.containers._table.Table.from_dict]           | Create a table from a dictionary.      |
-        | [from_columns][safeds.data.tabular.containers._table.Table.from_columns]     | Create a table from a list of columns. |
-        | [from_rows][safeds.data.tabular.containers._table.Table.from_rows]           | Create a table from a list of rows.    |
+        Raises
+        ------
+        ColumnLengthMismatchError
+            If columns have different lengths.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table
+        >>> table = Table({"a": [1, 2, 3], "b": [4, 5, 6]})
         """
-        self._data: pd.DataFrame = data if isinstance(data, pd.DataFrame) else pd.DataFrame(data)
-        self._schema: Schema = Schema._from_pandas_dataframe(self._data) if schema is None else schema
+        if data is None:
+            data = {}
 
-        if self._data.empty:
-            self._data = pd.DataFrame(columns=self._schema.column_names)
+        # Validation
+        expected_length: int | None = None
+        for column_values in data.values():
+            if expected_length is None:
+                expected_length = len(column_values)
+            elif len(column_values) != expected_length:
+                raise ColumnLengthMismatchError(
+                    "\n".join(f"{column_name}: {len(column_values)}" for column_name, column_values in data.items()),
+                )
 
+        # Implementation
+        self._data: pd.DataFrame = pd.DataFrame(data)
         self._data = self._data.reset_index(drop=True)
-        self._data.columns = self._schema.column_names
+        self._schema: Schema = Schema._from_pandas_dataframe(self._data)
 
     def __eq__(self, other: Any) -> bool:
         if not isinstance(other, Table):
@@ -534,7 +535,7 @@ class Table:
         result = pd.concat([pd.DataFrame(list(statistics.keys())), result], axis=1)
         result.columns = ["metrics", *self.column_names]
 
-        return Table(result)
+        return Table._from_pandas_dataframe(result)
 
     # ------------------------------------------------------------------------------------------------------------------
     # Transformations
@@ -569,7 +570,7 @@ class Table:
         result = self._data.copy()
         result.columns = self._schema.column_names
         result[column.name] = column._data
-        return Table(result)
+        return Table._from_pandas_dataframe(result)
 
     def add_columns(self, columns: list[Column] | Table) -> Table:
         """
@@ -606,7 +607,7 @@ class Table:
                 raise ColumnSizeError(str(self.number_of_rows), str(column._data.size))
 
             result[column.name] = column._data
-        return Table(result)
+        return Table._from_pandas_dataframe(result)
 
     def add_row(self, row: Row) -> Table:
         """
@@ -630,7 +631,7 @@ class Table:
 
         new_df = pd.concat([self._data, row._data]).infer_objects()
         new_df.columns = self.column_names
-        return Table(new_df)
+        return Table._from_pandas_dataframe(new_df)
 
     def add_rows(self, rows: list[Row] | Table) -> Table:
         """
@@ -659,7 +660,7 @@ class Table:
 
         result = pd.concat([result, *row_frames]).infer_objects()
         result.columns = self.column_names
-        return Table(result)
+        return Table._from_pandas_dataframe(result)
 
     def filter_rows(self, query: Callable[[Row], bool]) -> Table:
         """
@@ -679,7 +680,7 @@ class Table:
         """
         rows: list[Row] = [row for row in self.to_rows() if query(row)]
         if len(rows) == 0:
-            result_table = Table([], self._schema)
+            result_table = Table._from_pandas_dataframe(pd.DataFrame(), self._schema)
         else:
             result_table = self.from_rows(rows)
         return result_table
@@ -714,7 +715,7 @@ class Table:
 
         transformed_data = self._data[column_names]
         transformed_data.columns = column_names
-        return Table(transformed_data)
+        return Table._from_pandas_dataframe(transformed_data)
 
     def remove_columns(self, column_names: list[str]) -> Table:
         """
@@ -746,7 +747,7 @@ class Table:
 
         transformed_data = self._data.drop(labels=column_names, axis="columns")
         transformed_data.columns = [name for name in self._schema.column_names if name not in column_names]
-        return Table(transformed_data)
+        return Table._from_pandas_dataframe(transformed_data)
 
     def remove_columns_with_missing_values(self) -> Table:
         """
@@ -788,7 +789,7 @@ class Table:
         """
         result = self._data.drop_duplicates(ignore_index=True)
         result.columns = self._schema.column_names
-        return Table(result)
+        return Table._from_pandas_dataframe(result)
 
     def remove_rows_with_missing_values(self) -> Table:
         """
@@ -803,7 +804,7 @@ class Table:
         """
         result = self._data.copy(deep=True)
         result = result.dropna(axis="index")
-        return Table(result, self._schema)
+        return Table._from_pandas_dataframe(result, self._schema)
 
     def remove_rows_with_outliers(self) -> Table:
         """
@@ -826,7 +827,7 @@ class Table:
         z_scores = np.absolute(stats.zscore(table_without_nonnumericals._data, nan_policy="omit"))
         filter_ = ((z_scores < 3) | np.isnan(z_scores)).all(axis=1)
 
-        return Table(copy[filter_], self._schema)
+        return Table._from_pandas_dataframe(copy[filter_], self._schema)
 
     def rename_column(self, old_name: str, new_name: str) -> Table:
         """
@@ -862,7 +863,7 @@ class Table:
 
         new_df = self._data.copy()
         new_df.columns = self._schema.column_names
-        return Table(new_df.rename(columns={old_name: new_name}))
+        return Table._from_pandas_dataframe(new_df.rename(columns={old_name: new_name}))
 
     def replace_column(self, old_column_name: str, new_column: Column) -> Table:
         """
@@ -912,7 +913,7 @@ class Table:
             result.columns = self._schema.column_names
 
         result[new_column.name] = new_column._data
-        return Table(result)
+        return Table._from_pandas_dataframe(result)
 
     def shuffle_rows(self) -> Table:
         """
@@ -928,7 +929,7 @@ class Table:
         """
         new_df = self._data.sample(frac=1.0)
         new_df.columns = self._schema.column_names
-        return Table(new_df)
+        return Table._from_pandas_dataframe(new_df)
 
     def slice_rows(
         self,
@@ -971,7 +972,7 @@ class Table:
 
         new_df = self._data.iloc[start:end:step]
         new_df.columns = self._schema.column_names
-        return Table(new_df)
+        return Table._from_pandas_dataframe(new_df)
 
     def sort_columns(
         self,
@@ -1079,7 +1080,7 @@ class Table:
         """
         from ._tagged_table import TaggedTable
 
-        return TaggedTable(self._data, target_name, feature_names, self._schema)
+        return TaggedTable(self._data, self._schema, target_name, feature_names)
 
     def transform_column(self, name: str, transformer: Callable[[Row], Any]) -> Table:
         """
@@ -1130,9 +1131,9 @@ class Table:
         >>> from safeds.data.tabular.transformation import OneHotEncoder
         >>> from safeds.data.tabular.containers import Table
         >>> transformer = OneHotEncoder()
-        >>> table = Table.from_dict({"col1": [1, 2, 1], "col2": [1, 2, 4]})
-        >>> transformer = transformer.fit(table, None)
-        >>> table.transform_table(transformer)
+        >>> table = Table({"col1": [1, 2, 1], "col2": [1, 2, 4]})
+        >>> fitted_transformer = transformer.fit(table, None)
+        >>> table.transform_table(fitted_transformer)
            col1_1  col1_2  col2_1  col2_2  col2_4
         0     1.0     0.0     1.0     0.0     0.0
         1     0.0     1.0     0.0     1.0     0.0
@@ -1166,15 +1167,15 @@ class Table:
         >>> from safeds.data.tabular.transformation import OneHotEncoder
         >>> from safeds.data.tabular.containers import Table
         >>> transformer = OneHotEncoder()
-        >>> table = Table.from_dict({"col1": [1, 2, 1], "col2": [1, 2, 4]})
-        >>> transformer = transformer.fit(table, None)
-        >>> transformed_table = transformer.transform(table)
-        >>> transformed_table.inverse_transform_table(transformer)
+        >>> table = Table({"col1": [1, 2, 1], "col2": [1, 2, 4]})
+        >>> fitted_transformer = transformer.fit(table, None)
+        >>> transformed_table = fitted_transformer.transform(table)
+        >>> transformed_table.inverse_transform_table(fitted_transformer)
            col1  col2
         0     1     1
         1     2     2
         2     1     4
-        >>> transformer.inverse_transform(transformed_table)
+        >>> fitted_transformer.inverse_transform(transformed_table)
            col1  col2
         0     1     1
         1     2     2
@@ -1393,7 +1394,7 @@ class Table:
         Examples
         --------
         >>> from safeds.data.tabular.containers import Table
-        >>> table = Table.from_dict({"a": [1, 2, 3], "b": [4, 5, 6]})
+        >>> table = Table({"a": [1, 2, 3], "b": [4, 5, 6]})
         >>> html = table.to_html()
         """
         return self._data.to_html(max_rows=self._data.shape[0], max_cols=self._data.shape[1])

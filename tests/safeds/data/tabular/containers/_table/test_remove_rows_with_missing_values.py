@@ -6,7 +6,7 @@ from safeds.data.tabular.containers import Table
     ("table", "expected"),
     [
         (
-            Table.from_dict(
+            Table(
                 {
                     "col1": [None, None, "C", "A"],
                     "col3": [None, 2, 3, 4],
@@ -14,7 +14,7 @@ from safeds.data.tabular.containers import Table
             ),
             2,
         ),
-        (Table([]), 0),
+        (Table({}), 0),
     ],
     ids=["some missing values", "empty"],
 )
