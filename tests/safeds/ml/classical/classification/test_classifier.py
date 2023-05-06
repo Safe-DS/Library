@@ -53,7 +53,7 @@ def classifiers() -> list[Classifier]:
 
 @pytest.fixture()
 def valid_data() -> TaggedTable:
-    return Table.from_dict(
+    return Table(
         {
             "id": [1, 4],
             "feat1": [2, 5],
@@ -65,7 +65,7 @@ def valid_data() -> TaggedTable:
 
 @pytest.fixture()
 def invalid_data() -> TaggedTable:
-    return Table.from_dict(
+    return Table(
         {
             "id": [1, 4],
             "feat1": ["a", 5],
@@ -98,7 +98,7 @@ class TestFit:
     @pytest.mark.parametrize(
         "table",
         [
-            Table.from_dict(
+            Table(
                 {
                     "a": [1.0, 0.0, 0.0, 0.0],
                     "b": [0.0, 1.0, 1.0, 0.0],
@@ -204,7 +204,7 @@ class DummyClassifier(Classifier):
 
 class TestAccuracy:
     def test_with_same_type(self) -> None:
-        table = Table.from_dict(
+        table = Table(
             {
                 "predicted": [1, 2, 3, 4],
                 "expected": [1, 2, 3, 3],
@@ -214,7 +214,7 @@ class TestAccuracy:
         assert DummyClassifier().accuracy(table) == 0.75
 
     def test_with_different_types(self) -> None:
-        table = Table.from_dict(
+        table = Table(
             {
                 "predicted": ["1", "2", "3", "4"],
                 "expected": [1, 2, 3, 3],
@@ -226,7 +226,7 @@ class TestAccuracy:
     @pytest.mark.parametrize(
         "table",
         [
-            Table.from_dict(
+            Table(
                 {
                     "a": [1.0, 0.0, 0.0, 0.0],
                     "b": [0.0, 1.0, 1.0, 0.0],
@@ -243,7 +243,7 @@ class TestAccuracy:
 
 class TestPrecision:
     def test_should_compare_result(self) -> None:
-        table = Table.from_dict(
+        table = Table(
             {
                 "predicted": [1, 1, 0, 2],
                 "expected": [1, 0, 1, 2],
@@ -253,7 +253,7 @@ class TestPrecision:
         assert DummyClassifier().precision(table, 1) == 0.5
 
     def test_should_compare_result_with_different_types(self) -> None:
-        table = Table.from_dict(
+        table = Table(
             {
                 "predicted": [1, "1", "0", "2"],
                 "expected": [1, 0, 1, 2],
@@ -263,7 +263,7 @@ class TestPrecision:
         assert DummyClassifier().precision(table, 1) == 1.0
 
     def test_should_return_1_if_never_expected_to_be_positive(self) -> None:
-        table = Table.from_dict(
+        table = Table(
             {
                 "predicted": ["lol", "1", "0", "2"],
                 "expected": [1, 0, 1, 2],
@@ -275,7 +275,7 @@ class TestPrecision:
     @pytest.mark.parametrize(
         "table",
         [
-            Table.from_dict(
+            Table(
                 {
                     "a": [1.0, 0.0, 0.0, 0.0],
                     "b": [0.0, 1.0, 1.0, 0.0],
@@ -292,7 +292,7 @@ class TestPrecision:
 
 class TestRecall:
     def test_should_compare_result(self) -> None:
-        table = Table.from_dict(
+        table = Table(
             {
                 "predicted": [1, 1, 0, 2],
                 "expected": [1, 0, 1, 2],
@@ -302,7 +302,7 @@ class TestRecall:
         assert DummyClassifier().recall(table, 1) == 0.5
 
     def test_should_compare_result_with_different_types(self) -> None:
-        table = Table.from_dict(
+        table = Table(
             {
                 "predicted": [1, "1", "0", "2"],
                 "expected": [1, 0, 1, 2],
@@ -312,7 +312,7 @@ class TestRecall:
         assert DummyClassifier().recall(table, 1) == 0.5
 
     def test_should_return_1_if_never_expected_to_be_positive(self) -> None:
-        table = Table.from_dict(
+        table = Table(
             {
                 "predicted": ["lol", "1", "0", "2"],
                 "expected": [2, 0, 5, 2],
@@ -324,7 +324,7 @@ class TestRecall:
     @pytest.mark.parametrize(
         "table",
         [
-            Table.from_dict(
+            Table(
                 {
                     "a": [1.0, 0.0, 0.0, 0.0],
                     "b": [0.0, 1.0, 1.0, 0.0],
@@ -341,7 +341,7 @@ class TestRecall:
 
 class TestF1Score:
     def test_should_compare_result(self) -> None:
-        table = Table.from_dict(
+        table = Table(
             {
                 "predicted": [1, 1, 0, 2],
                 "expected": [1, 0, 1, 2],
@@ -351,7 +351,7 @@ class TestF1Score:
         assert DummyClassifier().f1_score(table, 1) == 0.5
 
     def test_should_compare_result_with_different_types(self) -> None:
-        table = Table.from_dict(
+        table = Table(
             {
                 "predicted": [1, "1", "0", "2"],
                 "expected": [1, 0, 1, 2],
@@ -361,7 +361,7 @@ class TestF1Score:
         assert DummyClassifier().f1_score(table, 1) == pytest.approx(0.6666667)
 
     def test_should_return_1_if_never_expected_or_predicted_to_be_positive(self) -> None:
-        table = Table.from_dict(
+        table = Table(
             {
                 "predicted": ["lol", "1", "0", "2"],
                 "expected": [2, 0, 2, 2],
@@ -373,7 +373,7 @@ class TestF1Score:
     @pytest.mark.parametrize(
         "table",
         [
-            Table.from_dict(
+            Table(
                 {
                     "a": [1.0, 0.0, 0.0, 0.0],
                     "b": [0.0, 1.0, 1.0, 0.0],

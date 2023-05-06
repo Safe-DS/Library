@@ -31,7 +31,7 @@ def test_should_return_sorted_table(
         Column("col3", [1, 2, 3, 4, 5]),
         Column("col4", [2, 3, 1, 4, 6]),
     ]
-    table1 = Table.from_dict(
+    table1 = Table(
         {
             "col2": ["Test1", "Test1", "Test3", "Test1", "Test4"],
             "col3": [1, 2, 3, 4, 5],

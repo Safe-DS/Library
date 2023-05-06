@@ -9,7 +9,7 @@ from safeds.data.tabular.exceptions import SchemaMismatchError
     [
         (
             [],
-            Table.from_dict({}),
+            Table({}),
         ),
         (
             [
@@ -17,7 +17,7 @@ from safeds.data.tabular.exceptions import SchemaMismatchError
                 Row({"A": 2, "B": 5, "C": "e"}),
                 Row({"A": 3, "B": 6, "C": "f"}),
             ],
-            Table.from_dict(
+            Table(
                 {
                     "A": [1, 2, 3],
                     "B": [4, 5, 6],

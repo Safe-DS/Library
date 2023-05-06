@@ -5,7 +5,7 @@ from safeds.data.tabular.containers import Table
 @pytest.mark.parametrize(
     "table",
     [
-        (Table.from_dict({"col1": [1], "col2": [1]})),
+        (Table({"col1": [1], "col2": [1]})),
     ],
     ids=["Table with identical values in rows"],
 )

@@ -12,5 +12,5 @@ def test_should_create_empty_table() -> None:
 
 
 def test_should_create_empty_table_without_schema() -> None:
-    table = Table.from_dict({})
+    table = Table()
     assert table.schema == Schema({})

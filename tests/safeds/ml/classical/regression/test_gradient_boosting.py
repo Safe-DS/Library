@@ -5,7 +5,7 @@ from safeds.ml.classical.regression import GradientBoosting
 
 @pytest.fixture()
 def training_set() -> TaggedTable:
-    table = Table.from_dict({"col1": [1, 2, 3, 4], "col2": [1, 2, 3, 4]})
+    table = Table({"col1": [1, 2, 3, 4], "col2": [1, 2, 3, 4]})
     return table.tag_columns(target_name="col1", feature_names=["col2"])
 
 

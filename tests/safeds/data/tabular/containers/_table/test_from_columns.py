@@ -11,14 +11,14 @@ from safeds.data.tabular.exceptions import ColumnLengthMismatchError
                 Column("A", [1, 4]),
                 Column("B", [2, 5]),
             ],
-            Table.from_dict(
+            Table(
                 {
                     "A": [1, 4],
                     "B": [2, 5],
                 },
             ),
         ),
-        ([], Table.from_dict({})),
+        ([], Table()),
     ],
     ids=["2 Columns", "empty"],
 )

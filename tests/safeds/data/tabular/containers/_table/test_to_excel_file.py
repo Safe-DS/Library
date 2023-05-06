@@ -5,7 +5,7 @@ from safeds.data.tabular.containers import Table
 
 
 def test_should_create_csv_file_from_table_by_str() -> None:
-    table = Table.from_dict({"col1": ["col1_1"], "col2": ["col2_1"]})
+    table = Table({"col1": ["col1_1"], "col2": ["col2_1"]})
     with NamedTemporaryFile(suffix=".xlsx") as tmp_table_file:
         tmp_table_file.close()
         with Path(tmp_table_file.name).open("w", encoding="utf-8") as tmp_file:
@@ -16,7 +16,7 @@ def test_should_create_csv_file_from_table_by_str() -> None:
 
 
 def test_should_create_csv_file_from_table_by_path() -> None:
-    table = Table.from_dict({"col1": ["col1_1"], "col2": ["col2_1"]})
+    table = Table({"col1": ["col1_1"], "col2": ["col2_1"]})
     with NamedTemporaryFile(suffix=".xlsx") as tmp_table_file:
         tmp_table_file.close()
         with Path(tmp_table_file.name).open("w", encoding="utf-8") as tmp_file:

@@ -9,9 +9,9 @@ from safeds.data.tabular.containers import Row, Table
     [
         # Check that it works with an empty table when https://github.com/Safe-DS/Stdlib/issues/75 is fixed.
         (
-            Table.from_dict({"col1": [3, 2, 1]}),
+            Table({"col1": [3, 2, 1]}),
             lambda row1, row2: row1["col1"] - row2["col1"],
-            Table.from_dict({"col1": [1, 2, 3]}),
+            Table({"col1": [1, 2, 3]}),
         ),
     ],
 )
@@ -28,9 +28,9 @@ def test_should_return_sorted_table(
     [
         # Check that it works with an empty table when https://github.com/Safe-DS/Stdlib/issues/75 is fixed.
         (
-            Table.from_dict({"col1": [3, 2, 1]}),
+            Table({"col1": [3, 2, 1]}),
             lambda row1, row2: row1["col1"] - row2["col1"],
-            Table.from_dict({"col1": [3, 2, 1]}),
+            Table({"col1": [3, 2, 1]}),
         ),
     ],
 )

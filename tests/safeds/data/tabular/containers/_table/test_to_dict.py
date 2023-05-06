@@ -8,11 +8,11 @@ from safeds.data.tabular.containers import Table
     ("table", "expected"),
     [
         (
-            Table.from_dict({}),
+            Table({}),
             {},
         ),
         (
-            Table.from_dict(
+            Table(
                 {
                     "a": [1],
                     "b": [2],

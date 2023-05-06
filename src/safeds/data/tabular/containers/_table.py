@@ -1070,9 +1070,9 @@ class Table:
         >>> from safeds.data.tabular.transformation import OneHotEncoder
         >>> from safeds.data.tabular.containers import Table
         >>> transformer = OneHotEncoder()
-        >>> table = Table.from_dict({"col1": [1, 2, 1], "col2": [1, 2, 4]})
-        >>> transformer = transformer.fit(table, None)
-        >>> table.transform_table(transformer)
+        >>> table = Table({"col1": [1, 2, 1], "col2": [1, 2, 4]})
+        >>> fitted_transformer = transformer.fit(table, None)
+        >>> table.transform_table(fitted_transformer)
            col1_1  col1_2  col2_1  col2_2  col2_4
         0     1.0     0.0     1.0     0.0     0.0
         1     0.0     1.0     0.0     1.0     0.0
@@ -1104,15 +1104,15 @@ class Table:
         >>> from safeds.data.tabular.transformation import OneHotEncoder
         >>> from safeds.data.tabular.containers import Table
         >>> transformer = OneHotEncoder()
-        >>> table = Table.from_dict({"col1": [1, 2, 1], "col2": [1, 2, 4]})
-        >>> transformer = transformer.fit(table, None)
-        >>> transformed_table = transformer.transform(table)
-        >>> transformed_table.inverse_transform_table(transformer)
+        >>> table = Table({"col1": [1, 2, 1], "col2": [1, 2, 4]})
+        >>> fitted_transformer = transformer.fit(table, None)
+        >>> transformed_table = fitted_transformer.transform(table)
+        >>> transformed_table.inverse_transform_table(fitted_transformer)
            col1  col2
         0     1     1
         1     2     2
         2     1     4
-        >>> transformer.inverse_transform(transformed_table)
+        >>> fitted_transformer.inverse_transform(transformed_table)
            col1  col2
         0     1     1
         1     2     2
@@ -1331,7 +1331,7 @@ class Table:
         Examples
         --------
         >>> from safeds.data.tabular.containers import Table
-        >>> table = Table.from_dict({"a": [1, 2, 3], "b": [4, 5, 6]})
+        >>> table = Table({"a": [1, 2, 3], "b": [4, 5, 6]})
         >>> html = table.to_html()
         """
         return self._data.to_html(max_rows=self._data.shape[0], max_cols=self._data.shape[1])

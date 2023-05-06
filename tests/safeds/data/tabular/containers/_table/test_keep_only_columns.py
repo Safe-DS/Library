@@ -7,30 +7,30 @@ from safeds.data.tabular.exceptions import UnknownColumnNameError
     ("table", "column_names", "expected"),
     [
         (
-            Table.from_dict({"A": [1], "B": [2]}),
+            Table({"A": [1], "B": [2]}),
             [],
-            Table.from_dict({}),
+            Table({}),
         ),
         (
-            Table.from_dict({"A": [1], "B": [2]}),
+            Table({"A": [1], "B": [2]}),
             ["A"],
-            Table.from_dict({"A": [1]}),
+            Table({"A": [1]}),
         ),
         (
-            Table.from_dict({"A": [1], "B": [2]}),
+            Table({"A": [1], "B": [2]}),
             ["B"],
-            Table.from_dict({"B": [2]}),
+            Table({"B": [2]}),
         ),
         (
-            Table.from_dict({"A": [1], "B": [2]}),
+            Table({"A": [1], "B": [2]}),
             ["A", "B"],
-            Table.from_dict({"A": [1], "B": [2]}),
+            Table({"A": [1], "B": [2]}),
         ),
         # Related to https://github.com/Safe-DS/Stdlib/issues/115
         (
-            Table.from_dict({"A": [1], "B": [2], "C": [3]}),
+            Table({"A": [1], "B": [2], "C": [3]}),
             ["C", "A"],
-            Table.from_dict({"C": [3], "A": [1]}),
+            Table({"C": [3], "A": [1]}),
         ),
     ],
     ids=["No Column Name", "First Column", "Second Column", "All columns", "Last and first columns"],
@@ -41,6 +41,6 @@ def test_should_keep_only_listed_columns(table: Table, column_names: list[str], 
 
 
 def test_should_raise_error_if_column_name_unknown() -> None:
-    table = Table.from_dict({"A": [1], "B": [2]})
+    table = Table({"A": [1], "B": [2]})
     with pytest.raises(UnknownColumnNameError):
         table.keep_only_columns(["C"])
