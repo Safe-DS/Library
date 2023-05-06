@@ -28,7 +28,7 @@ class RandomForest(Regressor):
         If `number_of_trees` is less than or equal to 0.
     """
 
-    def __init__(self, number_of_trees: int = 100) -> None:
+    def __init__(self, *, number_of_trees: int = 100) -> None:
         # Validation
         if number_of_trees < 1:
             raise ValueError("The parameter 'number_of_trees' has to be greater than 0.")
@@ -65,7 +65,7 @@ class RandomForest(Regressor):
         wrapped_regressor = self._get_sklearn_regressor()
         fit(wrapped_regressor, training_set)
 
-        result = RandomForest(self._number_of_trees)
+        result = RandomForest(number_of_trees=self._number_of_trees)
         result._wrapped_regressor = wrapped_regressor
         result._feature_names = training_set.features.column_names
         result._target_name = training_set.target.name

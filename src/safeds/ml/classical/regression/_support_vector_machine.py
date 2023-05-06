@@ -29,7 +29,7 @@ class SupportVectorMachine(Regressor):
         If `c` is less than or equal to 0.
     """
 
-    def __init__(self, c: float = 1.0) -> None:
+    def __init__(self, *, c: float = 1.0) -> None:
         # Internal state
         self._wrapped_regressor: sk_SVR | None = None
         self._feature_names: list[str] | None = None
@@ -63,7 +63,7 @@ class SupportVectorMachine(Regressor):
         wrapped_regressor = self._get_sklearn_regressor()
         fit(wrapped_regressor, training_set)
 
-        result = SupportVectorMachine(self._c)
+        result = SupportVectorMachine(c=self._c)
         result._wrapped_regressor = wrapped_regressor
         result._feature_names = training_set.features.column_names
         result._target_name = training_set.target.name

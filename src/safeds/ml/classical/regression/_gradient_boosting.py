@@ -33,7 +33,7 @@ class GradientBoosting(Regressor):
         If `number_of_trees` is less than or equal to 0 or `learning_rate` is non-positive.
     """
 
-    def __init__(self, number_of_trees: int = 100, learning_rate: float = 0.1) -> None:
+    def __init__(self, *, number_of_trees: int = 100, learning_rate: float = 0.1) -> None:
         # Validation
         if number_of_trees <= 0:
             raise ValueError("The parameter 'number_of_trees' has to be greater than 0.")
