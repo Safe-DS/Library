@@ -15,6 +15,8 @@ class TableTransformer(ABC):
         """
         Learn a transformation for a set of columns in a table.
 
+        This transformer is not modified.
+
         Parameters
         ----------
         table : Table
@@ -32,6 +34,8 @@ class TableTransformer(ABC):
     def transform(self, table: Table) -> Table:
         """
         Apply the learned transformation to a table.
+
+        The table is not modified.
 
         Parameters
         ----------
@@ -64,7 +68,7 @@ class TableTransformer(ABC):
         """
         Learn a transformation for a set of columns in a table and apply the learned transformation to the same table.
 
-        If you also need the fitted transformer, use `fit` and `transform` separately.
+        The table is not modified. If you also need the fitted transformer, use `fit` and `transform` separately.
 
         Parameters
         ----------
@@ -106,6 +110,8 @@ class InvertibleTableTransformer(TableTransformer):
     def inverse_transform(self, transformed_table: Table) -> Table:
         """
         Undo the learned transformation.
+
+        The table is not modified.
 
         Parameters
         ----------
