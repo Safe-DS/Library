@@ -4,8 +4,8 @@ from typing import Any
 import pandas as pd
 import pytest
 from safeds.data.tabular.containers import Row, Table
-from safeds.data.tabular.exceptions import UnknownColumnNameError
 from safeds.data.tabular.typing import ColumnType, Integer, Schema, String
+from safeds.exceptions import UnknownColumnNameError
 
 
 class TestFromDict:

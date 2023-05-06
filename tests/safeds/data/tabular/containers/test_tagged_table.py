@@ -1,6 +1,6 @@
 import pytest
 from safeds.data.tabular.containers import Column, Table, TaggedTable
-from safeds.data.tabular.exceptions import UnknownColumnNameError
+from safeds.exceptions import UnknownColumnNameError
 
 
 @pytest.fixture()

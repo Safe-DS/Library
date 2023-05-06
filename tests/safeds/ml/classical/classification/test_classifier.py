@@ -4,6 +4,14 @@ from typing import TYPE_CHECKING
 
 import pytest
 from safeds.data.tabular.containers import Table, TaggedTable
+from safeds.exceptions import (
+    DatasetContainsTargetError,
+    DatasetMissesFeaturesError,
+    LearningError,
+    ModelNotFittedError,
+    PredictionError,
+    UntaggedTableError,
+)
 from safeds.ml.classical.classification import (
     AdaBoost,
     Classifier,
@@ -13,14 +21,6 @@ from safeds.ml.classical.classification import (
     LogisticRegression,
     RandomForest,
     SupportVectorMachine,
-)
-from safeds.ml.exceptions import (
-    DatasetContainsTargetError,
-    DatasetMissesFeaturesError,
-    LearningError,
-    ModelNotFittedError,
-    PredictionError,
-    UntaggedTableError,
 )
 
 if TYPE_CHECKING:

@@ -1,6 +1,6 @@
 import pytest
 from safeds.data.tabular.containers import Row, Table
-from safeds.data.tabular.exceptions import IndexOutOfBoundsError
+from safeds.exceptions import IndexOutOfBoundsError
 
 
 @pytest.mark.parametrize(

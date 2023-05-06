@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 from sklearn.metrics import accuracy_score as sk_accuracy_score
 
 from safeds.data.tabular.containers import Table, TaggedTable
-from safeds.ml.exceptions import UntaggedTableError
+from safeds.exceptions import UntaggedTableError
 
 if TYPE_CHECKING:
     from typing import Any
