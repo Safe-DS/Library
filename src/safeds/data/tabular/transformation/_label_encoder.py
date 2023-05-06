@@ -21,6 +21,8 @@ class LabelEncoder(InvertibleTableTransformer):
         """
         Learn a transformation for a set of columns in a table.
 
+        This transformer is not modified.
+
         Parameters
         ----------
         table : Table
@@ -52,6 +54,8 @@ class LabelEncoder(InvertibleTableTransformer):
     def transform(self, table: Table) -> Table:
         """
         Apply the learned transformation to a table.
+
+        The table is not modified.
 
         Parameters
         ----------
@@ -85,6 +89,8 @@ class LabelEncoder(InvertibleTableTransformer):
     def inverse_transform(self, transformed_table: Table) -> Table:
         """
         Undo the learned transformation.
+
+        The table is not modified.
 
         Parameters
         ----------
