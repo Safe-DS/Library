@@ -2,7 +2,7 @@ import warnings
 from typing import Any
 
 from safeds.data.tabular.containers import Table, TaggedTable
-from safeds.ml.exceptions import (
+from safeds.exceptions import (
     DatasetContainsTargetError,
     DatasetMissesFeaturesError,
     LearningError,

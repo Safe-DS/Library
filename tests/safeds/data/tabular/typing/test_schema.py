@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 
 import pandas as pd
 import pytest
-from safeds.data.tabular.exceptions import UnknownColumnNameError
+from safeds.exceptions import UnknownColumnNameError
 from safeds.data.tabular.typing import Boolean, ColumnType, Integer, RealNumber, Schema, String
 
 if TYPE_CHECKING:

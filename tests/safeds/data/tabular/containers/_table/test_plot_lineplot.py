@@ -1,7 +1,7 @@
 import pytest
 from safeds.data.image.containers import Image
 from safeds.data.tabular.containers import Table
-from safeds.data.tabular.exceptions import UnknownColumnNameError
+from safeds.exceptions import UnknownColumnNameError
 
 from tests.helpers import resolve_resource_path
 

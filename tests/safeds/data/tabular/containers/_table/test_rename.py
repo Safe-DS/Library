@@ -1,6 +1,6 @@
 import pytest
 from safeds.data.tabular.containers import Table
-from safeds.data.tabular.exceptions import DuplicateColumnNameError, UnknownColumnNameError
+from safeds.exceptions import DuplicateColumnNameError, UnknownColumnNameError
 
 
 @pytest.mark.parametrize(

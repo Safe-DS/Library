@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
-from safeds.data.tabular.exceptions import UnknownColumnNameError
+from safeds.exceptions import UnknownColumnNameError
 from safeds.data.tabular.typing._column_type import ColumnType
 
 if TYPE_CHECKING:

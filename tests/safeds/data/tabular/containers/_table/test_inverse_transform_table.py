@@ -1,6 +1,6 @@
 import pytest
 from safeds.data.tabular.containers import Table
-from safeds.data.tabular.exceptions import TransformerNotFittedError
+from safeds.exceptions import TransformerNotFittedError
 from safeds.data.tabular.transformation import OneHotEncoder
 
 

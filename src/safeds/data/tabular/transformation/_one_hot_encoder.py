@@ -4,7 +4,7 @@ import pandas as pd
 from sklearn.preprocessing import OneHotEncoder as sk_OneHotEncoder
 
 from safeds.data.tabular.containers import Table
-from safeds.data.tabular.exceptions import TransformerNotFittedError, UnknownColumnNameError
+from safeds.exceptions import TransformerNotFittedError, UnknownColumnNameError
 from safeds.data.tabular.transformation._table_transformer import (
     InvertibleTableTransformer,
 )

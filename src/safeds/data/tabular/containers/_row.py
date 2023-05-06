@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, Any
 
 import pandas as pd
 
-from safeds.data.tabular.exceptions import UnknownColumnNameError
+from safeds.exceptions import UnknownColumnNameError
 from safeds.data.tabular.typing import ColumnType, Schema
 
 if TYPE_CHECKING:

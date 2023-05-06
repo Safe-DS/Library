@@ -15,7 +15,7 @@ from scipy import stats
 
 from safeds.data.image.containers import Image
 from safeds.data.image.typing import ImageFormat
-from safeds.data.tabular.exceptions import (
+from safeds.exceptions import (
     ColumnLengthMismatchError,
     ColumnSizeError,
     DuplicateColumnNameError,

@@ -1,7 +1,7 @@
 import pytest
 from _pytest.python_api import raises
 from safeds.data.tabular.containers import Row, Table
-from safeds.data.tabular.exceptions import SchemaMismatchError
+from safeds.exceptions import SchemaMismatchError
 
 
 @pytest.mark.parametrize(
