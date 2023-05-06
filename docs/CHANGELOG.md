@@ -3,7 +3,7 @@
 
 ### Features
 
-* `OneHotEncoder.inverse_transform` now maintains the column order from the original table ([#195](https://github.com/Safe-DS/Stdlib/issues/195)) ([3ec0041](https://github.com/Safe-DS/Stdlib/commit/3ec0041669ffe97640f96db345f3f43720d5c3f7)), closes [#109](https://github.com/Safe-DS/Stdlib/issues/109) [#109](https://github.com/Safe-DS/Stdlib/issues/109)
+* `OneHotEncoder.inverse_transform` now maintains the column order from the original table ([#195](https://github.com/Safe-DS/Stdlib/issues/195)) ([3ec0041](https://github.com/Safe-DS/Stdlib/commit/3ec0041669ffe97640f96db345f3f43720d5c3f7)), closes [#109](https://github.com/Safe-DS/Stdlib/issues/109)
 * add `plot_` prefix back to plotting methods ([#212](https://github.com/Safe-DS/Stdlib/issues/212)) ([e50c3b0](https://github.com/Safe-DS/Stdlib/commit/e50c3b0118825e33eef0e2a7073673603e316ee5)), closes [#211](https://github.com/Safe-DS/Stdlib/issues/211)
 * adjust `Column`, `Schema` and `Table` to changes in `Row` ([#216](https://github.com/Safe-DS/Stdlib/issues/216)) ([ca3eebb](https://github.com/Safe-DS/Stdlib/commit/ca3eebbe2166f08d76cdcb89a012518ae8ff8e4e))
 * back `Row` by a `polars.DataFrame` ([#214](https://github.com/Safe-DS/Stdlib/issues/214)) ([62ca34d](https://github.com/Safe-DS/Stdlib/commit/62ca34dd399da8b4e34b89bad408311707b53f41)), closes [#196](https://github.com/Safe-DS/Stdlib/issues/196) [#149](https://github.com/Safe-DS/Stdlib/issues/149)
