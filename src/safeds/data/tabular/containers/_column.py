@@ -301,6 +301,8 @@ class Column(Sequence[T]):
         """
         Return a new column with a new name.
 
+        This column is not modified.
+
         Parameters
         ----------
         new_name : str
@@ -317,10 +319,12 @@ class Column(Sequence[T]):
         """
         Apply a transform method to every data point.
 
+        This column is not modified.
+
         Parameters
         ----------
         transformer : Callable[[T], R]
-            Lambda function that will be applied to all data points.
+            Function that will be applied to all data points.
 
         Returns
         -------
