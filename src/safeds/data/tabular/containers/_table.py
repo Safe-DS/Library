@@ -63,6 +63,8 @@ class Table:
         """
         Read data from a CSV file into a table.
 
+        This table is not modified.
+
         Parameters
         ----------
         path : str | Path
@@ -89,6 +91,8 @@ class Table:
     def from_excel_file(path: str | Path) -> Table:
         """
         Read data from an Excel file into a table.
+
+        This table is not modified.
 
         Parameters
         ----------
@@ -117,6 +121,8 @@ class Table:
         """
         Read data from a JSON file into a table.
 
+        This table is not modified.
+
         Parameters
         ----------
         path : str | Path
@@ -143,6 +149,8 @@ class Table:
     def from_dict(data: dict[str, list[Any]]) -> Table:
         """
         Create a table from a dictionary that maps column names to column values.
+
+        This table is not modified.
 
         Parameters
         ----------
@@ -180,6 +188,8 @@ class Table:
         """
         Return a table created from a list of columns.
 
+        This table is not modified.
+
         Parameters
         ----------
         columns : list[Column]
@@ -210,6 +220,8 @@ class Table:
     def from_rows(rows: list[Row]) -> Table:
         """
         Return a table created from a list of rows.
+
+        This table is not modified.
 
         Parameters
         ----------
@@ -247,6 +259,8 @@ class Table:
     def _from_pandas_dataframe(data: pd.DataFrame, schema: Schema | None = None) -> Table:
         """
         Create a table from a `pandas.DataFrame`.
+
+        This table is not modified.
 
         Parameters
         ----------
@@ -483,6 +497,8 @@ class Table:
         """
         Return a table with a number of statistical key values.
 
+        This table is not modified.
+
         Returns
         -------
         result : Table
@@ -528,6 +544,8 @@ class Table:
         """
         Return the original table with the provided column attached at the end.
 
+        This table is not modified.
+
         Returns
         -------
         result : Table
@@ -556,6 +574,8 @@ class Table:
     def add_columns(self, columns: list[Column] | Table) -> Table:
         """
         Add multiple columns to the table.
+
+        This table is not modified.
 
         Parameters
         ----------
@@ -592,6 +612,8 @@ class Table:
         """
         Add a row to the table.
 
+        This table is not modified.
+
         Parameters
         ----------
         row : Row
@@ -613,6 +635,8 @@ class Table:
     def add_rows(self, rows: list[Row] | Table) -> Table:
         """
         Add multiple rows to a table.
+
+        This table is not modified.
 
         Parameters
         ----------
@@ -641,6 +665,8 @@ class Table:
         """
         Return a table with rows filtered by Callable (e.g. lambda function).
 
+        This table is not modified.
+
         Parameters
         ----------
         query : lambda function
@@ -661,6 +687,8 @@ class Table:
     def keep_only_columns(self, column_names: list[str]) -> Table:
         """
         Return a table with only the given column(s).
+
+        This table is not modified.
 
         Parameters
         ----------
@@ -692,6 +720,8 @@ class Table:
         """
         Return a table without the given column(s).
 
+        This table is not modified.
+
         Parameters
         ----------
         column_names : list[str]
@@ -722,6 +752,8 @@ class Table:
         """
         Return a table without the columns that contain missing values.
 
+        This table is not modified.
+
         Returns
         -------
         table : Table
@@ -732,6 +764,8 @@ class Table:
     def remove_columns_with_non_numerical_values(self) -> Table:
         """
         Return a table without the columns that contain non-numerical values.
+
+        This table is not modified.
 
         Returns
         -------
@@ -745,6 +779,8 @@ class Table:
         """
         Return a copy of the table with every duplicate row removed.
 
+        This table is not modified.
+
         Returns
         -------
         result : Table
@@ -757,6 +793,8 @@ class Table:
     def remove_rows_with_missing_values(self) -> Table:
         """
         Return a table without the rows that contain missing values.
+
+        This table is not modified.
 
         Returns
         -------
@@ -775,6 +813,8 @@ class Table:
         Missing values are not considered outliers. They are also ignored during the calculation of the standard
         deviation.
 
+        This table is not modified.
+
         Returns
         -------
         new_table : Table
@@ -791,6 +831,8 @@ class Table:
     def rename_column(self, old_name: str, new_name: str) -> Table:
         """
         Rename a single column.
+
+        This table is not modified.
 
         Parameters
         ----------
@@ -825,6 +867,8 @@ class Table:
     def replace_column(self, old_column_name: str, new_column: Column) -> Table:
         """
         Return a copy of the table with the specified old column replaced by a new column. Keeps the order of columns.
+
+        This table is not modified.
 
         Parameters
         ----------
@@ -874,6 +918,8 @@ class Table:
         """
         Shuffle the table randomly.
 
+        This table is not modified.
+
         Returns
         -------
         result : Table
@@ -892,6 +938,8 @@ class Table:
     ) -> Table:
         """
         Slice a part of the table into a new table.
+
+        This table is not modified.
 
         Parameters
         ----------
@@ -942,6 +990,8 @@ class Table:
 
         If no comparator is given, the columns will be sorted alphabetically by their name.
 
+        This table is not modified.
+
         Parameters
         ----------
         comparator : Callable[[Column, Column], int]
@@ -967,6 +1017,8 @@ class Table:
         * If `row1` should be ordered after `row2`, the function should return a positive number.
         * If the original order of `row1` and `row2` should be kept, the function should return 0.
 
+        This table is not modified.
+
         Parameters
         ----------
         comparator : Callable[[Row, Row], int]
@@ -984,6 +1036,8 @@ class Table:
     def split(self, percentage_in_first: float) -> tuple[Table, Table]:
         """
         Split the table into two new tables.
+
+        This table is not modified.
 
         Parameters
         ----------
@@ -1009,6 +1063,8 @@ class Table:
         """
         Mark the columns of the table as target column or feature columns. The original table is not modified.
 
+        This table is not modified.
+
         Parameters
         ----------
         target_name : str
@@ -1028,6 +1084,8 @@ class Table:
     def transform_column(self, name: str, transformer: Callable[[Row], Any]) -> Table:
         """
         Transform provided column by calling provided transformer.
+
+        This table is not modified.
 
         Returns
         -------
@@ -1049,6 +1107,8 @@ class Table:
     def transform_table(self, transformer: TableTransformer) -> Table:
         """
         Apply a learned transformation onto this table.
+
+        This table is not modified.
 
         Parameters
         ----------
@@ -1083,6 +1143,8 @@ class Table:
     def inverse_transform_table(self, transformer: InvertibleTableTransformer) -> Table:
         """
         Invert the transformation applied by the given transformer.
+
+        This table is not modified.
 
         Parameters
         ----------

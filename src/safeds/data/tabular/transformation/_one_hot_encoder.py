@@ -22,6 +22,8 @@ class OneHotEncoder(InvertibleTableTransformer):
         """
         Learn a transformation for a set of columns in a table.
 
+        This transformer is not modified.
+
         Parameters
         ----------
         table : Table
@@ -60,6 +62,8 @@ class OneHotEncoder(InvertibleTableTransformer):
     def transform(self, table: Table) -> Table:
         """
         Apply the learned transformation to a table.
+
+        The table is not modified.
 
         Parameters
         ----------
@@ -114,6 +118,8 @@ class OneHotEncoder(InvertibleTableTransformer):
         """
         Undo the learned transformation.
 
+        The table is not modified.
+
         Parameters
         ----------
         transformed_table : Table
@@ -146,15 +152,17 @@ class OneHotEncoder(InvertibleTableTransformer):
 
         res = Table(pd.concat([unchanged, decoded], axis=1))
         column_names = [
-            name
-            if name not in [value for value_list in list(self._column_names.values()) for value in value_list]
-            else list(self._column_names.keys())[
-                [
-                    list(self._column_names.values()).index(value)
-                    for value in list(self._column_names.values())
-                    if name in value
-                ][0]
-            ]
+            (
+                name
+                if name not in [value for value_list in list(self._column_names.values()) for value in value_list]
+                else list(self._column_names.keys())[
+                    [
+                        list(self._column_names.values()).index(value)
+                        for value in list(self._column_names.values())
+                        if name in value
+                    ][0]
+                ]
+            )
             for name in transformed_table.column_names
         ]
         res = res.sort_columns(lambda col1, col2: column_names.index(col1.name) - column_names.index(col2.name))
