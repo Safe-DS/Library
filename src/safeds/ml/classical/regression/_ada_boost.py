@@ -37,6 +37,7 @@ class AdaBoost(Regressor):
 
     def __init__(
         self,
+        *,
         learner: Regressor | None = None,
         maximum_number_of_learners: int = 50,
         learning_rate: float = 1.0,

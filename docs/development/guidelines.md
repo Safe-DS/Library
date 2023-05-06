@@ -72,6 +72,26 @@ Write full words rather than abbreviations. The increased verbosity is offset by
     figure.scs(CS.AUT)
     ```
 
+### Consider marking optional parameters as keyword-only
+
+_Keyword-only parameters_ are parameters that can only be passed by name. It prevents users from accidentally passing a value to the wrong parameter. This can happen easily if several parameters have the same type. Moreover, marking a parameter as keyword-only allows us to change the order of parameters without breaking client code. Because of this, strongly consider marking optional parameters as keyword-only. In particular, optional hyperparameters of models should be keyword-only.
+
+!!! success "**DO** (library code):"
+
+    ```py
+    class RandomForest:
+        def __init__(self, *, number_of_trees: int = 100) -> None:
+            ...
+    ```
+
+!!! failure "**DON'T** (library code):"
+
+    ```py
+    class RandomForest:
+        def __init__(self, number_of_trees: int = 100) -> None:
+            ...
+    ```
+
 ### Specify types of parameters and results
 
 Use [type hints](https://docs.python.org/3/library/typing.html) to describe the types of parameters and results of functions. This enables static type checking of client code.

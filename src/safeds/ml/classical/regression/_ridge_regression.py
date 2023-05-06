@@ -30,7 +30,7 @@ class RidgeRegression(Regressor):
         If `alpha` is negative.
     """
 
-    def __init__(self, alpha: float = 1.0) -> None:
+    def __init__(self, *, alpha: float = 1.0) -> None:
         # Validation
         if alpha < 0:
             raise ValueError("The parameter 'alpha' must be non-negative")

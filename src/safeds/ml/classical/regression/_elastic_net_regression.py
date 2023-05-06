@@ -33,7 +33,7 @@ class ElasticNetRegression(Regressor):
         If `alpha` is negative or `lasso_ratio` is not between 0 and 1.
     """
 
-    def __init__(self, alpha: float = 1.0, lasso_ratio: float = 0.5) -> None:
+    def __init__(self, *, alpha: float = 1.0, lasso_ratio: float = 0.5) -> None:
         # Validation
         if alpha < 0:
             raise ValueError("The parameter 'alpha' must be non-negative")

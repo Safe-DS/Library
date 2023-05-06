@@ -37,6 +37,7 @@ class AdaBoost(Classifier):
 
     def __init__(
         self,
+        *,
         learner: Classifier | None = None,
         maximum_number_of_learners: int = 50,
         learning_rate: float = 1.0,
