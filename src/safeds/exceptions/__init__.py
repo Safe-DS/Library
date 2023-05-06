@@ -29,7 +29,6 @@ __all__ = [
     "SchemaMismatchError",
     "TransformerNotFittedError",
     "UnknownColumnNameError",
-
     # ML exceptions
     "DatasetContainsTargetError",
     "DatasetMissesFeaturesError",

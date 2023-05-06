@@ -1,7 +1,7 @@
 import pytest
 from safeds.data.tabular.containers import Table
-from safeds.exceptions import ColumnLengthMismatchError
 from safeds.data.tabular.typing import Integer, Schema
+from safeds.exceptions import ColumnLengthMismatchError
 
 
 @pytest.mark.parametrize(

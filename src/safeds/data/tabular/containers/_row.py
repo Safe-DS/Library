@@ -5,8 +5,8 @@ from typing import TYPE_CHECKING, Any
 
 import pandas as pd
 
-from safeds.exceptions import UnknownColumnNameError
 from safeds.data.tabular.typing import ColumnType, Schema
+from safeds.exceptions import UnknownColumnNameError
 
 if TYPE_CHECKING:
     from collections.abc import Iterator

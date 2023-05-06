@@ -7,8 +7,7 @@ from sklearn.metrics import mean_absolute_error as sk_mean_absolute_error
 from sklearn.metrics import mean_squared_error as sk_mean_squared_error
 
 from safeds.data.tabular.containers import Column, Table, TaggedTable
-from safeds.exceptions import ColumnLengthMismatchError
-from safeds.exceptions import UntaggedTableError
+from safeds.exceptions import ColumnLengthMismatchError, UntaggedTableError
 
 if TYPE_CHECKING:
     from sklearn.base import RegressorMixin

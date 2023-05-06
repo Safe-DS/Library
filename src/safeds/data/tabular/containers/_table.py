@@ -15,6 +15,7 @@ from scipy import stats
 
 from safeds.data.image.containers import Image
 from safeds.data.image.typing import ImageFormat
+from safeds.data.tabular.typing import ColumnType, Schema
 from safeds.exceptions import (
     ColumnLengthMismatchError,
     ColumnSizeError,
@@ -24,7 +25,6 @@ from safeds.exceptions import (
     SchemaMismatchError,
     UnknownColumnNameError,
 )
-from safeds.data.tabular.typing import ColumnType, Schema
 
 from ._column import Column
 from ._row import Row
