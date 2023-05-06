@@ -22,6 +22,6 @@ class TestC:
     def test_should_raise_if_less_than_or_equal_to_0(self) -> None:
         with pytest.raises(
             ValueError,
-            match="The strength of regularization given by the c parameter must be strictly positive.",
+            match="The parameter 'c' has to be strictly positive.",
         ):
             SupportVectorMachine(c=-1)

@@ -20,7 +20,7 @@ class TestNumberOfNeighbors:
         assert fitted_model._wrapped_classifier.n_neighbors == 2
 
     def test_should_raise_if_less_than_or_equal_to_0(self) -> None:
-        with pytest.raises(ValueError, match="has to be greater than 0"):
+        with pytest.raises(ValueError, match="The parameter 'number_of_neighbors' has to be greater than 0."):
             KNearestNeighbors(number_of_neighbors=-1)
 
     def test_should_raise_if_greater_than_sample_size(self, training_set: TaggedTable) -> None:

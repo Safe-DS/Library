@@ -9,6 +9,8 @@ from safeds.ml.classical._util_sklearn import fit, predict
 from ._classifier import Classifier
 
 if TYPE_CHECKING:
+    from sklearn.base import ClassifierMixin
+
     from safeds.data.tabular.containers import Table, TaggedTable
 
 
@@ -34,7 +36,7 @@ class SupportVectorMachine(Classifier):
         self._target_name: str | None = None
 
         if c <= 0:
-            raise ValueError("The strength of regularization given by the c parameter must be strictly positive.")
+            raise ValueError("The parameter 'c' has to be strictly positive.")
         self._c = c
 
     def fit(self, training_set: TaggedTable) -> SupportVectorMachine:
@@ -58,7 +60,7 @@ class SupportVectorMachine(Classifier):
         LearningError
             If the training data contains invalid values or if the training failed.
         """
-        wrapped_classifier = sk_SVC(C=self._c)
+        wrapped_classifier = self._get_sklearn_classifier()
         fit(wrapped_classifier, training_set)
 
         result = SupportVectorMachine(self._c)
@@ -105,3 +107,14 @@ class SupportVectorMachine(Classifier):
             Whether the classifier is fitted.
         """
         return self._wrapped_classifier is not None
+
+    def _get_sklearn_classifier(self) -> ClassifierMixin:
+        """
+        Return a new wrapped Classifier from sklearn.
+
+        Returns
+        -------
+        wrapped_classifier: ClassifierMixin
+            The sklearn Classifier.
+        """
+        return sk_SVC(C=self._c)

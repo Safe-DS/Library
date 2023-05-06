@@ -11,6 +11,8 @@ from safeds.ml.exceptions import UntaggedTableError
 if TYPE_CHECKING:
     from typing import Any
 
+    from sklearn.base import ClassifierMixin
+
 
 class Classifier(ABC):
     """Abstract base class for all classifiers."""
@@ -74,6 +76,17 @@ class Classifier(ABC):
         -------
         is_fitted : bool
             Whether the classifier is fitted.
+        """
+
+    @abstractmethod
+    def _get_sklearn_classifier(self) -> ClassifierMixin:
+        """
+        Return a new wrapped Classifier from sklearn.
+
+        Returns
+        -------
+        wrapped_classifier: ClassifierMixin
+            The sklearn Classifier.
         """
 
     # noinspection PyProtectedMember

@@ -20,5 +20,5 @@ class TestNumberOfTrees:
         assert fitted_model._wrapped_regressor.n_estimators == 2
 
     def test_should_raise_if_less_than_or_equal_to_0(self) -> None:
-        with pytest.raises(ValueError, match="has to be greater than 0"):
+        with pytest.raises(ValueError, match="The parameter 'number_of_trees' has to be greater than 0."):
             RandomForest(number_of_trees=-1)
