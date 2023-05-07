@@ -1056,7 +1056,7 @@ class Table:
         ----------
         target_name : str
             Name of the target column.
-        feature_names : Optional[list[str]]
+        feature_names : list[str] | None
             Names of the feature columns. If None, all columns except the target column are used.
 
         Returns
@@ -1066,7 +1066,7 @@ class Table:
         """
         from ._tagged_table import TaggedTable
 
-        return TaggedTable(self._data, self._schema, target_name, feature_names)
+        return TaggedTable._from_table(self, target_name, feature_names)
 
     def transform_column(self, name: str, transformer: Callable[[Row], Any]) -> Table:
         """

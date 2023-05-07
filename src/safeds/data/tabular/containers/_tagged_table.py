@@ -17,12 +17,12 @@ class TaggedTable(Table):
     ----------
     data : Iterable
         The data.
+    schema : Schema | None
+        The schema of the table. If not specified, the schema will be inferred from the data.
     target_name : str
         Name of the target column.
-    feature_names : Optional[list[str]]
+    feature_names : list[str] | None
         Names of the feature columns. If None, all columns except the target column are used.
-    schema : Optional[Schema]
-        The schema of the table. If not specified, the schema will be inferred from the data.
     """
 
     # ------------------------------------------------------------------------------------------------------------------
