@@ -72,6 +72,43 @@ Write full words rather than abbreviations. The increased verbosity is offset by
     figure.scs(CS.AUT)
     ```
 
+### Place more important parameters first
+
+Parameters that are more important to the user should be placed first. This also applies to [keyword-only parameters](#consider-marking-optional-parameters-as-keyword-only), since they still have a fixed order in the documentation. In particular, parameters of model constructors should have the following order:
+
+1. Model hyperparameters (e.g., the number of trees in a random forest)
+2. Algorithm hyperparameters (e.g., the learning rate of a gradient boosting algorithm)
+3. Regularization hyperparameters (e.g., the maximum depth of a decision tree)
+4. Other parameters (e.g., the random seed)
+
+!!! success "**DO** (library code):"
+
+    ```py
+    class GradientBoosting:
+        def __init__(
+            self,
+            *,
+            number_of_trees: int = 100,
+            learning_rate: float = 0.1,
+            random_seed: int = 0,
+        ) -> None:
+            ...
+    ```
+
+!!! failure "**DON'T** (library code):"
+
+    ```py
+    class GradientBoosting:
+        def __init__(
+            self,
+            *,
+            random_seed: int = 0,
+            number_of_trees: int = 100,
+            learning_rate: float = 0.1,
+        ) -> None:
+            ...
+    ```
+
 ### Consider marking optional parameters as keyword-only
 
 _Keyword-only parameters_ are parameters that can only be passed by name. It prevents users from accidentally passing a value to the wrong parameter. This can happen easily if several parameters have the same type. Moreover, marking a parameter as keyword-only allows us to change the order of parameters without breaking client code. Because of this, strongly consider marking optional parameters as keyword-only. In particular, optional hyperparameters of models should be keyword-only.
