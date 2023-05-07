@@ -62,8 +62,6 @@ class Table:
         """
         Read data from a CSV file into a table.
 
-        This table is not modified.
-
         Parameters
         ----------
         path : str | Path
@@ -90,8 +88,6 @@ class Table:
     def from_excel_file(path: str | Path) -> Table:
         """
         Read data from an Excel file into a table.
-
-        This table is not modified.
 
         Parameters
         ----------
@@ -122,8 +118,6 @@ class Table:
         """
         Read data from a JSON file into a table.
 
-        This table is not modified.
-
         Parameters
         ----------
         path : str | Path
@@ -151,8 +145,6 @@ class Table:
         """
         Create a table from a dictionary that maps column names to column values.
 
-        This table is not modified.
-
         Parameters
         ----------
         data : dict[str, list[Any]]
@@ -174,8 +166,6 @@ class Table:
     def from_columns(columns: list[Column]) -> Table:
         """
         Return a table created from a list of columns.
-
-        This table is not modified.
 
         Parameters
         ----------
@@ -207,8 +197,6 @@ class Table:
     def from_rows(rows: list[Row]) -> Table:
         """
         Return a table created from a list of rows.
-
-        This table is not modified.
 
         Parameters
         ----------
@@ -244,8 +232,6 @@ class Table:
     def _from_pandas_dataframe(data: pd.DataFrame, schema: Schema | None = None) -> Table:
         """
         Create a table from a `pandas.DataFrame`.
-
-        This table is not modified.
 
         Parameters
         ----------
