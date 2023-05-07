@@ -5,8 +5,8 @@ from typing import TYPE_CHECKING
 from safeds.data.tabular.containers import Column, Table
 
 if TYPE_CHECKING:
-    import pandas as pd
-    from safeds.data.tabular.typing import Schema
+    from typing import Any
+    from collections.abc import Mapping, Sequence
 
 
 class TaggedTable(Table):
@@ -15,14 +15,27 @@ class TaggedTable(Table):
 
     Parameters
     ----------
-    data : Iterable
+    data : Mapping[str, Sequence[Any]]
         The data.
-    schema : Schema | None
-        The schema of the table. If not specified, the schema will be inferred from the data.
     target_name : str
         Name of the target column.
     feature_names : list[str] | None
         Names of the feature columns. If None, all columns except the target column are used.
+
+    Raises
+    ------
+    ColumnLengthMismatchError
+        If columns have different lengths.
+    ValueError
+        If the target column is also a feature column.
+    ValueError
+        If no feature columns are specified.
+
+    Examples
+    --------
+    >>> from safeds.data.tabular.containers import Table, TaggedTable
+    >>> table = Table({"col1": ["a", "b"], "col2": [1, 2]})
+    >>> tagged_table = table.tag_columns("col2", ["col1"])
     """
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -51,6 +64,13 @@ class TaggedTable(Table):
         -------
         tagged_table : TaggedTable
             The created table.
+
+        Raises
+        ------
+        ValueError
+            If the target column is also a feature column.
+        ValueError
+            If no feature columns are specified.
 
         Examples
         --------
@@ -84,16 +104,39 @@ class TaggedTable(Table):
     # Dunder methods
     # ------------------------------------------------------------------------------------------------------------------
 
-    # noinspection PyMissingConstructor
     def __init__(
         self,
-        data: pd.DataFrame,
-        schema: Schema,
+        data: Mapping[str, Sequence[Any]],
         target_name: str,
         feature_names: list[str] | None = None,
     ):
-        self._data = data
-        self._schema = schema
+        """
+        Create a tagged table from a mapping of column names to their values.
+
+        Parameters
+        ----------
+        data : Mapping[str, Sequence[Any]]
+            The data.
+        target_name : str
+            Name of the target column.
+        feature_names : list[str] | None
+            Names of the feature columns. If None, all columns except the target column are used.
+
+        Raises
+        ------
+        ColumnLengthMismatchError
+            If columns have different lengths.
+        ValueError
+            If the target column is also a feature column.
+        ValueError
+            If no feature columns are specified.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import TaggedTable
+        >>> table = TaggedTable({"a": [1, 2, 3], "b": [4, 5, 6]}, "b", ["a"])
+        """
+        super().__init__(data)
 
         # If no feature names are specified, use all columns except the target column
         if feature_names is None:

@@ -51,6 +51,21 @@ class Table:
     | [from_dict][safeds.data.tabular.containers._table.Table.from_dict]           | Create a table from a dictionary.      |
     | [from_columns][safeds.data.tabular.containers._table.Table.from_columns]     | Create a table from a list of columns. |
     | [from_rows][safeds.data.tabular.containers._table.Table.from_rows]           | Create a table from a list of rows.    |
+
+    Parameters
+    ----------
+    data : Mapping[str, Sequence[Any]] | None
+        The data. If None, an empty table is created.
+
+    Raises
+    ------
+    ColumnLengthMismatchError
+        If columns have different lengths.
+
+    Examples
+    --------
+    >>> from safeds.data.tabular.containers import Table
+    >>> table = Table({"a": [1, 2, 3], "b": [4, 5, 6]})
     """
 
     # ------------------------------------------------------------------------------------------------------------------
