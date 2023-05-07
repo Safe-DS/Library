@@ -11,7 +11,45 @@ from safeds.exceptions import TransformerNotFittedError, UnknownColumnNameError
 
 
 class OneHotEncoder(InvertibleTableTransformer):
-    """Encodes categorical columns to numerical features [0,1] that represent the existence for each value."""
+    """
+    A way to deal with categorical features that is particularly useful for unordered (i.e. nominal) data.
+
+    It replaces a column with a set of columns, each representing a unique value in the original column. The value of
+    each new column is 1 if the original column had that value, and 0 otherwise. Take the following table as an
+    example:
+
+    | col1 |
+    |------|
+    | "a"  |
+    | "b"  |
+    | "c"  |
+    | "a"  |
+
+    The one-hot encoding of this table is:
+
+    | col1_a | col1_b | col1_c |
+    |--------|--------|--------|
+    | 1      | 0      | 0      |
+    | 0      | 1      | 0      |
+    | 0      | 0      | 1      |
+    | 1      | 0      | 0      |
+
+    The name "one-hot" comes from the fact that each row has exactly one 1 in it, and the rest of the values are 0s.
+    One-hot encoding is closely related to dummy variable / indicator variables, which are used in statistics.
+
+    Examples
+    --------
+    >>> from safeds.data.tabular.containers import Table
+    >>> from safeds.data.tabular.transformation import OneHotEncoder
+    >>> table = Table({"col1": ["a", "b", "c", "a"]})
+    >>> transformer = OneHotEncoder()
+    >>> transformer.fit_and_transform(table, ["col1"])
+       col1_a  col1_b  col1_c
+    0     1.0     0.0     0.0
+    1     0.0     1.0     0.0
+    2     0.0     0.0     1.0
+    3     1.0     0.0     0.0
+    """
 
     def __init__(self) -> None:
         self._wrapped_transformer: sk_OneHotEncoder | None = None
