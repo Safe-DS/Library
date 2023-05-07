@@ -51,6 +51,21 @@ class Table:
     | [from_dict][safeds.data.tabular.containers._table.Table.from_dict]           | Create a table from a dictionary.      |
     | [from_columns][safeds.data.tabular.containers._table.Table.from_columns]     | Create a table from a list of columns. |
     | [from_rows][safeds.data.tabular.containers._table.Table.from_rows]           | Create a table from a list of rows.    |
+
+    Parameters
+    ----------
+    data : Mapping[str, Sequence[Any]] | None
+        The data. If None, an empty table is created.
+
+    Raises
+    ------
+    ColumnLengthMismatchError
+        If columns have different lengths.
+
+    Examples
+    --------
+    >>> from safeds.data.tabular.containers import Table
+    >>> table = Table({"a": [1, 2, 3], "b": [4, 5, 6]})
     """
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -61,8 +76,6 @@ class Table:
     def from_csv_file(path: str | Path) -> Table:
         """
         Read data from a CSV file into a table.
-
-        This table is not modified.
 
         Parameters
         ----------
@@ -90,8 +103,6 @@ class Table:
     def from_excel_file(path: str | Path) -> Table:
         """
         Read data from an Excel file into a table.
-
-        This table is not modified.
 
         Parameters
         ----------
@@ -122,8 +133,6 @@ class Table:
         """
         Read data from a JSON file into a table.
 
-        This table is not modified.
-
         Parameters
         ----------
         path : str | Path
@@ -151,8 +160,6 @@ class Table:
         """
         Create a table from a dictionary that maps column names to column values.
 
-        This table is not modified.
-
         Parameters
         ----------
         data : dict[str, list[Any]]
@@ -174,8 +181,6 @@ class Table:
     def from_columns(columns: list[Column]) -> Table:
         """
         Return a table created from a list of columns.
-
-        This table is not modified.
 
         Parameters
         ----------
@@ -207,8 +212,6 @@ class Table:
     def from_rows(rows: list[Row]) -> Table:
         """
         Return a table created from a list of rows.
-
-        This table is not modified.
 
         Parameters
         ----------
@@ -244,8 +247,6 @@ class Table:
     def _from_pandas_dataframe(data: pd.DataFrame, schema: Schema | None = None) -> Table:
         """
         Create a table from a `pandas.DataFrame`.
-
-        This table is not modified.
 
         Parameters
         ----------
@@ -1070,7 +1071,7 @@ class Table:
         ----------
         target_name : str
             Name of the target column.
-        feature_names : Optional[list[str]]
+        feature_names : list[str] | None
             Names of the feature columns. If None, all columns except the target column are used.
 
         Returns
@@ -1080,7 +1081,7 @@ class Table:
         """
         from ._tagged_table import TaggedTable
 
-        return TaggedTable(self._data, self._schema, target_name, feature_names)
+        return TaggedTable._from_table(self, target_name, feature_names)
 
     def transform_column(self, name: str, transformer: Callable[[Row], Any]) -> Table:
         """
