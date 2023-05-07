@@ -5,8 +5,8 @@ from typing import TYPE_CHECKING
 from safeds.data.tabular.containers import Column, Table
 
 if TYPE_CHECKING:
-    from typing import Any
     from collections.abc import Mapping, Sequence
+    from typing import Any
 
 
 class TaggedTable(Table):
