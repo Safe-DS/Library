@@ -11,7 +11,10 @@ def test_should_match_snapshot() -> None:
     table.get_column("A").plot_boxplot()
     current = table.get_column("A").plot_boxplot()
     snapshot = Image.from_png_file(resolve_resource_path("./image/snapshot_boxplot.png"))
-    assert snapshot._image.tobytes() == current._image.tobytes()
+
+    # Inlining the expression into the assert causes pytest to hang if the assertion fails when run from PyCharm.
+    assertion = snapshot._image.tobytes() == current._image.tobytes()
+    assert assertion
 
 
 def test_should_raise_if_column_contains_non_numerical_values() -> None:

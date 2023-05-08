@@ -8,7 +8,10 @@ def test_should_match_snapshot_numeric() -> None:
     table = Table({"A": [1, 2, 3]})
     current = table.get_column("A").plot_histogram()
     snapshot = Image.from_png_file(resolve_resource_path("./image/snapshot_histogram_numeric.png"))
-    assert snapshot._image.tobytes() == current._image.tobytes()
+
+    # Inlining the expression into the assert causes pytest to hang if the assertion fails when run from PyCharm.
+    assertion = snapshot._image.tobytes() == current._image.tobytes()
+    assert assertion
 
 
 def test_should_match_snapshot_str() -> None:
