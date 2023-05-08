@@ -30,6 +30,7 @@ def test_should_match_snapshot(table: Table, path: str) -> None:
     assertion = snapshot._image.tobytes() == current._image.tobytes()
     assert assertion
 
+
 def test_should_raise_if_column_contains_non_numerical_values() -> None:
     table = Table.from_dict({"A": ["1", "2", "3.5"], "B": ["0.2", "4", "77"]})
     with pytest.raises(NonNumericColumnError):
