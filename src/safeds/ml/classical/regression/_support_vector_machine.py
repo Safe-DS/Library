@@ -9,6 +9,8 @@ from safeds.ml.classical._util_sklearn import fit, predict
 from ._regressor import Regressor
 
 if TYPE_CHECKING:
+    from sklearn.base import RegressorMixin
+
     from safeds.data.tabular.containers import Table, TaggedTable
 
 
@@ -27,14 +29,14 @@ class SupportVectorMachine(Regressor):
         If `c` is less than or equal to 0.
     """
 
-    def __init__(self, c: float = 1.0) -> None:
+    def __init__(self, *, c: float = 1.0) -> None:
         # Internal state
         self._wrapped_regressor: sk_SVR | None = None
         self._feature_names: list[str] | None = None
         self._target_name: str | None = None
 
         if c <= 0:
-            raise ValueError("The strength of regularization given by the c parameter must be strictly positive.")
+            raise ValueError("The parameter 'c' has to be strictly positive.")
         self._c = c
 
     def fit(self, training_set: TaggedTable) -> SupportVectorMachine:
@@ -58,10 +60,10 @@ class SupportVectorMachine(Regressor):
         LearningError
             If the training data contains invalid values or if the training failed.
         """
-        wrapped_regressor = sk_SVR(C=self._c)
+        wrapped_regressor = self._get_sklearn_regressor()
         fit(wrapped_regressor, training_set)
 
-        result = SupportVectorMachine(self._c)
+        result = SupportVectorMachine(c=self._c)
         result._wrapped_regressor = wrapped_regressor
         result._feature_names = training_set.features.column_names
         result._target_name = training_set.target.name
@@ -105,3 +107,14 @@ class SupportVectorMachine(Regressor):
             Whether the regressor is fitted.
         """
         return self._wrapped_regressor is not None
+
+    def _get_sklearn_regressor(self) -> RegressorMixin:
+        """
+        Return a new wrapped Regressor from sklearn.
+
+        Returns
+        -------
+        wrapped_regressor: RegressorMixin
+            The sklearn Regressor.
+        """
+        return sk_SVR(C=self._c)

@@ -2,7 +2,7 @@ import warnings
 from typing import Any
 
 from safeds.data.tabular.containers import Table, TaggedTable
-from safeds.ml.exceptions import (
+from safeds.exceptions import (
     DatasetContainsTargetError,
     DatasetMissesFeaturesError,
     LearningError,
@@ -94,6 +94,9 @@ def predict(model: Any, dataset: Table, feature_names: list[str] | None, target_
             warnings.filterwarnings("ignore", message="X does not have valid feature names")
             predicted_target_vector = model.predict(dataset_df.values)
         result_set[target_name] = predicted_target_vector
-        return Table(result_set).tag_columns(target_name=target_name, feature_names=feature_names)
+        return Table._from_pandas_dataframe(result_set).tag_columns(
+            target_name=target_name,
+            feature_names=feature_names,
+        )
     except ValueError as exception:
         raise PredictionError(str(exception)) from exception

@@ -5,7 +5,7 @@ from safeds.ml.classical.regression import ElasticNetRegression
 
 @pytest.fixture()
 def training_set() -> TaggedTable:
-    table = Table.from_dict({"col1": [1, 2, 3, 4], "col2": [1, 2, 3, 4]})
+    table = Table({"col1": [1, 2, 3, 4], "col2": [1, 2, 3, 4]})
     return table.tag_columns(target_name="col1", feature_names=["col2"])
 
 
@@ -20,7 +20,7 @@ class TestAlpha:
         assert fitted_model._wrapped_regressor.alpha == 1
 
     def test_should_raise_if_less_than_0(self) -> None:
-        with pytest.raises(ValueError, match="alpha must be non-negative"):
+        with pytest.raises(ValueError, match="The parameter 'alpha' must be non-negative"):
             ElasticNetRegression(alpha=-1)
 
     def test_should_warn_if_equal_to_0(self) -> None:
@@ -45,11 +45,11 @@ class TestLassoRatio:
         assert fitted_model._wrapped_regressor.l1_ratio == 0.3
 
     def test_should_raise_if_less_than_0(self) -> None:
-        with pytest.raises(ValueError, match="lasso_ratio must be between 0 and 1."):
+        with pytest.raises(ValueError, match="The parameter 'lasso_ratio' must be between 0 and 1."):
             ElasticNetRegression(lasso_ratio=-1.0)
 
     def test_should_raise_if_greater_than_1(self) -> None:
-        with pytest.raises(ValueError, match="lasso_ratio must be between 0 and 1."):
+        with pytest.raises(ValueError, match="The parameter 'lasso_ratio' must be between 0 and 1."):
             ElasticNetRegression(lasso_ratio=2.0)
 
     def test_should_warn_if_0(self) -> None:

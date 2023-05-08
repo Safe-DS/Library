@@ -5,7 +5,7 @@ from safeds.ml.classical.regression import SupportVectorMachine
 
 @pytest.fixture()
 def training_set() -> TaggedTable:
-    table = Table.from_dict({"col1": [1, 2, 3, 4], "col2": [1, 2, 3, 4]})
+    table = Table({"col1": [1, 2, 3, 4], "col2": [1, 2, 3, 4]})
     return table.tag_columns(target_name="col1", feature_names=["col2"])
 
 
@@ -22,6 +22,6 @@ class TestC:
     def test_should_raise_if_less_than_or_equal_to_0(self) -> None:
         with pytest.raises(
             ValueError,
-            match="The strength of regularization given by the c parameter must be strictly positive.",
+            match="The parameter 'c' has to be strictly positive.",
         ):
             SupportVectorMachine(c=-1)

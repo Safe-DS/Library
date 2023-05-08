@@ -5,7 +5,7 @@ from safeds.ml.classical.regression import LassoRegression
 
 @pytest.fixture()
 def training_set() -> TaggedTable:
-    table = Table.from_dict({"col1": [1, 2, 3, 4], "col2": [1, 2, 3, 4]})
+    table = Table({"col1": [1, 2, 3, 4], "col2": [1, 2, 3, 4]})
     return table.tag_columns(target_name="col1", feature_names=["col2"])
 
 
@@ -20,7 +20,7 @@ class TestAlpha:
         assert fitted_model._wrapped_regressor.alpha == 1
 
     def test_should_raise_if_less_than_0(self) -> None:
-        with pytest.raises(ValueError, match="alpha must be non-negative"):
+        with pytest.raises(ValueError, match="The parameter 'alpha' must be non-negative"):
             LassoRegression(alpha=-1)
 
     def test_should_warn_if_equal_to_0(self) -> None:

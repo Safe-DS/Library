@@ -5,8 +5,8 @@ from typing import TYPE_CHECKING, Any
 
 import pandas as pd
 
-from safeds.data.tabular.exceptions import UnknownColumnNameError
 from safeds.data.tabular.typing import ColumnType, Schema
+from safeds.exceptions import UnknownColumnNameError
 
 if TYPE_CHECKING:
     from collections.abc import Iterator
@@ -101,7 +101,7 @@ class Row(Mapping[str, Any]):
     # Dunder methods
     # ------------------------------------------------------------------------------------------------------------------
 
-    def __init__(self, data: Mapping[str, Any] | None = None):
+    def __init__(self, data: Mapping[str, Any] | None = None) -> None:
         """
         Create a row from a mapping of column names to column values.
 

@@ -5,7 +5,7 @@ from safeds.ml.classical.regression import KNearestNeighbors
 
 @pytest.fixture()
 def training_set() -> TaggedTable:
-    table = Table.from_dict({"col1": [1, 2, 3, 4], "col2": [1, 2, 3, 4]})
+    table = Table({"col1": [1, 2, 3, 4], "col2": [1, 2, 3, 4]})
     return table.tag_columns(target_name="col1", feature_names=["col2"])
 
 
@@ -20,7 +20,7 @@ class TestNumberOfNeighbors:
         assert fitted_model._wrapped_regressor.n_neighbors == 2
 
     def test_should_raise_if_less_than_or_equal_to_0(self) -> None:
-        with pytest.raises(ValueError, match="has to be greater than 0"):
+        with pytest.raises(ValueError, match="The parameter 'number_of_neighbors' has to be greater than 0."):
             KNearestNeighbors(number_of_neighbors=-1)
 
     def test_should_raise_if_greater_than_sample_size(self, training_set: TaggedTable) -> None:

@@ -7,8 +7,8 @@ from safeds.data.tabular.containers import Table
 @pytest.mark.parametrize(
     "table",
     [
-        Table.from_dict({}),
-        Table.from_dict({"a": [1, 2], "b": [3, 4]}),
+        Table({}),
+        Table({"a": [1, 2], "b": [3, 4]}),
     ],
     ids=[
         "empty",
@@ -23,8 +23,8 @@ def test_should_contain_table_element(table: Table) -> None:
 @pytest.mark.parametrize(
     "table",
     [
-        Table.from_dict({}),
-        Table.from_dict({"a": [1, 2], "b": [3, 4]}),
+        Table({}),
+        Table({"a": [1, 2], "b": [3, 4]}),
     ],
     ids=[
         "empty",
@@ -39,8 +39,8 @@ def test_should_contain_th_element_for_each_column_name(table: Table) -> None:
 @pytest.mark.parametrize(
     "table",
     [
-        Table.from_dict({}),
-        Table.from_dict({"a": [1, 2], "b": [3, 4]}),
+        Table({}),
+        Table({"a": [1, 2], "b": [3, 4]}),
     ],
     ids=[
         "empty",
