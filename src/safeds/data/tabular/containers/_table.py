@@ -1334,7 +1334,10 @@ class Table:
         data = pd.melt(numerical_table._data, value_vars=numerical_table.column_names)
         grid = sns.FacetGrid(data, col="variable", sharey=False, sharex=False)
         with warnings.catch_warnings():
-            warnings.filterwarnings("ignore", message="Using the boxplot function without specifying `order` is likely to produce an incorrect plot.")
+            warnings.filterwarnings(
+                "ignore",
+                message="Using the boxplot function without specifying `order` is likely to produce an incorrect plot.",
+            )
             grid.map(sns.boxplot, "variable", "value")
         grid.set_ylabels("")
         grid.set_xlabels("")
