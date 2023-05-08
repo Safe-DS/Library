@@ -8,7 +8,6 @@ from tests.helpers import resolve_resource_path
 
 def test_should_match_snapshot() -> None:
     table = Table.from_dict({"A": [1, 2, 3]})
-    table.get_column("A").plot_boxplot()
     current = table.get_column("A").plot_boxplot()
     snapshot = Image.from_png_file(resolve_resource_path("./image/snapshot_boxplot.png"))
     assert snapshot._image.tobytes() == current._image.tobytes()

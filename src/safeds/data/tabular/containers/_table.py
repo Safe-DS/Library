@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import functools
 import io
+import warnings
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
@@ -1257,11 +1258,20 @@ class Table:
         -------
         plot: Image
             The plot as an image.
+
+        Raises
+        ------
+        NonNumericColumnError
+            If the table contains only non-numerical columns.
         """
         numerical_table = self.remove_columns_with_non_numerical_values()
+        if numerical_table.number_of_columns == 0:
+            raise NonNumericColumnError("This table contains only non-numerical columns.")
         data = pd.melt(numerical_table._data, value_vars=numerical_table.column_names)
         grid = sns.FacetGrid(data, col="variable", sharey=False, sharex=False)
-        grid.map(sns.boxplot, "variable", "value")
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", message="Using the boxplot function without specifying `order` is likely to produce an incorrect plot.")
+            grid.map(sns.boxplot, "variable", "value")
         grid.set_ylabels("")
         grid.set_xlabels("")
         grid.set_titles("{col_name}")
