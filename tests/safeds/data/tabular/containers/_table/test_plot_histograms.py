@@ -14,6 +14,7 @@ from tests.helpers import resolve_resource_path
             "./image/snapshot_histograms/four_columns.png",
         ),
     ],
+    ids=["one column", "four columns"],
 )
 def test_should_match_snapshot(table: Table, path: str) -> None:
     current = table.plot_histograms()

@@ -596,7 +596,8 @@ class Column(Sequence[T]):
 
         fig = plt.figure()
         ax = sns.boxplot(data=self._data)
-        ax.set(xlabel=self.name)
+        ax.set(title=self.name)
+        ax.set_xticks([])
         plt.tight_layout()
 
         buffer = io.BytesIO()

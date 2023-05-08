@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import functools
 import io
+import warnings
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
@@ -1306,6 +1307,47 @@ class Table:
             horizontalalignment="right",
         )  # rotate the labels of the x Axis to prevent the chance of overlapping of the labels
         plt.tight_layout()
+
+        buffer = io.BytesIO()
+        fig.savefig(buffer, format="png")
+        plt.close()  # Prevents the figure from being displayed directly
+        buffer.seek(0)
+        return Image(buffer, format_=ImageFormat.PNG)
+
+    def plot_boxplots(self) -> Image:
+        """
+        Plot a boxplot for every numerical column.
+
+        Returns
+        -------
+        plot: Image
+            The plot as an image.
+
+        Raises
+        ------
+        NonNumericColumnError
+            If the table contains only non-numerical columns.
+        """
+        numerical_table = self.remove_columns_with_non_numerical_values()
+        if numerical_table.number_of_columns == 0:
+            raise NonNumericColumnError("This table contains only non-numerical columns.")
+        col_wrap = min(numerical_table.number_of_columns, 3)
+
+        data = pd.melt(numerical_table._data, value_vars=numerical_table.column_names)
+        grid = sns.FacetGrid(data, col="variable", col_wrap=col_wrap, sharex=False, sharey=False)
+        with warnings.catch_warnings():
+            warnings.filterwarnings(
+                "ignore",
+                message="Using the boxplot function without specifying `order` is likely to produce an incorrect plot.",
+            )
+            grid.map(sns.boxplot, "variable", "value")
+        grid.set_xlabels("")
+        grid.set_ylabels("")
+        grid.set_titles("{col_name}")
+        for axes in grid.axes.flat:
+            axes.set_xticks([])
+        plt.tight_layout()
+        fig = grid.fig
 
         buffer = io.BytesIO()
         fig.savefig(buffer, format="png")
