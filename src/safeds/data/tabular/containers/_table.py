@@ -1313,6 +1313,35 @@ class Table:
         buffer.seek(0)
         return Image(buffer, format_=ImageFormat.PNG)
 
+    def plot_histograms(self) -> Image:
+        """
+        Plot a histogram for every column.
+
+        Returns
+        -------
+        plot: Image
+            The plot as an image.
+        """
+        col_wrap = min(self.number_of_columns, 3)
+
+        data = pd.melt(self._data, value_vars=self.column_names)
+        grid = sns.FacetGrid(data=data, col="variable", col_wrap=col_wrap, sharex=False, sharey=False)
+        grid.map(sns.histplot, "value")
+        grid.set_xlabels("")
+        grid.set_ylabels("")
+        grid.set_titles("{col_name}")
+        for axes in grid.axes.flat:
+            axes.set_xticks(axes.get_xticks())
+            axes.set_xticklabels(axes.get_xticklabels(), rotation=45, horizontalalignment="right")
+        grid.tight_layout()
+        fig = grid.fig
+
+        buffer = io.BytesIO()
+        fig.savefig(buffer, format="png")
+        plt.close()
+        buffer.seek(0)
+        return Image(buffer, ImageFormat.PNG)
+
     # ------------------------------------------------------------------------------------------------------------------
     # Conversion
     # ------------------------------------------------------------------------------------------------------------------
