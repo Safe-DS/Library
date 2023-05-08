@@ -165,7 +165,7 @@ class Column(Sequence[_T]):
             The single row's value, or rows' values.
 
         Raises
-        -------
+        ------
         IndexOutOfBoundsError
             If the given index or idices do not exist in the column.
 
@@ -538,14 +538,12 @@ class Column(Sequence[_T]):
         >>> from safeds.data.tabular.containers import Column
         >>> column1 = Column("test", [1, 2, 3])
         >>> column2 = Column("test", [2, 4, 6])
-        >>> column1.correlation_with(column2)
-        >>> print(pearson)
+        >>> pearson = column1.correlation_with(column2)
         1.0
 
         >>> column1 = Column("test", [1, 2, 3])
         >>> column2 = Column("test", [0.5, 4, -6])
         >>> pearson = column1.correlation_with(column2)
-        >>> print(pearson)
         -0.6404640308067906
         """
         if not self._type.is_numeric() or not other_column._type.is_numeric():
@@ -883,6 +881,13 @@ class Column(Sequence[_T]):
         ------
         NonNumericColumnError
             If the data contains non-numerical data.
+
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("test", [1, 2, 3])
+        >>> boxplot = column.plot_boxplot()
         """
         if not self.type.is_numeric():
             raise NonNumericColumnError(f"{self.name} is of type {self._type}.")
@@ -906,6 +911,12 @@ class Column(Sequence[_T]):
         -------
         plot: Image
             The plot as an image.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("test", [1, 2, 3])
+        >>> histogram = column.plot_histogram()
         """
         fig = plt.figure()
         ax = sns.histplot(data=self._data)
@@ -942,6 +953,28 @@ class Column(Sequence[_T]):
         >>> from safeds.data.tabular.containers import Column
         >>> column = Column("test", [1, 2, 3])
         >>> html = column.to_html()
+        <table border="1" class="dataframe">
+          <thead>
+            <tr style="text-align: right;">
+              <th></th>
+              <th>test</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th>0</th>
+              <td>1</td>
+            </tr>
+            <tr>
+              <th>1</th>
+              <td>2</td>
+            </tr>
+            <tr>
+              <th>2</th>
+              <td>3</td>
+            </tr>
+          </tbody>
+        </table>
         """
         frame = self._data.to_frame()
         frame.columns = [self.name]
@@ -960,6 +993,50 @@ class Column(Sequence[_T]):
         -------
         output : str
             The generated HTML.
+
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("col_1", ['a', 'b', 'c'])
+        >>> column._repr_html_()
+        <div>
+        <style scoped>
+            .dataframe tbody tr th:only-of-type {
+                vertical-align: middle;
+            }
+
+            .dataframe tbody tr th {
+                vertical-align: top;
+            }
+
+            .dataframe thead th {
+                text-align: right;
+            }
+        </style>
+        <table border="1" class="dataframe">
+          <thead>
+            <tr style="text-align: right;">
+              <th></th>
+              <th>col_1</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th>0</th>
+              <td>a</td>
+            </tr>
+            <tr>
+              <th>1</th>
+              <td>b</td>
+            </tr>
+            <tr>
+              <th>2</th>
+              <td>c</td>
+            </tr>
+          </tbody>
+        </table>
+        </div>
         """
         frame = self._data.to_frame()
         frame.columns = [self.name]
@@ -978,5 +1055,12 @@ class Column(Sequence[_T]):
         -------
         count : int
             The number of null values.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("col_1", [None, 'a', None])
+        >>> column._count_missing_values()
+        2
         """
         return self._data.isna().sum()
