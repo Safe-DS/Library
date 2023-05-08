@@ -1,59 +1,42 @@
-import pandas as pd
+import pytest
 from safeds.data.tabular.containers import Row, Table
+from safeds.exceptions import SchemaMismatchError
 
 
-def test_add_rows_valid() -> None:
-    table1 = Table.from_dict({"col1": ["a", "b", "c"], "col2": [1, 2, 4]})
-    row1 = Row._from_pandas_dataframe(
-        pd.DataFrame(
-            {
-                "col1": ["d"],
-                "col2": [6],
-            },
+@pytest.mark.parametrize(
+    ("table1", "rows", "table2"),
+    [
+        (
+            Table({"col1": ["a", "b", "c"], "col2": [1, 2, 4]}),
+            [Row({"col1": "d", "col2": 6}), Row({"col1": "e", "col2": 8})],
+            Table({"col1": ["a", "b", "c", "d", "e"], "col2": [1, 2, 4, 6, 8]}),
         ),
-        table1.schema,
-    )
-    row2 = Row._from_pandas_dataframe(
-        pd.DataFrame(
-            {
-                "col1": ["e"],
-                "col2": [8],
-            },
-        ),
-        table1.schema,
-    )
-    table1 = table1.add_rows([row1, row2])
-    assert table1.number_of_rows == 5
-    assert table1.get_row(3) == row1
-    assert table1.get_row(4) == row2
-    assert table1.schema == row1._schema
-    assert table1.schema == row2._schema
+    ],
+    ids=["Rows with string and integer values"],
+)
+def test_should_add_rows(table1: Table, rows: list[Row], table2: Table) -> None:
+    table1 = table1.add_rows(rows)
+    assert table1 == table2
 
 
-def test_add_rows_table_valid() -> None:
-    table1 = Table.from_dict({"col1": [1, 2, 1], "col2": [1, 2, 4]})
-    row1 = Row._from_pandas_dataframe(
-        pd.DataFrame(
-            {
-                "col1": [5],
-                "col2": [6],
-            },
+@pytest.mark.parametrize(
+    ("table1", "table2", "expected"),
+    [
+        (
+            Table({"col1": [1, 2, 1], "col2": [1, 2, 4]}),
+            Table({"col1": [5, 7], "col2": [6, 8]}),
+            Table({"col1": [1, 2, 1, 5, 7], "col2": [1, 2, 4, 6, 8]}),
         ),
-        table1.schema,
-    )
-    row2 = Row._from_pandas_dataframe(
-        pd.DataFrame(
-            {
-                "col1": [7],
-                "col2": [8],
-            },
-        ),
-        table1.schema,
-    )
-    table2 = Table.from_rows([row1, row2])
+    ],
+    ids=["Rows from table"],
+)
+def test_should_add_rows_from_table(table1: Table, table2: Table, expected: Table) -> None:
     table1 = table1.add_rows(table2)
-    assert table1.number_of_rows == 5
-    assert table1.get_row(3) == row1
-    assert table1.get_row(4) == row2
-    assert table1.schema == row1._schema
-    assert table1.schema == row2._schema
+    assert table1 == expected
+
+
+def test_should_raise_error_if_row_schema_invalid() -> None:
+    table1 = Table({"col1": [1, 2, 1], "col2": [1, 2, 4]})
+    row = [Row({"col1": 2, "col2": 4}), Row({"col1": 5, "col2": "Hallo"})]
+    with pytest.raises(SchemaMismatchError):
+        table1.add_rows(row)

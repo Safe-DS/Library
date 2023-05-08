@@ -5,8 +5,8 @@ from typing import TYPE_CHECKING, Any
 
 import pandas as pd
 
-from safeds.data.tabular.exceptions import UnknownColumnNameError
 from safeds.data.tabular.typing import ColumnType, Schema
+from safeds.exceptions import UnknownColumnNameError
 
 if TYPE_CHECKING:
     from collections.abc import Iterator
@@ -70,12 +70,20 @@ class Row(Mapping[str, Any]):
         row : Row
             The created row.
 
+        Raises
+        ------
+        ValueError
+            If the dataframe does not contain exactly one row.
+
         Examples
         --------
         >>> import pandas as pd
         >>> from safeds.data.tabular.containers import Row
         >>> row = Row._from_pandas_dataframe(pd.DataFrame({"a": [1], "b": [2]}))
         """
+        if data.shape[0] != 1:
+            raise ValueError("The dataframe has to contain exactly one row.")
+
         data = data.reset_index(drop=True)
 
         result = object.__new__(Row)
@@ -93,7 +101,7 @@ class Row(Mapping[str, Any]):
     # Dunder methods
     # ------------------------------------------------------------------------------------------------------------------
 
-    def __init__(self, data: Mapping[str, Any] | None = None):
+    def __init__(self, data: Mapping[str, Any] | None = None) -> None:
         """
         Create a row from a mapping of column names to column values.
 

@@ -1,30 +1,26 @@
 import pytest
 from safeds.data.tabular.containers import Table
-from safeds.data.tabular.exceptions import UnknownColumnNameError
+from safeds.exceptions import UnknownColumnNameError
 
 
-def test_transform_column_valid() -> None:
-    input_table = Table.from_dict(
-        {
-            "A": [1, 2, 3],
-            "B": [4, 5, 6],
-            "C": ["a", "b", "c"],
-        },
-    )
+@pytest.mark.parametrize(
+    ("table", "table_transformed"),
+    [
+        (
+            Table({"A": [1, 2, 3], "B": [4, 5, 6], "C": ["a", "b", "c"]}),
+            Table({"A": [2, 4, 6], "B": [4, 5, 6], "C": ["a", "b", "c"]}),
+        ),
+    ],
+    ids=["multiply by 2"],
+)
+def test_should_transform_column(table: Table, table_transformed: Table) -> None:
+    result = table.transform_column("A", lambda row: row.get_value("A") * 2)
 
-    result = input_table.transform_column("A", lambda row: row.get_value("A") * 2)
-
-    assert result == Table.from_dict(
-        {
-            "A": [2, 4, 6],
-            "B": [4, 5, 6],
-            "C": ["a", "b", "c"],
-        },
-    )
+    assert result == table_transformed
 
 
-def test_transform_column_invalid() -> None:
-    input_table = Table.from_dict(
+def test_should_raise_if_column_not_found() -> None:
+    input_table = Table(
         {
             "A": [1, 2, 3],
             "B": [4, 5, 6],
