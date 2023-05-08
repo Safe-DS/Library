@@ -1322,7 +1322,6 @@ class Table:
         plot: Image
             The plot as an image.
         """
-        fig = plt.figure()
         data = pd.melt(self._data, value_vars=self.column_names)
         grid = sns.FacetGrid(data=data, col="variable", sharey=False, sharex=False)
         grid.map(sns.histplot, "value")
@@ -1333,6 +1332,7 @@ class Table:
             axes.set_xticks(axes.get_xticks())
             axes.set_xticklabels(axes.get_xticklabels(), rotation=45, horizontalalignment="right")
         grid.tight_layout()
+        fig = grid.fig
 
         buffer = io.BytesIO()
         fig.savefig(buffer, format="png")
