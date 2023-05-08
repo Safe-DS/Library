@@ -23,7 +23,6 @@ from tests.helpers import resolve_resource_path
 )
 def test_should_match_snapshot(table: Table, path: str) -> None:
     current = table.plot_boxplots()
-    current.to_png_file(resolve_resource_path(path))
     snapshot = Image.from_png_file(resolve_resource_path(path))
 
     # Inlining the expression into the assert causes pytest to hang if the assertion fails when run from PyCharm.
