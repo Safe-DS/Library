@@ -1331,16 +1331,18 @@ class Table:
         numerical_table = self.remove_columns_with_non_numerical_values()
         if numerical_table.number_of_columns == 0:
             raise NonNumericColumnError("This table contains only non-numerical columns.")
+        col_wrap = min(numerical_table.number_of_columns, 3)
+
         data = pd.melt(numerical_table._data, value_vars=numerical_table.column_names)
-        grid = sns.FacetGrid(data, col="variable", sharey=False, sharex=False)
+        grid = sns.FacetGrid(data, col="variable", col_wrap=col_wrap, sharex=False, sharey=False)
         with warnings.catch_warnings():
             warnings.filterwarnings(
                 "ignore",
                 message="Using the boxplot function without specifying `order` is likely to produce an incorrect plot.",
             )
             grid.map(sns.boxplot, "variable", "value")
-        grid.set_ylabels("")
         grid.set_xlabels("")
+        grid.set_ylabels("")
         grid.set_titles("{col_name}")
         for axes in grid.axes.flat:
             axes.set_xticks([])
