@@ -11,7 +11,7 @@ nav:
     - Data Visualization: tutorials/data_visualization.ipynb
     - Machine Learning: tutorials/machine_learning.ipynb
   - API Reference: reference/
-  - Glossary: docs/glossary.md
+  - Glossary: includes/glossary.md
   - Development:
     - Environment: development/environment.md
     - Guidelines: development/guidelines.md
