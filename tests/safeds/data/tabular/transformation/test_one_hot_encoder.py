@@ -25,8 +25,8 @@ class TestFit:
         transformer = OneHotEncoder()
         transformer.fit(table, None)
 
-        assert transformer._wrapped_transformer is None
         assert transformer._column_names is None
+        assert transformer._value_to_column is None
 
 
 class TestTransform:

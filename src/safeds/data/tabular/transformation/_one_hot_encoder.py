@@ -58,6 +58,7 @@ class OneHotEncoder(InvertibleTableTransformer):
         for column in column_names:
             result._column_names[column] = []
             for element in table.get_column(column).get_unique_values():
+                # TODO: Change to double underscore and change tests accordingly.
                 base_name = f"{column}_{element}"
                 name_counter[base_name] += 1
                 new_column_name = base_name
@@ -111,6 +112,8 @@ class OneHotEncoder(InvertibleTableTransformer):
             for i in range(table.number_of_rows):
                 value = table.get_column(old_column_name).get_value(i)
                 new_column_name = self._value_to_column[(old_column_name, value)]
+                # TODO: Catch KeyError (this concrete value did not exist in the table the transformer was fitted on)
+                #       and raise user-understandable Error/Exception.
                 encoded_values[new_column_name][i] = 1.0
 
             for new_column in self._column_names[old_column_name]:
