@@ -133,8 +133,40 @@ class TestFitAndTransform:
                     },
                 ),
             ),
+            (
+                Table(
+                    {
+                        "a_b": ["c"],
+                        "a": ["b_c"],
+                    },
+                ),
+                None,
+                Table(
+                    {
+                        "a_b__c": [1.0],
+                        "a__b_c": [1.0],
+                    },
+                ),
+            ),
+            (
+                Table(
+                    {
+                        "a__b": ["c", "d"],
+                        "a": ["b__c", "d"],
+                    },
+                ),
+                None,
+                Table(
+                    {
+                        "a__b__c": [1.0, 0.0],
+                        "a__b__d": [0.0, 1.0],
+                        "a__b__c#2": [1.0, 0.0],
+                        "a__d": [0.0, 1.0],
+                    },
+                ),
+            ),
         ],
-        ids=["all columns", "one column", "multiple columns"],
+        ids=["all columns", "one column", "multiple columns", "single underscore counterexample", "name conflict"],
     )
     def test_should_return_transformed_table(
         self,
