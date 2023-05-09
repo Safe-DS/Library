@@ -7,8 +7,7 @@ $$
 \text{accuracy} = \frac{\text{True Positives + True Negatives}}{\text{Total amount of data points}}
 $$
 
-## API
-**A**pplication **P**rogramming **I**nterface <br>
+## Application Programming Interface (API)
 An API allows independent applications to communicate with each other and exchange data.
 
 ## Classification
@@ -41,6 +40,8 @@ It is analogous to a column within a table.
 ## Linear Regression
 Linear Regression is the supervised Machine Learning model in which the model finds the best fit linear line between the independent and dependent variable
 i.e. it finds the linear relationship between the dependent and independent variable.
+
+Implemented in Safe-DS as [LinearRegression][safeds.ml.classical.regression.LinearRegression].
 
 ## Machine Learning (ML)
 Machine Learning is a generic term for artificially generating knowledge through experience.
