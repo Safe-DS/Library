@@ -6,13 +6,13 @@ from safeds.data.tabular.containers import Table
     ("table", "expected"),
     [
         (
-            Table.from_dict(
+            Table(
                 {
                     "A": [1, 1, 1, 4],
                     "B": [2, 2, 2, 5],
                 },
             ),
-            Table.from_dict({"A": [1, 4], "B": [2, 5]}),
+            Table({"A": [1, 4], "B": [2, 5]}),
         ),
     ],
     ids=["duplicate rows"],

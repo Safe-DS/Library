@@ -12,18 +12,19 @@ import seaborn as sns
 
 from safeds.data.image.containers import Image
 from safeds.data.image.typing import ImageFormat
-from safeds.data.tabular.exceptions import (
+from safeds.data.tabular.typing import ColumnType
+from safeds.exceptions import (
     ColumnLengthMismatchError,
     ColumnSizeError,
     IndexOutOfBoundsError,
     NonNumericColumnError,
 )
-from safeds.data.tabular.typing import ColumnType
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterator
 
 T = TypeVar("T")
+R = TypeVar("R")
 
 
 class Column(Sequence[T]):
@@ -300,6 +301,8 @@ class Column(Sequence[T]):
         """
         Return a new column with a new name.
 
+        This column is not modified.
+
         Parameters
         ----------
         new_name : str
@@ -311,6 +314,30 @@ class Column(Sequence[T]):
             A new column with the new name.
         """
         return Column._from_pandas_series(self._data.rename(new_name), self._type)
+
+    def transform(self, transformer: Callable[[T], R]) -> Column[R]:
+        """
+        Apply a transform method to every data point.
+
+        This column is not modified.
+
+        Parameters
+        ----------
+        transformer : Callable[[T], R]
+            Function that will be applied to all data points.
+
+        Returns
+        -------
+        transformed_column: Column
+            The transformed column.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> price = Column("price", [4.99, 5.99, 2.49])
+        >>> sale = price.transform(lambda amount: amount * 0.8)
+        """
+        return Column(self.name, self._data.apply(transformer, convert_dtype=True))
 
     # ------------------------------------------------------------------------------------------------------------------
     # Statistics
@@ -569,7 +596,8 @@ class Column(Sequence[T]):
 
         fig = plt.figure()
         ax = sns.boxplot(data=self._data)
-        ax.set(xlabel=self.name)
+        ax.set(title=self.name)
+        ax.set_xticks([])
         plt.tight_layout()
 
         buffer = io.BytesIO()

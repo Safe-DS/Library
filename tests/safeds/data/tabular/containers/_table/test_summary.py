@@ -8,8 +8,8 @@ from safeds.data.tabular.containers import Table
     ("table", "truth"),
     [
         (
-            Table.from_dict({"col1": [1, 2, 1], "col2": ["a", "b", "c"]}),
-            Table.from_dict(
+            Table({"col1": [1, 2, 1], "col2": ["a", "b", "c"]}),
+            Table(
                 {
                     "metrics": [
                         "maximum",

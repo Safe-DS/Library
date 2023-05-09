@@ -1,15 +1,15 @@
 import pytest
 from safeds.data.tabular.containers import Column, Table
-from safeds.data.tabular.exceptions import ColumnSizeError, DuplicateColumnNameError
+from safeds.exceptions import ColumnSizeError, DuplicateColumnNameError
 
 
 @pytest.mark.parametrize(
     ("table1", "columns", "expected"),
     [
         (
-            Table.from_dict({"col1": [1, 2, 1], "col2": [1, 2, 4]}),
+            Table({"col1": [1, 2, 1], "col2": [1, 2, 4]}),
             [Column("col3", [0, -1, -2]), Column("col4", ["a", "b", "c"])],
-            Table.from_dict({"col1": [1, 2, 1], "col2": [1, 2, 4], "col3": [0, -1, -2], "col4": ["a", "b", "c"]}),
+            Table({"col1": [1, 2, 1], "col2": [1, 2, 4], "col3": [0, -1, -2], "col4": ["a", "b", "c"]}),
         ),
     ],
     ids=["add 2 columns"],
@@ -23,9 +23,9 @@ def test_should_add_columns(table1: Table, columns: list[Column], expected: Tabl
     ("table1", "table2", "expected"),
     [
         (
-            Table.from_dict({"col1": [1, 2, 1], "col2": [1, 2, 4]}),
-            Table.from_dict({"col3": [0, -1, -2], "col4": ["a", "b", "c"]}),
-            Table.from_dict({"col1": [1, 2, 1], "col2": [1, 2, 4], "col3": [0, -1, -2], "col4": ["a", "b", "c"]}),
+            Table({"col1": [1, 2, 1], "col2": [1, 2, 4]}),
+            Table({"col3": [0, -1, -2], "col4": ["a", "b", "c"]}),
+            Table({"col1": [1, 2, 1], "col2": [1, 2, 4], "col3": [0, -1, -2], "col4": ["a", "b", "c"]}),
         ),
     ],
     ids=["add a table with 2 columns"],
@@ -39,7 +39,7 @@ def test_should_add_columns_from_table(table1: Table, table2: Table, expected: T
     ("table", "columns"),
     [
         (
-            Table.from_dict({"col1": [1, 2, 1], "col2": [1, 2, 4]}),
+            Table({"col1": [1, 2, 1], "col2": [1, 2, 4]}),
             [Column("col3", ["a", "b", "c", "d"]), Column("col4", ["e", "f", "g", "h"])],
         ),
     ],
@@ -54,7 +54,7 @@ def test_should_raise_error_if_column_size_invalid(table: Table, columns: list[C
     ("table", "columns"),
     [
         (
-            Table.from_dict({"col1": [1, 2, 1], "col2": [1, 2, 4]}),
+            Table({"col1": [1, 2, 1], "col2": [1, 2, 4]}),
             [Column("col2", ["a", "b", "c"]), Column("col3", [2, 3, 4])],
         ),
     ],

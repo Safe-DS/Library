@@ -2,7 +2,7 @@ from typing import Any
 
 import pytest
 from safeds.data.tabular.containers import Column
-from safeds.data.tabular.exceptions import IndexOutOfBoundsError
+from safeds.exceptions import IndexOutOfBoundsError
 
 
 @pytest.mark.parametrize(

@@ -7,11 +7,11 @@ from safeds.data.tabular.containers import Row, Table
 @pytest.mark.parametrize(
     ("table1", "table2", "expected"),
     [
-        (Table({}), Table({}), True),
-        (Table.from_dict({"col1": [1]}), Table.from_dict({"col1": [1]}), True),
-        (Table.from_dict({"col1": [1]}), Table.from_dict({"col2": [1]}), False),
-        (Table.from_dict({"col1": [1, 2, 3]}), Table.from_dict({"col1": [1, 1, 3]}), False),
-        (Table.from_dict({"col1": [1, 2, 3]}), Table.from_dict({"col1": ["1", "2", "3"]}), False),
+        (Table(), Table(), True),
+        (Table({"col1": [1]}), Table({"col1": [1]}), True),
+        (Table({"col1": [1]}), Table({"col2": [1]}), False),
+        (Table({"col1": [1, 2, 3]}), Table({"col1": [1, 1, 3]}), False),
+        (Table({"col1": [1, 2, 3]}), Table({"col1": ["1", "2", "3"]}), False),
     ],
     ids=[
         "empty Table",
@@ -27,7 +27,7 @@ def test_should_return_whether_two_tables_are_equal(table1: Table, table2: Table
 
 @pytest.mark.parametrize(
     "table",
-    [Table.from_dict({}), Table.from_dict({"col1": [1]})],
+    [Table(), Table({"col1": [1]})],
     ids=[
         "empty",
         "non-empty",
@@ -40,8 +40,8 @@ def test_should_return_true_if_objects_are_identical(table: Table) -> None:
 @pytest.mark.parametrize(
     ("table", "other"),
     [
-        (Table.from_dict({"col1": [1]}), None),
-        (Table.from_dict({"col1": [1]}), Row()),
+        (Table({"col1": [1]}), None),
+        (Table({"col1": [1]}), Row()),
     ],
     ids=[
         "Table vs. None",

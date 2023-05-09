@@ -11,7 +11,7 @@ from tests.helpers import resolve_resource_path
     [
         (
             resolve_resource_path("./dummy_excel_file.xlsx"),
-            Table.from_dict(
+            Table(
                 {
                     "A": [1],
                     "B": [2],
@@ -20,7 +20,7 @@ from tests.helpers import resolve_resource_path
         ),
         (
             Path(resolve_resource_path("./dummy_excel_file.xlsx")),
-            Table.from_dict(
+            Table(
                 {
                     "A": [1],
                     "B": [2],

@@ -1,14 +1,14 @@
 import pytest
 from safeds.data.tabular.containers import Table
-from safeds.data.tabular.exceptions import TransformerNotFittedError
 from safeds.data.tabular.transformation import OneHotEncoder
+from safeds.exceptions import TransformerNotFittedError
 
 
 @pytest.mark.parametrize(
     ("table_to_fit", "column_names", "table_to_transform"),
     [
         (
-            Table.from_dict(
+            Table(
                 {
                     "a": [1.0, 0.0, 0.0, 0.0],
                     "b": ["a", "b", "b", "c"],
@@ -16,7 +16,7 @@ from safeds.data.tabular.transformation import OneHotEncoder
                 },
             ),
             ["b"],
-            Table.from_dict(
+            Table(
                 {
                     "a": [1.0, 0.0, 0.0, 0.0],
                     "b": ["a", "b", "b", "c"],
@@ -25,7 +25,7 @@ from safeds.data.tabular.transformation import OneHotEncoder
             ),
         ),
         (
-            Table.from_dict(
+            Table(
                 {
                     "a": [1.0, 0.0, 0.0, 0.0],
                     "b": ["a", "b", "b", "c"],
@@ -33,7 +33,7 @@ from safeds.data.tabular.transformation import OneHotEncoder
                 },
             ),
             ["b"],
-            Table.from_dict(
+            Table(
                 {
                     "c": [0.0, 0.0, 0.0, 1.0],
                     "b": ["a", "b", "b", "c"],
@@ -42,7 +42,7 @@ from safeds.data.tabular.transformation import OneHotEncoder
             ),
         ),
         (
-            Table.from_dict(
+            Table(
                 {
                     "a": [1.0, 0.0, 0.0, 0.0],
                     "b": ["a", "b", "b", "c"],
@@ -50,7 +50,7 @@ from safeds.data.tabular.transformation import OneHotEncoder
                 },
             ),
             ["b", "bb"],
-            Table.from_dict(
+            Table(
                 {
                     "a": [1.0, 0.0, 0.0, 0.0],
                     "b": ["a", "b", "b", "c"],
@@ -83,7 +83,7 @@ def test_should_return_original_table(
 
 
 def test_should_not_change_transformed_table() -> None:
-    table = Table.from_dict(
+    table = Table(
         {
             "col1": ["a", "b", "b", "c"],
         },
@@ -93,7 +93,7 @@ def test_should_not_change_transformed_table() -> None:
     transformed_table = transformer.transform(table)
     transformed_table.inverse_transform_table(transformer)
 
-    expected = Table.from_dict(
+    expected = Table(
         {
             "col1_a": [1.0, 0.0, 0.0, 0.0],
             "col1_b": [0.0, 1.0, 1.0, 0.0],
@@ -105,7 +105,7 @@ def test_should_not_change_transformed_table() -> None:
 
 
 def test_should_raise_error_if_not_fitted() -> None:
-    table = Table.from_dict(
+    table = Table(
         {
             "a": [1.0, 0.0, 0.0, 0.0],
             "b": [0.0, 1.0, 1.0, 0.0],

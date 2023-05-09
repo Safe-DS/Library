@@ -29,7 +29,7 @@ class SupportVectorMachine(Classifier):
         If `c` is less than or equal to 0.
     """
 
-    def __init__(self, c: float = 1.0) -> None:
+    def __init__(self, *, c: float = 1.0) -> None:
         # Internal state
         self._wrapped_classifier: sk_SVC | None = None
         self._feature_names: list[str] | None = None
@@ -63,7 +63,7 @@ class SupportVectorMachine(Classifier):
         wrapped_classifier = self._get_sklearn_classifier()
         fit(wrapped_classifier, training_set)
 
-        result = SupportVectorMachine(self._c)
+        result = SupportVectorMachine(c=self._c)
         result._wrapped_classifier = wrapped_classifier
         result._feature_names = training_set.features.column_names
         result._target_name = training_set.target.name
