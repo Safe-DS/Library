@@ -27,12 +27,12 @@ class OneHotEncoder(InvertibleTableTransformer):
 
     The one-hot encoding of this table is:
 
-    | col1_a | col1_b | col1_c |
-    |--------|--------|--------|
-    | 1      | 0      | 0      |
-    | 0      | 1      | 0      |
-    | 0      | 0      | 1      |
-    | 1      | 0      | 0      |
+    | col1__a | col1__b | col1__c |
+    |---------|---------|---------|
+    | 1       | 0       | 0       |
+    | 0       | 1       | 0       |
+    | 0       | 0       | 1       |
+    | 1       | 0       | 0       |
 
     The name "one-hot" comes from the fact that each row has exactly one 1 in it, and the rest of the values are 0s.
     One-hot encoding is closely related to dummy variable / indicator variables, which are used in statistics.
@@ -44,11 +44,11 @@ class OneHotEncoder(InvertibleTableTransformer):
     >>> table = Table({"col1": ["a", "b", "c", "a"]})
     >>> transformer = OneHotEncoder()
     >>> transformer.fit_and_transform(table, ["col1"])
-       col1_a  col1_b  col1_c
-    0     1.0     0.0     0.0
-    1     0.0     1.0     0.0
-    2     0.0     0.0     1.0
-    3     1.0     0.0     0.0
+       col1__a  col1__b  col1__c
+    0      1.0      0.0      0.0
+    1      0.0      1.0      0.0
+    2      0.0      0.0      1.0
+    3      1.0      0.0      0.0
     """
 
     def __init__(self) -> None:
