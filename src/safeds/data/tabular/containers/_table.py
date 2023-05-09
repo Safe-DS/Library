@@ -1546,6 +1546,12 @@ class Table:
         ----------
         path : str | Path
             The path to the output file.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table
+        >>> table = Table.from_dict({"a": [1, 2, 3], "b": [4, 5, 6]})
+        >>> table.to_json_file("./csv_files/csv.json")
         """
         Path(path).parent.mkdir(parents=True, exist_ok=True)
         data_to_csv = self._data.copy()
@@ -1563,6 +1569,12 @@ class Table:
         ----------
         path : str | Path
             The path to the output file.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table
+        >>> table = Table.from_dict({"a": [1, 2, 3], "b": [4, 5, 6]})
+        >>> table.to_json_file("./json_files/table.json")
         """
         Path(path).parent.mkdir(parents=True, exist_ok=True)
         data_to_json = self._data.copy()
@@ -1577,6 +1589,16 @@ class Table:
         -------
         data : dict[str, list[Any]]
             Dictionary representation of the table.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table
+        table:    a  b
+            0     1  4
+            1     2  5
+            2     3  6
+        >>> table.to_dict()
+        {"a": [1, 2, 3], "b": [4, 5, 6]}
         """
         return {column_name: list(self.get_column(column_name)) for column_name in self.column_names}
 
