@@ -1414,6 +1414,13 @@ class Table:
         -------
         plot: Image
             The plot as an image.
+
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table
+        >>> table = Table.from_dict({"temperature": [10, 15, 20, 25, 30], "sales": [54, 74, 90, 206, 210]})
+        >>> table.plot_correlation_heatmap()
         """
         only_numerical = self.remove_columns_with_non_numerical_values()
 
@@ -1457,6 +1464,12 @@ class Table:
         ------
         UnknownColumnNameError
             If either of the columns do not exist.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table
+        >>> table = Table.from_dict({"temperature": [10, 15, 20, 25, 30], "sales": [54, 74, 90, 206, 210]})
+        >>> table.plot_lineplot("temperature", "sales")
         """
         if not self.has_column(x_column_name):
             raise UnknownColumnNameError([x_column_name])
@@ -1504,6 +1517,12 @@ class Table:
         ------
         UnknownColumnNameError
             If either of the columns do not exist.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table
+        >>> table = Table.from_dict({"temperature": [10, 15, 20, 25, 30], "sales": [54, 74, 90, 206, 210]})
+        >>> table.plot_scatterplot("temperature", "sales")
         """
         if not self.has_column(x_column_name):
             raise UnknownColumnNameError([x_column_name])
