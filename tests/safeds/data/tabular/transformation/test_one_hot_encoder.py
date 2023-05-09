@@ -1,7 +1,7 @@
 import pytest
 from safeds.data.tabular.containers import Table
 from safeds.data.tabular.transformation import OneHotEncoder
-from safeds.exceptions import TransformerNotFittedError, UnknownColumnNameError
+from safeds.exceptions import TransformerNotFittedError, UnknownColumnNameError, ValueNotPresentWhenFittedError
 
 
 class TestFit:
@@ -59,6 +59,23 @@ class TestTransform:
 
         with pytest.raises(TransformerNotFittedError):
             transformer.transform(table)
+
+    def test_should_raise_value_not_present_when_fitted(self) -> None:
+        fit_table = Table(
+            {
+                "col1": ["a"],
+            },
+        )
+        transform_table = Table(
+            {
+                "col1": ["b"],
+            },
+        )
+
+        transformer = OneHotEncoder().fit(fit_table, None)
+
+        with pytest.raises(ValueNotPresentWhenFittedError):
+            transformer.transform(transform_table)
 
 
 class TestIsFitted:
