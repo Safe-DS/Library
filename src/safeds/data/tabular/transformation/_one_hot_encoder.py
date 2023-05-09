@@ -209,7 +209,7 @@ class OneHotEncoder(InvertibleTableTransformer):
         for original_column_name in self._column_names:
             original_columns[original_column_name] = [None for _ in range(transformed_table.number_of_rows)]
 
-        for (original_column_name, value) in self._value_to_column:
+        for original_column_name, value in self._value_to_column:
             constructed_column = self._value_to_column[(original_column_name, value)]
             for i in range(transformed_table.number_of_rows):
                 if transformed_table.get_column(constructed_column)[i] == 1.0:
