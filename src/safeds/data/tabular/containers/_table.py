@@ -1270,7 +1270,7 @@ class Table:
         Parameters
         ----------
         percentage_in_first : float
-            The desired size of the first table in percentage to the given table.
+            The desired size of the first table in percentage to the given table; must be between 0 and 1.
 
         Returns
         -------
@@ -1278,7 +1278,15 @@ class Table:
             A tuple containing the two resulting tables. The first table has the specified size, the second table
             contains the rest of the data.
 
-
+        Examples
+        ---------
+        >>> from safeds.data.tabular.containers import Table
+        >>> table = Table.from_dict({"temperature": [10, 15, 20, 25, 30], "sales": [54, 74, 90, 206, 210]})
+        >>> slices = table.split(0.4)
+        >>> slices[0].to_dict()
+        {"temperature": [10, 15], "sales": [54, 74]}
+        >>> slices[1].to_dict()
+        {"temperature": [20, 25, 30], "sales": [90, 206, 210]}
         """
         if percentage_in_first <= 0 or percentage_in_first >= 1:
             raise ValueError("the given percentage is not in range")
@@ -1302,6 +1310,13 @@ class Table:
         -------
         tagged_table : TaggedTable
             A new tagged table with the given target and feature names.
+
+        Examples
+        -------
+        >>> from safeds.data.tabular.containers._table
+        >>> from safeds.data.tabular.containers._tagged_table
+        >>> table = Table.from_dict({"item": ["apple", "milk", "beer"], "price": [1.10, 1.19, 1.79], "amount_bought": [74, 72, 51]})
+        >>> tagged_table = table.tag_columns("amount_bought")
         """
         from ._tagged_table import TaggedTable
 
@@ -1321,6 +1336,13 @@ class Table:
         UnknownColumnNameError
             If the column does not exist.
 
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table
+        >>> table = Table.from_dict({"item": ["apple", "milk", "beer"], "price": [1.10, 1.19, 1.79]})
+        >>> cents = table.transform_column("price", lambda val: val * 100)
+        >>> cents.to_dict()
+        {"item": ["apple", "milk", "beer"], "price": [110, 119, 179]}
         """
         if self.has_column(name):
             items: list = [transformer(item) for item in self.to_rows()]
