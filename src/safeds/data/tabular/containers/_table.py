@@ -1450,6 +1450,13 @@ class Table:
         -------
         columns : list[Columns]
             List of columns.
+
+       Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table
+        >>> table = Table.from_dict({"a":[1, 2],"b":[20, 30]})
+        >>> columns = table.to_columns()
+        [[1, 2], [20, 30]]
         """
         return [self.get_column(name) for name in self._schema.column_names]
 
@@ -1461,6 +1468,13 @@ class Table:
         -------
         rows : list[Row]
             List of rows.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table
+        >>> table = Table.from_dict({"a":[1, 2],"b":[20, 30]})
+        >>> rows = table.to_rows()
+        [[1, 20], [2, 30]]
         """
         return [
             Row._from_pandas_dataframe(
