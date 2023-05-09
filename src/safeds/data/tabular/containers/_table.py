@@ -286,7 +286,6 @@ class Table:
 
     def __eq__(self, other: Any) -> bool:
         """
-
         Examples
         --------
         >>> from safeds.data.tabular.containers import Table
@@ -1262,13 +1261,23 @@ class Table:
         Parameters
         ----------
         percentage_in_first : float
-            The desired size of the first table in percentage to the given table.
+            The desired size of the first table in percentage to the given table; must be between 0 and 1.
 
         Returns
         -------
         result : (Table, Table)
             A tuple containing the two resulting tables. The first table has the specified size, the second table
             contains the rest of the data.
+
+        Examples
+        ---------
+        >>> from safeds.data.tabular.containers import Table
+        >>> table = Table.from_dict({"temperature": [10, 15, 20, 25, 30], "sales": [54, 74, 90, 206, 210]})
+        >>> slices = table.split(0.4)
+        >>> slices[0].to_dict()
+        {"temperature": [10, 15], "sales": [54, 74]}
+        >>> slices[1].to_dict()
+        {"temperature": [20, 25, 30], "sales": [90, 206, 210]}
         """
         if percentage_in_first <= 0 or percentage_in_first >= 1:
             raise ValueError("the given percentage is not in range")
@@ -1292,6 +1301,13 @@ class Table:
         -------
         tagged_table : TaggedTable
             A new tagged table with the given target and feature names.
+
+        Examples
+        -------
+        >>> from safeds.data.tabular.containers._table
+        >>> from safeds.data.tabular.containers._tagged_table
+        >>> table = Table.from_dict({"item": ["apple", "milk", "beer"], "price": [1.10, 1.19, 1.79], "amount_bought": [74, 72, 51]})
+        >>> tagged_table = table.tag_columns("amount_bought")
         """
         from ._tagged_table import TaggedTable
 
@@ -1310,6 +1326,14 @@ class Table:
         ------
         UnknownColumnNameError
             If the column does not exist.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table
+        >>> table = Table.from_dict({"item": ["apple", "milk", "beer"], "price": [1.10, 1.19, 1.79]})
+        >>> cents = table.transform_column("price", lambda val: val * 100)
+        >>> cents.to_dict()
+        {"item": ["apple", "milk", "beer"], "price": [110, 119, 179]}
         """
         if self.has_column(name):
             items: list = [transformer(item) for item in self.to_rows()]
@@ -1395,7 +1419,6 @@ class Table:
     # Plotting
     # ------------------------------------------------------------------------------------------------------------------
 
-    # todo example for this?
     def plot_correlation_heatmap(self) -> Image:
         """
         Plot a correlation heatmap for all numerical columns of this `Table`.
@@ -1404,6 +1427,13 @@ class Table:
         -------
         plot: Image
             The plot as an image.
+
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table
+        >>> table = Table.from_dict({"temperature": [10, 15, 20, 25, 30], "sales": [54, 74, 90, 206, 210]})
+        >>> table.plot_correlation_heatmap()
         """
         only_numerical = self.remove_columns_with_non_numerical_values()
 
@@ -1447,6 +1477,12 @@ class Table:
         ------
         UnknownColumnNameError
             If either of the columns do not exist.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table
+        >>> table = Table.from_dict({"temperature": [10, 15, 20, 25, 30], "sales": [54, 74, 90, 206, 210]})
+        >>> table.plot_lineplot("temperature", "sales")
         """
         if not self.has_column(x_column_name):
             raise UnknownColumnNameError([x_column_name])
@@ -1494,6 +1530,12 @@ class Table:
         ------
         UnknownColumnNameError
             If either of the columns do not exist.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table
+        >>> table = Table.from_dict({"temperature": [10, 15, 20, 25, 30], "sales": [54, 74, 90, 206, 210]})
+        >>> table.plot_scatterplot("temperature", "sales")
         """
         if not self.has_column(x_column_name):
             raise UnknownColumnNameError([x_column_name])
@@ -1536,6 +1578,12 @@ class Table:
         ----------
         path : str | Path
             The path to the output file.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table
+        >>> table = Table.from_dict({"a": [1, 2, 3], "b": [4, 5, 6]})
+        >>> table.to_json_file("./csv_files/csv.json")
         """
         Path(path).parent.mkdir(parents=True, exist_ok=True)
         data_to_csv = self._data.copy()
@@ -1553,6 +1601,12 @@ class Table:
         ----------
         path : str | Path
             The path to the output file.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table
+        >>> table = Table.from_dict({"a": [1, 2, 3], "b": [4, 5, 6]})
+        >>> table.to_json_file("./json_files/table.json")
         """
         Path(path).parent.mkdir(parents=True, exist_ok=True)
         data_to_json = self._data.copy()
@@ -1567,6 +1621,16 @@ class Table:
         -------
         data : dict[str, list[Any]]
             Dictionary representation of the table.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table
+        table:    a  b
+            0     1  4
+            1     2  5
+            2     3  6
+        >>> table.to_dict()
+        {"a": [1, 2, 3], "b": [4, 5, 6]}
         """
         return {column_name: list(self.get_column(column_name)) for column_name in self.column_names}
 
@@ -1578,6 +1642,12 @@ class Table:
         -------
         output : str
             The generated HTML.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table
+        >>> table = Table.from_dict({"a": [1, 2, 3], "b": [4, 5, 6]})
+        >>> html = table.to_html()
         """
         return self._data.to_html(max_rows=self._data.shape[0], max_cols=self._data.shape[1])
 
@@ -1589,6 +1659,13 @@ class Table:
         -------
         columns : list[Columns]
             List of columns.
+
+       Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table
+        >>> table = Table.from_dict({"a":[1, 2],"b":[20, 30]})
+        >>> columns = table.to_columns()
+        [[1, 2], [20, 30]]
         """
         return [self.get_column(name) for name in self._schema.column_names]
 
@@ -1600,6 +1677,13 @@ class Table:
         -------
         rows : list[Row]
             List of rows.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table
+        >>> table = Table.from_dict({"a":[1, 2],"b":[20, 30]})
+        >>> rows = table.to_rows()
+        [[1, 20], [2, 30]]
         """
         return [
             Row._from_pandas_dataframe(
