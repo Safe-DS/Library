@@ -85,3 +85,10 @@ class TransformerNotFittedError(Exception):
 
     def __init__(self) -> None:
         super().__init__("The transformer has not been fitted yet.")
+
+
+class ValueNotPresentWhenFittedError(Exception):
+    """Exception raised when attempting to one-hot-encode a table containing values not present in the fitting phase."""
+
+    def __init__(self, value: str, column: str) -> None:
+        super().__init__(f"Value not present in the table the transformer was fitted on: \n{value} in column {column}.")

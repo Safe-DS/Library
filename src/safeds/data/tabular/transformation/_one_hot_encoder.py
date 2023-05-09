@@ -9,6 +9,8 @@ from safeds.data.tabular.transformation._table_transformer import (
 )
 from safeds.exceptions import TransformerNotFittedError, UnknownColumnNameError
 
+from src.safeds.exceptions._data import ValueNotPresentWhenFittedError
+
 
 class OneHotEncoder(InvertibleTableTransformer):
     """
@@ -153,9 +155,12 @@ class OneHotEncoder(InvertibleTableTransformer):
         for old_column_name in self._column_names:
             for i in range(table.number_of_rows):
                 value = table.get_column(old_column_name).get_value(i)
-                new_column_name = self._value_to_column[(old_column_name, value)]
-                # TODO: Catch KeyError (this concrete value did not exist in the table the transformer was fitted on)
-                #       and raise user-understandable Error/Exception.
+                try:
+                    new_column_name = self._value_to_column[(old_column_name, value)]
+                except KeyError:
+                    # This happens when a column in the to-be-transformed table contains a new value that was not
+                    # already present in the table the OneHotEncoder was fitted on.
+                    raise ValueNotPresentWhenFittedError(value, old_column_name) from None
                 encoded_values[new_column_name][i] = 1.0
 
             for new_column in self._column_names[old_column_name]:
