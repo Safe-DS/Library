@@ -729,6 +729,18 @@ class Table:
         table : Table
             A new table with the added row at the end.
 
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table
+        >>> from safeds.data.tabular.containers import Row
+        >>> row_1 = Row.from_dict({"a": 1, "b": 2})
+        >>> table = Table.from_rows([row_1])
+        >>> row_2 = Row.from_dict({"a": 3, "b": 4})
+        >>> new_table = table.add_row(row_2)
+           a  b
+        0  1  2
+        1  3  4
+
         """
         if self._schema != row.schema:
             raise SchemaMismatchError
@@ -750,6 +762,20 @@ class Table:
         -------
         result : Table
             A new table which combines the original table and the given rows.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table
+        >>> from safeds.data.tabular.containers import Row
+        >>> row_1 = Row.from_dict({"a": 1, "b": 2})
+        >>> table = Table.from_rows([row_1])
+        >>> row_2 = Row.from_dict({"a": 3, "b": 4})
+        >>> row_3 = Row.from_dict({"a": 5, "b": 6})
+        >>> new_table = table.add_rows([row_2, row_3])
+           a  b
+        0  1  2
+        1  3  4
+        2  5  6
         """
         if isinstance(rows, Table):
             rows = rows.to_rows()
@@ -777,6 +803,17 @@ class Table:
         -------
         table : Table
             A table containing only the rows filtered by the query.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table
+        >>> from safeds.data.tabular.containers import Row
+        >>> row_1 = Row.from_dict({"a": 1, "b": 2})
+        >>> row_2 = Row.from_dict({"a": 3, "b": 4})
+        >>> table = Table.from_rows([row_1, row_2])
+        >>> new_table = table.filter_rows(lambda x: x["a"] < 2)
+           a  b
+        0  1  2
         """
         rows: list[Row] = [row for row in self.to_rows() if query(row)]
         if len(rows) == 0:
@@ -803,6 +840,19 @@ class Table:
         ------
         ColumnNameError
             If any of the given columns does not exist.
+
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table
+        >>> from safeds.data.tabular.containers import Row
+        >>> row_1 = Row.from_dict({"a": 1, "b": 2})
+        >>> row_2 = Row.from_dict({"a": 3, "b": 4})
+        >>> table = Table.from_rows([row_1, row_2])
+        >>> new_table = table.keep_only_columns(["b"])
+           b
+        0  2
+        1  4
         """
         invalid_columns = []
         for name in column_names:
@@ -833,6 +883,19 @@ class Table:
         ------
         ColumnNameError
             If any of the given columns does not exist.
+
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table
+        >>> from safeds.data.tabular.containers import Row
+        >>> row_1 = Row.from_dict({"a": 1, "b": 2})
+        >>> row_2 = Row.from_dict({"a": 3, "b": 4})
+        >>> table = Table.from_rows([row_1, row_2])
+        >>> new_table = table.remove_columns(["b"])
+           a
+        0  1
+        1  3
         """
         invalid_columns = []
         for name in column_names:
@@ -853,6 +916,19 @@ class Table:
         -------
         table : Table
             A table without the columns that contain missing values.
+
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table
+        >>> from safeds.data.tabular.containers import Row
+        >>> row_1 = Row.from_dict({"a": 1, "b": None})
+        >>> row_2 = Row.from_dict({"a": 3, "b": None})
+        >>> table = Table.from_rows([row_1, row_2])
+        >>> new_table = table.remove_columns_with_missing_values()
+           a
+        0  1
+        1  3
         """
         return Table.from_columns([column for column in self.to_columns() if not column.has_missing_values()])
 
@@ -865,6 +941,18 @@ class Table:
         table : Table
             A table without the columns that contain non-numerical values.
 
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table
+        >>> from safeds.data.tabular.containers import Row
+        >>> row_1 = Row.from_dict({"a": 1, "b": "test"})
+        >>> row_2 = Row.from_dict({"a": 3, "b": "test"})
+        >>> table = Table.from_rows([row_1, row_2])
+        >>> table.remove_columns_with_non_numerical_values()
+           a
+        0  1
+        1  3
         """
         return Table.from_columns([column for column in self.to_columns() if column.type.is_numeric()])
 
@@ -876,6 +964,20 @@ class Table:
         -------
         result : Table
             The table with the duplicate rows removed.
+
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table
+        >>> from safeds.data.tabular.containers import Row
+        >>> row_1 = Row.from_dict({"a": 1, "b": 2})
+        >>> row_2 = Row.from_dict({"a": 3, "b": 4})
+        >>> row_3 = Row.from_dict({"a": 3, "b": 4})
+        >>> table = Table.from_rows([row_1, row_2, row_3])
+        >>> new_table = table.remove_duplicate_rows()
+           a  b
+        0  1  2
+        1  3  4
         """
         result = self._data.drop_duplicates(ignore_index=True)
         result.columns = self._schema.column_names
@@ -889,10 +991,12 @@ class Table:
         -------
         table : Table
             A table without the rows that contain missing values.
+        # todo how does that work?
         """
         result = self._data.copy(deep=True)
         result = result.dropna(axis="index")
         return Table(result, self._schema)
+
 
     def remove_rows_with_outliers(self) -> Table:
         """
@@ -906,6 +1010,8 @@ class Table:
         -------
         new_table : Table
             A new table without rows containing outliers.
+
+        # todo does this work properly?
         """
         copy = self._data.copy(deep=True)
 
@@ -937,6 +1043,17 @@ class Table:
             If the specified old target column name does not exist.
         DuplicateColumnNameError
             If the specified new target column name already exists.
+
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table
+        >>> from safeds.data.tabular.containers import Row
+        >>> row = Row.from_dict({"a": 1, "b": 2})
+        >>> table = Table.from_rows([row])
+        >>> new_table = table.rename_column("b", "c")
+           a  c
+        0  1  2
         """
         if old_name not in self._schema.column_names:
             raise UnknownColumnNameError([old_name])
@@ -976,6 +1093,17 @@ class Table:
 
         ColumnSizeError
             If the size of the column does not match the amount of rows.
+
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table
+        >>> from safeds.data.tabular.containers import Row
+        >>> from safeds.data.tabular.containers import Column
+        >>> row = Row.from_dict({"a": 1, "b": 2})
+        >>> table = Table.from_rows([row])
+        >>> new_column = Column("new", [3])
+        >>> new_table = table.replace_column("b", new_column)
         """
         if old_column_name not in self._schema.column_names:
             raise UnknownColumnNameError([old_column_name])
@@ -1006,6 +1134,20 @@ class Table:
         result : Table
             The shuffled Table.
 
+        #todo set seed in example?
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table
+        >>> from safeds.data.tabular.containers import Row
+        >>> row_1 = Row.from_dict({"a": 1, "b": 2})
+        >>> row_2 = Row.from_dict({"a": 3, "b": 4})
+        >>> row_3 = Row.from_dict({"a": 5, "b": 6})
+        >>> table = Table.from_rows([row_1, row_2, row_3])
+        >>> new_table = table.shuffle_rows()
+           a  b
+        0  1  2
+        1  5  6
+        2  3  4
         """
         new_df = self._data.sample(frac=1.0)
         new_df.columns = self._schema.column_names
@@ -1038,6 +1180,19 @@ class Table:
         ------
         ValueError
             If the index is out of bounds.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table
+        >>> from safeds.data.tabular.containers import Row
+        >>> row_1 = Row.from_dict({"a": 1, "b": 2})
+        >>> row_2 = Row.from_dict({"a": 3, "b": 4})
+        >>> row_3 = Row.from_dict({"a": 5, "b": 6})
+        >>> table = Table.from_rows([row_1, row_2, row_3])
+        >>> new_table = table.slice_rows(0, 2)
+           a  b
+        0  1  2
+        1  3  4
         """
         if start is None:
             start = 0
