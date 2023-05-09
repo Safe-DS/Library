@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from collections import Counter
+from typing import Any
 
 from safeds.data.tabular.containers import Column, Table
 from safeds.data.tabular.transformation._table_transformer import (
@@ -54,7 +55,7 @@ class OneHotEncoder(InvertibleTableTransformer):
         # Maps each old column to (list of) new columns created from it:
         self._column_names: dict[str, list[str]] | None = None
         # Maps concrete values (tuples of old column and value) to corresponding new column names:
-        self._value_to_column: dict[tuple[str, any], str] | None = None
+        self._value_to_column: dict[tuple[str, Any], str] | None = None
 
     # noinspection PyProtectedMember
     def fit(self, table: Table, column_names: list[str] | None) -> OneHotEncoder:
@@ -245,4 +246,4 @@ class OneHotEncoder(InvertibleTableTransformer):
         is_fitted : bool
             Whether the transformer is fitted.
         """
-        return self._column_names is not None
+        return self._column_names is not None and self._value_to_column is not None
