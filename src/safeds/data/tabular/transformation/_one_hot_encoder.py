@@ -98,8 +98,7 @@ class OneHotEncoder(InvertibleTableTransformer):
         for column in column_names:
             result._column_names[column] = []
             for element in table.get_column(column).get_unique_values():
-                # TODO: Change to double underscore and change tests accordingly.
-                base_name = f"{column}_{element}"
+                base_name = f"{column}__{element}"
                 name_counter[base_name] += 1
                 new_column_name = base_name
                 # Check if newly created name matches some other existing column name:
@@ -164,7 +163,6 @@ class OneHotEncoder(InvertibleTableTransformer):
         # Drop corresponding old columns:
         new_table = new_table.remove_columns(list(self._column_names.keys()))
 
-        #res = Table._from_pandas_dataframe(pd.concat([unchanged, one_hot_encoded], axis=1))
         column_names = []
 
         for name in table.column_names:
@@ -222,7 +220,6 @@ class OneHotEncoder(InvertibleTableTransformer):
         # Drop old column names:
         new_table = new_table.remove_columns(list(self._value_to_column.values()))
 
-        #res = Table._from_pandas_dataframe(pd.concat([unchanged, decoded], axis=1))
         column_names = [
             (
                 name
