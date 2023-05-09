@@ -1,8 +1,8 @@
 import pytest
 from safeds.data.tabular.containers import Table
-from safeds.data.tabular.exceptions import TransformerNotFittedError, UnknownColumnNameError
 from safeds.data.tabular.transformation import Imputer
 from safeds.data.tabular.typing import ImputerStrategy
+from safeds.exceptions import TransformerNotFittedError, UnknownColumnNameError
 
 
 class TestStrategy:
@@ -22,7 +22,7 @@ class TestStrategy:
 
 class TestFit:
     def test_should_raise_if_column_not_found(self) -> None:
-        table = Table.from_dict(
+        table = Table(
             {
                 "a": [1, 3, None],
             },
@@ -32,7 +32,7 @@ class TestFit:
             Imputer(Imputer.Strategy.Constant(0)).fit(table, ["b"])
 
     def test_should_not_change_original_transformer(self) -> None:
-        table = Table.from_dict(
+        table = Table(
             {
                 "a": [1, 3, None],
             },
@@ -47,7 +47,7 @@ class TestFit:
 
 class TestTransform:
     def test_should_raise_if_column_not_found(self) -> None:
-        table_to_fit = Table.from_dict(
+        table_to_fit = Table(
             {
                 "a": [1, 3, None],
             },
@@ -55,7 +55,7 @@ class TestTransform:
 
         transformer = Imputer(Imputer.Strategy.Constant(0)).fit(table_to_fit, None)
 
-        table_to_transform = Table.from_dict(
+        table_to_transform = Table(
             {
                 "b": [1, 3, None],
             },
@@ -65,7 +65,7 @@ class TestTransform:
             transformer.transform(table_to_transform)
 
     def test_should_raise_if_not_fitted(self) -> None:
-        table = Table.from_dict(
+        table = Table(
             {
                 "a": [1, 3, None],
             },
@@ -83,7 +83,7 @@ class TestIsFitted:
         assert not transformer.is_fitted()
 
     def test_should_return_true_after_fitting(self) -> None:
-        table = Table.from_dict(
+        table = Table(
             {
                 "a": [1, 3, None],
             },
@@ -99,63 +99,63 @@ class TestFitAndTransform:
         ("table", "column_names", "strategy", "expected"),
         [
             (
-                Table.from_dict(
+                Table(
                     {
                         "a": [1.0, 3.0, None],
                     },
                 ),
                 None,
                 Imputer.Strategy.Constant(0.0),
-                Table.from_dict(
+                Table(
                     {
                         "a": [1.0, 3.0, 0.0],
                     },
                 ),
             ),
             (
-                Table.from_dict(
+                Table(
                     {
                         "a": [1.0, 3.0, None],
                     },
                 ),
                 None,
                 Imputer.Strategy.Mean(),
-                Table.from_dict(
+                Table(
                     {
                         "a": [1.0, 3.0, 2.0],
                     },
                 ),
             ),
             (
-                Table.from_dict(
+                Table(
                     {
                         "a": [1.0, 3.0, 1.0, None],
                     },
                 ),
                 None,
                 Imputer.Strategy.Median(),
-                Table.from_dict(
+                Table(
                     {
                         "a": [1.0, 3.0, 1.0, 1.0],
                     },
                 ),
             ),
             (
-                Table.from_dict(
+                Table(
                     {
                         "a": [1.0, 3.0, 3.0, None],
                     },
                 ),
                 None,
                 Imputer.Strategy.Mode(),
-                Table.from_dict(
+                Table(
                     {
                         "a": [1.0, 3.0, 3.0, 3.0],
                     },
                 ),
             ),
             (
-                Table.from_dict(
+                Table(
                     {
                         "a": [1.0, 3.0, None],
                         "b": [1.0, 3.0, None],
@@ -163,7 +163,7 @@ class TestFitAndTransform:
                 ),
                 ["a"],
                 Imputer.Strategy.Constant(0.0),
-                Table.from_dict(
+                Table(
                     {
                         "a": [1.0, 3.0, 0.0],
                         "b": [1.0, 3.0, None],
@@ -182,7 +182,7 @@ class TestFitAndTransform:
         assert Imputer(strategy).fit_and_transform(table, column_names) == expected
 
     def test_should_raise_if_strategy_is_mode_but_multiple_values_are_most_frequent(self) -> None:
-        table = Table.from_dict(
+        table = Table(
             {
                 "a": [1, 2, 3, None],
             },
@@ -192,7 +192,7 @@ class TestFitAndTransform:
             Imputer(Imputer.Strategy.Mode()).fit_and_transform(table)
 
     def test_should_not_change_original_table(self) -> None:
-        table = Table.from_dict(
+        table = Table(
             {
                 "a": [1, None, None],
             },
@@ -200,7 +200,7 @@ class TestFitAndTransform:
 
         Imputer(strategy=Imputer.Strategy.Constant(1)).fit_and_transform(table)
 
-        expected = Table.from_dict(
+        expected = Table(
             {
                 "a": [1, None, None],
             },

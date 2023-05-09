@@ -1,6 +1,6 @@
 import pytest
 from safeds.data.tabular.containers import Column, Table
-from safeds.data.tabular.exceptions import (
+from safeds.exceptions import (
     ColumnSizeError,
     DuplicateColumnNameError,
     UnknownColumnNameError,
@@ -11,7 +11,7 @@ from safeds.data.tabular.exceptions import (
     ("table", "column_name", "column", "expected"),
     [
         (
-            Table.from_dict(
+            Table(
                 {
                     "A": [1, 2, 3],
                     "B": [4, 5, 6],
@@ -20,7 +20,7 @@ from safeds.data.tabular.exceptions import (
             ),
             "C",
             Column("C", ["d", "e", "f"]),
-            Table.from_dict(
+            Table(
                 {
                     "A": [1, 2, 3],
                     "B": [4, 5, 6],
@@ -29,7 +29,7 @@ from safeds.data.tabular.exceptions import (
             ),
         ),
         (
-            Table.from_dict(
+            Table(
                 {
                     "A": [1, 2, 3],
                     "B": [4, 5, 6],
@@ -38,7 +38,7 @@ from safeds.data.tabular.exceptions import (
             ),
             "C",
             Column("D", ["d", "e", "f"]),
-            Table.from_dict(
+            Table(
                 {
                     "A": [1, 2, 3],
                     "B": [4, 5, 6],
@@ -48,7 +48,7 @@ from safeds.data.tabular.exceptions import (
         ),
     ],
 )
-def test_replace_valid(table: Table, column_name: str, column: Column, expected: Table) -> None:
+def test_should_replace_column(table: Table, column_name: str, column: Column, expected: Table) -> None:
     result = table.replace_column(column_name, column)
     assert result == expected
 
@@ -60,14 +60,15 @@ def test_replace_valid(table: Table, column_name: str, column: Column, expected:
         ("C", ["d", "e", "f"], "B", DuplicateColumnNameError),
         ("C", ["d", "e"], "D", ColumnSizeError),
     ],
+    ids=["UnknownColumnNameError", "DuplicateColumnNameError", "ColumnSizeError"],
 )
-def test_replace_invalid(
+def test_should_raise_error(
     old_column_name: str,
     column_values: list[str],
     column_name: str,
     error: type[Exception],
 ) -> None:
-    input_table: Table = Table.from_dict(
+    input_table: Table = Table(
         {
             "A": [1, 2, 3],
             "B": [4, 5, 6],

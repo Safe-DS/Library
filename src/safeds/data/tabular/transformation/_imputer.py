@@ -6,9 +6,9 @@ import pandas as pd
 from sklearn.impute import SimpleImputer as sk_SimpleImputer
 
 from safeds.data.tabular.containers import Table
-from safeds.data.tabular.exceptions import TransformerNotFittedError, UnknownColumnNameError
 from safeds.data.tabular.transformation._table_transformer import TableTransformer
 from safeds.data.tabular.typing import ImputerStrategy
+from safeds.exceptions import TransformerNotFittedError, UnknownColumnNameError
 
 
 class Imputer(TableTransformer):
@@ -94,6 +94,8 @@ class Imputer(TableTransformer):
         """
         Learn a transformation for a set of columns in a table.
 
+        This transformer is not modified.
+
         Parameters
         ----------
         table : Table
@@ -133,6 +135,8 @@ class Imputer(TableTransformer):
         """
         Apply the learned transformation to a table.
 
+        The table is not modified.
+
         Parameters
         ----------
         table : Table
@@ -162,7 +166,7 @@ class Imputer(TableTransformer):
             self._wrapped_transformer.transform(data[self._column_names]),
             columns=self._column_names,
         )
-        return Table(data, table.schema)
+        return Table._from_pandas_dataframe(data, table.schema)
 
     def is_fitted(self) -> bool:
         """

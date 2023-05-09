@@ -3,14 +3,52 @@ from __future__ import annotations
 from collections import Counter
 
 from safeds.data.tabular.containers import Column, Table
-from safeds.data.tabular.exceptions import TransformerNotFittedError, UnknownColumnNameError
 from safeds.data.tabular.transformation._table_transformer import (
     InvertibleTableTransformer,
 )
+from safeds.exceptions import TransformerNotFittedError, UnknownColumnNameError
 
 
 class OneHotEncoder(InvertibleTableTransformer):
-    """Encodes categorical columns to numerical features [0,1] that represent the existence for each value."""
+    """
+    A way to deal with categorical features that is particularly useful for unordered (i.e. nominal) data.
+
+    It replaces a column with a set of columns, each representing a unique value in the original column. The value of
+    each new column is 1 if the original column had that value, and 0 otherwise. Take the following table as an
+    example:
+
+    | col1 |
+    |------|
+    | "a"  |
+    | "b"  |
+    | "c"  |
+    | "a"  |
+
+    The one-hot encoding of this table is:
+
+    | col1_a | col1_b | col1_c |
+    |--------|--------|--------|
+    | 1      | 0      | 0      |
+    | 0      | 1      | 0      |
+    | 0      | 0      | 1      |
+    | 1      | 0      | 0      |
+
+    The name "one-hot" comes from the fact that each row has exactly one 1 in it, and the rest of the values are 0s.
+    One-hot encoding is closely related to dummy variable / indicator variables, which are used in statistics.
+
+    Examples
+    --------
+    >>> from safeds.data.tabular.containers import Table
+    >>> from safeds.data.tabular.transformation import OneHotEncoder
+    >>> table = Table({"col1": ["a", "b", "c", "a"]})
+    >>> transformer = OneHotEncoder()
+    >>> transformer.fit_and_transform(table, ["col1"])
+       col1_a  col1_b  col1_c
+    0     1.0     0.0     0.0
+    1     0.0     1.0     0.0
+    2     0.0     0.0     1.0
+    3     1.0     0.0     0.0
+    """
 
     def __init__(self) -> None:
         # Maps each old column to (list of) new columns created from it:
@@ -22,6 +60,8 @@ class OneHotEncoder(InvertibleTableTransformer):
     def fit(self, table: Table, column_names: list[str] | None) -> OneHotEncoder:
         """
         Learn a transformation for a set of columns in a table.
+
+        This transformer is not modified.
 
         Parameters
         ----------
@@ -76,6 +116,8 @@ class OneHotEncoder(InvertibleTableTransformer):
         """
         Apply the learned transformation to a table.
 
+        The table is not modified.
+
         Parameters
         ----------
         table : Table
@@ -122,6 +164,7 @@ class OneHotEncoder(InvertibleTableTransformer):
         # Drop corresponding old columns:
         new_table = new_table.remove_columns(list(self._column_names.keys()))
 
+        #res = Table._from_pandas_dataframe(pd.concat([unchanged, one_hot_encoded], axis=1))
         column_names = []
 
         for name in table.column_names:
@@ -137,6 +180,8 @@ class OneHotEncoder(InvertibleTableTransformer):
     def inverse_transform(self, transformed_table: Table) -> Table:
         """
         Undo the learned transformation.
+
+        The table is not modified.
 
         Parameters
         ----------
@@ -177,16 +222,19 @@ class OneHotEncoder(InvertibleTableTransformer):
         # Drop old column names:
         new_table = new_table.remove_columns(list(self._value_to_column.values()))
 
+        #res = Table._from_pandas_dataframe(pd.concat([unchanged, decoded], axis=1))
         column_names = [
-            name
-            if name not in [value for value_list in list(self._column_names.values()) for value in value_list]
-            else list(self._column_names.keys())[
-                [
-                    list(self._column_names.values()).index(value)
-                    for value in list(self._column_names.values())
-                    if name in value
-                ][0]
-            ]
+            (
+                name
+                if name not in [value for value_list in list(self._column_names.values()) for value in value_list]
+                else list(self._column_names.keys())[
+                    [
+                        list(self._column_names.values()).index(value)
+                        for value in list(self._column_names.values())
+                        if name in value
+                    ][0]
+                ]
+            )
             for name in transformed_table.column_names
         ]
         return new_table.sort_columns(lambda col1, col2: column_names.index(col1.name) - column_names.index(col2.name))
