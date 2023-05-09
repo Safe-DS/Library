@@ -11,7 +11,7 @@ nav:
     - Data Visualization: tutorials/data_visualization.ipynb
     - Machine Learning: tutorials/machine_learning.ipynb
   - API Reference: reference/
-  - Glossary: includes/glossary.md
+  - Glossary: glossary.md
   - Development:
     - Environment: development/environment.md
     - Guidelines: development/guidelines.md
@@ -87,9 +87,7 @@ markdown_extensions:
   - pymdownx.highlight:
       anchor_linenums: true
   - pymdownx.inlinehilite
-  - pymdownx.snippets:
-      auto_append:
-        - includes/glossary.md
+  - pymdownx.snippets
 
 
   # Diagrams
