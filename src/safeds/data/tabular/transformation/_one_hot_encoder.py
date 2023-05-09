@@ -2,9 +2,7 @@ from __future__ import annotations
 
 from collections import Counter
 
-import pandas as pd
-
-from safeds.data.tabular.containers import Table, Column
+from safeds.data.tabular.containers import Column, Table
 from safeds.data.tabular.exceptions import TransformerNotFittedError, UnknownColumnNameError
 from safeds.data.tabular.transformation._table_transformer import (
     InvertibleTableTransformer,
@@ -15,9 +13,9 @@ class OneHotEncoder(InvertibleTableTransformer):
     """Encodes categorical columns to numerical features [0,1] that represent the existence for each value."""
 
     def __init__(self) -> None:
-        # Maps old to new column names (useful for reversing the transformation):
+        # Maps each old column to (list of) new columns created from it:
         self._column_names: dict[str, list[str]] | None = None
-        # Maps concrete values to new column names:
+        # Maps concrete values (tuples of old column and value) to corresponding new column names:
         self._value_to_column: dict[tuple[str, any], str] | None = None
 
     # noinspection PyProtectedMember
@@ -53,7 +51,7 @@ class OneHotEncoder(InvertibleTableTransformer):
         result._value_to_column = {}
 
         # Keep track of number of occurrences of column names;
-        # initially all old column names appear exactly ones:
+        # initially all old column names appear exactly once:
         name_counter = Counter(data.columns)
 
         # Iterate through all columns to-be-changed:
@@ -66,7 +64,8 @@ class OneHotEncoder(InvertibleTableTransformer):
                 # Check if newly created name matches some other existing column name:
                 if name_counter[base_name] > 1:
                     new_column_name += f"#{name_counter[base_name]}"
-                result._column_names[column].append(new_column_name)
+                # Update dictionary entries:
+                result._column_names[column] += [new_column_name]
                 result._value_to_column[(column, element)] = new_column_name
 
         return result
@@ -92,8 +91,7 @@ class OneHotEncoder(InvertibleTableTransformer):
             If the transformer has not been fitted yet.
         """
         # Transformer has not been fitted yet
-        # (may change this to a call to is_fitted() ?)
-        if self._column_names is None:
+        if not self.is_fitted():
             raise TransformerNotFittedError
 
         # Input table does not contain all columns used to fit the transformer
@@ -103,12 +101,11 @@ class OneHotEncoder(InvertibleTableTransformer):
 
         # Make a copy of the table:
         # TODO: change to copy method once implemented
-        # (Can also instead call remove_columns already here once #276 is fixed)
         new_table = table.remove_columns([])
 
         encoded_values = {}
         for new_column_name in self._value_to_column.values():
-            encoded_values[new_column_name] = [0.0 for i in range(table.number_of_rows)]
+            encoded_values[new_column_name] = [0.0 for _ in range(table.number_of_rows)]
 
         for old_column_name in self._column_names:
             for i in range(table.number_of_rows):
@@ -119,7 +116,7 @@ class OneHotEncoder(InvertibleTableTransformer):
             for new_column in self._column_names[old_column_name]:
                 new_table = new_table.add_column(Column(new_column, encoded_values[new_column]))
 
-        # Drop those column names affected by the OneHotEncoder:
+        # Drop corresponding old columns:
         new_table = new_table.remove_columns(list(self._column_names.keys()))
 
         column_names = []
@@ -131,9 +128,7 @@ class OneHotEncoder(InvertibleTableTransformer):
                 column_names.extend(
                     [f_name for f_name in self._value_to_column.values() if f_name.startswith(name)],
                 )
-        new_table = new_table.sort_columns(lambda col1, col2: column_names.index(col1.name) - column_names.index(col2.name))
-
-        return new_table
+        return new_table.sort_columns(lambda col1, col2: column_names.index(col1.name) - column_names.index(col2.name))
 
     # noinspection PyProtectedMember
     def inverse_transform(self, transformed_table: Table) -> Table:
@@ -155,19 +150,17 @@ class OneHotEncoder(InvertibleTableTransformer):
         TransformerNotFittedError
             If the transformer has not been fitted yet.
         """
-        #raise NotImplementedError
         # Transformer has not been fitted yet
-        if self._column_names is None:
+        if not self.is_fitted():
             raise TransformerNotFittedError
 
         # Make a copy of the table:
         # TODO: change to copy method once implemented
-        # (Can also instead call remove_columns already here once #276 is fixed)
         new_table = transformed_table.remove_columns([])
 
         original_columns = {}
         for original_column_name in self._column_names:
-            original_columns[original_column_name] = [None for i in range(transformed_table.number_of_rows)]
+            original_columns[original_column_name] = [None for _ in range(transformed_table.number_of_rows)]
 
         for (original_column_name, value) in self._value_to_column:
             constructed_column = self._value_to_column[(original_column_name, value)]
@@ -178,7 +171,7 @@ class OneHotEncoder(InvertibleTableTransformer):
         for column_name, encoded_column in original_columns.items():
             new_table = new_table.add_column(Column(column_name, encoded_column))
 
-        # Drop those column names affected by the OneHotEncoder:
+        # Drop old column names:
         new_table = new_table.remove_columns(list(self._value_to_column.values()))
 
         column_names = [
