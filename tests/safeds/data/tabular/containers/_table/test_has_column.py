@@ -1,11 +1,11 @@
+import pytest
 from safeds.data.tabular.containers import Table
 
 
-def test_has_column_positive() -> None:
-    table = Table.from_dict({"A": [1], "B": [2]})
-    assert table.has_column("A")
-
-
-def test_has_column_negative() -> None:
-    table = Table.from_dict({"A": [1], "B": [2]})
-    assert not table.has_column("C")
+@pytest.mark.parametrize(
+    ("table", "column", "expected"),
+    [(Table.from_dict({"A": [1], "B": [2]}), "A", True), (Table.from_dict({"A": [1], "B": [2]}), "C", False)],
+    ids=["has column", "doesn't have column"],
+)
+def test_should_return_if_column_is_in_table(table: Table, column: str, expected: bool) -> None:
+    assert table.has_column(column) == expected
