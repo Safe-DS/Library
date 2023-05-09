@@ -134,7 +134,7 @@ class OneHotEncoder(InvertibleTableTransformer):
             If the transformer has not been fitted yet.
         """
         # Transformer has not been fitted yet
-        if not self.is_fitted():
+        if self._column_names is None or self._value_to_column is None:
             raise TransformerNotFittedError
 
         # Input table does not contain all columns used to fit the transformer
@@ -198,7 +198,7 @@ class OneHotEncoder(InvertibleTableTransformer):
             If the transformer has not been fitted yet.
         """
         # Transformer has not been fitted yet
-        if not self.is_fitted():
+        if self._column_names is None or self._value_to_column is None:
             raise TransformerNotFittedError
 
         # Make a copy of the table:
