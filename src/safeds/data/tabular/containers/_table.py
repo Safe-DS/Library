@@ -312,6 +312,7 @@ class Table:
 
     def __repr__(self) -> str:
         """
+
         Returns
         -------
 
@@ -373,7 +374,7 @@ class Table:
         --------
         >>> from safeds.data.tabular.containers import Table
         >>> table = Table.from_dict({"a": [1], "b": [2]})
-        >>> table.number_of_columns
+        >>> table.n_columns
         2
         """
         return self._data.shape[1]
@@ -392,7 +393,7 @@ class Table:
         --------
         >>> from safeds.data.tabular.containers import Table
         >>> table = Table.from_dict({"a": [1], "b": [2]})
-        >>> table.number_of_rows
+        >>> table.n_rows
         1
         """
         return self._data.shape[0]
@@ -1289,7 +1290,7 @@ class Table:
             contains the rest of the data.
 
         Examples
-        ---------
+        --------
         >>> from safeds.data.tabular.containers import Table
         >>> table = Table.from_dict({"temperature": [10, 15, 20, 25, 30], "sales": [54, 74, 90, 206, 210]})
         >>> slices = table.split(0.4)
@@ -1322,7 +1323,7 @@ class Table:
             A new tagged table with the given target and feature names.
 
         Examples
-        -------
+        --------
         >>> from safeds.data.tabular.containers._table
         >>> from safeds.data.tabular.containers._tagged_table
         >>> table = Table.from_dict({"item": ["apple", "milk", "beer"], "price": [1.10, 1.19, 1.79], "amount_bought": [74, 72, 51]})
