@@ -314,8 +314,9 @@ class Table:
         """
         Returns
         -------
+
         Examples
-        -------
+        --------
         >>> from safeds.data.tabular.containers import Table
         >>> table = Table.from_dict({"col1": [1, 3], "col2": [2, 4]})
         >>> repr(table)
@@ -387,7 +388,6 @@ class Table:
         n_rows : int
             The number of rows.
 
-
         Examples
         --------
         >>> from safeds.data.tabular.containers import Table
@@ -407,13 +407,12 @@ class Table:
         schema : Schema
             The schema.
 
-
         Examples
         --------
         >>> from safeds.data.tabular.containers import Table
         >>> from safeds.data.tabular.containers import Row
         >>> row = Row({"a": 1, "b": 2.5, "c": [3, 4]})
-        >>> table = Table.from_dict({"a": [1], "b": [2.5], "c": [[3, 4]]}))
+        >>> table = Table.from_dict({"a": [1], "b": [2.5], "c": [[3, 4]]})
         >>> table.schema
         {
             'a': Integer,
@@ -685,7 +684,7 @@ class Table:
         >>> table = Table.from_dict({"a": [1, 3], "b": [2, 4]})
         >>> col1 = Column("c", ["d", "e"])
         >>> col2 = Column("d", [3.5, 7.9])
-        >>> table.add_columns([col1, col2])
+        >>> new_table = table.add_columns([col1, col2])
            a  b  c    d
         0  1  2  d  3.5
         1  3  4  e  7.9
@@ -825,7 +824,6 @@ class Table:
         ColumnNameError
             If any of the given columns does not exist.
 
-
         Examples
         --------
         >>> from safeds.data.tabular.containers import Table
@@ -864,7 +862,6 @@ class Table:
         ------
         ColumnNameError
             If any of the given columns does not exist.
-
 
         Examples
         --------
@@ -934,7 +931,6 @@ class Table:
         result : Table
             The table with the duplicate rows removed.
 
-
         Examples
         --------
         >>> from safeds.data.tabular.containers import Table
@@ -956,7 +952,16 @@ class Table:
         -------
         table : Table
             A table without the rows that contain missing values.
-        # todo how does that work?
+
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table
+        >>> table = Table.from_dict({"a": [1, 1, 1], "b": [2, 2, None]})
+        >>> new_table = table.remove_rows_with_missing_values()
+           a    b
+        0  1  2.0
+        1  1  2.0
         """
         result = self._data.copy(deep=True)
         result = result.dropna(axis="index")
@@ -976,7 +981,22 @@ class Table:
         new_table : Table
             A new table without rows containing outliers.
 
-        # todo does this work properly?
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table
+        >>> table = Table.from_dict({"a": [0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 2]})
+        >>> new_table = table.remove_rows_with_outliers()
+              a
+        0   0.1
+        1   0.1
+        2   0.1
+        3   0.1
+        4   0.1
+        5   0.1
+        6   0.1
+        7   0.1
+        8   0.1
         """
         copy = self._data.copy(deep=True)
 
@@ -1231,7 +1251,6 @@ class Table:
 
         Examples
         --------
-        # todo is there a mistake in the docstring above? 1 doesnt change order while -1 does
         >>> from safeds.data.tabular.containers import Table
         >>> table = Table.from_dict({"col1": [1, 3, 5], "col2": [2, 4, 6] })
         >>> new_table = table.sort_rows(lambda row1, row2: 1)
