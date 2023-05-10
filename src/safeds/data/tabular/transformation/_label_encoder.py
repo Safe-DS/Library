@@ -3,10 +3,10 @@ from __future__ import annotations
 from sklearn.preprocessing import OrdinalEncoder as sk_OrdinalEncoder
 
 from safeds.data.tabular.containers import Table
-from safeds.data.tabular.exceptions import TransformerNotFittedError, UnknownColumnNameError
 from safeds.data.tabular.transformation._table_transformer import (
     InvertibleTableTransformer,
 )
+from safeds.exceptions import TransformerNotFittedError, UnknownColumnNameError
 
 
 # noinspection PyProtectedMember
@@ -20,6 +20,8 @@ class LabelEncoder(InvertibleTableTransformer):
     def fit(self, table: Table, column_names: list[str] | None) -> LabelEncoder:
         """
         Learn a transformation for a set of columns in a table.
+
+        This transformer is not modified.
 
         Parameters
         ----------
@@ -53,6 +55,8 @@ class LabelEncoder(InvertibleTableTransformer):
         """
         Apply the learned transformation to a table.
 
+        The table is not modified.
+
         Parameters
         ----------
         table : Table
@@ -80,11 +84,13 @@ class LabelEncoder(InvertibleTableTransformer):
         data = table._data.copy()
         data.columns = table.column_names
         data[self._column_names] = self._wrapped_transformer.transform(data[self._column_names])
-        return Table(data)
+        return Table._from_pandas_dataframe(data)
 
     def inverse_transform(self, transformed_table: Table) -> Table:
         """
         Undo the learned transformation.
+
+        The table is not modified.
 
         Parameters
         ----------
@@ -108,7 +114,7 @@ class LabelEncoder(InvertibleTableTransformer):
         data = transformed_table._data.copy()
         data.columns = transformed_table.column_names
         data[self._column_names] = self._wrapped_transformer.inverse_transform(data[self._column_names])
-        return Table(data)
+        return Table._from_pandas_dataframe(data)
 
     def is_fitted(self) -> bool:
         """
