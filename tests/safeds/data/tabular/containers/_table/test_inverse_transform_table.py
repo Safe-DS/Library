@@ -95,9 +95,9 @@ def test_should_not_change_transformed_table() -> None:
 
     expected = Table(
         {
-            "col1_a": [1.0, 0.0, 0.0, 0.0],
-            "col1_b": [0.0, 1.0, 1.0, 0.0],
-            "col1_c": [0.0, 0.0, 0.0, 1.0],
+            "col1__a": [1.0, 0.0, 0.0, 0.0],
+            "col1__b": [0.0, 1.0, 1.0, 0.0],
+            "col1__c": [0.0, 0.0, 0.0, 1.0],
         },
     )
 

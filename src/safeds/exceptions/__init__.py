@@ -9,6 +9,7 @@ from safeds.exceptions._data import (
     SchemaMismatchError,
     TransformerNotFittedError,
     UnknownColumnNameError,
+    ValueNotPresentWhenFittedError,
 )
 from safeds.exceptions._ml import (
     DatasetContainsTargetError,
@@ -29,6 +30,7 @@ __all__ = [
     "SchemaMismatchError",
     "TransformerNotFittedError",
     "UnknownColumnNameError",
+    "ValueNotPresentWhenFittedError",
     # ML exceptions
     "DatasetContainsTargetError",
     "DatasetMissesFeaturesError",
