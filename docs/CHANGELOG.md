@@ -1,3 +1,45 @@
+## [0.12.0](https://github.com/Safe-DS/Stdlib/compare/v0.11.0...v0.12.0) (2023-05-11)
+
+
+### Features
+
+* add `learning_rate` to AdaBoost classifier and regressor. ([#251](https://github.com/Safe-DS/Stdlib/issues/251)) ([7f74440](https://github.com/Safe-DS/Stdlib/commit/7f744409c08fb465d59f1f04e2cac7ebed23f339)), closes [#167](https://github.com/Safe-DS/Stdlib/issues/167)
+* add alpha parameter to `lasso_regression` ([#232](https://github.com/Safe-DS/Stdlib/issues/232)) ([b5050b9](https://github.com/Safe-DS/Stdlib/commit/b5050b91f17774fa5cf3fc80b51d3ea6c295481f)), closes [#163](https://github.com/Safe-DS/Stdlib/issues/163)
+* add parameter `lasso_ratio` to `ElasticNetRegression` ([#237](https://github.com/Safe-DS/Stdlib/issues/237)) ([4a1a736](https://github.com/Safe-DS/Stdlib/commit/4a1a7367099125d2a072bf36686063de7180e8f0)), closes [#166](https://github.com/Safe-DS/Stdlib/issues/166)
+* Add parameter `number_of_tree` to `RandomForest` classifier and regressor ([#230](https://github.com/Safe-DS/Stdlib/issues/230)) ([414336a](https://github.com/Safe-DS/Stdlib/commit/414336ac9752f961cab30545cbe51befbde50d21)), closes [#161](https://github.com/Safe-DS/Stdlib/issues/161)
+* Added `Table.plot_boxplots` to plot a boxplot for each numerical column in the table ([#254](https://github.com/Safe-DS/Stdlib/issues/254)) ([0203a0c](https://github.com/Safe-DS/Stdlib/commit/0203a0c977184cdee1769d317fcb1f7cb5c644f3)), closes [#156](https://github.com/Safe-DS/Stdlib/issues/156) [#239](https://github.com/Safe-DS/Stdlib/issues/239)
+* Added `Table.plot_histograms` to plot a histogram for each column in the table ([#252](https://github.com/Safe-DS/Stdlib/issues/252)) ([e27d410](https://github.com/Safe-DS/Stdlib/commit/e27d410085ebaf9ab98069a5b175d800259d95a3)), closes [#157](https://github.com/Safe-DS/Stdlib/issues/157)
+* Added `Table.transform_table` method which returns the transformed Table ([#229](https://github.com/Safe-DS/Stdlib/issues/229)) ([0a9ce72](https://github.com/Safe-DS/Stdlib/commit/0a9ce72ba2101f99fea43dcd43b1f498dbb8e558)), closes [#110](https://github.com/Safe-DS/Stdlib/issues/110)
+* Added alpha parameter to `RidgeRegression` ([#231](https://github.com/Safe-DS/Stdlib/issues/231)) ([1ddc948](https://github.com/Safe-DS/Stdlib/commit/1ddc948aac5f153f649c3869b99184c2c1d96d9f)), closes [#164](https://github.com/Safe-DS/Stdlib/issues/164)
+* Added Column#transform ([#270](https://github.com/Safe-DS/Stdlib/issues/270)) ([40fb756](https://github.com/Safe-DS/Stdlib/commit/40fb7566307b4c015f3acae7bb94f4e937977e07)), closes [#255](https://github.com/Safe-DS/Stdlib/issues/255)
+* Added method `Table.inverse_transform_table` which returns the original table ([#227](https://github.com/Safe-DS/Stdlib/issues/227)) ([846bf23](https://github.com/Safe-DS/Stdlib/commit/846bf233235b2cdaf9bbd00cacb89ea44e94011b)), closes [#111](https://github.com/Safe-DS/Stdlib/issues/111)
+* Added parameter `c` to `SupportVectorMachines` ([#267](https://github.com/Safe-DS/Stdlib/issues/267)) ([a88eb8b](https://github.com/Safe-DS/Stdlib/commit/a88eb8b8c3f67e8485ce2847c4923a2cf0506f68)), closes [#169](https://github.com/Safe-DS/Stdlib/issues/169)
+* Added parameter `maximum_number_of_learner` and `learner` to `AdaBoost` ([#269](https://github.com/Safe-DS/Stdlib/issues/269)) ([bb5a07e](https://github.com/Safe-DS/Stdlib/commit/bb5a07e17b6563d394d79b62349633791675346f)), closes [#171](https://github.com/Safe-DS/Stdlib/issues/171) [#173](https://github.com/Safe-DS/Stdlib/issues/173)
+* Added parameter `number_of_trees` to `GradientBoosting` ([#268](https://github.com/Safe-DS/Stdlib/issues/268)) ([766f2ff](https://github.com/Safe-DS/Stdlib/commit/766f2ff2a6d68098be3e858ad12bf9e509e5f192)), closes [#170](https://github.com/Safe-DS/Stdlib/issues/170)
+* Allow arguments of type pathlib.Path for file I/O methods ([#228](https://github.com/Safe-DS/Stdlib/issues/228)) ([2b58c82](https://github.com/Safe-DS/Stdlib/commit/2b58c82f50ce88b4778f3c82108f5d5f474fdfa9)), closes [#146](https://github.com/Safe-DS/Stdlib/issues/146)
+* convert `Schema` to `dict` and format it nicely in a notebook ([#244](https://github.com/Safe-DS/Stdlib/issues/244)) ([ad1cac5](https://github.com/Safe-DS/Stdlib/commit/ad1cac5198709d0a78019787251ba2aed913cf55)), closes [#151](https://github.com/Safe-DS/Stdlib/issues/151)
+* Convert between Excel file and `Table` ([#233](https://github.com/Safe-DS/Stdlib/issues/233)) ([0d7a998](https://github.com/Safe-DS/Stdlib/commit/0d7a998f9e660f47147f7eaa6ebb8119c09188ac)), closes [#138](https://github.com/Safe-DS/Stdlib/issues/138) [#139](https://github.com/Safe-DS/Stdlib/issues/139)
+* convert containers for tabular data to HTML ([#243](https://github.com/Safe-DS/Stdlib/issues/243)) ([683c279](https://github.com/Safe-DS/Stdlib/commit/683c2793f053f5d0572e723b35db383aa00ddc44)), closes [#140](https://github.com/Safe-DS/Stdlib/issues/140)
+* make `Column` a subclass of `Sequence` ([#245](https://github.com/Safe-DS/Stdlib/issues/245)) ([a35b943](https://github.com/Safe-DS/Stdlib/commit/a35b943a126b28500499f5d7da1bccee10d98ff3))
+* mark optional hyperparameters as keyword only ([#296](https://github.com/Safe-DS/Stdlib/issues/296)) ([44a41eb](https://github.com/Safe-DS/Stdlib/commit/44a41eb205ad0f69f01564ab318e53873bb902c4)), closes [#278](https://github.com/Safe-DS/Stdlib/issues/278)
+* move exceptions back to common package ([#295](https://github.com/Safe-DS/Stdlib/issues/295)) ([a91172c](https://github.com/Safe-DS/Stdlib/commit/a91172c0f21ea9934cedbe9fd749eb4ff7929394)), closes [#177](https://github.com/Safe-DS/Stdlib/issues/177) [#262](https://github.com/Safe-DS/Stdlib/issues/262)
+* precision metric for classification ([#272](https://github.com/Safe-DS/Stdlib/issues/272)) ([5adadad](https://github.com/Safe-DS/Stdlib/commit/5adadadf6ab185b4d8864b7859d7cc036a055a6d)), closes [#185](https://github.com/Safe-DS/Stdlib/issues/185)
+* Raise error if an untagged table is used instead of a `TaggedTable` ([#234](https://github.com/Safe-DS/Stdlib/issues/234)) ([8eea3dd](https://github.com/Safe-DS/Stdlib/commit/8eea3dd31dab49b4d9371f61f02ace9fdca25394)), closes [#192](https://github.com/Safe-DS/Stdlib/issues/192)
+* recall and F1-score metrics for classification ([#277](https://github.com/Safe-DS/Stdlib/issues/277)) ([2cf93cc](https://github.com/Safe-DS/Stdlib/commit/2cf93cc7181ad69991055dd0e49035a785105356)), closes [#187](https://github.com/Safe-DS/Stdlib/issues/187) [#186](https://github.com/Safe-DS/Stdlib/issues/186)
+* replace prefix `n` with `number_of` ([#250](https://github.com/Safe-DS/Stdlib/issues/250)) ([f4f44a6](https://github.com/Safe-DS/Stdlib/commit/f4f44a6b8d5f8ee795673b11c5f00e3ebb1b1b39)), closes [#171](https://github.com/Safe-DS/Stdlib/issues/171)
+* set `alpha` parameter for regularization of `ElasticNetRegression` ([#238](https://github.com/Safe-DS/Stdlib/issues/238)) ([e642d1d](https://github.com/Safe-DS/Stdlib/commit/e642d1d49c5b21240fa5bbbde48e80d5b7743ff1)), closes [#165](https://github.com/Safe-DS/Stdlib/issues/165)
+* Set `column_names` in `fit` methods of table transformers to be required ([#225](https://github.com/Safe-DS/Stdlib/issues/225)) ([2856296](https://github.com/Safe-DS/Stdlib/commit/2856296fb7228e8d4adebceb86e22ecaeb609ad9)), closes [#179](https://github.com/Safe-DS/Stdlib/issues/179)
+* set learning rate of Gradient Boosting models ([#253](https://github.com/Safe-DS/Stdlib/issues/253)) ([9ffaf55](https://github.com/Safe-DS/Stdlib/commit/9ffaf55a97333bb2edce2f2c9c66650a9724ca60)), closes [#168](https://github.com/Safe-DS/Stdlib/issues/168)
+* Support vector machine for regression and for classification ([#236](https://github.com/Safe-DS/Stdlib/issues/236)) ([7f6c3bd](https://github.com/Safe-DS/Stdlib/commit/7f6c3bd9fba670a487d3ef96d281f3904a8974a7)), closes [#154](https://github.com/Safe-DS/Stdlib/issues/154)
+* usable constructor for `Table` ([#294](https://github.com/Safe-DS/Stdlib/issues/294)) ([56a1fc4](https://github.com/Safe-DS/Stdlib/commit/56a1fc4450ba77877b6b29467c0e1d11dd200f9d)), closes [#266](https://github.com/Safe-DS/Stdlib/issues/266)
+* usable constructor for `TaggedTable` ([#299](https://github.com/Safe-DS/Stdlib/issues/299)) ([01c3ad9](https://github.com/Safe-DS/Stdlib/commit/01c3ad9564a35f31744a30862ae1a533ef5adf6b)), closes [#293](https://github.com/Safe-DS/Stdlib/issues/293)
+
+
+### Bug Fixes
+
+* OneHotEncoder no longer creates duplicate column names ([#271](https://github.com/Safe-DS/Stdlib/issues/271)) ([f604666](https://github.com/Safe-DS/Stdlib/commit/f604666305d38d3a01696ea7ca60056ce7f78245)), closes [#201](https://github.com/Safe-DS/Stdlib/issues/201)
+* selectively ignore one warning instead of all warnings ([#235](https://github.com/Safe-DS/Stdlib/issues/235)) ([3aad07d](https://github.com/Safe-DS/Stdlib/commit/3aad07ddcc0da42e1dab2eed49fc41433a876765))
+
 ## [0.11.0](https://github.com/Safe-DS/Stdlib/compare/v0.10.0...v0.11.0) (2023-04-21)
 
 
