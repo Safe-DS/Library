@@ -1515,10 +1515,10 @@ class Table:
         >>> table = Table({"col1": [1, 2, 1], "col2": [1, 2, 4]})
         >>> fitted_transformer = transformer.fit(table, None)
         >>> table.transform_table(fitted_transformer)
-           col1_1  col1_2  col2_1  col2_2  col2_4
-        0     1.0     0.0     1.0     0.0     0.0
-        1     0.0     1.0     0.0     1.0     0.0
-        2     1.0     0.0     0.0     0.0     1.0
+           col1__1  col1__2  col2__1  col2__2  col2__4
+        0      1.0      0.0      1.0      0.0      0.0
+        1      0.0      1.0      0.0      1.0      0.0
+        2      1.0      0.0      0.0      0.0      1.0
         """
         return transformer.transform(self)
 

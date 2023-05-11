@@ -1,7 +1,7 @@
 import pytest
 from safeds.data.tabular.containers import Table
 from safeds.data.tabular.transformation import OneHotEncoder
-from safeds.exceptions import TransformerNotFittedError, UnknownColumnNameError
+from safeds.exceptions import TransformerNotFittedError, UnknownColumnNameError, ValueNotPresentWhenFittedError
 
 
 class TestFit:
@@ -25,8 +25,8 @@ class TestFit:
         transformer = OneHotEncoder()
         transformer.fit(table, None)
 
-        assert transformer._wrapped_transformer is None
         assert transformer._column_names is None
+        assert transformer._value_to_column is None
 
 
 class TestTransform:
@@ -60,6 +60,23 @@ class TestTransform:
         with pytest.raises(TransformerNotFittedError):
             transformer.transform(table)
 
+    def test_should_raise_value_not_present_when_fitted(self) -> None:
+        fit_table = Table(
+            {
+                "col1": ["a"],
+            },
+        )
+        transform_table = Table(
+            {
+                "col1": ["b"],
+            },
+        )
+
+        transformer = OneHotEncoder().fit(fit_table, None)
+
+        with pytest.raises(ValueNotPresentWhenFittedError):
+            transformer.transform(transform_table)
+
 
 class TestIsFitted:
     def test_should_return_false_before_fitting(self) -> None:
@@ -91,9 +108,9 @@ class TestFitAndTransform:
                 None,
                 Table(
                     {
-                        "col1_a": [1.0, 0.0, 0.0, 0.0],
-                        "col1_b": [0.0, 1.0, 1.0, 0.0],
-                        "col1_c": [0.0, 0.0, 0.0, 1.0],
+                        "col1__a": [1.0, 0.0, 0.0, 0.0],
+                        "col1__b": [0.0, 1.0, 1.0, 0.0],
+                        "col1__c": [0.0, 0.0, 0.0, 1.0],
                     },
                 ),
             ),
@@ -107,9 +124,9 @@ class TestFitAndTransform:
                 ["col1"],
                 Table(
                     {
-                        "col1_a": [1.0, 0.0, 0.0, 0.0],
-                        "col1_b": [0.0, 1.0, 1.0, 0.0],
-                        "col1_c": [0.0, 0.0, 0.0, 1.0],
+                        "col1__a": [1.0, 0.0, 0.0, 0.0],
+                        "col1__b": [0.0, 1.0, 1.0, 0.0],
+                        "col1__c": [0.0, 0.0, 0.0, 1.0],
                         "col2": ["a", "b", "b", "c"],
                     },
                 ),
@@ -124,17 +141,49 @@ class TestFitAndTransform:
                 ["col1", "col2"],
                 Table(
                     {
-                        "col1_a": [1.0, 0.0, 0.0, 0.0],
-                        "col1_b": [0.0, 1.0, 1.0, 0.0],
-                        "col1_c": [0.0, 0.0, 0.0, 1.0],
-                        "col2_a": [1.0, 0.0, 0.0, 0.0],
-                        "col2_b": [0.0, 1.0, 1.0, 0.0],
-                        "col2_c": [0.0, 0.0, 0.0, 1.0],
+                        "col1__a": [1.0, 0.0, 0.0, 0.0],
+                        "col1__b": [0.0, 1.0, 1.0, 0.0],
+                        "col1__c": [0.0, 0.0, 0.0, 1.0],
+                        "col2__a": [1.0, 0.0, 0.0, 0.0],
+                        "col2__b": [0.0, 1.0, 1.0, 0.0],
+                        "col2__c": [0.0, 0.0, 0.0, 1.0],
+                    },
+                ),
+            ),
+            (
+                Table(
+                    {
+                        "a_b": ["c"],
+                        "a": ["b_c"],
+                    },
+                ),
+                None,
+                Table(
+                    {
+                        "a_b__c": [1.0],
+                        "a__b_c": [1.0],
+                    },
+                ),
+            ),
+            (
+                Table(
+                    {
+                        "a__b": ["c", "d"],
+                        "a": ["b__c", "d"],
+                    },
+                ),
+                None,
+                Table(
+                    {
+                        "a__b__c": [1.0, 0.0],
+                        "a__b__d": [0.0, 1.0],
+                        "a__b__c#2": [1.0, 0.0],
+                        "a__d": [0.0, 1.0],
                     },
                 ),
             ),
         ],
-        ids=["all columns", "one column", "multiple columns"],
+        ids=["all columns", "one column", "multiple columns", "single underscore counterexample", "name conflict"],
     )
     def test_should_return_transformed_table(
         self,
@@ -253,9 +302,9 @@ class TestInverseTransform:
 
         expected = Table(
             {
-                "col1_a": [1.0, 0.0, 0.0, 0.0],
-                "col1_b": [0.0, 1.0, 1.0, 0.0],
-                "col1_c": [0.0, 0.0, 0.0, 1.0],
+                "col1__a": [1.0, 0.0, 0.0, 0.0],
+                "col1__b": [0.0, 1.0, 1.0, 0.0],
+                "col1__c": [0.0, 0.0, 0.0, 1.0],
             },
         )
 

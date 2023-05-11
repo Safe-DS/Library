@@ -16,9 +16,9 @@ from safeds.exceptions import TransformerNotFittedError, UnknownColumnNameError
             None,
             Table(
                 {
-                    "col1_a": [1.0, 0.0, 0.0, 0.0],
-                    "col1_b": [0.0, 1.0, 1.0, 0.0],
-                    "col1_c": [0.0, 0.0, 0.0, 1.0],
+                    "col1__a": [1.0, 0.0, 0.0, 0.0],
+                    "col1__b": [0.0, 1.0, 1.0, 0.0],
+                    "col1__c": [0.0, 0.0, 0.0, 1.0],
                 },
             ),
         ),
@@ -32,9 +32,9 @@ from safeds.exceptions import TransformerNotFittedError, UnknownColumnNameError
             ["col1"],
             Table(
                 {
-                    "col1_a": [1.0, 0.0, 0.0, 0.0],
-                    "col1_b": [0.0, 1.0, 1.0, 0.0],
-                    "col1_c": [0.0, 0.0, 0.0, 1.0],
+                    "col1__a": [1.0, 0.0, 0.0, 0.0],
+                    "col1__b": [0.0, 1.0, 1.0, 0.0],
+                    "col1__c": [0.0, 0.0, 0.0, 1.0],
                     "col2": ["a", "b", "b", "c"],
                 },
             ),
@@ -49,12 +49,12 @@ from safeds.exceptions import TransformerNotFittedError, UnknownColumnNameError
             ["col1", "col2"],
             Table(
                 {
-                    "col1_a": [1.0, 0.0, 0.0, 0.0],
-                    "col1_b": [0.0, 1.0, 1.0, 0.0],
-                    "col1_c": [0.0, 0.0, 0.0, 1.0],
-                    "col2_a": [1.0, 0.0, 0.0, 0.0],
-                    "col2_b": [0.0, 1.0, 1.0, 0.0],
-                    "col2_c": [0.0, 0.0, 0.0, 1.0],
+                    "col1__a": [1.0, 0.0, 0.0, 0.0],
+                    "col1__b": [0.0, 1.0, 1.0, 0.0],
+                    "col1__c": [0.0, 0.0, 0.0, 1.0],
+                    "col2__a": [1.0, 0.0, 0.0, 0.0],
+                    "col2__b": [0.0, 1.0, 1.0, 0.0],
+                    "col2__c": [0.0, 0.0, 0.0, 1.0],
                 },
             ),
         ),
