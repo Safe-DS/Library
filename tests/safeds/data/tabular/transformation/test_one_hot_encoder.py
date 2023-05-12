@@ -226,7 +226,8 @@ class TestFitAndTransform:
     def test_get_names_of_changed_columns(self) -> None:
         transformer = OneHotEncoder()
         with pytest.warns(
-            UserWarning, match="OneHotEncoder only removes and adds, but does not change any columns.",
+            UserWarning,
+            match="OneHotEncoder only removes and adds, but does not change any columns.",
         ), pytest.raises(TransformerNotFittedError):
             transformer.get_names_of_changed_columns()
 

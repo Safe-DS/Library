@@ -246,6 +246,7 @@ class TestFitAndTransform:
         )
         transformer = transformer.fit(table, None)
         with pytest.warns(
-            UserWarning, match="Imputer only changes data within columns, but does not remove any columns.",
+            UserWarning,
+            match="Imputer only changes data within columns, but does not remove any columns.",
         ):
             assert transformer.get_names_of_removed_columns() == []
