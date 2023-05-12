@@ -219,8 +219,7 @@ class TestFitAndTransform:
             },
         )
         transformer = transformer.fit(table, None)
-        with pytest.warns(UserWarning,
-                          match="Imputer only changes data within columns, but does not add any columns."):
+        with pytest.warns(UserWarning, match="Imputer only changes data within columns, but does not add any columns."):
             assert transformer.get_names_of_added_columns() == []
 
     def test_get_names_of_changed_columns(self) -> None:
@@ -246,8 +245,7 @@ class TestFitAndTransform:
             },
         )
         transformer = transformer.fit(table, None)
-        with pytest.warns(UserWarning,
-                          match="Imputer only changes data within columns, but does not remove any columns."):
+        with pytest.warns(
+            UserWarning, match="Imputer only changes data within columns, but does not remove any columns.",
+        ):
             assert transformer.get_names_of_removed_columns() == []
-
-
