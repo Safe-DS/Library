@@ -51,6 +51,11 @@ class LassoRegression(Regressor):
         self._feature_names: list[str] | None = None
         self._target_name: str | None = None
 
+    @property
+    def alpha(self):
+        return self._alpha
+
+
     def fit(self, training_set: TaggedTable) -> LassoRegression:
         """
         Create a copy of this regressor and fit it with the given training data.
