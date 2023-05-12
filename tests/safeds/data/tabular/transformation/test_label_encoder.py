@@ -140,7 +140,8 @@ class TestFitAndTransform:
     def test_get_names_of_added_columns(self) -> None:
         transformer = LabelEncoder()
         with pytest.warns(
-            UserWarning, match="LabelEncoder only changes data within columns, but does not add any columns.",
+            UserWarning,
+            match="LabelEncoder only changes data within columns, but does not add any columns.",
         ), pytest.raises(TransformerNotFittedError):
             transformer.get_names_of_added_columns()
 
@@ -171,7 +172,8 @@ class TestFitAndTransform:
     def test_get_names_of_removed_columns(self) -> None:
         transformer = LabelEncoder()
         with pytest.warns(
-            UserWarning, match="LabelEncoder only changes data within columns, but does not remove any columns.",
+            UserWarning,
+            match="LabelEncoder only changes data within columns, but does not remove any columns.",
         ), pytest.raises(TransformerNotFittedError):
             transformer.get_names_of_removed_columns()
 
