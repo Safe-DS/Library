@@ -632,12 +632,25 @@ class Table:
             A new table with the added row at the end.
 
         """
-        if self._schema != row.schema:
-            raise SchemaMismatchError
+
+        int_columns = []
+        if self.number_of_rows == 0:
+            int_columns = list(filter(lambda name: isinstance(row[name], (int, np.int64)), row.column_names))
+            if self.number_of_columns == 0:
+                for column in row.column_names:
+                    self._data[column] = Column(column, [])
+                self._schema = Schema._from_pandas_dataframe(self._data)
+        else:
+            if self._schema != row.schema:
+                raise SchemaMismatchError
 
         new_df = pd.concat([self._data, row._data]).infer_objects()
         new_df.columns = self.column_names
-        return Table._from_pandas_dataframe(new_df)
+        table = Table._from_pandas_dataframe(new_df)
+        for column in int_columns:
+            table = table.replace_column(column, table.get_column(column).transform(lambda it: int(it)))
+
+        return table
 
     def add_rows(self, rows: list[Row] | Table) -> Table:
         """
@@ -983,7 +996,7 @@ class Table:
     def sort_columns(
         self,
         comparator: Callable[[Column, Column], int] = lambda col1, col2: (col1.name > col2.name)
-        - (col1.name < col2.name),
+                                                                         - (col1.name < col2.name),
     ) -> Table:
         """
         Sort the columns of a `Table` with the given comparator and return a new `Table`.
