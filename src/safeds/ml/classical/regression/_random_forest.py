@@ -45,7 +45,6 @@ class RandomForest(Regressor):
     def number_of_trees(self) -> int:
         return self._number_of_trees
 
-
     def fit(self, training_set: TaggedTable) -> RandomForest:
         """
         Create a copy of this regressor and fit it with the given training data.
