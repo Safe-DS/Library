@@ -11,8 +11,13 @@ from safeds.exceptions import SchemaMismatchError
             [Row({"col1": "d", "col2": 6}), Row({"col1": "e", "col2": 8})],
             Table({"col1": ["a", "b", "c", "d", "e"], "col2": [1, 2, 4, 6, 8]}),
         ),
+        (
+            Table(),
+            [Row({"col1": "d", "col2": 6}), Row({"col1": "e", "col2": 8})],
+            Table({"col1": ["d", "e"], "col2": [6, 8]}),
+        ),
     ],
-    ids=["Rows with string and integer values"],
+    ids=["Rows with string and integer values", "empty"],
 )
 def test_should_add_rows(table1: Table, rows: list[Row], table2: Table) -> None:
     table1 = table1.add_rows(rows)

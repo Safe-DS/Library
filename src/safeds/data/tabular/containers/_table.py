@@ -620,6 +620,7 @@ class Table:
         Add a row to the table.
 
         This table is not modified.
+        If the table happens to be empty beforehand, respective features will be added automatically.
 
         Parameters
         ----------
@@ -647,6 +648,7 @@ class Table:
         new_df = pd.concat([self._data, row._data]).infer_objects()
         new_df.columns = self.column_names
         table = Table._from_pandas_dataframe(new_df)
+
         for column in int_columns:
             table = table.replace_column(column, table.get_column(column).transform(lambda it: int(it)))
 
@@ -668,7 +670,7 @@ class Table:
         result : Table
             A new table which combines the original table and the given rows.
         """
-        if isinstance(rows, Table):
+        """if isinstance(rows, Table):
             rows = rows.to_rows()
         result = self._data
         for row in rows:
@@ -680,6 +682,31 @@ class Table:
         result = pd.concat([result, *row_frames]).infer_objects()
         result.columns = self.column_names
         return Table._from_pandas_dataframe(result)
+        """
+        if isinstance(rows, Table):
+            rows = rows.to_rows()
+        int_columns = []
+        for row in rows:
+            if self.number_of_rows == 0:
+                int_columns = list(filter(lambda name: isinstance(row[name], (int, np.int64)), row.column_names))
+                if self.number_of_columns == 0:
+                    for column in row.column_names:
+                        self._data[column] = Column(column, [])
+            else:
+                if self._schema != row.schema:
+                    raise SchemaMismatchError
+        self._schema = Schema._from_pandas_dataframe(self._data)
+
+        row_frames = (row._data for row in rows)
+
+        result = pd.concat([self._data, *row_frames]).infer_objects()
+        result.columns = self.column_names
+        table = Table._from_pandas_dataframe(result)
+
+        for column in int_columns:
+            table = table.replace_column(column, table.get_column(column).transform(lambda it: int(it)))
+
+        return table
 
     def filter_rows(self, query: Callable[[Row], bool]) -> Table:
         """
