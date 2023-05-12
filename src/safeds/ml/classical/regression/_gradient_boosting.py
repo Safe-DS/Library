@@ -54,7 +54,7 @@ class GradientBoosting(Regressor):
         return self._number_of_trees
 
     @property
-    def learning_rate(self) -> int:
+    def learning_rate(self) -> float:
         return self._learning_rate
 
     def fit(self, training_set: TaggedTable) -> GradientBoosting:

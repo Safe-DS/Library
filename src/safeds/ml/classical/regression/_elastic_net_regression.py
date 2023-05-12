@@ -75,11 +75,11 @@ class ElasticNetRegression(Regressor):
         self._target_name: str | None = None
 
     @property
-    def alpha(self) -> int:
+    def alpha(self) -> float:
         return self._alpha
 
     @property
-    def lasso_ratio(self) -> int:
+    def lasso_ratio(self) -> float:
         return self._lasso_ratio
 
     def fit(self, training_set: TaggedTable) -> ElasticNetRegression:
