@@ -206,6 +206,7 @@ class Imputer(TableTransformer):
         """
         if self._column_names is None:
             raise TransformerNotFittedError
+        return self._column_names
 
     def get_names_of_removed_columns(self) -> list[str]:
         """

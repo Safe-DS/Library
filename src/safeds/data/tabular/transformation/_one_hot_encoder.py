@@ -260,7 +260,7 @@ class OneHotEncoder(InvertibleTableTransformer):
         added_columns : list[str]
             A list of names of the added columns, ordered as they will appear in the table.
         """
-        if not self.is_fitted():
+        if self._column_names is None:
             raise TransformerNotFittedError
         return [name for column_names in self._column_names.values() for name in column_names]
 
