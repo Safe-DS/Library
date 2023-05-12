@@ -18,8 +18,8 @@ def test_should_match_snapshot() -> None:
 
 @pytest.mark.parametrize(
     ("x", "y"),
-    [("C", "A"), ("A", "C")],
-    ids=["x column", "y column"],
+    [("C", "A"), ("A", "C"), ("C", "D")],
+    ids=["x column", "y column", "x and y column"],
 )
 def test_should_raise_if_column_does_not_exist(x: str, y: str) -> None:
     table = Table({"A": [1, 2, 3], "B": [2, 4, 7]})

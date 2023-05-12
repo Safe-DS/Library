@@ -1121,8 +1121,6 @@ class Table:
         ValueError
             If no feature columns are specified.
         """
-        from ._tagged_table import TaggedTable
-
         return TaggedTable._from_table(self, target_name, feature_names)
 
     def transform_column(self, name: str, transformer: Callable[[Row], Any]) -> Table:
