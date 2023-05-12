@@ -49,14 +49,26 @@ class AdaBoost(Classifier):
             raise ValueError("The parameter 'learning_rate' has to be greater than 0.")
 
         # Hyperparameters
-        self._learner = learner
-        self._maximum_number_of_learners = maximum_number_of_learners
+        self.learner = learner
+        self.maximum_number_of_learners = maximum_number_of_learners
         self._learning_rate = learning_rate
 
         # Internal state
         self._wrapped_classifier: sk_AdaBoostClassifier | None = None
         self._feature_names: list[str] | None = None
         self._target_name: str | None = None
+
+    @property
+    def learner(self) -> Classifier | None:
+        return self.learner
+
+    @property
+    def maximum_number_of_learners(self) -> int:
+        return self.maximum_number_of_learners
+
+    @property
+    def learning_rate(self) -> float:
+        return self._learning_rate
 
     def fit(self, training_set: TaggedTable) -> AdaBoost:
         """
@@ -83,8 +95,8 @@ class AdaBoost(Classifier):
         fit(wrapped_classifier, training_set)
 
         result = AdaBoost(
-            learner=self._learner,
-            maximum_number_of_learners=self._maximum_number_of_learners,
+            learner=self.learner,
+            maximum_number_of_learners=self.maximum_number_of_learners,
             learning_rate=self._learning_rate,
         )
         result._wrapped_classifier = wrapped_classifier
@@ -140,9 +152,9 @@ class AdaBoost(Classifier):
         wrapped_classifier: ClassifierMixin
             The sklearn Classifier.
         """
-        learner = self._learner._get_sklearn_classifier() if self._learner is not None else None
+        learner = self.learner._get_sklearn_classifier() if self.learner is not None else None
         return sk_AdaBoostClassifier(
             estimator=learner,
-            n_estimators=self._maximum_number_of_learners,
+            n_estimators=self.maximum_number_of_learners,
             learning_rate=self._learning_rate,
         )
