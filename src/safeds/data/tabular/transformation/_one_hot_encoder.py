@@ -249,3 +249,32 @@ class OneHotEncoder(InvertibleTableTransformer):
             Whether the transformer is fitted.
         """
         return self._column_names is not None and self._value_to_column is not None
+
+    def get_names_of_added_columns(self) -> list[str]:
+        """
+        awfawf
+
+        Returns
+        -------
+
+        """
+
+    def get_names_of_changed_columns(self) -> list[str]:
+        """
+        awfawf
+
+        Returns
+        -------
+
+        """
+
+
+    def get_names_of_removed_columns(self) -> list[str]:
+        """
+        awfawf
+
+        Returns
+        -------
+
+        """
+

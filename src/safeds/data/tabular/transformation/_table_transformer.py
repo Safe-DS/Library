@@ -54,6 +54,35 @@ class TableTransformer(ABC):
         """
 
     @abstractmethod
+    def get_names_of_added_columns(self) -> list[str]:
+        """
+        bla
+
+        Returns
+        -------
+
+        """
+
+    @abstractmethod
+    def get_names_of_changed_columns(self) -> list[str]:
+        """
+        bla
+
+        Returns
+        -------
+
+        """
+
+    @abstractmethod
+    def get_names_of_removed_columns(self) -> list[str]:
+        """
+        bla
+
+        Returns
+        -------
+
+        """
+    @abstractmethod
     def is_fitted(self) -> bool:
         """
         Check if the transformer is fitted.
