@@ -101,6 +101,7 @@ def test_should_not_change_transformed_table() -> None:
         },
     )
 
+    assert transformed_table.schema == expected.schema
     assert transformed_table == expected
 
 

@@ -15,7 +15,9 @@ from safeds.data.tabular.containers import Table
 )
 def test_should_split_table(table: Table, result_test_table: Table, result_train_table: Table) -> None:
     train_table, test_table = table.split(2 / 3)
+    assert result_test_table.schema == test_table.schema
     assert result_test_table == test_table
+    assert result_train_table.schema == train_table.schema
     assert result_train_table == train_table
 
 

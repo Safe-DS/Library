@@ -9,15 +9,21 @@ from safeds.data.tabular.containers import Table
             Table(
                 {
                     "col1": [None, None, "C", "A"],
-                    "col3": [None, 2, 3, 4],
+                    "col2": [None, "2", "3", "4"],
                 },
             ),
-            2,
+            Table(
+                {
+                    "col1": ["C", "A"],
+                    "col2": ["3", "4"],
+                }
+            ),
         ),
-        (Table({}), 0),
+        (Table({}), Table({})),
     ],
     ids=["some missing values", "empty"],
 )
-def test_should_remove_rows_with_missing_values(table: Table, expected: int) -> None:
+def test_should_remove_rows_with_missing_values(table: Table, expected: Table) -> None:
     updated_table = table.remove_rows_with_missing_values()
-    assert updated_table.number_of_rows == expected
+    assert updated_table.schema == expected.schema
+    assert updated_table == expected

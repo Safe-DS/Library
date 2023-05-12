@@ -24,6 +24,7 @@ from safeds.data.tabular.typing import ColumnType, Integer, Schema
 )
 def test_should_filter_rows(table1: Table, filter_column: str, filter_value: ColumnType, table2: Table) -> None:
     table1 = table1.filter_rows(lambda row: row.get_value(filter_column) == filter_value)
+    assert table1.schema == table2.schema
     assert table2 == table1
 
 

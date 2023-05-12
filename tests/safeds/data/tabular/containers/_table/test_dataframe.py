@@ -18,6 +18,7 @@ def test_should_restore_table_from_exchange_object(table: Table) -> None:
     exchange_object = table.__dataframe__()
     restored = Table._from_pandas_dataframe(from_dataframe(exchange_object))
 
+    assert restored.schema == table.schema
     assert restored == table
 
 
