@@ -137,6 +137,48 @@ class TestFitAndTransform:
 
         assert table == expected
 
+    def test_get_names_of_added_columns(self) -> None:
+        transformer = LabelEncoder()
+        with pytest.raises(TransformerNotFittedError):
+            transformer.get_names_of_changed_columns()
+
+        table = Table(
+            {
+                "a": ["b"],
+            },
+        )
+        transformer = transformer.fit(table, None)
+        with pytest.warns(UserWarning,
+                          match="LabelEncoder only changes data within columns, but does not add any columns."):
+            assert transformer.get_names_of_added_columns() == []
+
+    def test_get_names_of_changed_columns(self) -> None:
+        transformer = LabelEncoder()
+        with pytest.raises(TransformerNotFittedError):
+            transformer.get_names_of_changed_columns()
+        table = Table(
+            {
+                "a": ["b"],
+            },
+        )
+        transformer = transformer.fit(table, None)
+        assert transformer.get_names_of_changed_columns() == ["a"]
+
+    def test_get_names_of_removed_columns(self) -> None:
+        transformer = LabelEncoder()
+        with pytest.raises(TransformerNotFittedError):
+            transformer.get_names_of_changed_columns()
+
+        table = Table(
+            {
+                "a": ["b"],
+            },
+        )
+        transformer = transformer.fit(table, None)
+        with pytest.warns(UserWarning,
+                          match="LabelEncoder only changes data within columns, but does not remove any columns."):
+            assert transformer.get_names_of_removed_columns() == []
+
 
 class TestInverseTransform:
     @pytest.mark.parametrize(
