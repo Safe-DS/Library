@@ -42,7 +42,7 @@ class RandomForest(Regressor):
         self._target_name: str | None = None
 
     @property
-    def number_of_trees(self):
+    def number_of_trees(self) -> int:
         return self._number_of_trees
 
 

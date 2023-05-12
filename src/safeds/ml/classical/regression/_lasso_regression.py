@@ -52,7 +52,7 @@ class LassoRegression(Regressor):
         self._target_name: str | None = None
 
     @property
-    def alpha(self):
+    def alpha(self) -> float:
         return self._alpha
 
 
