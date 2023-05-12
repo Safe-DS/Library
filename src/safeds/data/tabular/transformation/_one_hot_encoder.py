@@ -262,7 +262,7 @@ class OneHotEncoder(InvertibleTableTransformer):
         """
         if not self.is_fitted():
             raise TransformerNotFittedError
-        return sum(self._column_names.values(), [])
+        return [name for column_names in self._column_names.values() for name in column_names]
 
     # (Must implement abstract method, cannot instantiate class otherwise.)
     def get_names_of_changed_columns(self) -> list[str]:
@@ -288,7 +288,7 @@ class OneHotEncoder(InvertibleTableTransformer):
         removed_columns : list[str]
             A list of names of the removed columns, ordered as they appear in the table the OneHotEncoder was fitted on.
         """
-        if not self.is_fitted():
+        if self._column_names is None:
             raise TransformerNotFittedError
         return list(self._column_names.keys())
 

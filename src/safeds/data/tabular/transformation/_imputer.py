@@ -204,10 +204,8 @@ class Imputer(TableTransformer):
        changed_columns : list[str]
             The list of (potentially) changed column names, as passed to fit.
         """
-        if not self.is_fitted():
+        if self._column_names is None:
             raise TransformerNotFittedError
-        # TODO: Clarify whether this is what was intended.
-        return self._column_names
 
     def get_names_of_removed_columns(self) -> list[str]:
         """
