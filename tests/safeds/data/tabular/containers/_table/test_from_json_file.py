@@ -2,6 +2,7 @@ from pathlib import Path
 
 import pytest
 from safeds.data.tabular.containers import Table
+from safeds.exceptions import WrongFileExtensionError
 
 from tests.helpers import resolve_resource_path
 
@@ -20,4 +21,14 @@ def test_should_create_table_from_json_file(path: str | Path) -> None:
 )
 def test_should_raise_error_if_file_not_found(path: str | Path) -> None:
     with pytest.raises(FileNotFoundError):
+        Table.from_json_file(resolve_resource_path(path))
+
+
+@pytest.mark.parametrize(
+    "path",
+    ["invalid_file_extension.file_extension", Path("invalid_file_extension.file_extension")],
+    ids=["by String", "by path"],
+)
+def test_should_raise_error_if_wrong_file_extension(path: str | Path) -> None:
+    with pytest.raises(WrongFileExtensionError):
         Table.from_json_file(resolve_resource_path(path))

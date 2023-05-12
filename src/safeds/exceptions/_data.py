@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from pathlib import Path
+
 
 class UnknownColumnNameError(KeyError):
     """
@@ -47,7 +49,10 @@ class IndexOutOfBoundsError(IndexError):
     """
 
     def __init__(self, index: int | slice):
-        super().__init__(f"There is no element at index '{index}'.")
+        if isinstance(index, int):
+            super().__init__(f"There is no element at index '{index}'.")
+        else:
+            super().__init__(f"There is no element in the range [{index.start}, {index.stop}]")
 
 
 class ColumnSizeError(Exception):
@@ -92,3 +97,10 @@ class ValueNotPresentWhenFittedError(Exception):
 
     def __init__(self, value: str, column: str) -> None:
         super().__init__(f"Value not present in the table the transformer was fitted on: \n{value} in column {column}.")
+
+
+class WrongFileExtensionError(Exception):
+    """Exception raised when the file has the wrong file extension."""
+
+    def __init__(self, file: str | Path, file_extension: str | list[str]) -> None:
+        super().__init__(f"The file {file} has a wrong file extension. Please provide a file with the following extension(s): [{file_extension}]")
