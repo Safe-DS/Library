@@ -25,9 +25,7 @@ def test_should_slice_rows(table: Table, test_table: Table, second_test_table: T
 
 @pytest.mark.parametrize(
     ("start", "end", "step"),
-    [
-        (3, 2, 1)
-    ],
+    [(3, 2, 1)],
 )
 def test_should_raise_value_error_if_start_larger_than_end(start: int, end: int, step: int) -> None:
     table = Table({"col1": [1, 2, 1], "col2": [1, 2, 4]})
@@ -38,9 +36,7 @@ def test_should_raise_value_error_if_start_larger_than_end(start: int, end: int,
 
 @pytest.mark.parametrize(
     ("start", "end", "step"),
-    [
-        (-5, 2, 1)
-    ],
+    [(-5, 2, 1)],
 )
 def test_should_raise_out_of_bounds_error_if_start_smaller_than_zero(start: int, end: int, step: int) -> None:
     table = Table({"col1": [1, 2, 1], "col2": [1, 2, 4]})
@@ -51,9 +47,7 @@ def test_should_raise_out_of_bounds_error_if_start_smaller_than_zero(start: int,
 
 @pytest.mark.parametrize(
     ("start", "end", "step"),
-    [
-        (2, 4, 1)
-    ],
+    [(2, 4, 1)],
 )
 def test_should_raise_out_of_bounds_error_if_end_is_larger_than_number_of_rows(start: int, end: int, step: int) -> None:
     table = Table({"col1": [1, 2, 1], "col2": [1, 2, 4]})
