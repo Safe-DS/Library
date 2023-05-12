@@ -328,6 +328,10 @@ class Table:
             return NotImplemented
         if self is other:
             return True
+        if self.number_of_rows == 0 and other.number_of_rows == 0 and self.column_names == other.column_names:
+            return True
+        if self.number_of_columns == 0 and other.number_of_columns == 0:
+            return True
         table1 = self.sort_columns()
         table2 = other.sort_columns()
         return table1._schema == table2._schema and table1._data.equals(table2._data)
@@ -566,7 +570,7 @@ class Table:
         if self.has_column(column.name):
             raise DuplicateColumnNameError(column.name)
 
-        if column._data.size != self.number_of_rows:
+        if column._data.size != self.number_of_rows and self.number_of_rows != 0:
             raise ColumnSizeError(str(self.number_of_rows), str(column._data.size))
 
         result = self._data.copy()
@@ -605,7 +609,7 @@ class Table:
             if column.name in result.columns:
                 raise DuplicateColumnNameError(column.name)
 
-            if column._data.size != self.number_of_rows:
+            if column._data.size != self.number_of_rows and self.number_of_rows != 0:
                 raise ColumnSizeError(str(self.number_of_rows), str(column._data.size))
 
             result[column.name] = column._data
