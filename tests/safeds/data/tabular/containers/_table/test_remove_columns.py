@@ -4,15 +4,16 @@ from safeds.exceptions import UnknownColumnNameError
 
 
 @pytest.mark.parametrize(
-    ("table1", "expected"),
+    ("table1", "expected", "columns"),
     [
-        (Table({"col1": [1, 2, 1], "col2": ["a", "b", "c"]}), Table({"col1": [1, 2, 1]})),
-        (Table({"col1": [1, 2, 1], "col2": [1, 2, 4]}), Table({"col1": [1, 2, 1]})),
+        (Table({"col1": [1, 2, 1], "col2": ["a", "b", "c"]}), Table({"col1": [1, 2, 1]}), ["col2"]),
+        (Table({"col1": [1, 2, 1], "col2": [1, 2, 4]}), Table({}), ["col1", "col2"]),
+        (Table({"col1": [1, 2, 1], "col2": [1, 2, 4]}), Table({"col1": [1, 2, 1], "col2": [1, 2, 4]}), []),
     ],
-    ids=["String", "Integer"],
+    ids=["one column", "multiple columns", "no columns"],
 )
-def test_should_remove_table_columns(table1: Table, expected: Table) -> None:
-    table1 = table1.remove_columns(["col2"])
+def test_should_remove_table_columns(table1: Table, expected: Table, columns: list[str]) -> None:
+    table1 = table1.remove_columns(columns)
     assert table1 == expected
 
 

@@ -1000,12 +1000,12 @@ class Table:
 
         if end < start:
             raise IndexOutOfBoundsError(slice(start, end))
-        if start < 0 or end < 0 or start >= self.number_of_rows or end > self.number_of_rows:
-            raise IndexOutOfBoundsError(start if start < 0 or start >= self.number_of_rows else end)
+        if start < 0 or end < 0 or start > self.number_of_rows or end > self.number_of_rows:
+            raise IndexOutOfBoundsError(start if start < 0 or start > self.number_of_rows else end)
 
         new_df = self._data.iloc[start:end:step]
         new_df.columns = self._schema.column_names
-        return Table._from_pandas_dataframe(new_df)
+        return Table._from_pandas_dataframe(new_df, self._schema)
 
     def sort_columns(
         self,
