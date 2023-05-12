@@ -49,8 +49,8 @@ class AdaBoost(Classifier):
             raise ValueError("The parameter 'learning_rate' has to be greater than 0.")
 
         # Hyperparameters
-        self.learner = learner
-        self.maximum_number_of_learners = maximum_number_of_learners
+        self._learner = learner
+        self._maximum_number_of_learners = maximum_number_of_learners
         self._learning_rate = learning_rate
 
         # Internal state
@@ -60,11 +60,11 @@ class AdaBoost(Classifier):
 
     @property
     def learner(self) -> Classifier | None:
-        return self.learner
+        return self._learner
 
     @property
     def maximum_number_of_learners(self) -> int:
-        return self.maximum_number_of_learners
+        return self._maximum_number_of_learners
 
     @property
     def learning_rate(self) -> float:
