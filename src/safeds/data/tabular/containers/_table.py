@@ -328,7 +328,7 @@ class Table:
             return NotImplemented
         if self is other:
             return True
-        if self.number_of_rows == 0 and other.number_of_rows == 0:
+        if self.number_of_rows == 0 and other.number_of_rows == 0 and self.column_names == other.column_names:
             return True
         if self.number_of_columns == 0 and other.number_of_columns == 0:
             return True
