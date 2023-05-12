@@ -1,5 +1,8 @@
 import pytest
+from _pytest.python_api import raises
+
 from safeds.data.tabular.containers import Table
+from safeds.exceptions import IndexOutOfBoundsError
 
 
 @pytest.mark.parametrize(
@@ -35,5 +38,5 @@ def test_should_slice_rows(table: Table, test_table: Table, second_test_table: T
 def test_should_raise_if_index_out_of_bounds(start: int, end: int, step: int) -> None:
     table = Table({"col1": [1, 2, 1], "col2": [1, 2, 4]})
 
-    with pytest.raises(ValueError, match="The given index is out of bounds"):
+    with raises(IndexOutOfBoundsError):
         table.slice_rows(start, end, step)
