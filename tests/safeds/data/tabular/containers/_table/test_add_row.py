@@ -5,17 +5,16 @@ from safeds.exceptions import SchemaMismatchError
 
 
 @pytest.mark.parametrize(
-    ("table", "row"),
+    ("table", "row", "expected"),
     [
-        (Table({"col1": [1, 2, 1], "col2": [1, 2, 4]}), Row({"col1": 5, "col2": 6})),
+        (Table({"col1": [1, 2, 1], "col2": [1, 2, 4]}), Row({"col1": 5, "col2": 6}), Table({"col1": [1, 2, 1, 5], "col2": [1, 2, 4, 6]})),
+        (Table({"col2": [], "col4": []}), Row({"col2": 5, "col4": 6}), Table({"col2": [5], "col4": [6]})),
     ],
-    ids=["added row"],
+    ids=["added row", "added row to empty column"],
 )
-def test_should_add_row(table: Table, row: Row) -> None:
+def test_should_add_row(table: Table, row: Row, expected: Table) -> None:
     table = table.add_row(row)
-    assert table.number_of_rows == 4
-    assert table.get_row(3) == row
-    assert table.schema == row._schema
+    assert table == expected
 
 
 def test_should_raise_error_if_row_schema_invalid() -> None:
