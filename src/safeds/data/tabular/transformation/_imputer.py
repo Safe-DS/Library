@@ -197,12 +197,12 @@ class Imputer(TableTransformer):
     # (Must implement abstract method, cannot instantiate class otherwise.)
     def get_names_of_changed_columns(self) -> list[str]:
         """
-        Get the names of all columns that have been changed by the Imputer.
+         Get the names of all columns that have been changed by the Imputer.
 
         Returns
         -------
-       changed_columns : list[str]
-            The list of (potentially) changed column names, as passed to fit.
+        changed_columns : list[str]
+             The list of (potentially) changed column names, as passed to fit.
         """
         if self._column_names is None:
             raise TransformerNotFittedError
@@ -221,4 +221,3 @@ class Imputer(TableTransformer):
         if not self.is_fitted():
             raise TransformerNotFittedError
         return []
-

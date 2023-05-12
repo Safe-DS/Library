@@ -72,17 +72,17 @@ class TableTransformer(ABC):
     @abstractmethod
     def get_names_of_changed_columns(self) -> list[str]:
         """
-        Get the names of all columns that have been changed by the transformer.
+         Get the names of all columns that have been changed by the transformer.
 
         Returns
         -------
-       changed_columns : list[str]
-            A list of names of changed columns, ordered as they appear in the table.
+        changed_columns : list[str]
+             A list of names of changed columns, ordered as they appear in the table.
 
         Raises
         ------
-        TransformerNotFittedError
-            If the transformer has not been fitted yet.
+         TransformerNotFittedError
+             If the transformer has not been fitted yet.
         """
 
     @abstractmethod
@@ -100,6 +100,7 @@ class TableTransformer(ABC):
         TransformerNotFittedError
             If the transformer has not been fitted yet.
         """
+
     @abstractmethod
     def is_fitted(self) -> bool:
         """

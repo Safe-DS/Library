@@ -267,12 +267,12 @@ class OneHotEncoder(InvertibleTableTransformer):
     # (Must implement abstract method, cannot instantiate class otherwise.)
     def get_names_of_changed_columns(self) -> list[str]:
         """
-        Get the names of all columns that have been changed by the OneHotEncoder (none).
+         Get the names of all columns that have been changed by the OneHotEncoder (none).
 
         Returns
         -------
-       changed_columns : list[str]
-            The empty list.
+        changed_columns : list[str]
+             The empty list.
         """
         warnings.warn("OneHotEncoder only removes and adds, but does not change any columns.", stacklevel=1)
         if not self.is_fitted():
@@ -291,4 +291,3 @@ class OneHotEncoder(InvertibleTableTransformer):
         if self._column_names is None:
             raise TransformerNotFittedError
         return list(self._column_names.keys())
-
