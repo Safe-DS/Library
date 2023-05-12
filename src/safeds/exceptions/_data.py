@@ -92,3 +92,10 @@ class ValueNotPresentWhenFittedError(Exception):
 
     def __init__(self, value: str, column: str) -> None:
         super().__init__(f"Value not present in the table the transformer was fitted on: \n{value} in column {column}.")
+
+
+class OutOfBoundsError(ValueError):
+    """Exception raised when a value is not in the range [lower, upper]."""
+
+    def __init__(self, value: float, lower: float, upper: float) -> None:
+        super().__init__(f"Value {value} is not in the range [{lower}, {upper}].")

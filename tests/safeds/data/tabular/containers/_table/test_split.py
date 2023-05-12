@@ -1,5 +1,6 @@
 import pytest
 from safeds.data.tabular.containers import Table
+from safeds.exceptions._data import OutOfBoundsError
 
 
 @pytest.mark.parametrize(
@@ -32,5 +33,5 @@ def test_should_split_table(table: Table, result_test_table: Table, result_train
 def test_should_raise_if_value_not_in_range(percentage_in_first: float) -> None:
     table = Table({"col1": [1, 2, 1], "col2": [1, 2, 4]})
 
-    with pytest.raises(ValueError, match="the given percentage is not in range"):
+    with pytest.raises(OutOfBoundsError, match=f"Value {percentage_in_first} is not in the range \\[0, 1\\]."):
         table.split(percentage_in_first)

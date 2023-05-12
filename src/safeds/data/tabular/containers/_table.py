@@ -26,6 +26,7 @@ from safeds.exceptions import (
     SchemaMismatchError,
     UnknownColumnNameError,
 )
+from safeds.exceptions._data import OutOfBoundsError
 
 from ._column import Column
 from ._row import Row
@@ -961,7 +962,10 @@ class Table:
         Raises
         ------
         ValueError
-            If the index is out of bounds.
+            If the given end index is smaller than the given start index.
+
+        OutOfBoundsError
+            If the given start or end index are smaller than 0 or larger than the number of rows.
         """
         if start is None:
             start = 0
@@ -969,8 +973,12 @@ class Table:
         if end is None:
             end = self.number_of_rows
 
-        if start < 0 or end < 0 or start >= self.number_of_rows or end > self.number_of_rows or end < start:
-            raise ValueError("The given index is out of bounds")
+        if end < start:
+            raise ValueError("The given end index is smaller than the given start index")
+        if start < 0 or start >= self.number_of_rows:
+            raise OutOfBoundsError(start, 0, self.number_of_rows)
+        if end < 0 or end > self.number_of_rows:
+            raise OutOfBoundsError(end, 0, self.number_of_rows)
 
         new_df = self._data.iloc[start:end:step]
         new_df.columns = self._schema.column_names
@@ -1053,10 +1061,13 @@ class Table:
             A tuple containing the two resulting tables. The first table has the specified size, the second table
             contains the rest of the data.
 
-
+        Raises
+        ------
+        OutOfBoundsError
+            If the given percentage is smaller than 0 or larger than 1.
         """
         if percentage_in_first <= 0 or percentage_in_first >= 1:
-            raise ValueError("the given percentage is not in range")
+            raise OutOfBoundsError(percentage_in_first, 0, 1)
         return (
             self.slice_rows(0, round(percentage_in_first * self.number_of_rows)),
             self.slice_rows(round(percentage_in_first * self.number_of_rows)),
