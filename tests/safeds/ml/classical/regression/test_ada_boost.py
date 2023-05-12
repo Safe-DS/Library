@@ -13,7 +13,7 @@ class TestLearner:
     def test_should_be_passed_to_fitted_model(self, training_set: TaggedTable) -> None:
         learner = AdaBoost()
         fitted_model = AdaBoost(learner=learner).fit(training_set)
-        assert fitted_model._learner == learner
+        assert fitted_model.learner == learner
 
     def test_should_be_passed_to_sklearn(self, training_set: TaggedTable) -> None:
         learner = AdaBoost()
@@ -25,7 +25,7 @@ class TestLearner:
 class TestMaximumNumberOfLearners:
     def test_should_be_passed_to_fitted_model(self, training_set: TaggedTable) -> None:
         fitted_model = AdaBoost(maximum_number_of_learners=2).fit(training_set)
-        assert fitted_model._maximum_number_of_learners == 2
+        assert fitted_model.maximum_number_of_learners == 2
 
     def test_should_be_passed_to_sklearn(self, training_set: TaggedTable) -> None:
         fitted_model = AdaBoost(maximum_number_of_learners=2).fit(training_set)
