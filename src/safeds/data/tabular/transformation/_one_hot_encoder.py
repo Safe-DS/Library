@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import warnings
 from collections import Counter
 from typing import Any
 
@@ -252,29 +253,42 @@ class OneHotEncoder(InvertibleTableTransformer):
 
     def get_names_of_added_columns(self) -> list[str]:
         """
-        awfawf
+        Get the names of all new columns that have been added by the OneHotEncoder.
 
         Returns
         -------
-
+        added_columns : list[str]
+            A list of names of the added columns, ordered as they will appear in the table.
         """
+        if not self.is_fitted():
+            raise TransformerNotFittedError
+        return sum(self._column_names.values(), [])
 
+    # (Must implement abstract method, cannot instantiate class otherwise.)
     def get_names_of_changed_columns(self) -> list[str]:
         """
-        awfawf
+        Get the names of all columns that have been changed by the OneHotEncoder (none).
 
         Returns
         -------
-
+       changed_columns : list[str]
+            The empty list.
         """
-
+        warnings.warn("OneHotEncoder only removes and adds, but does not change any columns.", stacklevel=1)
+        if not self.is_fitted():
+            raise TransformerNotFittedError
+        return []
 
     def get_names_of_removed_columns(self) -> list[str]:
         """
-        awfawf
+        Get the names of all columns that have been removed by the OneHotEncoder.
 
         Returns
         -------
-
+        removed_columns : list[str]
+            A list of names of the removed columns, ordered as they appear in the table the OneHotEncoder was fitted on.
         """
+        if not self.is_fitted():
+            raise TransformerNotFittedError
+        return list(self._column_names.keys())
 

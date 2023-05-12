@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import warnings
 from typing import Any
 
 import pandas as pd
@@ -178,3 +179,47 @@ class Imputer(TableTransformer):
             Whether the transformer is fitted.
         """
         return self._wrapped_transformer is not None
+
+    def get_names_of_added_columns(self) -> list[str]:
+        """
+        Get the names of all new columns that have been added by the Imputer.
+
+        Returns
+        -------
+        added_columns : list[str]
+            A list of names of the added columns, ordered as they will appear in the table.
+        """
+        warnings.warn("Imputer only changes data within columns, but does not add any columns.", stacklevel=1)
+        if not self.is_fitted():
+            raise TransformerNotFittedError
+        return []
+
+    # (Must implement abstract method, cannot instantiate class otherwise.)
+    def get_names_of_changed_columns(self) -> list[str]:
+        """
+        Get the names of all columns that have been changed by the Imputer.
+
+        Returns
+        -------
+       changed_columns : list[str]
+            The list of (potentially) changed column names, as passed to fit.
+        """
+        if not self.is_fitted():
+            raise TransformerNotFittedError
+        # TODO: Clarify whether this is what was intended.
+        return self._column_names
+
+    def get_names_of_removed_columns(self) -> list[str]:
+        """
+        Get the names of all columns that have been removed by the Imputer.
+
+        Returns
+        -------
+        removed_columns : list[str]
+            A list of names of the removed columns, ordered as they appear in the table the Imputer was fitted on.
+        """
+        warnings.warn("Imputer only changes data within columns, but does not remove any columns.", stacklevel=1)
+        if not self.is_fitted():
+            raise TransformerNotFittedError
+        return []
+
