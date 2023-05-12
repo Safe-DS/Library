@@ -1064,7 +1064,7 @@ class Table:
         Raises
         ------
         OutOfBoundsError
-            If the given percentage is smaller than 0 or larger than 1.
+            If the given percentage is smaller than or equal to 0 or larger than or equal to 1.
         """
         if percentage_in_first <= 0 or percentage_in_first >= 1:
             raise OutOfBoundsError(percentage_in_first, 0, 1)
