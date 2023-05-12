@@ -73,7 +73,7 @@ from safeds.data.tabular.containers import Table
                 {
                     "col1": [],
                     "col2": [],
-                }
+                },
             ),
         ),
     ],

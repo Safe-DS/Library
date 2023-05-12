@@ -19,7 +19,7 @@ from safeds.data.tabular.containers import Table
                     {
                         "col3": [1, 2, 3, 4],
                         "col4": [2, 3, 1, 4],
-                    }
+                    },
                 ),
             )
         ),

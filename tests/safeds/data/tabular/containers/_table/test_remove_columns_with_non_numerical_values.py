@@ -15,7 +15,7 @@ from safeds.data.tabular.containers import Table
             Table(
                 {
                     "col3": [2, 3, 1, 4],
-                }
+                },
             ),
         ),
         (Table({}), Table({})),
