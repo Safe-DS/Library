@@ -40,7 +40,7 @@ class TestMaximumNumberOfLearners:
 class TestLearningRate:
     def test_should_be_passed_to_fitted_model(self, training_set: TaggedTable) -> None:
         fitted_model = AdaBoost(learning_rate=2).fit(training_set)
-        assert fitted_model._learning_rate == 2
+        assert fitted_model.learning_rate == 2
 
     def test_should_be_passed_to_sklearn(self, training_set: TaggedTable) -> None:
         fitted_model = AdaBoost(learning_rate=2).fit(training_set)
