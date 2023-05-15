@@ -55,7 +55,6 @@ class LassoRegression(Regressor):
     def alpha(self) -> float:
         return self._alpha
 
-
     def fit(self, training_set: TaggedTable) -> LassoRegression:
         """
         Create a copy of this regressor and fit it with the given training data.

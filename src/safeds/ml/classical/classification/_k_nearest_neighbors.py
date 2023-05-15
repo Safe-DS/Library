@@ -47,7 +47,6 @@ class KNearestNeighbors(Classifier):
     def number_of_neighbors(self) -> int:
         return self._number_of_neighbors
 
-
     def fit(self, training_set: TaggedTable) -> KNearestNeighbors:
         """
         Create a copy of this classifier and fit it with the given training data.
