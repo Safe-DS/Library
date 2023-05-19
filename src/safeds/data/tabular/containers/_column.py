@@ -291,7 +291,7 @@ class Column(Sequence[T]):
         missing_values_exist : bool
             True if missing values exist.
         """
-        return self.any(lambda value: value is None or (isinstance(value, Number) and np.isnan(value)))
+        return self._type.may_be_missing()
 
     # ------------------------------------------------------------------------------------------------------------------
     # Transformations

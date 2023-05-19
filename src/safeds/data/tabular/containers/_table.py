@@ -808,6 +808,17 @@ class Table:
         result = result.dropna(axis="index")
         return Table._from_pandas_dataframe(result, self._schema)
 
+    def list_columns_with_missing_values(self) -> list[str]:
+        """
+        Return a list of column names that contain missing values.
+
+        Returns
+        -------
+        result : list[str]
+            A list of column names that contain missing values.
+        """
+        return [column.name for column in self.to_columns() if column.has_missing_values()]
+
     def remove_rows_with_outliers(self) -> Table:
         """
         Remove all rows from the table that contain at least one outlier.

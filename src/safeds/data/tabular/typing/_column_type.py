@@ -65,6 +65,17 @@ class ColumnType(ABC):
             True if the column is numeric.
         """
 
+    @abstractmethod
+    def may_be_missing(self) -> bool:
+        """
+        Return whether there are missing values.
+
+        Returns
+        -------
+        may_be_missing : bool
+            True if there are missing values.
+        """
+
 
 @dataclass
 class Anything(ColumnType):
@@ -107,6 +118,17 @@ class Anything(ColumnType):
         -------
         is_numeric : bool
             True if the column is numeric.
+        """
+        return False
+
+    def may_be_missing(self) -> bool:
+        """
+        Return whether the given column has missing values.
+
+        Returns
+        -------
+        may_be_missing : bool
+            True if the column has missing values.
         """
         return False
 
@@ -155,6 +177,17 @@ class Boolean(ColumnType):
         """
         return False
 
+    def may_be_missing(self) -> bool:
+        """
+        Return whether the given column has missing values.
+
+        Returns
+        -------
+        may_be_missing : bool
+            True if the column has missing values.
+        """
+        return False
+
 
 @dataclass
 class RealNumber(ColumnType):
@@ -199,6 +232,17 @@ class RealNumber(ColumnType):
             True if the column is numeric.
         """
         return True
+
+    def may_be_missing(self) -> bool:
+        """
+        Return whether the given column has missing values.
+
+        Returns
+        -------
+        may_be_missing : bool
+            True if the column has missing values.
+        """
+        return False
 
 
 @dataclass
@@ -245,6 +289,17 @@ class Integer(ColumnType):
         """
         return True
 
+    def may_be_missing(self) -> bool:
+        """
+        Return whether the given column has missing values.
+
+        Returns
+        -------
+        may_be_missing : bool
+            True if the column has missing values.
+        """
+        return False
+
 
 @dataclass
 class String(ColumnType):
@@ -289,3 +344,71 @@ class String(ColumnType):
             True if the column is numeric.
         """
         return False
+
+    def may_be_missing(self) -> bool:
+        """
+        Return whether the given column has missing values.
+
+        Returns
+        -------
+        may_be_missing : bool
+            True if the column has missing values.
+        """
+        return False
+
+
+@dataclass
+class Optional(ColumnType):
+    """
+    Type for a column that contains missing values.
+
+    Parameters
+    ----------
+    is_nullable : bool
+        Whether the type also allows null values.
+    """
+
+    _is_nullable: bool
+
+    def __init__(self, is_nullable: bool = False):
+        self._is_nullable = is_nullable
+
+    def __repr__(self) -> str:
+        result = "Optional"
+        if self._is_nullable:
+            result += "?"
+        return result
+
+    def is_nullable(self) -> bool:
+        """
+        Return whether the given column type is nullable.
+
+        Returns
+        -------
+        is_nullable : bool
+            True if the column is nullable.
+        """
+        return self._is_nullable
+
+    def is_numeric(self) -> bool:
+        """
+        Return whether the given column type is numeric.
+
+        Returns
+        -------
+        is_numeric : bool
+            True if the column is numeric.
+        """
+        return False
+
+    def may_be_missing(self) -> bool:
+        """
+        Return whether the given column has missing values.
+
+        Returns
+        -------
+        may_be_missing : bool
+            True if the column has missing values.
+        """
+        return True
+
