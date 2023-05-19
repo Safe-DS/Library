@@ -1,5 +1,5 @@
 from __future__ import annotations
-imporfrom _pytest import warnings
+from _pytest import warnings
 
 from sklearn.preprocessing import MinMaxScaler
 from safeds.data.tabular.containers import Table
