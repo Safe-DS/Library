@@ -914,7 +914,6 @@ class Table:
                 columns.append(self.get_column(old_column))
 
         result = Table.from_columns(columns)
-        print(result._schema)
         return result
 
     def shuffle_rows(self) -> Table:
