@@ -218,7 +218,8 @@ class TestFitAndTransform:
 
         table = Table(
             {
-                "a": ["b"],
+                "a": [1, None],
+                "b": [1, 1],
             },
         )
         transformer = transformer.fit(table, None)
@@ -231,11 +232,12 @@ class TestFitAndTransform:
             transformer.get_names_of_changed_columns()
         table = Table(
             {
-                "a": ["b"],
+                "a": [1, None],
+                "b": [1, 1],
             },
         )
         transformer = transformer.fit(table, None)
-        assert transformer.get_names_of_changed_columns() == ["a"]
+        assert transformer.get_names_of_changed_columns() == ["a", "b"]
 
     def test_get_names_of_removed_columns(self) -> None:
         transformer = Imputer(strategy=Imputer.Strategy.Constant(1))
@@ -247,7 +249,8 @@ class TestFitAndTransform:
 
         table = Table(
             {
-                "a": ["b"],
+                "a": [1, None],
+                "b": [1, 1],
             },
         )
         transformer = transformer.fit(table, None)

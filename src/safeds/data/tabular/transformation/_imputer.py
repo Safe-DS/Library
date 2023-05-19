@@ -202,7 +202,7 @@ class Imputer(TableTransformer):
     # (Must implement abstract method, cannot instantiate class otherwise.)
     def get_names_of_changed_columns(self) -> list[str]:
         """
-         Get the names of all columns that have been changed by the Imputer.
+         Get the names of all columns that may have been changed by the Imputer.
 
         Returns
         -------
