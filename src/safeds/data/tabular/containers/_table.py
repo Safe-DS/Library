@@ -913,8 +913,7 @@ class Table:
             else:
                 columns.append(self.get_column(old_column))
 
-        result = Table.from_columns(columns)
-        return result
+        return Table.from_columns(columns)
 
     def shuffle_rows(self) -> Table:
         """
