@@ -96,7 +96,7 @@ class Table:
         ValueError
             If the file could not be read.
         """
-        with Path.open(path) as f:
+        with Path(path).open() as f:
             if f.read().replace("\n", "") == "":
                 return Table()
 
@@ -156,7 +156,7 @@ class Table:
         ValueError
             If the file could not be read.
         """
-        with Path.open(path) as f:
+        with Path(path).open() as f:
             if f.read().replace("\n", "") in ("", "{}"):
                 return Table()
 
