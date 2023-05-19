@@ -26,4 +26,4 @@ def test_should_create_table_from_json_file(path: str | Path, expected: Table) -
 )
 def test_should_raise_error_if_file_not_found(path: str | Path) -> None:
     with pytest.raises(FileNotFoundError):
-        Table.from_json_file(resolve_resource_path(path))
+        Table.from_json_file(path)
