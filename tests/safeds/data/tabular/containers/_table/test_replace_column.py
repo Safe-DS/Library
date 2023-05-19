@@ -8,7 +8,7 @@ from safeds.exceptions import (
 
 
 @pytest.mark.parametrize(
-    ("table", "column_name", "column", "expected"),
+    ("table", "column_name", "columns", "expected"),
     [
         (
             Table(
@@ -18,13 +18,14 @@ from safeds.exceptions import (
                     "C": ["a", "b", "c"],
                 },
             ),
-            "C",
-            Column("C", ["d", "e", "f"]),
+            "B",
+            [Column("B", ["d", "e", "f"]), Column("D", [3, 4, 5])],
             Table(
                 {
                     "A": [1, 2, 3],
-                    "B": [4, 5, 6],
-                    "C": ["d", "e", "f"],
+                    "B": ["d", "e", "f"],
+                    "D": [3, 4, 5],
+                    "C": ["a", "b", "c"],
                 },
             ),
         ),
@@ -37,7 +38,7 @@ from safeds.exceptions import (
                 },
             ),
             "C",
-            Column("D", ["d", "e", "f"]),
+            [Column("D", ["d", "e", "f"])],
             Table(
                 {
                     "A": [1, 2, 3],
@@ -48,8 +49,8 @@ from safeds.exceptions import (
         ),
     ],
 )
-def test_should_replace_column(table: Table, column_name: str, column: Column, expected: Table) -> None:
-    result = table.replace_column(column_name, column)
+def test_should_replace_column(table: Table, column_name: str, columns: list[Column], expected: Table) -> None:
+    result = table.replace_column(column_name, columns)
     assert result == expected
 
 
@@ -75,7 +76,7 @@ def test_should_raise_error(
             "C": ["a", "b", "c"],
         },
     )
-    column = Column(column_name, column_values)
+    column = [Column(column_name, column_values)]
 
     with pytest.raises(error):
         input_table.replace_column(old_column_name, column)
