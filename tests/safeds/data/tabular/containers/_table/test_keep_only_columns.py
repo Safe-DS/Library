@@ -44,14 +44,8 @@ def test_should_keep_only_listed_columns(table: Table, column_names: list[str], 
     transformed_table = table.keep_only_columns(column_names)
     assert transformed_table == expected
 
-@pytest.mark.parametrize(
-    "table",
-    [
-        Table({"A": [1], "B": [2]}),
-        Table()
-    ],
-    ids=["table", "empty"]
-)
+
+@pytest.mark.parametrize("table", [Table({"A": [1], "B": [2]}), Table()], ids=["table", "empty"])
 def test_should_raise_error_if_column_name_unknown(table: Table) -> None:
     with pytest.raises(UnknownColumnNameError):
         table.keep_only_columns(["C"])

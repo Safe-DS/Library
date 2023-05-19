@@ -2,8 +2,8 @@ from pathlib import Path
 from tempfile import NamedTemporaryFile
 
 import pytest
-
 from safeds.data.tabular.containers import Table
+
 from tests.helpers import resolve_resource_path
 
 
@@ -13,7 +13,7 @@ from tests.helpers import resolve_resource_path
         (Table({"col1": ["col1_1"], "col2": ["col2_1"]})),
         (Table()),
     ],
-    ids=["by String", "empty"]
+    ids=["by String", "empty"],
 )
 def test_should_create_csv_file_from_table_by_str(table: Table) -> None:
     with NamedTemporaryFile() as tmp_table_file:
@@ -31,7 +31,7 @@ def test_should_create_csv_file_from_table_by_str(table: Table) -> None:
         (Table({"col1": ["col1_1"], "col2": ["col2_1"]})),
         (Table()),
     ],
-    ids=["by String", "empty"]
+    ids=["by String", "empty"],
 )
 def test_should_create_csv_file_from_table_by_path(table: Table) -> None:
     with NamedTemporaryFile(suffix=".xlsx") as tmp_table_file:

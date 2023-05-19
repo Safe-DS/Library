@@ -20,7 +20,7 @@ from safeds.exceptions import ColumnSizeError, DuplicateColumnNameError
             Table({}),
             [Column("col3", [1]), Column("col4", [2])],
             Table({"col3": [1], "col4": [2]}),
-        )
+        ),
     ],
     ids=["add 2 columns", "empty with empty column", "empty with filled column"],
 )

@@ -21,11 +21,11 @@ def test_should_match_snapshot() -> None:
     [
         (Table({"A": [1, 2, 3], "B": [2, 4, 7]}), "C", "A"),
         (Table({"A": [1, 2, 3], "B": [2, 4, 7]}), "A", "C"),
-        (Table(), "x", "y")
+        (Table(), "x", "y"),
     ],
     ids=["x column", "y column", "empty"],
 )
-def test_should_raise_if_column_does_not_exist(table:Table, x: str, y: str) -> None:
+def test_should_raise_if_column_does_not_exist(table: Table, x: str, y: str) -> None:
     table = Table({"A": [1, 2, 3], "B": [2, 4, 7]})
     with pytest.raises(UnknownColumnNameError):
         table.plot_lineplot(x, y)

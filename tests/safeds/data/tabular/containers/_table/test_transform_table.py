@@ -71,9 +71,7 @@ from safeds.exceptions import TransformerNotFittedError, UnknownColumnNameError
                 },
             ),
         ),
-        (Table(),
-         [],
-         Table())
+        (Table(), [], Table()),
     ],
     ids=["all columns", "one column", "multiple columns", "none", "empty"],
 )
@@ -94,8 +92,8 @@ def test_should_return_transformed_table(
                 "col1": ["a", "b", "c"],
             },
         ),
-        Table()
-    ]
+        Table(),
+    ],
 )
 def test_should_raise_if_column_not_found(table_to_fit: Table) -> None:
     table_to_fit = Table(

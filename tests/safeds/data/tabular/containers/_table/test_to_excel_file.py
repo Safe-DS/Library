@@ -2,7 +2,6 @@ from pathlib import Path
 from tempfile import NamedTemporaryFile
 
 import pytest
-
 from safeds.data.tabular.containers import Table
 
 
@@ -12,7 +11,7 @@ from safeds.data.tabular.containers import Table
         (Table({"col1": ["col1_1"], "col2": ["col2_1"]})),
         (Table()),
     ],
-    ids=["by String", "empty"]
+    ids=["by String", "empty"],
 )
 def test_should_create_excel_file_from_table_by_str(table: Table) -> None:
     with NamedTemporaryFile(suffix=".xlsx") as tmp_table_file:
@@ -23,13 +22,14 @@ def test_should_create_excel_file_from_table_by_str(table: Table) -> None:
             table_r = Table.from_excel_file(tmp_file.name)
     assert table_r == table
 
+
 @pytest.mark.parametrize(
     "table",
     [
         (Table({"col1": ["col1_1"], "col2": ["col2_1"]})),
         (Table()),
     ],
-    ids=["by String", "empty"]
+    ids=["by String", "empty"],
 )
 def test_should_create_excel_file_from_table_by_path(table: Table) -> None:
     with NamedTemporaryFile(suffix=".xlsx") as tmp_table_file:
