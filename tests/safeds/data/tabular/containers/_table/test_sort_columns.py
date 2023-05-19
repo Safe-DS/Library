@@ -50,3 +50,7 @@ def test_should_return_sorted_table(
     assert table_sorted_columns[3] == columns[col4]
     assert table_sorted.number_of_columns == 4
     assert table_sorted.number_of_rows == table1.number_of_rows
+
+
+def test_should_not_sort_anything_on_empty_table() -> None:
+    assert Table() == Table().sort_columns()

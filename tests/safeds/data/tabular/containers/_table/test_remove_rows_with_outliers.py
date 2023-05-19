@@ -47,8 +47,12 @@ from safeds.data.tabular.containers import Table
             ),
             0,
         ),
+        (
+            Table(),
+            0
+        )
     ],
-    ids=["no outliers", "with outliers", "no rows"],
+    ids=["no outliers", "with outliers", "no rows", "empty"],
 )
 def test_should_remove_rows_with_outliers(table: Table, expected: int) -> None:
     updated_table = table.remove_rows_with_outliers()
