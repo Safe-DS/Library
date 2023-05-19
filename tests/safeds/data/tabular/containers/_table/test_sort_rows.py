@@ -41,3 +41,7 @@ def test_should_not_modify_original_table(
 ) -> None:
     table.sort_rows(comparator)
     assert table == expected
+
+
+def test_should_not_sort_anything_on_empty_table() -> None:
+    assert Table() == Table().sort_rows(lambda row1, row2: row1["col1"] - row2["col1"])
