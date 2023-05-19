@@ -11,9 +11,10 @@ from tests.helpers import resolve_resource_path
     [
         ("table.csv", Table({"A": [1], "B": [2]})),
         (Path("table.csv"), Table({"A": [1], "B": [2]})),
-        ("emptytable.csv", Table())
+        ("emptytable.csv", Table()),
     ],
-    ids=["by String", "by path", "empty"])
+    ids=["by String", "by path", "empty"],
+)
 def test_should_create_table_from_csv_file(path: str | Path, expected: Table) -> None:
     table = Table.from_csv_file(resolve_resource_path(path))
     assert table == expected

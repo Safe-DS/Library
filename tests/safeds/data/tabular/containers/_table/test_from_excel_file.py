@@ -27,10 +27,7 @@ from tests.helpers import resolve_resource_path
                 },
             ),
         ),
-        (
-            resolve_resource_path("./empty_excel_file.xlsx"),
-            Table()
-        ),
+        (resolve_resource_path("./empty_excel_file.xlsx"), Table()),
     ],
     ids=["string path", "object path", "empty file"],
 )

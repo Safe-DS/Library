@@ -7,7 +7,11 @@ from safeds.exceptions import SchemaMismatchError
 @pytest.mark.parametrize(
     ("table", "row", "expected"),
     [
-        (Table({"col1": [1, 2, 1], "col2": [1, 2, 4]}), Row({"col1": 5, "col2": 6}), Table({"col1": [1, 2, 1, 5], "col2": [1, 2, 4, 6]})),
+        (
+            Table({"col1": [1, 2, 1], "col2": [1, 2, 4]}),
+            Row({"col1": 5, "col2": 6}),
+            Table({"col1": [1, 2, 1, 5], "col2": [1, 2, 4, 6]}),
+        ),
         (Table({"col2": [], "col4": []}), Row({"col2": 5, "col4": 6}), Table({"col2": [5], "col4": [6]})),
         (Table(), Row({"col2": 5, "col4": 6}), Table({"col2": [5], "col4": [6]})),
     ],

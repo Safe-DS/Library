@@ -27,7 +27,7 @@ from safeds.data.tabular.typing import Integer, Schema, String
                 ),
             ],
         ),
-        (Table(), [])
+        (Table(), []),
     ],
     ids=["normal", "empty"],
 )

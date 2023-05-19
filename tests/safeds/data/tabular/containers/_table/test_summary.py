@@ -52,9 +52,23 @@ from safeds.data.tabular.containers import Table
         ),
         (
             Table(),
-            Table({"metrics": ["maximum", "minimum", "mean", "mode", "median", "sum", "variance",
-                               "standard deviation", "idness", "stability"]})
-        )
+            Table(
+                {
+                    "metrics": [
+                        "maximum",
+                        "minimum",
+                        "mean",
+                        "mode",
+                        "median",
+                        "sum",
+                        "variance",
+                        "standard deviation",
+                        "idness",
+                        "stability",
+                    ],
+                },
+            ),
+        ),
     ],
     ids=["Column of integers and Column of characters", "empty"],
 )

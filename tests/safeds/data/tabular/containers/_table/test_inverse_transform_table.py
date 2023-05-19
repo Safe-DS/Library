@@ -68,7 +68,7 @@ from safeds.exceptions import TransformerNotFittedError
         "same table to fit and transform",
         "different tables to fit and transform",
         "one column name is a prefix of another column name",
-        "empty"
+        "empty",
     ],
 )
 def test_should_return_original_table(

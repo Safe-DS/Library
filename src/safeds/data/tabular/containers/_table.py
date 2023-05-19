@@ -12,7 +12,6 @@ import openpyxl
 import pandas as pd
 import seaborn as sns
 from pandas import DataFrame
-from pandas.errors import EmptyDataError
 from scipy import stats
 
 from safeds.data.image.containers import Image
@@ -521,8 +520,22 @@ class Table:
             The table with statistics.
         """
         if self.number_of_columns == 0:
-            return Table({"metrics": ["maximum", "minimum", "mean", "mode", "median", "sum", "variance",
-                                      "standard deviation", "idness", "stability"]})
+            return Table(
+                {
+                    "metrics": [
+                        "maximum",
+                        "minimum",
+                        "mean",
+                        "mode",
+                        "median",
+                        "sum",
+                        "variance",
+                        "standard deviation",
+                        "idness",
+                        "stability",
+                    ],
+                },
+            )
 
         columns = self.to_columns()
         result = pd.DataFrame()
@@ -646,10 +659,9 @@ class Table:
             A new table with the added row at the end.
 
         """
-
         int_columns = []
         if self.number_of_rows == 0:
-            int_columns = list(filter(lambda name: isinstance(row[name], (int, np.int64)), row.column_names))
+            int_columns = list(filter(lambda name: isinstance(row[name], int | np.int64), row.column_names))
             if self.number_of_columns == 0:
                 for column in row.column_names:
                     self._data[column] = Column(column, [])
@@ -700,7 +712,7 @@ class Table:
         int_columns = []
         for row in rows:
             if self.number_of_rows == 0:
-                int_columns = list(filter(lambda name: isinstance(row[name], (int, np.int64)), row.column_names))
+                int_columns = list(filter(lambda name: isinstance(row[name], int | np.int64), row.column_names))
                 if self.number_of_columns == 0:
                     for column in row.column_names:
                         self._data[column] = Column(column, [])
@@ -1034,7 +1046,7 @@ class Table:
     def sort_columns(
         self,
         comparator: Callable[[Column, Column], int] = lambda col1, col2: (col1.name > col2.name)
-                                                                         - (col1.name < col2.name),
+        - (col1.name < col2.name),
     ) -> Table:
         """
         Sort the columns of a `Table` with the given comparator and return a new `Table`.

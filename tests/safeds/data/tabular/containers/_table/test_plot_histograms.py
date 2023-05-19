@@ -24,6 +24,7 @@ def test_should_match_snapshot(table: Table, path: str) -> None:
     assertion = snapshot._image.tobytes() == current._image.tobytes()
     assert assertion
 
+
 def test_should_fail_on_empty_table() -> None:
     with pytest.raises(ZeroDivisionError):
         Table().plot_histograms()

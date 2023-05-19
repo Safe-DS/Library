@@ -25,7 +25,7 @@ from safeds.exceptions import ColumnSizeError, DuplicateColumnNameError
             Table({}),
             Column("col3", [1]),
             Table({"col3": [1]}),
-        )
+        ),
     ],
     ids=["String", "Integer", "empty with empty column", "empty with filled column"],
 )

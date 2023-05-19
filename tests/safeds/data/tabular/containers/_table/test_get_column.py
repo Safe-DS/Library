@@ -13,6 +13,7 @@ from safeds.exceptions import UnknownColumnNameError
 def test_should_get_column(table1: Table, expected: Column) -> None:
     assert table1.get_column("col1") == expected
 
+
 @pytest.mark.parametrize(
     "table",
     [
