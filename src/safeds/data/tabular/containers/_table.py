@@ -108,6 +108,7 @@ class Table:
     def from_excel_file(path: str | Path) -> Table:
         """
         Read data from an Excel file into a table.
+
         Valid file extensions are `.xls`, '.xlsx', `.xlsm`, `.xlsb`, `.odf`, `.ods` and `.odt`.
 
         Parameters
@@ -1453,8 +1454,8 @@ class Table:
     def to_excel_file(self, path: str | Path) -> None:
         """
         Write the data from the table into an Excel file.
-        Valid file extensions are `.xls`, '.xlsx', `.xlsm`, `.xlsb`, `.odf`, `.ods` and `.odt`.
 
+        Valid file extensions are `.xls`, '.xlsx', `.xlsm`, `.xlsb`, `.odf`, `.ods` and `.odt`.
         If the file and/or the directories do not exist, they will be created. If the file already exists, it will be
         overwritten.
 
