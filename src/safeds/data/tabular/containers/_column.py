@@ -2,11 +2,9 @@ from __future__ import annotations
 
 import io
 from collections.abc import Sequence
-from numbers import Number
 from typing import TYPE_CHECKING, Any, TypeVar, overload
 
 import matplotlib.pyplot as plt
-import numpy as np
 import pandas as pd
 import seaborn as sns
 

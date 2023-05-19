@@ -411,4 +411,3 @@ class Optional(ColumnType):
             True if the column has missing values.
         """
         return True
-

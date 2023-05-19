@@ -1,15 +1,6 @@
-
 import numpy as np
 import pytest
-from safeds.data.tabular.typing._column_type import (
-    Anything,
-    Boolean,
-    ColumnType,
-    Integer,
-    RealNumber,
-    String,
-    Optional
-)
+from safeds.data.tabular.typing._column_type import Anything, Boolean, ColumnType, Integer, Optional, RealNumber, String
 
 
 class TestFromNumpyDataType:
@@ -67,7 +58,7 @@ class TestRepr:
             (String(is_nullable=False), "String"),
             (String(is_nullable=True), "String?"),
             (Optional(is_nullable=False), "Optional"),
-            (Optional(is_nullable=True), "Optional?")
+            (Optional(is_nullable=True), "Optional?"),
         ],
         ids=repr,
     )
@@ -90,7 +81,7 @@ class TestIsNullable:
             (String(is_nullable=False), False),
             (String(is_nullable=True), True),
             (Optional(is_nullable=False), False),
-            (Optional(is_nullable=True), True)
+            (Optional(is_nullable=True), True),
         ],
         ids=repr,
     )
@@ -113,7 +104,7 @@ class TestIsNumeric:
             (String(is_nullable=False), False),
             (String(is_nullable=True), False),
             (Optional(is_nullable=False), False),
-            (Optional(is_nullable=True), False)
+            (Optional(is_nullable=True), False),
         ],
         ids=repr,
     )
@@ -136,10 +127,9 @@ class TestIsOptional:
             (String(is_nullable=False), False),
             (String(is_nullable=True), False),
             (Optional(is_nullable=False), True),
-            (Optional(is_nullable=True), True)
+            (Optional(is_nullable=True), True),
         ],
         ids=repr,
     )
-    def test_should_return_whether_the_column_type_is_optional(self, column_type: ColumnType,
-                                                              expected: bool) -> None:
+    def test_should_return_whether_the_column_type_is_optional(self, column_type: ColumnType, expected: bool) -> None:
         assert column_type.may_be_missing() == expected
