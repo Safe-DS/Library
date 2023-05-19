@@ -4,6 +4,12 @@ from safeds.data.tabular.transformation import RangeScaler
 from safeds.exceptions import TransformerNotFittedError, UnknownColumnNameError
 
 
+class TestInit:
+    def test_should_raise_value_error(self) -> None:
+        with pytest.raises(ValueError, match='Parameter "maximum" must be higher than parameter "minimum".'):
+            _ = RangeScaler(minimum=10, maximum=0)
+
+
 class TestFit:
     def test_should_raise_if_column_not_found(self) -> None:
         table = Table(
@@ -13,7 +19,7 @@ class TestFit:
         )
 
         with pytest.raises(UnknownColumnNameError):
-            LabelEncoder().fit(table, ["col2"])
+            RangeScaler().fit(table, ["col2"])
 
     def test_should_not_change_original_transformer(self) -> None:
         table = Table(
@@ -22,7 +28,7 @@ class TestFit:
             },
         )
 
-        transformer = LabelEncoder()
+        transformer = RangeScaler()
         transformer.fit(table, None)
 
         assert transformer._wrapped_transformer is None
@@ -37,7 +43,7 @@ class TestTransform:
             },
         )
 
-        transformer = LabelEncoder().fit(table_to_fit, None)
+        transformer = RangeScaler().fit(table_to_fit, None)
 
         table_to_transform = Table(
             {
@@ -55,7 +61,7 @@ class TestTransform:
             },
         )
 
-        transformer = LabelEncoder()
+        transformer = RangeScaler()
 
         with pytest.raises(TransformerNotFittedError):
             transformer.transform(table)
@@ -63,7 +69,7 @@ class TestTransform:
 
 class TestIsFitted:
     def test_should_return_false_before_fitting(self) -> None:
-        transformer = LabelEncoder()
+        transformer = RangeScaler()
         assert not transformer.is_fitted()
 
     def test_should_return_true_after_fitting(self) -> None:
@@ -73,7 +79,7 @@ class TestIsFitted:
             },
         )
 
-        transformer = LabelEncoder()
+        transformer = RangeScaler()
         fitted_transformer = transformer.fit(table, None)
         assert fitted_transformer.is_fitted()
 
@@ -118,7 +124,7 @@ class TestFitAndTransform:
         column_names: list[str] | None,
         expected: Table,
     ) -> None:
-        assert LabelEncoder().fit_and_transform(table, column_names) == expected
+        assert RangeScaler().fit_and_transform(table, column_names) == expected
 
     def test_should_not_change_original_table(self) -> None:
         table = Table(
@@ -127,7 +133,7 @@ class TestFitAndTransform:
             },
         )
 
-        LabelEncoder().fit_and_transform(table)
+        RangeScaler().fit_and_transform(table)
 
         expected = Table(
             {
@@ -138,10 +144,10 @@ class TestFitAndTransform:
         assert table == expected
 
     def test_get_names_of_added_columns(self) -> None:
-        transformer = LabelEncoder()
+        transformer = RangeScaler()
         with pytest.warns(
             UserWarning,
-            match="LabelEncoder only changes data within columns, but does not add any columns.",
+            match="RangeScaler only changes data within columns, but does not add any columns.",
         ), pytest.raises(TransformerNotFittedError):
             transformer.get_names_of_added_columns()
 
@@ -153,12 +159,12 @@ class TestFitAndTransform:
         transformer = transformer.fit(table, None)
         with pytest.warns(
             UserWarning,
-            match="LabelEncoder only changes data within columns, but does not add any columns.",
+            match="RangeScaler only changes data within columns, but does not add any columns.",
         ):
             assert transformer.get_names_of_added_columns() == []
 
     def test_get_names_of_changed_columns(self) -> None:
-        transformer = LabelEncoder()
+        transformer = RangeScaler()
         with pytest.raises(TransformerNotFittedError):
             transformer.get_names_of_changed_columns()
         table = Table(
@@ -170,10 +176,10 @@ class TestFitAndTransform:
         assert transformer.get_names_of_changed_columns() == ["a"]
 
     def test_get_names_of_removed_columns(self) -> None:
-        transformer = LabelEncoder()
+        transformer = RangeScaler()
         with pytest.warns(
             UserWarning,
-            match="LabelEncoder only changes data within columns, but does not remove any columns.",
+            match="RangeScaler only changes data within columns, but does not remove any columns.",
         ), pytest.raises(TransformerNotFittedError):
             transformer.get_names_of_removed_columns()
 
@@ -185,7 +191,7 @@ class TestFitAndTransform:
         transformer = transformer.fit(table, None)
         with pytest.warns(
             UserWarning,
-            match="LabelEncoder only changes data within columns, but does not remove any columns.",
+            match="RangeScaler only changes data within columns, but does not remove any columns.",
         ):
             assert transformer.get_names_of_removed_columns() == []
 
@@ -202,7 +208,7 @@ class TestInverseTransform:
         ],
     )
     def test_should_return_original_table(self, table: Table) -> None:
-        transformer = LabelEncoder().fit(table, None)
+        transformer = RangeScaler().fit(table, None)
 
         assert transformer.inverse_transform(transformer.transform(table)) == table
 
@@ -213,7 +219,7 @@ class TestInverseTransform:
             },
         )
 
-        transformer = LabelEncoder().fit(table, None)
+        transformer = RangeScaler().fit(table, None)
         transformed_table = transformer.transform(table)
         transformer.inverse_transform(transformed_table)
 
@@ -232,7 +238,7 @@ class TestInverseTransform:
             },
         )
 
-        transformer = LabelEncoder()
+        transformer = RangeScaler()
 
         with pytest.raises(TransformerNotFittedError):
             transformer.inverse_transform(table)
