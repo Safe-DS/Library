@@ -27,7 +27,7 @@ class RangeScaler(InvertibleTableTransformer):
 
     def __init__(self, minimum: float = 0.0, maximum: float = 1.0):
         self._column_names: list[str] | None = None
-        self._wrapped_transformer = None
+        self._wrapped_transformer: sk_MinMaxScaler | None = None
         if minimum >= maximum:
             raise ValueError('Parameter "maximum" must be higher than parameter "minimum".')
         self._minimum = minimum
@@ -58,7 +58,7 @@ class RangeScaler(InvertibleTableTransformer):
             if len(missing_columns) > 0:
                 raise UnknownColumnNameError(list(missing_columns))
 
-        wrapped_transformer = sk_MinMaxScaler()
+        wrapped_transformer = sk_MinMaxScaler((self._minimum, self._maximum))
         wrapped_transformer.fit(table._data[column_names])
 
         result = RangeScaler()
