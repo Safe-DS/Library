@@ -32,5 +32,5 @@ def test_should_match_snapshot(table: Table, path: str) -> None:
 
 def test_should_raise_if_column_contains_non_numerical_values() -> None:
     table = Table.from_dict({"A": ["1", "2", "3.5"], "B": ["0.2", "4", "77"]})
-    with pytest.raises(NonNumericColumnError):
+    with pytest.raises(NonNumericColumnError, match=r"Tried to do a numerical operation on one or multiple non numerical Columns: \nThis table contains only non-numerical columns."):
         table.plot_boxplots()
