@@ -214,7 +214,7 @@ class Table:
             If multiple columns have the same name.
         """
         dataframe: DataFrame = pd.DataFrame()
-        column_names = list()
+        column_names = []
 
         for column in columns:
             if column._data.size != columns[0]._data.size:
@@ -1284,7 +1284,10 @@ class Table:
             If either of the columns do not exist.
         """
         if not self.has_column(x_column_name) or not self.has_column(y_column_name):
-            raise UnknownColumnNameError(([x_column_name] if not self.has_column(x_column_name) else []) + ([y_column_name] if not self.has_column(y_column_name) else []))
+            raise UnknownColumnNameError(
+                ([x_column_name] if not self.has_column(x_column_name) else [])
+                + ([y_column_name] if not self.has_column(y_column_name) else []),
+            )
 
         fig = plt.figure()
         ax = sns.lineplot(
@@ -1329,7 +1332,10 @@ class Table:
             If either of the columns do not exist.
         """
         if not self.has_column(x_column_name) or not self.has_column(y_column_name):
-            raise UnknownColumnNameError(([x_column_name] if not self.has_column(x_column_name) else []) + ([y_column_name] if not self.has_column(y_column_name) else []))
+            raise UnknownColumnNameError(
+                ([x_column_name] if not self.has_column(x_column_name) else [])
+                + ([y_column_name] if not self.has_column(y_column_name) else []),
+            )
 
         fig = plt.figure()
         ax = sns.scatterplot(

@@ -43,7 +43,22 @@ def test_should_raise_if_file_not_found() -> None:
 
 @pytest.mark.parametrize(
     ("path", "expected_error_message"),
-    [("invalid_file_extension.file_extension", r"invalid_file_extension.file_extension has a wrong file extension. Please provide a file with the following extension\(s\): \['.xls', '.xlsx', '.xlsm', '.xlsb', '.odf', '.ods', '.odt'\]"), (Path("invalid_file_extension.file_extension"), r"invalid_file_extension.file_extension has a wrong file extension. Please provide a file with the following extension\(s\): \['.xls', '.xlsx', '.xlsm', '.xlsb', '.odf', '.ods', '.odt'\]")],
+    [
+        (
+            "invalid_file_extension.file_extension",
+            (
+                r"invalid_file_extension.file_extension has a wrong file extension. Please provide a file with the"
+                r" following extension\(s\): \['.xls', '.xlsx', '.xlsm', '.xlsb', '.odf', '.ods', '.odt'\]"
+            ),
+        ),
+        (
+            Path("invalid_file_extension.file_extension"),
+            (
+                r"invalid_file_extension.file_extension has a wrong file extension. Please provide a file with the"
+                r" following extension\(s\): \['.xls', '.xlsx', '.xlsm', '.xlsb', '.odf', '.ods', '.odt'\]"
+            ),
+        ),
+    ],
     ids=["by String", "by path"],
 )
 def test_should_raise_error_if_wrong_file_extension(path: str | Path, expected_error_message: str) -> None:

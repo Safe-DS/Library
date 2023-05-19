@@ -106,4 +106,7 @@ class WrongFileExtensionError(Exception):
     """Exception raised when the file has the wrong file extension."""
 
     def __init__(self, file: str | Path, file_extension: str | list[str]) -> None:
-        super().__init__(f"The file {file} has a wrong file extension. Please provide a file with the following extension(s): {file_extension}")
+        super().__init__(
+            f"The file {file} has a wrong file extension. Please provide a file with the following extension(s):"
+            f" {file_extension}",
+        )
