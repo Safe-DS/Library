@@ -217,11 +217,14 @@ class TestFitAndTransform:
 
         table = Table(
             {
-                "a": ["b"],
+                "a__b": ["c", "d"],
+                "a": ["b__c", "d"],
             },
         )
+        added_columns = ["a__b__c", "a__b__d", "a__b__c#2", "a__d"]
+
         transformer = transformer.fit(table, None)
-        assert transformer.get_names_of_added_columns() == ["a__b"]
+        assert transformer.get_names_of_added_columns() == added_columns
 
     def test_get_names_of_changed_columns(self) -> None:
         transformer = OneHotEncoder()
