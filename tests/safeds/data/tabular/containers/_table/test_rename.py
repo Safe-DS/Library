@@ -23,7 +23,7 @@ def test_should_rename_column(name_from: str, name_to: str, column_one: str, col
     ],
     ids=["normal", "empty"]
 )
-def test_should_raise_if_old_column_does_not_exist(table) -> None:
+def test_should_raise_if_old_column_does_not_exist(table: Table) -> None:
     with pytest.raises(UnknownColumnNameError):
         table.rename_column("C", "D")
 

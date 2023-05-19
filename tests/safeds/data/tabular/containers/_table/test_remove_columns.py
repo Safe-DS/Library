@@ -22,6 +22,6 @@ def test_should_remove_table_columns(table1: Table, expected: Table) -> None:
         Table()
     ]
 )
-def test_should_raise_if_column_not_found(table) -> None:
+def test_should_raise_if_column_not_found(table: Table) -> None:
     with pytest.raises(UnknownColumnNameError):
         table.remove_columns(["C"])
