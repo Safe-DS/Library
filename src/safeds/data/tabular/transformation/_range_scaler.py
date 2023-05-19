@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import warnings
 
-from sklearn.preprocessing import MinMaxScaler
+from sklearn.preprocessing import MinMaxScaler as sk_MinMaxScaler
 
 from safeds.data.tabular.containers import Table
 from safeds.data.tabular.transformation._table_transformer import InvertibleTableTransformer
@@ -13,6 +13,14 @@ class RangeScaler(InvertibleTableTransformer):
     """
     The RangeScaler transforms column values by scaling each value to a given range.
 
+    Parameters
+    ----------
+    minimum : float
+        The minimum of the new range after the transformation
+    maximum : float
+        The maximum of the new range after the transformation
+    column_names : list[str] | None
+        A List of column Names the RangeScale should be applied to
     Raises
     ------
     ValueError
@@ -20,7 +28,7 @@ class RangeScaler(InvertibleTableTransformer):
     """
 
     def __init__(self, minimum: float = 0.0, maximum: float = 1.0):
-        self._column_names = None
+        self._column_names : list[str] | None = None
         self._wrapped_transformer = None
         if minimum >= maximum:
             raise ValueError('Parameter "maximum" must be higher than parameter "minimum".')
@@ -52,7 +60,7 @@ class RangeScaler(InvertibleTableTransformer):
             if len(missing_columns) > 0:
                 raise UnknownColumnNameError(list(missing_columns))
 
-        wrapped_transformer = MinMaxScaler()
+        wrapped_transformer = sk_MinMaxScaler()
         wrapped_transformer.fit(table._data[column_names])
 
         result = RangeScaler()
