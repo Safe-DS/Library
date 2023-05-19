@@ -10,28 +10,11 @@ from safeds.exceptions import TransformerNotFittedError, UnknownColumnNameError
 
 
 class StandardScaler(InvertibleTableTransformer):
-    """
-    The StandardScaler transforms column values by scaling each value to a given range.
+    """The StandardScaler transforms column values by scaling each value to a given range."""
 
-    Parameters
-    ----------
-    minimum : float
-        The minimum of the new range after the transformation
-    maximum : float
-        The maximum of the new range after the transformation
-    Raises
-    ------
-    ValueError
-        If the given minimum is greater or equal to the given maximum
-    """
-
-    def __init__(self, minimum: float = 0.0, maximum: float = 1.0):
+    def __init__(self):
         self._column_names: list[str] | None = None
-        self._wrapped_transformer = None
-        if minimum >= maximum:
-            raise ValueError('Parameter "maximum" must be higher than parameter "minimum".')
-        self._minimum = minimum
-        self._maximum = maximum
+        self._wrapped_transformer: sk_StandardScaler | None = None
 
     def fit(self, table: Table, column_names: list[str] | None) -> StandardScaler:
         """
