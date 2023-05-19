@@ -34,3 +34,8 @@ def test_should_raise_if_column_contains_non_numerical_values() -> None:
     table = Table.from_dict({"A": ["1", "2", "3.5"], "B": ["0.2", "4", "77"]})
     with pytest.raises(NonNumericColumnError):
         table.plot_boxplots()
+
+
+def test_should_fail_on_empty_table() -> None:
+    with pytest.raises(NonNumericColumnError):
+        Table().plot_boxplots()

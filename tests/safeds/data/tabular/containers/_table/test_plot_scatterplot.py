@@ -21,8 +21,9 @@ def test_should_match_snapshot() -> None:
     [
         (Table({"A": [1, 2, 3], "B": [2, 4, 7]}), "C", "A"),
         (Table({"A": [1, 2, 3], "B": [2, 4, 7]}), "B", "C"),
+        (Table(), "x", "y")
     ],
-    ids=["First argument doesn't exist", "Second argument doesn't exist"],
+    ids=["First argument doesn't exist", "Second argument doesn't exist", "empty"],
 )
 def test_should_raise_if_column_does_not_exist(table: Table, col1: str, col2: str) -> None:
     with pytest.raises(UnknownColumnNameError):
