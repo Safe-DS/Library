@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import warnings
 from collections import Counter
 from typing import Any
 
@@ -249,3 +250,59 @@ class OneHotEncoder(InvertibleTableTransformer):
             Whether the transformer is fitted.
         """
         return self._column_names is not None and self._value_to_column is not None
+
+    def get_names_of_added_columns(self) -> list[str]:
+        """
+        Get the names of all new columns that have been added by the OneHotEncoder.
+
+        Returns
+        -------
+        added_columns : list[str]
+            A list of names of the added columns, ordered as they will appear in the table.
+
+        Raises
+        ------
+        TransformerNotFittedError
+            If the transformer has not been fitted yet.
+        """
+        if self._column_names is None:
+            raise TransformerNotFittedError
+        return [name for column_names in self._column_names.values() for name in column_names]
+
+    # (Must implement abstract method, cannot instantiate class otherwise.)
+    def get_names_of_changed_columns(self) -> list[str]:
+        """
+         Get the names of all columns that have been changed by the OneHotEncoder (none).
+
+        Returns
+        -------
+        changed_columns : list[str]
+             The empty list.
+
+        Raises
+        ------
+        TransformerNotFittedError
+            If the transformer has not been fitted yet.
+        """
+        warnings.warn("OneHotEncoder only removes and adds, but does not change any columns.", stacklevel=1)
+        if not self.is_fitted():
+            raise TransformerNotFittedError
+        return []
+
+    def get_names_of_removed_columns(self) -> list[str]:
+        """
+        Get the names of all columns that have been removed by the OneHotEncoder.
+
+        Returns
+        -------
+        removed_columns : list[str]
+            A list of names of the removed columns, ordered as they appear in the table the OneHotEncoder was fitted on.
+
+        Raises
+        ------
+        TransformerNotFittedError
+            If the transformer has not been fitted yet.
+        """
+        if self._column_names is None:
+            raise TransformerNotFittedError
+        return list(self._column_names.keys())
