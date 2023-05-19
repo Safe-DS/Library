@@ -19,4 +19,6 @@ from safeds.data.tabular.containers import Column
 )
 def test_should_return_whether_the_column_has_missing_values(values: list, expected: bool) -> None:
     column = Column("A", values)
+    print(column.type)
     assert column.has_missing_values() == expected
+
