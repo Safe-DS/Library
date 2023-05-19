@@ -59,5 +59,4 @@ from safeds.data.tabular.containers import Table
     ids=["Column of integers and Column of characters", "empty"],
 )
 def test_should_make_summary(table: Table, truth: Table) -> None:
-    print(table.summary())
     assert truth == table.summary()

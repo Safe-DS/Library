@@ -25,5 +25,5 @@ def test_should_match_snapshot(table: Table, path: str) -> None:
     assert assertion
 
 def test_should_fail_on_empty_table() -> None:
-    with pytest.raises(Exception):
+    with pytest.raises(ZeroDivisionError):
         Table().plot_histograms()

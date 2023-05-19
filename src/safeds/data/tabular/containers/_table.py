@@ -96,7 +96,7 @@ class Table:
         ValueError
             If the file could not be read.
         """
-        with open(path) as f:
+        with Path.open(path) as f:
             if f.read().replace("\n", "") == "":
                 return Table()
 
@@ -104,7 +104,6 @@ class Table:
             return Table._from_pandas_dataframe(pd.read_csv(path))
         except FileNotFoundError as exception:
             raise FileNotFoundError(f'File "{path}" does not exist') from exception
-
 
     @staticmethod
     def from_excel_file(path: str | Path) -> Table:
@@ -157,7 +156,7 @@ class Table:
         ValueError
             If the file could not be read.
         """
-        with open(path) as f:
+        with Path.open(path) as f:
             if f.read().replace("\n", "") == "":
                 return Table()
 
@@ -655,9 +654,8 @@ class Table:
                 for column in row.column_names:
                     self._data[column] = Column(column, [])
                 self._schema = Schema._from_pandas_dataframe(self._data)
-        else:
-            if self._schema != row.schema:
-                raise SchemaMismatchError
+        elif self._schema != row.schema:
+            raise SchemaMismatchError
 
         new_df = pd.concat([self._data, row._data]).infer_objects()
         new_df.columns = self.column_names
@@ -706,9 +704,8 @@ class Table:
                 if self.number_of_columns == 0:
                     for column in row.column_names:
                         self._data[column] = Column(column, [])
-            else:
-                if self._schema != row.schema:
-                    raise SchemaMismatchError
+            elif self._schema != row.schema:
+                raise SchemaMismatchError
         self._schema = Schema._from_pandas_dataframe(self._data)
 
         row_frames = (row._data for row in rows)
