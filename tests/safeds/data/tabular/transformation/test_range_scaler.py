@@ -4,6 +4,12 @@ from safeds.data.tabular.transformation import RangeScaler
 from safeds.exceptions import TransformerNotFittedError, UnknownColumnNameError
 
 
+class TestInit:
+    def test_should_raise_value_error(self) -> None:
+        with pytest.raises(ValueError, match='Parameter "maximum" must be higher than parameter "minimum".'):
+            _ = RangeScaler(minimum=10, maximum=0)
+
+
 class TestFit:
     def test_should_raise_if_column_not_found(self) -> None:
         table = Table(
