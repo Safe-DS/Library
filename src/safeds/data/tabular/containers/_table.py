@@ -521,6 +521,10 @@ class Table:
         result : Table
             The table with statistics.
         """
+        if self.number_of_columns == 0:
+            return Table({"metrics": ["maximum", "minimum", "mean", "mode", "median", "sum", "variance",
+                                      "standard deviation", "idness", "stability"]})
+
         columns = self.to_columns()
         result = pd.DataFrame()
         statistics = {}

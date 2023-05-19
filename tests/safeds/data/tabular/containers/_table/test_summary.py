@@ -50,8 +50,14 @@ from safeds.data.tabular.containers import Table
                 },
             ),
         ),
+        (
+            Table(),
+            Table({"metrics": ["maximum", "minimum", "mean", "mode", "median", "sum", "variance",
+                               "standard deviation", "idness", "stability"]})
+        )
     ],
-    ids=["Column of integers and Column of characters"],
+    ids=["Column of integers and Column of characters", "empty"],
 )
 def test_should_make_summary(table: Table, truth: Table) -> None:
+    print(table.summary())
     assert truth == table.summary()
