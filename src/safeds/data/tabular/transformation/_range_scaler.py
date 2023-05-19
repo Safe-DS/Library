@@ -23,7 +23,7 @@ class RangeScaler(InvertibleTableTransformer):
         self._column_names = None
         self._wrapped_transformer = None
         if minimum >= maximum:
-            raise ValueError
+            raise ValueError('Parameter "maximum" must be higher than parameter "minimum".')
         self._minimum = minimum
         self._maximum = maximum
 
