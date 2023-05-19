@@ -98,7 +98,7 @@ def test_should_raise_if_column_not_found() -> None:
         },
     )
 
-    with pytest.raises(UnknownColumnNameError):
+    with pytest.raises(UnknownColumnNameError, match=r"Could not find column\(s\) 'col1'"):
         table_to_transform.transform_table(transformer)
 
 

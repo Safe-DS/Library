@@ -34,5 +34,5 @@ def test_should_raise_error_if_wrong_file_extension() -> None:
     with NamedTemporaryFile(suffix=".invalid_file_extension") as tmp_table_file:
         tmp_table_file.close()
         with Path(tmp_table_file.name).open("w", encoding="utf-8") as tmp_file:
-            with pytest.raises(WrongFileExtensionError):
+            with pytest.raises(WrongFileExtensionError, match=r".invalid_file_extension has a wrong file extension. Please provide a file with the following extension\(s\): \['.xls', '.xlsx', '.xlsm', '.xlsb', '.odf', '.ods', '.odt'\]"):
                 table.to_excel_file(Path(tmp_file.name))
