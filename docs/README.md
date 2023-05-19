@@ -17,7 +17,7 @@ Instead of implementing DS methods from scratch, we use established DS libraries
 
  For more specialized tasks, we recommend using these or other DS libraries directly.
 
-Note that this library is still in development and not yet ready for production. Expect breaking changes in the future without a major version bump (while in the `0.y.z` version range). Feedback is very welcome! If you have a suggestion or find a bug, please [open an issue](https://github.com/Safe-DS/Stdlib/issues/new/choose). If you have a question, please [use our discussion forum][forum].
+Note that this library is still in development and not yet ready for production. Expect breaking changes in the future without a major version bump (while in the `0.y.z` version range). Feedback is very welcome, however! If you have a suggestion or find a bug, please [open an issue](https://github.com/Safe-DS/Stdlib/issues/new/choose). If you have a question, please [use our discussion forum][forum].
 
 ## Installation
 
