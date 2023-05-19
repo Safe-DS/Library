@@ -215,7 +215,7 @@ class TestInverseTransform:
     def test_should_not_change_transformed_table(self) -> None:
         table = Table(
             {
-                "col1": [0.0, 5.0, 10.0],
+                "col1": [0.0, 0.5, 1.0],
             },
         )
 
@@ -225,7 +225,7 @@ class TestInverseTransform:
 
         expected = Table(
             {
-                "col1": [0.0, 5.0, 10.0],
+                "col1": [0.0, 0.5, 1.0],
             },
         )
 
