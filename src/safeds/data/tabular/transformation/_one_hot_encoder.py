@@ -259,6 +259,11 @@ class OneHotEncoder(InvertibleTableTransformer):
         -------
         added_columns : list[str]
             A list of names of the added columns, ordered as they will appear in the table.
+
+        Raises
+        ------
+        TransformerNotFittedError
+            If the transformer has not been fitted yet.
         """
         if self._column_names is None:
             raise TransformerNotFittedError
@@ -273,6 +278,11 @@ class OneHotEncoder(InvertibleTableTransformer):
         -------
         changed_columns : list[str]
              The empty list.
+
+        Raises
+        ------
+        TransformerNotFittedError
+            If the transformer has not been fitted yet.
         """
         warnings.warn("OneHotEncoder only removes and adds, but does not change any columns.", stacklevel=1)
         if not self.is_fitted():
@@ -287,6 +297,11 @@ class OneHotEncoder(InvertibleTableTransformer):
         -------
         removed_columns : list[str]
             A list of names of the removed columns, ordered as they appear in the table the OneHotEncoder was fitted on.
+
+        Raises
+        ------
+        TransformerNotFittedError
+            If the transformer has not been fitted yet.
         """
         if self._column_names is None:
             raise TransformerNotFittedError

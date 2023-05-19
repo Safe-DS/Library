@@ -137,6 +137,11 @@ class LabelEncoder(InvertibleTableTransformer):
         -------
         added_columns : list[str]
             A list of names of the added columns, ordered as they will appear in the table.
+
+        Raises
+        ------
+        TransformerNotFittedError
+            If the transformer has not been fitted yet.
         """
         warnings.warn("LabelEncoder only changes data within columns, but does not add any columns.", stacklevel=1)
         if not self.is_fitted():
@@ -152,6 +157,11 @@ class LabelEncoder(InvertibleTableTransformer):
         -------
         changed_columns : list[str]
              The list of (potentially) changed column names, as passed to fit.
+
+        Raises
+        ------
+        TransformerNotFittedError
+            If the transformer has not been fitted yet.
         """
         if self._column_names is None:
             raise TransformerNotFittedError
@@ -165,6 +175,11 @@ class LabelEncoder(InvertibleTableTransformer):
         -------
         removed_columns : list[str]
             A list of names of the removed columns, ordered as they appear in the table the LabelEncoder was fitted on.
+
+        Raises
+        ------
+        TransformerNotFittedError
+            If the transformer has not been fitted yet.
         """
         warnings.warn("LabelEncoder only changes data within columns, but does not remove any columns.", stacklevel=1)
         if not self.is_fitted():
