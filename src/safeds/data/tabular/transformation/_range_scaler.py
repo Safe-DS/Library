@@ -20,9 +20,15 @@ class RangeScaler(InvertibleTableTransformer):
 
     Examples
     --------
+
+    Raises
+    ------
+    ValueError
+        If the given minimum is greater or equal to the given maximum
     """
 
     def __init__(self, minimum:float = 0.0 , maximum:float = 1.0):
+        if minimum >= maximum : raise ValueError
         self._minimum = minimum
         self._maximum = maximum
 
