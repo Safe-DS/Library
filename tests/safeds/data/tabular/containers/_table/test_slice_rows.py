@@ -1,6 +1,5 @@
 import pytest
 from _pytest.python_api import raises
-
 from safeds.data.tabular.containers import Table
 from safeds.exceptions import IndexOutOfBoundsError
 

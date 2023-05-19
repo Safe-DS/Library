@@ -1,7 +1,7 @@
 import pandas as pd
 import pytest
 from safeds.data.tabular.containers import Table
-from safeds.data.tabular.typing import Schema, Integer
+from safeds.data.tabular.typing import Integer, Schema
 
 
 @pytest.mark.parametrize(
@@ -11,15 +11,15 @@ from safeds.data.tabular.typing import Schema, Integer
             Table({"col1": [1, 2, 1], "col2": [1, 2, 4]}),
             Table({"col1": [1, 2], "col2": [1, 2]}),
             Table({"col1": [1], "col2": [4]}),
-            2/3,
+            2 / 3,
         ),
-(
+        (
             Table({"col1": [1, 2, 1], "col2": [1, 2, 4]}),
             Table._from_pandas_dataframe(pd.DataFrame(), Schema({"col1": Integer(), "col2": Integer()})),
             Table({"col1": [1, 2, 1], "col2": [1, 2, 4]}),
             0,
         ),
-(
+        (
             Table({"col1": [1, 2, 1], "col2": [1, 2, 4]}),
             Table({"col1": [1, 2, 1], "col2": [1, 2, 4]}),
             Table._from_pandas_dataframe(pd.DataFrame(), Schema({"col1": Integer(), "col2": Integer()})),
@@ -28,7 +28,12 @@ from safeds.data.tabular.typing import Schema, Integer
     ],
     ids=["2/3%", "0%", "100%"],
 )
-def test_should_split_table(table: Table, result_test_table: Table, result_train_table: Table, percentage_in_first: int) -> None:
+def test_should_split_table(
+    table: Table,
+    result_test_table: Table,
+    result_train_table: Table,
+    percentage_in_first: int,
+) -> None:
     train_table, test_table = table.split(percentage_in_first)
     assert result_test_table == test_table
     assert result_train_table == train_table

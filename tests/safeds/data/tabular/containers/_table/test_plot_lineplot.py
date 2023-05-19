@@ -18,7 +18,11 @@ def test_should_match_snapshot() -> None:
 
 @pytest.mark.parametrize(
     ("x", "y", "error_message"),
-    [("C", "A", r"Could not find column\(s\) 'C'"), ("A", "C", r"Could not find column\(s\) 'C'"), ("C", "D", r"Could not find column\(s\) 'C, D'")],
+    [
+        ("C", "A", r"Could not find column\(s\) 'C'"),
+        ("A", "C", r"Could not find column\(s\) 'C'"),
+        ("C", "D", r"Could not find column\(s\) 'C, D'"),
+    ],
     ids=["x column", "y column", "x and y column"],
 )
 def test_should_raise_if_column_does_not_exist(x: str, y: str, error_message: str) -> None:
