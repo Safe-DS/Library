@@ -100,10 +100,9 @@ class Table:
                 if f.read().replace("\n", "") == "":
                     return Table()
 
-        try:
             return Table._from_pandas_dataframe(pd.read_csv(path))
-        except FileNotFoundError as exception:
-            raise FileNotFoundError(f'File "{path}" does not exist') from exception
+        else:
+            raise FileNotFoundError(f'File "{path}" does not exist')
 
     @staticmethod
     def from_excel_file(path: str | Path) -> Table:
@@ -161,10 +160,9 @@ class Table:
                 if f.read().replace("\n", "") in ("", "{}"):
                     return Table()
 
-        try:
             return Table._from_pandas_dataframe(pd.read_json(path))
-        except FileNotFoundError as exception:
-            raise FileNotFoundError(f'File "{path}" does not exist') from exception
+        else:
+            raise FileNotFoundError(f'File "{path}" does not exist')
 
     @staticmethod
     def from_dict(data: dict[str, list[Any]]) -> Table:
