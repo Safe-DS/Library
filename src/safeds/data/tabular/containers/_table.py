@@ -351,8 +351,6 @@ class Table:
         table2 = other.sort_columns()
         if table1.number_of_rows == 0 and table2.number_of_rows == 0:
             return table1._schema == table2._schema
-        if table1.number_of_columns == 0 and table2.number_of_columns == 0:
-            return True
         return table1._schema == table2._schema and table1._data.equals(table2._data)
 
     def __repr__(self) -> str:
