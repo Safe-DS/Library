@@ -1,13 +1,9 @@
 from __future__ import annotations
-
-from typing import Any
-
-import pandas as pd
-from _pytest import warnings
+imporfrom _pytest import warnings
 
 from sklearn.preprocessing import MinMaxScaler
 from safeds.data.tabular.containers import Table
-from safeds.data.tabular.transformation._table_transformer import TableTransformer, InvertibleTableTransformer
+from safeds.data.tabular.transformation._table_transformer import InvertibleTableTransformer
 from safeds.exceptions import TransformerNotFittedError, UnknownColumnNameError
 
 
@@ -27,11 +23,13 @@ class RangeScaler(InvertibleTableTransformer):
         If the given minimum is greater or equal to the given maximum
     """
 
-    def __init__(self, minimum:float = 0.0 , maximum:float = 1.0):
-        if minimum >= maximum : raise ValueError
+    def __init__(self, minimum: float = 0.0, maximum: float = 1.0):
+        self._column_names = None
+        self._wrapped_transformer = None
+        if minimum >= maximum:
+            raise ValueError
         self._minimum = minimum
         self._maximum = maximum
-
 
     def fit(self, table: Table, column_names: list[str] | None) -> RangeScaler:
         """
@@ -199,5 +197,3 @@ class RangeScaler(InvertibleTableTransformer):
         if not self.is_fitted():
             raise TransformerNotFittedError
         return []
-
-
