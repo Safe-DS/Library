@@ -71,8 +71,11 @@ from safeds.exceptions import TransformerNotFittedError, UnknownColumnNameError
                 },
             ),
         ),
+        (Table(),
+         [],
+         Table())
     ],
-    ids=["all columns", "one column", "multiple columns", "none"],
+    ids=["all columns", "one column", "multiple columns", "none", "empty"],
 )
 def test_should_return_transformed_table(
     table: Table,
@@ -83,7 +86,18 @@ def test_should_return_transformed_table(
     assert table.transform_table(transformer) == expected
 
 
-def test_should_raise_if_column_not_found() -> None:
+@pytest.mark.parametrize(
+    "table_to_fit",
+    [
+        Table(
+            {
+                "col1": ["a", "b", "c"],
+            },
+        ),
+        Table()
+    ]
+)
+def test_should_raise_if_column_not_found(table_to_fit: Table) -> None:
     table_to_fit = Table(
         {
             "col1": ["a", "b", "c"],
