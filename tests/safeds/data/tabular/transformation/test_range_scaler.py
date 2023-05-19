@@ -126,6 +126,47 @@ class TestFitAndTransform:
     ) -> None:
         assert RangeScaler().fit_and_transform(table, column_names) == expected
 
+    @pytest.mark.parametrize(
+        ("table", "column_names", "expected"),
+        [
+            (
+                Table(
+                    {
+                        "col1": [0.0, 5.0, 5.0, 10.0],
+                    },
+                ),
+                None,
+                Table(
+                    {
+                        "col1": [-10.0, 0.0, 0.0, 10.0],
+                    },
+                ),
+            ),
+            (
+                Table(
+                    {
+                        "col1": [0.0, 5.0, 5.0, 10.0],
+                        "col2": [0.0, 5.0, 5.0, 10.0],
+                    },
+                ),
+                ["col1"],
+                Table(
+                    {
+                        "col1": [-10.0, 0.0, 0.0, 10.0],
+                        "col2": [0.0, 5.0, 5.0, 10.0],
+                    },
+                ),
+            ),
+        ],
+    )
+    def test_should_return_transformed_table_with_correct_range(
+        self,
+        table: Table,
+        column_names: list[str] | None,
+        expected: Table,
+    ) -> None:
+        assert RangeScaler(minimum=-10.0, maximum=10.0).fit_and_transform(table, column_names) == expected
+
     def test_should_not_change_original_table(self) -> None:
         table = Table(
             {
