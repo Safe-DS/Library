@@ -95,9 +95,10 @@ class Table:
         ValueError
             If the file could not be read.
         """
-        with Path(path).open() as f:
-            if f.read().replace("\n", "") == "" and Path(path).exists():
-                return Table()
+        if Path(path).exists():
+            with Path(path).open() as f:
+                if f.read().replace("\n", "") == "":
+                    return Table()
 
         try:
             return Table._from_pandas_dataframe(pd.read_csv(path))
@@ -155,9 +156,10 @@ class Table:
         ValueError
             If the file could not be read.
         """
-        with Path(path).open() as f:
-            if f.read().replace("\n", "") in ("", "{}") and Path(path).exists():
-                return Table()
+        if Path(path).exists():
+            with Path(path).open() as f:
+                if f.read().replace("\n", "") in ("", "{}"):
+                    return Table()
 
         try:
             return Table._from_pandas_dataframe(pd.read_json(path))
