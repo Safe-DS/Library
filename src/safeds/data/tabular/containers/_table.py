@@ -97,7 +97,7 @@ class Table:
             If the file could not be read.
         """
         with open(path) as f:
-            if f.read() == "":
+            if f.read().replace("\n", "") == "":
                 return Table()
 
         try:
@@ -158,7 +158,7 @@ class Table:
             If the file could not be read.
         """
         with open(path) as f:
-            if f.read() == "":
+            if f.read().replace("\n", "") == "":
                 return Table()
 
         try:
