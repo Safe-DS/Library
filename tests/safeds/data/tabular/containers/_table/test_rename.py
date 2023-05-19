@@ -15,6 +15,7 @@ def test_should_rename_column(name_from: str, name_to: str, column_one: str, col
     assert renamed_table.schema.has_column(column_two)
     assert renamed_table.number_of_columns == 2
 
+
 @pytest.mark.parametrize(
     "table",
     [

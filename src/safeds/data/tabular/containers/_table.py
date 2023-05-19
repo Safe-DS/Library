@@ -157,7 +157,7 @@ class Table:
             If the file could not be read.
         """
         with Path.open(path) as f:
-            if f.read().replace("\n", "") == "":
+            if f.read().replace("\n", "") in ("", "{}"):
                 return Table()
 
         try:
