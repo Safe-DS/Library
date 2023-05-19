@@ -52,6 +52,6 @@ def test_should_keep_only_listed_columns(table: Table, column_names: list[str], 
     ],
     ids=["table", "empty"]
 )
-def test_should_raise_error_if_column_name_unknown(table) -> None:
+def test_should_raise_error_if_column_name_unknown(table: Table) -> None:
     with pytest.raises(UnknownColumnNameError):
         table.keep_only_columns(["C"])
