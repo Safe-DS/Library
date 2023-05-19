@@ -19,8 +19,6 @@ class RangeScaler(InvertibleTableTransformer):
         The minimum of the new range after the transformation
     maximum : float
         The maximum of the new range after the transformation
-    column_names : list[str] | None
-        A List of column Names the RangeScale should be applied to
     Raises
     ------
     ValueError
