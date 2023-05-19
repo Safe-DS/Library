@@ -37,3 +37,10 @@ def test_should_raise_if_index_out_of_bounds(start: int, end: int, step: int) ->
 
     with pytest.raises(ValueError, match="The given index is out of bounds"):
         table.slice_rows(start, end, step)
+
+
+def test_should_raise_if_index_out_of_bounds_on_empty() -> None:
+    table = Table()
+
+    with pytest.raises(ValueError, match="The given index is out of bounds"):
+        table.slice_rows(2, 5, 1)

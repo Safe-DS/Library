@@ -15,9 +15,15 @@ def test_should_rename_column(name_from: str, name_to: str, column_one: str, col
     assert renamed_table.schema.has_column(column_two)
     assert renamed_table.number_of_columns == 2
 
-
-def test_should_raise_if_old_column_does_not_exist() -> None:
-    table: Table = Table({"A": [1], "B": [2]})
+@pytest.mark.parametrize(
+    "table",
+    [
+        Table({"A": [1], "B": [2]}),
+        Table()
+    ],
+    ids=["normal", "empty"]
+)
+def test_should_raise_if_old_column_does_not_exist(table) -> None:
     with pytest.raises(UnknownColumnNameError):
         table.rename_column("C", "D")
 
