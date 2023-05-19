@@ -1,7 +1,9 @@
 from __future__ import annotations
-from _pytest import warnings
+
+import warnings
 
 from sklearn.preprocessing import MinMaxScaler
+
 from safeds.data.tabular.containers import Table
 from safeds.data.tabular.transformation._table_transformer import InvertibleTableTransformer
 from safeds.exceptions import TransformerNotFittedError, UnknownColumnNameError
@@ -9,13 +11,7 @@ from safeds.exceptions import TransformerNotFittedError, UnknownColumnNameError
 
 class RangeScaler(InvertibleTableTransformer):
     """
-    The RangeScaler
-
-    Parameters
-    ----------
-
-    Examples
-    --------
+    The RangeScaler transforms column values by scaling each value to a given range.
 
     Raises
     ------
