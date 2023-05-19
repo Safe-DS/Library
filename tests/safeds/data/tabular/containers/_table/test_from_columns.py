@@ -28,7 +28,8 @@ def test_should_create_table_from_list_of_columns(columns: list[Column], expecte
 
 def test_should_raise_error_if_column_length_mismatch() -> None:
     with pytest.raises(
-        ColumnLengthMismatchError, match=r"The length of at least one column differs: \ncol1: 3\ncol2: 4",
+        ColumnLengthMismatchError,
+        match=r"The length of at least one column differs: \ncol1: 3\ncol2: 4",
     ):
         Table.from_columns([Column("col1", [5, 2, 3]), Column("col2", [5, 3, 4, 1])])
 

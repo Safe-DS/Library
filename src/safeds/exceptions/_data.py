@@ -107,6 +107,8 @@ class WrongFileExtensionError(Exception):
 
     def __init__(self, file: str | Path, file_extension: str | list[str]) -> None:
         super().__init__(
-            f"The file {file} has a wrong file extension. Please provide a file with the following extension(s):"
-            f" {file_extension}",
+            (
+                f"The file {file} has a wrong file extension. Please provide a file with the following extension(s):"
+                f" {file_extension}"
+            ),
         )

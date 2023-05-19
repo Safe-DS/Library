@@ -29,7 +29,10 @@ from safeds.data.tabular.typing import Integer, Schema
     ids=["2/3%", "0%", "100%"],
 )
 def test_should_split_table(
-    table: Table, result_test_table: Table, result_train_table: Table, percentage_in_first: int,
+    table: Table,
+    result_test_table: Table,
+    result_train_table: Table,
+    percentage_in_first: int,
 ) -> None:
     train_table, test_table = table.split(percentage_in_first)
     assert result_test_table == test_table
