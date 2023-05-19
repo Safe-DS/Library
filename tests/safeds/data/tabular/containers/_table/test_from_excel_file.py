@@ -27,8 +27,12 @@ from tests.helpers import resolve_resource_path
                 },
             ),
         ),
+        (
+            resolve_resource_path("./empty_excel_file.xlsx"),
+            Table()
+        ),
     ],
-    ids=["string path", "object path"],
+    ids=["string path", "object path", "empty file"],
 )
 def test_should_create_table_from_excel_file(path: str | Path, expected: Table) -> None:
     table = Table.from_excel_file(path)

@@ -12,6 +12,7 @@ import openpyxl
 import pandas as pd
 import seaborn as sns
 from pandas import DataFrame
+from pandas.errors import EmptyDataError
 from scipy import stats
 
 from safeds.data.image.containers import Image
@@ -95,10 +96,15 @@ class Table:
         ValueError
             If the file could not be read.
         """
+        with open(path) as f:
+            if f.read() == "":
+                return Table()
+
         try:
             return Table._from_pandas_dataframe(pd.read_csv(path))
         except FileNotFoundError as exception:
             raise FileNotFoundError(f'File "{path}" does not exist') from exception
+
 
     @staticmethod
     def from_excel_file(path: str | Path) -> Table:
@@ -151,6 +157,10 @@ class Table:
         ValueError
             If the file could not be read.
         """
+        with open(path) as f:
+            if f.read() == "":
+                return Table()
+
         try:
             return Table._from_pandas_dataframe(pd.read_json(path))
         except FileNotFoundError as exception:
