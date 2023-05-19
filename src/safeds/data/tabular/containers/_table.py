@@ -1111,6 +1111,8 @@ class Table:
         """
         if percentage_in_first <= 0 or percentage_in_first >= 1:
             raise ValueError("the given percentage is not in range")
+        if self.number_of_rows == 0:
+            return Table(), Table()
         return (
             self.slice_rows(0, round(percentage_in_first * self.number_of_rows)),
             self.slice_rows(round(percentage_in_first * self.number_of_rows)),
