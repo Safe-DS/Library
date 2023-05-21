@@ -5,8 +5,8 @@ from safeds.exceptions import DuplicateColumnNameError, UnknownColumnNameError
 
 @pytest.mark.parametrize(
     ("name_from", "name_to", "column_one", "column_two"),
-    [("A", "D", "D", "B"), ("A", "A", "A", "B")],
-    ids=["column renamed", "column not renamed"],
+    [("A", "D", "D", "B"), ("B", "C", "A", "C")],
+    ids=["first column renamed", "second column renamed"],
 )
 def test_should_rename_column(name_from: str, name_to: str, column_one: str, column_two: str) -> None:
     table: Table = Table({"A": [1], "B": [2]})
@@ -26,3 +26,4 @@ def test_should_raise_if_new_column_exists_already() -> None:
     table: Table = Table({"A": [1], "B": [2]})
     with pytest.raises(DuplicateColumnNameError):
         table.rename_column("A", "B")
+
