@@ -1,14 +1,11 @@
-import pandas as pd
 import pytest
 from safeds.data.tabular.containers import Table
-from safeds.data.tabular.typing import Integer
 from safeds.exceptions import DuplicateColumnNameError, UnknownColumnNameError
 
 
 @pytest.mark.parametrize(
     ("name_from", "name_to", "column_one", "column_two"),
-    [("A", "D", "D", "B"),
-     ("A", "A", "A", "B")],
+    [("A", "D", "D", "B"), ("A", "A", "A", "B")],
     ids=["column renamed", "column not renamed"],
 )
 def test_should_rename_column(name_from: str, name_to: str, column_one: str, column_two: str) -> None:
