@@ -1006,7 +1006,7 @@ class Table:
 
         new_df = self._data.iloc[start:end:step]
         new_df.columns = self._schema.column_names
-        return Table._from_pandas_dataframe(new_df, self._schema)
+        return Table._from_pandas_dataframe(new_df)
 
     def sort_columns(
         self,
