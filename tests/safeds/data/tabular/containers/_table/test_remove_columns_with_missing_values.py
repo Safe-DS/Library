@@ -30,3 +30,4 @@ from safeds.data.tabular.containers import Table
 def test_should_remove_columns_with_missing_values(table: Table, expected: Table) -> None:
     updated_table = table.remove_columns_with_missing_values()
     assert updated_table.schema == expected.schema
+    assert updated_table == expected
