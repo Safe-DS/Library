@@ -2,24 +2,38 @@ from __future__ import annotations
 
 import warnings
 
-from sklearn.preprocessing import OrdinalEncoder as sk_OrdinalEncoder
+from sklearn.preprocessing import MinMaxScaler as sk_MinMaxScaler
 
 from safeds.data.tabular.containers import Table
-from safeds.data.tabular.transformation._table_transformer import (
-    InvertibleTableTransformer,
-)
+from safeds.data.tabular.transformation._table_transformer import InvertibleTableTransformer
 from safeds.exceptions import TransformerNotFittedError, UnknownColumnNameError
 
 
-# noinspection PyProtectedMember
-class LabelEncoder(InvertibleTableTransformer):
-    """The LabelEncoder encodes one or more given columns into labels."""
+class RangeScaler(InvertibleTableTransformer):
+    """
+    The RangeScaler transforms column values by scaling each value to a given range.
 
-    def __init__(self) -> None:
-        self._wrapped_transformer: sk_OrdinalEncoder | None = None
+    Parameters
+    ----------
+    minimum : float
+        The minimum of the new range after the transformation
+    maximum : float
+        The maximum of the new range after the transformation
+    Raises
+    ------
+    ValueError
+        If the given minimum is greater or equal to the given maximum
+    """
+
+    def __init__(self, minimum: float = 0.0, maximum: float = 1.0):
         self._column_names: list[str] | None = None
+        self._wrapped_transformer: sk_MinMaxScaler | None = None
+        if minimum >= maximum:
+            raise ValueError('Parameter "maximum" must be higher than parameter "minimum".')
+        self._minimum = minimum
+        self._maximum = maximum
 
-    def fit(self, table: Table, column_names: list[str] | None) -> LabelEncoder:
+    def fit(self, table: Table, column_names: list[str] | None) -> RangeScaler:
         """
         Learn a transformation for a set of columns in a table.
 
@@ -44,10 +58,10 @@ class LabelEncoder(InvertibleTableTransformer):
             if len(missing_columns) > 0:
                 raise UnknownColumnNameError(list(missing_columns))
 
-        wrapped_transformer = sk_OrdinalEncoder()
+        wrapped_transformer = sk_MinMaxScaler((self._minimum, self._maximum))
         wrapped_transformer.fit(table._data[column_names])
 
-        result = LabelEncoder()
+        result = RangeScaler()
         result._wrapped_transformer = wrapped_transformer
         result._column_names = column_names
 
@@ -131,7 +145,7 @@ class LabelEncoder(InvertibleTableTransformer):
 
     def get_names_of_added_columns(self) -> list[str]:
         """
-        Get the names of all new columns that have been added by the LabelEncoder.
+        Get the names of all new columns that have been added by the RangeScaler.
 
         Returns
         -------
@@ -143,7 +157,7 @@ class LabelEncoder(InvertibleTableTransformer):
         TransformerNotFittedError
             If the transformer has not been fitted yet.
         """
-        warnings.warn("LabelEncoder only changes data within columns, but does not add any columns.", stacklevel=1)
+        warnings.warn("RangeScaler only changes data within columns, but does not add any columns.", stacklevel=1)
         if not self.is_fitted():
             raise TransformerNotFittedError
         return []
@@ -151,7 +165,7 @@ class LabelEncoder(InvertibleTableTransformer):
     # (Must implement abstract method, cannot instantiate class otherwise.)
     def get_names_of_changed_columns(self) -> list[str]:
         """
-         Get the names of all columns that may have been changed by the LabelEncoder.
+         Get the names of all columns that may have been changed by the RangeScaler.
 
         Returns
         -------
@@ -169,19 +183,19 @@ class LabelEncoder(InvertibleTableTransformer):
 
     def get_names_of_removed_columns(self) -> list[str]:
         """
-        Get the names of all columns that have been removed by the LabelEncoder.
+        Get the names of all columns that have been removed by the RangeScaler.
 
         Returns
         -------
         removed_columns : list[str]
-            A list of names of the removed columns, ordered as they appear in the table the LabelEncoder was fitted on.
+            A list of names of the removed columns, ordered as they appear in the table the RangeScaler was fitted on.
 
         Raises
         ------
         TransformerNotFittedError
             If the transformer has not been fitted yet.
         """
-        warnings.warn("LabelEncoder only changes data within columns, but does not remove any columns.", stacklevel=1)
+        warnings.warn("RangeScaler only changes data within columns, but does not remove any columns.", stacklevel=1)
         if not self.is_fitted():
             raise TransformerNotFittedError
         return []
