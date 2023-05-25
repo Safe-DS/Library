@@ -716,6 +716,8 @@ class Table:
                 if self.number_of_columns == 0:
                     for column in row.column_names:
                         self._data[column] = Column(column, [])
+                elif self.column_names != row.column_names:
+                    raise SchemaMismatchError
             elif self._schema != row.schema:
                 raise SchemaMismatchError
         self._schema = Schema._from_pandas_dataframe(self._data)
