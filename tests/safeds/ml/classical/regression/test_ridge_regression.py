@@ -12,7 +12,7 @@ def training_set() -> TaggedTable:
 class TestAlpha:
     def test_should_be_passed_to_fitted_model(self, training_set: TaggedTable) -> None:
         fitted_model = RidgeRegression(alpha=1).fit(training_set)
-        assert fitted_model._alpha == 1
+        assert fitted_model.alpha == 1
 
     def test_should_be_passed_to_sklearn(self, training_set: TaggedTable) -> None:
         fitted_model = RidgeRegression(alpha=1).fit(training_set)
