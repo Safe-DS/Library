@@ -336,10 +336,10 @@ class Table:
             return NotImplemented
         if self is other:
             return True
-        if self.number_of_rows == 0 and other.number_of_rows == 0 and self.column_names == other.column_names:
-            return True
         table1 = self.sort_columns()
         table2 = other.sort_columns()
+        if table1.number_of_rows == 0 and table2.number_of_rows == 0:
+            return table1.column_names == table2.column_names
         return table1._schema == table2._schema and table1._data.equals(table2._data)
 
     def __repr__(self) -> str:
