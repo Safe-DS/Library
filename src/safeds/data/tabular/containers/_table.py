@@ -753,11 +753,11 @@ class Table:
                 if self.number_of_columns == 0:
                     for column in row.column_names:
                         self._data[column] = Column(column, [])
+                    self._schema = Schema._from_pandas_dataframe(self._data)
                 elif self.column_names != row.column_names:
                     raise SchemaMismatchError
             elif self._schema != row.schema:
                 raise SchemaMismatchError
-        self._schema = Schema._from_pandas_dataframe(self._data)
 
         row_frames = (row._data for row in rows)
 
@@ -1167,7 +1167,7 @@ class Table:
             if the 'percentage_in_first' is not between 0 and 1
         """
         if percentage_in_first < 0 or percentage_in_first > 1:
-            raise ValueError("the given percentage is not between 0 and 1")
+            raise ValueError("The given percentage is not between 0 and 1")
         if self.number_of_rows == 0:
             return Table(), Table()
         return (
