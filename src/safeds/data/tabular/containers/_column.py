@@ -105,7 +105,7 @@ class Column(Sequence[T]):
         self._name: str = name
         self._data: pd.Series = data.rename(name) if isinstance(data, pd.Series) else pd.Series(data, name=name)
         # noinspection PyProtectedMember
-        self._type: ColumnType = ColumnType._from_numpy_data_type(self._data.dtype)
+        self._type: ColumnType = ColumnType._data_type(self)
 
     def __contains__(self, item: Any) -> bool:
         return item in self._data

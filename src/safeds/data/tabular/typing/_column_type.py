@@ -2,23 +2,25 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
+
 
 if TYPE_CHECKING:
     import numpy as np
+    from safeds.data.tabular.containers import Column
 
 
 class ColumnType(ABC):
     """Abstract base class for column types."""
 
     @staticmethod
-    def _from_numpy_data_type(data_type: np.dtype) -> ColumnType:
+    def _data_type(column: Column) -> ColumnType:
         """
         Return the column type for a given `numpy` data type.
 
         Parameters
         ----------
-        data_type : numpy.dtype
+        self : Column
             The `numpy` data type.
 
         Returns
@@ -31,17 +33,50 @@ class ColumnType(ABC):
         NotImplementedError
             If the given data type is not supported.
         """
-        if data_type.kind in ("u", "i"):
-            return Integer()
-        if data_type.kind == "b":
-            return Boolean()
-        if data_type.kind == "f":
-            return RealNumber()
-        if data_type.kind in ("S", "U", "O", "M", "m"):
-            return String()
 
-        message = f"Unsupported numpy data type '{data_type}'."
-        raise NotImplementedError(message)
+        def columntype_of_type(celltype: Any) -> ColumnType:
+            if celltype == int:
+                return Integer()
+            if celltype == bool:
+                return Boolean()
+            if celltype == float:
+                return RealNumber()
+            if celltype == str:
+                return String()
+            if celltype is None:
+                return Anything(is_nullable=True)
+            else:
+                message = f"Unsupported numpy data type '{celltype}'."
+                raise NotImplementedError(message)
+
+        for cell in column:
+            print("Hallo")
+            if column.type is None:
+                column.type = columntype_of_type(type(cell))
+            elif column.type != columntype_of_type(type(cell)):
+                if column.type == Integer and type(cell) == float:
+                    column.type = RealNumber()
+                else:
+                    column.type = Anything()
+        return column.type
+
+
+
+        # if celltype == int:
+        #     return Integer()
+        # if celltype == bool:
+        #     return Boolean()
+        # if celltype == float:
+        #     return RealNumber()
+        # if celltype == str:
+        #     return String()
+        # else:
+        #   return Anything()
+
+
+        # message = f"Unsupported numpy data type '{data_type}'."
+        # raise NotImplementedError(message)
+
 
     @abstractmethod
     def is_nullable(self) -> bool:
