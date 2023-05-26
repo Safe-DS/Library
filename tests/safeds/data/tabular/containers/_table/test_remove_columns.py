@@ -14,6 +14,7 @@ from safeds.exceptions import UnknownColumnNameError
 )
 def test_should_remove_table_columns(table1: Table, expected: Table, columns: list[str]) -> None:
     table1 = table1.remove_columns(columns)
+    assert table1.schema == expected.schema
     assert table1 == expected
 
 
