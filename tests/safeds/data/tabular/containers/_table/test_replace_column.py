@@ -75,7 +75,10 @@ from safeds.exceptions import (
     ids=["list[Column]", "Column", "Table"],
 )
 def test_should_replace_column(
-    table: Table, column_name: str, columns: Column | list[Column] | Table, expected: Table,
+    table: Table,
+    column_name: str,
+    columns: Column | list[Column] | Table,
+    expected: Table,
 ) -> None:
     result = table.replace_column(column_name, columns)
     assert result == expected
