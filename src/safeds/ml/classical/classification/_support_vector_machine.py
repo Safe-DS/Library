@@ -1,12 +1,13 @@
 from __future__ import annotations
 
+from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
 from sklearn.svm import SVC as sk_SVC  # noqa: N811
 
 from safeds.ml.classical._util_sklearn import fit, predict
 
-from ._classifier import Classifier
+from safeds.ml.classical.classification._classifier import Classifier
 
 if TYPE_CHECKING:
     from sklearn.base import ClassifierMixin
@@ -29,7 +30,7 @@ class SupportVectorMachine(Classifier):
         If `c` is less than or equal to 0.
     """
 
-    def __init__(self, *, c: float = 1.0, kernel: 'SupportVectorMachineKernel' = None) -> None:
+    def __init__(self, *, c: float = 1.0, kernel: SupportVectorMachineKernel = None) -> None:
         # Internal state
         self._wrapped_classifier: sk_SVC | None = None
         self._feature_names: list[str] | None = None
@@ -45,7 +46,7 @@ class SupportVectorMachine(Classifier):
         return self._c
 
     @property
-    def kernel(self) -> 'SupportVectorMachineKernel':
+    def kernel(self) -> SupportVectorMachineKernel:
         return self._kernel
 
     def fit(self, training_set: TaggedTable) -> SupportVectorMachine:
@@ -127,3 +128,5 @@ class SupportVectorMachine(Classifier):
             The sklearn Classifier.
         """
         return sk_SVC(C=self._c)
+
+
