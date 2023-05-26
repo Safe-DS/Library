@@ -5,7 +5,7 @@ from safeds.data.tabular.containers import Table
 
 
 @pytest.mark.parametrize(
-    ("table", "truth"),
+    ("table", "expected"),
     [
         (
             Table({"col1": [1, 2, 1], "col2": ["a", "b", "c"]}),
@@ -69,8 +69,33 @@ from safeds.data.tabular.containers import Table
                 },
             ),
         ),
+        (
+            Table({"col": [], "gg": []}),
+            Table(
+                {
+                    "metrics": [
+                        "maximum",
+                        "minimum",
+                        "mean",
+                        "mode",
+                        "median",
+                        "sum",
+                        "variance",
+                        "standard deviation",
+                        "idness",
+                        "stability",
+                    ],
+                    "col": [
+                        "-", "-", "-", "-", "-", "-", "-", "-", "-", "-",
+                    ],
+                    "gg": [
+                        "-", "-", "-", "-", "-", "-", "-", "-", "-", "-",
+                    ]
+                },
+            ),
+        ),
     ],
-    ids=["Column of integers and Column of characters", "empty"],
+    ids=["Column of integers and Column of characters", "empty", "empty with columns"],
 )
-def test_should_make_summary(table: Table, truth: Table) -> None:
-    assert truth == table.summary()
+def test_should_make_summary(table: Table, expected: Table) -> None:
+    assert expected == table.summary()

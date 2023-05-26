@@ -536,6 +536,26 @@ class Table:
                     ],
                 },
             )
+        elif self.number_of_rows == 0:
+            table = Table(
+                {
+                    "metrics": [
+                        "maximum",
+                        "minimum",
+                        "mean",
+                        "mode",
+                        "median",
+                        "sum",
+                        "variance",
+                        "standard deviation",
+                        "idness",
+                        "stability",
+                    ],
+                },
+            )
+            for column in self.column_names:
+                table = table.add_column(Column(column, ["-", "-", "-", "-", "-", "-", "-", "-", "-", "-"]))
+            return table
 
         columns = self.to_columns()
         result = pd.DataFrame()
@@ -693,19 +713,6 @@ class Table:
         -------
         result : Table
             A new table which combines the original table and the given rows.
-        """
-        """if isinstance(rows, Table):
-            rows = rows.to_rows()
-        result = self._data
-        for row in rows:
-            if self._schema != row.schema:
-                raise SchemaMismatchError
-
-        row_frames = (row._data for row in rows)
-
-        result = pd.concat([result, *row_frames]).infer_objects()
-        result.columns = self.column_names
-        return Table._from_pandas_dataframe(result)
         """
         if isinstance(rows, Table):
             rows = rows.to_rows()
@@ -1046,7 +1053,7 @@ class Table:
     def sort_columns(
         self,
         comparator: Callable[[Column, Column], int] = lambda col1, col2: (col1.name > col2.name)
-        - (col1.name < col2.name),
+                                                                         - (col1.name < col2.name),
     ) -> Table:
         """
         Sort the columns of a `Table` with the given comparator and return a new `Table`.
