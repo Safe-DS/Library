@@ -74,7 +74,9 @@ from safeds.exceptions import (
     ],
     ids=["list[Column]", "Column", "Table"],
 )
-def test_should_replace_column(table: Table, column_name: str, columns: Column | list[Column] | Table, expected: Table) -> None:
+def test_should_replace_column(
+    table: Table, column_name: str, columns: Column | list[Column] | Table, expected: Table,
+) -> None:
     result = table.replace_column(column_name, columns)
     assert result == expected
 
@@ -83,8 +85,18 @@ def test_should_replace_column(table: Table, column_name: str, columns: Column |
     ("old_column_name", "column", "error", "error_message"),
     [
         ("D", Column("C", ["d", "e", "f"]), UnknownColumnNameError, r"Could not find column\(s\) 'D'"),
-        ("C", [Column("B", ["d", "e", "f"]), Column("D", [3, 2, 1])], DuplicateColumnNameError, r"Column 'B' already exists."),
-        ("C", Table({"D": [7, 8], "E": ["c", "b"]}), ColumnSizeError, r"Expected a column of size 3 but got column of size 2."),
+        (
+            "C",
+            [Column("B", ["d", "e", "f"]), Column("D", [3, 2, 1])],
+            DuplicateColumnNameError,
+            r"Column 'B' already exists.",
+        ),
+        (
+            "C",
+            Table({"D": [7, 8], "E": ["c", "b"]}),
+            ColumnSizeError,
+            r"Expected a column of size 3 but got column of size 2.",
+        ),
     ],
     ids=["UnknownColumnNameError", "DuplicateColumnNameError", "ColumnSizeError"],
 )
