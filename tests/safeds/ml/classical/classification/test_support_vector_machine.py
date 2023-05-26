@@ -12,7 +12,7 @@ def training_set() -> TaggedTable:
 class TestC:
     def test_should_be_passed_to_fitted_model(self, training_set: TaggedTable) -> None:
         fitted_model = SupportVectorMachine(c=2).fit(training_set=training_set)
-        assert fitted_model._c == 2
+        assert fitted_model.c == 2
 
     def test_should_be_passed_to_sklearn(self, training_set: TaggedTable) -> None:
         fitted_model = SupportVectorMachine(c=2).fit(training_set)

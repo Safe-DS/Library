@@ -34,5 +34,5 @@ def test_should_transform_column(table: Table, table_transformed: Table) -> None
     ids=["column not found", "empty"],
 )
 def test_should_raise_if_column_not_found(table: Table) -> None:
-    with pytest.raises(UnknownColumnNameError):
+    with pytest.raises(UnknownColumnNameError, match=r"Could not find column\(s\) 'D'"):
         table.transform_column("D", lambda row: row.get_value("A") * 2)

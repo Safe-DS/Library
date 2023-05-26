@@ -26,3 +26,13 @@ def test_should_get_row(table1: Table, expected: Row) -> None:
 def test_should_raise_error_if_index_out_of_bounds(index: int, table: Table) -> None:
     with pytest.raises(IndexOutOfBoundsError):
         table.get_row(index)
+
+@pytest.mark.parametrize(
+    ("index", "expected_error_message"),
+    [(-1, r"There is no element at index '-1'."), (5, r"There is no element at index '5'.")],
+    ids=["<0", "too high"],
+)
+def test_should_raise_error_if_index_out_of_bounds_error_message(index: int, expected_error_message: str) -> None:
+    table = Table({"A": [1], "B": [2]})
+    with pytest.raises(IndexOutOfBoundsError, match=expected_error_message):
+        table.get_row(index)

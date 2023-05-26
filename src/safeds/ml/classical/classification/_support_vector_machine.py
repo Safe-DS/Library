@@ -35,9 +35,14 @@ class SupportVectorMachine(Classifier):
         self._feature_names: list[str] | None = None
         self._target_name: str | None = None
 
+        # Hyperparameters
         if c <= 0:
             raise ValueError("The parameter 'c' has to be strictly positive.")
         self._c = c
+
+    @property
+    def c(self) -> float:
+        return self._c
 
     def fit(self, training_set: TaggedTable) -> SupportVectorMachine:
         """
