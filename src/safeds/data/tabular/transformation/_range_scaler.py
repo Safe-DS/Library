@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-import warnings
-
 from sklearn.preprocessing import MinMaxScaler as sk_MinMaxScaler
 
 from safeds.data.tabular.containers import Table
@@ -157,7 +155,6 @@ class RangeScaler(InvertibleTableTransformer):
         TransformerNotFittedError
             If the transformer has not been fitted yet.
         """
-        warnings.warn("RangeScaler only changes data within columns, but does not add any columns.", stacklevel=1)
         if not self.is_fitted():
             raise TransformerNotFittedError
         return []
@@ -195,7 +192,6 @@ class RangeScaler(InvertibleTableTransformer):
         TransformerNotFittedError
             If the transformer has not been fitted yet.
         """
-        warnings.warn("RangeScaler only changes data within columns, but does not remove any columns.", stacklevel=1)
         if not self.is_fitted():
             raise TransformerNotFittedError
         return []
