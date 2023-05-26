@@ -29,7 +29,7 @@ class SupportVectorMachine(Classifier):
         If `c` is less than or equal to 0.
     """
 
-    def __init__(self, *, c: float = 1.0) -> None:
+    def __init__(self, *, c: float = 1.0, kernel: 'SupportVectorMachineKernel' = None) -> None:
         # Internal state
         self._wrapped_classifier: sk_SVC | None = None
         self._feature_names: list[str] | None = None
@@ -38,6 +38,15 @@ class SupportVectorMachine(Classifier):
         if c <= 0:
             raise ValueError("The parameter 'c' has to be strictly positive.")
         self._c = c
+        self._kernel = kernel
+
+    @property
+    def c(self) -> float:
+        return self._c
+
+    @property
+    def kernel(self) -> 'SupportVectorMachineKernel':
+        return self._kernel
 
     def fit(self, training_set: TaggedTable) -> SupportVectorMachine:
         """
