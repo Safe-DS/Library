@@ -17,13 +17,14 @@ def test_should_match_snapshot() -> None:
 
 
 @pytest.mark.parametrize(
-    ("table", "col1", "col2"),
+    ("table", "col1", "col2", "error_message"),
     [
-        (Table({"A": [1, 2, 3], "B": [2, 4, 7]}), "C", "A"),
-        (Table({"A": [1, 2, 3], "B": [2, 4, 7]}), "B", "C"),
+        (Table({"A": [1, 2, 3], "B": [2, 4, 7]}), "C", "A", r"Could not find column\(s\) 'C'"),
+        (Table({"A": [1, 2, 3], "B": [2, 4, 7]}), "B", "C", r"Could not find column\(s\) 'C'"),
+        (Table({"A": [1, 2, 3], "B": [2, 4, 7]}), "C", "D", r"Could not find column\(s\) 'C, D'"),
     ],
-    ids=["First argument doesn't exist", "Second argument doesn't exist"],
+    ids=["First argument doesn't exist", "Second argument doesn't exist", "Both arguments do not exist"],
 )
-def test_should_raise_if_column_does_not_exist(table: Table, col1: str, col2: str) -> None:
-    with pytest.raises(UnknownColumnNameError):
+def test_should_raise_if_column_does_not_exist(table: Table, col1: str, col2: str, error_message: str) -> None:
+    with pytest.raises(UnknownColumnNameError, match=error_message):
         table.plot_scatterplot(col1, col2)

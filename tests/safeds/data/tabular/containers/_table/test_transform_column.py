@@ -29,5 +29,5 @@ def test_should_raise_if_column_not_found() -> None:
         },
     )
 
-    with pytest.raises(UnknownColumnNameError):
+    with pytest.raises(UnknownColumnNameError, match=r"Could not find column\(s\) 'D'"):
         input_table.transform_column("D", lambda row: row.get_value("A") * 2)

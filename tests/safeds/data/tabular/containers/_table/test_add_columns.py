@@ -38,30 +38,40 @@ def test_should_add_columns_from_table(table1: Table, table2: Table, expected: T
 
 
 @pytest.mark.parametrize(
-    ("table", "columns"),
+    ("table", "columns", "error_message_regex"),
     [
         (
             Table({"col1": [1, 2, 1], "col2": [1, 2, 4]}),
             [Column("col3", ["a", "b", "c", "d"]), Column("col4", ["e", "f", "g", "h"])],
+            r"Expected a column of size 3 but got column of size 4.",
         ),
     ],
     ids=["Two Columns with too many values"],
 )
-def test_should_raise_error_if_column_size_invalid(table: Table, columns: list[Column] | Table) -> None:
-    with pytest.raises(ColumnSizeError):
+def test_should_raise_error_if_column_size_invalid(
+    table: Table,
+    columns: list[Column] | Table,
+    error_message_regex: str,
+) -> None:
+    with pytest.raises(ColumnSizeError, match=error_message_regex):
         table.add_columns(columns)
 
 
 @pytest.mark.parametrize(
-    ("table", "columns"),
+    ("table", "columns", "error_message_regex"),
     [
         (
             Table({"col1": [1, 2, 1], "col2": [1, 2, 4]}),
             [Column("col2", ["a", "b", "c"]), Column("col3", [2, 3, 4])],
+            r"Column 'col2' already exists.",
         ),
     ],
     ids=["Column already exists"],
 )
-def test_should_raise_error_if_column_name_in_result_column(table: Table, columns: list[Column] | Table) -> None:
-    with pytest.raises(DuplicateColumnNameError):
+def test_should_raise_error_if_column_name_in_result_column(
+    table: Table,
+    columns: list[Column] | Table,
+    error_message_regex: str,
+) -> None:
+    with pytest.raises(DuplicateColumnNameError, match=error_message_regex):
         table.add_columns(columns)

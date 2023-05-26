@@ -31,5 +31,5 @@ def test_should_filter_rows(table1: Table, filter_column: str, filter_value: Col
 # noinspection PyTypeChecker
 def test_should_raise_error_if_column_type_invalid() -> None:
     table = Table({"col1": [1, 2, 3], "col2": [1, 1, 4]})
-    with pytest.raises(TypeError):
+    with pytest.raises(TypeError, match=r"'Series' object is not callable"):
         table.filter_rows(table.get_column("col1")._data > table.get_column("col2")._data)

@@ -99,7 +99,7 @@ def test_should_raise_if_column_not_found() -> None:
         },
     )
 
-    with pytest.raises(UnknownColumnNameError):
+    with pytest.raises(UnknownColumnNameError, match=r"Could not find column\(s\) 'col1'"):
         table_to_transform.transform_table(transformer)
 
 
@@ -112,5 +112,5 @@ def test_should_raise_if_not_fitted() -> None:
 
     transformer = OneHotEncoder()
 
-    with pytest.raises(TransformerNotFittedError):
+    with pytest.raises(TransformerNotFittedError, match=r"The transformer has not been fitted yet."):
         table.transform_table(transformer)

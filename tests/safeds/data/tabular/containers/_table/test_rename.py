@@ -17,11 +17,11 @@ def test_should_rename_column(name_from: str, name_to: str, column_one: str, col
 
 def test_should_raise_if_old_column_does_not_exist() -> None:
     table: Table = Table({"A": [1], "B": [2]})
-    with pytest.raises(UnknownColumnNameError):
+    with pytest.raises(UnknownColumnNameError, match=r"Could not find column\(s\) 'C'"):
         table.rename_column("C", "D")
 
 
 def test_should_raise_if_new_column_exists_already() -> None:
     table: Table = Table({"A": [1], "B": [2]})
-    with pytest.raises(DuplicateColumnNameError):
+    with pytest.raises(DuplicateColumnNameError, match=r"Column 'B' already exists."):
         table.rename_column("A", "B")
