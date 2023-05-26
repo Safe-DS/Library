@@ -112,13 +112,13 @@ class TestFitAndTransform:
                 ["col1"],
                 Table(
                     {
-                        "col1": ["(0, 0)\t1.0", "(0, 2)\t1.0","(0, 2)\t1.0", "(0, 3)\t1.0"],
+                        "col1": ["(0, 0)\t1.0", "(0, 2)\t1.0", "(0, 2)\t1.0", "(0, 3)\t1.0"],
                         "col2": [0.0, 5.0, 5.0, 10.0],
                     },
                 ),
             ),
         ],
-        ids=["None", "col1"]
+        ids=["None", "col1"],
     )
     def test_should_return_transformed_table(
         self,
@@ -126,7 +126,6 @@ class TestFitAndTransform:
         column_names: list[str] | None,
         expected: Table,
     ) -> None:
-
         assert Discretizer().fit_and_transform(table, column_names) == expected
 
     @pytest.mark.parametrize(
@@ -159,7 +158,7 @@ class TestFitAndTransform:
                 ),
             ),
         ],
-        ids=["2", "10"]
+        ids=["2", "10"],
     )
     def test_should_return_transformed_table_with_correct_number_of_bins(
         self,
@@ -167,7 +166,6 @@ class TestFitAndTransform:
         number_of_bins: int,
         expected: Table,
     ) -> None:
-
         assert Discretizer(number_of_bins).fit_and_transform(table, ["col1"]) == expected
 
     def test_should_not_change_original_table(self) -> None:
