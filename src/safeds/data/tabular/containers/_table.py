@@ -594,7 +594,7 @@ class Table:
         if self.has_column(column.name):
             raise DuplicateColumnNameError(column.name)
 
-        if column._data.size != self.number_of_rows and self.number_of_rows != 0:
+        if column.number_of_rows != self.number_of_rows and self.number_of_columns != 0:
             raise ColumnSizeError(str(self.number_of_rows), str(column._data.size))
 
         result = self._data.copy()
