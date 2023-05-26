@@ -75,9 +75,9 @@ from safeds.data.tabular.containers import Table
                     "col2": [],
                 },
             ),
-            0,
         ),
-        (Table(), 0),
+        (Table()
+         , Table()),
     ],
     ids=["no outliers", "with outliers", "no rows", "empty"],
 )
