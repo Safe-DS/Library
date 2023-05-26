@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from numpy import isclose
+from _pytest.python_api import approx
 
 from src.safeds.data.tabular.containers import Table
 
@@ -43,4 +43,4 @@ def check_that_tables_are_close(table1: Table, table2: Table) -> None:
         for i in range(table1.number_of_rows):
             entry_1 = table1.get_column(column_name).get_value(i)
             entry_2 = table2.get_column(column_name).get_value(i)
-            assert (isclose(entry_1, entry_2))
+            assert entry_1 == approx(entry_2)
