@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import warnings
 from typing import Any
 
 import pandas as pd
@@ -194,7 +193,6 @@ class Imputer(TableTransformer):
         TransformerNotFittedError
             If the transformer has not been fitted yet.
         """
-        warnings.warn("Imputer only changes data within columns, but does not add any columns.", stacklevel=1)
         if not self.is_fitted():
             raise TransformerNotFittedError
         return []
@@ -232,7 +230,6 @@ class Imputer(TableTransformer):
         TransformerNotFittedError
             If the transformer has not been fitted yet.
         """
-        warnings.warn("Imputer only changes data within columns, but does not remove any columns.", stacklevel=1)
         if not self.is_fitted():
             raise TransformerNotFittedError
         return []
