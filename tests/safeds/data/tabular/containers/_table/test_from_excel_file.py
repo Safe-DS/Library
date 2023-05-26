@@ -34,6 +34,7 @@ from tests.helpers import resolve_resource_path
 )
 def test_should_create_table_from_excel_file(path: str | Path, expected: Table) -> None:
     table = Table.from_excel_file(path)
+    assert table.schema == expected.schema
     assert table == expected
 
 

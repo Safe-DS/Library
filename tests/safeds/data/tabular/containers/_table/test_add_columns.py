@@ -26,6 +26,7 @@ from safeds.exceptions import ColumnSizeError, DuplicateColumnNameError
 )
 def test_should_add_columns(table1: Table, columns: list[Column], expected: Table) -> None:
     table1 = table1.add_columns(columns)
+    assert table1.schema == expected.schema
     assert table1 == expected
 
 
@@ -42,6 +43,7 @@ def test_should_add_columns(table1: Table, columns: list[Column], expected: Tabl
 )
 def test_should_add_columns_from_table(table1: Table, table2: Table, expected: Table) -> None:
     table1 = table1.add_columns(table2)
+    assert table1.schema == expected.schema
     assert table1 == expected
 
 

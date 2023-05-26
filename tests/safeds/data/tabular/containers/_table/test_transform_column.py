@@ -16,6 +16,7 @@ from safeds.exceptions import UnknownColumnNameError
 def test_should_transform_column(table: Table, table_transformed: Table) -> None:
     result = table.transform_column("A", lambda row: row.get_value("A") * 2)
 
+    assert result.schema == table_transformed.schema
     assert result == table_transformed
 
 

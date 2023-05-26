@@ -11,9 +11,8 @@ from safeds.exceptions import DuplicateColumnNameError, UnknownColumnNameError
 def test_should_rename_column(name_from: str, name_to: str, column_one: str, column_two: str) -> None:
     table: Table = Table({"A": [1], "B": [2]})
     renamed_table = table.rename_column(name_from, name_to)
-    assert renamed_table.schema.has_column(column_one)
-    assert renamed_table.schema.has_column(column_two)
-    assert renamed_table.number_of_columns == 2
+    assert renamed_table.schema.column_names == [column_one, column_two]
+    assert renamed_table.column_names == [column_one, column_two]
 
 
 @pytest.mark.parametrize("table", [Table({"A": [1], "B": [2]}), Table()], ids=["normal", "empty"])

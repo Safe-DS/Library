@@ -11,6 +11,7 @@ from safeds.exceptions import IndexOutOfBoundsError
     ids=["table with one row"],
 )
 def test_should_get_row(table1: Table, expected: Row) -> None:
+    assert table1.get_row(0).schema == expected.schema
     assert table1.get_row(0) == expected
 
 

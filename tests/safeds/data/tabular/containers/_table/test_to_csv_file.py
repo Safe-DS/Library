@@ -23,6 +23,7 @@ def test_should_create_csv_file_from_table_by_str(table: Table) -> None:
             table.to_csv_file(resolve_resource_path(tmp_file.name))
         with Path(tmp_table_file.name).open("r", encoding="utf-8") as tmp_file:
             table_r = Table.from_csv_file(tmp_file.name)
+    assert table.schema == table_r.schema
     assert table_r == table
 
 
@@ -41,6 +42,7 @@ def test_should_create_csv_file_from_table_by_path(table: Table) -> None:
             table.to_csv_file(Path(tmp_file.name))
         with Path(tmp_table_file.name).open("r", encoding="utf-8") as tmp_file:
             table_r = Table.from_csv_file(Path(tmp_file.name))
+    assert table.schema == table_r.schema
     assert table == table_r
 
 
