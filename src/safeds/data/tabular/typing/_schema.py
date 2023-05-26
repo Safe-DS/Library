@@ -184,7 +184,7 @@ class Schema:
 
         Raises
         ------
-        ColumnNameError
+        UnknownColumnNameError
             If the specified column name does not exist.
 
         Examples

@@ -12,7 +12,7 @@ def training_set() -> TaggedTable:
 class TestNumberOfTrees:
     def test_should_be_passed_to_fitted_model(self, training_set: TaggedTable) -> None:
         fitted_model = GradientBoosting(number_of_trees=2).fit(training_set)
-        assert fitted_model._number_of_trees == 2
+        assert fitted_model.number_of_trees == 2
 
     def test_should_be_passed_to_sklearn(self, training_set: TaggedTable) -> None:
         fitted_model = GradientBoosting(number_of_trees=2).fit(training_set)
@@ -27,7 +27,7 @@ class TestNumberOfTrees:
 class TestLearningRate:
     def test_should_be_passed_to_fitted_model(self, training_set: TaggedTable) -> None:
         fitted_model = GradientBoosting(learning_rate=2).fit(training_set)
-        assert fitted_model._learning_rate == 2
+        assert fitted_model.learning_rate == 2
 
     def test_should_be_passed_to_sklearn(self, training_set: TaggedTable) -> None:
         fitted_model = GradientBoosting(learning_rate=2).fit(training_set)
