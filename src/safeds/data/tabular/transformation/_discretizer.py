@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-import warnings
-
 from sklearn.preprocessing import KBinsDiscretizer as sk_KBinsDiscretizer
 
 from safeds.data.tabular.containers import Table
@@ -100,7 +98,6 @@ class Discretizer(TableTransformer):
         data.columns = table.column_names
         data[self._column_names] = self._wrapped_transformer.transform(data[self._column_names])
         return Table._from_pandas_dataframe(data)
-
 
     def is_fitted(self) -> bool:
         """

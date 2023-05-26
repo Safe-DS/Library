@@ -14,5 +14,5 @@ __all__ = [
     "InvertibleTableTransformer",
     "TableTransformer",
     "RangeScaler",
-    "Discretizer"
+    "Discretizer",
 ]
