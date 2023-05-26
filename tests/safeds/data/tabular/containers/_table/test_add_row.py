@@ -21,5 +21,5 @@ def test_should_add_row(table: Table, row: Row) -> None:
 def test_should_raise_error_if_row_schema_invalid() -> None:
     table1 = Table({"col1": [1, 2, 1], "col2": [1, 2, 4]})
     row = Row({"col1": 5, "col2": "Hallo"})
-    with raises(SchemaMismatchError):
+    with raises(SchemaMismatchError, match=r"Failed because at least two schemas didn't match."):
         table1.add_row(row)

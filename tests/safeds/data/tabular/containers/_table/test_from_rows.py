@@ -33,5 +33,5 @@ def test_should_create_table_from_rows(rows: list[Row], expected: Table) -> None
 
 def test_should_raise_error_if_mismatching_schema() -> None:
     rows = [Row({"A": 1, "B": 2}), Row({"A": 2, "B": "a"})]
-    with pytest.raises(SchemaMismatchError):
+    with pytest.raises(SchemaMismatchError, match=r"Failed because at least two schemas didn't match."):
         Table.from_rows(rows)
