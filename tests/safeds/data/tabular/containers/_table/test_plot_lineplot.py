@@ -17,11 +17,15 @@ def test_should_match_snapshot() -> None:
 
 
 @pytest.mark.parametrize(
-    ("x", "y"),
-    [("C", "A"), ("A", "C")],
-    ids=["x column", "y column"],
+    ("x", "y", "error_message"),
+    [
+        ("C", "A", r"Could not find column\(s\) 'C'"),
+        ("A", "C", r"Could not find column\(s\) 'C'"),
+        ("C", "D", r"Could not find column\(s\) 'C, D'"),
+    ],
+    ids=["x column", "y column", "x and y column"],
 )
-def test_should_raise_if_column_does_not_exist(x: str, y: str) -> None:
+def test_should_raise_if_column_does_not_exist(x: str, y: str, error_message: str) -> None:
     table = Table({"A": [1, 2, 3], "B": [2, 4, 7]})
-    with pytest.raises(UnknownColumnNameError):
+    with pytest.raises(UnknownColumnNameError, match=error_message):
         table.plot_lineplot(x, y)

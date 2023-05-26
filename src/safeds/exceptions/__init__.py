@@ -10,6 +10,7 @@ from safeds.exceptions._data import (
     TransformerNotFittedError,
     UnknownColumnNameError,
     ValueNotPresentWhenFittedError,
+    WrongFileExtensionError,
 )
 from safeds.exceptions._ml import (
     DatasetContainsTargetError,
@@ -31,6 +32,7 @@ __all__ = [
     "TransformerNotFittedError",
     "UnknownColumnNameError",
     "ValueNotPresentWhenFittedError",
+    "WrongFileExtensionError",
     # ML exceptions
     "DatasetContainsTargetError",
     "DatasetMissesFeaturesError",
