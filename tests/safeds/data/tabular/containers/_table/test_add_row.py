@@ -27,3 +27,8 @@ def test_should_raise_error_if_row_schema_invalid() -> None:
     row = Row({"col1": 5, "col2": "Hallo"})
     with raises(SchemaMismatchError, match=r"Failed because at least two schemas didn't match."):
         table1.add_row(row)
+
+
+def test_should_raise_schema_mismatch() -> None:
+    with raises(SchemaMismatchError, match=r"Failed because at least two schemas didn't match."):
+        Table({"a": [], "b": []}).add_row(Row({"beer": None, "rips": None}))
