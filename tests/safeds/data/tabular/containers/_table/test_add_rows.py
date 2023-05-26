@@ -16,6 +16,7 @@ from safeds.exceptions import SchemaMismatchError
 )
 def test_should_add_rows(table1: Table, rows: list[Row], table2: Table) -> None:
     table1 = table1.add_rows(rows)
+    assert table1.schema == table2.schema
     assert table1 == table2
 
 
@@ -32,6 +33,7 @@ def test_should_add_rows(table1: Table, rows: list[Row], table2: Table) -> None:
 )
 def test_should_add_rows_from_table(table1: Table, table2: Table, expected: Table) -> None:
     table1 = table1.add_rows(table2)
+    assert table1.schema == expected.schema
     assert table1 == expected
 
 

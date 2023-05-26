@@ -80,6 +80,7 @@ def test_should_return_transformed_table(
     expected: Table,
 ) -> None:
     transformer = OneHotEncoder().fit(table, column_names)
+    assert table.transform_table(transformer).schema == expected.schema
     assert table.transform_table(transformer) == expected
 
 
