@@ -103,8 +103,9 @@ class Discretizer(TableTransformer):
 
     def inverse_transform(self, transformed_table: Table) -> Table:
         """
-        Undo the learned transformation.
+        Transform discretized data back to original feature space.
 
+        Note that this function does not regenerate the original data due to discretization rounding.
         The table is not modified.
 
         Parameters
