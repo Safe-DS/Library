@@ -17,13 +17,7 @@ def test_should_remove_table_columns(table1: Table, expected: Table, columns: li
     assert table1 == expected
 
 
-@pytest.mark.parametrize(
-    "table",
-    [
-        Table({"A": [1], "B": [2]}),
-        Table()
-    ], ids=["normal", "empty"]
-)
+@pytest.mark.parametrize("table", [Table({"A": [1], "B": [2]}), Table()], ids=["normal", "empty"])
 def test_should_raise_if_column_not_found(table: Table) -> None:
     with pytest.raises(UnknownColumnNameError, match=r"Could not find column\(s\) 'C'"):
         table.remove_columns(["C"])
