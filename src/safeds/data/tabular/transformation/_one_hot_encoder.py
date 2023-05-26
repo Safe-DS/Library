@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import warnings
 from collections import Counter
 from typing import Any
 
@@ -284,7 +283,6 @@ class OneHotEncoder(InvertibleTableTransformer):
         TransformerNotFittedError
             If the transformer has not been fitted yet.
         """
-        warnings.warn("OneHotEncoder only removes and adds, but does not change any columns.", stacklevel=1)
         if not self.is_fitted():
             raise TransformerNotFittedError
         return []
