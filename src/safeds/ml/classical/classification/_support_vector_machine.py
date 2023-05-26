@@ -130,3 +130,41 @@ class SupportVectorMachine(Classifier):
         return sk_SVC(C=self._c)
 
 
+class SupportVectorMachineKernel(ABC):
+    """The abstract base class of the different subclasses supported by the `Kernel`."""
+
+    @abstractmethod
+    def get_sklearn_kernel(self, kernel: SupportVectorMachineKernel):
+        """
+        Get the kernel of the given SupportVectorMachine.
+
+        Parameters
+        ----------
+        kernel: SupportVectorMachine
+        The kernel to get.
+        """
+
+
+class Linear(SupportVectorMachineKernel):
+    def get_sklearn_kernel(self):
+        return "linear"
+
+
+class Polynomial(SupportVectorMachineKernel):
+    def __init__(self, degree: int):
+        if degree < 1:
+            raise ValueError("The parameter 'degree' has to be greater than or equal to 1.")
+        self._degree = degree
+
+    def get_sklearn_kernel(self):
+        return f"poly_{self._degree}"
+
+
+class Sigmoid(SupportVectorMachineKernel):
+    def get_sklearn_kernel(self):
+        return "sigmoid"
+
+
+class RadialBasisFunction(SupportVectorMachineKernel):
+    def get_sklearn_kernel(self):
+        return "rbf"
