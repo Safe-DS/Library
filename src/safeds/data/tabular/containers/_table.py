@@ -336,12 +336,10 @@ class Table:
             return NotImplemented
         if self is other:
             return True
-        if self.number_of_rows == 0 and other.number_of_rows == 0 and self.column_names == other.column_names:
-            return True
-        if self.number_of_columns == 0 and other.number_of_columns == 0:
-            return True
         table1 = self.sort_columns()
         table2 = other.sort_columns()
+        if table1.number_of_rows == 0 and table2.number_of_rows == 0:
+            return table1.column_names == table2.column_names
         return table1._schema == table2._schema and table1._data.equals(table2._data)
 
     def __repr__(self) -> str:
@@ -616,7 +614,7 @@ class Table:
         if self.has_column(column.name):
             raise DuplicateColumnNameError(column.name)
 
-        if column._data.size != self.number_of_rows and self.number_of_rows != 0:
+        if column.number_of_rows != self.number_of_rows and self.number_of_columns != 0:
             raise ColumnSizeError(str(self.number_of_rows), str(column._data.size))
 
         result = self._data.copy()
@@ -655,7 +653,7 @@ class Table:
             if column.name in result.columns:
                 raise DuplicateColumnNameError(column.name)
 
-            if column._data.size != self.number_of_rows and self.number_of_rows != 0:
+            if column.number_of_rows != self.number_of_rows and self.number_of_columns != 0:
                 raise ColumnSizeError(str(self.number_of_rows), str(column._data.size))
 
             result[column.name] = column._data
@@ -686,6 +684,8 @@ class Table:
                 for column in row.column_names:
                     self._data[column] = Column(column, [])
                 self._schema = Schema._from_pandas_dataframe(self._data)
+            elif self.column_names != row.column_names:
+                raise SchemaMismatchError
         elif self._schema != row.schema:
             raise SchemaMismatchError
 
@@ -723,6 +723,8 @@ class Table:
                 if self.number_of_columns == 0:
                     for column in row.column_names:
                         self._data[column] = Column(column, [])
+                elif self.column_names != row.column_names:
+                    raise SchemaMismatchError
             elif self._schema != row.schema:
                 raise SchemaMismatchError
         self._schema = Schema._from_pandas_dataframe(self._data)
