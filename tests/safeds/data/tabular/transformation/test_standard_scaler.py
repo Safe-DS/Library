@@ -3,7 +3,7 @@ from safeds.data.tabular.containers import Table
 from safeds.data.tabular.transformation import StandardScaler
 from safeds.exceptions import TransformerNotFittedError, UnknownColumnNameError
 
-from tests.helpers._resources import check_that_tables_are_close
+from tests.helpers import assert_that_tables_are_close
 
 
 class TestFit:
@@ -216,7 +216,7 @@ class TestInverseTransform:
             },
         )
 
-        check_that_tables_are_close(transformed_table, expected)
+        assert_that_tables_are_close(transformed_table, expected)
 
     def test_should_raise_if_not_fitted(self) -> None:
         table = Table(
