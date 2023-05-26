@@ -22,7 +22,7 @@ def test_should_match_snapshot() -> None:
         (Table({"A": [1, 2, 3], "B": [2, 4, 7]}), "C", "A", r"Could not find column\(s\) 'C'"),
         (Table({"A": [1, 2, 3], "B": [2, 4, 7]}), "B", "C", r"Could not find column\(s\) 'C'"),
         (Table({"A": [1, 2, 3], "B": [2, 4, 7]}), "C", "D", r"Could not find column\(s\) 'C, D'"),
-        (Table(), "x", "y"),
+        (Table(), "C", "D", r"Could not find column\(s\) 'C, D'"),
     ],
     ids=["First argument doesn't exist", "Second argument doesn't exist", "Both arguments do not exist", "empty"],
 )
