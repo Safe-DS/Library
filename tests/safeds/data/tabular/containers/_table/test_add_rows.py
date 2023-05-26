@@ -1,6 +1,5 @@
 import pytest
 from _pytest.python_api import raises
-
 from safeds.data.tabular.containers import Row, Table
 from safeds.exceptions import SchemaMismatchError
 
@@ -47,6 +46,7 @@ def test_should_raise_error_if_row_schema_invalid() -> None:
     row = [Row({"col1": 2, "col2": 4}), Row({"col1": 5, "col2": "Hallo"})]
     with pytest.raises(SchemaMismatchError, match=r"Failed because at least two schemas didn't match."):
         table1.add_rows(row)
+
 
 def test_should_raise_schema_mismatch() -> None:
     with raises(SchemaMismatchError, match=r"Failed because at least two schemas didn't match."):
