@@ -3,6 +3,8 @@ from safeds.data.tabular.containers import Table
 from safeds.data.tabular.transformation import StandardScaler
 from safeds.exceptions import TransformerNotFittedError, UnknownColumnNameError
 
+from tests.helpers._resources import check_that_tables_are_close
+
 
 class TestFit:
     def test_should_raise_if_column_not_found(self) -> None:
@@ -91,7 +93,8 @@ class TestFitAndTransformOnMultipleTables:
                 ),
                 Table(
                     {
-                        "col1": [2, 2],
+                        "col1": [2],
+                        "col2": [2],
                     },
                 ),
                 None,
@@ -103,7 +106,8 @@ class TestFitAndTransformOnMultipleTables:
                 ),
                 Table(
                     {
-                        "col1": [3, 3],
+                        "col1": [3.0],
+                        "col2": [3.0],
                     },
                 ),
             ),
@@ -117,9 +121,9 @@ class TestFitAndTransformOnMultipleTables:
         expected_1: Table,
         expected_2: Table,
     ) -> None:
-        s = StandardScaler().fit(fit_and_transform_table)
+        s = StandardScaler().fit(fit_and_transform_table, column_names)
         assert s.fit_and_transform(fit_and_transform_table, column_names) == expected_1
-        assert s.fit_and_transform(only_transform_table, column_names) == expected_2
+        assert s.transform(only_transform_table) == expected_2
 
 
 class TestFitAndTransform:
@@ -218,7 +222,7 @@ class TestInverseTransform:
 
         transformer = StandardScaler().fit(table, None)
         transformed_table = transformer.transform(table)
-        transformer.inverse_transform(transformed_table)
+        transformed_table = transformer.inverse_transform(transformed_table)
 
         expected = Table(
             {
@@ -226,7 +230,7 @@ class TestInverseTransform:
             },
         )
 
-        assert transformed_table == expected
+        check_that_tables_are_close(transformed_table, expected)
 
     def test_should_raise_if_not_fitted(self) -> None:
         table = Table(
