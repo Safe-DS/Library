@@ -1,6 +1,6 @@
 import pytest
 from safeds.data.tabular.containers import Table
-from safeds.data.tabular.transformation._discretizer import Discretizer
+from safeds.data.tabular.transformation import Discretizer
 from safeds.exceptions import TransformerNotFittedError, UnknownColumnNameError
 
 
@@ -85,7 +85,6 @@ class TestIsFitted:
 
 
 class TestFitAndTransform:
-    # the return value has a formate with "(0,int)\t1.0" and I don't understand how that happens and how the test should look like...
     @pytest.mark.parametrize(
         ("table", "column_names", "expected"),
         [
