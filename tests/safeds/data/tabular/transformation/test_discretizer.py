@@ -167,7 +167,7 @@ class TestFitAndTransform:
         number_of_bins: int,
         expected: Table,
     ) -> None:
-        print(Discretizer(number_of_bins).fit_and_transform(table, ["col1"]))
+
         assert Discretizer(number_of_bins).fit_and_transform(table, ["col1"]) == expected
 
     def test_should_not_change_original_table(self) -> None:
@@ -189,10 +189,7 @@ class TestFitAndTransform:
 
     def test_get_names_of_added_columns(self) -> None:
         transformer = Discretizer()
-        with pytest.warns(
-            UserWarning,
-            match="Discretizer only changes data within columns, but does not add any columns.",
-        ), pytest.raises(TransformerNotFittedError):
+        with pytest.raises(TransformerNotFittedError):
             transformer.get_names_of_added_columns()
 
         table = Table(
@@ -201,11 +198,7 @@ class TestFitAndTransform:
             },
         )
         transformer = transformer.fit(table, None)
-        with pytest.warns(
-            UserWarning,
-            match="Discretizer only changes data within columns, but does not add any columns.",
-        ):
-            assert transformer.get_names_of_added_columns() == []
+        assert transformer.get_names_of_added_columns() == []
 
     def test_get_names_of_changed_columns(self) -> None:
         transformer = Discretizer()
@@ -221,10 +214,7 @@ class TestFitAndTransform:
 
     def test_get_names_of_removed_columns(self) -> None:
         transformer = Discretizer()
-        with pytest.warns(
-            UserWarning,
-            match="Discretizer only changes data within columns, but does not remove any columns.",
-        ), pytest.raises(TransformerNotFittedError):
+        with pytest.raises(TransformerNotFittedError):
             transformer.get_names_of_removed_columns()
 
         table = Table(
@@ -233,58 +223,4 @@ class TestFitAndTransform:
             },
         )
         transformer = transformer.fit(table, None)
-        with pytest.warns(
-            UserWarning,
-            match="Discretizer only changes data within columns, but does not remove any columns.",
-        ):
-            assert transformer.get_names_of_removed_columns() == []
-
-
-class TestInverseTransform:
-    # inverse_transform doesn't regenerate the old table, it just transforms the discretized data back to original feature space
-    # need to test if the features are the same
-    @pytest.mark.parametrize(
-        "table",
-        [
-            Table(
-                {
-                    "col1": [0.0, 5.0, 5.0, 10.0],
-                },
-            ),
-        ],
-    )
-    def test_should_return_original_table(self, table: Table) -> None:
-        transformer = Discretizer().fit(table, None)
-
-        assert transformer.inverse_transform(transformer.transform(table)) == table
-
-    def test_should_not_change_transformed_table(self) -> None:
-        table = Table(
-            {
-                "col1": [0.0, 0.5, 1.0],
-            },
-        )
-
-        transformer = Discretizer().fit(table, None)
-        transformed_table = transformer.transform(table)
-        transformer.inverse_transform(transformed_table)
-
-        expected = Table(
-            {
-                "col1": [0.0, 0.5, 1.0],
-            },
-        )
-
-        assert transformed_table == expected
-
-    def test_should_raise_if_not_fitted(self) -> None:
-        table = Table(
-            {
-                "col1": [0.0, 5.0, 5.0, 10.0],
-            },
-        )
-
-        transformer = Discretizer()
-
-        with pytest.raises(TransformerNotFittedError):
-            transformer.inverse_transform(table)
+        assert transformer.get_names_of_removed_columns() == []

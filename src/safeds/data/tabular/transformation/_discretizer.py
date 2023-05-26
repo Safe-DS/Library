@@ -101,36 +101,6 @@ class Discretizer(TableTransformer):
         data[self._column_names] = self._wrapped_transformer.transform(data[self._column_names])
         return Table._from_pandas_dataframe(data)
 
-    def inverse_transform(self, transformed_table: Table) -> Table:
-        """
-        Transform discretized data back to original feature space.
-
-        Note that this function does not regenerate the original data due to discretization rounding.
-        The table is not modified.
-
-        Parameters
-        ----------
-        transformed_table : Table
-            The table to be transformed back to the original version.
-
-        Returns
-        -------
-        table : Table
-            The original table.
-
-        Raises
-        ------
-        TransformerNotFittedError
-            If the transformer has not been fitted yet.
-        """
-        # Transformer has not been fitted yet
-        if self._wrapped_transformer is None or self._column_names is None:
-            raise TransformerNotFittedError
-
-        data = transformed_table._data.copy()
-        data.columns = transformed_table.column_names
-        data[self._column_names] = self._wrapped_transformer.inverse_transform(data[self._column_names])
-        return Table._from_pandas_dataframe(data)
 
     def is_fitted(self) -> bool:
         """
@@ -157,7 +127,6 @@ class Discretizer(TableTransformer):
         TransformerNotFittedError
             If the transformer has not been fitted yet.
         """
-        warnings.warn("Discretizer only changes data within columns, but does not add any columns.", stacklevel=1)
         if not self.is_fitted():
             raise TransformerNotFittedError
         return []
@@ -195,7 +164,6 @@ class Discretizer(TableTransformer):
         TransformerNotFittedError
             If the transformer has not been fitted yet.
         """
-        warnings.warn("Discretizer only changes data within columns, but does not remove any columns.", stacklevel=1)
         if not self.is_fitted():
             raise TransformerNotFittedError
         return []

@@ -1,5 +1,6 @@
 """Classes for transforming tabular data."""
 
+from ._discretizer import Discretizer
 from ._imputer import Imputer
 from ._label_encoder import LabelEncoder
 from ._one_hot_encoder import OneHotEncoder
@@ -13,4 +14,5 @@ __all__ = [
     "InvertibleTableTransformer",
     "TableTransformer",
     "RangeScaler",
+    "Discretizer"
 ]
