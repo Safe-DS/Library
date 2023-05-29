@@ -389,3 +389,46 @@ class TaggedTable(Table):
         except UnknownColumnNameError:
             raise ColumnIsTaggedError(self.target.name) from None
         return tagged
+
+    def remove_duplicate_rows(self) -> TaggedTable:
+        """
+        Return a copy of the table with every duplicate row removed.
+
+        This table is not modified.
+
+        Returns
+        -------
+        result : TaggedTable
+            The table with the duplicate rows removed.
+        """
+        return TaggedTable._from_table(super().remove_duplicate_rows(), self.target.name, None)
+
+    def remove_rows_with_missing_values(self) -> TaggedTable:
+        """
+        Return a table without the rows that contain missing values.
+
+        This table is not modified.
+
+        Returns
+        -------
+        table : TaggedTable
+            A table without the rows that contain missing values.
+        """
+        return TaggedTable._from_table(super().remove_rows_with_missing_values(), self.target.name, None)
+
+    def remove_rows_with_outliers(self) -> TaggedTable:
+        """
+        Remove all rows from the table that contain at least one outlier.
+
+        We define an outlier as a value that has a distance of more than 3 standard deviations from the column mean.
+        Missing values are not considered outliers. They are also ignored during the calculation of the standard
+        deviation.
+
+        This table is not modified.
+
+        Returns
+        -------
+        new_table : TaggedTable
+            A new table without rows containing outliers.
+        """
+        return TaggedTable._from_table(super().remove_rows_with_outliers(), self.target.name, None)
