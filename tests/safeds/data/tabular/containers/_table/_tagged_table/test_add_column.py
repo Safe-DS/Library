@@ -23,4 +23,6 @@ def test_should_add_column() -> None:
         None,
     )
     assert new_table.schema == expected.schema
+    assert new_table.features == expected.features
+    assert new_table.target == expected.target
     assert new_table == expected
