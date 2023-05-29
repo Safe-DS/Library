@@ -282,6 +282,7 @@ class TaggedTable(Table):
         return TaggedTable._from_table(super().filter_rows(query), target_name=self.target.name, feature_names=None)
 
     def keep_only_columns(self, column_names: list[str]) -> Table:
+        # TODO: Change return type to TaggedTable (in function definition and in docstring).
         """
         Return a table with only the given column(s).
 
@@ -304,10 +305,10 @@ class TaggedTable(Table):
         IllegalSchemaModificationError
             If none of the given columns is the target column.
         """
-        # TODO: Change return type to TaggedTable (2x in docstring, 1x in function definition),
-        #  re-build TaggedTable before returning,
+        # TODO:
+        #  Re-build TaggedTable before returning,
         #  throw exception if appropriate,
-        #  investigate and fix pytest errors
+        #  investigate and fix pytest errors.
         # if self.target.name not in column_names:
         # raise IllegalSchemaModificationError(f'Must keep target column "{self.target.name}".')
         return super().keep_only_columns(column_names)
@@ -340,7 +341,7 @@ class TaggedTable(Table):
             return TaggedTable._from_table(super().remove_columns(column_names), self.target.name, None)
         except UnknownColumnNameError:
             # TODO: Don't return; throw exception and handle it correctly in tests.
-            # raise ColumnIsTaggedError({self.target.name})
+            # raise ColumnIsTaggedError({self.target.name}) from None
             return super().remove_columns(column_names)
 
     def remove_columns_with_missing_values(self) -> TaggedTable:
@@ -360,6 +361,29 @@ class TaggedTable(Table):
             If any of the columns to be removed is the target column.
         """
         table = super().remove_columns_with_missing_values()
+        try:
+            tagged = TaggedTable._from_table(table, self.target.name, None)
+        except UnknownColumnNameError:
+            raise ColumnIsTaggedError(self.target.name) from None
+        return tagged
+
+    def remove_columns_with_non_numerical_values(self) -> TaggedTable:
+        """
+        Return a table without the columns that contain non-numerical values.
+
+        This table is not modified.
+
+        Returns
+        -------
+        table : TaggedTable
+            A table without the columns that contain non-numerical values.
+
+        Raises
+        ------
+        ColumnIsTaggedError
+            If any of the columns to be removed is the target column.
+        """
+        table = super().remove_columns_with_non_numerical_values()
         try:
             tagged = TaggedTable._from_table(table, self.target.name, None)
         except UnknownColumnNameError:
