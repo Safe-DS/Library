@@ -112,3 +112,17 @@ class WrongFileExtensionError(Exception):
                 f" {file_extension}"
             ),
         )
+
+
+class IllegalSchemaModificationError(Exception):
+    """Exception raised when modifying the schema in a way that is not consistent with the subclass's requirements."""
+
+    def __init__(self, msg: str) -> None:
+        super().__init__(f"Illegal schema modification: {msg}")
+
+
+class ColumnIsTaggedError(IllegalSchemaModificationError):
+    """Exception raised in overriden methods of the Table class when removing tagged Columns from a TaggedTable."""
+
+    def __init__(self, column_name: str) -> None:
+        super().__init__(f'Column "{column_name}" is tagged and cannot be removed.')
