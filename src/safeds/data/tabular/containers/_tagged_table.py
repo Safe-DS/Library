@@ -432,3 +432,31 @@ class TaggedTable(Table):
             A new table without rows containing outliers.
         """
         return TaggedTable._from_table(super().remove_rows_with_outliers(), self.target.name, None)
+
+    def rename_column(self, old_name: str, new_name: str) -> TaggedTable:
+        """
+        Rename a single column.
+
+        This table is not modified.
+
+        Parameters
+        ----------
+        old_name : str
+            The old name of the target column
+        new_name : str
+            The new name of the target column
+
+        Returns
+        -------
+        table : TaggedTable
+            The Table with the renamed column.
+
+        Raises
+        ------
+        UnknownColumnNameError
+            If the specified old target column name does not exist.
+        DuplicateColumnNameError
+            If the specified new target column name already exists.
+        """
+        return TaggedTable._from_table(super().rename_column(old_name, new_name),
+                                       new_name if self.target.name == old_name else self.target.name, None)
