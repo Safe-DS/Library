@@ -363,6 +363,6 @@ class TaggedTable(Table):
         table = super().remove_columns_with_missing_values()
         try:
             tagged = TaggedTable._from_table(table, self.target.name, None)
-        except ValueError:  # TODO: Check if this is actually the error that would e raised
+        except ValueError:  # TODO: Check if this is actually the error that would be raised
             raise ColumnIsTaggedError(self.target.name) from None
         return tagged
