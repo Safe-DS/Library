@@ -1,4 +1,4 @@
-from safeds.data.tabular.containers import TaggedTable, Column
+from safeds.data.tabular.containers import TaggedTable
 
 
 def test_should_remove_column() -> None:

@@ -1,4 +1,4 @@
-from safeds.data.tabular.containers import TaggedTable, Row
+from safeds.data.tabular.containers import Row, TaggedTable
 
 
 def test_should_add_rows() -> None:
@@ -11,14 +11,13 @@ def test_should_add_rows() -> None:
         None,
     )
     rows = [
-        Row({
-            "feature": 2,
-            "target": 6,
-        }),
-        Row({
-            "feature": 3,
-            "target": 7
-        })
+        Row(
+            {
+                "feature": 2,
+                "target": 6,
+            },
+        ),
+        Row({"feature": 3, "target": 7}),
     ]
     new_table = table.add_rows(rows)
     expected = TaggedTable(
