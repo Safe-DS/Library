@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from safeds.data.tabular.containers import Column, Row, Table
+from safeds.exceptions import ColumnIsTaggedError
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Mapping, Sequence
@@ -342,3 +343,26 @@ class TaggedTable(Table):
             # raise ColumnIsTaggedError({self.target.name})
             pass
         return super().remove_columns(column_names)
+
+    def remove_columns_with_missing_values(self) -> TaggedTable:
+        """
+        Return a table without the columns that contain missing values.
+
+        This table is not modified.
+
+        Returns
+        -------
+        table : TaggedTable
+            A table without the columns that contain missing values.
+
+        Raises
+        ------
+        ColumnIsTaggedError
+            If any of the columns to be removed is the target column.
+        """
+        table = super().remove_columns_with_missing_values()
+        try:
+            tagged = TaggedTable._from_table(table, self.target.name, None)
+        except ValueError:  # TODO: Check if this is actually the error that would e raised
+            raise ColumnIsTaggedError(self.target.name) from None
+        return tagged
