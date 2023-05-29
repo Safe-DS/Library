@@ -458,5 +458,8 @@ class TaggedTable(Table):
         DuplicateColumnNameError
             If the specified new target column name already exists.
         """
-        return TaggedTable._from_table(super().rename_column(old_name, new_name),
-                                       new_name if self.target.name == old_name else self.target.name, None)
+        return TaggedTable._from_table(
+            super().rename_column(old_name, new_name),
+            new_name if self.target.name == old_name else self.target.name,
+            None,
+        )
