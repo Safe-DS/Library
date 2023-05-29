@@ -3,7 +3,7 @@ import pytest
 from safeds.data.tabular.containers import TaggedTable, Column
 
 
-def test_should_add_column():
+def test_should_add_column() -> None:
     table = TaggedTable(
         {
             "feature_1": [0, 1, 2],
