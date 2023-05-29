@@ -177,7 +177,7 @@ class TaggedTable(Table):
 
         Returns
         -------
-        result : Table
+        result : TaggedTable
             The table with the column attached as a feature column.
 
         Raises
@@ -190,3 +190,28 @@ class TaggedTable(Table):
 
         """
         return TaggedTable._from_table(super().add_column(column), target_name=self._target.name, feature_names=None)
+
+    def add_columns(self, columns: list[Column] | Table) -> TaggedTable:
+        """
+        Add multiple columns to the table, as feature columns.
+
+        This table is not modified.
+
+        Parameters
+        ----------
+        columns : list[Column] or Table
+            The columns to be added.
+
+        Returns
+        -------
+        result: TaggedTable
+            A new table combining the original table and the given columns as feature columns.
+
+        Raises
+        ------
+        ColumnSizeError
+            If at least one of the column sizes from the provided column list does not match the table.
+        DuplicateColumnNameError
+            If at least one column name from the provided column list already exists in the table.
+        """
+        return TaggedTable._from_table(super().add_columns(columns), target_name=self._target.name, feature_names=None)
