@@ -304,7 +304,41 @@ class TaggedTable(Table):
             If none of the given columns is the target column.
         """
         # TODO: Change return type to TaggedTable (2x in docstring, 1x in function definition),
-        #  throw exception if appropriate, investigate and fix pytest errors
+        #  re-build TaggedTable before returning,
+        #  throw exception if appropriate,
+        #  investigate and fix pytest errors
         # if self.target.name not in column_names:
         # raise IllegalSchemaModificationError(f'Must keep target column "{self.target.name}".')
         return super().keep_only_columns(column_names)
+
+    def remove_columns(self, column_names: list[str]) -> Table:
+        """
+        Return a table without the given column(s).
+
+        This table is not modified.
+
+        Parameters
+        ----------
+        column_names : list[str]
+            A list containing all columns to be dropped.
+
+        Returns
+        -------
+        table : Table
+            A table without the given columns.
+
+        Raises
+        ------
+        UnknownColumnNameError
+            If any of the given columns does not exist.
+        ColumnIsTaggedError
+            If any of the given columns is the target column.
+        """
+        # TODO: Change return type to TaggedTable (2x in docstring, 1x in function definition),
+        #  re-build TaggedTable before returning,
+        #  throw exception if appropriate,
+        #  investigate and fix pytest errors
+        if self.target.name in column_names:
+            # raise ColumnIsTaggedError({self.target.name})
+            pass
+        return super().remove_columns(column_names)
