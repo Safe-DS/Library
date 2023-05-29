@@ -38,6 +38,7 @@ def test_should_throw_column_is_tagged() -> None:
         None,
     )
     with pytest.raises(
-        ColumnIsTaggedError, match='Illegal schema modification: Column "target" is tagged and cannot be removed.',
+        ColumnIsTaggedError,
+        match='Illegal schema modification: Column "target" is tagged and cannot be removed.',
     ):
         table.remove_columns_with_missing_values()
