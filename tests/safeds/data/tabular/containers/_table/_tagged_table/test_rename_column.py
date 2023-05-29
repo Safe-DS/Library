@@ -49,7 +49,10 @@ from safeds.data.tabular.containers import TaggedTable
     ids=["rename_feature_column", "rename_target_column"],
 )
 def test_should_add_column(
-    original_table: TaggedTable, old_column_name: str, new_column_name: str, result_table: TaggedTable,
+    original_table: TaggedTable,
+    old_column_name: str,
+    new_column_name: str,
+    result_table: TaggedTable,
 ) -> None:
     new_table = original_table.rename_column(old_column_name, new_column_name)
     assert new_table.schema == result_table.schema

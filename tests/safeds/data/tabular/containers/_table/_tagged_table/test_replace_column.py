@@ -49,7 +49,10 @@ from safeds.data.tabular.containers import Column, TaggedTable
     ids=["replace_feature_column", "replace_target_column"],
 )
 def test_should_replace_column(
-    original_table: TaggedTable, new_column: Column, column_name_to_be_replaced: str, result_table: TaggedTable,
+    original_table: TaggedTable,
+    new_column: Column,
+    column_name_to_be_replaced: str,
+    result_table: TaggedTable,
 ) -> None:
     new_table = original_table.replace_column(column_name_to_be_replaced, new_column)
     assert new_table.schema == result_table.schema
