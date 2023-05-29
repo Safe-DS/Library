@@ -164,3 +164,29 @@ class TaggedTable(Table):
     @property
     def target(self) -> Column:
         return self._target
+
+    # ------------------------------------------------------------------------------------------------------------------
+    # Overriden methods from Table class:
+    # ------------------------------------------------------------------------------------------------------------------
+
+    def add_column(self, column: Column) -> TaggedTable:
+        """
+        Return the original table with the provided column attached at the end, as a feature column.
+
+        This table is not modified.
+
+        Returns
+        -------
+        result : Table
+            The table with the column attached as a feature column.
+
+        Raises
+        ------
+        DuplicateColumnNameError
+            If the new column already exists.
+
+        ColumnSizeError
+            If the size of the column does not match the amount of rows.
+
+        """
+        return TaggedTable._from_table(super().add_column(column), target_name=self._target.name, feature_names=None)
