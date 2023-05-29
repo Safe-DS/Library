@@ -1,9 +1,11 @@
 """Custom exceptions that can be raised by Safe-DS."""
 
 from safeds.exceptions._data import (
+    ColumnIsTaggedError,
     ColumnLengthMismatchError,
     ColumnSizeError,
     DuplicateColumnNameError,
+    IllegalSchemaModificationError,
     IndexOutOfBoundsError,
     NonNumericColumnError,
     SchemaMismatchError,
@@ -11,8 +13,6 @@ from safeds.exceptions._data import (
     UnknownColumnNameError,
     ValueNotPresentWhenFittedError,
     WrongFileExtensionError,
-    IllegalSchemaModificationError,
-    ColumnIsTaggedError,
 )
 from safeds.exceptions._ml import (
     DatasetContainsTargetError,
