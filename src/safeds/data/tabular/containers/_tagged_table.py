@@ -2,10 +2,10 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from safeds.data.tabular.containers import Column, Table
+from safeds.data.tabular.containers import Column, Table, Row
 
 if TYPE_CHECKING:
-    from collections.abc import Mapping, Sequence
+    from collections.abc import Callable, Mapping, Sequence
     from typing import Any
 
 
@@ -215,3 +215,91 @@ class TaggedTable(Table):
             If at least one column name from the provided column list already exists in the table.
         """
         return TaggedTable._from_table(super().add_columns(columns), target_name=self.target.name, feature_names=None)
+
+    def add_row(self, row: Row) -> TaggedTable:
+        """
+        Add a row to the table.
+
+        This table is not modified.
+
+        Parameters
+        ----------
+        row : Row
+            The row to be added.
+
+        Returns
+        -------
+        table : TaggedTable
+            A new table with the added row at the end.
+
+        Raises
+        ------
+        SchemaMismatchError
+            If the schema of the row does not match the table schema.
+        """
+        return TaggedTable._from_table(super().add_row(row), target_name=self.target.name, feature_names=None)
+
+    def add_rows(self, rows: list[Row] | Table) -> TaggedTable:
+        """
+        Add multiple rows to a table.
+
+        This table is not modified.
+
+        Parameters
+        ----------
+        rows : list[Row] or Table
+            The rows to be added.
+
+        Returns
+        -------
+        result : TaggedTable
+            A new table which combines the original table and the given rows.
+
+        Raises
+        ------
+        SchemaMismatchError
+            If the schema of on of the row does not match the table schema.
+        """
+        return TaggedTable._from_table(super().add_rows(rows), target_name=self.target.name, feature_names=None)
+
+    def filter_rows(self, query: Callable[[Row], bool]) -> TaggedTable:
+        """
+        Return a table with rows filtered by Callable (e.g. lambda function).
+
+        This table is not modified.
+
+        Parameters
+        ----------
+        query : lambda function
+            A Callable that is applied to all rows.
+
+        Returns
+        -------
+        table : TaggedTable
+            A table containing only the rows filtered by the query.
+        """
+        return TaggedTable._from_table(super().filter_rows(query), target_name=self.target.name, feature_names=None)
+
+    def keep_only_columns(self, column_names: list[str]) -> Table:
+        """
+        Return a table with only the given column(s).
+
+        This table is not modified.
+
+        Parameters
+        ----------
+        column_names : list[str]
+            A list containing only the columns to be kept.
+
+        Returns
+        -------
+        table : Table
+            A table containing only the given column(s).
+
+        Raises
+        ------
+        UnknownColumnNameError
+            If any of the given columns does not exist.
+        """
+        # TODO: Change return type to TaggedTable, throw exception if appropriate, fix pytest errors
+        return super().keep_only_columns(column_names)
