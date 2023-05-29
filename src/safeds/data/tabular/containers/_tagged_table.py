@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from safeds.data.tabular.containers import Column, Table, Row
+from safeds.data.tabular.containers import Column, Row, Table
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Mapping, Sequence
