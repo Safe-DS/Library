@@ -189,7 +189,7 @@ class TaggedTable(Table):
             If the size of the column does not match the amount of rows.
 
         """
-        return TaggedTable._from_table(super().add_column(column), target_name=self._target.name, feature_names=None)
+        return TaggedTable._from_table(super().add_column(column), target_name=self.target.name, feature_names=None)
 
     def add_columns(self, columns: list[Column] | Table) -> TaggedTable:
         """
@@ -214,4 +214,4 @@ class TaggedTable(Table):
         DuplicateColumnNameError
             If at least one column name from the provided column list already exists in the table.
         """
-        return TaggedTable._from_table(super().add_columns(columns), target_name=self._target.name, feature_names=None)
+        return TaggedTable._from_table(super().add_columns(columns), target_name=self.target.name, feature_names=None)
