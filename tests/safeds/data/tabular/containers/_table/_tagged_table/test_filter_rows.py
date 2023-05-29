@@ -9,7 +9,7 @@ def test_should_remove_row() -> None:
             "target": [1, 3, 2],
         },
         "target",
-        None
+        None,
     )
     new_table = table.filter_rows(lambda row: all(row.get_value(col) < 10 for col in table.column_names))
     expected = TaggedTable(
@@ -19,7 +19,7 @@ def test_should_remove_row() -> None:
             "target": [1, 2],
         },
         "target",
-        None
+        None,
     )
     assert new_table.schema == expected.schema
     assert new_table.features == expected.features
