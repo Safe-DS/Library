@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from safeds.data.tabular.containers import Column, Row, Table
+from safeds.exceptions import IllegalSchemaModificationError
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Mapping, Sequence
@@ -300,6 +301,11 @@ class TaggedTable(Table):
         ------
         UnknownColumnNameError
             If any of the given columns does not exist.
+        IllegalSchemaModificationError
+            If none of the given columns is the target column.
         """
-        # TODO: Change return type to TaggedTable, throw exception if appropriate, fix pytest errors
+        # TODO: Change return type to TaggedTable (2x in docstring, 1x in function definition),
+        #  throw exception if appropriate, investigate and fix pytest errors
+        # if self.target.name not in column_names:
+            # raise IllegalSchemaModificationError(f'Must keep target column "{self.target.name}".')
         return super().keep_only_columns(column_names)
