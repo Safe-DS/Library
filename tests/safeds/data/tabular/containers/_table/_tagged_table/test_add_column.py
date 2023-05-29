@@ -1,6 +1,5 @@
-import pytest
 
-from safeds.data.tabular.containers import TaggedTable, Column
+from safeds.data.tabular.containers import Column, TaggedTable
 
 
 def test_should_add_column() -> None:
