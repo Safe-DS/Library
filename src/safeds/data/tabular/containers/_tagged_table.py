@@ -463,3 +463,43 @@ class TaggedTable(Table):
             new_name if self.target.name == old_name else self.target.name,
             None,
         )
+
+    def replace_column(self, old_column_name: str, new_column: Column) -> TaggedTable:
+        """
+        Return a copy of the table with the specified old column replaced by a new column.
+
+        The order of columns is kept.
+
+        The column to be replaced may be the target column.
+
+        This table is not modified.
+
+        Parameters
+        ----------
+        old_column_name : str
+            The name of the column to be replaced.
+
+        new_column : Column
+            The new column replacing the old column.
+
+        Returns
+        -------
+        result : TaggedTable
+            A table with the old column replaced by the new column.
+
+        Raises
+        ------
+        UnknownColumnNameError
+            If the old column does not exist.
+
+        DuplicateColumnNameError
+            If the new column already exists and the existing column is not affected by the replacement.
+
+        ColumnSizeError
+            If the size of the column does not match the amount of rows.
+        """
+        return TaggedTable._from_table(
+            super().replace_column(old_column_name, new_column),
+            new_column.name if self.target.name == old_column_name else self.target.name,
+            None,
+        )
