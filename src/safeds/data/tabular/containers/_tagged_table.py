@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from safeds.data.tabular.containers import Column, Row, Table
-from safeds.exceptions import ColumnIsTaggedError
+from safeds.exceptions import ColumnIsTaggedError, UnknownColumnNameError
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Mapping, Sequence
@@ -363,6 +363,6 @@ class TaggedTable(Table):
         table = super().remove_columns_with_missing_values()
         try:
             tagged = TaggedTable._from_table(table, self.target.name, None)
-        except ValueError:  # TODO: Check if this is actually the error that would be raised
+        except UnknownColumnNameError:
             raise ColumnIsTaggedError(self.target.name) from None
         return tagged
