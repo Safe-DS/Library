@@ -313,6 +313,7 @@ class TaggedTable(Table):
         return super().keep_only_columns(column_names)
 
     def remove_columns(self, column_names: list[str]) -> Table:
+        # TODO: Change return type to TaggedTable (in function definition and in docstring).
         """
         Return a table without the given column(s).
 
@@ -335,14 +336,12 @@ class TaggedTable(Table):
         ColumnIsTaggedError
             If any of the given columns is the target column.
         """
-        # TODO: Change return type to TaggedTable (2x in docstring, 1x in function definition),
-        #  re-build TaggedTable before returning,
-        #  throw exception if appropriate,
-        #  investigate and fix pytest errors
-        if self.target.name in column_names:
+        try:
+            return TaggedTable._from_table(super().remove_columns(column_names), self.target.name, None)
+        except UnknownColumnNameError:
+            # TODO: Don't return; throw exception and handle it correctly in tests.
             # raise ColumnIsTaggedError({self.target.name})
-            pass
-        return super().remove_columns(column_names)
+            return super().remove_columns(column_names)
 
     def remove_columns_with_missing_values(self) -> TaggedTable:
         """
