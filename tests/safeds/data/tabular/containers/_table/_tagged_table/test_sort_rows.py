@@ -19,7 +19,7 @@ from safeds.data.tabular.containers import Row, TaggedTable
             TaggedTable({"feature": [1, 2, 3], "target": [0, 0, 0]}, "target", None),
         ),
     ],
-    ids=["unsorted", "already_sorted"]
+    ids=["unsorted", "already_sorted"],
 )
 def test_should_sort_table(
     table: TaggedTable,
@@ -48,7 +48,7 @@ def test_should_sort_table(
             TaggedTable({"feature": [1, 2, 3], "target": [0, 0, 0]}, "target", None),
         ),
     ],
-    ids=["unsorted", "already_sorted"]
+    ids=["unsorted", "already_sorted"],
 )
 def test_should_not_modify_original_table(
     table: TaggedTable,
