@@ -503,3 +503,17 @@ class TaggedTable(Table):
             new_column.name if self.target.name == old_column_name else self.target.name,
             None,
         )
+
+    def shuffle_rows(self) -> TaggedTable:
+        """
+        Shuffle the table randomly.
+
+        This table is not modified.
+
+        Returns
+        -------
+        result : TaggedTable
+            The shuffled Table.
+
+        """
+        return TaggedTable._from_table(super().shuffle_rows(), self.target.name, None)
