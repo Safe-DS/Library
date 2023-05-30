@@ -601,3 +601,22 @@ class TaggedTable(Table):
             A new table with sorted rows.
         """
         return TaggedTable._from_table(super().sort_rows(comparator), self.target.name, None)
+
+    def transform_column(self, name: str, transformer: Callable[[Row], Any]) -> TaggedTable:
+        """
+        Transform provided column by calling provided transformer.
+
+        This table is not modified.
+
+        Returns
+        -------
+        result : TaggedTable
+            The table with the transformed column.
+
+        Raises
+        ------
+        UnknownColumnNameError
+            If the column does not exist.
+
+        """
+        return TaggedTable._from_table(super().transform_column(name, transformer), self.target.name, None)
