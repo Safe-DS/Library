@@ -549,3 +549,32 @@ class TaggedTable(Table):
             If the index is out of bounds.
         """
         return TaggedTable._from_table(super().slice_rows(start, end, step), self.target.name, None)
+
+    def sort_columns(
+        self,
+        comparator: Callable[[Column, Column], int] = lambda col1, col2: (col1.name > col2.name)
+        - (col1.name < col2.name),
+    ) -> TaggedTable:
+        """
+        Sort the columns of a `TaggedTable` with the given comparator and return a new `TaggedTable`.
+
+        The original table is not modified. The comparator is a function that takes two columns `col1` and `col2` and
+        returns an integer:
+
+        * If `col1` should be ordered before `col2`, the function should return a negative number.
+        * If `col1` should be ordered after `col2`, the function should return a positive number.
+        * If the original order of `col1` and `col2` should be kept, the function should return 0.
+
+        If no comparator is given, the columns will be sorted alphabetically by their name.
+
+        Parameters
+        ----------
+        comparator : Callable[[Column, Column], int]
+            The function used to compare two columns.
+
+        Returns
+        -------
+        new_table : TaggedTable
+            A new table with sorted columns.
+        """
+        return TaggedTable._from_table(super().sort_columns(comparator), self.target.name, None)
