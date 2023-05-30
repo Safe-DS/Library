@@ -517,3 +517,35 @@ class TaggedTable(Table):
 
         """
         return TaggedTable._from_table(super().shuffle_rows(), self.target.name, None)
+
+    def slice_rows(
+        self,
+        start: int | None = None,
+        end: int | None = None,
+        step: int = 1,
+    ) -> TaggedTable:
+        """
+        Slice a part of the table into a new table.
+
+        This table is not modified.
+
+        Parameters
+        ----------
+        start : int
+            The first index of the range to be copied into a new table, None by default.
+        end : int
+            The last index of the range to be copied into a new table, None by default.
+        step : int
+            The step size used to iterate through the table, 1 by default.
+
+        Returns
+        -------
+        result : TaggedTable
+            The resulting table.
+
+        Raises
+        ------
+        IndexOutOfBoundsError
+            If the index is out of bounds.
+        """
+        return TaggedTable._from_table(super().slice_rows(start, end, step), self.target.name, None)
