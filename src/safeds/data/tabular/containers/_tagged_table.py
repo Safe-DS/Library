@@ -578,3 +578,26 @@ class TaggedTable(Table):
             A new table with sorted columns.
         """
         return TaggedTable._from_table(super().sort_columns(comparator), self.target.name, None)
+
+    def sort_rows(self, comparator: Callable[[Row, Row], int]) -> TaggedTable:
+        """
+        Sort the rows of a `TaggedTable` with the given comparator and return a new `TaggedTable`.
+
+        The original table is not modified. The comparator is a function that takes two rows `row1` and `row2` and
+        returns an integer:
+
+        * If `row1` should be ordered before `row2`, the function should return a negative number.
+        * If `row1` should be ordered after `row2`, the function should return a positive number.
+        * If the original order of `row1` and `row2` should be kept, the function should return 0.
+
+        Parameters
+        ----------
+        comparator : Callable[[Row, Row], int]
+            The function used to compare two rows.
+
+        Returns
+        -------
+        new_table : TaggedTable
+            A new table with sorted rows.
+        """
+        return TaggedTable._from_table(super().sort_rows(comparator), self.target.name, None)
