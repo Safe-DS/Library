@@ -9,7 +9,7 @@ if TYPE_CHECKING:
     from collections.abc import Callable, Mapping, Sequence
     from typing import Any
 
-    from safeds.data.tabular.transformation import TableTransformer
+    from safeds.data.tabular.transformation import TableTransformer, InvertibleTableTransformer
 
 
 class TaggedTable(Table):
@@ -649,6 +649,11 @@ class TaggedTable(Table):
         >>> from safeds.data.tabular.transformation import OneHotEncoder
         >>> from safeds.data.tabular.containers import TaggedTable
         >>> table = TaggedTable({"feat1": ["a", "b", "a"], "feat2": ["a", "b", "d"], "target": [1, 2, 3]},"target")
+        >>> table
+           feat1  feat2  target
+        0    "a"    "a"       1
+        1    "b"    "b"       2
+        2    "a"    "d"       3
         >>> transformer = OneHotEncoder().fit(table, table.features.column_names)
         >>> table.transform_table(transformer)
            feat1__a  feat1__b  feat2__a  feat2__b  feat2__d  target
@@ -660,3 +665,49 @@ class TaggedTable(Table):
         if self.target.name in transformer.get_names_of_removed_columns():
             raise ColumnIsTaggedError(self.target.name)
         return TaggedTable._from_table(transformed_table, self.target.name)
+
+    def inverse_transform_table(self, transformer: InvertibleTableTransformer) -> TaggedTable:
+        """
+        Invert the transformation applied by the given transformer.
+
+        This table is not modified.
+
+        Parameters
+        ----------
+        transformer : InvertibleTableTransformer
+            The transformer that was used to create this table.
+
+        Returns
+        -------
+        table : TaggedTable
+            The original table.
+
+        Raises
+        ------
+        TransformerNotFittedError
+            If the transformer has not been fitted yet.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.transformation import OneHotEncoder
+        >>> from safeds.data.tabular.containers import TaggedTable
+        >>> table = TaggedTable({"feat1": ["a", "b", "a"], "feat2": ["a", "b", "d"], "target": [1, 2, 3]}, "target")
+        >>> table
+           feat1  feat2  target
+        0    "a"    "a"       1
+        1    "b"    "b"       2
+        2    "a"    "d"       3
+        >>> transformer = OneHotEncoder().fit(table, table.features.column_names)
+        >>> transformed_table = table.transform_table(transformer)
+        >>> transformed_table
+           feat1__a  feat1__b  feat2__a  feat2__b  feat2__d  target
+        0       1.0       0.0       1.0       0.0       0.0       1
+        1       0.0       1.0       0.0       1.0       0.0       2
+        2       1.0       0.0       0.0       0.0       1.0       3
+        >>> transformed_table.inverse_transform_table(transformer)
+           feat1  feat2  target
+        0    "a"    "a"       1
+        1    "b"    "b"       2
+        2    "a"    "d"       3
+        """
+        return TaggedTable._from_table(transformer.inverse_transform(self), self.target.name)
