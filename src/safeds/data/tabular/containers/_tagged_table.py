@@ -650,10 +650,10 @@ class TaggedTable(Table):
         >>> from safeds.data.tabular.containers import TaggedTable
         >>> table = TaggedTable({"feat1": ["a", "b", "a"], "feat2": ["a", "b", "d"], "target": [1, 2, 3]},"target")
         >>> table
-          feat1 feat2 target
-        0     a     a      1
-        1     b     b      2
-        2     a     d      3
+          feat1 feat2  target
+        0     a     a       1
+        1     b     b       2
+        2     a     d       3
         >>> transformer = OneHotEncoder().fit(table, table.features.column_names)
         >>> table.transform_table(transformer)
            feat1__a  feat1__b  feat2__a  feat2__b  feat2__d  target
@@ -693,10 +693,10 @@ class TaggedTable(Table):
         >>> from safeds.data.tabular.containers import TaggedTable
         >>> table = TaggedTable({"feat1": ["a", "b", "a"], "feat2": ["a", "b", "d"], "target": [1, 2, 3]}, "target")
         >>> table
-           feat1  feat2  target
-        0      a      a       1
-        1      b      b       2
-        2      a      d       3
+          feat1 feat2  target
+        0     a     a       1
+        1     b     b       2
+        2     a     d       3
         >>> transformer = OneHotEncoder().fit(table, table.features.column_names)
         >>> transformed_table = table.transform_table(transformer)
         >>> transformed_table
@@ -705,9 +705,9 @@ class TaggedTable(Table):
         1       0.0       1.0       0.0       1.0       0.0       2
         2       1.0       0.0       0.0       0.0       1.0       3
         >>> transformed_table.inverse_transform_table(transformer)
-           feat1  feat2  target
-        0      a      a       1
-        1      b      b       2
-        2      a      d       3
+          feat1 feat2  target
+        0     a     a       1
+        1     b     b       2
+        2     a     d       3
         """
         return TaggedTable._from_table(transformer.inverse_transform(self), self.target.name)
