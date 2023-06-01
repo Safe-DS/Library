@@ -1,7 +1,5 @@
-import pytest
 from safeds.data.tabular.containers import TaggedTable
 from safeds.data.tabular.transformation import OneHotEncoder
-from safeds.exceptions import ColumnIsTaggedError
 
 from tests.helpers import assert_that_tagged_tables_are_equal
 

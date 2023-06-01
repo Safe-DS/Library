@@ -9,7 +9,7 @@ if TYPE_CHECKING:
     from collections.abc import Callable, Mapping, Sequence
     from typing import Any
 
-    from safeds.data.tabular.transformation import TableTransformer, InvertibleTableTransformer
+    from safeds.data.tabular.transformation import InvertibleTableTransformer, TableTransformer
 
 
 class TaggedTable(Table):
