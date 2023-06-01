@@ -15,7 +15,7 @@ def test_should_transform_table() -> None:
             "feat2__a": [1.0, 0.0, 0.0],
             "feat2__b": [0.0, 1.0, 0.0],
             "feat2__d": [0.0, 0.0, 1.0],
-            "target": [1, 2, 3]
+            "target": [1, 2, 3],
         },
         "target",
     )
@@ -29,6 +29,7 @@ def test_should_raise_column_is_tagged() -> None:
     table = TaggedTable({"feat1": ["a", "b", "a"], "feat2": ["a", "b", "d"], "target": [1, 2, 3]}, "target")
     transformer = OneHotEncoder().fit(table, None)
     # Passing None means all columns get one-hot-encoded, i.e. also the target column!
-    with pytest.raises(ColumnIsTaggedError, match='Illegal schema modification: Column "target" is tagged and cannot '
-                                                  'be removed.'):
+    with pytest.raises(
+        ColumnIsTaggedError, match='Illegal schema modification: Column "target" is tagged and cannot be removed.',
+    ):
         table.transform_table(transformer)

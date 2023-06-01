@@ -7,8 +7,9 @@ from safeds.exceptions import ColumnIsTaggedError, UnknownColumnNameError
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Mapping, Sequence
-    from safeds.data.tabular.transformation import TableTransformer
     from typing import Any
+
+    from safeds.data.tabular.transformation import TableTransformer
 
 
 class TaggedTable(Table):
