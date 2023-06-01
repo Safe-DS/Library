@@ -30,6 +30,7 @@ def test_should_raise_column_is_tagged() -> None:
     transformer = OneHotEncoder().fit(table, None)
     # Passing None means all columns get one-hot-encoded, i.e. also the target column!
     with pytest.raises(
-        ColumnIsTaggedError, match='Illegal schema modification: Column "target" is tagged and cannot be removed.',
+        ColumnIsTaggedError,
+        match='Illegal schema modification: Column "target" is tagged and cannot be removed.',
     ):
         table.transform_table(transformer)
