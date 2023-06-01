@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from safeds.data.tabular.containers import Column, Row, Table
+from safeds.data.tabular.transformation import TableTransformer
 from safeds.exceptions import ColumnIsTaggedError, UnknownColumnNameError
 
 if TYPE_CHECKING:
@@ -618,3 +619,43 @@ class TaggedTable(Table):
 
         """
         return TaggedTable._from_table(super().transform_column(name, transformer), self.target.name)
+
+    def transform_table(self, transformer: TableTransformer) -> TaggedTable:
+        """
+        Apply a learned transformation onto this table.
+
+        This table is not modified.
+
+        Parameters
+        ----------
+        transformer : TableTransformer
+            The transformer which transforms the given table.
+
+        Returns
+        -------
+        transformed_table : TaggedTable
+            The transformed table.
+
+        Raises
+        ------
+        TransformerNotFittedError
+            If the transformer has not been fitted yet.
+        ColunmIsTaggedError
+            If the transformer tries to remove or replace the target column.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.transformation import OneHotEncoder
+        >>> from safeds.data.tabular.containers import TaggedTable
+        >>> table = TaggedTable({"feat1": ["a", "b", "a"], "feat2": ["a", "b", "d"], "target": [1, 2, 3]},"target")
+        >>> transformer = OneHotEncoder().fit(table, table.features.column_names)
+        >>> table.transform_table(transformer)
+           feat1__a  feat1__b  feat2__a  feat2__b  feat2__d  target
+        0       1.0       0.0       1.0       0.0       0.0       1
+        1       0.0       1.0       0.0       1.0       0.0       2
+        2       1.0       0.0       0.0       0.0       1.0       3
+        """
+        transformed_table = transformer.transform(self)
+        if self.target.name in transformer.get_names_of_removed_columns():
+            raise ColumnIsTaggedError(self.target.name)
+        return TaggedTable._from_table(transformed_table, self.target.name)
