@@ -8,9 +8,9 @@ from safeds.exceptions import IndexOutOfBoundsError
     ("table", "test_table", "second_test_table"),
     [
         (
-            TaggedTable({"feature": [1, 2, 1], "target": [1, 2, 4]}, "target", None),
-            TaggedTable({"feature": [1, 2], "target": [1, 2]}, "target", None),
-            TaggedTable({"feature": [1, 1], "target": [1, 4]}, "target", None),
+            TaggedTable({"feature": [1, 2, 1], "target": [1, 2, 4]}, "target"),
+            TaggedTable({"feature": [1, 2], "target": [1, 2]}, "target"),
+            TaggedTable({"feature": [1, 1], "target": [1, 4]}, "target"),
         ),
     ],
     ids=["Table with three rows"],
@@ -44,7 +44,7 @@ def test_should_slice_rows(table: TaggedTable, test_table: TaggedTable, second_t
     ],
 )
 def test_should_raise_if_index_out_of_bounds(start: int, end: int, step: int, error_message: str) -> None:
-    table = TaggedTable({"feature": [1, 2, 1], "target": [1, 2, 4]}, "target", None)
+    table = TaggedTable({"feature": [1, 2, 1], "target": [1, 2, 4]}, "target")
 
     with raises(IndexOutOfBoundsError, match=error_message):
         table.slice_rows(start, end, step)

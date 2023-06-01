@@ -8,7 +8,6 @@ def test_should_remove_row() -> None:
             "target": [3.0, 4.0, 5.0],
         },
         "target",
-        None,
     )
     new_table = table.remove_rows_with_missing_values()
     expected = TaggedTable(
@@ -17,7 +16,6 @@ def test_should_remove_row() -> None:
             "target": [3.0, 5.0],
         },
         "target",
-        None,
     )
     assert new_table.schema == expected.schema
     assert new_table.features == expected.features

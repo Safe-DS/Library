@@ -11,7 +11,6 @@ def test_should_remove_column() -> None:
             "target": [3, 4, 5],
         },
         "target",
-        None,
     )
     new_table = table.remove_columns_with_non_numerical_values()
     expected = TaggedTable(
@@ -20,7 +19,6 @@ def test_should_remove_column() -> None:
             "target": [3, 4, 5],
         },
         "target",
-        None,
     )
     assert new_table.schema == expected.schema
     assert new_table.features == expected.features
@@ -35,7 +33,6 @@ def test_should_throw_column_is_tagged() -> None:
             "target": ["a", "b", "c"],
         },
         "target",
-        None,
     )
     with pytest.raises(
         ColumnIsTaggedError,

@@ -9,7 +9,6 @@ def test_should_shuffle_rows() -> None:
             "target": [6, 7, 8],
         },
         "target",
-        None,
     )
     shuffled = table.shuffle_rows()
     assert table.schema == shuffled.schema
@@ -26,7 +25,6 @@ def test_should_shuffle_rows() -> None:
             "target": [6],
         },
         "target",
-        None,
     )
     expected_1 = TaggedTable(
         {
@@ -35,7 +33,6 @@ def test_should_shuffle_rows() -> None:
             "target": [7],
         },
         "target",
-        None,
     )
     expected_2 = TaggedTable(
         {
@@ -44,7 +41,6 @@ def test_should_shuffle_rows() -> None:
             "target": [8],
         },
         "target",
-        None,
     )
     assert row_0 == expected_0
     assert row_1 == expected_1

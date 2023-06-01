@@ -190,7 +190,7 @@ class TaggedTable(Table):
             If the size of the column does not match the amount of rows.
 
         """
-        return TaggedTable._from_table(super().add_column(column), target_name=self.target.name, feature_names=None)
+        return TaggedTable._from_table(super().add_column(column), target_name=self.target.name)
 
     def add_columns(self, columns: list[Column] | Table) -> TaggedTable:
         """
@@ -215,7 +215,7 @@ class TaggedTable(Table):
         DuplicateColumnNameError
             If at least one column name from the provided column list already exists in the table.
         """
-        return TaggedTable._from_table(super().add_columns(columns), target_name=self.target.name, feature_names=None)
+        return TaggedTable._from_table(super().add_columns(columns), target_name=self.target.name)
 
     def add_row(self, row: Row) -> TaggedTable:
         """
@@ -238,7 +238,7 @@ class TaggedTable(Table):
         SchemaMismatchError
             If the schema of the row does not match the table schema.
         """
-        return TaggedTable._from_table(super().add_row(row), target_name=self.target.name, feature_names=None)
+        return TaggedTable._from_table(super().add_row(row), target_name=self.target.name)
 
     def add_rows(self, rows: list[Row] | Table) -> TaggedTable:
         """
@@ -261,7 +261,7 @@ class TaggedTable(Table):
         SchemaMismatchError
             If the schema of on of the row does not match the table schema.
         """
-        return TaggedTable._from_table(super().add_rows(rows), target_name=self.target.name, feature_names=None)
+        return TaggedTable._from_table(super().add_rows(rows), target_name=self.target.name)
 
     def filter_rows(self, query: Callable[[Row], bool]) -> TaggedTable:
         """
@@ -279,7 +279,7 @@ class TaggedTable(Table):
         table : TaggedTable
             A table containing only the rows filtered by the query.
         """
-        return TaggedTable._from_table(super().filter_rows(query), target_name=self.target.name, feature_names=None)
+        return TaggedTable._from_table(super().filter_rows(query), target_name=self.target.name)
 
     def keep_only_columns(self, column_names: list[str]) -> Table:
         # TODO: Change return type to TaggedTable (in function definition and in docstring).
@@ -338,7 +338,7 @@ class TaggedTable(Table):
             If any of the given columns is the target column.
         """
         try:
-            return TaggedTable._from_table(super().remove_columns(column_names), self.target.name, None)
+            return TaggedTable._from_table(super().remove_columns(column_names), self.target.name)
         except UnknownColumnNameError:
             # TODO: Don't return; throw exception and handle it correctly in tests.
             # raise ColumnIsTaggedError({self.target.name}) from None
@@ -385,7 +385,7 @@ class TaggedTable(Table):
         """
         table = super().remove_columns_with_non_numerical_values()
         try:
-            tagged = TaggedTable._from_table(table, self.target.name, None)
+            tagged = TaggedTable._from_table(table, self.target.name)
         except UnknownColumnNameError:
             raise ColumnIsTaggedError(self.target.name) from None
         return tagged
@@ -401,7 +401,7 @@ class TaggedTable(Table):
         result : TaggedTable
             The table with the duplicate rows removed.
         """
-        return TaggedTable._from_table(super().remove_duplicate_rows(), self.target.name, None)
+        return TaggedTable._from_table(super().remove_duplicate_rows(), self.target.name)
 
     def remove_rows_with_missing_values(self) -> TaggedTable:
         """
@@ -414,7 +414,7 @@ class TaggedTable(Table):
         table : TaggedTable
             A table without the rows that contain missing values.
         """
-        return TaggedTable._from_table(super().remove_rows_with_missing_values(), self.target.name, None)
+        return TaggedTable._from_table(super().remove_rows_with_missing_values(), self.target.name)
 
     def remove_rows_with_outliers(self) -> TaggedTable:
         """
@@ -431,7 +431,7 @@ class TaggedTable(Table):
         new_table : TaggedTable
             A new table without rows containing outliers.
         """
-        return TaggedTable._from_table(super().remove_rows_with_outliers(), self.target.name, None)
+        return TaggedTable._from_table(super().remove_rows_with_outliers(), self.target.name)
 
     def rename_column(self, old_name: str, new_name: str) -> TaggedTable:
         """
@@ -461,7 +461,6 @@ class TaggedTable(Table):
         return TaggedTable._from_table(
             super().rename_column(old_name, new_name),
             new_name if self.target.name == old_name else self.target.name,
-            None,
         )
 
     def replace_column(self, old_column_name: str, new_column: Column) -> TaggedTable:
@@ -501,7 +500,6 @@ class TaggedTable(Table):
         return TaggedTable._from_table(
             super().replace_column(old_column_name, new_column),
             new_column.name if self.target.name == old_column_name else self.target.name,
-            None,
         )
 
     def shuffle_rows(self) -> TaggedTable:
@@ -516,7 +514,7 @@ class TaggedTable(Table):
             The shuffled Table.
 
         """
-        return TaggedTable._from_table(super().shuffle_rows(), self.target.name, None)
+        return TaggedTable._from_table(super().shuffle_rows(), self.target.name)
 
     def slice_rows(
         self,
@@ -548,7 +546,7 @@ class TaggedTable(Table):
         IndexOutOfBoundsError
             If the index is out of bounds.
         """
-        return TaggedTable._from_table(super().slice_rows(start, end, step), self.target.name, None)
+        return TaggedTable._from_table(super().slice_rows(start, end, step), self.target.name)
 
     def sort_columns(
         self,
@@ -577,7 +575,7 @@ class TaggedTable(Table):
         new_table : TaggedTable
             A new table with sorted columns.
         """
-        return TaggedTable._from_table(super().sort_columns(comparator), self.target.name, None)
+        return TaggedTable._from_table(super().sort_columns(comparator), self.target.name)
 
     def sort_rows(self, comparator: Callable[[Row, Row], int]) -> TaggedTable:
         """
@@ -600,7 +598,7 @@ class TaggedTable(Table):
         new_table : TaggedTable
             A new table with sorted rows.
         """
-        return TaggedTable._from_table(super().sort_rows(comparator), self.target.name, None)
+        return TaggedTable._from_table(super().sort_rows(comparator), self.target.name)
 
     def transform_column(self, name: str, transformer: Callable[[Row], Any]) -> TaggedTable:
         """
@@ -619,4 +617,4 @@ class TaggedTable(Table):
             If the column does not exist.
 
         """
-        return TaggedTable._from_table(super().transform_column(name, transformer), self.target.name, None)
+        return TaggedTable._from_table(super().transform_column(name, transformer), self.target.name)

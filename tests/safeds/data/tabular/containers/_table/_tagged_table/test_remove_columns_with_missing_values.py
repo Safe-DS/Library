@@ -11,7 +11,6 @@ def test_should_remove_column() -> None:
             "target": [6, 7, 8],
         },
         "target",
-        None,
     )
     new_table = table.remove_columns_with_missing_values()
     expected = TaggedTable(
@@ -20,7 +19,6 @@ def test_should_remove_column() -> None:
             "target": [6, 7, 8],
         },
         "target",
-        None,
     )
     assert new_table.schema == expected.schema
     assert new_table.features == expected.features
@@ -35,7 +33,6 @@ def test_should_throw_column_is_tagged() -> None:
             "target": [3, None, 5],
         },
         "target",
-        None,
     )
     with pytest.raises(
         ColumnIsTaggedError,

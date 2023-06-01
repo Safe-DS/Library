@@ -8,7 +8,6 @@ def test_should_add_column() -> None:
             "target": [3, 4, 5],
         },
         "target",
-        None,
     )
     col = Column("feature_2", [6, 7, 8])
     new_table = table.add_column(col)
@@ -19,7 +18,6 @@ def test_should_add_column() -> None:
             "feature_2": [6, 7, 8],
         },
         "target",
-        None,
     )
     assert new_table.schema == expected.schema
     assert new_table.features == expected.features

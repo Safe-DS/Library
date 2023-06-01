@@ -9,14 +9,14 @@ from safeds.data.tabular.containers import Row, TaggedTable
     [
         # TODO: Check that it works with an empty table
         (
-            TaggedTable({"feature": [3, 2, 1], "target": [0, 0, 0]}, "target", None),
+            TaggedTable({"feature": [3, 2, 1], "target": [0, 0, 0]}, "target"),
             lambda row1, row2: row1["feature"] - row2["feature"],
-            TaggedTable({"feature": [1, 2, 3], "target": [0, 0, 0]}, "target", None),
+            TaggedTable({"feature": [1, 2, 3], "target": [0, 0, 0]}, "target"),
         ),
         (
-            TaggedTable({"feature": [1, 2, 3], "target": [0, 0, 0]}, "target", None),
+            TaggedTable({"feature": [1, 2, 3], "target": [0, 0, 0]}, "target"),
             lambda row1, row2: row1["feature"] - row2["feature"],
-            TaggedTable({"feature": [1, 2, 3], "target": [0, 0, 0]}, "target", None),
+            TaggedTable({"feature": [1, 2, 3], "target": [0, 0, 0]}, "target"),
         ),
     ],
     ids=["unsorted", "already_sorted"],
@@ -38,14 +38,14 @@ def test_should_sort_table(
     [
         # TODO: Check that it works with an empty table
         (
-            TaggedTable({"feature": [3, 2, 1], "target": [0, 0, 0]}, "target", None),
+            TaggedTable({"feature": [3, 2, 1], "target": [0, 0, 0]}, "target"),
             lambda row1, row2: row1["feature"] - row2["feature"],
-            TaggedTable({"feature": [3, 2, 1], "target": [0, 0, 0]}, "target", None),
+            TaggedTable({"feature": [3, 2, 1], "target": [0, 0, 0]}, "target"),
         ),
         (
-            TaggedTable({"feature": [1, 2, 3], "target": [0, 0, 0]}, "target", None),
+            TaggedTable({"feature": [1, 2, 3], "target": [0, 0, 0]}, "target"),
             lambda row1, row2: row1["feature"] - row2["feature"],
-            TaggedTable({"feature": [1, 2, 3], "target": [0, 0, 0]}, "target", None),
+            TaggedTable({"feature": [1, 2, 3], "target": [0, 0, 0]}, "target"),
         ),
     ],
     ids=["unsorted", "already_sorted"],

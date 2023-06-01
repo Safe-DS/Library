@@ -39,7 +39,6 @@ def test_should_return_sorted_table(
             "col1": ["A", "B", "C", "A", "D"],
         },
         "col1",
-        None,
     )
     if query is not None:
         table_sorted = table1.sort_columns(query)

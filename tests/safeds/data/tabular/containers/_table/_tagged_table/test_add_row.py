@@ -8,7 +8,6 @@ def test_should_add_row() -> None:
             "target": [3, 4],
         },
         "target",
-        None,
     )
     row = Row(
         {
@@ -23,7 +22,6 @@ def test_should_add_row() -> None:
             "target": [3, 4, 5],
         },
         "target",
-        None,
     )
     assert new_table.schema == expected.schema
     assert new_table.features == expected.features
