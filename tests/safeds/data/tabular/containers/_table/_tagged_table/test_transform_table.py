@@ -3,6 +3,8 @@ from safeds.data.tabular.containers import TaggedTable
 from safeds.data.tabular.transformation import OneHotEncoder
 from safeds.exceptions import ColumnIsTaggedError
 
+from tests.helpers import assert_that_tagged_tables_are_equal
+
 
 def test_should_transform_table() -> None:
     table = TaggedTable({"feat1": ["a", "b", "a"], "feat2": ["a", "b", "d"], "target": [1, 2, 3]}, "target")
@@ -19,10 +21,7 @@ def test_should_transform_table() -> None:
         },
         "target",
     )
-    assert transformed_table.schema == expected.schema
-    assert transformed_table.features == expected.features
-    assert transformed_table.target == expected.target
-    assert transformed_table == expected
+    assert_that_tagged_tables_are_equal(transformed_table, expected)
 
 
 def test_should_raise_column_is_tagged() -> None:

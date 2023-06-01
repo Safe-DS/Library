@@ -2,6 +2,8 @@ import pytest
 from safeds.data.tabular.containers import TaggedTable
 from safeds.exceptions import UnknownColumnNameError
 
+from tests.helpers import assert_that_tagged_tables_are_equal
+
 
 @pytest.mark.parametrize(
     ("table", "column_name", "table_transformed"),
@@ -22,10 +24,7 @@ from safeds.exceptions import UnknownColumnNameError
 def test_should_transform_column(table: TaggedTable, column_name: str, table_transformed: TaggedTable) -> None:
     result = table.transform_column(column_name, lambda row: row.get_value(column_name) * 2)
 
-    assert result.schema == table_transformed.schema
-    assert result.features == table_transformed.features
-    assert result.target == table_transformed.target
-    assert result == table_transformed
+    assert_that_tagged_tables_are_equal(result, table_transformed)
 
 
 def test_should_raise_if_column_not_found() -> None:

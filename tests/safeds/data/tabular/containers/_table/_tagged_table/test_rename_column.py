@@ -1,6 +1,8 @@
 import pytest
 from safeds.data.tabular.containers import TaggedTable
 
+from tests.helpers import assert_that_tagged_tables_are_equal
+
 
 @pytest.mark.parametrize(
     ("original_table", "old_column_name", "new_column_name", "result_table"),
@@ -51,7 +53,4 @@ def test_should_add_column(
     result_table: TaggedTable,
 ) -> None:
     new_table = original_table.rename_column(old_column_name, new_column_name)
-    assert new_table.schema == result_table.schema
-    assert new_table.features == result_table.features
-    assert new_table.target == result_table.target
-    assert new_table == result_table
+    assert_that_tagged_tables_are_equal(new_table, result_table)

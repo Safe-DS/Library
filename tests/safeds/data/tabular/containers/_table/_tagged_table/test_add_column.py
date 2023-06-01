@@ -1,5 +1,7 @@
 from safeds.data.tabular.containers import Column, TaggedTable
 
+from tests.helpers import assert_that_tagged_tables_are_equal
+
 
 def test_should_add_column() -> None:
     table = TaggedTable(
@@ -19,7 +21,4 @@ def test_should_add_column() -> None:
         },
         "target",
     )
-    assert new_table.schema == expected.schema
-    assert new_table.features == expected.features
-    assert new_table.target == expected.target
-    assert new_table == expected
+    assert_that_tagged_tables_are_equal(new_table, expected)

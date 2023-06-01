@@ -3,6 +3,8 @@ from _pytest.python_api import raises
 from safeds.data.tabular.containers import TaggedTable
 from safeds.exceptions import IndexOutOfBoundsError
 
+from tests.helpers import assert_that_tagged_tables_are_equal
+
 
 @pytest.mark.parametrize(
     ("table", "test_table", "second_test_table"),
@@ -19,18 +21,9 @@ def test_should_slice_rows(table: TaggedTable, test_table: TaggedTable, second_t
     new_table = table.slice_rows(0, 2, 1)
     second_new_table = table.slice_rows(0, 3, 2)
     third_new_table = table.slice_rows()
-    assert new_table.schema == test_table.schema
-    assert new_table.features == test_table.features
-    assert new_table.target == test_table.target
-    assert new_table == test_table
-    assert second_new_table.schema == second_test_table.schema
-    assert second_new_table.features == second_test_table.features
-    assert second_new_table.target == second_test_table.target
-    assert second_new_table == second_test_table
-    assert third_new_table.schema == table.schema
-    assert third_new_table.features == table.features
-    assert third_new_table.target == table.target
-    assert third_new_table == table
+    assert_that_tagged_tables_are_equal(new_table, test_table)
+    assert_that_tagged_tables_are_equal(second_new_table, second_test_table)
+    assert_that_tagged_tables_are_equal(third_new_table, table)
 
 
 @pytest.mark.parametrize(

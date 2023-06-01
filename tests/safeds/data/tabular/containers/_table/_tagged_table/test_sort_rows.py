@@ -3,6 +3,8 @@ from collections.abc import Callable
 import pytest
 from safeds.data.tabular.containers import Row, TaggedTable
 
+from tests.helpers import assert_that_tagged_tables_are_equal
+
 
 @pytest.mark.parametrize(
     ("table", "comparator", "expected"),
@@ -27,10 +29,7 @@ def test_should_sort_table(
     expected: TaggedTable,
 ) -> None:
     table_sorted = table.sort_rows(comparator)
-    assert table_sorted.schema == expected.schema
-    assert table_sorted.features == expected.features
-    assert table_sorted.target == expected.target
-    assert table_sorted == expected
+    assert_that_tagged_tables_are_equal(table_sorted, expected)
 
 
 @pytest.mark.parametrize(
@@ -56,7 +55,4 @@ def test_should_not_modify_original_table(
     table_copy: TaggedTable,
 ) -> None:
     table.sort_rows(comparator)
-    assert table.schema == table_copy.schema
-    assert table.features == table_copy.features
-    assert table.target == table_copy.target
-    assert table == table_copy
+    assert_that_tagged_tables_are_equal(table, table_copy)
