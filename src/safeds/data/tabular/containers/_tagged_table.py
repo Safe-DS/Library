@@ -3,11 +3,11 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from safeds.data.tabular.containers import Column, Row, Table
-from safeds.data.tabular.transformation import TableTransformer
 from safeds.exceptions import ColumnIsTaggedError, UnknownColumnNameError
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Mapping, Sequence
+    from safeds.data.tabular.transformation import TableTransformer
     from typing import Any
 
 
