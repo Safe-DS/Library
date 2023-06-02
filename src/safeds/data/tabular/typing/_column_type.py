@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
+from types import NoneType
 from typing import TYPE_CHECKING, Any
 
 import pandas as pd
@@ -44,21 +45,24 @@ class ColumnType(ABC):
                 return RealNumber()
             if celltype == str:
                 return String()
-            if celltype is None:
+            if celltype is NoneType:
                 return Anything(is_nullable=True)  #when Nothing() exists Nothing()
             else:
                 message = f"Unsupported numpy data type '{celltype}'."
                 raise NotImplementedError(message)
 
+        result = None  # set type to Nothing as a default
+        is_nullable = False
         for cell in data:
-            result = None      #set type to Nothing as a default
-            is_nullable = False
+            print(result)
+            print(data.dtype)
+            print(type(cell))
             if result is None:
                 result = columntype_of_type(type(cell))
             elif result != columntype_of_type(type(cell)):
                 is_nullable = True
                 if result == Integer and type(cell) == float:
-                    result = RealNumber()
+                    result = RealNumber(is_nullable)
                 else:
                     result = Anything()
             return result
