@@ -49,7 +49,9 @@ class Schema:
         """
         names = dataframe.columns
         # noinspection PyProtectedMember
-        types = (ColumnType._from_numpy_data_type(data_type) for data_type in dataframe.dtypes)
+        types = []
+        for col in dataframe:
+            types.append(ColumnType._data_type(dataframe[col]))
 
         return Schema(dict(zip(names, types, strict=True)))
 

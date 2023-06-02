@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 
 import pandas as pd
 import pytest
-from safeds.data.tabular.typing import Boolean, ColumnType, Integer, RealNumber, Schema, String
+from safeds.data.tabular.typing import Boolean, ColumnType, Integer, RealNumber, Schema, String, Anything
 from safeds.exceptions import UnknownColumnNameError
 
 if TYPE_CHECKING:
@@ -17,7 +17,7 @@ class TestFromPandasDataFrame:
         [
             (
                 pd.DataFrame({"A": [True, False, True]}),
-                Schema({"A": Boolean()}),
+                Schema({"A": Boolean(is_nullable=False)}),
             ),
             (
                 pd.DataFrame({"A": [1, 2, 3]}),
@@ -29,15 +29,15 @@ class TestFromPandasDataFrame:
             ),
             (
                 pd.DataFrame({"A": ["a", "b", "c"]}),
-                Schema({"A": String()}),
+                Schema({"A": String(is_nullable=False)}),
             ),
             (
                 pd.DataFrame({"A": [1, 2.0, "a", True]}),
-                Schema({"A": String()}),
+                Schema({"A": Anything(is_nullable=False)}),
             ),
             (
                 pd.DataFrame({"A": [1, 2, 3], "B": ["a", "b", "c"]}),
-                Schema({"A": Integer(), "B": String()}),
+                Schema({"A": Integer(is_nullable=False), "B": String(is_nullable=False)}),
             ),
         ],
         ids=[

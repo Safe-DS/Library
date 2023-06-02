@@ -38,52 +38,32 @@ class ColumnType(ABC):
 
         def columntype_of_type(celltype: Any) -> ColumnType:
             if celltype == int:
-                return Integer()
+                return Integer(is_nullable)
             if celltype == bool:
-                return Boolean()
+                return Boolean(is_nullable)
             if celltype == float:
-                return RealNumber()
+                return RealNumber(is_nullable)
             if celltype == str:
-                return String()
+                return String(is_nullable)
             if celltype is NoneType:
-                return Anything(is_nullable=True)  #when Nothing() exists Nothing()
+                return Nothing()
             else:
                 message = f"Unsupported numpy data type '{celltype}'."
                 raise NotImplementedError(message)
 
-        result = None  # set type to Nothing as a default
+        result = Nothing()
         is_nullable = False
         for cell in data:
-            print(result)
-            print(data.dtype)
-            print(type(cell))
-            if result is None:
+            if result == Nothing():
                 result = columntype_of_type(type(cell))
             elif result != columntype_of_type(type(cell)):
                 is_nullable = True
                 if result == Integer and type(cell) == float:
                     result = RealNumber(is_nullable)
                 else:
-                    result = Anything()
-            return result
+                    result = Anything(is_nullable)
 
-
-
-        # if celltype == int:
-        #     return Integer()
-        # if celltype == bool:
-        #     return Boolean()
-        # if celltype == float:
-        #     return RealNumber()
-        # if celltype == str:
-        #     return String()
-        # else:
-        #   return Anything()
-
-
-        # message = f"Unsupported numpy data type '{data_type}'."
-        # raise NotImplementedError(message)
-
+        return result
 
     @abstractmethod
     def is_nullable(self) -> bool:
