@@ -1,10 +1,10 @@
 # Glossary
 
 ## Accuracy
-The fraction of predictions a classification model has correctly identified. Formula:
+The fraction of predictions a [classification](#classification) model has correctly identified. Formula:
 
 $$
-\text{accuracy} = \frac{\text{True Positives + True Negatives}}{\text{Total amount of data points}}
+\text{accuracy} = \frac{\text{[True Positives](#true-positive-tp) + [True Negatives](#true-negative-tn)}}{\text{Total amount of data points}}
 $$
 
 ## Application Programming Interface (API)
@@ -14,11 +14,14 @@ An API allows independent applications to communicate with each other and exchan
 Classification refers to dividing a data set into multiple chunks, which are then considered "classes".
 
 ## Confusion Matrix
-A confusion matrix is a table that is used to define the performance of a classification algorithm.
-It classifies the predictions to be either be true positive, true negative, false positive or false negative.
+A confusion matrix is a table that is used to define the performance of a [classification](#classification) algorithm.
+It classifies the predictions to be either be [true positive](#true-positive-tp), [true negative](#true-negative-tn),
+[false positive](#false-positive-fp) or [false negative](#false-negative-fn).
 
 ## Decision Tree
 A Decision Tree represents the process of conditional evaluation in a tree diagram.
+
+Implemented in Safe-DS as [Decision Tree][safeds.ml.classical.classification.DecisionTree].
 
 ## F1-Score
 The harmonic mean of [precision](#precision) and [recall](#recall). Formula:
@@ -54,6 +57,8 @@ A data metric is an aggregated calculation within a raw dataset.
 If a column's entries consist of a non-numerical data type, using a One Hot Encoder will create
 a new column for each different entry, filling it with a '1' in the respective places, '0' otherwise.
 
+Implemented in Safe-DS as [OneHotEncoder][safeds.data.tabular.transformation.OneHotEncoder].
+
 ## Overfitting
 Overfitting is a scenario in which a data model is unable to capture the relationship between the input and output variables accurately,
 due to not generalizing enough.
@@ -62,20 +67,22 @@ due to not generalizing enough.
 The "Positive Class" consists of all attributes to be considered positive. Consequently, every attribute to not be in this class is considered to be negative class.
 
 ## Precision
-The ability of a classification model to identify only the relevant data points. Formula:
+The ability of a [classification](#classification) model to identify only the relevant data points. Formula:
 
 $$
-\text{precision} = \frac{\text{True Positives}}{\text{True Positives + False Positives}}
+\text{precision} = \frac{\text{[True Positives](#true-positive-tp)}}{\text{[True Positives](#true-positive-tp) + [False Positives](#false-positive-fp)}}
 $$
 
 ## Random Forest
 Random Forest is an ML model that works by generating decision trees at random.
 
+Implemented in Safe-DS as [RandomForest][safeds.ml.classical.regression.RandomForest].
+
 ## Recall
-The ability of a classification model to identify all the relevant data points. Formula:
+The ability of a [classification](#classification) model to identify all the relevant data points. Formula:
 
 $$
-\text{recall} = \frac{\text{True Positives}}{\text{True Positives + False Negatives}}
+\text{recall} = \frac{\text{[True Positives](#true-positive-tp)}}{\text{[True Positives](#true-positive-tp) + [False Negatives](#false-negative-fn)}}
 $$
 
 ## Regression
@@ -83,7 +90,7 @@ Regression refers to the estimation of continuous dependent variables.
 
 ## Regularization
 Regularization refers to techniques that are used to calibrate machine learning models
-in order to minimize the adjusted loss function and prevent overfitting or underfitting.
+in order to minimize the adjusted loss function and prevent [overfitting](#overfitting) or [underfitting](#underfitting).
 
 ## Sample
 A sample is a subset of the whole data set.
@@ -95,16 +102,16 @@ Those Algorithms might be able to find hidden meaning in data - without being to
 
 ## Tagged Table
 In addition to a regular table, a Tagged Table will mark one column as tagged, meaning that
-an applied algorithm will train to predict its entries.
+an applied algorithm will train to predict its entries. The marked column is referred to as ["target"](#target).
 
 ## Target
 The target variable of a dataset is the feature of a dataset about which you want to gain a deeper understanding.
 
 ## Test Set
-A set of examples used only to assess the performance of a fully-specified classifier.
+A set of examples used only to assess the performance of a fully-specified [classifier](#classification).
 
 ## Training Set
-A set of examples used for learning, that is to fit the parameters of the classifier.
+A set of examples used for learning, that is to fit the parameters of the [classifier](#classification).
 
 ## True Negative (TN)
 An outcome is considered to be a true negative, if the data model has correctly predicted a value of negative class.
@@ -117,4 +124,4 @@ Underfitting is a scenario in which a data model is unable to capture the relati
 due to generalizing too much.
 
 ## Validation Set
-A set of examples used to the parameters of a classifier.
+A set of examples used to the parameters of a [classifier](#classification).
