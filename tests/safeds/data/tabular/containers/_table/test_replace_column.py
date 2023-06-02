@@ -50,6 +50,7 @@ from safeds.exceptions import (
 )
 def test_should_replace_column(table: Table, column_name: str, column: Column, expected: Table) -> None:
     result = table.replace_column(column_name, column)
+    assert result.schema == expected.schema
     assert result == expected
 
 

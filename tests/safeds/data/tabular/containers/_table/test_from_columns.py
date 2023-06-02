@@ -23,6 +23,7 @@ from safeds.exceptions import ColumnLengthMismatchError, DuplicateColumnNameErro
     ids=["2 Columns", "empty"],
 )
 def test_should_create_table_from_list_of_columns(columns: list[Column], expected: Table) -> None:
+    assert Table.from_columns(columns).schema == expected.schema
     assert Table.from_columns(columns) == expected
 
 

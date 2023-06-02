@@ -28,6 +28,7 @@ from safeds.exceptions import ColumnLengthMismatchError
     ids=["empty", "with values"],
 )
 def test_should_create_table_from_dict(data: dict[str, list[Any]], expected: Table) -> None:
+    assert Table.from_dict(data).schema == expected.schema
     assert Table.from_dict(data) == expected
 
 

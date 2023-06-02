@@ -37,6 +37,7 @@ from safeds.exceptions import UnknownColumnNameError
 )
 def test_should_keep_only_listed_columns(table: Table, column_names: list[str], expected: Table) -> None:
     transformed_table = table.keep_only_columns(column_names)
+    assert transformed_table.schema == expected.schema
     assert transformed_table == expected
 
 
