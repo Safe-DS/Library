@@ -223,7 +223,7 @@ class Schema:
         return dict(self._schema)  # defensive copy
 
     @staticmethod
-    def merge_multiple_schemas(schemas: list[Schema]):
+    def merge_multiple_schemas(schemas: list[Schema]) -> Schema:
         """
         Merge multiple schemas into one.
 
@@ -265,9 +265,7 @@ class Schema:
                         nullable = True
                     if isinstance(schema_dict[col_name], type(schema.get_column_type(col_name))):
                         if schema.get_column_type(col_name).is_nullable() and not schema_dict[col_name].is_nullable():
-                            new_type = deepcopy(schema.get_column_type(col_name))
-                            new_type._is_nullable = nullable
-                            schema_dict[col_name] = new_type
+                            schema_dict[col_name] = type(schema.get_column_type(col_name))(nullable)
                         continue
                     if (isinstance(schema_dict[col_name], RealNumber) and isinstance(schema.get_column_type(col_name), Integer)) or (isinstance(schema_dict[col_name], Integer) and isinstance(schema.get_column_type(col_name), RealNumber)):
                         schema_dict[col_name] = RealNumber(nullable)

@@ -696,11 +696,11 @@ class Table:
         UnknownColumnNameError
             If at least one of the rows have different column names than the table.
         """
-        if self.number_of_columns == 0:
-            return Table.from_rows(rows)
-
         if isinstance(rows, Table):
             rows = rows.to_rows()
+
+        if self.number_of_columns == 0:
+            return Table.from_rows(rows)
 
         missing_col_names = set()
         for row in rows:
