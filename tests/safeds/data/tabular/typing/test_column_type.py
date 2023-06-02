@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 import pytest
 
 from safeds.data.tabular.containers import Column
@@ -54,23 +55,23 @@ from safeds.data.tabular.typing import (
 
 class TestDataType:
     @pytest.mark.parametrize(
-        ("column", "expected"),
+        ("data", "expected"),
         [
-            (Column("a", [1, 2, 3]), Integer()),
-            (Column("a", [1.0, 2.0, 3.0]), RealNumber()),
-            (Column("a", [True, False, True]), Boolean()),
-            (Column("a", ["a", "b", "c"]), String()),
-            (Column("a", [None, None, None]), Anything(is_nullable=True)),
-            (Column("a", [1, 2, None]), Anything(is_nullable=True)),
-            (Column("a", [1.0, 2.0, None]), Anything(is_nullable=True)),
-            (Column("a", [True, False, None]), Anything(is_nullable=True)),
-            (Column("a", ["a", "b", None]), Anything(is_nullable=True)),
+            (pd.Series([1, 2, 3]), Integer()),
+            (pd.Series([1.0, 2.0, 3.0]), RealNumber()),
+            (pd.Series([True, False, True]), Boolean()),
+            (pd.Series(["a", "b", "c"]), String()),
+            (pd.Series([None, None, None]), Anything(is_nullable=True)),
+            (pd.Series([1, 2, None]), Anything(is_nullable=True)),
+            (pd.Series([1.0, 2.0, None]), Anything(is_nullable=True)),
+            (pd.Series([True, False, None]), Anything(is_nullable=True)),
+            (pd.Series(["a", "b", None]), Anything(is_nullable=True)),
 
         ],
         ids=repr,
     )
-    def test_should_return_the_data_type(self, column: Column, expected: ColumnType) -> None:
-        assert ColumnType._data_type(column) == expected
+    def test_should_return_the_data_type(self, data: pd.Series, expected: ColumnType) -> None:
+        assert ColumnType._data_type(data) == expected
 
 
 class TestRepr:

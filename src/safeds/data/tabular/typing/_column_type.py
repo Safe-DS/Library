@@ -4,6 +4,7 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
 
+import pandas as pd
 
 if TYPE_CHECKING:
     import numpy as np
@@ -14,14 +15,14 @@ class ColumnType(ABC):
     """Abstract base class for column types."""
 
     @staticmethod
-    def _data_type(column: Column) -> ColumnType:
+    def _data_type(data: pd.Series) -> ColumnType:
         """
         Return the column type for a given `numpy` data type.
 
         Parameters
         ----------
-        self : Column
-            The `numpy` data type.
+        data : pd.Series
+            The data to be checked.
 
         Returns
         -------
@@ -44,21 +45,23 @@ class ColumnType(ABC):
             if celltype == str:
                 return String()
             if celltype is None:
-                return Anything(is_nullable=True)
+                return Anything(is_nullable=True)  #when Nothing() exists Nothing()
             else:
                 message = f"Unsupported numpy data type '{celltype}'."
                 raise NotImplementedError(message)
 
-        for cell in column:
-            print("Hallo")
-            if column.type is None:
-                column.type = columntype_of_type(type(cell))
-            elif column.type != columntype_of_type(type(cell)):
-                if column.type == Integer and type(cell) == float:
-                    column.type = RealNumber()
+        for cell in data:
+            result = None      #set type to Nothing as a default
+            is_nullable = False
+            if result is None:
+                result = columntype_of_type(type(cell))
+            elif result != columntype_of_type(type(cell)):
+                is_nullable = True
+                if result == Integer and type(cell) == float:
+                    result = RealNumber()
                 else:
-                    column.type = Anything()
-        return column.type
+                    result = Anything()
+            return result
 
 
 
