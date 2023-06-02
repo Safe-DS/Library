@@ -1,12 +1,13 @@
 from __future__ import annotations
 
+from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
 from sklearn.svm import SVR as sk_SVR  # noqa: N811
 
 from safeds.ml.classical._util_sklearn import fit, predict
 
-from ._regressor import Regressor
+from safeds.ml.classical.regression._regressor import Regressor
 
 if TYPE_CHECKING:
     from sklearn.base import RegressorMixin
@@ -29,15 +30,24 @@ class SupportVectorMachine(Regressor):
         If `c` is less than or equal to 0.
     """
 
-    def __init__(self, *, c: float = 1.0) -> None:
+    def __init__(self, *, c: float = 1.0, kernel: SupportVectorMachineKernel = None) -> None:
         # Internal state
         self._wrapped_regressor: sk_SVR | None = None
         self._feature_names: list[str] | None = None
         self._target_name: str | None = None
 
         if c <= 0:
-            raise ValueError("The parameter 'c' has to be strictly positive.")
+            raise ValueError("The parameter 'c' has to be greater than 0.")
         self._c = c
+        self._kernel = kernel
+
+    @property
+    def c(self) -> float:
+        return self._c
+
+    @property
+    def kernel(self) -> SupportVectorMachineKernel:
+        return self._kernel
 
     def fit(self, training_set: TaggedTable) -> SupportVectorMachine:
         """
@@ -118,3 +128,43 @@ class SupportVectorMachine(Regressor):
             The sklearn Regressor.
         """
         return sk_SVR(C=self._c)
+
+
+class SupportVectorMachineKernel(ABC):
+    """The abstract base class of the different subclasses supported by the `Kernel`."""
+
+    @abstractmethod
+    def get_sklearn_kernel(self, kernel: SupportVectorMachineKernel):
+        """
+        Get the kernel of the given SupportVectorMachine.
+
+        Parameters
+        ----------
+        kernel: SupportVectorMachine
+        The kernel to get.
+        """
+
+
+class Linear(SupportVectorMachineKernel):
+    def get_sklearn_kernel(self):
+        return "linear"
+
+
+class Polynomial(SupportVectorMachineKernel):
+    def __init__(self, degree: int):
+        if degree < 1:
+            raise ValueError("The parameter 'degree' has to be greater than or equal to 1.")
+        self._degree = degree
+
+    def get_sklearn_kernel(self):
+        return f"poly_{self._degree}"
+
+
+class Sigmoid(SupportVectorMachineKernel):
+    def get_sklearn_kernel(self):
+        return "sigmoid"
+
+
+class RadialBasisFunction(SupportVectorMachineKernel):
+    def get_sklearn_kernel(self):
+        return "rbf"

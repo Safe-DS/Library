@@ -37,7 +37,7 @@ class SupportVectorMachine(Classifier):
         self._target_name: str | None = None
 
         if c <= 0:
-            raise ValueError("The parameter 'c' has to be strictly positive.")
+            raise ValueError("The parameter 'c' has to be greater than 0.")
         self._c = c
         self._kernel = kernel
 
