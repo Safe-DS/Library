@@ -710,7 +710,9 @@ class Table:
         sorted_rows = []
         for row in rows:
             sorted_rows.append(
-                row.sort_columns(lambda col1, col2: self.column_names.index(col2[0]) - self.column_names.index(col1[0])),
+                row.sort_columns(
+                    lambda col1, col2: self.column_names.index(col2[0]) - self.column_names.index(col1[0]),
+                ),
             )
         rows = sorted_rows
 
