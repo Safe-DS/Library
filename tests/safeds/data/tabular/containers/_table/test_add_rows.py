@@ -1,6 +1,6 @@
 import pytest
 from safeds.data.tabular.containers import Row, Table
-from safeds.exceptions import SchemaMismatchError
+from safeds.exceptions import UnknownColumnNameError
 
 
 @pytest.mark.parametrize(
@@ -35,8 +35,15 @@ def test_should_add_rows_from_table(table1: Table, table2: Table, expected: Tabl
     assert table1 == expected
 
 
-def test_should_raise_error_if_row_schema_invalid() -> None:
-    table1 = Table({"col1": [1, 2, 1], "col2": [1, 2, 4]})
-    row = [Row({"col1": 2, "col2": 4}), Row({"col1": 5, "col2": "Hallo"})]
-    with pytest.raises(SchemaMismatchError, match=r"Failed because at least two schemas didn't match."):
-        table1.add_rows(row)
+@pytest.mark.parametrize(
+    ("table", "rows", "expected_error_msg"),
+    [
+        (Table({"col1": [1, 2, 1], "col2": [1, 2, 4]}),
+         [Row({"col1": 2, "col3": 4}), Row({"col1": 5, "col2": "Hallo"})],
+         r"aa"
+         ),
+    ]
+)
+def test_should_raise_error_if_row_column_names_invalid(table: Table, rows: list[Row], expected_error_msg: str) -> None:
+    with pytest.raises(UnknownColumnNameError, match=expected_error_msg):
+        table.add_rows(rows)

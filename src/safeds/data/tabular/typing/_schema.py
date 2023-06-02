@@ -1,8 +1,10 @@
 from __future__ import annotations
 
+from copy import deepcopy
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
+from safeds.data.tabular.typing import Integer, RealNumber, Anything
 from safeds.data.tabular.typing._column_type import ColumnType
 from safeds.exceptions import UnknownColumnNameError
 
@@ -219,6 +221,59 @@ class Schema:
         {'A': Integer, 'B': String}
         """
         return dict(self._schema)  # defensive copy
+
+    @staticmethod
+    def merge_multiple_schemas(schemas: list[Schema]):
+        """
+        Merge multiple schemas into one.
+
+        For each type missmatch the new schema will have the least common supertype.
+
+        The type hierarchy is as follows:
+        * Anything
+            * RealNumber
+                * Integer
+            * Boolean
+            * String
+
+        Parameters
+        ----------
+        schemas : list[Schema]
+            the list of schemas you want to merge
+
+        Returns
+        -------
+        schema : Schema
+            the new merged schema
+
+        Raises
+        ------
+        UnknownColumnNameError
+            if not all schemas have the same column names
+        """
+        schema_dict = schemas[0]._schema
+        missing_col_names = set()
+        for schema in schemas:
+            missing_col_names.update(set(schema.column_names) - set(schema_dict.keys()))
+        if len(missing_col_names) > 0:
+            raise UnknownColumnNameError(list(missing_col_names))
+        for schema in schemas:
+            if schema_dict != schema._schema:
+                for col_name in schema_dict.keys():
+                    nullable = False
+                    if schema_dict[col_name].is_nullable() or schema.get_column_type(col_name).is_nullable():
+                        nullable = True
+                    if isinstance(schema_dict[col_name], type(schema.get_column_type(col_name))):
+                        if schema.get_column_type(col_name).is_nullable() and not schema_dict[col_name].is_nullable():
+                            new_type = deepcopy(schema.get_column_type(col_name))
+                            new_type._is_nullable = nullable
+                            schema_dict[col_name] = new_type
+                        continue
+                    if (isinstance(schema_dict[col_name], RealNumber) and isinstance(schema.get_column_type(col_name), Integer)) or (isinstance(schema_dict[col_name], Integer) and isinstance(schema.get_column_type(col_name), RealNumber)):
+                        schema_dict[col_name] = RealNumber(nullable)
+                        continue
+                    schema_dict[col_name] = Anything(nullable)
+        return Schema(schema_dict)
 
     # ------------------------------------------------------------------------------------------------------------------
     # IPython Integration

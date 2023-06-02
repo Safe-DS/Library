@@ -245,23 +245,28 @@ class Table:
 
         Raises
         ------
-        SchemaMismatchError
-            If any of the row schemas does not match with the others.
+        UnknownColumnNameError
+            If any of the row column names does not match with the first row.
         """
         if len(rows) == 0:
             return Table._from_pandas_dataframe(pd.DataFrame())
 
-        schema_compare: Schema = rows[0]._schema
+        column_names_compare: list = list(rows[0].column_names)
+        unknown_column_names = set()
         row_array: list[pd.DataFrame] = []
 
         for row in rows:
-            if schema_compare != row._schema:
-                raise SchemaMismatchError
+            unknown_column_names.update(set(column_names_compare) - set(row.column_names))
             row_array.append(row._data)
+        if len(unknown_column_names) > 0:
+            raise UnknownColumnNameError(list(unknown_column_names))
 
         dataframe: DataFrame = pd.concat(row_array, ignore_index=True)
-        dataframe.columns = schema_compare.column_names
-        return Table._from_pandas_dataframe(dataframe)
+        dataframe.columns = column_names_compare
+
+        schema = Schema.merge_multiple_schemas(list(row.schema for row in rows))
+
+        return Table._from_pandas_dataframe(dataframe, schema)
 
     @staticmethod
     def _from_pandas_dataframe(data: pd.DataFrame, schema: Schema | None = None) -> Table:
@@ -636,7 +641,8 @@ class Table:
         """
         Add a row to the table.
 
-        This table is not modified.
+        The order of columns of the new row will be adjusted to the order of columns in the table.
+        This table will contain the merged schema.
 
         Parameters
         ----------
@@ -650,21 +656,30 @@ class Table:
 
         Raises
         ------
-        SchemaMismatchError
-            If the schema of the row does not match the table schema.
+        UnknownColumnNameError
+            If the row has different column names than the table.
         """
-        if self._schema != row.schema:
-            raise SchemaMismatchError
+        if self.number_of_columns == 0:
+            return Table.from_rows([row])
+
+        if len(set(self.column_names) - set(row.column_names)) > 0:
+            raise UnknownColumnNameError(list(set(self.column_names) - set(row.column_names)))
+
+        row = row.sort_columns(lambda col1, col2: self.column_names.index(col2[0]) - self.column_names.index(col1[0]))
 
         new_df = pd.concat([self._data, row._data]).infer_objects()
         new_df.columns = self.column_names
-        return Table._from_pandas_dataframe(new_df)
+
+        schema = Schema.merge_multiple_schemas([self.schema, row.schema])
+
+        return Table._from_pandas_dataframe(new_df, schema)
 
     def add_rows(self, rows: list[Row] | Table) -> Table:
         """
         Add multiple rows to a table.
 
-        This table is not modified.
+        The order of columns of the new rows will be adjusted to the order of columns in the table.
+        This table will contain the merged schema.
 
         Parameters
         ----------
@@ -678,21 +693,35 @@ class Table:
 
         Raises
         ------
-        SchemaMismatchError
-            If the schema of on of the row does not match the table schema.
+        UnknownColumnNameError
+            If at least one of the rows have different column names than the table.
         """
+        if self.number_of_columns == 0:
+            return Table.from_rows(rows)
+
         if isinstance(rows, Table):
             rows = rows.to_rows()
-        result = self._data
-        for row in rows:
-            if self._schema != row.schema:
-                raise SchemaMismatchError
 
+        sorted_rows = list()
+        for row in rows:
+            sorted_rows.append(row.sort_columns(lambda col1, col2: self.column_names.index(col2[0]) - self.column_names.index(col1[0])))
+        rows = sorted_rows
+
+        missing_col_names = set()
+        for row in rows:
+            missing_col_names.update(set(self.column_names) - set(row.column_names))
+        if len(missing_col_names) > 0:
+            raise UnknownColumnNameError(list(missing_col_names))
+
+        result = self._data
         row_frames = (row._data for row in rows)
 
         result = pd.concat([result, *row_frames]).infer_objects()
         result.columns = self.column_names
-        return Table._from_pandas_dataframe(result)
+
+        schema = Schema.merge_multiple_schemas([self.schema] + list(row.schema for row in rows))
+
+        return Table._from_pandas_dataframe(result, schema)
 
     def filter_rows(self, query: Callable[[Row], bool]) -> Table:
         """
@@ -1024,8 +1053,6 @@ class Table:
         * If the original order of `col1` and `col2` should be kept, the function should return 0.
 
         If no comparator is given, the columns will be sorted alphabetically by their name.
-
-        This table is not modified.
 
         Parameters
         ----------
