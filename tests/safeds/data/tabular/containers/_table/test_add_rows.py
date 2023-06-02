@@ -11,11 +11,17 @@ from safeds.exceptions import UnknownColumnNameError
             [Row({"col1": "d", "col2": 6}), Row({"col1": "e", "col2": 8})],
             Table({"col1": ["a", "b", "c", "d", "e"], "col2": [1, 2, 4, 6, 8]}),
         ),
+        (
+            Table({"col1": ["a", "b", "c"], "col2": [1, 2, 4]}),
+            [Row({"col1": "d", "col2": 6}), Row({"col1": "e", "col2": "f"})],
+            Table({"col1": ["a", "b", "c", "d", "e"], "col2": [1, 2, 4, 6, "f"]}),
+        ),
     ],
-    ids=["Rows with string and integer values"],
+    ids=["Rows with string and integer values", "different schema"],
 )
 def test_should_add_rows(table1: Table, rows: list[Row], table2: Table) -> None:
     table1 = table1.add_rows(rows)
+    assert table1.schema == table2.schema
     assert table1 == table2
 
 
@@ -27,11 +33,17 @@ def test_should_add_rows(table1: Table, rows: list[Row], table2: Table) -> None:
             Table({"col1": [5, 7], "col2": [6, 8]}),
             Table({"col1": [1, 2, 1, 5, 7], "col2": [1, 2, 4, 6, 8]}),
         ),
+        (
+            Table({"col1": [1, 2, 1], "col2": [1, 2, 4]}),
+            Table({"col1": [5, "7"], "col2": [6, None]}),
+            Table({"col1": [1, 2, 1, 5, "7"], "col2": [1, 2, 4, 6, None]}),
+        ),
     ],
-    ids=["Rows from table"],
+    ids=["Rows from table", "different schema"],
 )
 def test_should_add_rows_from_table(table1: Table, table2: Table, expected: Table) -> None:
     table1 = table1.add_rows(table2)
+    assert table1.schema == expected.schema
     assert table1 == expected
 
 
@@ -40,9 +52,10 @@ def test_should_add_rows_from_table(table1: Table, table2: Table, expected: Tabl
     [
         (Table({"col1": [1, 2, 1], "col2": [1, 2, 4]}),
          [Row({"col1": 2, "col3": 4}), Row({"col1": 5, "col2": "Hallo"})],
-         r"aa"
+         r"Could not find column\(s\) 'col2'"
          ),
-    ]
+    ],
+    ids=["column names do not match"]
 )
 def test_should_raise_error_if_row_column_names_invalid(table: Table, rows: list[Row], expected_error_msg: str) -> None:
     with pytest.raises(UnknownColumnNameError, match=expected_error_msg):

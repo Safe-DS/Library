@@ -702,16 +702,16 @@ class Table:
         if isinstance(rows, Table):
             rows = rows.to_rows()
 
-        sorted_rows = list()
-        for row in rows:
-            sorted_rows.append(row.sort_columns(lambda col1, col2: self.column_names.index(col2[0]) - self.column_names.index(col1[0])))
-        rows = sorted_rows
-
         missing_col_names = set()
         for row in rows:
             missing_col_names.update(set(self.column_names) - set(row.column_names))
         if len(missing_col_names) > 0:
             raise UnknownColumnNameError(list(missing_col_names))
+
+        sorted_rows = list()
+        for row in rows:
+            sorted_rows.append(row.sort_columns(lambda col1, col2: self.column_names.index(col2[0]) - self.column_names.index(col1[0])))
+        rows = sorted_rows
 
         result = self._data
         row_frames = (row._data for row in rows)
