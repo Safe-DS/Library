@@ -1,8 +1,6 @@
-import numpy as np
 import pandas as pd
 import pytest
 
-from safeds.data.tabular.containers import Column
 from safeds.data.tabular.typing import (
     Anything,
     Boolean,
@@ -10,48 +8,9 @@ from safeds.data.tabular.typing import (
     Integer,
     RealNumber,
     String,
+    Nothing,
 )
 
-
-# class TestFromNumpyDataType:
-#     # Test cases taken from https://numpy.org/doc/stable/reference/arrays.scalars.html#scalars
-#     @pytest.mark.parametrize(
-#         ("data_type", "expected"),
-#         [
-#             # Boolean
-#             (np.dtype(np.bool_), Boolean()),
-#             # Number
-#             (np.dtype(np.half), RealNumber()),
-#             (np.dtype(np.single), RealNumber()),
-#             (np.dtype(np.float_), RealNumber()),
-#             (np.dtype(np.longfloat), RealNumber()),
-#             # Int
-#             (np.dtype(np.byte), Integer()),
-#             (np.dtype(np.short), Integer()),
-#             (np.dtype(np.intc), Integer()),
-#             (np.dtype(np.int_), Integer()),
-#             (np.dtype(np.longlong), Integer()),
-#             (np.dtype(np.ubyte), Integer()),
-#             (np.dtype(np.ushort), Integer()),
-#             (np.dtype(np.uintc), Integer()),
-#             (np.dtype(np.uint), Integer()),
-#             (np.dtype(np.ulonglong), Integer()),
-#             # String
-#             (np.dtype(np.str_), String()),
-#             (np.dtype(np.unicode_), String()),
-#             (np.dtype(np.object_), String()),
-#             (np.dtype(np.datetime64), String()),
-#             (np.dtype(np.timedelta64), String()),
-#         ],
-#         ids=repr,
-#     )
-#     def test_should_create_column_type_from_numpy_data_type(self, data_type: np.dtype, expected: ColumnType) -> None:
-#         assert ColumnType._from_numpy_data_type(data_type) == expected
-#
-#     def test_should_raise_if_data_type_is_not_supported(self) -> None:
-#         with pytest.raises(NotImplementedError):
-#             ColumnType._from_numpy_data_type(np.dtype(np.void))
-#
 
 class TestDataType:
     @pytest.mark.parametrize(

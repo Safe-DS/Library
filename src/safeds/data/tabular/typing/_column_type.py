@@ -56,9 +56,11 @@ class ColumnType(ABC):
         for cell in data:
             if result == Nothing():
                 result = columntype_of_type(type(cell))
-            elif result != columntype_of_type(type(cell)):
-                is_nullable = True
-                if result == Integer and type(cell) == float:
+            if result != columntype_of_type(type(cell)):
+                if type(cell) is NoneType:
+                    is_nullable = True
+                    result._is_nullable = is_nullable
+                elif result == Integer and type(cell) == float:
                     result = RealNumber(is_nullable)
                 else:
                     result = Anything(is_nullable)
@@ -300,6 +302,44 @@ class String(ColumnType):
             True if the column is nullable.
         """
         return self._is_nullable
+
+    def is_numeric(self) -> bool:
+        """
+        Return whether the given column type is numeric.
+
+        Returns
+        -------
+        is_numeric : bool
+            True if the column is numeric.
+        """
+        return False
+
+
+@dataclass
+class Nothing(ColumnType):
+    """Type for a column that contains None Values only."""
+
+    _is_nullable: bool
+
+    def __init__(self):
+        self._is_nullable = True
+
+    def __repr__(self) -> str:
+        result = "Nothing"
+        if self._is_nullable:
+            result += "?"
+        return result
+
+    def is_nullable(self) -> bool:
+        """
+        Return whether the given column type is nullable.
+
+        Returns
+        -------
+        is_nullable : bool
+            True if the column is nullable.
+        """
+        return True
 
     def is_numeric(self) -> bool:
         """

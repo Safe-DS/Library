@@ -21,11 +21,11 @@ class TestFromPandasDataFrame:
             ),
             (
                 pd.DataFrame({"A": [1, 2, 3]}),
-                Schema({"A": Integer()}),
+                Schema({"A": Integer(is_nullable=False)}),
             ),
             (
                 pd.DataFrame({"A": [1.0, 2.0, 3.0]}),
-                Schema({"A": RealNumber()}),
+                Schema({"A": RealNumber(is_nullable=False)}),
             ),
             (
                 pd.DataFrame({"A": ["a", "b", "c"]}),
@@ -39,14 +39,49 @@ class TestFromPandasDataFrame:
                 pd.DataFrame({"A": [1, 2, 3], "B": ["a", "b", "c"]}),
                 Schema({"A": Integer(is_nullable=False), "B": String(is_nullable=False)}),
             ),
+            (
+                pd.DataFrame({"A": [True, False, None]}),
+                Schema({"A": Boolean(is_nullable=True)}),
+            ),
+            (
+                pd.DataFrame({"A": [None, 2, 3]}),
+                Schema({"A": Integer(is_nullable=True)}),
+            ),
+            (
+                pd.DataFrame({"A": [None, 2.0, 3.0]}),
+                Schema({"A": RealNumber(is_nullable=True)}),
+            ),
+            (
+                pd.DataFrame({"A": ["a", None, "b"]}),
+                Schema({"A": String(is_nullable=True)}),
+            ),
+            (
+                pd.DataFrame({"A": [1, 2.0, "a", True, None]}),
+                Schema({"A": Anything(is_nullable=True)}),
+            ),
+            (
+                pd.DataFrame({"A": [1, 2, 3], "B": ["a", "b", None]}),
+                Schema({"A": Integer(is_nullable=False), "B": String(is_nullable=True)}),
+            ),
+            (
+                pd.DataFrame({"A": [1, 2, 3], "B": ["a", "b", "c"], "C": [True, True, False]}),
+                Schema({"A": Integer(is_nullable=False), "B": String(is_nullable=False), "C": Boolean(is_nullable=False)}),
+            ),
         ],
         ids=[
+            "boolean",
             "integer",
             "real number",
             "string",
-            "boolean",
             "mixed",
             "multiple columns",
+            "boolean?",
+            "integer?",
+            "real number?",
+            "string?",
+            "anything?",
+            "integer, string?",
+            "integer, string, boolean"
         ],
     )
     def test_should_create_schema_from_pandas_dataframe(self, dataframe: pd.DataFrame, expected: Schema) -> None:
