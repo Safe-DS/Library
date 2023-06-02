@@ -717,7 +717,7 @@ class Table:
             result_table = self.from_rows(rows)
         return result_table
 
-    _T = TypeVar('_T')
+    _T = TypeVar("_T")
 
     def group_by(self, key_selector: Callable[[Row], _T]) -> dict[_T, Table]:
         """
@@ -735,9 +735,9 @@ class Table:
         dictionary : dict
             A dictionary containing the new tables as values and the selected keys as keys.
         """
-        dictionary: dict[Table._T, Table] = dict()
+        dictionary: dict[Table._T, Table] = {}
         for row in self.to_rows():
-            if key_selector(row) in dictionary.keys():
+            if key_selector(row) in dictionary:
                 dictionary[key_selector(row)] = dictionary[key_selector(row)].add_row(row)
             else:
                 dictionary[key_selector(row)] = Table.from_rows([row])
