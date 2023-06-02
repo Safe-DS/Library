@@ -1,8 +1,8 @@
 from __future__ import annotations
 
 import functools
-from collections.abc import Mapping
-from typing import TYPE_CHECKING, Any, Callable, Tuple
+from collections.abc import Callable, Mapping
+from typing import TYPE_CHECKING, Any
 
 import pandas as pd
 
@@ -264,7 +264,7 @@ class Row(Mapping[str, Any]):
         >>> repr(row)
         "Row({'a': 1})"
         """
-        return f"Row({str(self)})"
+        return f"Row({self!s})"
 
     def __str__(self) -> str:
         """
@@ -445,8 +445,9 @@ class Row(Mapping[str, Any]):
     # Transformations
     # ------------------------------------------------------------------------------------------------------------------
 
-    def sort_columns(self, comparator: Callable[[Tuple, Tuple], int] = lambda col1, col2: (col1[0] > col2[0])
-        - (col1[0] < col2[0])) -> Row:
+    def sort_columns(
+        self, comparator: Callable[[tuple, tuple], int] = lambda col1, col2: (col1[0] > col2[0]) - (col1[0] < col2[0]),
+    ) -> Row:
         """
         Sort the columns of a `Row` with the given comparator and return a new `Row`.
 

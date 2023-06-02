@@ -49,11 +49,7 @@ def test_should_create_table_from_rows(rows: list[Row], expected: Table) -> None
 
 @pytest.mark.parametrize(
     ("rows", "expected_error_msg"),
-    [
-        (
-            [Row({"A": 1, "B": 2}), Row({"A": 2, "C": 4})], r"Could not find column\(s\) 'B'"
-        )
-    ]
+    [([Row({"A": 1, "B": 2}), Row({"A": 2, "C": 4})], r"Could not find column\(s\) 'B'")],
 )
 def test_should_raise_error_if_unknown_column_names(rows: list[Row], expected_error_msg: str) -> None:
     with pytest.raises(UnknownColumnNameError, match=expected_error_msg):

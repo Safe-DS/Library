@@ -1,10 +1,9 @@
 from __future__ import annotations
 
-from copy import deepcopy
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
-from safeds.data.tabular.typing import Integer, RealNumber, Anything
+from safeds.data.tabular.typing import Anything, Integer, RealNumber
 from safeds.data.tabular.typing._column_type import ColumnType
 from safeds.exceptions import UnknownColumnNameError
 
@@ -97,7 +96,7 @@ class Schema:
         >>> repr(schema)
         "Schema({'A': Integer})"
         """
-        return f"Schema({str(self)})"
+        return f"Schema({self!s})"
 
     def __str__(self) -> str:
         """
@@ -259,7 +258,7 @@ class Schema:
             raise UnknownColumnNameError(list(missing_col_names))
         for schema in schemas:
             if schema_dict != schema._schema:
-                for col_name in schema_dict.keys():
+                for col_name in schema_dict:
                     nullable = False
                     if schema_dict[col_name].is_nullable() or schema.get_column_type(col_name).is_nullable():
                         nullable = True
@@ -267,7 +266,13 @@ class Schema:
                         if schema.get_column_type(col_name).is_nullable() and not schema_dict[col_name].is_nullable():
                             schema_dict[col_name] = type(schema.get_column_type(col_name))(nullable)
                         continue
-                    if (isinstance(schema_dict[col_name], RealNumber) and isinstance(schema.get_column_type(col_name), Integer)) or (isinstance(schema_dict[col_name], Integer) and isinstance(schema.get_column_type(col_name), RealNumber)):
+                    if (
+                        isinstance(schema_dict[col_name], RealNumber)
+                        and isinstance(schema.get_column_type(col_name), Integer)
+                    ) or (
+                        isinstance(schema_dict[col_name], Integer)
+                        and isinstance(schema.get_column_type(col_name), RealNumber)
+                    ):
                         schema_dict[col_name] = RealNumber(nullable)
                         continue
                     schema_dict[col_name] = Anything(nullable)

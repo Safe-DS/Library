@@ -50,12 +50,13 @@ def test_should_add_rows_from_table(table1: Table, table2: Table, expected: Tabl
 @pytest.mark.parametrize(
     ("table", "rows", "expected_error_msg"),
     [
-        (Table({"col1": [1, 2, 1], "col2": [1, 2, 4]}),
-         [Row({"col1": 2, "col3": 4}), Row({"col1": 5, "col2": "Hallo"})],
-         r"Could not find column\(s\) 'col2'"
-         ),
+        (
+            Table({"col1": [1, 2, 1], "col2": [1, 2, 4]}),
+            [Row({"col1": 2, "col3": 4}), Row({"col1": 5, "col2": "Hallo"})],
+            r"Could not find column\(s\) 'col2'",
+        ),
     ],
-    ids=["column names do not match"]
+    ids=["column names do not match"],
 )
 def test_should_raise_error_if_row_column_names_invalid(table: Table, rows: list[Row], expected_error_msg: str) -> None:
     with pytest.raises(UnknownColumnNameError, match=expected_error_msg):

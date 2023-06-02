@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 
 import pandas as pd
 import pytest
-from safeds.data.tabular.typing import Boolean, ColumnType, Integer, RealNumber, Schema, String, Anything
+from safeds.data.tabular.typing import Anything, Boolean, ColumnType, Integer, RealNumber, Schema, String
 from safeds.exceptions import UnknownColumnNameError
 
 if TYPE_CHECKING:
@@ -238,10 +238,8 @@ class TestToDict:
 class TestMergeMultipleSchemas:
     @pytest.mark.parametrize(
         ("schemas", "error_msg_regex"),
-        [
-            ([Schema({"Column1": Anything()}), Schema({"Column2": Anything()})], r"Could not find column\(s\) 'Column2'")
-        ],
-        ids=["different_column_names"]
+        [([Schema({"Column1": Anything()}), Schema({"Column2": Anything()})], r"Could not find column\(s\) 'Column2'")],
+        ids=["different_column_names"],
     )
     def test_should_raise_if_column_names_are_different(self, schemas: list[Schema], error_msg_regex: str) -> None:
         with pytest.raises(UnknownColumnNameError, match=error_msg_regex):
@@ -265,38 +263,126 @@ class TestMergeMultipleSchemas:
             ([Schema({"Column1": Boolean()}), Schema({"Column1": String()})], Schema({"Column1": Anything()})),
             ([Schema({"Column1": Boolean()}), Schema({"Column1": Anything()})], Schema({"Column1": Anything()})),
             ([Schema({"Column1": String()}), Schema({"Column1": Anything()})], Schema({"Column1": Anything()})),
-
-            ([Schema({"Column1": Integer(is_nullable=True)}), Schema({"Column1": Integer()})], Schema({"Column1": Integer(is_nullable=True)})),
-            ([Schema({"Column1": RealNumber(is_nullable=True)}), Schema({"Column1": RealNumber()})], Schema({"Column1": RealNumber(is_nullable=True)})),
-            ([Schema({"Column1": Boolean(is_nullable=True)}), Schema({"Column1": Boolean()})], Schema({"Column1": Boolean(is_nullable=True)})),
-            ([Schema({"Column1": String(is_nullable=True)}), Schema({"Column1": String()})], Schema({"Column1": String(is_nullable=True)})),
-            ([Schema({"Column1": Anything(is_nullable=True)}), Schema({"Column1": Anything()})], Schema({"Column1": Anything(is_nullable=True)})),
-            ([Schema({"Column1": Integer(is_nullable=True)}), Schema({"Column1": RealNumber()})], Schema({"Column1": RealNumber(is_nullable=True)})),
-            ([Schema({"Column1": Integer(is_nullable=True)}), Schema({"Column1": Boolean()})], Schema({"Column1": Anything(is_nullable=True)})),
-            ([Schema({"Column1": Integer(is_nullable=True)}), Schema({"Column1": String()})], Schema({"Column1": Anything(is_nullable=True)})),
-            ([Schema({"Column1": Integer(is_nullable=True)}), Schema({"Column1": Anything()})], Schema({"Column1": Anything(is_nullable=True)})),
-            ([Schema({"Column1": RealNumber(is_nullable=True)}), Schema({"Column1": Boolean()})], Schema({"Column1": Anything(is_nullable=True)})),
-            ([Schema({"Column1": RealNumber(is_nullable=True)}), Schema({"Column1": String()})], Schema({"Column1": Anything(is_nullable=True)})),
-            ([Schema({"Column1": RealNumber(is_nullable=True)}), Schema({"Column1": Anything()})], Schema({"Column1": Anything(is_nullable=True)})),
-            ([Schema({"Column1": Boolean(is_nullable=True)}), Schema({"Column1": String()})], Schema({"Column1": Anything(is_nullable=True)})),
-            ([Schema({"Column1": Boolean(is_nullable=True)}), Schema({"Column1": Anything()})], Schema({"Column1": Anything(is_nullable=True)})),
-            ([Schema({"Column1": String(is_nullable=True)}), Schema({"Column1": Anything()})], Schema({"Column1": Anything(is_nullable=True)})),
-
-            ([Schema({"Column1": Integer()}), Schema({"Column1": Integer(is_nullable=True)})], Schema({"Column1": Integer(is_nullable=True)})),
-            ([Schema({"Column1": RealNumber()}), Schema({"Column1": RealNumber(is_nullable=True)})], Schema({"Column1": RealNumber(is_nullable=True)})),
-            ([Schema({"Column1": Boolean()}), Schema({"Column1": Boolean(is_nullable=True)})], Schema({"Column1": Boolean(is_nullable=True)})),
-            ([Schema({"Column1": String()}), Schema({"Column1": String(is_nullable=True)})], Schema({"Column1": String(is_nullable=True)})),
-            ([Schema({"Column1": Anything()}), Schema({"Column1": Anything(is_nullable=True)})], Schema({"Column1": Anything(is_nullable=True)})),
-            ([Schema({"Column1": Integer()}), Schema({"Column1": RealNumber(is_nullable=True)})], Schema({"Column1": RealNumber(is_nullable=True)})),
-            ([Schema({"Column1": Integer()}), Schema({"Column1": Boolean(is_nullable=True)})], Schema({"Column1": Anything(is_nullable=True)})),
-            ([Schema({"Column1": Integer()}), Schema({"Column1": String(is_nullable=True)})], Schema({"Column1": Anything(is_nullable=True)})),
-            ([Schema({"Column1": Integer()}), Schema({"Column1": Anything(is_nullable=True)})], Schema({"Column1": Anything(is_nullable=True)})),
-            ([Schema({"Column1": RealNumber()}), Schema({"Column1": Boolean(is_nullable=True)})], Schema({"Column1": Anything(is_nullable=True)})),
-            ([Schema({"Column1": RealNumber()}), Schema({"Column1": String(is_nullable=True)})], Schema({"Column1": Anything(is_nullable=True)})),
-            ([Schema({"Column1": RealNumber()}), Schema({"Column1": Anything(is_nullable=True)})], Schema({"Column1": Anything(is_nullable=True)})),
-            ([Schema({"Column1": Boolean()}), Schema({"Column1": String(is_nullable=True)})], Schema({"Column1": Anything(is_nullable=True)})),
-            ([Schema({"Column1": Boolean()}), Schema({"Column1": Anything(is_nullable=True)})], Schema({"Column1": Anything(is_nullable=True)})),
-            ([Schema({"Column1": String()}), Schema({"Column1": Anything(is_nullable=True)})], Schema({"Column1": Anything(is_nullable=True)})),
+            (
+                [Schema({"Column1": Integer(is_nullable=True)}), Schema({"Column1": Integer()})],
+                Schema({"Column1": Integer(is_nullable=True)}),
+            ),
+            (
+                [Schema({"Column1": RealNumber(is_nullable=True)}), Schema({"Column1": RealNumber()})],
+                Schema({"Column1": RealNumber(is_nullable=True)}),
+            ),
+            (
+                [Schema({"Column1": Boolean(is_nullable=True)}), Schema({"Column1": Boolean()})],
+                Schema({"Column1": Boolean(is_nullable=True)}),
+            ),
+            (
+                [Schema({"Column1": String(is_nullable=True)}), Schema({"Column1": String()})],
+                Schema({"Column1": String(is_nullable=True)}),
+            ),
+            (
+                [Schema({"Column1": Anything(is_nullable=True)}), Schema({"Column1": Anything()})],
+                Schema({"Column1": Anything(is_nullable=True)}),
+            ),
+            (
+                [Schema({"Column1": Integer(is_nullable=True)}), Schema({"Column1": RealNumber()})],
+                Schema({"Column1": RealNumber(is_nullable=True)}),
+            ),
+            (
+                [Schema({"Column1": Integer(is_nullable=True)}), Schema({"Column1": Boolean()})],
+                Schema({"Column1": Anything(is_nullable=True)}),
+            ),
+            (
+                [Schema({"Column1": Integer(is_nullable=True)}), Schema({"Column1": String()})],
+                Schema({"Column1": Anything(is_nullable=True)}),
+            ),
+            (
+                [Schema({"Column1": Integer(is_nullable=True)}), Schema({"Column1": Anything()})],
+                Schema({"Column1": Anything(is_nullable=True)}),
+            ),
+            (
+                [Schema({"Column1": RealNumber(is_nullable=True)}), Schema({"Column1": Boolean()})],
+                Schema({"Column1": Anything(is_nullable=True)}),
+            ),
+            (
+                [Schema({"Column1": RealNumber(is_nullable=True)}), Schema({"Column1": String()})],
+                Schema({"Column1": Anything(is_nullable=True)}),
+            ),
+            (
+                [Schema({"Column1": RealNumber(is_nullable=True)}), Schema({"Column1": Anything()})],
+                Schema({"Column1": Anything(is_nullable=True)}),
+            ),
+            (
+                [Schema({"Column1": Boolean(is_nullable=True)}), Schema({"Column1": String()})],
+                Schema({"Column1": Anything(is_nullable=True)}),
+            ),
+            (
+                [Schema({"Column1": Boolean(is_nullable=True)}), Schema({"Column1": Anything()})],
+                Schema({"Column1": Anything(is_nullable=True)}),
+            ),
+            (
+                [Schema({"Column1": String(is_nullable=True)}), Schema({"Column1": Anything()})],
+                Schema({"Column1": Anything(is_nullable=True)}),
+            ),
+            (
+                [Schema({"Column1": Integer()}), Schema({"Column1": Integer(is_nullable=True)})],
+                Schema({"Column1": Integer(is_nullable=True)}),
+            ),
+            (
+                [Schema({"Column1": RealNumber()}), Schema({"Column1": RealNumber(is_nullable=True)})],
+                Schema({"Column1": RealNumber(is_nullable=True)}),
+            ),
+            (
+                [Schema({"Column1": Boolean()}), Schema({"Column1": Boolean(is_nullable=True)})],
+                Schema({"Column1": Boolean(is_nullable=True)}),
+            ),
+            (
+                [Schema({"Column1": String()}), Schema({"Column1": String(is_nullable=True)})],
+                Schema({"Column1": String(is_nullable=True)}),
+            ),
+            (
+                [Schema({"Column1": Anything()}), Schema({"Column1": Anything(is_nullable=True)})],
+                Schema({"Column1": Anything(is_nullable=True)}),
+            ),
+            (
+                [Schema({"Column1": Integer()}), Schema({"Column1": RealNumber(is_nullable=True)})],
+                Schema({"Column1": RealNumber(is_nullable=True)}),
+            ),
+            (
+                [Schema({"Column1": Integer()}), Schema({"Column1": Boolean(is_nullable=True)})],
+                Schema({"Column1": Anything(is_nullable=True)}),
+            ),
+            (
+                [Schema({"Column1": Integer()}), Schema({"Column1": String(is_nullable=True)})],
+                Schema({"Column1": Anything(is_nullable=True)}),
+            ),
+            (
+                [Schema({"Column1": Integer()}), Schema({"Column1": Anything(is_nullable=True)})],
+                Schema({"Column1": Anything(is_nullable=True)}),
+            ),
+            (
+                [Schema({"Column1": RealNumber()}), Schema({"Column1": Boolean(is_nullable=True)})],
+                Schema({"Column1": Anything(is_nullable=True)}),
+            ),
+            (
+                [Schema({"Column1": RealNumber()}), Schema({"Column1": String(is_nullable=True)})],
+                Schema({"Column1": Anything(is_nullable=True)}),
+            ),
+            (
+                [Schema({"Column1": RealNumber()}), Schema({"Column1": Anything(is_nullable=True)})],
+                Schema({"Column1": Anything(is_nullable=True)}),
+            ),
+            (
+                [Schema({"Column1": Boolean()}), Schema({"Column1": String(is_nullable=True)})],
+                Schema({"Column1": Anything(is_nullable=True)}),
+            ),
+            (
+                [Schema({"Column1": Boolean()}), Schema({"Column1": Anything(is_nullable=True)})],
+                Schema({"Column1": Anything(is_nullable=True)}),
+            ),
+            (
+                [Schema({"Column1": String()}), Schema({"Column1": Anything(is_nullable=True)})],
+                Schema({"Column1": Anything(is_nullable=True)}),
+            ),
         ],
         ids=[
             "Integer Integer",
@@ -314,7 +400,6 @@ class TestMergeMultipleSchemas:
             "Boolean String",
             "Boolean Anything",
             "String Anything",
-
             "Integer(null) Integer",
             "RealNumber(null) RealNumber",
             "Boolean(null) Boolean",
@@ -330,7 +415,6 @@ class TestMergeMultipleSchemas:
             "Boolean(null) String",
             "Boolean(null) Anything",
             "String(null) Anything",
-
             "Integer Integer(null)",
             "RealNumber RealNumber(null)",
             "Boolean Boolean(null)",
@@ -346,12 +430,14 @@ class TestMergeMultipleSchemas:
             "Boolean String(null)",
             "Boolean Anything(null)",
             "String Anything(null)",
-        ]
+        ],
     )
     def test_should_return_merged_schema(self, schemas: list[Schema], expected: Schema) -> None:
         assert Schema.merge_multiple_schemas(schemas) == expected
         schemas.reverse()
-        assert Schema.merge_multiple_schemas(schemas) == expected  # test the reversed list because the first parameter is handled differently
+        assert (
+            Schema.merge_multiple_schemas(schemas) == expected
+        )  # test the reversed list because the first parameter is handled differently
 
 
 class TestReprMarkdown:

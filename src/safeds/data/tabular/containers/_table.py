@@ -23,7 +23,6 @@ from safeds.exceptions import (
     DuplicateColumnNameError,
     IndexOutOfBoundsError,
     NonNumericColumnError,
-    SchemaMismatchError,
     UnknownColumnNameError,
     WrongFileExtensionError,
 )
@@ -264,7 +263,7 @@ class Table:
         dataframe: DataFrame = pd.concat(row_array, ignore_index=True)
         dataframe.columns = column_names_compare
 
-        schema = Schema.merge_multiple_schemas(list(row.schema for row in rows))
+        schema = Schema.merge_multiple_schemas([row.schema for row in rows])
 
         return Table._from_pandas_dataframe(dataframe, schema)
 
@@ -708,9 +707,11 @@ class Table:
         if len(missing_col_names) > 0:
             raise UnknownColumnNameError(list(missing_col_names))
 
-        sorted_rows = list()
+        sorted_rows = []
         for row in rows:
-            sorted_rows.append(row.sort_columns(lambda col1, col2: self.column_names.index(col2[0]) - self.column_names.index(col1[0])))
+            sorted_rows.append(
+                row.sort_columns(lambda col1, col2: self.column_names.index(col2[0]) - self.column_names.index(col1[0])),
+            )
         rows = sorted_rows
 
         result = self._data
@@ -719,7 +720,7 @@ class Table:
         result = pd.concat([result, *row_frames]).infer_objects()
         result.columns = self.column_names
 
-        schema = Schema.merge_multiple_schemas([self.schema] + list(row.schema for row in rows))
+        schema = Schema.merge_multiple_schemas([self.schema, *[row.schema for row in rows]])
 
         return Table._from_pandas_dataframe(result, schema)
 
