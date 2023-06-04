@@ -315,37 +315,6 @@ class TaggedTable(Table):
         # raise IllegalSchemaModificationError(f'Must keep target column "{self.target.name}".')
         return super().keep_only_columns(column_names)
 
-    def remove_columns(self, column_names: list[str]) -> Table:
-        # TODO: Change return type to TaggedTable (in function definition and in docstring).
-        """
-        Return a table without the given column(s).
-
-        This table is not modified.
-
-        Parameters
-        ----------
-        column_names : list[str]
-            A list containing all columns to be dropped.
-
-        Returns
-        -------
-        table : Table
-            A table without the given columns.
-
-        Raises
-        ------
-        UnknownColumnNameError
-            If any of the given columns does not exist.
-        ColumnIsTaggedError
-            If any of the given columns is the target column.
-        """
-        try:
-            return TaggedTable._from_table(super().remove_columns(column_names), self.target.name)
-        except UnknownColumnNameError:
-            # TODO: Don't return; throw exception and handle it correctly in tests.
-            # raise ColumnIsTaggedError({self.target.name}) from None
-            return super().remove_columns(column_names)
-
     def remove_columns_with_missing_values(self) -> TaggedTable:
         """
         Return a table without the columns that contain missing values.
@@ -711,3 +680,37 @@ class TaggedTable(Table):
         2     a     d       3
         """
         return TaggedTable._from_table(transformer.inverse_transform(self), self.target.name)
+
+    # ------------------------------------------------------------------------------------------------------------------
+    # New methods specific for TaggedTable class:
+    # ------------------------------------------------------------------------------------------------------------------
+
+    def remove_feature_columns(self, column_names: list[str]) -> TaggedTable:
+        """
+        Return a new table without the given feature column(s).
+
+        The original table is not modified.
+
+        Parameters
+        ----------
+        column_names : list[str]
+            A list containing all feature columns to be dropped.
+
+        Returns
+        -------
+        table : TaggedTable
+            A table without the given feature columns.
+
+        Raises
+        ------
+        UnknownColumnNameError
+            If any of the given columns does not exist.
+        ColumnIsTaggedError
+            If any of the given columns is the target column.
+        """
+        new_table = super().remove_columns(column_names)  # if this fails, just pass on the UnknownColumnError
+        try:
+            return TaggedTable._from_table(new_table, self.target.name)
+        except UnknownColumnNameError:  # if this fails, we have deleted the target column
+            raise ColumnIsTaggedError(self.target.name) from None
+
