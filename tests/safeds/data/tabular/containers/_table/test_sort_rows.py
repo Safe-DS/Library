@@ -20,6 +20,7 @@ def test_should_return_sorted_table(
     comparator: Callable[[Row, Row], int],
     expected: Table,
 ) -> None:
+    assert table.sort_rows(comparator).schema == expected.schema
     assert table.sort_rows(comparator) == expected
 
 
@@ -40,4 +41,5 @@ def test_should_not_modify_original_table(
     expected: Table,
 ) -> None:
     table.sort_rows(comparator)
+    assert table.schema == expected.schema
     assert table == expected

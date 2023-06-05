@@ -81,6 +81,7 @@ def test_should_replace_column(
     expected: Table,
 ) -> None:
     result = table.replace_column(column_name, columns)
+    assert result.schema == expected.schema
     assert result == expected
 
 
