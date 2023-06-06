@@ -1,3 +1,15 @@
+## [0.13.0](https://github.com/Safe-DS/Stdlib/compare/v0.12.0...v0.13.0) (2023-06-01)
+
+
+### Features
+
+* add `Choice` class for possible values of hyperparameter ([#325](https://github.com/Safe-DS/Stdlib/issues/325)) ([d511c3e](https://github.com/Safe-DS/Stdlib/commit/d511c3eed779e64fc53499e7c2eb2e8292955645)), closes [#264](https://github.com/Safe-DS/Stdlib/issues/264)
+* Add `RangeScaler` transformer ([#310](https://github.com/Safe-DS/Stdlib/issues/310)) ([f687840](https://github.com/Safe-DS/Stdlib/commit/f68784057afe20d5450e9eb875fce1a07fb5fa77)), closes [#141](https://github.com/Safe-DS/Stdlib/issues/141)
+* Add methods that tell which columns would be affected by a transformer ([#304](https://github.com/Safe-DS/Stdlib/issues/304)) ([3933b45](https://github.com/Safe-DS/Stdlib/commit/3933b458042f524d337f41d0ffa3aa4da16f5a2e)), closes [#190](https://github.com/Safe-DS/Stdlib/issues/190)
+* Getters for hyperparameters of Regression and Classification models ([#306](https://github.com/Safe-DS/Stdlib/issues/306)) ([5c7a662](https://github.com/Safe-DS/Stdlib/commit/5c7a6623cd47f7c6cc25d2cd02179ff5b1a520d9)), closes [#260](https://github.com/Safe-DS/Stdlib/issues/260)
+* improve error handling of table ([#308](https://github.com/Safe-DS/Stdlib/issues/308)) ([ef87cc4](https://github.com/Safe-DS/Stdlib/commit/ef87cc4d7f62fd0830688f8535e53ad7e2329457)), closes [#147](https://github.com/Safe-DS/Stdlib/issues/147)
+* Remove warnings thrown in new `Transformer` methods ([#324](https://github.com/Safe-DS/Stdlib/issues/324)) ([ca046c4](https://github.com/Safe-DS/Stdlib/commit/ca046c40217bebcc05af98129d4e194c0509c9bb)), closes [#323](https://github.com/Safe-DS/Stdlib/issues/323)
+
 ## [0.12.0](https://github.com/Safe-DS/Stdlib/compare/v0.11.0...v0.12.0) (2023-05-11)
 
 
