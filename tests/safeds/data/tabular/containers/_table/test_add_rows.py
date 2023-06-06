@@ -48,7 +48,7 @@ def test_should_add_rows(table1: Table, rows: list[Row], table2: Table) -> None:
             Table({"col1": [], "yikes": []}),
             Table({"col1": [], "yikes": []}),
             Table({"col1": [], "yikes": []}),
-        )
+        ),
     ],
     ids=["Rows from table", "add empty to table", "add on empty table", "rowless"],
 )

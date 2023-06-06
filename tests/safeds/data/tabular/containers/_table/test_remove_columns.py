@@ -6,24 +6,10 @@ from safeds.exceptions import UnknownColumnNameError
 @pytest.mark.parametrize(
     ("table1", "expected", "columns"),
     [
-        (
-            Table({"col1": [1, 2, 1], "col2": ["a", "b", "c"]}),
-            Table({"col1": [1, 2, 1]}),
-            ["col2"]
-        ),
-        (
-            Table({"col1": [1, 2, 1], "col2": [1, 2, 4]}),
-            Table({}),
-            ["col1", "col2"]
-        ),
-        (
-            Table({"col1": [1, 2, 1], "col2": [1, 2, 4]}),
-            Table({"col1": [1, 2, 1],"col2": [1, 2, 4]}),
-            []
-        ),
-        (Table(),
-         Table(),
-         []),
+        (Table({"col1": [1, 2, 1], "col2": ["a", "b", "c"]}), Table({"col1": [1, 2, 1]}), ["col2"]),
+        (Table({"col1": [1, 2, 1], "col2": [1, 2, 4]}), Table({}), ["col1", "col2"]),
+        (Table({"col1": [1, 2, 1], "col2": [1, 2, 4]}), Table({"col1": [1, 2, 1], "col2": [1, 2, 4]}), []),
+        (Table(), Table(), []),
     ],
     ids=["one column", "multiple columns", "no columns", "empty"],
 )

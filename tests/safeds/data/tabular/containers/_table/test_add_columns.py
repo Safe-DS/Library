@@ -38,21 +38,13 @@ def test_should_add_columns(table1: Table, columns: list[Column], expected: Tabl
             Table({"col3": [0, -1, -2], "col4": ["a", "b", "c"]}),
             Table({"col1": [1, 2, 1], "col2": [1, 2, 4], "col3": [0, -1, -2], "col4": ["a", "b", "c"]}),
         ),
-        (
-            Table(),
-            Table({"col1": [1, 2], "col2": [60, 2]}),
-            Table({"col1": [1, 2], "col2": [60, 2]})
-        ),
+        (Table(), Table({"col1": [1, 2], "col2": [60, 2]}), Table({"col1": [1, 2], "col2": [60, 2]})),
         (
             Table({"col1": [1, 2], "col2": [60, 2]}),
             Table(),
             Table({"col1": [1, 2], "col2": [60, 2]}),
         ),
-        (
-            Table({"yeet": [], "col": []}),
-            Table({"gg": []}),
-            Table({"yeet": [], "col": [], "gg": []})
-        )
+        (Table({"yeet": [], "col": []}), Table({"gg": []}), Table({"yeet": [], "col": [], "gg": []})),
     ],
     ids=["add a table with 2 columns", "empty add filled", "filled add empty", "rowless"],
 )
