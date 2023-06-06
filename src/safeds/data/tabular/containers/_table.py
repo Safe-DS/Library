@@ -99,10 +99,14 @@ class Table:
         path = Path(path)
         if path.suffix != ".csv":
             raise WrongFileExtensionError(path, ".csv")
-        try:
+        if path.exists():
+            with path.open() as f:
+                if f.read().replace("\n", "") == "":
+                    return Table()
+
             return Table._from_pandas_dataframe(pd.read_csv(path))
-        except FileNotFoundError as exception:
-            raise FileNotFoundError(f'File "{path}" does not exist') from exception
+        else:
+            raise FileNotFoundError(f'File "{path}" does not exist')
 
     @staticmethod
     def from_excel_file(path: str | Path) -> Table:
@@ -164,10 +168,14 @@ class Table:
         path = Path(path)
         if path.suffix != ".json":
             raise WrongFileExtensionError(path, ".json")
-        try:
+        if path.exists():
+            with path.open() as f:
+                if f.read().replace("\n", "") in ("", "{}"):
+                    return Table()
+
             return Table._from_pandas_dataframe(pd.read_json(path))
-        except FileNotFoundError as exception:
-            raise FileNotFoundError(f'File "{path}" does not exist') from exception
+        else:
+            raise FileNotFoundError(f'File "{path}" does not exist')
 
     @staticmethod
     def from_dict(data: dict[str, list[Any]]) -> Table:
@@ -351,6 +359,8 @@ class Table:
             return self.column_names == other.column_names
         table1 = self.sort_columns()
         table2 = other.sort_columns()
+        if table1.number_of_rows == 0 and table2.number_of_rows == 0:
+            return table1.column_names == table2.column_names
         return table1._schema == table2._schema and table1._data.equals(table2._data)
 
     def __repr__(self) -> str:
@@ -528,6 +538,44 @@ class Table:
         result : Table
             The table with statistics.
         """
+        if self.number_of_columns == 0:
+            return Table(
+                {
+                    "metrics": [
+                        "maximum",
+                        "minimum",
+                        "mean",
+                        "mode",
+                        "median",
+                        "sum",
+                        "variance",
+                        "standard deviation",
+                        "idness",
+                        "stability",
+                    ],
+                },
+            )
+        elif self.number_of_rows == 0:
+            table = Table(
+                {
+                    "metrics": [
+                        "maximum",
+                        "minimum",
+                        "mean",
+                        "mode",
+                        "median",
+                        "sum",
+                        "variance",
+                        "standard deviation",
+                        "idness",
+                        "stability",
+                    ],
+                },
+            )
+            for name in self.column_names:
+                table = table.add_column(Column(name, ["-", "-", "-", "-", "-", "-", "-", "-", "-", "-"]))
+            return table
+
         columns = self.to_columns()
         result = pd.DataFrame()
         statistics = {}
@@ -587,7 +635,7 @@ class Table:
         if self.has_column(column.name):
             raise DuplicateColumnNameError(column.name)
 
-        if column._data.size != self.number_of_rows:
+        if column.number_of_rows != self.number_of_rows and self.number_of_columns != 0:
             raise ColumnSizeError(str(self.number_of_rows), str(column._data.size))
 
         result = self._data.copy()
@@ -626,7 +674,7 @@ class Table:
             if column.name in result.columns:
                 raise DuplicateColumnNameError(column.name)
 
-            if column._data.size != self.number_of_rows:
+            if column.number_of_rows != self.number_of_rows and self.number_of_columns != 0:
                 raise ColumnSizeError(str(self.number_of_rows), str(column._data.size))
 
             result[column.name] = column._data
@@ -637,6 +685,7 @@ class Table:
         Add a row to the table.
 
         This table is not modified.
+        If the table happens to be empty beforehand, respective features will be added automatically.
 
         Parameters
         ----------
@@ -653,12 +702,27 @@ class Table:
         SchemaMismatchError
             If the schema of the row does not match the table schema.
         """
-        if self._schema != row.schema:
+        int_columns = []
+        result = self.remove_columns([])  # clone
+        if result.number_of_rows == 0:
+            int_columns = list(filter(lambda name: isinstance(row[name], int | np.int64), row.column_names))
+            if result.number_of_columns == 0:
+                for column in row.column_names:
+                    result._data[column] = Column(column, [])
+                result._schema = Schema._from_pandas_dataframe(result._data)
+            elif result.column_names != row.column_names:
+                raise SchemaMismatchError
+        elif result._schema != row.schema:
             raise SchemaMismatchError
 
-        new_df = pd.concat([self._data, row._data]).infer_objects()
-        new_df.columns = self.column_names
-        return Table._from_pandas_dataframe(new_df)
+        new_df = pd.concat([result._data, row._data]).infer_objects()
+        new_df.columns = result.column_names
+        result = Table._from_pandas_dataframe(new_df)
+
+        for column in int_columns:
+            result = result.replace_column(column, result.get_column(column).transform(lambda it: int(it)))
+
+        return result
 
     def add_rows(self, rows: list[Row] | Table) -> Table:
         """
@@ -683,16 +747,30 @@ class Table:
         """
         if isinstance(rows, Table):
             rows = rows.to_rows()
-        result = self._data
+        int_columns = []
+        result = self.remove_columns([])  # clone
         for row in rows:
-            if self._schema != row.schema:
+            if result.number_of_rows == 0:
+                int_columns = list(filter(lambda name: isinstance(row[name], int | np.int64), row.column_names))
+                if result.number_of_columns == 0:
+                    for column in row.column_names:
+                        result._data[column] = Column(column, [])
+                    result._schema = Schema._from_pandas_dataframe(result._data)
+                elif result.column_names != row.column_names:
+                    raise SchemaMismatchError
+            elif result._schema != row.schema:
                 raise SchemaMismatchError
 
         row_frames = (row._data for row in rows)
 
-        result = pd.concat([result, *row_frames]).infer_objects()
-        result.columns = self.column_names
-        return Table._from_pandas_dataframe(result)
+        new_df = pd.concat([result._data, *row_frames]).infer_objects()
+        new_df.columns = result.column_names
+        result = Table._from_pandas_dataframe(new_df)
+
+        for column in int_columns:
+            result = result.replace_column(column, result.get_column(column).transform(lambda it: int(it)))
+
+        return result
 
     def filter_rows(self, query: Callable[[Row], bool]) -> Table:
         """
@@ -1118,6 +1196,8 @@ class Table:
         """
         if percentage_in_first < 0 or percentage_in_first > 1:
             raise ValueError("The given percentage is not between 0 and 1")
+        if self.number_of_rows == 0:
+            return Table(), Table()
         return (
             self.slice_rows(0, round(percentage_in_first * self.number_of_rows)),
             self.slice_rows(round(percentage_in_first * self.number_of_rows)),

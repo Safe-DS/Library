@@ -42,3 +42,10 @@ def test_should_raise_if_index_out_of_bounds(start: int, end: int, step: int, er
 
     with raises(IndexOutOfBoundsError, match=error_message):
         table.slice_rows(start, end, step)
+
+
+def test_should_raise_if_index_out_of_bounds_on_empty() -> None:
+    table = Table()
+
+    with pytest.raises(IndexOutOfBoundsError, match="There is no element at index '2'"):
+        table.slice_rows(2, 5, 1)
