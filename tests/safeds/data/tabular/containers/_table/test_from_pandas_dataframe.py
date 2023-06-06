@@ -31,7 +31,10 @@ from safeds.data.tabular.typing import Integer, RealNumber, Schema, String
     ids=["one row, one column", "one row, two columns", "two rows, one column", "two rows, two columns", "empty"],
 )
 def test_should_use_the_schema_if_passed(
-    dataframe: pd.DataFrame, schema: Schema, expected: Schema, expected_table: Table,
+    dataframe: pd.DataFrame,
+    schema: Schema,
+    expected: Schema,
+    expected_table: Table,
 ) -> None:
     table = Table._from_pandas_dataframe(dataframe, schema)
     assert table._schema == expected
