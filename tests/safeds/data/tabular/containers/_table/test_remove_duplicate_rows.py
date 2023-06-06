@@ -14,8 +14,9 @@ from safeds.data.tabular.containers import Table
             ),
             Table({"A": [1, 4], "B": [2, 5]}),
         ),
+        (Table(), Table()),
     ],
-    ids=["duplicate rows"],
+    ids=["duplicate rows", "empty"],
 )
 def test_should_remove_duplicate_rows(table: Table, expected: Table) -> None:
     result_table = table.remove_duplicate_rows()
