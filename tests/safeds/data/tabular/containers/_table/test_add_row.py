@@ -12,10 +12,18 @@ from safeds.exceptions import SchemaMismatchError
             Row({"col1": 5, "col2": 6}),
             Table({"col1": [1, 2, 1, 5], "col2": [1, 2, 4, 6]}),
         ),
-        (Table({"col2": [], "col4": []}), Row({"col2": 5, "col4": 6}), Table({"col2": [5], "col4": [6]})),
-        (Table(), Row({"col2": 5, "col4": 6}), Table({"col2": [5], "col4": [6]})),
+        (
+            Table({"col2": [], "col4": []}),
+            Row({"col2": 5, "col4": 6}),
+            Table({"col2": [5], "col4": [6]})
+        ),
+        (
+            Table(),
+            Row({"col2": 5, "col4": 6}),
+            Table({"col2": [5], "col4": [6]})
+        ),
     ],
-    ids=["added row", "added row to empty column", "empty row to empty table"],
+    ids=["add row", "add row to rowless table", "add row to empty table"],
 )
 def test_should_add_row(table: Table, row: Row, expected: Table) -> None:
     table = table.add_row(row)

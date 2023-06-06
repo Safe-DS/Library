@@ -34,8 +34,23 @@ def test_should_add_rows(table1: Table, rows: list[Row], table2: Table) -> None:
             Table({"col1": [5, 7], "col2": [6, 8]}),
             Table({"col1": [1, 2, 1, 5, 7], "col2": [1, 2, 4, 6, 8]}),
         ),
+        (
+            Table({"col1": [2], "yikes": [5]}),
+            Table(),
+            Table({"col1": [2], "yikes": [5]}),
+        ),
+        (
+            Table(),
+            Table({"col1": [2], "yikes": [5]}),
+            Table({"col1": [2], "yikes": [5]}),
+        ),
+        (
+            Table({"col1": [], "yikes": []}),
+            Table({"col1": [], "yikes": []}),
+            Table({"col1": [], "yikes": []}),
+        )
     ],
-    ids=["Rows from table"],
+    ids=["Rows from table", "add empty to table", "add on empty table", "rowless"],
 )
 def test_should_add_rows_from_table(table1: Table, table2: Table, expected: Table) -> None:
     table1 = table1.add_rows(table2)
