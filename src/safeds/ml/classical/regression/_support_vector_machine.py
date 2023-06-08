@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 
 from sklearn.svm import SVR as sk_SVR  # noqa: N811
 
@@ -49,7 +49,7 @@ class SupportVectorMachine(Regressor):
         If `c` is less than or equal to 0.
     """
 
-    def __init__(self, *, c: float = 1.0, kernel: SupportVectorMachineKernel = None) -> None:
+    def __init__(self, *, c: float = 1.0, kernel: SupportVectorMachineKernel | None = None) -> None:
         # Internal state
         self._wrapped_regressor: sk_SVR | None = None
         self._feature_names: list[str] | None = None

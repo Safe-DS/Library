@@ -49,7 +49,7 @@ class SupportVectorMachine(Classifier):
         If `c` is less than or equal to 0.
     """
 
-    def __init__(self, *, c: float = 1.0, kernel: SupportVectorMachineKernel = None) -> None:
+    def __init__(self, *, c: float = 1.0, kernel: SupportVectorMachineKernel | None = None) -> None:
         # Internal state
         self._wrapped_classifier: sk_SVC | None = None
         self._feature_names: list[str] | None = None
