@@ -1,23 +1,20 @@
 from __future__ import annotations
 
-from sklearn.preprocessing import OrdinalEncoder as sk_OrdinalEncoder
+from sklearn.preprocessing import StandardScaler as sk_StandardScaler
 
 from safeds.data.tabular.containers import Table
-from safeds.data.tabular.transformation._table_transformer import (
-    InvertibleTableTransformer,
-)
+from safeds.data.tabular.transformation._table_transformer import InvertibleTableTransformer
 from safeds.exceptions import TransformerNotFittedError, UnknownColumnNameError
 
 
-# noinspection PyProtectedMember
-class LabelEncoder(InvertibleTableTransformer):
-    """The LabelEncoder encodes one or more given columns into labels."""
+class StandardScaler(InvertibleTableTransformer):
+    """The StandardScaler transforms column values by scaling each value to a given range."""
 
     def __init__(self) -> None:
-        self._wrapped_transformer: sk_OrdinalEncoder | None = None
         self._column_names: list[str] | None = None
+        self._wrapped_transformer: sk_StandardScaler | None = None
 
-    def fit(self, table: Table, column_names: list[str] | None) -> LabelEncoder:
+    def fit(self, table: Table, column_names: list[str] | None) -> StandardScaler:
         """
         Learn a transformation for a set of columns in a table.
 
@@ -42,10 +39,10 @@ class LabelEncoder(InvertibleTableTransformer):
             if len(missing_columns) > 0:
                 raise UnknownColumnNameError(list(missing_columns))
 
-        wrapped_transformer = sk_OrdinalEncoder()
+        wrapped_transformer = sk_StandardScaler()
         wrapped_transformer.fit(table._data[column_names])
 
-        result = LabelEncoder()
+        result = StandardScaler()
         result._wrapped_transformer = wrapped_transformer
         result._column_names = column_names
 
@@ -129,7 +126,7 @@ class LabelEncoder(InvertibleTableTransformer):
 
     def get_names_of_added_columns(self) -> list[str]:
         """
-        Get the names of all new columns that have been added by the LabelEncoder.
+        Get the names of all new columns that have been added by the StandardScaler.
 
         Returns
         -------
@@ -148,7 +145,7 @@ class LabelEncoder(InvertibleTableTransformer):
     # (Must implement abstract method, cannot instantiate class otherwise.)
     def get_names_of_changed_columns(self) -> list[str]:
         """
-         Get the names of all columns that may have been changed by the LabelEncoder.
+         Get the names of all columns that may have been changed by the StandardScaler.
 
         Returns
         -------
@@ -166,12 +163,12 @@ class LabelEncoder(InvertibleTableTransformer):
 
     def get_names_of_removed_columns(self) -> list[str]:
         """
-        Get the names of all columns that have been removed by the LabelEncoder.
+        Get the names of all columns that have been removed by the StandardScaler.
 
         Returns
         -------
         removed_columns : list[str]
-            A list of names of the removed columns, ordered as they appear in the table the LabelEncoder was fitted on.
+            A list of names of the removed columns, ordered as they appear in the table the StandardScaler was fitted on.
 
         Raises
         ------

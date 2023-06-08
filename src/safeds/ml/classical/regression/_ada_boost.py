@@ -58,6 +58,18 @@ class AdaBoost(Regressor):
         self._feature_names: list[str] | None = None
         self._target_name: str | None = None
 
+    @property
+    def learner(self) -> Regressor | None:
+        return self._learner
+
+    @property
+    def maximum_number_of_learners(self) -> int:
+        return self._maximum_number_of_learners
+
+    @property
+    def learning_rate(self) -> float:
+        return self._learning_rate
+
     def fit(self, training_set: TaggedTable) -> AdaBoost:
         """
         Create a copy of this regressor and fit it with the given training data.

@@ -10,7 +10,7 @@ from safeds.exceptions import ColumnLengthMismatchError
     [
         (
             {},
-            Table.from_dict({}),
+            Table(),
         ),
         (
             {
@@ -28,9 +28,10 @@ from safeds.exceptions import ColumnLengthMismatchError
     ids=["empty", "with values"],
 )
 def test_should_create_table_from_dict(data: dict[str, list[Any]], expected: Table) -> None:
+    assert Table.from_dict(data).schema == expected.schema
     assert Table.from_dict(data) == expected
 
 
 def test_should_raise_error_if_columns_have_different_lengths() -> None:
-    with pytest.raises(ColumnLengthMismatchError):
+    with pytest.raises(ColumnLengthMismatchError, match=r"The length of at least one column differs: \na: 2\nb: 1"):
         Table.from_dict({"a": [1, 2], "b": [3]})

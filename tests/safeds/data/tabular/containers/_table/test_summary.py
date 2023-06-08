@@ -86,11 +86,29 @@ from safeds.data.tabular.containers import Table
                         "stability",
                     ],
                     "col": [
-                        "-", "-", "-", "-", "-", "-", "-", "-", "-", "-",
+                        "-",
+                        "-",
+                        "-",
+                        "-",
+                        "-",
+                        "-",
+                        "-",
+                        "-",
+                        "-",
+                        "-",
                     ],
                     "gg": [
-                        "-", "-", "-", "-", "-", "-", "-", "-", "-", "-",
-                    ]
+                        "-",
+                        "-",
+                        "-",
+                        "-",
+                        "-",
+                        "-",
+                        "-",
+                        "-",
+                        "-",
+                        "-",
+                    ],
                 },
             ),
         ),
@@ -98,4 +116,5 @@ from safeds.data.tabular.containers import Table
     ids=["Column of integers and Column of characters", "empty", "empty with columns"],
 )
 def test_should_make_summary(table: Table, expected: Table) -> None:
+    assert expected.schema == table.summary().schema
     assert expected == table.summary()

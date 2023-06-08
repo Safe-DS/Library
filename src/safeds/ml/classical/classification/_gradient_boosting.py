@@ -49,6 +49,14 @@ class GradientBoosting(Classifier):
         self._feature_names: list[str] | None = None
         self._target_name: str | None = None
 
+    @property
+    def number_of_trees(self) -> int:
+        return self._number_of_trees
+
+    @property
+    def learning_rate(self) -> float:
+        return self._learning_rate
+
     def fit(self, training_set: TaggedTable) -> GradientBoosting:
         """
         Create a copy of this classifier and fit it with the given training data.
