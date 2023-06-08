@@ -104,10 +104,6 @@ class SupportVectorMachine(Regressor):
         else:
             raise TypeError("Invalid kernel type.")
 
-    @property
-    def c(self) -> float:
-        return self._c
-
     def fit(self, training_set: TaggedTable) -> SupportVectorMachine:
         """
         Create a copy of this regressor and fit it with the given training data.
