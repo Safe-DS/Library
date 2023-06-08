@@ -1,6 +1,5 @@
 import pytest
-from safeds.data.tabular.containers import Table
-from safeds.data.tabular.containers import TaggedTable
+from safeds.data.tabular.containers import Table, TaggedTable
 
 
 def assert_that_tables_are_close(table1: Table, table2: Table) -> None:
