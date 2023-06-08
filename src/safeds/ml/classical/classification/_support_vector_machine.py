@@ -6,13 +6,31 @@ from typing import TYPE_CHECKING
 from sklearn.svm import SVC as sk_SVC  # noqa: N811
 
 from safeds.ml.classical._util_sklearn import fit, predict
-
 from safeds.ml.classical.classification._classifier import Classifier
 
 if TYPE_CHECKING:
     from sklearn.base import ClassifierMixin
 
     from safeds.data.tabular.containers import Table, TaggedTable
+
+
+class SupportVectorMachineKernel(ABC):
+    """The abstract base class of the different subclasses supported by the `Kernel`."""
+
+    @abstractmethod
+    def get_sklearn_kernel(self, svm: SupportVectorMachine) -> object:
+        """
+        Get the kernel of the given SupportVectorMachine.
+
+        Parameters
+        ----------
+        svm: SupportVectorMachine. The SupportVectorMachine instance.
+
+        Returns
+        -------
+        object
+              The kernel of the SupportVectorMachine.
+        """
 
 
 class SupportVectorMachine(Classifier):
@@ -23,6 +41,7 @@ class SupportVectorMachine(Classifier):
     ----------
     c: float
         The strength of regularization. Must be strictly positive.
+    kernel: The type of kernel to be used. Defaults to None.
 
     Raises
     ------
@@ -37,7 +56,7 @@ class SupportVectorMachine(Classifier):
         self._target_name: str | None = None
 
         if c <= 0:
-            raise ValueError("The parameter 'c' has to be greater than 0.")
+            raise ValueError("The parameter 'c' has to be strictly positive.")
         self._c = c
         self._kernel = kernel
 
@@ -48,6 +67,41 @@ class SupportVectorMachine(Classifier):
     @property
     def kernel(self) -> SupportVectorMachineKernel:
         return self._kernel
+
+    class Kernel:
+
+        class Linear(SupportVectorMachineKernel):
+            def get_sklearn_kernel(self, svm: SupportVectorMachine) -> object:
+                return svm.kernel
+
+        class Polynomial(SupportVectorMachineKernel):
+            def __init__(self, degree: int):
+                if degree < 1:
+                    raise ValueError("The parameter 'degree' has to be greater than or equal to 1.")
+                self._degree = degree
+
+            def get_sklearn_kernel(self, svm: SupportVectorMachine) -> object:
+                return svm.kernel
+
+        class Sigmoid(SupportVectorMachineKernel):
+            def get_sklearn_kernel(self, svm: SupportVectorMachine) -> object:
+                return svm.kernel
+
+        class RadialBasisFunction(SupportVectorMachineKernel):
+            def get_sklearn_kernel(self, svm: SupportVectorMachine) -> object:
+                return svm.kernel
+
+    def _get_kernel_name(self) -> str:
+        if isinstance(self.kernel, SupportVectorMachine.Kernel.Linear):
+            return "linear"
+        elif isinstance(self.kernel, SupportVectorMachine.Kernel.Polynomial):
+            return "poly"
+        elif isinstance(self.kernel, SupportVectorMachine.Kernel.Sigmoid):
+            return "sigmoid"
+        elif isinstance(self.kernel, SupportVectorMachine.Kernel.RadialBasisFunction):
+            return "rbf"
+        else:
+            raise TypeError("Invalid kernel type.")
 
     def fit(self, training_set: TaggedTable) -> SupportVectorMachine:
         """
@@ -73,7 +127,7 @@ class SupportVectorMachine(Classifier):
         wrapped_classifier = self._get_sklearn_classifier()
         fit(wrapped_classifier, training_set)
 
-        result = SupportVectorMachine(c=self._c)
+        result = SupportVectorMachine(c=self._c, kernel=self._kernel)
         result._wrapped_classifier = wrapped_classifier
         result._feature_names = training_set.features.column_names
         result._target_name = training_set.target.name
@@ -128,43 +182,3 @@ class SupportVectorMachine(Classifier):
             The sklearn Classifier.
         """
         return sk_SVC(C=self._c)
-
-
-class SupportVectorMachineKernel(ABC):
-    """The abstract base class of the different subclasses supported by the `Kernel`."""
-
-    @abstractmethod
-    def get_sklearn_kernel(self, kernel: SupportVectorMachineKernel):
-        """
-        Get the kernel of the given SupportVectorMachine.
-
-        Parameters
-        ----------
-        kernel: SupportVectorMachine
-        The kernel to get.
-        """
-
-
-class Linear(SupportVectorMachineKernel):
-    def get_sklearn_kernel(self):
-        return "linear"
-
-
-class Polynomial(SupportVectorMachineKernel):
-    def __init__(self, degree: int):
-        if degree < 1:
-            raise ValueError("The parameter 'degree' has to be greater than or equal to 1.")
-        self._degree = degree
-
-    def get_sklearn_kernel(self):
-        return f"poly_{self._degree}"
-
-
-class Sigmoid(SupportVectorMachineKernel):
-    def get_sklearn_kernel(self):
-        return "sigmoid"
-
-
-class RadialBasisFunction(SupportVectorMachineKernel):
-    def get_sklearn_kernel(self):
-        return "rbf"
