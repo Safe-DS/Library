@@ -20,7 +20,7 @@ class SupportVectorMachineKernel(ABC):
     @abstractmethod
     def get_sklearn_kernel(self, svm: SupportVectorMachine) -> object:
         """
-        Get the kernel of the given SupportVectorMachine.git.
+        Get the kernel of the given SupportVectorMachine.
 
         Parameters
         ----------
