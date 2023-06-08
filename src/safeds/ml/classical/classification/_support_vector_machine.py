@@ -70,7 +70,6 @@ class SupportVectorMachine(Classifier):
         return self._kernel
 
     class Kernel:
-
         class Linear(SupportVectorMachineKernel):
             def get_sklearn_kernel(self, svm: SupportVectorMachine) -> object:
                 return svm.kernel
