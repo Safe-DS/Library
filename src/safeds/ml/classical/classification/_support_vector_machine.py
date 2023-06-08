@@ -66,7 +66,7 @@ class SupportVectorMachine(Classifier):
         return self._c
 
     @property
-    def kernel(self) -> SupportVectorMachineKernel:
+    def kernel(self) -> SupportVectorMachineKernel | None:
         return self._kernel
 
     class Kernel:
