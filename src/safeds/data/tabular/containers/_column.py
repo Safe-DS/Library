@@ -969,29 +969,8 @@ class Column(Sequence[T]):
         --------
         >>> from safeds.data.tabular.containers import Column
         >>> column = Column("test", [1, 2, 3])
-        >>> html = column.to_html()
-        <table border="1" class="dataframe">
-          <thead>
-            <tr style="text-align: right;">
-              <th></th>
-              <th>test</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <th>0</th>
-              <td>1</td>
-            </tr>
-            <tr>
-              <th>1</th>
-              <td>2</td>
-            </tr>
-            <tr>
-              <th>2</th>
-              <td>3</td>
-            </tr>
-          </tbody>
-        </table>
+        >>> column.to_html()
+        '<table border="1" class="dataframe">\\n  <thead>\\n    <tr style="text-align: right;">\\n      <th></th>\\n      <th>test</th>\\n    </tr>\\n  </thead>\\n  <tbody>\\n    <tr>\\n      <th>0</th>\\n      <td>1</td>\\n    </tr>\\n    <tr>\\n      <th>1</th>\\n      <td>2</td>\\n    </tr>\\n    <tr>\\n      <th>2</th>\\n      <td>3</td>\\n    </tr>\\n  </tbody>\\n</table>'
         """
         frame = self._data.to_frame()
         frame.columns = [self.name]
@@ -1017,43 +996,7 @@ class Column(Sequence[T]):
         >>> from safeds.data.tabular.containers import Column
         >>> column = Column("col_1", ['a', 'b', 'c'])
         >>> column._repr_html_()
-        <div>
-        <style scoped>
-            .dataframe tbody tr th:only-of-type {
-                vertical-align: middle;
-            }
-
-            .dataframe tbody tr th {
-                vertical-align: top;
-            }
-
-            .dataframe thead th {
-                text-align: right;
-            }
-        </style>
-        <table border="1" class="dataframe">
-          <thead>
-            <tr style="text-align: right;">
-              <th></th>
-              <th>col_1</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <th>0</th>
-              <td>a</td>
-            </tr>
-            <tr>
-              <th>1</th>
-              <td>b</td>
-            </tr>
-            <tr>
-              <th>2</th>
-              <td>c</td>
-            </tr>
-          </tbody>
-        </table>
-        </div>
+        '<div>\\n<style scoped>\\n    .dataframe tbody tr th:only-of-type {\\n        vertical-align: middle;\\n    }\\n\\n    .dataframe tbody tr th {\\n        vertical-align: top;\\n    }\\n\\n    .dataframe thead th {\\n        text-align: right;\\n    }\\n</style>\\n<table border="1" class="dataframe">\\n  <thead>\\n    <tr style="text-align: right;">\\n      <th></th>\\n      <th>col_1</th>\\n    </tr>\\n  </thead>\\n  <tbody>\\n    <tr>\\n      <th>0</th>\\n      <td>a</td>\\n    </tr>\\n    <tr>\\n      <th>1</th>\\n      <td>b</td>\\n    </tr>\\n    <tr>\\n      <th>2</th>\\n      <td>c</td>\\n    </tr>\\n  </tbody>\\n</table>\\n</div>'
         """
         frame = self._data.to_frame()
         frame.columns = [self.name]

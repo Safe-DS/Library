@@ -863,8 +863,9 @@ class Table:
         >>> new_table = table.add_rows([row1, row2])
         >>> new_table
            a  b
-        0  1  21  3  4
-        1  5  6
+        0  1  2
+        1  3  4
+        2  5  6
         """
         if isinstance(rows, Table):
             rows = rows.to_rows()
@@ -1079,11 +1080,11 @@ class Table:
         Examples
         --------
         >>> from safeds.data.tabular.containers import Table
-        >>> table = Table.from_dict({"a": [1, None, 3], "b": [2, 4, None]})
+        >>> table = Table.from_dict({"a": [1.0, None, 3], "b": [2, 4.0, None]})
         >>> new_table = table.remove_rows_with_missing_values()
         >>> new_table
-           a  b
-        0  1  2
+             a    b
+        0  1.0  2.0
         """
         result = self._data.copy(deep=True)
         result = result.dropna(axis="index")
@@ -1107,12 +1108,13 @@ class Table:
         Examples
         -------
         >>> from safeds.data.tabular.containers._table import Table
-        >>> table = Table.from_dict({"a": [1, 2, 3], "b": [2.5, 80000, 8.5]})
+        >>> table = Table.from_dict({"a": [1, 20000, 1, 0.1], "b": [1.5, 800000, 0.5, 0.01], "c": [0.1, 42069, 0.4, 0.2], "d": [0.01, 1000000, 0.01, -0.01]})
         >>> new_table = table.remove_rows_with_outliers()
         >>> new_table
-           a  b
-        0  1  2.5
-        1  3  8.5
+             a    b     c      d
+        0  1    1.5   0.1   0.01
+        1  1    0.5   0.4   0.01
+        2  0.1  0.01  0.2  -0.01
         """
         copy = self._data.copy(deep=True)
 
@@ -1389,19 +1391,19 @@ class Table:
         >>> from safeds.data.tabular.containers import Table
         >>> table = Table.from_dict({"a": [1, 3, 5], "b": [2, 4, 6] })
         >>> new_table = table.sort_rows(lambda row1, row2: 1)
-        >>> repr(new_table)
+        >>> new_table
            a  b
         0  1  2
         1  3  4
         2  5  6
         >>> new_table = table.sort_rows(lambda row1, row2: -1)
-        >>> repr(new_table)
+        >>> new_table
            a  b
         0  5  6
         1  3  4
         2  1  2
         >>> new_table = table.sort_rows(lambda row1, row2: 0)
-        >>> repr(new_table)
+        >>> new_table
            a  b
         0  1  2
         1  3  4
@@ -1493,10 +1495,10 @@ class Table:
         Examples
         --------
         >>> from safeds.data.tabular.containers import Table
-        >>> table = Table.from_dict({"item": ["apple", "milk", "beer"], "price": [1.12, 1.19, 1.79]})
+        >>> table = Table.from_dict({"item": ["apple", "milk", "beer"], "price": [1.00, 1.19, 1.79]})
         >>> cents = table.transform_column("price", lambda row: row.get_value("price") * 100)
         >>> cents.to_dict()
-        {"item": ["apple", "milk", "beer"], "price": [112.0, 119.0, 179.0]}
+        {'item': ['apple', 'milk', 'beer'], 'price': [100.0, 119.0, 179.0]}
         """
         if self.has_column(name):
             items: list = [transformer(item) for item in self.to_rows()]
@@ -1902,8 +1904,10 @@ class Table:
         >>> from safeds.data.tabular.containers import Table
         >>> row1 = Row({"a": 1, "b": 5})
         >>> row2 = Row({"a": 2, "b": 6})
-        >>> table = Table.from_rows([row1, row2])
-        {"a": [1, 2], "b": [5, 6]}
+        >>> Table.from_rows([row1, row2])
+           a  b
+        0  1  5
+        1  2  6
         """
         return {column_name: list(self.get_column(column_name)) for column_name in self.column_names}
 
