@@ -80,3 +80,8 @@ def test_should_raise_error(
 
     with pytest.raises(error, match=error_message):
         input_table.replace_column(old_column_name, column)
+
+
+def test_should_fail_on_empty_table() -> None:
+    with pytest.raises(UnknownColumnNameError):
+        Table().replace_column("col", Column("a", [1, 2]))

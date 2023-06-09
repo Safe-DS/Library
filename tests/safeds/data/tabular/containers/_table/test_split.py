@@ -53,3 +53,9 @@ def test_should_raise_if_value_not_in_range(percentage_in_first: float) -> None:
 
     with pytest.raises(ValueError, match=r"The given percentage is not between 0 and 1"):
         table.split(percentage_in_first)
+
+
+def test_should_split_empty_table() -> None:
+    t1, t2 = Table().split(0.4)
+    assert t1.number_of_rows == 0
+    assert t2.number_of_rows == 0

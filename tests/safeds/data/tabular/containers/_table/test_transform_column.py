@@ -20,14 +20,20 @@ def test_should_transform_column(table: Table, table_transformed: Table) -> None
     assert result == table_transformed
 
 
-def test_should_raise_if_column_not_found() -> None:
-    input_table = Table(
-        {
-            "A": [1, 2, 3],
-            "B": [4, 5, 6],
-            "C": ["a", "b", "c"],
-        },
-    )
-
+@pytest.mark.parametrize(
+    "table",
+    [
+        Table(
+            {
+                "A": [1, 2, 3],
+                "B": [4, 5, 6],
+                "C": ["a", "b", "c"],
+            },
+        ),
+        Table(),
+    ],
+    ids=["column not found", "empty"],
+)
+def test_should_raise_if_column_not_found(table: Table) -> None:
     with pytest.raises(UnknownColumnNameError, match=r"Could not find column\(s\) 'D'"):
-        input_table.transform_column("D", lambda row: row.get_value("A") * 2)
+        table.transform_column("D", lambda row: row.get_value("A") * 2)
