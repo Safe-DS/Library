@@ -288,7 +288,6 @@ class TaggedTable(Table):
         return TaggedTable._from_table(super().filter_rows(query), target_name=self.target.name)
 
     def keep_only_columns(self, column_names: list[str]) -> TaggedTable:
-        # TODO: Change return type to TaggedTable (in function definition and in docstring).
         """
         Return a table with only the given column(s).
 
