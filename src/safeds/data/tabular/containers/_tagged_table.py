@@ -509,7 +509,7 @@ class TaggedTable(Table):
         if old_column_name == self.target.name:
             if len(new_columns) != 1:
                 raise IllegalSchemaModificationError(
-                    f"Column {self.target.name} can only be replaced by exactly one new column.",
+                    f'Target column "{self.target.name}" can only be replaced by exactly one new column.',
                 )
             else:
                 return TaggedTable._from_table(
