@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from safeds.data.tabular.containers import Column, Row, Table
-from safeds.exceptions import ColumnIsTargetError, UnknownColumnNameError
+from safeds.exceptions import ColumnIsTargetError, UnknownColumnNameError, IllegalSchemaModificationError
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Mapping, Sequence
@@ -346,7 +346,9 @@ class TaggedTable(Table):
         try:
             return TaggedTable._from_table(super().remove_columns(column_names), self.target.name)
         except UnknownColumnNameError:
-            raise ColumnIsTargetError(self.target.name) from None
+            # raise ColumnIsTargetError(self.target.name) from None
+            # TODO: Revert this again
+            return super().remove_columns(column_names)
 
     def remove_columns_with_missing_values(self) -> TaggedTable:
         """
@@ -467,23 +469,23 @@ class TaggedTable(Table):
             new_name if self.target.name == old_name else self.target.name,
         )
 
-    def replace_column(self, old_column_name: str, new_column: Column) -> TaggedTable:
+    def replace_column(self, old_column_name: str, new_columns: list[Column]) -> TaggedTable:
         """
-        Return a copy of the table with the specified old column replaced by a new column.
+        Return a copy of the table with the specified column replaced by new columns.
 
         The order of columns is kept.
 
-        The column to be replaced may be the target column.
+        If the column to be replaced is the target column, it must be replaced by exactly one column.
 
-        This table is not modified.
+        The original is not modified.
 
         Parameters
         ----------
         old_column_name : str
             The name of the column to be replaced.
 
-        new_column : Column
-            The new column replacing the old column.
+        new_columns : list[Column]
+            The new columns replacing the old column.
 
         Returns
         -------
@@ -500,11 +502,18 @@ class TaggedTable(Table):
 
         ColumnSizeError
             If the size of the column does not match the amount of rows.
+
+        IllegalSchemaModificationError
+            If the target column would be removed or replaced by more than one column.
         """
-        return TaggedTable._from_table(
-            super().replace_column(old_column_name, new_column),
-            new_column.name if self.target.name == old_column_name else self.target.name,
-        )
+        if old_column_name == self.target.name:
+            if len(new_columns) != 1:
+                raise IllegalSchemaModificationError(f"Column {self.target.name} can only be replaced by exactly one "
+                                                     f"new column.")
+            else:
+                return TaggedTable._from_table(super().replace_column(old_column_name, new_columns), new_columns[0].name)
+        else:
+            return TaggedTable._from_table(super().replace_column(old_column_name, new_columns), self.target.name)
 
     def shuffle_rows(self) -> TaggedTable:
         """

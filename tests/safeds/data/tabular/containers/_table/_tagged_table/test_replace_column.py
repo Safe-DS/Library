@@ -5,7 +5,8 @@ from tests.helpers import assert_that_tagged_tables_are_equal
 
 
 @pytest.mark.parametrize(
-    ("original_table", "new_column", "column_name_to_be_replaced", "result_table"),
+    ("original_table", "new_columns", "column_name_to_be_replaced", "result_table"),
+    # TODO: Add multicolumn cases, add illegal cases
     [
         (
             TaggedTable(
@@ -15,7 +16,7 @@ from tests.helpers import assert_that_tagged_tables_are_equal
                 },
                 "target_old",
             ),
-            Column("feature_new", [2, 1, 0]),
+            [Column("feature_new", [2, 1, 0])],
             "feature_old",
             TaggedTable(
                 {
@@ -33,7 +34,7 @@ from tests.helpers import assert_that_tagged_tables_are_equal
                 },
                 "target_old",
             ),
-            Column("target_new", [2, 1, 0]),
+            [Column("target_new", [2, 1, 0])],
             "target_old",
             TaggedTable(
                 {
@@ -48,9 +49,9 @@ from tests.helpers import assert_that_tagged_tables_are_equal
 )
 def test_should_replace_column(
     original_table: TaggedTable,
-    new_column: Column,
+    new_columns: list[Column],
     column_name_to_be_replaced: str,
     result_table: TaggedTable,
 ) -> None:
-    new_table = original_table.replace_column(column_name_to_be_replaced, new_column)
+    new_table = original_table.replace_column(column_name_to_be_replaced, new_columns)
     assert_that_tagged_tables_are_equal(new_table, result_table)
