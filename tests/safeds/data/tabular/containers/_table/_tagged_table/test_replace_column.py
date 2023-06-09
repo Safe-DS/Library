@@ -105,7 +105,9 @@ def test_should_replace_column(
     ids=["zero_columns", "multiple_columns"],
 )
 def test_should_throw_illegal_schema_modification(
-    original_table: TaggedTable, new_columns: list[Column], column_name_to_be_replaced: str,
+    original_table: TaggedTable,
+    new_columns: list[Column],
+    column_name_to_be_replaced: str,
 ) -> None:
     with pytest.raises(
         IllegalSchemaModificationError,
