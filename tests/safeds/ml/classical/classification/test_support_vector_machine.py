@@ -29,6 +29,16 @@ class TestC:
         linear_kernel = svm.kernel.get_sklearn_kernel()
         assert linear_kernel == "linear"
 
+    def test_should_raise_if_degree_less_than_1(self) -> None:
+        with pytest.raises(ValueError, match="The parameter 'degree' has to be greater than or equal to 1."):
+            SupportVectorMachine.Kernel.Polynomial(degree=0)
+
+    def test_should_get_sklearn_kernel_polynomial(self) -> None:
+        svm = SupportVectorMachine(c=2, kernel=SupportVectorMachine.Kernel.Polynomial(degree=2))
+        assert isinstance(svm.kernel, SupportVectorMachine.Kernel.Polynomial)
+        poly_kernel = svm.kernel.get_sklearn_kernel()
+        assert poly_kernel == "poly"
+
     def test_should_raise_if_less_than_or_equal_to_0(self) -> None:
         with pytest.raises(
             ValueError,
