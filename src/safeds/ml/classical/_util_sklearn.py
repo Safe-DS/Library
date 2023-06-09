@@ -82,9 +82,9 @@ def predict(model: Any, dataset: Table, feature_names: list[str] | None, target_
     missing_feature_names = [feature_name for feature_name in feature_names if not dataset.has_column(feature_name)]
     if missing_feature_names:
         raise DatasetMissesFeaturesError(missing_feature_names)
-
     if isinstance(dataset, TaggedTable):
-        dataset = dataset.remove_target_column()
+        dataset = dataset.remove_target_column()  # Cast to Table type, so Python will call the right methods...
+
     dataset_df = dataset.keep_only_columns(feature_names)._data
     dataset_df.columns = feature_names
 
