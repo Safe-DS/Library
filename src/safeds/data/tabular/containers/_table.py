@@ -720,7 +720,7 @@ class Table:
         result = Table._from_pandas_dataframe(new_df)
 
         for column in int_columns:
-            result = result.replace_column(column, result.get_column(column).transform(lambda it: int(it)))
+            result = result.replace_column(column, [result.get_column(column).transform(lambda it: int(it))])
 
         return result
 
@@ -768,7 +768,7 @@ class Table:
         result = Table._from_pandas_dataframe(new_df)
 
         for column in int_columns:
-            result = result.replace_column(column, result.get_column(column).transform(lambda it: int(it)))
+            result = result.replace_column(column, [result.get_column(column).transform(lambda it: int(it))])
 
         return result
 

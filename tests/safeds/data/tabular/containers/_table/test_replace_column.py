@@ -84,4 +84,4 @@ def test_should_raise_error(
 
 def test_should_fail_on_empty_table() -> None:
     with pytest.raises(UnknownColumnNameError):
-        Table().replace_column("col", Column("a", [1, 2]))
+        Table().replace_column("col", [Column("a", [1, 2])])
