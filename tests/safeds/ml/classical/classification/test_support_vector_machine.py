@@ -25,6 +25,7 @@ class TestC:
 
     def test_should_get_sklearn_kernel_linear(self) -> None:
         svm = SupportVectorMachine(c=2, kernel=SupportVectorMachine.Kernel.Linear())
+        assert isinstance(svm.kernel, SupportVectorMachine.Kernel.Linear)
         linear_kernel = svm.kernel.get_sklearn_kernel()
         assert linear_kernel == "linear"
 
