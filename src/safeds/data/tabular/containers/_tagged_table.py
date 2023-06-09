@@ -316,7 +316,7 @@ class TaggedTable(Table):
         #  throw exception if appropriate,
         #  investigate and fix pytest errors.
         # if self.target.name not in column_names:
-        # raise IllegalSchemaModificationError(f'Must keep target column "{self.target.name}".')
+        # raise IllegalSchemaModificationError(f'Must keep target column "self.target.name".')
         return super().keep_only_columns(column_names)
 
     def remove_columns(self, column_names: list[str]) -> Table:
@@ -726,3 +726,21 @@ class TaggedTable(Table):
         2     a     d       3
         """
         return TaggedTable._from_table(transformer.inverse_transform(self), self.target.name)
+
+    # ------------------------------------------------------------------------------------------------------------------
+    # New methods specific to `TaggedTable`s:
+    # ------------------------------------------------------------------------------------------------------------------
+    def remove_target_column(self) -> Table:
+        """
+        Return a new table consisting of only the feature columns.
+
+        The original TaggedTable is not modified.
+
+        Returns
+        -------
+        table : Table
+            The table, without the target column.
+
+        """
+        return super().remove_columns([self.target.name])
+
