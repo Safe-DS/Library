@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from safeds.data.tabular.containers import Column, Row, Table
-from safeds.exceptions import ColumnIsTargetError, UnknownColumnNameError, IllegalSchemaModificationError
+from safeds.exceptions import ColumnIsTargetError, IllegalSchemaModificationError, UnknownColumnNameError
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Mapping, Sequence
@@ -508,10 +508,13 @@ class TaggedTable(Table):
         """
         if old_column_name == self.target.name:
             if len(new_columns) != 1:
-                raise IllegalSchemaModificationError(f"Column {self.target.name} can only be replaced by exactly one "
-                                                     f"new column.")
+                raise IllegalSchemaModificationError(
+                    f"Column {self.target.name} can only be replaced by exactly one new column.",
+                )
             else:
-                return TaggedTable._from_table(super().replace_column(old_column_name, new_columns), new_columns[0].name)
+                return TaggedTable._from_table(
+                    super().replace_column(old_column_name, new_columns), new_columns[0].name,
+                )
         else:
             return TaggedTable._from_table(super().replace_column(old_column_name, new_columns), self.target.name)
 
