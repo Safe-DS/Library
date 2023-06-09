@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 from sklearn.svm import SVR as sk_SVR  # noqa: N811
 
 from safeds.ml.classical._util_sklearn import fit, predict
-from safeds.ml.classical.regression._regressor import Regressor
+from safeds.ml.classical.regression import Regressor
 
 if TYPE_CHECKING:
     from sklearn.base import RegressorMixin
