@@ -29,7 +29,7 @@ class DatasetMissesFeaturesError(ValueError):
 class DatasetMissesDataError(ValueError):
     """Raised when a dataset contains no rows."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__("Dataset contains no rows")
 
 
