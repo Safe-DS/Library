@@ -673,9 +673,14 @@ class TaggedTable(Table):
         1       0.0       1.0       0.0       1.0       0.0       2
         2       1.0       0.0       0.0       0.0       1.0       3
         """
-        transformed_table = transformer.transform(self)
-        if self.target.name in transformer.get_names_of_removed_columns():
-            raise ColumnIsTargetError(self.target.name)
+        try:
+            transformed_table = transformer.transform(self)
+        except ColumnIsTargetError as e:  # can happen for example with OneHotEncoder
+            raise ColumnIsTargetError(self.target.name) from e  # Re-throw for shorter stacktrace
+        # For future transformers, it may also happen that they remove the target column without throwing.
+        # If this ever happens, comment-in these lines (currently out-commented b/c of code coverage):
+        # if self.target.name in transformer.get_names_of_removed_columns():
+        #     raise ColumnIsTargetError(self.target.name)
         return TaggedTable._from_table(transformed_table, self.target.name)
 
     def inverse_transform_table(self, transformer: InvertibleTableTransformer) -> TaggedTable:
