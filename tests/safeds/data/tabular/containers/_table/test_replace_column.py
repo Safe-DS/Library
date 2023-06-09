@@ -47,32 +47,8 @@ from safeds.exceptions import (
                 },
             ),
         ),
-        (
-            Table(
-                {
-                    "A": [1, 2, 3],
-                    "B": [4, 5, 6],
-                    "C": ["a", "b", "c"],
-                },
-            ),
-            "B",
-            Table(
-                {
-                    "D": [7, 8, 9],
-                    "E": ["c", "b", "a"],
-                },
-            ),
-            Table(
-                {
-                    "A": [1, 2, 3],
-                    "D": [7, 8, 9],
-                    "E": ["c", "b", "a"],
-                    "C": ["a", "b", "c"],
-                },
-            ),
-        ),
     ],
-    ids=["list[Column]", "Column", "Table"],
+    ids=["multiple Columns", "one Column"],
 )
 def test_should_replace_column(table: Table, column_name: str, columns: list[Column], expected: Table) -> None:
     result = table.replace_column(column_name, columns)
