@@ -38,7 +38,7 @@ from safeds.exceptions import (
                 },
             ),
             "C",
-            Column("D", ["d", "e", "f"]),
+            [Column("D", ["d", "e", "f"])],
             Table(
                 {
                     "A": [1, 2, 3],
@@ -74,39 +74,23 @@ from safeds.exceptions import (
     ],
     ids=["list[Column]", "Column", "Table"],
 )
-def test_should_replace_column(
-    table: Table,
-    column_name: str,
-    columns: Column | list[Column] | Table,
-    expected: Table,
-) -> None:
+def test_should_replace_column(table: Table, column_name: str, columns: list[Column], expected: Table) -> None:
     result = table.replace_column(column_name, columns)
-    assert result.schema == expected.schema
     assert result == expected
 
 
 @pytest.mark.parametrize(
     ("old_column_name", "column", "error", "error_message"),
     [
-        ("D", Column("C", ["d", "e", "f"]), UnknownColumnNameError, r"Could not find column\(s\) 'D'"),
-        (
-            "C",
-            [Column("B", ["d", "e", "f"]), Column("D", [3, 2, 1])],
-            DuplicateColumnNameError,
-            r"Column 'B' already exists.",
-        ),
-        (
-            "C",
-            Table({"D": [7, 8], "E": ["c", "b"]}),
-            ColumnSizeError,
-            r"Expected a column of size 3 but got column of size 2.",
-        ),
+        ("D", [Column("C", ["d", "e", "f"])], UnknownColumnNameError, r"Could not find column\(s\) 'D'"),
+        ("C", [Column("B", ["d", "e", "f"]), Column("D", [3, 2, 1])], DuplicateColumnNameError, r"Column 'B' already exists."),
+        ("C", [Column("D", [7, 8]), Column("E", ["c", "b"])], ColumnSizeError, r"Expected a column of size 3 but got column of size 2."),
     ],
     ids=["UnknownColumnNameError", "DuplicateColumnNameError", "ColumnSizeError"],
 )
 def test_should_raise_error(
     old_column_name: str,
-    column: Column | list[Column] | Table,
+    column: list[Column],
     error: type[Exception],
     error_message: str,
 ) -> None:

@@ -923,7 +923,7 @@ class Table:
         new_df.columns = self._schema.column_names
         return Table._from_pandas_dataframe(new_df.rename(columns={old_name: new_name}))
 
-    def replace_column(self, old_column_name: str, new_columns: Column | list[Column] | Table) -> Table:
+    def replace_column(self, old_column_name: str, new_columns: list[Column]) -> Table:
         """
         Return a copy of the table with the specified old column replaced by a list of new columns. Keeps the order of columns.
 
@@ -955,11 +955,6 @@ class Table:
         """
         if old_column_name not in self._schema.column_names:
             raise UnknownColumnNameError([old_column_name])
-
-        if isinstance(new_columns, Column):
-            new_columns = [new_columns]
-        elif isinstance(new_columns, Table):
-            new_columns = new_columns.to_columns()
 
         columns = list[Column]()
         for old_column in self.schema.column_names:
