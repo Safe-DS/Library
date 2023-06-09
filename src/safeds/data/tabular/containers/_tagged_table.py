@@ -319,8 +319,7 @@ class TaggedTable(Table):
         # raise IllegalSchemaModificationError(f'Must keep target column "self.target.name".')
         return super().keep_only_columns(column_names)
 
-    def remove_columns(self, column_names: list[str]) -> Table:
-        # TODO: Change return type to TaggedTable (in function definition and in docstring).
+    def remove_columns(self, column_names: list[str]) -> TaggedTable:
         """
         Return a table without the given column(s).
 
@@ -333,7 +332,7 @@ class TaggedTable(Table):
 
         Returns
         -------
-        table : Table
+        table : TaggedTable
             A table without the given columns.
 
         Raises
@@ -346,9 +345,7 @@ class TaggedTable(Table):
         try:
             return TaggedTable._from_table(super().remove_columns(column_names), self.target.name)
         except UnknownColumnNameError:
-            # raise ColumnIsTargetError(self.target.name) from None
-            # TODO: Revert this again
-            return super().remove_columns(column_names)
+            raise ColumnIsTargetError(self.target.name) from None
 
     def remove_columns_with_missing_values(self) -> TaggedTable:
         """
