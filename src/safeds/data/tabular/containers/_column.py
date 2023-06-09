@@ -559,12 +559,12 @@ class Column(Sequence[T]):
         >>> from safeds.data.tabular.containers import Column
         >>> column1 = Column("test", [1, 2, 3])
         >>> column2 = Column("test", [2, 4, 6])
-        >>> pearson = column1.correlation_with(column2)
+        >>> column1.correlation_with(column2)
         1.0
 
         >>> column1 = Column("test", [1, 2, 3])
         >>> column2 = Column("test", [0.5, 4, -6])
-        >>> pearson = column1.correlation_with(column2)
+        >>> column1.correlation_with(column2)
         -0.6404640308067906
         """
         if not self._type.is_numeric() or not other_column._type.is_numeric():
