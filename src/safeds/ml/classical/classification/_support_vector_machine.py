@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 from sklearn.svm import SVC as sk_SVC  # noqa: N811
 
 from safeds.ml.classical._util_sklearn import fit, predict
-from safeds.ml.classical.classification._classifier import Classifier
+from safeds.ml.classical.classification import Classifier
 
 if TYPE_CHECKING:
     from sklearn.base import ClassifierMixin
