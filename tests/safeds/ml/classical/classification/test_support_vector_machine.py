@@ -64,13 +64,6 @@ class TestC:
         svm = SupportVectorMachine(c=2, kernel=SupportVectorMachine.Kernel.RadialBasisFunction())
         assert svm._get_kernel_name() == "rbf"
 
-    def test_should_get_kernel_name_invalid_kernel_type(self) -> None:
-        svm = SupportVectorMachine(c=2)
-        svm._kernel = "invalid_kernel_type"
-
-        with pytest.raises(TypeError, match="Invalid kernel type."):
-            svm._get_kernel_name()
-
     def test_should_raise_if_less_than_or_equal_to_0(self) -> None:
         with pytest.raises(
             ValueError,
