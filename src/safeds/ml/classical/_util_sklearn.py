@@ -9,6 +9,9 @@ from safeds.exceptions import (
     ModelNotFittedError,
     PredictionError,
     UntaggedTableError,
+    NonNumericColumnError,
+    MissingValuesColumnError,
+    DatasetMissesDataError,
 )
 
 
@@ -30,9 +33,32 @@ def fit(model: Any, tagged_table: TaggedTable) -> None:
         If the tagged table contains invalid values or if the training failed.
     UntaggedTableError
         If the table is untagged.
+    NonNumericColumnError
+        If the training data contains non-numerical values.
+    MissingValuesColumnError
+        If the training data contains missing values.
+    DatasetMissesDataError
+        If the training data contains no rows.
     """
     if not isinstance(tagged_table, TaggedTable) and isinstance(tagged_table, Table):
         raise UntaggedTableError
+
+    if tagged_table.number_of_rows == 0:
+        raise DatasetMissesDataError()
+
+    non_numerical_column_names = set(tagged_table.features.column_names) - set(tagged_table.features.remove_columns_with_non_numerical_values().column_names)
+    if len(non_numerical_column_names) != 0:
+        raise NonNumericColumnError(str(non_numerical_column_names),
+                                    "You can use the LabelEncoder or OneHotEncoder to transform your non-numerical data to numerical data.\n"
+                                    "The OneHotEncoder should be used if you work with nominal data. If your data contains too many different values\n"
+                                    "or is ordinal, you should use the LabelEncoder.")
+
+    null_containing_column_names = set(tagged_table.features.column_names) - set(tagged_table.features.remove_columns_with_missing_values().column_names)
+    if len(null_containing_column_names) != 0:
+        raise MissingValuesColumnError(str(null_containing_column_names),
+                                       "You can use the Imputer to replace the missing values based on different strategies.\n"
+                                       "If you want to remove the missing values entirely you can use the method `Table.remove_rows_with_missing_values`.")
+
     try:
         model.fit(
             tagged_table.features._data,
@@ -73,6 +99,12 @@ def predict(model: Any, dataset: Table, feature_names: list[str] | None, target_
         If the dataset misses feature columns.
     PredictionError
         If predicting with the given dataset failed.
+    NonNumericColumnError
+        If the dataset contains non-numerical values.
+    MissingValuesColumnError
+        If the dataset contains missing values.
+    DatasetMissesDataError
+        If the dataset contains no rows.
     """
     # Validation
     if model is None or target_name is None or feature_names is None:
@@ -82,6 +114,22 @@ def predict(model: Any, dataset: Table, feature_names: list[str] | None, target_
     missing_feature_names = [feature_name for feature_name in feature_names if not dataset.has_column(feature_name)]
     if missing_feature_names:
         raise DatasetMissesFeaturesError(missing_feature_names)
+
+    if dataset.number_of_rows == 0:
+        raise DatasetMissesDataError()
+
+    non_numerical_column_names = set(dataset.keep_only_columns(feature_names).column_names) - set(dataset.keep_only_columns(feature_names).remove_columns_with_non_numerical_values().column_names)
+    if len(non_numerical_column_names) != 0:
+        raise NonNumericColumnError(str(non_numerical_column_names),
+                                    "You can use the LabelEncoder or OneHotEncoder to transform your non-numerical data to numerical data.\n"
+                                    "The OneHotEncoder should be used if you work with nominal data. If your data contains too many different values\n"
+                                    "or is ordinal, you should use the LabelEncoder.\n")
+
+    null_containing_column_names = set(dataset.keep_only_columns(feature_names).column_names) - set(dataset.keep_only_columns(feature_names).remove_columns_with_missing_values().column_names)
+    if len(null_containing_column_names) != 0:
+        raise MissingValuesColumnError(str(null_containing_column_names),
+                                       "You can use the Imputer to replace the missing values based on different strategies.\n"
+                                       "If you want to remove the missing values entirely you can use the method `Table.remove_rows_with_missing_values`.")
 
     dataset_df = dataset.keep_only_columns(feature_names)._data
     dataset_df.columns = feature_names

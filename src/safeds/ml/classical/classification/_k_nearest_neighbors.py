@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING
 
 from sklearn.neighbors import KNeighborsClassifier as sk_KNeighborsClassifier
 
+from safeds.exceptions import DatasetMissesDataError
 from safeds.ml.classical._util_sklearn import fit, predict
 
 from ._classifier import Classifier
@@ -69,7 +70,17 @@ class KNearestNeighbors(Classifier):
             If `number_of_neighbors` is greater than the sample size.
         LearningError
             If the training data contains invalid values or if the training failed.
+        UntaggedTableError
+            If the table is untagged.
+        NonNumericColumnError
+            If the training data contains non-numerical values.
+        MissingValuesColumnError
+            If the training data contains missing values.
+        DatasetMissesDataError
+            If the training data contains no rows.
         """
+        if training_set.number_of_rows == 0:
+            raise DatasetMissesDataError()
         if self._number_of_neighbors > training_set.number_of_rows:
             raise ValueError(
                 (
@@ -111,6 +122,12 @@ class KNearestNeighbors(Classifier):
             If the dataset misses feature columns.
         PredictionError
             If predicting with the given dataset failed.
+        NonNumericColumnError
+            If the dataset contains non-numerical values.
+        MissingValuesColumnError
+            If the dataset contains missing values.
+        DatasetMissesDataError
+            If the dataset contains no rows.
         """
         return predict(self._wrapped_classifier, dataset, self._feature_names, self._target_name)
 

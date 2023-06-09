@@ -26,6 +26,13 @@ class DatasetMissesFeaturesError(ValueError):
         super().__init__(f"Dataset misses the feature columns '{missing_feature_names}'.")
 
 
+class DatasetMissesDataError(ValueError):
+    """Raised when a dataset contains no rows."""
+
+    def __init__(self):
+        super().__init__("Dataset contains no rows")
+
+
 class LearningError(Exception):
     """
     Raised when an error occurred while training a model.
