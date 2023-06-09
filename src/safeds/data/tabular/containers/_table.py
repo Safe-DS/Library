@@ -720,7 +720,7 @@ class Table:
         result = Table._from_pandas_dataframe(new_df)
 
         for column in int_columns:
-            result = result.replace_column(column, result.get_column(column).transform(lambda it: int(it)))
+            result = result.replace_column(column, [result.get_column(column).transform(lambda it: int(it))])
 
         return result
 
@@ -768,7 +768,7 @@ class Table:
         result = Table._from_pandas_dataframe(new_df)
 
         for column in int_columns:
-            result = result.replace_column(column, result.get_column(column).transform(lambda it: int(it)))
+            result = result.replace_column(column, [result.get_column(column).transform(lambda it: int(it))])
 
         return result
 
@@ -1001,9 +1001,9 @@ class Table:
         new_df.columns = self._schema.column_names
         return Table._from_pandas_dataframe(new_df.rename(columns={old_name: new_name}))
 
-    def replace_column(self, old_column_name: str, new_column: Column) -> Table:
+    def replace_column(self, old_column_name: str, new_columns: list[Column]) -> Table:
         """
-        Return a copy of the table with the specified old column replaced by a new column. Keeps the order of columns.
+        Return a copy of the table with the specified old column replaced by a list of new columns. Keeps the order of columns.
 
         This table is not modified.
 
@@ -1012,13 +1012,13 @@ class Table:
         old_column_name : str
             The name of the column to be replaced.
 
-        new_column : Column
-            The new column replacing the old column.
+        new_columns : list[Column]
+            The list of new columns replacing the old column.
 
         Returns
         -------
         result : Table
-            A table with the old column replaced by the new column.
+            A table with the old column replaced by the new columns.
 
         Raises
         ------
@@ -1026,30 +1026,28 @@ class Table:
             If the old column does not exist.
 
         DuplicateColumnNameError
-            If the new column already exists and the existing column is not affected by the replacement.
+            If at least one of the new columns already exists and the existing column is not affected by the replacement.
 
         ColumnSizeError
-            If the size of the column does not match the amount of rows.
+            If the size of at least one of the new columns does not match the amount of rows.
         """
         if old_column_name not in self._schema.column_names:
             raise UnknownColumnNameError([old_column_name])
 
-        if new_column.name in self._schema.column_names and new_column.name != old_column_name:
-            raise DuplicateColumnNameError(new_column.name)
+        columns = list[Column]()
+        for old_column in self.column_names:
+            if old_column == old_column_name:
+                for new_column in new_columns:
+                    if new_column.name in self.column_names and new_column.name != old_column_name:
+                        raise DuplicateColumnNameError(new_column.name)
 
-        if self.number_of_rows != new_column._data.size:
-            raise ColumnSizeError(str(self.number_of_rows), str(new_column._data.size))
+                    if self.number_of_rows != new_column.number_of_rows:
+                        raise ColumnSizeError(str(self.number_of_rows), str(new_column.number_of_rows))
+                    columns.append(new_column)
+            else:
+                columns.append(self.get_column(old_column))
 
-        if old_column_name != new_column.name:
-            renamed_table = self.rename_column(old_column_name, new_column.name)
-            result = renamed_table._data
-            result.columns = renamed_table._schema.column_names
-        else:
-            result = self._data.copy()
-            result.columns = self._schema.column_names
-
-        result[new_column.name] = new_column._data
-        return Table._from_pandas_dataframe(result)
+        return Table.from_columns(columns)
 
     def shuffle_rows(self) -> Table:
         """
@@ -1251,7 +1249,7 @@ class Table:
         """
         if self.has_column(name):
             items: list = [transformer(item) for item in self.to_rows()]
-            result: Column = Column(name, items)
+            result: list[Column] = [Column(name, items)]
             return self.replace_column(name, result)
         raise UnknownColumnNameError([name])
 
