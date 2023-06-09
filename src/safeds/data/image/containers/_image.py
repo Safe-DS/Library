@@ -158,7 +158,7 @@ class Image:
 
     def resize(self, new_width: int, new_height: int) -> Image:
         """
-        Return the resized image
+        Return the resized image.
 
         Returns
         -------
@@ -167,9 +167,9 @@ class Image:
         """
         data = io.BytesIO()
         if self._repr_png_() is not None:
-            data = io.BytesIO(self._repr_png_())
+            data = io.BytesIO(bytes(self._repr_png_()))
         elif self._repr_jpeg_() is not None:
-            data = io.BytesIO(self._repr_jpeg_())
+            data = io.BytesIO(bytes(self._repr_jpeg_()))
 
         new_image = Image(data, self._format)
         new_image._image = new_image._image.resize((new_width, new_height))
