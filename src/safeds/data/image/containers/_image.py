@@ -165,7 +165,7 @@ class Image:
         result : Image
             The image with the given width and height
         """
-        data = io.BytesIO
+        data = io.BytesIO()
         if self._repr_png_() is not None:
             data = io.BytesIO(self._repr_png_())
         elif self._repr_jpeg_() is not None:
