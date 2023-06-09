@@ -1,7 +1,7 @@
 import pytest
 from safeds.data.tabular.containers import TaggedTable
 from safeds.data.tabular.transformation import OneHotEncoder
-from safeds.exceptions import ColumnIsTaggedError
+from safeds.exceptions import ColumnIsTargetError
 
 from tests.helpers import assert_that_tagged_tables_are_equal
 
@@ -24,12 +24,12 @@ def test_should_transform_table() -> None:
     assert_that_tagged_tables_are_equal(transformed_table, expected)
 
 
-def test_should_raise_column_is_tagged() -> None:
+def test_should_raise_column_is_target() -> None:
     table = TaggedTable({"feat1": ["a", "b", "a"], "feat2": ["a", "b", "d"], "target": [1, 2, 3]}, "target")
     transformer = OneHotEncoder().fit(table, None)
     # Passing None means all columns get one-hot-encoded, i.e. also the target column!
     with pytest.raises(
-        ColumnIsTaggedError,
-        match='Illegal schema modification: Column "target" is tagged and cannot be removed.',
+        ColumnIsTargetError,
+        match='Illegal schema modification: Column "target" is the target column and cannot be removed.',
     ):
         table.transform_table(transformer)

@@ -121,8 +121,8 @@ class IllegalSchemaModificationError(Exception):
         super().__init__(f"Illegal schema modification: {msg}")
 
 
-class ColumnIsTaggedError(IllegalSchemaModificationError):
+class ColumnIsTargetError(IllegalSchemaModificationError):
     """Exception raised in overriden methods of the Table class when removing tagged Columns from a TaggedTable."""
 
     def __init__(self, column_name: str) -> None:
-        super().__init__(f'Column "{column_name}" is tagged and cannot be removed.')
+        super().__init__(f'Column "{column_name}" is the target column and cannot be removed.')

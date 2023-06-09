@@ -1,7 +1,7 @@
 """Custom exceptions that can be raised by Safe-DS."""
 
 from safeds.exceptions._data import (
-    ColumnIsTaggedError,
+    ColumnIsTargetError,
     ColumnLengthMismatchError,
     ColumnSizeError,
     DuplicateColumnNameError,
@@ -36,7 +36,7 @@ __all__ = [
     "ValueNotPresentWhenFittedError",
     "WrongFileExtensionError",
     "IllegalSchemaModificationError",
-    "ColumnIsTaggedError",
+    "ColumnIsTargetError",
     # ML exceptions
     "DatasetContainsTargetError",
     "DatasetMissesFeaturesError",

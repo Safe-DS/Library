@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from safeds.data.tabular.containers import Column, Row, Table
-from safeds.exceptions import ColumnIsTaggedError, UnknownColumnNameError
+from safeds.exceptions import ColumnIsTargetError, UnknownColumnNameError
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Mapping, Sequence
@@ -340,14 +340,14 @@ class TaggedTable(Table):
         ------
         UnknownColumnNameError
             If any of the given columns does not exist.
-        ColumnIsTaggedError
+        ColumnIsTargetError
             If any of the given columns is the target column.
         """
         try:
             return TaggedTable._from_table(super().remove_columns(column_names), self.target.name)
         except UnknownColumnNameError:
             # TODO: Don't return; throw exception and handle it correctly in tests.
-            # raise ColumnIsTaggedError({self.target.name}) from None
+            # raise ColumnIsTargetError({self.target.name}) from None
             return super().remove_columns(column_names)
 
     def remove_columns_with_missing_values(self) -> TaggedTable:
@@ -363,14 +363,14 @@ class TaggedTable(Table):
 
         Raises
         ------
-        ColumnIsTaggedError
+        ColumnIsTargetError
             If any of the columns to be removed is the target column.
         """
         table = super().remove_columns_with_missing_values()
         try:
             tagged = TaggedTable._from_table(table, self.target.name, None)
         except UnknownColumnNameError:
-            raise ColumnIsTaggedError(self.target.name) from None
+            raise ColumnIsTargetError(self.target.name) from None
         return tagged
 
     def remove_columns_with_non_numerical_values(self) -> TaggedTable:
@@ -386,14 +386,14 @@ class TaggedTable(Table):
 
         Raises
         ------
-        ColumnIsTaggedError
+        ColumnIsTargetError
             If any of the columns to be removed is the target column.
         """
         table = super().remove_columns_with_non_numerical_values()
         try:
             tagged = TaggedTable._from_table(table, self.target.name)
         except UnknownColumnNameError:
-            raise ColumnIsTaggedError(self.target.name) from None
+            raise ColumnIsTargetError(self.target.name) from None
         return tagged
 
     def remove_duplicate_rows(self) -> TaggedTable:
@@ -645,7 +645,7 @@ class TaggedTable(Table):
         ------
         TransformerNotFittedError
             If the transformer has not been fitted yet.
-        ColunmIsTaggedError
+        ColunmIsTargetError
             If the transformer tries to remove or replace the target column.
 
         Examples
@@ -667,7 +667,7 @@ class TaggedTable(Table):
         """
         transformed_table = transformer.transform(self)
         if self.target.name in transformer.get_names_of_removed_columns():
-            raise ColumnIsTaggedError(self.target.name)
+            raise ColumnIsTargetError(self.target.name)
         return TaggedTable._from_table(transformed_table, self.target.name)
 
     def inverse_transform_table(self, transformer: InvertibleTableTransformer) -> TaggedTable:

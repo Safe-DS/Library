@@ -1,6 +1,6 @@
 import pytest
 from safeds.data.tabular.containers import TaggedTable
-from safeds.exceptions import ColumnIsTaggedError
+from safeds.exceptions import ColumnIsTargetError
 
 from tests.helpers import assert_that_tagged_tables_are_equal
 
@@ -25,7 +25,7 @@ def test_should_remove_column() -> None:
     assert_that_tagged_tables_are_equal(new_table, expected)
 
 
-def test_should_throw_column_is_tagged() -> None:
+def test_should_throw_column_is_target() -> None:
     table = TaggedTable(
         {
             "feature": [0, 1, 2],
@@ -34,7 +34,7 @@ def test_should_throw_column_is_tagged() -> None:
         "target",
     )
     with pytest.raises(
-        ColumnIsTaggedError,
-        match='Illegal schema modification: Column "target" is tagged and cannot be removed.',
+        ColumnIsTargetError,
+        match='Illegal schema modification: Column "target" is the target column and cannot be removed.',
     ):
         table.remove_columns_with_non_numerical_values()
