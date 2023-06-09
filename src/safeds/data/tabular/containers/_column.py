@@ -281,7 +281,7 @@ class Column(Sequence[T]):
         >>> from safeds.data.tabular.containers import Column
         >>> column = Column("test", [1, 2, 3])
         >>> column.name
-        test
+        'test'
         """
         return self._name
 
