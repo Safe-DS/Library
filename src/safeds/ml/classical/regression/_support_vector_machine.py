@@ -66,7 +66,6 @@ class SupportVectorMachine(Regressor):
         return self._kernel
 
     class Kernel:
-
         class Linear(SupportVectorMachineKernel):
             def get_sklearn_kernel(self) -> str:
                 return "linear"
