@@ -1035,14 +1035,14 @@ class Table:
             raise UnknownColumnNameError([old_column_name])
 
         columns = list[Column]()
-        for old_column in self.schema.column_names:
+        for old_column in self.column_names:
             if old_column == old_column_name:
                 for new_column in new_columns:
-                    if new_column.name in self._schema.column_names and new_column.name != old_column_name:
+                    if new_column.name in self.column_names and new_column.name != old_column_name:
                         raise DuplicateColumnNameError(new_column.name)
 
-                    if self.number_of_rows != new_column._data.size:
-                        raise ColumnSizeError(str(self.number_of_rows), str(new_column._data.size))
+                    if self.number_of_rows != new_column.number_of_rows:
+                        raise ColumnSizeError(str(self.number_of_rows), str(new_column.number_of_rows))
                     columns.append(new_column)
             else:
                 columns.append(self.get_column(old_column))
