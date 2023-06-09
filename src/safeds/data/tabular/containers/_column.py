@@ -240,10 +240,7 @@ class Column(Sequence[T]):
         >>> from safeds.data.tabular.containers import Column
         >>> column = Column("test", [1, 2, 3])
         >>> repr(column)
-                test
-            0     1
-            1     2
-            2     3
+        "Column('test', [1, 2, 3])"
         """
         return f"Column({self._name!r}, {list(self._data)!r})"
 
