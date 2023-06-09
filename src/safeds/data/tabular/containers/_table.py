@@ -841,6 +841,8 @@ class Table:
         ------
         UnknownColumnNameError
             If any of the given columns does not exist.
+        IllegalSchemaModificationError
+            If removing the columns would violate an invariant in the subclass.
         """
         invalid_columns = []
         for name in column_names:
@@ -873,6 +875,8 @@ class Table:
         ------
         UnknownColumnNameError
             If any of the given columns does not exist.
+        IllegalSchemaModificationError
+            If removing the columns would violate an invariant in the subclass.
         """
         invalid_columns = []
         for name in column_names:
