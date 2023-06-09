@@ -133,7 +133,11 @@ class TestFit:
         ids=["non-numerical data", "missing values in data", "no rows in data"],
     )
     def test_should_raise_on_invalid_data(
-        self, classifier: Classifier, invalid_data: TaggedTable, expected_error: Any, expected_error_msg: str,
+        self,
+        classifier: Classifier,
+        invalid_data: TaggedTable,
+        expected_error: Any,
+        expected_error_msg: str,
     ) -> None:
         with pytest.raises(expected_error, match=expected_error_msg):
             classifier.fit(invalid_data)
