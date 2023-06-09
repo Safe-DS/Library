@@ -1903,7 +1903,8 @@ class Table:
         >>> row1 = Row({"a": 1, "b": 5})
         >>> row2 = Row({"a": 2, "b": 6})
         >>> table = Table.from_rows([row1, row2])
-        {"a": [1, 2], "b": [5, 6]}
+        >>> table.to_dict()
+        {'a': [1, 2], 'b': [5, 6]}
         """
         return {column_name: list(self.get_column(column_name)) for column_name in self.column_names}
 
