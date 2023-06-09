@@ -37,7 +37,7 @@ class SupportVectorMachine(Classifier):
     ----------
     c: float
         The strength of regularization. Must be strictly positive.
-    kernel: The type of kernel to be used. Defaults to None.
+        kernel: The type of kernel to be used. Defaults to None.
 
     Raises
     ------
@@ -45,7 +45,7 @@ class SupportVectorMachine(Classifier):
         If `c` is less than or equal to 0.
     """
 
-    def __init__(self, *, c: float = 1.0, kernel: SupportVectorMachineKernel = None) -> None:
+    def __init__(self, *, c: float = 1.0, kernel: SupportVectorMachineKernel | None = None) -> None:
         # Internal state
         self._wrapped_classifier: sk_SVC | None = None
         self._feature_names: list[str] | None = None
@@ -62,7 +62,7 @@ class SupportVectorMachine(Classifier):
         return self._c
 
     @property
-    def kernel(self) -> SupportVectorMachineKernel:
+    def kernel(self) -> SupportVectorMachineKernel | None:
         return self._kernel
 
     class Kernel:
