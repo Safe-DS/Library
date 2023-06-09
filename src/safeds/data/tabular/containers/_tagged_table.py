@@ -70,6 +70,8 @@ class TaggedTable(Table):
 
         Raises
         ------
+        UnknownColumnNameError
+            If target_name matches none of the column names.
         ValueError
             If the target column is also a feature column.
         ValueError
@@ -81,11 +83,13 @@ class TaggedTable(Table):
         >>> table = Table({"col1": ["a", "b", "c", "a"], "col2": [1, 2, 3, 4]})
         >>> tagged_table = TaggedTable._from_table(table, "col2", ["col1"])
         """
+        if target_name not in table.column_names:
+            raise UnknownColumnNameError([target_name])
+
         # If no feature names are specified, use all columns except the target column
         if feature_names is None:
             feature_names = table.column_names
-            if target_name in feature_names:
-                feature_names.remove(target_name)
+            feature_names.remove(target_name)
 
         # Validate inputs
         if target_name in feature_names:
