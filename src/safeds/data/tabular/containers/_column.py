@@ -502,11 +502,8 @@ class Column(Sequence[T]):
         --------
         >>> from safeds.data.tabular.containers import Column
         >>> column = Column("test", [1, 2, 3])
-        >>> new_column = column.rename("new name")
-            new name
-        0         1
-        1         2
-        2         3
+        >>> column.rename("new name")
+        Column('new name', [1, 2, 3])
         """
         return Column._from_pandas_series(self._data.rename(new_name), self._type)
 
