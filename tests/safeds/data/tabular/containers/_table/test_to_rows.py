@@ -27,11 +27,13 @@ from safeds.data.tabular.typing import Integer, Schema, String
                 ),
             ],
         ),
+        (Table(), []),
     ],
-    ids=[""],
+    ids=["normal", "empty"],
 )
-def test_should_return_list_of_rows(table: Table, rows_expected: list) -> None:
+def test_should_return_list_of_rows(table: Table, rows_expected: list[Row]) -> None:
     rows_is = table.to_rows()
 
     for row_is, row_expected in zip(rows_is, rows_expected, strict=True):
+        assert row_is.schema == row_expected.schema
         assert row_is == row_expected

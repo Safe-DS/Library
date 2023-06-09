@@ -4,7 +4,7 @@ import functools
 import io
 import warnings
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, TypeVar
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -25,6 +25,7 @@ from safeds.exceptions import (
     NonNumericColumnError,
     SchemaMismatchError,
     UnknownColumnNameError,
+    WrongFileExtensionError,
 )
 
 from ._column import Column
@@ -92,23 +93,32 @@ class Table:
         ------
         FileNotFoundError
             If the specified file does not exist.
-        ValueError
-            If the file could not be read.
+        WrongFileExtensionError
+            If the file is not a csv file.
 
         Examples
         --------
         >>> from safeds.data.tabular.containers import Table
         >>> table = Table.from_csv_file('./example_files/from_csv_file.csv')
         """
-        try:
+        path = Path(path)
+        if path.suffix != ".csv":
+            raise WrongFileExtensionError(path, ".csv")
+        if path.exists():
+            with path.open() as f:
+                if f.read().replace("\n", "") == "":
+                    return Table()
+
             return Table._from_pandas_dataframe(pd.read_csv(path))
-        except FileNotFoundError as exception:
-            raise FileNotFoundError(f'File "{path}" does not exist') from exception
+        else:
+            raise FileNotFoundError(f'File "{path}" does not exist')
 
     @staticmethod
     def from_excel_file(path: str | Path) -> Table:
         """
         Read data from an Excel file into a table.
+
+        Valid file extensions are `.xls`, '.xlsx', `.xlsm`, `.xlsb`, `.odf`, `.ods` and `.odt`.
 
         Parameters
         ----------
@@ -124,9 +134,13 @@ class Table:
         ------
         FileNotFoundError
             If the specified file does not exist.
-        ValueError
-            If the file could not be read.
+        WrongFileExtensionError
+            If the file is not an Excel file.
         """
+        path = Path(path)
+        excel_extensions = [".xls", ".xlsx", ".xlsm", ".xlsb", ".odf", ".ods", ".odt"]
+        if path.suffix not in excel_extensions:
+            raise WrongFileExtensionError(path, excel_extensions)
         try:
             return Table._from_pandas_dataframe(
                 pd.read_excel(path, engine="openpyxl", usecols=lambda colname: "Unnamed" not in colname),
@@ -153,18 +167,25 @@ class Table:
         ------
         FileNotFoundError
             If the specified file does not exist.
-        ValueError
-            If the file could not be read.
+        WrongFileExtensionError
+            If the file is not a JSON file.
 
         Examples
         --------
         >>> from safeds.data.tabular.containers import Table
         >>> table = Table.from_json_file('./example_files/from_json_file.json')
         """
-        try:
+        path = Path(path)
+        if path.suffix != ".json":
+            raise WrongFileExtensionError(path, ".json")
+        if path.exists():
+            with path.open() as f:
+                if f.read().replace("\n", "") in ("", "{}"):
+                    return Table()
+
             return Table._from_pandas_dataframe(pd.read_json(path))
-        except FileNotFoundError as exception:
-            raise FileNotFoundError(f'File "{path}" does not exist') from exception
+        else:
+            raise FileNotFoundError(f'File "{path}" does not exist')
 
     @staticmethod
     def from_dict(data: dict[str, list[Any]]) -> Table:
@@ -217,6 +238,8 @@ class Table:
         ------
         ColumnLengthMismatchError
             If any of the column sizes does not match with the others.
+         DuplicateColumnNameError
+            If multiple columns have the same name.
 
         Examples
         --------
@@ -232,12 +255,16 @@ class Table:
         2  3  6
         """
         dataframe: DataFrame = pd.DataFrame()
+        column_names = []
 
         for column in columns:
             if column._data.size != columns[0]._data.size:
                 raise ColumnLengthMismatchError(
                     "\n".join(f"{column.name}: {column._data.size}" for column in columns),
                 )
+            if column.name in column_names:
+                raise DuplicateColumnNameError(column.name)
+            column_names.append(column.name)
             dataframe[column.name] = column._data
 
         return Table._from_pandas_dataframe(dataframe)
@@ -397,8 +424,12 @@ class Table:
             return NotImplemented
         if self is other:
             return True
+        if self.number_of_rows == 0 and other.number_of_rows == 0:
+            return self.column_names == other.column_names
         table1 = self.sort_columns()
         table2 = other.sort_columns()
+        if table1.number_of_rows == 0 and table2.number_of_rows == 0:
+            return table1.column_names == table2.column_names
         return table1._schema == table2._schema and table1._data.equals(table2._data)
 
     def __repr__(self) -> str:
@@ -597,7 +628,7 @@ class Table:
 
         Raises
         ------
-        ColumnNameError
+        UnknownColumnNameError
             If the specified target column name does not exist.
 
         Examples
@@ -676,6 +707,44 @@ class Table:
         8              idness                 1.0                 1.0
         9           stability                 0.5                 0.5
         """
+        if self.number_of_columns == 0:
+            return Table(
+                {
+                    "metrics": [
+                        "maximum",
+                        "minimum",
+                        "mean",
+                        "mode",
+                        "median",
+                        "sum",
+                        "variance",
+                        "standard deviation",
+                        "idness",
+                        "stability",
+                    ],
+                },
+            )
+        elif self.number_of_rows == 0:
+            table = Table(
+                {
+                    "metrics": [
+                        "maximum",
+                        "minimum",
+                        "mean",
+                        "mode",
+                        "median",
+                        "sum",
+                        "variance",
+                        "standard deviation",
+                        "idness",
+                        "stability",
+                    ],
+                },
+            )
+            for name in self.column_names:
+                table = table.add_column(Column(name, ["-", "-", "-", "-", "-", "-", "-", "-", "-", "-"]))
+            return table
+
         columns = self.to_columns()
         result = pd.DataFrame()
         statistics = {}
@@ -744,7 +813,7 @@ class Table:
         if self.has_column(column.name):
             raise DuplicateColumnNameError(column.name)
 
-        if column._data.size != self.number_of_rows:
+        if column.number_of_rows != self.number_of_rows and self.number_of_columns != 0:
             raise ColumnSizeError(str(self.number_of_rows), str(column._data.size))
 
         result = self._data.copy()
@@ -796,7 +865,7 @@ class Table:
             if column.name in result.columns:
                 raise DuplicateColumnNameError(column.name)
 
-            if column._data.size != self.number_of_rows:
+            if column.number_of_rows != self.number_of_rows and self.number_of_columns != 0:
                 raise ColumnSizeError(str(self.number_of_rows), str(column._data.size))
 
             result[column.name] = column._data
@@ -807,6 +876,7 @@ class Table:
         Add a row to the table.
 
         This table is not modified.
+        If the table happens to be empty beforehand, respective features will be added automatically.
 
         Parameters
         ----------
@@ -817,6 +887,11 @@ class Table:
         -------
         table : Table
             A new table with the added row at the end.
+
+        Raises
+        ------
+        SchemaMismatchError
+            If the schema of the row does not match
 
         Examples
         --------
@@ -830,12 +905,27 @@ class Table:
         0  1  2
         1  3  4
         """
-        if self._schema != row.schema:
+        int_columns = []
+        result = self.remove_columns([])  # clone
+        if result.number_of_rows == 0:
+            int_columns = list(filter(lambda name: isinstance(row[name], int | np.int64), row.column_names))
+            if result.number_of_columns == 0:
+                for column in row.column_names:
+                    result._data[column] = Column(column, [])
+                result._schema = Schema._from_pandas_dataframe(result._data)
+            elif result.column_names != row.column_names:
+                raise SchemaMismatchError
+        elif result._schema != row.schema:
             raise SchemaMismatchError
 
-        new_df = pd.concat([self._data, row._data]).infer_objects()
-        new_df.columns = self.column_names
-        return Table._from_pandas_dataframe(new_df)
+        new_df = pd.concat([result._data, row._data]).infer_objects()
+        new_df.columns = result.column_names
+        result = Table._from_pandas_dataframe(new_df)
+
+        for column in int_columns:
+            result = result.replace_column(column, [result.get_column(column).transform(lambda it: int(it))])
+
+        return result
 
     def add_rows(self, rows: list[Row] | Table) -> Table:
         """
@@ -853,6 +943,11 @@ class Table:
         result : Table
             A new table which combines the original table and the given rows.
 
+        Raises
+        ------
+        SchemaMismatchError
+            If the schema of on of the row does not match the table schema.
+
         Examples
         --------
         >>> from safeds.data.tabular.containers import Table
@@ -869,16 +964,30 @@ class Table:
         """
         if isinstance(rows, Table):
             rows = rows.to_rows()
-        result = self._data
+        int_columns = []
+        result = self.remove_columns([])  # clone
         for row in rows:
-            if self._schema != row.schema:
+            if result.number_of_rows == 0:
+                int_columns = list(filter(lambda name: isinstance(row[name], int | np.int64), row.column_names))
+                if result.number_of_columns == 0:
+                    for column in row.column_names:
+                        result._data[column] = Column(column, [])
+                    result._schema = Schema._from_pandas_dataframe(result._data)
+                elif result.column_names != row.column_names:
+                    raise SchemaMismatchError
+            elif result._schema != row.schema:
                 raise SchemaMismatchError
 
         row_frames = (row._data for row in rows)
 
-        result = pd.concat([result, *row_frames]).infer_objects()
-        result.columns = self.column_names
-        return Table._from_pandas_dataframe(result)
+        new_df = pd.concat([result._data, *row_frames]).infer_objects()
+        new_df.columns = result.column_names
+        result = Table._from_pandas_dataframe(new_df)
+
+        for column in int_columns:
+            result = result.replace_column(column, [result.get_column(column).transform(lambda it: int(it))])
+
+        return result
 
     def filter_rows(self, query: Callable[[Row], bool]) -> Table:
         """
@@ -912,6 +1021,32 @@ class Table:
             result_table = self.from_rows(rows)
         return result_table
 
+    _T = TypeVar("_T")
+
+    def group_by(self, key_selector: Callable[[Row], _T]) -> dict[_T, Table]:
+        """
+        Return a dictionary with the output tables as values and the keys from the key_selector.
+
+        This table is not modified.
+
+        Parameters
+        ----------
+        key_selector : Callable[[Row], _T]
+            A Callable that is applied to all rows and returns the key of the group.
+
+        Returns
+        -------
+        dictionary : dict
+            A dictionary containing the new tables as values and the selected keys as keys.
+        """
+        dictionary: dict[Table._T, Table] = {}
+        for row in self.to_rows():
+            if key_selector(row) in dictionary:
+                dictionary[key_selector(row)] = dictionary[key_selector(row)].add_row(row)
+            else:
+                dictionary[key_selector(row)] = Table.from_rows([row])
+        return dictionary
+
     def keep_only_columns(self, column_names: list[str]) -> Table:
         """
         Return a table with only the given column(s).
@@ -930,7 +1065,7 @@ class Table:
 
         Raises
         ------
-        ColumnNameError
+        UnknownColumnNameError
             If any of the given columns does not exist.
 
         Examples
@@ -972,7 +1107,7 @@ class Table:
 
         Raises
         ------
-        ColumnNameError
+        UnknownColumnNameError
             If any of the given columns does not exist.
 
         Examples
@@ -1155,7 +1290,7 @@ class Table:
 
         Raises
         ------
-        ColumnNameError
+        UnknownColumnNameError
             If the specified old target column name does not exist.
         DuplicateColumnNameError
             If the specified new target column name already exists.
@@ -1181,9 +1316,9 @@ class Table:
         new_df.columns = self._schema.column_names
         return Table._from_pandas_dataframe(new_df.rename(columns={old_name: new_name}))
 
-    def replace_column(self, old_column_name: str, new_column: Column) -> Table:
+    def replace_column(self, old_column_name: str, new_columns: list[Column]) -> Table:
         """
-        Return a copy of the table with the specified old column replaced by a new column. Keeps the order of columns.
+        Return a copy of the table with the specified old column replaced by a list of new columns. Keeps the order of columns.
 
         This table is not modified.
 
@@ -1192,13 +1327,13 @@ class Table:
         old_column_name : str
             The name of the column to be replaced.
 
-        new_column : Column
-            The new column replacing the old column.
+        new_columns : list[Column]
+            The list of new columns replacing the old column.
 
         Returns
         -------
         result : Table
-            A table with the old column replaced by the new column.
+            A table with the old column replaced by the new columns.
 
         Raises
         ------
@@ -1206,10 +1341,10 @@ class Table:
             If the old column does not exist.
 
         DuplicateColumnNameError
-            If the new column already exists and the existing column is not affected by the replacement.
+            If at least one of the new columns already exists and the existing column is not affected by the replacement.
 
         ColumnSizeError
-            If the size of the column does not match the amount of rows.
+            If the size of at least one of the new columns does not match the amount of rows.
 
         Examples
         --------
@@ -1225,22 +1360,20 @@ class Table:
         if old_column_name not in self._schema.column_names:
             raise UnknownColumnNameError([old_column_name])
 
-        if new_column.name in self._schema.column_names and new_column.name != old_column_name:
-            raise DuplicateColumnNameError(new_column.name)
+        columns = list[Column]()
+        for old_column in self.column_names:
+            if old_column == old_column_name:
+                for new_column in new_columns:
+                    if new_column.name in self.column_names and new_column.name != old_column_name:
+                        raise DuplicateColumnNameError(new_column.name)
 
-        if self.number_of_rows != new_column._data.size:
-            raise ColumnSizeError(str(self.number_of_rows), str(new_column._data.size))
+                    if self.number_of_rows != new_column.number_of_rows:
+                        raise ColumnSizeError(str(self.number_of_rows), str(new_column.number_of_rows))
+                    columns.append(new_column)
+            else:
+                columns.append(self.get_column(old_column))
 
-        if old_column_name != new_column.name:
-            renamed_table = self.rename_column(old_column_name, new_column.name)
-            result = renamed_table._data
-            result.columns = renamed_table._schema.column_names
-        else:
-            result = self._data.copy()
-            result.columns = self._schema.column_names
-
-        result[new_column.name] = new_column._data
-        return Table._from_pandas_dataframe(result)
+        return Table.from_columns(columns)
 
     def shuffle_rows(self) -> Table:
         """
@@ -1297,7 +1430,7 @@ class Table:
 
         Raises
         ------
-        ValueError
+        IndexOutOfBoundsError
             If the index is out of bounds.
 
         Examples
@@ -1316,8 +1449,10 @@ class Table:
         if end is None:
             end = self.number_of_rows
 
-        if start < 0 or end < 0 or start >= self.number_of_rows or end > self.number_of_rows or end < start:
-            raise ValueError("The given index is out of bounds")
+        if end < start:
+            raise IndexOutOfBoundsError(slice(start, end))
+        if start < 0 or end < 0 or start > self.number_of_rows or end > self.number_of_rows:
+            raise IndexOutOfBoundsError(start if start < 0 or start > self.number_of_rows else end)
 
         new_df = self._data.iloc[start:end:step]
         new_df.columns = self._schema.column_names
@@ -1441,6 +1576,11 @@ class Table:
             A tuple containing the two resulting tables. The first table has the specified size, the second table
             contains the rest of the data.
 
+        Raises
+        ------
+        ValueError:
+            if the 'percentage_in_first' is not between 0 and 1
+
         Examples
         --------
         >>> from safeds.data.tabular.containers import Table
@@ -1451,8 +1591,10 @@ class Table:
         >>> slices[1].to_dict()
         {'temperature': [20, 25, 30], 'sales': [90, 206, 210]}
         """
-        if percentage_in_first <= 0 or percentage_in_first >= 1:
-            raise ValueError("the given percentage is not in range")
+        if percentage_in_first < 0 or percentage_in_first > 1:
+            raise ValueError("The given percentage is not between 0 and 1")
+        if self.number_of_rows == 0:
+            return Table(), Table()
         return (
             self.slice_rows(0, round(percentage_in_first * self.number_of_rows)),
             self.slice_rows(round(percentage_in_first * self.number_of_rows)),
@@ -1475,6 +1617,13 @@ class Table:
         -------
         tagged_table : TaggedTable
             A new tagged table with the given target and feature names.
+
+        Raises
+        ------
+        ValueError
+            If the target column is also a feature column.
+        ValueError
+            If no feature columns are specified.
 
         Examples
         -------
@@ -1513,7 +1662,7 @@ class Table:
         """
         if self.has_column(name):
             items: list = [transformer(item) for item in self.to_rows()]
-            result: Column = Column(name, items)
+            result: list[Column] = [Column(name, items)]
             return self.replace_column(name, result)
         raise UnknownColumnNameError([name])
 
@@ -1663,10 +1812,11 @@ class Table:
         >>> table = Table.from_dict({"temperature": [10, 15, 20, 25, 30], "sales": [54, 74, 90, 206, 210]})
         >>> image = table.plot_lineplot("temperature", "sales")
         """
-        if not self.has_column(x_column_name):
-            raise UnknownColumnNameError([x_column_name])
-        if not self.has_column(y_column_name):
-            raise UnknownColumnNameError([y_column_name])
+        if not self.has_column(x_column_name) or not self.has_column(y_column_name):
+            raise UnknownColumnNameError(
+                ([x_column_name] if not self.has_column(x_column_name) else [])
+                + ([y_column_name] if not self.has_column(y_column_name) else []),
+            )
 
         fig = plt.figure()
         ax = sns.lineplot(
@@ -1716,10 +1866,11 @@ class Table:
         >>> table = Table.from_dict({"temperature": [10, 15, 20, 25, 30], "sales": [54, 74, 90, 206, 210]})
         >>> image = table.plot_scatterplot("temperature", "sales")
         """
-        if not self.has_column(x_column_name):
-            raise UnknownColumnNameError([x_column_name])
-        if not self.has_column(y_column_name):
-            raise UnknownColumnNameError([y_column_name])
+        if not self.has_column(x_column_name) or not self.has_column(y_column_name):
+            raise UnknownColumnNameError(
+                ([x_column_name] if not self.has_column(x_column_name) else [])
+                + ([y_column_name] if not self.has_column(y_column_name) else []),
+            )
 
         fig = plt.figure()
         ax = sns.scatterplot(
@@ -1840,13 +1991,21 @@ class Table:
         path : str | Path
             The path to the output file.
 
+        Raises
+        ------
+        WrongFileExtensionError
+            If the file is not a csv file.
+
         Examples
         --------
         >>> from safeds.data.tabular.containers import Table
         >>> table = Table.from_dict({"a": [1, 2, 3], "b": [4, 5, 6]})
         >>> table.to_csv_file("./example_files/to_csv_file.csv")
         """
-        Path(path).parent.mkdir(parents=True, exist_ok=True)
+        path = Path(path)
+        if path.suffix != ".csv":
+            raise WrongFileExtensionError(path, ".csv")
+        path.parent.mkdir(parents=True, exist_ok=True)
         data_to_csv = self._data.copy()
         data_to_csv.columns = self._schema.column_names
         data_to_csv.to_csv(path, index=False)
@@ -1855,6 +2014,7 @@ class Table:
         """
         Write the data from the table into an Excel file.
 
+        Valid file extensions are `.xls`, '.xlsx', `.xlsm`, `.xlsb`, `.odf`, `.ods` and `.odt`.
         If the file and/or the directories do not exist, they will be created. If the file already exists, it will be
         overwritten.
 
@@ -1863,17 +2023,28 @@ class Table:
         path : str | Path
             The path to the output file.
 
+
+        Raises
+        ------
+        WrongFileExtensionError
+            If the file is not an Excel file.
+
         Examples
         --------
         >>> from safeds.data.tabular.containers import Table
         >>> table = Table.from_dict({"a": [1, 2, 3], "b": [4, 5, 6]})
         >>> table.to_excel_file("./example_files/to_excel_file.xlsx")
         """
+        path = Path(path)
+        excel_extensions = [".xls", ".xlsx", ".xlsm", ".xlsb", ".odf", ".ods", ".odt"]
+        if path.suffix not in excel_extensions:
+            raise WrongFileExtensionError(path, excel_extensions)
+
         # Create Excel metadata in the file
         tmp_table_file = openpyxl.Workbook()
         tmp_table_file.save(path)
 
-        Path(path).parent.mkdir(parents=True, exist_ok=True)
+        path.parent.mkdir(parents=True, exist_ok=True)
         data_to_excel = self._data.copy()
         data_to_excel.columns = self._schema.column_names
         data_to_excel.to_excel(path)
@@ -1890,13 +2061,21 @@ class Table:
         path : str | Path
             The path to the output file.
 
+        Raises
+        ------
+        WrongFileExtensionError
+            If the file is not a JSON file.
+
         Examples
         --------
         >>> from safeds.data.tabular.containers import Table
         >>> table = Table.from_dict({"a": [1, 2, 3], "b": [4, 5, 6]})
         >>> table.to_json_file("./example_files/to_json_file.json")
         """
-        Path(path).parent.mkdir(parents=True, exist_ok=True)
+        path = Path(path)
+        if path.suffix != ".json":
+            raise WrongFileExtensionError(path, ".json")
+        path.parent.mkdir(parents=True, exist_ok=True)
         data_to_json = self._data.copy()
         data_to_json.columns = self._schema.column_names
         data_to_json.to_json(path)

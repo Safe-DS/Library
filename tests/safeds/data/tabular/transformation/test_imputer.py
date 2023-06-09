@@ -207,3 +207,44 @@ class TestFitAndTransform:
         )
 
         assert table == expected
+
+    def test_get_names_of_added_columns(self) -> None:
+        transformer = Imputer(strategy=Imputer.Strategy.Constant(1))
+        with pytest.raises(TransformerNotFittedError):
+            transformer.get_names_of_added_columns()
+
+        table = Table(
+            {
+                "a": [1, None],
+                "b": [1, 1],
+            },
+        )
+        transformer = transformer.fit(table, None)
+        assert transformer.get_names_of_added_columns() == []
+
+    def test_get_names_of_changed_columns(self) -> None:
+        transformer = Imputer(strategy=Imputer.Strategy.Constant(1))
+        with pytest.raises(TransformerNotFittedError):
+            transformer.get_names_of_changed_columns()
+        table = Table(
+            {
+                "a": [1, None],
+                "b": [1, 1],
+            },
+        )
+        transformer = transformer.fit(table, None)
+        assert transformer.get_names_of_changed_columns() == ["a", "b"]
+
+    def test_get_names_of_removed_columns(self) -> None:
+        transformer = Imputer(strategy=Imputer.Strategy.Constant(1))
+        with pytest.raises(TransformerNotFittedError):
+            transformer.get_names_of_removed_columns()
+
+        table = Table(
+            {
+                "a": [1, None],
+                "b": [1, 1],
+            },
+        )
+        transformer = transformer.fit(table, None)
+        assert transformer.get_names_of_removed_columns() == []
