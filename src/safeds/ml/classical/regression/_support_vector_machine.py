@@ -18,13 +18,9 @@ class SupportVectorMachineKernel(ABC):
     """The abstract base class of the different subclasses supported by the `Kernel`."""
 
     @abstractmethod
-    def get_sklearn_kernel(self, svm: SupportVectorMachine) -> object:
+    def get_sklearn_kernel(self) -> object:
         """
         Get the kernel of the given SupportVectorMachine.
-
-        Parameters
-        ----------
-        svm: SupportVectorMachine. The SupportVectorMachine instance.
 
         Returns
         -------
@@ -72,8 +68,8 @@ class SupportVectorMachine(Regressor):
     class Kernel:
 
         class Linear(SupportVectorMachineKernel):
-            def get_sklearn_kernel(self, svm: SupportVectorMachine) -> object:
-                return svm.kernel
+            def get_sklearn_kernel(self) -> str:
+                return "linear"
 
         class Polynomial(SupportVectorMachineKernel):
             def __init__(self, degree: int):
@@ -81,16 +77,16 @@ class SupportVectorMachine(Regressor):
                     raise ValueError("The parameter 'degree' has to be greater than or equal to 1.")
                 self._degree = degree
 
-            def get_sklearn_kernel(self, svm: SupportVectorMachine) -> object:
-                return svm.kernel
+            def get_sklearn_kernel(self) -> str:
+                return "poly"
 
         class Sigmoid(SupportVectorMachineKernel):
-            def get_sklearn_kernel(self, svm: SupportVectorMachine) -> object:
-                return svm.kernel
+            def get_sklearn_kernel(self) -> str:
+                return "sigmoid"
 
         class RadialBasisFunction(SupportVectorMachineKernel):
-            def get_sklearn_kernel(self, svm: SupportVectorMachine) -> object:
-                return svm.kernel
+            def get_sklearn_kernel(self) -> str:
+                return "rbf"
 
     def _get_kernel_name(self) -> str:
         if isinstance(self.kernel, SupportVectorMachine.Kernel.Linear):
