@@ -25,7 +25,7 @@ class SupportVectorMachineKernel(ABC):
         Returns
         -------
         object
-              The kernel of the SupportVectorMachine.
+        The kernel of the SupportVectorMachine.
         """
 
 
