@@ -169,9 +169,11 @@ class Image:
             The image with the given width and height
         """
         if self._format.value == ImageFormat.PNG:
-            data = io.BytesIO(self._repr_png_())
+            if self._repr_png_() is not None:
+                data = io.BytesIO(self._repr_png_())
         else:
-            data = io.BytesIO(self._repr_jpeg_())
+            if self._repr_jpeg_() is not None:
+                data = io.BytesIO(self._repr_jpeg_())
 
         new_image = Image(data, self._format)
         new_image._image = new_image._image.resize((new_width, new_height))
