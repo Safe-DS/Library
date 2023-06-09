@@ -1107,14 +1107,25 @@ class Table:
 
         Examples
         -------
-        >>> from safeds.data.tabular.containers._table import Table
-        >>> table = Table.from_dict({"a": [1, 20000, 1, 0.1], "b": [1.5, 800000, 0.5, 0.01], "c": [0.1, 42069, 0.4, 0.2], "d": [0.01, 1000000, 0.01, -0.01]})
+        >>> from safeds.data.tabular.containers import Table
+        >>> from safeds.data.tabular.containers import Column
+        >>> c1 = Column("a", [1, 3, 1, 0.1, 0, 0, 0, 0, 0])
+        >>> c2 = Column("b", [1.5, 1, 0.5, 0.01, 0, 0, 0, 0, 0])
+        >>> c3 = Column("c", [0.1, 0.00, 0.4, 0.2, 0, 0, 0, 0, 0])
+        >>> c4 = Column("d", [-1000000, 1000000, -1000000, -1000000, -1000000, -1000000, -1000000, -1000000, -1000000])
+        >>> table = Table.from_columns([c1, c2, c3, c4])
         >>> new_table = table.remove_rows_with_outliers()
         >>> new_table
-             a    b     c      d
-        0  1    1.5   0.1   0.01
-        1  1    0.5   0.4   0.01
-        2  0.1  0.01  0.2  -0.01
+             a     b    c        d
+        0  1.0  1.50  0.1 -1000000
+        1  3.0  1.00  0.0  1000000
+        2  1.0  0.50  0.4 -1000000
+        3  0.1  0.01  0.2 -1000000
+        4  0.0  0.00  0.0 -1000000
+        5  0.0  0.00  0.0 -1000000
+        6  0.0  0.00  0.0 -1000000
+        7  0.0  0.00  0.0 -1000000
+        8  0.0  0.00  0.0 -1000000
         """
         copy = self._data.copy(deep=True)
 
