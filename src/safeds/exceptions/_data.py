@@ -80,15 +80,15 @@ class ColumnLengthMismatchError(Exception):
         super().__init__(f"The length of at least one column differs: \n{column_info}")
 
 
-class MissingDataError(Exception):
-    """Exception raised if a function is not given enough data to succeed."""
-
-    def __init__(self, missing_data_info: str):
-        super().__init__(f"The function is missing data: \n{missing_data_info}")
-
-
 class TransformerNotFittedError(Exception):
     """Raised when a transformer is used before fitting it."""
 
     def __init__(self) -> None:
         super().__init__("The transformer has not been fitted yet.")
+
+
+class ValueNotPresentWhenFittedError(Exception):
+    """Exception raised when attempting to one-hot-encode a table containing values not present in the fitting phase."""
+
+    def __init__(self, value: str, column: str) -> None:
+        super().__init__(f"Value not present in the table the transformer was fitted on: \n{value} in column {column}.")

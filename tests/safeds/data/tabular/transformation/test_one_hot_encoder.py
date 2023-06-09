@@ -1,12 +1,12 @@
 import pytest
 from safeds.data.tabular.containers import Table
-from safeds.data.tabular.exceptions import TransformerNotFittedError, UnknownColumnNameError
 from safeds.data.tabular.transformation import OneHotEncoder
+from safeds.exceptions import TransformerNotFittedError, UnknownColumnNameError, ValueNotPresentWhenFittedError
 
 
 class TestFit:
     def test_should_raise_if_column_not_found(self) -> None:
-        table = Table.from_dict(
+        table = Table(
             {
                 "col1": ["a", "b", "c"],
             },
@@ -16,7 +16,7 @@ class TestFit:
             OneHotEncoder().fit(table, ["col2"])
 
     def test_should_not_change_original_transformer(self) -> None:
-        table = Table.from_dict(
+        table = Table(
             {
                 "col1": ["a", "b", "c"],
             },
@@ -25,13 +25,13 @@ class TestFit:
         transformer = OneHotEncoder()
         transformer.fit(table, None)
 
-        assert transformer._wrapped_transformer is None
         assert transformer._column_names is None
+        assert transformer._value_to_column is None
 
 
 class TestTransform:
     def test_should_raise_if_column_not_found(self) -> None:
-        table_to_fit = Table.from_dict(
+        table_to_fit = Table(
             {
                 "col1": ["a", "b", "c"],
             },
@@ -39,7 +39,7 @@ class TestTransform:
 
         transformer = OneHotEncoder().fit(table_to_fit, None)
 
-        table_to_transform = Table.from_dict(
+        table_to_transform = Table(
             {
                 "col2": ["a", "b", "c"],
             },
@@ -49,7 +49,7 @@ class TestTransform:
             transformer.transform(table_to_transform)
 
     def test_should_raise_if_not_fitted(self) -> None:
-        table = Table.from_dict(
+        table = Table(
             {
                 "col1": ["a", "b", "c"],
             },
@@ -60,6 +60,23 @@ class TestTransform:
         with pytest.raises(TransformerNotFittedError):
             transformer.transform(table)
 
+    def test_should_raise_value_not_present_when_fitted(self) -> None:
+        fit_table = Table(
+            {
+                "col1": ["a"],
+            },
+        )
+        transform_table = Table(
+            {
+                "col1": ["b"],
+            },
+        )
+
+        transformer = OneHotEncoder().fit(fit_table, None)
+
+        with pytest.raises(ValueNotPresentWhenFittedError):
+            transformer.transform(transform_table)
+
 
 class TestIsFitted:
     def test_should_return_false_before_fitting(self) -> None:
@@ -67,7 +84,7 @@ class TestIsFitted:
         assert not transformer.is_fitted()
 
     def test_should_return_true_after_fitting(self) -> None:
-        table = Table.from_dict(
+        table = Table(
             {
                 "col1": ["a", "b", "c"],
             },
@@ -83,58 +100,90 @@ class TestFitAndTransform:
         ("table", "column_names", "expected"),
         [
             (
-                Table.from_dict(
+                Table(
                     {
                         "col1": ["a", "b", "b", "c"],
                     },
                 ),
                 None,
-                Table.from_dict(
+                Table(
                     {
-                        "col1_a": [1.0, 0.0, 0.0, 0.0],
-                        "col1_b": [0.0, 1.0, 1.0, 0.0],
-                        "col1_c": [0.0, 0.0, 0.0, 1.0],
+                        "col1__a": [1.0, 0.0, 0.0, 0.0],
+                        "col1__b": [0.0, 1.0, 1.0, 0.0],
+                        "col1__c": [0.0, 0.0, 0.0, 1.0],
                     },
                 ),
             ),
             (
-                Table.from_dict(
+                Table(
                     {
                         "col1": ["a", "b", "b", "c"],
                         "col2": ["a", "b", "b", "c"],
                     },
                 ),
                 ["col1"],
-                Table.from_dict(
+                Table(
                     {
-                        "col1_a": [1.0, 0.0, 0.0, 0.0],
-                        "col1_b": [0.0, 1.0, 1.0, 0.0],
-                        "col1_c": [0.0, 0.0, 0.0, 1.0],
+                        "col1__a": [1.0, 0.0, 0.0, 0.0],
+                        "col1__b": [0.0, 1.0, 1.0, 0.0],
+                        "col1__c": [0.0, 0.0, 0.0, 1.0],
                         "col2": ["a", "b", "b", "c"],
                     },
                 ),
             ),
             (
-                Table.from_dict(
+                Table(
                     {
                         "col1": ["a", "b", "b", "c"],
                         "col2": ["a", "b", "b", "c"],
                     },
                 ),
                 ["col1", "col2"],
-                Table.from_dict(
+                Table(
                     {
-                        "col1_a": [1.0, 0.0, 0.0, 0.0],
-                        "col1_b": [0.0, 1.0, 1.0, 0.0],
-                        "col1_c": [0.0, 0.0, 0.0, 1.0],
-                        "col2_a": [1.0, 0.0, 0.0, 0.0],
-                        "col2_b": [0.0, 1.0, 1.0, 0.0],
-                        "col2_c": [0.0, 0.0, 0.0, 1.0],
+                        "col1__a": [1.0, 0.0, 0.0, 0.0],
+                        "col1__b": [0.0, 1.0, 1.0, 0.0],
+                        "col1__c": [0.0, 0.0, 0.0, 1.0],
+                        "col2__a": [1.0, 0.0, 0.0, 0.0],
+                        "col2__b": [0.0, 1.0, 1.0, 0.0],
+                        "col2__c": [0.0, 0.0, 0.0, 1.0],
+                    },
+                ),
+            ),
+            (
+                Table(
+                    {
+                        "a_b": ["c"],
+                        "a": ["b_c"],
+                    },
+                ),
+                None,
+                Table(
+                    {
+                        "a_b__c": [1.0],
+                        "a__b_c": [1.0],
+                    },
+                ),
+            ),
+            (
+                Table(
+                    {
+                        "a__b": ["c", "d"],
+                        "a": ["b__c", "d"],
+                    },
+                ),
+                None,
+                Table(
+                    {
+                        "a__b__c": [1.0, 0.0],
+                        "a__b__d": [0.0, 1.0],
+                        "a__b__c#2": [1.0, 0.0],
+                        "a__d": [0.0, 1.0],
                     },
                 ),
             ),
         ],
-        ids=["all columns", "one column", "multiple columns"],
+        ids=["all columns", "one column", "multiple columns", "single underscore counterexample", "name conflict"],
     )
     def test_should_return_transformed_table(
         self,
@@ -145,7 +194,7 @@ class TestFitAndTransform:
         assert OneHotEncoder().fit_and_transform(table, column_names) == expected
 
     def test_should_not_change_original_table(self) -> None:
-        table = Table.from_dict(
+        table = Table(
             {
                 "col1": ["a", "b", "c"],
             },
@@ -153,7 +202,7 @@ class TestFitAndTransform:
 
         OneHotEncoder().fit_and_transform(table)
 
-        expected = Table.from_dict(
+        expected = Table(
             {
                 "col1": ["a", "b", "c"],
             },
@@ -167,7 +216,7 @@ class TestInverseTransform:
         ("table_to_fit", "column_names", "table_to_transform"),
         [
             (
-                Table.from_dict(
+                Table(
                     {
                         "a": [1.0, 0.0, 0.0, 0.0],
                         "b": ["a", "b", "b", "c"],
@@ -175,7 +224,7 @@ class TestInverseTransform:
                     },
                 ),
                 ["b"],
-                Table.from_dict(
+                Table(
                     {
                         "a": [1.0, 0.0, 0.0, 0.0],
                         "b": ["a", "b", "b", "c"],
@@ -184,7 +233,7 @@ class TestInverseTransform:
                 ),
             ),
             (
-                Table.from_dict(
+                Table(
                     {
                         "a": [1.0, 0.0, 0.0, 0.0],
                         "b": ["a", "b", "b", "c"],
@@ -192,7 +241,7 @@ class TestInverseTransform:
                     },
                 ),
                 ["b"],
-                Table.from_dict(
+                Table(
                     {
                         "c": [0.0, 0.0, 0.0, 1.0],
                         "b": ["a", "b", "b", "c"],
@@ -201,7 +250,7 @@ class TestInverseTransform:
                 ),
             ),
             (
-                Table.from_dict(
+                Table(
                     {
                         "a": [1.0, 0.0, 0.0, 0.0],
                         "b": ["a", "b", "b", "c"],
@@ -209,7 +258,7 @@ class TestInverseTransform:
                     },
                 ),
                 ["b", "bb"],
-                Table.from_dict(
+                Table(
                     {
                         "a": [1.0, 0.0, 0.0, 0.0],
                         "b": ["a", "b", "b", "c"],
@@ -241,7 +290,7 @@ class TestInverseTransform:
         assert result == table_to_transform
 
     def test_should_not_change_transformed_table(self) -> None:
-        table = Table.from_dict(
+        table = Table(
             {
                 "col1": ["a", "b", "b", "c"],
             },
@@ -251,18 +300,18 @@ class TestInverseTransform:
         transformed_table = transformer.transform(table)
         transformer.inverse_transform(transformed_table)
 
-        expected = Table.from_dict(
+        expected = Table(
             {
-                "col1_a": [1.0, 0.0, 0.0, 0.0],
-                "col1_b": [0.0, 1.0, 1.0, 0.0],
-                "col1_c": [0.0, 0.0, 0.0, 1.0],
+                "col1__a": [1.0, 0.0, 0.0, 0.0],
+                "col1__b": [0.0, 1.0, 1.0, 0.0],
+                "col1__c": [0.0, 0.0, 0.0, 1.0],
             },
         )
 
         assert transformed_table == expected
 
     def test_should_raise_if_not_fitted(self) -> None:
-        table = Table.from_dict(
+        table = Table(
             {
                 "a": [1.0, 0.0, 0.0, 0.0],
                 "b": [0.0, 1.0, 1.0, 0.0],
