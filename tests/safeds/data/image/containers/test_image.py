@@ -174,6 +174,10 @@ class TestResize:
         ids=[".jpg", ".png"],
     )
     def test_should_return_resized_image(
-        self, image: Image, new_width: int, new_height: int, new_size: tuple[int, int],
+        self,
+        image: Image,
+        new_width: int,
+        new_height: int,
+        new_size: tuple[int, int],
     ) -> None:
         assert image.resize(new_width, new_height)._image.size == new_size
