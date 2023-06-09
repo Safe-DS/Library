@@ -1,6 +1,6 @@
 import pytest
 from safeds.data.tabular.containers import Column
-from safeds.data.tabular.exceptions import NonNumericColumnError
+from safeds.exceptions import NonNumericColumnError
 
 
 @pytest.mark.parametrize(
