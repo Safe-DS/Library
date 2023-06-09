@@ -9,9 +9,6 @@ from PIL.Image import open as open_image
 
 from safeds.data.image.typing import ImageFormat
 
-from safeds.exceptions import (
-    WrongFileExtensionError
-)
 
 class Image:
     """
@@ -168,12 +165,12 @@ class Image:
         result : Image
             The image with the given width and height
         """
+        data = io.BytesIO
         if self._repr_png_() is not None:
-                data = io.BytesIO(self._repr_png_())
+            data = io.BytesIO(self._repr_png_())
         elif self._repr_jpeg_() is not None:
-                data = io.BytesIO(self._repr_jpeg_())
+            data = io.BytesIO(self._repr_jpeg_())
 
         new_image = Image(data, self._format)
         new_image._image = new_image._image.resize((new_width, new_height))
         return new_image
-
