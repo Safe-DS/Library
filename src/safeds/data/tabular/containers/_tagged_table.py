@@ -743,4 +743,3 @@ class TaggedTable(Table):
 
         """
         return super().remove_columns([self.target.name])
-

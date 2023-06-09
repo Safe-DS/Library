@@ -1,5 +1,5 @@
 import pytest
-from safeds.data.tabular.containers import TaggedTable, Table
+from safeds.data.tabular.containers import Table, TaggedTable
 
 
 @pytest.mark.parametrize(
@@ -12,16 +12,16 @@ from safeds.data.tabular.containers import TaggedTable, Table
                         "feature_a": [0, 1, 2],
                         "feature_b": [3, 4, 5],
                         "target": [6, 7, 8],
-                    }
+                    },
                 ),
-                "target"
+                "target",
             ),
             Table(
                 {
                     "feature_a": [0, 1, 2],
                     "feature_b": [3, 4, 5],
-                }
-            )
+                },
+            ),
         ),
     ],
     ids=["normal"],
