@@ -23,6 +23,15 @@ class TestC:
         assert fitted_model._wrapped_regressor.C == 2
         assert isinstance(fitted_model.kernel, SupportVectorMachine.Kernel.Linear)
 
+    def test_should_raise_if_less_than_or_equal_to_0(self) -> None:
+        with pytest.raises(
+            ValueError,
+            match="The parameter 'c' has to be strictly positive.",
+        ):
+            SupportVectorMachine(c=-1)
+
+
+class TestKernel:
     def test_should_get_sklearn_kernel_linear(self) -> None:
         svm = SupportVectorMachine(c=2, kernel=SupportVectorMachine.Kernel.Linear())
         assert isinstance(svm.kernel, SupportVectorMachine.Kernel.Linear)
@@ -66,13 +75,5 @@ class TestC:
 
     def test_should_get_kernel_name_invalid_kernel_type(self) -> None:
         svm = SupportVectorMachine(c=2)
-        svm._kernel = None
         with pytest.raises(TypeError, match="Invalid kernel type."):
             svm._get_kernel_name()
-
-    def test_should_raise_if_less_than_or_equal_to_0(self) -> None:
-        with pytest.raises(
-            ValueError,
-            match="The parameter 'c' has to be strictly positive.",
-        ):
-            SupportVectorMachine(c=-1)
