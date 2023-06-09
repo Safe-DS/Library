@@ -159,7 +159,7 @@ class Image:
     # Transformations
     # ------------------------------------------------------------------------------------------------------------------
 
-    def resize(self, new_width: int, new_height: int) -> Image | None:
+    def resize(self, new_width: int, new_height: int) -> Image:
         """
         Return the resized image
 
