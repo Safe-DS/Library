@@ -1390,22 +1390,13 @@ class Table:
         >>> table = Table.from_dict({"a": [1, 3, 5], "b": [2, 4, 6] })
         >>> new_table = table.sort_rows(lambda row1, row2: 1)
         >>> repr(new_table)
-           a  b
-        0  1  2
-        1  3  4
-        2  5  6
+        '   a  b\\n0  1  2\\n1  3  4\\n2  5  6'
         >>> new_table = table.sort_rows(lambda row1, row2: -1)
         >>> repr(new_table)
-           a  b
-        0  5  6
-        1  3  4
-        2  1  2
+        '   a  b\\n0  5  6\\n1  3  4\\n2  1  2'
         >>> new_table = table.sort_rows(lambda row1, row2: 0)
         >>> repr(new_table)
-           a  b
-        0  1  2
-        1  3  4
-        2  5  6
+        '   a  b\\n0  1  2\\n1  3  4\\n2  5  6'
         """
         rows = self.to_rows()
         rows.sort(key=functools.cmp_to_key(comparator))
