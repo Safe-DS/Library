@@ -166,10 +166,12 @@ class Image:
             The image with the given width and height
         """
         data = io.BytesIO()
-        if self._repr_png_() is not None:
-            data = io.BytesIO(bytes(self._repr_png_()))
-        elif self._repr_jpeg_() is not None:
-            data = io.BytesIO(bytes(self._repr_jpeg_()))
+        repr_png = self._repr_png_()
+        repr_jpeg = self._repr_jpeg_()
+        if repr_png is not None:
+            data = io.BytesIO(repr_png)
+        elif repr_jpeg is not None:
+            data = io.BytesIO(repr_jpeg)
 
         new_image = Image(data, self._format)
         new_image._image = new_image._image.resize((new_width, new_height))
