@@ -66,7 +66,7 @@ class TestC:
 
     def test_should_get_kernel_name_invalid_kernel_type(self) -> None:
         svm = SupportVectorMachine(c=2)
-        svm._kernel = "invalid_kernel_type"
+        svm._kernel = None
         with pytest.raises(TypeError, match="Invalid kernel type."):
             svm._get_kernel_name()
 
