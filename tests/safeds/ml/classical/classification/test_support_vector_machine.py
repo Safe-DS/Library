@@ -51,6 +51,26 @@ class TestC:
         rbf_kernel = svm.kernel.get_sklearn_kernel()
         assert rbf_kernel == "rbf"
 
+    def test_should_get_kernel_name(self) -> None:
+        svm = SupportVectorMachine(c=2, kernel=SupportVectorMachine.Kernel.Linear())
+        assert svm._get_kernel_name() == "linear"
+
+        svm = SupportVectorMachine(c=2, kernel=SupportVectorMachine.Kernel.Polynomial(degree=2))
+        assert svm._get_kernel_name() == "poly"
+
+        svm = SupportVectorMachine(c=2, kernel=SupportVectorMachine.Kernel.Sigmoid())
+        assert svm._get_kernel_name() == "sigmoid"
+
+        svm = SupportVectorMachine(c=2, kernel=SupportVectorMachine.Kernel.RadialBasisFunction())
+        assert svm._get_kernel_name() == "rbf"
+
+    def test_should_get_kernel_name_invalid_kernel_type(self) -> None:
+        svm = SupportVectorMachine(c=2)
+        svm._kernel = "invalid_kernel_type"
+
+        with pytest.raises(TypeError, match="Invalid kernel type."):
+            svm._get_kernel_name()
+
     def test_should_raise_if_less_than_or_equal_to_0(self) -> None:
         with pytest.raises(
             ValueError,
