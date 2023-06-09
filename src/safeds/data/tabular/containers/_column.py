@@ -258,10 +258,7 @@ class Column(Sequence[T]):
         >>> from safeds.data.tabular.containers import Column
         >>> column = Column("test", [1, 2, 3])
         >>> str(column)
-                test
-            0     1
-            1     2
-            2     3
+        "'test': [1, 2, 3]"
         """
         return f"{self._name!r}: {list(self._data)!r}"
 
