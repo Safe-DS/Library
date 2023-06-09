@@ -14,7 +14,14 @@ def test_should_get_column(table1: Table, expected: Column) -> None:
     assert table1.get_column("col1") == expected
 
 
-def test_should_raise_error_if_column_name_unknown() -> None:
-    table = Table({"col1": ["col1_1"], "col2": ["col2_1"]})
+@pytest.mark.parametrize(
+    "table",
+    [
+        (Table({"col1": ["col1_1"], "col2": ["col2_1"]})),
+        (Table()),
+    ],
+    ids=["no col3", "empty"],
+)
+def test_should_raise_error_if_column_name_unknown(table: Table) -> None:
     with pytest.raises(UnknownColumnNameError, match=r"Could not find column\(s\) 'col3'"):
         table.get_column("col3")
