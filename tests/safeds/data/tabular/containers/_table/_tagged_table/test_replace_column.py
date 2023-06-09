@@ -75,6 +75,7 @@ def test_should_replace_column(
     new_table = original_table.replace_column(column_name_to_be_replaced, new_columns)
     assert_that_tagged_tables_are_equal(new_table, result_table)
 
+
 @pytest.mark.parametrize(
     ("original_table", "new_columns", "column_name_to_be_replaced"),
     [
@@ -101,13 +102,13 @@ def test_should_replace_column(
             "target_old",
         ),
     ],
-    ids=["zero_columns", "multiple_columns"]
+    ids=["zero_columns", "multiple_columns"],
 )
 def test_should_throw_illegal_schema_modification(
-    original_table: TaggedTable,
-    new_columns: list[Column],
-    column_name_to_be_replaced: str
+    original_table: TaggedTable, new_columns: list[Column], column_name_to_be_replaced: str,
 ) -> None:
-    with pytest.raises(IllegalSchemaModificationError, match='Target column "target_old" can only be replaced by '
-                                                             'exactly one new column.'):
+    with pytest.raises(
+        IllegalSchemaModificationError,
+        match='Target column "target_old" can only be replaced by exactly one new column.',
+    ):
         original_table.replace_column(column_name_to_be_replaced, new_columns)
