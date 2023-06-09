@@ -8,12 +8,12 @@ from safeds.data.tabular.containers import Column, Table, TaggedTable
 from safeds.exceptions import (
     ColumnLengthMismatchError,
     DatasetContainsTargetError,
-    DatasetMissesFeaturesError,
-    ModelNotFittedError,
-    UntaggedTableError,
-    NonNumericColumnError,
-    MissingValuesColumnError,
     DatasetMissesDataError,
+    DatasetMissesFeaturesError,
+    MissingValuesColumnError,
+    ModelNotFittedError,
+    NonNumericColumnError,
+    UntaggedTableError,
 )
 from safeds.ml.classical.regression import (
     AdaBoost,
@@ -129,11 +129,13 @@ class TestFit:
                 ).tag_columns(target_name="target", feature_names=["feat1", "feat2"]),
                 DatasetMissesDataError,
                 r"Dataset contains no rows",
-            )
+            ),
         ],
-        ids=["non-numerical data", "missing values in data", "no rows in data"]
+        ids=["non-numerical data", "missing values in data", "no rows in data"],
     )
-    def test_should_raise_on_invalid_data(self, regressor: Regressor, invalid_data: TaggedTable, expected_error: Any, expected_error_msg: str) -> None:
+    def test_should_raise_on_invalid_data(
+        self, regressor: Regressor, invalid_data: TaggedTable, expected_error: Any, expected_error_msg: str,
+    ) -> None:
         with pytest.raises(expected_error, match=expected_error_msg):
             regressor.fit(invalid_data)
 
@@ -205,7 +207,12 @@ class TestPredict:
                     },
                 ),
                 NonNumericColumnError,
-                r"Tried to do a numerical operation on one or multiple non-numerical columns: \n\{'feat1'\}\nYou can use the LabelEncoder or OneHotEncoder to transform your non-numerical data to numerical data.\nThe OneHotEncoder should be used if you work with nominal data. If your data contains too many different values\nor is ordinal, you should use the LabelEncoder.",
+                (
+                    r"Tried to do a numerical operation on one or multiple non-numerical columns: \n\{'feat1'\}\nYou"
+                    r" can use the LabelEncoder or OneHotEncoder to transform your non-numerical data to numerical"
+                    r" data.\nThe OneHotEncoder should be used if you work with nominal data. If your data contains too"
+                    r" many different values\nor is ordinal, you should use the LabelEncoder."
+                ),
             ),
             (
                 Table(
@@ -216,7 +223,12 @@ class TestPredict:
                     },
                 ),
                 MissingValuesColumnError,
-                r"Tried to do an operation on one or multiple columns containing missing values: \n\{'feat1'\}\nYou can use the Imputer to replace the missing values based on different strategies.\nIf you want to remove the missing values entirely you can use the method `Table.remove_rows_with_missing_values`.",
+                (
+                    r"Tried to do an operation on one or multiple columns containing missing values: \n\{'feat1'\}\nYou"
+                    r" can use the Imputer to replace the missing values based on different strategies.\nIf you want to"
+                    r" remove the missing values entirely you can use the method"
+                    r" `Table.remove_rows_with_missing_values`."
+                ),
             ),
             (
                 Table(
@@ -228,11 +240,18 @@ class TestPredict:
                 ),
                 DatasetMissesDataError,
                 r"Dataset contains no rows",
-            )
+            ),
         ],
-        ids=["non-numerical data", "missing values in data", "no rows in data"]
+        ids=["non-numerical data", "missing values in data", "no rows in data"],
     )
-    def test_should_raise_on_invalid_data(self, regressor: Regressor, valid_data: TaggedTable, invalid_data: Table, expected_error: Any, expected_error_msg: str) -> None:
+    def test_should_raise_on_invalid_data(
+        self,
+        regressor: Regressor,
+        valid_data: TaggedTable,
+        invalid_data: Table,
+        expected_error: Any,
+        expected_error_msg: str,
+    ) -> None:
         regressor = regressor.fit(valid_data)
         with pytest.raises(expected_error, match=expected_error_msg):
             regressor.predict(invalid_data)
