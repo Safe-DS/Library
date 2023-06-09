@@ -287,7 +287,7 @@ class TaggedTable(Table):
         """
         return TaggedTable._from_table(super().filter_rows(query), target_name=self.target.name)
 
-    def keep_only_columns(self, column_names: list[str]) -> Table:
+    def keep_only_columns(self, column_names: list[str]) -> TaggedTable:
         # TODO: Change return type to TaggedTable (in function definition and in docstring).
         """
         Return a table with only the given column(s).
@@ -301,7 +301,7 @@ class TaggedTable(Table):
 
         Returns
         -------
-        table : Table
+        table : TaggedTable
             A table containing only the given column(s).
 
         Raises
@@ -316,7 +316,7 @@ class TaggedTable(Table):
         #  throw exception if appropriate,
         #  investigate and fix pytest errors.
         # if self.target.name not in column_names:
-        # raise IllegalSchemaModificationError(f'Must keep target column "self.target.name".')
+        # raise IllegalSchemaModificationError(f'Must keep target column and at least one feature column.')
         return super().keep_only_columns(column_names)
 
     def remove_columns(self, column_names: list[str]) -> TaggedTable:
