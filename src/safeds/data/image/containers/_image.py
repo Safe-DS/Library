@@ -168,7 +168,7 @@ class Image:
         result : Image
             The image with the given width and height
         """
-        if self._format.value == ImageFormat.PNG:
+        if self._format == ImageFormat.PNG:
             if self._repr_png_() is not None:
                 data = io.BytesIO(self._repr_png_())
         else:
