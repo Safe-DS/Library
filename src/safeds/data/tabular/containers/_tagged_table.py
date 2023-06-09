@@ -346,9 +346,7 @@ class TaggedTable(Table):
         try:
             return TaggedTable._from_table(super().remove_columns(column_names), self.target.name)
         except UnknownColumnNameError:
-            # TODO: Don't return; throw exception and handle it correctly in tests.
-            # raise ColumnIsTargetError({self.target.name}) from None
-            return super().remove_columns(column_names)
+            raise ColumnIsTargetError(self.target.name) from None
 
     def remove_columns_with_missing_values(self) -> TaggedTable:
         """
