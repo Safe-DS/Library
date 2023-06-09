@@ -22,5 +22,5 @@ def test_should_infer_the_schema(table: Table, expected: Schema) -> None:
 
 
 def test_should_raise_error_if_columns_have_different_lengths() -> None:
-    with pytest.raises(ColumnLengthMismatchError):
+    with pytest.raises(ColumnLengthMismatchError, match=r"The length of at least one column differs: \na: 2\nb: 1"):
         Table({"a": [1, 2], "b": [3]})

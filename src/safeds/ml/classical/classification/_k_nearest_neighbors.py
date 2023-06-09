@@ -43,6 +43,10 @@ class KNearestNeighbors(Classifier):
         self._feature_names: list[str] | None = None
         self._target_name: str | None = None
 
+    @property
+    def number_of_neighbors(self) -> int:
+        return self._number_of_neighbors
+
     def fit(self, training_set: TaggedTable) -> KNearestNeighbors:
         """
         Create a copy of this classifier and fit it with the given training data.
