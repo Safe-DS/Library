@@ -513,7 +513,8 @@ class TaggedTable(Table):
                 )
             else:
                 return TaggedTable._from_table(
-                    super().replace_column(old_column_name, new_columns), new_columns[0].name,
+                    super().replace_column(old_column_name, new_columns),
+                    new_columns[0].name,
                 )
         else:
             return TaggedTable._from_table(super().replace_column(old_column_name, new_columns), self.target.name)
