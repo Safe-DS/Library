@@ -315,7 +315,7 @@ class TaggedTable(Table):
         #  throw exception if appropriate,
         #  investigate and fix pytest errors.
         # if self.target.name not in column_names:
-        # raise IllegalSchemaModificationError(f'Must keep target column and at least one feature column.')
+        # raise IllegalSchemaModificationError("Must keep target column and at least one feature column.")
         return super().keep_only_columns(column_names)
 
     def remove_columns(self, column_names: list[str]) -> TaggedTable:
