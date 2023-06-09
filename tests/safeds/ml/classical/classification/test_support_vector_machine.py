@@ -39,6 +39,18 @@ class TestC:
         poly_kernel = svm.kernel.get_sklearn_kernel()
         assert poly_kernel == "poly"
 
+    def test_should_get_sklearn_kernel_sigmoid(self) -> None:
+        svm = SupportVectorMachine(c=2, kernel=SupportVectorMachine.Kernel.Sigmoid())
+        assert isinstance(svm.kernel, SupportVectorMachine.Kernel.Sigmoid)
+        sigmoid_kernel = svm.kernel.get_sklearn_kernel()
+        assert sigmoid_kernel == "sigmoid"
+
+    def test_should_get_sklearn_kernel_rbf(self) -> None:
+        svm = SupportVectorMachine(c=2, kernel=SupportVectorMachine.Kernel.RadialBasisFunction())
+        assert isinstance(svm.kernel, SupportVectorMachine.Kernel.RadialBasisFunction)
+        rbf_kernel = svm.kernel.get_sklearn_kernel()
+        assert rbf_kernel == "rbf"
+
     def test_should_raise_if_less_than_or_equal_to_0(self) -> None:
         with pytest.raises(
             ValueError,
