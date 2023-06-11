@@ -1,17 +1,32 @@
 from __future__ import annotations
 
+from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
 from sklearn.svm import SVR as sk_SVR  # noqa: N811
 
 from safeds.ml.classical._util_sklearn import fit, predict
-
-from ._regressor import Regressor
+from safeds.ml.classical.regression import Regressor
 
 if TYPE_CHECKING:
     from sklearn.base import RegressorMixin
 
     from safeds.data.tabular.containers import Table, TaggedTable
+
+
+class SupportVectorMachineKernel(ABC):
+    """The abstract base class of the different subclasses supported by the `Kernel`."""
+
+    @abstractmethod
+    def get_sklearn_kernel(self) -> object:
+        """
+        Get the kernel of the given SupportVectorMachine.
+
+        Returns
+        -------
+        object
+        The kernel of the SupportVectorMachine.
+        """
 
 
 class SupportVectorMachine(Regressor):
@@ -22,6 +37,7 @@ class SupportVectorMachine(Regressor):
     ----------
     c: float
         The strength of regularization. Must be strictly positive.
+    kernel: The type of kernel to be used. Defaults to None.
 
     Raises
     ------
@@ -29,7 +45,7 @@ class SupportVectorMachine(Regressor):
         If `c` is less than or equal to 0.
     """
 
-    def __init__(self, *, c: float = 1.0) -> None:
+    def __init__(self, *, c: float = 1.0, kernel: SupportVectorMachineKernel | None = None) -> None:
         # Internal state
         self._wrapped_regressor: sk_SVR | None = None
         self._feature_names: list[str] | None = None
@@ -39,10 +55,49 @@ class SupportVectorMachine(Regressor):
         if c <= 0:
             raise ValueError("The parameter 'c' has to be strictly positive.")
         self._c = c
+        self._kernel = kernel
 
     @property
     def c(self) -> float:
         return self._c
+
+    @property
+    def kernel(self) -> SupportVectorMachineKernel | None:
+        return self._kernel
+
+    class Kernel:
+        class Linear(SupportVectorMachineKernel):
+            def get_sklearn_kernel(self) -> str:
+                return "linear"
+
+        class Polynomial(SupportVectorMachineKernel):
+            def __init__(self, degree: int):
+                if degree < 1:
+                    raise ValueError("The parameter 'degree' has to be greater than or equal to 1.")
+                self._degree = degree
+
+            def get_sklearn_kernel(self) -> str:
+                return "poly"
+
+        class Sigmoid(SupportVectorMachineKernel):
+            def get_sklearn_kernel(self) -> str:
+                return "sigmoid"
+
+        class RadialBasisFunction(SupportVectorMachineKernel):
+            def get_sklearn_kernel(self) -> str:
+                return "rbf"
+
+    def _get_kernel_name(self) -> str:
+        if isinstance(self.kernel, SupportVectorMachine.Kernel.Linear):
+            return "linear"
+        elif isinstance(self.kernel, SupportVectorMachine.Kernel.Polynomial):
+            return "poly"
+        elif isinstance(self.kernel, SupportVectorMachine.Kernel.Sigmoid):
+            return "sigmoid"
+        elif isinstance(self.kernel, SupportVectorMachine.Kernel.RadialBasisFunction):
+            return "rbf"
+        else:
+            raise TypeError("Invalid kernel type.")
 
     def fit(self, training_set: TaggedTable) -> SupportVectorMachine:
         """
@@ -76,7 +131,7 @@ class SupportVectorMachine(Regressor):
         wrapped_regressor = self._get_sklearn_regressor()
         fit(wrapped_regressor, training_set)
 
-        result = SupportVectorMachine(c=self._c)
+        result = SupportVectorMachine(c=self._c, kernel=self._kernel)
         result._wrapped_regressor = wrapped_regressor
         result._feature_names = training_set.features.column_names
         result._target_name = training_set.target.name
