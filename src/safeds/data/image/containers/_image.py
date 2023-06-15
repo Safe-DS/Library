@@ -82,6 +82,30 @@ class Image:
         """
         return self._format
 
+    @property
+    def width(self) -> int:
+        """
+        Get the width of the image in pixels.
+
+        Returns
+        -------
+        width : int
+            The width of the image.
+        """
+        return self._image.width
+
+    @property
+    def height(self) -> int:
+        """
+        Get the height of the image in pixels.
+
+        Returns
+        -------
+        height : int
+            The height of the image.
+        """
+        return self._image.height
+
     # ------------------------------------------------------------------------------------------------------------------
     # Conversion
     # ------------------------------------------------------------------------------------------------------------------
