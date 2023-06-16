@@ -10,6 +10,7 @@ import PIL
 from PIL import ImageFilter
 from PIL import ImageEnhance
 from PIL import ImageFilter, ImageOps
+from PIL import ImageEnhance, ImageFilter
 from PIL.Image import Image as PillowImage
 from PIL.Image import open as open_image
 
@@ -314,7 +315,11 @@ class Image:
         if factor < 0:
             raise ValueError("Brightness factor has to be 0 or bigger")
         elif factor == 1:
-            warnings.warn("Brightness adjustment factor is 1.0, this will not make changes to the image.", UserWarning, stacklevel=2)
+            warnings.warn(
+                "Brightness adjustment factor is 1.0, this will not make changes to the image.",
+                UserWarning,
+                stacklevel=2,
+            )
 
         image_copy = copy.deepcopy(self)
         image_copy._image = ImageEnhance.Brightness(image_copy._image).enhance(factor)
@@ -339,8 +344,9 @@ class Image:
         if factor < 0:
             raise ValueError("Contrast factor has to be 0 or bigger")
         elif factor == 1:
-            warnings.warn("Contrast adjustment factor is 1.0, this will not make changes to the image.", UserWarning,
-                          stacklevel=2)
+            warnings.warn(
+                "Contrast adjustment factor is 1.0, this will not make changes to the image.", UserWarning, stacklevel=2,
+            )
 
         image_copy = copy.deepcopy(self)
         image_copy._image = ImageEnhance.Contrast(image_copy._image).enhance(factor)
