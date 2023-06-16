@@ -221,6 +221,20 @@ class Image:
         new_image._image = new_image._image.resize((new_width, new_height))
         return new_image
 
+    def convert_to_grayscale(self) -> Image:
+        """
+        Convert the image to grayscale.
+
+        Returns
+        -------
+        grayscale_image : Image
+            The grayscale image.
+        """
+        data = io.BytesIO()
+        grayscale_image = self._image.convert("L")
+        grayscale_image.save(data, format=self._format.value)
+        return Image(data, self._format)
+
     def flip_vertically(self) -> Image:
         """
         Flip the image vertically (horizontal axis, flips up-down and vice versa).
@@ -246,3 +260,4 @@ class Image:
         imagecopy = copy.deepcopy(self)
         imagecopy._image = self._image.transpose(PIL.Image.FLIP_LEFT_RIGHT)
         return imagecopy
+
