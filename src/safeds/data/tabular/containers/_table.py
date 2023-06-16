@@ -408,7 +408,7 @@ class Table:
         Compare two 'table' instances.
 
         Returns
-        --------
+        -------
         'True' if contents are equal, 'False' otherwise
 
         Examples
@@ -1249,7 +1249,7 @@ class Table:
             A new table without rows containing outliers.
 
         Examples
-        -------
+        --------
         >>> from safeds.data.tabular.containers import Table
         >>> from safeds.data.tabular.containers import Column
         >>> c1 = Column("a", [1, 3, 1, 0.1, 0, 0, 0, 0, 0])
@@ -1469,7 +1469,7 @@ class Table:
     def sort_columns(
         self,
         comparator: Callable[[Column, Column], int] = lambda col1, col2: (col1.name > col2.name)
-                                                                         - (col1.name < col2.name),
+        - (col1.name < col2.name),
     ) -> Table:
         """
         Sort the columns of a `Table` with the given comparator and return a new `Table`.
@@ -1634,7 +1634,7 @@ class Table:
             If no feature columns are specified.
 
         Examples
-        -------
+        --------
         >>> from safeds.data.tabular.containers._table import Table
         >>> from safeds.data.tabular.containers._tagged_table import Table
         >>> table = Table.from_dict({"item": ["apple", "milk", "beer"], "price": [1.10, 1.19, 1.79], "amount_bought": [74, 72, 51]})
@@ -1916,7 +1916,7 @@ class Table:
             If the table contains only non-numerical columns.
 
         Examples
-        ------
+        --------
         >>> from safeds.data.tabular.containers._table import Table
         >>> table = Table({"a":[1, 2], "b": [3, 42]})
         >>> image = table.plot_boxplots()
@@ -1958,7 +1958,7 @@ class Table:
             The plot as an image.
 
         Examples
-        -------
+        --------
         >>> from safeds.data.tabular.containers._table import Table
         >>> table = Table({"a": [2, 3, 5, 1], "b": [54, 74, 90, 2014]})
         >>> image = table.plot_histograms()
@@ -2128,19 +2128,19 @@ class Table:
 
     def to_columns(self) -> list[Column]:
         """
-        Return a list of the columns.
+         Return a list of the columns.
 
         Returns
         -------
-        columns : list[Columns]
-            List of columns.
+         columns : list[Columns]
+             List of columns.
 
-       Examples
+        Examples
         --------
-        >>> from safeds.data.tabular.containers import Table
-        >>> table = Table.from_dict({"a":[1, 2],"b":[20, 30]})
-        >>> table.to_columns()
-        [Column('a', [1, 2]), Column('b', [20, 30])]
+         >>> from safeds.data.tabular.containers import Table
+         >>> table = Table.from_dict({"a":[1, 2],"b":[20, 30]})
+         >>> table.to_columns()
+         [Column('a', [1, 2]), Column('b', [20, 30])]
         """
         return [self.get_column(name) for name in self._schema.column_names]
 
