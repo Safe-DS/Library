@@ -1,6 +1,10 @@
 import warnings
 
+import pytest
+
 from safeds.data.tabular.containers import Table
+from safeds.exceptions import LearningError, PredictionError
+from safeds.ml.classical._util_sklearn import fit, predict
 from safeds.ml.classical.regression import LinearRegression
 
 
@@ -17,3 +21,23 @@ def test_predict_should_not_warn_about_feature_names() -> None:
     with warnings.catch_warnings():
         warnings.filterwarnings("error", message="X has feature names")
         fitted_model.predict(test_set)
+
+
+class MLModelRaiseValueErrorOnFitAndPredict:
+    def fit(self, x, y):
+        raise ValueError("Raise ValueError (LearningError) in fit for Test")
+
+    def predict(self, x):
+        raise ValueError("Raise ValueError (PredictionError) in predict for Test")
+
+
+def test_should_raise_learning_error():
+    tagged_table = Table({"col1": [1, 2], "col2": [3, 4], "col3": [5, 6]}).tag_columns("col3")
+    with pytest.raises(LearningError, match=r"Error occurred while learning: Raise ValueError \(LearningError\) in fit for Test"):
+        fit(MLModelRaiseValueErrorOnFitAndPredict(), tagged_table)
+
+
+def test_should_raise_prediction_error():
+    table = Table({"col1": [1, 2], "col2": [3, 4]})
+    with pytest.raises(PredictionError, match=r"Error occurred while predicting: Raise ValueError \(PredictionError\) in predict for Test"):
+        predict(MLModelRaiseValueErrorOnFitAndPredict(), table, ["col1", "col2"], "col3")
