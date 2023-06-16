@@ -6,9 +6,9 @@ from pathlib import Path
 from typing import Any, BinaryIO
 
 import PIL
+from PIL import ImageEnhance
 from PIL.Image import Image as PillowImage
 from PIL.Image import open as open_image
-from PIL import ImageEnhance
 
 from safeds.data.image.typing import ImageFormat
 
@@ -253,7 +253,7 @@ class Image:
         Return the sharpened image.
 
         Parameters
-        -------
+        ----------
         factor: The amount of sharpness to be applied to the image.
         Factor 1.0 is considered to be neutral and does not make any changes.
 
