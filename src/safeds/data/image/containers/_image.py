@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import io
 from pathlib import Path
-from typing import BinaryIO, Any
+from typing import Any, BinaryIO
 
 from PIL import ImageFilter
 from PIL.Image import Image as PillowImage
@@ -155,8 +155,6 @@ class Image:
         if not isinstance(other, Image):
             return NotImplemented
         return self._image.tobytes() == other._image.tobytes()
-
-
 
     def _repr_jpeg_(self) -> bytes | None:
         """

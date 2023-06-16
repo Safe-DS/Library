@@ -1,4 +1,3 @@
-import os
 from pathlib import Path
 from tempfile import NamedTemporaryFile
 
@@ -214,7 +213,6 @@ class TestBlur:
         image = Image.from_png_file(resolve_resource_path("image/blurredboy1.png"))
         image2 = Image.from_png_file(resolve_resource_path("image/blurredboy.png"))
         assert image._image == image2._image
-
 
     def test_should_return_blurred_jpg_image(self) -> None:
         image = Image.from_jpeg_file(resolve_resource_path("image/boy.jpg"))
