@@ -242,9 +242,10 @@ class TestEQ:
 class TestFlipVertically:
     def test_should_flip_vertically(self) -> None:
         image = Image.from_png_file(resolve_resource_path("image/original.png"))
-        image = image.flip_vertically()
-        image2 = Image.from_png_file(resolve_resource_path("image/flip_vertically.png"))
-        assert image == image2
+        image2 = image.flip_vertically()
+        image3 = Image.from_png_file(resolve_resource_path("image/flip_vertically.png"))
+        assert image != image2
+        assert image2 == image3
 
     def test_should_be_original(self) -> None:
         image = Image.from_png_file(resolve_resource_path("image/original.png"))
@@ -255,14 +256,65 @@ class TestFlipVertically:
 class TestFlipHorizontally:
     def test_should_flip_horizontally(self) -> None:
         image = Image.from_png_file(resolve_resource_path("image/original.png"))
-        image = image.flip_horizontally()
-        image2 = Image.from_png_file(resolve_resource_path("image/flip_horizontally.png"))
-        assert image == image2
+        image2 = image.flip_horizontally()
+        image3 = Image.from_png_file(resolve_resource_path("image/flip_horizontally.png"))
+        assert image != image2
+        assert image2 == image3
 
     def test_should_be_original(self) -> None:
         image = Image.from_png_file(resolve_resource_path("image/original.png"))
         image2 = image.flip_horizontally().flip_horizontally()
         assert image == image2
+
+
+class TestAdjustContrast:
+    @pytest.mark.parametrize("factor", [0.75, 5])
+    def test_should_adjust_contrast(self, factor: float) -> None:
+        image = Image.from_png_file(resolve_resource_path("image/contrast/to_adjust_contrast.png"))
+        image2 = image.adjust_contrast(factor)
+        image3 = Image.from_png_file(
+            resolve_resource_path("image/contrast/contrast_adjusted_by_" + str(factor) + ".png"),
+        )
+        assert image != image2
+        assert image2 == image3
+
+    def test_should_not_adjust_contrast(self) -> None:
+        with pytest.warns(
+            UserWarning,
+            match="Contrast adjustment factor is 1.0, this will not make changes to the image.",
+        ):
+            image = Image.from_png_file(resolve_resource_path("image/contrast/to_adjust_contrast.png"))
+            image2 = image.adjust_contrast(1)
+            assert image == image2
+
+    def test_should_raise(self) -> None:
+        image = Image.from_png_file(resolve_resource_path("image/brightness/to_brighten.png"))
+        with pytest.raises(ValueError, match="Contrast factor has to be 0 or bigger"):
+            image.adjust_contrast(-1)
+
+
+class TestBrightness:
+    @pytest.mark.parametrize("factor", [0.5, 10])
+    def test_should_adjust_brightness(self, factor: float) -> None:
+        image = Image.from_png_file(resolve_resource_path("image/brightness/to_brighten.png"))
+        image2 = image.adjust_brightness(factor)
+        image3 = Image.from_png_file(resolve_resource_path("image/brightness/brightened_by_" + str(factor) + ".png"))
+        assert image != image2
+        assert image2 == image3
+
+    def test_should_not_brighten(self) -> None:
+        with pytest.warns(
+            UserWarning,
+            match="Brightness adjustment factor is 1.0, this will not make changes to the image.",
+        ):
+            image = Image.from_png_file(resolve_resource_path("image/brightness/to_brighten.png"))
+            image2 = image.adjust_brightness(1)
+            assert image == image2
+
+    def test_should_raise(self) -> None:
+        image = Image.from_png_file(resolve_resource_path("image/brightness/to_brighten.png"))
+        with pytest.raises(ValueError, match="Brightness factor has to be 0 or bigger"):
+            image.adjust_brightness(-1)
 
 
 class TestInvertColors:

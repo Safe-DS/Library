@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import copy
 import io
+import warnings
 from pathlib import Path
 from typing import Any, BinaryIO
 
@@ -273,9 +274,9 @@ class Image:
         result : Image
             The flipped image.
         """
-        imagecopy = copy.deepcopy(self)
-        imagecopy._image = self._image.transpose(PIL.Image.FLIP_TOP_BOTTOM)
-        return imagecopy
+        image_copy = copy.deepcopy(self)
+        image_copy._image = self._image.transpose(PIL.Image.FLIP_TOP_BOTTOM)
+        return image_copy
 
     def flip_horizontally(self) -> Image:
         """
@@ -286,9 +287,69 @@ class Image:
         result : Image
             The flipped image.
         """
-        imagecopy = copy.deepcopy(self)
-        imagecopy._image = self._image.transpose(PIL.Image.FLIP_LEFT_RIGHT)
-        return imagecopy
+        image_copy = copy.deepcopy(self)
+        image_copy._image = self._image.transpose(PIL.Image.FLIP_LEFT_RIGHT)
+        return image_copy
+
+    def adjust_brightness(self, factor: float) -> Image:
+        """
+        Adjust the brightness of an image.
+
+        Parameters
+        ----------
+        factor: float
+            The brightness factor.
+            1.0 will not change the brightness.
+            Below 1.0 will result in a darker image.
+            Above 1.0 will resolut in a brighter image.
+            Has to be bigger than or equal to 0 (black).
+
+        Returns
+        -------
+        result: Image
+            The Image with adjusted brightness.
+        """
+        if factor < 0:
+            raise ValueError("Brightness factor has to be 0 or bigger")
+        elif factor == 1:
+            warnings.warn(
+                "Brightness adjustment factor is 1.0, this will not make changes to the image.",
+                UserWarning,
+                stacklevel=2,
+            )
+
+        image_copy = copy.deepcopy(self)
+        image_copy._image = ImageEnhance.Brightness(image_copy._image).enhance(factor)
+        return image_copy
+
+    def adjust_contrast(self, factor: float) -> Image:
+        """
+        Adjust Contrast of image.
+
+        Parameters
+        ----------
+        factor: float
+            If factor > 1, increase contrast of image.
+            If factor = 1, no changes will be made.
+            If factor < 1, make image greyer.
+            Has to be bigger than or equal to 0 (gray).
+
+        Returns
+        -------
+        New image with adjusted contrast.
+        """
+        if factor < 0:
+            raise ValueError("Contrast factor has to be 0 or bigger")
+        elif factor == 1:
+            warnings.warn(
+                "Contrast adjustment factor is 1.0, this will not make changes to the image.",
+                UserWarning,
+                stacklevel=2,
+            )
+
+        image_copy = copy.deepcopy(self)
+        image_copy._image = ImageEnhance.Contrast(image_copy._image).enhance(factor)
+        return image_copy
 
     def blur(self, radius: int = 1) -> Image:
         """
