@@ -433,17 +433,17 @@ class Table:
         return table1._schema == table2._schema and table1._data.equals(table2._data)
 
     def __repr__(self) -> str:
-        """
-
+        r"""
         Returns
         -------
+        A string representation of the table in only one line.
 
         Examples
         --------
         >>> from safeds.data.tabular.containers import Table
         >>> table = Table.from_dict({"a": [1, 3], "b": [2, 4]})
         >>> repr(table)
-        '   a  b\\n0  1  2\\n1  3  4'
+        '   a  b\n0  1  2\n1  3  4'
         """
         tmp = self._data.copy(deep=True)
         tmp.columns = self.column_names
@@ -1352,7 +1352,7 @@ class Table:
         >>> from safeds.data.tabular.containers import Column
         >>> table = Table.from_dict({"a": [1], "b": [2]})
         >>> new_col = Column("new", [3])
-        >>> new_table = table.replace_column("b", new_col)
+        >>> new_table = table.replace_column("b", [new_col])
         >>> new_table
            a  new
         0  1    3
