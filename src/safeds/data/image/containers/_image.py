@@ -222,6 +222,20 @@ class Image:
         new_image._image = new_image._image.resize((new_width, new_height))
         return new_image
 
+    def convert_to_grayscale(self) -> Image:
+        """
+        Convert the image to grayscale.
+
+        Returns
+        -------
+        grayscale_image : Image
+            The grayscale image.
+        """
+        data = io.BytesIO()
+        grayscale_image = self._image.convert("L")
+        grayscale_image.save(data, format=self._format.value)
+        return Image(data, self._format)
+
     def crop(self, x: int, y: int, width: int, height: int) -> Image:
         """
         Return an image that has been cropped to a given bounding rectangle.
