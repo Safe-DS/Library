@@ -178,7 +178,7 @@ class Image:
 
     def resize(self, new_width: int, new_height: int) -> Image:
         """
-        Resize an image to any size.
+        Return an image that has been resized to a given size.
 
         Returns
         -------
