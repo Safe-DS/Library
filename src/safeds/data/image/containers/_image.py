@@ -248,9 +248,14 @@ class Image:
         imagecopy._image = self._image.transpose(PIL.Image.FLIP_LEFT_RIGHT)
         return imagecopy
 
-    def sharpen(self, factor: int) -> Image:
+    def sharpen(self, factor: float) -> Image:
         """
         Return the sharpened image.
+
+        Parameters
+        -------
+        factor: The amount of sharpness to be applied to the image.
+        Factor 1.0 is considered to be neutral and does not make any changes.
 
         Returns
         -------
