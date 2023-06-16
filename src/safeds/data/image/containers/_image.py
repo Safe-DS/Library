@@ -115,6 +115,24 @@ class Image:
     # IPython integration
     # ------------------------------------------------------------------------------------------------------------------
 
+    def __eq__(self, other: Any) -> bool:
+        """
+        Compare two images.
+
+        Parameters
+        ----------
+        other: The image to compare to.
+
+        Returns
+        -------
+        equals : bool
+            Whether the two images contain equal pixel data.
+
+        """
+        if not isinstance(other, Image):
+            return NotImplemented
+        return self._image.tobytes() == other._image.tobytes()
+
     def _repr_jpeg_(self) -> bytes | None:
         """
         Return a JPEG image as bytes.
