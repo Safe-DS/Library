@@ -378,6 +378,24 @@ class Image:
         new_image._image = new_image._image.filter(ImageFilter.BoxBlur(radius))
         return new_image
 
+    def sharpen(self, factor: float) -> Image:
+        """
+        Return the sharpened image.
+
+        Parameters
+        ----------
+        factor: The amount of sharpness to be applied to the image.
+        Factor 1.0 is considered to be neutral and does not make any changes.
+
+        Returns
+        -------
+        result : Image
+            The image sharpened by the given factor.
+        """
+        image_copy = copy.deepcopy(self)
+        image_copy._image = ImageEnhance.Sharpness(image_copy._image).enhance(factor)
+        return image_copy
+
     def invert_colors(self) -> Image:
         """
         Return the image with inverted colors.
