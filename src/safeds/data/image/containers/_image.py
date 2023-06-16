@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import io
 from pathlib import Path
-from typing import BinaryIO
+from typing import BinaryIO, Any
 
 from PIL import ImageFilter
 from PIL.Image import Image as PillowImage
@@ -115,7 +115,7 @@ class Image:
     # IPython integration
     # ------------------------------------------------------------------------------------------------------------------
 
-    def __eq__(self, other: Any) -> bool:
+    def __eq__(self, other: Image) -> bool:
         """
         Compare two images.
 
@@ -127,11 +127,10 @@ class Image:
         -------
         equals : bool
             Whether the two images contain equal pixel data.
-
         """
-        if not isinstance(other, Image):
-            return NotImplemented
         return self._image.tobytes() == other._image.tobytes()
+
+
 
     def _repr_jpeg_(self) -> bytes | None:
         """
