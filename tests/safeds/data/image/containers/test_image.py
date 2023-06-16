@@ -284,9 +284,9 @@ class TestAdjustContrast:
             image2 = image.adjust_contrast(1)
             assert image == image2
 
-    def test_should_raise(self):
+    def test_should_raise(self) -> None:
+        image = Image.from_png_file(resolve_resource_path("image/brightness/to_brighten.png"))
         with pytest.raises(ValueError, match="Contrast factor has to be 0 or bigger"):
-            image = Image.from_png_file(resolve_resource_path("image/brightness/to_brighten.png"))
             image.adjust_contrast(-1)
 
 
@@ -305,9 +305,9 @@ class TestBrightness:
             image2 = image.adjust_brightness(1)
             assert image == image2
 
-    def test_should_raise(self):
+    def test_should_raise(self) -> None:
+        image = Image.from_png_file(resolve_resource_path("image/brightness/to_brighten.png"))
         with pytest.raises(ValueError, match="Brightness factor has to be 0 or bigger"):
-            image = Image.from_png_file(resolve_resource_path("image/brightness/to_brighten.png"))
             image.adjust_brightness(-1)
 
 
