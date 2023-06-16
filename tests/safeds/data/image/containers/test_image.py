@@ -317,7 +317,6 @@ class TestBrightness:
             image.adjust_brightness(-1)
 
 
-
 class TestInvertColors:
     def test_should_invert_colors_png(self) -> None:
         image = Image.from_png_file(resolve_resource_path("image/original.png"))
