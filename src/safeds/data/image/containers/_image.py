@@ -196,6 +196,7 @@ class Image:
         self._image.save(buffer, format="png")
         buffer.seek(0)
         return buffer.read()
+
     # ------------------------------------------------------------------------------------------------------------------
     # Transformations
     # ------------------------------------------------------------------------------------------------------------------
@@ -234,7 +235,7 @@ class Image:
         grayscale_image = self._image.convert("L")
         grayscale_image.save(data, format=self._format.value)
         return Image(data, self._format)
-      
+
     def crop(self, x: int, y: int, width: int, height: int) -> Image:
         """
         Return an image that has been cropped to a given bounding rectangle.
