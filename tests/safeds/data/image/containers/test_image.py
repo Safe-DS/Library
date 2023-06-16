@@ -208,7 +208,7 @@ class TestFlipVertically:
         image2 = Image.from_png_file(resolve_resource_path("image/flip_vertically.png"))
         assert image == image2
 
-    def test_should_be_original(self):
+    def test_should_be_original(self) -> None:
         image = Image.from_png_file(resolve_resource_path("image/original.png"))
         image2 = image.flip_vertically().flip_vertically()
         assert image == image2
@@ -221,7 +221,8 @@ class TestFlipHorizontally:
         image2 = Image.from_png_file(resolve_resource_path("image/flip_horizontally.png"))
         assert image == image2
 
-    def test_should_should_be_original(self):
+    def test_should_should_be_original(self) -> None:
         image = Image.from_png_file(resolve_resource_path("image/original.png"))
         image2 = image.flip_horizontally().flip_horizontally()
         assert image == image2
+
