@@ -182,13 +182,14 @@ class TestResize:
     ) -> None:
         assert image.resize(new_width, new_height)._image.size == new_size
 
+
 class TestRotate:
     @pytest.mark.parametrize(
         ("image", "expected"),
         [
             (
                 Image.from_png_file(resolve_resource_path("image/snapshot_boxplot.png")),
-                Image.from_png_file(resolve_resource_path("image/snapshot_boxplot_right_rotation.png"))
+                Image.from_png_file(resolve_resource_path("image/snapshot_boxplot_right_rotation.png")),
             ),
         ],
         ids=["snapshot_boxplot"],
@@ -205,7 +206,7 @@ class TestRotate:
         [
             (
                 Image.from_png_file(resolve_resource_path("image/snapshot_boxplot.png")),
-                Image.from_png_file(resolve_resource_path("image/snapshot_boxplot_left_rotation.png"))
+                Image.from_png_file(resolve_resource_path("image/snapshot_boxplot_left_rotation.png")),
             ),
         ],
         ids=["snapshot_boxplot"],
