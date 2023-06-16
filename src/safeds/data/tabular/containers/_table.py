@@ -405,6 +405,12 @@ class Table:
 
     def __eq__(self, other: Any) -> bool:
         """
+        Compare two 'table' instances.
+
+        Returns
+        --------
+        'True' if contents are equal, 'False' otherwise
+
         Examples
         --------
         >>> from safeds.data.tabular.containers import Table
@@ -434,6 +440,8 @@ class Table:
 
     def __repr__(self) -> str:
         r"""
+        Display the table in only one line.
+
         Returns
         -------
         A string representation of the table in only one line.
