@@ -154,23 +154,30 @@ class TestReprPng:
         assert image._repr_png_() is None
 
 
-class TestProperties:
+class TestResize:
     @pytest.mark.parametrize(
-        ("image", "width", "height"),
+        ("image", "new_width", "new_height", "new_size"),
         [
             (
                 Image.from_jpeg_file(resolve_resource_path("image/white_square.jpg")),
-                1,
-                1,
+                2,
+                3,
+                (2, 3),
             ),
             (
-                Image.from_png_file(resolve_resource_path("image/snapshot_boxplot.png")),
-                640,
-                480,
+                Image.from_png_file(resolve_resource_path("image/white_square.png")),
+                2,
+                3,
+                (2, 3),
             ),
         ],
-        ids=["[1,1].jpg", "[640,480].png"],
+        ids=[".jpg", ".png"],
     )
-    def test_should_return_image_properties(self, image: Image, width: int, height: int) -> None:
-        assert image.width == width
-        assert image.height == height
+    def test_should_return_resized_image(
+        self,
+        image: Image,
+        new_width: int,
+        new_height: int,
+        new_size: tuple[int, int],
+    ) -> None:
+        assert image.resize(new_width, new_height)._image.size == new_size
