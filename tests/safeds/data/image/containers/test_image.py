@@ -256,7 +256,9 @@ class TestAdjustContrast:
     def test_should_adjust_contrast(self, factor: float) -> None:
         image = Image.from_png_file(resolve_resource_path("image/contrast/to_adjust_contrast.png"))
         image2 = image.adjust_contrast(factor)
-        image3 = Image.from_png_file(resolve_resource_path("image/contrast/contrast_adjusted_by_" + str(factor) + ".png"))
+        image3 = Image.from_png_file(
+            resolve_resource_path("image/contrast/contrast_adjusted_by_" + str(factor) + ".png"),
+        )
         assert image != image2
         assert image2 == image3
 
@@ -264,6 +266,7 @@ class TestAdjustContrast:
         image = Image.from_png_file(resolve_resource_path("image/contrast/to_adjust_contrast.png"))
         image2 = image.adjust_contrast(1)
         assert image == image2
+
 
 class TestBrightness:
     @pytest.mark.parametrize("factor", [-1, 0.5, 10])
@@ -278,6 +281,7 @@ class TestBrightness:
         image = Image.from_png_file(resolve_resource_path("image/brightness/to_brighten.png"))
         image2 = image.adjust_brightness(1)
         assert image == image2
+
 
 class TestCrop:
     def test_should_crop_jpg_image(self) -> None:
