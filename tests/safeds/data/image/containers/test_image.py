@@ -256,7 +256,9 @@ class TestAdjustContrast:
     def test_should_adjust_contrast(self, factor: float) -> None:
         image = Image.from_png_file(resolve_resource_path("image/contrast/to_adjust_contrast.png"))
         image2 = image.adjust_contrast(factor)
-        image3 = Image.from_png_file(resolve_resource_path("image/contrast/contrast_adjusted_by_" + str(factor) + ".png"))
+        image3 = Image.from_png_file(
+            resolve_resource_path("image/contrast/contrast_adjusted_by_" + str(factor) + ".png"),
+        )
         assert image != image2
         assert image2 == image3
 
@@ -270,6 +272,7 @@ class TestAdjustContrast:
         with pytest.raises(ValueError, match="Contrast factor has to be 0 or bigger"):
             image = Image.from_png_file(resolve_resource_path("image/brightness/to_brighten.png"))
             image.adjust_contrast(-1)
+
 
 class TestBrightness:
     @pytest.mark.parametrize("factor", [0.5, 10])
@@ -290,6 +293,7 @@ class TestBrightness:
         with pytest.raises(ValueError, match="Brightness factor has to be 0 or bigger"):
             image = Image.from_png_file(resolve_resource_path("image/brightness/to_brighten.png"))
             image.adjust_brightness(-1)
+
 
 
 class TestCrop:
