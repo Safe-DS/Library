@@ -183,12 +183,12 @@ class TestResize:
         assert image.resize(new_width, new_height)._image.size == new_size
 
 class TestEQ:
-    def test_should_be_equal(self):
+    def test_should_be_equal(self) -> None:
         image = Image.from_png_file(resolve_resource_path("image/original.png"))
         image2 = Image.from_png_file(resolve_resource_path("image/copy.png"))
         assert image == image2
 
-    def test_should_not_be_equal(self):
+    def test_should_not_be_equal(self) -> None:
         image = Image.from_png_file(resolve_resource_path("image/original.png"))
         image2 = Image.from_png_file(resolve_resource_path("image/white_square.png"))
         assert image != image2
