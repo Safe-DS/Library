@@ -193,7 +193,7 @@ class TestRotate:
             ),
             (
                 Image.from_jpeg_file(resolve_resource_path("image/snapshot_boxplot.jpg")),
-                Image.from_jpeg_file(resolve_resource_path("image/snapshot_boxplot_right_rotation.jpg"))
+                Image.from_jpeg_file(resolve_resource_path("image/snapshot_boxplot_right_rotation.jpg")),
             ),
         ],
         ids=["snapshot_boxplot", "snapshot_boxplot.jpg"],
@@ -217,7 +217,7 @@ class TestRotate:
             ),
             (
                 Image.from_jpeg_file(resolve_resource_path("image/snapshot_boxplot.jpg")),
-                Image.from_jpeg_file(resolve_resource_path("image/snapshot_boxplot_left_rotation.jpg"))
+                Image.from_jpeg_file(resolve_resource_path("image/snapshot_boxplot_left_rotation.jpg")),
             ),
         ],
         ids=["snapshot_boxplot.png", "snapshot_boxplot.jpg"],
@@ -231,4 +231,3 @@ class TestRotate:
             assert image.rotate_left()._repr_png_() == expected._repr_png_()
         else:
             assert image.rotate_left()._repr_jpeg_() == expected._repr_jpeg_()
-
