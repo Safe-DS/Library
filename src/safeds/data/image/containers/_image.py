@@ -221,6 +221,34 @@ class Image:
         new_image._image = new_image._image.resize((new_width, new_height))
         return new_image
 
+    def crop(self, x: int, y: int, width: int, height: int) -> Image:
+        """
+        Return an image that has been cropped to a given bounding rectangle.
+
+        Parameters
+        ----------
+        x: the x coordinate of the top-left corner of the bounding rectangle
+        y: the y coordinate of the top-left corner of the bounding rectangle
+        width:  the width of the bounding rectangle
+        height:  the height of the bounding rectangle
+
+        Returns
+        -------
+        result : Image
+            The image with the
+        """
+        data = io.BytesIO()
+        repr_png = self._repr_png_()
+        repr_jpeg = self._repr_jpeg_()
+        if repr_png is not None:
+            data = io.BytesIO(repr_png)
+        elif repr_jpeg is not None:
+            data = io.BytesIO(repr_jpeg)
+
+        new_image = Image(data, self._format)
+        new_image._image = new_image._image.crop((x, y, (x + width), (y + height)))
+        return new_image
+
     def flip_vertically(self) -> Image:
         """
         Flip the image vertically (horizontal axis, flips up-down and vice versa).
