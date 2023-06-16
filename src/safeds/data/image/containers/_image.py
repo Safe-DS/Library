@@ -8,6 +8,7 @@ from typing import Any, BinaryIO
 import PIL
 from PIL import ImageFilter
 from PIL import ImageEnhance
+from PIL import ImageFilter, ImageOps
 from PIL.Image import Image as PillowImage
 from PIL.Image import open as open_image
 
@@ -335,3 +336,24 @@ class Image:
         image_copy = copy.deepcopy(self)
         image_copy._image = ImageEnhance.Sharpness(image_copy._image).enhance(factor)
         return image_copy
+
+    def invert_colors(self) -> Image:
+        """
+        Return the image with inverted colors.
+
+        Returns
+        -------
+        result : Image
+            The image with inverted colors.
+        """
+        data = io.BytesIO()
+        repr_png = self._repr_png_()
+        repr_jpeg = self._repr_jpeg_()
+        if repr_png is not None:
+            data = io.BytesIO(repr_png)
+        elif repr_jpeg is not None:
+            data = io.BytesIO(repr_jpeg)
+
+        new_image = Image(data, self._format)
+        new_image._image = ImageOps.invert(new_image._image)
+        return new_image
