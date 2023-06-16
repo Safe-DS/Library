@@ -28,6 +28,7 @@ from safeds.exceptions import SchemaMismatchError
     ids=["empty", "non-empty"],
 )
 def test_should_create_table_from_rows(rows: list[Row], expected: Table) -> None:
+    assert Table.from_rows(rows).schema == expected.schema
     assert Table.from_rows(rows) == expected
 
 
