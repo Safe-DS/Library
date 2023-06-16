@@ -181,3 +181,28 @@ class TestResize:
         new_size: tuple[int, int],
     ) -> None:
         assert image.resize(new_width, new_height)._image.size == new_size
+
+class TestEQ:
+    def test_should_be_equal(self):
+        image = Image.from_png_file(resolve_resource_path("image/original.png"))
+        image2 = Image.from_png_file(resolve_resource_path("image/copy.png"))
+        assert image == image2
+
+    def test_should_not_be_equal(self):
+        image = Image.from_png_file(resolve_resource_path("image/original.png"))
+        image2 = Image.from_png_file(resolve_resource_path("image/white_square.png"))
+        assert image != image2
+
+
+class TestFlip:
+    def test_should_flip_vertically(self):
+        image = Image.from_png_file(resolve_resource_path("image/original.png"))
+        image = image.flip_image_vertically()
+        image2 = Image.from_png_file(resolve_resource_path("image/flip_vertically.png"))
+        assert image == image2
+
+    def test_should_flip_horizontally(self):
+        image = Image.from_png_file(resolve_resource_path("image/original.png"))
+        image = image.flip_image_horizontally()
+        image2 = Image.from_png_file(resolve_resource_path("image/flip_horizontally.png"))
+        assert image == image2
