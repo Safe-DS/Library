@@ -314,3 +314,20 @@ class TestCrop:
         image = image.crop(0, 0, 100, 100)
         image2 = Image.from_png_file(resolve_resource_path("image/whiteCropped.png"))
         assert image == image2
+
+
+class TestSharpen:
+    @pytest.mark.parametrize("factor", [-1, 0.5, 10])
+    def test_should_sharpen(self, factor: float) -> None:
+        image = Image.from_png_file(resolve_resource_path("image/sharpen/to_sharpen.png"))
+        image2 = image.sharpen(factor)
+        image2.to_png_file(resolve_resource_path("image/sharpen/sharpened_by_" + str(factor) + ".png"))
+        assert image != image2
+        assert image2 == Image.from_png_file(
+            resolve_resource_path("image/sharpen/sharpened_by_" + str(factor) + ".png"),
+        )
+
+    def test_should_not_sharpen(self) -> None:
+        image = Image.from_png_file(resolve_resource_path("image/sharpen/to_sharpen.png"))
+        image2 = image.sharpen(1)
+        assert image == image2
