@@ -7,6 +7,7 @@ from safeds.exceptions._data import (
     DuplicateColumnNameError,
     IllegalSchemaModificationError,
     IndexOutOfBoundsError,
+    MissingValuesColumnError,
     NonNumericColumnError,
     SchemaMismatchError,
     TransformerNotFittedError,
@@ -16,6 +17,7 @@ from safeds.exceptions._data import (
 )
 from safeds.exceptions._ml import (
     DatasetContainsTargetError,
+    DatasetMissesDataError,
     DatasetMissesFeaturesError,
     LearningError,
     ModelNotFittedError,
@@ -25,20 +27,22 @@ from safeds.exceptions._ml import (
 
 __all__ = [
     # Data exceptions
+    "ColumnIsTargetError",
     "ColumnLengthMismatchError",
     "ColumnSizeError",
     "DuplicateColumnNameError",
+    "IllegalSchemaModificationError",
     "IndexOutOfBoundsError",
+    "MissingValuesColumnError",
     "NonNumericColumnError",
     "SchemaMismatchError",
     "TransformerNotFittedError",
     "UnknownColumnNameError",
     "ValueNotPresentWhenFittedError",
     "WrongFileExtensionError",
-    "IllegalSchemaModificationError",
-    "ColumnIsTargetError",
     # ML exceptions
     "DatasetContainsTargetError",
+    "DatasetMissesDataError",
     "DatasetMissesFeaturesError",
     "LearningError",
     "ModelNotFittedError",

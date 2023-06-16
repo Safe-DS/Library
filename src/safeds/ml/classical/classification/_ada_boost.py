@@ -90,6 +90,14 @@ class AdaBoost(Classifier):
         ------
         LearningError
             If the training data contains invalid values or if the training failed.
+        UntaggedTableError
+            If the table is untagged.
+        NonNumericColumnError
+            If the training data contains non-numerical values.
+        MissingValuesColumnError
+            If the training data contains missing values.
+        DatasetMissesDataError
+            If the training data contains no rows.
         """
         wrapped_classifier = self._get_sklearn_classifier()
         fit(wrapped_classifier, training_set)
@@ -129,6 +137,12 @@ class AdaBoost(Classifier):
             If the dataset misses feature columns.
         PredictionError
             If predicting with the given dataset failed.
+        NonNumericColumnError
+            If the dataset contains non-numerical values.
+        MissingValuesColumnError
+            If the dataset contains missing values.
+        DatasetMissesDataError
+            If the dataset contains no rows.
         """
         return predict(self._wrapped_classifier, dataset, self._feature_names, self._target_name)
 
