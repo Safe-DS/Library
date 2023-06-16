@@ -2,7 +2,6 @@ import warnings
 from typing import Any
 
 import pytest
-
 from safeds.data.tabular.containers import Table
 from safeds.exceptions import LearningError, PredictionError
 from safeds.ml.classical._util_sklearn import fit, predict
@@ -41,11 +40,16 @@ class MLModelRaiseValueErrorOnFitAndPredict:
 
 def test_should_raise_learning_error() -> None:
     tagged_table = Table({"col1": [1, 2], "col2": [3, 4], "col3": [5, 6]}).tag_columns("col3")
-    with pytest.raises(LearningError, match=r"Error occurred while learning: Raise ValueError \(LearningError\) in fit for Test"):
+    with pytest.raises(
+        LearningError, match=r"Error occurred while learning: Raise ValueError \(LearningError\) in fit for Test",
+    ):
         fit(MLModelRaiseValueErrorOnFitAndPredict(), tagged_table)
 
 
 def test_should_raise_prediction_error() -> None:
     table = Table({"col1": [1, 2], "col2": [3, 4]})
-    with pytest.raises(PredictionError, match=r"Error occurred while predicting: Raise ValueError \(PredictionError\) in predict for Test"):
+    with pytest.raises(
+        PredictionError,
+        match=r"Error occurred while predicting: Raise ValueError \(PredictionError\) in predict for Test",
+    ):
         predict(MLModelRaiseValueErrorOnFitAndPredict(), table, ["col1", "col2"], "col3")
