@@ -10,6 +10,7 @@ import PIL
 from PIL import ImageFilter
 from PIL import ImageEnhance
 from PIL import ImageFilter, ImageOps
+from PIL import ImageEnhance, ImageFilter
 from PIL.Image import Image as PillowImage
 from PIL.Image import open as open_image
 
@@ -304,17 +305,21 @@ class Image:
             1.0 will not change the brightness.
             Below 1.0 will result in a darker image.
             Above 1.0 will resolut in a brighter image.
-            Has to be bigger than 0.
+            Has to be bigger than or equal to 0 (black).
 
         Returns
         -------
         result: Image
-            The adjusted image.
+            The Image with adjusted brightness.
         """
         if factor < 0:
             raise ValueError("Brightness factor has to be 0 or bigger")
         elif factor == 1:
-            warnings.warn("Brightness adjustment factor is 1.0, this will not make changes to the image.", UserWarning, stacklevel=2)
+            warnings.warn(
+                "Brightness adjustment factor is 1.0, this will not make changes to the image.",
+                UserWarning,
+                stacklevel=2,
+            )
 
         image_copy = copy.deepcopy(self)
         image_copy._image = ImageEnhance.Brightness(image_copy._image).enhance(factor)
@@ -330,7 +335,7 @@ class Image:
             If factor > 1, increase contrast of image.
             If factor = 1, no changes will be made.
             If factor < 1, make image greyer.
-            Has to be bigger than 0.
+            Has to be bigger than or equal to 0 (gray).
 
         Returns
         -------
@@ -339,8 +344,9 @@ class Image:
         if factor < 0:
             raise ValueError("Contrast factor has to be 0 or bigger")
         elif factor == 1:
-            warnings.warn("Contrast adjustment factor is 1.0, this will not make changes to the image.", UserWarning,
-                          stacklevel=2)
+            warnings.warn(
+                "Contrast adjustment factor is 1.0, this will not make changes to the image.", UserWarning, stacklevel=2,
+            )
 
         image_copy = copy.deepcopy(self)
         image_copy._image = ImageEnhance.Contrast(image_copy._image).enhance(factor)
