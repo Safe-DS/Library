@@ -247,3 +247,11 @@ class TestFlipHorizontally:
         image = Image.from_png_file(resolve_resource_path("image/original.png"))
         image2 = image.flip_horizontally().flip_horizontally()
         assert image == image2
+
+
+class TestInvertColors:
+    def test_should_invert_colors(self) -> None:
+        image = Image.from_png_file(resolve_resource_path("image/original.png"))
+        image = image.invert_colors()
+        image2 = Image.from_png_file(resolve_resource_path("image/inverted_colors_original.png"))
+        assert image == image2
