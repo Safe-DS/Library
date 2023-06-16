@@ -169,4 +169,3 @@ class TestProperties:
     def test_should_return_image_properties(self, image: Image, width: int, height: int) -> None:
         assert image._image.width == width
         assert image._image.height == height
-
