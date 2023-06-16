@@ -81,7 +81,7 @@ def fit(model: Any, tagged_table: TaggedTable) -> None:
 
 
 # noinspection PyProtectedMember
-def predict(model: Any, dataset: Table, feature_names: list[str], target_name: str) -> TaggedTable:
+def predict(model: Any, dataset: Table, feature_names: list[str] | None, target_name: str | None) -> TaggedTable:
     """
     Predict a target vector using a dataset containing feature vectors. The model has to be trained first.
 
@@ -91,9 +91,9 @@ def predict(model: Any, dataset: Table, feature_names: list[str], target_name: s
         Classifier or regressor from scikit-learn.
     dataset : Table
         The dataset containing the features.
-    target_name : str
+    target_name : Optional[str]
         The name of the target column.
-    feature_names : list[str]
+    feature_names : Optional[list[str]]
         The names of the feature columns.
 
     Returns
