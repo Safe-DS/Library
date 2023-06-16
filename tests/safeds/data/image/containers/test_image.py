@@ -250,7 +250,7 @@ class TestFlipHorizontally:
 
 
 class TestSharpen:
-    @pytest.mark.parametrize("factor", [2, 25])
+    @pytest.mark.parametrize("factor", [-1, 0.5, 2, 25])
     def test_should_sharpen(self, factor: int) -> None:
         image = Image.from_png_file(resolve_resource_path("image/sharpen/to_sharpen.png"))
         image2 = image.sharpen(factor)
