@@ -55,6 +55,28 @@ class TestFormat:
         assert image.format == format_
 
 
+class TestProperties:
+    @pytest.mark.parametrize(
+        ("image", "width", "height"),
+        [
+            (
+                Image.from_jpeg_file(resolve_resource_path("image/white_square.jpg")),
+                1,
+                1,
+            ),
+            (
+                Image.from_png_file(resolve_resource_path("image/snapshot_boxplot.png")),
+                640,
+                480,
+            ),
+        ],
+        ids=["[1,1].jpg", "[640,480].png"],
+    )
+    def test_should_return_image_properties(self, image: Image, width: int, height: int) -> None:
+        assert image.width == width
+        assert image.height == height
+
+
 class TestToJpegFile:
     @pytest.mark.parametrize(
         "path",
