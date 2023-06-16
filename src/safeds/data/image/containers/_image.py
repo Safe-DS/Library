@@ -231,9 +231,9 @@ class Image:
         result : Image
             The flipped image.
         """
-        imagecopy = copy.deepcopy(self)
-        imagecopy._image = self._image.transpose(PIL.Image.FLIP_TOP_BOTTOM)
-        return imagecopy
+        image_copy = copy.deepcopy(self)
+        image_copy._image = self._image.transpose(PIL.Image.FLIP_TOP_BOTTOM)
+        return image_copy
 
     def flip_horizontally(self) -> Image:
         """
@@ -244,16 +244,16 @@ class Image:
         result : Image
             The flipped image.
         """
-        imagecopy = copy.deepcopy(self)
-        imagecopy._image = self._image.transpose(PIL.Image.FLIP_LEFT_RIGHT)
-        return imagecopy
+        image_copy = copy.deepcopy(self)
+        image_copy._image = self._image.transpose(PIL.Image.FLIP_LEFT_RIGHT)
+        return image_copy
 
     def adjust_brightness(self, factor: float) -> Image:
         """
         Adjust the brightness of an image.
 
         Parameters
-        -------
+        ----------
         factor: float
             The brightness factor.
             1.0 will not change the brightness.
@@ -267,4 +267,24 @@ class Image:
         """
         image_copy = copy.deepcopy(self)
         image_copy._image = ImageEnhance.Brightness(image_copy._image).enhance(factor)
+        return image_copy
+
+    def adjust_contrast(self, factor: float) -> Image:
+        """
+        Adjust Contrast of image.
+
+        Parameters
+        ----------
+        factor: float
+            If factor > 1, increase contrast of image.
+            If 0 < factor < 1, make image greyer.
+            If factor < 0, decrease contrast of image.
+
+
+        Returns
+        -------
+        New image with adjusted contrast.
+        """
+        image_copy = copy.deepcopy(self)
+        image_copy._image = ImageEnhance.Contrast(image_copy._image).enhance(factor)
         return image_copy
