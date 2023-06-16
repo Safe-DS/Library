@@ -280,7 +280,8 @@ class TestAdjustContrast:
 
     def test_should_not_adjust_contrast(self) -> None:
         with pytest.warns(
-            UserWarning, match="Contrast adjustment factor is 1.0, this will not make changes to the image.",
+            UserWarning,
+            match="Contrast adjustment factor is 1.0, this will not make changes to the image.",
         ):
             image = Image.from_png_file(resolve_resource_path("image/contrast/to_adjust_contrast.png"))
             image2 = image.adjust_contrast(1)
@@ -303,7 +304,8 @@ class TestBrightness:
 
     def test_should_not_brighten(self) -> None:
         with pytest.warns(
-            UserWarning, match="Brightness adjustment factor is 1.0, this will not make changes to the image.",
+            UserWarning,
+            match="Brightness adjustment factor is 1.0, this will not make changes to the image.",
         ):
             image = Image.from_png_file(resolve_resource_path("image/brightness/to_brighten.png"))
             image2 = image.adjust_brightness(1)

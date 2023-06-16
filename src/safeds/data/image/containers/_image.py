@@ -11,6 +11,7 @@ from PIL import ImageFilter
 from PIL import ImageEnhance
 from PIL import ImageFilter, ImageOps
 from PIL import ImageEnhance, ImageFilter
+from PIL import ImageEnhance, ImageFilter, ImageOps
 from PIL.Image import Image as PillowImage
 from PIL.Image import open as open_image
 
@@ -345,7 +346,9 @@ class Image:
             raise ValueError("Contrast factor has to be 0 or bigger")
         elif factor == 1:
             warnings.warn(
-                "Contrast adjustment factor is 1.0, this will not make changes to the image.", UserWarning, stacklevel=2,
+                "Contrast adjustment factor is 1.0, this will not make changes to the image.",
+                UserWarning,
+                stacklevel=2,
             )
 
         image_copy = copy.deepcopy(self)
