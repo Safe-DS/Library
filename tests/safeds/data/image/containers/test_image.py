@@ -216,7 +216,6 @@ class TestConvertToGrayscale:
             ),
         ],
         ids=["grayscale"],
-
     )
     def test_convert_to_grayscale(self, image: Image, expected: Image) -> None:
         grayscale_image = image.convert_to_grayscale()
