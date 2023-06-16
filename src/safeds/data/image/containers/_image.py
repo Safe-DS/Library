@@ -9,6 +9,7 @@ import PIL
 from PIL import ImageFilter
 from PIL import ImageEnhance
 from PIL import ImageFilter, ImageOps
+from PIL import ImageEnhance, ImageFilter
 from PIL.Image import Image as PillowImage
 from PIL.Image import open as open_image
 
