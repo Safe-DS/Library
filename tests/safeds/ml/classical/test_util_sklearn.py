@@ -24,20 +24,27 @@ def test_predict_should_not_warn_about_feature_names() -> None:
 
 
 class MLModelRaiseValueErrorOnFitAndPredict:
-    def fit(self, x, y):
+    x, y = None, None
+
+    def fit(self, x, y) -> None:
+        # The Linter does not want unnecessary parameters, so we just assign them to the class values
+        self.x = x
+        self.y = y
         raise ValueError("Raise ValueError (LearningError) in fit for Test")
 
-    def predict(self, x):
+    def predict(self, x) -> None:
+        # The Linter does not want unnecessary parameters, so we just assign it to the class value
+        self.x = x
         raise ValueError("Raise ValueError (PredictionError) in predict for Test")
 
 
-def test_should_raise_learning_error():
+def test_should_raise_learning_error() -> None:
     tagged_table = Table({"col1": [1, 2], "col2": [3, 4], "col3": [5, 6]}).tag_columns("col3")
     with pytest.raises(LearningError, match=r"Error occurred while learning: Raise ValueError \(LearningError\) in fit for Test"):
         fit(MLModelRaiseValueErrorOnFitAndPredict(), tagged_table)
 
 
-def test_should_raise_prediction_error():
+def test_should_raise_prediction_error() -> None:
     table = Table({"col1": [1, 2], "col2": [3, 4]})
     with pytest.raises(PredictionError, match=r"Error occurred while predicting: Raise ValueError \(PredictionError\) in predict for Test"):
         predict(MLModelRaiseValueErrorOnFitAndPredict(), table, ["col1", "col2"], "col3")
