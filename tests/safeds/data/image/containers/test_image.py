@@ -152,3 +152,32 @@ class TestReprPng:
     )
     def test_should_return_none_if_image_is_not_png(self, image: Image) -> None:
         assert image._repr_png_() is None
+
+
+class TestResize:
+    @pytest.mark.parametrize(
+        ("image", "new_width", "new_height", "new_size"),
+        [
+            (
+                Image.from_jpeg_file(resolve_resource_path("image/white_square.jpg")),
+                2,
+                3,
+                (2, 3),
+            ),
+            (
+                Image.from_png_file(resolve_resource_path("image/white_square.png")),
+                2,
+                3,
+                (2, 3),
+            ),
+        ],
+        ids=[".jpg", ".png"],
+    )
+    def test_should_return_resized_image(
+        self,
+        image: Image,
+        new_width: int,
+        new_height: int,
+        new_size: tuple[int, int],
+    ) -> None:
+        assert image.resize(new_width, new_height)._image.size == new_size
