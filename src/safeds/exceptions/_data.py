@@ -34,7 +34,7 @@ class NonNumericColumnError(Exception):
 
 
 class MissingValuesColumnError(Exception):
-    """Exception raised for trying to do operations on a columns containing missing values."""
+    """Exception raised for trying to do operations on columns containing missing values."""
 
     def __init__(self, column_info: str, help_msg: str | None = None) -> None:
         line_break = "\n"
