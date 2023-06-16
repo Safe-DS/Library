@@ -190,15 +190,22 @@ class TestRotate:
                 Image.from_png_file(resolve_resource_path("image/snapshot_boxplot.png")),
                 Image.from_png_file(resolve_resource_path("image/snapshot_boxplot_right_rotation.png"))
             ),
+            (
+                Image.from_jpeg_file(resolve_resource_path("image/snapshot_boxplot.jpg")),
+                Image.from_jpeg_file(resolve_resource_path("image/snapshot_boxplot_right_rotation.jpg"))
+            ),
         ],
-        ids=["snapshot_boxplot"],
+        ids=["snapshot_boxplot", "snapshot_boxplot.jpg"],
     )
     def test_should_return_clockwise_rotated_image(
         self,
         image: Image,
         expected: Image,
     ) -> None:
-        assert image.rotate_right()._repr_png_() == expected._repr_png_()
+        if image._repr_png_() is not None:
+            assert image.rotate_right()._repr_png_() == expected._repr_png_()
+        else:
+            assert image.rotate_right()._repr_jpeg_() == expected._repr_jpeg_()
 
     @pytest.mark.parametrize(
         ("image", "expected"),
@@ -207,12 +214,20 @@ class TestRotate:
                 Image.from_png_file(resolve_resource_path("image/snapshot_boxplot.png")),
                 Image.from_png_file(resolve_resource_path("image/snapshot_boxplot_left_rotation.png"))
             ),
+            (
+                Image.from_jpeg_file(resolve_resource_path("image/snapshot_boxplot.jpg")),
+                Image.from_jpeg_file(resolve_resource_path("image/snapshot_boxplot_left_rotation.jpg"))
+            ),
         ],
-        ids=["snapshot_boxplot"],
+        ids=["snapshot_boxplot.png", "snapshot_boxplot.jpg"],
     )
     def test_should_return_counter_clockwise_rotated_image(
         self,
         image: Image,
         expected: Image,
     ) -> None:
-        assert image.rotate_left()._repr_png_() == expected._repr_png_()
+        if image._repr_png_() is not None:
+            assert image.rotate_left()._repr_png_() == expected._repr_png_()
+        else:
+            assert image.rotate_left()._repr_jpeg_() == expected._repr_jpeg_()
+
