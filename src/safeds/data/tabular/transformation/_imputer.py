@@ -75,7 +75,7 @@ class Imputer(TableTransformer):
                 imputer.strategy = "median"
 
         class Mode(ImputerStrategy):
-            """An imputation strategy for imputing missing data with mode values."""
+            """An imputation strategy for imputing missing data with mode values. The lowest value will be used if there are multiple values with the same highest count"""
 
             def __str__(self) -> str:
                 return "Mode"
