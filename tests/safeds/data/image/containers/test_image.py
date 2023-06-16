@@ -185,12 +185,15 @@ class TestResize:
 
 class TestConvertToGrayscale:
     @pytest.mark.parametrize(
-        "image",
+        ("image", "expected"),
         [
-            (Image.from_png_file(resolve_resource_path("image/snapshot_heatmap.png")))
+            (Image.from_png_file(resolve_resource_path("image/snapshot_heatmap.png")),
+             Image.from_png_file(resolve_resource_path("image/snapshot_heatmap_grayscale.png"))),
         ],
         ids=["grayscale"],
     )
-    def test_convert_to_grayscale(self, image: Image) -> None:
+    def test_convert_to_grayscale(self, image: Image, expected: Image) -> None:
         grayscale_image = image.convert_to_grayscale()
-        assert grayscale_image._image.mode == "L"
+        assert grayscale_image._image.tobytes() == expected._image.tobytes()
+
+
