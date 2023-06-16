@@ -6,9 +6,9 @@ from pathlib import Path
 from typing import Any, BinaryIO
 
 import PIL
+from PIL import ImageOps
 from PIL.Image import Image as PillowImage
 from PIL.Image import open as open_image
-from PIL import ImageOps
 
 from safeds.data.image.typing import ImageFormat
 
