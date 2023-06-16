@@ -210,8 +210,10 @@ class TestConvertToGrayscale:
     @pytest.mark.parametrize(
         ("image", "expected"),
         [
-            (Image.from_png_file(resolve_resource_path("image/snapshot_heatmap.png")),
-             Image.from_png_file(resolve_resource_path("image/snapshot_heatmap_grayscale.png"))),
+            (
+                Image.from_png_file(resolve_resource_path("image/snapshot_heatmap.png")),
+                Image.from_png_file(resolve_resource_path("image/snapshot_heatmap_grayscale.png")),
+            ),
         ],
         ids=["grayscale"],
     )

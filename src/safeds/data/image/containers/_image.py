@@ -260,4 +260,3 @@ class Image:
         imagecopy = copy.deepcopy(self)
         imagecopy._image = self._image.transpose(PIL.Image.FLIP_LEFT_RIGHT)
         return imagecopy
-
