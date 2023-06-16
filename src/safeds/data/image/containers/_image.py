@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import copy
 import io
+import warnings
 from pathlib import Path
 from typing import Any, BinaryIO
 
@@ -287,12 +288,18 @@ class Image:
             1.0 will not change the brightness.
             Below 1.0 will result in a darker image.
             Above 1.0 will resolut in a brighter image.
+            Has to be bigger than 0.
 
         Returns
         -------
         result: Image
             The adjusted image.
         """
+        if factor < 0:
+            raise ValueError("Brightness factor has to be 0 or bigger")
+        elif factor == 1:
+            warnings.warn("Brightness adjustment factor is 1.0, this will not make changes to the image.", UserWarning, stacklevel=2)
+
         image_copy = copy.deepcopy(self)
         image_copy._image = ImageEnhance.Brightness(image_copy._image).enhance(factor)
         return image_copy
@@ -305,14 +312,20 @@ class Image:
         ----------
         factor: float
             If factor > 1, increase contrast of image.
-            If 0 < factor < 1, make image greyer.
-            If factor < 0, decrease contrast of image.
-
+            If factor = 1, no changes will be made.
+            If factor < 1, make image greyer.
+            Has to be bigger than 0.
 
         Returns
         -------
         New image with adjusted contrast.
         """
+        if factor < 0:
+            raise ValueError("Contrast factor has to be 0 or bigger")
+        elif factor == 1:
+            warnings.warn("Contrast adjustment factor is 1.0, this will not make changes to the image.", UserWarning,
+                          stacklevel=2)
+
         image_copy = copy.deepcopy(self)
         image_copy._image = ImageEnhance.Contrast(image_copy._image).enhance(factor)
         return image_copy
