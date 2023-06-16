@@ -8,6 +8,7 @@ from typing import Any, BinaryIO
 import PIL
 from PIL.Image import Image as PillowImage
 from PIL.Image import open as open_image
+from PIL import ImageEnhance
 
 from safeds.data.image.typing import ImageFormat
 
@@ -246,3 +247,16 @@ class Image:
         imagecopy = copy.deepcopy(self)
         imagecopy._image = self._image.transpose(PIL.Image.FLIP_LEFT_RIGHT)
         return imagecopy
+
+    def sharpen(self, factor: int) -> Image:
+        """
+        Return the sharpened image.
+
+        Returns
+        -------
+        result : Image
+            The image sharpened by the given factor.
+        """
+        image_copy = copy.deepcopy(self)
+        image_copy._image = ImageEnhance.Sharpness(image_copy._image).enhance(factor)
+        return image_copy
