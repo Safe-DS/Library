@@ -1,15 +1,16 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 import pytest
 from safeds.data.tabular.containers import Table, TaggedTable
 from safeds.exceptions import (
     DatasetContainsTargetError,
+    DatasetMissesDataError,
     DatasetMissesFeaturesError,
-    LearningError,
+    MissingValuesColumnError,
     ModelNotFittedError,
-    PredictionError,
+    NonNumericColumnError,
     UntaggedTableError,
 )
 from safeds.ml.classical.classification import (
@@ -63,18 +64,6 @@ def valid_data() -> TaggedTable:
     ).tag_columns(target_name="target", feature_names=["feat1", "feat2"])
 
 
-@pytest.fixture()
-def invalid_data() -> TaggedTable:
-    return Table(
-        {
-            "id": [1, 4],
-            "feat1": ["a", 5],
-            "feat2": [3, 6],
-            "target": [0, 1],
-        },
-    ).tag_columns(target_name="target", feature_names=["feat1", "feat2"])
-
-
 @pytest.mark.parametrize("classifier", classifiers(), ids=lambda x: x.__class__.__name__)
 class TestFit:
     def test_should_succeed_on_valid_data(self, classifier: Classifier, valid_data: TaggedTable) -> None:
@@ -91,8 +80,66 @@ class TestFit:
         classifier.fit(valid_data)
         assert valid_data == valid_data_copy
 
-    def test_should_raise_on_invalid_data(self, classifier: Classifier, invalid_data: TaggedTable) -> None:
-        with pytest.raises(LearningError):
+    @pytest.mark.parametrize(
+        ("invalid_data", "expected_error", "expected_error_msg"),
+        [
+            (
+                Table(
+                    {
+                        "id": [1, 4],
+                        "feat1": ["a", 5],
+                        "feat2": [3, 6],
+                        "target": [0, 1],
+                    },
+                ).tag_columns(target_name="target", feature_names=["feat1", "feat2"]),
+                NonNumericColumnError,
+                (
+                    r"Tried to do a numerical operation on one or multiple non-numerical columns: \n\{'feat1'\}\nYou"
+                    r" can use the LabelEncoder or OneHotEncoder to transform your non-numerical data to numerical"
+                    r" data.\nThe OneHotEncoder should be used if you work with nominal data. If your data contains too"
+                    r" many different values\nor is ordinal, you should use the LabelEncoder."
+                ),
+            ),
+            (
+                Table(
+                    {
+                        "id": [1, 4],
+                        "feat1": [None, 5],
+                        "feat2": [3, 6],
+                        "target": [0, 1],
+                    },
+                ).tag_columns(target_name="target", feature_names=["feat1", "feat2"]),
+                MissingValuesColumnError,
+                (
+                    r"Tried to do an operation on one or multiple columns containing missing values: \n\{'feat1'\}\nYou"
+                    r" can use the Imputer to replace the missing values based on different strategies.\nIf you want to"
+                    r" remove the missing values entirely you can use the method"
+                    r" `Table.remove_rows_with_missing_values`."
+                ),
+            ),
+            (
+                Table(
+                    {
+                        "id": [],
+                        "feat1": [],
+                        "feat2": [],
+                        "target": [],
+                    },
+                ).tag_columns(target_name="target", feature_names=["feat1", "feat2"]),
+                DatasetMissesDataError,
+                r"Dataset contains no rows",
+            ),
+        ],
+        ids=["non-numerical data", "missing values in data", "no rows in data"],
+    )
+    def test_should_raise_on_invalid_data(
+        self,
+        classifier: Classifier,
+        invalid_data: TaggedTable,
+        expected_error: Any,
+        expected_error_msg: str,
+    ) -> None:
+        with pytest.raises(expected_error, match=expected_error_msg):
             classifier.fit(invalid_data)
 
     @pytest.mark.parametrize(
@@ -151,15 +198,56 @@ class TestPredict:
         with pytest.raises(DatasetMissesFeaturesError, match="[feat1, feat2]"):
             fitted_classifier.predict(valid_data.remove_columns(["feat1", "feat2", "target"]))
 
+    @pytest.mark.parametrize(
+        ("invalid_data", "expected_error", "expected_error_msg"),
+        [
+            (
+                Table(
+                    {
+                        "id": [1, 4],
+                        "feat1": ["a", 5],
+                        "feat2": [3, 6],
+                    },
+                ),
+                NonNumericColumnError,
+                r"Tried to do a numerical operation on one or multiple non-numerical columns: \n\{'feat1'\}",
+            ),
+            (
+                Table(
+                    {
+                        "id": [1, 4],
+                        "feat1": [None, 5],
+                        "feat2": [3, 6],
+                    },
+                ),
+                MissingValuesColumnError,
+                r"Tried to do an operation on one or multiple columns containing missing values: \n\{'feat1'\}",
+            ),
+            (
+                Table(
+                    {
+                        "id": [],
+                        "feat1": [],
+                        "feat2": [],
+                    },
+                ),
+                DatasetMissesDataError,
+                r"Dataset contains no rows",
+            ),
+        ],
+        ids=["non-numerical data", "missing values in data", "no rows in data"],
+    )
     def test_should_raise_on_invalid_data(
         self,
         classifier: Classifier,
         valid_data: TaggedTable,
-        invalid_data: TaggedTable,
+        invalid_data: Table,
+        expected_error: Any,
+        expected_error_msg: str,
     ) -> None:
-        fitted_classifier = classifier.fit(valid_data)
-        with pytest.raises(PredictionError):
-            fitted_classifier.predict(invalid_data.features)
+        classifier = classifier.fit(valid_data)
+        with pytest.raises(expected_error, match=expected_error_msg):
+            classifier.predict(invalid_data)
 
 
 @pytest.mark.parametrize("classifier", classifiers(), ids=lambda x: x.__class__.__name__)
