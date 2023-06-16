@@ -1,4 +1,5 @@
 import warnings
+from typing import Any
 
 import pytest
 
@@ -26,13 +27,13 @@ def test_predict_should_not_warn_about_feature_names() -> None:
 class MLModelRaiseValueErrorOnFitAndPredict:
     x, y = None, None
 
-    def fit(self, x, y) -> None:
+    def fit(self, x: Any, y: Any) -> None:
         # The Linter does not want unnecessary parameters, so we just assign them to the class values
         self.x = x
         self.y = y
         raise ValueError("Raise ValueError (LearningError) in fit for Test")
 
-    def predict(self, x) -> None:
+    def predict(self, x: Any) -> None:
         # The Linter does not want unnecessary parameters, so we just assign it to the class value
         self.x = x
         raise ValueError("Raise ValueError (PredictionError) in predict for Test")
