@@ -163,8 +163,13 @@ class TestProperties:
                 1,
                 1,
             ),
+            (
+                Image.from_png_file(resolve_resource_path("image/snapshot_boxplot.png")),
+                640,
+                480,
+            ),
         ],
-        ids=[".jpg"],
+        ids=["[1,1].jpg", "[640,480].png"],
     )
     def test_should_return_image_properties(self, image: Image, width: int, height: int) -> None:
         assert image.width == width
