@@ -176,3 +176,45 @@ class Image:
         new_image = Image(data, self._format)
         new_image._image = new_image._image.resize((new_width, new_height))
         return new_image
+
+    def rotate_right(self) -> Image:
+        """
+        Return the image clockwise rotated by 90 degrees.
+
+        Returns
+        -------
+        result : Image
+            The image clockwise rotated by 90 degrees.
+        """
+        data = io.BytesIO()
+        repr_png = self._repr_png_()
+        repr_jpeg = self._repr_jpeg_()
+        if repr_png is not None:
+            data = io.BytesIO(repr_png)
+        elif repr_jpeg is not None:
+            data = io.BytesIO(repr_jpeg)
+
+        new_image = Image(data, self._format)
+        new_image._image = new_image._image.rotate(270, expand=True)
+        return new_image
+
+    def rotate_left(self) -> Image:
+        """
+        Return the image counter-clockwise rotated by 90 degrees.
+
+        Returns
+        -------
+        result : Image
+            The image counter-clockwise rotated by 90 degrees.
+        """
+        data = io.BytesIO()
+        repr_png = self._repr_png_()
+        repr_jpeg = self._repr_jpeg_()
+        if repr_png is not None:
+            data = io.BytesIO(repr_png)
+        elif repr_jpeg is not None:
+            data = io.BytesIO(repr_jpeg)
+
+        new_image = Image(data, self._format)
+        new_image._image = new_image._image.rotate(90, expand=True)
+        return new_image
