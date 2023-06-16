@@ -1,9 +1,11 @@
 from __future__ import annotations
 
+import copy
 import io
 from pathlib import Path
-from typing import BinaryIO
+from typing import Any, BinaryIO
 
+import PIL
 from PIL.Image import Image as PillowImage
 from PIL.Image import open as open_image
 
@@ -82,6 +84,30 @@ class Image:
         """
         return self._format
 
+    @property
+    def width(self) -> int:
+        """
+        Get the width of the image in pixels.
+
+        Returns
+        -------
+        width : int
+            The width of the image.
+        """
+        return self._image.width
+
+    @property
+    def height(self) -> int:
+        """
+        Get the height of the image in pixels.
+
+        Returns
+        -------
+        height : int
+            The height of the image.
+        """
+        return self._image.height
+
     # ------------------------------------------------------------------------------------------------------------------
     # Conversion
     # ------------------------------------------------------------------------------------------------------------------
@@ -113,6 +139,24 @@ class Image:
     # ------------------------------------------------------------------------------------------------------------------
     # IPython integration
     # ------------------------------------------------------------------------------------------------------------------
+
+    def __eq__(self, other: Any) -> bool:
+        """
+        Compare two images.
+
+        Parameters
+        ----------
+        other: The image to compare to.
+
+        Returns
+        -------
+        equals : bool
+            Whether the two images contain equal pixel data.
+
+        """
+        if not isinstance(other, Image):
+            return NotImplemented
+        return self._image.tobytes() == other._image.tobytes()
 
     def _repr_jpeg_(self) -> bytes | None:
         """
@@ -158,7 +202,7 @@ class Image:
 
     def resize(self, new_width: int, new_height: int) -> Image:
         """
-        Return the resized image.
+        Return an image that has been resized to a given size.
 
         Returns
         -------
@@ -177,19 +221,28 @@ class Image:
         new_image._image = new_image._image.resize((new_width, new_height))
         return new_image
 
-    def convert_to_grayscale(self) -> Image:
+    def flip_vertically(self) -> Image:
         """
-        Convert the image to grayscale.
+        Flip the image vertically (horizontal axis, flips up-down and vice versa).
 
         Returns
         -------
-        grayscale_image : Image
-            The grayscale image.
+        result : Image
+            The flipped image.
         """
-        data = io.BytesIO()
-        grayscale_image = self._image.convert("L")
-        grayscale_image.save(data, format=self._format.value)
-        return Image(data, self._format)
+        imagecopy = copy.deepcopy(self)
+        imagecopy._image = self._image.transpose(PIL.Image.FLIP_TOP_BOTTOM)
+        return imagecopy
 
+    def flip_horizontally(self) -> Image:
+        """
+        Flip the image horizontally (vertical axis, flips left-right and vice versa).
 
-
+        Returns
+        -------
+        result : Image
+            The flipped image.
+        """
+        imagecopy = copy.deepcopy(self)
+        imagecopy._image = self._image.transpose(PIL.Image.FLIP_LEFT_RIGHT)
+        return imagecopy
