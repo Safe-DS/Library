@@ -181,3 +181,16 @@ class TestResize:
         new_size: tuple[int, int],
     ) -> None:
         assert image.resize(new_width, new_height)._image.size == new_size
+
+
+class TestConvertToGrayscale:
+    @pytest.mark.parametrize(
+        "image",
+        [
+            (Image.from_png_file(resolve_resource_path("image/snapshot_heatmap.png")))
+        ],
+        ids=["grayscale"],
+    )
+    def test_convert_to_grayscale(self, image: Image) -> None:
+        grayscale_image = image.convert_to_grayscale()
+        assert grayscale_image._image.mode == "L"
