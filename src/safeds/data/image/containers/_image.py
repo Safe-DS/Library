@@ -1,11 +1,14 @@
 from __future__ import annotations
 
+import copy
 import io
 from pathlib import Path
 from typing import BinaryIO
 
+import self as self
 from PIL.Image import Image as PillowImage
 from PIL.Image import open as open_image
+from PIL import ImageEnhance
 
 from safeds.data.image.typing import ImageFormat
 
@@ -176,3 +179,16 @@ class Image:
         new_image = Image(data, self._format)
         new_image._image = new_image._image.resize((new_width, new_height))
         return new_image
+
+    def sharpen(self, factor: int) -> Image:
+        """
+        Return the sharpened image.
+
+        Returns
+        -------
+        result : Image
+            The image sharpened by the given factor.
+        """
+        image_copy = copy.deepcopy(self)
+        image_copy._image = ImageEnhance.Sharpness(image_copy._image).enhance(factor)
+        return image_copy
