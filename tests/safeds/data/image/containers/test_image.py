@@ -247,3 +247,21 @@ class TestFlipHorizontally:
         image = Image.from_png_file(resolve_resource_path("image/original.png"))
         image2 = image.flip_horizontally().flip_horizontally()
         assert image == image2
+
+
+class TestSharpen:
+    @pytest.mark.parametrize(
+        "factor",
+        [2, 25]
+    )
+    def test_should_sharpen(self, factor: int) -> None:
+        image = Image.from_png_file(resolve_resource_path("image/sharpen/to_sharpen.png"))
+        image2 = image.sharpen(factor)
+        assert image != image2
+        assert image2 == Image.from_png_file(
+            resolve_resource_path("image/sharpen/sharpened_by_" + str(factor) + ".png"))
+
+    def test_should_not_sharpen(self):
+        image = Image.from_png_file(resolve_resource_path("image/sharpen/to_sharpen.png"))
+        image2 = image.sharpen(1)
+        assert image == image2
