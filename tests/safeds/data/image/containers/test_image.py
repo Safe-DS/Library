@@ -194,6 +194,7 @@ class TestResize:
             ),
         ],
         ids=[".jpg", ".png"],
+
     )
     def test_should_return_resized_image(
         self,
