@@ -204,12 +204,17 @@ class TestEQ:
 class TestFlip:
     def test_should_flip_vertically(self) -> None:
         image = Image.from_png_file(resolve_resource_path("image/original.png"))
-        image = image.flip_image_vertically()
+        image = image.flip_vertically()
         image2 = Image.from_png_file(resolve_resource_path("image/flip_vertically.png"))
         assert image == image2
 
     def test_should_flip_horizontally(self) -> None:
         image = Image.from_png_file(resolve_resource_path("image/original.png"))
-        image = image.flip_image_horizontally()
+        image = image.flip_horizontally()
         image2 = Image.from_png_file(resolve_resource_path("image/flip_horizontally.png"))
+        assert image == image2
+
+    def test_should_should_be_original(self):
+        image = Image.from_png_file(resolve_resource_path("image/original.png"))
+        image2 = image.flip_vertically().flip_vertically().flip_horizontally().flip_horizontally()
         assert image == image2

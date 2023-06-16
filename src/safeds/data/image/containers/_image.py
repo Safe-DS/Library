@@ -197,7 +197,7 @@ class Image:
         new_image._image = new_image._image.resize((new_width, new_height))
         return new_image
 
-    def flip_image_vertically(self) -> Image:
+    def flip_vertically(self) -> Image:
         """
         Flip the image vertically (horizontal axis, flips up-down and vice versa).
 
@@ -210,7 +210,7 @@ class Image:
         imagecopy._image = self._image.transpose(PIL.Image.FLIP_TOP_BOTTOM)
         return imagecopy
 
-    def flip_image_horizontally(self) -> Image:
+    def flip_horizontally(self) -> Image:
         """
         Flip the image horizontally (vertical axis, flips left-right and vice versa).
 
