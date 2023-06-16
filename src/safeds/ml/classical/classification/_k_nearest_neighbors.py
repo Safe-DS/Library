@@ -80,7 +80,7 @@ class KNearestNeighbors(Classifier):
             If the training data contains no rows.
         """
         if training_set.number_of_rows == 0:
-            raise DatasetMissesDataError()
+            raise DatasetMissesDataError
         if self._number_of_neighbors > training_set.number_of_rows:
             raise ValueError(
                 (

@@ -25,7 +25,12 @@ class NonNumericColumnError(Exception):
 
     def __init__(self, column_info: str, help_msg: str | None = None) -> None:
         line_break = "\n"
-        super().__init__(f"Tried to do a numerical operation on one or multiple non-numerical columns: \n{column_info}{line_break + help_msg if help_msg is not None else ''}")
+        super().__init__(
+            (
+                "Tried to do a numerical operation on one or multiple non-numerical columns:"
+                f" \n{column_info}{line_break + help_msg if help_msg is not None else ''}"
+            ),
+        )
 
 
 class MissingValuesColumnError(Exception):
@@ -33,7 +38,12 @@ class MissingValuesColumnError(Exception):
 
     def __init__(self, column_info: str, help_msg: str | None = None) -> None:
         line_break = "\n"
-        super().__init__(f"Tried to do an operation on one or multiple columns containing missing values: \n{column_info}{line_break + help_msg if help_msg is not None else ''}")
+        super().__init__(
+            (
+                "Tried to do an operation on one or multiple columns containing missing values:"
+                f" \n{column_info}{line_break + help_msg if help_msg is not None else ''}"
+            ),
+        )
 
 
 class DuplicateColumnNameError(Exception):
