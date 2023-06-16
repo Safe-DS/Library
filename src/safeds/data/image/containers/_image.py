@@ -1,9 +1,11 @@
 from __future__ import annotations
 
+import copy
 import io
 from pathlib import Path
-from typing import BinaryIO
+from typing import Any, BinaryIO
 
+import PIL
 from PIL.Image import Image as PillowImage
 from PIL.Image import open as open_image
 
@@ -138,6 +140,24 @@ class Image:
     # IPython integration
     # ------------------------------------------------------------------------------------------------------------------
 
+    def __eq__(self, other: Any) -> bool:
+        """
+        Compare two images.
+
+        Parameters
+        ----------
+        other: The image to compare to.
+
+        Returns
+        -------
+        equals : bool
+            Whether the two images contain equal pixel data.
+
+        """
+        if not isinstance(other, Image):
+            return NotImplemented
+        return self._image.tobytes() == other._image.tobytes()
+
     def _repr_jpeg_(self) -> bytes | None:
         """
         Return a JPEG image as bytes.
@@ -182,7 +202,7 @@ class Image:
 
     def resize(self, new_width: int, new_height: int) -> Image:
         """
-        Return the resized image.
+        Return an image that has been resized to a given size.
 
         Returns
         -------
@@ -200,3 +220,29 @@ class Image:
         new_image = Image(data, self._format)
         new_image._image = new_image._image.resize((new_width, new_height))
         return new_image
+
+    def flip_vertically(self) -> Image:
+        """
+        Flip the image vertically (horizontal axis, flips up-down and vice versa).
+
+        Returns
+        -------
+        result : Image
+            The flipped image.
+        """
+        imagecopy = copy.deepcopy(self)
+        imagecopy._image = self._image.transpose(PIL.Image.FLIP_TOP_BOTTOM)
+        return imagecopy
+
+    def flip_horizontally(self) -> Image:
+        """
+        Flip the image horizontally (vertical axis, flips left-right and vice versa).
+
+        Returns
+        -------
+        result : Image
+            The flipped image.
+        """
+        imagecopy = copy.deepcopy(self)
+        imagecopy._image = self._image.transpose(PIL.Image.FLIP_LEFT_RIGHT)
+        return imagecopy
