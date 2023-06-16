@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Any, BinaryIO
 
 import PIL
+from PIL import ImageFilter
 from PIL.Image import Image as PillowImage
 from PIL.Image import open as open_image
 
@@ -274,3 +275,30 @@ class Image:
         imagecopy = copy.deepcopy(self)
         imagecopy._image = self._image.transpose(PIL.Image.FLIP_LEFT_RIGHT)
         return imagecopy
+
+    def blur(self, radius: int = 1) -> Image:
+        """
+        Return the blurred image.
+
+        Parameters
+        ----------
+        radius : int
+             Radius is directly proportional to the blur value. The radius is equal to the amount of pixels united in each direction.
+             A Radius of 1 will result in a united box of 9 pixels.
+
+        Returns
+        -------
+        result : Image
+            The blurred image
+        """
+        data = io.BytesIO()
+        repr_png = self._repr_png_()
+        repr_jpeg = self._repr_jpeg_()
+        if repr_png is not None:
+            data = io.BytesIO(repr_png)
+        elif repr_jpeg is not None:
+            data = io.BytesIO(repr_jpeg)
+
+        new_image = Image(data, self._format)
+        new_image._image = new_image._image.filter(ImageFilter.BoxBlur(radius))
+        return new_image
