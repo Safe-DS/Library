@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Any, BinaryIO
 
 import PIL
+from PIL import ImageFilter
 from PIL import ImageEnhance
 from PIL.Image import Image as PillowImage
 from PIL.Image import open as open_image
@@ -223,6 +224,20 @@ class Image:
         new_image._image = new_image._image.resize((new_width, new_height))
         return new_image
 
+    def convert_to_grayscale(self) -> Image:
+        """
+        Convert the image to grayscale.
+
+        Returns
+        -------
+        grayscale_image : Image
+            The grayscale image.
+        """
+        data = io.BytesIO()
+        grayscale_image = self._image.convert("L")
+        grayscale_image.save(data, format=self._format.value)
+        return Image(data, self._format)
+
     def crop(self, x: int, y: int, width: int, height: int) -> Image:
         """
         Return an image that has been cropped to a given bounding rectangle.
@@ -329,3 +344,30 @@ class Image:
         image_copy = copy.deepcopy(self)
         image_copy._image = ImageEnhance.Contrast(image_copy._image).enhance(factor)
         return image_copy
+
+    def blur(self, radius: int = 1) -> Image:
+        """
+        Return the blurred image.
+
+        Parameters
+        ----------
+        radius : int
+             Radius is directly proportional to the blur value. The radius is equal to the amount of pixels united in each direction.
+             A Radius of 1 will result in a united box of 9 pixels.
+
+        Returns
+        -------
+        result : Image
+            The blurred image
+        """
+        data = io.BytesIO()
+        repr_png = self._repr_png_()
+        repr_jpeg = self._repr_jpeg_()
+        if repr_png is not None:
+            data = io.BytesIO(repr_png)
+        elif repr_jpeg is not None:
+            data = io.BytesIO(repr_jpeg)
+
+        new_image = Image(data, self._format)
+        new_image._image = new_image._image.filter(ImageFilter.BoxBlur(radius))
+        return new_image

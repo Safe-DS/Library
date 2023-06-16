@@ -206,6 +206,22 @@ class TestResize:
         assert image.resize(new_width, new_height)._image.size == new_size
 
 
+class TestConvertToGrayscale:
+    @pytest.mark.parametrize(
+        ("image", "expected"),
+        [
+            (
+                Image.from_png_file(resolve_resource_path("image/snapshot_heatmap.png")),
+                Image.from_png_file(resolve_resource_path("image/snapshot_heatmap_grayscale.png")),
+            ),
+        ],
+        ids=["grayscale"],
+    )
+    def test_convert_to_grayscale(self, image: Image, expected: Image) -> None:
+        grayscale_image = image.convert_to_grayscale()
+        assert grayscale_image._image.tobytes() == expected._image.tobytes()
+
+
 class TestEQ:
     def test_should_be_equal(self) -> None:
         image = Image.from_png_file(resolve_resource_path("image/original.png"))
@@ -294,6 +310,26 @@ class TestBrightness:
             image = Image.from_png_file(resolve_resource_path("image/brightness/to_brighten.png"))
             image.adjust_brightness(-1)
 
+
+
+class TestBlur:
+    def test_should_return_blurred_png_image(self) -> None:
+        image = Image.from_png_file(resolve_resource_path("image/boy.png"))
+        image = image.blur(2)
+        image.to_png_file(resolve_resource_path("image/blurredboy1.png"))
+        image = Image.from_png_file(resolve_resource_path("image/blurredboy1.png"))
+        image2 = Image.from_png_file(resolve_resource_path("image/blurredboy.png"))
+        assert image._image == image2._image
+
+    def test_should_return_blurred_jpg_image(self) -> None:
+        image = Image.from_jpeg_file(resolve_resource_path("image/boy.jpg"))
+        image = image.blur(2)
+        image.to_jpeg_file(resolve_resource_path("image/blurredboy1.jpg"))
+        image = Image.from_jpeg_file(resolve_resource_path("image/blurredboy1.jpg"))
+        image2 = Image.from_jpeg_file(resolve_resource_path("image/blurredboy.jpg"))
+        assert image._image == image2._image
+        Path.unlink(Path(resolve_resource_path("image/blurredboy1.jpg")))
+        Path.unlink(Path(resolve_resource_path("image/blurredboy1.png")))
 
 
 class TestCrop:
