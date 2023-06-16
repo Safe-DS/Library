@@ -4,6 +4,7 @@ from tempfile import NamedTemporaryFile
 import pytest
 from safeds.data.image.containers import Image
 from safeds.data.image.typing import ImageFormat
+from safeds.data.tabular.containers import Table
 
 from tests.helpers import resolve_resource_path
 
@@ -193,6 +194,11 @@ class TestEQ:
         image = Image.from_png_file(resolve_resource_path("image/original.png"))
         image2 = Image.from_png_file(resolve_resource_path("image/white_square.png"))
         assert image != image2
+
+    def test_should_raise(self) -> None:
+        image = Image.from_png_file(resolve_resource_path("image/original.png"))
+        other = Table()
+        assert (image.__eq__(other)) is NotImplemented
 
 
 class TestFlip:
