@@ -268,6 +268,7 @@ class TestBlur:
         Path.unlink(Path(resolve_resource_path("image/blurredboy1.jpg")))
         Path.unlink(Path(resolve_resource_path("image/blurredboy1.png")))
 
+
 class TestCrop:
     def test_should_crop_jpg_image(self) -> None:
         image = Image.from_jpeg_file(resolve_resource_path("image/white.jpg"))
@@ -280,4 +281,3 @@ class TestCrop:
         image = image.crop(0, 0, 100, 100)
         image2 = Image.from_png_file(resolve_resource_path("image/whiteCropped.png"))
         assert image == image2
-
