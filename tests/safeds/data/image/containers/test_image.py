@@ -181,3 +181,48 @@ class TestResize:
         new_size: tuple[int, int],
     ) -> None:
         assert image.resize(new_width, new_height)._image.size == new_size
+
+class TestBlur:
+    @pytest.mark.parametrize(
+        ("image", "radius"),
+        [
+            (
+                Image.from_png_file(resolve_resource_path("image/boy.png")),
+                2,
+            ),
+        ],
+        ids=[".png"],
+    )
+    def test_should_return_blurred_png_image(
+        self,
+        image: Image,
+        radius: int,
+    ) -> None:
+        image = Image.from_png_file(resolve_resource_path("image/boy.png"))
+        image = image.blur(radius)
+        image2 = Image.from_png_file(resolve_resource_path("image/blurredboy.png"))
+        assert image == image2
+
+    @pytest.mark.parametrize(
+        ("image", "radius"),
+        [
+            (
+                Image.from_jpeg_file(resolve_resource_path("image/boy.jpg")),
+                2,
+            ),
+        ],
+        ids=[".jpg"],
+    )
+    def test_should_return_blurred_jpg_image(
+        self,
+        image: Image,
+        radius: int,
+    ) -> None:
+        image = Image.from_jpg_file(resolve_resource_path("image/boy.jpg"))
+        image = image.blur(radius)
+        image2 = Image.from_jpg_file(resolve_resource_path("image/blurredboy.jpg"))
+        assert image == image2
+
+
+
+
