@@ -201,5 +201,5 @@ class TestBlur:
         image = Image.from_jpeg_file(resolve_resource_path("image/blurredboy1.jpg"))
         image2 = Image.from_jpeg_file(resolve_resource_path("image/blurredboy.jpg"))
         assert image._image == image2._image
-        os.unlink(resolve_resource_path("image/blurredboy1.jpg"))
-        os.unlink(resolve_resource_path("image/blurredboy1.png"))
+        Path.unlink(Path(resolve_resource_path("image/blurredboy1.jpg")))
+        Path.unlink(Path(resolve_resource_path("image/blurredboy1.png")))

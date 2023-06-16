@@ -115,7 +115,7 @@ class Image:
     # IPython integration
     # ------------------------------------------------------------------------------------------------------------------
 
-    def __eq__(self, other: Image) -> bool:
+    def __eq__(self, other: Any) -> bool:
         """
         Compare two images.
 
@@ -128,6 +128,8 @@ class Image:
         equals : bool
             Whether the two images contain equal pixel data.
         """
+        if not isinstance(other, Image):
+            return NotImplemented
         return self._image.tobytes() == other._image.tobytes()
 
 
