@@ -3,7 +3,7 @@ from __future__ import annotations
 import copy
 import io
 from pathlib import Path
-from typing import BinaryIO, Any
+from typing import Any, BinaryIO
 
 import PIL
 from PIL.Image import Image as PillowImage
@@ -199,12 +199,12 @@ class Image:
 
     def flip_image_vertically(self) -> Image:
         """
-            Flip the image vertically (horizontal axis, flips up-down and vice versa)
+        Flip the image vertically (horizontal axis, flips up-down and vice versa).
 
-            Returns
-            -------
-            result : Image
-                The flipped image.
+        Returns
+        -------
+        result : Image
+            The flipped image.
         """
         imagecopy = copy.deepcopy(self)
         imagecopy._image = self._image.transpose(PIL.Image.FLIP_TOP_BOTTOM)
@@ -212,12 +212,12 @@ class Image:
 
     def flip_image_horizontally(self) -> Image:
         """
-            Flip the image horizontally (vertical axis, flips left-right and vice versa)
+        Flip the image horizontally (vertical axis, flips left-right and vice versa).
 
-            Returns
-            -------
-            result : Image
-                The flipped image.
+        Returns
+        -------
+        result : Image
+            The flipped image.
         """
         imagecopy = copy.deepcopy(self)
         imagecopy._image = self._image.transpose(PIL.Image.FLIP_LEFT_RIGHT)
