@@ -5,8 +5,8 @@ import io
 from pathlib import Path
 from typing import Any, BinaryIO
 
-from PIL import ImageFilter
 import PIL
+from PIL import ImageFilter
 from PIL.Image import Image as PillowImage
 from PIL.Image import open as open_image
 
