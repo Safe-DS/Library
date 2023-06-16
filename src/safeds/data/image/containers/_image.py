@@ -6,8 +6,7 @@ from pathlib import Path
 from typing import Any, BinaryIO
 
 import PIL
-from PIL import ImageFilter
-from PIL import ImageEnhance
+from PIL import ImageEnhance, ImageFilter
 from PIL.Image import Image as PillowImage
 from PIL.Image import open as open_image
 
