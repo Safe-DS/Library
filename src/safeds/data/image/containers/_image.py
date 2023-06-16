@@ -246,7 +246,7 @@ class Image:
             data = io.BytesIO(repr_jpeg)
 
         new_image = Image(data, self._format)
-        new_image._image = new_image._image.crop((x, y, (x+width), (y+height)))
+        new_image._image = new_image._image.crop((x, y, (x + width), (y + height)))
         return new_image
 
     def flip_vertically(self) -> Image:

@@ -248,6 +248,7 @@ class TestFlipHorizontally:
         image2 = image.flip_horizontally().flip_horizontally()
         assert image == image2
 
+
 class TestCrop:
     def test_should_crop_jpg_image(self) -> None:
         image = Image.from_jpeg_file(resolve_resource_path("image/white.jpg"))
