@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Any, BinaryIO
 
 import PIL
+from PIL import ImageEnhance
 from PIL.Image import Image as PillowImage
 from PIL.Image import open as open_image
 
@@ -246,3 +247,24 @@ class Image:
         imagecopy = copy.deepcopy(self)
         imagecopy._image = self._image.transpose(PIL.Image.FLIP_LEFT_RIGHT)
         return imagecopy
+
+    def adjust_brightness(self, factor: float) -> Image:
+        """
+        Adjust the brightness of an image.
+
+        Parameters
+        -------
+        factor: float
+            The brightness factor.
+            1.0 will not change the brightness.
+            Below 1.0 will result in a darker image.
+            Above 1.0 will resolut in a brighter image.
+
+        Returns
+        -------
+        result: Image
+            The adjusted image.
+        """
+        image_copy = copy.deepcopy(self)
+        image_copy._image = ImageEnhance.Brightness(image_copy._image).enhance(factor)
+        return image_copy

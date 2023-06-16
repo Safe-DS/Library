@@ -247,3 +247,8 @@ class TestFlipHorizontally:
         image = Image.from_png_file(resolve_resource_path("image/original.png"))
         image2 = image.flip_horizontally().flip_horizontally()
         assert image == image2
+
+class TestBrightness:
+    @pytest.mark.parametrize("factor", [0.5, 2, 10])
+    def test_should_adjust_brightness(self, factor):
+        image = Image.from_png_file(resolve_resource_path("image/original.png"))
