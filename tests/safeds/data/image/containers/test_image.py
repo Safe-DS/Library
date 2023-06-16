@@ -265,6 +265,7 @@ class TestInvertColors:
         assert image == image2
         Path.unlink(Path(resolve_resource_path("image/inverted_colors_original1.jpg")))
 
+
 class TestCrop:
     def test_should_crop_jpg_image(self) -> None:
         image = Image.from_jpeg_file(resolve_resource_path("image/white.jpg"))
