@@ -6,7 +6,7 @@ from safeds.data.image.containers import Image
 from safeds.data.image.typing import ImageFormat
 from safeds.data.tabular.containers import Table
 
-from src.safeds.exceptions._data import WrongFileExtensionError
+from safeds.exceptions._data import WrongFileExtensionError
 from tests.helpers import resolve_resource_path
 
 

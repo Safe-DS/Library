@@ -13,7 +13,7 @@ from PIL.Image import open as open_image
 
 from safeds.data.image.typing import ImageFormat
 
-from src.safeds.exceptions._data import WrongFileExtensionError
+from safeds.exceptions._data import WrongFileExtensionError
 
 
 class Image:
