@@ -387,39 +387,21 @@ class TestSharpen:
 
 
 class TestRotate:
-    @pytest.mark.parametrize(
-        ("image", "expected"),
-        [
-            (
-                Image.from_png_file(resolve_resource_path("image/snapshot_boxplot.png")),
-                Image.from_png_file(resolve_resource_path("image/snapshot_boxplot_right_rotation.png")),
-            ),
-        ],
-        ids=["snapshot_boxplot"],
-    )
     def test_should_return_clockwise_rotated_image(
         self,
-        image: Image,
-        expected: Image,
     ) -> None:
-        assert image.rotate_right()._repr_png_() == expected._repr_png_()
+        image = Image.from_png_file(resolve_resource_path("image/snapshot_boxplot.png"))
+        image = image.rotate_right()
+        image2 = Image.from_png_file(resolve_resource_path("image/snapshot_boxplot_right_rotation.png"))
+        assert image == image2
 
-    @pytest.mark.parametrize(
-        ("image", "expected"),
-        [
-            (
-                Image.from_png_file(resolve_resource_path("image/snapshot_boxplot.png")),
-                Image.from_png_file(resolve_resource_path("image/snapshot_boxplot_left_rotation.png")),
-            ),
-        ],
-        ids=["snapshot_boxplot"],
-    )
     def test_should_return_counter_clockwise_rotated_image(
         self,
-        image: Image,
-        expected: Image,
     ) -> None:
-        assert image.rotate_left()._repr_png_() == expected._repr_png_()
+        image = Image.from_png_file(resolve_resource_path("image/snapshot_boxplot.png"))
+        image = image.rotate_left()
+        image2 = Image.from_png_file(resolve_resource_path("image/snapshot_boxplot_left_rotation.png"))
+        assert image == image2
 
     def test_should_raise_if_not_png_right(self) -> None:
         with pytest.raises(WrongFileExtensionError, match=f"The file /image has a wrong file extension. Please provide a file with the following extension\(s\): .png"):

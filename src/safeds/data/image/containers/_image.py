@@ -431,14 +431,9 @@ class Image:
         if self.format != ImageFormat.PNG:
             raise WrongFileExtensionError("/image", ".png")
 
-        data = io.BytesIO()
-        repr_png = self._repr_png_()
-        if repr_png is not None:
-            data = io.BytesIO(repr_png)
-
-        new_image = Image(data, self._format)
-        new_image._image = new_image._image.rotate(270, expand=True)
-        return new_image
+        imagecopy = copy.deepcopy(self)
+        imagecopy._image = imagecopy._image.rotate(270, expand=True)
+        return imagecopy
 
     def rotate_left(self) -> Image:
         """
@@ -457,11 +452,6 @@ class Image:
         if self.format != ImageFormat.PNG:
             raise WrongFileExtensionError("/image", ".png")
 
-        data = io.BytesIO()
-        repr_png = self._repr_png_()
-        if repr_png is not None:
-            data = io.BytesIO(repr_png)
-
-        new_image = Image(data, self._format)
-        new_image._image = new_image._image.rotate(90, expand=True)
-        return new_image
+        imagecopy = copy.deepcopy(self)
+        imagecopy._image = imagecopy._image.rotate(90, expand=True)
+        return imagecopy
