@@ -76,10 +76,26 @@ class ElasticNetRegression(Regressor):
 
     @property
     def alpha(self) -> float:
+        """
+        Get the regularization of the model.
+
+        Returns
+        -------
+        result: float
+            The regularization of the model.
+        """
         return self._alpha
 
     @property
     def lasso_ratio(self) -> float:
+        """
+        Get the ratio between Lasso and Ridge regularization.
+
+        Returns
+        -------
+        result: float
+            The ratio between Lasso and Ridge regularization.
+        """
         return self._lasso_ratio
 
     def fit(self, training_set: TaggedTable) -> ElasticNetRegression:

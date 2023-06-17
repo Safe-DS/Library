@@ -43,6 +43,14 @@ class RandomForest(Classifier):
 
     @property
     def number_of_trees(self) -> int:
+        """
+        Get the number of trees used in the random forest.
+
+        Returns
+        -------
+        result: int
+            The number of trees.
+        """
         return self._number_of_trees
 
     def fit(self, training_set: TaggedTable) -> RandomForest:

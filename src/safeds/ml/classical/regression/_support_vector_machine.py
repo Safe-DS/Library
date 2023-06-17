@@ -59,15 +59,39 @@ class SupportVectorMachine(Regressor):
 
     @property
     def c(self) -> float:
+        """
+        Get the regularization strength.
+
+        Returns
+        -------
+        result: float
+            The regularization strength.
+        """
         return self._c
 
     @property
     def kernel(self) -> SupportVectorMachineKernel | None:
+        """
+        Get the type of kernel used.
+
+        Returns
+        -------
+        result: SupportVectorMachineKernel | None
+            The type of kernel used.
+        """
         return self._kernel
 
     class Kernel:
         class Linear(SupportVectorMachineKernel):
             def get_sklearn_kernel(self) -> str:
+                """
+                Get the name of the linear kernel.
+
+                Returns
+                -------
+                result: str
+                    The name of the linear kernel.
+                """
                 return "linear"
 
         class Polynomial(SupportVectorMachineKernel):
@@ -77,17 +101,54 @@ class SupportVectorMachine(Regressor):
                 self._degree = degree
 
             def get_sklearn_kernel(self) -> str:
+                """
+                Get the name of the polynomial kernel.
+
+                Returns
+                -------
+                result: str
+                    The name of the polynomial kernel.
+                """
                 return "poly"
 
         class Sigmoid(SupportVectorMachineKernel):
             def get_sklearn_kernel(self) -> str:
+                """
+                Get the name of the sigmoid kernel.
+
+                Returns
+                -------
+                result: str
+                    The name of the sigmoid kernel.
+                """
                 return "sigmoid"
 
         class RadialBasisFunction(SupportVectorMachineKernel):
             def get_sklearn_kernel(self) -> str:
+                """
+                Get the name of the radial basis function (RBF) kernel.
+
+                Returns
+                -------
+                result: str
+                    The name of the RBF kernel.
+                """
                 return "rbf"
 
     def _get_kernel_name(self) -> str:
+        """
+        Get the name of the kernel.
+
+        Returns
+        -------
+        result: str
+            The name of the kernel.
+
+        Raises
+        ------
+        TypeError
+            If the kernel type is invalid.
+        """
         if isinstance(self.kernel, SupportVectorMachine.Kernel.Linear):
             return "linear"
         elif isinstance(self.kernel, SupportVectorMachine.Kernel.Polynomial):
