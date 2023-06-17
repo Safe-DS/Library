@@ -431,8 +431,10 @@ class Image:
         if self.format != ImageFormat.PNG:
             raise WrongFileExtensionError("/image", ".png")
 
+        data = io.BytesIO()
         repr_png = self._repr_png_()
-        data = io.BytesIO(repr_png)
+        if repr_png is not None:
+            data = io.BytesIO(repr_png)
 
         new_image = Image(data, self._format)
         new_image._image = new_image._image.rotate(270, expand=True)
@@ -455,8 +457,10 @@ class Image:
         if self.format != ImageFormat.PNG:
             raise WrongFileExtensionError("/image", ".png")
 
+        data = io.BytesIO()
         repr_png = self._repr_png_()
-        data = io.BytesIO(repr_png)
+        if repr_png is not None:
+            data = io.BytesIO(repr_png)
 
         new_image = Image(data, self._format)
         new_image._image = new_image._image.rotate(90, expand=True)
