@@ -5,8 +5,8 @@ import pytest
 from safeds.data.image.containers import Image
 from safeds.data.image.typing import ImageFormat
 from safeds.data.tabular.containers import Table
-
 from safeds.exceptions._data import WrongFileExtensionError
+
 from tests.helpers import resolve_resource_path
 
 
@@ -422,9 +422,21 @@ class TestRotate:
         assert image.rotate_left()._repr_png_() == expected._repr_png_()
 
     def test_should_raise_if_not_png_right(self) -> None:
-        with pytest.raises(WrongFileExtensionError, match=f"The file /image has a wrong file extension. Please provide a file with the following extension\(s\): .png"):
+        with pytest.raises(
+            WrongFileExtensionError,
+            match=(
+                "The file /image has a wrong file extension. Please provide a file with the following extension\\(s\\):"
+                " .png"
+            ),
+        ):
             Image.from_jpeg_file(resolve_resource_path("image/white_square.jpg")).rotate_right()
 
     def test_should_raise_if_not_png_left(self) -> None:
-        with pytest.raises(WrongFileExtensionError, match=f"The file /image has a wrong file extension. Please provide a file with the following extension\(s\): .png"):
+        with pytest.raises(
+            WrongFileExtensionError,
+            match=(
+                "The file /image has a wrong file extension. Please provide a file with the following extension\\(s\\):"
+                " .png"
+            ),
+        ):
             Image.from_jpeg_file(resolve_resource_path("image/white_square.jpg")).rotate_left()
