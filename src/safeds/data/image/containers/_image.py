@@ -13,6 +13,8 @@ from PIL.Image import open as open_image
 
 from safeds.data.image.typing import ImageFormat
 
+from src.safeds.exceptions._data import WrongFileExtensionError
+
 
 class Image:
     """
@@ -419,20 +421,18 @@ class Image:
 
     def rotate_right(self) -> Image:
         """
-        Return the image clockwise rotated by 90 degrees.
+        Return the png-image clockwise rotated by 90 degrees.
 
         Returns
         -------
         result : Image
             The image clockwise rotated by 90 degrees.
         """
-        data = io.BytesIO()
+        if self.format != ImageFormat.PNG:
+            raise WrongFileExtensionError("/image", ".png")
+
         repr_png = self._repr_png_()
-        repr_jpeg = self._repr_jpeg_()
-        if repr_png is not None:
-            data = io.BytesIO(repr_png)
-        elif repr_jpeg is not None:
-            data = io.BytesIO(repr_jpeg)
+        data = io.BytesIO(repr_png)
 
         new_image = Image(data, self._format)
         new_image._image = new_image._image.rotate(270, expand=True)
@@ -440,20 +440,23 @@ class Image:
 
     def rotate_left(self) -> Image:
         """
-        Return the image counter-clockwise rotated by 90 degrees.
+        Return the png-image counter-clockwise rotated by 90 degrees.
 
         Returns
         -------
         result : Image
             The image counter-clockwise rotated by 90 degrees.
+
+        Raises
+        ------
+        WrongFileExtensionError
+            If given a File that's not PNG.
         """
-        data = io.BytesIO()
+        if self.format != ImageFormat.PNG:
+            raise WrongFileExtensionError("/image", ".png")
+
         repr_png = self._repr_png_()
-        repr_jpeg = self._repr_jpeg_()
-        if repr_png is not None:
-            data = io.BytesIO(repr_png)
-        elif repr_jpeg is not None:
-            data = io.BytesIO(repr_jpeg)
+        data = io.BytesIO(repr_png)
 
         new_image = Image(data, self._format)
         new_image._image = new_image._image.rotate(90, expand=True)
