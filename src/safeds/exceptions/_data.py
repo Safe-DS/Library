@@ -120,7 +120,10 @@ class ValueNotPresentWhenFittedError(Exception):
     def __init__(self, values: list[tuple[str, str]]) -> None:
         values_info = [f"{value} in column {column}" for value, column in values]
         line_break = "\n"
-        super().__init__(f"Value(s) not present in the table the transformer was fitted on: {line_break}{line_break.join(values_info)}")
+        super().__init__(
+            "Value(s) not present in the table the transformer was fitted on:"
+            f" {line_break}{line_break.join(values_info)}",
+        )
 
 
 class WrongFileExtensionError(Exception):

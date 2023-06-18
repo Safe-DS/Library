@@ -1,7 +1,12 @@
 import pytest
 from safeds.data.tabular.containers import Table
 from safeds.data.tabular.transformation import OneHotEncoder
-from safeds.exceptions import TransformerNotFittedError, UnknownColumnNameError, ValueNotPresentWhenFittedError, NonNumericColumnError
+from safeds.exceptions import (
+    NonNumericColumnError,
+    TransformerNotFittedError,
+    UnknownColumnNameError,
+    ValueNotPresentWhenFittedError,
+)
 
 
 class TestFit:
@@ -20,7 +25,13 @@ class TestFit:
             OneHotEncoder().fit(Table({"col1": []}), ["col1"])
 
     def test_should_warn_if_table_contains_numerical_data(self) -> None:
-        with pytest.warns(UserWarning, match=r"The columns \['col1'\] contain numerical data. The OneHotEncoder is designed to encode non-numerical values into numerical values"):
+        with pytest.warns(
+            UserWarning,
+            match=(
+                r"The columns \['col1'\] contain numerical data. The OneHotEncoder is designed to encode non-numerical"
+                r" values into numerical values"
+            ),
+        ):
             OneHotEncoder().fit(Table({"col1": [1, 2, 3]}), ["col1"])
 
     @pytest.mark.parametrize(
@@ -33,11 +44,11 @@ class TestFit:
             ),
             Table(
                 {
-                    "col1": ["a", "b", float('nan')],
+                    "col1": ["a", "b", float("nan")],
                 },
-            )
+            ),
         ],
-        ids=["string table", "table with nan"]
+        ids=["string table", "table with nan"],
     )
     def test_should_not_change_original_transformer(self, table: Table) -> None:
         transformer = OneHotEncoder()
@@ -86,21 +97,21 @@ class TestTransform:
 
     def test_should_raise_value_not_present_when_fitted(self) -> None:
         fit_table = Table(
-            {
-                "col1": ["a"],
-                "col2": ["b"]
-            },
+            {"col1": ["a"], "col2": ["b"]},
         )
         transform_table = Table(
-            {
-                "col1": ["b", "c"],
-                "col2": ["a", "b"]
-            },
+            {"col1": ["b", "c"], "col2": ["a", "b"]},
         )
 
         transformer = OneHotEncoder().fit(fit_table, None)
 
-        with pytest.raises(ValueNotPresentWhenFittedError, match=r"Value\(s\) not present in the table the transformer was fitted on: \nb in column col1\nc in column col1\na in column col2"):
+        with pytest.raises(
+            ValueNotPresentWhenFittedError,
+            match=(
+                r"Value\(s\) not present in the table the transformer was fitted on: \nb in column col1\nc in column"
+                r" col1\na in column col2"
+            ),
+        ):
             transformer.transform(transform_table)
 
 
@@ -119,11 +130,11 @@ class TestIsFitted:
             ),
             Table(
                 {
-                    "col1": [float('nan')],
+                    "col1": [float("nan")],
                 },
-            )
+            ),
         ],
-        ids=["table with strings", "table with nans"]
+        ids=["table with strings", "table with nans"],
     )
     def test_should_return_true_after_fitting(self, table: Table) -> None:
         transformer = OneHotEncoder()
@@ -219,25 +230,27 @@ class TestFitAndTransform:
                 ),
             ),
             (
-                Table(
-                    {
-                        "a": ["a", "b", "c", "c"],
-                        "b": ["a", float('nan'), float('nan'), "a"]
-                    }
-                ),
+                Table({"a": ["a", "b", "c", "c"], "b": ["a", float("nan"), float("nan"), "a"]}),
                 None,
                 Table(
                     {
-                        "a__a": [1., 0., 0., 0.],
-                        "a__b": [0., 1., 0., 0.],
-                        "a__c": [0., 0., 1., 1.],
-                        "b__a": [1., 0., 0., 1.],
-                        "b__nan": [0., 1., 1., 0.],
-                    }
-                )
-            )
+                        "a__a": [1.0, 0.0, 0.0, 0.0],
+                        "a__b": [0.0, 1.0, 0.0, 0.0],
+                        "a__c": [0.0, 0.0, 1.0, 1.0],
+                        "b__a": [1.0, 0.0, 0.0, 1.0],
+                        "b__nan": [0.0, 1.0, 1.0, 0.0],
+                    },
+                ),
+            ),
         ],
-        ids=["all columns", "one column", "multiple columns", "single underscore counterexample", "name conflict", "column with nans"],
+        ids=[
+            "all columns",
+            "one column",
+            "multiple columns",
+            "single underscore counterexample",
+            "name conflict",
+            "column with nans",
+        ],
     )
     def test_should_return_transformed_table(
         self,
@@ -270,11 +283,7 @@ class TestFitAndTransform:
             transformer.get_names_of_added_columns()
 
         table = Table(
-            {
-                "a__b": ["c", "d"],
-                "a": ["b__c", "d"],
-                "b": ["a", float('nan')]
-            },
+            {"a__b": ["c", "d"], "a": ["b__c", "d"], "b": ["a", float("nan")]},
         )
         added_columns = ["a__b__c", "a__b__d", "a__b__c#2", "a__d", "b__a", "b__nan"]
 
@@ -363,19 +372,7 @@ class TestInverseTransform:
                     },
                 ),
             ),
-            (
-                Table(
-                    {
-                        "a": ["a", "b", "b", float('nan')]
-                    }
-                ),
-                ["a"],
-                Table(
-                    {
-                        "a": ["a", "b", "b", float('nan')]
-                    }
-                )
-            )
+            (Table({"a": ["a", "b", "b", float("nan")]}), ["a"], Table({"a": ["a", "b", "b", float("nan")]})),
         ],
         ids=[
             "same table to fit and transform",
@@ -403,7 +400,7 @@ class TestInverseTransform:
     def test_should_not_change_transformed_table(self) -> None:
         table = Table(
             {
-                "col1": ["a", "b", "b", "c", float('nan')],
+                "col1": ["a", "b", "b", "c", float("nan")],
             },
         )
 
@@ -416,7 +413,7 @@ class TestInverseTransform:
                 "col1__a": [1.0, 0.0, 0.0, 0.0, 0.0],
                 "col1__b": [0.0, 1.0, 1.0, 0.0, 0.0],
                 "col1__c": [0.0, 0.0, 0.0, 1.0, 0.0],
-                "col1__nan": [0.0, 0.0, 0.0, 0.0, 1.0]
+                "col1__nan": [0.0, 0.0, 0.0, 0.0, 1.0],
             },
         )
 
@@ -438,13 +435,24 @@ class TestInverseTransform:
 
     def test_should_raise_if_column_not_found(self) -> None:
         with pytest.raises(UnknownColumnNameError, match=r"Could not find column\(s\) 'col1__one, col1__two'"):
-            OneHotEncoder().fit(Table({"col1": ["one", "two"]}), ["col1"]).inverse_transform(Table({"col1": [1.0, 0.0]}))
+            OneHotEncoder().fit(Table({"col1": ["one", "two"]}), ["col1"]).inverse_transform(
+                Table({"col1": [1.0, 0.0]}),
+            )
 
     def test_should_raise_if_table_contains_non_numerical_data(self) -> None:
-        with pytest.raises(NonNumericColumnError, match=r"Tried to do a numerical operation on one or multiple non-numerical columns: \n\['col1__one', 'col1__two'\]"):
-            OneHotEncoder().fit(Table({"col1": ["one", "two"]}), ["col1"]).inverse_transform(Table({"col1__one": ["1", "null"], "col1__two": ["2", "ok"]}))
+        with pytest.raises(
+            NonNumericColumnError,
+            match=(
+                r"Tried to do a numerical operation on one or multiple non-numerical columns: \n\['col1__one',"
+                r" 'col1__two'\]"
+            ),
+        ):
+            OneHotEncoder().fit(Table({"col1": ["one", "two"]}), ["col1"]).inverse_transform(
+                Table({"col1__one": ["1", "null"], "col1__two": ["2", "ok"]}),
+            )
 
     def test_should_raise_if_table_contains_no_rows(self) -> None:
-        with pytest.raises(ValueError, match=r"The OneHotEncoder cannot inverse transform the table because it contains 0 rows"):
+        with pytest.raises(
+            ValueError, match=r"The OneHotEncoder cannot inverse transform the table because it contains 0 rows",
+        ):
             OneHotEncoder().fit(Table({"col1": ["one"]}), ["col1"]).inverse_transform(Table({"col1__one": []}))
-

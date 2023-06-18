@@ -8,7 +8,7 @@ from safeds.data.tabular.containers import Table
 from safeds.data.tabular.transformation._table_transformer import (
     InvertibleTableTransformer,
 )
-from safeds.exceptions import TransformerNotFittedError, UnknownColumnNameError, NonNumericColumnError
+from safeds.exceptions import NonNumericColumnError, TransformerNotFittedError, UnknownColumnNameError
 
 
 # noinspection PyProtectedMember
@@ -55,7 +55,16 @@ class LabelEncoder(InvertibleTableTransformer):
             raise ValueError("The LabelEncoder cannot transform the table because it contains 0 rows")
 
         if table.keep_only_columns(column_names).remove_columns_with_non_numerical_values().number_of_columns > 0:
-            warnings.warn(f"The columns {table.keep_only_columns(column_names).remove_columns_with_non_numerical_values().column_names} contain numerical data. The LabelEncoder is designed to encode non-numerical values into numerical values", UserWarning, stacklevel=2)
+            warnings.warn(
+                (
+                    "The columns"
+                    f" {table.keep_only_columns(column_names).remove_columns_with_non_numerical_values().column_names} contain"
+                    " numerical data. The LabelEncoder is designed to encode non-numerical values into numerical"
+                    " values"
+                ),
+                UserWarning,
+                stacklevel=2,
+            )
 
         wrapped_transformer = sk_OrdinalEncoder()
         wrapped_transformer.fit(table._data[column_names])
@@ -143,8 +152,21 @@ class LabelEncoder(InvertibleTableTransformer):
         if len(missing_columns) > 0:
             raise UnknownColumnNameError(missing_columns)
 
-        if transformed_table.keep_only_columns(self._column_names).remove_columns_with_non_numerical_values().number_of_columns < len(self._column_names):
-            raise NonNumericColumnError(str(sorted(set(self._column_names) - set(transformed_table.keep_only_columns(self._column_names).remove_columns_with_non_numerical_values().column_names))))
+        if transformed_table.keep_only_columns(
+            self._column_names,
+        ).remove_columns_with_non_numerical_values().number_of_columns < len(self._column_names):
+            raise NonNumericColumnError(
+                str(
+                    sorted(
+                        set(self._column_names)
+                        - set(
+                            transformed_table.keep_only_columns(self._column_names)
+                            .remove_columns_with_non_numerical_values()
+                            .column_names,
+                        ),
+                    ),
+                ),
+            )
 
         if transformed_table.number_of_rows == 0:
             raise ValueError("The LabelEncoder cannot inverse transform the table because it contains 0 rows")

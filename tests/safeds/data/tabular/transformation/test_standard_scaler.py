@@ -1,7 +1,7 @@
 import pytest
 from safeds.data.tabular.containers import Table
 from safeds.data.tabular.transformation import StandardScaler
-from safeds.exceptions import TransformerNotFittedError, UnknownColumnNameError, NonNumericColumnError
+from safeds.exceptions import NonNumericColumnError, TransformerNotFittedError, UnknownColumnNameError
 
 from tests.helpers import assert_that_tables_are_close
 
@@ -18,8 +18,13 @@ class TestFit:
             StandardScaler().fit(table, ["col2", "col3"])
 
     def test_should_raise_if_table_contains_non_numerical_data(self) -> None:
-        with pytest.raises(NonNumericColumnError, match=r"Tried to do a numerical operation on one or multiple non-numerical columns: \n\['col1', 'col2'\]"):
-            StandardScaler().fit(Table({"col1": ["one", "two", "apple"], "col2": ["three", "four", "banana"]}), ["col1", "col2"])
+        with pytest.raises(
+            NonNumericColumnError,
+            match=r"Tried to do a numerical operation on one or multiple non-numerical columns: \n\['col1', 'col2'\]",
+        ):
+            StandardScaler().fit(
+                Table({"col1": ["one", "two", "apple"], "col2": ["three", "four", "banana"]}), ["col1", "col2"],
+            )
 
     def test_should_raise_if_table_contains_no_rows(self) -> None:
         with pytest.raises(ValueError, match=r"The StandardScaler cannot be fitted because the table contains 0 rows"):
@@ -72,11 +77,18 @@ class TestTransform:
             transformer.transform(table)
 
     def test_should_raise_if_table_contains_non_numerical_data(self) -> None:
-        with pytest.raises(NonNumericColumnError, match=r"Tried to do a numerical operation on one or multiple non-numerical columns: \n\['col1', 'col2'\]"):
-            StandardScaler().fit(Table({"col1": [1, 2, 3], "col2": [2, 3, 4]}), ["col1", "col2"]).transform(Table({"col1": ["a", "b", "c"], "col2": ["b", "c", "e"]}))
+        with pytest.raises(
+            NonNumericColumnError,
+            match=r"Tried to do a numerical operation on one or multiple non-numerical columns: \n\['col1', 'col2'\]",
+        ):
+            StandardScaler().fit(Table({"col1": [1, 2, 3], "col2": [2, 3, 4]}), ["col1", "col2"]).transform(
+                Table({"col1": ["a", "b", "c"], "col2": ["b", "c", "e"]}),
+            )
 
     def test_should_raise_if_table_contains_no_rows(self) -> None:
-        with pytest.raises(ValueError, match=r"The StandardScaler cannot transform the table because it contains 0 rows"):
+        with pytest.raises(
+            ValueError, match=r"The StandardScaler cannot transform the table because it contains 0 rows",
+        ):
             StandardScaler().fit(Table({"col1": [1, 2, 3]}), ["col1"]).transform(Table({"col1": []}))
 
 
@@ -249,12 +261,21 @@ class TestInverseTransform:
 
     def test_should_raise_if_column_not_found(self) -> None:
         with pytest.raises(UnknownColumnNameError, match=r"Could not find column\(s\) 'col1, col2'"):
-            StandardScaler().fit(Table({"col1": [1, 2, 4], "col2": [2, 3, 4]}), ["col1", "col2"]).inverse_transform(Table({"col3": [0, 1, 2]}))
+            StandardScaler().fit(Table({"col1": [1, 2, 4], "col2": [2, 3, 4]}), ["col1", "col2"]).inverse_transform(
+                Table({"col3": [0, 1, 2]}),
+            )
 
     def test_should_raise_if_table_contains_non_numerical_data(self) -> None:
-        with pytest.raises(NonNumericColumnError, match=r"Tried to do a numerical operation on one or multiple non-numerical columns: \n\['col1', 'col2'\]"):
-            StandardScaler().fit(Table({"col1": [1, 2, 4], "col2": [2, 3, 4]}), ["col1", "col2"]).inverse_transform(Table({"col1": ["one", "two", "apple"], "col2": ["three", "four", "banana"]}))
+        with pytest.raises(
+            NonNumericColumnError,
+            match=r"Tried to do a numerical operation on one or multiple non-numerical columns: \n\['col1', 'col2'\]",
+        ):
+            StandardScaler().fit(Table({"col1": [1, 2, 4], "col2": [2, 3, 4]}), ["col1", "col2"]).inverse_transform(
+                Table({"col1": ["one", "two", "apple"], "col2": ["three", "four", "banana"]}),
+            )
 
     def test_should_raise_if_table_contains_no_rows(self) -> None:
-        with pytest.raises(ValueError, match=r"The StandardScaler cannot transform the table because it contains 0 rows"):
+        with pytest.raises(
+            ValueError, match=r"The StandardScaler cannot transform the table because it contains 0 rows",
+        ):
             StandardScaler().fit(Table({"col1": [1, 2, 4]}), ["col1"]).inverse_transform(Table({"col1": []}))

@@ -9,7 +9,7 @@ from sklearn.impute import SimpleImputer as sk_SimpleImputer
 from safeds.data.tabular.containers import Table
 from safeds.data.tabular.transformation._table_transformer import TableTransformer
 from safeds.data.tabular.typing import ImputerStrategy
-from safeds.exceptions import TransformerNotFittedError, UnknownColumnNameError, NonNumericColumnError
+from safeds.exceptions import NonNumericColumnError, TransformerNotFittedError, UnknownColumnNameError
 
 
 class Imputer(TableTransformer):
@@ -76,7 +76,7 @@ class Imputer(TableTransformer):
                 imputer.strategy = "median"
 
         class Mode(ImputerStrategy):
-            """An imputation strategy for imputing missing data with mode values. The lowest value will be used if there are multiple values with the same highest count"""
+            """An imputation strategy for imputing missing data with mode values. The lowest value will be used if there are multiple values with the same highest count."""
 
             def __str__(self) -> str:
                 return "Mode"
@@ -128,8 +128,23 @@ class Imputer(TableTransformer):
         if table.number_of_rows == 0:
             raise ValueError("The Imputer cannot be fitted because the table contains 0 rows")
 
-        if (isinstance(self._strategy, Imputer.Strategy.Mean) or isinstance(self._strategy, Imputer.Strategy.Median)) and table.keep_only_columns(column_names).remove_columns_with_non_numerical_values().number_of_columns < len(column_names):
-            raise NonNumericColumnError(str(sorted(set(table.keep_only_columns(column_names).column_names) - set(table.keep_only_columns(column_names).remove_columns_with_non_numerical_values().column_names))))
+        if (
+            isinstance(self._strategy, Imputer.Strategy.Mean | Imputer.Strategy.Median)
+        ) and table.keep_only_columns(column_names).remove_columns_with_non_numerical_values().number_of_columns < len(
+            column_names,
+        ):
+            raise NonNumericColumnError(
+                str(
+                    sorted(
+                        set(table.keep_only_columns(column_names).column_names)
+                        - set(
+                            table.keep_only_columns(column_names)
+                            .remove_columns_with_non_numerical_values()
+                            .column_names,
+                        ),
+                    ),
+                ),
+            )
 
         if isinstance(self._strategy, Imputer.Strategy.Mode):
             multiple_most_frequent = {}
@@ -137,7 +152,15 @@ class Imputer(TableTransformer):
                 if len(table.get_column(name).mode()) > 1:
                     multiple_most_frequent[name] = table.get_column(name).mode()
             if len(multiple_most_frequent) > 0:
-                warnings.warn(f"There are multiple most frequent values in a column given to the Imputer.\nThe lowest values are being chosen in this cases. The following columns have multiple most frequent values:\n{multiple_most_frequent}", UserWarning, stacklevel=2)
+                warnings.warn(
+                    (
+                        "There are multiple most frequent values in a column given to the Imputer.\nThe lowest values"
+                        " are being chosen in this cases. The following columns have multiple most frequent"
+                        f" values:\n{multiple_most_frequent}"
+                    ),
+                    UserWarning,
+                    stacklevel=2,
+                )
 
         wrapped_transformer = sk_SimpleImputer()
         self._strategy._augment_imputer(wrapped_transformer)
@@ -188,7 +211,15 @@ class Imputer(TableTransformer):
             raise ValueError("The Imputer cannot transform the table because it contains 0 rows")
 
         if table.keep_only_columns(self._column_names).remove_columns_with_missing_values().number_of_columns > 0:
-            warnings.warn(f"The columns {table.keep_only_columns(self._column_names).remove_columns_with_missing_values().column_names} have no missing values, so the Imputer did not change these columns", UserWarning, stacklevel=2)
+            warnings.warn(
+                (
+                    "The columns"
+                    f" {table.keep_only_columns(self._column_names).remove_columns_with_missing_values().column_names} have"
+                    " no missing values, so the Imputer did not change these columns"
+                ),
+                UserWarning,
+                stacklevel=2,
+            )
 
         data = table._data.copy()
         data[self._column_names] = pd.DataFrame(

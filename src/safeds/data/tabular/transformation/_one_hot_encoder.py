@@ -10,7 +10,12 @@ from safeds.data.tabular.containers import Column, Table
 from safeds.data.tabular.transformation._table_transformer import (
     InvertibleTableTransformer,
 )
-from safeds.exceptions import TransformerNotFittedError, UnknownColumnNameError, ValueNotPresentWhenFittedError, NonNumericColumnError
+from safeds.exceptions import (
+    NonNumericColumnError,
+    TransformerNotFittedError,
+    UnknownColumnNameError,
+    ValueNotPresentWhenFittedError,
+)
 
 
 class OneHotEncoder(InvertibleTableTransformer):
@@ -99,7 +104,16 @@ class OneHotEncoder(InvertibleTableTransformer):
             raise ValueError("The OneHotEncoder cannot be fitted because the table contains 0 rows")
 
         if table.keep_only_columns(column_names).remove_columns_with_non_numerical_values().number_of_columns > 0:
-            warnings.warn(f"The columns {table.keep_only_columns(column_names).remove_columns_with_non_numerical_values().column_names} contain numerical data. The OneHotEncoder is designed to encode non-numerical values into numerical values", UserWarning, stacklevel=2)
+            warnings.warn(
+                (
+                    "The columns"
+                    f" {table.keep_only_columns(column_names).remove_columns_with_non_numerical_values().column_names} contain"
+                    " numerical data. The OneHotEncoder is designed to encode non-numerical values into numerical"
+                    " values"
+                ),
+                UserWarning,
+                stacklevel=2,
+            )
 
         data = table._data.copy()
         data.columns = table.column_names
@@ -207,7 +221,8 @@ class OneHotEncoder(InvertibleTableTransformer):
                 column_names.append(name)
             else:
                 column_names.extend(
-                    [f_name for f_name in self._value_to_column.values() if f_name.startswith(name)] + [f_name for f_name in self._value_to_column_nans.values() if f_name.startswith(name)],
+                    [f_name for f_name in self._value_to_column.values() if f_name.startswith(name)]
+                    + [f_name for f_name in self._value_to_column_nans.values() if f_name.startswith(name)],
                 )
 
         # Drop old, non-encoded columns:
@@ -256,8 +271,21 @@ class OneHotEncoder(InvertibleTableTransformer):
         if len(missing_columns) > 0:
             raise UnknownColumnNameError(missing_columns)
 
-        if transformed_table.keep_only_columns(_transformed_column_names).remove_columns_with_non_numerical_values().number_of_columns < len(_transformed_column_names):
-            raise NonNumericColumnError(str(sorted(set(_transformed_column_names) - set(transformed_table.keep_only_columns(_transformed_column_names).remove_columns_with_non_numerical_values().column_names))))
+        if transformed_table.keep_only_columns(
+            _transformed_column_names,
+        ).remove_columns_with_non_numerical_values().number_of_columns < len(_transformed_column_names):
+            raise NonNumericColumnError(
+                str(
+                    sorted(
+                        set(_transformed_column_names)
+                        - set(
+                            transformed_table.keep_only_columns(_transformed_column_names)
+                            .remove_columns_with_non_numerical_values()
+                            .column_names,
+                        ),
+                    ),
+                ),
+            )
 
         if transformed_table.number_of_rows == 0:
             raise ValueError("The OneHotEncoder cannot inverse transform the table because it contains 0 rows")
@@ -307,7 +335,11 @@ class OneHotEncoder(InvertibleTableTransformer):
         is_fitted : bool
             Whether the transformer is fitted.
         """
-        return self._column_names is not None and self._value_to_column is not None and self._value_to_column_nans is not None
+        return (
+            self._column_names is not None
+            and self._value_to_column is not None
+            and self._value_to_column_nans is not None
+        )
 
     def get_names_of_added_columns(self) -> list[str]:
         """

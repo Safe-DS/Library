@@ -4,7 +4,7 @@ from sklearn.preprocessing import MinMaxScaler as sk_MinMaxScaler
 
 from safeds.data.tabular.containers import Table
 from safeds.data.tabular.transformation._table_transformer import InvertibleTableTransformer
-from safeds.exceptions import TransformerNotFittedError, UnknownColumnNameError, NonNumericColumnError
+from safeds.exceptions import NonNumericColumnError, TransformerNotFittedError, UnknownColumnNameError
 
 
 class RangeScaler(InvertibleTableTransformer):
@@ -65,8 +65,22 @@ class RangeScaler(InvertibleTableTransformer):
             if len(missing_columns) > 0:
                 raise UnknownColumnNameError(missing_columns)
 
-        if table.keep_only_columns(column_names).remove_columns_with_non_numerical_values().number_of_columns < table.keep_only_columns(column_names).number_of_columns:
-            raise NonNumericColumnError(str(sorted(set(table.keep_only_columns(column_names).column_names) - set(table.keep_only_columns(column_names).remove_columns_with_non_numerical_values().column_names))))
+        if (
+            table.keep_only_columns(column_names).remove_columns_with_non_numerical_values().number_of_columns
+            < table.keep_only_columns(column_names).number_of_columns
+        ):
+            raise NonNumericColumnError(
+                str(
+                    sorted(
+                        set(table.keep_only_columns(column_names).column_names)
+                        - set(
+                            table.keep_only_columns(column_names)
+                            .remove_columns_with_non_numerical_values()
+                            .column_names,
+                        ),
+                    ),
+                ),
+            )
 
         if table.number_of_rows == 0:
             raise ValueError("The RangeScaler cannot be fitted because the table contains 0 rows")
@@ -116,8 +130,22 @@ class RangeScaler(InvertibleTableTransformer):
         if len(missing_columns) > 0:
             raise UnknownColumnNameError(missing_columns)
 
-        if table.keep_only_columns(self._column_names).remove_columns_with_non_numerical_values().number_of_columns < table.keep_only_columns(self._column_names).number_of_columns:
-            raise NonNumericColumnError(str(sorted(set(table.keep_only_columns(self._column_names).column_names) - set(table.keep_only_columns(self._column_names).remove_columns_with_non_numerical_values().column_names))))
+        if (
+            table.keep_only_columns(self._column_names).remove_columns_with_non_numerical_values().number_of_columns
+            < table.keep_only_columns(self._column_names).number_of_columns
+        ):
+            raise NonNumericColumnError(
+                str(
+                    sorted(
+                        set(table.keep_only_columns(self._column_names).column_names)
+                        - set(
+                            table.keep_only_columns(self._column_names)
+                            .remove_columns_with_non_numerical_values()
+                            .column_names,
+                        ),
+                    ),
+                ),
+            )
 
         if table.number_of_rows == 0:
             raise ValueError("The RangeScaler cannot transform the table because it contains 0 rows")
@@ -162,8 +190,24 @@ class RangeScaler(InvertibleTableTransformer):
         if len(missing_columns) > 0:
             raise UnknownColumnNameError(missing_columns)
 
-        if transformed_table.keep_only_columns(self._column_names).remove_columns_with_non_numerical_values().number_of_columns < transformed_table.keep_only_columns(self._column_names).number_of_columns:
-            raise NonNumericColumnError(str(sorted(set(transformed_table.keep_only_columns(self._column_names).column_names) - set(transformed_table.keep_only_columns(self._column_names).remove_columns_with_non_numerical_values().column_names))))
+        if (
+            transformed_table.keep_only_columns(self._column_names)
+            .remove_columns_with_non_numerical_values()
+            .number_of_columns
+            < transformed_table.keep_only_columns(self._column_names).number_of_columns
+        ):
+            raise NonNumericColumnError(
+                str(
+                    sorted(
+                        set(transformed_table.keep_only_columns(self._column_names).column_names)
+                        - set(
+                            transformed_table.keep_only_columns(self._column_names)
+                            .remove_columns_with_non_numerical_values()
+                            .column_names,
+                        ),
+                    ),
+                ),
+            )
 
         if transformed_table.number_of_rows == 0:
             raise ValueError("The RangeScaler cannot transform the table because it contains 0 rows")
