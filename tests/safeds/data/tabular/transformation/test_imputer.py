@@ -151,6 +151,12 @@ class TestTransform:
         with pytest.raises(TransformerNotFittedError, match=r"The transformer has not been fitted yet."):
             transformer.transform(table)
 
+    @pytest.mark.parametrize(
+        "strategy", strategies(), ids=lambda x: x.__class__.__name__
+    )
+    def test_should_warn_if_no_missing_values(self, strategy: ImputerStrategy) -> None:
+        with pytest.warns(UserWarning, match=r"The columns \['col1'\] have no missing values, so the Imputer did not change these columns"):
+            Imputer(strategy).fit(Table({"col1": [1, 2, 3]}), ["col1"]).transform(Table({"col1": [1, 2, 3, 4, 5]}))
 
 class TestIsFitted:
     @pytest.mark.parametrize(

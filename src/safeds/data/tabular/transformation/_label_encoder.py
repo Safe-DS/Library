@@ -55,7 +55,7 @@ class LabelEncoder(InvertibleTableTransformer):
             raise ValueError("The LabelEncoder cannot transform the table because it contains 0 rows")
 
         if table.keep_only_columns(column_names).remove_columns_with_non_numerical_values().number_of_columns > 0:
-            warnings.warn(f"The columns {table.keep_only_columns(column_names).remove_columns_with_non_numerical_values().column_names} contain numerical data. The LabelEncoder is designed to encode non-numerical values into numerical values")
+            warnings.warn(f"The columns {table.keep_only_columns(column_names).remove_columns_with_non_numerical_values().column_names} contain numerical data. The LabelEncoder is designed to encode non-numerical values into numerical values", UserWarning, stacklevel=2)
 
         wrapped_transformer = sk_OrdinalEncoder()
         wrapped_transformer.fit(table._data[column_names])

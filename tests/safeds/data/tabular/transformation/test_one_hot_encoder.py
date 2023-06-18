@@ -125,7 +125,7 @@ class TestIsFitted:
         ],
         ids=["table with strings", "table with nans"]
     )
-    def test_should_return_true_after_fitting(self, table) -> None:
+    def test_should_return_true_after_fitting(self, table: Table) -> None:
         transformer = OneHotEncoder()
         fitted_transformer = transformer.fit(table, None)
         assert fitted_transformer.is_fitted()
