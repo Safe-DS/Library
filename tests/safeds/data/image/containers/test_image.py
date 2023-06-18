@@ -4,6 +4,7 @@ from tempfile import NamedTemporaryFile
 import pytest
 from safeds.data.image.containers import Image
 from safeds.data.image.typing import ImageFormat
+from safeds.data.tabular.containers import Table
 
 from tests.helpers import resolve_resource_path
 
@@ -52,6 +53,28 @@ class TestFormat:
     )
     def test_should_return_correct_format(self, image: Image, format_: ImageFormat) -> None:
         assert image.format == format_
+
+
+class TestProperties:
+    @pytest.mark.parametrize(
+        ("image", "width", "height"),
+        [
+            (
+                Image.from_jpeg_file(resolve_resource_path("image/white_square.jpg")),
+                1,
+                1,
+            ),
+            (
+                Image.from_png_file(resolve_resource_path("image/snapshot_boxplot.png")),
+                640,
+                480,
+            ),
+        ],
+        ids=["[1,1].jpg", "[640,480].png"],
+    )
+    def test_should_return_image_properties(self, image: Image, width: int, height: int) -> None:
+        assert image.width == width
+        assert image.height == height
 
 
 class TestToJpegFile:
@@ -181,3 +204,182 @@ class TestResize:
         new_size: tuple[int, int],
     ) -> None:
         assert image.resize(new_width, new_height)._image.size == new_size
+
+
+class TestConvertToGrayscale:
+    @pytest.mark.parametrize(
+        ("image", "expected"),
+        [
+            (
+                Image.from_png_file(resolve_resource_path("image/snapshot_heatmap.png")),
+                Image.from_png_file(resolve_resource_path("image/snapshot_heatmap_grayscale.png")),
+            ),
+        ],
+        ids=["grayscale"],
+    )
+    def test_convert_to_grayscale(self, image: Image, expected: Image) -> None:
+        grayscale_image = image.convert_to_grayscale()
+        assert grayscale_image._image.tobytes() == expected._image.tobytes()
+
+
+class TestEQ:
+    def test_should_be_equal(self) -> None:
+        image = Image.from_png_file(resolve_resource_path("image/original.png"))
+        image2 = Image.from_png_file(resolve_resource_path("image/copy.png"))
+        assert image == image2
+
+    def test_should_not_be_equal(self) -> None:
+        image = Image.from_png_file(resolve_resource_path("image/original.png"))
+        image2 = Image.from_png_file(resolve_resource_path("image/white_square.png"))
+        assert image != image2
+
+    def test_should_raise(self) -> None:
+        image = Image.from_png_file(resolve_resource_path("image/original.png"))
+        other = Table()
+        assert (image.__eq__(other)) is NotImplemented
+
+
+class TestFlipVertically:
+    def test_should_flip_vertically(self) -> None:
+        image = Image.from_png_file(resolve_resource_path("image/original.png"))
+        image2 = image.flip_vertically()
+        image3 = Image.from_png_file(resolve_resource_path("image/flip_vertically.png"))
+        assert image != image2
+        assert image2 == image3
+
+    def test_should_be_original(self) -> None:
+        image = Image.from_png_file(resolve_resource_path("image/original.png"))
+        image2 = image.flip_vertically().flip_vertically()
+        assert image == image2
+
+
+class TestFlipHorizontally:
+    def test_should_flip_horizontally(self) -> None:
+        image = Image.from_png_file(resolve_resource_path("image/original.png"))
+        image2 = image.flip_horizontally()
+        image3 = Image.from_png_file(resolve_resource_path("image/flip_horizontally.png"))
+        assert image != image2
+        assert image2 == image3
+
+    def test_should_be_original(self) -> None:
+        image = Image.from_png_file(resolve_resource_path("image/original.png"))
+        image2 = image.flip_horizontally().flip_horizontally()
+        assert image == image2
+
+
+class TestAdjustContrast:
+    @pytest.mark.parametrize("factor", [0.75, 5])
+    def test_should_adjust_contrast(self, factor: float) -> None:
+        image = Image.from_png_file(resolve_resource_path("image/contrast/to_adjust_contrast.png"))
+        image2 = image.adjust_contrast(factor)
+        image3 = Image.from_png_file(
+            resolve_resource_path("image/contrast/contrast_adjusted_by_" + str(factor) + ".png"),
+        )
+        assert image != image2
+        assert image2 == image3
+
+    def test_should_not_adjust_contrast(self) -> None:
+        with pytest.warns(
+            UserWarning,
+            match="Contrast adjustment factor is 1.0, this will not make changes to the image.",
+        ):
+            image = Image.from_png_file(resolve_resource_path("image/contrast/to_adjust_contrast.png"))
+            image2 = image.adjust_contrast(1)
+            assert image == image2
+
+    def test_should_raise(self) -> None:
+        image = Image.from_png_file(resolve_resource_path("image/brightness/to_brighten.png"))
+        with pytest.raises(ValueError, match="Contrast factor has to be 0 or bigger"):
+            image.adjust_contrast(-1)
+
+
+class TestBrightness:
+    @pytest.mark.parametrize("factor", [0.5, 10])
+    def test_should_adjust_brightness(self, factor: float) -> None:
+        image = Image.from_png_file(resolve_resource_path("image/brightness/to_brighten.png"))
+        image2 = image.adjust_brightness(factor)
+        image3 = Image.from_png_file(resolve_resource_path("image/brightness/brightened_by_" + str(factor) + ".png"))
+        assert image != image2
+        assert image2 == image3
+
+    def test_should_not_brighten(self) -> None:
+        with pytest.warns(
+            UserWarning,
+            match="Brightness adjustment factor is 1.0, this will not make changes to the image.",
+        ):
+            image = Image.from_png_file(resolve_resource_path("image/brightness/to_brighten.png"))
+            image2 = image.adjust_brightness(1)
+            assert image == image2
+
+    def test_should_raise(self) -> None:
+        image = Image.from_png_file(resolve_resource_path("image/brightness/to_brighten.png"))
+        with pytest.raises(ValueError, match="Brightness factor has to be 0 or bigger"):
+            image.adjust_brightness(-1)
+
+
+class TestInvertColors:
+    def test_should_invert_colors_png(self) -> None:
+        image = Image.from_png_file(resolve_resource_path("image/original.png"))
+        image = image.invert_colors()
+        image2 = Image.from_png_file(resolve_resource_path("image/inverted_colors_original.png"))
+        assert image == image2
+
+    def test_should_invert_colors_jpeg(self) -> None:
+        image = Image.from_jpeg_file(resolve_resource_path("image/original.jpg"))
+        image = image.invert_colors()
+        image.to_jpeg_file(resolve_resource_path("image/inverted_colors_original1.jpg"))
+        image = Image.from_jpeg_file(resolve_resource_path("image/inverted_colors_original1.jpg"))
+        image2 = Image.from_jpeg_file(resolve_resource_path("image/inverted_colors_original.jpg"))
+        assert image == image2
+        Path.unlink(Path(resolve_resource_path("image/inverted_colors_original1.jpg")))
+
+
+class TestBlur:
+    def test_should_return_blurred_png_image(self) -> None:
+        image = Image.from_png_file(resolve_resource_path("image/boy.png"))
+        image = image.blur(2)
+        image.to_png_file(resolve_resource_path("image/blurredboy1.png"))
+        image = Image.from_png_file(resolve_resource_path("image/blurredboy1.png"))
+        image2 = Image.from_png_file(resolve_resource_path("image/blurredboy.png"))
+        assert image._image == image2._image
+
+    def test_should_return_blurred_jpg_image(self) -> None:
+        image = Image.from_jpeg_file(resolve_resource_path("image/boy.jpg"))
+        image = image.blur(2)
+        image.to_jpeg_file(resolve_resource_path("image/blurredboy1.jpg"))
+        image = Image.from_jpeg_file(resolve_resource_path("image/blurredboy1.jpg"))
+        image2 = Image.from_jpeg_file(resolve_resource_path("image/blurredboy.jpg"))
+        assert image._image == image2._image
+        Path.unlink(Path(resolve_resource_path("image/blurredboy1.jpg")))
+        Path.unlink(Path(resolve_resource_path("image/blurredboy1.png")))
+
+
+class TestCrop:
+    def test_should_crop_jpg_image(self) -> None:
+        image = Image.from_jpeg_file(resolve_resource_path("image/white.jpg"))
+        image = image.crop(0, 0, 100, 100)
+        image2 = Image.from_jpeg_file(resolve_resource_path("image/whiteCropped.jpg"))
+        assert image == image2
+
+    def test_should_crop_png_image(self) -> None:
+        image = Image.from_png_file(resolve_resource_path("image/white.png"))
+        image = image.crop(0, 0, 100, 100)
+        image2 = Image.from_png_file(resolve_resource_path("image/whiteCropped.png"))
+        assert image == image2
+
+
+class TestSharpen:
+    @pytest.mark.parametrize("factor", [-1, 0.5, 10])
+    def test_should_sharpen(self, factor: float) -> None:
+        image = Image.from_png_file(resolve_resource_path("image/sharpen/to_sharpen.png"))
+        image2 = image.sharpen(factor)
+        image2.to_png_file(resolve_resource_path("image/sharpen/sharpened_by_" + str(factor) + ".png"))
+        assert image != image2
+        assert image2 == Image.from_png_file(
+            resolve_resource_path("image/sharpen/sharpened_by_" + str(factor) + ".png"),
+        )
+
+    def test_should_not_sharpen(self) -> None:
+        image = Image.from_png_file(resolve_resource_path("image/sharpen/to_sharpen.png"))
+        image2 = image.sharpen(1)
+        assert image == image2
