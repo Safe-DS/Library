@@ -453,6 +453,7 @@ class TestInverseTransform:
 
     def test_should_raise_if_table_contains_no_rows(self) -> None:
         with pytest.raises(
-            ValueError, match=r"The OneHotEncoder cannot inverse transform the table because it contains 0 rows",
+            ValueError,
+            match=r"The OneHotEncoder cannot inverse transform the table because it contains 0 rows",
         ):
             OneHotEncoder().fit(Table({"col1": ["one"]}), ["col1"]).inverse_transform(Table({"col1__one": []}))

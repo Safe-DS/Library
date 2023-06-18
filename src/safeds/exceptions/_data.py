@@ -121,8 +121,10 @@ class ValueNotPresentWhenFittedError(Exception):
         values_info = [f"{value} in column {column}" for value, column in values]
         line_break = "\n"
         super().__init__(
-            "Value(s) not present in the table the transformer was fitted on:"
-            f" {line_break}{line_break.join(values_info)}",
+            (
+                "Value(s) not present in the table the transformer was fitted on:"
+                f" {line_break}{line_break.join(values_info)}"
+            ),
         )
 
 

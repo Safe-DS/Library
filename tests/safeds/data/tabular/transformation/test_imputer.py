@@ -61,7 +61,10 @@ class TestFit:
         ids=["Strategy Mean", "Strategy Median"],
     )
     def test_should_raise_if_table_contains_non_numerical_data(
-        self, table: Table, col_names: list[str], strategy: ImputerStrategy,
+        self,
+        table: Table,
+        col_names: list[str],
+        strategy: ImputerStrategy,
     ) -> None:
         with pytest.raises(
             NonNumericColumnError,

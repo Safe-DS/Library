@@ -245,7 +245,8 @@ class TestInverseTransform:
     def test_should_raise_if_column_not_found(self) -> None:
         with pytest.raises(UnknownColumnNameError, match=r"Could not find column\(s\) 'col1, col2'"):
             LabelEncoder().fit(
-                Table({"col1": ["one", "two"], "col2": ["three", "four"]}), ["col1", "col2"],
+                Table({"col1": ["one", "two"], "col2": ["three", "four"]}),
+                ["col1", "col2"],
             ).inverse_transform(Table({"col3": [1.0, 0.0]}))
 
     def test_should_raise_if_table_contains_non_numerical_data(self) -> None:
@@ -254,11 +255,13 @@ class TestInverseTransform:
             match=r"Tried to do a numerical operation on one or multiple non-numerical columns: \n\['col1', 'col2'\]",
         ):
             LabelEncoder().fit(
-                Table({"col1": ["one", "two"], "col2": ["three", "four"]}), ["col1", "col2"],
+                Table({"col1": ["one", "two"], "col2": ["three", "four"]}),
+                ["col1", "col2"],
             ).inverse_transform(Table({"col1": ["1", "null"], "col2": ["2", "apple"]}))
 
     def test_should_raise_if_table_contains_no_rows(self) -> None:
         with pytest.raises(
-            ValueError, match=r"The LabelEncoder cannot inverse transform the table because it contains 0 rows",
+            ValueError,
+            match=r"The LabelEncoder cannot inverse transform the table because it contains 0 rows",
         ):
             LabelEncoder().fit(Table({"col1": ["one", "two"]}), ["col1"]).inverse_transform(Table({"col1": []}))
