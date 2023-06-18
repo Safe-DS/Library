@@ -441,7 +441,7 @@ class TestInverseTransform:
             OneHotEncoder().fit(Table({"col1": ["one", "two"]}), ["col1"]).inverse_transform(Table({"col1": [1.0, 0.0]}))
 
     def test_should_raise_if_table_contains_non_numerical_data(self) -> None:
-        with pytest.raises(NonNumericColumnError, match=r"Tried to do a numerical operation on one or multiple non-numerical Columns: \n\['col1__one', 'col1__two'\]"):
+        with pytest.raises(NonNumericColumnError, match=r"Tried to do a numerical operation on one or multiple non-numerical columns: \n\['col1__one', 'col1__two'\]"):
             OneHotEncoder().fit(Table({"col1": ["one", "two"]}), ["col1"]).inverse_transform(Table({"col1__one": ["1", "null"], "col1__two": ["2", "ok"]}))
 
     def test_should_raise_if_table_contains_no_rows(self) -> None:

@@ -72,7 +72,7 @@ class TestFit:
         ids=["Strategy Mean", "Strategy Median"]
     )
     def test_should_raise_if_table_contains_non_numerical_data(self, table: Table, col_names: list[str], strategy: ImputerStrategy) -> None:
-        with pytest.raises(NonNumericColumnError, match=r"Tried to do a numerical operation on one or multiple non-numerical Columns: \n\['col1', 'col2'\]"):
+        with pytest.raises(NonNumericColumnError, match=r"Tried to do a numerical operation on one or multiple non-numerical columns: \n\['col1', 'col2'\]"):
             Imputer(strategy).fit(table, col_names)
 
     @pytest.mark.parametrize(

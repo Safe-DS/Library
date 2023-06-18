@@ -18,7 +18,7 @@ class TestFit:
             StandardScaler().fit(table, ["col2", "col3"])
 
     def test_should_raise_if_table_contains_non_numerical_data(self) -> None:
-        with pytest.raises(NonNumericColumnError, match=r"Tried to do a numerical operation on one or multiple non-numerical Columns: \n\['col1', 'col2'\]"):
+        with pytest.raises(NonNumericColumnError, match=r"Tried to do a numerical operation on one or multiple non-numerical columns: \n\['col1', 'col2'\]"):
             StandardScaler().fit(Table({"col1": ["one", "two", "apple"], "col2": ["three", "four", "banana"]}), ["col1", "col2"])
 
     def test_should_raise_if_table_contains_no_rows(self) -> None:
@@ -72,7 +72,7 @@ class TestTransform:
             transformer.transform(table)
 
     def test_should_raise_if_table_contains_non_numerical_data(self) -> None:
-        with pytest.raises(NonNumericColumnError, match=r"Tried to do a numerical operation on one or multiple non-numerical Columns: \n\['col1', 'col2'\]"):
+        with pytest.raises(NonNumericColumnError, match=r"Tried to do a numerical operation on one or multiple non-numerical columns: \n\['col1', 'col2'\]"):
             StandardScaler().fit(Table({"col1": [1, 2, 3], "col2": [2, 3, 4]}), ["col1", "col2"]).transform(Table({"col1": ["a", "b", "c"], "col2": ["b", "c", "e"]}))
 
     def test_should_raise_if_table_contains_no_rows(self) -> None:
@@ -252,7 +252,7 @@ class TestInverseTransform:
             StandardScaler().fit(Table({"col1": [1, 2, 4], "col2": [2, 3, 4]}), ["col1", "col2"]).inverse_transform(Table({"col3": [0, 1, 2]}))
 
     def test_should_raise_if_table_contains_non_numerical_data(self) -> None:
-        with pytest.raises(NonNumericColumnError, match=r"Tried to do a numerical operation on one or multiple non-numerical Columns: \n\['col1', 'col2'\]"):
+        with pytest.raises(NonNumericColumnError, match=r"Tried to do a numerical operation on one or multiple non-numerical columns: \n\['col1', 'col2'\]"):
             StandardScaler().fit(Table({"col1": [1, 2, 4], "col2": [2, 3, 4]}), ["col1", "col2"]).inverse_transform(Table({"col1": ["one", "two", "apple"], "col2": ["three", "four", "banana"]}))
 
     def test_should_raise_if_table_contains_no_rows(self) -> None:
