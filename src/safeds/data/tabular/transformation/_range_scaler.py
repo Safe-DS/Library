@@ -4,7 +4,7 @@ from sklearn.preprocessing import MinMaxScaler as sk_MinMaxScaler
 
 from safeds.data.tabular.containers import Table
 from safeds.data.tabular.transformation._table_transformer import InvertibleTableTransformer
-from safeds.exceptions import TransformerNotFittedError, UnknownColumnNameError
+from safeds.exceptions import TransformerNotFittedError, UnknownColumnNameError, NonNumericColumnError
 
 
 class RangeScaler(InvertibleTableTransformer):
@@ -48,13 +48,28 @@ class RangeScaler(InvertibleTableTransformer):
         -------
         fitted_transformer : TableTransformer
             The fitted transformer.
+
+        Raises
+        ------
+        UnknownColumnNameError
+            If column_names contain a column name that is missing in the table
+        NonNumericColumnError
+            If at least one of the specified columns in the table contains non-numerical data
+        ValueError
+            If the table contains 0 rows
         """
         if column_names is None:
             column_names = table.column_names
         else:
-            missing_columns = set(column_names) - set(table.column_names)
+            missing_columns = sorted(set(column_names) - set(table.column_names))
             if len(missing_columns) > 0:
-                raise UnknownColumnNameError(list(missing_columns))
+                raise UnknownColumnNameError(missing_columns)
+
+        if table.keep_only_columns(column_names).remove_columns_with_non_numerical_values().number_of_columns < table.keep_only_columns(column_names).number_of_columns:
+            raise NonNumericColumnError(str(sorted(set(table.keep_only_columns(column_names).column_names) - set(table.keep_only_columns(column_names).remove_columns_with_non_numerical_values().column_names))))
+
+        if table.number_of_rows == 0:
+            raise ValueError("The RangeScaler cannot be fitted because the table contains 0 rows")
 
         wrapped_transformer = sk_MinMaxScaler((self._minimum, self._maximum))
         wrapped_transformer.fit(table._data[column_names])
@@ -85,15 +100,27 @@ class RangeScaler(InvertibleTableTransformer):
         ------
         TransformerNotFittedError
             If the transformer has not been fitted yet.
+        UnknownColumnNameError
+            If the input table does not contain all columns used to fit the transformer
+        NonNumericColumnError
+            If at least one of the columns in the input table that is used to fit contains non-numerical data
+        ValueError
+            If the table contains 0 rows
         """
         # Transformer has not been fitted yet
         if self._wrapped_transformer is None or self._column_names is None:
             raise TransformerNotFittedError
 
         # Input table does not contain all columns used to fit the transformer
-        missing_columns = set(self._column_names) - set(table.column_names)
+        missing_columns = sorted(set(self._column_names) - set(table.column_names))
         if len(missing_columns) > 0:
-            raise UnknownColumnNameError(list(missing_columns))
+            raise UnknownColumnNameError(missing_columns)
+
+        if table.keep_only_columns(self._column_names).remove_columns_with_non_numerical_values().number_of_columns < table.keep_only_columns(self._column_names).number_of_columns:
+            raise NonNumericColumnError(str(sorted(set(table.keep_only_columns(self._column_names).column_names) - set(table.keep_only_columns(self._column_names).remove_columns_with_non_numerical_values().column_names))))
+
+        if table.number_of_rows == 0:
+            raise ValueError("The RangeScaler cannot transform the table because it contains 0 rows")
 
         data = table._data.copy()
         data.columns = table.column_names
@@ -120,10 +147,26 @@ class RangeScaler(InvertibleTableTransformer):
         ------
         TransformerNotFittedError
             If the transformer has not been fitted yet.
+        UnknownColumnNameError
+            If the input table does not contain all columns used to fit the transformer
+        NonNumericColumnError
+            If the transformed columns of the input table contain non-numerical data
+        ValueError
+            If the table contains 0 rows
         """
         # Transformer has not been fitted yet
         if self._wrapped_transformer is None or self._column_names is None:
             raise TransformerNotFittedError
+
+        missing_columns = sorted(set(self._column_names) - set(transformed_table.column_names))
+        if len(missing_columns) > 0:
+            raise UnknownColumnNameError(missing_columns)
+
+        if transformed_table.keep_only_columns(self._column_names).remove_columns_with_non_numerical_values().number_of_columns < transformed_table.keep_only_columns(self._column_names).number_of_columns:
+            raise NonNumericColumnError(str(sorted(set(transformed_table.keep_only_columns(self._column_names).column_names) - set(transformed_table.keep_only_columns(self._column_names).remove_columns_with_non_numerical_values().column_names))))
+
+        if transformed_table.number_of_rows == 0:
+            raise ValueError("The RangeScaler cannot transform the table because it contains 0 rows")
 
         data = transformed_table._data.copy()
         data.columns = transformed_table.column_names

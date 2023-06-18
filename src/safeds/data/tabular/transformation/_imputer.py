@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import warnings
 from typing import Any
 
 import pandas as pd
@@ -8,7 +9,7 @@ from sklearn.impute import SimpleImputer as sk_SimpleImputer
 from safeds.data.tabular.containers import Table
 from safeds.data.tabular.transformation._table_transformer import TableTransformer
 from safeds.data.tabular.typing import ImputerStrategy
-from safeds.exceptions import TransformerNotFittedError, UnknownColumnNameError
+from safeds.exceptions import TransformerNotFittedError, UnknownColumnNameError, NonNumericColumnError
 
 
 class Imputer(TableTransformer):
@@ -107,18 +108,36 @@ class Imputer(TableTransformer):
         -------
         fitted_transformer : TableTransformer
             The fitted transformer.
+
+        Raises
+        ------
+        UnknownColumnNameError
+            If column_names contain a column name that is missing in the table
+        ValueError
+            If the table contains 0 rows
+        NonNumericColumnError
+            If the strategy is set to either Mean or Median and the specified columns of the table contain non-numerical data
         """
         if column_names is None:
             column_names = table.column_names
         else:
-            missing_columns = set(column_names) - set(table.column_names)
+            missing_columns = sorted(set(column_names) - set(table.column_names))
             if len(missing_columns) > 0:
-                raise UnknownColumnNameError(list(missing_columns))
+                raise UnknownColumnNameError(missing_columns)
+
+        if table.number_of_rows == 0:
+            raise ValueError("The Imputer cannot be fitted because the table contains 0 rows")
+
+        if (isinstance(self._strategy, Imputer.Strategy.Mean) or isinstance(self._strategy, Imputer.Strategy.Median)) and table.keep_only_columns(column_names).remove_columns_with_non_numerical_values().number_of_columns < len(column_names):
+            raise NonNumericColumnError(str(sorted(set(table.keep_only_columns(column_names).column_names) - set(table.keep_only_columns(column_names).remove_columns_with_non_numerical_values().column_names))))
 
         if isinstance(self._strategy, Imputer.Strategy.Mode):
+            multiple_most_frequent = {}
             for name in column_names:
                 if len(table.get_column(name).mode()) > 1:
-                    raise IndexError("There are multiple most frequent values in a column given for the Imputer")
+                    multiple_most_frequent[name] = table.get_column(name).mode()
+            if len(multiple_most_frequent) > 0:
+                warnings.warn(f"There are multiple most frequent values in a column given to the Imputer.\nThe lowest values are being chosen in this cases. The following columns have multiple most frequent values:\n{multiple_most_frequent}", UserWarning, stacklevel=2)
 
         wrapped_transformer = sk_SimpleImputer()
         self._strategy._augment_imputer(wrapped_transformer)
@@ -151,15 +170,25 @@ class Imputer(TableTransformer):
         ------
         TransformerNotFittedError
             If the transformer has not been fitted yet.
+        UnknownColumnNameError
+            If the input table does not contain all columns used to fit the transformer
+        ValueError
+            If the table contains 0 rows
         """
         # Transformer has not been fitted yet
         if self._wrapped_transformer is None or self._column_names is None:
             raise TransformerNotFittedError
 
         # Input table does not contain all columns used to fit the transformer
-        missing_columns = set(self._column_names) - set(table.column_names)
+        missing_columns = sorted(set(self._column_names) - set(table.column_names))
         if len(missing_columns) > 0:
-            raise UnknownColumnNameError(list(missing_columns))
+            raise UnknownColumnNameError(missing_columns)
+
+        if table.number_of_rows == 0:
+            raise ValueError("The Imputer cannot transform the table because it contains 0 rows")
+
+        if table.keep_only_columns(self._column_names).remove_columns_with_missing_values().number_of_columns > 0:
+            warnings.warn(f"The columns {table.keep_only_columns(self._column_names).remove_columns_with_missing_values().column_names} have no missing values, so the Imputer did not change these columns", UserWarning, stacklevel=2)
 
         data = table._data.copy()
         data[self._column_names] = pd.DataFrame(

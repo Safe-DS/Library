@@ -24,7 +24,7 @@ class NonNumericColumnError(Exception):
     """Exception raised for trying to do numerical operations on a non-numerical column."""
 
     def __init__(self, column_info: str) -> None:
-        super().__init__(f"Tried to do a numerical operation on one or multiple non numerical Columns: \n{column_info}")
+        super().__init__(f"Tried to do a numerical operation on one or multiple non-numerical Columns: \n{column_info}")
 
 
 class DuplicateColumnNameError(Exception):
@@ -98,8 +98,10 @@ class TransformerNotFittedError(Exception):
 class ValueNotPresentWhenFittedError(Exception):
     """Exception raised when attempting to one-hot-encode a table containing values not present in the fitting phase."""
 
-    def __init__(self, value: str, column: str) -> None:
-        super().__init__(f"Value not present in the table the transformer was fitted on: \n{value} in column {column}.")
+    def __init__(self, values: list[tuple[str, str]]) -> None:
+        values_info = [f"{value} in column {column}" for value, column in values]
+        line_break = "\n"
+        super().__init__(f"Value(s) not present in the table the transformer was fitted on: {line_break}{line_break.join(values_info)}")
 
 
 class WrongFileExtensionError(Exception):
