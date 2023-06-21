@@ -205,24 +205,16 @@ class Image:
 
     def resize(self, new_width: int, new_height: int) -> Image:
         """
-        Return an image that has been resized to a given size.
+        Return a new image that has been resized to a given size.
 
         Returns
         -------
         result : Image
             The image with the given width and height
         """
-        data = io.BytesIO()
-        repr_png = self._repr_png_()
-        repr_jpeg = self._repr_jpeg_()
-        if repr_png is not None:
-            data = io.BytesIO(repr_png)
-        elif repr_jpeg is not None:
-            data = io.BytesIO(repr_jpeg)
-
-        new_image = Image(data, self._format)
-        new_image._image = new_image._image.resize((new_width, new_height))
-        return new_image
+        image_copy = copy.deepcopy(self)
+        image_copy._image = image_copy._image.resize((new_width, new_height))
+        return image_copy
 
     def convert_to_grayscale(self) -> Image:
         """

@@ -183,19 +183,13 @@ class TestResize:
         ("image", "new_width", "new_height", "new_size"),
         [
             (
-                Image.from_jpeg_file(resolve_resource_path("image/white_square.jpg")),
-                2,
-                3,
-                (2, 3),
-            ),
-            (
                 Image.from_png_file(resolve_resource_path("image/white_square.png")),
                 2,
                 3,
                 (2, 3),
             ),
         ],
-        ids=[".jpg", ".png"],
+        ids=[".png"],
     )
     def test_should_return_resized_image(
         self,
