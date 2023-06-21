@@ -225,10 +225,9 @@ class Image:
         grayscale_image : Image
             The grayscale image.
         """
-        data = io.BytesIO()
-        grayscale_image = self._image.convert("L")
-        grayscale_image.save(data, format=self._format.value)
-        return Image(data, self._format)
+        image_copy = copy.deepcopy(self)
+        image_copy._image = image_copy._image.convert("L")
+        return image_copy
 
     def crop(self, x: int, y: int, width: int, height: int) -> Image:
         """
