@@ -5,7 +5,6 @@ import pytest
 from safeds.data.image.containers import Image
 from safeds.data.image.typing import ImageFormat
 from safeds.data.tabular.containers import Table
-from safeds.exceptions._data import WrongFileExtensionError
 
 from tests.helpers import resolve_resource_path
 
@@ -383,38 +382,30 @@ class TestSharpen:
 
 
 class TestRotate:
-    def test_should_return_clockwise_rotated_image(
-        self,
-    ) -> None:
-        image = Image.from_png_file(resolve_resource_path("image/snapshot_boxplot.png"))
+    @pytest.mark.parametrize(
+        ("image", "expected"),
+        [
+            (
+                Image.from_png_file(resolve_resource_path("image/snapshot_boxplot.png")),
+                Image.from_png_file(resolve_resource_path("image/snapshot_boxplot_right_rotation.png")),
+            ),
+        ],
+        ids=[".png"],
+    )
+    def test_should_return_clockwise_rotated_image(self, image: Image, expected: Image) -> None:
         image = image.rotate_right()
-        image2 = Image.from_png_file(resolve_resource_path("image/snapshot_boxplot_right_rotation.png"))
-        assert image == image2
+        assert image == expected
 
-    def test_should_return_counter_clockwise_rotated_image(
-        self,
-    ) -> None:
-        image = Image.from_png_file(resolve_resource_path("image/snapshot_boxplot.png"))
+    @pytest.mark.parametrize(
+        ("image", "expected"),
+        [
+            (
+                Image.from_png_file(resolve_resource_path("image/snapshot_boxplot.png")),
+                Image.from_png_file(resolve_resource_path("image/snapshot_boxplot_left_rotation.png")),
+            ),
+        ],
+        ids=[".png"],
+    )
+    def test_should_return_counter_clockwise_rotated_image(self, image: Image, expected: Image) -> None:
         image = image.rotate_left()
-        image2 = Image.from_png_file(resolve_resource_path("image/snapshot_boxplot_left_rotation.png"))
-        assert image == image2
-
-    def test_should_raise_if_not_png_right(self) -> None:
-        with pytest.raises(
-            WrongFileExtensionError,
-            match=(
-                "The file /image has a wrong file extension. Please provide a file with the following extension\\(s\\):"
-                " .png"
-            ),
-        ):
-            Image.from_jpeg_file(resolve_resource_path("image/white_square.jpg")).rotate_right()
-
-    def test_should_raise_if_not_png_left(self) -> None:
-        with pytest.raises(
-            WrongFileExtensionError,
-            match=(
-                "The file /image has a wrong file extension. Please provide a file with the following extension\\(s\\):"
-                " .png"
-            ),
-        ):
-            Image.from_jpeg_file(resolve_resource_path("image/white_square.jpg")).rotate_left()
+        assert image == expected
