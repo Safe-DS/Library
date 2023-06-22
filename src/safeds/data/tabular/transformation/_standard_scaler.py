@@ -8,7 +8,7 @@ from safeds.exceptions import TransformerNotFittedError, UnknownColumnNameError
 
 
 class StandardScaler(InvertibleTableTransformer):
-    """The StandardScaler transforms column values by scaling each value to a given range."""
+    """The StandardScaler transforms column values by standardizing them."""
 
     def __init__(self) -> None:
         self._column_names: list[str] | None = None
