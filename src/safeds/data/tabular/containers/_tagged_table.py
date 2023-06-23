@@ -107,6 +107,26 @@ class TaggedTable(Table):
 
         return result
 
+    @staticmethod
+    def to_table(table: TaggedTable) -> Table:
+        """
+        Remove the tagging from a TaggedTable.
+
+        The original TaggedTable is not modified.
+
+        Parameters
+        ----------
+        table: TaggedTable
+        The TaggedTable.
+
+        Returns
+        -------
+        table: Table
+        The table as an untagged Table, i.e. without the information about which columns are features or target.
+
+        """
+        return table.features.add_column(table.target)
+
     # ------------------------------------------------------------------------------------------------------------------
     # Dunder methods
     # ------------------------------------------------------------------------------------------------------------------
