@@ -1,4 +1,5 @@
-import pandas as pd
+from typing import Iterable
+
 import pytest
 
 from safeds.data.tabular.typing import (

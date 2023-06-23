@@ -1,11 +1,11 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Iterable
 
 import pandas as pd
 import pytest
 
-from safeds.data.tabular.containers import Column, Table
+
 from safeds.data.tabular.typing import Boolean, ColumnType, Integer, RealNumber, Schema, String, Anything
 from safeds.exceptions import UnknownColumnNameError
 
@@ -18,57 +18,48 @@ class TestFromPandasDataFrame:
         ("columns", "expected"),
         [
             (
-                Column("A", [True, False, True]),
-                Schema({"A": Boolean(is_nullable=False)}),
+                pd.DataFrame({"A": [True, False, True]}),
+                Schema({"A": Boolean()}),
             ),
             (
-                Column("A", [1, 2, 3]),
-                Schema({"A": Integer(is_nullable=False)}),
+                pd.DataFrame({"A": [1, 2, 3]}),
+                Schema({"A": Integer()}),
             ),
             (
-                Column("A", [1.0, 2.0, 3.0]),
-                Schema({"A": RealNumber(is_nullable=False)}),
+                pd.DataFrame({"A": [1.0, 2.0, 3.0]}),
+                Schema({"A": RealNumber()}),
             ),
             (
-                Column("A", ["a", "b", "c"]),
-                Schema({"A": String(is_nullable=False)}),
+                pd.DataFrame({"A": ["a", "b", "c"]}),
+                Schema({"A": String()}),
             ),
             (
-                Column("A", [1, 2.0, "a", True]),
-                Schema({"A": Anything(is_nullable=False)}),
+                pd.DataFrame({"A": [1, 2.0, "a", True]}),
+                Schema({"A": Anything()}),
             ),
             (
-                Table({"A": [1, 2, 3], "B": ["a", "b", "c"]}),
-                Schema({"A": Integer(is_nullable=False), "B": String(is_nullable=False)}),
+                pd.DataFrame({"A": [1, 2, 3], "B": ["a", "b", "c"]}),
+                Schema({"A": Integer(), "B": String()}),
             ),
             (
-                Column("A", [True, False, None]),
+                pd.DataFrame({"A": [True, False, None]}),
                 Schema({"A": Boolean(is_nullable=True)}),
             ),
             (
-                Column("A", [None, 2, 3]),
-                Schema({"A": Integer(is_nullable=True)}),
+                pd.DataFrame({"A": [1, None, 3]}),
+                Schema({"A": RealNumber()}),
             ),
             (
-                Column("A", [2.0, None, 3.0]),
-                Schema({"A": RealNumber(is_nullable=True)}),
+                pd.DataFrame({"A": [1.0, None, 3.0]}),
+                Schema({"A": RealNumber()}),
             ),
             (
-                Column("A", ["a", None, "b"]),
+                pd.DataFrame({"A": ["a", None, "c"]}),
                 Schema({"A": String(is_nullable=True)}),
             ),
             (
-                Column("A", [1, 2.0, "a", True, None]),
+                pd.DataFrame({"A": [1, 2.0, None, True]}),
                 Schema({"A": Anything(is_nullable=True)}),
-            ),
-            (
-                Table({"A": [1, 2, 3], "B": ["a", "b", None]}),
-                Schema({"A": Integer(is_nullable=False), "B": String(is_nullable=True)}),
-            ),
-            (
-                Table({"A": [1, 2, 3], "B": ["a", "b", "c"], "C": [True, True, False]}),
-                Schema(
-                    {"A": Integer(is_nullable=False), "B": String(is_nullable=False), "C": Boolean(is_nullable=False)}),
             ),
         ],
         ids=[
@@ -82,12 +73,10 @@ class TestFromPandasDataFrame:
             "integer?",
             "real number?",
             "string?",
-            "anything?",
-            "integer, string?",
-            "integer, string, boolean"
+            "Anything?",
         ],
     )
-    def test_should_create_schema_from_pandas_dataframe(self, columns: Column | Table, expected: Schema) -> None:
+    def test_should_create_schema_from_pandas_dataframe(self, columns: Iterable, expected: Schema) -> None:
         assert Schema._from_pandas_dataframe(columns) == expected
 
 

@@ -3,13 +3,9 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from types import NoneType
-from typing import TYPE_CHECKING, Any
+from typing import Any
 
 import pandas as pd
-
-if TYPE_CHECKING:
-    import numpy as np
-    from safeds.data.tabular.containers import Column
 
 
 class ColumnType(ABC):
