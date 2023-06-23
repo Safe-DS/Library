@@ -242,8 +242,7 @@ class Table:
 
         Examples
         --------
-        >>> from safeds.data.tabular.containers import Table
-        >>> from safeds.data.tabular.containers import Column
+        >>> from safeds.data.tabular.containers import Column, Table
         >>> col1 = Column("a", [1, 2, 3])
         >>> col2 = Column("b", [4, 5, 6])
         >>> Table.from_columns([col1, col2])
