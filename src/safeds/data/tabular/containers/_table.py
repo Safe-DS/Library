@@ -141,7 +141,7 @@ class Table:
             If the file is not an Excel file.
 
         Examples
-        -------
+        --------
         >>> from safeds.data.tabular.containers import Table
         >>> Table.from_excel_file('./example_files/from_excel_file.xlsx')
            a  b
