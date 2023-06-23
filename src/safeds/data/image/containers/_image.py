@@ -12,6 +12,7 @@ from PIL.Image import Image as PillowImage
 from PIL.Image import open as open_image
 
 from safeds.data.image.typing import ImageFormat
+from safeds.exceptions import WrongFileExtensionError
 
 
 class Image:
@@ -334,15 +335,15 @@ class Image:
         image_copy._image = ImageEnhance.Contrast(image_copy._image).enhance(factor)
         return image_copy
 
-    def blur(self, radius: int = 1) -> Image:
+    def blur(self, radius: int) -> Image:
         """
         Return the blurred image.
 
         Parameters
         ----------
         radius : int
-             Radius is directly proportional to the blur value. The radius is equal to the amount of pixels united in each direction.
-             A Radius of 1 will result in a united box of 9 pixels.
+             Radius is directly proportional to the blur value. The radius is equal to the amount of pixels united in
+             each direction. A radius of 1 will result in a united box of 9 pixels.
 
         Returns
         -------
