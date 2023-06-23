@@ -32,8 +32,13 @@ from safeds.exceptions import UnknownColumnNameError
             ["C", "A"],
             Table({"C": [3], "A": [1]}),
         ),
+        (
+            Table(),
+            [],
+            Table(),
+        ),
     ],
-    ids=["No Column Name", "First Column", "Second Column", "All columns", "Last and first columns"],
+    ids=["No Column Name", "First Column", "Second Column", "All columns", "Last and first columns", "empty"],
 )
 def test_should_keep_only_listed_columns(table: Table, column_names: list[str], expected: Table) -> None:
     transformed_table = table.keep_only_columns(column_names)
@@ -41,7 +46,7 @@ def test_should_keep_only_listed_columns(table: Table, column_names: list[str], 
     assert transformed_table == expected
 
 
-def test_should_raise_error_if_column_name_unknown() -> None:
-    table = Table({"A": [1], "B": [2]})
+@pytest.mark.parametrize("table", [Table({"A": [1], "B": [2]}), Table()], ids=["table", "empty"])
+def test_should_raise_error_if_column_name_unknown(table: Table) -> None:
     with pytest.raises(UnknownColumnNameError, match=r"Could not find column\(s\) 'C'"):
         table.keep_only_columns(["C"])

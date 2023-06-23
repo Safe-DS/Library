@@ -35,8 +35,13 @@ def test_should_raise_if_column_contains_non_numerical_values() -> None:
     with pytest.raises(
         NonNumericColumnError,
         match=(
-            r"Tried to do a numerical operation on one or multiple non numerical Columns: \nThis table contains only"
+            r"Tried to do a numerical operation on one or multiple non-numerical columns: \nThis table contains only"
             r" non-numerical columns."
         ),
     ):
         table.plot_boxplots()
+
+
+def test_should_fail_on_empty_table() -> None:
+    with pytest.raises(NonNumericColumnError):
+        Table().plot_boxplots()
