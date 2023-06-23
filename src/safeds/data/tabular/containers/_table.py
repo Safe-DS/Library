@@ -825,6 +825,8 @@ class Table:
 
         This table is not modified.
 
+        Note: When removing the last column of the table, the `number_of_columns` property will be set to 0.
+
         Parameters
         ----------
         column_names : list[str]
