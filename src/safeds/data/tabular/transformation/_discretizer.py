@@ -3,13 +3,13 @@ from __future__ import annotations
 from sklearn.preprocessing import KBinsDiscretizer as sk_KBinsDiscretizer
 
 from safeds.data.tabular.containers import Table
-from safeds.data.tabular.transformation._table_transformer import TableTransformer
+from safeds.data.tabular.transformation import TableTransformer
 from safeds.exceptions import TransformerNotFittedError, UnknownColumnNameError
 
 
 class Discretizer(TableTransformer):
     """
-    The Discretizer transforms replaces a continuous variable by a variable that only has a finite amount of values.
+    The Discretizer bins continuous data into intervals.
 
     Parameters
     ----------
