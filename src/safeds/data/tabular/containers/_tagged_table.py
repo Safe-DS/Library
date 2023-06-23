@@ -230,12 +230,12 @@ class TaggedTable(Table):
         Parameters
         ----------
         self: TaggedTable
-        The TaggedTable.
+            The TaggedTable.
 
         Returns
         -------
         table: Table
-        The table as an untagged Table, i.e. without the information about which columns are features or target.
+            The table as an untagged Table, i.e. without the information about which columns are features or target.
 
         """
         return self.features.add_column(self.target)
