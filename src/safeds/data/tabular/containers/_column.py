@@ -192,8 +192,7 @@ class Column(Sequence[T]):
 
     def __iter__(self) -> Iterator[T]:
         r"""
-        Create an iterator for the data of this column.
-        This way e.g. for-each loops can be used on it.
+        Create an iterator for the data of this column. This way e.g. for-each loops can be used on it.
 
         Returns
         -------
