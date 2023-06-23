@@ -25,3 +25,13 @@ def test_should_get_column(table1: Table, expected: Column) -> None:
 def test_should_raise_error_if_column_name_unknown(table: Table) -> None:
     with pytest.raises(UnknownColumnNameError, match=r"Could not find column\(s\) 'col3'"):
         table.get_column("col3")
+
+def test_should_warn_if_similar_column_name() -> None:
+    table1 = Table({"col1": ["col1_1"], "col2": ["col2_1"]})
+    with pytest.warns(
+        UserWarning,
+        match=(
+            f"did you mean col1?"
+        ),
+    ):
+        table1.get_column("cil1")

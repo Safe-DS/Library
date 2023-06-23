@@ -12,6 +12,7 @@ import openpyxl
 import pandas as pd
 import seaborn as sns
 from pandas import DataFrame
+from rapidfuzz.distance import Levenshtein
 from scipy import stats
 
 from safeds.data.image.containers import Image
@@ -522,6 +523,17 @@ class Table:
             raise IndexOutOfBoundsError(index)
 
         return Row._from_pandas_dataframe(self._data.iloc[[index]], self._schema)
+
+    def get_similar_columns(self, column_name) -> bool:
+        for column in self.column_names:
+            if Levenshtein.normalized_similarity(column, column_name) >= 0.7:
+                warnings.warn(
+                    (
+                        f"did you mean {column}?"
+                    ),
+                    UserWarning,
+                    stacklevel=2,
+                )
 
     # ------------------------------------------------------------------------------------------------------------------
     # Information
