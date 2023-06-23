@@ -412,7 +412,7 @@ class Image:
 
     def find_edges(self) -> Image:
         """
-        Return the image with edges found.
+        Return a grayscale image with the highlighted edges.
 
         Returns
         -------
