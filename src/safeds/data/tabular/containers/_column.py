@@ -677,7 +677,7 @@ class Column(Sequence[T]):
         --------
         >>> from safeds.data.tabular.containers import Column
         >>> column = Column("test", [1, 2, 3, 4])
-        >>> column.mean()
+        >>> column.median()
         2.5
 
         >>> from safeds.data.tabular.containers import Column
