@@ -342,7 +342,7 @@ class TestBlur:
         image = image.blur(2)
         image.to_png_file(resolve_resource_path("image/blurredBoy1.png"))
         image = image.from_png_file(resolve_resource_path("image/blurredBoy1.png"))
-        assert image._image == expected._image
+        assert image == expected
 
 
 class TestCrop:
