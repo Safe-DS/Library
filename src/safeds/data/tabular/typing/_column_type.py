@@ -56,6 +56,9 @@ class ColumnType(ABC):
         for cell in data:
             if result == Nothing():
                 result = column_type_of_type(type(cell))
+                if type(cell) is NoneType:
+                    is_nullable = True
+                    result._is_nullable = is_nullable
             if result != column_type_of_type(type(cell)):
                 if type(cell) is NoneType:
                     is_nullable = True
