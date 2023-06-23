@@ -112,8 +112,39 @@ from safeds.data.tabular.containers import Table
                 },
             ),
         ),
+        (
+            Table({"col": [None, None]}),
+            Table(
+                {
+                    "metrics": [
+                        "maximum",
+                        "minimum",
+                        "mean",
+                        "mode",
+                        "median",
+                        "sum",
+                        "variance",
+                        "standard deviation",
+                        "idness",
+                        "stability",
+                    ],
+                    "col": [
+                        "-",
+                        "-",
+                        "-",
+                        "[]",
+                        "-",
+                        "-",
+                        "-",
+                        "-",
+                        "0.0",
+                        "-"
+                    ],
+                },
+            ),
+        ),
     ],
-    ids=["Column of integers and Column of characters", "empty", "empty with columns"],
+    ids=["Column of integers and Column of characters", "empty", "empty with columns", "Column of None"],
 )
 def test_should_make_summary(table: Table, expected: Table) -> None:
     assert expected.schema == table.summary().schema
