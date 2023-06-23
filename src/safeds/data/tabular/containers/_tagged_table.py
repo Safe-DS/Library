@@ -102,8 +102,8 @@ class TaggedTable(Table):
 
         result._data = table._data
         result._schema = table.schema
-        result._features = result.keep_only_columns(feature_names)
-        result._target = result.get_column(target_name)
+        result._features = table.keep_only_columns(feature_names)
+        result._target = table.get_column(target_name)
 
         return result
 
@@ -157,8 +157,8 @@ class TaggedTable(Table):
         if len(feature_names) == 0:
             raise ValueError("At least one feature column must be specified.")
 
-        self._features: Table = self.keep_only_columns(feature_names)
-        self._target: Column = self.get_column(target_name)
+        self._features: Table = super().keep_only_columns(feature_names)
+        self._target: Column = super().get_column(target_name)
 
     # ------------------------------------------------------------------------------------------------------------------
     # Properties
