@@ -33,5 +33,5 @@ def test_should_raise_column_size_error_if_column_is_empty() -> None:
 
 def test_should_raise_value_error_if_column_contains_only_none() -> None:
     column: Column[Any] = Column("A", [None, None])
-    with pytest.raises(ValueError, match="Stability cannot be calculated for a column with only null values."):
+    with pytest.raises(ValueError, match="Stability is not definded for a column with only null values."):
         column.stability()
