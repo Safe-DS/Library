@@ -749,20 +749,3 @@ class TaggedTable(Table):
         2     a     d       3
         """
         return TaggedTable._from_table(transformer.inverse_transform(self), self.target.name)
-
-    # ------------------------------------------------------------------------------------------------------------------
-    # New methods specific to `TaggedTable`s:
-    # ------------------------------------------------------------------------------------------------------------------
-    def remove_target_column(self) -> Table:
-        """
-        Return a new table consisting of only the feature columns.
-
-        The original TaggedTable is not modified.
-
-        Returns
-        -------
-        table : Table
-            The table, without the target column.
-
-        """
-        return super().remove_columns([self.target.name])

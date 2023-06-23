@@ -169,8 +169,8 @@ class TestPredict:
 
     def test_should_include_complete_input_table(self, classifier: Classifier, valid_data: TaggedTable) -> None:
         fitted_regressor = classifier.fit(valid_data)
-        prediction = fitted_regressor.predict(valid_data.remove_target_column())
-        assert prediction.remove_target_column() == valid_data.remove_target_column()
+        prediction = fitted_regressor.predict(valid_data.features)
+        assert prediction.features == valid_data.features
 
     def test_should_set_correct_target_name(self, classifier: Classifier, valid_data: TaggedTable) -> None:
         fitted_classifier = classifier.fit(valid_data)
@@ -196,7 +196,7 @@ class TestPredict:
     def test_should_raise_if_dataset_misses_features(self, classifier: Classifier, valid_data: TaggedTable) -> None:
         fitted_classifier = classifier.fit(valid_data)
         with pytest.raises(DatasetMissesFeaturesError, match="[feat1, feat2]"):
-            fitted_classifier.predict(valid_data.remove_target_column().remove_columns(["feat1", "feat2"]))
+            fitted_classifier.predict(valid_data.features.remove_columns(["feat1", "feat2"]))
 
     @pytest.mark.parametrize(
         ("invalid_data", "expected_error", "expected_error_msg"),
