@@ -375,7 +375,7 @@ class TestPrecision:
     )
     def test_should_raise_if_table_is_not_tagged(self, table: Table) -> None:
         with pytest.raises(UntaggedTableError):
-            DummyClassifier().precision(table)  # type: ignore[arg-type]
+            DummyClassifier().precision(table, 1)  # type: ignore[arg-type]
 
 
 class TestRecall:
@@ -424,7 +424,7 @@ class TestRecall:
     )
     def test_should_raise_if_table_is_not_tagged(self, table: Table) -> None:
         with pytest.raises(UntaggedTableError):
-            DummyClassifier().recall(table)  # type: ignore[arg-type]
+            DummyClassifier().recall(table, 1)  # type: ignore[arg-type]
 
 
 class TestF1Score:
@@ -473,4 +473,4 @@ class TestF1Score:
     )
     def test_should_raise_if_table_is_not_tagged(self, table: Table) -> None:
         with pytest.raises(UntaggedTableError):
-            DummyClassifier().f1_score(table)  # type: ignore[arg-type]
+            DummyClassifier().f1_score(table, 1)  # type: ignore[arg-type]
