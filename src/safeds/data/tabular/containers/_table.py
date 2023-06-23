@@ -857,6 +857,8 @@ class Table:
 
         This table is not modified.
 
+        Note: When removing the last column of the table, the `number_of_columns` property will be set to 0.
+
         Parameters
         ----------
         column_names : list[str]
@@ -889,6 +891,8 @@ class Table:
 
         This table is not modified.
 
+        Note: When removing the last column of the table, the `number_of_columns` property will be set to 0.
+
         Returns
         -------
         table : Table
@@ -901,6 +905,8 @@ class Table:
         Return a table without the columns that contain non-numerical values.
 
         This table is not modified.
+
+        Note: When removing the last column of the table, the `number_of_columns` property will be set to 0.
 
         Returns
         -------
