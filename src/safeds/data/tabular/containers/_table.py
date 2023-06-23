@@ -6,13 +6,13 @@ import warnings
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, TypeVar
 
+import Levenshtein
 import matplotlib.pyplot as plt
 import numpy as np
 import openpyxl
 import pandas as pd
 import seaborn as sns
 from pandas import DataFrame
-from rapidfuzz.distance import Levenshtein
 from scipy import stats
 
 from safeds.data.image.containers import Image
@@ -541,7 +541,7 @@ class Table:
         """
         similar_columns = []
         for column in self.column_names:
-            if Levenshtein.normalized_similarity(column, column_name) >= 0.7:
+            if Levenshtein.jaro_winkler(column, column_name) >= 0.7:
                 similar_columns.append(column)
         if len(similar_columns) > 0:
             warnings.warn(
