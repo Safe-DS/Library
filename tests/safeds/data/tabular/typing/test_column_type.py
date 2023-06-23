@@ -16,19 +16,20 @@ class TestDataType:
     @pytest.mark.parametrize(
         ("data", "expected"),
         [
-            (pd.Series([1, 2, 3]), Integer(is_nullable=False)),
-            (pd.Series([1.0, 2.0, 3.0]), RealNumber(is_nullable=False)),
-            (pd.Series([True, False, True]), Boolean(is_nullable=False)),
-            (pd.Series(["a", "b", "c"]), String(is_nullable=False)),
-            (pd.Series(["a", 1, 2.0]), Anything(is_nullable=False)),
-            (pd.Series([None, None, None]), Nothing()),
-            (pd.Series([1, 2, None]), Integer(is_nullable=True)),
-            (pd.Series([1.0, 2.0, None]), RealNumber(is_nullable=True)),
-            (pd.Series([True, False, None]), Boolean(is_nullable=True)),
-            (pd.Series(["a", None, "b"]), String(is_nullable=True)),
+            (([1, 2, 3]), Integer(is_nullable=False)),
+            (([1.0, 2.0, 3.0]), RealNumber(is_nullable=False)),
+            (([True, False, True]), Boolean(is_nullable=False)),
+            ((["a", "b", "c"]), String(is_nullable=False)),
+            ((["a", 1, 2.0]), Anything(is_nullable=False)),
+            (([None, None, None]), Nothing()),
+            (([1, 2, None]), Integer(is_nullable=True)),
+            (([1.0, 2.0, None]), RealNumber(is_nullable=True)),
+            (([True, False, None]), Boolean(is_nullable=True)),
+            ((["a", None, "b"]), String(is_nullable=True)),
 
         ],
-        ids=repr,
+        ids=["Integer", "RealNumber", "Boolean", "String", "Mixed", "None", "Nullable Integer", "Nullable RealNumber",
+             "Nullable Boolean", "Nullable String"],
     )
     def test_should_return_the_data_type(self, data: pd.Series, expected: ColumnType) -> None:
         assert ColumnType._data_type(data) == expected
