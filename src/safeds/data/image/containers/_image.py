@@ -12,7 +12,6 @@ from PIL.Image import Image as PillowImage
 from PIL.Image import open as open_image
 
 from safeds.data.image.typing import ImageFormat
-from safeds.exceptions import WrongFileExtensionError
 
 
 class Image:
