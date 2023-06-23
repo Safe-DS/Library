@@ -271,7 +271,7 @@ class OneHotEncoder(InvertibleTableTransformer):
         if len(missing_columns) > 0:
             raise UnknownColumnNameError(missing_columns)
 
-        if transformed_table.keep_only_columns(
+        if transformed_table._as_table().keep_only_columns(
             _transformed_column_names,
         ).remove_columns_with_non_numerical_values().number_of_columns < len(_transformed_column_names):
             raise NonNumericColumnError(
