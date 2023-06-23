@@ -60,14 +60,38 @@ class AdaBoost(Classifier):
 
     @property
     def learner(self) -> Classifier | None:
+        """
+        Get the base learner used for training the ensemble.
+
+        Returns
+        -------
+        result: Classifier | None
+            The base learner.
+        """
         return self._learner
 
     @property
     def maximum_number_of_learners(self) -> int:
+        """
+        Get the maximum number of learners in the ensemble.
+
+        Returns
+        -------
+        result: int
+            The maximum number of learners.
+        """
         return self._maximum_number_of_learners
 
     @property
     def learning_rate(self) -> float:
+        """
+        Get the learning rate.
+
+        Returns
+        -------
+        result: float
+            The learning rate.
+        """
         return self._learning_rate
 
     def fit(self, training_set: TaggedTable) -> AdaBoost:
