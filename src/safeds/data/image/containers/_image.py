@@ -349,17 +349,9 @@ class Image:
         result : Image
             The blurred image
         """
-        data = io.BytesIO()
-        repr_png = self._repr_png_()
-        repr_jpeg = self._repr_jpeg_()
-        if repr_png is not None:
-            data = io.BytesIO(repr_png)
-        elif repr_jpeg is not None:
-            data = io.BytesIO(repr_jpeg)
-
-        new_image = Image(data, self._format)
-        new_image._image = new_image._image.filter(ImageFilter.BoxBlur(radius))
-        return new_image
+        image_copy = copy.deepcopy(self)
+        image_copy._image = image_copy._image.filter(ImageFilter.BoxBlur(radius))
+        return image_copy
 
     def sharpen(self, factor: float) -> Image:
         """
@@ -388,10 +380,6 @@ class Image:
         result : Image
             The image with inverted colors.
         """
- #       new_image = Image(data, self._format)
- #       new_image._image = ImageOps.invert(new_image._image)
-#        return new_image
-
         image_copy = copy.deepcopy(self)
         image_copy._image = ImageOps.invert(image_copy._image)
         return image_copy

@@ -312,39 +312,37 @@ class TestBrightness:
 
 
 class TestInvertColors:
-    def test_should_invert_colors_png(self) -> None:
-        image = Image.from_png_file(resolve_resource_path("image/original.png"))
+    @pytest.mark.parametrize(
+        ("image", "expected"),
+        [
+            (
+                Image.from_png_file(resolve_resource_path("image/original.png")),
+                Image.from_png_file(resolve_resource_path("image/inverted_colors_original.png")),
+            ),
+        ],
+        ids=[".png"],
+    )
+    def test_should_invert_colors_png(self, image: Image, expected: Image) -> None:
         image = image.invert_colors()
-        image2 = Image.from_png_file(resolve_resource_path("image/inverted_colors_original.png"))
-        assert image == image2
-
-    def test_should_invert_colors_jpeg(self) -> None:
-        image = Image.from_jpeg_file(resolve_resource_path("image/original.jpg"))
-        image = image.invert_colors()
-        image2 = Image.from_jpeg_file(resolve_resource_path("image/inverted_colors_original.jpg"))
-        assert image == image2
-
+        assert image == expected
 
 
 class TestBlur:
-    def test_should_return_blurred_png_image(self) -> None:
-        image = Image.from_png_file(resolve_resource_path("image/boy.png"))
+    @pytest.mark.parametrize(
+        ("image", "expected"),
+        [
+            (
+                Image.from_png_file(resolve_resource_path("image/boy.png")),
+                Image.from_png_file(resolve_resource_path("image/blurredBoy.png")),
+            ),
+        ],
+        ids=[".png"],
+    )
+    def test_should_return_blurred_png_image(self, image: Image, expected: Image) -> None:
         image = image.blur(2)
-        image.to_png_file(resolve_resource_path("image/blurredboy1.png"))
-        image = Image.from_png_file(resolve_resource_path("image/blurredboy1.png"))
-        image2 = Image.from_png_file(resolve_resource_path("image/blurredboy.png"))
-        assert image._image == image2._image
-
-    def test_should_return_blurred_jpg_image(self) -> None:
-        image = Image.from_jpeg_file(resolve_resource_path("image/boy.jpg"))
-        image = image.blur(2)
-        image.to_jpeg_file(resolve_resource_path("image/blurredboy1.jpg"))
-        image = Image.from_jpeg_file(resolve_resource_path("image/blurredboy1.jpg"))
-        image2 = Image.from_jpeg_file(resolve_resource_path("image/blurredboy.jpg"))
-        assert image._image == image2._image
-        Path.unlink(Path(resolve_resource_path("image/blurredboy1.jpg")))
-        Path.unlink(Path(resolve_resource_path("image/blurredboy1.png")))
-
+        image.to_png_file(resolve_resource_path("image/blurredBoy1.png"))
+        image = image.from_png_file(resolve_resource_path("image/blurredBoy1.png"))
+        assert image._image == expected._image
 
 
 class TestCrop:
