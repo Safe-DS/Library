@@ -913,6 +913,11 @@ class Table:
         -------
         table : Table
             A table without the columns that contain missing values.
+
+        Raises
+        ------
+        IllegalSchemaModificationError
+            If removing the columns would violate an invariant in the subclass.
         """
         return Table.from_columns([column for column in self.to_columns() if not column.has_missing_values()])
 
@@ -927,6 +932,10 @@ class Table:
         table : Table
             A table without the columns that contain non-numerical values.
 
+        Raises
+        ------
+        IllegalSchemaModificationError
+            If removing the columns would violate an invariant in the subclass.
         """
         return Table.from_columns([column for column in self.to_columns() if column.type.is_numeric()])
 
@@ -1048,6 +1057,9 @@ class Table:
 
         ColumnSizeError
             If the size of at least one of the new columns does not match the amount of rows.
+
+        IllegalSchemaModificationError
+            If replacing the column would violate an invariant in the subclass.
         """
         if old_column_name not in self._schema.column_names:
             raise UnknownColumnNameError([old_column_name])
@@ -1263,7 +1275,6 @@ class Table:
         ------
         UnknownColumnNameError
             If the column does not exist.
-
         """
         if self.has_column(name):
             items: list = [transformer(item) for item in self.to_rows()]
@@ -1291,6 +1302,8 @@ class Table:
         ------
         TransformerNotFittedError
             If the transformer has not been fitted yet.
+        IllegalSchemaModificationError
+            If replacing the column would violate an invariant in the subclass.
 
         Examples
         --------
