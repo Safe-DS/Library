@@ -196,10 +196,10 @@ class TaggedTable(Table):
         return self.features.add_column(self.target)
 
     # ------------------------------------------------------------------------------------------------------------------
-    # Overriden methods from Table class:
+    # Specific methods from TaggedTable class:
     # ------------------------------------------------------------------------------------------------------------------
 
-    def add_column(self, column: Column) -> TaggedTable:
+    def add_column_as_feature(self, column: Column) -> TaggedTable:
         """
         Return the original table with the provided column attached at the end, as a feature column.
 
@@ -214,16 +214,58 @@ class TaggedTable(Table):
         ------
         DuplicateColumnNameError
             If the new column already exists.
-
         ColumnSizeError
             If the size of the column does not match the amount of rows.
-
         """
-        return TaggedTable._from_table(super().add_column(column), target_name=self.target.name)
+        return TaggedTable._from_table(super().add_column(column), target_name=self.target.name, feature_names=self.features.column_names + [column.name])
+
+    def add_columns_as_features(self, columns: list[Column] | Table) -> TaggedTable:
+        """
+        Return the original table with the provided column attached at the end, as feature columns.
+
+        This table is not modified.
+
+        Returns
+        -------
+        result : TaggedTable
+            The table with the column attached as feature columns.
+
+        Raises
+        ------
+        DuplicateColumnNameError
+            If the new column already exists.
+        ColumnSizeError
+            If the size of the column does not match the amount of rows.
+        """
+        return TaggedTable._from_table(super().add_columns(columns), target_name=self.target.name, feature_names=self.features.column_names + list(map(lambda col: col.name, columns.to_columns() if isinstance(columns, Table) else columns)))
+
+    # ------------------------------------------------------------------------------------------------------------------
+    # Overriden methods from Table class:
+    # ------------------------------------------------------------------------------------------------------------------
+
+    def add_column(self, column: Column) -> TaggedTable:
+        """
+        Return the original table with the provided column attached at the end, as neither target nor feature column.
+
+        This table is not modified.
+
+        Returns
+        -------
+        result : TaggedTable
+            The table with the column attached as neither target nor feature column.
+
+        Raises
+        ------
+        DuplicateColumnNameError
+            If the new column already exists.
+        ColumnSizeError
+            If the size of the column does not match the amount of rows.
+        """
+        return TaggedTable._from_table(super().add_column(column), target_name=self.target.name, feature_names=self.features.column_names)
 
     def add_columns(self, columns: list[Column] | Table) -> TaggedTable:
         """
-        Add multiple columns to the table, as feature columns.
+        Add multiple columns to the table, as neither target nor feature columns.
 
         This table is not modified.
 
@@ -235,7 +277,7 @@ class TaggedTable(Table):
         Returns
         -------
         result: TaggedTable
-            A new table combining the original table and the given columns as feature columns.
+            A new table combining the original table and the given columns as neither target nor feature columns.
 
         Raises
         ------
@@ -244,7 +286,7 @@ class TaggedTable(Table):
         DuplicateColumnNameError
             If at least one column name from the provided column list already exists in the table.
         """
-        return TaggedTable._from_table(super().add_columns(columns), target_name=self.target.name)
+        return TaggedTable._from_table(super().add_columns(columns), target_name=self.target.name, feature_names=self.features.column_names)
 
     def add_row(self, row: Row) -> TaggedTable:
         """
@@ -366,10 +408,9 @@ class TaggedTable(Table):
         ColumnIsTargetError
             If any of the given columns is the target column.
         """
-        try:
-            return TaggedTable._from_table(super().remove_columns(column_names), self.target.name)
-        except UnknownColumnNameError:
-            raise ColumnIsTargetError(self.target.name) from None
+        if self.target.name in column_names:
+            raise ColumnIsTargetError(self.target.name)
+        return TaggedTable._from_table(super().remove_columns(column_names), target_name=self.target.name, feature_names=sorted(set(self.features.column_names) - set(column_names), key={val: ix for ix, val in enumerate(self.features.column_names)}.get))
 
     def remove_columns_with_missing_values(self) -> TaggedTable:
         """
@@ -388,11 +429,9 @@ class TaggedTable(Table):
             If any of the columns to be removed is the target column.
         """
         table = super().remove_columns_with_missing_values()
-        try:
-            tagged = TaggedTable._from_table(table, self.target.name, None)
-        except UnknownColumnNameError:
-            raise ColumnIsTargetError(self.target.name) from None
-        return tagged
+        if self.target.name not in table.column_names:
+            raise ColumnIsTargetError(self.target.name)
+        return TaggedTable._from_table(table, self.target.name, feature_names=sorted(set(self.features.column_names).intersection(set(table.column_names)), key={val: ix for ix, val in enumerate(self.features.column_names)}.get))
 
     def remove_columns_with_non_numerical_values(self) -> TaggedTable:
         """
@@ -411,11 +450,9 @@ class TaggedTable(Table):
             If any of the columns to be removed is the target column.
         """
         table = super().remove_columns_with_non_numerical_values()
-        try:
-            tagged = TaggedTable._from_table(table, self.target.name)
-        except UnknownColumnNameError:
-            raise ColumnIsTargetError(self.target.name) from None
-        return tagged
+        if self.target.name not in table.column_names:
+            raise ColumnIsTargetError(self.target.name)
+        return TaggedTable._from_table(table, self.target.name, feature_names=sorted(set(self.features.column_names).intersection(set(table.column_names)), key={val: ix for ix, val in enumerate(self.features.column_names)}.get))
 
     def remove_duplicate_rows(self) -> TaggedTable:
         """
@@ -428,7 +465,7 @@ class TaggedTable(Table):
         result : TaggedTable
             The table with the duplicate rows removed.
         """
-        return TaggedTable._from_table(super().remove_duplicate_rows(), self.target.name)
+        return TaggedTable._from_table(super().remove_duplicate_rows(), target_name=self.target.name, feature_names=self.features.column_names)
 
     def remove_rows_with_missing_values(self) -> TaggedTable:
         """
@@ -441,7 +478,7 @@ class TaggedTable(Table):
         table : TaggedTable
             A table without the rows that contain missing values.
         """
-        return TaggedTable._from_table(super().remove_rows_with_missing_values(), self.target.name)
+        return TaggedTable._from_table(super().remove_rows_with_missing_values(), target_name=self.target.name, feature_names=self.features.column_names)
 
     def remove_rows_with_outliers(self) -> TaggedTable:
         """
@@ -458,7 +495,7 @@ class TaggedTable(Table):
         new_table : TaggedTable
             A new table without rows containing outliers.
         """
-        return TaggedTable._from_table(super().remove_rows_with_outliers(), self.target.name)
+        return TaggedTable._from_table(super().remove_rows_with_outliers(), target_name=self.target.name, feature_names=self.features.column_names)
 
     def rename_column(self, old_name: str, new_name: str) -> TaggedTable:
         """
@@ -487,7 +524,7 @@ class TaggedTable(Table):
         """
         return TaggedTable._from_table(
             super().rename_column(old_name, new_name),
-            new_name if self.target.name == old_name else self.target.name,
+            target_name=new_name if self.target.name == old_name else self.target.name, feature_names=self.features.column_names if old_name not in self.features.column_names else [column_name if column_name != old_name else new_name for column_name in self.features.column_names]
         )
 
     def replace_column(self, old_column_name: str, new_columns: list[Column]) -> TaggedTable:
@@ -504,7 +541,6 @@ class TaggedTable(Table):
         ----------
         old_column_name : str
             The name of the column to be replaced.
-
         new_columns : list[Column]
             The new columns replacing the old column.
 
@@ -517,13 +553,10 @@ class TaggedTable(Table):
         ------
         UnknownColumnNameError
             If the old column does not exist.
-
         DuplicateColumnNameError
             If the new column already exists and the existing column is not affected by the replacement.
-
         ColumnSizeError
             If the size of the column does not match the amount of rows.
-
         IllegalSchemaModificationError
             If the target column would be removed or replaced by more than one column.
         """
@@ -535,10 +568,10 @@ class TaggedTable(Table):
             else:
                 return TaggedTable._from_table(
                     super().replace_column(old_column_name, new_columns),
-                    new_columns[0].name,
+                    target_name=new_columns[0].name, feature_names=self.features.column_names
                 )
         else:
-            return TaggedTable._from_table(super().replace_column(old_column_name, new_columns), self.target.name)
+            return TaggedTable._from_table(super().replace_column(old_column_name, new_columns), target_name=self.target.name, feature_names=self.features.column_names if old_column_name not in self.features.column_names else self.features.column_names[:self.features.column_names.index(old_column_name)] + list(map(lambda col: col.name, new_columns)) + self.features.column_names[self.features.column_names.index(old_column_name):])
 
     def shuffle_rows(self) -> TaggedTable:
         """
@@ -552,7 +585,7 @@ class TaggedTable(Table):
             The shuffled Table.
 
         """
-        return TaggedTable._from_table(super().shuffle_rows(), self.target.name)
+        return TaggedTable._from_table(super().shuffle_rows(), target_name=self.target.name, feature_names=self.features.column_names)
 
     def slice_rows(
         self,
@@ -584,7 +617,7 @@ class TaggedTable(Table):
         IndexOutOfBoundsError
             If the index is out of bounds.
         """
-        return TaggedTable._from_table(super().slice_rows(start, end, step), self.target.name)
+        return TaggedTable._from_table(super().slice_rows(start, end, step), target_name=self.target.name, feature_names=self.features.column_names)
 
     def sort_columns(
         self,
@@ -613,7 +646,8 @@ class TaggedTable(Table):
         new_table : TaggedTable
             A new table with sorted columns.
         """
-        return TaggedTable._from_table(super().sort_columns(comparator), self.target.name)
+        sorted_table = super().sort_columns(comparator)
+        return TaggedTable._from_table(sorted_table, target_name=self.target.name, feature_names=sorted(set(sorted_table.column_names).intersection(self.features.column_names), key={val: ix for ix, val in enumerate(sorted_table.column_names)}.get))
 
     def sort_rows(self, comparator: Callable[[Row, Row], int]) -> TaggedTable:
         """
@@ -636,7 +670,7 @@ class TaggedTable(Table):
         new_table : TaggedTable
             A new table with sorted rows.
         """
-        return TaggedTable._from_table(super().sort_rows(comparator), self.target.name)
+        return TaggedTable._from_table(super().sort_rows(comparator), target_name=self.target.name, feature_names=self.features.column_names)
 
     def transform_column(self, name: str, transformer: Callable[[Row], Any]) -> TaggedTable:
         """
@@ -653,102 +687,6 @@ class TaggedTable(Table):
         ------
         UnknownColumnNameError
             If the column does not exist.
-
         """
-        return TaggedTable._from_table(super().transform_column(name, transformer), self.target.name)
+        return TaggedTable._from_table(super().transform_column(name, transformer), target_name=self.target.name, feature_names=self.features.column_names)
 
-    def transform_table(self, transformer: TableTransformer) -> TaggedTable:
-        """
-        Apply a learned transformation onto this table.
-
-        This table is not modified.
-
-        Parameters
-        ----------
-        transformer : TableTransformer
-            The transformer which transforms the given table.
-
-        Returns
-        -------
-        transformed_table : TaggedTable
-            The transformed table.
-
-        Raises
-        ------
-        TransformerNotFittedError
-            If the transformer has not been fitted yet.
-        ColunmIsTargetError
-            If the transformer tries to remove or replace the target column.
-
-        Examples
-        --------
-        >>> from safeds.data.tabular.transformation import OneHotEncoder
-        >>> from safeds.data.tabular.containers import TaggedTable
-        >>> table = TaggedTable({"feat1": ["a", "b", "a"], "feat2": ["a", "b", "d"], "target": [1, 2, 3]},"target")
-        >>> table
-          feat1 feat2  target
-        0     a     a       1
-        1     b     b       2
-        2     a     d       3
-        >>> transformer = OneHotEncoder().fit(table, table.features.column_names)
-        >>> table.transform_table(transformer)
-           feat1__a  feat1__b  feat2__a  feat2__b  feat2__d  target
-        0       1.0       0.0       1.0       0.0       0.0       1
-        1       0.0       1.0       0.0       1.0       0.0       2
-        2       1.0       0.0       0.0       0.0       1.0       3
-        """
-        try:
-            transformed_table = transformer.transform(self)
-        except ColumnIsTargetError as e:  # can happen for example with OneHotEncoder
-            raise ColumnIsTargetError(self.target.name) from e  # Re-throw for shorter stacktrace
-        # For future transformers, it may also happen that they remove the target column without throwing.
-        # If this ever happens, comment-in these lines (currently out-commented b/c of code coverage):
-        # if self.target.name in transformer.get_names_of_removed_columns():
-        #     raise ColumnIsTargetError(self.target.name)
-        return TaggedTable._from_table(transformed_table, self.target.name)
-
-    def inverse_transform_table(self, transformer: InvertibleTableTransformer) -> TaggedTable:
-        """
-        Invert the transformation applied by the given transformer.
-
-        This table is not modified.
-
-        Parameters
-        ----------
-        transformer : InvertibleTableTransformer
-            The transformer that was used to create this table.
-
-        Returns
-        -------
-        table : TaggedTable
-            The original table.
-
-        Raises
-        ------
-        TransformerNotFittedError
-            If the transformer has not been fitted yet.
-
-        Examples
-        --------
-        >>> from safeds.data.tabular.transformation import OneHotEncoder
-        >>> from safeds.data.tabular.containers import TaggedTable
-        >>> table = TaggedTable({"feat1": ["a", "b", "a"], "feat2": ["a", "b", "d"], "target": [1, 2, 3]}, "target")
-        >>> table
-          feat1 feat2  target
-        0     a     a       1
-        1     b     b       2
-        2     a     d       3
-        >>> transformer = OneHotEncoder().fit(table, table.features.column_names)
-        >>> transformed_table = table.transform_table(transformer)
-        >>> transformed_table
-           feat1__a  feat1__b  feat2__a  feat2__b  feat2__d  target
-        0       1.0       0.0       1.0       0.0       0.0       1
-        1       0.0       1.0       0.0       1.0       0.0       2
-        2       1.0       0.0       0.0       0.0       1.0       3
-        >>> transformed_table.inverse_transform_table(transformer)
-          feat1 feat2  target
-        0     a     a       1
-        1     b     b       2
-        2     a     d       3
-        """
-        return TaggedTable._from_table(transformer.inverse_transform(self), self.target.name)
