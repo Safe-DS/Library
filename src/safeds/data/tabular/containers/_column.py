@@ -168,7 +168,7 @@ class Column(Sequence[T]):
         Raises
         ------
         IndexOutOfBoundsError
-            If the given index or idices do not exist in the column.
+            If the given index or indices do not exist in the column.
 
         Examples
         --------
