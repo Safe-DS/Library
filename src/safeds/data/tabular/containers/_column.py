@@ -682,7 +682,7 @@ class Column(Sequence[T]):
 
         >>> from safeds.data.tabular.containers import Column
         >>> column = Column("test", [1, 2, 3, 4, 5])
-        >>> column.mean()
+        >>> column.median()
         3.0
         """
         if not self._type.is_numeric():
