@@ -386,7 +386,7 @@ class Image:
 
     def rotate_right(self) -> Image:
         """
-        Return the png-image rotated clockwise by 90 degrees.
+        Return the image rotated clockwise by 90 degrees.
 
         Returns
         -------
@@ -399,7 +399,7 @@ class Image:
 
     def rotate_left(self) -> Image:
         """
-        Return the png-image rotated counter-clockwise by 90 degrees.
+        Return the image rotated counter-clockwise by 90 degrees.
 
         Returns
         -------
