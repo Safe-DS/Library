@@ -526,15 +526,27 @@ class Table:
         return Row._from_pandas_dataframe(self._data.iloc[[index]], self._schema)
 
     def get_similar_columns(self, column_name) -> bool:
+        """
+            Gives a warning with similar columns to the given one that's not in the table.
+
+            Parameters
+            ----------
+            column_name : str
+                The name of the Column, that's not in the Table.
+
+            Returns
+            -------
+            bool
+                True if there are similar columns.
+        """
         similar_columns = []
         for column in self.column_names:
             if Levenshtein.normalized_similarity(column, column_name) >= 0.7:
                 similar_columns.append(column)
         if len(similar_columns) > 0:
-            print(similar_columns)
             warnings.warn(
                     (
-                        f"did you mean one of these: {similar_columns}?"
+                        f"The Column {column_name} is unknown.\n Did you mean one of these: {similar_columns}?"
                     ),
                     UserWarning,
                     stacklevel=2,

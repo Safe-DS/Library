@@ -22,7 +22,7 @@ def test_should_warn_if_similar_column_name(table1: Table, column_name: str, exp
     with pytest.warns(
         UserWarning,
         match=(
-            f"did you mean one of these: {expected}?"
+            f"The Column {column_name} is unknown.\n Did you mean one of these: {expected}?"
         ),
     ):
         table1.get_similar_columns(column_name)
