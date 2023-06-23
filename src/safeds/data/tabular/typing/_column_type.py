@@ -36,27 +36,27 @@ class ColumnType(ABC):
             If the given data type is not supported.
         """
 
-        def columntype_of_type(celltype: Any) -> ColumnType:
-            if celltype == int:
+        def column_type_of_type(cell_type: Any) -> ColumnType:
+            if cell_type == int:
                 return Integer(is_nullable)
-            if celltype == bool:
+            if cell_type == bool:
                 return Boolean(is_nullable)
-            if celltype == float:
+            if cell_type == float:
                 return RealNumber(is_nullable)
-            if celltype == str:
+            if cell_type == str:
                 return String(is_nullable)
-            if celltype is NoneType:
+            if cell_type is NoneType:
                 return Nothing()
             else:
-                message = f"Unsupported numpy data type '{celltype}'."
+                message = f"Unsupported numpy data type '{cell_type}'."
                 raise NotImplementedError(message)
 
         result = Nothing()
         is_nullable = False
         for cell in data:
             if result == Nothing():
-                result = columntype_of_type(type(cell))
-            if result != columntype_of_type(type(cell)):
+                result = column_type_of_type(type(cell))
+            if result != column_type_of_type(type(cell)):
                 if type(cell) is NoneType:
                     is_nullable = True
                     result._is_nullable = is_nullable

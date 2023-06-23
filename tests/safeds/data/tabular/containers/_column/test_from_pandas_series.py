@@ -1,7 +1,7 @@
 import pandas as pd
 import pytest
 from safeds.data.tabular.containers import Column
-from safeds.data.tabular.typing import Boolean, ColumnType, Integer, RealNumber, String
+from safeds.data.tabular.typing import Boolean, ColumnType, Integer, RealNumber, String, Nothing, Anything
 
 
 @pytest.mark.parametrize(
@@ -35,12 +35,12 @@ def test_should_use_type_if_passed(series: pd.Series, type_: ColumnType) -> None
 @pytest.mark.parametrize(
     ("series", "expected"),
     [
-        (pd.Series([]), String()),
+        (pd.Series([]), Nothing()),
         (pd.Series([True, False, True]), Boolean()),
         (pd.Series([1, 2, 3]), Integer()),
         (pd.Series([1.0, 2.0, 3.0]), RealNumber()),
         (pd.Series(["a", "b", "c"]), String()),
-        (pd.Series([1, 2.0, "a", True]), String()),
+        (pd.Series([1, 2.0, "a", True]), Anything(is_nullable=False)),
     ],
     ids=["empty", "boolean", "integer", "real number", "string", "mixed"],
 )
