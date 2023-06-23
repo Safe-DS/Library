@@ -295,8 +295,7 @@ class Table:
         >>> from safeds.data.tabular.containers import Row
         >>> row1 = Row({"a": 1, "b": 2})
         >>> row2 = Row({"a": 3, "b": 4})
-        >>> table = Table.from_rows([row1, row2])
-        >>> table
+        >>> Table.from_rows([row1, row2])
            a  b
         0  1  2
         1  3  4
