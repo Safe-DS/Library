@@ -54,6 +54,8 @@ class Table:
     | [from_columns][safeds.data.tabular.containers._table.Table.from_columns]     | Create a table from a list of columns. |
     | [from_rows][safeds.data.tabular.containers._table.Table.from_rows]           | Create a table from a list of rows.    |
 
+    Note: When removing the last column of the table, the `number_of_columns` property will be set to 0.
+
     Parameters
     ----------
     data : Mapping[str, Sequence[Any]] | None
@@ -841,6 +843,8 @@ class Table:
 
         This table is not modified.
 
+        Note: When removing the last column of the table, the `number_of_columns` property will be set to 0.
+
         Parameters
         ----------
         column_names : list[str]
@@ -874,6 +878,8 @@ class Table:
         Return a table without the given column(s).
 
         This table is not modified.
+
+        Note: When removing the last column of the table, the `number_of_columns` property will be set to 0.
 
         Parameters
         ----------
@@ -909,6 +915,8 @@ class Table:
 
         This table is not modified.
 
+        Note: When removing the last column of the table, the `number_of_columns` property will be set to 0.
+
         Returns
         -------
         table : Table
@@ -926,6 +934,8 @@ class Table:
         Return a table without the columns that contain non-numerical values.
 
         This table is not modified.
+
+        Note: When removing the last column of the table, the `number_of_columns` property will be set to 0.
 
         Returns
         -------
