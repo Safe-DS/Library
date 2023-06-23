@@ -95,12 +95,13 @@ def test_should_not_change_transformed_table() -> None:
 
     expected = Table(
         {
-            "col1_a": [1.0, 0.0, 0.0, 0.0],
-            "col1_b": [0.0, 1.0, 1.0, 0.0],
-            "col1_c": [0.0, 0.0, 0.0, 1.0],
+            "col1__a": [1.0, 0.0, 0.0, 0.0],
+            "col1__b": [0.0, 1.0, 1.0, 0.0],
+            "col1__c": [0.0, 0.0, 0.0, 1.0],
         },
     )
 
+    assert transformed_table.schema == expected.schema
     assert transformed_table == expected
 
 
@@ -115,5 +116,5 @@ def test_should_raise_error_if_not_fitted() -> None:
 
     transformer = OneHotEncoder()
 
-    with pytest.raises(TransformerNotFittedError):
+    with pytest.raises(TransformerNotFittedError, match=r"The transformer has not been fitted yet."):
         table.inverse_transform_table(transformer)

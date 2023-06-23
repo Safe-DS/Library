@@ -41,6 +41,18 @@ class RandomForest(Classifier):
         self._feature_names: list[str] | None = None
         self._target_name: str | None = None
 
+    @property
+    def number_of_trees(self) -> int:
+        """
+        Get the number of trees used in the random forest.
+
+        Returns
+        -------
+        result: int
+            The number of trees.
+        """
+        return self._number_of_trees
+
     def fit(self, training_set: TaggedTable) -> RandomForest:
         """
         Create a copy of this classifier and fit it with the given training data.
@@ -61,6 +73,14 @@ class RandomForest(Classifier):
         ------
         LearningError
             If the training data contains invalid values or if the training failed.
+        UntaggedTableError
+            If the table is untagged.
+        NonNumericColumnError
+            If the training data contains non-numerical values.
+        MissingValuesColumnError
+            If the training data contains missing values.
+        DatasetMissesDataError
+            If the training data contains no rows.
         """
         wrapped_classifier = self._get_sklearn_classifier()
         fit(wrapped_classifier, training_set)
@@ -96,6 +116,12 @@ class RandomForest(Classifier):
             If the dataset misses feature columns.
         PredictionError
             If predicting with the given dataset failed.
+        NonNumericColumnError
+            If the dataset contains non-numerical values.
+        MissingValuesColumnError
+            If the dataset contains missing values.
+        DatasetMissesDataError
+            If the dataset contains no rows.
         """
         return predict(self._wrapped_classifier, dataset, self._feature_names, self._target_name)
 

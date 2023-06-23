@@ -58,6 +58,42 @@ class AdaBoost(Regressor):
         self._feature_names: list[str] | None = None
         self._target_name: str | None = None
 
+    @property
+    def learner(self) -> Regressor | None:
+        """
+        Get the base learner used for training the ensemble.
+
+        Returns
+        -------
+        result: Classifier | None
+            The base learner.
+        """
+        return self._learner
+
+    @property
+    def maximum_number_of_learners(self) -> int:
+        """
+        Get the maximum number of learners in the ensemble.
+
+        Returns
+        -------
+        result: int
+            The maximum number of learners.
+        """
+        return self._maximum_number_of_learners
+
+    @property
+    def learning_rate(self) -> float:
+        """
+        Get the learning rate.
+
+        Returns
+        -------
+        result: float
+            The learning rate.
+        """
+        return self._learning_rate
+
     def fit(self, training_set: TaggedTable) -> AdaBoost:
         """
         Create a copy of this regressor and fit it with the given training data.
@@ -78,6 +114,14 @@ class AdaBoost(Regressor):
         ------
         LearningError
             If the training data contains invalid values or if the training failed.
+        UntaggedTableError
+            If the table is untagged.
+        NonNumericColumnError
+            If the training data contains non-numerical values.
+        MissingValuesColumnError
+            If the training data contains missing values.
+        DatasetMissesDataError
+            If the training data contains no rows.
         """
         wrapped_regressor = self._get_sklearn_regressor()
         fit(wrapped_regressor, training_set)
@@ -117,6 +161,12 @@ class AdaBoost(Regressor):
             If the dataset misses feature columns.
         PredictionError
             If predicting with the given dataset failed.
+        NonNumericColumnError
+            If the dataset contains non-numerical values.
+        MissingValuesColumnError
+            If the dataset contains missing values.
+        DatasetMissesDataError
+            If the dataset contains no rows.
         """
         return predict(self._wrapped_regressor, dataset, self._feature_names, self._target_name)
 

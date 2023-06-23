@@ -16,9 +16,9 @@ from safeds.exceptions import TransformerNotFittedError, UnknownColumnNameError
             None,
             Table(
                 {
-                    "col1_a": [1.0, 0.0, 0.0, 0.0],
-                    "col1_b": [0.0, 1.0, 1.0, 0.0],
-                    "col1_c": [0.0, 0.0, 0.0, 1.0],
+                    "col1__a": [1.0, 0.0, 0.0, 0.0],
+                    "col1__b": [0.0, 1.0, 1.0, 0.0],
+                    "col1__c": [0.0, 0.0, 0.0, 1.0],
                 },
             ),
         ),
@@ -32,9 +32,9 @@ from safeds.exceptions import TransformerNotFittedError, UnknownColumnNameError
             ["col1"],
             Table(
                 {
-                    "col1_a": [1.0, 0.0, 0.0, 0.0],
-                    "col1_b": [0.0, 1.0, 1.0, 0.0],
-                    "col1_c": [0.0, 0.0, 0.0, 1.0],
+                    "col1__a": [1.0, 0.0, 0.0, 0.0],
+                    "col1__b": [0.0, 1.0, 1.0, 0.0],
+                    "col1__c": [0.0, 0.0, 0.0, 1.0],
                     "col2": ["a", "b", "b", "c"],
                 },
             ),
@@ -49,12 +49,12 @@ from safeds.exceptions import TransformerNotFittedError, UnknownColumnNameError
             ["col1", "col2"],
             Table(
                 {
-                    "col1_a": [1.0, 0.0, 0.0, 0.0],
-                    "col1_b": [0.0, 1.0, 1.0, 0.0],
-                    "col1_c": [0.0, 0.0, 0.0, 1.0],
-                    "col2_a": [1.0, 0.0, 0.0, 0.0],
-                    "col2_b": [0.0, 1.0, 1.0, 0.0],
-                    "col2_c": [0.0, 0.0, 0.0, 1.0],
+                    "col1__a": [1.0, 0.0, 0.0, 0.0],
+                    "col1__b": [0.0, 1.0, 1.0, 0.0],
+                    "col1__c": [0.0, 0.0, 0.0, 1.0],
+                    "col2__a": [1.0, 0.0, 0.0, 0.0],
+                    "col2__b": [0.0, 1.0, 1.0, 0.0],
+                    "col2__c": [0.0, 0.0, 0.0, 1.0],
                 },
             ),
         ),
@@ -80,10 +80,22 @@ def test_should_return_transformed_table(
     expected: Table,
 ) -> None:
     transformer = OneHotEncoder().fit(table, column_names)
+    assert table.transform_table(transformer).schema == expected.schema
     assert table.transform_table(transformer) == expected
 
 
-def test_should_raise_if_column_not_found() -> None:
+@pytest.mark.parametrize(
+    "table_to_fit",
+    [
+        Table(
+            {
+                "col1": ["a", "b", "c"],
+            },
+        ),
+        Table(),
+    ],
+)
+def test_should_raise_if_column_not_found(table_to_fit: Table) -> None:
     table_to_fit = Table(
         {
             "col1": ["a", "b", "c"],
@@ -98,7 +110,7 @@ def test_should_raise_if_column_not_found() -> None:
         },
     )
 
-    with pytest.raises(UnknownColumnNameError):
+    with pytest.raises(UnknownColumnNameError, match=r"Could not find column\(s\) 'col1'"):
         table_to_transform.transform_table(transformer)
 
 
@@ -111,5 +123,5 @@ def test_should_raise_if_not_fitted() -> None:
 
     transformer = OneHotEncoder()
 
-    with pytest.raises(TransformerNotFittedError):
+    with pytest.raises(TransformerNotFittedError, match=r"The transformer has not been fitted yet."):
         table.transform_table(transformer)

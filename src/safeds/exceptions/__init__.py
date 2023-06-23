@@ -5,13 +5,17 @@ from safeds.exceptions._data import (
     ColumnSizeError,
     DuplicateColumnNameError,
     IndexOutOfBoundsError,
+    MissingValuesColumnError,
     NonNumericColumnError,
     SchemaMismatchError,
     TransformerNotFittedError,
     UnknownColumnNameError,
+    ValueNotPresentWhenFittedError,
+    WrongFileExtensionError,
 )
 from safeds.exceptions._ml import (
     DatasetContainsTargetError,
+    DatasetMissesDataError,
     DatasetMissesFeaturesError,
     LearningError,
     ModelNotFittedError,
@@ -29,6 +33,9 @@ __all__ = [
     "SchemaMismatchError",
     "TransformerNotFittedError",
     "UnknownColumnNameError",
+    "ValueNotPresentWhenFittedError",
+    "WrongFileExtensionError",
+    "MissingValuesColumnError",
     # ML exceptions
     "DatasetContainsTargetError",
     "DatasetMissesFeaturesError",
@@ -36,4 +43,5 @@ __all__ = [
     "ModelNotFittedError",
     "PredictionError",
     "UntaggedTableError",
+    "DatasetMissesDataError",
 ]

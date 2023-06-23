@@ -5,7 +5,7 @@ from safeds.data.tabular.containers import Table
 
 
 @pytest.mark.parametrize(
-    ("table", "truth"),
+    ("table", "expected"),
     [
         (
             Table({"col1": [1, 2, 1], "col2": ["a", "b", "c"]}),
@@ -50,8 +50,91 @@ from safeds.data.tabular.containers import Table
                 },
             ),
         ),
+        (
+            Table(),
+            Table(
+                {
+                    "metrics": [
+                        "maximum",
+                        "minimum",
+                        "mean",
+                        "mode",
+                        "median",
+                        "sum",
+                        "variance",
+                        "standard deviation",
+                        "idness",
+                        "stability",
+                    ],
+                },
+            ),
+        ),
+        (
+            Table({"col": [], "gg": []}),
+            Table(
+                {
+                    "metrics": [
+                        "maximum",
+                        "minimum",
+                        "mean",
+                        "mode",
+                        "median",
+                        "sum",
+                        "variance",
+                        "standard deviation",
+                        "idness",
+                        "stability",
+                    ],
+                    "col": [
+                        "-",
+                        "-",
+                        "-",
+                        "-",
+                        "-",
+                        "-",
+                        "-",
+                        "-",
+                        "-",
+                        "-",
+                    ],
+                    "gg": [
+                        "-",
+                        "-",
+                        "-",
+                        "-",
+                        "-",
+                        "-",
+                        "-",
+                        "-",
+                        "-",
+                        "-",
+                    ],
+                },
+            ),
+        ),
+        (
+            Table({"col": [None, None]}),
+            Table(
+                {
+                    "metrics": [
+                        "maximum",
+                        "minimum",
+                        "mean",
+                        "mode",
+                        "median",
+                        "sum",
+                        "variance",
+                        "standard deviation",
+                        "idness",
+                        "stability",
+                    ],
+                    "col": ["-", "-", "-", "[]", "-", "-", "-", "-", "0.0", "-"],
+                },
+            ),
+        ),
     ],
-    ids=["Column of integers and Column of characters"],
+    ids=["Column of integers and Column of characters", "empty", "empty with columns", "Column of None"],
 )
-def test_should_make_summary(table: Table, truth: Table) -> None:
-    assert truth == table.summary()
+def test_should_make_summary(table: Table, expected: Table) -> None:
+    assert expected.schema == table.summary().schema
+    assert expected == table.summary()

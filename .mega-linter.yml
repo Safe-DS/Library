@@ -17,5 +17,4 @@ JSON_PRETTIER_FILE_EXTENSIONS:
 
 # Commands
 PRE_COMMANDS:
-  - command: npm install @lars-reimann/prettier-config
-    cwd: workspace
+  - command: npm i @lars-reimann/prettier-config

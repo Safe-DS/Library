@@ -1,5 +1,10 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from pathlib import Path
+
 
 class UnknownColumnNameError(KeyError):
     """
@@ -18,8 +23,27 @@ class UnknownColumnNameError(KeyError):
 class NonNumericColumnError(Exception):
     """Exception raised for trying to do numerical operations on a non-numerical column."""
 
-    def __init__(self, column_info: str) -> None:
-        super().__init__(f"Tried to do a numerical operation on one or multiple non numerical Columns: \n{column_info}")
+    def __init__(self, column_info: str, help_msg: str | None = None) -> None:
+        line_break = "\n"
+        super().__init__(
+            (
+                "Tried to do a numerical operation on one or multiple non-numerical columns:"
+                f" \n{column_info}{line_break + help_msg if help_msg is not None else ''}"
+            ),
+        )
+
+
+class MissingValuesColumnError(Exception):
+    """Exception raised for trying to do operations on columns containing missing values."""
+
+    def __init__(self, column_info: str, help_msg: str | None = None) -> None:
+        line_break = "\n"
+        super().__init__(
+            (
+                "Tried to do an operation on one or multiple columns containing missing values:"
+                f" \n{column_info}{line_break + help_msg if help_msg is not None else ''}"
+            ),
+        )
 
 
 class DuplicateColumnNameError(Exception):
@@ -47,7 +71,10 @@ class IndexOutOfBoundsError(IndexError):
     """
 
     def __init__(self, index: int | slice):
-        super().__init__(f"There is no element at index '{index}'.")
+        if isinstance(index, int):
+            super().__init__(f"There is no element at index '{index}'.")
+        else:
+            super().__init__(f"There is no element in the range [{index.start}, {index.stop}]")
 
 
 class ColumnSizeError(Exception):
@@ -85,3 +112,29 @@ class TransformerNotFittedError(Exception):
 
     def __init__(self) -> None:
         super().__init__("The transformer has not been fitted yet.")
+
+
+class ValueNotPresentWhenFittedError(Exception):
+    """Exception raised when attempting to one-hot-encode a table containing values not present in the fitting phase."""
+
+    def __init__(self, values: list[tuple[str, str]]) -> None:
+        values_info = [f"{value} in column {column}" for value, column in values]
+        line_break = "\n"
+        super().__init__(
+            (
+                "Value(s) not present in the table the transformer was fitted on:"
+                f" {line_break}{line_break.join(values_info)}"
+            ),
+        )
+
+
+class WrongFileExtensionError(Exception):
+    """Exception raised when the file has the wrong file extension."""
+
+    def __init__(self, file: str | Path, file_extension: str | list[str]) -> None:
+        super().__init__(
+            (
+                f"The file {file} has a wrong file extension. Please provide a file with the following extension(s):"
+                f" {file_extension}"
+            ),
+        )

@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING
 
 from sklearn.neighbors import KNeighborsRegressor as sk_KNeighborsRegressor
 
+from safeds.exceptions import DatasetMissesDataError
 from safeds.ml.classical._util_sklearn import fit, predict
 
 from ._regressor import Regressor
@@ -43,6 +44,18 @@ class KNearestNeighbors(Regressor):
         self._feature_names: list[str] | None = None
         self._target_name: str | None = None
 
+    @property
+    def number_of_neighbors(self) -> int:
+        """
+        Get the number of neighbors used for interpolation.
+
+        Returns
+        -------
+        result: int
+            The number of neighbors.
+        """
+        return self._number_of_neighbors
+
     def fit(self, training_set: TaggedTable) -> KNearestNeighbors:
         """
         Create a copy of this regressor and fit it with the given training data.
@@ -65,7 +78,17 @@ class KNearestNeighbors(Regressor):
             If `number_of_neighbors` is greater than the sample size.
         LearningError
             If the training data contains invalid values or if the training failed.
+        UntaggedTableError
+            If the table is untagged.
+        NonNumericColumnError
+            If the training data contains non-numerical values.
+        MissingValuesColumnError
+            If the training data contains missing values.
+        DatasetMissesDataError
+            If the training data contains no rows.
         """
+        if training_set.number_of_rows == 0:
+            raise DatasetMissesDataError
         if self._number_of_neighbors > training_set.number_of_rows:
             raise ValueError(
                 (
@@ -108,6 +131,12 @@ class KNearestNeighbors(Regressor):
             If the dataset misses feature columns.
         PredictionError
             If predicting with the given dataset failed.
+        NonNumericColumnError
+            If the dataset contains non-numerical values.
+        MissingValuesColumnError
+            If the dataset contains missing values.
+        DatasetMissesDataError
+            If the dataset contains no rows.
         """
         return predict(self._wrapped_regressor, dataset, self._feature_names, self._target_name)
 
