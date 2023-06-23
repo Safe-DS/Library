@@ -543,6 +543,7 @@ class Table:
         for column in self.column_names:
             if Levenshtein.jaro_winkler(column, column_name) >= 0.7:
                 similar_columns.append(column)
+
         if len(similar_columns) > 0:
             warnings.warn(
                 f"The Column {column_name} is unknown.\n Did you mean one of these: {similar_columns}?",
