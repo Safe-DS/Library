@@ -801,7 +801,6 @@ class Table:
         ------
         DuplicateColumnNameError
             If the new column already exists.
-
         ColumnSizeError
             If the size of the column does not match the amount of rows.
 
@@ -2029,7 +2028,6 @@ class Table:
         path : str | Path
             The path to the output file.
 
-
         Raises
         ------
         WrongFileExtensionError
@@ -2130,7 +2128,7 @@ class Table:
 
         Returns
         -------
-         columns : list[Columns]
+        columns : list[Columns]
              List of columns.
 
         Examples
