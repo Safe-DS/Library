@@ -17,6 +17,6 @@ def test_should_return_table() -> None:
             "target": [1, 3, 2],
         },
     )
-    table = TaggedTable.to_table(tagged_table)
+    table = tagged_table.to_table()
     assert table.schema == expected.schema
     assert table == expected
