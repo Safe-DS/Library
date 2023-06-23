@@ -895,7 +895,7 @@ class Table:
         Raises
         ------
         SchemaMismatchError
-            If the schema of the row does not match
+            If the schema of the row does not match the table schema.
 
         Examples
         --------
