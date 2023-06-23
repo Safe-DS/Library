@@ -24,6 +24,6 @@ def test_should_add_columns() -> None:
             "other2": [9, 6, 3],
         },
         "target",
-        ["feature_1"]
+        ["feature_1"],
     )
     assert_that_tagged_tables_are_equal(new_table, expected)
