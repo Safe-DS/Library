@@ -101,7 +101,7 @@ class Table:
         Examples
         --------
         >>> from safeds.data.tabular.containers import Table
-        >>> Table.from_csv_file('./example_files/from_csv_file.csv')
+        >>> Table.from_csv_file('./src/resources/from_csv_file.csv')
            a  b  c
         0  1  2  1
         1  0  0  7
@@ -145,7 +145,7 @@ class Table:
         Examples
         --------
         >>> from safeds.data.tabular.containers import Table
-        >>> Table.from_excel_file('./example_files/from_excel_file.xlsx')
+        >>> Table.from_excel_file('./src/resources/from_excel_file.xlsx')
            a  b
         0  1  4
         1  2  5
@@ -187,7 +187,7 @@ class Table:
         Examples
         --------
         >>> from safeds.data.tabular.containers import Table
-        >>> Table.from_json_file('./example_files/from_json_file.json')
+        >>> Table.from_json_file('./src/resources/from_json_file.json')
            a  b
         0  1  4
         1  2  5
@@ -2004,7 +2004,7 @@ class Table:
         --------
         >>> from safeds.data.tabular.containers import Table
         >>> table = Table.from_dict({"a": [1, 2, 3], "b": [4, 5, 6]})
-        >>> table.to_csv_file("./example_files/to_csv_file.csv")
+        >>> table.to_csv_file("./src/resources/to_csv_file.csv")
         """
         path = Path(path)
         if path.suffix != ".csv":
@@ -2036,7 +2036,7 @@ class Table:
         --------
         >>> from safeds.data.tabular.containers import Table
         >>> table = Table.from_dict({"a": [1, 2, 3], "b": [4, 5, 6]})
-        >>> table.to_excel_file("./example_files/to_excel_file.xlsx")
+        >>> table.to_excel_file("./src/resources/to_excel_file.xlsx")
         """
         path = Path(path)
         excel_extensions = [".xls", ".xlsx", ".xlsm", ".xlsb", ".odf", ".ods", ".odt"]
@@ -2073,7 +2073,7 @@ class Table:
         --------
         >>> from safeds.data.tabular.containers import Table
         >>> table = Table.from_dict({"a": [1, 2, 3], "b": [4, 5, 6]})
-        >>> table.to_json_file("./example_files/to_json_file.json")
+        >>> table.to_json_file("./src/resources/to_json_file.json")
         """
         path = Path(path)
         if path.suffix != ".json":
