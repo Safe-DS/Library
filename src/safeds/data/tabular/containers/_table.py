@@ -2124,7 +2124,7 @@ class Table:
 
     def to_columns(self) -> list[Column]:
         """
-         Return a list of the columns.
+        Return a list of the columns.
 
         Returns
         -------
