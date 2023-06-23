@@ -1149,11 +1149,12 @@ class Table:
         Examples
         --------
         >>> from safeds.data.tabular.containers import Table
-        >>> table = Table.from_dict({"a": [1], "b": [None]})
+        >>> table = Table.from_dict({"a": [1, 2], "b": [None, 2]})
         >>> new_table = table.remove_columns_with_missing_values()
         >>> new_table
            a
         0  1
+        1  2
         """
         return Table.from_columns([column for column in self.to_columns() if not column.has_missing_values()])
 
