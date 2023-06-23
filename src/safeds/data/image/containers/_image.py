@@ -2,10 +2,12 @@ from __future__ import annotations
 
 import copy
 import io
+import warnings
 from pathlib import Path
 from typing import Any, BinaryIO
 
 import PIL
+from PIL import ImageEnhance, ImageFilter, ImageOps
 from PIL.Image import Image as PillowImage
 from PIL.Image import open as open_image
 
@@ -202,24 +204,49 @@ class Image:
 
     def resize(self, new_width: int, new_height: int) -> Image:
         """
-        Return an image that has been resized to a given size.
+        Return a new image that has been resized to a given size.
 
         Returns
         -------
         result : Image
             The image with the given width and height
         """
-        data = io.BytesIO()
-        repr_png = self._repr_png_()
-        repr_jpeg = self._repr_jpeg_()
-        if repr_png is not None:
-            data = io.BytesIO(repr_png)
-        elif repr_jpeg is not None:
-            data = io.BytesIO(repr_jpeg)
+        image_copy = copy.deepcopy(self)
+        image_copy._image = image_copy._image.resize((new_width, new_height))
+        return image_copy
 
-        new_image = Image(data, self._format)
-        new_image._image = new_image._image.resize((new_width, new_height))
-        return new_image
+    def convert_to_grayscale(self) -> Image:
+        """
+        Convert the image to grayscale.
+
+        Returns
+        -------
+        grayscale_image : Image
+            The grayscale image.
+        """
+        image_copy = copy.deepcopy(self)
+        image_copy._image = image_copy._image.convert("L")
+        return image_copy
+
+    def crop(self, x: int, y: int, width: int, height: int) -> Image:
+        """
+        Return an image that has been cropped to a given bounding rectangle.
+
+        Parameters
+        ----------
+        x: the x coordinate of the top-left corner of the bounding rectangle
+        y: the y coordinate of the top-left corner of the bounding rectangle
+        width:  the width of the bounding rectangle
+        height:  the height of the bounding rectangle
+
+        Returns
+        -------
+        result : Image
+            The image with the
+        """
+        image_copy = copy.deepcopy(self)
+        image_copy._image = image_copy._image.crop((x, y, (x + width), (y + height)))
+        return image_copy
 
     def flip_vertically(self) -> Image:
         """
@@ -230,9 +257,9 @@ class Image:
         result : Image
             The flipped image.
         """
-        imagecopy = copy.deepcopy(self)
-        imagecopy._image = self._image.transpose(PIL.Image.FLIP_TOP_BOTTOM)
-        return imagecopy
+        image_copy = copy.deepcopy(self)
+        image_copy._image = self._image.transpose(PIL.Image.FLIP_TOP_BOTTOM)
+        return image_copy
 
     def flip_horizontally(self) -> Image:
         """
@@ -243,6 +270,142 @@ class Image:
         result : Image
             The flipped image.
         """
-        imagecopy = copy.deepcopy(self)
-        imagecopy._image = self._image.transpose(PIL.Image.FLIP_LEFT_RIGHT)
-        return imagecopy
+        image_copy = copy.deepcopy(self)
+        image_copy._image = self._image.transpose(PIL.Image.FLIP_LEFT_RIGHT)
+        return image_copy
+
+    def adjust_brightness(self, factor: float) -> Image:
+        """
+        Adjust the brightness of an image.
+
+        Parameters
+        ----------
+        factor: float
+            The brightness factor.
+            1.0 will not change the brightness.
+            Below 1.0 will result in a darker image.
+            Above 1.0 will resolut in a brighter image.
+            Has to be bigger than or equal to 0 (black).
+
+        Returns
+        -------
+        result: Image
+            The Image with adjusted brightness.
+        """
+        if factor < 0:
+            raise ValueError("Brightness factor has to be 0 or bigger")
+        elif factor == 1:
+            warnings.warn(
+                "Brightness adjustment factor is 1.0, this will not make changes to the image.",
+                UserWarning,
+                stacklevel=2,
+            )
+
+        image_copy = copy.deepcopy(self)
+        image_copy._image = ImageEnhance.Brightness(image_copy._image).enhance(factor)
+        return image_copy
+
+    def adjust_contrast(self, factor: float) -> Image:
+        """
+        Adjust Contrast of image.
+
+        Parameters
+        ----------
+        factor: float
+            If factor > 1, increase contrast of image.
+            If factor = 1, no changes will be made.
+            If factor < 1, make image greyer.
+            Has to be bigger than or equal to 0 (gray).
+
+        Returns
+        -------
+        New image with adjusted contrast.
+        """
+        if factor < 0:
+            raise ValueError("Contrast factor has to be 0 or bigger")
+        elif factor == 1:
+            warnings.warn(
+                "Contrast adjustment factor is 1.0, this will not make changes to the image.",
+                UserWarning,
+                stacklevel=2,
+            )
+
+        image_copy = copy.deepcopy(self)
+        image_copy._image = ImageEnhance.Contrast(image_copy._image).enhance(factor)
+        return image_copy
+
+    def blur(self, radius: int) -> Image:
+        """
+        Return the blurred image.
+
+        Parameters
+        ----------
+        radius : int
+             Radius is directly proportional to the blur value. The radius is equal to the amount of pixels united in
+             each direction. A radius of 1 will result in a united box of 9 pixels.
+
+        Returns
+        -------
+        result : Image
+            The blurred image
+        """
+        image_copy = copy.deepcopy(self)
+        image_copy._image = image_copy._image.filter(ImageFilter.BoxBlur(radius))
+        return image_copy
+
+    def sharpen(self, factor: float) -> Image:
+        """
+        Return the sharpened image.
+
+        Parameters
+        ----------
+        factor: The amount of sharpness to be applied to the image.
+        Factor 1.0 is considered to be neutral and does not make any changes.
+
+        Returns
+        -------
+        result : Image
+            The image sharpened by the given factor.
+        """
+        image_copy = copy.deepcopy(self)
+        image_copy._image = ImageEnhance.Sharpness(image_copy._image).enhance(factor)
+        return image_copy
+
+    def invert_colors(self) -> Image:
+        """
+        Return the image with inverted colors.
+
+        Returns
+        -------
+        result : Image
+            The image with inverted colors.
+        """
+        image_copy = copy.deepcopy(self)
+        image_copy._image = ImageOps.invert(image_copy._image)
+        return image_copy
+
+    def rotate_right(self) -> Image:
+        """
+        Return the image rotated 90 degrees clockwise.
+
+        Returns
+        -------
+        result : Image
+            The image rotated 90 degrees clockwise.
+        """
+        image_copy = copy.deepcopy(self)
+        image_copy._image = image_copy._image.rotate(270, expand=True)
+        return image_copy
+
+    def rotate_left(self) -> Image:
+        """
+        Return the image rotated 90 degrees counter-clockwise.
+
+        Returns
+        -------
+        result : Image
+            The image rotated 90 degrees counter-clockwise.
+        """
+        image_copy = copy.deepcopy(self)
+        image_copy._image = image_copy._image.rotate(90, expand=True)
+        return image_copy

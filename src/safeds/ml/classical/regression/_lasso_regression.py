@@ -53,6 +53,14 @@ class LassoRegression(Regressor):
 
     @property
     def alpha(self) -> float:
+        """
+        Get the regularization of the model.
+
+        Returns
+        -------
+        result: float
+            The regularization of the model.
+        """
         return self._alpha
 
     def fit(self, training_set: TaggedTable) -> LassoRegression:
@@ -75,6 +83,14 @@ class LassoRegression(Regressor):
         ------
         LearningError
             If the training data contains invalid values or if the training failed.
+        UntaggedTableError
+            If the table is untagged.
+        NonNumericColumnError
+            If the training data contains non-numerical values.
+        MissingValuesColumnError
+            If the training data contains missing values.
+        DatasetMissesDataError
+            If the training data contains no rows.
         """
         wrapped_regressor = self._get_sklearn_regressor()
         fit(wrapped_regressor, training_set)
@@ -110,6 +126,12 @@ class LassoRegression(Regressor):
             If the dataset misses feature columns.
         PredictionError
             If predicting with the given dataset failed.
+        NonNumericColumnError
+            If the dataset contains non-numerical values.
+        MissingValuesColumnError
+            If the dataset contains missing values.
+        DatasetMissesDataError
+            If the dataset contains no rows.
         """
         return predict(self._wrapped_regressor, dataset, self._feature_names, self._target_name)
 

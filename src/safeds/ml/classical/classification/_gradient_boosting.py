@@ -51,10 +51,26 @@ class GradientBoosting(Classifier):
 
     @property
     def number_of_trees(self) -> int:
+        """
+        Get the number of trees (estimators) in the ensemble.
+
+        Returns
+        -------
+        result: int
+            The number of trees.
+        """
         return self._number_of_trees
 
     @property
     def learning_rate(self) -> float:
+        """
+        Get the learning rate.
+
+        Returns
+        -------
+        result: float
+            The learning rate.
+        """
         return self._learning_rate
 
     def fit(self, training_set: TaggedTable) -> GradientBoosting:
@@ -77,6 +93,14 @@ class GradientBoosting(Classifier):
         ------
         LearningError
             If the training data contains invalid values or if the training failed.
+        UntaggedTableError
+            If the table is untagged.
+        NonNumericColumnError
+            If the training data contains non-numerical values.
+        MissingValuesColumnError
+            If the training data contains missing values.
+        DatasetMissesDataError
+            If the training data contains no rows.
         """
         wrapped_classifier = self._get_sklearn_classifier()
         fit(wrapped_classifier, training_set)
@@ -112,6 +136,12 @@ class GradientBoosting(Classifier):
             If the dataset misses feature columns.
         PredictionError
             If predicting with the given dataset failed.
+        NonNumericColumnError
+            If the dataset contains non-numerical values.
+        MissingValuesColumnError
+            If the dataset contains missing values.
+        DatasetMissesDataError
+            If the dataset contains no rows.
         """
         return predict(self._wrapped_classifier, dataset, self._feature_names, self._target_name)
 

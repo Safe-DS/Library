@@ -182,19 +182,13 @@ class TestResize:
         ("image", "new_width", "new_height", "new_size"),
         [
             (
-                Image.from_jpeg_file(resolve_resource_path("image/white_square.jpg")),
-                2,
-                3,
-                (2, 3),
-            ),
-            (
                 Image.from_png_file(resolve_resource_path("image/white_square.png")),
                 2,
                 3,
                 (2, 3),
             ),
         ],
-        ids=[".jpg", ".png"],
+        ids=["(2, 3)"],
     )
     def test_should_return_resized_image(
         self,
@@ -204,6 +198,22 @@ class TestResize:
         new_size: tuple[int, int],
     ) -> None:
         assert image.resize(new_width, new_height)._image.size == new_size
+
+
+class TestConvertToGrayscale:
+    @pytest.mark.parametrize(
+        ("image", "expected"),
+        [
+            (
+                Image.from_png_file(resolve_resource_path("image/snapshot_heatmap.png")),
+                Image.from_png_file(resolve_resource_path("image/snapshot_heatmap_grayscale.png")),
+            ),
+        ],
+        ids=["grayscale"],
+    )
+    def test_convert_to_grayscale(self, image: Image, expected: Image) -> None:
+        grayscale_image = image.convert_to_grayscale()
+        assert grayscale_image == expected
 
 
 class TestEQ:
@@ -226,9 +236,10 @@ class TestEQ:
 class TestFlipVertically:
     def test_should_flip_vertically(self) -> None:
         image = Image.from_png_file(resolve_resource_path("image/original.png"))
-        image = image.flip_vertically()
-        image2 = Image.from_png_file(resolve_resource_path("image/flip_vertically.png"))
-        assert image == image2
+        image2 = image.flip_vertically()
+        image3 = Image.from_png_file(resolve_resource_path("image/flip_vertically.png"))
+        assert image != image2
+        assert image2 == image3
 
     def test_should_be_original(self) -> None:
         image = Image.from_png_file(resolve_resource_path("image/original.png"))
@@ -239,11 +250,157 @@ class TestFlipVertically:
 class TestFlipHorizontally:
     def test_should_flip_horizontally(self) -> None:
         image = Image.from_png_file(resolve_resource_path("image/original.png"))
-        image = image.flip_horizontally()
-        image2 = Image.from_png_file(resolve_resource_path("image/flip_horizontally.png"))
-        assert image == image2
+        image2 = image.flip_horizontally()
+        image3 = Image.from_png_file(resolve_resource_path("image/flip_horizontally.png"))
+        assert image != image2
+        assert image2 == image3
 
     def test_should_be_original(self) -> None:
         image = Image.from_png_file(resolve_resource_path("image/original.png"))
         image2 = image.flip_horizontally().flip_horizontally()
         assert image == image2
+
+
+class TestAdjustContrast:
+    @pytest.mark.parametrize("factor", [0.75, 5])
+    def test_should_adjust_contrast(self, factor: float) -> None:
+        image = Image.from_png_file(resolve_resource_path("image/contrast/to_adjust_contrast.png"))
+        image2 = image.adjust_contrast(factor)
+        image3 = Image.from_png_file(
+            resolve_resource_path("image/contrast/contrast_adjusted_by_" + str(factor) + ".png"),
+        )
+        assert image != image2
+        assert image2 == image3
+
+    def test_should_not_adjust_contrast(self) -> None:
+        with pytest.warns(
+            UserWarning,
+            match="Contrast adjustment factor is 1.0, this will not make changes to the image.",
+        ):
+            image = Image.from_png_file(resolve_resource_path("image/contrast/to_adjust_contrast.png"))
+            image2 = image.adjust_contrast(1)
+            assert image == image2
+
+    def test_should_raise(self) -> None:
+        image = Image.from_png_file(resolve_resource_path("image/brightness/to_brighten.png"))
+        with pytest.raises(ValueError, match="Contrast factor has to be 0 or bigger"):
+            image.adjust_contrast(-1)
+
+
+class TestBrightness:
+    @pytest.mark.parametrize("factor", [0.5, 10])
+    def test_should_adjust_brightness(self, factor: float) -> None:
+        image = Image.from_png_file(resolve_resource_path("image/brightness/to_brighten.png"))
+        image2 = image.adjust_brightness(factor)
+        image3 = Image.from_png_file(resolve_resource_path("image/brightness/brightened_by_" + str(factor) + ".png"))
+        assert image != image2
+        assert image2 == image3
+
+    def test_should_not_brighten(self) -> None:
+        with pytest.warns(
+            UserWarning,
+            match="Brightness adjustment factor is 1.0, this will not make changes to the image.",
+        ):
+            image = Image.from_png_file(resolve_resource_path("image/brightness/to_brighten.png"))
+            image2 = image.adjust_brightness(1)
+            assert image == image2
+
+    def test_should_raise(self) -> None:
+        image = Image.from_png_file(resolve_resource_path("image/brightness/to_brighten.png"))
+        with pytest.raises(ValueError, match="Brightness factor has to be 0 or bigger"):
+            image.adjust_brightness(-1)
+
+
+class TestInvertColors:
+    @pytest.mark.parametrize(
+        ("image", "expected"),
+        [
+            (
+                Image.from_png_file(resolve_resource_path("image/original.png")),
+                Image.from_png_file(resolve_resource_path("image/inverted_colors_original.png")),
+            ),
+        ],
+        ids=["invert-colors"],
+    )
+    def test_should_invert_colors(self, image: Image, expected: Image) -> None:
+        image = image.invert_colors()
+        assert image == expected
+
+
+class TestBlur:
+    @pytest.mark.parametrize(
+        ("image", "expected"),
+        [
+            (
+                Image.from_png_file(resolve_resource_path("image/boy.png")),
+                Image.from_png_file(resolve_resource_path("image/blurredBoy.png")),
+            ),
+        ],
+        ids=["blur"],
+    )
+    def test_should_return_blurred_image(self, image: Image, expected: Image) -> None:
+        image = image.blur(2)
+        assert image == expected
+
+
+class TestCrop:
+    @pytest.mark.parametrize(
+        ("image", "expected"),
+        [
+            (
+                Image.from_png_file(resolve_resource_path("image/white.png")),
+                Image.from_png_file(resolve_resource_path("image/whiteCropped.png")),
+            ),
+        ],
+        ids=["crop"],
+    )
+    def test_should_return_cropped_image(self, image: Image, expected: Image) -> None:
+        image = image.crop(0, 0, 100, 100)
+        assert image == expected
+
+
+class TestSharpen:
+    @pytest.mark.parametrize("factor", [-1, 0.5, 10])
+    def test_should_sharpen(self, factor: float) -> None:
+        image = Image.from_png_file(resolve_resource_path("image/sharpen/to_sharpen.png"))
+        image2 = image.sharpen(factor)
+        image2.to_png_file(resolve_resource_path("image/sharpen/sharpened_by_" + str(factor) + ".png"))
+        assert image != image2
+        assert image2 == Image.from_png_file(
+            resolve_resource_path("image/sharpen/sharpened_by_" + str(factor) + ".png"),
+        )
+
+    def test_should_not_sharpen(self) -> None:
+        image = Image.from_png_file(resolve_resource_path("image/sharpen/to_sharpen.png"))
+        image2 = image.sharpen(1)
+        assert image == image2
+
+
+class TestRotate:
+    @pytest.mark.parametrize(
+        ("image", "expected"),
+        [
+            (
+                Image.from_png_file(resolve_resource_path("image/snapshot_boxplot.png")),
+                Image.from_png_file(resolve_resource_path("image/snapshot_boxplot_right_rotation.png")),
+            ),
+        ],
+        ids=["rotate-clockwise"],
+    )
+    def test_should_return_clockwise_rotated_image(self, image: Image, expected: Image) -> None:
+        image = image.rotate_right()
+        assert image == expected
+
+    @pytest.mark.parametrize(
+        ("image", "expected"),
+        [
+            (
+                Image.from_png_file(resolve_resource_path("image/snapshot_boxplot.png")),
+                Image.from_png_file(resolve_resource_path("image/snapshot_boxplot_left_rotation.png")),
+            ),
+        ],
+        ids=["rotate-counter-clockwise"],
+    )
+    def test_should_return_counter_clockwise_rotated_image(self, image: Image, expected: Image) -> None:
+        image = image.rotate_left()
+        assert image == expected

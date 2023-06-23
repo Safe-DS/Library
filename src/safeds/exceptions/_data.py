@@ -23,8 +23,27 @@ class UnknownColumnNameError(KeyError):
 class NonNumericColumnError(Exception):
     """Exception raised for trying to do numerical operations on a non-numerical column."""
 
-    def __init__(self, column_info: str) -> None:
-        super().__init__(f"Tried to do a numerical operation on one or multiple non numerical Columns: \n{column_info}")
+    def __init__(self, column_info: str, help_msg: str | None = None) -> None:
+        line_break = "\n"
+        super().__init__(
+            (
+                "Tried to do a numerical operation on one or multiple non-numerical columns:"
+                f" \n{column_info}{line_break + help_msg if help_msg is not None else ''}"
+            ),
+        )
+
+
+class MissingValuesColumnError(Exception):
+    """Exception raised for trying to do operations on columns containing missing values."""
+
+    def __init__(self, column_info: str, help_msg: str | None = None) -> None:
+        line_break = "\n"
+        super().__init__(
+            (
+                "Tried to do an operation on one or multiple columns containing missing values:"
+                f" \n{column_info}{line_break + help_msg if help_msg is not None else ''}"
+            ),
+        )
 
 
 class DuplicateColumnNameError(Exception):
@@ -98,8 +117,15 @@ class TransformerNotFittedError(Exception):
 class ValueNotPresentWhenFittedError(Exception):
     """Exception raised when attempting to one-hot-encode a table containing values not present in the fitting phase."""
 
-    def __init__(self, value: str, column: str) -> None:
-        super().__init__(f"Value not present in the table the transformer was fitted on: \n{value} in column {column}.")
+    def __init__(self, values: list[tuple[str, str]]) -> None:
+        values_info = [f"{value} in column {column}" for value, column in values]
+        line_break = "\n"
+        super().__init__(
+            (
+                "Value(s) not present in the table the transformer was fitted on:"
+                f" {line_break}{line_break.join(values_info)}"
+            ),
+        )
 
 
 class WrongFileExtensionError(Exception):
