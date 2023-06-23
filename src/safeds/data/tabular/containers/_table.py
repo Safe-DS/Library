@@ -545,16 +545,13 @@ class Table:
                 similar_columns.append(column)
         if len(similar_columns) > 0:
             warnings.warn(
-                    (
-                        f"The Column {column_name} is unknown.\n Did you mean one of these: {similar_columns}?"
-                    ),
-                    UserWarning,
-                    stacklevel=2,
-                )
+                f"The Column {column_name} is unknown.\n Did you mean one of these: {similar_columns}?",
+                UserWarning,
+                stacklevel=2,
+            )
             return True
         else:
             return False
-
 
     # ------------------------------------------------------------------------------------------------------------------
     # Information
