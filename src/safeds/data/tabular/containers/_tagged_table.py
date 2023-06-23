@@ -637,7 +637,7 @@ class TaggedTable(Table):
             A new table with sorted columns.
         """
         sorted_table = super().sort_columns(comparator)
-        return TaggedTable._from_table(sorted_table, target_name=self.target.name, feature_names=sorted(set(sorted_table.column_names).intersection(self.features.column_names), key={val: ix for ix, val in enumerate(sorted_table.column_names)}.get))
+        return TaggedTable._from_table(sorted_table, target_name=self.target.name, feature_names=sorted(set(sorted_table.column_names).intersection(self.features.column_names), key={val: ix for ix, val in enumerate(sorted_table.column_names)}.__getitem__))
 
     def sort_rows(self, comparator: Callable[[Row, Row], int]) -> TaggedTable:
         """
