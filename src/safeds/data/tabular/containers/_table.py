@@ -1633,7 +1633,7 @@ class Table:
         >>> from safeds.data.tabular.containers._table import Table
         >>> from safeds.data.tabular.containers._tagged_table import Table
         >>> table = Table.from_dict({"item": ["apple", "milk", "beer"], "price": [1.10, 1.19, 1.79], "amount_bought": [74, 72, 51]})
-        >>> tagged_table = table.tag_columns("amount_bought")
+        >>> tagged_table = table.tag_columns(target_name="amount_bought", feature_names=["apple", "milk", "beer"])
         """
         from ._tagged_table import TaggedTable
 
