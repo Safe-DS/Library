@@ -158,7 +158,7 @@ class Column(Sequence[T]):
         Parameters
         ----------
         index : int | slice
-            The index of the row, or a slice indicing the rows.
+            The index of the row, or a slice specifying the start and end index.
 
         Returns
         -------
