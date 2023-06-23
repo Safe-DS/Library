@@ -527,17 +527,17 @@ class Table:
 
     def get_similar_columns(self, column_name) -> bool:
         """
-            Gives a warning with similar columns to the given one that's not in the table.
+        Give a warning with similar columns to the given one that's not in the table.
 
-            Parameters
-            ----------
-            column_name : str
-                The name of the Column, that's not in the Table.
+        Parameters
+        ----------
+        column_name : str
+            The name of the Column, that's not in the Table.
 
-            Returns
-            -------
-            bool
-                True if there are similar columns.
+        Returns
+        -------
+        bool
+            True if there are similar columns.
         """
         similar_columns = []
         for column in self.column_names:
