@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import copy
 import functools
 import io
 import warnings
@@ -355,7 +356,7 @@ class Table:
             return NotImplemented
         if self is other:
             return True
-        if self.number_of_rows == 0 and other.number_of_rows == 0:
+        if self.number_of_columns == 0 and other.number_of_columns == 0:
             return self.column_names == other.column_names
         table1 = self.sort_columns()
         table2 = other.sort_columns()
@@ -847,9 +848,9 @@ class Table:
         if len(invalid_columns) != 0:
             raise UnknownColumnNameError(invalid_columns)
 
-        transformed_data = self._data[column_names]
-        transformed_data.columns = column_names
-        return Table._from_pandas_dataframe(transformed_data)
+        clone = copy.deepcopy(self)
+        clone = clone.remove_columns(list(set(self.column_names) - set(column_names)))
+        return clone
 
     def remove_columns(self, column_names: list[str]) -> Table:
         """
@@ -881,6 +882,10 @@ class Table:
 
         transformed_data = self._data.drop(labels=column_names, axis="columns")
         transformed_data.columns = [name for name in self._schema.column_names if name not in column_names]
+
+        if len(transformed_data.columns) == 0:
+            return Table()
+
         return Table._from_pandas_dataframe(transformed_data)
 
     def remove_columns_with_missing_values(self) -> Table:
