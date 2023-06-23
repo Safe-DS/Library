@@ -12,7 +12,6 @@ from PIL.Image import Image as PillowImage
 from PIL.Image import open as open_image
 
 from safeds.data.image.typing import ImageFormat
-from safeds.exceptions import WrongFileExtensionError
 
 
 class Image:
@@ -205,24 +204,16 @@ class Image:
 
     def resize(self, new_width: int, new_height: int) -> Image:
         """
-        Return an image that has been resized to a given size.
+        Return a new image that has been resized to a given size.
 
         Returns
         -------
         result : Image
             The image with the given width and height
         """
-        data = io.BytesIO()
-        repr_png = self._repr_png_()
-        repr_jpeg = self._repr_jpeg_()
-        if repr_png is not None:
-            data = io.BytesIO(repr_png)
-        elif repr_jpeg is not None:
-            data = io.BytesIO(repr_jpeg)
-
-        new_image = Image(data, self._format)
-        new_image._image = new_image._image.resize((new_width, new_height))
-        return new_image
+        image_copy = copy.deepcopy(self)
+        image_copy._image = image_copy._image.resize((new_width, new_height))
+        return image_copy
 
     def convert_to_grayscale(self) -> Image:
         """
@@ -233,10 +224,9 @@ class Image:
         grayscale_image : Image
             The grayscale image.
         """
-        data = io.BytesIO()
-        grayscale_image = self._image.convert("L")
-        grayscale_image.save(data, format=self._format.value)
-        return Image(data, self._format)
+        image_copy = copy.deepcopy(self)
+        image_copy._image = image_copy._image.convert("L")
+        return image_copy
 
     def crop(self, x: int, y: int, width: int, height: int) -> Image:
         """
@@ -254,17 +244,9 @@ class Image:
         result : Image
             The image with the
         """
-        data = io.BytesIO()
-        repr_png = self._repr_png_()
-        repr_jpeg = self._repr_jpeg_()
-        if repr_png is not None:
-            data = io.BytesIO(repr_png)
-        elif repr_jpeg is not None:
-            data = io.BytesIO(repr_jpeg)
-
-        new_image = Image(data, self._format)
-        new_image._image = new_image._image.crop((x, y, (x + width), (y + height)))
-        return new_image
+        image_copy = copy.deepcopy(self)
+        image_copy._image = image_copy._image.crop((x, y, (x + width), (y + height)))
+        return image_copy
 
     def flip_vertically(self) -> Image:
         """
@@ -367,17 +349,9 @@ class Image:
         result : Image
             The blurred image
         """
-        data = io.BytesIO()
-        repr_png = self._repr_png_()
-        repr_jpeg = self._repr_jpeg_()
-        if repr_png is not None:
-            data = io.BytesIO(repr_png)
-        elif repr_jpeg is not None:
-            data = io.BytesIO(repr_jpeg)
-
-        new_image = Image(data, self._format)
-        new_image._image = new_image._image.filter(ImageFilter.BoxBlur(radius))
-        return new_image
+        image_copy = copy.deepcopy(self)
+        image_copy._image = image_copy._image.filter(ImageFilter.BoxBlur(radius))
+        return image_copy
 
     def sharpen(self, factor: float) -> Image:
         """
@@ -406,51 +380,46 @@ class Image:
         result : Image
             The image with inverted colors.
         """
-        data = io.BytesIO()
-        repr_png = self._repr_png_()
-        repr_jpeg = self._repr_jpeg_()
-        if repr_png is not None:
-            data = io.BytesIO(repr_png)
-        elif repr_jpeg is not None:
-            data = io.BytesIO(repr_jpeg)
-
-        new_image = Image(data, self._format)
-        new_image._image = ImageOps.invert(new_image._image)
-        return new_image
+        image_copy = copy.deepcopy(self)
+        image_copy._image = ImageOps.invert(image_copy._image)
+        return image_copy
 
     def rotate_right(self) -> Image:
         """
-        Return the png-image clockwise rotated by 90 degrees.
+        Return the image rotated 90 degrees clockwise.
 
         Returns
         -------
         result : Image
-            The image clockwise rotated by 90 degrees.
+            The image rotated 90 degrees clockwise.
         """
-        if self.format != ImageFormat.PNG:
-            raise WrongFileExtensionError("/image", ".png")
-
-        imagecopy = copy.deepcopy(self)
-        imagecopy._image = imagecopy._image.rotate(270, expand=True)
-        return imagecopy
+        image_copy = copy.deepcopy(self)
+        image_copy._image = image_copy._image.rotate(270, expand=True)
+        return image_copy
 
     def rotate_left(self) -> Image:
         """
-        Return the png-image counter-clockwise rotated by 90 degrees.
+        Return the image rotated 90 degrees counter-clockwise.
 
         Returns
         -------
         result : Image
-            The image counter-clockwise rotated by 90 degrees.
-
-        Raises
-        ------
-        WrongFileExtensionError
-            If given a File that's not PNG.
+            The image rotated 90 degrees counter-clockwise.
         """
-        if self.format != ImageFormat.PNG:
-            raise WrongFileExtensionError("/image", ".png")
+        image_copy = copy.deepcopy(self)
+        image_copy._image = image_copy._image.rotate(90, expand=True)
+        return image_copy
 
-        imagecopy = copy.deepcopy(self)
-        imagecopy._image = imagecopy._image.rotate(90, expand=True)
-        return imagecopy
+    def find_edges(self) -> Image:
+        """
+        Return a grayscale image with the highlighted edges.
+
+        Returns
+        -------
+        result : Image
+            The image with edges found.
+        """
+        image_copy = copy.deepcopy(self)
+        image_copy = image_copy.convert_to_grayscale()
+        image_copy._image = image_copy._image.filter(ImageFilter.FIND_EDGES)
+        return image_copy

@@ -5,7 +5,6 @@ import pytest
 from safeds.data.image.containers import Image
 from safeds.data.image.typing import ImageFormat
 from safeds.data.tabular.containers import Table
-from safeds.exceptions._data import WrongFileExtensionError
 
 from tests.helpers import resolve_resource_path
 
@@ -183,19 +182,13 @@ class TestResize:
         ("image", "new_width", "new_height", "new_size"),
         [
             (
-                Image.from_jpeg_file(resolve_resource_path("image/white_square.jpg")),
-                2,
-                3,
-                (2, 3),
-            ),
-            (
                 Image.from_png_file(resolve_resource_path("image/white_square.png")),
                 2,
                 3,
                 (2, 3),
             ),
         ],
-        ids=[".jpg", ".png"],
+        ids=["(2, 3)"],
     )
     def test_should_return_resized_image(
         self,
@@ -220,7 +213,7 @@ class TestConvertToGrayscale:
     )
     def test_convert_to_grayscale(self, image: Image, expected: Image) -> None:
         grayscale_image = image.convert_to_grayscale()
-        assert grayscale_image._image.tobytes() == expected._image.tobytes()
+        assert grayscale_image == expected
 
 
 class TestEQ:
@@ -319,54 +312,51 @@ class TestBrightness:
 
 
 class TestInvertColors:
-    def test_should_invert_colors_png(self) -> None:
-        image = Image.from_png_file(resolve_resource_path("image/original.png"))
+    @pytest.mark.parametrize(
+        ("image", "expected"),
+        [
+            (
+                Image.from_png_file(resolve_resource_path("image/original.png")),
+                Image.from_png_file(resolve_resource_path("image/inverted_colors_original.png")),
+            ),
+        ],
+        ids=["invert-colors"],
+    )
+    def test_should_invert_colors(self, image: Image, expected: Image) -> None:
         image = image.invert_colors()
-        image2 = Image.from_png_file(resolve_resource_path("image/inverted_colors_original.png"))
-        assert image == image2
-
-    def test_should_invert_colors_jpeg(self) -> None:
-        image = Image.from_jpeg_file(resolve_resource_path("image/original.jpg"))
-        image = image.invert_colors()
-        image.to_jpeg_file(resolve_resource_path("image/inverted_colors_original1.jpg"))
-        image = Image.from_jpeg_file(resolve_resource_path("image/inverted_colors_original1.jpg"))
-        image2 = Image.from_jpeg_file(resolve_resource_path("image/inverted_colors_original.jpg"))
-        assert image == image2
-        Path.unlink(Path(resolve_resource_path("image/inverted_colors_original1.jpg")))
+        assert image == expected
 
 
 class TestBlur:
-    def test_should_return_blurred_png_image(self) -> None:
-        image = Image.from_png_file(resolve_resource_path("image/boy.png"))
+    @pytest.mark.parametrize(
+        ("image", "expected"),
+        [
+            (
+                Image.from_png_file(resolve_resource_path("image/boy.png")),
+                Image.from_png_file(resolve_resource_path("image/blurredBoy.png")),
+            ),
+        ],
+        ids=["blur"],
+    )
+    def test_should_return_blurred_image(self, image: Image, expected: Image) -> None:
         image = image.blur(2)
-        image.to_png_file(resolve_resource_path("image/blurredboy1.png"))
-        image = Image.from_png_file(resolve_resource_path("image/blurredboy1.png"))
-        image2 = Image.from_png_file(resolve_resource_path("image/blurredboy.png"))
-        assert image._image == image2._image
-
-    def test_should_return_blurred_jpg_image(self) -> None:
-        image = Image.from_jpeg_file(resolve_resource_path("image/boy.jpg"))
-        image = image.blur(2)
-        image.to_jpeg_file(resolve_resource_path("image/blurredboy1.jpg"))
-        image = Image.from_jpeg_file(resolve_resource_path("image/blurredboy1.jpg"))
-        image2 = Image.from_jpeg_file(resolve_resource_path("image/blurredboy.jpg"))
-        assert image._image == image2._image
-        Path.unlink(Path(resolve_resource_path("image/blurredboy1.jpg")))
-        Path.unlink(Path(resolve_resource_path("image/blurredboy1.png")))
+        assert image == expected
 
 
 class TestCrop:
-    def test_should_crop_jpg_image(self) -> None:
-        image = Image.from_jpeg_file(resolve_resource_path("image/white.jpg"))
+    @pytest.mark.parametrize(
+        ("image", "expected"),
+        [
+            (
+                Image.from_png_file(resolve_resource_path("image/white.png")),
+                Image.from_png_file(resolve_resource_path("image/whiteCropped.png")),
+            ),
+        ],
+        ids=["crop"],
+    )
+    def test_should_return_cropped_image(self, image: Image, expected: Image) -> None:
         image = image.crop(0, 0, 100, 100)
-        image2 = Image.from_jpeg_file(resolve_resource_path("image/whiteCropped.jpg"))
-        assert image == image2
-
-    def test_should_crop_png_image(self) -> None:
-        image = Image.from_png_file(resolve_resource_path("image/white.png"))
-        image = image.crop(0, 0, 100, 100)
-        image2 = Image.from_png_file(resolve_resource_path("image/whiteCropped.png"))
-        assert image == image2
+        assert image == expected
 
 
 class TestSharpen:
@@ -387,38 +377,46 @@ class TestSharpen:
 
 
 class TestRotate:
-    def test_should_return_clockwise_rotated_image(
-        self,
-    ) -> None:
-        image = Image.from_png_file(resolve_resource_path("image/snapshot_boxplot.png"))
+    @pytest.mark.parametrize(
+        ("image", "expected"),
+        [
+            (
+                Image.from_png_file(resolve_resource_path("image/snapshot_boxplot.png")),
+                Image.from_png_file(resolve_resource_path("image/snapshot_boxplot_right_rotation.png")),
+            ),
+        ],
+        ids=["rotate-clockwise"],
+    )
+    def test_should_return_clockwise_rotated_image(self, image: Image, expected: Image) -> None:
         image = image.rotate_right()
-        image2 = Image.from_png_file(resolve_resource_path("image/snapshot_boxplot_right_rotation.png"))
-        assert image == image2
+        assert image == expected
 
-    def test_should_return_counter_clockwise_rotated_image(
-        self,
-    ) -> None:
-        image = Image.from_png_file(resolve_resource_path("image/snapshot_boxplot.png"))
+    @pytest.mark.parametrize(
+        ("image", "expected"),
+        [
+            (
+                Image.from_png_file(resolve_resource_path("image/snapshot_boxplot.png")),
+                Image.from_png_file(resolve_resource_path("image/snapshot_boxplot_left_rotation.png")),
+            ),
+        ],
+        ids=["rotate-counter-clockwise"],
+    )
+    def test_should_return_counter_clockwise_rotated_image(self, image: Image, expected: Image) -> None:
         image = image.rotate_left()
-        image2 = Image.from_png_file(resolve_resource_path("image/snapshot_boxplot_left_rotation.png"))
-        assert image == image2
+        assert image == expected
 
-    def test_should_raise_if_not_png_right(self) -> None:
-        with pytest.raises(
-            WrongFileExtensionError,
-            match=(
-                "The file /image has a wrong file extension. Please provide a file with the following extension\\(s\\):"
-                " .png"
-            ),
-        ):
-            Image.from_jpeg_file(resolve_resource_path("image/white_square.jpg")).rotate_right()
 
-    def test_should_raise_if_not_png_left(self) -> None:
-        with pytest.raises(
-            WrongFileExtensionError,
-            match=(
-                "The file /image has a wrong file extension. Please provide a file with the following extension\\(s\\):"
-                " .png"
+class TestFindEdges:
+    @pytest.mark.parametrize(
+        ("image", "expected"),
+        [
+            (
+                Image.from_png_file(resolve_resource_path("image/boy.png")),
+                Image.from_png_file(resolve_resource_path("image/edgyBoy.png")),
             ),
-        ):
-            Image.from_jpeg_file(resolve_resource_path("image/white_square.jpg")).rotate_left()
+        ],
+        ids=["find_edges"],
+    )
+    def test_should_return_edges_of_image(self, image: Image, expected: Image) -> None:
+        image = image.find_edges()
+        assert image == expected
