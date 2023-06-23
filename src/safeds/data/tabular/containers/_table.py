@@ -864,6 +864,7 @@ class Table:
         invalid_columns = []
         for name in column_names:
             if not self._schema.has_column(name):
+                self.get_similar_columns(name)
                 invalid_columns.append(name)
         if len(invalid_columns) != 0:
             raise UnknownColumnNameError(invalid_columns)
@@ -896,6 +897,7 @@ class Table:
         invalid_columns = []
         for name in column_names:
             if not self._schema.has_column(name):
+                self.get_similar_columns(name)
                 invalid_columns.append(name)
         if len(invalid_columns) != 0:
             raise UnknownColumnNameError(invalid_columns)
@@ -1010,6 +1012,7 @@ class Table:
             If the specified new target column name already exists.
         """
         if old_name not in self._schema.column_names:
+            self.get_similar_columns(old_name)
             raise UnknownColumnNameError([old_name])
         if old_name == new_name:
             return self
@@ -1051,6 +1054,7 @@ class Table:
             If the size of at least one of the new columns does not match the amount of rows.
         """
         if old_column_name not in self._schema.column_names:
+            self.get_similar_columns(old_column_name)
             raise UnknownColumnNameError([old_column_name])
 
         columns = list[Column]()
@@ -1270,6 +1274,7 @@ class Table:
             items: list = [transformer(item) for item in self.to_rows()]
             result: list[Column] = [Column(name, items)]
             return self.replace_column(name, result)
+        self.get_similar_columns(name)
         raise UnknownColumnNameError([name])
 
     def transform_table(self, transformer: TableTransformer) -> Table:
@@ -1407,6 +1412,8 @@ class Table:
             If either of the columns do not exist.
         """
         if not self.has_column(x_column_name) or not self.has_column(y_column_name):
+            self.get_similar_columns(x_column_name)
+            self.get_similar_columns(y_column_name)
             raise UnknownColumnNameError(
                 ([x_column_name] if not self.has_column(x_column_name) else [])
                 + ([y_column_name] if not self.has_column(y_column_name) else []),
@@ -1455,6 +1462,8 @@ class Table:
             If either of the columns do not exist.
         """
         if not self.has_column(x_column_name) or not self.has_column(y_column_name):
+            self.get_similar_columns(x_column_name)
+            self.get_similar_columns(y_column_name)
             raise UnknownColumnNameError(
                 ([x_column_name] if not self.has_column(x_column_name) else [])
                 + ([y_column_name] if not self.has_column(y_column_name) else []),
