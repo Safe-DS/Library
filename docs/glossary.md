@@ -4,8 +4,12 @@
 The fraction of predictions a [classification](#classification) model has correctly identified. Formula:
 
 $$
-\text{accuracy} = \frac{\text{[True Positives](#true-positive-tp) + [True Negatives](#true-negative-tn)}}{\text{Total amount of data points}}
+\text{accuracy} = \frac{\text{True Positives + True Negatives}}{\text{Total amount of data points}}
 $$
+
+See here for respective definitions:
+[True Positives](#true-positive-tp)
+[True Negatives](#true-negative-tn)
 
 ## Application Programming Interface (API)
 An API allows independent applications to communicate with each other and exchange data.
@@ -70,8 +74,12 @@ The "Positive Class" consists of all attributes to be considered positive. Conse
 The ability of a [classification](#classification) model to identify only the relevant data points. Formula:
 
 $$
-\text{precision} = \frac{\text{[True Positives](#true-positive-tp)}}{\text{[True Positives](#true-positive-tp) + [False Positives](#false-positive-fp)}}
+\text{precision} = \frac{\text{True Positives}}{\text{True Positives + False Positives}}
 $$
+
+See here for respective references:
+[True Positives](#true-positive-tp)
+[False Positives](#false-positive-fp)
 
 ## Random Forest
 Random Forest is an ML model that works by generating decision trees at random.
@@ -82,8 +90,12 @@ Implemented in Safe-DS as [RandomForest][safeds.ml.classical.regression.RandomFo
 The ability of a [classification](#classification) model to identify all the relevant data points. Formula:
 
 $$
-\text{recall} = \frac{\text{[True Positives](#true-positive-tp)}}{\text{[True Positives](#true-positive-tp) + [False Negatives](#false-negative-fn)}}
+\text{recall} = \frac{\text{True Positives}}{\text{True Positives + False Negatives}}
 $$
+
+See here for respective references:
+[True Positives](#true-positive-tp)
+[False Negatives](#false-negative-fn)
 
 ## Regression
 Regression refers to the estimation of continuous dependent variables.
