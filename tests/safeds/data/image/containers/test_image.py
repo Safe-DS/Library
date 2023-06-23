@@ -404,3 +404,19 @@ class TestRotate:
     def test_should_return_counter_clockwise_rotated_image(self, image: Image, expected: Image) -> None:
         image = image.rotate_left()
         assert image == expected
+
+
+class TestFindEdges:
+    @pytest.mark.parametrize(
+        ("image", "expected"),
+        [
+            (
+                Image.from_png_file(resolve_resource_path("image/boy.png")),
+                Image.from_png_file(resolve_resource_path("image/edgyBoy.png")),
+            ),
+        ],
+        ids=["find_edges"],
+    )
+    def test_should_return_edges_of_image(self, image: Image, expected: Image) -> None:
+        image = image.find_edges()
+        assert image == expected
