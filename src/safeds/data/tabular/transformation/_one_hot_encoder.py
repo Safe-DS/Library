@@ -103,7 +103,13 @@ class OneHotEncoder(InvertibleTableTransformer):
         if table.number_of_rows == 0:
             raise ValueError("The OneHotEncoder cannot be fitted because the table contains 0 rows")
 
-        if table._as_table().keep_only_columns(column_names).remove_columns_with_non_numerical_values().number_of_columns > 0:
+        if (
+            table._as_table()
+            .keep_only_columns(column_names)
+            .remove_columns_with_non_numerical_values()
+            .number_of_columns
+            > 0
+        ):
             warnings.warn(
                 (
                     "The columns"
