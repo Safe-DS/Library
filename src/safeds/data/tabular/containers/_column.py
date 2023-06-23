@@ -504,7 +504,7 @@ class Column(Sequence[T]):
         \frac{\text{number of occurrences of most common non-null value}}{\text{number of non-null values}}
         $$
 
-        The stability cannot be calculated for a column with only null values.
+        The stability is not definded for a column with only null values.
 
         Returns
         -------
@@ -520,7 +520,7 @@ class Column(Sequence[T]):
             raise ColumnSizeError("> 0", "0")
 
         if self.all(lambda x: x is None):
-            raise ValueError("Stability cannot be calculated for a column with only null values.")
+            raise ValueError("Stability is not definded for a column with only null values.")
 
         return self._data.value_counts()[self.mode()[0]] / self._data.count()
 
