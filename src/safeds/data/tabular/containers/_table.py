@@ -525,7 +525,7 @@ class Table:
 
         return Row._from_pandas_dataframe(self._data.iloc[[index]], self._schema)
 
-    def get_similar_columns(self, column_name) -> bool:
+    def get_similar_columns(self, column_name: str) -> bool:
         """
             Gives a warning with similar columns to the given one that's not in the table.
 
