@@ -237,7 +237,7 @@ class Table:
         ------
         ColumnLengthMismatchError
             If any of the column sizes does not match with the others.
-         DuplicateColumnNameError
+        DuplicateColumnNameError
             If multiple columns have the same name.
 
         Examples
