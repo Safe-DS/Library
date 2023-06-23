@@ -57,7 +57,7 @@ def test_should_return_table(table: TaggedTable, column_names: list[str], expect
     ],
     ids=["table"],
 )
-def should_raise_illegal_schema_modification(table: TaggedTable, column_names: list[str]) -> None:
+def test_should_raise_illegal_schema_modification(table: TaggedTable, column_names: list[str]) -> None:
     with pytest.raises(
         IllegalSchemaModificationError,
         match="Must keep target column and at least one feature column.",
