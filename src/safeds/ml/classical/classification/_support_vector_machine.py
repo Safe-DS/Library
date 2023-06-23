@@ -254,4 +254,3 @@ class SupportVectorMachine(Classifier):
             The sklearn Classifier.
         """
         return sk_SVC(C=self._c)
-
