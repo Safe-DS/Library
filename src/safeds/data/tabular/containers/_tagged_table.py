@@ -563,7 +563,7 @@ class TaggedTable(Table):
                     target_name=new_columns[0].name, feature_names=self.features.column_names
                 )
         else:
-            return TaggedTable._from_table(super().replace_column(old_column_name, new_columns), target_name=self.target.name, feature_names=self.features.column_names if old_column_name not in self.features.column_names else self.features.column_names[:self.features.column_names.index(old_column_name)] + list(map(lambda col: col.name, new_columns)) + self.features.column_names[self.features.column_names.index(old_column_name):])
+            return TaggedTable._from_table(super().replace_column(old_column_name, new_columns), target_name=self.target.name, feature_names=self.features.column_names if old_column_name not in self.features.column_names else self.features.column_names[:self.features.column_names.index(old_column_name)] + list(map(lambda col: col.name, new_columns)) + self.features.column_names[self.features.column_names.index(old_column_name) + 1:])
 
     def shuffle_rows(self) -> TaggedTable:
         """
