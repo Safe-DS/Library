@@ -409,3 +409,17 @@ class Image:
         image_copy = copy.deepcopy(self)
         image_copy._image = image_copy._image.rotate(90, expand=True)
         return image_copy
+
+    def find_edges(self) -> Image:
+        """
+        Return a grayscale image with the highlighted edges.
+
+        Returns
+        -------
+        result : Image
+            The image with edges found.
+        """
+        image_copy = copy.deepcopy(self)
+        image_copy = image_copy.convert_to_grayscale()
+        image_copy._image = image_copy._image.filter(ImageFilter.FIND_EDGES)
+        return image_copy
