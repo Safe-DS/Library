@@ -612,6 +612,20 @@ class Table:
     # Transformations
     # ------------------------------------------------------------------------------------------------------------------
 
+    # This method is meant as a way to "cast" instances of subclasses of `Table` to a proper `Table`, dropping any
+    # additional constraints that might have to hold in the subclass.
+    # Override accordingly in subclasses.
+    def _as_table(self: Table) -> Table:
+        """
+        Transform the table to an instance of the Table class.
+
+        Returns
+        -------
+        table: Table
+        The table, as an instance of the Table class.
+        """
+        return self
+
     def add_column(self, column: Column) -> Table:
         """
         Return the original table with the provided column attached at the end.
