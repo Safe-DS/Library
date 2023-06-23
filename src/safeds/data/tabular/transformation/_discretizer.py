@@ -28,7 +28,7 @@ class Discretizer(TableTransformer):
 
         if number_of_bins < 2:
             raise ValueError("Parameter 'number_of_bins' must be >= 2.")
-        self.number_of_bins = number_of_bins
+        self._number_of_bins = number_of_bins
 
     def fit(self, table: Table, column_names: list[str] | None) -> Discretizer:
         """
@@ -55,10 +55,10 @@ class Discretizer(TableTransformer):
             if len(missing_columns) > 0:
                 raise UnknownColumnNameError(list(missing_columns))
 
-        wrapped_transformer = sk_KBinsDiscretizer(n_bins=self.number_of_bins)
+        wrapped_transformer = sk_KBinsDiscretizer(n_bins=self._number_of_bins, encode="ordinal")
         wrapped_transformer.fit(table._data[column_names])
 
-        result = Discretizer()
+        result = Discretizer(self._number_of_bins)
         result._wrapped_transformer = wrapped_transformer
         result._column_names = column_names
 
