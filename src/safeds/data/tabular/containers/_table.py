@@ -907,8 +907,7 @@ class Table:
         >>> from safeds.data.tabular.containers import Row
         >>> table = Table.from_dict({"a": [1], "b": [2]})
         >>> row = Row.from_dict({"a": 3, "b": 4})
-        >>> new_table = table.add_row(row)
-        >>> new_table
+        >>> table.add_row(row)
            a  b
         0  1  2
         1  3  4
