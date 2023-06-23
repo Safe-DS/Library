@@ -600,7 +600,7 @@ class Table:
             for function in statistics.values():
                 try:
                     values.append(str(function()))
-                except NonNumericColumnError:
+                except (NonNumericColumnError, ValueError):
                     values.append("-")
 
             result = pd.concat([result, pd.DataFrame(values)], axis=1)
