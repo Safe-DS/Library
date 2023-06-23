@@ -19,5 +19,5 @@ from safeds.data.tabular.containers import TaggedTable, Column, Table
         Table({"f1": [1, 2], "target": [2, 3], "other": [0, -1], "f2": [4, 5], "f3": [6, 7]}).tag_columns(target_name="target", feature_names=["f1", "f2", "f3"])
     )], ids=["new columns as feature", "table added as features", "table contains a non feature/target column"]
 )
-def test_add_columns_as_features(tagged_table: TaggedTable, columns: list[Column] | Table, tagged_table_with_new_columns) -> None:
+def test_add_columns_as_features(tagged_table: TaggedTable, columns: list[Column] | Table, tagged_table_with_new_columns: TaggedTable) -> None:
     assert tagged_table.add_columns_as_features(columns) == tagged_table_with_new_columns

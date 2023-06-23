@@ -9,8 +9,6 @@ if TYPE_CHECKING:
     from collections.abc import Callable, Mapping, Sequence
     from typing import Any
 
-    from safeds.data.tabular.transformation import InvertibleTableTransformer, TableTransformer
-
 
 class TaggedTable(Table):
     """
@@ -195,7 +193,7 @@ class TaggedTable(Table):
         ColumnSizeError
             If the size of the column does not match the amount of rows.
         """
-        return TaggedTable._from_table(super().add_column(column), target_name=self.target.name, feature_names=self.features.column_names + [column.name])
+        return TaggedTable._from_table(super().add_column(column), target_name=self.target.name, feature_names=[*self.features.column_names, column.name])
 
     def add_columns_as_features(self, columns: list[Column] | Table) -> TaggedTable:
         """
@@ -215,7 +213,7 @@ class TaggedTable(Table):
         ColumnSizeError
             If the size of the column does not match the amount of rows.
         """
-        return TaggedTable._from_table(super().add_columns(columns), target_name=self.target.name, feature_names=self.features.column_names + list(map(lambda col: col.name, columns.to_columns() if isinstance(columns, Table) else columns)))
+        return TaggedTable._from_table(super().add_columns(columns), target_name=self.target.name, feature_names=self.features.column_names + [col.name for col in (columns.to_columns() if isinstance(columns, Table) else columns)])
 
     # ------------------------------------------------------------------------------------------------------------------
     # Overriden methods from Table class:
@@ -563,7 +561,7 @@ class TaggedTable(Table):
                     target_name=new_columns[0].name, feature_names=self.features.column_names
                 )
         else:
-            return TaggedTable._from_table(super().replace_column(old_column_name, new_columns), target_name=self.target.name, feature_names=self.features.column_names if old_column_name not in self.features.column_names else self.features.column_names[:self.features.column_names.index(old_column_name)] + list(map(lambda col: col.name, new_columns)) + self.features.column_names[self.features.column_names.index(old_column_name) + 1:])
+            return TaggedTable._from_table(super().replace_column(old_column_name, new_columns), target_name=self.target.name, feature_names=self.features.column_names if old_column_name not in self.features.column_names else self.features.column_names[:self.features.column_names.index(old_column_name)] + [col.name for col in new_columns] + self.features.column_names[self.features.column_names.index(old_column_name) + 1:])
 
     def shuffle_rows(self) -> TaggedTable:
         """
