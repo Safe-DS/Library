@@ -340,8 +340,6 @@ class TestBlur:
     )
     def test_should_return_blurred_image(self, image: Image, expected: Image) -> None:
         image = image.blur(2)
-        image.to_png_file(resolve_resource_path("image/blurredBoy1.png"))
-        image = image.from_png_file(resolve_resource_path("image/blurredBoy1.png"))
         assert image == expected
 
 
