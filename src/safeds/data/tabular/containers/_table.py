@@ -859,8 +859,7 @@ class Table:
         >>> table = Table.from_dict({"a": [1, 3], "b": [2, 4]})
         >>> col1 = Column("c", ["d", "e"])
         >>> col2 = Column("d", [3.5, 7.9])
-        >>> new_table = table.add_columns([col1, col2])
-        >>> new_table
+        >>> table.add_columns([col1, col2])
            a  b  c    d
         0  1  2  d  3.5
         1  3  4  e  7.9
