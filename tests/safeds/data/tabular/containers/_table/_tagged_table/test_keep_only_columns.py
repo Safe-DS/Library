@@ -15,9 +15,9 @@ from tests.helpers import assert_that_tagged_tables_are_equal
                         "feat1": [1, 2, 3],
                         "feat2": [4, 5, 6],
                         "target": [7, 8, 9],
-                    }
+                    },
                 ),
-                "target"
+                "target",
             ),
             ["feat1", "target"],
             TaggedTable._from_table(
@@ -27,9 +27,9 @@ from tests.helpers import assert_that_tagged_tables_are_equal
                         "target": [7, 8, 9],
                     },
                 ),
-                "target"
-            )
-        )
+                "target",
+            ),
+        ),
     ],
     ids=["table"],
 )
@@ -48,15 +48,17 @@ def test_should_return_table(table: TaggedTable, column_names: list[str], expect
                         "feat1": [1, 2, 3],
                         "feat2": [4, 5, 6],
                         "target": [7, 8, 9],
-                    }
+                    },
                 ),
-                "target"
+                "target",
             ),
             ["feat1", "feat2"],
-        )
+        ),
     ],
     ids=["table"],
 )
 def should_raise_illegal_schema_modification(table: TaggedTable, column_names: list[str]) -> None:
-    with pytest.raises(IllegalSchemaModificationError, match="Must keep target column and at least one feature column."):
+    with pytest.raises(
+        IllegalSchemaModificationError, match="Must keep target column and at least one feature column.",
+    ):
         table.keep_only_columns(column_names)
