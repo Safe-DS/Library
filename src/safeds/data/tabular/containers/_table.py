@@ -1335,8 +1335,7 @@ class Table:
         >>> from safeds.data.tabular.containers import Column, Table
         >>> table = Table.from_dict({"a": [1], "b": [2]})
         >>> new_col = Column("new", [3])
-        >>> new_table = table.replace_column("b", [new_col])
-        >>> new_table
+        >>> table.replace_column("b", [new_col])
            a  new
         0  1    3
         """
