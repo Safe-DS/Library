@@ -54,6 +54,14 @@ class RidgeRegression(Regressor):
 
     @property
     def alpha(self) -> float:
+        """
+        Get the regularization of the model.
+
+        Returns
+        -------
+        result: float
+            The regularization of the model.
+        """
         return self._alpha
 
     def fit(self, training_set: TaggedTable) -> RidgeRegression:

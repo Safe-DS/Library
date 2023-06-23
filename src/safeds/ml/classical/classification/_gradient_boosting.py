@@ -51,10 +51,26 @@ class GradientBoosting(Classifier):
 
     @property
     def number_of_trees(self) -> int:
+        """
+        Get the number of trees (estimators) in the ensemble.
+
+        Returns
+        -------
+        result: int
+            The number of trees.
+        """
         return self._number_of_trees
 
     @property
     def learning_rate(self) -> float:
+        """
+        Get the learning rate.
+
+        Returns
+        -------
+        result: float
+            The learning rate.
+        """
         return self._learning_rate
 
     def fit(self, training_set: TaggedTable) -> GradientBoosting:
