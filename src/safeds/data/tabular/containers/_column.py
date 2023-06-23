@@ -193,6 +193,7 @@ class Column(Sequence[T]):
     def __iter__(self) -> Iterator[T]:
         r"""
         Create an iterator for the data of this column.
+        This way e.g. for-each loops can be used on it.
 
         Returns
         -------
@@ -203,11 +204,11 @@ class Column(Sequence[T]):
         --------
         >>> from safeds.data.tabular.containers import Column
         >>> column = Column("test", ["A", "B", "C"])
+        >>> string = ""
         >>> for val in column:
-        >>>     print(val + "\n")
-        A
-        B
-        C
+        ...     string += val + ", "
+        >>> string
+        'A, B, C, '
         """
         return iter(self._data)
 
