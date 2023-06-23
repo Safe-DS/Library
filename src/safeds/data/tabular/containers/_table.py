@@ -452,6 +452,7 @@ class Table:
             If the specified target column name does not exist.
         """
         if not self.has_column(column_name):
+            self.get_similar_columns(column_name)
             raise UnknownColumnNameError([column_name])
 
         return Column._from_pandas_series(
@@ -525,15 +526,23 @@ class Table:
         return Row._from_pandas_dataframe(self._data.iloc[[index]], self._schema)
 
     def get_similar_columns(self, column_name) -> bool:
+        similar_columns = []
         for column in self.column_names:
             if Levenshtein.normalized_similarity(column, column_name) >= 0.7:
-                warnings.warn(
+                similar_columns.append(column)
+        if len(similar_columns) > 0:
+            print(similar_columns)
+            warnings.warn(
                     (
-                        f"did you mean {column}?"
+                        f"did you mean one of these: {similar_columns}?"
                     ),
                     UserWarning,
                     stacklevel=2,
                 )
+            return True
+        else:
+            return False
+
 
     # ------------------------------------------------------------------------------------------------------------------
     # Information
