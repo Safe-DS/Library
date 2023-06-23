@@ -901,7 +901,6 @@ class Column(Sequence[T]):
         NonNumericColumnError
             If the data contains non-numerical data.
 
-
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
@@ -992,7 +991,6 @@ class Column(Sequence[T]):
         -------
         output : str
             The generated HTML.
-
 
         Examples
         --------

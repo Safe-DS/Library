@@ -505,7 +505,6 @@ class Table:
         number_of_columns : int
             The number of columns.
 
-
         Examples
         --------
         >>> from safeds.data.tabular.containers import Table
@@ -673,7 +672,6 @@ class Table:
         ------
         IndexOutOfBoundsError
             If no row at the specified index exists in this table.
-
 
         Examples
         --------
@@ -1147,7 +1145,6 @@ class Table:
         table : Table
             A table without the columns that contain missing values.
 
-
         Examples
         --------
         >>> from safeds.data.tabular.containers import Table
@@ -1251,8 +1248,7 @@ class Table:
         >>> c3 = Column("c", [0.1, 0.00, 0.4, 0.2, 0, 0, 0, 0, 0, 0, 0, 0])
         >>> c4 = Column("d", [-1000000, 1000000, -1000000, -1000000, -1000000, -1000000, -1000000, -1000000, -1000000, -1000000, -1000000, -1000000])
         >>> table = Table.from_columns([c1, c2, c3, c4])
-        >>> new_table = table.remove_rows_with_outliers()
-        >>> new_table
+        >>> table.remove_rows_with_outliers()
               a     b    c        d
         0   1.0  1.50  0.1 -1000000
         1   1.0  0.50  0.4 -1000000
@@ -1298,7 +1294,6 @@ class Table:
             If the specified old target column name does not exist.
         DuplicateColumnNameError
             If the specified new target column name already exists.
-
 
         Examples
         --------
@@ -1496,8 +1491,8 @@ class Table:
         >>> table.sort_columns(lambda col1, col2: -1)
            b  a
         0  2  1
-        >>> table = Table.from_dict({"b": [2], "a": [1]})
-        >>> table.sort_columns()
+        >>> table2 = Table.from_dict({"b": [2], "a": [1]})
+        >>> table2.sort_columns()
            a  b
         0  1  2
         """
