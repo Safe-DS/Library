@@ -288,8 +288,7 @@ class Table:
 
         Examples
         --------
-        >>> from safeds.data.tabular.containers import Table
-        >>> from safeds.data.tabular.containers import Row
+        >>> from safeds.data.tabular.containers import Row, Table
         >>> row1 = Row({"a": 1, "b": 2})
         >>> row2 = Row({"a": 3, "b": 4})
         >>> Table.from_rows([row1, row2])
@@ -333,8 +332,7 @@ class Table:
         --------
         >>> import pandas as pd
         >>> from safeds.data.tabular.containers import Table
-        >>> table = Table._from_pandas_dataframe(pd.DataFrame({"a": [1], "b": [2]}))
-        >>> table
+        >>> Table._from_pandas_dataframe(pd.DataFrame({"a": [1], "b": [2]}))
            a  b
         0  1  2
         """
@@ -374,8 +372,7 @@ class Table:
         Examples
         --------
         >>> from safeds.data.tabular.containers import Table
-        >>> table = Table({"a": [1, 2, 3], "b": [4, 5, 6]})
-        >>> table
+        >>> Table({"a": [1, 2, 3], "b": [4, 5, 6]})
            a  b
         0  1  4
         1  2  5
@@ -401,7 +398,7 @@ class Table:
 
     def __eq__(self, other: Any) -> bool:
         """
-        Compare two 'table' instances.
+        Compare two table instances.
 
         Returns
         -------
@@ -409,8 +406,7 @@ class Table:
 
         Examples
         --------
-        >>> from safeds.data.tabular.containers import Table
-        >>> from safeds.data.tabular.containers import Row
+        >>> from safeds.data.tabular.containers import Row, Table
         >>> row1 = Row({"a": 1, "b": 2})
         >>> row2 = Row({"a": 3, "b": 4})
         >>> row3 = Row({"a": 5, "b": 6})
@@ -534,8 +530,7 @@ class Table:
 
         Examples
         --------
-        >>> from safeds.data.tabular.containers import Table
-        >>> from safeds.data.tabular.containers import Row
+        >>> from safeds.data.tabular.containers import Row, Table
         >>> row = Row({"a": 1, "b": 2.5, "c": "ff"})
         >>> table = Table.from_dict({"a": [1, 8], "b": [2.5, 9], "c": ["g", "g"]})
         >>> table.schema
@@ -849,8 +844,7 @@ class Table:
 
         Examples
         --------
-        >>> from safeds.data.tabular.containers import Table
-        >>> from safeds.data.tabular.containers import Column
+        >>> from safeds.data.tabular.containers import Column, Table
         >>> table = Table.from_dict({"a": [1, 3], "b": [2, 4]})
         >>> col1 = Column("c", ["d", "e"])
         >>> col2 = Column("d", [3.5, 7.9])
@@ -897,8 +891,7 @@ class Table:
 
         Examples
         --------
-        >>> from safeds.data.tabular.containers import Table
-        >>> from safeds.data.tabular.containers import Row
+        >>> from safeds.data.tabular.containers import Row, Table
         >>> table = Table.from_dict({"a": [1], "b": [2]})
         >>> row = Row.from_dict({"a": 3, "b": 4})
         >>> table.add_row(row)
@@ -947,17 +940,15 @@ class Table:
         Raises
         ------
         SchemaMismatchError
-            If the schema of on of the row does not match the table schema.
+            If the schema of one of the rows does not match the table schema.
 
         Examples
         --------
-        >>> from safeds.data.tabular.containers import Table
-        >>> from safeds.data.tabular.containers import Row
+        >>> from safeds.data.tabular.containers import Row, Table
         >>> table = Table.from_dict({"a": [1], "b": [2]})
         >>> row1 = Row.from_dict({"a": 3, "b": 4})
         >>> row2 = Row.from_dict({"a": 5, "b": 6})
-        >>> new_table = table.add_rows([row1, row2])
-        >>> new_table
+        >>> table.add_rows([row1, row2])
            a  b
         0  1  2
         1  3  4
@@ -1010,8 +1001,7 @@ class Table:
         --------
         >>> from safeds.data.tabular.containers import Table
         >>> table = Table.from_dict({"a": [1, 3], "b": [2, 4]})
-        >>> new_table = table.filter_rows(lambda x: x["a"] < 2)
-        >>> new_table
+        >>> table.filter_rows(lambda x: x["a"] < 2)
            a  b
         0  1  2
         """
@@ -1073,8 +1063,7 @@ class Table:
         --------
         >>> from safeds.data.tabular.containers import Table
         >>> table = Table.from_dict({"a": [1, 3], "b": [2, 4]})
-        >>> new_table = table.keep_only_columns(["b"])
-        >>> new_table
+        >>> table.keep_only_columns(["b"])
            b
         0  2
         1  4
@@ -1115,8 +1104,7 @@ class Table:
         --------
         >>> from safeds.data.tabular.containers import Table
         >>> table = Table.from_dict({"a": [1, 3], "b": [2, 4]})
-        >>> new_table = table.remove_columns(["b"])
-        >>> new_table
+        >>> table.remove_columns(["b"])
            a
         0  1
         1  3
@@ -1148,8 +1136,7 @@ class Table:
         --------
         >>> from safeds.data.tabular.containers import Table
         >>> table = Table.from_dict({"a": [1, 2], "b": [None, 2]})
-        >>> new_table = table.remove_columns_with_missing_values()
-        >>> new_table
+        >>> table.remove_columns_with_missing_values()
            a
         0  1
         1  2
@@ -1171,8 +1158,7 @@ class Table:
         --------
         >>> from safeds.data.tabular.containers import Table
         >>> table = Table.from_dict({"a": [1], "b": ["test"]})
-        >>> new_table = table.remove_columns_with_non_numerical_values()
-        >>> new_table
+        >>> table.remove_columns_with_non_numerical_values()
            a
         0  1
         """
@@ -1193,8 +1179,7 @@ class Table:
         --------
         >>> from safeds.data.tabular.containers import Table
         >>> table = Table.from_dict({"a": [1, 3, 3], "b": [2, 4, 4]})
-        >>> new_table = table.remove_duplicate_rows()
-        >>> new_table
+        >>> table.remove_duplicate_rows()
            a  b
         0  1  2
         1  3  4
@@ -1218,8 +1203,7 @@ class Table:
         --------
         >>> from safeds.data.tabular.containers import Table
         >>> table = Table.from_dict({"a": [1.0, None, 3], "b": [2, 4.0, None]})
-        >>> new_table = table.remove_rows_with_missing_values()
-        >>> new_table
+        >>> table.remove_rows_with_missing_values()
              a    b
         0  1.0  2.0
         """
@@ -1244,8 +1228,7 @@ class Table:
 
         Examples
         --------
-        >>> from safeds.data.tabular.containers import Table
-        >>> from safeds.data.tabular.containers import Column
+        >>> from safeds.data.tabular.containers import Column, Table
         >>> c1 = Column("a", [1, 3, 1, 0.1, 0, 0, 0, 0, 0])
         >>> c2 = Column("b", [1.5, 1, 0.5, 0.01, 0, 0, 0, 0, 0])
         >>> c3 = Column("c", [0.1, 0.00, 0.4, 0.2, 0, 0, 0, 0, 0])
@@ -1302,8 +1285,7 @@ class Table:
         --------
         >>> from safeds.data.tabular.containers import Table
         >>> table = Table.from_dict({"a": [1], "b": [2]})
-        >>> new_table = table.rename_column("b", "c")
-        >>> new_table
+        >>> table.rename_column("b", "c")
            a  c
         0  1  2
         """
@@ -1350,8 +1332,7 @@ class Table:
 
         Examples
         --------
-        >>> from safeds.data.tabular.containers import Table
-        >>> from safeds.data.tabular.containers import Column
+        >>> from safeds.data.tabular.containers import Column, Table
         >>> table = Table.from_dict({"a": [1], "b": [2]})
         >>> new_col = Column("new", [3])
         >>> new_table = table.replace_column("b", [new_col])
@@ -1394,8 +1375,7 @@ class Table:
         >>> import numpy as np
         >>> np.random.seed(123456)
         >>> table = Table.from_dict({"a": [1, 3, 5], "b": [2, 4, 6]})
-        >>> new_table = table.shuffle_rows()
-        >>> new_table
+        >>> table.shuffle_rows()
            a  b
         0  5  6
         1  1  2
@@ -1439,8 +1419,7 @@ class Table:
         --------
         >>> from safeds.data.tabular.containers import Table
         >>> table = Table.from_dict({"a": [1, 3, 5], "b": [2, 4, 6]})
-        >>> new_table = table.slice_rows(0, 2)
-        >>> new_table
+        >>> table.slice_rows(0, 2)
            a  b
         0  1  2
         1  3  4
@@ -1493,17 +1472,14 @@ class Table:
         --------
         >>> from safeds.data.tabular.containers import Table
         >>> table = Table.from_dict({"a": [1], "b": [2] })
-        >>> new_table = table.sort_columns(lambda col1, col2: 1)
-        >>> new_table
+        >>> table.sort_columns(lambda col1, col2: 1)
            a  b
         0  1  2
-        >>> new_table = table.sort_columns(lambda col1, col2: -1)
-        >>> new_table
+        >>> table.sort_columns(lambda col1, col2: -1)
            b  a
         0  2  1
         >>> table = Table.from_dict({"b": [2], "a": [1]})
-        >>> new_table = table.sort_columns()
-        >>> new_table
+        >>> table.sort_columns()
            a  b
         0  1  2
         """
@@ -1538,20 +1514,17 @@ class Table:
         --------
         >>> from safeds.data.tabular.containers import Table
         >>> table = Table.from_dict({"a": [1, 3, 5], "b": [2, 4, 6] })
-        >>> new_table = table.sort_rows(lambda row1, row2: 1)
-        >>> new_table
+        >>> table.sort_rows(lambda row1, row2: 1)
            a  b
         0  1  2
         1  3  4
         2  5  6
-        >>> new_table = table.sort_rows(lambda row1, row2: -1)
-        >>> new_table
+        >>> table.sort_rows(lambda row1, row2: -1)
            a  b
         0  5  6
         1  3  4
         2  1  2
-        >>> new_table = table.sort_rows(lambda row1, row2: 0)
-        >>> new_table
+        >>> table.sort_rows(lambda row1, row2: 0)
            a  b
         0  1  2
         1  3  4
@@ -1629,8 +1602,7 @@ class Table:
 
         Examples
         --------
-        >>> from safeds.data.tabular.containers._table import Table
-        >>> from safeds.data.tabular.containers._tagged_table import Table
+        >>> from safeds.data.tabular.containers import Table, TaggedTable
         >>> table = Table.from_dict({"item": ["apple", "milk", "beer"], "price": [1.10, 1.19, 1.79], "amount_bought": [74, 72, 51]})
         >>> tagged_table = table.tag_columns(target_name="amount_bought", feature_names=["apple", "milk", "beer"])
         """
@@ -1913,7 +1885,7 @@ class Table:
 
         Examples
         --------
-        >>> from safeds.data.tabular.containers._table import Table
+        >>> from safeds.data.tabular.containers import Table
         >>> table = Table({"a":[1, 2], "b": [3, 42]})
         >>> image = table.plot_boxplots()
         """
@@ -1955,7 +1927,7 @@ class Table:
 
         Examples
         --------
-        >>> from safeds.data.tabular.containers._table import Table
+        >>> from safeds.data.tabular.containers import Table
         >>> table = Table({"a": [2, 3, 5, 1], "b": [54, 74, 90, 2014]})
         >>> image = table.plot_histograms()
         """
@@ -2128,14 +2100,14 @@ class Table:
         Returns
         -------
         columns : list[Columns]
-             List of columns.
+            List of columns.
 
         Examples
         --------
-         >>> from safeds.data.tabular.containers import Table
-         >>> table = Table.from_dict({"a":[1, 2],"b":[20, 30]})
-         >>> table.to_columns()
-         [Column('a', [1, 2]), Column('b', [20, 30])]
+        >>> from safeds.data.tabular.containers import Table
+        >>> table = Table.from_dict({"a":[1, 2],"b":[20, 30]})
+        >>> table.to_columns()
+        [Column('a', [1, 2]), Column('b', [20, 30])]
         """
         return [self.get_column(name) for name in self._schema.column_names]
 
