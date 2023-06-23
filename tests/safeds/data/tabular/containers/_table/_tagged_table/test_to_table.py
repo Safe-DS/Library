@@ -1,4 +1,4 @@
-from safeds.data.tabular.containers import TaggedTable, Table
+from safeds.data.tabular.containers import Table, TaggedTable
 
 
 def test_should_return_table() -> None:
