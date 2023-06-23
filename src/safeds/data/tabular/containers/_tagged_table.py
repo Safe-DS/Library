@@ -83,6 +83,9 @@ class TaggedTable(Table):
         >>> table = Table({"col1": ["a", "b", "c", "a"], "col2": [1, 2, 3, 4]})
         >>> tagged_table = TaggedTable._from_table(table, "col2", ["col1"])
         """
+        # Cast to normal Table if necessary:
+        if isinstance(table, TaggedTable):
+            table = table.to_table()
         if target_name not in table.column_names:
             raise UnknownColumnNameError([target_name])
 
