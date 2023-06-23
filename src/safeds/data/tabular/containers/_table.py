@@ -357,7 +357,7 @@ class Table:
         if self is other:
             return True
         if self.number_of_columns == 0 and other.number_of_columns == 0:
-            return self.column_names == other.column_names
+            return True
         table1 = self.sort_columns()
         table2 = other.sort_columns()
         if table1.number_of_rows == 0 and table2.number_of_rows == 0:
