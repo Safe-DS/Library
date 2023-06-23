@@ -191,7 +191,7 @@ class Column(Sequence[T]):
             return Column._from_pandas_series(data, self._type)
 
     def __iter__(self) -> Iterator[T]:
-        """
+        r"""
         Create an iterator for the data of this column.
 
         Returns
@@ -202,9 +202,12 @@ class Column(Sequence[T]):
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("test", [1, 2, 3])
-        >>> list(column)
-        [1, 2, 3]
+        >>> column = Column("test", ["A", "B", "C"])
+        >>> for val in column:
+        >>>     print(val + "\n")
+        A
+        B
+        C
         """
         return iter(self._data)
 

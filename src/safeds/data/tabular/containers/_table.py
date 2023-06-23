@@ -1664,9 +1664,11 @@ class Table:
         --------
         >>> from safeds.data.tabular.containers import Table
         >>> table = Table.from_dict({"item": ["apple", "milk", "beer"], "price": [1.00, 1.19, 1.79]})
-        >>> cents = table.transform_column("price", lambda row: row.get_value("price") * 100)
-        >>> cents.to_dict()
-        {'item': ['apple', 'milk', 'beer'], 'price': [100.0, 119.0, 179.0]}
+        >>> table.transform_column("price", lambda row: row.get_value("price") * 100)
+            item  price
+        0  apple  100.0
+        1   milk  119.0
+        2   beer  179.0
         """
         if self.has_column(name):
             items: list = [transformer(item) for item in self.to_rows()]
@@ -1700,13 +1702,13 @@ class Table:
         >>> from safeds.data.tabular.transformation import OneHotEncoder
         >>> from safeds.data.tabular.containers import Table
         >>> transformer = OneHotEncoder()
-        >>> table = Table.from_dict({"a": [1, 2, 1], "b": [1, 2, 4]})
+        >>> table = Table.from_dict({"fruit": ["apple", "pear", "apple"], "pet": ["dog", "duck", "duck"]})
         >>> transformer = transformer.fit(table, None)
         >>> table.transform_table(transformer)
-           a__1  a__2  b__1  b__2  b__4
-        0   1.0   0.0   1.0   0.0   0.0
-        1   0.0   1.0   0.0   1.0   0.0
-        2   1.0   0.0   0.0   0.0   1.0
+           fruit__apple  fruit__pear  pet__dog  pet__duck
+        0           1.0          0.0       1.0        0.0
+        1           0.0          1.0       0.0        1.0
+        2           1.0          0.0       0.0        1.0
         """
         return transformer.transform(self)
 
@@ -1736,19 +1738,19 @@ class Table:
         >>> from safeds.data.tabular.transformation import OneHotEncoder
         >>> from safeds.data.tabular.containers import Table
         >>> transformer = OneHotEncoder()
-        >>> table = Table.from_dict({"a": [1, 2, 1], "b": [1, 2, 4]})
+        >>> table = Table.from_dict({"a": ["j", "k", "k"], "b": ["x", "y", "x"]})
         >>> transformer = transformer.fit(table, None)
         >>> transformed_table = transformer.transform(table)
         >>> transformed_table.inverse_transform_table(transformer)
            a  b
-        0  1  1
-        1  2  2
-        2  1  4
+        0  j  x
+        1  k  y
+        2  k  x
         >>> transformer.inverse_transform(transformed_table)
            a  b
-        0  1  1
-        1  2  2
-        2  1  4
+        0  j  x
+        1  k  y
+        2  k  x
         """
         return transformer.inverse_transform(self)
 
@@ -2102,10 +2104,10 @@ class Table:
         >>> from safeds.data.tabular.containers import Table
         >>> row1 = Row({"a": 1, "b": 5})
         >>> row2 = Row({"a": 2, "b": 6})
-        >>> Table.from_rows([row1, row2])
-           a  b
-        0  1  5
-        1  2  6
+        >>> table1 = Table.from_rows([row1, row2])
+        >>> table2 = Table.from_dict({"a": [1, 2], "b": [5, 6]})
+        >>> table1 == table2
+        True
         """
         return {column_name: list(self.get_column(column_name)) for column_name in self.column_names}
 
