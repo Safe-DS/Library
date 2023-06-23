@@ -34,4 +34,4 @@ def test_should_warn_if_similar_column_name() -> None:
             f"did you mean col1?"
         ),
     ):
-        table1.get_column("cil1")
+        table1.get_similar_columns("cil1")
