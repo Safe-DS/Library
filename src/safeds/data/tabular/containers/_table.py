@@ -627,10 +627,8 @@ class Table:
         ------
         DuplicateColumnNameError
             If the new column already exists.
-
         ColumnSizeError
             If the size of the column does not match the amount of rows.
-
         """
         if self.has_column(column.name):
             raise DuplicateColumnNameError(column.name)
