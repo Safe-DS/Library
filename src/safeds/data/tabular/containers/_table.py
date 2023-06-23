@@ -247,8 +247,7 @@ class Table:
         >>> from safeds.data.tabular.containers import Column
         >>> col1 = Column("a", [1, 2, 3])
         >>> col2 = Column("b", [4, 5, 6])
-        >>> table = Table.from_columns([col1, col2])
-        >>> table
+        >>> Table.from_columns([col1, col2])
            a  b
         0  1  4
         1  2  5
