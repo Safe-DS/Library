@@ -99,7 +99,10 @@ class Table:
         Examples
         --------
         >>> from safeds.data.tabular.containers import Table
-        >>> table = Table.from_csv_file('./example_files/from_csv_file.csv')
+        >>> Table.from_csv_file('./example_files/from_csv_file.csv')
+           a  b  c
+        0  1  2  1
+        1  0  0  7
         """
         path = Path(path)
         if path.suffix != ".csv":
@@ -136,6 +139,15 @@ class Table:
             If the specified file does not exist.
         WrongFileExtensionError
             If the file is not an Excel file.
+
+        Examples
+        -------
+        >>> from safeds.data.tabular.containers import Table
+        >>> Table.from_excel_file('./example_files/from_excel_file.xlsx')
+           a  b
+        0  1  4
+        1  2  5
+        2  3  6
         """
         path = Path(path)
         excel_extensions = [".xls", ".xlsx", ".xlsm", ".xlsb", ".odf", ".ods", ".odt"]
@@ -173,7 +185,11 @@ class Table:
         Examples
         --------
         >>> from safeds.data.tabular.containers import Table
-        >>> table = Table.from_json_file('./example_files/from_json_file.json')
+        >>> Table.from_json_file('./example_files/from_json_file.json')
+           a  b
+        0  1  4
+        1  2  5
+        2  3  6
         """
         path = Path(path)
         if path.suffix != ".json":
@@ -1157,10 +1173,11 @@ class Table:
         Examples
         --------
         >>> from safeds.data.tabular.containers import Table
-        >>> table = Table.from_dict({"a": [1], "b": ["test"]})
+        >>> table = Table.from_dict({"a": [1, 0], "b": ["test", 2]})
         >>> table.remove_columns_with_non_numerical_values()
            a
         0  1
+        1  0
         """
         return Table.from_columns([column for column in self.to_columns() if column.type.is_numeric()])
 
@@ -1229,23 +1246,25 @@ class Table:
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column, Table
-        >>> c1 = Column("a", [1, 3, 1, 0.1, 0, 0, 0, 0, 0])
-        >>> c2 = Column("b", [1.5, 1, 0.5, 0.01, 0, 0, 0, 0, 0])
-        >>> c3 = Column("c", [0.1, 0.00, 0.4, 0.2, 0, 0, 0, 0, 0])
-        >>> c4 = Column("d", [-1000000, 1000000, -1000000, -1000000, -1000000, -1000000, -1000000, -1000000, -1000000])
+        >>> c1 = Column("a", [1, 3, 1, 0.1, 0, 0, 0, 0, 0, 0, 0, 0])
+        >>> c2 = Column("b", [1.5, 1, 0.5, 0.01, 0, 0, 0, 0, 0, 0, 0, 0])
+        >>> c3 = Column("c", [0.1, 0.00, 0.4, 0.2, 0, 0, 0, 0, 0, 0, 0, 0])
+        >>> c4 = Column("d", [-1000000, 1000000, -1000000, -1000000, -1000000, -1000000, -1000000, -1000000, -1000000, -1000000, -1000000, -1000000])
         >>> table = Table.from_columns([c1, c2, c3, c4])
         >>> new_table = table.remove_rows_with_outliers()
         >>> new_table
-             a     b    c        d
-        0  1.0  1.50  0.1 -1000000
-        1  3.0  1.00  0.0  1000000
-        2  1.0  0.50  0.4 -1000000
-        3  0.1  0.01  0.2 -1000000
-        4  0.0  0.00  0.0 -1000000
-        5  0.0  0.00  0.0 -1000000
-        6  0.0  0.00  0.0 -1000000
-        7  0.0  0.00  0.0 -1000000
-        8  0.0  0.00  0.0 -1000000
+              a     b    c        d
+        0   1.0  1.50  0.1 -1000000
+        1   1.0  0.50  0.4 -1000000
+        2   0.1  0.01  0.2 -1000000
+        3   0.0  0.00  0.0 -1000000
+        4   0.0  0.00  0.0 -1000000
+        5   0.0  0.00  0.0 -1000000
+        6   0.0  0.00  0.0 -1000000
+        7   0.0  0.00  0.0 -1000000
+        8   0.0  0.00  0.0 -1000000
+        9   0.0  0.00  0.0 -1000000
+        10  0.0  0.00  0.0 -1000000
         """
         copy = self._data.copy(deep=True)
 
@@ -1560,10 +1579,15 @@ class Table:
         >>> from safeds.data.tabular.containers import Table
         >>> table = Table.from_dict({"temperature": [10, 15, 20, 25, 30], "sales": [54, 74, 90, 206, 210]})
         >>> slices = table.split(0.4)
-        >>> slices[0].to_dict()
-        {'temperature': [10, 15], 'sales': [54, 74]}
-        >>> slices[1].to_dict()
-        {'temperature': [20, 25, 30], 'sales': [90, 206, 210]}
+        >>> slices[0]
+           temperature  sales
+        0           10     54
+        1           15     74
+        >>> slices[1]
+           temperature  sales
+        0           20     90
+        1           25    206
+        2           30    210
         """
         if percentage_in_first < 0 or percentage_in_first > 1:
             raise ValueError("The given percentage is not between 0 and 1")
@@ -1603,7 +1627,7 @@ class Table:
         --------
         >>> from safeds.data.tabular.containers import Table, TaggedTable
         >>> table = Table.from_dict({"item": ["apple", "milk", "beer"], "price": [1.10, 1.19, 1.79], "amount_bought": [74, 72, 51]})
-        >>> tagged_table = table.tag_columns(target_name="amount_bought", feature_names=["apple", "milk", "beer"])
+        >>> tagged_table = table.tag_columns(target_name="amount_bought", feature_names=["item", "price"])
         """
         from ._tagged_table import TaggedTable
 
