@@ -10,7 +10,6 @@ from safeds.exceptions import NonNumericColumnError, TransformerNotFittedError, 
 class StandardScaler(InvertibleTableTransformer):
     """The StandardScaler transforms column values to a range by removing the mean and scaling to unit variance."""
 
-
     def __init__(self) -> None:
         self._column_names: list[str] | None = None
         self._wrapped_transformer: sk_StandardScaler | None = None
