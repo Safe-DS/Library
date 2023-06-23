@@ -211,8 +211,7 @@ class Table:
         --------
         >>> from safeds.data.tabular.containers import Table
         >>> d = {'a': [1, 2], 'b': [3, 4]}
-        >>> table = Table.from_dict(d)
-        >>> table
+        >>> Table.from_dict(d)
            a  b
         0  1  3
         1  2  4
