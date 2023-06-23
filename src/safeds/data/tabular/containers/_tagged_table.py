@@ -9,8 +9,6 @@ if TYPE_CHECKING:
     from collections.abc import Callable, Mapping, Sequence
     from typing import Any
 
-    from safeds.data.tabular.transformation import InvertibleTableTransformer, TableTransformer
-
 
 class TaggedTable(Table):
     """
@@ -195,7 +193,11 @@ class TaggedTable(Table):
         ColumnSizeError
             If the size of the column does not match the amount of rows.
         """
-        return TaggedTable._from_table(super().add_column(column), target_name=self.target.name, feature_names=self.features.column_names + [column.name])
+        return TaggedTable._from_table(
+            super().add_column(column),
+            target_name=self.target.name,
+            feature_names=[*self.features.column_names, column.name],
+        )
 
     def add_columns_as_features(self, columns: list[Column] | Table) -> TaggedTable:
         """
@@ -215,7 +217,12 @@ class TaggedTable(Table):
         ColumnSizeError
             If the size of the column does not match the amount of rows.
         """
-        return TaggedTable._from_table(super().add_columns(columns), target_name=self.target.name, feature_names=self.features.column_names + list(map(lambda col: col.name, columns.to_columns() if isinstance(columns, Table) else columns)))
+        return TaggedTable._from_table(
+            super().add_columns(columns),
+            target_name=self.target.name,
+            feature_names=self.features.column_names
+            + [col.name for col in (columns.to_columns() if isinstance(columns, Table) else columns)],
+        )
 
     # ------------------------------------------------------------------------------------------------------------------
     # Overriden methods from Table class:
@@ -258,7 +265,11 @@ class TaggedTable(Table):
         ColumnSizeError
             If the size of the column does not match the amount of rows.
         """
-        return TaggedTable._from_table(super().add_column(column), target_name=self.target.name, feature_names=self.features.column_names)
+        return TaggedTable._from_table(
+            super().add_column(column),
+            target_name=self.target.name,
+            feature_names=self.features.column_names,
+        )
 
     def add_columns(self, columns: list[Column] | Table) -> TaggedTable:
         """
@@ -283,7 +294,11 @@ class TaggedTable(Table):
         DuplicateColumnNameError
             If at least one column name from the provided column list already exists in the table.
         """
-        return TaggedTable._from_table(super().add_columns(columns), target_name=self.target.name, feature_names=self.features.column_names)
+        return TaggedTable._from_table(
+            super().add_columns(columns),
+            target_name=self.target.name,
+            feature_names=self.features.column_names,
+        )
 
     def add_row(self, row: Row) -> TaggedTable:
         """
@@ -375,7 +390,14 @@ class TaggedTable(Table):
         if self.target.name not in column_names:
             raise IllegalSchemaModificationError("Must keep target column and at least one feature column.")
         table = super().keep_only_columns(column_names)
-        return TaggedTable._from_table(table, target_name=self.target.name, feature_names=sorted(set(self.features.column_names).intersection(set(table.column_names)), key={val: ix for ix, val in enumerate(self.features.column_names)}.get))
+        return TaggedTable._from_table(
+            table,
+            target_name=self.target.name,
+            feature_names=sorted(
+                set(self.features.column_names).intersection(set(table.column_names)),
+                key={val: ix for ix, val in enumerate(self.features.column_names)}.__getitem__,
+            ),
+        )
 
     def remove_columns(self, column_names: list[str]) -> TaggedTable:
         """
@@ -402,7 +424,14 @@ class TaggedTable(Table):
         """
         if self.target.name in column_names:
             raise ColumnIsTargetError(self.target.name)
-        return TaggedTable._from_table(super().remove_columns(column_names), target_name=self.target.name, feature_names=sorted(set(self.features.column_names) - set(column_names), key={val: ix for ix, val in enumerate(self.features.column_names)}.get))
+        return TaggedTable._from_table(
+            super().remove_columns(column_names),
+            target_name=self.target.name,
+            feature_names=sorted(
+                set(self.features.column_names) - set(column_names),
+                key={val: ix for ix, val in enumerate(self.features.column_names)}.__getitem__,
+            ),
+        )
 
     def remove_columns_with_missing_values(self) -> TaggedTable:
         """
@@ -423,7 +452,14 @@ class TaggedTable(Table):
         table = super().remove_columns_with_missing_values()
         if self.target.name not in table.column_names:
             raise ColumnIsTargetError(self.target.name)
-        return TaggedTable._from_table(table, self.target.name, feature_names=sorted(set(self.features.column_names).intersection(set(table.column_names)), key={val: ix for ix, val in enumerate(self.features.column_names)}.get))
+        return TaggedTable._from_table(
+            table,
+            self.target.name,
+            feature_names=sorted(
+                set(self.features.column_names).intersection(set(table.column_names)),
+                key={val: ix for ix, val in enumerate(self.features.column_names)}.__getitem__,
+            ),
+        )
 
     def remove_columns_with_non_numerical_values(self) -> TaggedTable:
         """
@@ -444,7 +480,14 @@ class TaggedTable(Table):
         table = super().remove_columns_with_non_numerical_values()
         if self.target.name not in table.column_names:
             raise ColumnIsTargetError(self.target.name)
-        return TaggedTable._from_table(table, self.target.name, feature_names=sorted(set(self.features.column_names).intersection(set(table.column_names)), key={val: ix for ix, val in enumerate(self.features.column_names)}.get))
+        return TaggedTable._from_table(
+            table,
+            self.target.name,
+            feature_names=sorted(
+                set(self.features.column_names).intersection(set(table.column_names)),
+                key={val: ix for ix, val in enumerate(self.features.column_names)}.__getitem__,
+            ),
+        )
 
     def remove_duplicate_rows(self) -> TaggedTable:
         """
@@ -457,7 +500,11 @@ class TaggedTable(Table):
         result : TaggedTable
             The table with the duplicate rows removed.
         """
-        return TaggedTable._from_table(super().remove_duplicate_rows(), target_name=self.target.name, feature_names=self.features.column_names)
+        return TaggedTable._from_table(
+            super().remove_duplicate_rows(),
+            target_name=self.target.name,
+            feature_names=self.features.column_names,
+        )
 
     def remove_rows_with_missing_values(self) -> TaggedTable:
         """
@@ -470,7 +517,11 @@ class TaggedTable(Table):
         table : TaggedTable
             A table without the rows that contain missing values.
         """
-        return TaggedTable._from_table(super().remove_rows_with_missing_values(), target_name=self.target.name, feature_names=self.features.column_names)
+        return TaggedTable._from_table(
+            super().remove_rows_with_missing_values(),
+            target_name=self.target.name,
+            feature_names=self.features.column_names,
+        )
 
     def remove_rows_with_outliers(self) -> TaggedTable:
         """
@@ -487,7 +538,11 @@ class TaggedTable(Table):
         new_table : TaggedTable
             A new table without rows containing outliers.
         """
-        return TaggedTable._from_table(super().remove_rows_with_outliers(), target_name=self.target.name, feature_names=self.features.column_names)
+        return TaggedTable._from_table(
+            super().remove_rows_with_outliers(),
+            target_name=self.target.name,
+            feature_names=self.features.column_names,
+        )
 
     def rename_column(self, old_name: str, new_name: str) -> TaggedTable:
         """
@@ -516,7 +571,14 @@ class TaggedTable(Table):
         """
         return TaggedTable._from_table(
             super().rename_column(old_name, new_name),
-            target_name=new_name if self.target.name == old_name else self.target.name, feature_names=self.features.column_names if old_name not in self.features.column_names else [column_name if column_name != old_name else new_name for column_name in self.features.column_names]
+            target_name=new_name if self.target.name == old_name else self.target.name,
+            feature_names=(
+                self.features.column_names
+                if old_name not in self.features.column_names
+                else [
+                    column_name if column_name != old_name else new_name for column_name in self.features.column_names
+                ]
+            ),
         )
 
     def replace_column(self, old_column_name: str, new_columns: list[Column]) -> TaggedTable:
@@ -560,10 +622,21 @@ class TaggedTable(Table):
             else:
                 return TaggedTable._from_table(
                     super().replace_column(old_column_name, new_columns),
-                    target_name=new_columns[0].name, feature_names=self.features.column_names
+                    target_name=new_columns[0].name,
+                    feature_names=self.features.column_names,
                 )
         else:
-            return TaggedTable._from_table(super().replace_column(old_column_name, new_columns), target_name=self.target.name, feature_names=self.features.column_names if old_column_name not in self.features.column_names else self.features.column_names[:self.features.column_names.index(old_column_name)] + list(map(lambda col: col.name, new_columns)) + self.features.column_names[self.features.column_names.index(old_column_name) + 1:])
+            return TaggedTable._from_table(
+                super().replace_column(old_column_name, new_columns),
+                target_name=self.target.name,
+                feature_names=(
+                    self.features.column_names
+                    if old_column_name not in self.features.column_names
+                    else self.features.column_names[: self.features.column_names.index(old_column_name)]
+                    + [col.name for col in new_columns]
+                    + self.features.column_names[self.features.column_names.index(old_column_name) + 1 :]
+                ),
+            )
 
     def shuffle_rows(self) -> TaggedTable:
         """
@@ -577,7 +650,11 @@ class TaggedTable(Table):
             The shuffled Table.
 
         """
-        return TaggedTable._from_table(super().shuffle_rows(), target_name=self.target.name, feature_names=self.features.column_names)
+        return TaggedTable._from_table(
+            super().shuffle_rows(),
+            target_name=self.target.name,
+            feature_names=self.features.column_names,
+        )
 
     def slice_rows(
         self,
@@ -609,7 +686,11 @@ class TaggedTable(Table):
         IndexOutOfBoundsError
             If the index is out of bounds.
         """
-        return TaggedTable._from_table(super().slice_rows(start, end, step), target_name=self.target.name, feature_names=self.features.column_names)
+        return TaggedTable._from_table(
+            super().slice_rows(start, end, step),
+            target_name=self.target.name,
+            feature_names=self.features.column_names,
+        )
 
     def sort_columns(
         self,
@@ -639,7 +720,14 @@ class TaggedTable(Table):
             A new table with sorted columns.
         """
         sorted_table = super().sort_columns(comparator)
-        return TaggedTable._from_table(sorted_table, target_name=self.target.name, feature_names=sorted(set(sorted_table.column_names).intersection(self.features.column_names), key={val: ix for ix, val in enumerate(sorted_table.column_names)}.get))
+        return TaggedTable._from_table(
+            sorted_table,
+            target_name=self.target.name,
+            feature_names=sorted(
+                set(sorted_table.column_names).intersection(self.features.column_names),
+                key={val: ix for ix, val in enumerate(sorted_table.column_names)}.__getitem__,
+            ),
+        )
 
     def sort_rows(self, comparator: Callable[[Row, Row], int]) -> TaggedTable:
         """
@@ -662,7 +750,11 @@ class TaggedTable(Table):
         new_table : TaggedTable
             A new table with sorted rows.
         """
-        return TaggedTable._from_table(super().sort_rows(comparator), target_name=self.target.name, feature_names=self.features.column_names)
+        return TaggedTable._from_table(
+            super().sort_rows(comparator),
+            target_name=self.target.name,
+            feature_names=self.features.column_names,
+        )
 
     def transform_column(self, name: str, transformer: Callable[[Row], Any]) -> TaggedTable:
         """
@@ -680,5 +772,8 @@ class TaggedTable(Table):
         UnknownColumnNameError
             If the column does not exist.
         """
-        return TaggedTable._from_table(super().transform_column(name, transformer), target_name=self.target.name, feature_names=self.features.column_names)
-
+        return TaggedTable._from_table(
+            super().transform_column(name, transformer),
+            target_name=self.target.name,
+            feature_names=self.features.column_names,
+        )
