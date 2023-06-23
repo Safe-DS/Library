@@ -158,7 +158,7 @@ class Column(Sequence[T]):
         Parameters
         ----------
         index : int | slice
-            The index of the row, or a slice indicing the rows.
+            The index of the row, or a slice specifying the start and end index.
 
         Returns
         -------
@@ -168,7 +168,7 @@ class Column(Sequence[T]):
         Raises
         ------
         IndexOutOfBoundsError
-            If the given index or idices do not exist in the column.
+            If the given index or indices do not exist in the column.
 
         Examples
         --------
@@ -680,12 +680,12 @@ class Column(Sequence[T]):
         --------
         >>> from safeds.data.tabular.containers import Column
         >>> column = Column("test", [1, 2, 3, 4])
-        >>> column.mean()
+        >>> column.median()
         2.5
 
         >>> from safeds.data.tabular.containers import Column
         >>> column = Column("test", [1, 2, 3, 4, 5])
-        >>> column.mean()
+        >>> column.median()
         3.0
         """
         if not self._type.is_numeric():

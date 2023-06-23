@@ -211,8 +211,7 @@ class Table:
         --------
         >>> from safeds.data.tabular.containers import Table
         >>> d = {'a': [1, 2], 'b': [3, 4]}
-        >>> table = Table.from_dict(d)
-        >>> table
+        >>> Table.from_dict(d)
            a  b
         0  1  3
         1  2  4
@@ -247,8 +246,7 @@ class Table:
         >>> from safeds.data.tabular.containers import Column
         >>> col1 = Column("a", [1, 2, 3])
         >>> col2 = Column("b", [4, 5, 6])
-        >>> table = Table.from_columns([col1, col2])
-        >>> table
+        >>> Table.from_columns([col1, col2])
            a  b
         0  1  4
         1  2  5
@@ -295,8 +293,7 @@ class Table:
         >>> from safeds.data.tabular.containers import Row
         >>> row1 = Row({"a": 1, "b": 2})
         >>> row2 = Row({"a": 3, "b": 4})
-        >>> table = Table.from_rows([row1, row2])
-        >>> table
+        >>> Table.from_rows([row1, row2])
            a  b
         0  1  2
         1  3  4
@@ -859,8 +856,7 @@ class Table:
         >>> table = Table.from_dict({"a": [1, 3], "b": [2, 4]})
         >>> col1 = Column("c", ["d", "e"])
         >>> col2 = Column("d", [3.5, 7.9])
-        >>> new_table = table.add_columns([col1, col2])
-        >>> new_table
+        >>> table.add_columns([col1, col2])
            a  b  c    d
         0  1  2  d  3.5
         1  3  4  e  7.9
@@ -899,7 +895,7 @@ class Table:
         Raises
         ------
         SchemaMismatchError
-            If the schema of the row does not match
+            If the schema of the row does not match the table schema.
 
         Examples
         --------
@@ -907,8 +903,7 @@ class Table:
         >>> from safeds.data.tabular.containers import Row
         >>> table = Table.from_dict({"a": [1], "b": [2]})
         >>> row = Row.from_dict({"a": 3, "b": 4})
-        >>> new_table = table.add_row(row)
-        >>> new_table
+        >>> table.add_row(row)
            a  b
         0  1  2
         1  3  4
@@ -1154,11 +1149,12 @@ class Table:
         Examples
         --------
         >>> from safeds.data.tabular.containers import Table
-        >>> table = Table.from_dict({"a": [1], "b": [None]})
+        >>> table = Table.from_dict({"a": [1, 2], "b": [None, 2]})
         >>> new_table = table.remove_columns_with_missing_values()
         >>> new_table
            a
         0  1
+        1  2
         """
         return Table.from_columns([column for column in self.to_columns() if not column.has_missing_values()])
 
@@ -2130,7 +2126,7 @@ class Table:
 
     def to_columns(self) -> list[Column]:
         """
-         Return a list of the columns.
+        Return a list of the columns.
 
         Returns
         -------
