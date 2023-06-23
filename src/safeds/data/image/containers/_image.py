@@ -12,6 +12,7 @@ from PIL.Image import Image as PillowImage
 from PIL.Image import open as open_image
 
 from safeds.data.image.typing import ImageFormat
+from safeds.exceptions._data import WrongFileExtensionError
 
 
 class Image:
@@ -416,3 +417,40 @@ class Image:
         new_image = Image(data, self._format)
         new_image._image = ImageOps.invert(new_image._image)
         return new_image
+
+    def rotate_right(self) -> Image:
+        """
+        Return the png-image clockwise rotated by 90 degrees.
+
+        Returns
+        -------
+        result : Image
+            The image clockwise rotated by 90 degrees.
+        """
+        if self.format != ImageFormat.PNG:
+            raise WrongFileExtensionError("/image", ".png")
+
+        imagecopy = copy.deepcopy(self)
+        imagecopy._image = imagecopy._image.rotate(270, expand=True)
+        return imagecopy
+
+    def rotate_left(self) -> Image:
+        """
+        Return the png-image counter-clockwise rotated by 90 degrees.
+
+        Returns
+        -------
+        result : Image
+            The image counter-clockwise rotated by 90 degrees.
+
+        Raises
+        ------
+        WrongFileExtensionError
+            If given a File that's not PNG.
+        """
+        if self.format != ImageFormat.PNG:
+            raise WrongFileExtensionError("/image", ".png")
+
+        imagecopy = copy.deepcopy(self)
+        imagecopy._image = imagecopy._image.rotate(90, expand=True)
+        return imagecopy
