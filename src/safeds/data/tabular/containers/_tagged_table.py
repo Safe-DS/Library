@@ -266,7 +266,9 @@ class TaggedTable(Table):
             If the size of the column does not match the amount of rows.
         """
         return TaggedTable._from_table(
-            super().add_column(column), target_name=self.target.name, feature_names=self.features.column_names,
+            super().add_column(column),
+            target_name=self.target.name,
+            feature_names=self.features.column_names,
         )
 
     def add_columns(self, columns: list[Column] | Table) -> TaggedTable:
@@ -293,7 +295,9 @@ class TaggedTable(Table):
             If at least one column name from the provided column list already exists in the table.
         """
         return TaggedTable._from_table(
-            super().add_columns(columns), target_name=self.target.name, feature_names=self.features.column_names,
+            super().add_columns(columns),
+            target_name=self.target.name,
+            feature_names=self.features.column_names,
         )
 
     def add_row(self, row: Row) -> TaggedTable:
@@ -497,7 +501,9 @@ class TaggedTable(Table):
             The table with the duplicate rows removed.
         """
         return TaggedTable._from_table(
-            super().remove_duplicate_rows(), target_name=self.target.name, feature_names=self.features.column_names,
+            super().remove_duplicate_rows(),
+            target_name=self.target.name,
+            feature_names=self.features.column_names,
         )
 
     def remove_rows_with_missing_values(self) -> TaggedTable:
@@ -533,7 +539,9 @@ class TaggedTable(Table):
             A new table without rows containing outliers.
         """
         return TaggedTable._from_table(
-            super().remove_rows_with_outliers(), target_name=self.target.name, feature_names=self.features.column_names,
+            super().remove_rows_with_outliers(),
+            target_name=self.target.name,
+            feature_names=self.features.column_names,
         )
 
     def rename_column(self, old_name: str, new_name: str) -> TaggedTable:
@@ -643,7 +651,9 @@ class TaggedTable(Table):
 
         """
         return TaggedTable._from_table(
-            super().shuffle_rows(), target_name=self.target.name, feature_names=self.features.column_names,
+            super().shuffle_rows(),
+            target_name=self.target.name,
+            feature_names=self.features.column_names,
         )
 
     def slice_rows(
@@ -677,7 +687,9 @@ class TaggedTable(Table):
             If the index is out of bounds.
         """
         return TaggedTable._from_table(
-            super().slice_rows(start, end, step), target_name=self.target.name, feature_names=self.features.column_names,
+            super().slice_rows(start, end, step),
+            target_name=self.target.name,
+            feature_names=self.features.column_names,
         )
 
     def sort_columns(
@@ -739,7 +751,9 @@ class TaggedTable(Table):
             A new table with sorted rows.
         """
         return TaggedTable._from_table(
-            super().sort_rows(comparator), target_name=self.target.name, feature_names=self.features.column_names,
+            super().sort_rows(comparator),
+            target_name=self.target.name,
+            feature_names=self.features.column_names,
         )
 
     def transform_column(self, name: str, transformer: Callable[[Row], Any]) -> TaggedTable:
