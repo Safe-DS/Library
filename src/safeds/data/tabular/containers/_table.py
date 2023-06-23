@@ -12,7 +12,7 @@ import openpyxl
 import pandas as pd
 import seaborn as sns
 from pandas import DataFrame
-from rapidfuzz.distance import Levenshtein
+import Levenshtein
 from scipy import stats
 
 from safeds.data.image.containers import Image
