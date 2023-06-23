@@ -778,6 +778,8 @@ class Column(Sequence[T]):
         \frac{\text{number of occurrences of most common non-null value}}{\text{number of non-null values}}
         $$
 
+        The stability cannot be calculated for a column with only null values.
+
         Returns
         -------
         stability : float
@@ -801,6 +803,10 @@ class Column(Sequence[T]):
         """
         if self._data.size == 0:
             raise ColumnSizeError("> 0", "0")
+
+        if self.all(lambda x: x is None):
+            raise ValueError("Stability cannot be calculated for a column with only null values.")
+
         return self._data.value_counts()[self.mode()[0]] / self._data.count()
 
     def standard_deviation(self) -> float:
