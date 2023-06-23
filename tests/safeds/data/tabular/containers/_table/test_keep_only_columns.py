@@ -37,7 +37,6 @@ from safeds.exceptions import UnknownColumnNameError
             [],
             Table(),
         ),
-
     ],
     ids=["No Column Name", "First Column", "Second Column", "All columns", "Last and first columns", "empty"],
 )
