@@ -6,8 +6,15 @@ from safeds.data.tabular.containers import Table
 from safeds.exceptions import WrongFileExtensionError
 
 
-def test_should_create_json_file_from_table_by_str() -> None:
-    table = Table({"col1": ["col1_1"], "col2": ["col2_1"]})
+@pytest.mark.parametrize(
+    "table",
+    [
+        (Table({"col1": ["col1_1"], "col2": ["col2_1"]})),
+        (Table()),
+    ],
+    ids=["by String", "empty"],
+)
+def test_should_create_json_file_from_table_by_str(table: Table) -> None:
     with NamedTemporaryFile(suffix=".json") as tmp_table_file:
         tmp_table_file.close()
         with Path(tmp_table_file.name).open("w", encoding="utf-8") as tmp_file:
@@ -18,8 +25,15 @@ def test_should_create_json_file_from_table_by_str() -> None:
     assert table == table_r
 
 
-def test_should_create_json_file_from_table_by_path() -> None:
-    table = Table({"col1": ["col1_1"], "col2": ["col2_1"]})
+@pytest.mark.parametrize(
+    "table",
+    [
+        (Table({"col1": ["col1_1"], "col2": ["col2_1"]})),
+        (Table()),
+    ],
+    ids=["by String", "empty"],
+)
+def test_should_create_json_file_from_table_by_path(table: Table) -> None:
     with NamedTemporaryFile(suffix=".json") as tmp_table_file:
         tmp_table_file.close()
         with Path(tmp_table_file.name).open("w", encoding="utf-8") as tmp_file:

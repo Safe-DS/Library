@@ -4,6 +4,7 @@ from tempfile import NamedTemporaryFile
 import pytest
 from safeds.data.image.containers import Image
 from safeds.data.image.typing import ImageFormat
+from safeds.data.tabular.containers import Table
 
 from tests.helpers import resolve_resource_path
 
@@ -52,6 +53,28 @@ class TestFormat:
     )
     def test_should_return_correct_format(self, image: Image, format_: ImageFormat) -> None:
         assert image.format == format_
+
+
+class TestProperties:
+    @pytest.mark.parametrize(
+        ("image", "width", "height"),
+        [
+            (
+                Image.from_jpeg_file(resolve_resource_path("image/white_square.jpg")),
+                1,
+                1,
+            ),
+            (
+                Image.from_png_file(resolve_resource_path("image/snapshot_boxplot.png")),
+                640,
+                480,
+            ),
+        ],
+        ids=["[1,1].jpg", "[640,480].png"],
+    )
+    def test_should_return_image_properties(self, image: Image, width: int, height: int) -> None:
+        assert image.width == width
+        assert image.height == height
 
 
 class TestToJpegFile:
@@ -152,3 +175,75 @@ class TestReprPng:
     )
     def test_should_return_none_if_image_is_not_png(self, image: Image) -> None:
         assert image._repr_png_() is None
+
+
+class TestResize:
+    @pytest.mark.parametrize(
+        ("image", "new_width", "new_height", "new_size"),
+        [
+            (
+                Image.from_jpeg_file(resolve_resource_path("image/white_square.jpg")),
+                2,
+                3,
+                (2, 3),
+            ),
+            (
+                Image.from_png_file(resolve_resource_path("image/white_square.png")),
+                2,
+                3,
+                (2, 3),
+            ),
+        ],
+        ids=[".jpg", ".png"],
+    )
+    def test_should_return_resized_image(
+        self,
+        image: Image,
+        new_width: int,
+        new_height: int,
+        new_size: tuple[int, int],
+    ) -> None:
+        assert image.resize(new_width, new_height)._image.size == new_size
+
+
+class TestEQ:
+    def test_should_be_equal(self) -> None:
+        image = Image.from_png_file(resolve_resource_path("image/original.png"))
+        image2 = Image.from_png_file(resolve_resource_path("image/copy.png"))
+        assert image == image2
+
+    def test_should_not_be_equal(self) -> None:
+        image = Image.from_png_file(resolve_resource_path("image/original.png"))
+        image2 = Image.from_png_file(resolve_resource_path("image/white_square.png"))
+        assert image != image2
+
+    def test_should_raise(self) -> None:
+        image = Image.from_png_file(resolve_resource_path("image/original.png"))
+        other = Table()
+        assert (image.__eq__(other)) is NotImplemented
+
+
+class TestFlipVertically:
+    def test_should_flip_vertically(self) -> None:
+        image = Image.from_png_file(resolve_resource_path("image/original.png"))
+        image = image.flip_vertically()
+        image2 = Image.from_png_file(resolve_resource_path("image/flip_vertically.png"))
+        assert image == image2
+
+    def test_should_be_original(self) -> None:
+        image = Image.from_png_file(resolve_resource_path("image/original.png"))
+        image2 = image.flip_vertically().flip_vertically()
+        assert image == image2
+
+
+class TestFlipHorizontally:
+    def test_should_flip_horizontally(self) -> None:
+        image = Image.from_png_file(resolve_resource_path("image/original.png"))
+        image = image.flip_horizontally()
+        image2 = Image.from_png_file(resolve_resource_path("image/flip_horizontally.png"))
+        assert image == image2
+
+    def test_should_be_original(self) -> None:
+        image = Image.from_png_file(resolve_resource_path("image/original.png"))
+        image2 = image.flip_horizontally().flip_horizontally()
+        assert image == image2

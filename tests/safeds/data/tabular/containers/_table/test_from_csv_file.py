@@ -7,12 +7,19 @@ from safeds.exceptions import WrongFileExtensionError
 from tests.helpers import resolve_resource_path
 
 
-@pytest.mark.parametrize("path", ["table.csv", Path("table.csv")], ids=["by String", "by path"])
-def test_should_create_table_from_csv_file(path: str | Path) -> None:
-    table1 = Table.from_csv_file(resolve_resource_path(path))
-    table2 = Table({"A": [1], "B": [2]})
-    assert table1.schema == table2.schema
-    assert table1 == table2
+@pytest.mark.parametrize(
+    ("path", "expected"),
+    [
+        ("table.csv", Table({"A": [1], "B": [2]})),
+        (Path("table.csv"), Table({"A": [1], "B": [2]})),
+        ("emptytable.csv", Table()),
+    ],
+    ids=["by String", "by path", "empty"],
+)
+def test_should_create_table_from_csv_file(path: str | Path, expected: Table) -> None:
+    table = Table.from_csv_file(resolve_resource_path(path))
+    assert table.schema == expected.schema
+    assert table == expected
 
 
 @pytest.mark.parametrize(
