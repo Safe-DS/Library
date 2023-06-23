@@ -612,6 +612,22 @@ class Table:
     # Transformations
     # ------------------------------------------------------------------------------------------------------------------
 
+    # This method is meant as a way to "cast" instances of subclasses of `Table` to a proper `Table`, dropping any
+    # additional constraints that might have to hold in the subclass.
+    # Override accordingly in subclasses.
+    def _as_table(self: Table) -> Table:
+        """
+        Transform the table to an instance of the Table class.
+
+        The original table is not modified.
+
+        Returns
+        -------
+        table: Table
+        The table, as an instance of the Table class.
+        """
+        return self
+
     def add_column(self, column: Column) -> Table:
         """
         Return the original table with the provided column attached at the end.
@@ -627,10 +643,8 @@ class Table:
         ------
         DuplicateColumnNameError
             If the new column already exists.
-
         ColumnSizeError
             If the size of the column does not match the amount of rows.
-
         """
         if self.has_column(column.name):
             raise DuplicateColumnNameError(column.name)
@@ -899,6 +913,11 @@ class Table:
         -------
         table : Table
             A table without the columns that contain missing values.
+
+        Raises
+        ------
+        IllegalSchemaModificationError
+            If removing the columns would violate an invariant in the subclass.
         """
         return Table.from_columns([column for column in self.to_columns() if not column.has_missing_values()])
 
@@ -913,6 +932,10 @@ class Table:
         table : Table
             A table without the columns that contain non-numerical values.
 
+        Raises
+        ------
+        IllegalSchemaModificationError
+            If removing the columns would violate an invariant in the subclass.
         """
         return Table.from_columns([column for column in self.to_columns() if column.type.is_numeric()])
 
@@ -1034,6 +1057,9 @@ class Table:
 
         ColumnSizeError
             If the size of at least one of the new columns does not match the amount of rows.
+
+        IllegalSchemaModificationError
+            If replacing the column would violate an invariant in the subclass.
         """
         if old_column_name not in self._schema.column_names:
             raise UnknownColumnNameError([old_column_name])
@@ -1249,7 +1275,6 @@ class Table:
         ------
         UnknownColumnNameError
             If the column does not exist.
-
         """
         if self.has_column(name):
             items: list = [transformer(item) for item in self.to_rows()]
@@ -1277,6 +1302,8 @@ class Table:
         ------
         TransformerNotFittedError
             If the transformer has not been fitted yet.
+        IllegalSchemaModificationError
+            If replacing the column would violate an invariant in the subclass.
 
         Examples
         --------

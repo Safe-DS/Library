@@ -83,6 +83,7 @@ class TaggedTable(Table):
         >>> table = Table({"col1": ["a", "b", "c", "a"], "col2": [1, 2, 3, 4]})
         >>> tagged_table = TaggedTable._from_table(table, "col2", ["col1"])
         """
+        table = table._as_table()
         if target_name not in table.column_names:
             raise UnknownColumnNameError([target_name])
 
@@ -173,29 +174,6 @@ class TaggedTable(Table):
         return self._target
 
     # ------------------------------------------------------------------------------------------------------------------
-    # Conversion back to table
-    # ------------------------------------------------------------------------------------------------------------------
-
-    def to_table(self: TaggedTable) -> Table:
-        """
-        Remove the tagging from a TaggedTable.
-
-        The original TaggedTable is not modified.
-
-        Parameters
-        ----------
-        self: TaggedTable
-        The TaggedTable.
-
-        Returns
-        -------
-        table: Table
-        The table as an untagged Table, i.e. without the information about which columns are features or target.
-
-        """
-        return self.features.add_column(self.target)
-
-    # ------------------------------------------------------------------------------------------------------------------
     # Specific methods from TaggedTable class:
     # ------------------------------------------------------------------------------------------------------------------
 
@@ -242,6 +220,25 @@ class TaggedTable(Table):
     # ------------------------------------------------------------------------------------------------------------------
     # Overriden methods from Table class:
     # ------------------------------------------------------------------------------------------------------------------
+
+    def _as_table(self: TaggedTable) -> Table:
+        """
+        Remove the tagging from a TaggedTable.
+
+        The original TaggedTable is not modified.
+
+        Parameters
+        ----------
+        self: TaggedTable
+        The TaggedTable.
+
+        Returns
+        -------
+        table: Table
+        The table as an untagged Table, i.e. without the information about which columns are features or target.
+
+        """
+        return self.features.add_column(self.target)
 
     def add_column(self, column: Column) -> TaggedTable:
         """
@@ -352,8 +349,7 @@ class TaggedTable(Table):
         """
         return TaggedTable._from_table(super().filter_rows(query), target_name=self.target.name)
 
-    def keep_only_columns(self, column_names: list[str]) -> Table:
-        # TODO: Change return type in signature and docstring.
+    def keep_only_columns(self, column_names: list[str]) -> TaggedTable:
         """
         Return a table with only the given column(s).
 
@@ -366,7 +362,7 @@ class TaggedTable(Table):
 
         Returns
         -------
-        table : Table
+        table : TaggedTable
             A table containing only the given column(s).
 
         Raises
@@ -376,14 +372,10 @@ class TaggedTable(Table):
         IllegalSchemaModificationError
             If none of the given columns is the target column.
         """
-        return super().keep_only_columns(column_names)
-        # TODO:
-        #  Re-build TaggedTable before returning,
-        #  throw exception if appropriate,
-        #  investigate and fix pytest errors.
-        # if self.target.name not in column_names:
-        #     raise IllegalSchemaModificationError("Must keep target column and at least one feature column.")
-        # return TaggedTable._from_table(super().keep_only_columns(column_names), self.target.name)
+        if self.target.name not in column_names:
+            raise IllegalSchemaModificationError("Must keep target column and at least one feature column.")
+        table = super().keep_only_columns(column_names)
+        return TaggedTable._from_table(table, target_name=self.target.name, feature_names=sorted(set(self.features.column_names).intersection(set(table.column_names)), key={val: ix for ix, val in enumerate(self.features.column_names)}.get))
 
     def remove_columns(self, column_names: list[str]) -> TaggedTable:
         """

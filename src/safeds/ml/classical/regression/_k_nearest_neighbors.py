@@ -46,6 +46,14 @@ class KNearestNeighbors(Regressor):
 
     @property
     def number_of_neighbors(self) -> int:
+        """
+        Get the number of neighbors used for interpolation.
+
+        Returns
+        -------
+        result: int
+            The number of neighbors.
+        """
         return self._number_of_neighbors
 
     def fit(self, training_set: TaggedTable) -> KNearestNeighbors:
