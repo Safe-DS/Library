@@ -373,7 +373,7 @@ class TaggedTable(Table):
         if self.target.name not in column_names:
             raise IllegalSchemaModificationError("Must keep target column and at least one feature column.")
         table = super().keep_only_columns(column_names)
-        return TaggedTable._from_table(table, target_name=self.target.name, feature_names=sorted(set(self.features.column_names).intersection(set(table.column_names)), key={val: ix for ix, val in enumerate(self.features.column_names)}.get))
+        return TaggedTable._from_table(table, target_name=self.target.name, feature_names=sorted(set(self.features.column_names).intersection(set(table.column_names)), key={val: ix for ix, val in enumerate(self.features.column_names)}.__getitem__))
 
     def remove_columns(self, column_names: list[str]) -> TaggedTable:
         """
@@ -400,7 +400,7 @@ class TaggedTable(Table):
         """
         if self.target.name in column_names:
             raise ColumnIsTargetError(self.target.name)
-        return TaggedTable._from_table(super().remove_columns(column_names), target_name=self.target.name, feature_names=sorted(set(self.features.column_names) - set(column_names), key={val: ix for ix, val in enumerate(self.features.column_names)}.get))
+        return TaggedTable._from_table(super().remove_columns(column_names), target_name=self.target.name, feature_names=sorted(set(self.features.column_names) - set(column_names), key={val: ix for ix, val in enumerate(self.features.column_names)}.__getitem__))
 
     def remove_columns_with_missing_values(self) -> TaggedTable:
         """
@@ -421,7 +421,7 @@ class TaggedTable(Table):
         table = super().remove_columns_with_missing_values()
         if self.target.name not in table.column_names:
             raise ColumnIsTargetError(self.target.name)
-        return TaggedTable._from_table(table, self.target.name, feature_names=sorted(set(self.features.column_names).intersection(set(table.column_names)), key={val: ix for ix, val in enumerate(self.features.column_names)}.get))
+        return TaggedTable._from_table(table, self.target.name, feature_names=sorted(set(self.features.column_names).intersection(set(table.column_names)), key={val: ix for ix, val in enumerate(self.features.column_names)}.__getitem__))
 
     def remove_columns_with_non_numerical_values(self) -> TaggedTable:
         """
@@ -442,7 +442,7 @@ class TaggedTable(Table):
         table = super().remove_columns_with_non_numerical_values()
         if self.target.name not in table.column_names:
             raise ColumnIsTargetError(self.target.name)
-        return TaggedTable._from_table(table, self.target.name, feature_names=sorted(set(self.features.column_names).intersection(set(table.column_names)), key={val: ix for ix, val in enumerate(self.features.column_names)}.get))
+        return TaggedTable._from_table(table, self.target.name, feature_names=sorted(set(self.features.column_names).intersection(set(table.column_names)), key={val: ix for ix, val in enumerate(self.features.column_names)}.__getitem__))
 
     def remove_duplicate_rows(self) -> TaggedTable:
         """
