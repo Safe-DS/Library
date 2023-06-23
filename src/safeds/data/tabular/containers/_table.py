@@ -619,6 +619,8 @@ class Table:
         """
         Transform the table to an instance of the Table class.
 
+        The original table is not modified.
+
         Returns
         -------
         table: Table

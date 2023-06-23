@@ -83,9 +83,7 @@ class TaggedTable(Table):
         >>> table = Table({"col1": ["a", "b", "c", "a"], "col2": [1, 2, 3, 4]})
         >>> tagged_table = TaggedTable._from_table(table, "col2", ["col1"])
         """
-        # Cast to normal Table if necessary:
-        if isinstance(table, TaggedTable):
-            table = table.to_table()
+        table = table._as_table()
         if target_name not in table.column_names:
             raise UnknownColumnNameError([target_name])
 
@@ -176,10 +174,10 @@ class TaggedTable(Table):
         return self._target
 
     # ------------------------------------------------------------------------------------------------------------------
-    # Conversion back to table
+    # Overriden methods from Table class:
     # ------------------------------------------------------------------------------------------------------------------
 
-    def to_table(self: TaggedTable) -> Table:
+    def _as_table(self: TaggedTable) -> Table:
         """
         Remove the tagging from a TaggedTable.
 
@@ -197,10 +195,6 @@ class TaggedTable(Table):
 
         """
         return self.features.add_column(self.target)
-
-    # ------------------------------------------------------------------------------------------------------------------
-    # Overriden methods from Table class:
-    # ------------------------------------------------------------------------------------------------------------------
 
     def add_column(self, column: Column) -> TaggedTable:
         """
