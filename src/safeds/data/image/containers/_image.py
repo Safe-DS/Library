@@ -386,12 +386,12 @@ class Image:
 
     def rotate_right(self) -> Image:
         """
-        Return the image rotated clockwise by 90 degrees.
+        Return the image rotated 90 degrees clockwise.
 
         Returns
         -------
         result : Image
-            The image clockwise rotated by 90 degrees.
+            The image rotated 90 degrees clockwise.
         """
         image_copy = copy.deepcopy(self)
         image_copy._image = image_copy._image.rotate(270, expand=True)
@@ -399,12 +399,12 @@ class Image:
 
     def rotate_left(self) -> Image:
         """
-        Return the image rotated counter-clockwise by 90 degrees.
+        Return the image rotated 90 degrees counter-clockwise.
 
         Returns
         -------
         result : Image
-            The image counter-clockwise rotated by 90 degrees.
+            The image rotated 90 degrees counter-clockwise.
         """
         image_copy = copy.deepcopy(self)
         image_copy._image = image_copy._image.rotate(90, expand=True)

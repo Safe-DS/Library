@@ -188,7 +188,7 @@ class TestResize:
                 (2, 3),
             ),
         ],
-        ids=[".png"],
+        ids=["(2, 3)"],
     )
     def test_should_return_resized_image(
         self,
@@ -209,7 +209,7 @@ class TestConvertToGrayscale:
                 Image.from_png_file(resolve_resource_path("image/snapshot_heatmap_grayscale.png")),
             ),
         ],
-        ids=[".png"],
+        ids=["grayscale"],
     )
     def test_convert_to_grayscale(self, image: Image, expected: Image) -> None:
         grayscale_image = image.convert_to_grayscale()
@@ -320,9 +320,9 @@ class TestInvertColors:
                 Image.from_png_file(resolve_resource_path("image/inverted_colors_original.png")),
             ),
         ],
-        ids=[".png"],
+        ids=["invert-colors"],
     )
-    def test_should_invert_colors_png(self, image: Image, expected: Image) -> None:
+    def test_should_invert_colors(self, image: Image, expected: Image) -> None:
         image = image.invert_colors()
         assert image == expected
 
@@ -336,9 +336,9 @@ class TestBlur:
                 Image.from_png_file(resolve_resource_path("image/blurredBoy.png")),
             ),
         ],
-        ids=[".png"],
+        ids=["blur"],
     )
-    def test_should_return_blurred_png_image(self, image: Image, expected: Image) -> None:
+    def test_should_return_blurred_image(self, image: Image, expected: Image) -> None:
         image = image.blur(2)
         image.to_png_file(resolve_resource_path("image/blurredBoy1.png"))
         image = image.from_png_file(resolve_resource_path("image/blurredBoy1.png"))
@@ -354,9 +354,9 @@ class TestCrop:
                 Image.from_png_file(resolve_resource_path("image/whiteCropped.png")),
             ),
         ],
-        ids=[".png"],
+        ids=["crop"],
     )
-    def test_should_crop_png_image(self, image: Image, expected: Image) -> None:
+    def test_should_return_cropped_image(self, image: Image, expected: Image) -> None:
         image = image.crop(0, 0, 100, 100)
         assert image == expected
 
@@ -387,7 +387,7 @@ class TestRotate:
                 Image.from_png_file(resolve_resource_path("image/snapshot_boxplot_right_rotation.png")),
             ),
         ],
-        ids=[".png"],
+        ids=["rotate-clockwise"],
     )
     def test_should_return_clockwise_rotated_image(self, image: Image, expected: Image) -> None:
         image = image.rotate_right()
@@ -401,7 +401,7 @@ class TestRotate:
                 Image.from_png_file(resolve_resource_path("image/snapshot_boxplot_left_rotation.png")),
             ),
         ],
-        ids=[".png"],
+        ids=["rotate-counter-clockwise"],
     )
     def test_should_return_counter_clockwise_rotated_image(self, image: Image, expected: Image) -> None:
         image = image.rotate_left()
