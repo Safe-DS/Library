@@ -527,34 +527,32 @@ class Table:
 
     def get_similar_columns(self, column_name: str) -> bool:
         """
-            Gives a warning with similar columns to the given one that's not in the table.
+        Give a warning with similar columns to the given one that's not in the table.
 
-            Parameters
-            ----------
-            column_name : str
-                The name of the Column, that's not in the Table.
+        Parameters
+        ----------
+        column_name : str
+            The name of the Column, that's not in the Table.
 
-            Returns
-            -------
-            bool
-                True if there are similar columns.
+        Returns
+        -------
+        bool
+            True if there are similar columns.
         """
         similar_columns = []
         for column in self.column_names:
             if Levenshtein.jaro_winkler(column, column_name) >= 0.7:
                 similar_columns.append(column)
+
         if len(similar_columns) > 0:
             warnings.warn(
-                    (
-                        f"The Column {column_name} is unknown.\n Did you mean one of these: {similar_columns}?"
-                    ),
-                    UserWarning,
-                    stacklevel=2,
-                )
+                f"The Column {column_name} is unknown.\n Did you mean one of these: {similar_columns}?",
+                UserWarning,
+                stacklevel=2,
+            )
             return True
         else:
             return False
-
 
     # ------------------------------------------------------------------------------------------------------------------
     # Information
