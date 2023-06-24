@@ -8,14 +8,16 @@ from safeds.data.tabular.containers import Row, Table
     ("table1", "table2", "expected"),
     [
         (Table(), Table(), True),
+        (Table({"a": [], "b": []}), Table({"a": [], "b": []}), True),
         (Table({"col1": [1]}), Table({"col1": [1]}), True),
         (Table({"col1": [1]}), Table({"col2": [1]}), False),
         (Table({"col1": [1, 2, 3]}), Table({"col1": [1, 1, 3]}), False),
         (Table({"col1": [1, 2, 3]}), Table({"col1": ["1", "2", "3"]}), False),
     ],
     ids=[
-        "empty Table",
-        "equal Tables",
+        "empty table",
+        "rowless table",
+        "equal tables",
         "different column names",
         "different values",
         "different types",

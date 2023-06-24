@@ -4,19 +4,20 @@ from safeds.exceptions import UnknownColumnNameError
 
 
 @pytest.mark.parametrize(
-    ("table1", "expected", "columns"),
+    ("table", "expected", "columns"),
     [
         (Table({"col1": [1, 2, 1], "col2": ["a", "b", "c"]}), Table({"col1": [1, 2, 1]}), ["col2"]),
-        (Table({"col1": [1, 2, 1], "col2": [1, 2, 4]}), Table({}), ["col1", "col2"]),
+        (Table({"col1": [1, 2, 1], "col2": [1, 2, 4]}), Table(), ["col1", "col2"]),
         (Table({"col1": [1, 2, 1], "col2": [1, 2, 4]}), Table({"col1": [1, 2, 1], "col2": [1, 2, 4]}), []),
         (Table(), Table(), []),
     ],
     ids=["one column", "multiple columns", "no columns", "empty"],
 )
-def test_should_remove_table_columns(table1: Table, expected: Table, columns: list[str]) -> None:
-    table1 = table1.remove_columns(columns)
-    assert table1.schema == expected.schema
-    assert table1 == expected
+def test_should_remove_table_columns(table: Table, expected: Table, columns: list[str]) -> None:
+    table = table.remove_columns(columns)
+    assert table.schema == expected.schema
+    assert table == expected
+    assert table.number_of_rows == expected.number_of_rows
 
 
 @pytest.mark.parametrize("table", [Table({"A": [1], "B": [2]}), Table()], ids=["normal", "empty"])

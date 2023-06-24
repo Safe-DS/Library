@@ -9,7 +9,7 @@ from safeds.exceptions import UnknownColumnNameError
         (
             Table({"A": [1], "B": [2]}),
             [],
-            Table({}),
+            Table(),
         ),
         (
             Table({"A": [1], "B": [2]}),
@@ -44,6 +44,8 @@ def test_should_keep_only_listed_columns(table: Table, column_names: list[str], 
     transformed_table = table.keep_only_columns(column_names)
     assert transformed_table.schema == expected.schema
     assert transformed_table == expected
+    if len(column_names) == 0:
+        assert expected.number_of_rows == 0
 
 
 @pytest.mark.parametrize("table", [Table({"A": [1], "B": [2]}), Table()], ids=["table", "empty"])
