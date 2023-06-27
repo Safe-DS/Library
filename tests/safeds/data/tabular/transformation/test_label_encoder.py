@@ -17,8 +17,10 @@ class TestFit:
             LabelEncoder().fit(table, ["col2", "col3"])
 
     def test_should_raise_if_table_contains_no_rows(self) -> None:
-        with pytest.raises(sk_exceptions.NotFittedError,
-                           match=r"The LabelEncoder cannot transform the table because it contains 0 rows"):
+        with pytest.raises(
+            sk_exceptions.NotFittedError,
+            match=r"The LabelEncoder cannot transform the table because it contains 0 rows",
+        ):
             LabelEncoder().fit(Table({"col1": []}), ["col1"])
 
     def test_should_warn_if_table_contains_numerical_data(self) -> None:
