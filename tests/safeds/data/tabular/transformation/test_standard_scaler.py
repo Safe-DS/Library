@@ -30,7 +30,8 @@ class TestFit:
 
     def test_should_raise_if_table_contains_no_rows(self) -> None:
         with pytest.raises(
-            sk_exceptions.NotFittedError, match=r"The StandardScaler cannot be fitted because the table contains 0 rows",
+            sk_exceptions.NotFittedError,
+            match=r"The StandardScaler cannot be fitted because the table contains 0 rows",
         ):
             StandardScaler().fit(Table({"col1": []}), ["col1"])
 
