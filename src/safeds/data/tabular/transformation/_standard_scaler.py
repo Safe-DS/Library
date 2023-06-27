@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import sklearn.exceptions as sk_exceptions
 from sklearn.preprocessing import StandardScaler as sk_StandardScaler
 
 from safeds.data.tabular.containers import Table
@@ -66,7 +67,7 @@ class StandardScaler(InvertibleTableTransformer):
             )
 
         if table.number_of_rows == 0:
-            raise ValueError("The StandardScaler cannot be fitted because the table contains 0 rows")
+            raise sk_exceptions.NotFittedError("The StandardScaler cannot be fitted because the table contains 0 rows")
 
         wrapped_transformer = sk_StandardScaler()
         wrapped_transformer.fit(table._data[column_names])

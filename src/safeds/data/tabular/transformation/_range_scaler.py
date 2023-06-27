@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import sklearn.exceptions as sk_exceptions
 from sklearn.preprocessing import MinMaxScaler as sk_MinMaxScaler
 
 from safeds.data.tabular.containers import Table
@@ -83,7 +84,7 @@ class RangeScaler(InvertibleTableTransformer):
             )
 
         if table.number_of_rows == 0:
-            raise ValueError("The RangeScaler cannot be fitted because the table contains 0 rows")
+            raise sk_exceptions.NotFittedError("The RangeScaler cannot be fitted because the table contains 0 rows")
 
         wrapped_transformer = sk_MinMaxScaler((self._minimum, self._maximum))
         wrapped_transformer.fit(table._data[column_names])

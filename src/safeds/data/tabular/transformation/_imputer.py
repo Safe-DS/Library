@@ -4,6 +4,7 @@ import warnings
 from typing import Any
 
 import pandas as pd
+import sklearn.exceptions as sk_exceptions
 from sklearn.impute import SimpleImputer as sk_SimpleImputer
 
 from safeds.data.tabular.containers import Table
@@ -126,7 +127,7 @@ class Imputer(TableTransformer):
                 raise UnknownColumnNameError(missing_columns)
 
         if table.number_of_rows == 0:
-            raise ValueError("The Imputer cannot be fitted because the table contains 0 rows")
+            raise sk_exceptions.NotFittedError("The Imputer cannot be fitted because the table contains 0 rows")
 
         if (isinstance(self._strategy, Imputer.Strategy.Mean | Imputer.Strategy.Median)) and table.keep_only_columns(
             column_names,

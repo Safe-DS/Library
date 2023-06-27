@@ -1,4 +1,5 @@
 import pytest
+import sklearn.exceptions as sk_exceptions
 from safeds.data.tabular.containers import Table
 from safeds.data.tabular.transformation import Imputer
 from safeds.data.tabular.typing import ImputerStrategy
@@ -49,7 +50,8 @@ class TestFit:
 
     @pytest.mark.parametrize("strategy", strategies(), ids=lambda x: x.__class__.__name__)
     def test_should_raise_if_table_contains_no_rows(self, strategy: ImputerStrategy) -> None:
-        with pytest.raises(ValueError, match=r"The Imputer cannot be fitted because the table contains 0 rows"):
+        with pytest.raises(sk_exceptions.NotFittedError,
+                           match=r"The Imputer cannot be fitted because the table contains 0 rows"):
             Imputer(strategy).fit(Table({"col1": []}), ["col1"])
 
     @pytest.mark.parametrize(

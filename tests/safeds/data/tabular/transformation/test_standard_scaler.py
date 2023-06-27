@@ -1,4 +1,5 @@
 import pytest
+import sklearn.exceptions as sk_exceptions
 from safeds.data.tabular.containers import Table
 from safeds.data.tabular.transformation import StandardScaler
 from safeds.exceptions import NonNumericColumnError, TransformerNotFittedError, UnknownColumnNameError
@@ -28,7 +29,8 @@ class TestFit:
             )
 
     def test_should_raise_if_table_contains_no_rows(self) -> None:
-        with pytest.raises(ValueError, match=r"The StandardScaler cannot be fitted because the table contains 0 rows"):
+        with pytest.raises(sk_exceptions.NotFittedError,
+                           match=r"The StandardScaler cannot be fitted because the table contains 0 rows"):
             StandardScaler().fit(Table({"col1": []}), ["col1"])
 
     def test_should_not_change_original_transformer(self) -> None:

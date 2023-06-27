@@ -5,6 +5,7 @@ from collections import Counter
 from typing import Any
 
 import numpy as np
+import sklearn.exceptions as sk_exceptions
 
 from safeds.data.tabular.containers import Column, Table
 from safeds.data.tabular.transformation._table_transformer import (
@@ -101,7 +102,7 @@ class OneHotEncoder(InvertibleTableTransformer):
                 raise UnknownColumnNameError(missing_columns)
 
         if table.number_of_rows == 0:
-            raise ValueError("The OneHotEncoder cannot be fitted because the table contains 0 rows")
+            raise sk_exceptions.NotFittedError("The OneHotEncoder cannot be fitted because the table contains 0 rows")
 
         if table.keep_only_columns(column_names).remove_columns_with_non_numerical_values().number_of_columns > 0:
             warnings.warn(

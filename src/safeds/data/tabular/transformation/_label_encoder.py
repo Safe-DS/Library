@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import warnings
 
+import sklearn.exceptions as sk_exceptions
 from sklearn.preprocessing import OrdinalEncoder as sk_OrdinalEncoder
 
 from safeds.data.tabular.containers import Table
@@ -52,7 +53,7 @@ class LabelEncoder(InvertibleTableTransformer):
                 raise UnknownColumnNameError(missing_columns)
 
         if table.number_of_rows == 0:
-            raise ValueError("The LabelEncoder cannot transform the table because it contains 0 rows")
+            raise sk_exceptions.NotFittedError("The LabelEncoder cannot transform the table because it contains 0 rows")
 
         if table.keep_only_columns(column_names).remove_columns_with_non_numerical_values().number_of_columns > 0:
             warnings.warn(
