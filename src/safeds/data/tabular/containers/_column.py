@@ -75,7 +75,7 @@ class Column(Sequence[T]):
         result._name = data.name
         result._data = data
         # noinspection PyProtectedMember
-        result._type = type_ if type_ is not None else ColumnType._from_numpy_data_type(data.dtype)
+        result._type = type_ if type_ is not None else ColumnType._data_type(data)
 
         return result
 
@@ -105,7 +105,7 @@ class Column(Sequence[T]):
         self._name: str = name
         self._data: pd.Series = data.rename(name) if isinstance(data, pd.Series) else pd.Series(data, name=name)
         # noinspection PyProtectedMember
-        self._type: ColumnType = ColumnType._from_numpy_data_type(self._data.dtype)
+        self._type: ColumnType = ColumnType._data_type(data)
 
     def __contains__(self, item: Any) -> bool:
         return item in self._data
@@ -1031,3 +1031,4 @@ class Column(Sequence[T]):
         2
         """
         return self._data.isna().sum()
+

@@ -1,10 +1,12 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Iterable
 
 import pandas as pd
 import pytest
-from safeds.data.tabular.typing import Anything, Boolean, ColumnType, Integer, RealNumber, Schema, String
+
+
+from safeds.data.tabular.typing import Boolean, ColumnType, Integer, RealNumber, Schema, String, Anything
 from safeds.exceptions import UnknownColumnNameError
 
 if TYPE_CHECKING:
@@ -13,7 +15,7 @@ if TYPE_CHECKING:
 
 class TestFromPandasDataFrame:
     @pytest.mark.parametrize(
-        ("dataframe", "expected"),
+        ("columns", "expected"),
         [
             (
                 pd.DataFrame({"A": [True, False, True]}),
@@ -33,24 +35,49 @@ class TestFromPandasDataFrame:
             ),
             (
                 pd.DataFrame({"A": [1, 2.0, "a", True]}),
-                Schema({"A": String()}),
+                Schema({"A": Anything()}),
             ),
             (
                 pd.DataFrame({"A": [1, 2, 3], "B": ["a", "b", "c"]}),
                 Schema({"A": Integer(), "B": String()}),
             ),
+            (
+                pd.DataFrame({"A": [True, False, None]}),
+                Schema({"A": Boolean(is_nullable=True)}),
+            ),
+            (
+                pd.DataFrame({"A": [1, None, 3]}),
+                Schema({"A": RealNumber()}),
+            ),
+            (
+                pd.DataFrame({"A": [1.0, None, 3.0]}),
+                Schema({"A": RealNumber()}),
+            ),
+            (
+                pd.DataFrame({"A": ["a", None, "c"]}),
+                Schema({"A": String(is_nullable=True)}),
+            ),
+            (
+                pd.DataFrame({"A": [1, 2.0, None, True]}),
+                Schema({"A": Anything(is_nullable=True)}),
+            ),
         ],
         ids=[
+            "boolean",
             "integer",
             "real number",
             "string",
-            "boolean",
             "mixed",
             "multiple columns",
+            "boolean?",
+            "integer?",
+            "real number?",
+            "string?",
+            "Anything?",
         ],
     )
-    def test_should_create_schema_from_pandas_dataframe(self, dataframe: pd.DataFrame, expected: Schema) -> None:
-        assert Schema._from_pandas_dataframe(dataframe) == expected
+    def test_should_create_schema_from_pandas_dataframe(self, columns: Iterable, expected: Schema) -> None:
+        assert Schema._from_pandas_dataframe(columns) == expected
 
 
 class TestRepr:

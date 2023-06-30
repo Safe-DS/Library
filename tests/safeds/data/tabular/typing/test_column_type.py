@@ -1,5 +1,7 @@
-import numpy as np
+from typing import Iterable
+
 import pytest
+
 from safeds.data.tabular.typing import (
     Anything,
     Boolean,
@@ -7,47 +9,31 @@ from safeds.data.tabular.typing import (
     Integer,
     RealNumber,
     String,
+    Nothing,
 )
 
 
-class TestFromNumpyDataType:
-    # Test cases taken from https://numpy.org/doc/stable/reference/arrays.scalars.html#scalars
+class TestDataType:
     @pytest.mark.parametrize(
-        ("data_type", "expected"),
+        ("data", "expected"),
         [
-            # Boolean
-            (np.dtype(np.bool_), Boolean()),
-            # Number
-            (np.dtype(np.half), RealNumber()),
-            (np.dtype(np.single), RealNumber()),
-            (np.dtype(np.float_), RealNumber()),
-            (np.dtype(np.longfloat), RealNumber()),
-            # Int
-            (np.dtype(np.byte), Integer()),
-            (np.dtype(np.short), Integer()),
-            (np.dtype(np.intc), Integer()),
-            (np.dtype(np.int_), Integer()),
-            (np.dtype(np.longlong), Integer()),
-            (np.dtype(np.ubyte), Integer()),
-            (np.dtype(np.ushort), Integer()),
-            (np.dtype(np.uintc), Integer()),
-            (np.dtype(np.uint), Integer()),
-            (np.dtype(np.ulonglong), Integer()),
-            # String
-            (np.dtype(np.str_), String()),
-            (np.dtype(np.unicode_), String()),
-            (np.dtype(np.object_), String()),
-            (np.dtype(np.datetime64), String()),
-            (np.dtype(np.timedelta64), String()),
-        ],
-        ids=repr,
-    )
-    def test_should_create_column_type_from_numpy_data_type(self, data_type: np.dtype, expected: ColumnType) -> None:
-        assert ColumnType._from_numpy_data_type(data_type) == expected
+            ([1, 2, 3], Integer(is_nullable=False)),
+            ([1.0, 2.0, 3.0], RealNumber(is_nullable=False)),
+            ([True, False, True], Boolean(is_nullable=False)),
+            (["a", "b", "c"], String(is_nullable=False)),
+            (["a", 1, 2.0], Anything(is_nullable=False)),
+            ([None, None, None], Nothing()),
+            ([None, 1, 2], Integer(is_nullable=True)),
+            ([1.0, 2.0, None], RealNumber(is_nullable=True)),
+            ([True, False, None], Boolean(is_nullable=True)),
+            (["a", None, "b"], String(is_nullable=True)),
 
-    def test_should_raise_if_data_type_is_not_supported(self) -> None:
-        with pytest.raises(NotImplementedError):
-            ColumnType._from_numpy_data_type(np.dtype(np.void))
+        ],
+        ids=["Integer", "Real number", "Boolean", "String", "Mixed", "None", "Nullable integer",
+             "Nullable RealNumber", "Nullable Boolean", "Nullable String"],
+    )
+    def test_should_return_the_data_type(self, data: Iterable, expected: ColumnType) -> None:
+        assert ColumnType._data_type(data) == expected
 
 
 class TestRepr:
