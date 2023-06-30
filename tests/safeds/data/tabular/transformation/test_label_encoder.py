@@ -205,7 +205,6 @@ class TestInverseTransform:
                 },
             ),
         ],
-        ids=["no_column_names"],
     )
     def test_should_return_original_table(self, table: Table) -> None:
         transformer = LabelEncoder().fit(table, None)
