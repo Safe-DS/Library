@@ -2230,7 +2230,7 @@ class Table:
 
     def _copy(self) -> Table:
         """
-        Return a copy of the table.
+        Return a copy of this table.
 
         Returns
         -------
