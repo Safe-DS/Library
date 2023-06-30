@@ -1377,13 +1377,10 @@ class Table:
         ------
         UnknownColumnNameError
             If the old column does not exist.
-
         DuplicateColumnNameError
             If at least one of the new columns already exists and the existing column is not affected by the replacement.
-
         ColumnSizeError
             If the size of at least one of the new columns does not match the amount of rows.
-
         IllegalSchemaModificationError
             If replacing the column would violate an invariant in the subclass.
 
