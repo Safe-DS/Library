@@ -2235,6 +2235,6 @@ class Table:
         Returns
         -------
         table : Table
-            A copy of the table.
+            The copy of this table.
         """
         return copy.deepcopy(self)
