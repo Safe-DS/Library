@@ -1111,7 +1111,7 @@ class Table:
         1  4
         """
         invalid_columns = []
-        similar_columns = []
+        similar_columns = list(str)
         for name in column_names:
             if not self._schema.has_column(name):
                 similar_columns = similar_columns + self._get_similar_columns(name)
@@ -1156,7 +1156,7 @@ class Table:
         1  3
         """
         invalid_columns = []
-        similar_columns = []
+        similar_columns = list(str)
         for name in column_names:
             if not self._schema.has_column(name):
                 similar_columns = similar_columns + self._get_similar_columns(name)
