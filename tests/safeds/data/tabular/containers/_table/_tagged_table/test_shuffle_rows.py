@@ -36,7 +36,7 @@ def test_should_shuffle_rows(rows: list[Row], target_name: str, feature_names: l
     for i in range(table.number_of_rows):
         assert shuffled.get_row(i) in rows
 
-    # Assert that table and shuffled are equal after sorting:
+    # Assert that table and shuffled are equal again after sorting:
     def comparator(r1: Row, r2: Row) -> int:
         return 1 if r1.__repr__() < r2.__repr__() else -1
 
