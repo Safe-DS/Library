@@ -381,7 +381,6 @@ class TestCheckMetricsPreconditions:
             ([1, 2], ["A", "B"], TypeError),
             ([1, 2, 3], [1, 2], ColumnLengthMismatchError),
         ],
-        ids=["non-numerical data", "non-numerical-and-numerical data", "different lengths"],
     )
     def test_should_raise_if_validation_fails(
         self,
