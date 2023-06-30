@@ -24,11 +24,9 @@ from safeds.exceptions import (
     DuplicateColumnNameError,
     IndexOutOfBoundsError,
     NonNumericColumnError,
-    SchemaMismatchError,
     UnknownColumnNameError,
     WrongFileExtensionError,
 )
-
 from ._column import Column
 from ._row import Row
 
@@ -926,6 +924,8 @@ class Table:
         int_columns = []
         result = self.remove_columns([])  # clone
 
+        if self.number_of_columns == 0:
+            return Table.from_rows([row])
         if len(set(self.column_names) - set(row.column_names)) > 0:
             raise UnknownColumnNameError(list(set(self.column_names) - set(row.column_names)))
 
@@ -986,33 +986,26 @@ class Table:
         """
         if isinstance(rows, Table):
             rows = rows.to_rows()
-        int_columns = []
-        result = self.remove_columns([])  # clone
 
-        missing_col_names = set()
+        if len(rows) == 0:
+            return copy.deepcopy(self)
+
+        different_column_names = set()
         for row in rows:
-            missing_col_names.update(set(self.column_names) - set(row.column_names))
-        if len(missing_col_names) > 0:
-            raise UnknownColumnNameError(list(missing_col_names))
+            different_column_names.update(set(rows[0].column_names) - set(row.column_names))
+        if len(different_column_names) > 0:
+            raise UnknownColumnNameError(list(different_column_names))
+
+        different_column_names = set()
+        if self.number_of_columns != 0:
+            different_column_names.update(set(self.column_names) - set(rows[0].column_names))
+            if len(different_column_names) > 0:
+                raise UnknownColumnNameError(list(different_column_names))
+
+        result = copy.deepcopy(self)
 
         for row in rows:
-            if result.number_of_rows == 0:
-                int_columns = list(filter(lambda name: isinstance(row[name], int | np.int64), row.column_names))
-                if result.number_of_columns == 0:
-                    for column in row.column_names:
-                        result._data[column] = Column(column, [])
-                    result._schema = Schema._from_pandas_dataframe(result._data)
-
-        row_frames = (row._data for row in rows)
-
-        new_df = pd.concat([result._data, *row_frames]).infer_objects()
-        new_df.columns = result.column_names
-        result = Table._from_pandas_dataframe(new_df)
-
-        for column in int_columns:
-            result = result.replace_column(column, [result.get_column(column).transform(lambda it: int(it))])
-
-        result._schema = Schema.merge_multiple_schemas([self.schema, *[row.schema for row in rows]])
+            result = result.add_row(row)
 
         return result
 
