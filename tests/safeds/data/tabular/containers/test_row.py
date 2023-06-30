@@ -511,3 +511,15 @@ class TestReprHtml:
     def test_should_contain_td_element_for_each_value(self, row: Row) -> None:
         for value in row.values():
             assert f"<td>{value}</td>" in row._repr_html_()
+
+
+class TestCopy:
+    @pytest.mark.parametrize(
+        "row",
+        [Row(), Row({"a": [3, 0.1]})],
+        ids=["empty", "normal"],
+    )
+    def test_should_copy_table(self, row: Row) -> None:
+        copied = row._copy()
+        assert copied == row
+        assert copied is not row
