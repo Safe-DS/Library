@@ -594,8 +594,8 @@ class Table:
         Column('b', [2])
         """
         if not self.has_column(column_name):
-            self.get_similar_columns(column_name)
-            raise UnknownColumnNameError([column_name])
+            similar_columns = self._get_similar_columns(column_name)
+            raise UnknownColumnNameError([column_name], similar_columns)
 
         return Column._from_pandas_series(
             self._data[column_name],
@@ -1111,12 +1111,14 @@ class Table:
         1  4
         """
         invalid_columns = []
+        all_similar_columns = []
         for name in column_names:
             if not self._schema.has_column(name):
-                self.get_similar_columns(name)
+                similar_columns = self._get_similar_columns(name)
+                all_similar_columns.append(similar_columns)
                 invalid_columns.append(name)
         if len(invalid_columns) != 0:
-            raise UnknownColumnNameError(invalid_columns)
+            raise UnknownColumnNameError(invalid_columns, all_similar_columns)
 
         clone = copy.deepcopy(self)
         clone = clone.remove_columns(list(set(self.column_names) - set(column_names)))
@@ -1155,12 +1157,14 @@ class Table:
         1  3
         """
         invalid_columns = []
+        all_similar_columns = []
         for name in column_names:
             if not self._schema.has_column(name):
-                self.get_similar_columns(name)
+                similar_columns = self._get_similar_columns(name)
+                all_similar_columns.append(similar_columns)
                 invalid_columns.append(name)
         if len(invalid_columns) != 0:
-            raise UnknownColumnNameError(invalid_columns)
+            raise UnknownColumnNameError(invalid_columns, all_similar_columns)
 
         transformed_data = self._data.drop(labels=column_names, axis="columns")
         transformed_data.columns = [name for name in self._schema.column_names if name not in column_names]
@@ -1344,8 +1348,8 @@ class Table:
         0  1  2
         """
         if old_name not in self._schema.column_names:
-            self.get_similar_columns(old_name)
-            raise UnknownColumnNameError([old_name])
+            similar_columns = self._get_similar_columns(old_name)
+            raise UnknownColumnNameError([old_name], similar_columns)
         if old_name == new_name:
             return self
         if new_name in self._schema.column_names:
@@ -1395,8 +1399,8 @@ class Table:
         0  1    3
         """
         if old_column_name not in self._schema.column_names:
-            self.get_similar_columns(old_column_name)
-            raise UnknownColumnNameError([old_column_name])
+            similar_columns = self._get_similar_columns(old_column_name)
+            raise UnknownColumnNameError([old_column_name], similar_columns)
 
         columns = list[Column]()
         for old_column in self.column_names:
@@ -1700,8 +1704,8 @@ class Table:
             items: list = [transformer(item) for item in self.to_rows()]
             result: list[Column] = [Column(name, items)]
             return self.replace_column(name, result)
-        self.get_similar_columns(name)
-        raise UnknownColumnNameError([name])
+        similar_columns = self._get_similar_columns(name)
+        raise UnknownColumnNameError([name], similar_columns)
 
     def transform_table(self, transformer: TableTransformer) -> Table:
         """
@@ -1850,11 +1854,11 @@ class Table:
         >>> image = table.plot_lineplot("temperature", "sales")
         """
         if not self.has_column(x_column_name) or not self.has_column(y_column_name):
-            self.get_similar_columns(x_column_name)
-            self.get_similar_columns(y_column_name)
+            similar_columns_x = self._get_similar_columns(x_column_name)
+            similar_columns_y = self._get_similar_columns(y_column_name)
             raise UnknownColumnNameError(
-                ([x_column_name] if not self.has_column(x_column_name) else [])
-                + ([y_column_name] if not self.has_column(y_column_name) else []),
+                ([x_column_name], similar_columns_x if not self.has_column(x_column_name) else [])
+                + ([y_column_name], similar_columns_y if not self.has_column(y_column_name) else []),
             )
 
         fig = plt.figure()
@@ -1906,11 +1910,11 @@ class Table:
         >>> image = table.plot_scatterplot("temperature", "sales")
         """
         if not self.has_column(x_column_name) or not self.has_column(y_column_name):
-            self.get_similar_columns(x_column_name)
-            self.get_similar_columns(y_column_name)
+            similar_columns_x = self._get_similar_columns(x_column_name)
+            similar_columns_y = self._get_similar_columns(y_column_name)
             raise UnknownColumnNameError(
-                ([x_column_name] if not self.has_column(x_column_name) else [])
-                + ([y_column_name] if not self.has_column(y_column_name) else []),
+                ([x_column_name], similar_columns_x if not self.has_column(x_column_name) else [])
+                + ([y_column_name], similar_columns_y if not self.has_column(y_column_name) else []),
             )
 
         fig = plt.figure()

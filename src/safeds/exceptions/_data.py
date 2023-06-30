@@ -16,8 +16,8 @@ class UnknownColumnNameError(KeyError):
         The name of the column that was tried to be accessed.
     """
 
-    def __init__(self, column_names: list[str]):
-        super().__init__(f"Could not find column(s) '{', '.join(column_names)}'")
+    def __init__(self, column_names: list[str], similar_columns: list[str]|None):
+        super().__init__(f"Could not find column(s) '{', '.join(column_names)}'. \nDid you mean one of these? '{', '.join(similar_columns)}'")
 
 
 class NonNumericColumnError(Exception):
