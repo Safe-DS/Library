@@ -334,20 +334,20 @@ class TestColorAdjust:
             (
                 Image.from_png_file(resolve_resource_path("image/original.png")),
                 2,
-                Image.from_png_file(resolve_resource_path("image/adjusted_colors/by_2.png"))
+                Image.from_png_file(resolve_resource_path("image/adjusted_colors/by_2.png")),
             ),
             (
                 Image.from_png_file(resolve_resource_path("image/original.png")),
                 0.5,
-                Image.from_png_file(resolve_resource_path("image/adjusted_colors/by_0.5.png"))
+                Image.from_png_file(resolve_resource_path("image/adjusted_colors/by_0.5.png")),
             ),
             (
                 Image.from_png_file(resolve_resource_path("image/original.png")),
                 0,
-                Image.from_png_file(resolve_resource_path("image/adjusted_colors/by_0.png"))
+                Image.from_png_file(resolve_resource_path("image/adjusted_colors/by_0.png")),
             ),
         ],
-        ids=["add color", "remove color", "remove all color"]
+        ids=["add color", "remove color", "remove all color"],
     )
     def test_should_adjust_colors(self, image: Image, factor: float, expected: Image) -> None:
         image = image.adjust_color_balance(factor)
@@ -359,9 +359,9 @@ class TestColorAdjust:
             (
                 Image.from_png_file(resolve_resource_path("image/original.png")),
                 -1,
-            )
+            ),
         ],
-        ids=["negative"]
+        ids=["negative"],
     )
     def test_should_throw(self, image: Image, factor: float) -> None:
         with pytest.raises(ValueError, match="Color factor has to be 0 or bigger."):
@@ -373,12 +373,14 @@ class TestColorAdjust:
             (
                 Image.from_png_file(resolve_resource_path("image/original.png")),
                 1,
-            )
+            ),
         ],
-        ids=["no change"]
+        ids=["no change"],
     )
     def test_should_warn(self, image: Image, factor: float) -> None:
-        with pytest.warns(UserWarning, match="Color adjustment factor is 1.0, this will not make changes to the image."):
+        with pytest.warns(
+            UserWarning, match="Color adjustment factor is 1.0, this will not make changes to the image.",
+        ):
             adjust = image.adjust_color_balance(factor)
         assert adjust == image
 
