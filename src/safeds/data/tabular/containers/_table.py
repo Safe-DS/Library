@@ -1111,14 +1111,13 @@ class Table:
         1  4
         """
         invalid_columns = []
-        all_similar_columns = []
+        similar_columns = []
         for name in column_names:
             if not self._schema.has_column(name):
-                similar_columns = self._get_similar_columns(name)
-                all_similar_columns.append(similar_columns)
+                similar_columns = similar_columns + self._get_similar_columns(name)
                 invalid_columns.append(name)
         if len(invalid_columns) != 0:
-            raise UnknownColumnNameError(invalid_columns, all_similar_columns)
+            raise UnknownColumnNameError(invalid_columns, similar_columns)
 
         clone = copy.deepcopy(self)
         clone = clone.remove_columns(list(set(self.column_names) - set(column_names)))
@@ -1157,14 +1156,13 @@ class Table:
         1  3
         """
         invalid_columns = []
-        all_similar_columns = []
+        similar_columns = []
         for name in column_names:
             if not self._schema.has_column(name):
-                similar_columns = self._get_similar_columns(name)
-                all_similar_columns.append(similar_columns)
+                similar_columns = similar_columns + self._get_similar_columns(name)
                 invalid_columns.append(name)
         if len(invalid_columns) != 0:
-            raise UnknownColumnNameError(invalid_columns, all_similar_columns)
+            raise UnknownColumnNameError(invalid_columns, similar_columns)
 
         transformed_data = self._data.drop(labels=column_names, axis="columns")
         transformed_data.columns = [name for name in self._schema.column_names if name not in column_names]
