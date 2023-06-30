@@ -11,6 +11,10 @@ if TYPE_CHECKING:
 class ColumnType(ABC):
     """Abstract base class for column types."""
 
+    @abstractmethod
+    def __init__(self, is_nullable: bool = False):
+        pass
+
     @staticmethod
     def _from_numpy_data_type(data_type: np.dtype) -> ColumnType:
         """
