@@ -1,5 +1,4 @@
 import pytest
-
 from safeds.data.tabular.containers import Table, TaggedTable
 from safeds.exceptions import UnknownColumnNameError
 
@@ -8,42 +7,84 @@ from safeds.exceptions import UnknownColumnNameError
     ("table", "target_name", "feature_names", "error", "error_msg"),
     [
         (
-            Table({
-                "A": [1, 4],
-                "B": [2, 5],
-                "C": [3, 6],
-                "T": [0, 1],
-            }), "T", ["A", "B", "C", "D", "E"], UnknownColumnNameError, r"Could not find column\(s\) 'D, E'"
-        ),(
-            Table({
-                "A": [1, 4],
-                "B": [2, 5],
-                "C": [3, 6],
-                "T": [0, 1],
-            }), "D", ["A", "B", "C"], UnknownColumnNameError, r"Could not find column\(s\) 'D'"
-        ),(
-            Table({
-                "A": [1, 4],
-                "B": [2, 5],
-                "C": [3, 6],
-                "T": [0, 1],
-            }), "A", ["A", "B", "C"], ValueError, r"Column 'A' cannot be both feature and target."
-        ),(
-            Table({
-                "A": [1, 4],
-                "B": [2, 5],
-                "C": [3, 6],
-                "T": [0, 1],
-            }), "A", [], ValueError, r"At least one feature column must be specified."
-        ),(
-            Table({
-                "A": [1, 4],
-            }), "A", None, ValueError, r"At least one feature column must be specified."
+            Table(
+                {
+                    "A": [1, 4],
+                    "B": [2, 5],
+                    "C": [3, 6],
+                    "T": [0, 1],
+                },
+            ),
+            "T",
+            ["A", "B", "C", "D", "E"],
+            UnknownColumnNameError,
+            r"Could not find column\(s\) 'D, E'",
+        ),
+        (
+            Table(
+                {
+                    "A": [1, 4],
+                    "B": [2, 5],
+                    "C": [3, 6],
+                    "T": [0, 1],
+                },
+            ),
+            "D",
+            ["A", "B", "C"],
+            UnknownColumnNameError,
+            r"Could not find column\(s\) 'D'",
+        ),
+        (
+            Table(
+                {
+                    "A": [1, 4],
+                    "B": [2, 5],
+                    "C": [3, 6],
+                    "T": [0, 1],
+                },
+            ),
+            "A",
+            ["A", "B", "C"],
+            ValueError,
+            r"Column 'A' cannot be both feature and target.",
+        ),
+        (
+            Table(
+                {
+                    "A": [1, 4],
+                    "B": [2, 5],
+                    "C": [3, 6],
+                    "T": [0, 1],
+                },
+            ),
+            "A",
+            [],
+            ValueError,
+            r"At least one feature column must be specified.",
+        ),
+        (
+            Table(
+                {
+                    "A": [1, 4],
+                },
+            ),
+            "A",
+            None,
+            ValueError,
+            r"At least one feature column must be specified.",
         ),
     ],
-    ids=["feature_does_not_exist", "target_does_not_exist", "target_and_feature_overlap", "features_are_empty-explicitly", "features_are_empty_implicitly"]
+    ids=[
+        "feature_does_not_exist",
+        "target_does_not_exist",
+        "target_and_feature_overlap",
+        "features_are_empty-explicitly",
+        "features_are_empty_implicitly",
+    ],
 )
-def test_should_raise_error(table: Table, target_name: str, feature_names: list[str] | None, error: type[Exception], error_msg: str) -> None:
+def test_should_raise_error(
+    table: Table, target_name: str, feature_names: list[str] | None, error: type[Exception], error_msg: str,
+) -> None:
     with pytest.raises(error, match=error_msg):
         TaggedTable._from_table(table, target_name=target_name, feature_names=feature_names)
 
@@ -52,15 +93,19 @@ def test_should_raise_error(table: Table, target_name: str, feature_names: list[
     ("table", "target_name", "feature_names"),
     [
         (
-            Table({
-                "A": [1, 4],
-                "B": [2, 5],
-                "C": [3, 6],
-                "T": [0, 1],
-            }), "T", ["A", "B", "C"]
-        )
+            Table(
+                {
+                    "A": [1, 4],
+                    "B": [2, 5],
+                    "C": [3, 6],
+                    "T": [0, 1],
+                },
+            ),
+            "T",
+            ["A", "B", "C"],
+        ),
     ],
-    ids=["create_tagged_table"]
+    ids=["create_tagged_table"],
 )
 def test_should_create_a_tagged_table(table: Table, target_name: str, feature_names: list[str]) -> None:
     tagged_table = TaggedTable._from_table(table, target_name=target_name, feature_names=feature_names)

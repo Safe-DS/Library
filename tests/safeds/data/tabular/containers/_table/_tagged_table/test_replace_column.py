@@ -121,11 +121,13 @@ from tests.helpers import assert_that_tagged_tables_are_equal
             ),
         ),
     ],
-    ids=["replace_feature_column_with_one",
-         "replace_feature_column_with_multiple",
-         "replace_non_feature_column_with_one",
-         "replace_non_feature_column_with_multiple",
-         "replace_target_column"],
+    ids=[
+        "replace_feature_column_with_one",
+        "replace_feature_column_with_multiple",
+        "replace_non_feature_column_with_one",
+        "replace_non_feature_column_with_multiple",
+        "replace_target_column",
+    ],
 )
 def test_should_replace_column(
     original_table: TaggedTable,

@@ -1,6 +1,5 @@
 import pytest
-
-from safeds.data.tabular.containers import TaggedTable, Table
+from safeds.data.tabular.containers import Table, TaggedTable
 from safeds.exceptions import UnknownColumnNameError
 
 
@@ -13,7 +12,11 @@ from safeds.exceptions import UnknownColumnNameError
                 "B": [2, 5],
                 "C": [3, 6],
                 "T": [0, 1],
-            }, "T", ["A", "B", "C", "D", "E"], UnknownColumnNameError, r"Could not find column\(s\) 'D, E'"
+            },
+            "T",
+            ["A", "B", "C", "D", "E"],
+            UnknownColumnNameError,
+            r"Could not find column\(s\) 'D, E'",
         ),
         (
             {
@@ -21,7 +24,11 @@ from safeds.exceptions import UnknownColumnNameError
                 "B": [2, 5],
                 "C": [3, 6],
                 "T": [0, 1],
-            }, "D", ["A", "B", "C"], UnknownColumnNameError, r"Could not find column\(s\) 'D'"
+            },
+            "D",
+            ["A", "B", "C"],
+            UnknownColumnNameError,
+            r"Could not find column\(s\) 'D'",
         ),
         (
             {
@@ -29,7 +36,11 @@ from safeds.exceptions import UnknownColumnNameError
                 "B": [2, 5],
                 "C": [3, 6],
                 "T": [0, 1],
-            }, "A", ["A", "B", "C"], ValueError, r"Column 'A' cannot be both feature and target."
+            },
+            "A",
+            ["A", "B", "C"],
+            ValueError,
+            r"Column 'A' cannot be both feature and target.",
         ),
         (
             {
@@ -37,17 +48,37 @@ from safeds.exceptions import UnknownColumnNameError
                 "B": [2, 5],
                 "C": [3, 6],
                 "T": [0, 1],
-            }, "D", [], ValueError, r"At least one feature column must be specified."
+            },
+            "D",
+            [],
+            ValueError,
+            r"At least one feature column must be specified.",
         ),
         (
             {
                 "A": [1, 4],
-            }, "A", None, ValueError, r"At least one feature column must be specified."
-        )
+            },
+            "A",
+            None,
+            ValueError,
+            r"At least one feature column must be specified.",
+        ),
     ],
-    ids=["feature_does_not_exist", "target_does_not_exist", "target_and_feature_overlap", "features_are_empty-explicitly", "features_are_empty_implicitly"]
+    ids=[
+        "feature_does_not_exist",
+        "target_does_not_exist",
+        "target_and_feature_overlap",
+        "features_are_empty-explicitly",
+        "features_are_empty_implicitly",
+    ],
 )
-def test_should_raise_error(data: dict[str, list[int]], target_name: str, feature_names: list[str] | None, error: type[Exception], error_msg: str) -> None:
+def test_should_raise_error(
+    data: dict[str, list[int]],
+    target_name: str,
+    feature_names: list[str] | None,
+    error: type[Exception],
+    error_msg: str,
+) -> None:
     with pytest.raises(error, match=error_msg):
         TaggedTable(data, target_name=target_name, feature_names=feature_names)
 
@@ -61,10 +92,12 @@ def test_should_raise_error(data: dict[str, list[int]], target_name: str, featur
                 "B": [2, 5],
                 "C": [3, 6],
                 "T": [0, 1],
-            }, "T", ["A", "B", "C"]
-        )
+            },
+            "T",
+            ["A", "B", "C"],
+        ),
     ],
-    ids=["create_tagged_table"]
+    ids=["create_tagged_table"],
 )
 def test_should_create_a_tagged_table(data: dict[str, list[int]], target_name: str, feature_names: list[str]) -> None:
     tagged_table = TaggedTable(data, target_name=target_name, feature_names=feature_names)

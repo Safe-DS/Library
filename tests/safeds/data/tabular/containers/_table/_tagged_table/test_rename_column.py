@@ -15,7 +15,7 @@ from tests.helpers import assert_that_tagged_tables_are_equal
                     "target": [3, 4, 5],
                 },
                 target_name="target",
-                feature_names=["feature_old"]
+                feature_names=["feature_old"],
             ),
             "feature_old",
             "feature_new",
@@ -26,7 +26,7 @@ from tests.helpers import assert_that_tagged_tables_are_equal
                     "target": [3, 4, 5],
                 },
                 target_name="target",
-                feature_names=["feature_new"]
+                feature_names=["feature_new"],
             ),
         ),
         (
@@ -37,7 +37,7 @@ from tests.helpers import assert_that_tagged_tables_are_equal
                     "target_old": [3, 4, 5],
                 },
                 target_name="target_old",
-                feature_names=["feature"]
+                feature_names=["feature"],
             ),
             "target_old",
             "target_new",
@@ -48,7 +48,7 @@ from tests.helpers import assert_that_tagged_tables_are_equal
                     "target_new": [3, 4, 5],
                 },
                 target_name="target_new",
-                feature_names=["feature"]
+                feature_names=["feature"],
             ),
         ),
         (
@@ -59,7 +59,7 @@ from tests.helpers import assert_that_tagged_tables_are_equal
                     "target": [3, 4, 5],
                 },
                 target_name="target",
-                feature_names=["feature"]
+                feature_names=["feature"],
             ),
             "no_feature_old",
             "no_feature_new",
@@ -70,7 +70,7 @@ from tests.helpers import assert_that_tagged_tables_are_equal
                     "target": [3, 4, 5],
                 },
                 target_name="target",
-                feature_names=["feature"]
+                feature_names=["feature"],
             ),
         ),
     ],
