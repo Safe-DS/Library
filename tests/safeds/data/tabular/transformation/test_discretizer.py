@@ -1,8 +1,7 @@
 import pytest
 from safeds.data.tabular.containers import Table
 from safeds.data.tabular.transformation import Discretizer
-from safeds.exceptions import TransformerNotFittedError, UnknownColumnNameError
-from safeds.exceptions import NonNumericColumnError
+from safeds.exceptions import NonNumericColumnError, TransformerNotFittedError, UnknownColumnNameError
 
 
 class TestInit:
