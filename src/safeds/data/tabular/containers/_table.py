@@ -1857,8 +1857,10 @@ class Table:
             similar_columns_x = self._get_similar_columns(x_column_name)
             similar_columns_y = self._get_similar_columns(y_column_name)
             raise UnknownColumnNameError(
-                ([x_column_name], similar_columns_x if not self.has_column(x_column_name) else [])
-                + ([y_column_name], similar_columns_y if not self.has_column(y_column_name) else []),
+                ([x_column_name] if not self.has_column(x_column_name) else [])
+                + ([y_column_name] if not self.has_column(y_column_name) else []),
+                (similar_columns_x if not self.has_column(x_column_name) else [])
+                + (similar_columns_y if not self.has_column(y_column_name) else [])
             )
 
         fig = plt.figure()
@@ -1913,8 +1915,10 @@ class Table:
             similar_columns_x = self._get_similar_columns(x_column_name)
             similar_columns_y = self._get_similar_columns(y_column_name)
             raise UnknownColumnNameError(
-                ([x_column_name], similar_columns_x if not self.has_column(x_column_name) else [])
-                + ([y_column_name], similar_columns_y if not self.has_column(y_column_name) else []),
+                ([x_column_name] if not self.has_column(x_column_name) else [])
+                + ([y_column_name] if not self.has_column(y_column_name) else []),
+                (similar_columns_x if not self.has_column(x_column_name) else [])
+                + (similar_columns_y if not self.has_column(y_column_name) else [])
             )
 
         fig = plt.figure()

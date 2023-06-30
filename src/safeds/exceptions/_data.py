@@ -17,10 +17,7 @@ class UnknownColumnNameError(KeyError):
     """
 
     def __init__(self, column_names: list[str], similar_columns: list[str] | None = None):
-        if similar_columns.__sizeof__() == 0 or similar_columns is None:
-            super().__init__(f"Could not find column(s) '{', '.join(list(column_names))}'.")
-        else:
-            super().__init__(f"Could not find column(s) '{', '.join(list(column_names))}'. \nDid you mean one of these? '{', '.join(list(similar_columns))}'")
+        super().__init__(f"Could not find column(s) '{', '.join(column_names)}'. \nDo you mean '{similar_columns}")
 
 
 class NonNumericColumnError(Exception):
