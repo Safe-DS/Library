@@ -142,7 +142,6 @@ class TestFitAndTransform:
                 ),
             ),
         ],
-        ids=["one_column", "two_columns"],
     )
     def test_should_return_transformed_table(
         self,
