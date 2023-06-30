@@ -1,3 +1,38 @@
+## [0.14.0](https://github.com/Safe-DS/Stdlib/compare/v0.13.0...v0.14.0) (2023-06-30)
+
+
+### Features
+
+* 290 properties for width-height of image ([#359](https://github.com/Safe-DS/Stdlib/issues/359)) ([d9ebdc1](https://github.com/Safe-DS/Stdlib/commit/d9ebdc1e3deef986026abf5d90c57376dbac23ee)), closes [#290](https://github.com/Safe-DS/Stdlib/issues/290)
+* Add `find_edges` method to `Image` class ([#383](https://github.com/Safe-DS/Stdlib/issues/383)) ([d14b6ce](https://github.com/Safe-DS/Stdlib/commit/d14b6ce281c8b1324f727c45ca13b99b6f9ed2a2)), closes [#288](https://github.com/Safe-DS/Stdlib/issues/288)
+* Add `StandardScaler` transformer ([#316](https://github.com/Safe-DS/Stdlib/issues/316)) ([57b0572](https://github.com/Safe-DS/Stdlib/commit/57b057289ee5c862422df7d85e4fe72047567b7f)), closes [#142](https://github.com/Safe-DS/Stdlib/issues/142)
+* Add docstrings to the getter methods for hyperparameters in Regression and Classification models ([#371](https://github.com/Safe-DS/Stdlib/issues/371)) ([9073f04](https://github.com/Safe-DS/Stdlib/commit/9073f04cd339fc2146ea04339ed14688f29b336f)), closes [#313](https://github.com/Safe-DS/Stdlib/issues/313)
+* Added `Table.group_by` to group a table by a given key ([#343](https://github.com/Safe-DS/Stdlib/issues/343)) ([afb98be](https://github.com/Safe-DS/Stdlib/commit/afb98be2b1d0db0dad2084979537a1e5d449ba07)), closes [#160](https://github.com/Safe-DS/Stdlib/issues/160)
+* Added and improved errors and warnings in the table transformers ([#372](https://github.com/Safe-DS/Stdlib/issues/372)) ([544e307](https://github.com/Safe-DS/Stdlib/commit/544e307af638f8d830171ac34e3edb61da9abc07)), closes [#152](https://github.com/Safe-DS/Stdlib/issues/152)
+* added crop() method in image and tests ([#365](https://github.com/Safe-DS/Stdlib/issues/365)) ([eba8163](https://github.com/Safe-DS/Stdlib/commit/eba8163d649d1e4dcdda2ff4fc3e2229249d8940))
+* added invert_colors method ([#367](https://github.com/Safe-DS/Stdlib/issues/367)) ([1e4d110](https://github.com/Safe-DS/Stdlib/commit/1e4d110da9516fd1f95f2e9d7737ebeef250eb6a))
+* adjust brightness and contrast of image ([#368](https://github.com/Safe-DS/Stdlib/issues/368)) ([1752feb](https://github.com/Safe-DS/Stdlib/commit/1752feb06bb5b0f041310956eca2ee5ed08dd999)), closes [#289](https://github.com/Safe-DS/Stdlib/issues/289) [#291](https://github.com/Safe-DS/Stdlib/issues/291)
+* blur Image method ([#363](https://github.com/Safe-DS/Stdlib/issues/363)) ([c642176](https://github.com/Safe-DS/Stdlib/commit/c6421762c7ec810137713b581f71e0b1a66176c0))
+* check that methods of table can handle an empty table ([#314](https://github.com/Safe-DS/Stdlib/issues/314)) ([686c2e7](https://github.com/Safe-DS/Stdlib/commit/686c2e7728850d9c775135b391551495f6e87451)), closes [#123](https://github.com/Safe-DS/Stdlib/issues/123)
+* convert image to grayscale ([#366](https://github.com/Safe-DS/Stdlib/issues/366)) ([1312fe7](https://github.com/Safe-DS/Stdlib/commit/1312fe76dd3e79506423058b8b771788be8b54a3)), closes [#287](https://github.com/Safe-DS/Stdlib/issues/287)
+* enhance `replace_column` to accept a list of new columns ([#312](https://github.com/Safe-DS/Stdlib/issues/312)) ([d50c5b5](https://github.com/Safe-DS/Stdlib/commit/d50c5b54f3c1ec70eda2fd9bfcc7148fa3e89c6b)), closes [#301](https://github.com/Safe-DS/Stdlib/issues/301)
+* Explicitly throw `UnknownColumnNameError` in `TaggedTable._from_table` ([#334](https://github.com/Safe-DS/Stdlib/issues/334)) ([498999f](https://github.com/Safe-DS/Stdlib/commit/498999f50d9f48609043f87f45ec9383ace3afe1)), closes [#333](https://github.com/Safe-DS/Stdlib/issues/333)
+* flip images / eq method for image ([#360](https://github.com/Safe-DS/Stdlib/issues/360)) ([54f4ae1](https://github.com/Safe-DS/Stdlib/commit/54f4ae183a0d5e6f18386cc255594f8c810c0fdf)), closes [#280](https://github.com/Safe-DS/Stdlib/issues/280)
+* improve `table.summary`. Catch `ValueError` thrown by `column.stability` ([#390](https://github.com/Safe-DS/Stdlib/issues/390)) ([dbbe0e3](https://github.com/Safe-DS/Stdlib/commit/dbbe0e3a6ebd2f22c386c13a3cc53184e531f837)), closes [#320](https://github.com/Safe-DS/Stdlib/issues/320)
+* improve error handling of `column.stability` when given a column that contains only None ([#388](https://github.com/Safe-DS/Stdlib/issues/388)) ([1da2499](https://github.com/Safe-DS/Stdlib/commit/1da24992d02a3cbcea12fef0b78004d99403beb0)), closes [#319](https://github.com/Safe-DS/Stdlib/issues/319)
+* Improve Error Handling of classifiers and regressors ([#355](https://github.com/Safe-DS/Stdlib/issues/355)) ([66f5f64](https://github.com/Safe-DS/Stdlib/commit/66f5f647820b3bf36a6041f04d6e8547170b1c81)), closes [#153](https://github.com/Safe-DS/Stdlib/issues/153)
+* Resize image ([#354](https://github.com/Safe-DS/Stdlib/issues/354)) ([3a971ca](https://github.com/Safe-DS/Stdlib/commit/3a971ca3c88b86d7a780d3f163a2ee86ab35b98c)), closes [#283](https://github.com/Safe-DS/Stdlib/issues/283)
+* rotate_left and rotate_right added to Image ([#361](https://github.com/Safe-DS/Stdlib/issues/361)) ([c877530](https://github.com/Safe-DS/Stdlib/commit/c8775306deffe826cb14d0fe177e0c09aa4204fd)), closes [#281](https://github.com/Safe-DS/Stdlib/issues/281)
+* set kernel of support vector machine ([#350](https://github.com/Safe-DS/Stdlib/issues/350)) ([1326f40](https://github.com/Safe-DS/Stdlib/commit/1326f40a260437a373711c7c65a986bcfa321980)), closes [#172](https://github.com/Safe-DS/Stdlib/issues/172)
+* sharpen image ([#364](https://github.com/Safe-DS/Stdlib/issues/364)) ([3444700](https://github.com/Safe-DS/Stdlib/commit/344470004199dcf6763b1145ce38fdf14e11483a)), closes [#286](https://github.com/Safe-DS/Stdlib/issues/286)
+
+
+### Bug Fixes
+
+* Keeping no columns with Table.keep_only_columns results in an empty Table with a row count above 0 ([#386](https://github.com/Safe-DS/Stdlib/issues/386)) ([15dab06](https://github.com/Safe-DS/Stdlib/commit/15dab06d87a8f8cff7e676b67145eff55824134a)), closes [#318](https://github.com/Safe-DS/Stdlib/issues/318)
+* remove default value of `positive_class` parameter of classifier metrics ([#382](https://github.com/Safe-DS/Stdlib/issues/382)) ([58fc09e](https://github.com/Safe-DS/Stdlib/commit/58fc09eab2db1fb678522a807a8a20ed519627fd))
+* remove default value of `radius` parameter of `blur` ([#378](https://github.com/Safe-DS/Stdlib/issues/378)) ([7f07f29](https://github.com/Safe-DS/Stdlib/commit/7f07f29ad0b426861b929297305e61e0c2d93ebc))
+
 ## [0.13.0](https://github.com/Safe-DS/Stdlib/compare/v0.12.0...v0.13.0) (2023-06-01)
 
 
