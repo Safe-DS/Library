@@ -260,7 +260,6 @@ class TestInverseTransform:
                 },
             ),
         ],
-        ids=["one_column"],
     )
     def test_should_return_original_table(self, table: Table) -> None:
         transformer = RangeScaler().fit(table, None)
