@@ -379,7 +379,8 @@ class TestColorAdjust:
     )
     def test_should_warn(self, image: Image, factor: float) -> None:
         with pytest.warns(
-            UserWarning, match="Color adjustment factor is 1.0, this will not make changes to the image.",
+            UserWarning,
+            match="Color adjustment factor is 1.0, this will not make changes to the image.",
         ):
             adjust = image.adjust_color_balance(factor)
         assert adjust == image
