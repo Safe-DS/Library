@@ -182,6 +182,6 @@ class TaggedTable(Table):
         Returns
         -------
         table : TaggedTable
-            A copy of the tagged table.
+            The copy of this tagged table.
         """
         return copy.deepcopy(self)
