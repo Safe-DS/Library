@@ -32,10 +32,7 @@ class TestFit:
                     },
                 ),
                 NonNumericColumnError,
-                (
-                    "Tried to do a numerical operation on one or multiple non-numerical columns: \ncol2 is of type"
-                    " String."
-                ),
+                "Tried to do a numerical operation on one or multiple non-numerical columns: \ncol2 is of type String.",
             ),
         ],
         ids=["UnknownColumnNameError", "ValueError", "NonNumericColumnError"],
@@ -79,10 +76,7 @@ class TestTransform:
                     },
                 ),
                 NonNumericColumnError,
-                (
-                    "Tried to do a numerical operation on one or multiple non-numerical columns: \ncol1 is of type"
-                    " String."
-                ),
+                "Tried to do a numerical operation on one or multiple non-numerical columns: \ncol1 is of type String.",
             ),
         ],
         ids=["UnknownColumnNameError", "ValueError", "NonNumericColumnError"],
