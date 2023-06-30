@@ -22,13 +22,9 @@ class TestFit:
                     },
                 ),
                 UnknownColumnNameError,
-                r"Could not find column\(s\) 'col2'"
+                r"Could not find column\(s\) 'col2'",
             ),
-            (
-                Table(),
-                ValueError,
-                "The Discretizer cannot be fitted because the table contains 0 rows"
-            ),
+            (Table(), ValueError, "The Discretizer cannot be fitted because the table contains 0 rows"),
             (
                 Table(
                     {
@@ -37,7 +33,7 @@ class TestFit:
                     },
                 ),
                 NonNumericColumnError,
-                f"Tried to do a numerical operation on one or multiple non-numerical columns: \ncol2 is of type String."
+                "Tried to do a numerical operation on one or multiple non-numerical columns: \ncol2 is of type String.",
             ),
         ],
         ids=["UnknownColumnNameError", "ValueError", "NonNumericColumnError"],
@@ -71,13 +67,9 @@ class TestTransform:
                     },
                 ),
                 UnknownColumnNameError,
-                r"Could not find column\(s\) 'col1'"
+                r"Could not find column\(s\) 'col1'",
             ),
-            (
-                Table(),
-                ValueError,
-                "The table cannot be transformed because it contains 0 rows"
-            ),
+            (Table(), ValueError, "The table cannot be transformed because it contains 0 rows"),
             (
                 Table(
                     {
@@ -85,7 +77,7 @@ class TestTransform:
                     },
                 ),
                 NonNumericColumnError,
-                f"Tried to do a numerical operation on one or multiple non-numerical columns: \ncol1 is of type String."
+                "Tried to do a numerical operation on one or multiple non-numerical columns: \ncol1 is of type String.",
             ),
         ],
         ids=["UnknownColumnNameError", "ValueError", "NonNumericColumnError"],
