@@ -52,7 +52,6 @@ class TestFit:
         ids=["UnknownColumnNameError", "multiple missing columns", "ValueError", "NonNumericColumnError"],
     )
     def test_should_raise_errors(self, table: Table, columns: list[str], error: type[Exception], error_message: str) -> None:
-        print(type(error))
         with pytest.raises(error, match=error_message):
             Discretizer().fit(table, columns)
 
