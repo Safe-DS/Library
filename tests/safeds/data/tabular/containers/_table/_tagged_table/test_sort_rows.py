@@ -35,14 +35,14 @@ def test_should_sort_table(
     ("table", "comparator", "table_copy"),
     [
         (
-            TaggedTable({"feature": [3, 2, 1], "target": [0, 0, 0]}, "target"),
+            TaggedTable({"feature": [3, 2, 1], "non_feature": [1, 1, 1], "target": [0, 0, 0]}, "target"),
             lambda row1, row2: row1["feature"] - row2["feature"],
-            TaggedTable({"feature": [3, 2, 1], "target": [0, 0, 0]}, "target"),
+            TaggedTable({"feature": [3, 2, 1], "non_feature": [1, 1, 1], "target": [0, 0, 0]}, "target"),
         ),
         (
-            TaggedTable({"feature": [1, 2, 3], "target": [0, 0, 0]}, "target"),
+            TaggedTable({"feature": [1, 2, 3], "non_feature": [1, 1, 1], "target": [0, 0, 0]}, "target"),
             lambda row1, row2: row1["feature"] - row2["feature"],
-            TaggedTable({"feature": [1, 2, 3], "target": [0, 0, 0]}, "target"),
+            TaggedTable({"feature": [1, 2, 3], "non_feature": [1, 1, 1], "target": [0, 0, 0]}, "target"),
         ),
     ],
     ids=["unsorted", "already_sorted"],
