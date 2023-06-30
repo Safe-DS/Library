@@ -32,6 +32,8 @@ from tests.helpers import assert_that_tagged_tables_are_equal
     ids=["add_columns_as_non_feature"],
 )
 def test_should_add_columns(
-    tagged_table: TaggedTable, columns: list[Column], expected_tagged_table: TaggedTable,
+    tagged_table: TaggedTable,
+    columns: list[Column],
+    expected_tagged_table: TaggedTable,
 ) -> None:
     assert_that_tagged_tables_are_equal(tagged_table.add_columns(columns), expected_tagged_table)

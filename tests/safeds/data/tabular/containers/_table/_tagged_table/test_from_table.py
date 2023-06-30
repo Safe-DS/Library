@@ -83,7 +83,11 @@ from safeds.exceptions import UnknownColumnNameError
     ],
 )
 def test_should_raise_error(
-    table: Table, target_name: str, feature_names: list[str] | None, error: type[Exception], error_msg: str,
+    table: Table,
+    target_name: str,
+    feature_names: list[str] | None,
+    error: type[Exception],
+    error_msg: str,
 ) -> None:
     with pytest.raises(error, match=error_msg):
         TaggedTable._from_table(table, target_name=target_name, feature_names=feature_names)
