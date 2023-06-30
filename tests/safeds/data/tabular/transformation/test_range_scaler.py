@@ -142,7 +142,7 @@ class TestFitAndTransform:
                 ),
             ),
         ],
-        ids=["one_column", "two_columns"]
+        ids=["one_column", "two_columns"],
     )
     def test_should_return_transformed_table(
         self,
@@ -184,7 +184,7 @@ class TestFitAndTransform:
                 ),
             ),
         ],
-        ids=["one_column", "two_columns"]
+        ids=["one_column", "two_columns"],
     )
     def test_should_return_transformed_table_with_correct_range(
         self,
@@ -260,7 +260,7 @@ class TestInverseTransform:
                 },
             ),
         ],
-        ids=["one_column"]
+        ids=["one_column"],
     )
     def test_should_return_original_table(self, table: Table) -> None:
         transformer = RangeScaler().fit(table, None)
