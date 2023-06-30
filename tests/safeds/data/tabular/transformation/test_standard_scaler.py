@@ -225,7 +225,7 @@ class TestInverseTransform:
                 },
             ),
         ],
-        ids=["one column"],
+        ids=["one_column"],
     )
     def test_should_return_original_table(self, table: Table) -> None:
         transformer = StandardScaler().fit(table, None)
