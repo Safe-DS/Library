@@ -53,7 +53,7 @@ class Discretizer(TableTransformer):
         ValueError
             If the table is empty.
         NonNumericColumnError
-            If one of the columns, that should be fitted is not numeric.
+            If one of the columns, that should be fitted is non-numeric.
         UnknownColumnNameError
             If one of the columns, that should be fitted is not in the table.
         """
@@ -103,8 +103,10 @@ class Discretizer(TableTransformer):
             If the transformer has not been fitted yet.
         ValueError
             If the table is empty.
+        UnknownColumnNameError
+            If one of the columns, that should be transformed is not in the table.
         NonNumericColumnError
-            If one of the columns, that should be fitted is not numeric.
+            If one of the columns, that should be fitted is non-numeric.
         """
         # Transformer has not been fitted yet
         if self._wrapped_transformer is None or self._column_names is None:

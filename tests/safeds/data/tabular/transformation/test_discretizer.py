@@ -12,7 +12,7 @@ class TestInit:
 
 class TestFit:
     @pytest.mark.parametrize(
-        ("table", "error", "error_message"),
+        ("table", "columns", "error", "error_message"),
         [
             (
                 Table(
@@ -20,10 +20,23 @@ class TestFit:
                         "col1": [0.0, 5.0, 5.0, 10.0],
                     },
                 ),
+                ["col2"],
                 UnknownColumnNameError,
                 r"Could not find column\(s\) 'col2'",
             ),
-            (Table(), ValueError, "The Discretizer cannot be fitted because the table contains 0 rows"),
+            (
+                Table(
+                    {
+                        "col1": [0.0, 5.0, 5.0, 10.0],
+                        "col2": [0.0, 5.0, 5.0, 10.0],
+                        "col3": [0.0, 5.0, 5.0, 10.0],
+                    },
+                ),
+                ["col4", "col5"],
+                UnknownColumnNameError,
+                r"Could not find column\(s\) 'col5', 'col4",
+            ),
+            (Table(), ValueError, ["col2"], "The Discretizer cannot be fitted because the table contains 0 rows"),
             (
                 Table(
                     {
@@ -31,15 +44,16 @@ class TestFit:
                         "col2": ["a", "b", "c", "d"],
                     },
                 ),
+                ["col2"],
                 NonNumericColumnError,
                 "Tried to do a numerical operation on one or multiple non-numerical columns: \ncol2 is of type String.",
             ),
         ],
-        ids=["UnknownColumnNameError", "ValueError", "NonNumericColumnError"],
+        ids=["UnknownColumnNameError", "multiple missing columns", "ValueError", "NonNumericColumnError"],
     )
-    def test_should_raise_errors(self, table: Table, error: type[Exception], error_message: str) -> None:
+    def test_should_raise_errors(self, table: Table, columns: list[str], error: type[Exception], error_message: str) -> None:
         with pytest.raises(error, match=error_message):
-            Discretizer().fit(table, ["col2"])
+            Discretizer().fit(table, columns)
 
     def test_should_not_change_original_transformer(self) -> None:
         table = Table(
