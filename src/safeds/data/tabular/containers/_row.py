@@ -263,7 +263,7 @@ class Row(Mapping[str, Any]):
         >>> repr(row)
         "Row({'a': 1})"
         """
-        return f"Row({str(self)})"
+        return f"Row({self!s})"
 
     def __str__(self) -> str:
         """
