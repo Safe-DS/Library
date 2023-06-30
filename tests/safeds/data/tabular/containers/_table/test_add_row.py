@@ -22,7 +22,7 @@ from safeds.exceptions import UnknownColumnNameError, SchemaMismatchError
         ),
         (
             Table({"col1": [1, 2, 1], "col2": [1, 2, 4]}),
-            Table.from_rows([Row({"col1": "5", "col2": None}), Row({"col1": "5", "col2": 2})]).get_row(0),
+            Row({"col1": "5", "col2": None}),
             Table({"col1": [1, 2, 1, "5"], "col2": [1, 2, 4, None]}),
             Schema({"col1": Anything(), "col2": Integer(is_nullable=True)}),
         ),
@@ -30,17 +30,22 @@ from safeds.exceptions import UnknownColumnNameError, SchemaMismatchError
             Table({"col1": [1, 2, 1], "col2": [1, 2, 4]}),
             Row({"col1": 5, "col2": 6}),
             Table({"col1": [1, 2, 1, 5], "col2": [1, 2, 4, 6]}),
+            Schema({"col1": Integer(), "col2": Integer()})
         ),
-        (Table({"col2": [], "col4": []}), Row({"col2": 5, "col4": 6}), Table({"col2": [5], "col4": [6]})),
-        (Table(), Row({"col2": 5, "col4": 6}), Table({"col2": [5], "col4": [6]})),
+        (
+            Table({"col1": [], "col2": []}),
+            Row({"col1": 5, "col2": 6}),
+            Table({"col1": [5], "col2": [6]}),
+            Schema({"col1": Integer(), "col2": Integer()})
+        )
     ],
     ids=["added row", "different schemas", "different schemas and nullable", "add row to rowless table", "add row to empty table"],
 )
 def test_should_add_row(table: Table, row: Row, expected: Table, expected_schema: Schema) -> None:
-    table = table.add_row(row)
-    assert table.number_of_rows == 4
-    assert table.schema == expected_schema
-    assert table == expected
+    result = table.add_row(row)
+    assert result.number_of_rows - 1 == table.number_of_rows
+    assert result.schema == expected_schema
+    assert result == expected
 
 
 @pytest.mark.parametrize(
@@ -57,8 +62,3 @@ def test_should_add_row(table: Table, row: Row, expected: Table, expected_schema
 def test_should_raise_error_if_row_column_names_invalid(table: Table, row: Row, expected_error_msg: str) -> None:
     with raises(UnknownColumnNameError, match=expected_error_msg):
         table.add_row(row)
-
-
-def test_should_raise_schema_mismatch() -> None:
-    with raises(SchemaMismatchError, match=r"Failed because at least two schemas didn't match."):
-        Table({"a": [], "b": []}).add_row(Row({"beer": None, "rips": None}))

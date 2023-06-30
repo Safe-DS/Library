@@ -923,15 +923,12 @@ class Table:
         0  1  2
         1  3  4
         """
-        if self.number_of_columns == 0:
-            return Table.from_rows([row])
+        int_columns = []
+        result = self.remove_columns([])  # clone
 
         if len(set(self.column_names) - set(row.column_names)) > 0:
             raise UnknownColumnNameError(list(set(self.column_names) - set(row.column_names)))
 
-        row = row.sort_columns(lambda col1, col2: self.column_names.index(col2[0]) - self.column_names.index(col1[0]))
-        int_columns = []
-        result = self.remove_columns([])  # clone
         if result.number_of_rows == 0:
             int_columns = list(filter(lambda name: isinstance(row[name], int | np.int64), row.column_names))
             if result.number_of_columns == 0:
@@ -939,22 +936,17 @@ class Table:
                     result._data[column] = Column(column, [])
                 result._schema = Schema._from_pandas_dataframe(result._data)
             elif result.column_names != row.column_names:
-                raise SchemaMismatchError
-        elif result._schema != row.schema:
-            raise SchemaMismatchError
+                raise UnknownColumnNameError
 
         new_df = pd.concat([result._data, row._data]).infer_objects()
         new_df.columns = result.column_names
         result = Table._from_pandas_dataframe(new_df)
 
-        new_df = pd.concat([self._data, row._data]).infer_objects()
-        new_df.columns = self.column_names
-
-        schema = Schema.merge_multiple_schemas([self.schema, row.schema])
-
-        return Table._from_pandas_dataframe(new_df, schema)
         for column in int_columns:
             result = result.replace_column(column, [result.get_column(column).transform(lambda it: int(it))])
+
+        schema = Schema.merge_multiple_schemas([result.schema, row.schema])
+        result._schema = schema
 
         return result
 
@@ -994,9 +986,8 @@ class Table:
         """
         if isinstance(rows, Table):
             rows = rows.to_rows()
-
-        if self.number_of_columns == 0:
-            return Table.from_rows(rows)
+        int_columns = []
+        result = self.remove_columns([])  # clone
 
         missing_col_names = set()
         for row in rows:
@@ -1004,42 +995,24 @@ class Table:
         if len(missing_col_names) > 0:
             raise UnknownColumnNameError(list(missing_col_names))
 
-        sorted_rows = []
-        int_columns = []
-        result = self.remove_columns([])  # clone
         for row in rows:
-            sorted_rows.append(
-                row.sort_columns(
-                    lambda col1, col2: self.column_names.index(col2[0]) - self.column_names.index(col1[0]),
-                ),
-            )
-        rows = sorted_rows
             if result.number_of_rows == 0:
                 int_columns = list(filter(lambda name: isinstance(row[name], int | np.int64), row.column_names))
                 if result.number_of_columns == 0:
                     for column in row.column_names:
                         result._data[column] = Column(column, [])
                     result._schema = Schema._from_pandas_dataframe(result._data)
-                elif result.column_names != row.column_names:
-                    raise SchemaMismatchError
-            elif result._schema != row.schema:
-                raise SchemaMismatchError
 
-        result = self._data
         row_frames = (row._data for row in rows)
 
-        result = pd.concat([result, *row_frames]).infer_objects()
-        result.columns = self.column_names
-
-        schema = Schema.merge_multiple_schemas([self.schema, *[row.schema for row in rows]])
-
-        return Table._from_pandas_dataframe(result, schema)
         new_df = pd.concat([result._data, *row_frames]).infer_objects()
         new_df.columns = result.column_names
         result = Table._from_pandas_dataframe(new_df)
 
         for column in int_columns:
             result = result.replace_column(column, [result.get_column(column).transform(lambda it: int(it))])
+
+        result._schema = Schema.merge_multiple_schemas([self.schema, *[row.schema for row in rows]])
 
         return result
 
@@ -1515,7 +1488,7 @@ class Table:
     def sort_columns(
         self,
         comparator: Callable[[Column, Column], int] = lambda col1, col2: (col1.name > col2.name)
-        - (col1.name < col2.name),
+                                                                         - (col1.name < col2.name),
     ) -> Table:
         """
         Sort the columns of a `Table` with the given comparator and return a new `Table`.
