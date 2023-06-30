@@ -246,7 +246,7 @@ class TaggedTable(Table):
             The table as an untagged Table, i.e. without the information about which columns are features or target.
 
         """
-        return self.features.add_column(self.target)
+        return Table.from_columns(super().to_columns())
 
     def add_column(self, column: Column) -> TaggedTable:
         """

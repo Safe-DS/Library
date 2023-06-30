@@ -9,16 +9,15 @@ from tests.helpers import assert_that_tagged_tables_are_equal
 @pytest.mark.parametrize(
     ("table", "comparator", "expected"),
     [
-        # TODO: Check that it works with an empty table
         (
-            TaggedTable({"feature": [3, 2, 1], "target": [0, 0, 0]}, "target"),
+            TaggedTable({"feature": [3, 2, 1], "non_feature": [1, 1, 1], "target": [0, 0, 0]}, "target"),
             lambda row1, row2: row1["feature"] - row2["feature"],
-            TaggedTable({"feature": [1, 2, 3], "target": [0, 0, 0]}, "target"),
+            TaggedTable({"feature": [1, 2, 3], "non_feature": [1, 1, 1], "target": [0, 0, 0]}, "target"),
         ),
         (
-            TaggedTable({"feature": [1, 2, 3], "target": [0, 0, 0]}, "target"),
+            TaggedTable({"feature": [1, 2, 3], "non_feature": [1, 1, 1], "target": [0, 0, 0]}, "target"),
             lambda row1, row2: row1["feature"] - row2["feature"],
-            TaggedTable({"feature": [1, 2, 3], "target": [0, 0, 0]}, "target"),
+            TaggedTable({"feature": [1, 2, 3], "non_feature": [1, 1, 1], "target": [0, 0, 0]}, "target"),
         ),
     ],
     ids=["unsorted", "already_sorted"],
@@ -35,16 +34,15 @@ def test_should_sort_table(
 @pytest.mark.parametrize(
     ("table", "comparator", "table_copy"),
     [
-        # TODO: Check that it works with an empty table
         (
-            TaggedTable({"feature": [3, 2, 1], "target": [0, 0, 0]}, "target"),
+            TaggedTable({"feature": [3, 2, 1], "non_feature": [1, 1, 1], "target": [0, 0, 0]}, "target"),
             lambda row1, row2: row1["feature"] - row2["feature"],
-            TaggedTable({"feature": [3, 2, 1], "target": [0, 0, 0]}, "target"),
+            TaggedTable({"feature": [3, 2, 1], "non_feature": [1, 1, 1], "target": [0, 0, 0]}, "target"),
         ),
         (
-            TaggedTable({"feature": [1, 2, 3], "target": [0, 0, 0]}, "target"),
+            TaggedTable({"feature": [1, 2, 3], "non_feature": [1, 1, 1], "target": [0, 0, 0]}, "target"),
             lambda row1, row2: row1["feature"] - row2["feature"],
-            TaggedTable({"feature": [1, 2, 3], "target": [0, 0, 0]}, "target"),
+            TaggedTable({"feature": [1, 2, 3], "non_feature": [1, 1, 1], "target": [0, 0, 0]}, "target"),
         ),
     ],
     ids=["unsorted", "already_sorted"],
