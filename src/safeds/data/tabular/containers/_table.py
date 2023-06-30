@@ -525,7 +525,7 @@ class Table:
 
         return Row._from_pandas_dataframe(self._data.iloc[[index]], self._schema)
 
-    def get_similar_columns(self, column_name: str) -> bool:
+    def _get_similar_columns(self, column_name: str) -> list[str]:
         """
         Give a warning with similar columns to the given one that's not in the table.
 
@@ -544,15 +544,7 @@ class Table:
             if Levenshtein.jaro_winkler(column, column_name) >= 0.7:
                 similar_columns.append(column)
 
-        if len(similar_columns) > 0:
-            warnings.warn(
-                f"The Column {column_name} is unknown.\n Did you mean one of these: {similar_columns}?",
-                UserWarning,
-                stacklevel=2,
-            )
-            return True
-        else:
-            return False
+        return similar_columns
 
     # ------------------------------------------------------------------------------------------------------------------
     # Information
