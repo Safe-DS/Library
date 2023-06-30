@@ -117,8 +117,7 @@ class Discretizer(TableTransformer):
         # Input table does not contain all columns used to fit the transformer
         missing_columns = set(self._column_names) - set(table.column_names)
         if len(missing_columns) > 0:
-            raise UnknownColumnNameError(sorted(set(missing_columns).intersection(set(table.column_names)),
-                key={val: ix for ix, val in enumerate(missing_columns)}.__getitem__,))
+            raise UnknownColumnNameError(sorted(missing_columns))
 
         for column in self._column_names:
             if not table.get_column(column).type.is_numeric():
