@@ -143,10 +143,11 @@ class TaggedTable(Table):
         >>> table = TaggedTable({"a": [1, 2, 3], "b": [4, 5, 6]}, "b", ["a"])
         """
         super().__init__(data)
+        _data = Table(data)
 
         # If no feature names are specified, use all columns except the target column
         if feature_names is None:
-            feature_names = self.column_names
+            feature_names = _data.column_names
             if target_name in feature_names:
                 feature_names.remove(target_name)
 
@@ -156,8 +157,8 @@ class TaggedTable(Table):
         if len(feature_names) == 0:
             raise ValueError("At least one feature column must be specified.")
 
-        self._features: Table = super().keep_only_columns(feature_names)
-        self._target: Column = super().get_column(target_name)
+        self._features: Table = _data.keep_only_columns(feature_names)
+        self._target: Column = _data.get_column(target_name)
 
     # ------------------------------------------------------------------------------------------------------------------
     # Properties
