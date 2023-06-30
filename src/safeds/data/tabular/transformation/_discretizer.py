@@ -63,13 +63,14 @@ class Discretizer(TableTransformer):
         if column_names is None:
             column_names = table.column_names
         else:
+            missing_columns = set(column_names) - set(table.column_names)
+            if len(missing_columns) > 0:
+                raise UnknownColumnNameError(list(missing_columns))
+
             for column in column_names:
                 if not table.get_column(column).type.is_numeric():
                     raise NonNumericColumnError(f"{column} is of type {table.get_column(column).type}.")
 
-            missing_columns = set(column_names) - set(table.column_names)
-            if len(missing_columns) > 0:
-                raise UnknownColumnNameError(list(missing_columns))
 
         wrapped_transformer = sk_KBinsDiscretizer(n_bins=self._number_of_bins, encode="ordinal")
         wrapped_transformer.fit(table._data[column_names])
@@ -112,14 +113,15 @@ class Discretizer(TableTransformer):
         if table.number_of_rows == 0:
             raise ValueError("The table cannot be transformed because it contains 0 rows")
 
-        for column in self._column_names:
-            if not table.get_column(column).type.is_numeric():
-                raise NonNumericColumnError(f"{column} is of type {table.get_column(column).type}.")
-
         # Input table does not contain all columns used to fit the transformer
         missing_columns = set(self._column_names) - set(table.column_names)
         if len(missing_columns) > 0:
             raise UnknownColumnNameError(list(missing_columns))
+
+        for column in self._column_names:
+            if not table.get_column(column).type.is_numeric():
+                raise NonNumericColumnError(f"{column} is of type {table.get_column(column).type}.")
+
 
         data = table._data.copy()
         data.columns = table.column_names
