@@ -34,9 +34,9 @@ class TestFit:
                 ),
                 ["col4", "col5"],
                 UnknownColumnNameError,
-                r"Could not find column\(s\) 'col5', 'col4",
+                r"Could not find column\(s\) 'col4, col5'",
             ),
-            (Table(), ValueError, ["col2"], "The Discretizer cannot be fitted because the table contains 0 rows"),
+            (Table(), ["col2"], ValueError, "The Discretizer cannot be fitted because the table contains 0 rows"),
             (
                 Table(
                     {
@@ -52,6 +52,7 @@ class TestFit:
         ids=["UnknownColumnNameError", "multiple missing columns", "ValueError", "NonNumericColumnError"],
     )
     def test_should_raise_errors(self, table: Table, columns: list[str], error: type[Exception], error_message: str) -> None:
+        print(type(error))
         with pytest.raises(error, match=error_message):
             Discretizer().fit(table, columns)
 
@@ -71,7 +72,7 @@ class TestFit:
 
 class TestTransform:
     @pytest.mark.parametrize(
-        ("table_to_transform", "error", "error_message"),
+        ("table_to_transform", "columns", "error", "error_message"),
         [
             (
                 Table(
@@ -79,30 +80,43 @@ class TestTransform:
                         "col2": ["a", "b", "c"],
                     },
                 ),
+                ["col1"],
                 UnknownColumnNameError,
                 r"Could not find column\(s\) 'col1'",
             ),
-            (Table(), ValueError, "The table cannot be transformed because it contains 0 rows"),
+            (
+                Table(
+                    {
+                        "col2": ["a", "b", "c"],
+                    },
+                ),
+                ["col1", "col3"],
+                UnknownColumnNameError,
+                r"Could not find column\(s\) 'col1, col3'",
+            ),
+            (Table(), ["col1", "col3"], ValueError, "The table cannot be transformed because it contains 0 rows"),
             (
                 Table(
                     {
                         "col1": ["a", "b", "c", "d"],
                     },
                 ),
+                ["col1"],
                 NonNumericColumnError,
                 "Tried to do a numerical operation on one or multiple non-numerical columns: \ncol1 is of type String.",
             ),
         ],
-        ids=["UnknownColumnNameError", "ValueError", "NonNumericColumnError"],
+        ids=["UnknownColumnNameError", "multiple missing columns", "ValueError", "NonNumericColumnError"],
     )
-    def test_should_raise_errors(self, table_to_transform: Table, error: type[Exception], error_message: str) -> None:
+    def test_should_raise_errors(self, table_to_transform: Table, columns: list[str], error: type[Exception], error_message: str) -> None:
         table_to_fit = Table(
             {
                 "col1": [0.0, 5.0, 10.0],
+                "col3": [0.0, 5.0, 10.0],
             },
         )
 
-        transformer = Discretizer().fit(table_to_fit, None)
+        transformer = Discretizer().fit(table_to_fit, columns)
 
         with pytest.raises(error, match=error_message):
             transformer.transform(table_to_transform)
