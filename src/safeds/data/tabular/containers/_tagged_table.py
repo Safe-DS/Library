@@ -177,7 +177,7 @@ class TaggedTable(Table):
 
     def _copy(self) -> TaggedTable:
         """
-        Return a copy of the tagged table.
+        Return a copy of this tagged table.
 
         Returns
         -------
