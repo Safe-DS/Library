@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import copy
 import functools
 import io
 import warnings
@@ -55,6 +56,8 @@ class Table:
     | [from_columns][safeds.data.tabular.containers._table.Table.from_columns]     | Create a table from a list of columns. |
     | [from_rows][safeds.data.tabular.containers._table.Table.from_rows]           | Create a table from a list of rows.    |
 
+    Note: When removing the last column of the table, the `number_of_columns` property will be set to 0.
+
     Parameters
     ----------
     data : Mapping[str, Sequence[Any]] | None
@@ -96,6 +99,14 @@ class Table:
             If the specified file does not exist.
         WrongFileExtensionError
             If the file is not a csv file.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table
+        >>> Table.from_csv_file('./src/resources/from_csv_file.csv')
+           a  b  c
+        0  1  2  1
+        1  0  0  7
         """
         path = Path(path)
         if path.suffix != ".csv":
@@ -132,6 +143,15 @@ class Table:
             If the specified file does not exist.
         WrongFileExtensionError
             If the file is not an Excel file.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table
+        >>> Table.from_excel_file('./src/resources/from_excel_file.xlsx')
+           a  b
+        0  1  4
+        1  2  5
+        2  3  6
         """
         path = Path(path)
         excel_extensions = [".xls", ".xlsx", ".xlsm", ".xlsb", ".odf", ".ods", ".odt"]
@@ -165,6 +185,15 @@ class Table:
             If the specified file does not exist.
         WrongFileExtensionError
             If the file is not a JSON file.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table
+        >>> Table.from_json_file('./src/resources/from_json_file.json')
+           a  b
+        0  1  4
+        1  2  5
+        2  3  6
         """
         path = Path(path)
         if path.suffix != ".json":
@@ -197,6 +226,15 @@ class Table:
         ------
         ColumnLengthMismatchError
             If columns have different lengths.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table
+        >>> d = {'a': [1, 2], 'b': [3, 4]}
+        >>> Table.from_dict(d)
+           a  b
+        0  1  3
+        1  2  4
         """
         return Table(data)
 
@@ -221,6 +259,17 @@ class Table:
             If any of the column sizes does not match with the others.
         DuplicateColumnNameError
             If multiple columns have the same name.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column, Table
+        >>> col1 = Column("a", [1, 2, 3])
+        >>> col2 = Column("b", [4, 5, 6])
+        >>> Table.from_columns([col1, col2])
+           a  b
+        0  1  4
+        1  2  5
+        2  3  6
         """
         dataframe: DataFrame = pd.DataFrame()
         column_names = []
@@ -256,6 +305,16 @@ class Table:
         ------
         SchemaMismatchError
             If any of the row schemas does not match with the others.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Row, Table
+        >>> row1 = Row({"a": 1, "b": 2})
+        >>> row2 = Row({"a": 3, "b": 4})
+        >>> Table.from_rows([row1, row2])
+           a  b
+        0  1  2
+        1  3  4
         """
         if len(rows) == 0:
             return Table._from_pandas_dataframe(pd.DataFrame())
@@ -293,7 +352,9 @@ class Table:
         --------
         >>> import pandas as pd
         >>> from safeds.data.tabular.containers import Table
-        >>> table = Table._from_pandas_dataframe(pd.DataFrame({"a": [1], "b": [2]}))
+        >>> Table._from_pandas_dataframe(pd.DataFrame({"a": [1], "b": [2]}))
+           a  b
+        0  1  2
         """
         data = data.reset_index(drop=True)
 
@@ -331,7 +392,11 @@ class Table:
         Examples
         --------
         >>> from safeds.data.tabular.containers import Table
-        >>> table = Table({"a": [1, 2, 3], "b": [4, 5, 6]})
+        >>> Table({"a": [1, 2, 3], "b": [4, 5, 6]})
+           a  b
+        0  1  4
+        1  2  5
+        2  3  6
         """
         if data is None:
             data = {}
@@ -352,12 +417,33 @@ class Table:
         self._schema: Schema = Schema._from_pandas_dataframe(self._data)
 
     def __eq__(self, other: Any) -> bool:
+        """
+        Compare two table instances.
+
+        Returns
+        -------
+        'True' if contents are equal, 'False' otherwise
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Row, Table
+        >>> row1 = Row({"a": 1, "b": 2})
+        >>> row2 = Row({"a": 3, "b": 4})
+        >>> row3 = Row({"a": 5, "b": 6})
+        >>> table1 = Table.from_rows([row1, row2])
+        >>> table2 = Table.from_rows([row1, row2])
+        >>> table3 = Table.from_rows([row1, row3])
+        >>> table1 == table2
+        True
+        >>> table1 == table3
+        False
+        """
         if not isinstance(other, Table):
             return NotImplemented
         if self is other:
             return True
-        if self.number_of_rows == 0 and other.number_of_rows == 0:
-            return self.column_names == other.column_names
+        if self.number_of_columns == 0 and other.number_of_columns == 0:
+            return True
         table1 = self.sort_columns()
         table2 = other.sort_columns()
         if table1.number_of_rows == 0 and table2.number_of_rows == 0:
@@ -365,6 +451,20 @@ class Table:
         return table1._schema == table2._schema and table1._data.equals(table2._data)
 
     def __repr__(self) -> str:
+        r"""
+        Display the table in only one line.
+
+        Returns
+        -------
+        A string representation of the table in only one line.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table
+        >>> table = Table.from_dict({"a": [1, 3], "b": [2, 4]})
+        >>> repr(table)
+        '   a  b\n0  1  2\n1  3  4'
+        """
         tmp = self._data.copy(deep=True)
         tmp.columns = self.column_names
         return tmp.__repr__()
@@ -389,6 +489,13 @@ class Table:
         -------
         column_names : list[str]
             The list of the column names.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table
+        >>> table = Table.from_dict({"col1": [1, 3], "col2": [2, 4]})
+        >>> table.column_names
+        ['col1', 'col2']
         """
         return self._schema.column_names
 
@@ -401,6 +508,13 @@ class Table:
         -------
         number_of_columns : int
             The number of columns.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table
+        >>> table = Table.from_dict({"a": [1], "b": [2]})
+        >>> table.number_of_columns
+        2
         """
         return self._data.shape[1]
 
@@ -413,6 +527,13 @@ class Table:
         -------
         number_of_rows : int
             The number of rows.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table
+        >>> table = Table.from_dict({"a": [1], "b": [2]})
+        >>> table.number_of_rows
+        1
         """
         return self._data.shape[0]
 
@@ -425,6 +546,20 @@ class Table:
         -------
         schema : Schema
             The schema.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Row, Table
+        >>> row = Row({"a": 1, "b": 2.5, "c": "ff"})
+        >>> table = Table.from_dict({"a": [1, 8], "b": [2.5, 9], "c": ["g", "g"]})
+        >>> table.schema
+        Schema({
+            'a': Integer,
+            'b': RealNumber,
+            'c': String
+        })
+        >>> table.schema == row.schema
+        True
         """
         return self._schema
 
@@ -450,6 +585,13 @@ class Table:
         ------
         UnknownColumnNameError
             If the specified target column name does not exist.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table
+        >>> table = Table.from_dict({"a": [1], "b": [2]})
+        >>> table.get_column("b")
+        Column('b', [2])
         """
         if not self.has_column(column_name):
             self.get_similar_columns(column_name)
@@ -475,6 +617,15 @@ class Table:
         -------
         contains : bool
             True if the column exists.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table
+        >>> table = Table.from_dict({"a": [1], "b": [2]})
+        >>> table.has_column("b")
+        True
+        >>> table.has_column("c")
+        False
         """
         return self._schema.has_column(column_name)
 
@@ -498,6 +649,13 @@ class Table:
         ------
         UnknownColumnNameError
             If the specified target column name does not exist.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table
+        >>> table = Table.from_dict({"a": [1], "b": [2.5]})
+        >>> table.get_column_type("b")
+        RealNumber
         """
         return self._schema.get_column_type(column_name)
 
@@ -519,6 +677,16 @@ class Table:
         ------
         IndexOutOfBoundsError
             If no row at the specified index exists in this table.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table
+        >>> table = Table.from_dict({"a": [1, 3], "b": [2, 4]})
+        >>> table.get_row(0)
+        Row({
+            'a': 1,
+            'b': 2
+        })
         """
         if len(self._data.index) - 1 < index or index < 0:
             raise IndexOutOfBoundsError(index)
@@ -560,6 +728,23 @@ class Table:
         -------
         result : Table
             The table with statistics.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table
+        >>> table = Table.from_dict({"a": [1, 3], "b": [2, 4]})
+        >>> table.summary()
+                      metrics                   a                   b
+        0             maximum                   3                   4
+        1             minimum                   1                   2
+        2                mean                 2.0                 3.0
+        3                mode              [1, 3]              [2, 4]
+        4              median                 2.0                 3.0
+        5                 sum                   4                   6
+        6            variance                 2.0                 2.0
+        7  standard deviation  1.4142135623730951  1.4142135623730951
+        8              idness                 1.0                 1.0
+        9           stability                 0.5                 0.5
         """
         if self.number_of_columns == 0:
             return Table(
@@ -621,7 +806,7 @@ class Table:
             for function in statistics.values():
                 try:
                     values.append(str(function()))
-                except NonNumericColumnError:
+                except (NonNumericColumnError, ValueError):
                     values.append("-")
 
             result = pd.concat([result, pd.DataFrame(values)], axis=1)
@@ -652,6 +837,16 @@ class Table:
             If the new column already exists.
         ColumnSizeError
             If the size of the column does not match the amount of rows.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table
+        >>> table = Table.from_dict({"a": [1, 3], "b": [2, 4]})
+        >>> col = Column("c", ["d", "e"])
+        >>> table.add_column(col)
+           a  b  c
+        0  1  2  d
+        1  3  4  e
         """
         if self.has_column(column.name):
             raise DuplicateColumnNameError(column.name)
@@ -686,6 +881,17 @@ class Table:
             If at least one of the column sizes from the provided column list does not match the table.
         DuplicateColumnNameError
             If at least one column name from the provided column list already exists in the table.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column, Table
+        >>> table = Table.from_dict({"a": [1, 3], "b": [2, 4]})
+        >>> col1 = Column("c", ["d", "e"])
+        >>> col2 = Column("d", [3.5, 7.9])
+        >>> table.add_columns([col1, col2])
+           a  b  c    d
+        0  1  2  d  3.5
+        1  3  4  e  7.9
         """
         if isinstance(columns, Table):
             columns = columns.to_columns()
@@ -722,6 +928,16 @@ class Table:
         ------
         SchemaMismatchError
             If the schema of the row does not match the table schema.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Row, Table
+        >>> table = Table.from_dict({"a": [1], "b": [2]})
+        >>> row = Row.from_dict({"a": 3, "b": 4})
+        >>> table.add_row(row)
+           a  b
+        0  1  2
+        1  3  4
         """
         int_columns = []
         result = self.remove_columns([])  # clone
@@ -764,7 +980,19 @@ class Table:
         Raises
         ------
         SchemaMismatchError
-            If the schema of on of the row does not match the table schema.
+            If the schema of one of the rows does not match the table schema.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Row, Table
+        >>> table = Table.from_dict({"a": [1], "b": [2]})
+        >>> row1 = Row.from_dict({"a": 3, "b": 4})
+        >>> row2 = Row.from_dict({"a": 5, "b": 6})
+        >>> table.add_rows([row1, row2])
+           a  b
+        0  1  2
+        1  3  4
+        2  5  6
         """
         if isinstance(rows, Table):
             rows = rows.to_rows()
@@ -808,6 +1036,14 @@ class Table:
         -------
         table : Table
             A table containing only the rows filtered by the query.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table
+        >>> table = Table.from_dict({"a": [1, 3], "b": [2, 4]})
+        >>> table.filter_rows(lambda x: x["a"] < 2)
+           a  b
+        0  1  2
         """
         rows: list[Row] = [row for row in self.to_rows() if query(row)]
         if len(rows) == 0:
@@ -848,6 +1084,8 @@ class Table:
 
         This table is not modified.
 
+        Note: When removing the last column of the table, the `number_of_columns` property will be set to 0.
+
         Parameters
         ----------
         column_names : list[str]
@@ -862,6 +1100,15 @@ class Table:
         ------
         UnknownColumnNameError
             If any of the given columns does not exist.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table
+        >>> table = Table.from_dict({"a": [1, 3], "b": [2, 4]})
+        >>> table.keep_only_columns(["b"])
+           b
+        0  2
+        1  4
         """
         invalid_columns = []
         for name in column_names:
@@ -871,15 +1118,17 @@ class Table:
         if len(invalid_columns) != 0:
             raise UnknownColumnNameError(invalid_columns)
 
-        transformed_data = self._data[column_names]
-        transformed_data.columns = column_names
-        return Table._from_pandas_dataframe(transformed_data)
+        clone = copy.deepcopy(self)
+        clone = clone.remove_columns(list(set(self.column_names) - set(column_names)))
+        return clone
 
     def remove_columns(self, column_names: list[str]) -> Table:
         """
         Return a table without the given column(s).
 
         This table is not modified.
+
+        Note: When removing the last column of the table, the `number_of_columns` property will be set to 0.
 
         Parameters
         ----------
@@ -895,6 +1144,15 @@ class Table:
         ------
         UnknownColumnNameError
             If any of the given columns does not exist.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table
+        >>> table = Table.from_dict({"a": [1, 3], "b": [2, 4]})
+        >>> table.remove_columns(["b"])
+           a
+        0  1
+        1  3
         """
         invalid_columns = []
         for name in column_names:
@@ -906,6 +1164,10 @@ class Table:
 
         transformed_data = self._data.drop(labels=column_names, axis="columns")
         transformed_data.columns = [name for name in self._schema.column_names if name not in column_names]
+
+        if len(transformed_data.columns) == 0:
+            return Table()
+
         return Table._from_pandas_dataframe(transformed_data)
 
     def remove_columns_with_missing_values(self) -> Table:
@@ -914,10 +1176,21 @@ class Table:
 
         This table is not modified.
 
+        Note: When removing the last column of the table, the `number_of_columns` property will be set to 0.
+
         Returns
         -------
         table : Table
             A table without the columns that contain missing values.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table
+        >>> table = Table.from_dict({"a": [1, 2], "b": [None, 2]})
+        >>> table.remove_columns_with_missing_values()
+           a
+        0  1
+        1  2
         """
         return Table.from_columns([column for column in self.to_columns() if not column.has_missing_values()])
 
@@ -927,11 +1200,21 @@ class Table:
 
         This table is not modified.
 
+        Note: When removing the last column of the table, the `number_of_columns` property will be set to 0.
+
         Returns
         -------
         table : Table
             A table without the columns that contain non-numerical values.
 
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table
+        >>> table = Table.from_dict({"a": [1, 0], "b": ["test", 2]})
+        >>> table.remove_columns_with_non_numerical_values()
+           a
+        0  1
+        1  0
         """
         return Table.from_columns([column for column in self.to_columns() if column.type.is_numeric()])
 
@@ -945,6 +1228,15 @@ class Table:
         -------
         result : Table
             The table with the duplicate rows removed.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table
+        >>> table = Table.from_dict({"a": [1, 3, 3], "b": [2, 4, 4]})
+        >>> table.remove_duplicate_rows()
+           a  b
+        0  1  2
+        1  3  4
         """
         result = self._data.drop_duplicates(ignore_index=True)
         result.columns = self._schema.column_names
@@ -960,6 +1252,14 @@ class Table:
         -------
         table : Table
             A table without the rows that contain missing values.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table
+        >>> table = Table.from_dict({"a": [1.0, None, 3], "b": [2, 4.0, None]})
+        >>> table.remove_rows_with_missing_values()
+             a    b
+        0  1.0  2.0
         """
         result = self._data.copy(deep=True)
         result = result.dropna(axis="index")
@@ -979,6 +1279,28 @@ class Table:
         -------
         new_table : Table
             A new table without rows containing outliers.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column, Table
+        >>> c1 = Column("a", [1, 3, 1, 0.1, 0, 0, 0, 0, 0, 0, 0, 0])
+        >>> c2 = Column("b", [1.5, 1, 0.5, 0.01, 0, 0, 0, 0, 0, 0, 0, 0])
+        >>> c3 = Column("c", [0.1, 0.00, 0.4, 0.2, 0, 0, 0, 0, 0, 0, 0, 0])
+        >>> c4 = Column("d", [-1000000, 1000000, -1000000, -1000000, -1000000, -1000000, -1000000, -1000000, -1000000, -1000000, -1000000, -1000000])
+        >>> table = Table.from_columns([c1, c2, c3, c4])
+        >>> table.remove_rows_with_outliers()
+              a     b    c        d
+        0   1.0  1.50  0.1 -1000000
+        1   1.0  0.50  0.4 -1000000
+        2   0.1  0.01  0.2 -1000000
+        3   0.0  0.00  0.0 -1000000
+        4   0.0  0.00  0.0 -1000000
+        5   0.0  0.00  0.0 -1000000
+        6   0.0  0.00  0.0 -1000000
+        7   0.0  0.00  0.0 -1000000
+        8   0.0  0.00  0.0 -1000000
+        9   0.0  0.00  0.0 -1000000
+        10  0.0  0.00  0.0 -1000000
         """
         copy = self._data.copy(deep=True)
 
@@ -1012,6 +1334,14 @@ class Table:
             If the specified old target column name does not exist.
         DuplicateColumnNameError
             If the specified new target column name already exists.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table
+        >>> table = Table.from_dict({"a": [1], "b": [2]})
+        >>> table.rename_column("b", "c")
+           a  c
+        0  1  2
         """
         if old_name not in self._schema.column_names:
             self.get_similar_columns(old_name)
@@ -1054,6 +1384,15 @@ class Table:
 
         ColumnSizeError
             If the size of at least one of the new columns does not match the amount of rows.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column, Table
+        >>> table = Table.from_dict({"a": [1], "b": [2]})
+        >>> new_col = Column("new", [3])
+        >>> table.replace_column("b", [new_col])
+           a  new
+        0  1    3
         """
         if old_column_name not in self._schema.column_names:
             self.get_similar_columns(old_column_name)
@@ -1085,6 +1424,17 @@ class Table:
         result : Table
             The shuffled Table.
 
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table
+        >>> import numpy as np
+        >>> np.random.seed(123456)
+        >>> table = Table.from_dict({"a": [1, 3, 5], "b": [2, 4, 6]})
+        >>> table.shuffle_rows()
+           a  b
+        0  5  6
+        1  1  2
+        2  3  4
         """
         new_df = self._data.sample(frac=1.0)
         new_df.columns = self._schema.column_names
@@ -1119,6 +1469,15 @@ class Table:
         ------
         IndexOutOfBoundsError
             If the index is out of bounds.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table
+        >>> table = Table.from_dict({"a": [1, 3, 5], "b": [2, 4, 6]})
+        >>> table.slice_rows(0, 2)
+           a  b
+        0  1  2
+        1  3  4
         """
         if start is None:
             start = 0
@@ -1163,6 +1522,21 @@ class Table:
         -------
         new_table : Table
             A new table with sorted columns.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table
+        >>> table = Table.from_dict({"a": [1], "b": [2] })
+        >>> table.sort_columns(lambda col1, col2: 1)
+           a  b
+        0  1  2
+        >>> table.sort_columns(lambda col1, col2: -1)
+           b  a
+        0  2  1
+        >>> table2 = Table.from_dict({"b": [2], "a": [1]})
+        >>> table2.sort_columns()
+           a  b
+        0  1  2
         """
         columns = self.to_columns()
         columns.sort(key=functools.cmp_to_key(comparator))
@@ -1190,6 +1564,26 @@ class Table:
         -------
         new_table : Table
             A new table with sorted rows.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table
+        >>> table = Table.from_dict({"a": [1, 3, 5], "b": [2, 4, 6] })
+        >>> table.sort_rows(lambda row1, row2: 1)
+           a  b
+        0  1  2
+        1  3  4
+        2  5  6
+        >>> table.sort_rows(lambda row1, row2: -1)
+           a  b
+        0  5  6
+        1  3  4
+        2  1  2
+        >>> table.sort_rows(lambda row1, row2: 0)
+           a  b
+        0  1  2
+        1  3  4
+        2  5  6
         """
         rows = self.to_rows()
         rows.sort(key=functools.cmp_to_key(comparator))
@@ -1204,7 +1598,7 @@ class Table:
         Parameters
         ----------
         percentage_in_first : float
-            The desired size of the first table in percentage to the given table.
+            The desired size of the first table in percentage to the given table; must be between 0 and 1.
 
         Returns
         -------
@@ -1216,6 +1610,21 @@ class Table:
         ------
         ValueError:
             if the 'percentage_in_first' is not between 0 and 1
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table
+        >>> table = Table.from_dict({"temperature": [10, 15, 20, 25, 30], "sales": [54, 74, 90, 206, 210]})
+        >>> slices = table.split(0.4)
+        >>> slices[0]
+           temperature  sales
+        0           10     54
+        1           15     74
+        >>> slices[1]
+           temperature  sales
+        0           20     90
+        1           25    206
+        2           30    210
         """
         if percentage_in_first < 0 or percentage_in_first > 1:
             raise ValueError("The given percentage is not between 0 and 1")
@@ -1250,6 +1659,12 @@ class Table:
             If the target column is also a feature column.
         ValueError
             If no feature columns are specified.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table, TaggedTable
+        >>> table = Table.from_dict({"item": ["apple", "milk", "beer"], "price": [1.10, 1.19, 1.79], "amount_bought": [74, 72, 51]})
+        >>> tagged_table = table.tag_columns(target_name="amount_bought", feature_names=["item", "price"])
         """
         from ._tagged_table import TaggedTable
 
@@ -1271,6 +1686,15 @@ class Table:
         UnknownColumnNameError
             If the column does not exist.
 
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table
+        >>> table = Table.from_dict({"item": ["apple", "milk", "beer"], "price": [1.00, 1.19, 1.79]})
+        >>> table.transform_column("price", lambda row: row.get_value("price") * 100)
+            item  price
+        0  apple  100.0
+        1   milk  119.0
+        2   beer  179.0
         """
         if self.has_column(name):
             items: list = [transformer(item) for item in self.to_rows()]
@@ -1305,13 +1729,13 @@ class Table:
         >>> from safeds.data.tabular.transformation import OneHotEncoder
         >>> from safeds.data.tabular.containers import Table
         >>> transformer = OneHotEncoder()
-        >>> table = Table({"col1": [1, 2, 1], "col2": [1, 2, 4]})
-        >>> fitted_transformer = transformer.fit(table, None)
-        >>> table.transform_table(fitted_transformer)
-           col1__1  col1__2  col2__1  col2__2  col2__4
-        0      1.0      0.0      1.0      0.0      0.0
-        1      0.0      1.0      0.0      1.0      0.0
-        2      1.0      0.0      0.0      0.0      1.0
+        >>> table = Table.from_dict({"fruit": ["apple", "pear", "apple"], "pet": ["dog", "duck", "duck"]})
+        >>> transformer = transformer.fit(table, None)
+        >>> table.transform_table(transformer)
+           fruit__apple  fruit__pear  pet__dog  pet__duck
+        0           1.0          0.0       1.0        0.0
+        1           0.0          1.0       0.0        1.0
+        2           1.0          0.0       0.0        1.0
         """
         return transformer.transform(self)
 
@@ -1341,19 +1765,19 @@ class Table:
         >>> from safeds.data.tabular.transformation import OneHotEncoder
         >>> from safeds.data.tabular.containers import Table
         >>> transformer = OneHotEncoder()
-        >>> table = Table({"col1": [1, 2, 1], "col2": [1, 2, 4]})
-        >>> fitted_transformer = transformer.fit(table, None)
-        >>> transformed_table = fitted_transformer.transform(table)
-        >>> transformed_table.inverse_transform_table(fitted_transformer)
-           col1  col2
-        0     1     1
-        1     2     2
-        2     1     4
-        >>> fitted_transformer.inverse_transform(transformed_table)
-           col1  col2
-        0     1     1
-        1     2     2
-        2     1     4
+        >>> table = Table.from_dict({"a": ["j", "k", "k"], "b": ["x", "y", "x"]})
+        >>> transformer = transformer.fit(table, None)
+        >>> transformed_table = transformer.transform(table)
+        >>> transformed_table.inverse_transform_table(transformer)
+           a  b
+        0  j  x
+        1  k  y
+        2  k  x
+        >>> transformer.inverse_transform(transformed_table)
+           a  b
+        0  j  x
+        1  k  y
+        2  k  x
         """
         return transformer.inverse_transform(self)
 
@@ -1369,6 +1793,12 @@ class Table:
         -------
         plot: Image
             The plot as an image.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table
+        >>> table = Table.from_dict({"temperature": [10, 15, 20, 25, 30], "sales": [54, 74, 90, 206, 210]})
+        >>> image = table.plot_correlation_heatmap()
         """
         only_numerical = self.remove_columns_with_non_numerical_values()
 
@@ -1412,6 +1842,12 @@ class Table:
         ------
         UnknownColumnNameError
             If either of the columns do not exist.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table
+        >>> table = Table.from_dict({"temperature": [10, 15, 20, 25, 30], "sales": [54, 74, 90, 206, 210]})
+        >>> image = table.plot_lineplot("temperature", "sales")
         """
         if not self.has_column(x_column_name) or not self.has_column(y_column_name):
             self.get_similar_columns(x_column_name)
@@ -1462,6 +1898,12 @@ class Table:
         ------
         UnknownColumnNameError
             If either of the columns do not exist.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table
+        >>> table = Table.from_dict({"temperature": [10, 15, 20, 25, 30], "sales": [54, 74, 90, 206, 210]})
+        >>> image = table.plot_scatterplot("temperature", "sales")
         """
         if not self.has_column(x_column_name) or not self.has_column(y_column_name):
             self.get_similar_columns(x_column_name)
@@ -1505,6 +1947,12 @@ class Table:
         ------
         NonNumericColumnError
             If the table contains only non-numerical columns.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table
+        >>> table = Table({"a":[1, 2], "b": [3, 42]})
+        >>> image = table.plot_boxplots()
         """
         numerical_table = self.remove_columns_with_non_numerical_values()
         if numerical_table.number_of_columns == 0:
@@ -1541,6 +1989,12 @@ class Table:
         -------
         plot: Image
             The plot as an image.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table
+        >>> table = Table({"a": [2, 3, 5, 1], "b": [54, 74, 90, 2014]})
+        >>> image = table.plot_histograms()
         """
         col_wrap = min(self.number_of_columns, 3)
 
@@ -1582,6 +2036,12 @@ class Table:
         ------
         WrongFileExtensionError
             If the file is not a csv file.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table
+        >>> table = Table.from_dict({"a": [1, 2, 3], "b": [4, 5, 6]})
+        >>> table.to_csv_file("./src/resources/to_csv_file.csv")
         """
         path = Path(path)
         if path.suffix != ".csv":
@@ -1608,6 +2068,12 @@ class Table:
         ------
         WrongFileExtensionError
             If the file is not an Excel file.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table
+        >>> table = Table.from_dict({"a": [1, 2, 3], "b": [4, 5, 6]})
+        >>> table.to_excel_file("./src/resources/to_excel_file.xlsx")
         """
         path = Path(path)
         excel_extensions = [".xls", ".xlsx", ".xlsm", ".xlsb", ".odf", ".ods", ".odt"]
@@ -1639,6 +2105,12 @@ class Table:
         ------
         WrongFileExtensionError
             If the file is not a JSON file.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table
+        >>> table = Table.from_dict({"a": [1, 2, 3], "b": [4, 5, 6]})
+        >>> table.to_json_file("./src/resources/to_json_file.json")
         """
         path = Path(path)
         if path.suffix != ".json":
@@ -1656,6 +2128,16 @@ class Table:
         -------
         data : dict[str, list[Any]]
             Dictionary representation of the table.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table
+        >>> row1 = Row({"a": 1, "b": 5})
+        >>> row2 = Row({"a": 2, "b": 6})
+        >>> table1 = Table.from_rows([row1, row2])
+        >>> table2 = Table.from_dict({"a": [1, 2], "b": [5, 6]})
+        >>> table1 == table2
+        True
         """
         return {column_name: list(self.get_column(column_name)) for column_name in self.column_names}
 
@@ -1684,6 +2166,13 @@ class Table:
         -------
         columns : list[Columns]
             List of columns.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table
+        >>> table = Table.from_dict({"a":[1, 2],"b":[20, 30]})
+        >>> table.to_columns()
+        [Column('a', [1, 2]), Column('b', [20, 30])]
         """
         return [self.get_column(name) for name in self._schema.column_names]
 
@@ -1695,6 +2184,19 @@ class Table:
         -------
         rows : list[Row]
             List of rows.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table
+        >>> table = Table.from_dict({"a":[1, 2],"b":[20, 30]})
+        >>> table.to_rows()
+        [Row({
+            'a': 1,
+            'b': 20
+        }), Row({
+            'a': 2,
+            'b': 30
+        })]
         """
         return [
             Row._from_pandas_dataframe(
