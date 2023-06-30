@@ -143,6 +143,7 @@ class TestFitAndTransformOnMultipleTables:
                 ),
             ),
         ],
+        id=["two_columns"]
     )
     def test_should_return_transformed_tables(
         self,
@@ -224,6 +225,7 @@ class TestInverseTransform:
                 },
             ),
         ],
+        ids=["one_column"]
     )
     def test_should_return_original_table(self, table: Table) -> None:
         transformer = StandardScaler().fit(table, None)

@@ -346,6 +346,7 @@ class TestMeanSquaredError:
     @pytest.mark.parametrize(
         ("predicted", "expected", "result"),
         [([1, 2], [1, 2], 0), ([0, 0], [1, 1], 1), ([1, 1, 1], [2, 2, 11], 34)],
+        ids=["perfect_prediction", "bad_prediction", "worst_prediction"],
     )
     def test_valid_data(self, predicted: list[float], expected: list[float], result: float) -> None:
         table = Table({"predicted": predicted, "expected": expected}).tag_columns(
@@ -380,6 +381,7 @@ class TestCheckMetricsPreconditions:
             ([1, 2], ["A", "B"], TypeError),
             ([1, 2, 3], [1, 2], ColumnLengthMismatchError),
         ],
+        ids=["non-numerical data", "non-numerical-and-numerical data", "different lengths"],
     )
     def test_should_raise_if_validation_fails(
         self,
