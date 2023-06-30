@@ -92,7 +92,7 @@ class TestTransform:
                 ),
                 ["col1", "col3"],
                 UnknownColumnNameError,
-                r"Could not find column\(s\) 'col1, col3'",
+                r"Could not find column\(s\) 'col3, col1'",
             ),
             (Table(), ["col1", "col3"], ValueError, "The table cannot be transformed because it contains 0 rows"),
             (
