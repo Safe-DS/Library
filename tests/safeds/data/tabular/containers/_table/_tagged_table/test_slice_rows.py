@@ -10,9 +10,9 @@ from tests.helpers import assert_that_tagged_tables_are_equal
     ("table", "test_table", "second_test_table"),
     [
         (
-            TaggedTable({"feature": [1, 2, 1], "target": [1, 2, 4]}, "target"),
-            TaggedTable({"feature": [1, 2], "target": [1, 2]}, "target"),
-            TaggedTable({"feature": [1, 1], "target": [1, 4]}, "target"),
+            TaggedTable({"feature": [1, 2, 1], "non_feature": [0, 2, 4], "target": [1, 2, 4]}, target_name="target", feature_names=["non_feature"]),
+            TaggedTable({"feature": [1, 2], "non_feature": [0, 2], "target": [1, 2]}, target_name="target", feature_names=["non_feature"]),
+            TaggedTable({"feature": [1, 1], "non_feature": [0, 4], "target": [1, 4]}, target_name="target", feature_names=["non_feature"]),
         ),
     ],
     ids=["Table with three rows"],
