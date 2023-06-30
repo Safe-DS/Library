@@ -16,7 +16,7 @@ class UnknownColumnNameError(KeyError):
         The name of the column that was tried to be accessed.
     """
 
-    def __init__(self, column_names: list[str], similar_columns: list[str] | None):
+    def __init__(self, column_names: list[str], similar_columns: list[str] | None = None):
         if similar_columns is None:
             super().__init__(f"Could not find column(s) '{', '.join(column_names)}'.")
         else:
