@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import io
+import copy
 from collections.abc import Sequence
 from numbers import Number
 from typing import TYPE_CHECKING, Any, TypeVar, overload
@@ -1031,3 +1032,19 @@ class Column(Sequence[T]):
         2
         """
         return self._data.isna().sum()
+
+    # ------------------------------------------------------------------------------------------------------------------
+    # Helpers
+    # ------------------------------------------------------------------------------------------------------------------
+
+    def _copy(self) -> Column:
+        """
+        Return a copy of this column.
+
+        Returns
+        -------
+        column : Column
+            The copy of this column.
+
+        """
+        return copy.deepcopy(self)

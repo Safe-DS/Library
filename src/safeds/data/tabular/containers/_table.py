@@ -2223,3 +2223,18 @@ class Table:
         data_copy = self._data.copy()
         data_copy.columns = self.column_names
         return data_copy.__dataframe__(nan_as_null, allow_copy)
+
+    # ------------------------------------------------------------------------------------------------------------------
+    # Helpers
+    # ------------------------------------------------------------------------------------------------------------------
+
+    def _copy(self) -> Table:
+        """
+        Return a copy of the table.
+
+        Returns
+        -------
+        table : Table
+            A copy of the table.
+        """
+        return copy.deepcopy(self)
