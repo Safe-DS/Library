@@ -1,9 +1,8 @@
 from __future__ import annotations
 
+import copy
 from collections.abc import Mapping
 from typing import TYPE_CHECKING, Any
-
-import copy
 
 import pandas as pd
 
@@ -265,7 +264,7 @@ class Row(Mapping[str, Any]):
         >>> repr(row)
         "Row({'a': 1})"
         """
-        return f"Row({str(self)})"
+        return f"Row({self!s})"
 
     def __str__(self) -> str:
         """
