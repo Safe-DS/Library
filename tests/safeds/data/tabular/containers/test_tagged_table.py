@@ -86,18 +86,15 @@ class TestTarget:
     def test_should_return_target(self, tagged_table: TaggedTable) -> None:
         assert tagged_table.target == Column("T", [0, 1])
 
+
 class TestCopy:
     @pytest.mark.parametrize(
         "tagged_table",
         [
             TaggedTable({"a": [], "b": []}, target_name="b", feature_names=["a"]),
-            TaggedTable({"a": ["a", 3, 0.1], "b": [True, False, None]}, target_name="b", feature_names=["a"])
-
+            TaggedTable({"a": ["a", 3, 0.1], "b": [True, False, None]}, target_name="b", feature_names=["a"]),
         ],
-        ids=[
-            "empty-rows",
-            "normal"
-        ],
+        ids=["empty-rows", "normal"],
     )
     def test_should_copy_tagged_table(self, tagged_table: TaggedTable) -> None:
         copied = tagged_table._copy()
