@@ -334,6 +334,20 @@ class Image:
         image_copy._image = ImageEnhance.Contrast(image_copy._image).enhance(factor)
         return image_copy
 
+    def adjust_color_balance(self, factor: float) -> Image:
+        if factor < 0:
+            raise ValueError("Color factor has to be 0 or bigger.")
+        elif factor == 1:
+            warnings.warn(
+                "Color adjustment factor is 1.0, this will not make changes to the image.",
+                UserWarning,
+                stacklevel=2,
+            )
+
+        image_copy = copy.deepcopy(self)
+        image_copy._image = ImageEnhance.Color(image_copy._image).enhance(factor)
+        return image_copy
+
     def blur(self, radius: int) -> Image:
         """
         Return the blurred image.
