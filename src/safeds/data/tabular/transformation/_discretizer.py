@@ -71,7 +71,6 @@ class Discretizer(TableTransformer):
                 if not table.get_column(column).type.is_numeric():
                     raise NonNumericColumnError(f"{column} is of type {table.get_column(column).type}.")
 
-
         wrapped_transformer = sk_KBinsDiscretizer(n_bins=self._number_of_bins, encode="ordinal")
         wrapped_transformer.fit(table._data[column_names])
 
@@ -123,7 +122,6 @@ class Discretizer(TableTransformer):
         for column in self._column_names:
             if not table.get_column(column).type.is_numeric():
                 raise NonNumericColumnError(f"{column} is of type {table.get_column(column).type}.")
-
 
         data = table._data.copy()
         data.columns = table.column_names
