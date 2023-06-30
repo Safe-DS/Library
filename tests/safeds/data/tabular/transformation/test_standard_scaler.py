@@ -143,7 +143,6 @@ class TestFitAndTransformOnMultipleTables:
                 ),
             ),
         ],
-        id=["two_columns"],
     )
     def test_should_return_transformed_tables(
         self,
