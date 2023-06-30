@@ -8,7 +8,7 @@ from safeds.data.tabular.containers import Table
     ("table", "expected"),
     [
         (
-            Table({}),
+            Table(),
             {},
         ),
         (

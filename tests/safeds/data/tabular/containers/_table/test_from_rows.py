@@ -8,7 +8,7 @@ from safeds.exceptions import SchemaMismatchError
     [
         (
             [],
-            Table({}),
+            Table(),
         ),
         (
             [
