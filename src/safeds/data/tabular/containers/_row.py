@@ -506,6 +506,6 @@ class Row(Mapping[str, Any]):
         Returns
         -------
         copy : Row
-            The copy.
+            The copy of this row.
         """
         return copy.deepcopy(self)
