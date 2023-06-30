@@ -1,5 +1,6 @@
 import pytest
 from safeds.data.tabular.containers import Column, Table, TaggedTable
+from tests.helpers import assert_that_tagged_tables_are_equal
 
 
 @pytest.mark.parametrize(
@@ -40,4 +41,4 @@ def test_add_columns_as_features(
     columns: list[Column] | Table,
     tagged_table_with_new_columns: TaggedTable,
 ) -> None:
-    assert tagged_table.add_columns_as_features(columns) == tagged_table_with_new_columns
+    assert_that_tagged_tables_are_equal(tagged_table.add_columns_as_features(columns), tagged_table_with_new_columns)
