@@ -6,6 +6,8 @@ from safeds.data.tabular.containers import Table
 from safeds.data.tabular.transformation._table_transformer import TableTransformer
 from safeds.exceptions import TransformerNotFittedError, UnknownColumnNameError
 
+from src.safeds.exceptions._data import NonNumericColumnError
+
 
 class Discretizer(TableTransformer):
     """
@@ -47,10 +49,26 @@ class Discretizer(TableTransformer):
         -------
         fitted_transformer : TableTransformer
             The fitted transformer.
+
+        Raises
+        ------
+        ValueError
+            If the table is empty.
+        NonNumericColumnError
+            If one of the columns, that should be fitted is not numeric.
+        UnknownColumnNameError
+            If one of the columns, that should be fitted is not in the table.
         """
+        if table.number_of_rows == 0:
+            raise ValueError("The Discretizer cannot be fitted because the table contains 0 rows")
+
         if column_names is None:
             column_names = table.column_names
         else:
+            for column in column_names:
+                if not table.get_column(column).type.is_numeric():
+                    raise NonNumericColumnError(f"{column} is of type {table.get_column(column).type}.")
+
             missing_columns = set(column_names) - set(table.column_names)
             if len(missing_columns) > 0:
                 raise UnknownColumnNameError(list(missing_columns))
@@ -84,10 +102,21 @@ class Discretizer(TableTransformer):
         ------
         TransformerNotFittedError
             If the transformer has not been fitted yet.
+        ValueError
+            If the table is empty.
+        NonNumericColumnError
+            If one of the columns, that should be fitted is not numeric.
         """
         # Transformer has not been fitted yet
         if self._wrapped_transformer is None or self._column_names is None:
             raise TransformerNotFittedError
+
+        if table.number_of_rows == 0:
+            raise ValueError("The table cannot be transformed because it contains 0 rows")
+
+        for column in self._column_names:
+            if not table.get_column(column).type.is_numeric():
+                raise NonNumericColumnError(f"{column} is of type {table.get_column(column).type}.")
 
         # Input table does not contain all columns used to fit the transformer
         missing_columns = set(self._column_names) - set(table.column_names)
