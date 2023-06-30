@@ -112,7 +112,7 @@ class TestIsNumeric:
         assert column_type.is_numeric() == expected
 
 
-class TestIsOptional:
+class TestMayBeMissing:
     @pytest.mark.parametrize(
         ("column_type", "expected"),
         [
