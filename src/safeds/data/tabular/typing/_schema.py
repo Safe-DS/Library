@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
-from safeds.data.tabular.typing import Anything, Integer, RealNumber
+from safeds.data.tabular.typing import Anything, Integer, RealNumber, Nothing
 from safeds.data.tabular.typing._column_type import ColumnType
 from safeds.exceptions import UnknownColumnNameError
 
@@ -276,6 +276,16 @@ class Schema:
                         and isinstance(schema.get_column_type(col_name), RealNumber)
                     ):
                         schema_dict[col_name] = RealNumber(nullable)
+                        continue
+                    if (
+                        isinstance(schema_dict[col_name], Nothing)
+                    ):
+                        schema_dict[col_name] = type(schema.get_column_type(col_name))(nullable)
+                        continue
+                    if (
+                        isinstance(schema.get_column_type(col_name), Nothing)
+                    ):
+                        schema_dict[col_name] = type(schema_dict[col_name])(nullable)
                         continue
                     schema_dict[col_name] = Anything(nullable)
         return Schema(schema_dict)
