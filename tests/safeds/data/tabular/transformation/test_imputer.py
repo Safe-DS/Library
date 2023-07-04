@@ -126,7 +126,7 @@ class TestTransform:
             warnings.filterwarnings(
                 action="ignore",
                 message=r"There are multiple most frequent values in a column given to the Imputer\..*",
-                category=UserWarning
+                category=UserWarning,
             )
             transformer = Imputer(strategy).fit(table_to_fit, None)
 
@@ -292,7 +292,7 @@ class TestFitAndTransform:
             warnings.filterwarnings(
                 action="ignore",
                 message=r"There are multiple most frequent values in a column given to the Imputer\..*",
-                category=UserWarning
+                category=UserWarning,
             )
             assert Imputer(strategy).fit_and_transform(table, column_names) == expected
 
