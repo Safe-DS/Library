@@ -144,13 +144,11 @@ class TestIsFitted:
             warnings.filterwarnings(
                 action="ignore",
                 message=(
-                    "The columns \\['col1'\\] contain numerical data. The OneHotEncoder is designed to encode "
-                    "non-numerical values into numerical values"
+                    r"The columns .+ contain numerical data. The OneHotEncoder is designed to encode non-numerical "
+                    r"values into numerical values"
                 ),
                 category=UserWarning,
             )
-            # nan values are technically "numerical", thus we get a UserWarning for the 2nd testcase.
-            # (Proper testing for the UserWarning is done in the TestFit class.)
             fitted_transformer = transformer.fit(table, None)
         assert fitted_transformer.is_fitted()
 

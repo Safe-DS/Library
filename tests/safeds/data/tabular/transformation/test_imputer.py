@@ -123,8 +123,11 @@ class TestTransform:
         )
 
         with warnings.catch_warnings():
-            warnings.filterwarnings(action="ignore", category=UserWarning)
-            # "Mode" strategy will raise a warning (as there is no single, most-common value in the 2nd testcase).
+            warnings.filterwarnings(
+                action="ignore",
+                message=r"There are multiple most frequent values in a column given to the Imputer\..*",
+                category=UserWarning
+            )
             transformer = Imputer(strategy).fit(table_to_fit, None)
 
         table_to_transform = Table(
