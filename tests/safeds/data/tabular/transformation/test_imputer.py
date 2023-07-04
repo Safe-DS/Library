@@ -1,3 +1,5 @@
+import warnings
+
 import pytest
 from safeds.data.tabular.containers import Table
 from safeds.data.tabular.transformation import Imputer
@@ -120,7 +122,10 @@ class TestTransform:
             },
         )
 
-        transformer = Imputer(strategy).fit(table_to_fit, None)
+        with warnings.catch_warnings():
+            warnings.filterwarnings(action="ignore", category=UserWarning)
+            # "Mode" strategy will raise a warning (as there is no single, most-common value in the 2nd testcase).
+            transformer = Imputer(strategy).fit(table_to_fit, None)
 
         table_to_transform = Table(
             {
