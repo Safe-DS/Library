@@ -1,3 +1,5 @@
+import warnings
+
 import pytest
 from safeds.data.tabular.containers import Table
 from safeds.data.tabular.transformation import OneHotEncoder
@@ -138,7 +140,11 @@ class TestIsFitted:
     )
     def test_should_return_true_after_fitting(self, table: Table) -> None:
         transformer = OneHotEncoder()
-        fitted_transformer = transformer.fit(table, None)
+        with warnings.catch_warnings():
+            warnings.filterwarnings(action="ignore", category=UserWarning)
+            # nan values are technically "numerical", thus we get a UserWarning for the 2nd testcase.
+            # (Proper testing for the UserWarning is done in the TestFit class.)
+            fitted_transformer = transformer.fit(table, None)
         assert fitted_transformer.is_fitted()
 
 
