@@ -285,7 +285,13 @@ class TestFitAndTransform:
         strategy: ImputerStrategy,
         expected: Table,
     ) -> None:
-        assert Imputer(strategy).fit_and_transform(table, column_names) == expected
+        with warnings.catch_warnings():
+            warnings.filterwarnings(
+                action="ignore",
+                message=r"There are multiple most frequent values in a column given to the Imputer\..*",
+                category=UserWarning
+            )
+            assert Imputer(strategy).fit_and_transform(table, column_names) == expected
 
     @pytest.mark.parametrize("strategy", strategies(), ids=lambda x: x.__class__.__name__)
     def test_should_not_change_original_table(self, strategy: ImputerStrategy) -> None:
