@@ -144,8 +144,8 @@ class TestIsFitted:
             warnings.filterwarnings(
                 action="ignore",
                 message=r"The columns col1 contain numerical data. The OneHotEncoder is designed to encode "
-                        r"non-numerical values into numerical values",
-                category=UserWarning
+                r"non-numerical values into numerical values",
+                category=UserWarning,
             )
             # nan values are technically "numerical", thus we get a UserWarning for the 2nd testcase.
             # (Proper testing for the UserWarning is done in the TestFit class.)
