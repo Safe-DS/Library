@@ -112,7 +112,7 @@ class TableTransformer(ABC):
             Whether the transformer is fitted.
         """
 
-    def fit_and_transform(self, table: Table, column_names: [list[str]] = None) -> Table:
+    def fit_and_transform(self, table: Table, column_names: Optional[list[str]] = None) -> Table:
         """
         Learn a transformation for a set of columns in a table and apply the learned transformation to the same table.
 

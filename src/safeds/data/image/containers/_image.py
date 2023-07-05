@@ -4,7 +4,7 @@ import copy
 import io
 import warnings
 from pathlib import Path
-from typing import Any, BinaryIO
+from typing import Any, BinaryIO, Optional
 
 import PIL
 from PIL import ImageEnhance, ImageFilter, ImageOps
