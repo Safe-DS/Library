@@ -116,7 +116,7 @@ class Imputer(TableTransformer):
         ValueError
             If the table contains 0 rows
         NonNumericColumnError
-            If the strategy is set to either Mean or Median and the specified columns of the table contain non-numerical data
+            If the strategy is set to either Mean or Median and the specified columns of the table contain non-numerical data.
         """
         if column_names is None:
             column_names = table.column_names
@@ -194,9 +194,9 @@ class Imputer(TableTransformer):
         TransformerNotFittedError
             If the transformer has not been fitted yet.
         UnknownColumnNameError
-            If the input table does not contain all columns used to fit the transformer
+            If the input table does not contain all columns used to fit the transformer.
         ValueError
-            If the table contains 0 rows
+            If the table contains 0 rows.
         """
         # Transformer has not been fitted yet
         if self._wrapped_transformer is None or self._column_names is None:

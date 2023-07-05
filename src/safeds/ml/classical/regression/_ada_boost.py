@@ -20,7 +20,7 @@ class AdaBoost(Regressor):
 
     Parameters
     ----------
-    learner: Classifier
+    learner: Optional[Regressor]
         The learner from which the boosted ensemble is built.
     maximum_number_of_learners: int
         The maximum number of learners at which boosting is terminated. In case of perfect fit, the learning procedure
@@ -65,7 +65,7 @@ class AdaBoost(Regressor):
 
         Returns
         -------
-        result: Classifier | None
+        result: Optional[Classifier]
             The base learner.
         """
         return self._learner

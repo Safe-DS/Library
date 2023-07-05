@@ -37,7 +37,8 @@ class SupportVectorMachine(Regressor):
     ----------
     c: float
         The strength of regularization. Must be strictly positive.
-    kernel: The type of kernel to be used. Defaults to None.
+    kernel: Optional[SupportVectorMachineKernel]
+        The type of kernel to be used. Defaults to None.
 
     Raises
     ------
@@ -76,7 +77,7 @@ class SupportVectorMachine(Regressor):
 
         Returns
         -------
-        result: SupportVectorMachineKernel | None
+        result: Optional[SupportVectorMachineKernel]
             The type of kernel used.
         """
         return self._kernel

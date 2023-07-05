@@ -76,7 +76,7 @@ class SupportVectorMachine(Classifier):
 
         Returns
         -------
-        result: SupportVectorMachineKernel | None
+        result: Optional[SupportVectorMachineKernel]
             The type of kernel used.
         """
         return self._kernel

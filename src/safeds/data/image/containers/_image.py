@@ -168,7 +168,7 @@ class Image:
 
         Returns
         -------
-        jpeg : bytes
+        jpeg : Optional[bytes]
             The image as JPEG.
         """
         if self._format != ImageFormat.JPEG:
@@ -187,7 +187,7 @@ class Image:
 
         Returns
         -------
-        png : bytes
+        png : Optional[bytes]
             The image as PNG.
         """
         if self._format != ImageFormat.PNG:
@@ -209,7 +209,7 @@ class Image:
         Returns
         -------
         result : Image
-            The image with the given width and height
+            The image with the given width and height.
         """
         image_copy = copy.deepcopy(self)
         image_copy._image = image_copy._image.resize((new_width, new_height))
@@ -221,7 +221,7 @@ class Image:
 
         Returns
         -------
-        grayscale_image : Image
+        result : Image
             The grayscale image.
         """
         image_copy = copy.deepcopy(self)
@@ -242,7 +242,7 @@ class Image:
         Returns
         -------
         result : Image
-            The image with the
+            The cropped image.
         """
         image_copy = copy.deepcopy(self)
         image_copy._image = image_copy._image.crop((x, y, (x + width), (y + height)))
@@ -347,7 +347,7 @@ class Image:
         Returns
         -------
         result : Image
-            The blurred image
+            The blurred image.
         """
         image_copy = copy.deepcopy(self)
         image_copy._image = image_copy._image.filter(ImageFilter.BoxBlur(radius))

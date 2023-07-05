@@ -59,7 +59,7 @@ class Table:
 
     Parameters
     ----------
-    data : Mapping[str, Sequence[Any]] | None
+    data : Optional[Mapping[str, Sequence[Any]]]
         The data. If None, an empty table is created.
 
     Raises
@@ -339,7 +339,7 @@ class Table:
         ----------
         data : pd.DataFrame
             The data.
-        schema : Schema | None
+        schema : Optional[Schema]
             The schema. If None, the schema is inferred from the data.
 
         Returns
@@ -380,7 +380,7 @@ class Table:
 
         Parameters
         ----------
-        data : Mapping[str, Sequence[Any]] | None
+        data : [Mapping[str, Sequence[Any]]]
             The data. If None, an empty table is created.
 
         Raises
@@ -421,7 +421,7 @@ class Table:
 
         Returns
         -------
-        'True' if contents are equal, 'False' otherwise
+        'True' if contents are equal, 'False' otherwise.
 
         Examples
         --------
@@ -1294,9 +1294,9 @@ class Table:
         Parameters
         ----------
         old_name : str
-            The old name of the target column
+            The old name of the target column.
         new_name : str
-            The new name of the target column
+            The new name of the target column.
 
         Returns
         -------
@@ -1582,7 +1582,7 @@ class Table:
         Raises
         ------
         ValueError:
-            if the 'percentage_in_first' is not between 0 and 1
+            if the 'percentage_in_first' is not between 0 and 1.
 
         Examples
         --------
@@ -1618,7 +1618,7 @@ class Table:
         ----------
         target_name : str
             Name of the target column.
-        feature_names : list[str] | None
+        feature_names : Optional[list[str]]
             Names of the feature columns. If None, all columns except the target column are used.
 
         Returns

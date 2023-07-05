@@ -89,9 +89,9 @@ class OneHotEncoder(InvertibleTableTransformer):
         Raises
         ------
         UnknownColumnNameError
-            If column_names contain a column name that is missing in the table
+            If column_names contain a column name that is missing in the table.
         ValueError
-            If the table contains 0 rows
+            If the table contains 0 rows.
         """
         if column_names is None:
             column_names = table.column_names
@@ -169,11 +169,11 @@ class OneHotEncoder(InvertibleTableTransformer):
         TransformerNotFittedError
             If the transformer has not been fitted yet.
         UnknownColumnNameError
-            If the input table does not contain all columns used to fit the transformer
+            If the input table does not contain all columns used to fit the transformer.
         ValueError
-            If the table contains 0 rows
+            If the table contains 0 rows.
         ValueNotPresentWhenFittedError
-            If a column in the to-be-transformed table contains a new value that was not already present in the table the OneHotEncoder was fitted on
+            If a column in the to-be-transformed table contains a new value that was not already present in the table the OneHotEncoder was fitted on.
         """
         # Transformer has not been fitted yet
         if self._column_names is None or self._value_to_column is None or self._value_to_column_nans is None:
@@ -255,11 +255,11 @@ class OneHotEncoder(InvertibleTableTransformer):
         TransformerNotFittedError
             If the transformer has not been fitted yet.
         UnknownColumnNameError
-            If the input table does not contain all columns used to fit the transformer
+            If the input table does not contain all columns used to fit the transformer.
         NonNumericColumnError
-            If the transformed columns of the input table contain non-numerical data
+            If the transformed columns of the input table contain non-numerical data.
         ValueError
-            If the table contains 0 rows
+            If the table contains 0 rows.
         """
         # Transformer has not been fitted yet
         if self._column_names is None or self._value_to_column is None or self._value_to_column_nans is None:

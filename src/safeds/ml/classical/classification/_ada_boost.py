@@ -32,7 +32,7 @@ class AdaBoost(Classifier):
     Raises
     ------
     ValueError
-        If `maximum_number_of_learners` or `learning_rate` are less than or equal to 0
+        If `maximum_number_of_learners` or `learning_rate` are less than or equal to 0.
     """
 
     def __init__(
@@ -65,7 +65,7 @@ class AdaBoost(Classifier):
 
         Returns
         -------
-        result: Classifier | None
+        result: Optional[Classifier]
             The base learner.
         """
         return self._learner
