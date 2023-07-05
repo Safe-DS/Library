@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import copy
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from safeds.data.tabular.containers import Column, Table
 from safeds.exceptions import UnknownColumnNameError
@@ -48,7 +48,7 @@ class TaggedTable(Table):
     def _from_table(
         table: Table,
         target_name: str,
-        feature_names: Optional[list[str]] = None,
+        feature_names: list[str] | None = None,
     ) -> TaggedTable:
         """
         Create a tagged table from a table.
@@ -114,7 +114,7 @@ class TaggedTable(Table):
         self,
         data: Mapping[str, Sequence[Any]],
         target_name: str,
-        feature_names: Optional[list[str]] = None,
+        feature_names: list[str] | None = None,
     ):
         """
         Create a tagged table from a mapping of column names to their values.

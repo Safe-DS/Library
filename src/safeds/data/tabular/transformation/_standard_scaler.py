@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from typing import Optional
-
 from sklearn.preprocessing import StandardScaler as sk_StandardScaler
 
 from safeds.data.tabular.containers import Table
@@ -16,7 +14,7 @@ class StandardScaler(InvertibleTableTransformer):
         self._column_names: list[str] | None = None
         self._wrapped_transformer: sk_StandardScaler | None = None
 
-    def fit(self, table: Table, column_names: Optional[list[str]]) -> StandardScaler:
+    def fit(self, table: Table, column_names: list[str] | None) -> StandardScaler:
         """
         Learn a transformation for a set of columns in a table.
 

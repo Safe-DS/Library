@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import warnings
 from collections import Counter
-from typing import Any, Optional
+from typing import Any
 
 import numpy as np
 
@@ -68,7 +68,7 @@ class OneHotEncoder(InvertibleTableTransformer):
         self._value_to_column_nans: dict[str, str] | None = None
 
     # noinspection PyProtectedMember
-    def fit(self, table: Table, column_names: Optional[list[str]]) -> OneHotEncoder:
+    def fit(self, table: Table, column_names: list[str] | None) -> OneHotEncoder:
         """
         Learn a transformation for a set of columns in a table.
 

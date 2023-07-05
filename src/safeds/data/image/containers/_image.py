@@ -4,7 +4,7 @@ import copy
 import io
 import warnings
 from pathlib import Path
-from typing import Any, BinaryIO, Optional
+from typing import Any, BinaryIO
 
 import PIL
 from PIL import ImageEnhance, ImageFilter, ImageOps
@@ -179,7 +179,7 @@ class Image:
         buffer.seek(0)
         return buffer.read()
 
-    def _repr_png_(self) -> Optional[bytes]:
+    def _repr_png_(self) -> bytes | None:
         """
         Return a PNG image as bytes.
 

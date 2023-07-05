@@ -1,5 +1,5 @@
 import warnings
-from typing import Any, Optional
+from typing import Any
 
 from safeds.data.tabular.containers import Table, TaggedTable
 from safeds.exceptions import (
@@ -81,7 +81,7 @@ def fit(model: Any, tagged_table: TaggedTable) -> None:
 
 
 # noinspection PyProtectedMember
-def predict(model: Any, dataset: Table, feature_names: Optional[list[str]], target_name: Optional[str]) -> TaggedTable:
+def predict(model: Any, dataset: Table, feature_names: list[str] | None, target_name: str | None) -> TaggedTable:
     """
     Predict a target vector using a dataset containing feature vectors. The model has to be trained first.
 

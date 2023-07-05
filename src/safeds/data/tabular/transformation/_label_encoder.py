@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import warnings
-from typing import Optional
 
 from sklearn.preprocessing import OrdinalEncoder as sk_OrdinalEncoder
 
@@ -20,7 +19,7 @@ class LabelEncoder(InvertibleTableTransformer):
         self._wrapped_transformer: sk_OrdinalEncoder | None = None
         self._column_names: list[str] | None = None
 
-    def fit(self, table: Table, column_names: Optional[list[str]]) -> LabelEncoder:
+    def fit(self, table: Table, column_names: list[str] | None) -> LabelEncoder:
         """
         Learn a transformation for a set of columns in a table.
 

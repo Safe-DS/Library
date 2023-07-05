@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from sklearn.svm import SVR as sk_SVR  # noqa: N811
 
@@ -71,7 +71,7 @@ class SupportVectorMachine(Regressor):
         return self._c
 
     @property
-    def kernel(self) -> Optional[SupportVectorMachineKernel]:
+    def kernel(self) -> SupportVectorMachineKernel | None:
         """
         Get the type of kernel used.
 

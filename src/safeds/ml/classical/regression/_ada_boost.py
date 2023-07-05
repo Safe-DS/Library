@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from sklearn.ensemble import AdaBoostRegressor as sk_AdaBoostRegressor
 
@@ -38,7 +38,7 @@ class AdaBoost(Regressor):
     def __init__(
         self,
         *,
-        learner: Optional[Regressor] = None,
+        learner: Regressor | None = None,
         maximum_number_of_learners: int = 50,
         learning_rate: float = 1.0,
     ) -> None:
@@ -59,7 +59,7 @@ class AdaBoost(Regressor):
         self._target_name: str | None = None
 
     @property
-    def learner(self) -> Optional[Regressor]:
+    def learner(self) -> Regressor | None:
         """
         Get the base learner used for training the ensemble.
 

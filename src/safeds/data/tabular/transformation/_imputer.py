@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import warnings
-from typing import Any, Optional
+from typing import Any
 
 import pandas as pd
 from sklearn.impute import SimpleImputer as sk_SimpleImputer
@@ -91,7 +91,7 @@ class Imputer(TableTransformer):
         self._column_names: list[str] | None = None
 
     # noinspection PyProtectedMember
-    def fit(self, table: Table, column_names: Optional[list[str]]) -> Imputer:
+    def fit(self, table: Table, column_names: list[str] | None) -> Imputer:
         """
         Learn a transformation for a set of columns in a table.
 
