@@ -4,7 +4,7 @@ import copy
 import io
 import warnings
 from pathlib import Path
-from typing import Any, BinaryIO, Optional
+from typing import Any, BinaryIO
 
 import PIL
 from PIL import ImageEnhance, ImageFilter, ImageOps
@@ -160,7 +160,7 @@ class Image:
             return NotImplemented
         return self._image.tobytes() == other._image.tobytes()
 
-    def _repr_jpeg_(self) -> Optional[bytes]:
+    def _repr_jpeg_(self) -> bytes | None:
         """
         Return a JPEG image as bytes.
 
