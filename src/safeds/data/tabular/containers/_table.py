@@ -380,7 +380,7 @@ class Table:
 
         Parameters
         ----------
-        data : [Mapping[str, Sequence[Any]]]
+        data : Optional[Mapping[str, Sequence[Any]]]
             The data. If None, an empty table is created.
 
         Raises
