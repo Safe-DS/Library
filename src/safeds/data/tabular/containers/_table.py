@@ -374,7 +374,7 @@ class Table:
     # Dunder methods
     # ------------------------------------------------------------------------------------------------------------------
 
-    def __init__(self, data: Mapping[str, Optional[Sequence[Any]]] = None) -> None:
+    def __init__(self, data: Optional[Mapping[str, Sequence[Any]]] = None) -> None:
         """
         Create a table from a mapping of column names to their values.
 
