@@ -5,7 +5,7 @@ import functools
 import io
 import warnings
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, TypeVar
+from typing import TYPE_CHECKING, Any, TypeVar, Optional
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -331,7 +331,7 @@ class Table:
         return Table._from_pandas_dataframe(dataframe)
 
     @staticmethod
-    def _from_pandas_dataframe(data: pd.DataFrame, schema: Schema | None = None) -> Table:
+    def _from_pandas_dataframe(data: pd.DataFrame, schema: Optional[Schema] = None) -> Table:
         """
         Create a table from a `pandas.DataFrame`.
 
@@ -374,7 +374,7 @@ class Table:
     # Dunder methods
     # ------------------------------------------------------------------------------------------------------------------
 
-    def __init__(self, data: Mapping[str, Sequence[Any]] | None = None) -> None:
+    def __init__(self, data: Mapping[str, Optional[Sequence[Any]]] = None) -> None:
         """
         Create a table from a mapping of column names to their values.
 
@@ -1608,7 +1608,7 @@ class Table:
             self.slice_rows(round(percentage_in_first * self.number_of_rows)),
         )
 
-    def tag_columns(self, target_name: str, feature_names: list[str] | None = None) -> TaggedTable:
+    def tag_columns(self, target_name: str, feature_names: Optional[list[str]] = None) -> TaggedTable:
         """
         Mark the columns of the table as target column or feature columns. The original table is not modified.
 

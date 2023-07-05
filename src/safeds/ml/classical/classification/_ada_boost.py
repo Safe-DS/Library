@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 
 from sklearn.ensemble import AdaBoostClassifier as sk_AdaBoostClassifier
 
@@ -59,7 +59,7 @@ class AdaBoost(Classifier):
         self._target_name: str | None = None
 
     @property
-    def learner(self) -> Classifier | None:
+    def learner(self) -> Optional[Classifier]:
         """
         Get the base learner used for training the ensemble.
 

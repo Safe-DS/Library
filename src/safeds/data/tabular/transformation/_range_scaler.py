@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Optional
+
 from sklearn.preprocessing import MinMaxScaler as sk_MinMaxScaler
 
 from safeds.data.tabular.containers import Table
@@ -31,7 +33,7 @@ class RangeScaler(InvertibleTableTransformer):
         self._minimum = minimum
         self._maximum = maximum
 
-    def fit(self, table: Table, column_names: list[str] | None) -> RangeScaler:
+    def fit(self, table: Table, column_names: Optional[list[str]]) -> RangeScaler:
         """
         Learn a transformation for a set of columns in a table.
 

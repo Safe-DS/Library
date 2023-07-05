@@ -179,7 +179,7 @@ class Image:
         buffer.seek(0)
         return buffer.read()
 
-    def _repr_png_(self) -> bytes | None:
+    def _repr_png_(self) -> Optional[bytes]:
         """
         Return a PNG image as bytes.
 

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import copy
 from collections.abc import Mapping
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Optional
 
 import pandas as pd
 
@@ -55,7 +55,7 @@ class Row(Mapping[str, Any]):
         return Row(data)
 
     @staticmethod
-    def _from_pandas_dataframe(data: pd.DataFrame, schema: Schema | None = None) -> Row:
+    def _from_pandas_dataframe(data: pd.DataFrame, schema: Optional[Schema] = None) -> Row:
         """
         Create a row from a `pandas.DataFrame`.
 
@@ -102,7 +102,7 @@ class Row(Mapping[str, Any]):
     # Dunder methods
     # ------------------------------------------------------------------------------------------------------------------
 
-    def __init__(self, data: Mapping[str, Any] | None = None) -> None:
+    def __init__(self, data: Optional[Mapping[str, Any]] = None) -> None:
         """
         Create a row from a mapping of column names to column values.
 

@@ -4,7 +4,7 @@ import copy
 import io
 from collections.abc import Sequence
 from numbers import Number
-from typing import TYPE_CHECKING, Any, TypeVar, overload
+from typing import TYPE_CHECKING, Any, TypeVar, overload, Optional
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -50,7 +50,7 @@ class Column(Sequence[T]):
     # ------------------------------------------------------------------------------------------------------------------
 
     @staticmethod
-    def _from_pandas_series(data: pd.Series, type_: ColumnType | None = None) -> Column:
+    def _from_pandas_series(data: pd.Series, type_: Optional[ColumnType] = None) -> Column:
         """
         Create a column from a `pandas.Series`.
 
@@ -84,7 +84,7 @@ class Column(Sequence[T]):
     # Dunder methods
     # ------------------------------------------------------------------------------------------------------------------
 
-    def __init__(self, name: str, data: Sequence[T] | None = None) -> None:
+    def __init__(self, name: str, data: Optional[Sequence[T]] = None) -> None:
         """
         Create a column.
 
