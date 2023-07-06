@@ -1778,15 +1778,8 @@ class Table:
             warnings.filterwarnings(
                 "ignore",
                 message=(
-                    "Attempting to set identical low and high xlims makes transformation singular; automatically"
-                    " expanding."
-                ),
-            )
-            warnings.filterwarnings(
-                "ignore",
-                message=(
-                    "Attempting to set identical low and high ylims makes transformation singular; automatically"
-                    " expanding."
+                    "Attempting to set identical low and high (xlims|ylims) makes transformation singular;"
+                    " automatically expanding."
                 ),
             )
             fig = plt.figure()
