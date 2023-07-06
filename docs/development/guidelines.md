@@ -366,7 +366,7 @@ e.g. `test_should_add_column`.
 ### Testcases
 
 Tests should be parametrized
-using the `@pytest.mark.parametrize` construct,
+using `@pytest.mark.parametrize`,
 even if there is only a single testcase.
 Testcases should be given
 descriptive IDs.
