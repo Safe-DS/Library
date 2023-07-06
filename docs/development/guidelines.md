@@ -349,7 +349,13 @@ Examples
 
 ## Tests
 
-If a function contains more code than just the getting or setting of a value, automated test should be added to the [`tests`][tests-folder] folder. The file structure in the tests folder should mirror the file structure of the [`src`][src-folder] folder.
+If a function contains more code
+than just the getting or setting of a value,
+automated test should be added
+to the [`tests`][tests-folder] folder.
+The file structure in the tests folder
+should mirror the file structure
+of the [`src`][src-folder] folder.
 
 [src-folder]: https://github.com/Safe-DS/Stdlib/tree/main/src
 [tests-folder]: https://github.com/Safe-DS/Stdlib/tree/main/tests
