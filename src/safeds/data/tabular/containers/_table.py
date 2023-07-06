@@ -1774,16 +1774,25 @@ class Table:
         """
         only_numerical = self.remove_columns_with_non_numerical_values()
 
-        fig = plt.figure()
-        sns.heatmap(
-            data=only_numerical._data.corr(),
-            vmin=-1,
-            vmax=1,
-            xticklabels=only_numerical.column_names,
-            yticklabels=only_numerical.column_names,
-            cmap="vlag",
-        )
-        plt.tight_layout()
+        with warnings.catch_warnings():
+            warnings.filterwarnings(
+                "ignore",
+                message="Attempting to set identical low and high xlims makes transformation singular; automatically expanding.",
+            )
+            warnings.filterwarnings(
+                "ignore",
+                message="Attempting to set identical low and high ylims makes transformation singular; automatically expanding.",
+            )
+            fig = plt.figure()
+            sns.heatmap(
+                data=only_numerical._data.corr(),
+                vmin=-1,
+                vmax=1,
+                xticklabels=only_numerical.column_names,
+                yticklabels=only_numerical.column_names,
+                cmap="vlag",
+            )
+            plt.tight_layout()
 
         buffer = io.BytesIO()
         fig.savefig(buffer, format="png")
@@ -1966,17 +1975,22 @@ class Table:
         """
         col_wrap = min(self.number_of_columns, 3)
 
-        data = pd.melt(self._data, value_vars=self.column_names)
-        grid = sns.FacetGrid(data=data, col="variable", col_wrap=col_wrap, sharex=False, sharey=False)
-        grid.map(sns.histplot, "value")
-        grid.set_xlabels("")
-        grid.set_ylabels("")
-        grid.set_titles("{col_name}")
-        for axes in grid.axes.flat:
-            axes.set_xticks(axes.get_xticks())
-            axes.set_xticklabels(axes.get_xticklabels(), rotation=45, horizontalalignment="right")
-        grid.tight_layout()
-        fig = grid.fig
+        with warnings.catch_warnings():
+            warnings.filterwarnings(
+                "ignore",
+                message="Converting input from bool to <class 'numpy.uint8'> for compatibility.",
+            )
+            data = pd.melt(self._data, value_vars=self.column_names)
+            grid = sns.FacetGrid(data=data, col="variable", col_wrap=col_wrap, sharex=False, sharey=False)
+            grid.map(sns.histplot, "value")
+            grid.set_xlabels("")
+            grid.set_ylabels("")
+            grid.set_titles("{col_name}")
+            for axes in grid.axes.flat:
+                axes.set_xticks(axes.get_xticks())
+                axes.set_xticklabels(axes.get_xticklabels(), rotation=45, horizontalalignment="right")
+            grid.tight_layout()
+            fig = grid.fig
 
         buffer = io.BytesIO()
         fig.savefig(buffer, format="png")
