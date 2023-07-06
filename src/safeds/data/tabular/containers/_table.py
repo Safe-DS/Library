@@ -1777,11 +1777,17 @@ class Table:
         with warnings.catch_warnings():
             warnings.filterwarnings(
                 "ignore",
-                message="Attempting to set identical low and high xlims makes transformation singular; automatically expanding.",
+                message=(
+                    "Attempting to set identical low and high xlims makes transformation singular; automatically"
+                    " expanding."
+                ),
             )
             warnings.filterwarnings(
                 "ignore",
-                message="Attempting to set identical low and high ylims makes transformation singular; automatically expanding.",
+                message=(
+                    "Attempting to set identical low and high ylims makes transformation singular; automatically"
+                    " expanding."
+                ),
             )
             fig = plt.figure()
             sns.heatmap(
