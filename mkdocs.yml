@@ -8,6 +8,7 @@ nav:
     - Changelog: CHANGELOG.md
   - Tutorials:
     - Data Processing: tutorials/data_processing.ipynb
+    - Image processing: tutorials/image_processing.ipynb
     - Data Visualization: tutorials/data_visualization.ipynb
     - Machine Learning: tutorials/machine_learning.ipynb
   - API Reference: reference/
