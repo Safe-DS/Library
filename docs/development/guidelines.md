@@ -56,6 +56,30 @@ Some flag parameters drastically alter the semantics of a function. This can lea
     table.drop("name", axis="columns")
     ```
 
+### Return copies of objects
+
+Modifying objects in-place
+can lead to surprising behaviour
+and hard-to-find bugs.
+Methods shall never change
+the object they're called on
+or any of their parameters.
+
+!!! success "**DO** (library code):"
+
+    ```py
+        result = self._data.copy()
+        result.columns = self._schema.column_names
+        result[new_column.name] = new_column._data
+        return Table._from_pandas_dataframe(result)
+    ```
+
+!!! failure "**DON'T** (library code):"
+
+    ```py
+        self._data.add(new_column, axis='column')
+    ```
+
 ### Avoid uncommon abbreviations
 
 Write full words rather than abbreviations. The increased verbosity is offset by better readability, better functioning auto-completion, and a reduced need to consult the documentation when writing code. Common abbreviations like CSV or HTML are fine though, since they rarely require explanation.
