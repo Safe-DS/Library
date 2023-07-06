@@ -80,6 +80,21 @@ or any of their parameters.
         self._data.add(new_column, axis='column')
     ```
 
+The corresponding docstring should explicitly state
+that a method returns a copy:
+
+!!! success "**DO** (library code):"
+
+    ```py
+    """
+    Return a new table with the given column added as the last column.
+    The original table is not modified.
+    ...
+    """
+    ```
+
+!!! success "**DO** (library code):"
+
 ### Avoid uncommon abbreviations
 
 Write full words rather than abbreviations. The increased verbosity is offset by better readability, better functioning auto-completion, and a reduced need to consult the documentation when writing code. Common abbreviations like CSV or HTML are fine though, since they rarely require explanation.
