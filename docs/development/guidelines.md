@@ -397,23 +397,19 @@ descriptive IDs.
 
 Example:
 
-```py
-from pathlib import Path
-import pytest
-from safeds.data.tabular.containers import Table
-
-@pytest.mark.parametrize(
-    ("path", "expected"),
-    [
-        ("table.csv", Table({"A": [1], "B": [2]})),
-        (Path("table.csv"), Table({"A": [1], "B": [2]})),
-        ("empty_table.csv", Table()),
-    ],
-    ids=["by string", "by path", "empty"],
-)
-def test_should_create_table_from_csv_file(path: str | Path, expected: Table) -> None:
-    ...
-```
+    ```py
+    @pytest.mark.parametrize(
+        ("path", "expected"),
+        [
+            ("table.csv", Table({"A": [1], "B": [2]})),
+            (Path("table.csv"), Table({"A": [1], "B": [2]})),
+            ("empty_table.csv", Table()),
+        ],
+        ids=["by string", "by path", "empty"],
+    )
+    def test_should_create_table_from_csv_file(path: str | Path, expected: Table) -> None:
+        ...
+    ```
 
 [src-folder]: https://github.com/Safe-DS/Stdlib/tree/main/src
 [tests-folder]: https://github.com/Safe-DS/Stdlib/tree/main/tests
