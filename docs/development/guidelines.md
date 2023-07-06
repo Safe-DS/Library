@@ -93,8 +93,6 @@ that a method returns a copy:
     """
     ```
 
-!!! success "**DO** (library code):"
-
 ### Avoid uncommon abbreviations
 
 Write full words rather than abbreviations. The increased verbosity is offset by better readability, better functioning auto-completion, and a reduced need to consult the documentation when writing code. Common abbreviations like CSV or HTML are fine though, since they rarely require explanation.
