@@ -17,7 +17,7 @@ class OutOfBoundsError(ValueError):
         The lower Bound.
     """
 
-    def __init__(self, actual: float, *, lower_bound: Bound = None, upper_bound: Bound = None):
+    def __init__(self, actual: float, *, lower_bound: Bound | None = None, upper_bound: Bound | None = None):
         if (lower_bound is None or isinstance(lower_bound, MinInfinity)) and (upper_bound is None or isinstance(upper_bound, Infinity)):
             raise NotImplementedError("Value cannot be out of bounds if there are no bounds.")
         if lower_bound is None:
