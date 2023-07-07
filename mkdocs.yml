@@ -7,6 +7,7 @@ nav:
     - README.md
     - Changelog: CHANGELOG.md
   - Tutorials:
+
     - "Getting Started: Classification": tutorials/getting_started_classification.ipynb
     - "Getting Started: Regression": tutorials/getting_started_regression.ipynb
     - Data Processing: tutorials/data_processing.ipynb
