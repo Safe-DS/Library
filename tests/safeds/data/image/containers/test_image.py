@@ -13,7 +13,7 @@ class TestFromJpegFile:
     @pytest.mark.parametrize(
         "path",
         ["image/white_square.jpg", Path("image/white_square.jpg")],
-        ids=["white_square_jpg", "white_square_jpg,"],
+        ids=["jpg", "jpg_Path"]
     )
     def test_should_load_jpeg_file(self, path: str | Path) -> None:
         Image.from_jpeg_file(resolve_resource_path(path))
@@ -21,7 +21,7 @@ class TestFromJpegFile:
     @pytest.mark.parametrize(
         "path",
         ["image/missing_file.jpg", Path("image/missing_file.jpg")],
-        ids=["missing_file_jpg",],
+        ids=["missing_file_jpg", "missing_file_jpg_Path"]
     )
     def test_should_raise_if_file_not_found(self, path: str | Path) -> None:
         with pytest.raises(FileNotFoundError):
@@ -32,7 +32,7 @@ class TestFromPngFile:
     @pytest.mark.parametrize(
         "path",
         ["image/white_square.png", Path("image/white_square.png")],
-        ids=["white_square_png"],
+        ids=["png", "png_Path"]
     )
     def test_should_load_png_file(self, path: str | Path) -> None:
         Image.from_png_file(resolve_resource_path(path))
@@ -40,7 +40,7 @@ class TestFromPngFile:
     @pytest.mark.parametrize(
         "path",
         ["image/missing_file.png", Path("image/missing_file.png")],
-        ids=["missing_file_png"]
+        ids=["missing_file_png", "missing_file_png_Path"]
     )
     def test_should_raise_if_file_not_found(self, path: str | Path) -> None:
         with pytest.raises(FileNotFoundError):
@@ -54,7 +54,7 @@ class TestFormat:
             (Image.from_jpeg_file(resolve_resource_path("image/white_square.jpg")), ImageFormat.JPEG),
             (Image.from_png_file(resolve_resource_path("image/white_square.png")), ImageFormat.PNG),
         ],
-        ids=["jpg","png"]
+        ids=["jpg", "png"]
     )
     def test_should_return_correct_format(self, image: Image, format_: ImageFormat) -> None:
         assert image.format == format_
@@ -275,7 +275,7 @@ class TestFlipHorizontally:
 
 
 class TestAdjustContrast:
-    @pytest.mark.parametrize("factor", [0.75, 5], ids=["factor"])
+    @pytest.mark.parametrize("factor", [0.75, 5], ids=["small factor", "large factor"])
     def test_should_adjust_contrast(self, factor: float) -> None:
         image = Image.from_png_file(resolve_resource_path("image/contrast/to_adjust_contrast.png"))
         image2 = image.adjust_contrast(factor)
@@ -301,7 +301,7 @@ class TestAdjustContrast:
 
 
 class TestBrightness:
-    @pytest.mark.parametrize("factor", [0.5, 10], ids=["factor"])
+    @pytest.mark.parametrize("factor", [0.5, 10], ids=["small factor", "large factor"])
     def test_should_adjust_brightness(self, factor: float) -> None:
         image = Image.from_png_file(resolve_resource_path("image/brightness/to_brighten.png"))
         image2 = image.adjust_brightness(factor)
