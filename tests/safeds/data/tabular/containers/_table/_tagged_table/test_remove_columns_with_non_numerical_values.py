@@ -27,7 +27,7 @@ from tests.helpers import assert_that_tagged_tables_are_equal
                 },
                 "target",
                 ["feature_numerical"],
-            )
+            ),
         ),
         (
             TaggedTable(
@@ -47,8 +47,8 @@ from tests.helpers import assert_that_tagged_tables_are_equal
                     "target": [3, 4, 5],
                 },
                 "target",
-                ["feature_numerical"]
-            )
+                ["feature_numerical"],
+            ),
         ),
         (
             TaggedTable(
@@ -67,11 +67,11 @@ from tests.helpers import assert_that_tagged_tables_are_equal
                     "target": [3, 4, 5],
                 },
                 "target",
-                ["feature_numerical"]
-            )
+                ["feature_numerical"],
+            ),
         ),
     ],
-    ids=["non_numerical_feature", "non_numerical_non_feature", "all_numerical"]
+    ids=["non_numerical_feature", "non_numerical_non_feature", "all_numerical"],
 )
 def test_should_remove_columns_with_non_numerical_values(table: TaggedTable, expected: TaggedTable) -> None:
     new_table = table.remove_columns_with_non_numerical_values()
@@ -131,7 +131,7 @@ def test_should_remove_columns_with_non_numerical_values(table: TaggedTable, exp
         "also_feature_non_numerical",
         "also_non_feature_non_numerical",
         "all_non_numerical",
-    ]
+    ],
 )
 def test_should_throw_column_is_target(table: TaggedTable) -> None:
     with pytest.raises(
