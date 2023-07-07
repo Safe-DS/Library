@@ -36,7 +36,6 @@ __all__ = [
     "UnknownColumnNameError",
     "ValueNotPresentWhenFittedError",
     "WrongFileExtensionError",
-
     # ML exceptions
     "DatasetContainsTargetError",
     "DatasetMissesDataError",
@@ -45,5 +44,4 @@ __all__ = [
     "ModelNotFittedError",
     "PredictionError",
     "UntaggedTableError",
-
 ]
