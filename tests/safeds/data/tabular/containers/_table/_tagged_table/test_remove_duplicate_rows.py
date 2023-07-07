@@ -21,7 +21,7 @@ from tests.helpers import assert_that_tagged_tables_are_equal
                     "target": [2, 3],
                 },
                 "target",
-            )
+            ),
         ),
         (
             TaggedTable(
@@ -37,10 +37,10 @@ from tests.helpers import assert_that_tagged_tables_are_equal
                     "target": [2, 2, 3],
                 },
                 "target",
-            )
+            ),
         ),
     ],
-    ids=["with_duplicate_rows", "without_duplicate_rows"]
+    ids=["with_duplicate_rows", "without_duplicate_rows"],
 )
 def test_should_remove_duplicate_rows(table: TaggedTable, expected: TaggedTable) -> None:
     new_table = table.remove_duplicate_rows()

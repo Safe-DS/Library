@@ -27,7 +27,7 @@ from tests.helpers import assert_that_tagged_tables_are_equal
                 },
                 "target",
                 ["feature_complete"],
-            )
+            ),
         ),
         (
             TaggedTable(
@@ -47,8 +47,8 @@ from tests.helpers import assert_that_tagged_tables_are_equal
                     "target": [3, 4, 5],
                 },
                 "target",
-                ["feature_complete"]
-            )
+                ["feature_complete"],
+            ),
         ),
         (
             TaggedTable(
@@ -67,11 +67,11 @@ from tests.helpers import assert_that_tagged_tables_are_equal
                     "target": [3, 4, 5],
                 },
                 "target",
-                ["feature_complete"]
-            )
+                ["feature_complete"],
+            ),
         ),
     ],
-    ids=["incomplete_feature", "incomplete_non_feature", "all_complete"]
+    ids=["incomplete_feature", "incomplete_non_feature", "all_complete"],
 )
 def test_should_remove_columns_with_non_numerical_values(table: TaggedTable, expected: TaggedTable) -> None:
     new_table = table.remove_columns_with_missing_values()
@@ -131,7 +131,7 @@ def test_should_remove_columns_with_non_numerical_values(table: TaggedTable, exp
         "also_feature_incomplete",
         "also_non_feature_incomplete",
         "all_incomplete",
-    ]
+    ],
 )
 def test_should_throw_column_is_target(table: TaggedTable) -> None:
     with pytest.raises(

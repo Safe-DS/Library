@@ -5,7 +5,7 @@ from tests.helpers import assert_that_tagged_tables_are_equal
 
 
 @pytest.mark.parametrize(
-    ("table" ,"expected"),
+    ("table", "expected"),
     [
         (
             TaggedTable(
@@ -21,7 +21,7 @@ from tests.helpers import assert_that_tagged_tables_are_equal
                     "target": [3.0, 5.0],
                 },
                 "target",
-            )
+            ),
         ),
         (
             TaggedTable(
@@ -37,10 +37,10 @@ from tests.helpers import assert_that_tagged_tables_are_equal
                     "target": [3.0, 4.0, 5.0],
                 },
                 "target",
-            )
+            ),
         ),
     ],
-    ids=["with_missing_values", "without_missing_values"]
+    ids=["with_missing_values", "without_missing_values"],
 )
 def test_should_remove_rows_with_missing_values(table: TaggedTable, expected: TaggedTable) -> None:
     new_table = table.remove_rows_with_missing_values()
