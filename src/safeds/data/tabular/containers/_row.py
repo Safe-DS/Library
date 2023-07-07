@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import copy
 from collections.abc import Mapping
 from typing import TYPE_CHECKING, Any
 
@@ -263,7 +264,7 @@ class Row(Mapping[str, Any]):
         >>> repr(row)
         "Row({'a': 1})"
         """
-        return f"Row({str(self)})"
+        return f"Row({self!s})"
 
     def __str__(self) -> str:
         """
@@ -493,3 +494,18 @@ class Row(Mapping[str, Any]):
             The generated HTML.
         """
         return self._data.to_html(max_rows=1, max_cols=self._data.shape[1], notebook=True)
+
+    # ------------------------------------------------------------------------------------------------------------------
+    # Helpers
+    # ------------------------------------------------------------------------------------------------------------------
+
+    def _copy(self) -> Row:
+        """
+        Return a copy of this row.
+
+        Returns
+        -------
+        copy : Row
+            The copy of this row.
+        """
+        return copy.deepcopy(self)
