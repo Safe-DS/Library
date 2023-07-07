@@ -13,6 +13,7 @@ from safeds.exceptions._data import (
     ValueNotPresentWhenFittedError,
     WrongFileExtensionError,
 )
+from safeds.exceptions._generic import OutOfBoundsError
 from safeds.exceptions._ml import (
     DatasetContainsTargetError,
     DatasetMissesDataError,
@@ -24,6 +25,8 @@ from safeds.exceptions._ml import (
 )
 
 __all__ = [
+    # Generic exceptions
+    "OutOfBoundsError",
     # Data exceptions
     "ColumnLengthMismatchError",
     "ColumnSizeError",
