@@ -345,7 +345,7 @@ class TestGaussianNoise:
     @pytest.mark.parametrize(
         ("image", "standard_deviation", "opacity"),
         [(Image.from_png_file(resolve_resource_path("image/boy.png")), -1, 1.0)],
-        ids=["normal"]
+        ids=["normal"],
     )
     def test_should_raise_standard_deviation(self, image: Image, standard_deviation: float, opacity: float) -> None:
         with pytest.raises(ValueError, match="Standard deviation has to be 0 or bigger."):
@@ -366,7 +366,7 @@ class TestGaussianNoise:
     @pytest.mark.parametrize(
         ("image", "standard_deviation", "opacity"),
         [(Image.from_png_file(resolve_resource_path("image/boy.png")), 1, 0)],
-        ids=["normal"]
+        ids=["normal"],
     )
     def test_should_warn(self, image: Image, standard_deviation: float, opacity: float) -> None:
         with pytest.warns(UserWarning, match="Opacity is 0, this will not make changes to the image."):
