@@ -474,3 +474,14 @@ class TestF1Score:
     def test_should_raise_if_table_is_not_tagged(self, table: Table) -> None:
         with pytest.raises(UntaggedTableError):
             DummyClassifier().f1_score(table, 1)  # type: ignore[arg-type]
+
+class TestRocCurve:
+    def test_should_compare_result(self) -> None:
+        table = Table(
+            {
+                "predicted": [1, 1, 0, 2],
+                "expected": [1, 0, 1, 2],
+            },
+        ).tag_columns(target_name="expected")
+
+        assert DummyClassifier().roc_curve(table, 1) == 0.5

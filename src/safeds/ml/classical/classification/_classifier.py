@@ -5,8 +5,9 @@ from typing import TYPE_CHECKING
 
 from sklearn.metrics import accuracy_score as sk_accuracy_score
 
-from safeds.data.tabular.containers import Table, TaggedTable
+from safeds.data.tabular.containers import Table, TaggedTable, Row
 from safeds.exceptions import UntaggedTableError
+
 
 if TYPE_CHECKING:
     from typing import Any
@@ -231,7 +232,7 @@ class Classifier(ABC):
             return 1.0
         return 2 * n_true_positives / (2 * n_true_positives + n_false_positives + n_false_negatives)
 
- def roc_curve(self, validation_or_test_set: TaggedTable, positive_class: Any) -> Table:
+    def roc_curve(self, validation_or_test_set: TaggedTable, positive_class: Any) -> Table:
         """
         Compute the classifier's roc_curve on the given data.
 
@@ -252,25 +253,14 @@ class Classifier(ABC):
             raise UntaggedTableError
 
         expected_values = validation_or_test_set.target
-        predicted_values = self.predict(validation_or_test_set.features).target
-        roc_curve = Table({"col1": []})
-
-        n_true_positives = 0
-        n_false_negatives = 0
-        n_false_positives = 0
+        roc_curve = Table({})
 
         for i in expected_values.number_of_rows():
-            j = 0
-            while j < i:
-                if predicted_values.get_value(j) == positive_class:
-                    if expected_values.get_value(j) == positive_class:
-                        n_true_positives += 1
-                    else:
-                        n_false_positives += 1
-                elif expected_values.get_value_(j) == positive_class:
-                    n_false_negatives += 1
-                j += 1
+            roc = self.accuracy(validation_or_test_set.slice_rows(end=i), positive_class) + self.recall(validation_or_test_set..slice_rows(end=i), positive_class) - 1
+            roc_curve.add_row(Row({"col1": roc}))
 
-
+        print("\nRow:", Row({"col1": roc}))
+        print("\nroc:", roc)
+        print("\ncurve:", roc_curve)
 
         return roc_curve
