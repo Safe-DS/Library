@@ -1776,7 +1776,8 @@ class Table:
 
         if self.number_of_rows == 0:
             warnings.warn(
-                "An empty table has been used. A correlation heatmap on an empty table will show nothing.", stacklevel=2,
+                "An empty table has been used. A correlation heatmap on an empty table will show nothing.",
+                stacklevel=2,
             )
 
             with warnings.catch_warnings():
