@@ -1,5 +1,4 @@
 import pytest
-
 from safeds.data.tabular.containers import TaggedTable
 
 
@@ -8,7 +7,9 @@ from safeds.data.tabular.containers import TaggedTable
     [
         TaggedTable({"a": [], "b": []}, target_name="b", feature_names=["a"]),
         TaggedTable({"a": ["a", 3, 0.1], "b": [True, False, None]}, target_name="b", feature_names=["a"]),
-        TaggedTable({"a": ["a", 3, 0.1], "b": [True, False, None], "c": ["a", "b", "c"]}, target_name="b", feature_names=["a"]),
+        TaggedTable(
+            {"a": ["a", 3, 0.1], "b": [True, False, None], "c": ["a", "b", "c"]}, target_name="b", feature_names=["a"],
+        ),
         TaggedTable({"a": [], "b": [], "c": []}, target_name="b", feature_names=["a"]),
     ],
     ids=["empty-rows", "normal", "column_as_non_feature", "column_as_non_feature_with_empty_rows"],

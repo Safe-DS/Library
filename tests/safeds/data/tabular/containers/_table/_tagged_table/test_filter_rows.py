@@ -1,8 +1,7 @@
-from typing import Callable
+from collections.abc import Callable
 
 import pytest
-
-from safeds.data.tabular.containers import TaggedTable, Row
+from safeds.data.tabular.containers import Row, TaggedTable
 
 from tests.helpers import assert_that_tagged_tables_are_equal
 
@@ -27,7 +26,7 @@ from tests.helpers import assert_that_tagged_tables_are_equal
                 },
                 "target",
             ),
-            lambda row: all(row.get_value(col) < 10 for col in row.column_names)
+            lambda row: all(row.get_value(col) < 10 for col in row.column_names),
         ),
         (
             TaggedTable(
@@ -38,7 +37,7 @@ from tests.helpers import assert_that_tagged_tables_are_equal
                     "target": [1, 3, 2, 4],
                 },
                 "target",
-                ["feature_1", "feature_2"]
+                ["feature_1", "feature_2"],
             ),
             TaggedTable(
                 {
@@ -48,11 +47,11 @@ from tests.helpers import assert_that_tagged_tables_are_equal
                     "target": [1, 2],
                 },
                 "target",
-                ["feature_1", "feature_2"]
+                ["feature_1", "feature_2"],
             ),
-            lambda row: all(row.get_value(col) < 10 for col in row.column_names)
+            lambda row: all(row.get_value(col) < 10 for col in row.column_names),
         ),
-(
+        (
             TaggedTable(
                 {
                     "feature_1": [3, 9, 6],
@@ -69,7 +68,7 @@ from tests.helpers import assert_that_tagged_tables_are_equal
                 },
                 "target",
             ),
-            lambda row: all(row.get_value(col) < 20 for col in row.column_names)
+            lambda row: all(row.get_value(col) < 20 for col in row.column_names),
         ),
         (
             TaggedTable(
@@ -80,7 +79,7 @@ from tests.helpers import assert_that_tagged_tables_are_equal
                     "target": [1, 3, 2, 4],
                 },
                 "target",
-                ["feature_1", "feature_2"]
+                ["feature_1", "feature_2"],
             ),
             TaggedTable(
                 {
@@ -90,12 +89,17 @@ from tests.helpers import assert_that_tagged_tables_are_equal
                     "target": [1, 3, 2, 4],
                 },
                 "target",
-                ["feature_1", "feature_2"]
+                ["feature_1", "feature_2"],
             ),
-            lambda row: all(row.get_value(col) < 20 for col in row.column_names)
-        )
+            lambda row: all(row.get_value(col) < 20 for col in row.column_names),
+        ),
     ],
-    ids=["remove_rows_with_values_greater_9", "remove_rows_with_values_greater_9_non_feature_columns", "remove_no_rows", "remove_no_rows_non_feature_columns"]
+    ids=[
+        "remove_rows_with_values_greater_9",
+        "remove_rows_with_values_greater_9_non_feature_columns",
+        "remove_no_rows",
+        "remove_no_rows_non_feature_columns",
+    ],
 )
 def test_should_filter_rows(table: TaggedTable, expected: TaggedTable, query: Callable[[Row], bool]) -> None:
     assert_that_tagged_tables_are_equal(table.filter_rows(query), expected)
