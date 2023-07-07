@@ -1,6 +1,6 @@
+import numpy as np
 import pytest
 from safeds.data.tabular.containers import Table
-import numpy as np
 
 
 @pytest.mark.parametrize(
