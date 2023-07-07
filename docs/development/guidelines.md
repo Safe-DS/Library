@@ -209,7 +209,7 @@ The user should not have to deal with exceptions that are defined in the wrapper
 
 The exceptions in the `__all__` list in `src/safeds/exceptions/__init__.py` should be sorted alphabetically. This makes it easier for users to find the exception they are looking for.
 
-!!! success "**DO** (client code):"
+!!! success "**DO** (library code):"
 
     ```py
     __all__ =[
@@ -218,7 +218,7 @@ The exceptions in the `__all__` list in `src/safeds/exceptions/__init__.py` shou
         "MissingValuesColumnError"
     ]
     ```
-!!! failure "**DON'T** (client code):"
+!!! failure "**DON'T** (library code):"
 
     ```py
     __all__ =[
