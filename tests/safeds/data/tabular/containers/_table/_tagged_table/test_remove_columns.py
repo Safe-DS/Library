@@ -136,13 +136,7 @@ def test_should_remove_columns(table: TaggedTable, columns: list[str], expected:
     [
         (
             TaggedTable._from_table(
-                Table(
-                    {
-                        "feat": [1, 2, 3],
-                        "non_feat": [1, 2, 3],
-                        "target": [4, 5, 6]
-                    }
-                ),
+                Table({"feat": [1, 2, 3], "non_feat": [1, 2, 3], "target": [4, 5, 6]}),
                 "target",
                 ["feat"],
             ),
@@ -150,13 +144,7 @@ def test_should_remove_columns(table: TaggedTable, columns: list[str], expected:
         ),
         (
             TaggedTable._from_table(
-                Table(
-                    {
-                        "feat": [1, 2, 3],
-                        "non_feat": [1, 2, 3],
-                        "target": [4, 5, 6]
-                    }
-                ),
+                Table({"feat": [1, 2, 3], "non_feat": [1, 2, 3], "target": [4, 5, 6]}),
                 "target",
                 ["feat"],
             ),
