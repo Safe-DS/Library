@@ -205,10 +205,8 @@ The user should not have to deal with exceptions that are defined in the wrapper
         return pd.read_csv(path) # May raise a pd.ParserError
     ```
 
-### Sort the exceptions in the `__all__` list alphabetically
-
-The exceptions in the `__all__` list in `src/safeds/exceptions/__init__.py` should be sorted alphabetically. This makes it easier for users to find the exception they are looking for.
-
+### Sort entries in `__all__` lists alphabetically
+The entries in the `__all__` list in `__init__.py` files should be sorted alphabetically. This helps reduce the likelihood of merge conflicts when new entries are introduced on different branches.
 !!! success "**DO** (library code):"
 
     ```py
