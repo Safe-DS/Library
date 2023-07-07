@@ -32,6 +32,7 @@ class TestStrategy:
                 (Imputer.Strategy.Median(), "Median"),
                 (Imputer.Strategy.Mode(), "Mode"),
             ],
+            ids=["Constant", "Mean", "Median", "Mode"],
         )
         def test_should_return_correct_string_representation(self, strategy: ImputerStrategy, expected: str) -> None:
             assert str(strategy) == expected
