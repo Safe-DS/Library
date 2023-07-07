@@ -52,7 +52,7 @@ class ColumnType(ABC):
                 message = f"Unsupported numpy data type '{cell_type}'."
                 raise NotImplementedError(message)
 
-        result = Nothing()
+        result: ColumnType | Integer | String | Boolean | RealNumber | Nothing = Nothing()
         is_nullable = False
         for cell in data:
             if result == Nothing():
