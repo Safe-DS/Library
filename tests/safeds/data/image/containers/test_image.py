@@ -373,6 +373,7 @@ class TestGaussianNoise:
         with pytest.warns(UserWarning, match="Opacity is 0, this will not make changes to the image."):
             image.add_gaussian_noise(standard_deviation, opacity)
 
+
 class TestBlur:
     @pytest.mark.parametrize(
         ("image", "expected"),
