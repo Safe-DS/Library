@@ -16,6 +16,6 @@ def test_should_get_similar_column_names(table: Table, column_name: str, expecte
     assert table._get_similar_columns(column_name) == expected
 
 
-def test_should_raise_error_if_column_name_unknown():
+def test_should_raise_error_if_column_name_unknown() -> None:
     with pytest.raises(UnknownColumnNameError, match=r"Could not find column\(s\) 'col3'.\nDid you mean 'col1, col2'?"):
         raise UnknownColumnNameError(["col3"], ["col1", "col2"])
