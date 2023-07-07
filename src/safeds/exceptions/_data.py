@@ -22,7 +22,7 @@ class UnknownColumnNameError(KeyError):
             def __repr__(self) -> str:
                 return str(self)
 
-        super().__init__(_UnknownColumnNameErrorMessage(f"Could not find column(s) '{', '.join(column_names)}'.\nDid you mean '{', '.join(similar_columns)}'?"))
+        super().__init__(_UnknownColumnNameErrorMessage(f"Could not find column(s) '{', '.join(column_names)}'.\nDid you mean '{similar_columns}'?"))
 
 class NonNumericColumnError(Exception):
     """Exception raised for trying to do numerical operations on a non-numerical column."""
