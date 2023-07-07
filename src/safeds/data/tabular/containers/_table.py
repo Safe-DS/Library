@@ -935,7 +935,8 @@ class Table:
                     result._data[column] = Column(column, [])
                 result._schema = Schema._from_pandas_dataframe(result._data)
             elif result.column_names != row.column_names:
-                raise UnknownColumnNameError
+                unknown_columns = list(set(row.column_names) - set(result.column_names))
+                raise UnknownColumnNameError(unknown_columns)
 
         new_df = pd.concat([result._data, row._data]).infer_objects()
         new_df.columns = result.column_names
@@ -983,7 +984,6 @@ class Table:
         """
         if isinstance(rows, Table):
             rows = rows.to_rows()
-        int_columns = []
         result = self._copy()
 
         if len(rows) == 0:
