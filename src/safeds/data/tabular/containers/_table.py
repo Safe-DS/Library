@@ -922,7 +922,7 @@ class Table:
         1  3  4
         """
         int_columns = []
-        result = self.remove_columns([])  # clone
+        result = self._copy()
         if self.number_of_columns == 0:
             return Table.from_rows([row])
         if len(set(self.column_names) - set(row.column_names)) > 0:
@@ -983,9 +983,11 @@ class Table:
         """
         if isinstance(rows, Table):
             rows = rows.to_rows()
+        int_columns = []
+        result = self._copy()
 
         if len(rows) == 0:
-            return copy.deepcopy(self)
+            return self._copy()
 
         different_column_names = set()
         for row in rows:
@@ -999,7 +1001,7 @@ class Table:
             if len(different_column_names) > 0:
                 raise UnknownColumnNameError(list(different_column_names))
 
-        result = copy.deepcopy(self)
+        result = self._copy()
 
         for row in rows:
             result = result.add_row(row)
@@ -1102,7 +1104,7 @@ class Table:
         if len(invalid_columns) != 0:
             raise UnknownColumnNameError(invalid_columns)
 
-        clone = copy.deepcopy(self)
+        clone = self._copy()
         clone = clone.remove_columns(list(set(self.column_names) - set(column_names)))
         return clone
 
@@ -1491,6 +1493,8 @@ class Table:
         * If the original order of `col1` and `col2` should be kept, the function should return 0.
 
         If no comparator is given, the columns will be sorted alphabetically by their name.
+
+        This table is not modified.
 
         Parameters
         ----------
@@ -2229,3 +2233,18 @@ class Table:
         data_copy = self._data.copy()
         data_copy.columns = self.column_names
         return data_copy.__dataframe__(nan_as_null, allow_copy)
+
+    # ------------------------------------------------------------------------------------------------------------------
+    # Helpers
+    # ------------------------------------------------------------------------------------------------------------------
+
+    def _copy(self) -> Table:
+        """
+        Return a copy of this table.
+
+        Returns
+        -------
+        table : Table
+            The copy of this table.
+        """
+        return copy.deepcopy(self)
