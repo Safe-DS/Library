@@ -695,7 +695,7 @@ class Table:
 
     def _get_similar_columns(self, column_name: str) -> list[str]:
         """
-        Give a warning with similar columns to the given one that's not in the table.
+        Get all similar column names to the given one that's not in the table.
 
         Parameters
         ----------
@@ -704,8 +704,8 @@ class Table:
 
         Returns
         -------
-        bool
-            True if there are similar columns.
+        similar_columns: list[str]
+            A list of all similar column names.
         """
         similar_columns = []
         for column in self.column_names:
