@@ -379,7 +379,7 @@ class TaggedTable(Table):
         table : TaggedTable
             A table containing only the rows filtered by the query.
         """
-        return TaggedTable._from_table(super().filter_rows(query), target_name=self.target.name)
+        return TaggedTable._from_table(super().filter_rows(query), target_name=self.target.name, feature_names=self.features.column_names)
 
     def keep_only_columns(self, column_names: list[str]) -> TaggedTable:
         """
@@ -402,10 +402,12 @@ class TaggedTable(Table):
         UnknownColumnNameError
             If any of the given columns does not exist.
         IllegalSchemaModificationError
-            If none of the given columns is the target column.
+            If none of the given columns is the target column or any of the feature columns.
         """
         if self.target.name not in column_names:
-            raise IllegalSchemaModificationError("Must keep target column and at least one feature column.")
+            raise IllegalSchemaModificationError("Must keep the target column.")
+        if len(set(self.features.column_names).intersection(set(column_names))) == 0:
+            raise IllegalSchemaModificationError("Must keep at least one feature column.")
         table = super().keep_only_columns(column_names)
         return TaggedTable._from_table(
             table,
