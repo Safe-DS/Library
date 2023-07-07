@@ -18,7 +18,7 @@ from safeds.data.tabular.containers import Row, Table
             Table({"col1": [1, 2, 3]}),
         ),
     ],
-    ids=["empty", "3 rows"]
+    ids=["empty", "not empty"]
 )
 def test_should_return_sorted_table(
     table: Table,
@@ -43,7 +43,7 @@ def test_should_return_sorted_table(
             Table({"col1": [3, 2, 1]}),
         ),
     ],
-    ids=["empty", "3 rows"]
+    ids=["empty", "not empty"]
 )
 def test_should_not_modify_original_table(
     table: Table,
