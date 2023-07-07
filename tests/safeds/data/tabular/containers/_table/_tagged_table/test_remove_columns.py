@@ -97,18 +97,22 @@ from tests.helpers import assert_that_tagged_tables_are_equal
                 Table(
                     {
                         "feat_1": [1, 2, 3],
-                        "feat_2": [4, 5, 6],
                         "non_feat_1": [2, 4, 6],
-                        "non_feat_2": [3, 6, 9],
                         "target": [7, 8, 9],
                     },
                 ),
                 "target",
-                ["feat_1", "feat_2"],
+                ["feat_1"],
             ),
-            ["feat_2", "non_feat_2"],
+            [],
             TaggedTable._from_table(
-                Table({"feat_1": [1, 2, 3], "non_feat_1": [2, 4, 6], "target": [7, 8, 9]}),
+                Table(
+                    {
+                        "feat_1": [1, 2, 3],
+                        "non_feat_1": [2, 4, 6],
+                        "target": [7, 8, 9]
+                    }
+                ),
                 "target",
                 ["feat_1"],
             ),
