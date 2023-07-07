@@ -1,6 +1,6 @@
 import pytest
 from safeds.data.tabular.containers import TaggedTable
-from safeds.exceptions import ColumnIsTargetError
+from safeds.exceptions import ColumnIsTargetError, IllegalSchemaModificationError
 
 from tests.helpers import assert_that_tagged_tables_are_equal
 
@@ -79,7 +79,7 @@ def test_should_remove_columns_with_non_numerical_values(table: TaggedTable, exp
 
 
 @pytest.mark.parametrize(
-    "table",
+    ("table", "error", "error_msg"),
     [
         (
             TaggedTable(
@@ -90,7 +90,9 @@ def test_should_remove_columns_with_non_numerical_values(table: TaggedTable, exp
                 },
                 "target",
                 ["feature"],
-            )
+            ),
+            ColumnIsTargetError,
+            r'Illegal schema modification: Column "target" is the target column and cannot be removed.'
         ),
         (
             TaggedTable(
@@ -101,7 +103,9 @@ def test_should_remove_columns_with_non_numerical_values(table: TaggedTable, exp
                 },
                 "target",
                 ["feature"],
-            )
+            ),
+            ColumnIsTargetError,
+            r'Illegal schema modification: Column "target" is the target column and cannot be removed.'
         ),
         (
             TaggedTable(
@@ -112,7 +116,9 @@ def test_should_remove_columns_with_non_numerical_values(table: TaggedTable, exp
                 },
                 "target",
                 ["feature"],
-            )
+            ),
+            ColumnIsTargetError,
+            r'Illegal schema modification: Column "target" is the target column and cannot be removed.'
         ),
         (
             TaggedTable(
@@ -123,7 +129,35 @@ def test_should_remove_columns_with_non_numerical_values(table: TaggedTable, exp
                 },
                 "target",
                 ["feature"],
-            )
+            ),
+            ColumnIsTargetError,
+            r'Illegal schema modification: Column "target" is the target column and cannot be removed.'
+        ),
+        (
+            TaggedTable(
+                {
+                    "feature": [0, "a", 2],
+                    "non_feature": [1, 2, 3],
+                    "target": [3, 2, 5],
+                },
+                "target",
+                ["feature"],
+            ),
+            IllegalSchemaModificationError,
+            r'Illegal schema modification: You cannot remove every feature column.'
+        ),
+        (
+            TaggedTable(
+                {
+                    "feature": [0, "a", 2],
+                    "non_feature": [1, "b", 3],
+                    "target": [3, 2, 5],
+                },
+                "target",
+                ["feature"],
+            ),
+            IllegalSchemaModificationError,
+            r'Illegal schema modification: You cannot remove every feature column.'
         ),
     ],
     ids=[
@@ -131,11 +165,10 @@ def test_should_remove_columns_with_non_numerical_values(table: TaggedTable, exp
         "also_feature_non_numerical",
         "also_non_feature_non_numerical",
         "all_non_numerical",
+        "all_features_incomplete",
+        "all_features_and_non_feature_incomplete"
     ],
 )
-def test_should_throw_column_is_target(table: TaggedTable) -> None:
-    with pytest.raises(
-        ColumnIsTargetError,
-        match='Illegal schema modification: Column "target" is the target column and cannot be removed.',
-    ):
+def test_should_raise_in_remove_columns_with_non_numerical_values(table: TaggedTable, error: type[Exception], error_msg: str) -> None:
+    with pytest.raises(error, match=error_msg):
         table.remove_columns_with_non_numerical_values()

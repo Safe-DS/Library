@@ -809,7 +809,7 @@ class Table:
         Returns
         -------
         table: Table
-        The table, as an instance of the Table class.
+            The table, as an instance of the Table class.
         """
         return self
 
@@ -904,8 +904,9 @@ class Table:
         """
         Add a row to the table.
 
+        If the table happens to be empty beforehand, respective columns will be added automatically.
+
         This table is not modified.
-        If the table happens to be empty beforehand, respective features will be added automatically.
 
         Parameters
         ----------
@@ -1361,7 +1362,9 @@ class Table:
 
     def replace_column(self, old_column_name: str, new_columns: list[Column]) -> Table:
         """
-        Return a copy of the table with the specified old column replaced by a list of new columns. Keeps the order of columns.
+        Return a copy of the table with the specified old column replaced by a list of new columns.
+
+        The order of columns is kept.
 
         This table is not modified.
 
@@ -1505,7 +1508,7 @@ class Table:
         """
         Sort the columns of a `Table` with the given comparator and return a new `Table`.
 
-        The original table is not modified. The comparator is a function that takes two columns `col1` and `col2` and
+        The comparator is a function that takes two columns `col1` and `col2` and
         returns an integer:
 
         * If `col1` should be ordered before `col2`, the function should return a negative number.
@@ -1549,7 +1552,7 @@ class Table:
         """
         Sort the rows of a `Table` with the given comparator and return a new `Table`.
 
-        The original table is not modified. The comparator is a function that takes two rows `row1` and `row2` and
+        The comparator is a function that takes two rows `row1` and `row2` and
         returns an integer:
 
         * If `row1` should be ordered before `row2`, the function should return a negative number.

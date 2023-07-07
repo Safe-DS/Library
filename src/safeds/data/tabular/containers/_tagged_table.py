@@ -440,9 +440,13 @@ class TaggedTable(Table):
             If any of the given columns does not exist.
         ColumnIsTargetError
             If any of the given columns is the target column.
+        IllegalSchemaModificationError
+            If the given columns contain all the feature columns.
         """
         if self.target.name in column_names:
             raise ColumnIsTargetError(self.target.name)
+        if len(set(self.features.column_names) - set(column_names)) == 0:
+            raise IllegalSchemaModificationError("You cannot remove every feature column.")
         return TaggedTable._from_table(
             super().remove_columns(column_names),
             target_name=self.target.name,
@@ -467,10 +471,14 @@ class TaggedTable(Table):
         ------
         ColumnIsTargetError
             If any of the columns to be removed is the target column.
+        IllegalSchemaModificationError
+            If the columns to remove contain all the feature columns.
         """
         table = super().remove_columns_with_missing_values()
         if self.target.name not in table.column_names:
             raise ColumnIsTargetError(self.target.name)
+        if len(set(self.features.column_names).intersection(set(table.column_names))) == 0:
+            raise IllegalSchemaModificationError("You cannot remove every feature column.")
         return TaggedTable._from_table(
             table,
             self.target.name,
@@ -495,10 +503,14 @@ class TaggedTable(Table):
         ------
         ColumnIsTargetError
             If any of the columns to be removed is the target column.
+        IllegalSchemaModificationError
+            If the columns to remove contain all the feature columns.
         """
         table = super().remove_columns_with_non_numerical_values()
         if self.target.name not in table.column_names:
             raise ColumnIsTargetError(self.target.name)
+        if len(set(self.features.column_names).intersection(set(table.column_names))) == 0:
+            raise IllegalSchemaModificationError("You cannot remove every feature column.")
         return TaggedTable._from_table(
             table,
             self.target.name,
@@ -602,13 +614,13 @@ class TaggedTable(Table):
 
     def replace_column(self, old_column_name: str, new_columns: list[Column]) -> TaggedTable:
         """
-        Return a copy of the table with the specified column replaced by new columns.
+        Return a copy of the table with the specified old column replaced by a list of new columns.
 
         The order of columns is kept.
 
         If the column to be replaced is the target column, it must be replaced by exactly one column.
 
-        The original is not modified.
+        This table is not modified.
 
         Parameters
         ----------
@@ -667,7 +679,6 @@ class TaggedTable(Table):
         -------
         result : TaggedTable
             The shuffled Table.
-
         """
         return TaggedTable._from_table(
             super().shuffle_rows(),
@@ -719,7 +730,7 @@ class TaggedTable(Table):
         """
         Sort the columns of a `TaggedTable` with the given comparator and return a new `TaggedTable`.
 
-        The original table is not modified. The comparator is a function that takes two columns `col1` and `col2` and
+        The comparator is a function that takes two columns `col1` and `col2` and
         returns an integer:
 
         * If `col1` should be ordered before `col2`, the function should return a negative number.
@@ -727,6 +738,8 @@ class TaggedTable(Table):
         * If the original order of `col1` and `col2` should be kept, the function should return 0.
 
         If no comparator is given, the columns will be sorted alphabetically by their name.
+
+        This table is not modified.
 
         Parameters
         ----------
@@ -752,12 +765,14 @@ class TaggedTable(Table):
         """
         Sort the rows of a `TaggedTable` with the given comparator and return a new `TaggedTable`.
 
-        The original table is not modified. The comparator is a function that takes two rows `row1` and `row2` and
+        The comparator is a function that takes two rows `row1` and `row2` and
         returns an integer:
 
         * If `row1` should be ordered before `row2`, the function should return a negative number.
         * If `row1` should be ordered after `row2`, the function should return a positive number.
         * If the original order of `row1` and `row2` should be kept, the function should return 0.
+
+        This table is not modified.
 
         Parameters
         ----------

@@ -1,6 +1,6 @@
 import pytest
 from safeds.data.tabular.containers import Table, TaggedTable
-from safeds.exceptions import ColumnIsTargetError
+from safeds.exceptions import ColumnIsTargetError, IllegalSchemaModificationError
 
 from tests.helpers import assert_that_tagged_tables_are_equal
 
@@ -126,7 +126,7 @@ def test_should_remove_columns(table: TaggedTable, columns: list[str], expected:
 
 
 @pytest.mark.parametrize(
-    ("table", "columns"),
+    ("table", "columns", "error", "error_msg"),
     [
         (
             TaggedTable._from_table(
@@ -135,6 +135,8 @@ def test_should_remove_columns(table: TaggedTable, columns: list[str], expected:
                 ["feat"],
             ),
             ["target"],
+            ColumnIsTargetError,
+            r'Illegal schema modification: Column "target" is the target column and cannot be removed.'
         ),
         (
             TaggedTable._from_table(
@@ -143,13 +145,32 @@ def test_should_remove_columns(table: TaggedTable, columns: list[str], expected:
                 ["feat"],
             ),
             ["non_feat", "target"],
+            ColumnIsTargetError,
+            r'Illegal schema modification: Column "target" is the target column and cannot be removed.'
+        ),
+(
+            TaggedTable._from_table(
+                Table({"feat": [1, 2, 3], "non_feat": [1, 2, 3], "target": [4, 5, 6]}),
+                "target",
+                ["feat"],
+            ),
+            ["feat"],
+            IllegalSchemaModificationError,
+            r'Illegal schema modification: You cannot remove every feature column.'
+        ),
+        (
+            TaggedTable._from_table(
+                Table({"feat": [1, 2, 3], "non_feat": [1, 2, 3], "target": [4, 5, 6]}),
+                "target",
+                ["feat"],
+            ),
+            ["feat", "non_feat"],
+            IllegalSchemaModificationError,
+            r'Illegal schema modification: You cannot remove every feature column.'
         ),
     ],
-    ids=["remove_only_target", "remove_non_feat_and_target"],
+    ids=["remove_only_target", "remove_non_feat_and_target", "remove_all_features", "remove_non_feat_and_all_features"],
 )
-def test_should_raise_column_is_target_error(table: TaggedTable, columns: list[str]) -> None:
-    with pytest.raises(
-        ColumnIsTargetError,
-        match=r'Illegal schema modification: Column "target" is the target column and cannot be removed.',
-    ):
+def test_should_raise_in_remove_columns(table: TaggedTable, columns: list[str], error: type[Exception], error_msg: str) -> None:
+    with pytest.raises(error, match=error_msg):
         table.remove_columns(columns)
