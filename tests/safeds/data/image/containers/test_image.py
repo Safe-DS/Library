@@ -331,34 +331,20 @@ class TestGaussianNoise:
     @pytest.mark.parametrize(
         ("image", "standard_deviation", "opacity"),
         [
-            (
-                Image.from_png_file(resolve_resource_path("image/boy.png")),
-                0.7,
-                1.0
-            ),
-            (
-                Image.from_png_file(resolve_resource_path("image/boy.png")),
-                2.5,
-                0.6
-            )
+            (Image.from_png_file(resolve_resource_path("image/boy.png")), 0.7, 1.0),
+            (Image.from_png_file(resolve_resource_path("image/boy.png")), 2.5, 0.6),
         ],
-        ids=["one", "two"]
+        ids=["one", "two"],
     )
     def test_should_add_noise(self, image: Image, standard_deviation: float, opacity: float) -> None:
         expected = Image.from_png_file(
-            resolve_resource_path("image/noise/noise_" + str(standard_deviation) + "_" + str(opacity) + ".png"))
+            resolve_resource_path("image/noise/noise_" + str(standard_deviation) + "_" + str(opacity) + ".png"),
+        )
         assert image.add_gaussian_noise(standard_deviation, opacity) == expected
-
 
     @pytest.mark.parametrize(
         ("image", "standard_deviation", "opacity"),
-        [
-            (
-                Image.from_png_file(resolve_resource_path("image/boy.png")),
-                -1,
-                1.0
-            )
-        ]
+        [(Image.from_png_file(resolve_resource_path("image/boy.png")), -1, 1.0)],
     )
     def test_should_raise_standard_deviation(self, image: Image, standard_deviation: float, opacity: float) -> None:
         with pytest.raises(ValueError, match="Standard deviation has to be 0 or bigger."):
@@ -367,18 +353,10 @@ class TestGaussianNoise:
     @pytest.mark.parametrize(
         ("image", "standard_deviation", "opacity"),
         [
-            (
-                Image.from_png_file(resolve_resource_path("image/boy.png")),
-                2,
-                -1
-            ),
-            (
-                Image.from_png_file(resolve_resource_path("image/boy.png")),
-                2,
-                2
-            )
+            (Image.from_png_file(resolve_resource_path("image/boy.png")), 2, -1),
+            (Image.from_png_file(resolve_resource_path("image/boy.png")), 2, 2),
         ],
-        ids=["below zero", "above zero"]
+        ids=["below zero", "above zero"],
     )
     def test_should_raise_opacity(self, image: Image, standard_deviation: float, opacity: float) -> None:
         with pytest.raises(ValueError, match="Opacity has to be between 0 and 1."):
@@ -386,13 +364,7 @@ class TestGaussianNoise:
 
     @pytest.mark.parametrize(
         ("image", "standard_deviation", "opacity"),
-        [
-            (
-                Image.from_png_file(resolve_resource_path("image/boy.png")),
-                1,
-                0
-            )
-        ],
+        [(Image.from_png_file(resolve_resource_path("image/boy.png")), 1, 0)],
     )
     def test_should_warn(self, image: Image, standard_deviation: float, opacity: float) -> None:
         with pytest.warns(UserWarning, match="Opacity is 0, this will not make changes to the image."):
@@ -407,10 +379,10 @@ class TestBlend:
                 Image.from_png_file(resolve_resource_path("image/blend/original_scaled.png")),
                 Image.from_png_file(resolve_resource_path("image/boy.png")),
                 0.7,
-                Image.from_png_file(resolve_resource_path("image/blend/blended.png"))
-            )
+                Image.from_png_file(resolve_resource_path("image/blend/blended.png")),
+            ),
         ],
-        ids=["normal"]
+        ids=["normal"],
     )
     def test_should_blend_properly(self, image: Image, other: Image, alpha: float, expected: Image) -> None:
         blend = image.blend(other, alpha)
@@ -421,10 +393,10 @@ class TestBlend:
         [
             (
                 Image.from_png_file(resolve_resource_path("image/original.png")),
-                Image.from_png_file(resolve_resource_path("image/boy.png"))
-            )
+                Image.from_png_file(resolve_resource_path("image/boy.png")),
+            ),
         ],
-        ids=["normal"]
+        ids=["normal"],
     )
     def test_should_raise_different_size(self, image: Image, other: Image) -> None:
         with pytest.raises(AttributeError, match="Cannot blend two images of different size."):
@@ -436,10 +408,10 @@ class TestBlend:
             (
                 Image.from_png_file(resolve_resource_path("image/blend/original_scaled.png")),
                 Image.from_png_file(resolve_resource_path("image/boy.png")),
-                5.0
-            )
+                5.0,
+            ),
         ],
-        ids=["normal"]
+        ids=["normal"],
     )
     def test_should_raise_alpha(self, image: Image, other: Image, alpha: float) -> None:
         with pytest.raises(ValueError, match="alpha must be between 0 and 1."):

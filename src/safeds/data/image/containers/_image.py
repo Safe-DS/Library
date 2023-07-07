@@ -324,7 +324,7 @@ class Image:
         image_copy._image = PIL.Image.blend(image_copy._image.convert("L"), img_noise.convert("L"), 0.5)
         return image_copy
 
-    def blend(self, other: Image, alpha: float=0.5) -> Image:
+    def blend(self, other: Image, alpha: float = 0.5) -> Image:
         """
         Merge two images into one.
 
