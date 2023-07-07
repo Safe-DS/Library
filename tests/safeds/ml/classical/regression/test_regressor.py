@@ -346,6 +346,7 @@ class TestMeanSquaredError:
     @pytest.mark.parametrize(
         ("predicted", "expected", "result"),
         [([1, 2], [1, 2], 0), ([0, 0], [1, 1], 1), ([1, 1, 1], [2, 2, 11], 34)],
+        ids=["perfect_prediction", "bad_prediction", "worst_prediction"],
     )
     def test_valid_data(self, predicted: list[float], expected: list[float], result: float) -> None:
         table = Table({"predicted": predicted, "expected": expected}).tag_columns(
