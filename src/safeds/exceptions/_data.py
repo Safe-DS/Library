@@ -17,7 +17,10 @@ class UnknownColumnNameError(KeyError):
     """
 
     def __init__(self, column_names: list[str], similar_columns: list[str] | None = None):
-        super().__init__(f"Could not find column(s) '{', '.join(column_names)}'. \nDid you mean '{', '.join(similar_columns)}'?")
+        class _UnknownColumnNameErrorMessage(str):  # This class is necessary for the newline character in a KeyError exception. See https://stackoverflow.com/a/70114007
+            def __repr__(self) -> str:
+                return str(self)
+        super().__init__(_UnknownColumnNameErrorMessage(f"Could not find column(s) '{', '.join(column_names)}'.\nDid you mean '{', '.join(similar_columns)}'?"))
 
 
 class NonNumericColumnError(Exception):

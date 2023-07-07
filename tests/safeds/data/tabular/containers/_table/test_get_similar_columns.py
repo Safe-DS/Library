@@ -15,6 +15,7 @@ from safeds.exceptions._data import UnknownColumnNameError
 def test_should_get_similar_column_names(table: Table, column_name: str, expected: list[str]) -> None:
     assert table._get_similar_columns(column_name) == expected
 
+
 def test_should_raise_error_if_column_name_unknown():
-    with pytest.raises(UnknownColumnNameError, match=r"Could not find column\(s\) 'col3'\. \nDid you mean 'col1, col2'\?"):
+    with pytest.raises(UnknownColumnNameError, match=r"Could not find column\(s\) 'col3'.\nDid you mean 'col1, col2'?"):
         raise UnknownColumnNameError(["col3"], ["col1", "col2"])
