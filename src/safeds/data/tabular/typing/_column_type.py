@@ -68,7 +68,9 @@ class ColumnType(ABC):
                 if type(cell) is NoneType:
                     is_nullable = True
                     result._is_nullable = is_nullable
-                elif (isinstance(result, Integer) and isinstance(column_type_of_type(type(cell)), RealNumber)) or (isinstance(result, RealNumber) and isinstance(column_type_of_type(type(cell)), Integer)):
+                elif (isinstance(result, Integer) and isinstance(column_type_of_type(type(cell)), RealNumber)) or (
+                    isinstance(result, RealNumber) and isinstance(column_type_of_type(type(cell)), Integer)
+                ):
                     result = RealNumber(is_nullable)
                 else:
                     result = Anything(is_nullable)
