@@ -13,6 +13,7 @@ from safeds.data.tabular.containers import Table
     ids=["Empty table", "Table with multiple rows", "Table with one row"],
 )
 def test_should_shuffle_rows(table: Table, expected: Table) -> None:
+    np.random.default_rng(123456)
     np.random.RandomState(123456)
     result_table = table.shuffle_rows()
     assert table.schema == result_table.schema
