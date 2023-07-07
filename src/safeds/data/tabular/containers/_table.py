@@ -1974,22 +1974,17 @@ class Table:
         """
         col_wrap = min(self.number_of_columns, 3)
 
-        with warnings.catch_warnings():
-            warnings.filterwarnings(
-                "ignore",
-                message="Converting input from bool to <class 'numpy.uint8'> for compatibility.",
-            )
-            data = pd.melt(self._data, value_vars=self.column_names)
-            grid = sns.FacetGrid(data=data, col="variable", col_wrap=col_wrap, sharex=False, sharey=False)
-            grid.map(sns.histplot, "value")
-            grid.set_xlabels("")
-            grid.set_ylabels("")
-            grid.set_titles("{col_name}")
-            for axes in grid.axes.flat:
-                axes.set_xticks(axes.get_xticks())
-                axes.set_xticklabels(axes.get_xticklabels(), rotation=45, horizontalalignment="right")
-            grid.tight_layout()
-            fig = grid.fig
+        data = pd.melt(self._data.applymap(lambda value: str(value)), value_vars=self.column_names)
+        grid = sns.FacetGrid(data=data, col="variable", col_wrap=col_wrap, sharex=False, sharey=False)
+        grid.map(sns.histplot, "value")
+        grid.set_xlabels("")
+        grid.set_ylabels("")
+        grid.set_titles("{col_name}")
+        for axes in grid.axes.flat:
+            axes.set_xticks(axes.get_xticks())
+            axes.set_xticklabels(axes.get_xticklabels(), rotation=45, horizontalalignment="right")
+        grid.tight_layout()
+        fig = grid.fig
 
         buffer = io.BytesIO()
         fig.savefig(buffer, format="png")
