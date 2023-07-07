@@ -16,5 +16,5 @@ __all__ = [
     "OneHotEncoder",
     "RangeScaler",
     "StandardScaler",
-    "TableTransformer"
+    "TableTransformer",
 ]
