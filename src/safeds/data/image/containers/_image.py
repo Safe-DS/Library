@@ -305,6 +305,49 @@ class Image:
         image_copy._image = ImageEnhance.Brightness(image_copy._image).enhance(factor)
         return image_copy
 
+    def add_gaussian_noise(self, standard_deviation: float, opacity: float = 1.0) -> Image:
+        if standard_deviation < 0:
+            raise ValueError("Standard deviation has to be 0 or bigger.")
+
+        if opacity < 0 or opacity > 1:
+            raise ValueError("Opacity has to be between 0 and 1.")
+
+        if opacity == 0:
+            warnings.warn(
+                "Opacity is 0, this will not make changes to the image.",
+                UserWarning,
+                stacklevel=2,
+            )
+
+        image_copy = copy.deepcopy(self)
+        img_noise = PIL.Image.effect_noise((image_copy.width, image_copy.height), standard_deviation)
+        image_copy._image = PIL.Image.blend(image_copy._image.convert("L"), img_noise.convert("L"), 0.5)
+        return image_copy
+
+    def blend(self, other: Image, alpha=0.5) -> Image:
+        """
+        Merge two images into one.
+
+        Parameters
+        ----------
+        other: Image
+            The image to merge with. Must be of same size, use resize() upfront.
+        alpha: float
+            The percentage of the other image to be used. 0 will return a copy of this image, 1 will return a copy the other image. 0.5 () default will combine both equally.
+
+        Returns
+        -------
+        The new, combined image.
+        """
+        if alpha < 0 or alpha > 1:
+            raise ValueError("alpha must be between 0 and 1.")
+        if not (other.width == self.width and other.height == self.height):
+            raise AttributeError("Cannot blend two images of different size.")
+
+        image_copy = copy.deepcopy(self)
+        image_copy._image = PIL.Image.blend(image_copy._image.convert("L"), other._image.convert("L"), alpha)
+        return image_copy
+
     def adjust_contrast(self, factor: float) -> Image:
         """
         Adjust Contrast of image.
