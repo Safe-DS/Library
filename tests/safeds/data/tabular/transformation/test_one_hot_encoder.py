@@ -1,3 +1,5 @@
+import warnings
+
 import pytest
 from safeds.data.tabular.containers import Table
 from safeds.data.tabular.transformation import OneHotEncoder
@@ -138,7 +140,16 @@ class TestIsFitted:
     )
     def test_should_return_true_after_fitting(self, table: Table) -> None:
         transformer = OneHotEncoder()
-        fitted_transformer = transformer.fit(table, None)
+        with warnings.catch_warnings():
+            warnings.filterwarnings(
+                action="ignore",
+                message=(
+                    r"The columns .+ contain numerical data. The OneHotEncoder is designed to encode non-numerical "
+                    r"values into numerical values"
+                ),
+                category=UserWarning,
+            )
+            fitted_transformer = transformer.fit(table, None)
         assert fitted_transformer.is_fitted()
 
 

@@ -917,7 +917,7 @@ class Table:
         1  3  4
         """
         int_columns = []
-        result = self.remove_columns([])  # clone
+        result = self._copy()
         if result.number_of_rows == 0:
             int_columns = list(filter(lambda name: isinstance(row[name], int | np.int64), row.column_names))
             if result.number_of_columns == 0:
@@ -974,7 +974,7 @@ class Table:
         if isinstance(rows, Table):
             rows = rows.to_rows()
         int_columns = []
-        result = self.remove_columns([])  # clone
+        result = self._copy()
         for row in rows:
             if result.number_of_rows == 0:
                 int_columns = list(filter(lambda name: isinstance(row[name], int | np.int64), row.column_names))
@@ -1094,7 +1094,7 @@ class Table:
         if len(invalid_columns) != 0:
             raise UnknownColumnNameError(invalid_columns)
 
-        clone = copy.deepcopy(self)
+        clone = self._copy()
         clone = clone.remove_columns(list(set(self.column_names) - set(column_names)))
         return clone
 
@@ -2223,3 +2223,18 @@ class Table:
         data_copy = self._data.copy()
         data_copy.columns = self.column_names
         return data_copy.__dataframe__(nan_as_null, allow_copy)
+
+    # ------------------------------------------------------------------------------------------------------------------
+    # Helpers
+    # ------------------------------------------------------------------------------------------------------------------
+
+    def _copy(self) -> Table:
+        """
+        Return a copy of this table.
+
+        Returns
+        -------
+        table : Table
+            The copy of this table.
+        """
+        return copy.deepcopy(self)
