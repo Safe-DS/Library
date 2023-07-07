@@ -348,7 +348,8 @@ class Image:
 
         Returns
         -------
-        The new, adjusted image.
+        image: Image
+            The new, adjusted image.
         """
         if factor < 0:
             raise ValueError("Color factor has to be 0 or bigger.")
