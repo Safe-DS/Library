@@ -26,6 +26,10 @@ class OutOfBoundsError(ValueError):
             upper_bound = Infinity()
         if upper_bound._value < lower_bound._value:
             raise NotImplementedError("The upper bound cannot be less than the lower bound.")
+        if not lower_bound._cmp_lower_bound(actual):
+            raise NotImplementedError("The value should not be lower than the interval.")
+        if not upper_bound._cmp_upper_bound(actual):
+            raise NotImplementedError("The value should not be larger than the interval.")
         super().__init__(f"{actual} is not inside {lower_bound._str_lower_bound()}, {upper_bound._str_upper_bound()}.")
 
 
@@ -47,6 +51,14 @@ class Bound(ABC):
     def _str_upper_bound(self) -> str:
         pass
 
+    @abstractmethod
+    def _cmp_lower_bound(self, cmp_to: float) -> bool:
+        pass
+
+    @abstractmethod
+    def _cmp_upper_bound(self, cmp_to: float) -> bool:
+        pass
+
 
 class ClosedBound(Bound):
     def __init__(self, value: float):
@@ -58,6 +70,12 @@ class ClosedBound(Bound):
     def _str_upper_bound(self) -> str:
         return f"{self}]"
 
+    def _cmp_lower_bound(self, cmp_to: float) -> bool:
+        return cmp_to > self._value
+
+    def _cmp_upper_bound(self, cmp_to: float) -> bool:
+        return cmp_to < self._value
+
 
 class OpenBound(Bound):
     def __init__(self, value: float):
@@ -68,6 +86,12 @@ class OpenBound(Bound):
 
     def _str_upper_bound(self) -> str:
         return f"{self})"
+
+    def _cmp_lower_bound(self, cmp_to: float) -> bool:
+        return cmp_to >= self._value
+
+    def _cmp_upper_bound(self, cmp_to: float) -> bool:
+        return cmp_to <= self._value
 
 
 class Infinity(OpenBound):
