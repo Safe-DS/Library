@@ -59,7 +59,7 @@ class Table:
 
     Parameters
     ----------
-    data : Mapping[str, Sequence[Any] | None
+    data : Mapping[str, Sequence[Any]] | None
         The data. If None, an empty table is created.
 
     Raises
