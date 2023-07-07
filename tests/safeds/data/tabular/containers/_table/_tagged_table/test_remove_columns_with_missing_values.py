@@ -92,7 +92,7 @@ def test_should_remove_columns_with_non_numerical_values(table: TaggedTable, exp
                 ["feature"],
             ),
             ColumnIsTargetError,
-            'Illegal schema modification: Column "target" is the target column and cannot be removed.'
+            'Illegal schema modification: Column "target" is the target column and cannot be removed.',
         ),
         (
             TaggedTable(
@@ -105,7 +105,7 @@ def test_should_remove_columns_with_non_numerical_values(table: TaggedTable, exp
                 ["feature"],
             ),
             ColumnIsTargetError,
-            'Illegal schema modification: Column "target" is the target column and cannot be removed.'
+            'Illegal schema modification: Column "target" is the target column and cannot be removed.',
         ),
         (
             TaggedTable(
@@ -118,7 +118,7 @@ def test_should_remove_columns_with_non_numerical_values(table: TaggedTable, exp
                 ["feature"],
             ),
             ColumnIsTargetError,
-            'Illegal schema modification: Column "target" is the target column and cannot be removed.'
+            'Illegal schema modification: Column "target" is the target column and cannot be removed.',
         ),
         (
             TaggedTable(
@@ -131,7 +131,7 @@ def test_should_remove_columns_with_non_numerical_values(table: TaggedTable, exp
                 ["feature"],
             ),
             ColumnIsTargetError,
-            'Illegal schema modification: Column "target" is the target column and cannot be removed.'
+            'Illegal schema modification: Column "target" is the target column and cannot be removed.',
         ),
         (
             TaggedTable(
@@ -144,7 +144,7 @@ def test_should_remove_columns_with_non_numerical_values(table: TaggedTable, exp
                 ["feature"],
             ),
             IllegalSchemaModificationError,
-            'Illegal schema modification: You cannot remove every feature column.'
+            "Illegal schema modification: You cannot remove every feature column.",
         ),
         (
             TaggedTable(
@@ -157,7 +157,7 @@ def test_should_remove_columns_with_non_numerical_values(table: TaggedTable, exp
                 ["feature"],
             ),
             IllegalSchemaModificationError,
-            'Illegal schema modification: You cannot remove every feature column.'
+            "Illegal schema modification: You cannot remove every feature column.",
         ),
     ],
     ids=[
@@ -166,10 +166,12 @@ def test_should_remove_columns_with_non_numerical_values(table: TaggedTable, exp
         "also_non_feature_incomplete",
         "all_incomplete",
         "all_features_incomplete",
-        "all_features_and_non_feature_incomplete"
+        "all_features_and_non_feature_incomplete",
     ],
 )
-def test_should_raise_in_remove_columns_with_missing_values(table: TaggedTable, error: type[Exception], error_msg: str) -> None:
+def test_should_raise_in_remove_columns_with_missing_values(
+    table: TaggedTable, error: type[Exception], error_msg: str,
+) -> None:
     with pytest.raises(
         error,
         match=error_msg,
