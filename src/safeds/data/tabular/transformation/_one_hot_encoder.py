@@ -271,6 +271,9 @@ class OneHotEncoder(InvertibleTableTransformer):
         if len(missing_columns) > 0:
             raise UnknownColumnNameError(missing_columns)
 
+        if transformed_table.number_of_rows == 0:
+            raise ValueError("The OneHotEncoder cannot inverse transform the table because it contains 0 rows")
+
         if transformed_table.keep_only_columns(
             _transformed_column_names,
         ).remove_columns_with_non_numerical_values().number_of_columns < len(_transformed_column_names):
@@ -286,9 +289,6 @@ class OneHotEncoder(InvertibleTableTransformer):
                     ),
                 ),
             )
-
-        if transformed_table.number_of_rows == 0:
-            raise ValueError("The OneHotEncoder cannot inverse transform the table because it contains 0 rows")
 
         original_columns = {}
         for original_column_name in self._column_names:
