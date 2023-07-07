@@ -10,18 +10,17 @@ from tests.helpers import resolve_resource_path
     [
         (Table({"A": [1, 2, 3]}), "./image/snapshot_histograms/one_column.png"),
         (
-            Table({"A": [1, 2, 3], "B": ["A", "A", "Bla"], "C": [True, True, False], "D": [1.0, 2.1, 4.5]}),
+            Table({"A": [1, 2, 3, 3, 2, 4, 2], "B": ["a", "b", "b", "b", "b", "b", "a"], "C": [True, True, False, True, False, None, True], "D": [1.0, 2.1, 2.1, 2.1, 2.1, 3.0, 3.0]}),
             "./image/snapshot_histograms/four_columns.png",
         ),
     ],
-    ids=["one column", "four columns"],
+    ids=["one column", "four columns"]
 )
 def test_should_match_snapshot(table: Table, path: str) -> None:
     current = table.plot_histograms()
     snapshot = Image.from_png_file(resolve_resource_path(path))
-
     # Inlining the expression into the assert causes pytest to hang if the assertion fails when run from PyCharm.
-    assertion = snapshot._image.tobytes() == current._image.tobytes()
+    assertion = snapshot == current
     assert assertion
 
 

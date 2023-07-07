@@ -1774,14 +1774,28 @@ class Table:
         """
         only_numerical = self.remove_columns_with_non_numerical_values()
 
-        with warnings.catch_warnings():
-            warnings.filterwarnings(
-                "ignore",
-                message=(
-                    "Attempting to set identical low and high (xlims|ylims) makes transformation singular;"
-                    " automatically expanding."
-                ),
-            )
+        if self.number_of_rows == 0:
+            warnings.warn("An empty table has been used. A correlation heatmap on an empty table will show nothing.")
+
+            with warnings.catch_warnings():
+                warnings.filterwarnings(
+                    "ignore",
+                    message=(
+                        "Attempting to set identical low and high (xlims|ylims) makes transformation singular;"
+                        " automatically expanding."
+                    ),
+                )
+                fig = plt.figure()
+                sns.heatmap(
+                    data=only_numerical._data.corr(),
+                    vmin=-1,
+                    vmax=1,
+                    xticklabels=only_numerical.column_names,
+                    yticklabels=only_numerical.column_names,
+                    cmap="vlag",
+                )
+                plt.tight_layout()
+        else:
             fig = plt.figure()
             sns.heatmap(
                 data=only_numerical._data.corr(),
