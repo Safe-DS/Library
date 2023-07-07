@@ -1,15 +1,14 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Iterable
+from typing import TYPE_CHECKING
 
 import pandas as pd
 import pytest
-
-
-from safeds.data.tabular.typing import Boolean, ColumnType, Integer, RealNumber, Schema, String, Anything
+from safeds.data.tabular.typing import Anything, Boolean, ColumnType, Integer, RealNumber, Schema, String
 from safeds.exceptions import UnknownColumnNameError
 
 if TYPE_CHECKING:
+    from collections.abc import Iterable
     from typing import Any
 
 

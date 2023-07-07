@@ -1,5 +1,4 @@
 import pytest
-from _pytest.python_api import raises
 from safeds.data.tabular.containers import Row, Table
 from safeds.exceptions import UnknownColumnNameError
 
