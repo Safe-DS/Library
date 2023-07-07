@@ -281,6 +281,7 @@ The docstrings **should** use the [numpydoc](https://numpydoc.readthedocs.io/en/
         """
         data : Optional[Mapping[str, Any]]
         """
+    ```
 
 !!! failure "**DON'T** (library code):"
 
