@@ -94,6 +94,7 @@ def test_should_return_transformed_table(
         ),
         Table(),
     ],
+    ids=["non-empty table", "empty table"],
 )
 def test_should_raise_if_column_not_found(table_to_fit: Table) -> None:
     table_to_fit = Table(
