@@ -335,6 +335,21 @@ class Image:
         return image_copy
 
     def adjust_color_balance(self, factor: float) -> Image:
+        """
+        Adjust the image's color balance.
+
+        Parameters
+        ----------
+        factor: float
+            If factor > 1, increase color balance of image.
+            If factor = 1, no changes will be made.
+            If factor < 1, make image greyer.
+            Has to be bigger than or equal to 0.
+
+        Returns
+        -------
+        The new, adjusted image.
+        """
         if factor < 0:
             raise ValueError("Color factor has to be 0 or bigger.")
         elif factor == 1:
