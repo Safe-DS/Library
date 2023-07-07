@@ -13,20 +13,65 @@ from tests.helpers import assert_that_tagged_tables_are_equal
                 {
                     "feature_numerical": [0, 1, 2],
                     "feature_non_numerical": ["a", "b", "c"],
+                    "non_feature_numerical": [7, 8, 9],
                     "target": [3, 4, 5],
                 },
                 "target",
+                ["feature_numerical", "feature_non_numerical"],
             ),
             TaggedTable(
                 {
                     "feature_numerical": [0, 1, 2],
+                    "non_feature_numerical": [7, 8, 9],
                     "target": [3, 4, 5],
                 },
                 "target",
-                )
-                ),
+                ["feature_numerical"],
+            )
+        ),
+        (
+            TaggedTable(
+                {
+                    "feature_numerical": [0, 1, 2],
+                    "non_feature_numerical": [7, 8, 9],
+                    "non_feature_non_numerical": ["a", "b", "c"],
+                    "target": [3, 4, 5],
+                },
+                "target",
+                ["feature_numerical"],
+            ),
+            TaggedTable(
+                {
+                    "feature_numerical": [0, 1, 2],
+                    "non_feature_numerical": [7, 8, 9],
+                    "target": [3, 4, 5],
+                },
+                "target",
+                ["feature_numerical"]
+            )
+        ),
+        (
+            TaggedTable(
+                {
+                    "feature_numerical": [0, 1, 2],
+                    "non_feature_numerical": [7, 8, 9],
+                    "target": [3, 4, 5],
+                },
+                "target",
+                ["feature_numerical"],
+            ),
+            TaggedTable(
+                {
+                    "feature_numerical": [0, 1, 2],
+                    "non_feature_numerical": [7, 8, 9],
+                    "target": [3, 4, 5],
+                },
+                "target",
+                ["feature_numerical"]
+            )
+        ),
     ],
-    ids=["with_non_numerical"]
+    ids=["non_numerical_feature", "non_numerical_non_feature", "all_numerical"]
 )
 def test_should_remove_columns_with_non_numerical_values(table: TaggedTable, expected: TaggedTable) -> None:
     new_table = table.remove_columns_with_non_numerical_values()
