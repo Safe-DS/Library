@@ -10,6 +10,8 @@ nav:
     - Data Processing: tutorials/data_processing.ipynb
     - Data Visualization: tutorials/data_visualization.ipynb
     - Machine Learning: tutorials/machine_learning.ipynb
+    - "Getting Started: Classification": tutorials/getting_started_classification.ipynb
+    - "Getting Started: Regression": tutorials/getting_started_regression.ipynb
   - API Reference: reference/
   - Glossary: glossary.md
   - Development:
