@@ -86,6 +86,7 @@ class TestToJpegFile:
     @pytest.mark.parametrize(
         "path",
         ["image/white_square.jpg"],
+        ids=["jpg_file"]
     )
     def test_should_save_jpeg_file_by_str(self, path: str) -> None:
         image = Image.from_jpeg_file(resolve_resource_path(path))
@@ -373,7 +374,7 @@ class TestCrop:
 
 
 class TestSharpen:
-    @pytest.mark.parametrize("factor", [-1, 0.5, 10])
+    @pytest.mark.parametrize("factor", [-1, 0.5, 10], ids=["negative factor", "small factor", "large factor"])
     def test_should_sharpen(self, factor: float) -> None:
         image = Image.from_png_file(resolve_resource_path("image/sharpen/to_sharpen.png"))
         image2 = image.sharpen(factor)
