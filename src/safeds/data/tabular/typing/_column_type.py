@@ -15,6 +15,7 @@ class ColumnType(ABC):
     """Abstract base class for column types."""
 
     _is_nullable: bool  # This line is just here so the linter doesn't throw an error in line 63.
+
     @abstractmethod
     def __init__(self, is_nullable: bool = False) -> None:
         pass
