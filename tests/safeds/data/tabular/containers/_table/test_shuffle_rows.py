@@ -1,13 +1,20 @@
 import pytest
 from safeds.data.tabular.containers import Table
+import numpy as np
 
 
 @pytest.mark.parametrize(
-    "table",
-    [(Table({"col1": [1], "col2": [1]})), Table()],
-    ids=["Table with identical values in rows", "empty"],
+    ("table", "expected"),
+    [
+        (Table(), Table()),
+        (Table({"col1": [1, 3, 5], "col2": [2, 4, 6]}), Table({"col1": [5, 1, 3], "col2": [6, 2, 4]})),
+        (Table({"col1": [1], "col2": [2]}), Table({"col1": [1], "col2": [2]})),
+    ],
+    ids=["Empty table", "Table with multiple rows", "Table with one row"],
 )
-def test_should_shuffle_rows(table: Table) -> None:
+def test_should_shuffle_rows(table: Table, expected: Table) -> None:
+    np.random.seed(123456)
     result_table = table.shuffle_rows()
     assert table.schema == result_table.schema
-    assert table == result_table
+    assert result_table == expected
+
