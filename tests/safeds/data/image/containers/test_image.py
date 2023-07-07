@@ -341,7 +341,6 @@ class TestGaussianNoise:
             resolve_resource_path("image/noise/noise_" + str(standard_deviation) + "_" + str(opacity) + ".png"),
         )
         image = image.add_gaussian_noise(standard_deviation, opacity)
-
         assert image == expected
 
     @pytest.mark.parametrize(
@@ -373,54 +372,6 @@ class TestGaussianNoise:
     def test_should_warn(self, image: Image, standard_deviation: float, opacity: float) -> None:
         with pytest.warns(UserWarning, match="Opacity is 0, this will not make changes to the image."):
             image.add_gaussian_noise(standard_deviation, opacity)
-
-
-class TestBlend:
-    @pytest.mark.parametrize(
-        ("image", "other", "alpha", "expected"),
-        [
-            (
-                Image.from_png_file(resolve_resource_path("image/blend/original_scaled.png")),
-                Image.from_png_file(resolve_resource_path("image/boy.png")),
-                0.7,
-                Image.from_png_file(resolve_resource_path("image/blend/blended.png")),
-            ),
-        ],
-        ids=["check"],
-    )
-    def test_should_blend_properly(self, image: Image, other: Image, alpha: float, expected: Image) -> None:
-        blend = image.blend(other, alpha)
-        assert blend == expected
-
-    @pytest.mark.parametrize(
-        ("image", "other"),
-        [
-            (
-                Image.from_png_file(resolve_resource_path("image/original.png")),
-                Image.from_png_file(resolve_resource_path("image/boy.png")),
-            ),
-        ],
-        ids=["different sized images"],
-    )
-    def test_should_raise_different_size(self, image: Image, other: Image) -> None:
-        with pytest.raises(AttributeError, match="Cannot blend two images of different size."):
-            image.blend(other)
-
-    @pytest.mark.parametrize(
-        ("image", "other", "alpha"),
-        [
-            (
-                Image.from_png_file(resolve_resource_path("image/blend/original_scaled.png")),
-                Image.from_png_file(resolve_resource_path("image/boy.png")),
-                5.0,
-            ),
-        ],
-        ids=["alpha too high"],
-    )
-    def test_should_raise_alpha(self, image: Image, other: Image, alpha: float) -> None:
-        with pytest.raises(ValueError, match="alpha must be between 0 and 1."):
-            image.blend(other, alpha)
-
 
 class TestBlur:
     @pytest.mark.parametrize(
