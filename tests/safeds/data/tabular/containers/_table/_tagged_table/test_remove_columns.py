@@ -161,8 +161,37 @@ def test_should_remove_columns(table: TaggedTable, columns: list[str], expected:
 
 @pytest.mark.parametrize(
     ("table", "columns"),
-    [(TaggedTable._from_table(Table({"feat": [1, 2, 3], "target": [4, 5, 6]}), "target"), ["target"])],
-    ids=["only_features_and_target"],
+    [
+        (
+            TaggedTable._from_table(
+                Table(
+                    {
+                        "feat": [1, 2, 3],
+                        "non_feat": [1, 2, 3],
+                        "target": [4, 5, 6]
+                    }
+                ),
+                "target",
+                ["feat"],
+            ),
+            ["target"],
+        ),
+        (
+            TaggedTable._from_table(
+                Table(
+                    {
+                        "feat": [1, 2, 3],
+                        "non_feat": [1, 2, 3],
+                        "target": [4, 5, 6]
+                    }
+                ),
+                "target",
+                ["feat"],
+            ),
+            ["non_feat", "target"],
+        ),
+    ],
+    ids=["remove_only_target", "remove_non_feat_and_target"],
 )
 def test_should_raise_column_is_target_error(table: TaggedTable, columns: list[str]) -> None:
     with pytest.raises(
