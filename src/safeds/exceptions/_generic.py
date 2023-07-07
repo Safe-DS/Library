@@ -42,20 +42,20 @@ class OutOfBoundsError(ValueError):
             super().__init__(value)
 
         def _str_lower_bound(self) -> str:
-            return f"[{self._value}"
+            return f"[{self}"
 
         def _str_upper_bound(self) -> str:
-            return f"{self._value}]"
+            return f"{self}]"
 
     class _OpenBound(_Bound):
         def __init__(self, value: float):
             super().__init__(value)
 
         def _str_lower_bracket(self) -> str:
-            return f"({self._value}"
+            return f"({self}"
 
         def _str_upper_bracket(self) -> str:
-            return f"{self._value})"
+            return f"{self})"
 
     class _Infinity(_OpenBound):
 
