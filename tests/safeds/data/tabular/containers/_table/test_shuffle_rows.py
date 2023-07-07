@@ -17,4 +17,3 @@ def test_should_shuffle_rows(table: Table, expected: Table) -> None:
     result_table = table.shuffle_rows()
     assert table.schema == result_table.schema
     assert result_table == expected
-
