@@ -13,7 +13,14 @@ from safeds.exceptions._data import (
     ValueNotPresentWhenFittedError,
     WrongFileExtensionError,
 )
-from safeds.exceptions._generic import OutOfBoundsError
+from safeds.exceptions._generic import (
+    Bound,
+    ClosedBound,
+    Infinity,
+    MinInfinity,
+    OpenBound,
+    OutOfBoundsError,
+)
 from safeds.exceptions._ml import (
     DatasetContainsTargetError,
     DatasetMissesDataError,
@@ -47,4 +54,10 @@ __all__ = [
     "PredictionError",
     "UntaggedTableError",
     "DatasetMissesDataError",
+    # Other
+    "Bound",
+    "ClosedBound",
+    "Infinity",
+    "MinInfinity",
+    "OpenBound",
 ]
