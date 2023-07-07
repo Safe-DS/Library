@@ -6,10 +6,12 @@ import warnings
 from pathlib import Path
 from typing import Any, BinaryIO
 
+import numpy as np
 import PIL
 from PIL import ImageEnhance, ImageFilter, ImageOps
 from PIL.Image import Image as PillowImage
 from PIL.Image import open as open_image
+from skimage.util import random_noise
 
 from safeds.data.image.typing import ImageFormat
 
@@ -305,23 +307,17 @@ class Image:
         image_copy._image = ImageEnhance.Brightness(image_copy._image).enhance(factor)
         return image_copy
 
-    def add_gaussian_noise(self, standard_deviation: float, opacity: float = 1.0) -> Image:
+    def add_gaussian_noise(self, standard_deviation: float) -> Image:
         if standard_deviation < 0:
             raise ValueError("Standard deviation has to be 0 or bigger.")
 
-        if opacity < 0 or opacity > 1:
-            raise ValueError("Opacity has to be between 0 and 1.")
-
-        if opacity == 0:
-            warnings.warn(
-                "Opacity is 0, this will not make changes to the image.",
-                UserWarning,
-                stacklevel=2,
-            )
+        # noinspection PyTypeChecker
+        image_as_array = np.asarray(self._image)
+        noisy_image_as_array = random_noise(image_as_array, mode="gaussian", var=standard_deviation**2, rng=42, clip=True)
+        noisy_image = PIL.Image.fromarray(np.uint8(255 * noisy_image_as_array))
 
         image_copy = copy.deepcopy(self)
-        img_noise = PIL.Image.effect_noise((image_copy.width, image_copy.height), standard_deviation)
-        image_copy._image = PIL.Image.blend(image_copy._image.convert("RGB"), img_noise.convert("RGB"), opacity)
+        image_copy._image = noisy_image
         return image_copy
 
     def adjust_contrast(self, factor: float) -> Image:

@@ -329,49 +329,29 @@ class TestInvertColors:
 
 class TestGaussianNoise:
     @pytest.mark.parametrize(
-        ("image", "standard_deviation", "opacity"),
+        ("image", "standard_deviation"),
         [
-            (Image.from_png_file(resolve_resource_path("image/boy.png")), 0.7, 1.0),
-            (Image.from_png_file(resolve_resource_path("image/boy.png")), 2.5, 0.6),
+            (Image.from_png_file(resolve_resource_path("image/boy.png")), 0.7),
+            (Image.from_png_file(resolve_resource_path("image/boy.png")), 2.5),
         ],
         ids=["one", "two"],
     )
-    def test_should_add_noise(self, image: Image, standard_deviation: float, opacity: float) -> None:
+    def test_should_add_noise(self, image: Image, standard_deviation: float) -> None:
         expected = Image.from_png_file(
-            resolve_resource_path("image/noise/noise_" + str(standard_deviation) + "_" + str(opacity) + ".png"),
+            resolve_resource_path("image/noise/noise_" + str(standard_deviation) + ".png"),
         )
-        image = image.add_gaussian_noise(standard_deviation, opacity)
+        image = image.add_gaussian_noise(standard_deviation)
+
         assert image == expected
 
     @pytest.mark.parametrize(
-        ("image", "standard_deviation", "opacity"),
-        [(Image.from_png_file(resolve_resource_path("image/boy.png")), -1, 1.0)],
+        ("image", "standard_deviation"),
+        [(Image.from_png_file(resolve_resource_path("image/boy.png")), -1)],
         ids=["sigma below zero"],
     )
-    def test_should_raise_standard_deviation(self, image: Image, standard_deviation: float, opacity: float) -> None:
+    def test_should_raise_standard_deviation(self, image: Image, standard_deviation: float) -> None:
         with pytest.raises(ValueError, match="Standard deviation has to be 0 or bigger."):
-            image.add_gaussian_noise(standard_deviation, opacity)
-
-    @pytest.mark.parametrize(
-        ("image", "standard_deviation", "opacity"),
-        [
-            (Image.from_png_file(resolve_resource_path("image/boy.png")), 2, -1),
-            (Image.from_png_file(resolve_resource_path("image/boy.png")), 2, 2),
-        ],
-        ids=["opacity below zero", "opacity above zero"],
-    )
-    def test_should_raise_opacity(self, image: Image, standard_deviation: float, opacity: float) -> None:
-        with pytest.raises(ValueError, match="Opacity has to be between 0 and 1."):
-            image.add_gaussian_noise(standard_deviation, opacity)
-
-    @pytest.mark.parametrize(
-        ("image", "standard_deviation", "opacity"),
-        [(Image.from_png_file(resolve_resource_path("image/boy.png")), 1, 0)],
-        ids=["opacity zero"],
-    )
-    def test_should_warn(self, image: Image, standard_deviation: float, opacity: float) -> None:
-        with pytest.warns(UserWarning, match="Opacity is 0, this will not make changes to the image."):
-            image.add_gaussian_noise(standard_deviation, opacity)
+            image.add_gaussian_noise(standard_deviation)
 
 
 class TestBlur:
