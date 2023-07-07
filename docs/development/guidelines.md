@@ -207,7 +207,7 @@ The user should not have to deal with exceptions that are defined in the wrapper
 
 ### Sort the exceptions in the `__all__` list alphabetically
 
-The exceptions in the `__all__` list in `src/safeds/exceptions/__init__.py` should be sorted alphabetically. This makes it easier for users to find the exception they are looking for.
+The exceptions in the `__all__` list in `src/safeds/exceptions/__init__.py` should be sorted alphabetically. This helps to reduce the likelihood of merge conflicts when new exceptions are introduced on different branches.
 
 !!! success "**DO** (library code):"
 
