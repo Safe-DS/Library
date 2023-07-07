@@ -11,9 +11,7 @@ from tests.helpers import resolve_resource_path
 
 class TestFromJpegFile:
     @pytest.mark.parametrize(
-        "path",
-        ["image/white_square.jpg", Path("image/white_square.jpg")],
-        ids=["jpg", "jpg_Path"]
+        "path", ["image/white_square.jpg", Path("image/white_square.jpg")], ids=["jpg", "jpg_Path"],
     )
     def test_should_load_jpeg_file(self, path: str | Path) -> None:
         Image.from_jpeg_file(resolve_resource_path(path))
@@ -21,7 +19,7 @@ class TestFromJpegFile:
     @pytest.mark.parametrize(
         "path",
         ["image/missing_file.jpg", Path("image/missing_file.jpg")],
-        ids=["missing_file_jpg", "missing_file_jpg_Path"]
+        ids=["missing_file_jpg", "missing_file_jpg_Path"],
     )
     def test_should_raise_if_file_not_found(self, path: str | Path) -> None:
         with pytest.raises(FileNotFoundError):
@@ -30,9 +28,7 @@ class TestFromJpegFile:
 
 class TestFromPngFile:
     @pytest.mark.parametrize(
-        "path",
-        ["image/white_square.png", Path("image/white_square.png")],
-        ids=["png", "png_Path"]
+        "path", ["image/white_square.png", Path("image/white_square.png")], ids=["png", "png_Path"],
     )
     def test_should_load_png_file(self, path: str | Path) -> None:
         Image.from_png_file(resolve_resource_path(path))
@@ -40,7 +36,7 @@ class TestFromPngFile:
     @pytest.mark.parametrize(
         "path",
         ["image/missing_file.png", Path("image/missing_file.png")],
-        ids=["missing_file_png", "missing_file_png_Path"]
+        ids=["missing_file_png", "missing_file_png_Path"],
     )
     def test_should_raise_if_file_not_found(self, path: str | Path) -> None:
         with pytest.raises(FileNotFoundError):
@@ -54,7 +50,7 @@ class TestFormat:
             (Image.from_jpeg_file(resolve_resource_path("image/white_square.jpg")), ImageFormat.JPEG),
             (Image.from_png_file(resolve_resource_path("image/white_square.png")), ImageFormat.PNG),
         ],
-        ids=["jpg", "png"]
+        ids=["jpg", "png"],
     )
     def test_should_return_correct_format(self, image: Image, format_: ImageFormat) -> None:
         assert image.format == format_
@@ -99,11 +95,7 @@ class TestToJpegFile:
 
         assert image._image.tobytes() == image_read_back._image.tobytes()
 
-    @pytest.mark.parametrize(
-        "path",
-        ["image/white_square.jpg"],
-        ids=["jpg"]
-    )
+    @pytest.mark.parametrize("path", ["image/white_square.jpg"], ids=["jpg"])
     def test_should_save_jpeg_file_by_path(self, path: str) -> None:
         image = Image.from_jpeg_file(resolve_resource_path(path))
 
@@ -118,12 +110,7 @@ class TestToJpegFile:
 
 
 class TestToPngFile:
-    @pytest.mark.parametrize(
-        "path",
-        ["image/white_square.png"],
-        ids=["png"]
-    )
-
+    @pytest.mark.parametrize("path", ["image/white_square.png"], ids=["png"])
     def test_should_save_png_file_by_str(self, path: str) -> None:
         image = Image.from_png_file(resolve_resource_path(path))
 
@@ -136,11 +123,7 @@ class TestToPngFile:
 
         assert image._image.tobytes() == image_read_back._image.tobytes()
 
-    @pytest.mark.parametrize(
-        "path",
-        ["image/white_square.png"],
-        ids=["png"]
-    )
+    @pytest.mark.parametrize("path", ["image/white_square.png"], ids=["png"])
     def test_should_save_png_file_by_path(self, path: str) -> None:
         image = Image.from_png_file(resolve_resource_path(path))
 
@@ -156,17 +139,13 @@ class TestToPngFile:
 
 class TestReprJpeg:
     @pytest.mark.parametrize(
-        "image",
-        [Image.from_jpeg_file(resolve_resource_path("image/white_square.jpg"))],
-        ids=["jpg"]
+        "image", [Image.from_jpeg_file(resolve_resource_path("image/white_square.jpg"))], ids=["jpg"],
     )
     def test_should_return_bytes_if_image_is_jpeg(self, image: Image) -> None:
         assert isinstance(image._repr_jpeg_(), bytes)
 
     @pytest.mark.parametrize(
-        "image",
-        [Image.from_png_file(resolve_resource_path("image/white_square.png"))],
-        ids=["png"]
+        "image", [Image.from_png_file(resolve_resource_path("image/white_square.png"))], ids=["png"],
     )
     def test_should_return_none_if_image_is_not_jpeg(self, image: Image) -> None:
         assert image._repr_jpeg_() is None
@@ -174,17 +153,13 @@ class TestReprJpeg:
 
 class TestReprPng:
     @pytest.mark.parametrize(
-        "image",
-        [Image.from_png_file(resolve_resource_path("image/white_square.png"))],
-        ids=["png"]
+        "image", [Image.from_png_file(resolve_resource_path("image/white_square.png"))], ids=["png"],
     )
     def test_should_return_bytes_if_image_is_png(self, image: Image) -> None:
         assert isinstance(image._repr_png_(), bytes)
 
     @pytest.mark.parametrize(
-        "image",
-        [Image.from_jpeg_file(resolve_resource_path("image/white_square.jpg"))],
-        ids=["jpg"]
+        "image", [Image.from_jpeg_file(resolve_resource_path("image/white_square.jpg"))], ids=["jpg"],
     )
     def test_should_return_none_if_image_is_not_png(self, image: Image) -> None:
         assert image._repr_png_() is None
