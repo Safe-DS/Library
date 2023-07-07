@@ -5,11 +5,7 @@ from safeds.exceptions import Bound, ClosedBound, Infinity, MinInfinity, OpenBou
 
 
 @pytest.mark.parametrize(
-    "actual",
-    [
-        0, 1, -1, 2, -2, float("inf"), float("-inf")
-    ],
-    ids=["0", "1", "-1", "2", "-2", "inf", "-inf"]
+    "actual", [0, 1, -1, 2, -2, float("inf"), float("-inf")], ids=["0", "1", "-1", "2", "-2", "inf", "-inf"],
 )
 @pytest.mark.parametrize(
     ("lower_bound", "match_lower"),
@@ -59,6 +55,7 @@ def test_should_raise_in_out_of_bounds_error(
         ):
             raise OutOfBoundsError(actual, lower_bound=lower_bound, upper_bound=upper_bound)
 
+
 @pytest.mark.parametrize(
     ("value", "expected_value", "bound", "lower_bound"),
     [
@@ -88,9 +85,11 @@ def test_should_raise_in_out_of_bounds_error(
         "ex_true-inf-upper",
         "ex_true--inf-lower",
         "ex_false--inf-upper",
-    ]
+    ],
 )
-def test_should_return_true_if_value_in_bounds(value: float, expected_value: bool, bound: Bound, lower_bound: bool) -> None:
+def test_should_return_true_if_value_in_bounds(
+    value: float, expected_value: bool, bound: Bound, lower_bound: bool,
+) -> None:
     if lower_bound:
         assert expected_value == bound._cmp_lower_bound(value)
     else:
