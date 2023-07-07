@@ -40,7 +40,9 @@ class TestFromPngFile:
         Image.from_png_file(resolve_resource_path(path))
 
     @pytest.mark.parametrize(
-        "path", ["image/missing_file.png", Path("image/missing_file.png")], ids=["missing_file_png"],
+        "path",
+        ["image/missing_file.png", Path("image/missing_file.png")],
+        ids=["missing_file_png"],
     )
     def test_should_raise_if_file_not_found(self, path: str | Path) -> None:
         with pytest.raises(FileNotFoundError):
@@ -143,13 +145,17 @@ class TestToPngFile:
 
 class TestReprJpeg:
     @pytest.mark.parametrize(
-        "image", [Image.from_jpeg_file(resolve_resource_path("image/white_square.jpg"))], ids=["jpg"],
+        "image",
+        [Image.from_jpeg_file(resolve_resource_path("image/white_square.jpg"))],
+        ids=["jpg"],
     )
     def test_should_return_bytes_if_image_is_jpeg(self, image: Image) -> None:
         assert isinstance(image._repr_jpeg_(), bytes)
 
     @pytest.mark.parametrize(
-        "image", [Image.from_png_file(resolve_resource_path("image/white_square.png"))], ids=["png"],
+        "image",
+        [Image.from_png_file(resolve_resource_path("image/white_square.png"))],
+        ids=["png"],
     )
     def test_should_return_none_if_image_is_not_jpeg(self, image: Image) -> None:
         assert image._repr_jpeg_() is None
@@ -157,13 +163,17 @@ class TestReprJpeg:
 
 class TestReprPng:
     @pytest.mark.parametrize(
-        "image", [Image.from_png_file(resolve_resource_path("image/white_square.png"))], ids=["png"],
+        "image",
+        [Image.from_png_file(resolve_resource_path("image/white_square.png"))],
+        ids=["png"],
     )
     def test_should_return_bytes_if_image_is_png(self, image: Image) -> None:
         assert isinstance(image._repr_png_(), bytes)
 
     @pytest.mark.parametrize(
-        "image", [Image.from_jpeg_file(resolve_resource_path("image/white_square.jpg"))], ids=["jpg"],
+        "image",
+        [Image.from_jpeg_file(resolve_resource_path("image/white_square.jpg"))],
+        ids=["jpg"],
     )
     def test_should_return_none_if_image_is_not_png(self, image: Image) -> None:
         assert image._repr_png_() is None
