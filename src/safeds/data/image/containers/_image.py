@@ -313,7 +313,9 @@ class Image:
 
         # noinspection PyTypeChecker
         image_as_array = np.asarray(self._image)
-        noisy_image_as_array = random_noise(image_as_array, mode="gaussian", var=standard_deviation**2, rng=42, clip=True)
+        noisy_image_as_array = random_noise(
+            image_as_array, mode="gaussian", var=standard_deviation**2, rng=42, clip=True,
+        )
         noisy_image = PIL.Image.fromarray(np.uint8(255 * noisy_image_as_array))
 
         image_copy = copy.deepcopy(self)
