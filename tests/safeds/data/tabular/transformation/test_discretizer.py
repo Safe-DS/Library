@@ -51,7 +51,13 @@ class TestFit:
         ],
         ids=["UnknownColumnNameError", "multiple missing columns", "ValueError", "NonNumericColumnError"],
     )
-    def test_should_raise_errors(self, table: Table, columns: list[str], error: type[Exception], error_message: str) -> None:
+    def test_should_raise_errors(
+        self,
+        table: Table,
+        columns: list[str],
+        error: type[Exception],
+        error_message: str,
+    ) -> None:
         with pytest.raises(error, match=error_message):
             Discretizer().fit(table, columns)
 
@@ -107,7 +113,13 @@ class TestTransform:
         ],
         ids=["UnknownColumnNameError", "multiple missing columns", "ValueError", "NonNumericColumnError"],
     )
-    def test_should_raise_errors(self, table_to_transform: Table, columns: list[str], error: type[Exception], error_message: str) -> None:
+    def test_should_raise_errors(
+        self,
+        table_to_transform: Table,
+        columns: list[str],
+        error: type[Exception],
+        error_message: str,
+    ) -> None:
         table_to_fit = Table(
             {
                 "col1": [0.0, 5.0, 10.0],
