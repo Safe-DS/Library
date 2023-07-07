@@ -1246,7 +1246,7 @@ class Table:
         """
         result = self._data.copy(deep=True)
         result = result.dropna(axis="index")
-        return Table._from_pandas_dataframe(result, self._schema)
+        return Table._from_pandas_dataframe(result)
 
     def remove_rows_with_outliers(self) -> Table:
         """
