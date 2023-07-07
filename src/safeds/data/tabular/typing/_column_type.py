@@ -3,16 +3,18 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from types import NoneType
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
-import pandas as pd
+
+if TYPE_CHECKING:
+    import pandas as pd
 
 
 class ColumnType(ABC):
     """Abstract base class for column types."""
 
-    _is_nullable: bool # This line is just here so the linter doesn't throw an error in line 63.
+    _is_nullable: bool  # This line is just here so the linter doesn't throw an error in line 63.
     @abstractmethod
     def __init__(self, is_nullable: bool = False) -> None:
         pass

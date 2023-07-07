@@ -1,7 +1,7 @@
 import pandas as pd
 import pytest
 from safeds.data.tabular.containers import Table
-from safeds.data.tabular.typing import Integer, Schema, Nothing
+from safeds.data.tabular.typing import Integer, Nothing, Schema
 
 
 @pytest.mark.parametrize(

@@ -1,15 +1,14 @@
-from typing import Iterable
+from collections.abc import Iterable
 
 import pytest
-
 from safeds.data.tabular.typing import (
     Anything,
     Boolean,
     ColumnType,
     Integer,
+    Nothing,
     RealNumber,
     String,
-    Nothing,
 )
 
 
@@ -27,10 +26,19 @@ class TestDataType:
             ([1.0, 2.0, None], RealNumber(is_nullable=True)),
             ([True, False, None], Boolean(is_nullable=True)),
             (["a", None, "b"], String(is_nullable=True)),
-
         ],
-        ids=["Integer", "Real number", "Boolean", "String", "Mixed", "None", "Nullable integer",
-             "Nullable RealNumber", "Nullable Boolean", "Nullable String"],
+        ids=[
+            "Integer",
+            "Real number",
+            "Boolean",
+            "String",
+            "Mixed",
+            "None",
+            "Nullable integer",
+            "Nullable RealNumber",
+            "Nullable Boolean",
+            "Nullable String",
+        ],
     )
     def test_should_return_the_data_type(self, data: Iterable, expected: ColumnType) -> None:
         assert ColumnType._data_type(data) == expected

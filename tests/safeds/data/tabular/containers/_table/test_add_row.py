@@ -2,7 +2,7 @@ import pytest
 from _pytest.python_api import raises
 from safeds.data.tabular.containers import Row, Table
 from safeds.data.tabular.typing import Anything, Integer, Schema
-from safeds.exceptions import UnknownColumnNameError, SchemaMismatchError
+from safeds.exceptions import UnknownColumnNameError
 
 
 @pytest.mark.parametrize(
@@ -30,16 +30,22 @@ from safeds.exceptions import UnknownColumnNameError, SchemaMismatchError
             Table({"col1": [1, 2, 1], "col2": [1, 2, 4]}),
             Row({"col1": 5, "col2": 6}),
             Table({"col1": [1, 2, 1, 5], "col2": [1, 2, 4, 6]}),
-            Schema({"col1": Integer(), "col2": Integer()})
+            Schema({"col1": Integer(), "col2": Integer()}),
         ),
         (
             Table({"col1": [], "col2": []}),
             Row({"col1": 5, "col2": 6}),
             Table({"col1": [5], "col2": [6]}),
-            Schema({"col1": Integer(), "col2": Integer()})
-        )
+            Schema({"col1": Integer(), "col2": Integer()}),
+        ),
     ],
-    ids=["added row", "different schemas", "different schemas and nullable", "add row to rowless table", "add row to empty table"],
+    ids=[
+        "added row",
+        "different schemas",
+        "different schemas and nullable",
+        "add row to rowless table",
+        "add row to empty table",
+    ],
 )
 def test_should_add_row(table: Table, row: Row, expected: Table, expected_schema: Schema) -> None:
     result = table.add_row(row)
