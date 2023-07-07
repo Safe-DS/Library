@@ -11,7 +11,9 @@ from tests.helpers import resolve_resource_path
 
 class TestFromJpegFile:
     @pytest.mark.parametrize(
-        "path", ["image/white_square.jpg", Path("image/white_square.jpg")], ids=["jpg", "jpg_Path"],
+        "path",
+        ["image/white_square.jpg", Path("image/white_square.jpg")],
+        ids=["jpg", "jpg_Path"],
     )
     def test_should_load_jpeg_file(self, path: str | Path) -> None:
         Image.from_jpeg_file(resolve_resource_path(path))
@@ -28,7 +30,9 @@ class TestFromJpegFile:
 
 class TestFromPngFile:
     @pytest.mark.parametrize(
-        "path", ["image/white_square.png", Path("image/white_square.png")], ids=["png", "png_Path"],
+        "path",
+        ["image/white_square.png", Path("image/white_square.png")],
+        ids=["png", "png_Path"],
     )
     def test_should_load_png_file(self, path: str | Path) -> None:
         Image.from_png_file(resolve_resource_path(path))
@@ -139,13 +143,17 @@ class TestToPngFile:
 
 class TestReprJpeg:
     @pytest.mark.parametrize(
-        "image", [Image.from_jpeg_file(resolve_resource_path("image/white_square.jpg"))], ids=["jpg"],
+        "image",
+        [Image.from_jpeg_file(resolve_resource_path("image/white_square.jpg"))],
+        ids=["jpg"],
     )
     def test_should_return_bytes_if_image_is_jpeg(self, image: Image) -> None:
         assert isinstance(image._repr_jpeg_(), bytes)
 
     @pytest.mark.parametrize(
-        "image", [Image.from_png_file(resolve_resource_path("image/white_square.png"))], ids=["png"],
+        "image",
+        [Image.from_png_file(resolve_resource_path("image/white_square.png"))],
+        ids=["png"],
     )
     def test_should_return_none_if_image_is_not_jpeg(self, image: Image) -> None:
         assert image._repr_jpeg_() is None
@@ -153,13 +161,17 @@ class TestReprJpeg:
 
 class TestReprPng:
     @pytest.mark.parametrize(
-        "image", [Image.from_png_file(resolve_resource_path("image/white_square.png"))], ids=["png"],
+        "image",
+        [Image.from_png_file(resolve_resource_path("image/white_square.png"))],
+        ids=["png"],
     )
     def test_should_return_bytes_if_image_is_png(self, image: Image) -> None:
         assert isinstance(image._repr_png_(), bytes)
 
     @pytest.mark.parametrize(
-        "image", [Image.from_jpeg_file(resolve_resource_path("image/white_square.jpg"))], ids=["jpg"],
+        "image",
+        [Image.from_jpeg_file(resolve_resource_path("image/white_square.jpg"))],
+        ids=["jpg"],
     )
     def test_should_return_none_if_image_is_not_png(self, image: Image) -> None:
         assert image._repr_png_() is None
