@@ -83,11 +83,7 @@ class TestProperties:
 
 
 class TestToJpegFile:
-    @pytest.mark.parametrize(
-        "path",
-        ["image/white_square.jpg"],
-        ids=["jpg_file"]
-    )
+    @pytest.mark.parametrize("path", ["image/white_square.jpg"], ids=["jpg_file"])
     def test_should_save_jpeg_file_by_str(self, path: str) -> None:
         image = Image.from_jpeg_file(resolve_resource_path(path))
 
