@@ -14,7 +14,7 @@ if TYPE_CHECKING:
 class ColumnType(ABC):
     """Abstract base class for column types."""
 
-    _is_nullable: bool  # This line is just here so the linter doesn't throw an error in line 63.
+    _is_nullable: bool  # This line is just here so the linter doesn't throw an error
 
     @abstractmethod
     def __init__(self, is_nullable: bool = False) -> None:
@@ -44,10 +44,10 @@ class ColumnType(ABC):
         def column_type_of_type(cell_type: Any) -> ColumnType:
             if cell_type == int or cell_type == np.int64 or cell_type == np.int32:
                 return Integer(is_nullable)
-            if cell_type == bool:
-                return Boolean(is_nullable)
             if cell_type == float or cell_type == np.float64 or cell_type == np.float32:
                 return RealNumber(is_nullable)
+            if cell_type == bool:
+                return Boolean(is_nullable)
             if cell_type == str:
                 return String(is_nullable)
             if cell_type is NoneType:
@@ -68,7 +68,7 @@ class ColumnType(ABC):
                 if type(cell) is NoneType:
                     is_nullable = True
                     result._is_nullable = is_nullable
-                elif result == Integer and type(cell) == float:
+                elif (isinstance(result, Integer) and isinstance(column_type_of_type(type(cell)), RealNumber)) or (isinstance(result, RealNumber) and isinstance(column_type_of_type(type(cell)), Integer)):
                     result = RealNumber(is_nullable)
                 else:
                     result = Anything(is_nullable)
