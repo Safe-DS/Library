@@ -210,7 +210,7 @@ The entries in the `__all__` list in `__init__.py` files should be sorted alphab
 !!! success "**DO** (library code):"
 
     ```py
-    __all__ =[
+    __all__ = [
         "ColumnSizeError",
         "DuplicateColumnNameError",
         "MissingValuesColumnError"
@@ -219,7 +219,7 @@ The entries in the `__all__` list in `__init__.py` files should be sorted alphab
 !!! failure "**DON'T** (library code):"
 
     ```py
-    __all__ =[
+    __all__ = [
         "MissingValuesColumnError",
         "ColumnSizeError",
         "DuplicateColumnNameError"
