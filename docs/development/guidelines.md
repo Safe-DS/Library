@@ -205,6 +205,29 @@ The user should not have to deal with exceptions that are defined in the wrapper
         return pd.read_csv(path) # May raise a pd.ParserError
     ```
 
+### Sort the exceptions in the `__all__` list alphabetically
+
+The exceptions in the `__all__` list in `src/safeds/exceptions/__init__.py` should be sorted alphabetically. This makes it easier for users to find the exception they are looking for.
+
+!!! success "**DO** (client code):"
+
+    ```py
+    __all__ =[
+        "ColumnSizeError",
+        "DuplicateColumnNameError",
+        "MissingValuesColumnError"
+    ]
+    ```
+!!! failure "**DON'T** (client code):"
+
+    ```py
+    __all__ =[
+        "MissingValuesColumnError",
+        "ColumnSizeError",
+        "DuplicateColumnNameError"
+    ]
+    ```
+
 ### Group API elements by task
 
 Packages should correspond to a specific task like classification or imputation. This eases discovery and makes it easy to switch between different solutions for the same task.
