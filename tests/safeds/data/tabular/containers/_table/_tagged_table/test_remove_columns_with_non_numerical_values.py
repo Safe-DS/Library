@@ -5,34 +5,50 @@ from safeds.exceptions import ColumnIsTargetError
 from tests.helpers import assert_that_tagged_tables_are_equal
 
 
-def test_should_remove_column() -> None:
-    table = TaggedTable(
-        {
-            "feature_numerical": [0, 1, 2],
-            "feature_non_numerical": ["a", "b", "c"],
-            "target": [3, 4, 5],
-        },
-        "target",
-    )
+@pytest.mark.parametrize(
+    ("table", "expected"),
+    [
+        (
+            TaggedTable(
+                {
+                    "feature_numerical": [0, 1, 2],
+                    "feature_non_numerical": ["a", "b", "c"],
+                    "target": [3, 4, 5],
+                },
+                "target",
+            ),
+            TaggedTable(
+                {
+                    "feature_numerical": [0, 1, 2],
+                    "target": [3, 4, 5],
+                },
+                "target",
+                )
+                ),
+    ],
+    ids=["with_non_numerical"]
+)
+def test_should_remove_columns_with_non_numerical_values(table: TaggedTable, expected: TaggedTable) -> None:
     new_table = table.remove_columns_with_non_numerical_values()
-    expected = TaggedTable(
-        {
-            "feature_numerical": [0, 1, 2],
-            "target": [3, 4, 5],
-        },
-        "target",
-    )
     assert_that_tagged_tables_are_equal(new_table, expected)
 
 
-def test_should_throw_column_is_target() -> None:
-    table = TaggedTable(
-        {
-            "feature": [0, 1, 2],
-            "target": ["a", "b", "c"],
-        },
-        "target",
-    )
+@pytest.mark.parametrize(
+    "table",
+    [
+        (
+            TaggedTable(
+                {
+                    "feature": [0, 1, 2],
+                    "target": ["a", "b", "c"],
+                },
+                "target",
+            )
+        ),
+    ],
+    ids=["only_target_has_non_numerical"]
+)
+def test_should_throw_column_is_target(table: TaggedTable) -> None:
     with pytest.raises(
         ColumnIsTargetError,
         match='Illegal schema modification: Column "target" is the target column and cannot be removed.',
