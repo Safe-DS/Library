@@ -21,7 +21,7 @@ from tests.helpers import assert_that_tagged_tables_are_equal
                     "target": [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
                 },
                 "target",
-            )
+            ),
         ),
         (
             TaggedTable(
