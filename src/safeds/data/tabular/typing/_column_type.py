@@ -12,6 +12,7 @@ import pandas as pd
 class ColumnType(ABC):
     """Abstract base class for column types."""
 
+    _is_nullable: bool
     @abstractmethod
     def __init__(self, is_nullable: bool = False) -> None:
         pass
@@ -52,7 +53,7 @@ class ColumnType(ABC):
                 message = f"Unsupported numpy data type '{cell_type}'."
                 raise NotImplementedError(message)
 
-        result: ColumnType | Integer | String | Boolean | RealNumber | Nothing = Nothing()
+        result: ColumnType = Nothing()
         is_nullable = False
         for cell in data:
             if result == Nothing():
