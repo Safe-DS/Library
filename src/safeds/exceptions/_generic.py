@@ -24,6 +24,8 @@ class OutOfBoundsError(ValueError):
             lower_bound = MinInfinity()
         if upper_bound is None:
             upper_bound = Infinity()
+        if upper_bound._value < lower_bound._value:
+            raise NotImplementedError("The upper bound cannot be less than the lower bound.")
         super().__init__(f"{actual} is not inside {lower_bound._str_lower_bound()}, {upper_bound._str_upper_bound()}.")
 
 
@@ -71,7 +73,7 @@ class OpenBound(Bound):
 class Infinity(OpenBound):
 
     def __init__(self):
-        super().__init__(float("nan"))
+        super().__init__(float("inf"))
 
     def __str__(self) -> str:
         return "\u221e"
@@ -83,7 +85,7 @@ class Infinity(OpenBound):
 class MinInfinity(OpenBound):
 
     def __init__(self):
-        super().__init__(float("nan"))
+        super().__init__(float("-inf"))
 
     def __str__(self) -> str:
         return "-\u221e"
