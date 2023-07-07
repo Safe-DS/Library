@@ -18,7 +18,9 @@ class OutOfBoundsError(ValueError):
     """
 
     def __init__(self, actual: float, *, lower_bound: Bound | None = None, upper_bound: Bound | None = None):
-        if (lower_bound is None or isinstance(lower_bound, MinInfinity)) and (upper_bound is None or isinstance(upper_bound, Infinity)):
+        if (lower_bound is None or isinstance(lower_bound, MinInfinity)) and (
+            upper_bound is None or isinstance(upper_bound, Infinity)
+        ):
             raise NotImplementedError("Value cannot be out of bounds if there are no bounds.")
         if lower_bound is None:
             lower_bound = MinInfinity()
@@ -71,7 +73,6 @@ class OpenBound(Bound):
 
 
 class Infinity(OpenBound):
-
     def __init__(self) -> None:
         super().__init__(float("inf"))
 
@@ -83,7 +84,6 @@ class Infinity(OpenBound):
 
 
 class MinInfinity(OpenBound):
-
     def __init__(self) -> None:
         super().__init__(float("-inf"))
 
