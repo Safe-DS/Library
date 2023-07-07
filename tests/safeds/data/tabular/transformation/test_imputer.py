@@ -122,12 +122,15 @@ class TestTransform:
             },
         )
 
-        with warnings.catch_warnings():
-            warnings.filterwarnings(
-                action="ignore",
-                message=r"There are multiple most frequent values in a column given to the Imputer\..*",
-                category=UserWarning,
-            )
+        if isinstance(strategy, Imputer.Strategy.Mode):
+            with warnings.catch_warnings():
+                warnings.filterwarnings(
+                    action="ignore",
+                    message=r"There are multiple most frequent values in a column given to the Imputer\..*",
+                    category=UserWarning,
+                )
+                transformer = Imputer(strategy).fit(table_to_fit, None)
+        else:
             transformer = Imputer(strategy).fit(table_to_fit, None)
 
         table_to_transform = Table(
