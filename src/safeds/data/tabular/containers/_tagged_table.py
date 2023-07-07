@@ -201,7 +201,7 @@ class TaggedTable(Table):
         Returns
         -------
         result : TaggedTable
-            The table with the column attached as a feature column.
+            The table with the attached feature column.
 
         Raises
         ------
@@ -218,14 +218,14 @@ class TaggedTable(Table):
 
     def add_columns_as_features(self, columns: list[Column] | Table) -> TaggedTable:
         """
-        Return the original table with the provided column attached at the end, as feature columns.
+        Return the original table with the provided columns attached at the end, as feature columns.
 
         This table is not modified.
 
         Returns
         -------
         result : TaggedTable
-            The table with the column attached as feature columns.
+            The table with the attached feature columns.
 
         Raises
         ------
@@ -342,7 +342,7 @@ class TaggedTable(Table):
 
     def add_rows(self, rows: list[Row] | Table) -> TaggedTable:
         """
-        Add multiple rows to a table.
+        Add multiple rows to the table.
 
         This table is not modified.
 
@@ -365,7 +365,7 @@ class TaggedTable(Table):
 
     def filter_rows(self, query: Callable[[Row], bool]) -> TaggedTable:
         """
-        Return a table with rows filtered by Callable (e.g. lambda function).
+        Return a table containing only rows that match the given Callable (e.g. lambda function).
 
         This table is not modified.
 
@@ -377,7 +377,7 @@ class TaggedTable(Table):
         Returns
         -------
         table : TaggedTable
-            A table containing only the rows filtered by the query.
+            A table containing only the rows to match the query.
         """
         return TaggedTable._from_table(
             super().filter_rows(query),
@@ -424,14 +424,14 @@ class TaggedTable(Table):
 
     def remove_columns(self, column_names: list[str]) -> TaggedTable:
         """
-        Return a table without the given column(s).
+        Remove the given column(s) from the table.
 
         This table is not modified.
 
         Parameters
         ----------
         column_names : list[str]
-            A list containing all columns to be dropped.
+            The names of all columns to be dropped.
 
         Returns
         -------
@@ -462,7 +462,7 @@ class TaggedTable(Table):
 
     def remove_columns_with_missing_values(self) -> TaggedTable:
         """
-        Return a table without the columns that contain missing values.
+        Remove every column that misses values.
 
         This table is not modified.
 
@@ -494,7 +494,7 @@ class TaggedTable(Table):
 
     def remove_columns_with_non_numerical_values(self) -> TaggedTable:
         """
-        Return a table without the columns that contain non-numerical values.
+        Remove every column that contains non-numerical values.
 
         This table is not modified.
 
@@ -526,7 +526,7 @@ class TaggedTable(Table):
 
     def remove_duplicate_rows(self) -> TaggedTable:
         """
-        Return a copy of the table with every duplicate row removed.
+        Remove all row duplicates.
 
         This table is not modified.
 
@@ -618,7 +618,7 @@ class TaggedTable(Table):
 
     def replace_column(self, old_column_name: str, new_columns: list[Column]) -> TaggedTable:
         """
-        Return a copy of the table with the specified old column replaced by a list of new columns.
+        Replace the specified old column by a list of new columns.
 
         The order of columns is kept.
 
@@ -737,9 +737,9 @@ class TaggedTable(Table):
         The comparator is a function that takes two columns `col1` and `col2` and
         returns an integer:
 
-        * If `col1` should be ordered before `col2`, the function should return a negative number.
-        * If `col1` should be ordered after `col2`, the function should return a positive number.
-        * If the original order of `col1` and `col2` should be kept, the function should return 0.
+        * If the function returns a negative number, `col1` will be ordered before `col2`.
+        * If the function returns a positive number, `col1` will be ordered after `col2`.
+        * If the function returns 0, the original order of `col1` and `col2` will be kept.
 
         If no comparator is given, the columns will be sorted alphabetically by their name.
 
@@ -772,9 +772,9 @@ class TaggedTable(Table):
         The comparator is a function that takes two rows `row1` and `row2` and
         returns an integer:
 
-        * If `row1` should be ordered before `row2`, the function should return a negative number.
-        * If `row1` should be ordered after `row2`, the function should return a positive number.
-        * If the original order of `row1` and `row2` should be kept, the function should return 0.
+        * If the function returns a negative number, `row1` will be ordered before `row2`.
+        * If the function returns a positive number, `row1` will be ordered after `row2`.
+        * If the function returns 0, the original order of `row1` and `row2` will be kept.
 
         This table is not modified.
 
