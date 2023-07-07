@@ -172,7 +172,10 @@ def test_should_remove_columns(table: TaggedTable, columns: list[str], expected:
     ids=["remove_only_target", "remove_non_feat_and_target", "remove_all_features", "remove_non_feat_and_all_features"],
 )
 def test_should_raise_in_remove_columns(
-    table: TaggedTable, columns: list[str], error: type[Exception], error_msg: str,
+    table: TaggedTable,
+    columns: list[str],
+    error: type[Exception],
+    error_msg: str,
 ) -> None:
     with pytest.raises(error, match=error_msg):
         table.remove_columns(columns)

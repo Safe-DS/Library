@@ -170,7 +170,9 @@ def test_should_remove_columns_with_non_numerical_values(table: TaggedTable, exp
     ],
 )
 def test_should_raise_in_remove_columns_with_missing_values(
-    table: TaggedTable, error: type[Exception], error_msg: str,
+    table: TaggedTable,
+    error: type[Exception],
+    error_msg: str,
 ) -> None:
     with pytest.raises(
         error,
