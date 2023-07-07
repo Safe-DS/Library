@@ -168,7 +168,7 @@ class Image:
 
         Returns
         -------
-        jpeg : Optional[bytes]
+        jpeg : bytes | None
             The image as JPEG.
         """
         if self._format != ImageFormat.JPEG:
@@ -187,7 +187,7 @@ class Image:
 
         Returns
         -------
-        png : Optional[bytes]
+        png : bytes | None
             The image as PNG.
         """
         if self._format != ImageFormat.PNG:

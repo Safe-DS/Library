@@ -1,3 +1,5 @@
+
+
 # Guidelines
 
 This document describes general guidelines for the Safe-DS Python Library. In the **DO**/**DON'T** examples below we either show _client code_ to describe the code users should/shouldn't have to write, or _library code_ to describe the code we, as library developers, need to write to achieve readable client code. We'll continuously update this document as we find new categories of usability issues.
@@ -268,6 +270,15 @@ The docstrings **should** use the [numpydoc](https://numpydoc.readthedocs.io/en/
 !!! success "**DO** (library code):"
 
     ```py
+    def __init__(self, data: Mapping[str, Any] | None = None) -> None:
+        """
+        data : Mapping[str, Any] | None
+        """
+    ```
+
+!!! failure "**DON'T** (library code):"
+
+    ```py
     def __init__(self, data: Optional[Mapping[str, Any]] = None) -> None:
         """
         data : Optional[Mapping[str, Any]]
@@ -280,15 +291,6 @@ The docstrings **should** use the [numpydoc](https://numpydoc.readthedocs.io/en/
     def __init__(self, data: Mapping[str, Any] | None = None) -> None:
         """
         data : Optional[Mapping[str, Any]]
-        """
-    ```
-
-!!! failure "**DON'T** (library code):"
-
-    ```py
-    def __init__(self, data: Mapping[str, Any] | None = None) -> None:
-        """
-        data : Mapping[str, Any] | None
         """
     ```
 

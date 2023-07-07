@@ -19,7 +19,7 @@ class Row(Mapping[str, Any]):
 
     Parameters
     ----------
-    data : Optional[Mapping[str, Any]]
+    data : Mapping[str, Any] | None
         The data. If None, an empty row is created.
 
     Examples
@@ -63,7 +63,7 @@ class Row(Mapping[str, Any]):
         ----------
         data : pd.DataFrame
             The data.
-        schema : Optional[Schema]
+        schema : Schema | None
             The schema. If None, the schema is inferred from the data.
 
         Returns
@@ -108,7 +108,7 @@ class Row(Mapping[str, Any]):
 
         Parameters
         ----------
-        data : Optional[Mapping[str, Any]]
+        data : Mapping[str, Any] | None
             The data. If None, an empty row is created.
 
         Examples

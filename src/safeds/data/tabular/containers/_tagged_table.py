@@ -21,7 +21,7 @@ class TaggedTable(Table):
         The data.
     target_name : str
         Name of the target column.
-    feature_names : Optional[list[str]]
+    feature_names : list[str] | None
         Names of the feature columns. If None, all columns except the target column are used.
 
     Raises
@@ -59,7 +59,7 @@ class TaggedTable(Table):
             The table.
         target_name : str
             Name of the target column.
-        feature_names : Optional[list[str]]
+        feature_names : list[str] | None
             Names of the feature columns. If None, all columns except the target column are used.
 
         Returns
@@ -125,7 +125,7 @@ class TaggedTable(Table):
             The data.
         target_name : str
             Name of the target column.
-        feature_names : Optional[list[str]]
+        feature_names : list[str] | None
             Names of the feature columns. If None, all columns except the target column are used.
 
         Raises

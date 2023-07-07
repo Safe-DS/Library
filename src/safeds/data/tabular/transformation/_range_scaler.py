@@ -41,7 +41,7 @@ class RangeScaler(InvertibleTableTransformer):
         ----------
         table : Table
             The table used to fit the transformer.
-        column_names : Optional[list[str]]
+        column_names : list[str] | None
             The list of columns from the table used to fit the transformer. If `None`, all columns are used.
 
         Returns

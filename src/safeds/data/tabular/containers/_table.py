@@ -59,7 +59,7 @@ class Table:
 
     Parameters
     ----------
-    data : Optional[Mapping[str, Sequence[Any]]]
+    data : Mapping[str, Sequence[Any] | None
         The data. If None, an empty table is created.
 
     Raises
@@ -339,7 +339,7 @@ class Table:
         ----------
         data : pd.DataFrame
             The data.
-        schema : Optional[Schema]
+        schema : Schema | None
             The schema. If None, the schema is inferred from the data.
 
         Returns
@@ -380,7 +380,7 @@ class Table:
 
         Parameters
         ----------
-        data : Optional[Mapping[str, Sequence[Any]]]
+        data : Mapping[str, Sequence[Any]] | None
             The data. If None, an empty table is created.
 
         Raises
@@ -1618,7 +1618,7 @@ class Table:
         ----------
         target_name : str
             Name of the target column.
-        feature_names : Optional[list[str]]
+        feature_names : list[str] | None
             Names of the feature columns. If None, all columns except the target column are used.
 
         Returns

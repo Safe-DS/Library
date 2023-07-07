@@ -58,7 +58,7 @@ class Column(Sequence[T]):
         ----------
         data : pd.Series
             The data.
-        type_ : Optional[ColumnType]
+        type_ : ColumnType | None
             The type. If None, the type is inferred from the data.
 
         Returns
@@ -92,7 +92,7 @@ class Column(Sequence[T]):
         ----------
         name : str
             The name of the column.
-        data : Optional[Sequence[T]]
+        data : Sequence[T] | None
             The data. If None, an empty column is created.
 
         Examples
