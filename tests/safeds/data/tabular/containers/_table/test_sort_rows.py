@@ -7,13 +7,18 @@ from safeds.data.tabular.containers import Row, Table
 @pytest.mark.parametrize(
     ("table", "comparator", "expected"),
     [
-        # Check that it works with an empty table when https://github.com/Safe-DS/Stdlib/issues/75 is fixed.
+        (
+            Table(),
+            lambda row1, row2: row1["col1"] - row2["col1"],
+            Table(),
+        ),
         (
             Table({"col1": [3, 2, 1]}),
             lambda row1, row2: row1["col1"] - row2["col1"],
             Table({"col1": [1, 2, 3]}),
         ),
     ],
+    ids=["empty", "3 rows"],
 )
 def test_should_return_sorted_table(
     table: Table,
@@ -27,13 +32,18 @@ def test_should_return_sorted_table(
 @pytest.mark.parametrize(
     ("table", "comparator", "expected"),
     [
-        # Check that it works with an empty table when https://github.com/Safe-DS/Stdlib/issues/75 is fixed.
+        (
+            Table(),
+            lambda row1, row2: row1["col1"] - row2["col1"],
+            Table(),
+        ),
         (
             Table({"col1": [3, 2, 1]}),
             lambda row1, row2: row1["col1"] - row2["col1"],
             Table({"col1": [3, 2, 1]}),
         ),
     ],
+    ids=["empty", "3 rows"],
 )
 def test_should_not_modify_original_table(
     table: Table,
