@@ -16,22 +16,15 @@ from tests.helpers import assert_that_tagged_tables_are_equal
                         "feat_2": [4, 5, 6],
                         "non_feat_1": [2, 4, 6],
                         "non_feat_2": [3, 6, 9],
-                        "target": [7, 8, 9]
-                    }
+                        "target": [7, 8, 9],
+                    },
                 ),
                 "target",
                 ["feat_1", "feat_2"],
             ),
             ["feat_2"],
             TaggedTable._from_table(
-                Table(
-                    {
-                        "feat_1": [1, 2, 3],
-                        "non_feat_1": [2, 4, 6],
-                        "non_feat_2": [3, 6, 9],
-                        "target": [7, 8, 9]
-                    }
-                ),
+                Table({"feat_1": [1, 2, 3], "non_feat_1": [2, 4, 6], "non_feat_2": [3, 6, 9], "target": [7, 8, 9]}),
                 "target",
                 ["feat_1"],
             ),
@@ -44,22 +37,15 @@ from tests.helpers import assert_that_tagged_tables_are_equal
                         "feat_2": [4, 5, 6],
                         "non_feat_1": [2, 4, 6],
                         "non_feat_2": [3, 6, 9],
-                        "target": [7, 8, 9]
-                    }
+                        "target": [7, 8, 9],
+                    },
                 ),
                 "target",
                 ["feat_1", "feat_2"],
             ),
             ["non_feat_2"],
             TaggedTable._from_table(
-                Table(
-                    {
-                        "feat_1": [1, 2, 3],
-                        "feat_2": [4, 5, 6],
-                        "non_feat_1": [2, 4, 6],
-                        "target": [7, 8, 9]
-                    }
-                ),
+                Table({"feat_1": [1, 2, 3], "feat_2": [4, 5, 6], "non_feat_1": [2, 4, 6], "target": [7, 8, 9]}),
                 "target",
                 ["feat_1", "feat_2"],
             ),
@@ -72,21 +58,15 @@ from tests.helpers import assert_that_tagged_tables_are_equal
                         "feat_2": [4, 5, 6],
                         "non_feat_1": [2, 4, 6],
                         "non_feat_2": [3, 6, 9],
-                        "target": [7, 8, 9]
-                    }
+                        "target": [7, 8, 9],
+                    },
                 ),
                 "target",
                 ["feat_1", "feat_2"],
             ),
             ["non_feat_1", "non_feat_2"],
             TaggedTable._from_table(
-                Table(
-                    {
-                        "feat_1": [1, 2, 3],
-                        "feat_2": [4, 5, 6],
-                        "target": [7, 8, 9]
-                    }
-                ),
+                Table({"feat_1": [1, 2, 3], "feat_2": [4, 5, 6], "target": [7, 8, 9]}),
                 "target",
                 ["feat_1", "feat_2"],
             ),
@@ -99,21 +79,15 @@ from tests.helpers import assert_that_tagged_tables_are_equal
                         "feat_2": [4, 5, 6],
                         "non_feat_1": [2, 4, 6],
                         "non_feat_2": [3, 6, 9],
-                        "target": [7, 8, 9]
-                    }
+                        "target": [7, 8, 9],
+                    },
                 ),
                 "target",
                 ["feat_1", "feat_2"],
             ),
             ["feat_2", "non_feat_2"],
             TaggedTable._from_table(
-                Table(
-                    {
-                        "feat_1": [1, 2, 3],
-                        "non_feat_1": [2, 4, 6],
-                        "target": [7, 8, 9]
-                    }
-                ),
+                Table({"feat_1": [1, 2, 3], "non_feat_1": [2, 4, 6], "target": [7, 8, 9]}),
                 "target",
                 ["feat_1"],
             ),
@@ -126,21 +100,15 @@ from tests.helpers import assert_that_tagged_tables_are_equal
                         "feat_2": [4, 5, 6],
                         "non_feat_1": [2, 4, 6],
                         "non_feat_2": [3, 6, 9],
-                        "target": [7, 8, 9]
-                    }
+                        "target": [7, 8, 9],
+                    },
                 ),
                 "target",
                 ["feat_1", "feat_2"],
             ),
             ["feat_2", "non_feat_2"],
             TaggedTable._from_table(
-                Table(
-                    {
-                        "feat_1": [1, 2, 3],
-                        "non_feat_1": [2, 4, 6],
-                        "target": [7, 8, 9]
-                    }
-                ),
+                Table({"feat_1": [1, 2, 3], "non_feat_1": [2, 4, 6], "target": [7, 8, 9]}),
                 "target",
                 ["feat_1"],
             ),
@@ -151,7 +119,7 @@ from tests.helpers import assert_that_tagged_tables_are_equal
         "remove_non_feature",
         "remove_all_non_features",
         "remove_some_feat_and_some_non_feat",
-        "remove_nothing"
+        "remove_nothing",
     ],
 )
 def test_should_remove_columns(table: TaggedTable, columns: list[str], expected: TaggedTable) -> None:
