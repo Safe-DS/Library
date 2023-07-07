@@ -72,7 +72,7 @@ class OpenBound(Bound):
 
 class Infinity(OpenBound):
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__(float("inf"))
 
     def __str__(self) -> str:
@@ -84,7 +84,7 @@ class Infinity(OpenBound):
 
 class MinInfinity(OpenBound):
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__(float("-inf"))
 
     def __str__(self) -> str:
