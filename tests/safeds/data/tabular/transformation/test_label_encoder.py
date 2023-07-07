@@ -130,6 +130,7 @@ class TestFitAndTransform:
                 ),
             ),
         ],
+        ids=["no_column_names", "with_column_names"],
     )
     def test_should_return_transformed_table(
         self,
@@ -205,6 +206,7 @@ class TestInverseTransform:
                 },
             ),
         ],
+        ids=["no_column_names"],
     )
     def test_should_return_original_table(self, table: Table) -> None:
         transformer = LabelEncoder().fit(table, None)
