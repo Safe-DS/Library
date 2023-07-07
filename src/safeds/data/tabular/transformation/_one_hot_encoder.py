@@ -300,6 +300,12 @@ class OneHotEncoder(InvertibleTableTransformer):
                 if transformed_table.get_column(constructed_column)[i] == 1.0:
                     original_columns[original_column_name][i] = value
 
+        for original_column_name in self._value_to_column_nans:
+            constructed_column = self._value_to_column_nans[original_column_name]
+            for i in range(transformed_table.number_of_rows):
+                if transformed_table.get_column(constructed_column)[i] == 1.0:
+                    original_columns[original_column_name][i] = float("nan")
+
         table = transformed_table
 
         for column_name, encoded_column in original_columns.items():
