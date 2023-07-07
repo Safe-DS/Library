@@ -516,7 +516,7 @@ class TestReprHtml:
 class TestCopy:
     @pytest.mark.parametrize(
         "row",
-        [Row(), Row({"a": [3, 0.1]})],
+        [Row(), Row({"a": 3, "b": 4})],
         ids=["empty", "normal"],
     )
     def test_should_copy_table(self, row: Row) -> None:
