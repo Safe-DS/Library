@@ -98,11 +98,13 @@ def test_should_return_table(table: TaggedTable, column_names: list[str], expect
                         "target": [7, 8, 9],
                     },
                 ),
-                "target", ["feat1", "feat2"]
+                "target",
+                ["feat1", "feat2"],
             ),
             ["feat1", "feat2"],
-            r"Illegal schema modification: Must keep the target column."
-        ),(
+            r"Illegal schema modification: Must keep the target column.",
+        ),
+        (
             TaggedTable._from_table(
                 Table(
                     {
@@ -112,10 +114,11 @@ def test_should_return_table(table: TaggedTable, column_names: list[str], expect
                         "target": [7, 8, 9],
                     },
                 ),
-                "target", ["feat1", "feat2"]
+                "target",
+                ["feat1", "feat2"],
             ),
             ["target", "other"],
-            r"Illegal schema modification: Must keep at least one feature column."
+            r"Illegal schema modification: Must keep at least one feature column.",
         ),
     ],
     ids=["table_remove_target", "table_remove_all_features"],

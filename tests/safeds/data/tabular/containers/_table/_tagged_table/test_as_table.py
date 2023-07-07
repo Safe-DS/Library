@@ -1,5 +1,4 @@
 import pytest
-
 from safeds.data.tabular.containers import Table, TaggedTable
 
 
@@ -14,7 +13,7 @@ from safeds.data.tabular.containers import Table, TaggedTable
                     "target": [1, 3, 2],
                 },
                 "target",
-                ["feature_1", "feature_2"]
+                ["feature_1", "feature_2"],
             ),
             Table(
                 {
@@ -22,7 +21,7 @@ from safeds.data.tabular.containers import Table, TaggedTable
                     "feature_2": [6, 12, 9],
                     "target": [1, 3, 2],
                 },
-            )
+            ),
         ),
         (
             TaggedTable(
@@ -33,7 +32,7 @@ from safeds.data.tabular.containers import Table, TaggedTable
                     "target": [1, 3, 2],
                 },
                 "target",
-                ["feature_1", "feature_2"]
+                ["feature_1", "feature_2"],
             ),
             Table(
                 {
@@ -42,10 +41,10 @@ from safeds.data.tabular.containers import Table, TaggedTable
                     "other": [3, 9, 12],
                     "target": [1, 3, 2],
                 },
-            )
-        )
+            ),
+        ),
     ],
-    ids=["normal", "table_with_column_as_non_feature"]
+    ids=["normal", "table_with_column_as_non_feature"],
 )
 def test_should_return_table(tagged_table: TaggedTable, expected: Table) -> None:
     table = tagged_table._as_table()
