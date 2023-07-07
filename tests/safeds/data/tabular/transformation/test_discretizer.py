@@ -129,7 +129,7 @@ class TestTransform:
 
         transformer = Discretizer()
 
-        with pytest.raises(TransformerNotFittedError):
+        with pytest.raises(TransformerNotFittedError, match=r"The transformer has not been fitted yet."):
             transformer.transform(table)
 
 
@@ -252,7 +252,7 @@ class TestFitAndTransform:
 
     def test_get_names_of_added_columns(self) -> None:
         transformer = Discretizer()
-        with pytest.raises(TransformerNotFittedError):
+        with pytest.raises(TransformerNotFittedError, match=r"The transformer has not been fitted yet."):
             transformer.get_names_of_added_columns()
 
         table = Table(
@@ -265,7 +265,7 @@ class TestFitAndTransform:
 
     def test_get_names_of_changed_columns(self) -> None:
         transformer = Discretizer()
-        with pytest.raises(TransformerNotFittedError):
+        with pytest.raises(TransformerNotFittedError, match=r"The transformer has not been fitted yet."):
             transformer.get_names_of_changed_columns()
         table = Table(
             {
@@ -277,7 +277,7 @@ class TestFitAndTransform:
 
     def test_get_names_of_removed_columns(self) -> None:
         transformer = Discretizer()
-        with pytest.raises(TransformerNotFittedError):
+        with pytest.raises(TransformerNotFittedError, match=r"The transformer has not been fitted yet."):
             transformer.get_names_of_removed_columns()
 
         table = Table(
