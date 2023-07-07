@@ -13,7 +13,7 @@ class ColumnType(ABC):
     """Abstract base class for column types."""
 
     @abstractmethod
-    def __init__(self, is_nullable: bool = False):
+    def __init__(self, is_nullable: bool = False) -> None:
         pass
 
     @staticmethod
@@ -107,7 +107,7 @@ class Anything(ColumnType):
 
     _is_nullable: bool
 
-    def __init__(self, is_nullable: bool = False):
+    def __init__(self, is_nullable: bool = False) -> None:
         self._is_nullable = is_nullable
 
     def __repr__(self) -> str:
@@ -152,7 +152,7 @@ class Boolean(ColumnType):
 
     _is_nullable: bool
 
-    def __init__(self, is_nullable: bool = False):
+    def __init__(self, is_nullable: bool = False) -> None:
         self._is_nullable = is_nullable
 
     def __repr__(self) -> str:
@@ -197,7 +197,7 @@ class RealNumber(ColumnType):
 
     _is_nullable: bool
 
-    def __init__(self, is_nullable: bool = False):
+    def __init__(self, is_nullable: bool = False) -> None:
         self._is_nullable = is_nullable
 
     def __repr__(self) -> str:
@@ -242,7 +242,7 @@ class Integer(ColumnType):
 
     _is_nullable: bool
 
-    def __init__(self, is_nullable: bool = False):
+    def __init__(self, is_nullable: bool = False) -> None:
         self._is_nullable = is_nullable
 
     def __repr__(self) -> str:
@@ -287,7 +287,7 @@ class String(ColumnType):
 
     _is_nullable: bool
 
-    def __init__(self, is_nullable: bool = False):
+    def __init__(self, is_nullable: bool = False) -> None:
         self._is_nullable = is_nullable
 
     def __repr__(self) -> str:
@@ -325,7 +325,7 @@ class Nothing(ColumnType):
 
     _is_nullable: bool
 
-    def __init__(self):
+    def __init__(self) -> None:
         self._is_nullable = True
 
     def __repr__(self) -> str:
