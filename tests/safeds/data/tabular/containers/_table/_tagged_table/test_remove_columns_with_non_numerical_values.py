@@ -85,13 +85,53 @@ def test_should_remove_columns_with_non_numerical_values(table: TaggedTable, exp
             TaggedTable(
                 {
                     "feature": [0, 1, 2],
+                    "non_feature": [1, 2, 3],
                     "target": ["a", "b", "c"],
                 },
                 "target",
+                ["feature"],
+            )
+        ),
+        (
+            TaggedTable(
+                {
+                    "feature": [0, "x", 2],
+                    "non_feature": [1, 2, 3],
+                    "target": ["a", "b", "c"],
+                },
+                "target",
+                ["feature"],
+            )
+        ),
+        (
+            TaggedTable(
+                {
+                    "feature": [0, 1, 2],
+                    "non_feature": [1, "x", 3],
+                    "target": ["a", "b", "c"],
+                },
+                "target",
+                ["feature"],
+            )
+        ),
+        (
+            TaggedTable(
+                {
+                    "feature": [0, "x", 2],
+                    "non_feature": [1, "x", 3],
+                    "target": ["a", "b", "c"],
+                },
+                "target",
+                ["feature"],
             )
         ),
     ],
-    ids=["only_target_has_non_numerical"]
+    ids=[
+        "only_target_non_numerical",
+        "also_feature_non_numerical",
+        "also_non_feature_non_numerical",
+        "all_non_numerical",
+    ]
 )
 def test_should_throw_column_is_target(table: TaggedTable) -> None:
     with pytest.raises(
