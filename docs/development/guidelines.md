@@ -290,7 +290,7 @@ The docstrings **should** use the [numpydoc](https://numpydoc.readthedocs.io/en/
         """
         data : Mapping[str, Any] | None
         """
-
+    ```
 
 ### Modules
 
