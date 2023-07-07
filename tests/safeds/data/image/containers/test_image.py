@@ -340,7 +340,9 @@ class TestGaussianNoise:
         expected = Image.from_png_file(
             resolve_resource_path("image/noise/noise_" + str(standard_deviation) + "_" + str(opacity) + ".png"),
         )
-        assert image.add_gaussian_noise(standard_deviation, opacity) == expected
+        image = image.add_gaussian_noise(standard_deviation, opacity)
+
+        assert image == expected
 
     @pytest.mark.parametrize(
         ("image", "standard_deviation", "opacity"),
