@@ -8,7 +8,9 @@ from safeds.data.tabular.containers import TaggedTable
         TaggedTable({"a": [], "b": []}, target_name="b", feature_names=["a"]),
         TaggedTable({"a": ["a", 3, 0.1], "b": [True, False, None]}, target_name="b", feature_names=["a"]),
         TaggedTable(
-            {"a": ["a", 3, 0.1], "b": [True, False, None], "c": ["a", "b", "c"]}, target_name="b", feature_names=["a"],
+            {"a": ["a", 3, 0.1], "b": [True, False, None], "c": ["a", "b", "c"]},
+            target_name="b",
+            feature_names=["a"],
         ),
         TaggedTable({"a": [], "b": [], "c": []}, target_name="b", feature_names=["a"]),
     ],

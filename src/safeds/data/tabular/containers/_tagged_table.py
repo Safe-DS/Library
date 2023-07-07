@@ -380,7 +380,9 @@ class TaggedTable(Table):
             A table containing only the rows filtered by the query.
         """
         return TaggedTable._from_table(
-            super().filter_rows(query), target_name=self.target.name, feature_names=self.features.column_names,
+            super().filter_rows(query),
+            target_name=self.target.name,
+            feature_names=self.features.column_names,
         )
 
     def keep_only_columns(self, column_names: list[str]) -> TaggedTable:
