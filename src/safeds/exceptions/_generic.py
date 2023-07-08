@@ -18,6 +18,18 @@ class OutOfBoundsError(ValueError):
     """
 
     def __init__(self, actual: float, *, lower_bound: Bound | None = None, upper_bound: Bound | None = None):
+        """
+        Initialize an OutOfBoundError.
+
+        Parameters
+        ----------
+        actual: float
+            The actual value that is outside its expected range.
+        lower_bound: Bound | None
+            The lower bound of the expected range.
+        upper_bound: Bound | None
+            The upper bound of the expected range.
+        """
         if (lower_bound is None or isinstance(lower_bound, MinInfinity)) and (
             upper_bound is None or isinstance(upper_bound, Infinity)
         ):
