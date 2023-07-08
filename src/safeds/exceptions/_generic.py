@@ -45,9 +45,6 @@ class Bound(ABC):
         """Get a string representation of the concrete value of the Bound."""
         return str(self._value)
 
-    def _is_float(self) -> bool:
-        return True
-
     @abstractmethod
     def _str_lower_bound(self) -> str:
         pass
@@ -117,9 +114,6 @@ class Infinity(OpenBound):
         """Get a string representation of the concrete value of the Bound."""
         return "\u221e"
 
-    def _is_float(self) -> bool:
-        return False
-
 
 class MinInfinity(OpenBound):
     """An infinite or unrestricted lower Bound."""
@@ -130,6 +124,3 @@ class MinInfinity(OpenBound):
     def __str__(self) -> str:
         """Get a string representation of the concrete value of the Bound."""
         return "-\u221e"
-
-    def _is_float(self) -> bool:
-        return False
