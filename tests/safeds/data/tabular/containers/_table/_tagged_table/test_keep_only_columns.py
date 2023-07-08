@@ -78,7 +78,7 @@ from tests.helpers import assert_that_tagged_tables_are_equal
             ),
         ),
     ],
-    ids=["table", "table_keep_non_feature_column", "table_not_keep_non_feature_column"],
+    ids=["keep_feature_and_target_column", "keep_non_feature_column", "don't_keep_non_feature_column"],
 )
 def test_should_return_table(table: TaggedTable, column_names: list[str], expected: TaggedTable) -> None:
     new_table = table.keep_only_columns(column_names)
