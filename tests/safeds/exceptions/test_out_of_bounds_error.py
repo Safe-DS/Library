@@ -41,14 +41,16 @@ def test_should_raise_out_of_bounds_error(
         upper_bound is None or isinstance(upper_bound, Infinity)
     ):
         with pytest.raises(
-            NotImplementedError, match=r"Illegal interval: Value cannot be out of bounds if there are no bounds.",
+            NotImplementedError,
+            match=r"Illegal interval: Value cannot be out of bounds if there are no bounds.",
         ):
             raise OutOfBoundsError(actual, lower_bound=lower_bound, upper_bound=upper_bound)
         return
     # All tests: Check interval where lower > upper:
     if lower_bound is not None and upper_bound is not None:
         with pytest.raises(
-            NotImplementedError, match=r"Illegal interval: The upper bound cannot be less than the lower bound.",
+            NotImplementedError,
+            match=r"Illegal interval: The upper bound cannot be less than the lower bound.",
         ):
             raise OutOfBoundsError(actual, lower_bound=upper_bound, upper_bound=lower_bound)
     # Check case where actual value lies inside the interval:
