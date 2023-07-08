@@ -29,7 +29,7 @@ from safeds.exceptions import Bound, ClosedBound, Infinity, MinInfinity, OpenBou
     ],
     ids=["ub_closed_-1", "ub_open_-1", "ub_open_inf", "ub_none"],
 )
-def test_should_raise_in_out_of_bounds_error(
+def test_should_raise_out_of_bounds_error(
     actual: float,
     lower_bound: Bound | None,
     upper_bound: Bound | None,
