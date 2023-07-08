@@ -61,12 +61,12 @@ def test_should_raise_out_of_bounds_error(
 @pytest.mark.parametrize(
     ("value", "expected_value", "bound", "lower_bound"),
     [
-        (2, False, ClosedBound(2), False),
-        (2, False, ClosedBound(2), True),
+        (2, True, ClosedBound(2), False),
+        (2, True, ClosedBound(2), True),
         (2, True, ClosedBound(3), False),
         (2, True, ClosedBound(1), True),
-        (2, True, OpenBound(2), False),
-        (2, True, OpenBound(2), True),
+        (2, False, OpenBound(2), False),
+        (2, False, OpenBound(2), True),
         (2, False, OpenBound(1), False),
         (2, False, OpenBound(3), True),
         (2, False, Infinity(), True),

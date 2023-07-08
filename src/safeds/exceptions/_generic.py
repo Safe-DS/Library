@@ -69,20 +69,20 @@ class ClosedBound(Bound):
         super().__init__(value)
 
     def str_lower_bound(self) -> str:
-        """Get a string representation of the Bound as the lower Bound of an interval."""
+        """Get a string representation of the ClosedBound as the lower Bound of an interval."""
         return f"[{self}"
 
     def str_upper_bound(self) -> str:
-        """Get a string representation of the Bound as the upper Bound of an interval."""
+        """Get a string representation of the ClosedBound as the upper Bound of an interval."""
         return f"{self}]"
 
     def check_lower_bound(self, value: float) -> bool:
-        """Check that a value does not exceed the Bound on the lower side."""
-        return value > self._value
+        """Check that a value is not strictly lower than the ClosedBound."""
+        return value >= self._value
 
     def check_upper_bound(self, value: float) -> bool:
-        """Check that a value does not exceed the Bound on the upper side."""
-        return value < self._value
+        """Check that a value is not strictly higher than the ClosedBound."""
+        return value <= self._value
 
 
 class OpenBound(Bound):
@@ -96,20 +96,20 @@ class OpenBound(Bound):
         super().__init__(value)
 
     def str_lower_bound(self) -> str:
-        """Get a string representation of the Bound as the lower Bound of an interval."""
+        """Get a string representation of the OpenBound as the lower Bound of an interval."""
         return f"({self}"
 
     def str_upper_bound(self) -> str:
-        """Get a string representation of the Bound as the upper Bound of an interval."""
+        """Get a string representation of the OpenBound as the upper Bound of an interval."""
         return f"{self})"
 
     def check_lower_bound(self, value: float) -> bool:
-        """Check that a value does not exceed the Bound on the lower side."""
-        return value >= self._value
+        """Check that a value is not lower or equal to the Bound."""
+        return value > self._value
 
     def check_upper_bound(self, value: float) -> bool:
-        """Check that a value does not exceed the Bound on the upper side."""
-        return value <= self._value
+        """Check that a value is not higher ot equal to the Bound."""
+        return value < self._value
 
 
 class Infinity(OpenBound):
@@ -122,6 +122,14 @@ class Infinity(OpenBound):
         """Get a string representation of the concrete value of the Bound."""
         return "\u221e"
 
+    def check_lower_bound(self, _: float) -> bool:
+        """Check that a value does not exceed the unrestricted Bound on the lower side. Always False."""
+        return False
+
+    def check_upper_bound(self, _: float) -> bool:
+        """Check that a value does not exceed the unrestricted Bound on the upper side. Always true."""
+        return True
+
 
 class MinInfinity(OpenBound):
     """An infinite or unrestricted lower Bound."""
@@ -132,3 +140,11 @@ class MinInfinity(OpenBound):
     def __str__(self) -> str:
         """Get a string representation of the concrete value of the Bound."""
         return "-\u221e"
+
+    def check_lower_bound(self, _: float) -> bool:
+        """Check that a value does not exceed the unrestricted Bound on the lower side. Always true."""
+        return True
+
+    def check_upper_bound(self, _: float) -> bool:
+        """Check that a value does not exceed the unrestricted Bound on the upper side. Always false."""
+        return False
