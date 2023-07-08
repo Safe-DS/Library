@@ -32,7 +32,7 @@ class OutOfBoundsError(ValueError):
             raise NotImplementedError("The value should not be lower than the interval.")
         if not upper_bound._cmp_upper_bound(actual):
             raise NotImplementedError("The value should not be larger than the interval.")
-        super().__init__(f"{actual} is not inside {lower_bound._str_lower_bound()}, {upper_bound._str_upper_bound()}.")
+        super().__init__(f"{actual} is not inside {lower_bound.str_lower_bound()}, {upper_bound.str_upper_bound()}.")
 
 
 class Bound(ABC):
@@ -46,12 +46,12 @@ class Bound(ABC):
         return str(self._value)
 
     @abstractmethod
-    def _str_lower_bound(self) -> str:
-        pass
+    def str_lower_bound(self) -> str:
+        """Get a string representation of the Bound as the lower Bound of an interval."""
 
     @abstractmethod
-    def _str_upper_bound(self) -> str:
-        pass
+    def str_upper_bound(self) -> str:
+        """Get a string representation of the Bound as the upper Bound of an interval."""
 
     @abstractmethod
     def _cmp_lower_bound(self, cmp_to: float) -> bool:
@@ -68,10 +68,12 @@ class ClosedBound(Bound):
     def __init__(self, value: float):
         super().__init__(value)
 
-    def _str_lower_bound(self) -> str:
+    def str_lower_bound(self) -> str:
+        """Get a string representation of the Bound as the lower Bound of an interval."""
         return f"[{self}"
 
-    def _str_upper_bound(self) -> str:
+    def str_upper_bound(self) -> str:
+        """Get a string representation of the Bound as the upper Bound of an interval."""
         return f"{self}]"
 
     def _cmp_lower_bound(self, cmp_to: float) -> bool:
@@ -91,10 +93,12 @@ class OpenBound(Bound):
     def __init__(self, value: float):
         super().__init__(value)
 
-    def _str_lower_bound(self) -> str:
+    def str_lower_bound(self) -> str:
+        """Get a string representation of the Bound as the lower Bound of an interval."""
         return f"({self}"
 
-    def _str_upper_bound(self) -> str:
+    def str_upper_bound(self) -> str:
+        """Get a string representation of the Bound as the upper Bound of an interval."""
         return f"{self})"
 
     def _cmp_lower_bound(self, cmp_to: float) -> bool:
