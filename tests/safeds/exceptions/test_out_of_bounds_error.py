@@ -44,10 +44,10 @@ def test_should_raise_out_of_bounds_error(
     elif lower_bound is not None and upper_bound is not None and upper_bound._value < lower_bound._value:
         with pytest.raises(NotImplementedError, match=r"The upper bound cannot be less than the lower bound."):
             raise OutOfBoundsError(actual, lower_bound=lower_bound, upper_bound=upper_bound)
-    elif lower_bound is not None and not lower_bound._cmp_lower_bound(actual):
+    elif lower_bound is not None and not lower_bound.check_lower_bound(actual):
         with pytest.raises(NotImplementedError, match=r"The value should not be lower than the interval."):
             raise OutOfBoundsError(actual, lower_bound=lower_bound, upper_bound=upper_bound)
-    elif upper_bound is not None and not upper_bound._cmp_upper_bound(actual):
+    elif upper_bound is not None and not upper_bound.check_upper_bound(actual):
         with pytest.raises(NotImplementedError, match=r"The value should not be larger than the interval."):
             raise OutOfBoundsError(actual, lower_bound=lower_bound, upper_bound=upper_bound)
     else:
@@ -96,6 +96,6 @@ def test_should_return_true_if_value_in_bounds(
     lower_bound: bool,
 ) -> None:
     if lower_bound:
-        assert expected_value == bound._cmp_lower_bound(value)
+        assert expected_value == bound.check_lower_bound(value)
     else:
-        assert expected_value == bound._cmp_upper_bound(value)
+        assert expected_value == bound.check_upper_bound(value)

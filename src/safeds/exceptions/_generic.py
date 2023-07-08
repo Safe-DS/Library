@@ -28,9 +28,9 @@ class OutOfBoundsError(ValueError):
             upper_bound = Infinity()
         if upper_bound._value < lower_bound._value:
             raise NotImplementedError("The upper bound cannot be less than the lower bound.")
-        if not lower_bound._cmp_lower_bound(actual):
+        if not lower_bound.check_lower_bound(actual):
             raise NotImplementedError("The value should not be lower than the interval.")
-        if not upper_bound._cmp_upper_bound(actual):
+        if not upper_bound.check_upper_bound(actual):
             raise NotImplementedError("The value should not be larger than the interval.")
         super().__init__(f"{actual} is not inside {lower_bound.str_lower_bound()}, {upper_bound.str_upper_bound()}.")
 
@@ -54,12 +54,12 @@ class Bound(ABC):
         """Get a string representation of the Bound as the upper Bound of an interval."""
 
     @abstractmethod
-    def _cmp_lower_bound(self, cmp_to: float) -> bool:
-        pass
+    def check_lower_bound(self, value: float) -> bool:
+        """Check that a value does not exceed the Bound on the lower side."""
 
     @abstractmethod
-    def _cmp_upper_bound(self, cmp_to: float) -> bool:
-        pass
+    def check_upper_bound(self, value: float) -> bool:
+        """Check that a value does not exceed the Bound on the upper side."""
 
 
 class ClosedBound(Bound):
@@ -76,11 +76,13 @@ class ClosedBound(Bound):
         """Get a string representation of the Bound as the upper Bound of an interval."""
         return f"{self}]"
 
-    def _cmp_lower_bound(self, cmp_to: float) -> bool:
-        return cmp_to > self._value
+    def check_lower_bound(self, value: float) -> bool:
+        """Check that a value does not exceed the Bound on the lower side."""
+        return value > self._value
 
-    def _cmp_upper_bound(self, cmp_to: float) -> bool:
-        return cmp_to < self._value
+    def check_upper_bound(self, value: float) -> bool:
+        """Check that a value does not exceed the Bound on the upper side."""
+        return value < self._value
 
 
 class OpenBound(Bound):
@@ -101,11 +103,13 @@ class OpenBound(Bound):
         """Get a string representation of the Bound as the upper Bound of an interval."""
         return f"{self})"
 
-    def _cmp_lower_bound(self, cmp_to: float) -> bool:
-        return cmp_to >= self._value
+    def check_lower_bound(self, value: float) -> bool:
+        """Check that a value does not exceed the Bound on the lower side."""
+        return value >= self._value
 
-    def _cmp_upper_bound(self, cmp_to: float) -> bool:
-        return cmp_to <= self._value
+    def check_upper_bound(self, value: float) -> bool:
+        """Check that a value does not exceed the Bound on the upper side."""
+        return value <= self._value
 
 
 class Infinity(OpenBound):
