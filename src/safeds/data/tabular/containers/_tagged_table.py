@@ -618,36 +618,36 @@ class TaggedTable(Table):
 
     def replace_column(self, old_column_name: str, new_columns: list[Column]) -> TaggedTable:
         """
-        Replace the specified old column by a list of new columns.
+                Replace the specified old column by a list of new columns.
 
-        The order of columns is kept.
+                The order of columns is kept.
 
-        If the column to be replaced is the target column, it must be replaced by exactly one column. That column becomes the new target column.
-If the column to be replaced is a feature column, the new columns that replace it all become feature columns.
-        This table is not modified.
+                If the column to be replaced is the target column, it must be replaced by exactly one column. That column becomes the new target column.
+        If the column to be replaced is a feature column, the new columns that replace it all become feature columns.
+                This table is not modified.
 
         Parameters
         ----------
-        old_column_name : str
-            The name of the column to be replaced.
-        new_columns : list[Column]
-            The new columns replacing the old column.
+                old_column_name : str
+                    The name of the column to be replaced.
+                new_columns : list[Column]
+                    The new columns replacing the old column.
 
         Returns
         -------
-        result : TaggedTable
-            A table with the old column replaced by the new column.
+                result : TaggedTable
+                    A table with the old column replaced by the new column.
 
         Raises
         ------
-        UnknownColumnNameError
-            If the old column does not exist.
-        DuplicateColumnNameError
-            If the new column already exists and the existing column is not affected by the replacement.
-        ColumnSizeError
-            If the size of the column does not match the amount of rows.
-        IllegalSchemaModificationError
-            If the target column would be removed or replaced by more than one column.
+                UnknownColumnNameError
+                    If the old column does not exist.
+                DuplicateColumnNameError
+                    If the new column already exists and the existing column is not affected by the replacement.
+                ColumnSizeError
+                    If the size of the column does not match the amount of rows.
+                IllegalSchemaModificationError
+                    If the target column would be removed or replaced by more than one column.
         """
         if old_column_name == self.target.name:
             if len(new_columns) != 1:
