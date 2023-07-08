@@ -36,26 +36,31 @@ def test_should_raise_out_of_bounds_error(
     match_lower: str,
     match_upper: str,
 ) -> None:
+    # Check (-inf, inf) interval:
     if (lower_bound is None or isinstance(lower_bound, MinInfinity)) and (
         upper_bound is None or isinstance(upper_bound, Infinity)
     ):
-        with pytest.raises(NotImplementedError, match=r"Value cannot be out of bounds if there are no bounds."):
+        with pytest.raises(NotImplementedError, match=r"Illegal interval: Value cannot be out of bounds if there are "
+                                                      r"no bounds."):
             raise OutOfBoundsError(actual, lower_bound=lower_bound, upper_bound=upper_bound)
-    elif lower_bound is not None and upper_bound is not None:
-        with pytest.raises(NotImplementedError, match=r"The upper bound cannot be less than the lower bound."):
+        return
+    # All tests: Check interval where lower > upper:
+    if lower_bound is not None and upper_bound is not None:
+        with pytest.raises(NotImplementedError, match=r"Illegal interval: The upper bound cannot be less than the "
+                                                      r"lower bound."):
             raise OutOfBoundsError(actual, lower_bound=upper_bound, upper_bound=lower_bound)
-    elif lower_bound is not None and not lower_bound.check_lower_bound(actual):
-        with pytest.raises(NotImplementedError, match=r"The value should not be lower than the interval."):
+    # Check case where actual value lies inside the interval:
+    if (lower_bound is None or lower_bound.check_lower_bound(actual)) and (upper_bound is None or upper_bound.check_upper_bound(actual)):
+        with pytest.raises(NotImplementedError, match=r"Illegal interval: Attempting to raise OutOfBoundsError, "
+                                                      r"but value is not out of bounds."):
             raise OutOfBoundsError(actual, lower_bound=lower_bound, upper_bound=upper_bound)
-    elif upper_bound is not None and not upper_bound.check_upper_bound(actual):
-        with pytest.raises(NotImplementedError, match=r"The value should not be larger than the interval."):
-            raise OutOfBoundsError(actual, lower_bound=lower_bound, upper_bound=upper_bound)
-    else:
-        with pytest.raises(
-            OutOfBoundsError,
-            match=rf"{actual} is not inside {re.escape(match_lower)}, {re.escape(match_upper)}.",
-        ):
-            raise OutOfBoundsError(actual, lower_bound=lower_bound, upper_bound=upper_bound)
+        return
+    # Check that error is raised correctly:
+    with pytest.raises(
+        OutOfBoundsError,
+        match=rf"{actual} is not inside {re.escape(match_lower)}, {re.escape(match_upper)}.",
+    ):
+        raise OutOfBoundsError(actual, lower_bound=lower_bound, upper_bound=upper_bound)
 
 
 @pytest.mark.parametrize(
