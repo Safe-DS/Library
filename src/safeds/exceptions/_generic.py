@@ -29,8 +29,9 @@ class OutOfBoundsError(ValueError):
         if upper_bound._value < lower_bound._value:
             raise NotImplementedError("Illegal interval: The upper bound cannot be less than the lower bound.")
         elif lower_bound.check_lower_bound(actual) and upper_bound.check_upper_bound(actual):
-            raise NotImplementedError("Illegal interval: Attempting to raise OutOfBoundsError, but value is not out "
-                                      "of bounds.")
+            raise NotImplementedError(
+                "Illegal interval: Attempting to raise OutOfBoundsError, but value is not out of bounds.",
+            )
         super().__init__(f"{actual} is not inside {lower_bound.str_lower_bound()}, {upper_bound.str_upper_bound()}.")
 
 
