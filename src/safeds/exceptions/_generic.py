@@ -5,16 +5,16 @@ from abc import ABC, abstractmethod
 
 class OutOfBoundsError(ValueError):
     """
-    A generic exception to signal that a (float) value is out of bounds.
+    A generic exception that can be used to signal that a (float) value is outside its expected range.
 
     Parameters
     ----------
     actual: float
         The actual value.
-    lower_bound: _Bound | None
+    lower_bound: Bound | None
         The lower Bound.
-    upper_bound: _Bound | None
-        The lower Bound.
+    upper_bound: Bound | None
+        The upper Bound.
     """
 
     def __init__(self, actual: float, *, lower_bound: Bound | None = None, upper_bound: Bound | None = None):
@@ -36,10 +36,13 @@ class OutOfBoundsError(ValueError):
 
 
 class Bound(ABC):
+    """Abstract base class for (lower or upper) Bounds on a float value."""
+
     def __init__(self, value: float):
         self._value = value
 
     def __str__(self) -> str:
+        """Get a string representation of the concrete value of the Bound."""
         return str(self._value)
 
     def _is_float(self) -> bool:
@@ -63,6 +66,8 @@ class Bound(ABC):
 
 
 class ClosedBound(Bound):
+    """A closed Bound, i.e. the value on the border belongs to the range."""
+
     def __init__(self, value: float):
         super().__init__(value)
 
@@ -80,6 +85,12 @@ class ClosedBound(Bound):
 
 
 class OpenBound(Bound):
+    """
+    An open Bound, i.e. the value on the border does not belong to the range.
+
+    May be infinite (unbounded).
+    """
+
     def __init__(self, value: float):
         super().__init__(value)
 
@@ -97,10 +108,13 @@ class OpenBound(Bound):
 
 
 class Infinity(OpenBound):
+    """An infinite or unrestricted upper Bound."""
+
     def __init__(self) -> None:
         super().__init__(float("inf"))
 
     def __str__(self) -> str:
+        """Get a string representation of the concrete value of the Bound."""
         return "\u221e"
 
     def _is_float(self) -> bool:
@@ -108,10 +122,13 @@ class Infinity(OpenBound):
 
 
 class MinInfinity(OpenBound):
+    """An infinite or unrestricted lower Bound."""
+
     def __init__(self) -> None:
         super().__init__(float("-inf"))
 
     def __str__(self) -> str:
+        """Get a string representation of the concrete value of the Bound."""
         return "-\u221e"
 
     def _is_float(self) -> bool:
