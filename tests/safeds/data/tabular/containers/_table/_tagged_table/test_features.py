@@ -31,7 +31,7 @@ from safeds.data.tabular.containers import Table, TaggedTable
             Table({"A": [1, 4], "C": [3, 6]}),
         ),
     ],
-    ids=["all_columns_are_feature", "not_all_columns_are_features"],
+    ids=["only_target_and_features", "target_features_and_other"],
 )
 def test_should_return_features(tagged_table: TaggedTable, features: Table) -> None:
     assert tagged_table.features == features
