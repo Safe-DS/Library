@@ -622,7 +622,7 @@ class TaggedTable(Table):
 
         The order of columns is kept.
 
-        If the column to be replaced is the target column, it must be replaced by exactly one column.
+        If the column to be replaced is the target column, it must be replaced by exactly one column. That column becomes the new target column.
 
         This table is not modified.
 
