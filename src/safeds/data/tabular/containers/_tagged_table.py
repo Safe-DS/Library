@@ -412,12 +412,11 @@ class TaggedTable(Table):
             raise IllegalSchemaModificationError("Must keep the target column.")
         if len(set(self.features.column_names).intersection(set(column_names))) == 0:
             raise IllegalSchemaModificationError("Must keep at least one feature column.")
-        table = super().keep_only_columns(column_names)
         return TaggedTable._from_table(
-            table,
+            super().keep_only_columns(column_names),
             target_name=self.target.name,
             feature_names=sorted(
-                set(self.features.column_names).intersection(set(table.column_names)),
+                set(self.features.column_names).intersection(set(column_names)),
                 key={val: ix for ix, val in enumerate(self.features.column_names)}.__getitem__,
             ),
         )
