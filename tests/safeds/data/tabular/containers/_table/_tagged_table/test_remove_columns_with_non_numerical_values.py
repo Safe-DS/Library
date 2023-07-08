@@ -165,8 +165,8 @@ def test_should_remove_columns_with_non_numerical_values(table: TaggedTable, exp
         "also_feature_non_numerical",
         "also_non_feature_non_numerical",
         "all_non_numerical",
-        "all_features_incomplete",
-        "all_features_and_non_feature_incomplete",
+        "all_features_non_numerical",
+        "all_features_and_non_feature_non_numerical",
     ],
 )
 def test_should_raise_in_remove_columns_with_non_numerical_values(
