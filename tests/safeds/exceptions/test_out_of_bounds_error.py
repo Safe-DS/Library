@@ -41,9 +41,9 @@ def test_should_raise_out_of_bounds_error(
     ):
         with pytest.raises(NotImplementedError, match=r"Value cannot be out of bounds if there are no bounds."):
             raise OutOfBoundsError(actual, lower_bound=lower_bound, upper_bound=upper_bound)
-    elif lower_bound is not None and upper_bound is not None and upper_bound._value < lower_bound._value:
+    elif lower_bound is not None and upper_bound is not None:
         with pytest.raises(NotImplementedError, match=r"The upper bound cannot be less than the lower bound."):
-            raise OutOfBoundsError(actual, lower_bound=lower_bound, upper_bound=upper_bound)
+            raise OutOfBoundsError(actual, lower_bound=upper_bound, upper_bound=lower_bound)
     elif lower_bound is not None and not lower_bound.check_lower_bound(actual):
         with pytest.raises(NotImplementedError, match=r"The value should not be lower than the interval."):
             raise OutOfBoundsError(actual, lower_bound=lower_bound, upper_bound=upper_bound)
