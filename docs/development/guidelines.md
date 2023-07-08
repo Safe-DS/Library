@@ -205,6 +205,27 @@ The user should not have to deal with exceptions that are defined in the wrapper
         return pd.read_csv(path) # May raise a pd.ParserError
     ```
 
+### Sort entries in `__all__` lists alphabetically
+The entries in the `__all__` list in `__init__.py` files should be sorted alphabetically. This helps reduce the likelihood of merge conflicts when new entries are introduced on different branches.
+!!! success "**DO** (library code):"
+
+    ```py
+    __all__ = [
+        "ColumnSizeError",
+        "DuplicateColumnNameError",
+        "MissingValuesColumnError"
+    ]
+    ```
+!!! failure "**DON'T** (library code):"
+
+    ```py
+    __all__ = [
+        "MissingValuesColumnError",
+        "ColumnSizeError",
+        "DuplicateColumnNameError"
+    ]
+    ```
+
 ### Group API elements by task
 
 Packages should correspond to a specific task like classification or imputation. This eases discovery and makes it easy to switch between different solutions for the same task.
