@@ -4,18 +4,7 @@ from abc import ABC, abstractmethod
 
 
 class OutOfBoundsError(ValueError):
-    """
-    A generic exception that can be used to signal that a (float) value is outside its expected range.
-
-    Parameters
-    ----------
-    actual: float
-        The actual value.
-    lower_bound: Bound | None
-        The lower Bound.
-    upper_bound: Bound | None
-        The upper Bound.
-    """
+    """A generic exception that can be used to signal that a (float) value is outside its expected range."""
 
     def __init__(self, actual: float, *, lower_bound: Bound | None = None, upper_bound: Bound | None = None):
         """
