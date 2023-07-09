@@ -8,7 +8,7 @@ class OutOfBoundsError(ValueError):
 
     def __init__(self, actual: float, *, lower_bound: Bound | None = None, upper_bound: Bound | None = None):
         """
-        Initialize an OutOfBoundError.
+        Initialize an OutOfBoundsError.
 
         Parameters
         ----------
@@ -18,6 +18,11 @@ class OutOfBoundsError(ValueError):
             The lower bound of the expected range.
         upper_bound: Bound | None
             The upper bound of the expected range.
+
+        Raises
+        ------
+        ValueError
+            If upper_bound < lower_bound or if actual does not lie outside the given interval.
         """
         if lower_bound is None and upper_bound is None:
             raise ValueError("Illegal interval: Attempting to raise OutOfBoundsError, but no bounds given.")
