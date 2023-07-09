@@ -21,17 +21,18 @@ class OutOfBoundsError(ValueError):
         """
         if lower_bound is None and upper_bound is None:
             raise ValueError("Illegal interval: Attempting to raise OutOfBoundsError, but no bounds given.")
-        lower_bound: Bound = lower_bound if lower_bound is not None else _MinInfinity()
-        upper_bound: Bound = upper_bound if upper_bound is not None else _Infinity()
-        if upper_bound.value < lower_bound.value:
+        # Use local variables with stricter types to help static analysis:
+        _lower_bound: Bound = lower_bound if lower_bound is not None else _MinInfinity()
+        _upper_bound: Bound = upper_bound if upper_bound is not None else _Infinity()
+        if _upper_bound.value < _lower_bound.value:
             raise ValueError(
                 "Illegal interval: Attempting to raise OutOfBoundsError, but upper bound is less than the lower bound.",
             )
-        elif lower_bound.check_lower_bound(actual) and upper_bound.check_upper_bound(actual):
+        elif _lower_bound.check_lower_bound(actual) and _upper_bound.check_upper_bound(actual):
             raise ValueError(
                 "Illegal interval: Attempting to raise OutOfBoundsError, but value is not out of bounds.",
             )
-        super().__init__(f"{actual} is not inside {lower_bound.str_lower_bound()}, {upper_bound.str_upper_bound()}.")
+        super().__init__(f"{actual} is not inside {_lower_bound.str_lower_bound()}, {_upper_bound.str_upper_bound()}.")
 
 
 class Bound(ABC):
