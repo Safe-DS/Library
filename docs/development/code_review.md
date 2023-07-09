@@ -16,7 +16,7 @@ when reviewing a Pull Request (PR).
 * Check the Pull Request for __completeness__: Was every point from the issue covered?
 * Check for __correctness__: Were the problems described in the issue solved in the intended way?
 * (For PRs that introduce new features:) Check the design - does it comply with our [guidelines](../guidelines)?
-* Check for potential bugs - edge cases, exceptions that may be raised in code that was called etc.
+* Check for potential bugs - edge cases, exceptions that may be raised in functions that were called etc.
 * Check the code style: Is it readable? Do variables have sensible names? Is it consistent to existing code? Is there a better / more elegant way to do certain things (e.g. f-string instead of manual string concatenation)?
 * Check any warnings reported by your IDE
 
