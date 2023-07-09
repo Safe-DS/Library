@@ -51,8 +51,8 @@ def test_should_raise_out_of_bounds_error(
         ):
             raise OutOfBoundsError(actual, lower_bound=upper_bound, upper_bound=lower_bound)
     # Check case where actual value lies inside the interval:
-    if (lower_bound is None or lower_bound.check_lower_bound(actual)) and (
-        upper_bound is None or upper_bound.check_upper_bound(actual)
+    if (lower_bound is None or lower_bound._check_lower_bound(actual)) and (
+        upper_bound is None or upper_bound._check_upper_bound(actual)
     ):
         with pytest.raises(
             ValueError,
@@ -107,6 +107,6 @@ def test_should_return_true_if_value_in_bounds(
     lower_bound: bool,
 ) -> None:
     if lower_bound:
-        assert expected_value == bound.check_lower_bound(value)
+        assert expected_value == bound._check_lower_bound(value)
     else:
-        assert expected_value == bound.check_upper_bound(value)
+        assert expected_value == bound._check_upper_bound(value)
