@@ -29,7 +29,7 @@ class OutOfBoundsError(ValueError):
             upper_bound = Infinity()
         if upper_bound._value < lower_bound._value:
             raise ValueError(
-                "Illegal interval: Attempting to raise OutOfBoundsError, but upper bound is less than the lower bound."
+                "Illegal interval: Attempting to raise OutOfBoundsError, but upper bound is less than the lower bound.",
             )
         elif lower_bound.check_lower_bound(actual) and upper_bound.check_upper_bound(actual):
             raise ValueError(
