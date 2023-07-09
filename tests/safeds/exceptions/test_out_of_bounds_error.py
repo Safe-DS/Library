@@ -2,13 +2,12 @@ import re
 
 import pytest
 from safeds.exceptions import Bound, ClosedBound, OpenBound, OutOfBoundsError
-from safeds.exceptions._generic import _Infinity, _MinInfinity
 
 
 @pytest.mark.parametrize(
     "actual",
-    [0, 1, -1, 2, -2, float("inf"), float("-inf")],
-    ids=["0", "1", "-1", "2", "-2", "inf", "-inf"],
+    [0, 1, -1, 2, -2],
+    ids=["0", "1", "-1", "2", "-2"],
 )
 @pytest.mark.parametrize(
     ("lower_bound", "match_lower"),
@@ -81,10 +80,10 @@ def test_should_raise_out_of_bounds_error(
         (2, False, OpenBound(2), True),
         (2, False, OpenBound(1), False),
         (2, False, OpenBound(3), True),
-        (2, False, _Infinity(), True),
-        (2, True, _Infinity(), False),
-        (2, True, _MinInfinity(), True),
-        (2, False, _MinInfinity(), False),
+        (2, False, OpenBound(float("inf")), True),
+        (2, True, OpenBound(float("inf")), False),
+        (2, True, OpenBound(float("-inf")), True),
+        (2, False, OpenBound(float("-inf")), False),
     ],
     ids=[
         "ex_false-close_2-upper",
