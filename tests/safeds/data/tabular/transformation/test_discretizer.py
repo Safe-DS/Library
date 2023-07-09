@@ -1,12 +1,12 @@
 import pytest
 from safeds.data.tabular.containers import Table
 from safeds.data.tabular.transformation import Discretizer
-from safeds.exceptions import NonNumericColumnError, TransformerNotFittedError, UnknownColumnNameError
+from safeds.exceptions import NonNumericColumnError, TransformerNotFittedError, UnknownColumnNameError, OutOfBoundsError
 
 
 class TestInit:
     def test_should_raise_value_error(self) -> None:
-        with pytest.raises(ValueError, match="Parameter 'number_of_bins' must be >= 2."):
+        with pytest.raises(OutOfBoundsError, match=r"number_of_bins \(=1\) is not inside \[2, \u221e\)\."):
             _ = Discretizer(1)
 
 

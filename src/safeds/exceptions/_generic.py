@@ -19,7 +19,7 @@ class OutOfBoundsError(ValueError):
         The upper bound of the expected range.
     """
 
-    def __init__(self, actual: float, *, lower_bound: Bound | None = None, upper_bound: Bound | None = None):
+    def __init__(self, actual: float, *, name: str | None = None, lower_bound: Bound | None = None, upper_bound: Bound | None = None):
         """
         Initialize an OutOfBoundsError.
 
@@ -27,6 +27,8 @@ class OutOfBoundsError(ValueError):
         ----------
         actual: float
             The actual value that is outside its expected range.
+        name: str | None
+            The name of the offending variable, for a better error message.
         lower_bound: Bound | None
             The lower bound of the expected range.
         upper_bound: Bound | None
@@ -56,8 +58,9 @@ class OutOfBoundsError(ValueError):
                     f" outside given interval {_lower_bound._str_lower_bound()}, {_upper_bound._str_upper_bound()}."
                 ),
             )
+        full_variable_name = actual if name is None else f"{name} (={actual})"
         super().__init__(
-            f"{actual} is not inside {_lower_bound._str_lower_bound()}, {_upper_bound._str_upper_bound()}.",
+            f"{full_variable_name} is not inside {_lower_bound._str_lower_bound()}, {_upper_bound._str_upper_bound()}.",
         )
 
 
