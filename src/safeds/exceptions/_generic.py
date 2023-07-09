@@ -63,8 +63,8 @@ class Bound(ABC):
         """Check that a value does not exceed the Bound on the upper side."""
 
     @property
-    def value(self):
-        """Get the actual value of the Bound."""
+    def value(self) -> float:
+        """Get the concrete value of the Bound."""
         return self._value
 
 
