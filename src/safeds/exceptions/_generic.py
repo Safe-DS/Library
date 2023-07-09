@@ -21,10 +21,8 @@ class OutOfBoundsError(ValueError):
         """
         if lower_bound is None and upper_bound is None:
             raise ValueError("Illegal interval: Attempting to raise OutOfBoundsError, but no bounds given.")
-        elif lower_bound is None:
-            lower_bound = _MinInfinity()
-        elif upper_bound is None:
-            upper_bound = _Infinity()
+        lower_bound: Bound = lower_bound if lower_bound is not None else _MinInfinity
+        upper_bound: Bound = upper_bound if upper_bound is not None else _Infinity
         if upper_bound.value < lower_bound.value:
             raise ValueError(
                 "Illegal interval: Attempting to raise OutOfBoundsError, but upper bound is less than the lower bound.",
