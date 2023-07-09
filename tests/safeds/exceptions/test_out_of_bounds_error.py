@@ -113,9 +113,7 @@ def test_should_return_true_if_value_in_bounds(
         assert expected_value == bound._check_upper_bound(value)
 
 
-@pytest.mark.parametrize(
-    "value", [float("nan"), float("-inf"), float("inf")], ids=["nan", "neg_inf", "inf"]
-)
+@pytest.mark.parametrize("value", [float("nan"), float("-inf"), float("inf")], ids=["nan", "neg_inf", "inf"])
 def test_should_raise_value_error(value: float) -> None:
     if isnan(value):
         with pytest.raises(ValueError, match="Bound must be a real number, not nan."):
