@@ -18,8 +18,6 @@ from safeds.exceptions._generic import (
     ClosedBound,
     OpenBound,
     OutOfBoundsError,
-    _Infinity,
-    _MinInfinity,
 )
 from safeds.exceptions._ml import (
     DatasetContainsTargetError,
@@ -57,7 +55,5 @@ __all__ = [
     # Other
     "Bound",
     "ClosedBound",
-    "_Infinity",
-    "_MinInfinity",
     "OpenBound",
 ]

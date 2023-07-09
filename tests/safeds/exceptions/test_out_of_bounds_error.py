@@ -1,7 +1,8 @@
 import re
 
 import pytest
-from safeds.exceptions import Bound, ClosedBound, OpenBound, OutOfBoundsError, _Infinity, _MinInfinity
+from safeds.exceptions import Bound, ClosedBound, OpenBound, OutOfBoundsError
+from safeds.exceptions._generic import _Infinity, _MinInfinity
 
 
 @pytest.mark.parametrize(
