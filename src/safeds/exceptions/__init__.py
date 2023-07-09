@@ -1,9 +1,11 @@
 """Custom exceptions that can be raised by Safe-DS."""
 
 from safeds.exceptions._data import (
+    ColumnIsTargetError,
     ColumnLengthMismatchError,
     ColumnSizeError,
     DuplicateColumnNameError,
+    IllegalSchemaModificationError,
     IndexOutOfBoundsError,
     MissingValuesColumnError,
     NonNumericColumnError,
@@ -33,9 +35,11 @@ __all__ = [
     # Generic exceptions
     "OutOfBoundsError",
     # Data exceptions
+    "ColumnIsTargetError",
     "ColumnLengthMismatchError",
     "ColumnSizeError",
     "DuplicateColumnNameError",
+    "IllegalSchemaModificationError",
     "IndexOutOfBoundsError",
     "MissingValuesColumnError",
     "NonNumericColumnError",
