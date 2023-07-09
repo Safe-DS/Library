@@ -22,15 +22,17 @@ class OutOfBoundsError(ValueError):
         if (lower_bound is None or isinstance(lower_bound, MinInfinity)) and (
             upper_bound is None or isinstance(upper_bound, Infinity)
         ):
-            raise NotImplementedError("Illegal interval: Value cannot be out of bounds if there are no bounds.")
+            raise ValueError("Illegal interval: Attempting to raise OutOfBoundsError, but no bounds given.")
         if lower_bound is None:
             lower_bound = MinInfinity()
         if upper_bound is None:
             upper_bound = Infinity()
         if upper_bound._value < lower_bound._value:
-            raise NotImplementedError("Illegal interval: The upper bound cannot be less than the lower bound.")
+            raise ValueError(
+                "Illegal interval: Attempting to raise OutOfBoundsError, but upper bound is less than the lower bound."
+            )
         elif lower_bound.check_lower_bound(actual) and upper_bound.check_upper_bound(actual):
-            raise NotImplementedError(
+            raise ValueError(
                 "Illegal interval: Attempting to raise OutOfBoundsError, but value is not out of bounds.",
             )
         super().__init__(f"{actual} is not inside {lower_bound.str_lower_bound()}, {upper_bound.str_upper_bound()}.")
