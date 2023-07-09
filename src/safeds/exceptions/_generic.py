@@ -43,7 +43,9 @@ class OutOfBoundsError(ValueError):
                     f" outside given interval {_lower_bound._str_lower_bound()}, {_upper_bound._str_upper_bound()}."
                 ),
             )
-        super().__init__(f"{actual} is not inside {_lower_bound._str_lower_bound()}, {_upper_bound._str_upper_bound()}.")
+        super().__init__(
+            f"{actual} is not inside {_lower_bound._str_lower_bound()}, {_upper_bound._str_upper_bound()}.",
+        )
 
 
 class Bound(ABC):
