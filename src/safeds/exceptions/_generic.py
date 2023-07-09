@@ -13,6 +13,8 @@ class OutOfBoundsError(ValueError):
     ----------
     actual: float
         The actual value that is outside its expected range.
+    name: str | None
+        The name of the offending variable.
     lower_bound: Bound | None
         The lower bound of the expected range.
     upper_bound: Bound | None
@@ -35,7 +37,7 @@ class OutOfBoundsError(ValueError):
         actual: float
             The actual value that is outside its expected range.
         name: str | None
-            The name of the offending variable, for a better error message.
+            The name of the offending variable.
         lower_bound: Bound | None
             The lower bound of the expected range.
         upper_bound: Bound | None
