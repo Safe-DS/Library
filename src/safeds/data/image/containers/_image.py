@@ -10,6 +10,7 @@ import PIL
 from PIL import ImageEnhance, ImageFilter, ImageOps
 from PIL.Image import Image as PillowImage
 from PIL.Image import open as open_image
+
 from safeds.data.image.typing import ImageFormat
 from safeds.exceptions import ClosedBound, OutOfBoundsError
 
