@@ -25,7 +25,7 @@ class OutOfBoundsError(ValueError):
             lower_bound = _MinInfinity()
         elif upper_bound is None:
             upper_bound = _Infinity()
-        if upper_bound._value < lower_bound._value:
+        if upper_bound.value < lower_bound.value:
             raise ValueError(
                 "Illegal interval: Attempting to raise OutOfBoundsError, but upper bound is less than the lower bound.",
             )
@@ -44,7 +44,7 @@ class Bound(ABC):
 
     def __str__(self) -> str:
         """Get a string representation of the concrete value of the Bound."""
-        return str(self._value)
+        return str(self.value)
 
     @abstractmethod
     def str_lower_bound(self) -> str:
@@ -61,6 +61,11 @@ class Bound(ABC):
     @abstractmethod
     def check_upper_bound(self, value: float) -> bool:
         """Check that a value does not exceed the Bound on the upper side."""
+
+    @property
+    def value(self):
+        """Get the actual value of the Bound."""
+        return self._value
 
 
 class ClosedBound(Bound):
