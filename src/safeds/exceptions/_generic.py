@@ -19,7 +19,14 @@ class OutOfBoundsError(ValueError):
         The upper bound of the expected range.
     """
 
-    def __init__(self, actual: float, *, name: str | None = None, lower_bound: Bound | None = None, upper_bound: Bound | None = None):
+    def __init__(
+        self,
+        actual: float,
+        *,
+        name: str | None = None,
+        lower_bound: Bound | None = None,
+        upper_bound: Bound | None = None,
+    ):
         """
         Initialize an OutOfBoundsError.
 
