@@ -110,3 +110,11 @@ def test_should_return_true_if_value_in_bounds(
         assert expected_value == bound._check_lower_bound(value)
     else:
         assert expected_value == bound._check_upper_bound(value)
+
+
+# Cannot parametrize because we cannot iterate over classes.
+def test_should_raise_value_error_because_nan() -> None:
+    with pytest.raises(ValueError, match=r"Bound must be a number or \+\/\-infinity, not nan\."):
+        ClosedBound(float("nan"))
+    with pytest.raises(ValueError, match=r"Bound must be a number or \+\/\-infinity, not nan\."):
+        OpenBound(float("nan"))

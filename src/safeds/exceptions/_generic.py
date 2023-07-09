@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 
+from numpy import isnan
+
 
 class OutOfBoundsError(ValueError):
     """A generic exception that can be used to signal that a (float) value is outside its expected range."""
@@ -52,6 +54,8 @@ class Bound(ABC):
     """Abstract base class for (lower or upper) Bounds on a float value."""
 
     def __init__(self, value: float):
+        if isnan(value):
+            raise ValueError("Bound must be a number or +/-infinity, not nan.")
         self._value = value
 
     def __str__(self) -> str:
