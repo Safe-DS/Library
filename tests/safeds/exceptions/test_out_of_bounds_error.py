@@ -47,8 +47,8 @@ def test_should_raise_out_of_bounds_error(
     if lower_bound is not None and upper_bound is not None:
         with pytest.raises(
             ValueError,
-            match=r"Illegal interval: Attempting to raise OutOfBoundsError, but upper bound is less than the lower "
-            r"bound\.",
+            match=r"Illegal interval: Attempting to raise OutOfBoundsError, but given upper bound .+ is actually less "
+            r"than given lower bound .+\.",
         ):
             raise OutOfBoundsError(actual, lower_bound=upper_bound, upper_bound=lower_bound)
     # Check case where actual value lies inside the interval:
@@ -57,7 +57,8 @@ def test_should_raise_out_of_bounds_error(
     ):
         with pytest.raises(
             ValueError,
-            match=r"Illegal interval: Attempting to raise OutOfBoundsError, but value is not out of bounds\.",
+            match=rf"Illegal interval: Attempting to raise OutOfBoundsError, but value {actual} is not actually outside"
+            rf" given interval [\[(].+,.+[\])]\.",
         ):
             raise OutOfBoundsError(actual, lower_bound=lower_bound, upper_bound=upper_bound)
         return

@@ -26,11 +26,13 @@ class OutOfBoundsError(ValueError):
         _upper_bound: Bound = upper_bound if upper_bound is not None else _Infinity()
         if _upper_bound.value < _lower_bound.value:
             raise ValueError(
-                "Illegal interval: Attempting to raise OutOfBoundsError, but upper bound is less than the lower bound.",
+                f"Illegal interval: Attempting to raise OutOfBoundsError, but given upper bound {_upper_bound} is "
+                f"actually less than given lower bound {_lower_bound}.",
             )
         elif _lower_bound.check_lower_bound(actual) and _upper_bound.check_upper_bound(actual):
             raise ValueError(
-                "Illegal interval: Attempting to raise OutOfBoundsError, but value is not out of bounds.",
+                f"Illegal interval: Attempting to raise OutOfBoundsError, but value {actual} is not actually outside "
+                f"given interval {_lower_bound.str_lower_bound()}, {_upper_bound.str_upper_bound()}.",
             )
         super().__init__(f"{actual} is not inside {_lower_bound.str_lower_bound()}, {_upper_bound.str_upper_bound()}.")
 
