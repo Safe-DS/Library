@@ -10,8 +10,8 @@ import PIL
 from PIL import ImageEnhance, ImageFilter, ImageOps
 from PIL.Image import Image as PillowImage
 from PIL.Image import open as open_image
-
 from safeds.data.image.typing import ImageFormat
+from safeds.exceptions import ClosedBound, OutOfBoundsError
 
 
 class Image:
@@ -293,7 +293,7 @@ class Image:
             The Image with adjusted brightness.
         """
         if factor < 0:
-            raise ValueError("Brightness factor has to be 0 or bigger")
+            raise OutOfBoundsError(factor, lower_bound=ClosedBound(0))
         elif factor == 1:
             warnings.warn(
                 "Brightness adjustment factor is 1.0, this will not make changes to the image.",
@@ -322,7 +322,7 @@ class Image:
         New image with adjusted contrast.
         """
         if factor < 0:
-            raise ValueError("Contrast factor has to be 0 or bigger")
+            raise OutOfBoundsError(factor, lower_bound=ClosedBound(0))
         elif factor == 1:
             warnings.warn(
                 "Contrast adjustment factor is 1.0, this will not make changes to the image.",
@@ -352,7 +352,7 @@ class Image:
             The new, adjusted image.
         """
         if factor < 0:
-            raise ValueError("Color factor has to be 0 or bigger.")
+            raise OutOfBoundsError(factor, lower_bound=ClosedBound(0))
         elif factor == 1:
             warnings.warn(
                 "Color adjustment factor is 1.0, this will not make changes to the image.",

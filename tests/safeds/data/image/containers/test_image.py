@@ -5,6 +5,7 @@ import pytest
 from safeds.data.image.containers import Image
 from safeds.data.image.typing import ImageFormat
 from safeds.data.tabular.containers import Table
+from safeds.exceptions import OutOfBoundsError
 
 from tests.helpers import resolve_resource_path
 
@@ -280,7 +281,7 @@ class TestAdjustContrast:
 
     def test_should_raise(self) -> None:
         image = Image.from_png_file(resolve_resource_path("image/brightness/to_brighten.png"))
-        with pytest.raises(ValueError, match="Contrast factor has to be 0 or bigger"):
+        with pytest.raises(OutOfBoundsError, match=r"-1 is not inside \[0, \u221e\)."):
             image.adjust_contrast(-1)
 
 
@@ -304,7 +305,7 @@ class TestBrightness:
 
     def test_should_raise(self) -> None:
         image = Image.from_png_file(resolve_resource_path("image/brightness/to_brighten.png"))
-        with pytest.raises(ValueError, match="Brightness factor has to be 0 or bigger"):
+        with pytest.raises(OutOfBoundsError, match=r"-1 is not inside \[0, \u221e\)."):
             image.adjust_brightness(-1)
 
 
@@ -361,7 +362,7 @@ class TestColorAdjust:
         ids=["negative"],
     )
     def test_should_throw(self, image: Image, factor: float) -> None:
-        with pytest.raises(ValueError, match="Color factor has to be 0 or bigger."):
+        with pytest.raises(OutOfBoundsError, match=rf"{factor} is not inside \[0, \u221e\)."):
             image.adjust_color_balance(factor)
 
     @pytest.mark.parametrize(
