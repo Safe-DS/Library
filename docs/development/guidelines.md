@@ -305,7 +305,7 @@ check how it has been solved
 at other places in the codebase
 and stick to that solution.
 
-### List exported classes in `__init__.py`
+### Sort exported classes in `__init__.py`
 
 Classes defined in a module
 that other classes shall be able to import
