@@ -11,6 +11,9 @@ from safeds.exceptions import Bound, ClosedBound, OpenBound, OutOfBoundsError
     ids=["0", "1", "-1", "2", "-2"],
 )
 @pytest.mark.parametrize(
+    "variable_name", ["test_variable"], ids=["test_variable"]
+)
+@pytest.mark.parametrize(
     ("lower_bound", "match_lower"),
     [
         (ClosedBound(-1), "[-1"),
@@ -30,6 +33,7 @@ from safeds.exceptions import Bound, ClosedBound, OpenBound, OutOfBoundsError
 )
 def test_should_raise_out_of_bounds_error(
     actual: float,
+    variable_name: str | None,
     lower_bound: Bound | None,
     upper_bound: Bound | None,
     match_lower: str,
@@ -68,6 +72,11 @@ def test_should_raise_out_of_bounds_error(
         match=rf"{actual} is not inside {re.escape(match_lower)}, {re.escape(match_upper)}.",
     ):
         raise OutOfBoundsError(actual, lower_bound=lower_bound, upper_bound=upper_bound)
+    with pytest.raises(
+        OutOfBoundsError,
+        match=rf"{variable_name} \(={actual}\) is not inside {re.escape(match_lower)}, {re.escape(match_upper)}.",
+    ):
+        raise OutOfBoundsError(actual, name=variable_name, lower_bound=lower_bound, upper_bound=upper_bound)
 
 
 @pytest.mark.parametrize(
