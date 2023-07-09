@@ -10,9 +10,7 @@ from safeds.exceptions import Bound, ClosedBound, OpenBound, OutOfBoundsError
     [0, 1, -1, 2, -2],
     ids=["0", "1", "-1", "2", "-2"],
 )
-@pytest.mark.parametrize(
-    "variable_name", ["test_variable"], ids=["test_variable"]
-)
+@pytest.mark.parametrize("variable_name", ["test_variable"], ids=["test_variable"])
 @pytest.mark.parametrize(
     ("lower_bound", "match_lower"),
     [
