@@ -6,7 +6,18 @@ from numpy import isnan
 
 
 class OutOfBoundsError(ValueError):
-    """A generic exception that can be used to signal that a (float) value is outside its expected range."""
+    """
+    A generic exception that can be used to signal that a (float) value is outside its expected range.
+
+    Parameters
+    ----------
+    actual: float
+        The actual value that is outside its expected range.
+    lower_bound: Bound | None
+        The lower bound of the expected range.
+    upper_bound: Bound | None
+        The upper bound of the expected range.
+    """
 
     def __init__(self, actual: float, *, lower_bound: Bound | None = None, upper_bound: Bound | None = None):
         """
@@ -51,11 +62,31 @@ class OutOfBoundsError(ValueError):
 
 
 class Bound(ABC):
-    """Abstract base class for (lower or upper) Bounds on a float value."""
+    """
+    Abstract base class for (lower or upper) Bounds on a float value.
+
+    Parameters
+    ----------
+    value: float
+        The value of the Bound.
+    """
 
     def __init__(self, value: float):
+        """
+        Initialize a Bound.
+
+        Parameters
+        ----------
+        value: float
+            The value of the Bound.
+
+        Raises
+        ------
+        ValueError
+            If value is nan or if value is +/-inf and the Bound type does not allow for infinite Bounds.
+        """
         if isnan(value):
-            raise ValueError("Bound must be a number or +/-infinity, not nan.")
+            raise ValueError("Bound must be a real number, not nan.")
         self._value = value
 
     def __str__(self) -> str:
@@ -71,12 +102,26 @@ class Bound(ABC):
         """Get a string representation of the Bound as the upper Bound of an interval."""
 
     @abstractmethod
-    def _check_lower_bound(self, value: float) -> bool:
-        """Check that a value does not exceed the Bound on the lower side."""
+    def _check_lower_bound(self, actual: float) -> bool:
+        """
+        Check that a value does not exceed the Bound on the lower side.
+
+        Parameters
+        ----------
+        actual: float
+            The actual value that should be checked for not exceeding the Bound.
+        """
 
     @abstractmethod
-    def _check_upper_bound(self, value: float) -> bool:
-        """Check that a value does not exceed the Bound on the upper side."""
+    def _check_upper_bound(self, actual: float) -> bool:
+        """
+        Check that a value does not exceed the Bound on the upper side.
+
+        Parameters
+        ----------
+        actual: float
+            The actual value that should be checked for not exceeding the Bound.
+        """
 
     @property
     def value(self) -> float:
@@ -85,9 +130,31 @@ class Bound(ABC):
 
 
 class ClosedBound(Bound):
-    """A closed Bound, i.e. the value on the border belongs to the range."""
+    """
+    A closed Bound, i.e. the value on the border belongs to the range.
+
+    Parameters
+    ----------
+    value: float
+        The value of the Bound.
+    """
 
     def __init__(self, value: float):
+        """
+        Initialize a ClosedBound.
+
+        Parameters
+        ----------
+        value: float
+            The value of the ClosedBound.
+
+        Raises
+        ------
+        ValueError
+            If value is nan or if value is +/-inf.
+        """
+        if value == float("-inf") or value == float("inf"):
+            raise ValueError("ClosedBound must be a real number, not +/-inf.")
         super().__init__(value)
 
     def _str_lower_bound(self) -> str:
@@ -98,27 +165,57 @@ class ClosedBound(Bound):
         """Get a string representation of the ClosedBound as the upper Bound of an interval."""
         return f"{self}]"
 
-    def _check_lower_bound(self, value: float) -> bool:
-        """Check that a value is not strictly lower than the ClosedBound."""
-        return value >= self.value
+    def _check_lower_bound(self, actual: float) -> bool:
+        """
+        Check that a value is not strictly lower than the ClosedBound.
 
-    def _check_upper_bound(self, value: float) -> bool:
-        """Check that a value is not strictly higher than the ClosedBound."""
-        return value <= self.value
+        Parameters
+        ----------
+        actual: float
+            The actual value that should be checked for not exceeding the Bound.
+        """
+        return actual >= self.value
+
+    def _check_upper_bound(self, actual: float) -> bool:
+        """
+        Check that a value is not strictly higher than the ClosedBound.
+
+        Parameters
+        ----------
+        actual: float
+            The actual value that should be checked for not exceeding the Bound.
+        """
+        return actual <= self.value
 
 
 class OpenBound(Bound):
     """
     An open Bound, i.e. the value on the border does not belong to the range.
 
-    May be infinite (unbounded).
+    Parameters
+    ----------
+    value: float
+        The value of the OpenBound.
     """
 
     def __init__(self, value: float):
+        """
+        Initialize an OpenBound.
+
+        Parameters
+        ----------
+        value: float
+            The value of the OpenBound.
+
+        Raises
+        ------
+        ValueError
+            If value is nan.
+        """
         super().__init__(value)
 
     def __str__(self) -> str:
-        """Get a string representation of the concrete value of the Bound."""
+        """Get a string representation of the concrete value of the OpenBound."""
         if self.value == float("-inf"):
             return "-\u221e"
         elif self.value == float("inf"):
@@ -134,10 +231,24 @@ class OpenBound(Bound):
         """Get a string representation of the OpenBound as the upper Bound of an interval."""
         return f"{self})"
 
-    def _check_lower_bound(self, value: float) -> bool:
-        """Check that a value is not lower or equal to the Bound."""
-        return value > self.value
+    def _check_lower_bound(self, actual: float) -> bool:
+        """
+        Check that a value is not lower or equal to the OpenBound.
 
-    def _check_upper_bound(self, value: float) -> bool:
-        """Check that a value is not higher ot equal to the Bound."""
-        return value < self.value
+        Parameters
+        ----------
+        actual: float
+            The actual value that should be checked for not exceeding the Bound.
+        """
+        return actual > self.value
+
+    def _check_upper_bound(self, actual: float) -> bool:
+        """
+        Check that a value is not higher or equal to the OpenBound.
+
+        Parameters
+        ----------
+        actual: float
+            The actual value that should be checked for not exceeding the Bound.
+        """
+        return actual < self.value

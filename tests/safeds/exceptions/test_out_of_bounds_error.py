@@ -1,6 +1,7 @@
 import re
 
 import pytest
+from numpy import isnan
 from safeds.exceptions import Bound, ClosedBound, OpenBound, OutOfBoundsError
 
 
@@ -112,9 +113,15 @@ def test_should_return_true_if_value_in_bounds(
         assert expected_value == bound._check_upper_bound(value)
 
 
-# Cannot parametrize because we cannot iterate over classes.
-def test_should_raise_value_error_because_nan() -> None:
-    with pytest.raises(ValueError, match=r"Bound must be a number or \+\/\-infinity, not nan\."):
-        ClosedBound(float("nan"))
-    with pytest.raises(ValueError, match=r"Bound must be a number or \+\/\-infinity, not nan\."):
-        OpenBound(float("nan"))
+@pytest.mark.parametrize(
+    "value", [float("nan"), float("-inf"), float("inf")], ids=["nan", "neg_inf", "inf"]
+)
+def test_should_raise_value_error(value: float) -> None:
+    if isnan(value):
+        with pytest.raises(ValueError, match="Bound must be a real number, not nan."):
+            ClosedBound(value)
+        with pytest.raises(ValueError, match="Bound must be a real number, not nan."):
+            OpenBound(value)
+    else:
+        with pytest.raises(ValueError, match=r"ClosedBound must be a real number, not \+\/\-inf\."):
+            ClosedBound(value)
