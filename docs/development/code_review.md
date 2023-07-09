@@ -41,5 +41,5 @@ However, you should always:
 * Check that the changes introduced by the PR are documented in the PR message
 * Check that the `time spent by team` has been updated on the issue page
 
-[guidelines-general]: guidelines
-[guidelines-tests]: guidelines#Tests
+[guidelines-general]: https://stdlib.safeds.com/en/stable/development/guidelines/
+[guidelines-tests]: https://stdlib.safeds.com/en/stable/development/guidelines/#tests
