@@ -41,5 +41,41 @@ However, you should always:
 * Check that the changes introduced by the PR are documented in the PR message
 * Check that the `time spent by team` has been updated on the issue page
 
+## Requesting changes
+
+If you found any issues with the reviewed PR,
+navigate to the `Files changed` tab in the PR page
+and click on the respective line
+to add your comments.
+
+For more details on specific review features,
+check out the [documentation on GitHub][github-review].
+
+## Finishing the review
+
+When done, finish your review
+by navigating to the `Files changed` tab
+and clicking the green `Review changes` button
+on the top right.
+
+If you found no issues,
+select the `Approve` option
+to approve the changes made by the PR.
+If you like, you can add a "LGTM" meme
+from [lgtm.party](https://lgtm.party/),
+preferably one with a cat image.
+
+If no other reviewer suggested changes either,
+please also mark the corresponding issue
+as `Ready to merge` on the issue's page
+to update its status on the issue board.
+
+If you found any problems,
+select `Request Changes` instead.
+In this case, please also
+mark the corresponding issue
+as `In progress` again.
+
 [guidelines-general]: https://stdlib.safeds.com/en/stable/development/guidelines/
 [guidelines-tests]: https://stdlib.safeds.com/en/stable/development/guidelines/#tests
+[github-review]: https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/reviewing-changes-in-pull-requests
