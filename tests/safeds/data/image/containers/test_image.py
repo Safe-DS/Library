@@ -281,7 +281,7 @@ class TestAdjustContrast:
 
     def test_should_raise(self) -> None:
         image = Image.from_png_file(resolve_resource_path("image/brightness/to_brighten.png"))
-        with pytest.raises(OutOfBoundsError, match=r"-1 is not inside \[0, \u221e\)."):
+        with pytest.raises(OutOfBoundsError, match=r"factor \(=-1\) is not inside \[0, \u221e\)."):
             image.adjust_contrast(-1)
 
 
@@ -305,7 +305,7 @@ class TestBrightness:
 
     def test_should_raise(self) -> None:
         image = Image.from_png_file(resolve_resource_path("image/brightness/to_brighten.png"))
-        with pytest.raises(OutOfBoundsError, match=r"-1 is not inside \[0, \u221e\)."):
+        with pytest.raises(OutOfBoundsError, match=r"factor \(=-1\) is not inside \[0, \u221e\)."):
             image.adjust_brightness(-1)
 
 
@@ -362,7 +362,7 @@ class TestColorAdjust:
         ids=["negative"],
     )
     def test_should_throw(self, image: Image, factor: float) -> None:
-        with pytest.raises(OutOfBoundsError, match=rf"{factor} is not inside \[0, \u221e\)."):
+        with pytest.raises(OutOfBoundsError, match=rf"factor \(={factor}\) is not inside \[0, \u221e\)."):
             image.adjust_color_balance(factor)
 
     @pytest.mark.parametrize(

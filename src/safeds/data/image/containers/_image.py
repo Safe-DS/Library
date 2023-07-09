@@ -294,7 +294,7 @@ class Image:
             The Image with adjusted brightness.
         """
         if factor < 0:
-            raise OutOfBoundsError(factor, lower_bound=ClosedBound(0))
+            raise OutOfBoundsError(factor, name="factor", lower_bound=ClosedBound(0))
         elif factor == 1:
             warnings.warn(
                 "Brightness adjustment factor is 1.0, this will not make changes to the image.",
@@ -323,7 +323,7 @@ class Image:
         New image with adjusted contrast.
         """
         if factor < 0:
-            raise OutOfBoundsError(factor, lower_bound=ClosedBound(0))
+            raise OutOfBoundsError(factor, name="factor", lower_bound=ClosedBound(0))
         elif factor == 1:
             warnings.warn(
                 "Contrast adjustment factor is 1.0, this will not make changes to the image.",
@@ -353,7 +353,7 @@ class Image:
             The new, adjusted image.
         """
         if factor < 0:
-            raise OutOfBoundsError(factor, lower_bound=ClosedBound(0))
+            raise OutOfBoundsError(factor, name="factor", lower_bound=ClosedBound(0))
         elif factor == 1:
             warnings.warn(
                 "Color adjustment factor is 1.0, this will not make changes to the image.",
