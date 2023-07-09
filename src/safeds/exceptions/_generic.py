@@ -19,14 +19,12 @@ class OutOfBoundsError(ValueError):
         upper_bound: Bound | None
             The upper bound of the expected range.
         """
-        if (lower_bound is None or isinstance(lower_bound, MinInfinity)) and (
-            upper_bound is None or isinstance(upper_bound, Infinity)
-        ):
+        if lower_bound is None and upper_bound is None:
             raise ValueError("Illegal interval: Attempting to raise OutOfBoundsError, but no bounds given.")
-        if lower_bound is None:
-            lower_bound = MinInfinity()
-        if upper_bound is None:
-            upper_bound = Infinity()
+        elif lower_bound is None:
+            lower_bound = _MinInfinity()
+        elif upper_bound is None:
+            upper_bound = _Infinity()
         if upper_bound._value < lower_bound._value:
             raise ValueError(
                 "Illegal interval: Attempting to raise OutOfBoundsError, but upper bound is less than the lower bound."
@@ -115,7 +113,7 @@ class OpenBound(Bound):
         return value < self._value
 
 
-class Infinity(OpenBound):
+class _Infinity(OpenBound):
     """An infinite or unrestricted upper Bound."""
 
     def __init__(self) -> None:
@@ -134,7 +132,7 @@ class Infinity(OpenBound):
         return True
 
 
-class MinInfinity(OpenBound):
+class _MinInfinity(OpenBound):
     """An infinite or unrestricted lower Bound."""
 
     def __init__(self) -> None:

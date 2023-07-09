@@ -1,7 +1,7 @@
 import re
 
 import pytest
-from safeds.exceptions import Bound, ClosedBound, Infinity, MinInfinity, OpenBound, OutOfBoundsError
+from safeds.exceptions import Bound, ClosedBound, OpenBound, OutOfBoundsError, _Infinity, _MinInfinity
 
 
 @pytest.mark.parametrize(
@@ -14,20 +14,18 @@ from safeds.exceptions import Bound, ClosedBound, Infinity, MinInfinity, OpenBou
     [
         (ClosedBound(-1), "[-1"),
         (OpenBound(-1), "(-1"),
-        (MinInfinity(), "(-\u221e"),
         (None, "(-\u221e"),
     ],
-    ids=["lb_closed_-1", "lb_open_-1", "lb_open_inf", "lb_none"],
+    ids=["lb_closed_-1", "lb_open_-1", "lb_none"],
 )
 @pytest.mark.parametrize(
     ("upper_bound", "match_upper"),
     [
         (ClosedBound(1), "1]"),
         (OpenBound(1), "1)"),
-        (Infinity(), "\u221e)"),
         (None, "\u221e)"),
     ],
-    ids=["ub_closed_-1", "ub_open_-1", "ub_open_inf", "ub_none"],
+    ids=["ub_closed_-1", "ub_open_-1", "ub_none"],
 )
 def test_should_raise_out_of_bounds_error(
     actual: float,
@@ -37,9 +35,7 @@ def test_should_raise_out_of_bounds_error(
     match_upper: str,
 ) -> None:
     # Check (-inf, inf) interval:
-    if (lower_bound is None or isinstance(lower_bound, MinInfinity)) and (
-        upper_bound is None or isinstance(upper_bound, Infinity)
-    ):
+    if lower_bound is None and upper_bound is None:
         with pytest.raises(
             ValueError,
             match=r"Illegal interval: Attempting to raise OutOfBoundsError, but no bounds given\.",
@@ -83,10 +79,10 @@ def test_should_raise_out_of_bounds_error(
         (2, False, OpenBound(2), True),
         (2, False, OpenBound(1), False),
         (2, False, OpenBound(3), True),
-        (2, False, Infinity(), True),
-        (2, True, Infinity(), False),
-        (2, True, MinInfinity(), True),
-        (2, False, MinInfinity(), False),
+        (2, False, _Infinity(), True),
+        (2, True, _Infinity(), False),
+        (2, True, _MinInfinity(), True),
+        (2, False, _MinInfinity(), False),
     ],
     ids=[
         "ex_false-close_2-upper",
