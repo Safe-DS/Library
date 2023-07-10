@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 
 from sklearn.neighbors import KNeighborsClassifier as sk_KNeighborsClassifier
 
-from safeds.exceptions import DatasetMissesDataError, OpenBound, OutOfBoundsError
+from safeds.exceptions import DatasetMissesDataError, OpenBound, OutOfBoundsError, ClosedBound
 from safeds.ml.classical._util_sklearn import fit, predict
 
 from ._classifier import Classifier
@@ -28,13 +28,13 @@ class KNearestNeighbors(Classifier):
     Raises
     ------
     OutOfBoundsError
-        If `number_of_neighbors` is less than or equal to 0.
+        If `number_of_neighbors` is less than 1.
     """
 
     def __init__(self, number_of_neighbors: int) -> None:
         # Validation
-        if number_of_neighbors <= 0:
-            raise OutOfBoundsError(number_of_neighbors, name="number_of_neighbors", lower_bound=OpenBound(0))
+        if number_of_neighbors < 1:
+            raise OutOfBoundsError(number_of_neighbors, name="number_of_neighbors", lower_bound=ClosedBound(1))
 
         # Hyperparameters
         self._number_of_neighbors = number_of_neighbors

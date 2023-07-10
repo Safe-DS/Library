@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 
 from sklearn.ensemble import GradientBoostingRegressor as sk_GradientBoostingRegressor
 
-from safeds.exceptions import OpenBound, OutOfBoundsError
+from safeds.exceptions import OpenBound, OutOfBoundsError, ClosedBound
 from safeds.ml.classical._util_sklearn import fit, predict
 
 from ._regressor import Regressor
@@ -31,13 +31,13 @@ class GradientBoosting(Regressor):
     Raises
     ------
     OutOfBoundsError
-        If `number_of_trees` is less than or equal to 0 or `learning_rate` is non-positive.
+        If `number_of_trees` or `learning_rate` are less than or equal to 0.
     """
 
     def __init__(self, *, number_of_trees: int = 100, learning_rate: float = 0.1) -> None:
         # Validation
-        if number_of_trees <= 0:
-            raise OutOfBoundsError(number_of_trees, name="number_of_trees", lower_bound=OpenBound(0))
+        if number_of_trees < 1:
+            raise OutOfBoundsError(number_of_trees, name="number_of_trees", lower_bound=ClosedBound(1))
         if learning_rate <= 0:
             raise OutOfBoundsError(learning_rate, name="learning_rate", lower_bound=OpenBound(0))
 

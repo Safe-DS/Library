@@ -24,6 +24,6 @@ class TestNumberOfTrees:
     def test_should_raise_if_less_than_or_equal_to_0(self, number_of_trees: int) -> None:
         with pytest.raises(
             OutOfBoundsError,
-            match=rf"number_of_trees \(={number_of_trees}\) is not inside \(0, \u221e\)\.",
+            match=rf"number_of_trees \(={number_of_trees}\) is not inside \[1, \u221e\)\.",
         ):
             RandomForest(number_of_trees=number_of_trees)

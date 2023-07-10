@@ -26,7 +26,7 @@ class RandomForest(Regressor):
     Raises
     ------
     OutOfBoundsError
-        If `number_of_trees` is less than or equal to 0.
+        If `number_of_trees` is less than 1.
     """
 
     def __init__(self, *, number_of_trees: int = 100) -> None:

@@ -37,7 +37,7 @@ class TestMaximumNumberOfLearners:
     def test_should_raise_if_less_than_or_equal_to_0(self, maximum_number_of_learners: int) -> None:
         with pytest.raises(
             OutOfBoundsError,
-            match=rf"maximum_number_of_learners \(={maximum_number_of_learners}\) is not inside \(0, \u221e\)\.",
+            match=rf"maximum_number_of_learners \(={maximum_number_of_learners}\) is not inside \[1, \u221e\)\.",
         ):
             AdaBoost(maximum_number_of_learners=maximum_number_of_learners)
 

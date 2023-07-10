@@ -24,7 +24,7 @@ class TestNumberOfTrees:
     def test_should_raise_if_less_than_1(self, number_of_trees: int) -> None:
         with pytest.raises(
             OutOfBoundsError,
-            match=rf"number_of_trees \(={number_of_trees}\) is not inside \(0, \u221e\)\.",
+            match=rf"number_of_trees \(={number_of_trees}\) is not inside \[1, \u221e\)\.",
         ):
             GradientBoosting(number_of_trees=number_of_trees)
 
