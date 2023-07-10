@@ -59,7 +59,12 @@ class OutOfBoundsError(ValueError):
         # Use local variables with stricter types to help static analysis:
         _lower_bound: Bound = lower_bound if lower_bound is not None else OpenBound(float("-inf"))
         _upper_bound: Bound = upper_bound if upper_bound is not None else OpenBound(float("inf"))
-        if lower_bound == OpenBound(float("-inf")) or upper_bound == OpenBound(float("-inf")) or lower_bound == OpenBound(float("inf")) or upper_bound == OpenBound(float("inf")):
+        if (
+            lower_bound == OpenBound(float("-inf"))
+            or upper_bound == OpenBound(float("-inf"))
+            or lower_bound == OpenBound(float("inf"))
+            or upper_bound == OpenBound(float("inf"))
+        ):
             raise ValueError("Illegal interval: Lower and upper bounds must be real numbers, or None if unbounded.")
         if _upper_bound.value < _lower_bound.value:
             raise ValueError(
