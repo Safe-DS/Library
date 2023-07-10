@@ -48,12 +48,7 @@ def test_should_raise_out_of_bounds_error(
             raise OutOfBoundsError(actual, lower_bound=lower_bound, upper_bound=upper_bound)
         return
     # Check if infinity was passed instead of None:
-    if (
-        lower_bound == OpenBound(float("-inf"))
-        or lower_bound == OpenBound(float("inf"))
-        or upper_bound == OpenBound(float("-inf"))
-        or upper_bound == OpenBound(float("inf"))
-    ):
+    if lower_bound == OpenBound(float("-inf")) or upper_bound == OpenBound(float("inf")):
         with pytest.raises(
             ValueError,
             match="Illegal interval: Lower and upper bounds must be real numbers, or None if unbounded.",
