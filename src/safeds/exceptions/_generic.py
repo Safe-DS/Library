@@ -60,7 +60,7 @@ class OutOfBoundsError(ValueError):
         ):
             raise ValueError("Illegal interval: Lower and upper bounds must be real numbers, or None if unbounded.")
         # Validate actual parameter:
-        if isnan(actual) or actual == float("-inf") or actual == float("inf"):
+        if isinf(actual) or isnan(actual):
             raise ValueError("Attempting to raise OutOfBoundsError with actual value not being a real number.")
         # Use local variables with stricter types to help static analysis:
         _lower_bound: Bound = lower_bound if lower_bound is not None else OpenBound(float("-inf"))
