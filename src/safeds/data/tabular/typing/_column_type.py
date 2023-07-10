@@ -16,10 +16,6 @@ class ColumnType(ABC):
 
     _is_nullable: bool  # This line is just here so the linter doesn't throw an error
 
-    @abstractmethod
-    def __init__(self, is_nullable: bool = False) -> None:
-        pass
-
     @staticmethod
     def _data_type(data: pd.Series) -> ColumnType:
         """
