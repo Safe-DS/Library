@@ -1,5 +1,6 @@
 import re
-from typing import Any, Callable
+from collections.abc import Callable
+from typing import Any
 
 import pandas as pd
 import pytest
@@ -529,8 +530,16 @@ class TestSortColumns:
     @pytest.mark.parametrize(
         ("row", "comparator", "expected"),
         [
-            (Row({"b": 1, "a": 2}), lambda col1, col2: (col1[0] > col2[0]) - (col1[0] < col2[0]), Row({"a": 2, "b": 1})),
-            (Row({"a": 2, "b": 1}), lambda col1, col2: (col2[0] > col1[0]) - (col2[0] < col1[0]), Row({"b": 1, "a": 2})),
+            (
+                Row({"b": 1, "a": 2}),
+                lambda col1, col2: (col1[0] > col2[0]) - (col1[0] < col2[0]),
+                Row({"a": 2, "b": 1}),
+            ),
+            (
+                Row({"a": 2, "b": 1}),
+                lambda col1, col2: (col2[0] > col1[0]) - (col2[0] < col1[0]),
+                Row({"b": 1, "a": 2}),
+            ),
             (Row(), lambda col1, col2: (col1[0] > col2[0]) - (col1[0] < col2[0]), Row()),
         ],
         ids=[

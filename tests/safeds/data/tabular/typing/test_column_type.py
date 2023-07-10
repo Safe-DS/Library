@@ -47,9 +47,7 @@ class TestDataType:
 
     @pytest.mark.parametrize(
         ("data", "error_message"),
-        [
-            (np.array([1, 2, 3], dtype=np.int16), "Unsupported numpy data type '<class 'numpy.int16'>'.")
-        ],
+        [(np.array([1, 2, 3], dtype=np.int16), "Unsupported numpy data type '<class 'numpy.int16'>'.")],
         ids=["int16 not supported"],
     )
     def test_should_throw_not_implemented_error_when_type_is_not_supported(self, data: Any, error_message: str) -> None:
@@ -118,4 +116,3 @@ class TestIsNumeric:
     )
     def test_should_return_whether_the_column_type_is_numeric(self, column_type: ColumnType, expected: bool) -> None:
         assert column_type.is_numeric() == expected
-
