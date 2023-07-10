@@ -1,5 +1,6 @@
 import pytest
 from safeds.data.tabular.containers import Table, TaggedTable
+from safeds.exceptions import OutOfBoundsError
 from safeds.ml.classical.classification import AdaBoost
 
 
@@ -32,9 +33,10 @@ class TestMaximumNumberOfLearners:
         assert fitted_model._wrapped_classifier is not None
         assert fitted_model._wrapped_classifier.n_estimators == 2
 
-    def test_should_raise_if_less_than_or_equal_to_0(self) -> None:
-        with pytest.raises(ValueError, match="The parameter 'maximum_number_of_learners' has to be grater than 0."):
-            AdaBoost(maximum_number_of_learners=-1)
+    @pytest.mark.parametrize("maximum_number_of_learners", [-1, 0], ids=["minus_one", "zero"])
+    def test_should_raise_if_less_than_or_equal_to_0(self, maximum_number_of_learners: int) -> None:
+        with pytest.raises(OutOfBoundsError, match=rf"maximum_number_of_learners \(={maximum_number_of_learners}\) is not inside \(0, \u221e\)\."):
+            AdaBoost(maximum_number_of_learners=maximum_number_of_learners)
 
 
 class TestLearningRate:
@@ -47,6 +49,7 @@ class TestLearningRate:
         assert fitted_model._wrapped_classifier is not None
         assert fitted_model._wrapped_classifier.learning_rate == 2
 
-    def test_should_raise_if_less_than_or_equal_to_0(self) -> None:
-        with pytest.raises(ValueError, match="The parameter 'learning_rate' has to be greater than 0."):
-            AdaBoost(learning_rate=-1)
+    @pytest.mark.parametrize("learning_rate", [-1, 0], ids=["minus_one", "zero"])
+    def test_should_raise_if_less_than_or_equal_to_0(self, learning_rate: int) -> None:
+        with pytest.raises(OutOfBoundsError, match=rf"learning_rate \(={learning_rate}\) is not inside \(0, \u221e\)\."):
+            AdaBoost(learning_rate=learning_rate)
