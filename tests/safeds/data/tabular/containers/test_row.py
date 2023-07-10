@@ -539,7 +539,7 @@ class TestSortColumns:
             "empty rows",
         ],
     )
-    def test_should_sort_table(self, row: Row, comparator: Callable[[tuple[str, Any], tuple[str, Any]], int], expected: Row) -> None:
+    def test_should_sort_columns(self, row: Row, comparator: Callable[[tuple, tuple], int], expected: Row) -> None:
         row = row.sort_columns(comparator)
         assert row == expected
 
