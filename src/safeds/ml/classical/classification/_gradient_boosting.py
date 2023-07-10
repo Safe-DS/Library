@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from safeds.exceptions import OutOfBoundsError, OpenBound
 from sklearn.ensemble import GradientBoostingClassifier as sk_GradientBoostingClassifier
 
 from safeds.ml.classical._util_sklearn import fit, predict
@@ -29,16 +30,16 @@ class GradientBoosting(Classifier):
 
     Raises
     ------
-    ValueError
-        If `number_of_trees` is less than or equal to 0 or `learning_rate` is non-positive.
+    OutOfBoundsError
+        If `number_of_trees` or `learning_rate` is less than or equal to 0.
     """
 
     def __init__(self, *, number_of_trees: int = 100, learning_rate: float = 0.1) -> None:
         # Validation
         if number_of_trees <= 0:
-            raise ValueError("The parameter 'number_of_trees' has to be greater than 0.")
+            raise OutOfBoundsError(number_of_trees, name="number_of_trees", lower_bound=OpenBound(0))
         if learning_rate <= 0:
-            raise ValueError("The parameter 'learning_rate' has to be greater than 0.")
+            raise OutOfBoundsError(learning_rate, name="learning_rate", lower_bound=OpenBound(0))
 
         # Hyperparameters
         self._number_of_trees = number_of_trees
