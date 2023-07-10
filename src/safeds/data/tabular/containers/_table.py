@@ -947,14 +947,7 @@ class Table:
             raise UnknownColumnNameError(list(set(self.column_names) - set(row.column_names)))
 
         if result.number_of_rows == 0:
-            int_columns = list(filter(lambda name: isinstance(row[name], int | np.int64), row.column_names))
-            if result.number_of_columns == 0:
-                for column in row.column_names:
-                    result._data[column] = Column(column, [])
-                result._schema = Schema._from_pandas_dataframe(result._data)
-            elif result.column_names != row.column_names:
-                unknown_columns = list(set(row.column_names) - set(result.column_names))
-                raise UnknownColumnNameError(unknown_columns)
+            int_columns = list(filter(lambda name: isinstance(row[name], int | np.int64 | np.int32), row.column_names))
 
         new_df = pd.concat([result._data, row._data]).infer_objects()
         new_df.columns = result.column_names
