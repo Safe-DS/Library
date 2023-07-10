@@ -39,7 +39,6 @@ However, you should always:
 
 * Check that the PR title starts with a fitting [type](https://github.com/Safe-DS/.github/blob/main/.github/CONTRIBUTING.md#types) (e.g. `feat`, `fix`, `docs`, ...)
 * Check that the changes introduced by the PR are documented in the PR message
-* Check that the `time spent by team` has been updated on the issue page
 
 ## Requesting changes
 

@@ -274,49 +274,6 @@ Passing values that are commonly used together around separately is tedious, ver
     training_feature_vectors, validation_feature_vectors, training_target_values, validation_target_values = split(feature_vectors, target_values)
     ```
 
-## Code style
-
-### Consistency
-
-If there is more than one way
-to solve a particular task,
-check how it has been solved
-at other places in the codebase
-and stick to that solution.
-
-### Sort exported classes in `__init__.py`
-
-Classes defined in a module
-that other classes shall be able to import
-must be defined
-in a list named `__all__`
-in the module's `__init__.py` file.
-This list should be sorted alphabetically,
-to reduce the likelihood of merge conflicts
-when adding new classes to it.
-
-!!! success "**DO** (library code):"
-
-    ```py
-    __all__ = [
-        "Column",
-        "Row",
-        "Table",
-        "TaggedTable",
-    ]
-    ```
-
-!!! failure "**DON'T** (library code):"
-
-    ```py
-    __all__ = [
-        "Table",
-        "TaggedTable",
-        "Column",
-        "Row",
-    ]
-    ```
-
 ## Docstrings
 
 The docstrings **should** use the [numpydoc](https://numpydoc.readthedocs.io/en/latest/format.html) format. The descriptions **should not** start with "this" and **should** use imperative mood. Refer to the subsections below for more details on how to document specific API elements.
@@ -467,6 +424,49 @@ Example:
     )
     def test_should_create_table_from_csv_file(path: str | Path, expected: Table) -> None:
         ...
+    ```
+
+## Code style
+
+### Consistency
+
+If there is more than one way
+to solve a particular task,
+check how it has been solved
+at other places in the codebase
+and stick to that solution.
+
+### Sort exported classes in `__init__.py`
+
+Classes defined in a module
+that other classes shall be able to import
+must be defined
+in a list named `__all__`
+in the module's `__init__.py` file.
+This list should be sorted alphabetically,
+to reduce the likelihood of merge conflicts
+when adding new classes to it.
+
+!!! success "**DO** (library code):"
+
+    ```py
+    __all__ = [
+        "Column",
+        "Row",
+        "Table",
+        "TaggedTable",
+    ]
+    ```
+
+!!! failure "**DON'T** (library code):"
+
+    ```py
+    __all__ = [
+        "Table",
+        "TaggedTable",
+        "Column",
+        "Row",
+    ]
     ```
 
 [src-folder]: https://github.com/Safe-DS/Stdlib/tree/main/src
