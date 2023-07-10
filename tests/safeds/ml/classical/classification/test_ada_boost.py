@@ -55,6 +55,7 @@ class TestLearningRate:
     @pytest.mark.parametrize("learning_rate", [-1, 0], ids=["minus_one", "zero"])
     def test_should_raise_if_less_than_or_equal_to_0(self, learning_rate: int) -> None:
         with pytest.raises(
-            OutOfBoundsError, match=rf"learning_rate \(={learning_rate}\) is not inside \(0, \u221e\)\.",
+            OutOfBoundsError,
+            match=rf"learning_rate \(={learning_rate}\) is not inside \(0, \u221e\)\.",
         ):
             AdaBoost(learning_rate=learning_rate)
