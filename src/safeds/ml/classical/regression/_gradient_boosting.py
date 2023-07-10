@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 
 from sklearn.ensemble import GradientBoostingRegressor as sk_GradientBoostingRegressor
 
-from safeds.exceptions import OpenBound, OutOfBoundsError, ClosedBound
+from safeds.exceptions import ClosedBound, OpenBound, OutOfBoundsError
 from safeds.ml.classical._util_sklearn import fit, predict
 
 from ._regressor import Regressor

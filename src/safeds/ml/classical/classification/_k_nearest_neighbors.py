@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 
 from sklearn.neighbors import KNeighborsClassifier as sk_KNeighborsClassifier
 
-from safeds.exceptions import DatasetMissesDataError, OpenBound, OutOfBoundsError, ClosedBound
+from safeds.exceptions import ClosedBound, DatasetMissesDataError, OutOfBoundsError
 from safeds.ml.classical._util_sklearn import fit, predict
 
 from ._classifier import Classifier

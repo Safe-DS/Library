@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 
 from sklearn.neighbors import KNeighborsRegressor as sk_KNeighborsRegressor
 
-from safeds.exceptions import DatasetMissesDataError, OpenBound, OutOfBoundsError, ClosedBound
+from safeds.exceptions import ClosedBound, DatasetMissesDataError, OutOfBoundsError
 from safeds.ml.classical._util_sklearn import fit, predict
 
 from ._regressor import Regressor

@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 
 from sklearn.ensemble import RandomForestClassifier as sk_RandomForestClassifier
 
-from safeds.exceptions import OpenBound, OutOfBoundsError, ClosedBound
+from safeds.exceptions import ClosedBound, OutOfBoundsError
 from safeds.ml.classical._util_sklearn import fit, predict
 
 from ._classifier import Classifier
