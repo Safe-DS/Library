@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 
-from numpy import isnan
+from numpy import isinf, isnan
 
 
 class OutOfBoundsError(ValueError):
@@ -52,20 +52,18 @@ class OutOfBoundsError(ValueError):
             * If actual does not lie outside the given interval.
             * If actual is not a real number.
         """
+        # Validate bound parameters:
         if lower_bound is None and upper_bound is None:
             raise ValueError("Illegal interval: Attempting to raise OutOfBoundsError, but no bounds given.")
-        if isnan(actual) or actual == float("inf") or actual == float("-inf"):
+        if (lower_bound is not None and isinf(lower_bound.value)) or (upper_bound is not None and isinf(upper_bound.value)):
+            raise ValueError("Illegal interval: Lower and upper bounds must be real numbers, or None if unbounded.")
+        # Validate actual parameter:
+        if isnan(actual) or actual == float("-inf") or actual == float("inf"):
             raise ValueError("Attempting to raise OutOfBoundsError with actual value not being a real number.")
         # Use local variables with stricter types to help static analysis:
         _lower_bound: Bound = lower_bound if lower_bound is not None else OpenBound(float("-inf"))
         _upper_bound: Bound = upper_bound if upper_bound is not None else OpenBound(float("inf"))
-        if (
-            lower_bound == OpenBound(float("-inf"))
-            or upper_bound == OpenBound(float("-inf"))
-            or lower_bound == OpenBound(float("inf"))
-            or upper_bound == OpenBound(float("inf"))
-        ):
-            raise ValueError("Illegal interval: Lower and upper bounds must be real numbers, or None if unbounded.")
+        # Check bounds:
         if _upper_bound.value < _lower_bound.value:
             raise ValueError(
                 (
@@ -73,6 +71,7 @@ class OutOfBoundsError(ValueError):
                     f"actually less than given lower bound {_lower_bound}."
                 ),
             )
+        # Check that actual is indeed outside the interval:
         elif _lower_bound._check_lower_bound(actual) and _upper_bound._check_upper_bound(actual):
             raise ValueError(
                 (
@@ -80,6 +79,7 @@ class OutOfBoundsError(ValueError):
                     f" outside given interval {_lower_bound._str_lower_bound()}, {_upper_bound._str_upper_bound()}."
                 ),
             )
+        # Raise the actual exception:
         full_variable_name = actual if name is None else f"{name} (={actual})"
         super().__init__(
             f"{full_variable_name} is not inside {_lower_bound._str_lower_bound()}, {_upper_bound._str_upper_bound()}.",
@@ -118,6 +118,11 @@ class Bound(ABC):
         """Get a string representation of the concrete value of the Bound."""
         return str(self.value)
 
+    @property
+    def value(self) -> float:
+        """Get the concrete value of the Bound."""
+        return self._value
+
     @abstractmethod
     def _str_lower_bound(self) -> str:
         """Get a string representation of the Bound as the lower Bound of an interval."""
@@ -147,11 +152,6 @@ class Bound(ABC):
         actual: float
             The actual value that should be checked for not exceeding the Bound.
         """
-
-    @property
-    def value(self) -> float:
-        """Get the concrete value of the Bound."""
-        return self._value
 
 
 class ClosedBound(Bound):

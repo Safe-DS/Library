@@ -1,7 +1,7 @@
 import re
 
 import pytest
-from numpy import isnan
+from numpy import isinf, isnan
 from safeds.exceptions import Bound, ClosedBound, OpenBound, OutOfBoundsError
 
 
@@ -18,8 +18,9 @@ from safeds.exceptions import Bound, ClosedBound, OpenBound, OutOfBoundsError
         (OpenBound(-1), "(-1"),
         (None, "(-\u221e"),
         (OpenBound(float("-inf")), "(-\u221e"),
+        (OpenBound(float("inf")), "(\u221e"),
     ],
-    ids=["lb_closed_-1", "lb_open_-1", "lb_none", "lb_neg_inf"],
+    ids=["lb_closed_-1", "lb_open_-1", "lb_none", "lb_neg_inf", "lb_inf"],
 )
 @pytest.mark.parametrize(
     ("upper_bound", "match_upper"),
@@ -27,9 +28,10 @@ from safeds.exceptions import Bound, ClosedBound, OpenBound, OutOfBoundsError
         (ClosedBound(1), "1]"),
         (OpenBound(1), "1)"),
         (None, "\u221e)"),
+        (OpenBound(float("-inf")), "-\u221e)"),
         (OpenBound(float("inf")), "\u221e)"),
     ],
-    ids=["ub_closed_-1", "ub_open_-1", "ub_none", "ub_inf"],
+    ids=["ub_closed_-1", "ub_open_-1", "ub_none", "ub_neg_inf", "ub_inf"],
 )
 def test_should_raise_out_of_bounds_error(
     actual: float,
@@ -48,7 +50,7 @@ def test_should_raise_out_of_bounds_error(
             raise OutOfBoundsError(actual, lower_bound=lower_bound, upper_bound=upper_bound)
         return
     # Check if infinity was passed instead of None:
-    if lower_bound == OpenBound(float("-inf")) or upper_bound == OpenBound(float("inf")):
+    if (lower_bound is not None and isinf(lower_bound.value)) or (upper_bound is not None and isinf(upper_bound.value)):
         with pytest.raises(
             ValueError,
             match="Illegal interval: Lower and upper bounds must be real numbers, or None if unbounded.",
@@ -60,7 +62,7 @@ def test_should_raise_out_of_bounds_error(
         with pytest.raises(
             ValueError,
             match=r"Illegal interval: Attempting to raise OutOfBoundsError, but given upper bound .+ is actually less "
-            r"than given lower bound .+\.",
+                  r"than given lower bound .+\.",
         ):
             raise OutOfBoundsError(actual, lower_bound=upper_bound, upper_bound=lower_bound)
     # Check case where actual value lies inside the interval:
@@ -70,7 +72,7 @@ def test_should_raise_out_of_bounds_error(
         with pytest.raises(
             ValueError,
             match=rf"Illegal interval: Attempting to raise OutOfBoundsError, but value {actual} is not actually outside"
-            rf" given interval [\[(].+,.+[\])]\.",
+                  rf" given interval [\[(].+,.+[\])]\.",
         ):
             raise OutOfBoundsError(actual, lower_bound=lower_bound, upper_bound=upper_bound)
         return
