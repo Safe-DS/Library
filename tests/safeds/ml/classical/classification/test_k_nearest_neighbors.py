@@ -1,5 +1,6 @@
 import pytest
 from safeds.data.tabular.containers import Table, TaggedTable
+from safeds.exceptions import OutOfBoundsError
 from safeds.ml.classical.classification import KNearestNeighbors
 
 
@@ -19,9 +20,13 @@ class TestNumberOfNeighbors:
         assert fitted_model._wrapped_classifier is not None
         assert fitted_model._wrapped_classifier.n_neighbors == 2
 
-    def test_should_raise_if_less_than_or_equal_to_0(self) -> None:
-        with pytest.raises(ValueError, match="The parameter 'number_of_neighbors' has to be greater than 0."):
-            KNearestNeighbors(number_of_neighbors=-1)
+    @pytest.mark.parametrize("number_of_neighbors", [-1, 0], ids=["minus_one", "zero"])
+    def test_should_raise_if_less_than_or_equal_to_0(self, number_of_neighbors: int) -> None:
+        with pytest.raises(
+            OutOfBoundsError,
+            match=rf"number_of_neighbors \(={number_of_neighbors}\) is not inside \(0, \u221e\)\.",
+        ):
+            KNearestNeighbors(number_of_neighbors=number_of_neighbors)
 
     def test_should_raise_if_greater_than_sample_size(self, training_set: TaggedTable) -> None:
         with pytest.raises(ValueError, match="has to be less than or equal to the sample size"):
