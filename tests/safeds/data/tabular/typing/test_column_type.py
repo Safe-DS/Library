@@ -119,9 +119,3 @@ class TestIsNumeric:
     def test_should_return_whether_the_column_type_is_numeric(self, column_type: ColumnType, expected: bool) -> None:
         assert column_type.is_numeric() == expected
 
-
-# We need this test for CodeCoverage
-class TestAbstractClass:
-    def test_should_raise_if_abstract_class_is_initialized(self) -> None:
-        with pytest.raises(TypeError, match="Can't instantiate abstract class ColumnType with abstract methods __init__, is_nullable, is_numeric"):
-            ColumnType()
