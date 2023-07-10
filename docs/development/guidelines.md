@@ -387,18 +387,39 @@ Examples
 ## Tests
 
 We aim for 100% line coverage,
-so for any new function
-automated test should be added
-to the [`tests`][tests-folder] folder.
+so automated tests should be added
+for any new function.
+
+### File structure
+
+Tests belong in the [`tests`][tests-folder] folder.
 The file structure in the tests folder
 should mirror the file structure
 of the [`src`][src-folder] folder.
+
+### Naming
 
 Names of test functions
 shall start with `test_should_`
 followed by a description
 of the expected behaviour,
 e.g. `test_should_add_column`.
+
+!!! success "**DO** (library code):"
+
+    ```py
+    def test_should_raise_if_less_than_or_equal_to_0(self, number_of_trees) -> None:
+        with pytest.raises(ValueError, match="The parameter 'number_of_trees' has to be greater than 0."):
+            ...
+    ```
+
+!!! failure "**DON'T** (library code):"
+
+    ```py
+    def test_value_error(self, number_of_trees) -> None:
+        with pytest.raises(ValueError, match="The parameter 'number_of_trees' has to be greater than 0."):
+            ...
+    ```
 
 ### Parametrization
 
@@ -410,20 +431,25 @@ to add new test cases in the future.
 Test cases should be given
 descriptive IDs.
 
-Example:
+!!! success "**DO** (library code):"
 
     ```py
-    @pytest.mark.parametrize(
-        ("path", "expected"),
-        [
-            ("table.csv", Table({"A": [1], "B": [2]})),
-            (Path("table.csv"), Table({"A": [1], "B": [2]})),
-            ("empty_table.csv", Table()),
-        ],
-        ids=["by string", "by path", "empty"],
-    )
-    def test_should_create_table_from_csv_file(path: str | Path, expected: Table) -> None:
-        ...
+    @pytest.mark.parametrize("number_of_trees", [0, -1], ids=["zero", "negative"])
+    def test_should_raise_if_less_than_or_equal_to_0(self, number_of_trees) -> None:
+        with pytest.raises(ValueError, match="The parameter 'number_of_trees' has to be greater than 0."):
+            RandomForest(number_of_trees=number_of_trees)
+    ```
+
+!!! failure "**DON'T** (library code):"
+
+    ```py
+    def test_should_raise_if_less_than_0(self, number_of_trees) -> None:
+        with pytest.raises(ValueError, match="The parameter 'number_of_trees' has to be greater than 0."):
+            RandomForest(number_of_trees=-1)
+
+    def test_should_raise_if_equal_to_0(self, number_of_trees) -> None:
+        with pytest.raises(ValueError, match="The parameter 'number_of_trees' has to be greater than 0."):
+            RandomForest(number_of_trees=0)
     ```
 
 ## Code style
