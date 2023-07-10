@@ -17,8 +17,9 @@ from safeds.exceptions import Bound, ClosedBound, OpenBound, OutOfBoundsError
         (ClosedBound(-1), "[-1"),
         (OpenBound(-1), "(-1"),
         (None, "(-\u221e"),
+        (OpenBound(float("-inf")), "(-\u221e"),
     ],
-    ids=["lb_closed_-1", "lb_open_-1", "lb_none"],
+    ids=["lb_closed_-1", "lb_open_-1", "lb_none", "lb_neg_inf"],
 )
 @pytest.mark.parametrize(
     ("upper_bound", "match_upper"),
@@ -26,8 +27,9 @@ from safeds.exceptions import Bound, ClosedBound, OpenBound, OutOfBoundsError
         (ClosedBound(1), "1]"),
         (OpenBound(1), "1)"),
         (None, "\u221e)"),
+        (OpenBound(float("inf")), "\u221e)"),
     ],
-    ids=["ub_closed_-1", "ub_open_-1", "ub_none"],
+    ids=["ub_closed_-1", "ub_open_-1", "ub_none", "ub_inf"],
 )
 def test_should_raise_out_of_bounds_error(
     actual: float,
@@ -43,6 +45,12 @@ def test_should_raise_out_of_bounds_error(
             ValueError,
             match=r"Illegal interval: Attempting to raise OutOfBoundsError, but no bounds given\.",
         ):
+            raise OutOfBoundsError(actual, lower_bound=lower_bound, upper_bound=upper_bound)
+        return
+    # Check if infinity was passed instead of None:
+    if lower_bound == OpenBound(float("-inf")) or lower_bound == OpenBound(float("inf")) or upper_bound == OpenBound(float("-inf")) or upper_bound == OpenBound(float("inf")):
+        with pytest.raises(ValueError, match="Illegal interval: Lower and upper bounds must be real numbers, or None "
+                                             "if unbounded."):
             raise OutOfBoundsError(actual, lower_bound=lower_bound, upper_bound=upper_bound)
         return
     # All tests: Check interval where lower > upper:
@@ -130,3 +138,10 @@ def test_should_raise_value_error(value: float) -> None:
     else:
         with pytest.raises(ValueError, match=r"ClosedBound must be a real number, not \+\/\-inf\."):
             ClosedBound(value)
+
+
+@pytest.mark.parametrize("actual", [float("nan"), float("-inf"), float("inf")], ids=["nan", "neg_inf", "inf"])
+def test_should_raise_value_error_because_invalid_actual(actual: float) -> None:
+    with pytest.raises(ValueError, match="Attempting to raise OutOfBoundsError with actual value not being a real "
+                                         "number."):
+        raise OutOfBoundsError(actual, lower_bound=ClosedBound(-1), upper_bound=ClosedBound(1))

@@ -16,9 +16,9 @@ class OutOfBoundsError(ValueError):
     name: str | None
         The name of the offending variable.
     lower_bound: Bound | None
-        The lower bound of the expected range.
+        The lower bound of the expected range. Use None if there is no lower Bound.
     upper_bound: Bound | None
-        The upper bound of the expected range.
+        The upper bound of the expected range. Use None if there is no upper Bound.
     """
 
     def __init__(
@@ -39,20 +39,28 @@ class OutOfBoundsError(ValueError):
         name: str | None
             The name of the offending variable.
         lower_bound: Bound | None
-            The lower bound of the expected range.
+            The lower bound of the expected range. Use None if there is no lower Bound.
         upper_bound: Bound | None
-            The upper bound of the expected range.
+            The upper bound of the expected range. Use None if there is no upper Bound.
 
         Raises
         ------
         ValueError
-            If upper_bound < lower_bound or if actual does not lie outside the given interval.
+            * If one of the given Bounds is +/-inf. (For infinite Bounds, pass None instead.)
+            * If one of the given Bounds is nan.
+            * If upper_bound < lower_bound.
+            * If actual does not lie outside the given interval.
+            * If actual is not a real number.
         """
         if lower_bound is None and upper_bound is None:
             raise ValueError("Illegal interval: Attempting to raise OutOfBoundsError, but no bounds given.")
+        if isnan(actual) or actual == float("inf") or actual == float("-inf"):
+            raise ValueError("Attempting to raise OutOfBoundsError with actual value not being a real number.")
         # Use local variables with stricter types to help static analysis:
         _lower_bound: Bound = lower_bound if lower_bound is not None else OpenBound(float("-inf"))
         _upper_bound: Bound = upper_bound if upper_bound is not None else OpenBound(float("inf"))
+        if lower_bound == OpenBound(float("-inf")) or upper_bound == OpenBound(float("-inf")) or lower_bound == OpenBound(float("inf")) or upper_bound == OpenBound(float("inf")):
+            raise ValueError("Illegal interval: Lower and upper bounds must be real numbers, or None if unbounded.")
         if _upper_bound.value < _lower_bound.value:
             raise ValueError(
                 (
