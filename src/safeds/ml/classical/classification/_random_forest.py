@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from safeds.exceptions import OutOfBoundsError, OpenBound
 from sklearn.ensemble import RandomForestClassifier as sk_RandomForestClassifier
 
 from safeds.ml.classical._util_sklearn import fit, predict
@@ -24,14 +25,14 @@ class RandomForest(Classifier):
 
     Raises
     ------
-    ValueError
+    OutOfBoundsError
         If `number_of_trees` is less than or equal to 0.
     """
 
     def __init__(self, *, number_of_trees: int = 100) -> None:
         # Validation
         if number_of_trees < 1:
-            raise ValueError("The parameter 'number_of_trees' has to be greater than 0.")
+            raise OutOfBoundsError(number_of_trees, name="number_of_trees", lower_bound=OpenBound(0))
 
         # Hyperparameters
         self._number_of_trees = number_of_trees
