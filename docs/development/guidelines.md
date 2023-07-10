@@ -299,10 +299,10 @@ when adding new classes to it.
 
     ```py
     __all__ = [
-    "Column",
-    "Row",
-    "Table",
-    "TaggedTable",
+        "Column",
+        "Row",
+        "Table",
+        "TaggedTable",
     ]
     ```
 
@@ -310,10 +310,10 @@ when adding new classes to it.
 
     ```py
     __all__ = [
-    "Table",
-    "TaggedTable",
-    "Column",
-    "Row",
+        "Table",
+        "TaggedTable",
+        "Column",
+        "Row",
     ]
     ```
 
@@ -443,12 +443,12 @@ followed by a description
 of the expected behaviour,
 e.g. `test_should_add_column`.
 
-### Testcases
+### Parametrization
 
 Tests should be parametrized
 using `@pytest.mark.parametrize`,
-even if there is only a single testcase.
-Testcases should be given
+even if there is only a single test case.
+Test cases should be given
 descriptive IDs.
 
 Example:
