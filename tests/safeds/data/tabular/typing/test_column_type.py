@@ -1,5 +1,7 @@
 from collections.abc import Iterable
+from typing import Any
 
+import numpy as np
 import pytest
 from safeds.data.tabular.typing import (
     Anything,
@@ -42,6 +44,17 @@ class TestDataType:
     )
     def test_should_return_the_data_type(self, data: Iterable, expected: ColumnType) -> None:
         assert ColumnType._data_type(data) == expected
+
+    @pytest.mark.parametrize(
+        ("data", "error_message"),
+        [
+            (np.array([1, 2, 3], dtype=np.int16), "Unsupported numpy data type '<class 'numpy.int16'>'.")
+        ],
+        ids=["int16 not supported"],
+    )
+    def test_should_throw_not_implemented_error_when_type_is_not_supported(self, data: Any, error_message: str) -> None:
+        with pytest.raises(NotImplementedError, match=error_message):
+            ColumnType._data_type(data)
 
 
 class TestRepr:
