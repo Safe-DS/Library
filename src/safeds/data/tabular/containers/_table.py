@@ -1006,12 +1006,6 @@ class Table:
         if len(different_column_names) > 0:
             raise UnknownColumnNameError(list(different_column_names))
 
-        different_column_names = set()
-        if self.number_of_columns != 0:
-            different_column_names.update(set(self.column_names) - set(rows[0].column_names))
-            if len(different_column_names) > 0:
-                raise UnknownColumnNameError(list(different_column_names))
-
         result = self._copy()
 
         for row in rows:
