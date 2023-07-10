@@ -55,7 +55,9 @@ class OutOfBoundsError(ValueError):
         # Validate bound parameters:
         if lower_bound is None and upper_bound is None:
             raise ValueError("Illegal interval: Attempting to raise OutOfBoundsError, but no bounds given.")
-        if (lower_bound is not None and isinf(lower_bound.value)) or (upper_bound is not None and isinf(upper_bound.value)):
+        if (lower_bound is not None and isinf(lower_bound.value)) or (
+            upper_bound is not None and isinf(upper_bound.value)
+        ):
             raise ValueError("Illegal interval: Lower and upper bounds must be real numbers, or None if unbounded.")
         # Validate actual parameter:
         if isnan(actual) or actual == float("-inf") or actual == float("inf"):
