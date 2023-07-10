@@ -67,6 +67,6 @@ preferably one with a cat image.
 If you found any problems,
 select `Request Changes` instead.
 
-[guidelines-general]: guidelines.md
-[guidelines-tests]: guidelines.md#tests
+[guidelines-general]: project_guidelines.md
+[guidelines-tests]: project_guidelines.md#tests
 [github-review]: https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/reviewing-changes-in-pull-requests

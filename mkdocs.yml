@@ -15,7 +15,7 @@ nav:
   - Glossary: glossary.md
   - Development:
     - Environment: development/environment.md
-    - Project Guidelines: development/guidelines.md
+    - Project Guidelines: development/project_guidelines.md
     - Contributing: https://github.com/Safe-DS/Stdlib/contribute
     - Code Review Guide: development/code_review.md
 
