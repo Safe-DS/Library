@@ -11,9 +11,9 @@ when reviewing a pull request (PR).
 * Read the issue that was addressed by the PR and make sure you understand it
 * Read any discussions that occurred on the issue page
 
-### Check the Pull Request
+### Check the PR
 
-* Check the Pull Request for __completeness__: Was every point from the issue covered?
+* Check the PR for __completeness__: Was every point from the issue covered?
 * Check for __correctness__: Were the problems described in the issue solved in the intended way?
 * (For PRs that introduce new features:) Check the design - does it comply with our [project guidelines][guidelines-general]?
 * Check for potential bugs - edge cases, exceptions that may be raised in functions that were called etc.
@@ -35,7 +35,7 @@ However, you should always:
 * Make sure all tests actually ran through (pytest, linter, code coverage)
 * Make sure that the branch is up-to-date with the `main` branch, so you actually test the behaviour that will result once the feature branch is merged
 
-## Check the Pull Request format
+## Check the PR format
 
 * Check that the PR title starts with a fitting [type](https://github.com/Safe-DS/.github/blob/main/.github/CONTRIBUTING.md#types) (e.g. `feat`, `fix`, `docs`, ...)
 * Check that the changes introduced by the PR are documented in the PR message
