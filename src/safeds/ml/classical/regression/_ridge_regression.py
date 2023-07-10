@@ -3,6 +3,7 @@ from __future__ import annotations
 import warnings
 from typing import TYPE_CHECKING
 
+from safeds.exceptions import OutOfBoundsError, ClosedBound
 from sklearn.linear_model import Ridge as sk_Ridge
 
 from safeds.ml.classical._util_sklearn import fit, predict
@@ -26,14 +27,14 @@ class RidgeRegression(Regressor):
 
     Raises
     ------
-    ValueError
+    OutOfBoundsError
         If `alpha` is negative.
     """
 
     def __init__(self, *, alpha: float = 1.0) -> None:
         # Validation
         if alpha < 0:
-            raise ValueError("The parameter 'alpha' must be non-negative")
+            raise OutOfBoundsError(alpha, name="alpha", lower_bound=ClosedBound(0))
         if alpha == 0.0:
             warnings.warn(
                 (
