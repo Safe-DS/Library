@@ -801,6 +801,22 @@ class Table:
     # Transformations
     # ------------------------------------------------------------------------------------------------------------------
 
+    # This method is meant as a way to "cast" instances of subclasses of `Table` to a proper `Table`, dropping any
+    # additional constraints that might have to hold in the subclass.
+    # Override accordingly in subclasses.
+    def _as_table(self: Table) -> Table:
+        """
+        Transform the table to an instance of the Table class.
+
+        The original table is not modified.
+
+        Returns
+        -------
+        table: Table
+            The table, as an instance of the Table class.
+        """
+        return self
+
     def add_column(self, column: Column) -> Table:
         """
         Return the original table with the provided column attached at the end.
@@ -892,10 +908,11 @@ class Table:
         """
         Add a row to the table.
 
+        If the table happens to be empty beforehand, respective columns will be added automatically.
+
         The order of columns of the new row will be adjusted to the order of columns in the table.
         This table will contain the merged schema.
         This table is not modified.
-        If the table happens to be empty beforehand, respective features will be added automatically.
 
         Parameters
         ----------
@@ -1088,6 +1105,8 @@ class Table:
         ------
         UnknownColumnNameError
             If any of the given columns does not exist.
+        IllegalSchemaModificationError
+            If removing the columns would violate an invariant in the subclass.
 
         Examples
         --------
@@ -1131,6 +1150,8 @@ class Table:
         ------
         UnknownColumnNameError
             If any of the given columns does not exist.
+        IllegalSchemaModificationError
+            If removing the columns would violate an invariant in the subclass.
 
         Examples
         --------
@@ -1169,6 +1190,11 @@ class Table:
         table : Table
             A table without the columns that contain missing values.
 
+        Raises
+        ------
+        IllegalSchemaModificationError
+            If removing the columns would violate an invariant in the subclass.
+
         Examples
         --------
         >>> from safeds.data.tabular.containers import Table
@@ -1192,6 +1218,11 @@ class Table:
         -------
         table : Table
             A table without the columns that contain non-numerical values.
+
+        Raises
+        ------
+        IllegalSchemaModificationError
+            If removing the columns would violate an invariant in the subclass.
 
         Examples
         --------
@@ -1342,7 +1373,9 @@ class Table:
 
     def replace_column(self, old_column_name: str, new_columns: list[Column]) -> Table:
         """
-        Return a copy of the table with the specified old column replaced by a list of new columns. Keeps the order of columns.
+        Return a copy of the table with the specified old column replaced by a list of new columns.
+
+        The order of columns is kept.
 
         This table is not modified.
 
@@ -1363,12 +1396,12 @@ class Table:
         ------
         UnknownColumnNameError
             If the old column does not exist.
-
         DuplicateColumnNameError
             If at least one of the new columns already exists and the existing column is not affected by the replacement.
-
         ColumnSizeError
             If the size of at least one of the new columns does not match the amount of rows.
+        IllegalSchemaModificationError
+            If replacing the column would violate an invariant in the subclass.
 
         Examples
         --------
@@ -1486,7 +1519,7 @@ class Table:
         """
         Sort the columns of a `Table` with the given comparator and return a new `Table`.
 
-        The original table is not modified. The comparator is a function that takes two columns `col1` and `col2` and
+        The comparator is a function that takes two columns `col1` and `col2` and
         returns an integer:
 
         * If `col1` should be ordered before `col2`, the function should return a negative number.
@@ -1530,7 +1563,7 @@ class Table:
         """
         Sort the rows of a `Table` with the given comparator and return a new `Table`.
 
-        The original table is not modified. The comparator is a function that takes two rows `row1` and `row2` and
+        The comparator is a function that takes two rows `row1` and `row2` and
         returns an integer:
 
         * If `row1` should be ordered before `row2`, the function should return a negative number.
@@ -1706,6 +1739,8 @@ class Table:
         ------
         TransformerNotFittedError
             If the transformer has not been fitted yet.
+        IllegalSchemaModificationError
+            If replacing the column would violate an invariant in the subclass.
 
         Examples
         --------
