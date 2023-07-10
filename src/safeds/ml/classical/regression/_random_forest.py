@@ -2,9 +2,9 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from safeds.exceptions import OutOfBoundsError, ClosedBound
 from sklearn.ensemble import RandomForestRegressor as sk_RandomForestRegressor
 
+from safeds.exceptions import ClosedBound, OutOfBoundsError
 from safeds.ml.classical._util_sklearn import fit, predict
 
 from ._regressor import Regressor

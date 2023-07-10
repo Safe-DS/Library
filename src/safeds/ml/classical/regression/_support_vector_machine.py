@@ -3,9 +3,9 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
-from safeds.exceptions import OutOfBoundsError, OpenBound, ClosedBound
 from sklearn.svm import SVR as sk_SVR  # noqa: N811
 
+from safeds.exceptions import ClosedBound, OpenBound, OutOfBoundsError
 from safeds.ml.classical._util_sklearn import fit, predict
 from safeds.ml.classical.regression import Regressor
 

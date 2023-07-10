@@ -2,9 +2,9 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from safeds.exceptions import OutOfBoundsError, OpenBound
 from sklearn.ensemble import GradientBoostingRegressor as sk_GradientBoostingRegressor
 
+from safeds.exceptions import OpenBound, OutOfBoundsError
 from safeds.ml.classical._util_sklearn import fit, predict
 
 from ._regressor import Regressor

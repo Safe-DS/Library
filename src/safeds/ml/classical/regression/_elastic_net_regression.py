@@ -4,9 +4,9 @@ import warnings
 from typing import TYPE_CHECKING
 from warnings import warn
 
-from safeds.exceptions import ClosedBound, OutOfBoundsError
 from sklearn.linear_model import ElasticNet as sk_ElasticNet
 
+from safeds.exceptions import ClosedBound, OutOfBoundsError
 from safeds.ml.classical._util_sklearn import fit, predict
 
 from ._regressor import Regressor
@@ -49,10 +49,7 @@ class ElasticNetRegression(Regressor):
             )
         if lasso_ratio < 0 or lasso_ratio > 1:
             raise OutOfBoundsError(
-                lasso_ratio,
-                name="lasso_ratio",
-                lower_bound=ClosedBound(0),
-                upper_bound=ClosedBound(1)
+                lasso_ratio, name="lasso_ratio", lower_bound=ClosedBound(0), upper_bound=ClosedBound(1),
             )
         elif lasso_ratio == 0:
             warnings.warn(

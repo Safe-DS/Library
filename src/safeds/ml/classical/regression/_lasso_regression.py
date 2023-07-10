@@ -3,9 +3,9 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 from warnings import warn
 
-from safeds.exceptions import OutOfBoundsError, ClosedBound
 from sklearn.linear_model import Lasso as sk_Lasso
 
+from safeds.exceptions import ClosedBound, OutOfBoundsError
 from safeds.ml.classical._util_sklearn import fit, predict
 
 from ._regressor import Regressor

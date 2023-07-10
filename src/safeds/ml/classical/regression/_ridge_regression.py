@@ -3,9 +3,9 @@ from __future__ import annotations
 import warnings
 from typing import TYPE_CHECKING
 
-from safeds.exceptions import OutOfBoundsError, ClosedBound
 from sklearn.linear_model import Ridge as sk_Ridge
 
+from safeds.exceptions import ClosedBound, OutOfBoundsError
 from safeds.ml.classical._util_sklearn import fit, predict
 
 from ._regressor import Regressor
