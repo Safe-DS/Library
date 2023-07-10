@@ -46,7 +46,9 @@ class AdaBoost(Regressor):
         # Validation
         if maximum_number_of_learners <= 0:
             raise OutOfBoundsError(
-                maximum_number_of_learners, name="maximum_number_of_learners", lower_bound=OpenBound(0),
+                maximum_number_of_learners,
+                name="maximum_number_of_learners",
+                lower_bound=OpenBound(0),
             )
         if learning_rate <= 0:
             raise OutOfBoundsError(learning_rate, name="learning_rate", lower_bound=OpenBound(0))

@@ -49,7 +49,10 @@ class ElasticNetRegression(Regressor):
             )
         if lasso_ratio < 0 or lasso_ratio > 1:
             raise OutOfBoundsError(
-                lasso_ratio, name="lasso_ratio", lower_bound=ClosedBound(0), upper_bound=ClosedBound(1),
+                lasso_ratio,
+                name="lasso_ratio",
+                lower_bound=ClosedBound(0),
+                upper_bound=ClosedBound(1),
             )
         elif lasso_ratio == 0:
             warnings.warn(
