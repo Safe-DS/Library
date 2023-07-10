@@ -429,8 +429,8 @@ Examples
 
 ## Tests
 
-If a function contains more code
-than just the getting or setting of a value,
+We aim for 100% line coverage,
+so for any new function
 automated test should be added
 to the [`tests`][tests-folder] folder.
 The file structure in the tests folder
@@ -448,6 +448,8 @@ e.g. `test_should_add_column`.
 Tests should be parametrized
 using `@pytest.mark.parametrize`,
 even if there is only a single test case.
+This makes it easier
+to add new test cases in the future.
 Test cases should be given
 descriptive IDs.
 

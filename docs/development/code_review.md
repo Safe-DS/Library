@@ -17,7 +17,7 @@ when reviewing a pull request (PR).
 * Check for __correctness__: Were the problems described in the issue solved in the intended way?
 * (For PRs that introduce new features:) Check the design - does it comply with our [project guidelines][guidelines-general]?
 * Check for potential bugs - edge cases, exceptions that may be raised in functions that were called etc.
-* Check the code style: Is it readable? Do variables have sensible names? Is it consistent to existing code? Is there a better / more elegant way to do certain things (e.g. f-string instead of manual string concatenation)?
+* Check the code style: Is it readable? Do variables have sensible names? Is it consistent to existing code? Is there a better / more elegant way to do certain things (e.g. [f-string](https://docs.python.org/3/tutorial/inputoutput.html#tut-f-strings) instead of manual string concatenation)?
 * Check any warnings reported by your IDE
 
 ## Check the tests
@@ -65,16 +65,8 @@ If you like, you can add a "LGTM" meme
 from [lgtm.party](https://lgtm.party/),
 preferably one with a cat image.
 
-If no other reviewer suggested changes either,
-please also mark the corresponding issue
-as `Ready to merge` on the issue's page
-to update its status on the issue board.
-
 If you found any problems,
 select `Request Changes` instead.
-In this case, please also
-mark the corresponding issue
-as `In progress` again.
 
 [guidelines-general]: https://stdlib.safeds.com/en/stable/development/guidelines/
 [guidelines-tests]: https://stdlib.safeds.com/en/stable/development/guidelines/#tests
