@@ -14,4 +14,6 @@ from safeds.data.tabular.containers import Table
 def test_should_shuffle_rows(table: Table) -> None:
     result_table = table.shuffle_rows()
     assert table.schema == result_table.schema
-    assert table.sort_rows(lambda row1, row2: row1["col1"] - row2["col1"]) == result_table.sort_rows(lambda row1, row2: row1["col1"] - row2["col1"])
+    assert table.sort_rows(lambda row1, row2: row1["col1"] - row2["col1"]) == result_table.sort_rows(
+        lambda row1, row2: row1["col1"] - row2["col1"],
+    )
