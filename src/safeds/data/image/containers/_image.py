@@ -389,8 +389,9 @@ class Image:
 
         Parameters
         ----------
-        factor: The amount of sharpness to be applied to the image.
-        Factor 1.0 is considered to be neutral and does not make any changes.
+        factor : float
+            The amount of sharpness to be applied to the image. Factor 1.0 is considered to be neutral and does not make
+            any changes.
 
         Returns
         -------

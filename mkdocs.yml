@@ -3,6 +3,7 @@ repo_url: https://github.com/Safe-DS/Stdlib
 repo_name: Safe-DS/Stdlib
 edit_uri: edit/main/docs/
 site_url: !ENV READTHEDOCS_CANONICAL_URL
+strict: true
 
 nav:
   - Home:
