@@ -10,8 +10,8 @@ __all__ = [
     "ColumnType",
     "ImputerStrategy",
     "Integer",
+    "Nothing",
     "RealNumber",
     "Schema",
     "String",
-    "Nothing",
 ]
