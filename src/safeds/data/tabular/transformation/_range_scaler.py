@@ -17,6 +17,7 @@ class RangeScaler(InvertibleTableTransformer):
         The minimum of the new range after the transformation
     maximum : float
         The maximum of the new range after the transformation
+
     Raises
     ------
     ValueError

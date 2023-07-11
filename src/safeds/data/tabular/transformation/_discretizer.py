@@ -4,7 +4,13 @@ from sklearn.preprocessing import KBinsDiscretizer as sk_KBinsDiscretizer
 
 from safeds.data.tabular.containers import Table
 from safeds.data.tabular.transformation._table_transformer import TableTransformer
-from safeds.exceptions import NonNumericColumnError, TransformerNotFittedError, UnknownColumnNameError
+from safeds.exceptions import (
+    ClosedBound,
+    NonNumericColumnError,
+    OutOfBoundsError,
+    TransformerNotFittedError,
+    UnknownColumnNameError,
+)
 
 
 class Discretizer(TableTransformer):
@@ -18,7 +24,7 @@ class Discretizer(TableTransformer):
 
     Raises
     ------
-    ValueError
+    OutOfBoundsError
         If the given number_of_bins is less than 2.
     """
 
@@ -27,7 +33,7 @@ class Discretizer(TableTransformer):
         self._wrapped_transformer: sk_KBinsDiscretizer | None = None
 
         if number_of_bins < 2:
-            raise ValueError("Parameter 'number_of_bins' must be >= 2.")
+            raise OutOfBoundsError(number_of_bins, name="number_of_bins", lower_bound=ClosedBound(2))
         self._number_of_bins = number_of_bins
 
     def fit(self, table: Table, column_names: list[str] | None) -> Discretizer:
