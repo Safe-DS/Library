@@ -695,7 +695,7 @@ class Table:
     # Information
     # ------------------------------------------------------------------------------------------------------------------
 
-    def summary(self) -> Table:
+    def summarize_statistics(self) -> Table:
         """
         Return a table with a number of statistical key values.
 
@@ -710,7 +710,7 @@ class Table:
         --------
         >>> from safeds.data.tabular.containers import Table
         >>> table = Table.from_dict({"a": [1, 3], "b": [2, 4]})
-        >>> table.summary()
+        >>> table.summarize_statistics()
                       metrics                   a                   b
         0             maximum                   3                   4
         1             minimum                   1                   2
