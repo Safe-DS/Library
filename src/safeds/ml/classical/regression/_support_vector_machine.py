@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING
 
 from sklearn.svm import SVR as sk_SVR  # noqa: N811
 
+from safeds.exceptions import ClosedBound, OpenBound, OutOfBoundsError
 from safeds.ml.classical._util_sklearn import fit, predict
 from safeds.ml.classical.regression import Regressor
 
@@ -41,7 +42,7 @@ class SupportVectorMachine(Regressor):
 
     Raises
     ------
-    ValueError
+    OutOfBoundsError
         If `c` is less than or equal to 0.
     """
 
@@ -53,7 +54,7 @@ class SupportVectorMachine(Regressor):
 
         # Hyperparameters
         if c <= 0:
-            raise ValueError("The parameter 'c' has to be strictly positive.")
+            raise OutOfBoundsError(c, name="c", lower_bound=OpenBound(0))
         self._c = c
         self._kernel = kernel
 
@@ -97,7 +98,7 @@ class SupportVectorMachine(Regressor):
         class Polynomial(SupportVectorMachineKernel):
             def __init__(self, degree: int):
                 if degree < 1:
-                    raise ValueError("The parameter 'degree' has to be greater than or equal to 1.")
+                    raise OutOfBoundsError(degree, name="degree", lower_bound=ClosedBound(1))
                 self._degree = degree
 
             def get_sklearn_kernel(self) -> str:
