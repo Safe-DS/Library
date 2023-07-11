@@ -1595,7 +1595,7 @@ class Table:
         rows.sort(key=functools.cmp_to_key(comparator))
         return Table.from_rows(rows)
 
-    def split(self, percentage_in_first: float) -> tuple[Table, Table]:
+    def split_rows(self, percentage_in_first: float) -> tuple[Table, Table]:
         """
         Split the table into two new tables.
 
@@ -1621,7 +1621,7 @@ class Table:
         --------
         >>> from safeds.data.tabular.containers import Table
         >>> table = Table.from_dict({"temperature": [10, 15, 20, 25, 30], "sales": [54, 74, 90, 206, 210]})
-        >>> slices = table.split(0.4)
+        >>> slices = table.split_rows(0.4)
         >>> slices[0]
            temperature  sales
         0           10     54
