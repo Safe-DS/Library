@@ -1,9 +1,11 @@
 from __future__ import annotations
 
+import sys
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
-from sklearn.metrics import accuracy_score as sk_accuracy_score
+from matplotlib import pyplot as plt
+from sklearn.metrics import accuracy_score as sk_accuracy_score, roc_curve
 
 from safeds.data.tabular.containers import Table, TaggedTable, Row
 from safeds.exceptions import UntaggedTableError
@@ -232,7 +234,7 @@ class Classifier(ABC):
             return 1.0
         return 2 * n_true_positives / (2 * n_true_positives + n_false_positives + n_false_negatives)
 
-    def roc_curve(self, validation_or_test_set: TaggedTable, positive_class: Any) -> Table:
+    def roc_curve(self, validation_or_test_set: TaggedTable) -> Table:
         """
         Compute the classifier's roc_curve on the given data.
 
@@ -253,14 +255,22 @@ class Classifier(ABC):
             raise UntaggedTableError
 
         expected_values = validation_or_test_set.target
-        roc_curve = Table({})
+        predicted_values = self.predict(validation_or_test_set.features).target
 
-        for i in expected_values.number_of_rows():
-            roc = self.accuracy(validation_or_test_set.slice_rows(end=i), positive_class) + self.recall(validation_or_test_set..slice_rows(end=i), positive_class) - 1
-            roc_curve.add_row(Row({"col1": roc}))
+        y_expected_values = []
+        y_predicted_values = []
+        for row in expected_values:
+            y_expected_values.append(row)
+        for row in predicted_values:
+            y_predicted_values.append(row)
 
-        print("\nRow:", Row({"col1": roc}))
-        print("\nroc:", roc)
-        print("\ncurve:", roc_curve)
+        roc_table = Table()
 
-        return roc_curve
+        fpr, tpr, thresholds = roc_curve(y_expected_values, y_predicted_values)
+
+        i = 0
+        while i < len(fpr):
+            roc_table = roc_table.add_row(Row.from_dict({"fpr": fpr[i], "tpr": tpr[i]}))
+            i += 1
+
+        return roc_table

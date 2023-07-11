@@ -476,12 +476,25 @@ class TestF1Score:
             DummyClassifier().f1_score(table, 1)  # type: ignore[arg-type]
 
 class TestRocCurve:
-    def test_should_compare_result(self) -> None:
-        table = Table(
-            {
-                "predicted": [1, 1, 0, 2],
-                "expected": [1, 0, 1, 2],
-            },
-        ).tag_columns(target_name="expected")
-
-        assert DummyClassifier().roc_curve(table, 1) == 0.5
+    @pytest.mark.parametrize(
+        ("table", "roc_curve"),
+        [
+            (
+                Table(
+                    {
+                        "predicted": [0, 1, 0, 1],
+                        "expected": [0, 1, 1, 0],
+                    },
+                ).tag_columns(target_name="expected"),
+                Table(
+                    {
+                        "fpr": [0.0, 0.5, 1.0],
+                        "tpr": [0.0, 0.5, 1.0],
+                    },
+                ),
+             )
+        ],
+        ids=["untagged_table"],
+    )
+    def test_should_compare_result(self, table: Table, roc_curve: Table) -> None:
+        assert DummyClassifier().roc_curve(table) == roc_curve
