@@ -3,7 +3,6 @@
 
 ### Features
 
-* 290 properties for width-height of image ([#359](https://github.com/Safe-DS/Stdlib/issues/359)) ([d9ebdc1](https://github.com/Safe-DS/Stdlib/commit/d9ebdc1e3deef986026abf5d90c57376dbac23ee)), closes [#290](https://github.com/Safe-DS/Stdlib/issues/290)
 * Add `find_edges` method to `Image` class ([#383](https://github.com/Safe-DS/Stdlib/issues/383)) ([d14b6ce](https://github.com/Safe-DS/Stdlib/commit/d14b6ce281c8b1324f727c45ca13b99b6f9ed2a2)), closes [#288](https://github.com/Safe-DS/Stdlib/issues/288)
 * Add `StandardScaler` transformer ([#316](https://github.com/Safe-DS/Stdlib/issues/316)) ([57b0572](https://github.com/Safe-DS/Stdlib/commit/57b057289ee5c862422df7d85e4fe72047567b7f)), closes [#142](https://github.com/Safe-DS/Stdlib/issues/142)
 * Add docstrings to the getter methods for hyperparameters in Regression and Classification models ([#371](https://github.com/Safe-DS/Stdlib/issues/371)) ([9073f04](https://github.com/Safe-DS/Stdlib/commit/9073f04cd339fc2146ea04339ed14688f29b336f)), closes [#313](https://github.com/Safe-DS/Stdlib/issues/313)
@@ -21,6 +20,7 @@
 * improve `table.summary`. Catch `ValueError` thrown by `column.stability` ([#390](https://github.com/Safe-DS/Stdlib/issues/390)) ([dbbe0e3](https://github.com/Safe-DS/Stdlib/commit/dbbe0e3a6ebd2f22c386c13a3cc53184e531f837)), closes [#320](https://github.com/Safe-DS/Stdlib/issues/320)
 * improve error handling of `column.stability` when given a column that contains only None ([#388](https://github.com/Safe-DS/Stdlib/issues/388)) ([1da2499](https://github.com/Safe-DS/Stdlib/commit/1da24992d02a3cbcea12fef0b78004d99403beb0)), closes [#319](https://github.com/Safe-DS/Stdlib/issues/319)
 * Improve Error Handling of classifiers and regressors ([#355](https://github.com/Safe-DS/Stdlib/issues/355)) ([66f5f64](https://github.com/Safe-DS/Stdlib/commit/66f5f647820b3bf36a6041f04d6e8547170b1c81)), closes [#153](https://github.com/Safe-DS/Stdlib/issues/153)
+* properties for width-height of image ([#359](https://github.com/Safe-DS/Stdlib/issues/359)) ([d9ebdc1](https://github.com/Safe-DS/Stdlib/commit/d9ebdc1e3deef986026abf5d90c57376dbac23ee)), closes [#290](https://github.com/Safe-DS/Stdlib/issues/290)
 * Resize image ([#354](https://github.com/Safe-DS/Stdlib/issues/354)) ([3a971ca](https://github.com/Safe-DS/Stdlib/commit/3a971ca3c88b86d7a780d3f163a2ee86ab35b98c)), closes [#283](https://github.com/Safe-DS/Stdlib/issues/283)
 * rotate_left and rotate_right added to Image ([#361](https://github.com/Safe-DS/Stdlib/issues/361)) ([c877530](https://github.com/Safe-DS/Stdlib/commit/c8775306deffe826cb14d0fe177e0c09aa4204fd)), closes [#281](https://github.com/Safe-DS/Stdlib/issues/281)
 * set kernel of support vector machine ([#350](https://github.com/Safe-DS/Stdlib/issues/350)) ([1326f40](https://github.com/Safe-DS/Stdlib/commit/1326f40a260437a373711c7c65a986bcfa321980)), closes [#172](https://github.com/Safe-DS/Stdlib/issues/172)

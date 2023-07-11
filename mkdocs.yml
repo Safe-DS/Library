@@ -1,6 +1,9 @@
 site_name: Safe-DS Python Library
 repo_url: https://github.com/Safe-DS/Stdlib
 repo_name: Safe-DS/Stdlib
+edit_uri: edit/main/docs/
+site_url: !ENV READTHEDOCS_CANONICAL_URL
+strict: true
 
 nav:
   - Home:
@@ -15,8 +18,9 @@ nav:
   - Glossary: glossary.md
   - Development:
     - Environment: development/environment.md
-    - Guidelines: development/guidelines.md
+    - Project Guidelines: development/project_guidelines.md
     - Contributing: https://github.com/Safe-DS/Stdlib/contribute
+    - Code Review Guide: development/code_review.md
 
 # Configuration of MkDocs & Material for MkDocs --------------------------------
 

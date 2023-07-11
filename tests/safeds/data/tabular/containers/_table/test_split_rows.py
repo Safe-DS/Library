@@ -34,7 +34,7 @@ def test_should_split_table(
     result_train_table: Table,
     percentage_in_first: int,
 ) -> None:
-    train_table, test_table = table.split(percentage_in_first)
+    train_table, test_table = table.split_rows(percentage_in_first)
     assert result_test_table == test_table
     assert result_train_table.schema == train_table.schema
     assert result_train_table == train_table
@@ -52,10 +52,10 @@ def test_should_raise_if_value_not_in_range(percentage_in_first: float) -> None:
     table = Table({"col1": [1, 2, 1], "col2": [1, 2, 4]})
 
     with pytest.raises(ValueError, match=r"The given percentage is not between 0 and 1"):
-        table.split(percentage_in_first)
+        table.split_rows(percentage_in_first)
 
 
 def test_should_split_empty_table() -> None:
-    t1, t2 = Table().split(0.4)
+    t1, t2 = Table().split_rows(0.4)
     assert t1.number_of_rows == 0
     assert t2.number_of_rows == 0
