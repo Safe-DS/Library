@@ -453,7 +453,7 @@ class Row(Mapping[str, Any]):
         """
         Sort the columns of a `Row` with the given comparator and return a new `Row`.
 
-        The original row is not modified. The comparator is a function that takes two Tuples of (ColumnName: Value) `col1` and `col2` and
+        The original row is not modified. The comparator is a function that takes two tuples of (ColumnName, Value) `col1` and `col2` and
         returns an integer:
 
         * If `col1` should be ordered before `col2`, the function should return a negative number.
@@ -464,8 +464,8 @@ class Row(Mapping[str, Any]):
 
         Parameters
         ----------
-        comparator : Callable[[Tuple, Tuple], int]
-            The function used to compare two Tuples of (ColumnName: Value).
+        comparator : Callable[[tuple, tuple], int]
+            The function used to compare two tuples of (ColumnName, Value).
 
         Returns
         -------

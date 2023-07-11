@@ -30,7 +30,7 @@ class ColumnType(ABC):
     @staticmethod
     def _data_type(data: pd.Series) -> ColumnType:
         """
-        Return the column type for a given `numpy` data type.
+        Return the column type for a given `Series` from `pandas`.
 
         Parameters
         ----------

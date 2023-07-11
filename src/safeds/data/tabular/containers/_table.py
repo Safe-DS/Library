@@ -911,7 +911,8 @@ class Table:
         If the table happens to be empty beforehand, respective columns will be added automatically.
 
         The order of columns of the new row will be adjusted to the order of columns in the table.
-        This table will contain the merged schema.
+        The new table will contain the merged schema.
+        
         This table is not modified.
 
         Parameters
@@ -964,7 +965,9 @@ class Table:
         Add multiple rows to a table.
 
         The order of columns of the new rows will be adjusted to the order of columns in the table.
-        This table will contain the merged schema.
+        The new table will contain the merged schema.
+        
+        This table is not modified.
 
         Parameters
         ----------
