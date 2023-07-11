@@ -18,7 +18,14 @@ class ColumnType(ABC):
 
     @abstractmethod
     def __init__(self, is_nullable: bool = False) -> None:
-        pass
+        """
+        Abstract initializer for ColumnType.
+
+        Parameters
+        ----------
+        is_nullable
+            Whether the columntype is nullable.
+        """
 
     @staticmethod
     def _data_type(data: pd.Series) -> ColumnType:
