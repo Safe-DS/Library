@@ -265,13 +265,13 @@ Passing values that are commonly used together around separately is tedious, ver
 !!! success "**DO** (client code):"
 
     ```py
-    training_data, validation_data = split(full_data)
+    training_data, validation_data = split_rows(full_data)
     ```
 
 !!! failure "**DON'T** (client code):"
 
     ```py
-    training_feature_vectors, validation_feature_vectors, training_target_values, validation_target_values = split(feature_vectors, target_values)
+    training_feature_vectors, validation_feature_vectors, training_target_values, validation_target_values = split_rows(feature_vectors, target_values)
     ```
 
 ## Docstrings

@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING
 
 from sklearn.ensemble import AdaBoostRegressor as sk_AdaBoostRegressor
 
+from safeds.exceptions import ClosedBound, OpenBound, OutOfBoundsError
 from safeds.ml.classical._util_sklearn import fit, predict
 
 from ._regressor import Regressor
@@ -31,8 +32,8 @@ class AdaBoost(Regressor):
 
     Raises
     ------
-    ValueError
-        If `maximum_number_of_learners` or `learning_rate` are less than or equal to 0
+    OutOfBoundsError
+        If `maximum_number_of_learners` or `learning_rate` are less than or equal to 0.
     """
 
     def __init__(
@@ -43,10 +44,14 @@ class AdaBoost(Regressor):
         learning_rate: float = 1.0,
     ) -> None:
         # Validation
-        if maximum_number_of_learners <= 0:
-            raise ValueError("The parameter 'maximum_number_of_learners' has to be grater than 0.")
+        if maximum_number_of_learners < 1:
+            raise OutOfBoundsError(
+                maximum_number_of_learners,
+                name="maximum_number_of_learners",
+                lower_bound=ClosedBound(1),
+            )
         if learning_rate <= 0:
-            raise ValueError("The parameter 'learning_rate' has to be greater than 0.")
+            raise OutOfBoundsError(learning_rate, name="learning_rate", lower_bound=OpenBound(0))
 
         # Hyperparameters
         self._learner = learner

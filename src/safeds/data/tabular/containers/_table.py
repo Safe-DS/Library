@@ -695,7 +695,7 @@ class Table:
     # Information
     # ------------------------------------------------------------------------------------------------------------------
 
-    def summary(self) -> Table:
+    def summarize_statistics(self) -> Table:
         """
         Return a table with a number of statistical key values.
 
@@ -710,7 +710,7 @@ class Table:
         --------
         >>> from safeds.data.tabular.containers import Table
         >>> table = Table.from_dict({"a": [1, 3], "b": [2, 4]})
-        >>> table.summary()
+        >>> table.summarize_statistics()
                       metrics                   a                   b
         0             maximum                   3                   4
         1             minimum                   1                   2
@@ -1048,7 +1048,7 @@ class Table:
 
     _T = TypeVar("_T")
 
-    def group_by(self, key_selector: Callable[[Row], _T]) -> dict[_T, Table]:
+    def group_rows_by(self, key_selector: Callable[[Row], _T]) -> dict[_T, Table]:
         """
         Return a dictionary with the output tables as values and the keys from the key_selector.
 
@@ -1595,7 +1595,7 @@ class Table:
         rows.sort(key=functools.cmp_to_key(comparator))
         return Table.from_rows(rows)
 
-    def split(self, percentage_in_first: float) -> tuple[Table, Table]:
+    def split_rows(self, percentage_in_first: float) -> tuple[Table, Table]:
         """
         Split the table into two new tables.
 
@@ -1621,7 +1621,7 @@ class Table:
         --------
         >>> from safeds.data.tabular.containers import Table
         >>> table = Table.from_dict({"temperature": [10, 15, 20, 25, 30], "sales": [54, 74, 90, 206, 210]})
-        >>> slices = table.split(0.4)
+        >>> slices = table.split_rows(0.4)
         >>> slices[0]
            temperature  sales
         0           10     54
