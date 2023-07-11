@@ -3,8 +3,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
-from safeds.data.tabular.exceptions import UnknownColumnNameError
 from safeds.data.tabular.typing._column_type import ColumnType
+from safeds.exceptions import UnknownColumnNameError
 
 if TYPE_CHECKING:
     import pandas as pd
@@ -19,12 +19,128 @@ class Schema:
     ----------
     schema : dict[str, ColumnType]
         Map from column names to data types.
+
+    Examples
+    --------
+    >>> from safeds.data.tabular.typing import Integer, Schema, String
+    >>> schema = Schema({"A": Integer(), "B": String()})
     """
 
     _schema: dict[str, ColumnType]
 
+    # ------------------------------------------------------------------------------------------------------------------
+    # Creation
+    # ------------------------------------------------------------------------------------------------------------------
+
+    @staticmethod
+    def _from_pandas_dataframe(dataframe: pd.DataFrame) -> Schema:
+        """
+        Create a schema from a `pandas.DataFrame`.
+
+        Parameters
+        ----------
+        dataframe : pd.DataFrame
+            The dataframe.
+
+        Returns
+        -------
+        schema : Schema
+            The schema.
+        """
+        names = dataframe.columns
+        # noinspection PyProtectedMember
+        types = (ColumnType._from_numpy_data_type(data_type) for data_type in dataframe.dtypes)
+
+        return Schema(dict(zip(names, types, strict=True)))
+
+    # ------------------------------------------------------------------------------------------------------------------
+    # Dunder methods
+    # ------------------------------------------------------------------------------------------------------------------
+
     def __init__(self, schema: dict[str, ColumnType]):
         self._schema = dict(schema)  # Defensive copy
+
+    def __hash__(self) -> int:
+        """
+        Return a hash value for the schema.
+
+        Returns
+        -------
+        hash : int
+            The hash value.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.typing import Integer, Schema, String
+        >>> schema = Schema({"A": Integer(), "B": String()})
+        >>> hash_value = hash(schema)
+        """
+        column_names = self._schema.keys()
+        column_types = map(repr, self._schema.values())
+        return hash(tuple(zip(column_names, column_types, strict=True)))
+
+    def __repr__(self) -> str:
+        """
+        Return an unambiguous string representation of this row.
+
+        Returns
+        -------
+        representation : str
+            The string representation.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.typing import Integer, Schema, String
+        >>> schema = Schema({"A": Integer()})
+        >>> repr(schema)
+        "Schema({'A': Integer})"
+        """
+        return f"Schema({str(self)})"
+
+    def __str__(self) -> str:
+        """
+        Return a user-friendly string representation of the schema.
+
+        Returns
+        -------
+        string : str
+            The string representation.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.typing import Integer, Schema, String
+        >>> schema = Schema({"A": Integer()})
+        >>> str(schema)
+        "{'A': Integer}"
+        """
+        match len(self._schema):
+            case 0:
+                return "{}"
+            case 1:
+                return str(self._schema)
+            case _:
+                lines = (f"    {name!r}: {type_}" for name, type_ in self._schema.items())
+                joined = ",\n".join(lines)
+                return f"{{\n{joined}\n}}"
+
+    @property
+    def column_names(self) -> list[str]:
+        """
+        Return a list of all column names saved in this schema.
+
+        Returns
+        -------
+        column_names : list[str]
+            The column names.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.typing import Integer, Schema, String
+        >>> schema = Schema({"A": Integer(), "B": String()})
+        >>> schema.column_names
+        ['A', 'B']
+        """
+        return list(self._schema.keys())
 
     def has_column(self, column_name: str) -> bool:
         """
@@ -39,10 +155,20 @@ class Schema:
         -------
         contains : bool
             True if the schema contains the column.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.typing import Integer, Schema, String
+        >>> schema = Schema({"A": Integer(), "B": String()})
+        >>> schema.has_column("A")
+        True
+
+        >>> schema.has_column("C")
+        False
         """
         return column_name in self._schema
 
-    def get_type_of_column(self, column_name: str) -> ColumnType:
+    def get_column_type(self, column_name: str) -> ColumnType:
         """
         Return the type of the given column.
 
@@ -58,83 +184,58 @@ class Schema:
 
         Raises
         ------
-        ColumnNameError
-            If the specified target column name does not exist.
+        UnknownColumnNameError
+            If the specified column name does not exist.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.typing import Integer, Schema, String
+        >>> schema = Schema({"A": Integer(), "B": String()})
+        >>> schema.get_column_type("A")
+        Integer
         """
         if not self.has_column(column_name):
             raise UnknownColumnNameError([column_name])
         return self._schema[column_name]
 
-    def _get_column_index_by_name(self, column_name: str) -> int:
-        """
-         Return the index of the column with specified column name.
+    # ------------------------------------------------------------------------------------------------------------------
+    # Conversion
+    # ------------------------------------------------------------------------------------------------------------------
 
-        Parameters
-        ----------
-         column_name : str
-             The name of the column.
+    def to_dict(self) -> dict[str, ColumnType]:
+        """
+        Return a dictionary that maps column names to column types.
 
         Returns
         -------
-        index : int
-             The index of the column.
-        """
-        return list(self._schema.keys()).index(column_name)
+        data : dict[str, ColumnType]
+            Dictionary representation of the schema.
 
-    @staticmethod
-    def _from_dataframe(dataframe: pd.DataFrame) -> Schema:
+        Examples
+        --------
+        >>> from safeds.data.tabular.typing import Integer, Schema, String
+        >>> schema = Schema({"A": Integer(), "B": String()})
+        >>> schema.to_dict()
+        {'A': Integer, 'B': String}
         """
-        Construct a TableSchema from a Dataframe. This function is not supposed to be exposed to the user.
+        return dict(self._schema)  # defensive copy
 
-        Parameters
-        ----------
-        dataframe : pd.DataFrame
-            The Dataframe used to construct the TableSchema.
+    # ------------------------------------------------------------------------------------------------------------------
+    # IPython Integration
+    # ------------------------------------------------------------------------------------------------------------------
+
+    def _repr_markdown_(self) -> str:
+        """
+        Return a Markdown representation of the schema.
 
         Returns
         -------
-        _from_dataframe: Schema
-            The constructed TableSchema.
-
+        markdown : str
+            The Markdown representation.
         """
-        names = dataframe.columns
-        # noinspection PyProtectedMember
-        types = (ColumnType._from_numpy_dtype(dtype) for dtype in dataframe.dtypes)
+        if len(self._schema) == 0:
+            return "Empty Schema"
 
-        return Schema(dict(zip(names, types, strict=True)))
-
-    def get_column_names(self) -> list[str]:
-        """
-        Return a list of all column names saved in this schema.
-
-        Returns
-        -------
-        column_names : list[str]
-            The column names.
-        """
-        return list(self._schema.keys())
-
-    def __str__(self) -> str:
-        """
-        Return a print-string for the TableSchema.
-
-        Returns
-        -------
-        output_string : str
-            The string.
-        """
-        column_count = len(self._schema)
-        output_string = f"TableSchema:\nColumn Count: {column_count}\nColumns:\n"
-        for column_name, data_type in self._schema.items():
-            output_string += f"    {column_name}: {data_type}\n"
-        return output_string
-
-    def __repr__(self) -> str:
-        return self.__str__()
-
-    def __eq__(self, o: object) -> bool:
-        if not isinstance(o, Schema):
-            return NotImplemented
-        if self is o:
-            return True
-        return self._schema == o._schema
+        lines = (f"| {name} | {type_} |" for name, type_ in self._schema.items())
+        joined = "\n".join(lines)
+        return f"| Column Name | Column Type |\n| --- | --- |\n{joined}"

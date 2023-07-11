@@ -1,33 +1,47 @@
 import pytest
 from safeds.data.tabular.containers import Column, Table
-from safeds.data.tabular.exceptions import ColumnSizeError, DuplicateColumnNameError
-from safeds.data.tabular.typing import ColumnType, Integer, String
+from safeds.exceptions import ColumnSizeError, DuplicateColumnNameError
 
 
 @pytest.mark.parametrize(
-    ("column", "col_type"),
+    ("table1", "column", "expected"),
     [
-        (Column("col3", ["a", "b", "c"]), String()),
-        (Column("col3", [0, -1, -2]), Integer()),
+        (
+            Table({"col1": [1, 2, 1], "col2": [1, 2, 4]}),
+            Column("col3", ["a", "b", "c"]),
+            Table({"col1": [1, 2, 1], "col2": [1, 2, 4], "col3": ["a", "b", "c"]}),
+        ),
+        (
+            Table({"col1": [1, 2, 1], "col2": [1, 2, 4]}),
+            Column("col3", [0, -1, -2]),
+            Table({"col1": [1, 2, 1], "col2": [1, 2, 4], "col3": [0, -1, -2]}),
+        ),
+        (
+            Table({}),
+            Column("col3", []),
+            Table({"col3": []}),
+        ),
+        (
+            Table({}),
+            Column("col3", [1]),
+            Table({"col3": [1]}),
+        ),
     ],
+    ids=["String", "Integer", "empty with empty column", "empty with filled column"],
 )
-def test_add_column_valid(column: Column, col_type: ColumnType) -> None:
-    table1 = Table.from_dict({"col1": [1, 2, 1], "col2": [1, 2, 4]})
+def test_should_add_column(table1: Table, column: Column, expected: Table) -> None:
     table1 = table1.add_column(column)
-    assert table1.count_columns() == 3
-    assert table1.get_column("col3") == column
-    assert isinstance(table1.schema.get_type_of_column("col1"), Integer)
-    assert isinstance(table1.schema.get_type_of_column("col2"), Integer)
-    assert isinstance(table1.schema.get_type_of_column("col3"), type(col_type))
+    # assert table1.schema == expected.schema
+    assert table1 == expected
 
 
-def test_add_column_invalid_duplicate_column_name_error() -> None:
-    table1 = Table.from_dict({"col1": [1, 2, 1], "col2": [1, 2, 4]})
-    with pytest.raises(DuplicateColumnNameError):
-        table1 = table1.add_column(Column("col1", ["a", "b", "c"]))
+def test_should_raise_error_if_column_name_exists() -> None:
+    table1 = Table({"col1": [1, 2, 1], "col2": [1, 2, 4]})
+    with pytest.raises(DuplicateColumnNameError, match=r"Column 'col1' already exists."):
+        table1.add_column(Column("col1", ["a", "b", "c"]))
 
 
-def test_add_column_invalid_column_size_error() -> None:
-    table1 = Table.from_dict({"col1": [1, 2, 1], "col2": [1, 2, 4]})
-    with pytest.raises(ColumnSizeError):
-        table1 = table1.add_column(Column("col3", ["a", "b", "c", "d"]))
+def test_should_raise_error_if_column_size_invalid() -> None:
+    table1 = Table({"col1": [1, 2, 1], "col2": [1, 2, 4]})
+    with pytest.raises(ColumnSizeError, match=r"Expected a column of size 3 but got column of size 4."):
+        table1.add_column(Column("col3", ["a", "b", "c", "d"]))

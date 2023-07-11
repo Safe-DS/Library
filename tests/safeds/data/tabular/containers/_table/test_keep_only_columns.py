@@ -1,45 +1,54 @@
 import pytest
 from safeds.data.tabular.containers import Table
-from safeds.data.tabular.exceptions import UnknownColumnNameError
+from safeds.exceptions import UnknownColumnNameError
 
 
-class TestKeepOnlyColumns:
-    @pytest.mark.parametrize(
-        ("table", "column_names", "expected"),
-        [
-            (
-                Table.from_dict({"A": [1], "B": [2]}),
-                [],
-                Table.from_dict({}),
-            ),
-            (
-                Table.from_dict({"A": [1], "B": [2]}),
-                ["A"],
-                Table.from_dict({"A": [1]}),
-            ),
-            (
-                Table.from_dict({"A": [1], "B": [2]}),
-                ["B"],
-                Table.from_dict({"B": [2]}),
-            ),
-            (
-                Table.from_dict({"A": [1], "B": [2]}),
-                ["A", "B"],
-                Table.from_dict({"A": [1], "B": [2]}),
-            ),
-            # Related to https://github.com/Safe-DS/Stdlib/issues/115
-            (
-                Table.from_dict({"A": [1], "B": [2], "C": [3]}),
-                ["C", "A"],
-                Table.from_dict({"C": [3], "A": [1]}),
-            ),
-        ],
-    )
-    def test_should_keep_only_listed_columns(self, table: Table, column_names: list[str], expected: Table) -> None:
-        transformed_table = table.keep_only_columns(column_names)
-        assert transformed_table == expected
+@pytest.mark.parametrize(
+    ("table", "column_names", "expected"),
+    [
+        (
+            Table({"A": [1], "B": [2]}),
+            [],
+            Table(),
+        ),
+        (
+            Table({"A": [1], "B": [2]}),
+            ["A"],
+            Table({"A": [1]}),
+        ),
+        (
+            Table({"A": [1], "B": [2]}),
+            ["B"],
+            Table({"B": [2]}),
+        ),
+        (
+            Table({"A": [1], "B": [2]}),
+            ["A", "B"],
+            Table({"A": [1], "B": [2]}),
+        ),
+        # Related to https://github.com/Safe-DS/Stdlib/issues/115
+        (
+            Table({"A": [1], "B": [2], "C": [3]}),
+            ["C", "A"],
+            Table({"C": [3], "A": [1]}),
+        ),
+        (
+            Table(),
+            [],
+            Table(),
+        ),
+    ],
+    ids=["No Column Name", "First Column", "Second Column", "All columns", "Last and first columns", "empty"],
+)
+def test_should_keep_only_listed_columns(table: Table, column_names: list[str], expected: Table) -> None:
+    transformed_table = table.keep_only_columns(column_names)
+    assert transformed_table.schema == expected.schema
+    assert transformed_table == expected
+    if len(column_names) == 0:
+        assert expected.number_of_rows == 0
 
-    def test_should_raise_if_column_does_no_exist(self) -> None:
-        table = Table.from_dict({"A": [1], "B": [2]})
-        with pytest.raises(UnknownColumnNameError):
-            table.keep_only_columns(["C"])
+
+@pytest.mark.parametrize("table", [Table({"A": [1], "B": [2]}), Table()], ids=["table", "empty"])
+def test_should_raise_error_if_column_name_unknown(table: Table) -> None:
+    with pytest.raises(UnknownColumnNameError, match=r"Could not find column\(s\) 'C'"):
+        table.keep_only_columns(["C"])

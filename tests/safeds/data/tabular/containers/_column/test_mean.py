@@ -1,16 +1,38 @@
 import pytest
-from safeds.data.tabular.containers import Table
-from safeds.data.tabular.exceptions import NonNumericColumnError
+from safeds.data.tabular.containers import Column
+from safeds.exceptions import NonNumericColumnError
 
 
-def test_mean_invalid() -> None:
-    table = Table.from_dict({"col1": ["col1_1", 2]})
-    column = table.get_column("col1")
+@pytest.mark.parametrize(
+    ("values", "expected"),
+    [
+        ([1, 2, 3], 2),
+        ([1, 2, 3, None], 2),
+    ],
+    ids=[
+        "no missing values",
+        "some missing values",
+    ],
+)
+def test_should_return_the_mean_value(values: list, expected: int) -> None:
+    column = Column("A", values)
+    assert column.mean() == expected
+
+
+@pytest.mark.parametrize(
+    "values",
+    [
+        [],
+        ["a", "b", "c"],
+        [None, None, None],
+    ],
+    ids=[
+        "empty",
+        "non-numeric",
+        "all missing values",
+    ],
+)
+def test_should_raise_if_column_is_not_numeric(values: list) -> None:
+    column = Column("A", values)
     with pytest.raises(NonNumericColumnError):
         column.mean()
-
-
-def test_mean_valid() -> None:
-    table = Table.from_dict({"col1": [1, 2, 3, 4]})
-    column = table.get_column("col1")
-    assert column.mean() == 2.5

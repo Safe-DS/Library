@@ -11,13 +11,17 @@ nav:
     - README.md
     - Changelog: CHANGELOG.md
   - Tutorials:
+    - Getting started: tutorials/getting_started.ipynb
     - Data Processing: tutorials/data_processing.ipynb
     - Data Visualization: tutorials/data_visualization.ipynb
     - Machine Learning: tutorials/machine_learning.ipynb
   - API Reference: reference/
+  - Glossary: glossary.md
   - Development:
     - Environment: development/environment.md
-    - Guidelines: development/guidelines.md
+    - Project Guidelines: development/project_guidelines.md
+    - Contributing: https://github.com/Safe-DS/Stdlib/contribute
+    - Code Review Guide: development/code_review.md
 
 # Configuration of MkDocs & Material for MkDocs --------------------------------
 
@@ -90,6 +94,7 @@ markdown_extensions:
       anchor_linenums: true
   - pymdownx.inlinehilite
   - pymdownx.snippets
+
 
   # Diagrams
   - pymdownx.superfences:

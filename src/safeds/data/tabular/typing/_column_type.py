@@ -11,6 +11,38 @@ if TYPE_CHECKING:
 class ColumnType(ABC):
     """Abstract base class for column types."""
 
+    @staticmethod
+    def _from_numpy_data_type(data_type: np.dtype) -> ColumnType:
+        """
+        Return the column type for a given `numpy` data type.
+
+        Parameters
+        ----------
+        data_type : numpy.dtype
+            The `numpy` data type.
+
+        Returns
+        -------
+        column_type : ColumnType
+            The ColumnType.
+
+        Raises
+        ------
+        NotImplementedError
+            If the given data type is not supported.
+        """
+        if data_type.kind in ("u", "i"):
+            return Integer()
+        if data_type.kind == "b":
+            return Boolean()
+        if data_type.kind == "f":
+            return RealNumber()
+        if data_type.kind in ("S", "U", "O", "M", "m"):
+            return String()
+
+        message = f"Unsupported numpy data type '{data_type}'."
+        raise NotImplementedError(message)
+
     @abstractmethod
     def is_nullable(self) -> bool:
         """
@@ -32,36 +64,6 @@ class ColumnType(ABC):
         is_numeric : bool
             True if the column is numeric.
         """
-
-    @staticmethod
-    def _from_numpy_dtype(dtype: np.dtype) -> ColumnType:
-        """
-        Return the column type for a given numpy dtype.
-
-        Parameters
-        ----------
-        dtype : numpy.dtype
-            The numpy dtype.
-
-        Returns
-        -------
-        column_type : ColumnType
-            The ColumnType.
-
-        Raises
-        ------
-        TypeError
-            If the given dtype is not supported.
-        """
-        if dtype.kind in ("u", "i"):
-            return Integer()
-        if dtype.kind == "b":
-            return Boolean()
-        if dtype.kind == "f":
-            return RealNumber()
-        if dtype.kind in ("S", "U", "O", "M", "m"):
-            return String()
-        raise TypeError("Unexpected column type")
 
 
 @dataclass

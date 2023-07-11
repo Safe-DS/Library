@@ -1,20 +1,39 @@
 import pytest
 from safeds.data.tabular.containers import Table
-from safeds.data.tabular.exceptions import UnknownColumnNameError
-
-from tests.helpers import resolve_resource_path
+from safeds.exceptions import UnknownColumnNameError
 
 
-def test_transform_column_valid() -> None:
-    input_table: Table = Table.from_csv_file(resolve_resource_path("test_table_transform_column.csv"))
+@pytest.mark.parametrize(
+    ("table", "table_transformed"),
+    [
+        (
+            Table({"A": [1, 2, 3], "B": [4, 5, 6], "C": ["a", "b", "c"]}),
+            Table({"A": [2, 4, 6], "B": [4, 5, 6], "C": ["a", "b", "c"]}),
+        ),
+    ],
+    ids=["multiply by 2"],
+)
+def test_should_transform_column(table: Table, table_transformed: Table) -> None:
+    result = table.transform_column("A", lambda row: row.get_value("A") * 2)
 
-    result: Table = input_table.transform_column("A", lambda row: row.get_value("A") * 2)
+    assert result.schema == table_transformed.schema
+    assert result == table_transformed
 
-    assert result == Table.from_csv_file(resolve_resource_path("test_table_transform_column_output.csv"))
 
-
-def test_transform_column_invalid() -> None:
-    input_table: Table = Table.from_csv_file(resolve_resource_path("test_table_transform_column.csv"))
-
-    with pytest.raises(UnknownColumnNameError):
-        input_table.transform_column("D", lambda row: row.get_value("A") * 2)
+@pytest.mark.parametrize(
+    "table",
+    [
+        Table(
+            {
+                "A": [1, 2, 3],
+                "B": [4, 5, 6],
+                "C": ["a", "b", "c"],
+            },
+        ),
+        Table(),
+    ],
+    ids=["column not found", "empty"],
+)
+def test_should_raise_if_column_not_found(table: Table) -> None:
+    with pytest.raises(UnknownColumnNameError, match=r"Could not find column\(s\) 'D'"):
+        table.transform_column("D", lambda row: row.get_value("A") * 2)

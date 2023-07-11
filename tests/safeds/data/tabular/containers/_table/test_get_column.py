@@ -1,17 +1,27 @@
-import pandas as pd
 import pytest
 from safeds.data.tabular.containers import Column, Table
-from safeds.data.tabular.exceptions import UnknownColumnNameError
+from safeds.exceptions import UnknownColumnNameError
 
 
-def test_get_column_valid() -> None:
-    table = Table.from_dict({"col1": ["col1_1"], "col2": ["col2_1"]})
-    assert isinstance(table.get_column("col1"), Column)
-    assert table.get_column("col1")._data[0] == pd.Series(data=["col1_1"])[0]
-    assert table.get_column("col1")._data[0] == "col1_1"
+@pytest.mark.parametrize(
+    ("table1", "expected"),
+    [
+        (Table({"col1": ["col1_1"], "col2": ["col2_1"]}), Column("col1", ["col1_1"])),
+    ],
+    ids=["First column"],
+)
+def test_should_get_column(table1: Table, expected: Column) -> None:
+    assert table1.get_column("col1") == expected
 
 
-def test_get_column_invalid() -> None:
-    table = Table.from_dict({"col1": ["col1_1"], "col2": ["col2_1"]})
-    with pytest.raises(UnknownColumnNameError):
+@pytest.mark.parametrize(
+    "table",
+    [
+        (Table({"col1": ["col1_1"], "col2": ["col2_1"]})),
+        (Table()),
+    ],
+    ids=["no col3", "empty"],
+)
+def test_should_raise_error_if_column_name_unknown(table: Table) -> None:
+    with pytest.raises(UnknownColumnNameError, match=r"Could not find column\(s\) 'col3'"):
         table.get_column("col3")

@@ -1,24 +1,40 @@
 import pytest
-from safeds.data.tabular.containers import Table
-from safeds.data.tabular.exceptions import IndexOutOfBoundsError
-
-from tests.helpers import resolve_resource_path
+from safeds.data.tabular.containers import Row, Table
+from safeds.exceptions import IndexOutOfBoundsError
 
 
-def test_get_row() -> None:
-    table = Table.from_csv_file(resolve_resource_path("test_table_from_csv_file.csv"))
-    val = table.get_row(0)
-    assert val.get_value("A") == 1
-    assert val.get_value("B") == 2
+@pytest.mark.parametrize(
+    ("table1", "expected"),
+    [
+        (Table({"A": [1], "B": [2]}), Row({"A": 1, "B": 2})),
+    ],
+    ids=["table with one row"],
+)
+def test_should_get_row(table1: Table, expected: Row) -> None:
+    assert table1.get_row(0).schema == expected.schema
+    assert table1.get_row(0) == expected
 
 
-def test_get_row_negative_index() -> None:
-    table = Table.from_csv_file(resolve_resource_path("test_table_from_csv_file.csv"))
+@pytest.mark.parametrize(
+    ("index", "table"),
+    [
+        (-1, Table({"A": [1], "B": [2]})),
+        (5, Table({"A": [1], "B": [2]})),
+        (0, Table()),
+    ],
+    ids=["<0", "too high", "empty"],
+)
+def test_should_raise_error_if_index_out_of_bounds(index: int, table: Table) -> None:
     with pytest.raises(IndexOutOfBoundsError):
-        table.get_row(-1)
+        table.get_row(index)
 
 
-def test_get_row_out_of_bounds_index() -> None:
-    table = Table.from_csv_file(resolve_resource_path("test_table_from_csv_file.csv"))
-    with pytest.raises(IndexOutOfBoundsError):
-        table.get_row(5)
+@pytest.mark.parametrize(
+    ("index", "expected_error_message"),
+    [(-1, r"There is no element at index '-1'."), (5, r"There is no element at index '5'.")],
+    ids=["<0", "too high"],
+)
+def test_should_raise_error_if_index_out_of_bounds_error_message(index: int, expected_error_message: str) -> None:
+    table = Table({"A": [1], "B": [2]})
+    with pytest.raises(IndexOutOfBoundsError, match=expected_error_message):
+        table.get_row(index)

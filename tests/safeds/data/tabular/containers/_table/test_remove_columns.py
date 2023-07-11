@@ -1,18 +1,26 @@
 import pytest
 from safeds.data.tabular.containers import Table
-from safeds.data.tabular.exceptions import UnknownColumnNameError
-
-from tests.helpers import resolve_resource_path
+from safeds.exceptions import UnknownColumnNameError
 
 
-def test_table_remove_columns() -> None:
-    table = Table.from_csv_file(resolve_resource_path("test_table_from_csv_file.csv"))
-    transformed_table = table.remove_columns(["A"])
-    assert transformed_table.schema.has_column("B")
-    assert not transformed_table.schema.has_column("A")
+@pytest.mark.parametrize(
+    ("table", "expected", "columns"),
+    [
+        (Table({"col1": [1, 2, 1], "col2": ["a", "b", "c"]}), Table({"col1": [1, 2, 1]}), ["col2"]),
+        (Table({"col1": [1, 2, 1], "col2": [1, 2, 4]}), Table(), ["col1", "col2"]),
+        (Table({"col1": [1, 2, 1], "col2": [1, 2, 4]}), Table({"col1": [1, 2, 1], "col2": [1, 2, 4]}), []),
+        (Table(), Table(), []),
+    ],
+    ids=["one column", "multiple columns", "no columns", "empty"],
+)
+def test_should_remove_table_columns(table: Table, expected: Table, columns: list[str]) -> None:
+    table = table.remove_columns(columns)
+    assert table.schema == expected.schema
+    assert table == expected
+    assert table.number_of_rows == expected.number_of_rows
 
 
-def test_table_remove_columns_warning() -> None:
-    table = Table.from_csv_file(resolve_resource_path("test_table_from_csv_file.csv"))
-    with pytest.raises(UnknownColumnNameError):
+@pytest.mark.parametrize("table", [Table({"A": [1], "B": [2]}), Table()], ids=["normal", "empty"])
+def test_should_raise_if_column_not_found(table: Table) -> None:
+    with pytest.raises(UnknownColumnNameError, match=r"Could not find column\(s\) 'C'"):
         table.remove_columns(["C"])

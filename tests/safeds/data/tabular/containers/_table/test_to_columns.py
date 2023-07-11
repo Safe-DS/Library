@@ -1,17 +1,11 @@
 import pytest
 from safeds.data.tabular.containers import Column, Table
 
-from tests.helpers import resolve_resource_path
-
 
 @pytest.mark.parametrize(
-    ("values", "name", "index"),
-    [([1, 4], "A", 0), ([2, 5], "B", 1)],
+    ("table", "expected"),
+    [(Table({"A": [54, 74], "B": [90, 2010]}), [Column("A", [54, 74]), Column("B", [90, 2010])]), (Table(), [])],
+    ids=["normal", "empty"],
 )
-def test_to_columns(values: list[int], name: str, index: int) -> None:
-    table = Table.from_csv_file(resolve_resource_path("test_column_table.csv"))
-    columns_list: list[Column] = table.to_columns()
-
-    column_expected: Column = Column(name, values)
-
-    assert column_expected == columns_list[index]
+def test_should_return_list_of_columns(table: Table, expected: list[Column]) -> None:
+    assert table.to_columns() == expected

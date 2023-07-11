@@ -1,58 +1,266 @@
+import pytest
 from safeds.data.tabular.containers import Table
-from safeds.data.tabular.typing import RealNumber, Schema
 
 
-def test_remove_rows_with_outliers_no_outliers() -> None:
-    table = Table.from_dict(
-        {
-            "col1": ["A", "B", "C"],
-            "col2": [1.0, 2.0, 3.0],
-            "col3": [2, 3, 1],
-        },
-    )
-    names = table.get_column_names()
-    result = table.remove_rows_with_outliers()
-    assert result.count_rows() == 3
-    assert result.count_columns() == 3
-    assert names == table.get_column_names()
-
-
-def test_remove_rows_with_outliers_with_outliers() -> None:
-    input_ = Table.from_dict(
-        {
-            "col1": [
-                "A",
-                "B",
-                "C",
-                "outlier",
-                "a",
-                "a",
-                "a",
-                "a",
-                "a",
-                "a",
-                "a",
-                "a",
-            ],
-            "col2": [1.0, 2.0, 3.0, 4.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, None],
-            "col3": [2, 3, 1, 1_000_000_000, 1, 1, 1, 1, 1, 1, 1, 1],
-        },
-    )
-    result = input_.remove_rows_with_outliers()
-
-    expected = Table.from_dict(
-        {
-            "col1": ["A", "B", "C", "a", "a", "a", "a", "a", "a", "a", "a"],
-            "col2": [1.0, 2.0, 3.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, None],
-            "col3": [2, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-        },
-    )
-
-    assert result == expected
-
-
-def test_remove_rows_with_outliers_no_rows() -> None:
-    table = Table([], Schema({"col1": RealNumber()}))
-    result = table.remove_rows_with_outliers()
-    assert result.count_rows() == 0
-    assert result.count_columns() == 1
+@pytest.mark.parametrize(
+    ("table", "expected"),
+    [
+        (
+            Table(
+                {
+                    "col1": ["A", "B", "C"],
+                    "col2": [1.0, 2.0, 3.0],
+                    "col3": [2, 3, 1],
+                },
+            ),
+            Table(
+                {
+                    "col1": ["A", "B", "C"],
+                    "col2": [1.0, 2.0, 3.0],
+                    "col3": [2, 3, 1],
+                },
+            ),
+        ),
+        (
+            Table(
+                {
+                    "col1": [
+                        "A",
+                        "B",
+                        "A",
+                        "outlier",
+                        "a",
+                        "a",
+                        "a",
+                        "a",
+                        "a",
+                        "a",
+                        "a",
+                        "a",
+                    ],
+                    "col2": [1.0, 2.0, 3.0, 4.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, None],
+                    "col3": [2, 3, 1, 1_000_000_000, 1, 1, 1, 1, 1, 1, 1, 1],
+                },
+            ),
+            Table(
+                {
+                    "col1": [
+                        "A",
+                        "B",
+                        "A",
+                        "a",
+                        "a",
+                        "a",
+                        "a",
+                        "a",
+                        "a",
+                        "a",
+                        "a",
+                    ],
+                    "col2": [1.0, 2.0, 3.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, None],
+                    "col3": [2, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+                },
+            ),
+        ),
+        (
+            Table(
+                {
+                    "col1": [
+                        "A",
+                        "B",
+                        "A",
+                        "outlier_col3",
+                        "a",
+                        "a",
+                        "a",
+                        "a",
+                        "a",
+                        "a",
+                        "outlier_col2",
+                        "a",
+                    ],
+                    "col2": [1.0, 2.0, 3.0, 4.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, -1000.0, None],
+                    "col3": [2, 3, 1, 1_000_000_000, 1, 1, 1, 1, 1, 1, 1, 1],
+                },
+            ),
+            Table(
+                {
+                    "col1": [
+                        "A",
+                        "B",
+                        "A",
+                        "a",
+                        "a",
+                        "a",
+                        "a",
+                        "a",
+                        "a",
+                        "a",
+                    ],
+                    "col2": [1.0, 2.0, 3.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, None],
+                    "col3": [2, 3, 1, 1, 1, 1, 1, 1, 1, 1],
+                },
+            ),
+        ),
+        (
+            Table(
+                {
+                    "col1": [
+                        "A",
+                        "B",
+                        "A",
+                        "positive_outlier",
+                        "a",
+                        "a",
+                        "a",
+                        "a",
+                        "a",
+                        "a",
+                        "a",
+                        "a",
+                        "negative_outlier",
+                        "a",
+                        "a",
+                        "a",
+                        "a",
+                        "a",
+                        "a",
+                        "a",
+                        "a",
+                        "a",
+                        "a",
+                    ],
+                    "col2": [
+                        1.0,
+                        2.0,
+                        3.0,
+                        4.0,
+                        1.0,
+                        1.0,
+                        1.0,
+                        1.0,
+                        1.0,
+                        1.0,
+                        1.0,
+                        None,
+                        1.0,
+                        2.0,
+                        1.0,
+                        4.0,
+                        1.0,
+                        3.0,
+                        1.0,
+                        2.0,
+                        1.0,
+                        4.0,
+                        1.0,
+                    ],
+                    "col3": [
+                        2,
+                        3,
+                        1,
+                        1_000_000_000_000,
+                        1,
+                        1,
+                        1,
+                        1,
+                        1,
+                        1,
+                        1,
+                        1,
+                        -1_000_000_000_000,
+                        1,
+                        1,
+                        1,
+                        1,
+                        1,
+                        1,
+                        1,
+                        1,
+                        1,
+                        1,
+                    ],
+                },
+            ),
+            Table(
+                {
+                    "col1": [
+                        "A",
+                        "B",
+                        "A",
+                        "a",
+                        "a",
+                        "a",
+                        "a",
+                        "a",
+                        "a",
+                        "a",
+                        "a",
+                        "a",
+                        "a",
+                        "a",
+                        "a",
+                        "a",
+                        "a",
+                        "a",
+                        "a",
+                        "a",
+                        "a",
+                    ],
+                    "col2": [
+                        1.0,
+                        2.0,
+                        3.0,
+                        1.0,
+                        1.0,
+                        1.0,
+                        1.0,
+                        1.0,
+                        1.0,
+                        1.0,
+                        None,
+                        2.0,
+                        1.0,
+                        4.0,
+                        1.0,
+                        3.0,
+                        1.0,
+                        2.0,
+                        1.0,
+                        4.0,
+                        1.0,
+                    ],
+                    "col3": [2, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+                },
+            ),
+        ),
+        (
+            Table(
+                {
+                    "col1": [],
+                    "col2": [],
+                },
+            ),
+            Table(
+                {
+                    "col1": [],
+                    "col2": [],
+                },
+            ),
+        ),
+        (Table(), Table()),
+    ],
+    ids=[
+        "no outliers",
+        "one outlier",
+        "outliers in two different columns",
+        "multiple outliers in one column",
+        "no rows",
+        "empty",
+    ],
+)
+def test_should_remove_rows_with_outliers(table: Table, expected: Table) -> None:
+    updated_table = table.remove_rows_with_outliers()
+    assert updated_table.schema == expected.schema
+    assert updated_table.number_of_rows == expected.number_of_rows
+    assert updated_table == expected
