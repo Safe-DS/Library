@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING
 
 from sklearn.ensemble import RandomForestRegressor as sk_RandomForestRegressor
 
+from safeds.exceptions import ClosedBound, OutOfBoundsError
 from safeds.ml.classical._util_sklearn import fit, predict
 
 from ._regressor import Regressor
@@ -24,14 +25,14 @@ class RandomForest(Regressor):
 
     Raises
     ------
-    ValueError
-        If `number_of_trees` is less than or equal to 0.
+    OutOfBoundsError
+        If `number_of_trees` is less than 1.
     """
 
     def __init__(self, *, number_of_trees: int = 100) -> None:
         # Validation
         if number_of_trees < 1:
-            raise ValueError("The parameter 'number_of_trees' has to be greater than 0.")
+            raise OutOfBoundsError(number_of_trees, name="number_of_trees", lower_bound=ClosedBound(1))
 
         # Hyperparameters
         self._number_of_trees = number_of_trees

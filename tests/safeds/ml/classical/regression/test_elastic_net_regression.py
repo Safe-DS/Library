@@ -1,5 +1,6 @@
 import pytest
 from safeds.data.tabular.containers import Table, TaggedTable
+from safeds.exceptions import OutOfBoundsError
 from safeds.ml.classical.regression import ElasticNetRegression
 
 
@@ -19,9 +20,13 @@ class TestAlpha:
         assert fitted_model._wrapped_regressor is not None
         assert fitted_model._wrapped_regressor.alpha == 1
 
-    def test_should_raise_if_less_than_0(self) -> None:
-        with pytest.raises(ValueError, match="The parameter 'alpha' must be non-negative"):
-            ElasticNetRegression(alpha=-1)
+    @pytest.mark.parametrize("alpha", [-0.5], ids=["minus_0_point_5"])
+    def test_should_raise_if_less_than_0(self, alpha: float) -> None:
+        with pytest.raises(
+            OutOfBoundsError,
+            match=rf"alpha \(={alpha}\) is not inside \[0, \u221e\)\.",
+        ):
+            ElasticNetRegression(alpha=alpha)
 
     def test_should_warn_if_equal_to_0(self) -> None:
         with pytest.warns(
@@ -44,13 +49,13 @@ class TestLassoRatio:
         assert fitted_model._wrapped_regressor is not None
         assert fitted_model._wrapped_regressor.l1_ratio == 0.3
 
-    def test_should_raise_if_less_than_0(self) -> None:
-        with pytest.raises(ValueError, match="The parameter 'lasso_ratio' must be between 0 and 1."):
-            ElasticNetRegression(lasso_ratio=-1.0)
-
-    def test_should_raise_if_greater_than_1(self) -> None:
-        with pytest.raises(ValueError, match="The parameter 'lasso_ratio' must be between 0 and 1."):
-            ElasticNetRegression(lasso_ratio=2.0)
+    @pytest.mark.parametrize("lasso_ratio", [-0.5, 1.5], ids=["minus_zero_point_5", "one_point_5"])
+    def test_should_raise_if_not_between_0_and_1(self, lasso_ratio: float) -> None:
+        with pytest.raises(
+            OutOfBoundsError,
+            match=rf"lasso_ratio \(={lasso_ratio}\) is not inside \[0, 1\]\.",
+        ):
+            ElasticNetRegression(lasso_ratio=lasso_ratio)
 
     def test_should_warn_if_0(self) -> None:
         with pytest.warns(
