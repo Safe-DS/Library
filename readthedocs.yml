@@ -8,7 +8,6 @@ build:
     - pip install poetry
     - poetry config virtualenvs.create false
     - poetry install --with docs
-    - poetry env info
     - cat mkdocs.yml
     - mkdocs build --clean --site-dir $READTHEDOCS_OUTPUT/html --config-file mkdocs.yml
 # Once https://github.com/readthedocs/readthedocs.org/issues/8529 is fixed, replace the commands above with the
