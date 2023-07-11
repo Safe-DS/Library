@@ -309,6 +309,19 @@ class Image:
         return image_copy
 
     def add_gaussian_noise(self, standard_deviation: float) -> Image:
+        """
+        Add Gaussian noise to the image.
+
+        Parameters
+        ----------
+        standard_deviation : float
+            The standard deviation of the Gaussian distribution.
+
+        Returns
+        -------
+        result : Image
+            The image with added Gaussian noise.
+        """
         if standard_deviation < 0:
             raise ValueError("Standard deviation has to be 0 or bigger.")
 
