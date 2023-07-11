@@ -1,6 +1,9 @@
 site_name: Safe-DS Python Library
 repo_url: https://github.com/Safe-DS/Stdlib
 repo_name: Safe-DS/Stdlib
+edit_uri: edit/main/docs/
+# Once https://github.com/readthedocs/readthedocs.org/issues/8529 is fixed, we can set the site_url with the following
+# line and revert the changes to readthedocs.yml so the default build steps are used again.
 site_url: !ENV READTHEDOCS_CANONICAL_URL
 
 nav:
