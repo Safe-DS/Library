@@ -26,7 +26,7 @@ class TestFromPandasDataFrame:
             ),
             (
                 pd.DataFrame({"A": [1.0, 2.0, 3.0]}),
-                Schema({"A": RealNumber()}),
+                Schema({"A": Integer()}),
             ),
             (
                 pd.DataFrame({"A": ["a", "b", "c"]}),
