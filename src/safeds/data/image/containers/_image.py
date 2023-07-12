@@ -315,15 +315,20 @@ class Image:
         Parameters
         ----------
         standard_deviation : float
-            The standard deviation of the Gaussian distribution.
+            The standard deviation of the Gaussian distribution. Has to be bigger than or equal to 0.
 
         Returns
         -------
         result : Image
             The image with added Gaussian noise.
+
+        Raises
+        ------
+        OutOfBoundsError
+            If standard_deviation is smaller than 0.
         """
         if standard_deviation < 0:
-            raise ValueError("Standard deviation has to be 0 or bigger.")
+            raise OutOfBoundsError(standard_deviation, name="standard_deviation", lower_bound=ClosedBound(0))
 
         # noinspection PyTypeChecker
         image_as_array = np.asarray(self._image)

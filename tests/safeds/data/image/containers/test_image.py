@@ -407,7 +407,10 @@ class TestAddGaussianNoise:
         ids=["sigma below zero"],
     )
     def test_should_raise_standard_deviation(self, image: Image, standard_deviation: float) -> None:
-        with pytest.raises(ValueError, match="Standard deviation has to be 0 or bigger."):
+        with pytest.raises(
+                OutOfBoundsError,
+                match=rf"standard_deviation \(={standard_deviation}\) is not inside \[0, \u221e\)\."
+        ):
             image.add_gaussian_noise(standard_deviation)
 
 
