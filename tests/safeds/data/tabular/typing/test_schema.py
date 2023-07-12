@@ -37,6 +37,10 @@ class TestFromPandasDataFrame:
                 Schema({"A": Anything()}),
             ),
             (
+                pd.DataFrame({"A": [1.0, 2.5, 3.0]}),
+                Schema({"A": RealNumber()}),
+            ),
+            (
                 pd.DataFrame({"A": [1, 2, 3], "B": ["a", "b", "c"]}),
                 Schema({"A": Integer(), "B": String()}),
             ),
@@ -46,11 +50,15 @@ class TestFromPandasDataFrame:
             ),
             (
                 pd.DataFrame({"A": [1, None, 3]}),
-                Schema({"A": RealNumber()}),
+                Schema({"A": Integer(is_nullable=True)}),
             ),
             (
                 pd.DataFrame({"A": [1.0, None, 3.0]}),
-                Schema({"A": RealNumber()}),
+                Schema({"A": Integer(is_nullable=True)}),
+            ),
+            (
+                pd.DataFrame({"A": [1.5, None, 3.0]}),
+                Schema({"A": RealNumber(is_nullable=True)}),
             ),
             (
                 pd.DataFrame({"A": ["a", None, "c"]}),
@@ -64,12 +72,14 @@ class TestFromPandasDataFrame:
         ids=[
             "boolean",
             "integer",
-            "real number",
+            "real number .0",
             "string",
             "mixed",
+            "real number",
             "multiple columns",
             "boolean?",
             "integer?",
+            "real number? .0",
             "real number?",
             "string?",
             "Anything?",

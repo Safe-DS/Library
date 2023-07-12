@@ -38,11 +38,12 @@ def test_should_use_type_if_passed(series: pd.Series, type_: ColumnType) -> None
         (pd.Series([]), Nothing()),
         (pd.Series([True, False, True]), Boolean()),
         (pd.Series([1, 2, 3]), Integer()),
-        (pd.Series([1.0, 2.0, 3.0]), RealNumber()),
+        (pd.Series([1.0, 2.0, 3.0]), Integer()),
+        (pd.Series([1.0, 2.5, 3.0]), RealNumber()),
         (pd.Series(["a", "b", "c"]), String()),
         (pd.Series([1, 2.0, "a", True]), Anything(is_nullable=False)),
     ],
-    ids=["empty", "boolean", "integer", "real number", "string", "mixed"],
+    ids=["empty", "boolean", "integer", "real number .0", "real number", "string", "mixed"],
 )
 def test_should_infer_type_if_not_passed(series: pd.Series, expected: ColumnType) -> None:
     assert Column._from_pandas_series(series).type == expected

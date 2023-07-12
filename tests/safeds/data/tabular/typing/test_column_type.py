@@ -19,31 +19,35 @@ class TestDataType:
         ("data", "expected"),
         [
             ([1, 2, 3], Integer(is_nullable=False)),
-            ([1.0, 2.0, 3.0], RealNumber(is_nullable=False)),
+            ([1.0, 2.0, 3.0], Integer(is_nullable=False)),
+            ([1.0, 2.5, 3.0], RealNumber(is_nullable=False)),
             ([True, False, True], Boolean(is_nullable=False)),
             (["a", "b", "c"], String(is_nullable=False)),
             (["a", 1, 2.0], Anything(is_nullable=False)),
             ([None, None, None], Nothing()),
             ([None, 1, 2], Integer(is_nullable=True)),
-            ([1.0, 2.0, None], RealNumber(is_nullable=True)),
+            ([1.0, 2.0, None], Integer(is_nullable=True)),
+            ([1.0, 2.5, None], RealNumber(is_nullable=True)),
             ([True, False, None], Boolean(is_nullable=True)),
             (["a", None, "b"], String(is_nullable=True)),
         ],
         ids=[
             "Integer",
+            "Real number .0",
             "Real number",
             "Boolean",
             "String",
             "Mixed",
             "None",
             "Nullable integer",
+            "Nullable RealNumber .0",
             "Nullable RealNumber",
             "Nullable Boolean",
             "Nullable String",
         ],
     )
     def test_should_return_the_data_type(self, data: Iterable, expected: ColumnType) -> None:
-        assert ColumnType._data_type(data) == expected
+        assert ColumnType._data_type(pd.Series(data)) == expected
 
     @pytest.mark.parametrize(
         ("data", "error_message"),
