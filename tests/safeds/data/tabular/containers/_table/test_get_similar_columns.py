@@ -7,7 +7,19 @@ from safeds.exceptions._data import UnknownColumnNameError
     ("table", "column_name", "expected"),
     [
         (Table({"column1": ["col1_1"], "x": ["y"], "cilumn2": ["cil2_1"]}), "col1", ["column1"]),
-        (Table({"column1": ["col1_1"], "col2": ["col2_1"], "col3": ["col2_1"], "col4": ["col2_1"], "cilumn2": ["cil2_1"]}), "clumn1", ["column1", "cilumn2"]),
+        (
+            Table(
+                {
+                    "column1": ["col1_1"],
+                    "col2": ["col2_1"],
+                    "col3": ["col2_1"],
+                    "col4": ["col2_1"],
+                    "cilumn2": ["cil2_1"],
+                },
+            ),
+            "clumn1",
+            ["column1", "cilumn2"],
+        ),
     ],
     ids=["one similar", "two similar/ dynamic increase"],
 )
