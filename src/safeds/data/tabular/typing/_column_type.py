@@ -85,7 +85,9 @@ class ColumnType(ABC):
                 is_nullable = True
                 result._is_nullable = is_nullable
 
-        if isinstance(result, RealNumber) and all(data.apply(lambda c: True if (isinstance(c, float) and np.isnan(c)) or (c == float(int(c))) else False)):
+        if isinstance(result, RealNumber) and all(
+            data.apply(lambda c: bool(isinstance(c, float) and np.isnan(c) or c == float(int(c)))),
+        ):
             result = Integer(is_nullable)
 
         return result
