@@ -7,3 +7,8 @@
 .jp-OutputPrompt {
     display: none !important;
 }
+
+.jp-OutputArea-executeResult {
+    max-height: 585px !important; /* 585px is exactly the height of 20 lines plus the header in a table */
+    overflow: auto !important;
+}
