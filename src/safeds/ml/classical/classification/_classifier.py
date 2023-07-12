@@ -1,15 +1,13 @@
 from __future__ import annotations
 
-import sys
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
-from matplotlib import pyplot as plt
-from sklearn.metrics import accuracy_score as sk_accuracy_score, roc_curve
+from sklearn.metrics import accuracy_score as sk_accuracy_score
+from sklearn.metrics import roc_curve
 
-from safeds.data.tabular.containers import Table, TaggedTable, Row
+from safeds.data.tabular.containers import Row, Table, TaggedTable
 from safeds.exceptions import UntaggedTableError
-
 
 if TYPE_CHECKING:
     from typing import Any

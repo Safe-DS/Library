@@ -475,6 +475,7 @@ class TestF1Score:
         with pytest.raises(UntaggedTableError):
             DummyClassifier().f1_score(table, 1)  # type: ignore[arg-type]
 
+
 class TestRocCurve:
     @pytest.mark.parametrize(
         ("table", "roc_curve"),
@@ -492,7 +493,7 @@ class TestRocCurve:
                         "tpr": [0.0, 0.5, 1.0],
                     },
                 ),
-             )
+            ),
         ],
         ids=["untagged_table"],
     )
