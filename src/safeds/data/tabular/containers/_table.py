@@ -24,7 +24,6 @@ from safeds.exceptions import (
     DuplicateColumnNameError,
     IndexOutOfBoundsError,
     NonNumericColumnError,
-    SchemaMismatchError,
     UnknownColumnNameError,
     WrongFileExtensionError,
 )
@@ -302,8 +301,8 @@ class Table:
 
         Raises
         ------
-        SchemaMismatchError
-            If any of the row schemas does not match with the others.
+        UnknownColumnNameError
+            If any of the row column names does not match with the first row.
 
         Examples
         --------
@@ -318,17 +317,22 @@ class Table:
         if len(rows) == 0:
             return Table._from_pandas_dataframe(pd.DataFrame())
 
-        schema_compare: Schema = rows[0]._schema
+        column_names_compare: list = list(rows[0].column_names)
+        unknown_column_names = set()
         row_array: list[pd.DataFrame] = []
 
         for row in rows:
-            if schema_compare != row._schema:
-                raise SchemaMismatchError
+            unknown_column_names.update(set(column_names_compare) - set(row.column_names))
             row_array.append(row._data)
+        if len(unknown_column_names) > 0:
+            raise UnknownColumnNameError(list(unknown_column_names))
 
         dataframe: DataFrame = pd.concat(row_array, ignore_index=True)
-        dataframe.columns = schema_compare.column_names
-        return Table._from_pandas_dataframe(dataframe)
+        dataframe.columns = column_names_compare
+
+        schema = Schema.merge_multiple_schemas([row.schema for row in rows])
+
+        return Table._from_pandas_dataframe(dataframe, schema)
 
     @staticmethod
     def _from_pandas_dataframe(data: pd.DataFrame, schema: Schema | None = None) -> Table:
@@ -906,6 +910,9 @@ class Table:
 
         If the table happens to be empty beforehand, respective columns will be added automatically.
 
+        The order of columns of the new row will be adjusted to the order of columns in the table.
+        The new table will contain the merged schema.
+
         This table is not modified.
 
         Parameters
@@ -920,8 +927,8 @@ class Table:
 
         Raises
         ------
-        SchemaMismatchError
-            If the schema of the row does not match the table schema.
+        UnknownColumnNameError
+            If the row has different column names than the table.
 
         Examples
         --------
@@ -935,20 +942,18 @@ class Table:
         """
         int_columns = []
         result = self._copy()
+        if self.number_of_columns == 0:
+            return Table.from_rows([row])
+        if len(set(self.column_names) - set(row.column_names)) > 0:
+            raise UnknownColumnNameError(list(set(self.column_names) - set(row.column_names)))
+
         if result.number_of_rows == 0:
-            int_columns = list(filter(lambda name: isinstance(row[name], int | np.int64), row.column_names))
-            if result.number_of_columns == 0:
-                for column in row.column_names:
-                    result._data[column] = Column(column, [])
-                result._schema = Schema._from_pandas_dataframe(result._data)
-            elif result.column_names != row.column_names:
-                raise SchemaMismatchError
-        elif result._schema != row.schema:
-            raise SchemaMismatchError
+            int_columns = list(filter(lambda name: isinstance(row[name], int | np.int64 | np.int32), row.column_names))
 
         new_df = pd.concat([result._data, row._data]).infer_objects()
         new_df.columns = result.column_names
-        result = Table._from_pandas_dataframe(new_df)
+        schema = Schema.merge_multiple_schemas([result.schema, row.schema])
+        result = Table._from_pandas_dataframe(new_df, schema)
 
         for column in int_columns:
             result = result.replace_column(column, [result.get_column(column).transform(lambda it: int(it))])
@@ -958,6 +963,9 @@ class Table:
     def add_rows(self, rows: list[Row] | Table) -> Table:
         """
         Add multiple rows to a table.
+
+        The order of columns of the new rows will be adjusted to the order of columns in the table.
+        The new table will contain the merged schema.
 
         This table is not modified.
 
@@ -973,8 +981,8 @@ class Table:
 
         Raises
         ------
-        SchemaMismatchError
-            If the schema of one of the rows does not match the table schema.
+        UnknownColumnNameError
+            If at least one of the rows have different column names than the table.
 
         Examples
         --------
@@ -990,28 +998,21 @@ class Table:
         """
         if isinstance(rows, Table):
             rows = rows.to_rows()
-        int_columns = []
         result = self._copy()
+
+        if len(rows) == 0:
+            return self._copy()
+
+        different_column_names = set()
         for row in rows:
-            if result.number_of_rows == 0:
-                int_columns = list(filter(lambda name: isinstance(row[name], int | np.int64), row.column_names))
-                if result.number_of_columns == 0:
-                    for column in row.column_names:
-                        result._data[column] = Column(column, [])
-                    result._schema = Schema._from_pandas_dataframe(result._data)
-                elif result.column_names != row.column_names:
-                    raise SchemaMismatchError
-            elif result._schema != row.schema:
-                raise SchemaMismatchError
+            different_column_names.update(set(rows[0].column_names) - set(row.column_names))
+        if len(different_column_names) > 0:
+            raise UnknownColumnNameError(list(different_column_names))
 
-        row_frames = (row._data for row in rows)
+        result = self._copy()
 
-        new_df = pd.concat([result._data, *row_frames]).infer_objects()
-        new_df.columns = result.column_names
-        result = Table._from_pandas_dataframe(new_df)
-
-        for column in int_columns:
-            result = result.replace_column(column, [result.get_column(column).transform(lambda it: int(it))])
+        for row in rows:
+            result = result.add_row(row)
 
         return result
 
@@ -1269,7 +1270,7 @@ class Table:
         """
         result = self._data.copy(deep=True)
         result = result.dropna(axis="index")
-        return Table._from_pandas_dataframe(result, self._schema)
+        return Table._from_pandas_dataframe(result)
 
     def remove_rows_with_outliers(self) -> Table:
         """

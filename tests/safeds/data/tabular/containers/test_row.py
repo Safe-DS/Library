@@ -1,4 +1,5 @@
 import re
+from collections.abc import Callable
 from typing import Any
 
 import pandas as pd
@@ -516,10 +517,50 @@ class TestReprHtml:
 class TestCopy:
     @pytest.mark.parametrize(
         "row",
-        [Row(), Row({"a": [3, 0.1]})],
+        [Row(), Row({"a": 3, "b": 4})],
         ids=["empty", "normal"],
     )
     def test_should_copy_table(self, row: Row) -> None:
         copied = row._copy()
         assert copied == row
         assert copied is not row
+
+
+class TestSortColumns:
+    @pytest.mark.parametrize(
+        ("row", "comparator", "expected"),
+        [
+            (
+                Row({"b": 1, "a": 2}),
+                lambda col1, col2: (col1[0] > col2[0]) - (col1[0] < col2[0]),
+                Row({"a": 2, "b": 1}),
+            ),
+            (
+                Row({"a": 2, "b": 1}),
+                lambda col1, col2: (col2[0] > col1[0]) - (col2[0] < col1[0]),
+                Row({"b": 1, "a": 2}),
+            ),
+            (Row(), lambda col1, col2: (col1[0] > col2[0]) - (col1[0] < col2[0]), Row()),
+        ],
+        ids=[
+            "sort descending by first element",
+            "sort ascending by first element",
+            "empty rows",
+        ],
+    )
+    def test_should_sort_columns(self, row: Row, comparator: Callable[[tuple, tuple], int], expected: Row) -> None:
+        row = row.sort_columns(comparator)
+        assert row == expected
+
+    @pytest.mark.parametrize(
+        "row",
+        [
+            (Row({"b": 1, "a": 2})),
+        ],
+        ids=[
+            "sort descending by first element",
+        ],
+    )
+    def test_should_sort_table_out_of_place(self, row: Row) -> None:
+        sorted_row = row.sort_columns()
+        assert sorted_row != row
