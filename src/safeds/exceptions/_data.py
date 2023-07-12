@@ -103,13 +103,6 @@ class ColumnSizeError(Exception):
         super().__init__(f"Expected a column of size {expected_size} but got column of size {actual_size}.")
 
 
-class SchemaMismatchError(Exception):
-    """Exception raised when schemas are unequal."""
-
-    def __init__(self) -> None:
-        super().__init__("Failed because at least two schemas didn't match.")
-
-
 class ColumnLengthMismatchError(Exception):
     """Exception raised when the lengths of two or more columns do not match."""
 
@@ -148,3 +141,17 @@ class WrongFileExtensionError(Exception):
                 f" {file_extension}"
             ),
         )
+
+
+class IllegalSchemaModificationError(Exception):
+    """Exception raised when modifying a schema in a way that is inconsistent with the subclass's requirements."""
+
+    def __init__(self, msg: str) -> None:
+        super().__init__(f"Illegal schema modification: {msg}")
+
+
+class ColumnIsTargetError(IllegalSchemaModificationError):
+    """Exception raised in overriden methods of the Table class when removing tagged Columns from a TaggedTable."""
+
+    def __init__(self, column_name: str) -> None:
+        super().__init__(f'Column "{column_name}" is the target column and cannot be removed.')

@@ -5,6 +5,7 @@ import pytest
 from safeds.data.image.containers import Image
 from safeds.data.image.typing import ImageFormat
 from safeds.data.tabular.containers import Table
+from safeds.exceptions import OutOfBoundsError
 
 from tests.helpers import resolve_resource_path
 
@@ -280,7 +281,7 @@ class TestAdjustContrast:
 
     def test_should_raise(self) -> None:
         image = Image.from_png_file(resolve_resource_path("image/brightness/to_brighten.png"))
-        with pytest.raises(ValueError, match="Contrast factor has to be 0 or bigger"):
+        with pytest.raises(OutOfBoundsError, match=r"factor \(=-1\) is not inside \[0, \u221e\)."):
             image.adjust_contrast(-1)
 
 
@@ -304,7 +305,7 @@ class TestBrightness:
 
     def test_should_raise(self) -> None:
         image = Image.from_png_file(resolve_resource_path("image/brightness/to_brighten.png"))
-        with pytest.raises(ValueError, match="Brightness factor has to be 0 or bigger"):
+        with pytest.raises(OutOfBoundsError, match=r"factor \(=-1\) is not inside \[0, \u221e\)."):
             image.adjust_brightness(-1)
 
 
@@ -322,6 +323,65 @@ class TestInvertColors:
     def test_should_invert_colors(self, image: Image, expected: Image) -> None:
         image = image.invert_colors()
         assert image == expected
+
+
+class TestColorAdjust:
+    @pytest.mark.parametrize(
+        ("image", "factor", "expected"),
+        [
+            (
+                Image.from_png_file(resolve_resource_path("image/original.png")),
+                2,
+                Image.from_png_file(resolve_resource_path("image/adjusted_colors/by_2.png")),
+            ),
+            (
+                Image.from_png_file(resolve_resource_path("image/original.png")),
+                0.5,
+                Image.from_png_file(resolve_resource_path("image/adjusted_colors/by_0.5.png")),
+            ),
+            (
+                Image.from_png_file(resolve_resource_path("image/original.png")),
+                0,
+                Image.from_png_file(resolve_resource_path("image/adjusted_colors/by_0.png")),
+            ),
+        ],
+        ids=["add color", "remove color", "remove all color"],
+    )
+    def test_should_adjust_colors(self, image: Image, factor: float, expected: Image) -> None:
+        image = image.adjust_color_balance(factor)
+        assert image == expected
+
+    @pytest.mark.parametrize(
+        ("image", "factor"),
+        [
+            (
+                Image.from_png_file(resolve_resource_path("image/original.png")),
+                -1,
+            ),
+        ],
+        ids=["negative"],
+    )
+    def test_should_throw(self, image: Image, factor: float) -> None:
+        with pytest.raises(OutOfBoundsError, match=rf"factor \(={factor}\) is not inside \[0, \u221e\)."):
+            image.adjust_color_balance(factor)
+
+    @pytest.mark.parametrize(
+        ("image", "factor"),
+        [
+            (
+                Image.from_png_file(resolve_resource_path("image/original.png")),
+                1,
+            ),
+        ],
+        ids=["no change"],
+    )
+    def test_should_warn(self, image: Image, factor: float) -> None:
+        with pytest.warns(
+            UserWarning,
+            match="Color adjustment factor is 1.0, this will not make changes to the image.",
+        ):
+            adjust = image.adjust_color_balance(factor)
+        assert adjust == image
 
 
 class TestBlur:
