@@ -496,5 +496,21 @@ class TestRocCurve:
         ],
         ids=["untagged_table"],
     )
-    def test_should_compare_result(self, table: Table, roc_curve: Table) -> None:
+    def test_should_compare_result(self, table: TaggedTable, roc_curve: Table) -> None:
         assert DummyClassifier().roc_curve(table) == roc_curve
+
+    @pytest.mark.parametrize(
+        "table",
+        [
+            Table(
+                {
+                    "predicted": [0, 1, 0, 1],
+                    "expected": [0, 1, 1, 0],
+                },
+            ),
+        ],
+        ids=["untagged_table"],
+    )
+    def test_should_raise_if_table_is_not_tagged(self, table: Table) -> None:
+        with pytest.raises(UntaggedTableError):
+            DummyClassifier().roc_curve(table)
