@@ -712,9 +712,17 @@ class Table:
             A list of all similar column names.
         """
         similar_columns = []
-        for column in self.column_names:
-            if Levenshtein.jaro_winkler(column, column_name) >= 0.7:
-                similar_columns.append(column)
+        similarity = 0.6
+        i = 0
+        while i < len(self.column_names):
+            if Levenshtein.jaro_winkler(self.column_names[i], column_name) >= similarity:
+                similar_columns.append(self.column_names[i])
+            i += 1
+            if len(similar_columns) == 4 and similarity < 0.9:
+                similarity += 0.1
+                similar_columns = []
+                i = 0
+
 
         return similar_columns
 
