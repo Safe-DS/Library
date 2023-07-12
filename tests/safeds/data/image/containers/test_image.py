@@ -408,8 +408,7 @@ class TestAddGaussianNoise:
     )
     def test_should_raise_standard_deviation(self, image: Image, standard_deviation: float) -> None:
         with pytest.raises(
-                OutOfBoundsError,
-                match=rf"standard_deviation \(={standard_deviation}\) is not inside \[0, \u221e\)\."
+            OutOfBoundsError, match=rf"standard_deviation \(={standard_deviation}\) is not inside \[0, \u221e\)\.",
         ):
             image.add_gaussian_noise(standard_deviation)
 
