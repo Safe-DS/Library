@@ -2,6 +2,7 @@ from collections.abc import Iterable
 from typing import Any
 
 import numpy as np
+import pandas as pd
 import pytest
 from safeds.data.tabular.typing import (
     Anything,
