@@ -210,17 +210,6 @@ class Imputer(TableTransformer):
         if table.number_of_rows == 0:
             raise ValueError("The Imputer cannot transform the table because it contains 0 rows")
 
-        if table.keep_only_columns(self._column_names).remove_columns_with_missing_values().number_of_columns > 0:
-            warnings.warn(
-                (
-                    "The columns"
-                    f" {table.keep_only_columns(self._column_names).remove_columns_with_missing_values().column_names} have"
-                    " no missing values, so the Imputer did not change these columns"
-                ),
-                UserWarning,
-                stacklevel=2,
-            )
-
         data = table._data.copy()
         data[self._column_names] = pd.DataFrame(
             self._wrapped_transformer.transform(data[self._column_names]),
