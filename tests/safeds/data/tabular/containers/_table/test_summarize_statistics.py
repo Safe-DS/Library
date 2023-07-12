@@ -135,6 +135,6 @@ from safeds.data.tabular.containers import Table
     ],
     ids=["Column of integers and Column of characters", "empty", "empty with columns", "Column of None"],
 )
-def test_should_make_summary(table: Table, expected: Table) -> None:
-    assert expected.schema == table.summary().schema
-    assert expected == table.summary()
+def test_should_summarize_statistics(table: Table, expected: Table) -> None:
+    assert expected.schema == table.summarize_statistics().schema
+    assert expected == table.summarize_statistics()

@@ -1,5 +1,6 @@
 import pytest
 from safeds.data.tabular.containers import Table, TaggedTable
+from safeds.exceptions import OutOfBoundsError
 from safeds.ml.classical.regression import LassoRegression
 
 
@@ -19,9 +20,10 @@ class TestAlpha:
         assert fitted_model._wrapped_regressor is not None
         assert fitted_model._wrapped_regressor.alpha == 1
 
-    def test_should_raise_if_less_than_0(self) -> None:
-        with pytest.raises(ValueError, match="The parameter 'alpha' must be non-negative"):
-            LassoRegression(alpha=-1)
+    @pytest.mark.parametrize("alpha", [-0.5], ids=["minus_zero_point_5"])
+    def test_should_raise_if_less_than_0(self, alpha: float) -> None:
+        with pytest.raises(OutOfBoundsError, match=rf"alpha \(={alpha}\) is not inside \[0, \u221e\)\."):
+            LassoRegression(alpha=alpha)
 
     def test_should_warn_if_equal_to_0(self) -> None:
         with pytest.warns(
