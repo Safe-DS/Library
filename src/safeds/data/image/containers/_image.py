@@ -413,7 +413,7 @@ class Image:
             The image with inverted colors.
         """
         image_copy = copy.deepcopy(self)
-        image_copy._image = ImageOps.invert(image_copy._image)
+        image_copy._image = ImageOps.invert(image_copy._image.convert("RGB"))
         return image_copy
 
     def rotate_right(self) -> Image:

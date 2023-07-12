@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 import copy
-from collections.abc import Mapping
+import functools
+from collections.abc import Callable, Mapping
 from typing import TYPE_CHECKING, Any
 
 import pandas as pd
@@ -440,6 +441,39 @@ class Row(Mapping[str, Any]):
         Integer
         """
         return self._schema.get_column_type(column_name)
+
+    # ------------------------------------------------------------------------------------------------------------------
+    # Transformations
+    # ------------------------------------------------------------------------------------------------------------------
+
+    def sort_columns(
+        self,
+        comparator: Callable[[tuple, tuple], int] = lambda col1, col2: (col1[0] > col2[0]) - (col1[0] < col2[0]),
+    ) -> Row:
+        """
+        Sort the columns of a `Row` with the given comparator and return a new `Row`.
+
+        The original row is not modified. The comparator is a function that takes two tuples of (ColumnName, Value) `col1` and `col2` and
+        returns an integer:
+
+        * If `col1` should be ordered before `col2`, the function should return a negative number.
+        * If `col1` should be ordered after `col2`, the function should return a positive number.
+        * If the original order of `col1` and `col2` should be kept, the function should return 0.
+
+        If no comparator is given, the columns will be sorted alphabetically by their name.
+
+        Parameters
+        ----------
+        comparator : Callable[[tuple, tuple], int]
+            The function used to compare two tuples of (ColumnName, Value).
+
+        Returns
+        -------
+        new_row : Row
+            A new row with sorted columns.
+        """
+        sorted_row_dict = dict(sorted(self.to_dict().items(), key=functools.cmp_to_key(comparator)))
+        return Row.from_dict(sorted_row_dict)
 
     # ------------------------------------------------------------------------------------------------------------------
     # Conversion
