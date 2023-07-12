@@ -66,6 +66,9 @@ class RangeScaler(InvertibleTableTransformer):
             if len(missing_columns) > 0:
                 raise UnknownColumnNameError(missing_columns)
 
+        if table.number_of_rows == 0:
+            raise ValueError("The RangeScaler cannot be fitted because the table contains 0 rows")
+
         if (
             table.keep_only_columns(column_names).remove_columns_with_non_numerical_values().number_of_columns
             < table.keep_only_columns(column_names).number_of_columns
@@ -82,9 +85,6 @@ class RangeScaler(InvertibleTableTransformer):
                     ),
                 ),
             )
-
-        if table.number_of_rows == 0:
-            raise ValueError("The RangeScaler cannot be fitted because the table contains 0 rows")
 
         wrapped_transformer = sk_MinMaxScaler((self._minimum, self._maximum))
         wrapped_transformer.fit(table._data[column_names])
@@ -131,6 +131,9 @@ class RangeScaler(InvertibleTableTransformer):
         if len(missing_columns) > 0:
             raise UnknownColumnNameError(missing_columns)
 
+        if table.number_of_rows == 0:
+            raise ValueError("The RangeScaler cannot transform the table because it contains 0 rows")
+
         if (
             table.keep_only_columns(self._column_names).remove_columns_with_non_numerical_values().number_of_columns
             < table.keep_only_columns(self._column_names).number_of_columns
@@ -147,9 +150,6 @@ class RangeScaler(InvertibleTableTransformer):
                     ),
                 ),
             )
-
-        if table.number_of_rows == 0:
-            raise ValueError("The RangeScaler cannot transform the table because it contains 0 rows")
 
         data = table._data.copy()
         data.columns = table.column_names
@@ -191,6 +191,9 @@ class RangeScaler(InvertibleTableTransformer):
         if len(missing_columns) > 0:
             raise UnknownColumnNameError(missing_columns)
 
+        if transformed_table.number_of_rows == 0:
+            raise ValueError("The RangeScaler cannot transform the table because it contains 0 rows")
+
         if (
             transformed_table.keep_only_columns(self._column_names)
             .remove_columns_with_non_numerical_values()
@@ -209,9 +212,6 @@ class RangeScaler(InvertibleTableTransformer):
                     ),
                 ),
             )
-
-        if transformed_table.number_of_rows == 0:
-            raise ValueError("The RangeScaler cannot transform the table because it contains 0 rows")
 
         data = transformed_table._data.copy()
         data.columns = transformed_table.column_names
