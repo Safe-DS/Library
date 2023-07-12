@@ -388,10 +388,11 @@ class TestAddGaussianNoise:
     @pytest.mark.parametrize(
         ("image", "standard_deviation"),
         [
+            (Image.from_png_file(resolve_resource_path("image/boy.png")), 0.0),
             (Image.from_png_file(resolve_resource_path("image/boy.png")), 0.7),
             (Image.from_png_file(resolve_resource_path("image/boy.png")), 2.5),
         ],
-        ids=["some noise", "very noisy"],
+        ids=["minimum noise", "some noise", "very noisy"],
     )
     def test_should_add_noise(self, image: Image, standard_deviation: float) -> None:
         expected = Image.from_png_file(
