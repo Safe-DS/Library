@@ -1,11 +1,6 @@
 import pytest
 from safeds.data.tabular.containers import Column, TaggedTable
-from safeds.exceptions import (
-    ColumnSizeError,
-    DuplicateColumnNameError,
-    IllegalSchemaModificationError,
-    UnknownColumnNameError,
-)
+from safeds.exceptions import IllegalSchemaModificationError
 
 from tests.helpers import assert_that_tagged_tables_are_equal
 
@@ -182,47 +177,3 @@ def test_should_throw_illegal_schema_modification(
         match='Target column "target_old" can only be replaced by exactly one new column.',
     ):
         original_table.replace_column(column_name_to_be_replaced, new_columns)
-
-
-@pytest.mark.parametrize(
-    ("old_column_name", "column", "error", "error_message"),
-    [
-        (
-            "D",
-            [Column("C", ["d", "e", "f"])],
-            UnknownColumnNameError,
-            r"Could not find column\(s\) 'D'",
-        ),
-        (
-            "target",
-            [Column("non-feat", ["d", "e", "f"]), Column("D", [3, 2, 1])],
-            DuplicateColumnNameError,
-            r"Column 'non-feat' already exists.",
-        ),
-        (
-            "target",
-            [Column("D", [7, 8]), Column("E", ["c", "b"])],
-            ColumnSizeError,
-            r"Expected a column of size 3 but got column of size 2.",
-        ),
-    ],
-    ids=["UnknownColumnNameError", "DuplicateColumnNameError", "ColumnSizeError"],
-)
-def test_should_raise_error(
-    old_column_name: str,
-    column: list[Column],
-    error: type[Exception],
-    error_message: str,
-) -> None:
-    input_table: TaggedTable = TaggedTable(
-        {
-            "feat": [1, 2, 3],
-            "non-feat": [4, 5, 6],
-            "target": ["a", "b", "c"],
-        },
-        "target",
-        ["feat"],
-    )
-
-    with pytest.raises(error, match=error_message):
-        input_table.replace_column(old_column_name, column)

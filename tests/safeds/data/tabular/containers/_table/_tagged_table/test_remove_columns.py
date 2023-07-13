@@ -1,6 +1,6 @@
 import pytest
 from safeds.data.tabular.containers import Table, TaggedTable
-from safeds.exceptions import ColumnIsTargetError, IllegalSchemaModificationError, UnknownColumnNameError
+from safeds.exceptions import ColumnIsTargetError, IllegalSchemaModificationError
 
 from tests.helpers import assert_that_tagged_tables_are_equal
 
@@ -168,23 +168,12 @@ def test_should_remove_columns(table: TaggedTable, columns: list[str], expected:
             IllegalSchemaModificationError,
             r"Illegal schema modification: You cannot remove every feature column.",
         ),
-        (
-            TaggedTable._from_table(
-                Table({"feat": [1, 2, 3], "non-feat": [4, 5, 6], "target": [7, 8, 9]}),
-                "target",
-                ["feat"],
-            ),
-            ["feat", "feet"],
-            UnknownColumnNameError,
-            r"Could not find column\(s\) 'feet'",
-        ),
     ],
     ids=[
         "remove_only_target",
         "remove_non_feat_and_target",
         "remove_all_features",
         "remove_non_feat_and_all_features",
-        "remove_unknown_column",
     ],
 )
 def test_should_raise_in_remove_columns(

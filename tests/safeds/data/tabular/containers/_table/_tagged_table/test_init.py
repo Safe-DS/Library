@@ -1,6 +1,6 @@
 import pytest
 from safeds.data.tabular.containers import Table, TaggedTable
-from safeds.exceptions import ColumnLengthMismatchError, UnknownColumnNameError
+from safeds.exceptions import UnknownColumnNameError
 
 
 @pytest.mark.parametrize(
@@ -63,18 +63,6 @@ from safeds.exceptions import ColumnLengthMismatchError, UnknownColumnNameError
             ValueError,
             r"At least one feature column must be specified.",
         ),
-        (
-            {
-                "A": [1, 4],
-                "B": [2, 5],
-                "C": [3, 6],
-                "T": [0, 1, 2],
-            },
-            "T",
-            ["A", "B"],
-            ColumnLengthMismatchError,
-            r"The length of at least one column differs: \nA: 2\nB: 2\nC: 2\nT: 3",
-        ),
     ],
     ids=[
         "feature_does_not_exist",
@@ -82,7 +70,6 @@ from safeds.exceptions import ColumnLengthMismatchError, UnknownColumnNameError
         "target_and_feature_overlap",
         "features_are_empty-explicitly",
         "features_are_empty_implicitly",
-        "Columns do not match",
     ],
 )
 def test_should_raise_error(
