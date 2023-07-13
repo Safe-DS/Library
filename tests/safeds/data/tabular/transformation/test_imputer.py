@@ -1,3 +1,5 @@
+import warnings
+
 import pytest
 from safeds.data.tabular.containers import Table
 from safeds.data.tabular.transformation import Imputer
@@ -30,6 +32,7 @@ class TestStrategy:
                 (Imputer.Strategy.Median(), "Median"),
                 (Imputer.Strategy.Mode(), "Mode"),
             ],
+            ids=["Constant", "Mean", "Median", "Mode"],
         )
         def test_should_return_correct_string_representation(self, strategy: ImputerStrategy, expected: str) -> None:
             assert str(strategy) == expected
@@ -120,7 +123,16 @@ class TestTransform:
             },
         )
 
-        transformer = Imputer(strategy).fit(table_to_fit, None)
+        if isinstance(strategy, Imputer.Strategy.Mode):
+            with warnings.catch_warnings():
+                warnings.filterwarnings(
+                    action="ignore",
+                    message=r"There are multiple most frequent values in a column given to the Imputer\..*",
+                    category=UserWarning,
+                )
+                transformer = Imputer(strategy).fit(table_to_fit, None)
+        else:
+            transformer = Imputer(strategy).fit(table_to_fit, None)
 
         table_to_transform = Table(
             {
@@ -148,14 +160,6 @@ class TestTransform:
 
         with pytest.raises(TransformerNotFittedError, match=r"The transformer has not been fitted yet."):
             transformer.transform(table)
-
-    @pytest.mark.parametrize("strategy", strategies(), ids=lambda x: x.__class__.__name__)
-    def test_should_warn_if_no_missing_values(self, strategy: ImputerStrategy) -> None:
-        with pytest.warns(
-            UserWarning,
-            match=r"The columns \['col1'\] have no missing values, so the Imputer did not change these columns",
-        ):
-            Imputer(strategy).fit(Table({"col1": [1, 2, 3]}), ["col1"]).transform(Table({"col1": [1, 2, 3, 4, 5]}))
 
 
 class TestIsFitted:
@@ -280,7 +284,16 @@ class TestFitAndTransform:
         strategy: ImputerStrategy,
         expected: Table,
     ) -> None:
-        assert Imputer(strategy).fit_and_transform(table, column_names) == expected
+        if isinstance(strategy, Imputer.Strategy.Mode):
+            with warnings.catch_warnings():
+                warnings.filterwarnings(
+                    action="ignore",
+                    message=r"There are multiple most frequent values in a column given to the Imputer\..*",
+                    category=UserWarning,
+                )
+                assert Imputer(strategy).fit_and_transform(table, column_names) == expected
+        else:
+            assert Imputer(strategy).fit_and_transform(table, column_names) == expected
 
     @pytest.mark.parametrize("strategy", strategies(), ids=lambda x: x.__class__.__name__)
     def test_should_not_change_original_table(self, strategy: ImputerStrategy) -> None:

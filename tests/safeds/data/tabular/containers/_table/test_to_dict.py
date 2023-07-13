@@ -24,6 +24,7 @@ from safeds.data.tabular.containers import Table
             },
         ),
     ],
+    ids=["Empty table", "Table with one row"],
 )
 def test_should_return_dict_for_table(table: Table, expected: dict[str, list[Any]]) -> None:
     assert table.to_dict() == expected
