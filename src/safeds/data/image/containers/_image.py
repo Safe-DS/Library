@@ -363,19 +363,20 @@ class Image:
         """
         Return a new `Image` with adjusted contrast.
 
-         The original image is not modified.
+        The original image is not modified.
 
         Parameters
         ----------
-         factor: float
-             If factor > 1, increase contrast of image.
-             If factor = 1, no changes will be made.
-             If factor < 1, make image greyer.
-             Has to be bigger than or equal to 0 (gray).
+        factor: float
+            If factor > 1, increase contrast of image.
+            If factor = 1, no changes will be made.
+            If factor < 1, make image greyer.
+            Has to be bigger than or equal to 0 (gray).
 
         Returns
         -------
-         New image with adjusted contrast.
+        image: Image
+            New image with adjusted contrast.
         """
         if factor < 0:
             raise OutOfBoundsError(factor, name="factor", lower_bound=ClosedBound(0))
