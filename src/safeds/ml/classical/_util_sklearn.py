@@ -126,6 +126,8 @@ def predict(model: Any, dataset: Table, feature_names: list[str] | None, target_
     missing_feature_names = [feature_name for feature_name in feature_names if not dataset.has_column(feature_name)]
     if missing_feature_names:
         raise DatasetMissesFeaturesError(missing_feature_names)
+    if isinstance(dataset, TaggedTable):
+        dataset = dataset.features  # Cast to Table type, so Python will call the right methods...
 
     if dataset.number_of_rows == 0:
         raise DatasetMissesDataError

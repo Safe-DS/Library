@@ -3,7 +3,7 @@ from typing import Any
 import pandas as pd
 import pytest
 from safeds.data.tabular.containers import Column
-from safeds.data.tabular.typing import Boolean, ColumnType, Integer, RealNumber, String
+from safeds.data.tabular.typing import Anything, Boolean, ColumnType, Integer, Nothing, RealNumber, String
 
 
 def test_should_store_the_name() -> None:
@@ -43,14 +43,15 @@ def test_should_store_the_data(column: Column, expected: list) -> None:
 @pytest.mark.parametrize(
     ("column", "expected"),
     [
-        (Column("A", []), String()),
+        (Column("A", []), Nothing()),
         (Column("A", [True, False, True]), Boolean()),
         (Column("A", [1, 2, 3]), Integer()),
-        (Column("A", [1.0, 2.0, 3.0]), RealNumber()),
+        (Column("A", [1.0, 2.0, 3.0]), Integer()),
+        (Column("A", [1.0, 2.5, 3.0]), RealNumber()),
         (Column("A", ["a", "b", "c"]), String()),
-        (Column("A", [1, 2.0, "a", True]), String()),
+        (Column("A", [1, 2.0, "a", True]), Anything()),
     ],
-    ids=["empty", "boolean", "integer", "real number", "string", "mixed"],
+    ids=["empty", "boolean", "integer", "real number .0", "real number", "string", "mixed"],
 )
 def test_should_infer_type(column: Column, expected: ColumnType) -> None:
     assert column.type == expected

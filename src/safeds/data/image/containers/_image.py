@@ -6,12 +6,15 @@ import warnings
 from pathlib import Path
 from typing import Any, BinaryIO
 
+import numpy as np
 import PIL
 from PIL import ImageEnhance, ImageFilter, ImageOps
 from PIL.Image import Image as PillowImage
 from PIL.Image import open as open_image
+from skimage.util import random_noise
 
 from safeds.data.image.typing import ImageFormat
+from safeds.exceptions import ClosedBound, OutOfBoundsError
 
 
 class Image:
@@ -293,7 +296,7 @@ class Image:
             The Image with adjusted brightness.
         """
         if factor < 0:
-            raise ValueError("Brightness factor has to be 0 or bigger")
+            raise OutOfBoundsError(factor, name="factor", lower_bound=ClosedBound(0))
         elif factor == 1:
             warnings.warn(
                 "Brightness adjustment factor is 1.0, this will not make changes to the image.",
@@ -303,6 +306,43 @@ class Image:
 
         image_copy = copy.deepcopy(self)
         image_copy._image = ImageEnhance.Brightness(image_copy._image).enhance(factor)
+        return image_copy
+
+    def add_gaussian_noise(self, standard_deviation: float) -> Image:
+        """
+        Add Gaussian noise to the image.
+
+        Parameters
+        ----------
+        standard_deviation : float
+            The standard deviation of the Gaussian distribution. Has to be bigger than or equal to 0.
+
+        Returns
+        -------
+        result : Image
+            The image with added Gaussian noise.
+
+        Raises
+        ------
+        OutOfBoundsError
+            If standard_deviation is smaller than 0.
+        """
+        if standard_deviation < 0:
+            raise OutOfBoundsError(standard_deviation, name="standard_deviation", lower_bound=ClosedBound(0))
+
+        # noinspection PyTypeChecker
+        image_as_array = np.asarray(self._image)
+        noisy_image_as_array = random_noise(
+            image_as_array,
+            mode="gaussian",
+            var=standard_deviation**2,
+            rng=42,
+            clip=True,
+        )
+        noisy_image = PIL.Image.fromarray(np.uint8(255 * noisy_image_as_array))
+
+        image_copy = copy.deepcopy(self)
+        image_copy._image = noisy_image
         return image_copy
 
     def adjust_contrast(self, factor: float) -> Image:
@@ -322,7 +362,7 @@ class Image:
         New image with adjusted contrast.
         """
         if factor < 0:
-            raise ValueError("Contrast factor has to be 0 or bigger")
+            raise OutOfBoundsError(factor, name="factor", lower_bound=ClosedBound(0))
         elif factor == 1:
             warnings.warn(
                 "Contrast adjustment factor is 1.0, this will not make changes to the image.",
@@ -352,7 +392,7 @@ class Image:
             The new, adjusted image.
         """
         if factor < 0:
-            raise ValueError("Color factor has to be 0 or bigger.")
+            raise OutOfBoundsError(factor, name="factor", lower_bound=ClosedBound(0))
         elif factor == 1:
             warnings.warn(
                 "Color adjustment factor is 1.0, this will not make changes to the image.",
@@ -389,8 +429,9 @@ class Image:
 
         Parameters
         ----------
-        factor: The amount of sharpness to be applied to the image.
-        Factor 1.0 is considered to be neutral and does not make any changes.
+        factor : float
+            The amount of sharpness to be applied to the image. Factor 1.0 is considered to be neutral and does not make
+            any changes.
 
         Returns
         -------
@@ -411,7 +452,7 @@ class Image:
             The image with inverted colors.
         """
         image_copy = copy.deepcopy(self)
-        image_copy._image = ImageOps.invert(image_copy._image)
+        image_copy._image = ImageOps.invert(image_copy._image.convert("RGB"))
         return image_copy
 
     def rotate_right(self) -> Image:

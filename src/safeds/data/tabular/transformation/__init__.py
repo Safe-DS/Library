@@ -9,12 +9,12 @@ from ._standard_scaler import StandardScaler
 from ._table_transformer import InvertibleTableTransformer, TableTransformer
 
 __all__ = [
+    "Discretizer",
     "Imputer",
+    "InvertibleTableTransformer",
     "LabelEncoder",
     "OneHotEncoder",
-    "InvertibleTableTransformer",
-    "TableTransformer",
     "RangeScaler",
-    "Discretizer",
     "StandardScaler",
+    "TableTransformer",
 ]
