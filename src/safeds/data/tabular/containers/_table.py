@@ -709,7 +709,7 @@ class Table:
         Returns
         -------
         similar_columns: list[str]
-            A list of all similar column names.
+            A list of all column names in the Table that are similar or equal to the given column name.
         """
         similar_columns = []
         similarity = 0.6
