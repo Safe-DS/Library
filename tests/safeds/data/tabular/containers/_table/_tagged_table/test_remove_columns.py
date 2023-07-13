@@ -169,7 +169,12 @@ def test_should_remove_columns(table: TaggedTable, columns: list[str], expected:
             r"Illegal schema modification: You cannot remove every feature column.",
         ),
     ],
-    ids=["remove_only_target", "remove_non_feat_and_target", "remove_all_features", "remove_non_feat_and_all_features"],
+    ids=[
+        "remove_only_target",
+        "remove_non_feat_and_target",
+        "remove_all_features",
+        "remove_non_feat_and_all_features",
+    ],
 )
 def test_should_raise_in_remove_columns(
     table: TaggedTable,

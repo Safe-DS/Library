@@ -861,7 +861,7 @@ class Table:
         DuplicateColumnNameError
             If the new column already exists.
         ColumnSizeError
-            If the size of the column does not match the amount of rows.
+            If the size of the column does not match the number of rows.
 
         Examples
         --------
@@ -902,10 +902,10 @@ class Table:
 
         Raises
         ------
-        ColumnSizeError
-            If at least one of the column sizes from the provided column list does not match the table.
         DuplicateColumnNameError
             If at least one column name from the provided column list already exists in the table.
+        ColumnSizeError
+            If at least one of the column sizes from the provided column list does not match the table.
 
         Examples
         --------
@@ -973,7 +973,12 @@ class Table:
         if self.number_of_columns == 0:
             return Table.from_rows([row])
         if len(set(self.column_names) - set(row.column_names)) > 0:
-            raise UnknownColumnNameError(list(set(self.column_names) - set(row.column_names)))
+            raise UnknownColumnNameError(
+                sorted(
+                    set(self.column_names) - set(row.column_names),
+                    key={val: ix for ix, val in enumerate(self.column_names)}.__getitem__,
+                ),
+            )
 
         if result.number_of_rows == 0:
             int_columns = list(filter(lambda name: isinstance(row[name], int | np.int64 | np.int32), row.column_names))
@@ -1026,16 +1031,20 @@ class Table:
         """
         if isinstance(rows, Table):
             rows = rows.to_rows()
-        result = self._copy()
 
         if len(rows) == 0:
             return self._copy()
 
         different_column_names = set()
         for row in rows:
-            different_column_names.update(set(rows[0].column_names) - set(row.column_names))
+            different_column_names.update(set(self.column_names) - set(row.column_names))
         if len(different_column_names) > 0:
-            raise UnknownColumnNameError(list(different_column_names))
+            raise UnknownColumnNameError(
+                sorted(
+                    different_column_names,
+                    key={val: ix for ix, val in enumerate(self.column_names)}.__getitem__,
+                ),
+            )
 
         result = self._copy()
 
