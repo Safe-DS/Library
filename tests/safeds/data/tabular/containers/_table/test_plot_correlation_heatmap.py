@@ -1,4 +1,3 @@
-import warnings
 
 import pytest
 from safeds.data.image.containers import Image
@@ -17,7 +16,10 @@ from tests.helpers import resolve_resource_path
 )
 def test_should_match_snapshot(table: Table, path: str) -> None:
     if table.number_of_rows == 0:
-        with pytest.warns(UserWarning, match=r"An empty table has been used. A correlation heatmap on an empty table will show nothing."):
+        with pytest.warns(
+            UserWarning,
+            match=r"An empty table has been used. A correlation heatmap on an empty table will show nothing.",
+        ):
             current = table.plot_correlation_heatmap()
     else:
         current = table.plot_correlation_heatmap()
