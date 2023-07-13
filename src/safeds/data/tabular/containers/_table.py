@@ -733,7 +733,7 @@ class Table:
         """
         Return a table with a number of statistical key values.
 
-        This table is not modified.
+        The original table is not modified.
 
         Returns
         -------
@@ -838,8 +838,6 @@ class Table:
         """
         Transform the table to an instance of the Table class.
 
-        The original table is not modified.
-
         Returns
         -------
         table: Table
@@ -849,9 +847,9 @@ class Table:
 
     def add_column(self, column: Column) -> Table:
         """
-        Return the original table with the provided column attached at the end.
+        Return a new table with the provided column attached at the end.
 
-        This table is not modified.
+        The original table is not modified.
 
         Returns
         -------
@@ -888,9 +886,9 @@ class Table:
 
     def add_columns(self, columns: list[Column] | Table) -> Table:
         """
-        Add multiple columns to the table.
+        Return a new `Table` with multiple added columns.
 
-        This table is not modified.
+        The original table is not modified.
 
         Parameters
         ----------
@@ -936,14 +934,14 @@ class Table:
 
     def add_row(self, row: Row) -> Table:
         """
-        Add a row to the table.
+        Return a new `Table` with an added Row attached.
 
         If the table happens to be empty beforehand, respective columns will be added automatically.
 
         The order of columns of the new row will be adjusted to the order of columns in the table.
         The new table will contain the merged schema.
 
-        This table is not modified.
+        The original table is not modified.
 
         Parameters
         ----------
@@ -992,12 +990,12 @@ class Table:
 
     def add_rows(self, rows: list[Row] | Table) -> Table:
         """
-        Add multiple rows to a table.
+        Return a new `Table` with multiple added Rows attached.
 
         The order of columns of the new rows will be adjusted to the order of columns in the table.
         The new table will contain the merged schema.
 
-        This table is not modified.
+        The original table is not modified.
 
         Parameters
         ----------
@@ -1048,9 +1046,9 @@ class Table:
 
     def filter_rows(self, query: Callable[[Row], bool]) -> Table:
         """
-        Return a table with rows filtered by Callable (e.g. lambda function).
+        Return a new table with rows filtered by Callable (e.g. lambda function).
 
-        This table is not modified.
+        The original table is not modified.
 
         Parameters
         ----------
@@ -1081,9 +1079,9 @@ class Table:
 
     def group_rows_by(self, key_selector: Callable[[Row], _T]) -> dict[_T, Table]:
         """
-        Return a dictionary with the output tables as values and the keys from the key_selector.
+        Return a dictionary with copies of the output tables as values and the keys from the key_selector.
 
-        This table is not modified.
+        The original table is not modified.
 
         Parameters
         ----------
@@ -1105,9 +1103,9 @@ class Table:
 
     def keep_only_columns(self, column_names: list[str]) -> Table:
         """
-        Return a table with only the given column(s).
+        Return a new table with only the given column(s).
 
-        This table is not modified.
+        The original table is not modified.
 
         Note: When removing the last column of the table, the `number_of_columns` property will be set to 0.
 
@@ -1152,9 +1150,9 @@ class Table:
 
     def remove_columns(self, column_names: list[str]) -> Table:
         """
-        Return a table without the given column(s).
+        Return a new table without the given column(s).
 
-        This table is not modified.
+        The original table is not modified.
 
         Note: When removing the last column of the table, the `number_of_columns` property will be set to 0.
 
@@ -1203,9 +1201,9 @@ class Table:
 
     def remove_columns_with_missing_values(self) -> Table:
         """
-        Return a table without the columns that contain missing values.
+        Return a new table without the columns that contain missing values.
 
-        This table is not modified.
+        The original table is not modified.
 
         Note: When removing the last column of the table, the `number_of_columns` property will be set to 0.
 
@@ -1232,9 +1230,9 @@ class Table:
 
     def remove_columns_with_non_numerical_values(self) -> Table:
         """
-        Return a table without the columns that contain non-numerical values.
+        Return a new table without the columns that contain non-numerical values.
 
-        This table is not modified.
+        The original table is not modified.
 
         Note: When removing the last column of the table, the `number_of_columns` property will be set to 0.
 
@@ -1261,9 +1259,9 @@ class Table:
 
     def remove_duplicate_rows(self) -> Table:
         """
-        Return a copy of the table with every duplicate row removed.
+        Return a new table with every duplicate row removed.
 
-        This table is not modified.
+        The original table is not modified.
 
         Returns
         -------
@@ -1285,9 +1283,9 @@ class Table:
 
     def remove_rows_with_missing_values(self) -> Table:
         """
-        Return a table without the rows that contain missing values.
+        Return a new table without the rows that contain missing values.
 
-        This table is not modified.
+        The original table is not modified.
 
         Returns
         -------
@@ -1308,13 +1306,13 @@ class Table:
 
     def remove_rows_with_outliers(self) -> Table:
         """
-        Remove all rows from the table that contain at least one outlier.
+        Return a new table without those rows that contain at least one outlier.
 
         We define an outlier as a value that has a distance of more than 3 standard deviations from the column mean.
         Missing values are not considered outliers. They are also ignored during the calculation of the standard
         deviation.
 
-        This table is not modified.
+        The original table is not modified.
 
         Returns
         -------
@@ -1353,9 +1351,9 @@ class Table:
 
     def rename_column(self, old_name: str, new_name: str) -> Table:
         """
-        Rename a single column.
+        Return a new `Table` with a single column renamed.
 
-        This table is not modified.
+        The original table is not modified.
 
         Parameters
         ----------
@@ -1398,11 +1396,11 @@ class Table:
 
     def replace_column(self, old_column_name: str, new_columns: list[Column]) -> Table:
         """
-        Return a copy of the table with the specified old column replaced by a list of new columns.
+        Return a new table with the specified old column replaced by a list of new columns.
 
         The order of columns is kept.
 
-        This table is not modified.
+        The original table is not modified.
 
         Parameters
         ----------
@@ -1458,9 +1456,9 @@ class Table:
 
     def shuffle_rows(self) -> Table:
         """
-        Shuffle the table randomly.
+        Return a new `Table` with randomly shuffled rows of this `Table`.
 
-        This table is not modified.
+        The original table is not modified.
 
         Returns
         -------
@@ -1492,7 +1490,7 @@ class Table:
         """
         Slice a part of the table into a new table.
 
-        This table is not modified.
+        The original table is not modified.
 
         Parameters
         ----------
@@ -1554,7 +1552,7 @@ class Table:
 
         If no comparator is given, the columns will be sorted alphabetically by their name.
 
-        This table is not modified.
+        The original table is not modified.
 
         Parameters
         ----------
@@ -1596,7 +1594,7 @@ class Table:
         * If `row1` should be ordered after `row2`, the function should return a positive number.
         * If the original order of `row1` and `row2` should be kept, the function should return 0.
 
-        This table is not modified.
+        The original table is not modified.
 
         Parameters
         ----------
@@ -1636,7 +1634,7 @@ class Table:
         """
         Split the table into two new tables.
 
-        This table is not modified.
+        The original table is not modified.
 
         Parameters
         ----------
@@ -1680,9 +1678,9 @@ class Table:
 
     def tag_columns(self, target_name: str, feature_names: list[str] | None = None) -> TaggedTable:
         """
-        Mark the columns of the table as target column or feature columns. The original table is not modified.
+        Return a new `TaggedTable` with columns marked as a target column or feature columns.
 
-        This table is not modified.
+        The original table is not modified.
 
         Parameters
         ----------
@@ -1715,9 +1713,9 @@ class Table:
 
     def transform_column(self, name: str, transformer: Callable[[Row], Any]) -> Table:
         """
-        Transform provided column by calling provided transformer.
+        Return a new `Table` with the provided column transformed by calling the provided transformer.
 
-        This table is not modified.
+        The original table is not modified.
 
         Returns
         -------
@@ -1748,9 +1746,9 @@ class Table:
 
     def transform_table(self, transformer: TableTransformer) -> Table:
         """
-        Apply a learned transformation onto this table.
+        Return a new `Table` with a learned transformation applied to this table.
 
-        This table is not modified.
+        The original table is not modified.
 
         Parameters
         ----------
@@ -1786,9 +1784,9 @@ class Table:
 
     def inverse_transform_table(self, transformer: InvertibleTableTransformer) -> Table:
         """
-        Invert the transformation applied by the given transformer.
+        Return a new `Table` with the inverted transformation applied by the given transformer.
 
-        This table is not modified.
+        The original table is not modified.
 
         Parameters
         ----------
