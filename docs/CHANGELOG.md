@@ -1,3 +1,28 @@
+## [0.15.0](https://github.com/Safe-DS/Stdlib/compare/v0.14.0...v0.15.0) (2023-07-13)
+
+
+### Features
+
+* Add copy method for tables ([#405](https://github.com/Safe-DS/Stdlib/issues/405)) ([72e87f0](https://github.com/Safe-DS/Stdlib/commit/72e87f0e3fd8c647b1021678ed8712224de074de)), closes [#275](https://github.com/Safe-DS/Stdlib/issues/275)
+* add gaussian noise to image ([#430](https://github.com/Safe-DS/Stdlib/issues/430)) ([925a505](https://github.com/Safe-DS/Stdlib/commit/925a50547cb8726ac3038fa7c4108eb49f309cca)), closes [#381](https://github.com/Safe-DS/Stdlib/issues/381)
+* add schema conversions when adding new rows to a table and schema conversion when creating a new table ([#432](https://github.com/Safe-DS/Stdlib/issues/432)) ([6e9ff69](https://github.com/Safe-DS/Stdlib/commit/6e9ff6900b912a6c8f1dca8cafbb2f290fd146a5)), closes [#404](https://github.com/Safe-DS/Stdlib/issues/404) [#322](https://github.com/Safe-DS/Stdlib/issues/322) [#127](https://github.com/Safe-DS/Stdlib/issues/127) [#322](https://github.com/Safe-DS/Stdlib/issues/322) [#127](https://github.com/Safe-DS/Stdlib/issues/127)
+* add test for empty tables for the method `Table.sort_rows` ([#431](https://github.com/Safe-DS/Stdlib/issues/431)) ([f94b768](https://github.com/Safe-DS/Stdlib/commit/f94b768ae089988ec9511e2356a9f201ba41fea8)), closes [#402](https://github.com/Safe-DS/Stdlib/issues/402)
+* added color adjustment feature ([#409](https://github.com/Safe-DS/Stdlib/issues/409)) ([2cbee36](https://github.com/Safe-DS/Stdlib/commit/2cbee36d3bfcfb8389731ba4d20687587a781a7a)), closes [#380](https://github.com/Safe-DS/Stdlib/issues/380)
+* added test_repr table tests ([#410](https://github.com/Safe-DS/Stdlib/issues/410)) ([cb77790](https://github.com/Safe-DS/Stdlib/commit/cb777906e81f2becf3da2b530dd2cb84ad42fd63)), closes [#349](https://github.com/Safe-DS/Stdlib/issues/349)
+* discretize table ([#327](https://github.com/Safe-DS/Stdlib/issues/327)) ([5e3da8d](https://github.com/Safe-DS/Stdlib/commit/5e3da8d26250b9f06a3209a35e26e296890fc6a2)), closes [#143](https://github.com/Safe-DS/Stdlib/issues/143)
+* Improve error handling of TaggedTable ([#450](https://github.com/Safe-DS/Stdlib/issues/450)) ([c5da544](https://github.com/Safe-DS/Stdlib/commit/c5da544554d1895aad274ba5a4775fd63257d65f)), closes [#150](https://github.com/Safe-DS/Stdlib/issues/150)
+* Maintain tagging in methods inherited from `Table` class ([#332](https://github.com/Safe-DS/Stdlib/issues/332)) ([bc73a6c](https://github.com/Safe-DS/Stdlib/commit/bc73a6ca1c4a8429ced3a3b27ff5dedbeec59c03)), closes [#58](https://github.com/Safe-DS/Stdlib/issues/58)
+* new error class `OutOfBoundsError` ([#438](https://github.com/Safe-DS/Stdlib/issues/438)) ([1f37e4a](https://github.com/Safe-DS/Stdlib/commit/1f37e4a18b8637ebcb6a5db22642d13c5568cd1a)), closes [#262](https://github.com/Safe-DS/Stdlib/issues/262)
+* rename several `Table` methods for consistency ([#445](https://github.com/Safe-DS/Stdlib/issues/445)) ([9954986](https://github.com/Safe-DS/Stdlib/commit/9954986b1a5a3bf11c70cf9a82538b48ff840e12)), closes [#439](https://github.com/Safe-DS/Stdlib/issues/439)
+* suggest similar columns if column gets accessed that doesnt exist ([#385](https://github.com/Safe-DS/Stdlib/issues/385)) ([6a097a4](https://github.com/Safe-DS/Stdlib/commit/6a097a4d3e6544a0c6c96b44d5c461ac2cbc61e8)), closes [#203](https://github.com/Safe-DS/Stdlib/issues/203)
+
+
+### Bug Fixes
+
+* added the missing ids in parameterized tests ([#412](https://github.com/Safe-DS/Stdlib/issues/412)) ([dab6419](https://github.com/Safe-DS/Stdlib/commit/dab64191791550f9449e2fd4b44b8d4228e70f34)), closes [#362](https://github.com/Safe-DS/Stdlib/issues/362)
+* don't warn if `Imputer` transforms column without missing values ([#448](https://github.com/Safe-DS/Stdlib/issues/448)) ([f0cb6a5](https://github.com/Safe-DS/Stdlib/commit/f0cb6a5d0852f280b1b88f62e16c2014b09f0c65))
+* Warnings raised by underlying seaborn and numpy libraries  ([#425](https://github.com/Safe-DS/Stdlib/issues/425)) ([c4143af](https://github.com/Safe-DS/Stdlib/commit/c4143afed0f3345baae4052427eed2e3e0d296f4)), closes [#357](https://github.com/Safe-DS/Stdlib/issues/357)
+
 ## [0.14.0](https://github.com/Safe-DS/Stdlib/compare/v0.13.0...v0.14.0) (2023-06-30)
 
 
