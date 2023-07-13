@@ -23,11 +23,12 @@ class UnknownColumnNameError(KeyError):
             def __repr__(self) -> str:
                 return str(self)
 
-        super().__init__(
-            _UnknownColumnNameErrorMessage(
-                f"Could not find column(s) '{', '.join(column_names)}'.\nDid you mean '{similar_columns}'?",
-            ),
-        )
+        error_message = f"Could not find column(s) '{', '.join(column_names)}'."
+
+        if similar_columns is not None:
+            error_message += f"\nDid you mean '{similar_columns}'?"
+
+        super().__init__(_UnknownColumnNameErrorMessage(error_message))
 
 
 class NonNumericColumnError(Exception):

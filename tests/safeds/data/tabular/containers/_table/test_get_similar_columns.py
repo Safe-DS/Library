@@ -20,8 +20,19 @@ from safeds.exceptions._data import UnknownColumnNameError
             "clumn1",
             ["column1", "cilumn2"],
         ),
+        (
+            Table({"column1": ["col1_1"], "x": ["y"], "cilumn2": ["cil2_1"]}),
+            "notexisting",
+            ["x"],
+        ),
+        (
+            Table({"column1": ["col1_1"], "x": ["y"], "cilumn2": ["cil2_1"]}),
+            "x",
+            ["x"],
+        ),
+        (Table({}), "column1", []),
     ],
-    ids=["one similar", "two similar/ dynamic increase"],
+    ids=["one similar", "two similar/ dynamic increase", "no similar", "exact match", "empty table"],
 )
 def test_should_get_similar_column_names(table: Table, column_name: str, expected: list[str]) -> None:
     assert table._get_similar_columns(column_name) == expected
