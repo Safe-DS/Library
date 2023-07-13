@@ -22,5 +22,5 @@ def test_should_match_snapshot(table: Table, path: str) -> None:
     snapshot = Image.from_png_file(resolve_resource_path(path))
 
     # Inlining the expression into the assert causes pytest to hang if the assertion fails when run from PyCharm.
-    assertion = snapshot._image.tobytes() == current._image.tobytes()
+    assertion = snapshot == current
     assert assertion
