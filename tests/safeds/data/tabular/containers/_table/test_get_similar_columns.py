@@ -20,10 +20,10 @@ from safeds.exceptions._data import UnknownColumnNameError
             "clumn1",
             ["column1", "cilumn2"],
         ),
-        (
-            Table({"column1": ["col1_1"], "x": ["y"], "cilumn2": ["cil2_1"]}),
+               (
+            Table({"column1": ["a"], "column2": ["b"], "column3": ["c"]}),
             "notexisting",
-            ["x"],
+            [],
         ),
         (
             Table({"column1": ["col1_1"], "x": ["y"], "cilumn2": ["cil2_1"]}),
