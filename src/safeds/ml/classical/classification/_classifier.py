@@ -7,6 +7,7 @@ from sklearn.metrics import accuracy_score as sk_accuracy_score
 from sklearn.metrics import roc_curve
 
 from safeds.data.tabular.containers import Row, Table, TaggedTable
+from safeds.data.image.containers import Image
 from safeds.exceptions import UntaggedTableError
 
 if TYPE_CHECKING:
