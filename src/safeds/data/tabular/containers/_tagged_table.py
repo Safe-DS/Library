@@ -795,7 +795,7 @@ class TaggedTable(Table):
 
     def transform_column(self, name: str, transformer: Callable[[Row], Any]) -> TaggedTable:
         """
-        Transform provided column by calling provided transformer and return a new `TaggedTable`.
+        Transform the provided column by calling the provided transformer and return a new `TaggedTable`.
 
         The original table is not modified.
 

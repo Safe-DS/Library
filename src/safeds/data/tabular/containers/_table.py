@@ -1677,7 +1677,7 @@ class Table:
 
     def transform_column(self, name: str, transformer: Callable[[Row], Any]) -> Table:
         """
-        Transform provided column by calling provided transformer and return a new `Table`.
+        Transform the provided column by calling the provided transformer and return a new `Table`.
 
         The original table is not modified.
 
