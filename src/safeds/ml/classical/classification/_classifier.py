@@ -232,7 +232,7 @@ class Classifier(ABC):
             return 1.0
         return 2 * n_true_positives / (2 * n_true_positives + n_false_positives + n_false_negatives)
 
-    def roc_curve(self, validation_or_test_set: TaggedTable) -> Table:
+    def roc_curve(self, validation_or_test_set: TaggedTable) -> Image:
         """
         Compute the classifier's roc_curve on the given data.
 
@@ -269,4 +269,7 @@ class Classifier(ABC):
             roc_table = roc_table.add_row(Row.from_dict({"fpr": fpr[i], "tpr": tpr[i]}))
             i += 1
 
-        return roc_table
+        roc_plotted = roc_table.plot_lineplot("fpr", "tpr")
+        roc_plotted._image.show()
+
+        return roc_plotted

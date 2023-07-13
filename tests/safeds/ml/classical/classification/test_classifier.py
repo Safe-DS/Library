@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING, Any
 
 import pytest
 from safeds.data.tabular.containers import Table, TaggedTable
+from safeds.data.image.containers import Image
 from safeds.exceptions import (
     DatasetContainsTargetError,
     DatasetMissesDataError,
@@ -23,6 +24,8 @@ from safeds.ml.classical.classification import (
     RandomForest,
     SupportVectorMachine,
 )
+
+from tests.helpers import resolve_resource_path
 
 if TYPE_CHECKING:
     from _pytest.fixtures import FixtureRequest
@@ -483,21 +486,17 @@ class TestRocCurve:
             (
                 Table(
                     {
-                        "predicted": [0, 1, 0, 1],
-                        "expected": [0, 1, 1, 0],
+                        "predicted": [1, 1, 0, 1, 0, 1, 0, 0, 1],
+                        "expected": [0, 1, 1, 0, 0, 0, 1, 0, 1],
                     },
                 ).tag_columns(target_name="expected"),
-                Table(
-                    {
-                        "fpr": [0.0, 0.5, 1.0],
-                        "tpr": [0.0, 0.5, 1.0],
-                    },
+                Image.from_png_file(resolve_resource_path("image/roc_curve.png")
                 ),
             ),
         ],
-        ids=["untagged_table"],
+        ids=["tagged_table"],
     )
-    def test_should_compare_result(self, table: TaggedTable, roc_curve: Table) -> None:
+    def test_should_compare_result(self, table: TaggedTable, roc_curve: Image) -> None:
         assert DummyClassifier().roc_curve(table) == roc_curve
 
     @pytest.mark.parametrize(
