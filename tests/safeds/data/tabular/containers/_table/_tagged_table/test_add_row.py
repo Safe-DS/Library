@@ -55,3 +55,22 @@ def test_should_raise_an_error_if_row_schema_invalid(
 ) -> None:
     with pytest.raises(UnknownColumnNameError, match=error_msg):
         tagged_table.add_row(row)
+
+
+@pytest.mark.parametrize(
+    ("tagged_table", "row", "expected_table"),
+    [
+        (
+            TaggedTable({"feature": [], "target": []}, "target"),
+            Row({"feature": 2, "target": 5}),
+            TaggedTable({"feature": [2], "target": [5]}, "target"),
+        ),
+    ],
+    ids=["empty_feature_column"],
+)
+def test_should_add_row_to_empty_table(
+    tagged_table: TaggedTable,
+    row: Row,
+    expected_table: TaggedTable,
+) -> None:
+    assert_that_tagged_tables_are_equal(tagged_table.add_row(row), expected_table)
