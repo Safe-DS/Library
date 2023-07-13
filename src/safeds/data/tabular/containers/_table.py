@@ -425,7 +425,7 @@ class Table:
 
         Returns
         -------
-        'True' if contents are equal, 'False' otherwise
+        'True' if contents are equal, 'False' otherwise.
 
         Examples
         --------
@@ -1324,9 +1324,9 @@ class Table:
         Parameters
         ----------
         old_name : str
-            The old name of the target column
+            The old name of the target column.
         new_name : str
-            The new name of the target column
+            The new name of the target column.
 
         Returns
         -------
@@ -1458,9 +1458,9 @@ class Table:
 
         Parameters
         ----------
-        start : int
+        start : int | None
             The first index of the range to be copied into a new table, None by default.
-        end : int
+        end : int | None
             The last index of the range to be copied into a new table, None by default.
         step : int
             The step size used to iterate through the table, 1 by default.
@@ -1614,7 +1614,7 @@ class Table:
         Raises
         ------
         ValueError:
-            if the 'percentage_in_first' is not between 0 and 1
+            if the 'percentage_in_first' is not between 0 and 1.
 
         Examples
         --------
