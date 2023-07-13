@@ -207,7 +207,9 @@ class Image:
 
     def resize(self, new_width: int, new_height: int) -> Image:
         """
-        Return a new image that has been resized to a given size.
+        Return a new `Image` that has been resized to a given size.
+
+        The original image is not modified.
 
         Returns
         -------
@@ -220,7 +222,9 @@ class Image:
 
     def convert_to_grayscale(self) -> Image:
         """
-        Convert the image to grayscale.
+        Return a new `Image` that is converted to grayscale.
+
+        The original image is not modified.
 
         Returns
         -------
@@ -233,7 +237,9 @@ class Image:
 
     def crop(self, x: int, y: int, width: int, height: int) -> Image:
         """
-        Return an image that has been cropped to a given bounding rectangle.
+        Return a new `Image` that has been cropped to a given bounding rectangle.
+
+        The original image is not modified.
 
         Parameters
         ----------
@@ -253,7 +259,9 @@ class Image:
 
     def flip_vertically(self) -> Image:
         """
-        Flip the image vertically (horizontal axis, flips up-down and vice versa).
+        Return a new `Image` that is flipped vertically (horizontal axis, flips up-down and vice versa).
+
+        The original image is not modified.
 
         Returns
         -------
@@ -266,7 +274,9 @@ class Image:
 
     def flip_horizontally(self) -> Image:
         """
-        Flip the image horizontally (vertical axis, flips left-right and vice versa).
+        Return a new `Ìmage` that is flipped horizontally (vertical axis, flips left-right and vice versa).
+
+        The original image is not modified.
 
         Returns
         -------
@@ -279,7 +289,9 @@ class Image:
 
     def adjust_brightness(self, factor: float) -> Image:
         """
-        Adjust the brightness of an image.
+        Return a new `Image` with an adjusted brightness.
+
+        The original image is not modified.
 
         Parameters
         ----------
@@ -310,7 +322,9 @@ class Image:
 
     def add_gaussian_noise(self, standard_deviation: float) -> Image:
         """
-        Add Gaussian noise to the image.
+        Return a new `Image` with Gaussian noise added to the image.
+
+        The original image is not modified.
 
         Parameters
         ----------
@@ -347,7 +361,9 @@ class Image:
 
     def adjust_contrast(self, factor: float) -> Image:
         """
-        Adjust Contrast of image.
+        Return a new `Image` with adjusted contrast.
+
+        The original image is not modified.
 
         Parameters
         ----------
@@ -359,7 +375,8 @@ class Image:
 
         Returns
         -------
-        New image with adjusted contrast.
+        image: Image
+            New image with adjusted contrast.
         """
         if factor < 0:
             raise OutOfBoundsError(factor, name="factor", lower_bound=ClosedBound(0))
@@ -376,7 +393,9 @@ class Image:
 
     def adjust_color_balance(self, factor: float) -> Image:
         """
-        Adjust the image's color balance.
+        Return a new `Image` with adjusted color balance.
+
+        The original image is not modified.
 
         Parameters
         ----------
@@ -406,7 +425,9 @@ class Image:
 
     def blur(self, radius: int) -> Image:
         """
-        Return the blurred image.
+        Return a blurred version of the image.
+
+        The original image is not modified.
 
         Parameters
         ----------
@@ -425,7 +446,9 @@ class Image:
 
     def sharpen(self, factor: float) -> Image:
         """
-        Return the sharpened image.
+        Return a sharpened version of the image.
+
+        The original image is not modified.
 
         Parameters
         ----------
@@ -444,7 +467,9 @@ class Image:
 
     def invert_colors(self) -> Image:
         """
-        Return the image with inverted colors.
+        Return a new image with colors inverted.
+
+        The original image is not modified.
 
         Returns
         -------
@@ -457,7 +482,9 @@ class Image:
 
     def rotate_right(self) -> Image:
         """
-        Return the image rotated 90 degrees clockwise.
+        Return a new `Image` that is rotated 90 degrees clockwise.
+
+        The original image is not modified.
 
         Returns
         -------
@@ -470,7 +497,9 @@ class Image:
 
     def rotate_left(self) -> Image:
         """
-        Return the image rotated 90 degrees counter-clockwise.
+        Return a new `Image` that is rotated 90 degrees counter-clockwise.
+
+        The original image is not modified.
 
         Returns
         -------
@@ -483,7 +512,9 @@ class Image:
 
     def find_edges(self) -> Image:
         """
-        Return a grayscale image with the highlighted edges.
+        Return a grayscale version of the image with the edges highlighted.
+
+        The original image is not modified.
 
         Returns
         -------

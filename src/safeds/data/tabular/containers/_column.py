@@ -490,7 +490,7 @@ class Column(Sequence[T]):
         """
         Return a new column with a new name.
 
-        This column is not modified.
+        The original column is not modified.
 
         Parameters
         ----------
@@ -515,7 +515,7 @@ class Column(Sequence[T]):
         """
         Apply a transform method to every data point.
 
-        This column is not modified.
+        The original column is not modified.
 
         Parameters
         ----------
