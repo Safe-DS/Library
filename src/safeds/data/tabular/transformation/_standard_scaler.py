@@ -24,7 +24,7 @@ class StandardScaler(InvertibleTableTransformer):
         ----------
         table : Table
             The table used to fit the transformer.
-        column_names : Optional[list[str]]
+        column_names : list[str] | None
             The list of columns from the table used to fit the transformer. If `None`, all columns are used.
 
         Returns
@@ -35,11 +35,11 @@ class StandardScaler(InvertibleTableTransformer):
         Raises
         ------
         UnknownColumnNameError
-            If column_names contain a column name that is missing in the table
+            If column_names contain a column name that is missing in the table.
         NonNumericColumnError
-            If at least one of the specified columns in the table contains non-numerical data
+            If at least one of the specified columns in the table contains non-numerical data.
         ValueError
-            If the table contains 0 rows
+            If the table contains 0 rows.
         """
         if column_names is None:
             column_names = table.column_names
@@ -98,11 +98,11 @@ class StandardScaler(InvertibleTableTransformer):
         TransformerNotFittedError
             If the transformer has not been fitted yet.
         UnknownColumnNameError
-            If the input table does not contain all columns used to fit the transformer
+            If the input table does not contain all columns used to fit the transformer.
         NonNumericColumnError
-            If at least one of the columns in the input table that is used to fit contains non-numerical data
+            If at least one of the columns in the input table that is used to fit contains non-numerical data.
         ValueError
-            If the table contains 0 rows
+            If the table contains 0 rows.
         """
         # Transformer has not been fitted yet
         if self._wrapped_transformer is None or self._column_names is None:
@@ -159,11 +159,11 @@ class StandardScaler(InvertibleTableTransformer):
         TransformerNotFittedError
             If the transformer has not been fitted yet.
         UnknownColumnNameError
-            If the input table does not contain all columns used to fit the transformer
+            If the input table does not contain all columns used to fit the transformer.
         NonNumericColumnError
-            If the transformed columns of the input table contain non-numerical data
+            If the transformed columns of the input table contain non-numerical data.
         ValueError
-            If the table contains 0 rows
+            If the table contains 0 rows.
         """
         # Transformer has not been fitted yet
         if self._wrapped_transformer is None or self._column_names is None:

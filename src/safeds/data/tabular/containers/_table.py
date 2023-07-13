@@ -425,7 +425,7 @@ class Table:
 
         Returns
         -------
-        'True' if contents are equal, 'False' otherwise
+        'True' if contents are equal, 'False' otherwise.
 
         Examples
         --------
@@ -1333,9 +1333,9 @@ class Table:
         Parameters
         ----------
         old_name : str
-            The old name of the target column
+            The old name of the target column.
         new_name : str
-            The new name of the target column
+            The new name of the target column.
 
         Returns
         -------
@@ -1467,9 +1467,9 @@ class Table:
 
         Parameters
         ----------
-        start : int
+        start : int | None
             The first index of the range to be copied into a new table, None by default.
-        end : int
+        end : int | None
             The last index of the range to be copied into a new table, None by default.
         step : int
             The step size used to iterate through the table, 1 by default.
@@ -1623,7 +1623,7 @@ class Table:
         Raises
         ------
         ValueError:
-            if the 'percentage_in_first' is not between 0 and 1
+            if the 'percentage_in_first' is not between 0 and 1.
 
         Examples
         --------
@@ -1817,16 +1817,41 @@ class Table:
         """
         only_numerical = self.remove_columns_with_non_numerical_values()
 
-        fig = plt.figure()
-        sns.heatmap(
-            data=only_numerical._data.corr(),
-            vmin=-1,
-            vmax=1,
-            xticklabels=only_numerical.column_names,
-            yticklabels=only_numerical.column_names,
-            cmap="vlag",
-        )
-        plt.tight_layout()
+        if self.number_of_rows == 0:
+            warnings.warn(
+                "An empty table has been used. A correlation heatmap on an empty table will show nothing.",
+                stacklevel=2,
+            )
+
+            with warnings.catch_warnings():
+                warnings.filterwarnings(
+                    "ignore",
+                    message=(
+                        "Attempting to set identical low and high (xlims|ylims) makes transformation singular;"
+                        " automatically expanding."
+                    ),
+                )
+                fig = plt.figure()
+                sns.heatmap(
+                    data=only_numerical._data.corr(),
+                    vmin=-1,
+                    vmax=1,
+                    xticklabels=only_numerical.column_names,
+                    yticklabels=only_numerical.column_names,
+                    cmap="vlag",
+                )
+                plt.tight_layout()
+        else:
+            fig = plt.figure()
+            sns.heatmap(
+                data=only_numerical._data.corr(),
+                vmin=-1,
+                vmax=1,
+                xticklabels=only_numerical.column_names,
+                yticklabels=only_numerical.column_names,
+                cmap="vlag",
+            )
+            plt.tight_layout()
 
         buffer = io.BytesIO()
         fig.savefig(buffer, format="png")
@@ -2009,7 +2034,7 @@ class Table:
         """
         col_wrap = min(self.number_of_columns, 3)
 
-        data = pd.melt(self._data, value_vars=self.column_names)
+        data = pd.melt(self._data.applymap(lambda value: str(value)), value_vars=self.column_names)
         grid = sns.FacetGrid(data=data, col="variable", col_wrap=col_wrap, sharex=False, sharey=False)
         grid.map(sns.histplot, "value")
         grid.set_xlabels("")
