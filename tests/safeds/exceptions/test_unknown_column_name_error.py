@@ -8,9 +8,21 @@ from safeds.exceptions import UnknownColumnNameError
         (["column1"], [], r"Could not find column\(s\) 'column1'\."),
         (["column1", "column2"], [], r"Could not find column\(s\) 'column1, column2'\."),
         (["column1"], ["column_a"], r"Could not find column\(s\) 'column1'\.\nDid you mean '\['column_a'\]'\?"),
-        (["column1", "column2"], ["column_a"], r"Could not find column\(s\) 'column1, column2'\.\nDid you mean '\['column_a'\]'\?"),
-        (["column1"], ["column_a", "column_b"], r"Could not find column\(s\) 'column1'\.\nDid you mean '\['column_a', 'column_b'\]'\?"),
-        (["column1", "column2"], ["column_a", "column_b"], r"Could not find column\(s\) 'column1, column2'\.\nDid you mean '\['column_a', 'column_b'\]'\?"),
+        (
+            ["column1", "column2"],
+            ["column_a"],
+            r"Could not find column\(s\) 'column1, column2'\.\nDid you mean '\['column_a'\]'\?",
+        ),
+        (
+            ["column1"],
+            ["column_a", "column_b"],
+            r"Could not find column\(s\) 'column1'\.\nDid you mean '\['column_a', 'column_b'\]'\?",
+        ),
+        (
+            ["column1", "column2"],
+            ["column_a", "column_b"],
+            r"Could not find column\(s\) 'column1, column2'\.\nDid you mean '\['column_a', 'column_b'\]'\?",
+        ),
     ],
     ids=[
         "one_unknown_no_suggestions",
