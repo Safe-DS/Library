@@ -384,6 +384,37 @@ class TestColorAdjust:
         assert adjust == image
 
 
+class TestAddGaussianNoise:
+    @pytest.mark.parametrize(
+        ("image", "standard_deviation"),
+        [
+            (Image.from_png_file(resolve_resource_path("image/boy.png")), 0.0),
+            (Image.from_png_file(resolve_resource_path("image/boy.png")), 0.7),
+            (Image.from_png_file(resolve_resource_path("image/boy.png")), 2.5),
+        ],
+        ids=["minimum noise", "some noise", "very noisy"],
+    )
+    def test_should_add_noise(self, image: Image, standard_deviation: float) -> None:
+        expected = Image.from_png_file(
+            resolve_resource_path("image/noise/noise_" + str(standard_deviation) + ".png"),
+        )
+        image = image.add_gaussian_noise(standard_deviation)
+
+        assert image == expected
+
+    @pytest.mark.parametrize(
+        ("image", "standard_deviation"),
+        [(Image.from_png_file(resolve_resource_path("image/boy.png")), -1)],
+        ids=["sigma below zero"],
+    )
+    def test_should_raise_standard_deviation(self, image: Image, standard_deviation: float) -> None:
+        with pytest.raises(
+            OutOfBoundsError,
+            match=rf"standard_deviation \(={standard_deviation}\) is not inside \[0, \u221e\)\.",
+        ):
+            image.add_gaussian_noise(standard_deviation)
+
+
 class TestBlur:
     @pytest.mark.parametrize(
         ("image", "expected"),
