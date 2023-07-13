@@ -93,6 +93,13 @@ class ColumnSizeError(Exception):
         super().__init__(f"Expected a column of size {expected_size} but got column of size {actual_size}.")
 
 
+class SchemaMismatchError(Exception):
+    """Exception raised when schemas are unequal."""
+
+    def __init__(self) -> None:
+        super().__init__("Failed because at least two schemas didn't match.")
+
+
 class ColumnLengthMismatchError(Exception):
     """Exception raised when the lengths of two or more columns do not match."""
 

@@ -3,8 +3,19 @@ from __future__ import annotations
 import copy
 from typing import TYPE_CHECKING
 
+import pandas as pd
+
 from safeds.data.tabular.containers import Column, Row, Table
-from safeds.exceptions import ColumnIsTargetError, IllegalSchemaModificationError, UnknownColumnNameError
+from safeds.exceptions import (
+    ColumnIsTargetError,
+    ColumnLengthMismatchError,
+    ColumnSizeError,
+    DuplicateColumnNameError,
+    IllegalSchemaModificationError,
+    IndexOutOfBoundsError,
+    SchemaMismatchError,
+    UnknownColumnNameError,
+)
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Mapping, Sequence
@@ -158,6 +169,17 @@ class TaggedTable(Table):
         if len(feature_names) == 0:
             raise ValueError("At least one feature column must be specified.")
 
+        # Validate column lengths
+        expected_length: int | None = None
+        for column_values in data.values():
+            if expected_length is None:
+                expected_length = len(column_values)
+            elif len(column_values) != expected_length:
+                raise ColumnLengthMismatchError(
+                    "\n".join(
+                        f"{column_name}: {len(column_values)}" for column_name, column_values in data.items())
+                )
+
         self._features: Table = _data.keep_only_columns(feature_names)
         self._target: Column = _data.get_column(target_name)
 
@@ -167,10 +189,26 @@ class TaggedTable(Table):
 
     @property
     def features(self) -> Table:
+        """
+        Get the feature columns of the tagged table.
+
+        Returns
+        -------
+        Table
+            The table containing the feature columns.
+        """
         return self._features
 
     @property
     def target(self) -> Column:
+        """
+        Get the target column of the tagged table.
+
+        Returns
+        -------
+        Column
+            The target column.
+        """
         return self._target
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -198,6 +236,11 @@ class TaggedTable(Table):
 
         This table is not modified.
 
+        Parameters
+        ----------
+        column : Column
+            The column to be added.
+
         Returns
         -------
         result : TaggedTable
@@ -208,8 +251,14 @@ class TaggedTable(Table):
         DuplicateColumnNameError
             If the new column already exists.
         ColumnSizeError
-            If the size of the column does not match the amount of rows.
+            If the size of the column does not match the number of rows.
         """
+        if column.name in self.column_names:
+            raise DuplicateColumnNameError(f"Column '{column.name}' already exists.")
+
+        if column.number_of_rows != self.number_of_rows and self.number_of_columns != 0:
+            raise ColumnSizeError(str(self.number_of_rows), str(column.number_of_rows))
+
         return TaggedTable._from_table(
             super().add_column(column),
             target_name=self.target.name,
@@ -222,6 +271,11 @@ class TaggedTable(Table):
 
         This table is not modified.
 
+        Parameters
+        ----------
+        columns : list[Column] | Table
+            The columns to be added as features.
+
         Returns
         -------
         result : TaggedTable
@@ -230,10 +284,20 @@ class TaggedTable(Table):
         Raises
         ------
         DuplicateColumnNameError
-            If the new column already exists.
+            If any of the new feature columns already exist.
         ColumnSizeError
-            If the size of the column does not match the amount of rows.
+            If the size of any feature column does not match the number of rows.
         """
+        if isinstance(columns, Table):
+            columns = columns.to_columns()
+
+        for column in columns:
+            if column.name in self.column_names:
+                raise DuplicateColumnNameError(column.name)
+
+            if column.number_of_rows != self.number_of_rows and self.number_of_columns != 0:
+                raise ColumnSizeError(str(self.number_of_rows), str(column.number_of_rows))
+
         return TaggedTable._from_table(
             super().add_columns(columns),
             target_name=self.target.name,
@@ -270,6 +334,11 @@ class TaggedTable(Table):
 
         This table is not modified.
 
+        Parameters
+        ----------
+        column : Column
+            The column to be added.
+
         Returns
         -------
         result : TaggedTable
@@ -282,6 +351,12 @@ class TaggedTable(Table):
         ColumnSizeError
             If the size of the column does not match the amount of rows.
         """
+        if column.name in self.column_names:
+            raise DuplicateColumnNameError(f"Column '{column.name}' already exists.")
+
+        if column.number_of_rows != self.number_of_rows and self.number_of_columns != 0:
+            raise ColumnSizeError(str(self.number_of_rows), str(column.number_of_rows))
+
         return TaggedTable._from_table(
             super().add_column(column),
             target_name=self.target.name,
@@ -311,6 +386,16 @@ class TaggedTable(Table):
         DuplicateColumnNameError
             If at least one column name from the provided column list already exists in the table.
         """
+        if isinstance(columns, Table):
+            columns = columns.to_columns()
+
+        for column in columns:
+            if column.name in self.column_names:
+                raise DuplicateColumnNameError(f"Column '{column.name}' already exists.")
+
+            if column.number_of_rows != self.number_of_rows and self.number_of_columns != 0:
+                raise ColumnSizeError(str(self.number_of_rows), str(column.number_of_rows))
+
         return TaggedTable._from_table(
             super().add_columns(columns),
             target_name=self.target.name,
@@ -338,6 +423,16 @@ class TaggedTable(Table):
         SchemaMismatchError
             If the schema of the row does not match the table schema.
         """
+        if self.number_of_rows == 0:
+            if self.number_of_columns == 0:
+                for column in row.column_names:
+                    self._data[column] = Column(column, [])
+                self._schema = Table._from_pandas_dataframe(pd.DataFrame(columns=row.column_names))._schema
+            elif self.column_names != row.column_names:
+                raise SchemaMismatchError
+        elif self._schema != row.schema:
+            raise SchemaMismatchError
+
         return TaggedTable._from_table(super().add_row(row), target_name=self.target.name)
 
     def add_rows(self, rows: list[Row] | Table) -> TaggedTable:
@@ -361,6 +456,19 @@ class TaggedTable(Table):
         SchemaMismatchError
             If the schema of on of the row does not match the table schema.
         """
+        if isinstance(rows, Table):
+            rows = rows.to_rows()
+        for row in rows:
+            if self.number_of_rows == 0:
+                if self.number_of_columns == 0:
+                    for column in row.column_names:
+                        self._data[column] = Column(column, [])
+                    self._schema = Table._from_pandas_dataframe(pd.DataFrame(columns=self.column_names))._schema
+                elif self.column_names != row.column_names:
+                    raise SchemaMismatchError
+            elif self._schema != row.schema:
+                raise SchemaMismatchError
+
         return TaggedTable._from_table(super().add_rows(rows), target_name=self.target.name)
 
     def filter_rows(self, query: Callable[[Row], bool]) -> TaggedTable:
@@ -408,6 +516,13 @@ class TaggedTable(Table):
         IllegalSchemaModificationError
             If none of the given columns is the target column or any of the feature columns.
         """
+        invalid_columns = []
+        for name in column_names:
+            if not self._schema.has_column(name):
+                invalid_columns.append(name)
+        if len(invalid_columns) != 0:
+            raise UnknownColumnNameError(invalid_columns)
+
         if self.target.name not in column_names:
             raise IllegalSchemaModificationError("Must keep the target column.")
         if len(set(self.features.column_names).intersection(set(column_names))) == 0:
@@ -446,6 +561,13 @@ class TaggedTable(Table):
         IllegalSchemaModificationError
             If the given columns contain all the feature columns.
         """
+        invalid_columns = []
+        for name in column_names:
+            if not self._schema.has_column(name):
+                invalid_columns.append(name)
+        if len(invalid_columns) != 0:
+            raise UnknownColumnNameError(invalid_columns)
+
         if self.target.name in column_names:
             raise ColumnIsTargetError(self.target.name)
         if len(set(self.features.column_names) - set(column_names)) == 0:
@@ -587,9 +709,9 @@ class TaggedTable(Table):
         Parameters
         ----------
         old_name : str
-            The old name of the target column
+            The old name of the target column.
         new_name : str
-            The new name of the target column
+            The new name of the target column.
 
         Returns
         -------
@@ -603,6 +725,13 @@ class TaggedTable(Table):
         DuplicateColumnNameError
             If the specified new target column name already exists.
         """
+        if old_name not in self._schema.column_names:
+            raise UnknownColumnNameError([old_name])
+        if old_name == new_name:
+            return self
+        if new_name in self._schema.column_names:
+            raise DuplicateColumnNameError(new_name)
+
         return TaggedTable._from_table(
             super().rename_column(old_name, new_name),
             target_name=new_name if self.target.name == old_name else self.target.name,
@@ -648,6 +777,22 @@ class TaggedTable(Table):
         IllegalSchemaModificationError
             If the target column would be removed or replaced by more than one column.
         """
+        if old_column_name not in self._schema.column_names:
+            raise UnknownColumnNameError([old_column_name])
+
+        columns = list[Column]()
+        for old_column in self.column_names:
+            if old_column == old_column_name:
+                for new_column in new_columns:
+                    if new_column.name in self.column_names and new_column.name != old_column_name:
+                        raise DuplicateColumnNameError(new_column.name)
+
+                    if self.number_of_rows != new_column.number_of_rows:
+                        raise ColumnSizeError(str(self.number_of_rows), str(new_column.number_of_rows))
+                    columns.append(new_column)
+            else:
+                columns.append(self.get_column(old_column))
+
         if old_column_name == self.target.name:
             if len(new_columns) != 1:
                 raise IllegalSchemaModificationError(
@@ -668,7 +813,7 @@ class TaggedTable(Table):
                     if old_column_name not in self.features.column_names
                     else self.features.column_names[: self.features.column_names.index(old_column_name)]
                     + [col.name for col in new_columns]
-                    + self.features.column_names[self.features.column_names.index(old_column_name) + 1 :]
+                    + self.features.column_names[self.features.column_names.index(old_column_name) + 1:]
                 ),
             )
 
@@ -719,6 +864,17 @@ class TaggedTable(Table):
         IndexOutOfBoundsError
             If the index is out of bounds.
         """
+        if start is None:
+            start = 0
+
+        if end is None:
+            end = self.number_of_rows
+
+        if end < start:
+            raise IndexOutOfBoundsError(slice(start, end))
+        if start < 0 or end < 0 or start > self.number_of_rows or end > self.number_of_rows:
+            raise IndexOutOfBoundsError(start if start < 0 or start > self.number_of_rows else end)
+
         return TaggedTable._from_table(
             super().slice_rows(start, end, step),
             target_name=self.target.name,
@@ -809,8 +965,12 @@ class TaggedTable(Table):
         UnknownColumnNameError
             If the column does not exist.
         """
-        return TaggedTable._from_table(
-            super().transform_column(name, transformer),
-            target_name=self.target.name,
-            feature_names=self.features.column_names,
-        )
+        if self.has_column(name):
+            items: list = [transformer(item) for item in self.to_rows()]
+            result: list[Column] = [Column(name, items)]
+            return TaggedTable._from_table(
+                super().replace_column(name, result),
+                target_name=self.target.name,
+                feature_names=self.features.column_names,
+            )
+        raise UnknownColumnNameError([name])

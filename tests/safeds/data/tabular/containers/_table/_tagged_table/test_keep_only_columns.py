@@ -1,6 +1,6 @@
 import pytest
 from safeds.data.tabular.containers import Table, TaggedTable
-from safeds.exceptions import IllegalSchemaModificationError
+from safeds.exceptions import IllegalSchemaModificationError, UnknownColumnNameError
 
 from tests.helpers import assert_that_tagged_tables_are_equal
 
@@ -129,3 +129,18 @@ def test_should_raise_illegal_schema_modification(table: TaggedTable, column_nam
         match=error_msg,
     ):
         table.keep_only_columns(column_names)
+
+
+@pytest.mark.parametrize(
+    ("tagged_table", "error_msg"),
+    [
+        (
+            TaggedTable({"feature": [1], "target": [2]}, "target", ["feature"]),
+            r"Could not find column\(s\) 'feat'"
+        ),
+    ],
+    ids=["unknown_column"],
+)
+def test_should_raise_error_if_column_name_unknown(tagged_table: TaggedTable, error_msg: str) -> None:
+    with pytest.raises(UnknownColumnNameError, match=error_msg):
+        tagged_table.keep_only_columns(["feat"])
