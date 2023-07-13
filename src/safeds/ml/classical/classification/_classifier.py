@@ -270,6 +270,4 @@ class Classifier(ABC):
             roc_table = roc_table.add_row(Row.from_dict({"fpr": fpr[i], "tpr": tpr[i]}))
             i += 1
 
-        roc_plotted = roc_table.plot_lineplot("fpr", "tpr")
-
-        return roc_plotted
+        return roc_table.plot_lineplot("fpr", "tpr")
