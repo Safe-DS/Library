@@ -1118,6 +1118,26 @@ class Table:
         clone = clone.remove_columns(list(set(self.column_names) - set(column_names)))
         return clone
 
+    def list_columns_with_missing_values(self) -> list[str]:
+        """
+        Return a list of column names that contain missing values.
+
+        The original table is not modified.
+
+        Returns
+        -------
+        result : list[str]
+            A list of column names that contain missing values.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table
+        >>> table = Table.from_dict({"a": [1, 2], "b": [None, 2]})
+        >>> table.list_columns_with_missing_values()
+        ['b']
+        """
+        return [column.name for column in self.to_columns() if column.has_missing_values()]
+
     def remove_columns(self, column_names: list[str]) -> Table:
         """
         Return a table without the given column(s).
