@@ -38,7 +38,8 @@ class SupportVectorMachine(Regressor):
     ----------
     c: float
         The strength of regularization. Must be strictly positive.
-    kernel: The type of kernel to be used. Defaults to None.
+    kernel: SupportVectorMachineKernel | None
+        The type of kernel to be used. Defaults to None.
 
     Raises
     ------

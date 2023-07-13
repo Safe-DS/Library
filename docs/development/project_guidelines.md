@@ -302,6 +302,33 @@ The docstrings **should** use the [numpydoc](https://numpydoc.readthedocs.io/en/
         return a + b
     ```
 
+!!! success "**DO** (library code):"
+
+    ```py
+    def __init__(self, data: Mapping[str, Any] | None = None) -> None:
+        """
+        data : Mapping[str, Any] | None
+        """
+    ```
+
+!!! failure "**DON'T** (library code):"
+
+    ```py
+    def __init__(self, data: Optional[Mapping[str, Any]] = None) -> None:
+        """
+        data : Optional[Mapping[str, Any]]
+        """
+    ```
+
+!!! failure "**DON'T** (library code):"
+
+    ```py
+    def __init__(self, data: Mapping[str, Any] | None = None) -> None:
+        """
+        data : Optional[Mapping[str, Any]]
+        """
+    ```
+
 ### Modules
 
 All modules should have
