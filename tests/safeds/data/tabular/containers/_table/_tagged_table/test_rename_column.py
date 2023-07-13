@@ -108,8 +108,9 @@ def test_should_raise_if_old_column_does_not_exist(
     error_msg: str,
 ) -> None:
     with pytest.raises(UnknownColumnNameError, match=error_msg):
-        assert_that_tagged_tables_are_equal(original_table.rename_column(old_column_name, new_column_name),
-                                            result_table)
+        assert_that_tagged_tables_are_equal(
+            original_table.rename_column(old_column_name, new_column_name), result_table,
+        )
 
 
 @pytest.mark.parametrize(
@@ -133,5 +134,6 @@ def test_should_raise_if_new_column_exists_already(
     error_msg: str,
 ) -> None:
     with pytest.raises(DuplicateColumnNameError, match=error_msg):
-        assert_that_tagged_tables_are_equal(original_table.rename_column(old_column_name, new_column_name),
-                                            result_table)
+        assert_that_tagged_tables_are_equal(
+            original_table.rename_column(old_column_name, new_column_name), result_table,
+        )

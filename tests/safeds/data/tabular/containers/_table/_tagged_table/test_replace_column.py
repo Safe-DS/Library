@@ -219,7 +219,9 @@ def test_should_raise_error(
             "feat": [1, 2, 3],
             "non-feat": [4, 5, 6],
             "target": ["a", "b", "c"],
-        }, "target", ["feat"]
+        },
+        "target",
+        ["feat"],
     )
 
     with pytest.raises(error, match=error_message):

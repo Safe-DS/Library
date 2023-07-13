@@ -134,10 +134,7 @@ def test_should_raise_illegal_schema_modification(table: TaggedTable, column_nam
 @pytest.mark.parametrize(
     ("tagged_table", "error_msg"),
     [
-        (
-            TaggedTable({"feature": [1], "target": [2]}, "target", ["feature"]),
-            r"Could not find column\(s\) 'feat'"
-        ),
+        (TaggedTable({"feature": [1], "target": [2]}, "target", ["feature"]), r"Could not find column\(s\) 'feat'"),
     ],
     ids=["unknown_column"],
 )

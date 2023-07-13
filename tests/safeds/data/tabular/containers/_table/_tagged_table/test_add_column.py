@@ -41,8 +41,8 @@ def test_should_add_column(tagged_table: TaggedTable, column: Column, expected_t
         (
             TaggedTable({"A": ["a", "b", "c"], "B": ["d", "e", "f"]}, target_name="B", feature_names=["A"]),
             Column("B", ["g", "h", "i"]),
-            r"Column 'B' already exists."
-        )
+            r"Column 'B' already exists.",
+        ),
     ],
     ids=["column_already_exists"],
 )
@@ -61,8 +61,8 @@ def test_should_raise_duplicate_column_name_if_column_already_exists(
         (
             TaggedTable({"A": ["a", "b", "c"], "B": ["d", "e", "f"]}, target_name="B", feature_names=["A"]),
             Column("C", ["g", "h", "i", "j"]),
-            r"Expected a column of size 3 but got column of size 4."
-        )
+            r"Expected a column of size 3 but got column of size 4.",
+        ),
     ],
     ids=["column_is_oversize"],
 )

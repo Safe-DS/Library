@@ -43,12 +43,12 @@ def test_should_add_row(table: TaggedTable, row: Row, expected: TaggedTable) -> 
         (
             TaggedTable({"feature": [1, 2, 3], "target": [4, 5, 6]}, "target", ["feature"]),
             Row({"feature": "a", "target": 8}),
-            r"Failed because at least two schemas didn't match."
+            r"Failed because at least two schemas didn't match.",
         ),
         (
             TaggedTable({"feature": [], "target": []}, "target", ["feature"]),
             Row({"feat": None, "targ": None}),
-            r"Failed because at least two schemas didn't match."
+            r"Failed because at least two schemas didn't match.",
         ),
     ],
     ids=["invalid_schemas", "schemas_mismatch"],
