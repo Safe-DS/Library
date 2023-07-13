@@ -747,7 +747,7 @@ class TaggedTable(Table):
                     if old_column_name not in self.features.column_names
                     else self.features.column_names[: self.features.column_names.index(old_column_name)]
                     + [col.name for col in new_columns]
-                    + self.features.column_names[self.features.column_names.index(old_column_name) + 1:]
+                    + self.features.column_names[self.features.column_names.index(old_column_name) + 1 :]
                 ),
             )
 
