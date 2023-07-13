@@ -699,7 +699,7 @@ class Table:
 
     def _get_similar_columns(self, column_name: str) -> list[str]:
         """
-        Get all similar column names to the given one that's not in the table.
+        Get all the column names in a Table that are similar to a given name.
 
         Parameters
         ----------
