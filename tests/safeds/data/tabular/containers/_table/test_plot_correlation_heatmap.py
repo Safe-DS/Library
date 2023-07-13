@@ -1,4 +1,3 @@
-
 import pytest
 from safeds.data.image.containers import Image
 from safeds.data.tabular.containers import Table
