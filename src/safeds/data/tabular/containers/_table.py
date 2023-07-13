@@ -704,7 +704,7 @@ class Table:
         Parameters
         ----------
         column_name : str
-            The name of the Column, that's not in the Table.
+            The name to compare the Table's column names to.
 
         Returns
         -------
