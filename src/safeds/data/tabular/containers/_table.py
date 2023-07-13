@@ -945,7 +945,12 @@ class Table:
         if self.number_of_columns == 0:
             return Table.from_rows([row])
         if len(set(self.column_names) - set(row.column_names)) > 0:
-            raise UnknownColumnNameError(sorted(set(self.column_names) - set(row.column_names), key={val: ix for ix, val in enumerate(self.column_names)}.__getitem__,))
+            raise UnknownColumnNameError(
+                sorted(
+                    set(self.column_names) - set(row.column_names),
+                    key={val: ix for ix, val in enumerate(self.column_names)}.__getitem__,
+                ),
+            )
 
         if result.number_of_rows == 0:
             int_columns = list(filter(lambda name: isinstance(row[name], int | np.int64 | np.int32), row.column_names))
@@ -1006,7 +1011,12 @@ class Table:
         for row in rows:
             different_column_names.update(set(self.column_names) - set(row.column_names))
         if len(different_column_names) > 0:
-            raise UnknownColumnNameError(sorted(different_column_names, key={val: ix for ix, val in enumerate(self.column_names)}.__getitem__,))
+            raise UnknownColumnNameError(
+                sorted(
+                    different_column_names,
+                    key={val: ix for ix, val in enumerate(self.column_names)}.__getitem__,
+                ),
+            )
 
         result = self._copy()
 
