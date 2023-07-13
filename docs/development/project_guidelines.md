@@ -1,5 +1,3 @@
-
-
 # Project Guidelines
 
 This document describes general guidelines for the Safe-DS Python Library. In the **DO**/**DON'T** examples below we either show _client code_ to describe the code users should/shouldn't have to write, or _library code_ to describe the code we, as library developers, need to write to achieve readable client code. We'll continuously update this document as we find new categories of usability issues.
@@ -56,6 +54,43 @@ Some flag parameters drastically alter the semantics of a function. This can lea
 
     ```py
     table.drop("name", axis="columns")
+    ```
+
+### Return copies of objects
+
+Modifying objects in-place
+can lead to surprising behaviour
+and hard-to-find bugs.
+Methods shall never change
+the object they're called on
+or any of their parameters.
+
+!!! success "**DO** (library code):"
+
+    ```py
+        result = self._data.copy()
+        result.columns = self._schema.column_names
+        result[new_column.name] = new_column._data
+        return Table._from_pandas_dataframe(result)
+    ```
+
+!!! failure "**DON'T** (library code):"
+
+    ```py
+        self._data.add(new_column, axis='column')
+    ```
+
+The corresponding docstring should explicitly state
+that a method returns a copy:
+
+!!! success "**DO** (library code):"
+
+    ```py
+    """
+    Return a new table with the given column added as the last column.
+    The original table is not modified.
+    ...
+    """
     ```
 
 ### Avoid uncommon abbreviations
@@ -230,13 +265,13 @@ Passing values that are commonly used together around separately is tedious, ver
 !!! success "**DO** (client code):"
 
     ```py
-    training_data, validation_data = split(full_data)
+    training_data, validation_data = split_rows(full_data)
     ```
 
 !!! failure "**DON'T** (client code):"
 
     ```py
-    training_feature_vectors, validation_feature_vectors, training_target_values, validation_target_values = split(feature_vectors, target_values)
+    training_feature_vectors, validation_feature_vectors, training_target_values, validation_target_values = split_rows(feature_vectors, target_values)
     ```
 
 ## Docstrings
@@ -378,7 +413,114 @@ Examples
 
 ## Tests
 
-If a function contains more code than just the getting or setting of a value, automated test should be added to the [`tests`][tests-folder] folder. The file structure in the tests folder should mirror the file structure of the [`src`][src-folder] folder.
+We aim for 100% line coverage,
+so automated tests should be added
+for any new function.
+
+### File structure
+
+Tests belong in the [`tests`][tests-folder] folder.
+The file structure in the tests folder
+should mirror the file structure
+of the [`src`][src-folder] folder.
+
+### Naming
+
+Names of test functions
+shall start with `test_should_`
+followed by a description
+of the expected behaviour,
+e.g. `test_should_add_column`.
+
+!!! success "**DO** (library code):"
+
+    ```py
+    def test_should_raise_if_less_than_or_equal_to_0(self, number_of_trees) -> None:
+        with pytest.raises(ValueError, match="The parameter 'number_of_trees' has to be greater than 0."):
+            ...
+    ```
+
+!!! failure "**DON'T** (library code):"
+
+    ```py
+    def test_value_error(self, number_of_trees) -> None:
+        with pytest.raises(ValueError, match="The parameter 'number_of_trees' has to be greater than 0."):
+            ...
+    ```
+
+### Parametrization
+
+Tests should be parametrized
+using `@pytest.mark.parametrize`,
+even if there is only a single test case.
+This makes it easier
+to add new test cases in the future.
+Test cases should be given
+descriptive IDs.
+
+!!! success "**DO** (library code):"
+
+    ```py
+    @pytest.mark.parametrize("number_of_trees", [0, -1], ids=["zero", "negative"])
+    def test_should_raise_if_less_than_or_equal_to_0(self, number_of_trees) -> None:
+        with pytest.raises(ValueError, match="The parameter 'number_of_trees' has to be greater than 0."):
+            RandomForest(number_of_trees=number_of_trees)
+    ```
+
+!!! failure "**DON'T** (library code):"
+
+    ```py
+    def test_should_raise_if_less_than_0(self, number_of_trees) -> None:
+        with pytest.raises(ValueError, match="The parameter 'number_of_trees' has to be greater than 0."):
+            RandomForest(number_of_trees=-1)
+
+    def test_should_raise_if_equal_to_0(self, number_of_trees) -> None:
+        with pytest.raises(ValueError, match="The parameter 'number_of_trees' has to be greater than 0."):
+            RandomForest(number_of_trees=0)
+    ```
+
+## Code style
+
+### Consistency
+
+If there is more than one way
+to solve a particular task,
+check how it has been solved
+at other places in the codebase
+and stick to that solution.
+
+### Sort exported classes in `__init__.py`
+
+Classes defined in a module
+that other classes shall be able to import
+must be defined
+in a list named `__all__`
+in the module's `__init__.py` file.
+This list should be sorted alphabetically,
+to reduce the likelihood of merge conflicts
+when adding new classes to it.
+
+!!! success "**DO** (library code):"
+
+    ```py
+    __all__ = [
+        "Column",
+        "Row",
+        "Table",
+        "TaggedTable",
+    ]
+    ```
+
+!!! failure "**DON'T** (library code):"
+
+    ```py
+    __all__ = [
+        "Table",
+        "TaggedTable",
+        "Column",
+        "Row",
+    ]
+    ```
 
 [src-folder]: https://github.com/Safe-DS/Stdlib/tree/main/src
 [tests-folder]: https://github.com/Safe-DS/Stdlib/tree/main/tests

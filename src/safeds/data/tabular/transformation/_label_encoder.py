@@ -152,6 +152,9 @@ class LabelEncoder(InvertibleTableTransformer):
         if len(missing_columns) > 0:
             raise UnknownColumnNameError(missing_columns)
 
+        if transformed_table.number_of_rows == 0:
+            raise ValueError("The LabelEncoder cannot inverse transform the table because it contains 0 rows")
+
         if transformed_table.keep_only_columns(
             self._column_names,
         ).remove_columns_with_non_numerical_values().number_of_columns < len(self._column_names):
@@ -167,9 +170,6 @@ class LabelEncoder(InvertibleTableTransformer):
                     ),
                 ),
             )
-
-        if transformed_table.number_of_rows == 0:
-            raise ValueError("The LabelEncoder cannot inverse transform the table because it contains 0 rows")
 
         data = transformed_table._data.copy()
         data.columns = transformed_table.column_names

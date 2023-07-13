@@ -1,13 +1,14 @@
 """Custom exceptions that can be raised by Safe-DS."""
 
 from safeds.exceptions._data import (
+    ColumnIsTargetError,
     ColumnLengthMismatchError,
     ColumnSizeError,
     DuplicateColumnNameError,
+    IllegalSchemaModificationError,
     IndexOutOfBoundsError,
     MissingValuesColumnError,
     NonNumericColumnError,
-    SchemaMismatchError,
     TransformerNotFittedError,
     UnknownColumnNameError,
     ValueNotPresentWhenFittedError,
@@ -33,25 +34,26 @@ __all__ = [
     # Generic exceptions
     "OutOfBoundsError",
     # Data exceptions
+    "ColumnIsTargetError",
     "ColumnLengthMismatchError",
     "ColumnSizeError",
     "DuplicateColumnNameError",
+    "IllegalSchemaModificationError",
     "IndexOutOfBoundsError",
+    "MissingValuesColumnError",
     "NonNumericColumnError",
-    "SchemaMismatchError",
     "TransformerNotFittedError",
     "UnknownColumnNameError",
     "ValueNotPresentWhenFittedError",
     "WrongFileExtensionError",
-    "MissingValuesColumnError",
     # ML exceptions
     "DatasetContainsTargetError",
+    "DatasetMissesDataError",
     "DatasetMissesFeaturesError",
     "LearningError",
     "ModelNotFittedError",
     "PredictionError",
     "UntaggedTableError",
-    "DatasetMissesDataError",
     # Other
     "Bound",
     "ClosedBound",
