@@ -427,8 +427,6 @@ class TaggedTable(Table):
         SchemaMismatchError
             If the schema of on of the row does not match the table schema.
         """
-        if isinstance(rows, Table):
-            rows = rows.to_rows()
         for row in rows:
             if self.number_of_rows == 0:
                 if self.number_of_columns == 0:
