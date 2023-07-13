@@ -25,7 +25,7 @@ class UnknownColumnNameError(KeyError):
 
         error_message = f"Could not find column(s) '{', '.join(column_names)}'."
 
-        if similar_columns is not None:
+        if similar_columns is not None and len(similar_columns) > 0:
             error_message += f"\nDid you mean '{similar_columns}'?"
 
         super().__init__(_UnknownColumnNameErrorMessage(error_message))
