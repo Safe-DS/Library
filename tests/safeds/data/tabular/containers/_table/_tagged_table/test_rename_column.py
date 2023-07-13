@@ -76,7 +76,7 @@ from tests.helpers import assert_that_tagged_tables_are_equal
     ],
     ids=["rename_feature_column", "rename_target_column", "rename_non_feature_column"],
 )
-def test_should_add_column(
+def test_should_rename_column(
     original_table: TaggedTable,
     old_column_name: str,
     new_column_name: str,

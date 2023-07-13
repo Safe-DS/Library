@@ -4,7 +4,11 @@ import copy
 from typing import TYPE_CHECKING
 
 from safeds.data.tabular.containers import Column, Row, Table
-from safeds.exceptions import ColumnIsTargetError, IllegalSchemaModificationError, UnknownColumnNameError
+from safeds.exceptions import (
+    ColumnIsTargetError,
+    IllegalSchemaModificationError,
+    UnknownColumnNameError,
+)
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Mapping, Sequence
@@ -167,10 +171,26 @@ class TaggedTable(Table):
 
     @property
     def features(self) -> Table:
+        """
+        Get the feature columns of the tagged table.
+
+        Returns
+        -------
+        Table
+            The table containing the feature columns.
+        """
         return self._features
 
     @property
     def target(self) -> Column:
+        """
+        Get the target column of the tagged table.
+
+        Returns
+        -------
+        Column
+            The target column.
+        """
         return self._target
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -198,6 +218,11 @@ class TaggedTable(Table):
 
         the original table is not modified.
 
+        Parameters
+        ----------
+        column : Column
+            The column to be added.
+
         Returns
         -------
         result : TaggedTable
@@ -208,7 +233,7 @@ class TaggedTable(Table):
         DuplicateColumnNameError
             If the new column already exists.
         ColumnSizeError
-            If the size of the column does not match the amount of rows.
+            If the size of the column does not match the number of rows.
         """
         return TaggedTable._from_table(
             super().add_column(column),
@@ -222,6 +247,11 @@ class TaggedTable(Table):
 
         The original table is not modified.
 
+        Parameters
+        ----------
+        columns : list[Column] | Table
+            The columns to be added as features.
+
         Returns
         -------
         result : TaggedTable
@@ -230,9 +260,9 @@ class TaggedTable(Table):
         Raises
         ------
         DuplicateColumnNameError
-            If the new column already exists.
+            If any of the new feature columns already exist.
         ColumnSizeError
-            If the size of the column does not match the amount of rows.
+            If the size of any feature column does not match the number of rows.
         """
         return TaggedTable._from_table(
             super().add_columns(columns),
@@ -270,6 +300,11 @@ class TaggedTable(Table):
 
         The original table is not modified.
 
+        Parameters
+        ----------
+        column : Column
+            The column to be added.
+
         Returns
         -------
         result : TaggedTable
@@ -280,7 +315,7 @@ class TaggedTable(Table):
         DuplicateColumnNameError
             If the new column already exists.
         ColumnSizeError
-            If the size of the column does not match the amount of rows.
+            If the size of the column does not match the number of rows.
         """
         return TaggedTable._from_table(
             super().add_column(column),
@@ -306,10 +341,10 @@ class TaggedTable(Table):
 
         Raises
         ------
-        ColumnSizeError
-            If at least one of the column sizes from the provided column list does not match the table.
         DuplicateColumnNameError
             If at least one column name from the provided column list already exists in the table.
+        ColumnSizeError
+            If at least one of the column sizes from the provided column list does not match the table.
         """
         return TaggedTable._from_table(
             super().add_columns(columns),
@@ -335,8 +370,8 @@ class TaggedTable(Table):
 
         Raises
         ------
-        SchemaMismatchError
-            If the schema of the row does not match the table schema.
+        UnknownColumnNameError
+            If the row has different column names than the table.
         """
         return TaggedTable._from_table(super().add_row(row), target_name=self.target.name)
 
@@ -358,8 +393,8 @@ class TaggedTable(Table):
 
         Raises
         ------
-        SchemaMismatchError
-            If the schema of on of the row does not match the table schema.
+        UnknownColumnNameError
+            If at least one of the rows have different column names than the table.
         """
         return TaggedTable._from_table(super().add_rows(rows), target_name=self.target.name)
 
@@ -587,9 +622,9 @@ class TaggedTable(Table):
         Parameters
         ----------
         old_name : str
-            The old name of the target column
+            The old name of the target column.
         new_name : str
-            The new name of the target column
+            The new name of the target column.
 
         Returns
         -------
