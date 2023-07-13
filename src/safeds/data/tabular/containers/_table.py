@@ -24,7 +24,6 @@ from safeds.exceptions import (
     DuplicateColumnNameError,
     IndexOutOfBoundsError,
     NonNumericColumnError,
-    SchemaMismatchError,
     UnknownColumnNameError,
     WrongFileExtensionError,
 )
@@ -302,8 +301,8 @@ class Table:
 
         Raises
         ------
-        SchemaMismatchError
-            If any of the row schemas does not match with the others.
+        UnknownColumnNameError
+            If any of the row column names does not match with the first row.
 
         Examples
         --------
@@ -318,17 +317,22 @@ class Table:
         if len(rows) == 0:
             return Table._from_pandas_dataframe(pd.DataFrame())
 
-        schema_compare: Schema = rows[0]._schema
+        column_names_compare: list = list(rows[0].column_names)
+        unknown_column_names = set()
         row_array: list[pd.DataFrame] = []
 
         for row in rows:
-            if schema_compare != row._schema:
-                raise SchemaMismatchError
+            unknown_column_names.update(set(column_names_compare) - set(row.column_names))
             row_array.append(row._data)
+        if len(unknown_column_names) > 0:
+            raise UnknownColumnNameError(list(unknown_column_names))
 
         dataframe: DataFrame = pd.concat(row_array, ignore_index=True)
-        dataframe.columns = schema_compare.column_names
-        return Table._from_pandas_dataframe(dataframe)
+        dataframe.columns = column_names_compare
+
+        schema = Schema.merge_multiple_schemas([row.schema for row in rows])
+
+        return Table._from_pandas_dataframe(dataframe, schema)
 
     @staticmethod
     def _from_pandas_dataframe(data: pd.DataFrame, schema: Schema | None = None) -> Table:
@@ -695,11 +699,11 @@ class Table:
     # Information
     # ------------------------------------------------------------------------------------------------------------------
 
-    def summary(self) -> Table:
+    def summarize_statistics(self) -> Table:
         """
         Return a table with a number of statistical key values.
 
-        This table is not modified.
+        The original table is not modified.
 
         Returns
         -------
@@ -710,7 +714,7 @@ class Table:
         --------
         >>> from safeds.data.tabular.containers import Table
         >>> table = Table.from_dict({"a": [1, 3], "b": [2, 4]})
-        >>> table.summary()
+        >>> table.summarize_statistics()
                       metrics                   a                   b
         0             maximum                   3                   4
         1             minimum                   1                   2
@@ -797,11 +801,25 @@ class Table:
     # Transformations
     # ------------------------------------------------------------------------------------------------------------------
 
+    # This method is meant as a way to "cast" instances of subclasses of `Table` to a proper `Table`, dropping any
+    # additional constraints that might have to hold in the subclass.
+    # Override accordingly in subclasses.
+    def _as_table(self: Table) -> Table:
+        """
+        Transform the table to an instance of the Table class.
+
+        Returns
+        -------
+        table: Table
+            The table, as an instance of the Table class.
+        """
+        return self
+
     def add_column(self, column: Column) -> Table:
         """
-        Return the original table with the provided column attached at the end.
+        Return a new table with the provided column attached at the end.
 
-        This table is not modified.
+        The original table is not modified.
 
         Returns
         -------
@@ -838,9 +856,9 @@ class Table:
 
     def add_columns(self, columns: list[Column] | Table) -> Table:
         """
-        Add multiple columns to the table.
+        Return a new `Table` with multiple added columns.
 
-        This table is not modified.
+        The original table is not modified.
 
         Parameters
         ----------
@@ -886,10 +904,14 @@ class Table:
 
     def add_row(self, row: Row) -> Table:
         """
-        Add a row to the table.
+        Return a new `Table` with an added Row attached.
 
-        This table is not modified.
-        If the table happens to be empty beforehand, respective features will be added automatically.
+        If the table happens to be empty beforehand, respective columns will be added automatically.
+
+        The order of columns of the new row will be adjusted to the order of columns in the table.
+        The new table will contain the merged schema.
+
+        The original table is not modified.
 
         Parameters
         ----------
@@ -903,8 +925,8 @@ class Table:
 
         Raises
         ------
-        SchemaMismatchError
-            If the schema of the row does not match the table schema.
+        UnknownColumnNameError
+            If the row has different column names than the table.
 
         Examples
         --------
@@ -918,20 +940,18 @@ class Table:
         """
         int_columns = []
         result = self._copy()
+        if self.number_of_columns == 0:
+            return Table.from_rows([row])
+        if len(set(self.column_names) - set(row.column_names)) > 0:
+            raise UnknownColumnNameError(list(set(self.column_names) - set(row.column_names)))
+
         if result.number_of_rows == 0:
-            int_columns = list(filter(lambda name: isinstance(row[name], int | np.int64), row.column_names))
-            if result.number_of_columns == 0:
-                for column in row.column_names:
-                    result._data[column] = Column(column, [])
-                result._schema = Schema._from_pandas_dataframe(result._data)
-            elif result.column_names != row.column_names:
-                raise SchemaMismatchError
-        elif result._schema != row.schema:
-            raise SchemaMismatchError
+            int_columns = list(filter(lambda name: isinstance(row[name], int | np.int64 | np.int32), row.column_names))
 
         new_df = pd.concat([result._data, row._data]).infer_objects()
         new_df.columns = result.column_names
-        result = Table._from_pandas_dataframe(new_df)
+        schema = Schema.merge_multiple_schemas([result.schema, row.schema])
+        result = Table._from_pandas_dataframe(new_df, schema)
 
         for column in int_columns:
             result = result.replace_column(column, [result.get_column(column).transform(lambda it: int(it))])
@@ -940,9 +960,12 @@ class Table:
 
     def add_rows(self, rows: list[Row] | Table) -> Table:
         """
-        Add multiple rows to a table.
+        Return a new `Table` with multiple added Rows attached.
 
-        This table is not modified.
+        The order of columns of the new rows will be adjusted to the order of columns in the table.
+        The new table will contain the merged schema.
+
+        The original table is not modified.
 
         Parameters
         ----------
@@ -956,8 +979,8 @@ class Table:
 
         Raises
         ------
-        SchemaMismatchError
-            If the schema of one of the rows does not match the table schema.
+        UnknownColumnNameError
+            If at least one of the rows have different column names than the table.
 
         Examples
         --------
@@ -973,36 +996,29 @@ class Table:
         """
         if isinstance(rows, Table):
             rows = rows.to_rows()
-        int_columns = []
         result = self._copy()
+
+        if len(rows) == 0:
+            return self._copy()
+
+        different_column_names = set()
         for row in rows:
-            if result.number_of_rows == 0:
-                int_columns = list(filter(lambda name: isinstance(row[name], int | np.int64), row.column_names))
-                if result.number_of_columns == 0:
-                    for column in row.column_names:
-                        result._data[column] = Column(column, [])
-                    result._schema = Schema._from_pandas_dataframe(result._data)
-                elif result.column_names != row.column_names:
-                    raise SchemaMismatchError
-            elif result._schema != row.schema:
-                raise SchemaMismatchError
+            different_column_names.update(set(rows[0].column_names) - set(row.column_names))
+        if len(different_column_names) > 0:
+            raise UnknownColumnNameError(list(different_column_names))
 
-        row_frames = (row._data for row in rows)
+        result = self._copy()
 
-        new_df = pd.concat([result._data, *row_frames]).infer_objects()
-        new_df.columns = result.column_names
-        result = Table._from_pandas_dataframe(new_df)
-
-        for column in int_columns:
-            result = result.replace_column(column, [result.get_column(column).transform(lambda it: int(it))])
+        for row in rows:
+            result = result.add_row(row)
 
         return result
 
     def filter_rows(self, query: Callable[[Row], bool]) -> Table:
         """
-        Return a table with rows filtered by Callable (e.g. lambda function).
+        Return a new table with rows filtered by Callable (e.g. lambda function).
 
-        This table is not modified.
+        The original table is not modified.
 
         Parameters
         ----------
@@ -1031,11 +1047,11 @@ class Table:
 
     _T = TypeVar("_T")
 
-    def group_by(self, key_selector: Callable[[Row], _T]) -> dict[_T, Table]:
+    def group_rows_by(self, key_selector: Callable[[Row], _T]) -> dict[_T, Table]:
         """
-        Return a dictionary with the output tables as values and the keys from the key_selector.
+        Return a dictionary with copies of the output tables as values and the keys from the key_selector.
 
-        This table is not modified.
+        The original table is not modified.
 
         Parameters
         ----------
@@ -1057,9 +1073,9 @@ class Table:
 
     def keep_only_columns(self, column_names: list[str]) -> Table:
         """
-        Return a table with only the given column(s).
+        Return a new table with only the given column(s).
 
-        This table is not modified.
+        The original table is not modified.
 
         Note: When removing the last column of the table, the `number_of_columns` property will be set to 0.
 
@@ -1077,6 +1093,8 @@ class Table:
         ------
         UnknownColumnNameError
             If any of the given columns does not exist.
+        IllegalSchemaModificationError
+            If removing the columns would violate an invariant in the subclass.
 
         Examples
         --------
@@ -1100,9 +1118,9 @@ class Table:
 
     def remove_columns(self, column_names: list[str]) -> Table:
         """
-        Return a table without the given column(s).
+        Return a new table without the given column(s).
 
-        This table is not modified.
+        The original table is not modified.
 
         Note: When removing the last column of the table, the `number_of_columns` property will be set to 0.
 
@@ -1120,6 +1138,8 @@ class Table:
         ------
         UnknownColumnNameError
             If any of the given columns does not exist.
+        IllegalSchemaModificationError
+            If removing the columns would violate an invariant in the subclass.
 
         Examples
         --------
@@ -1147,9 +1167,9 @@ class Table:
 
     def remove_columns_with_missing_values(self) -> Table:
         """
-        Return a table without the columns that contain missing values.
+        Return a new table without the columns that contain missing values.
 
-        This table is not modified.
+        The original table is not modified.
 
         Note: When removing the last column of the table, the `number_of_columns` property will be set to 0.
 
@@ -1157,6 +1177,11 @@ class Table:
         -------
         table : Table
             A table without the columns that contain missing values.
+
+        Raises
+        ------
+        IllegalSchemaModificationError
+            If removing the columns would violate an invariant in the subclass.
 
         Examples
         --------
@@ -1171,9 +1196,9 @@ class Table:
 
     def remove_columns_with_non_numerical_values(self) -> Table:
         """
-        Return a table without the columns that contain non-numerical values.
+        Return a new table without the columns that contain non-numerical values.
 
-        This table is not modified.
+        The original table is not modified.
 
         Note: When removing the last column of the table, the `number_of_columns` property will be set to 0.
 
@@ -1181,6 +1206,11 @@ class Table:
         -------
         table : Table
             A table without the columns that contain non-numerical values.
+
+        Raises
+        ------
+        IllegalSchemaModificationError
+            If removing the columns would violate an invariant in the subclass.
 
         Examples
         --------
@@ -1195,9 +1225,9 @@ class Table:
 
     def remove_duplicate_rows(self) -> Table:
         """
-        Return a copy of the table with every duplicate row removed.
+        Return a new table with every duplicate row removed.
 
-        This table is not modified.
+        The original table is not modified.
 
         Returns
         -------
@@ -1219,9 +1249,9 @@ class Table:
 
     def remove_rows_with_missing_values(self) -> Table:
         """
-        Return a table without the rows that contain missing values.
+        Return a new table without the rows that contain missing values.
 
-        This table is not modified.
+        The original table is not modified.
 
         Returns
         -------
@@ -1238,17 +1268,17 @@ class Table:
         """
         result = self._data.copy(deep=True)
         result = result.dropna(axis="index")
-        return Table._from_pandas_dataframe(result, self._schema)
+        return Table._from_pandas_dataframe(result)
 
     def remove_rows_with_outliers(self) -> Table:
         """
-        Remove all rows from the table that contain at least one outlier.
+        Return a new table without those rows that contain at least one outlier.
 
         We define an outlier as a value that has a distance of more than 3 standard deviations from the column mean.
         Missing values are not considered outliers. They are also ignored during the calculation of the standard
         deviation.
 
-        This table is not modified.
+        The original table is not modified.
 
         Returns
         -------
@@ -1287,9 +1317,9 @@ class Table:
 
     def rename_column(self, old_name: str, new_name: str) -> Table:
         """
-        Rename a single column.
+        Return a new `Table` with a single column renamed.
 
-        This table is not modified.
+        The original table is not modified.
 
         Parameters
         ----------
@@ -1331,9 +1361,11 @@ class Table:
 
     def replace_column(self, old_column_name: str, new_columns: list[Column]) -> Table:
         """
-        Return a copy of the table with the specified old column replaced by a list of new columns. Keeps the order of columns.
+        Return a new table with the specified old column replaced by a list of new columns.
 
-        This table is not modified.
+        The order of columns is kept.
+
+        The original table is not modified.
 
         Parameters
         ----------
@@ -1352,12 +1384,12 @@ class Table:
         ------
         UnknownColumnNameError
             If the old column does not exist.
-
         DuplicateColumnNameError
             If at least one of the new columns already exists and the existing column is not affected by the replacement.
-
         ColumnSizeError
             If the size of at least one of the new columns does not match the amount of rows.
+        IllegalSchemaModificationError
+            If replacing the column would violate an invariant in the subclass.
 
         Examples
         --------
@@ -1388,9 +1420,9 @@ class Table:
 
     def shuffle_rows(self) -> Table:
         """
-        Shuffle the table randomly.
+        Return a new `Table` with randomly shuffled rows of this `Table`.
 
-        This table is not modified.
+        The original table is not modified.
 
         Returns
         -------
@@ -1422,7 +1454,7 @@ class Table:
         """
         Slice a part of the table into a new table.
 
-        This table is not modified.
+        The original table is not modified.
 
         Parameters
         ----------
@@ -1475,7 +1507,7 @@ class Table:
         """
         Sort the columns of a `Table` with the given comparator and return a new `Table`.
 
-        The original table is not modified. The comparator is a function that takes two columns `col1` and `col2` and
+        The comparator is a function that takes two columns `col1` and `col2` and
         returns an integer:
 
         * If `col1` should be ordered before `col2`, the function should return a negative number.
@@ -1484,7 +1516,7 @@ class Table:
 
         If no comparator is given, the columns will be sorted alphabetically by their name.
 
-        This table is not modified.
+        The original table is not modified.
 
         Parameters
         ----------
@@ -1519,14 +1551,14 @@ class Table:
         """
         Sort the rows of a `Table` with the given comparator and return a new `Table`.
 
-        The original table is not modified. The comparator is a function that takes two rows `row1` and `row2` and
+        The comparator is a function that takes two rows `row1` and `row2` and
         returns an integer:
 
         * If `row1` should be ordered before `row2`, the function should return a negative number.
         * If `row1` should be ordered after `row2`, the function should return a positive number.
         * If the original order of `row1` and `row2` should be kept, the function should return 0.
 
-        This table is not modified.
+        The original table is not modified.
 
         Parameters
         ----------
@@ -1562,11 +1594,11 @@ class Table:
         rows.sort(key=functools.cmp_to_key(comparator))
         return Table.from_rows(rows)
 
-    def split(self, percentage_in_first: float) -> tuple[Table, Table]:
+    def split_rows(self, percentage_in_first: float) -> tuple[Table, Table]:
         """
         Split the table into two new tables.
 
-        This table is not modified.
+        The original table is not modified.
 
         Parameters
         ----------
@@ -1588,7 +1620,7 @@ class Table:
         --------
         >>> from safeds.data.tabular.containers import Table
         >>> table = Table.from_dict({"temperature": [10, 15, 20, 25, 30], "sales": [54, 74, 90, 206, 210]})
-        >>> slices = table.split(0.4)
+        >>> slices = table.split_rows(0.4)
         >>> slices[0]
            temperature  sales
         0           10     54
@@ -1610,9 +1642,9 @@ class Table:
 
     def tag_columns(self, target_name: str, feature_names: list[str] | None = None) -> TaggedTable:
         """
-        Mark the columns of the table as target column or feature columns. The original table is not modified.
+        Return a new `TaggedTable` with columns marked as a target column or feature columns.
 
-        This table is not modified.
+        The original table is not modified.
 
         Parameters
         ----------
@@ -1645,9 +1677,9 @@ class Table:
 
     def transform_column(self, name: str, transformer: Callable[[Row], Any]) -> Table:
         """
-        Transform provided column by calling provided transformer.
+        Return a new `Table` with the provided column transformed by calling the provided transformer.
 
-        This table is not modified.
+        The original table is not modified.
 
         Returns
         -------
@@ -1677,9 +1709,9 @@ class Table:
 
     def transform_table(self, transformer: TableTransformer) -> Table:
         """
-        Apply a learned transformation onto this table.
+        Return a new `Table` with a learned transformation applied to this table.
 
-        This table is not modified.
+        The original table is not modified.
 
         Parameters
         ----------
@@ -1695,6 +1727,8 @@ class Table:
         ------
         TransformerNotFittedError
             If the transformer has not been fitted yet.
+        IllegalSchemaModificationError
+            If replacing the column would violate an invariant in the subclass.
 
         Examples
         --------
@@ -1713,9 +1747,9 @@ class Table:
 
     def inverse_transform_table(self, transformer: InvertibleTableTransformer) -> Table:
         """
-        Invert the transformation applied by the given transformer.
+        Return a new `Table` with the inverted transformation applied by the given transformer.
 
-        This table is not modified.
+        The original table is not modified.
 
         Parameters
         ----------

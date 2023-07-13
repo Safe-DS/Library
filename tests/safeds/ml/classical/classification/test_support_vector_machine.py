@@ -1,5 +1,6 @@
 import pytest
 from safeds.data.tabular.containers import Table, TaggedTable
+from safeds.exceptions import OutOfBoundsError
 from safeds.ml.classical.classification import SupportVectorMachine
 
 
@@ -19,12 +20,10 @@ class TestC:
         assert fitted_model._wrapped_classifier is not None
         assert fitted_model._wrapped_classifier.C == 2
 
-    def test_should_raise_if_less_than_or_equal_to_0(self) -> None:
-        with pytest.raises(
-            ValueError,
-            match="The parameter 'c' has to be strictly positive.",
-        ):
-            SupportVectorMachine(c=-1)
+    @pytest.mark.parametrize("c", [-1.0, 0.0], ids=["minus_one", "zero"])
+    def test_should_raise_if_less_than_or_equal_to_0(self, c: float) -> None:
+        with pytest.raises(OutOfBoundsError, match=rf"c \(={c}\) is not inside \(0, \u221e\)\."):
+            SupportVectorMachine(c=c)
 
 
 class TestKernel:
@@ -45,9 +44,10 @@ class TestKernel:
         linear_kernel = svm.kernel.get_sklearn_kernel()
         assert linear_kernel == "linear"
 
-    def test_should_raise_if_degree_less_than_1(self) -> None:
-        with pytest.raises(ValueError, match="The parameter 'degree' has to be greater than or equal to 1."):
-            SupportVectorMachine.Kernel.Polynomial(degree=0)
+    @pytest.mark.parametrize("degree", [-1, 0], ids=["minus_one", "zero"])
+    def test_should_raise_if_degree_less_than_1(self, degree: int) -> None:
+        with pytest.raises(OutOfBoundsError, match=rf"degree \(={degree}\) is not inside \[1, \u221e\)\."):
+            SupportVectorMachine.Kernel.Polynomial(degree=degree)
 
     def test_should_get_sklearn_kernel_polynomial(self) -> None:
         svm = SupportVectorMachine(c=2, kernel=SupportVectorMachine.Kernel.Polynomial(degree=2))
