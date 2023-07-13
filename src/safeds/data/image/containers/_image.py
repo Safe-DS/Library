@@ -222,7 +222,7 @@ class Image:
 
     def convert_to_grayscale(self) -> Image:
         """
-        Convert the image to grayscale and return a new `Image`.
+       Return a new `Image` that is converted to grayscale.
 
         The original image is not modified.
 
@@ -259,7 +259,7 @@ class Image:
 
     def flip_vertically(self) -> Image:
         """
-        Flip the image vertically (horizontal axis, flips up-down and vice versa) and return a new `Image`.
+        Return a new `Image` that is flipped vertically (horizontal axis, flips up-down and vice versa).
 
         The original image is not modified.
 
@@ -274,7 +274,7 @@ class Image:
 
     def flip_horizontally(self) -> Image:
         """
-        Flip the image horizontally (vertical axis, flips left-right and vice versa) and return a new `Image`.
+        Return a new `Ìmage` that is flipped horizontally (vertical axis, flips left-right and vice versa).
 
         The original image is not modified.
 
@@ -289,7 +289,7 @@ class Image:
 
     def adjust_brightness(self, factor: float) -> Image:
         """
-        Adjust the brightness of an image and return a new `Image`.
+        Return a new `Image` with an adjusted brightness.
 
         The original image is not modified.
 
@@ -322,7 +322,7 @@ class Image:
 
     def add_gaussian_noise(self, standard_deviation: float) -> Image:
         """
-        Add Gaussian noise to the image and return a new `Image`.
+        Return a new `Image` with Gaussian noise added to the image.
 
         The original image is not modified.
 
@@ -361,7 +361,7 @@ class Image:
 
     def adjust_contrast(self, factor: float) -> Image:
         """
-        Adjust Contrast of image and return a new `Image`.
+       Return a new `Image` with adjusted contrast.
 
         The original image is not modified.
 
@@ -392,7 +392,7 @@ class Image:
 
     def adjust_color_balance(self, factor: float) -> Image:
         """
-        Adjust the color balance of an image and return a new `Image`.
+        Return a new `Image` with adjusted color balance.
 
         The original image is not modified.
 
@@ -481,7 +481,7 @@ class Image:
 
     def rotate_right(self) -> Image:
         """
-        Rotate the image 90 degrees clockwise and return a new `Image`.
+        Return a new `Image` that is rotated 90 degrees clockwise.
 
         The original image is not modified.
 
@@ -496,7 +496,7 @@ class Image:
 
     def rotate_left(self) -> Image:
         """
-        Rotate the image 90 degrees counter-clockwise and return a new `Image`.
+        Return a new `Image` that is rotated 90 degrees counter-clockwise.
 
         The original image is not modified.
 

@@ -856,7 +856,7 @@ class Table:
 
     def add_columns(self, columns: list[Column] | Table) -> Table:
         """
-        Add multiple columns to the table and return a new `Table`.
+        Return a new `Table` with multiple added columns.
 
         The original table is not modified.
 
@@ -904,7 +904,7 @@ class Table:
 
     def add_row(self, row: Row) -> Table:
         """
-        Add a row to the table and return a new `Table`.
+        Return a new `Table` with an added Row attached.
 
         If the table happens to be empty beforehand, respective columns will be added automatically.
 
@@ -960,7 +960,7 @@ class Table:
 
     def add_rows(self, rows: list[Row] | Table) -> Table:
         """
-        Add multiple rows to a table and return a new `Table`.
+        Return a new `Table` with multiple added Rows attached.
 
         The order of columns of the new rows will be adjusted to the order of columns in the table.
         The new table will contain the merged schema.
@@ -1317,7 +1317,7 @@ class Table:
 
     def rename_column(self, old_name: str, new_name: str) -> Table:
         """
-        Rename a single column and return a new `Table`.
+        Return a new `Table` with a single column renamed.
 
         The original table is not modified.
 
@@ -1420,7 +1420,7 @@ class Table:
 
     def shuffle_rows(self) -> Table:
         """
-        Shuffle the table randomly and return a new `Table`.
+        Return a new `Table` with randomly shuffled rows of this `Table`.
 
         The original table is not modified.
 
@@ -1642,7 +1642,7 @@ class Table:
 
     def tag_columns(self, target_name: str, feature_names: list[str] | None = None) -> TaggedTable:
         """
-        Mark the columns of the table as target column or feature columns and return a new `TaggedTable`.
+        Return a new `TaggedTable` with columns marked as a target column or feature columns.
 
         The original table is not modified.
 
@@ -1677,7 +1677,7 @@ class Table:
 
     def transform_column(self, name: str, transformer: Callable[[Row], Any]) -> Table:
         """
-        Transform the provided column by calling the provided transformer and return a new `Table`.
+        Return a new `Table` with the provided column transformed by calling the provided transformer.
 
         The original table is not modified.
 
@@ -1709,7 +1709,7 @@ class Table:
 
     def transform_table(self, transformer: TableTransformer) -> Table:
         """
-        Apply a learned transformation onto this table and return a new `Table`.
+        Return a new `Table` with a learned transformation applied to this table.
 
         The original table is not modified.
 
@@ -1747,7 +1747,7 @@ class Table:
 
     def inverse_transform_table(self, transformer: InvertibleTableTransformer) -> Table:
         """
-        Invert the transformation applied by the given transformer and return a new `Table`.
+        Return a new `Table` with the inverted transformation applied by the given transformer.
 
         The original table is not modified.
 

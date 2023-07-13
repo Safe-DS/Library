@@ -247,7 +247,7 @@ class TaggedTable(Table):
 
     def _as_table(self: TaggedTable) -> Table:
         """
-        Remove the tagging from a TaggedTable and return a new `Table`.
+        Return a new `Table` with the tagging removed.
 
         The original TaggedTable is not modified.
 
@@ -290,7 +290,7 @@ class TaggedTable(Table):
 
     def add_columns(self, columns: list[Column] | Table) -> TaggedTable:
         """
-        Add multiple columns to the table, as neither target nor feature columns, and return a new `TaggedTable`.
+        Return a new `TaggedTable` with multiple added columns, as neither target nor feature columns.
 
         The original table is not modified.
 
@@ -319,7 +319,7 @@ class TaggedTable(Table):
 
     def add_row(self, row: Row) -> TaggedTable:
         """
-        Add a row to the table and return a new `TaggedTable`.
+        Return a new `TaggedTable` with an added Row attached.
 
         The original table is not modified.
 
@@ -342,7 +342,7 @@ class TaggedTable(Table):
 
     def add_rows(self, rows: list[Row] | Table) -> TaggedTable:
         """
-        Add multiple rows to the table and return a new `TaggedTable`.
+        Return a new `TaggedTable` with multiple added Rows attached.
 
         The original table is not modified.
 
@@ -423,7 +423,7 @@ class TaggedTable(Table):
 
     def remove_columns(self, column_names: list[str]) -> TaggedTable:
         """
-        Remove the given column(s) from the table and return a new `TaggedTable`.
+        Return a new `TaggedTable` with the given column(s) removed from the table.
 
         The original table is not modified.
 
@@ -461,7 +461,7 @@ class TaggedTable(Table):
 
     def remove_columns_with_missing_values(self) -> TaggedTable:
         """
-        Remove every column that misses values and return a new `TaggedTable`.
+        Return a new `TaggedTable` with every column that misses values removed.
 
         The original table is not modified.
 
@@ -493,7 +493,7 @@ class TaggedTable(Table):
 
     def remove_columns_with_non_numerical_values(self) -> TaggedTable:
         """
-        Remove every column that contains non-numerical values and return a new `TaggedTable`.
+        Return a new `TaggedTable` with every column that contains non-numerical values removed.
 
         The original table is not modified.
 
@@ -559,7 +559,7 @@ class TaggedTable(Table):
 
     def remove_rows_with_outliers(self) -> TaggedTable:
         """
-        Remove all rows from the table that contain at least one outlier and return a new `TaggedTable`.
+        Return a new `TaggedTable` with all rows that contain at least one outlier removed.
 
         We define an outlier as a value that has a distance of more than 3 standard deviations from the column mean.
         Missing values are not considered outliers. They are also ignored during the calculation of the standard
@@ -580,7 +580,7 @@ class TaggedTable(Table):
 
     def rename_column(self, old_name: str, new_name: str) -> TaggedTable:
         """
-        Rename a single column and return a new `TaggedTable`.
+        Return a new `TaggedTable` with a single column renamed.
 
         The original table is not modified.
 
@@ -617,7 +617,7 @@ class TaggedTable(Table):
 
     def replace_column(self, old_column_name: str, new_columns: list[Column]) -> TaggedTable:
         """
-        Replace the specified old column by a list of new columns and return a new `TaggedTable`.
+        Return a new `TaggedTable` with the specified old column replaced by a list of new columns.
 
         If the column to be replaced is the target column, it must be replaced by exactly one column. That column
         becomes the new target column. If the column to be replaced is a feature column, the new columns that replace it
@@ -674,7 +674,7 @@ class TaggedTable(Table):
 
     def shuffle_rows(self) -> TaggedTable:
         """
-        Shuffle the table randomly and return a new `TaggedTable`.
+        Return a new `TaggedTable` with randomly shuffled rows of this table.
 
         The original table is not modified.
 
@@ -795,7 +795,7 @@ class TaggedTable(Table):
 
     def transform_column(self, name: str, transformer: Callable[[Row], Any]) -> TaggedTable:
         """
-        Transform the provided column by calling the provided transformer and return a new `TaggedTable`.
+        Return a new `TaggedTable` with the provided column transformed by calling the provided transformer.
 
         The original table is not modified.
 
