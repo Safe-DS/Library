@@ -244,26 +244,18 @@ class Classifier(ABC):
 
         Returns
         -------
-        roc_curve : Table
-            The calculated roc_curve, i.e. the harmonic mean between precision and recall.
-            Return 1 if there are no positive expectations and predictions.
+        roc_curve : Image
+            The calculated roc_curve plots the true positive rate (TPR) against the false positive rate (FPR)
         """
         if not isinstance(validation_or_test_set, TaggedTable) and isinstance(validation_or_test_set, Table):
             raise UntaggedTableError
 
-        expected_values = validation_or_test_set.target
-        predicted_values = self.predict(validation_or_test_set.features).target
-
-        y_expected_values = []
-        y_predicted_values = []
-        for row in expected_values:
-            y_expected_values.append(row)
-        for row in predicted_values:
-            y_predicted_values.append(row)
+        expected_values = list(validation_or_test_set.target)
+        predicted_values = list(self.predict(validation_or_test_set.features).target)
 
         roc_table = Table()
 
-        fpr, tpr, thresholds = roc_curve(y_expected_values, y_predicted_values)
+        fpr, tpr, thresholds = roc_curve(expected_values, predicted_values)
 
         i = 0
         while i < len(fpr):
