@@ -222,14 +222,14 @@ class Image:
 
     def convert_to_grayscale(self) -> Image:
         """
-       Return a new `Image` that is converted to grayscale.
+        Return a new `Image` that is converted to grayscale.
 
-        The original image is not modified.
+         The original image is not modified.
 
         Returns
         -------
-        grayscale_image : Image
-            The grayscale image.
+         grayscale_image : Image
+             The grayscale image.
         """
         image_copy = copy.deepcopy(self)
         image_copy._image = image_copy._image.convert("L")
@@ -361,21 +361,21 @@ class Image:
 
     def adjust_contrast(self, factor: float) -> Image:
         """
-       Return a new `Image` with adjusted contrast.
+        Return a new `Image` with adjusted contrast.
 
-        The original image is not modified.
+         The original image is not modified.
 
         Parameters
         ----------
-        factor: float
-            If factor > 1, increase contrast of image.
-            If factor = 1, no changes will be made.
-            If factor < 1, make image greyer.
-            Has to be bigger than or equal to 0 (gray).
+         factor: float
+             If factor > 1, increase contrast of image.
+             If factor = 1, no changes will be made.
+             If factor < 1, make image greyer.
+             Has to be bigger than or equal to 0 (gray).
 
         Returns
         -------
-        New image with adjusted contrast.
+         New image with adjusted contrast.
         """
         if factor < 0:
             raise OutOfBoundsError(factor, name="factor", lower_bound=ClosedBound(0))
