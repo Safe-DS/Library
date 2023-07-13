@@ -17,12 +17,12 @@ from safeds.exceptions import ColumnSizeError, DuplicateColumnNameError
             Table({"col1": [1, 2, 1], "col2": [1, 2, 4], "col3": [0, -1, -2]}),
         ),
         (
-            Table({}),
+            Table(),
             Column("col3", []),
             Table({"col3": []}),
         ),
         (
-            Table({}),
+            Table(),
             Column("col3", [1]),
             Table({"col3": [1]}),
         ),

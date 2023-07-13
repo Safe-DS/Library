@@ -19,7 +19,7 @@ from safeds.data.tabular.containers import Table
                 },
             ),
         ),
-        (Table({}), Table({})),
+        (Table(), Table()),
     ],
     ids=["some missing values", "empty"],
 )
