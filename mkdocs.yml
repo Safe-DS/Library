@@ -10,10 +10,11 @@ nav:
     - README.md
     - Changelog: CHANGELOG.md
   - Tutorials:
-    - Getting started: tutorials/getting_started.ipynb
     - Data Processing: tutorials/data_processing.ipynb
     - Image processing: tutorials/image_processing.ipynb
     - Data Visualization: tutorials/data_visualization.ipynb
+    - Classification: tutorials/classification.ipynb
+    - Regression: tutorials/regression.ipynb
     - Machine Learning: tutorials/machine_learning.ipynb
   - API Reference: reference/
   - Glossary: glossary.md
