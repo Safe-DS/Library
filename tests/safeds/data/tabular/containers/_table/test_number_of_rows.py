@@ -6,7 +6,7 @@ from safeds.data.tabular.containers import Table
     ("table", "expected"),
     [
         (Table(), 0),
-        (Table({}), 0),
+        (Table(), 0),
         (Table({"col1": [1]}), 1),
         (Table({"col1": [1, 2]}), 2),
     ],

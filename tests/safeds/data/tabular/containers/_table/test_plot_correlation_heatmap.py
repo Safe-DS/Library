@@ -14,9 +14,16 @@ from tests.helpers import resolve_resource_path
     ids=["normal", "empty"],
 )
 def test_should_match_snapshot(table: Table, path: str) -> None:
-    current = table.plot_correlation_heatmap()
+    if table.number_of_rows == 0:
+        with pytest.warns(
+            UserWarning,
+            match=r"An empty table has been used. A correlation heatmap on an empty table will show nothing.",
+        ):
+            current = table.plot_correlation_heatmap()
+    else:
+        current = table.plot_correlation_heatmap()
     snapshot = Image.from_png_file(resolve_resource_path(path))
 
     # Inlining the expression into the assert causes pytest to hang if the assertion fails when run from PyCharm.
-    assertion = snapshot._image.tobytes() == current._image.tobytes()
+    assertion = snapshot == current
     assert assertion

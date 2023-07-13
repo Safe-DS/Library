@@ -91,9 +91,9 @@ def predict(model: Any, dataset: Table, feature_names: list[str] | None, target_
         Classifier or regressor from scikit-learn.
     dataset : Table
         The dataset containing the features.
-    target_name : Optional[str]
+    target_name : str | None
         The name of the target column.
-    feature_names : Optional[list[str]]
+    feature_names : list[str] | None
         The names of the feature columns.
 
     Returns
