@@ -3,8 +3,8 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 
 import pytest
-from safeds.data.tabular.containers import Table, TaggedTable
 from safeds.data.image.containers import Image
+from safeds.data.tabular.containers import Table, TaggedTable
 from safeds.exceptions import (
     DatasetContainsTargetError,
     DatasetMissesDataError,
@@ -490,8 +490,7 @@ class TestRocCurve:
                         "expected": [0, 1, 1, 0, 0, 0, 1, 0, 1],
                     },
                 ).tag_columns(target_name="expected"),
-                Image.from_png_file(resolve_resource_path("image/roc_curve.png")
-                ),
+                Image.from_png_file(resolve_resource_path("image/roc_curve.png")),
             ),
         ],
         ids=["tagged_table"],
