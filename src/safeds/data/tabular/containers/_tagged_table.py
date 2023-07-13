@@ -702,9 +702,9 @@ class TaggedTable(Table):
 
         Parameters
         ----------
-        start : int
+        start : int | None
             The first index of the range to be copied into a new table, None by default.
-        end : int
+        end : int | None
             The last index of the range to be copied into a new table, None by default.
         step : int
             The step size used to iterate through the table, 1 by default.
