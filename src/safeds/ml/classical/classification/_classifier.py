@@ -271,6 +271,5 @@ class Classifier(ABC):
             i += 1
 
         roc_plotted = roc_table.plot_lineplot("fpr", "tpr")
-        roc_plotted._image.show()
 
         return roc_plotted
