@@ -3,15 +3,10 @@ from __future__ import annotations
 import copy
 from typing import TYPE_CHECKING
 
-import pandas as pd
-
 from safeds.data.tabular.containers import Column, Row, Table
 from safeds.exceptions import (
     ColumnIsTargetError,
-    ColumnSizeError,
-    DuplicateColumnNameError,
     IllegalSchemaModificationError,
-    SchemaMismatchError,
     UnknownColumnNameError,
 )
 
@@ -240,12 +235,6 @@ class TaggedTable(Table):
         ColumnSizeError
             If the size of the column does not match the number of rows.
         """
-        if column.name in self.column_names:
-            raise DuplicateColumnNameError(f"Column '{column.name}' already exists.")
-
-        if column.number_of_rows != self.number_of_rows and self.number_of_columns != 0:
-            raise ColumnSizeError(str(self.number_of_rows), str(column.number_of_rows))
-
         return TaggedTable._from_table(
             super().add_column(column),
             target_name=self.target.name,
@@ -275,16 +264,6 @@ class TaggedTable(Table):
         ColumnSizeError
             If the size of any feature column does not match the number of rows.
         """
-        if isinstance(columns, Table):
-            columns = columns.to_columns()
-
-        for column in columns:
-            if column.name in self.column_names:
-                raise DuplicateColumnNameError(column.name)
-
-            if column.number_of_rows != self.number_of_rows and self.number_of_columns != 0:
-                raise ColumnSizeError(str(self.number_of_rows), str(column.number_of_rows))
-
         return TaggedTable._from_table(
             super().add_columns(columns),
             target_name=self.target.name,
@@ -336,7 +315,7 @@ class TaggedTable(Table):
         DuplicateColumnNameError
             If the new column already exists.
         ColumnSizeError
-            If the size of the column does not match the amount of rows.
+            If the size of the column does not match the number of rows.
         """
         return TaggedTable._from_table(
             super().add_column(column),
@@ -362,10 +341,10 @@ class TaggedTable(Table):
 
         Raises
         ------
-        ColumnSizeError
-            If at least one of the column sizes from the provided column list does not match the table.
         DuplicateColumnNameError
             If at least one column name from the provided column list already exists in the table.
+        ColumnSizeError
+            If at least one of the column sizes from the provided column list does not match the table.
         """
         return TaggedTable._from_table(
             super().add_columns(columns),
@@ -391,19 +370,9 @@ class TaggedTable(Table):
 
         Raises
         ------
-        SchemaMismatchError
-            If the schema of the row does not match the table schema.
+        UnknownColumnNameError
+            If the row has different column names than the table.
         """
-        if self.number_of_rows == 0:
-            if self.number_of_columns == 0:
-                for column in row.column_names:
-                    self._data[column] = Column(column, [])
-                self._schema = Table._from_pandas_dataframe(pd.DataFrame(columns=row.column_names))._schema
-            elif self.column_names != row.column_names:
-                raise SchemaMismatchError
-        elif self._schema != row.schema:
-            raise SchemaMismatchError
-
         return TaggedTable._from_table(super().add_row(row), target_name=self.target.name)
 
     def add_rows(self, rows: list[Row] | Table) -> TaggedTable:
@@ -424,22 +393,9 @@ class TaggedTable(Table):
 
         Raises
         ------
-        SchemaMismatchError
-            If the schema of on of the row does not match the table schema.
+        UnknownColumnNameError
+            If at least one of the rows have different column names than the table.
         """
-        if isinstance(rows, Table):
-            rows = rows.to_rows()
-        for row in rows:
-            if self.number_of_rows == 0:
-                if self.number_of_columns == 0:
-                    for column in row.column_names:
-                        self._data[column] = Column(column, [])
-                    self._schema = Table._from_pandas_dataframe(pd.DataFrame(columns=self.column_names))._schema
-                elif self.column_names != row.column_names:
-                    raise SchemaMismatchError
-            elif self._schema != row.schema:
-                raise SchemaMismatchError
-
         return TaggedTable._from_table(super().add_rows(rows), target_name=self.target.name)
 
     def filter_rows(self, query: Callable[[Row], bool]) -> TaggedTable:

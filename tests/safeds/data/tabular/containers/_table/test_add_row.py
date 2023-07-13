@@ -62,8 +62,13 @@ def test_should_add_row(table: Table, row: Row, expected: Table, expected_schema
             Row({"col1": 5, "col3": "Hallo"}),
             r"Could not find column\(s\) 'col2'",
         ),
+        (
+            Table({"col1": [1, 2, 1], "col2": [1, 2, 4]}),
+            Row({"col3": 5, "col4": "Hallo"}),
+            r"Could not find column\(s\) 'col1, col2'",
+        ),
     ],
-    ids=["unknown column col2 in row"],
+    ids=["unknown column col2 in row", "multiple columns missing"],
 )
 def test_should_raise_error_if_row_column_names_invalid(table: Table, row: Row, expected_error_msg: str) -> None:
     with raises(UnknownColumnNameError, match=expected_error_msg):
