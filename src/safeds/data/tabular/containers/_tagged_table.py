@@ -525,7 +525,7 @@ class TaggedTable(Table):
 
     def remove_duplicate_rows(self) -> TaggedTable:
         """
-        Remove all row duplicates and return a new `TaggedTable`.
+        Return a new `TaggedTable` with all row duplicates removed
 
         The original table is not modified.
 
