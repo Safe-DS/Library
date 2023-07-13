@@ -224,12 +224,12 @@ class Image:
         """
         Return a new `Image` that is converted to grayscale.
 
-         The original image is not modified.
+        The original image is not modified.
 
         Returns
         -------
-         grayscale_image : Image
-             The grayscale image.
+        grayscale_image : Image
+            The grayscale image.
         """
         image_copy = copy.deepcopy(self)
         image_copy._image = image_copy._image.convert("L")
