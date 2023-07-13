@@ -10,7 +10,9 @@ from safeds.exceptions import UnknownColumnNameError
     ids=["empty_list"],
 )
 def test_empty_similar_columns(
-    column_names: list[str], similar_columns: list[str], expected_error_message: str,
+    column_names: list[str],
+    similar_columns: list[str],
+    expected_error_message: str,
 ) -> None:
     with pytest.raises(UnknownColumnNameError, match=expected_error_message):
         raise UnknownColumnNameError(column_names, similar_columns)
