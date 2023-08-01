@@ -703,20 +703,17 @@ dev = ["flake8", "markdown", "twine", "wheel"]
 
 [[package]]
 name = "griffe"
-version = "0.25.5"
+version = "0.32.3"
 description = "Signatures for entire Python programs. Extract the structure, the frame, the skeleton of your project, to generate API documentation or find breaking changes in your API."
 optional = false
-python-versions = ">=3.7"
+python-versions = ">=3.8"
 files = [
-    {file = "griffe-0.25.5-py3-none-any.whl", hash = "sha256:1fb9edff48e66d4873014a2ebf21aca5f271d0006a4c937826e3cf592ffb3706"},
-    {file = "griffe-0.25.5.tar.gz", hash = "sha256:11ea3403ef0560a1cbcf7f302eb5d21cf4c1d8ed3f8a16a75aa9f6f458caf3f1"},
+    {file = "griffe-0.32.3-py3-none-any.whl", hash = "sha256:d9471934225818bf8f309822f70451cc6abb4b24e59e0bb27402a45f9412510f"},
+    {file = "griffe-0.32.3.tar.gz", hash = "sha256:14983896ad581f59d5ad7b6c9261ff12bdaa905acccc1129341d13e545da8521"},
 ]
 
 [package.dependencies]
 colorama = ">=0.4"
-
-[package.extras]
-async = ["aiofiles (>=0.7,<1.0)"]
 
 [[package]]
 name = "idna"
@@ -1802,17 +1799,17 @@ python-legacy = ["mkdocstrings-python-legacy (>=0.2.1)"]
 
 [[package]]
 name = "mkdocstrings-python"
-version = "1.1.2"
+version = "1.2.1"
 description = "A Python handler for mkdocstrings."
 optional = false
-python-versions = ">=3.7"
+python-versions = ">=3.8"
 files = [
-    {file = "mkdocstrings_python-1.1.2-py3-none-any.whl", hash = "sha256:c2b652a850fec8e85034a9cdb3b45f8ad1a558686edc20ed1f40b4e17e62070f"},
-    {file = "mkdocstrings_python-1.1.2.tar.gz", hash = "sha256:f28bdcacb9bcdb44b6942a5642c1ea8b36870614d33e29e3c923e204a8d8ed61"},
+    {file = "mkdocstrings_python-1.2.1-py3-none-any.whl", hash = "sha256:7c08f33e9ba7b1655e9cf0608eba3ce7a9513bd8b42a68a8d24ffaf4a6a50cfc"},
+    {file = "mkdocstrings_python-1.2.1.tar.gz", hash = "sha256:ae40825b3b676a94626882901ed9c8fcf9a7f0330e466ffe37ce15c525987aa9"},
 ]
 
 [package.dependencies]
-griffe = ">=0.24"
+griffe = ">=0.30"
 mkdocstrings = ">=0.20"
 
 [[package]]
@@ -3557,4 +3554,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "37018d792652bc414af945891a7be97f17c39c6afeff3ee08246caf1d97f4d3a"
+content-hash = "aeed6e9193959735f496f8427299a9ab5ea7ff73fdeb4e93f89813c5a8f82e03"
