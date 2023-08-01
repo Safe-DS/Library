@@ -1693,16 +1693,17 @@ files = [
 
 [[package]]
 name = "mkdocs-jupyter"
-version = "0.24.1"
+version = "0.24.2"
 description = "Use Jupyter in mkdocs websites"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "mkdocs_jupyter-0.24.1-py3-none-any.whl", hash = "sha256:759833c7d1528ae2d6337342786be7bc1e2235b0b98e9326427d4cf8d4eebee0"},
-    {file = "mkdocs_jupyter-0.24.1.tar.gz", hash = "sha256:9677037fb7e931268f3df7599fc0828c261247df3d1575bced320ba8b7d1d46d"},
+    {file = "mkdocs_jupyter-0.24.2-py3-none-any.whl", hash = "sha256:5295a34b1d0bd0a7688a857323eaf0319d83c8a14179b2651709b8ced6eae7db"},
+    {file = "mkdocs_jupyter-0.24.2.tar.gz", hash = "sha256:5e0c109d535d48797230719b6941f4d08de95a7a3c95bf158662c412fc15cb2e"},
 ]
 
 [package.dependencies]
+ipykernel = ">6.0.0,<7.0.0"
 jupytext = ">1.13.8,<2"
 mkdocs = ">=1.4.0,<2"
 mkdocs-material = ">9.0.0"
@@ -1710,7 +1711,7 @@ nbconvert = ">=7.2.9,<8"
 pygments = ">2.12.0"
 
 [package.extras]
-test = ["pytest", "pytest-cov"]
+test = ["coverage[toml]", "pymdown-extensions", "pytest", "pytest-cov"]
 
 [[package]]
 name = "mkdocs-literate-nav"
