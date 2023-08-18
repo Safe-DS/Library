@@ -522,8 +522,8 @@ when adding new classes to it.
     ]
     ```
 
-[src-folder]: https://github.com/Safe-DS/Stdlib/tree/main/src
-[tests-folder]: https://github.com/Safe-DS/Stdlib/tree/main/tests
+[src-folder]: https://github.com/Safe-DS/Library/tree/main/src
+[tests-folder]: https://github.com/Safe-DS/Library/tree/main/tests
 
 [short-summary-section]: https://numpydoc.readthedocs.io/en/latest/format.html#short-summary
 [extended-summary-section]: https://numpydoc.readthedocs.io/en/latest/format.html#extended-summary
