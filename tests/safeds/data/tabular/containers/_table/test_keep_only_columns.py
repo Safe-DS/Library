@@ -26,7 +26,7 @@ from safeds.exceptions import UnknownColumnNameError
             ["A", "B"],
             Table({"A": [1], "B": [2]}),
         ),
-        # Related to https://github.com/Safe-DS/Stdlib/issues/115
+        # Related to https://github.com/Safe-DS/Library/issues/115
         (
             Table({"A": [1], "B": [2], "C": [3]}),
             ["C", "A"],

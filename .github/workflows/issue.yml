@@ -1,4 +1,4 @@
-name: Add Issues to Stdlib Project
+name: Add Issues to Library Project
 
 on:
   issues:

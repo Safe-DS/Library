@@ -276,7 +276,7 @@ class DummyClassifier(Classifier):
         return self
 
     def predict(self, dataset: Table) -> TaggedTable:
-        # Needed until https://github.com/Safe-DS/Stdlib/issues/75 is fixed
+        # Needed until https://github.com/Safe-DS/Library/issues/75 is fixed
         predicted = dataset.get_column("predicted")
         feature = predicted.rename("feature")
         dataset = Table.from_columns([feature, predicted])
