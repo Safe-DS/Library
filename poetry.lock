@@ -1839,13 +1839,13 @@ files = [
 
 [[package]]
 name = "mkdocs-jupyter"
-version = "0.24.2"
+version = "0.24.5"
 description = "Use Jupyter in mkdocs websites"
 optional = false
-python-versions = ">=3.7"
+python-versions = ">=3.9"
 files = [
-    {file = "mkdocs_jupyter-0.24.2-py3-none-any.whl", hash = "sha256:5295a34b1d0bd0a7688a857323eaf0319d83c8a14179b2651709b8ced6eae7db"},
-    {file = "mkdocs_jupyter-0.24.2.tar.gz", hash = "sha256:5e0c109d535d48797230719b6941f4d08de95a7a3c95bf158662c412fc15cb2e"},
+    {file = "mkdocs_jupyter-0.24.5-py3-none-any.whl", hash = "sha256:e8b9c5f3988004372ba2f95c4a70e2125f9c85b1e8ee2b2afc7879f7b3632c88"},
+    {file = "mkdocs_jupyter-0.24.5.tar.gz", hash = "sha256:fa7804879a627702497e2afaea40a3db1cbdd2a3aba0e4417782dd24ca899bb3"},
 ]
 
 [package.dependencies]
@@ -1855,9 +1855,6 @@ mkdocs = ">=1.4.0,<2"
 mkdocs-material = ">9.0.0"
 nbconvert = ">=7.2.9,<8"
 pygments = ">2.12.0"
-
-[package.extras]
-test = ["coverage[toml]", "pymdown-extensions", "pytest", "pytest-cov"]
 
 [[package]]
 name = "mkdocs-literate-nav"
