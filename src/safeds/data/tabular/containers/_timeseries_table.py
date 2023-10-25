@@ -57,10 +57,53 @@ class TimeSeries(Table):
     def _from_table(
         table: Table,
         target_name: str,
+        date_name: str,
+        window_size: int,
         feature_names: list[str] | None = None,
     ) -> TimeSeries:
-        "Create a TimeSeries from a table"
-        pass
+        """Create a TimeSeries from a table
+        
+        Parameters
+        ----------
+        table : Table
+            The table.
+        target_name : str
+            Name of the target column.
+        feature_names : list[str] | None
+            Names of the feature columns. If None, all columns except the target column are used.
+
+        
+        """
+        table = table._as_table()
+        #check if target column exists
+        if target_name not in table.column_names:
+            raise UnknownColumnNameError([target_name])
+        
+        # If no feature names are specified, use all columns except the target column
+        if feature_names is None:
+            feature_names = table.column_names
+            # still needs to be thought about, if a target can be a feature normally yes
+            #feature_names.remove(target_name)
+        if len(feature_names) == 0:
+            raise ValueError("At least one feature column must be specified.")
+        
+        # Create Time Series Object
+        result = object.__new__(TimeSeries)
+        result._data = table._data
+        result._schema = table._schema
+        result._features = table.keep_only_columns(feature_names)
+        result._target = table.get_column(target_name)
+        result._date = table.get_column(date_name)
+
+        #window the given data
+        result._features = result._make_windowed_table_for_features()
+        result._target = result._make_windows(result._target)
+        return result
+
+    
+
+        
+
 
     # ------------------------------------------------------------------------------------------------------------------
     # Dunder methods
@@ -101,7 +144,6 @@ class TimeSeries(Table):
             If no feature columns are specified.
 
         """
-        print("hi")
         super().__init__(data)
         _data = Table(data)
 
@@ -124,32 +166,49 @@ class TimeSeries(Table):
 
         # We have a Target Column and a Data Column
         # So we need a function which takes all features and also the target
-        # but the data gets reshaped alot wo the user knowing
-        column_list = []
+        # but the data gets reshaped alot without the user knowing
+
+
+        #window the given data
+        self._features = self._make_windowed_table_for_features()
+        self._target = self._make_target_windows()
+
+
+    def _make_windowed_table_for_features(self):
+        #init list, to create a Table out of a list of columns
+        col_list = []
         for col_name in self._features.column_names:
-            ds_col = self._features.get_column(col_name)
-            feature_column = ds_col._data.to_numpy()
-            x_s = self._makeWindows(feature_column, window_size)
-            #append column to column list
-            col = Column._from_pandas_series(pd.Series(x_s, name = col_name),ds_col.type)
-            column_list.append(col)
+            #get the column
+            temp_col = self._features.get_column(col_name)
+            #get data of the column and load it into a numpy array, also create windowed numpy array
+            x_s = self._make_windows(temp_col._data.to_numpy())
+            #load the new data in
+            col_list.append(Column._from_pandas_series(pd.Series(x_s, name = col_name)))
+        return Table.from_columns(col_list)
 
-        self._features = Table.from_columns(column_list)
-        self._target = self._makeWindows(self._target, window_size)
-
-
-
-    def _makeWindows(self, seq, window_size: int):
-        x_s = []
+    
+    def _make_target_windows(self):
+        seq = self._target._data.to_numpy()
         y_s = []
         l = len(seq)
-        for i in range(l - window_size-1):
-            window = seq[i:i+window_size]
-            label = seq[i + window_size + 1]
-            x_s.append(window)
+        for i in range(l - self._window_size):
+            # its sliced so its an np.ndarray
+            # we mby also need longer arrays then 1 for forecast horizon
+            label = seq[i+self._window_size:i+self._window_size+1]
             y_s.append(label)
-        return x_s, 
+        print(y_s)
+        self._target = Column._from_pandas_series(pd.Series(y_s, name = self._target.name))
 
+    #toDo: Change behavior of this function so it behacios similiar to the other window functions
+    #      it is just a subrouting of _make_windowed_table_for_features
+    def _make_windows(self, seq):
+        x_s = []
+        l = len(seq)
+        for i in range(l -self._window_size):
+            window = seq[i:i+self._window_size]
+            x_s.append(window)
+        print(x_s)
+        return x_s
 
 
     # ------------------------------------------------------------------------------------------------------------------
