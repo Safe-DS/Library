@@ -57,8 +57,6 @@ class ColumnType(ABC):
                 return Boolean(is_nullable)
             if cell_type == str:
                 return String(is_nullable)
-            if cell_type == np.ndarray:
-                return String(is_nullable)      #toDo: get something for list
             if cell_type is NoneType:
                 return Nothing()
             else:
