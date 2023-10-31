@@ -30,12 +30,12 @@ def test_create_timeseries() -> None:
                     date_name="f1",
                     window_size=2,
                     forecast_horizon=1,
-                    feature_names=["f1", "f2"])
+                    feature_names=["f1", "f2", "target"])
     
     
     # ein Modell erstellen ist in safeDS noch nicht definiert darum low level in PyTorch
     # 2 ist hier die number der feature Columns
-    input_dim = ts._window_size * 2 
+    input_dim = ts._window_size * len(ts._feature_names)
     hidden_dim = 1
     output_dim = ts._forecast_horizon
     model = LSTMModel(input_dim, hidden_dim, output_dim)
@@ -50,4 +50,4 @@ def test_create_timeseries() -> None:
     
 
     #wenn durchläuft wurde korrekt Table in Dataloader geladen
-    assert False
+    #assert False

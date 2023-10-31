@@ -431,7 +431,7 @@ class TimeSeries(Table):
 
 
     # ------------------------------------------------------------------------------------------------------------------
-    # Windiw Functions and needed class:
+    # Window Functions and needed class:
     # for testing purposes they are here
     # ------------------------------------------------------------------------------------------------------------------
 
@@ -458,8 +458,12 @@ class TimeSeries(Table):
 
 
     def into_DataLoader(self):
+        #code below concatenate the column like the following 
+        #f1:[w1, w2, w3] f2[w1, w2, w3] -> [w1+w1, w2+w2, w3+w3]
         x_train = np.concatenate(list(self._create_all_windows_for_column()), axis=1)
+        #for target this will be created:  [   t1,    t2,    t3]
         y_train = np.array(self._create_all_labels_for_target_column())
+        #load them into PyTorch 
         dataset = TimeSeriesDataset(x_train,y_train)
         return DataLoader(dataset, batch_size=1) 
         
