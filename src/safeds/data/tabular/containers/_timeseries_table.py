@@ -3,6 +3,10 @@ from __future__ import annotations
 import copy
 import numpy as np
 import pandas as pd
+import torch
+import torch.nn as nn
+from torch.utils.data import DataLoader
+from torch.utils.data import Dataset
 from typing import TYPE_CHECKING
 
 from safeds.data.tabular.containers import Column, Row, Table, TaggedTable
@@ -190,31 +194,8 @@ class TimeSeries(Table):
         for col in self._create_all_windows_for_column():
             print(col)
 
-        print(self._create_all_labels_for_target_column())
+        #print(self._create_all_labels_for_target_column())
         
-    
-    def _create_all_windows_for_column(self):
-    #this generator generates all windows for all feature columns
-        def in_yield(col: Column):
-            ser = col._data
-            for i in range(len(ser) - self._window_size):
-                yield ser.iloc[i : i + self._window_size]
-        for col_name in self._feature_names:
-            print("windowing feature col:" + col_name)
-            col = self._features.get_column(col_name)
-            yield list(in_yield(col)) 
-
-
-    
-    def _create_all_labels_for_target_column(self):
-    #this generator generates all forecast horizons for the target column
-        print("creating labels for target column:" + self.target.name)
-        def _generate_label_windows( ):
-            ser = self._target._data
-            for i in range(len(ser) - self._forecast_horizon):
-                yield ser.iloc[i + self._window_size : i + self._window_size + self._forecast_horizon]
-        return list(_generate_label_windows())
-
 
     # ------------------------------------------------------------------------------------------------------------------
     # Properties
@@ -445,4 +426,54 @@ class TimeSeries(Table):
 
         """
         return Table.from_columns(super().to_columns())
+    
+
+
+
+    # ------------------------------------------------------------------------------------------------------------------
+    # Windiw Functions and needed class:
+    # for testing purposes they are here
+    # ------------------------------------------------------------------------------------------------------------------
+
+    def _create_all_windows_for_column(self):
+    #this generator generates all windows for all feature columns
+        def in_yield(col: Column):
+            ser = col._data
+            for i in range(len(ser) - self._window_size):
+                yield list(ser.iloc[i : i + self._window_size])
+        for col_name in self._feature_names:
+            col = self._features.get_column(col_name)
+            yield list(in_yield(col)) 
+
+
+    
+    def _create_all_labels_for_target_column(self):
+    #this generator generates all forecast horizons for the target column
+        def _generate_label_windows( ):
+            ser = self._target._data
+            for i in range(len(ser) - self._window_size):
+                yield list(ser.iloc[i + self._window_size : i + self._window_size + self._forecast_horizon])
+        return list((_generate_label_windows()))
+    
+
+
+    def into_DataLoader(self):
+        x_train = np.concatenate(list(self._create_all_windows_for_column()), axis=1)
+        y_train = np.array(self._create_all_labels_for_target_column())
+        dataset = TimeSeriesDataset(x_train,y_train)
+        return DataLoader(dataset, batch_size=1) 
+        
+
+class TimeSeriesDataset(Dataset):
+    def __init__(self, data, labels):
+        self.data = data
+        self.labels = labels
+
+    def __len__(self):
+        return len(self.data)
+    
+    def __getitem__(self, idx):
+        timeseries_sample = self.data[idx]
+        label = self.labels[idx]
+        return timeseries_sample, label
     

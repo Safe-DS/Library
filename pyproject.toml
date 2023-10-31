@@ -23,6 +23,7 @@ seaborn = "^0.12.2"
 openpyxl = "^3.1.2"
 scikit-image = "^0.21.0"
 levenshtein = "^0.21.1"
+torch = "^1.4"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.2.1"
