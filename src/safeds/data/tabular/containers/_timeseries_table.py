@@ -112,6 +112,7 @@ class TimeSeries(Table):
 
         # Create Time Series Object
         result = object.__new__(TimeSeries)
+        result._feature_names = feature_names
         result._data = table._data
         result._schema = table._schema
         result._features = table.keep_only_columns(feature_names)
@@ -214,7 +215,7 @@ class TimeSeries(Table):
         return self._features
 
     @property
-    def target(self) -> Column:
+    def     target(self) -> Column:
         """
         Get the target column of the tagged table.
 
@@ -435,10 +436,12 @@ class TimeSeries(Table):
     # for testing purposes they are here
     # ------------------------------------------------------------------------------------------------------------------
 
-    def _create_all_windows_for_column(self):
+    def _create_all_windows_for_column(self, train_size: float):
     #this generator generates all windows for all feature columns
         def in_yield(col: Column):
-            ser = col._data
+            testsplit_index = int(col.__len__()*train_size)
+            #get only the training data of a column and normalize it
+            ser = (col._data[:testsplit_index]-col.mean())/col.standard_deviation()
             for i in range(len(ser) - self._window_size):
                 yield list(ser.iloc[i : i + self._window_size])
         for col_name in self._feature_names:
@@ -446,23 +449,24 @@ class TimeSeries(Table):
             yield list(in_yield(col)) 
 
 
-    
-    def _create_all_labels_for_target_column(self):
+    def _create_all_labels_for_target_column(self, train_size: float):
     #this generator generates all forecast horizons for the target column
         def _generate_label_windows( ):
-            ser = self._target._data
+            testsplit_index = int(self.target.__len__()*train_size)
+            #get only the training data of a column and normalize it
+            ser = (self._target._data[:testsplit_index]-self._target.mean())/self._target.standard_deviation()
             for i in range(len(ser) - self._window_size):
                 yield list(ser.iloc[i + self._window_size : i + self._window_size + self._forecast_horizon])
         return list((_generate_label_windows()))
     
 
 
-    def into_DataLoader(self):
+    def into_train_DataLoader(self, train_size: float):
         #code below concatenate the column like the following 
         #f1:[w1, w2, w3] f2[w1, w2, w3] -> [w1+w1, w2+w2, w3+w3]
-        x_train = np.concatenate(list(self._create_all_windows_for_column()), axis=1)
+        x_train = np.concatenate(list(self._create_all_windows_for_column(train_size)), axis=1)
         #for target this will be created:  [   t1,    t2,    t3]
-        y_train = np.array(self._create_all_labels_for_target_column())
+        y_train = np.array(self._create_all_labels_for_target_column(train_size))
         #load them into PyTorch 
         dataset = TimeSeriesDataset(x_train,y_train)
         return DataLoader(dataset, batch_size=1) 
