@@ -7,7 +7,7 @@ import time
 from torch.utils.data import DataLoader
 from safeds.data.tabular.containers import Column, Table, TaggedTable, TimeSeries
 from safeds.exceptions import ColumnSizeError, DuplicateColumnNameError
-from safeds.ml.nn import RNN_Layer, Model
+from safeds.ml.nn import FNN_Layer,RNN_Layer, Model
 
 
 
@@ -24,9 +24,9 @@ def test_create_timeseries() -> None:
     hidden_dim = 256
     output_dim = ts._forecast_horizon
     layer1 = RNN_Layer(input_dim, hidden_dim) 
-    layer2 = RNN_Layer(hidden_dim, output_dim)
+    layer2 = FNN_Layer(hidden_dim, output_dim)
     model = Model([layer1, layer2])
-    #model.train(ts.into_DataLoader(), 5, 0.01)
+    model.train(ts.into_train_DataLoader(0.75), 50, 0.001)
 
     
 
