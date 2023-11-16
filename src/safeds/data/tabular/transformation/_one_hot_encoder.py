@@ -111,12 +111,9 @@ class OneHotEncoder(InvertibleTableTransformer):
             > 0
         ):
             warnings.warn(
-                (
-                    "The columns"
-                    f" {table._as_table().keep_only_columns(column_names).remove_columns_with_non_numerical_values().column_names} contain"
-                    " numerical data. The OneHotEncoder is designed to encode non-numerical values into numerical"
-                    " values"
-                ),
+                "The columns"
+                f" {table._as_table().keep_only_columns(column_names).remove_columns_with_non_numerical_values().column_names} contain"
+                " numerical data. The OneHotEncoder is designed to encode non-numerical values into numerical values",
                 UserWarning,
                 stacklevel=2,
             )

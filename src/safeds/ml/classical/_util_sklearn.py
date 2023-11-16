@@ -52,11 +52,9 @@ def fit(model: Any, tagged_table: TaggedTable) -> None:
     if len(non_numerical_column_names) != 0:
         raise NonNumericColumnError(
             str(non_numerical_column_names),
-            (
-                "You can use the LabelEncoder or OneHotEncoder to transform your non-numerical data to numerical"
-                " data.\nThe OneHotEncoder should be used if you work with nominal data. If your data contains too many"
-                " different values\nor is ordinal, you should use the LabelEncoder."
-            ),
+            "You can use the LabelEncoder or OneHotEncoder to transform your non-numerical data to numerical"
+            " data.\nThe OneHotEncoder should be used if you work with nominal data. If your data contains too many"
+            " different values\nor is ordinal, you should use the LabelEncoder.",
         )
 
     null_containing_column_names = set(tagged_table.features.column_names) - set(
@@ -65,10 +63,8 @@ def fit(model: Any, tagged_table: TaggedTable) -> None:
     if len(null_containing_column_names) != 0:
         raise MissingValuesColumnError(
             str(null_containing_column_names),
-            (
-                "You can use the Imputer to replace the missing values based on different strategies.\nIf you want to"
-                " remove the missing values entirely you can use the method `Table.remove_rows_with_missing_values`."
-            ),
+            "You can use the Imputer to replace the missing values based on different strategies.\nIf you want to"
+            " remove the missing values entirely you can use the method `Table.remove_rows_with_missing_values`.",
         )
 
     try:
@@ -138,11 +134,9 @@ def predict(model: Any, dataset: Table, feature_names: list[str] | None, target_
     if len(non_numerical_column_names) != 0:
         raise NonNumericColumnError(
             str(non_numerical_column_names),
-            (
-                "You can use the LabelEncoder or OneHotEncoder to transform your non-numerical data to numerical"
-                " data.\nThe OneHotEncoder should be used if you work with nominal data. If your data contains too many"
-                " different values\nor is ordinal, you should use the LabelEncoder.\n"
-            ),
+            "You can use the LabelEncoder or OneHotEncoder to transform your non-numerical data to numerical"
+            " data.\nThe OneHotEncoder should be used if you work with nominal data. If your data contains too many"
+            " different values\nor is ordinal, you should use the LabelEncoder.\n",
         )
 
     null_containing_column_names = set(dataset.keep_only_columns(feature_names).column_names) - set(
@@ -151,10 +145,8 @@ def predict(model: Any, dataset: Table, feature_names: list[str] | None, target_
     if len(null_containing_column_names) != 0:
         raise MissingValuesColumnError(
             str(null_containing_column_names),
-            (
-                "You can use the Imputer to replace the missing values based on different strategies.\nIf you want to"
-                " remove the missing values entirely you can use the method `Table.remove_rows_with_missing_values`."
-            ),
+            "You can use the Imputer to replace the missing values based on different strategies.\nIf you want to"
+            " remove the missing values entirely you can use the method `Table.remove_rows_with_missing_values`.",
         )
 
     dataset_df = dataset.keep_only_columns(feature_names)._data

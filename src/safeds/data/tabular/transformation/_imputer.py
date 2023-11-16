@@ -153,11 +153,9 @@ class Imputer(TableTransformer):
                     multiple_most_frequent[name] = table.get_column(name).mode()
             if len(multiple_most_frequent) > 0:
                 warnings.warn(
-                    (
-                        "There are multiple most frequent values in a column given to the Imputer.\nThe lowest values"
-                        " are being chosen in this cases. The following columns have multiple most frequent"
-                        f" values:\n{multiple_most_frequent}"
-                    ),
+                    "There are multiple most frequent values in a column given to the Imputer.\nThe lowest values"
+                    " are being chosen in this cases. The following columns have multiple most frequent"
+                    f" values:\n{multiple_most_frequent}",
                     UserWarning,
                     stacklevel=2,
                 )
