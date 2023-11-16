@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import copy
 import functools
 from collections.abc import Callable, Mapping
 from typing import TYPE_CHECKING, Any
@@ -155,7 +154,7 @@ class Row(Mapping[str, Any]):
         """
         return isinstance(obj, str) and self.has_column(obj)
 
-    def __eq__(self, other: Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         """
         Check whether this row is equal to another object.
 
@@ -531,18 +530,3 @@ class Row(Mapping[str, Any]):
             The generated HTML.
         """
         return self._data.to_html(max_rows=1, max_cols=self._data.shape[1], notebook=True)
-
-    # ------------------------------------------------------------------------------------------------------------------
-    # Helpers
-    # ------------------------------------------------------------------------------------------------------------------
-
-    def _copy(self) -> Row:
-        """
-        Return a copy of this row.
-
-        Returns
-        -------
-        copy : Row
-            The copy of this row.
-        """
-        return copy.deepcopy(self)
