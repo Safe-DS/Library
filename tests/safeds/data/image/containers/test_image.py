@@ -12,40 +12,52 @@ from tests.helpers import resolve_resource_path
 
 class TestFromJpegFile:
     @pytest.mark.parametrize(
-        "path",
-        ["image/white_square.jpg", Path("image/white_square.jpg")],
+        "resource_path",
+        [
+            "image/plane.jpg",
+            Path("image/plane.jpg"),
+        ],
         ids=["jpg", "jpg_Path"],
     )
-    def test_should_load_jpeg_file(self, path: str | Path) -> None:
-        Image.from_jpeg_file(resolve_resource_path(path))
+    def test_should_load_jpeg_file(self, resource_path: str | Path) -> None:
+        Image.from_jpeg_file(resolve_resource_path(resource_path))
 
     @pytest.mark.parametrize(
-        "path",
-        ["image/missing_file.jpg", Path("image/missing_file.jpg")],
+        "resource_path",
+        [
+            "image/missing_file.jpg",
+            Path("image/missing_file.jpg"),
+        ],
         ids=["missing_file_jpg", "missing_file_jpg_Path"],
     )
-    def test_should_raise_if_file_not_found(self, path: str | Path) -> None:
+    def test_should_raise_if_file_not_found(self, resource_path: str | Path) -> None:
         with pytest.raises(FileNotFoundError):
-            Image.from_jpeg_file(resolve_resource_path(path))
+            Image.from_jpeg_file(resolve_resource_path(resource_path))
 
 
 class TestFromPngFile:
     @pytest.mark.parametrize(
-        "path",
-        ["image/white_square.png", Path("image/white_square.png")],
+        "resource_path",
+        [
+            "image/plane.png",
+            Path("image/plane.png"),
+        ],
         ids=["png", "png_Path"],
     )
-    def test_should_load_png_file(self, path: str | Path) -> None:
-        Image.from_png_file(resolve_resource_path(path))
+    def test_should_load_png_file(self, resource_path: str | Path) -> None:
+        Image.from_png_file(resolve_resource_path(resource_path))
 
     @pytest.mark.parametrize(
-        "path",
-        ["image/missing_file.png", Path("image/missing_file.png")],
+        "resource_path",
+        [
+            "image/missing_file.png",
+            Path("image/missing_file.png"),
+        ],
         ids=["missing_file_png", "missing_file_png_Path"],
     )
-    def test_should_raise_if_file_not_found(self, path: str | Path) -> None:
+    def test_should_raise_if_file_not_found(self, resource_path: str | Path) -> None:
         with pytest.raises(FileNotFoundError):
-            Image.from_png_file(resolve_resource_path(path))
+            Image.from_png_file(resolve_resource_path(resource_path))
 
 
 class TestFormat:
@@ -71,12 +83,12 @@ class TestProperties:
                 1,
             ),
             (
-                Image.from_png_file(resolve_resource_path("image/snapshot_boxplot.png")),
-                640,
-                480,
+                Image.from_png_file(resolve_resource_path("image/plane.png")),
+                568,
+                320,
             ),
         ],
-        ids=["[1,1].jpg", "[640,480].png"],
+        ids=["[1,1]", "[568,320]"],
     )
     def test_should_return_image_properties(self, image: Image, width: int, height: int) -> None:
         assert image.width == width
@@ -84,9 +96,13 @@ class TestProperties:
 
 
 class TestToJpegFile:
-    @pytest.mark.parametrize("path", ["image/white_square.jpg"], ids=["jpg_file"])
-    def test_should_save_jpeg_file_by_str(self, path: str) -> None:
-        image = Image.from_jpeg_file(resolve_resource_path(path))
+    @pytest.mark.parametrize(
+        "resource_path",
+        ["image/white_square.jpg"],
+        ids=["jpg"],
+    )
+    def test_should_save_jpeg_file_by_str(self, resource_path: str) -> None:
+        image = Image.from_jpeg_file(resolve_resource_path(resource_path))
 
         with NamedTemporaryFile() as tmp_file:
             tmp_file.close()
@@ -97,9 +113,13 @@ class TestToJpegFile:
 
         assert image._image.tobytes() == image_read_back._image.tobytes()
 
-    @pytest.mark.parametrize("path", ["image/white_square.jpg"], ids=["jpg"])
-    def test_should_save_jpeg_file_by_path(self, path: str) -> None:
-        image = Image.from_jpeg_file(resolve_resource_path(path))
+    @pytest.mark.parametrize(
+        "resource_path",
+        ["image/white_square.jpg"],
+        ids=["jpg"],
+    )
+    def test_should_save_jpeg_file_by_path(self, resource_path: str) -> None:
+        image = Image.from_jpeg_file(resolve_resource_path(resource_path))
 
         with NamedTemporaryFile() as tmp_file:
             tmp_file.close()
@@ -112,9 +132,13 @@ class TestToJpegFile:
 
 
 class TestToPngFile:
-    @pytest.mark.parametrize("path", ["image/white_square.png"], ids=["png"])
-    def test_should_save_png_file_by_str(self, path: str) -> None:
-        image = Image.from_png_file(resolve_resource_path(path))
+    @pytest.mark.parametrize(
+        "resource_path",
+        ["image/white_square.png"],
+        ids=["png"],
+    )
+    def test_should_save_png_file_by_str(self, resource_path: str) -> None:
+        image = Image.from_png_file(resolve_resource_path(resource_path))
 
         with NamedTemporaryFile() as tmp_file:
             tmp_file.close()
@@ -125,9 +149,13 @@ class TestToPngFile:
 
         assert image._image.tobytes() == image_read_back._image.tobytes()
 
-    @pytest.mark.parametrize("path", ["image/white_square.png"], ids=["png"])
-    def test_should_save_png_file_by_path(self, path: str) -> None:
-        image = Image.from_png_file(resolve_resource_path(path))
+    @pytest.mark.parametrize(
+        "resource_path",
+        ["image/white_square.png"],
+        ids=["png"],
+    )
+    def test_should_save_png_file_by_path(self, resource_path: str) -> None:
+        image = Image.from_png_file(resolve_resource_path(resource_path))
 
         with NamedTemporaryFile() as tmp_file:
             tmp_file.close()
@@ -141,37 +169,41 @@ class TestToPngFile:
 
 class TestReprJpeg:
     @pytest.mark.parametrize(
-        "image",
-        [Image.from_jpeg_file(resolve_resource_path("image/white_square.jpg"))],
+        "resource_path",
+        ["image/white_square.jpg"],
         ids=["jpg"],
     )
-    def test_should_return_bytes_if_image_is_jpeg(self, image: Image) -> None:
+    def test_should_return_bytes_if_image_is_jpeg(self, resource_path: str) -> None:
+        image = Image.from_jpeg_file(resolve_resource_path(resource_path))
         assert isinstance(image._repr_jpeg_(), bytes)
 
     @pytest.mark.parametrize(
-        "image",
-        [Image.from_png_file(resolve_resource_path("image/white_square.png"))],
+        "resource_path",
+        ["image/white_square.png"],
         ids=["png"],
     )
-    def test_should_return_none_if_image_is_not_jpeg(self, image: Image) -> None:
+    def test_should_return_none_if_image_is_not_jpeg(self, resource_path: str) -> None:
+        image = Image.from_png_file(resolve_resource_path(resource_path))
         assert image._repr_jpeg_() is None
 
 
 class TestReprPng:
     @pytest.mark.parametrize(
-        "image",
-        [Image.from_png_file(resolve_resource_path("image/white_square.png"))],
+        "resource_path",
+        ["image/white_square.png"],
         ids=["png"],
     )
-    def test_should_return_bytes_if_image_is_png(self, image: Image) -> None:
+    def test_should_return_bytes_if_image_is_png(self, resource_path: str) -> None:
+        image = Image.from_png_file(resolve_resource_path(resource_path))
         assert isinstance(image._repr_png_(), bytes)
 
     @pytest.mark.parametrize(
-        "image",
-        [Image.from_jpeg_file(resolve_resource_path("image/white_square.jpg"))],
+        "resource_path",
+        ["image/white_square.jpg"],
         ids=["jpg"],
     )
-    def test_should_return_none_if_image_is_not_png(self, image: Image) -> None:
+    def test_should_return_none_if_image_is_not_png(self, resource_path: str) -> None:
+        image = Image.from_jpeg_file(resolve_resource_path(resource_path))
         assert image._repr_png_() is None
 
 
@@ -200,214 +232,196 @@ class TestResize:
 
 class TestConvertToGrayscale:
     @pytest.mark.parametrize(
-        ("image", "expected"),
-        [
-            (
-                Image.from_png_file(resolve_resource_path("image/snapshot_heatmap.png")),
-                Image.from_png_file(resolve_resource_path("image/snapshot_heatmap_grayscale.png")),
-            ),
-        ],
-        ids=["grayscale"],
+        "resource_path",
+        ["image/plane.png"],
+        ids=["plane"],
     )
-    def test_convert_to_grayscale(self, image: Image, expected: Image) -> None:
-        grayscale_image = image.convert_to_grayscale()
-        assert grayscale_image == expected
+    def test_convert_to_grayscale(self, resource_path: str, snapshot_png) -> None:
+        image = Image.from_png_file(resolve_resource_path(resource_path))
+        assert image.convert_to_grayscale() == snapshot_png
 
 
-class TestEQ:
+class TestEquals:
     def test_should_be_equal(self) -> None:
-        image = Image.from_png_file(resolve_resource_path("image/original.png"))
-        image2 = Image.from_png_file(resolve_resource_path("image/copy.png"))
+        image = Image.from_png_file(resolve_resource_path("image/white_square.png"))
+        image2 = Image.from_png_file(resolve_resource_path("image/white_square.png"))
         assert image == image2
 
     def test_should_not_be_equal(self) -> None:
-        image = Image.from_png_file(resolve_resource_path("image/original.png"))
-        image2 = Image.from_png_file(resolve_resource_path("image/white_square.png"))
+        image = Image.from_png_file(resolve_resource_path("image/white_square.png"))
+        image2 = Image.from_png_file(resolve_resource_path("image/plane.png"))
         assert image != image2
 
     def test_should_raise(self) -> None:
-        image = Image.from_png_file(resolve_resource_path("image/original.png"))
+        image = Image.from_png_file(resolve_resource_path("image/white_square.png"))
         other = Table()
         assert (image.__eq__(other)) is NotImplemented
 
 
 class TestFlipVertically:
-    def test_should_flip_vertically(self) -> None:
-        image = Image.from_png_file(resolve_resource_path("image/original.png"))
-        image2 = image.flip_vertically()
-        image3 = Image.from_png_file(resolve_resource_path("image/flip_vertically.png"))
-        assert image != image2
-        assert image2 == image3
+    @pytest.mark.parametrize(
+        "resource_path",
+        ["image/plane.png"],
+        ids=["plane"],
+    )
+    def test_should_flip_vertically(self, resource_path: str, snapshot_png) -> None:
+        image = Image.from_png_file(resolve_resource_path(resource_path))
+        assert image.flip_vertically() == snapshot_png
 
-    def test_should_be_original(self) -> None:
-        image = Image.from_png_file(resolve_resource_path("image/original.png"))
-        image2 = image.flip_vertically().flip_vertically()
-        assert image == image2
+    def test_should_be_original_if_flipped_twice(self) -> None:
+        original = Image.from_png_file(resolve_resource_path("image/plane.png"))
+        flipped_twice = original.flip_vertically().flip_vertically()
+        assert original == flipped_twice
 
 
 class TestFlipHorizontally:
-    def test_should_flip_horizontally(self) -> None:
-        image = Image.from_png_file(resolve_resource_path("image/original.png"))
-        image2 = image.flip_horizontally()
-        image3 = Image.from_png_file(resolve_resource_path("image/flip_horizontally.png"))
-        assert image != image2
-        assert image2 == image3
+    @pytest.mark.parametrize(
+        "resource_path",
+        ["image/plane.png"],
+        ids=["plane"],
+    )
+    def test_should_flip_horizontally(self, resource_path: str, snapshot_png) -> None:
+        image = Image.from_png_file(resolve_resource_path(resource_path))
+        assert image.flip_horizontally() == snapshot_png
 
-    def test_should_be_original(self) -> None:
-        image = Image.from_png_file(resolve_resource_path("image/original.png"))
-        image2 = image.flip_horizontally().flip_horizontally()
-        assert image == image2
+    def test_should_be_original_if_flipped_twice(self) -> None:
+        original = Image.from_png_file(resolve_resource_path("image/plane.png"))
+        flipped_twice = original.flip_horizontally().flip_horizontally()
+        assert original == flipped_twice
 
 
 class TestAdjustContrast:
-    @pytest.mark.parametrize("factor", [0.75, 5], ids=["small factor", "large factor"])
-    def test_should_adjust_contrast(self, factor: float) -> None:
-        image = Image.from_png_file(resolve_resource_path("image/contrast/to_adjust_contrast.png"))
-        image2 = image.adjust_contrast(factor)
-        image3 = Image.from_png_file(
-            resolve_resource_path("image/contrast/contrast_adjusted_by_" + str(factor) + ".png"),
-        )
-        assert image != image2
-        assert image2 == image3
+    @pytest.mark.parametrize(
+        ("resource_path", "factor"),
+        [
+            ("image/plane.png", 0.75),
+            ("image/plane.png", 5)
+        ],
+        ids=["small factor", "large factor"]
+    )
+    def test_should_adjust_contrast(self, resource_path: str, factor: float, snapshot_png) -> None:
+        image = Image.from_png_file(resolve_resource_path(resource_path))
+        assert image.adjust_contrast(factor) == snapshot_png
 
     def test_should_not_adjust_contrast(self) -> None:
+        original = Image.from_png_file(resolve_resource_path("image/plane.png"))
         with pytest.warns(
             UserWarning,
             match="Contrast adjustment factor is 1.0, this will not make changes to the image.",
         ):
-            image = Image.from_png_file(resolve_resource_path("image/contrast/to_adjust_contrast.png"))
-            image2 = image.adjust_contrast(1)
-            assert image == image2
+            adjusted = original.adjust_contrast(1)
+        assert original == adjusted
 
     def test_should_raise(self) -> None:
-        image = Image.from_png_file(resolve_resource_path("image/brightness/to_brighten.png"))
+        image = Image.from_png_file(resolve_resource_path("image/plane.png"))
         with pytest.raises(OutOfBoundsError, match=r"factor \(=-1\) is not inside \[0, \u221e\)."):
             image.adjust_contrast(-1)
 
 
-class TestBrightness:
-    @pytest.mark.parametrize("factor", [0.5, 10], ids=["small factor", "large factor"])
-    def test_should_adjust_brightness(self, factor: float) -> None:
-        image = Image.from_png_file(resolve_resource_path("image/brightness/to_brighten.png"))
-        image2 = image.adjust_brightness(factor)
-        image3 = Image.from_png_file(resolve_resource_path("image/brightness/brightened_by_" + str(factor) + ".png"))
-        assert image != image2
-        assert image2 == image3
+class TestAdjustBrightness:
+    @pytest.mark.parametrize(
+        ("resource_path", "factor"),
+        [
+            ("image/plane.png", 0.5),
+            ("image/plane.png", 10)
+        ],
+        ids=["small factor", "large factor"]
+    )
+    def test_should_adjust_brightness(self, resource_path: str, factor: float, snapshot_png) -> None:
+        image = Image.from_png_file(resolve_resource_path(resource_path))
+        assert image.adjust_brightness(factor) == snapshot_png
 
     def test_should_not_brighten(self) -> None:
+        image = Image.from_png_file(resolve_resource_path("image/plane.png"))
         with pytest.warns(
             UserWarning,
             match="Brightness adjustment factor is 1.0, this will not make changes to the image.",
         ):
-            image = Image.from_png_file(resolve_resource_path("image/brightness/to_brighten.png"))
             image2 = image.adjust_brightness(1)
-            assert image == image2
+        assert image == image2
 
     def test_should_raise(self) -> None:
-        image = Image.from_png_file(resolve_resource_path("image/brightness/to_brighten.png"))
+        image = Image.from_png_file(resolve_resource_path("image/plane.png"))
         with pytest.raises(OutOfBoundsError, match=r"factor \(=-1\) is not inside \[0, \u221e\)."):
             image.adjust_brightness(-1)
 
 
 class TestInvertColors:
     @pytest.mark.parametrize(
-        ("image", "expected"),
-        [
-            (
-                Image.from_png_file(resolve_resource_path("image/original.png")),
-                Image.from_png_file(resolve_resource_path("image/inverted_colors_original.png")),
-            ),
-        ],
+        "resource_path",
+        ["image/plane.png"],
         ids=["invert-colors"],
     )
-    def test_should_invert_colors(self, image: Image, expected: Image) -> None:
-        image = image.invert_colors()
-        assert image == expected
+    def test_should_invert_colors(self, resource_path: str, snapshot_png) -> None:
+        image = Image.from_png_file(resolve_resource_path(resource_path))
+        assert image.invert_colors() == snapshot_png
 
 
 class TestColorAdjust:
     @pytest.mark.parametrize(
-        ("image", "factor", "expected"),
+        ("resource_path", "factor"),
         [
-            (
-                Image.from_png_file(resolve_resource_path("image/original.png")),
-                2,
-                Image.from_png_file(resolve_resource_path("image/adjusted_colors/by_2.png")),
-            ),
-            (
-                Image.from_png_file(resolve_resource_path("image/original.png")),
-                0.5,
-                Image.from_png_file(resolve_resource_path("image/adjusted_colors/by_0.5.png")),
-            ),
-            (
-                Image.from_png_file(resolve_resource_path("image/original.png")),
-                0,
-                Image.from_png_file(resolve_resource_path("image/adjusted_colors/by_0.png")),
-            ),
+            ("image/plane.png", 2),
+            ("image/plane.png", 0.5),
+            ("image/plane.png", 0),
         ],
         ids=["add color", "remove color", "remove all color"],
     )
-    def test_should_adjust_colors(self, image: Image, factor: float, expected: Image) -> None:
-        image = image.adjust_color_balance(factor)
-        assert image == expected
+    def test_should_adjust_colors(self, resource_path: str, factor: float, snapshot_png) -> None:
+        image = Image.from_png_file(resolve_resource_path(resource_path))
+        assert image.adjust_color_balance(factor) == snapshot_png
 
     @pytest.mark.parametrize(
-        ("image", "factor"),
+        ("resource_path", "factor"),
         [
-            (
-                Image.from_png_file(resolve_resource_path("image/original.png")),
-                -1,
-            ),
+            ("image/plane.png", -1),
         ],
         ids=["negative"],
     )
-    def test_should_throw(self, image: Image, factor: float) -> None:
+    def test_should_throw(self, resource_path: str, factor: float) -> None:
+        image = Image.from_png_file(resolve_resource_path(resource_path))
         with pytest.raises(OutOfBoundsError, match=rf"factor \(={factor}\) is not inside \[0, \u221e\)."):
             image.adjust_color_balance(factor)
 
     @pytest.mark.parametrize(
-        ("image", "factor"),
+        ("resource_path", "factor"),
         [
-            (
-                Image.from_png_file(resolve_resource_path("image/original.png")),
-                1,
-            ),
+            ("image/plane.png", 1),
         ],
         ids=["no change"],
     )
-    def test_should_warn(self, image: Image, factor: float) -> None:
+    def test_should_warn(self, resource_path: str, factor: float) -> None:
+        original = Image.from_png_file(resolve_resource_path(resource_path))
         with pytest.warns(
             UserWarning,
             match="Color adjustment factor is 1.0, this will not make changes to the image.",
         ):
-            adjust = image.adjust_color_balance(factor)
-        assert adjust == image
+            adjusted = original.adjust_color_balance(factor)
+        assert adjusted == original
 
 
 class TestAddGaussianNoise:
     @pytest.mark.parametrize(
-        ("image", "standard_deviation"),
+        ("resource_path", "standard_deviation"),
         [
-            (Image.from_png_file(resolve_resource_path("image/boy.png")), 0.0),
-            (Image.from_png_file(resolve_resource_path("image/boy.png")), 0.7),
-            (Image.from_png_file(resolve_resource_path("image/boy.png")), 2.5),
+            ("image/plane.png", 0.0),
+            ("image/plane.png", 0.7),
+            ("image/plane.png", 2.5),
         ],
         ids=["minimum noise", "some noise", "very noisy"],
     )
-    def test_should_add_noise(self, image: Image, standard_deviation: float) -> None:
-        expected = Image.from_png_file(
-            resolve_resource_path("image/noise/noise_" + str(standard_deviation) + ".png"),
-        )
-        image = image.add_gaussian_noise(standard_deviation)
-
-        assert image == expected
+    def test_should_add_noise(self, resource_path: str, standard_deviation: float, snapshot_png) -> None:
+        image = Image.from_png_file(resolve_resource_path(resource_path))
+        assert image.add_gaussian_noise(standard_deviation) == snapshot_png
 
     @pytest.mark.parametrize(
-        ("image", "standard_deviation"),
-        [(Image.from_png_file(resolve_resource_path("image/boy.png")), -1)],
+        ("resource_path", "standard_deviation"),
+        [("image/plane.png", -1)],
         ids=["sigma below zero"],
     )
-    def test_should_raise_standard_deviation(self, image: Image, standard_deviation: float) -> None:
+    def test_should_raise_standard_deviation(self, resource_path: str, standard_deviation: float) -> None:
+        image = Image.from_png_file(resolve_resource_path(resource_path))
+
         with pytest.raises(
             OutOfBoundsError,
             match=rf"standard_deviation \(={standard_deviation}\) is not inside \[0, \u221e\)\.",
@@ -417,94 +431,72 @@ class TestAddGaussianNoise:
 
 class TestBlur:
     @pytest.mark.parametrize(
-        ("image", "expected"),
-        [
-            (
-                Image.from_png_file(resolve_resource_path("image/boy.png")),
-                Image.from_png_file(resolve_resource_path("image/blurredBoy.png")),
-            ),
-        ],
+        "resource_path",
+        ["image/plane.png"],
         ids=["blur"],
     )
-    def test_should_return_blurred_image(self, image: Image, expected: Image) -> None:
-        image = image.blur(2)
-        assert image == expected
+    def test_should_return_blurred_image(self, resource_path: str, snapshot_png) -> None:
+        image = Image.from_png_file(resolve_resource_path(resource_path))
+        assert image.blur(2) == snapshot_png
 
 
 class TestCrop:
     @pytest.mark.parametrize(
-        ("image", "expected"),
-        [
-            (
-                Image.from_png_file(resolve_resource_path("image/white.png")),
-                Image.from_png_file(resolve_resource_path("image/whiteCropped.png")),
-            ),
-        ],
+        "resource_path",
+        ["image/plane.png"],
         ids=["crop"],
     )
-    def test_should_return_cropped_image(self, image: Image, expected: Image) -> None:
-        image = image.crop(0, 0, 100, 100)
-        assert image == expected
+    def test_should_return_cropped_image(self, resource_path: str, snapshot_png) -> None:
+        image = Image.from_png_file(resolve_resource_path(resource_path))
+        assert image.crop(0, 0, 100, 100) == snapshot_png
 
 
 class TestSharpen:
-    @pytest.mark.parametrize("factor", [-1, 0.5, 10], ids=["negative factor", "small factor", "large factor"])
-    def test_should_sharpen(self, factor: float) -> None:
-        image = Image.from_png_file(resolve_resource_path("image/sharpen/to_sharpen.png"))
-        image2 = image.sharpen(factor)
-        image2.to_png_file(resolve_resource_path("image/sharpen/sharpened_by_" + str(factor) + ".png"))
-        assert image != image2
-        assert image2 == Image.from_png_file(
-            resolve_resource_path("image/sharpen/sharpened_by_" + str(factor) + ".png"),
-        )
+    @pytest.mark.parametrize(
+        ("resource_path", "factor"),
+        [
+            ("image/plane.png", -1),
+            ("image/plane.png", 0.5),
+            ("image/plane.png", 10),
+        ],
+        ids=["negative factor", "small factor", "large factor"],
+    )
+    def test_should_sharpen(self, resource_path: str, factor: float, snapshot_png) -> None:
+        image = Image.from_png_file(resolve_resource_path(resource_path))
+        assert image.sharpen(factor) == snapshot_png
 
-    def test_should_not_sharpen(self) -> None:
-        image = Image.from_png_file(resolve_resource_path("image/sharpen/to_sharpen.png"))
+    def test_should_not_sharpen_if_factor_is_1(self) -> None:
+        image = Image.from_png_file(resolve_resource_path("image/plane.png"))
         image2 = image.sharpen(1)
         assert image == image2
 
 
 class TestRotate:
     @pytest.mark.parametrize(
-        ("image", "expected"),
-        [
-            (
-                Image.from_png_file(resolve_resource_path("image/snapshot_boxplot.png")),
-                Image.from_png_file(resolve_resource_path("image/snapshot_boxplot_right_rotation.png")),
-            ),
-        ],
+        "resource_path",
+        ["image/plane.png"],
         ids=["rotate-clockwise"],
     )
-    def test_should_return_clockwise_rotated_image(self, image: Image, expected: Image) -> None:
-        image = image.rotate_right()
-        assert image == expected
+    def test_should_return_clockwise_rotated_image(self, resource_path: str, snapshot_png) -> None:
+        image = Image.from_png_file(resolve_resource_path(resource_path))
+        assert image.rotate_right() == snapshot_png
 
     @pytest.mark.parametrize(
-        ("image", "expected"),
-        [
-            (
-                Image.from_png_file(resolve_resource_path("image/snapshot_boxplot.png")),
-                Image.from_png_file(resolve_resource_path("image/snapshot_boxplot_left_rotation.png")),
-            ),
-        ],
+        "resource_path",
+        ["image/plane.png"],
         ids=["rotate-counter-clockwise"],
     )
-    def test_should_return_counter_clockwise_rotated_image(self, image: Image, expected: Image) -> None:
-        image = image.rotate_left()
-        assert image == expected
+    def test_should_return_counter_clockwise_rotated_image(self, resource_path: str, snapshot_png) -> None:
+        image = Image.from_png_file(resolve_resource_path(resource_path))
+        assert image.rotate_left() == snapshot_png
 
 
 class TestFindEdges:
     @pytest.mark.parametrize(
-        ("image", "expected"),
-        [
-            (
-                Image.from_png_file(resolve_resource_path("image/boy.png")),
-                Image.from_png_file(resolve_resource_path("image/edgyBoy.png")),
-            ),
-        ],
+        "resource_path",
+        ["image/plane.png"],
         ids=["find_edges"],
     )
-    def test_should_return_edges_of_image(self, image: Image, expected: Image) -> None:
-        image = image.find_edges()
-        assert image == expected
+    def test_should_return_edges_of_image(self, resource_path: str, snapshot_png) -> None:
+        image = Image.from_png_file(resolve_resource_path(resource_path))
+        assert image.find_edges() == snapshot_png
