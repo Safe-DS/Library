@@ -423,7 +423,7 @@ class Table:
         self._data = self._data.reset_index(drop=True)
         self._schema: Schema = Schema._from_pandas_dataframe(self._data)
 
-    def __eq__(self, other: Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         """
         Compare two table instances.
 
@@ -472,12 +472,12 @@ class Table:
         >>> repr(table)
         '   a  b\n0  1  2\n1  3  4'
         """
-        tmp = self._data.copy(deep=True)
+        tmp = self._data.reset_index(drop=True)
         tmp.columns = self.column_names
         return tmp.__repr__()
 
     def __str__(self) -> str:
-        tmp = self._data.copy(deep=True)
+        tmp = self._data.reset_index(drop=True)
         tmp.columns = self.column_names
         return tmp.__str__()
 
@@ -834,12 +834,12 @@ class Table:
     # Transformations
     # ------------------------------------------------------------------------------------------------------------------
 
-    # This method is meant as a way to "cast" instances of subclasses of `Table` to a proper `Table`, dropping any
-    # additional constraints that might have to hold in the subclass.
-    # Override accordingly in subclasses.
     def _as_table(self: Table) -> Table:
         """
         Transform the table to an instance of the Table class.
+
+        This method is meant as a way to "cast" instances of subclasses of `Table` to a proper `Table`, dropping any
+        additional constraints that might have to hold in the subclass. Override accordingly in subclasses.
 
         Returns
         -------
@@ -882,7 +882,7 @@ class Table:
         if column.number_of_rows != self.number_of_rows and self.number_of_columns != 0:
             raise ColumnSizeError(str(self.number_of_rows), str(column._data.size))
 
-        result = self._data.copy()
+        result = self._data.reset_index(drop=True)
         result.columns = self._schema.column_names
         result[column.name] = column._data
         return Table._from_pandas_dataframe(result)
@@ -923,7 +923,7 @@ class Table:
         """
         if isinstance(columns, Table):
             columns = columns.to_columns()
-        result = self._data.copy()
+        result = self._data.reset_index(drop=True)
         result.columns = self._schema.column_names
         for column in columns:
             if column.name in result.columns:
@@ -972,7 +972,7 @@ class Table:
         1  3  4
         """
         int_columns = []
-        result = self._copy()
+
         if self.number_of_columns == 0:
             return Table.from_rows([row])
         if len(set(self.column_names) - set(row.column_names)) > 0:
@@ -983,12 +983,12 @@ class Table:
                 ),
             )
 
-        if result.number_of_rows == 0:
+        if self.number_of_rows == 0:
             int_columns = list(filter(lambda name: isinstance(row[name], int | np.int64 | np.int32), row.column_names))
 
-        new_df = pd.concat([result._data, row._data]).infer_objects()
-        new_df.columns = result.column_names
-        schema = Schema.merge_multiple_schemas([result.schema, row.schema])
+        new_df = pd.concat([self._data, row._data]).infer_objects()
+        new_df.columns = self.column_names
+        schema = Schema.merge_multiple_schemas([self.schema, row.schema])
         result = Table._from_pandas_dataframe(new_df, schema)
 
         for column in int_columns:
@@ -1036,7 +1036,7 @@ class Table:
             rows = rows.to_rows()
 
         if len(rows) == 0:
-            return self._copy()
+            return self
 
         different_column_names = set()
         for row in rows:
@@ -1049,8 +1049,7 @@ class Table:
                 ),
             )
 
-        result = self._copy()
-
+        result = self
         for row in rows:
             result = result.add_row(row)
 
@@ -1156,8 +1155,7 @@ class Table:
         if len(invalid_columns) != 0:
             raise UnknownColumnNameError(invalid_columns, similar_columns)
 
-        clone = self._copy()
-        return clone.remove_columns(list(set(self.column_names) - set(column_names)))
+        return self.remove_columns(list(set(self.column_names) - set(column_names)))
 
     def remove_columns(self, column_names: list[str]) -> Table:
         """
@@ -1311,8 +1309,7 @@ class Table:
              a    b
         0  1.0  2.0
         """
-        result = self._data.copy(deep=True)
-        result = result.dropna(axis="index")
+        result = self._data.dropna(axis="index")
         return Table._from_pandas_dataframe(result)
 
     def remove_rows_with_outliers(self) -> Table:
@@ -1352,13 +1349,11 @@ class Table:
         9   0.0  0.00  0.0 -1000000
         10  0.0  0.00  0.0 -1000000
         """
-        copy = self._data.copy(deep=True)
-
         table_without_nonnumericals = self.remove_columns_with_non_numerical_values()
         z_scores = np.absolute(stats.zscore(table_without_nonnumericals._data, nan_policy="omit"))
         filter_ = ((z_scores < 3) | np.isnan(z_scores)).all(axis=1)
 
-        return Table._from_pandas_dataframe(copy[filter_], self._schema)
+        return Table._from_pandas_dataframe(self._data[filter_], self._schema)
 
     def rename_column(self, old_name: str, new_name: str) -> Table:
         """
@@ -1401,7 +1396,7 @@ class Table:
         if new_name in self._schema.column_names:
             raise DuplicateColumnNameError(new_name)
 
-        new_df = self._data.copy()
+        new_df = self._data.reset_index(drop=True)
         new_df.columns = self._schema.column_names
         return Table._from_pandas_dataframe(new_df.rename(columns={old_name: new_name}))
 
@@ -2130,7 +2125,7 @@ class Table:
         if path.suffix != ".csv":
             raise WrongFileExtensionError(path, ".csv")
         path.parent.mkdir(parents=True, exist_ok=True)
-        data_to_csv = self._data.copy()
+        data_to_csv = self._data.reset_index(drop=True)
         data_to_csv.columns = self._schema.column_names
         data_to_csv.to_csv(path, index=False)
 
@@ -2168,7 +2163,7 @@ class Table:
         tmp_table_file.save(path)
 
         path.parent.mkdir(parents=True, exist_ok=True)
-        data_to_excel = self._data.copy()
+        data_to_excel = self._data.reset_index(drop=True)
         data_to_excel.columns = self._schema.column_names
         data_to_excel.to_excel(path)
 
@@ -2199,7 +2194,7 @@ class Table:
         if path.suffix != ".json":
             raise WrongFileExtensionError(path, ".json")
         path.parent.mkdir(parents=True, exist_ok=True)
-        data_to_json = self._data.copy()
+        data_to_json = self._data.reset_index(drop=True)
         data_to_json.columns = self._schema.column_names
         data_to_json.to_json(path)
 
@@ -2335,21 +2330,6 @@ class Table:
         if not allow_copy:
             raise NotImplementedError("For the moment we need to copy the data, so `allow_copy` must be True.")
 
-        data_copy = self._data.copy()
+        data_copy = self._data.reset_index(drop=True)
         data_copy.columns = self.column_names
         return data_copy.__dataframe__(nan_as_null, allow_copy)
-
-    # ------------------------------------------------------------------------------------------------------------------
-    # Helpers
-    # ------------------------------------------------------------------------------------------------------------------
-
-    def _copy(self) -> Table:
-        """
-        Return a copy of this table.
-
-        Returns
-        -------
-        table : Table
-            The copy of this table.
-        """
-        return copy.deepcopy(self)
