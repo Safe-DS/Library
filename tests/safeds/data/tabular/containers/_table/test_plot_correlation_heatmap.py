@@ -1,5 +1,6 @@
 import pytest
 from safeds.data.tabular.containers import Table
+from syrupy import SnapshotAssertion
 
 
 @pytest.mark.parametrize(
@@ -9,7 +10,7 @@ from safeds.data.tabular.containers import Table
     ],
     ids=["normal"],
 )
-def test_should_match_snapshot(table: Table, snapshot_png) -> None:
+def test_should_match_snapshot(table: Table, snapshot_png: SnapshotAssertion) -> None:
     correlation_heatmap = table.plot_correlation_heatmap()
     assert correlation_heatmap == snapshot_png
 

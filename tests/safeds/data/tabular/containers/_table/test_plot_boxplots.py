@@ -1,6 +1,7 @@
 import pytest
 from safeds.data.tabular.containers import Table
 from safeds.exceptions import NonNumericColumnError
+from syrupy import SnapshotAssertion
 
 
 @pytest.mark.parametrize(
@@ -12,7 +13,7 @@ from safeds.exceptions import NonNumericColumnError
     ],
     ids=["one column", "four columns (some non-numeric)", "four columns (all numeric)"],
 )
-def test_should_match_snapshot(table: Table, snapshot_png) -> None:
+def test_should_match_snapshot(table: Table, snapshot_png: SnapshotAssertion) -> None:
     boxplots = table.plot_boxplots()
     assert boxplots == snapshot_png
 

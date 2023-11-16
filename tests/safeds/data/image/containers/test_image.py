@@ -6,6 +6,7 @@ from safeds.data.image.containers import Image
 from safeds.data.image.typing import ImageFormat
 from safeds.data.tabular.containers import Table
 from safeds.exceptions import OutOfBoundsError
+from syrupy import SnapshotAssertion
 
 from tests.helpers import resolve_resource_path
 
@@ -236,7 +237,7 @@ class TestConvertToGrayscale:
         ["image/plane.png"],
         ids=["plane"],
     )
-    def test_convert_to_grayscale(self, resource_path: str, snapshot_png) -> None:
+    def test_convert_to_grayscale(self, resource_path: str, snapshot_png: SnapshotAssertion) -> None:
         image = Image.from_png_file(resolve_resource_path(resource_path))
         assert image.convert_to_grayscale() == snapshot_png
 
@@ -264,7 +265,7 @@ class TestFlipVertically:
         ["image/plane.png"],
         ids=["plane"],
     )
-    def test_should_flip_vertically(self, resource_path: str, snapshot_png) -> None:
+    def test_should_flip_vertically(self, resource_path: str, snapshot_png: SnapshotAssertion) -> None:
         image = Image.from_png_file(resolve_resource_path(resource_path))
         assert image.flip_vertically() == snapshot_png
 
@@ -280,7 +281,7 @@ class TestFlipHorizontally:
         ["image/plane.png"],
         ids=["plane"],
     )
-    def test_should_flip_horizontally(self, resource_path: str, snapshot_png) -> None:
+    def test_should_flip_horizontally(self, resource_path: str, snapshot_png: SnapshotAssertion) -> None:
         image = Image.from_png_file(resolve_resource_path(resource_path))
         assert image.flip_horizontally() == snapshot_png
 
@@ -295,11 +296,11 @@ class TestAdjustContrast:
         ("resource_path", "factor"),
         [
             ("image/plane.png", 0.75),
-            ("image/plane.png", 5)
+            ("image/plane.png", 5),
         ],
-        ids=["small factor", "large factor"]
+        ids=["small factor", "large factor"],
     )
-    def test_should_adjust_contrast(self, resource_path: str, factor: float, snapshot_png) -> None:
+    def test_should_adjust_contrast(self, resource_path: str, factor: float, snapshot_png: SnapshotAssertion) -> None:
         image = Image.from_png_file(resolve_resource_path(resource_path))
         assert image.adjust_contrast(factor) == snapshot_png
 
@@ -323,11 +324,11 @@ class TestAdjustBrightness:
         ("resource_path", "factor"),
         [
             ("image/plane.png", 0.5),
-            ("image/plane.png", 10)
+            ("image/plane.png", 10),
         ],
-        ids=["small factor", "large factor"]
+        ids=["small factor", "large factor"],
     )
-    def test_should_adjust_brightness(self, resource_path: str, factor: float, snapshot_png) -> None:
+    def test_should_adjust_brightness(self, resource_path: str, factor: float, snapshot_png: SnapshotAssertion) -> None:
         image = Image.from_png_file(resolve_resource_path(resource_path))
         assert image.adjust_brightness(factor) == snapshot_png
 
@@ -352,7 +353,7 @@ class TestInvertColors:
         ["image/plane.png"],
         ids=["invert-colors"],
     )
-    def test_should_invert_colors(self, resource_path: str, snapshot_png) -> None:
+    def test_should_invert_colors(self, resource_path: str, snapshot_png: SnapshotAssertion) -> None:
         image = Image.from_png_file(resolve_resource_path(resource_path))
         assert image.invert_colors() == snapshot_png
 
@@ -367,7 +368,7 @@ class TestColorAdjust:
         ],
         ids=["add color", "remove color", "remove all color"],
     )
-    def test_should_adjust_colors(self, resource_path: str, factor: float, snapshot_png) -> None:
+    def test_should_adjust_colors(self, resource_path: str, factor: float, snapshot_png: SnapshotAssertion) -> None:
         image = Image.from_png_file(resolve_resource_path(resource_path))
         assert image.adjust_color_balance(factor) == snapshot_png
 
@@ -410,7 +411,9 @@ class TestAddGaussianNoise:
         ],
         ids=["minimum noise", "some noise", "very noisy"],
     )
-    def test_should_add_noise(self, resource_path: str, standard_deviation: float, snapshot_png) -> None:
+    def test_should_add_noise(
+        self, resource_path: str, standard_deviation: float, snapshot_png: SnapshotAssertion
+    ) -> None:
         image = Image.from_png_file(resolve_resource_path(resource_path))
         assert image.add_gaussian_noise(standard_deviation) == snapshot_png
 
@@ -435,7 +438,7 @@ class TestBlur:
         ["image/plane.png"],
         ids=["blur"],
     )
-    def test_should_return_blurred_image(self, resource_path: str, snapshot_png) -> None:
+    def test_should_return_blurred_image(self, resource_path: str, snapshot_png: SnapshotAssertion) -> None:
         image = Image.from_png_file(resolve_resource_path(resource_path))
         assert image.blur(2) == snapshot_png
 
@@ -446,7 +449,7 @@ class TestCrop:
         ["image/plane.png"],
         ids=["crop"],
     )
-    def test_should_return_cropped_image(self, resource_path: str, snapshot_png) -> None:
+    def test_should_return_cropped_image(self, resource_path: str, snapshot_png: SnapshotAssertion) -> None:
         image = Image.from_png_file(resolve_resource_path(resource_path))
         assert image.crop(0, 0, 100, 100) == snapshot_png
 
@@ -461,7 +464,7 @@ class TestSharpen:
         ],
         ids=["negative factor", "small factor", "large factor"],
     )
-    def test_should_sharpen(self, resource_path: str, factor: float, snapshot_png) -> None:
+    def test_should_sharpen(self, resource_path: str, factor: float, snapshot_png: SnapshotAssertion) -> None:
         image = Image.from_png_file(resolve_resource_path(resource_path))
         assert image.sharpen(factor) == snapshot_png
 
@@ -477,7 +480,7 @@ class TestRotate:
         ["image/plane.png"],
         ids=["rotate-clockwise"],
     )
-    def test_should_return_clockwise_rotated_image(self, resource_path: str, snapshot_png) -> None:
+    def test_should_return_clockwise_rotated_image(self, resource_path: str, snapshot_png: SnapshotAssertion) -> None:
         image = Image.from_png_file(resolve_resource_path(resource_path))
         assert image.rotate_right() == snapshot_png
 
@@ -486,7 +489,9 @@ class TestRotate:
         ["image/plane.png"],
         ids=["rotate-counter-clockwise"],
     )
-    def test_should_return_counter_clockwise_rotated_image(self, resource_path: str, snapshot_png) -> None:
+    def test_should_return_counter_clockwise_rotated_image(
+        self, resource_path: str, snapshot_png: SnapshotAssertion
+    ) -> None:
         image = Image.from_png_file(resolve_resource_path(resource_path))
         assert image.rotate_left() == snapshot_png
 
@@ -497,6 +502,6 @@ class TestFindEdges:
         ["image/plane.png"],
         ids=["find_edges"],
     )
-    def test_should_return_edges_of_image(self, resource_path: str, snapshot_png) -> None:
+    def test_should_return_edges_of_image(self, resource_path: str, snapshot_png: SnapshotAssertion) -> None:
         image = Image.from_png_file(resolve_resource_path(resource_path))
         assert image.find_edges() == snapshot_png

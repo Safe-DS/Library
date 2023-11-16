@@ -1,9 +1,10 @@
 import pytest
 from safeds.data.tabular.containers import Table
 from safeds.exceptions import UnknownColumnNameError
+from syrupy import SnapshotAssertion
 
 
-def test_should_match_snapshot(snapshot_png) -> None:
+def test_should_match_snapshot(snapshot_png: SnapshotAssertion) -> None:
     table = Table({"A": [1, 2, 3], "B": [2, 4, 7]})
     lineplot = table.plot_lineplot("A", "B")
     assert lineplot == snapshot_png

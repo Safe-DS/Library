@@ -1,8 +1,6 @@
 import pytest
-from safeds.data.image.containers import Image
 from safeds.data.tabular.containers import Table
-
-from tests.helpers import resolve_resource_path
+from syrupy import SnapshotAssertion
 
 
 @pytest.mark.parametrize(
@@ -20,7 +18,7 @@ from tests.helpers import resolve_resource_path
     ],
     ids=["one column", "four columns"],
 )
-def test_should_match_snapshot(table: Table, snapshot_png) -> None:
+def test_should_match_snapshot(table: Table, snapshot_png: SnapshotAssertion) -> None:
     histograms = table.plot_histograms()
     assert histograms == snapshot_png
 

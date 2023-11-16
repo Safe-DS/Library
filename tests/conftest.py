@@ -20,7 +20,7 @@ class JPEGImageExtension(SingleFileSnapshotExtension):
 
 
 @pytest.fixture()
-def snapshot_jpeg(snapshot) -> SnapshotAssertion:
+def snapshot_jpeg(snapshot: SnapshotAssertion) -> SnapshotAssertion:
     return snapshot.use_extension(JPEGImageExtension)
 
 
@@ -32,5 +32,5 @@ class PNGImageSnapshotExtension(SingleFileSnapshotExtension):
 
 
 @pytest.fixture()
-def snapshot_png(snapshot) -> SnapshotAssertion:
+def snapshot_png(snapshot: SnapshotAssertion) -> SnapshotAssertion:
     return snapshot.use_extension(PNGImageSnapshotExtension)

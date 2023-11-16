@@ -1,9 +1,10 @@
 import pytest
 from safeds.data.tabular.containers import Table
 from safeds.exceptions import NonNumericColumnError
+from syrupy import SnapshotAssertion
 
 
-def test_should_match_snapshot(snapshot_png) -> None:
+def test_should_match_snapshot(snapshot_png: SnapshotAssertion) -> None:
     table = Table({"A": [1, 2, 3]})
     boxplot = table.get_column("A").plot_boxplot()
     assert boxplot == snapshot_png
