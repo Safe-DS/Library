@@ -121,7 +121,7 @@ class OneHotEncoder(InvertibleTableTransformer):
                 stacklevel=2,
             )
 
-        data = table._data.copy()
+        data = table._data.reset_index(drop=True)
         data.columns = table.column_names
 
         result = OneHotEncoder()

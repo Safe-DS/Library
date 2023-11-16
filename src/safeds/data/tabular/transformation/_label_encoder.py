@@ -112,7 +112,7 @@ class LabelEncoder(InvertibleTableTransformer):
         if table.number_of_rows == 0:
             raise ValueError("The LabelEncoder cannot transform the table because it contains 0 rows")
 
-        data = table._data.copy()
+        data = table._data.reset_index(drop=True)
         data.columns = table.column_names
         data[self._column_names] = self._wrapped_transformer.transform(data[self._column_names])
         return Table._from_pandas_dataframe(data)
@@ -171,7 +171,7 @@ class LabelEncoder(InvertibleTableTransformer):
                 ),
             )
 
-        data = transformed_table._data.copy()
+        data = transformed_table._data.reset_index(drop=True)
         data.columns = transformed_table.column_names
         data[self._column_names] = self._wrapped_transformer.inverse_transform(data[self._column_names])
         return Table._from_pandas_dataframe(data)

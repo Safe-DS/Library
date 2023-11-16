@@ -139,7 +139,7 @@ class Discretizer(TableTransformer):
             if not table.get_column(column).type.is_numeric():
                 raise NonNumericColumnError(f"{column} is of type {table.get_column(column).type}.")
 
-        data = table._data.copy()
+        data = table._data.reset_index(drop=True)
         data.columns = table.column_names
         data[self._column_names] = self._wrapped_transformer.transform(data[self._column_names])
         return Table._from_pandas_dataframe(data)

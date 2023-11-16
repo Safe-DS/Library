@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import copy
 from typing import TYPE_CHECKING
 
 from safeds.data.tabular.containers import Column, Row, Table
@@ -194,21 +193,6 @@ class TaggedTable(Table):
         return self._target
 
     # ------------------------------------------------------------------------------------------------------------------
-    # Helpers
-    # ------------------------------------------------------------------------------------------------------------------
-
-    def _copy(self) -> TaggedTable:
-        """
-        Return a copy of this tagged table.
-
-        Returns
-        -------
-        table : TaggedTable
-            The copy of this tagged table.
-        """
-        return copy.deepcopy(self)
-
-    # ------------------------------------------------------------------------------------------------------------------
     # Specific methods from TaggedTable class:
     # ------------------------------------------------------------------------------------------------------------------
 
@@ -268,7 +252,7 @@ class TaggedTable(Table):
             super().add_columns(columns),
             target_name=self.target.name,
             feature_names=self.features.column_names
-            + [col.name for col in (columns.to_columns() if isinstance(columns, Table) else columns)],
+                          + [col.name for col in (columns.to_columns() if isinstance(columns, Table) else columns)],
         )
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -702,8 +686,8 @@ class TaggedTable(Table):
                     self.features.column_names
                     if old_column_name not in self.features.column_names
                     else self.features.column_names[: self.features.column_names.index(old_column_name)]
-                    + [col.name for col in new_columns]
-                    + self.features.column_names[self.features.column_names.index(old_column_name) + 1 :]
+                         + [col.name for col in new_columns]
+                         + self.features.column_names[self.features.column_names.index(old_column_name) + 1:]
                 ),
             )
 
@@ -763,7 +747,7 @@ class TaggedTable(Table):
     def sort_columns(
         self,
         comparator: Callable[[Column, Column], int] = lambda col1, col2: (col1.name > col2.name)
-        - (col1.name < col2.name),
+                                                                         - (col1.name < col2.name),
     ) -> TaggedTable:
         """
         Sort the columns of a `TaggedTable` with the given comparator and return a new `TaggedTable`.

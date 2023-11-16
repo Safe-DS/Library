@@ -160,7 +160,7 @@ def predict(model: Any, dataset: Table, feature_names: list[str] | None, target_
     dataset_df = dataset.keep_only_columns(feature_names)._data
     dataset_df.columns = feature_names
 
-    result_set = dataset._data.copy(deep=True)
+    result_set = dataset._data.reset_index(drop=True)
     result_set.columns = dataset.column_names
 
     try:

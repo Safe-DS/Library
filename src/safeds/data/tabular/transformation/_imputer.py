@@ -210,7 +210,7 @@ class Imputer(TableTransformer):
         if table.number_of_rows == 0:
             raise ValueError("The Imputer cannot transform the table because it contains 0 rows")
 
-        data = table._data.copy()
+        data = table._data.reset_index(drop=True)
         data[self._column_names] = pd.DataFrame(
             self._wrapped_transformer.transform(data[self._column_names]),
             columns=self._column_names,
