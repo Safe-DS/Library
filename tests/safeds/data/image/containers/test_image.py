@@ -412,7 +412,7 @@ class TestAddGaussianNoise:
         ids=["minimum noise", "some noise", "very noisy"],
     )
     def test_should_add_noise(
-        self, resource_path: str, standard_deviation: float, snapshot_png: SnapshotAssertion
+        self, resource_path: str, standard_deviation: float, snapshot_png: SnapshotAssertion,
     ) -> None:
         image = Image.from_png_file(resolve_resource_path(resource_path))
         assert image.add_gaussian_noise(standard_deviation) == snapshot_png
@@ -490,7 +490,7 @@ class TestRotate:
         ids=["rotate-counter-clockwise"],
     )
     def test_should_return_counter_clockwise_rotated_image(
-        self, resource_path: str, snapshot_png: SnapshotAssertion
+        self, resource_path: str, snapshot_png: SnapshotAssertion,
     ) -> None:
         image = Image.from_png_file(resolve_resource_path(resource_path))
         assert image.rotate_left() == snapshot_png
