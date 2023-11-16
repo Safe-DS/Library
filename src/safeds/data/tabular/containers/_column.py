@@ -921,6 +921,7 @@ class Column(Sequence[T]):
         ax = sns.boxplot(data=self._data)
         ax.set(title=self.name)
         ax.set_xticks([])
+        ax.set_ylabel("")
         plt.tight_layout()
 
         buffer = io.BytesIO()
