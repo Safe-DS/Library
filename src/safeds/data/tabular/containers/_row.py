@@ -13,6 +13,9 @@ from safeds.exceptions import UnknownColumnNameError
 if TYPE_CHECKING:
     from collections.abc import Iterator
 
+# Enable copy-on-write for pandas dataframes
+pd.options.mode.copy_on_write = True
+
 
 class Row(Mapping[str, Any]):
     """

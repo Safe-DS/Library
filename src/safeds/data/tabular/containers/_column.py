@@ -27,6 +27,9 @@ if TYPE_CHECKING:
 T = TypeVar("T")
 R = TypeVar("R")
 
+# Enable copy-on-write for pandas dataframes
+pd.options.mode.copy_on_write = True
+
 
 class Column(Sequence[T]):
     """

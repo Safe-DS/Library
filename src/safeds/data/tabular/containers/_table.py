@@ -39,6 +39,9 @@ if TYPE_CHECKING:
 
     from ._tagged_table import TaggedTable
 
+# Enable copy-on-write for pandas dataframes
+pd.options.mode.copy_on_write = True
+
 
 # noinspection PyProtectedMember
 class Table:
@@ -1154,8 +1157,7 @@ class Table:
             raise UnknownColumnNameError(invalid_columns, similar_columns)
 
         clone = self._copy()
-        clone = clone.remove_columns(list(set(self.column_names) - set(column_names)))
-        return clone
+        return clone.remove_columns(list(set(self.column_names) - set(column_names)))
 
     def remove_columns(self, column_names: list[str]) -> Table:
         """
