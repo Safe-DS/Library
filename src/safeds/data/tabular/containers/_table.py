@@ -2075,7 +2075,7 @@ class Table:
         """
         col_wrap = min(self.number_of_columns, 3)
 
-        data = pd.melt(self._data.applymap(lambda value: str(value)), value_vars=self.column_names)
+        data = pd.melt(self._data.map(lambda value: str(value)), value_vars=self.column_names)
         grid = sns.FacetGrid(data=data, col="variable", col_wrap=col_wrap, sharex=False, sharey=False)
         grid.map(sns.histplot, "value")
         grid.set_xlabels("")

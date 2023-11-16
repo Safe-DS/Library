@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import copy
 from typing import TYPE_CHECKING
 
 from safeds.data.tabular.containers import Column, Row, Table
@@ -192,21 +191,6 @@ class TaggedTable(Table):
             The target column.
         """
         return self._target
-
-    # ------------------------------------------------------------------------------------------------------------------
-    # Helpers
-    # ------------------------------------------------------------------------------------------------------------------
-
-    def _copy(self) -> TaggedTable:
-        """
-        Return a copy of this tagged table.
-
-        Returns
-        -------
-        table : TaggedTable
-            The copy of this tagged table.
-        """
-        return copy.deepcopy(self)
 
     # ------------------------------------------------------------------------------------------------------------------
     # Specific methods from TaggedTable class:
