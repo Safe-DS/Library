@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import copy
 import io
 from collections.abc import Sequence
 from numbers import Number
@@ -26,6 +25,9 @@ if TYPE_CHECKING:
 
 T = TypeVar("T")
 R = TypeVar("R")
+
+# Enable copy-on-write for pandas dataframes
+pd.options.mode.copy_on_write = True
 
 
 class Column(Sequence[T]):
@@ -1031,19 +1033,3 @@ class Column(Sequence[T]):
         2
         """
         return self._data.isna().sum()
-
-    # ------------------------------------------------------------------------------------------------------------------
-    # Helpers
-    # ------------------------------------------------------------------------------------------------------------------
-
-    def _copy(self) -> Column:
-        """
-        Return a copy of this column.
-
-        Returns
-        -------
-        column : Column
-            The copy of this column.
-
-        """
-        return copy.deepcopy(self)
