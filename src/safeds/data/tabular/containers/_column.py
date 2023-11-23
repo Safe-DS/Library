@@ -11,7 +11,7 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 
-from safeds.data.image.containers import Image
+from safeds.data.image.containers import ImagePil
 from safeds.data.image.typing import ImageFormat
 from safeds.data.tabular.typing import ColumnType
 from safeds.exceptions import (
@@ -894,13 +894,13 @@ class Column(Sequence[T]):
     # Plotting
     # ------------------------------------------------------------------------------------------------------------------
 
-    def plot_boxplot(self) -> Image:
+    def plot_boxplot(self) -> ImagePil:
         """
         Plot this column in a boxplot. This function can only plot real numerical data.
 
         Returns
         -------
-        plot: Image
+        plot: ImagePil
             The plot as an image.
 
         Raises
@@ -927,15 +927,15 @@ class Column(Sequence[T]):
         fig.savefig(buffer, format="png")
         plt.close()  # Prevents the figure from being displayed directly
         buffer.seek(0)
-        return Image(buffer, ImageFormat.PNG)
+        return ImagePil(buffer, ImageFormat.PNG)
 
-    def plot_histogram(self) -> Image:
+    def plot_histogram(self) -> ImagePil:
         """
         Plot a column in a histogram.
 
         Returns
         -------
-        plot: Image
+        plot: ImagePil
             The plot as an image.
 
         Examples
@@ -959,7 +959,7 @@ class Column(Sequence[T]):
         fig.savefig(buffer, format="png")
         plt.close()  # Prevents the figure from being displayed directly
         buffer.seek(0)
-        return Image(buffer, ImageFormat.PNG)
+        return ImagePil(buffer, ImageFormat.PNG)
 
     # ------------------------------------------------------------------------------------------------------------------
     # Conversion

@@ -1,5 +1,5 @@
 import pytest
-from safeds.data.image.containers import Image
+from safeds.data.image.containers import ImagePil
 from safeds.data.tabular.containers import Table
 
 from tests.helpers import resolve_resource_path
@@ -25,7 +25,7 @@ from tests.helpers import resolve_resource_path
 )
 def test_should_match_snapshot(table: Table, path: str) -> None:
     current = table.plot_histograms()
-    snapshot = Image.from_png_file(resolve_resource_path(path))
+    snapshot = ImagePil.from_png_file(resolve_resource_path(path))
     # Inlining the expression into the assert causes pytest to hang if the assertion fails when run from PyCharm.
     assertion = snapshot == current
     assert assertion
