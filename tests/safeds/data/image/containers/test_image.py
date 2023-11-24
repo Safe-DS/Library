@@ -8,13 +8,21 @@ from safeds.data.tabular.containers import Table
 from safeds.exceptions import OutOfBoundsError
 from tests.helpers import resolve_resource_path
 
+_device_cuda = torch.device("cuda")
+_device_cpu = torch.device("cpu")
+
 
 def _test_devices() -> list[torch.device]:
-    return [torch.device("cpu")] + ([torch.device("cuda")] if torch.cuda.is_available() else [])
+    return [_device_cpu, _device_cuda]
 
 
 def _test_devices_ids() -> list[str]:
-    return ["cpu"] + (["cuda"] if torch.cuda.is_available() else [])
+    return ["cpu", "cuda"]
+
+
+def _skip_if_device_not_available(device) -> None:
+    if device == _device_cuda and torch.cuda.is_available():
+        pytest.skip("This test requires cuda")
 
 
 @pytest.mark.parametrize(
@@ -29,6 +37,7 @@ class TestFromFile:
         ids=["jpg", "jpg_Path", "png", "png_Path"],
     )
     def test_should_load_from_file(self, path: str | Path, device) -> None:
+        _skip_if_device_not_available(device)
         Image.from_file(resolve_resource_path(path), device)
 
     @pytest.mark.parametrize(
@@ -38,6 +47,7 @@ class TestFromFile:
         ids=["missing_file_jpg", "missing_file_jpg_Path", "missing_file_png", "missing_file_png_Path"],
     )
     def test_should_raise_if_file_not_found(self, path: str | Path, device) -> None:
+        _skip_if_device_not_available(device)
         with pytest.raises(FileNotFoundError):
             Image.from_file(resolve_resource_path(path), device)
 
@@ -64,6 +74,7 @@ class TestProperties:
         ids=["[1,1].jpg", "[640,480].png"],
     )
     def test_should_return_image_properties(self, image_path: str, width: int, height: int, device) -> None:
+        _skip_if_device_not_available(device)
         image = Image.from_file(resolve_resource_path(image_path), device)
         assert image.width == width
         assert image.height == height
@@ -75,6 +86,7 @@ class TestEQ:
         "device", _test_devices(), ids=_test_devices_ids()
     )
     def test_should_be_equal(self, device) -> None:
+        _skip_if_device_not_available(device)
         image = Image.from_file(resolve_resource_path("image/original.png"), device)
         image2 = Image.from_file(resolve_resource_path("image/copy.png"), device)
         assert image == image2
@@ -83,19 +95,20 @@ class TestEQ:
         "device", _test_devices(), ids=_test_devices_ids()
     )
     def test_should_not_be_equal(self, device) -> None:
+        _skip_if_device_not_available(device)
         image = Image.from_file(resolve_resource_path("image/original.png"), device)
         image2 = Image.from_file(resolve_resource_path("image/white_square.png"), device)
         assert image != image2
 
-    @pytest.mark.skipif(not torch.cuda.is_available(), reason="requires cuda")
     def test_should_be_equal_different_devices(self) -> None:
+        _skip_if_device_not_available(_device_cuda)
         image = Image.from_file(resolve_resource_path("image/original.png"), torch.device("cpu"))
         image2 = Image.from_file(resolve_resource_path("image/copy.png"), torch.device("cuda"))
         assert image == image2
         assert image2 == image
 
-    @pytest.mark.skipif(not torch.cuda.is_available(), reason="requires cuda")
     def test_should_not_be_equal_different_devices(self) -> None:
+        _skip_if_device_not_available(_device_cuda)
         image = Image.from_file(resolve_resource_path("image/original.png"), torch.device("cpu"))
         image2 = Image.from_file(resolve_resource_path("image/white_square.png"), torch.device("cuda"))
         assert image != image2
@@ -105,6 +118,7 @@ class TestEQ:
         "device", _test_devices(), ids=_test_devices_ids()
     )
     def test_should_raise(self, device) -> None:
+        _skip_if_device_not_available(device)
         image = Image.from_file(resolve_resource_path("image/original.png"), device)
         other = Table()
         assert (image.__eq__(other)) is NotImplemented
@@ -132,6 +146,7 @@ class TestResize:
         new_height: int,
         device
     ) -> None:
+        _skip_if_device_not_available(device)
         image = Image.from_file(resolve_resource_path("image/white_square.png"), device)
         new_image = image.resize(new_width, new_height)
         assert new_image.width == new_width
@@ -143,8 +158,8 @@ class TestResize:
 
 class TestDevices:
 
-    @pytest.mark.skipif(not torch.cuda.is_available(), reason="requires cuda")
     def test_should_change_device(self):
+        _skip_if_device_not_available(_device_cuda)
         image = Image.from_file(resolve_resource_path("image/original.png"), torch.device("cpu"))
         new_device = torch.device("cuda", 0)
         assert image.set_device(new_device).device == new_device
@@ -165,6 +180,7 @@ class TestConvertToGrayscale:
         ids=["grayscale"],
     )
     def test_convert_to_grayscale(self, image_path: str, expected_path: str, device) -> None:
+        _skip_if_device_not_available(device)
         image = Image.from_file(resolve_resource_path(image_path), device)
         expected = Image.from_file(resolve_resource_path(expected_path), device)
         grayscale_image = image.convert_to_grayscale()
@@ -186,6 +202,7 @@ class TestCrop:
         ids=["crop"],
     )
     def test_should_return_cropped_image(self, image_path: str, expected_path: str, device) -> None:
+        _skip_if_device_not_available(device)
         image = Image.from_file(resolve_resource_path(image_path), device)
         expected = Image.from_file(resolve_resource_path(expected_path), device)
         image = image.crop(0, 0, 100, 100)
@@ -197,6 +214,7 @@ class TestCrop:
 )
 class TestFlipVertically:
     def test_should_flip_vertically(self, device) -> None:
+        _skip_if_device_not_available(device)
         image = Image.from_file(resolve_resource_path("image/original.png"), device)
         image2 = image.flip_vertically()
         image3 = Image.from_file(resolve_resource_path("image/flip_vertically.png"), device)
@@ -204,6 +222,7 @@ class TestFlipVertically:
         assert image2 == image3
 
     def test_should_be_original(self, device) -> None:
+        _skip_if_device_not_available(device)
         image = Image.from_file(resolve_resource_path("image/original.png"), device)
         image2 = image.flip_vertically().flip_vertically()
         assert image == image2
@@ -214,6 +233,7 @@ class TestFlipVertically:
 )
 class TestFlipHorizontally:
     def test_should_flip_horizontally(self, device) -> None:
+        _skip_if_device_not_available(device)
         image = Image.from_file(resolve_resource_path("image/original.png"), device)
         image2 = image.flip_horizontally()
         image3 = Image.from_file(resolve_resource_path("image/flip_horizontally.png"), device)
@@ -221,6 +241,7 @@ class TestFlipHorizontally:
         assert image2 == image3
 
     def test_should_be_original(self, device) -> None:
+        _skip_if_device_not_available(device)
         image = Image.from_file(resolve_resource_path("image/original.png"), device)
         image2 = image.flip_horizontally().flip_horizontally()
         assert image == image2
@@ -232,6 +253,7 @@ class TestFlipHorizontally:
 class TestBrightness:
     @pytest.mark.parametrize("factor", [0.5, 10], ids=["small factor", "large factor"])
     def test_should_adjust_brightness(self, factor: float, device) -> None:
+        _skip_if_device_not_available(device)
         image = Image.from_file(resolve_resource_path("image/brightness/to_brighten.png"), device)
         image2 = image.adjust_brightness(factor)
         image3 = Image.from_file(resolve_resource_path("image/brightness/brightened_by_" + str(factor) + ".png"),
@@ -240,6 +262,7 @@ class TestBrightness:
         assert image2 == image3
 
     def test_should_not_brighten(self, device) -> None:
+        _skip_if_device_not_available(device)
         with pytest.warns(
             UserWarning,
             match="Brightness adjustment factor is 1.0, this will not make changes to the image.",
@@ -249,6 +272,7 @@ class TestBrightness:
             assert image == image2
 
     def test_should_raise(self, device) -> None:
+        _skip_if_device_not_available(device)
         image = Image.from_file(resolve_resource_path("image/brightness/to_brighten.png"), device)
         with pytest.raises(OutOfBoundsError, match=r"factor \(=-1\) is not inside \[0, \u221e\)."):
             image.adjust_brightness(-1)
@@ -268,6 +292,7 @@ class TestAddGaussianNoise:
         ids=["minimum noise", "some noise", "very noisy"],
     )
     def test_should_add_noise(self, image_path: str, standard_deviation: float, device) -> None:
+        _skip_if_device_not_available(device)
         image = Image.from_file(resolve_resource_path(image_path), device)
         expected = Image.from_file(
             resolve_resource_path("image/noise/noise_" + str(standard_deviation) + ".png"), device
@@ -288,6 +313,7 @@ class TestAddGaussianNoise:
         ids=["sigma below zero"],
     )
     def test_should_raise_standard_deviation(self, image_path: str, standard_deviation: float, device) -> None:
+        _skip_if_device_not_available(device)
         with pytest.raises(
             OutOfBoundsError,
             match=rf"standard_deviation \(={standard_deviation}\) is not inside \[0, \u221e\)\.",
@@ -302,6 +328,7 @@ class TestAddGaussianNoise:
 class TestAdjustContrast:
     @pytest.mark.parametrize("factor", [0.75, 5], ids=["small factor", "large factor"])
     def test_should_adjust_contrast(self, factor: float, device) -> None:
+        _skip_if_device_not_available(device)
         image = Image.from_file(resolve_resource_path("image/contrast/to_adjust_contrast.png"), device)
         image2 = image.adjust_contrast(factor)
         image3 = Image.from_file(
@@ -318,6 +345,7 @@ class TestAdjustContrast:
         assert image2 == image3
 
     def test_should_not_adjust_contrast(self, device) -> None:
+        _skip_if_device_not_available(device)
         with pytest.warns(
             UserWarning,
             match="Contrast adjustment factor is 1.0, this will not make changes to the image.",
@@ -342,6 +370,7 @@ class TestBlur:
         ids=["blur"],
     )
     def test_should_return_blurred_image(self, image_path: str, expected_path: str, device) -> None:
+        _skip_if_device_not_available(device)
         image = Image.from_file(resolve_resource_path(image_path), device=device)
         expected = Image.from_file(resolve_resource_path(expected_path), device=device)
         image = image.blur(2)
@@ -359,6 +388,7 @@ class TestBlur:
 class TestSharpen:
     @pytest.mark.parametrize("factor", [0, 0.5, 10], ids=["zero factor", "small factor", "large factor"])
     def test_should_sharpen(self, factor: float, device) -> None:
+        _skip_if_device_not_available(device)
         image = Image.from_file(resolve_resource_path("image/sharpen/to_sharpen.png"), device)
         image2 = image.sharpen(factor)
         # image2.to_png_file(resolve_resource_path("image/sharpen/sharpened_by_" + str(factor) + ".png"))
@@ -368,10 +398,12 @@ class TestSharpen:
         )
 
     def test_should_raise_negative_sharpen(self, device) -> None:
+        _skip_if_device_not_available(device)
         with pytest.raises(OutOfBoundsError):
             Image.from_file(resolve_resource_path("image/sharpen/to_sharpen.png"), device).sharpen(-1.0)
 
     def test_should_not_sharpen(self, device) -> None:
+        _skip_if_device_not_available(device)
         with pytest.warns(UserWarning, match="Sharpen factor is 1.0, this will not make changes to the image."):
             image = Image.from_file(resolve_resource_path("image/sharpen/to_sharpen.png"), device)
             image2 = image.sharpen(1)
@@ -393,6 +425,7 @@ class TestInvertColors:
         ids=["invert-colors"],
     )
     def test_should_invert_colors(self, image_path: str, expected_path: str, device) -> None:
+        _skip_if_device_not_available(device)
         image = Image.from_file(resolve_resource_path(image_path), device)
         expected = Image.from_file(resolve_resource_path(expected_path), device)
         image = image.invert_colors()
@@ -414,6 +447,7 @@ class TestRotate:
         ids=["rotate-clockwise"],
     )
     def test_should_return_clockwise_rotated_image(self, image_path: str, expected_path: str, device) -> None:
+        _skip_if_device_not_available(device)
         image = Image.from_file(resolve_resource_path(image_path), device)
         expected = Image.from_file(resolve_resource_path(expected_path), device)
         image = image.rotate_right()
@@ -430,6 +464,7 @@ class TestRotate:
         ids=["rotate-counter-clockwise"],
     )
     def test_should_return_counter_clockwise_rotated_image(self, image_path: str, expected_path: str, device) -> None:
+        _skip_if_device_not_available(device)
         image = Image.from_file(resolve_resource_path(image_path), device)
         expected = Image.from_file(resolve_resource_path(expected_path), device)
         image = image.rotate_left()

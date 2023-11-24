@@ -1,0 +1,60 @@
+import pandas as pd
+import numpy as np
+import torch
+import time
+import torch.nn as nn
+from torch.utils.data import DataLoader
+from safeds.exceptions import ColumnSizeError, DuplicateColumnNameError
+from safeds.ml.nn._cnn_layer import Layer
+
+
+class Model():
+    def __init__(self, layers: list):
+        self._model = PyTorchModel(layers)
+
+    def from_layers(self, layers: list):
+        pass
+
+    # this is just a demo function
+    def model_forward(self, data: DataLoader):
+        for batch in iter(data):
+            inputs, labels = batch
+            inputs = inputs.to(torch.float32)
+            self._model(inputs)
+
+    def train(self, images: torch.Tensor, batches: int, epochs: int, learningrate: float):
+        start_time = time.time()
+        criterion = nn.MSELoss()
+        optimizer = torch.optim.Adam(self._model.parameters(), lr=learningrate)
+
+        for epoch in range(epochs):
+            # for batch in iter(train_loader):
+            for batch in range(images.size(dim=0).item() / batches):
+                # inputs, labels = batch
+                inputs = images
+                optimizer.zero_grad()
+
+                labels = labels.to(torch.float32)
+                inputs = inputs.to(torch.float32)
+                outputs = self._model(inputs)
+                loss = criterion(outputs, labels)
+                loss.backward()
+                optimizer.step()
+            print(f'Epoch: {epoch + 1:2} Loss {loss.item():10.8f}')
+        print(f'\nDuration: {time.time() - start_time:.0f} seconds')
+
+
+class PyTorchModel(nn.Module):
+    def __init__(self, LayerListe: list[Layer]):
+        super(PyTorchModel, self).__init__()
+        layers = []
+        for layer in LayerListe:
+            layers.append(layer._create_pytorch_layer())
+
+        self._layerliste = nn.ModuleList(layers)
+
+    def forward(self, x):
+        out = x
+        for layer in self._layerliste:
+            out = layer(out)
+        return out
