@@ -1,3 +1,21 @@
+## [0.16.0](https://github.com/Safe-DS/Library/compare/v0.15.0...v0.16.0) (2023-11-22)
+
+
+### Features
+
+* drop Python 3.10 and add Python 3.12 ([#478](https://github.com/Safe-DS/Library/issues/478)) ([5bf0e75](https://github.com/Safe-DS/Library/commit/5bf0e75746662f91cc354d1a63882ad3abf5b84e))
+* enable copy-on-write for pandas dataframes ([#494](https://github.com/Safe-DS/Library/issues/494)) ([9a19389](https://github.com/Safe-DS/Library/commit/9a1938989c084414df5ee6a8510957760cfe321e)), closes [#428](https://github.com/Safe-DS/Library/issues/428)
+
+
+### Bug Fixes
+
+* **deps-dev:** Bump urllib3 from 1.26.17 to 1.26.18 ([#480](https://github.com/Safe-DS/Library/issues/480)) ([a592d2c](https://github.com/Safe-DS/Library/commit/a592d2c2e7d93127a80159945f436fcb86b81620)), closes [#3159](https://github.com/Safe-DS/Library/issues/3159)
+
+
+### Performance Improvements
+
+* remove unneeded copy operations in table transformers ([#496](https://github.com/Safe-DS/Library/issues/496)) ([6443beb](https://github.com/Safe-DS/Library/commit/6443beb28e0dc8cf6f9f2508872dd67a6abde363)), closes [#494](https://github.com/Safe-DS/Library/issues/494)
+
 ## [0.15.0](https://github.com/Safe-DS/Library/compare/v0.14.0...v0.15.0) (2023-07-13)
 
 

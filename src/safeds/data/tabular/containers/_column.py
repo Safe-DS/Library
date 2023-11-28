@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import copy
 import io
 from collections.abc import Sequence
 from numbers import Number
@@ -26,6 +25,9 @@ if TYPE_CHECKING:
 
 T = TypeVar("T")
 R = TypeVar("R")
+
+# Enable copy-on-write for pandas dataframes
+pd.options.mode.copy_on_write = True
 
 
 class Column(Sequence[T]):
@@ -145,12 +147,10 @@ class Column(Sequence[T]):
         return self.name == other.name and self._data.equals(other._data)
 
     @overload
-    def __getitem__(self, index: int) -> T:
-        ...
+    def __getitem__(self, index: int) -> T: ...
 
     @overload
-    def __getitem__(self, index: slice) -> Column[T]:
-        ...
+    def __getitem__(self, index: slice) -> Column[T]: ...
 
     def __getitem__(self, index: int | slice) -> T | Column[T]:
         """
@@ -921,6 +921,7 @@ class Column(Sequence[T]):
         ax = sns.boxplot(data=self._data)
         ax.set(title=self.name)
         ax.set_xticks([])
+        ax.set_ylabel("")
         plt.tight_layout()
 
         buffer = io.BytesIO()
@@ -1032,19 +1033,3 @@ class Column(Sequence[T]):
         2
         """
         return self._data.isna().sum()
-
-    # ------------------------------------------------------------------------------------------------------------------
-    # Helpers
-    # ------------------------------------------------------------------------------------------------------------------
-
-    def _copy(self) -> Column:
-        """
-        Return a copy of this column.
-
-        Returns
-        -------
-        column : Column
-            The copy of this column.
-
-        """
-        return copy.deepcopy(self)

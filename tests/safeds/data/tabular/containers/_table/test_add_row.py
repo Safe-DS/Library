@@ -27,13 +27,13 @@ from safeds.exceptions import UnknownColumnNameError
             Schema({"col1": Anything(), "col2": Integer(is_nullable=True)}),
         ),
         (
-            Table({"col1": [1, 2, 1], "col2": [1, 2, 4]}),
+            Table({"col1": [], "col2": []}),
             Row({"col1": 5, "col2": 6}),
-            Table({"col1": [1, 2, 1, 5], "col2": [1, 2, 4, 6]}),
+            Table({"col1": [5], "col2": [6]}),
             Schema({"col1": Integer(), "col2": Integer()}),
         ),
         (
-            Table({"col1": [], "col2": []}),
+            Table(),
             Row({"col1": 5, "col2": 6}),
             Table({"col1": [5], "col2": [6]}),
             Schema({"col1": Integer(), "col2": Integer()}),

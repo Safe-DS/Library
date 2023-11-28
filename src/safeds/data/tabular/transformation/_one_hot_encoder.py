@@ -111,17 +111,14 @@ class OneHotEncoder(InvertibleTableTransformer):
             > 0
         ):
             warnings.warn(
-                (
-                    "The columns"
-                    f" {table._as_table().keep_only_columns(column_names).remove_columns_with_non_numerical_values().column_names} contain"
-                    " numerical data. The OneHotEncoder is designed to encode non-numerical values into numerical"
-                    " values"
-                ),
+                "The columns"
+                f" {table._as_table().keep_only_columns(column_names).remove_columns_with_non_numerical_values().column_names} contain"
+                " numerical data. The OneHotEncoder is designed to encode non-numerical values into numerical values",
                 UserWarning,
                 stacklevel=2,
             )
 
-        data = table._data.copy()
+        data = table._data.reset_index(drop=True)
         data.columns = table.column_names
 
         result = OneHotEncoder()
@@ -223,7 +220,7 @@ class OneHotEncoder(InvertibleTableTransformer):
         # New columns may not be sorted:
         column_names = []
         for name in table.column_names:
-            if name not in self._column_names.keys():
+            if name not in self._column_names:
                 column_names.append(name)
             else:
                 column_names.extend(
@@ -322,11 +319,11 @@ class OneHotEncoder(InvertibleTableTransformer):
                 name
                 if name not in [value for value_list in list(self._column_names.values()) for value in value_list]
                 else list(self._column_names.keys())[
-                    [
+                    next(
                         list(self._column_names.values()).index(value)
                         for value in list(self._column_names.values())
                         if name in value
-                    ][0]
+                    )
                 ]
             )
             for name in table.column_names
