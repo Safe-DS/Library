@@ -48,6 +48,10 @@ class Image:
         return self._image_tensor.size(dim=1)
 
     @property
+    def channel(self) -> int:
+        return self._image_tensor.size(dim=0)
+
+    @property
     def device(self) -> Device:
         return self._image_tensor.device
 
@@ -68,7 +72,12 @@ class Image:
                      device=self._image_tensor.device)
 
     def convert_to_grayscale(self) -> Image:
-        return Image(F2.rgb_to_grayscale(self._image_tensor[0:3], num_output_channels=3), device=self.device)
+        if self.channel == 4:
+            return Image(torch.cat(
+                [F2.rgb_to_grayscale(self._image_tensor[0:3], num_output_channels=3), self._image_tensor[3].unsqueeze(dim=0)]),
+                device=self.device)
+        else:
+            return Image(F2.rgb_to_grayscale(self._image_tensor[0:3], num_output_channels=3), device=self.device)
 
     def crop(self, x: int, y: int, width: int, height: int) -> Image:
         return Image(F2.crop(self._image_tensor, x, y, height, width), device=self.device)
@@ -89,7 +98,7 @@ class Image:
                 UserWarning,
                 stacklevel=2,
             )
-        if self._image_tensor.size(dim=0) == 4:
+        if self.channel == 4:
             return Image(torch.cat(
                 [F2.adjust_brightness(self._image_tensor[0:3], factor * 1.0), self._image_tensor[3].unsqueeze(dim=0)]),
                 device=self.device)
@@ -113,7 +122,7 @@ class Image:
                 UserWarning,
                 stacklevel=2,
             )
-        if self._image_tensor.size(dim=0) == 4:
+        if self.channel == 4:
             return Image(torch.cat(
                 [F2.adjust_contrast(self._image_tensor[0:3], factor * 1.0), self._image_tensor[3].unsqueeze(dim=0)]),
                 device=self.device)
@@ -136,7 +145,7 @@ class Image:
                 UserWarning,
                 stacklevel=2,
             )
-        if self._image_tensor.size(dim=0) == 4:
+        if self.channel == 4:
             return Image(torch.cat(
                 [F2.adjust_sharpness(self._image_tensor[0:3], factor * 1.0), self._image_tensor[3].unsqueeze(dim=0)]),
                 device=self.device)
@@ -144,7 +153,7 @@ class Image:
             return Image(F2.adjust_sharpness(self._image_tensor, factor * 1.0), device=self.device)
 
     def invert_colors(self) -> Image:
-        if self._image_tensor.size(dim=0) == 4:
+        if self.channel == 4:
             return Image(torch.cat(
                 [F2.invert(self._image_tensor[0:3]), self._image_tensor[3].unsqueeze(dim=0)]),
                 device=self.device)
