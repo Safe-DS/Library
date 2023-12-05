@@ -37,6 +37,8 @@ if TYPE_CHECKING:
     from safeds.data.tabular.transformation import InvertibleTableTransformer, TableTransformer
 
     from ._tagged_table import TaggedTable
+    
+    from ._time_series import TimeSeries
 
 # Enable copy-on-write for pandas dataframes
 pd.options.mode.copy_on_write = True
@@ -1715,7 +1717,43 @@ class Table:
         from ._tagged_table import TaggedTable
 
         return TaggedTable._from_table(self, target_name, feature_names)
+    
+    #rethink name here
+    def time_columns(self, target_name: str,time_name: str, feature_names: list[str] | None = None) -> TimeSeries:
+        """
+        Return a new `TimeSeries` with columns marked as a target and time column or feature columns.
 
+        The original table is not modified.
+
+        Parameters
+        ----------
+        target_name : str
+            Name of the target column.
+        time_name : str
+            Name of the time column.
+        feature_names : list[str] | None
+            Names of the feature columns. If None, all columns except the target column are used.
+
+        Returns
+        -------
+        time_series : TimeSeries
+            A new tagged table with the given target and feature names.
+
+        Raises
+        ------
+        ValueError
+            If the target column is also a feature column.
+        ValueError
+            If no feature columns are specified.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table, TimeSeries
+        >>> table = Table.from_dict({"time": ["01.01", "01.02", "01.03"], "price": [1.10, 1.19, 1.79], "amount_bought": [74, 72, 51]})
+        >>> tagged_table = table.tag_columns(target_name="amount_bought", feature_names=["item", "price"])
+        """
+        from ._time_series import TimeSeries
+        return  TimeSeries._from_table(self, target_name, time_name, feature_names)
     def transform_column(self, name: str, transformer: Callable[[Row], Any]) -> Table:
         """
         Return a new `Table` with the provided column transformed by calling the provided transformer.
