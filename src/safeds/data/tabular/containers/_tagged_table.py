@@ -3,7 +3,11 @@ from __future__ import annotations
 import copy
 from typing import TYPE_CHECKING
 
+import numpy as np
+import torch
+
 from safeds.data.tabular.containers import Column, Row, Table
+from torch.utils.data import Dataset, DataLoader
 from safeds.exceptions import (
     ColumnIsTargetError,
     IllegalSchemaModificationError,
@@ -849,3 +853,25 @@ class TaggedTable(Table):
             target_name=self.target.name,
             feature_names=self.features.column_names,
         )
+
+    def into_dataloader(self, batch_size=1) -> DataLoader:
+        feature_rows = self.features.to_rows()
+        all_rows = []
+        for row in feature_rows:
+            new_item = []
+            for column_name in row:
+                new_item.append(row.get_value(column_name))
+            all_rows.append(new_item.copy())
+        return DataLoader(dataset=CustomDataset(np.array(all_rows), np.array(self.target)), batch_size=batch_size)
+
+class CustomDataset(Dataset):
+    def __init__(self, features, target):
+        self.X = torch.from_numpy(features.astype(np.float32))
+        self.Y = torch.from_numpy(target.astype(np.float32))
+        self.len = self.X.shape[0]
+
+    def __getitem__(self, item):
+        return self.X[item], self.Y[item].unsqueeze(-1)
+
+    def __len__(self):
+        return self.len
