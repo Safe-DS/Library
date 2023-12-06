@@ -23,6 +23,7 @@ if TYPE_CHECKING:
 
 
 class TimeSeries(TaggedTable):
+    # Invarainte should be that a time is never a target or feature
     # target should always be an feature
     # date should never be an feature
     """
@@ -80,23 +81,28 @@ class TimeSeries(TaggedTable):
         >>> tagged_table = TaggedTable({"date": ["01.01", "01.02", "01.03", "01.04"], "col1": ["a", "b", "c", "a"]}, "col1" )
         >>> timeseries = TimeSeries._from_table(tagged_table, "date")
         """
+
         table = tagged_table._as_table()
+        #make sure that the time_name is not part of the features
+        result = object.__new__(TimeSeries)
+        feature_names = tagged_table.features.column_names
+        if time_name in feature_names:
+            feature_names.remove(time_name)
 
         #no need to validate the tagged table on tagged table specs
-        if time_name in tagged_table.features.column_names:
+        if time_name in feature_names:
             raise ValueError(f"Column '{time_name}' cannot be both time column and feature.")
         
         if time_name == tagged_table.target.name:
             raise ValueError(f"Column '{time_name}' cannot be both timecolumn and target.")
         
         
-        # Create Time Series Object
-        result = object.__new__(TimeSeries)
+
 
         result._data = table._data
         result._schema = table.schema
         result._time = table.get_column(time_name)
-        result._features = table.keep_only_columns(tagged_table.features.column_names)
+        result._features = table.keep_only_columns(feature_names)
         result._target = table.get_column(tagged_table.target.name)
         return result
 
@@ -135,9 +141,14 @@ class TimeSeries(TaggedTable):
         >>> table = Table({"date": ["01.01", "01.02", "01.03", "01.04"], "col1": ["a", "b", "c", "a"]})
         >>> timeseries = TimeSeries._from_table(table, "f1", "date", ["f1"])
         """
-
+        if feature_names is None:
+            feature_names = table.column_names
+            if time_name in feature_names:
+                feature_names.remove(time_name) 
+            if target_name in feature_names:
+                feature_names.remove(target_name)
         tagged_table = TaggedTable._from_table(table=table, target_name= target_name, feature_names=feature_names)
-
+        #check if time column got added as feature column
         return TimeSeries._from_tagged_table(tagged_table=tagged_table, time_name=time_name)
     
     # ------------------------------------------------------------------------------------------------------------------
@@ -179,12 +190,20 @@ class TimeSeries(TaggedTable):
         >>> from safeds.data.tabular.containers import TaggedTable
         >>> table = TaggedTable({"a": [1, 2, 3], "b": [4, 5, 6]}, "b", ["a"])
         """
-                
-        if time_name in feature_names:
-            raise ValueError(f"Date column '{time_name}' can not be an feature column.")
+        _data = Table(data)
+        # time sollte nicht in feature names sein auch wenn feature_names none ist
+        if feature_names is None:
+            feature_names = _data.column_names
+            if time_name in feature_names:
+                feature_names.remove(time_name) 
+            if target_name in feature_names:
+                feature_names.remove(target_name)
 
         super().__init__(data, target_name, feature_names)
-        _data = Table(data)
+
+      
+        if time_name in feature_names:
+            raise ValueError(f"Date column '{time_name}' can not be an feature column.")
 
         # Validate inputs
         if time_name not in (_data.column_names):
@@ -217,6 +236,25 @@ class TimeSeries(TaggedTable):
     # ------------------------------------------------------------------------------------------------------------------
     # Overriden methods from TaggedTable class:
     # ------------------------------------------------------------------------------------------------------------------
+    def _as_table(self: TimeSeries) -> Table:
+        """
+        Return a new `Table` with the tagging removed.
+
+        The original TaggedTable is not modified.
+
+        Parameters
+        ----------
+        self: TaggedTable
+            The TaggedTable.
+
+        Returns
+        -------
+        table: Table
+            The table as an untagged Table, i.e. without the information about which columns are features or target.
+
+        """
+        return Table.from_columns(super().to_columns())
+
     def add_column(self, column: Column) -> TimeSeries:
         """
         Return a new `TimeSeries` with the provided column attached at the end, as neither target nor feature column.
@@ -242,7 +280,7 @@ class TimeSeries(TaggedTable):
         """
         return TimeSeries._from_tagged_table(
             super().add_column(column),
-            time_name = self.time,
+            time_name = self.time.name,
         )
     def add_column_as_feature(self, column: Column) -> TimeSeries:
         """
@@ -269,5 +307,126 @@ class TimeSeries(TaggedTable):
         """
         return TimeSeries._from_tagged_table(
             super().add_column_as_feature(column),
+            time_name= self.time.name,)
+    
+    def add_columns_as_features(self, columns: list[Column] | Table) -> TimeSeries:
+        """
+        Return a new `TimeSeries` with the provided columns attached at the end, as feature columns.
+
+        The original time series is not modified.
+
+        Parameters
+        ----------
+        columns : list[Column] | Table
+            The columns to be added as features.
+
+        Returns
+        -------
+        result : TimeSeries
+            The time series with the attached feature columns.
+
+        Raises
+        ------
+        DuplicateColumnNameError
+            If any of the new feature columns already exist.
+        ColumnSizeError
+            If the size of any feature column does not match the number of rows.
+        """
+        return TimeSeries._from_tagged_table(
+            super().add_columns_as_features(columns),
+            time_name= self.time.name,)
+    
+    def add_columns(self, columns: list[Column] | Table) -> TimeSeries:
+        """
+        Return a new `TimeSeries` with multiple added columns, as neither target nor feature columns.
+
+        The original table is not modified.
+
+        Parameters
+        ----------
+        columns : list[Column] or Table
+            The columns to be added.
+
+        Returns
+        -------
+        result: TimeSeries
+            A new time series combining the original table and the given columns as neither target nor feature columns.
+
+        Raises
+        ------
+        DuplicateColumnNameError
+            If at least one column name from the provided column list already exists in the table.
+        ColumnSizeError
+            If at least one of the column sizes from the provided column list does not match the table.
+        """
+        return TimeSeries._from_tagged_table(
+            super().add_columns(columns),
+            time_name = self.time.name,
+        )
+    def add_row(self, row: Row) -> TimeSeries:
+        """
+        Return a new `TimeSeries` with an added Row attached.
+
+        The original table is not modified.
+
+        Parameters
+        ----------
+        row : Row
+            The row to be added.
+
+        Returns
+        -------
+        table : TimeSeries
+            A new time series with the added row at the end.
+
+        Raises
+        ------
+        UnknownColumnNameError
+            If the row has different column names than the table.
+        """
+        return TimeSeries._from_tagged_table(super().add_row(row), 
+                                             time_name= self.time.name)
+    
+    def add_rows(self, rows: list[Row] | Table) -> TimeSeries:
+        """
+        Return a new `TimeSeries` with multiple added Rows attached.
+
+        The original table is not modified.
+
+        Parameters
+        ----------
+        rows : list[Row] or Table
+            The rows to be added.
+
+        Returns
+        -------
+        result : TimeSeries
+            A new time series which combines the original table and the given rows.
+
+        Raises
+        ------
+        UnknownColumnNameError
+            If at least one of the rows have different column names than the table.
+        """
+        return TimeSeries._from_tagged_table(super().add_rows(rows),
+                                        time_name = self.time.name)
+    def filter_rows(self, query: Callable[[Row], bool]) -> TimeSeries:
+        """
+        Return a new `TimeSeries` containing only rows that match the given Callable (e.g. lambda function).
+
+        The original time series is not modified.
+
+        Parameters
+        ----------
+        query : lambda function
+            A Callable that is applied to all rows.
+
+        Returns
+        -------
+        result: TimeSeries
+            A time series containing only the rows to match the query.
+        """
+        return TimeSeries._from_tagged_table(
+            super().filter_rows(query),
             time_name= self.time.name,
         )
