@@ -67,6 +67,7 @@ class TestFromBytes:
         ids=["white_square-jpg", "white_square-png"]
     )
     def test_should_write_and_load_bytes_jpeg(self, resource_path: str | Path, device: Device) -> None:
+        _skip_if_device_not_available(device)
         image = Image.from_file(resolve_resource_path(resource_path), device)
         image_copy = Image.from_bytes(image._repr_jpeg_(), device)
         assert image == image_copy
@@ -83,6 +84,7 @@ class TestFromBytes:
         ids=["plane-jpg", "plane-png", "rgba-png", "white_square-jpg", "white_square-png"]
     )
     def test_should_write_and_load_bytes_png(self, resource_path: str | Path, device: Device) -> None:
+        _skip_if_device_not_available(device)
         image = Image.from_file(resolve_resource_path(resource_path), device)
         image_copy = Image.from_bytes(image._repr_png_(), device)
         assert image == image_copy
@@ -102,6 +104,7 @@ class TestReprJpeg:
         ids=["plane-jpg", "white_square-jpg", "white_square-png"]
     )
     def test_should_return_bytes(self, resource_path: str | Path, device: Device) -> None:
+        _skip_if_device_not_available(device)
         image = Image.from_file(resolve_resource_path(resource_path), device)
         assert isinstance(image._repr_jpeg_(), bytes)
 
@@ -114,6 +117,7 @@ class TestReprJpeg:
         ids=["plane-png", "rgba-png"]
     )
     def test_should_raise_if_image_has_alpha_channel(self, resource_path: str | Path, device: Device) -> None:
+        _skip_if_device_not_available(device)
         image = Image.from_file(resolve_resource_path(resource_path), device)
         with pytest.raises(IllegalFormatError, match=r"This format is illegal. The image has an alpha channel which "
                                                      r"cannot be displayed in jpeg format. Use one of the following "
@@ -137,6 +141,7 @@ class TestReprPng:
         ids=["plane-jpg", "plane-png", "rgba-png", "white_square-jpg", "white_square-png"]
     )
     def test_should_return_bytes(self, resource_path: str | Path, device: Device) -> None:
+        _skip_if_device_not_available(device)
         image = Image.from_file(resolve_resource_path(resource_path), device)
         assert isinstance(image._repr_png_(), bytes)
 
