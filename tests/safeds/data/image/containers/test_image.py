@@ -70,7 +70,10 @@ class TestFromBytes:
     def test_should_write_and_load_bytes_jpeg(self, resource_path: str | Path, device: Device) -> None:
         _skip_if_device_not_available(device)
         image = Image.from_file(resolve_resource_path(resource_path), device)
-        image_copy = Image.from_bytes(bytes(image._repr_jpeg_()), device)
+        repr_jpeg = image._repr_jpeg_()
+        if repr_jpeg is None:
+            assert False  # Linter fix; should always be not None
+        image_copy = Image.from_bytes(repr_jpeg, device)
         assert image == image_copy
 
     @pytest.mark.parametrize(
