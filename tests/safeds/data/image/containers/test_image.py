@@ -56,6 +56,40 @@ class TestFromFile:
 @pytest.mark.parametrize(
     "device", _test_devices(), ids=_test_devices_ids()
 )
+class TestFromBytes:
+    @pytest.mark.parametrize(
+        "resource_path",
+        [
+            "image/white_square.jpg",
+            "image/white_square.png"
+        ],
+        ids=["white_square-jpg", "white_square-png"]
+    )
+    def test_should_write_and_load_bytes_jpeg(self, resource_path: str | Path, device) -> None:
+        image = Image.from_file(resolve_resource_path(resource_path), device)
+        image_copy = Image.from_bytes(image._repr_jpeg_(), device)
+        assert image == image_copy
+
+    @pytest.mark.parametrize(
+        "resource_path",
+        [
+            "image/plane.jpg",
+            "image/plane.png",
+            "image/rgba.png",
+            "image/white_square.jpg",
+            "image/white_square.png"
+        ],
+        ids=["plane-jpg", "plane-png", "rgba-png", "white_square-jpg", "white_square-png"]
+    )
+    def test_should_write_and_load_bytes_png(self, resource_path: str | Path, device) -> None:
+        image = Image.from_file(resolve_resource_path(resource_path), device)
+        image_copy = Image.from_bytes(image._repr_png_(), device)
+        assert image == image_copy
+
+
+@pytest.mark.parametrize(
+    "device", _test_devices(), ids=_test_devices_ids()
+)
 class TestReprJpeg:
     @pytest.mark.parametrize(
         "resource_path",

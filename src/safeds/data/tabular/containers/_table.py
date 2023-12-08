@@ -15,8 +15,7 @@ import seaborn as sns
 from pandas import DataFrame
 from scipy import stats
 
-from safeds.data.image.containers import ImagePil
-from safeds.data.image.typing import ImageFormat
+from safeds.data.image.containers import Image
 from safeds.data.tabular.typing import ColumnType, Schema
 from safeds.exceptions import (
     ColumnLengthMismatchError,
@@ -1833,13 +1832,13 @@ class Table:
     # Plotting
     # ------------------------------------------------------------------------------------------------------------------
 
-    def plot_correlation_heatmap(self) -> ImagePil:
+    def plot_correlation_heatmap(self) -> Image:
         """
         Plot a correlation heatmap for all numerical columns of this `Table`.
 
         Returns
         -------
-        plot: ImagePil
+        plot: Image
             The plot as an image.
 
         Examples
@@ -1890,9 +1889,9 @@ class Table:
         fig.savefig(buffer, format="png")
         plt.close()  # Prevents the figure from being displayed directly
         buffer.seek(0)
-        return ImagePil(buffer, format_=ImageFormat.PNG)
+        return Image.from_bytes(buffer.read())
 
-    def plot_lineplot(self, x_column_name: str, y_column_name: str) -> ImagePil:
+    def plot_lineplot(self, x_column_name: str, y_column_name: str) -> Image:
         """
         Plot two columns against each other in a lineplot.
 
@@ -1908,7 +1907,7 @@ class Table:
 
         Returns
         -------
-        plot: ImagePil
+        plot: Image
             The plot as an image.
 
         Raises
@@ -1951,9 +1950,9 @@ class Table:
         fig.savefig(buffer, format="png")
         plt.close()  # Prevents the figure from being displayed directly
         buffer.seek(0)
-        return ImagePil(buffer, format_=ImageFormat.PNG)
+        return Image.from_bytes(buffer.read())
 
-    def plot_scatterplot(self, x_column_name: str, y_column_name: str) -> ImagePil:
+    def plot_scatterplot(self, x_column_name: str, y_column_name: str) -> Image:
         """
         Plot two columns against each other in a scatterplot.
 
@@ -1966,7 +1965,7 @@ class Table:
 
         Returns
         -------
-        plot: ImagePil
+        plot: Image
             The plot as an image.
 
         Raises
@@ -2009,15 +2008,15 @@ class Table:
         fig.savefig(buffer, format="png")
         plt.close()  # Prevents the figure from being displayed directly
         buffer.seek(0)
-        return ImagePil(buffer, format_=ImageFormat.PNG)
+        return Image.from_bytes(buffer.read())
 
-    def plot_boxplots(self) -> ImagePil:
+    def plot_boxplots(self) -> Image:
         """
         Plot a boxplot for every numerical column.
 
         Returns
         -------
-        plot: ImagePil
+        plot: Image
             The plot as an image.
 
         Raises
@@ -2056,15 +2055,15 @@ class Table:
         fig.savefig(buffer, format="png")
         plt.close()  # Prevents the figure from being displayed directly
         buffer.seek(0)
-        return ImagePil(buffer, format_=ImageFormat.PNG)
+        return Image.from_bytes(buffer.read())
 
-    def plot_histograms(self) -> ImagePil:
+    def plot_histograms(self) -> Image:
         """
         Plot a histogram for every column.
 
         Returns
         -------
-        plot: ImagePil
+        plot: Image
             The plot as an image.
 
         Examples
@@ -2091,7 +2090,7 @@ class Table:
         fig.savefig(buffer, format="png")
         plt.close()
         buffer.seek(0)
-        return ImagePil(buffer, ImageFormat.PNG)
+        return Image.from_bytes(buffer.read())
 
     # ------------------------------------------------------------------------------------------------------------------
     # Conversion

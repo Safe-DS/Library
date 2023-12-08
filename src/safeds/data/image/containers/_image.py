@@ -52,6 +52,29 @@ class Image:
         """
         return Image(image_tensor=Image._pil_to_tensor(pil_image_open(path)), device=device)
 
+    @staticmethod
+    def from_bytes(data: bytes, device: Device = _default_device):
+        """
+        Create an image from bytes.
+
+        Parameters
+        ----------
+        data : bytes
+            The data of the image.
+        device: Device
+            The device where the tensor will be saved on. Defaults to the default device
+
+        Returns
+        -------
+        image : Image
+            The image.
+        """
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", message="The given buffer is not writable, and PyTorch does not support "
+                                                      "non-writable tensors.")
+            input_tensor = torch.frombuffer(data, dtype=torch.uint8)
+        return Image(image_tensor=torchvision.io.decode_image(input_tensor), device=device)
+
     def __init__(self, image_tensor: Tensor, device: Device = _default_device) -> None:
         self._image_tensor: Tensor = image_tensor.to(device)
 
