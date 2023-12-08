@@ -6,7 +6,7 @@ This document describes how to configure and use your development environment.
 
 You must complete these steps once before you can start setting up the project itself:
 
-1. Install [Python 3.10](https://www.python.org/downloads/).
+1. Install [Python 3.11](https://www.python.org/downloads/).
 2. Verify that `python` can be launched by running this command in a **new** terminal:
     ```shell
     python --version

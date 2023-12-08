@@ -21,8 +21,8 @@ nav:
   - Development:
     - Environment: development/environment.md
     - Project Guidelines: development/project_guidelines.md
-    - Contributing: https://github.com/Safe-DS/Library/contribute
     - Code Review Guide: development/code_review.md
+    - Contributing 🌐: https://github.com/Safe-DS/Library/contribute
 
 # Configuration of MkDocs & Material for MkDocs --------------------------------
 
