@@ -6,7 +6,7 @@ import pytest
 import torch
 from safeds.data.image.containers import Image
 from safeds.data.tabular.containers import Table
-from safeds.exceptions import OutOfBoundsError, IllegalFormatError
+from safeds.exceptions import IllegalFormatError, OutOfBoundsError
 from syrupy import SnapshotAssertion
 from torch.types import Device
 
@@ -156,7 +156,9 @@ class TestToJpegFile:
         image = Image.from_file(resolve_resource_path(resource_path), device)
         with NamedTemporaryFile(suffix=".jpg") as tmp_jpeg_file:
             tmp_jpeg_file.close()
-            with Path(tmp_jpeg_file.name).open("w", encoding="utf-8") as tmp_file, pytest.raises(IllegalFormatError, match=r"This format is illegal. Use one of the following formats: png"):
+            with Path(tmp_jpeg_file.name).open("w", encoding="utf-8") as tmp_file, pytest.raises(
+                IllegalFormatError, match=r"This format is illegal. Use one of the following formats: png",
+            ):
                 image.to_jpeg_file(tmp_file.name)
 
 
