@@ -2,11 +2,10 @@ from typing import Any
 
 import matplotlib as mpl
 import pytest
+from safeds.data.image.containers import Image
 from syrupy import SnapshotAssertion
 from syrupy.extensions.single_file import SingleFileSnapshotExtension
 from syrupy.types import SerializedData
-
-from safeds.data.image.containers import Image
 
 # Fix for failures when running pytest in a terminal (https://github.com/Safe-DS/Library/issues/482)
 mpl.use("agg")

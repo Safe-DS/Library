@@ -5,6 +5,7 @@ from safeds.exceptions._data import (
     ColumnLengthMismatchError,
     ColumnSizeError,
     DuplicateColumnNameError,
+    IllegalFormatError,
     IllegalSchemaModificationError,
     IndexOutOfBoundsError,
     MissingValuesColumnError,
@@ -13,7 +14,6 @@ from safeds.exceptions._data import (
     UnknownColumnNameError,
     ValueNotPresentWhenFittedError,
     WrongFileExtensionError,
-    IllegalFormatError,
 )
 from safeds.exceptions._generic import (
     Bound,

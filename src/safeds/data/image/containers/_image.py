@@ -3,7 +3,7 @@ from __future__ import annotations
 import io
 import warnings
 from pathlib import Path
-from typing import Any, TYPE_CHECKING
+from typing import TYPE_CHECKING
 
 import torch
 import torch.nn.functional as func
@@ -17,10 +17,11 @@ import torchvision
 # Disables torchvision V2 beta warnings
 # Disabled because of RUFF Linter E402 (Module level import not at top of file)
 # torchvision.disable_beta_transforms_warning()
-from torchvision.transforms.v2 import PILToTensor, functional as func2
+from torchvision.transforms.v2 import PILToTensor
+from torchvision.transforms.v2 import functional as func2
 from torchvision.utils import save_image
 
-from safeds.exceptions import OutOfBoundsError, ClosedBound, IllegalFormatError
+from safeds.exceptions import ClosedBound, IllegalFormatError, OutOfBoundsError
 
 
 class Image:
@@ -73,8 +74,9 @@ class Image:
             The image.
         """
         with warnings.catch_warnings():
-            warnings.filterwarnings("ignore", message="The given buffer is not writable, and PyTorch does not support "
-                                                      "non-writable tensors.")
+            warnings.filterwarnings(
+                "ignore", message="The given buffer is not writable, and PyTorch does not support non-writable tensors.",
+            )
             input_tensor = torch.frombuffer(data, dtype=torch.uint8)
         return Image(image_tensor=torchvision.io.decode_image(input_tensor), device=device)
 
@@ -201,7 +203,7 @@ class Image:
         """
         return Image(self._image_tensor, device)
 
-    def __eq__(self, other: Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         """
         Compare two images.
 
@@ -216,8 +218,10 @@ class Image:
         """
         if not isinstance(other, Image):
             return NotImplemented
-        return self._image_tensor.size() == other._image_tensor.size() and torch.all(
-            torch.eq(self._image_tensor, other.set_device(self.device)._image_tensor)).item()
+        return (
+            self._image_tensor.size() == other._image_tensor.size()
+            and torch.all(torch.eq(self._image_tensor, other.set_device(self.device)._image_tensor)).item()
+        )
 
     def resize(self, new_width: int, new_height: int) -> Image:
         """
@@ -230,8 +234,10 @@ class Image:
         result : Image
             The image with the given width and height.
         """
-        return Image(func.interpolate(self._image_tensor.unsqueeze(dim=1), size=(new_height, new_width)).squeeze(dim=1),
-                     device=self._image_tensor.device)
+        return Image(
+            func.interpolate(self._image_tensor.unsqueeze(dim=1), size=(new_height, new_width)).squeeze(dim=1),
+            device=self._image_tensor.device,
+        )
 
     def convert_to_grayscale(self) -> Image:
         """
@@ -245,10 +251,13 @@ class Image:
             The grayscale image.
         """
         if self.channel == 4:
-            return Image(torch.cat(
-                [func2.rgb_to_grayscale(self._image_tensor[0:3], num_output_channels=3),
-                 self._image_tensor[3].unsqueeze(dim=0)]),
-                device=self.device)
+            return Image(
+                torch.cat([
+                    func2.rgb_to_grayscale(self._image_tensor[0:3], num_output_channels=3),
+                    self._image_tensor[3].unsqueeze(dim=0),
+                ]),
+                device=self.device,
+            )
         else:
             return Image(func2.rgb_to_grayscale(self._image_tensor[0:3], num_output_channels=3), device=self.device)
 
@@ -332,10 +341,13 @@ class Image:
                 stacklevel=2,
             )
         if self.channel == 4:
-            return Image(torch.cat(
-                [func2.adjust_brightness(self._image_tensor[0:3], factor * 1.0),
-                 self._image_tensor[3].unsqueeze(dim=0)]),
-                device=self.device)
+            return Image(
+                torch.cat([
+                    func2.adjust_brightness(self._image_tensor[0:3], factor * 1.0),
+                    self._image_tensor[3].unsqueeze(dim=0),
+                ]),
+                device=self.device,
+            )
         else:
             return Image(func2.adjust_brightness(self._image_tensor, factor * 1.0), device=self.device)
 
@@ -364,7 +376,8 @@ class Image:
             raise OutOfBoundsError(standard_deviation, name="standard_deviation", lower_bound=ClosedBound(0))
         return Image(
             self._image_tensor + torch.normal(0, standard_deviation, self._image_tensor.size()).to(self.device) * 255,
-            device=self.device)
+            device=self.device,
+        )
 
     def adjust_contrast(self, factor: float) -> Image:
         """
@@ -399,9 +412,12 @@ class Image:
                 stacklevel=2,
             )
         if self.channel == 4:
-            return Image(torch.cat(
-                [func2.adjust_contrast(self._image_tensor[0:3], factor * 1.0), self._image_tensor[3].unsqueeze(dim=0)]),
-                device=self.device)
+            return Image(
+                torch.cat([
+                    func2.adjust_contrast(self._image_tensor[0:3], factor * 1.0), self._image_tensor[3].unsqueeze(dim=0),
+                ]),
+                device=self.device,
+            )
         else:
             return Image(func2.adjust_contrast(self._image_tensor, factor * 1.0), device=self.device)
 
@@ -460,10 +476,13 @@ class Image:
                 stacklevel=2,
             )
         if self.channel == 4:
-            return Image(torch.cat(
-                [func2.adjust_sharpness(self._image_tensor[0:3], factor * 1.0),
-                 self._image_tensor[3].unsqueeze(dim=0)]),
-                device=self.device)
+            return Image(
+                torch.cat([
+                    func2.adjust_sharpness(self._image_tensor[0:3], factor * 1.0),
+                    self._image_tensor[3].unsqueeze(dim=0),
+                ]),
+                device=self.device,
+            )
         else:
             return Image(func2.adjust_sharpness(self._image_tensor, factor * 1.0), device=self.device)
 
@@ -479,9 +498,10 @@ class Image:
             The image with inverted colors.
         """
         if self.channel == 4:
-            return Image(torch.cat(
-                [func2.invert(self._image_tensor[0:3]), self._image_tensor[3].unsqueeze(dim=0)]),
-                device=self.device)
+            return Image(
+                torch.cat([func2.invert(self._image_tensor[0:3]), self._image_tensor[3].unsqueeze(dim=0)]),
+                device=self.device,
+            )
         else:
             return Image(func2.invert(self._image_tensor), device=self.device)
 
