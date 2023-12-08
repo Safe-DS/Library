@@ -75,7 +75,8 @@ class Image:
         """
         with warnings.catch_warnings():
             warnings.filterwarnings(
-                "ignore", message="The given buffer is not writable, and PyTorch does not support non-writable tensors.",
+                "ignore",
+                message="The given buffer is not writable, and PyTorch does not support non-writable tensors.",
             )
             input_tensor = torch.frombuffer(data, dtype=torch.uint8)
         return Image(image_tensor=torchvision.io.decode_image(input_tensor), device=device)
@@ -414,7 +415,8 @@ class Image:
         if self.channel == 4:
             return Image(
                 torch.cat([
-                    func2.adjust_contrast(self._image_tensor[0:3], factor * 1.0), self._image_tensor[3].unsqueeze(dim=0),
+                    func2.adjust_contrast(self._image_tensor[0:3], factor * 1.0),
+                    self._image_tensor[3].unsqueeze(dim=0),
                 ]),
                 device=self.device,
             )

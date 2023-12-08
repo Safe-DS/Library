@@ -151,7 +151,12 @@ class TestProperties:
         ids=["[3,1,1].jpg", "[4,568,320].png", "[4,568,320].png"],
     )
     def test_should_return_image_properties(
-        self, resource_path: str, width: int, height: int, channel: int, device: Device,
+        self,
+        resource_path: str,
+        width: int,
+        height: int,
+        channel: int,
+        device: Device,
     ) -> None:
         _skip_if_device_not_available(device)
         image = Image.from_file(resolve_resource_path(resource_path), device)
@@ -256,7 +261,12 @@ class TestResize:
         ids=["(2, 3)", "(700, 400)"],
     )
     def test_should_return_resized_image(
-        self, resource_path: str, new_width: int, new_height: int, snapshot_png: SnapshotAssertion, device: Device,
+        self,
+        resource_path: str,
+        new_width: int,
+        new_height: int,
+        snapshot_png: SnapshotAssertion,
+        device: Device,
     ) -> None:
         _skip_if_device_not_available(device)
         image = Image.from_file(resolve_resource_path(resource_path), device)
@@ -305,7 +315,10 @@ class TestCrop:
         ids=["crop", "crop-transparent"],
     )
     def test_should_return_cropped_image(
-        self, resource_path: str, snapshot_png: SnapshotAssertion, device: Device,
+        self,
+        resource_path: str,
+        snapshot_png: SnapshotAssertion,
+        device: Device,
     ) -> None:
         _skip_if_device_not_available(device)
         image = Image.from_file(resolve_resource_path(resource_path), device)
@@ -335,7 +348,10 @@ class TestFlipVertically:
 class TestFlipHorizontally:
     @pytest.mark.parametrize("resource_path", ["image/plane.png", "image/rgba.png"], ids=["opaque", "transparent"])
     def test_should_flip_horizontally(
-        self, resource_path: str, snapshot_png: SnapshotAssertion, device: Device,
+        self,
+        resource_path: str,
+        snapshot_png: SnapshotAssertion,
+        device: Device,
     ) -> None:
         _skip_if_device_not_available(device)
         image = Image.from_file(resolve_resource_path(resource_path), device)
@@ -390,7 +406,11 @@ class TestAddNoise:
         ids=["minimum noise", "some noise", "very noisy"],
     )
     def test_should_add_noise(
-        self, resource_path: str, standard_deviation: float, snapshot_png: SnapshotAssertion, device: Device,
+        self,
+        resource_path: str,
+        standard_deviation: float,
+        snapshot_png: SnapshotAssertion,
+        device: Device,
     ) -> None:
         _skip_if_device_not_available(device)
         torch.manual_seed(0)
@@ -404,7 +424,10 @@ class TestAddNoise:
         ids=["sigma below zero"],
     )
     def test_should_raise_standard_deviation(
-        self, resource_path: str, standard_deviation: float, device: Device,
+        self,
+        resource_path: str,
+        standard_deviation: float,
+        device: Device,
     ) -> None:
         _skip_if_device_not_available(device)
         image = Image.from_file(resolve_resource_path(resource_path), device)
@@ -444,7 +467,10 @@ class TestBlur:
         ids=["blur"],
     )
     def test_should_return_blurred_image(
-        self, resource_path: str, snapshot_png: SnapshotAssertion, device: Device,
+        self,
+        resource_path: str,
+        snapshot_png: SnapshotAssertion,
+        device: Device,
     ) -> None:
         _skip_if_device_not_available(device)
         image = Image.from_file(resolve_resource_path(resource_path), device=device)
@@ -503,7 +529,10 @@ class TestRotate:
         ids=["rotate-clockwise", "rotate-clockwise-transparent"],
     )
     def test_should_return_clockwise_rotated_image(
-        self, resource_path: str, snapshot_png: SnapshotAssertion, device: Device,
+        self,
+        resource_path: str,
+        snapshot_png: SnapshotAssertion,
+        device: Device,
     ) -> None:
         _skip_if_device_not_available(device)
         image = Image.from_file(resolve_resource_path(resource_path), device)
@@ -519,7 +548,10 @@ class TestRotate:
         ids=["rotate-counter-clockwise", "rotate-counter-clockwise-transparent"],
     )
     def test_should_return_counter_clockwise_rotated_image(
-        self, resource_path: str, snapshot_png: SnapshotAssertion, device: Device,
+        self,
+        resource_path: str,
+        snapshot_png: SnapshotAssertion,
+        device: Device,
     ) -> None:
         _skip_if_device_not_available(device)
         image = Image.from_file(resolve_resource_path(resource_path), device)
