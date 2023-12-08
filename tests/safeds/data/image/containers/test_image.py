@@ -6,7 +6,7 @@ from syrupy import SnapshotAssertion
 
 from safeds.data.image.containers import Image
 from safeds.data.tabular.containers import Table
-from safeds.exceptions import OutOfBoundsError
+from safeds.exceptions import OutOfBoundsError, IllegalFormatError
 from tests.helpers import resolve_resource_path
 
 _device_cuda = torch.device("cuda")
@@ -51,6 +51,59 @@ class TestFromFile:
         _skip_if_device_not_available(device)
         with pytest.raises(FileNotFoundError):
             Image.from_file(resolve_resource_path(resource_path), device)
+
+
+@pytest.mark.parametrize(
+    "device", _test_devices(), ids=_test_devices_ids()
+)
+class TestReprJpeg:
+    @pytest.mark.parametrize(
+        "resource_path",
+        [
+            "image/plane.jpg",
+            "image/white_square.jpg",
+            "image/white_square.png"
+        ],
+        ids=["plane-jpg", "white_square-jpg", "white_square-png"]
+    )
+    def test_should_return_bytes(self, resource_path: str | Path, device) -> None:
+        image = Image.from_file(resolve_resource_path(resource_path), device)
+        assert isinstance(image._repr_jpeg_(), bytes)
+
+    @pytest.mark.parametrize(
+        "resource_path",
+        [
+            "image/plane.png",
+            "image/rgba.png",
+        ],
+        ids=["plane-png", "rgba-png"]
+    )
+    def test_should_raise_if_image_has_alpha_channel(self, resource_path: str | Path, device) -> None:
+        image = Image.from_file(resolve_resource_path(resource_path), device)
+        with pytest.raises(IllegalFormatError, match=r"This format is illegal. The image has an alpha channel which "
+                                                     r"cannot be displayed in jpeg format. Use one of the following "
+                                                     r"formats: png"):
+            image._repr_jpeg_()
+
+
+@pytest.mark.parametrize(
+    "device", _test_devices(), ids=_test_devices_ids()
+)
+class TestReprPng:
+    @pytest.mark.parametrize(
+        "resource_path",
+        [
+            "image/plane.jpg",
+            "image/plane.png",
+            "image/rgba.png",
+            "image/white_square.jpg",
+            "image/white_square.png"
+        ],
+        ids=["plane-jpg", "plane-png", "rgba-png", "white_square-jpg", "white_square-png"]
+    )
+    def test_should_return_bytes(self, resource_path: str | Path, device) -> None:
+        image = Image.from_file(resolve_resource_path(resource_path), device)
+        assert isinstance(image._repr_png_(), bytes)
 
 
 @pytest.mark.parametrize(
@@ -352,7 +405,7 @@ class TestBrightness:
 @pytest.mark.parametrize(
     "device", _test_devices(), ids=_test_devices_ids()
 )
-class TestAddGaussianNoise:
+class TestAddNoise:
     @pytest.mark.parametrize(
         ("resource_path", "standard_deviation"),
         [
@@ -367,7 +420,7 @@ class TestAddGaussianNoise:
         _skip_if_device_not_available(device)
         torch.manual_seed(0)
         image = Image.from_file(resolve_resource_path(resource_path), device)
-        image_noise = image.add_gaussian_noise(standard_deviation)
+        image_noise = image.add_noise(standard_deviation)
         assert image_noise == snapshot_png
 
     @pytest.mark.parametrize(
@@ -382,7 +435,7 @@ class TestAddGaussianNoise:
             match=rf"standard_deviation \(={standard_deviation}\) is not inside \[0, \u221e\)\.",
         ):
             image = Image.from_file(resolve_resource_path(resource_path), device)
-            image.add_gaussian_noise(standard_deviation)
+            image.add_noise(standard_deviation)
 
 
 @pytest.mark.parametrize(

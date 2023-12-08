@@ -13,6 +13,7 @@ from safeds.exceptions._data import (
     UnknownColumnNameError,
     ValueNotPresentWhenFittedError,
     WrongFileExtensionError,
+    IllegalFormatError,
 )
 from safeds.exceptions._generic import (
     Bound,
@@ -46,6 +47,7 @@ __all__ = [
     "UnknownColumnNameError",
     "ValueNotPresentWhenFittedError",
     "WrongFileExtensionError",
+    "IllegalFormatError",
     # ML exceptions
     "DatasetContainsTargetError",
     "DatasetMissesDataError",
