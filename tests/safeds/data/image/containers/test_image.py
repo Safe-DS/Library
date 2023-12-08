@@ -1,12 +1,9 @@
 from pathlib import Path
-from typing import TYPE_CHECKING
 
 import pytest
 import torch
 from syrupy import SnapshotAssertion
-
-if TYPE_CHECKING:
-    from torch.types import Device
+from torch.types import Device
 
 from safeds.data.image.containers import Image
 from safeds.data.tabular.containers import Table
@@ -208,7 +205,7 @@ class TestEQ:
     @pytest.mark.parametrize(
         "device", _test_devices(), ids=_test_devices_ids()
     )
-    def test_should_not_be_equal(self, device) -> None:
+    def test_should_not_be_equal(self, device: Device) -> None:
         _skip_if_device_not_available(device)
         image = Image.from_file(resolve_resource_path("image/plane.png"), device)
         image2 = Image.from_file(resolve_resource_path("image/white_square.png"), device)
@@ -297,7 +294,7 @@ class TestResize:
 
 class TestDevices:
 
-    def test_should_change_device(self):
+    def test_should_change_device(self) -> None:
         _skip_if_device_not_available(_device_cuda)
         image = Image.from_file(resolve_resource_path("image/plane.png"), torch.device("cpu"))
         new_device = torch.device("cuda", 0)
