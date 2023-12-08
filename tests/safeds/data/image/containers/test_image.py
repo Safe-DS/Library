@@ -1,10 +1,11 @@
 from pathlib import Path
+from tempfile import NamedTemporaryFile
 
 import pytest
 import torch
 from safeds.data.image.containers import Image
 from safeds.data.tabular.containers import Table
-from safeds.exceptions import OutOfBoundsError
+from safeds.exceptions import OutOfBoundsError, IllegalFormatError
 from syrupy import SnapshotAssertion
 from torch.types import Device
 
@@ -69,7 +70,7 @@ class TestFromBytes:
     def test_should_write_and_load_bytes_jpeg(self, resource_path: str | Path, device: Device) -> None:
         _skip_if_device_not_available(device)
         image = Image.from_file(resolve_resource_path(resource_path), device)
-        image_copy = Image.from_bytes(image._repr_jpeg_(), device)
+        image_copy = Image.from_bytes(bytes(image._repr_jpeg_()), device)
         assert image == image_copy
 
     @pytest.mark.parametrize(
@@ -121,6 +122,60 @@ class TestReprPng:
         _skip_if_device_not_available(device)
         image = Image.from_file(resolve_resource_path(resource_path), device)
         assert isinstance(image._repr_png_(), bytes)
+
+
+@pytest.mark.parametrize("device", _test_devices(), ids=_test_devices_ids())
+class TestToJpegFile:
+    @pytest.mark.parametrize(
+        "resource_path",
+        ["image/white_square.jpg", "image/white_square.png"],
+        ids=["white_square-jpg", "white_square-png"],
+    )
+    def test_should_save_file(self, resource_path: str | Path, device: Device) -> None:
+        _skip_if_device_not_available(device)
+        image = Image.from_file(resolve_resource_path(resource_path), device)
+        with NamedTemporaryFile(suffix=".jpg") as tmp_jpeg_file:
+            tmp_jpeg_file.close()
+            with Path(tmp_jpeg_file.name).open("w", encoding="utf-8") as tmp_file:
+                image.to_jpeg_file(tmp_file.name)
+            with Path(tmp_jpeg_file.name).open("r", encoding="utf-8") as tmp_file:
+                image_r = Image.from_file(tmp_file.name)
+        assert image == image_r
+
+    @pytest.mark.parametrize(
+        "resource_path",
+        [
+            "image/plane.png",
+            "image/rgba.png",
+        ],
+        ids=["plane-png", "rgba-png"],
+    )
+    def test_should_raise_if_image_has_alpha_channel(self, resource_path: str | Path, device: Device) -> None:
+        _skip_if_device_not_available(device)
+        image = Image.from_file(resolve_resource_path(resource_path), device)
+        with NamedTemporaryFile(suffix=".jpg") as tmp_jpeg_file:
+            tmp_jpeg_file.close()
+            with Path(tmp_jpeg_file.name).open("w", encoding="utf-8") as tmp_file, pytest.raises(IllegalFormatError, match=r"This format is illegal. Use one of the following formats: png"):
+                image.to_jpeg_file(tmp_file.name)
+
+
+@pytest.mark.parametrize("device", _test_devices(), ids=_test_devices_ids())
+class TestToPngFile:
+    @pytest.mark.parametrize(
+        "resource_path",
+        ["image/plane.jpg", "image/plane.png", "image/rgba.png", "image/white_square.jpg", "image/white_square.png"],
+        ids=["plane-jpg", "plane-png", "rgba-png", "white_square-jpg", "white_square-png"],
+    )
+    def test_should_save_file(self, resource_path: str | Path, device: Device) -> None:
+        _skip_if_device_not_available(device)
+        image = Image.from_file(resolve_resource_path(resource_path), device)
+        with NamedTemporaryFile(suffix=".png") as tmp_png_file:
+            tmp_png_file.close()
+            with Path(tmp_png_file.name).open("w", encoding="utf-8") as tmp_file:
+                image.to_png_file(tmp_file.name)
+            with Path(tmp_png_file.name).open("r", encoding="utf-8") as tmp_file:
+                image_r = Image.from_file(tmp_file.name)
+        assert image == image_r
 
 
 @pytest.mark.parametrize("device", _test_devices(), ids=_test_devices_ids())

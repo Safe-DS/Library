@@ -21,7 +21,7 @@ from torchvision.transforms.v2 import PILToTensor
 from torchvision.transforms.v2 import functional as func2
 from torchvision.utils import save_image
 
-from safeds.exceptions import ClosedBound, OutOfBoundsError
+from safeds.exceptions import ClosedBound, OutOfBoundsError, IllegalFormatError
 
 
 class Image:
