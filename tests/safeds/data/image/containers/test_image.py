@@ -157,7 +157,8 @@ class TestToJpegFile:
         with NamedTemporaryFile(suffix=".jpg") as tmp_jpeg_file:
             tmp_jpeg_file.close()
             with Path(tmp_jpeg_file.name).open("w", encoding="utf-8") as tmp_file, pytest.raises(
-                IllegalFormatError, match=r"This format is illegal. Use one of the following formats: png",
+                IllegalFormatError,
+                match=r"This format is illegal. Use one of the following formats: png",
             ):
                 image.to_jpeg_file(tmp_file.name)
 
