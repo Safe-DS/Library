@@ -3,18 +3,21 @@ from __future__ import annotations
 import io
 import warnings
 from pathlib import Path
-from typing import Any
+from typing import Any, TYPE_CHECKING
 
 import torch
-import torch.nn.functional as F
+import torch.nn.functional as func
 from PIL.Image import open as pil_image_open
 from torch import Tensor
-from torch.types import Device
+
+if TYPE_CHECKING:
+    from torch.types import Device
 import torchvision
 
-# Disable torchvision V2 beta warnings
-torchvision.disable_beta_transforms_warning()
-from torchvision.transforms.v2 import PILToTensor, functional as F2
+# Disables torchvision V2 beta warnings
+# Disabled because of RUFF Linter E402 (Module level import not at top of file)
+# torchvision.disable_beta_transforms_warning()
+from torchvision.transforms.v2 import PILToTensor, functional as func2
 from torchvision.utils import save_image
 
 from safeds.exceptions import OutOfBoundsError, ClosedBound, IllegalFormatError
@@ -34,7 +37,7 @@ class Image:
     _default_device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
 
     @staticmethod
-    def from_file(path: str | Path, device: Device = _default_device):
+    def from_file(path: str | Path, device: Device = _default_device) -> Image:
         """
         Create an image from a file.
 
@@ -53,7 +56,7 @@ class Image:
         return Image(image_tensor=Image._pil_to_tensor(pil_image_open(path)), device=device)
 
     @staticmethod
-    def from_bytes(data: bytes, device: Device = _default_device):
+    def from_bytes(data: bytes, device: Device = _default_device) -> Image:
         """
         Create an image from bytes.
 
@@ -227,7 +230,7 @@ class Image:
         result : Image
             The image with the given width and height.
         """
-        return Image(F.interpolate(self._image_tensor.unsqueeze(dim=1), size=(new_height, new_width)).squeeze(dim=1),
+        return Image(func.interpolate(self._image_tensor.unsqueeze(dim=1), size=(new_height, new_width)).squeeze(dim=1),
                      device=self._image_tensor.device)
 
     def convert_to_grayscale(self) -> Image:
@@ -243,11 +246,11 @@ class Image:
         """
         if self.channel == 4:
             return Image(torch.cat(
-                [F2.rgb_to_grayscale(self._image_tensor[0:3], num_output_channels=3),
+                [func2.rgb_to_grayscale(self._image_tensor[0:3], num_output_channels=3),
                  self._image_tensor[3].unsqueeze(dim=0)]),
                 device=self.device)
         else:
-            return Image(F2.rgb_to_grayscale(self._image_tensor[0:3], num_output_channels=3), device=self.device)
+            return Image(func2.rgb_to_grayscale(self._image_tensor[0:3], num_output_channels=3), device=self.device)
 
     def crop(self, x: int, y: int, width: int, height: int) -> Image:
         """
@@ -267,7 +270,7 @@ class Image:
         result : Image
             The cropped image.
         """
-        return Image(F2.crop(self._image_tensor, x, y, height, width), device=self.device)
+        return Image(func2.crop(self._image_tensor, x, y, height, width), device=self.device)
 
     def flip_vertically(self) -> Image:
         """
@@ -280,7 +283,7 @@ class Image:
         result : Image
             The flipped image.
         """
-        return Image(F2.vertical_flip(self._image_tensor), device=self.device)
+        return Image(func2.vertical_flip(self._image_tensor), device=self.device)
 
     def flip_horizontally(self) -> Image:
         """
@@ -293,7 +296,7 @@ class Image:
         result : Image
             The flipped image.
         """
-        return Image(F2.horizontal_flip(self._image_tensor), device=self.device)
+        return Image(func2.horizontal_flip(self._image_tensor), device=self.device)
 
     def adjust_brightness(self, factor: float) -> Image:
         """
@@ -330,10 +333,11 @@ class Image:
             )
         if self.channel == 4:
             return Image(torch.cat(
-                [F2.adjust_brightness(self._image_tensor[0:3], factor * 1.0), self._image_tensor[3].unsqueeze(dim=0)]),
+                [func2.adjust_brightness(self._image_tensor[0:3], factor * 1.0),
+                 self._image_tensor[3].unsqueeze(dim=0)]),
                 device=self.device)
         else:
-            return Image(F2.adjust_brightness(self._image_tensor, factor * 1.0), device=self.device)
+            return Image(func2.adjust_brightness(self._image_tensor, factor * 1.0), device=self.device)
 
     def add_noise(self, standard_deviation: float) -> Image:
         """
@@ -396,13 +400,13 @@ class Image:
             )
         if self.channel == 4:
             return Image(torch.cat(
-                [F2.adjust_contrast(self._image_tensor[0:3], factor * 1.0), self._image_tensor[3].unsqueeze(dim=0)]),
+                [func2.adjust_contrast(self._image_tensor[0:3], factor * 1.0), self._image_tensor[3].unsqueeze(dim=0)]),
                 device=self.device)
         else:
-            return Image(F2.adjust_contrast(self._image_tensor, factor * 1.0), device=self.device)
+            return Image(func2.adjust_contrast(self._image_tensor, factor * 1.0), device=self.device)
 
-    def adjust_color_balance(self, factor: float) -> Image:
-        pass
+    # def adjust_color_balance(self, factor: float) -> Image:
+    #     pass
 
     def blur(self, radius: int) -> Image:
         """
@@ -421,7 +425,7 @@ class Image:
         result : Image
             The blurred image.
         """
-        return Image(F2.gaussian_blur(self._image_tensor, [radius * 2 + 1, radius * 2 + 1]), device=self.device)
+        return Image(func2.gaussian_blur(self._image_tensor, [radius * 2 + 1, radius * 2 + 1]), device=self.device)
 
     def sharpen(self, factor: float) -> Image:
         """
@@ -457,10 +461,11 @@ class Image:
             )
         if self.channel == 4:
             return Image(torch.cat(
-                [F2.adjust_sharpness(self._image_tensor[0:3], factor * 1.0), self._image_tensor[3].unsqueeze(dim=0)]),
+                [func2.adjust_sharpness(self._image_tensor[0:3], factor * 1.0),
+                 self._image_tensor[3].unsqueeze(dim=0)]),
                 device=self.device)
         else:
-            return Image(F2.adjust_sharpness(self._image_tensor, factor * 1.0), device=self.device)
+            return Image(func2.adjust_sharpness(self._image_tensor, factor * 1.0), device=self.device)
 
     def invert_colors(self) -> Image:
         """
@@ -475,10 +480,10 @@ class Image:
         """
         if self.channel == 4:
             return Image(torch.cat(
-                [F2.invert(self._image_tensor[0:3]), self._image_tensor[3].unsqueeze(dim=0)]),
+                [func2.invert(self._image_tensor[0:3]), self._image_tensor[3].unsqueeze(dim=0)]),
                 device=self.device)
         else:
-            return Image(F2.invert(self._image_tensor), device=self.device)
+            return Image(func2.invert(self._image_tensor), device=self.device)
 
     def rotate_right(self) -> Image:
         """
@@ -491,7 +496,7 @@ class Image:
         result : Image
             The image rotated 90 degrees clockwise.
         """
-        return Image(F2.rotate(self._image_tensor, -90, expand=True), device=self.device)
+        return Image(func2.rotate(self._image_tensor, -90, expand=True), device=self.device)
 
     def rotate_left(self) -> Image:
         """
@@ -504,7 +509,7 @@ class Image:
         result : Image
             The image rotated 90 degrees counter-clockwise.
         """
-        return Image(F2.rotate(self._image_tensor, 90, expand=True), device=self.device)
+        return Image(func2.rotate(self._image_tensor, 90, expand=True), device=self.device)
 
-    def find_edges(self) -> Image:
-        pass
+    # def find_edges(self) -> Image:
+    #     pass

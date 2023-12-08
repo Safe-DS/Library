@@ -159,7 +159,7 @@ class ColumnIsTargetError(IllegalSchemaModificationError):
 
 
 class IllegalFormatError(Exception):
-    """Exception raised when a format is not legal"""
+    """Exception raised when a format is not legal."""
 
     def __init__(self, formats: list[str] | str, reason: str = "") -> None:
         super().__init__(f"This format is illegal. {reason}Use one of the following formats: {formats}")

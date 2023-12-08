@@ -1,8 +1,12 @@
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 import pytest
 import torch
 from syrupy import SnapshotAssertion
+
+if TYPE_CHECKING:
+    from torch.types import Device
 
 from safeds.data.image.containers import Image
 from safeds.data.tabular.containers import Table
@@ -21,7 +25,7 @@ def _test_devices_ids() -> list[str]:
     return ["cpu", "cuda"]
 
 
-def _skip_if_device_not_available(device) -> None:
+def _skip_if_device_not_available(device: Device) -> None:
     if device == _device_cuda and not torch.cuda.is_available():
         pytest.skip("This test requires cuda")
 
@@ -37,7 +41,7 @@ class TestFromFile:
          Path("image/white_square.png")],
         ids=["jpg", "jpg_Path", "png", "png_Path"],
     )
-    def test_should_load_from_file(self, resource_path: str | Path, device) -> None:
+    def test_should_load_from_file(self, resource_path: str | Path, device: Device) -> None:
         _skip_if_device_not_available(device)
         Image.from_file(resolve_resource_path(resource_path), device)
 
@@ -47,7 +51,7 @@ class TestFromFile:
          Path("image/missing_file.png")],
         ids=["missing_file_jpg", "missing_file_jpg_Path", "missing_file_png", "missing_file_png_Path"],
     )
-    def test_should_raise_if_file_not_found(self, resource_path: str | Path, device) -> None:
+    def test_should_raise_if_file_not_found(self, resource_path: str | Path, device: Device) -> None:
         _skip_if_device_not_available(device)
         with pytest.raises(FileNotFoundError):
             Image.from_file(resolve_resource_path(resource_path), device)
@@ -65,7 +69,7 @@ class TestFromBytes:
         ],
         ids=["white_square-jpg", "white_square-png"]
     )
-    def test_should_write_and_load_bytes_jpeg(self, resource_path: str | Path, device) -> None:
+    def test_should_write_and_load_bytes_jpeg(self, resource_path: str | Path, device: Device) -> None:
         image = Image.from_file(resolve_resource_path(resource_path), device)
         image_copy = Image.from_bytes(image._repr_jpeg_(), device)
         assert image == image_copy
@@ -81,7 +85,7 @@ class TestFromBytes:
         ],
         ids=["plane-jpg", "plane-png", "rgba-png", "white_square-jpg", "white_square-png"]
     )
-    def test_should_write_and_load_bytes_png(self, resource_path: str | Path, device) -> None:
+    def test_should_write_and_load_bytes_png(self, resource_path: str | Path, device: Device) -> None:
         image = Image.from_file(resolve_resource_path(resource_path), device)
         image_copy = Image.from_bytes(image._repr_png_(), device)
         assert image == image_copy
@@ -100,7 +104,7 @@ class TestReprJpeg:
         ],
         ids=["plane-jpg", "white_square-jpg", "white_square-png"]
     )
-    def test_should_return_bytes(self, resource_path: str | Path, device) -> None:
+    def test_should_return_bytes(self, resource_path: str | Path, device: Device) -> None:
         image = Image.from_file(resolve_resource_path(resource_path), device)
         assert isinstance(image._repr_jpeg_(), bytes)
 
@@ -112,7 +116,7 @@ class TestReprJpeg:
         ],
         ids=["plane-png", "rgba-png"]
     )
-    def test_should_raise_if_image_has_alpha_channel(self, resource_path: str | Path, device) -> None:
+    def test_should_raise_if_image_has_alpha_channel(self, resource_path: str | Path, device: Device) -> None:
         image = Image.from_file(resolve_resource_path(resource_path), device)
         with pytest.raises(IllegalFormatError, match=r"This format is illegal. The image has an alpha channel which "
                                                      r"cannot be displayed in jpeg format. Use one of the following "
@@ -135,7 +139,7 @@ class TestReprPng:
         ],
         ids=["plane-jpg", "plane-png", "rgba-png", "white_square-jpg", "white_square-png"]
     )
-    def test_should_return_bytes(self, resource_path: str | Path, device) -> None:
+    def test_should_return_bytes(self, resource_path: str | Path, device: Device) -> None:
         image = Image.from_file(resolve_resource_path(resource_path), device)
         assert isinstance(image._repr_png_(), bytes)
 
@@ -170,7 +174,7 @@ class TestProperties:
         ids=["[3,1,1].jpg", "[4,568,320].png", "[4,568,320].png"],
     )
     def test_should_return_image_properties(self, resource_path: str, width: int, height: int, channel: int,
-                                            device) -> None:
+                                            device: Device) -> None:
         _skip_if_device_not_available(device)
         image = Image.from_file(resolve_resource_path(resource_path), device)
         assert image.width == width
@@ -195,7 +199,7 @@ class TestEQ:
         ids=["opaque-4-channel-jpg", "opaque-4-channel-png", "transparent", "opaque-3-channel-jpg",
              "opaque-3-channel-png"],
     )
-    def test_should_be_equal(self, resource_path: str, device) -> None:
+    def test_should_be_equal(self, resource_path: str, device: Device) -> None:
         _skip_if_device_not_available(device)
         image = Image.from_file(resolve_resource_path(resource_path), device)
         image2 = Image.from_file(resolve_resource_path(resource_path), device)
@@ -239,7 +243,7 @@ class TestEQ:
     @pytest.mark.parametrize(
         "device", _test_devices(), ids=_test_devices_ids()
     )
-    def test_should_raise(self, device) -> None:
+    def test_should_raise(self, device: Device) -> None:
         _skip_if_device_not_available(device)
         image = Image.from_file(resolve_resource_path("image/plane.png"), device)
         other = Table()
@@ -278,7 +282,7 @@ class TestResize:
         new_width: int,
         new_height: int,
         snapshot_png: SnapshotAssertion,
-        device
+        device: Device
     ) -> None:
         _skip_if_device_not_available(device)
         image = Image.from_file(resolve_resource_path(resource_path), device)
@@ -312,7 +316,7 @@ class TestConvertToGrayscale:
         ],
         ids=["grayscale", "grayscale-transparent"],
     )
-    def test_convert_to_grayscale(self, resource_path: str, snapshot_png: SnapshotAssertion, device) -> None:
+    def test_convert_to_grayscale(self, resource_path: str, snapshot_png: SnapshotAssertion, device: Device) -> None:
         _skip_if_device_not_available(device)
         image = Image.from_file(resolve_resource_path(resource_path), device)
         grayscale_image = image.convert_to_grayscale()
@@ -331,10 +335,11 @@ class TestCrop:
         ],
         ids=["crop", "crop-transparent"],
     )
-    def test_should_return_cropped_image(self, resource_path: str, snapshot_png: SnapshotAssertion, device) -> None:
+    def test_should_return_cropped_image(self, resource_path: str, snapshot_png: SnapshotAssertion,
+                                         device: Device) -> None:
         _skip_if_device_not_available(device)
         image = Image.from_file(resolve_resource_path(resource_path), device)
-        image = image.crop(0, 0, 100, 100)  # TODO what is expected behaviour if image is smaller
+        image = image.crop(0, 0, 100, 100)
         assert image == snapshot_png
 
 
@@ -350,7 +355,7 @@ class TestFlipVertically:
         ],
         ids=["opaque", "transparent"]
     )
-    def test_should_flip_vertically(self, resource_path: str, snapshot_png: SnapshotAssertion, device) -> None:
+    def test_should_flip_vertically(self, resource_path: str, snapshot_png: SnapshotAssertion, device: Device) -> None:
         _skip_if_device_not_available(device)
         image = Image.from_file(resolve_resource_path(resource_path), device)
         image_flip_v = image.flip_vertically()
@@ -365,7 +370,7 @@ class TestFlipVertically:
         ],
         ids=["opaque", "transparent"]
     )
-    def test_should_be_original(self, resource_path: str, device) -> None:
+    def test_should_be_original(self, resource_path: str, device: Device) -> None:
         _skip_if_device_not_available(device)
         image = Image.from_file(resolve_resource_path(resource_path), device)
         image_flip_v_v = image.flip_vertically().flip_vertically()
@@ -385,7 +390,8 @@ class TestFlipHorizontally:
         ],
         ids=["opaque", "transparent"]
     )
-    def test_should_flip_horizontally(self, resource_path: str, snapshot_png: SnapshotAssertion, device) -> None:
+    def test_should_flip_horizontally(self, resource_path: str, snapshot_png: SnapshotAssertion,
+                                      device: Device) -> None:
         _skip_if_device_not_available(device)
         image = Image.from_file(resolve_resource_path(resource_path), device)
         image_flip_h = image.flip_horizontally()
@@ -400,7 +406,7 @@ class TestFlipHorizontally:
         ],
         ids=["opaque", "transparent"]
     )
-    def test_should_be_original(self, resource_path: str, device) -> None:
+    def test_should_be_original(self, resource_path: str, device: Device) -> None:
         _skip_if_device_not_available(device)
         image = Image.from_file(resolve_resource_path(resource_path), device)
         image_flip_h_h = image.flip_horizontally().flip_horizontally()
@@ -412,14 +418,14 @@ class TestFlipHorizontally:
 )
 class TestBrightness:
     @pytest.mark.parametrize("factor", [0.5, 10], ids=["small factor", "large factor"])
-    def test_should_adjust_brightness(self, factor: float, snapshot_png: SnapshotAssertion, device) -> None:
+    def test_should_adjust_brightness(self, factor: float, snapshot_png: SnapshotAssertion, device: Device) -> None:
         _skip_if_device_not_available(device)
         image = Image.from_file(resolve_resource_path("image/plane.png"), device)
         image_adjusted_brightness = image.adjust_brightness(factor)
         assert image != image_adjusted_brightness
         assert image_adjusted_brightness == snapshot_png
 
-    def test_should_not_brighten(self, device) -> None:
+    def test_should_not_brighten(self, device: Device) -> None:
         _skip_if_device_not_available(device)
         with pytest.warns(
             UserWarning,
@@ -429,7 +435,7 @@ class TestBrightness:
             image2 = image.adjust_brightness(1)
             assert image == image2
 
-    def test_should_raise(self, device) -> None:
+    def test_should_raise(self, device: Device) -> None:
         _skip_if_device_not_available(device)
         image = Image.from_file(resolve_resource_path("image/plane.png"), device)
         with pytest.raises(OutOfBoundsError, match=r"factor \(=-1\) is not inside \[0, \u221e\)."):
@@ -450,7 +456,7 @@ class TestAddNoise:
         ids=["minimum noise", "some noise", "very noisy"],
     )
     def test_should_add_noise(self, resource_path: str, standard_deviation: float, snapshot_png: SnapshotAssertion,
-                              device) -> None:
+                              device: Device) -> None:
         _skip_if_device_not_available(device)
         torch.manual_seed(0)
         image = Image.from_file(resolve_resource_path(resource_path), device)
@@ -462,13 +468,14 @@ class TestAddNoise:
         [("image/plane.png", -1)],
         ids=["sigma below zero"],
     )
-    def test_should_raise_standard_deviation(self, resource_path: str, standard_deviation: float, device) -> None:
+    def test_should_raise_standard_deviation(self, resource_path: str, standard_deviation: float,
+                                             device: Device) -> None:
         _skip_if_device_not_available(device)
+        image = Image.from_file(resolve_resource_path(resource_path), device)
         with pytest.raises(
             OutOfBoundsError,
             match=rf"standard_deviation \(={standard_deviation}\) is not inside \[0, \u221e\)\.",
         ):
-            image = Image.from_file(resolve_resource_path(resource_path), device)
             image.add_noise(standard_deviation)
 
 
@@ -477,14 +484,14 @@ class TestAddNoise:
 )
 class TestAdjustContrast:
     @pytest.mark.parametrize("factor", [0.75, 5], ids=["small factor", "large factor"])
-    def test_should_adjust_contrast(self, factor: float, snapshot_png: SnapshotAssertion, device) -> None:
+    def test_should_adjust_contrast(self, factor: float, snapshot_png: SnapshotAssertion, device: Device) -> None:
         _skip_if_device_not_available(device)
         image = Image.from_file(resolve_resource_path("image/plane.png"), device)
         image_adjusted_contrast = image.adjust_contrast(factor)
         assert image != image_adjusted_contrast
         assert image_adjusted_contrast == snapshot_png
 
-    def test_should_not_adjust_contrast(self, device) -> None:
+    def test_should_not_adjust_contrast(self, device: Device) -> None:
         _skip_if_device_not_available(device)
         with pytest.warns(
             UserWarning,
@@ -506,7 +513,8 @@ class TestBlur:
         ],
         ids=["blur"],
     )
-    def test_should_return_blurred_image(self, resource_path: str, snapshot_png: SnapshotAssertion, device) -> None:
+    def test_should_return_blurred_image(self, resource_path: str, snapshot_png: SnapshotAssertion,
+                                         device: Device) -> None:
         _skip_if_device_not_available(device)
         image = Image.from_file(resolve_resource_path(resource_path), device=device)
         image_blurred = image.blur(2)
@@ -518,19 +526,19 @@ class TestBlur:
 )
 class TestSharpen:
     @pytest.mark.parametrize("factor", [0, 0.5, 10], ids=["zero factor", "small factor", "large factor"])
-    def test_should_sharpen(self, factor: float, snapshot_png: SnapshotAssertion, device) -> None:
+    def test_should_sharpen(self, factor: float, snapshot_png: SnapshotAssertion, device: Device) -> None:
         _skip_if_device_not_available(device)
         image = Image.from_file(resolve_resource_path("image/plane.png"), device)
         image_sharpened = image.sharpen(factor)
         assert image != image_sharpened
         assert image_sharpened == snapshot_png
 
-    def test_should_raise_negative_sharpen(self, device) -> None:
+    def test_should_raise_negative_sharpen(self, device: Device) -> None:
         _skip_if_device_not_available(device)
         with pytest.raises(OutOfBoundsError):
             Image.from_file(resolve_resource_path("image/plane.png"), device).sharpen(-1.0)
 
-    def test_should_not_sharpen(self, device) -> None:
+    def test_should_not_sharpen(self, device: Device) -> None:
         _skip_if_device_not_available(device)
         with pytest.warns(UserWarning, match="Sharpen factor is 1.0, this will not make changes to the image."):
             image = Image.from_file(resolve_resource_path("image/plane.png"), device)
@@ -550,7 +558,7 @@ class TestInvertColors:
         ],
         ids=["invert-colors", "invert-colors-transparent"],
     )
-    def test_should_invert_colors(self, resource_path: str, snapshot_png: SnapshotAssertion, device) -> None:
+    def test_should_invert_colors(self, resource_path: str, snapshot_png: SnapshotAssertion, device: Device) -> None:
         _skip_if_device_not_available(device)
         image = Image.from_file(resolve_resource_path(resource_path), device)
         image_inverted_colors = image.invert_colors()
@@ -570,7 +578,7 @@ class TestRotate:
         ids=["rotate-clockwise", "rotate-clockwise-transparent"],
     )
     def test_should_return_clockwise_rotated_image(self, resource_path: str, snapshot_png: SnapshotAssertion,
-                                                   device) -> None:
+                                                   device: Device) -> None:
         _skip_if_device_not_available(device)
         image = Image.from_file(resolve_resource_path(resource_path), device)
         image_right_rotated = image.rotate_right()
@@ -585,7 +593,7 @@ class TestRotate:
         ids=["rotate-counter-clockwise", "rotate-counter-clockwise-transparent"],
     )
     def test_should_return_counter_clockwise_rotated_image(self, resource_path: str, snapshot_png: SnapshotAssertion,
-                                                           device) -> None:
+                                                           device: Device) -> None:
         _skip_if_device_not_available(device)
         image = Image.from_file(resolve_resource_path(resource_path), device)
         image_left_rotated = image.rotate_left()
@@ -599,7 +607,7 @@ class TestRotate:
         ],
         ids=["rotate-to-flipped", "rotate-to-flipped-transparent"],
     )
-    def test_should_return_flipped_image(self, resource_path: str, device) -> None:
+    def test_should_return_flipped_image(self, resource_path: str, device: Device) -> None:
         _skip_if_device_not_available(device)
         image = Image.from_file(resolve_resource_path(resource_path), device)
         image_left_rotated = image.rotate_left().rotate_left()
@@ -618,7 +626,7 @@ class TestRotate:
         ],
         ids=["rotate-to-flipped", "rotate-to-flipped-transparent"],
     )
-    def test_should_be_original(self, resource_path: str, device) -> None:
+    def test_should_be_original(self, resource_path: str, device: Device) -> None:
         _skip_if_device_not_available(device)
         image = Image.from_file(resolve_resource_path(resource_path), device)
         image_left_right_rotated = image.rotate_left().rotate_right()
