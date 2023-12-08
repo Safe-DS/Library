@@ -21,7 +21,7 @@ from torchvision.transforms.v2 import PILToTensor
 from torchvision.transforms.v2 import functional as func2
 from torchvision.utils import save_image
 
-from safeds.exceptions import ClosedBound, IllegalFormatError, OutOfBoundsError
+from safeds.exceptions import ClosedBound, OutOfBoundsError
 
 
 class Image:
@@ -84,22 +84,19 @@ class Image:
     def __init__(self, image_tensor: Tensor, device: Device = _default_device) -> None:
         self._image_tensor: Tensor = image_tensor.to(device)
 
-    def _repr_jpeg_(self) -> bytes:
+    def _repr_jpeg_(self) -> bytes | None:
         """
         Return a JPEG image as bytes.
+
+        If the image has an alpha channel return None.
 
         Returns
         -------
         jpeg : bytes
             The image as JPEG.
-
-        Raises
-        ------
-        IllegalFormatError
-            If the image has an alpha channel
         """
         if self.channel == 4:
-            raise IllegalFormatError("png", "The image has an alpha channel which cannot be displayed in jpeg format. ")
+            return None
         buffer = io.BytesIO()
         save_image(self._image_tensor.to(torch.float32) / 255, buffer, format="jpeg")
         buffer.seek(0)

@@ -5,7 +5,6 @@ from safeds.exceptions._data import (
     ColumnLengthMismatchError,
     ColumnSizeError,
     DuplicateColumnNameError,
-    IllegalFormatError,
     IllegalSchemaModificationError,
     IndexOutOfBoundsError,
     MissingValuesColumnError,
@@ -47,7 +46,6 @@ __all__ = [
     "UnknownColumnNameError",
     "ValueNotPresentWhenFittedError",
     "WrongFileExtensionError",
-    "IllegalFormatError",
     # ML exceptions
     "DatasetContainsTargetError",
     "DatasetMissesDataError",

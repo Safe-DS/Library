@@ -4,7 +4,7 @@ import pytest
 import torch
 from safeds.data.image.containers import Image
 from safeds.data.tabular.containers import Table
-from safeds.exceptions import IllegalFormatError, OutOfBoundsError
+from safeds.exceptions import OutOfBoundsError
 from syrupy import SnapshotAssertion
 from torch.types import Device
 
@@ -104,16 +104,10 @@ class TestReprJpeg:
         ],
         ids=["plane-png", "rgba-png"],
     )
-    def test_should_raise_if_image_has_alpha_channel(self, resource_path: str | Path, device: Device) -> None:
+    def test_should_return_none_if_image_has_alpha_channel(self, resource_path: str | Path, device: Device) -> None:
         _skip_if_device_not_available(device)
         image = Image.from_file(resolve_resource_path(resource_path), device)
-        with pytest.raises(
-            IllegalFormatError,
-            match=r"This format is illegal. The image has an alpha channel which "
-            r"cannot be displayed in jpeg format. Use one of the following "
-            r"formats: png",
-        ):
-            image._repr_jpeg_()
+        assert image._repr_jpeg_() is None
 
 
 @pytest.mark.parametrize("device", _test_devices(), ids=_test_devices_ids())
