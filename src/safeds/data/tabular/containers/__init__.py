@@ -11,4 +11,5 @@ __all__ = [
     "Row",
     "Table",
     "TaggedTable",
+    "TimeSeries",
 ]

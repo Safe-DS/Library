@@ -156,3 +156,10 @@ class ColumnIsTargetError(IllegalSchemaModificationError):
 
     def __init__(self, column_name: str) -> None:
         super().__init__(f'Column "{column_name}" is the target column and cannot be removed.')
+
+
+class ColumnIsTimeError(IllegalSchemaModificationError):
+    """Exception raised in overriden methods of the Table class when removing tagged Columns from a TimeSeries."""
+
+    def __init__(self, column_name: str) -> None:
+        super().__init__(f'Column "{column_name}" is the time column and cannot be removed.')

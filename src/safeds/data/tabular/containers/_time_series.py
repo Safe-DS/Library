@@ -10,8 +10,11 @@ from torch.utils.data import Dataset
 from typing import TYPE_CHECKING
 
 from safeds.data.tabular.containers import Column, Row, Table, TaggedTable
+from safeds.data.image.containers import Image
+
 from safeds.exceptions import (
     ColumnIsTargetError,
+    ColumnIsTimeError,
     IllegalSchemaModificationError,
     UnknownColumnNameError,
 )
@@ -21,13 +24,12 @@ if TYPE_CHECKING:
     from typing import Any
 
 
-
 class TimeSeries(TaggedTable):
     # Invarainte should be that a time is never a target or feature
     # target should always be an feature
     # date should never be an feature
     """
-     A TimeSeries is a tagged table that additionally knows which column is the time column 
+     A TimeSeries is a tagged table that additionally knows which column is the time column
      and uses the target column as an feature.
      A Time Column should neve be an feature
     ----------
@@ -49,6 +51,7 @@ class TimeSeries(TaggedTable):
     ValueError
         If no feature columns are specified.
     """
+
     # ------------------------------------------------------------------------------------------------------------------
     # Creation
     # ------------------------------------------------------------------------------------------------------------------
@@ -68,7 +71,7 @@ class TimeSeries(TaggedTable):
         -------
         time_series : TimeSeries
             the created time series
-        
+
         Raises
         ------
         UnknownColumnError
@@ -83,21 +86,18 @@ class TimeSeries(TaggedTable):
         """
 
         table = tagged_table._as_table()
-        #make sure that the time_name is not part of the features
+        # make sure that the time_name is not part of the features
         result = object.__new__(TimeSeries)
         feature_names = tagged_table.features.column_names
         if time_name in feature_names:
             feature_names.remove(time_name)
 
-        #no need to validate the tagged table on tagged table specs
+        # no need to validate the tagged table on tagged table specs
         if time_name in feature_names:
             raise ValueError(f"Column '{time_name}' cannot be both time column and feature.")
-        
+
         if time_name == tagged_table.target.name:
             raise ValueError(f"Column '{time_name}' cannot be both timecolumn and target.")
-        
-        
-
 
         result._data = table._data
         result._schema = table.schema
@@ -128,7 +128,7 @@ class TimeSeries(TaggedTable):
         -------
         time_series : TimeSeries
             the created time series
-        
+
         Raises
         ------
         UnknownColumnError
@@ -144,13 +144,13 @@ class TimeSeries(TaggedTable):
         if feature_names is None:
             feature_names = table.column_names
             if time_name in feature_names:
-                feature_names.remove(time_name) 
+                feature_names.remove(time_name)
             if target_name in feature_names:
                 feature_names.remove(target_name)
-        tagged_table = TaggedTable._from_table(table=table, target_name= target_name, feature_names=feature_names)
-        #check if time column got added as feature column
+        tagged_table = TaggedTable._from_table(table=table, target_name=target_name, feature_names=feature_names)
+        # check if time column got added as feature column
         return TimeSeries._from_tagged_table(tagged_table=tagged_table, time_name=time_name)
-    
+
     # ------------------------------------------------------------------------------------------------------------------
     # Dunder methods
     # ------------------------------------------------------------------------------------------------------------------
@@ -195,13 +195,12 @@ class TimeSeries(TaggedTable):
         if feature_names is None:
             feature_names = _data.column_names
             if time_name in feature_names:
-                feature_names.remove(time_name) 
+                feature_names.remove(time_name)
             if target_name in feature_names:
                 feature_names.remove(target_name)
 
         super().__init__(data, target_name, feature_names)
 
-      
         if time_name in feature_names:
             raise ValueError(f"Date column '{time_name}' can not be an feature column.")
 
@@ -226,12 +225,27 @@ class TimeSeries(TaggedTable):
             The time column.
         """
         return self._time
-    
+
     # ------------------------------------------------------------------------------------------------------------------
     # Specific methods from time series class:
     # ------------------------------------------------------------------------------------------------------------------
-    
-    #ToDo: add Specific methods for time series dTable class
+
+    def _create_moving_average(self, window_size: int) -> Column:
+        # calculate the windows and the moving average of a timeserties, this function for now only has intern use
+        # some unexpected behavior while casting to series agains, because it addds NAN values
+        return Column._from_pandas_series(pd.Series(self.target._data.rolling(window_size).mean()))
+
+    def plot_moving_average(self, window_size: int) -> Image:
+        # this method should plot the moving average of a time series
+        pass
+
+    def show_time_series(self) -> Image:
+        # this method should plot the time series
+        pass
+
+    def decompose_time_series(self) -> Image:
+        # this Method should show a plot of a decomposed time series
+        pass
 
     # ------------------------------------------------------------------------------------------------------------------
     # Overriden methods from TaggedTable class:
@@ -280,8 +294,9 @@ class TimeSeries(TaggedTable):
         """
         return TimeSeries._from_tagged_table(
             super().add_column(column),
-            time_name = self.time.name,
+            time_name=self.time.name,
         )
+
     def add_column_as_feature(self, column: Column) -> TimeSeries:
         """
         Return a new time series with the provided column attached at the end, as a feature column.
@@ -307,8 +322,8 @@ class TimeSeries(TaggedTable):
         """
         return TimeSeries._from_tagged_table(
             super().add_column_as_feature(column),
-            time_name= self.time.name,)
-    
+            time_name=self.time.name, )
+
     def add_columns_as_features(self, columns: list[Column] | Table) -> TimeSeries:
         """
         Return a new `TimeSeries` with the provided columns attached at the end, as feature columns.
@@ -334,8 +349,8 @@ class TimeSeries(TaggedTable):
         """
         return TimeSeries._from_tagged_table(
             super().add_columns_as_features(columns),
-            time_name= self.time.name,)
-    
+            time_name=self.time.name, )
+
     def add_columns(self, columns: list[Column] | Table) -> TimeSeries:
         """
         Return a new `TimeSeries` with multiple added columns, as neither target nor feature columns.
@@ -361,8 +376,9 @@ class TimeSeries(TaggedTable):
         """
         return TimeSeries._from_tagged_table(
             super().add_columns(columns),
-            time_name = self.time.name,
+            time_name=self.time.name,
         )
+
     def add_row(self, row: Row) -> TimeSeries:
         """
         Return a new `TimeSeries` with an added Row attached.
@@ -384,9 +400,9 @@ class TimeSeries(TaggedTable):
         UnknownColumnNameError
             If the row has different column names than the table.
         """
-        return TimeSeries._from_tagged_table(super().add_row(row), 
-                                             time_name= self.time.name)
-    
+        return TimeSeries._from_tagged_table(super().add_row(row),
+                                             time_name=self.time.name)
+
     def add_rows(self, rows: list[Row] | Table) -> TimeSeries:
         """
         Return a new `TimeSeries` with multiple added Rows attached.
@@ -409,7 +425,8 @@ class TimeSeries(TaggedTable):
             If at least one of the rows have different column names than the table.
         """
         return TimeSeries._from_tagged_table(super().add_rows(rows),
-                                        time_name = self.time.name)
+                                             time_name=self.time.name)
+
     def filter_rows(self, query: Callable[[Row], bool]) -> TimeSeries:
         """
         Return a new `TimeSeries` containing only rows that match the given Callable (e.g. lambda function).
@@ -428,5 +445,84 @@ class TimeSeries(TaggedTable):
         """
         return TimeSeries._from_tagged_table(
             super().filter_rows(query),
-            time_name= self.time.name,
+            time_name=self.time.name,
         )
+
+    def keep_only_columns(self, column_names: list[str]) -> TimeSeries:
+        """
+        Return a new `TimeSeries` with only the given column(s).
+
+        The original table is not modified.
+
+        Parameters
+        ----------
+        column_names : list[str]
+            A list containing only the columns to be kept.
+
+        Returns
+        -------
+        table : TimeSeries
+            A time series containing only the given column(s).
+
+        Raises
+        ------
+        UnknownColumnNameError
+            If any of the given columns does not exist.
+        IllegalSchemaModificationError
+            If none of the given columns is the target column or any of the feature columns.
+        """
+
+        if self.target.name not in column_names:
+            raise IllegalSchemaModificationError("Must keep the target column.")
+        if len(set(self.features.column_names).intersection(set(column_names))) == 0:
+            raise IllegalSchemaModificationError("Must keep at least one feature column.")
+        if self.time.name not in column_names:
+            raise IllegalSchemaModificationError("Must keep the time column.")
+        return TimeSeries._from_tagged_table(TaggedTable._from_table(
+            super().keep_only_columns(column_names),
+            target_name=self.target.name,
+            feature_names=sorted(
+                set(self.features.column_names).intersection(set(column_names)),
+                key={val: ix for ix, val in enumerate(self.features.column_names)}.__getitem__,
+            ),
+        ), time_name=self.time.name)
+
+    def remove_columns(self, column_names: list[str]) -> TimeSeries:
+        """
+        Return a new `TimeSeries` with the given column(s) removed from the table.
+
+        The original table is not modified.
+
+        Parameters
+        ----------
+        column_names : list[str]
+            The names of all columns to be dropped.
+
+        Returns
+        -------
+        table : TimeSeries
+            A time series without the given columns.
+
+        Raises
+        ------
+        UnknownColumnNameError
+            If any of the given columns does not exist.
+        ColumnIsTargetError
+            If any of the given columns is the target column.
+        IllegalSchemaModificationError
+            If the given columns contain all the feature columns.
+        """
+        if self.target.name in column_names:
+            raise ColumnIsTargetError(self.target.name)
+        if len(set(self.features.column_names) - set(column_names)) == 0:
+            raise IllegalSchemaModificationError("You cannot remove every feature column.")
+        if self.time.name in column_names:
+            raise ColumnIsTimeError(self.time.name)
+        return TimeSeries._from_tagged_table(TaggedTable._from_table(
+            super().remove_columns(column_names),
+            target_name=self.target.name,
+            feature_names=sorted(
+                set(self.features.column_names) - set(column_names),
+                key={val: ix for ix, val in enumerate(self.features.column_names)}.__getitem__,
+            ),
+        ), time_name=self.time.name)
