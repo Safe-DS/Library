@@ -233,8 +233,8 @@ class TimeSeries(TaggedTable):
     def _create_moving_average(self, window_size: int) -> Column:
         # calculate the windows and the moving average of a timeserties, this function for now only has intern use
         # some unexpected behavior while casting to series agains, because it addds NAN values
-        return Column._from_pandas_series(pd.Series(self.target._data.rolling(window_size).mean()))
-
+        #return Column._from_pandas_series(pd.Series(self.target._data.rolling(window_size).mean()))
+        pass
     def plot_moving_average(self, window_size: int) -> Image:
         # this method should plot the moving average of a time series
         pass
@@ -526,3 +526,328 @@ class TimeSeries(TaggedTable):
                 key={val: ix for ix, val in enumerate(self.features.column_names)}.__getitem__,
             ),
         ), time_name=self.time.name)
+
+    def remove_columns_with_missing_values(self) -> TimeSeries:
+        """
+        Return a new `TimeSeries` with every column that misses values removed.
+
+        The original table is not modified.
+
+        Returns
+        -------
+        table : TimeSeries
+            A time series without the columns that contain missing values.
+
+        Raises
+        ------
+        ColumnIsTargetError
+            If any of the columns to be removed is the target column.
+        IllegalSchemaModificationError
+            If the columns to remove contain all the feature columns.
+        """
+        table = super().remove_columns_with_missing_values()
+        if self.target.name not in table.column_names:
+            raise ColumnIsTargetError(self.target.name)
+        if len(set(self.features.column_names).intersection(set(table.column_names))) == 0:
+            raise IllegalSchemaModificationError("You cannot remove every feature column.")
+        if self.time.name not in table.column_names:
+            raise ColumnIsTimeError(self.time.name)
+        return TimeSeries._from_tagged_table(TaggedTable._from_table(
+            table,
+            self.target.name,
+            feature_names=sorted(
+                set(self.features.column_names).intersection(set(table.column_names)),
+                key={val: ix for ix, val in enumerate(self.features.column_names)}.__getitem__,
+            ),
+        ), time_name=self.time.name)
+
+    def remove_columns_with_non_numerical_values(self) -> TimeSeries:
+        """
+        Return a new `TimeSeries` with every column that contains non-numerical values removed.
+
+        The original table is not modified.
+
+        Returns
+        -------
+        table : TimeSeries
+            A time series without the columns that contain non-numerical values.
+
+        Raises
+        ------
+        ColumnIsTargetError
+            If any of the columns to be removed is the target column.
+        IllegalSchemaModificationError
+            If the columns to remove contain all the feature columns.
+        """
+        table = super().remove_columns_with_non_numerical_values()
+        if self.target.name not in table.column_names:
+            raise ColumnIsTargetError(self.target.name)
+        if len(set(self.features.column_names).intersection(set(table.column_names))) == 0:
+            raise IllegalSchemaModificationError("You cannot remove every feature column.")
+        if self.time.name not in table.column_names:
+            raise ColumnIsTimeError(self.time.name)
+        return TimeSeries._from_tagged_table(TaggedTable._from_table(
+            table,
+            self.target.name,
+            feature_names=sorted(
+                set(self.features.column_names).intersection(set(table.column_names)),
+                key={val: ix for ix, val in enumerate(self.features.column_names)}.__getitem__,
+            ),
+        ), time_name=self.time.name)
+
+    def remove_duplicate_rows(self) -> TimeSeries:
+        """
+        Return a new `TimeSeries` with all row duplicates removed.
+
+        The original time series is not modified.
+
+        Returns
+        -------
+        result : TimeSeries
+            The time series with the duplicate rows removed.
+        """
+        return TimeSeries._from_tagged_table(TaggedTable._from_table(
+            super().remove_duplicate_rows(),
+            target_name=self.target.name,
+            feature_names=self.features.column_names,
+        ), time_name=self.time.name)
+
+    def remove_rows_with_missing_values(self) -> TimeSeries:
+        """
+        Return a new `TimeSeries` without the rows that contain missing values.
+
+        The original time series is not modified.
+
+        Returns
+        -------
+        table : TimeSeries
+            A time series without the rows that contain missing values.
+        """
+        return TimeSeries._from_tagged_table(TaggedTable._from_table(
+            super().remove_rows_with_missing_values(),
+            target_name=self.target.name,
+            feature_names=self.features.column_names,
+        ), time_name=self.time.name)
+
+    def remove_rows_with_outliers(self) -> TimeSeries:
+        """
+        Return a new `TimeSeries` with all rows that contain at least one outlier removed.
+
+        We define an outlier as a value that has a distance of more than 3 standard deviations from the column mean.
+        Missing values are not considered outliers. They are also ignored during the calculation of the standard
+        deviation.
+
+        The original time series is not modified.
+
+        Returns
+        -------
+        new_time_series : TimeSeries
+            A new time series without rows containing outliers.
+        """
+        return TimeSeries._from_tagged_table(TaggedTable._from_table(
+            super().remove_rows_with_outliers(),
+            target_name=self.target.name,
+            feature_names=self.features.column_names,
+        ), time_name=self.time.name)
+
+    def rename_column(self, old_name: str, new_name: str) -> TimeSeries:
+        """
+        Return a new `TimeSeries` with a single column renamed.
+
+        The original time series is not modified.
+
+        Parameters
+        ----------
+        old_name : str
+            The old name of the target column.
+        new_name : str
+            The new name of the target column.
+
+        Returns
+        -------
+        table : TimeSeries
+            The time series with the renamed column.
+
+        Raises
+        ------
+        UnknownColumnNameError
+            If the specified old target column name does not exist.
+        DuplicateColumnNameError
+            If the specified new target column name already exists.
+        """
+        return TimeSeries._from_tagged_table(TaggedTable._from_table(
+            super().rename_column(old_name, new_name),
+            target_name=new_name if self.target.name == old_name else self.target.name,
+            feature_names=(
+                self.features.column_names
+                if old_name not in self.features.column_names
+                else [
+                    column_name if column_name != old_name else new_name for column_name in self.features.column_names
+                ]
+            ),
+        ), time_name=new_name if self.time.name == old_name else self.time.name)
+
+    def replace_column(self, old_column_name: str, new_columns: list[Column]) -> TimeSeries:
+        """
+        Return a new `TimeSeries` with the specified old column replaced by a list of new columns.
+
+        If the column to be replaced is the target column, it must be replaced by exactly one column. That column
+        becomes the new target column. If the column to be replaced is a feature column, the new columns that replace it
+        all become feature columns.
+
+        The order of columns is kept. The original table is not modified.
+
+        Parameters
+        ----------
+        old_column_name : str
+            The name of the column to be replaced.
+        new_columns : list[Column]
+            The new columns replacing the old column.
+
+        Returns
+        -------
+        result : TimeSeries
+            A time series with the old column replaced by the new column.
+
+        Raises
+        ------
+        UnknownColumnNameError
+            If the old column does not exist.
+        DuplicateColumnNameError
+            If the new column already exists and the existing column is not affected by the replacement.
+        ColumnSizeError
+            If the size of the column does not match the amount of rows.
+        IllegalSchemaModificationError
+            If the target column would be removed or replaced by more than one column.
+        """
+        if old_column_name == self.time.name:
+            if len(new_columns) != 1:
+                raise IllegalSchemaModificationError(
+                    f'Time column "{self.time.name}" can only be replaced by exactly one new column.',
+                )
+            else:
+                return TimeSeries._from_tagged_table(TaggedTable._from_table(
+                    super().replace_column(old_column_name, new_columns),
+                    target_name=self.target.name,
+                    feature_names=self.features.column_names,
+                ), time_name=new_columns[0].name)
+        if old_column_name == self.target.name:
+            if len(new_columns) != 1:
+                raise IllegalSchemaModificationError(
+                    f'Target column "{self.target.name}" can only be replaced by exactly one new column.',
+                )
+            else:
+                return TimeSeries._from_tagged_table(TaggedTable._from_table(
+                    super().replace_column(old_column_name, new_columns),
+                    target_name=new_columns[0].name,
+                    feature_names=self.features.column_names,
+                ), time_name=self.time.name)
+        else:
+            return TimeSeries._from_tagged_table(TaggedTable._from_table(
+                super().replace_column(old_column_name, new_columns),
+                target_name=self.target.name,
+                feature_names=(
+                    self.features.column_names
+                    if old_column_name not in self.features.column_names
+                    else self.features.column_names[: self.features.column_names.index(old_column_name)]
+                         + [col.name for col in new_columns]
+                         + self.features.column_names[self.features.column_names.index(old_column_name) + 1:]
+                ),
+            ), time_name=self.time.name)
+
+    def slice_rows(
+        self,
+        start: int | None = None,
+        end: int | None = None,
+        step: int = 1,
+    ) -> TimeSeries:
+        """
+        Slice a part of the table into a new `TimeSeries`.
+
+        The original time series is not modified.
+
+        Parameters
+        ----------
+        start : int | None
+            The first index of the range to be copied into a new time series, None by default.
+        end : int | None
+            The last index of the range to be copied into a new time series, None by default.
+        step : int
+            The step size used to iterate through the time series, 1 by default.
+
+        Returns
+        -------
+        result : TimeSeries
+            The resulting time series.
+
+        Raises
+        ------
+        IndexOutOfBoundsError
+            If the index is out of bounds.
+        """
+        return TimeSeries._from_tagged_table(TaggedTable._from_table(
+            super().slice_rows(start, end, step),
+            target_name=self.target.name,
+            feature_names=self.features.column_names,
+        ), time_name=self.time.name)
+
+    def sort_columns(
+        self,
+        comparator: Callable[[Column, Column], int] = lambda col1, col2: (col1.name > col2.name)
+                                                                         - (col1.name < col2.name),
+    ) -> TimeSeries:
+        """
+        Sort the columns of a `TimeSeries` with the given comparator and return a new `TimeSeries`.
+
+        The comparator is a function that takes two columns `col1` and `col2` and
+        returns an integer:
+
+        * If the function returns a negative number, `col1` will be ordered before `col2`.
+        * If the function returns a positive number, `col1` will be ordered after `col2`.
+        * If the function returns 0, the original order of `col1` and `col2` will be kept.
+
+        If no comparator is given, the columns will be sorted alphabetically by their name.
+
+        The original table is not modified.
+
+        Parameters
+        ----------
+        comparator : Callable[[Column, Column], int]
+            The function used to compare two columns.
+
+        Returns
+        -------
+        new_time_series : TimeSeries
+            A new time series with sorted columns.
+        """
+        sorted_table = super().sort_columns(comparator)
+        return TimeSeries._from_tagged_table(TaggedTable._from_table(
+            sorted_table,
+            target_name=self.target.name,
+            feature_names=sorted(
+                set(sorted_table.column_names).intersection(self.features.column_names),
+                key={val: ix for ix, val in enumerate(sorted_table.column_names)}.__getitem__,
+            ),
+        ), time_name=self.time.name)
+
+    def transform_column(self, name: str, transformer: Callable[[Row], Any]) -> TimeSeries:
+        """
+        Return a new `TimeSeries` with the provided column transformed by calling the provided transformer.
+
+        The original time series is not modified.
+
+        Returns
+        -------
+        result : TimeSeries
+            The time series with the transformed column.
+
+        Raises
+        ------
+        UnknownColumnNameError
+            If the column does not exist.
+        """
+        return TimeSeries._from_tagged_table(TaggedTable._from_table(
+            super().transform_column(name, transformer),
+            target_name=self.target.name,
+            feature_names=self.features.column_names,
+        ),time_name= self.time.name)

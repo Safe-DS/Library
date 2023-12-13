@@ -2,7 +2,7 @@ import pytest
 from safeds.data.tabular.containers import Table, TimeSeries
 from safeds.exceptions import ColumnIsTargetError, IllegalSchemaModificationError
 
-from tests.helpers import assert_that_tagged_tables_are_equal
+from tests.helpers import assert_that_time_series_are_equal
 
 
 @pytest.mark.parametrize(
@@ -138,7 +138,7 @@ from tests.helpers import assert_that_tagged_tables_are_equal
 )
 def test_should_remove_columns(table: TimeSeries, columns: list[str], expected: TimeSeries) -> None:
     new_table = table.remove_columns(columns)
-    assert_that_tagged_tables_are_equal(new_table, expected)
+    assert_that_time_series_are_equal(new_table, expected)
 
 
 @pytest.mark.parametrize(
