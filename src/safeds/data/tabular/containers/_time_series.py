@@ -138,8 +138,8 @@ class TimeSeries(TaggedTable):
         Examples
         --------
         >>> from safeds.data.tabular.containers import Table, TimeSeries
-        >>> table = Table({"date": ["01.01", "01.02", "01.03", "01.04"], "col1": ["a", "b", "c", "a"]})
-        >>> timeseries = TimeSeries._from_table(table, "f1", "date", ["f1"])
+        >>> table = Table({"date": ["01.01", "01.02", "01.03", "01.04"], "f1": ["a", "b", "c", "a"], "t": [1,2,3,4]})
+        >>> timeseries = TimeSeries._from_table(table, "t", "date", ["f1"])
         """
         if feature_names is None:
             feature_names = table.column_names
