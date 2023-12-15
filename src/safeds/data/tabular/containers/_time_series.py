@@ -82,7 +82,7 @@ class TimeSeries(TaggedTable):
         --------
         >>> from safeds.data.tabular.containers import Table, TimeSeries
         >>> tagged_table = TaggedTable({"date": ["01.01", "01.02", "01.03", "01.04"], "col1": ["a", "b", "c", "a"]}, "col1" )
-        >>> timeseries = TimeSeries._from_table(tagged_table, "date")
+        >>> timeseries = TimeSeries._from_tagged_table(tagged_table, time_name = "date")
         """
 
         table = tagged_table._as_table()
