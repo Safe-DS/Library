@@ -7,7 +7,8 @@ import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
 from torch.utils.data import Dataset
-from typing import TYPE_CHECKING, override
+from typing import TYPE_CHECKING
+from typing import overload
 
 from safeds.data.tabular.containers import Column, Row, Table, TaggedTable
 
@@ -108,7 +109,7 @@ class TimeSeries(TaggedTable):
         return result
 
     @staticmethod
-    @override
+    @overload
     #idk if this method should exist, because we cant use it like the Method in TaggedTable, but the Method is static and this seem to doesnt get checked by the megalinter.
     def _from_table(
         table: Table,
