@@ -110,7 +110,7 @@ class TimeSeries(TaggedTable):
 
     @staticmethod
     #idk if this method should exist, because we cant use it like the Method in TaggedTable, but the Method is static and this seem to doesnt get checked by the megalinter.
-    def _from_table(
+    def _from_table_to_tagged_table(
         table: Table,
         target_name: str,
         time_name: str,
