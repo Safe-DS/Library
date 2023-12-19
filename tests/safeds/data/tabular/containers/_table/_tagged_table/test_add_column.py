@@ -1,5 +1,5 @@
 import pytest
-from src.safeds.data.tabular.containers import Column, TaggedTable
+from safeds.data.tabular.containers import Column, TaggedTable
 
 from tests.helpers import assert_that_tagged_tables_are_equal
 
