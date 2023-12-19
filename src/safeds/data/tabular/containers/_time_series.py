@@ -7,7 +7,7 @@ import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
 from torch.utils.data import Dataset
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, override
 
 from safeds.data.tabular.containers import Column, Row, Table, TaggedTable
 
@@ -21,6 +21,7 @@ from safeds.exceptions import (
 if TYPE_CHECKING:
 
     from collections.abc import Callable, Mapping, Sequence
+
     from safeds.data.image.containers import Image
     from typing import Any
 
@@ -107,50 +108,51 @@ class TimeSeries(TaggedTable):
         return result
 
     @staticmethod
+    @override
     #idk if this method should exist, because we cant use it like the Method in TaggedTable, but the Method is static and this seem to doesnt get checked by the megalinter.
-    #def _from_table(
-    #    table: Table,
-    #    target_name: str,
-    #    time_name: str,
-    #    feature_names: list[str] | None = None,
-    #) -> TimeSeries:
-    #    """Create a TimeSeries from a table
-    #    Parameters
-    #    ----------
-    #    table : Table
-    #        The table.
-    #    target_name : str
-    #        Name of the target column.
-    #    time_name: str
-    #        Name of the date column.
-    #    feature_names : list[str] | None
-    #        Names of the feature columns. If None, all columns except the target column are used.
-    #    Retruns
-    #    -------
-    #    time_series : TimeSeries
-    #        the created time series
+    def _from_table(
+        table: Table,
+        target_name: str,
+        time_name: str,
+        feature_names: list[str] | None = None,
+    ) -> TimeSeries:
+        """Create a TimeSeries from a table
+        Parameters
+        ----------
+        table : Table
+            The table.
+        target_name : str
+            Name of the target column.
+        time_name: str
+            Name of the date column.
+        feature_names : list[str] | None
+            Names of the feature columns. If None, all columns except the target column are used.
+        Retruns
+        -------
+        time_series : TimeSeries
+            the created time series
 
-    #    Raises
-    #    ------
-    #    UnknownColumnError
-    #        If target_name matches none of the column names.
-    #    Value Error
-    #        If no feature columns are specified
-    #    Examples
-    #    --------
-    #    >>> from safeds.data.tabular.containers import Table, TimeSeries
-    #    >>> table = Table({"date": ["01.01", "01.02", "01.03", "01.04"], "f1": ["a", "b", "c", "a"], "t": [1,2,3,4]})
-    #    >>> timeseries = TimeSeries._from_table(table, "t", "date", ["f1"])
-    #    """
-    #    if feature_names is None:
-    #        feature_names = table.column_names
-    #        if time_name in feature_names:
-    #            feature_names.remove(time_name)
-    #        if target_name in feature_names:
-    #            feature_names.remove(target_name)
-    #    tagged_table = TaggedTable._from_table(table=table, target_name=target_name, feature_names=feature_names)
-    #    # check if time column got added as feature column
-    #    return TimeSeries._from_tagged_table(tagged_table=tagged_table, time_name=time_name)
+        Raises
+        ------
+        UnknownColumnError
+            If target_name matches none of the column names.
+        Value Error
+            If no feature columns are specified
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table, TimeSeries
+        >>> table = Table({"date": ["01.01", "01.02", "01.03", "01.04"], "f1": ["a", "b", "c", "a"], "t": [1,2,3,4]})
+        >>> timeseries = TimeSeries._from_table(table, "t", "date", ["f1"])
+        """
+        if feature_names is None:
+            feature_names = table.column_names
+            if time_name in feature_names:
+                feature_names.remove(time_name)
+            if target_name in feature_names:
+                feature_names.remove(target_name)
+        tagged_table = TaggedTable._from_table(table=table, target_name=target_name, feature_names=feature_names)
+        # check if time column got added as feature column
+        return TimeSeries._from_tagged_table(tagged_table=tagged_table, time_name=time_name)
 
     # ------------------------------------------------------------------------------------------------------------------
     # Dunder methods
