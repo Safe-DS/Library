@@ -109,7 +109,6 @@ class TimeSeries(TaggedTable):
         return result
 
     @staticmethod
-    @overload
     #idk if this method should exist, because we cant use it like the Method in TaggedTable, but the Method is static and this seem to doesnt get checked by the megalinter.
     def _from_table(
         table: Table,
