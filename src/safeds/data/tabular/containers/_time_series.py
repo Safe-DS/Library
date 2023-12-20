@@ -189,9 +189,6 @@ class TimeSeries(TaggedTable):
 
         super().__init__(data, target_name, feature_names)
 
-        if time_name in feature_names:
-            raise ValueError(f"Date column '{time_name}' can not be an feature column.")
-
         # Validate inputs
         if time_name not in (_data.column_names):
             raise ValueError(f"Column '{time_name}' must exist in the table.")

@@ -73,6 +73,20 @@ from safeds.exceptions import UnknownColumnNameError
             ValueError,
             r"At least one feature column must be specified.",
         ),
+        (
+            {
+                "time": [0, 1],
+                "A": [1, 4],
+                "B": [2, 5],
+                "C": [3, 6],
+                "T": [0, 1],
+            },
+            "random",
+            "B",
+            ["A"],
+            ValueError,
+            r"Column 'random' must exist in the table.",
+        ),
     ],
     ids=[
         "feature_does_not_exist",
@@ -80,6 +94,7 @@ from safeds.exceptions import UnknownColumnNameError
         "target_and_feature_overlap",
         "features_are_empty-explicitly",
         "features_are_empty_implicitly",
+        "time_column_does_not_exist",
     ],
 )
 def test_should_raise_error(
