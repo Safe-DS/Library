@@ -10,7 +10,7 @@ from tests.helpers import assert_that_time_series_are_equal
         (
             TimeSeries(
                 {
-                    "time":[0, 0, 1],
+                    "time": [0, 0, 1],
                     "feature": [0, 0, 1],
                     "target": [2, 2, 3],
                 },

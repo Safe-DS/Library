@@ -15,7 +15,7 @@ from tests.helpers import assert_that_time_series_are_equal
                     "target": [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
                 },
                 "target",
-            "time",
+                "time",
             ),
             TimeSeries(
                 {

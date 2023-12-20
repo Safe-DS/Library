@@ -101,7 +101,12 @@ def test_should_raise_error(
     error_msg: str,
 ) -> None:
     with pytest.raises(error, match=error_msg):
-        TimeSeries._from_table_to_time_series(table, target_name=target_name, time_name=time_name, feature_names=feature_names)
+        TimeSeries._from_table_to_time_series(
+            table,
+            target_name=target_name,
+            time_name=time_name,
+            feature_names=feature_names,
+        )
 
 
 @pytest.mark.parametrize(
@@ -152,9 +157,21 @@ def test_should_raise_error(
     ],
     ids=["create_tagged_table", "tagged_table_not_all_columns_are_features", "tagged_table_with_feature_names_as_None"],
 )
-def test_should_create_a_tagged_table(table: Table, target_name: str, time_name: str, feature_names: list[str] | None) -> None:
-    time_series = TimeSeries._from_table_to_time_series(table, target_name=target_name, time_name=time_name, feature_names=feature_names)
-    feature_names = feature_names if feature_names is not None else table.remove_columns([target_name, time_name]).column_names
+def test_should_create_a_tagged_table(
+    table: Table,
+    target_name: str,
+    time_name: str,
+    feature_names: list[str] | None,
+) -> None:
+    time_series = TimeSeries._from_table_to_time_series(
+        table,
+        target_name=target_name,
+        time_name=time_name,
+        feature_names=feature_names,
+    )
+    feature_names = (
+        feature_names if feature_names is not None else table.remove_columns([target_name, time_name]).column_names
+    )
     assert isinstance(time_series, TimeSeries)
     assert time_series._features.column_names == feature_names
     assert time_series._target.name == target_name

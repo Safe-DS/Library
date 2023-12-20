@@ -11,19 +11,19 @@ from tests.helpers import assert_that_tagged_tables_are_equal
     [
         (
             TimeSeries(
-                data={"time":[0, 1, 2], "feature": [1, 2, 1], "non_feature": [0, 2, 4], "target": [1, 2, 4]},
+                data={"time": [0, 1, 2], "feature": [1, 2, 1], "non_feature": [0, 2, 4], "target": [1, 2, 4]},
                 target_name="target",
                 time_name="time",
                 feature_names=["non_feature"],
             ),
             TimeSeries(
-                data={"time":[0, 1],"feature": [1, 2], "non_feature": [0, 2], "target": [1, 2]},
+                data={"time": [0, 1], "feature": [1, 2], "non_feature": [0, 2], "target": [1, 2]},
                 target_name="target",
                 time_name="time",
                 feature_names=["non_feature"],
             ),
             TimeSeries(
-                {"time":[0, 2], "feature": [1, 1], "non_feature": [0, 4], "target": [1, 4]},
+                {"time": [0, 2], "feature": [1, 1], "non_feature": [0, 4], "target": [1, 4]},
                 target_name="target",
                 time_name="time",
                 feature_names=["non_feature"],

@@ -3,6 +3,7 @@ from collections.abc import Callable
 import pytest
 from safeds.data.tabular.containers import Column, TaggedTable
 
+
 # this tests seems written very specific //Gerhardsa0
 @pytest.mark.parametrize(
     ("query", "col1", "col2", "col3", "col4"),

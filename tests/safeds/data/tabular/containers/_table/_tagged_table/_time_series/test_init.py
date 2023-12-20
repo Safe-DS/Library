@@ -4,7 +4,7 @@ from safeds.exceptions import UnknownColumnNameError
 
 
 @pytest.mark.parametrize(
-    ("data","time_name", "target_name", "feature_names", "error", "error_msg"),
+    ("data", "time_name", "target_name", "feature_names", "error", "error_msg"),
     [
         (
             {
@@ -110,7 +110,7 @@ def test_should_raise_error(
 
 
 @pytest.mark.parametrize(
-    ("data","time_name", "target_name", "feature_names"),
+    ("data", "time_name", "target_name", "feature_names"),
     [
         (
             {

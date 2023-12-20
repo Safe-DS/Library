@@ -37,7 +37,6 @@ if TYPE_CHECKING:
     from safeds.data.tabular.transformation import InvertibleTableTransformer, TableTransformer
 
     from ._tagged_table import TaggedTable
-
     from ._time_series import TimeSeries
 
 # Enable copy-on-write for pandas dataframes
@@ -1545,7 +1544,7 @@ class Table:
     def sort_columns(
         self,
         comparator: Callable[[Column, Column], int] = lambda col1, col2: (col1.name > col2.name)
-                                                                         - (col1.name < col2.name),
+        - (col1.name < col2.name),
     ) -> Table:
         """
         Sort the columns of a `Table` with the given comparator and return a new `Table`.
@@ -1753,6 +1752,7 @@ class Table:
         >>> tagged_table = table.time_columns(target_name="amount_bought",time_name = "time", feature_names=["price"])
         """
         from ._time_series import TimeSeries
+
         return TimeSeries._from_table_to_time_series(self, target_name, time_name, feature_names)
 
     def transform_column(self, name: str, transformer: Callable[[Row], Any]) -> Table:
