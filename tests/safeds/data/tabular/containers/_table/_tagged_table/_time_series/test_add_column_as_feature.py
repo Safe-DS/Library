@@ -40,7 +40,6 @@ def test_should_add_column_as_feature(
     column: Column,
     time_series_with_new_column: TimeSeries,
 ) -> None:
-    test = time_series.add_column_as_feature(column)
     assert_that_time_series_are_equal(time_series.add_column_as_feature(column),time_series_with_new_column,
 )
 @pytest.mark.parametrize(
