@@ -19,6 +19,7 @@ if TYPE_CHECKING:
 class TimeSeries(TaggedTable):
 
     """A TimeSeries is a tagged table that additionally knows which column is the time column and uses the target column as an feature.
+
      A Time Column should never be an feature.
     ----------
     data : Mapping[str, Sequence[Any]]
@@ -98,7 +99,8 @@ class TimeSeries(TaggedTable):
         time_name: str,
         feature_names: list[str] | None = None,
     ) -> TimeSeries:
-        """Create a TimeSeries from a table
+        """Create a TimeSeries from a table.
+
         Parameters
         ----------
         table : Table
