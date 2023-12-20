@@ -10,7 +10,9 @@ from tests.helpers import assert_that_time_series_are_equal
     [
         (
             Table({"time": [0, 1], "f1": [1, 2], "target": [2, 3]}).time_columns(
-                target_name="target", time_name="time", feature_names=["f1"],
+                target_name="target",
+                time_name="time",
+                feature_names=["f1"],
             ),
             [Column("f2", [4, 5]), Column("f3", [6, 7])],
             Table({"time": [0, 1], "f1": [1, 2], "target": [2, 3], "f2": [4, 5], "f3": [6, 7]}).time_columns(
@@ -21,7 +23,9 @@ from tests.helpers import assert_that_time_series_are_equal
         ),
         (
             Table({"time": [0, 1], "f1": [1, 2], "target": [2, 3]}).time_columns(
-                target_name="target", time_name="time", feature_names=["f1"],
+                target_name="target",
+                time_name="time",
+                feature_names=["f1"],
             ),
             Table.from_columns([Column("f2", [4, 5]), Column("f3", [6, 7])]),
             Table({"time": [0, 1], "f1": [1, 2], "target": [2, 3], "f2": [4, 5], "f3": [6, 7]}).time_columns(
@@ -38,7 +42,12 @@ from tests.helpers import assert_that_time_series_are_equal
             ),
             Table.from_columns([Column("f2", [4, 5]), Column("f3", [6, 7])]),
             Table({
-                "time": [0, 1], "f1": [1, 2], "target": [2, 3], "other": [0, -1], "f2": [4, 5], "f3": [6, 7],
+                "time": [0, 1],
+                "f1": [1, 2],
+                "target": [2, 3],
+                "other": [0, -1],
+                "f2": [4, 5],
+                "f3": [6, 7],
             }).time_columns(
                 target_name="target",
                 time_name="time",

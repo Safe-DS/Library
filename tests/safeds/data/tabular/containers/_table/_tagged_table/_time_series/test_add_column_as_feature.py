@@ -10,7 +10,9 @@ from tests.helpers import assert_that_time_series_are_equal
     [
         (
             Table({"t": [1, 2], "f1": [1, 2], "target": [2, 3]}).time_columns(
-                target_name="target", time_name="t", feature_names=["f1"],
+                target_name="target",
+                time_name="t",
+                feature_names=["f1"],
             ),
             Column("f2", [4, 5]),
             Table({"t": [1, 2], "f1": [1, 2], "target": [2, 3], "f2": [4, 5]}).time_columns(
