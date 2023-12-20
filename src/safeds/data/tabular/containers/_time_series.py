@@ -536,10 +536,6 @@ class TimeSeries(TaggedTable):
             If the columns to remove contain all the feature columns.
         """
         table = super().remove_columns_with_missing_values()
-        if self.target.name not in table.column_names:
-            raise ColumnIsTargetError(self.target.name)
-        if len(set(self.features.column_names).intersection(set(table.column_names))) == 0:
-            raise IllegalSchemaModificationError("You cannot remove every feature column.")
         if self.time.name not in table.column_names:
             raise ColumnIsTimeError(self.time.name)
         return TimeSeries._from_tagged_table(
@@ -573,10 +569,6 @@ class TimeSeries(TaggedTable):
             If the columns to remove contain all the feature columns.
         """
         table = super().remove_columns_with_non_numerical_values()
-        if self.target.name not in table.column_names:
-            raise ColumnIsTargetError(self.target.name)
-        if len(set(self.features.column_names).intersection(set(table.column_names))) == 0:
-            raise IllegalSchemaModificationError("You cannot remove every feature column.")
         if self.time.name not in table.column_names:
             raise ColumnIsTimeError(self.time.name)
         return TimeSeries._from_tagged_table(
