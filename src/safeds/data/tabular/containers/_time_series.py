@@ -18,13 +18,8 @@ if TYPE_CHECKING:
 
 class TimeSeries(TaggedTable):
 
-    # Invarainte should be that a time is never a target or feature
-    # target should always be an feature
-    # date should never be an feature
-    """
-
-     A TimeSeries is a tagged table that additionally knows which column is the time column and uses the target column as an feature.
-     A Time Column should neve be an feature.
+    """A TimeSeries is a tagged table that additionally knows which column is the time column and uses the target column as an feature.
+     A Time Column should never be an feature.
     ----------
     data : Mapping[str, Sequence[Any]]
         The data.
