@@ -277,8 +277,9 @@ class TimeSeries(TaggedTable):
         ColumnSizeError
             If the size of the column does not match the number of rows.
         """
+        new_tagged_table = super().add_column()
         return TimeSeries._from_tagged_table(
-            super().add_column(column),
+            new_tagged_table,
             time_name=self.time.name,
         )
 
