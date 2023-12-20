@@ -187,7 +187,7 @@ def test_should_replace_column(
 
 
 @pytest.mark.parametrize(
-    ("original_table", "new_columns", "column_name_to_be_replaced","error"),
+    ("original_table", "new_columns", "column_name_to_be_replaced", "error"),
     [
         (
             TimeSeries(
@@ -231,7 +231,6 @@ def test_should_replace_column(
             "time",
             'Time column "time" can only be replaced by exactly one new column.',
         ),
-
     ],
     ids=["zero_columns", "multiple_columns", "time_column"],
 )

@@ -1,6 +1,6 @@
 import pytest
 from safeds.data.tabular.containers import TimeSeries
-from safeds.exceptions import ColumnIsTargetError, IllegalSchemaModificationError, ColumnIsTimeError
+from safeds.exceptions import ColumnIsTargetError, ColumnIsTimeError, IllegalSchemaModificationError
 
 from tests.helpers import assert_that_time_series_are_equal
 
@@ -11,7 +11,7 @@ from tests.helpers import assert_that_time_series_are_equal
         (
             TimeSeries(
                 {
-                    "time":[0,1,2],
+                    "time": [0, 1, 2],
                     "feature_numerical": [0, 1, 2],
                     "feature_non_numerical": ["a", "b", "c"],
                     "non_feature_numerical": [7, 8, 9],
@@ -138,7 +138,7 @@ def test_should_remove_columns_with_non_numerical_values(table: TimeSeries, expe
             ColumnIsTargetError,
             r'Illegal schema modification: Column "target" is the target column and cannot be removed.',
         ),
-(
+        (
             TimeSeries(
                 {
                     "time": ["!", "x", "2"],

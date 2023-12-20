@@ -12,7 +12,7 @@ from tests.helpers import assert_that_time_series_are_equal
             TimeSeries._from_table_to_time_series(
                 Table(
                     {
-                        "time": [0, 1 ,2],
+                        "time": [0, 1, 2],
                         "feat1": [1, 2, 3],
                         "feat2": [4, 5, 6],
                         "target": [7, 8, 9],
@@ -52,7 +52,7 @@ from tests.helpers import assert_that_time_series_are_equal
             TimeSeries._from_table_to_time_series(
                 Table(
                     {
-                        "time" : [0, 1, 2],
+                        "time": [0, 1, 2],
                         "feat1": [1, 2, 3],
                         "other": [3, 4, 5],
                         "target": [7, 8, 9],
@@ -136,7 +136,7 @@ def test_should_return_table(table: TimeSeries, column_names: list[str], expecte
             ["target", "other"],
             r"Illegal schema modification: Must keep at least one feature column.",
         ),
-(
+        (
             TimeSeries._from_table_to_time_series(
                 Table(
                     {

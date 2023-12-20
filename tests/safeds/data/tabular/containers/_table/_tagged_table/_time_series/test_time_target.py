@@ -1,6 +1,8 @@
 import pytest
 from safeds.data.tabular.containers import Column, TimeSeries
-#test
+
+# test
+
 
 @pytest.mark.parametrize(
     ("time_series", "target_column", "time_column"),
@@ -15,7 +17,7 @@ from safeds.data.tabular.containers import Column, TimeSeries
                     "T": [0, 1],
                 },
                 target_name="T",
-                time_name="time"
+                time_name="time",
             ),
             Column("T", [0, 1]),
             Column("time", [0, 1]),
@@ -23,6 +25,6 @@ from safeds.data.tabular.containers import Column, TimeSeries
     ],
     ids=["target"],
 )
-def test_should_return_target(time_series: TimeSeries, target_column: Column, time_column : Column) -> None:
+def test_should_return_target(time_series: TimeSeries, target_column: Column, time_column: Column) -> None:
     assert time_series.target == target_column
     assert time_series.time == time_column
