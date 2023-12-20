@@ -103,9 +103,8 @@ def test_should_raise_error(
     error: type[Exception],
     error_msg: str,
 ) -> None:
-    tagged_table = TaggedTable._from_table(table, target_name=target_name, feature_names=feature_names)
     with pytest.raises(error, match=error_msg):
-        TimeSeries._from_tagged_table(tagged_table, time_name=time_name)
+        TimeSeries._from_tagged_table(TaggedTable._from_table(table, target_name=target_name, feature_names=feature_names), time_name=time_name)
 
 
 @pytest.mark.parametrize(
