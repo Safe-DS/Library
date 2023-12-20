@@ -105,7 +105,8 @@ def test_should_raise_error(
 ) -> None:
     with pytest.raises(error, match=error_msg):
         TimeSeries._from_tagged_table(
-            TaggedTable._from_table(table, target_name=target_name, feature_names=feature_names), time_name=time_name,
+            TaggedTable._from_table(table, target_name=target_name, feature_names=feature_names),
+            time_name=time_name,
         )
 
 
@@ -158,7 +159,10 @@ def test_should_raise_error(
     ids=["create_tagged_table", "tagged_table_not_all_columns_are_features", "tagged_table_with_feature_names_as_None"],
 )
 def test_should_create_a_tagged_table(
-    table: Table, target_name: str, time_name: str, feature_names: list[str] | None,
+    table: Table,
+    target_name: str,
+    time_name: str,
+    feature_names: list[str] | None,
 ) -> None:
     tagged_table = TaggedTable._from_table(table, target_name=target_name, feature_names=feature_names)
     time_series = TimeSeries._from_tagged_table(tagged_table, time_name=time_name)
