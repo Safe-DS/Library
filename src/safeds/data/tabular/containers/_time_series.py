@@ -49,7 +49,8 @@ class TimeSeries(TaggedTable):
         tagged_table: TaggedTable,
         time_name: str,
     ) -> TimeSeries:
-        """Create a time series from a tagged table
+        """Create a time series from a tagged table.
+
         Parameters
         ----------
         table : TaggedTable
