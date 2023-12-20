@@ -219,4 +219,3 @@ def test_should_raise_in_remove_columns_with_missing_values(
         match=error_msg,
     ):
         table.remove_columns_with_missing_values()
-

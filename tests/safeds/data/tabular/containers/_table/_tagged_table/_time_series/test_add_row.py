@@ -11,7 +11,7 @@ from tests.helpers import assert_that_time_series_are_equal
         (
             TimeSeries(
                 {
-                    "time": [0,1],
+                    "time": [0, 1],
                     "feature": [0, 1],
                     "target": [3, 4],
                 },
@@ -41,6 +41,7 @@ from tests.helpers import assert_that_time_series_are_equal
 def test_should_add_row(time_series: TimeSeries, row: Row, expected: TimeSeries) -> None:
     assert_that_time_series_are_equal(time_series.add_row(row), expected)
 
+
 @pytest.mark.parametrize(
     ("time_series", "row", "error_msg"),
     [
@@ -66,8 +67,8 @@ def test_should_raise_an_error_if_row_schema_invalid(
     ("time_series", "row", "expected_time_series"),
     [
         (
-            TimeSeries({"time": [],"feature": [], "target": []}, "target", "time"),
-            Row({"time": 0,"feature": 2, "target": 5}),
+            TimeSeries({"time": [], "feature": [], "target": []}, "target", "time"),
+            Row({"time": 0, "feature": 2, "target": 5}),
             TimeSeries({"time": [0], "feature": [2], "target": [5]}, "target", "time"),
         ),
     ],
@@ -79,7 +80,3 @@ def test_should_add_row_to_empty_table(
     expected_time_series: TimeSeries,
 ) -> None:
     assert_that_time_series_are_equal(time_series.add_row(row), expected_time_series)
-
-
-
-

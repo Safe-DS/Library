@@ -1,6 +1,6 @@
 import pytest
 from safeds.data.tabular.containers import Table, TimeSeries
-from safeds.exceptions import ColumnIsTargetError, IllegalSchemaModificationError, ColumnIsTimeError
+from safeds.exceptions import ColumnIsTargetError, ColumnIsTimeError, IllegalSchemaModificationError
 
 from tests.helpers import assert_that_time_series_are_equal
 

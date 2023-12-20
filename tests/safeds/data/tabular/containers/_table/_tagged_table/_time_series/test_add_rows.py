@@ -11,7 +11,7 @@ from tests.helpers import assert_that_time_series_are_equal
         (
             TimeSeries(
                 {
-                    "time": [0,1],
+                    "time": [0, 1],
                     "feature": [0, 1],
                     "target": [4, 5],
                 },
@@ -26,16 +26,11 @@ from tests.helpers import assert_that_time_series_are_equal
                         "target": 6,
                     },
                 ),
-                Row({
-                        "time": 3,
-                        "feature": 3,
-                        "target": 7
-                    }
-                ),
+                Row({"time": 3, "feature": 3, "target": 7}),
             ],
             TimeSeries(
                 {
-                    "time" : [0, 1, 2, 3],
+                    "time": [0, 1, 2, 3],
                     "feature": [0, 1, 2, 3],
                     "target": [4, 5, 6, 7],
                 },
@@ -54,7 +49,7 @@ def test_should_add_rows(time_series: TimeSeries, rows: list[Row], expected: Tim
     ("time_series", "rows", "error_msg"),
     [
         (
-            TimeSeries({"time": [], "feature": [], "target": []}, "target","time", ["feature"]),
+            TimeSeries({"time": [], "feature": [], "target": []}, "target", "time", ["feature"]),
             [Row({"feat": None, "targ": None}), Row({"targ": None, "feat": None})],
             r"Could not find column\(s\) 'time, feature, target'.",
         ),
