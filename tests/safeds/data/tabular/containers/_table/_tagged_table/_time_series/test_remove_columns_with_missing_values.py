@@ -143,7 +143,7 @@ def test_should_remove_columns_with_non_numerical_values(table: TimeSeries, expe
                 {
                     "time": [0, 1, 2],
                     "feature": [0, 1, 2],
-                    "non_feature": [1, None, 3],
+                    "non_feature": [1, 2, 3],
                     "target": [3, 4, None],
                 },
                 "target",
@@ -219,3 +219,4 @@ def test_should_raise_in_remove_columns_with_missing_values(
         match=error_msg,
     ):
         table.remove_columns_with_missing_values()
+

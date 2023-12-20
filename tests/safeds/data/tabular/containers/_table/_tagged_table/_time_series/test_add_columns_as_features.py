@@ -53,8 +53,6 @@ def test_add_columns_as_features(
     columns: list[Column] | Table,
     time_series_with_new_columns: TimeSeries,
 ) -> None:
-    print(time_series.add_columns_as_features(columns).features.column_names)
-    print(time_series_with_new_columns.features.column_names)
     assert_that_time_series_are_equal(time_series.add_columns_as_features(columns), time_series_with_new_columns)
 @pytest.mark.parametrize(
     ("time_series", "columns", "error_msg"),

@@ -277,9 +277,8 @@ class TimeSeries(TaggedTable):
         ColumnSizeError
             If the size of the column does not match the number of rows.
         """
-        new_tagged_table = super().add_column(column)
         return TimeSeries._from_tagged_table(
-            new_tagged_table,
+            super().add_column(column),
             time_name=self.time.name,
         )
 
@@ -542,6 +541,7 @@ class TimeSeries(TaggedTable):
         if len(set(self.features.column_names).intersection(set(table.column_names))) == 0:
             raise IllegalSchemaModificationError("You cannot remove every feature column.")
         if self.time.name not in table.column_names:
+            print("hi")
             raise ColumnIsTimeError(self.time.name)
         return TimeSeries._from_tagged_table(
             TaggedTable._from_table(

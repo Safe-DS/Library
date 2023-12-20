@@ -53,3 +53,4 @@ from tests.helpers import assert_that_time_series_are_equal
 def test_should_remove_rows_with_missing_values(table: TimeSeries, expected: TimeSeries) -> None:
     new_table = table.remove_rows_with_missing_values()
     assert_that_time_series_are_equal(new_table, expected)
+
