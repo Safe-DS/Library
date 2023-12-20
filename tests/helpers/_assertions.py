@@ -40,6 +40,7 @@ def assert_that_tagged_tables_are_equal(table1: TaggedTable, table2: TaggedTable
     assert table1.target == table2.target
     assert table1 == table2
 
+
 def assert_that_time_series_are_equal(table1: TimeSeries, table2: TimeSeries) -> None:
     """
     Assert that two time series are equal.
