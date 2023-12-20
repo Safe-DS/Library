@@ -110,7 +110,7 @@ class TimeSeries(TaggedTable):
 
     @staticmethod
     #idk if this method should exist, because we cant use it like the Method in TaggedTable, but the Method is static and this seem to doesnt get checked by the megalinter.
-    def _from_table_to_tagged_table(
+    def _from_table_to_time_series(
         table: Table,
         target_name: str,
         time_name: str,
@@ -142,7 +142,7 @@ class TimeSeries(TaggedTable):
         --------
         >>> from safeds.data.tabular.containers import Table, TimeSeries
         >>> table = Table({"date": ["01.01", "01.02", "01.03", "01.04"], "f1": ["a", "b", "c", "a"], "t": [1,2,3,4]})
-        >>> timeseries = TimeSeries._from_table_to_tagged_table(table, "t", "date", ["f1"])
+        >>> timeseries = TimeSeries._from_table_to_time_series(table, "t", "date", ["f1"])
         """
         if feature_names is None:
             feature_names = table.column_names
@@ -233,22 +233,22 @@ class TimeSeries(TaggedTable):
     # Specific methods from time series class:
     # ------------------------------------------------------------------------------------------------------------------
 
-    def _create_moving_average(self, window_size: int) -> Column:
+    #def _create_moving_average(self, window_size: int) -> Column:
         # calculate the windows and the moving average of a timeserties, this function for now only has intern use
         # some unexpected behavior while casting to series agains, because it addds NAN values
         #return Column._from_pandas_series(pd.Series(self.target._data.rolling(window_size).mean()))
-        pass
-    def plot_moving_average(self, window_size: int) -> Image:
+        #pass
+    #def plot_moving_average(self, window_size: int) -> Image:
         # this method should plot the moving average of a time series
-        pass
+        #pass
 
-    def show_time_series(self) -> Image:
+    #def show_time_series(self) -> Image:
         # this method should plot the time series
-        pass
+        #pass
 
-    def decompose_time_series(self) -> Image:
+    #def decompose_time_series(self) -> Image:
         # this Method should show a plot of a decomposed time series
-        pass
+        #pass
 
     # ------------------------------------------------------------------------------------------------------------------
     # Overriden methods from TaggedTable class:

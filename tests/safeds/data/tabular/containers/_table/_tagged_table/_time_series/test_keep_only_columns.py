@@ -9,7 +9,7 @@ from tests.helpers import assert_that_time_series_are_equal
     ("table", "column_names", "expected"),
     [
         (
-            TimeSeries._from_table_to_tagged_table(
+            TimeSeries._from_table_to_time_series(
                 Table(
                     {
                         "time": [0, 1 ,2],
@@ -22,7 +22,7 @@ from tests.helpers import assert_that_time_series_are_equal
                 "time",
             ),
             ["feat1", "target", "time"],
-            TimeSeries._from_table_to_tagged_table(
+            TimeSeries._from_table_to_time_series(
                 Table(
                     {
                         "time": [0, 1, 2],
@@ -35,7 +35,7 @@ from tests.helpers import assert_that_time_series_are_equal
             ),
         ),
         (
-            TimeSeries._from_table_to_tagged_table(
+            TimeSeries._from_table_to_time_series(
                 Table(
                     {
                         "time": [0, 1, 2],
@@ -49,7 +49,7 @@ from tests.helpers import assert_that_time_series_are_equal
                 "time",
             ),
             ["feat1", "other", "target", "time"],
-            TimeSeries._from_table_to_tagged_table(
+            TimeSeries._from_table_to_time_series(
                 Table(
                     {
                         "time" : [0, 1, 2],
@@ -63,7 +63,7 @@ from tests.helpers import assert_that_time_series_are_equal
             ),
         ),
         (
-            TimeSeries._from_table_to_tagged_table(
+            TimeSeries._from_table_to_time_series(
                 Table(
                     {
                         "time": [0, 1, 2],
@@ -77,7 +77,7 @@ from tests.helpers import assert_that_time_series_are_equal
                 "time",
             ),
             ["feat1", "target", "time"],
-            TimeSeries._from_table_to_tagged_table(
+            TimeSeries._from_table_to_time_series(
                 Table(
                     {
                         "time": [0, 1, 2],
@@ -101,7 +101,7 @@ def test_should_return_table(table: TimeSeries, column_names: list[str], expecte
     ("table", "column_names", "error_msg"),
     [
         (
-            TimeSeries._from_table_to_tagged_table(
+            TimeSeries._from_table_to_time_series(
                 Table(
                     {
                         "time": [0, 1, 2],
@@ -119,7 +119,7 @@ def test_should_return_table(table: TimeSeries, column_names: list[str], expecte
             r"Illegal schema modification: Must keep the target column.",
         ),
         (
-            TimeSeries._from_table_to_tagged_table(
+            TimeSeries._from_table_to_time_series(
                 Table(
                     {
                         "time": [0, 1, 2],
@@ -137,7 +137,7 @@ def test_should_return_table(table: TimeSeries, column_names: list[str], expecte
             r"Illegal schema modification: Must keep at least one feature column.",
         ),
 (
-            TimeSeries._from_table_to_tagged_table(
+            TimeSeries._from_table_to_time_series(
                 Table(
                     {
                         "time": [0, 1, 2],
