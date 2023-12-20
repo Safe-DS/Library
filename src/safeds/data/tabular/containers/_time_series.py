@@ -94,12 +94,9 @@ class TimeSeries(TaggedTable):
         if time_name in feature_names:
             feature_names.remove(time_name)
 
-        # no need to validate the tagged table on tagged table specs
-        if time_name in feature_names:
-            raise ValueError(f"Column '{time_name}' cannot be both time column and feature.")
 
         if time_name == tagged_table.target.name:
-            raise ValueError(f"Column '{time_name}' cannot be both timecolumn and target.")
+            raise ValueError(f"Column '{time_name}' cannot be both time column and target.")
 
         result._data = table._data
         result._schema = table.schema
