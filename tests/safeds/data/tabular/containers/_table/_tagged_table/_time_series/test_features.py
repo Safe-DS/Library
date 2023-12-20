@@ -15,12 +15,9 @@ from safeds.data.tabular.containers import Table, TimeSeries
                     "T": [0, 1],
                 },
                 target_name="T",
-                time_name= "time",
+                time_name="time",
             ),
-            Table({
-                    "A": [1, 4],
-                    "B": [2, 5],
-                    "C": [3, 6]}),
+            Table({"A": [1, 4], "B": [2, 5], "C": [3, 6]}),
         ),
         (
             TimeSeries(
@@ -32,15 +29,10 @@ from safeds.data.tabular.containers import Table, TimeSeries
                     "T": [0, 1],
                 },
                 target_name="T",
-                time_name = "time",
+                time_name="time",
                 feature_names=["A", "C"],
             ),
-            Table(
-                {
-                    "A": [1, 4],
-                    "C": [3, 6]
-                }
-            ),
+            Table({"A": [1, 4], "C": [3, 6]}),
         ),
     ],
     ids=["only_target_and_features", "target_features_and_other"],

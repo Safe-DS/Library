@@ -10,25 +10,25 @@ from tests.helpers import assert_that_time_series_are_equal
         (
             TimeSeries(
                 {
-                    "time" : [0,1,2],
+                    "time": [0, 1, 2],
                     "feature_1": [0, 1, 2],
                     "target": [3, 4, 5],
                 },
-                target_name = "target",
-                time_name = "time",
-                feature_names = None,
+                target_name="target",
+                time_name="time",
+                feature_names=None,
             ),
             Column("other", [6, 7, 8]),
             TimeSeries(
                 {
-                    "time" : [0,1,2],
+                    "time": [0, 1, 2],
                     "feature_1": [0, 1, 2],
                     "target": [3, 4, 5],
                     "other": [6, 7, 8],
                 },
-                target_name = "target",
-                time_name = "time",
-                feature_names = ["feature_1"],
+                target_name="target",
+                time_name="time",
+                feature_names=["feature_1"],
             ),
         ),
     ],
