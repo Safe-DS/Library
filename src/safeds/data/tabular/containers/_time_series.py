@@ -1,14 +1,6 @@
 from __future__ import annotations
 
-import copy
-import numpy as np
-import pandas as pd
-import torch
-import torch.nn as nn
-from torch.utils.data import DataLoader
-from torch.utils.data import Dataset
 from typing import TYPE_CHECKING
-from typing import overload
 
 from safeds.data.tabular.containers import Column, Row, Table, TaggedTable
 
@@ -16,18 +8,16 @@ from safeds.exceptions import (
     ColumnIsTargetError,
     ColumnIsTimeError,
     IllegalSchemaModificationError,
-    UnknownColumnNameError,
 )
 
 if TYPE_CHECKING:
-
     from collections.abc import Callable, Mapping, Sequence
 
-    from safeds.data.image.containers import Image
     from typing import Any
 
 
 class TimeSeries(TaggedTable):
+
     # Invarainte should be that a time is never a target or feature
     # target should always be an feature
     # date should never be an feature
@@ -95,7 +85,6 @@ class TimeSeries(TaggedTable):
         if time_name in feature_names:
             feature_names.remove(time_name)
 
-
         if time_name == tagged_table.target.name:
             raise ValueError(f"Column '{time_name}' cannot be both time column and target.")
 
@@ -107,7 +96,7 @@ class TimeSeries(TaggedTable):
         return result
 
     @staticmethod
-    #idk if this method should exist, because we cant use it like the Method in TaggedTable, but the Method is static and this seem to doesnt get checked by the megalinter.
+    # idk if this method should exist, because we cant use it like the Method in TaggedTable, but the Method is static and this seem to doesnt get checked by the megalinter.
     def _from_table_to_time_series(
         table: Table,
         target_name: str,
@@ -231,22 +220,22 @@ class TimeSeries(TaggedTable):
     # Specific methods from time series class:
     # ------------------------------------------------------------------------------------------------------------------
 
-    #def _create_moving_average(self, window_size: int) -> Column:
-        # calculate the windows and the moving average of a timeserties, this function for now only has intern use
-        # some unexpected behavior while casting to series agains, because it addds NAN values
-        #return Column._from_pandas_series(pd.Series(self.target._data.rolling(window_size).mean()))
-        #pass
-    #def plot_moving_average(self, window_size: int) -> Image:
-        # this method should plot the moving average of a time series
-        #pass
+    # def _create_moving_average(self, window_size: int) -> Column:
+    # calculate the windows and the moving average of a timeserties, this function for now only has intern use
+    # some unexpected behavior while casting to series agains, because it addds NAN values
+    # return Column._from_pandas_series(pd.Series(self.target._data.rolling(window_size).mean()))
+    # pass
+    # def plot_moving_average(self, window_size: int) -> Image:
+    # this method should plot the moving average of a time series
+    # pass
 
-    #def show_time_series(self) -> Image:
-        # this method should plot the time series
-        #pass
+    # def show_time_series(self) -> Image:
+    # this method should plot the time series
+    # pass
 
-    #def decompose_time_series(self) -> Image:
-        # this Method should show a plot of a decomposed time series
-        #pass
+    # def decompose_time_series(self) -> Image:
+    # this Method should show a plot of a decomposed time series
+    # pass
 
     # ------------------------------------------------------------------------------------------------------------------
     # Overriden methods from TaggedTable class:
@@ -851,4 +840,4 @@ class TimeSeries(TaggedTable):
             super().transform_column(name, transformer),
             target_name=self.target.name,
             feature_names=self.features.column_names,
-        ),time_name= self.time.name)
+        ), time_name=self.time.name)
