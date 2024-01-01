@@ -593,6 +593,16 @@ class TestAdjustContrast:
             image_adjusted_contrast = image.adjust_contrast(1)
             assert image == image_adjusted_contrast
 
+    @pytest.mark.parametrize(
+        "resource_path",
+        _test_images_all(),
+        ids=_test_images_all_ids(),
+    )
+    def test_should_raise_negative_contrast(self, resource_path: str, device: Device) -> None:
+        _skip_if_device_not_available(device)
+        with pytest.raises(OutOfBoundsError, match=r"factor \(=-1.0\) is not inside \[0, \u221e\)."):
+            Image.from_file(resolve_resource_path(resource_path), device).adjust_contrast(-1.0)
+
 
 @pytest.mark.parametrize("device", _test_devices(), ids=_test_devices_ids())
 class TestBlur:
@@ -636,7 +646,7 @@ class TestSharpen:
     )
     def test_should_raise_negative_sharpen(self, resource_path: str, device: Device) -> None:
         _skip_if_device_not_available(device)
-        with pytest.raises(OutOfBoundsError):
+        with pytest.raises(OutOfBoundsError, match=r"factor \(=-1.0\) is not inside \[0, \u221e\)."):
             Image.from_file(resolve_resource_path(resource_path), device).sharpen(-1.0)
 
     @pytest.mark.parametrize(
