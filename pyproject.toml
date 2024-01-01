@@ -13,7 +13,7 @@ packages = [
 ]
 
 [tool.poetry.dependencies]
-python = "^3.11,<3.13"
+python = "^3.11,<3.12"
 ipython = "^8.8.0"
 matplotlib = "^3.6.3"
 pandas = "^2.0.0"
