@@ -474,7 +474,11 @@ class TestBrightness:
         ids=[_plane_jpg_id, _plane_png_id],
     )
     def test_should_adjust_brightness(
-        self, factor: float, resource_path: str, snapshot_png: SnapshotAssertion, device: Device,
+        self,
+        factor: float,
+        resource_path: str,
+        snapshot_png: SnapshotAssertion,
+        device: Device,
     ) -> None:
         _skip_if_device_not_available(device)
         image = Image.from_file(resolve_resource_path(resource_path), device)
@@ -572,7 +576,11 @@ class TestAdjustContrast:
         ids=[_plane_jpg_id, _plane_png_id],
     )
     def test_should_adjust_contrast(
-        self, factor: float, resource_path: str, snapshot_png: SnapshotAssertion, device: Device,
+        self,
+        factor: float,
+        resource_path: str,
+        snapshot_png: SnapshotAssertion,
+        device: Device,
     ) -> None:
         _skip_if_device_not_available(device)
         image = Image.from_file(resolve_resource_path(resource_path), device)
@@ -624,7 +632,11 @@ class TestSharpen:
         ids=[_plane_jpg_id, _plane_png_id],
     )
     def test_should_sharpen(
-        self, factor: float, resource_path: str, snapshot_png: SnapshotAssertion, device: Device,
+        self,
+        factor: float,
+        resource_path: str,
+        snapshot_png: SnapshotAssertion,
+        device: Device,
     ) -> None:
         _skip_if_device_not_available(device)
         image = Image.from_file(resolve_resource_path(resource_path), device)
