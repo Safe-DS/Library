@@ -15,6 +15,18 @@ from tests.helpers import resolve_resource_path
 _device_cuda = torch.device("cuda")
 _device_cpu = torch.device("cpu")
 
+_plane_jpg_path = "image/plane.jpg"
+_plane_png_path = "image/plane.png"
+_rgba_png_path = "image/rgba.png"
+_white_square_jpg_path = "image/white_square.jpg"
+_white_square_png_path = "image/white_square.png"
+
+_plane_jpg_id = "opaque-3-channel-jpg-plane"
+_plane_png_id = "opaque-4-channel-png-plane"
+_rgba_png_id = "transparent-4-channel-png-rgba"
+_white_square_jpg_id = "opaque-3-channel-jpg-white_square"
+_white_square_png_id = "opaque-3-channel-png-white_square"
+
 
 def _test_devices() -> list[torch.device]:
     return [_device_cpu, _device_cuda]
@@ -22,6 +34,42 @@ def _test_devices() -> list[torch.device]:
 
 def _test_devices_ids() -> list[str]:
     return ["cpu", "cuda"]
+
+
+def _test_images_all() -> list[str]:
+    return [
+        _plane_jpg_path,
+        _plane_png_path,
+        _rgba_png_path,
+        _white_square_jpg_path,
+        _white_square_png_path,
+    ]
+
+
+def _test_images_all_ids() -> list[str]:
+    return [
+        _plane_jpg_id,
+        _plane_png_id,
+        _rgba_png_id,
+        _white_square_jpg_id,
+        _white_square_png_id,
+    ]
+
+
+def _test_images_asymmetric() -> list[str]:
+    return [
+        _plane_jpg_path,
+        _plane_png_path,
+        _rgba_png_path,
+    ]
+
+
+def _test_images_asymmetric_ids() -> list[str]:
+    return [
+        _plane_jpg_id,
+        _plane_png_id,
+        _rgba_png_id,
+    ]
 
 
 def _skip_if_device_not_available(device: Device) -> None:
@@ -34,16 +82,15 @@ class TestFromFile:
     @pytest.mark.parametrize(
         "resource_path",
         [
-            "image/white_square.jpg",
-            Path("image/white_square.jpg"),
-            "image/white_square.png",
-            Path("image/white_square.png"),
+            *_test_images_all(),
+            *[Path(image_path) for image_path in _test_images_all()]
         ],
-        ids=["jpg", "jpg_Path", "png", "png_Path"],
+        ids=[*["file-" + image_id for image_id in _test_images_all_ids()], *["path-" + image_id for image_id in _test_images_all_ids()]]
     )
     def test_should_load_from_file(self, resource_path: str | Path, device: Device) -> None:
         _skip_if_device_not_available(device)
-        Image.from_file(resolve_resource_path(resource_path), device)
+        image = Image.from_file(resolve_resource_path(resource_path), device)
+        assert image != Image(torch.empty(1, 1, 1))
 
     @pytest.mark.parametrize(
         "resource_path",
@@ -65,8 +112,8 @@ class TestFromFile:
 class TestFromBytes:
     @pytest.mark.parametrize(
         "resource_path",
-        ["image/white_square.jpg", "image/white_square.png"],
-        ids=["white_square-jpg", "white_square-png"],
+        [_white_square_jpg_path, _white_square_png_path],
+        ids=[_white_square_jpg_id, _white_square_png_id],
     )
     def test_should_write_and_load_bytes_jpeg(self, resource_path: str | Path, device: Device) -> None:
         _skip_if_device_not_available(device)
@@ -76,8 +123,8 @@ class TestFromBytes:
 
     @pytest.mark.parametrize(
         "resource_path",
-        ["image/plane.jpg", "image/plane.png", "image/rgba.png", "image/white_square.jpg", "image/white_square.png"],
-        ids=["plane-jpg", "plane-png", "rgba-png", "white_square-jpg", "white_square-png"],
+        _test_images_all(),
+        ids=_test_images_all_ids(),
     )
     def test_should_write_and_load_bytes_png(self, resource_path: str | Path, device: Device) -> None:
         _skip_if_device_not_available(device)
@@ -90,8 +137,8 @@ class TestFromBytes:
 class TestReprJpeg:
     @pytest.mark.parametrize(
         "resource_path",
-        ["image/plane.jpg", "image/white_square.jpg", "image/white_square.png"],
-        ids=["plane-jpg", "white_square-jpg", "white_square-png"],
+        [_plane_jpg_path, _white_square_jpg_path, _white_square_png_path],
+        ids=[_plane_jpg_id, _white_square_jpg_id, _white_square_png_id],
     )
     def test_should_return_bytes(self, resource_path: str | Path, device: Device) -> None:
         _skip_if_device_not_available(device)
@@ -101,10 +148,10 @@ class TestReprJpeg:
     @pytest.mark.parametrize(
         "resource_path",
         [
-            "image/plane.png",
-            "image/rgba.png",
+            _plane_png_path,
+            _rgba_png_path,
         ],
-        ids=["plane-png", "rgba-png"],
+        ids=[_plane_png_id, _rgba_png_id],
     )
     def test_should_return_none_if_image_has_alpha_channel(self, resource_path: str | Path, device: Device) -> None:
         _skip_if_device_not_available(device)
@@ -116,8 +163,8 @@ class TestReprJpeg:
 class TestReprPng:
     @pytest.mark.parametrize(
         "resource_path",
-        ["image/plane.jpg", "image/plane.png", "image/rgba.png", "image/white_square.jpg", "image/white_square.png"],
-        ids=["plane-jpg", "plane-png", "rgba-png", "white_square-jpg", "white_square-png"],
+        _test_images_all(),
+        ids=_test_images_all_ids(),
     )
     def test_should_return_bytes(self, resource_path: str | Path, device: Device) -> None:
         _skip_if_device_not_available(device)
@@ -129,8 +176,8 @@ class TestReprPng:
 class TestToJpegFile:
     @pytest.mark.parametrize(
         "resource_path",
-        ["image/white_square.jpg", "image/white_square.png"],
-        ids=["white_square-jpg", "white_square-png"],
+        [_white_square_jpg_path, _white_square_png_path],
+        ids=[_white_square_jpg_id, _white_square_png_id],
     )
     def test_should_save_file(self, resource_path: str | Path, device: Device) -> None:
         _skip_if_device_not_available(device)
@@ -146,10 +193,10 @@ class TestToJpegFile:
     @pytest.mark.parametrize(
         "resource_path",
         [
-            "image/plane.png",
-            "image/rgba.png",
+            _plane_png_path,
+            _rgba_png_path,
         ],
-        ids=["plane-png", "rgba-png"],
+        ids=[_plane_png_id, _rgba_png_id],
     )
     def test_should_raise_if_image_has_alpha_channel(self, resource_path: str | Path, device: Device) -> None:
         _skip_if_device_not_available(device)
@@ -167,8 +214,8 @@ class TestToJpegFile:
 class TestToPngFile:
     @pytest.mark.parametrize(
         "resource_path",
-        ["image/plane.jpg", "image/plane.png", "image/rgba.png", "image/white_square.jpg", "image/white_square.png"],
-        ids=["plane-jpg", "plane-png", "rgba-png", "white_square-jpg", "white_square-png"],
+        _test_images_all(),
+        ids=_test_images_all_ids(),
     )
     def test_should_save_file(self, resource_path: str | Path, device: Device) -> None:
         _skip_if_device_not_available(device)
@@ -188,25 +235,25 @@ class TestProperties:
         ("resource_path", "width", "height", "channel"),
         [
             (
-                "image/white_square.jpg",
+                _white_square_jpg_path,
                 1,
                 1,
                 3,
             ),
             (
-                "image/plane.png",
+                _plane_png_path,
                 568,
                 320,
                 4,
             ),
             (
-                "image/rgba.png",
+                _rgba_png_path,
                 7,
                 5,
                 4,
             ),
         ],
-        ids=["[3,1,1].jpg", "[4,568,320].png", "[4,568,320].png"],
+        ids=["[3,1,1]" + _white_square_jpg_id, "[4,568,320]" + _plane_png_id, "[4,568,320]" + _rgba_png_id],
     )
     def test_should_return_image_properties(
         self,
@@ -227,20 +274,8 @@ class TestEQ:
     @pytest.mark.parametrize("device", _test_devices(), ids=_test_devices_ids())
     @pytest.mark.parametrize(
         "resource_path",
-        [
-            "image/plane.jpg",
-            "image/plane.png",
-            "image/rgba.png",
-            "image/white_square.jpg",
-            "image/white_square.png",
-        ],
-        ids=[
-            "opaque-4-channel-jpg",
-            "opaque-4-channel-png",
-            "transparent",
-            "opaque-3-channel-jpg",
-            "opaque-3-channel-png",
-        ],
+        _test_images_all(),
+        ids=_test_images_all_ids(),
     )
     def test_should_be_equal(self, resource_path: str, device: Device) -> None:
         _skip_if_device_not_available(device)
@@ -251,26 +286,14 @@ class TestEQ:
     @pytest.mark.parametrize("device", _test_devices(), ids=_test_devices_ids())
     def test_should_not_be_equal(self, device: Device) -> None:
         _skip_if_device_not_available(device)
-        image = Image.from_file(resolve_resource_path("image/plane.png"), device)
-        image2 = Image.from_file(resolve_resource_path("image/white_square.png"), device)
+        image = Image.from_file(resolve_resource_path(_plane_png_path), device)
+        image2 = Image.from_file(resolve_resource_path(_white_square_png_path), device)
         assert image != image2
 
     @pytest.mark.parametrize(
         "resource_path",
-        [
-            "image/plane.jpg",
-            "image/plane.png",
-            "image/rgba.png",
-            "image/white_square.jpg",
-            "image/white_square.png",
-        ],
-        ids=[
-            "opaque-4-channel-jpg",
-            "opaque-4-channel-png",
-            "transparent",
-            "opaque-3-channel-jpg",
-            "opaque-3-channel-png",
-        ],
+        _test_images_all(),
+        ids=_test_images_all_ids(),
     )
     def test_should_be_equal_different_devices(self, resource_path: str) -> None:
         _skip_if_device_not_available(_device_cuda)
@@ -281,15 +304,20 @@ class TestEQ:
 
     def test_should_not_be_equal_different_devices(self) -> None:
         _skip_if_device_not_available(_device_cuda)
-        image = Image.from_file(resolve_resource_path("image/plane.png"), torch.device("cpu"))
-        image2 = Image.from_file(resolve_resource_path("image/white_square.png"), torch.device("cuda"))
+        image = Image.from_file(resolve_resource_path(_plane_png_path), torch.device("cpu"))
+        image2 = Image.from_file(resolve_resource_path(_white_square_png_path), torch.device("cuda"))
         assert image != image2
         assert image2 != image
 
     @pytest.mark.parametrize("device", _test_devices(), ids=_test_devices_ids())
-    def test_should_raise(self, device: Device) -> None:
+    @pytest.mark.parametrize(
+        "resource_path",
+        _test_images_all(),
+        ids=_test_images_all_ids(),
+    )
+    def test_should_raise(self, resource_path: str, device: Device) -> None:
         _skip_if_device_not_available(device)
-        image = Image.from_file(resolve_resource_path("image/plane.png"), device)
+        image = Image.from_file(resolve_resource_path(resource_path), device)
         other = Table()
         assert (image.__eq__(other)) is NotImplemented
 
@@ -298,11 +326,8 @@ class TestEQ:
 class TestResize:
     @pytest.mark.parametrize(
         "resource_path",
-        [
-            "image/plane.png",
-            "image/rgba.png",
-        ],
-        ids=["opaque", "transparent"],
+        _test_images_all(),
+        ids=_test_images_all_ids(),
     )
     @pytest.mark.parametrize(
         ("new_width", "new_height"),
@@ -338,9 +363,14 @@ class TestResize:
 
 
 class TestDevices:
-    def test_should_change_device(self) -> None:
+    @pytest.mark.parametrize(
+        "resource_path",
+        _test_images_all(),
+        ids=_test_images_all_ids(),
+    )
+    def test_should_change_device(self, resource_path: str) -> None:
         _skip_if_device_not_available(_device_cuda)
-        image = Image.from_file(resolve_resource_path("image/plane.png"), torch.device("cpu"))
+        image = Image.from_file(resolve_resource_path(resource_path), torch.device("cpu"))
         new_device = torch.device("cuda", 0)
         assert image.set_device(new_device).device == new_device
 
@@ -349,11 +379,8 @@ class TestDevices:
 class TestConvertToGrayscale:
     @pytest.mark.parametrize(
         "resource_path",
-        [
-            "image/plane.png",
-            "image/rgba.png",
-        ],
-        ids=["grayscale", "grayscale-transparent"],
+        _test_images_all(),
+        ids=_test_images_all_ids(),
     )
     def test_convert_to_grayscale(self, resource_path: str, snapshot_png: SnapshotAssertion, device: Device) -> None:
         _skip_if_device_not_available(device)
@@ -366,11 +393,8 @@ class TestConvertToGrayscale:
 class TestCrop:
     @pytest.mark.parametrize(
         "resource_path",
-        [
-            "image/plane.png",
-            "image/rgba.png",
-        ],
-        ids=["crop", "crop-transparent"],
+        _test_images_all(),
+        ids=_test_images_all_ids(),
     )
     def test_should_return_cropped_image(
         self,
@@ -386,7 +410,11 @@ class TestCrop:
 
 @pytest.mark.parametrize("device", _test_devices(), ids=_test_devices_ids())
 class TestFlipVertically:
-    @pytest.mark.parametrize("resource_path", ["image/plane.png", "image/rgba.png"], ids=["opaque", "transparent"])
+    @pytest.mark.parametrize(
+        "resource_path",
+        _test_images_asymmetric(),
+        ids=_test_images_asymmetric_ids(),
+    )
     def test_should_flip_vertically(self, resource_path: str, snapshot_png: SnapshotAssertion, device: Device) -> None:
         _skip_if_device_not_available(device)
         image = Image.from_file(resolve_resource_path(resource_path), device)
@@ -394,7 +422,11 @@ class TestFlipVertically:
         assert image != image_flip_v
         assert image_flip_v == snapshot_png
 
-    @pytest.mark.parametrize("resource_path", ["image/plane.png", "image/rgba.png"], ids=["opaque", "transparent"])
+    @pytest.mark.parametrize(
+        "resource_path",
+        _test_images_all(),
+        ids=_test_images_all_ids(),
+    )
     def test_should_be_original(self, resource_path: str, device: Device) -> None:
         _skip_if_device_not_available(device)
         image = Image.from_file(resolve_resource_path(resource_path), device)
@@ -404,7 +436,11 @@ class TestFlipVertically:
 
 @pytest.mark.parametrize("device", _test_devices(), ids=_test_devices_ids())
 class TestFlipHorizontally:
-    @pytest.mark.parametrize("resource_path", ["image/plane.png", "image/rgba.png"], ids=["opaque", "transparent"])
+    @pytest.mark.parametrize(
+        "resource_path",
+        _test_images_asymmetric(),
+        ids=_test_images_asymmetric_ids(),
+    )
     def test_should_flip_horizontally(
         self,
         resource_path: str,
@@ -417,7 +453,11 @@ class TestFlipHorizontally:
         assert image != image_flip_h
         assert image_flip_h == snapshot_png
 
-    @pytest.mark.parametrize("resource_path", ["image/plane.png", "image/rgba.png"], ids=["opaque", "transparent"])
+    @pytest.mark.parametrize(
+        "resource_path",
+        _test_images_all(),
+        ids=_test_images_all_ids(),
+    )
     def test_should_be_original(self, resource_path: str, device: Device) -> None:
         _skip_if_device_not_available(device)
         image = Image.from_file(resolve_resource_path(resource_path), device)
@@ -428,26 +468,42 @@ class TestFlipHorizontally:
 @pytest.mark.parametrize("device", _test_devices(), ids=_test_devices_ids())
 class TestBrightness:
     @pytest.mark.parametrize("factor", [0.5, 10], ids=["small factor", "large factor"])
-    def test_should_adjust_brightness(self, factor: float, snapshot_png: SnapshotAssertion, device: Device) -> None:
+    @pytest.mark.parametrize(
+        "resource_path",
+        [_plane_jpg_path, _plane_png_path],
+        ids=[_plane_jpg_id, _plane_png_id],
+    )
+    def test_should_adjust_brightness(self, factor: float, resource_path: str, snapshot_png: SnapshotAssertion,
+                                      device: Device) -> None:
         _skip_if_device_not_available(device)
-        image = Image.from_file(resolve_resource_path("image/plane.png"), device)
+        image = Image.from_file(resolve_resource_path(resource_path), device)
         image_adjusted_brightness = image.adjust_brightness(factor)
         assert image != image_adjusted_brightness
         assert image_adjusted_brightness == snapshot_png
 
-    def test_should_not_brighten(self, device: Device) -> None:
+    @pytest.mark.parametrize(
+        "resource_path",
+        _test_images_all(),
+        ids=_test_images_all_ids(),
+    )
+    def test_should_not_brighten(self, resource_path: str, device: Device) -> None:
         _skip_if_device_not_available(device)
         with pytest.warns(
             UserWarning,
             match="Brightness adjustment factor is 1.0, this will not make changes to the image.",
         ):
-            image = Image.from_file(resolve_resource_path("image/plane.png"), device)
+            image = Image.from_file(resolve_resource_path(resource_path), device)
             image2 = image.adjust_brightness(1)
             assert image == image2
 
-    def test_should_raise(self, device: Device) -> None:
+    @pytest.mark.parametrize(
+        "resource_path",
+        _test_images_all(),
+        ids=_test_images_all_ids(),
+    )
+    def test_should_raise(self, resource_path: str, device: Device) -> None:
         _skip_if_device_not_available(device)
-        image = Image.from_file(resolve_resource_path("image/plane.png"), device)
+        image = Image.from_file(resolve_resource_path(resource_path), device)
         with pytest.raises(OutOfBoundsError, match=r"factor \(=-1\) is not inside \[0, \u221e\)."):
             image.adjust_brightness(-1)
 
@@ -455,13 +511,18 @@ class TestBrightness:
 @pytest.mark.parametrize("device", _test_devices(), ids=_test_devices_ids())
 class TestAddNoise:
     @pytest.mark.parametrize(
-        ("resource_path", "standard_deviation"),
+        "standard_deviation",
         [
-            ("image/plane.png", 0.0),
-            ("image/plane.png", 0.7),
-            ("image/plane.png", 2.5),
+            0.0,
+            0.7,
+            2.5,
         ],
         ids=["minimum noise", "some noise", "very noisy"],
+    )
+    @pytest.mark.parametrize(
+        "resource_path",
+        _test_images_all(),
+        ids=_test_images_all_ids(),
     )
     def test_should_add_noise(
         self,
@@ -477,9 +538,14 @@ class TestAddNoise:
         assert image_noise == snapshot_png
 
     @pytest.mark.parametrize(
-        ("resource_path", "standard_deviation"),
-        [("image/plane.png", -1)],
+        "standard_deviation",
+        [-1],
         ids=["sigma below zero"],
+    )
+    @pytest.mark.parametrize(
+        "resource_path",
+        _test_images_all(),
+        ids=_test_images_all_ids(),
     )
     def test_should_raise_standard_deviation(
         self,
@@ -499,20 +565,31 @@ class TestAddNoise:
 @pytest.mark.parametrize("device", _test_devices(), ids=_test_devices_ids())
 class TestAdjustContrast:
     @pytest.mark.parametrize("factor", [0.75, 5], ids=["small factor", "large factor"])
-    def test_should_adjust_contrast(self, factor: float, snapshot_png: SnapshotAssertion, device: Device) -> None:
+    @pytest.mark.parametrize(
+        "resource_path",
+        [_plane_jpg_path, _plane_png_path],
+        ids=[_plane_jpg_id, _plane_png_id],
+    )
+    def test_should_adjust_contrast(self, factor: float, resource_path: str, snapshot_png: SnapshotAssertion,
+                                    device: Device) -> None:
         _skip_if_device_not_available(device)
-        image = Image.from_file(resolve_resource_path("image/plane.png"), device)
+        image = Image.from_file(resolve_resource_path(resource_path), device)
         image_adjusted_contrast = image.adjust_contrast(factor)
         assert image != image_adjusted_contrast
         assert image_adjusted_contrast == snapshot_png
 
-    def test_should_not_adjust_contrast(self, device: Device) -> None:
+    @pytest.mark.parametrize(
+        "resource_path",
+        _test_images_all(),
+        ids=_test_images_all_ids(),
+    )
+    def test_should_not_adjust_contrast(self, resource_path: str, device: Device) -> None:
         _skip_if_device_not_available(device)
         with pytest.warns(
             UserWarning,
             match="Contrast adjustment factor is 1.0, this will not make changes to the image.",
         ):
-            image = Image.from_file(resolve_resource_path("image/plane.png"), device)
+            image = Image.from_file(resolve_resource_path(resource_path), device)
             image_adjusted_contrast = image.adjust_contrast(1)
             assert image == image_adjusted_contrast
 
@@ -521,8 +598,8 @@ class TestAdjustContrast:
 class TestBlur:
     @pytest.mark.parametrize(
         "resource_path",
-        ["image/plane.png"],
-        ids=["blur"],
+        _test_images_asymmetric(),
+        ids=_test_images_asymmetric_ids(),
     )
     def test_should_return_blurred_image(
         self,
@@ -539,22 +616,38 @@ class TestBlur:
 @pytest.mark.parametrize("device", _test_devices(), ids=_test_devices_ids())
 class TestSharpen:
     @pytest.mark.parametrize("factor", [0, 0.5, 10], ids=["zero factor", "small factor", "large factor"])
-    def test_should_sharpen(self, factor: float, snapshot_png: SnapshotAssertion, device: Device) -> None:
+    @pytest.mark.parametrize(
+        "resource_path",
+        [_plane_jpg_path, _plane_png_path],
+        ids=[_plane_jpg_id, _plane_png_id],
+    )
+    def test_should_sharpen(self, factor: float, resource_path: str, snapshot_png: SnapshotAssertion,
+                            device: Device) -> None:
         _skip_if_device_not_available(device)
-        image = Image.from_file(resolve_resource_path("image/plane.png"), device)
+        image = Image.from_file(resolve_resource_path(resource_path), device)
         image_sharpened = image.sharpen(factor)
         assert image != image_sharpened
         assert image_sharpened == snapshot_png
 
-    def test_should_raise_negative_sharpen(self, device: Device) -> None:
+    @pytest.mark.parametrize(
+        "resource_path",
+        _test_images_all(),
+        ids=_test_images_all_ids(),
+    )
+    def test_should_raise_negative_sharpen(self, resource_path: str, device: Device) -> None:
         _skip_if_device_not_available(device)
         with pytest.raises(OutOfBoundsError):
-            Image.from_file(resolve_resource_path("image/plane.png"), device).sharpen(-1.0)
+            Image.from_file(resolve_resource_path(resource_path), device).sharpen(-1.0)
 
-    def test_should_not_sharpen(self, device: Device) -> None:
+    @pytest.mark.parametrize(
+        "resource_path",
+        _test_images_all(),
+        ids=_test_images_all_ids(),
+    )
+    def test_should_not_sharpen(self, resource_path: str, device: Device) -> None:
         _skip_if_device_not_available(device)
         with pytest.warns(UserWarning, match="Sharpen factor is 1.0, this will not make changes to the image."):
-            image = Image.from_file(resolve_resource_path("image/plane.png"), device)
+            image = Image.from_file(resolve_resource_path(resource_path), device)
             image_sharpened = image.sharpen(1)
             assert image == image_sharpened
 
@@ -563,11 +656,8 @@ class TestSharpen:
 class TestInvertColors:
     @pytest.mark.parametrize(
         "resource_path",
-        [
-            "image/plane.png",
-            "image/rgba.png",
-        ],
-        ids=["invert-colors", "invert-colors-transparent"],
+        _test_images_all(),
+        ids=_test_images_all_ids(),
     )
     def test_should_invert_colors(self, resource_path: str, snapshot_png: SnapshotAssertion, device: Device) -> None:
         _skip_if_device_not_available(device)
@@ -580,11 +670,8 @@ class TestInvertColors:
 class TestRotate:
     @pytest.mark.parametrize(
         "resource_path",
-        [
-            "image/plane.png",
-            "image/rgba.png",
-        ],
-        ids=["rotate-clockwise", "rotate-clockwise-transparent"],
+        _test_images_all(),
+        ids=_test_images_all_ids(),
     )
     def test_should_return_clockwise_rotated_image(
         self,
@@ -599,11 +686,8 @@ class TestRotate:
 
     @pytest.mark.parametrize(
         "resource_path",
-        [
-            "image/plane.png",
-            "image/rgba.png",
-        ],
-        ids=["rotate-counter-clockwise", "rotate-counter-clockwise-transparent"],
+        _test_images_all(),
+        ids=_test_images_all_ids(),
     )
     def test_should_return_counter_clockwise_rotated_image(
         self,
@@ -618,11 +702,8 @@ class TestRotate:
 
     @pytest.mark.parametrize(
         "resource_path",
-        [
-            "image/plane.png",
-            "image/rgba.png",
-        ],
-        ids=["rotate-to-flipped", "rotate-to-flipped-transparent"],
+        _test_images_all(),
+        ids=_test_images_all_ids(),
     )
     def test_should_return_flipped_image(self, resource_path: str, device: Device) -> None:
         _skip_if_device_not_available(device)
@@ -637,11 +718,8 @@ class TestRotate:
 
     @pytest.mark.parametrize(
         "resource_path",
-        [
-            "image/plane.png",
-            "image/rgba.png",
-        ],
-        ids=["rotate-to-flipped", "rotate-to-flipped-transparent"],
+        _test_images_all(),
+        ids=_test_images_all_ids(),
     )
     def test_should_be_original(self, resource_path: str, device: Device) -> None:
         _skip_if_device_not_available(device)
