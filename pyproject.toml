@@ -25,11 +25,11 @@ scikit-image = ">=0.21,<0.23"
 levenshtein = ">=0.21.1,<0.24.0"
 torch = {version = "~2.0.0", source = "torch_cuda118"}
 torchvision = {version = "<0.16.0", source = "torch_cuda118"}
-syrupy = "^4.6.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.2.1"
 pytest-cov = "^4.0.0"
+syrupy = "^4.6.0"
 
 [tool.poetry.group.docs.dependencies]
 jupyter = "^1.0.0"
@@ -55,6 +55,7 @@ requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.pytest.ini_options]
+addopts = "--snapshot-warn-unused"
 filterwarnings = [
     "ignore:Deprecated call to `pkg_resources.declare_namespace",
     "ignore:Jupyter is migrating its paths to use standard platformdirs"
