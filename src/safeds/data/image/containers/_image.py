@@ -116,6 +116,21 @@ class Image:
         buffer.seek(0)
         return buffer.read()
 
+    def _set_device(self, device: Device) -> Image:
+        """
+        Set the device where the image will be saved on.
+
+        Returns
+        -------
+        result : Image
+            The image on the given device
+        """
+        return Image(self._image_tensor, device)
+
+    # ------------------------------------------------------------------------------------------------------------------
+    # Properties
+    # ------------------------------------------------------------------------------------------------------------------
+
     @property
     def width(self) -> int:
         """
@@ -164,6 +179,10 @@ class Image:
         """
         return self._image_tensor.device
 
+    # ------------------------------------------------------------------------------------------------------------------
+    # Conversion
+    # ------------------------------------------------------------------------------------------------------------------
+
     def to_jpeg_file(self, path: str | Path) -> None:
         """
         Save the image as a JPEG file.
@@ -190,16 +209,9 @@ class Image:
         Path(path).parent.mkdir(parents=True, exist_ok=True)
         save_image(self._image_tensor.to(torch.float32) / 255, path, format="png")
 
-    def set_device(self, device: Device) -> Image:
-        """
-        Set the device where the image will be saved on.
-
-        Returns
-        -------
-        result : Image
-            The image on the given device
-        """
-        return Image(self._image_tensor, device)
+    # ------------------------------------------------------------------------------------------------------------------
+    # IPython integration
+    # ------------------------------------------------------------------------------------------------------------------
 
     def __eq__(self, other: object) -> bool:
         """
@@ -218,8 +230,12 @@ class Image:
             return NotImplemented
         return (
             self._image_tensor.size() == other._image_tensor.size()
-            and torch.all(torch.eq(self._image_tensor, other.set_device(self.device)._image_tensor)).item()
+            and torch.all(torch.eq(self._image_tensor, other._set_device(self.device)._image_tensor)).item()
         )
+
+    # ------------------------------------------------------------------------------------------------------------------
+    # Transformations
+    # ------------------------------------------------------------------------------------------------------------------
 
     def resize(self, new_width: int, new_height: int) -> Image:
         """

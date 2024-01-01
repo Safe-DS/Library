@@ -372,7 +372,7 @@ class TestDevices:
         _skip_if_device_not_available(_device_cuda)
         image = Image.from_file(resolve_resource_path(resource_path), torch.device("cpu"))
         new_device = torch.device("cuda", 0)
-        assert image.set_device(new_device).device == new_device
+        assert image._set_device(new_device).device == new_device
 
 
 @pytest.mark.parametrize("device", _test_devices(), ids=_test_devices_ids())
