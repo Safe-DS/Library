@@ -10,6 +10,8 @@ import torch.nn.functional as func
 from PIL.Image import open as pil_image_open
 from torch import Tensor
 
+from safeds.config import _get_device
+
 if TYPE_CHECKING:
     from torch.types import Device
 import torchvision
@@ -35,10 +37,9 @@ class Image:
     """
 
     _pil_to_tensor = PILToTensor()
-    _default_device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
 
     @staticmethod
-    def from_file(path: str | Path, device: Device = _default_device) -> Image:
+    def from_file(path: str | Path, device: Device = _get_device()) -> Image:
         """
         Create an image from a file.
 
@@ -57,7 +58,7 @@ class Image:
         return Image(image_tensor=Image._pil_to_tensor(pil_image_open(path)), device=device)
 
     @staticmethod
-    def from_bytes(data: bytes, device: Device = _default_device) -> Image:
+    def from_bytes(data: bytes, device: Device = _get_device()) -> Image:
         """
         Create an image from bytes.
 
@@ -81,8 +82,28 @@ class Image:
             input_tensor = torch.frombuffer(data, dtype=torch.uint8)
         return Image(image_tensor=torchvision.io.decode_image(input_tensor), device=device)
 
-    def __init__(self, image_tensor: Tensor, device: Device = _default_device) -> None:
+    def __init__(self, image_tensor: Tensor, device: Device = _get_device()) -> None:
         self._image_tensor: Tensor = image_tensor.to(device)
+
+    def __eq__(self, other: object) -> bool:
+        """
+        Compare two images.
+
+        Parameters
+        ----------
+        other: The image to compare to.
+
+        Returns
+        -------
+        equals : bool
+            Whether the two images contain equal pixel data.
+        """
+        if not isinstance(other, Image):
+            return NotImplemented
+        return (
+            self._image_tensor.size() == other._image_tensor.size()
+            and torch.all(torch.eq(self._image_tensor, other._set_device(self.device)._image_tensor)).item()
+        )
 
     def _repr_jpeg_(self) -> bytes | None:
         """
@@ -208,30 +229,6 @@ class Image:
         """
         Path(path).parent.mkdir(parents=True, exist_ok=True)
         save_image(self._image_tensor.to(torch.float32) / 255, path, format="png")
-
-    # ------------------------------------------------------------------------------------------------------------------
-    # IPython integration
-    # ------------------------------------------------------------------------------------------------------------------
-
-    def __eq__(self, other: object) -> bool:
-        """
-        Compare two images.
-
-        Parameters
-        ----------
-        other: The image to compare to.
-
-        Returns
-        -------
-        equals : bool
-            Whether the two images contain equal pixel data.
-        """
-        if not isinstance(other, Image):
-            return NotImplemented
-        return (
-            self._image_tensor.size() == other._image_tensor.size()
-            and torch.all(torch.eq(self._image_tensor, other._set_device(self.device)._image_tensor)).item()
-        )
 
     # ------------------------------------------------------------------------------------------------------------------
     # Transformations
@@ -545,6 +542,3 @@ class Image:
             The image rotated 90 degrees counter-clockwise.
         """
         return Image(func2.rotate(self._image_tensor, 90, expand=True), device=self.device)
-
-    # def find_edges(self) -> Image:
-    #     pass
