@@ -37,9 +37,10 @@ class Image:
     """
 
     _pil_to_tensor = PILToTensor()
+    _default_device = _get_device()
 
     @staticmethod
-    def from_file(path: str | Path, device: Device = _get_device()) -> Image:
+    def from_file(path: str | Path, device: Device = _default_device) -> Image:
         """
         Create an image from a file.
 
@@ -58,7 +59,7 @@ class Image:
         return Image(image_tensor=Image._pil_to_tensor(pil_image_open(path)), device=device)
 
     @staticmethod
-    def from_bytes(data: bytes, device: Device = _get_device()) -> Image:
+    def from_bytes(data: bytes, device: Device = _default_device) -> Image:
         """
         Create an image from bytes.
 
@@ -82,7 +83,7 @@ class Image:
             input_tensor = torch.frombuffer(data, dtype=torch.uint8)
         return Image(image_tensor=torchvision.io.decode_image(input_tensor), device=device)
 
-    def __init__(self, image_tensor: Tensor, device: Device = _get_device()) -> None:
+    def __init__(self, image_tensor: Tensor, device: Device = _default_device) -> None:
         self._image_tensor: Tensor = image_tensor.to(device)
 
     def __eq__(self, other: object) -> bool:
