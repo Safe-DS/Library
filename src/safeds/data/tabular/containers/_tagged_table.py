@@ -2,6 +2,10 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+import numpy as np
+import torch
+from torch.utils.data import DataLoader, Dataset
+
 from safeds.data.tabular.containers import Column, Row, Table
 from safeds.exceptions import (
     ColumnIsTargetError,
@@ -252,7 +256,7 @@ class TaggedTable(Table):
             super().add_columns(columns),
             target_name=self.target.name,
             feature_names=self.features.column_names
-            + [col.name for col in (columns.to_columns() if isinstance(columns, Table) else columns)],
+                          + [col.name for col in (columns.to_columns() if isinstance(columns, Table) else columns)],
         )
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -686,8 +690,8 @@ class TaggedTable(Table):
                     self.features.column_names
                     if old_column_name not in self.features.column_names
                     else self.features.column_names[: self.features.column_names.index(old_column_name)]
-                    + [col.name for col in new_columns]
-                    + self.features.column_names[self.features.column_names.index(old_column_name) + 1 :]
+                         + [col.name for col in new_columns]
+                         + self.features.column_names[self.features.column_names.index(old_column_name) + 1:]
                 ),
             )
 
@@ -747,7 +751,7 @@ class TaggedTable(Table):
     def sort_columns(
         self,
         comparator: Callable[[Column, Column], int] = lambda col1, col2: (col1.name > col2.name)
-        - (col1.name < col2.name),
+                                                                         - (col1.name < col2.name),
     ) -> TaggedTable:
         """
         Sort the columns of a `TaggedTable` with the given comparator and return a new `TaggedTable`.
@@ -833,3 +837,26 @@ class TaggedTable(Table):
             target_name=self.target.name,
             feature_names=self.features.column_names,
         )
+
+    def into_dataloader(self, batch_size=1) -> DataLoader:
+        feature_rows = self.features.to_rows()
+        all_rows = []
+        for row in feature_rows:
+            new_item = []
+            for column_name in row:
+                new_item.append(row.get_value(column_name))
+            all_rows.append(new_item.copy())
+        return DataLoader(dataset=CustomDataset(np.array(all_rows), np.array(self.target)), batch_size=batch_size)
+
+
+class CustomDataset(Dataset):
+    def __init__(self, features, target):
+        self.X = torch.from_numpy(features.astype(np.float32))
+        self.Y = torch.from_numpy(target.astype(np.float32))
+        self.len = self.X.shape[0]
+
+    def __getitem__(self, item):
+        return self.X[item], self.Y[item].unsqueeze(-1)
+
+    def __len__(self):
+        return self.len
