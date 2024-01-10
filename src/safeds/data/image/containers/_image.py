@@ -434,9 +434,6 @@ class Image:
         else:
             return Image(func2.adjust_contrast(self._image_tensor, factor * 1.0), device=self.device)
 
-    # def adjust_color_balance(self, factor: float) -> Image:
-    #     pass
-
     def blur(self, radius: int) -> Image:
         """
         Return a blurred version of the image.
