@@ -11,7 +11,6 @@ import pandas as pd
 import seaborn as sns
 
 from safeds.data.image.containers import Image
-from safeds.data.image.typing import ImageFormat
 from safeds.data.tabular.typing import ColumnType
 from safeds.exceptions import (
     ColumnLengthMismatchError,
@@ -928,7 +927,7 @@ class Column(Sequence[T]):
         fig.savefig(buffer, format="png")
         plt.close()  # Prevents the figure from being displayed directly
         buffer.seek(0)
-        return Image(buffer, ImageFormat.PNG)
+        return Image.from_bytes(buffer.read())
 
     def plot_histogram(self) -> Image:
         """
@@ -960,7 +959,7 @@ class Column(Sequence[T]):
         fig.savefig(buffer, format="png")
         plt.close()  # Prevents the figure from being displayed directly
         buffer.seek(0)
-        return Image(buffer, ImageFormat.PNG)
+        return Image.from_bytes(buffer.read())
 
     # ------------------------------------------------------------------------------------------------------------------
     # Conversion
