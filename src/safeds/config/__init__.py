@@ -1,4 +1,4 @@
-"""Configuration for Safe-DS"""
+"""Configuration for Safe-DS."""
 
 from ._device import _get_device
 
