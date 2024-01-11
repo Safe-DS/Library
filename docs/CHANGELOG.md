@@ -1,3 +1,10 @@
+## [0.17.1](https://github.com/Safe-DS/Library/compare/v0.17.0...v0.17.1) (2024-01-11)
+
+
+### Bug Fixes
+
+* update `torch` ([#527](https://github.com/Safe-DS/Library/issues/527)) ([6934d1d](https://github.com/Safe-DS/Library/commit/6934d1d1820e9e0d1b8877cafdffc449595dca29))
+
 ## [0.17.0](https://github.com/Safe-DS/Library/compare/v0.16.0...v0.17.0) (2024-01-11)
 
 

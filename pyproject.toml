@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "safe-ds"
-version = "0.17.0"
+version = "0.17.1"
 description = "A user-friendly library for Data Science in Python."
 authors = ["Lars Reimann <mail@larsreimann.com>"]
 license = "MIT"
