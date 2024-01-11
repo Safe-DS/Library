@@ -1,3 +1,10 @@
+## [0.17.0](https://github.com/Safe-DS/Library/compare/v0.16.0...v0.17.0) (2024-01-11)
+
+
+### Features
+
+* change image class to use PyTorch tensors and methods ([#506](https://github.com/Safe-DS/Library/issues/506)) ([efa2b61](https://github.com/Safe-DS/Library/commit/efa2b61c4c1d3a54f8b94ddb2cb62792a03c1b85)), closes [#505](https://github.com/Safe-DS/Library/issues/505)
+
 ## [0.16.0](https://github.com/Safe-DS/Library/compare/v0.15.0...v0.16.0) (2023-11-22)
 
 
