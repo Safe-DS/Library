@@ -155,3 +155,10 @@ class ColumnIsTimeError(IllegalSchemaModificationError):
 
     def __init__(self, column_name: str) -> None:
         super().__init__(f'Column "{column_name}" is the time column and cannot be removed.')
+
+
+class IllegalFormatError(Exception):
+    """Exception raised when a format is not legal."""
+
+    def __init__(self, formats: list[str] | str) -> None:
+        super().__init__(f"This format is illegal. Use one of the following formats: {formats}")

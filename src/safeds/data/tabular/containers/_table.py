@@ -16,7 +16,6 @@ from pandas import DataFrame
 from scipy import stats
 
 from safeds.data.image.containers import Image
-from safeds.data.image.typing import ImageFormat
 from safeds.data.tabular.typing import ColumnType, Schema
 from safeds.exceptions import (
     ColumnLengthMismatchError,
@@ -1929,7 +1928,7 @@ class Table:
         fig.savefig(buffer, format="png")
         plt.close()  # Prevents the figure from being displayed directly
         buffer.seek(0)
-        return Image(buffer, format_=ImageFormat.PNG)
+        return Image.from_bytes(buffer.read())
 
     def plot_lineplot(self, x_column_name: str, y_column_name: str) -> Image:
         """
@@ -1990,7 +1989,7 @@ class Table:
         fig.savefig(buffer, format="png")
         plt.close()  # Prevents the figure from being displayed directly
         buffer.seek(0)
-        return Image(buffer, format_=ImageFormat.PNG)
+        return Image.from_bytes(buffer.read())
 
     def plot_scatterplot(self, x_column_name: str, y_column_name: str) -> Image:
         """
@@ -2048,7 +2047,7 @@ class Table:
         fig.savefig(buffer, format="png")
         plt.close()  # Prevents the figure from being displayed directly
         buffer.seek(0)
-        return Image(buffer, format_=ImageFormat.PNG)
+        return Image.from_bytes(buffer.read())
 
     def plot_boxplots(self) -> Image:
         """
@@ -2095,7 +2094,7 @@ class Table:
         fig.savefig(buffer, format="png")
         plt.close()  # Prevents the figure from being displayed directly
         buffer.seek(0)
-        return Image(buffer, format_=ImageFormat.PNG)
+        return Image.from_bytes(buffer.read())
 
     def plot_histograms(self) -> Image:
         """
@@ -2130,7 +2129,7 @@ class Table:
         fig.savefig(buffer, format="png")
         plt.close()
         buffer.seek(0)
-        return Image(buffer, ImageFormat.PNG)
+        return Image.from_bytes(buffer.read())
 
     # ------------------------------------------------------------------------------------------------------------------
     # Conversion
