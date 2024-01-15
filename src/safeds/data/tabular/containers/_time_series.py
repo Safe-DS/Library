@@ -15,9 +15,9 @@ if TYPE_CHECKING:
 
 
 class TimeSeries(TaggedTable):
-    """A TimeSeries is a tagged table that additionally knows which column is the time column and uses the target column as an feature.
+    """A TimeSeries is a tagged table that additionally knows which column is the time column and uses the target column as a feature.
 
-     A Time Column should never be an feature.
+     A Time Column should never be a feature.
     ----------
     data : Mapping[str, Sequence[Any]]
         The data.
@@ -26,11 +26,10 @@ class TimeSeries(TaggedTable):
     feature_names : list[str] | None
         Names of the feature columns. If None, all columns except the target column are used.
 
-    Raises
-    ------
     time_name : str
         Name of the time column.
-
+    Raises
+    ------
     ------
     ColumnLengthMismatchError
         If columns have different lengths.
@@ -63,8 +62,8 @@ class TimeSeries(TaggedTable):
 
         Raises
         ------
-        UnknownColumnError
-            If target_name matches none of the column names.
+        UnknownColumnNameError
+            If time_name matches none of the column names.
         Value Error
             If no feature columns are specified
 
@@ -120,7 +119,7 @@ class TimeSeries(TaggedTable):
 
         Raises
         ------
-        UnknownColumnError
+        UnknownColumnNameError
             If target_name matches none of the column names.
         Value Error
             If no feature columns are specified
@@ -186,10 +185,10 @@ class TimeSeries(TaggedTable):
         # time sollte nicht in feature names sein auch wenn feature_names none ist
         if feature_names is None:
             feature_names = _data.column_names
-            if time_name in feature_names:
-                feature_names.remove(time_name)
-            if target_name in feature_names:
-                feature_names.remove(target_name)
+        if time_name in feature_names:
+            feature_names.remove(time_name)
+        if target_name in feature_names:
+            feature_names.remove(target_name)
 
 
         super().__init__(data, target_name, feature_names)
@@ -246,17 +245,17 @@ class TimeSeries(TaggedTable):
         """
         Return a new `Table` with the tagging removed.
 
-        The original TaggedTable is not modified.
+        The original table is not modified.
 
         Parameters
         ----------
-        self: TaggedTable
-            The TaggedTable.
+        self: TimeSeries
+            The Time Series.
 
         Returns
         -------
         table: Table
-            The table as an untagged Table, i.e. without the information about which columns are features or target.
+            The table as an untagged Table, i.e. without the information about which columns are features, target or time.
 
         """
         return Table.from_columns(super().to_columns())
@@ -291,7 +290,7 @@ class TimeSeries(TaggedTable):
 
     def add_column_as_feature(self, column: Column) -> TimeSeries:
         """
-        Return a new time series with the provided column attached at the end, as a feature column.
+        Return a new `TimeSeries` with the provided column attached at the end, as a feature column.
 
         the original time series is not modified.
 
@@ -375,7 +374,7 @@ class TimeSeries(TaggedTable):
 
     def add_row(self, row: Row) -> TimeSeries:
         """
-        Return a new `TimeSeries` with an added Row attached.
+        Return a new `TimeSeries` with an extra Row attached.
 
         The original table is not modified.
 
@@ -398,7 +397,7 @@ class TimeSeries(TaggedTable):
 
     def add_rows(self, rows: list[Row] | Table) -> TimeSeries:
         """
-        Return a new `TimeSeries` with multiple added Rows attached.
+        Return a new `TimeSeries` with multiple extra Rows attached.
 
         The original table is not modified.
 
@@ -449,7 +448,7 @@ class TimeSeries(TaggedTable):
         Parameters
         ----------
         column_names : list[str]
-            A list containing only the columns to be kept.
+            A list containing the columns to be kept.
 
         Returns
         -------
@@ -503,6 +502,8 @@ class TimeSeries(TaggedTable):
             If any of the given columns does not exist.
         ColumnIsTargetError
             If any of the given columns is the target column.
+        ColumnIsTimeError
+            If any of the given columns is the time column.
         IllegalSchemaModificationError
             If the given columns contain all the feature columns.
         """
@@ -539,6 +540,8 @@ class TimeSeries(TaggedTable):
         ------
         ColumnIsTargetError
             If any of the columns to be removed is the target column.
+        ColumnIsTimeError
+            If any of the columns to be removed is the time column.
         IllegalSchemaModificationError
             If the columns to remove contain all the feature columns.
         """
@@ -572,6 +575,8 @@ class TimeSeries(TaggedTable):
         ------
         ColumnIsTargetError
             If any of the columns to be removed is the target column.
+        ColumnIsTimeError
+            If any of the columns to be removed is the time column.
         IllegalSchemaModificationError
             If the columns to remove contain all the feature columns.
         """
@@ -699,8 +704,8 @@ class TimeSeries(TaggedTable):
         """
         Return a new `TimeSeries` with the specified old column replaced by a list of new columns.
 
-        If the column to be replaced is the target column, it must be replaced by exactly one column. That column
-        becomes the new target column. If the column to be replaced is a feature column, the new columns that replace it
+        If the column to be replaced is the target or time column, it must be replaced by exactly one column. That column
+        becomes the new target or time column. If the column to be replaced is a feature column, the new columns that replace it
         all become feature columns.
 
         The order of columns is kept. The original table is not modified.
