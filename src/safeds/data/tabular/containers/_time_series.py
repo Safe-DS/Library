@@ -74,6 +74,8 @@ class TimeSeries(TaggedTable):
         >>> tagged_table = TaggedTable({"date": ["01.01", "01.02", "01.03", "01.04"], "col1": ["a", "b", "c", "a"]}, "col1" )
         >>> timeseries = TimeSeries._from_tagged_table(tagged_table, time_name = "date")
         """
+        if time_name not in tagged_table.column_names:
+            raise ValueError(f"Could not find Column '{time_name}'.")
         table = tagged_table._as_table()
         # make sure that the time_name is not part of the features
         result = object.__new__(TimeSeries)
@@ -129,6 +131,7 @@ class TimeSeries(TaggedTable):
         >>> table = Table({"date": ["01.01", "01.02", "01.03", "01.04"], "f1": ["a", "b", "c", "a"], "t": [1,2,3,4]})
         >>> timeseries = TimeSeries._from_table_to_time_series(table, "t", "date", ["f1"])
         """
+
         if feature_names is None:
             feature_names = table.column_names
             if time_name in feature_names:
@@ -179,6 +182,7 @@ class TimeSeries(TaggedTable):
         >>> table = TaggedTable({"a": [1, 2, 3], "b": [4, 5, 6]}, "b", ["a"])
         """
         _data = Table(data)
+        old_names = feature_names
         # time sollte nicht in feature names sein auch wenn feature_names none ist
         if feature_names is None:
             feature_names = _data.column_names
@@ -187,12 +191,15 @@ class TimeSeries(TaggedTable):
             if target_name in feature_names:
                 feature_names.remove(target_name)
 
+
         super().__init__(data, target_name, feature_names)
 
         # Validate inputs
         if time_name not in (_data.column_names):
             raise ValueError(f"Column '{time_name}' must exist in the table.")
 
+        if time_name in old_names:
+            raise ValueError(f"Column '{time_name}' can not be time and feature column.")
         self._time: Column = _data.get_column(time_name)
 
     # ------------------------------------------------------------------------------------------------------------------

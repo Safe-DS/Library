@@ -87,6 +87,20 @@ from safeds.exceptions import UnknownColumnNameError
             ValueError,
             r"Column 'random' must exist in the table.",
         ),
+        (
+            {
+                "time": [0, 1],
+                "A": [1, 4],
+                "B": [2, 5],
+                "C": [3, 6],
+                "T": [0, 1],
+            },
+            "time",
+            "T",
+            ["A", "B", "C", "time"],
+            ValueError,
+            "Column 'time' can not be time and feature column.",
+        ),
     ],
     ids=[
         "feature_does_not_exist",
@@ -95,6 +109,8 @@ from safeds.exceptions import UnknownColumnNameError
         "features_are_empty-explicitly",
         "features_are_empty_implicitly",
         "time_column_does_not_exist",
+        "time_is_also_feature",
+
     ],
 )
 def test_should_raise_error(

@@ -86,6 +86,23 @@ from safeds.exceptions import UnknownColumnNameError
             ValueError,
             r"Column 'time' cannot be both time column and target.",
         ),
+(
+            Table(
+                {
+                    "r": [0, 1],
+                    "A": [1, 4],
+                    "B": [2, 5],
+                    "C": [3, 6],
+                    "T": [0, 1],
+                },
+            ),
+            "T",
+            "time",
+            ["A", "B", "C"],
+            ValueError,
+            r"Could not find Column 'time'.",
+
+        ),
     ],
     ids=[
         "feature_does_not_exist",
@@ -93,6 +110,7 @@ from safeds.exceptions import UnknownColumnNameError
         "target_and_feature_overlap",
         "features_are_empty-explicitly",
         "time_name_is_target",
+        "time_does_not_exist",
     ],
 )
 def test_should_raise_error(
