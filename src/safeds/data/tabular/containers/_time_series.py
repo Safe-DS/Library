@@ -28,6 +28,7 @@ class TimeSeries(TaggedTable):
 
     time_name : str
         Name of the time column.
+
     Raises
     ------
     ------
@@ -130,7 +131,6 @@ class TimeSeries(TaggedTable):
         >>> table = Table({"date": ["01.01", "01.02", "01.03", "01.04"], "f1": ["a", "b", "c", "a"], "t": [1,2,3,4]})
         >>> timeseries = TimeSeries._from_table_to_time_series(table, "t", "date", ["f1"])
         """
-
         if feature_names is None:
             feature_names = table.column_names
             if time_name in feature_names:

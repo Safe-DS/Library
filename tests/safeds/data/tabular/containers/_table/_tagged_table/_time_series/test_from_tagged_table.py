@@ -86,7 +86,7 @@ from safeds.exceptions import UnknownColumnNameError
             ValueError,
             r"Column 'time' cannot be both time column and target.",
         ),
-(
+        (
             Table(
                 {
                     "r": [0, 1],
@@ -101,7 +101,6 @@ from safeds.exceptions import UnknownColumnNameError
             ["A", "B", "C"],
             ValueError,
             r"Could not find Column 'time'.",
-
         ),
     ],
     ids=[

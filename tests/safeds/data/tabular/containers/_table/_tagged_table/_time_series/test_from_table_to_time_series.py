@@ -98,7 +98,6 @@ from safeds.exceptions import UnknownColumnNameError
             ["A", "B", "C"],
             ValueError,
             r"Could not find Column 'time'.",
-
         ),
     ],
     ids=[
@@ -144,7 +143,6 @@ def test_should_raise_error(
             "time",
             ["A", "B", "C"],
         ),
-
         (
             Table(
                 {

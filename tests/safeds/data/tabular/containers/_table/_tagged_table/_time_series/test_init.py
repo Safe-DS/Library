@@ -110,7 +110,6 @@ from safeds.exceptions import UnknownColumnNameError
         "features_are_empty_implicitly",
         "time_column_does_not_exist",
         "time_is_also_feature",
-
     ],
 )
 def test_should_raise_error(
