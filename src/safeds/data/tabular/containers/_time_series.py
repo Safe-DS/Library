@@ -181,24 +181,21 @@ class TimeSeries(TaggedTable):
         >>> table = TaggedTable({"a": [1, 2, 3], "b": [4, 5, 6]}, "b", ["a"])
         """
         _data = Table(data)
-        old_names = feature_names
+
         # time sollte nicht in feature names sein auch wenn feature_names none ist
         if feature_names is None:
             feature_names = _data.column_names
-        if time_name in feature_names:
-            feature_names.remove(time_name)
-        if target_name in feature_names:
-            feature_names.remove(target_name)
-
-
-        super().__init__(data, target_name, feature_names)
+            if time_name in feature_names:
+                feature_names.remove(time_name)
+            if target_name in feature_names:
+                feature_names.remove(target_name)
 
         # Validate inputs
+        super().__init__(data, target_name, feature_names)
+        if time_name in feature_names:
+            raise ValueError(f"Column '{time_name}' can not be time and feature column.")
         if time_name not in (_data.column_names):
             raise ValueError(f"Column '{time_name}' must exist in the table.")
-
-        if time_name in old_names:
-            raise ValueError(f"Column '{time_name}' can not be time and feature column.")
         self._time: Column = _data.get_column(time_name)
 
     # ------------------------------------------------------------------------------------------------------------------
