@@ -11,7 +11,7 @@ class Model:
         self._model = PytorchModel(layers)
         self._batch_size = 1
 
-    def train(self, train_data: TaggedTable, epoch_size: int = 25, batch_size: int = 1):
+    def train(self, train_data: TaggedTable, epoch_size: int = 25, batch_size: int = 1) -> None:
         """
         Train the neural network with given training data.
 
@@ -107,7 +107,7 @@ class PytorchModel(nn.Module):
 
         self._pytorch_layers = nn.ModuleList(layers)
 
-    def forward(self, x) -> float:
+    def forward(self, x: float) -> float:
         for layer in self._pytorch_layers:
             x = layer(x)
         return x

@@ -1,4 +1,4 @@
-import torch.nn as nn
+from torch import nn
 
 
 class PytorchLayer(nn.Module):
@@ -8,7 +8,7 @@ class PytorchLayer(nn.Module):
         self.layer = nn.Linear(input_size, output_size)
         self.fn = nn.ReLU()
 
-    def forward(self, x) -> float:
+    def forward(self, x: float) -> float:
         return self.fn(self.layer(x))
 
     def get_size(self) -> int:
@@ -22,10 +22,10 @@ class FNNLayer:
 
         Parameters
         ----------
-        epoch_size : int
-            The number of times the training cycle should be done
-        batch_size : int
-            The size of data batches that should be loaded at one time.
+        input_size : int
+            The number of neurons in the previous layer
+        output_size : int
+            The number of neurons in this layer
 
         Raises
         ------

@@ -871,7 +871,7 @@ class CustomDataset(Dataset):
         self.Y = torch.from_numpy(target.astype(np.float32))
         self.len = self.X.shape[0]
 
-    def __getitem__(self, item) -> [torch.Tensor, torch.Tensor]:
+    def __getitem__(self, item: int) -> tuple[torch.Tensor, torch.Tensor]:
         return self.X[item], self.Y[item].unsqueeze(-1)
 
     def __len__(self) -> int:
