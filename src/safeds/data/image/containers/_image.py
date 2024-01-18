@@ -16,9 +16,6 @@ if TYPE_CHECKING:
     from torch.types import Device
 import torchvision
 
-# Disables torchvision V2 beta warnings
-# Disabled because of RUFF Linter E402 (Module level import not at top of file)
-# torchvision.disable_beta_transforms_warning()
 from torchvision.transforms.v2 import PILToTensor
 from torchvision.transforms.v2 import functional as func2
 from torchvision.utils import save_image
@@ -434,6 +431,35 @@ class Image:
         else:
             return Image(func2.adjust_contrast(self._image_tensor, factor * 1.0), device=self.device)
 
+    def adjust_color_balance(self, factor: float) -> Image:
+        """
+        Return a new `Image` with adjusted color balance.
+
+        The original image is not modified.
+
+        Parameters
+        ----------
+        factor: float
+            If factor > 1, increase color balance of image.
+            If factor = 1, no changes will be made.
+            If factor < 1, make image greyer.
+            Has to be bigger than or equal to 0.
+
+        Returns
+        -------
+        image: Image
+            The new, adjusted image.
+        """
+        if factor < 0:
+            raise OutOfBoundsError(factor, name="factor", lower_bound=ClosedBound(0))
+        elif factor == 1:
+            warnings.warn(
+                "Color adjustment factor is 1.0, this will not make changes to the image.",
+                UserWarning,
+                stacklevel=2,
+            )
+        return Image(self.convert_to_grayscale()._image_tensor * (1.0 - factor * 1.0) + self._image_tensor * (factor * 1.0), device=self.device)
+
     def blur(self, radius: int) -> Image:
         """
         Return a blurred version of the image.
@@ -498,7 +524,7 @@ class Image:
 
     def invert_colors(self) -> Image:
         """
-        Return a new image with colors inverted.
+        Return a new `Image` with colors inverted.
 
         The original image is not modified.
 
