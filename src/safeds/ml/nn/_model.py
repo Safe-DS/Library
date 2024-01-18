@@ -10,6 +10,29 @@ class Model:
         self._model = PytorchModel(layers)
 
     def train(self, train_data: TaggedTable, epoch_size=25, batch_size=1):
+        """
+        Train the neural network with given training data.
+
+        Parameters
+        ----------
+        train_data : TaggedTable
+            The data the network should be trained on.
+        epoch_size : int
+            The number of times the training cycle should be done
+        batch_size : int
+            The size of data batches that should be loaded at one time.
+
+        Raises
+        ------
+        ValueError
+            If epoch_size < 1
+            If batch_size < 1
+
+        """
+        if epoch_size < 1:
+            raise ValueError("The Number of Epochs must be at least 1")
+        if batch_size < 1:
+            raise ValueError("Batch Size must be at least 1")
         dataloader = train_data.into_dataloader(batch_size)
 
         if self.is_for_regression():
@@ -21,8 +44,7 @@ class Model:
 
         loss_values = []
         accuracies = []
-        num_epochs = epoch_size
-        for epoch in range(num_epochs):
+        for epoch in range(epoch_size):
             print(f"Epoch {epoch+1}")
             tmp_loss = []
             tmp_accuracies = []
@@ -43,14 +65,23 @@ class Model:
         print(loss_values)
 
     def predict(self, test_data: TaggedTable):
+        """
+        Make a prediction for the given test data.
+
+        Parameters
+        ----------
+        test_data : TaggedTable
+            The data the network should try to predict.
+
+        """
         dataloader = test_data.into_dataloader()
         self._model.eval()
         loss_values_test = []
         accuracies_test = []
         loss_fn = nn.MSELoss()
         with torch.no_grad():
-            for X, y in dataloader:
-                pred = self._model(X)
+            for x, y in dataloader:
+                pred = self._model(x)
                 loss = loss_fn(pred, y)
                 loss_values_test.append(loss.item())
                 accuracy = torch.mean(1 - torch.abs(pred - y))

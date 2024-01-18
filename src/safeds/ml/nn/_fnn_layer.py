@@ -3,6 +3,27 @@ import torch.nn as nn
 
 class fnn_layer():
     def __init__(self, input_size, output_size):
+        """
+        Create a FNN Layer.
+
+        Parameters
+        ----------
+        epoch_size : int
+            The number of times the training cycle should be done
+        batch_size : int
+            The size of data batches that should be loaded at one time.
+
+        Raises
+        ------
+        ValueError
+            If input_size < 1
+            If output_size < 1
+
+        """
+        if input_size < 1:
+            raise ValueError("Input Size must be at least 1")
+        if output_size < 1:
+            raise ValueError("Output Size must be at least 1")
         self.input_size = input_size
         self.output_size = output_size
 

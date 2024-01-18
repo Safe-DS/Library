@@ -838,7 +838,23 @@ class TaggedTable(Table):
             feature_names=self.features.column_names,
         )
 
-    def into_dataloader(self, batch_size=1) -> DataLoader:
+    def into_dataloader(self, batch_size) -> DataLoader:
+        """
+        Return a Dataloader for the data stored in this table, used for training neural networks.
+
+        The original table is not modified.
+
+        Parameters
+        ----------
+        batch_size : int
+            The size of data batches that should be loaded at one time.
+
+        Returns
+        -------
+        result : DataLoader
+            The DataLoader.
+
+        """
         feature_rows = self.features.to_rows()
         all_rows = []
         for row in feature_rows:
