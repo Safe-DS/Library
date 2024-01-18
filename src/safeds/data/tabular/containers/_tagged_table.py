@@ -838,7 +838,7 @@ class TaggedTable(Table):
             feature_names=self.features.column_names,
         )
 
-    def into_dataloader(self, batch_size) -> DataLoader:
+    def into_dataloader(self, batch_size: int) -> DataLoader:
         """
         Return a Dataloader for the data stored in this table, used for training neural networks.
 
@@ -866,13 +866,13 @@ class TaggedTable(Table):
 
 
 class CustomDataset(Dataset):
-    def __init__(self, features, target):
+    def __init__(self, features: np.array, target: np.array):
         self.X = torch.from_numpy(features.astype(np.float32))
         self.Y = torch.from_numpy(target.astype(np.float32))
         self.len = self.X.shape[0]
 
-    def __getitem__(self, item):
+    def __getitem__(self, item) -> [torch.Tensor, torch.Tensor]:
         return self.X[item], self.Y[item].unsqueeze(-1)
 
-    def __len__(self):
+    def __len__(self) -> int:
         return self.len

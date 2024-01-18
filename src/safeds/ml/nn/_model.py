@@ -11,7 +11,7 @@ class Model:
         self._model = PytorchModel(layers)
         self._batch_size = 1
 
-    def train(self, train_data: TaggedTable, epoch_size=25, batch_size=1):
+    def train(self, train_data: TaggedTable, epoch_size: int = 25, batch_size: int = 1):
         """
         Train the neural network with given training data.
 
@@ -67,7 +67,7 @@ class Model:
             accuracies.append(np.mean(tmp_accuracies))
         # print(loss_values)
 
-    def predict(self, test_data: TaggedTable):
+    def predict(self, test_data: TaggedTable) -> None:
         """
         Make a prediction for the given test data.
 
@@ -93,12 +93,12 @@ class Model:
         # print(np.mean(loss_values_test))
         # print(np.mean(accuracies_test))
 
-    def is_for_regression(self):
+    def is_for_regression(self) -> bool:
         return self._model.last_layer_has_output_size_one()
 
 
 class PytorchModel(nn.Module):
-    def __init__(self, layer_list: list[FNNLayer]):
+    def __init__(self, layer_list: list[FNNLayer]) -> None:
         super().__init__()
         self._layer_list = layer_list
         layers = []
@@ -107,10 +107,10 @@ class PytorchModel(nn.Module):
 
         self._pytorch_layers = nn.ModuleList(layers)
 
-    def forward(self, x):
+    def forward(self, x) -> float:
         for layer in self._pytorch_layers:
             x = layer(x)
         return x
 
-    def last_layer_has_output_size_one(self):
+    def last_layer_has_output_size_one(self) -> bool:
         return self._layer_list[-1].get_size() == 1
