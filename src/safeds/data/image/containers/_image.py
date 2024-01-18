@@ -1,20 +1,29 @@
 from __future__ import annotations
 
-import copy
 import io
 import warnings
 from pathlib import Path
-from typing import Any, BinaryIO
+from typing import TYPE_CHECKING
 
-import numpy as np
-import PIL
-from PIL import ImageEnhance, ImageFilter, ImageOps
-from PIL.Image import Image as PillowImage
-from PIL.Image import open as open_image
-from skimage.util import random_noise
+import torch
+import torch.nn.functional as func
+from PIL.Image import open as pil_image_open
+from torch import Tensor
 
-from safeds.data.image.typing import ImageFormat
-from safeds.exceptions import ClosedBound, OutOfBoundsError
+from safeds.config import _get_device
+
+if TYPE_CHECKING:
+    from torch.types import Device
+import torchvision
+
+# Disables torchvision V2 beta warnings
+# Disabled because of RUFF Linter E402 (Module level import not at top of file)
+# torchvision.disable_beta_transforms_warning()
+from torchvision.transforms.v2 import PILToTensor
+from torchvision.transforms.v2 import functional as func2
+from torchvision.utils import save_image
+
+from safeds.exceptions import ClosedBound, IllegalFormatError, OutOfBoundsError
 
 
 class Image:
@@ -23,71 +32,126 @@ class Image:
 
     Parameters
     ----------
-    data : BinaryIO
-        The image data as bytes.
+    image_tensor : Tensor
+        The image data as tensor.
     """
 
+    _pil_to_tensor = PILToTensor()
+    _default_device = _get_device()
+
     @staticmethod
-    def from_jpeg_file(path: str | Path) -> Image:
+    def from_file(path: str | Path, device: Device = _default_device) -> Image:
         """
-        Create an image from a JPEG file.
+        Create an image from a file.
 
         Parameters
         ----------
         path : str | Path
-            The path to the JPEG file.
+            The path to the image file.
+        device: Device
+            The device where the tensor will be saved on. Defaults to the default device
 
         Returns
         -------
         image : Image
             The image.
         """
-        return Image(
-            data=Path(path).open("rb"),
-            format_=ImageFormat.JPEG,
-        )
+        return Image(image_tensor=Image._pil_to_tensor(pil_image_open(path)), device=device)
 
     @staticmethod
-    def from_png_file(path: str | Path) -> Image:
+    def from_bytes(data: bytes, device: Device = _default_device) -> Image:
         """
-        Create an image from a PNG file.
+        Create an image from bytes.
 
         Parameters
         ----------
-        path : str | Path
-            The path to the PNG file.
+        data : bytes
+            The data of the image.
+        device: Device
+            The device where the tensor will be saved on. Defaults to the default device
 
         Returns
         -------
         image : Image
             The image.
         """
-        return Image(
-            data=Path(path).open("rb"),
-            format_=ImageFormat.PNG,
+        with warnings.catch_warnings():
+            warnings.filterwarnings(
+                "ignore",
+                message="The given buffer is not writable, and PyTorch does not support non-writable tensors.",
+            )
+            input_tensor = torch.frombuffer(data, dtype=torch.uint8)
+        return Image(image_tensor=torchvision.io.decode_image(input_tensor), device=device)
+
+    def __init__(self, image_tensor: Tensor, device: Device = _default_device) -> None:
+        self._image_tensor: Tensor = image_tensor.to(device)
+
+    def __eq__(self, other: object) -> bool:
+        """
+        Compare two images.
+
+        Parameters
+        ----------
+        other: The image to compare to.
+
+        Returns
+        -------
+        equals : bool
+            Whether the two images contain equal pixel data.
+        """
+        if not isinstance(other, Image):
+            return NotImplemented
+        return (
+            self._image_tensor.size() == other._image_tensor.size()
+            and torch.all(torch.eq(self._image_tensor, other._set_device(self.device)._image_tensor)).item()
         )
 
-    def __init__(self, data: BinaryIO, format_: ImageFormat):
-        data.seek(0)
+    def _repr_jpeg_(self) -> bytes | None:
+        """
+        Return a JPEG image as bytes.
 
-        self._image: PillowImage = open_image(data, formats=[format_.value])
-        self._format: ImageFormat = format_
+        If the image has an alpha channel return None.
+
+        Returns
+        -------
+        jpeg : bytes
+            The image as JPEG.
+        """
+        if self.channel == 4:
+            return None
+        buffer = io.BytesIO()
+        save_image(self._image_tensor.to(torch.float32) / 255, buffer, format="jpeg")
+        buffer.seek(0)
+        return buffer.read()
+
+    def _repr_png_(self) -> bytes:
+        """
+        Return a PNG image as bytes.
+
+        Returns
+        -------
+        png : bytes
+            The image as PNG.
+        """
+        buffer = io.BytesIO()
+        save_image(self._image_tensor.to(torch.float32) / 255, buffer, format="png")
+        buffer.seek(0)
+        return buffer.read()
+
+    def _set_device(self, device: Device) -> Image:
+        """
+        Set the device where the image will be saved on.
+
+        Returns
+        -------
+        result : Image
+            The image on the given device
+        """
+        return Image(self._image_tensor, device)
 
     # ------------------------------------------------------------------------------------------------------------------
     # Properties
     # ------------------------------------------------------------------------------------------------------------------
-
-    @property
-    def format(self) -> ImageFormat:
-        """
-        Get the image format.
-
-        Returns
-        -------
-        format : ImageFormat
-            The image format.
-        """
-        return self._format
 
     @property
     def width(self) -> int:
@@ -99,7 +163,7 @@ class Image:
         width : int
             The width of the image.
         """
-        return self._image.width
+        return self._image_tensor.size(dim=2)
 
     @property
     def height(self) -> int:
@@ -111,7 +175,31 @@ class Image:
         height : int
             The height of the image.
         """
-        return self._image.height
+        return self._image_tensor.size(dim=1)
+
+    @property
+    def channel(self) -> int:
+        """
+        Get the number of channels of the image.
+
+        Returns
+        -------
+        channel : int
+            The number of channels of the image.
+        """
+        return self._image_tensor.size(dim=0)
+
+    @property
+    def device(self) -> Device:
+        """
+        Get the device where the image is saved on.
+
+        Returns
+        -------
+        device : Device
+            The device of the image
+        """
+        return self._image_tensor.device
 
     # ------------------------------------------------------------------------------------------------------------------
     # Conversion
@@ -126,8 +214,10 @@ class Image:
         path : str | Path
             The path to the JPEG file.
         """
+        if self.channel == 4:
+            raise IllegalFormatError("png")
         Path(path).parent.mkdir(parents=True, exist_ok=True)
-        self._image.save(path, format="jpeg")
+        save_image(self._image_tensor.to(torch.float32) / 255, path, format="jpeg")
 
     def to_png_file(self, path: str | Path) -> None:
         """
@@ -139,67 +229,7 @@ class Image:
             The path to the PNG file.
         """
         Path(path).parent.mkdir(parents=True, exist_ok=True)
-        self._image.save(path, format="png")
-
-    # ------------------------------------------------------------------------------------------------------------------
-    # IPython integration
-    # ------------------------------------------------------------------------------------------------------------------
-
-    def __eq__(self, other: Any) -> bool:
-        """
-        Compare two images.
-
-        Parameters
-        ----------
-        other: The image to compare to.
-
-        Returns
-        -------
-        equals : bool
-            Whether the two images contain equal pixel data.
-
-        """
-        if not isinstance(other, Image):
-            return NotImplemented
-        return self._image.tobytes() == other._image.tobytes()
-
-    def _repr_jpeg_(self) -> bytes | None:
-        """
-        Return a JPEG image as bytes.
-
-        If the image is not a JPEG, return None.
-
-        Returns
-        -------
-        jpeg : bytes | None
-            The image as JPEG.
-        """
-        if self._format != ImageFormat.JPEG:
-            return None
-
-        buffer = io.BytesIO()
-        self._image.save(buffer, format="jpeg")
-        buffer.seek(0)
-        return buffer.read()
-
-    def _repr_png_(self) -> bytes | None:
-        """
-        Return a PNG image as bytes.
-
-        If the image is not a PNG, return None.
-
-        Returns
-        -------
-        png : bytes | None
-            The image as PNG.
-        """
-        if self._format != ImageFormat.PNG:
-            return None
-
-        buffer = io.BytesIO()
-        self._image.save(buffer, format="png")
-        buffer.seek(0)
-        return buffer.read()
+        save_image(self._image_tensor.to(torch.float32) / 255, path, format="png")
 
     # ------------------------------------------------------------------------------------------------------------------
     # Transformations
@@ -216,9 +246,10 @@ class Image:
         result : Image
             The image with the given width and height.
         """
-        image_copy = copy.deepcopy(self)
-        image_copy._image = image_copy._image.resize((new_width, new_height))
-        return image_copy
+        return Image(
+            func.interpolate(self._image_tensor.unsqueeze(dim=1), size=(new_height, new_width)).squeeze(dim=1),
+            device=self._image_tensor.device,
+        )
 
     def convert_to_grayscale(self) -> Image:
         """
@@ -231,9 +262,16 @@ class Image:
         result : Image
             The grayscale image.
         """
-        image_copy = copy.deepcopy(self)
-        image_copy._image = image_copy._image.convert("L")
-        return image_copy
+        if self.channel == 4:
+            return Image(
+                torch.cat([
+                    func2.rgb_to_grayscale(self._image_tensor[0:3], num_output_channels=3),
+                    self._image_tensor[3].unsqueeze(dim=0),
+                ]),
+                device=self.device,
+            )
+        else:
+            return Image(func2.rgb_to_grayscale(self._image_tensor[0:3], num_output_channels=3), device=self.device)
 
     def crop(self, x: int, y: int, width: int, height: int) -> Image:
         """
@@ -253,9 +291,7 @@ class Image:
         result : Image
             The cropped image.
         """
-        image_copy = copy.deepcopy(self)
-        image_copy._image = image_copy._image.crop((x, y, (x + width), (y + height)))
-        return image_copy
+        return Image(func2.crop(self._image_tensor, x, y, height, width), device=self.device)
 
     def flip_vertically(self) -> Image:
         """
@@ -268,9 +304,7 @@ class Image:
         result : Image
             The flipped image.
         """
-        image_copy = copy.deepcopy(self)
-        image_copy._image = self._image.transpose(PIL.Image.FLIP_TOP_BOTTOM)
-        return image_copy
+        return Image(func2.vertical_flip(self._image_tensor), device=self.device)
 
     def flip_horizontally(self) -> Image:
         """
@@ -283,9 +317,7 @@ class Image:
         result : Image
             The flipped image.
         """
-        image_copy = copy.deepcopy(self)
-        image_copy._image = self._image.transpose(PIL.Image.FLIP_LEFT_RIGHT)
-        return image_copy
+        return Image(func2.horizontal_flip(self._image_tensor), device=self.device)
 
     def adjust_brightness(self, factor: float) -> Image:
         """
@@ -306,6 +338,11 @@ class Image:
         -------
         result: Image
             The Image with adjusted brightness.
+
+        Raises
+        ------
+        OutOfBoundsError
+            If factor is smaller than 0.
         """
         if factor < 0:
             raise OutOfBoundsError(factor, name="factor", lower_bound=ClosedBound(0))
@@ -315,26 +352,32 @@ class Image:
                 UserWarning,
                 stacklevel=2,
             )
+        if self.channel == 4:
+            return Image(
+                torch.cat([
+                    func2.adjust_brightness(self._image_tensor[0:3], factor * 1.0),
+                    self._image_tensor[3].unsqueeze(dim=0),
+                ]),
+                device=self.device,
+            )
+        else:
+            return Image(func2.adjust_brightness(self._image_tensor, factor * 1.0), device=self.device)
 
-        image_copy = copy.deepcopy(self)
-        image_copy._image = ImageEnhance.Brightness(image_copy._image).enhance(factor)
-        return image_copy
-
-    def add_gaussian_noise(self, standard_deviation: float) -> Image:
+    def add_noise(self, standard_deviation: float) -> Image:
         """
-        Return a new `Image` with Gaussian noise added to the image.
+        Return a new `Image` with noise added to the image.
 
         The original image is not modified.
 
         Parameters
         ----------
         standard_deviation : float
-            The standard deviation of the Gaussian distribution. Has to be bigger than or equal to 0.
+            The standard deviation of the normal distribution. Has to be bigger than or equal to 0.
 
         Returns
         -------
         result : Image
-            The image with added Gaussian noise.
+            The image with added noise.
 
         Raises
         ------
@@ -343,21 +386,10 @@ class Image:
         """
         if standard_deviation < 0:
             raise OutOfBoundsError(standard_deviation, name="standard_deviation", lower_bound=ClosedBound(0))
-
-        # noinspection PyTypeChecker
-        image_as_array = np.asarray(self._image)
-        noisy_image_as_array = random_noise(
-            image_as_array,
-            mode="gaussian",
-            var=standard_deviation**2,
-            rng=42,
-            clip=True,
+        return Image(
+            self._image_tensor + torch.normal(0, standard_deviation, self._image_tensor.size()).to(self.device) * 255,
+            device=self.device,
         )
-        noisy_image = PIL.Image.fromarray(np.uint8(255 * noisy_image_as_array))
-
-        image_copy = copy.deepcopy(self)
-        image_copy._image = noisy_image
-        return image_copy
 
     def adjust_contrast(self, factor: float) -> Image:
         """
@@ -377,6 +409,11 @@ class Image:
         -------
         image: Image
             New image with adjusted contrast.
+
+        Raises
+        ------
+        OutOfBoundsError
+            If factor is smaller than 0.
         """
         if factor < 0:
             raise OutOfBoundsError(factor, name="factor", lower_bound=ClosedBound(0))
@@ -386,42 +423,16 @@ class Image:
                 UserWarning,
                 stacklevel=2,
             )
-
-        image_copy = copy.deepcopy(self)
-        image_copy._image = ImageEnhance.Contrast(image_copy._image).enhance(factor)
-        return image_copy
-
-    def adjust_color_balance(self, factor: float) -> Image:
-        """
-        Return a new `Image` with adjusted color balance.
-
-        The original image is not modified.
-
-        Parameters
-        ----------
-        factor: float
-            If factor > 1, increase color balance of image.
-            If factor = 1, no changes will be made.
-            If factor < 1, make image greyer.
-            Has to be bigger than or equal to 0.
-
-        Returns
-        -------
-        image: Image
-            The new, adjusted image.
-        """
-        if factor < 0:
-            raise OutOfBoundsError(factor, name="factor", lower_bound=ClosedBound(0))
-        elif factor == 1:
-            warnings.warn(
-                "Color adjustment factor is 1.0, this will not make changes to the image.",
-                UserWarning,
-                stacklevel=2,
+        if self.channel == 4:
+            return Image(
+                torch.cat([
+                    func2.adjust_contrast(self._image_tensor[0:3], factor * 1.0),
+                    self._image_tensor[3].unsqueeze(dim=0),
+                ]),
+                device=self.device,
             )
-
-        image_copy = copy.deepcopy(self)
-        image_copy._image = ImageEnhance.Color(image_copy._image).enhance(factor)
-        return image_copy
+        else:
+            return Image(func2.adjust_contrast(self._image_tensor, factor * 1.0), device=self.device)
 
     def blur(self, radius: int) -> Image:
         """
@@ -440,9 +451,7 @@ class Image:
         result : Image
             The blurred image.
         """
-        image_copy = copy.deepcopy(self)
-        image_copy._image = image_copy._image.filter(ImageFilter.BoxBlur(radius))
-        return image_copy
+        return Image(func2.gaussian_blur(self._image_tensor, [radius * 2 + 1, radius * 2 + 1]), device=self.device)
 
     def sharpen(self, factor: float) -> Image:
         """
@@ -453,17 +462,39 @@ class Image:
         Parameters
         ----------
         factor : float
-            The amount of sharpness to be applied to the image. Factor 1.0 is considered to be neutral and does not make
-            any changes.
+            If factor > 1, increase the sharpness of the image.
+            If factor = 1, no changes will be made.
+            If factor < 1, blur the image.
+            Has to be bigger than or equal to 0 (blurred).
 
         Returns
         -------
         result : Image
             The image sharpened by the given factor.
+
+        Raises
+        ------
+        OutOfBoundsError
+            If factor is smaller than 0.
         """
-        image_copy = copy.deepcopy(self)
-        image_copy._image = ImageEnhance.Sharpness(image_copy._image).enhance(factor)
-        return image_copy
+        if factor < 0:
+            raise OutOfBoundsError(factor, name="factor", lower_bound=ClosedBound(0))
+        elif factor == 1:
+            warnings.warn(
+                "Sharpen factor is 1.0, this will not make changes to the image.",
+                UserWarning,
+                stacklevel=2,
+            )
+        if self.channel == 4:
+            return Image(
+                torch.cat([
+                    func2.adjust_sharpness(self._image_tensor[0:3], factor * 1.0),
+                    self._image_tensor[3].unsqueeze(dim=0),
+                ]),
+                device=self.device,
+            )
+        else:
+            return Image(func2.adjust_sharpness(self._image_tensor, factor * 1.0), device=self.device)
 
     def invert_colors(self) -> Image:
         """
@@ -476,9 +507,13 @@ class Image:
         result : Image
             The image with inverted colors.
         """
-        image_copy = copy.deepcopy(self)
-        image_copy._image = ImageOps.invert(image_copy._image.convert("RGB"))
-        return image_copy
+        if self.channel == 4:
+            return Image(
+                torch.cat([func2.invert(self._image_tensor[0:3]), self._image_tensor[3].unsqueeze(dim=0)]),
+                device=self.device,
+            )
+        else:
+            return Image(func2.invert(self._image_tensor), device=self.device)
 
     def rotate_right(self) -> Image:
         """
@@ -491,9 +526,7 @@ class Image:
         result : Image
             The image rotated 90 degrees clockwise.
         """
-        image_copy = copy.deepcopy(self)
-        image_copy._image = image_copy._image.rotate(270, expand=True)
-        return image_copy
+        return Image(func2.rotate(self._image_tensor, -90, expand=True), device=self.device)
 
     def rotate_left(self) -> Image:
         """
@@ -506,22 +539,4 @@ class Image:
         result : Image
             The image rotated 90 degrees counter-clockwise.
         """
-        image_copy = copy.deepcopy(self)
-        image_copy._image = image_copy._image.rotate(90, expand=True)
-        return image_copy
-
-    def find_edges(self) -> Image:
-        """
-        Return a grayscale version of the image with the edges highlighted.
-
-        The original image is not modified.
-
-        Returns
-        -------
-        result : Image
-            The image with edges found.
-        """
-        image_copy = copy.deepcopy(self)
-        image_copy = image_copy.convert_to_grayscale()
-        image_copy._image = image_copy._image.filter(ImageFilter.FIND_EDGES)
-        return image_copy
+        return Image(func2.rotate(self._image_tensor, 90, expand=True), device=self.device)
