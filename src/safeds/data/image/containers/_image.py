@@ -15,7 +15,6 @@ from safeds.config import _get_device
 if TYPE_CHECKING:
     from torch.types import Device
 import torchvision
-
 from torchvision.transforms.v2 import PILToTensor
 from torchvision.transforms.v2 import functional as func2
 from torchvision.utils import save_image
@@ -458,7 +457,10 @@ class Image:
                 UserWarning,
                 stacklevel=2,
             )
-        return Image(self.convert_to_grayscale()._image_tensor * (1.0 - factor * 1.0) + self._image_tensor * (factor * 1.0), device=self.device)
+        return Image(
+            self.convert_to_grayscale()._image_tensor * (1.0 - factor * 1.0) + self._image_tensor * (factor * 1.0),
+            device=self.device,
+        )
 
     def blur(self, radius: int) -> Image:
         """
