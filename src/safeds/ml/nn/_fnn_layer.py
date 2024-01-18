@@ -1,7 +1,7 @@
 import torch.nn as nn
 
 
-class fnn_layer():
+class FNNLayer:
     def __init__(self, input_size, output_size):
         """
         Create a FNN Layer.

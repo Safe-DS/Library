@@ -1,13 +1,15 @@
 import numpy as np
-from torch import nn
 import torch
+from torch import nn
+
 from safeds.data.tabular.containers import TaggedTable
-from safeds.ml.nn import fnn_layer
+from safeds.ml.nn._fnn_layer import FNNLayer
 
 
 class Model:
     def __init__(self, layers: list):
         self._model = PytorchModel(layers)
+        self._batch_size = 1
 
     def train(self, train_data: TaggedTable, epoch_size=25, batch_size=1):
         """
@@ -33,7 +35,8 @@ class Model:
             raise ValueError("The Number of Epochs must be at least 1")
         if batch_size < 1:
             raise ValueError("Batch Size must be at least 1")
-        dataloader = train_data.into_dataloader(batch_size)
+        self._batch_size = batch_size
+        dataloader = train_data.into_dataloader(self._batch_size)
 
         if self.is_for_regression():
             loss_fn = nn.MSELoss()
@@ -44,8 +47,8 @@ class Model:
 
         loss_values = []
         accuracies = []
-        for epoch in range(epoch_size):
-            print(f"Epoch {epoch+1}")
+        for _epoch in range(epoch_size):
+            # print(f"Epoch {epoch+1}")
             tmp_loss = []
             tmp_accuracies = []
             for x, y in dataloader:
@@ -62,7 +65,7 @@ class Model:
                 optimizer.step()
             loss_values.append(np.mean(tmp_loss))
             accuracies.append(np.mean(tmp_accuracies))
-        print(loss_values)
+        # print(loss_values)
 
     def predict(self, test_data: TaggedTable):
         """
@@ -74,7 +77,7 @@ class Model:
             The data the network should try to predict.
 
         """
-        dataloader = test_data.into_dataloader()
+        dataloader = test_data.into_dataloader(self._batch_size)
         self._model.eval()
         loss_values_test = []
         accuracies_test = []
@@ -87,14 +90,15 @@ class Model:
                 accuracy = torch.mean(1 - torch.abs(pred - y))
                 accuracies_test.append(accuracy.item())
 
-        print(np.mean(loss_values_test))
-        print(np.mean(accuracies_test))
+        # print(np.mean(loss_values_test))
+        # print(np.mean(accuracies_test))
 
     def is_for_regression(self):
         return self._model.last_layer_has_output_size_one()
 
+
 class PytorchModel(nn.Module):
-    def __init__(self, layer_list: list[fnn_layer]):
+    def __init__(self, layer_list: list[FNNLayer]):
         super().__init__()
         self._layer_list = layer_list
         layers = []

@@ -1,5 +1,5 @@
 import pytest
-from safeds.ml.nn._fnn_layer import fnn_layer
+from safeds.ml.nn._fnn_layer import FNNLayer
 
 
 @pytest.mark.parametrize(
@@ -24,4 +24,4 @@ from safeds.ml.nn._fnn_layer import fnn_layer
 )
 def test_should_raise_error(input_size: int, output_size: int, expected_error_message: str) -> None:
     with pytest.raises(ValueError, match=expected_error_message):
-        layer = fnn_layer(input_size, output_size)
+        FNNLayer(input_size, output_size)
