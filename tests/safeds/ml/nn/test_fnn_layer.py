@@ -8,16 +8,12 @@ from safeds.ml.nn._fnn_layer import FNNLayer
         (
             0,
             5,
-            (
-                r"Input Size must be at least 1"
-            ),
+            r"Input Size must be at least 1",
         ),
         (
             5,
             0,
-            (
-                r"Output Size must be at least 1"
-            ),
+            r"Output Size must be at least 1",
         ),
     ],
     ids=["input_size_out_of_bounds", "output_size_out_of_bounds"],

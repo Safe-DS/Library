@@ -10,16 +10,12 @@ from safeds.ml.nn._model import Model
         (
             0,
             5,
-            (
-                r"The Number of Epochs must be at least 1"
-            ),
+            r"The Number of Epochs must be at least 1",
         ),
         (
             5,
             0,
-            (
-                r"Batch Size must be at least 1"
-            ),
+            r"Batch Size must be at least 1",
         ),
     ],
     ids=["epoch_size_out_of_bounds", "batch_size_out_of_bounds"],
