@@ -37,10 +37,8 @@ class NonNumericColumnError(Exception):
     def __init__(self, column_info: str, help_msg: str | None = None) -> None:
         line_break = "\n"
         super().__init__(
-            (
-                "Tried to do a numerical operation on one or multiple non-numerical columns:"
-                f" \n{column_info}{line_break + help_msg if help_msg is not None else ''}"
-            ),
+            "Tried to do a numerical operation on one or multiple non-numerical columns:"
+            f" \n{column_info}{line_break + help_msg if help_msg is not None else ''}",
         )
 
 
@@ -50,10 +48,8 @@ class MissingValuesColumnError(Exception):
     def __init__(self, column_info: str, help_msg: str | None = None) -> None:
         line_break = "\n"
         super().__init__(
-            (
-                "Tried to do an operation on one or multiple columns containing missing values:"
-                f" \n{column_info}{line_break + help_msg if help_msg is not None else ''}"
-            ),
+            "Tried to do an operation on one or multiple columns containing missing values:"
+            f" \n{column_info}{line_break + help_msg if help_msg is not None else ''}",
         )
 
 
@@ -125,10 +121,8 @@ class ValueNotPresentWhenFittedError(Exception):
         values_info = [f"{value} in column {column}" for value, column in values]
         line_break = "\n"
         super().__init__(
-            (
-                "Value(s) not present in the table the transformer was fitted on:"
-                f" {line_break}{line_break.join(values_info)}"
-            ),
+            "Value(s) not present in the table the transformer was fitted on:"
+            f" {line_break}{line_break.join(values_info)}",
         )
 
 
@@ -137,10 +131,8 @@ class WrongFileExtensionError(Exception):
 
     def __init__(self, file: str | Path, file_extension: str | list[str]) -> None:
         super().__init__(
-            (
-                f"The file {file} has a wrong file extension. Please provide a file with the following extension(s):"
-                f" {file_extension}"
-            ),
+            f"The file {file} has a wrong file extension. Please provide a file with the following extension(s):"
+            f" {file_extension}",
         )
 
 
@@ -156,3 +148,10 @@ class ColumnIsTargetError(IllegalSchemaModificationError):
 
     def __init__(self, column_name: str) -> None:
         super().__init__(f'Column "{column_name}" is the target column and cannot be removed.')
+
+
+class IllegalFormatError(Exception):
+    """Exception raised when a format is not legal."""
+
+    def __init__(self, formats: list[str] | str) -> None:
+        super().__init__(f"This format is illegal. Use one of the following formats: {formats}")
