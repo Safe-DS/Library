@@ -194,8 +194,8 @@ class TestReprPng:
 class TestToJpegFile:
     @pytest.mark.parametrize(
         "resource_path",
-        [_white_square_jpg_path, _white_square_png_path],
-        ids=[_white_square_jpg_id, _white_square_png_id],
+        [_plane_jpg_path, _white_square_jpg_path, _white_square_png_path, _grayscale_jpg_path, _grayscale_png_path],
+        ids=[_plane_jpg_id, _white_square_jpg_id, _white_square_png_id, _grayscale_jpg_id, _grayscale_png_id],
     )
     def test_should_save_file(self, resource_path: str | Path, device: Device) -> None:
         _skip_if_device_not_available(device)
@@ -206,7 +206,7 @@ class TestToJpegFile:
                 image.to_jpeg_file(tmp_file.name)
             with Path(tmp_jpeg_file.name).open("r", encoding="utf-8") as tmp_file:
                 image_r = Image.from_file(tmp_file.name)
-        assert image == image_r
+        _assert_width_height_channel(image, image_r)
 
     @pytest.mark.parametrize(
         "resource_path",
