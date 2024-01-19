@@ -795,7 +795,9 @@ class TestFindEdges:
         _test_images_all(),
         ids=_test_images_all_ids(),
     )
-    def test_should_return_edges_of_image(self, resource_path: str, snapshot_png: SnapshotAssertion, device: Device) -> None:
+    def test_should_return_edges_of_image(
+        self, resource_path: str, snapshot_png: SnapshotAssertion, device: Device,
+    ) -> None:
         _skip_if_device_not_available(device)
         image = Image.from_file(resolve_resource_path(resource_path), device=device)
         image_edges = image.find_edges()

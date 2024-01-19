@@ -34,8 +34,12 @@ class Image:
 
     _pil_to_tensor = PILToTensor()
     _default_device = _get_device()
-    _FILTER_EDGES_KERNEL = torch.tensor([[-1., -1., -1.], [-1., 8., -1.], [-1., -1., -1.]]).unsqueeze(dim=0).unsqueeze(dim=0).to(_default_device)
-
+    _FILTER_EDGES_KERNEL = (
+        torch.tensor([[-1.0, -1.0, -1.0], [-1.0, 8.0, -1.0], [-1.0, -1.0, -1.0]])
+        .unsqueeze(dim=0)
+        .unsqueeze(dim=0)
+        .to(_default_device)
+    )
 
     @staticmethod
     def from_file(path: str | Path, device: Device = _default_device) -> Image:
@@ -562,11 +566,23 @@ class Image:
         result : Image
             The image with edges found.
         """
-        kernel = Image._FILTER_EDGES_KERNEL if self.device.type == Image._default_device else Image._FILTER_EDGES_KERNEL.to(self.device)
-        edges_tensor = torch.clamp(torch.nn.functional.conv2d(self.convert_to_grayscale()._image_tensor.float()[0].unsqueeze(dim=0), kernel, padding="same").squeeze(dim=1), 0, 255).to(torch.uint8)
+        kernel = (
+            Image._FILTER_EDGES_KERNEL
+            if self.device.type == Image._default_device
+            else Image._FILTER_EDGES_KERNEL.to(self.device)
+        )
+        edges_tensor = torch.clamp(
+            torch.nn.functional.conv2d(
+                self.convert_to_grayscale()._image_tensor.float()[0].unsqueeze(dim=0), kernel, padding="same",
+            ).squeeze(dim=1),
+            0,
+            255,
+        ).to(torch.uint8)
         if self.channel == 3:
             return Image(edges_tensor.repeat(3, 1, 1), device=self.device)
         elif self.channel == 4:
-            return Image(torch.cat([edges_tensor.repeat(3, 1, 1), self._image_tensor[3].unsqueeze(dim=0)]), device=self.device)
+            return Image(
+                torch.cat([edges_tensor.repeat(3, 1, 1), self._image_tensor[3].unsqueeze(dim=0)]), device=self.device,
+            )
         else:
             return Image(edges_tensor, device=self.device)
