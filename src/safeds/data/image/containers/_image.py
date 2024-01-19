@@ -439,10 +439,10 @@ class Image:
         Parameters
         ----------
         factor: float
-            If factor > 1, increase color balance of image.
-            If factor = 1, no changes will be made.
-            If factor < 1, make image greyer.
             Has to be bigger than or equal to 0.
+            If 0 <= factor < 1, make image greyer.
+            If factor = 1, no changes will be made.
+            If factor > 1, increase color balance of image.
 
         Returns
         -------
