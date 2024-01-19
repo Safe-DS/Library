@@ -20,12 +20,16 @@ _plane_png_path = "image/plane.png"
 _rgba_png_path = "image/rgba.png"
 _white_square_jpg_path = "image/white_square.jpg"
 _white_square_png_path = "image/white_square.png"
+_grayscale_jpg_path = "image/grayscale.jpg"
+_grayscale_png_path = "image/grayscale.png"
 
 _plane_jpg_id = "opaque-3-channel-jpg-plane"
 _plane_png_id = "opaque-4-channel-png-plane"
 _rgba_png_id = "transparent-4-channel-png-rgba"
 _white_square_jpg_id = "opaque-3-channel-jpg-white_square"
 _white_square_png_id = "opaque-3-channel-png-white_square"
+_grayscale_jpg_id = "opaque-1-channel-jpg-grayscale"
+_grayscale_png_id = "opaque-1-channel-png-grayscale"
 
 
 def _test_devices() -> list[torch.device]:
@@ -43,6 +47,8 @@ def _test_images_all() -> list[str]:
         _rgba_png_path,
         _white_square_jpg_path,
         _white_square_png_path,
+        _grayscale_jpg_path,
+        _grayscale_png_path,
     ]
 
 
@@ -53,6 +59,8 @@ def _test_images_all_ids() -> list[str]:
         _rgba_png_id,
         _white_square_jpg_id,
         _white_square_png_id,
+        _grayscale_jpg_id,
+        _grayscale_png_id,
     ]
 
 
@@ -61,6 +69,8 @@ def _test_images_asymmetric() -> list[str]:
         _plane_jpg_path,
         _plane_png_path,
         _rgba_png_path,
+        _grayscale_jpg_path,
+        _grayscale_png_path,
     ]
 
 
@@ -69,12 +79,20 @@ def _test_images_asymmetric_ids() -> list[str]:
         _plane_jpg_id,
         _plane_png_id,
         _rgba_png_id,
+        _grayscale_jpg_id,
+        _grayscale_png_id,
     ]
 
 
 def _skip_if_device_not_available(device: Device) -> None:
     if device == _device_cuda and not torch.cuda.is_available():
         pytest.skip("This test requires cuda")
+
+
+def _assert_width_height_channel(image1: Image, image2: Image) -> None:
+    assert image1.width == image2.width
+    assert image1.height == image2.height
+    assert image1.channel == image2.channel
 
 
 @pytest.mark.parametrize("device", _test_devices(), ids=_test_devices_ids())
@@ -112,14 +130,14 @@ class TestFromFile:
 class TestFromBytes:
     @pytest.mark.parametrize(
         "resource_path",
-        [_white_square_jpg_path, _white_square_png_path],
-        ids=[_white_square_jpg_id, _white_square_png_id],
+        [_plane_jpg_path, _white_square_jpg_path, _white_square_png_path, _grayscale_jpg_path, _grayscale_png_path],
+        ids=[_plane_jpg_id, _white_square_jpg_id, _white_square_png_id, _grayscale_jpg_id, _grayscale_png_id],
     )
     def test_should_write_and_load_bytes_jpeg(self, resource_path: str | Path, device: Device) -> None:
         _skip_if_device_not_available(device)
         image = Image.from_file(resolve_resource_path(resource_path), device)
         image_copy = Image.from_bytes(typing.cast(bytes, image._repr_jpeg_()), device)
-        assert image == image_copy
+        _assert_width_height_channel(image, image_copy)
 
     @pytest.mark.parametrize(
         "resource_path",
@@ -137,8 +155,8 @@ class TestFromBytes:
 class TestReprJpeg:
     @pytest.mark.parametrize(
         "resource_path",
-        [_plane_jpg_path, _white_square_jpg_path, _white_square_png_path],
-        ids=[_plane_jpg_id, _white_square_jpg_id, _white_square_png_id],
+        [_plane_jpg_path, _white_square_jpg_path, _white_square_png_path, _grayscale_jpg_path, _grayscale_png_path],
+        ids=[_plane_jpg_id, _white_square_jpg_id, _white_square_png_id, _grayscale_jpg_id, _grayscale_png_id],
     )
     def test_should_return_bytes(self, resource_path: str | Path, device: Device) -> None:
         _skip_if_device_not_available(device)
@@ -356,8 +374,7 @@ class TestResize:
         new_image = image.resize(new_width, new_height)
         assert new_image.width == new_width
         assert new_image.height == new_height
-        assert image.width != new_width
-        assert image.height != new_height
+        assert image.channel == new_image.channel
         assert image != new_image
         assert new_image == snapshot_png
 
@@ -387,6 +404,7 @@ class TestConvertToGrayscale:
         image = Image.from_file(resolve_resource_path(resource_path), device)
         grayscale_image = image.convert_to_grayscale()
         assert grayscale_image == snapshot_png
+        _assert_width_height_channel(image, grayscale_image)
 
 
 @pytest.mark.parametrize("device", _test_devices(), ids=_test_devices_ids())
@@ -404,8 +422,9 @@ class TestCrop:
     ) -> None:
         _skip_if_device_not_available(device)
         image = Image.from_file(resolve_resource_path(resource_path), device)
-        image = image.crop(0, 0, 100, 100)
-        assert image == snapshot_png
+        image_cropped = image.crop(0, 0, 100, 100)
+        assert image_cropped == snapshot_png
+        assert image_cropped.channel == image.channel
 
 
 @pytest.mark.parametrize("device", _test_devices(), ids=_test_devices_ids())
@@ -421,6 +440,7 @@ class TestFlipVertically:
         image_flip_v = image.flip_vertically()
         assert image != image_flip_v
         assert image_flip_v == snapshot_png
+        _assert_width_height_channel(image, image_flip_v)
 
     @pytest.mark.parametrize(
         "resource_path",
@@ -452,6 +472,7 @@ class TestFlipHorizontally:
         image_flip_h = image.flip_horizontally()
         assert image != image_flip_h
         assert image_flip_h == snapshot_png
+        _assert_width_height_channel(image, image_flip_h)
 
     @pytest.mark.parametrize(
         "resource_path",
@@ -485,6 +506,7 @@ class TestBrightness:
         image_adjusted_brightness = image.adjust_brightness(factor)
         assert image != image_adjusted_brightness
         assert image_adjusted_brightness == snapshot_png
+        _assert_width_height_channel(image, image_adjusted_brightness)
 
     @pytest.mark.parametrize(
         "resource_path",
@@ -541,6 +563,7 @@ class TestAddNoise:
         image = Image.from_file(resolve_resource_path(resource_path), device)
         image_noise = image.add_noise(standard_deviation)
         assert image_noise == snapshot_png
+        _assert_width_height_channel(image, image_noise)
 
     @pytest.mark.parametrize(
         "standard_deviation",
@@ -587,6 +610,7 @@ class TestAdjustContrast:
         image_adjusted_contrast = image.adjust_contrast(factor)
         assert image != image_adjusted_contrast
         assert image_adjusted_contrast == snapshot_png
+        _assert_width_height_channel(image, image_adjusted_contrast)
 
     @pytest.mark.parametrize(
         "resource_path",
@@ -631,6 +655,7 @@ class TestBlur:
         image = Image.from_file(resolve_resource_path(resource_path), device=device)
         image_blurred = image.blur(2)
         assert image_blurred == snapshot_png
+        _assert_width_height_channel(image, image_blurred)
 
 
 @pytest.mark.parametrize("device", _test_devices(), ids=_test_devices_ids())
@@ -653,6 +678,7 @@ class TestSharpen:
         image_sharpened = image.sharpen(factor)
         assert image != image_sharpened
         assert image_sharpened == snapshot_png
+        _assert_width_height_channel(image, image_sharpened)
 
     @pytest.mark.parametrize(
         "resource_path",
@@ -689,6 +715,7 @@ class TestInvertColors:
         image = Image.from_file(resolve_resource_path(resource_path), device)
         image_inverted_colors = image.invert_colors()
         assert image_inverted_colors == snapshot_png
+        _assert_width_height_channel(image, image_inverted_colors)
 
 
 @pytest.mark.parametrize("device", _test_devices(), ids=_test_devices_ids())
@@ -708,6 +735,7 @@ class TestRotate:
         image = Image.from_file(resolve_resource_path(resource_path), device)
         image_right_rotated = image.rotate_right()
         assert image_right_rotated == snapshot_png
+        assert image.channel == image_right_rotated.channel
 
     @pytest.mark.parametrize(
         "resource_path",
@@ -724,6 +752,7 @@ class TestRotate:
         image = Image.from_file(resolve_resource_path(resource_path), device)
         image_left_rotated = image.rotate_left()
         assert image_left_rotated == snapshot_png
+        assert image.channel == image_left_rotated.channel
 
     @pytest.mark.parametrize(
         "resource_path",
@@ -757,3 +786,18 @@ class TestRotate:
         assert image == image_right_left_rotated
         assert image == image_left_l_l_l_l
         assert image == image_left_r_r_r_r
+
+
+@pytest.mark.parametrize("device", _test_devices(), ids=_test_devices_ids())
+class TestFindEdges:
+    @pytest.mark.parametrize(
+        "resource_path",
+        _test_images_all(),
+        ids=_test_images_all_ids(),
+    )
+    def test_should_return_edges_of_image(self, resource_path: str, snapshot_png: SnapshotAssertion, device: Device) -> None:
+        _skip_if_device_not_available(device)
+        image = Image.from_file(resolve_resource_path(resource_path), device=device)
+        image_edges = image.find_edges()
+        assert image_edges == snapshot_png
+        _assert_width_height_channel(image, image_edges)
