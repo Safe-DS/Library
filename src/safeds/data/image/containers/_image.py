@@ -564,9 +564,9 @@ class Image:
         """
         kernel = Image._FILTER_EDGES_KERNEL if self.device.type == Image._default_device else Image._FILTER_EDGES_KERNEL.to(self.device)
         edges_tensor = torch.clamp(torch.nn.functional.conv2d(self.convert_to_grayscale()._image_tensor.float()[0].unsqueeze(dim=0), kernel, padding="same").squeeze(dim=1), 0, 255).to(torch.uint8)
-        if self.channel == 1:
-            return Image(edges_tensor, device=self.device)
-        elif self.channel == 3:
+        if self.channel == 3:
             return Image(edges_tensor.repeat(3, 1, 1), device=self.device)
         elif self.channel == 4:
             return Image(torch.cat([edges_tensor.repeat(3, 1, 1), self._image_tensor[3].unsqueeze(dim=0)]), device=self.device)
+        else:
+            return Image(edges_tensor, device=self.device)
