@@ -295,7 +295,15 @@ class TestProperties:
                 1,
             ),
         ],
-        ids=["[3,1,1]" + _white_square_jpg_id, "[3,1,1]" + _white_square_png_id, "[4,568,320]" + _plane_jpg_id, "[3,568,320]" + _plane_png_id, "[4,568,320]" + _rgba_png_id, "[1,16,16]" + _grayscale_jpg_id, "[1,16,16]" + _grayscale_png_id],
+        ids=[
+            "[3,1,1]" + _white_square_jpg_id,
+            "[3,1,1]" + _white_square_png_id,
+            "[4,568,320]" + _plane_jpg_id,
+            "[3,568,320]" + _plane_png_id,
+            "[4,568,320]" + _rgba_png_id,
+            "[1,16,16]" + _grayscale_jpg_id,
+            "[1,16,16]" + _grayscale_png_id,
+        ],
     )
     def test_should_return_image_properties(
         self,
