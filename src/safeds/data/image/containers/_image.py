@@ -479,7 +479,7 @@ class Image:
             warnings.warn(
                 "Color adjustment will not have an affect on grayscale images with only one channel.",
                 UserWarning,
-                stacklevel=2
+                stacklevel=2,
             )
         return Image(
             self.convert_to_grayscale()._image_tensor * (1.0 - factor * 1.0) + self._image_tensor * (factor * 1.0),
