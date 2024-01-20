@@ -639,6 +639,53 @@ class TestAdjustContrast:
 
 
 @pytest.mark.parametrize("device", _test_devices(), ids=_test_devices_ids())
+class TestAdjustColor:
+    @pytest.mark.parametrize("factor", [2, 0.5, 0], ids=["add color", "remove color", "gray"])
+    @pytest.mark.parametrize(
+        "resource_path",
+        _test_images_all(),
+        ids=_test_images_all_ids(),
+    )
+    def test_should_adjust_colors(
+        self,
+        factor: float,
+        resource_path: str,
+        snapshot_png: SnapshotAssertion,
+        device: Device,
+    ) -> None:
+        _skip_if_device_not_available(device)
+        image = Image.from_file(resolve_resource_path(resource_path), device)
+        image_adjusted_color_balance = image.adjust_color_balance(factor)
+        assert image != image_adjusted_color_balance
+        assert image_adjusted_color_balance == snapshot_png
+
+    @pytest.mark.parametrize(
+        "resource_path",
+        _test_images_all(),
+        ids=_test_images_all_ids(),
+    )
+    def test_should_not_adjust_colors(self, resource_path: str, device: Device) -> None:
+        _skip_if_device_not_available(device)
+        with pytest.warns(
+            UserWarning,
+            match="Color adjustment factor is 1.0, this will not make changes to the image.",
+        ):
+            image = Image.from_file(resolve_resource_path(resource_path), device)
+            image_adjusted_color_balance = image.adjust_color_balance(1)
+            assert image == image_adjusted_color_balance
+
+    @pytest.mark.parametrize(
+        "resource_path",
+        _test_images_all(),
+        ids=_test_images_all_ids(),
+    )
+    def test_should_raise_negative_color_adjust(self, resource_path: str, device: Device) -> None:
+        _skip_if_device_not_available(device)
+        with pytest.raises(OutOfBoundsError, match=r"factor \(=-1.0\) is not inside \[0, \u221e\)."):
+            Image.from_file(resolve_resource_path(resource_path), device).adjust_color_balance(-1.0)
+
+
+@pytest.mark.parametrize("device", _test_devices(), ids=_test_devices_ids())
 class TestBlur:
     @pytest.mark.parametrize(
         "resource_path",
