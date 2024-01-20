@@ -643,8 +643,8 @@ class TestAdjustColor:
     @pytest.mark.parametrize("factor", [2, 0.5, 0], ids=["add color", "remove color", "gray"])
     @pytest.mark.parametrize(
         "resource_path",
-        _test_images_all(),
-        ids=_test_images_all_ids(),
+        [_plane_jpg_path, _plane_png_path, _rgba_png_path, _white_square_jpg_path, _white_square_png_path],
+        ids=[_plane_jpg_id, _plane_png_id, _rgba_png_id, _white_square_jpg_id, _white_square_png_id],
     )
     def test_should_adjust_colors(
         self,
@@ -664,7 +664,7 @@ class TestAdjustColor:
         _test_images_all(),
         ids=_test_images_all_ids(),
     )
-    def test_should_not_adjust_colors(self, resource_path: str, device: Device) -> None:
+    def test_should_not_adjust_colors_factor_1(self, resource_path: str, device: Device) -> None:
         _skip_if_device_not_available(device)
         with pytest.warns(
             UserWarning,
@@ -672,6 +672,21 @@ class TestAdjustColor:
         ):
             image = Image.from_file(resolve_resource_path(resource_path), device)
             image_adjusted_color_balance = image.adjust_color_balance(1)
+            assert image == image_adjusted_color_balance
+
+    @pytest.mark.parametrize(
+        "resource_path",
+        [_grayscale_png_path, _grayscale_jpg_path],
+        ids=[_grayscale_png_id, _grayscale_jpg_id],
+    )
+    def test_should_not_adjust_colors_channel_1(self, resource_path: str, device: Device) -> None:
+        _skip_if_device_not_available(device)
+        with pytest.warns(
+            UserWarning,
+            match="Color adjustment will not have an affect on grayscale images with only one channel",
+        ):
+            image = Image.from_file(resolve_resource_path(resource_path), device)
+            image_adjusted_color_balance = image.adjust_color_balance(0.5)
             assert image == image_adjusted_color_balance
 
     @pytest.mark.parametrize(
