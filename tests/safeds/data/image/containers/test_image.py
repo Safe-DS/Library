@@ -259,6 +259,18 @@ class TestProperties:
                 3,
             ),
             (
+                _white_square_png_path,
+                1,
+                1,
+                3,
+            ),
+            (
+                _plane_jpg_path,
+                568,
+                320,
+                3,
+            ),
+            (
                 _plane_png_path,
                 568,
                 320,
@@ -270,8 +282,20 @@ class TestProperties:
                 5,
                 4,
             ),
+            (
+                _grayscale_jpg_path,
+                16,
+                16,
+                1,
+            ),
+            (
+                _grayscale_png_path,
+                16,
+                16,
+                1,
+            ),
         ],
-        ids=["[3,1,1]" + _white_square_jpg_id, "[4,568,320]" + _plane_png_id, "[4,568,320]" + _rgba_png_id],
+        ids=["[3,1,1]" + _white_square_jpg_id, "[3,1,1]" + _white_square_png_id, "[4,568,320]" + _plane_jpg_id, "[3,568,320]" + _plane_png_id, "[4,568,320]" + _rgba_png_id, "[1,16,16]" + _grayscale_jpg_id, "[1,16,16]" + _grayscale_png_id],
     )
     def test_should_return_image_properties(
         self,
@@ -491,8 +515,8 @@ class TestBrightness:
     @pytest.mark.parametrize("factor", [0.5, 10], ids=["small factor", "large factor"])
     @pytest.mark.parametrize(
         "resource_path",
-        [_plane_jpg_path, _plane_png_path],
-        ids=[_plane_jpg_id, _plane_png_id],
+        [_plane_jpg_path, _plane_png_path, _grayscale_png_path, _grayscale_jpg_path],
+        ids=[_plane_jpg_id, _plane_png_id, _grayscale_png_id, _grayscale_jpg_id],
     )
     def test_should_adjust_brightness(
         self,
@@ -595,8 +619,8 @@ class TestAdjustContrast:
     @pytest.mark.parametrize("factor", [0.75, 5], ids=["small factor", "large factor"])
     @pytest.mark.parametrize(
         "resource_path",
-        [_plane_jpg_path, _plane_png_path],
-        ids=[_plane_jpg_id, _plane_png_id],
+        [_plane_jpg_path, _plane_png_path, _grayscale_jpg_path, _grayscale_png_path],
+        ids=[_plane_jpg_id, _plane_png_id, _grayscale_jpg_id, _grayscale_png_id],
     )
     def test_should_adjust_contrast(
         self,
@@ -725,8 +749,8 @@ class TestSharpen:
     @pytest.mark.parametrize("factor", [0, 0.5, 10], ids=["zero factor", "small factor", "large factor"])
     @pytest.mark.parametrize(
         "resource_path",
-        [_plane_jpg_path, _plane_png_path],
-        ids=[_plane_jpg_id, _plane_png_id],
+        [_plane_jpg_path, _plane_png_path, _grayscale_jpg_path, _grayscale_png_path],
+        ids=[_plane_jpg_id, _plane_png_id, _grayscale_jpg_id, _grayscale_png_id],
     )
     def test_should_sharpen(
         self,
