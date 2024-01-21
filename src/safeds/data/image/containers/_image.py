@@ -34,6 +34,12 @@ class Image:
 
     _pil_to_tensor = PILToTensor()
     _default_device = _get_device()
+    _FILTER_EDGES_KERNEL = (
+        torch.tensor([[-1.0, -1.0, -1.0], [-1.0, 8.0, -1.0], [-1.0, -1.0, -1.0]])
+        .unsqueeze(dim=0)
+        .unsqueeze(dim=0)
+        .to(_default_device)
+    )
 
     @staticmethod
     def from_file(path: str | Path, device: Device = _default_device) -> Image:
@@ -116,7 +122,10 @@ class Image:
         if self.channel == 4:
             return None
         buffer = io.BytesIO()
-        save_image(self._image_tensor.to(torch.float32) / 255, buffer, format="jpeg")
+        if self.channel == 1:
+            func2.to_pil_image(self._image_tensor, mode="L").save(buffer, format="jpeg")
+        else:
+            save_image(self._image_tensor.to(torch.float32) / 255, buffer, format="jpeg")
         buffer.seek(0)
         return buffer.read()
 
@@ -130,7 +139,10 @@ class Image:
             The image as PNG.
         """
         buffer = io.BytesIO()
-        save_image(self._image_tensor.to(torch.float32) / 255, buffer, format="png")
+        if self.channel == 1:
+            func2.to_pil_image(self._image_tensor, mode="L").save(buffer, format="png")
+        else:
+            save_image(self._image_tensor.to(torch.float32) / 255, buffer, format="png")
         buffer.seek(0)
         return buffer.read()
 
@@ -213,7 +225,10 @@ class Image:
         if self.channel == 4:
             raise IllegalFormatError("png")
         Path(path).parent.mkdir(parents=True, exist_ok=True)
-        save_image(self._image_tensor.to(torch.float32) / 255, path, format="jpeg")
+        if self.channel == 1:
+            func2.to_pil_image(self._image_tensor, mode="L").save(path, format="jpeg")
+        else:
+            save_image(self._image_tensor.to(torch.float32) / 255, path, format="jpeg")
 
     def to_png_file(self, path: str | Path) -> None:
         """
@@ -225,7 +240,10 @@ class Image:
             The path to the PNG file.
         """
         Path(path).parent.mkdir(parents=True, exist_ok=True)
-        save_image(self._image_tensor.to(torch.float32) / 255, path, format="png")
+        if self.channel == 1:
+            func2.to_pil_image(self._image_tensor, mode="L").save(path, format="png")
+        else:
+            save_image(self._image_tensor.to(torch.float32) / 255, path, format="png")
 
     # ------------------------------------------------------------------------------------------------------------------
     # Transformations
@@ -457,6 +475,12 @@ class Image:
                 UserWarning,
                 stacklevel=2,
             )
+        elif self.channel == 1:
+            warnings.warn(
+                "Color adjustment will not have an affect on grayscale images with only one channel.",
+                UserWarning,
+                stacklevel=2,
+            )
         return Image(
             self.convert_to_grayscale()._image_tensor * (1.0 - factor * 1.0) + self._image_tensor * (factor * 1.0),
             device=self.device,
@@ -568,3 +592,38 @@ class Image:
             The image rotated 90 degrees counter-clockwise.
         """
         return Image(func2.rotate(self._image_tensor, 90, expand=True), device=self.device)
+
+    def find_edges(self) -> Image:
+        """
+        Return a grayscale version of the image with the edges highlighted.
+
+        The original image is not modified.
+
+        Returns
+        -------
+        result : Image
+            The image with edges found.
+        """
+        kernel = (
+            Image._FILTER_EDGES_KERNEL
+            if self.device.type == Image._default_device
+            else Image._FILTER_EDGES_KERNEL.to(self.device)
+        )
+        edges_tensor = torch.clamp(
+            torch.nn.functional.conv2d(
+                self.convert_to_grayscale()._image_tensor.float()[0].unsqueeze(dim=0),
+                kernel,
+                padding="same",
+            ).squeeze(dim=1),
+            0,
+            255,
+        ).to(torch.uint8)
+        if self.channel == 3:
+            return Image(edges_tensor.repeat(3, 1, 1), device=self.device)
+        elif self.channel == 4:
+            return Image(
+                torch.cat([edges_tensor.repeat(3, 1, 1), self._image_tensor[3].unsqueeze(dim=0)]),
+                device=self.device,
+            )
+        else:
+            return Image(edges_tensor, device=self.device)
