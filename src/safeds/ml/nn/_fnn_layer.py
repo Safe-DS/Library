@@ -2,11 +2,14 @@ from torch import nn
 
 
 class PytorchLayer(nn.Module):
-    def __init__(self, input_size: int, output_size: int):
+    def __init__(self, input_size: int, output_size: int, is_for_classification: bool):
         super().__init__()
         self.size = output_size
         self.layer = nn.Linear(input_size, output_size)
-        self.fn = nn.ReLU()
+        if is_for_classification:
+            self.fn = nn.ReLU()
+        else:
+            self.fn = nn.Sigmoid()
 
     def forward(self, x: float) -> float:
         return self.fn(self.layer(x))
@@ -41,8 +44,8 @@ class FNNLayer:
         self.input_size = input_size
         self.output_size = output_size
 
-    def _get_pytorch_layer(self) -> PytorchLayer:
-        return PytorchLayer(self.input_size, self.output_size)
+    def get_pytorch_layer(self, is_for_classification: bool) -> PytorchLayer:
+        return PytorchLayer(self.input_size, self.output_size, is_for_classification)
 
     def get_size(self) -> int:
         return self.output_size
