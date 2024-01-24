@@ -3,12 +3,13 @@ import torch
 from torch import nn
 
 from safeds.data.tabular.containers import TaggedTable
+from safeds.exceptions import ClosedBound, OutOfBoundsError
 from safeds.ml.nn._fnn_layer import FNNLayer
 
 
 class RegressionModel:
     def __init__(self, layers: list):
-        self._model = PytorchModel(layers, is_for_classification=False)
+        self._model = _PytorchModel(layers, is_for_classification=False)
         self._batch_size = 1
 
     def train(self, train_data: TaggedTable, epoch_size: int = 25, batch_size: int = 1) -> None:
@@ -32,9 +33,9 @@ class RegressionModel:
 
         """
         if epoch_size < 1:
-            raise ValueError("The Number of Epochs must be at least 1")
+            raise OutOfBoundsError(actual=epoch_size, name="epoch_size", lower_bound=ClosedBound(1))
         if batch_size < 1:
-            raise ValueError("Batch Size must be at least 1")
+            raise OutOfBoundsError(actual=batch_size, name="batch_size", lower_bound=ClosedBound(1))
         self._batch_size = batch_size
         dataloader = train_data.into_dataloader(self._batch_size)
 
@@ -45,7 +46,6 @@ class RegressionModel:
         loss_values = []
         accuracies = []
         for _epoch in range(epoch_size):
-            # print(f"Epoch {epoch+1}")
             tmp_loss = []
             tmp_accuracies = []
             for x, y in dataloader:
@@ -62,7 +62,6 @@ class RegressionModel:
                 optimizer.step()
             loss_values.append(np.mean(tmp_loss))
             accuracies.append(np.mean(tmp_accuracies))
-        # print(loss_values)
 
     def predict(self, test_data: TaggedTable) -> None:
         """
@@ -87,13 +86,10 @@ class RegressionModel:
                 accuracy = torch.mean(1 - torch.abs(pred - y))
                 accuracies_test.append(accuracy.item())
 
-        # print(np.mean(loss_values_test))
-        # print(np.mean(accuracies_test))
-
 
 class ClassificationModel:
     def __init__(self, layers: list):
-        self._model = PytorchModel(layers, is_for_classification=True)
+        self._model = _PytorchModel(layers, is_for_classification=True)
         self._batch_size = 1
 
     def train(self, train_data: TaggedTable, epoch_size: int = 25, batch_size: int = 1) -> None:
@@ -117,9 +113,9 @@ class ClassificationModel:
 
         """
         if epoch_size < 1:
-            raise ValueError("The Number of Epochs must be at least 1")
+            raise OutOfBoundsError(actual=epoch_size, name="epoch_size", lower_bound=ClosedBound(1))
         if batch_size < 1:
-            raise ValueError("Batch Size must be at least 1")
+            raise OutOfBoundsError(actual=batch_size, name="batch_size", lower_bound=ClosedBound(1))
         self._batch_size = batch_size
         dataloader = train_data.into_dataloader(self._batch_size)
 
@@ -147,7 +143,6 @@ class ClassificationModel:
                 optimizer.step()
             loss_values.append(np.mean(tmp_loss))
             accuracies.append(np.mean(tmp_accuracies))
-        # print(loss_values)
 
     def predict(self, test_data: TaggedTable) -> None:
         """
@@ -172,14 +167,11 @@ class ClassificationModel:
                 accuracy = torch.mean(1 - torch.abs(pred - y))
                 accuracies_test.append(accuracy.item())
 
-        # print(np.mean(loss_values_test))
-        # print(np.mean(accuracies_test))
-
     def is_for_regression(self) -> bool:
         return self._model.last_layer_has_output_size_one()
 
 
-class PytorchModel(nn.Module):
+class _PytorchModel(nn.Module):
     def __init__(self, layer_list: list[FNNLayer], is_for_classification: bool) -> None:
         super().__init__()
         self._layer_list = layer_list
