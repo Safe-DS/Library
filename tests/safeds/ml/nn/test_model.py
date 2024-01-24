@@ -19,7 +19,8 @@ class TestClassificationModel:
             match=rf"epoch_size \(={epoch_size}\) is not inside \[1, \u221e\)\.",
         ):
             ClassificationModel([FNNLayer(1, 1)]).train(
-                Table.from_dict({"a": [1], "b": [2]}).tag_columns("a"), epoch_size=epoch_size,
+                Table.from_dict({"a": [1], "b": [2]}).tag_columns("a"),
+                epoch_size=epoch_size,
             )
 
     @pytest.mark.parametrize(
@@ -35,7 +36,8 @@ class TestClassificationModel:
             match=rf"batch_size \(={batch_size}\) is not inside \[1, \u221e\)\.",
         ):
             ClassificationModel([FNNLayer(1, 1)]).train(
-                Table.from_dict({"a": [1], "b": [2]}).tag_columns("a"), batch_size=batch_size,
+                Table.from_dict({"a": [1], "b": [2]}).tag_columns("a"),
+                batch_size=batch_size,
             )
 
 
@@ -53,7 +55,8 @@ class TestRegressionModel:
             match=rf"epoch_size \(={epoch_size}\) is not inside \[1, \u221e\)\.",
         ):
             RegressionModel([FNNLayer(1, 1)]).train(
-                Table.from_dict({"a": [1], "b": [2]}).tag_columns("a"), epoch_size=epoch_size,
+                Table.from_dict({"a": [1], "b": [2]}).tag_columns("a"),
+                epoch_size=epoch_size,
             )
 
     @pytest.mark.parametrize(
@@ -69,5 +72,6 @@ class TestRegressionModel:
             match=rf"batch_size \(={batch_size}\) is not inside \[1, \u221e\)\.",
         ):
             RegressionModel([FNNLayer(1, 1)]).train(
-                Table.from_dict({"a": [1], "b": [2]}).tag_columns("a"), batch_size=batch_size,
+                Table.from_dict({"a": [1], "b": [2]}).tag_columns("a"),
+                batch_size=batch_size,
             )
