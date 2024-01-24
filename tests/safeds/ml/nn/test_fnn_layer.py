@@ -1,6 +1,6 @@
 import pytest
 from safeds.exceptions import OutOfBoundsError
-from safeds.ml.nn._fnn_layer import FNNLayer
+from safeds.ml.nn import FNNLayer
 
 
 @pytest.mark.parametrize(
