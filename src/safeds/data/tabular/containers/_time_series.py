@@ -7,6 +7,7 @@ from safeds.exceptions import (
     ColumnIsTargetError,
     ColumnIsTimeError,
     IllegalSchemaModificationError,
+    UnknownColumnNameError,
 )
 
 if TYPE_CHECKING:
@@ -38,6 +39,9 @@ class TimeSeries(TaggedTable):
         If the target column is also a feature column.
     ValueError
         If no feature columns are specified.
+    ValueError
+        If time column is also a feature column
+
     """
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -67,6 +71,8 @@ class TimeSeries(TaggedTable):
             If time_name matches none of the column names.
         Value Error
             If no feature columns are specified
+        Value Error
+            If time name is in features
 
         Examples
         --------
@@ -122,7 +128,9 @@ class TimeSeries(TaggedTable):
         UnknownColumnNameError
             If target_name or time_name matches none of the column names.
         Value Error
-            If no feature columns are specified
+            If there is no other column than the specified target and time columns left to be a feature column
+        Value Error
+            If one column is target and feature
 
         Examples
         --------
@@ -173,6 +181,10 @@ class TimeSeries(TaggedTable):
             If the target column is also a feature column.
         ValueError
             If no feature columns are specified.
+        ValueError
+            If time column is also a feature column
+        UnknownColumnNameError
+            If time column does not exist
 
         Examples
         --------
@@ -181,7 +193,6 @@ class TimeSeries(TaggedTable):
         """
         _data = Table(data)
 
-        # time sollte nicht in feature names sein auch wenn feature_names none ist
         if feature_names is None:
             feature_names = _data.column_names
             if time_name in feature_names:
@@ -194,7 +205,7 @@ class TimeSeries(TaggedTable):
         if time_name in feature_names:
             raise ValueError(f"Column '{time_name}' can not be time and feature column.")
         if time_name not in (_data.column_names):
-            raise ValueError(f"Column '{time_name}' must exist in the table.")
+            raise UnknownColumnNameError(f"Column '{time_name}' must exist in the table.")
         self._time: Column = _data.get_column(time_name)
 
     # ------------------------------------------------------------------------------------------------------------------

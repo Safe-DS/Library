@@ -1716,7 +1716,7 @@ class Table:
 
         return TaggedTable._from_table(self, target_name, feature_names)
 
-    # rethink name here
+
     def time_columns(self, target_name: str, time_name: str, feature_names: list[str] | None = None) -> TimeSeries:
         """
         Return a new `TimeSeries` with columns marked as a target and time column or feature columns.
@@ -1742,7 +1742,7 @@ class Table:
         ValueError
             If the target column is also a feature column.
         ValueError
-            If no feature columns are specified.
+            If there is no other column than the specified target and time columns left to be a feature column
 
         Examples
         --------
