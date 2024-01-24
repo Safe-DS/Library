@@ -1716,7 +1716,6 @@ class Table:
 
         return TaggedTable._from_table(self, target_name, feature_names)
 
-
     def time_columns(self, target_name: str, time_name: str, feature_names: list[str] | None = None) -> TimeSeries:
         """
         Return a new `TimeSeries` with columns marked as a target and time column or feature columns.
@@ -1751,6 +1750,7 @@ class Table:
         >>> tagged_table = table.time_columns(target_name="amount_bought",time_name = "time", feature_names=["price"])
         """
         from ._time_series import TimeSeries
+
         return TimeSeries._from_table_to_time_series(self, target_name, time_name, feature_names)
 
     def transform_column(self, name: str, transformer: Callable[[Row], Any]) -> Table:

@@ -15,7 +15,7 @@ if TYPE_CHECKING:
     from typing import Any
 
 
-class  TimeSeries(TaggedTable):
+class TimeSeries(TaggedTable):
     """A TimeSeries is a tagged table that additionally knows which column is the time column and uses the target column as a feature.
 
      A Time Column should never be a feature.
@@ -60,6 +60,7 @@ class  TimeSeries(TaggedTable):
             The tagged table.
         time_name: str
             Name of the time column.
+
         Returns
         -------
         time_series : TimeSeries
@@ -118,6 +119,7 @@ class  TimeSeries(TaggedTable):
             Name of the date column.
         feature_names : list[str] | None
             Names of the feature columns. If None, all columns except the target and time columns are used.
+
         Returns
         -------
         time_series : TimeSeries
