@@ -126,7 +126,6 @@ class ClassificationModel:
         loss_values = []
         accuracies = []
         for _epoch in range(epoch_size):
-            # print(f"Epoch {epoch+1}")
             tmp_loss = []
             tmp_accuracies = []
             for x, y in dataloader:

@@ -1,23 +1,33 @@
 import pytest
+from safeds.exceptions import OutOfBoundsError
 from safeds.ml.nn._fnn_layer import FNNLayer
 
 
 @pytest.mark.parametrize(
-    ("input_size", "output_size", "expected_error_message"),
+    "input_size",
     [
-        (
-            0,
-            5,
-            r"Input Size must be at least 1",
-        ),
-        (
-            5,
-            0,
-            r"Output Size must be at least 1",
-        ),
+        0,
     ],
-    ids=["input_size_out_of_bounds", "output_size_out_of_bounds"],
+    ids=["input_size_out_of_bounds"],
 )
-def test_should_raise_error(input_size: int, output_size: int, expected_error_message: str) -> None:
-    with pytest.raises(ValueError, match=expected_error_message):
-        FNNLayer(input_size, output_size)
+def test_should_raise_if_input_size_out_of_bounds(input_size: int) -> None:
+    with pytest.raises(
+        OutOfBoundsError,
+        match=rf"input_size \(={input_size}\) is not inside \[1, \u221e\)\.",
+    ):
+        FNNLayer(input_size, 1)
+
+
+@pytest.mark.parametrize(
+    "output_size",
+    [
+        0,
+    ],
+    ids=["output_size_out_of_bounds"],
+)
+def test_should_raise_if_output_size_out_of_bounds(output_size: int) -> None:
+    with pytest.raises(
+        OutOfBoundsError,
+        match=rf"output_size \(={output_size}\) is not inside \[1, \u221e\)\.",
+    ):
+        FNNLayer(1, output_size)

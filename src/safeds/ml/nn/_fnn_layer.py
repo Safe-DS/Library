@@ -1,5 +1,7 @@
 from torch import nn
 
+from safeds.exceptions import OutOfBoundsError, ClosedBound
+
 
 class PytorchLayer(nn.Module):
     def __init__(self, input_size: int, output_size: int, is_for_classification: bool):
@@ -38,9 +40,9 @@ class FNNLayer:
 
         """
         if input_size < 1:
-            raise ValueError("Input Size must be at least 1")
+            raise OutOfBoundsError(actual=input_size, name="input_size", lower_bound=ClosedBound(1))
         if output_size < 1:
-            raise ValueError("Output Size must be at least 1")
+            raise OutOfBoundsError(actual=output_size, name="output_size", lower_bound=ClosedBound(1))
         self.input_size = input_size
         self.output_size = output_size
 
