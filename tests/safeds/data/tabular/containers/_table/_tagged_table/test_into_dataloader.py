@@ -1,7 +1,6 @@
 import pytest
-from torch.utils.data import DataLoader
-
 from safeds.data.tabular.containers import Table
+from torch.utils.data import DataLoader
 
 
 @pytest.mark.parametrize(
