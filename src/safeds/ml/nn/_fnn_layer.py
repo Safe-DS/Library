@@ -1,6 +1,6 @@
 from torch import nn
 
-from safeds.exceptions import OutOfBoundsError, ClosedBound
+from safeds.exceptions import ClosedBound, OutOfBoundsError
 
 
 class PytorchLayer(nn.Module):
