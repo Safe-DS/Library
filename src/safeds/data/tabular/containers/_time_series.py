@@ -56,7 +56,7 @@ class TimeSeries(TaggedTable):
             The tagged table.
         time_name: str
             Name of the time column.
-        Retruns
+        Returns
         -------
         time_series : TimeSeries
             the created time series
@@ -94,7 +94,6 @@ class TimeSeries(TaggedTable):
         return result
 
     @staticmethod
-    # idk if this method should exist, because we cant use it like the Method in TaggedTable, but the Method is static and this seem to doesnt get checked by the megalinter.
     def _from_table_to_time_series(
         table: Table,
         target_name: str,
@@ -112,8 +111,8 @@ class TimeSeries(TaggedTable):
         time_name: str
             Name of the date column.
         feature_names : list[str] | None
-            Names of the feature columns. If None, all columns except the target column are used.
-        Retruns
+            Names of the feature columns. If None, all columns except the target and time columns are used.
+        Returns
         -------
         time_series : TimeSeries
             the created time series
@@ -121,7 +120,7 @@ class TimeSeries(TaggedTable):
         Raises
         ------
         UnknownColumnNameError
-            If target_name matches none of the column names.
+            If target_name or time_name matches none of the column names.
         Value Error
             If no feature columns are specified
 
@@ -153,7 +152,7 @@ class TimeSeries(TaggedTable):
         feature_names: list[str] | None = None,
     ):
         """
-        Create a tagged table from a mapping of column names to their values.
+        Create a time series from a mapping of column names to their values.
 
         Parameters
         ----------
@@ -164,7 +163,7 @@ class TimeSeries(TaggedTable):
         time_name : str
             Name of the time column
         feature_names : list[str] | None
-            Names of the feature columns. If None, all columns except the target column are used.
+            Names of the feature columns. If None, all columns except the target and time columns are used.
 
         Raises
         ------
@@ -215,34 +214,13 @@ class TimeSeries(TaggedTable):
         return self._time
 
     # ------------------------------------------------------------------------------------------------------------------
-    # Specific methods from time series class:
-    # ------------------------------------------------------------------------------------------------------------------
-
-    # def _create_moving_average(self, window_size: int) -> Column:
-    # calculate the windows and the moving average of a timeserties, this function for now only has intern use
-    # some unexpected behavior while casting to series agains, because it addds NAN values
-    # return Column._from_pandas_series(pd.Series(self.target._data.rolling(window_size).mean()))
-    # pass
-    # def plot_moving_average(self, window_size: int) -> Image:
-    # this method should plot the moving average of a time series
-    # pass
-
-    # def show_time_series(self) -> Image:
-    # this method should plot the time series
-    # pass
-
-    # def decompose_time_series(self) -> Image:
-    # this Method should show a plot of a decomposed time series
-    # pass
-
-    # ------------------------------------------------------------------------------------------------------------------
     # Overriden methods from TaggedTable class:
     # ------------------------------------------------------------------------------------------------------------------
     def _as_table(self: TimeSeries) -> Table:
         """
         Return a new `Table` with the tagging removed.
 
-        The original table is not modified.
+        The original time series is not modified.
 
         Parameters
         ----------
@@ -252,7 +230,7 @@ class TimeSeries(TaggedTable):
         Returns
         -------
         table: Table
-            The table as an untagged Table, i.e. without the information about which columns are features, target or time.
+            The time series as an untagged Table, i.e. without the information about which columns are features, target or time.
 
         """
         return Table.from_columns(super().to_columns())
@@ -261,7 +239,7 @@ class TimeSeries(TaggedTable):
         """
         Return a new `TimeSeries` with the provided column attached at the end, as neither target nor feature column.
 
-        The original table is not modified.
+        The original time series is not modified.
 
         Parameters
         ----------
@@ -271,7 +249,7 @@ class TimeSeries(TaggedTable):
         Returns
         -------
         result : TimeSeries
-            The table with the column attached as neither target nor feature column.
+            The time series with the column attached as neither target nor feature column.
 
         Raises
         ------
@@ -299,7 +277,7 @@ class TimeSeries(TaggedTable):
         Returns
         -------
         result : TimeSeries
-            The table with the attached feature column.
+            The time series with the attached feature column.
 
         Raises
         ------
@@ -345,7 +323,7 @@ class TimeSeries(TaggedTable):
         """
         Return a new `TimeSeries` with multiple added columns, as neither target nor feature columns.
 
-        The original table is not modified.
+        The original time series is not modified.
 
         Parameters
         ----------
@@ -360,9 +338,9 @@ class TimeSeries(TaggedTable):
         Raises
         ------
         DuplicateColumnNameError
-            If at least one column name from the provided column list already exists in the table.
+            If at least one column name from the provided column list already exists in the time series.
         ColumnSizeError
-            If at least one of the column sizes from the provided column list does not match the table.
+            If at least one of the column sizes from the provided column list does not match the time series.
         """
         return TimeSeries._from_tagged_table(
             super().add_columns(columns),
@@ -373,7 +351,7 @@ class TimeSeries(TaggedTable):
         """
         Return a new `TimeSeries` with an extra Row attached.
 
-        The original table is not modified.
+        The original time series is not modified.
 
         Parameters
         ----------
@@ -388,7 +366,7 @@ class TimeSeries(TaggedTable):
         Raises
         ------
         UnknownColumnNameError
-            If the row has different column names than the table.
+            If the row has different column names than the time series.
         """
         return TimeSeries._from_tagged_table(super().add_row(row), time_name=self.time.name)
 
@@ -396,7 +374,7 @@ class TimeSeries(TaggedTable):
         """
         Return a new `TimeSeries` with multiple extra Rows attached.
 
-        The original table is not modified.
+        The original time series is not modified.
 
         Parameters
         ----------
@@ -406,12 +384,12 @@ class TimeSeries(TaggedTable):
         Returns
         -------
         result : TimeSeries
-            A new time series which combines the original table and the given rows.
+            A new time series which combines the original time series and the given rows.
 
         Raises
         ------
         UnknownColumnNameError
-            If at least one of the rows have different column names than the table.
+            If at least one of the rows have different column names than the time series.
         """
         return TimeSeries._from_tagged_table(super().add_rows(rows), time_name=self.time.name)
 
@@ -440,7 +418,7 @@ class TimeSeries(TaggedTable):
         """
         Return a new `TimeSeries` with only the given column(s).
 
-        The original table is not modified.
+        The original time series is not modified.
 
         Parameters
         ----------
@@ -457,7 +435,7 @@ class TimeSeries(TaggedTable):
         UnknownColumnNameError
             If any of the given columns does not exist.
         IllegalSchemaModificationError
-            If none of the given columns is the target column or any of the feature columns.
+            If none of the given columns is the target or time column or any of the feature columns.
         """
         if self.target.name not in column_names:
             raise IllegalSchemaModificationError("Must keep the target column.")
@@ -479,9 +457,9 @@ class TimeSeries(TaggedTable):
 
     def remove_columns(self, column_names: list[str]) -> TimeSeries:
         """
-        Return a new `TimeSeries` with the given column(s) removed from the table.
+        Return a new `TimeSeries` with the given column(s) removed from the time series.
 
-        The original table is not modified.
+        The original time series is not modified.
 
         Parameters
         ----------
@@ -526,7 +504,7 @@ class TimeSeries(TaggedTable):
         """
         Return a new `TimeSeries` with every column that misses values removed.
 
-        The original table is not modified.
+        The original time series is not modified.
 
         Returns
         -------
@@ -561,7 +539,7 @@ class TimeSeries(TaggedTable):
         """
         Return a new `TimeSeries` with every column that contains non-numerical values removed.
 
-        The original table is not modified.
+        The original time series is not modified.
 
         Returns
         -------
@@ -665,9 +643,9 @@ class TimeSeries(TaggedTable):
         Parameters
         ----------
         old_name : str
-            The old name of the target column.
+            The old name of the column.
         new_name : str
-            The new name of the target column.
+            The new name of the column.
 
         Returns
         -------
@@ -705,7 +683,7 @@ class TimeSeries(TaggedTable):
         becomes the new target or time column. If the column to be replaced is a feature column, the new columns that replace it
         all become feature columns.
 
-        The order of columns is kept. The original table is not modified.
+        The order of columns is kept. The original time series is not modified.
 
         Parameters
         ----------
@@ -717,7 +695,7 @@ class TimeSeries(TaggedTable):
         Returns
         -------
         result : TimeSeries
-            A time series with the old column replaced by the new column.
+            A time series with the old column replaced by the new columns.
 
         Raises
         ------
@@ -728,7 +706,7 @@ class TimeSeries(TaggedTable):
         ColumnSizeError
             If the size of the column does not match the amount of rows.
         IllegalSchemaModificationError
-            If the target column would be removed or replaced by more than one column.
+            If the target or time column would be removed or replaced by more than one column.
         """
         if old_column_name == self.time.name:
             if len(new_columns) != 1:
@@ -830,7 +808,7 @@ class TimeSeries(TaggedTable):
 
         If no comparator is given, the columns will be sorted alphabetically by their name.
 
-        The original table is not modified.
+        The original time series is not modified.
 
         Parameters
         ----------

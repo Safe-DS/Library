@@ -396,7 +396,7 @@ class TaggedTable(Table):
         Returns
         -------
         result : TaggedTable
-            A table containing only the rows to match the query.
+            A new tagged table containing only the rows to match the query.
         """
         return TaggedTable._from_table(
             super().filter_rows(query),
