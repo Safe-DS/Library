@@ -1,8 +1,7 @@
 import pytest
 from safeds.data.tabular.containers import Table
 from safeds.exceptions import OutOfBoundsError
-from safeds.ml.nn import FNNLayer
-from safeds.ml.nn import ClassificationModel, RegressionModel
+from safeds.ml.nn import ClassificationModel, FNNLayer, RegressionModel
 
 
 class TestClassificationModel:
