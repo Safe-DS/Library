@@ -84,8 +84,8 @@ from safeds.exceptions import UnknownColumnNameError
             "random",
             "B",
             ["A"],
-            ValueError,
-            r"Column 'random' must exist in the table.",
+            UnknownColumnNameError,
+            r"Could not find column\(s\) 'random'.",
         ),
         (
             {

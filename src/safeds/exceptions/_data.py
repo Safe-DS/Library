@@ -6,7 +6,7 @@ if TYPE_CHECKING:
     from pathlib import Path
 
 
-class UnknownColumnNameError(KeyError):
+class  UnknownColumnNameError(KeyError):
     """
     Exception raised for trying to access an invalid column name.
 

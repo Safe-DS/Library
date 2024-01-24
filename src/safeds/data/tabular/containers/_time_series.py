@@ -15,7 +15,7 @@ if TYPE_CHECKING:
     from typing import Any
 
 
-class TimeSeries(TaggedTable):
+class  TimeSeries(TaggedTable):
     """A TimeSeries is a tagged table that additionally knows which column is the time column and uses the target column as a feature.
 
      A Time Column should never be a feature.
@@ -205,7 +205,7 @@ class TimeSeries(TaggedTable):
         if time_name in feature_names:
             raise ValueError(f"Column '{time_name}' can not be time and feature column.")
         if time_name not in (_data.column_names):
-            raise UnknownColumnNameError(f"Column '{time_name}' must exist in the table.")
+            raise UnknownColumnNameError([time_name])
         self._time: Column = _data.get_column(time_name)
 
     # ------------------------------------------------------------------------------------------------------------------

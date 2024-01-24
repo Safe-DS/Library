@@ -1750,6 +1750,7 @@ class Table:
         >>> table = Table.from_dict({"time": ["01.01", "01.02", "01.03"], "price": [1.10, 1.19, 1.79], "amount_bought": [74, 72, 51]})
         >>> tagged_table = table.time_columns(target_name="amount_bought",time_name = "time", feature_names=["price"])
         """
+        from ._time_series import TimeSeries
         return TimeSeries._from_table_to_time_series(self, target_name, time_name, feature_names)
 
     def transform_column(self, name: str, transformer: Callable[[Row], Any]) -> Table:
