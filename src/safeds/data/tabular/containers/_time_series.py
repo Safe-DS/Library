@@ -16,33 +16,6 @@ if TYPE_CHECKING:
 
 
 class TimeSeries(TaggedTable):
-    """A TimeSeries is a tagged table that additionally knows which column is the time column and uses the target column as a feature.
-
-     A Time Column should never be a feature.
-    ----------
-    data : Mapping[str, Sequence[Any]]
-        The data.
-    target_name : str
-        Name of the target column.
-    feature_names : list[str] | None
-        Names of the feature columns. If None, all columns except the target column are used.
-
-    time_name : str
-        Name of the time column.
-
-    Raises
-    ------
-    ------
-    ColumnLengthMismatchError
-        If columns have different lengths.
-    ValueError
-        If the target column is also a feature column.
-    ValueError
-        If no feature columns are specified.
-    ValueError
-        If time column is also a feature column
-
-    """
 
     # ------------------------------------------------------------------------------------------------------------------
     # Creation
