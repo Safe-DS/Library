@@ -26,8 +26,6 @@ def test_should_create_dataloader(
     target_name: str,
     feature_names: list[str] | None,
 ) -> None:
-    # Todo Fix that TaggedTable doesnt have a split_rows Method
-
     tagged_table = Table.from_dict(data).tag_columns(target_name, feature_names)
     data_loader = tagged_table.into_dataloader(1)
     assert isinstance(data_loader, DataLoader)

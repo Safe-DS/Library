@@ -3,7 +3,7 @@ from torch import nn
 from safeds.exceptions import ClosedBound, OutOfBoundsError
 
 
-class PytorchLayer(nn.Module):
+class _PytorchLayer(nn.Module):
     def __init__(self, input_size: int, output_size: int, is_for_classification: bool):
         super().__init__()
         self.size = output_size
@@ -46,8 +46,8 @@ class FNNLayer:
         self.input_size = input_size
         self.output_size = output_size
 
-    def get_pytorch_layer(self, is_for_classification: bool) -> PytorchLayer:
-        return PytorchLayer(self.input_size, self.output_size, is_for_classification)
+    def get_pytorch_layer(self, is_for_classification: bool) -> _PytorchLayer:
+        return _PytorchLayer(self.input_size, self.output_size, is_for_classification)
 
     def get_size(self) -> int:
         return self.output_size
