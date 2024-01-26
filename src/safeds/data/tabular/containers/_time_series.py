@@ -44,8 +44,6 @@ class TimeSeries(TaggedTable):
         UnknownColumnNameError
             If time_name matches none of the column names.
         Value Error
-            If no feature columns are specified
-        Value Error
             If time column is also a feature column
 
         Examples
