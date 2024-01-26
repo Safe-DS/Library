@@ -46,7 +46,7 @@ class TimeSeries(TaggedTable):
         Value Error
             If no feature columns are specified
         Value Error
-            If time name is in features
+            If time column is also a feature column
 
         Examples
         --------
