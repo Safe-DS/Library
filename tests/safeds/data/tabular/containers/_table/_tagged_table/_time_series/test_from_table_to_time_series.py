@@ -96,8 +96,24 @@ from safeds.exceptions import UnknownColumnNameError
             "T",
             "time",
             ["A", "B", "C"],
+            UnknownColumnNameError,
+            r"Could not find column\(s\) 'time'",
+        ),
+(
+            Table(
+                {
+                    "time": [0, 1],
+                    "A": [1, 4],
+                    "B": [2, 5],
+                    "C": [3, 6],
+                    "T": [0, 1],
+                },
+            ),
+            "T",
+            "A",
+            ["A", "B", "C"],
             ValueError,
-            r"Could not find Column 'time'.",
+            r"Column 'A' can not be time and feature column."
         ),
     ],
     ids=[
@@ -107,6 +123,7 @@ from safeds.exceptions import UnknownColumnNameError
         "features_are_empty-explicitly",
         "features_are_empty_implicitly",
         "time_does_not_exist",
+        "time_is_also_feature",
     ],
 )
 def test_should_raise_error(
