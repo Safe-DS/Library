@@ -56,7 +56,7 @@ class TimeSeries(TaggedTable):
         >>> timeseries = TimeSeries._from_tagged_table(tagged_table, time_name = "date")
         """
         if time_name not in tagged_table.column_names:
-            raise UnknownColumnNameError([time_name])
+            raise ValueError(f"Could not find Column '{time_name}'.")
         table = tagged_table._as_table()
         # make sure that the time_name is not part of the features
         result = object.__new__(TimeSeries)
@@ -114,10 +114,6 @@ class TimeSeries(TaggedTable):
         >>> table = Table({"date": ["01.01", "01.02", "01.03", "01.04"], "f1": ["a", "b", "c", "a"], "t": [1,2,3,4]})
         >>> timeseries = TimeSeries._from_table_to_time_series(table, "t", "date", ["f1"])
         """
-        if feature_names is not None:
-            if time_name in feature_names:
-                raise ValueError(f"Column '{time_name}' can not be time and feature column.")
-
         if feature_names is None:
             feature_names = table.column_names
             if time_name in feature_names:

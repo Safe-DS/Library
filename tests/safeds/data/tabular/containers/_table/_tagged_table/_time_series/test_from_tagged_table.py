@@ -99,8 +99,8 @@ from safeds.exceptions import UnknownColumnNameError
             "T",
             "time",
             ["A", "B", "C"],
-            UnknownColumnNameError,
-            r"Could not find column\(s\) 'time'",
+            ValueError,
+            r"Could not find Column 'time'.",
         ),
     ],
     ids=[
