@@ -1741,7 +1741,7 @@ class Table:
         ValueError
             If the target column is also a feature column.
         ValueError
-            If there is no other column than the specified target and time columns left to be a feature column
+            If theTtre is no other column than the specified target and time columns left to be a feature column
 
         Examples
         --------
