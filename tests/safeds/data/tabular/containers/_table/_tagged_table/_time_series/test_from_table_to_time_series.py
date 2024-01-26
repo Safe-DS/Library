@@ -99,7 +99,7 @@ from safeds.exceptions import UnknownColumnNameError
             UnknownColumnNameError,
             r"Could not find column\(s\) 'time'",
         ),
-(
+        (
             Table(
                 {
                     "time": [0, 1],
@@ -113,7 +113,7 @@ from safeds.exceptions import UnknownColumnNameError
             "A",
             ["A", "B", "C"],
             ValueError,
-            r"Column 'A' can not be time and feature column."
+            r"Column 'A' can not be time and feature column.",
         ),
     ],
     ids=[
