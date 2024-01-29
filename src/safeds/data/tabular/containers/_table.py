@@ -36,6 +36,7 @@ if TYPE_CHECKING:
     from safeds.data.tabular.transformation import InvertibleTableTransformer, TableTransformer
 
     from ._tagged_table import TaggedTable
+    from ._time_series import TimeSeries
 
 # Enable copy-on-write for pandas dataframes
 pd.options.mode.copy_on_write = True
@@ -1714,6 +1715,43 @@ class Table:
         from ._tagged_table import TaggedTable
 
         return TaggedTable._from_table(self, target_name, feature_names)
+
+    def time_columns(self, target_name: str, time_name: str, feature_names: list[str] | None = None) -> TimeSeries:
+        """
+        Return a new `TimeSeries` with columns marked as a target and time column or feature columns.
+
+        The original table is not modified.
+
+        Parameters
+        ----------
+        target_name : str
+            Name of the target column.
+        time_name : str
+            Name of the time column.
+        feature_names : list[str] | None
+            Names of the feature columns. If None, all columns except the target and time columns are used.
+
+        Returns
+        -------
+        time_series : TimeSeries
+            A new time series with the given target, time and feature names.
+
+        Raises
+        ------
+        ValueError
+            If the target column is also a feature column.
+        ValueError
+            If there is no other column than the specified target and time columns left to be a feature column
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table, TimeSeries
+        >>> table = Table.from_dict({"time": ["01.01", "01.02", "01.03"], "price": [1.10, 1.19, 1.79], "amount_bought": [74, 72, 51]})
+        >>> tagged_table = table.time_columns(target_name="amount_bought",time_name = "time", feature_names=["price"])
+        """
+        from ._time_series import TimeSeries
+
+        return TimeSeries._from_table_to_time_series(self, target_name, time_name, feature_names)
 
     def transform_column(self, name: str, transformer: Callable[[Row], Any]) -> Table:
         """
