@@ -105,7 +105,7 @@ class TimeSeries(TaggedTable):
         Value Error
             If one column is target and feature
         Value Error
-            If time column is also feature column
+            If one column is time and feature
 
         Examples
         --------
