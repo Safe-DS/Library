@@ -6,18 +6,19 @@ from safeds.exceptions import ClosedBound, OutOfBoundsError
 class _InternalLayer(nn.Module):
     def __init__(self, input_size: int, output_size: int, is_for_classification: bool):
         super().__init__()
-        self.size = output_size
-        self.layer = nn.Linear(input_size, output_size)
+        self._output_size = output_size
+        self._layer = nn.Linear(input_size, output_size)
         if is_for_classification:
-            self.fn = nn.ReLU()
+            self._fn = nn.ReLU()
         else:
-            self.fn = nn.Sigmoid()
+            self._fn = nn.Sigmoid()
 
     def forward(self, x: float) -> float:
-        return self.fn(self.layer(x))
+        return self._fn(self._layer(x))
 
-    def get_size(self) -> int:
-        return self.size
+    @property
+    def output_size(self) -> int:
+        return self._output_size
 
 
 class FNNLayer:
@@ -43,11 +44,12 @@ class FNNLayer:
             raise OutOfBoundsError(actual=input_size, name="input_size", lower_bound=ClosedBound(1))
         if output_size < 1:
             raise OutOfBoundsError(actual=output_size, name="output_size", lower_bound=ClosedBound(1))
-        self.input_size = input_size
-        self.output_size = output_size
+        self._input_size = input_size
+        self._output_size = output_size
 
     def _get_internal_layer(self, is_for_classification: bool) -> _InternalLayer:
-        return _InternalLayer(self.input_size, self.output_size, is_for_classification)
+        return _InternalLayer(self._input_size, self._output_size, is_for_classification)
 
-    def get_size(self) -> int:
-        return self.output_size
+    @property
+    def output_size(self) -> int:
+        return self._output_size

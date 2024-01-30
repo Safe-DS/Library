@@ -45,7 +45,7 @@ class RegressionModel:
 
         loss_values = []
         accuracies = []
-        for _epoch in range(epoch_size):
+        for epoch in range(epoch_size):
             tmp_loss = []
             tmp_accuracies = []
             for x, y in dataloader:
