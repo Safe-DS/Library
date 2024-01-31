@@ -194,7 +194,7 @@ class ClassificationNeuralNetwork(Classifier):
         with torch.no_grad():
             for x, _ in dataloader:
                 predictions.append(copied_model._model(x))
-        tagged_test_data.replace_column("predictions", [Column("prediction"), predictions])
+        tagged_test_data.replace_column("predictions", [Column("prediction", predictions)])
         return tagged_test_data
 
 
