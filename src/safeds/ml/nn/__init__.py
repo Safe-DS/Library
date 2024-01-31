@@ -1,10 +1,10 @@
 """Classes for classification tasks."""
 
 from ._fnn_layer import FNNLayer
-from ._model import ClassificationModel, RegressionModel
+from ._model import ClassificationNeuralNetwork, RegressionNeuralNetwork
 
 __all__ = [
     "FNNLayer",
-    "ClassificationModel",
-    "RegressionModel",
+    "ClassificationNeuralNetwork",
+    "RegressionNeuralNetwork",
 ]

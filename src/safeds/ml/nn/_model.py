@@ -12,7 +12,7 @@ from safeds.ml.classical.regression import Regressor
 from safeds.ml.nn._fnn_layer import FNNLayer
 
 
-class RegressionModel(Regressor):
+class RegressionNeuralNetwork(Regressor):
     def __init__(self, layers: list):
         self._model = _PytorchModel(layers, is_for_classification=False)
         self._batch_size = 1
@@ -40,7 +40,7 @@ class RegressionModel(Regressor):
 
         Returns
         -------
-        RegressionModel
+        RegressionNeuralNetwork
             The trained Model
         """
         if epoch_size < 1:
@@ -57,7 +57,7 @@ class RegressionModel(Regressor):
 
         loss_values = []
         accuracies = []
-        for _epoch in range(epoch_size):
+        for epoch in range(epoch_size):
             tmp_loss = []
             tmp_accuracies = []
             for x, y in dataloader:
@@ -105,7 +105,7 @@ class RegressionModel(Regressor):
         return tagged_test_data
 
 
-class ClassificationModel(Classifier):
+class ClassificationNeuralNetwork(Classifier):
     def __init__(self, layers: list):
         self._model = _PytorchModel(layers, is_for_classification=True)
         self._batch_size = 1
@@ -133,7 +133,7 @@ class ClassificationModel(Classifier):
 
         Returns
         -------
-        ClassificationModel
+        ClassificationNeuralNetwork
             The trained Model
         """
         if epoch_size < 1:
@@ -150,7 +150,7 @@ class ClassificationModel(Classifier):
 
         loss_values = []
         accuracies = []
-        for _epoch in range(epoch_size):
+        for epoch in range(epoch_size):
             tmp_loss = []
             tmp_accuracies = []
             for x, y in dataloader:
