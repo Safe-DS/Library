@@ -57,7 +57,7 @@ class RegressionNeuralNetwork(Regressor):
 
         loss_values = []
         accuracies = []
-        for _epoch in range(epoch_size):
+        for _ in range(epoch_size):
             tmp_loss = []
             tmp_accuracies = []
             for x, y in dataloader:
@@ -99,7 +99,7 @@ class RegressionNeuralNetwork(Regressor):
         copied_model._model.eval()
         predictions = []
         with torch.no_grad():
-            for x, _y in dataloader:
+            for x, _ in dataloader:
                 predictions.append(copied_model._model(x))
         tagged_test_data.replace_column("predictions", [Column("prediction", predictions)])
         return tagged_test_data
@@ -150,7 +150,7 @@ class ClassificationNeuralNetwork(Classifier):
 
         loss_values = []
         accuracies = []
-        for _epoch in range(epoch_size):
+        for _ in range(epoch_size):
             tmp_loss = []
             tmp_accuracies = []
             for x, y in dataloader:
@@ -192,7 +192,7 @@ class ClassificationNeuralNetwork(Classifier):
         copied_model._model.eval()
         predictions = []
         with torch.no_grad():
-            for x, _y in dataloader:
+            for x, _ in dataloader:
                 predictions.append(copied_model._model(x))
         tagged_test_data.replace_column("predictions", [Column("prediction"), predictions])
         return tagged_test_data
