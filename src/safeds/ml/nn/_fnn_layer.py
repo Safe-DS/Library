@@ -52,4 +52,12 @@ class FNNLayer:
 
     @property
     def output_size(self) -> int:
+        """
+        Get the output_size of this layer.
+
+        Returns
+        -------
+        result: int
+            The Number of Neurons in this layer.
+        """
         return self._output_size

@@ -17,7 +17,7 @@ class TestClassificationModel:
             OutOfBoundsError,
             match=rf"epoch_size \(={epoch_size}\) is not inside \[1, \u221e\)\.",
         ):
-            ClassificationModel([FNNLayer(1, 1)]).train(
+            ClassificationModel([FNNLayer(1, 1)]).fit(
                 Table.from_dict({"a": [1], "b": [2]}).tag_columns("a"),
                 epoch_size=epoch_size,
             )
@@ -34,7 +34,7 @@ class TestClassificationModel:
             OutOfBoundsError,
             match=rf"batch_size \(={batch_size}\) is not inside \[1, \u221e\)\.",
         ):
-            ClassificationModel([FNNLayer(1, 1)]).train(
+            ClassificationModel([FNNLayer(1, 1)]).fit(
                 Table.from_dict({"a": [1], "b": [2]}).tag_columns("a"),
                 batch_size=batch_size,
             )
