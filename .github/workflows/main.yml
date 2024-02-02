@@ -11,7 +11,7 @@ jobs:
       matrix:
         python-version:
           - "3.11"
-          # - "3.12"
+          - "3.12"
     uses: lars-reimann/.github/.github/workflows/poetry-codecov-reusable.yml@main
     with:
       working-directory: .
