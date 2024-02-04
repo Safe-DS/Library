@@ -354,7 +354,7 @@ class TaggedTable(Table):
         Returns
         -------
         table : TaggedTable
-            A new table with the added row at the end.
+            A new tagged table with the added row at the end.
 
         Raises
         ------
@@ -377,7 +377,7 @@ class TaggedTable(Table):
         Returns
         -------
         result : TaggedTable
-            A new table which combines the original table and the given rows.
+            A new tagged table which combines the original table and the given rows.
 
         Raises
         ------
@@ -390,7 +390,7 @@ class TaggedTable(Table):
         """
         Return a new `TaggedTable` containing only rows that match the given Callable (e.g. lambda function).
 
-        The original table is not modified.
+        The original tagged table is not modified.
 
         Parameters
         ----------
@@ -399,8 +399,8 @@ class TaggedTable(Table):
 
         Returns
         -------
-        table : TaggedTable
-            A table containing only the rows to match the query.
+        result : TaggedTable
+            A new tagged table containing only the rows to match the query.
         """
         return TaggedTable._from_table(
             super().filter_rows(query),
