@@ -248,6 +248,16 @@ class Column(Sequence[T]):
         """
         return f"Column({self._name!r}, {list(self._data)!r})"
 
+    def __sizeof__(self) -> int:
+        """
+        Return the complete size of this object.
+
+        Returns
+        -------
+        Size of this object in bytes.
+        """
+        return sys.getsizeof(self._data) + sys.getsizeof(self._name) + sys.getsizeof(self._type)
+
     def __str__(self) -> str:
         """
         Return a user-friendly string representation of this column.
@@ -1033,13 +1043,3 @@ class Column(Sequence[T]):
         2
         """
         return self._data.isna().sum()
-
-    def __sizeof__(self) -> int:
-        """
-        Return the complete size of this object.
-
-        Returns
-        -------
-        Size of this object in bytes.
-        """
-        return sys.getsizeof(self._data) + sys.getsizeof(self._name) + sys.getsizeof(self._type)

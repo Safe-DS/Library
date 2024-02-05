@@ -270,6 +270,16 @@ class Row(Mapping[str, Any]):
         """
         return f"Row({self!s})"
 
+    def __sizeof__(self) -> int:
+        """
+        Return the complete size of this object.
+
+        Returns
+        -------
+        Size of this object in bytes.
+        """
+        return sys.getsizeof(self._data) + sys.getsizeof(self._schema)
+
     def __str__(self) -> str:
         """
         Return a user-friendly string representation of this row.
@@ -531,13 +541,3 @@ class Row(Mapping[str, Any]):
             The generated HTML.
         """
         return self._data.to_html(max_rows=1, max_cols=self._data.shape[1], notebook=True)
-
-    def __sizeof__(self) -> int:
-        """
-        Return the complete size of this object.
-
-        Returns
-        -------
-        Size of this object in bytes.
-        """
-        return sys.getsizeof(self._data) + sys.getsizeof(self._schema)

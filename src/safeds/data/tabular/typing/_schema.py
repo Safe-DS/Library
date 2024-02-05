@@ -101,6 +101,16 @@ class Schema:
         """
         return f"Schema({self!s})"
 
+    def __sizeof__(self) -> int:
+        """
+        Return the complete size of this object.
+
+        Returns
+        -------
+        Size of this object in bytes.
+        """
+        return sum(map(sys.getsizeof, self._schema.keys())) + sum(map(sys.getsizeof, self._schema.values())) + sys.getsizeof(self._schema)
+
     def __str__(self) -> str:
         """
         Return a user-friendly string representation of the schema.
@@ -306,13 +316,3 @@ class Schema:
         lines = (f"| {name} | {type_} |" for name, type_ in self._schema.items())
         joined = "\n".join(lines)
         return f"| Column Name | Column Type |\n| --- | --- |\n{joined}"
-
-    def __sizeof__(self) -> int:
-        """
-        Return the complete size of this object.
-
-        Returns
-        -------
-        Size of this object in bytes.
-        """
-        return sys.getsizeof(self._schema)

@@ -187,6 +187,16 @@ class TimeSeries(TaggedTable):
             raise UnknownColumnNameError([time_name])
         self._time: Column = _data.get_column(time_name)
 
+    def __sizeof__(self) -> int:
+        """
+        Return the complete size of this object.
+
+        Returns
+        -------
+        Size of this object in bytes.
+        """
+        return TaggedTable.__sizeof__(self) + sys.getsizeof(self._time)
+
     # ------------------------------------------------------------------------------------------------------------------
     # Properties
     # ------------------------------------------------------------------------------------------------------------------
@@ -847,13 +857,3 @@ class TimeSeries(TaggedTable):
             ),
             time_name=self.time.name,
         )
-
-    def __sizeof__(self) -> int:
-        """
-        Return the complete size of this object.
-
-        Returns
-        -------
-        Size of this object in bytes.
-        """
-        return TaggedTable.__sizeof__(self) + sys.getsizeof(self._time)

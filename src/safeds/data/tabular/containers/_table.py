@@ -476,6 +476,16 @@ class Table:
         tmp.columns = self.column_names
         return tmp.__repr__()
 
+    def __sizeof__(self) -> int:
+        """
+        Return the complete size of this object.
+
+        Returns
+        -------
+        Size of this object in bytes.
+        """
+        return sys.getsizeof(self._data) + sys.getsizeof(self._schema)
+
     def __str__(self) -> str:
         tmp = self._data.reset_index(drop=True)
         tmp.columns = self.column_names
@@ -2370,13 +2380,3 @@ class Table:
         data_copy = self._data.reset_index(drop=True)
         data_copy.columns = self.column_names
         return data_copy.__dataframe__(nan_as_null, allow_copy)
-
-    def __sizeof__(self) -> int:
-        """
-        Return the complete size of this object.
-
-        Returns
-        -------
-        Size of this object in bytes.
-        """
-        return sys.getsizeof(self._data) + sys.getsizeof(self._schema)
