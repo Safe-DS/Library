@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import sys
 import functools
 from collections.abc import Callable, Mapping
 from typing import TYPE_CHECKING, Any
@@ -530,3 +531,13 @@ class Row(Mapping[str, Any]):
             The generated HTML.
         """
         return self._data.to_html(max_rows=1, max_cols=self._data.shape[1], notebook=True)
+
+    def __sizeof__(self) -> int:
+        """
+        Return the complete size of this object.
+
+        Returns
+        -------
+        Size of this object in bytes.
+        """
+        return sys.getsizeof(self._data) + sys.getsizeof(self._schema)

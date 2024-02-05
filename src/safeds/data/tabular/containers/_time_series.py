@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import sys
 from typing import TYPE_CHECKING
 
 from safeds.data.tabular.containers import Column, Row, Table, TaggedTable
@@ -846,3 +847,13 @@ class TimeSeries(TaggedTable):
             ),
             time_name=self.time.name,
         )
+
+    def __sizeof__(self) -> int:
+        """
+        Return the complete size of this object.
+
+        Returns
+        -------
+        Size of this object in bytes.
+        """
+        return TaggedTable.__sizeof__(self) + sys.getsizeof(self._time)

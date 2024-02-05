@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import sys
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
@@ -305,3 +306,13 @@ class Schema:
         lines = (f"| {name} | {type_} |" for name, type_ in self._schema.items())
         joined = "\n".join(lines)
         return f"| Column Name | Column Type |\n| --- | --- |\n{joined}"
+
+    def __sizeof__(self) -> int:
+        """
+        Return the complete size of this object.
+
+        Returns
+        -------
+        Size of this object in bytes.
+        """
+        return sys.getsizeof(self._schema)

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import sys
 import io
 import warnings
 from pathlib import Path
@@ -627,3 +628,13 @@ class Image:
             )
         else:
             return Image(edges_tensor, device=self.device)
+
+    def __sizeof__(self) -> int:
+        """
+        Return the complete size of this object.
+
+        Returns
+        -------
+        Size of this object in bytes.
+        """
+        return sys.getsizeof(self._image_tensor) + self._image_tensor.element_size() * self._image_tensor.nelement()

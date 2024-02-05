@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import sys
 import functools
 import io
 import warnings
@@ -2369,3 +2370,13 @@ class Table:
         data_copy = self._data.reset_index(drop=True)
         data_copy.columns = self.column_names
         return data_copy.__dataframe__(nan_as_null, allow_copy)
+
+    def __sizeof__(self) -> int:
+        """
+        Return the complete size of this object.
+
+        Returns
+        -------
+        Size of this object in bytes.
+        """
+        return sys.getsizeof(self._data) + sys.getsizeof(self._schema)

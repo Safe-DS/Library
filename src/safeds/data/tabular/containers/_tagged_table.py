@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import sys
 from typing import TYPE_CHECKING
 
 from safeds.data.tabular.containers import Column, Row, Table
@@ -833,3 +834,13 @@ class TaggedTable(Table):
             target_name=self.target.name,
             feature_names=self.features.column_names,
         )
+
+    def __sizeof__(self) -> int:
+        """
+        Return the complete size of this object.
+
+        Returns
+        -------
+        Size of this object in bytes.
+        """
+        return Table.__sizeof__(self) + sys.getsizeof(self._features) + sys.getsizeof(self._target)

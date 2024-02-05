@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import sys
 import io
 from collections.abc import Sequence
 from numbers import Number
@@ -1032,3 +1033,13 @@ class Column(Sequence[T]):
         2
         """
         return self._data.isna().sum()
+
+    def __sizeof__(self) -> int:
+        """
+        Return the complete size of this object.
+
+        Returns
+        -------
+        Size of this object in bytes.
+        """
+        return sys.getsizeof(self._data) + sys.getsizeof(self._name) + sys.getsizeof(self._type)
