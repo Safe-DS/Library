@@ -7,15 +7,14 @@ from torch import nn
 
 from safeds.data.tabular.containers import Column, Table, TaggedTable
 from safeds.exceptions import ClosedBound, OutOfBoundsError
-from safeds.ml.classical.classification import Classifier
-from safeds.ml.classical.regression import Regressor
 from safeds.ml.nn._fnn_layer import FNNLayer
 
 
-class RegressionNeuralNetwork(Regressor):
+class RegressionNeuralNetwork:
     def __init__(self, layers: list):
         self._model = _PytorchModel(layers, is_for_classification=False)
         self._batch_size = 1
+        self._is_fitted = False
 
     def fit(self, train_data: TaggedTable, epoch_size: int = 25, batch_size: int = 1) -> Self:
         """
@@ -104,11 +103,23 @@ class RegressionNeuralNetwork(Regressor):
         tagged_test_data.replace_column("predictions", [Column("prediction", predictions)])
         return tagged_test_data
 
+    @property
+    def is_fitted(self) -> bool:
+        """
+        Check if the classifier is fitted.
 
-class ClassificationNeuralNetwork(Classifier):
+        Returns
+        -------
+        is_fitted : bool
+            Whether the classifier is fitted.
+        """
+        return self._is_fitted
+
+class ClassificationNeuralNetwork:
     def __init__(self, layers: list):
         self._model = _PytorchModel(layers, is_for_classification=True)
         self._batch_size = 1
+        self._is_fitted = False
 
     def fit(self, train_data: TaggedTable, epoch_size: int = 25, batch_size: int = 1) -> Self:
         """
@@ -167,6 +178,7 @@ class ClassificationNeuralNetwork(Classifier):
                 optimizer.step()
             loss_values.append(np.mean(tmp_loss))
             accuracies.append(np.mean(tmp_accuracies))
+        self._is_fitted = True
         return copied_model
 
     def predict(self, test_data: Table) -> TaggedTable:
@@ -185,6 +197,8 @@ class ClassificationNeuralNetwork(Classifier):
         TaggedTable
             The given test_data with an added "prediction" column at the end
         """
+        if not self._is_fitted:
+            raise
         copied_model = copy.deepcopy(self)
         test_data.add_column(Column("predictions"))
         tagged_test_data = test_data.tag_columns("predictions")
@@ -196,6 +210,18 @@ class ClassificationNeuralNetwork(Classifier):
                 predictions.append(copied_model._model(x))
         tagged_test_data.replace_column("predictions", [Column("prediction", predictions)])
         return tagged_test_data
+
+    @property
+    def is_fitted(self) -> bool:
+        """
+        Check if the classifier is fitted.
+
+        Returns
+        -------
+        is_fitted : bool
+            Whether the classifier is fitted.
+        """
+        return self._is_fitted
 
 
 class _PytorchModel(nn.Module):
