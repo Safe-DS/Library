@@ -115,6 +115,7 @@ class RegressionNeuralNetwork:
         """
         return self._is_fitted
 
+
 class ClassificationNeuralNetwork:
     def __init__(self, layers: list):
         self._model = _PytorchModel(layers, is_for_classification=True)
