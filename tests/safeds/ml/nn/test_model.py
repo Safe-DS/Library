@@ -53,7 +53,7 @@ class TestRegressionModel:
             OutOfBoundsError,
             match=rf"epoch_size \(={epoch_size}\) is not inside \[1, \u221e\)\.",
         ):
-            RegressionNeuralNetwork([FNNLayer(1, 1)]).train(
+            RegressionNeuralNetwork([FNNLayer(1, 1)]).fit(
                 Table.from_dict({"a": [1], "b": [2]}).tag_columns("a"),
                 epoch_size=epoch_size,
             )
@@ -70,7 +70,7 @@ class TestRegressionModel:
             OutOfBoundsError,
             match=rf"batch_size \(={batch_size}\) is not inside \[1, \u221e\)\.",
         ):
-            RegressionNeuralNetwork([FNNLayer(1, 1)]).train(
+            RegressionNeuralNetwork([FNNLayer(1, 1)]).fit(
                 Table.from_dict({"a": [1], "b": [2]}).tag_columns("a"),
                 batch_size=batch_size,
             )
