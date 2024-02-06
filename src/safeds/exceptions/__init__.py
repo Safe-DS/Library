@@ -2,6 +2,7 @@
 
 from safeds.exceptions._data import (
     ColumnIsTargetError,
+    ColumnIsTimeError,
     ColumnLengthMismatchError,
     ColumnSizeError,
     DuplicateColumnNameError,
@@ -36,6 +37,7 @@ __all__ = [
     "OutOfBoundsError",
     # Data exceptions
     "ColumnIsTargetError",
+    "ColumnIsTimeError",
     "ColumnLengthMismatchError",
     "ColumnSizeError",
     "DuplicateColumnNameError",

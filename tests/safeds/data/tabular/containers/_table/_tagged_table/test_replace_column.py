@@ -140,7 +140,7 @@ def test_should_replace_column(
 
 
 @pytest.mark.parametrize(
-    ("original_table", "new_columns", "column_name_to_be_replaced"),
+    ("original_table", "new_columns", "column_name_to_be_replaced", "error"),
     [
         (
             TaggedTable(
@@ -152,6 +152,7 @@ def test_should_replace_column(
             ),
             [],
             "target_old",
+            'Target column "target_old" can only be replaced by exactly one new column.',
         ),
         (
             TaggedTable(
@@ -163,6 +164,7 @@ def test_should_replace_column(
             ),
             [Column("target_new_a", [2, 1, 0]), Column("target_new_b"), [4, 2, 0]],
             "target_old",
+            'Target column "target_old" can only be replaced by exactly one new column.',
         ),
     ],
     ids=["zero_columns", "multiple_columns"],
@@ -171,9 +173,10 @@ def test_should_throw_illegal_schema_modification(
     original_table: TaggedTable,
     new_columns: list[Column],
     column_name_to_be_replaced: str,
+    error: str,
 ) -> None:
     with pytest.raises(
         IllegalSchemaModificationError,
-        match='Target column "target_old" can only be replaced by exactly one new column.',
+        match=error,
     ):
         original_table.replace_column(column_name_to_be_replaced, new_columns)

@@ -1,3 +1,12 @@
+## [0.18.0](https://github.com/Safe-DS/Library/compare/v0.17.1...v0.18.0) (2024-02-03)
+
+
+### Features
+
+* Add adjust_color_balance method in Image ([#530](https://github.com/Safe-DS/Library/issues/530)) ([dba23f9](https://github.com/Safe-DS/Library/commit/dba23f90b29af3ac5b3187eeea53dcedebe9a2b8)), closes [#525](https://github.com/Safe-DS/Library/issues/525)
+* Add find_edges method in Image ([#531](https://github.com/Safe-DS/Library/issues/531)) ([d728eb6](https://github.com/Safe-DS/Library/commit/d728eb60aa75afddde386a129f93cd0f327e56df)), closes [#523](https://github.com/Safe-DS/Library/issues/523)
+* class for time series ([#508](https://github.com/Safe-DS/Library/issues/508)) ([73cdfb1](https://github.com/Safe-DS/Library/commit/73cdfb119cb4243e56a5e99d40cfdbacf0466daf)), closes [#481](https://github.com/Safe-DS/Library/issues/481)
+
 ## [0.17.1](https://github.com/Safe-DS/Library/compare/v0.17.0...v0.17.1) (2024-01-11)
 
 

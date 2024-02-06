@@ -276,9 +276,12 @@ Passing values that are commonly used together around separately is tedious, ver
 
 ## Docstrings
 
-The docstrings **should** use the [numpydoc](https://numpydoc.readthedocs.io/en/latest/format.html) format. The descriptions **should not** start with "this" and **should** use imperative mood. Refer to the subsections below for more details on how to document specific API elements.
+The docstrings **should** use the [numpydoc](https://numpydoc.readthedocs.io/en/latest/format.html) format. The
+descriptions **should not** start with "this" and **should** use imperative mood. Docstrings **should not** contain
+type hints, since they are already specified in the code. Refer to the subsections below for more details on how to
+document specific API elements.
 
-!!! success "**DO** (library code):"
+!!! success "**DO**:"
 
     ```py
     def add_ints(a: int, b: int) -> int:
@@ -286,7 +289,7 @@ The docstrings **should** use the [numpydoc](https://numpydoc.readthedocs.io/en/
         return a + b
     ```
 
-!!! failure "**DON'T** (library code):"
+!!! failure "**DON'T**:"
 
     ```py
     def add_ints(a: int, b: int) -> int:
@@ -294,7 +297,7 @@ The docstrings **should** use the [numpydoc](https://numpydoc.readthedocs.io/en/
         return a + b
     ```
 
-!!! failure "**DON'T** (library code):"
+!!! failure "**DON'T**:"
 
     ```py
     def add_ints(a: int, b: int) -> int:
@@ -302,39 +305,12 @@ The docstrings **should** use the [numpydoc](https://numpydoc.readthedocs.io/en/
         return a + b
     ```
 
-!!! success "**DO** (library code):"
-
-    ```py
-    def __init__(self, data: Mapping[str, Any] | None = None) -> None:
-        """
-        data : Mapping[str, Any] | None
-        """
-    ```
-
-!!! failure "**DON'T** (library code):"
-
-    ```py
-    def __init__(self, data: Optional[Mapping[str, Any]] = None) -> None:
-        """
-        data : Optional[Mapping[str, Any]]
-        """
-    ```
-
-!!! failure "**DON'T** (library code):"
-
-    ```py
-    def __init__(self, data: Mapping[str, Any] | None = None) -> None:
-        """
-        data : Optional[Mapping[str, Any]]
-        """
-    ```
-
 ### Modules
 
 All modules should have
 
-* a one-line description ([short summary][short-summary-section]),
-* a longer description if needed ([extended summary][extended-summary-section]).
+* A one-line description ([short summary][short-summary-section]).
+* A longer description if needed ([extended summary][extended-summary-section]).
 
 Example:
 
@@ -346,10 +322,11 @@ Example:
 
 All classes should have
 
-* a one-line description ([short summary][short-summary-section]),
-* a longer description if needed ([extended summary][extended-summary-section])
-* a description of the parameters of their `__init__` method ([`Parameters` section][parameters-section]),
-* examples that show how to use them correctly ([`Examples` section][examples-section]).
+* A one-line description ([short summary][short-summary-section]).
+* A longer description if needed ([extended summary][extended-summary-section]).
+* A description of the parameters of their `__init__` method ([`Parameters` section][parameters-section]). Omit types
+  and default values.
+* Examples that show how to use them correctly ([`Examples` section][examples-section]).
 
 Example:
 
@@ -359,7 +336,7 @@ A row is a collection of named values.
 
 Parameters
 ----------
-data : Mapping[str, Any] | None
+data
     The data. If None, an empty row is created.
 
 Examples
@@ -373,13 +350,17 @@ Examples
 
 All functions should have
 
-* a one-line description ([short summary][short-summary-section]),
-* a longer description if needed ([extended summary][extended-summary-section])
-* a description of their parameters ([`Parameters` section][parameters-section]),
-* a description of their results ([`Returns` section][returns-section]),
-* a description of any exceptions that may be raised and under which conditions that may happen ([`Raises` section][raises-section]),
-* a description of any warnings that may be issued and under which conditions that may happen ([`Warns` section][warns-section]),
-* examples that show how to use them correctly ([`Examples` section][examples-section]).
+* A one-line description ([short summary][short-summary-section]).
+* A longer description if needed ([extended summary][extended-summary-section]).
+* A description of their parameters ([`Parameters` section][parameters-section]). Omit types
+  and default values.
+* A description of their results ([`Returns` section][returns-section]). Specify a name for the return value but omit
+  its type. Note that the colon after the name is required here, otherwise it will be interpreted as a type.
+* A description of any exceptions that may be raised and under which conditions that may
+  happen ([`Raises` section][raises-section]).
+* A description of any warnings that may be issued and under which conditions that may
+  happen ([`Warns` section][warns-section]).
+* Examples that show how to use them correctly ([`Examples` section][examples-section]).
 
 Example:
 
@@ -389,12 +370,12 @@ Return the value of a specified column.
 
 Parameters
 ----------
-column_name : str
+column_name
     The column name.
 
 Returns
 -------
-value : Any
+value :
     The column value.
 
 Raises
