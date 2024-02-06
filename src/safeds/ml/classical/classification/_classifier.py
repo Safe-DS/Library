@@ -4,14 +4,17 @@ from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
 from sklearn.metrics import accuracy_score as sk_accuracy_score
+from sklearn.metrics import roc_curve
 
-from safeds.data.tabular.containers import Table, TaggedTable
+from safeds.data.tabular.containers import Row, Table, TaggedTable
 from safeds.exceptions import UntaggedTableError
 
 if TYPE_CHECKING:
     from typing import Any
 
     from sklearn.base import ClassifierMixin
+
+    from safeds.data.image.containers import Image
 
 
 class Classifier(ABC):
@@ -230,3 +233,34 @@ class Classifier(ABC):
         if (2 * n_true_positives + n_false_positives + n_false_negatives) == 0:
             return 1.0
         return 2 * n_true_positives / (2 * n_true_positives + n_false_positives + n_false_negatives)
+
+    def roc_curve(self, validation_or_test_set: TaggedTable) -> Image:
+        """
+        Compute the classifier's roc_curve on the given data.
+
+        Parameters
+        ----------
+        validation_or_test_set : TaggedTable
+            The validation or test set.
+
+        Returns
+        -------
+        roc_curve : Image
+            The calculated roc_curve plots the true positive rate (TPR) against the false positive rate (FPR)
+        """
+        if not isinstance(validation_or_test_set, TaggedTable) and isinstance(validation_or_test_set, Table):
+            raise UntaggedTableError
+
+        expected_values = list(validation_or_test_set.target)
+        predicted_values = list(self.predict(validation_or_test_set.features).target)
+
+        roc_table = Table()
+
+        fpr, tpr, thresholds = roc_curve(expected_values, predicted_values)
+
+        i = 0
+        while i < len(fpr):
+            roc_table = roc_table.add_row(Row.from_dict({"fpr": fpr[i], "tpr": tpr[i]}))
+            i += 1
+
+        return roc_table.plot_lineplot("fpr", "tpr")

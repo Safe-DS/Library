@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 
 import pytest
+from safeds.data.image.containers import Image
 from safeds.data.tabular.containers import Table, TaggedTable
 from safeds.exceptions import (
     DatasetContainsTargetError,
@@ -23,6 +24,8 @@ from safeds.ml.classical.classification import (
     RandomForest,
     SupportVectorMachine,
 )
+
+from tests.helpers import resolve_resource_path
 
 if TYPE_CHECKING:
     from _pytest.fixtures import FixtureRequest
@@ -474,3 +477,39 @@ class TestF1Score:
     def test_should_raise_if_table_is_not_tagged(self, table: Table) -> None:
         with pytest.raises(UntaggedTableError):
             DummyClassifier().f1_score(table, 1)  # type: ignore[arg-type]
+
+
+class TestRocCurve:
+    @pytest.mark.parametrize(
+        ("table", "roc_curve"),
+        [
+            (
+                Table(
+                    {
+                        "predicted": [1, 1, 0, 1, 0, 1, 0, 0, 1],
+                        "expected": [0, 1, 1, 0, 0, 0, 1, 0, 1],
+                    },
+                ).tag_columns(target_name="expected"),
+                Image.from_png_file(resolve_resource_path("image/roc_curve.png")),
+            ),
+        ],
+        ids=["tagged_table"],
+    )
+    def test_should_compare_result(self, table: TaggedTable, roc_curve: Image) -> None:
+        assert DummyClassifier().roc_curve(table) == roc_curve
+
+    @pytest.mark.parametrize(
+        "table",
+        [
+            Table(
+                {
+                    "predicted": [0, 1, 0, 1],
+                    "expected": [0, 1, 1, 0],
+                },
+            ),
+        ],
+        ids=["untagged_table"],
+    )
+    def test_should_raise_if_table_is_not_tagged(self, table: TaggedTable) -> None:
+        with pytest.raises(UntaggedTableError):
+            DummyClassifier().roc_curve(table)  # type: ignore[arg-type]
