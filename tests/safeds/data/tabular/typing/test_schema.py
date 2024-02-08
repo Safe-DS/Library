@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import sys
 from typing import TYPE_CHECKING
 
 import pandas as pd
@@ -495,3 +496,21 @@ class TestReprMarkdown:
     )
     def test_should_create_a_string_representation(self, schema: Schema, expected: str) -> None:
         assert schema._repr_markdown_() == expected
+
+
+class TestSizeof:
+    @pytest.mark.parametrize(
+        "schema",
+        [
+            Schema({}),
+            Schema({"A": Integer()}),
+            Schema({"A": Integer(), "B": String()}),
+        ],
+        ids=[
+            "empty",
+            "single column",
+            "multiple columns",
+        ],
+    )
+    def test_should_size_be_greater_than_normal_object(self, schema: Schema) -> None:
+        assert sys.getsizeof(schema) > sys.getsizeof(object())

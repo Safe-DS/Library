@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import sys
 import functools
 from collections.abc import Callable, Mapping
 from typing import TYPE_CHECKING, Any
@@ -268,6 +269,16 @@ class Row(Mapping[str, Any]):
         "Row({'a': 1})"
         """
         return f"Row({self!s})"
+
+    def __sizeof__(self) -> int:
+        """
+        Return the complete size of this object.
+
+        Returns
+        -------
+        Size of this object in bytes.
+        """
+        return sys.getsizeof(self._data) + sys.getsizeof(self._schema)
 
     def __str__(self) -> str:
         """

@@ -1,3 +1,10 @@
+## [0.19.0](https://github.com/Safe-DS/Library/compare/v0.18.0...v0.19.0) (2024-02-06)
+
+
+### Features
+
+* return the correct size for custom container objects ([#547](https://github.com/Safe-DS/Library/issues/547)) ([f44c34d](https://github.com/Safe-DS/Library/commit/f44c34d2be12d4887f662320c332c58cb3ac4220))
+
 ## [0.18.0](https://github.com/Safe-DS/Library/compare/v0.17.1...v0.18.0) (2024-02-03)
 
 

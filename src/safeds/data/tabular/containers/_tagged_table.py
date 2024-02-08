@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import sys
 from typing import TYPE_CHECKING
 
 import numpy as np
@@ -167,6 +168,16 @@ class TaggedTable(Table):
 
         self._features: Table = _data.keep_only_columns(feature_names)
         self._target: Column = _data.get_column(target_name)
+
+    def __sizeof__(self) -> int:
+        """
+        Return the complete size of this object.
+
+        Returns
+        -------
+        Size of this object in bytes.
+        """
+        return Table.__sizeof__(self) + sys.getsizeof(self._features) + sys.getsizeof(self._target)
 
     # ------------------------------------------------------------------------------------------------------------------
     # Properties
