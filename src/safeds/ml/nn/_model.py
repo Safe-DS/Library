@@ -6,7 +6,7 @@ import torch
 from torch import nn
 
 from safeds.data.tabular.containers import Column, Table, TaggedTable
-from safeds.exceptions import ClosedBound, OutOfBoundsError, ModelNotFittedError
+from safeds.exceptions import ClosedBound, ModelNotFittedError, OutOfBoundsError
 from safeds.ml.nn._fnn_layer import FNNLayer
 
 
@@ -239,10 +239,10 @@ class _PytorchModel(nn.Module):
         self._layer_list = layer_list
         layers = []
         for layer in layer_list:
-            layers.append(layer._get_internal_layer(False))
+            layers.append(layer._get_internal_layer(is_last_layer_of_classification_model=False))
         if is_for_classification:
             layers.pop()
-            layers.append(layer_list.pop()._get_internal_layer(True))
+            layers.append(layer_list.pop()._get_internal_layer(is_last_layer_of_classification_model=True))
         self._pytorch_layers = nn.ModuleList(layers)
 
     def forward(self, x: float) -> float:
