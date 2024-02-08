@@ -4,21 +4,16 @@ from safeds.exceptions import ClosedBound, OutOfBoundsError
 
 
 class _InternalLayer(nn.Module):
-    def __init__(self, input_size: int, output_size: int, is_for_classification: bool):
+    def __init__(self, input_size: int, output_size: int, is_last_layer_of_classification_model: bool):
         super().__init__()
-        self._output_size = output_size
         self._layer = nn.Linear(input_size, output_size)
-        if is_for_classification:
-            self._fn = nn.ReLU()
-        else:
+        if is_last_layer_of_classification_model:
             self._fn = nn.Sigmoid()
+        else:
+            self._fn = nn.ReLU()
 
     def forward(self, x: float) -> float:
         return self._fn(self._layer(x))
-
-    @property
-    def output_size(self) -> int:
-        return self._output_size
 
 
 class FNNLayer:
@@ -47,8 +42,8 @@ class FNNLayer:
         self._input_size = input_size
         self._output_size = output_size
 
-    def _get_internal_layer(self, is_for_classification: bool) -> _InternalLayer:
-        return _InternalLayer(self._input_size, self._output_size, is_for_classification)
+    def _get_internal_layer(self, is_last_layer_of_classification_model: bool) -> _InternalLayer:
+        return _InternalLayer(self._input_size, self._output_size, is_last_layer_of_classification_model)
 
     @property
     def output_size(self) -> int:

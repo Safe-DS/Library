@@ -6,7 +6,7 @@ import torch
 from torch import nn
 
 from safeds.data.tabular.containers import Column, Table, TaggedTable
-from safeds.exceptions import ClosedBound, OutOfBoundsError
+from safeds.exceptions import ClosedBound, OutOfBoundsError, ModelNotFittedError
 from safeds.ml.nn._fnn_layer import FNNLayer
 
 
@@ -73,6 +73,7 @@ class RegressionNeuralNetwork:
                 optimizer.step()
             loss_values.append(np.mean(tmp_loss))
             accuracies.append(np.mean(tmp_accuracies))
+        copied_model._is_fitted = True
         return copied_model
 
     def predict(self, test_data: Table) -> TaggedTable:
@@ -91,17 +92,16 @@ class RegressionNeuralNetwork:
         TaggedTable
             The given test_data with an added "prediction" column at the end
         """
+        if not self._is_fitted:
+            raise ModelNotFittedError
         copied_model = copy.deepcopy(self)
-        test_data.add_column(Column("predictions"))
-        tagged_test_data = test_data.tag_columns("predictions")
-        dataloader = tagged_test_data.into_dataloader(copied_model._batch_size)
+        dataloader = test_data.into_dataloader(copied_model._batch_size)
         copied_model._model.eval()
         predictions = []
         with torch.no_grad():
-            for x, _ in dataloader:
-                predictions.append(copied_model._model(x))
-        tagged_test_data.replace_column("predictions", [Column("prediction", predictions)])
-        return tagged_test_data
+            for x in dataloader:
+                predictions.append(copied_model._model(x).item())
+        return test_data.add_column(Column("prediction", predictions)).tag_columns("prediction")
 
     @property
     def is_fitted(self) -> bool:
@@ -114,6 +114,7 @@ class RegressionNeuralNetwork:
             Whether the classifier is fitted.
         """
         return self._is_fitted
+
 
 class ClassificationNeuralNetwork:
     def __init__(self, layers: list):
@@ -178,7 +179,7 @@ class ClassificationNeuralNetwork:
                 optimizer.step()
             loss_values.append(np.mean(tmp_loss))
             accuracies.append(np.mean(tmp_accuracies))
-        self._is_fitted = True
+        copied_model._is_fitted = True
         return copied_model
 
     def predict(self, test_data: Table) -> TaggedTable:
@@ -196,20 +197,23 @@ class ClassificationNeuralNetwork:
         -------
         TaggedTable
             The given test_data with an added "prediction" column at the end
+
+        Raises
+        ------
+        ModelNotFittedError
+            If the Model has not been fitted yet
         """
         if not self._is_fitted:
-            raise
+            raise ModelNotFittedError
         copied_model = copy.deepcopy(self)
-        test_data.add_column(Column("predictions"))
-        tagged_test_data = test_data.tag_columns("predictions")
-        dataloader = tagged_test_data.into_dataloader(copied_model._batch_size)
+        dataloader = test_data.into_dataloader(copied_model._batch_size)
         copied_model._model.eval()
         predictions = []
         with torch.no_grad():
-            for x, _ in dataloader:
-                predictions.append(copied_model._model(x))
-        tagged_test_data.replace_column("predictions", [Column("prediction", predictions)])
-        return tagged_test_data
+            for x in dataloader:
+                predictions.append(copied_model._model(x).item())
+        return test_data.add_column(Column("prediction", predictions)).tag_columns("prediction")
+
 
     @property
     def is_fitted(self) -> bool:
@@ -230,8 +234,10 @@ class _PytorchModel(nn.Module):
         self._layer_list = layer_list
         layers = []
         for layer in layer_list:
-            layers.append(layer._get_internal_layer(is_for_classification))
-
+            layers.append(layer._get_internal_layer(False))
+        if is_for_classification:
+            layers.pop()
+            layers.append(layer_list.pop()._get_internal_layer(True))
         self._pytorch_layers = nn.ModuleList(layers)
 
     def forward(self, x: float) -> float:

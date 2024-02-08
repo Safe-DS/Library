@@ -31,3 +31,18 @@ def test_should_raise_if_output_size_out_of_bounds(output_size: int) -> None:
         match=rf"output_size \(={output_size}\) is not inside \[1, \u221e\)\.",
     ):
         FNNLayer(1, output_size)
+
+@pytest.mark.parametrize(
+    "output_size",
+    [
+        (
+            1
+        ),
+        (
+            20
+        ),
+    ],
+    ids=["one", "twenty"],
+)
+def test_should_raise_if_output_size_doesnt_match(output_size: int) -> None:
+    assert FNNLayer(1, output_size).output_size == output_size

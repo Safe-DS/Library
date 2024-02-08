@@ -1,6 +1,6 @@
 import pytest
-from safeds.data.tabular.containers import Table
-from safeds.exceptions import OutOfBoundsError
+from safeds.data.tabular.containers import Table, TaggedTable
+from safeds.exceptions import OutOfBoundsError, ModelNotFittedError
 from safeds.ml.nn import ClassificationNeuralNetwork, FNNLayer, RegressionNeuralNetwork
 
 
@@ -39,6 +39,36 @@ class TestClassificationModel:
                 batch_size=batch_size,
             )
 
+    def test_should_raise_if_fit_function_returns_wrong_datatype(self) -> None:
+        fitted_model = ClassificationNeuralNetwork([FNNLayer(1, 8), FNNLayer(8, 1)]).fit(
+            Table.from_dict({"a": [1], "b": [0]}).tag_columns("a"),
+        )
+        assert isinstance(fitted_model, ClassificationNeuralNetwork)
+
+    def test_should_raise_if_predict_function_returns_wrong_datatype(self) -> None:
+        fitted_model = ClassificationNeuralNetwork([FNNLayer(1, 8), FNNLayer(8, 1)]).fit(
+            Table.from_dict({"a": [1], "b": [0]}).tag_columns("a"),
+        )
+        predictions = fitted_model.predict(Table.from_dict({"b": [1]}))
+        assert isinstance(predictions, TaggedTable)
+
+    def test_should_raise_if_model_has_not_been_fitted(self) -> None:
+        with pytest.raises(
+            ModelNotFittedError,
+            match="The model has not been fitted yet."
+        ):
+            ClassificationNeuralNetwork([FNNLayer(1, 1)]).predict(
+                Table.from_dict({"a": [1]}),
+            )
+
+    def test_should_raise_if_is_fitted_is_set_correctly(self) -> None:
+        model = ClassificationNeuralNetwork([FNNLayer(1, 1)])
+        assert not model.is_fitted
+        model = model.fit(
+            Table.from_dict({"a": [1], "b": [0]}).tag_columns("a"),
+        )
+        assert model.is_fitted
+
 
 class TestRegressionModel:
     @pytest.mark.parametrize(
@@ -74,3 +104,33 @@ class TestRegressionModel:
                 Table.from_dict({"a": [1], "b": [2]}).tag_columns("a"),
                 batch_size=batch_size,
             )
+
+    def test_should_raise_if_fit_function_returns_wrong_datatype(self) -> None:
+        fitted_model = RegressionNeuralNetwork([FNNLayer(1, 1)]).fit(
+            Table.from_dict({"a": [1], "b": [2]}).tag_columns("a"),
+        )
+        assert isinstance(fitted_model, RegressionNeuralNetwork)
+
+    def test_should_raise_if_predict_function_returns_wrong_datatype(self) -> None:
+        fitted_model = RegressionNeuralNetwork([FNNLayer(1, 1)]).fit(
+            Table.from_dict({"a": [1], "b": [2]}).tag_columns("a"),
+        )
+        predictions = fitted_model.predict(Table.from_dict({"b": [1]}))
+        assert isinstance(predictions, TaggedTable)
+
+    def test_should_raise_if_model_has_not_been_fitted(self) -> None:
+        with pytest.raises(
+            ModelNotFittedError,
+            match="The model has not been fitted yet."
+        ):
+            RegressionNeuralNetwork([FNNLayer(1, 1)]).predict(
+                Table.from_dict({"a": [1]}),
+            )
+
+    def test_should_raise_if_is_fitted_is_set_correctly(self) -> None:
+        model = RegressionNeuralNetwork([FNNLayer(1, 1)])
+        assert not model.is_fitted
+        model = model.fit(
+            Table.from_dict({"a": [1], "b": [0]}).tag_columns("a"),
+        )
+        assert model.is_fitted
