@@ -91,6 +91,11 @@ class RegressionNeuralNetwork:
         -------
         TaggedTable
             The given test_data with an added "prediction" column at the end
+
+        Raises
+        ------
+        ModelNotFittedError
+            If the model has not been fitted yet
         """
         if not self._is_fitted:
             raise ModelNotFittedError
@@ -106,12 +111,12 @@ class RegressionNeuralNetwork:
     @property
     def is_fitted(self) -> bool:
         """
-        Check if the classifier is fitted.
+        Check if the model is fitted.
 
         Returns
         -------
         is_fitted : bool
-            Whether the classifier is fitted.
+            Whether the model is fitted.
         """
         return self._is_fitted
 
@@ -218,12 +223,12 @@ class ClassificationNeuralNetwork:
     @property
     def is_fitted(self) -> bool:
         """
-        Check if the classifier is fitted.
+        Check if the model is fitted.
 
         Returns
         -------
         is_fitted : bool
-            Whether the classifier is fitted.
+            Whether the model is fitted.
         """
         return self._is_fitted
 
