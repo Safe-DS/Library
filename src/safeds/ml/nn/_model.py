@@ -219,7 +219,6 @@ class ClassificationNeuralNetwork:
                 predictions.append(copied_model._model(x).item())
         return test_data.add_column(Column("prediction", predictions)).tag_columns("prediction")
 
-
     @property
     def is_fitted(self) -> bool:
         """

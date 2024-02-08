@@ -1,6 +1,6 @@
 import pytest
 from safeds.data.tabular.containers import Table, TaggedTable
-from safeds.exceptions import OutOfBoundsError, ModelNotFittedError
+from safeds.exceptions import ModelNotFittedError, OutOfBoundsError
 from safeds.ml.nn import ClassificationNeuralNetwork, FNNLayer, RegressionNeuralNetwork
 
 
@@ -53,10 +53,7 @@ class TestClassificationModel:
         assert isinstance(predictions, TaggedTable)
 
     def test_should_raise_if_model_has_not_been_fitted(self) -> None:
-        with pytest.raises(
-            ModelNotFittedError,
-            match="The model has not been fitted yet."
-        ):
+        with pytest.raises(ModelNotFittedError, match="The model has not been fitted yet."):
             ClassificationNeuralNetwork([FNNLayer(1, 1)]).predict(
                 Table.from_dict({"a": [1]}),
             )
@@ -119,10 +116,7 @@ class TestRegressionModel:
         assert isinstance(predictions, TaggedTable)
 
     def test_should_raise_if_model_has_not_been_fitted(self) -> None:
-        with pytest.raises(
-            ModelNotFittedError,
-            match="The model has not been fitted yet."
-        ):
+        with pytest.raises(ModelNotFittedError, match="The model has not been fitted yet."):
             RegressionNeuralNetwork([FNNLayer(1, 1)]).predict(
                 Table.from_dict({"a": [1]}),
             )

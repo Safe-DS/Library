@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-import sys
 import functools
 import io
+import sys
 import warnings
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, TypeVar
@@ -1556,7 +1556,7 @@ class Table:
     def sort_columns(
         self,
         comparator: Callable[[Column, Column], int] = lambda col1, col2: (col1.name > col2.name)
-                                                                         - (col1.name < col2.name),
+        - (col1.name < col2.name),
     ) -> Table:
         """
         Sort the columns of a `Table` with the given comparator and return a new `Table`.
