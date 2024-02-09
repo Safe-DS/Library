@@ -4,10 +4,10 @@ from safeds.exceptions import NonNumericColumnError
 from syrupy import SnapshotAssertion
 
 
-def test_should_match_snapshot(snapshot_png: SnapshotAssertion) -> None:
+def test_should_match_snapshot(snapshot_png_image: SnapshotAssertion) -> None:
     table = Table({"A": [1, 2, 3]})
     boxplot = table.get_column("A").plot_boxplot()
-    assert boxplot == snapshot_png
+    assert boxplot == snapshot_png_image
 
 
 def test_should_raise_if_column_contains_non_numerical_values() -> None:

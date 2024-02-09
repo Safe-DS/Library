@@ -249,6 +249,38 @@ class Image:
     # Transformations
     # ------------------------------------------------------------------------------------------------------------------
 
+    def change_channel(self, channel: int) -> Image:
+        """
+        Return a new `Image` that has the given number of channels.
+
+        The original image is not modified.
+
+        Parameters
+        ----------
+        channel
+            The new number of channels. 1 will result in a grayscale image.
+
+        Returns
+        -------
+        result :
+            The image with the given number of channels.
+        """
+        if self.channel == channel:
+            image_tensor = self._image_tensor
+        elif self.channel == 1 and channel == 3:
+            image_tensor = torch.cat([self._image_tensor, self._image_tensor, self._image_tensor], dim=0)
+        elif self.channel == 1 and channel == 4:
+            image_tensor = torch.cat([self._image_tensor, self._image_tensor, self._image_tensor, torch.full(self._image_tensor.size(), 255).to(self.device)], dim=0)
+        elif self.channel in (3, 4) and channel == 1:
+            image_tensor = self.convert_to_grayscale()._image_tensor[0:1]
+        elif self.channel == 3 and channel == 4:
+            image_tensor = torch.cat([self._image_tensor, torch.full(self._image_tensor[0:1].size(), 255).to(self.device)], dim=0)
+        elif self.channel == 4 and channel == 3:
+            image_tensor = self._image_tensor[0:3]
+        else:
+            image_tensor = self._image_tensor
+        return Image(image_tensor, device=self._image_tensor.device)
+
     def resize(self, new_width: int, new_height: int) -> Image:
         """
         Return a new `Image` that has been resized to a given size.
