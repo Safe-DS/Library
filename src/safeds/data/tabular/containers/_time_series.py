@@ -1,9 +1,13 @@
 from __future__ import annotations
 
 import sys
+import io
+import matplotlib.pyplot as plt
+import pandas as pd
 from typing import TYPE_CHECKING
 
 from safeds.data.tabular.containers import Column, Row, Table, TaggedTable
+from safeds.data.image.containers import Image
 from safeds.exceptions import (
     ColumnIsTargetError,
     ColumnIsTimeError,
@@ -745,8 +749,8 @@ class TimeSeries(TaggedTable):
                         self.features.column_names
                         if old_column_name not in self.features.column_names
                         else self.features.column_names[: self.features.column_names.index(old_column_name)]
-                        + [col.name for col in new_columns]
-                        + self.features.column_names[self.features.column_names.index(old_column_name) + 1 :]
+                             + [col.name for col in new_columns]
+                             + self.features.column_names[self.features.column_names.index(old_column_name) + 1:]
                     ),
                 ),
                 time_name=self.time.name,
@@ -794,7 +798,7 @@ class TimeSeries(TaggedTable):
     def sort_columns(
         self,
         comparator: Callable[[Column, Column], int] = lambda col1, col2: (col1.name > col2.name)
-        - (col1.name < col2.name),
+                                                                         - (col1.name < col2.name),
     ) -> TimeSeries:
         """
         Sort the columns of a `TimeSeries` with the given comparator and return a new `TimeSeries`.
@@ -857,3 +861,12 @@ class TimeSeries(TaggedTable):
             ),
             time_name=self.time.name,
         )
+
+    def plot_lag(self, lag: int) -> Image:
+        ax = pd.plotting.lag_plot(self.target._data, lag=lag)
+        fig = ax.figure
+        buffer = io.BytesIO()
+        fig.savefig(buffer, format="png")
+        plt.close()  # Prevents the figure from being displayed directly
+        buffer.seek(0)
+        return Image.from_bytes(buffer.read())
