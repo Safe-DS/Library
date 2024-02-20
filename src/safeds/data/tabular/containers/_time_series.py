@@ -1,13 +1,14 @@
 from __future__ import annotations
 
-import sys
 import io
-import matplotlib.pyplot as plt
-import pandas as pd
+import sys
 from typing import TYPE_CHECKING
 
-from safeds.data.tabular.containers import Column, Row, Table, TaggedTable
+import matplotlib.pyplot as plt
+import pandas as pd
+
 from safeds.data.image.containers import Image
+from safeds.data.tabular.containers import Column, Row, Table, TaggedTable
 from safeds.exceptions import (
     NonNumericColumnError,
     ColumnIsTargetError,
@@ -750,8 +751,8 @@ class TimeSeries(TaggedTable):
                         self.features.column_names
                         if old_column_name not in self.features.column_names
                         else self.features.column_names[: self.features.column_names.index(old_column_name)]
-                             + [col.name for col in new_columns]
-                             + self.features.column_names[self.features.column_names.index(old_column_name) + 1:]
+                        + [col.name for col in new_columns]
+                        + self.features.column_names[self.features.column_names.index(old_column_name) + 1 :]
                     ),
                 ),
                 time_name=self.time.name,
@@ -799,7 +800,7 @@ class TimeSeries(TaggedTable):
     def sort_columns(
         self,
         comparator: Callable[[Column, Column], int] = lambda col1, col2: (col1.name > col2.name)
-                                                                         - (col1.name < col2.name),
+        - (col1.name < col2.name),
     ) -> TimeSeries:
         """
         Sort the columns of a `TimeSeries` with the given comparator and return a new `TimeSeries`.
