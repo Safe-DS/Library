@@ -864,6 +864,7 @@ class TimeSeries(TaggedTable):
             time_name=self.time.name,
         )
 
+
     def plot_lagplot(self, lag: int) -> Image:
         """
                 Plot a lagplot for target column.

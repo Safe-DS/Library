@@ -16,7 +16,7 @@ def test_should_return_table(snapshot_png: SnapshotAssertion) -> None:
         target_name="target",
         time_name="time",
         feature_names=None, )
-    lag_plot = table.plot_lag_plot(lag=1)
+    lag_plot = table.plot_lagplot(lag=1)
     assert lag_plot == snapshot_png
 
 def test_should_raise_if_column_contains_non_numerical_values() -> None:
