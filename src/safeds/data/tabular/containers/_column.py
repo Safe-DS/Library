@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-import sys
 import io
+import sys
 from collections.abc import Sequence
 from numbers import Number
 from typing import TYPE_CHECKING, Any, TypeVar, overload
