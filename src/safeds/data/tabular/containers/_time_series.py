@@ -846,9 +846,9 @@ class TimeSeries(TaggedTable):
         The original time series is not modified.
         Parameters
         ----------
-        name : str
+        name:
             The name of the column to be transformed.
-        transformer: Callable[[Row], Any]
+        transformer:
             The transformer to the given column
 
         Returns
