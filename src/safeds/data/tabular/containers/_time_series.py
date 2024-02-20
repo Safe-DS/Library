@@ -844,6 +844,12 @@ class TimeSeries(TaggedTable):
         Return a new `TimeSeries` with the provided column transformed by calling the provided transformer.
 
         The original time series is not modified.
+        Parameters
+        ----------
+        name : str
+            The name of the column to be transformed.
+        transformer: Callable[[Row], Any]
+            The transformer to the given column
 
         Returns
         -------
@@ -867,11 +873,16 @@ class TimeSeries(TaggedTable):
 
     def plot_lagplot(self, lag: int) -> Image:
         """
-        Plot a lagplot for target column.
+        Plot a lagplot for the target column.
+
+        Parameters
+        ----------
+        lag:
+            The amount of lag used to plot
 
         Returns
         -------
-        plot: Image
+        plot:
             The plot as an image.
 
         Raises
