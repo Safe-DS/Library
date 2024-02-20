@@ -94,7 +94,7 @@ class Column(Sequence[T]):
         ----------
         name : str
             The name of the column.
-        data : Sequence[T]
+        data : Sequence[T] | None
             The data. If None, an empty column is created.
 
         Examples
