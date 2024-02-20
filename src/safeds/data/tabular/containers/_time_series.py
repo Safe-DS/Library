@@ -870,7 +870,6 @@ class TimeSeries(TaggedTable):
             time_name=self.time.name,
         )
 
-
     def plot_lagplot(self, lag: int) -> Image:
         """
         Plot a lagplot for the target column.
@@ -890,8 +889,8 @@ class TimeSeries(TaggedTable):
         NonNumericColumnError
             If the time series targets contains non-numerical values.
 
-                Examples
-                --------
+        Examples
+        --------
                 >>> from safeds.data.tabular.containers import TimeSeries
                 >>> table = TimeSeries({"time":[1, 2], "target": [3, 4], "feature":[2,2]}, target_name= "target", time_name="time", feature_names=["feature"], )
                 >>> image = table.plot_lagplot(lag = 1)
