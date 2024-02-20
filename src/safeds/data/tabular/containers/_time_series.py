@@ -884,8 +884,8 @@ class TimeSeries(TaggedTable):
                 >>> from safeds.data.tabular.containers import TimeSeries
                 >>> table = TimeSeries({"time":[1, 2], "target": [3, 4]}, target_name= "target", time_name="time", feature_names=None, )
                 >>> image = table.plot_lag_plot(lag = 1)
-                """
-        Examples
+
+         Examples
         --------
         >>> from safeds.data.tabular.containers import TimeSeries
         >>> table = TimeSeries({"time":[1, 2], "target": [3, 4]}, target_name= "target", time_name="time")
