@@ -1,13 +1,19 @@
 from __future__ import annotations
 
+import io
 import sys
 from typing import TYPE_CHECKING
 
+import matplotlib.pyplot as plt
+import pandas as pd
+
+from safeds.data.image.containers import Image
 from safeds.data.tabular.containers import Column, Row, Table, TaggedTable
 from safeds.exceptions import (
     ColumnIsTargetError,
     ColumnIsTimeError,
     IllegalSchemaModificationError,
+    NonNumericColumnError,
     UnknownColumnNameError,
 )
 
@@ -839,6 +845,13 @@ class TimeSeries(TaggedTable):
 
         The original time series is not modified.
 
+        Parameters
+        ----------
+        name:
+            The name of the column to be transformed.
+        transformer:
+            The transformer to the given column
+
         Returns
         -------
         result : TimeSeries
@@ -857,3 +870,39 @@ class TimeSeries(TaggedTable):
             ),
             time_name=self.time.name,
         )
+
+    def plot_lagplot(self, lag: int) -> Image:
+        """
+        Plot a lagplot for the target column.
+
+        Parameters
+        ----------
+        lag:
+            The amount of lag used to plot
+
+        Returns
+        -------
+        plot:
+            The plot as an image.
+
+        Raises
+        ------
+        NonNumericColumnError
+            If the time series targets contains non-numerical values.
+
+        Examples
+        --------
+                >>> from safeds.data.tabular.containers import TimeSeries
+                >>> table = TimeSeries({"time":[1, 2], "target": [3, 4], "feature":[2,2]}, target_name= "target", time_name="time", feature_names=["feature"], )
+                >>> image = table.plot_lagplot(lag = 1)
+
+        """
+        if not self.target.type.is_numeric():
+            raise NonNumericColumnError("This time series target contains non-numerical columns.")
+        ax = pd.plotting.lag_plot(self.target._data, lag=lag)
+        fig = ax.figure
+        buffer = io.BytesIO()
+        fig.savefig(buffer, format="png")
+        plt.close()  # Prevents the figure from being displayed directly
+        buffer.seek(0)
+        return Image.from_bytes(buffer.read())
