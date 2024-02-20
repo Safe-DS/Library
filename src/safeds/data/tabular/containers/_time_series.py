@@ -10,10 +10,10 @@ import pandas as pd
 from safeds.data.image.containers import Image
 from safeds.data.tabular.containers import Column, Row, Table, TaggedTable
 from safeds.exceptions import (
-    NonNumericColumnError,
     ColumnIsTargetError,
     ColumnIsTimeError,
     IllegalSchemaModificationError,
+    NonNumericColumnError,
     UnknownColumnNameError,
 )
 
@@ -864,27 +864,26 @@ class TimeSeries(TaggedTable):
             time_name=self.time.name,
         )
 
-
     def plot_lagplot(self, lag: int) -> Image:
         """
-                Plot a lagplot for target column.
+        Plot a lagplot for target column.
 
-                Returns
-                -------
-                plot: Image
-                    The plot as an image.
+        Returns
+        -------
+        plot: Image
+            The plot as an image.
 
-                Raises
-                ------
-                NonNumericColumnError
-                    If the time series targets contains only non-numerical values.
+        Raises
+        ------
+        NonNumericColumnError
+            If the time series targets contains only non-numerical values.
 
-                Examples
-                --------
-                >>> from safeds.data.tabular.containers import TimeSeries
-                >>> table = TimeSeries({"time":[1, 2], "target": [3, 4]}, target_name= "target", time_name="time")
-                >>> image = table.plot_lag_plot(lag = 1)
-                """
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import TimeSeries
+        >>> table = TimeSeries({"time":[1, 2], "target": [3, 4]}, target_name= "target", time_name="time")
+        >>> image = table.plot_lag_plot(lag = 1)
+        """
         if not self.target.type.is_numeric():
             raise NonNumericColumnError("This time series target contains non-numerical columns.")
         ax = pd.plotting.lag_plot(self.target._data, lag=lag)
