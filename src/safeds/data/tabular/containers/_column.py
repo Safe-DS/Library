@@ -92,9 +92,9 @@ class Column(Sequence[T]):
 
         Parameters
         ----------
-        name:
+        name : str
             The name of the column.
-        data:
+        data : Sequence[T]
             The data. If None, an empty column is created.
 
         Examples
