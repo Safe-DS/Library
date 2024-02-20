@@ -844,6 +844,7 @@ class TimeSeries(TaggedTable):
         Return a new `TimeSeries` with the provided column transformed by calling the provided transformer.
 
         The original time series is not modified.
+
         Parameters
         ----------
         name:
