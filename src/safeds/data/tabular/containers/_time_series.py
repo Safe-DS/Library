@@ -906,6 +906,7 @@ class TimeSeries(TaggedTable):
         plt.close()  # Prevents the figure from being displayed directly
         buffer.seek(0)
         return Image.from_bytes(buffer.read())
+
     def plot_time_series(self) -> Image:
         """
         Plot the time series, which is the target column.
