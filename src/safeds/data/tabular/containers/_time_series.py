@@ -894,7 +894,7 @@ class TimeSeries(TaggedTable):
         --------
                 >>> from safeds.data.tabular.containers import TimeSeries
                 >>> table = TimeSeries({"time":[1, 2], "target": [3, 4], "feature":[2,2]}, target_name= "target", time_name="time", feature_names=["feature"], )
-                >>> image = table.plot_lagp_lot(lag = 1)
+                >>> image = table.plot_lag_plot(lag = 1)
 
         """
         if not self.target.type.is_numeric():
