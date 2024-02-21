@@ -906,7 +906,8 @@ class TimeSeries(TaggedTable):
         plt.close()  # Prevents the figure from being displayed directly
         buffer.seek(0)
         return Image.from_bytes(buffer.read())
-    def plot_moving_average(self, window_size : int) -> Image:
+
+    def plot_moving_average(self, window_size: int) -> Image:
         """
         Plot the moving average for the target column.
 
@@ -935,11 +936,10 @@ class TimeSeries(TaggedTable):
         if not self.target.type.is_numeric():
             raise NonNumericColumnError("This time series target contains non-numerical columns.")
 
-        #create moving average series
+        # create moving average series
         series = self.target._data.rolling(window_size).mean()
 
-
-        #plot both series and put them together
+        # plot both series and put them together
         ax_temp = self.target._data.plot()
         ax = series.plot(ax=ax_temp)
 
@@ -949,4 +949,3 @@ class TimeSeries(TaggedTable):
         plt.close()  # Prevents the figure from being displayed directly
         buffer.seek(0)
         return Image.from_bytes(buffer.read())
-
