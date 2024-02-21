@@ -871,7 +871,7 @@ class TimeSeries(TaggedTable):
             time_name=self.time.name,
         )
 
-    def plot_lagplot(self, lag: int) -> Image:
+    def plot_lag_plot(self, lag: int) -> Image:
         """
         Plot a lagplot for the target column.
 
@@ -906,3 +906,47 @@ class TimeSeries(TaggedTable):
         plt.close()  # Prevents the figure from being displayed directly
         buffer.seek(0)
         return Image.from_bytes(buffer.read())
+    def plot_moving_average(self, window_size : int) -> Image:
+        """
+        Plot the moving average for the target column.
+
+        Parameters
+        ----------
+        window_size:
+            The size of the windows, which the average gets calculated for
+
+        Returns
+        -------
+        plot:
+            The moving avereage plot and the normal plot as an image.
+
+        Raises
+        ------
+        NonNumericColumnError
+            If the time series targets contains non-numerical values.
+
+        Examples
+        --------
+                >>> from safeds.data.tabular.containers import TimeSeries
+                >>> table = TimeSeries({"time":[1, 2], "target": [3, 4], "feature":[2,2]}, target_name= "target", time_name="time", feature_names=["feature"], )
+                >>> image = table.plot_moving_average(window_size = 2)
+
+        """
+        if not self.target.type.is_numeric():
+            raise NonNumericColumnError("This time series target contains non-numerical columns.")
+
+        #create moving average series
+        series = self.target._data.rolling(window_size).mean()
+
+
+        #plot both series and put them together
+        ax_temp = self.target._data.plot()
+        ax = series.plot(ax=ax_temp)
+
+        fig = ax.figure
+        buffer = io.BytesIO()
+        fig.savefig(buffer, format="png")
+        plt.close()  # Prevents the figure from being displayed directly
+        buffer.seek(0)
+        return Image.from_bytes(buffer.read())
+

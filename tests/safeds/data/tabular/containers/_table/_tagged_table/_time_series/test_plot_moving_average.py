@@ -9,14 +9,14 @@ def test_should_return_table(snapshot_png: SnapshotAssertion) -> None:
         {
             "time": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
             "feature_1": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-            "target": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+            "target": [1, 2, 3, 4, 3, 2, 1, 2, 3, 4],
         },
         target_name="target",
         time_name="time",
         feature_names=None,
     )
-    lag_plot = table.plot_lagplot(lag=1)
-    assert lag_plot == snapshot_png
+    moving_average_plot = table.plot_moving_average(window_size=2)
+    assert moving_average_plot == snapshot_png
 
 
 def test_should_raise_if_column_contains_non_numerical_values() -> None:
@@ -38,4 +38,4 @@ def test_should_raise_if_column_contains_non_numerical_values() -> None:
             r" non-numerical columns."
         ),
     ):
-        table.plot_lagplot(2)
+        table.plot_moving_average(2)
