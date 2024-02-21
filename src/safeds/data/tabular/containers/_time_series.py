@@ -906,3 +906,36 @@ class TimeSeries(TaggedTable):
         plt.close()  # Prevents the figure from being displayed directly
         buffer.seek(0)
         return Image.from_bytes(buffer.read())
+    def plot_time_series(self) -> Image:
+        """
+        Plot the time series, which is the target column.
+
+        Parameters
+        ----------
+
+        Returns
+        -------
+        plot:
+            The plot as an image.
+
+        Raises
+        ------
+        NonNumericColumnError
+            If the time series targets contains non-numerical values.
+
+        Examples
+        --------
+                >>> from safeds.data.tabular.containers import TimeSeries
+                >>> table = TimeSeries({"time":[1, 2], "target": [3, 4], "feature":[2,2]}, target_name= "target", time_name="time", feature_names=["feature"], )
+                >>> image = table.plot_time_series()
+
+        """
+        if not self.target.type.is_numeric():
+            raise NonNumericColumnError("This time series target contains non-numerical columns.")
+        ax = self.target._data.plot()
+        fig = ax.figure
+        buffer = io.BytesIO()
+        fig.savefig(buffer, format="png")
+        plt.close()  # Prevents the figure from being displayed directly
+        buffer.seek(0)
+        return Image.from_bytes(buffer.read())
