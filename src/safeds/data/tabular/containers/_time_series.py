@@ -910,9 +910,6 @@ class TimeSeries(TaggedTable):
         """
         Plot the time series, which is the target column.
 
-        Parameters
-        ----------
-
         Returns
         -------
         plot:
