@@ -97,7 +97,10 @@ def test_should_raise_if_column_contains_non_numerical_values() -> None:
     ids=["feature_not_numerical", "feature_does_not_exist"],
 )
 def test_should_raise_error_optional_parameter(
-    time_series: TimeSeries, name: str, error: type[Exception], error_msg: str,
+    time_series: TimeSeries,
+    name: str,
+    error: type[Exception],
+    error_msg: str,
 ) -> None:
     with pytest.raises(
         error,
