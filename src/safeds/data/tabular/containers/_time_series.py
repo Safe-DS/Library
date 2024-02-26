@@ -907,7 +907,11 @@ class TimeSeries(TaggedTable):
         buffer.seek(0)
         return Image.from_bytes(buffer.read())
 
-    def plot_moving_average(self, window_size: int, feature_name: str | None = None, ) -> Image:
+    def plot_moving_average(
+        self,
+        window_size: int,
+        feature_name: str | None = None,
+    ) -> Image:
         """
         Plot the moving average for the target column.
 
@@ -939,7 +943,6 @@ class TimeSeries(TaggedTable):
                 >>> image = table.plot_moving_average(window_size = 2)
 
         """
-
         if feature_name is None or feature_name == self.target.name:
             series = self.target._data
             feature_name = self.target.name
@@ -956,7 +959,7 @@ class TimeSeries(TaggedTable):
         # plot both series and put them together
         ax_temp = series_mvg.plot()
         ax = series.plot(ax=ax_temp)
-        ax.legend(labels = ["moving_average", feature_name])
+        ax.legend(labels=["moving_average", feature_name])
 
         fig = ax.figure
         buffer = io.BytesIO()

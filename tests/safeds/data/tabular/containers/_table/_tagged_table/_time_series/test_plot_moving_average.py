@@ -48,7 +48,8 @@ def test_should_raise_if_column_contains_non_numerical_values() -> None:
     with pytest.raises(
         NonNumericColumnError,
         match=(
-            r"Tried to do a numerical operation on one or multiple non-numerical columns: \nThis time series plotted column"
+            r"Tried to do a numerical operation on one or multiple non-numerical columns: \nThis time series plotted"
+            r" column"
             r" contains"
             r" non-numerical columns."
         ),
@@ -72,7 +73,8 @@ def test_should_raise_if_column_contains_non_numerical_values() -> None:
             ),
             "feature_1",
             NonNumericColumnError,
-            r"Tried to do a numerical operation on one or multiple non-numerical columns: \nThis time series plotted column"
+            r"Tried to do a numerical operation on one or multiple non-numerical columns: \nThis time series plotted"
+            r" column"
             r" contains"
             r" non-numerical columns.",
         ),
@@ -92,9 +94,11 @@ def test_should_raise_if_column_contains_non_numerical_values() -> None:
             r"Could not find column\(s\) 'feature_3'.",
         ),
     ],
-    ids=["feature_not_numerical", "feature_does_not_exist"]
+    ids=["feature_not_numerical", "feature_does_not_exist"],
 )
-def test_should_raise_error_optional_parameter(time_series: TimeSeries, name: str, error: type[Exception], error_msg: str) -> None:
+def test_should_raise_error_optional_parameter(
+    time_series: TimeSeries, name: str, error: type[Exception], error_msg: str,
+) -> None:
     with pytest.raises(
         error,
         match=error_msg,
