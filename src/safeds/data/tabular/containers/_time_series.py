@@ -907,7 +907,7 @@ class TimeSeries(TaggedTable):
         buffer.seek(0)
         return Image.from_bytes(buffer.read())
 
-    def plot_moving_average(self, window_size: int) -> Image:
+    def plot_moving_average(self, window_size: int, feature_name: str | None = None, ) -> Image:
         """
         Plot the moving average for the target column.
 
@@ -915,6 +915,9 @@ class TimeSeries(TaggedTable):
         ----------
         window_size:
             The size of the windows, which the average gets calculated for
+
+        feature_name:
+            The name of the column which will be used to calculate the moving average, if None the target column will be taken
 
         Returns
         -------
@@ -926,6 +929,9 @@ class TimeSeries(TaggedTable):
         NonNumericColumnError
             If the time series targets contains non-numerical values.
 
+        UnknownColumnNameError
+            If the time series doesn't contain the given column name
+
         Examples
         --------
                 >>> from safeds.data.tabular.containers import TimeSeries
@@ -933,15 +939,24 @@ class TimeSeries(TaggedTable):
                 >>> image = table.plot_moving_average(window_size = 2)
 
         """
-        if not self.target.type.is_numeric():
-            raise NonNumericColumnError("This time series target contains non-numerical columns.")
+
+        if feature_name is None or feature_name == self.target.name:
+            series = self.target._data
+            feature_name = self.target.name
+        else:
+            if feature_name not in self.column_names:
+                raise UnknownColumnNameError([feature_name])
+            series = self._data[feature_name]
+        if not self.get_column(feature_name).type.is_numeric():
+            raise NonNumericColumnError("This time series plotted column contains non-numerical columns.")
 
         # create moving average series
-        series = self.target._data.rolling(window_size).mean()
+        series_mvg = series.rolling(window_size).mean()
 
         # plot both series and put them together
-        ax_temp = self.target._data.plot()
+        ax_temp = series_mvg.plot()
         ax = series.plot(ax=ax_temp)
+        ax.legend(labels = ["moving_average", feature_name])
 
         fig = ax.figure
         buffer = io.BytesIO()
