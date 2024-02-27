@@ -122,7 +122,7 @@ def test_should_raise_if_column_contains_non_numerical_values() -> None:
             r" non-numerical columns."
         ),
     ):
-        table.plot_time_series_lineplot( x_column_name="target")
+        table.plot_time_series_lineplot(x_column_name="target")
 
 
 @pytest.mark.parametrize(
@@ -227,6 +227,8 @@ def test_should_raise_error_optional_parameter_y(
         match=error_msg,
     ):
         time_series.plot_time_series_lineplot(y_column_name=name)
+
+
 def test_should_raise_if_column_does_not_exist_x() -> None:
     table = TimeSeries(
         {
@@ -240,11 +242,10 @@ def test_should_raise_if_column_does_not_exist_x() -> None:
     )
     with pytest.raises(
         UnknownColumnNameError,
-        match=(
-            "Could not find column\(s\) '2'."
-        ),
+        match=r"Could not find column\(s\) '2'.",
     ):
-        table.plot_time_series_lineplot( x_column_name="target", y_column_name="2")
+        table.plot_time_series_lineplot(x_column_name="target", y_column_name="2")
+
 
 def test_should_raise_if_column_does_not_exist_y() -> None:
     table = TimeSeries(
@@ -259,8 +260,6 @@ def test_should_raise_if_column_does_not_exist_y() -> None:
     )
     with pytest.raises(
         UnknownColumnNameError,
-        match=(
-            "Could not find column\(s\) '2'."
-        ),
+        match=r"Could not find column\(s\) '2'.",
     ):
-        table.plot_time_series_lineplot( x_column_name="2", y_column_name="target")
+        table.plot_time_series_lineplot(x_column_name="2", y_column_name="target")
