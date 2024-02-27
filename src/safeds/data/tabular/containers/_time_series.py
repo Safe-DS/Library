@@ -907,7 +907,7 @@ class TimeSeries(TaggedTable):
         buffer.seek(0)
         return Image.from_bytes(buffer.read())
 
-    def plot_time_series(self) -> Image:
+    def plot_time_series(self, feature_name: str | None = None,) -> Image:
         """
         Plot the time series, which is the target column.
 
@@ -928,9 +928,18 @@ class TimeSeries(TaggedTable):
                 >>> image = table.plot_time_series()
 
         """
-        if not self.target.type.is_numeric():
-            raise NonNumericColumnError("This time series target contains non-numerical columns.")
-        ax = self.target._data.plot()
+        if feature_name is None or feature_name == self.target.name:
+            series = self.target._data
+            feature_name = self.target.name
+        else:
+            if feature_name not in self.column_names:
+                raise UnknownColumnNameError([feature_name])
+            series = self._data[feature_name]
+        if not self.get_column(feature_name).type.is_numeric():
+            raise NonNumericColumnError("The time series plotted column contains non-numerical columns.")
+
+        ax = series.plot()
+        ax.legend(labels=[feature_name])
         fig = ax.figure
         buffer = io.BytesIO()
         fig.savefig(buffer, format="png")
