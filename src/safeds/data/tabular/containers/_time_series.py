@@ -948,20 +948,14 @@ class TimeSeries(TaggedTable):
         self._data.index.name = "index"
         if y_column_name is None:
             y_column_name = self.target.name
+        else:
+            if y_column_name not in self._data.columns:
+                raise UnknownColumnNameError([y_column_name])
         if x_column_name is None:
             x_column_name = "index"
         else:
-            if not self.get_column(x_column_name).type.is_numeric():
-                raise NonNumericColumnError("The time series plotted column contains non-numerical columns.")
-            if not self.has_column(x_column_name) or not self.has_column(y_column_name):
-                similar_columns_x = self._get_similar_columns(x_column_name)
-                similar_columns_y = self._get_similar_columns(y_column_name)
-                raise UnknownColumnNameError(
-                    ([x_column_name] if not self.has_column(x_column_name) else [])
-                    + ([y_column_name] if not self.has_column(y_column_name) else []),
-                    (similar_columns_x if not self.has_column(x_column_name) else [])
-                    + (similar_columns_y if not self.has_column(y_column_name) else []),
-                )
+            if x_column_name not in self._data.columns:
+                raise UnknownColumnNameError([x_column_name])
         if not self.get_column(y_column_name).type.is_numeric():
             raise NonNumericColumnError("The time series plotted column contains non-numerical columns.")
 
@@ -1029,20 +1023,14 @@ class TimeSeries(TaggedTable):
         self._data.index.name = "index"
         if y_column_name is None:
             y_column_name = self.target.name
+        else:
+            if y_column_name not in self._data.columns:
+                raise UnknownColumnNameError([y_column_name])
         if x_column_name is None:
             x_column_name = "index"
         else:
-            if not self.get_column(x_column_name).type.is_numeric():
-                raise NonNumericColumnError("The time series plotted column contains non-numerical columns.")
-            if not self.has_column(x_column_name) or not self.has_column(y_column_name):
-                similar_columns_x = self._get_similar_columns(x_column_name)
-                similar_columns_y = self._get_similar_columns(y_column_name)
-                raise UnknownColumnNameError(
-                    ([x_column_name] if not self.has_column(x_column_name) else [])
-                    + ([y_column_name] if not self.has_column(y_column_name) else []),
-                    (similar_columns_x if not self.has_column(x_column_name) else [])
-                    + (similar_columns_y if not self.has_column(y_column_name) else []),
-                )
+            if x_column_name not in self._data.columns:
+                raise UnknownColumnNameError([x_column_name])
         if not self.get_column(y_column_name).type.is_numeric():
             raise NonNumericColumnError("The time series plotted column contains non-numerical columns.")
 
