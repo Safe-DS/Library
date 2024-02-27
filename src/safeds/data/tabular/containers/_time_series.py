@@ -928,7 +928,7 @@ class TimeSeries(TaggedTable):
         --------
                 >>> from safeds.data.tabular.containers import TimeSeries
                 >>> table = TimeSeries({"time":[1, 2], "target": [3, 4], "feature":[2,2]}, target_name= "target", time_name="time", feature_names=["feature"], )
-                >>> image = table.plot_time_series()
+                >>> image = table.plot_time_series_line_plot()
 
         """
         if feature_name is None or feature_name == self.target.name:
@@ -942,6 +942,46 @@ class TimeSeries(TaggedTable):
             raise NonNumericColumnError("The time series plotted column contains non-numerical columns.")
 
         ax = series.plot()
+        ax.legend(labels=[feature_name])
+        fig = ax.figure
+        buffer = io.BytesIO()
+        fig.savefig(buffer, format="png")
+        plt.close()  # Prevents the figure from being displayed directly
+        buffer.seek(0)
+        return Image.from_bytes(buffer.read())
+    def plot_time_series_scatter_plot(self, feature_name: str | None = None,) -> Image:
+        """
+        Plots the time series target or the given column as scatter plot.
+
+        Returns
+        -------
+        plot:
+            The plot as an image.
+
+        Raises
+        ------
+        NonNumericColumnError
+            If the time series targets contains non-numerical values.
+
+        Examples
+        --------
+                >>> from safeds.data.tabular.containers import TimeSeries
+                >>> table = TimeSeries({"time":[1, 2], "target": [3, 4], "feature":[2,2]}, target_name= "target", time_name="time", feature_names=["feature"], )
+                >>> image = table.plot_time_series_scatter_plot()
+
+        """
+        if feature_name is None or feature_name == self.target.name:
+            series = self.target._data
+            feature_name = self.target.name
+        else:
+            if feature_name not in self.column_names:
+                raise UnknownColumnNameError([feature_name])
+            series = self._data[feature_name]
+        if not self.get_column(feature_name).type.is_numeric():
+            raise NonNumericColumnError("The time series plotted column contains non-numerical columns.")
+
+        fig, ax = plt.subplots()
+        ax.scatter(series.index, series.values)
         ax.legend(labels=[feature_name])
         fig = ax.figure
         buffer = io.BytesIO()
