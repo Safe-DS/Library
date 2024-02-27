@@ -752,8 +752,8 @@ class TimeSeries(TaggedTable):
                         self.features.column_names
                         if old_column_name not in self.features.column_names
                         else self.features.column_names[: self.features.column_names.index(old_column_name)]
-                        + [col.name for col in new_columns]
-                        + self.features.column_names[self.features.column_names.index(old_column_name) + 1 :]
+                             + [col.name for col in new_columns]
+                             + self.features.column_names[self.features.column_names.index(old_column_name) + 1:]
                     ),
                 ),
                 time_name=self.time.name,
@@ -801,7 +801,7 @@ class TimeSeries(TaggedTable):
     def sort_columns(
         self,
         comparator: Callable[[Column, Column], int] = lambda col1, col2: (col1.name > col2.name)
-        - (col1.name < col2.name),
+                                                                         - (col1.name < col2.name),
     ) -> TimeSeries:
         """
         Sort the columns of a `TimeSeries` with the given comparator and return a new `TimeSeries`.
@@ -944,16 +944,23 @@ class TimeSeries(TaggedTable):
 
         """
         self._data.index.name = "index"
+        # falls mitgegebene column kein numerical column ist
+        if x_column_name is not None:
+            if not self.get_column(x_column_name).type.is_numeric():
+                raise NonNumericColumnError("The time series plotted column contains non-numerical columns.")
+
         if y_column_name is None:
             y_column_name = self.target.name
-        else:
-            if y_column_name not in self._data.columns:
-                raise UnknownColumnNameError([y_column_name])
+
+        elif y_column_name not in self._data.columns:
+            raise UnknownColumnNameError([y_column_name])
+
         if x_column_name is None:
             x_column_name = "index"
-        else:
-            if x_column_name not in self._data.columns:
-                raise UnknownColumnNameError([x_column_name])
+
+        elif x_column_name not in self._data.columns:
+            raise UnknownColumnNameError([x_column_name])
+
         if not self.get_column(y_column_name).type.is_numeric():
             raise NonNumericColumnError("The time series plotted column contains non-numerical columns.")
 
@@ -1018,16 +1025,18 @@ class TimeSeries(TaggedTable):
 
         """
         self._data.index.name = "index"
+        if x_column_name is not None:
+            if not self.get_column(x_column_name).type.is_numeric():
+                raise NonNumericColumnError("The time series plotted column contains non-numerical columns.")
         if y_column_name is None:
             y_column_name = self.target.name
-        else:
-            if y_column_name not in self._data.columns:
-                raise UnknownColumnNameError([y_column_name])
+        elif y_column_name not in self._data.columns:
+            raise UnknownColumnNameError([y_column_name])
         if x_column_name is None:
             x_column_name = "index"
-        else:
-            if x_column_name not in self._data.columns:
-                raise UnknownColumnNameError([x_column_name])
+
+        elif x_column_name not in self._data.columns:
+            raise UnknownColumnNameError([x_column_name])
         if not self.get_column(y_column_name).type.is_numeric():
             raise NonNumericColumnError("The time series plotted column contains non-numerical columns.")
 
