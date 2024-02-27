@@ -949,7 +949,11 @@ class TimeSeries(TaggedTable):
         plt.close()  # Prevents the figure from being displayed directly
         buffer.seek(0)
         return Image.from_bytes(buffer.read())
-    def plot_time_series_scatter_plot(self, feature_name: str | None = None,) -> Image:
+
+    def plot_time_series_scatter_plot(
+        self,
+        feature_name: str | None = None,
+    ) -> Image:
         """
         Plot the time series target or the given column as scatter plot.
 
