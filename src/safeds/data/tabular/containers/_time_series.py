@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING
 
 import matplotlib.pyplot as plt
 import pandas as pd
+import seaborn as sns
 
 from safeds.data.image.containers import Image
 from safeds.data.tabular.containers import Column, Row, Table, TaggedTable
@@ -36,7 +37,7 @@ class TimeSeries(TaggedTable):
 
         Parameters
         ----------
-        table : TaggedTable
+        tagged_table: TaggedTable
             The tagged table.
         time_name: str
             Name of the time column.
@@ -751,8 +752,8 @@ class TimeSeries(TaggedTable):
                         self.features.column_names
                         if old_column_name not in self.features.column_names
                         else self.features.column_names[: self.features.column_names.index(old_column_name)]
-                        + [col.name for col in new_columns]
-                        + self.features.column_names[self.features.column_names.index(old_column_name) + 1 :]
+                             + [col.name for col in new_columns]
+                             + self.features.column_names[self.features.column_names.index(old_column_name) + 1:]
                     ),
                 ),
                 time_name=self.time.name,
@@ -800,7 +801,7 @@ class TimeSeries(TaggedTable):
     def sort_columns(
         self,
         comparator: Callable[[Column, Column], int] = lambda col1, col2: (col1.name > col2.name)
-        - (col1.name < col2.name),
+                                                                         - (col1.name < col2.name),
     ) -> TimeSeries:
         """
         Sort the columns of a `TimeSeries` with the given comparator and return a new `TimeSeries`.
@@ -907,12 +908,20 @@ class TimeSeries(TaggedTable):
         buffer.seek(0)
         return Image.from_bytes(buffer.read())
 
-    def plot_time_series_line_plot(
-        self,
-        feature_name: str | None = None,
-    ) -> Image:
+    def plot_time_series_lineplot(self, y_column_name: str | None = None,
+                                      x_column_name: str | None = None) -> Image:
         """
-        Plot the time series, which is the target column.
+
+        Plot the time series target or the given column(s) as line plot.
+        The function will take the target column as the default value for x_column_name and a time dummy column as the
+        default value for y_column_name.
+
+        Parameters
+        ----------
+        x_column_name : str
+            The column name of the column to be plotted on the x-Axis.
+        y_column_name : str
+            The column name of the column to be plotted on the y-Axis.
 
         Returns
         -------
@@ -922,36 +931,73 @@ class TimeSeries(TaggedTable):
         Raises
         ------
         NonNumericColumnError
-            If the time series targets contains non-numerical values.
+            If the time series given columns contain non-numerical values.
+
+        UnknownColumnNameError
+            If one of the given names does not exist in the table
 
         Examples
         --------
                 >>> from safeds.data.tabular.containers import TimeSeries
                 >>> table = TimeSeries({"time":[1, 2], "target": [3, 4], "feature":[2,2]}, target_name= "target", time_name="time", feature_names=["feature"], )
-                >>> image = table.plot_time_series_line_plot()
+                >>> image = table.plot_time_series_lineplot()
 
         """
-        if feature_name is None or feature_name == self.target.name:
-            series = self.target._data
-            feature_name = self.target.name
+        self._data.index.name = "index"
+        if y_column_name is None:
+            y_column_name = self.target.name
+        if x_column_name is None:
+            x_column_name = "index"
         else:
-            if feature_name not in self.column_names:
-                raise UnknownColumnNameError([feature_name])
-            series = self._data[feature_name]
-        if not self.get_column(feature_name).type.is_numeric():
+            if not self.get_column(x_column_name).type.is_numeric():
+                raise NonNumericColumnError("The time series plotted column contains non-numerical columns.")
+            if not self.has_column(x_column_name) or not self.has_column(y_column_name):
+                similar_columns_x = self._get_similar_columns(x_column_name)
+                similar_columns_y = self._get_similar_columns(y_column_name)
+                raise UnknownColumnNameError(
+                    ([x_column_name] if not self.has_column(x_column_name) else [])
+                    + ([y_column_name] if not self.has_column(y_column_name) else []),
+                    (similar_columns_x if not self.has_column(x_column_name) else [])
+                    + (similar_columns_y if not self.has_column(y_column_name) else []),
+                )
+        if not self.get_column(y_column_name).type.is_numeric():
             raise NonNumericColumnError("The time series plotted column contains non-numerical columns.")
 
-        ax = series.plot()
-        ax.legend(labels=[feature_name])
-        fig = ax.figure
+        fig = plt.figure()
+        ax = sns.lineplot(
+            data=self._data,
+            x=x_column_name,
+            y=y_column_name,
+        )
+        ax.set(xlabel=x_column_name, ylabel=y_column_name)
+        ax.set_xticks(ax.get_xticks())
+        ax.set_xticklabels(
+            ax.get_xticklabels(),
+            rotation=45,
+            horizontalalignment="right",
+        )  # rotate the labels of the x Axis to prevent the chance of overlapping of the labels
+        plt.tight_layout()
+
         buffer = io.BytesIO()
         fig.savefig(buffer, format="png")
         plt.close()  # Prevents the figure from being displayed directly
         buffer.seek(0)
+        self._data.reset_index(inplace=True)
         return Image.from_bytes(buffer.read())
-    def plot_time_series_scatter_plot(self, feature_name: str | None = None,) -> Image:
+
+    def plot_time_series_scatterplot(self, y_column_name: str | None = None, x_column_name: str | None = None) -> Image:
+
         """
-        Plot the time series target or the given column as scatter plot.
+        Plot the time series target or the given column(s) as scatter plot.
+        The function will take the target column as the default value for x_column_name and a time dummy column as the
+        default value for y_column_name.
+
+        Parameters
+        ----------
+        x_column_name : str
+            The column name of the column to be plotted on the x-Axis.
+        y_column_name : str
+            The column name of the column to be plotted on the y-Axis.
 
         Returns
         -------
@@ -961,31 +1007,56 @@ class TimeSeries(TaggedTable):
         Raises
         ------
         NonNumericColumnError
-            If the time series targets contains non-numerical values.
+            If the time series given columns contain non-numerical values.
+
+        UnknownColumnNameError
+            If one of the given names does not exist in the table
 
         Examples
         --------
                 >>> from safeds.data.tabular.containers import TimeSeries
                 >>> table = TimeSeries({"time":[1, 2], "target": [3, 4], "feature":[2,2]}, target_name= "target", time_name="time", feature_names=["feature"], )
-                >>> image = table.plot_time_series_scatter_plot()
+                >>> image = table.plot_time_series_scatterplot()
 
         """
-        if feature_name is None or feature_name == self.target.name:
-            series = self.target._data
-            feature_name = self.target.name
+        self._data.index.name = "index"
+        if y_column_name is None:
+            y_column_name = self.target.name
+        if x_column_name is None:
+            x_column_name = "index"
         else:
-            if feature_name not in self.column_names:
-                raise UnknownColumnNameError([feature_name])
-            series = self._data[feature_name]
-        if not self.get_column(feature_name).type.is_numeric():
+            if not self.get_column(x_column_name).type.is_numeric():
+                raise NonNumericColumnError("The time series plotted column contains non-numerical columns.")
+            if not self.has_column(x_column_name) or not self.has_column(y_column_name):
+                similar_columns_x = self._get_similar_columns(x_column_name)
+                similar_columns_y = self._get_similar_columns(y_column_name)
+                raise UnknownColumnNameError(
+                    ([x_column_name] if not self.has_column(x_column_name) else [])
+                    + ([y_column_name] if not self.has_column(y_column_name) else []),
+                    (similar_columns_x if not self.has_column(x_column_name) else [])
+                    + (similar_columns_y if not self.has_column(y_column_name) else []),
+                )
+        if not self.get_column(y_column_name).type.is_numeric():
             raise NonNumericColumnError("The time series plotted column contains non-numerical columns.")
 
-        fig, ax = plt.subplots()
-        ax.scatter(series.index, series.values)
-        ax.legend(labels=[feature_name])
-        fig = ax.figure
+        fig = plt.figure()
+        ax = sns.scatterplot(
+            data=self._data,
+            x=x_column_name,
+            y=y_column_name,
+        )
+        ax.set(xlabel=x_column_name, ylabel=y_column_name)
+        ax.set_xticks(ax.get_xticks())
+        ax.set_xticklabels(
+            ax.get_xticklabels(),
+            rotation=45,
+            horizontalalignment="right",
+        )  # rotate the labels of the x Axis to prevent the chance of overlapping of the labels
+        plt.tight_layout()
+
         buffer = io.BytesIO()
         fig.savefig(buffer, format="png")
         plt.close()  # Prevents the figure from being displayed directly
         buffer.seek(0)
+        self._data.reset_index(inplace=True)
         return Image.from_bytes(buffer.read())
