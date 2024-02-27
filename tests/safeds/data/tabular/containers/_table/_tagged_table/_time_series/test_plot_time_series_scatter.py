@@ -32,6 +32,8 @@ def test_should_plot_feature(snapshot_png: SnapshotAssertion) -> None:
     )
     plot = table.plot_time_series_scatterplot(y_column_name="feature_1")
     assert plot == snapshot_png
+
+
 def test_should_plot_feature_only_x(snapshot_png: SnapshotAssertion) -> None:
     table = TimeSeries(
         {
@@ -45,6 +47,8 @@ def test_should_plot_feature_only_x(snapshot_png: SnapshotAssertion) -> None:
     )
     plot = table.plot_time_series_scatterplot(x_column_name="feature_1")
     assert plot == snapshot_png
+
+
 def test_should_plot_feature_only_y_optional(snapshot_png: SnapshotAssertion) -> None:
     table = TimeSeries(
         {
@@ -58,6 +62,8 @@ def test_should_plot_feature_only_y_optional(snapshot_png: SnapshotAssertion) ->
     )
     plot = table.plot_time_series_scatterplot(y_column_name="feature_1")
     assert plot == snapshot_png
+
+
 def test_should_plot_feature_both_set(snapshot_png: SnapshotAssertion) -> None:
     table = TimeSeries(
         {
@@ -69,8 +75,9 @@ def test_should_plot_feature_both_set(snapshot_png: SnapshotAssertion) -> None:
         time_name="time",
         feature_names=None,
     )
-    plot = table.plot_time_series_scatterplot(x_column_name="feature_1",y_column_name="target")
+    plot = table.plot_time_series_scatterplot(x_column_name="feature_1", y_column_name="target")
     assert plot == snapshot_png
+
 
 def test_should_raise_if_column_contains_non_numerical_values() -> None:
     table = TimeSeries(
@@ -86,7 +93,8 @@ def test_should_raise_if_column_contains_non_numerical_values() -> None:
     with pytest.raises(
         NonNumericColumnError,
         match=(
-            r"Tried to do a numerical operation on one or multiple non-numerical columns: \nThe time series plotted column"
+            r"Tried to do a numerical operation on one or multiple non-numerical columns: \nThe time series plotted"
+            r" column"
             r" contains"
             r" non-numerical columns."
         ),
