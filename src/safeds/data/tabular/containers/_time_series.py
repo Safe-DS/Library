@@ -752,8 +752,8 @@ class TimeSeries(TaggedTable):
                         self.features.column_names
                         if old_column_name not in self.features.column_names
                         else self.features.column_names[: self.features.column_names.index(old_column_name)]
-                             + [col.name for col in new_columns]
-                             + self.features.column_names[self.features.column_names.index(old_column_name) + 1:]
+                        + [col.name for col in new_columns]
+                        + self.features.column_names[self.features.column_names.index(old_column_name) + 1 :]
                     ),
                 ),
                 time_name=self.time.name,
@@ -910,6 +910,7 @@ class TimeSeries(TaggedTable):
 
     def plot_time_series_lineplot(self, y_column_name: str | None = None,
                                       x_column_name: str | None = None) -> Image:
+
         """
 
         Plot the time series target or the given column(s) as line plot.
@@ -982,10 +983,14 @@ class TimeSeries(TaggedTable):
         fig.savefig(buffer, format="png")
         plt.close()  # Prevents the figure from being displayed directly
         buffer.seek(0)
-        self._data.reset_index(inplace=True)
+        self._data = self._data.reset_index()
         return Image.from_bytes(buffer.read())
 
-    def plot_time_series_scatterplot(self, y_column_name: str | None = None, x_column_name: str | None = None) -> Image:
+    def plot_time_series_scatterplot(
+        self,
+        x_column_name: str | None = None,
+        y_column_name:str | None = None,
+    ) -> Image:
 
         """
         Plot the time series target or the given column(s) as scatter plot.
@@ -1058,5 +1063,5 @@ class TimeSeries(TaggedTable):
         fig.savefig(buffer, format="png")
         plt.close()  # Prevents the figure from being displayed directly
         buffer.seek(0)
-        self._data.reset_index(inplace=True)
+        self._data = self._data.reset_index()
         return Image.from_bytes(buffer.read())

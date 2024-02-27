@@ -94,7 +94,7 @@ def test_should_raise_if_column_contains_non_numerical_values() -> None:
         table.plot_time_series_scatterplot(y_column_name="feature_1")
 
 
-def test_should_raise_if_column_contains_non_numerical_values() -> None:
+def test_should_raise_if_column_contains_non_numerical_values_x() -> None:
     table = TimeSeries(
         {
             "time": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
@@ -114,7 +114,7 @@ def test_should_raise_if_column_contains_non_numerical_values() -> None:
             r" non-numerical columns."
         ),
     ):
-        table.plot_time_series_scatterplot()
+        table.plot_time_series_scatterplot(x_column_name="feature_1")
 
 
 @pytest.mark.parametrize(

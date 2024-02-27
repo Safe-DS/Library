@@ -18,6 +18,50 @@ def test_should_return_table(snapshot_png: SnapshotAssertion) -> None:
     plot = table.plot_time_series_lineplot()
     assert plot == snapshot_png
 
+def test_should_raise_if_column_contains_non_numerical_values_x() -> None:
+    table = TimeSeries(
+        {
+            "time": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+            "feature_1": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
+            "target": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+        },
+        target_name="target",
+        time_name="time",
+        feature_names=None,
+    )
+    with pytest.raises(
+        NonNumericColumnError,
+        match=(
+            r"Tried to do a numerical operation on one or multiple non-numerical columns: \nThe time series plotted column"
+            r" contains"
+            r" non-numerical columns."
+        ),
+    ):
+        table.plot_time_series_lineplot(y_column_name="feature_1")
+
+
+def test_should_raise_if_column_contains_non_numerical_values_x() -> None:
+    table = TimeSeries(
+        {
+            "time": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+            "feature_1": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+            "target": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
+        },
+        target_name="target",
+        time_name="time",
+        feature_names=None,
+    )
+    with pytest.raises(
+        NonNumericColumnError,
+        match=(
+            r"Tried to do a numerical operation on one or multiple non-numerical columns: \nThe time series plotted"
+            r" column"
+            r" contains"
+            r" non-numerical columns."
+        ),
+    ):
+        table.plot_time_series_lineplot(x_column_name="feature_1")
+
 def test_should_return_table_both(snapshot_png: SnapshotAssertion) -> None:
     table = TimeSeries(
         {
