@@ -17,6 +17,8 @@ def test_should_return_table(snapshot_png: SnapshotAssertion) -> None:
     )
     plot = table.plot_time_series_scatterplot()
     assert plot == snapshot_png
+
+
 def test_should_plot_feature(snapshot_png: SnapshotAssertion) -> None:
     table = TimeSeries(
         {
@@ -91,6 +93,7 @@ def test_should_raise_if_column_contains_non_numerical_values() -> None:
     ):
         table.plot_time_series_scatterplot(y_column_name="feature_1")
 
+
 def test_should_raise_if_column_contains_non_numerical_values() -> None:
     table = TimeSeries(
         {
@@ -105,12 +108,14 @@ def test_should_raise_if_column_contains_non_numerical_values() -> None:
     with pytest.raises(
         NonNumericColumnError,
         match=(
-            r"Tried to do a numerical operation on one or multiple non-numerical columns: \nThe time series plotted column"
+            r"Tried to do a numerical operation on one or multiple non-numerical columns: \nThe time series plotted"
+            r" column"
             r" contains"
             r" non-numerical columns."
         ),
     ):
         table.plot_time_series_scatterplot()
+
 
 @pytest.mark.parametrize(
     ("time_series", "name", "error", "error_msg"),
