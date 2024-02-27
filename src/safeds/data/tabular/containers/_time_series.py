@@ -907,12 +907,12 @@ class TimeSeries(TaggedTable):
         buffer.seek(0)
         return Image.from_bytes(buffer.read())
 
-    def plot_time_series(
+    def plot_time_series_line_plot(
         self,
         feature_name: str | None = None,
     ) -> Image:
         """
-        Plot the time series, which is the target column.
+        Plots the time series, which is the target column.
 
         Returns
         -------
