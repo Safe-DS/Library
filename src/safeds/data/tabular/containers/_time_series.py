@@ -914,6 +914,7 @@ class TimeSeries(TaggedTable):
         """
 
         Plot the time series target or the given column(s) as line plot.
+
         The function will take the target column as the default value for x_column_name and a time dummy column as the
         default value for y_column_name.
 
@@ -994,6 +995,7 @@ class TimeSeries(TaggedTable):
 
         """
         Plot the time series target or the given column(s) as scatter plot.
+
         The function will take the target column as the default value for x_column_name and a time dummy column as the
         default value for y_column_name.
 
