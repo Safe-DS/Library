@@ -801,7 +801,7 @@ class TimeSeries(TaggedTable):
     def sort_columns(
         self,
         comparator: Callable[[Column, Column], int] = lambda col1, col2: (col1.name > col2.name)
-                                                                         - (col1.name < col2.name),
+        - (col1.name < col2.name),
     ) -> TimeSeries:
         """
         Sort the columns of a `TimeSeries` with the given comparator and return a new `TimeSeries`.
@@ -908,9 +908,7 @@ class TimeSeries(TaggedTable):
         buffer.seek(0)
         return Image.from_bytes(buffer.read())
 
-    def plot_time_series_lineplot(self, y_column_name: str | None = None,
-                                      x_column_name: str | None = None) -> Image:
-
+    def plot_time_series_lineplot(self, y_column_name: str | None = None, x_column_name: str | None = None) -> Image:
         """
 
         Plot the time series target or the given column(s) as line plot.
@@ -990,9 +988,8 @@ class TimeSeries(TaggedTable):
     def plot_time_series_scatterplot(
         self,
         x_column_name: str | None = None,
-        y_column_name:str | None = None,
+        y_column_name: str | None = None,
     ) -> Image:
-
         """
         Plot the time series target or the given column(s) as scatter plot.
 
