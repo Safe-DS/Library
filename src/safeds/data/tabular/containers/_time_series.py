@@ -945,9 +945,8 @@ class TimeSeries(TaggedTable):
         """
         self._data.index.name = "index"
         # falls mitgegebene column kein numerical column ist
-        if x_column_name is not None:
-            if not self.get_column(x_column_name).type.is_numeric():
-                raise NonNumericColumnError("The time series plotted column contains non-numerical columns.")
+        if x_column_name is not None and not self.get_column(x_column_name).type.is_numeric():
+            raise NonNumericColumnError("The time series plotted column contains non-numerical columns.")
 
         if y_column_name is None:
             y_column_name = self.target.name
@@ -1025,9 +1024,9 @@ class TimeSeries(TaggedTable):
 
         """
         self._data.index.name = "index"
-        if x_column_name is not None:
-            if not self.get_column(x_column_name).type.is_numeric():
-                raise NonNumericColumnError("The time series plotted column contains non-numerical columns.")
+        if x_column_name is not None and not self.get_column(x_column_name).type.is_numeric():
+            raise NonNumericColumnError("The time series plotted column contains non-numerical columns.")
+
         if y_column_name is None:
             y_column_name = self.target.name
         elif y_column_name not in self._data.columns:
