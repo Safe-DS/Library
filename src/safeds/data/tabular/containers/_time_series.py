@@ -912,7 +912,7 @@ class TimeSeries(TaggedTable):
         feature_name: str | None = None,
     ) -> Image:
         """
-        Plots the time series, which is the target column.
+        Plot the time series, which is the target column.
 
         Returns
         -------
@@ -951,7 +951,7 @@ class TimeSeries(TaggedTable):
         return Image.from_bytes(buffer.read())
     def plot_time_series_scatter_plot(self, feature_name: str | None = None,) -> Image:
         """
-        Plots the time series target or the given column as scatter plot.
+        Plot the time series target or the given column as scatter plot.
 
         Returns
         -------
