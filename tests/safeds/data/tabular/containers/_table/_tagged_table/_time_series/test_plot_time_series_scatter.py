@@ -247,7 +247,6 @@ def test_should_raise_if_column_does_not_exist_y() -> None:
         table.plot_time_series_scatterplot(x_column_name="target", y_column_name="2")
 
 
-
 def test_should_raise_if_column_does_not_exist_x() -> None:
     table = TimeSeries(
         {
