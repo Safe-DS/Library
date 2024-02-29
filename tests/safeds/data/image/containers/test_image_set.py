@@ -45,14 +45,14 @@ class TestFromFiles:
         for image in images_not_included:
             assert image.change_channel(expected_channel) not in image_set
         # Check if all images have the right index
-        assert image_set.get_image(0) == image1.change_channel(expected_channel)
-        assert image_set.get_image(1) == image2.change_channel(expected_channel)
-        assert image_set.get_image(2) == image3.change_channel(expected_channel)
         assert 0 in image_set.index(image1.change_channel(expected_channel))
         assert 1 in image_set.index(image2.change_channel(expected_channel))
         assert 2 in image_set.index(image3.change_channel(expected_channel))
         with pytest.raises(KeyError, match=r"No image with index 3"):
             image_set.get_image(3)
+        assert image_set.get_image(0) == image1.change_channel(expected_channel)
+        assert image_set.get_image(1) == image2.change_channel(expected_channel)
+        assert image_set.get_image(2) == image3.change_channel(expected_channel)
 
     @pytest.mark.parametrize("resource_path", [images_all()], ids=["all-images"])
     def test_from_files_creation(self, resource_path: list[str], snapshot_png_image_set: SnapshotAssertion):

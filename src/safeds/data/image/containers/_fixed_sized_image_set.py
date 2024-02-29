@@ -23,20 +23,31 @@ class _FixedSizedImageSet(ImageSet):
     @staticmethod
     def _create_image_set(images: list[Tensor], indices: list[int]) -> ImageSet:
         image_set = _FixedSizedImageSet()
-        image_set._indices = indices
-        image_set._tensor = images[0].unsqueeze(dim=0)
-        for image in images[1:]:
-            if image.size(dim=0) > image_set._tensor.size(dim=1):
-                image_set = image_set.change_channel(image.size(dim=0))
-            if image.size(dim=0) < image_set._tensor.size(dim=1):
-                if image_set._tensor.size(dim=1) == 3:
-                    image_set._tensor = torch.cat([image_set._tensor, torch.cat([image, image, image], dim=0).unsqueeze(dim=0)])
-                if image.size(dim=0) == 1:
-                    image_set._tensor = torch.cat([image_set._tensor, torch.cat([image, image, image, torch.full(image.size(), 255)], dim=0).unsqueeze(dim=0)])
-                else:
-                    image_set._tensor = torch.cat([image_set._tensor, torch.cat([image, torch.full(image[0:1].size(), 255)], dim=0).unsqueeze(dim=0)])
-            else:
-                image_set._tensor = torch.cat([image_set._tensor, image.unsqueeze(dim=0)])
+        images_ready_to_concat = []
+        images_with_correct_channel = []
+        images_with_less_channels = []
+        max_channel = 0
+        for image, index in zip(images, indices):
+            if max_channel < image.size(dim=-3):  # all images have to increase their channel
+                images_with_less_channels += images_with_correct_channel
+                images_with_correct_channel = [(image, index)]
+                max_channel = image.size(dim=-3)
+            elif max_channel > image.size(dim=-3):  # current image has to increase its channel
+                images_with_less_channels.append((image, index))
+            else:  # current image has same channel as max_channel
+                images_with_correct_channel.append((image, index))
+        for image, index in images_with_correct_channel:
+            images_ready_to_concat.append((image.unsqueeze(dim=0), index))
+        for image, index in images_with_less_channels:
+            if max_channel == 3:  # image channel 1 and max channel 3
+                image = torch.cat([image, image, image], dim=0)
+            elif image.size(dim=0) == 1:  # image channel 1 and max channel 4
+                image = torch.cat([image, image, image, torch.full(image.size(), 255)], dim=0)
+            else:  # image channel 3 and max channel 4
+                image = torch.cat([image, torch.full(image[0:1].size(), 255)], dim=0)
+            images_ready_to_concat.append((image.unsqueeze(dim=0), index))
+        image_set._tensor = torch.cat([image for image, index in images_ready_to_concat])
+        image_set._indices = [index for image, index in images_ready_to_concat]
 
         return image_set
 

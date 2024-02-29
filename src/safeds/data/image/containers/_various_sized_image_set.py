@@ -21,15 +21,24 @@ class _VariousSizedImageSet(ImageSet):
 
         max_channel = 0
 
+        image_tensor_dict = {}
+        image_index_dict = {}
+
         image_set = _VariousSizedImageSet()
-        for image, index in zip(images, indices):
+        for index in indices:
+            image = images.pop(0)
             size = (image.size(dim=2), image.size(dim=1))
-            if size not in image_set._image_set_dict:
-                image_set._image_set_dict[size] = _FixedSizedImageSet._create_image_set([image], [index])
-                max_channel = max(max_channel, image_set._image_set_dict[size].channel)
+            if size not in image_tensor_dict:
+                image_tensor_dict[size] = [image]
+                image_index_dict[size] = [index]
+                max_channel = max(max_channel, image.size(dim=-3))
             else:
-                image_set._image_set_dict[size] = image_set._image_set_dict.get(size)._add_image_tensor(image, index)
-                max_channel = max(max_channel, image_set._image_set_dict[size].channel)
+                image_tensor_dict[size].append(image)
+                image_index_dict[size].append(index)
+                max_channel = max(max_channel, image.size(dim=-3))
+
+        for size in image_tensor_dict.keys():
+            image_set._image_set_dict[size] = _FixedSizedImageSet._create_image_set(image_tensor_dict[size], image_index_dict[size])
 
         if max_channel > 1:
             image_set = image_set.change_channel(max_channel)
