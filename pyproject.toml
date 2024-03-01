@@ -15,7 +15,7 @@ packages = [
 [tool.poetry.dependencies]
 python = "^3.11,<3.13"
 ipython = "^8.8.0"
-levenshtein = ">=0.21.1,<0.25.0"
+levenshtein = ">=0.21.1,<0.26.0"
 matplotlib = "^3.6.3"
 openpyxl = "^3.1.2"
 pandas = "^2.0.0"
