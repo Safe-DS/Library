@@ -4,7 +4,7 @@
     "private": true,
     "prettier": "@lars-reimann/prettier-config",
     "devDependencies": {
-        "@lars-reimann/prettier-config": "^5.0.0",
+        "@lars-reimann/prettier-config": "^5.2.1",
         "@semantic-release/changelog": "^6.0.3",
         "@semantic-release/exec": "^6.0.3",
         "@semantic-release/git": "^10.0.1",
