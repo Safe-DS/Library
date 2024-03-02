@@ -36,8 +36,8 @@ def test_should_raise_if_output_size_out_of_bounds(output_size: int) -> None:
 @pytest.mark.parametrize(
     "output_size",
     [
-        (1),
-        (20),
+        1,
+        20,
     ],
     ids=["one", "twenty"],
 )

@@ -34,19 +34,19 @@ class TestClassificationModel:
             OutOfBoundsError,
             match=rf"batch_size \(={batch_size}\) is not inside \[1, \u221e\)\.",
         ):
-            ClassificationNeuralNetwork([FNNLayer(1, 1)]).fit(
+            ClassificationNeuralNetwork([FNNLayer(input_size=1, output_size=1)]).fit(
                 Table.from_dict({"a": [1], "b": [2]}).tag_columns("a"),
                 batch_size=batch_size,
             )
 
     def test_should_raise_if_fit_function_returns_wrong_datatype(self) -> None:
-        fitted_model = ClassificationNeuralNetwork([FNNLayer(1, 8), FNNLayer(8, 1)]).fit(
+        fitted_model = ClassificationNeuralNetwork([FNNLayer(input_size=1, output_size=8), FNNLayer(output_size=1)]).fit(
             Table.from_dict({"a": [1], "b": [0]}).tag_columns("a"),
         )
         assert isinstance(fitted_model, ClassificationNeuralNetwork)
 
     def test_should_raise_if_predict_function_returns_wrong_datatype(self) -> None:
-        fitted_model = ClassificationNeuralNetwork([FNNLayer(1, 8), FNNLayer(8, 1)]).fit(
+        fitted_model = ClassificationNeuralNetwork([FNNLayer(input_size=1, output_size=8), FNNLayer(output_size=1)]).fit(
             Table.from_dict({"a": [1], "b": [0]}).tag_columns("a"),
         )
         predictions = fitted_model.predict(Table.from_dict({"b": [1]}))
@@ -54,12 +54,12 @@ class TestClassificationModel:
 
     def test_should_raise_if_model_has_not_been_fitted(self) -> None:
         with pytest.raises(ModelNotFittedError, match="The model has not been fitted yet."):
-            ClassificationNeuralNetwork([FNNLayer(1, 1)]).predict(
+            ClassificationNeuralNetwork([FNNLayer(input_size=1, output_size=1)]).predict(
                 Table.from_dict({"a": [1]}),
             )
 
     def test_should_raise_if_is_fitted_is_set_correctly(self) -> None:
-        model = ClassificationNeuralNetwork([FNNLayer(1, 1)])
+        model = ClassificationNeuralNetwork([FNNLayer(input_size=1, output_size=1)])
         assert not model.is_fitted
         model = model.fit(
             Table.from_dict({"a": [1], "b": [0]}).tag_columns("a"),
@@ -80,7 +80,7 @@ class TestRegressionModel:
             OutOfBoundsError,
             match=rf"epoch_size \(={epoch_size}\) is not inside \[1, \u221e\)\.",
         ):
-            RegressionNeuralNetwork([FNNLayer(1, 1)]).fit(
+            RegressionNeuralNetwork([FNNLayer(input_size=1, output_size=1)]).fit(
                 Table.from_dict({"a": [1], "b": [2]}).tag_columns("a"),
                 epoch_size=epoch_size,
             )
@@ -97,19 +97,19 @@ class TestRegressionModel:
             OutOfBoundsError,
             match=rf"batch_size \(={batch_size}\) is not inside \[1, \u221e\)\.",
         ):
-            RegressionNeuralNetwork([FNNLayer(1, 1)]).fit(
+            RegressionNeuralNetwork([FNNLayer(input_size=1, output_size=1)]).fit(
                 Table.from_dict({"a": [1], "b": [2]}).tag_columns("a"),
                 batch_size=batch_size,
             )
 
     def test_should_raise_if_fit_function_returns_wrong_datatype(self) -> None:
-        fitted_model = RegressionNeuralNetwork([FNNLayer(1, 1)]).fit(
+        fitted_model = RegressionNeuralNetwork([FNNLayer(input_size=1, output_size=1)]).fit(
             Table.from_dict({"a": [1], "b": [2]}).tag_columns("a"),
         )
         assert isinstance(fitted_model, RegressionNeuralNetwork)
 
     def test_should_raise_if_predict_function_returns_wrong_datatype(self) -> None:
-        fitted_model = RegressionNeuralNetwork([FNNLayer(1, 1)]).fit(
+        fitted_model = RegressionNeuralNetwork([FNNLayer(input_size=1, output_size=1)]).fit(
             Table.from_dict({"a": [1], "b": [2]}).tag_columns("a"),
         )
         predictions = fitted_model.predict(Table.from_dict({"b": [1]}))
@@ -117,12 +117,12 @@ class TestRegressionModel:
 
     def test_should_raise_if_model_has_not_been_fitted(self) -> None:
         with pytest.raises(ModelNotFittedError, match="The model has not been fitted yet."):
-            RegressionNeuralNetwork([FNNLayer(1, 1)]).predict(
+            RegressionNeuralNetwork([FNNLayer(input_size=1, output_size=1)]).predict(
                 Table.from_dict({"a": [1]}),
             )
 
     def test_should_raise_if_is_fitted_is_set_correctly(self) -> None:
-        model = RegressionNeuralNetwork([FNNLayer(1, 1)])
+        model = RegressionNeuralNetwork([FNNLayer(input_size=1, output_size=1)])
         assert not model.is_fitted
         model = model.fit(
             Table.from_dict({"a": [1], "b": [0]}).tag_columns("a"),

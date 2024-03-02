@@ -17,7 +17,7 @@ class _InternalLayer(nn.Module):
 
 
 class FNNLayer:
-    def __init__(self, input_size: int, output_size: int):
+    def __init__(self, output_size: int, input_size: int = None):
         """
         Create a FNN Layer.
 
@@ -35,11 +35,12 @@ class FNNLayer:
             If output_size < 1
 
         """
-        if input_size < 1:
-            raise OutOfBoundsError(actual=input_size, name="input_size", lower_bound=ClosedBound(1))
+        if input_size is not None:
+            if input_size < 1:
+                raise OutOfBoundsError(actual=input_size, name="input_size", lower_bound=ClosedBound(1))
+            self._input_size = input_size
         if output_size < 1:
             raise OutOfBoundsError(actual=output_size, name="output_size", lower_bound=ClosedBound(1))
-        self._input_size = input_size
         self._output_size = output_size
 
     def _get_internal_layer(self, is_last_layer_of_classification_model: bool) -> _InternalLayer:
@@ -56,3 +57,8 @@ class FNNLayer:
             The Number of Neurons in this layer.
         """
         return self._output_size
+
+    def _set_input_size(self, input_size: int) -> None:
+        if input_size < 1:
+            raise OutOfBoundsError(actual=input_size, name="input_size", lower_bound=ClosedBound(1))
+        self._input_size = input_size

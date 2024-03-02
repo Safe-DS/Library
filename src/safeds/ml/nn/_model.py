@@ -5,6 +5,7 @@ import numpy as np
 import torch
 from torch import nn
 
+from collections.abc import Callable
 from safeds.data.tabular.containers import Column, Table, TaggedTable
 from safeds.exceptions import ClosedBound, ModelNotFittedError, OutOfBoundsError
 from safeds.ml.nn._fnn_layer import FNNLayer
@@ -16,7 +17,9 @@ class RegressionNeuralNetwork:
         self._batch_size = 1
         self._is_fitted = False
 
-    def fit(self, train_data: TaggedTable, epoch_size: int = 25, batch_size: int = 1) -> Self:
+    def fit(self, train_data: TaggedTable, epoch_size: int = 25, batch_size: int = 1,
+            callback_on_batch_completion: Callable[[]] = None,
+            callback_on_epoch_completion: Callable[[]] = None) -> Self:
         """
         Train the neural network with given training data.
 
@@ -27,9 +30,13 @@ class RegressionNeuralNetwork:
         train_data : TaggedTable
             The data the network should be trained on.
         epoch_size : int
-            The number of times the training cycle should be done
+            The number of times the training cycle should be done.
         batch_size : int
             The size of data batches that should be loaded at one time.
+        callback_on_batch_completion: Callable[]
+            Function used to view metrics while training. Gets called after a batch is completed.
+        callback_on_epoch_completion: Callable[]
+            Function used to view metrics while training. Gets called after an epoch is completed.
 
         Raises
         ------
@@ -54,26 +61,22 @@ class RegressionNeuralNetwork:
 
         optimizer = torch.optim.SGD(copied_model._model.parameters(), lr=0.05)
 
-        loss_values = []
-        accuracies = []
         for _ in range(epoch_size):
-            tmp_loss = []
-            tmp_accuracies = []
             for x, y in dataloader:
+                optimizer.zero_grad()
+
                 pred = copied_model._model(x)
 
                 loss = loss_fn(pred, y)
-                tmp_loss.append(loss.item())
 
-                accuracy = torch.mean(1 - torch.abs(pred - y))
-                tmp_accuracies.append(accuracy.item())
-
-                optimizer.zero_grad()
                 loss.backward()
                 optimizer.step()
-            loss_values.append(np.mean(tmp_loss))
-            accuracies.append(np.mean(tmp_accuracies))
+                if callback_on_batch_completion is not None:
+                    callback_on_batch_completion()
+        if callback_on_epoch_completion is not None:
+            callback_on_epoch_completion()
         copied_model._is_fitted = True
+        copied_model._model.eval()
         return copied_model
 
     def predict(self, test_data: Table) -> TaggedTable:
@@ -99,13 +102,11 @@ class RegressionNeuralNetwork:
         """
         if not self._is_fitted:
             raise ModelNotFittedError
-        copied_model = copy.deepcopy(self)
-        dataloader = test_data.into_dataloader(copied_model._batch_size)
-        copied_model._model.eval()
+        dataloader = test_data.into_dataloader(self._batch_size)
         predictions = []
         with torch.no_grad():
             for x in dataloader:
-                predictions.append(copied_model._model(x).item())
+                predictions.append(self._model(x).item())
         return test_data.add_column(Column("prediction", predictions)).tag_columns("prediction")
 
     @property
@@ -165,26 +166,17 @@ class ClassificationNeuralNetwork:
 
         optimizer = torch.optim.SGD(copied_model._model.parameters(), lr=0.05)
 
-        loss_values = []
-        accuracies = []
         for _ in range(epoch_size):
-            tmp_loss = []
-            tmp_accuracies = []
             for x, y in dataloader:
+                optimizer.zero_grad()
                 pred = copied_model._model(x)
 
                 loss = loss_fn(pred, y)
-                tmp_loss.append(loss.item())
 
-                accuracy = torch.mean(1 - torch.abs(pred - y))
-                tmp_accuracies.append(accuracy.item())
-
-                optimizer.zero_grad()
                 loss.backward()
                 optimizer.step()
-            loss_values.append(np.mean(tmp_loss))
-            accuracies.append(np.mean(tmp_accuracies))
         copied_model._is_fitted = True
+        copied_model._model.eval()
         return copied_model
 
     def predict(self, test_data: Table) -> TaggedTable:
@@ -210,13 +202,11 @@ class ClassificationNeuralNetwork:
         """
         if not self._is_fitted:
             raise ModelNotFittedError
-        copied_model = copy.deepcopy(self)
-        dataloader = test_data.into_dataloader(copied_model._batch_size)
-        copied_model._model.eval()
+        dataloader = test_data.into_dataloader(self._batch_size)
         predictions = []
         with torch.no_grad():
             for x in dataloader:
-                predictions.append(copied_model._model(x).item())
+                predictions.append(self._model(x).item())
         return test_data.add_column(Column("prediction", predictions)).tag_columns("prediction")
 
     @property
@@ -237,8 +227,12 @@ class _PytorchModel(nn.Module):
         super().__init__()
         self._layer_list = layer_list
         layers = []
+        last_output_size = None
         for layer in layer_list:
+            if len(layers) > 0:
+                layer._set_input_size(last_output_size)
             layers.append(layer._get_internal_layer(is_last_layer_of_classification_model=False))
+            last_output_size = layer.output_size
         if is_for_classification:
             layers.pop()
             layers.append(layer_list.pop()._get_internal_layer(is_last_layer_of_classification_model=True))
