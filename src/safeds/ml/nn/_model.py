@@ -1,11 +1,10 @@
 import copy
+from collections.abc import Callable
 from typing import Self
 
-import numpy as np
 import torch
 from torch import nn
 
-from collections.abc import Callable
 from safeds.data.tabular.containers import Column, Table, TaggedTable
 from safeds.exceptions import ClosedBound, ModelNotFittedError, OutOfBoundsError
 from safeds.ml.nn._fnn_layer import FNNLayer
@@ -17,9 +16,14 @@ class RegressionNeuralNetwork:
         self._batch_size = 1
         self._is_fitted = False
 
-    def fit(self, train_data: TaggedTable, epoch_size: int = 25, batch_size: int = 1,
-            callback_on_batch_completion: Callable[[], None] | None = None,
-            callback_on_epoch_completion: Callable[[], None] | None = None) -> Self:
+    def fit(
+        self,
+        train_data: TaggedTable,
+        epoch_size: int = 25,
+        batch_size: int = 1,
+        callback_on_batch_completion: Callable[[], None] | None = None,
+        callback_on_epoch_completion: Callable[[], None] | None = None,
+    ) -> Self:
         """
         Train the neural network with given training data.
 
