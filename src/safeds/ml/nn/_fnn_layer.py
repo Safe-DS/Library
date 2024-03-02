@@ -17,7 +17,7 @@ class _InternalLayer(nn.Module):
 
 
 class FNNLayer:
-    def __init__(self, output_size: int, input_size: int = None):
+    def __init__(self, output_size: int, input_size: int | None = None):
         """
         Create a FNN Layer.
 

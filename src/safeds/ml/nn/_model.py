@@ -18,8 +18,8 @@ class RegressionNeuralNetwork:
         self._is_fitted = False
 
     def fit(self, train_data: TaggedTable, epoch_size: int = 25, batch_size: int = 1,
-            callback_on_batch_completion: Callable[[]] = None,
-            callback_on_epoch_completion: Callable[[]] = None) -> Self:
+            callback_on_batch_completion: Callable[[], None] | None = None,
+            callback_on_epoch_completion: Callable[[], None] | None = None) -> Self:
         """
         Train the neural network with given training data.
 
@@ -223,20 +223,20 @@ class ClassificationNeuralNetwork:
 
 
 class _PytorchModel(nn.Module):
-    def __init__(self, layer_list: list[FNNLayer], is_for_classification: bool) -> None:
+    def __init__(self, fnn_layers: list[FNNLayer], is_for_classification: bool) -> None:
         super().__init__()
-        self._layer_list = layer_list
-        layers = []
+        self._layer_list = fnn_layers
+        internal_layers = []
         last_output_size = None
-        for layer in layer_list:
-            if len(layers) > 0:
+        for layer in fnn_layers:
+            if last_output_size is not None:
                 layer._set_input_size(last_output_size)
-            layers.append(layer._get_internal_layer(is_last_layer_of_classification_model=False))
+            internal_layers.append(layer._get_internal_layer(is_last_layer_of_classification_model=False))
             last_output_size = layer.output_size
         if is_for_classification:
-            layers.pop()
-            layers.append(layer_list.pop()._get_internal_layer(is_last_layer_of_classification_model=True))
-        self._pytorch_layers = nn.ModuleList(layers)
+            internal_layers.pop()
+            internal_layers.append(fnn_layers.pop()._get_internal_layer(is_last_layer_of_classification_model=True))
+        self._pytorch_layers = nn.ModuleList(internal_layers)
 
     def forward(self, x: float) -> float:
         for layer in self._pytorch_layers:
