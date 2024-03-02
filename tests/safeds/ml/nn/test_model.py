@@ -40,13 +40,17 @@ class TestClassificationModel:
             )
 
     def test_should_raise_if_fit_function_returns_wrong_datatype(self) -> None:
-        fitted_model = ClassificationNeuralNetwork([FNNLayer(input_size=1, output_size=8), FNNLayer(output_size=1)]).fit(
+        fitted_model = ClassificationNeuralNetwork(
+            [FNNLayer(input_size=1, output_size=8), FNNLayer(output_size=1)],
+        ).fit(
             Table.from_dict({"a": [1], "b": [0]}).tag_columns("a"),
         )
         assert isinstance(fitted_model, ClassificationNeuralNetwork)
 
     def test_should_raise_if_predict_function_returns_wrong_datatype(self) -> None:
-        fitted_model = ClassificationNeuralNetwork([FNNLayer(input_size=1, output_size=8), FNNLayer(output_size=1)]).fit(
+        fitted_model = ClassificationNeuralNetwork(
+            [FNNLayer(input_size=1, output_size=8), FNNLayer(output_size=1)],
+        ).fit(
             Table.from_dict({"a": [1], "b": [0]}).tag_columns("a"),
         )
         predictions = fitted_model.predict(Table.from_dict({"b": [1]}))
