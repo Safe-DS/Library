@@ -15,7 +15,7 @@ def test_should_raise_if_input_size_out_of_bounds(input_size: int) -> None:
         OutOfBoundsError,
         match=rf"input_size \(={input_size}\) is not inside \[1, \u221e\)\.",
     ):
-        FNNLayer(input_size, 1)
+        FNNLayer(output_size=1, input_size=input_size)
 
 
 @pytest.mark.parametrize(
@@ -30,7 +30,7 @@ def test_should_raise_if_output_size_out_of_bounds(output_size: int) -> None:
         OutOfBoundsError,
         match=rf"output_size \(={output_size}\) is not inside \[1, \u221e\)\.",
     ):
-        FNNLayer(1, output_size)
+        FNNLayer(output_size=output_size, input_size=1)
 
 
 @pytest.mark.parametrize(
@@ -42,4 +42,4 @@ def test_should_raise_if_output_size_out_of_bounds(output_size: int) -> None:
     ids=["one", "twenty"],
 )
 def test_should_raise_if_output_size_doesnt_match(output_size: int) -> None:
-    assert FNNLayer(1, output_size).output_size == output_size
+    assert FNNLayer(output_size=output_size, input_size=1).output_size == output_size
