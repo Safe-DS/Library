@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 
-from safeds.data.image.containers import Image
+
 from safeds.data.tabular.containers import Column, Row, Table, TaggedTable
 from safeds.exceptions import (
     ColumnIsTargetError,
@@ -19,6 +19,7 @@ from safeds.exceptions import (
 )
 
 if TYPE_CHECKING:
+    from safeds.data.image.containers import Image
     from safeds._utils._plotting import _create_image_for_plot
     from collections.abc import Callable, Mapping, Sequence
     from typing import Any

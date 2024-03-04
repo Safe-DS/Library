@@ -16,7 +16,7 @@ import seaborn as sns
 from pandas import DataFrame
 from scipy import stats
 
-from safeds.data.image.containers import Image
+
 from safeds.data.tabular.typing import ColumnType, Schema
 from safeds.exceptions import (
     ColumnLengthMismatchError,
@@ -36,7 +36,7 @@ if TYPE_CHECKING:
 
     from safeds.data.tabular.transformation import InvertibleTableTransformer, TableTransformer
     from safeds._utils._plotting import _create_image_for_plot
-
+    from safeds.data.image.containers import Image
     from ._tagged_table import TaggedTable
     from ._time_series import TimeSeries
 
