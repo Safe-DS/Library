@@ -908,20 +908,20 @@ class TimeSeries(TaggedTable):
         buffer.seek(0)
         return Image.from_bytes(buffer.read())
 
-    def plot_time_series_lineplot(self, y_column_name: str | None = None, x_column_name: str | None = None) -> Image:
+    def plot_lineplot(self, x_column_name: str | None = None, y_column_name: str | None = None) -> Image:
         """
 
         Plot the time series target or the given column(s) as line plot.
 
-        The function will take the target column as the default value for x_column_name and a time dummy column as the
-        default value for y_column_name.
+        The function will take the time column as the default value for y_column_name and the target column as the
+        default value for x_column_name.
 
         Parameters
         ----------
-        x_column_name : str
-            The column name of the column to be plotted on the x-Axis.
-        y_column_name : str
-            The column name of the column to be plotted on the y-Axis.
+        x_column_name:
+            The column name of the column to be plotted on the x-Axis, default is the time column.
+        y_column_name:
+            The column name of the column to be plotted on the y-Axis, default is the target column.
 
         Returns
         -------
@@ -944,7 +944,6 @@ class TimeSeries(TaggedTable):
 
         """
         self._data.index.name = "index"
-        # falls mitgegebene column kein numerical column ist
         if x_column_name is not None and not self.get_column(x_column_name).type.is_numeric():
             raise NonNumericColumnError("The time series plotted column contains non-numerical columns.")
 
@@ -955,7 +954,7 @@ class TimeSeries(TaggedTable):
             raise UnknownColumnNameError([y_column_name])
 
         if x_column_name is None:
-            x_column_name = "index"
+            x_column_name = self.time.name
 
         if not self.get_column(y_column_name).type.is_numeric():
             raise NonNumericColumnError("The time series plotted column contains non-numerical columns.")
@@ -982,7 +981,7 @@ class TimeSeries(TaggedTable):
         self._data = self._data.reset_index()
         return Image.from_bytes(buffer.read())
 
-    def plot_time_series_scatterplot(
+    def plot_scatterplot(
         self,
         x_column_name: str | None = None,
         y_column_name: str | None = None,
@@ -990,14 +989,14 @@ class TimeSeries(TaggedTable):
         """
         Plot the time series target or the given column(s) as scatter plot.
 
-        The function will take the target column as the default value for x_column_name and a time dummy column as the
+        The function will take the time column as the default value for x_column_name and the target column as the
         default value for y_column_name.
 
         Parameters
         ----------
-        x_column_name : str
+        x_column_name:
             The column name of the column to be plotted on the x-Axis.
-        y_column_name : str
+        y_column_name:
             The column name of the column to be plotted on the y-Axis.
 
         Returns
@@ -1029,7 +1028,7 @@ class TimeSeries(TaggedTable):
         elif y_column_name not in self._data.columns:
             raise UnknownColumnNameError([y_column_name])
         if x_column_name is None:
-            x_column_name = "index"
+            x_column_name = self.time.name
 
         if not self.get_column(y_column_name).type.is_numeric():
             raise NonNumericColumnError("The time series plotted column contains non-numerical columns.")
