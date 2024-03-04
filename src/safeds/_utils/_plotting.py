@@ -1,6 +1,9 @@
-from safeds.data.image.containers import Image
 import io
+
 import matplotlib.pyplot as plt
+
+from safeds.data.image.containers import Image
+
 
 def _create_image_for_plot(fig: plt.Figure) -> Image:
     buffer = io.BytesIO()

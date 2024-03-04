@@ -1,8 +1,7 @@
 from __future__ import annotations
 
-import sys
 import functools
-import io
+import sys
 import warnings
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, TypeVar
@@ -15,7 +14,6 @@ import pandas as pd
 import seaborn as sns
 from pandas import DataFrame
 from scipy import stats
-
 
 from safeds.data.tabular.typing import ColumnType, Schema
 from safeds.exceptions import (
@@ -34,9 +32,9 @@ from ._row import Row
 if TYPE_CHECKING:
     from collections.abc import Callable, Mapping, Sequence
 
-    from safeds.data.tabular.transformation import InvertibleTableTransformer, TableTransformer
-    from safeds._utils._plotting import _create_image_for_plot
     from safeds.data.image.containers import Image
+    from safeds.data.tabular.transformation import InvertibleTableTransformer, TableTransformer
+
     from ._tagged_table import TaggedTable
     from ._time_series import TimeSeries
 
@@ -1993,6 +1991,7 @@ class Table:
         )  # rotate the labels of the x Axis to prevent the chance of overlapping of the labels
         plt.tight_layout()
         from safeds._utils._plotting import _create_image_for_plot
+
         return _create_image_for_plot(fig)
 
     def plot_scatterplot(self, x_column_name: str, y_column_name: str) -> Image:
@@ -2047,6 +2046,7 @@ class Table:
         )  # rotate the labels of the x Axis to prevent the chance of overlapping of the labels
         plt.tight_layout()
         from safeds._utils._plotting import _create_image_for_plot
+
         return _create_image_for_plot(fig)
 
     def plot_boxplots(self) -> Image:
@@ -2090,6 +2090,7 @@ class Table:
         plt.tight_layout()
         fig = grid.fig
         from safeds._utils._plotting import _create_image_for_plot
+
         return _create_image_for_plot(fig)
 
     def plot_histograms(self) -> Image:
@@ -2121,6 +2122,7 @@ class Table:
         grid.tight_layout()
         fig = grid.fig
         from safeds._utils._plotting import _create_image_for_plot
+
         return _create_image_for_plot(fig)
 
     # ------------------------------------------------------------------------------------------------------------------
