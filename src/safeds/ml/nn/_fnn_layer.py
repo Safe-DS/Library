@@ -36,9 +36,7 @@ class FNNLayer:
 
         """
         if input_size is not None:
-            if input_size < 1:
-                raise OutOfBoundsError(actual=input_size, name="input_size", lower_bound=ClosedBound(1))
-            self._input_size = input_size
+            self._set_input_size(input_size=input_size)
         if output_size < 1:
             raise OutOfBoundsError(actual=output_size, name="output_size", lower_bound=ClosedBound(1))
         self._output_size = output_size
