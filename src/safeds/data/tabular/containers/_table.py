@@ -16,6 +16,7 @@ import seaborn as sns
 from pandas import DataFrame
 from scipy import stats
 
+from safeds._utils._plotting import _create_image_for_plot
 from safeds.data.image.containers import Image
 from safeds.data.tabular.typing import ColumnType, Schema
 from safeds.exceptions import (
@@ -1934,11 +1935,7 @@ class Table:
             )
             plt.tight_layout()
 
-        buffer = io.BytesIO()
-        fig.savefig(buffer, format="png")
-        plt.close()  # Prevents the figure from being displayed directly
-        buffer.seek(0)
-        return Image.from_bytes(buffer.read())
+        return _create_image_for_plot(fig)
 
     def plot_lineplot(self, x_column_name: str, y_column_name: str) -> Image:
         """
@@ -1995,11 +1992,7 @@ class Table:
         )  # rotate the labels of the x Axis to prevent the chance of overlapping of the labels
         plt.tight_layout()
 
-        buffer = io.BytesIO()
-        fig.savefig(buffer, format="png")
-        plt.close()  # Prevents the figure from being displayed directly
-        buffer.seek(0)
-        return Image.from_bytes(buffer.read())
+        return _create_image_for_plot(fig)
 
     def plot_scatterplot(self, x_column_name: str, y_column_name: str) -> Image:
         """
@@ -2053,11 +2046,7 @@ class Table:
         )  # rotate the labels of the x Axis to prevent the chance of overlapping of the labels
         plt.tight_layout()
 
-        buffer = io.BytesIO()
-        fig.savefig(buffer, format="png")
-        plt.close()  # Prevents the figure from being displayed directly
-        buffer.seek(0)
-        return Image.from_bytes(buffer.read())
+        return _create_image_for_plot(fig)
 
     def plot_boxplots(self) -> Image:
         """
@@ -2100,11 +2089,7 @@ class Table:
         plt.tight_layout()
         fig = grid.fig
 
-        buffer = io.BytesIO()
-        fig.savefig(buffer, format="png")
-        plt.close()  # Prevents the figure from being displayed directly
-        buffer.seek(0)
-        return Image.from_bytes(buffer.read())
+        return _create_image_for_plot(fig)
 
     def plot_histograms(self) -> Image:
         """
@@ -2135,11 +2120,7 @@ class Table:
         grid.tight_layout()
         fig = grid.fig
 
-        buffer = io.BytesIO()
-        fig.savefig(buffer, format="png")
-        plt.close()
-        buffer.seek(0)
-        return Image.from_bytes(buffer.read())
+        return _create_image_for_plot(fig)
 
     # ------------------------------------------------------------------------------------------------------------------
     # Conversion

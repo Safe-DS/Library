@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING
 import matplotlib.pyplot as plt
 import pandas as pd
 
+from safeds._utils._plotting import _create_image_for_plot
 from safeds.data.image.containers import Image
 from safeds.data.tabular.containers import Column, Row, Table, TaggedTable
 from safeds.exceptions import (
@@ -900,12 +901,7 @@ class TimeSeries(TaggedTable):
         if not self.target.type.is_numeric():
             raise NonNumericColumnError("This time series target contains non-numerical columns.")
         ax = pd.plotting.lag_plot(self.target._data, lag=lag)
-        fig = ax.figure
-        buffer = io.BytesIO()
-        fig.savefig(buffer, format="png")
-        plt.close()  # Prevents the figure from being displayed directly
-        buffer.seek(0)
-        return Image.from_bytes(buffer.read())
+        return _create_image_for_plot(ax.figure)
 
     def plot_moving_average(
         self,
@@ -961,9 +957,4 @@ class TimeSeries(TaggedTable):
         ax = series.plot(ax=ax_temp)
         ax.legend(labels=["moving_average", feature_name])
 
-        fig = ax.figure
-        buffer = io.BytesIO()
-        fig.savefig(buffer, format="png")
-        plt.close()  # Prevents the figure from being displayed directly
-        buffer.seek(0)
-        return Image.from_bytes(buffer.read())
+        return _create_image_for_plot(ax.figure)
