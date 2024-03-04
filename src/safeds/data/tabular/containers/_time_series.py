@@ -1,13 +1,10 @@
 from __future__ import annotations
 
-import io
 import sys
 from typing import TYPE_CHECKING
 
-import matplotlib.pyplot as plt
 import pandas as pd
 
-from safeds.data.image.containers import Image
 from safeds.data.tabular.containers import Column, Row, Table, TaggedTable
 from safeds.exceptions import (
     ColumnIsTargetError,
@@ -20,6 +17,8 @@ from safeds.exceptions import (
 if TYPE_CHECKING:
     from collections.abc import Callable, Mapping, Sequence
     from typing import Any
+
+    from safeds.data.image.containers import Image
 
 
 class TimeSeries(TaggedTable):
@@ -871,7 +870,7 @@ class TimeSeries(TaggedTable):
             time_name=self.time.name,
         )
 
-    def plot_lagplot(self, lag: int) -> Image:
+    def plot_lag_plot(self, lag: int) -> Image:
         """
         Plot a lagplot for the target column.
 
@@ -894,15 +893,69 @@ class TimeSeries(TaggedTable):
         --------
                 >>> from safeds.data.tabular.containers import TimeSeries
                 >>> table = TimeSeries({"time":[1, 2], "target": [3, 4], "feature":[2,2]}, target_name= "target", time_name="time", feature_names=["feature"], )
-                >>> image = table.plot_lagplot(lag = 1)
+                >>> image = table.plot_lag_plot(lag = 1)
 
         """
         if not self.target.type.is_numeric():
             raise NonNumericColumnError("This time series target contains non-numerical columns.")
         ax = pd.plotting.lag_plot(self.target._data, lag=lag)
-        fig = ax.figure
-        buffer = io.BytesIO()
-        fig.savefig(buffer, format="png")
-        plt.close()  # Prevents the figure from being displayed directly
-        buffer.seek(0)
-        return Image.from_bytes(buffer.read())
+        from safeds._utils._plotting import _create_image_for_plot
+
+        return _create_image_for_plot(ax.figure)
+
+    def plot_moving_average(
+        self,
+        window_size: int,
+        column_name: str | None = None,
+    ) -> Image:
+        """
+        Plot the moving average for the target column.
+
+        Parameters
+        ----------
+        window_size:
+            The size of the windows, which the average gets calculated for
+
+        column_name:
+            The name of the column which will be used to calculate the moving average, if None the target column will be taken
+
+        Returns
+        -------
+        plot:
+            The moving avereage plot and the normal plot as an image.
+
+        Raises
+        ------
+        NonNumericColumnError
+            If the time series targets contains non-numerical values.
+
+        UnknownColumnNameError
+            If the time series doesn't contain the given column name
+
+        Examples
+        --------
+                >>> from safeds.data.tabular.containers import TimeSeries
+                >>> table = TimeSeries({"time":[1, 2], "target": [3, 4], "feature":[2,2]}, target_name= "target", time_name="time", feature_names=["feature"], )
+                >>> image = table.plot_moving_average(window_size = 2)
+
+        """
+        if column_name is None or column_name == self.target.name:
+            series = self.target._data
+            column_name = self.target.name
+        else:
+            if column_name not in self.column_names:
+                raise UnknownColumnNameError([column_name])
+            series = self._data[column_name]
+        if not self.get_column(column_name).type.is_numeric():
+            raise NonNumericColumnError("This time series plotted column contains non-numerical columns.")
+
+        # create moving average series
+        series_mvg = series.rolling(window_size).mean()
+
+        # plot both series and put them together
+        ax_temp = series_mvg.plot()
+        ax = series.plot(ax=ax_temp)
+        ax.legend(labels=["moving_average", column_name])
+        from safeds._utils._plotting import _create_image_for_plot
+
+        return _create_image_for_plot(ax.figure)

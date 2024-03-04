@@ -1,8 +1,7 @@
 from __future__ import annotations
 
-import sys
 import functools
-import io
+import sys
 import warnings
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, TypeVar
@@ -16,7 +15,6 @@ import seaborn as sns
 from pandas import DataFrame
 from scipy import stats
 
-from safeds.data.image.containers import Image
 from safeds.data.tabular.typing import ColumnType, Schema
 from safeds.exceptions import (
     ColumnLengthMismatchError,
@@ -34,6 +32,7 @@ from ._row import Row
 if TYPE_CHECKING:
     from collections.abc import Callable, Mapping, Sequence
 
+    from safeds.data.image.containers import Image
     from safeds.data.tabular.transformation import InvertibleTableTransformer, TableTransformer
 
     from ._tagged_table import TaggedTable
@@ -1933,12 +1932,9 @@ class Table:
                 cmap="vlag",
             )
             plt.tight_layout()
+        from safeds._utils._plotting import _create_image_for_plot
 
-        buffer = io.BytesIO()
-        fig.savefig(buffer, format="png")
-        plt.close()  # Prevents the figure from being displayed directly
-        buffer.seek(0)
-        return Image.from_bytes(buffer.read())
+        return _create_image_for_plot(fig)
 
     def plot_lineplot(self, x_column_name: str, y_column_name: str) -> Image:
         """
@@ -1994,12 +1990,9 @@ class Table:
             horizontalalignment="right",
         )  # rotate the labels of the x Axis to prevent the chance of overlapping of the labels
         plt.tight_layout()
+        from safeds._utils._plotting import _create_image_for_plot
 
-        buffer = io.BytesIO()
-        fig.savefig(buffer, format="png")
-        plt.close()  # Prevents the figure from being displayed directly
-        buffer.seek(0)
-        return Image.from_bytes(buffer.read())
+        return _create_image_for_plot(fig)
 
     def plot_scatterplot(self, x_column_name: str, y_column_name: str) -> Image:
         """
@@ -2052,12 +2045,9 @@ class Table:
             horizontalalignment="right",
         )  # rotate the labels of the x Axis to prevent the chance of overlapping of the labels
         plt.tight_layout()
+        from safeds._utils._plotting import _create_image_for_plot
 
-        buffer = io.BytesIO()
-        fig.savefig(buffer, format="png")
-        plt.close()  # Prevents the figure from being displayed directly
-        buffer.seek(0)
-        return Image.from_bytes(buffer.read())
+        return _create_image_for_plot(fig)
 
     def plot_boxplots(self) -> Image:
         """
@@ -2099,12 +2089,9 @@ class Table:
             axes.set_xticks([])
         plt.tight_layout()
         fig = grid.fig
+        from safeds._utils._plotting import _create_image_for_plot
 
-        buffer = io.BytesIO()
-        fig.savefig(buffer, format="png")
-        plt.close()  # Prevents the figure from being displayed directly
-        buffer.seek(0)
-        return Image.from_bytes(buffer.read())
+        return _create_image_for_plot(fig)
 
     def plot_histograms(self) -> Image:
         """
@@ -2134,12 +2121,9 @@ class Table:
             axes.set_xticklabels(axes.get_xticklabels(), rotation=45, horizontalalignment="right")
         grid.tight_layout()
         fig = grid.fig
+        from safeds._utils._plotting import _create_image_for_plot
 
-        buffer = io.BytesIO()
-        fig.savefig(buffer, format="png")
-        plt.close()
-        buffer.seek(0)
-        return Image.from_bytes(buffer.read())
+        return _create_image_for_plot(fig)
 
     # ------------------------------------------------------------------------------------------------------------------
     # Conversion
