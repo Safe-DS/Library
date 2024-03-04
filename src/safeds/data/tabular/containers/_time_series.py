@@ -908,7 +908,7 @@ class TimeSeries(TaggedTable):
     def plot_moving_average(
         self,
         window_size: int,
-        feature_name: str | None = None,
+        column_name: str | None = None,
     ) -> Image:
         """
         Plot the moving average for the target column.
@@ -918,7 +918,7 @@ class TimeSeries(TaggedTable):
         window_size:
             The size of the windows, which the average gets calculated for
 
-        feature_name:
+        column_name:
             The name of the column which will be used to calculate the moving average, if None the target column will be taken
 
         Returns
@@ -941,14 +941,14 @@ class TimeSeries(TaggedTable):
                 >>> image = table.plot_moving_average(window_size = 2)
 
         """
-        if feature_name is None or feature_name == self.target.name:
+        if column_name is None or column_name == self.target.name:
             series = self.target._data
-            feature_name = self.target.name
+            column_name = self.target.name
         else:
-            if feature_name not in self.column_names:
-                raise UnknownColumnNameError([feature_name])
-            series = self._data[feature_name]
-        if not self.get_column(feature_name).type.is_numeric():
+            if column_name not in self.column_names:
+                raise UnknownColumnNameError([column_name])
+            series = self._data[column_name]
+        if not self.get_column(column_name).type.is_numeric():
             raise NonNumericColumnError("This time series plotted column contains non-numerical columns.")
 
         # create moving average series
@@ -957,6 +957,6 @@ class TimeSeries(TaggedTable):
         # plot both series and put them together
         ax_temp = series_mvg.plot()
         ax = series.plot(ax=ax_temp)
-        ax.legend(labels=["moving_average", feature_name])
+        ax.legend(labels=["moving_average", column_name])
         from safeds._utils._plotting import _create_image_for_plot
         return _create_image_for_plot(ax.figure)

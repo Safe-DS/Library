@@ -30,7 +30,7 @@ def test_optional_parameter(snapshot_png: SnapshotAssertion) -> None:
         time_name="time",
         feature_names=None,
     )
-    moving_average_plot = table.plot_moving_average(window_size=2, feature_name="feature_1")
+    moving_average_plot = table.plot_moving_average(window_size=2, column_name="feature_1")
     assert moving_average_plot == snapshot_png
 
 
@@ -106,4 +106,4 @@ def test_should_raise_error_optional_parameter(
         error,
         match=error_msg,
     ):
-        time_series.plot_moving_average(2, feature_name=name)
+        time_series.plot_moving_average(2, column_name=name)
