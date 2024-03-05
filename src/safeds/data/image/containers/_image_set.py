@@ -72,6 +72,10 @@ class ImageSet(metaclass=ABCMeta):
             return _VariousSizedImageSet._create_image_set(image_tensors, indices)
 
     @abstractmethod
+    def clone(self) -> ImageSet:
+        pass
+
+    @abstractmethod
     def __eq__(self, other: object) -> bool:
         pass
 
@@ -123,11 +127,6 @@ class ImageSet(metaclass=ABCMeta):
     @property
     @abstractmethod
     def number_of_sizes(self) -> int:
-        pass
-
-    @property
-    @abstractmethod
-    def indices(self) -> list[int]:
         pass
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -189,13 +188,9 @@ class ImageSet(metaclass=ABCMeta):
     def add_image(self, image: Image) -> ImageSet:
         return self._add_image_tensor(image._image_tensor, self.number_of_images)
 
+    @abstractmethod
     def add_images(self, images: list[Image] | ImageSet) -> ImageSet:
-        if isinstance(images, ImageSet):
-            images = images.to_images()
-        image_set = ImageSet.from_images(self.to_images(), self.indices)
-        for image in images:
-            image_set = image_set.add_image(image)
-        return image_set
+        pass
 
     def remove_image(self, image: Image) -> ImageSet:
         return self.remove_image_by_index(self.index(image))
@@ -208,11 +203,9 @@ class ImageSet(metaclass=ABCMeta):
     def remove_images_with_size(self, width: int, height: int) -> ImageSet:
         pass
 
+    @abstractmethod
     def remove_duplicate_images(self) -> ImageSet:
-        image_set = ImageSet.from_images(self.to_images(), self.indices)
-        for image in self.to_images():
-            image_set = image_set.remove_image_by_index(image_set.index(image)[1:])
-        return image_set
+        pass
 
     @abstractmethod
     def shuffle_images(self) -> ImageSet:

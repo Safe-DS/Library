@@ -3,6 +3,7 @@ import torch
 from syrupy import SnapshotAssertion
 
 from safeds.data.image.containers import ImageSet, Image, _FixedSizedImageSet, _VariousSizedImageSet
+from safeds.exceptions import IndexOutOfBoundsError
 from tests.helpers import images_all, images_all_ids, resolve_resource_path
 
 
@@ -48,7 +49,7 @@ class TestFromFiles:
         assert 0 in image_set.index(image1.change_channel(expected_channel))
         assert 1 in image_set.index(image2.change_channel(expected_channel))
         assert 2 in image_set.index(image3.change_channel(expected_channel))
-        with pytest.raises(KeyError, match=r"No image with index 3"):
+        with pytest.raises(IndexOutOfBoundsError, match=r"There is no element at index '3'."):
             image_set.get_image(3)
         assert image_set.get_image(0) == image1.change_channel(expected_channel)
         assert image_set.get_image(1) == image2.change_channel(expected_channel)

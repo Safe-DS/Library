@@ -1,3 +1,6 @@
+from __future__ import annotations
+
+import copy
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -5,6 +8,7 @@ from torch import Tensor
 
 from safeds.data.image.containers import Image
 from safeds.data.image.containers._image_set import ImageSet
+from safeds.exceptions import IndexOutOfBoundsError, DuplicateIndexError
 
 if TYPE_CHECKING:
     from safeds.data.image.containers import _FixedSizedImageSet
@@ -13,7 +17,8 @@ if TYPE_CHECKING:
 class _VariousSizedImageSet(ImageSet):
 
     def __init__(self):
-        self._image_set_dict: dict[tuple[int, int], ImageSet] = {}
+        self._image_set_dict: dict[tuple[int, int], ImageSet] = {}  # {image_size: image_set}
+        self._indices_to_image_size_dict: dict[int, tuple[int, int]] = {}  # {index: image_size}
 
     @staticmethod
     def _create_image_set(images: list[Tensor], indices: list[int]) -> ImageSet:
@@ -39,11 +44,24 @@ class _VariousSizedImageSet(ImageSet):
 
         for size in image_tensor_dict.keys():
             image_set._image_set_dict[size] = _FixedSizedImageSet._create_image_set(image_tensor_dict[size], image_index_dict[size])
+            image_set._indices_to_image_size_dict.update(zip(image_set._image_set_dict[size]._as_fixed_sized_image_set()._indices_to_tensor_positions.keys(), [size] * len(image_set._image_set_dict[size])))
+            print(image_set._indices_to_image_size_dict)
 
         if max_channel > 1:
             image_set = image_set.change_channel(max_channel)
 
         return image_set
+
+    def clone(self) -> ImageSet:
+        cloned_image_set = self._clone_without_image_dict()
+        for image_set_size, image_set in self._image_set_dict.items():
+            cloned_image_set._image_set_dict[image_set_size] = image_set.clone()
+        return cloned_image_set
+
+    def _clone_without_image_dict(self) -> _VariousSizedImageSet:
+        cloned_image_set = _VariousSizedImageSet()
+        cloned_image_set._indices_to_image_size_dict = copy.deepcopy(self._indices_to_image_size_dict)
+        return cloned_image_set
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, ImageSet):
@@ -85,18 +103,10 @@ class _VariousSizedImageSet(ImageSet):
     def number_of_sizes(self) -> int:
         return len(self._image_set_dict)
 
-    @property
-    def indices(self) -> list[int]:
-        indices = []
-        for image_set in self._image_set_dict.values():
-            indices += image_set.indices
-        return indices
-
     def get_image(self, index: int) -> Image:
-        for image_set in self._image_set_dict.values():
-            if index in image_set.indices:
-                return image_set.get_image(index)
-        raise KeyError(f'No image with index {index}')
+        if index not in self._indices_to_image_size_dict:
+            raise IndexOutOfBoundsError(index)
+        return self._image_set_dict[self._indices_to_image_size_dict[index]].get_image(index)
 
     def index(self, image: Image) -> list[int]:
         indices = []
@@ -116,14 +126,21 @@ class _VariousSizedImageSet(ImageSet):
 
     def to_images(self, indices: list[int] | None = None) -> list[Image]:
         if indices is None:
-            indices = self.indices
-        image_list = []
-        for image_set in self._image_set_dict.values():
-            image_list += image_set.to_images(image_set.indices)
-        return [image_list[indices.index(i)] for i in sorted(indices)]
+            indices = self._indices_to_image_size_dict.keys()
+        else:
+            wrong_indices = []
+            for index in indices:
+                if index not in self._indices_to_image_size_dict:
+                    wrong_indices.append(index)
+            if len(wrong_indices) == 0:
+                raise IndexOutOfBoundsError(wrong_indices)
+        images = []
+        for index in indices:
+            images.append(self._image_set_dict[self._indices_to_image_size_dict[index]].get_image(index))
+        return images
 
     def change_channel(self, channel: int) -> ImageSet:
-        image_set = _VariousSizedImageSet()
+        image_set = self._clone_without_image_dict()
         for image_set_key, image_set_original in self._image_set_dict.items():
             image_set._image_set_dict[image_set_key] = image_set_original.change_channel(channel)
         return image_set
@@ -131,37 +148,85 @@ class _VariousSizedImageSet(ImageSet):
     def _add_image_tensor(self, image_tensor: Tensor, index: int) -> ImageSet:
         from safeds.data.image.containers import _FixedSizedImageSet
 
-        image_set = _VariousSizedImageSet()
-        image_set._image_set_dict = self._image_set_dict
-        size = (image_tensor.size(dim=2), image_tensor.size(dim=1))
+        if index in self._indices_to_image_size_dict:
+            raise DuplicateIndexError(index)
 
-        current_max_channel = max_channel = self.channel
+        image_set = self.clone()._as_various_sized_image_set()
+        size = (image_tensor.size(dim=2), image_tensor.size(dim=1))
+        image_set._indices_to_image_size_dict[index] = size
 
         if size in self._image_set_dict:
             image_set._image_set_dict[size] = image_set._image_set_dict[size]._add_image_tensor(image_tensor, index)
-            max_channel = max(max_channel, image_set._image_set_dict[size].channel)
         else:
             image_set._image_set_dict[size] = _FixedSizedImageSet._create_image_set([image_tensor], [index])
-            max_channel = max(max_channel, image_set._image_set_dict[size].channel)
 
-        if max_channel > current_max_channel:
-            image_set = image_set.change_channel(max_channel)
+        if image_tensor.size(dim=0) != self.channel:
+            image_set = image_set.change_channel(max(image_tensor.size(dim=0), self.channel))
 
         return image_set
 
+    def add_images(self, images: list[Image] | ImageSet) -> ImageSet:
+        images_with_size = {}
+        if isinstance(images, ImageSet):
+            if images.number_of_sizes == 1:
+                images_with_size[(images.widths[0], images.heights[0])] = images
+            else:
+                for size, im_set in images._as_various_sized_image_set()._image_set_dict.items():
+                    images_with_size[size] = im_set
+        else:
+            for image in images:
+                size = (image.width, image.height)
+                if size in images_with_size:
+                    images_with_size[size].append(image)
+                else:
+                    images_with_size[size] = [image]
+        image_set = self.clone()._as_various_sized_image_set()
+        max_channel = self.channel
+        for size, ims in images_with_size.items():
+            current_max_index = max(self._indices_to_image_size_dict)
+            new_indices = list(range(current_max_index + 1, current_max_index + 1 + len(ims)))
+            if size in image_set._image_set_dict:
+                image_set._image_set_dict[size] = _FixedSizedImageSet._create_image_set(image_set._image_set_dict[size].to_images() + [im._image_tensor for im in ims], image_set._image_set_dict[size]._as_fixed_sized_image_set()._tensor_positions_to_indices + new_indices)
+            else:
+                if isinstance(ims, _FixedSizedImageSet):
+                    fixed_ims = ims.clone()._as_fixed_sized_image_set()
+                    old_indices = list(fixed_ims._indices_to_tensor_positions.items())
+                    fixed_ims._tensor_positions_to_indices = [new_indices[i] for i in sorted(range(len(new_indices)), key=sorted(range(len(new_indices)), key=old_indices.__getitem__).__getitem__)]
+                    fixed_ims._calc_new_indices_to_tensor_positions()
+                    image_set._image_set_dict[size] = fixed_ims
+                else:
+                    image_set._image_set_dict[size] = _FixedSizedImageSet._create_image_set([im._image_tensor for im in ims], new_indices)
+            for i in new_indices:
+                image_set._indices_to_image_size_dict[i] = size
+            max_channel = max(max_channel,  image_set._image_set_dict[size].channel)
+        if max_channel > self.channel:
+            image_set.change_channel(max_channel)
+        return image_set
+
     def remove_image_by_index(self, index: int | list[int]) -> ImageSet:
-        image_set = _VariousSizedImageSet()
+        if isinstance(index, int):
+            index = [index]
+        image_set = self._clone_without_image_dict()
+
         for image_set_key, image_set_original in self._image_set_dict.items():
-            image_set_new = image_set_original.remove_image_by_index(index)
-            if len(image_set_new) > 0:
-                image_set._image_set_dict[image_set_key] = image_set_new
+            image_set._image_set_dict[image_set_key] = image_set_original.remove_image_by_index(index)
+        [image_set._indices_to_image_size_dict.pop(i, None) for i in index]
         return image_set
 
     def remove_images_with_size(self, width: int, height: int) -> ImageSet:
         image_set = _VariousSizedImageSet()
         for image_set_key, image_set_original in self._image_set_dict.items():
             if (width, height) != image_set_key:
-                image_set._image_set_dict[image_set_key] = image_set_original
+                image_set._image_set_dict[image_set_key] = image_set_original.clone()
+        for index, size in self._indices_to_image_size_dict:
+            if size != (width, height):
+                image_set._indices_to_image_size_dict[index] = size
+        return image_set
+
+    def remove_duplicate_images(self) -> ImageSet:
+        image_set = self._clone_without_image_dict()
+        for image_set_key, image_set_original in self._image_set_dict.items():
+            image_set._image_set_dict[image_set_key] = image_set_original.remove_duplicate_images()
         return image_set
 
     def shuffle_images(self) -> ImageSet:

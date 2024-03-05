@@ -73,15 +73,35 @@ class IndexOutOfBoundsError(IndexError):
 
     Parameters
     ----------
-    index : int | slice
+    index : int | list[int] | slice
         The wrongly used index.
     """
 
-    def __init__(self, index: int | slice):
+    def __init__(self, index: int | list[int] | slice):
+        if isinstance(index, list):
+            if len(index) == 1:
+                index = index[0]
+            else:
+                super().__init__(f"There are no elements at indices {index}.")
+                return
         if isinstance(index, int):
             super().__init__(f"There is no element at index '{index}'.")
         else:
             super().__init__(f"There is no element in the range [{index.start}, {index.stop}]")
+
+
+class DuplicateIndexError(IndexError):
+    """
+    Exception raised for trying to add an element with an index that does already exist in the underlying data.
+
+    Parameters
+    ----------
+    index : int
+        The wrongly added index.
+    """
+
+    def __init__(self, index: int):
+        super().__init__(f"The index '{index}' is already in use.")
 
 
 class ColumnSizeError(Exception):
