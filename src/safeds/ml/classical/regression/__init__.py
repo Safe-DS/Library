@@ -11,9 +11,11 @@ from ._random_forest import RandomForest
 from ._regressor import Regressor
 from ._ridge_regression import RidgeRegression
 from ._support_vector_machine import SupportVectorMachine
+from ._arima import arimaModel
 
 __all__ = [
     "AdaBoost",
+    "arimaModel",
     "DecisionTree",
     "ElasticNetRegression",
     "GradientBoosting",
