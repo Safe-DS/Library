@@ -21,8 +21,8 @@ class RegressionNeuralNetwork:
         train_data: TaggedTable,
         epoch_size: int = 25,
         batch_size: int = 1,
-        callback_on_batch_completion: Callable[float, None] | None = None,
-        callback_on_epoch_completion: Callable[float, None] | None = None,
+        callback_on_batch_completion: Callable[[float], None] | None = None,
+        callback_on_epoch_completion: Callable[[float], None] | None = None,
     ) -> Self:
         """
         Train the neural network with given training data.
@@ -139,8 +139,8 @@ class ClassificationNeuralNetwork:
         train_data: TaggedTable,
         epoch_size: int = 25,
         batch_size: int = 1,
-        callback_on_batch_completion: Callable[float, None] | None = None,
-        callback_on_epoch_completion: Callable[float, None] | None = None,
+        callback_on_batch_completion: Callable[[float], None] | None = None,
+        callback_on_epoch_completion: Callable[[float], None] | None = None,
     ) -> Self:
         """
         Train the neural network with given training data.
