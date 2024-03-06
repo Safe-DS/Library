@@ -21,8 +21,8 @@ class RegressionNeuralNetwork:
         train_data: TaggedTable,
         epoch_size: int = 25,
         batch_size: int = 1,
-        callback_on_batch_completion: Callable[[], None] | None = None,
-        callback_on_epoch_completion: Callable[[], None] | None = None,
+        callback_on_batch_completion: Callable[float, None] | None = None,
+        callback_on_epoch_completion: Callable[float, None] | None = None,
     ) -> Self:
         """
         Train the neural network with given training data.
@@ -59,12 +59,13 @@ class RegressionNeuralNetwork:
             raise OutOfBoundsError(actual=batch_size, name="batch_size", lower_bound=ClosedBound(1))
         copied_model = copy.deepcopy(self)
         copied_model._batch_size = batch_size
-        dataloader = train_data.into_dataloader(copied_model._batch_size)
+        dataloader = train_data._into_dataloader(copied_model._batch_size)
 
         loss_fn = nn.MSELoss()
 
         optimizer = torch.optim.SGD(copied_model._model.parameters(), lr=0.05)
-
+        loss_sum = 0.0
+        number_of_batches_done = 0
         for _ in range(epoch_size):
             for x, y in dataloader:
                 optimizer.zero_grad()
@@ -72,13 +73,14 @@ class RegressionNeuralNetwork:
                 pred = copied_model._model(x)
 
                 loss = loss_fn(pred, y)
-
+                loss_sum += loss
                 loss.backward()
                 optimizer.step()
+                number_of_batches_done += 1
                 if callback_on_batch_completion is not None:
-                    callback_on_batch_completion()
+                    callback_on_batch_completion(loss_sum/(number_of_batches_done*batch_size))
         if callback_on_epoch_completion is not None:
-            callback_on_epoch_completion()
+            callback_on_epoch_completion(loss_sum/(number_of_batches_done*batch_size))
         copied_model._is_fitted = True
         copied_model._model.eval()
         return copied_model
@@ -106,7 +108,7 @@ class RegressionNeuralNetwork:
         """
         if not self._is_fitted:
             raise ModelNotFittedError
-        dataloader = test_data.into_dataloader(self._batch_size)
+        dataloader = test_data._into_dataloader(self._batch_size)
         predictions = []
         with torch.no_grad():
             for x in dataloader:
@@ -132,7 +134,14 @@ class ClassificationNeuralNetwork:
         self._batch_size = 1
         self._is_fitted = False
 
-    def fit(self, train_data: TaggedTable, epoch_size: int = 25, batch_size: int = 1) -> Self:
+    def fit(
+        self,
+        train_data: TaggedTable,
+        epoch_size: int = 25,
+        batch_size: int = 1,
+        callback_on_batch_completion: Callable[float, None] | None = None,
+        callback_on_epoch_completion: Callable[float, None] | None = None,
+    ) -> Self:
         """
         Train the neural network with given training data.
 
@@ -143,9 +152,13 @@ class ClassificationNeuralNetwork:
         train_data
             The data the network should be trained on.
         epoch_size
-            The number of times the training cycle should be done
+            The number of times the training cycle should be done.
         batch_size
             The size of data batches that should be loaded at one time.
+        callback_on_batch_completion
+            Function used to view metrics while training. Gets called after a batch is completed.
+        callback_on_epoch_completion
+            Function used to view metrics while training. Gets called after an epoch is completed.
 
         Raises
         ------
@@ -155,7 +168,7 @@ class ClassificationNeuralNetwork:
 
         Returns
         -------
-        ClassificationNeuralNetwork
+        trained_model :
             The trained Model
         """
         if epoch_size < 1:
@@ -164,21 +177,28 @@ class ClassificationNeuralNetwork:
             raise OutOfBoundsError(actual=batch_size, name="batch_size", lower_bound=ClosedBound(1))
         copied_model = copy.deepcopy(self)
         copied_model._batch_size = batch_size
-        dataloader = train_data.into_dataloader(copied_model._batch_size)
+        dataloader = train_data._into_dataloader(copied_model._batch_size)
 
         loss_fn = nn.BCELoss()
 
         optimizer = torch.optim.SGD(copied_model._model.parameters(), lr=0.05)
-
+        loss_sum = 0.0
+        number_of_batches_done = 0
         for _ in range(epoch_size):
             for x, y in dataloader:
                 optimizer.zero_grad()
+
                 pred = copied_model._model(x)
 
                 loss = loss_fn(pred, y)
-
+                loss_sum += loss
                 loss.backward()
                 optimizer.step()
+                number_of_batches_done += 1
+                if callback_on_batch_completion is not None:
+                    callback_on_batch_completion(loss_sum/(number_of_batches_done*batch_size))
+        if callback_on_epoch_completion is not None:
+            callback_on_epoch_completion(loss_sum/(number_of_batches_done*batch_size))
         copied_model._is_fitted = True
         copied_model._model.eval()
         return copied_model
@@ -206,7 +226,7 @@ class ClassificationNeuralNetwork:
         """
         if not self._is_fitted:
             raise ModelNotFittedError
-        dataloader = test_data.into_dataloader(self._batch_size)
+        dataloader = test_data._into_dataloader(self._batch_size)
         predictions = []
         with torch.no_grad():
             for x in dataloader:

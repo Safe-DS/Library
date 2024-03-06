@@ -849,7 +849,7 @@ class TaggedTable(Table):
             feature_names=self.features.column_names,
         )
 
-    def into_dataloader(self, batch_size: int) -> DataLoader:
+    def _into_dataloader(self, batch_size: int) -> DataLoader:
         """
         Return a Dataloader for the data stored in this table, used for training neural networks.
 

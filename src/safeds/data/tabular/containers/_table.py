@@ -2383,7 +2383,7 @@ class Table:
         data_copy.columns = self.column_names
         return data_copy.__dataframe__(nan_as_null, allow_copy)
 
-    def into_dataloader(self, batch_size: int) -> DataLoader:
+    def _into_dataloader(self, batch_size: int) -> DataLoader:
         """
         Return a Dataloader for the data stored in this table, used for training neural networks.
 
