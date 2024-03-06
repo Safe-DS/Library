@@ -31,15 +31,15 @@ class RegressionNeuralNetwork:
 
         Parameters
         ----------
-        train_data : TaggedTable
+        train_data
             The data the network should be trained on.
-        epoch_size : int
+        epoch_size
             The number of times the training cycle should be done.
-        batch_size : int
+        batch_size
             The size of data batches that should be loaded at one time.
-        callback_on_batch_completion: Callable[]
+        callback_on_batch_completion
             Function used to view metrics while training. Gets called after a batch is completed.
-        callback_on_epoch_completion: Callable[]
+        callback_on_epoch_completion
             Function used to view metrics while training. Gets called after an epoch is completed.
 
         Raises
@@ -50,7 +50,7 @@ class RegressionNeuralNetwork:
 
         Returns
         -------
-        RegressionNeuralNetwork
+        trained_model :
             The trained Model
         """
         if epoch_size < 1:
@@ -91,12 +91,12 @@ class RegressionNeuralNetwork:
 
         Parameters
         ----------
-        test_data : Table
+        test_data
             The data the network should predict.
 
         Returns
         -------
-        TaggedTable
+        prediction :
             The given test_data with an added "prediction" column at the end
 
         Raises
@@ -120,7 +120,7 @@ class RegressionNeuralNetwork:
 
         Returns
         -------
-        is_fitted : bool
+        is_fitted
             Whether the model is fitted.
         """
         return self._is_fitted
@@ -140,11 +140,11 @@ class ClassificationNeuralNetwork:
 
         Parameters
         ----------
-        train_data : TaggedTable
+        train_data
             The data the network should be trained on.
-        epoch_size : int
+        epoch_size
             The number of times the training cycle should be done
-        batch_size : int
+        batch_size
             The size of data batches that should be loaded at one time.
 
         Raises
@@ -191,12 +191,12 @@ class ClassificationNeuralNetwork:
 
         Parameters
         ----------
-        test_data : Table
+        test_data
             The data the network should predict.
 
         Returns
         -------
-        TaggedTable
+        prediction :
             The given test_data with an added "prediction" column at the end
 
         Raises
@@ -220,7 +220,7 @@ class ClassificationNeuralNetwork:
 
         Returns
         -------
-        is_fitted : bool
+        is_fitted :
             Whether the model is fitted.
         """
         return self._is_fitted

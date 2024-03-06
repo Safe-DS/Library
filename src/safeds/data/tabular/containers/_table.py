@@ -2396,7 +2396,7 @@ class Table:
 
         Returns
         -------
-        result : DataLoader
+        result :
             The DataLoader.
 
         """

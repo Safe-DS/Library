@@ -857,12 +857,12 @@ class TaggedTable(Table):
 
         Parameters
         ----------
-        batch_size : int
+        batch_size
             The size of data batches that should be loaded at one time.
 
         Returns
         -------
-        result : DataLoader
+        result :
             The DataLoader.
 
         """

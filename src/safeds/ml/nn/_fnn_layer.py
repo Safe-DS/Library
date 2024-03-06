@@ -23,9 +23,9 @@ class FNNLayer:
 
         Parameters
         ----------
-        input_size : int
+        input_size
             The number of neurons in the previous layer
-        output_size : int
+        output_size
             The number of neurons in this layer
 
         Raises
@@ -51,7 +51,7 @@ class FNNLayer:
 
         Returns
         -------
-        result: int
+        result :
             The Number of Neurons in this layer.
         """
         return self._output_size
