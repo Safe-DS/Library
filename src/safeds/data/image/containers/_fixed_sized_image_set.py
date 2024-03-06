@@ -1,16 +1,19 @@
 from __future__ import annotations
 
 import copy
+import random
+import warnings
 from pathlib import Path
 from typing import TYPE_CHECKING
 
 import torch
+import torch.nn.functional as func
 from torch import Tensor
 from torchvision.transforms.v2 import functional as func2
 
 from safeds.data.image.containers import Image
 from safeds.data.image.containers._image_set import ImageSet
-from safeds.exceptions import DuplicateIndexError, IndexOutOfBoundsError
+from safeds.exceptions import DuplicateIndexError, IndexOutOfBoundsError, OutOfBoundsError, ClosedBound
 
 if TYPE_CHECKING:
     from safeds.data.image.containers._various_sized_image_set import _VariousSizedImageSet
@@ -210,7 +213,7 @@ class _FixedSizedImageSet(ImageSet):
                 for index in self._tensor_positions_to_indices:
                     image_set._indices_to_image_size_dict[index] = (self.widths[0], self.heights[0])
                 for index in images._tensor_positions_to_indices:
-                    image_set._indices_to_image_size_dict[index] = (images.widths[0], images.heights[0])
+                    image_set._indices_to_image_size_dict[index + max_index + 1] = (images.widths[0], images.heights[0])
 
                 if images.channel != self.channel:
                     image_set = image_set.change_channel(max(images.channel, self.channel))
@@ -246,10 +249,15 @@ class _FixedSizedImageSet(ImageSet):
         return image_set
 
     def shuffle_images(self) -> ImageSet:
-        pass
+        image_set = self.clone()._as_fixed_sized_image_set()
+        random.shuffle(image_set._tensor_positions_to_indices)
+        image_set._indices_to_tensor_positions = image_set._calc_new_indices_to_tensor_positions()
+        return image_set
 
     def resize(self, new_width: int, new_height: int) -> ImageSet:
-        pass
+        image_set = self._clone_without_tensor()
+        image_set._tensor = func.interpolate(self._tensor, size=(new_height, new_width))
+        return image_set
 
     def convert_to_grayscale(self) -> ImageSet:
         image_set = self._clone_without_tensor()
@@ -257,40 +265,135 @@ class _FixedSizedImageSet(ImageSet):
         return image_set
 
     def crop(self, x: int, y: int, width: int, height: int) -> ImageSet:
-        pass
+        image_set = self._clone_without_tensor()
+        image_set._tensor = func2.crop(self._tensor, x, y, height, width)
+        return image_set
 
     def flip_vertically(self) -> ImageSet:
-        pass
+        image_set = self._clone_without_tensor()
+        image_set._tensor = func2.vertical_flip(self._tensor)
+        return image_set
 
     def flip_horizontally(self) -> ImageSet:
-        pass
+        image_set = self._clone_without_tensor()
+        image_set._tensor = func2.horizontal_flip(self._tensor)
+        return image_set
 
     def adjust_brightness(self, factor: float) -> ImageSet:
-        pass
+        if factor < 0:
+            raise OutOfBoundsError(factor, name="factor", lower_bound=ClosedBound(0))
+        elif factor == 1:
+            warnings.warn(
+                "Brightness adjustment factor is 1.0, this will not make changes to the images.",
+                UserWarning,
+                stacklevel=2,
+            )
+        image_set = self._clone_without_tensor()
+        if self.channel == 4:
+            image_set._tensor = torch.cat([func2.adjust_brightness(self._tensor[:, 0:3], factor * 1.0), self._tensor[:, 3].unsqueeze(dim=1)], dim=1)
+        else:
+            image_set._tensor = func2.adjust_brightness(self._tensor, factor * 1.0)
+        return image_set
 
     def add_noise(self, standard_deviation: float) -> ImageSet:
-        pass
+        if standard_deviation < 0:
+            raise OutOfBoundsError(standard_deviation, name="standard_deviation", lower_bound=ClosedBound(0))
+        image_set = self._clone_without_tensor()
+        image_set._tensor = self._tensor + torch.normal(0, standard_deviation, self._tensor.size()) * 255
+        return image_set
 
     def adjust_contrast(self, factor: float) -> ImageSet:
-        pass
+        if factor < 0:
+            raise OutOfBoundsError(factor, name="factor", lower_bound=ClosedBound(0))
+        elif factor == 1:
+            warnings.warn(
+                "Contrast adjustment factor is 1.0, this will not make changes to the images.",
+                UserWarning,
+                stacklevel=2,
+            )
+        image_set = self._clone_without_tensor()
+        if self.channel == 4:
+            image_set._tensor = torch.cat([func2.adjust_contrast(self._tensor[:, 0:3], factor * 1.0), self._tensor[:, 3].unsqueeze(dim=1)], dim=1)
+        else:
+            image_set._tensor = func2.adjust_contrast(self._tensor, factor * 1.0)
+        return image_set
 
     def adjust_color_balance(self, factor: float) -> ImageSet:
-        pass
+        if factor < 0:
+            raise OutOfBoundsError(factor, name="factor", lower_bound=ClosedBound(0))
+        elif factor == 1:
+            warnings.warn(
+                "Color adjustment factor is 1.0, this will not make changes to the images.",
+                UserWarning,
+                stacklevel=2,
+            )
+        elif self.channel == 1:
+            warnings.warn(
+                "Color adjustment will not have an affect on grayscale images with only one channel.",
+                UserWarning,
+                stacklevel=2,
+            )
+        image_set = self._clone_without_tensor()
+        image_set._tensor = self.convert_to_grayscale()._as_fixed_sized_image_set()._tensor * (1.0 - factor * 1.0) + self._tensor * (factor * 1.0)
+        return image_set
 
     def blur(self, radius: int) -> ImageSet:
-        pass
+        image_set = self._clone_without_tensor()
+        image_set._tensor = func2.gaussian_blur(self._tensor, [radius * 2 + 1, radius * 2 + 1])
+        return image_set
 
     def sharpen(self, factor: float) -> ImageSet:
-        pass
+        if factor < 0:
+            raise OutOfBoundsError(factor, name="factor", lower_bound=ClosedBound(0))
+        elif factor == 1:
+            warnings.warn(
+                "Sharpen factor is 1.0, this will not make changes to the images.",
+                UserWarning,
+                stacklevel=2,
+            )
+        image_set = self._clone_without_tensor()
+        if self.channel == 4:
+            image_set._tensor = torch.cat([func2.adjust_sharpness(self._tensor[:, 0:3], factor * 1.0), self._tensor[3].unsqueeze(dim=1)], dim=1)
+        else:
+            image_set._tensor = func2.adjust_sharpness(self._tensor, factor * 1.0)
+        return image_set
 
     def invert_colors(self) -> ImageSet:
-        pass
+        image_set = self._clone_without_tensor()
+        if self.channel == 4:
+            image_set._tensor = torch.cat([func2.invert(self._tensor[:, 0:3]), self._tensor[3].unsqueeze(dim=1)], dim=1)
+        else:
+            image_set._tensor = func2.invert(self._tensor)
+        return image_set
 
     def rotate_right(self) -> ImageSet:
-        pass
+        image_set = self._clone_without_tensor()
+        image_set._tensor = func2.rotate(self._tensor, -90, expand=True)
+        return image_set
 
     def rotate_left(self) -> ImageSet:
-        pass
+        image_set = self._clone_without_tensor()
+        image_set._tensor = func2.rotate(self._tensor, 90, expand=True)
+        return image_set
 
     def find_edges(self) -> ImageSet:
-        pass
+        kernel = (
+            Image._FILTER_EDGES_KERNEL.to("cpu")
+        )
+        edges_tensor = torch.clamp(
+            torch.nn.functional.conv2d(
+                self.convert_to_grayscale()._as_fixed_sized_image_set()._tensor.float()[:, 0].unsqueeze(dim=1),
+                kernel,
+                padding="same",
+            ),
+            0,
+            255,
+        ).to(torch.uint8)
+        image_set = self._clone_without_tensor()
+        if self.channel == 3:
+            image_set._tensor = edges_tensor.repeat(1, 3, 1, 1)
+        elif self.channel == 4:
+            image_set._tensor = torch.cat([edges_tensor.repeat(1, 3, 1, 1), self._tensor[:, 3].unsqueeze(dim=1)], dim=1)
+        else:
+            image_set._tensor = edges_tensor
+        return image_set

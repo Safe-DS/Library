@@ -45,7 +45,6 @@ class _VariousSizedImageSet(ImageSet):
         for size in image_tensor_dict.keys():
             image_set._image_set_dict[size] = _FixedSizedImageSet._create_image_set(image_tensor_dict[size], image_index_dict[size])
             image_set._indices_to_image_size_dict.update(zip(image_set._image_set_dict[size]._as_fixed_sized_image_set()._indices_to_tensor_positions.keys(), [size] * len(image_set._image_set_dict[size])))
-            print(image_set._indices_to_image_size_dict)
 
         if max_channel > 1:
             image_set = image_set.change_channel(max_channel)
@@ -167,24 +166,31 @@ class _VariousSizedImageSet(ImageSet):
 
     def add_images(self, images: list[Image] | ImageSet) -> ImageSet:
         images_with_size = {}
+        indices_for_images_with_size = {}
+        current_index = max(self._indices_to_image_size_dict) + 1
         if isinstance(images, ImageSet):
             if images.number_of_sizes == 1:
                 images_with_size[(images.widths[0], images.heights[0])] = images
+                indices_for_images_with_size[(images.widths[0], images.heights[0])] = [index + current_index for index in images._as_fixed_sized_image_set()._tensor_positions_to_indices]
             else:
                 for size, im_set in images._as_various_sized_image_set()._image_set_dict.items():
                     images_with_size[size] = im_set
+                    indices_for_images_with_size[size] = [index + current_index for index in im_set._as_fixed_sized_image_set()._tensor_positions_to_indices]
+                    current_index += len(im_set)
         else:
             for image in images:
                 size = (image.width, image.height)
                 if size in images_with_size:
                     images_with_size[size].append(image)
+                    indices_for_images_with_size[size].append(current_index)
                 else:
                     images_with_size[size] = [image]
+                    indices_for_images_with_size[size] = [current_index]
+                current_index += 1
         image_set = self.clone()._as_various_sized_image_set()
         max_channel = self.channel
         for size, ims in images_with_size.items():
-            current_max_index = max(self._indices_to_image_size_dict)
-            new_indices = list(range(current_max_index + 1, current_max_index + 1 + len(ims)))
+            new_indices = indices_for_images_with_size[size]
             if size in image_set._image_set_dict:
                 image_set._image_set_dict[size] = _FixedSizedImageSet._create_image_set(image_set._image_set_dict[size].to_images() + [im._image_tensor for im in ims], image_set._image_set_dict[size]._as_fixed_sized_image_set()._tensor_positions_to_indices + new_indices)
             else:
