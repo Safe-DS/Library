@@ -2391,7 +2391,7 @@ class Table:
 
         Parameters
         ----------
-        batch_size : int
+        batch_size
             The size of data batches that should be loaded at one time.
 
         Returns
