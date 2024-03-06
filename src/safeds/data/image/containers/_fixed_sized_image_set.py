@@ -254,7 +254,7 @@ class _FixedSizedImageSet(ImageSet):
         image_set._indices_to_tensor_positions = image_set._calc_new_indices_to_tensor_positions()
         return image_set
 
-    def resize(self, new_width: int, new_height: int) -> ImageSet:
+    def resize(self, new_width: int, new_height: int) -> _FixedSizedImageSet:
         image_set = self._clone_without_tensor()
         image_set._tensor = func.interpolate(self._tensor, size=(new_height, new_width))
         return image_set
@@ -264,7 +264,7 @@ class _FixedSizedImageSet(ImageSet):
         image_set._tensor = func2.rgb_to_grayscale(self._tensor[:, 0:3])
         return image_set
 
-    def crop(self, x: int, y: int, width: int, height: int) -> ImageSet:
+    def crop(self, x: int, y: int, width: int, height: int) -> _FixedSizedImageSet:
         image_set = self._clone_without_tensor()
         image_set._tensor = func2.crop(self._tensor, x, y, height, width)
         return image_set

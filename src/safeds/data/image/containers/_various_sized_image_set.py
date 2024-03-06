@@ -1,9 +1,11 @@
 from __future__ import annotations
 
 import copy
+import random
 from pathlib import Path
 from typing import TYPE_CHECKING
 
+import torch
 from torch import Tensor
 
 from safeds.data.image.containers import Image
@@ -236,49 +238,120 @@ class _VariousSizedImageSet(ImageSet):
         return image_set
 
     def shuffle_images(self) -> ImageSet:
-        pass
+        image_set = _VariousSizedImageSet()
+        new_indices = list(self._indices_to_image_size_dict.keys())
+        random.shuffle(new_indices)
+        current_index = 0
+        for image_set_key, image_set_original in self._image_set_dict.items():
+            new_image_set = image_set_original.clone()._as_fixed_sized_image_set()
+            new_image_set._tensor_positions_to_indices = new_indices[current_index:current_index + len(image_set_original)]
+            new_image_set._indices_to_tensor_positions = new_image_set._calc_new_indices_to_tensor_positions()
+            image_set._image_set_dict[image_set_key] = new_image_set
+            for i in new_indices[current_index:current_index + len(image_set_original)]:
+                image_set._indices_to_image_size_dict[i] = image_set_key
+            current_index += len(image_set_original)
+        return image_set
 
-    def resize(self, new_width: int, new_height: int) -> ImageSet:
-        pass
+    def resize(self, new_width: int, new_height: int) -> _FixedSizedImageSet:
+        image_set_tensors = []
+        image_set_indices = []
+        for image_set_original in self._image_set_dict.values():
+            image_set_new = image_set_original.resize(new_width, new_height)
+            image_set_tensors.append(image_set_new._tensor)
+            image_set_indices += image_set_new._tensor_positions_to_indices
+        image_set = _FixedSizedImageSet()
+        image_set._tensor = torch.cat(image_set_tensors, dim=0)
+        image_set._tensor_positions_to_indices = image_set_indices
+        image_set._indices_to_tensor_positions = image_set._calc_new_indices_to_tensor_positions()
+        return image_set
 
     def convert_to_grayscale(self) -> ImageSet:
-        pass
+        image_set = self._clone_without_image_dict()
+        for image_set_key, image_set_original in self._image_set_dict.items():
+            image_set._image_set_dict[image_set_key] = image_set_original.convert_to_grayscale()
+        return image_set
 
-    def crop(self, x: int, y: int, width: int, height: int) -> ImageSet:
-        pass
+    def crop(self, x: int, y: int, width: int, height: int) -> _FixedSizedImageSet:
+        image_set_tensors = []
+        image_set_indices = []
+        for image_set_original in self._image_set_dict.values():
+            image_set_new = image_set_original.crop(x, y, width, height)
+            image_set_tensors.append(image_set_new._tensor)
+            image_set_indices += image_set_new._tensor_positions_to_indices
+        image_set = _FixedSizedImageSet()
+        image_set._tensor = torch.cat(image_set_tensors, dim=0)
+        image_set._tensor_positions_to_indices = image_set_indices
+        image_set._indices_to_tensor_positions = image_set._calc_new_indices_to_tensor_positions()
+        return image_set
 
     def flip_vertically(self) -> ImageSet:
-        pass
+        image_set = self._clone_without_image_dict()
+        for image_set_key, image_set_original in self._image_set_dict.items():
+            image_set._image_set_dict[image_set_key] = image_set_original.flip_vertically()
+        return image_set
 
     def flip_horizontally(self) -> ImageSet:
-        pass
+        image_set = self._clone_without_image_dict()
+        for image_set_key, image_set_original in self._image_set_dict.items():
+            image_set._image_set_dict[image_set_key] = image_set_original.flip_horizontally()
+        return image_set
 
     def adjust_brightness(self, factor: float) -> ImageSet:
-        pass
+        image_set = self._clone_without_image_dict()
+        for image_set_key, image_set_original in self._image_set_dict.items():
+            image_set._image_set_dict[image_set_key] = image_set_original.adjust_brightness(factor)
+        return image_set
 
     def add_noise(self, standard_deviation: float) -> ImageSet:
-        pass
+        image_set = self._clone_without_image_dict()
+        for image_set_key, image_set_original in self._image_set_dict.items():
+            image_set._image_set_dict[image_set_key] = image_set_original.add_noise(standard_deviation)
+        return image_set
 
     def adjust_contrast(self, factor: float) -> ImageSet:
-        pass
+        image_set = self._clone_without_image_dict()
+        for image_set_key, image_set_original in self._image_set_dict.items():
+            image_set._image_set_dict[image_set_key] = image_set_original.adjust_contrast(factor)
+        return image_set
 
     def adjust_color_balance(self, factor: float) -> ImageSet:
-        pass
+        image_set = self._clone_without_image_dict()
+        for image_set_key, image_set_original in self._image_set_dict.items():
+            image_set._image_set_dict[image_set_key] = image_set_original.adjust_color_balance(factor)
+        return image_set
 
     def blur(self, radius: int) -> ImageSet:
-        pass
+        image_set = self._clone_without_image_dict()
+        for image_set_key, image_set_original in self._image_set_dict.items():
+            image_set._image_set_dict[image_set_key] = image_set_original.blur(radius)
+        return image_set
 
     def sharpen(self, factor: float) -> ImageSet:
-        pass
+        image_set = self._clone_without_image_dict()
+        for image_set_key, image_set_original in self._image_set_dict.items():
+            image_set._image_set_dict[image_set_key] = image_set_original.sharpen(factor)
+        return image_set
 
     def invert_colors(self) -> ImageSet:
-        pass
+        image_set = self._clone_without_image_dict()
+        for image_set_key, image_set_original in self._image_set_dict.items():
+            image_set._image_set_dict[image_set_key] = image_set_original.invert_colors()
+        return image_set
 
     def rotate_right(self) -> ImageSet:
-        pass
+        image_set = self._clone_without_image_dict()
+        for image_set_key, image_set_original in self._image_set_dict.items():
+            image_set._image_set_dict[image_set_key] = image_set_original.rotate_right()
+        return image_set
 
     def rotate_left(self) -> ImageSet:
-        pass
+        image_set = self._clone_without_image_dict()
+        for image_set_key, image_set_original in self._image_set_dict.items():
+            image_set._image_set_dict[image_set_key] = image_set_original.rotate_left()
+        return image_set
 
     def find_edges(self) -> ImageSet:
-        pass
+        image_set = self._clone_without_image_dict()
+        for image_set_key, image_set_original in self._image_set_dict.items():
+            image_set._image_set_dict[image_set_key] = image_set_original.find_edges()
+        return image_set

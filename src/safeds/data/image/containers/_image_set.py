@@ -212,7 +212,7 @@ class ImageSet(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def resize(self, new_width: int, new_height: int) -> ImageSet:
+    def resize(self, new_width: int, new_height: int) -> _FixedSizedImageSet:
         pass
 
     @abstractmethod
@@ -220,7 +220,7 @@ class ImageSet(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def crop(self, x: int, y: int, width: int, height: int) -> ImageSet:
+    def crop(self, x: int, y: int, width: int, height: int) -> _FixedSizedImageSet:
         pass
 
     @abstractmethod
