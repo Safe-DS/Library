@@ -871,8 +871,8 @@ class TestFindEdges:
 class TestSizeof:
     @pytest.mark.parametrize(
         "resource_path",
-        _test_images_all(),
-        ids=_test_images_all_ids(),
+        images_all(),
+        ids=images_all_ids(),
     )
     def test_should_size_be_greater_than_normal_object(self, resource_path: str | Path, device: Device) -> None:
         _skip_if_device_not_available(device)
