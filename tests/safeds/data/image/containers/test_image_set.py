@@ -1,3 +1,5 @@
+import random
+
 import pytest
 import torch
 from syrupy import SnapshotAssertion
@@ -131,6 +133,13 @@ class TestAllImageCombinations:
         assert ImageSet.from_images([image1, image2, image3] + images_not_included) == image_set.add_images(
             images_not_included)
 
+        # Test shuffle images
+        image_set_shuffled = image_set.shuffle_images()
+        assert len(image_set_shuffled) == 3
+        assert image_set_shuffled.get_image(0) in image_set
+        assert image_set_shuffled.get_image(1) in image_set
+        assert image_set_shuffled.get_image(2) in image_set
+
 
 class TestFromFiles:
 
@@ -161,6 +170,25 @@ class TestToImages:
         with pytest.raises(IndexOutOfBoundsError,
                            match=rf"There are no elements at indices {str(list(range(len(image_set), 2 + len(image_set)))).replace('[', bracket_open).replace(']', bracket_close)}."):
             image_set.to_images(list(range(2, 2 + len(image_set))))
+
+
+class TestShuffleImages:
+
+    @pytest.mark.parametrize("resource_path", [images_all(), [plane_png_path, plane_jpg_path] * 2],
+                             ids=["all-images", "planes"])
+    def test_shuffle_images(self, resource_path: list[str], snapshot_png_image_set: SnapshotAssertion):
+        torch.set_default_device(_get_device())
+        image_set_original = ImageSet.from_files(resolve_resource_path(resource_path))
+        image_set_clone = image_set_original.clone()
+        random.seed(420)
+        image_set_shuffled = image_set_original.shuffle_images()
+        random.seed()
+        assert len(image_set_shuffled) == len(resource_path)
+        for index in range(len(resource_path)):
+            assert image_set_shuffled.get_image(index) in image_set_original
+        assert image_set_shuffled == snapshot_png_image_set
+        assert image_set_original is not image_set_clone
+        assert image_set_original == image_set_clone
 
 
 @pytest.mark.parametrize("resource_path3", images_all_channel(), ids=images_all_channel_ids())
