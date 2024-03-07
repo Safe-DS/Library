@@ -289,7 +289,7 @@ class Image:
         elif self.channel == 4 and channel == 3:
             image_tensor = self._image_tensor[0:3]
         else:
-            image_tensor = self._image_tensor
+            raise ValueError(f"Channel {channel} is not a valid channel option. Use either 1, 3 or 4")
         return Image(image_tensor, device=self._image_tensor.device)
 
     def resize(self, new_width: int, new_height: int) -> Image:

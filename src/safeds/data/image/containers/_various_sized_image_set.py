@@ -137,7 +137,7 @@ class _VariousSizedImageSet(ImageSet):
             for index in indices:
                 if index not in self._indices_to_image_size_dict:
                     wrong_indices.append(index)
-            if len(wrong_indices) == 0:
+            if len(wrong_indices) != 0:
                 raise IndexOutOfBoundsError(wrong_indices)
         images = []
         for index in indices:

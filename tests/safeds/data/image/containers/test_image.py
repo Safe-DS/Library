@@ -332,6 +332,22 @@ class TestChangeChannel:
         assert new_image.channel == channel
         assert new_image == snapshot_png_image
 
+    @pytest.mark.parametrize(
+        "resource_path",
+        images_all(),
+        ids=images_all_ids(),
+    )
+    @pytest.mark.parametrize(
+        "channel",
+        [2],
+        ids=["invalid-channel"]
+    )
+    def test_should_raise(self, resource_path: str, channel: int, device: Device) -> None:
+        _skip_if_device_not_available(device)
+        image = Image.from_file(resolve_resource_path(resource_path), device)
+        with pytest.raises(ValueError, match=rf"Channel {channel} is not a valid channel option. Use either 1, 3 or 4"):
+            image.change_channel(channel)
+
 
 @pytest.mark.parametrize("device", _test_devices(), ids=_test_devices_ids())
 class TestResize:

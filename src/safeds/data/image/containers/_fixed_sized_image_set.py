@@ -134,7 +134,7 @@ class _FixedSizedImageSet(ImageSet):
             for index in indices:
                 if index not in self._indices_to_tensor_positions:
                     wrong_indices.append(index)
-            if len(wrong_indices) == 0:
+            if len(wrong_indices) != 0:
                 raise IndexOutOfBoundsError(wrong_indices)
         return [Image(self._tensor[self._indices_to_tensor_positions[index]]) for index in indices]
 

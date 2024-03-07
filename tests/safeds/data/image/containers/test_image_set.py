@@ -4,8 +4,9 @@ from syrupy import SnapshotAssertion
 
 from safeds.config import _get_device
 from safeds.data.image.containers import ImageSet, Image, _FixedSizedImageSet, _VariousSizedImageSet
-from safeds.exceptions import IndexOutOfBoundsError, OutOfBoundsError
-from tests.helpers import images_all, images_all_ids, resolve_resource_path, images_all_channel, images_all_channel_ids
+from safeds.exceptions import IndexOutOfBoundsError, OutOfBoundsError, DuplicateIndexError
+from tests.helpers import images_all, images_all_ids, resolve_resource_path, images_all_channel, images_all_channel_ids, \
+    plane_png_path, plane_jpg_path
 
 
 class TestAllImageCombinations:
@@ -26,7 +27,8 @@ class TestAllImageCombinations:
         images_not_included = []
         for image_path in images_all():
             if image_path[:-4] not in (resource_path1[:-4], resource_path2[:-4], resource_path3[:-4]):
-                images_not_included.append(Image.from_file(resolve_resource_path(image_path)).change_channel(expected_channel))
+                images_not_included.append(
+                    Image.from_file(resolve_resource_path(image_path)).change_channel(expected_channel))
 
         image1_with_expected_channel = image1.change_channel(expected_channel)
         image2_with_expected_channel = image2.change_channel(expected_channel)
@@ -53,6 +55,8 @@ class TestAllImageCombinations:
         assert 0 in image_set.index(image1_with_expected_channel)
         assert 1 in image_set.index(image2_with_expected_channel)
         assert 2 in image_set.index(image3_with_expected_channel)
+        for image in images_not_included:
+            assert not image_set.index(image)
         with pytest.raises(IndexOutOfBoundsError, match=r"There is no element at index '3'."):
             image_set.get_image(3)
         assert image_set.get_image(0) == image1_with_expected_channel
@@ -60,8 +64,9 @@ class TestAllImageCombinations:
         assert image_set.get_image(2) == image3_with_expected_channel
 
         # Test eq
-        image_set_equal = ImageSet.from_files([resolve_resource_path(resource_path1), resolve_resource_path(resource_path2),
-                                               resolve_resource_path(resource_path3)])
+        image_set_equal = ImageSet.from_files(
+            [resolve_resource_path(resource_path1), resolve_resource_path(resource_path2),
+             resolve_resource_path(resource_path3)])
         image_set_unequal = ImageSet.from_images(images_not_included)
         assert image_set == image_set_equal
         assert image_set != image_set_unequal
@@ -109,7 +114,8 @@ class TestAllImageCombinations:
             assert not image_set.has_image(image)
 
         # Test to_images
-        assert image_set.to_images() == [image1_with_expected_channel, image2_with_expected_channel, image3_with_expected_channel]
+        assert image_set.to_images() == [image1_with_expected_channel, image2_with_expected_channel,
+                                         image3_with_expected_channel]
 
         # Test change_channel
         assert image_set.change_channel(1).channel == 1
@@ -121,7 +127,9 @@ class TestAllImageCombinations:
 
         # Test add images
         assert image_set == ImageSet.from_images([image1]).add_images([image2, image3])
-        assert ImageSet.from_images([image1, image2, image3] + images_not_included) == image_set.add_images(images_not_included)
+        assert image_set == ImageSet.from_images([image1]).add_images(ImageSet.from_images([image2, image3]))
+        assert ImageSet.from_images([image1, image2, image3] + images_not_included) == image_set.add_images(
+            images_not_included)
 
 
 class TestFromFiles:
@@ -133,10 +141,32 @@ class TestFromFiles:
         assert image_set == snapshot_png_image_set
 
 
+class TestToImages:
+
+    @pytest.mark.parametrize("resource_path", [images_all(), [plane_png_path, plane_jpg_path] * 2],
+                             ids=["all-images", "planes"])
+    def test_should_return_images(self, resource_path: list[str]):
+        torch.set_default_device(torch.device("cpu"))
+        image_set_all = ImageSet.from_files(resolve_resource_path(resource_path))
+        image_set_select = ImageSet.from_files(resolve_resource_path(resource_path[::2]))
+        assert image_set_all.to_images(list(range(0, len(image_set_all), 2))) == image_set_select.to_images()
+
+    @pytest.mark.parametrize("resource_path", [images_all(), [plane_png_path, plane_jpg_path]],
+                             ids=["all-images", "planes"])
+    def test_from_files_creation(self, resource_path: list[str]):
+        torch.set_default_device(torch.device("cpu"))
+        image_set = ImageSet.from_files(resolve_resource_path(resource_path))
+        bracket_open = r"\["
+        bracket_close = r"\]"
+        with pytest.raises(IndexOutOfBoundsError,
+                           match=rf"There are no elements at indices {str(list(range(len(image_set), 2 + len(image_set)))).replace('[', bracket_open).replace(']', bracket_close)}."):
+            image_set.to_images(list(range(2, 2 + len(image_set))))
+
+
 @pytest.mark.parametrize("resource_path3", images_all_channel(), ids=images_all_channel_ids())
 @pytest.mark.parametrize("resource_path2", images_all_channel(), ids=images_all_channel_ids())
 @pytest.mark.parametrize("resource_path1", images_all_channel(), ids=images_all_channel_ids())
-class TestTransforms:
+class TestTransformsEqualImageTransforms:
 
     @pytest.mark.parametrize(
         ("method", "attributes"),
@@ -215,59 +245,214 @@ class TestTransforms:
         assert image_set_original == image_set_clone
 
 
-class TestAddNoise:
-    @pytest.mark.parametrize(
-        "standard_deviation",
-        [
-            0.0,
-            0.7,
-            2.5,
-        ],
-        ids=["minimum noise", "some noise", "very noisy"],
-    )
-    @pytest.mark.parametrize(
-        "resource_path",
-        [images_all()],
-        ids=["all images"],
-    )
-    def test_should_add_noise(
-        self,
-        resource_path: list[str],
-        standard_deviation: float,
-        snapshot_png_image_set: SnapshotAssertion,
-    ) -> None:
-        torch.set_default_device(torch.device("cpu"))
-        torch.manual_seed(0)
-        image_set_original = ImageSet.from_files(
-            [resolve_resource_path(unresolved_path) for unresolved_path in resource_path])
-        image_set_clone = image_set_original.clone()
-        image_set_noise = image_set_original.add_noise(standard_deviation)
-        assert image_set_noise == snapshot_png_image_set
-        assert image_set_original is not image_set_clone
-        assert image_set_original == image_set_clone
+@pytest.mark.parametrize("resource_path", [images_all(), [plane_png_path, plane_jpg_path] * 2],
+                         ids=["all-images", "planes"])
+class TestTransforms:
+    class TestAddNoise:
+        @pytest.mark.parametrize(
+            "standard_deviation",
+            [
+                0.0,
+                0.7,
+                2.5,
+            ],
+            ids=["minimum noise", "some noise", "very noisy"],
+        )
+        def test_should_add_noise(
+            self,
+            resource_path: list[str],
+            standard_deviation: float,
+            snapshot_png_image_set: SnapshotAssertion,
+        ) -> None:
+            torch.set_default_device(torch.device("cpu"))
+            torch.manual_seed(0)
+            image_set_original = ImageSet.from_files(
+                [resolve_resource_path(unresolved_path) for unresolved_path in resource_path])
+            image_set_clone = image_set_original.clone()
+            image_set_noise = image_set_original.add_noise(standard_deviation)
+            assert image_set_noise == snapshot_png_image_set
+            assert image_set_original is not image_set_clone
+            assert image_set_original == image_set_clone
 
-    @pytest.mark.parametrize(
-        "standard_deviation",
-        [-1],
-        ids=["sigma below zero"],
-    )
-    @pytest.mark.parametrize(
-        "resource_path",
-        [images_all()],
-        ids=["all images"],
-    )
-    def test_should_raise_standard_deviation(
-        self,
-        resource_path: list[str],
-        standard_deviation: float,
-    ) -> None:
-        image_set_original = ImageSet.from_files(
-            [resolve_resource_path(unresolved_path) for unresolved_path in resource_path])
-        image_set_clone = image_set_original.clone()
-        with pytest.raises(
-            OutOfBoundsError,
-            match=rf"standard_deviation \(={standard_deviation}\) is not inside \[0, \u221e\)\.",
-        ):
-            image_set_original.add_noise(standard_deviation)
-        assert image_set_original is not image_set_clone
-        assert image_set_original == image_set_clone
+
+@pytest.mark.parametrize("resource_path", [images_all(), [plane_png_path, plane_jpg_path] * 2],
+                         ids=["VariousSizedImageSet", "FixedSizedImageSet"])
+class TestErrorsAndWarnings:
+
+    class TestAddImageTensor:
+
+        def test_should_raise(self, resource_path: list[str]):
+            torch.set_default_device(torch.device("cpu"))
+            image_set = ImageSet.from_files(resolve_resource_path(resource_path))
+            with pytest.raises(DuplicateIndexError, match=r"The index '0' is already in use."):
+                image_set._add_image_tensor(image_set.to_images([0])[0]._image_tensor, 0)
+
+    class TestEquals:
+
+        def test_should_raise(self, resource_path: list[str]):
+            image_set_original = ImageSet.from_files(
+                [resolve_resource_path(unresolved_path) for unresolved_path in resource_path])
+            assert (image_set_original.__eq__(image_set_original.to_images([0]))) is NotImplemented
+
+    class TestAddNoise:
+
+        @pytest.mark.parametrize(
+            "standard_deviation",
+            [-1],
+            ids=["sigma below zero"],
+        )
+        def test_should_raise_standard_deviation(
+            self,
+            resource_path: list[str],
+            standard_deviation: float,
+        ) -> None:
+            image_set_original = ImageSet.from_files(
+                [resolve_resource_path(unresolved_path) for unresolved_path in resource_path])
+            image_set_clone = image_set_original.clone()
+            with pytest.raises(
+                OutOfBoundsError,
+                match=rf"standard_deviation \(={standard_deviation}\) is not inside \[0, \u221e\)\.",
+            ):
+                image_set_original.add_noise(standard_deviation)
+            assert image_set_original is not image_set_clone
+            assert image_set_original == image_set_clone
+
+    class TestAdjustBrightness:
+
+        @pytest.mark.parametrize(
+            "factor",
+            [-1],
+            ids=["factor below zero"],
+        )
+        def test_should_raise(
+            self,
+            resource_path: list[str],
+            factor: float,
+        ) -> None:
+            image_set_original = ImageSet.from_files(
+                [resolve_resource_path(unresolved_path) for unresolved_path in resource_path])
+            image_set_clone = image_set_original.clone()
+            with pytest.raises(OutOfBoundsError, match=r"factor \(=-1\) is not inside \[0, \u221e\)."):
+                image_set_original.adjust_brightness(factor)
+            assert image_set_original is not image_set_clone
+            assert image_set_original == image_set_clone
+
+        def test_should_not_brighten(
+            self,
+            resource_path: list[str],
+        ) -> None:
+            image_set_original = ImageSet.from_files(
+                [resolve_resource_path(unresolved_path) for unresolved_path in resource_path])
+            image_set_clone = image_set_original.clone()
+            with pytest.warns(UserWarning,
+                              match="Brightness adjustment factor is 1.0, this will not make changes to the images.", ):
+                image_set_no_change = image_set_original.adjust_brightness(1)
+                assert image_set_no_change is not image_set_original
+                assert image_set_no_change == image_set_original
+            assert image_set_original is not image_set_clone
+            assert image_set_original == image_set_clone
+
+    class TestAdjustContrast:
+
+        @pytest.mark.parametrize(
+            "factor",
+            [-1],
+            ids=["factor below zero"],
+        )
+        def test_should_raise(
+            self,
+            resource_path: list[str],
+            factor: float,
+        ) -> None:
+            image_set_original = ImageSet.from_files(
+                [resolve_resource_path(unresolved_path) for unresolved_path in resource_path])
+            image_set_clone = image_set_original.clone()
+            with pytest.raises(OutOfBoundsError, match=r"factor \(=-1\) is not inside \[0, \u221e\)."):
+                image_set_original.adjust_contrast(factor)
+            assert image_set_original is not image_set_clone
+            assert image_set_original == image_set_clone
+
+        def test_should_not_adjust(
+            self,
+            resource_path: list[str],
+        ) -> None:
+            image_set_original = ImageSet.from_files(
+                [resolve_resource_path(unresolved_path) for unresolved_path in resource_path])
+            image_set_clone = image_set_original.clone()
+            with pytest.warns(UserWarning,
+                              match="Contrast adjustment factor is 1.0, this will not make changes to the images.", ):
+                image_set_no_change = image_set_original.adjust_contrast(1)
+                assert image_set_no_change is not image_set_original
+                assert image_set_no_change == image_set_original
+            assert image_set_original is not image_set_clone
+            assert image_set_original == image_set_clone
+
+    class TestAdjustColorBalance:
+
+        @pytest.mark.parametrize(
+            "factor",
+            [-1],
+            ids=["factor below zero"],
+        )
+        def test_should_raise(
+            self,
+            resource_path: list[str],
+            factor: float,
+        ) -> None:
+            image_set_original = ImageSet.from_files(
+                [resolve_resource_path(unresolved_path) for unresolved_path in resource_path])
+            image_set_clone = image_set_original.clone()
+            with pytest.raises(OutOfBoundsError, match=r"factor \(=-1\) is not inside \[0, \u221e\)."):
+                image_set_original.adjust_color_balance(factor)
+            assert image_set_original is not image_set_clone
+            assert image_set_original == image_set_clone
+
+        def test_should_not_adjust(
+            self,
+            resource_path: list[str],
+        ) -> None:
+            image_set_original = ImageSet.from_files(
+                [resolve_resource_path(unresolved_path) for unresolved_path in resource_path])
+            image_set_clone = image_set_original.clone()
+            with pytest.warns(UserWarning,
+                              match="Color adjustment factor is 1.0, this will not make changes to the images.", ):
+                image_set_no_change = image_set_original.adjust_color_balance(1)
+                assert image_set_no_change is not image_set_original
+                assert image_set_no_change == image_set_original
+            assert image_set_original is not image_set_clone
+            assert image_set_original == image_set_clone
+
+    class TestSharpen:
+
+        @pytest.mark.parametrize(
+            "factor",
+            [-1],
+            ids=["factor below zero"],
+        )
+        def test_should_raise(
+            self,
+            resource_path: list[str],
+            factor: float,
+        ) -> None:
+            image_set_original = ImageSet.from_files(
+                [resolve_resource_path(unresolved_path) for unresolved_path in resource_path])
+            image_set_clone = image_set_original.clone()
+            with pytest.raises(OutOfBoundsError, match=r"factor \(=-1\) is not inside \[0, \u221e\)."):
+                image_set_original.sharpen(factor)
+            assert image_set_original is not image_set_clone
+            assert image_set_original == image_set_clone
+
+        def test_should_not_adjust(
+            self,
+            resource_path: list[str],
+        ) -> None:
+            image_set_original = ImageSet.from_files(
+                [resolve_resource_path(unresolved_path) for unresolved_path in resource_path])
+            image_set_clone = image_set_original.clone()
+            with pytest.warns(UserWarning,
+                              match="Sharpen factor is 1.0, this will not make changes to the images.", ):
+                image_set_no_change = image_set_original.sharpen(1)
+                assert image_set_no_change is not image_set_original
+                assert image_set_no_change == image_set_original
+            assert image_set_original is not image_set_clone
+            assert image_set_original == image_set_clone
