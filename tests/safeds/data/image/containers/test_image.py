@@ -1,3 +1,4 @@
+import sys
 import typing
 from pathlib import Path
 from tempfile import NamedTemporaryFile
@@ -864,3 +865,16 @@ class TestFindEdges:
         image_edges = image.find_edges()
         assert image_edges == snapshot_png_image
         _assert_width_height_channel(image, image_edges)
+
+
+@pytest.mark.parametrize("device", _test_devices(), ids=_test_devices_ids())
+class TestSizeof:
+    @pytest.mark.parametrize(
+        "resource_path",
+        _test_images_all(),
+        ids=_test_images_all_ids(),
+    )
+    def test_should_size_be_greater_than_normal_object(self, resource_path: str | Path, device: Device) -> None:
+        _skip_if_device_not_available(device)
+        image = Image.from_file(resolve_resource_path(resource_path), device)
+        assert sys.getsizeof(image) >= image.width * image.height * image.channel

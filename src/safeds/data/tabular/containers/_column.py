@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import io
+import sys
 from collections.abc import Sequence
 from numbers import Number
 from typing import TYPE_CHECKING, Any, TypeVar, overload
@@ -246,6 +247,16 @@ class Column(Sequence[T]):
         "Column('test', [1, 2, 3])"
         """
         return f"Column({self._name!r}, {list(self._data)!r})"
+
+    def __sizeof__(self) -> int:
+        """
+        Return the complete size of this object.
+
+        Returns
+        -------
+        Size of this object in bytes.
+        """
+        return sys.getsizeof(self._data) + sys.getsizeof(self._name) + sys.getsizeof(self._type)
 
     def __str__(self) -> str:
         """

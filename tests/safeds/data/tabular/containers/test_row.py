@@ -1,4 +1,5 @@
 import re
+import sys
 from collections.abc import Callable
 from typing import Any
 
@@ -552,3 +553,21 @@ class TestSortColumns:
     def test_should_sort_table_out_of_place(self, row: Row) -> None:
         sorted_row = row.sort_columns()
         assert sorted_row != row
+
+
+class TestSizeof:
+    @pytest.mark.parametrize(
+        "row",
+        [
+            Row(),
+            Row({"col1": 0}),
+            Row({"col1": 0, "col2": "a"}),
+        ],
+        ids=[
+            "empty",
+            "single column",
+            "multiple columns",
+        ],
+    )
+    def test_should_size_be_greater_than_normal_object(self, row: Row) -> None:
+        assert sys.getsizeof(row) > sys.getsizeof(object())

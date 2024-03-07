@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import sys
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
@@ -99,6 +100,16 @@ class Schema:
         "Schema({'A': Integer})"
         """
         return f"Schema({self!s})"
+
+    def __sizeof__(self) -> int:
+        """
+        Return the complete size of this object.
+
+        Returns
+        -------
+        Size of this object in bytes.
+        """
+        return sum(map(sys.getsizeof, self._schema.keys())) + sum(map(sys.getsizeof, self._schema.values())) + sys.getsizeof(self._schema)
 
     def __str__(self) -> str:
         """

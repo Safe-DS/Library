@@ -1,12 +1,20 @@
 from __future__ import annotations
 
+import io
+import sys
 from typing import TYPE_CHECKING
 
+import matplotlib.pyplot as plt
+import pandas as pd
+import seaborn as sns
+
+from safeds.data.image.containers import Image
 from safeds.data.tabular.containers import Column, Row, Table, TaggedTable
 from safeds.exceptions import (
     ColumnIsTargetError,
     ColumnIsTimeError,
     IllegalSchemaModificationError,
+    NonNumericColumnError,
     UnknownColumnNameError,
 )
 
@@ -29,7 +37,7 @@ class TimeSeries(TaggedTable):
 
         Parameters
         ----------
-        table : TaggedTable
+        tagged_table: TaggedTable
             The tagged table.
         time_name: str
             Name of the time column.
@@ -185,6 +193,16 @@ class TimeSeries(TaggedTable):
         if time_name not in (_data.column_names):
             raise UnknownColumnNameError([time_name])
         self._time: Column = _data.get_column(time_name)
+
+    def __sizeof__(self) -> int:
+        """
+        Return the complete size of this object.
+
+        Returns
+        -------
+        Size of this object in bytes.
+        """
+        return TaggedTable.__sizeof__(self) + sys.getsizeof(self._time)
 
     # ------------------------------------------------------------------------------------------------------------------
     # Properties
@@ -828,6 +846,13 @@ class TimeSeries(TaggedTable):
 
         The original time series is not modified.
 
+        Parameters
+        ----------
+        name:
+            The name of the column to be transformed.
+        transformer:
+            The transformer to the given column
+
         Returns
         -------
         result : TimeSeries
@@ -846,3 +871,186 @@ class TimeSeries(TaggedTable):
             ),
             time_name=self.time.name,
         )
+
+    def plot_lagplot(self, lag: int) -> Image:
+        """
+        Plot a lagplot for the target column.
+
+        Parameters
+        ----------
+        lag:
+            The amount of lag used to plot
+
+        Returns
+        -------
+        plot:
+            The plot as an image.
+
+        Raises
+        ------
+        NonNumericColumnError
+            If the time series targets contains non-numerical values.
+
+        Examples
+        --------
+                >>> from safeds.data.tabular.containers import TimeSeries
+                >>> table = TimeSeries({"time":[1, 2], "target": [3, 4], "feature":[2,2]}, target_name= "target", time_name="time", feature_names=["feature"], )
+                >>> image = table.plot_lagplot(lag = 1)
+
+        """
+        if not self.target.type.is_numeric():
+            raise NonNumericColumnError("This time series target contains non-numerical columns.")
+        ax = pd.plotting.lag_plot(self.target._data, lag=lag)
+        fig = ax.figure
+        buffer = io.BytesIO()
+        fig.savefig(buffer, format="png")
+        plt.close()  # Prevents the figure from being displayed directly
+        buffer.seek(0)
+        return Image.from_bytes(buffer.read())
+
+    def plot_lineplot(self, x_column_name: str | None = None, y_column_name: str | None = None) -> Image:
+        """
+
+        Plot the time series target or the given column(s) as line plot.
+
+        The function will take the time column as the default value for y_column_name and the target column as the
+        default value for x_column_name.
+
+        Parameters
+        ----------
+        x_column_name:
+            The column name of the column to be plotted on the x-Axis, default is the time column.
+        y_column_name:
+            The column name of the column to be plotted on the y-Axis, default is the target column.
+
+        Returns
+        -------
+        plot:
+            The plot as an image.
+
+        Raises
+        ------
+        NonNumericColumnError
+            If the time series given columns contain non-numerical values.
+
+        UnknownColumnNameError
+            If one of the given names does not exist in the table
+
+        Examples
+        --------
+                >>> from safeds.data.tabular.containers import TimeSeries
+                >>> table = TimeSeries({"time":[1, 2], "target": [3, 4], "feature":[2,2]}, target_name= "target", time_name="time", feature_names=["feature"], )
+                >>> image = table.plot_lineplot()
+
+        """
+        self._data.index.name = "index"
+        if x_column_name is not None and not self.get_column(x_column_name).type.is_numeric():
+            raise NonNumericColumnError("The time series plotted column contains non-numerical columns.")
+
+        if y_column_name is None:
+            y_column_name = self.target.name
+
+        elif y_column_name not in self._data.columns:
+            raise UnknownColumnNameError([y_column_name])
+
+        if x_column_name is None:
+            x_column_name = self.time.name
+
+        if not self.get_column(y_column_name).type.is_numeric():
+            raise NonNumericColumnError("The time series plotted column contains non-numerical columns.")
+
+        fig = plt.figure()
+        ax = sns.lineplot(
+            data=self._data,
+            x=x_column_name,
+            y=y_column_name,
+        )
+        ax.set(xlabel=x_column_name, ylabel=y_column_name)
+        ax.set_xticks(ax.get_xticks())
+        ax.set_xticklabels(
+            ax.get_xticklabels(),
+            rotation=45,
+            horizontalalignment="right",
+        )  # rotate the labels of the x Axis to prevent the chance of overlapping of the labels
+        plt.tight_layout()
+
+        buffer = io.BytesIO()
+        fig.savefig(buffer, format="png")
+        plt.close()  # Prevents the figure from being displayed directly
+        buffer.seek(0)
+        self._data = self._data.reset_index()
+        return Image.from_bytes(buffer.read())
+
+    def plot_scatterplot(
+        self,
+        x_column_name: str | None = None,
+        y_column_name: str | None = None,
+    ) -> Image:
+        """
+        Plot the time series target or the given column(s) as scatter plot.
+
+        The function will take the time column as the default value for x_column_name and the target column as the
+        default value for y_column_name.
+
+        Parameters
+        ----------
+        x_column_name:
+            The column name of the column to be plotted on the x-Axis.
+        y_column_name:
+            The column name of the column to be plotted on the y-Axis.
+
+        Returns
+        -------
+        plot:
+            The plot as an image.
+
+        Raises
+        ------
+        NonNumericColumnError
+            If the time series given columns contain non-numerical values.
+
+        UnknownColumnNameError
+            If one of the given names does not exist in the table
+
+        Examples
+        --------
+                >>> from safeds.data.tabular.containers import TimeSeries
+                >>> table = TimeSeries({"time":[1, 2], "target": [3, 4], "feature":[2,2]}, target_name= "target", time_name="time", feature_names=["feature"], )
+                >>> image = table.plot_scatterplot()
+
+        """
+        self._data.index.name = "index"
+        if x_column_name is not None and not self.get_column(x_column_name).type.is_numeric():
+            raise NonNumericColumnError("The time series plotted column contains non-numerical columns.")
+
+        if y_column_name is None:
+            y_column_name = self.target.name
+        elif y_column_name not in self._data.columns:
+            raise UnknownColumnNameError([y_column_name])
+        if x_column_name is None:
+            x_column_name = self.time.name
+
+        if not self.get_column(y_column_name).type.is_numeric():
+            raise NonNumericColumnError("The time series plotted column contains non-numerical columns.")
+
+        fig = plt.figure()
+        ax = sns.scatterplot(
+            data=self._data,
+            x=x_column_name,
+            y=y_column_name,
+        )
+        ax.set(xlabel=x_column_name, ylabel=y_column_name)
+        ax.set_xticks(ax.get_xticks())
+        ax.set_xticklabels(
+            ax.get_xticklabels(),
+            rotation=45,
+            horizontalalignment="right",
+        )  # rotate the labels of the x Axis to prevent the chance of overlapping of the labels
+        plt.tight_layout()
+
+        buffer = io.BytesIO()
+        fig.savefig(buffer, format="png")
+        plt.close()  # Prevents the figure from being displayed directly
+        buffer.seek(0)
+        self._data = self._data.reset_index()
+        return Image.from_bytes(buffer.read())
