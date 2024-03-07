@@ -347,11 +347,15 @@ class TestResize:
                 3,
             ),
             (
+                50,
+                75,
+            ),
+            (
                 700,
                 400,
             ),
         ],
-        ids=["(2, 3)", "(700, 400)"],
+        ids=["(2, 3)", "(50, 75)", "(700, 400)"],
     )
     def test_should_return_resized_image(
         self,

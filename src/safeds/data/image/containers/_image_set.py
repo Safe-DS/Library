@@ -195,6 +195,12 @@ class ImageSet(metaclass=ABCMeta):
     def remove_image(self, image: Image) -> ImageSet:
         return self.remove_image_by_index(self.index(image))
 
+    def remove_images(self, images: list[Image]) -> ImageSet:
+        indices_to_remove = []
+        for image in images:
+            indices_to_remove += self.index(image)
+        return self.remove_image_by_index(list(set(indices_to_remove)))
+
     @abstractmethod
     def remove_image_by_index(self, index: int | list[int]) -> ImageSet:
         pass

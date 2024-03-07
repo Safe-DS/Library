@@ -57,3 +57,19 @@ def images_asymmetric_ids() -> list[str]:
         grayscale_jpg_id,
         grayscale_png_id,
     ]
+
+
+def images_all_channel() -> list[str]:
+    return [
+        plane_jpg_path,
+        rgba_png_path,
+        grayscale_png_path,
+    ]
+
+
+def images_all_channel_ids() -> list[str]:
+    return [
+        plane_jpg_id,
+        rgba_png_id,
+        grayscale_png_id,
+    ]

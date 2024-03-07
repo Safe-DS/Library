@@ -83,17 +83,21 @@ class _VariousSizedImageSet(ImageSet):
 
     @property
     def widths(self) -> list[int]:
-        widths = []
+        widths = {}
         for image_set in self._image_set_dict.values():
-            widths += image_set.widths
-        return widths
+            indices = image_set._as_fixed_sized_image_set()._tensor_positions_to_indices
+            for i, index in enumerate(indices):
+                widths[index] = image_set.widths[i]
+        return [widths[index] for index in sorted(widths)]
 
     @property
     def heights(self) -> list[int]:
-        heights = []
+        heights = {}
         for image_set in self._image_set_dict.values():
-            heights += image_set.heights
-        return heights
+            indices = image_set._as_fixed_sized_image_set()._tensor_positions_to_indices
+            for i, index in enumerate(indices):
+                heights[index] = image_set.heights[i]
+        return [heights[index] for index in sorted(heights)]
 
     @property
     def channel(self) -> int:
@@ -127,7 +131,7 @@ class _VariousSizedImageSet(ImageSet):
 
     def to_images(self, indices: list[int] | None = None) -> list[Image]:
         if indices is None:
-            indices = self._indices_to_image_size_dict.keys()
+            indices = sorted(self._indices_to_image_size_dict)
         else:
             wrong_indices = []
             for index in indices:
@@ -167,6 +171,8 @@ class _VariousSizedImageSet(ImageSet):
         return image_set
 
     def add_images(self, images: list[Image] | ImageSet) -> ImageSet:
+        from safeds.data.image.containers import _FixedSizedImageSet
+
         images_with_size = {}
         indices_for_images_with_size = {}
         current_index = max(self._indices_to_image_size_dict) + 1
@@ -178,7 +184,6 @@ class _VariousSizedImageSet(ImageSet):
                 for size, im_set in images._as_various_sized_image_set()._image_set_dict.items():
                     images_with_size[size] = im_set
                     indices_for_images_with_size[size] = [index + current_index for index in im_set._as_fixed_sized_image_set()._tensor_positions_to_indices]
-                    current_index += len(im_set)
         else:
             for image in images:
                 size = (image.width, image.height)
@@ -190,13 +195,19 @@ class _VariousSizedImageSet(ImageSet):
                     indices_for_images_with_size[size] = [current_index]
                 current_index += 1
         image_set = self.clone()._as_various_sized_image_set()
-        max_channel = self.channel
+        smallest_channel = max_channel = self.channel
         for size, ims in images_with_size.items():
             new_indices = indices_for_images_with_size[size]
             if size in image_set._image_set_dict:
-                image_set._image_set_dict[size] = _FixedSizedImageSet._create_image_set(image_set._image_set_dict[size].to_images() + [im._image_tensor for im in ims], image_set._image_set_dict[size]._as_fixed_sized_image_set()._tensor_positions_to_indices + new_indices)
+                if isinstance(ims, _FixedSizedImageSet):
+                    ims_tensors = [im._image_tensor for im in ims.to_images()]
+                else:
+                    ims_tensors = [im._image_tensor for im in ims]
+                image_set._image_set_dict[size] = _FixedSizedImageSet._create_image_set([im._image_tensor for im in image_set._image_set_dict[size].to_images()] + ims_tensors, image_set._image_set_dict[size]._as_fixed_sized_image_set()._tensor_positions_to_indices + new_indices)
             else:
                 if isinstance(ims, _FixedSizedImageSet):
+                    if smallest_channel > ims.channel:
+                        smallest_channel = ims.channel
                     fixed_ims = ims.clone()._as_fixed_sized_image_set()
                     old_indices = list(fixed_ims._indices_to_tensor_positions.items())
                     fixed_ims._tensor_positions_to_indices = [new_indices[i] for i in sorted(range(len(new_indices)), key=sorted(range(len(new_indices)), key=old_indices.__getitem__).__getitem__)]
@@ -204,11 +215,13 @@ class _VariousSizedImageSet(ImageSet):
                     image_set._image_set_dict[size] = fixed_ims
                 else:
                     image_set._image_set_dict[size] = _FixedSizedImageSet._create_image_set([im._image_tensor for im in ims], new_indices)
+                    if smallest_channel > image_set._image_set_dict[size].channel:
+                        smallest_channel = image_set._image_set_dict[size].channel
             for i in new_indices:
                 image_set._indices_to_image_size_dict[i] = size
             max_channel = max(max_channel,  image_set._image_set_dict[size].channel)
-        if max_channel > self.channel:
-            image_set.change_channel(max_channel)
+        if smallest_channel < max_channel:
+            image_set = image_set.change_channel(max_channel)
         return image_set
 
     def remove_image_by_index(self, index: int | list[int]) -> ImageSet:
@@ -253,6 +266,8 @@ class _VariousSizedImageSet(ImageSet):
         return image_set
 
     def resize(self, new_width: int, new_height: int) -> _FixedSizedImageSet:
+        from safeds.data.image.containers import _FixedSizedImageSet
+
         image_set_tensors = []
         image_set_indices = []
         for image_set_original in self._image_set_dict.values():
@@ -272,6 +287,8 @@ class _VariousSizedImageSet(ImageSet):
         return image_set
 
     def crop(self, x: int, y: int, width: int, height: int) -> _FixedSizedImageSet:
+        from safeds.data.image.containers import _FixedSizedImageSet
+
         image_set_tensors = []
         image_set_indices = []
         for image_set_original in self._image_set_dict.values():

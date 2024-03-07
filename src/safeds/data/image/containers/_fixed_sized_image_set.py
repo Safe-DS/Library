@@ -7,8 +7,8 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 import torch
-import torch.nn.functional as func
 from torch import Tensor
+from torchvision.transforms import InterpolationMode
 from torchvision.transforms.v2 import functional as func2
 
 from safeds.data.image.containers import Image
@@ -48,9 +48,9 @@ class _FixedSizedImageSet(ImageSet):
             if max_channel == 3:  # image channel 1 and max channel 3
                 image = torch.cat([image, image, image], dim=0)
             elif image.size(dim=0) == 1:  # image channel 1 and max channel 4
-                image = torch.cat([image, image, image, torch.full(image.size(), 255)], dim=0)
+                image = torch.cat([image, image, image, torch.full(image.size(), 255, device=image.device)], dim=0)
             else:  # image channel 3 and max channel 4
-                image = torch.cat([image, torch.full(image[0:1].size(), 255)], dim=0)
+                image = torch.cat([image, torch.full(image[0:1].size(), 255, device=image.device)], dim=0)
             images_ready_to_concat.append((image.unsqueeze(dim=0), index))
         image_set._tensor = torch.cat([image for image, index in images_ready_to_concat])
         image_set._tensor_positions_to_indices = [index for image, index in images_ready_to_concat]
@@ -93,11 +93,11 @@ class _FixedSizedImageSet(ImageSet):
 
     @property
     def widths(self) -> list[int]:
-        return [self._tensor.size(dim=3)]
+        return [self._tensor.size(dim=3)] * self.number_of_images
 
     @property
     def heights(self) -> list[int]:
-        return [self._tensor.size(dim=2)]
+        return [self._tensor.size(dim=2)] * self.number_of_images
 
     @property
     def channel(self) -> int:
@@ -118,7 +118,7 @@ class _FixedSizedImageSet(ImageSet):
         return [self._tensor_positions_to_indices[i] for i in (image._image_tensor == self._tensor).all(dim=[1, 2, 3]).nonzero()]
 
     def has_image(self, image: Image) -> bool:
-        return not (image.width != self.widths[0] or image.height != self.heights[0]) and image._image_tensor in self._tensor
+        return not (image.width != self.widths[0] or image.height != self.heights[0] or image.channel != self.channel) and image._image_tensor in self._tensor
 
     def to_jpeg_files(self, path: str | Path | list[str] | list[Path]) -> None:
         pass
@@ -128,7 +128,7 @@ class _FixedSizedImageSet(ImageSet):
 
     def to_images(self, indices: list[int] | None = None) -> list[Image]:
         if indices is None:
-            indices = self._tensor_positions_to_indices
+            indices = sorted(self._tensor_positions_to_indices)
         else:
             wrong_indices = []
             for index in indices:
@@ -171,7 +171,7 @@ class _FixedSizedImageSet(ImageSet):
             if image_tensor.size(dim=0) < tensor.size(dim=1):
                 if tensor.size(dim=1) == 3:
                     image_set._tensor = torch.cat([tensor, torch.cat([image_tensor, image_tensor, image_tensor], dim=0).unsqueeze(dim=0)])
-                if tensor.size(dim=0) == 1:
+                elif image_tensor.size(dim=0) == 1:
                     image_set._tensor = torch.cat([tensor, torch.cat([image_tensor, image_tensor, image_tensor, torch.full(image_tensor.size(), 255)], dim=0).unsqueeze(dim=0)])
                 else:
                     image_set._tensor = torch.cat([tensor, torch.cat([image_tensor, torch.full(image_tensor[0:1].size(), 255)], dim=0).unsqueeze(dim=0)])
@@ -193,10 +193,12 @@ class _FixedSizedImageSet(ImageSet):
         return image_set
 
     def add_images(self, images: list[Image] | ImageSet) -> ImageSet:
-        max_index = max(self._tensor_positions_to_indices)
-        new_indices = list(range(max_index, max_index + 1 + len(images)))
+        from safeds.data.image.containers import _VariousSizedImageSet
+
+        first_new_index = max(self._tensor_positions_to_indices) + 1
+        new_indices = list(range(first_new_index, first_new_index + len(images)))
         if isinstance(images, list):
-            images = ImageSet.from_images(images, new_indices)
+            images = ImageSet.from_images(images)
         if isinstance(images, _VariousSizedImageSet):
             image_set = _VariousSizedImageSet()
             image_set._image_set_dict[(self.widths[0], self.heights[0])] = self.clone()
@@ -204,7 +206,7 @@ class _FixedSizedImageSet(ImageSet):
                 image_set._indices_to_image_size_dict[index] = (self.widths[0], self.heights[0])
             return image_set.add_images(images)
         if isinstance(images, _FixedSizedImageSet):
-            if images.widths == self.widths and images.heights == self.heights:
+            if images.widths[0] == self.widths[0] and images.heights[0] == self.heights[0]:
                 return _FixedSizedImageSet._create_image_set([image._image_tensor for image in self.to_images() + images.to_images()], self._tensor_positions_to_indices + new_indices)
             else:
                 image_set = _VariousSizedImageSet()
@@ -213,7 +215,7 @@ class _FixedSizedImageSet(ImageSet):
                 for index in self._tensor_positions_to_indices:
                     image_set._indices_to_image_size_dict[index] = (self.widths[0], self.heights[0])
                 for index in images._tensor_positions_to_indices:
-                    image_set._indices_to_image_size_dict[index + max_index + 1] = (images.widths[0], images.heights[0])
+                    image_set._indices_to_image_size_dict[index + first_new_index] = (images.widths[0], images.heights[0])
 
                 if images.channel != self.channel:
                     image_set = image_set.change_channel(max(images.channel, self.channel))
@@ -256,12 +258,15 @@ class _FixedSizedImageSet(ImageSet):
 
     def resize(self, new_width: int, new_height: int) -> _FixedSizedImageSet:
         image_set = self._clone_without_tensor()
-        image_set._tensor = func.interpolate(self._tensor, size=(new_height, new_width))
+        image_set._tensor = func2.resize(self._tensor, size=[new_height, new_width], interpolation=InterpolationMode.NEAREST)
         return image_set
 
     def convert_to_grayscale(self) -> ImageSet:
         image_set = self._clone_without_tensor()
-        image_set._tensor = func2.rgb_to_grayscale(self._tensor[:, 0:3])
+        if self.channel == 4:
+            image_set._tensor = torch.cat([func2.rgb_to_grayscale(self._tensor[:, 0:3], num_output_channels=3), self._tensor[:, 3].unsqueeze(dim=1)], dim=1)
+        else:
+            image_set._tensor = func2.rgb_to_grayscale(self._tensor[:, 0:3], num_output_channels=3)
         return image_set
 
     def crop(self, x: int, y: int, width: int, height: int) -> _FixedSizedImageSet:
@@ -353,7 +358,7 @@ class _FixedSizedImageSet(ImageSet):
             )
         image_set = self._clone_without_tensor()
         if self.channel == 4:
-            image_set._tensor = torch.cat([func2.adjust_sharpness(self._tensor[:, 0:3], factor * 1.0), self._tensor[3].unsqueeze(dim=1)], dim=1)
+            image_set._tensor = torch.cat([func2.adjust_sharpness(self._tensor[:, 0:3], factor * 1.0), self._tensor[:, 3].unsqueeze(dim=1)], dim=1)
         else:
             image_set._tensor = func2.adjust_sharpness(self._tensor, factor * 1.0)
         return image_set
@@ -361,7 +366,7 @@ class _FixedSizedImageSet(ImageSet):
     def invert_colors(self) -> ImageSet:
         image_set = self._clone_without_tensor()
         if self.channel == 4:
-            image_set._tensor = torch.cat([func2.invert(self._tensor[:, 0:3]), self._tensor[3].unsqueeze(dim=1)], dim=1)
+            image_set._tensor = torch.cat([func2.invert(self._tensor[:, 0:3]), self._tensor[:, 3].unsqueeze(dim=1)], dim=1)
         else:
             image_set._tensor = func2.invert(self._tensor)
         return image_set

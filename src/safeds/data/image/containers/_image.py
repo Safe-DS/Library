@@ -6,9 +6,9 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 import torch
-import torch.nn.functional as func
 from PIL.Image import open as pil_image_open
 from torch import Tensor
+from torchvision.transforms import InterpolationMode
 
 from safeds.config import _get_device
 
@@ -293,7 +293,7 @@ class Image:
             The image with the given width and height.
         """
         return Image(
-            func.interpolate(self._image_tensor.unsqueeze(dim=1), size=(new_height, new_width)).squeeze(dim=1),
+            func2.resize(self._image_tensor, size=[new_height, new_width], interpolation=InterpolationMode.NEAREST),
             device=self._image_tensor.device,
         )
 
