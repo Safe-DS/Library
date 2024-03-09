@@ -182,7 +182,7 @@ class ClassificationNeuralNetwork:
         dataloader = train_data._into_dataloader(copied_model._batch_size)
 
         if self._is_multi_class:
-            loss_fn = nn.CrossEntropyLoss
+            loss_fn = nn.CrossEntropyLoss()
         else:
             loss_fn = nn.BCELoss()
 
@@ -193,19 +193,23 @@ class ClassificationNeuralNetwork:
             for x, y in dataloader:
                 optimizer.zero_grad()
                 pred = copied_model._model(x)
-                pred_size = Tensor.size(pred, dim=1)
-                y_as_list = []
-                class_index = y.item()
-                for index in range(pred_size):
-                    if index is int(class_index):
-                        y_as_list.append(1.0)
-                    else:
-                        y_as_list.append(0.0)
 
-                new_list = [y_as_list]
-                y_reshaped_as_tensor = torch.tensor(new_list)
+                if self._is_multi_class:
+                    pred_size = Tensor.size(pred, dim=1)
+                    y_as_list = []
+                    class_index = y.item()
+                    for index in range(pred_size):
+                        if index is int(class_index):
+                            y_as_list.append(1.0)
+                        else:
+                            y_as_list.append(0.0)
 
-                loss = loss_fn(pred, y_reshaped_as_tensor)
+                    new_list = [y_as_list]
+                    y_reshaped_as_tensor = torch.tensor(new_list)
+
+                    loss = loss_fn(pred, y_reshaped_as_tensor)
+                else:
+                    loss = loss_fn(pred, y)
                 loss_sum += loss
                 loss.backward()
                 optimizer.step()

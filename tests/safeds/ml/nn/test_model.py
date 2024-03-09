@@ -62,11 +62,19 @@ class TestClassificationModel:
                 Table.from_dict({"a": [1]}),
             )
 
-    def test_should_raise_if_is_fitted_is_set_correctly(self) -> None:
+    def test_should_raise_if_is_fitted_is_set_correctly_for_binary_classification(self) -> None:
         model = ClassificationNeuralNetwork([FNNLayer(input_size=1, output_size=1)])
         assert not model.is_fitted
         model = model.fit(
             Table.from_dict({"a": [1], "b": [0]}).tag_columns("a"),
+        )
+        assert model.is_fitted
+
+    def test_should_raise_if_is_fitted_is_set_correctly_for_multiclass_classification(self) -> None:
+        model = ClassificationNeuralNetwork([FNNLayer(input_size=1, output_size=1), FNNLayer(output_size=3)])
+        assert not model.is_fitted
+        model = model.fit(
+            Table.from_dict({"a": [1, 0, 2], "b": [0, 15, 5]}).tag_columns("a"),
         )
         assert model.is_fitted
 
