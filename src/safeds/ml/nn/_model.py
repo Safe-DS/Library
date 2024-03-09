@@ -2,9 +2,8 @@ import copy
 from collections.abc import Callable
 from typing import Self
 
-import numpy as np
 import torch
-from torch import nn, Tensor
+from torch import Tensor, nn
 
 from safeds.data.tabular.containers import Column, Table, TaggedTable
 from safeds.exceptions import ClosedBound, ModelNotFittedError, OutOfBoundsError
@@ -79,9 +78,11 @@ class RegressionNeuralNetwork:
                 optimizer.step()
                 number_of_batches_done += 1
                 if callback_on_batch_completion is not None:
-                    callback_on_batch_completion(number_of_batches_done, loss_sum/(number_of_batches_done*batch_size))
+                    callback_on_batch_completion(
+                        number_of_batches_done, loss_sum / (number_of_batches_done * batch_size),
+                    )
             if callback_on_epoch_completion is not None:
-                callback_on_epoch_completion(epoch, loss_sum/(number_of_batches_done*batch_size))
+                callback_on_epoch_completion(epoch, loss_sum / (number_of_batches_done * batch_size))
         copied_model._is_fitted = True
         copied_model._model.eval()
         return copied_model
@@ -211,9 +212,11 @@ class ClassificationNeuralNetwork:
                 optimizer.step()
                 number_of_batches_done += 1
                 if callback_on_batch_completion is not None:
-                    callback_on_batch_completion(number_of_batches_done, loss_sum/(number_of_batches_done*batch_size))
+                    callback_on_batch_completion(
+                        number_of_batches_done, loss_sum / (number_of_batches_done * batch_size),
+                    )
             if callback_on_epoch_completion is not None:
-                callback_on_epoch_completion(epoch, loss_sum/(number_of_batches_done*batch_size))
+                callback_on_epoch_completion(epoch, loss_sum / (number_of_batches_done * batch_size))
         copied_model._is_fitted = True
         copied_model._model.eval()
         return copied_model
