@@ -19,7 +19,7 @@ class Discretizer(TableTransformer):
 
     Parameters
     ----------
-    number_of_bins: float
+    number_of_bins
         The number of bins to be created.
 
     Raises
@@ -28,7 +28,7 @@ class Discretizer(TableTransformer):
         If the given number_of_bins is less than 2.
     """
 
-    def __init__(self, number_of_bins: float = 5):
+    def __init__(self, number_of_bins: int = 5):
         self._column_names: list[str] | None = None
         self._wrapped_transformer: sk_KBinsDiscretizer | None = None
 
@@ -44,14 +44,14 @@ class Discretizer(TableTransformer):
 
         Parameters
         ----------
-        table : Table
+        table
             The table used to fit the transformer.
-        column_names : list[str] | None
+        column_names
             The list of columns from the table used to fit the transformer. If `None`, all columns are used.
 
         Returns
         -------
-        fitted_transformer : TableTransformer
+        fitted_transformer :
             The fitted transformer.
 
         Raises
@@ -99,12 +99,12 @@ class Discretizer(TableTransformer):
 
         Parameters
         ----------
-        table : Table
+        table
             The table to which the learned transformation is applied.
 
         Returns
         -------
-        transformed_table : Table
+        transformed_table :
             The transformed table.
 
         Raises
@@ -150,7 +150,7 @@ class Discretizer(TableTransformer):
 
         Returns
         -------
-        is_fitted : bool
+        is_fitted :
             Whether the transformer is fitted.
         """
         return self._wrapped_transformer is not None
@@ -161,7 +161,7 @@ class Discretizer(TableTransformer):
 
         Returns
         -------
-        added_columns : list[str]
+        added_columns :
             A list of names of the added columns, ordered as they will appear in the table.
 
         Raises
@@ -180,7 +180,7 @@ class Discretizer(TableTransformer):
 
         Returns
         -------
-        changed_columns : list[str]
+        changed_columns :
              The list of (potentially) changed column names, as passed to fit.
 
         Raises
@@ -198,7 +198,7 @@ class Discretizer(TableTransformer):
 
         Returns
         -------
-        removed_columns : list[str]
+        removed_columns :
             A list of names of the removed columns, ordered as they appear in the table the Discretizer was fitted on.
 
         Raises
