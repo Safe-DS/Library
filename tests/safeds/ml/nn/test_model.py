@@ -76,11 +76,11 @@ class TestClassificationModel:
         class Test:
             self.was_called = False
 
-            def cb(self, ind: int, loss: float):
+            def cb(self, ind: int, loss: float) -> None:
                 if ind >= 0 and loss >= 0.0:
                     self.was_called = True
 
-            def callback_was_called(self):
+            def callback_was_called(self) -> bool:
                 return self.was_called
 
         obj = Test()
@@ -96,11 +96,11 @@ class TestClassificationModel:
         class Test:
             self.was_called = False
 
-            def cb(self, ind: int, loss: float):
+            def cb(self, ind: int, loss: float) -> None:
                 if ind >= 0 and loss >= 0.0:
                     self.was_called = True
 
-            def callback_was_called(self):
+            def callback_was_called(self) -> bool:
                 return self.was_called
 
         obj = Test()
@@ -173,42 +173,42 @@ class TestRegressionModel:
         )
         assert model.is_fitted
 
-        def test_should_raise_if_fit_doesnt_batch_callback(self) -> None:
-            model = RegressionNeuralNetwork([FNNLayer(input_size=1, output_size=1)])
+    def test_should_raise_if_fit_doesnt_batch_callback(self) -> None:
+        model = RegressionNeuralNetwork([FNNLayer(input_size=1, output_size=1)])
 
-            class Test:
-                self.was_called = False
+        class Test:
+            self.was_called = False
 
-                def cb(self, ind: int, loss: float):
-                    if ind >= 0 and loss >= 0.0:
-                        self.was_called = True
+            def cb(self, ind: int, loss: float) -> None:
+                if ind >= 0 and loss >= 0.0:
+                    self.was_called = True
 
-                def callback_was_called(self):
-                    return self.was_called
+            def callback_was_called(self) -> bool:
+                return self.was_called
 
-            obj = Test()
-            model.fit(
-                Table.from_dict({"a": [1], "b": [0]}).tag_columns("a"), callback_on_batch_completion=obj.cb
-            )
+        obj = Test()
+        model.fit(
+            Table.from_dict({"a": [1], "b": [0]}).tag_columns("a"), callback_on_batch_completion=obj.cb
+        )
 
-            assert obj.callback_was_called() is True
+        assert obj.callback_was_called() is True
 
-        def test_should_raise_if_fit_doesnt_epoch_callback(self) -> None:
-            model = RegressionNeuralNetwork([FNNLayer(input_size=1, output_size=1)])
+    def test_should_raise_if_fit_doesnt_epoch_callback(self) -> None:
+        model = RegressionNeuralNetwork([FNNLayer(input_size=1, output_size=1)])
 
-            class Test:
-                self.was_called = False
+        class Test:
+            self.was_called = False
 
-                def cb(self, ind: int, loss: float):
-                    if ind >= 0 and loss >= 0.0:
-                        self.was_called = True
+            def cb(self, ind: int, loss: float) -> None:
+                if ind >= 0 and loss >= 0.0:
+                    self.was_called = True
 
-                def callback_was_called(self):
-                    return self.was_called
+            def callback_was_called(self) -> bool:
+                return self.was_called
 
-            obj = Test()
-            model.fit(
-                Table.from_dict({"a": [1], "b": [0]}).tag_columns("a"), callback_on_epoch_completion=obj.cb
-            )
+        obj = Test()
+        model.fit(
+            Table.from_dict({"a": [1], "b": [0]}).tag_columns("a"), callback_on_epoch_completion=obj.cb
+        )
 
-            assert obj.callback_was_called() is True
+        assert obj.callback_was_called() is True
