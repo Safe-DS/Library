@@ -4,13 +4,18 @@ from safeds.exceptions import ClosedBound, OutOfBoundsError
 
 
 class _InternalLayer(nn.Module):
-    def __init__(self, input_size: int, output_size: int, is_last_layer_of_classification_model: bool):
+    def __init__(self, input_size: int, output_size: int, activation_function: str):
         super().__init__()
         self._layer = nn.Linear(input_size, output_size)
-        if is_last_layer_of_classification_model:
-            self._fn = nn.Sigmoid()
-        else:
-            self._fn = nn.ReLU()
+        match activation_function:
+            case "sigmoid":
+                self._fn = nn.Sigmoid()
+            case "relu":
+                self._fn = nn.ReLU()
+            case "softmax":
+                self._fn = nn.Softmax()
+            case _:
+                raise ValueError("Unknown Activation Function: " + activation_function)
 
     def forward(self, x: float) -> float:
         return self._fn(self._layer(x))
@@ -41,8 +46,8 @@ class FNNLayer:
             raise OutOfBoundsError(actual=output_size, name="output_size", lower_bound=ClosedBound(1))
         self._output_size = output_size
 
-    def _get_internal_layer(self, is_last_layer_of_classification_model: bool) -> _InternalLayer:
-        return _InternalLayer(self._input_size, self._output_size, is_last_layer_of_classification_model)
+    def _get_internal_layer(self, activation_function: str) -> _InternalLayer:
+        return _InternalLayer(self._input_size, self._output_size, activation_function)
 
     @property
     def output_size(self) -> int:
