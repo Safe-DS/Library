@@ -79,7 +79,8 @@ class RegressionNeuralNetwork:
                 number_of_batches_done += 1
                 if callback_on_batch_completion is not None:
                     callback_on_batch_completion(
-                        number_of_batches_done, loss_sum / (number_of_batches_done * batch_size),
+                        number_of_batches_done,
+                        loss_sum / (number_of_batches_done * batch_size),
                     )
             if callback_on_epoch_completion is not None:
                 callback_on_epoch_completion(epoch, loss_sum / (number_of_batches_done * batch_size))
@@ -213,7 +214,8 @@ class ClassificationNeuralNetwork:
                 number_of_batches_done += 1
                 if callback_on_batch_completion is not None:
                     callback_on_batch_completion(
-                        number_of_batches_done, loss_sum / (number_of_batches_done * batch_size),
+                        number_of_batches_done,
+                        loss_sum / (number_of_batches_done * batch_size),
                     )
             if callback_on_epoch_completion is not None:
                 callback_on_epoch_completion(epoch, loss_sum / (number_of_batches_done * batch_size))
