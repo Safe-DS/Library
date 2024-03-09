@@ -92,9 +92,7 @@ class TestClassificationModel:
                 return self.was_called
 
         obj = Test()
-        model.fit(
-            Table.from_dict({"a": [1], "b": [0]}).tag_columns("a"), callback_on_batch_completion=obj.cb
-        )
+        model.fit(Table.from_dict({"a": [1], "b": [0]}).tag_columns("a"), callback_on_batch_completion=obj.cb)
 
         assert obj.callback_was_called() is True
 
@@ -112,9 +110,7 @@ class TestClassificationModel:
                 return self.was_called
 
         obj = Test()
-        model.fit(
-            Table.from_dict({"a": [1], "b": [0]}).tag_columns("a"), callback_on_epoch_completion=obj.cb
-        )
+        model.fit(Table.from_dict({"a": [1], "b": [0]}).tag_columns("a"), callback_on_epoch_completion=obj.cb)
 
         assert obj.callback_was_called() is True
 
@@ -195,9 +191,7 @@ class TestRegressionModel:
                 return self.was_called
 
         obj = Test()
-        model.fit(
-            Table.from_dict({"a": [1], "b": [0]}).tag_columns("a"), callback_on_batch_completion=obj.cb
-        )
+        model.fit(Table.from_dict({"a": [1], "b": [0]}).tag_columns("a"), callback_on_batch_completion=obj.cb)
 
         assert obj.callback_was_called() is True
 
@@ -215,8 +209,6 @@ class TestRegressionModel:
                 return self.was_called
 
         obj = Test()
-        model.fit(
-            Table.from_dict({"a": [1], "b": [0]}).tag_columns("a"), callback_on_epoch_completion=obj.cb
-        )
+        model.fit(Table.from_dict({"a": [1], "b": [0]}).tag_columns("a"), callback_on_epoch_completion=obj.cb)
 
         assert obj.callback_was_called() is True
