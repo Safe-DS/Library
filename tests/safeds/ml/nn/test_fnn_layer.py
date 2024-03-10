@@ -19,6 +19,21 @@ def test_should_raise_if_input_size_out_of_bounds(input_size: int) -> None:
 
 
 @pytest.mark.parametrize(
+    "activation_function",
+    [
+        "unknown_string",
+    ],
+    ids=["unknown"],
+)
+def test_should_raise_if_unknown_activation_function_is_passed(activation_function: str) -> None:
+    with pytest.raises(
+        ValueError,
+        match=rf"Unknown Activation Function: {activation_function}",
+    ):
+        FNNLayer(output_size=1, input_size=1)._get_internal_layer(activation_function)
+
+
+@pytest.mark.parametrize(
     "output_size",
     [
         0,
