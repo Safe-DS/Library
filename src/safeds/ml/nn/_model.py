@@ -207,9 +207,9 @@ class ClassificationNeuralNetwork:
                             y_as_list.append(0.0)
 
                     new_list = [y_as_list]
-                    y_reshaped_as_tensor = torch.tensor(new_list)
+                    y_reshaped_as_tensor_to_fit_format_of_pred = torch.tensor(new_list)
 
-                    loss = loss_fn(pred, y_reshaped_as_tensor)
+                    loss = loss_fn(pred, y_reshaped_as_tensor_to_fit_format_of_pred)
                 else:
                     loss = loss_fn(pred, y)
                 loss_sum += loss
