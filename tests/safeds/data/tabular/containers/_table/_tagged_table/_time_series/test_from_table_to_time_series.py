@@ -186,7 +186,7 @@ def test_should_raise_error(
             ),
             "T",
             "time",
-            None,
+            ["B"],
         ),
     ],
     ids=["create_tagged_table", "tagged_table_not_all_columns_are_features", "tagged_table_with_feature_names_as_None"],
@@ -212,3 +212,16 @@ def test_should_create_a_tagged_table(
     assert time_series._features == table.keep_only_columns(feature_names)
     assert time_series._target == table.get_column(target_name)
     assert time_series.time == table.get_column(time_name)
+
+def test_optional_parameter()->None:
+    table = Table(
+        {
+            "time": [0, 1],
+            "T": [0, 1],
+        },
+    )
+
+    ts = TimeSeries._from_table_to_time_series(table=table, target_name = "T", time_name="time")
+    print(ts)
+    assert False
+

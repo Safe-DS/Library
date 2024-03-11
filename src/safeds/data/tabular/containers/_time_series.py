@@ -23,7 +23,7 @@ if TYPE_CHECKING:
     from typing import Any
 
 
-class TimeSeries(TaggedTable):
+class TimeSeries(Table):
 
     # ------------------------------------------------------------------------------------------------------------------
     # Creation
@@ -109,8 +109,6 @@ class TimeSeries(TaggedTable):
         UnknownColumnNameError
             If target_name or time_name matches none of the column names.
         Value Error
-            If there is no other column than the specified target and time columns left to be a feature column
-        Value Error
             If one column is target and feature
         Value Error
             If one column is time and feature
@@ -124,15 +122,27 @@ class TimeSeries(TaggedTable):
         if feature_names is not None and time_name in feature_names:
             raise ValueError(f"Column '{time_name}' can not be time and feature column.")
 
-        if feature_names is None:
-            feature_names = table.column_names
-            if time_name in feature_names:
-                feature_names.remove(time_name)
-            if target_name in feature_names:
-                feature_names.remove(target_name)
-        tagged_table = TaggedTable._from_table(table=table, target_name=target_name, feature_names=feature_names)
+        if target_name not in table.column_names:
+            raise UnknownColumnNameError([target_name])
+
+        result = object.__new__(TimeSeries)
+
+        result._data = table._data
+        result._schema = table._schema
+        result._time = table.get_column(time_name)
+        result._target = table.get_column(target_name)
+        if feature_names is not None:
+            result._feature_names = feature_names
+            result._features = table.keep_only_columns(feature_names)
+        else:
+            result._feature_names = None
+            result._features = None
+
+
+
+
         # check if time column got added as feature column
-        return TimeSeries._from_tagged_table(tagged_table=tagged_table, time_name=time_name)
+        return result
 
     # ------------------------------------------------------------------------------------------------------------------
     # Dunder methods
@@ -179,20 +189,23 @@ class TimeSeries(TaggedTable):
         """
         _data = Table(data)
 
-        if feature_names is None:
-            feature_names = _data.column_names
-            if time_name in feature_names:
-                feature_names.remove(time_name)
-            if target_name in feature_names:
-                feature_names.remove(target_name)
 
         # Validate inputs
-        super().__init__(data, target_name, feature_names)
+        super().__init__(data)
+        if feature_names is None:
+            self._feature_names = None
+            self._features = None
+        else:
+            self._feature_names = feature_names
+            self._features = _data.keep_only_columns(feature_names)
         if time_name in feature_names:
             raise ValueError(f"Column '{time_name}' can not be time and feature column.")
-        if time_name not in (_data.column_names):
+        if target_name in feature_names:
+            raise ValueError(f"Column '{target_name}' can not be time and feature column.")
+        if time_name not in _data.column_names:
             raise UnknownColumnNameError([time_name])
         self._time: Column = _data.get_column(time_name)
+        self._target: Column = _data.get_column(target_name)
 
     def __sizeof__(self) -> int:
         """
@@ -202,7 +215,7 @@ class TimeSeries(TaggedTable):
         -------
         Size of this object in bytes.
         """
-        return TaggedTable.__sizeof__(self) + sys.getsizeof(self._time)
+        return Table.__sizeof__(self) + sys.getsizeof(self._time)
 
     # ------------------------------------------------------------------------------------------------------------------
     # Properties
