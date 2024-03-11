@@ -1,6 +1,6 @@
 import pytest
-from safeds.ml.classical.regression import arimaModel
-from safeds.data.tabular.containers import TimeSeries, Table
+from safeds.ml.classical.regression import ArimaModel
+from safeds.data.tabular.containers import TimeSeries, Table, Column
 from syrupy import SnapshotAssertion
 import pandas as pd
 import numpy as np
@@ -18,16 +18,14 @@ def test_arimaModel(snapshot_png: SnapshotAssertion) -> None:
     feature_data = np.random.randint(0, 100, length_of_series)
 
     # Create a DataFrame
-    time_series_df = pd.DataFrame({
-        'Date': range(length_of_series),
-        'Value': synthetic_data,
-        'Feature': feature_data  # Add the feature column with random integers
-    })
-    table = Table._from_pandas_dataframe(time_series_df)
-    time_series = TimeSeries._from_table_to_time_series(table, target_name="Value", time_name="Date", feature_names=["Feature"])
-    model = arimaModel()
+    table = Table.from_csv_file("C:/Users/ettel/PycharmProjects/Library/tests/resources/_datas/US_Inflation_rates.csv")
+    col = Column("feature", range(0,918))
+    table = table.add_column(col)
+    time_series = TimeSeries._from_table_to_time_series(table, target_name="value", time_name="date", feature_names=["feature"])
+    tuple_ts = time_series.split_rows()
+    model = ArimaModel()
     #right now the model just saves the best parameter for the predict method in the fit method
-    trained_model = model.fit(time_series)
-    snap = model.predict(time_series)
+    trained_model =model.fit(time_series)
+    snap = trained_model.predict(time_series)
     assert snapshot_png == snap
 

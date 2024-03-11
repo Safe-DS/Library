@@ -16,6 +16,7 @@ from safeds.exceptions import (
     IllegalSchemaModificationError,
     NonNumericColumnError,
     UnknownColumnNameError,
+    IndexOutOfBoundsError,
 )
 
 if TYPE_CHECKING:
@@ -1054,3 +1055,57 @@ class TimeSeries(TaggedTable):
         buffer.seek(0)
         self._data = self._data.reset_index()
         return Image.from_bytes(buffer.read())
+
+    def slice_rows(
+        self,
+        start: int | None = None,
+        end: int | None = None,
+        step: int = 1,
+    ) -> Table:
+        """
+        Slice a part of the time series into a new time series.
+
+        The original table is not modified.
+
+        Parameters
+        ----------
+        start : int | None
+            The first index of the range to be copied into a new table, None by default.
+        end : int | None
+            The last index of the range to be copied into a new table, None by default.
+        step : int
+            The step size used to iterate through the table, 1 by default.
+
+        Returns
+        -------
+        result : TimeSeries
+            The resulting time series.
+
+        Raises
+        ------
+        IndexOutOfBoundsError
+            If the index is out of bounds.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import TimeSeries
+        >>> table = TimeSeries({"time":[1, 2, 3], "target": [3, 4, 6], "feature":[2, 2, 7]}, target_name= "target", time_name="time", feature_names=["feature"], )
+        >>> table.slice_rows(0, 2)
+           time  feature target
+        0  1        2      3
+        1  2        4      2
+        """
+        if start is None:
+            start = 0
+
+        if end is None:
+            end = self.number_of_rows
+
+        if end < start:
+            raise IndexOutOfBoundsError(slice(start, end))
+        if start < 0 or end < 0 or start > self.number_of_rows or end > self.number_of_rows:
+            raise IndexOutOfBoundsError(start if start < 0 or start > self.number_of_rows else end)
+
+        new_df = self._data.iloc[start:end:step]
+        new_df.columns = self._schema.column_names
+        return TimeSeries(Table._from_pandas_dataframe(new_df)
