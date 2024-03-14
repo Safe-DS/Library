@@ -1762,7 +1762,7 @@ class Table:
         """
         from ._time_series import TimeSeries
 
-        return TimeSeries._from_table_to_time_series(self, target_name, time_name, feature_names)
+        return TimeSeries._from_table(self, target_name, time_name, feature_names)
 
     def transform_column(self, name: str, transformer: Callable[[Row], Any]) -> Table:
         """

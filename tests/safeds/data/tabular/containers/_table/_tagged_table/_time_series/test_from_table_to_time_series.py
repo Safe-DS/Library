@@ -52,36 +52,7 @@ from safeds.exceptions import UnknownColumnNameError
             "time",
             ["A", "B", "C"],
             ValueError,
-            r"Column 'A' cannot be both feature and target.",
-        ),
-        (
-            Table(
-                {
-                    "time": [0, 1],
-                    "A": [1, 4],
-                    "B": [2, 5],
-                    "C": [3, 6],
-                    "T": [0, 1],
-                },
-            ),
-            "A",
-            "time",
-            [],
-            ValueError,
-            r"At least one feature column must be specified.",
-        ),
-        (
-            Table(
-                {
-                    "time": [0, 1],
-                    "A": [1, 4],
-                },
-            ),
-            "A",
-            "time",
-            None,
-            ValueError,
-            r"At least one feature column must be specified.",
+            r"Column 'A' can not be target and feature column.",
         ),
         (
             Table(
@@ -120,8 +91,6 @@ from safeds.exceptions import UnknownColumnNameError
         "feature_does_not_exist",
         "target_does_not_exist",
         "target_and_feature_overlap",
-        "features_are_empty-explicitly",
-        "features_are_empty_implicitly",
         "time_does_not_exist",
         "time_is_also_feature",
     ],
@@ -135,7 +104,7 @@ def test_should_raise_error(
     error_msg: str,
 ) -> None:
     with pytest.raises(error, match=error_msg):
-        TimeSeries._from_table_to_time_series(
+        TimeSeries._from_table(
             table,
             target_name=target_name,
             time_name=time_name,
@@ -197,7 +166,7 @@ def test_should_create_a_tagged_table(
     time_name: str,
     feature_names: list[str] | None,
 ) -> None:
-    time_series = TimeSeries._from_table_to_time_series(
+    time_series = TimeSeries._from_table(
         table,
         target_name=target_name,
         time_name=time_name,
@@ -213,15 +182,5 @@ def test_should_create_a_tagged_table(
     assert time_series._target == table.get_column(target_name)
     assert time_series.time == table.get_column(time_name)
 
-def test_optional_parameter()->None:
-    table = Table(
-        {
-            "time": [0, 1],
-            "T": [0, 1],
-        },
-    )
 
-    ts = TimeSeries._from_table_to_time_series(table=table, target_name = "T", time_name="time")
-    print(ts)
-    assert False
 

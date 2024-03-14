@@ -3,7 +3,7 @@ from _pytest.python_api import raises
 from safeds.data.tabular.containers import TimeSeries
 from safeds.exceptions import IndexOutOfBoundsError
 
-from tests.helpers import assert_that_tagged_tables_are_equal
+from tests.helpers import assert_that_time_series_are_equal
 
 
 @pytest.mark.parametrize(
@@ -36,9 +36,9 @@ def test_should_slice_rows(table: TimeSeries, test_table: TimeSeries, second_tes
     new_table = table.slice_rows(0, 2, 1)
     second_new_table = table.slice_rows(0, 3, 2)
     third_new_table = table.slice_rows()
-    assert_that_tagged_tables_are_equal(new_table, test_table)
-    assert_that_tagged_tables_are_equal(second_new_table, second_test_table)
-    assert_that_tagged_tables_are_equal(third_new_table, table)
+    assert_that_time_series_are_equal(new_table, test_table)
+    assert_that_time_series_are_equal(second_new_table, second_test_table)
+    assert_that_time_series_are_equal(third_new_table, table)
 
 
 @pytest.mark.parametrize(

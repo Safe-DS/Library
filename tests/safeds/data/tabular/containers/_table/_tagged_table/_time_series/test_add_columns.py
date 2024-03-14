@@ -29,7 +29,7 @@ from tests.helpers import assert_that_time_series_are_equal
                 },
                 "target",
                 "time",
-                ["feature_1"],
+                None,
             ),
         ),
     ],
@@ -40,4 +40,8 @@ def test_should_add_columns(
     columns: list[Column],
     expected_time_series: TimeSeries,
 ) -> None:
+    print(len(time_series.add_columns(columns)._feature_names))
+    print(expected_time_series._feature_names)
+    print(time_series.add_columns(columns)._features)
+    print(expected_time_series._features)
     assert_that_time_series_are_equal(time_series.add_columns(columns), expected_time_series)

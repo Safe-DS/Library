@@ -28,7 +28,7 @@ from tests.helpers import assert_that_time_series_are_equal
                 },
                 target_name="target",
                 time_name="time",
-                feature_names=["feature_1"],
+                feature_names=None,
             ),
         ),
     ],
