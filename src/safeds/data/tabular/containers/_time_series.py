@@ -194,7 +194,7 @@ class TimeSeries(TaggedTable):
             raise UnknownColumnNameError([time_name])
         self._time: Column = _data.get_column(time_name)
 
-    def __eq__(self, other) -> bool:
+    def __eq__(self, other: object) -> bool:
         """
         Compare two time series instances.
 

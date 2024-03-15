@@ -165,7 +165,7 @@ class TaggedTable(Table):
         self._features: Table = _data.keep_only_columns(feature_names)
         self._target: Column = _data.get_column(target_name)
 
-    def __eq__(self, other) -> bool:
+    def __eq__(self, other: object) -> bool:
         """
         Compare two tagged table instances.
 
