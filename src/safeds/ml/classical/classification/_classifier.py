@@ -17,7 +17,7 @@ if TYPE_CHECKING:
 class Classifier(ABC):
     """Abstract base class for all classifiers."""
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         """
         Return a deterministic hash value for a classifier.
 

@@ -165,7 +165,7 @@ class TaggedTable(Table):
         self._features: Table = _data.keep_only_columns(feature_names)
         self._target: Column = _data.get_column(target_name)
 
-    def __eq__(self, other):
+    def __eq__(self, other) -> bool:
         """
         Compare two tagged table instances.
 
@@ -179,7 +179,7 @@ class TaggedTable(Table):
             return True
         return self.target == other.target and self.features == other.features and Table.__eq__(self, other)
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         """
         Return a deterministic hash value for this tagged table.
 

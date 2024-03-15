@@ -216,7 +216,7 @@ class Row(Mapping[str, Any]):
         """
         return self.get_value(column_name)
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         """
         Return a deterministic hash value for this row.
 

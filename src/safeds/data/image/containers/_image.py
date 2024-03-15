@@ -109,7 +109,7 @@ class Image:
             and torch.all(torch.eq(self._image_tensor, other._set_device(self.device)._image_tensor)).item()
         )
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         """
         Return a deterministic hash value for this image.
 

@@ -16,7 +16,7 @@ if TYPE_CHECKING:
 class Regressor(ABC):
     """Abstract base class for all regressors."""
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         """
         Return a deterministic hash value for a regressor.
 

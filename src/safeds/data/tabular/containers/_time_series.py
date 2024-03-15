@@ -194,7 +194,7 @@ class TimeSeries(TaggedTable):
             raise UnknownColumnNameError([time_name])
         self._time: Column = _data.get_column(time_name)
 
-    def __eq__(self, other):
+    def __eq__(self, other) -> bool:
         """
         Compare two time series instances.
 
@@ -208,7 +208,7 @@ class TimeSeries(TaggedTable):
             return True
         return self.time == other.time and TaggedTable.__eq__(self, other)
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         """
         Return a deterministic hash value for this time series.
 

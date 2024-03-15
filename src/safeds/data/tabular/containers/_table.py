@@ -457,7 +457,7 @@ class Table:
             return table1.column_names == table2.column_names
         return table1._schema == table2._schema and table1._data.equals(table2._data)
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         """
         Return a deterministic hash value for this table.
 

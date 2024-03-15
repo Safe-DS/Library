@@ -10,7 +10,7 @@ if TYPE_CHECKING:
 class TableTransformer(ABC):
     """Learn a transformation for a set of columns in a `Table` and transform another `Table` with the same columns."""
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         """
         Return a deterministic hash value for a table transformer.
 

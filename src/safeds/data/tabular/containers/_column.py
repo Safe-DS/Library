@@ -191,7 +191,7 @@ class Column(Sequence[T]):
             data = self._data[index].reset_index(drop=True).rename(self.name)
             return Column._from_pandas_series(data, self._type)
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         """
         Return a deterministic hash value for this column.
 
