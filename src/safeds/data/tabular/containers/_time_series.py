@@ -8,7 +8,6 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
 
-
 from safeds.data.image.containers import Image
 from safeds.data.tabular.containers import Column, Row, Table, TaggedTable
 from safeds.exceptions import (
@@ -143,7 +142,7 @@ class TimeSeries(Table):
             result._features = Table()
         else:
             result._feature_names = feature_names
-            #for some reason it gets converted into TimeSeries sometimes
+            # for some reason it gets converted into TimeSeries sometimes
             table = table._as_table()
             result._features = table.keep_only_columns(feature_names)
 
@@ -315,7 +314,7 @@ class TimeSeries(Table):
             super().add_column(column),
             target_name=self._target.name,
             time_name=self.time.name,
-            feature_names=[*self._feature_names, column.name]
+            feature_names=[*self._feature_names, column.name],
         )
 
     def add_columns_as_features(self, columns: list[Column] | Table) -> TimeSeries:
@@ -346,7 +345,7 @@ class TimeSeries(Table):
             time_name=self.time.name,
             target_name=self._target.name,
             feature_names=self._feature_names
-                          + [col.name for col in (columns.to_columns() if isinstance(columns, Table) else columns)],
+            + [col.name for col in (columns.to_columns() if isinstance(columns, Table) else columns)],
         )
 
     def add_columns(self, columns: list[Column] | Table) -> TimeSeries:
@@ -376,7 +375,7 @@ class TimeSeries(Table):
             super().add_columns(columns),
             time_name=self.time.name,
             target_name=self._target.name,
-            feature_names=self._feature_names
+            feature_names=self._feature_names,
         )
 
     def add_row(self, row: Row) -> TimeSeries:
@@ -400,10 +399,12 @@ class TimeSeries(Table):
         UnknownColumnNameError
             If the row has different column names than the time series.
         """
-        return TimeSeries._from_table(super().add_row(row),
-                                      target_name=self._target.name,
-                                      time_name=self.time.name,
-                                      feature_names=self._feature_names)
+        return TimeSeries._from_table(
+            super().add_row(row),
+            target_name=self._target.name,
+            time_name=self.time.name,
+            feature_names=self._feature_names,
+        )
 
     def add_rows(self, rows: list[Row] | Table) -> TimeSeries:
         """
@@ -426,10 +427,12 @@ class TimeSeries(Table):
         UnknownColumnNameError
             If at least one of the rows have different column names than the time series.
         """
-        return TimeSeries._from_table(super().add_rows(rows),
-                                      target_name=self._target.name,
-                                      time_name=self.time.name,
-                                      feature_names=self._feature_names)
+        return TimeSeries._from_table(
+            super().add_rows(rows),
+            target_name=self._target.name,
+            time_name=self.time.name,
+            feature_names=self._feature_names,
+        )
 
     def filter_rows(self, query: Callable[[Row], bool]) -> TimeSeries:
         """
@@ -451,7 +454,7 @@ class TimeSeries(Table):
             super().filter_rows(query),
             target_name=self._target.name,
             time_name=self.time.name,
-            feature_names=self._feature_names
+            feature_names=self._feature_names,
         )
 
     def keep_only_columns(self, column_names: list[str]) -> TimeSeries:
@@ -489,7 +492,6 @@ class TimeSeries(Table):
                 set(self._feature_names).intersection(set(column_names)),
                 key={val: ix for ix, val in enumerate(self._feature_names)}.__getitem__,
             ),
-
         )
 
     def remove_columns(self, column_names: list[str]) -> TimeSeries:
@@ -693,11 +695,8 @@ class TimeSeries(Table):
             feature_names=(
                 self._feature_names
                 if old_name not in self._feature_names
-                else [
-                    column_name if column_name != old_name else new_name
-                    for column_name in self._feature_names
-                ]
-            )
+                else [column_name if column_name != old_name else new_name for column_name in self._feature_names]
+            ),
         )
 
     def replace_column(self, old_column_name: str, new_columns: list[Column]) -> TimeSeries:
@@ -743,7 +742,7 @@ class TimeSeries(Table):
                     super().replace_column(old_column_name, new_columns),
                     target_name=self._target.name,
                     feature_names=self._feature_names,
-                    time_name=new_columns[0].name
+                    time_name=new_columns[0].name,
                 )
         if old_column_name == self._target.name:
             if len(new_columns) != 1:
@@ -767,8 +766,8 @@ class TimeSeries(Table):
                     self._feature_names
                     if old_column_name not in self._feature_names
                     else self._feature_names[: self._feature_names.index(old_column_name)]
-                         + [col.name for col in new_columns]
-                         + self._feature_names[self._feature_names.index(old_column_name) + 1:]
+                    + [col.name for col in new_columns]
+                    + self._feature_names[self._feature_names.index(old_column_name) + 1 :]
                 ),
             )
 
@@ -806,13 +805,13 @@ class TimeSeries(Table):
             super().slice_rows(start, end, step),
             target_name=self._target.name,
             feature_names=self._feature_names,
-            time_name=self.time.name
+            time_name=self.time.name,
         )
 
     def sort_columns(
         self,
         comparator: Callable[[Column, Column], int] = lambda col1, col2: (col1.name > col2.name)
-                                                                         - (col1.name < col2.name),
+        - (col1.name < col2.name),
     ) -> TimeSeries:
         """
         Sort the columns of a `TimeSeries` with the given comparator and return a new `TimeSeries`.

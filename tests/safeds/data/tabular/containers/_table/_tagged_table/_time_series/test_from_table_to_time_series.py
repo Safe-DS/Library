@@ -181,6 +181,3 @@ def test_should_create_a_tagged_table(
     assert time_series._features == table.keep_only_columns(feature_names)
     assert time_series._target == table.get_column(target_name)
     assert time_series.time == table.get_column(time_name)
-
-
-

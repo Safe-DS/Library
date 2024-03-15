@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-import sys
 import functools
 import io
+import sys
 import warnings
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, TypeVar

@@ -16,7 +16,7 @@ from safeds.data.tabular.containers import Table, TimeSeries
                 },
                 target_name="T",
                 time_name="time",
-                feature_names=["A", "B", "C"]
+                feature_names=["A", "B", "C"],
             ),
             Table({"A": [1, 4], "B": [2, 5], "C": [3, 6]}),
         ),
