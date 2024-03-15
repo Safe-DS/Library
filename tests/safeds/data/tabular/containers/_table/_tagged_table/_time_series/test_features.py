@@ -39,5 +39,4 @@ from safeds.data.tabular.containers import Table, TimeSeries
     ids=["only_target_and_features", "target_features_and_other"],
 )
 def test_should_return_features(time_series: TimeSeries, features: Table) -> None:
-    print(time_series._features)
     assert time_series._features == features

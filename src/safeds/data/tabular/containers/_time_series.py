@@ -558,7 +558,6 @@ class TimeSeries(Table):
             raise ColumnIsTargetError(self._target.name)
         if self.time.name not in table.column_names:
             raise ColumnIsTimeError(self.time.name)
-        print("!!!!")
         return TimeSeries._from_table(
             table,
             target_name=self._target.name,
