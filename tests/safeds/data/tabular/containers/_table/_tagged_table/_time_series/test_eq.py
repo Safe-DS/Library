@@ -32,6 +32,17 @@ def test_should_return_whether_two_tagged_tables_are_equal(table1: TimeSeries, t
 
 
 @pytest.mark.parametrize(
+    "table1",
+    [TimeSeries({"a": [], "b": [], "c": []}, "b", "c", ["a"])],
+    ids=[
+        "any",
+    ],
+)
+def test_should_return_true_if_objects_are_identical(table1: TimeSeries) -> None:
+    assert (table1.__eq__(table1)) is True
+
+
+@pytest.mark.parametrize(
     ("table", "other"),
     [
         (TimeSeries({"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9]}, "b", "c", ["a"]), None),
