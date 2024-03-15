@@ -225,6 +225,29 @@ class TimeSeries(Table):
     # ------------------------------------------------------------------------------------------------------------------
 
     @property
+    def target(self) -> Column:
+        """
+        Get the target column of the tagged table.
+
+        Returns
+        -------
+        Column
+            The target column.
+        """
+        return self._target
+
+    @property
+    def features(self) -> Table:
+        """
+        Get the feature columns of the tagged table.
+
+        Returns
+        -------
+        Table
+            The table containing the feature columns.
+        """
+        return self._features
+    @property
     def time(self) -> Column:
         """
         Get the time column of the time series.
@@ -345,7 +368,7 @@ class TimeSeries(Table):
             time_name=self.time.name,
             target_name=self._target.name,
             feature_names=self._feature_names
-            + [col.name for col in (columns.to_columns() if isinstance(columns, Table) else columns)],
+                          + [col.name for col in (columns.to_columns() if isinstance(columns, Table) else columns)],
         )
 
     def add_columns(self, columns: list[Column] | Table) -> TimeSeries:
@@ -766,8 +789,8 @@ class TimeSeries(Table):
                     self._feature_names
                     if old_column_name not in self._feature_names
                     else self._feature_names[: self._feature_names.index(old_column_name)]
-                    + [col.name for col in new_columns]
-                    + self._feature_names[self._feature_names.index(old_column_name) + 1 :]
+                         + [col.name for col in new_columns]
+                         + self._feature_names[self._feature_names.index(old_column_name) + 1:]
                 ),
             )
 
@@ -811,7 +834,7 @@ class TimeSeries(Table):
     def sort_columns(
         self,
         comparator: Callable[[Column, Column], int] = lambda col1, col2: (col1.name > col2.name)
-        - (col1.name < col2.name),
+                                                                         - (col1.name < col2.name),
     ) -> TimeSeries:
         """
         Sort the columns of a `TimeSeries` with the given comparator and return a new `TimeSeries`.
