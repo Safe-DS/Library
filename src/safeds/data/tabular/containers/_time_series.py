@@ -194,6 +194,32 @@ class TimeSeries(TaggedTable):
             raise UnknownColumnNameError([time_name])
         self._time: Column = _data.get_column(time_name)
 
+    def __eq__(self, other):
+        """
+        Compare two time series instances.
+
+        Returns
+        -------
+        'True' if contents are equal, 'False' otherwise.
+        """
+        if not isinstance(other, TimeSeries):
+            return NotImplemented
+        if self is other:
+            return True
+        return self.time == other.time and TaggedTable.__eq__(self, other)
+
+    def __hash__(self):
+        """
+        Return a deterministic hash value for this time series.
+
+        Returns
+        -------
+        hash : int
+            The hash value.
+        """
+        import xxhash
+        return xxhash.xxh3_64(hash(self.time).to_bytes(8) + TaggedTable.__hash__(self).to_bytes(8)).intdigest()
+
     def __sizeof__(self) -> int:
         """
         Return the complete size of this object.

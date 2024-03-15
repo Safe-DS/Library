@@ -10,6 +10,18 @@ if TYPE_CHECKING:
 class TableTransformer(ABC):
     """Learn a transformation for a set of columns in a `Table` and transform another `Table` with the same columns."""
 
+    def __hash__(self):
+        """
+        Return a deterministic hash value for a table transformer.
+
+        Returns
+        -------
+        hash : int
+            The hash value.
+        """
+        import xxhash
+        return xxhash.xxh3_64(self.__class__.__qualname__.encode("utf-8") + (1 if self.is_fitted() else 0).to_bytes(1)).intdigest()
+
     @abstractmethod
     def fit(self, table: Table, column_names: list[str] | None) -> TableTransformer:
         """

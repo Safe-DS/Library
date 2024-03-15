@@ -1,7 +1,7 @@
 import sys
 
 import pytest
-from safeds.data.tabular.containers import Table, TimeSeries
+from safeds.data.tabular.containers import TimeSeries
 
 
 @pytest.mark.parametrize(

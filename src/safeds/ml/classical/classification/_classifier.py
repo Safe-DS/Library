@@ -17,6 +17,18 @@ if TYPE_CHECKING:
 class Classifier(ABC):
     """Abstract base class for all classifiers."""
 
+    def __hash__(self):
+        """
+        Return a deterministic hash value for a classifier.
+
+        Returns
+        -------
+        hash : int
+            The hash value.
+        """
+        import xxhash
+        return xxhash.xxh3_64(self.__class__.__qualname__.encode("utf-8") + (1 if self.is_fitted() else 0).to_bytes(1)).intdigest()
+
     @abstractmethod
     def fit(self, training_set: TaggedTable) -> Classifier:
         """

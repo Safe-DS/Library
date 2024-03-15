@@ -109,6 +109,18 @@ class Image:
             and torch.all(torch.eq(self._image_tensor, other._set_device(self.device)._image_tensor)).item()
         )
 
+    def __hash__(self):
+        """
+        Return a deterministic hash value for this image.
+
+        Returns
+        -------
+        hash : int
+            The hash value.
+        """
+        import xxhash
+        return xxhash.xxh3_64(self.width.to_bytes(8) + self.height.to_bytes(8) + self.channel.to_bytes(8)).intdigest()
+
     def __sizeof__(self) -> int:
         """
         Return the complete size of this object.

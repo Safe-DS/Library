@@ -165,6 +165,32 @@ class TaggedTable(Table):
         self._features: Table = _data.keep_only_columns(feature_names)
         self._target: Column = _data.get_column(target_name)
 
+    def __eq__(self, other):
+        """
+        Compare two tagged table instances.
+
+        Returns
+        -------
+        'True' if contents and tags are equal, 'False' otherwise.
+        """
+        if not isinstance(other, TaggedTable):
+            return NotImplemented
+        if self is other:
+            return True
+        return self.target == other.target and self.features == other.features and Table.__eq__(self, other)
+
+    def __hash__(self):
+        """
+        Return a deterministic hash value for this tagged table.
+
+        Returns
+        -------
+        hash : int
+            The hash value.
+        """
+        import xxhash
+        return xxhash.xxh3_64(hash(self.target).to_bytes(8) + hash(self.features).to_bytes(8) + Table.__hash__(self).to_bytes(8)).intdigest()
+
     def __sizeof__(self) -> int:
         """
         Return the complete size of this object.

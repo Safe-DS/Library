@@ -66,7 +66,7 @@ class Schema:
 
     def __hash__(self) -> int:
         """
-        Return a hash value for the schema.
+        Return a deterministic hash value for the schema.
 
         Returns
         -------
@@ -79,9 +79,10 @@ class Schema:
         >>> schema = Schema({"A": Integer(), "B": String()})
         >>> hash_value = hash(schema)
         """
+        import xxhash
         column_names = self._schema.keys()
         column_types = map(repr, self._schema.values())
-        return hash(tuple(zip(column_names, column_types, strict=True)))
+        return xxhash.xxh3_64(str(tuple(zip(column_names, column_types, strict=True)))).intdigest()
 
     def __repr__(self) -> str:
         """

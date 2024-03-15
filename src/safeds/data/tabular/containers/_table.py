@@ -457,6 +457,18 @@ class Table:
             return table1.column_names == table2.column_names
         return table1._schema == table2._schema and table1._data.equals(table2._data)
 
+    def __hash__(self):
+        """
+        Return a deterministic hash value for this table.
+
+        Returns
+        -------
+        hash : int
+            The hash value.
+        """
+        import xxhash
+        return xxhash.xxh3_64(hash(self._schema).to_bytes(8) + self.number_of_rows.to_bytes(8)).intdigest()
+
     def __repr__(self) -> str:
         r"""
         Display the table in only one line.

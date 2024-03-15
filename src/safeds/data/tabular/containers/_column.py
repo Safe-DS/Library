@@ -191,6 +191,18 @@ class Column(Sequence[T]):
             data = self._data[index].reset_index(drop=True).rename(self.name)
             return Column._from_pandas_series(data, self._type)
 
+    def __hash__(self):
+        """
+        Return a deterministic hash value for this column.
+
+        Returns
+        -------
+        hash : int
+            The hash value.
+        """
+        import xxhash
+        return xxhash.xxh3_64(self.name.encode("utf-8") + self.type.__repr__().encode("utf-8") + self.number_of_rows.to_bytes(8)).intdigest()
+
     def __iter__(self) -> Iterator[T]:
         r"""
         Create an iterator for the data of this column. This way e.g. for-each loops can be used on it.

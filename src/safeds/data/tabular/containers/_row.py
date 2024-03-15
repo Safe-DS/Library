@@ -216,6 +216,20 @@ class Row(Mapping[str, Any]):
         """
         return self.get_value(column_name)
 
+    def __hash__(self):
+        """
+        Return a deterministic hash value for this row.
+
+        Returns
+        -------
+        hash : int
+            The hash value.
+        """
+        import xxhash
+        import functools
+        import operator
+        return xxhash.xxh3_64(hash(self._schema).to_bytes(8) + functools.reduce(operator.add, [xxhash.xxh3_64(str(self.get_value(value))).intdigest().to_bytes(8) for value in self], b"\0")).intdigest()
+
     def __iter__(self) -> Iterator[Any]:
         """
         Create an iterator for the column names of this row.
