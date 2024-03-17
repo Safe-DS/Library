@@ -1,5 +1,5 @@
 import pytest
-from safeds.data.tabular.containers import TimeSeries, Column
+from safeds.data.tabular.containers import Column, TimeSeries
 
 
 @pytest.mark.parametrize(
