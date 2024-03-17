@@ -1,7 +1,6 @@
 import pytest
 from safeds.data.tabular.containers import Table, TimeSeries
 from safeds.exceptions import UnknownColumnNameError
-from tests.helpers import assert_that_time_series_are_equal
 
 
 @pytest.mark.parametrize(
