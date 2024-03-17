@@ -1,6 +1,7 @@
 import pytest
 from safeds.data.tabular.containers import Table, TimeSeries
 from safeds.exceptions import UnknownColumnNameError
+from tests.helpers import assert_that_time_series_are_equal
 
 
 @pytest.mark.parametrize(
@@ -148,6 +149,7 @@ def test_should_create_a_time_series(
     time_series = TimeSeries(data, target_name=target_name, time_name=time_name, feature_names=feature_names)
     if feature_names is None:
         feature_names = []
+
     assert isinstance(time_series, TimeSeries)
     assert time_series._feature_names == feature_names
     assert time_series._target.name == target_name
