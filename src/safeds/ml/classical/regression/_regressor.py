@@ -3,6 +3,7 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
+import xxhash
 from sklearn.metrics import mean_absolute_error as sk_mean_absolute_error
 from sklearn.metrics import mean_squared_error as sk_mean_squared_error
 
@@ -15,6 +16,17 @@ if TYPE_CHECKING:
 
 class Regressor(ABC):
     """Abstract base class for all regressors."""
+
+    def __hash__(self) -> int:
+        """
+        Return a deterministic hash value for a regressor.
+
+        Returns
+        -------
+        hash : int
+            The hash value.
+        """
+        return xxhash.xxh3_64(self.__class__.__qualname__.encode("utf-8") + (1 if self.is_fitted() else 0).to_bytes(1)).intdigest()
 
     @abstractmethod
     def fit(self, training_set: TaggedTable) -> Regressor:
