@@ -57,6 +57,6 @@ def test_should_return_sorted_table(
     assert table_sorted_columns[2] == columns[col3]
     assert table_sorted_columns[3] == columns[col4]
     assert table_sorted_columns[4] == columns[col5]
-    assert table_sorted.features == table1.features
-    assert table_sorted.target == table1.target
+    assert table_sorted._features == table1._features
+    assert table_sorted._target == table1._target
     assert table_sorted.time == table1.time
