@@ -60,7 +60,9 @@ from safeds.data.tabular.containers import Row, Table, TaggedTable, TimeSeries
     ],
 )
 def test_should_return_whether_two_tagged_tables_are_equal(
-    table1: TimeSeries, table2: TimeSeries, expected: bool,
+    table1: TimeSeries,
+    table2: TimeSeries,
+    expected: bool,
 ) -> None:
     assert (table1.__eq__(table2)) == expected
 
