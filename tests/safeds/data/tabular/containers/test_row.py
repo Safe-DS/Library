@@ -184,6 +184,39 @@ class TestEq:
         assert (row.__eq__(other)) is NotImplemented
 
 
+class TestHash:
+    @pytest.mark.parametrize(
+        ("row1", "row2"),
+        [
+            (Row(), Row()),
+            (Row({"col1": 0}), Row({"col1": 0})),
+        ],
+        ids=[
+            "empty rows",
+            "equal rows",
+        ],
+    )
+    def test_should_return_same_hash_for_equal_rows(self, row1: Row, row2: Row) -> None:
+        assert hash(row1) == hash(row2)
+
+    @pytest.mark.parametrize(
+        ("row1", "row2"),
+        [
+
+            (Row({"col1": 0}), Row({"col1": 1})),
+            (Row({"col1": 0}), Row({"col2": 0})),
+            (Row({"col1": 0}), Row({"col1": "a"})),
+        ],
+        ids=[
+            "different values",
+            "different columns",
+            "different types",
+        ],
+    )
+    def test_should_return_different_hash_for_unequal_rows(self, row1: Row, row2: Row) -> None:
+        assert hash(row1) != hash(row2)
+
+
 class TestGetitem:
     @pytest.mark.parametrize(
         ("row", "column_name", "expected"),

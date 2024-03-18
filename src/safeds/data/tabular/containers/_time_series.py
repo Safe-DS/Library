@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING
 import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
+import xxhash
 
 from safeds.data.image.containers import Image
 from safeds.data.tabular.containers import Column, Row, Table, TaggedTable
@@ -203,6 +204,31 @@ class TimeSeries(Table):
             raise UnknownColumnNameError([time_name])
         self._time: Column = _data.get_column(time_name)
         self._target: Column = _data.get_column(target_name)
+
+    def __eq__(self, other: object) -> bool:
+        """
+        Compare two time series instances.
+
+        Returns
+        -------
+        'True' if contents are equal, 'False' otherwise.
+        """
+        if not isinstance(other, TimeSeries):
+            return NotImplemented
+        if self is other:
+            return True
+        return self.time == other.time and TaggedTable.__eq__(self, other)
+
+    def __hash__(self) -> int:
+        """
+        Return a deterministic hash value for this time series.
+
+        Returns
+        -------
+        hash : int
+            The hash value.
+        """
+        return xxhash.xxh3_64(hash(self.time).to_bytes(8) + TaggedTable.__hash__(self).to_bytes(8)).intdigest()
 
     def __sizeof__(self) -> int:
         """

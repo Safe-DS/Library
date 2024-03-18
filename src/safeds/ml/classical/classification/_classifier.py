@@ -3,6 +3,7 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
+import xxhash
 from sklearn.metrics import accuracy_score as sk_accuracy_score
 
 from safeds.data.tabular.containers import Table, TaggedTable
@@ -16,6 +17,17 @@ if TYPE_CHECKING:
 
 class Classifier(ABC):
     """Abstract base class for all classifiers."""
+
+    def __hash__(self) -> int:
+        """
+        Return a deterministic hash value for a classifier.
+
+        Returns
+        -------
+        hash : int
+            The hash value.
+        """
+        return xxhash.xxh3_64(self.__class__.__qualname__.encode("utf-8") + (1 if self.is_fitted() else 0).to_bytes(1)).intdigest()
 
     @abstractmethod
     def fit(self, training_set: TaggedTable) -> Classifier:
