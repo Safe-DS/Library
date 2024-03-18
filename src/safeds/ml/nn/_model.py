@@ -115,7 +115,9 @@ class RegressionNeuralNetwork:
         predictions = []
         with torch.no_grad():
             for x in dataloader:
-                predictions.append(self._model(x).item())
+                elem = self._model(x)
+                for item in range(len(elem)):
+                    predictions.append(elem[item].item())
         return test_data.add_column(Column("prediction", predictions)).tag_columns("prediction")
 
     @property
@@ -217,10 +219,7 @@ class ClassificationNeuralNetwork:
                 optimizer.step()
                 number_of_batches_done += 1
                 if callback_on_batch_completion is not None:
-                    callback_on_batch_completion(
-                        number_of_batches_done,
-                        loss_sum / (number_of_batches_done * batch_size),
-                    )
+                    callback_on_batch_completion(number_of_batches_done, loss_sum / (number_of_batches_done * batch_size))
             if callback_on_epoch_completion is not None:
                 callback_on_epoch_completion(epoch, loss_sum / (number_of_batches_done * batch_size))
         copied_model._is_fitted = True
@@ -254,7 +253,9 @@ class ClassificationNeuralNetwork:
         predictions = []
         with torch.no_grad():
             for x in dataloader:
-                predictions.append(self._model(x).item())
+                elem = self._model(x)
+                for item in range(len(elem)):
+                    predictions.append(elem[item].item())
         return test_data.add_column(Column("prediction", predictions)).tag_columns("prediction")
 
     @property
