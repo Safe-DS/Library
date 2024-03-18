@@ -217,7 +217,7 @@ class TimeSeries(Table):
             return NotImplemented
         if self is other:
             return True
-        return self.time == other.time and TaggedTable.__eq__(self, other)
+        return self.time == other.time and self.target == other.target and self.features == other.features and Table.__eq__(self, other)
 
     def __hash__(self) -> int:
         """
@@ -228,7 +228,7 @@ class TimeSeries(Table):
         hash : int
             The hash value.
         """
-        return xxhash.xxh3_64(hash(self.time).to_bytes(8) + TaggedTable.__hash__(self).to_bytes(8)).intdigest()
+        return xxhash.xxh3_64(hash(self.time).to_bytes(8) + hash(self.target).to_bytes(8) + hash(self.features).to_bytes(8) + Table.__hash__(self).to_bytes(8)).intdigest()
 
     def __sizeof__(self) -> int:
         """
