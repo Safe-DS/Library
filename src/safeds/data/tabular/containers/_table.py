@@ -13,6 +13,7 @@ import numpy as np
 import openpyxl
 import pandas as pd
 import seaborn as sns
+import xxhash
 from pandas import DataFrame
 from scipy import stats
 
@@ -466,7 +467,6 @@ class Table:
         hash : int
             The hash value.
         """
-        import xxhash
         return xxhash.xxh3_64(hash(self._schema).to_bytes(8) + self.number_of_rows.to_bytes(8)).intdigest()
 
     def __repr__(self) -> str:

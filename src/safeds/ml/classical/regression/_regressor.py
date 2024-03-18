@@ -3,6 +3,7 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
+import xxhash
 from sklearn.metrics import mean_absolute_error as sk_mean_absolute_error
 from sklearn.metrics import mean_squared_error as sk_mean_squared_error
 
@@ -25,7 +26,6 @@ class Regressor(ABC):
         hash : int
             The hash value.
         """
-        import xxhash
         return xxhash.xxh3_64(self.__class__.__qualname__.encode("utf-8") + (1 if self.is_fitted() else 0).to_bytes(1)).intdigest()
 
     @abstractmethod

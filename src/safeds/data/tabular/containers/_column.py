@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import seaborn as sns
+import xxhash
 
 from safeds.data.image.containers import Image
 from safeds.data.tabular.typing import ColumnType
@@ -200,7 +201,6 @@ class Column(Sequence[T]):
         hash : int
             The hash value.
         """
-        import xxhash
         return xxhash.xxh3_64(self.name.encode("utf-8") + self.type.__repr__().encode("utf-8") + self.number_of_rows.to_bytes(8)).intdigest()
 
     def __iter__(self) -> Iterator[T]:

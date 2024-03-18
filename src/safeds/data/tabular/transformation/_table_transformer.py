@@ -3,6 +3,8 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
+import xxhash
+
 if TYPE_CHECKING:
     from safeds.data.tabular.containers import Table
 
@@ -19,7 +21,6 @@ class TableTransformer(ABC):
         hash : int
             The hash value.
         """
-        import xxhash
         return xxhash.xxh3_64(self.__class__.__qualname__.encode("utf-8") + (1 if self.is_fitted() else 0).to_bytes(1)).intdigest()
 
     @abstractmethod

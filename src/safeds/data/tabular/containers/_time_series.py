@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING
 import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
+import xxhash
 
 from safeds.data.image.containers import Image
 from safeds.data.tabular.containers import Column, Row, Table, TaggedTable
@@ -217,7 +218,6 @@ class TimeSeries(TaggedTable):
         hash : int
             The hash value.
         """
-        import xxhash
         return xxhash.xxh3_64(hash(self.time).to_bytes(8) + TaggedTable.__hash__(self).to_bytes(8)).intdigest()
 
     def __sizeof__(self) -> int:

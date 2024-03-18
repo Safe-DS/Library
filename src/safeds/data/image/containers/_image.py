@@ -8,6 +8,7 @@ from typing import TYPE_CHECKING
 
 import torch
 import torch.nn.functional as func
+import xxhash
 from PIL.Image import open as pil_image_open
 from torch import Tensor
 
@@ -118,7 +119,6 @@ class Image:
         hash : int
             The hash value.
         """
-        import xxhash
         return xxhash.xxh3_64(self.width.to_bytes(8) + self.height.to_bytes(8) + self.channel.to_bytes(8)).intdigest()
 
     def __sizeof__(self) -> int:

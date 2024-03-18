@@ -3,6 +3,8 @@ from __future__ import annotations
 import sys
 from typing import TYPE_CHECKING
 
+import xxhash
+
 from safeds.data.tabular.containers import Column, Row, Table
 from safeds.exceptions import (
     ColumnIsTargetError,
@@ -188,7 +190,6 @@ class TaggedTable(Table):
         hash : int
             The hash value.
         """
-        import xxhash
         return xxhash.xxh3_64(hash(self.target).to_bytes(8) + hash(self.features).to_bytes(8) + Table.__hash__(self).to_bytes(8)).intdigest()
 
     def __sizeof__(self) -> int:
