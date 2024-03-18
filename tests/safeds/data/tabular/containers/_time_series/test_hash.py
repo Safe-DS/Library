@@ -1,15 +1,23 @@
-from typing import Any
 
 import pytest
-from safeds.data.tabular.containers import Row, Table, TimeSeries, TimeSeries, TaggedTable
+from safeds.data.tabular.containers import TimeSeries
 
 
 @pytest.mark.parametrize(
     ("table1", "table2"),
     [
-        (TimeSeries({"a": [], "b": [], "c": []}, "b", "c", ["a"]), TimeSeries({"a": [], "b": [], "c": []}, "b", "c", ["a"])),
-        (TimeSeries({"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9]}, "b", "c", ["a"]), TimeSeries({"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9]}, "b", "c", ["a"])),
-        (TimeSeries({"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9]}, "b", "c", ["a"]), TimeSeries({"a": [1, 1, 3], "b": [4, 5, 6], "c": [7, 8, 9]}, "b", "c", ["a"])),
+        (
+            TimeSeries({"a": [], "b": [], "c": []}, "b", "c", ["a"]),
+            TimeSeries({"a": [], "b": [], "c": []}, "b", "c", ["a"]),
+        ),
+        (
+            TimeSeries({"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9]}, "b", "c", ["a"]),
+            TimeSeries({"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9]}, "b", "c", ["a"]),
+        ),
+        (
+            TimeSeries({"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9]}, "b", "c", ["a"]),
+            TimeSeries({"a": [1, 1, 3], "b": [4, 5, 6], "c": [7, 8, 9]}, "b", "c", ["a"]),
+        ),
     ],
     ids=[
         "rowless table",
@@ -24,11 +32,26 @@ def test_should_return_same_hash_for_equal_time_series(table1: TimeSeries, table
 @pytest.mark.parametrize(
     ("table1", "table2"),
     [
-        (TimeSeries({"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9], "d": [10, 11, 12]}, "b", "d", ["a"]), TimeSeries({"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9], "d": [10, 11, 12]}, "c", "d", ["a"])),
-        (TimeSeries({"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9], "d": [10, 11, 12]}, "b", "c", ["a"]), TimeSeries({"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9], "e": [10, 11, 12]}, "b", "c", ["a"])),
-        (TimeSeries({"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9]}, "b", "c", ["a"]), TimeSeries({"a": ["1", "2", "3"], "b": [4, 5, 6], "c": [7, 8, 9]}, "b", "c", ["a"])),
-        (TimeSeries({"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9], "d": [10, 11, 12]}, "b", "d", ["a"]), TimeSeries({"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9], "d": [10, 11, 12]}, "b", "d", ["c"])),
-        (TimeSeries({"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9], "d": [10, 11, 12]}, "b", "d", ["a"]), TimeSeries({"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9], "d": [10, 11, 12]}, "b", "c", ["a"])),
+        (
+            TimeSeries({"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9], "d": [10, 11, 12]}, "b", "d", ["a"]),
+            TimeSeries({"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9], "d": [10, 11, 12]}, "c", "d", ["a"]),
+        ),
+        (
+            TimeSeries({"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9], "d": [10, 11, 12]}, "b", "c", ["a"]),
+            TimeSeries({"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9], "e": [10, 11, 12]}, "b", "c", ["a"]),
+        ),
+        (
+            TimeSeries({"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9]}, "b", "c", ["a"]),
+            TimeSeries({"a": ["1", "2", "3"], "b": [4, 5, 6], "c": [7, 8, 9]}, "b", "c", ["a"]),
+        ),
+        (
+            TimeSeries({"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9], "d": [10, 11, 12]}, "b", "d", ["a"]),
+            TimeSeries({"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9], "d": [10, 11, 12]}, "b", "d", ["c"]),
+        ),
+        (
+            TimeSeries({"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9], "d": [10, 11, 12]}, "b", "d", ["a"]),
+            TimeSeries({"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9], "d": [10, 11, 12]}, "b", "c", ["a"]),
+        ),
     ],
     ids=[
         "different target",
