@@ -119,6 +119,7 @@ class TimeSeries(Table):
         >>> test_table = Table({"date": ["01.01", "01.02", "01.03", "01.04"], "f1": ["a", "b", "c", "a"], "t": [1,2,3,4]})
         >>> timeseries = TimeSeries._from_table(test_table, "t", "date", ["f1"])
         """
+        table = table._as_table()
         if feature_names is not None and time_name in feature_names:
             raise ValueError(f"Column '{time_name}' can not be time and feature column.")
         if feature_names is not None and target_name in feature_names:
@@ -128,22 +129,15 @@ class TimeSeries(Table):
             raise UnknownColumnNameError([target_name])
 
         result = object.__new__(TimeSeries)
-
         result._data = table._data
         result._schema = table._schema
         result._time = table.get_column(time_name)
         result._target = table.get_column(target_name)
-        if feature_names is None:
-            result._feature_names = []
-            feature_names = []
-            result._features = Table()
-        if len(feature_names) == 0:
+        if feature_names is None or len(feature_names) == 0:
             result._feature_names = []
             result._features = Table()
         else:
             result._feature_names = feature_names
-            # for some reason it gets converted into TimeSeries sometimes
-            table = table._as_table()
             result._features = table.keep_only_columns(feature_names)
 
         # check if time column got added as feature column
@@ -190,10 +184,10 @@ class TimeSeries(Table):
         >>> from safeds.data.tabular.containers import TaggedTable
         >>> table = TaggedTable({"a": [1, 2, 3], "b": [4, 5, 6]}, "b", ["a"])
         """
-        _data = Table(data)
 
         # Validate inputs
         super().__init__(data)
+        _data = Table(data)
         if feature_names is None:
             self._features = Table()
             self._feature_names = []
@@ -895,6 +889,7 @@ class TimeSeries(Table):
         UnknownColumnNameError
             If the column does not exist.
         """
+
         return TimeSeries._from_table(
             super().transform_column(name, transformer),
             time_name=self.time.name,
