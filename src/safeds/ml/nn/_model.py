@@ -261,9 +261,9 @@ class ClassificationNeuralNetwork:
                 for item in range(len(elem)):
                     if not self._is_multi_class:
                         if elem[item].item() < 0.5:
-                            predicted_class = 0                         # pragma: no cover
-                        else:                                           # pragma: no cover
-                            predicted_class = 1                         # pragma: no cover
+                            predicted_class = 0  # pragma: no cover
+                        else:  # pragma: no cover
+                            predicted_class = 1  # pragma: no cover
                         predictions.append(predicted_class)
                     else:
                         values = elem[item].tolist()
