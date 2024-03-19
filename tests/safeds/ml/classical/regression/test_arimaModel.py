@@ -1,19 +1,19 @@
 import pytest
 from safeds.ml.classical.regression import ArimaModel
-from safeds.data.tabular.containers import TimeSeries, Table, Column
+from safeds.data.tabular.containers import TimeSeries, Table
 from syrupy import SnapshotAssertion
-import pandas as pd
 import numpy as np
 
 
-def test_arimaModel(snapshot_png: SnapshotAssertion) -> None:
+def test_arima_model(snapshot_png: SnapshotAssertion) -> None:
     # Create a DataFrame
     np.random.seed(42)
-    table = Table.from_csv_file("C:/Users/ettel/PycharmProjects/Library/tests/resources/_datas/US_Inflation_rates.csv")
-    time_series = TimeSeries._from_table(table, target_name="value", time_name="date")
+    time_series = TimeSeries.timeseries_from_csv_file("C:/Users/ettel/PycharmProjects/Library/tests/resources/_datas/US_Inflation_rates.csv",                                                  target_name= "value", time_name="date")
     train_ts, test_ts = time_series.split_rows(0.8)
     model = ArimaModel()
-
     trained_model = model.fit(train_ts)
-    assert snapshot_png == trained_model.predict(test_ts)
+    predictions = trained_model.predict(test_ts)
+    print(predictions)
+    assert snapshot_png == trained_model.plot_predictions(test_ts)
+    assert False
 

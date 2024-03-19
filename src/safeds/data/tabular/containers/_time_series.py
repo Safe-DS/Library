@@ -5,6 +5,7 @@ import sys
 from typing import TYPE_CHECKING
 
 import matplotlib.pyplot as plt
+from pathlib import Path
 import pandas as pd
 import seaborn as sns
 import xxhash
@@ -19,6 +20,7 @@ from safeds.exceptions import (
     IllegalSchemaModificationError,
     NonNumericColumnError,
     UnknownColumnNameError,
+    WrongFileExtensionError,
     IndexOutOfBoundsError,
 )
 
@@ -32,6 +34,57 @@ class TimeSeries(Table):
     # ------------------------------------------------------------------------------------------------------------------
     # Creation
     # ------------------------------------------------------------------------------------------------------------------
+
+    @staticmethod
+    def timeseries_from_csv_file(path: str | Path,
+                                 target_name: str,
+                                 time_name: str,
+                                 feature_names: list[str] | None = None,
+                                 ) -> TimeSeries:
+        """
+        Read data from a CSV file into a table.
+
+        Parameters
+        ----------
+        path :
+            The path to the CSV file.
+
+        target_name:
+            The name of the target column
+
+        time_name :
+            The name of the time column
+
+        feature_names:
+            The name(s) of the column(s)
+
+
+        Returns
+        -------
+        table :
+            The time series created from the CSV file.
+
+        Raises
+        ------
+        FileNotFoundError
+            If the specified file does not exist.
+        WrongFileExtensionError
+            If the file is not a csv file.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table
+        >>> TimeSeries.timeseries_from_csv_file('./src/resources/from_csv_file.csv')
+           a  b  c
+        0  1  2  1
+        1  0  0  7
+        """
+        return TimeSeries._from_table(
+            Table.from_csv_file(path=path),
+            target_name=target_name,
+            time_name=time_name,
+            feature_names=feature_names
+        )
 
     @staticmethod
     def _from_tagged_table(
@@ -138,7 +191,7 @@ class TimeSeries(Table):
         result._schema = table._schema
         result._time = table.get_column(time_name)
         result._target = table.get_column(target_name)
-        #empty Columns have dtype Object
+        # empty Columns have dtype Object
         if len(result._time._data) == 0:
             result._time._data = pd.Series(name=time_name)
         if len(result.target._data) == 0:
@@ -212,7 +265,7 @@ class TimeSeries(Table):
             raise UnknownColumnNameError([time_name])
         self._time: Column = _data.get_column(time_name)
         self._target: Column = _data.get_column(target_name)
-        #empty Columns have dtype Object
+        # empty Columns have dtype Object
         if len(self._time._data) == 0:
             self._time._data = pd.Series(name=time_name)
         if len(self.target._data) == 0:
@@ -413,7 +466,7 @@ class TimeSeries(Table):
             time_name=self.time.name,
             target_name=self._target.name,
             feature_names=self._feature_names
-            + [col.name for col in (columns.to_columns() if isinstance(columns, Table) else columns)],
+                          + [col.name for col in (columns.to_columns() if isinstance(columns, Table) else columns)],
         )
 
     def add_columns(self, columns: list[Column] | Table) -> TimeSeries:
@@ -834,8 +887,8 @@ class TimeSeries(Table):
                     self._feature_names
                     if old_column_name not in self._feature_names
                     else self._feature_names[: self._feature_names.index(old_column_name)]
-                    + [col.name for col in new_columns]
-                    + self._feature_names[self._feature_names.index(old_column_name) + 1 :]
+                         + [col.name for col in new_columns]
+                         + self._feature_names[self._feature_names.index(old_column_name) + 1:]
                 ),
             )
 
@@ -879,7 +932,7 @@ class TimeSeries(Table):
     def sort_columns(
         self,
         comparator: Callable[[Column, Column], int] = lambda col1, col2: (col1.name > col2.name)
-        - (col1.name < col2.name),
+                                                                         - (col1.name < col2.name),
     ) -> TimeSeries:
         """
         Sort the columns of a `TimeSeries` with the given comparator and return a new `TimeSeries`.
@@ -1167,6 +1220,8 @@ class TimeSeries(Table):
         2    4       30       210
         """
         temp = self._as_table()
-        t1, t2 = temp.split_rows(percentage_in_first = percentage_in_first)
-        return(TimeSeries._from_table(t1, time_name=self.time.name, target_name=self._target.name, feature_names= self._feature_names),
-               TimeSeries._from_table(t2, time_name=self.time.name, target_name=self._target.name, feature_names= self._feature_names))
+        t1, t2 = temp.split_rows(percentage_in_first=percentage_in_first)
+        return (TimeSeries._from_table(t1, time_name=self.time.name, target_name=self._target.name,
+                                       feature_names=self._feature_names),
+                TimeSeries._from_table(t2, time_name=self.time.name, target_name=self._target.name,
+                                       feature_names=self._feature_names))

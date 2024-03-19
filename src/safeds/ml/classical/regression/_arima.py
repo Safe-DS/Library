@@ -5,12 +5,16 @@ from typing import TYPE_CHECKING
 import itertools
 import matplotlib.pyplot as plt
 
-from safeds.data.tabular.containers import TimeSeries
+from safeds.data.tabular.containers import TimeSeries, Column
 from safeds.data.image.containers import Image
 
 if TYPE_CHECKING:
     from sklearn.base import RegressorMixin
     from safeds.data.tabular.containers import TimeSeries
+from safeds.exceptions import (
+    ModelNotFittedError,
+    PredictionError
+)
 
 
 class ArimaModel:
@@ -20,6 +24,7 @@ class ArimaModel:
         # Internal state
         self._arima = None
         self._order = None
+        self._fitted = False
 
     def fit(self, time_series: TimeSeries):
         """
@@ -57,26 +62,77 @@ class ArimaModel:
         best_model = None
         best_param = None
         for param in pdq:
-            try:
-                # Create and fit an ARIMA model with the current parameters
-                mod = ARIMA(time_series.target._data.values, order=param)
-                result = mod.fit()
+            # Create and fit an ARIMA model with the current parameters
+            mod = ARIMA(time_series.target._data.values, order=param)
+            result = mod.fit()
 
-                # Compare the current model's AIC with the best AIC so far
-                if result.aic < best_aic:
-                    best_aic = result.aic
-                    best_param = param
-                    best_model = result
-            except Exception as e:
-                # Skip the iteration if the model cannot be fitted with current parameters
-                print('ARIMA{} - AIC: skipped due to an error: {}'.format(param, e))
-                continue
+            # Compare the current model's AIC with the best AIC so far
+            if result.aic < best_aic:
+                best_aic = result.aic
+                best_param = param
+                best_model = result
 
         fitted_arima._order = best_param
         fitted_arima._arima = best_model
+        fitted_arima._fitted = True
         return fitted_arima
 
     def predict(self, time_series: TimeSeries):
+        """
+            Predict a target vector using a time series target column. The model has to be trained first.
+
+            Parameters
+            ----------
+            time_series : TimeSeries
+                The time series containing the target vector.
+
+            Returns
+            -------
+            table : TimeSeries
+                A timeseries containing the old time series vectors and the predicted target vector.
+
+            Raises
+            ------
+            ModelNotFittedError
+                If the model has not been fitted yet.
+            PredictionError
+                If predicting with the given dataset failed.
+                """
+        if not self.is_fitted():
+            raise ModelNotFittedError
+
+        test_data = time_series.target._data.to_numpy()
+        n_steps = len(test_data)
+        try:
+            forecast_results = self._arima.forecast(steps=n_steps)
+        except any:
+            raise PredictionError
+
+        # create new TimeSeries
+        result = time_series.add_column(Column(name="forecasted", data = forecast_results))
+        return result
+
+    def plot_predictions(self, time_series: TimeSeries)-> Image:
+        """
+        Plot the predictions of the given time series target
+        Parameters
+        ----------
+        time_series : TimeSeries
+            The time series containing the target vector.
+
+        Returns
+        -------
+        image : Image
+            Plots predictions of the given time series to the given target Column
+
+        Raises
+        ------
+        ModelNotFittedError
+            If the model has not been fitted yet.
+        PredictionError
+                If predicting with the given dataset failed.
+
+        """
         test_data = time_series.target._data.values
         n_steps = len(test_data)
         forecast_results = self._arima.forecast(steps=n_steps)
@@ -92,3 +148,14 @@ class ArimaModel:
         plt.close()  # Prevents the figure from being displayed directly
         buffer.seek(0)
         return Image.from_bytes(buffer.read())
+
+    def is_fitted(self) -> bool:
+        """
+        Check if the classifier is fitted.
+
+        Returns
+        -------
+        is_fitted : bool
+            Whether the regressor is fitted.
+        """
+        return self._fitted
