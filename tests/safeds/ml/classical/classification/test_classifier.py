@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import itertools
 from typing import TYPE_CHECKING, Any
 
 import pytest
@@ -258,6 +259,26 @@ class TestIsFitted:
     def test_should_return_true_after_fitting(self, classifier: Classifier, valid_data: TaggedTable) -> None:
         fitted_classifier = classifier.fit(valid_data)
         assert fitted_classifier.is_fitted()
+
+
+class TestHash:
+    @pytest.mark.parametrize(("classifier1", "classifier2"), ([(x, y) for x in classifiers() for y in classifiers() if x.__class__ == y.__class__]), ids=lambda x: x.__class__.__name__)
+    def test_should_return_same_hash_for_equal_classifier(self, classifier1: Classifier, classifier2: Classifier) -> None:
+        assert hash(classifier1) == hash(classifier2)
+
+    @pytest.mark.parametrize(("classifier1", "classifier2"), ([(x, y) for x in classifiers() for y in classifiers() if x.__class__ != y.__class__]), ids=lambda x: x.__class__.__name__)
+    def test_should_return_different_hash_for_unequal_classifier(self, classifier1: Classifier, classifier2: Classifier) -> None:
+        assert hash(classifier1) != hash(classifier2)
+
+    @pytest.mark.parametrize("classifier1", classifiers(), ids=lambda x: x.__class__.__name__)
+    def test_should_return_different_hash_for_same_classifier_fit(self, classifier1: Classifier, valid_data: TaggedTable) -> None:
+        regressor1_fit = classifier1.fit(valid_data)
+        assert hash(classifier1) != hash(regressor1_fit)
+
+    @pytest.mark.parametrize(("classifier1", "classifier2"), (list(itertools.product(classifiers(), classifiers()))), ids=lambda x: x.__class__.__name__)
+    def test_should_return_different_hash_for_classifier_fit(self, classifier1: Classifier, classifier2: Classifier, valid_data: TaggedTable) -> None:
+        classifier1_fit = classifier1.fit(valid_data)
+        assert hash(classifier1_fit) != hash(classifier2)
 
 
 class DummyClassifier(Classifier):

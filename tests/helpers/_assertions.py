@@ -53,7 +53,8 @@ def assert_that_time_series_are_equal(table1: TimeSeries, table2: TimeSeries) ->
         The timeseries to compare the first timeseries to.
     """
     assert table1.schema == table2.schema
-    assert table1.features == table2.features
-    assert table1.target == table2.target
+    assert table1._feature_names == table2._feature_names
+    assert table1.features == table2._features
+    assert table1.target == table2._target
     assert table1.time == table2.time
     assert table1 == table2
