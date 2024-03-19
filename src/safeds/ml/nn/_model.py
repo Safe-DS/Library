@@ -138,7 +138,7 @@ class ClassificationNeuralNetwork:
         self._model = _PytorchModel(layers, is_for_classification=True)
         self._batch_size = 1
         self._is_fitted = False
-        self._is_multi_class = layers[-1].output_size > 2
+        self._is_multi_class = layers[-1].output_size > 1
 
     def fit(
         self,
