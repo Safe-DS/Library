@@ -5,8 +5,8 @@ from typing import TYPE_CHECKING
 
 import numpy as np
 import torch
-from torch.utils.data import DataLoader, Dataset
 import xxhash
+from torch.utils.data import DataLoader, Dataset
 
 from safeds.data.tabular.containers import Column, Row, Table
 from safeds.exceptions import (
@@ -193,7 +193,9 @@ class TaggedTable(Table):
         hash : int
             The hash value.
         """
-        return xxhash.xxh3_64(hash(self.target).to_bytes(8) + hash(self.features).to_bytes(8) + Table.__hash__(self).to_bytes(8)).intdigest()
+        return xxhash.xxh3_64(
+            hash(self.target).to_bytes(8) + hash(self.features).to_bytes(8) + Table.__hash__(self).to_bytes(8),
+        ).intdigest()
 
     def __sizeof__(self) -> int:
         """
