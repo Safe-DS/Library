@@ -8,13 +8,12 @@ import numpy as np
 
 def test_arimaModel(snapshot_png: SnapshotAssertion) -> None:
     # Create a DataFrame
+    np.random.seed(42)
     table = Table.from_csv_file("C:/Users/ettel/PycharmProjects/Library/tests/resources/_datas/US_Inflation_rates.csv")
-    time_series = TimeSeries._from_table(table, target_name="value", time_name="date", feature_names=["feature"])
-    tuple_ts = time_series.split_rows()
+    time_series = TimeSeries._from_table(table, target_name="value", time_name="date")
+    train_ts, test_ts = time_series.split_rows(0.8)
     model = ArimaModel()
 
-    #right now the model just saves the best parameter for the predict method in the fit method
-    trained_model =model.fit(time_series)
-    snap = trained_model.predict(time_series)
-    assert snapshot_png == snap
+    trained_model = model.fit(train_ts)
+    assert snapshot_png == trained_model.predict(test_ts)
 
