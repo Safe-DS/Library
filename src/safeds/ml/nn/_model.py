@@ -73,7 +73,7 @@ class RegressionNeuralNetwork:
                 pred = copied_model._model(x)
 
                 loss = loss_fn(pred, y)
-                loss_sum += loss
+                loss_sum += loss.item()
                 loss.backward()
                 optimizer.step()
                 number_of_batches_done += 1
@@ -83,7 +83,7 @@ class RegressionNeuralNetwork:
                         loss_sum / (number_of_batches_done * batch_size),
                     )
             if callback_on_epoch_completion is not None:
-                callback_on_epoch_completion(epoch, loss_sum / (number_of_batches_done * batch_size))
+                callback_on_epoch_completion(epoch+1, loss_sum / (number_of_batches_done * batch_size))
         copied_model._is_fitted = True
         copied_model._model.eval()
         return copied_model
@@ -215,7 +215,7 @@ class ClassificationNeuralNetwork:
                     loss = loss_fn(pred, y_reshaped_as_tensor_to_fit_format_of_pred)
                 else:
                     loss = loss_fn(pred, y)
-                loss_sum += loss
+                loss_sum += loss.item()
                 loss.backward()
                 optimizer.step()
                 number_of_batches_done += 1
@@ -225,7 +225,7 @@ class ClassificationNeuralNetwork:
                         loss_sum / (number_of_batches_done * batch_size),
                     )
             if callback_on_epoch_completion is not None:
-                callback_on_epoch_completion(epoch, loss_sum / (number_of_batches_done * batch_size))
+                callback_on_epoch_completion(epoch+1, loss_sum / (number_of_batches_done * batch_size))
         copied_model._is_fitted = True
         copied_model._model.eval()
         return copied_model
@@ -260,7 +260,11 @@ class ClassificationNeuralNetwork:
                 elem = self._model(x)
                 for item in range(len(elem)):
                     if not self._is_multi_class:
-                        predictions.append(elem[item].item())
+                        if elem[item].item() < 0.5:
+                            predicted_class = 0
+                        else:
+                            predicted_class = 1
+                        predictions.append(predicted_class)
                     else:
                         values = elem[item].tolist()
                         highest_value = 0
@@ -300,7 +304,7 @@ class _PytorchModel(nn.Module):
 
         if is_for_classification:
             internal_layers.pop()
-            if fnn_layers[-1].output_size > 1:
+            if fnn_layers[-1].output_size > 2:
                 internal_layers.append(fnn_layers[-1]._get_internal_layer(activation_function="softmax"))
             else:
                 internal_layers.append(fnn_layers[-1]._get_internal_layer(activation_function="sigmoid"))
