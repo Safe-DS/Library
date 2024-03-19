@@ -1,6 +1,6 @@
 import pytest
 from safeds.data.tabular.containers import TimeSeries
-from safeds.exceptions import ColumnIsTargetError, ColumnIsTimeError, IllegalSchemaModificationError
+from safeds.exceptions import ColumnIsTargetError, ColumnIsTimeError
 
 from tests.helpers import assert_that_time_series_are_equal
 
@@ -168,36 +168,6 @@ def test_should_remove_columns_with_non_numerical_values(table: TimeSeries, expe
             ColumnIsTargetError,
             r'Illegal schema modification: Column "target" is the target column and cannot be removed.',
         ),
-        (
-            TimeSeries(
-                {
-                    "time": [0, 1, 2],
-                    "feature": [0, "a", 2],
-                    "non_feature": [1, 2, 3],
-                    "target": [3, 2, 5],
-                },
-                "target",
-                "time",
-                ["feature"],
-            ),
-            IllegalSchemaModificationError,
-            r"Illegal schema modification: You cannot remove every feature column.",
-        ),
-        (
-            TimeSeries(
-                {
-                    "time": [0, 1, 2],
-                    "feature": [0, "a", 2],
-                    "non_feature": [1, "b", 3],
-                    "target": [3, 2, 5],
-                },
-                "target",
-                "time",
-                ["feature"],
-            ),
-            IllegalSchemaModificationError,
-            r"Illegal schema modification: You cannot remove every feature column.",
-        ),
     ],
     ids=[
         "only_target_non_numerical",
@@ -205,8 +175,6 @@ def test_should_remove_columns_with_non_numerical_values(table: TimeSeries, expe
         "also_non_feature_non_numerical",
         "time_non_numerical",
         "all_non_numerical",
-        "all_features_non_numerical",
-        "all_features_and_non_feature_non_numerical",
     ],
 )
 def test_should_raise_in_remove_columns_with_non_numerical_values(

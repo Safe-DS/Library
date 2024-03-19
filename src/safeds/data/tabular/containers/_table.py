@@ -14,6 +14,7 @@ import openpyxl
 import pandas as pd
 import seaborn as sns
 import torch
+import xxhash
 from pandas import DataFrame
 from scipy import stats
 from torch.utils.data import DataLoader, Dataset
@@ -458,6 +459,17 @@ class Table:
         if table1.number_of_rows == 0 and table2.number_of_rows == 0:
             return table1.column_names == table2.column_names
         return table1._schema == table2._schema and table1._data.equals(table2._data)
+
+    def __hash__(self) -> int:
+        """
+        Return a deterministic hash value for this table.
+
+        Returns
+        -------
+        hash : int
+            The hash value.
+        """
+        return xxhash.xxh3_64(hash(self._schema).to_bytes(8) + self.number_of_rows.to_bytes(8)).intdigest()
 
     def __repr__(self) -> str:
         r"""
@@ -1764,7 +1776,7 @@ class Table:
         """
         from ._time_series import TimeSeries
 
-        return TimeSeries._from_table_to_time_series(self, target_name, time_name, feature_names)
+        return TimeSeries._from_table(self, target_name, time_name, feature_names)
 
     def transform_column(self, name: str, transformer: Callable[[Row], Any]) -> Table:
         """

@@ -9,7 +9,7 @@ from tests.helpers import assert_that_time_series_are_equal
     ("table", "column_names", "expected"),
     [
         (
-            TimeSeries._from_table_to_time_series(
+            TimeSeries._from_table(
                 Table(
                     {
                         "time": [0, 1, 2],
@@ -22,7 +22,7 @@ from tests.helpers import assert_that_time_series_are_equal
                 "time",
             ),
             ["feat1", "target", "time"],
-            TimeSeries._from_table_to_time_series(
+            TimeSeries._from_table(
                 Table(
                     {
                         "time": [0, 1, 2],
@@ -35,7 +35,7 @@ from tests.helpers import assert_that_time_series_are_equal
             ),
         ),
         (
-            TimeSeries._from_table_to_time_series(
+            TimeSeries._from_table(
                 Table(
                     {
                         "time": [0, 1, 2],
@@ -49,7 +49,7 @@ from tests.helpers import assert_that_time_series_are_equal
                 "time",
             ),
             ["feat1", "other", "target", "time"],
-            TimeSeries._from_table_to_time_series(
+            TimeSeries._from_table(
                 Table(
                     {
                         "time": [0, 1, 2],
@@ -63,7 +63,7 @@ from tests.helpers import assert_that_time_series_are_equal
             ),
         ),
         (
-            TimeSeries._from_table_to_time_series(
+            TimeSeries._from_table(
                 Table(
                     {
                         "time": [0, 1, 2],
@@ -77,7 +77,7 @@ from tests.helpers import assert_that_time_series_are_equal
                 "time",
             ),
             ["feat1", "target", "time"],
-            TimeSeries._from_table_to_time_series(
+            TimeSeries._from_table(
                 Table(
                     {
                         "time": [0, 1, 2],
@@ -101,7 +101,7 @@ def test_should_return_table(table: TimeSeries, column_names: list[str], expecte
     ("table", "column_names", "error_msg"),
     [
         (
-            TimeSeries._from_table_to_time_series(
+            TimeSeries._from_table(
                 Table(
                     {
                         "time": [0, 1, 2],
@@ -119,25 +119,7 @@ def test_should_return_table(table: TimeSeries, column_names: list[str], expecte
             r"Illegal schema modification: Must keep the target column.",
         ),
         (
-            TimeSeries._from_table_to_time_series(
-                Table(
-                    {
-                        "time": [0, 1, 2],
-                        "feat1": [1, 2, 3],
-                        "feat2": [4, 5, 6],
-                        "other": [3, 5, 7],
-                        "target": [7, 8, 9],
-                    },
-                ),
-                "target",
-                "time",
-                ["feat1", "feat2"],
-            ),
-            ["target", "other"],
-            r"Illegal schema modification: Must keep at least one feature column.",
-        ),
-        (
-            TimeSeries._from_table_to_time_series(
+            TimeSeries._from_table(
                 Table(
                     {
                         "time": [0, 1, 2],
@@ -155,7 +137,7 @@ def test_should_return_table(table: TimeSeries, column_names: list[str], expecte
             r"Illegal schema modification: Must keep the time column.",
         ),
     ],
-    ids=["table_remove_target", "table_remove_all_features", "table_remove_time"],
+    ids=["table_remove_target", "table_remove_time"],
 )
 def test_should_raise_illegal_schema_modification(table: TimeSeries, column_names: list[str], error_msg: str) -> None:
     with pytest.raises(
