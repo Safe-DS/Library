@@ -51,9 +51,9 @@ class TestClassificationModel:
         fitted_model = ClassificationNeuralNetwork(
             [FNNLayer(input_size=1, output_size=8), FNNLayer(output_size=1)],
         ).fit(
-            Table.from_dict({"a": [1,0], "b": [0,1]}).tag_columns("a"),
+            Table.from_dict({"a": [1, 0], "b": [0, 1]}).tag_columns("a"),
         )
-        predictions = fitted_model.predict(Table.from_dict({"b": [1,0]}))
+        predictions = fitted_model.predict(Table.from_dict({"b": [1, 0]}))
         assert isinstance(predictions, TaggedTable)
 
     def test_should_raise_if_predict_function_returns_wrong_datatype_for_multiclass_classification(self) -> None:
