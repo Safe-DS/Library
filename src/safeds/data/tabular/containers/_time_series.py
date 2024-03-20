@@ -1207,7 +1207,7 @@ class TimeSeries(Table):
         Examples
         --------
         >>> from safeds.data.tabular.containers import Table
-        >>> table = TimeSeries({"time":[0, 1, 2, 3, 4]"temperature": [10, 15, 20, 25, 30], "sales": [54, 74, 90, 206, 210]}, time_name="time", target_name="sales")
+        >>> table = TimeSeries({"time":[0, 1, 2, 3, 4], "temperature": [10, 15, 20, 25, 30], "sales": [54, 74, 90, 206, 210]}, time_name="time", target_name="sales")
         >>> slices = table.split_rows(0.4)
         >>> slices[0]
            time  temperature  sales
