@@ -15,5 +15,5 @@ def test_arima_model(snapshot_png: SnapshotAssertion) -> None:
     predictions = trained_model.predict(test_ts)
     print(predictions)
     assert snapshot_png == trained_model.plot_predictions(test_ts)
-    assert False
+
 
