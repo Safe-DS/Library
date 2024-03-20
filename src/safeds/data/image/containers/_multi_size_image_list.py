@@ -250,12 +250,8 @@ class _MultiSizeImageList(ImageList):
             return image_list
 
     def remove_images_with_size(self, width: int, height: int) -> ImageList:
-        from safeds.data.image.containers import _EmptyImageList
-
         if (width, height) not in self._image_list_dict:
             return self.clone()
-        if len(self._image_list_dict) == 1:
-            return _EmptyImageList()
         if len(self._image_list_dict) == 2:
             return self._image_list_dict[[key for key in list(self._image_list_dict.keys()) if key != (width, height)][0]].clone()
 
