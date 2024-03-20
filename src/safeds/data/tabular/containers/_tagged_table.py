@@ -3,7 +3,10 @@ from __future__ import annotations
 import sys
 from typing import TYPE_CHECKING
 
+import numpy as np
+import torch
 import xxhash
+from torch.utils.data import DataLoader, Dataset
 
 from safeds.data.tabular.containers import Column, Row, Table
 from safeds.exceptions import (
@@ -190,7 +193,9 @@ class TaggedTable(Table):
         hash : int
             The hash value.
         """
-        return xxhash.xxh3_64(hash(self.target).to_bytes(8) + hash(self.features).to_bytes(8) + Table.__hash__(self).to_bytes(8)).intdigest()
+        return xxhash.xxh3_64(
+            hash(self.target).to_bytes(8) + hash(self.features).to_bytes(8) + Table.__hash__(self).to_bytes(8),
+        ).intdigest()
 
     def __sizeof__(self) -> int:
         """
@@ -871,3 +876,42 @@ class TaggedTable(Table):
             target_name=self.target.name,
             feature_names=self.features.column_names,
         )
+
+    def _into_dataloader(self, batch_size: int) -> DataLoader:
+        """
+        Return a Dataloader for the data stored in this table, used for training neural networks.
+
+        The original table is not modified.
+
+        Parameters
+        ----------
+        batch_size
+            The size of data batches that should be loaded at one time.
+
+        Returns
+        -------
+        result :
+            The DataLoader.
+
+        """
+        feature_rows = self.features.to_rows()
+        all_rows = []
+        for row in feature_rows:
+            new_item = []
+            for column_name in row:
+                new_item.append(row.get_value(column_name))
+            all_rows.append(new_item.copy())
+        return DataLoader(dataset=_CustomDataset(np.array(all_rows), np.array(self.target)), batch_size=batch_size)
+
+
+class _CustomDataset(Dataset):
+    def __init__(self, features: np.array, target: np.array):
+        self.X = torch.from_numpy(features.astype(np.float32))
+        self.Y = torch.from_numpy(target.astype(np.float32))
+        self.len = self.X.shape[0]
+
+    def __getitem__(self, item: int) -> tuple[torch.Tensor, torch.Tensor]:
+        return self.X[item], self.Y[item].unsqueeze(-1)
+
+    def __len__(self) -> int:
+        return self.len
