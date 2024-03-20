@@ -59,7 +59,7 @@ class ImageList(metaclass=ABCMeta):
         while len(path) != 0:
             p = Path(path.pop(0))
             if p.is_dir():
-                path += [str(p) + "\\" + name for name in os.listdir(p)]
+                path += [os.path.join(p, name) for name in os.listdir(p)]
             else:
                 image_tensors.append(ImageList._pil_to_tensor(pil_image_open(p)))
                 if fixed_size and (image_tensors[0].size(dim=2) != image_tensors[-1].size(dim=2) or image_tensors[0].size(dim=1) != image_tensors[-1].size(dim=1)):
