@@ -71,13 +71,6 @@ class TimeSeries(Table):
         WrongFileExtensionError
             If the file is not a csv file.
 
-        Examples
-        --------
-        >>> from safeds.data.tabular.containers import Table
-        >>> TimeSeries.timeseries_from_csv_file('./src/resources/from_csv_file.csv')
-           a  b  c
-        0  1  2  1
-        1  0  0  7
         """
         return TimeSeries._from_table(
             Table.from_csv_file(path=path),
@@ -1211,13 +1204,13 @@ class TimeSeries(Table):
         >>> slices = table.split_rows(0.4)
         >>> slices[0]
            time  temperature  sales
-        0    0       10         54
-        1    1       15         74
+        0     0           10     54
+        1     1           15     74
         >>> slices[1]
            time  temperature  sales
-        0    2       20       90
-        1    3       25       206
-        2    4       30       210
+        0     2           20     90
+        1     3           25    206
+        2     4           30    210
         """
         temp = self._as_table()
         t1, t2 = temp.split_rows(percentage_in_first=percentage_in_first)
