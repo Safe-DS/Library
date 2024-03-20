@@ -46,32 +46,7 @@ from safeds.exceptions import UnknownColumnNameError
             "A",
             ["A", "B", "C"],
             ValueError,
-            r"Column 'A' cannot be both feature and target.",
-        ),
-        (
-            {
-                "time": [0, 1],
-                "A": [1, 4],
-                "B": [2, 5],
-                "C": [3, 6],
-                "T": [0, 1],
-            },
-            "time",
-            "D",
-            [],
-            ValueError,
-            r"At least one feature column must be specified.",
-        ),
-        (
-            {
-                "time": [0, 1],
-                "A": [1, 4],
-            },
-            "time",
-            "A",
-            None,
-            ValueError,
-            r"At least one feature column must be specified.",
+            r"Column 'A' can not be time and feature column.",
         ),
         (
             {
@@ -106,8 +81,6 @@ from safeds.exceptions import UnknownColumnNameError
         "feature_does_not_exist",
         "target_does_not_exist",
         "target_and_feature_overlap",
-        "features_are_empty-explicitly",
-        "features_are_empty_implicitly",
         "time_column_does_not_exist",
         "time_is_also_feature",
     ],
@@ -174,11 +147,10 @@ def test_should_create_a_time_series(
 ) -> None:
     time_series = TimeSeries(data, target_name=target_name, time_name=time_name, feature_names=feature_names)
     if feature_names is None:
-        feature_names = list(data.keys())
-        feature_names.remove(target_name)
-        feature_names.remove(time_name)
+        feature_names = []
+
     assert isinstance(time_series, TimeSeries)
-    assert time_series._features.column_names == feature_names
+    assert time_series._feature_names == feature_names
     assert time_series._target.name == target_name
     assert time_series._features == Table(data).keep_only_columns(feature_names)
     assert time_series._target == Table(data).get_column(target_name)

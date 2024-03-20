@@ -4,6 +4,8 @@ import sys
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
+import xxhash
+
 from safeds.data.tabular.typing import Anything, Integer, Nothing, RealNumber
 from safeds.data.tabular.typing._column_type import ColumnType
 from safeds.exceptions import UnknownColumnNameError
@@ -66,7 +68,7 @@ class Schema:
 
     def __hash__(self) -> int:
         """
-        Return a hash value for the schema.
+        Return a deterministic hash value for the schema.
 
         Returns
         -------
@@ -81,7 +83,7 @@ class Schema:
         """
         column_names = self._schema.keys()
         column_types = map(repr, self._schema.values())
-        return hash(tuple(zip(column_names, column_types, strict=True)))
+        return xxhash.xxh3_64(str(tuple(zip(column_names, column_types, strict=True)))).intdigest()
 
     def __repr__(self) -> str:
         """
