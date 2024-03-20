@@ -13,7 +13,7 @@ if TYPE_CHECKING:
     from safeds.data.tabular.containers import TimeSeries
 from safeds.exceptions import (
     ModelNotFittedError,
-    PredictionError
+    PredictionError, DatasetMissesDataError, NonNumericColumnError, MissingValuesColumnError, LearningError
 )
 
 
@@ -46,8 +46,8 @@ class ArimaModel:
         ------
         LearningError
             If the training data contains invalid values or if the training failed.
-        UntaggedTableError
-            If the table is untagged.
+        NonTimeSeriesError
+            If the table is not a TimeSeries object.
         NonNumericColumnError
             If the training data contains non-numerical values.
         MissingValuesColumnError
@@ -55,6 +55,20 @@ class ArimaModel:
         DatasetMissesDataError
             If the training data contains no rows.
         """
+
+        if time_series.number_of_rows == 0:
+            raise DatasetMissesDataError
+        if not time_series.target.type.is_numeric():
+            raise NonNumericColumnError(
+                time_series.target.name, "The target Column of your time series contains non-numerical values."
+            )
+        if time_series.target.has_missing_values():
+            raise MissingValuesColumnError(
+                time_series.target.name,
+                "You can use the Imputer to replace the missing values based on different strategies.\nIf you want to"
+                "remove the missing values entirely you can use the method "
+                "`TimeSeries.remove_rows_with_missing_values`.",
+            )
         fitted_arima = ArimaModel()
         p = d = q = range(0, 2)
         pdq = list(itertools.product(p, d, q))
@@ -64,7 +78,10 @@ class ArimaModel:
         for param in pdq:
             # Create and fit an ARIMA model with the current parameters
             mod = ARIMA(time_series.target._data.values, order=param)
-            result = mod.fit()
+            try:
+                result = mod.fit()
+            except ValueError as exception:
+                raise LearningError(str(exception)) from exception
 
             # Compare the current model's AIC with the best AIC so far
             if result.aic < best_aic:
@@ -84,7 +101,7 @@ class ArimaModel:
             Parameters
             ----------
             time_series : TimeSeries
-                The time series containing the target vector.
+                The time series where the target column contains the predicted values.
 
             Returns
             -------
@@ -95,12 +112,33 @@ class ArimaModel:
             ------
             ModelNotFittedError
                 If the model has not been fitted yet.
+            DatasetContainsTargetError
+                If the dataset contains the target column already.
             PredictionError
                 If predicting with the given dataset failed.
-                """
+            MissingValuesColumnError
+                If the dataset contains missing values.
+            DatasetMissesDataError
+                If the dataset contains no rows.
+        """
         if not self.is_fitted():
             raise ModelNotFittedError
 
+        if time_series.number_of_rows == 0:
+            raise DatasetMissesDataError
+        if not time_series.target.type.is_numeric():
+            raise NonNumericColumnError(
+                time_series.target.name, "The target Column of your time series contains non-numerical values."
+            )
+        if time_series.target.has_missing_values():
+            raise MissingValuesColumnError(
+                time_series.target.name,
+                "You can use the Imputer to replace the missing values based on different strategies.\nIf you want to"
+                "remove the missing values entirely you can use the method "
+                "`TimeSeries.remove_rows_with_missing_values`.",
+            )
+        table = time_series._as_table()
+        table = table.remove_columns([time_series.time.name])
         test_data = time_series.target._data.to_numpy()
         n_steps = len(test_data)
         try:
@@ -109,10 +147,10 @@ class ArimaModel:
             raise PredictionError
 
         # create new TimeSeries
-        result = time_series.add_column(Column(name="forecasted", data = forecast_results))
+        result = time_series._from_table(table.add_column(Column(name=time_series.target.name, data=forecast_results)))
         return result
 
-    def plot_predictions(self, time_series: TimeSeries)-> Image:
+    def plot_predictions(self, time_series: TimeSeries) -> Image:
         """
         Plot the predictions of the given time series target
         Parameters
@@ -133,6 +171,8 @@ class ArimaModel:
                 If predicting with the given dataset failed.
 
         """
+        if not self.is_fitted():
+            raise ModelNotFittedError
         test_data = time_series.target._data.values
         n_steps = len(test_data)
         forecast_results = self._arima.forecast(steps=n_steps)
