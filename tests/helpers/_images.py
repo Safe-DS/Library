@@ -1,12 +1,14 @@
+import os.path
+
 test_images_folder = "image"
 
-plane_jpg_path = test_images_folder + "\\plane.jpg"
-plane_png_path = test_images_folder + "\\plane.png"
-rgba_png_path = test_images_folder + "\\rgba.png"
-white_square_jpg_path = test_images_folder + "\\white_square.jpg"
-white_square_png_path = test_images_folder + "\\white_square.png"
-grayscale_jpg_path = test_images_folder + "\\grayscale.jpg"
-grayscale_png_path = test_images_folder + "\\grayscale.png"
+plane_jpg_path = os.path.join(test_images_folder, "plane.jpg")
+plane_png_path = os.path.join(test_images_folder, "plane.png")
+rgba_png_path = os.path.join(test_images_folder, "rgba.png")
+white_square_jpg_path = os.path.join(test_images_folder, "white_square.jpg")
+white_square_png_path = os.path.join(test_images_folder, "white_square.png")
+grayscale_jpg_path = os.path.join(test_images_folder, "grayscale.jpg")
+grayscale_png_path = os.path.join(test_images_folder, "grayscale.png")
 
 plane_jpg_id = "opaque-3-channel-jpg-plane"
 plane_png_id = "opaque-4-channel-png-plane"
