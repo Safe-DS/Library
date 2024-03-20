@@ -16,24 +16,24 @@ from torchvision.utils import make_grid, save_image
 from safeds.data.image.containers import Image
 
 if TYPE_CHECKING:
-    from safeds.data.image.containers import _FixedSizedImageSet
-    from safeds.data.image.containers import _VariousSizedImageSet
+    from safeds.data.image.containers import _EmptyImageList, _SingleSizeImageList, _MultiSizeImageList
 
 
-class ImageSet(metaclass=ABCMeta):
+class ImageList(metaclass=ABCMeta):
 
     _pil_to_tensor = PILToTensor()
 
     @staticmethod
     @abstractmethod
-    def _create_image_set(images: list[Tensor], indices: list[int]) -> ImageSet:
+    def _create_image_list(images: list[Tensor], indices: list[int]) -> ImageList:
         pass
 
     @staticmethod
-    def from_images(images: list[Image], indices: list[int] | None = None) -> ImageSet:
-        from safeds.data.image.containers import _FixedSizedImageSet
-        from safeds.data.image.containers import _VariousSizedImageSet
+    def from_images(images: list[Image], indices: list[int] | None = None) -> ImageList:
+        from safeds.data.image.containers import _EmptyImageList, _SingleSizeImageList, _MultiSizeImageList
 
+        if len(images) == 0:
+            return _EmptyImageList()
         if indices is None:
             indices = list(range(len(images)))
 
@@ -41,13 +41,15 @@ class ImageSet(metaclass=ABCMeta):
         first_height = images[0].height
         for im in images:
             if first_width != im.width or first_height != im.height:
-                return _VariousSizedImageSet._create_image_set([image._image_tensor for image in images], indices)
-        return _FixedSizedImageSet._create_image_set([image._image_tensor for image in images], indices)
+                return _MultiSizeImageList._create_image_list([image._image_tensor for image in images], indices)
+        return _SingleSizeImageList._create_image_list([image._image_tensor for image in images], indices)
 
     @staticmethod
-    def from_files(path: str | Path | list[str | Path], indices: list[int] | None = None) -> ImageSet:
-        from safeds.data.image.containers import _FixedSizedImageSet
-        from safeds.data.image.containers import _VariousSizedImageSet
+    def from_files(path: str | Path | list[str | Path], indices: list[int] | None = None) -> ImageList:
+        from safeds.data.image.containers import _EmptyImageList, _SingleSizeImageList, _MultiSizeImageList
+
+        if isinstance(path, list) and len(path) == 0:
+            return _EmptyImageList()
 
         image_tensors = []
         fixed_size = True
@@ -59,20 +61,23 @@ class ImageSet(metaclass=ABCMeta):
             if p.is_dir():
                 path += [str(p) + "\\" + name for name in os.listdir(p)]
             else:
-                image_tensors.append(ImageSet._pil_to_tensor(pil_image_open(p)))
+                image_tensors.append(ImageList._pil_to_tensor(pil_image_open(p)))
                 if fixed_size and (image_tensors[0].size(dim=2) != image_tensors[-1].size(dim=2) or image_tensors[0].size(dim=1) != image_tensors[-1].size(dim=1)):
                     fixed_size = False
+
+        if len(image_tensors) == 0:
+            return _EmptyImageList()
 
         if indices is None:
             indices = list(range(len(image_tensors)))
 
         if fixed_size:
-            return _FixedSizedImageSet._create_image_set(image_tensors, indices)
+            return _SingleSizeImageList._create_image_list(image_tensors, indices)
         else:
-            return _VariousSizedImageSet._create_image_set(image_tensors, indices)
+            return _MultiSizeImageList._create_image_list(image_tensors, indices)
 
     @abstractmethod
-    def clone(self) -> ImageSet:
+    def clone(self) -> ImageList:
         pass
 
     @abstractmethod
@@ -83,11 +88,14 @@ class ImageSet(metaclass=ABCMeta):
         return self.number_of_images
 
     def __contains__(self, item):
-        if not isinstance(item, Image):
-            return NotImplementedError
-        return self.has_image(item)
+        return isinstance(item, Image) and self.has_image(item)
 
     def _repr_png_(self) -> bytes:
+        from safeds.data.image.containers import _EmptyImageList
+
+        if isinstance(self, _EmptyImageList):
+            raise ValueError("You cannot display an empty ImageList")
+
         max_width, max_height = max(self.widths), max(self.heights)
         tensors = []
         for image in self.to_images():
@@ -161,118 +169,118 @@ class ImageSet(metaclass=ABCMeta):
     def to_images(self, indices: list[int] | None = None) -> list[Image]:
         pass
 
-    def _as_various_sized_image_set(self) -> _VariousSizedImageSet:
-        from safeds.data.image.containers import _VariousSizedImageSet
-        if isinstance(self, _VariousSizedImageSet):
+    def _as_multi_size_image_list(self) -> _MultiSizeImageList:
+        from safeds.data.image.containers import _MultiSizeImageList
+        if isinstance(self, _MultiSizeImageList):
             return self
-        raise ValueError("The given image_set is not a VariousSizedImageSet")
+        raise ValueError("The given image_list is not a MultiSizeImageList")
 
-    def _as_fixed_sized_image_set(self) -> _FixedSizedImageSet:
-        from safeds.data.image.containers import _FixedSizedImageSet
-        if isinstance(self, _FixedSizedImageSet):
+    def _as_single_size_image_list(self) -> _SingleSizeImageList:
+        from safeds.data.image.containers import _SingleSizeImageList
+        if isinstance(self, _SingleSizeImageList):
             return self
-        raise ValueError("The given image_set is not a FixedSizedImageSet")
+        raise ValueError("The given image_list is not a SingleSizeImageList")
 
     # ------------------------------------------------------------------------------------------------------------------
     # Transformations
     # ------------------------------------------------------------------------------------------------------------------
 
     @abstractmethod
-    def change_channel(self, channel: int) -> ImageSet:
+    def change_channel(self, channel: int) -> ImageList:
         pass
 
     @abstractmethod
-    def _add_image_tensor(self, image_tensor: Tensor, index: int) -> ImageSet:
+    def _add_image_tensor(self, image_tensor: Tensor, index: int) -> ImageList:
         pass
 
-    def add_image(self, image: Image) -> ImageSet:
+    def add_image(self, image: Image) -> ImageList:
         return self._add_image_tensor(image._image_tensor, self.number_of_images)
 
     @abstractmethod
-    def add_images(self, images: list[Image] | ImageSet) -> ImageSet:
+    def add_images(self, images: list[Image] | ImageList) -> ImageList:
         pass
 
-    def remove_image(self, image: Image) -> ImageSet:
+    def remove_image(self, image: Image) -> ImageList:
         return self.remove_image_by_index(self.index(image))
 
-    def remove_images(self, images: list[Image]) -> ImageSet:
+    def remove_images(self, images: list[Image]) -> ImageList:
         indices_to_remove = []
         for image in images:
             indices_to_remove += self.index(image)
         return self.remove_image_by_index(list(set(indices_to_remove)))
 
     @abstractmethod
-    def remove_image_by_index(self, index: int | list[int]) -> ImageSet:
+    def remove_image_by_index(self, index: int | list[int]) -> ImageList:
         pass
 
     @abstractmethod
-    def remove_images_with_size(self, width: int, height: int) -> ImageSet:
+    def remove_images_with_size(self, width: int, height: int) -> ImageList:
         pass
 
     @abstractmethod
-    def remove_duplicate_images(self) -> ImageSet:
+    def remove_duplicate_images(self) -> ImageList:
         pass
 
     @abstractmethod
-    def shuffle_images(self) -> ImageSet:
+    def shuffle_images(self) -> ImageList:
         pass
 
     @abstractmethod
-    def resize(self, new_width: int, new_height: int) -> _FixedSizedImageSet:
+    def resize(self, new_width: int, new_height: int) -> ImageList:
         pass
 
     @abstractmethod
-    def convert_to_grayscale(self) -> ImageSet:
+    def convert_to_grayscale(self) -> ImageList:
         pass
 
     @abstractmethod
-    def crop(self, x: int, y: int, width: int, height: int) -> _FixedSizedImageSet:
+    def crop(self, x: int, y: int, width: int, height: int) -> ImageList:
         pass
 
     @abstractmethod
-    def flip_vertically(self) -> ImageSet:
+    def flip_vertically(self) -> ImageList:
         pass
 
     @abstractmethod
-    def flip_horizontally(self) -> ImageSet:
+    def flip_horizontally(self) -> ImageList:
         pass
 
     @abstractmethod
-    def adjust_brightness(self, factor: float) -> ImageSet:
+    def adjust_brightness(self, factor: float) -> ImageList:
         pass
 
     @abstractmethod
-    def add_noise(self, standard_deviation: float) -> ImageSet:
+    def add_noise(self, standard_deviation: float) -> ImageList:
         pass
 
     @abstractmethod
-    def adjust_contrast(self, factor: float) -> ImageSet:
+    def adjust_contrast(self, factor: float) -> ImageList:
         pass
 
     @abstractmethod
-    def adjust_color_balance(self, factor: float) -> ImageSet:
+    def adjust_color_balance(self, factor: float) -> ImageList:
         pass
 
     @abstractmethod
-    def blur(self, radius: int) -> ImageSet:
+    def blur(self, radius: int) -> ImageList:
         pass
 
     @abstractmethod
-    def sharpen(self, factor: float) -> ImageSet:
+    def sharpen(self, factor: float) -> ImageList:
         pass
 
     @abstractmethod
-    def invert_colors(self) -> ImageSet:
+    def invert_colors(self) -> ImageList:
         pass
 
     @abstractmethod
-    def rotate_right(self) -> ImageSet:
+    def rotate_right(self) -> ImageList:
         pass
 
     @abstractmethod
-    def rotate_left(self) -> ImageSet:
+    def rotate_left(self) -> ImageList:
         pass
 
     @abstractmethod
-    def find_edges(self) -> ImageSet:
+    def find_edges(self) -> ImageList:
         pass

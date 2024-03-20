@@ -87,7 +87,7 @@ class IndexOutOfBoundsError(IndexError):
         if isinstance(index, int):
             super().__init__(f"There is no element at index '{index}'.")
         else:
-            super().__init__(f"There is no element in the range [{index.start}, {index.stop}]")
+            super().__init__(f"There is no element in the range [{index.start}, {index.stop}].")
 
 
 class DuplicateIndexError(IndexError):

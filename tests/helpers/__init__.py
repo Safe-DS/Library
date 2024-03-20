@@ -5,6 +5,7 @@ from ._assertions import (
 )
 from ._resources import resolve_resource_path
 from ._images import (
+    test_images_folder,
     images_all,
     images_all_ids,
     images_asymmetric,
@@ -31,6 +32,7 @@ __all__ = [
     "assert_that_tagged_tables_are_equal",
     "resolve_resource_path",
     "assert_that_time_series_are_equal",
+    "test_images_folder",
     "images_all",
     "images_all_ids",
     "images_asymmetric",

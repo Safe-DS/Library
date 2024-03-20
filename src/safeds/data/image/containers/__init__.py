@@ -1,13 +1,15 @@
 """Classes that can store image data."""
 
 from ._image import Image
-from ._image_set import ImageSet
-from ._fixed_sized_image_set import _FixedSizedImageSet
-from ._various_sized_image_set import _VariousSizedImageSet
+from ._image_list import ImageList
+from ._single_size_image_list import _SingleSizeImageList
+from ._multi_size_image_list import _MultiSizeImageList
+from ._empty_image_list import _EmptyImageList
 
 __all__ = [
     "Image",
-    "ImageSet",
-    "_FixedSizedImageSet",
-    "_VariousSizedImageSet",
+    "ImageList",
+    "_SingleSizeImageList",
+    "_MultiSizeImageList",
+    "_EmptyImageList",
 ]
