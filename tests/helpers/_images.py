@@ -1,4 +1,4 @@
-test_images_folder = "image/"
+test_images_folder = "image\\"
 
 plane_jpg_path = test_images_folder + "plane.jpg"
 plane_png_path = test_images_folder + "plane.png"
