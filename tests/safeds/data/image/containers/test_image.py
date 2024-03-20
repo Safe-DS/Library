@@ -317,8 +317,8 @@ class TestHash:
     @pytest.mark.parametrize("device", _test_devices(), ids=_test_devices_ids())
     @pytest.mark.parametrize(
         "resource_path",
-        _test_images_all(),
-        ids=_test_images_all_ids(),
+        images_all(),
+        ids=images_all_ids(),
     )
     def test_should_hash_be_equal(self, resource_path: str, device: Device) -> None:
         _skip_if_device_not_available(device)
@@ -329,14 +329,14 @@ class TestHash:
     @pytest.mark.parametrize("device", _test_devices(), ids=_test_devices_ids())
     def test_should_hash_not_be_equal(self, device: Device) -> None:
         _skip_if_device_not_available(device)
-        image = Image.from_file(resolve_resource_path(_plane_png_path), device)
-        image2 = Image.from_file(resolve_resource_path(_white_square_png_path), device)
+        image = Image.from_file(resolve_resource_path(plane_png_path), device)
+        image2 = Image.from_file(resolve_resource_path(white_square_png_path), device)
         assert hash(image) != hash(image2)
 
     @pytest.mark.parametrize(
         "resource_path",
-        _test_images_all(),
-        ids=_test_images_all_ids(),
+        images_all(),
+        ids=images_all_ids(),
     )
     def test_should_hash_be_equal_different_devices(self, resource_path: str) -> None:
         _skip_if_device_not_available(_device_cuda)
@@ -346,8 +346,8 @@ class TestHash:
 
     def test_should_hash_not_be_equal_different_devices(self) -> None:
         _skip_if_device_not_available(_device_cuda)
-        image = Image.from_file(resolve_resource_path(_plane_png_path), torch.device("cpu"))
-        image2 = Image.from_file(resolve_resource_path(_white_square_png_path), torch.device("cuda"))
+        image = Image.from_file(resolve_resource_path(plane_png_path), torch.device("cpu"))
+        image2 = Image.from_file(resolve_resource_path(white_square_png_path), torch.device("cuda"))
         assert hash(image) != hash(image2)
 
 
