@@ -13,9 +13,11 @@ import numpy as np
 import openpyxl
 import pandas as pd
 import seaborn as sns
+import torch
 import xxhash
 from pandas import DataFrame
 from scipy import stats
+from torch.utils.data import DataLoader, Dataset
 
 from safeds.data.image.containers import Image
 from safeds.data.tabular.typing import ColumnType, Schema
@@ -2392,3 +2394,41 @@ class Table:
         data_copy = self._data.reset_index(drop=True)
         data_copy.columns = self.column_names
         return data_copy.__dataframe__(nan_as_null, allow_copy)
+
+    def _into_dataloader(self, batch_size: int) -> DataLoader:
+        """
+        Return a Dataloader for the data stored in this table, used for training neural networks.
+
+        The original table is not modified.
+
+        Parameters
+        ----------
+        batch_size
+            The size of data batches that should be loaded at one time.
+
+        Returns
+        -------
+        result :
+            The DataLoader.
+
+        """
+        features = self.to_rows()
+        all_rows = []
+        for row in features:
+            new_item = []
+            for column_name in row:
+                new_item.append(row.get_value(column_name))
+            all_rows.append(new_item.copy())
+        return DataLoader(dataset=_CustomDataset(np.array(all_rows)), batch_size=batch_size)
+
+
+class _CustomDataset(Dataset):
+    def __init__(self, features: np.array):
+        self.X = torch.from_numpy(features.astype(np.float32))
+        self.len = self.X.shape[0]
+
+    def __getitem__(self, item: int) -> torch.Tensor:
+        return self.X[item]
+
+    def __len__(self) -> int:
+        return self.len
