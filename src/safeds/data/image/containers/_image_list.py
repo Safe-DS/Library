@@ -92,10 +92,10 @@ class ImageList(metaclass=ABCMeta):
     def __sizeof__(self) -> int:
         pass
 
-    def __len__(self):
+    def __len__(self) -> int:
         return self.number_of_images
 
-    def __contains__(self, item):
+    def __contains__(self, item) -> bool:
         return isinstance(item, Image) and self.has_image(item)
 
     def _repr_png_(self) -> bytes:

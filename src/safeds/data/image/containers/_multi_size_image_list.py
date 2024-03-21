@@ -21,7 +21,7 @@ if TYPE_CHECKING:
 
 class _MultiSizeImageList(ImageList):
 
-    def __init__(self):
+    def __init__(self) -> None:
         self._image_list_dict: dict[tuple[int, int], ImageList] = {}  # {image_size: image_list}
         self._indices_to_image_size_dict: dict[int, tuple[int, int]] = {}  # {index: image_size}
 
@@ -55,7 +55,7 @@ class _MultiSizeImageList(ImageList):
             image_list._indices_to_image_size_dict.update(zip(image_list._image_list_dict[size]._as_single_size_image_list()._indices_to_tensor_positions.keys(), [size] * len(image_list._image_list_dict[size])))
 
         if max_channel > 1:
-            image_list = image_list.change_channel(max_channel)
+            image_list = image_list.change_channel(max_channel)._as_multi_size_image_list()
 
         return image_list
 
@@ -113,8 +113,7 @@ class _MultiSizeImageList(ImageList):
 
     @property
     def channel(self) -> int:
-        for image_list in self._image_list_dict.values():
-            return image_list.channel
+        return list(self._image_list_dict.values())[0].channel
 
     @property
     def number_of_sizes(self) -> int:
@@ -139,6 +138,7 @@ class _MultiSizeImageList(ImageList):
         if self.channel == 4:
             raise IllegalFormatError("png")
         if isinstance(path, list):
+            path: list[str] | list[Path] = path
             if len(path) == self.number_of_images:
                 for image_size, image_list in self._image_list_dict.items():
                     image_list.to_jpeg_files([p for i, p in enumerate(path) if self._indices_to_image_size_dict[i] == image_size])
@@ -153,6 +153,7 @@ class _MultiSizeImageList(ImageList):
 
     def to_png_files(self, path: str | Path | list[str] | list[Path]) -> None:
         if isinstance(path, list):
+            path: list[str] | list[Path] = path
             if len(path) == self.number_of_images:
                 for image_size, image_list in self._image_list_dict.items():
                     image_list.to_png_files([p for i, p in enumerate(path) if self._indices_to_image_size_dict[i] == image_size])
@@ -202,7 +203,7 @@ class _MultiSizeImageList(ImageList):
             image_list._image_list_dict[size] = _SingleSizeImageList._create_image_list([image_tensor], [index])
 
         if image_tensor.size(dim=0) != self.channel:
-            image_list = image_list.change_channel(max(image_tensor.size(dim=0), self.channel))
+            image_list = image_list.change_channel(max(image_tensor.size(dim=0), self.channel))._as_multi_size_image_list()
 
         return image_list
 
@@ -212,16 +213,16 @@ class _MultiSizeImageList(ImageList):
         if isinstance(images, _EmptyImageList) or isinstance(images, list) and len(images) == 0:
             return self.clone()
 
-        images_with_size = {}
+        images_with_size: dict[tuple[int, int], list[Image] | _SingleSizeImageList] = {}
         indices_for_images_with_size = {}
         current_index = max(self._indices_to_image_size_dict) + 1
         if isinstance(images, ImageList):
             if images.number_of_sizes == 1:
-                images_with_size[(images.widths[0], images.heights[0])] = images
+                images_with_size[(images.widths[0], images.heights[0])] = images._as_single_size_image_list()
                 indices_for_images_with_size[(images.widths[0], images.heights[0])] = [index + current_index for index in images._as_single_size_image_list()._tensor_positions_to_indices]
             else:
                 for size, im_list in images._as_multi_size_image_list()._image_list_dict.items():
-                    images_with_size[size] = im_list
+                    images_with_size[size] = im_list._as_single_size_image_list()
                     indices_for_images_with_size[size] = [index + current_index for index in im_list._as_single_size_image_list()._tensor_positions_to_indices]
         else:
             for image in images:
@@ -260,7 +261,7 @@ class _MultiSizeImageList(ImageList):
                 image_list._indices_to_image_size_dict[i] = size
             max_channel = max(max_channel, image_list._image_list_dict[size].channel)
         if smallest_channel < max_channel:
-            image_list = image_list.change_channel(max_channel)
+            image_list = image_list.change_channel(max_channel)._as_multi_size_image_list()
         return image_list
 
     def remove_image_by_index(self, index: int | list[int]) -> ImageList:

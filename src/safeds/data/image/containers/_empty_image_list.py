@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import warnings
 from pathlib import Path
 
@@ -16,7 +18,7 @@ class _EmptyImageList(ImageList):
     def _warn_empty_image_list() -> None:
         warnings.warn("You are using an empty ImageList. This method changes nothing if used on an empty ImageList.", UserWarning, stacklevel=2)
 
-    def __new__(cls):
+    def __new__(cls) -> _EmptyImageList:
         if cls._instance is None:
             cls._instance = super().__new__(cls)
         return cls._instance

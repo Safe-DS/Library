@@ -215,7 +215,7 @@ class TestAllImageCombinations:
 class TestFromFiles:
 
     @pytest.mark.parametrize("resource_path", [images_all(), test_images_folder] + images_all(), ids=["all-images", "images_folder"] + images_all_ids())
-    def test_from_files_creation(self, resource_path: list[str], snapshot_png_image_list: SnapshotAssertion):
+    def test_from_files_creation(self, resource_path: list[str], snapshot_png_image_list: SnapshotAssertion) -> None:
         torch.set_default_device(torch.device("cpu"))
         image_list = ImageList.from_files(resolve_resource_path(resource_path))
         assert image_list == snapshot_png_image_list
@@ -225,7 +225,7 @@ class TestToImages:
 
     @pytest.mark.parametrize("resource_path", [images_all(), [plane_png_path, plane_jpg_path] * 2],
                              ids=["all-images", "planes"])
-    def test_should_return_images(self, resource_path: list[str]):
+    def test_should_return_images(self, resource_path: list[str]) -> None:
         torch.set_default_device(torch.device("cpu"))
         image_list_all = ImageList.from_files(resolve_resource_path(resource_path))
         image_list_select = ImageList.from_files(resolve_resource_path(resource_path[::2]))
@@ -233,7 +233,7 @@ class TestToImages:
 
     @pytest.mark.parametrize("resource_path", [images_all(), [plane_png_path, plane_jpg_path]],
                              ids=["all-images", "planes"])
-    def test_from_files_creation(self, resource_path: list[str]):
+    def test_from_files_creation(self, resource_path: list[str]) -> None:
         torch.set_default_device(torch.device("cpu"))
         image_list = ImageList.from_files(resolve_resource_path(resource_path))
         bracket_open = r"\["
@@ -247,7 +247,7 @@ class TestToJpegFiles:
 
     @pytest.mark.parametrize("resource_path", [images_all(), [plane_png_path, plane_jpg_path]],
                              ids=["all-images", "planes"])
-    def test_should_raise_if_alpha_channel(self, resource_path: list[str]):
+    def test_should_raise_if_alpha_channel(self, resource_path: list[str]) -> None:
         image_list = ImageList.from_files(resolve_resource_path(resource_path))
         with tempfile.TemporaryDirectory() as tmpdir:
             with pytest.raises(IllegalFormatError,
@@ -256,14 +256,14 @@ class TestToJpegFiles:
 
     @pytest.mark.parametrize("resource_path", [[grayscale_jpg_path, plane_jpg_path, grayscale_jpg_path, plane_jpg_path, white_square_jpg_path, white_square_jpg_path, plane_jpg_path], [plane_jpg_path, plane_jpg_path], [grayscale_jpg_path, grayscale_jpg_path]],
                              ids=["all-jpg-images", "jpg-planes", "jpg-grayscale"])
-    def test_should_raise_if_invalid_path(self, resource_path: list[str]):
+    def test_should_raise_if_invalid_path(self, resource_path: list[str]) -> None:
         image_list = ImageList.from_files(resolve_resource_path(resource_path))
         with pytest.raises(ValueError, match="The path specified is invalid. Please provide either the path to a directory, a list of paths with one path for each image, or a list of paths with one path per image size."):
             image_list.to_jpeg_files([])
 
     @pytest.mark.parametrize("resource_path", [[grayscale_jpg_path, plane_jpg_path, grayscale_jpg_path, plane_jpg_path, white_square_jpg_path, white_square_jpg_path, plane_jpg_path], [plane_jpg_path, plane_jpg_path], [grayscale_jpg_path, grayscale_jpg_path]],
                              ids=["all-jpg-images", "jpg-planes", "jpg-grayscale"])
-    def test_should_save_images_in_directory(self, resource_path: list[str]):
+    def test_should_save_images_in_directory(self, resource_path: list[str]) -> None:
         image_list = ImageList.from_files(resolve_resource_path(resource_path))
         with tempfile.TemporaryDirectory() as tmpdir:
             image_list.to_jpeg_files(tmpdir)
@@ -280,7 +280,7 @@ class TestToJpegFiles:
 
     @pytest.mark.parametrize("resource_path", [[grayscale_jpg_path, plane_jpg_path, grayscale_jpg_path, plane_jpg_path, white_square_jpg_path, white_square_jpg_path, plane_jpg_path], [plane_jpg_path, plane_jpg_path], [grayscale_jpg_path, grayscale_jpg_path]],
                              ids=["all-jpg-images", "jpg-planes", "jpg-grayscale"])
-    def test_should_save_images_in_directories_for_different_sizes(self, resource_path: list[str]):
+    def test_should_save_images_in_directories_for_different_sizes(self, resource_path: list[str]) -> None:
         image_list = ImageList.from_files(resolve_resource_path(resource_path))
 
         with tempfile.TemporaryDirectory() as tmp_parent_dir:
@@ -299,7 +299,7 @@ class TestToJpegFiles:
 
     @pytest.mark.parametrize("resource_path", [[grayscale_jpg_path, plane_jpg_path, grayscale_jpg_path, plane_jpg_path, white_square_jpg_path, white_square_jpg_path, plane_jpg_path], [plane_jpg_path, plane_jpg_path], [grayscale_jpg_path, grayscale_jpg_path]],
                              ids=["all-jpg-images", "jpg-planes", "jpg-grayscale"])
-    def test_should_save_images_in_files(self, resource_path: list[str]):
+    def test_should_save_images_in_files(self, resource_path: list[str]) -> None:
         image_list = ImageList.from_files(resolve_resource_path(resource_path))
 
         with (tempfile.TemporaryDirectory() as tmp_parent_dir):
@@ -323,14 +323,14 @@ class TestToPngFiles:
 
     @pytest.mark.parametrize("resource_path", [images_all(), [plane_png_path, plane_jpg_path], [grayscale_png_path, grayscale_png_path]],
                              ids=["all-images", "planes", "grayscale"])
-    def test_should_raise_if_invalid_path(self, resource_path: list[str]):
+    def test_should_raise_if_invalid_path(self, resource_path: list[str]) -> None:
         image_list = ImageList.from_files(resolve_resource_path(resource_path))
         with pytest.raises(ValueError, match="The path specified is invalid. Please provide either the path to a directory, a list of paths with one path for each image, or a list of paths with one path per image size."):
             image_list.to_png_files([])
 
     @pytest.mark.parametrize("resource_path", [images_all(), [plane_png_path, plane_jpg_path], [grayscale_png_path, grayscale_png_path]],
                              ids=["all-images", "planes", "grayscale"])
-    def test_should_save_images_in_directory(self, resource_path: list[str]):
+    def test_should_save_images_in_directory(self, resource_path: list[str]) -> None:
         image_list = ImageList.from_files(resolve_resource_path(resource_path))
         with tempfile.TemporaryDirectory() as tmpdir:
             image_list.to_png_files(tmpdir)
@@ -342,7 +342,7 @@ class TestToPngFiles:
 
     @pytest.mark.parametrize("resource_path", [images_all(), [plane_png_path, plane_jpg_path], [grayscale_png_path, grayscale_png_path]],
                              ids=["all-images", "planes", "grayscale"])
-    def test_should_save_images_in_directories_for_different_sizes(self, resource_path: list[str]):
+    def test_should_save_images_in_directories_for_different_sizes(self, resource_path: list[str]) -> None:
         image_list = ImageList.from_files(resolve_resource_path(resource_path))
 
         with tempfile.TemporaryDirectory() as tmp_parent_dir:
@@ -361,7 +361,7 @@ class TestToPngFiles:
 
     @pytest.mark.parametrize("resource_path", [images_all(), [plane_png_path, plane_jpg_path], [grayscale_png_path, grayscale_png_path]],
                              ids=["all-images", "planes", "grayscale"])
-    def test_should_save_images_in_files(self, resource_path: list[str]):
+    def test_should_save_images_in_files(self, resource_path: list[str]) -> None:
         image_list = ImageList.from_files(resolve_resource_path(resource_path))
 
         with (tempfile.TemporaryDirectory() as tmp_parent_dir):
@@ -380,7 +380,7 @@ class TestShuffleImages:
 
     @pytest.mark.parametrize("resource_path", [images_all(), [plane_png_path, plane_jpg_path] * 2],
                              ids=["all-images", "planes"])
-    def test_shuffle_images(self, resource_path: list[str], snapshot_png_image_list: SnapshotAssertion):
+    def test_shuffle_images(self, resource_path: list[str], snapshot_png_image_list: SnapshotAssertion) -> None:
         torch.set_default_device(_get_device())
         image_list_original = ImageList.from_files(resolve_resource_path(resource_path))
         image_list_clone = image_list_original.clone()
@@ -452,7 +452,7 @@ class TestTransformsEqualImageTransforms:
         ]
     )
     def test_all_transform_methods(self, method: str, attributes: list, resource_path1: str, resource_path2: str,
-                                   resource_path3: str):
+                                   resource_path3: str) -> None:
         torch.set_default_device(torch.device("cpu"))
         image_list_original = ImageList.from_files(
             [resolve_resource_path(resource_path1), resolve_resource_path(resource_path2),
@@ -513,7 +513,7 @@ class TestErrorsAndWarnings:
 
     class TestAddImageTensor:
 
-        def test_should_raise(self, resource_path: list[str]):
+        def test_should_raise(self, resource_path: list[str]) -> None:
             torch.set_default_device(torch.device("cpu"))
             image_list = ImageList.from_files(resolve_resource_path(resource_path))
             with pytest.raises(DuplicateIndexError, match=r"The index '0' is already in use."):
@@ -521,7 +521,7 @@ class TestErrorsAndWarnings:
 
     class TestEquals:
 
-        def test_should_raise(self, resource_path: list[str]):
+        def test_should_raise(self, resource_path: list[str]) -> None:
             image_list_original = ImageList.from_files(
                 [resolve_resource_path(unresolved_path) for unresolved_path in resource_path])
             assert (image_list_original.__eq__(image_list_original.to_images([0]))) is NotImplemented
@@ -529,7 +529,7 @@ class TestErrorsAndWarnings:
     class TestChangeChannel:
 
         @pytest.mark.parametrize("channel", [-1, 0, 2, 5], ids=["channel-negative-1", "channel-0", "channel-2", "channel-5"])
-        def test_should_raise(self, resource_path: list[str], channel: int):
+        def test_should_raise(self, resource_path: list[str], channel: int) -> None:
             image_list = ImageList.from_files([resolve_resource_path(unresolved_path) for unresolved_path in resource_path])
             with pytest.raises(ValueError, match=rf"Channel {channel} is not a valid channel option. Use either 1, 3 or 4"):
                 image_list.change_channel(channel)
@@ -700,7 +700,7 @@ class TestErrorsAndWarnings:
 
 class TestEmptyImageList:
 
-    def test_warn_empty_image_list(self):
+    def test_warn_empty_image_list(self) -> None:
         with pytest.warns(UserWarning, match=r"You are using an empty ImageList. This method changes nothing if used on an empty ImageList."):
             _EmptyImageList._warn_empty_image_list()
 
@@ -712,74 +712,74 @@ class TestEmptyImageList:
     def test_create_image_list(self, image_list: ImageList) -> None:
         assert isinstance(image_list._create_image_list([], []), _EmptyImageList)
 
-    def test_from_images(self):
+    def test_from_images(self) -> None:
         assert ImageList.from_images([]) == _EmptyImageList()
 
-    def test_from_files(self):
+    def test_from_files(self) -> None:
         assert ImageList.from_files([]) == _EmptyImageList()
         with tempfile.TemporaryDirectory() as tmpdir:
             assert ImageList.from_files(tmpdir) == _EmptyImageList()
             assert ImageList.from_files([tmpdir]) == _EmptyImageList()
 
-    def test_clone(self):
+    def test_clone(self) -> None:
         assert _EmptyImageList() == _EmptyImageList().clone()
         assert _EmptyImageList() is _EmptyImageList().clone()  # Singleton
 
-    def test_repr_png(self):
+    def test_repr_png(self) -> None:
         with pytest.raises(ValueError, match=r"You cannot display an empty ImageList"):
             ImageList.from_images([])._repr_png_()
 
-    def test_eq(self):
+    def test_eq(self) -> None:
         assert _EmptyImageList() == _EmptyImageList()
         assert _EmptyImageList().__eq__(Table()) is NotImplemented
 
-    def test_hash(self):
+    def test_hash(self) -> None:
         assert hash(_EmptyImageList()) == hash(_EmptyImageList())
 
-    def test_sizeof(self):
+    def test_sizeof(self) -> None:
         assert sys.getsizeof(_EmptyImageList()) >= 0
         assert _EmptyImageList().__sizeof__() == 0
 
-    def test_number_of_images(self):
+    def test_number_of_images(self) -> None:
         assert _EmptyImageList().number_of_images == 0
 
-    def test_widths(self):
+    def test_widths(self) -> None:
         assert _EmptyImageList().widths == []
 
-    def test_heights(self):
+    def test_heights(self) -> None:
         assert _EmptyImageList().heights == []
 
-    def test_channel(self):
+    def test_channel(self) -> None:
         assert _EmptyImageList().channel is NotImplemented
 
-    def test_number_of_sizes(self):
+    def test_number_of_sizes(self) -> None:
         assert _EmptyImageList().number_of_sizes == 0
 
-    def test_get_image(self):
+    def test_get_image(self) -> None:
         with pytest.raises(IndexOutOfBoundsError, match=r"There is no element at index '0'."):
             _EmptyImageList().get_image(0)
 
-    def test_index(self):
+    def test_index(self) -> None:
         assert _EmptyImageList().index(Image.from_file(resolve_resource_path(plane_png_path), _get_device())) == []
 
-    def test_has_image(self):
+    def test_has_image(self) -> None:
         assert not _EmptyImageList().has_image(Image.from_file(resolve_resource_path(plane_png_path), _get_device()))
         assert Image.from_file(resolve_resource_path(plane_png_path), _get_device()) not in _EmptyImageList()
 
-    def test_to_jpeg_file(self):
+    def test_to_jpeg_file(self) -> None:
         with pytest.warns(UserWarning, match="You are using an empty ImageList. No files will be saved."):
             _EmptyImageList().to_jpeg_files("path")
 
-    def test_to_png_file(self):
+    def test_to_png_file(self) -> None:
         with pytest.warns(UserWarning, match="You are using an empty ImageList. No files will be saved."):
             _EmptyImageList().to_png_files("path")
 
-    def test_to_images(self):
+    def test_to_images(self) -> None:
         assert _EmptyImageList().to_images() == []
         assert _EmptyImageList().to_images([0]) == []
 
     @pytest.mark.parametrize("resource_path", images_all(), ids=images_all_ids())
-    def test_add_image_tensor(self, resource_path: str):
+    def test_add_image_tensor(self, resource_path: str) -> None:
         torch.set_default_device(_get_device())
         assert _EmptyImageList()._add_image_tensor(Image.from_file(resolve_resource_path(resource_path), _get_device())._image_tensor, 0) == ImageList.from_files(resolve_resource_path(resource_path))
 
@@ -848,7 +848,7 @@ class TestEmptyImageList:
             "find_edges",
         ]
     )
-    def test_transform_is_still_empty_image_list(self, method: str, attributes: list):
+    def test_transform_is_still_empty_image_list(self, method: str, attributes: list) -> None:
         torch.set_default_device(torch.device("cpu"))
         image_list = _EmptyImageList()
 

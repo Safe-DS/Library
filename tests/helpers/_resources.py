@@ -1,6 +1,15 @@
 from pathlib import Path
+from typing import overload
 
 _resources_root = Path(__file__).parent / ".." / "resources"
+
+
+@overload
+def resolve_resource_path(resource_path: str | Path) -> str: ...
+
+
+@overload
+def resolve_resource_path(resource_path: list[str] | list[Path]) -> list[str]: ...
 
 
 def resolve_resource_path(resource_path: str | Path | list[str] | list[Path]) -> str | list[str]:

@@ -13,6 +13,6 @@ from safeds.exceptions import IndexOutOfBoundsError
     ],
     ids=["int", "list", "list-size-1", "slice"]
 )
-def test_should_raise_index_out_of_bounds_error(index: int | list[int] | slice, match: str):
+def test_should_raise_index_out_of_bounds_error(index: int | list[int] | slice, match: str) -> None:
     with pytest.raises(IndexOutOfBoundsError, match=match):
         raise IndexOutOfBoundsError(index)
