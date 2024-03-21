@@ -9,7 +9,7 @@ import torch
 from torch import Tensor
 
 from safeds.data.image.containers import Image, ImageList
-from safeds.exceptions import IndexOutOfBoundsError, DuplicateIndexError
+from safeds.exceptions import IndexOutOfBoundsError, DuplicateIndexError, IllegalFormatError
 
 if TYPE_CHECKING:
     from safeds.data.image.containers import _EmptyImageList, _SingleSizeImageList
@@ -126,10 +126,34 @@ class _MultiSizeImageList(ImageList):
         return (image.width, image.height) in self._image_list_dict and self._image_list_dict[(image.width, image.height)].has_image(image)
 
     def to_jpeg_files(self, path: str | Path | list[str] | list[Path]) -> None:
-        pass
+        if self.channel == 4:
+            raise IllegalFormatError("png")
+        if isinstance(path, list):
+            if len(path) == self.number_of_images:
+                for image_size, image_list in self._image_list_dict.items():
+                    image_list.to_jpeg_files([p for i, p in enumerate(path) if self._indices_to_image_size_dict[i] == image_size])
+            elif len(path) == self.number_of_sizes:
+                for image_list_path, image_list in zip(path, self._image_list_dict.values()):
+                    image_list.to_jpeg_files(image_list_path)
+            else:
+                raise ValueError("The path specified is invalid. Please provide either the path to a directory, a list of paths with one path for each image, or a list of paths with one path per image size.")
+        else:
+            for image_list in self._image_list_dict.values():
+                image_list.to_jpeg_files(path)
 
     def to_png_files(self, path: str | Path | list[str] | list[Path]) -> None:
-        pass
+        if isinstance(path, list):
+            if len(path) == self.number_of_images:
+                for image_size, image_list in self._image_list_dict.items():
+                    image_list.to_png_files([p for i, p in enumerate(path) if self._indices_to_image_size_dict[i] == image_size])
+            elif len(path) == self.number_of_sizes:
+                for image_list_path, image_list in zip(path, self._image_list_dict.values()):
+                    image_list.to_png_files(image_list_path)
+            else:
+                raise ValueError("The path specified is invalid. Please provide either the path to a directory, a list of paths with one path for each image, or a list of paths with one path per image size.")
+        else:
+            for image_list in self._image_list_dict.values():
+                image_list.to_png_files(path)
 
     def to_images(self, indices: list[int] | None = None) -> list[Image]:
         if indices is None:

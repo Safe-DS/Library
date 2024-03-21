@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import copy
+import os.path
 import random
 import warnings
 from pathlib import Path
@@ -10,9 +11,11 @@ import torch
 from torch import Tensor
 from torchvision.transforms import InterpolationMode
 from torchvision.transforms.v2 import functional as func2
+from torchvision.utils import save_image
 
 from safeds.data.image.containers import Image, ImageList
-from safeds.exceptions import DuplicateIndexError, IndexOutOfBoundsError, OutOfBoundsError, ClosedBound
+from safeds.exceptions import DuplicateIndexError, IndexOutOfBoundsError, OutOfBoundsError, ClosedBound, \
+    IllegalFormatError
 
 if TYPE_CHECKING:
     from safeds.data.image.containers import _EmptyImageList, _MultiSizeImageList
@@ -125,10 +128,50 @@ class _SingleSizeImageList(ImageList):
         return not (image.width != self.widths[0] or image.height != self.heights[0] or image.channel != self.channel) and image._image_tensor in self._tensor
 
     def to_jpeg_files(self, path: str | Path | list[str] | list[Path]) -> None:
-        pass
+        if self.channel == 4:
+            raise IllegalFormatError("png")
+        if isinstance(path, list):
+            if len(path) == self.number_of_images:
+                for image_path, index in zip(path, sorted(self._tensor_positions_to_indices)):
+                    Path(image_path).parent.mkdir(parents=True, exist_ok=True)
+                    if self.channel == 1:
+                        func2.to_pil_image(self._tensor[self._indices_to_tensor_positions[index]], mode="L").save(image_path, format="jpeg")
+                    else:
+                        save_image(self._tensor[self._indices_to_tensor_positions[index]].to(torch.float32) / 255, image_path, format="jpeg")
+                return
+            elif len(path) == 1:
+                path = path[0]
+            else:
+                raise ValueError("The path specified is invalid. Please provide either the path to a directory, a list of paths with one path for each image, or a list of paths with one path per image size.")
+        for index in self._tensor_positions_to_indices:
+            image_path = os.path.join(path, str(index) + ".jpg")
+            Path(image_path).parent.mkdir(parents=True, exist_ok=True)
+            if self.channel == 1:
+                func2.to_pil_image(self._tensor[self._indices_to_tensor_positions[index]], mode="L").save(image_path, format="jpeg")
+            else:
+                save_image(self._tensor[self._indices_to_tensor_positions[index]].to(torch.float32) / 255, image_path, format="jpeg")
 
     def to_png_files(self, path: str | Path | list[str] | list[Path]) -> None:
-        pass
+        if isinstance(path, list):
+            if len(path) == self.number_of_images:
+                for image_path, index in zip(path, sorted(self._tensor_positions_to_indices)):
+                    Path(image_path).parent.mkdir(parents=True, exist_ok=True)
+                    if self.channel == 1:
+                        func2.to_pil_image(self._tensor[self._indices_to_tensor_positions[index]], mode="L").save(image_path, format="png")
+                    else:
+                        save_image(self._tensor[self._indices_to_tensor_positions[index]].to(torch.float32) / 255, image_path, format="png")
+                return
+            elif len(path) == 1:
+                path = path[0]
+            else:
+                raise ValueError("The path specified is invalid. Please provide either the path to a directory, a list of paths with one path for each image, or a list of paths with one path per image size.")
+        for index in self._tensor_positions_to_indices:
+            image_path = os.path.join(path, str(index) + ".png")
+            Path(image_path).parent.mkdir(parents=True, exist_ok=True)
+            if self.channel == 1:
+                func2.to_pil_image(self._tensor[self._indices_to_tensor_positions[index]], mode="L").save(image_path, format="png")
+            else:
+                save_image(self._tensor[self._indices_to_tensor_positions[index]].to(torch.float32) / 255, image_path, format="png")
 
     def to_images(self, indices: list[int] | None = None) -> list[Image]:
         if indices is None:

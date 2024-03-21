@@ -8,9 +8,9 @@ from syrupy import SnapshotAssertion
 from safeds.config import _get_device
 from safeds.data.image.containers import ImageList, Image, _SingleSizeImageList, _MultiSizeImageList, _EmptyImageList
 from safeds.data.tabular.containers import Table
-from safeds.exceptions import IndexOutOfBoundsError, OutOfBoundsError, DuplicateIndexError
+from safeds.exceptions import IndexOutOfBoundsError, OutOfBoundsError, DuplicateIndexError, IllegalFormatError
 from tests.helpers import images_all, images_all_ids, resolve_resource_path, images_all_channel, images_all_channel_ids, \
-    plane_png_path, plane_jpg_path, test_images_folder
+    plane_png_path, plane_jpg_path, test_images_folder, grayscale_jpg_path, white_square_jpg_path
 
 
 class TestAllImageCombinations:
@@ -231,6 +231,139 @@ class TestToImages:
         with pytest.raises(IndexOutOfBoundsError,
                            match=rf"There are no elements at indices {str(list(range(len(image_list), 2 + len(image_list)))).replace('[', bracket_open).replace(']', bracket_close)}."):
             image_list.to_images(list(range(2, 2 + len(image_list))))
+
+
+class TestToJpegFiles:
+
+    @pytest.mark.parametrize("resource_path", [images_all(), [plane_png_path, plane_jpg_path]],
+                             ids=["all-images", "planes"])
+    def test_should_raise_if_alpha_channel(self, resource_path: list[str]):
+        image_list = ImageList.from_files(resolve_resource_path(resource_path))
+        with tempfile.TemporaryDirectory() as tmpdir:
+            with pytest.raises(IllegalFormatError,
+                               match="This format is illegal. Use one of the following formats: png"):
+                image_list.to_jpeg_files(tmpdir)
+
+    @pytest.mark.parametrize("resource_path", [[plane_jpg_path, grayscale_jpg_path, white_square_jpg_path], [plane_jpg_path, plane_jpg_path]],
+                             ids=["all-jpg-images", "jpg-planes"])
+    def test_should_raise_if_invalid_path(self, resource_path: list[str]):
+        image_list = ImageList.from_files(resolve_resource_path(resource_path))
+        with pytest.raises(ValueError, match="The path specified is invalid. Please provide either the path to a directory, a list of paths with one path for each image, or a list of paths with one path per image size."):
+            image_list.to_jpeg_files([])
+
+    @pytest.mark.parametrize("resource_path", [[grayscale_jpg_path, plane_jpg_path, grayscale_jpg_path, plane_jpg_path, white_square_jpg_path, white_square_jpg_path, plane_jpg_path], [plane_jpg_path, plane_jpg_path]],
+                             ids=["all-jpg-images", "jpg-planes"])
+    def test_should_save_images_in_directory(self, resource_path: list[str]):
+        image_list = ImageList.from_files(resolve_resource_path(resource_path))
+        with tempfile.TemporaryDirectory() as tmpdir:
+            image_list.to_jpeg_files(tmpdir)
+            image_list_loaded = ImageList.from_files(tmpdir)
+            assert len(image_list) == len(image_list_loaded)
+            assert image_list.number_of_sizes == image_list_loaded.number_of_sizes
+            assert isinstance(image_list_loaded, type(image_list))
+            for index in range(len(image_list)):
+                im_saved = image_list.get_image(index)
+                im_loaded = image_list_loaded.get_image(index)
+                assert im_saved.width == im_loaded.width
+                assert im_saved.height == im_loaded.height
+                assert im_saved.channel == im_loaded.channel
+
+    @pytest.mark.parametrize("resource_path", [[grayscale_jpg_path, plane_jpg_path, grayscale_jpg_path, plane_jpg_path, white_square_jpg_path, white_square_jpg_path, plane_jpg_path], [plane_jpg_path, plane_jpg_path]],
+                             ids=["all-jpg-images", "jpg-planes"])
+    def test_should_save_images_in_directories_for_different_sizes(self, resource_path: list[str]):
+        image_list = ImageList.from_files(resolve_resource_path(resource_path))
+
+        with tempfile.TemporaryDirectory() as tmp_parent_dir:
+            tmp_dirs = [tempfile.TemporaryDirectory(dir=tmp_parent_dir) for _ in range(image_list.number_of_sizes)]
+
+            image_list.to_jpeg_files([tmp_dir.name for tmp_dir in tmp_dirs])
+            image_list_loaded = ImageList.from_files(tmp_parent_dir)
+            assert len(image_list) == len(image_list_loaded)
+            assert image_list.number_of_sizes == image_list_loaded.number_of_sizes
+            assert isinstance(image_list_loaded, type(image_list))
+            assert set(image_list.widths) == set(image_list_loaded.widths)
+            assert set(image_list.heights) == set(image_list_loaded.heights)
+            assert image_list.channel == image_list_loaded.channel
+
+            [tmp_dir.cleanup() for tmp_dir in tmp_dirs]
+
+    @pytest.mark.parametrize("resource_path", [[grayscale_jpg_path, plane_jpg_path, grayscale_jpg_path, plane_jpg_path, white_square_jpg_path, white_square_jpg_path, plane_jpg_path], [plane_jpg_path, plane_jpg_path]],
+                             ids=["all-jpg-images", "jpg-planes"])
+    def test_should_save_images_in_files(self, resource_path: list[str]):
+        image_list = ImageList.from_files(resolve_resource_path(resource_path))
+
+        with (tempfile.TemporaryDirectory() as tmp_parent_dir):
+            tmp_files = [tempfile.NamedTemporaryFile(suffix=".jpg", prefix=str(i), dir=tmp_parent_dir) for i in range(len(image_list))]
+            [tmp_file.close() for tmp_file in tmp_files]
+
+            image_list.to_jpeg_files([tmp_file.name for tmp_file in tmp_files])
+            image_list_loaded = ImageList.from_files(tmp_parent_dir)
+            assert len(image_list) == len(image_list_loaded)
+            assert image_list.number_of_sizes == image_list_loaded.number_of_sizes
+            assert isinstance(image_list_loaded, type(image_list))
+            for index in range(len(image_list)):
+                im_saved = image_list.get_image(index)
+                im_loaded = image_list_loaded.get_image(index)
+                assert im_saved.width == im_loaded.width
+                assert im_saved.height == im_loaded.height
+                assert im_saved.channel == im_loaded.channel
+
+
+class TestToPngFiles:
+
+    @pytest.mark.parametrize("resource_path", [images_all(), [plane_png_path, plane_jpg_path]],
+                             ids=["all-images", "planes"])
+    def test_should_raise_if_invalid_path(self, resource_path: list[str]):
+        image_list = ImageList.from_files(resolve_resource_path(resource_path))
+        with pytest.raises(ValueError, match="The path specified is invalid. Please provide either the path to a directory, a list of paths with one path for each image, or a list of paths with one path per image size."):
+            image_list.to_png_files([])
+
+    @pytest.mark.parametrize("resource_path", [images_all(), [plane_png_path, plane_jpg_path]],
+                             ids=["all-images", "planes"])
+    def test_should_save_images_in_directory(self, resource_path: list[str]):
+        image_list = ImageList.from_files(resolve_resource_path(resource_path))
+        with tempfile.TemporaryDirectory() as tmpdir:
+            image_list.to_png_files(tmpdir)
+            image_list_loaded = ImageList.from_files(tmpdir)
+            assert len(image_list) == len(image_list_loaded)
+            assert image_list.number_of_sizes == image_list_loaded.number_of_sizes
+            assert isinstance(image_list_loaded, type(image_list))
+            assert image_list == image_list_loaded
+
+    @pytest.mark.parametrize("resource_path", [images_all(), [plane_png_path, plane_jpg_path]],
+                             ids=["all-images", "planes"])
+    def test_should_save_images_in_directories_for_different_sizes(self, resource_path: list[str]):
+        image_list = ImageList.from_files(resolve_resource_path(resource_path))
+
+        with tempfile.TemporaryDirectory() as tmp_parent_dir:
+            tmp_dirs = [tempfile.TemporaryDirectory(dir=tmp_parent_dir) for _ in range(image_list.number_of_sizes)]
+
+            image_list.to_png_files([tmp_dir.name for tmp_dir in tmp_dirs])
+            image_list_loaded = ImageList.from_files(tmp_parent_dir)
+            assert len(image_list) == len(image_list_loaded)
+            assert image_list.number_of_sizes == image_list_loaded.number_of_sizes
+            assert isinstance(image_list_loaded, type(image_list))
+            assert set(image_list.widths) == set(image_list_loaded.widths)
+            assert set(image_list.heights) == set(image_list_loaded.heights)
+            assert image_list.channel == image_list_loaded.channel
+
+            [tmp_dir.cleanup() for tmp_dir in tmp_dirs]
+
+    @pytest.mark.parametrize("resource_path", [images_all(), [plane_png_path, plane_jpg_path]],
+                             ids=["all-images", "planes"])
+    def test_should_save_images_in_files(self, resource_path: list[str]):
+        image_list = ImageList.from_files(resolve_resource_path(resource_path))
+
+        with (tempfile.TemporaryDirectory() as tmp_parent_dir):
+            tmp_files = [tempfile.NamedTemporaryFile(suffix=".png", prefix=str(i), dir=tmp_parent_dir) for i in range(len(image_list))]
+            [tmp_file.close() for tmp_file in tmp_files]
+
+            image_list.to_png_files([tmp_file.name for tmp_file in tmp_files])
+            image_list_loaded = ImageList.from_files(tmp_parent_dir)
+            assert len(image_list) == len(image_list_loaded)
+            assert image_list.number_of_sizes == image_list_loaded.number_of_sizes
+            assert isinstance(image_list_loaded, type(image_list))
+            assert image_list == image_list_loaded
 
 
 class TestShuffleImages:

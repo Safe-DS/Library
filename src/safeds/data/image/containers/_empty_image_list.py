@@ -62,9 +62,11 @@ class _EmptyImageList(ImageList):
         return False
 
     def to_jpeg_files(self, path: str | Path | list[str] | list[Path]) -> None:
+        warnings.warn("You are using an empty ImageList. No files will be saved.", UserWarning, stacklevel=2)
         return
 
     def to_png_files(self, path: str | Path | list[str] | list[Path]) -> None:
+        warnings.warn("You are using an empty ImageList. No files will be saved.", UserWarning, stacklevel=2)
         return
 
     def to_images(self, indices: list[int] | None = None) -> list[Image]:
