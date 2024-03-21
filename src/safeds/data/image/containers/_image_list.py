@@ -84,6 +84,14 @@ class ImageList(metaclass=ABCMeta):
     def __eq__(self, other: object) -> bool:
         pass
 
+    @abstractmethod
+    def __hash__(self) -> int:
+        pass
+
+    @abstractmethod
+    def __sizeof__(self) -> int:
+        pass
+
     def __len__(self):
         return self.number_of_images
 

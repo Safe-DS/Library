@@ -1,11 +1,15 @@
 from __future__ import annotations
 
 import copy
+import functools
+import operator
 import random
+import sys
 from pathlib import Path
 from typing import TYPE_CHECKING
 
 import torch
+import xxhash
 from torch import Tensor
 
 from safeds.data.image.containers import Image, ImageList
@@ -75,6 +79,12 @@ class _MultiSizeImageList(ImageList):
             if image_list_value != other._image_list_dict[image_list_key]:
                 return False
         return True
+
+    def __hash__(self) -> int:
+        return xxhash.xxh3_64(functools.reduce(operator.add, [hash(self._image_list_dict[image_size]).to_bytes(8) for image_size in sorted(self._image_list_dict)])).intdigest()
+
+    def __sizeof__(self) -> int:
+        return sys.getsizeof(self._image_list_dict) + sum(map(sys.getsizeof, self._image_list_dict.keys())) + sum(map(sys.getsizeof, self._image_list_dict.values())) + sys.getsizeof(self._indices_to_image_size_dict) + sum(map(sys.getsizeof, self._indices_to_image_size_dict.keys())) + sum(map(sys.getsizeof, self._indices_to_image_size_dict.values()))
 
     @property
     def number_of_images(self) -> int:

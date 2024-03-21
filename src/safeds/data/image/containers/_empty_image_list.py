@@ -1,6 +1,7 @@
 import warnings
 from pathlib import Path
 
+import xxhash
 from torch import Tensor
 
 from safeds.data.image.containers import ImageList, Image, _SingleSizeImageList
@@ -31,6 +32,12 @@ class _EmptyImageList(ImageList):
         if not isinstance(other, ImageList):
             return NotImplemented
         return isinstance(other, _EmptyImageList)
+
+    def __hash__(self) -> int:
+        return xxhash.xxh3_64("_EmptyImageList").intdigest()
+
+    def __sizeof__(self) -> int:
+        return 0
 
     @property
     def number_of_images(self) -> int:

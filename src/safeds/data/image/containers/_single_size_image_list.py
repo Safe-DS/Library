@@ -1,13 +1,17 @@
 from __future__ import annotations
 
 import copy
+import functools
+import operator
 import os.path
 import random
+import sys
 import warnings
 from pathlib import Path
 from typing import TYPE_CHECKING
 
 import torch
+import xxhash
 from torch import Tensor
 from torchvision.transforms import InterpolationMode
 from torchvision.transforms.v2 import functional as func2
@@ -93,6 +97,12 @@ class _SingleSizeImageList(ImageList):
             and set(self._indices_to_tensor_positions) == set(self._indices_to_tensor_positions)
             and torch.all(torch.eq(self._tensor[torch.tensor(self._tensor_positions_to_indices).argsort()], other._tensor[torch.tensor(other._tensor_positions_to_indices).argsort()])).item()
         )
+
+    def __hash__(self) -> int:
+        return xxhash.xxh3_64(self.widths[0].to_bytes(8) + self.heights[0].to_bytes(8) + self.channel.to_bytes(8) + self.number_of_images.to_bytes(8) + functools.reduce(operator.add, [xxhash.xxh3_64(index.to_bytes(8)).intdigest().to_bytes(8) for index in sorted(self._tensor_positions_to_indices)])).intdigest()
+
+    def __sizeof__(self) -> int:
+        return sys.getsizeof(self._tensor) + self._tensor.element_size() * self._tensor.nelement() + sum(map(sys.getsizeof, self._tensor_positions_to_indices)) + sys.getsizeof(self._tensor_positions_to_indices) + sum(map(sys.getsizeof, self._indices_to_tensor_positions.keys())) + sum(map(sys.getsizeof, self._indices_to_tensor_positions.values())) + sys.getsizeof(self._indices_to_tensor_positions)
 
     @property
     def number_of_images(self) -> int:

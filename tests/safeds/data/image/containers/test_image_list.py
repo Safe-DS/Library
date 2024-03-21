@@ -1,4 +1,5 @@
 import random
+import sys
 import tempfile
 
 import pytest
@@ -87,6 +88,15 @@ class TestAllImageCombinations:
         assert image_list != image_list_unequal_1
         assert image_list != image_list_unequal_2
         assert image_list.__eq__(Table()) is NotImplemented
+
+        # Test hash
+        assert hash(image_list) == hash(image_list_clone)
+        assert hash(image_list) == hash(image_list_equal)
+        assert hash(image_list) != hash(image_list_unequal_1)
+        assert hash(image_list) != hash(image_list_unequal_2)
+
+        # Test size
+        assert sys.getsizeof(image_list) >= image1.__sizeof__() + image2.__sizeof__() + image3.__sizeof__()
 
         # Test from_images
         image_list_from_images = ImageList.from_images([image1, image2, image3])
@@ -722,6 +732,13 @@ class TestEmptyImageList:
     def test_eq(self):
         assert _EmptyImageList() == _EmptyImageList()
         assert _EmptyImageList().__eq__(Table()) is NotImplemented
+
+    def test_hash(self):
+        assert hash(_EmptyImageList()) == hash(_EmptyImageList())
+
+    def test_sizeof(self):
+        assert sys.getsizeof(_EmptyImageList()) >= 0
+        assert _EmptyImageList().__sizeof__() == 0
 
     def test_number_of_images(self):
         assert _EmptyImageList().number_of_images == 0
