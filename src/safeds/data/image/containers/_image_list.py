@@ -55,7 +55,7 @@ class ImageList(metaclass=ABCMeta):
         fixed_size = True
 
         if isinstance(path, str) or isinstance(path, Path):
-            path = [Path(path)]
+            path: Sequence[str | Path] = [Path(path)]
         while len(path) != 0:
             p = Path(path.pop(0))
             if p.is_dir():
@@ -95,7 +95,7 @@ class ImageList(metaclass=ABCMeta):
     def __len__(self) -> int:
         return self.number_of_images
 
-    def __contains__(self, item) -> bool:
+    def __contains__(self, item: object) -> bool:
         return isinstance(item, Image) and self.has_image(item)
 
     def _repr_png_(self) -> bytes:

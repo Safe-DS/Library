@@ -295,7 +295,8 @@ class TestToJpegFiles:
             assert set(image_list.heights) == set(image_list_loaded.heights)
             assert image_list.channel == image_list_loaded.channel
 
-            [tmp_dir.cleanup() for tmp_dir in tmp_dirs]
+            for tmp_dir in tmp_dirs:
+                tmp_dir.cleanup()
 
     @pytest.mark.parametrize("resource_path", [[grayscale_jpg_path, plane_jpg_path, grayscale_jpg_path, plane_jpg_path, white_square_jpg_path, white_square_jpg_path, plane_jpg_path], [plane_jpg_path, plane_jpg_path], [grayscale_jpg_path, grayscale_jpg_path]],
                              ids=["all-jpg-images", "jpg-planes", "jpg-grayscale"])
@@ -304,7 +305,8 @@ class TestToJpegFiles:
 
         with (tempfile.TemporaryDirectory() as tmp_parent_dir):
             tmp_files = [tempfile.NamedTemporaryFile(suffix=".jpg", prefix=str(i), dir=tmp_parent_dir) for i in range(len(image_list))]
-            [tmp_file.close() for tmp_file in tmp_files]
+            for tmp_file in tmp_files:
+                tmp_file.close()
 
             image_list.to_jpeg_files([tmp_file.name for tmp_file in tmp_files])
             image_list_loaded = ImageList.from_files(tmp_parent_dir)
@@ -357,7 +359,8 @@ class TestToPngFiles:
             assert set(image_list.heights) == set(image_list_loaded.heights)
             assert image_list.channel == image_list_loaded.channel
 
-            [tmp_dir.cleanup() for tmp_dir in tmp_dirs]
+            for tmp_dir in tmp_dirs:
+                tmp_dir.cleanup()
 
     @pytest.mark.parametrize("resource_path", [images_all(), [plane_png_path, plane_jpg_path], [grayscale_png_path, grayscale_png_path]],
                              ids=["all-images", "planes", "grayscale"])
@@ -366,7 +369,8 @@ class TestToPngFiles:
 
         with (tempfile.TemporaryDirectory() as tmp_parent_dir):
             tmp_files = [tempfile.NamedTemporaryFile(suffix=".png", prefix=str(i), dir=tmp_parent_dir) for i in range(len(image_list))]
-            [tmp_file.close() for tmp_file in tmp_files]
+            for tmp_file in tmp_files:
+                tmp_file.close()
 
             image_list.to_png_files([tmp_file.name for tmp_file in tmp_files])
             image_list_loaded = ImageList.from_files(tmp_parent_dir)

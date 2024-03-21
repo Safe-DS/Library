@@ -138,11 +138,12 @@ class _MultiSizeImageList(ImageList):
         if self.channel == 4:
             raise IllegalFormatError("png")
         if isinstance(path, list):
-            path: list[str] | list[Path] = path
             if len(path) == self.number_of_images:
                 for image_size, image_list in self._image_list_dict.items():
+                    p: str | Path
                     image_list.to_jpeg_files([p for i, p in enumerate(path) if self._indices_to_image_size_dict[i] == image_size])
             elif len(path) == self.number_of_sizes:
+                image_list_path: str | Path
                 for image_list_path, image_list in zip(path, self._image_list_dict.values()):
                     image_list.to_jpeg_files(image_list_path)
             else:
@@ -153,11 +154,12 @@ class _MultiSizeImageList(ImageList):
 
     def to_png_files(self, path: str | Path | list[str] | list[Path]) -> None:
         if isinstance(path, list):
-            path: list[str] | list[Path] = path
             if len(path) == self.number_of_images:
                 for image_size, image_list in self._image_list_dict.items():
+                    p: str | Path
                     image_list.to_png_files([p for i, p in enumerate(path) if self._indices_to_image_size_dict[i] == image_size])
             elif len(path) == self.number_of_sizes:
+                image_list_path: str | Path
                 for image_list_path, image_list in zip(path, self._image_list_dict.values()):
                     image_list.to_png_files(image_list_path)
             else:
@@ -213,10 +215,11 @@ class _MultiSizeImageList(ImageList):
         if isinstance(images, _EmptyImageList) or isinstance(images, list) and len(images) == 0:
             return self.clone()
 
-        images_with_size: dict[tuple[int, int], list[Image] | _SingleSizeImageList] = {}
         indices_for_images_with_size = {}
         current_index = max(self._indices_to_image_size_dict) + 1
         if isinstance(images, ImageList):
+            images_with_size: dict[tuple[int, int], _SingleSizeImageList] = {}
+
             if images.number_of_sizes == 1:
                 images_with_size[(images.widths[0], images.heights[0])] = images._as_single_size_image_list()
                 indices_for_images_with_size[(images.widths[0], images.heights[0])] = [index + current_index for index in images._as_single_size_image_list()._tensor_positions_to_indices]
@@ -225,6 +228,8 @@ class _MultiSizeImageList(ImageList):
                     images_with_size[size] = im_list._as_single_size_image_list()
                     indices_for_images_with_size[size] = [index + current_index for index in im_list._as_single_size_image_list()._tensor_positions_to_indices]
         else:
+            images_with_size: dict[tuple[int, int], list[Image]] = {}
+
             for image in images:
                 size = (image.width, image.height)
                 if size in images_with_size:
