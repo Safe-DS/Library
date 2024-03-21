@@ -5,7 +5,7 @@ import math
 import os
 from abc import ABCMeta, abstractmethod
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Sequence
 
 import torch
 from PIL.Image import open as pil_image_open
@@ -45,7 +45,7 @@ class ImageList(metaclass=ABCMeta):
         return _SingleSizeImageList._create_image_list([image._image_tensor for image in images], indices)
 
     @staticmethod
-    def from_files(path: str | Path | list[str | Path], indices: list[int] | None = None) -> ImageList:
+    def from_files(path: str | Path | Sequence[str | Path], indices: list[int] | None = None) -> ImageList:
         from safeds.data.image.containers import _EmptyImageList, _SingleSizeImageList, _MultiSizeImageList
 
         if isinstance(path, list) and len(path) == 0:
