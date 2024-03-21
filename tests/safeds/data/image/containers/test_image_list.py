@@ -11,7 +11,7 @@ from safeds.data.image.containers import ImageList, Image, _SingleSizeImageList,
 from safeds.data.tabular.containers import Table
 from safeds.exceptions import IndexOutOfBoundsError, OutOfBoundsError, DuplicateIndexError, IllegalFormatError
 from tests.helpers import images_all, images_all_ids, resolve_resource_path, images_all_channel, images_all_channel_ids, \
-    plane_png_path, plane_jpg_path, test_images_folder, grayscale_jpg_path, white_square_jpg_path
+    plane_png_path, plane_jpg_path, test_images_folder, grayscale_jpg_path, white_square_jpg_path, grayscale_png_path
 
 
 class TestAllImageCombinations:
@@ -254,15 +254,15 @@ class TestToJpegFiles:
                                match="This format is illegal. Use one of the following formats: png"):
                 image_list.to_jpeg_files(tmpdir)
 
-    @pytest.mark.parametrize("resource_path", [[plane_jpg_path, grayscale_jpg_path, white_square_jpg_path], [plane_jpg_path, plane_jpg_path]],
-                             ids=["all-jpg-images", "jpg-planes"])
+    @pytest.mark.parametrize("resource_path", [[grayscale_jpg_path, plane_jpg_path, grayscale_jpg_path, plane_jpg_path, white_square_jpg_path, white_square_jpg_path, plane_jpg_path], [plane_jpg_path, plane_jpg_path], [grayscale_jpg_path, grayscale_jpg_path]],
+                             ids=["all-jpg-images", "jpg-planes", "jpg-grayscale"])
     def test_should_raise_if_invalid_path(self, resource_path: list[str]):
         image_list = ImageList.from_files(resolve_resource_path(resource_path))
         with pytest.raises(ValueError, match="The path specified is invalid. Please provide either the path to a directory, a list of paths with one path for each image, or a list of paths with one path per image size."):
             image_list.to_jpeg_files([])
 
-    @pytest.mark.parametrize("resource_path", [[grayscale_jpg_path, plane_jpg_path, grayscale_jpg_path, plane_jpg_path, white_square_jpg_path, white_square_jpg_path, plane_jpg_path], [plane_jpg_path, plane_jpg_path]],
-                             ids=["all-jpg-images", "jpg-planes"])
+    @pytest.mark.parametrize("resource_path", [[grayscale_jpg_path, plane_jpg_path, grayscale_jpg_path, plane_jpg_path, white_square_jpg_path, white_square_jpg_path, plane_jpg_path], [plane_jpg_path, plane_jpg_path], [grayscale_jpg_path, grayscale_jpg_path]],
+                             ids=["all-jpg-images", "jpg-planes", "jpg-grayscale"])
     def test_should_save_images_in_directory(self, resource_path: list[str]):
         image_list = ImageList.from_files(resolve_resource_path(resource_path))
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -278,8 +278,8 @@ class TestToJpegFiles:
                 assert im_saved.height == im_loaded.height
                 assert im_saved.channel == im_loaded.channel
 
-    @pytest.mark.parametrize("resource_path", [[grayscale_jpg_path, plane_jpg_path, grayscale_jpg_path, plane_jpg_path, white_square_jpg_path, white_square_jpg_path, plane_jpg_path], [plane_jpg_path, plane_jpg_path]],
-                             ids=["all-jpg-images", "jpg-planes"])
+    @pytest.mark.parametrize("resource_path", [[grayscale_jpg_path, plane_jpg_path, grayscale_jpg_path, plane_jpg_path, white_square_jpg_path, white_square_jpg_path, plane_jpg_path], [plane_jpg_path, plane_jpg_path], [grayscale_jpg_path, grayscale_jpg_path]],
+                             ids=["all-jpg-images", "jpg-planes", "jpg-grayscale"])
     def test_should_save_images_in_directories_for_different_sizes(self, resource_path: list[str]):
         image_list = ImageList.from_files(resolve_resource_path(resource_path))
 
@@ -297,8 +297,8 @@ class TestToJpegFiles:
 
             [tmp_dir.cleanup() for tmp_dir in tmp_dirs]
 
-    @pytest.mark.parametrize("resource_path", [[grayscale_jpg_path, plane_jpg_path, grayscale_jpg_path, plane_jpg_path, white_square_jpg_path, white_square_jpg_path, plane_jpg_path], [plane_jpg_path, plane_jpg_path]],
-                             ids=["all-jpg-images", "jpg-planes"])
+    @pytest.mark.parametrize("resource_path", [[grayscale_jpg_path, plane_jpg_path, grayscale_jpg_path, plane_jpg_path, white_square_jpg_path, white_square_jpg_path, plane_jpg_path], [plane_jpg_path, plane_jpg_path], [grayscale_jpg_path, grayscale_jpg_path]],
+                             ids=["all-jpg-images", "jpg-planes", "jpg-grayscale"])
     def test_should_save_images_in_files(self, resource_path: list[str]):
         image_list = ImageList.from_files(resolve_resource_path(resource_path))
 
@@ -321,15 +321,15 @@ class TestToJpegFiles:
 
 class TestToPngFiles:
 
-    @pytest.mark.parametrize("resource_path", [images_all(), [plane_png_path, plane_jpg_path]],
-                             ids=["all-images", "planes"])
+    @pytest.mark.parametrize("resource_path", [images_all(), [plane_png_path, plane_jpg_path], [grayscale_png_path, grayscale_png_path]],
+                             ids=["all-images", "planes", "grayscale"])
     def test_should_raise_if_invalid_path(self, resource_path: list[str]):
         image_list = ImageList.from_files(resolve_resource_path(resource_path))
         with pytest.raises(ValueError, match="The path specified is invalid. Please provide either the path to a directory, a list of paths with one path for each image, or a list of paths with one path per image size."):
             image_list.to_png_files([])
 
-    @pytest.mark.parametrize("resource_path", [images_all(), [plane_png_path, plane_jpg_path]],
-                             ids=["all-images", "planes"])
+    @pytest.mark.parametrize("resource_path", [images_all(), [plane_png_path, plane_jpg_path], [grayscale_png_path, grayscale_png_path]],
+                             ids=["all-images", "planes", "grayscale"])
     def test_should_save_images_in_directory(self, resource_path: list[str]):
         image_list = ImageList.from_files(resolve_resource_path(resource_path))
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -340,8 +340,8 @@ class TestToPngFiles:
             assert isinstance(image_list_loaded, type(image_list))
             assert image_list == image_list_loaded
 
-    @pytest.mark.parametrize("resource_path", [images_all(), [plane_png_path, plane_jpg_path]],
-                             ids=["all-images", "planes"])
+    @pytest.mark.parametrize("resource_path", [images_all(), [plane_png_path, plane_jpg_path], [grayscale_png_path, grayscale_png_path]],
+                             ids=["all-images", "planes", "grayscale"])
     def test_should_save_images_in_directories_for_different_sizes(self, resource_path: list[str]):
         image_list = ImageList.from_files(resolve_resource_path(resource_path))
 
@@ -359,8 +359,8 @@ class TestToPngFiles:
 
             [tmp_dir.cleanup() for tmp_dir in tmp_dirs]
 
-    @pytest.mark.parametrize("resource_path", [images_all(), [plane_png_path, plane_jpg_path]],
-                             ids=["all-images", "planes"])
+    @pytest.mark.parametrize("resource_path", [images_all(), [plane_png_path, plane_jpg_path], [grayscale_png_path, grayscale_png_path]],
+                             ids=["all-images", "planes", "grayscale"])
     def test_should_save_images_in_files(self, resource_path: list[str]):
         image_list = ImageList.from_files(resolve_resource_path(resource_path))
 
@@ -765,6 +765,14 @@ class TestEmptyImageList:
     def test_has_image(self):
         assert not _EmptyImageList().has_image(Image.from_file(resolve_resource_path(plane_png_path), _get_device()))
         assert Image.from_file(resolve_resource_path(plane_png_path), _get_device()) not in _EmptyImageList()
+
+    def test_to_jpeg_file(self):
+        with pytest.warns(UserWarning, match="You are using an empty ImageList. No files will be saved."):
+            _EmptyImageList().to_jpeg_files("path")
+
+    def test_to_png_file(self):
+        with pytest.warns(UserWarning, match="You are using an empty ImageList. No files will be saved."):
+            _EmptyImageList().to_png_files("path")
 
     def test_to_images(self):
         assert _EmptyImageList().to_images() == []
