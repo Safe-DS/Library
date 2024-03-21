@@ -28,7 +28,7 @@ if TYPE_CHECKING:
 class _SingleSizeImageList(ImageList):
 
     def __init__(self) -> None:
-        self._tensor: Tensor = torch.empty()
+        self._tensor: Tensor = torch.empty(0)
         self._tensor_positions_to_indices: list[int] = []  # list[tensor_position] = index
         self._indices_to_tensor_positions: dict[int, int] = {}  # {index: tensor_position}
 
