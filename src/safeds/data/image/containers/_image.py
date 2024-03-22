@@ -587,7 +587,12 @@ class Image:
             If radius is smaller than 0 or equal or greater than the smaller size of the image.
         """
         if radius < 0 or radius >= min(self.width, self.height):
-            raise OutOfBoundsError(radius, name="radius", lower_bound=ClosedBound(0), upper_bound=ClosedBound(min(self.width, self.height) - 1))
+            raise OutOfBoundsError(
+                radius,
+                name="radius",
+                lower_bound=ClosedBound(0),
+                upper_bound=ClosedBound(min(self.width, self.height) - 1),
+            )
         elif radius == 0:
             warnings.warn(
                 "Blur radius is 0, this will not make changes to the image.",

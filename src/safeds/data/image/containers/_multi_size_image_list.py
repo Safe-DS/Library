@@ -12,8 +12,13 @@ import xxhash
 from torch import Tensor
 
 from safeds.data.image.containers import Image, ImageList
-from safeds.exceptions import DuplicateIndexError, IllegalFormatError, IndexOutOfBoundsError, OutOfBoundsError, \
-    ClosedBound
+from safeds.exceptions import (
+    ClosedBound,
+    DuplicateIndexError,
+    IllegalFormatError,
+    IndexOutOfBoundsError,
+    OutOfBoundsError,
+)
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -495,7 +500,12 @@ class _MultiSizeImageList(ImageList):
 
     def blur(self, radius: int) -> ImageList:
         if radius < 0 or radius >= min(*self.widths, *self.heights):
-            raise OutOfBoundsError(radius, name="radius", lower_bound=ClosedBound(0), upper_bound=ClosedBound(min(*self.widths, *self.heights) - 1))
+            raise OutOfBoundsError(
+                radius,
+                name="radius",
+                lower_bound=ClosedBound(0),
+                upper_bound=ClosedBound(min(*self.widths, *self.heights) - 1),
+            )
         image_list = self._clone_without_image_dict()
         for image_list_key, image_list_original in self._image_list_dict.items():
             image_list._image_list_dict[image_list_key] = image_list_original.blur(radius)

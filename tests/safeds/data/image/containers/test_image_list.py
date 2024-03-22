@@ -973,9 +973,15 @@ class TestErrorsAndWarnings:
                 [resolve_resource_path(unresolved_path) for unresolved_path in resource_path],
             )
             image_list_clone = image_list_original.clone()
-            with pytest.raises(OutOfBoundsError, match=rf"radius \(=-1\) is not inside \[0, {min(*image_list_original.widths, *image_list_original.heights) - 1}\]."):
+            with pytest.raises(
+                OutOfBoundsError,
+                match=rf"radius \(=-1\) is not inside \[0, {min(*image_list_original.widths, *image_list_original.heights) - 1}\].",
+            ):
                 image_list_original.blur(-1)
-            with pytest.raises(OutOfBoundsError, match=rf"radius \(={min(*image_list_original.widths, *image_list_original.heights)}\) is not inside \[0, {min(*image_list_original.widths, *image_list_original.heights) - 1}\]."):
+            with pytest.raises(
+                OutOfBoundsError,
+                match=rf"radius \(={min(*image_list_original.widths, *image_list_original.heights)}\) is not inside \[0, {min(*image_list_original.widths, *image_list_original.heights) - 1}\].",
+            ):
                 image_list_original.blur(min(*image_list_original.widths, *image_list_original.heights))
             assert image_list_original is not image_list_clone
             assert image_list_original == image_list_clone
