@@ -41,7 +41,8 @@ class _MultiSizeImageList(ImageList):
 
     @staticmethod
     def _create_image_list(images: list[Tensor], indices: list[int]) -> ImageList:
-        from safeds.data.image.containers import _EmptyImageList, _SingleSizeImageList
+        from safeds.data.image.containers._empty_image_list import _EmptyImageList
+        from safeds.data.image.containers._single_size_image_list import _SingleSizeImageList
 
         if len(images) == 0:
             return _EmptyImageList()
@@ -241,7 +242,7 @@ class _MultiSizeImageList(ImageList):
         return image_list
 
     def _add_image_tensor(self, image_tensor: Tensor, index: int) -> ImageList:
-        from safeds.data.image.containers import _SingleSizeImageList
+        from safeds.data.image.containers._single_size_image_list import _SingleSizeImageList
 
         if index in self._indices_to_image_size_dict:
             raise DuplicateIndexError(index)
@@ -263,7 +264,8 @@ class _MultiSizeImageList(ImageList):
         return image_list
 
     def add_images(self, images: list[Image] | ImageList) -> ImageList:
-        from safeds.data.image.containers import _EmptyImageList, _SingleSizeImageList
+        from safeds.data.image.containers._empty_image_list import _EmptyImageList
+        from safeds.data.image.containers._single_size_image_list import _SingleSizeImageList
 
         if isinstance(images, _EmptyImageList) or isinstance(images, list) and len(images) == 0:
             return self.clone()
@@ -338,7 +340,8 @@ class _MultiSizeImageList(ImageList):
         return image_list
 
     def remove_image_by_index(self, index: int | list[int]) -> ImageList:
-        from safeds.data.image.containers import _EmptyImageList, _SingleSizeImageList
+        from safeds.data.image.containers._empty_image_list import _EmptyImageList
+        from safeds.data.image.containers._single_size_image_list import _SingleSizeImageList
 
         if isinstance(index, int):
             index = [index]
@@ -419,7 +422,7 @@ class _MultiSizeImageList(ImageList):
         return image_list
 
     def resize(self, new_width: int, new_height: int) -> ImageList:
-        from safeds.data.image.containers import _SingleSizeImageList
+        from safeds.data.image.containers._single_size_image_list import _SingleSizeImageList
 
         image_list_tensors = []
         image_list_indices = []
@@ -440,7 +443,7 @@ class _MultiSizeImageList(ImageList):
         return image_list
 
     def crop(self, x: int, y: int, width: int, height: int) -> ImageList:
-        from safeds.data.image.containers import _SingleSizeImageList
+        from safeds.data.image.containers._single_size_image_list import _SingleSizeImageList
 
         image_list_tensors = []
         image_list_indices = []

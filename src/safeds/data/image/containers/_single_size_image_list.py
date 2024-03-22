@@ -51,7 +51,7 @@ class _SingleSizeImageList(ImageList):
 
     @staticmethod
     def _create_image_list(images: list[Tensor], indices: list[int]) -> ImageList:
-        from safeds.data.image.containers import _EmptyImageList
+        from safeds.data.image.containers._empty_image_list import _EmptyImageList
 
         if len(images) == 0:
             return _EmptyImageList()
@@ -343,7 +343,7 @@ class _SingleSizeImageList(ImageList):
             raise ValueError(f"Channel {channel} is not a valid channel option. Use either 1, 3 or 4")
 
     def _add_image_tensor(self, image_tensor: Tensor, index: int) -> ImageList:
-        from safeds.data.image.containers import _MultiSizeImageList
+        from safeds.data.image.containers._multi_size_image_list import _MultiSizeImageList
 
         if index in self._indices_to_tensor_positions:
             raise DuplicateIndexError(index)
@@ -398,7 +398,8 @@ class _SingleSizeImageList(ImageList):
             return image_list_multi
 
     def add_images(self, images: list[Image] | ImageList) -> ImageList:
-        from safeds.data.image.containers import _EmptyImageList, _MultiSizeImageList
+        from safeds.data.image.containers._empty_image_list import _EmptyImageList
+        from safeds.data.image.containers._multi_size_image_list import _MultiSizeImageList
 
         if isinstance(images, _EmptyImageList) or isinstance(images, list) and len(images) == 0:
             return self.clone()
@@ -448,7 +449,7 @@ class _SingleSizeImageList(ImageList):
             return image_list_multi
 
     def remove_image_by_index(self, index: int | list[int]) -> ImageList:
-        from safeds.data.image.containers import _EmptyImageList
+        from safeds.data.image.containers._empty_image_list import _EmptyImageList
 
         if isinstance(index, int):
             index = [index]
@@ -472,7 +473,7 @@ class _SingleSizeImageList(ImageList):
         return image_list
 
     def remove_images_with_size(self, width: int, height: int) -> ImageList:
-        from safeds.data.image.containers import _EmptyImageList
+        from safeds.data.image.containers._empty_image_list import _EmptyImageList
 
         if self.widths[0] == width and self.heights[0] == height:
             return _EmptyImageList()

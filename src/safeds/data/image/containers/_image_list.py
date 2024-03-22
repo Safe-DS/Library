@@ -69,7 +69,9 @@ class ImageList(metaclass=ABCMeta):
         image_list:
             the image list
         """
-        from safeds.data.image.containers import _EmptyImageList, _MultiSizeImageList, _SingleSizeImageList
+        from safeds.data.image.containers._empty_image_list import _EmptyImageList
+        from safeds.data.image.containers._multi_size_image_list import _MultiSizeImageList
+        from safeds.data.image.containers._single_size_image_list import _SingleSizeImageList
 
         if len(images) == 0:
             return _EmptyImageList()
@@ -99,7 +101,9 @@ class ImageList(metaclass=ABCMeta):
         image_list:
             the image list
         """
-        from safeds.data.image.containers import _EmptyImageList, _MultiSizeImageList, _SingleSizeImageList
+        from safeds.data.image.containers._empty_image_list import _EmptyImageList
+        from safeds.data.image.containers._multi_size_image_list import _MultiSizeImageList
+        from safeds.data.image.containers._single_size_image_list import _SingleSizeImageList
 
         if isinstance(path, list) and len(path) == 0:
             return _EmptyImageList()
@@ -220,7 +224,7 @@ class ImageList(metaclass=ABCMeta):
         png:
             the png representation of this image list
         """
-        from safeds.data.image.containers import _EmptyImageList
+        from safeds.data.image.containers._empty_image_list import _EmptyImageList
 
         if isinstance(self, _EmptyImageList):
             raise TypeError("You cannot display an empty ImageList")
@@ -428,7 +432,7 @@ class ImageList(metaclass=ABCMeta):
         ValueError
             if this image list is not a MultiSizeImageList
         """
-        from safeds.data.image.containers import _MultiSizeImageList
+        from safeds.data.image.containers._multi_size_image_list import _MultiSizeImageList
 
         if isinstance(self, _MultiSizeImageList):
             return self
@@ -448,7 +452,7 @@ class ImageList(metaclass=ABCMeta):
         ValueError
             if this image list is not a SingleSizeImageList
         """
-        from safeds.data.image.containers import _SingleSizeImageList
+        from safeds.data.image.containers._single_size_image_list import _SingleSizeImageList
 
         if isinstance(self, _SingleSizeImageList):
             return self
