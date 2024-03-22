@@ -10,9 +10,9 @@ from syrupy import SnapshotAssertion
     ],
     ids=["normal"],
 )
-def test_should_match_snapshot(table: Table, snapshot_png: SnapshotAssertion) -> None:
+def test_should_match_snapshot(table: Table, snapshot_png_image: SnapshotAssertion) -> None:
     correlation_heatmap = table.plot_correlation_heatmap()
-    assert correlation_heatmap == snapshot_png
+    assert correlation_heatmap == snapshot_png_image
 
 
 def test_should_warn_about_empty_table() -> None:

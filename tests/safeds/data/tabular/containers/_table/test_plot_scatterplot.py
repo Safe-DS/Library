@@ -4,10 +4,10 @@ from safeds.exceptions import UnknownColumnNameError
 from syrupy import SnapshotAssertion
 
 
-def test_should_match_snapshot(snapshot_png: SnapshotAssertion) -> None:
+def test_should_match_snapshot(snapshot_png_image: SnapshotAssertion) -> None:
     table = Table({"A": [1, 2, 3], "B": [2, 4, 7]})
     scatterplot = table.plot_scatterplot("A", "B")
-    assert scatterplot == snapshot_png
+    assert scatterplot == snapshot_png_image
 
 
 @pytest.mark.parametrize(

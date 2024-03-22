@@ -1,16 +1,16 @@
 from __future__ import annotations
 
-import sys
 import io
+import sys
 import warnings
 from pathlib import Path
 from typing import TYPE_CHECKING
 
 import torch
-import torch.nn.functional as func
 import xxhash
 from PIL.Image import open as pil_image_open
 from torch import Tensor
+from torchvision.transforms import InterpolationMode
 
 from safeds.config import _get_device
 
@@ -272,11 +272,61 @@ class Image:
     # Transformations
     # ------------------------------------------------------------------------------------------------------------------
 
+    def change_channel(self, channel: int) -> Image:
+        """
+        Return a new `Image` that has the given number of channels.
+
+        The original image is not modified.
+
+        Parameters
+        ----------
+        channel
+            The new number of channels. 1 will result in a grayscale image.
+
+        Returns
+        -------
+        result :
+            The image with the given number of channels.
+        """
+        if self.channel == channel:
+            image_tensor = self._image_tensor
+        elif self.channel == 1 and channel == 3:
+            image_tensor = torch.cat([self._image_tensor, self._image_tensor, self._image_tensor], dim=0)
+        elif self.channel == 1 and channel == 4:
+            image_tensor = torch.cat(
+                [
+                    self._image_tensor,
+                    self._image_tensor,
+                    self._image_tensor,
+                    torch.full(self._image_tensor.size(), 255).to(self.device),
+                ],
+                dim=0,
+            )
+        elif self.channel in (3, 4) and channel == 1:
+            image_tensor = self.convert_to_grayscale()._image_tensor[0:1]
+        elif self.channel == 3 and channel == 4:
+            image_tensor = torch.cat(
+                [self._image_tensor, torch.full(self._image_tensor[0:1].size(), 255).to(self.device)],
+                dim=0,
+            )
+        elif self.channel == 4 and channel == 3:
+            image_tensor = self._image_tensor[0:3]
+        else:
+            raise ValueError(f"Channel {channel} is not a valid channel option. Use either 1, 3 or 4")
+        return Image(image_tensor, device=self._image_tensor.device)
+
     def resize(self, new_width: int, new_height: int) -> Image:
         """
         Return a new `Image` that has been resized to a given size.
 
         The original image is not modified.
+
+        Parameters
+        ----------
+        new_width:
+            the new width of the image
+        new_height:
+            the new height of the image
 
         Returns
         -------
@@ -284,7 +334,7 @@ class Image:
             The image with the given width and height.
         """
         return Image(
-            func.interpolate(self._image_tensor.unsqueeze(dim=1), size=(new_height, new_width)).squeeze(dim=1),
+            func2.resize(self._image_tensor, size=[new_height, new_width], interpolation=InterpolationMode.NEAREST),
             device=self._image_tensor.device,
         )
 
@@ -489,6 +539,11 @@ class Image:
         -------
         image: Image
             The new, adjusted image.
+
+        Raises
+        ------
+        OutOfBoundsError
+            If factor is smaller than 0.
         """
         if factor < 0:
             raise OutOfBoundsError(factor, name="factor", lower_bound=ClosedBound(0))
@@ -525,7 +580,25 @@ class Image:
         -------
         result : Image
             The blurred image.
+
+        Raises
+        ------
+        OutOfBoundsError
+            If radius is smaller than 0 or equal or greater than the smaller size of the image.
         """
+        if radius < 0 or radius >= min(self.width, self.height):
+            raise OutOfBoundsError(
+                radius,
+                name="radius",
+                lower_bound=ClosedBound(0),
+                upper_bound=ClosedBound(min(self.width, self.height) - 1),
+            )
+        elif radius == 0:
+            warnings.warn(
+                "Blur radius is 0, this will not make changes to the image.",
+                UserWarning,
+                stacklevel=2,
+            )
         return Image(func2.gaussian_blur(self._image_tensor, [radius * 2 + 1, radius * 2 + 1]), device=self.device)
 
     def sharpen(self, factor: float) -> Image:
