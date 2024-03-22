@@ -5,7 +5,7 @@ import math
 import os
 from abc import ABCMeta, abstractmethod
 from pathlib import Path
-from typing import TYPE_CHECKING, Sequence
+from typing import TYPE_CHECKING
 
 import torch
 from PIL.Image import open as pil_image_open
@@ -17,6 +17,8 @@ from safeds.data.image.containers import Image
 
 if TYPE_CHECKING:
     from safeds.data.image.containers import _EmptyImageList, _SingleSizeImageList, _MultiSizeImageList
+    from typing import Sequence
+
 
 
 class ImageList(metaclass=ABCMeta):
@@ -62,7 +64,7 @@ class ImageList(metaclass=ABCMeta):
         while len(path_list) != 0:
             p = Path(path_list.pop(0))
             if p.is_dir():
-                path_list += sorted([os.path.join(p, name) for name in os.listdir(p)])
+                path_list += sorted([p / name for name in os.listdir(p)])
             else:
                 image_tensors.append(ImageList._pil_to_tensor(pil_image_open(p)))
                 if fixed_size and (image_tensors[0].size(dim=2) != image_tensors[-1].size(dim=2) or image_tensors[0].size(dim=1) != image_tensors[-1].size(dim=1)):
@@ -105,7 +107,7 @@ class ImageList(metaclass=ABCMeta):
         from safeds.data.image.containers import _EmptyImageList
 
         if isinstance(self, _EmptyImageList):
-            raise ValueError("You cannot display an empty ImageList")
+            raise TypeError("You cannot display an empty ImageList")
 
         max_width, max_height = max(self.widths), max(self.heights)
         tensors = []

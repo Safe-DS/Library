@@ -11,7 +11,10 @@ from safeds.exceptions import IllegalFormatError, OutOfBoundsError
 from syrupy import SnapshotAssertion
 from torch.types import Device
 
-from tests.helpers import *
+from tests.helpers import images_all, images_all_ids, resolve_resource_path, plane_jpg_path, white_square_jpg_path, \
+    white_square_png_path, grayscale_jpg_path, grayscale_png_path, plane_jpg_id, white_square_jpg_id, \
+    white_square_png_id, grayscale_jpg_id, grayscale_png_id, plane_png_path, rgba_png_path, plane_png_id, rgba_png_id, \
+    images_asymmetric, images_asymmetric_ids
 
 _device_cuda = torch.device("cuda")
 _device_cpu = torch.device("cpu")

@@ -126,7 +126,7 @@ class TestAllImageCombinations:
         assert image_list.channel == expected_channel
 
         # Test number_of_sizes
-        assert image_list.number_of_sizes == len(set((image.width, image.height) for image in [image1, image2, image3]))
+        assert image_list.number_of_sizes == len({(image.width, image.height) for image in [image1, image2, image3]})
 
         # Test has_image
         assert image_list.has_image(image1_with_expected_channel)
@@ -152,7 +152,7 @@ class TestAllImageCombinations:
         assert image_list == ImageList.from_images([image1, image2]).add_images([image3])
         assert image_list == ImageList.from_images([image1]).add_images(ImageList.from_images([image2, image3]))
         assert image_list == ImageList.from_images([image1, image2]).add_images(ImageList.from_images([image3]))
-        assert ImageList.from_images([image1, image2, image3] + images_not_included) == image_list.add_images(
+        assert ImageList.from_images([image1, image2, image3, *images_not_included]) == image_list.add_images(
             images_not_included)
         assert image_list == image_list.add_images([])
         assert image_list == image_list.add_images(_EmptyImageList())
@@ -214,7 +214,7 @@ class TestAllImageCombinations:
 
 class TestFromFiles:
 
-    @pytest.mark.parametrize("resource_path", [images_all(), test_images_folder] + images_all(), ids=["all-images", "images_folder"] + images_all_ids())
+    @pytest.mark.parametrize("resource_path", [images_all(), test_images_folder, *images_all()], ids=["all-images", "images_folder", *images_all_ids()])
     def test_from_files_creation(self, resource_path: list[str], snapshot_png_image_list: SnapshotAssertion) -> None:
         torch.set_default_device(torch.device("cpu"))
         image_list = ImageList.from_files(resolve_resource_path(resource_path))
@@ -249,9 +249,7 @@ class TestToJpegFiles:
                              ids=["all-images", "planes"])
     def test_should_raise_if_alpha_channel(self, resource_path: list[str]) -> None:
         image_list = ImageList.from_files(resolve_resource_path(resource_path))
-        with tempfile.TemporaryDirectory() as tmpdir:
-            with pytest.raises(IllegalFormatError,
-                               match="This format is illegal. Use one of the following formats: png"):
+        with tempfile.TemporaryDirectory() as tmpdir, pytest.raises(IllegalFormatError, match="This format is illegal. Use one of the following formats: png"):
                 image_list.to_jpeg_files(tmpdir)
 
     @pytest.mark.parametrize("resource_path", [[grayscale_jpg_path, plane_jpg_path, grayscale_jpg_path, plane_jpg_path, white_square_jpg_path, white_square_jpg_path, plane_jpg_path], [plane_jpg_path, plane_jpg_path], [grayscale_jpg_path, grayscale_jpg_path]],
@@ -730,7 +728,7 @@ class TestEmptyImageList:
         assert _EmptyImageList() is _EmptyImageList().clone()  # Singleton
 
     def test_repr_png(self) -> None:
-        with pytest.raises(ValueError, match=r"You cannot display an empty ImageList"):
+        with pytest.raises(TypeError, match=r"You cannot display an empty ImageList"):
             ImageList.from_images([])._repr_png_()
 
     def test_eq(self) -> None:

@@ -57,12 +57,12 @@ class _SingleSizeImageList(ImageList):
             images_ready_to_concat.append((image.unsqueeze(dim=0), index))
         for image, index in images_with_less_channels:
             if max_channel == 3:  # image channel 1 and max channel 3
-                image = torch.cat([image, image, image], dim=0)
+                image_to_append = torch.cat([image, image, image], dim=0)
             elif image.size(dim=0) == 1:  # image channel 1 and max channel 4
-                image = torch.cat([image, image, image, torch.full(image.size(), 255, device=image.device)], dim=0)
+                image_to_append = torch.cat([image, image, image, torch.full(image.size(), 255, device=image.device)], dim=0)
             else:  # image channel 3 and max channel 4
-                image = torch.cat([image, torch.full(image[0:1].size(), 255, device=image.device)], dim=0)
-            images_ready_to_concat.append((image.unsqueeze(dim=0), index))
+                image_to_append = torch.cat([image, torch.full(image[0:1].size(), 255, device=image.device)], dim=0)
+            images_ready_to_concat.append((image_to_append.unsqueeze(dim=0), index))
         image_list._tensor = torch.cat([image for image, index in images_ready_to_concat])
         image_list._tensor_positions_to_indices = [index for image, index in images_ready_to_concat]
         image_list._indices_to_tensor_positions = image_list._calc_new_indices_to_tensor_positions()
@@ -157,7 +157,7 @@ class _SingleSizeImageList(ImageList):
         else:
             path_str = path
         for index in self._tensor_positions_to_indices:
-            image_path = os.path.join(path_str, str(index) + ".jpg")
+            image_path = Path(path_str) / (str(index) + ".jpg")
             Path(image_path).parent.mkdir(parents=True, exist_ok=True)
             if self.channel == 1:
                 func2.to_pil_image(self._tensor[self._indices_to_tensor_positions[index]], mode="L").save(image_path, format="jpeg")
@@ -182,7 +182,7 @@ class _SingleSizeImageList(ImageList):
         else:
             path_str = path
         for index in self._tensor_positions_to_indices:
-            image_path = os.path.join(path_str, str(index) + ".png")
+            image_path = Path(path_str) / (str(index) + ".png")
             Path(image_path).parent.mkdir(parents=True, exist_ok=True)
             if self.channel == 1:
                 func2.to_pil_image(self._tensor[self._indices_to_tensor_positions[index]], mode="L").save(image_path, format="png")

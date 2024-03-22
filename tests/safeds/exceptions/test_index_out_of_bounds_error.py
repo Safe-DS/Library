@@ -4,7 +4,7 @@ from safeds.exceptions import IndexOutOfBoundsError
 
 
 @pytest.mark.parametrize(
-    ["index", "match"],
+    ("index", "match"),
     [
         (3, r"There is no element at index '3'."),
         ([3], r"There is no element at index '3'."),

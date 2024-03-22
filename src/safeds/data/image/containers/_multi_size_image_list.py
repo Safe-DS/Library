@@ -5,7 +5,6 @@ import functools
 import operator
 import random
 import sys
-from pathlib import Path
 from typing import TYPE_CHECKING
 
 import torch
@@ -17,6 +16,7 @@ from safeds.exceptions import IndexOutOfBoundsError, DuplicateIndexError, Illega
 
 if TYPE_CHECKING:
     from safeds.data.image.containers import _EmptyImageList, _SingleSizeImageList
+    from pathlib import Path
 
 
 class _MultiSizeImageList(ImageList):
@@ -113,7 +113,7 @@ class _MultiSizeImageList(ImageList):
 
     @property
     def channel(self) -> int:
-        return list(self._image_list_dict.values())[0].channel
+        return next(iter(self._image_list_dict.values())).channel
 
     @property
     def number_of_sizes(self) -> int:
@@ -140,7 +140,6 @@ class _MultiSizeImageList(ImageList):
         if isinstance(path, list):
             if len(path) == self.number_of_images:
                 for image_size, image_list in self._image_list_dict.items():
-                    p: str | Path
                     image_list.to_jpeg_files([p for i, p in enumerate(path) if self._indices_to_image_size_dict[i] == image_size])
             elif len(path) == self.number_of_sizes:
                 image_list_path: str | Path
@@ -156,7 +155,6 @@ class _MultiSizeImageList(ImageList):
         if isinstance(path, list):
             if len(path) == self.number_of_images:
                 for image_size, image_list in self._image_list_dict.items():
-                    p: str | Path
                     image_list.to_png_files([p for i, p in enumerate(path) if self._indices_to_image_size_dict[i] == image_size])
             elif len(path) == self.number_of_sizes:
                 image_list_path: str | Path
@@ -283,7 +281,7 @@ class _MultiSizeImageList(ImageList):
         if len(image_list._image_list_dict) == 0:
             return _EmptyImageList()
         elif len(image_list._image_list_dict) == 1:
-            return list(image_list._image_list_dict.values())[0]
+            return next(iter(image_list._image_list_dict.values()))
         else:
             return image_list
 
@@ -291,7 +289,7 @@ class _MultiSizeImageList(ImageList):
         if (width, height) not in self._image_list_dict:
             return self.clone()
         if len(self._image_list_dict) == 2:
-            return self._image_list_dict[[key for key in list(self._image_list_dict.keys()) if key != (width, height)][0]].clone()
+            return self._image_list_dict[next(iter([key for key in list(self._image_list_dict.keys()) if key != (width, height)]))].clone()
 
         image_list = _MultiSizeImageList()
         for image_list_key, image_list_original in self._image_list_dict.items():
