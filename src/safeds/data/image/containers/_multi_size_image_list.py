@@ -12,11 +12,12 @@ import xxhash
 from torch import Tensor
 
 from safeds.data.image.containers import Image, ImageList
-from safeds.exceptions import IndexOutOfBoundsError, DuplicateIndexError, IllegalFormatError
+from safeds.exceptions import DuplicateIndexError, IllegalFormatError, IndexOutOfBoundsError
 
 if TYPE_CHECKING:
-    from safeds.data.image.containers import _EmptyImageList, _SingleSizeImageList
     from pathlib import Path
+
+    from safeds.data.image.containers import _SingleSizeImageList
 
 
 class _MultiSizeImageList(ImageList):
@@ -50,9 +51,16 @@ class _MultiSizeImageList(ImageList):
                 image_index_dict[size].append(index)
                 max_channel = max(max_channel, image.size(dim=-3))
 
-        for size in image_tensor_dict.keys():
-            image_list._image_list_dict[size] = _SingleSizeImageList._create_image_list(image_tensor_dict[size], image_index_dict[size])
-            image_list._indices_to_image_size_dict.update(zip(image_list._image_list_dict[size]._as_single_size_image_list()._indices_to_tensor_positions.keys(), [size] * len(image_list._image_list_dict[size])))
+        for size in image_tensor_dict:
+            image_list._image_list_dict[size] = _SingleSizeImageList._create_image_list(
+                image_tensor_dict[size], image_index_dict[size],
+            )
+            image_list._indices_to_image_size_dict.update(
+                zip(
+                    image_list._image_list_dict[size]._as_single_size_image_list()._indices_to_tensor_positions.keys(),
+                    [size] * len(image_list._image_list_dict[size]), strict=False,
+                ),
+            )
 
         if max_channel > 1:
             image_list = image_list.change_channel(max_channel)._as_multi_size_image_list()
@@ -81,10 +89,22 @@ class _MultiSizeImageList(ImageList):
         return True
 
     def __hash__(self) -> int:
-        return xxhash.xxh3_64(functools.reduce(operator.add, [hash(self._image_list_dict[image_size]).to_bytes(8) for image_size in sorted(self._image_list_dict)])).intdigest()
+        return xxhash.xxh3_64(
+            functools.reduce(
+                operator.add,
+                [hash(self._image_list_dict[image_size]).to_bytes(8) for image_size in sorted(self._image_list_dict)],
+            ),
+        ).intdigest()
 
     def __sizeof__(self) -> int:
-        return sys.getsizeof(self._image_list_dict) + sum(map(sys.getsizeof, self._image_list_dict.keys())) + sum(map(sys.getsizeof, self._image_list_dict.values())) + sys.getsizeof(self._indices_to_image_size_dict) + sum(map(sys.getsizeof, self._indices_to_image_size_dict.keys())) + sum(map(sys.getsizeof, self._indices_to_image_size_dict.values()))
+        return (
+            sys.getsizeof(self._image_list_dict)
+            + sum(map(sys.getsizeof, self._image_list_dict.keys()))
+            + sum(map(sys.getsizeof, self._image_list_dict.values()))
+            + sys.getsizeof(self._indices_to_image_size_dict)
+            + sum(map(sys.getsizeof, self._indices_to_image_size_dict.keys()))
+            + sum(map(sys.getsizeof, self._indices_to_image_size_dict.values()))
+        )
 
     @property
     def number_of_images(self) -> int:
@@ -132,7 +152,9 @@ class _MultiSizeImageList(ImageList):
         return indices
 
     def has_image(self, image: Image) -> bool:
-        return (image.width, image.height) in self._image_list_dict and self._image_list_dict[(image.width, image.height)].has_image(image)
+        return (image.width, image.height) in self._image_list_dict and self._image_list_dict[
+            (image.width, image.height)
+        ].has_image(image)
 
     def to_jpeg_files(self, path: str | Path | list[str | Path]) -> None:
         if self.channel == 4:
@@ -140,13 +162,17 @@ class _MultiSizeImageList(ImageList):
         if isinstance(path, list):
             if len(path) == self.number_of_images:
                 for image_size, image_list in self._image_list_dict.items():
-                    image_list.to_jpeg_files([p for i, p in enumerate(path) if self._indices_to_image_size_dict[i] == image_size])
+                    image_list.to_jpeg_files(
+                        [p for i, p in enumerate(path) if self._indices_to_image_size_dict[i] == image_size],
+                    )
             elif len(path) == self.number_of_sizes:
                 image_list_path: str | Path
-                for image_list_path, image_list in zip(path, self._image_list_dict.values()):
+                for image_list_path, image_list in zip(path, self._image_list_dict.values(), strict=False):
                     image_list.to_jpeg_files(image_list_path)
             else:
-                raise ValueError("The path specified is invalid. Please provide either the path to a directory, a list of paths with one path for each image, or a list of paths with one path per image size.")
+                raise ValueError(
+                    "The path specified is invalid. Please provide either the path to a directory, a list of paths with one path for each image, or a list of paths with one path per image size.",
+                )
         else:
             for image_list in self._image_list_dict.values():
                 image_list.to_jpeg_files(path)
@@ -155,13 +181,17 @@ class _MultiSizeImageList(ImageList):
         if isinstance(path, list):
             if len(path) == self.number_of_images:
                 for image_size, image_list in self._image_list_dict.items():
-                    image_list.to_png_files([p for i, p in enumerate(path) if self._indices_to_image_size_dict[i] == image_size])
+                    image_list.to_png_files(
+                        [p for i, p in enumerate(path) if self._indices_to_image_size_dict[i] == image_size],
+                    )
             elif len(path) == self.number_of_sizes:
                 image_list_path: str | Path
-                for image_list_path, image_list in zip(path, self._image_list_dict.values()):
+                for image_list_path, image_list in zip(path, self._image_list_dict.values(), strict=False):
                     image_list.to_png_files(image_list_path)
             else:
-                raise ValueError("The path specified is invalid. Please provide either the path to a directory, a list of paths with one path for each image, or a list of paths with one path per image size.")
+                raise ValueError(
+                    "The path specified is invalid. Please provide either the path to a directory, a list of paths with one path for each image, or a list of paths with one path per image size.",
+                )
         else:
             for image_list in self._image_list_dict.values():
                 image_list.to_png_files(path)
@@ -203,7 +233,9 @@ class _MultiSizeImageList(ImageList):
             image_list._image_list_dict[size] = _SingleSizeImageList._create_image_list([image_tensor], [index])
 
         if image_tensor.size(dim=0) != self.channel:
-            image_list = image_list.change_channel(max(image_tensor.size(dim=0), self.channel))._as_multi_size_image_list()
+            image_list = image_list.change_channel(
+                max(image_tensor.size(dim=0), self.channel),
+            )._as_multi_size_image_list()
 
         return image_list
 
@@ -220,11 +252,16 @@ class _MultiSizeImageList(ImageList):
         if isinstance(images, ImageList):
             if images.number_of_sizes == 1:
                 image_list_with_size[(images.widths[0], images.heights[0])] = images._as_single_size_image_list()
-                indices_for_images_with_size[(images.widths[0], images.heights[0])] = [index + current_index for index in images._as_single_size_image_list()._tensor_positions_to_indices]
+                indices_for_images_with_size[(images.widths[0], images.heights[0])] = [
+                    index + current_index for index in images._as_single_size_image_list()._tensor_positions_to_indices
+                ]
             else:
                 for size, im_list in images._as_multi_size_image_list()._image_list_dict.items():
                     image_list_with_size[size] = im_list._as_single_size_image_list()
-                    indices_for_images_with_size[size] = [index + current_index for index in im_list._as_single_size_image_list()._tensor_positions_to_indices]
+                    indices_for_images_with_size[size] = [
+                        index + current_index
+                        for index in im_list._as_single_size_image_list()._tensor_positions_to_indices
+                    ]
         else:
             for image in images:
                 size = (image.width, image.height)
@@ -244,20 +281,31 @@ class _MultiSizeImageList(ImageList):
                     ims_tensors = [im._image_tensor for im in ims.to_images()]
                 else:
                     ims_tensors = [im._image_tensor for im in ims]
-                image_list._image_list_dict[size] = _SingleSizeImageList._create_image_list([im._image_tensor for im in image_list._image_list_dict[size].to_images()] + ims_tensors, image_list._image_list_dict[size]._as_single_size_image_list()._tensor_positions_to_indices + new_indices)
+                image_list._image_list_dict[size] = _SingleSizeImageList._create_image_list(
+                    [im._image_tensor for im in image_list._image_list_dict[size].to_images()] + ims_tensors,
+                    image_list._image_list_dict[size]._as_single_size_image_list()._tensor_positions_to_indices
+                    + new_indices,
+                )
+            elif isinstance(ims, _SingleSizeImageList):
+                if smallest_channel > ims.channel:
+                    smallest_channel = ims.channel
+                fixed_ims = ims.clone()._as_single_size_image_list()
+                old_indices = list(fixed_ims._indices_to_tensor_positions.items())
+                fixed_ims._tensor_positions_to_indices = [
+                    new_indices[i]
+                    for i in sorted(
+                        range(len(new_indices)),
+                        key=sorted(range(len(new_indices)), key=old_indices.__getitem__).__getitem__,
+                    )
+                ]
+                fixed_ims._calc_new_indices_to_tensor_positions()
+                image_list._image_list_dict[size] = fixed_ims
             else:
-                if isinstance(ims, _SingleSizeImageList):
-                    if smallest_channel > ims.channel:
-                        smallest_channel = ims.channel
-                    fixed_ims = ims.clone()._as_single_size_image_list()
-                    old_indices = list(fixed_ims._indices_to_tensor_positions.items())
-                    fixed_ims._tensor_positions_to_indices = [new_indices[i] for i in sorted(range(len(new_indices)), key=sorted(range(len(new_indices)), key=old_indices.__getitem__).__getitem__)]
-                    fixed_ims._calc_new_indices_to_tensor_positions()
-                    image_list._image_list_dict[size] = fixed_ims
-                else:
-                    image_list._image_list_dict[size] = _SingleSizeImageList._create_image_list([im._image_tensor for im in ims], new_indices)
-                    if smallest_channel > image_list._image_list_dict[size].channel:
-                        smallest_channel = image_list._image_list_dict[size].channel
+                image_list._image_list_dict[size] = _SingleSizeImageList._create_image_list(
+                    [im._image_tensor for im in ims], new_indices,
+                )
+                if smallest_channel > image_list._image_list_dict[size].channel:
+                    smallest_channel = image_list._image_list_dict[size].channel
             for i in new_indices:
                 image_list._indices_to_image_size_dict[i] = size
             max_channel = max(max_channel, image_list._image_list_dict[size].channel)
@@ -289,7 +337,9 @@ class _MultiSizeImageList(ImageList):
         if (width, height) not in self._image_list_dict:
             return self.clone()
         if len(self._image_list_dict) == 2:
-            return self._image_list_dict[next(iter([key for key in list(self._image_list_dict.keys()) if key != (width, height)]))].clone()
+            return self._image_list_dict[
+                next(iter([key for key in list(self._image_list_dict.keys()) if key != (width, height)]))
+            ].clone()
 
         image_list = _MultiSizeImageList()
         for image_list_key, image_list_original in self._image_list_dict.items():
@@ -305,12 +355,21 @@ class _MultiSizeImageList(ImageList):
         indices_to_remove = []
         for image_list_key, image_list_original in self._image_list_dict.items():
             image_list_duplicates_removed = image_list_original.remove_duplicate_images()
-            indices_to_remove += [index for index in image_list_original._as_single_size_image_list()._tensor_positions_to_indices if index not in image_list_duplicates_removed._as_single_size_image_list()._tensor_positions_to_indices]
+            indices_to_remove += [
+                index
+                for index in image_list_original._as_single_size_image_list()._tensor_positions_to_indices
+                if index not in image_list_duplicates_removed._as_single_size_image_list()._tensor_positions_to_indices
+            ]
             image_list._image_list_dict[image_list_key] = image_list_duplicates_removed
         for index_rem in indices_to_remove:
             for image_list_duplicates_removed in image_list._image_list_dict.values():
-                image_list_duplicates_removed._as_single_size_image_list()._tensor_positions_to_indices = [index - 1 if index > index_rem else index for index in image_list_duplicates_removed._as_single_size_image_list()._tensor_positions_to_indices]
-                image_list_duplicates_removed._as_single_size_image_list()._indices_to_tensor_positions = image_list_duplicates_removed._as_single_size_image_list()._calc_new_indices_to_tensor_positions()
+                image_list_duplicates_removed._as_single_size_image_list()._tensor_positions_to_indices = [
+                    index - 1 if index > index_rem else index
+                    for index in image_list_duplicates_removed._as_single_size_image_list()._tensor_positions_to_indices
+                ]
+                image_list_duplicates_removed._as_single_size_image_list()._indices_to_tensor_positions = (
+                    image_list_duplicates_removed._as_single_size_image_list()._calc_new_indices_to_tensor_positions()
+                )
         next_index = 0
         for index_key, index_value in sorted(self._indices_to_image_size_dict.items()):
             if index_key not in indices_to_remove:
@@ -325,10 +384,12 @@ class _MultiSizeImageList(ImageList):
         current_index = 0
         for image_list_key, image_list_original in self._image_list_dict.items():
             new_image_list = image_list_original.clone()._as_single_size_image_list()
-            new_image_list._tensor_positions_to_indices = new_indices[current_index:current_index + len(image_list_original)]
+            new_image_list._tensor_positions_to_indices = new_indices[
+                current_index : current_index + len(image_list_original)
+            ]
             new_image_list._indices_to_tensor_positions = new_image_list._calc_new_indices_to_tensor_positions()
             image_list._image_list_dict[image_list_key] = new_image_list
-            for i in new_indices[current_index:current_index + len(image_list_original)]:
+            for i in new_indices[current_index : current_index + len(image_list_original)]:
                 image_list._indices_to_image_size_dict[i] = image_list_key
             current_index += len(image_list_original)
         return image_list

@@ -5,11 +5,12 @@ from typing import TYPE_CHECKING, Self
 
 if TYPE_CHECKING:
     from pathlib import Path
+
     from torch import Tensor
 
 import xxhash
 
-from safeds.data.image.containers import ImageList, Image, _SingleSizeImageList
+from safeds.data.image.containers import Image, ImageList, _SingleSizeImageList
 from safeds.exceptions import IndexOutOfBoundsError
 
 
@@ -19,7 +20,11 @@ class _EmptyImageList(ImageList):
 
     @staticmethod
     def _warn_empty_image_list() -> None:
-        warnings.warn("You are using an empty ImageList. This method changes nothing if used on an empty ImageList.", UserWarning, stacklevel=2)
+        warnings.warn(
+            "You are using an empty ImageList. This method changes nothing if used on an empty ImageList.",
+            UserWarning,
+            stacklevel=2,
+        )
 
     def __new__(cls) -> Self:
         if cls._instance is None:
@@ -75,11 +80,9 @@ class _EmptyImageList(ImageList):
 
     def to_jpeg_files(self, _path: str | Path | list[str | Path]) -> None:
         warnings.warn("You are using an empty ImageList. No files will be saved.", UserWarning, stacklevel=2)
-        return
 
     def to_png_files(self, _path: str | Path | list[str | Path]) -> None:
         warnings.warn("You are using an empty ImageList. No files will be saved.", UserWarning, stacklevel=2)
-        return
 
     def to_images(self, _indices: list[int] | None = None) -> list[Image]:
         return []
@@ -169,4 +172,3 @@ class _EmptyImageList(ImageList):
     def find_edges(self) -> ImageList:
         _EmptyImageList._warn_empty_image_list()
         return _EmptyImageList()
-

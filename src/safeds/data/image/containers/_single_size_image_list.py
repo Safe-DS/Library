@@ -3,7 +3,6 @@ from __future__ import annotations
 import copy
 import functools
 import operator
-import os.path
 import random
 import sys
 import warnings
@@ -18,11 +17,16 @@ from torchvision.transforms.v2 import functional as func2
 from torchvision.utils import save_image
 
 from safeds.data.image.containers import Image, ImageList
-from safeds.exceptions import DuplicateIndexError, IndexOutOfBoundsError, OutOfBoundsError, ClosedBound, \
-    IllegalFormatError
+from safeds.exceptions import (
+    ClosedBound,
+    DuplicateIndexError,
+    IllegalFormatError,
+    IndexOutOfBoundsError,
+    OutOfBoundsError,
+)
 
 if TYPE_CHECKING:
-    from safeds.data.image.containers import _EmptyImageList, _MultiSizeImageList
+    from safeds.data.image.containers import _MultiSizeImageList
 
 
 class _SingleSizeImageList(ImageList):
@@ -44,7 +48,7 @@ class _SingleSizeImageList(ImageList):
         images_with_correct_channel: list[tuple[Tensor, int]] = []
         images_with_less_channels: list[tuple[Tensor, int]] = []
         max_channel = 0
-        for image, index in zip(images, indices):
+        for image, index in zip(images, indices, strict=False):
             if max_channel < image.size(dim=-3):  # all images have to increase their channel
                 images_with_less_channels += images_with_correct_channel
                 images_with_correct_channel = [(image, index)]
@@ -59,7 +63,9 @@ class _SingleSizeImageList(ImageList):
             if max_channel == 3:  # image channel 1 and max channel 3
                 image_to_append = torch.cat([image, image, image], dim=0)
             elif image.size(dim=0) == 1:  # image channel 1 and max channel 4
-                image_to_append = torch.cat([image, image, image, torch.full(image.size(), 255, device=image.device)], dim=0)
+                image_to_append = torch.cat(
+                    [image, image, image, torch.full(image.size(), 255, device=image.device)], dim=0,
+                )
             else:  # image channel 3 and max channel 4
                 image_to_append = torch.cat([image, torch.full(image[0:1].size(), 255, device=image.device)], dim=0)
             images_ready_to_concat.append((image_to_append.unsqueeze(dim=0), index))
@@ -95,14 +101,39 @@ class _SingleSizeImageList(ImageList):
             self._tensor.size() == other._tensor.size()
             and set(self._tensor_positions_to_indices) == set(self._tensor_positions_to_indices)
             and set(self._indices_to_tensor_positions) == set(self._indices_to_tensor_positions)
-            and torch.all(torch.eq(self._tensor[torch.tensor(self._tensor_positions_to_indices).argsort()], other._tensor[torch.tensor(other._tensor_positions_to_indices).argsort()])).item()
+            and torch.all(
+                torch.eq(
+                    self._tensor[torch.tensor(self._tensor_positions_to_indices).argsort()],
+                    other._tensor[torch.tensor(other._tensor_positions_to_indices).argsort()],
+                ),
+            ).item()
         )
 
     def __hash__(self) -> int:
-        return xxhash.xxh3_64(self.widths[0].to_bytes(8) + self.heights[0].to_bytes(8) + self.channel.to_bytes(8) + self.number_of_images.to_bytes(8) + functools.reduce(operator.add, [xxhash.xxh3_64(index.to_bytes(8)).intdigest().to_bytes(8) for index in sorted(self._tensor_positions_to_indices)])).intdigest()
+        return xxhash.xxh3_64(
+            self.widths[0].to_bytes(8)
+            + self.heights[0].to_bytes(8)
+            + self.channel.to_bytes(8)
+            + self.number_of_images.to_bytes(8)
+            + functools.reduce(
+                operator.add,
+                [
+                    xxhash.xxh3_64(index.to_bytes(8)).intdigest().to_bytes(8)
+                    for index in sorted(self._tensor_positions_to_indices)
+                ],
+            ),
+        ).intdigest()
 
     def __sizeof__(self) -> int:
-        return sys.getsizeof(self._tensor) + self._tensor.element_size() * self._tensor.nelement() + sum(map(sys.getsizeof, self._tensor_positions_to_indices)) + sys.getsizeof(self._tensor_positions_to_indices) + sum(map(sys.getsizeof, self._indices_to_tensor_positions.keys())) + sum(map(sys.getsizeof, self._indices_to_tensor_positions.values())) + sys.getsizeof(self._indices_to_tensor_positions)
+        return (
+            sys.getsizeof(self._tensor)
+            + self._tensor.element_size() * self._tensor.nelement()
+            + sum(map(sys.getsizeof, self._tensor_positions_to_indices))
+            + sys.getsizeof(self._tensor_positions_to_indices)
+            + sum(map(sys.getsizeof, self._indices_to_tensor_positions.keys()))
+            + sum(map(sys.getsizeof, self._indices_to_tensor_positions.values()))
+            + sys.getsizeof(self._indices_to_tensor_positions)
+        )
 
     @property
     def number_of_images(self) -> int:
@@ -132,10 +163,16 @@ class _SingleSizeImageList(ImageList):
     def index(self, image: Image) -> list[int]:
         if image not in self:
             return []
-        return [self._tensor_positions_to_indices[i] for i in (image._image_tensor == self._tensor).all(dim=[1, 2, 3]).nonzero()]
+        return [
+            self._tensor_positions_to_indices[i]
+            for i in (image._image_tensor == self._tensor).all(dim=[1, 2, 3]).nonzero()
+        ]
 
     def has_image(self, image: Image) -> bool:
-        return not (image.width != self.widths[0] or image.height != self.heights[0] or image.channel != self.channel) and image._image_tensor in self._tensor
+        return (
+            not (image.width != self.widths[0] or image.height != self.heights[0] or image.channel != self.channel)
+            and image._image_tensor in self._tensor
+        )
 
     def to_jpeg_files(self, path: str | Path | list[str | Path]) -> None:
         if self.channel == 4:
@@ -143,51 +180,79 @@ class _SingleSizeImageList(ImageList):
         path_str: str | Path
         if isinstance(path, list):
             if len(path) == self.number_of_images:
-                for image_path, index in zip(path, sorted(self._tensor_positions_to_indices)):
+                for image_path, index in zip(path, sorted(self._tensor_positions_to_indices), strict=False):
                     Path(image_path).parent.mkdir(parents=True, exist_ok=True)
                     if self.channel == 1:
-                        func2.to_pil_image(self._tensor[self._indices_to_tensor_positions[index]], mode="L").save(image_path, format="jpeg")
+                        func2.to_pil_image(self._tensor[self._indices_to_tensor_positions[index]], mode="L").save(
+                            image_path, format="jpeg",
+                        )
                     else:
-                        save_image(self._tensor[self._indices_to_tensor_positions[index]].to(torch.float32) / 255, image_path, format="jpeg")
+                        save_image(
+                            self._tensor[self._indices_to_tensor_positions[index]].to(torch.float32) / 255,
+                            image_path,
+                            format="jpeg",
+                        )
                 return
             elif len(path) == 1:
                 path_str = path[0]
             else:
-                raise ValueError("The path specified is invalid. Please provide either the path to a directory, a list of paths with one path for each image, or a list of paths with one path per image size.")
+                raise ValueError(
+                    "The path specified is invalid. Please provide either the path to a directory, a list of paths with one path for each image, or a list of paths with one path per image size.",
+                )
         else:
             path_str = path
         for index in self._tensor_positions_to_indices:
             image_path = Path(path_str) / (str(index) + ".jpg")
             Path(image_path).parent.mkdir(parents=True, exist_ok=True)
             if self.channel == 1:
-                func2.to_pil_image(self._tensor[self._indices_to_tensor_positions[index]], mode="L").save(image_path, format="jpeg")
+                func2.to_pil_image(self._tensor[self._indices_to_tensor_positions[index]], mode="L").save(
+                    image_path, format="jpeg",
+                )
             else:
-                save_image(self._tensor[self._indices_to_tensor_positions[index]].to(torch.float32) / 255, image_path, format="jpeg")
+                save_image(
+                    self._tensor[self._indices_to_tensor_positions[index]].to(torch.float32) / 255,
+                    image_path,
+                    format="jpeg",
+                )
 
     def to_png_files(self, path: str | Path | list[str | Path]) -> None:
         path_str: str | Path
         if isinstance(path, list):
             if len(path) == self.number_of_images:
-                for image_path, index in zip(path, sorted(self._tensor_positions_to_indices)):
+                for image_path, index in zip(path, sorted(self._tensor_positions_to_indices), strict=False):
                     Path(image_path).parent.mkdir(parents=True, exist_ok=True)
                     if self.channel == 1:
-                        func2.to_pil_image(self._tensor[self._indices_to_tensor_positions[index]], mode="L").save(image_path, format="png")
+                        func2.to_pil_image(self._tensor[self._indices_to_tensor_positions[index]], mode="L").save(
+                            image_path, format="png",
+                        )
                     else:
-                        save_image(self._tensor[self._indices_to_tensor_positions[index]].to(torch.float32) / 255, image_path, format="png")
+                        save_image(
+                            self._tensor[self._indices_to_tensor_positions[index]].to(torch.float32) / 255,
+                            image_path,
+                            format="png",
+                        )
                 return
             elif len(path) == 1:
                 path_str = path[0]
             else:
-                raise ValueError("The path specified is invalid. Please provide either the path to a directory, a list of paths with one path for each image, or a list of paths with one path per image size.")
+                raise ValueError(
+                    "The path specified is invalid. Please provide either the path to a directory, a list of paths with one path for each image, or a list of paths with one path per image size.",
+                )
         else:
             path_str = path
         for index in self._tensor_positions_to_indices:
             image_path = Path(path_str) / (str(index) + ".png")
             Path(image_path).parent.mkdir(parents=True, exist_ok=True)
             if self.channel == 1:
-                func2.to_pil_image(self._tensor[self._indices_to_tensor_positions[index]], mode="L").save(image_path, format="png")
+                func2.to_pil_image(self._tensor[self._indices_to_tensor_positions[index]], mode="L").save(
+                    image_path, format="png",
+                )
             else:
-                save_image(self._tensor[self._indices_to_tensor_positions[index]].to(torch.float32) / 255, image_path, format="png")
+                save_image(
+                    self._tensor[self._indices_to_tensor_positions[index]].to(torch.float32) / 255,
+                    image_path,
+                    format="png",
+                )
 
     def to_images(self, indices: list[int] | None = None) -> list[Image]:
         if indices is None:
@@ -229,7 +294,9 @@ class _SingleSizeImageList(ImageList):
         if index in self._indices_to_tensor_positions:
             raise DuplicateIndexError(index)
 
-        if self._tensor.size(dim=2) == image_tensor.size(dim=1) and self._tensor.size(dim=3) == image_tensor.size(dim=2):
+        if self._tensor.size(dim=2) == image_tensor.size(dim=1) and self._tensor.size(dim=3) == image_tensor.size(
+            dim=2,
+        ):
             image_list_single: _SingleSizeImageList = self._clone_without_tensor()
             if image_tensor.size(dim=0) > self.channel:
                 tensor = self.change_channel(image_tensor.size(dim=0))._as_single_size_image_list()._tensor
@@ -237,11 +304,21 @@ class _SingleSizeImageList(ImageList):
                 tensor = self._tensor
             if image_tensor.size(dim=0) < tensor.size(dim=1):
                 if tensor.size(dim=1) == 3:
-                    image_list_single._tensor = torch.cat([tensor, torch.cat([image_tensor, image_tensor, image_tensor], dim=0).unsqueeze(dim=0)])
+                    image_list_single._tensor = torch.cat(
+                        [tensor, torch.cat([image_tensor, image_tensor, image_tensor], dim=0).unsqueeze(dim=0)],
+                    )
                 elif image_tensor.size(dim=0) == 1:
-                    image_list_single._tensor = torch.cat([tensor, torch.cat([image_tensor, image_tensor, image_tensor, torch.full(image_tensor.size(), 255)], dim=0).unsqueeze(dim=0)])
+                    image_list_single._tensor = torch.cat([
+                        tensor,
+                        torch.cat(
+                            [image_tensor, image_tensor, image_tensor, torch.full(image_tensor.size(), 255)], dim=0,
+                        ).unsqueeze(dim=0),
+                    ])
                 else:
-                    image_list_single._tensor = torch.cat([tensor, torch.cat([image_tensor, torch.full(image_tensor[0:1].size(), 255)], dim=0).unsqueeze(dim=0)])
+                    image_list_single._tensor = torch.cat([
+                        tensor,
+                        torch.cat([image_tensor, torch.full(image_tensor[0:1].size(), 255)], dim=0).unsqueeze(dim=0),
+                    ])
             else:
                 image_list_single._tensor = torch.cat([tensor, image_tensor.unsqueeze(dim=0)])
             image_list_single._tensor_positions_to_indices.append(index)
@@ -251,10 +328,14 @@ class _SingleSizeImageList(ImageList):
         else:
             image_list_multi: _MultiSizeImageList = _MultiSizeImageList()
             image_list_multi._image_list_dict[(self.widths[0], self.heights[0])] = self.clone()
-            image_list_multi._image_list_dict[(image_tensor.size(dim=2), image_tensor.size(dim=1))] = _SingleSizeImageList._create_image_list([image_tensor], [index])
+            image_list_multi._image_list_dict[(image_tensor.size(dim=2), image_tensor.size(dim=1))] = (
+                _SingleSizeImageList._create_image_list([image_tensor], [index])
+            )
 
             if image_tensor.size(dim=0) != self.channel:
-                image_list_multi = image_list_multi.change_channel(max(image_tensor.size(dim=0), self.channel))._as_multi_size_image_list()
+                image_list_multi = image_list_multi.change_channel(
+                    max(image_tensor.size(dim=0), self.channel),
+                )._as_multi_size_image_list()
             for index in self._tensor_positions_to_indices:
                 image_list_multi._indices_to_image_size_dict[index] = (self.widths[0], self.heights[0])
             image_list_multi._indices_to_image_size_dict[index] = (image_tensor.size(dim=2), image_tensor.size(dim=1))
@@ -282,9 +363,13 @@ class _SingleSizeImageList(ImageList):
             image_list_single: _SingleSizeImageList = self._clone_without_tensor()._as_single_size_image_list()
             image_list_single._tensor_positions_to_indices += new_indices
             if self.channel > images.channel:
-                image_list_single._tensor = torch.cat([self._tensor, _SingleSizeImageList._change_channel_of_tensor(images._tensor, self.channel)])
+                image_list_single._tensor = torch.cat(
+                    [self._tensor, _SingleSizeImageList._change_channel_of_tensor(images._tensor, self.channel)],
+                )
             elif self.channel < images.channel:
-                image_list_single._tensor = torch.cat([_SingleSizeImageList._change_channel_of_tensor(self._tensor, images.channel), images._tensor])
+                image_list_single._tensor = torch.cat(
+                    [_SingleSizeImageList._change_channel_of_tensor(self._tensor, images.channel), images._tensor],
+                )
             else:
                 image_list_single._tensor = torch.cat([self._tensor, images._tensor])
             image_list_single._indices_to_tensor_positions = image_list_single._calc_new_indices_to_tensor_positions()
@@ -296,10 +381,15 @@ class _SingleSizeImageList(ImageList):
             for index in self._tensor_positions_to_indices:
                 image_list_multi._indices_to_image_size_dict[index] = (self.widths[0], self.heights[0])
             for index in images._tensor_positions_to_indices:
-                image_list_multi._indices_to_image_size_dict[index + first_new_index] = (images.widths[0], images.heights[0])
+                image_list_multi._indices_to_image_size_dict[index + first_new_index] = (
+                    images.widths[0],
+                    images.heights[0],
+                )
 
             if images.channel != self.channel:
-                image_list_multi = image_list_multi.change_channel(max(images.channel, self.channel))._as_multi_size_image_list()
+                image_list_multi = image_list_multi.change_channel(
+                    max(images.channel, self.channel),
+                )._as_multi_size_image_list()
             return image_list_multi
 
     def remove_image_by_index(self, index: int | list[int]) -> ImageList:
@@ -317,8 +407,12 @@ class _SingleSizeImageList(ImageList):
             return _EmptyImageList()
 
         image_list = _SingleSizeImageList()
-        image_list._tensor = self._tensor[[i for i, v in enumerate(self._tensor_positions_to_indices) if v not in index]].clone()
-        image_list._tensor_positions_to_indices = [i - len([k for k in index if k < i]) for i in self._tensor_positions_to_indices if i not in index]
+        image_list._tensor = self._tensor[
+            [i for i, v in enumerate(self._tensor_positions_to_indices) if v not in index]
+        ].clone()
+        image_list._tensor_positions_to_indices = [
+            i - len([k for k in index if k < i]) for i in self._tensor_positions_to_indices if i not in index
+        ]
         image_list._indices_to_tensor_positions = image_list._calc_new_indices_to_tensor_positions()
         return image_list
 
@@ -332,13 +426,19 @@ class _SingleSizeImageList(ImageList):
 
     def remove_duplicate_images(self) -> ImageList:
         image_list = _SingleSizeImageList()
-        tensor_cpu_unique, new_indices = self._tensor.cpu().unique(dim=0, return_inverse=True)  # Works somehow faster on cpu
+        tensor_cpu_unique, new_indices = self._tensor.cpu().unique(
+            dim=0, return_inverse=True,
+        )  # Works somehow faster on cpu
         image_list._tensor = tensor_cpu_unique.to(self._tensor.device)
         indices, indices_to_remove = [], []
         offset_indices: list[int] = []
         for index_n, index_v in enumerate(new_indices):
             if list(new_indices).index(index_v) == index_n:
-                indices.append(self._tensor_positions_to_indices[index_v + len([offset for offset in offset_indices if index_v > offset])])
+                indices.append(
+                    self._tensor_positions_to_indices[
+                        index_v + len([offset for offset in offset_indices if index_v > offset])
+                    ],
+                )
             else:
                 offset_indices.append(index_v)
         indices_to_remove = [index_rem for index_rem in self._tensor_positions_to_indices if index_rem not in indices]
@@ -356,7 +456,9 @@ class _SingleSizeImageList(ImageList):
 
     def resize(self, new_width: int, new_height: int) -> ImageList:
         image_list = self._clone_without_tensor()
-        image_list._tensor = func2.resize(self._tensor, size=[new_height, new_width], interpolation=InterpolationMode.NEAREST)
+        image_list._tensor = func2.resize(
+            self._tensor, size=[new_height, new_width], interpolation=InterpolationMode.NEAREST,
+        )
         return image_list
 
     def convert_to_grayscale(self) -> ImageList:
@@ -367,7 +469,9 @@ class _SingleSizeImageList(ImageList):
     @staticmethod
     def _convert_tensor_to_grayscale(tensor: Tensor) -> Tensor:
         if tensor.size(dim=-3) == 4:
-            return torch.cat([func2.rgb_to_grayscale(tensor[:, 0:3], num_output_channels=3), tensor[:, 3].unsqueeze(dim=1)], dim=1)
+            return torch.cat(
+                [func2.rgb_to_grayscale(tensor[:, 0:3], num_output_channels=3), tensor[:, 3].unsqueeze(dim=1)], dim=1,
+            )
         else:
             return func2.rgb_to_grayscale(tensor[:, 0:3], num_output_channels=3)
 
@@ -397,7 +501,10 @@ class _SingleSizeImageList(ImageList):
             )
         image_list = self._clone_without_tensor()
         if self.channel == 4:
-            image_list._tensor = torch.cat([func2.adjust_brightness(self._tensor[:, 0:3], factor * 1.0), self._tensor[:, 3].unsqueeze(dim=1)], dim=1)
+            image_list._tensor = torch.cat(
+                [func2.adjust_brightness(self._tensor[:, 0:3], factor * 1.0), self._tensor[:, 3].unsqueeze(dim=1)],
+                dim=1,
+            )
         else:
             image_list._tensor = func2.adjust_brightness(self._tensor, factor * 1.0)
         return image_list
@@ -420,7 +527,9 @@ class _SingleSizeImageList(ImageList):
             )
         image_list = self._clone_without_tensor()
         if self.channel == 4:
-            image_list._tensor = torch.cat([func2.adjust_contrast(self._tensor[:, 0:3], factor * 1.0), self._tensor[:, 3].unsqueeze(dim=1)], dim=1)
+            image_list._tensor = torch.cat(
+                [func2.adjust_contrast(self._tensor[:, 0:3], factor * 1.0), self._tensor[:, 3].unsqueeze(dim=1)], dim=1,
+            )
         else:
             image_list._tensor = func2.adjust_contrast(self._tensor, factor * 1.0)
         return image_list
@@ -441,7 +550,9 @@ class _SingleSizeImageList(ImageList):
                 stacklevel=2,
             )
         image_list = self._clone_without_tensor()
-        image_list._tensor = self.convert_to_grayscale()._as_single_size_image_list()._tensor * (1.0 - factor * 1.0) + self._tensor * (factor * 1.0)
+        image_list._tensor = self.convert_to_grayscale()._as_single_size_image_list()._tensor * (
+            1.0 - factor * 1.0
+        ) + self._tensor * (factor * 1.0)
         return image_list
 
     def blur(self, radius: int) -> ImageList:
@@ -460,7 +571,9 @@ class _SingleSizeImageList(ImageList):
             )
         image_list = self._clone_without_tensor()
         if self.channel == 4:
-            image_list._tensor = torch.cat([func2.adjust_sharpness(self._tensor[:, 0:3], factor * 1.0), self._tensor[:, 3].unsqueeze(dim=1)], dim=1)
+            image_list._tensor = torch.cat(
+                [func2.adjust_sharpness(self._tensor[:, 0:3], factor * 1.0), self._tensor[:, 3].unsqueeze(dim=1)], dim=1,
+            )
         else:
             image_list._tensor = func2.adjust_sharpness(self._tensor, factor * 1.0)
         return image_list
@@ -468,7 +581,9 @@ class _SingleSizeImageList(ImageList):
     def invert_colors(self) -> ImageList:
         image_list = self._clone_without_tensor()
         if self.channel == 4:
-            image_list._tensor = torch.cat([func2.invert(self._tensor[:, 0:3]), self._tensor[:, 3].unsqueeze(dim=1)], dim=1)
+            image_list._tensor = torch.cat(
+                [func2.invert(self._tensor[:, 0:3]), self._tensor[:, 3].unsqueeze(dim=1)], dim=1,
+            )
         else:
             image_list._tensor = func2.invert(self._tensor)
         return image_list
@@ -484,9 +599,7 @@ class _SingleSizeImageList(ImageList):
         return image_list
 
     def find_edges(self) -> ImageList:
-        kernel = (
-            Image._FILTER_EDGES_KERNEL.to("cpu")
-        )
+        kernel = Image._FILTER_EDGES_KERNEL.to("cpu")
         edges_tensor = torch.clamp(
             torch.nn.functional.conv2d(
                 self.convert_to_grayscale()._as_single_size_image_list()._tensor.float()[:, 0].unsqueeze(dim=1),
@@ -500,7 +613,9 @@ class _SingleSizeImageList(ImageList):
         if self.channel == 3:
             image_list._tensor = edges_tensor.repeat(1, 3, 1, 1)
         elif self.channel == 4:
-            image_list._tensor = torch.cat([edges_tensor.repeat(1, 3, 1, 1), self._tensor[:, 3].unsqueeze(dim=1)], dim=1)
+            image_list._tensor = torch.cat(
+                [edges_tensor.repeat(1, 3, 1, 1), self._tensor[:, 3].unsqueeze(dim=1)], dim=1,
+            )
         else:
             image_list._tensor = edges_tensor
         return image_list

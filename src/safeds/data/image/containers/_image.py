@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-import sys
 import io
+import sys
 import warnings
 from pathlib import Path
 from typing import TYPE_CHECKING
@@ -293,11 +293,21 @@ class Image:
         elif self.channel == 1 and channel == 3:
             image_tensor = torch.cat([self._image_tensor, self._image_tensor, self._image_tensor], dim=0)
         elif self.channel == 1 and channel == 4:
-            image_tensor = torch.cat([self._image_tensor, self._image_tensor, self._image_tensor, torch.full(self._image_tensor.size(), 255).to(self.device)], dim=0)
+            image_tensor = torch.cat(
+                [
+                    self._image_tensor,
+                    self._image_tensor,
+                    self._image_tensor,
+                    torch.full(self._image_tensor.size(), 255).to(self.device),
+                ],
+                dim=0,
+            )
         elif self.channel in (3, 4) and channel == 1:
             image_tensor = self.convert_to_grayscale()._image_tensor[0:1]
         elif self.channel == 3 and channel == 4:
-            image_tensor = torch.cat([self._image_tensor, torch.full(self._image_tensor[0:1].size(), 255).to(self.device)], dim=0)
+            image_tensor = torch.cat(
+                [self._image_tensor, torch.full(self._image_tensor[0:1].size(), 255).to(self.device)], dim=0,
+            )
         elif self.channel == 4 and channel == 3:
             image_tensor = self._image_tensor[0:3]
         else:

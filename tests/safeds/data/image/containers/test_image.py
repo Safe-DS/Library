@@ -11,10 +11,27 @@ from safeds.exceptions import IllegalFormatError, OutOfBoundsError
 from syrupy import SnapshotAssertion
 from torch.types import Device
 
-from tests.helpers import images_all, images_all_ids, resolve_resource_path, plane_jpg_path, white_square_jpg_path, \
-    white_square_png_path, grayscale_jpg_path, grayscale_png_path, plane_jpg_id, white_square_jpg_id, \
-    white_square_png_id, grayscale_jpg_id, grayscale_png_id, plane_png_path, rgba_png_path, plane_png_id, rgba_png_id, \
-    images_asymmetric, images_asymmetric_ids
+from tests.helpers import (
+    grayscale_jpg_id,
+    grayscale_jpg_path,
+    grayscale_png_id,
+    grayscale_png_path,
+    images_all,
+    images_all_ids,
+    images_asymmetric,
+    images_asymmetric_ids,
+    plane_jpg_id,
+    plane_jpg_path,
+    plane_png_id,
+    plane_png_path,
+    resolve_resource_path,
+    rgba_png_id,
+    rgba_png_path,
+    white_square_jpg_id,
+    white_square_jpg_path,
+    white_square_png_id,
+    white_square_png_path,
+)
 
 _device_cuda = torch.device("cuda")
 _device_cpu = torch.device("cpu")
@@ -361,12 +378,10 @@ class TestChangeChannel:
         images_all(),
         ids=images_all_ids(),
     )
-    @pytest.mark.parametrize(
-        "channel",
-        [1, 3, 4],
-        ids=["to-gray-1-channel", "to-rgb-3-channel", "to-rgba-4-channel"]
-    )
-    def test_should_change_channel(self, resource_path: str, channel: int, snapshot_png_image: SnapshotAssertion, device: Device) -> None:
+    @pytest.mark.parametrize("channel", [1, 3, 4], ids=["to-gray-1-channel", "to-rgb-3-channel", "to-rgba-4-channel"])
+    def test_should_change_channel(
+        self, resource_path: str, channel: int, snapshot_png_image: SnapshotAssertion, device: Device,
+    ) -> None:
         _skip_if_device_not_available(device)
         image = Image.from_file(resolve_resource_path(resource_path), device)
         new_image = image.change_channel(channel)
@@ -378,11 +393,7 @@ class TestChangeChannel:
         images_all(),
         ids=images_all_ids(),
     )
-    @pytest.mark.parametrize(
-        "channel",
-        [2],
-        ids=["invalid-channel"]
-    )
+    @pytest.mark.parametrize("channel", [2], ids=["invalid-channel"])
     def test_should_raise(self, resource_path: str, channel: int, device: Device) -> None:
         _skip_if_device_not_available(device)
         image = Image.from_file(resolve_resource_path(resource_path), device)
@@ -453,7 +464,9 @@ class TestConvertToGrayscale:
         images_all(),
         ids=images_all_ids(),
     )
-    def test_convert_to_grayscale(self, resource_path: str, snapshot_png_image: SnapshotAssertion, device: Device) -> None:
+    def test_convert_to_grayscale(
+        self, resource_path: str, snapshot_png_image: SnapshotAssertion, device: Device,
+    ) -> None:
         _skip_if_device_not_available(device)
         image = Image.from_file(resolve_resource_path(resource_path), device)
         grayscale_image = image.convert_to_grayscale()
@@ -488,7 +501,9 @@ class TestFlipVertically:
         images_asymmetric(),
         ids=images_asymmetric_ids(),
     )
-    def test_should_flip_vertically(self, resource_path: str, snapshot_png_image: SnapshotAssertion, device: Device) -> None:
+    def test_should_flip_vertically(
+        self, resource_path: str, snapshot_png_image: SnapshotAssertion, device: Device,
+    ) -> None:
         _skip_if_device_not_available(device)
         image = Image.from_file(resolve_resource_path(resource_path), device)
         image_flip_v = image.flip_vertically()
@@ -826,7 +841,9 @@ class TestInvertColors:
         images_all(),
         ids=images_all_ids(),
     )
-    def test_should_invert_colors(self, resource_path: str, snapshot_png_image: SnapshotAssertion, device: Device) -> None:
+    def test_should_invert_colors(
+        self, resource_path: str, snapshot_png_image: SnapshotAssertion, device: Device,
+    ) -> None:
         _skip_if_device_not_available(device)
         image = Image.from_file(resolve_resource_path(resource_path), device)
         image_inverted_colors = image.invert_colors()

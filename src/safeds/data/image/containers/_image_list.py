@@ -16,9 +16,9 @@ from torchvision.utils import make_grid, save_image
 from safeds.data.image.containers import Image
 
 if TYPE_CHECKING:
-    from safeds.data.image.containers import _EmptyImageList, _SingleSizeImageList, _MultiSizeImageList
-    from typing import Sequence
+    from collections.abc import Sequence
 
+    from safeds.data.image.containers import _MultiSizeImageList, _SingleSizeImageList
 
 
 class ImageList(metaclass=ABCMeta):
@@ -32,7 +32,7 @@ class ImageList(metaclass=ABCMeta):
 
     @staticmethod
     def from_images(images: list[Image], indices: list[int] | None = None) -> ImageList:
-        from safeds.data.image.containers import _EmptyImageList, _SingleSizeImageList, _MultiSizeImageList
+        from safeds.data.image.containers import _EmptyImageList, _MultiSizeImageList, _SingleSizeImageList
 
         if len(images) == 0:
             return _EmptyImageList()
@@ -48,7 +48,7 @@ class ImageList(metaclass=ABCMeta):
 
     @staticmethod
     def from_files(path: str | Path | Sequence[str | Path], indices: list[int] | None = None) -> ImageList:
-        from safeds.data.image.containers import _EmptyImageList, _SingleSizeImageList, _MultiSizeImageList
+        from safeds.data.image.containers import _EmptyImageList, _MultiSizeImageList, _SingleSizeImageList
 
         if isinstance(path, list) and len(path) == 0:
             return _EmptyImageList()
@@ -57,7 +57,7 @@ class ImageList(metaclass=ABCMeta):
         fixed_size = True
 
         path_list: list[str | Path]
-        if isinstance(path, str) or isinstance(path, Path):
+        if isinstance(path, Path | str):
             path_list = [Path(path)]
         else:
             path_list = list(path)
@@ -67,7 +67,10 @@ class ImageList(metaclass=ABCMeta):
                 path_list += sorted([p / name for name in os.listdir(p)])
             else:
                 image_tensors.append(ImageList._pil_to_tensor(pil_image_open(p)))
-                if fixed_size and (image_tensors[0].size(dim=2) != image_tensors[-1].size(dim=2) or image_tensors[0].size(dim=1) != image_tensors[-1].size(dim=1)):
+                if fixed_size and (
+                    image_tensors[0].size(dim=2) != image_tensors[-1].size(dim=2)
+                    or image_tensors[0].size(dim=1) != image_tensors[-1].size(dim=1)
+                ):
                     fixed_size = False
 
         if len(image_tensors) == 0:
@@ -113,7 +116,7 @@ class ImageList(metaclass=ABCMeta):
         tensors = []
         for image in self.to_images():
             im_tensor = torch.zeros([4, max_height, max_width])
-            im_tensor[:, :image.height, :image.width] = image.change_channel(4)._image_tensor
+            im_tensor[:, : image.height, : image.width] = image.change_channel(4)._image_tensor
             tensors.append(im_tensor)
         tensor_grid = make_grid(tensors, math.ceil(math.sqrt(len(tensors))))
         buffer = io.BytesIO()
@@ -184,12 +187,14 @@ class ImageList(metaclass=ABCMeta):
 
     def _as_multi_size_image_list(self) -> _MultiSizeImageList:
         from safeds.data.image.containers import _MultiSizeImageList
+
         if isinstance(self, _MultiSizeImageList):
             return self
         raise ValueError("The given image_list is not a MultiSizeImageList")
 
     def _as_single_size_image_list(self) -> _SingleSizeImageList:
         from safeds.data.image.containers import _SingleSizeImageList
+
         if isinstance(self, _SingleSizeImageList):
             return self
         raise ValueError("The given image_list is not a SingleSizeImageList")
