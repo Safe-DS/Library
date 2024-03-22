@@ -429,7 +429,8 @@ class _SingleSizeImageList(ImageList):
                         [
                             self._tensor,
                             _SingleSizeImageList._change_channel_of_tensor(
-                                images_as_single_size_image_list._tensor, self.channel,
+                                images_as_single_size_image_list._tensor,
+                                self.channel,
                             ),
                         ],
                     )
@@ -437,7 +438,8 @@ class _SingleSizeImageList(ImageList):
                     image_list_single._tensor = torch.cat(
                         [
                             _SingleSizeImageList._change_channel_of_tensor(
-                                self._tensor, images_as_single_size_image_list.channel,
+                                self._tensor,
+                                images_as_single_size_image_list.channel,
                             ),
                             images_as_single_size_image_list._tensor,
                         ],
