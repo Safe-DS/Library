@@ -4,6 +4,7 @@ import warnings
 from typing import TYPE_CHECKING, Self
 
 if TYPE_CHECKING:
+    from pathlib import Path
     from torch import Tensor
 
 import xxhash
@@ -66,38 +67,38 @@ class _EmptyImageList(ImageList):
     def get_image(self, index: int) -> Image:
         raise IndexOutOfBoundsError(index)
 
-    def index(self, *_) -> list[int]:
+    def index(self, _image: Image) -> list[int]:
         return []
 
-    def has_image(self, *_) -> bool:
+    def has_image(self, _image: Image) -> bool:
         return False
 
-    def to_jpeg_files(self, *_) -> None:
+    def to_jpeg_files(self, _path: str | Path | list[str | Path]) -> None:
         warnings.warn("You are using an empty ImageList. No files will be saved.", UserWarning, stacklevel=2)
         return
 
-    def to_png_files(self, *_) -> None:
+    def to_png_files(self, _path: str | Path | list[str | Path]) -> None:
         warnings.warn("You are using an empty ImageList. No files will be saved.", UserWarning, stacklevel=2)
         return
 
-    def to_images(self, *_) -> list[Image]:
+    def to_images(self, _indices: list[int] | None = None) -> list[Image]:
         return []
 
-    def change_channel(self, *_) -> ImageList:
+    def change_channel(self, _channel: int) -> ImageList:
         _EmptyImageList._warn_empty_image_list()
         return _EmptyImageList()
 
-    def _add_image_tensor(self, image_tensor: Tensor, *_) -> ImageList:
+    def _add_image_tensor(self, image_tensor: Tensor, _index: int) -> ImageList:
         return _SingleSizeImageList._create_image_list([image_tensor], [0])
 
     def add_images(self, images: list[Image] | ImageList) -> ImageList:
         return ImageList.from_images(images) if isinstance(images, list) else images.clone()
 
-    def remove_image_by_index(self, *_) -> ImageList:
+    def remove_image_by_index(self, _index: int | list[int]) -> ImageList:
         _EmptyImageList._warn_empty_image_list()
         return _EmptyImageList()
 
-    def remove_images_with_size(self,*_) -> ImageList:
+    def remove_images_with_size(self, _width: int, _height: int) -> ImageList:
         _EmptyImageList._warn_empty_image_list()
         return _EmptyImageList()
 
@@ -109,7 +110,7 @@ class _EmptyImageList(ImageList):
         _EmptyImageList._warn_empty_image_list()
         return _EmptyImageList()
 
-    def resize(self, *_) -> ImageList:
+    def resize(self, _new_width: int, _new_height: int) -> ImageList:
         _EmptyImageList._warn_empty_image_list()
         return _EmptyImageList()
 
@@ -117,7 +118,7 @@ class _EmptyImageList(ImageList):
         _EmptyImageList._warn_empty_image_list()
         return _EmptyImageList()
 
-    def crop(self, *_) -> ImageList:
+    def crop(self, _x: int, _y: int, _width: int, _height: int) -> ImageList:
         _EmptyImageList._warn_empty_image_list()
         return _EmptyImageList()
 
@@ -129,27 +130,27 @@ class _EmptyImageList(ImageList):
         _EmptyImageList._warn_empty_image_list()
         return _EmptyImageList()
 
-    def adjust_brightness(self, *_) -> ImageList:
+    def adjust_brightness(self, _factor: float) -> ImageList:
         _EmptyImageList._warn_empty_image_list()
         return _EmptyImageList()
 
-    def add_noise(self, *_) -> ImageList:
+    def add_noise(self, _standard_deviation: float) -> ImageList:
         _EmptyImageList._warn_empty_image_list()
         return _EmptyImageList()
 
-    def adjust_contrast(self, *_) -> ImageList:
+    def adjust_contrast(self, _factor: float) -> ImageList:
         _EmptyImageList._warn_empty_image_list()
         return _EmptyImageList()
 
-    def adjust_color_balance(self, *_) -> ImageList:
+    def adjust_color_balance(self, _factor: float) -> ImageList:
         _EmptyImageList._warn_empty_image_list()
         return _EmptyImageList()
 
-    def blur(self, *_) -> ImageList:
+    def blur(self, _radius: int) -> ImageList:
         _EmptyImageList._warn_empty_image_list()
         return _EmptyImageList()
 
-    def sharpen(self, *_) -> ImageList:
+    def sharpen(self, _factor: float) -> ImageList:
         _EmptyImageList._warn_empty_image_list()
         return _EmptyImageList()
 
