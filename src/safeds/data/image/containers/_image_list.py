@@ -13,7 +13,7 @@ from torch import Tensor
 from torchvision.transforms.v2 import PILToTensor
 from torchvision.utils import make_grid, save_image
 
-from safeds.data.image.containers import Image
+from safeds.data.image.containers._image import Image
 
 if TYPE_CHECKING:
     from collections.abc import Sequence

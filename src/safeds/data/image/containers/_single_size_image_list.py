@@ -16,7 +16,6 @@ from torchvision.transforms import InterpolationMode
 from torchvision.transforms.v2 import functional as func2
 from torchvision.utils import save_image
 
-from safeds.data.image.containers import Image, ImageList
 from safeds.exceptions import (
     ClosedBound,
     DuplicateIndexError,
@@ -24,6 +23,9 @@ from safeds.exceptions import (
     IndexOutOfBoundsError,
     OutOfBoundsError,
 )
+
+from safeds.data.image.containers._image_list import ImageList
+from safeds.data.image.containers._image import Image
 
 if TYPE_CHECKING:
     from safeds.data.image.containers import _MultiSizeImageList

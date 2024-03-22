@@ -7,11 +7,13 @@ if TYPE_CHECKING:
     from pathlib import Path
 
     from torch import Tensor
+    from safeds.data.image.containers import Image
 
 import xxhash
 
-from safeds.data.image.containers import Image, ImageList, _SingleSizeImageList
 from safeds.exceptions import IndexOutOfBoundsError
+from safeds.data.image.containers._image_list import ImageList
+from safeds.data.image.containers._single_size_image_list import _SingleSizeImageList
 
 
 class _EmptyImageList(ImageList):
