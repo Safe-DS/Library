@@ -821,9 +821,14 @@ class TestBlur:
     def test_should_raise_blur_radius_out_of_bounds(self, resource_path: str, device: Device) -> None:
         _skip_if_device_not_available(device)
         image = Image.from_file(resolve_resource_path(resource_path), device)
-        with pytest.raises(OutOfBoundsError, match=rf"radius \(=-1\) is not inside \[0, {min(image.width, image.height) - 1}\]."):
+        with pytest.raises(
+            OutOfBoundsError, match=rf"radius \(=-1\) is not inside \[0, {min(image.width, image.height) - 1}\].",
+        ):
             image.blur(-1)
-        with pytest.raises(OutOfBoundsError, match=rf"radius \(={min(image.width, image.height)}\) is not inside \[0, {min(image.width, image.height) - 1}\]."):
+        with pytest.raises(
+            OutOfBoundsError,
+            match=rf"radius \(={min(image.width, image.height)}\) is not inside \[0, {min(image.width, image.height) - 1}\].",
+        ):
             image.blur(min(image.width, image.height))
 
 

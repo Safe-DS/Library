@@ -617,7 +617,12 @@ class _SingleSizeImageList(ImageList):
 
     def blur(self, radius: int) -> ImageList:
         if radius < 0 or radius >= min(self.widths[0], self.heights[0]):
-            raise OutOfBoundsError(radius, name="radius", lower_bound=ClosedBound(0), upper_bound=ClosedBound(min(self.widths[0], self.heights[0]) - 1))
+            raise OutOfBoundsError(
+                radius,
+                name="radius",
+                lower_bound=ClosedBound(0),
+                upper_bound=ClosedBound(min(self.widths[0], self.heights[0]) - 1),
+            )
         elif radius == 0:
             warnings.warn(
                 "Blur radius is 0, this will not make changes to the image.",
