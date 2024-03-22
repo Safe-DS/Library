@@ -240,7 +240,7 @@ class _MultiSizeImageList(ImageList):
         image_list = self.clone()._as_multi_size_image_list()
         smallest_channel = max_channel = self.channel
         ims: _SingleSizeImageList | list[Image]
-        for size, ims in (images_with_size.items() if len(images_with_size) > 0 else image_list_with_size.items()):
+        for size, ims in list(images_with_size.items() if len(images_with_size) > 0 else image_list_with_size.items()):
             new_indices = indices_for_images_with_size[size]
             if size in image_list._image_list_dict:
                 if isinstance(ims, _SingleSizeImageList):

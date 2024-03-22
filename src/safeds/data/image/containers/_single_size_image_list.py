@@ -140,6 +140,7 @@ class _SingleSizeImageList(ImageList):
     def to_jpeg_files(self, path: str | Path | list[str | Path]) -> None:
         if self.channel == 4:
             raise IllegalFormatError("png")
+        path_str: str | Path
         if isinstance(path, list):
             if len(path) == self.number_of_images:
                 for image_path, index in zip(path, sorted(self._tensor_positions_to_indices)):
@@ -150,11 +151,11 @@ class _SingleSizeImageList(ImageList):
                         save_image(self._tensor[self._indices_to_tensor_positions[index]].to(torch.float32) / 255, image_path, format="jpeg")
                 return
             elif len(path) == 1:
-                path_str: str | Path = path[0]
+                path_str = path[0]
             else:
                 raise ValueError("The path specified is invalid. Please provide either the path to a directory, a list of paths with one path for each image, or a list of paths with one path per image size.")
         else:
-            path_str: str | Path = path
+            path_str = path
         for index in self._tensor_positions_to_indices:
             image_path = os.path.join(path_str, str(index) + ".jpg")
             Path(image_path).parent.mkdir(parents=True, exist_ok=True)
@@ -164,6 +165,7 @@ class _SingleSizeImageList(ImageList):
                 save_image(self._tensor[self._indices_to_tensor_positions[index]].to(torch.float32) / 255, image_path, format="jpeg")
 
     def to_png_files(self, path: str | Path | list[str | Path]) -> None:
+        path_str: str | Path
         if isinstance(path, list):
             if len(path) == self.number_of_images:
                 for image_path, index in zip(path, sorted(self._tensor_positions_to_indices)):
@@ -174,11 +176,11 @@ class _SingleSizeImageList(ImageList):
                         save_image(self._tensor[self._indices_to_tensor_positions[index]].to(torch.float32) / 255, image_path, format="png")
                 return
             elif len(path) == 1:
-                path_str: str | Path = path[0]
+                path_str = path[0]
             else:
                 raise ValueError("The path specified is invalid. Please provide either the path to a directory, a list of paths with one path for each image, or a list of paths with one path per image size.")
         else:
-            path_str: str | Path = path
+            path_str = path
         for index in self._tensor_positions_to_indices:
             image_path = os.path.join(path_str, str(index) + ".png")
             Path(image_path).parent.mkdir(parents=True, exist_ok=True)
