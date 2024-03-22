@@ -35,9 +35,7 @@ class _EmptyImageList(ImageList):
 
     @staticmethod
     def _warn_empty_image_list() -> None:
-        """
-        Warn if a transform method is used on an empty ImageList
-        """
+        """Warn if a transform method is used on an empty ImageList."""
         warnings.warn(
             "You are using an empty ImageList. This method changes nothing if used on an empty ImageList.",
             UserWarning,

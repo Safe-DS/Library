@@ -110,7 +110,7 @@ class _SingleSizeImageList(ImageList):
 
     def _calc_new_indices_to_tensor_positions(self) -> dict[int, int]:
         """
-        Calculate the new indices to tensor position dictionary
+        Calculate the new indices to tensor position dictionary.
 
         Returns
         -------
@@ -308,7 +308,7 @@ class _SingleSizeImageList(ImageList):
     @staticmethod
     def _change_channel_of_tensor(tensor: Tensor, channel: int) -> Tensor:
         """
-        Changes the channel of a tensor to the given channel.
+        Change the channel of a tensor to the given channel.
 
         Parameters
         ----------

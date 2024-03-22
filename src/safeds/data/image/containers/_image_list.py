@@ -416,7 +416,7 @@ class ImageList(metaclass=ABCMeta):
 
     def _as_multi_size_image_list(self) -> _MultiSizeImageList:
         """
-        Typechecking method for MultiSizeImageList
+        Typechecking method for MultiSizeImageList.
 
         Returns
         -------
@@ -436,7 +436,7 @@ class ImageList(metaclass=ABCMeta):
 
     def _as_single_size_image_list(self) -> _SingleSizeImageList:
         """
-        Typechecking method for SingleSizeImageList
+        Typechecking method for SingleSizeImageList.
 
         Returns
         -------
@@ -594,7 +594,7 @@ class ImageList(metaclass=ABCMeta):
     @abstractmethod
     def remove_images_with_size(self, width: int, height: int) -> ImageList:
         """
-        Return a new `ImageList` with the all images of the given size removed
+        Return a new `ImageList` with the all images of the given size removed.
 
         The original image list is not modified.
 
