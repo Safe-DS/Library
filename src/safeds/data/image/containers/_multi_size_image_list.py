@@ -217,19 +217,17 @@ class _MultiSizeImageList(ImageList):
 
         indices_for_images_with_size = {}
         current_index = max(self._indices_to_image_size_dict) + 1
+        image_list_with_size: dict[tuple[int, int], _SingleSizeImageList] = {}
+        images_with_size: dict[tuple[int, int], list[Image]] = {}
         if isinstance(images, ImageList):
-            images_with_size: dict[tuple[int, int], _SingleSizeImageList] = {}
-
             if images.number_of_sizes == 1:
-                images_with_size[(images.widths[0], images.heights[0])] = images._as_single_size_image_list()
+                image_list_with_size[(images.widths[0], images.heights[0])] = images._as_single_size_image_list()
                 indices_for_images_with_size[(images.widths[0], images.heights[0])] = [index + current_index for index in images._as_single_size_image_list()._tensor_positions_to_indices]
             else:
                 for size, im_list in images._as_multi_size_image_list()._image_list_dict.items():
-                    images_with_size[size] = im_list._as_single_size_image_list()
+                    image_list_with_size[size] = im_list._as_single_size_image_list()
                     indices_for_images_with_size[size] = [index + current_index for index in im_list._as_single_size_image_list()._tensor_positions_to_indices]
         else:
-            images_with_size: dict[tuple[int, int], list[Image]] = {}
-
             for image in images:
                 size = (image.width, image.height)
                 if size in images_with_size:
@@ -241,7 +239,7 @@ class _MultiSizeImageList(ImageList):
                 current_index += 1
         image_list = self.clone()._as_multi_size_image_list()
         smallest_channel = max_channel = self.channel
-        for size, ims in images_with_size.items():
+        for size, ims in (images_with_size.items() if len(images_with_size) > 0 else image_list_with_size.items()):
             new_indices = indices_for_images_with_size[size]
             if size in image_list._image_list_dict:
                 if isinstance(ims, _SingleSizeImageList):

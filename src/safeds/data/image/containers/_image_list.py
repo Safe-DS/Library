@@ -54,12 +54,15 @@ class ImageList(metaclass=ABCMeta):
         image_tensors = []
         fixed_size = True
 
+        path_list: list[str | Path]
         if isinstance(path, str) or isinstance(path, Path):
-            path: Sequence[str | Path] = [Path(path)]
-        while len(path) != 0:
-            p = Path(path.pop(0))
+            path_list = [Path(path)]
+        else:
+            path_list = list(path)
+        while len(path_list) != 0:
+            p = Path(path_list.pop(0))
             if p.is_dir():
-                path += sorted([os.path.join(p, name) for name in os.listdir(p)])
+                path_list += sorted([os.path.join(p, name) for name in os.listdir(p)])
             else:
                 image_tensors.append(ImageList._pil_to_tensor(pil_image_open(p)))
                 if fixed_size and (image_tensors[0].size(dim=2) != image_tensors[-1].size(dim=2) or image_tensors[0].size(dim=1) != image_tensors[-1].size(dim=1)):
