@@ -169,11 +169,11 @@ class ImageList(metaclass=ABCMeta):
     # ------------------------------------------------------------------------------------------------------------------
 
     @abstractmethod
-    def to_jpeg_files(self, path: str | Path | list[str] | list[Path]) -> None:
+    def to_jpeg_files(self, path: str | Path | list[str | Path]) -> None:
         pass
 
     @abstractmethod
-    def to_png_files(self, path: str | Path | list[str] | list[Path]) -> None:
+    def to_png_files(self, path: str | Path | list[str | Path]) -> None:
         pass
 
     @abstractmethod

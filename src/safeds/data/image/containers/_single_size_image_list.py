@@ -137,7 +137,7 @@ class _SingleSizeImageList(ImageList):
     def has_image(self, image: Image) -> bool:
         return not (image.width != self.widths[0] or image.height != self.heights[0] or image.channel != self.channel) and image._image_tensor in self._tensor
 
-    def to_jpeg_files(self, path: str | Path | list[str] | list[Path]) -> None:
+    def to_jpeg_files(self, path: str | Path | list[str | Path]) -> None:
         if self.channel == 4:
             raise IllegalFormatError("png")
         if isinstance(path, list):
@@ -163,7 +163,7 @@ class _SingleSizeImageList(ImageList):
             else:
                 save_image(self._tensor[self._indices_to_tensor_positions[index]].to(torch.float32) / 255, image_path, format="jpeg")
 
-    def to_png_files(self, path: str | Path | list[str] | list[Path]) -> None:
+    def to_png_files(self, path: str | Path | list[str | Path]) -> None:
         if isinstance(path, list):
             if len(path) == self.number_of_images:
                 for image_path, index in zip(path, sorted(self._tensor_positions_to_indices)):
