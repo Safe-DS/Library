@@ -66,38 +66,38 @@ class _EmptyImageList(ImageList):
     def get_image(self, index: int) -> Image:
         raise IndexOutOfBoundsError(index)
 
-    def index(self, *args) -> list[int]:
+    def index(self, *_) -> list[int]:
         return []
 
-    def has_image(self, *args) -> bool:
+    def has_image(self, *_) -> bool:
         return False
 
-    def to_jpeg_files(self, *args) -> None:
+    def to_jpeg_files(self, *_) -> None:
         warnings.warn("You are using an empty ImageList. No files will be saved.", UserWarning, stacklevel=2)
         return
 
-    def to_png_files(self, *args) -> None:
+    def to_png_files(self, *_) -> None:
         warnings.warn("You are using an empty ImageList. No files will be saved.", UserWarning, stacklevel=2)
         return
 
-    def to_images(self, *args) -> list[Image]:
+    def to_images(self, *_) -> list[Image]:
         return []
 
-    def change_channel(self, *args) -> ImageList:
+    def change_channel(self, *_) -> ImageList:
         _EmptyImageList._warn_empty_image_list()
         return _EmptyImageList()
 
-    def _add_image_tensor(self, image_tensor: Tensor, *args) -> ImageList:
+    def _add_image_tensor(self, image_tensor: Tensor, *_) -> ImageList:
         return _SingleSizeImageList._create_image_list([image_tensor], [0])
 
     def add_images(self, images: list[Image] | ImageList) -> ImageList:
         return ImageList.from_images(images) if isinstance(images, list) else images.clone()
 
-    def remove_image_by_index(self, *args) -> ImageList:
+    def remove_image_by_index(self, *_) -> ImageList:
         _EmptyImageList._warn_empty_image_list()
         return _EmptyImageList()
 
-    def remove_images_with_size(self,*args) -> ImageList:
+    def remove_images_with_size(self,*_) -> ImageList:
         _EmptyImageList._warn_empty_image_list()
         return _EmptyImageList()
 
@@ -109,7 +109,7 @@ class _EmptyImageList(ImageList):
         _EmptyImageList._warn_empty_image_list()
         return _EmptyImageList()
 
-    def resize(self, *args) -> ImageList:
+    def resize(self, *_) -> ImageList:
         _EmptyImageList._warn_empty_image_list()
         return _EmptyImageList()
 
@@ -117,7 +117,7 @@ class _EmptyImageList(ImageList):
         _EmptyImageList._warn_empty_image_list()
         return _EmptyImageList()
 
-    def crop(self, *args) -> ImageList:
+    def crop(self, *_) -> ImageList:
         _EmptyImageList._warn_empty_image_list()
         return _EmptyImageList()
 
@@ -129,27 +129,27 @@ class _EmptyImageList(ImageList):
         _EmptyImageList._warn_empty_image_list()
         return _EmptyImageList()
 
-    def adjust_brightness(self, *args) -> ImageList:
+    def adjust_brightness(self, *_) -> ImageList:
         _EmptyImageList._warn_empty_image_list()
         return _EmptyImageList()
 
-    def add_noise(self, *args) -> ImageList:
+    def add_noise(self, *_) -> ImageList:
         _EmptyImageList._warn_empty_image_list()
         return _EmptyImageList()
 
-    def adjust_contrast(self, *args) -> ImageList:
+    def adjust_contrast(self, *_) -> ImageList:
         _EmptyImageList._warn_empty_image_list()
         return _EmptyImageList()
 
-    def adjust_color_balance(self, *args) -> ImageList:
+    def adjust_color_balance(self, *_) -> ImageList:
         _EmptyImageList._warn_empty_image_list()
         return _EmptyImageList()
 
-    def blur(self, *args) -> ImageList:
+    def blur(self, *_) -> ImageList:
         _EmptyImageList._warn_empty_image_list()
         return _EmptyImageList()
 
-    def sharpen(self, *args) -> ImageList:
+    def sharpen(self, *_) -> ImageList:
         _EmptyImageList._warn_empty_image_list()
         return _EmptyImageList()
 
