@@ -18,11 +18,26 @@ from safeds.exceptions import IndexOutOfBoundsError
 
 
 class _EmptyImageList(ImageList):
+    """
+    An ImageList is a list of different images. It can hold different sizes of Images. The channel of all images is the same.
+
+    This is the class for an empty ImageList.
+
+    To create an `ImageList` call one of the following static methods:
+
+    | Method                                                                        | Description                                              |
+    | ----------------------------------------------------------------------------- | -------------------------------------------------------- |
+    | [from_images][safeds.data.image.containers._image_list.ImageList.from_images] | Create an ImageList from a list of Images.               |
+    | [from_files][safeds.data.image.containers._image_list.ImageList.from_files]   | Create an ImageList from a directory or a list of files. |
+    """
 
     _instance = None
 
     @staticmethod
     def _warn_empty_image_list() -> None:
+        """
+        Warn if a transform method is used on an empty ImageList
+        """
         warnings.warn(
             "You are using an empty ImageList. This method changes nothing if used on an empty ImageList.",
             UserWarning,

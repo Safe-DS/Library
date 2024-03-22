@@ -963,6 +963,35 @@ class TestErrorsAndWarnings:
             assert image_list_original is not image_list_clone
             assert image_list_original == image_list_clone
 
+    class TestBlur:
+
+        def test_should_raise_radius_out_of_bounds(self, resource_path: str) -> None:
+            image_list_original = ImageList.from_files(
+                [resolve_resource_path(unresolved_path) for unresolved_path in resource_path],
+            )
+            image_list_clone = image_list_original.clone()
+            with pytest.raises(OutOfBoundsError, match=rf"radius \(=-1\) is not inside \[0, {min(*image_list_original.widths, *image_list_original.heights) - 1}\]."):
+                image_list_original.blur(-1)
+            with pytest.raises(OutOfBoundsError, match=rf"radius \(={min(*image_list_original.widths, *image_list_original.heights)}\) is not inside \[0, {min(*image_list_original.widths, *image_list_original.heights) - 1}\]."):
+                image_list_original.blur(min(*image_list_original.widths, *image_list_original.heights))
+            assert image_list_original is not image_list_clone
+            assert image_list_original == image_list_clone
+
+        def test_should_not_blur(self, resource_path: str) -> None:
+            image_list_original = ImageList.from_files(
+                [resolve_resource_path(unresolved_path) for unresolved_path in resource_path],
+            )
+            image_list_clone = image_list_original.clone()
+            with pytest.warns(
+                UserWarning,
+                match="Blur radius is 0, this will not make changes to the image.",
+            ):
+                image_list_no_change = image_list_original.blur(0)
+                assert image_list_no_change is not image_list_original
+                assert image_list_no_change == image_list_original
+            assert image_list_original is not image_list_clone
+            assert image_list_original == image_list_clone
+
     class TestSharpen:
 
         @pytest.mark.parametrize(

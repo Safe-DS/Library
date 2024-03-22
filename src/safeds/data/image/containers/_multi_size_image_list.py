@@ -12,7 +12,8 @@ import xxhash
 from torch import Tensor
 
 from safeds.data.image.containers import Image, ImageList
-from safeds.exceptions import DuplicateIndexError, IllegalFormatError, IndexOutOfBoundsError
+from safeds.exceptions import DuplicateIndexError, IllegalFormatError, IndexOutOfBoundsError, OutOfBoundsError, \
+    ClosedBound
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -21,6 +22,18 @@ if TYPE_CHECKING:
 
 
 class _MultiSizeImageList(ImageList):
+    """
+    An ImageList is a list of different images. It can hold different sizes of Images. The channel of all images is the same.
+
+    This is the class for an ImageList with multiple different sizes.
+
+    To create an `ImageList` call one of the following static methods:
+
+    | Method                                                                        | Description                                              |
+    | ----------------------------------------------------------------------------- | -------------------------------------------------------- |
+    | [from_images][safeds.data.image.containers._image_list.ImageList.from_images] | Create an ImageList from a list of Images.               |
+    | [from_files][safeds.data.image.containers._image_list.ImageList.from_files]   | Create an ImageList from a directory or a list of files. |
+    """
 
     def __init__(self) -> None:
         self._image_list_dict: dict[tuple[int, int], ImageList] = {}  # {image_size: image_list}
@@ -76,6 +89,14 @@ class _MultiSizeImageList(ImageList):
         return cloned_image_list
 
     def _clone_without_image_dict(self) -> _MultiSizeImageList:
+        """
+        Clone this MultiSizeImageList to a new instance without the image data.
+
+        Returns
+        -------
+        image_list:
+            the cloned image list
+        """
         cloned_image_list = _MultiSizeImageList()
         cloned_image_list._indices_to_image_size_dict = copy.deepcopy(self._indices_to_image_size_dict)
         return cloned_image_list
@@ -470,6 +491,8 @@ class _MultiSizeImageList(ImageList):
         return image_list
 
     def blur(self, radius: int) -> ImageList:
+        if radius < 0 or radius >= min(*self.widths, *self.heights):
+            raise OutOfBoundsError(radius, name="radius", lower_bound=ClosedBound(0), upper_bound=ClosedBound(min(*self.widths, *self.heights) - 1))
         image_list = self._clone_without_image_dict()
         for image_list_key, image_list_original in self._image_list_dict.items():
             image_list._image_list_dict[image_list_key] = image_list_original.blur(radius)

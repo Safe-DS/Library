@@ -798,6 +798,34 @@ class TestBlur:
         assert image_blurred == snapshot_png_image
         _assert_width_height_channel(image, image_blurred)
 
+    @pytest.mark.parametrize(
+        "resource_path",
+        images_asymmetric(),
+        ids=images_asymmetric_ids(),
+    )
+    def test_should_not_blur_radius_0(self, resource_path: str, device: Device) -> None:
+        _skip_if_device_not_available(device)
+        with pytest.warns(
+            UserWarning,
+            match="Blur radius is 0, this will not make changes to the image.",
+        ):
+            image = Image.from_file(resolve_resource_path(resource_path), device)
+            image_blurred = image.blur(0)
+            assert image == image_blurred
+
+    @pytest.mark.parametrize(
+        "resource_path",
+        images_asymmetric(),
+        ids=images_asymmetric_ids(),
+    )
+    def test_should_raise_blur_radius_out_of_bounds(self, resource_path: str, device: Device) -> None:
+        _skip_if_device_not_available(device)
+        image = Image.from_file(resolve_resource_path(resource_path), device)
+        with pytest.raises(OutOfBoundsError, match=rf"radius \(=-1\) is not inside \[0, {min(image.width, image.height) - 1}\]."):
+            image.blur(-1)
+        with pytest.raises(OutOfBoundsError, match=rf"radius \(={min(image.width, image.height)}\) is not inside \[0, {min(image.width, image.height) - 1}\]."):
+            image.blur(min(image.width, image.height))
+
 
 @pytest.mark.parametrize("device", _test_devices(), ids=_test_devices_ids())
 class TestSharpen:

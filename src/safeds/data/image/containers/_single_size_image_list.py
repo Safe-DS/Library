@@ -31,6 +31,18 @@ if TYPE_CHECKING:
 
 
 class _SingleSizeImageList(ImageList):
+    """
+    An ImageList is a list of different images. It can hold different sizes of Images. The channel of all images is the same.
+
+    This is the class for an ImageList with only one size for all images.
+
+    To create an `ImageList` call one of the following static methods:
+
+    | Method                                                                        | Description                                              |
+    | ----------------------------------------------------------------------------- | -------------------------------------------------------- |
+    | [from_images][safeds.data.image.containers._image_list.ImageList.from_images] | Create an ImageList from a list of Images.               |
+    | [from_files][safeds.data.image.containers._image_list.ImageList.from_files]   | Create an ImageList from a directory or a list of files. |
+    """
 
     def __init__(self) -> None:
         self._tensor: Tensor = torch.empty(0)
@@ -83,12 +95,28 @@ class _SingleSizeImageList(ImageList):
         return cloned_image_list
 
     def _clone_without_tensor(self) -> _SingleSizeImageList:
+        """
+        Clone this SingleSizeImageList to a new instance without the image data.
+
+        Returns
+        -------
+        image_list:
+            the cloned image list
+        """
         cloned_image_list = _SingleSizeImageList()
         cloned_image_list._indices_to_tensor_positions = copy.deepcopy(self._indices_to_tensor_positions)
         cloned_image_list._tensor_positions_to_indices = copy.deepcopy(self._tensor_positions_to_indices)
         return cloned_image_list
 
     def _calc_new_indices_to_tensor_positions(self) -> dict[int, int]:
+        """
+        Calculate the new indices to tensor position dictionary
+
+        Returns
+        -------
+        new_indices_to_tensor_positions:
+            the new dictionary
+        """
         _indices_to_tensor_positions: dict[int, int] = {}
         for i, index in enumerate(self._tensor_positions_to_indices):
             _indices_to_tensor_positions[index] = i
@@ -279,6 +307,26 @@ class _SingleSizeImageList(ImageList):
 
     @staticmethod
     def _change_channel_of_tensor(tensor: Tensor, channel: int) -> Tensor:
+        """
+        Changes the channel of a tensor to the given channel.
+
+        Parameters
+        ----------
+        tensor:
+            the tensor to change the channel of
+        channel:
+            the given new channel
+
+        Returns
+        -------
+        new_tensor:
+            a new tensor with the given channel
+
+        Raises
+        ------
+        ValueError:
+            if the given channel is not a valid channel option
+        """
         if tensor.size(dim=-3) == channel:
             return tensor.detach().clone()
         elif tensor.size(dim=-3) == 1 and channel == 3:
@@ -568,6 +616,14 @@ class _SingleSizeImageList(ImageList):
         return image_list
 
     def blur(self, radius: int) -> ImageList:
+        if radius < 0 or radius >= min(self.widths[0], self.heights[0]):
+            raise OutOfBoundsError(radius, name="radius", lower_bound=ClosedBound(0), upper_bound=ClosedBound(min(self.widths[0], self.heights[0]) - 1))
+        elif radius == 0:
+            warnings.warn(
+                "Blur radius is 0, this will not make changes to the image.",
+                UserWarning,
+                stacklevel=2,
+            )
         image_list = self._clone_without_tensor()
         image_list._tensor = func2.gaussian_blur(self._tensor, [radius * 2 + 1, radius * 2 + 1])
         return image_list

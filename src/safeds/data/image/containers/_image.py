@@ -321,6 +321,13 @@ class Image:
 
         The original image is not modified.
 
+        Parameters
+        ----------
+        new_width:
+            the new width of the image
+        new_height:
+            the new height of the image
+
         Returns
         -------
         result : Image
@@ -532,6 +539,11 @@ class Image:
         -------
         image: Image
             The new, adjusted image.
+
+        Raises
+        ------
+        OutOfBoundsError
+            If factor is smaller than 0.
         """
         if factor < 0:
             raise OutOfBoundsError(factor, name="factor", lower_bound=ClosedBound(0))
@@ -568,7 +580,20 @@ class Image:
         -------
         result : Image
             The blurred image.
+
+        Raises
+        ------
+        OutOfBoundsError
+            If radius is smaller than 0 or equal or greater than the smaller size of the image.
         """
+        if radius < 0 or radius >= min(self.width, self.height):
+            raise OutOfBoundsError(radius, name="radius", lower_bound=ClosedBound(0), upper_bound=ClosedBound(min(self.width, self.height) - 1))
+        elif radius == 0:
+            warnings.warn(
+                "Blur radius is 0, this will not make changes to the image.",
+                UserWarning,
+                stacklevel=2,
+            )
         return Image(func2.gaussian_blur(self._image_tensor, [radius * 2 + 1, radius * 2 + 1]), device=self.device)
 
     def sharpen(self, factor: float) -> Image:
