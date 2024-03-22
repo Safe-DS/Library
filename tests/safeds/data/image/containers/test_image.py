@@ -380,7 +380,11 @@ class TestChangeChannel:
     )
     @pytest.mark.parametrize("channel", [1, 3, 4], ids=["to-gray-1-channel", "to-rgb-3-channel", "to-rgba-4-channel"])
     def test_should_change_channel(
-        self, resource_path: str, channel: int, snapshot_png_image: SnapshotAssertion, device: Device,
+        self,
+        resource_path: str,
+        channel: int,
+        snapshot_png_image: SnapshotAssertion,
+        device: Device,
     ) -> None:
         _skip_if_device_not_available(device)
         image = Image.from_file(resolve_resource_path(resource_path), device)
@@ -465,7 +469,10 @@ class TestConvertToGrayscale:
         ids=images_all_ids(),
     )
     def test_convert_to_grayscale(
-        self, resource_path: str, snapshot_png_image: SnapshotAssertion, device: Device,
+        self,
+        resource_path: str,
+        snapshot_png_image: SnapshotAssertion,
+        device: Device,
     ) -> None:
         _skip_if_device_not_available(device)
         image = Image.from_file(resolve_resource_path(resource_path), device)
@@ -502,7 +509,10 @@ class TestFlipVertically:
         ids=images_asymmetric_ids(),
     )
     def test_should_flip_vertically(
-        self, resource_path: str, snapshot_png_image: SnapshotAssertion, device: Device,
+        self,
+        resource_path: str,
+        snapshot_png_image: SnapshotAssertion,
+        device: Device,
     ) -> None:
         _skip_if_device_not_available(device)
         image = Image.from_file(resolve_resource_path(resource_path), device)
@@ -842,7 +852,10 @@ class TestInvertColors:
         ids=images_all_ids(),
     )
     def test_should_invert_colors(
-        self, resource_path: str, snapshot_png_image: SnapshotAssertion, device: Device,
+        self,
+        resource_path: str,
+        snapshot_png_image: SnapshotAssertion,
+        device: Device,
     ) -> None:
         _skip_if_device_not_available(device)
         image = Image.from_file(resolve_resource_path(resource_path), device)

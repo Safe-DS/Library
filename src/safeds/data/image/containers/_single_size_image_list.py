@@ -64,7 +64,8 @@ class _SingleSizeImageList(ImageList):
                 image_to_append = torch.cat([image, image, image], dim=0)
             elif image.size(dim=0) == 1:  # image channel 1 and max channel 4
                 image_to_append = torch.cat(
-                    [image, image, image, torch.full(image.size(), 255, device=image.device)], dim=0,
+                    [image, image, image, torch.full(image.size(), 255, device=image.device)],
+                    dim=0,
                 )
             else:  # image channel 3 and max channel 4
                 image_to_append = torch.cat([image, torch.full(image[0:1].size(), 255, device=image.device)], dim=0)
@@ -184,7 +185,8 @@ class _SingleSizeImageList(ImageList):
                     Path(image_path).parent.mkdir(parents=True, exist_ok=True)
                     if self.channel == 1:
                         func2.to_pil_image(self._tensor[self._indices_to_tensor_positions[index]], mode="L").save(
-                            image_path, format="jpeg",
+                            image_path,
+                            format="jpeg",
                         )
                     else:
                         save_image(
@@ -206,7 +208,8 @@ class _SingleSizeImageList(ImageList):
             Path(image_path).parent.mkdir(parents=True, exist_ok=True)
             if self.channel == 1:
                 func2.to_pil_image(self._tensor[self._indices_to_tensor_positions[index]], mode="L").save(
-                    image_path, format="jpeg",
+                    image_path,
+                    format="jpeg",
                 )
             else:
                 save_image(
@@ -223,7 +226,8 @@ class _SingleSizeImageList(ImageList):
                     Path(image_path).parent.mkdir(parents=True, exist_ok=True)
                     if self.channel == 1:
                         func2.to_pil_image(self._tensor[self._indices_to_tensor_positions[index]], mode="L").save(
-                            image_path, format="png",
+                            image_path,
+                            format="png",
                         )
                     else:
                         save_image(
@@ -245,7 +249,8 @@ class _SingleSizeImageList(ImageList):
             Path(image_path).parent.mkdir(parents=True, exist_ok=True)
             if self.channel == 1:
                 func2.to_pil_image(self._tensor[self._indices_to_tensor_positions[index]], mode="L").save(
-                    image_path, format="png",
+                    image_path,
+                    format="png",
                 )
             else:
                 save_image(
@@ -311,7 +316,8 @@ class _SingleSizeImageList(ImageList):
                     image_list_single._tensor = torch.cat([
                         tensor,
                         torch.cat(
-                            [image_tensor, image_tensor, image_tensor, torch.full(image_tensor.size(), 255)], dim=0,
+                            [image_tensor, image_tensor, image_tensor, torch.full(image_tensor.size(), 255)],
+                            dim=0,
                         ).unsqueeze(dim=0),
                     ])
                 else:
@@ -427,7 +433,8 @@ class _SingleSizeImageList(ImageList):
     def remove_duplicate_images(self) -> ImageList:
         image_list = _SingleSizeImageList()
         tensor_cpu_unique, new_indices = self._tensor.cpu().unique(
-            dim=0, return_inverse=True,
+            dim=0,
+            return_inverse=True,
         )  # Works somehow faster on cpu
         image_list._tensor = tensor_cpu_unique.to(self._tensor.device)
         indices, indices_to_remove = [], []
@@ -457,7 +464,9 @@ class _SingleSizeImageList(ImageList):
     def resize(self, new_width: int, new_height: int) -> ImageList:
         image_list = self._clone_without_tensor()
         image_list._tensor = func2.resize(
-            self._tensor, size=[new_height, new_width], interpolation=InterpolationMode.NEAREST,
+            self._tensor,
+            size=[new_height, new_width],
+            interpolation=InterpolationMode.NEAREST,
         )
         return image_list
 
@@ -470,7 +479,8 @@ class _SingleSizeImageList(ImageList):
     def _convert_tensor_to_grayscale(tensor: Tensor) -> Tensor:
         if tensor.size(dim=-3) == 4:
             return torch.cat(
-                [func2.rgb_to_grayscale(tensor[:, 0:3], num_output_channels=3), tensor[:, 3].unsqueeze(dim=1)], dim=1,
+                [func2.rgb_to_grayscale(tensor[:, 0:3], num_output_channels=3), tensor[:, 3].unsqueeze(dim=1)],
+                dim=1,
             )
         else:
             return func2.rgb_to_grayscale(tensor[:, 0:3], num_output_channels=3)
@@ -528,7 +538,8 @@ class _SingleSizeImageList(ImageList):
         image_list = self._clone_without_tensor()
         if self.channel == 4:
             image_list._tensor = torch.cat(
-                [func2.adjust_contrast(self._tensor[:, 0:3], factor * 1.0), self._tensor[:, 3].unsqueeze(dim=1)], dim=1,
+                [func2.adjust_contrast(self._tensor[:, 0:3], factor * 1.0), self._tensor[:, 3].unsqueeze(dim=1)],
+                dim=1,
             )
         else:
             image_list._tensor = func2.adjust_contrast(self._tensor, factor * 1.0)
@@ -572,7 +583,8 @@ class _SingleSizeImageList(ImageList):
         image_list = self._clone_without_tensor()
         if self.channel == 4:
             image_list._tensor = torch.cat(
-                [func2.adjust_sharpness(self._tensor[:, 0:3], factor * 1.0), self._tensor[:, 3].unsqueeze(dim=1)], dim=1,
+                [func2.adjust_sharpness(self._tensor[:, 0:3], factor * 1.0), self._tensor[:, 3].unsqueeze(dim=1)],
+                dim=1,
             )
         else:
             image_list._tensor = func2.adjust_sharpness(self._tensor, factor * 1.0)
@@ -582,7 +594,8 @@ class _SingleSizeImageList(ImageList):
         image_list = self._clone_without_tensor()
         if self.channel == 4:
             image_list._tensor = torch.cat(
-                [func2.invert(self._tensor[:, 0:3]), self._tensor[:, 3].unsqueeze(dim=1)], dim=1,
+                [func2.invert(self._tensor[:, 0:3]), self._tensor[:, 3].unsqueeze(dim=1)],
+                dim=1,
             )
         else:
             image_list._tensor = func2.invert(self._tensor)
@@ -614,7 +627,8 @@ class _SingleSizeImageList(ImageList):
             image_list._tensor = edges_tensor.repeat(1, 3, 1, 1)
         elif self.channel == 4:
             image_list._tensor = torch.cat(
-                [edges_tensor.repeat(1, 3, 1, 1), self._tensor[:, 3].unsqueeze(dim=1)], dim=1,
+                [edges_tensor.repeat(1, 3, 1, 1), self._tensor[:, 3].unsqueeze(dim=1)],
+                dim=1,
             )
         else:
             image_list._tensor = edges_tensor

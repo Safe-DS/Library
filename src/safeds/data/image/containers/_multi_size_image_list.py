@@ -53,12 +53,14 @@ class _MultiSizeImageList(ImageList):
 
         for size in image_tensor_dict:
             image_list._image_list_dict[size] = _SingleSizeImageList._create_image_list(
-                image_tensor_dict[size], image_index_dict[size],
+                image_tensor_dict[size],
+                image_index_dict[size],
             )
             image_list._indices_to_image_size_dict.update(
                 zip(
                     image_list._image_list_dict[size]._as_single_size_image_list()._indices_to_tensor_positions.keys(),
-                    [size] * len(image_list._image_list_dict[size]), strict=False,
+                    [size] * len(image_list._image_list_dict[size]),
+                    strict=False,
                 ),
             )
 
@@ -302,7 +304,8 @@ class _MultiSizeImageList(ImageList):
                 image_list._image_list_dict[size] = fixed_ims
             else:
                 image_list._image_list_dict[size] = _SingleSizeImageList._create_image_list(
-                    [im._image_tensor for im in ims], new_indices,
+                    [im._image_tensor for im in ims],
+                    new_indices,
                 )
                 if smallest_channel > image_list._image_list_dict[size].channel:
                     smallest_channel = image_list._image_list_dict[size].channel

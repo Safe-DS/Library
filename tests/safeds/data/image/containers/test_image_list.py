@@ -199,34 +199,46 @@ class TestAllImageCombinations:
             if im != image3_with_expected_channel
         ])
         assert image_list_wo_im_1.remove_image(image2_with_expected_channel) == ImageList.from_images(
-            [image3_with_expected_channel]
-            if image3_with_expected_channel not in [image1_with_expected_channel, image2_with_expected_channel]
-            else [],
+            (
+                [image3_with_expected_channel]
+                if image3_with_expected_channel not in [image1_with_expected_channel, image2_with_expected_channel]
+                else []
+            ),
         )
         assert image_list_wo_im_2.remove_image(image1_with_expected_channel) == ImageList.from_images(
-            [image3_with_expected_channel]
-            if image3_with_expected_channel not in [image1_with_expected_channel, image2_with_expected_channel]
-            else [],
+            (
+                [image3_with_expected_channel]
+                if image3_with_expected_channel not in [image1_with_expected_channel, image2_with_expected_channel]
+                else []
+            ),
         )
         assert image_list_wo_im_1.remove_image(image3_with_expected_channel) == ImageList.from_images(
-            [image2_with_expected_channel]
-            if image2_with_expected_channel not in [image1_with_expected_channel, image3_with_expected_channel]
-            else [],
+            (
+                [image2_with_expected_channel]
+                if image2_with_expected_channel not in [image1_with_expected_channel, image3_with_expected_channel]
+                else []
+            ),
         )
         assert image_list_wo_im_3.remove_image(image1_with_expected_channel) == ImageList.from_images(
-            [image2_with_expected_channel]
-            if image2_with_expected_channel not in [image1_with_expected_channel, image3_with_expected_channel]
-            else [],
+            (
+                [image2_with_expected_channel]
+                if image2_with_expected_channel not in [image1_with_expected_channel, image3_with_expected_channel]
+                else []
+            ),
         )
         assert image_list_wo_im_2.remove_image(image3_with_expected_channel) == ImageList.from_images(
-            [image1_with_expected_channel]
-            if image1_with_expected_channel not in [image2_with_expected_channel, image3_with_expected_channel]
-            else [],
+            (
+                [image1_with_expected_channel]
+                if image1_with_expected_channel not in [image2_with_expected_channel, image3_with_expected_channel]
+                else []
+            ),
         )
         assert image_list_wo_im_3.remove_image(image2_with_expected_channel) == ImageList.from_images(
-            [image1_with_expected_channel]
-            if image1_with_expected_channel not in [image2_with_expected_channel, image3_with_expected_channel]
-            else [],
+            (
+                [image1_with_expected_channel]
+                if image1_with_expected_channel not in [image2_with_expected_channel, image3_with_expected_channel]
+                else []
+            ),
         )
         assert (
             image_list_wo_im_1.remove_image(image2_with_expected_channel).remove_image(image3_with_expected_channel)
@@ -272,23 +284,29 @@ class TestAllImageCombinations:
         assert image_list.remove_images(
             [image1_with_expected_channel, image2_with_expected_channel],
         ) == ImageList.from_images(
-            [image3_with_expected_channel]
-            if image3_with_expected_channel not in [image1_with_expected_channel, image2_with_expected_channel]
-            else [],
+            (
+                [image3_with_expected_channel]
+                if image3_with_expected_channel not in [image1_with_expected_channel, image2_with_expected_channel]
+                else []
+            ),
         )
         assert image_list.remove_images(
             [image1_with_expected_channel, image3_with_expected_channel],
         ) == ImageList.from_images(
-            [image2_with_expected_channel]
-            if image2_with_expected_channel not in [image1_with_expected_channel, image3_with_expected_channel]
-            else [],
+            (
+                [image2_with_expected_channel]
+                if image2_with_expected_channel not in [image1_with_expected_channel, image3_with_expected_channel]
+                else []
+            ),
         )
         assert image_list.remove_images(
             [image2_with_expected_channel, image3_with_expected_channel],
         ) == ImageList.from_images(
-            [image1_with_expected_channel]
-            if image1_with_expected_channel not in [image2_with_expected_channel, image3_with_expected_channel]
-            else [],
+            (
+                [image1_with_expected_channel]
+                if image1_with_expected_channel not in [image2_with_expected_channel, image3_with_expected_channel]
+                else []
+            ),
         )
         assert (
             image_list.remove_images(
@@ -366,7 +384,9 @@ class TestFromFiles:
 class TestToImages:
 
     @pytest.mark.parametrize(
-        "resource_path", [images_all(), [plane_png_path, plane_jpg_path] * 2], ids=["all-images", "planes"],
+        "resource_path",
+        [images_all(), [plane_png_path, plane_jpg_path] * 2],
+        ids=["all-images", "planes"],
     )
     def test_should_return_images(self, resource_path: list[str]) -> None:
         torch.set_default_device(torch.device("cpu"))
@@ -375,7 +395,9 @@ class TestToImages:
         assert image_list_all.to_images(list(range(0, len(image_list_all), 2))) == image_list_select.to_images()
 
     @pytest.mark.parametrize(
-        "resource_path", [images_all(), [plane_png_path, plane_jpg_path]], ids=["all-images", "planes"],
+        "resource_path",
+        [images_all(), [plane_png_path, plane_jpg_path]],
+        ids=["all-images", "planes"],
     )
     def test_from_files_creation(self, resource_path: list[str]) -> None:
         torch.set_default_device(torch.device("cpu"))
@@ -392,7 +414,9 @@ class TestToImages:
 class TestToJpegFiles:
 
     @pytest.mark.parametrize(
-        "resource_path", [images_all(), [plane_png_path, plane_jpg_path]], ids=["all-images", "planes"],
+        "resource_path",
+        [images_all(), [plane_png_path, plane_jpg_path]],
+        ids=["all-images", "planes"],
     )
     def test_should_raise_if_alpha_channel(self, resource_path: list[str]) -> None:
         image_list = ImageList.from_files(resolve_resource_path(resource_path))
@@ -615,7 +639,9 @@ class TestToPngFiles:
 class TestShuffleImages:
 
     @pytest.mark.parametrize(
-        "resource_path", [images_all(), [plane_png_path, plane_jpg_path] * 2], ids=["all-images", "planes"],
+        "resource_path",
+        [images_all(), [plane_png_path, plane_jpg_path] * 2],
+        ids=["all-images", "planes"],
     )
     def test_shuffle_images(self, resource_path: list[str], snapshot_png_image_list: SnapshotAssertion) -> None:
         torch.set_default_device(_get_device())
@@ -689,7 +715,12 @@ class TestTransformsEqualImageTransforms:
         ],
     )
     def test_all_transform_methods(
-        self, method: str, attributes: list, resource_path1: str, resource_path2: str, resource_path3: str,
+        self,
+        method: str,
+        attributes: list,
+        resource_path1: str,
+        resource_path2: str,
+        resource_path3: str,
     ) -> None:
         torch.set_default_device(torch.device("cpu"))
         image_list_original = ImageList.from_files([
@@ -718,7 +749,9 @@ class TestTransformsEqualImageTransforms:
 
 
 @pytest.mark.parametrize(
-    "resource_path", [images_all(), [plane_png_path, plane_jpg_path] * 2], ids=["all-images", "planes"],
+    "resource_path",
+    [images_all(), [plane_png_path, plane_jpg_path] * 2],
+    ids=["all-images", "planes"],
 )
 class TestTransforms:
     class TestAddNoise:
@@ -775,14 +808,17 @@ class TestErrorsAndWarnings:
     class TestChangeChannel:
 
         @pytest.mark.parametrize(
-            "channel", [-1, 0, 2, 5], ids=["channel-negative-1", "channel-0", "channel-2", "channel-5"],
+            "channel",
+            [-1, 0, 2, 5],
+            ids=["channel-negative-1", "channel-0", "channel-2", "channel-5"],
         )
         def test_should_raise(self, resource_path: list[str], channel: int) -> None:
             image_list = ImageList.from_files(
                 [resolve_resource_path(unresolved_path) for unresolved_path in resource_path],
             )
             with pytest.raises(
-                ValueError, match=rf"Channel {channel} is not a valid channel option. Use either 1, 3 or 4",
+                ValueError,
+                match=rf"Channel {channel} is not a valid channel option. Use either 1, 3 or 4",
             ):
                 image_list.change_channel(channel)
 
@@ -981,7 +1017,9 @@ class TestEmptyImageList:
             _EmptyImageList._create_image_list([], [])
 
     @pytest.mark.parametrize(
-        "image_list", [_SingleSizeImageList(), _MultiSizeImageList()], ids=["SingleSizeImageList", "MultiSizeImageList"],
+        "image_list",
+        [_SingleSizeImageList(), _MultiSizeImageList()],
+        ids=["SingleSizeImageList", "MultiSizeImageList"],
     )
     def test_create_image_list(self, image_list: ImageList) -> None:
         assert isinstance(image_list._create_image_list([], []), _EmptyImageList)
@@ -1056,7 +1094,8 @@ class TestEmptyImageList:
     def test_add_image_tensor(self, resource_path: str) -> None:
         torch.set_default_device(_get_device())
         assert _EmptyImageList()._add_image_tensor(
-            Image.from_file(resolve_resource_path(resource_path), _get_device())._image_tensor, 0,
+            Image.from_file(resolve_resource_path(resource_path), _get_device())._image_tensor,
+            0,
         ) == ImageList.from_files(resolve_resource_path(resource_path))
 
     @pytest.mark.parametrize(
