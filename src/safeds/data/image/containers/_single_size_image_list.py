@@ -415,26 +415,45 @@ class _SingleSizeImageList(ImageList):
             return image_list_multi.add_images(images)
         else:
             images_as_single_size_image_list: _SingleSizeImageList = images._as_single_size_image_list()
-            new_indices = [index + first_new_index for index in images_as_single_size_image_list._tensor_positions_to_indices]
-            if images_as_single_size_image_list.widths[0] == self.widths[0] and images_as_single_size_image_list.heights[0] == self.heights[0]:
+            new_indices = [
+                index + first_new_index for index in images_as_single_size_image_list._tensor_positions_to_indices
+            ]
+            if (
+                images_as_single_size_image_list.widths[0] == self.widths[0]
+                and images_as_single_size_image_list.heights[0] == self.heights[0]
+            ):
                 image_list_single: _SingleSizeImageList = self._clone_without_tensor()._as_single_size_image_list()
                 image_list_single._tensor_positions_to_indices += new_indices
                 if self.channel > images_as_single_size_image_list.channel:
                     image_list_single._tensor = torch.cat(
-                        [self._tensor, _SingleSizeImageList._change_channel_of_tensor(images_as_single_size_image_list._tensor, self.channel)],
+                        [
+                            self._tensor,
+                            _SingleSizeImageList._change_channel_of_tensor(
+                                images_as_single_size_image_list._tensor, self.channel,
+                            ),
+                        ],
                     )
                 elif self.channel < images_as_single_size_image_list.channel:
                     image_list_single._tensor = torch.cat(
-                        [_SingleSizeImageList._change_channel_of_tensor(self._tensor, images_as_single_size_image_list.channel), images_as_single_size_image_list._tensor],
+                        [
+                            _SingleSizeImageList._change_channel_of_tensor(
+                                self._tensor, images_as_single_size_image_list.channel,
+                            ),
+                            images_as_single_size_image_list._tensor,
+                        ],
                     )
                 else:
                     image_list_single._tensor = torch.cat([self._tensor, images_as_single_size_image_list._tensor])
-                image_list_single._indices_to_tensor_positions = image_list_single._calc_new_indices_to_tensor_positions()
+                image_list_single._indices_to_tensor_positions = (
+                    image_list_single._calc_new_indices_to_tensor_positions()
+                )
                 return image_list_single
             else:
                 image_list_multi = _MultiSizeImageList()
                 image_list_multi._image_list_dict[(self.widths[0], self.heights[0])] = self.clone()
-                image_list_multi._image_list_dict[(images_as_single_size_image_list.widths[0], images_as_single_size_image_list.heights[0])] = images_as_single_size_image_list.clone()
+                image_list_multi._image_list_dict[
+                    (images_as_single_size_image_list.widths[0], images_as_single_size_image_list.heights[0])
+                ] = images_as_single_size_image_list.clone()
                 for index in self._tensor_positions_to_indices:
                     image_list_multi._indices_to_image_size_dict[index] = (self.widths[0], self.heights[0])
                 for index in images_as_single_size_image_list._tensor_positions_to_indices:
