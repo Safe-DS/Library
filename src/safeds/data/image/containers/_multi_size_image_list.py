@@ -23,7 +23,7 @@ from safeds.exceptions import (
 if TYPE_CHECKING:
     from pathlib import Path
 
-    from safeds.data.image.containers import _SingleSizeImageList
+    from safeds.data.image.containers._single_size_image_list import _SingleSizeImageList
 
 
 class _MultiSizeImageList(ImageList):

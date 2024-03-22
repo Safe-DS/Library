@@ -27,7 +27,7 @@ from safeds.exceptions import (
 )
 
 if TYPE_CHECKING:
-    from safeds.data.image.containers import _MultiSizeImageList
+    from safeds.data.image.containers._multi_size_image_list import _MultiSizeImageList
 
 
 class _SingleSizeImageList(ImageList):
@@ -413,40 +413,41 @@ class _SingleSizeImageList(ImageList):
             for index in self._tensor_positions_to_indices:
                 image_list_multi._indices_to_image_size_dict[index] = (self.widths[0], self.heights[0])
             return image_list_multi.add_images(images)
-        images = images._as_single_size_image_list()
-        new_indices = [index + first_new_index for index in images._tensor_positions_to_indices]
-        if images.widths[0] == self.widths[0] and images.heights[0] == self.heights[0]:
-            image_list_single: _SingleSizeImageList = self._clone_without_tensor()._as_single_size_image_list()
-            image_list_single._tensor_positions_to_indices += new_indices
-            if self.channel > images.channel:
-                image_list_single._tensor = torch.cat(
-                    [self._tensor, _SingleSizeImageList._change_channel_of_tensor(images._tensor, self.channel)],
-                )
-            elif self.channel < images.channel:
-                image_list_single._tensor = torch.cat(
-                    [_SingleSizeImageList._change_channel_of_tensor(self._tensor, images.channel), images._tensor],
-                )
-            else:
-                image_list_single._tensor = torch.cat([self._tensor, images._tensor])
-            image_list_single._indices_to_tensor_positions = image_list_single._calc_new_indices_to_tensor_positions()
-            return image_list_single
         else:
-            image_list_multi = _MultiSizeImageList()
-            image_list_multi._image_list_dict[(self.widths[0], self.heights[0])] = self.clone()
-            image_list_multi._image_list_dict[(images.widths[0], images.heights[0])] = images.clone()
-            for index in self._tensor_positions_to_indices:
-                image_list_multi._indices_to_image_size_dict[index] = (self.widths[0], self.heights[0])
-            for index in images._tensor_positions_to_indices:
-                image_list_multi._indices_to_image_size_dict[index + first_new_index] = (
-                    images.widths[0],
-                    images.heights[0],
-                )
+            images_as_single_size_image_list: _SingleSizeImageList = images._as_single_size_image_list()
+            new_indices = [index + first_new_index for index in images_as_single_size_image_list._tensor_positions_to_indices]
+            if images_as_single_size_image_list.widths[0] == self.widths[0] and images_as_single_size_image_list.heights[0] == self.heights[0]:
+                image_list_single: _SingleSizeImageList = self._clone_without_tensor()._as_single_size_image_list()
+                image_list_single._tensor_positions_to_indices += new_indices
+                if self.channel > images_as_single_size_image_list.channel:
+                    image_list_single._tensor = torch.cat(
+                        [self._tensor, _SingleSizeImageList._change_channel_of_tensor(images_as_single_size_image_list._tensor, self.channel)],
+                    )
+                elif self.channel < images_as_single_size_image_list.channel:
+                    image_list_single._tensor = torch.cat(
+                        [_SingleSizeImageList._change_channel_of_tensor(self._tensor, images_as_single_size_image_list.channel), images_as_single_size_image_list._tensor],
+                    )
+                else:
+                    image_list_single._tensor = torch.cat([self._tensor, images_as_single_size_image_list._tensor])
+                image_list_single._indices_to_tensor_positions = image_list_single._calc_new_indices_to_tensor_positions()
+                return image_list_single
+            else:
+                image_list_multi = _MultiSizeImageList()
+                image_list_multi._image_list_dict[(self.widths[0], self.heights[0])] = self.clone()
+                image_list_multi._image_list_dict[(images_as_single_size_image_list.widths[0], images_as_single_size_image_list.heights[0])] = images_as_single_size_image_list.clone()
+                for index in self._tensor_positions_to_indices:
+                    image_list_multi._indices_to_image_size_dict[index] = (self.widths[0], self.heights[0])
+                for index in images_as_single_size_image_list._tensor_positions_to_indices:
+                    image_list_multi._indices_to_image_size_dict[index + first_new_index] = (
+                        images_as_single_size_image_list.widths[0],
+                        images_as_single_size_image_list.heights[0],
+                    )
 
-            if images.channel != self.channel:
-                image_list_multi = image_list_multi.change_channel(
-                    max(images.channel, self.channel),
-                )._as_multi_size_image_list()
-            return image_list_multi
+                if images_as_single_size_image_list.channel != self.channel:
+                    image_list_multi = image_list_multi.change_channel(
+                        max(images_as_single_size_image_list.channel, self.channel),
+                    )._as_multi_size_image_list()
+                return image_list_multi
 
     def remove_image_by_index(self, index: int | list[int]) -> ImageList:
         from safeds.data.image.containers._empty_image_list import _EmptyImageList
