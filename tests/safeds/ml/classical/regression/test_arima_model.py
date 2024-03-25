@@ -17,10 +17,9 @@ from safeds.exceptions import (
 )
 
 
-def test_arima_model(snapshot_png: SnapshotAssertion) -> None:
+def test_arima_model() -> None:
     # Create a DataFrame
     _inflation_path = "_datas/US_Inflation_rates.csv"
-    np.random.seed(42)
     time_series = TimeSeries.timeseries_from_csv_file(path=resolve_resource_path(_inflation_path), target_name="value",
                                                       time_name="date")
     train_ts, test_ts = time_series.split_rows(0.8)
@@ -113,8 +112,8 @@ def test_should_raise_on_invalid_data(
     expected_error: Any,
     expected_error_msg: str,
 ) -> None:
+    model = ArimaModel()
     with pytest.raises(expected_error, match=expected_error_msg):
-        model = ArimaModel()
         model.fit(invalid_data)
 
 
@@ -132,8 +131,8 @@ def test_should_raise_on_invalid_data(
     ids=["untagged_table"],
 )
 def test_should_raise_if_table_is_not_tagged(table: Table) -> None:
+    model = ArimaModel()
     with pytest.raises(NonTimeSeriesError):
-        model = ArimaModel()
         model.fit(table)  # type: ignore[arg-type]
 
 

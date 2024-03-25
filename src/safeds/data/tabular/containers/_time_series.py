@@ -5,7 +5,6 @@ import sys
 from typing import TYPE_CHECKING
 
 import matplotlib.pyplot as plt
-from pathlib import Path
 import pandas as pd
 import seaborn as sns
 import xxhash
@@ -27,6 +26,7 @@ from safeds.exceptions import (
 if TYPE_CHECKING:
     from collections.abc import Callable, Mapping, Sequence
     from typing import Any
+    from pathlib import Path
 
 
 class TimeSeries(Table):

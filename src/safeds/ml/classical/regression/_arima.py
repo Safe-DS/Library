@@ -11,7 +11,6 @@ from safeds.data.image.containers import Image
 
 if TYPE_CHECKING:
     from sklearn.base import RegressorMixin
-    from safeds.data.tabular.containers import TimeSeries
 from safeds.exceptions import (
     ModelNotFittedError,
     PredictionError,
@@ -132,8 +131,8 @@ class ArimaModel:
 
         try:
             forecast_results = self._arima.forecast(steps=forecast_horizon)
-        except any:
-            raise PredictionError
+        except any as exception:
+            raise PredictionError(str(exception)) from exception
         target_column = Column(name="target", data=forecast_results)
         time_column = Column(name="time", data= pd.Series(range(0, forecast_horizon),  name="time"))
         # create new TimeSeries
@@ -144,7 +143,8 @@ class ArimaModel:
 
     def plot_predictions(self, time_series: TimeSeries) -> Image:
         """
-        Plot the predictions of the given time series target
+        Plot the predictions of the given time series target.
+
         Parameters
         ----------
         time_series : TimeSeries
@@ -165,7 +165,7 @@ class ArimaModel:
         """
         if not self.is_fitted():
             raise ModelNotFittedError
-        test_data = time_series.target._data.values
+        test_data = time_series.target._data.to_numpy()
         n_steps = len(test_data)
         forecast_results = self._arima.forecast(steps=n_steps)
 
