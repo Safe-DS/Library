@@ -1,27 +1,25 @@
-import pytest
-from safeds.ml.classical.regression import ArimaModel
-from safeds.data.tabular.containers import TimeSeries, Table
-from typing import TYPE_CHECKING, Any
-from syrupy import SnapshotAssertion
-import numpy as np
-import os
+from typing import Any
 
-from tests.helpers import resolve_resource_path
+import pytest
+from safeds.data.tabular.containers import Table, TimeSeries
 from safeds.exceptions import (
-    NonTimeSeriesError,
     DatasetMissesDataError,
     MissingValuesColumnError,
-    NonNumericColumnError,
     ModelNotFittedError,
-
+    NonNumericColumnError,
+    NonTimeSeriesError,
 )
+from safeds.ml.classical.regression import ArimaModel
+
+from tests.helpers import resolve_resource_path
 
 
 def test_arima_model() -> None:
     # Create a DataFrame
     _inflation_path = "_datas/US_Inflation_rates.csv"
-    time_series = TimeSeries.timeseries_from_csv_file(path=resolve_resource_path(_inflation_path), target_name="value",
-                                                      time_name="date")
+    time_series = TimeSeries.timeseries_from_csv_file(
+        path=resolve_resource_path(_inflation_path), target_name="value", time_name="date",
+    )
     train_ts, test_ts = time_series.split_rows(0.8)
     model = ArimaModel()
     trained_model = model.fit(train_ts)
@@ -31,8 +29,11 @@ def test_arima_model() -> None:
 
 
 def create_test_data() -> TimeSeries:
-    return TimeSeries({"time": [1, 2, 3, 4, 5, 6, 7, 8, 9], "value": [1, 2, 3, 4, 5, 6, 7, 8, 9]},
-                      time_name="time", target_name="value")
+    return TimeSeries(
+        {"time": [1, 2, 3, 4, 5, 6, 7, 8, 9], "value": [1, 2, 3, 4, 5, 6, 7, 8, 9]},
+        time_name="time",
+        target_name="value",
+    )
 
 
 def test_should_succeed_on_valid_data() -> None:
@@ -78,7 +79,7 @@ def test_should_succeed_on_valid_data_plot() -> None:
                 },
             ).time_columns(target_name="target", feature_names=["feat1", "feat2"], time_name="id"),
             NonNumericColumnError,
-            r'Tried to do a numerical operation on one or multiple non-numerical columns: \ntarget',
+            r"Tried to do a numerical operation on one or multiple non-numerical columns: \ntarget",
         ),
         (
             Table(
@@ -90,7 +91,7 @@ def test_should_succeed_on_valid_data_plot() -> None:
                 },
             ).time_columns(target_name="target", feature_names=["feat1", "feat2"], time_name="id"),
             MissingValuesColumnError,
-            r'Tried to do an operation on one or multiple columns containing missing values: \ntarget\nYou can use the Imputer to replace the missing values based on different strategies.\nIf you want toremove the missing values entirely you can use the method `TimeSeries.remove_rows_with_missing_values`.',
+            r"Tried to do an operation on one or multiple columns containing missing values: \ntarget\nYou can use the Imputer to replace the missing values based on different strategies.\nIf you want toremove the missing values entirely you can use the method `TimeSeries.remove_rows_with_missing_values`.",
         ),
         (
             Table(

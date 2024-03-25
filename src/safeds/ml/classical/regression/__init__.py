@@ -1,6 +1,7 @@
 """Models for regression tasks."""
 
 from ._ada_boost import AdaBoost
+from ._arima import ArimaModel
 from ._decision_tree import DecisionTree
 from ._elastic_net_regression import ElasticNetRegression
 from ._gradient_boosting import GradientBoosting
@@ -11,7 +12,6 @@ from ._random_forest import RandomForest
 from ._regressor import Regressor
 from ._ridge_regression import RidgeRegression
 from ._support_vector_machine import SupportVectorMachine
-from ._arima import ArimaModel
 
 __all__ = [
     "AdaBoost",

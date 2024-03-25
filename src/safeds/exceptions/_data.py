@@ -162,5 +162,3 @@ class IllegalFormatError(Exception):
 
     def __init__(self, formats: list[str] | str) -> None:
         super().__init__(f"This format is illegal. Use one of the following formats: {formats}")
-
-

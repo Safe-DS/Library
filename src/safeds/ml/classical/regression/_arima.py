@@ -1,26 +1,22 @@
 from __future__ import annotations
 
+import io
+import itertools
+
+import matplotlib.pyplot as plt
 import pandas as pd
 from statsmodels.tsa.arima.model import ARIMA
 
-import io
-from typing import TYPE_CHECKING, Optional
-import itertools
-import matplotlib.pyplot as plt
-
-from safeds.data.tabular.containers import TimeSeries, Column, Table
 from safeds.data.image.containers import Image
-
-if TYPE_CHECKING:
-    from sklearn.base import RegressorMixin
+from safeds.data.tabular.containers import Column, Table, TimeSeries
 from safeds.exceptions import (
-    ModelNotFittedError,
-    PredictionError,
     DatasetMissesDataError,
-    NonNumericColumnError,
-    MissingValuesColumnError,
     LearningError,
+    MissingValuesColumnError,
+    ModelNotFittedError,
+    NonNumericColumnError,
     NonTimeSeriesError,
+    PredictionError,
 )
 
 
@@ -67,9 +63,7 @@ class ArimaModel:
         if time_series.number_of_rows == 0:
             raise DatasetMissesDataError
         if not time_series.target.type.is_numeric():
-            raise NonNumericColumnError(
-                time_series.target.name
-            )
+            raise NonNumericColumnError(time_series.target.name)
         if time_series.target.has_missing_values():
             raise MissingValuesColumnError(
                 time_series.target.name,
@@ -78,7 +72,7 @@ class ArimaModel:
                 "`TimeSeries.remove_rows_with_missing_values`.",
             )
         fitted_arima = ArimaModel()
-        p = d = q = range(0, 2)
+        p = d = q = range(2)
         pdq = list(itertools.product(p, d, q))
         best_aic = float("inf")
         best_model = None
@@ -105,26 +99,26 @@ class ArimaModel:
 
     def predict(self, forecast_horizon: int) -> TimeSeries:
         """
-            Predict a target vector using a time series target column. The model has to be trained first.
+        Predict a target vector using a time series target column. The model has to be trained first.
 
-            Parameters
-            ----------
-            forecast_horizon : TimeSeries
-                The forecast horizon for the predicted value.
+        Parameters
+        ----------
+        forecast_horizon : TimeSeries
+            The forecast horizon for the predicted value.
 
-            Returns
-            -------
-            table : TimeSeries
-                A timeseries containing the predicted target vector and a time dummy as time column.
+        Returns
+        -------
+        table : TimeSeries
+            A timeseries containing the predicted target vector and a time dummy as time column.
 
-            Raises
-            ------
-            ModelNotFittedError
-                If the model has not been fitted yet.
-            IndexError
-                If the forecast horizon is not greater than zero.
-            PredictionError
-                If predicting with the given dataset failed.
+        Raises
+        ------
+        ModelNotFittedError
+            If the model has not been fitted yet.
+        IndexError
+            If the forecast horizon is not greater than zero.
+        PredictionError
+            If predicting with the given dataset failed.
         """
         # Validation
         if forecast_horizon <= 0:
@@ -139,7 +133,7 @@ class ArimaModel:
         except ValueError as exception:
             raise PredictionError(str(exception)) from exception
         target_column: Column = Column(name="target", data=forecast_results)
-        time_column: Column = Column(name="time", data=pd.Series(range(0, forecast_horizon), name="time"))
+        time_column: Column = Column(name="time", data=pd.Series(range(forecast_horizon), name="time"))
         # create new TimeSeries
         result = Table()
         result = result.add_column(target_column)
@@ -177,7 +171,9 @@ class ArimaModel:
         forecast_results = self._arima.forecast(steps=n_steps)
 
         fig = plt.figure()
-        plt.plot(forecast_results, )
+        plt.plot(
+            forecast_results,
+        )
         plt.legend(["forecasted"])
         plt.plot(test_data)
         plt.tight_layout()

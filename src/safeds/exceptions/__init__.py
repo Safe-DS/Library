@@ -28,9 +28,9 @@ from safeds.exceptions._ml import (
     DatasetMissesFeaturesError,
     LearningError,
     ModelNotFittedError,
+    NonTimeSeriesError,
     PredictionError,
     UntaggedTableError,
-    NonTimeSeriesError,
 )
 
 __all__ = [

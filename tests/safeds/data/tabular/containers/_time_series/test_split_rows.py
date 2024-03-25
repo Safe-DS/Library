@@ -1,8 +1,8 @@
 import pandas as pd
 import pytest
-from tests.helpers import assert_that_time_series_are_equal
-from safeds.data.tabular.containers import TimeSeries, Table
+from safeds.data.tabular.containers import Table, TimeSeries
 from safeds.data.tabular.typing import Integer, Nothing, Schema
+
 
 @pytest.mark.parametrize(
     ("table", "result_train_table", "result_test_table", "percentage_in_first"),
@@ -15,16 +15,22 @@ from safeds.data.tabular.typing import Integer, Nothing, Schema
         ),
         (
             TimeSeries({"col1": [1, 2, 1], "col2": [1, 2, 4]}, time_name="col1", target_name="col2"),
-            TimeSeries._from_table(Table._from_pandas_dataframe(pd.DataFrame(), Schema({"col1": Nothing(), "col2": Nothing()})),
-                                   time_name="col1", target_name="col2"),
+            TimeSeries._from_table(
+                Table._from_pandas_dataframe(pd.DataFrame(), Schema({"col1": Nothing(), "col2": Nothing()})),
+                time_name="col1",
+                target_name="col2",
+            ),
             TimeSeries({"col1": [1, 2, 1], "col2": [1, 2, 4]}, time_name="col1", target_name="col2"),
             0,
         ),
         (
             TimeSeries({"col1": [1, 2, 1], "col2": [1, 2, 4]}, time_name="col1", target_name="col2"),
             TimeSeries({"col1": [1, 2, 1], "col2": [1, 2, 4]}, time_name="col1", target_name="col2"),
-            TimeSeries._from_table(Table._from_pandas_dataframe(pd.DataFrame(), Schema({"col1": Integer(), "col2": Integer()})),
-                                   time_name="col1", target_name="col2"),
+            TimeSeries._from_table(
+                Table._from_pandas_dataframe(pd.DataFrame(), Schema({"col1": Integer(), "col2": Integer()})),
+                time_name="col1",
+                target_name="col2",
+            ),
             1,
         ),
     ],
