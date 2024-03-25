@@ -83,7 +83,7 @@ class ArimaModel:
         best_aic = float("inf")
         best_model = None
         # best param will get overwritten
-        best_param = (-1, -1, -1)
+        best_param = (0, 0, 0)
         for param in pdq:
             # Create and fit an ARIMA model with the current parameters
             mod = ARIMA(time_series.target._data.values, order=param)
@@ -169,6 +169,8 @@ class ArimaModel:
 
         """
         if not self.is_fitted():
+            raise ModelNotFittedError
+        if self._arima is None:
             raise ModelNotFittedError
         test_data = time_series.target._data.to_numpy()
         n_steps = len(test_data)
