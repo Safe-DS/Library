@@ -1,8 +1,10 @@
+from __future__ import annotations
+
 import pandas as pd
 from statsmodels.tsa.arima.model import ARIMA
 
 import io
-from typing import TYPE_CHECKING, Tuple, Optional
+from typing import TYPE_CHECKING, Optional
 import itertools
 import matplotlib.pyplot as plt
 
@@ -31,7 +33,7 @@ class ArimaModel:
         self._order = None
         self._fitted = False
 
-    def fit(self, time_series: TimeSeries) -> TimeSeries:
+    def fit(self, time_series: TimeSeries) -> ArimaModel:
         """
         Create a copy of this ARIMA Model and fit it with the given training data.
 
@@ -80,7 +82,7 @@ class ArimaModel:
         pdq = list(itertools.product(p, d, q))
         best_aic = float("inf")
         best_model = None
-        best_param: Optional[Tuple[int, int, int]] = None
+        best_param: Optional[tuple[int, int, int]] = None
         for param in pdq:
             # Create and fit an ARIMA model with the current parameters
             mod = ARIMA(time_series.target._data.values, order=param)
@@ -123,7 +125,7 @@ class ArimaModel:
             PredictionError
                 If predicting with the given dataset failed.
         """
-        #Validation
+        # Validation
         if forecast_horizon <= 0:
             raise IndexError("forecast_horizon must be greater 0")
         if not self.is_fitted():
@@ -134,7 +136,7 @@ class ArimaModel:
         except ValueError as exception:
             raise PredictionError(str(exception)) from exception
         target_column: Column = Column(name="target", data=forecast_results)
-        time_column: Column = Column(name="time", data= pd.Series(range(0, forecast_horizon),  name="time"))
+        time_column: Column = Column(name="time", data=pd.Series(range(0, forecast_horizon), name="time"))
         # create new TimeSeries
         result = Table()
         result = result.add_column(target_column)
