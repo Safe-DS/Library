@@ -30,6 +30,7 @@ from safeds.exceptions._ml import (
     ModelNotFittedError,
     PredictionError,
     UntaggedTableError,
+    NonTimeSeriesError,
 )
 
 __all__ = [
@@ -58,6 +59,7 @@ __all__ = [
     "ModelNotFittedError",
     "PredictionError",
     "UntaggedTableError",
+    "NonTimeSeriesError",
     # Other
     "Bound",
     "ClosedBound",
