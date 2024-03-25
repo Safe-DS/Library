@@ -30,7 +30,7 @@ class ArimaModel:
     def __init__(self) -> None:
         # Internal state
         self._arima: ARIMA | None = None
-        self._order = None
+        self._order: tuple[int, int, int] | None = None
         self._fitted = False
 
     def fit(self, time_series: TimeSeries) -> ArimaModel:
