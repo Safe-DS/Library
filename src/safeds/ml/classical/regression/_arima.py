@@ -2,7 +2,7 @@ import pandas as pd
 from statsmodels.tsa.arima.model import ARIMA
 
 import io
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Tuple, Optional
 import itertools
 import matplotlib.pyplot as plt
 
@@ -27,11 +27,11 @@ class ArimaModel:
 
     def __init__(self) -> None:
         # Internal state
-        self._arima = None
+        self._arima: ARIMA | None = None
         self._order = None
         self._fitted = False
 
-    def fit(self, time_series: TimeSeries):
+    def fit(self, time_series: TimeSeries) -> TimeSeries:
         """
         Create a copy of this ARIMA Model and fit it with the given training data.
 
@@ -80,7 +80,7 @@ class ArimaModel:
         pdq = list(itertools.product(p, d, q))
         best_aic = float("inf")
         best_model = None
-        best_param = None
+        best_param: Optional[Tuple[int, int, int]] = None
         for param in pdq:
             # Create and fit an ARIMA model with the current parameters
             mod = ARIMA(time_series.target._data.values, order=param)
@@ -100,7 +100,7 @@ class ArimaModel:
         fitted_arima._fitted = True
         return fitted_arima
 
-    def predict(self, forecast_horizon: int):
+    def predict(self, forecast_horizon: int) -> TimeSeries:
         """
             Predict a target vector using a time series target column. The model has to be trained first.
 
@@ -131,10 +131,10 @@ class ArimaModel:
 
         try:
             forecast_results = self._arima.forecast(steps=forecast_horizon)
-        except any as exception:
+        except ValueError as exception:
             raise PredictionError(str(exception)) from exception
-        target_column = Column(name="target", data=forecast_results)
-        time_column = Column(name="time", data= pd.Series(range(0, forecast_horizon),  name="time"))
+        target_column: Column = Column(name="target", data=forecast_results)
+        time_column: Column = Column(name="time", data= pd.Series(range(0, forecast_horizon),  name="time"))
         # create new TimeSeries
         result = Table()
         result = result.add_column(target_column)
