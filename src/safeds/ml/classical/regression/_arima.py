@@ -82,7 +82,8 @@ class ArimaModel:
         pdq = list(itertools.product(p, d, q))
         best_aic = float("inf")
         best_model = None
-        best_param: Optional[tuple[int, int, int]] = None
+        # best param will get overwritten
+        best_param = (-1, -1, -1)
         for param in pdq:
             # Create and fit an ARIMA model with the current parameters
             mod = ARIMA(time_series.target._data.values, order=param)
@@ -129,6 +130,8 @@ class ArimaModel:
         if forecast_horizon <= 0:
             raise IndexError("forecast_horizon must be greater 0")
         if not self.is_fitted():
+            raise ModelNotFittedError
+        if self._arima is None:
             raise ModelNotFittedError
 
         try:
