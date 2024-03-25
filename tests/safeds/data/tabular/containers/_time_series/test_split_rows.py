@@ -37,7 +37,6 @@ def test_should_split_table(
     percentage_in_first: int,
 ) -> None:
     train_table, test_table = table.split_rows(percentage_in_first)
-    print(result_test_table.time._data)
     assert result_test_table == test_table
     assert result_train_table.schema == train_table.schema
     assert result_train_table == train_table
