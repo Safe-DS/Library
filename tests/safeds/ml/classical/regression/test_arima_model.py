@@ -184,6 +184,6 @@ def test_should_raise_if_horizon_too_small_plot() -> None:
 def test_value_error_predict() -> None:
     model = ArimaModel()
     ts = TimeSeries._from_table(Table({"time": [1, 2, 3], "value": [4, 5, 6]}), target_name="value", time_name="time")
+    model = model.fit(ts)
     with pytest.raises(PredictionError):
-        model = model.fit(ts)
         model.predict(forecast_horizon=3000000000000000000000000000)

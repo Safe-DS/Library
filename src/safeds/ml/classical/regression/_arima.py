@@ -141,8 +141,7 @@ class ArimaModel:
 
     def plot_predictions(self, test_series: TimeSeries) -> Image:
         """
-        Plot the predictions of the trained model to the given target of the time series. So you can see the predictions
-        and the actual values in one plot.
+        Plot the predictions of the trained model to the given target of the time series. So you can see the predictions and the actual values in one plot.
 
         Parameters
         ----------
