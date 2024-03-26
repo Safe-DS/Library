@@ -11,7 +11,6 @@ from safeds.data.image.containers import Image
 from safeds.data.tabular.containers import Column, Table, TimeSeries
 from safeds.exceptions import (
     DatasetMissesDataError,
-    LearningError,
     MissingValuesColumnError,
     ModelNotFittedError,
     NonNumericColumnError,
@@ -85,7 +84,6 @@ class ArimaModel:
             # I wasnt able to invoke an learning Error
             # Add try catch when an learning error is found
             result = mod.fit()
-
 
             # Compare the current model's AIC with the best AIC so far
             if result.aic < best_aic:
