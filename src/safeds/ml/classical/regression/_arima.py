@@ -143,7 +143,7 @@ class ArimaModel:
 
         Parameters
         ----------
-        time_series : TimeSeries
+        test_series : TimeSeries
             The time series containing the target vector.
 
         Returns
