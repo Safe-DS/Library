@@ -70,7 +70,10 @@ class TimeSeries(Table):
 
         """
         return TimeSeries._from_table(
-            Table.from_csv_file(path=path), target_name=target_name, time_name=time_name, feature_names=feature_names,
+            Table.from_csv_file(path=path),
+            target_name=target_name,
+            time_name=time_name,
+            feature_names=feature_names,
         )
 
     @staticmethod
@@ -1210,9 +1213,15 @@ class TimeSeries(Table):
         t1, t2 = temp.split_rows(percentage_in_first=percentage_in_first)
         return (
             TimeSeries._from_table(
-                t1, time_name=self.time.name, target_name=self._target.name, feature_names=self._feature_names,
+                t1,
+                time_name=self.time.name,
+                target_name=self._target.name,
+                feature_names=self._feature_names,
             ),
             TimeSeries._from_table(
-                t2, time_name=self.time.name, target_name=self._target.name, feature_names=self._feature_names,
+                t2,
+                time_name=self.time.name,
+                target_name=self._target.name,
+                feature_names=self._feature_names,
             ),
         )

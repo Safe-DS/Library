@@ -21,7 +21,9 @@ def test_arima_model() -> None:
     # Create a DataFrame
     _inflation_path = "_datas/US_Inflation_rates.csv"
     time_series = TimeSeries.timeseries_from_csv_file(
-        path=resolve_resource_path(_inflation_path), target_name="value", time_name="date",
+        path=resolve_resource_path(_inflation_path),
+        target_name="value",
+        time_name="date",
     )
     train_ts, test_ts = time_series.split_rows(0.8)
     model = ArimaModel()
