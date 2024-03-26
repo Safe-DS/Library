@@ -81,10 +81,11 @@ class ArimaModel:
         for param in pdq:
             # Create and fit an ARIMA model with the current parameters
             mod = ARIMA(time_series.target._data.values, order=param)
-            try:
-                result = mod.fit()
-            except ValueError as exception:
-                raise LearningError(str(exception)) from exception
+
+            # I wasnt able to invoke an learning Error
+            # Add try catch when an learning error is found
+            result = mod.fit()
+
 
             # Compare the current model's AIC with the best AIC so far
             if result.aic < best_aic:
@@ -123,9 +124,7 @@ class ArimaModel:
         # Validation
         if forecast_horizon <= 0:
             raise IndexError("forecast_horizon must be greater 0")
-        if not self.is_fitted():
-            raise ModelNotFittedError
-        if self._arima is None:
+        if not self.is_fitted() or self._arima is None:
             raise ModelNotFittedError
 
         try:
@@ -140,9 +139,10 @@ class ArimaModel:
         result = result.add_column(time_column)
         return TimeSeries._from_table(result, time_name="time", target_name="target")
 
-    def plot_predictions(self, time_series: TimeSeries) -> Image:
+    def plot_predictions(self, test_series: TimeSeries) -> Image:
         """
-        Plot the predictions of the given time series target.
+        Plot the predictions of the trained model to the given target of the time series. So you can see the predictions
+        and the actual values in one plot.
 
         Parameters
         ----------
@@ -162,11 +162,9 @@ class ArimaModel:
                 If predicting with the given dataset failed.
 
         """
-        if not self.is_fitted():
+        if not self.is_fitted() or self._arima is None:
             raise ModelNotFittedError
-        if self._arima is None:
-            raise ModelNotFittedError
-        test_data = time_series.target._data.to_numpy()
+        test_data = test_series.target._data.to_numpy()
         n_steps = len(test_data)
         forecast_results = self._arima.forecast(steps=n_steps)
 

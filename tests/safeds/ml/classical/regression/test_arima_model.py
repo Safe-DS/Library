@@ -8,7 +8,10 @@ from safeds.exceptions import (
     ModelNotFittedError,
     NonNumericColumnError,
     NonTimeSeriesError,
+    LearningError,
+    PredictionError,
 )
+
 from safeds.ml.classical.regression import ArimaModel
 
 from tests.helpers import resolve_resource_path
@@ -163,3 +166,22 @@ def test_if_fitted_fitted() -> None:
     model = ArimaModel()
     model = model.fit(create_test_data())
     assert model.is_fitted()
+
+
+def test_should_raise_if_horizon_too_small() -> None:
+    model = ArimaModel()
+    with pytest.raises(IndexError):
+        model.predict(forecast_horizon=0)
+
+
+def test_should_raise_if_horizon_too_small_plot() -> None:
+    model = ArimaModel()
+    with pytest.raises(ModelNotFittedError):
+        model.plot_predictions(create_test_data())
+
+def test_value_error_predict() -> None:
+    model = ArimaModel()
+    ts = TimeSeries._from_table(Table({"time": [1, 2, 3], "value": [4, 5, 6]}), target_name="value", time_name="time")
+    with pytest.raises(PredictionError):
+        model = model.fit(ts)
+        model.predict(forecast_horizon=3000000000000000000000000000)
