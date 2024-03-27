@@ -1225,3 +1225,45 @@ class TimeSeries(Table):
                 feature_names=self._feature_names,
             ),
         )
+
+    def plot_compare_time_series(self, time_series: list[TimeSeries]) -> Image:
+        """
+        Creates a plot where the given time series targets are plotted by the time on the x-axis.
+
+        Parameters
+        ----------
+        time_series
+            A list of time series to be plotted.
+
+        Returns
+        -------
+            A plot with all the time series targets plotted by the time on the x-axis.
+
+        """
+        if not self._target.type.is_numeric():
+            raise NonNumericColumnError("The time series plotted column contains non-numerical columns.")
+
+
+        data = pd.DataFrame()
+        data[self.time.name] = self.time._data
+        data[self.target.name] = self.target._data
+        index = 0
+        for ts in time_series:
+            if not ts.target.type.is_numeric():
+                raise NonNumericColumnError("The time series plotted column contains non-numerical columns.")
+            data[ts.target.name+str(index)] = ts.target._data
+            index = index+1
+        fig = plt.figure()
+
+        data= pd.melt(data, [self.time.name])
+        sns.lineplot(x=self.time.name, y='value', hue = 'variable', data=data)
+        plt.title("Multiple Series Plot")
+        plt.xlabel("Time")
+
+        plt.tight_layout()
+        buffer = io.BytesIO()
+        fig.savefig(buffer, format="png")
+        plt.close()  # Prevents the figure from being displayed directly
+        buffer.seek(0)
+        self._data = self._data.reset_index()
+        return Image.from_bytes(buffer.read())
