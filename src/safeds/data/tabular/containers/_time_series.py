@@ -1228,7 +1228,7 @@ class TimeSeries(Table):
 
     def plot_compare_time_series(self, time_series: list[TimeSeries]) -> Image:
         """
-        Creates a plot where the given time series targets are plotted by the time on the x-axis.
+        Plot the given time series targets along the time on the x-axis.
 
         Parameters
         ----------
