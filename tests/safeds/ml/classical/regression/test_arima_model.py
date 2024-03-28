@@ -175,7 +175,7 @@ def test_correct_structure_of_time_series() -> None:
 def test_should_raise_if_not_fitted() -> None:
     model = ArimaModel()
     with pytest.raises(ModelNotFittedError):
-        model.predict(forecast_horizon=5)
+        model.predict(create_test_data())
 
 
 def test_if_fitted_not_fitted() -> None:
@@ -189,10 +189,6 @@ def test_if_fitted_fitted() -> None:
     assert model.is_fitted()
 
 
-def test_should_raise_if_horizon_too_small() -> None:
-    model = ArimaModel()
-    with pytest.raises(IndexError):
-        model.predict(forecast_horizon=0)
 
 
 def test_should_raise_if_horizon_too_small_plot() -> None:
@@ -201,9 +197,3 @@ def test_should_raise_if_horizon_too_small_plot() -> None:
         model.plot_predictions(create_test_data())
 
 
-def test_value_error_predict() -> None:
-    model = ArimaModel()
-    ts = TimeSeries._from_table(Table({"time": [1, 2, 3], "value": [4, 5, 6]}), target_name="value", time_name="time")
-    model = model.fit(ts)
-    with pytest.raises(PredictionError):
-        model.predict(forecast_horizon=3000000000000000000000000000)

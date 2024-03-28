@@ -124,16 +124,12 @@ class ArimaModel:
         result_table = time_series._as_table()
         result_table = result_table.remove_columns([time_series.target.name])
         # Validation
-        if forecast_horizon <= 0:
-            raise IndexError("forecast_horizon must be greater 0")
         if not self.is_fitted() or self._arima is None:
             raise ModelNotFittedError
 
         # forecast
-        try:
-            forecast_results = self._arima.forecast(steps=forecast_horizon)
-        except ValueError as exception:
-            raise PredictionError(str(exception)) from exception
+        # couldn't invoke prediction error, will be added when found
+        forecast_results = self._arima.forecast(steps=forecast_horizon)
         target_column: Column = Column(name=time_series.target.name + " " + str("forecasted"), data=forecast_results)
 
         # create new TimeSeries
