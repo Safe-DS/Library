@@ -1250,8 +1250,8 @@ class TimeSeries(Table):
         for ts in time_series:
             if not ts.target.type.is_numeric():
                 raise NonNumericColumnError("The time series plotted column contains non-numerical columns.")
-            data[ts.target.name+" "+str(index)] = ts.target._data
-            index = index+1
+            data[ts.target.name + " " + str(index)] = ts.target._data
+            index = index + 1
         fig = plt.figure()
 
         data = pd.melt(data, [self.time.name])

@@ -8,7 +8,6 @@ from safeds.exceptions import (
     ModelNotFittedError,
     NonNumericColumnError,
     NonTimeSeriesError,
-    PredictionError,
 )
 from safeds.ml.classical.regression import ArimaModel
 
@@ -38,11 +37,15 @@ def create_test_data() -> TimeSeries:
         time_name="time",
         target_name="value",
     )
+
+
 def create_test_data_with_feature() -> TimeSeries:
     return TimeSeries(
-        {"time": [1, 2, 3, 4, 5, 6, 7, 8, 9],
+        {
+            "time": [1, 2, 3, 4, 5, 6, 7, 8, 9],
             "value": [1, 2, 3, 4, 5, 6, 7, 8, 9],
-            "feature": [1, 2, 3, 4, 5, 6, 7, 8, 9]},
+            "feature": [1, 2, 3, 4, 5, 6, 7, 8, 9],
+        },
         time_name="time",
         target_name="value",
     )
@@ -160,6 +163,7 @@ def test_correct_structure_of_time_series_with_features() -> None:
     assert predics_ts.target.name == data.target.name + " " + "forecasted"
     assert predics_ts.features.column_names == data.features.column_names
 
+
 def test_correct_structure_of_time_series() -> None:
     data = create_test_data()
     model = ArimaModel()
@@ -189,11 +193,7 @@ def test_if_fitted_fitted() -> None:
     assert model.is_fitted()
 
 
-
-
 def test_should_raise_if_horizon_too_small_plot() -> None:
     model = ArimaModel()
     with pytest.raises(ModelNotFittedError):
         model.plot_predictions(create_test_data())
-
-

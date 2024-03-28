@@ -4,7 +4,6 @@ import io
 import itertools
 
 import matplotlib.pyplot as plt
-import pandas as pd
 from statsmodels.tsa.arima.model import ARIMA
 
 from safeds.data.image.containers import Image
@@ -15,7 +14,6 @@ from safeds.exceptions import (
     ModelNotFittedError,
     NonNumericColumnError,
     NonTimeSeriesError,
-    PredictionError,
 )
 
 
@@ -130,13 +128,16 @@ class ArimaModel:
         # forecast
         # couldn't invoke prediction error, will be added when found
         forecast_results = self._arima.forecast(steps=forecast_horizon)
-        target_column: Column = Column(name=time_series.target.name + " " + str("forecasted"), data=forecast_results)
+        target_column: Column = Column(name=time_series.target.name + " " + "forecasted", data=forecast_results)
 
         # create new TimeSeries
         result_table = result_table.add_column(target_column)
-        return TimeSeries._from_table(result_table, time_name=time_series.time.name,
-                                      target_name=time_series.target.name + " " + str("forecasted"),
-                                      feature_names=time_series.features.column_names)
+        return TimeSeries._from_table(
+            result_table,
+            time_name=time_series.time.name,
+            target_name=time_series.target.name + " " + "forecasted",
+            feature_names=time_series.features.column_names,
+        )
 
     def plot_predictions(self, test_series: TimeSeries) -> Image:
         """
