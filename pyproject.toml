@@ -26,6 +26,7 @@ seaborn = "^0.13.0"
 torch = {version = "^2.2.0", source = "torch_cuda121"}
 torchvision = {version = "^0.17.0", source = "torch_cuda121"}
 xxhash = "^3.4.1"
+statsmodels = "^0.14.1"
 
 [tool.poetry.group.dev.dependencies]
 pytest = ">=7.2.1,<9.0.0"
