@@ -1,6 +1,6 @@
 import pytest
 from safeds.data.tabular.containers import TimeSeries
-from safeds.exceptions import NonNumericColumnError, UnknownColumnNameError
+from safeds.exceptions import NonNumericColumnError
 from syrupy import SnapshotAssertion
 
 
@@ -65,7 +65,6 @@ def test_legit_compare(snapshot_png: SnapshotAssertion) -> None:
     )
     plot = table.plot_compare_time_series(create_time_series_list())
     assert plot == snapshot_png
-
 
 
 def test_should_raise_if_column_contains_non_numerical_values_x() -> None:

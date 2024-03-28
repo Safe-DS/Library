@@ -1243,7 +1243,6 @@ class TimeSeries(Table):
         if not self._target.type.is_numeric():
             raise NonNumericColumnError("The time series plotted column contains non-numerical columns.")
 
-
         data = pd.DataFrame()
         data[self.time.name] = self.time._data
         data[self.target.name] = self.target._data
@@ -1255,8 +1254,8 @@ class TimeSeries(Table):
             index = index+1
         fig = plt.figure()
 
-        data= pd.melt(data, [self.time.name])
-        sns.lineplot(x=self.time.name, y='value', hue = 'variable', data=data)
+        data = pd.melt(data, [self.time.name])
+        sns.lineplot(x=self.time.name, y="value", hue="variable", data=data)
         plt.title("Multiple Series Plot")
         plt.xlabel("Time")
 
