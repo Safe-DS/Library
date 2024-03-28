@@ -26,7 +26,8 @@ def test_arima_model() -> None:
     train_ts, test_ts = time_series.split_rows(0.8)
     model = ArimaModel()
     trained_model = model.fit(train_ts)
-    trained_model.plot_predictions(test_ts)
+    predicted_ts = trained_model.predict(test_ts)
+    predicted_ts.plot_compare_time_series([test_ts])
     # suggest it ran through
     assert True
 
@@ -34,6 +35,14 @@ def test_arima_model() -> None:
 def create_test_data() -> TimeSeries:
     return TimeSeries(
         {"time": [1, 2, 3, 4, 5, 6, 7, 8, 9], "value": [1, 2, 3, 4, 5, 6, 7, 8, 9]},
+        time_name="time",
+        target_name="value",
+    )
+def create_test_data_with_feature() -> TimeSeries:
+    return TimeSeries(
+        {"time": [1, 2, 3, 4, 5, 6, 7, 8, 9],
+            "value": [1, 2, 3, 4, 5, 6, 7, 8, 9],
+            "feature": [1, 2, 3, 4, 5, 6, 7, 8, 9]},
         time_name="time",
         target_name="value",
     )
@@ -140,15 +149,27 @@ def test_should_raise_if_table_is_not_tagged(table: Table) -> None:
         model.fit(table)  # type: ignore[arg-type]
 
 
+def test_correct_structure_of_time_series_with_features() -> None:
+    data = create_test_data_with_feature()
+    model = ArimaModel()
+    model = model.fit(data)
+    predics_ts = model.predict(data)
+    assert len(predics_ts.time) == len(data.time)
+    assert len(predics_ts.target) == len(data.target)
+    assert predics_ts.time.name == data.time.name
+    assert predics_ts.target.name == data.target.name + " " + "forecasted"
+    assert predics_ts.features.column_names == data.features.column_names
+
 def test_correct_structure_of_time_series() -> None:
     data = create_test_data()
     model = ArimaModel()
     model = model.fit(data)
-    predics_ts = model.predict(5)
-    assert len(predics_ts.time) == 5
-    assert len(predics_ts.target) == 5
-    assert predics_ts.time.name == "time"
-    assert predics_ts.target.name == "target"
+    predics_ts = model.predict(data)
+    assert len(predics_ts.time) == len(data.time)
+    assert len(predics_ts.target) == len(data.target)
+    assert predics_ts.time.name == data.time.name
+    assert predics_ts.target.name == data.target.name + " " + "forecasted"
+    assert predics_ts.features.column_names == data.features.column_names
 
 
 def test_should_raise_if_not_fitted() -> None:

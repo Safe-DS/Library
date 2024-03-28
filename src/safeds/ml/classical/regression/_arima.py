@@ -96,14 +96,14 @@ class ArimaModel:
         fitted_arima._fitted = True
         return fitted_arima
 
-    def predict(self, forecast_horizon: int) -> TimeSeries:
+    def predict(self, time_series: TimeSeries) -> TimeSeries:
         """
         Predict a target vector using a time series target column. The model has to be trained first.
 
         Parameters
         ----------
-        forecast_horizon : TimeSeries
-            The forecast horizon for the predicted value.
+        time_series : TimeSeries
+            The test dataset of the time series.
 
         Returns
         -------
@@ -119,23 +119,28 @@ class ArimaModel:
         PredictionError
             If predicting with the given dataset failed.
         """
+        # make a table without
+        forecast_horizon = len(time_series.target._data)
+        result_table = time_series._as_table()
+        result_table = result_table.remove_columns([time_series.target.name])
         # Validation
         if forecast_horizon <= 0:
             raise IndexError("forecast_horizon must be greater 0")
         if not self.is_fitted() or self._arima is None:
             raise ModelNotFittedError
 
+        # forecast
         try:
             forecast_results = self._arima.forecast(steps=forecast_horizon)
         except ValueError as exception:
             raise PredictionError(str(exception)) from exception
-        target_column: Column = Column(name="target", data=forecast_results)
-        time_column: Column = Column(name="time", data=pd.Series(range(forecast_horizon), name="time"))
+        target_column: Column = Column(name=time_series.target.name + " " + str("forecasted"), data=forecast_results)
+
         # create new TimeSeries
-        result = Table()
-        result = result.add_column(target_column)
-        result = result.add_column(time_column)
-        return TimeSeries._from_table(result, time_name="time", target_name="target")
+        result_table = result_table.add_column(target_column)
+        return TimeSeries._from_table(result_table, time_name=time_series.time.name,
+                                      target_name=time_series.target.name + " " + str("forecasted"),
+                                      feature_names=time_series.features.column_names)
 
     def plot_predictions(self, test_series: TimeSeries) -> Image:
         """
