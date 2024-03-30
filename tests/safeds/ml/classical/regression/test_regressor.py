@@ -273,21 +273,39 @@ class TestIsFitted:
 
 
 class TestHash:
-    @pytest.mark.parametrize(("regressor1", "regressor2"), ([(x, y) for x in regressors() for y in regressors() if x.__class__ == y.__class__]), ids=lambda x: x.__class__.__name__)
+    @pytest.mark.parametrize(
+        ("regressor1", "regressor2"),
+        ([(x, y) for x in regressors() for y in regressors() if x.__class__ == y.__class__]),
+        ids=lambda x: x.__class__.__name__,
+    )
     def test_should_return_same_hash_for_equal_regressor(self, regressor1: Regressor, regressor2: Regressor) -> None:
         assert hash(regressor1) == hash(regressor2)
 
-    @pytest.mark.parametrize(("regressor1", "regressor2"), ([(x, y) for x in regressors() for y in regressors() if x.__class__ != y.__class__]), ids=lambda x: x.__class__.__name__)
-    def test_should_return_different_hash_for_unequal_regressor(self, regressor1: Regressor, regressor2: Regressor) -> None:
+    @pytest.mark.parametrize(
+        ("regressor1", "regressor2"),
+        ([(x, y) for x in regressors() for y in regressors() if x.__class__ != y.__class__]),
+        ids=lambda x: x.__class__.__name__,
+    )
+    def test_should_return_different_hash_for_unequal_regressor(
+        self, regressor1: Regressor, regressor2: Regressor,
+    ) -> None:
         assert hash(regressor1) != hash(regressor2)
 
     @pytest.mark.parametrize("regressor1", regressors(), ids=lambda x: x.__class__.__name__)
-    def test_should_return_different_hash_for_same_regressor_fit(self, regressor1: Regressor, valid_data: TaggedTable) -> None:
+    def test_should_return_different_hash_for_same_regressor_fit(
+        self, regressor1: Regressor, valid_data: TaggedTable,
+    ) -> None:
         regressor1_fit = regressor1.fit(valid_data)
         assert hash(regressor1) != hash(regressor1_fit)
 
-    @pytest.mark.parametrize(("regressor1", "regressor2"), (list(itertools.product(regressors(), regressors()))), ids=lambda x: x.__class__.__name__)
-    def test_should_return_different_hash_for_regressor_fit(self, regressor1: Regressor, regressor2: Regressor, valid_data: TaggedTable) -> None:
+    @pytest.mark.parametrize(
+        ("regressor1", "regressor2"),
+        (list(itertools.product(regressors(), regressors()))),
+        ids=lambda x: x.__class__.__name__,
+    )
+    def test_should_return_different_hash_for_regressor_fit(
+        self, regressor1: Regressor, regressor2: Regressor, valid_data: TaggedTable,
+    ) -> None:
         regressor1_fit = regressor1.fit(valid_data)
         assert hash(regressor1_fit) != hash(regressor2)
 
