@@ -15,7 +15,7 @@ if TYPE_CHECKING:
     from safeds.data.tabular.containers import Table, TaggedTable
 
 
-class AdaBoost(Classifier):
+class AdaBoostClassifier(Classifier):
     """
     Ada Boost classification.
 
@@ -99,7 +99,7 @@ class AdaBoost(Classifier):
         """
         return self._learning_rate
 
-    def fit(self, training_set: TaggedTable) -> AdaBoost:
+    def fit(self, training_set: TaggedTable) -> AdaBoostClassifier:
         """
         Create a copy of this classifier and fit it with the given training data.
 
@@ -112,7 +112,7 @@ class AdaBoost(Classifier):
 
         Returns
         -------
-        fitted_classifier : AdaBoost
+        fitted_classifier : AdaBoostClassifier
             The fitted classifier.
 
         Raises
@@ -131,7 +131,7 @@ class AdaBoost(Classifier):
         wrapped_classifier = self._get_sklearn_classifier()
         fit(wrapped_classifier, training_set)
 
-        result = AdaBoost(
+        result = AdaBoostClassifier(
             learner=self.learner,
             maximum_number_of_learners=self.maximum_number_of_learners,
             learning_rate=self._learning_rate,

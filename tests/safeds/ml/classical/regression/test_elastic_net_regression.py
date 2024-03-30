@@ -1,7 +1,7 @@
 import pytest
 from safeds.data.tabular.containers import Table, TaggedTable
 from safeds.exceptions import OutOfBoundsError
-from safeds.ml.classical.regression import ElasticNetRegression
+from safeds.ml.classical.regression import ElasticNetRegressor
 
 
 @pytest.fixture()
@@ -12,11 +12,11 @@ def training_set() -> TaggedTable:
 
 class TestAlpha:
     def test_should_be_passed_to_fitted_model(self, training_set: TaggedTable) -> None:
-        fitted_model = ElasticNetRegression(alpha=1).fit(training_set)
+        fitted_model = ElasticNetRegressor(alpha=1).fit(training_set)
         assert fitted_model.alpha == 1
 
     def test_should_be_passed_to_sklearn(self, training_set: TaggedTable) -> None:
-        fitted_model = ElasticNetRegression(alpha=1).fit(training_set)
+        fitted_model = ElasticNetRegressor(alpha=1).fit(training_set)
         assert fitted_model._wrapped_regressor is not None
         assert fitted_model._wrapped_regressor.alpha == 1
 
@@ -26,7 +26,7 @@ class TestAlpha:
             OutOfBoundsError,
             match=rf"alpha \(={alpha}\) is not inside \[0, \u221e\)\.",
         ):
-            ElasticNetRegression(alpha=alpha)
+            ElasticNetRegressor(alpha=alpha)
 
     def test_should_warn_if_equal_to_0(self) -> None:
         with pytest.warns(
@@ -36,16 +36,16 @@ class TestAlpha:
                 "should use LinearRegression instead for better numerical stability."
             ),
         ):
-            ElasticNetRegression(alpha=0)
+            ElasticNetRegressor(alpha=0)
 
 
 class TestLassoRatio:
     def test_should_be_passed_to_fitted_model(self, training_set: TaggedTable) -> None:
-        fitted_model = ElasticNetRegression(lasso_ratio=0.3).fit(training_set)
+        fitted_model = ElasticNetRegressor(lasso_ratio=0.3).fit(training_set)
         assert fitted_model.lasso_ratio == 0.3
 
     def test_should_be_passed_to_sklearn(self, training_set: TaggedTable) -> None:
-        fitted_model = ElasticNetRegression(lasso_ratio=0.3).fit(training_set)
+        fitted_model = ElasticNetRegressor(lasso_ratio=0.3).fit(training_set)
         assert fitted_model._wrapped_regressor is not None
         assert fitted_model._wrapped_regressor.l1_ratio == 0.3
 
@@ -55,7 +55,7 @@ class TestLassoRatio:
             OutOfBoundsError,
             match=rf"lasso_ratio \(={lasso_ratio}\) is not inside \[0, 1\]\.",
         ):
-            ElasticNetRegression(lasso_ratio=lasso_ratio)
+            ElasticNetRegressor(lasso_ratio=lasso_ratio)
 
     def test_should_warn_if_0(self) -> None:
         with pytest.warns(
@@ -65,7 +65,7 @@ class TestLassoRatio:
                 " Use RidgeRegression instead for better numerical stability."
             ),
         ):
-            ElasticNetRegression(lasso_ratio=0)
+            ElasticNetRegressor(lasso_ratio=0)
 
     def test_should_warn_if_1(self) -> None:
         with pytest.warns(
@@ -75,4 +75,4 @@ class TestLassoRatio:
                 " Use LassoRegression instead for better numerical stability."
             ),
         ):
-            ElasticNetRegression(lasso_ratio=1)
+            ElasticNetRegressor(lasso_ratio=1)

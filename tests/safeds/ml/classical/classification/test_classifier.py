@@ -15,14 +15,14 @@ from safeds.exceptions import (
     UntaggedTableError,
 )
 from safeds.ml.classical.classification import (
-    AdaBoost,
+    AdaBoostClassifier,
     Classifier,
-    DecisionTree,
-    GradientBoosting,
-    KNearestNeighbors,
-    LogisticRegression,
-    RandomForest,
-    SupportVectorMachine,
+    DecisionTreeClassifier,
+    GradientBoostingClassifier,
+    KNearestNeighborsClassifier,
+    LogisticRegressionClassifier,
+    RandomForestClassifier,
+    SupportVectorMachineClassifier,
 )
 
 if TYPE_CHECKING:
@@ -43,13 +43,13 @@ def classifiers() -> list[Classifier]:
         The list of classifiers to test.
     """
     return [
-        AdaBoost(),
-        DecisionTree(),
-        GradientBoosting(),
-        KNearestNeighbors(2),
-        LogisticRegression(),
-        RandomForest(),
-        SupportVectorMachine(),
+        AdaBoostClassifier(),
+        DecisionTreeClassifier(),
+        GradientBoostingClassifier(),
+        KNearestNeighborsClassifier(2),
+        LogisticRegressionClassifier(),
+        RandomForestClassifier(),
+        SupportVectorMachineClassifier(),
     ]
 
 
@@ -262,21 +262,50 @@ class TestIsFitted:
 
 
 class TestHash:
-    @pytest.mark.parametrize(("classifier1", "classifier2"), ([(x, y) for x in classifiers() for y in classifiers() if x.__class__ == y.__class__]), ids=lambda x: x.__class__.__name__)
-    def test_should_return_same_hash_for_equal_classifier(self, classifier1: Classifier, classifier2: Classifier) -> None:
+    @pytest.mark.parametrize(
+        ("classifier1", "classifier2"),
+        ([(x, y) for x in classifiers() for y in classifiers() if x.__class__ == y.__class__]),
+        ids=lambda x: x.__class__.__name__,
+    )
+    def test_should_return_same_hash_for_equal_classifier(
+        self,
+        classifier1: Classifier,
+        classifier2: Classifier,
+    ) -> None:
         assert hash(classifier1) == hash(classifier2)
 
-    @pytest.mark.parametrize(("classifier1", "classifier2"), ([(x, y) for x in classifiers() for y in classifiers() if x.__class__ != y.__class__]), ids=lambda x: x.__class__.__name__)
-    def test_should_return_different_hash_for_unequal_classifier(self, classifier1: Classifier, classifier2: Classifier) -> None:
+    @pytest.mark.parametrize(
+        ("classifier1", "classifier2"),
+        ([(x, y) for x in classifiers() for y in classifiers() if x.__class__ != y.__class__]),
+        ids=lambda x: x.__class__.__name__,
+    )
+    def test_should_return_different_hash_for_unequal_classifier(
+        self,
+        classifier1: Classifier,
+        classifier2: Classifier,
+    ) -> None:
         assert hash(classifier1) != hash(classifier2)
 
     @pytest.mark.parametrize("classifier1", classifiers(), ids=lambda x: x.__class__.__name__)
-    def test_should_return_different_hash_for_same_classifier_fit(self, classifier1: Classifier, valid_data: TaggedTable) -> None:
+    def test_should_return_different_hash_for_same_classifier_fit(
+        self,
+        classifier1: Classifier,
+        valid_data: TaggedTable,
+    ) -> None:
         regressor1_fit = classifier1.fit(valid_data)
         assert hash(classifier1) != hash(regressor1_fit)
 
-    @pytest.mark.parametrize(("classifier1", "classifier2"), (list(itertools.product(classifiers(), classifiers()))), ids=lambda x: x.__class__.__name__)
-    def test_should_return_different_hash_for_classifier_fit(self, classifier1: Classifier, classifier2: Classifier, valid_data: TaggedTable) -> None:
+    @pytest.mark.parametrize(
+        ("classifier1", "classifier2"),
+        (list(itertools.product(classifiers(), classifiers()))),
+        ids=lambda x: x.__class__.__name__,
+    )
+    def test_should_return_different_hash_for_classifier_fit(
+        self,
+        classifier1: Classifier,
+        classifier2: Classifier,
+        valid_data: TaggedTable,
+    ) -> None:
         classifier1_fit = classifier1.fit(valid_data)
         assert hash(classifier1_fit) != hash(classifier2)
 

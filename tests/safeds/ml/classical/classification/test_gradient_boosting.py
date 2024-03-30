@@ -1,7 +1,7 @@
 import pytest
 from safeds.data.tabular.containers import Table, TaggedTable
 from safeds.exceptions import OutOfBoundsError
-from safeds.ml.classical.classification import GradientBoosting
+from safeds.ml.classical.classification import GradientBoostingClassifier
 
 
 @pytest.fixture()
@@ -12,11 +12,11 @@ def training_set() -> TaggedTable:
 
 class TestNumberOfTrees:
     def test_should_be_passed_to_fitted_model(self, training_set: TaggedTable) -> None:
-        fitted_model = GradientBoosting(number_of_trees=2).fit(training_set)
+        fitted_model = GradientBoostingClassifier(number_of_trees=2).fit(training_set)
         assert fitted_model.number_of_trees == 2
 
     def test_should_be_passed_to_sklearn(self, training_set: TaggedTable) -> None:
-        fitted_model = GradientBoosting(number_of_trees=2).fit(training_set)
+        fitted_model = GradientBoostingClassifier(number_of_trees=2).fit(training_set)
         assert fitted_model._wrapped_classifier is not None
         assert fitted_model._wrapped_classifier.n_estimators == 2
 
@@ -26,16 +26,16 @@ class TestNumberOfTrees:
             OutOfBoundsError,
             match=rf"number_of_trees \(={number_of_trees}\) is not inside \[1, \u221e\)\.",
         ):
-            GradientBoosting(number_of_trees=number_of_trees)
+            GradientBoostingClassifier(number_of_trees=number_of_trees)
 
 
 class TestLearningRate:
     def test_should_be_passed_to_fitted_model(self, training_set: TaggedTable) -> None:
-        fitted_model = GradientBoosting(learning_rate=2).fit(training_set)
+        fitted_model = GradientBoostingClassifier(learning_rate=2).fit(training_set)
         assert fitted_model.learning_rate == 2
 
     def test_should_be_passed_to_sklearn(self, training_set: TaggedTable) -> None:
-        fitted_model = GradientBoosting(learning_rate=2).fit(training_set)
+        fitted_model = GradientBoostingClassifier(learning_rate=2).fit(training_set)
         assert fitted_model._wrapped_classifier is not None
         assert fitted_model._wrapped_classifier.learning_rate == 2
 
@@ -45,4 +45,4 @@ class TestLearningRate:
             OutOfBoundsError,
             match=rf"learning_rate \(={learning_rate}\) is not inside \(0, \u221e\)\.",
         ):
-            GradientBoosting(learning_rate=learning_rate)
+            GradientBoostingClassifier(learning_rate=learning_rate)
