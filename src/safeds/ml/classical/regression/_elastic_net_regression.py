@@ -17,7 +17,7 @@ if TYPE_CHECKING:
     from safeds.data.tabular.containers import Table, TaggedTable
 
 
-class ElasticNetRegression(Regressor):
+class ElasticNetRegressor(Regressor):
     """Elastic net regression.
 
     Parameters
@@ -104,7 +104,7 @@ class ElasticNetRegression(Regressor):
         """
         return self._lasso_ratio
 
-    def fit(self, training_set: TaggedTable) -> ElasticNetRegression:
+    def fit(self, training_set: TaggedTable) -> ElasticNetRegressor:
         """
         Create a copy of this regressor and fit it with the given training data.
 
@@ -117,7 +117,7 @@ class ElasticNetRegression(Regressor):
 
         Returns
         -------
-        fitted_regressor : ElasticNetRegression
+        fitted_regressor : ElasticNetRegressor
             The fitted regressor.
 
         Raises
@@ -136,7 +136,7 @@ class ElasticNetRegression(Regressor):
         wrapped_regressor = self._get_sklearn_regressor()
         fit(wrapped_regressor, training_set)
 
-        result = ElasticNetRegression(alpha=self._alpha, lasso_ratio=self._lasso_ratio)
+        result = ElasticNetRegressor(alpha=self._alpha, lasso_ratio=self._lasso_ratio)
         result._wrapped_regressor = wrapped_regressor
         result._feature_names = training_set.features.column_names
         result._target_name = training_set.target.name

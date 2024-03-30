@@ -15,7 +15,7 @@ if TYPE_CHECKING:
     from safeds.data.tabular.containers import Table, TaggedTable
 
 
-class KNearestNeighbors(Classifier):
+class KNearestNeighborsClassifier(Classifier):
     """
     K-nearest-neighbors classification.
 
@@ -56,7 +56,7 @@ class KNearestNeighbors(Classifier):
         """
         return self._number_of_neighbors
 
-    def fit(self, training_set: TaggedTable) -> KNearestNeighbors:
+    def fit(self, training_set: TaggedTable) -> KNearestNeighborsClassifier:
         """
         Create a copy of this classifier and fit it with the given training data.
 
@@ -69,7 +69,7 @@ class KNearestNeighbors(Classifier):
 
         Returns
         -------
-        fitted_classifier : KNearestNeighbors
+        fitted_classifier : KNearestNeighborsClassifier
             The fitted classifier.
 
         Raises
@@ -99,7 +99,7 @@ class KNearestNeighbors(Classifier):
         wrapped_classifier = self._get_sklearn_classifier()
         fit(wrapped_classifier, training_set)
 
-        result = KNearestNeighbors(self._number_of_neighbors)
+        result = KNearestNeighborsClassifier(self._number_of_neighbors)
         result._wrapped_classifier = wrapped_classifier
         result._feature_names = training_set.features.column_names
         result._target_name = training_set.target.name

@@ -14,7 +14,7 @@ if TYPE_CHECKING:
     from safeds.data.tabular.containers import Table, TaggedTable
 
 
-class DecisionTree(Regressor):
+class DecisionTreeRegressor(Regressor):
     """Decision tree regression."""
 
     def __init__(self) -> None:
@@ -23,7 +23,7 @@ class DecisionTree(Regressor):
         self._feature_names: list[str] | None = None
         self._target_name: str | None = None
 
-    def fit(self, training_set: TaggedTable) -> DecisionTree:
+    def fit(self, training_set: TaggedTable) -> DecisionTreeRegressor:
         """
         Create a copy of this regressor and fit it with the given training data.
 
@@ -36,7 +36,7 @@ class DecisionTree(Regressor):
 
         Returns
         -------
-        fitted_regressor : DecisionTree
+        fitted_regressor : DecisionTreeRegressor
             The fitted regressor.
 
         Raises
@@ -55,7 +55,7 @@ class DecisionTree(Regressor):
         wrapped_regressor = self._get_sklearn_regressor()
         fit(wrapped_regressor, training_set)
 
-        result = DecisionTree()
+        result = DecisionTreeRegressor()
         result._wrapped_regressor = wrapped_regressor
         result._feature_names = training_set.features.column_names
         result._target_name = training_set.target.name

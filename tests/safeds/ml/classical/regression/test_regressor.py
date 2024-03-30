@@ -17,17 +17,17 @@ from safeds.exceptions import (
     UntaggedTableError,
 )
 from safeds.ml.classical.regression import (
-    AdaBoost,
-    DecisionTree,
-    ElasticNetRegression,
-    GradientBoosting,
-    KNearestNeighbors,
-    LassoRegression,
-    LinearRegression,
-    RandomForest,
+    AdaBoostRegressor,
+    DecisionTreeRegressor,
+    ElasticNetRegressor,
+    GradientBoostingRegressor,
+    KNearestNeighborsRegressor,
+    LassoRegressor,
+    LinearRegressionRegressor,
+    RandomForestRegressor,
     Regressor,
-    RidgeRegression,
-    SupportVectorMachine,
+    RidgeRegressor,
+    SupportVectorMachineRegressor,
 )
 
 # noinspection PyProtectedMember
@@ -51,16 +51,16 @@ def regressors() -> list[Regressor]:
         The list of regressors to test.
     """
     return [
-        AdaBoost(),
-        DecisionTree(),
-        ElasticNetRegression(),
-        GradientBoosting(),
-        KNearestNeighbors(2),
-        LassoRegression(),
-        LinearRegression(),
-        RandomForest(),
-        RidgeRegression(),
-        SupportVectorMachine(),
+        AdaBoostRegressor(),
+        DecisionTreeRegressor(),
+        ElasticNetRegressor(),
+        GradientBoostingRegressor(),
+        KNearestNeighborsRegressor(2),
+        LassoRegressor(),
+        LinearRegressionRegressor(),
+        RandomForestRegressor(),
+        RidgeRegressor(),
+        SupportVectorMachineRegressor(),
     ]
 
 

@@ -30,7 +30,7 @@ class SupportVectorMachineKernel(ABC):
         """
 
 
-class SupportVectorMachine(Classifier):
+class SupportVectorMachineClassifier(Classifier):
     """
     Support vector machine.
 
@@ -151,18 +151,18 @@ class SupportVectorMachine(Classifier):
         TypeError
             If the kernel type is invalid.
         """
-        if isinstance(self.kernel, SupportVectorMachine.Kernel.Linear):
+        if isinstance(self.kernel, SupportVectorMachineClassifier.Kernel.Linear):
             return "linear"
-        elif isinstance(self.kernel, SupportVectorMachine.Kernel.Polynomial):
+        elif isinstance(self.kernel, SupportVectorMachineClassifier.Kernel.Polynomial):
             return "poly"
-        elif isinstance(self.kernel, SupportVectorMachine.Kernel.Sigmoid):
+        elif isinstance(self.kernel, SupportVectorMachineClassifier.Kernel.Sigmoid):
             return "sigmoid"
-        elif isinstance(self.kernel, SupportVectorMachine.Kernel.RadialBasisFunction):
+        elif isinstance(self.kernel, SupportVectorMachineClassifier.Kernel.RadialBasisFunction):
             return "rbf"
         else:
             raise TypeError("Invalid kernel type.")
 
-    def fit(self, training_set: TaggedTable) -> SupportVectorMachine:
+    def fit(self, training_set: TaggedTable) -> SupportVectorMachineClassifier:
         """
         Create a copy of this classifier and fit it with the given training data.
 
@@ -175,7 +175,7 @@ class SupportVectorMachine(Classifier):
 
         Returns
         -------
-        fitted_classifier : SupportVectorMachine
+        fitted_classifier : SupportVectorMachineClassifier
             The fitted classifier.
 
         Raises
@@ -194,7 +194,7 @@ class SupportVectorMachine(Classifier):
         wrapped_classifier = self._get_sklearn_classifier()
         fit(wrapped_classifier, training_set)
 
-        result = SupportVectorMachine(c=self._c, kernel=self._kernel)
+        result = SupportVectorMachineClassifier(c=self._c, kernel=self._kernel)
         result._wrapped_classifier = wrapped_classifier
         result._feature_names = training_set.features.column_names
         result._target_name = training_set.target.name

@@ -14,7 +14,7 @@ if TYPE_CHECKING:
     from safeds.data.tabular.containers import Table, TaggedTable
 
 
-class DecisionTree(Classifier):
+class DecisionTreeClassifier(Classifier):
     """Decision tree classification."""
 
     def __init__(self) -> None:
@@ -23,7 +23,7 @@ class DecisionTree(Classifier):
         self._feature_names: list[str] | None = None
         self._target_name: str | None = None
 
-    def fit(self, training_set: TaggedTable) -> DecisionTree:
+    def fit(self, training_set: TaggedTable) -> DecisionTreeClassifier:
         """
         Create a copy of this classifier and fit it with the given training data.
 
@@ -36,7 +36,7 @@ class DecisionTree(Classifier):
 
         Returns
         -------
-        fitted_classifier : DecisionTree
+        fitted_classifier : DecisionTreeClassifier
             The fitted classifier.
 
         Raises
@@ -55,7 +55,7 @@ class DecisionTree(Classifier):
         wrapped_classifier = self._get_sklearn_classifier()
         fit(wrapped_classifier, training_set)
 
-        result = DecisionTree()
+        result = DecisionTreeClassifier()
         result._wrapped_classifier = wrapped_classifier
         result._feature_names = training_set.features.column_names
         result._target_name = training_set.target.name

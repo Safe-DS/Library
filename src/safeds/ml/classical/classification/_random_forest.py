@@ -15,7 +15,7 @@ if TYPE_CHECKING:
     from safeds.data.tabular.containers import Table, TaggedTable
 
 
-class RandomForest(Classifier):
+class RandomForestClassifier(Classifier):
     """Random forest classification.
 
     Parameters
@@ -54,7 +54,7 @@ class RandomForest(Classifier):
         """
         return self._number_of_trees
 
-    def fit(self, training_set: TaggedTable) -> RandomForest:
+    def fit(self, training_set: TaggedTable) -> RandomForestClassifier:
         """
         Create a copy of this classifier and fit it with the given training data.
 
@@ -67,7 +67,7 @@ class RandomForest(Classifier):
 
         Returns
         -------
-        fitted_classifier : RandomForest
+        fitted_classifier : RandomForestClassifier
             The fitted classifier.
 
         Raises
@@ -86,7 +86,7 @@ class RandomForest(Classifier):
         wrapped_classifier = self._get_sklearn_classifier()
         fit(wrapped_classifier, training_set)
 
-        result = RandomForest(number_of_trees=self._number_of_trees)
+        result = RandomForestClassifier(number_of_trees=self._number_of_trees)
         result._wrapped_classifier = wrapped_classifier
         result._feature_names = training_set.features.column_names
         result._target_name = training_set.target.name

@@ -16,7 +16,7 @@ if TYPE_CHECKING:
     from safeds.data.tabular.containers import Table, TaggedTable
 
 
-class RidgeRegression(Regressor):
+class RidgeRegressor(Regressor):
     """
     Ridge regression.
 
@@ -65,7 +65,7 @@ class RidgeRegression(Regressor):
         """
         return self._alpha
 
-    def fit(self, training_set: TaggedTable) -> RidgeRegression:
+    def fit(self, training_set: TaggedTable) -> RidgeRegressor:
         """
         Create a copy of this regressor and fit it with the given training data.
 
@@ -78,7 +78,7 @@ class RidgeRegression(Regressor):
 
         Returns
         -------
-        fitted_regressor : RidgeRegression
+        fitted_regressor : RidgeRegressor
             The fitted regressor.
 
         Raises
@@ -97,7 +97,7 @@ class RidgeRegression(Regressor):
         wrapped_regressor = self._get_sklearn_regressor()
         fit(wrapped_regressor, training_set)
 
-        result = RidgeRegression(alpha=self._alpha)
+        result = RidgeRegressor(alpha=self._alpha)
         result._wrapped_regressor = wrapped_regressor
         result._feature_names = training_set.features.column_names
         result._target_name = training_set.target.name

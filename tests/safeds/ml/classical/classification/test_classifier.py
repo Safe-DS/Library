@@ -15,14 +15,14 @@ from safeds.exceptions import (
     UntaggedTableError,
 )
 from safeds.ml.classical.classification import (
-    AdaBoost,
+    AdaBoostClassifier,
     Classifier,
-    DecisionTree,
-    GradientBoosting,
-    KNearestNeighbors,
-    LogisticRegression,
-    RandomForest,
-    SupportVectorMachine,
+    DecisionTreeClassifier,
+    GradientBoostingClassifier,
+    KNearestNeighborsClassifier,
+    LogisticRegressionClassifier,
+    RandomForestClassifier,
+    SupportVectorMachineClassifier,
 )
 
 if TYPE_CHECKING:
@@ -43,13 +43,13 @@ def classifiers() -> list[Classifier]:
         The list of classifiers to test.
     """
     return [
-        AdaBoost(),
-        DecisionTree(),
-        GradientBoosting(),
-        KNearestNeighbors(2),
-        LogisticRegression(),
-        RandomForest(),
-        SupportVectorMachine(),
+        AdaBoostClassifier(),
+        DecisionTreeClassifier(),
+        GradientBoostingClassifier(),
+        KNearestNeighborsClassifier(2),
+        LogisticRegressionClassifier(),
+        RandomForestClassifier(),
+        SupportVectorMachineClassifier(),
     ]
 
 

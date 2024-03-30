@@ -1,7 +1,7 @@
 import pytest
 from safeds.data.tabular.containers import Table, TaggedTable
 from safeds.exceptions import OutOfBoundsError
-from safeds.ml.classical.regression import RandomForest
+from safeds.ml.classical.regression import RandomForestRegressor
 
 
 @pytest.fixture()
@@ -12,11 +12,11 @@ def training_set() -> TaggedTable:
 
 class TestNumberOfTrees:
     def test_should_be_passed_to_fitted_model(self, training_set: TaggedTable) -> None:
-        fitted_model = RandomForest(number_of_trees=2).fit(training_set)
+        fitted_model = RandomForestRegressor(number_of_trees=2).fit(training_set)
         assert fitted_model.number_of_trees == 2
 
     def test_should_be_passed_to_sklearn(self, training_set: TaggedTable) -> None:
-        fitted_model = RandomForest(number_of_trees=2).fit(training_set)
+        fitted_model = RandomForestRegressor(number_of_trees=2).fit(training_set)
         assert fitted_model._wrapped_regressor is not None
         assert fitted_model._wrapped_regressor.n_estimators == 2
 
@@ -26,4 +26,4 @@ class TestNumberOfTrees:
             OutOfBoundsError,
             match=rf"number_of_trees \(={number_of_trees}\) is not inside \[1, \u221e\)\.",
         ):
-            RandomForest(number_of_trees=number_of_trees)
+            RandomForestRegressor(number_of_trees=number_of_trees)
