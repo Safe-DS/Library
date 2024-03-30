@@ -19,7 +19,7 @@ class SupportVectorMachineKernel(ABC):
     """The abstract base class of the different subclasses supported by the `Kernel`."""
 
     @abstractmethod
-    def get_sklearn_kernel(self) -> object:
+    def _get_sklearn_kernel(self) -> object:
         """
         Get the kernel of the given SupportVectorMachine.
 
@@ -85,7 +85,7 @@ class SupportVectorMachine(Classifier):
 
     class Kernel:
         class Linear(SupportVectorMachineKernel):
-            def get_sklearn_kernel(self) -> str:
+            def _get_sklearn_kernel(self) -> str:
                 """
                 Get the name of the linear kernel.
 
@@ -102,7 +102,7 @@ class SupportVectorMachine(Classifier):
                     raise OutOfBoundsError(degree, name="degree", lower_bound=ClosedBound(1))
                 self._degree = degree
 
-            def get_sklearn_kernel(self) -> str:
+            def _get_sklearn_kernel(self) -> str:
                 """
                 Get the name of the polynomial kernel.
 
@@ -114,7 +114,7 @@ class SupportVectorMachine(Classifier):
                 return "poly"
 
         class Sigmoid(SupportVectorMachineKernel):
-            def get_sklearn_kernel(self) -> str:
+            def _get_sklearn_kernel(self) -> str:
                 """
                 Get the name of the sigmoid kernel.
 
@@ -126,7 +126,7 @@ class SupportVectorMachine(Classifier):
                 return "sigmoid"
 
         class RadialBasisFunction(SupportVectorMachineKernel):
-            def get_sklearn_kernel(self) -> str:
+            def _get_sklearn_kernel(self) -> str:
                 """
                 Get the name of the radial basis function (RBF) kernel.
 
