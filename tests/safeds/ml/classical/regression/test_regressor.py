@@ -287,13 +287,17 @@ class TestHash:
         ids=lambda x: x.__class__.__name__,
     )
     def test_should_return_different_hash_for_unequal_regressor(
-        self, regressor1: Regressor, regressor2: Regressor,
+        self,
+        regressor1: Regressor,
+        regressor2: Regressor,
     ) -> None:
         assert hash(regressor1) != hash(regressor2)
 
     @pytest.mark.parametrize("regressor1", regressors(), ids=lambda x: x.__class__.__name__)
     def test_should_return_different_hash_for_same_regressor_fit(
-        self, regressor1: Regressor, valid_data: TaggedTable,
+        self,
+        regressor1: Regressor,
+        valid_data: TaggedTable,
     ) -> None:
         regressor1_fit = regressor1.fit(valid_data)
         assert hash(regressor1) != hash(regressor1_fit)
@@ -304,7 +308,10 @@ class TestHash:
         ids=lambda x: x.__class__.__name__,
     )
     def test_should_return_different_hash_for_regressor_fit(
-        self, regressor1: Regressor, regressor2: Regressor, valid_data: TaggedTable,
+        self,
+        regressor1: Regressor,
+        regressor2: Regressor,
+        valid_data: TaggedTable,
     ) -> None:
         regressor1_fit = regressor1.fit(valid_data)
         assert hash(regressor1_fit) != hash(regressor2)
