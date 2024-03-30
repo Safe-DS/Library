@@ -345,7 +345,7 @@ class Image:
 
     def flip_horizontally(self) -> Image:
         """
-        Return a new `Ìmage` that is flipped horizontally (vertical axis, flips left-right and vice versa).
+        Return a new `Image` that is flipped horizontally (vertical axis, flips left-right and vice versa).
 
         The original image is not modified.
 
