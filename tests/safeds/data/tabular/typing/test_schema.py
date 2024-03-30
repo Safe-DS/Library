@@ -280,7 +280,7 @@ class TestMergeMultipleSchemas:
     )
     def test_should_raise_if_column_names_are_different(self, schemas: list[Schema], error_msg_regex: str) -> None:
         with pytest.raises(UnknownColumnNameError, match=error_msg_regex):
-            Schema.merge_multiple_schemas(schemas)
+            Schema._merge_multiple_schemas(schemas)
 
     @pytest.mark.parametrize(
         ("schemas", "expected"),
@@ -470,10 +470,10 @@ class TestMergeMultipleSchemas:
         ],
     )
     def test_should_return_merged_schema(self, schemas: list[Schema], expected: Schema) -> None:
-        assert Schema.merge_multiple_schemas(schemas) == expected
+        assert Schema._merge_multiple_schemas(schemas) == expected
         schemas.reverse()
         assert (
-            Schema.merge_multiple_schemas(schemas) == expected
+                Schema._merge_multiple_schemas(schemas) == expected
         )  # test the reversed list because the first parameter is handled differently
 
 

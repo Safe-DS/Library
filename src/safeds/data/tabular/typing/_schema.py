@@ -237,7 +237,7 @@ class Schema:
         return dict(self._schema)  # defensive copy
 
     @staticmethod
-    def merge_multiple_schemas(schemas: list[Schema]) -> Schema:
+    def _merge_multiple_schemas(schemas: list[Schema]) -> Schema:
         """
         Merge multiple schemas into one.
 
