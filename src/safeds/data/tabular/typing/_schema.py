@@ -111,7 +111,11 @@ class Schema:
         -------
         Size of this object in bytes.
         """
-        return sum(map(sys.getsizeof, self._schema.keys())) + sum(map(sys.getsizeof, self._schema.values())) + sys.getsizeof(self._schema)
+        return (
+            sum(map(sys.getsizeof, self._schema.keys()))
+            + sum(map(sys.getsizeof, self._schema.values()))
+            + sys.getsizeof(self._schema)
+        )
 
     def __str__(self) -> str:
         """

@@ -473,7 +473,7 @@ class TestMergeMultipleSchemas:
         assert Schema._merge_multiple_schemas(schemas) == expected
         schemas.reverse()
         assert (
-                Schema._merge_multiple_schemas(schemas) == expected
+            Schema._merge_multiple_schemas(schemas) == expected
         )  # test the reversed list because the first parameter is handled differently
 
 
