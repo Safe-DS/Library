@@ -25,7 +25,7 @@ It classifies the predictions to be either be [true positive](#true-positive-tp)
 ## Decision Tree
 A Decision Tree represents the process of conditional evaluation in a tree diagram.
 
-Implemented in Safe-DS as [Decision Tree][safeds.ml.classical.classification.DecisionTree].
+Implemented in Safe-DS as [DecisionTreeClassifier][safeds.ml.classical.classification.DecisionTreeClassifier] and [DecisionTreeRegressor][safeds.ml.classical.regression.DecisionTreeRegressor].
 
 ## F1-Score
 The harmonic mean of [precision](#precision) and [recall](#recall). Formula:
@@ -48,7 +48,7 @@ It is analogous to a column within a table.
 Linear Regression is the supervised Machine Learning model in which the model finds the best fit linear line between the independent and dependent variable
 i.e. it finds the linear relationship between the dependent and independent variable.
 
-Implemented in Safe-DS as [LinearRegression][safeds.ml.classical.regression.LinearRegression].
+Implemented in Safe-DS as [LinearRegression][safeds.ml.classical.regression.LinearRegressionRegressor].
 
 ## Machine Learning (ML)
 Machine Learning is a generic term for artificially generating knowledge through experience.
@@ -84,7 +84,7 @@ See here for respective references:
 ## Random Forest
 Random Forest is an ML model that works by generating decision trees at random.
 
-Implemented in Safe-DS as [RandomForest][safeds.ml.classical.regression.RandomForest].
+Implemented in Safe-DS as [RandomForestClassifier][safeds.ml.classical.classification.RandomForestClassifier] and [RandomForestRegressor][safeds.ml.classical.regression.RandomForestRegressor].
 
 ## Recall
 The ability of a [classification](#classification) model to identify all the relevant data points. Formula:

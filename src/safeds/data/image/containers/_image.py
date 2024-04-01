@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-import sys
 import io
+import sys
 import warnings
 from pathlib import Path
 from typing import TYPE_CHECKING
@@ -12,7 +12,7 @@ import xxhash
 from PIL.Image import open as pil_image_open
 from torch import Tensor
 
-from safeds.config import _get_device
+from safeds._config import _get_device
 
 if TYPE_CHECKING:
     from torch.types import Device
@@ -345,7 +345,7 @@ class Image:
 
     def flip_horizontally(self) -> Image:
         """
-        Return a new `Ìmage` that is flipped horizontally (vertical axis, flips left-right and vice versa).
+        Return a new `Image` that is flipped horizontally (vertical axis, flips left-right and vice versa).
 
         The original image is not modified.
 

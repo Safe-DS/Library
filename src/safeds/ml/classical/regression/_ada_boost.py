@@ -15,7 +15,7 @@ if TYPE_CHECKING:
     from safeds.data.tabular.containers import Table, TaggedTable
 
 
-class AdaBoost(Regressor):
+class AdaBoostRegressor(Regressor):
     """
     Ada Boost regression.
 
@@ -99,7 +99,7 @@ class AdaBoost(Regressor):
         """
         return self._learning_rate
 
-    def fit(self, training_set: TaggedTable) -> AdaBoost:
+    def fit(self, training_set: TaggedTable) -> AdaBoostRegressor:
         """
         Create a copy of this regressor and fit it with the given training data.
 
@@ -112,7 +112,7 @@ class AdaBoost(Regressor):
 
         Returns
         -------
-        fitted_regressor : AdaBoost
+        fitted_regressor : AdaBoostRegressor
             The fitted regressor.
 
         Raises
@@ -131,7 +131,7 @@ class AdaBoost(Regressor):
         wrapped_regressor = self._get_sklearn_regressor()
         fit(wrapped_regressor, training_set)
 
-        result = AdaBoost(
+        result = AdaBoostRegressor(
             learner=self._learner,
             maximum_number_of_learners=self._maximum_number_of_learners,
             learning_rate=self._learning_rate,

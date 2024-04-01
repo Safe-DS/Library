@@ -10,8 +10,8 @@ from ._lasso_regression import LassoRegression
 from ._linear_regression import LinearRegression
 from ._random_forest import RandomForest
 from ._regressor import Regressor
-from ._ridge_regression import RidgeRegression
-from ._support_vector_machine import SupportVectorMachine
+from ._ridge_regression import RidgeRegressor
+from ._support_vector_machine import SupportVectorMachineRegressor
 
 __all__ = [
     "AdaBoost",
@@ -24,6 +24,6 @@ __all__ = [
     "LinearRegression",
     "RandomForest",
     "Regressor",
-    "RidgeRegression",
-    "SupportVectorMachine",
+    "RidgeRegressor",
+    "SupportVectorMachineRegressor",
 ]

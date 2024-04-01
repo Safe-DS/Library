@@ -1,7 +1,7 @@
 import pytest
 from safeds.data.tabular.containers import Table, TaggedTable
 from safeds.exceptions import OutOfBoundsError
-from safeds.ml.classical.regression import KNearestNeighbors
+from safeds.ml.classical.regression import KNearestNeighborsRegressor
 
 
 @pytest.fixture()
@@ -12,11 +12,11 @@ def training_set() -> TaggedTable:
 
 class TestNumberOfNeighbors:
     def test_should_be_passed_to_fitted_model(self, training_set: TaggedTable) -> None:
-        fitted_model = KNearestNeighbors(number_of_neighbors=2).fit(training_set)
+        fitted_model = KNearestNeighborsRegressor(number_of_neighbors=2).fit(training_set)
         assert fitted_model.number_of_neighbors == 2
 
     def test_should_be_passed_to_sklearn(self, training_set: TaggedTable) -> None:
-        fitted_model = KNearestNeighbors(number_of_neighbors=2).fit(training_set)
+        fitted_model = KNearestNeighborsRegressor(number_of_neighbors=2).fit(training_set)
         assert fitted_model._wrapped_regressor is not None
         assert fitted_model._wrapped_regressor.n_neighbors == 2
 
@@ -26,8 +26,8 @@ class TestNumberOfNeighbors:
             OutOfBoundsError,
             match=rf"number_of_neighbors \(={number_of_neighbors}\) is not inside \[1, \u221e\)\.",
         ):
-            KNearestNeighbors(number_of_neighbors=number_of_neighbors)
+            KNearestNeighborsRegressor(number_of_neighbors=number_of_neighbors)
 
     def test_should_raise_if_greater_than_sample_size(self, training_set: TaggedTable) -> None:
         with pytest.raises(ValueError, match="has to be less than or equal to the sample size"):
-            KNearestNeighbors(number_of_neighbors=5).fit(training_set)
+            KNearestNeighborsRegressor(number_of_neighbors=5).fit(training_set)

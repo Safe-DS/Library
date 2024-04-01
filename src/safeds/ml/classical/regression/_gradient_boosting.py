@@ -15,7 +15,7 @@ if TYPE_CHECKING:
     from safeds.data.tabular.containers import Table, TaggedTable
 
 
-class GradientBoosting(Regressor):
+class GradientBoostingRegressor(Regressor):
     """
     Gradient boosting regression.
 
@@ -74,7 +74,7 @@ class GradientBoosting(Regressor):
         """
         return self._learning_rate
 
-    def fit(self, training_set: TaggedTable) -> GradientBoosting:
+    def fit(self, training_set: TaggedTable) -> GradientBoostingRegressor:
         """
         Create a copy of this regressor and fit it with the given training data.
 
@@ -87,7 +87,7 @@ class GradientBoosting(Regressor):
 
         Returns
         -------
-        fitted_regressor : GradientBoosting
+        fitted_regressor : GradientBoostingRegressor
             The fitted regressor.
 
         Raises
@@ -106,7 +106,7 @@ class GradientBoosting(Regressor):
         wrapped_regressor = self._get_sklearn_regressor()
         fit(wrapped_regressor, training_set)
 
-        result = GradientBoosting(number_of_trees=self._number_of_trees, learning_rate=self._learning_rate)
+        result = GradientBoostingRegressor(number_of_trees=self._number_of_trees, learning_rate=self._learning_rate)
         result._wrapped_regressor = wrapped_regressor
         result._feature_names = training_set.features.column_names
         result._target_name = training_set.target.name

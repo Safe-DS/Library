@@ -111,7 +111,11 @@ class Schema:
         -------
         Size of this object in bytes.
         """
-        return sum(map(sys.getsizeof, self._schema.keys())) + sum(map(sys.getsizeof, self._schema.values())) + sys.getsizeof(self._schema)
+        return (
+            sum(map(sys.getsizeof, self._schema.keys()))
+            + sum(map(sys.getsizeof, self._schema.values()))
+            + sys.getsizeof(self._schema)
+        )
 
     def __str__(self) -> str:
         """
@@ -237,7 +241,7 @@ class Schema:
         return dict(self._schema)  # defensive copy
 
     @staticmethod
-    def merge_multiple_schemas(schemas: list[Schema]) -> Schema:
+    def _merge_multiple_schemas(schemas: list[Schema]) -> Schema:
         """
         Merge multiple schemas into one.
 
