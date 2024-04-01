@@ -198,19 +198,24 @@ def test_should_raise_if_horizon_too_small_plot() -> None:
     with pytest.raises(ModelNotFittedError):
         model.plot_predictions(create_test_data())
 
+
 def test_should_return_same_hash_for_equal_regressor() -> None:
-        regressor1 = ArimaModelRegressor()
-        regressor2 = ArimaModelRegressor()
-        assert hash(regressor1) == hash(regressor2)
+    regressor1 = ArimaModelRegressor()
+    regressor2 = ArimaModelRegressor()
+    assert hash(regressor1) == hash(regressor2)
+
+
 def test_should_return_different_hash_for_unequal_regressor() -> None:
     regressor1 = ArimaModelRegressor()
     regressor2 = LassoRegressor()
     assert hash(regressor1) != hash(regressor2)
 
+
 def test_should_return_different_hash_for_same_regressor_fit() -> None:
     regressor1 = ArimaModelRegressor()
     regressor1_fit = regressor1.fit(create_test_data())
     assert hash(regressor1) != hash(regressor1_fit)
+
 
 def test_should_return_different_hash_for_regressor_fit() -> None:
     regressor1 = ArimaModelRegressor()
