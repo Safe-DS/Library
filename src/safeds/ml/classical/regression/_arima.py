@@ -18,7 +18,7 @@ from safeds.exceptions import (
 )
 
 
-class ArimaModel:
+class ArimaModelRegressor:
     """Auto Regressive Integrated Moving Average Model."""
     def __hash__(self) -> int:
         """
@@ -38,7 +38,7 @@ class ArimaModel:
         self._order: tuple[int, int, int] | None = None
         self._fitted = False
 
-    def fit(self, time_series: TimeSeries) -> ArimaModel:
+    def fit(self, time_series: TimeSeries) -> ArimaModelRegressor:
         """
         Create a copy of this ARIMA Model and fit it with the given training data.
 
@@ -51,7 +51,7 @@ class ArimaModel:
 
         Returns
         -------
-        fitted_arima : ArimaModel
+        fitted_arima : ArimaModelRegressor
             The fitted ARIMA Model.
 
         Raises
@@ -80,7 +80,7 @@ class ArimaModel:
                 "remove the missing values entirely you can use the method "
                 "`TimeSeries.remove_rows_with_missing_values`.",
             )
-        fitted_arima = ArimaModel()
+        fitted_arima = ArimaModelRegressor()
         p = d = q = range(2)
         pdq = list(itertools.product(p, d, q))
         best_aic = float("inf")

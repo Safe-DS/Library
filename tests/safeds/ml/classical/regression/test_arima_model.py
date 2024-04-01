@@ -9,7 +9,7 @@ from safeds.exceptions import (
     NonNumericColumnError,
     NonTimeSeriesError,
 )
-from safeds.ml.classical.regression import ArimaModel, LassoRegression
+from safeds.ml.classical.regression import ArimaModelRegressor, LassoRegressor
 
 from tests.helpers import resolve_resource_path
 
@@ -23,7 +23,7 @@ def test_arima_model() -> None:
         time_name="date",
     )
     train_ts, test_ts = time_series.split_rows(0.8)
-    model = ArimaModel()
+    model = ArimaModelRegressor()
     trained_model = model.fit(train_ts)
     predicted_ts = trained_model.predict(test_ts)
     predicted_ts.plot_compare_time_series([test_ts])
@@ -53,14 +53,14 @@ def create_test_data_with_feature() -> TimeSeries:
 
 def test_should_succeed_on_valid_data() -> None:
     valid_data = create_test_data()
-    model = ArimaModel()
+    model = ArimaModelRegressor()
     model.fit(valid_data)
     assert True
 
 
 def test_should_not_change_input_regressor() -> None:
     valid_data = create_test_data()
-    model = ArimaModel()
+    model = ArimaModelRegressor()
     model.fit(valid_data)
     assert not model.is_fitted()
 
@@ -68,14 +68,14 @@ def test_should_not_change_input_regressor() -> None:
 def test_should_not_change_input_table() -> None:
     valid_data = create_test_data()
     valid_data_copy = create_test_data()
-    model = ArimaModel()
+    model = ArimaModelRegressor()
     model.fit(valid_data)
     assert valid_data_copy == valid_data
 
 
 def test_should_succeed_on_valid_data_plot() -> None:
     valid_data = create_test_data()
-    model = ArimaModel()
+    model = ArimaModelRegressor()
     fitted_model = model.fit(valid_data)
     fitted_model.plot_predictions(valid_data)
     assert True
@@ -128,7 +128,7 @@ def test_should_raise_on_invalid_data(
     expected_error: Any,
     expected_error_msg: str,
 ) -> None:
-    model = ArimaModel()
+    model = ArimaModelRegressor()
     with pytest.raises(expected_error, match=expected_error_msg):
         model.fit(invalid_data)
 
@@ -147,14 +147,14 @@ def test_should_raise_on_invalid_data(
     ids=["untagged_table"],
 )
 def test_should_raise_if_table_is_not_tagged(table: Table) -> None:
-    model = ArimaModel()
+    model = ArimaModelRegressor()
     with pytest.raises(NonTimeSeriesError):
         model.fit(table)  # type: ignore[arg-type]
 
 
 def test_correct_structure_of_time_series_with_features() -> None:
     data = create_test_data_with_feature()
-    model = ArimaModel()
+    model = ArimaModelRegressor()
     model = model.fit(data)
     predics_ts = model.predict(data)
     assert len(predics_ts.time) == len(data.time)
@@ -166,7 +166,7 @@ def test_correct_structure_of_time_series_with_features() -> None:
 
 def test_correct_structure_of_time_series() -> None:
     data = create_test_data()
-    model = ArimaModel()
+    model = ArimaModelRegressor()
     model = model.fit(data)
     predics_ts = model.predict(data)
     assert len(predics_ts.time) == len(data.time)
@@ -177,43 +177,43 @@ def test_correct_structure_of_time_series() -> None:
 
 
 def test_should_raise_if_not_fitted() -> None:
-    model = ArimaModel()
+    model = ArimaModelRegressor()
     with pytest.raises(ModelNotFittedError):
         model.predict(create_test_data())
 
 
 def test_if_fitted_not_fitted() -> None:
-    model = ArimaModel()
+    model = ArimaModelRegressor()
     assert not model.is_fitted()
 
 
 def test_if_fitted_fitted() -> None:
-    model = ArimaModel()
+    model = ArimaModelRegressor()
     model = model.fit(create_test_data())
     assert model.is_fitted()
 
 
 def test_should_raise_if_horizon_too_small_plot() -> None:
-    model = ArimaModel()
+    model = ArimaModelRegressor()
     with pytest.raises(ModelNotFittedError):
         model.plot_predictions(create_test_data())
 
 def test_should_return_same_hash_for_equal_regressor() -> None:
-        regressor1 = ArimaModel()
-        regressor2 = ArimaModel()
+        regressor1 = ArimaModelRegressor()
+        regressor2 = ArimaModelRegressor()
         assert hash(regressor1) == hash(regressor2)
 def test_should_return_different_hash_for_unequal_regressor() -> None:
-    regressor1 = ArimaModel()
-    regressor2 = LassoRegression()
+    regressor1 = ArimaModelRegressor()
+    regressor2 = LassoRegressor()
     assert hash(regressor1) != hash(regressor2)
 
 def test_should_return_different_hash_for_same_regressor_fit() -> None:
-    regressor1 = ArimaModel()
+    regressor1 = ArimaModelRegressor()
     regressor1_fit = regressor1.fit(create_test_data())
     assert hash(regressor1) != hash(regressor1_fit)
 
 def test_should_return_different_hash_for_regressor_fit() -> None:
-    regressor1 = ArimaModel()
-    regressor2 = ArimaModel()
+    regressor1 = ArimaModelRegressor()
+    regressor2 = ArimaModelRegressor()
     regressor1_fit = regressor1.fit(create_test_data())
     assert hash(regressor1_fit) != hash(regressor2)
