@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import io
 import itertools
+import xxhash
 
 import matplotlib.pyplot as plt
 from statsmodels.tsa.arima.model import ARIMA
@@ -19,7 +20,18 @@ from safeds.exceptions import (
 
 class ArimaModel:
     """Auto Regressive Integrated Moving Average Model."""
+    def __hash__(self) -> int:
+        """
+        Return a deterministic hash value for a regressor.
 
+        Returns
+        -------
+        hash : int
+            The hash value.
+        """
+        return xxhash.xxh3_64(self.__class__.__qualname__.encode("utf-8") +
+                              (1 if self.is_fitted() else 0).to_bytes(1)+
+                              (bytes((9, 9, 9)) if self._order is None else bytes(self._order))).intdigest()
     def __init__(self) -> None:
         # Internal state
         self._arima: ARIMA | None = None

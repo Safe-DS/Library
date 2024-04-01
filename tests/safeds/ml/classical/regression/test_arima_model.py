@@ -9,7 +9,7 @@ from safeds.exceptions import (
     NonNumericColumnError,
     NonTimeSeriesError,
 )
-from safeds.ml.classical.regression import ArimaModel
+from safeds.ml.classical.regression import ArimaModel, LassoRegression
 
 from tests.helpers import resolve_resource_path
 
@@ -197,3 +197,23 @@ def test_should_raise_if_horizon_too_small_plot() -> None:
     model = ArimaModel()
     with pytest.raises(ModelNotFittedError):
         model.plot_predictions(create_test_data())
+
+def test_should_return_same_hash_for_equal_regressor() -> None:
+        regressor1 = ArimaModel()
+        regressor2 = ArimaModel()
+        assert hash(regressor1) == hash(regressor2)
+def test_should_return_different_hash_for_unequal_regressor() -> None:
+    regressor1 = ArimaModel()
+    regressor2 = LassoRegression()
+    assert hash(regressor1) != hash(regressor2)
+
+def test_should_return_different_hash_for_same_regressor_fit() -> None:
+    regressor1 = ArimaModel()
+    regressor1_fit = regressor1.fit(create_test_data())
+    assert hash(regressor1) != hash(regressor1_fit)
+
+def test_should_return_different_hash_for_regressor_fit() -> None:
+    regressor1 = ArimaModel()
+    regressor2 = ArimaModel()
+    regressor1_fit = regressor1.fit(create_test_data())
+    assert hash(regressor1_fit) != hash(regressor2)
