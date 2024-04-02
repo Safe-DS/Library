@@ -1234,21 +1234,22 @@ class TimeSeries(Table):
 
     def plot_compare_time_series(self, time_series: list[TimeSeries]) -> Image:
         """
-        Plot the given time series targets along the time on the x-axis.
+          Plot the given time series targets along the time on the x-axis.
 
         Parameters
         ----------
-        time_series:
-            A list of time series to be plotted.
+          time_series:
+              A list of time series to be plotted.
 
         Returns
         -------
-      plot:
-            A plot with all the time series targets plotted by the time on the x-axis.
+        plot:
+              A plot with all the time series targets plotted by the time on the x-axis.
+
         Raises
-        -----
-        NonNumericColumnError
-            if the target column contains non numerical values
+        ------
+          NonNumericColumnError
+              if the target column contains non numerical values
 
         """
         if not self._target.type.is_numeric():
