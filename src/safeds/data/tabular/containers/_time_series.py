@@ -1237,6 +1237,7 @@ class TimeSeries(Table):
 
         Returns
         -------
+      plot:
             A plot with all the time series targets plotted by the time on the x-axis.
 
         """
