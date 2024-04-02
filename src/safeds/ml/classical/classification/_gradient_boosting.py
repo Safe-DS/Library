@@ -15,7 +15,7 @@ if TYPE_CHECKING:
     from safeds.data.tabular.containers import Table, TaggedTable
 
 
-class GradientBoosting(Classifier):
+class GradientBoostingClassifier(Classifier):
     """
     Gradient boosting classification.
 
@@ -74,7 +74,7 @@ class GradientBoosting(Classifier):
         """
         return self._learning_rate
 
-    def fit(self, training_set: TaggedTable) -> GradientBoosting:
+    def fit(self, training_set: TaggedTable) -> GradientBoostingClassifier:
         """
         Create a copy of this classifier and fit it with the given training data.
 
@@ -87,7 +87,7 @@ class GradientBoosting(Classifier):
 
         Returns
         -------
-        fitted_classifier : GradientBoosting
+        fitted_classifier : GradientBoostingClassifier
             The fitted classifier.
 
         Raises
@@ -106,7 +106,7 @@ class GradientBoosting(Classifier):
         wrapped_classifier = self._get_sklearn_classifier()
         fit(wrapped_classifier, training_set)
 
-        result = GradientBoosting(number_of_trees=self._number_of_trees, learning_rate=self._learning_rate)
+        result = GradientBoostingClassifier(number_of_trees=self._number_of_trees, learning_rate=self._learning_rate)
         result._wrapped_classifier = wrapped_classifier
         result._feature_names = training_set.features.column_names
         result._target_name = training_set.target.name

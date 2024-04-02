@@ -16,7 +16,7 @@ if TYPE_CHECKING:
     from safeds.data.tabular.containers import Table, TaggedTable
 
 
-class LassoRegression(Regressor):
+class LassoRegressor(Regressor):
     """Lasso regression.
 
     Parameters
@@ -64,7 +64,7 @@ class LassoRegression(Regressor):
         """
         return self._alpha
 
-    def fit(self, training_set: TaggedTable) -> LassoRegression:
+    def fit(self, training_set: TaggedTable) -> LassoRegressor:
         """
         Create a copy of this regressor and fit it with the given training data.
 
@@ -77,7 +77,7 @@ class LassoRegression(Regressor):
 
         Returns
         -------
-        fitted_regressor : LassoRegression
+        fitted_regressor : LassoRegressor
             The fitted regressor.
 
         Raises
@@ -96,7 +96,7 @@ class LassoRegression(Regressor):
         wrapped_regressor = self._get_sklearn_regressor()
         fit(wrapped_regressor, training_set)
 
-        result = LassoRegression(alpha=self._alpha)
+        result = LassoRegressor(alpha=self._alpha)
         result._wrapped_regressor = wrapped_regressor
         result._feature_names = training_set.features.column_names
         result._target_name = training_set.target.name

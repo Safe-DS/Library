@@ -337,7 +337,7 @@ class Table:
         dataframe: DataFrame = pd.concat(row_array, ignore_index=True)
         dataframe.columns = column_names_compare
 
-        schema = Schema.merge_multiple_schemas([row.schema for row in rows])
+        schema = Schema._merge_multiple_schemas([row.schema for row in rows])
 
         return Table._from_pandas_dataframe(dataframe, schema)
 
@@ -1012,7 +1012,7 @@ class Table:
 
         new_df = pd.concat([self._data, row._data]).infer_objects()
         new_df.columns = self.column_names
-        schema = Schema.merge_multiple_schemas([self.schema, row.schema])
+        schema = Schema._merge_multiple_schemas([self.schema, row.schema])
         result = Table._from_pandas_dataframe(new_df, schema)
 
         for column in int_columns:

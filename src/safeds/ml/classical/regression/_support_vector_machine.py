@@ -19,7 +19,7 @@ class SupportVectorMachineKernel(ABC):
     """The abstract base class of the different subclasses supported by the `Kernel`."""
 
     @abstractmethod
-    def get_sklearn_kernel(self) -> object:
+    def _get_sklearn_kernel(self) -> object:
         """
         Get the kernel of the given SupportVectorMachine.
 
@@ -30,7 +30,7 @@ class SupportVectorMachineKernel(ABC):
         """
 
 
-class SupportVectorMachine(Regressor):
+class SupportVectorMachineRegressor(Regressor):
     """
     Support vector machine.
 
@@ -85,7 +85,7 @@ class SupportVectorMachine(Regressor):
 
     class Kernel:
         class Linear(SupportVectorMachineKernel):
-            def get_sklearn_kernel(self) -> str:
+            def _get_sklearn_kernel(self) -> str:
                 """
                 Get the name of the linear kernel.
 
@@ -102,7 +102,7 @@ class SupportVectorMachine(Regressor):
                     raise OutOfBoundsError(degree, name="degree", lower_bound=ClosedBound(1))
                 self._degree = degree
 
-            def get_sklearn_kernel(self) -> str:
+            def _get_sklearn_kernel(self) -> str:
                 """
                 Get the name of the polynomial kernel.
 
@@ -114,7 +114,7 @@ class SupportVectorMachine(Regressor):
                 return "poly"
 
         class Sigmoid(SupportVectorMachineKernel):
-            def get_sklearn_kernel(self) -> str:
+            def _get_sklearn_kernel(self) -> str:
                 """
                 Get the name of the sigmoid kernel.
 
@@ -126,7 +126,7 @@ class SupportVectorMachine(Regressor):
                 return "sigmoid"
 
         class RadialBasisFunction(SupportVectorMachineKernel):
-            def get_sklearn_kernel(self) -> str:
+            def _get_sklearn_kernel(self) -> str:
                 """
                 Get the name of the radial basis function (RBF) kernel.
 
@@ -151,18 +151,18 @@ class SupportVectorMachine(Regressor):
         TypeError
             If the kernel type is invalid.
         """
-        if isinstance(self.kernel, SupportVectorMachine.Kernel.Linear):
+        if isinstance(self.kernel, SupportVectorMachineRegressor.Kernel.Linear):
             return "linear"
-        elif isinstance(self.kernel, SupportVectorMachine.Kernel.Polynomial):
+        elif isinstance(self.kernel, SupportVectorMachineRegressor.Kernel.Polynomial):
             return "poly"
-        elif isinstance(self.kernel, SupportVectorMachine.Kernel.Sigmoid):
+        elif isinstance(self.kernel, SupportVectorMachineRegressor.Kernel.Sigmoid):
             return "sigmoid"
-        elif isinstance(self.kernel, SupportVectorMachine.Kernel.RadialBasisFunction):
+        elif isinstance(self.kernel, SupportVectorMachineRegressor.Kernel.RadialBasisFunction):
             return "rbf"
         else:
             raise TypeError("Invalid kernel type.")
 
-    def fit(self, training_set: TaggedTable) -> SupportVectorMachine:
+    def fit(self, training_set: TaggedTable) -> SupportVectorMachineRegressor:
         """
         Create a copy of this regressor and fit it with the given training data.
 
@@ -175,7 +175,7 @@ class SupportVectorMachine(Regressor):
 
         Returns
         -------
-        fitted_regressor : SupportVectorMachine
+        fitted_regressor : SupportVectorMachineRegressor
             The fitted regressor.
 
         Raises
@@ -194,7 +194,7 @@ class SupportVectorMachine(Regressor):
         wrapped_regressor = self._get_sklearn_regressor()
         fit(wrapped_regressor, training_set)
 
-        result = SupportVectorMachine(c=self._c, kernel=self._kernel)
+        result = SupportVectorMachineRegressor(c=self._c, kernel=self._kernel)
         result._wrapped_regressor = wrapped_regressor
         result._feature_names = training_set.features.column_names
         result._target_name = training_set.target.name

@@ -14,7 +14,7 @@ if TYPE_CHECKING:
     from safeds.data.tabular.containers import Table, TaggedTable
 
 
-class LinearRegression(Regressor):
+class LinearRegressionRegressor(Regressor):
     """Linear regression."""
 
     def __init__(self) -> None:
@@ -23,7 +23,7 @@ class LinearRegression(Regressor):
         self._feature_names: list[str] | None = None
         self._target_name: str | None = None
 
-    def fit(self, training_set: TaggedTable) -> LinearRegression:
+    def fit(self, training_set: TaggedTable) -> LinearRegressionRegressor:
         """
         Create a copy of this regressor and fit it with the given training data.
 
@@ -36,7 +36,7 @@ class LinearRegression(Regressor):
 
         Returns
         -------
-        fitted_regressor : LinearRegression
+        fitted_regressor : LinearRegressionRegressor
             The fitted regressor.
 
         Raises
@@ -55,7 +55,7 @@ class LinearRegression(Regressor):
         wrapped_regressor = self._get_sklearn_regressor()
         fit(wrapped_regressor, training_set)
 
-        result = LinearRegression()
+        result = LinearRegressionRegressor()
         result._wrapped_regressor = wrapped_regressor
         result._feature_names = training_set.features.column_names
         result._target_name = training_set.target.name

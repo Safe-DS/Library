@@ -1,5 +1,5 @@
 import torch
-from safeds.config import _get_device
+from safeds._config import _get_device
 
 
 def test_device() -> None:

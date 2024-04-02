@@ -10,7 +10,7 @@ from safeds.exceptions import ClosedBound, ModelNotFittedError, OutOfBoundsError
 from safeds.ml.nn._fnn_layer import FNNLayer
 
 
-class RegressionNeuralNetwork:
+class NeuralNetworkRegressor:
     def __init__(self, layers: list):
         self._model = _PytorchModel(layers, is_for_classification=False)
         self._batch_size = 1
@@ -133,7 +133,7 @@ class RegressionNeuralNetwork:
         return self._is_fitted
 
 
-class ClassificationNeuralNetwork:
+class NeuralNetworkClassifier:
     def __init__(self, layers: list[FNNLayer]):
         self._model = _PytorchModel(layers, is_for_classification=True)
         self._batch_size = 1
