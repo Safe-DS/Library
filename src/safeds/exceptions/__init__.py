@@ -46,6 +46,7 @@ __all__ = [
     "IllegalSchemaModificationError",
     "IndexOutOfBoundsError",
     "MissingValuesColumnError",
+    "NonTimeSeriesError",
     "NonNumericColumnError",
     "TransformerNotFittedError",
     "UnknownColumnNameError",
@@ -59,7 +60,6 @@ __all__ = [
     "ModelNotFittedError",
     "PredictionError",
     "UntaggedTableError",
-    "NonTimeSeriesError",
     # Other
     "Bound",
     "ClosedBound",

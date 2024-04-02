@@ -67,6 +67,12 @@ class TimeSeries(Table):
             If the specified file does not exist.
         WrongFileExtensionError
             If the file is not a csv file.
+        UnknownColumnNameError
+            If target_name or time_name matches none of the column names.
+        Value Error
+            If one column is target and feature
+        Value Error
+            If one column is time and feature
 
         """
         return TimeSeries._from_table(
@@ -1239,6 +1245,10 @@ class TimeSeries(Table):
         -------
       plot:
             A plot with all the time series targets plotted by the time on the x-axis.
+        Raises
+        -----
+        NonNumericColumnError
+            if the target column contains non numerical values
 
         """
         if not self._target.type.is_numeric():
