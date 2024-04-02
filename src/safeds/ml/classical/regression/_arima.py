@@ -121,7 +121,7 @@ class ArimaModelRegressor:
 
         Returns
         -------
-        table : TimeSeries
+        table:
             A timeseries containing the predicted target vector and a time dummy as time column.
 
         Raises
