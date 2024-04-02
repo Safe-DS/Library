@@ -50,7 +50,7 @@ class ArimaModelRegressor:
 
         Parameters
         ----------
-        time_series : TimeSeries
+        time_series:
             The time series containing the target column, which will be used.
 
         Returns
