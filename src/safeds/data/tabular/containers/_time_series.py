@@ -1257,7 +1257,6 @@ class TimeSeries(Table):
         data = pd.DataFrame()
         data[self.time.name] = self.time._data
         data[self.target.name] = self.target._data
-        index = 0
         for index,ts in enumerate(time_series):
             if not ts.target.type.is_numeric():
                 raise NonNumericColumnError("The time series plotted column contains non-numerical columns.")
