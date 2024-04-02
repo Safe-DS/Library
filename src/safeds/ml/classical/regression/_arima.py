@@ -161,7 +161,7 @@ class ArimaModelRegressor:
 
         Parameters
         ----------
-        test_series : TimeSeries
+        test_series:
             The time series containing the target vector.
 
         Returns
