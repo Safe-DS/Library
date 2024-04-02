@@ -1258,11 +1258,10 @@ class TimeSeries(Table):
         data[self.time.name] = self.time._data
         data[self.target.name] = self.target._data
         index = 0
-        for ts in time_series:
+        for index,ts in enumerate(time_series):
             if not ts.target.type.is_numeric():
                 raise NonNumericColumnError("The time series plotted column contains non-numerical columns.")
             data[ts.target.name + " " + str(index)] = ts.target._data
-            index = index + 1
         fig = plt.figure()
 
         data = pd.melt(data, [self.time.name])
