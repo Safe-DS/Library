@@ -1180,7 +1180,7 @@ class TimeSeries(Table):
 
         Parameters
         ----------
-        percentage_in_first : float
+        percentage_in_first:
             The desired size of the first table in percentage to the given table; must be between 0 and 1.
 
         Returns
