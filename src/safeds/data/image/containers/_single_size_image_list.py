@@ -362,18 +362,24 @@ class _SingleSizeImageList(ImageList):
                         [tensor, torch.cat([image_tensor, image_tensor, image_tensor], dim=0).unsqueeze(dim=0)],
                     )
                 elif image_tensor.size(dim=0) == 1:
-                    image_list_single._tensor = torch.cat([
-                        tensor,
-                        torch.cat(
-                            [image_tensor, image_tensor, image_tensor, torch.full(image_tensor.size(), 255)],
-                            dim=0,
-                        ).unsqueeze(dim=0),
-                    ])
+                    image_list_single._tensor = torch.cat(
+                        [
+                            tensor,
+                            torch.cat(
+                                [image_tensor, image_tensor, image_tensor, torch.full(image_tensor.size(), 255)],
+                                dim=0,
+                            ).unsqueeze(dim=0),
+                        ],
+                    )
                 else:
-                    image_list_single._tensor = torch.cat([
-                        tensor,
-                        torch.cat([image_tensor, torch.full(image_tensor[0:1].size(), 255)], dim=0).unsqueeze(dim=0),
-                    ])
+                    image_list_single._tensor = torch.cat(
+                        [
+                            tensor,
+                            torch.cat([image_tensor, torch.full(image_tensor[0:1].size(), 255)], dim=0).unsqueeze(
+                                dim=0,
+                            ),
+                        ],
+                    )
             else:
                 image_list_single._tensor = torch.cat([tensor, image_tensor.unsqueeze(dim=0)])
             image_list_single._tensor_positions_to_indices.append(index)

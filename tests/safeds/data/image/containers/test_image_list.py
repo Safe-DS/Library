@@ -37,11 +37,13 @@ class TestAllImageCombinations:
         # Setup
         torch.set_default_device(_get_device())
 
-        image_list = ImageList.from_files([
-            resolve_resource_path(resource_path1),
-            resolve_resource_path(resource_path2),
-            resolve_resource_path(resource_path3),
-        ])
+        image_list = ImageList.from_files(
+            [
+                resolve_resource_path(resource_path1),
+                resolve_resource_path(resource_path2),
+                resolve_resource_path(resource_path3),
+            ],
+        )
         image1 = Image.from_file(resolve_resource_path(resource_path1))
         image2 = Image.from_file(resolve_resource_path(resource_path2))
         image3 = Image.from_file(resolve_resource_path(resource_path3))
@@ -97,11 +99,13 @@ class TestAllImageCombinations:
         assert image_list.get_image(2) == image3_with_expected_channel
 
         # Test eq
-        image_list_equal = ImageList.from_files([
-            resolve_resource_path(resource_path1),
-            resolve_resource_path(resource_path2),
-            resolve_resource_path(resource_path3),
-        ])
+        image_list_equal = ImageList.from_files(
+            [
+                resolve_resource_path(resource_path1),
+                resolve_resource_path(resource_path2),
+                resolve_resource_path(resource_path3),
+            ],
+        )
         image_list_unequal_1 = ImageList.from_images(images_not_included)
         image_list_unequal_2 = image_list.remove_image_by_index(0)
         assert image_list == image_list_equal
@@ -186,21 +190,27 @@ class TestAllImageCombinations:
         image_list_wo_im_2 = image_list.remove_image(image2_with_expected_channel)
         image_list_wo_im_3 = image_list.remove_image(image3_with_expected_channel)
 
-        assert image_list_wo_im_1 == ImageList.from_images([
-            im
-            for im in [image2_with_expected_channel, image3_with_expected_channel]
-            if im != image1_with_expected_channel
-        ])
-        assert image_list_wo_im_2 == ImageList.from_images([
-            im
-            for im in [image1_with_expected_channel, image3_with_expected_channel]
-            if im != image2_with_expected_channel
-        ])
-        assert image_list_wo_im_3 == ImageList.from_images([
-            im
-            for im in [image1_with_expected_channel, image2_with_expected_channel]
-            if im != image3_with_expected_channel
-        ])
+        assert image_list_wo_im_1 == ImageList.from_images(
+            [
+                im
+                for im in [image2_with_expected_channel, image3_with_expected_channel]
+                if im != image1_with_expected_channel
+            ],
+        )
+        assert image_list_wo_im_2 == ImageList.from_images(
+            [
+                im
+                for im in [image1_with_expected_channel, image3_with_expected_channel]
+                if im != image2_with_expected_channel
+            ],
+        )
+        assert image_list_wo_im_3 == ImageList.from_images(
+            [
+                im
+                for im in [image1_with_expected_channel, image2_with_expected_channel]
+                if im != image3_with_expected_channel
+            ],
+        )
         assert image_list_wo_im_1.remove_image(image2_with_expected_channel) == ImageList.from_images(
             (
                 [image3_with_expected_channel]
@@ -269,21 +279,27 @@ class TestAllImageCombinations:
         )
 
         # # Test remove images
-        assert image_list.remove_images([image1_with_expected_channel]) == ImageList.from_images([
-            im
-            for im in [image2_with_expected_channel, image3_with_expected_channel]
-            if im != image1_with_expected_channel
-        ])
-        assert image_list.remove_images([image2_with_expected_channel]) == ImageList.from_images([
-            im
-            for im in [image1_with_expected_channel, image3_with_expected_channel]
-            if im != image2_with_expected_channel
-        ])
-        assert image_list.remove_images([image3_with_expected_channel]) == ImageList.from_images([
-            im
-            for im in [image1_with_expected_channel, image2_with_expected_channel]
-            if im != image3_with_expected_channel
-        ])
+        assert image_list.remove_images([image1_with_expected_channel]) == ImageList.from_images(
+            [
+                im
+                for im in [image2_with_expected_channel, image3_with_expected_channel]
+                if im != image1_with_expected_channel
+            ],
+        )
+        assert image_list.remove_images([image2_with_expected_channel]) == ImageList.from_images(
+            [
+                im
+                for im in [image1_with_expected_channel, image3_with_expected_channel]
+                if im != image2_with_expected_channel
+            ],
+        )
+        assert image_list.remove_images([image3_with_expected_channel]) == ImageList.from_images(
+            [
+                im
+                for im in [image1_with_expected_channel, image2_with_expected_channel]
+                if im != image3_with_expected_channel
+            ],
+        )
         assert image_list.remove_images(
             [image1_with_expected_channel, image2_with_expected_channel],
         ) == ImageList.from_images(
@@ -342,11 +358,13 @@ class TestAllImageCombinations:
         # Test remove images with size
         for image in [image1, image2, image3]:
             w, h = image.width, image.height
-            assert image_list.remove_images_with_size(w, h) == ImageList.from_images([
-                im
-                for im in [image1_with_expected_channel, image2_with_expected_channel, image3_with_expected_channel]
-                if im.width != w and im.height != h
-            ])
+            assert image_list.remove_images_with_size(w, h) == ImageList.from_images(
+                [
+                    im
+                    for im in [image1_with_expected_channel, image2_with_expected_channel, image3_with_expected_channel]
+                    if im.width != w and im.height != h
+                ],
+            )
         assert image_list.remove_images_with_size(12345, 67890) == image_list
 
         # Test remove duplicate images
@@ -726,11 +744,13 @@ class TestTransformsEqualImageTransforms:
         resource_path3: str,
     ) -> None:
         torch.set_default_device(torch.device("cpu"))
-        image_list_original = ImageList.from_files([
-            resolve_resource_path(resource_path1),
-            resolve_resource_path(resource_path2),
-            resolve_resource_path(resource_path3),
-        ])
+        image_list_original = ImageList.from_files(
+            [
+                resolve_resource_path(resource_path1),
+                resolve_resource_path(resource_path2),
+                resolve_resource_path(resource_path3),
+            ],
+        )
         image_list_clone = image_list_original.clone()
 
         if isinstance(attributes, list):
