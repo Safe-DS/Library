@@ -166,7 +166,7 @@ class ArimaModelRegressor:
 
         Returns
         -------
-        image : Image
+        image:
             Plots predictions of the given time series to the given target Column
 
         Raises
