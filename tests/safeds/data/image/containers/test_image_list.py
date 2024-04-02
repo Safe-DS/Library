@@ -4,7 +4,7 @@ import tempfile
 
 import pytest
 import torch
-from safeds.config import _get_device
+from safeds._config import _get_device
 from safeds.data.image.containers import Image, ImageList
 from safeds.data.image.containers._empty_image_list import _EmptyImageList
 from safeds.data.image.containers._multi_size_image_list import _MultiSizeImageList
