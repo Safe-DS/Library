@@ -55,7 +55,7 @@ class ArimaModelRegressor:
 
         Returns
         -------
-        fitted_arima : ArimaModelRegressor
+        fitted_arima:
             The fitted ARIMA Model.
 
         Raises
