@@ -1232,7 +1232,7 @@ class TimeSeries(Table):
 
         Parameters
         ----------
-        time_series
+        time_series:
             A list of time series to be plotted.
 
         Returns
