@@ -174,7 +174,7 @@ class ArimaModelRegressor:
         ModelNotFittedError
             If the model has not been fitted yet.
         PredictionError
-                If predicting with the given dataset failed.
+            If predicting with the given dataset failed.
 
         """
         if not self.is_fitted() or self._arima is None:
