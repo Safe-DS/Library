@@ -116,7 +116,7 @@ class ArimaModelRegressor:
 
         Parameters
         ----------
-        time_series : TimeSeries
+        time_series:
             The test dataset of the time series.
 
         Returns
