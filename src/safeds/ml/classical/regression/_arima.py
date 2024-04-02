@@ -203,7 +203,7 @@ class ArimaModelRegressor:
 
         Returns
         -------
-        is_fitted : bool
+        is_fitted:
             Whether the regressor is fitted.
         """
         return self._fitted
