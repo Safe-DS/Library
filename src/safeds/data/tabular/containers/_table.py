@@ -1059,7 +1059,7 @@ class Table:
         if isinstance(rows, Table):
             if rows.number_of_rows == 0:
                 return self
-            if self.number_of_columns == 0:
+            if self.number_of_columns == 0 or self.number_of_rows == 0:
                 return rows
             different_column_names = set(self.column_names) - set(rows.column_names)
             if len(different_column_names) > 0:
