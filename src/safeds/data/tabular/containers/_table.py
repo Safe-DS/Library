@@ -1069,6 +1069,8 @@ class Table:
                         key={val: ix for ix, val in enumerate(self.column_names)}.__getitem__,
                     ),
                 )
+            if self.number_of_rows == 0:
+                return rows
 
             new_df = pd.concat([self._data, rows._data]).infer_objects()
             new_df.columns = self.column_names
