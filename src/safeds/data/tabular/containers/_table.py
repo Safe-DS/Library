@@ -1061,8 +1061,7 @@ class Table:
                 return self
             if self.number_of_columns == 0:
                 return rows
-            different_column_names = set()
-            different_column_names.update(set(self.column_names) - set(rows.column_names))
+            different_column_names = set(self.column_names) - set(rows.column_names)
             if len(different_column_names) > 0:
                 raise UnknownColumnNameError(
                     sorted(
