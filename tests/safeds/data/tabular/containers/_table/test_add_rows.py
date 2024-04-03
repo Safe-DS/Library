@@ -25,7 +25,7 @@ from safeds.exceptions import UnknownColumnNameError
             Table({"col1": ["a", "b", "c"], "col2": [1, 2, 4]}),
             [],
             Table({"col1": ["a", "b", "c"], "col2": [1, 2, 4]}),
-        )
+        ),
     ],
     ids=["Rows with string and integer values", "different schema", "empty", "add empty"],
 )
@@ -69,7 +69,14 @@ def test_should_add_rows(table1: Table, rows: list[Row], table2: Table) -> None:
             Table({"col1": [2], "yikes": [5]}),
         ),
     ],
-    ids=["Rows from table", "add empty to table", "add on empty table", "rowless", "different schema", "same schema no rows"],
+    ids=[
+        "Rows from table",
+        "add empty to table",
+        "add on empty table",
+        "rowless",
+        "different schema",
+        "same schema no rows",
+    ],
 )
 def test_should_add_rows_from_table(table1: Table, table2: Table, expected: Table) -> None:
     table1 = table1.add_rows(table2)
