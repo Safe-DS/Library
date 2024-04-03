@@ -1057,7 +1057,26 @@ class Table:
         2  5  6
         """
         if isinstance(rows, Table):
-            rows = rows.to_rows()
+            if rows.number_of_rows == 0:
+                return self
+            if self.number_of_columns == 0:
+                return rows
+            different_column_names = set()
+            different_column_names.update(set(self.column_names) - set(rows.column_names))
+            if len(different_column_names) > 0:
+                raise UnknownColumnNameError(
+                    sorted(
+                        different_column_names,
+                        key={val: ix for ix, val in enumerate(self.column_names)}.__getitem__,
+                    ),
+                )
+
+            new_df = pd.concat([self._data, rows._data]).infer_objects()
+            new_df.columns = self.column_names
+            schema = Schema._merge_multiple_schemas([self.schema, rows.schema])
+            result = Table._from_pandas_dataframe(new_df, schema)
+
+            return result
 
         if len(rows) == 0:
             return self
