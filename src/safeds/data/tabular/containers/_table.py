@@ -1057,7 +1057,7 @@ class Table:
         2  5  6
         """
         if isinstance(rows, Table):
-            if rows.number_of_rows == 0:
+            if rows.number_of_columns == 0 or rows.number_of_rows == 0:
                 return self
             if self.number_of_columns == 0 or self.number_of_rows == 0:
                 return rows
