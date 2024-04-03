@@ -1069,6 +1069,8 @@ class Table:
                         key={val: ix for ix, val in enumerate(self.column_names)}.__getitem__,
                     ),
                 )
+            if rows.number_of_rows == 0:
+                return self
             if self.number_of_rows == 0:
                 return rows
 
