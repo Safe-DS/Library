@@ -68,6 +68,11 @@ def test_should_add_rows(table1: Table, rows: list[Row], table2: Table) -> None:
             Table({"col1": [2], "yikes": [5]}),
             Table({"col1": [2], "yikes": [5]}),
         ),
+        (
+            Table({"col1": [2], "yikes": [5]}),
+            Table({"col1": [], "yikes": []}),
+            Table({"col1": [2], "yikes": [5]}),
+        ),
     ],
     ids=[
         "Rows from table",
@@ -75,7 +80,8 @@ def test_should_add_rows(table1: Table, rows: list[Row], table2: Table) -> None:
         "add on empty table",
         "rowless",
         "different schema",
-        "same schema no rows",
+        "same schema add to no rows",
+        "same schema add no rows",
     ],
 )
 def test_should_add_rows_from_table(table1: Table, table2: Table, expected: Table) -> None:
