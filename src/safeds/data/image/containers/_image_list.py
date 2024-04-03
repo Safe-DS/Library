@@ -101,6 +101,11 @@ class ImageList(metaclass=ABCMeta):
         -------
         image_list:
             the image list
+
+        Raises
+        ------
+        FileNotFoundError
+            If the directory or one of the files of the path cannot be found
         """
         from safeds.data.image.containers._empty_image_list import _EmptyImageList
         from safeds.data.image.containers._multi_size_image_list import _MultiSizeImageList
@@ -479,6 +484,11 @@ class ImageList(metaclass=ABCMeta):
         -------
         image_list:
             the image list with the given number of channels
+
+        Raises
+        ------
+        ValueError:
+            if the given channel is not a valid channel option
         """
 
     @abstractmethod

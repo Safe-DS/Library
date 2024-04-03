@@ -59,6 +59,11 @@ class Image:
         -------
         image : Image
             The image.
+
+        Raises
+        ------
+        FileNotFoundError
+            If the file of the path cannot be found
         """
         return Image(image_tensor=Image._pil_to_tensor(pil_image_open(path)), device=device)
 
@@ -287,6 +292,11 @@ class Image:
         -------
         result :
             The image with the given number of channels.
+
+        Raises
+        ------
+        ValueError:
+            if the given channel is not a valid channel option
         """
         if self.channel == channel:
             image_tensor = self._image_tensor
