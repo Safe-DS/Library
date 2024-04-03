@@ -1074,9 +1074,7 @@ class Table:
             new_df = pd.concat([self._data, rows._data]).infer_objects()
             new_df.columns = self.column_names
             schema = Schema._merge_multiple_schemas([self.schema, rows.schema])
-            result = Table._from_pandas_dataframe(new_df, schema)
-
-            return result
+            return Table._from_pandas_dataframe(new_df, schema)
 
         if len(rows) == 0:
             return self
