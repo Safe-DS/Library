@@ -49,7 +49,7 @@ class Imputer(TableTransformer):
                 The given value to impute missing values.
             """
 
-            def __eq__(self, other) -> bool:
+            def __eq__(self, other: object) -> bool:
                 if not isinstance(other, Imputer.Strategy.Constant):
                     return NotImplemented
                 if self is other:
@@ -81,7 +81,7 @@ class Imputer(TableTransformer):
         class Mean(ImputerStrategy):
             """An imputation strategy for imputing missing data with mean values."""
 
-            def __eq__(self, other) -> bool:
+            def __eq__(self, other: object) -> bool:
                 if not isinstance(other, Imputer.Strategy.Mean):
                     return NotImplemented
                 return True
@@ -98,7 +98,7 @@ class Imputer(TableTransformer):
         class Median(ImputerStrategy):
             """An imputation strategy for imputing missing data with median values."""
 
-            def __eq__(self, other) -> bool:
+            def __eq__(self, other: object) -> bool:
                 if not isinstance(other, Imputer.Strategy.Median):
                     return NotImplemented
                 return True
@@ -115,7 +115,7 @@ class Imputer(TableTransformer):
         class Mode(ImputerStrategy):
             """An imputation strategy for imputing missing data with mode values. The lowest value will be used if there are multiple values with the same highest count."""
 
-            def __eq__(self, other) -> bool:
+            def __eq__(self, other: object) -> bool:
                 if not isinstance(other, Imputer.Strategy.Mode):
                     return NotImplemented
                 return True

@@ -36,6 +36,7 @@ class ImputerStrategy(ABC):
             Whether the two imputer strategies are equal
         """
 
+    @abstractmethod
     def __hash__(self) -> int:
         """
         Return a deterministic hash value for this imputer strategy.
@@ -44,4 +45,3 @@ class ImputerStrategy(ABC):
         hash : int
             The hash value.
         """
-        return xxhash.xxh3_64(self.__class__.__qualname__.encode("utf-8")).intdigest()
