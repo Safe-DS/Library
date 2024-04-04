@@ -400,6 +400,17 @@ class TestEq:
         assert strategy1 == strategy2
 
     @pytest.mark.parametrize(
+        "strategy",
+        ([x for x in strategies() if x.__class__]),
+        ids=lambda x: x.__class__.__name__,
+    )
+    def test_equal_identity_strategy(
+        self,
+        strategy: ImputerStrategy,
+    ) -> None:
+        assert strategy == strategy
+
+    @pytest.mark.parametrize(
         ("strategy1", "strategy2"),
         ([(x, y) for x in strategies() for y in strategies() if x.__class__ != y.__class__]),
         ids=lambda x: x.__class__.__name__,
@@ -418,7 +429,7 @@ class TestSizeof:
         ([Imputer.Strategy.Constant(1)]),
         ids=lambda x: x.__class__.__name__,
     )
-    def test_unequal_strategy(
+    def test_sizeof_strategy(
         self,
         strategy: ImputerStrategy,
     ) -> None:

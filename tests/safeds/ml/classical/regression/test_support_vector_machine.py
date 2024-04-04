@@ -1,3 +1,5 @@
+import sys
+
 import pytest
 from safeds.data.tabular.containers import Table, TaggedTable
 from safeds.exceptions import OutOfBoundsError
@@ -153,3 +155,14 @@ class TestKernel:
         kernel2: SupportVectorMachineKernel,
     ) -> None:
         assert kernel1 != kernel2
+
+    @pytest.mark.parametrize(
+        "kernel",
+        ([SupportVectorMachineRegressor.Kernel.Polynomial(3)]),
+        ids=lambda x: x.__class__.__name__,
+    )
+    def test_sizeof_kernel(
+        self,
+        kernel: SupportVectorMachineKernel,
+    ) -> None:
+        assert sys.getsizeof(kernel) > sys.getsizeof(object())
