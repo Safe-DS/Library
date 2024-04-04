@@ -1,3 +1,4 @@
+import sys
 import warnings
 
 import pytest
@@ -356,3 +357,69 @@ class TestFitAndTransform:
         )
         transformer = transformer.fit(table, None)
         assert transformer.get_names_of_removed_columns() == []
+
+
+class TestHash:
+    @pytest.mark.parametrize(
+        ("strategy1", "strategy2"),
+        ([(x, y) for x in strategies() for y in strategies() if x.__class__ == y.__class__]),
+        ids=lambda x: x.__class__.__name__,
+    )
+    def test_should_return_same_hash_for_equal_strategy(
+        self,
+        strategy1: ImputerStrategy,
+        strategy2: ImputerStrategy,
+    ) -> None:
+        assert hash(strategy1) == hash(strategy2)
+
+    @pytest.mark.parametrize(
+        ("strategy1", "strategy2"),
+        ([(x, y) for x in strategies() for y in strategies() if x.__class__ != y.__class__]),
+        ids=lambda x: x.__class__.__name__,
+    )
+    def test_should_return_different_hash_for_unequal_strategy(
+        self,
+        strategy1: ImputerStrategy,
+        strategy2: ImputerStrategy,
+    ) -> None:
+        assert hash(strategy1) != hash(strategy2)
+
+
+class TestEq:
+
+    @pytest.mark.parametrize(
+        ("strategy1", "strategy2"),
+        ([(x, y) for x in strategies() for y in strategies() if x.__class__ == y.__class__]),
+        ids=lambda x: x.__class__.__name__,
+    )
+    def test_equal_strategy(
+        self,
+        strategy1: ImputerStrategy,
+        strategy2: ImputerStrategy,
+    ) -> None:
+        assert strategy1 == strategy2
+
+    @pytest.mark.parametrize(
+        ("strategy1", "strategy2"),
+        ([(x, y) for x in strategies() for y in strategies() if x.__class__ != y.__class__]),
+        ids=lambda x: x.__class__.__name__,
+    )
+    def test_unequal_strategy(
+        self,
+        strategy1: ImputerStrategy,
+        strategy2: ImputerStrategy,
+    ) -> None:
+        assert strategy1 != strategy2
+
+
+class TestSizeof:
+    @pytest.mark.parametrize(
+        "strategy",
+        ([Imputer.Strategy.Constant(1)]),
+        ids=lambda x: x.__class__.__name__,
+    )
+    def test_unequal_strategy(
+        self,
+        strategy: ImputerStrategy,
+    ) -> None:
+        assert sys.getsizeof(strategy) > sys.getsizeof(object())
