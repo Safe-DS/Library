@@ -408,7 +408,7 @@ class TestEq:
         self,
         strategy: ImputerStrategy,
     ) -> None:
-        assert strategy == strategy
+        assert strategy == strategy  # noqa: PLR0124
 
     @pytest.mark.parametrize(
         ("strategy1", "strategy2"),
