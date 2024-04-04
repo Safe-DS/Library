@@ -1,7 +1,11 @@
 from __future__ import annotations
 
+import functools
+import operator
+import struct
 from typing import TYPE_CHECKING
 
+import xxhash
 from sklearn.ensemble import AdaBoostRegressor as sk_AdaBoostRegressor
 
 from safeds.exceptions import ClosedBound, OpenBound, OutOfBoundsError
@@ -35,6 +39,9 @@ class AdaBoostRegressor(Regressor):
     OutOfBoundsError
         If `maximum_number_of_learners` or `learning_rate` are less than or equal to 0.
     """
+
+    def __hash__(self) -> int:
+        return xxhash.xxh3_64(Regressor.__hash__(self).to_bytes(8) + (self._target_name.encode("utf-8") if self._target_name is not None else b'\0') + (functools.reduce(operator.add, [feature.encode("utf-8") for feature in self._feature_names], b'') if self._feature_names is not None else b'\0') + struct.pack('d', self._learning_rate) + self._maximum_number_of_learners.to_bytes(8)).intdigest()
 
     def __init__(
         self,

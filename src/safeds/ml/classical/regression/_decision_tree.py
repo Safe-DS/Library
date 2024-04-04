@@ -1,7 +1,10 @@
 from __future__ import annotations
 
+import functools
+import operator
 from typing import TYPE_CHECKING
 
+import xxhash
 from sklearn.tree import DecisionTreeRegressor as sk_DecisionTreeRegressor
 
 from safeds.ml.classical._util_sklearn import fit, predict
@@ -16,6 +19,9 @@ if TYPE_CHECKING:
 
 class DecisionTreeRegressor(Regressor):
     """Decision tree regression."""
+
+    def __hash__(self) -> int:
+        return xxhash.xxh3_64(Regressor.__hash__(self).to_bytes(8) + (self._target_name.encode("utf-8") if self._target_name is not None else b'\0') + (functools.reduce(operator.add, [feature.encode("utf-8") for feature in self._feature_names], b'') if self._feature_names is not None else b'\0')).intdigest()
 
     def __init__(self) -> None:
         # Internal state

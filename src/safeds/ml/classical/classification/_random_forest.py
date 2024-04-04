@@ -1,7 +1,10 @@
 from __future__ import annotations
 
+import functools
+import operator
 from typing import TYPE_CHECKING
 
+import xxhash
 from sklearn.ensemble import RandomForestClassifier as sk_RandomForestClassifier
 
 from safeds.exceptions import ClosedBound, OutOfBoundsError
@@ -28,6 +31,9 @@ class RandomForestClassifier(Classifier):
     OutOfBoundsError
         If `number_of_trees` is less than 1.
     """
+
+    def __hash__(self) -> int:
+        return xxhash.xxh3_64(Classifier.__hash__(self).to_bytes(8) + (self._target_name.encode("utf-8") if self._target_name is not None else b'\0') + (functools.reduce(operator.add, [feature.encode("utf-8") for feature in self._feature_names], b'') if self._feature_names is not None else b'\0') + self._number_of_trees.to_bytes(8)).intdigest()
 
     def __init__(self, *, number_of_trees: int = 100) -> None:
         # Validation

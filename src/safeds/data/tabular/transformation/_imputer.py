@@ -1,9 +1,11 @@
 from __future__ import annotations
 
+import sys
 import warnings
 from typing import Any
 
 import pandas as pd
+import xxhash
 from sklearn.impute import SimpleImputer as sk_SimpleImputer
 
 from safeds.data.tabular.containers import Table
@@ -47,8 +49,27 @@ class Imputer(TableTransformer):
                 The given value to impute missing values.
             """
 
+            def __eq__(self, other):
+                if not isinstance(other, Imputer.Strategy.Constant):
+                    return NotImplemented
+                if self is other:
+                    return True
+                return self._value == other._value
+
+            def __hash__(self) -> int:
+                return xxhash.xxh3_64(self.__class__.__qualname__.encode("utf-8")).intdigest()
+
             def __init__(self, value: Any):
                 self._value = value
+
+            def __sizeof__(self) -> int:
+                """
+                Return the complete size of this object.
+                Returns
+                -------
+                Size of this object in bytes.
+                """
+                return sys.getsizeof(self._value)
 
             def __str__(self) -> str:
                 return f"Constant({self._value})"
@@ -60,6 +81,14 @@ class Imputer(TableTransformer):
         class Mean(ImputerStrategy):
             """An imputation strategy for imputing missing data with mean values."""
 
+            def __eq__(self, other):
+                if not isinstance(other, Imputer.Strategy.Mean):
+                    return NotImplemented
+                return True
+
+            def __hash__(self) -> int:
+                return xxhash.xxh3_64(self.__class__.__qualname__.encode("utf-8")).intdigest()
+
             def __str__(self) -> str:
                 return "Mean"
 
@@ -69,6 +98,14 @@ class Imputer(TableTransformer):
         class Median(ImputerStrategy):
             """An imputation strategy for imputing missing data with median values."""
 
+            def __eq__(self, other):
+                if not isinstance(other, Imputer.Strategy.Median):
+                    return NotImplemented
+                return True
+
+            def __hash__(self) -> int:
+                return xxhash.xxh3_64(self.__class__.__qualname__.encode("utf-8")).intdigest()
+
             def __str__(self) -> str:
                 return "Median"
 
@@ -77,6 +114,14 @@ class Imputer(TableTransformer):
 
         class Mode(ImputerStrategy):
             """An imputation strategy for imputing missing data with mode values. The lowest value will be used if there are multiple values with the same highest count."""
+
+            def __eq__(self, other):
+                if not isinstance(other, Imputer.Strategy.Mode):
+                    return NotImplemented
+                return True
+
+            def __hash__(self) -> int:
+                return xxhash.xxh3_64(self.__class__.__qualname__.encode("utf-8")).intdigest()
 
             def __str__(self) -> str:
                 return "Mode"

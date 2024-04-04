@@ -1,8 +1,13 @@
 from __future__ import annotations
 
+import functools
+import operator
+import sys
+import struct
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
+import xxhash
 from sklearn.svm import SVC as sk_SVC  # noqa: N811
 
 from safeds.exceptions import ClosedBound, OpenBound, OutOfBoundsError
@@ -29,6 +34,30 @@ class SupportVectorMachineKernel(ABC):
         The kernel of the SupportVectorMachine.
         """
 
+    @abstractmethod
+    def __eq__(self, other: object) -> bool:
+        """
+        Compare two kernels.
+        Parameters
+        ----------
+        other:
+            other object to compare to
+        Returns
+        -------
+        equals:
+            Whether the two kernels are equal
+        """
+
+    def __hash__(self) -> int:
+        """
+        Return a deterministic hash value for this kernel.
+        Returns
+        -------
+        hash : int
+            The hash value.
+        """
+        return xxhash.xxh3_64(self.__class__.__qualname__.encode("utf-8")).intdigest()
+
 
 class SupportVectorMachineClassifier(Classifier):
     """
@@ -46,6 +75,9 @@ class SupportVectorMachineClassifier(Classifier):
     OutOfBoundsError
         If `c` is less than or equal to 0.
     """
+
+    def __hash__(self) -> int:
+        return xxhash.xxh3_64(Classifier.__hash__(self).to_bytes(8) + (self._target_name.encode("utf-8") if self._target_name is not None else b'\0') + (functools.reduce(operator.add, [feature.encode("utf-8") for feature in self._feature_names], b'') if self._feature_names is not None else b'\0') + struct.pack('d', self._c) + (hash(self.kernel).to_bytes(8) if self.kernel is not None else b'\0')).intdigest()
 
     def __init__(self, *, c: float = 1.0, kernel: SupportVectorMachineKernel | None = None) -> None:
         # Internal state
@@ -96,6 +128,11 @@ class SupportVectorMachineClassifier(Classifier):
                 """
                 return "linear"
 
+            def __eq__(self, other):
+                if not isinstance(other, SupportVectorMachineClassifier.Kernel.Linear):
+                    return NotImplemented
+                return True
+
         class Polynomial(SupportVectorMachineKernel):
             def __init__(self, degree: int):
                 if degree < 1:
@@ -113,6 +150,20 @@ class SupportVectorMachineClassifier(Classifier):
                 """
                 return "poly"
 
+            def __eq__(self, other):
+                if not isinstance(other, SupportVectorMachineClassifier.Kernel.Polynomial):
+                    return NotImplemented
+                return self._degree == other._degree
+
+            def __sizeof__(self) -> int:
+                """
+                Return the complete size of this object.
+                Returns
+                -------
+                Size of this object in bytes.
+                """
+                return sys.getsizeof(self._degree)
+
         class Sigmoid(SupportVectorMachineKernel):
             def _get_sklearn_kernel(self) -> str:
                 """
@@ -125,6 +176,11 @@ class SupportVectorMachineClassifier(Classifier):
                 """
                 return "sigmoid"
 
+            def __eq__(self, other):
+                if not isinstance(other, SupportVectorMachineClassifier.Kernel.Sigmoid):
+                    return NotImplemented
+                return True
+
         class RadialBasisFunction(SupportVectorMachineKernel):
             def _get_sklearn_kernel(self) -> str:
                 """
@@ -136,6 +192,11 @@ class SupportVectorMachineClassifier(Classifier):
                     The name of the RBF kernel.
                 """
                 return "rbf"
+
+            def __eq__(self, other):
+                if not isinstance(other, SupportVectorMachineClassifier.Kernel.RadialBasisFunction):
+                    return NotImplemented
+                return True
 
     def _get_kernel_name(self) -> str:
         """
