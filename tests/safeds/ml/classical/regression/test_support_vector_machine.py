@@ -2,6 +2,27 @@ import pytest
 from safeds.data.tabular.containers import Table, TaggedTable
 from safeds.exceptions import OutOfBoundsError
 from safeds.ml.classical.regression import SupportVectorMachineRegressor
+from safeds.ml.classical.regression._support_vector_machine import SupportVectorMachineKernel
+
+
+def kernels() -> list[SupportVectorMachineKernel]:
+    """
+    Return the list of kernels to test.
+
+    After you implemented a new kernel, add it to this list to ensure its `__hash__` and `__eq__` method work as
+    expected.
+
+    Returns
+    -------
+    kernels : list[SupportVectorMachineKernel]
+        The list of kernels to test.
+    """
+    return [
+        SupportVectorMachineRegressor.Kernel.Linear(),
+        SupportVectorMachineRegressor.Kernel.Sigmoid(),
+        SupportVectorMachineRegressor.Kernel.Polynomial(3),
+        SupportVectorMachineRegressor.Kernel.RadialBasisFunction()
+    ]
 
 
 @pytest.fixture()
@@ -84,3 +105,51 @@ class TestKernel:
         svm = SupportVectorMachineRegressor(c=2)
         with pytest.raises(TypeError, match="Invalid kernel type."):
             svm._get_kernel_name()
+
+    @pytest.mark.parametrize(
+        ("kernel1", "kernel2"),
+        ([(x, y) for x in kernels() for y in kernels() if x.__class__ == y.__class__]),
+        ids=lambda x: x.__class__.__name__,
+    )
+    def test_should_return_same_hash_for_equal_kernel(
+        self,
+        kernel1: SupportVectorMachineKernel,
+        kernel2: SupportVectorMachineKernel,
+    ) -> None:
+        assert hash(kernel1) == hash(kernel2)
+
+    @pytest.mark.parametrize(
+        ("kernel1", "kernel2"),
+        ([(x, y) for x in kernels() for y in kernels() if x.__class__ != y.__class__]),
+        ids=lambda x: x.__class__.__name__,
+    )
+    def test_should_return_different_hash_for_unequal_kernel(
+        self,
+        kernel1: SupportVectorMachineKernel,
+        kernel2: SupportVectorMachineKernel,
+    ) -> None:
+        assert hash(kernel1) != hash(kernel2)
+
+    @pytest.mark.parametrize(
+        ("kernel1", "kernel2"),
+        ([(x, y) for x in kernels() for y in kernels() if x.__class__ == y.__class__]),
+        ids=lambda x: x.__class__.__name__,
+    )
+    def test_equal_kernel(
+        self,
+        kernel1: SupportVectorMachineKernel,
+        kernel2: SupportVectorMachineKernel,
+    ) -> None:
+        assert kernel1 == kernel2
+
+    @pytest.mark.parametrize(
+        ("kernel1", "kernel2"),
+        ([(x, y) for x in kernels() for y in kernels() if x.__class__ != y.__class__]),
+        ids=lambda x: x.__class__.__name__,
+    )
+    def test_unequal_kernel(
+        self,
+        kernel1: SupportVectorMachineKernel,
+        kernel2: SupportVectorMachineKernel,
+    ) -> None:
+        assert kernel1 != kernel2

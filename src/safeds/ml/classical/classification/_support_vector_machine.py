@@ -48,6 +48,7 @@ class SupportVectorMachineKernel(ABC):
             Whether the two kernels are equal
         """
 
+    @abstractmethod
     def __hash__(self) -> int:
         """
         Return a deterministic hash value for this kernel.
@@ -56,7 +57,6 @@ class SupportVectorMachineKernel(ABC):
         hash : int
             The hash value.
         """
-        return xxhash.xxh3_64(self.__class__.__qualname__.encode("utf-8")).intdigest()
 
 
 class SupportVectorMachineClassifier(Classifier):
@@ -133,6 +133,9 @@ class SupportVectorMachineClassifier(Classifier):
                     return NotImplemented
                 return True
 
+            def __hash__(self) -> int:
+                return xxhash.xxh3_64(self.__class__.__qualname__.encode("utf-8")).intdigest()
+
         class Polynomial(SupportVectorMachineKernel):
             def __init__(self, degree: int):
                 if degree < 1:
@@ -154,6 +157,9 @@ class SupportVectorMachineClassifier(Classifier):
                 if not isinstance(other, SupportVectorMachineClassifier.Kernel.Polynomial):
                     return NotImplemented
                 return self._degree == other._degree
+
+            def __hash__(self) -> int:
+                return xxhash.xxh3_64(self.__class__.__qualname__.encode("utf-8") + self._degree.to_bytes(8)).intdigest()
 
             def __sizeof__(self) -> int:
                 """
@@ -181,6 +187,9 @@ class SupportVectorMachineClassifier(Classifier):
                     return NotImplemented
                 return True
 
+            def __hash__(self) -> int:
+                return xxhash.xxh3_64(self.__class__.__qualname__.encode("utf-8")).intdigest()
+
         class RadialBasisFunction(SupportVectorMachineKernel):
             def _get_sklearn_kernel(self) -> str:
                 """
@@ -197,6 +206,9 @@ class SupportVectorMachineClassifier(Classifier):
                 if not isinstance(other, SupportVectorMachineClassifier.Kernel.RadialBasisFunction):
                     return NotImplemented
                 return True
+
+            def __hash__(self) -> int:
+                return xxhash.xxh3_64(self.__class__.__qualname__.encode("utf-8")).intdigest()
 
     def _get_kernel_name(self) -> str:
         """
