@@ -65,6 +65,7 @@ class Imputer(TableTransformer):
             def __sizeof__(self) -> int:
                 """
                 Return the complete size of this object.
+
                 Returns
                 -------
                 Size of this object in bytes.

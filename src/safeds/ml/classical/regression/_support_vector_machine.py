@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import functools
 import operator
-import sys
 import struct
+import sys
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
@@ -38,10 +38,12 @@ class SupportVectorMachineKernel(ABC):
     def __eq__(self, other: object) -> bool:
         """
         Compare two kernels.
+
         Parameters
         ----------
         other:
             other object to compare to
+
         Returns
         -------
         equals:
@@ -52,6 +54,7 @@ class SupportVectorMachineKernel(ABC):
     def __hash__(self) -> int:
         """
         Return a deterministic hash value for this kernel.
+
         Returns
         -------
         hash : int
@@ -77,7 +80,17 @@ class SupportVectorMachineRegressor(Regressor):
     """
 
     def __hash__(self) -> int:
-        return xxhash.xxh3_64(Regressor.__hash__(self).to_bytes(8) + (self._target_name.encode("utf-8") if self._target_name is not None else b'\0') + (functools.reduce(operator.add, [feature.encode("utf-8") for feature in self._feature_names], b'') if self._feature_names is not None else b'\0') + struct.pack('d', self._c) + (hash(self.kernel).to_bytes(8) if self.kernel is not None else b'\0')).intdigest()
+        return xxhash.xxh3_64(
+            Regressor.__hash__(self).to_bytes(8)
+            + (self._target_name.encode("utf-8") if self._target_name is not None else b"\0")
+            + (
+                functools.reduce(operator.add, [feature.encode("utf-8") for feature in self._feature_names], b"")
+                if self._feature_names is not None
+                else b"\0"
+            )
+            + struct.pack("d", self._c)
+            + (hash(self.kernel).to_bytes(8) if self.kernel is not None else b"\0"),
+        ).intdigest()
 
     def __init__(self, *, c: float = 1.0, kernel: SupportVectorMachineKernel | None = None) -> None:
         # Internal state
@@ -159,11 +172,14 @@ class SupportVectorMachineRegressor(Regressor):
                 return self._degree == other._degree
 
             def __hash__(self) -> int:
-                return xxhash.xxh3_64(self.__class__.__qualname__.encode("utf-8") + self._degree.to_bytes(8)).intdigest()
+                return xxhash.xxh3_64(
+                    self.__class__.__qualname__.encode("utf-8") + self._degree.to_bytes(8),
+                ).intdigest()
 
             def __sizeof__(self) -> int:
                 """
                 Return the complete size of this object.
+
                 Returns
                 -------
                 Size of this object in bytes.

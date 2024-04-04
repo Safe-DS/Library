@@ -26,7 +26,13 @@ class TableTransformer(ABC):
         added = self.get_names_of_added_columns() if self.is_fitted() else []
         changed = self.get_names_of_changed_columns() if self.is_fitted() else []
         removed = self.get_names_of_removed_columns() if self.is_fitted() else []
-        return xxhash.xxh3_64(self.__class__.__qualname__.encode("utf-8") + (1 if self.is_fitted() else 0).to_bytes(1) + functools.reduce(operator.add, [feature.encode("utf-8") for feature in added], b'A') + functools.reduce(operator.add, [feature.encode("utf-8") for feature in changed], b'C') + functools.reduce(operator.add, [feature.encode("utf-8") for feature in removed], b'R')).intdigest()
+        return xxhash.xxh3_64(
+            self.__class__.__qualname__.encode("utf-8")
+            + (1 if self.is_fitted() else 0).to_bytes(1)
+            + functools.reduce(operator.add, [feature.encode("utf-8") for feature in added], b"A")
+            + functools.reduce(operator.add, [feature.encode("utf-8") for feature in changed], b"C")
+            + functools.reduce(operator.add, [feature.encode("utf-8") for feature in removed], b"R"),
+        ).intdigest()
 
     @abstractmethod
     def fit(self, table: Table, column_names: list[str] | None) -> TableTransformer:

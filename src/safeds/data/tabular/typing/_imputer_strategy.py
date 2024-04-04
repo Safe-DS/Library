@@ -1,6 +1,5 @@
 from abc import ABC, abstractmethod
 
-import xxhash
 from sklearn.impute import SimpleImputer as sk_SimpleImputer
 
 
@@ -26,10 +25,12 @@ class ImputerStrategy(ABC):
     def __eq__(self, other: object) -> bool:
         """
         Compare two imputer strategies.
+
         Parameters
         ----------
         other:
             other object to compare to
+
         Returns
         -------
         equals:
@@ -40,6 +41,7 @@ class ImputerStrategy(ABC):
     def __hash__(self) -> int:
         """
         Return a deterministic hash value for this imputer strategy.
+
         Returns
         -------
         hash : int

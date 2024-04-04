@@ -39,7 +39,17 @@ class ElasticNetRegressor(Regressor):
     """
 
     def __hash__(self) -> int:
-        return xxhash.xxh3_64(Regressor.__hash__(self).to_bytes(8) + (self._target_name.encode("utf-8") if self._target_name is not None else b'\0') + (functools.reduce(operator.add, [feature.encode("utf-8") for feature in self._feature_names], b'') if self._feature_names is not None else b'\0') + struct.pack('d', self._alpha) + struct.pack('d', self._lasso_ratio)).intdigest()
+        return xxhash.xxh3_64(
+            Regressor.__hash__(self).to_bytes(8)
+            + (self._target_name.encode("utf-8") if self._target_name is not None else b"\0")
+            + (
+                functools.reduce(operator.add, [feature.encode("utf-8") for feature in self._feature_names], b"")
+                if self._feature_names is not None
+                else b"\0"
+            )
+            + struct.pack("d", self._alpha)
+            + struct.pack("d", self._lasso_ratio),
+        ).intdigest()
 
     def __init__(self, *, alpha: float = 1.0, lasso_ratio: float = 0.5) -> None:
         # Validation

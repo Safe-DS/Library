@@ -23,7 +23,7 @@ def kernels() -> list[SupportVectorMachineKernel]:
         SupportVectorMachineRegressor.Kernel.Linear(),
         SupportVectorMachineRegressor.Kernel.Sigmoid(),
         SupportVectorMachineRegressor.Kernel.Polynomial(3),
-        SupportVectorMachineRegressor.Kernel.RadialBasisFunction()
+        SupportVectorMachineRegressor.Kernel.RadialBasisFunction(),
     ]
 
 
