@@ -67,7 +67,7 @@ class NeuralNetworkRegressor:
         loss_sum = 0.0
         number_of_batches_done = 0
         for epoch in range(epoch_size):
-            for x, y in dataloader:
+            for x, y in iter(dataloader):
                 optimizer.zero_grad()
 
                 pred = copied_model._model(x)
@@ -116,8 +116,9 @@ class NeuralNetworkRegressor:
         with torch.no_grad():
             for x in dataloader:
                 elem = self._model(x)
-                for item in range(len(elem)):
-                    predictions.append(elem[item].item())
+                predictions += elem.squeeze(dim=1).tolist()
+                # for item in range(len(elem)):
+                #     predictions.append(elem[item].item())
         return test_data.add_column(Column("prediction", predictions)).tag_columns("prediction")
 
     @property
@@ -194,27 +195,28 @@ class NeuralNetworkClassifier:
         loss_sum = 0.0
         number_of_batches_done = 0
         for epoch in range(epoch_size):
-            for x, y in dataloader:
+            for x, y in iter(dataloader):
                 optimizer.zero_grad()
                 pred = copied_model._model(x)
-                if self._is_multi_class:
-                    pred_size = Tensor.size(pred, dim=1)
-                    predictions_for_all_items_of_batch = []
-                    for value in range(len(y)):
-                        list_of_probabilities_for_each_category = []
-                        class_index = y[value].item()
-                        for index in range(pred_size):
-                            if index is int(class_index):
-                                list_of_probabilities_for_each_category.append(1.0)
-                            else:
-                                list_of_probabilities_for_each_category.append(0.0)
-                        predictions_for_all_items_of_batch.append(list_of_probabilities_for_each_category.copy())
-
-                    y_reshaped_as_tensor_to_fit_format_of_pred = torch.tensor(predictions_for_all_items_of_batch)
-
-                    loss = loss_fn(pred, y_reshaped_as_tensor_to_fit_format_of_pred)
-                else:
-                    loss = loss_fn(pred, y)
+                # if self._is_multi_class:
+                #     pred_size = Tensor.size(pred, dim=1)
+                #     predictions_for_all_items_of_batch = []
+                #     for value in range(len(y)):
+                #         list_of_probabilities_for_each_category = []
+                #         class_index = y[value].item()
+                #         for index in range(pred_size):
+                #             if index is int(class_index):
+                #                 list_of_probabilities_for_each_category.append(1.0)
+                #             else:
+                #                 list_of_probabilities_for_each_category.append(0.0)
+                #         predictions_for_all_items_of_batch.append(list_of_probabilities_for_each_category.copy())
+                #
+                #     y_reshaped_as_tensor_to_fit_format_of_pred = torch.tensor(predictions_for_all_items_of_batch)
+                #
+                #     loss = loss_fn(pred, y_reshaped_as_tensor_to_fit_format_of_pred)
+                # else:
+                #     loss = loss_fn(pred, y)
+                loss = loss_fn(pred, y)
                 loss_sum += loss.item()
                 loss.backward()
                 optimizer.step()
@@ -258,22 +260,26 @@ class NeuralNetworkClassifier:
         with torch.no_grad():
             for x in dataloader:
                 elem = self._model(x)
-                for item in range(len(elem)):
-                    if not self._is_multi_class:
-                        if elem[item].item() < 0.5:
-                            predicted_class = 0  # pragma: no cover
-                        else:  # pragma: no cover
-                            predicted_class = 1  # pragma: no cover
-                        predictions.append(predicted_class)
-                    else:
-                        values = elem[item].tolist()
-                        highest_value = 0
-                        category_of_highest_value = 0
-                        for index in range(len(values)):
-                            if values[index] > highest_value:
-                                highest_value = values[index]
-                                category_of_highest_value = index
-                        predictions.append(category_of_highest_value)
+                if self._is_multi_class:
+                    predictions += torch.argmax(elem, dim=1).tolist()
+                else:
+                    predictions += elem.round().tolist()
+                # for item in range(len(elem)):
+                #     if not self._is_multi_class:
+                #         if elem[item].item() < 0.5:
+                #             predicted_class = 0  # pragma: no cover
+                #         else:  # pragma: no cover
+                #             predicted_class = 1  # pragma: no cover
+                #         predictions.append(predicted_class)
+                #     else:
+                #         values = elem[item].tolist()
+                #         highest_value = 0
+                #         category_of_highest_value = 0
+                #         for index in range(len(values)):
+                #             if values[index] > highest_value:
+                #                 highest_value = values[index]
+                #                 category_of_highest_value = index
+                #         predictions.append(category_of_highest_value)
         return test_data.add_column(Column("prediction", predictions)).tag_columns("prediction")
 
     @property
@@ -308,7 +314,8 @@ class _PytorchModel(nn.Module):
                 internal_layers.append(fnn_layers[-1]._get_internal_layer(activation_function="softmax"))
             else:
                 internal_layers.append(fnn_layers[-1]._get_internal_layer(activation_function="sigmoid"))
-        self._pytorch_layers = nn.ModuleList(internal_layers)
+        self._pytorch_layers = nn.Sequential(*internal_layers)
+        # self._pytorch_layers = nn.ModuleList(internal_layers)
 
     def forward(self, x: float) -> float:
         for layer in self._pytorch_layers:
