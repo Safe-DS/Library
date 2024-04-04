@@ -128,7 +128,7 @@ class SupportVectorMachineRegressor(Regressor):
                 """
                 return "linear"
 
-            def __eq__(self, other):
+            def __eq__(self, other) -> bool:
                 if not isinstance(other, SupportVectorMachineRegressor.Kernel.Linear):
                     return NotImplemented
                 return True
@@ -150,7 +150,7 @@ class SupportVectorMachineRegressor(Regressor):
                 """
                 return "poly"
 
-            def __eq__(self, other):
+            def __eq__(self, other) -> bool:
                 if not isinstance(other, SupportVectorMachineRegressor.Kernel.Polynomial):
                     return NotImplemented
                 return self._degree == other._degree
@@ -176,7 +176,7 @@ class SupportVectorMachineRegressor(Regressor):
                 """
                 return "sigmoid"
 
-            def __eq__(self, other):
+            def __eq__(self, other) -> bool:
                 if not isinstance(other, SupportVectorMachineRegressor.Kernel.Sigmoid):
                     return NotImplemented
                 return True
@@ -193,7 +193,7 @@ class SupportVectorMachineRegressor(Regressor):
                 """
                 return "rbf"
 
-            def __eq__(self, other):
+            def __eq__(self, other) -> bool:
                 if not isinstance(other, SupportVectorMachineRegressor.Kernel.RadialBasisFunction):
                     return NotImplemented
                 return True

@@ -128,7 +128,7 @@ class SupportVectorMachineClassifier(Classifier):
                 """
                 return "linear"
 
-            def __eq__(self, other):
+            def __eq__(self, other) -> bool:
                 if not isinstance(other, SupportVectorMachineClassifier.Kernel.Linear):
                     return NotImplemented
                 return True
@@ -150,7 +150,7 @@ class SupportVectorMachineClassifier(Classifier):
                 """
                 return "poly"
 
-            def __eq__(self, other):
+            def __eq__(self, other) -> bool:
                 if not isinstance(other, SupportVectorMachineClassifier.Kernel.Polynomial):
                     return NotImplemented
                 return self._degree == other._degree
@@ -176,7 +176,7 @@ class SupportVectorMachineClassifier(Classifier):
                 """
                 return "sigmoid"
 
-            def __eq__(self, other):
+            def __eq__(self, other) -> bool:
                 if not isinstance(other, SupportVectorMachineClassifier.Kernel.Sigmoid):
                     return NotImplemented
                 return True
@@ -193,7 +193,7 @@ class SupportVectorMachineClassifier(Classifier):
                 """
                 return "rbf"
 
-            def __eq__(self, other):
+            def __eq__(self, other) -> bool:
                 if not isinstance(other, SupportVectorMachineClassifier.Kernel.RadialBasisFunction):
                     return NotImplemented
                 return True
