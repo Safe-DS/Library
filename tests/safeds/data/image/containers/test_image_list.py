@@ -394,8 +394,22 @@ class TestFromFiles:
 
     @pytest.mark.parametrize(
         "resource_path",
-        [images_all(), str(test_images_folder), *images_all(), [Path(im) for im in images_all()], test_images_folder, *[Path(im) for im in images_all()]],
-        ids=["all-images", "images_folder", *images_all_ids(), "all-images-path", "images_folder-path", *[s + "-path" for s in images_all_ids()]],
+        [
+            images_all(),
+            str(test_images_folder),
+            *images_all(),
+            [Path(im) for im in images_all()],
+            test_images_folder,
+            *[Path(im) for im in images_all()],
+        ],
+        ids=[
+            "all-images",
+            "images_folder",
+            *images_all_ids(),
+            "all-images-path",
+            "images_folder-path",
+            *[s + "-path" for s in images_all_ids()],
+        ],
     )
     def test_from_files_creation(self, resource_path: str | Path, snapshot_png_image_list: SnapshotAssertion) -> None:
         torch.set_default_device(torch.device("cpu"))
@@ -404,8 +418,15 @@ class TestFromFiles:
 
     @pytest.mark.parametrize(
         "resource_path",
-        ["\\images\\missing_directory\\", Path("\\images\\missing_directory\\"), ["\\images\\missing_file1.png", "\\images\\missing_file2.png"], [Path("\\images\\missing_file1.png"), Path("\\images\\missing_file2.png")], [*images_all(), "\\images\\missing_file2.png"], [*[Path(im) for im in images_all()], Path("\\images\\missing_file2.png")]],
-        ids=["dir-str", "dir-path", "list-str", "list-path", "list-str-last-missing", "list-path-last-missing"]
+        [
+            "\\images\\missing_directory\\",
+            Path("\\images\\missing_directory\\"),
+            ["\\images\\missing_file1.png", "\\images\\missing_file2.png"],
+            [Path("\\images\\missing_file1.png"), Path("\\images\\missing_file2.png")],
+            [*images_all(), "\\images\\missing_file2.png"],
+            [*[Path(im) for im in images_all()], Path("\\images\\missing_file2.png")],
+        ],
+        ids=["dir-str", "dir-path", "list-str", "list-path", "list-str-last-missing", "list-path-last-missing"],
     )
     def test_should_raise_if_one_file_or_directory_not_found(self, resource_path: str | Path) -> None:
         with pytest.raises(FileNotFoundError):
