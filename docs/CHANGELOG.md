@@ -1,3 +1,21 @@
+## [0.20.0](https://github.com/Safe-DS/Library/compare/v0.19.0...v0.20.0) (2024-04-03)
+
+
+### Features
+
+* add deterministic hash methods to all types ([#573](https://github.com/Safe-DS/Library/issues/573)) ([f6a3ca7](https://github.com/Safe-DS/Library/commit/f6a3ca791fc1b3b99266dbe68c85dde0669c4186))
+* add fnn functionality ([#529](https://github.com/Safe-DS/Library/issues/529)) ([ce53153](https://github.com/Safe-DS/Library/commit/ce5315308b6d1c56258397c1300ee64698cf71bb)), closes [#522](https://github.com/Safe-DS/Library/issues/522)
+* add suffixes to models to indicate their task ([#588](https://github.com/Safe-DS/Library/issues/588)) ([d490dee](https://github.com/Safe-DS/Library/commit/d490dee5e01d65216d4417cceef505c08b27fda3))
+* added lag_plot ([#548](https://github.com/Safe-DS/Library/issues/548)) ([0fb38d2](https://github.com/Safe-DS/Library/commit/0fb38d252c1596063ddad768d8a0a1e6ad07c1d4)), closes [#519](https://github.com/Safe-DS/Library/issues/519)
+* added normal plot for time series ([#550](https://github.com/Safe-DS/Library/issues/550)) ([dbdf11e](https://github.com/Safe-DS/Library/commit/dbdf11e9c8cbdd39861ba2c7946caf0e135011d2)), closes [#549](https://github.com/Safe-DS/Library/issues/549)
+* when using from table to time series feature must be given ([#572](https://github.com/Safe-DS/Library/issues/572)) ([ca23f0f](https://github.com/Safe-DS/Library/commit/ca23f0f6f6f42a36f79a38d1a7a696ca523bfd0c)), closes [#571](https://github.com/Safe-DS/Library/issues/571)
+
+
+### Bug Fixes
+
+* incorrect type hint for `number_of_bins` parameter ([#567](https://github.com/Safe-DS/Library/issues/567)) ([b434e53](https://github.com/Safe-DS/Library/commit/b434e537661e56fec44e265ef05f3e78779effc5))
+* mark various API elements as internal ([#587](https://github.com/Safe-DS/Library/issues/587)) ([ea176fc](https://github.com/Safe-DS/Library/commit/ea176fc576dd715dbfd2699055770a80d5ffb5ad)), closes [#582](https://github.com/Safe-DS/Library/issues/582) [#585](https://github.com/Safe-DS/Library/issues/585)
+
 ## [0.19.0](https://github.com/Safe-DS/Library/compare/v0.18.0...v0.19.0) (2024-02-06)
 
 
