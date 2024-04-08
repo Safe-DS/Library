@@ -1190,7 +1190,7 @@ class TimeSeries(Table):
 
         Returns
         -------
-        result : (TimeSeries, TimeSeries)
+        result:
             A tuple containing the two resulting time series. The first time series has the specified size, the second time series
             contains the rest of the data.
 
