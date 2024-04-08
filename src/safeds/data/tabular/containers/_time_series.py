@@ -43,7 +43,7 @@ class TimeSeries(Table):
 
         Parameters
         ----------
-        path :
+        path:
             The path to the CSV file.
 
         target_name:
