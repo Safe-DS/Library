@@ -49,16 +49,15 @@ class TimeSeries(Table):
         target_name:
             The name of the target column
 
-        time_name :
+        time_name:
             The name of the time column
 
         feature_names:
             The name(s) of the column(s)
 
-
         Returns
         -------
-        table :
+        table:
             The time series created from the CSV file.
 
         Raises
@@ -1182,17 +1181,17 @@ class TimeSeries(Table):
         """
         Split the table into two new tables.
 
-        The original table is not modified.
+        The original time series is not modified.
 
         Parameters
         ----------
         percentage_in_first:
-            The desired size of the first table in percentage to the given table; must be between 0 and 1.
+            The desired size of the first time series in percentage to the given time series; must be between 0 and 1.
 
         Returns
         -------
         result : (TimeSeries, TimeSeries)
-            A tuple containing the two resulting tables. The first table has the specified size, the second table
+            A tuple containing the two resulting time series. The first time series has the specified size, the second time series
             contains the rest of the data.
 
         Raises
@@ -1202,9 +1201,9 @@ class TimeSeries(Table):
 
         Examples
         --------
-        >>> from safeds.data.tabular.containers import Table
-        >>> table = TimeSeries({"time":[0, 1, 2, 3, 4], "temperature": [10, 15, 20, 25, 30], "sales": [54, 74, 90, 206, 210]}, time_name="time", target_name="sales")
-        >>> slices = table.split_rows(0.4)
+        >>> from safeds.data.tabular.containers import TimeSeries
+        >>> time_series = TimeSeries({"time":[0, 1, 2, 3, 4], "temperature": [10, 15, 20, 25, 30], "sales": [54, 74, 90, 206, 210]}, time_name="time", target_name="sales")
+        >>> slices = time_series.split_rows(0.4)
         >>> slices[0]
            time  temperature  sales
         0     0           10     54

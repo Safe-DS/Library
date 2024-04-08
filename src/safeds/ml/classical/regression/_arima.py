@@ -27,7 +27,7 @@ class ArimaModelRegressor:
 
         Returns
         -------
-        hash : int
+        hash:
             The hash value.
         """
         return xxhash.xxh3_64(
@@ -121,7 +121,7 @@ class ArimaModelRegressor:
 
         Returns
         -------
-        table:
+        time_series:
             A timeseries containing the predicted target vector and a time dummy as time column.
 
         Raises
