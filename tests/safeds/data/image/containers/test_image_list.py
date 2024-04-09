@@ -358,22 +358,34 @@ class TestAllImageCombinations:
         assert image_list.remove_image_by_index([0, 1, 2]) == _EmptyImageList()
 
         # Test remove image by index ignore invalid
-        assert image_list._remove_image_by_index_ignore_invalid(0) == ImageList.from_images([image2, image3]).change_channel(
+        assert image_list._remove_image_by_index_ignore_invalid(0) == ImageList.from_images(
+            [image2, image3],
+        ).change_channel(
             image_list.channel,
         )
-        assert image_list._remove_image_by_index_ignore_invalid(1) == ImageList.from_images([image1, image3]).change_channel(
+        assert image_list._remove_image_by_index_ignore_invalid(1) == ImageList.from_images(
+            [image1, image3],
+        ).change_channel(
             image_list.channel,
         )
-        assert image_list._remove_image_by_index_ignore_invalid(2) == ImageList.from_images([image1, image2]).change_channel(
+        assert image_list._remove_image_by_index_ignore_invalid(2) == ImageList.from_images(
+            [image1, image2],
+        ).change_channel(
             image_list.channel,
         )
-        assert image_list._remove_image_by_index_ignore_invalid([0, 1]) == ImageList.from_images([image3]).change_channel(
+        assert image_list._remove_image_by_index_ignore_invalid([0, 1]) == ImageList.from_images(
+            [image3],
+        ).change_channel(
             image_list.channel,
         )
-        assert image_list._remove_image_by_index_ignore_invalid([0, 2]) == ImageList.from_images([image2]).change_channel(
+        assert image_list._remove_image_by_index_ignore_invalid([0, 2]) == ImageList.from_images(
+            [image2],
+        ).change_channel(
             image_list.channel,
         )
-        assert image_list._remove_image_by_index_ignore_invalid([1, 2]) == ImageList.from_images([image1]).change_channel(
+        assert image_list._remove_image_by_index_ignore_invalid([1, 2]) == ImageList.from_images(
+            [image1],
+        ).change_channel(
             image_list.channel,
         )
         assert image_list._remove_image_by_index_ignore_invalid([0, 1, 2]) == _EmptyImageList()
