@@ -21,6 +21,7 @@ from safeds.exceptions import (
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Mapping, Sequence
+    from pathlib import Path
     from typing import Any
 
 
@@ -29,6 +30,57 @@ class TimeSeries(Table):
     # ------------------------------------------------------------------------------------------------------------------
     # Creation
     # ------------------------------------------------------------------------------------------------------------------
+
+    @staticmethod
+    def timeseries_from_csv_file(
+        path: str | Path,
+        target_name: str,
+        time_name: str,
+        feature_names: list[str] | None = None,
+    ) -> TimeSeries:
+        """
+        Read data from a CSV file into a table.
+
+        Parameters
+        ----------
+        path:
+            The path to the CSV file.
+
+        target_name:
+            The name of the target column
+
+        time_name:
+            The name of the time column
+
+        feature_names:
+            The name(s) of the column(s)
+
+        Returns
+        -------
+        table:
+            The time series created from the CSV file.
+
+        Raises
+        ------
+        FileNotFoundError
+            If the specified file does not exist.
+        WrongFileExtensionError
+            If the file is not a csv file.
+        UnknownColumnNameError
+            If target_name or time_name matches none of the column names.
+        Value Error
+            If one column is target and feature
+        Value Error
+            If one column is time and feature
+
+        """
+        return TimeSeries._from_table(
+            Table.from_csv_file(path=path),
+            target_name=target_name,
+            time_name=time_name,
+            feature_names=feature_names,
+        )
+
     @staticmethod
     def _from_tagged_table(
         tagged_table: TaggedTable,
@@ -128,12 +180,17 @@ class TimeSeries(Table):
 
         if target_name not in table.column_names:
             raise UnknownColumnNameError([target_name])
-
         result = object.__new__(TimeSeries)
         result._data = table._data
+
         result._schema = table._schema
         result._time = table.get_column(time_name)
         result._target = table.get_column(target_name)
+        # empty Columns have dtype Object
+        if len(result._time._data) == 0:
+            result._time._data = pd.Series(name=time_name)
+        if len(result.target._data) == 0:
+            result.target._data = pd.Series(name=target_name)
         if feature_names is None or len(feature_names) == 0:
             result._feature_names = []
             result._features = Table()
@@ -203,6 +260,11 @@ class TimeSeries(Table):
             raise UnknownColumnNameError([time_name])
         self._time: Column = _data.get_column(time_name)
         self._target: Column = _data.get_column(target_name)
+        # empty Columns have dtype Object
+        if len(self._time._data) == 0:
+            self._time._data = pd.Series(name=time_name)
+        if len(self.target._data) == 0:
+            self.target._data = pd.Series(name=target_name)
 
     def __eq__(self, other: object) -> bool:
         """
@@ -216,6 +278,7 @@ class TimeSeries(Table):
             return NotImplemented
         if self is other:
             return True
+
         return (
             self.time == other.time
             and self.target == other.target
@@ -1107,6 +1170,105 @@ class TimeSeries(Table):
         )  # rotate the labels of the x Axis to prevent the chance of overlapping of the labels
         plt.tight_layout()
 
+        buffer = io.BytesIO()
+        fig.savefig(buffer, format="png")
+        plt.close()  # Prevents the figure from being displayed directly
+        buffer.seek(0)
+        self._data = self._data.reset_index()
+        return Image.from_bytes(buffer.read())
+
+    def split_rows(self, percentage_in_first: float) -> tuple[TimeSeries, TimeSeries]:
+        """
+        Split the table into two new tables.
+
+        The original time series is not modified.
+
+        Parameters
+        ----------
+        percentage_in_first:
+            The desired size of the first time series in percentage to the given time series; must be between 0 and 1.
+
+        Returns
+        -------
+        result:
+            A tuple containing the two resulting time series. The first time series has the specified size, the second time series
+            contains the rest of the data.
+
+        Raises
+        ------
+        ValueError:
+            if the 'percentage_in_first' is not between 0 and 1.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import TimeSeries
+        >>> time_series = TimeSeries({"time":[0, 1, 2, 3, 4], "temperature": [10, 15, 20, 25, 30], "sales": [54, 74, 90, 206, 210]}, time_name="time", target_name="sales")
+        >>> slices = time_series.split_rows(0.4)
+        >>> slices[0]
+           time  temperature  sales
+        0     0           10     54
+        1     1           15     74
+        >>> slices[1]
+           time  temperature  sales
+        0     2           20     90
+        1     3           25    206
+        2     4           30    210
+        """
+        temp = self._as_table()
+        t1, t2 = temp.split_rows(percentage_in_first=percentage_in_first)
+        return (
+            TimeSeries._from_table(
+                t1,
+                time_name=self.time.name,
+                target_name=self._target.name,
+                feature_names=self._feature_names,
+            ),
+            TimeSeries._from_table(
+                t2,
+                time_name=self.time.name,
+                target_name=self._target.name,
+                feature_names=self._feature_names,
+            ),
+        )
+
+    def plot_compare_time_series(self, time_series: list[TimeSeries]) -> Image:
+        """
+        Plot the given time series targets along the time on the x-axis.
+
+        Parameters
+        ----------
+        time_series:
+            A list of time series to be plotted.
+
+        Returns
+        -------
+        plot:
+              A plot with all the time series targets plotted by the time on the x-axis.
+
+        Raises
+        ------
+        NonNumericColumnError
+            if the target column contains non numerical values
+
+        """
+        if not self._target.type.is_numeric():
+            raise NonNumericColumnError("The time series plotted column contains non-numerical columns.")
+
+        data = pd.DataFrame()
+        data[self.time.name] = self.time._data
+        data[self.target.name] = self.target._data
+        for index, ts in enumerate(time_series):
+            if not ts.target.type.is_numeric():
+                raise NonNumericColumnError("The time series plotted column contains non-numerical columns.")
+            data[ts.target.name + " " + str(index)] = ts.target._data
+        fig = plt.figure()
+
+        data = pd.melt(data, [self.time.name])
+        sns.lineplot(x=self.time.name, y="value", hue="variable", data=data)
+        plt.title("Multiple Series Plot")
+        plt.xlabel("Time")
+
+        plt.tight_layout()
         buffer = io.BytesIO()
         fig.savefig(buffer, format="png")
         plt.close()  # Prevents the figure from being displayed directly
