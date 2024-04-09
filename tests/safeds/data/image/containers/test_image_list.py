@@ -858,17 +858,18 @@ class TestErrorsAndWarningsWithoutEmptyImageList:
 
         @pytest.mark.parametrize(
             ("new_x", "new_y"),
-            [
-                (10000, 1),
-                (1, 10000),
-                (10000, 10000)
-            ],
-            ids=["outside x", "outside y", "outside x and y"]
+            [(10000, 1), (1, 10000), (10000, 10000)],
+            ids=["outside x", "outside y", "outside x and y"],
         )
-        def test_should_warn_if_coordinates_outsize_image(self, resource_path: list[str], new_x: int, new_y: int) -> None:
+        def test_should_warn_if_coordinates_outsize_image(
+            self, resource_path: list[str], new_x: int, new_y: int,
+        ) -> None:
             image_list = ImageList.from_files(resolve_resource_path(resource_path))
             image_blank_tensor = torch.zeros((image_list.number_of_images, image_list.channel, 1, 1))
-            with pytest.warns(UserWarning, match=r"The specified bounding rectangle does not contain any content of at least one image. Therefore these images will be blank."):
+            with pytest.warns(
+                UserWarning,
+                match=r"The specified bounding rectangle does not contain any content of at least one image. Therefore these images will be blank.",
+            ):
                 cropped_image_list = image_list.crop(new_x, new_y, 1, 1)
                 assert torch.all(torch.eq(cropped_image_list._as_single_size_image_list()._tensor, image_blank_tensor))
 
@@ -917,62 +918,56 @@ class TestErrorsAndWarningsWithEmptyImageList:
 
         @pytest.mark.parametrize(
             ("width", "height"),
-            [
-                (-10, 10),
-                (10, -10),
-                (-10, -10)
-            ],
-            ids=["invalid width", "invalid height", "invalid width and height"]
+            [(-10, 10), (10, -10), (-10, -10)],
+            ids=["invalid width", "invalid height", "invalid width and height"],
         )
         def test_should_raise_negative_size(self, resource_path: list[str], width: int, height: int) -> None:
             image_list = ImageList.from_files(resolve_resource_path(resource_path))
-            with pytest.raises(OutOfBoundsError, match=rf"At least one of width and height \(={min(width, height)}\) is not inside \[1, \u221e\)."):
+            with pytest.raises(
+                OutOfBoundsError,
+                match=rf"At least one of width and height \(={min(width, height)}\) is not inside \[1, \u221e\).",
+            ):
                 image_list.remove_images_with_size(width, height)
 
     class TestResize:
 
         @pytest.mark.parametrize(
             ("new_width", "new_height"),
-            [
-                (-10, 10),
-                (10, -10),
-                (-10, -10)
-            ],
-            ids=["invalid width", "invalid height", "invalid width and height"]
+            [(-10, 10), (10, -10), (-10, -10)],
+            ids=["invalid width", "invalid height", "invalid width and height"],
         )
         def test_should_raise_new_size(self, resource_path: list[str], new_width: int, new_height: int) -> None:
             image_list = ImageList.from_files(resolve_resource_path(resource_path))
-            with pytest.raises(OutOfBoundsError, match=rf"At least one of the new sizes new_width and new_height \(={min(new_width, new_height)}\) is not inside \[1, \u221e\)."):
+            with pytest.raises(
+                OutOfBoundsError,
+                match=rf"At least one of the new sizes new_width and new_height \(={min(new_width, new_height)}\) is not inside \[1, \u221e\).",
+            ):
                 image_list.resize(new_width, new_height)
 
     class TestCrop:
 
         @pytest.mark.parametrize(
             ("new_width", "new_height"),
-            [
-                (-10, 1),
-                (1, -10),
-                (-10, -1)
-            ],
-            ids=["invalid width", "invalid height", "invalid width and height"]
+            [(-10, 1), (1, -10), (-10, -1)],
+            ids=["invalid width", "invalid height", "invalid width and height"],
         )
         def test_should_raise_invalid_size(self, resource_path: list[str], new_width: int, new_height: int) -> None:
             image_list = ImageList.from_files(resolve_resource_path(resource_path))
-            with pytest.raises(OutOfBoundsError, match=rf"At least one of width and height \(={min(new_width, new_height)}\) is not inside \[1, \u221e\)."):
+            with pytest.raises(
+                OutOfBoundsError,
+                match=rf"At least one of width and height \(={min(new_width, new_height)}\) is not inside \[1, \u221e\).",
+            ):
                 image_list.crop(0, 0, new_width, new_height)
 
         @pytest.mark.parametrize(
-            ("new_x", "new_y"),
-            [
-                (-10, 1),
-                (1, -10),
-                (-10, -1)
-            ],
-            ids=["invalid x", "invalid y", "invalid x and y"]
+            ("new_x", "new_y"), [(-10, 1), (1, -10), (-10, -1)], ids=["invalid x", "invalid y", "invalid x and y"],
         )
         def test_should_raise_invalid_coordinates(self, resource_path: list[str], new_x: int, new_y: int) -> None:
             image_list = ImageList.from_files(resolve_resource_path(resource_path))
-            with pytest.raises(OutOfBoundsError, match=rf"At least one of the coordinates x and y \(={min(new_x, new_y)}\) is not inside \[0, \u221e\)."):
+            with pytest.raises(
+                OutOfBoundsError,
+                match=rf"At least one of the coordinates x and y \(={min(new_x, new_y)}\) is not inside \[0, \u221e\).",
+            ):
                 image_list.crop(new_x, new_y, 100, 100)
 
     class TestAddNoise:
@@ -1106,7 +1101,11 @@ class TestErrorsAndWarningsWithEmptyImageList:
                 OutOfBoundsError,
                 match=rf"radius \(={'1' if isinstance(image_list_original, _EmptyImageList) else min(*image_list_original.widths, *image_list_original.heights)}\) is not inside \[0, {'0' if isinstance(image_list_original, _EmptyImageList) else min(*image_list_original.widths, *image_list_original.heights) - 1}\].",
             ):
-                image_list_original.blur(1 if isinstance(image_list_original, _EmptyImageList) else min(*image_list_original.widths, *image_list_original.heights))
+                image_list_original.blur(
+                    1
+                    if isinstance(image_list_original, _EmptyImageList)
+                    else min(*image_list_original.widths, *image_list_original.heights),
+                )
             assert image_list_original == image_list_clone
 
         def test_should_not_blur(self, resource_path: str) -> None:

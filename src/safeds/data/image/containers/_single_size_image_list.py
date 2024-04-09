@@ -17,10 +17,17 @@ from torchvision.utils import save_image
 
 from safeds.data.image.containers._image import Image
 from safeds.data.image.containers._image_list import ImageList
-from safeds.data.image.utils._image_transformation_error_and_warning_checks import _check_resize_errors, \
-    _check_crop_errors_and_warnings, _check_adjust_brightness_errors_and_warnings, _check_add_noise_errors, \
-    _check_adjust_contrast_errors_and_warnings, _check_adjust_color_balance_errors_and_warnings, \
-    _check_blur_errors_and_warnings, _check_sharpen_errors_and_warnings, _check_remove_images_with_size_errors
+from safeds.data.image.utils._image_transformation_error_and_warning_checks import (
+    _check_add_noise_errors,
+    _check_adjust_brightness_errors_and_warnings,
+    _check_adjust_color_balance_errors_and_warnings,
+    _check_adjust_contrast_errors_and_warnings,
+    _check_blur_errors_and_warnings,
+    _check_crop_errors_and_warnings,
+    _check_remove_images_with_size_errors,
+    _check_resize_errors,
+    _check_sharpen_errors_and_warnings,
+)
 from safeds.exceptions import (
     DuplicateIndexError,
     IllegalFormatError,

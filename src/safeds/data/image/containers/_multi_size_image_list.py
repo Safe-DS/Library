@@ -12,8 +12,10 @@ import xxhash
 from torch import Tensor
 
 from safeds.data.image.containers import Image, ImageList
-from safeds.data.image.utils._image_transformation_error_and_warning_checks import _check_blur_errors_and_warnings, \
-    _check_remove_images_with_size_errors
+from safeds.data.image.utils._image_transformation_error_and_warning_checks import (
+    _check_blur_errors_and_warnings,
+    _check_remove_images_with_size_errors,
+)
 from safeds.exceptions import (
     DuplicateIndexError,
     IllegalFormatError,
@@ -366,8 +368,9 @@ class _MultiSizeImageList(ImageList):
         image_list = self._clone_without_image_dict()
 
         for image_list_key, image_list_original in self._image_list_dict.items():
-            new_single_size_image_list = image_list_original._as_single_size_image_list()._remove_image_by_index_ignore_invalid(
-                index)
+            new_single_size_image_list = (
+                image_list_original._as_single_size_image_list()._remove_image_by_index_ignore_invalid(index)
+            )
             if isinstance(new_single_size_image_list, _SingleSizeImageList):
                 image_list._image_list_dict[image_list_key] = new_single_size_image_list
         [image_list._indices_to_image_size_dict.pop(i, None) for i in index]
@@ -384,9 +387,15 @@ class _MultiSizeImageList(ImageList):
         if (width, height) not in self._image_list_dict:
             return self
         if len(self._image_list_dict) == 2:
-            single_size_image_list = self._image_list_dict[next(iter([key for key in list(self._image_list_dict.keys()) if key != (width, height)]))]._as_single_size_image_list()
-            single_size_image_list._tensor_positions_to_indices = torch.sort(torch.Tensor(single_size_image_list._tensor_positions_to_indices))[1].tolist()
-            single_size_image_list._indices_to_tensor_positions = single_size_image_list._calc_new_indices_to_tensor_positions()
+            single_size_image_list = self._image_list_dict[
+                next(iter([key for key in list(self._image_list_dict.keys()) if key != (width, height)]))
+            ]._as_single_size_image_list()
+            single_size_image_list._tensor_positions_to_indices = torch.sort(
+                torch.Tensor(single_size_image_list._tensor_positions_to_indices),
+            )[1].tolist()
+            single_size_image_list._indices_to_tensor_positions = (
+                single_size_image_list._calc_new_indices_to_tensor_positions()
+            )
             return single_size_image_list
 
         image_list = _MultiSizeImageList()

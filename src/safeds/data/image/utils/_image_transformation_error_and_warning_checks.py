@@ -1,6 +1,6 @@
 import warnings
 
-from safeds.exceptions import OutOfBoundsError, ClosedBound
+from safeds.exceptions import ClosedBound, OutOfBoundsError
 
 
 def _check_remove_images_with_size_errors(width: int, height: int) -> None:
@@ -10,10 +10,16 @@ def _check_remove_images_with_size_errors(width: int, height: int) -> None:
 
 def _check_resize_errors(new_width: int, new_height: int) -> None:
     if new_width <= 0 or new_height <= 0:
-        raise OutOfBoundsError(min(new_width, new_height), name="At least one of the new sizes new_width and new_height", lower_bound=ClosedBound(1))
+        raise OutOfBoundsError(
+            min(new_width, new_height),
+            name="At least one of the new sizes new_width and new_height",
+            lower_bound=ClosedBound(1),
+        )
 
 
-def _check_crop_errors_and_warnings(x: int, y: int, width: int, height: int, min_width: int, min_height: int, plural: bool) -> None:
+def _check_crop_errors_and_warnings(
+    x: int, y: int, width: int, height: int, min_width: int, min_height: int, plural: bool,
+) -> None:
     if x < 0 or y < 0:
         raise OutOfBoundsError(min(x, y), name="At least one of the coordinates x and y", lower_bound=ClosedBound(0))
     if width <= 0 or height <= 0:
@@ -22,7 +28,7 @@ def _check_crop_errors_and_warnings(x: int, y: int, width: int, height: int, min
         warnings.warn(
             f"The specified bounding rectangle does not contain any content of {'at least one' if plural else 'the'} image. Therefore {'these images' if plural else 'the image'} will be blank.",
             UserWarning,
-            stacklevel=2
+            stacklevel=2,
         )
 
 
