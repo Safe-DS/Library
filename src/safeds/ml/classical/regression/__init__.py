@@ -1,6 +1,7 @@
 """Models for regression tasks."""
 
 from ._ada_boost import AdaBoostRegressor
+from ._arima import ArimaModelRegressor
 from ._decision_tree import DecisionTreeRegressor
 from ._elastic_net_regression import ElasticNetRegressor
 from ._gradient_boosting import GradientBoostingRegressor
@@ -14,6 +15,7 @@ from ._support_vector_machine import SupportVectorMachineRegressor
 
 __all__ = [
     "AdaBoostRegressor",
+    "ArimaModelRegressor",
     "DecisionTreeRegressor",
     "ElasticNetRegressor",
     "GradientBoostingRegressor",
