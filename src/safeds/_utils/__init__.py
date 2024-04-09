@@ -1,4 +1,4 @@
-"""Configuration for Safe-DS."""
+"""Utilities for Safe-DS."""
 
 from ._hashing import _structural_hash
 
