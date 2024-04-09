@@ -36,7 +36,9 @@ class GradientBoostingRegressor(Regressor):
     """
 
     def __hash__(self) -> int:
-        return _structural_hash(Regressor.__hash__(self), self._target_name, self._feature_names, self._learning_rate, self._number_of_trees)
+        return _structural_hash(
+            Regressor.__hash__(self), self._target_name, self._feature_names, self._learning_rate, self._number_of_trees,
+        )
 
     def __init__(self, *, number_of_trees: int = 100, learning_rate: float = 0.1) -> None:
         # Validation

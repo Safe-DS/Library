@@ -1,7 +1,7 @@
-from typing import Any
-import struct
 import functools
 import operator
+import struct
+from typing import Any
 
 import xxhash
 
@@ -38,24 +38,30 @@ def _value_to_bytes(value: Any) -> bytes:
         Byte representation of the provided value
     """
     if value is None:
-        return b'\0'
+        return b"\0"
     elif isinstance(value, bytes):
         return value
     elif isinstance(value, bool):
-        return b'\1' if value else b'\0'
+        return b"\1" if value else b"\0"
     elif isinstance(value, int) and value < 0:
         return value.to_bytes(8, signed=True)
     elif isinstance(value, int) and value >= 0:
         return value.to_bytes(8)
     elif isinstance(value, str):
-        return value.encode('utf-8')
+        return value.encode("utf-8")
     elif isinstance(value, float):
         return struct.pack("d", value)
-    elif isinstance(value, tuple) or isinstance(value, list):
+    elif isinstance(value, list | tuple):
         return functools.reduce(operator.add, [_value_to_bytes(entry) for entry in value], len(value).to_bytes(8))
-    elif isinstance(value, set) or isinstance(value, frozenset):
-        return functools.reduce(operator.add, sorted([_value_to_bytes(entry) for entry in value]), len(value).to_bytes(8))
+    elif isinstance(value, frozenset | set):
+        return functools.reduce(
+            operator.add, sorted([_value_to_bytes(entry) for entry in value]), len(value).to_bytes(8),
+        )
     elif isinstance(value, dict):
-        return functools.reduce(operator.add, sorted([_value_to_bytes(key) + _value_to_bytes(entry) for key, entry in value.items()]), len(value).to_bytes(8))
+        return functools.reduce(
+            operator.add,
+            sorted([_value_to_bytes(key) + _value_to_bytes(entry) for key, entry in value.items()]),
+            len(value).to_bytes(8),
+        )
     else:
         return _value_to_bytes(hash(value))

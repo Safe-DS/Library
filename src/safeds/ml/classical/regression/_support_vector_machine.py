@@ -1,13 +1,9 @@
 from __future__ import annotations
 
-import functools
-import operator
-import struct
 import sys
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
-import xxhash
 from sklearn.svm import SVR as sk_SVR  # noqa: N811
 
 from safeds._utils import _structural_hash

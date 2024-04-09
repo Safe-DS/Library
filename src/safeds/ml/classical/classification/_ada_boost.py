@@ -38,7 +38,13 @@ class AdaBoostClassifier(Classifier):
     """
 
     def __hash__(self) -> int:
-        return _structural_hash(Classifier.__hash__(self), self._target_name, self._feature_names, self._learning_rate, self._maximum_number_of_learners)
+        return _structural_hash(
+            Classifier.__hash__(self),
+            self._target_name,
+            self._feature_names,
+            self._learning_rate,
+            self._maximum_number_of_learners,
+        )
 
     def __init__(
         self,

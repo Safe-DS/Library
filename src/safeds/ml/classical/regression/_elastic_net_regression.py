@@ -36,7 +36,9 @@ class ElasticNetRegressor(Regressor):
     """
 
     def __hash__(self) -> int:
-        return _structural_hash(Regressor.__hash__(self), self._target_name, self._feature_names, self._alpha, self._lasso_ratio)
+        return _structural_hash(
+            Regressor.__hash__(self), self._target_name, self._feature_names, self._alpha, self._lasso_ratio,
+        )
 
     def __init__(self, *, alpha: float = 1.0, lasso_ratio: float = 0.5) -> None:
         # Validation
