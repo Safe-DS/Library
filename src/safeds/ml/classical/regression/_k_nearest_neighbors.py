@@ -34,7 +34,10 @@ class KNearestNeighborsRegressor(Regressor):
 
     def __hash__(self) -> int:
         return _structural_hash(
-            Regressor.__hash__(self), self._target_name, self._feature_names, self._number_of_neighbors,
+            Regressor.__hash__(self),
+            self._target_name,
+            self._feature_names,
+            self._number_of_neighbors,
         )
 
     def __init__(self, number_of_neighbors: int) -> None:

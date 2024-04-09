@@ -55,7 +55,9 @@ def _value_to_bytes(value: Any) -> bytes:
         return functools.reduce(operator.add, [_value_to_bytes(entry) for entry in value], len(value).to_bytes(8))
     elif isinstance(value, frozenset | set):
         return functools.reduce(
-            operator.add, sorted([_value_to_bytes(entry) for entry in value]), len(value).to_bytes(8),
+            operator.add,
+            sorted([_value_to_bytes(entry) for entry in value]),
+            len(value).to_bytes(8),
         )
     elif isinstance(value, dict):
         return functools.reduce(

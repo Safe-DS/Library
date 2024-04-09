@@ -32,7 +32,10 @@ class RandomForestClassifier(Classifier):
 
     def __hash__(self) -> int:
         return _structural_hash(
-            Classifier.__hash__(self), self._target_name, self._feature_names, self._number_of_trees,
+            Classifier.__hash__(self),
+            self._target_name,
+            self._feature_names,
+            self._number_of_trees,
         )
 
     def __init__(self, *, number_of_trees: int = 100) -> None:
