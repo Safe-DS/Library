@@ -28,10 +28,6 @@ class Layer(ABC):
     def __init__(self) -> None:
         pass    # pragma: no cover
 
-    @abstractmethod
-    def output_size(self) -> int:
-        pass    # pragma: no cover
-
 class FNNLayer(Layer):
     def __init__(self, output_size: int, input_size: int | None = None):
         """
