@@ -7,11 +7,11 @@ from torch import Tensor, nn
 
 from safeds.data.tabular.containers import Column, Table, TaggedTable
 from safeds.exceptions import ClosedBound, ModelNotFittedError, OutOfBoundsError, TestTrainDataMismatchError
-from safeds.ml.nn._fnn_layer import FNNLayer
+from safeds.ml.nn._fnn_layer import FNNLayer, Layer
 
 
 class NeuralNetworkRegressor:
-    def __init__(self, layers: list):
+    def __init__(self, layers: list[Layer | FNNLayer]):
         self._model = _PytorchModel(layers, is_for_classification=False)
         self._batch_size = 1
         self._is_fitted = False
@@ -142,7 +142,7 @@ class NeuralNetworkRegressor:
 
 
 class NeuralNetworkClassifier:
-    def __init__(self, layers: list[FNNLayer]):
+    def __init__(self, layers: list[Layer | FNNLayer]):
         self._model = _PytorchModel(layers, is_for_classification=True)
         self._batch_size = 1
         self._is_fitted = False
@@ -306,13 +306,13 @@ class NeuralNetworkClassifier:
 
 
 class _PytorchModel(nn.Module):
-    def __init__(self, fnn_layers: list[FNNLayer], is_for_classification: bool) -> None:
+    def __init__(self, layers: list[Layer | FNNLayer], is_for_classification: bool) -> None:
         super().__init__()
-        self._layer_list = fnn_layers
+        self._layer_list = layers
         internal_layers = []
         previous_output_size = None
 
-        for layer in fnn_layers:
+        for layer in layers:
             if previous_output_size is not None:
                 layer._set_input_size(previous_output_size)
             internal_layers.append(layer._get_internal_layer(activation_function="relu"))
@@ -320,10 +320,10 @@ class _PytorchModel(nn.Module):
 
         if is_for_classification:
             internal_layers.pop()
-            if fnn_layers[-1].output_size > 2:
-                internal_layers.append(fnn_layers[-1]._get_internal_layer(activation_function="softmax"))
+            if layers[-1].output_size > 2:
+                internal_layers.append(layers[-1]._get_internal_layer(activation_function="softmax"))
             else:
-                internal_layers.append(fnn_layers[-1]._get_internal_layer(activation_function="sigmoid"))
+                internal_layers.append(layers[-1]._get_internal_layer(activation_function="sigmoid"))
         self._pytorch_layers = nn.ModuleList(internal_layers)
 
     def forward(self, x: float) -> float:

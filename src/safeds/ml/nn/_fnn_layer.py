@@ -1,3 +1,5 @@
+from abc import ABC, abstractmethod
+
 from torch import nn
 
 from safeds.exceptions import ClosedBound, OutOfBoundsError
@@ -21,7 +23,17 @@ class _InternalLayer(nn.Module):
         return self._fn(self._layer(x))
 
 
-class FNNLayer:
+class Layer(ABC):
+    @abstractmethod
+    def __init__(self):
+        pass
+
+    @abstractmethod
+    def output_size(self) -> int:
+        pass
+
+
+class FNNLayer(Layer):
     def __init__(self, output_size: int, input_size: int | None = None):
         """
         Create a FNN Layer.
