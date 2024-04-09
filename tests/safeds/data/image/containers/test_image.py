@@ -447,6 +447,26 @@ class TestResize:
         assert image != new_image
         assert new_image == snapshot_png_image
 
+    @pytest.mark.parametrize(
+        "resource_path",
+        images_all(),
+        ids=images_all_ids(),
+    )
+    @pytest.mark.parametrize(
+        ("new_width", "new_height"),
+        [
+            (-10, 10),
+            (10, -10),
+            (-10, -10)
+        ],
+        ids=["invalid width", "invalid height", "invalid width and height"]
+    )
+    def test_should_raise(self, resource_path: str, new_width: int, new_height: int, device: Device) -> None:
+        _skip_if_device_not_available(device)
+        image = Image.from_file(resolve_resource_path(resource_path), device)
+        with pytest.raises(OutOfBoundsError, match=rf"At least one of the new sizes new_width and new_height \(={min(new_width, new_height)}\) is not inside \[1, \u221e\)."):
+            image.resize(new_width, new_height)
+
 
 class TestDevices:
     @pytest.mark.parametrize(
@@ -499,6 +519,68 @@ class TestCrop:
         image_cropped = image.crop(0, 0, 100, 100)
         assert image_cropped == snapshot_png_image
         assert image_cropped.channel == image.channel
+
+    @pytest.mark.parametrize(
+        "resource_path",
+        images_all(),
+        ids=images_all_ids(),
+    )
+    @pytest.mark.parametrize(
+        ("new_width", "new_height"),
+        [
+            (-10, 1),
+            (1, -10),
+            (-10, -1)
+        ],
+        ids=["invalid width", "invalid height", "invalid width and height"]
+    )
+    def test_should_raise_invalid_size(self, resource_path: str, new_width: int, new_height: int, device: Device) -> None:
+        _skip_if_device_not_available(device)
+        image = Image.from_file(resolve_resource_path(resource_path), device)
+        with pytest.raises(OutOfBoundsError, match=rf"At least one of width and height \(={min(new_width, new_height)}\) is not inside \[1, \u221e\)."):
+            image.crop(0, 0, new_width, new_height)
+
+    @pytest.mark.parametrize(
+        "resource_path",
+        images_all(),
+        ids=images_all_ids(),
+    )
+    @pytest.mark.parametrize(
+        ("new_x", "new_y"),
+        [
+            (-10, 1),
+            (1, -10),
+            (-10, -1)
+        ],
+        ids=["invalid x", "invalid y", "invalid x and y"]
+    )
+    def test_should_raise_invalid_coordinates(self, resource_path: str, new_x: int, new_y: int, device: Device) -> None:
+        _skip_if_device_not_available(device)
+        image = Image.from_file(resolve_resource_path(resource_path), device)
+        with pytest.raises(OutOfBoundsError, match=rf"At least one of the coordinates x and y \(={min(new_x, new_y)}\) is not inside \[0, \u221e\)."):
+            image.crop(new_x, new_y, 100, 100)
+
+    @pytest.mark.parametrize(
+        "resource_path",
+        images_all(),
+        ids=images_all_ids(),
+    )
+    @pytest.mark.parametrize(
+        ("new_x", "new_y"),
+        [
+            (10000, 1),
+            (1, 10000),
+            (10000, 10000)
+        ],
+        ids=["outside x", "outside y", "outside x and y"]
+    )
+    def test_should_warn_if_coordinates_outsize_image(self, resource_path: str, new_x: int, new_y: int, device: Device) -> None:
+        _skip_if_device_not_available(device)
+        image = Image.from_file(resolve_resource_path(resource_path), device)
+        image_blank_tensor = torch.zeros((image.channel, 1, 1), device=device)
+        with pytest.warns(UserWarning, match=r"The specified bounding rectangle does not contain any content of the image. Therefore the image will be blank."):
+            cropped_image = image.crop(new_x, new_y, 1, 1)
+            assert torch.all(torch.eq(cropped_image._image_tensor, image_blank_tensor))
 
 
 @pytest.mark.parametrize("device", _test_devices(), ids=_test_devices_ids())

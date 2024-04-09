@@ -5,7 +5,6 @@ import functools
 import operator
 import random
 import sys
-import warnings
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -18,12 +17,14 @@ from torchvision.utils import save_image
 
 from safeds.data.image.containers._image import Image
 from safeds.data.image.containers._image_list import ImageList
+from safeds.data.image.utils._image_transformation_error_and_warning_checks import _check_resize_errors, \
+    _check_crop_errors_and_warnings, _check_adjust_brightness_errors_and_warnings, _check_add_noise_errors, \
+    _check_adjust_contrast_errors_and_warnings, _check_adjust_color_balance_errors_and_warnings, \
+    _check_blur_errors_and_warnings, _check_sharpen_errors_and_warnings, _check_remove_images_with_size_errors
 from safeds.exceptions import (
-    ClosedBound,
     DuplicateIndexError,
     IllegalFormatError,
     IndexOutOfBoundsError,
-    OutOfBoundsError,
 )
 
 if TYPE_CHECKING:
@@ -388,7 +389,7 @@ class _SingleSizeImageList(ImageList):
             return image_list_single
         else:
             image_list_multi: _MultiSizeImageList = _MultiSizeImageList()
-            image_list_multi._image_list_dict[(self.widths[0], self.heights[0])] = self.clone()
+            image_list_multi._image_list_dict[(self.widths[0], self.heights[0])] = self
             image_list_multi._image_list_dict[(image_tensor.size(dim=2), image_tensor.size(dim=1))] = (
                 _SingleSizeImageList._create_image_list([image_tensor], [index])
             )
@@ -397,8 +398,8 @@ class _SingleSizeImageList(ImageList):
                 image_list_multi = image_list_multi.change_channel(
                     max(image_tensor.size(dim=0), self.channel),
                 )._as_multi_size_image_list()
-            for index in self._tensor_positions_to_indices:
-                image_list_multi._indices_to_image_size_dict[index] = (self.widths[0], self.heights[0])
+            for _index in self._tensor_positions_to_indices:
+                image_list_multi._indices_to_image_size_dict[_index] = (self.widths[0], self.heights[0])
             image_list_multi._indices_to_image_size_dict[index] = (image_tensor.size(dim=2), image_tensor.size(dim=1))
 
             return image_list_multi
@@ -408,14 +409,14 @@ class _SingleSizeImageList(ImageList):
         from safeds.data.image.containers._multi_size_image_list import _MultiSizeImageList
 
         if isinstance(images, _EmptyImageList) or isinstance(images, list) and len(images) == 0:
-            return self.clone()
+            return self
 
         first_new_index = max(self._tensor_positions_to_indices) + 1
         if isinstance(images, list):
             images = ImageList.from_images(images)
         if isinstance(images, _MultiSizeImageList):
             image_list_multi: _MultiSizeImageList = _MultiSizeImageList()
-            image_list_multi._image_list_dict[(self.widths[0], self.heights[0])] = self.clone()
+            image_list_multi._image_list_dict[(self.widths[0], self.heights[0])] = self
             for index in self._tensor_positions_to_indices:
                 image_list_multi._indices_to_image_size_dict[index] = (self.widths[0], self.heights[0])
             return image_list_multi.add_images(images)
@@ -458,10 +459,10 @@ class _SingleSizeImageList(ImageList):
                 return image_list_single
             else:
                 image_list_multi = _MultiSizeImageList()
-                image_list_multi._image_list_dict[(self.widths[0], self.heights[0])] = self.clone()
+                image_list_multi._image_list_dict[(self.widths[0], self.heights[0])] = self
                 image_list_multi._image_list_dict[
                     (images_as_single_size_image_list.widths[0], images_as_single_size_image_list.heights[0])
-                ] = images_as_single_size_image_list.clone()
+                ] = images_as_single_size_image_list
                 for index in self._tensor_positions_to_indices:
                     image_list_multi._indices_to_image_size_dict[index] = (self.widths[0], self.heights[0])
                 for index in images_as_single_size_image_list._tensor_positions_to_indices:
@@ -477,6 +478,19 @@ class _SingleSizeImageList(ImageList):
                 return image_list_multi
 
     def remove_image_by_index(self, index: int | list[int]) -> ImageList:
+        if isinstance(index, int):
+            index = [index]
+
+        invalid_indices = []
+        for _i in index:
+            if _i not in self._tensor_positions_to_indices:
+                invalid_indices.append(_i)
+        if len(invalid_indices) > 0:
+            raise IndexOutOfBoundsError(invalid_indices)
+
+        return self._remove_image_by_index_ignore_invalid(index)
+
+    def _remove_image_by_index_ignore_invalid(self, index: int | list[int]) -> ImageList:
         from safeds.data.image.containers._empty_image_list import _EmptyImageList
 
         if isinstance(index, int):
@@ -503,10 +517,12 @@ class _SingleSizeImageList(ImageList):
     def remove_images_with_size(self, width: int, height: int) -> ImageList:
         from safeds.data.image.containers._empty_image_list import _EmptyImageList
 
+        _check_remove_images_with_size_errors(width, height)
+
         if self.widths[0] == width and self.heights[0] == height:
             return _EmptyImageList()
         else:
-            return self.clone()
+            return self
 
     def remove_duplicate_images(self) -> ImageList:
         image_list = _SingleSizeImageList()
@@ -540,6 +556,7 @@ class _SingleSizeImageList(ImageList):
         return image_list
 
     def resize(self, new_width: int, new_height: int) -> ImageList:
+        _check_resize_errors(new_width, new_height)
         image_list = self._clone_without_tensor()
         image_list._tensor = func2.resize(
             self._tensor,
@@ -564,6 +581,7 @@ class _SingleSizeImageList(ImageList):
             return func2.rgb_to_grayscale(tensor[:, 0:3], num_output_channels=3)
 
     def crop(self, x: int, y: int, width: int, height: int) -> ImageList:
+        _check_crop_errors_and_warnings(x, y, width, height, self.widths[0], self.heights[0], True)
         image_list = self._clone_without_tensor()
         image_list._tensor = func2.crop(self._tensor, x, y, height, width)
         return image_list
@@ -579,14 +597,7 @@ class _SingleSizeImageList(ImageList):
         return image_list
 
     def adjust_brightness(self, factor: float) -> ImageList:
-        if factor < 0:
-            raise OutOfBoundsError(factor, name="factor", lower_bound=ClosedBound(0))
-        elif factor == 1:
-            warnings.warn(
-                "Brightness adjustment factor is 1.0, this will not make changes to the images.",
-                UserWarning,
-                stacklevel=2,
-            )
+        _check_adjust_brightness_errors_and_warnings(factor, True)
         image_list = self._clone_without_tensor()
         if self.channel == 4:
             image_list._tensor = torch.cat(
@@ -598,21 +609,13 @@ class _SingleSizeImageList(ImageList):
         return image_list
 
     def add_noise(self, standard_deviation: float) -> ImageList:
-        if standard_deviation < 0:
-            raise OutOfBoundsError(standard_deviation, name="standard_deviation", lower_bound=ClosedBound(0))
+        _check_add_noise_errors(standard_deviation)
         image_list = self._clone_without_tensor()
         image_list._tensor = self._tensor + torch.normal(0, standard_deviation, self._tensor.size()) * 255
         return image_list
 
     def adjust_contrast(self, factor: float) -> ImageList:
-        if factor < 0:
-            raise OutOfBoundsError(factor, name="factor", lower_bound=ClosedBound(0))
-        elif factor == 1:
-            warnings.warn(
-                "Contrast adjustment factor is 1.0, this will not make changes to the images.",
-                UserWarning,
-                stacklevel=2,
-            )
+        _check_adjust_contrast_errors_and_warnings(factor, True)
         image_list = self._clone_without_tensor()
         if self.channel == 4:
             image_list._tensor = torch.cat(
@@ -624,20 +627,7 @@ class _SingleSizeImageList(ImageList):
         return image_list
 
     def adjust_color_balance(self, factor: float) -> ImageList:
-        if factor < 0:
-            raise OutOfBoundsError(factor, name="factor", lower_bound=ClosedBound(0))
-        elif factor == 1:
-            warnings.warn(
-                "Color adjustment factor is 1.0, this will not make changes to the images.",
-                UserWarning,
-                stacklevel=2,
-            )
-        elif self.channel == 1:
-            warnings.warn(
-                "Color adjustment will not have an affect on grayscale images with only one channel.",
-                UserWarning,
-                stacklevel=2,
-            )
+        _check_adjust_color_balance_errors_and_warnings(factor, self.channel, True)
         image_list = self._clone_without_tensor()
         image_list._tensor = self.convert_to_grayscale()._as_single_size_image_list()._tensor * (
             1.0 - factor * 1.0
@@ -645,32 +635,13 @@ class _SingleSizeImageList(ImageList):
         return image_list
 
     def blur(self, radius: int) -> ImageList:
-        if radius < 0 or radius >= min(self.widths[0], self.heights[0]):
-            raise OutOfBoundsError(
-                radius,
-                name="radius",
-                lower_bound=ClosedBound(0),
-                upper_bound=ClosedBound(min(self.widths[0], self.heights[0]) - 1),
-            )
-        elif radius == 0:
-            warnings.warn(
-                "Blur radius is 0, this will not make changes to the image.",
-                UserWarning,
-                stacklevel=2,
-            )
+        _check_blur_errors_and_warnings(radius, min(self.widths[0], self.heights[0]), True)
         image_list = self._clone_without_tensor()
         image_list._tensor = func2.gaussian_blur(self._tensor, [radius * 2 + 1, radius * 2 + 1])
         return image_list
 
     def sharpen(self, factor: float) -> ImageList:
-        if factor < 0:
-            raise OutOfBoundsError(factor, name="factor", lower_bound=ClosedBound(0))
-        elif factor == 1:
-            warnings.warn(
-                "Sharpen factor is 1.0, this will not make changes to the images.",
-                UserWarning,
-                stacklevel=2,
-            )
+        _check_sharpen_errors_and_warnings(factor, True)
         image_list = self._clone_without_tensor()
         if self.channel == 4:
             image_list._tensor = torch.cat(

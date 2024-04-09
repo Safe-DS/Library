@@ -3,6 +3,11 @@ from __future__ import annotations
 import warnings
 from typing import TYPE_CHECKING, Self
 
+from safeds.data.image.utils._image_transformation_error_and_warning_checks import _check_resize_errors, \
+    _check_crop_errors_and_warnings, _check_adjust_brightness_errors_and_warnings, _check_add_noise_errors, \
+    _check_adjust_contrast_errors_and_warnings, _check_adjust_color_balance_errors_and_warnings, \
+    _check_blur_errors_and_warnings, _check_sharpen_errors_and_warnings, _check_remove_images_with_size_errors
+
 if TYPE_CHECKING:
     from pathlib import Path
 
@@ -103,22 +108,28 @@ class _EmptyImageList(ImageList):
     def to_images(self, _indices: list[int] | None = None) -> list[Image]:
         return []
 
-    def change_channel(self, _channel: int) -> ImageList:
+    def change_channel(self, channel: int) -> ImageList:
         _EmptyImageList._warn_empty_image_list()
+        if channel not in (1, 3, 4):
+            raise ValueError(f"Channel {channel} is not a valid channel option. Use either 1, 3 or 4")
         return _EmptyImageList()
 
     def _add_image_tensor(self, image_tensor: Tensor, _index: int) -> ImageList:
         return _SingleSizeImageList._create_image_list([image_tensor], [0])
 
     def add_images(self, images: list[Image] | ImageList) -> ImageList:
-        return ImageList.from_images(images) if isinstance(images, list) else images.clone()
+        return ImageList.from_images(images) if isinstance(images, list) else images
 
-    def remove_image_by_index(self, _index: int | list[int]) -> ImageList:
+    def remove_image_by_index(self, index: int | list[int]) -> ImageList:
+        raise IndexOutOfBoundsError(index)
+
+    def _remove_image_by_index_ignore_invalid(self, index: int | list[int]) -> ImageList:
         _EmptyImageList._warn_empty_image_list()
         return _EmptyImageList()
 
-    def remove_images_with_size(self, _width: int, _height: int) -> ImageList:
+    def remove_images_with_size(self, width: int, height: int) -> ImageList:
         _EmptyImageList._warn_empty_image_list()
+        _check_remove_images_with_size_errors(width, height)
         return _EmptyImageList()
 
     def remove_duplicate_images(self) -> ImageList:
@@ -129,16 +140,18 @@ class _EmptyImageList(ImageList):
         _EmptyImageList._warn_empty_image_list()
         return _EmptyImageList()
 
-    def resize(self, _new_width: int, _new_height: int) -> ImageList:
+    def resize(self, new_width: int, new_height: int) -> ImageList:
         _EmptyImageList._warn_empty_image_list()
+        _check_resize_errors(new_width, new_height)
         return _EmptyImageList()
 
     def convert_to_grayscale(self) -> ImageList:
         _EmptyImageList._warn_empty_image_list()
         return _EmptyImageList()
 
-    def crop(self, _x: int, _y: int, _width: int, _height: int) -> ImageList:
+    def crop(self, x: int, y: int, width: int, height: int) -> ImageList:
         _EmptyImageList._warn_empty_image_list()
+        _check_crop_errors_and_warnings(x, y, width, height, x + 1, y + 1, True)  # Disable x|y >= min_width|min_height check with min_width|min_height=x|y+1
         return _EmptyImageList()
 
     def flip_vertically(self) -> ImageList:
@@ -149,28 +162,34 @@ class _EmptyImageList(ImageList):
         _EmptyImageList._warn_empty_image_list()
         return _EmptyImageList()
 
-    def adjust_brightness(self, _factor: float) -> ImageList:
+    def adjust_brightness(self, factor: float) -> ImageList:
         _EmptyImageList._warn_empty_image_list()
+        _check_adjust_brightness_errors_and_warnings(factor, True)
         return _EmptyImageList()
 
-    def add_noise(self, _standard_deviation: float) -> ImageList:
+    def add_noise(self, standard_deviation: float) -> ImageList:
         _EmptyImageList._warn_empty_image_list()
+        _check_add_noise_errors(standard_deviation)
         return _EmptyImageList()
 
-    def adjust_contrast(self, _factor: float) -> ImageList:
+    def adjust_contrast(self, factor: float) -> ImageList:
         _EmptyImageList._warn_empty_image_list()
+        _check_adjust_contrast_errors_and_warnings(factor, True)
         return _EmptyImageList()
 
-    def adjust_color_balance(self, _factor: float) -> ImageList:
+    def adjust_color_balance(self, factor: float) -> ImageList:
         _EmptyImageList._warn_empty_image_list()
+        _check_adjust_color_balance_errors_and_warnings(factor, 0, True)  # Disable channel check with channel=0
         return _EmptyImageList()
 
-    def blur(self, _radius: int) -> ImageList:
+    def blur(self, radius: int) -> ImageList:
         _EmptyImageList._warn_empty_image_list()
+        _check_blur_errors_and_warnings(radius, 1, True)
         return _EmptyImageList()
 
-    def sharpen(self, _factor: float) -> ImageList:
+    def sharpen(self, factor: float) -> ImageList:
         _EmptyImageList._warn_empty_image_list()
+        _check_sharpen_errors_and_warnings(factor, True)
         return _EmptyImageList()
 
     def invert_colors(self) -> ImageList:

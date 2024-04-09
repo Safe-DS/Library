@@ -191,7 +191,8 @@ class ImageList(metaclass=ABCMeta):
 
         Returns
         -------
-        Size of this object in bytes.
+        size:
+            Size of this object in bytes.
         """
 
     def __len__(self) -> int:
@@ -563,7 +564,7 @@ class ImageList(metaclass=ABCMeta):
         image_list:
             the image list with the given image removed
         """
-        return self.remove_image_by_index(self.index(image))
+        return self._remove_image_by_index_ignore_invalid(self.index(image))
 
     def remove_images(self, images: list[Image]) -> ImageList:
         """
@@ -586,18 +587,43 @@ class ImageList(metaclass=ABCMeta):
         indices_to_remove = []
         for image in images:
             indices_to_remove += self.index(image)
-        return self.remove_image_by_index(list(set(indices_to_remove)))
+        return self._remove_image_by_index_ignore_invalid(list(set(indices_to_remove)))
 
     @abstractmethod
     def remove_image_by_index(self, index: int | list[int]) -> ImageList:
         """
-        Return a new `ImageList` with the given index removed from the image list.
+        Return a new `ImageList` with the given indices removed from the image list.
 
         The original image list is not modified.
 
         Parameters
         ----------
-        index
+        index:
+            The index of the image to be removed from the image list
+
+        Returns
+        -------
+        image_list:
+            the image list with the without the removed image
+
+        Raises
+        ------
+        IndexOutOfBoundsError
+            If one of the indices is out of bounds
+        """
+
+    @abstractmethod
+    def _remove_image_by_index_ignore_invalid(self, index: int | list[int]) -> ImageList:
+        """
+        Return a new `ImageList` with the given indices removed from the image list.
+
+        Invalid indices will be ignored.
+
+        The original image list is not modified.
+
+        Parameters
+        ----------
+        index:
             The index of the image to be removed from the image list
 
         Returns
@@ -624,6 +650,11 @@ class ImageList(metaclass=ABCMeta):
         -------
         image_list:
             the image list with the given images removed
+
+        Raises
+        ------
+        OutOfBoundsError
+            If width or height are below 1
         """
 
     @abstractmethod
@@ -672,6 +703,11 @@ class ImageList(metaclass=ABCMeta):
         -------
         image_list
             The image list with all images resized to the given width and height.
+
+        Raises
+        ------
+        OutOfBoundsError
+            If new_width or new_height are below 1
         """
 
     @abstractmethod
@@ -696,15 +732,24 @@ class ImageList(metaclass=ABCMeta):
 
         Parameters
         ----------
-        x: the x coordinate of the top-left corner of the bounding rectangle
-        y: the y coordinate of the top-left corner of the bounding rectangle
-        width:  the width of the bounding rectangle
-        height:  the height of the bounding rectangle
+        x:
+            the x coordinate of the top-left corner of the bounding rectangle
+        y:
+            the y coordinate of the top-left corner of the bounding rectangle
+        width:
+            the width of the bounding rectangle
+        height:
+            the height of the bounding rectangle
 
         Returns
         -------
-        image_list
+        image_list:
             The image list with all images cropped
+
+        Raises
+        ------
+        OutOfBoundsError
+            If x or y are below 0 or if width or height are below 1
         """
 
     @abstractmethod

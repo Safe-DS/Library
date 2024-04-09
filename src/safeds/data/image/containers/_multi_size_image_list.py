@@ -12,12 +12,12 @@ import xxhash
 from torch import Tensor
 
 from safeds.data.image.containers import Image, ImageList
+from safeds.data.image.utils._image_transformation_error_and_warning_checks import _check_blur_errors_and_warnings, \
+    _check_remove_images_with_size_errors
 from safeds.exceptions import (
-    ClosedBound,
     DuplicateIndexError,
     IllegalFormatError,
     IndexOutOfBoundsError,
-    OutOfBoundsError,
 )
 
 if TYPE_CHECKING:
@@ -273,7 +273,7 @@ class _MultiSizeImageList(ImageList):
         from safeds.data.image.containers._single_size_image_list import _SingleSizeImageList
 
         if isinstance(images, _EmptyImageList) or isinstance(images, list) and len(images) == 0:
-            return self.clone()
+            return self
 
         indices_for_images_with_size = {}
         current_index = max(self._indices_to_image_size_dict) + 1
@@ -319,7 +319,7 @@ class _MultiSizeImageList(ImageList):
             elif isinstance(ims, _SingleSizeImageList):
                 if smallest_channel > ims.channel:
                     smallest_channel = ims.channel
-                fixed_ims = ims.clone()._as_single_size_image_list()
+                fixed_ims = ims
                 old_indices = list(fixed_ims._indices_to_tensor_positions.items())
                 fixed_ims._tensor_positions_to_indices = [
                     new_indices[i]
@@ -345,6 +345,19 @@ class _MultiSizeImageList(ImageList):
         return image_list
 
     def remove_image_by_index(self, index: int | list[int]) -> ImageList:
+        if isinstance(index, int):
+            index = [index]
+
+        invalid_indices = []
+        for _i in index:
+            if _i not in self._indices_to_image_size_dict:
+                invalid_indices.append(_i)
+        if len(invalid_indices) > 0:
+            raise IndexOutOfBoundsError(invalid_indices)
+
+        return self._remove_image_by_index_ignore_invalid(index)
+
+    def _remove_image_by_index_ignore_invalid(self, index: int | list[int]) -> ImageList:
         from safeds.data.image.containers._empty_image_list import _EmptyImageList
         from safeds.data.image.containers._single_size_image_list import _SingleSizeImageList
 
@@ -353,9 +366,10 @@ class _MultiSizeImageList(ImageList):
         image_list = self._clone_without_image_dict()
 
         for image_list_key, image_list_original in self._image_list_dict.items():
-            new_single_size_image_list = image_list_original.remove_image_by_index(index)
+            new_single_size_image_list = image_list_original._as_single_size_image_list()._remove_image_by_index_ignore_invalid(
+                index)
             if isinstance(new_single_size_image_list, _SingleSizeImageList):
-                image_list._image_list_dict[image_list_key] = image_list_original.remove_image_by_index(index)
+                image_list._image_list_dict[image_list_key] = new_single_size_image_list
         [image_list._indices_to_image_size_dict.pop(i, None) for i in index]
 
         if len(image_list._image_list_dict) == 0:
@@ -366,17 +380,19 @@ class _MultiSizeImageList(ImageList):
             return image_list
 
     def remove_images_with_size(self, width: int, height: int) -> ImageList:
+        _check_remove_images_with_size_errors(width, height)
         if (width, height) not in self._image_list_dict:
-            return self.clone()
+            return self
         if len(self._image_list_dict) == 2:
-            return self._image_list_dict[
-                next(iter([key for key in list(self._image_list_dict.keys()) if key != (width, height)]))
-            ].clone()
+            image_list = self._image_list_dict[next(iter([key for key in list(self._image_list_dict.keys()) if key != (width, height)]))]._as_single_size_image_list()
+            image_list._tensor_positions_to_indices = torch.sort(torch.Tensor(image_list._tensor_positions_to_indices))[1].tolist()
+            image_list._indices_to_tensor_positions = image_list._calc_new_indices_to_tensor_positions()
+            return image_list
 
         image_list = _MultiSizeImageList()
         for image_list_key, image_list_original in self._image_list_dict.items():
             if (width, height) != image_list_key:
-                image_list._image_list_dict[image_list_key] = image_list_original.clone()
+                image_list._image_list_dict[image_list_key] = image_list_original
         for index, size in self._indices_to_image_size_dict.items():
             if size != (width, height):
                 image_list._indices_to_image_size_dict[index] = size
@@ -499,13 +515,7 @@ class _MultiSizeImageList(ImageList):
         return image_list
 
     def blur(self, radius: int) -> ImageList:
-        if radius < 0 or radius >= min(*self.widths, *self.heights):
-            raise OutOfBoundsError(
-                radius,
-                name="radius",
-                lower_bound=ClosedBound(0),
-                upper_bound=ClosedBound(min(*self.widths, *self.heights) - 1),
-            )
+        _check_blur_errors_and_warnings(radius, min(*self.widths, *self.heights), True)
         image_list = self._clone_without_image_dict()
         for image_list_key, image_list_original in self._image_list_dict.items():
             image_list._image_list_dict[image_list_key] = image_list_original.blur(radius)

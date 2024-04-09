@@ -68,7 +68,6 @@ class TestAllImageCombinations:
         # Check creation of EmptyImageList
         assert image_list == _EmptyImageList().add_images([image1, image2, image3])
         assert image_list == _EmptyImageList().add_images(image_list)
-        assert image_list is not _EmptyImageList().add_images(image_list)
 
         # Check if factory method selected the right ImageList
         if image1.width == image2.width == image3.width and image1.height == image2.height == image3.height:
@@ -826,9 +825,7 @@ class TestTransforms:
         ) -> None:
             torch.set_default_device(torch.device("cpu"))
             torch.manual_seed(0)
-            image_list_original = ImageList.from_files(
-                [resolve_resource_path(unresolved_path) for unresolved_path in resource_path],
-            )
+            image_list_original = ImageList.from_files(resolve_resource_path(resource_path))
             image_list_clone = image_list_original.clone()
             image_list_noise = image_list_original.add_noise(standard_deviation)
             assert image_list_noise == snapshot_png_image_list
@@ -841,7 +838,7 @@ class TestTransforms:
     [images_all(), [plane_png_path, plane_jpg_path] * 2],
     ids=["SingleSizeImageList", "MultiSizeImageList"],
 )
-class TestErrorsAndWarnings:
+class TestErrorsAndWarningsWithoutEmptyImageList:
 
     class TestAddImageTensor:
 
@@ -854,10 +851,52 @@ class TestErrorsAndWarnings:
     class TestEquals:
 
         def test_should_raise(self, resource_path: list[str]) -> None:
-            image_list_original = ImageList.from_files(
-                [resolve_resource_path(unresolved_path) for unresolved_path in resource_path],
-            )
+            image_list_original = ImageList.from_files(resolve_resource_path(resource_path))
             assert (image_list_original.__eq__(image_list_original.to_images([0]))) is NotImplemented
+
+    class TestCrop:
+
+        @pytest.mark.parametrize(
+            ("new_x", "new_y"),
+            [
+                (10000, 1),
+                (1, 10000),
+                (10000, 10000)
+            ],
+            ids=["outside x", "outside y", "outside x and y"]
+        )
+        def test_should_warn_if_coordinates_outsize_image(self, resource_path: list[str], new_x: int, new_y: int) -> None:
+            image_list = ImageList.from_files(resolve_resource_path(resource_path))
+            image_blank_tensor = torch.zeros((image_list.number_of_images, image_list.channel, 1, 1))
+            with pytest.warns(UserWarning, match=r"The specified bounding rectangle does not contain any content of at least one image. Therefore these images will be blank."):
+                cropped_image_list = image_list.crop(new_x, new_y, 1, 1)
+                assert torch.all(torch.eq(cropped_image_list._as_single_size_image_list()._tensor, image_blank_tensor))
+
+    class TestAdjustColorBalance:
+
+        def test_should_not_adjust_color_balance_channel_1(
+            self,
+            resource_path: list[str],
+        ) -> None:
+            image_list_original = ImageList.from_files(resolve_resource_path(resource_path)).change_channel(1)
+            image_list_clone = image_list_original.clone()
+            with pytest.warns(
+                UserWarning,
+                match="Color adjustment will not have an affect on grayscale images with only one channel.",
+            ):
+                image_list_no_change = image_list_original.adjust_color_balance(0.5)
+                assert image_list_no_change is not image_list_original
+                assert image_list_no_change == image_list_original
+            assert image_list_original is not image_list_clone
+            assert image_list_original == image_list_clone
+
+
+@pytest.mark.parametrize(
+    "resource_path",
+    [images_all(), [plane_png_path, plane_jpg_path] * 2, []],
+    ids=["SingleSizeImageList", "MultiSizeImageList", "EmptyImageList"],
+)
+class TestErrorsAndWarningsWithEmptyImageList:
 
     class TestChangeChannel:
 
@@ -867,14 +906,74 @@ class TestErrorsAndWarnings:
             ids=["channel-negative-1", "channel-0", "channel-2", "channel-5"],
         )
         def test_should_raise(self, resource_path: list[str], channel: int) -> None:
-            image_list = ImageList.from_files(
-                [resolve_resource_path(unresolved_path) for unresolved_path in resource_path],
-            )
+            image_list = ImageList.from_files(resolve_resource_path(resource_path))
             with pytest.raises(
                 ValueError,
                 match=rf"Channel {channel} is not a valid channel option. Use either 1, 3 or 4",
             ):
                 image_list.change_channel(channel)
+
+    class TestRemoveImagesWithSize:
+
+        @pytest.mark.parametrize(
+            ("width", "height"),
+            [
+                (-10, 10),
+                (10, -10),
+                (-10, -10)
+            ],
+            ids=["invalid width", "invalid height", "invalid width and height"]
+        )
+        def test_should_raise_negative_size(self, resource_path: list[str], width: int, height: int) -> None:
+            image_list = ImageList.from_files(resolve_resource_path(resource_path))
+            with pytest.raises(OutOfBoundsError, match=rf"At least one of width and height \(={min(width, height)}\) is not inside \[1, \u221e\)."):
+                image_list.remove_images_with_size(width, height)
+
+    class TestResize:
+
+        @pytest.mark.parametrize(
+            ("new_width", "new_height"),
+            [
+                (-10, 10),
+                (10, -10),
+                (-10, -10)
+            ],
+            ids=["invalid width", "invalid height", "invalid width and height"]
+        )
+        def test_should_raise_new_size(self, resource_path: list[str], new_width: int, new_height: int) -> None:
+            image_list = ImageList.from_files(resolve_resource_path(resource_path))
+            with pytest.raises(OutOfBoundsError, match=rf"At least one of the new sizes new_width and new_height \(={min(new_width, new_height)}\) is not inside \[1, \u221e\)."):
+                image_list.resize(new_width, new_height)
+
+    class TestCrop:
+
+        @pytest.mark.parametrize(
+            ("new_width", "new_height"),
+            [
+                (-10, 1),
+                (1, -10),
+                (-10, -1)
+            ],
+            ids=["invalid width", "invalid height", "invalid width and height"]
+        )
+        def test_should_raise_invalid_size(self, resource_path: list[str], new_width: int, new_height: int) -> None:
+            image_list = ImageList.from_files(resolve_resource_path(resource_path))
+            with pytest.raises(OutOfBoundsError, match=rf"At least one of width and height \(={min(new_width, new_height)}\) is not inside \[1, \u221e\)."):
+                image_list.crop(0, 0, new_width, new_height)
+
+        @pytest.mark.parametrize(
+            ("new_x", "new_y"),
+            [
+                (-10, 1),
+                (1, -10),
+                (-10, -1)
+            ],
+            ids=["invalid x", "invalid y", "invalid x and y"]
+        )
+        def test_should_raise_invalid_coordinates(self, resource_path: list[str], new_x: int, new_y: int) -> None:
+            image_list = ImageList.from_files(resolve_resource_path(resource_path))
+            with pytest.raises(OutOfBoundsError, match=rf"At least one of the coordinates x and y \(={min(new_x, new_y)}\) is not inside \[0, \u221e\)."):
+                image_list.crop(new_x, new_y, 100, 100)
 
     class TestAddNoise:
 
@@ -888,16 +987,13 @@ class TestErrorsAndWarnings:
             resource_path: list[str],
             standard_deviation: float,
         ) -> None:
-            image_list_original = ImageList.from_files(
-                [resolve_resource_path(unresolved_path) for unresolved_path in resource_path],
-            )
+            image_list_original = ImageList.from_files(resolve_resource_path(resource_path))
             image_list_clone = image_list_original.clone()
             with pytest.raises(
                 OutOfBoundsError,
                 match=rf"standard_deviation \(={standard_deviation}\) is not inside \[0, \u221e\)\.",
             ):
                 image_list_original.add_noise(standard_deviation)
-            assert image_list_original is not image_list_clone
             assert image_list_original == image_list_clone
 
     class TestAdjustBrightness:
@@ -912,31 +1008,24 @@ class TestErrorsAndWarnings:
             resource_path: list[str],
             factor: float,
         ) -> None:
-            image_list_original = ImageList.from_files(
-                [resolve_resource_path(unresolved_path) for unresolved_path in resource_path],
-            )
+            image_list_original = ImageList.from_files(resolve_resource_path(resource_path))
             image_list_clone = image_list_original.clone()
             with pytest.raises(OutOfBoundsError, match=r"factor \(=-1\) is not inside \[0, \u221e\)."):
                 image_list_original.adjust_brightness(factor)
-            assert image_list_original is not image_list_clone
             assert image_list_original == image_list_clone
 
         def test_should_not_brighten(
             self,
             resource_path: list[str],
         ) -> None:
-            image_list_original = ImageList.from_files(
-                [resolve_resource_path(unresolved_path) for unresolved_path in resource_path],
-            )
+            image_list_original = ImageList.from_files(resolve_resource_path(resource_path))
             image_list_clone = image_list_original.clone()
             with pytest.warns(
                 UserWarning,
                 match="Brightness adjustment factor is 1.0, this will not make changes to the images.",
             ):
                 image_list_no_change = image_list_original.adjust_brightness(1)
-                assert image_list_no_change is not image_list_original
                 assert image_list_no_change == image_list_original
-            assert image_list_original is not image_list_clone
             assert image_list_original == image_list_clone
 
     class TestAdjustContrast:
@@ -951,31 +1040,24 @@ class TestErrorsAndWarnings:
             resource_path: list[str],
             factor: float,
         ) -> None:
-            image_list_original = ImageList.from_files(
-                [resolve_resource_path(unresolved_path) for unresolved_path in resource_path],
-            )
+            image_list_original = ImageList.from_files(resolve_resource_path(resource_path))
             image_list_clone = image_list_original.clone()
             with pytest.raises(OutOfBoundsError, match=r"factor \(=-1\) is not inside \[0, \u221e\)."):
                 image_list_original.adjust_contrast(factor)
-            assert image_list_original is not image_list_clone
             assert image_list_original == image_list_clone
 
         def test_should_not_adjust(
             self,
             resource_path: list[str],
         ) -> None:
-            image_list_original = ImageList.from_files(
-                [resolve_resource_path(unresolved_path) for unresolved_path in resource_path],
-            )
+            image_list_original = ImageList.from_files(resolve_resource_path(resource_path))
             image_list_clone = image_list_original.clone()
             with pytest.warns(
                 UserWarning,
                 match="Contrast adjustment factor is 1.0, this will not make changes to the images.",
             ):
                 image_list_no_change = image_list_original.adjust_contrast(1)
-                assert image_list_no_change is not image_list_original
                 assert image_list_no_change == image_list_original
-            assert image_list_original is not image_list_clone
             assert image_list_original == image_list_clone
 
     class TestAdjustColorBalance:
@@ -990,66 +1072,52 @@ class TestErrorsAndWarnings:
             resource_path: list[str],
             factor: float,
         ) -> None:
-            image_list_original = ImageList.from_files(
-                [resolve_resource_path(unresolved_path) for unresolved_path in resource_path],
-            )
+            image_list_original = ImageList.from_files(resolve_resource_path(resource_path))
             image_list_clone = image_list_original.clone()
             with pytest.raises(OutOfBoundsError, match=r"factor \(=-1\) is not inside \[0, \u221e\)."):
                 image_list_original.adjust_color_balance(factor)
-            assert image_list_original is not image_list_clone
             assert image_list_original == image_list_clone
 
-        def test_should_not_adjust(
+        def test_should_not_adjust_color_balance_factor_1(
             self,
             resource_path: list[str],
         ) -> None:
-            image_list_original = ImageList.from_files(
-                [resolve_resource_path(unresolved_path) for unresolved_path in resource_path],
-            )
+            image_list_original = ImageList.from_files(resolve_resource_path(resource_path))
             image_list_clone = image_list_original.clone()
             with pytest.warns(
                 UserWarning,
                 match="Color adjustment factor is 1.0, this will not make changes to the images.",
             ):
                 image_list_no_change = image_list_original.adjust_color_balance(1)
-                assert image_list_no_change is not image_list_original
                 assert image_list_no_change == image_list_original
-            assert image_list_original is not image_list_clone
             assert image_list_original == image_list_clone
 
     class TestBlur:
 
         def test_should_raise_radius_out_of_bounds(self, resource_path: str) -> None:
-            image_list_original = ImageList.from_files(
-                [resolve_resource_path(unresolved_path) for unresolved_path in resource_path],
-            )
+            image_list_original = ImageList.from_files(resolve_resource_path(resource_path))
             image_list_clone = image_list_original.clone()
             with pytest.raises(
                 OutOfBoundsError,
-                match=rf"radius \(=-1\) is not inside \[0, {min(*image_list_original.widths, *image_list_original.heights) - 1}\].",
+                match=rf"radius \(=-1\) is not inside \[0, {'0' if isinstance(image_list_original, _EmptyImageList) else min(*image_list_original.widths, *image_list_original.heights) - 1}\].",
             ):
                 image_list_original.blur(-1)
             with pytest.raises(
                 OutOfBoundsError,
-                match=rf"radius \(={min(*image_list_original.widths, *image_list_original.heights)}\) is not inside \[0, {min(*image_list_original.widths, *image_list_original.heights) - 1}\].",
+                match=rf"radius \(={'1' if isinstance(image_list_original, _EmptyImageList) else min(*image_list_original.widths, *image_list_original.heights)}\) is not inside \[0, {'0' if isinstance(image_list_original, _EmptyImageList) else min(*image_list_original.widths, *image_list_original.heights) - 1}\].",
             ):
-                image_list_original.blur(min(*image_list_original.widths, *image_list_original.heights))
-            assert image_list_original is not image_list_clone
+                image_list_original.blur(1 if isinstance(image_list_original, _EmptyImageList) else min(*image_list_original.widths, *image_list_original.heights))
             assert image_list_original == image_list_clone
 
         def test_should_not_blur(self, resource_path: str) -> None:
-            image_list_original = ImageList.from_files(
-                [resolve_resource_path(unresolved_path) for unresolved_path in resource_path],
-            )
+            image_list_original = ImageList.from_files(resolve_resource_path(resource_path))
             image_list_clone = image_list_original.clone()
             with pytest.warns(
                 UserWarning,
-                match="Blur radius is 0, this will not make changes to the image.",
+                match="Blur radius is 0, this will not make changes to the images.",
             ):
                 image_list_no_change = image_list_original.blur(0)
-                assert image_list_no_change is not image_list_original
                 assert image_list_no_change == image_list_original
-            assert image_list_original is not image_list_clone
             assert image_list_original == image_list_clone
 
     class TestSharpen:
@@ -1064,31 +1132,24 @@ class TestErrorsAndWarnings:
             resource_path: list[str],
             factor: float,
         ) -> None:
-            image_list_original = ImageList.from_files(
-                [resolve_resource_path(unresolved_path) for unresolved_path in resource_path],
-            )
+            image_list_original = ImageList.from_files(resolve_resource_path(resource_path))
             image_list_clone = image_list_original.clone()
             with pytest.raises(OutOfBoundsError, match=r"factor \(=-1\) is not inside \[0, \u221e\)."):
                 image_list_original.sharpen(factor)
-            assert image_list_original is not image_list_clone
             assert image_list_original == image_list_clone
 
         def test_should_not_adjust(
             self,
             resource_path: list[str],
         ) -> None:
-            image_list_original = ImageList.from_files(
-                [resolve_resource_path(unresolved_path) for unresolved_path in resource_path],
-            )
+            image_list_original = ImageList.from_files(resolve_resource_path(resource_path))
             image_list_clone = image_list_original.clone()
             with pytest.warns(
                 UserWarning,
                 match="Sharpen factor is 1.0, this will not make changes to the images.",
             ):
                 image_list_no_change = image_list_original.sharpen(1)
-                assert image_list_no_change is not image_list_original
                 assert image_list_no_change == image_list_original
-            assert image_list_original is not image_list_clone
             assert image_list_original == image_list_clone
 
 
@@ -1187,12 +1248,16 @@ class TestEmptyImageList:
             0,
         ) == ImageList.from_files(resolve_resource_path(resource_path))
 
+    def test_remove_image_by_index(self) -> None:
+        with pytest.raises(IndexOutOfBoundsError):
+            _EmptyImageList().remove_image_by_index(0)
+
     @pytest.mark.parametrize(
         ("method", "attributes"),
         [
             ("change_channel", [1]),
-            ("remove_image_by_index", [0]),
-            ("remove_image_by_index", [[0]]),
+            ("_remove_image_by_index_ignore_invalid", [0]),
+            ("_remove_image_by_index_ignore_invalid", [[0]]),
             ("remove_images_with_size", [2, 3]),
             ("remove_duplicate_images", None),
             ("shuffle_images", None),
@@ -1211,7 +1276,7 @@ class TestEmptyImageList:
             ("adjust_color_balance", [2]),
             ("adjust_color_balance", [0.5]),
             ("adjust_color_balance", [0]),
-            ("blur", [2]),
+            ("blur", [0]),
             ("sharpen", [0]),
             ("sharpen", [0.5]),
             ("sharpen", [10]),
@@ -1222,8 +1287,8 @@ class TestEmptyImageList:
         ],
         ids=[
             "change_channel-(1)",
-            "remove_image_by_index-(0)",
-            "remove_image_by_index-([0])",
+            "_remove_image_by_index_ignore_invalid-(0)",
+            "_remove_image_by_index_ignore_invalid-([0])",
             "remove_images_with_size-(2, 3)",
             "remove_duplicate_images",
             "shuffle_images",

@@ -13,6 +13,10 @@ from torch import Tensor
 from torchvision.transforms import InterpolationMode
 
 from safeds._config import _get_device
+from safeds.data.image.utils._image_transformation_error_and_warning_checks import _check_resize_errors, \
+    _check_crop_errors_and_warnings, _check_adjust_brightness_errors_and_warnings, _check_add_noise_errors, \
+    _check_adjust_contrast_errors_and_warnings, _check_adjust_color_balance_errors_and_warnings, \
+    _check_blur_errors_and_warnings, _check_sharpen_errors_and_warnings
 
 if TYPE_CHECKING:
     from torch.types import Device
@@ -21,7 +25,7 @@ from torchvision.transforms.v2 import PILToTensor
 from torchvision.transforms.v2 import functional as func2
 from torchvision.utils import save_image
 
-from safeds.exceptions import ClosedBound, IllegalFormatError, OutOfBoundsError
+from safeds.exceptions import IllegalFormatError
 
 
 class Image:
@@ -101,11 +105,12 @@ class Image:
 
         Parameters
         ----------
-        other: The image to compare to.
+        other:
+            The image to compare to.
 
         Returns
         -------
-        equals : bool
+        equals:
             Whether the two images contain equal pixel data.
         """
         if not isinstance(other, Image):
@@ -132,7 +137,8 @@ class Image:
 
         Returns
         -------
-        Size of this object in bytes.
+        size:
+            Size of this object in bytes.
         """
         return sys.getsizeof(self._image_tensor) + self._image_tensor.element_size() * self._image_tensor.nelement()
 
@@ -340,9 +346,15 @@ class Image:
 
         Returns
         -------
-        result : Image
+        result:
             The image with the given width and height.
+
+        Raises
+        ------
+        OutOfBoundsError
+            If new_width or new_height are below 1
         """
+        _check_resize_errors(new_width, new_height)
         return Image(
             func2.resize(self._image_tensor, size=[new_height, new_width], interpolation=InterpolationMode.NEAREST),
             device=self._image_tensor.device,
@@ -380,17 +392,27 @@ class Image:
 
         Parameters
         ----------
-        x: the x coordinate of the top-left corner of the bounding rectangle
-        y: the y coordinate of the top-left corner of the bounding rectangle
-        width:  the width of the bounding rectangle
-        height:  the height of the bounding rectangle
+        x:
+            the x coordinate of the top-left corner of the bounding rectangle
+        y:
+            the y coordinate of the top-left corner of the bounding rectangle
+        width:
+            the width of the bounding rectangle
+        height:
+            the height of the bounding rectangle
 
         Returns
         -------
-        result : Image
+        result:
             The cropped image.
+
+        Raises
+        ------
+        OutOfBoundsError
+            If x or y are below 0 or if width or height are below 1
         """
-        return Image(func2.crop(self._image_tensor, x, y, height, width), device=self.device)
+        _check_crop_errors_and_warnings(x, y, width, height, self.width, self.height, False)
+        return Image(func2.crop(self._image_tensor, y, x, height, width), device=self.device)
 
     def flip_vertically(self) -> Image:
         """
@@ -443,14 +465,7 @@ class Image:
         OutOfBoundsError
             If factor is smaller than 0.
         """
-        if factor < 0:
-            raise OutOfBoundsError(factor, name="factor", lower_bound=ClosedBound(0))
-        elif factor == 1:
-            warnings.warn(
-                "Brightness adjustment factor is 1.0, this will not make changes to the image.",
-                UserWarning,
-                stacklevel=2,
-            )
+        _check_adjust_brightness_errors_and_warnings(factor, False)
         if self.channel == 4:
             return Image(
                 torch.cat(
@@ -485,8 +500,7 @@ class Image:
         OutOfBoundsError
             If standard_deviation is smaller than 0.
         """
-        if standard_deviation < 0:
-            raise OutOfBoundsError(standard_deviation, name="standard_deviation", lower_bound=ClosedBound(0))
+        _check_add_noise_errors(standard_deviation)
         return Image(
             self._image_tensor + torch.normal(0, standard_deviation, self._image_tensor.size()).to(self.device) * 255,
             device=self.device,
@@ -516,14 +530,7 @@ class Image:
         OutOfBoundsError
             If factor is smaller than 0.
         """
-        if factor < 0:
-            raise OutOfBoundsError(factor, name="factor", lower_bound=ClosedBound(0))
-        elif factor == 1:
-            warnings.warn(
-                "Contrast adjustment factor is 1.0, this will not make changes to the image.",
-                UserWarning,
-                stacklevel=2,
-            )
+        _check_adjust_contrast_errors_and_warnings(factor, False)
         if self.channel == 4:
             return Image(
                 torch.cat(
@@ -561,20 +568,7 @@ class Image:
         OutOfBoundsError
             If factor is smaller than 0.
         """
-        if factor < 0:
-            raise OutOfBoundsError(factor, name="factor", lower_bound=ClosedBound(0))
-        elif factor == 1:
-            warnings.warn(
-                "Color adjustment factor is 1.0, this will not make changes to the image.",
-                UserWarning,
-                stacklevel=2,
-            )
-        elif self.channel == 1:
-            warnings.warn(
-                "Color adjustment will not have an affect on grayscale images with only one channel.",
-                UserWarning,
-                stacklevel=2,
-            )
+        _check_adjust_color_balance_errors_and_warnings(factor, self.channel, False)
         return Image(
             self.convert_to_grayscale()._image_tensor * (1.0 - factor * 1.0) + self._image_tensor * (factor * 1.0),
             device=self.device,
@@ -602,19 +596,7 @@ class Image:
         OutOfBoundsError
             If radius is smaller than 0 or equal or greater than the smaller size of the image.
         """
-        if radius < 0 or radius >= min(self.width, self.height):
-            raise OutOfBoundsError(
-                radius,
-                name="radius",
-                lower_bound=ClosedBound(0),
-                upper_bound=ClosedBound(min(self.width, self.height) - 1),
-            )
-        elif radius == 0:
-            warnings.warn(
-                "Blur radius is 0, this will not make changes to the image.",
-                UserWarning,
-                stacklevel=2,
-            )
+        _check_blur_errors_and_warnings(radius, min(self.width, self.height), False)
         return Image(func2.gaussian_blur(self._image_tensor, [radius * 2 + 1, radius * 2 + 1]), device=self.device)
 
     def sharpen(self, factor: float) -> Image:
@@ -641,14 +623,7 @@ class Image:
         OutOfBoundsError
             If factor is smaller than 0.
         """
-        if factor < 0:
-            raise OutOfBoundsError(factor, name="factor", lower_bound=ClosedBound(0))
-        elif factor == 1:
-            warnings.warn(
-                "Sharpen factor is 1.0, this will not make changes to the image.",
-                UserWarning,
-                stacklevel=2,
-            )
+        _check_sharpen_errors_and_warnings(factor, False)
         if self.channel == 4:
             return Image(
                 torch.cat(
