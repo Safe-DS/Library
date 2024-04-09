@@ -30,6 +30,7 @@ from safeds.exceptions._ml import (
     ModelNotFittedError,
     PredictionError,
     UntaggedTableError,
+    TestTrainDataMismatchError,
 )
 
 __all__ = [
@@ -57,6 +58,7 @@ __all__ = [
     "LearningError",
     "ModelNotFittedError",
     "PredictionError",
+    "TestTrainDataMismatchError",
     "UntaggedTableError",
     # Other
     "Bound",

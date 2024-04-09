@@ -1,6 +1,6 @@
 import pytest
 from safeds.data.tabular.containers import Table, TaggedTable
-from safeds.exceptions import ModelNotFittedError, OutOfBoundsError
+from safeds.exceptions import ModelNotFittedError, OutOfBoundsError, TestTrainDataMismatchError
 from safeds.ml.nn import FNNLayer, NeuralNetworkClassifier, NeuralNetworkRegressor
 
 
@@ -86,6 +86,17 @@ class TestClassificationModel:
             Table.from_dict({"a": [1, 0, 2], "b": [0, 15, 5]}).tag_columns("a"),
         )
         assert model.is_fitted
+
+    def test_should_raise_if__test_and_train_data_mismatch(self) -> None:
+        model = NeuralNetworkClassifier([FNNLayer(input_size=1, output_size=1), FNNLayer(output_size=3)])
+        model = model.fit(
+            Table.from_dict({"a": [1, 0, 2], "b": [0, 15, 5]}).tag_columns("a"),
+        )
+        with pytest.raises(TestTrainDataMismatchError, match="The column names in the test table do not match with the feature columns names of the training data."):
+            model.predict(
+                Table.from_dict({"a": [1], "c": [2]}),
+            )
+
 
     def test_should_raise_if_fit_doesnt_batch_callback(self) -> None:
         model = NeuralNetworkClassifier([FNNLayer(input_size=1, output_size=1)])
@@ -185,6 +196,16 @@ class TestRegressionModel:
             Table.from_dict({"a": [1], "b": [0]}).tag_columns("a"),
         )
         assert model.is_fitted
+
+    def test_should_raise_if__test_and_train_data_mismatch(self) -> None:
+        model = NeuralNetworkRegressor([FNNLayer(input_size=1, output_size=1)])
+        model = model.fit(
+            Table.from_dict({"a": [1, 0, 2], "b": [0, 15, 5]}).tag_columns("a"),
+        )
+        with pytest.raises(TestTrainDataMismatchError, match="The column names in the test table do not match with the feature columns names of the training data."):
+            model.predict(
+                Table.from_dict({"a": [1], "c": [2]}),
+            )
 
     def test_should_raise_if_fit_doesnt_batch_callback(self) -> None:
         model = NeuralNetworkRegressor([FNNLayer(input_size=1, output_size=1)])

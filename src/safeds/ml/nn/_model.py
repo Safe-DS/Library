@@ -6,7 +6,7 @@ import torch
 from torch import Tensor, nn
 
 from safeds.data.tabular.containers import Column, Table, TaggedTable
-from safeds.exceptions import ClosedBound, ModelNotFittedError, OutOfBoundsError
+from safeds.exceptions import ClosedBound, ModelNotFittedError, OutOfBoundsError, TestTrainDataMismatchError
 from safeds.ml.nn._fnn_layer import FNNLayer
 
 
@@ -15,13 +15,14 @@ class NeuralNetworkRegressor:
         self._model = _PytorchModel(layers, is_for_classification=False)
         self._batch_size = 1
         self._is_fitted = False
+        self._feature_names = None
 
     def fit(
         self,
         train_data: TaggedTable,
         epoch_size: int = 25,
         batch_size: int = 1,
-        learning_rate=0.05,
+        learning_rate: float = 0.001,
         callback_on_batch_completion: Callable[[int, float], None] | None = None,
         callback_on_epoch_completion: Callable[[int, float], None] | None = None,
     ) -> Self:
@@ -38,6 +39,8 @@ class NeuralNetworkRegressor:
             The number of times the training cycle should be done.
         batch_size
             The size of data batches that should be loaded at one time.
+        learning_rate
+            The learning rate of the neural network.
         callback_on_batch_completion
             Function used to view metrics while training. Gets called after a batch is completed with the index of the last batch and the overall loss average.
         callback_on_epoch_completion
@@ -58,7 +61,9 @@ class NeuralNetworkRegressor:
             raise OutOfBoundsError(actual=epoch_size, name="epoch_size", lower_bound=ClosedBound(1))
         if batch_size < 1:
             raise OutOfBoundsError(actual=batch_size, name="batch_size", lower_bound=ClosedBound(1))
+        self._feature_names = train_data.features.column_names
         copied_model = copy.deepcopy(self)
+
         copied_model._batch_size = batch_size
         dataloader = train_data._into_dataloader(copied_model._batch_size)
 
@@ -112,6 +117,8 @@ class NeuralNetworkRegressor:
         """
         if not self._is_fitted:
             raise ModelNotFittedError
+        if not sorted(test_data.column_names).__eq__(sorted(self._feature_names)):
+            raise TestTrainDataMismatchError
         dataloader = test_data._into_dataloader(self._batch_size)
         predictions = []
         with torch.no_grad():
@@ -140,13 +147,14 @@ class NeuralNetworkClassifier:
         self._batch_size = 1
         self._is_fitted = False
         self._is_multi_class = layers[-1].output_size > 1
+        self._feature_names = None
 
     def fit(
         self,
         train_data: TaggedTable,
         epoch_size: int = 25,
         batch_size: int = 1,
-        learning_rate = 0.05,
+        learning_rate: float = 0.001,
         callback_on_batch_completion: Callable[[int, float], None] | None = None,
         callback_on_epoch_completion: Callable[[int, float], None] | None = None,
     ) -> Self:
@@ -163,6 +171,8 @@ class NeuralNetworkClassifier:
             The number of times the training cycle should be done.
         batch_size
             The size of data batches that should be loaded at one time.
+        learning_rate
+            The learning rate of the neural network.
         callback_on_batch_completion
             Function used to view metrics while training. Gets called after a batch is completed with the index of the last batch and the overall loss average.
         callback_on_epoch_completion
@@ -183,7 +193,9 @@ class NeuralNetworkClassifier:
             raise OutOfBoundsError(actual=epoch_size, name="epoch_size", lower_bound=ClosedBound(1))
         if batch_size < 1:
             raise OutOfBoundsError(actual=batch_size, name="batch_size", lower_bound=ClosedBound(1))
+        self._feature_names = train_data.features.column_names
         copied_model = copy.deepcopy(self)
+
         copied_model._batch_size = batch_size
         dataloader = train_data._into_dataloader(copied_model._batch_size)
 
@@ -255,6 +267,8 @@ class NeuralNetworkClassifier:
         """
         if not self._is_fitted:
             raise ModelNotFittedError
+        if not sorted(test_data.column_names).__eq__(sorted(self._feature_names)):
+            raise TestTrainDataMismatchError
         dataloader = test_data._into_dataloader(self._batch_size)
         predictions = []
         with torch.no_grad():
