@@ -28,6 +28,7 @@ from safeds.exceptions._ml import (
     DatasetMissesFeaturesError,
     LearningError,
     ModelNotFittedError,
+    NonTimeSeriesError,
     PredictionError,
     UntaggedTableError,
 )
@@ -56,6 +57,7 @@ __all__ = [
     "DatasetMissesFeaturesError",
     "LearningError",
     "ModelNotFittedError",
+    "NonTimeSeriesError",
     "PredictionError",
     "UntaggedTableError",
     # Other
