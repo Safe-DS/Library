@@ -25,13 +25,12 @@ class _InternalLayer(nn.Module):
 
 class Layer(ABC):
     @abstractmethod
-    def __init__(self):
-        pass
+    def __init__(self) -> None:
+        pass    # pragma: no cover
 
     @abstractmethod
     def output_size(self) -> int:
-        pass
-
+        pass    # pragma: no cover
 
 class FNNLayer(Layer):
     def __init__(self, output_size: int, input_size: int | None = None):
