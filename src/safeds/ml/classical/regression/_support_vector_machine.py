@@ -10,6 +10,7 @@ from typing import TYPE_CHECKING
 import xxhash
 from sklearn.svm import SVR as sk_SVR  # noqa: N811
 
+from safeds._utils import _structural_hash
 from safeds.exceptions import ClosedBound, OpenBound, OutOfBoundsError
 from safeds.ml.classical._util_sklearn import fit, predict
 from safeds.ml.classical.regression import Regressor
@@ -50,7 +51,6 @@ class SupportVectorMachineKernel(ABC):
             Whether the two kernels are equal
         """
 
-    @abstractmethod
     def __hash__(self) -> int:
         """
         Return a deterministic hash value for this kernel.
@@ -60,6 +60,7 @@ class SupportVectorMachineKernel(ABC):
         hash : int
             The hash value.
         """
+        return _structural_hash(self.__class__.__qualname__)
 
 
 class SupportVectorMachineRegressor(Regressor):
@@ -80,17 +81,7 @@ class SupportVectorMachineRegressor(Regressor):
     """
 
     def __hash__(self) -> int:
-        return xxhash.xxh3_64(
-            Regressor.__hash__(self).to_bytes(8)
-            + (self._target_name.encode("utf-8") if self._target_name is not None else b"\0")
-            + (
-                functools.reduce(operator.add, [feature.encode("utf-8") for feature in self._feature_names], b"")
-                if self._feature_names is not None
-                else b"\0"
-            )
-            + struct.pack("d", self._c)
-            + (hash(self.kernel).to_bytes(8) if self.kernel is not None else b"\0"),
-        ).intdigest()
+        return _structural_hash(Regressor.__hash__(self), self._target_name, self._feature_names, self._c, self.kernel)
 
     def __init__(self, *, c: float = 1.0, kernel: SupportVectorMachineKernel | None = None) -> None:
         # Internal state
@@ -146,8 +137,7 @@ class SupportVectorMachineRegressor(Regressor):
                     return NotImplemented
                 return True
 
-            def __hash__(self) -> int:
-                return xxhash.xxh3_64(self.__class__.__qualname__.encode("utf-8")).intdigest()
+            __hash__ = SupportVectorMachineKernel.__hash__
 
         class Polynomial(SupportVectorMachineKernel):
             def __init__(self, degree: int):
@@ -172,9 +162,7 @@ class SupportVectorMachineRegressor(Regressor):
                 return self._degree == other._degree
 
             def __hash__(self) -> int:
-                return xxhash.xxh3_64(
-                    self.__class__.__qualname__.encode("utf-8") + self._degree.to_bytes(8),
-                ).intdigest()
+                return _structural_hash(SupportVectorMachineKernel.__hash__(self), self._degree)
 
             def __sizeof__(self) -> int:
                 """
@@ -203,8 +191,7 @@ class SupportVectorMachineRegressor(Regressor):
                     return NotImplemented
                 return True
 
-            def __hash__(self) -> int:
-                return xxhash.xxh3_64(self.__class__.__qualname__.encode("utf-8")).intdigest()
+            __hash__ = SupportVectorMachineKernel.__hash__
 
         class RadialBasisFunction(SupportVectorMachineKernel):
             def _get_sklearn_kernel(self) -> str:
@@ -223,8 +210,7 @@ class SupportVectorMachineRegressor(Regressor):
                     return NotImplemented
                 return True
 
-            def __hash__(self) -> int:
-                return xxhash.xxh3_64(self.__class__.__qualname__.encode("utf-8")).intdigest()
+            __hash__ = SupportVectorMachineKernel.__hash__
 
     def _get_kernel_name(self) -> str:
         """

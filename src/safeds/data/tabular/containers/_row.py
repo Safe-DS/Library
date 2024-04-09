@@ -2,13 +2,12 @@ from __future__ import annotations
 
 import sys
 import functools
-import operator
 from collections.abc import Callable, Mapping
 from typing import TYPE_CHECKING, Any
 
 import pandas as pd
-import xxhash
 
+from safeds._utils import _structural_hash
 from safeds.data.tabular.typing import ColumnType, Schema
 from safeds.exceptions import UnknownColumnNameError
 
@@ -227,7 +226,7 @@ class Row(Mapping[str, Any]):
         hash : int
             The hash value.
         """
-        return xxhash.xxh3_64(hash(self._schema).to_bytes(8) + functools.reduce(operator.add, [xxhash.xxh3_64(str(self.get_value(value))).intdigest().to_bytes(8) for value in self], b"\0")).intdigest()
+        return _structural_hash(self._schema, [str(self.get_value(value)) for value in self])
 
     def __iter__(self) -> Iterator[Any]:
         """

@@ -1,12 +1,10 @@
 from __future__ import annotations
 
-import functools
-import operator
 from typing import TYPE_CHECKING
 
-import xxhash
 from sklearn.ensemble import RandomForestRegressor as sk_RandomForestRegressor
 
+from safeds._utils import _structural_hash
 from safeds.exceptions import ClosedBound, OutOfBoundsError
 from safeds.ml.classical._util_sklearn import fit, predict
 
@@ -33,16 +31,7 @@ class RandomForestRegressor(Regressor):
     """
 
     def __hash__(self) -> int:
-        return xxhash.xxh3_64(
-            Regressor.__hash__(self).to_bytes(8)
-            + (self._target_name.encode("utf-8") if self._target_name is not None else b"\0")
-            + (
-                functools.reduce(operator.add, [feature.encode("utf-8") for feature in self._feature_names], b"")
-                if self._feature_names is not None
-                else b"\0"
-            )
-            + self._number_of_trees.to_bytes(8),
-        ).intdigest()
+        return _structural_hash(Regressor.__hash__(self), self._target_name, self._feature_names, self._number_of_trees)
 
     def __init__(self, *, number_of_trees: int = 100) -> None:
         # Validation

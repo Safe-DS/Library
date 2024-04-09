@@ -2,6 +2,8 @@ from abc import ABC, abstractmethod
 
 from sklearn.impute import SimpleImputer as sk_SimpleImputer
 
+from safeds._utils import _structural_hash
+
 
 class ImputerStrategy(ABC):
     """
@@ -37,7 +39,6 @@ class ImputerStrategy(ABC):
             Whether the two imputer strategies are equal
         """
 
-    @abstractmethod
     def __hash__(self) -> int:
         """
         Return a deterministic hash value for this imputer strategy.
@@ -47,3 +48,4 @@ class ImputerStrategy(ABC):
         hash : int
             The hash value.
         """
+        return _structural_hash(self.__class__.__qualname__)

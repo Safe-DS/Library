@@ -5,7 +5,6 @@ import warnings
 from typing import Any
 
 import pandas as pd
-import xxhash
 from sklearn.impute import SimpleImputer as sk_SimpleImputer
 
 from safeds.data.tabular.containers import Table
@@ -56,8 +55,7 @@ class Imputer(TableTransformer):
                     return True
                 return self._value == other._value
 
-            def __hash__(self) -> int:
-                return xxhash.xxh3_64(self.__class__.__qualname__.encode("utf-8")).intdigest()
+            __hash__ = ImputerStrategy.__hash__
 
             def __init__(self, value: Any):
                 self._value = value
@@ -87,8 +85,7 @@ class Imputer(TableTransformer):
                     return NotImplemented
                 return True
 
-            def __hash__(self) -> int:
-                return xxhash.xxh3_64(self.__class__.__qualname__.encode("utf-8")).intdigest()
+            __hash__ = ImputerStrategy.__hash__
 
             def __str__(self) -> str:
                 return "Mean"
@@ -104,8 +101,7 @@ class Imputer(TableTransformer):
                     return NotImplemented
                 return True
 
-            def __hash__(self) -> int:
-                return xxhash.xxh3_64(self.__class__.__qualname__.encode("utf-8")).intdigest()
+            __hash__ = ImputerStrategy.__hash__
 
             def __str__(self) -> str:
                 return "Median"
@@ -121,8 +117,7 @@ class Imputer(TableTransformer):
                     return NotImplemented
                 return True
 
-            def __hash__(self) -> int:
-                return xxhash.xxh3_64(self.__class__.__qualname__.encode("utf-8")).intdigest()
+            __hash__ = ImputerStrategy.__hash__
 
             def __str__(self) -> str:
                 return "Mode"

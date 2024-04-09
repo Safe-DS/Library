@@ -1,12 +1,10 @@
 from __future__ import annotations
 
-import functools
-import operator
 from typing import TYPE_CHECKING
 
-import xxhash
 from sklearn.neighbors import KNeighborsClassifier as sk_KNeighborsClassifier
 
+from safeds._utils import _structural_hash
 from safeds.exceptions import ClosedBound, DatasetMissesDataError, OutOfBoundsError
 from safeds.ml.classical._util_sklearn import fit, predict
 
@@ -35,16 +33,7 @@ class KNearestNeighborsClassifier(Classifier):
     """
 
     def __hash__(self) -> int:
-        return xxhash.xxh3_64(
-            Classifier.__hash__(self).to_bytes(8)
-            + (self._target_name.encode("utf-8") if self._target_name is not None else b"\0")
-            + (
-                functools.reduce(operator.add, [feature.encode("utf-8") for feature in self._feature_names], b"")
-                if self._feature_names is not None
-                else b"\0"
-            )
-            + self._number_of_neighbors.to_bytes(8),
-        ).intdigest()
+        return _structural_hash(Classifier.__hash__(self), self._target_name, self._feature_names, self._number_of_neighbors)
 
     def __init__(self, number_of_neighbors: int) -> None:
         # Validation

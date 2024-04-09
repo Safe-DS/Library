@@ -8,11 +8,11 @@ from typing import TYPE_CHECKING
 
 import torch
 import torch.nn.functional as func
-import xxhash
 from PIL.Image import open as pil_image_open
 from torch import Tensor
 
 from safeds._config import _get_device
+from safeds._utils import _structural_hash
 
 if TYPE_CHECKING:
     from torch.types import Device
@@ -119,7 +119,7 @@ class Image:
         hash : int
             The hash value.
         """
-        return xxhash.xxh3_64(self.width.to_bytes(8) + self.height.to_bytes(8) + self.channel.to_bytes(8)).intdigest()
+        return _structural_hash(self.width, self.height, self.channel)
 
     def __sizeof__(self) -> int:
         """

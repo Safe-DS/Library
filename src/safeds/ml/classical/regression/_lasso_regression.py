@@ -1,14 +1,11 @@
 from __future__ import annotations
 
-import functools
-import operator
-import struct
 from typing import TYPE_CHECKING
 from warnings import warn
 
-import xxhash
 from sklearn.linear_model import Lasso as sk_Lasso
 
+from safeds._utils import _structural_hash
 from safeds.exceptions import ClosedBound, OutOfBoundsError
 from safeds.ml.classical._util_sklearn import fit, predict
 
@@ -35,16 +32,7 @@ class LassoRegressor(Regressor):
     """
 
     def __hash__(self) -> int:
-        return xxhash.xxh3_64(
-            Regressor.__hash__(self).to_bytes(8)
-            + (self._target_name.encode("utf-8") if self._target_name is not None else b"\0")
-            + (
-                functools.reduce(operator.add, [feature.encode("utf-8") for feature in self._feature_names], b"")
-                if self._feature_names is not None
-                else b"\0"
-            )
-            + struct.pack("d", self._alpha),
-        ).intdigest()
+        return _structural_hash(Regressor.__hash__(self), self._target_name, self._feature_names, self._alpha)
 
     def __init__(self, *, alpha: float = 1.0) -> None:
         # Validation

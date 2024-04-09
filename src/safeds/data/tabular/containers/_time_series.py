@@ -7,8 +7,8 @@ from typing import TYPE_CHECKING
 import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
-import xxhash
 
+from safeds._utils import _structural_hash
 from safeds.data.image.containers import Image
 from safeds.data.tabular.containers import Column, Row, Table, TaggedTable
 from safeds.exceptions import (
@@ -232,12 +232,7 @@ class TimeSeries(Table):
         hash : int
             The hash value.
         """
-        return xxhash.xxh3_64(
-            hash(self.time).to_bytes(8)
-            + hash(self.target).to_bytes(8)
-            + hash(self.features).to_bytes(8)
-            + Table.__hash__(self).to_bytes(8),
-        ).intdigest()
+        return _structural_hash(self.time, self.target, self.features, Table.__hash__(self))
 
     def __sizeof__(self) -> int:
         """
