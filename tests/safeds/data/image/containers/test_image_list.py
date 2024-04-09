@@ -108,9 +108,11 @@ class TestAllImageCombinations:
         )
         image_list_unequal_1 = ImageList.from_images(images_not_included)
         image_list_unequal_2 = image_list.remove_image_by_index(0)
+        image_list_unequal_3 = image_list._remove_image_by_index_ignore_invalid(0)
         assert image_list == image_list_equal
         assert image_list != image_list_unequal_1
         assert image_list != image_list_unequal_2
+        assert image_list != image_list_unequal_3
         assert image_list.__eq__(Table()) is NotImplemented
 
         # Test hash
@@ -354,6 +356,27 @@ class TestAllImageCombinations:
             image_list.channel,
         )
         assert image_list.remove_image_by_index([0, 1, 2]) == _EmptyImageList()
+
+        # Test remove image by index ignore invalid
+        assert image_list._remove_image_by_index_ignore_invalid(0) == ImageList.from_images([image2, image3]).change_channel(
+            image_list.channel,
+        )
+        assert image_list._remove_image_by_index_ignore_invalid(1) == ImageList.from_images([image1, image3]).change_channel(
+            image_list.channel,
+        )
+        assert image_list._remove_image_by_index_ignore_invalid(2) == ImageList.from_images([image1, image2]).change_channel(
+            image_list.channel,
+        )
+        assert image_list._remove_image_by_index_ignore_invalid([0, 1]) == ImageList.from_images([image3]).change_channel(
+            image_list.channel,
+        )
+        assert image_list._remove_image_by_index_ignore_invalid([0, 2]) == ImageList.from_images([image2]).change_channel(
+            image_list.channel,
+        )
+        assert image_list._remove_image_by_index_ignore_invalid([1, 2]) == ImageList.from_images([image1]).change_channel(
+            image_list.channel,
+        )
+        assert image_list._remove_image_by_index_ignore_invalid([0, 1, 2]) == _EmptyImageList()
 
         # Test remove images with size
         for image in [image1, image2, image3]:
@@ -916,6 +939,15 @@ class TestErrorsAndWarningsWithEmptyImageList:
                 match=rf"Channel {channel} is not a valid channel option. Use either 1, 3 or 4",
             ):
                 image_list.change_channel(channel)
+
+    class TestRemoveImageByIndex:
+
+        def test_should_raise_invalid_index(self, resource_path: list[str]) -> None:
+            image_list = ImageList.from_files(resolve_resource_path(resource_path))
+            with pytest.raises(IndexOutOfBoundsError):
+                image_list.remove_image_by_index(-1)
+            with pytest.raises(IndexOutOfBoundsError):
+                image_list.remove_image_by_index(len(image_list))
 
     class TestRemoveImagesWithSize:
 
