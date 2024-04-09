@@ -530,7 +530,11 @@ class TestCrop:
         ids=["invalid width", "invalid height", "invalid width and height"],
     )
     def test_should_raise_invalid_size(
-        self, resource_path: str, new_width: int, new_height: int, device: Device,
+        self,
+        resource_path: str,
+        new_width: int,
+        new_height: int,
+        device: Device,
     ) -> None:
         _skip_if_device_not_available(device)
         image = Image.from_file(resolve_resource_path(resource_path), device)
@@ -546,7 +550,9 @@ class TestCrop:
         ids=images_all_ids(),
     )
     @pytest.mark.parametrize(
-        ("new_x", "new_y"), [(-10, 1), (1, -10), (-10, -1)], ids=["invalid x", "invalid y", "invalid x and y"],
+        ("new_x", "new_y"),
+        [(-10, 1), (1, -10), (-10, -1)],
+        ids=["invalid x", "invalid y", "invalid x and y"],
     )
     def test_should_raise_invalid_coordinates(self, resource_path: str, new_x: int, new_y: int, device: Device) -> None:
         _skip_if_device_not_available(device)
@@ -563,10 +569,16 @@ class TestCrop:
         ids=images_all_ids(),
     )
     @pytest.mark.parametrize(
-        ("new_x", "new_y"), [(10000, 1), (1, 10000), (10000, 10000)], ids=["outside x", "outside y", "outside x and y"],
+        ("new_x", "new_y"),
+        [(10000, 1), (1, 10000), (10000, 10000)],
+        ids=["outside x", "outside y", "outside x and y"],
     )
     def test_should_warn_if_coordinates_outsize_image(
-        self, resource_path: str, new_x: int, new_y: int, device: Device,
+        self,
+        resource_path: str,
+        new_x: int,
+        new_y: int,
+        device: Device,
     ) -> None:
         _skip_if_device_not_available(device)
         image = Image.from_file(resolve_resource_path(resource_path), device)

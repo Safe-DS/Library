@@ -159,7 +159,13 @@ class _EmptyImageList(ImageList):
     def crop(self, x: int, y: int, width: int, height: int) -> ImageList:
         _EmptyImageList._warn_empty_image_list()
         _check_crop_errors_and_warnings(
-            x, y, width, height, x + 1, y + 1, plural=True,
+            x,
+            y,
+            width,
+            height,
+            x + 1,
+            y + 1,
+            plural=True,
         )  # Disable x|y >= min_width|min_height check with min_width|min_height=x|y+1
         return _EmptyImageList()
 

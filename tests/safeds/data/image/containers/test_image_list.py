@@ -862,7 +862,10 @@ class TestErrorsAndWarningsWithoutEmptyImageList:
             ids=["outside x", "outside y", "outside x and y"],
         )
         def test_should_warn_if_coordinates_outsize_image(
-            self, resource_path: list[str], new_x: int, new_y: int,
+            self,
+            resource_path: list[str],
+            new_x: int,
+            new_y: int,
         ) -> None:
             image_list = ImageList.from_files(resolve_resource_path(resource_path))
             image_blank_tensor = torch.zeros((image_list.number_of_images, image_list.channel, 1, 1))
@@ -960,7 +963,9 @@ class TestErrorsAndWarningsWithEmptyImageList:
                 image_list.crop(0, 0, new_width, new_height)
 
         @pytest.mark.parametrize(
-            ("new_x", "new_y"), [(-10, 1), (1, -10), (-10, -1)], ids=["invalid x", "invalid y", "invalid x and y"],
+            ("new_x", "new_y"),
+            [(-10, 1), (1, -10), (-10, -1)],
+            ids=["invalid x", "invalid y", "invalid x and y"],
         )
         def test_should_raise_invalid_coordinates(self, resource_path: list[str], new_x: int, new_y: int) -> None:
             image_list = ImageList.from_files(resolve_resource_path(resource_path))
@@ -1102,9 +1107,11 @@ class TestErrorsAndWarningsWithEmptyImageList:
                 match=rf"radius \(={'1' if isinstance(image_list_original, _EmptyImageList) else min(*image_list_original.widths, *image_list_original.heights)}\) is not inside \[0, {'0' if isinstance(image_list_original, _EmptyImageList) else min(*image_list_original.widths, *image_list_original.heights) - 1}\].",
             ):
                 image_list_original.blur(
-                    1
-                    if isinstance(image_list_original, _EmptyImageList)
-                    else min(*image_list_original.widths, *image_list_original.heights),
+                    (
+                        1
+                        if isinstance(image_list_original, _EmptyImageList)
+                        else min(*image_list_original.widths, *image_list_original.heights)
+                    ),
                 )
             assert image_list_original == image_list_clone
 
