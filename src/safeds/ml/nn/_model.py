@@ -15,7 +15,7 @@ class NeuralNetworkRegressor:
         self._model = _PytorchModel(layers, is_for_classification=False)
         self._batch_size = 1
         self._is_fitted = False
-        self._feature_names = None
+        self._feature_names: None | list[str] = None
 
     def fit(
         self,
@@ -117,7 +117,7 @@ class NeuralNetworkRegressor:
         """
         if not self._is_fitted:
             raise ModelNotFittedError
-        if not sorted(test_data.column_names).__eq__(sorted(self._feature_names)):
+        if not (test_data.column_names.sort()).__eq__(self._feature_names.sort()):
             raise TestTrainDataMismatchError
         dataloader = test_data._into_dataloader(self._batch_size)
         predictions = []
