@@ -21,6 +21,7 @@ class NeuralNetworkRegressor:
         train_data: TaggedTable,
         epoch_size: int = 25,
         batch_size: int = 1,
+        learning_rate=0.05,
         callback_on_batch_completion: Callable[[int, float], None] | None = None,
         callback_on_epoch_completion: Callable[[int, float], None] | None = None,
     ) -> Self:
@@ -63,11 +64,11 @@ class NeuralNetworkRegressor:
 
         loss_fn = nn.MSELoss()
 
-        optimizer = torch.optim.SGD(copied_model._model.parameters(), lr=0.05)
+        optimizer = torch.optim.SGD(copied_model._model.parameters(), lr=learning_rate)
         loss_sum = 0.0
         number_of_batches_done = 0
         for epoch in range(epoch_size):
-            for x, y in dataloader:
+            for x, y in iter(dataloader):
                 optimizer.zero_grad()
 
                 pred = copied_model._model(x)
@@ -145,6 +146,7 @@ class NeuralNetworkClassifier:
         train_data: TaggedTable,
         epoch_size: int = 25,
         batch_size: int = 1,
+        learning_rate = 0.05,
         callback_on_batch_completion: Callable[[int, float], None] | None = None,
         callback_on_epoch_completion: Callable[[int, float], None] | None = None,
     ) -> Self:
@@ -190,11 +192,11 @@ class NeuralNetworkClassifier:
         else:
             loss_fn = nn.BCELoss()
 
-        optimizer = torch.optim.SGD(copied_model._model.parameters(), lr=0.05)
+        optimizer = torch.optim.SGD(copied_model._model.parameters(), lr=learning_rate)
         loss_sum = 0.0
         number_of_batches_done = 0
         for epoch in range(epoch_size):
-            for x, y in dataloader:
+            for x, y in iter(dataloader):
                 optimizer.zero_grad()
                 pred = copied_model._model(x)
                 if self._is_multi_class:
