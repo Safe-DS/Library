@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from torch import nn
+from torch import Tensor, nn
 
 from safeds.exceptions import ClosedBound, OutOfBoundsError
 
@@ -19,7 +19,7 @@ class _InternalLayer(nn.Module):
             case _:
                 raise ValueError("Unknown Activation Function: " + activation_function)
 
-    def forward(self, x: float) -> float:
+    def forward(self, x: Tensor) -> Tensor:
         return self._fn(self._layer(x))
 
 

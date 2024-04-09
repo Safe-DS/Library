@@ -324,9 +324,9 @@ class _PytorchModel(nn.Module):
                 internal_layers.append(layers[-1]._get_internal_layer(activation_function="softmax"))
             else:
                 internal_layers.append(layers[-1]._get_internal_layer(activation_function="sigmoid"))
-        self._pytorch_layers = nn.ModuleList(internal_layers)
+        self._pytorch_layers = nn.Sequential(*internal_layers)
 
-    def forward(self, x: float) -> float:
+    def forward(self, x: Tensor) -> Tensor:
         for layer in self._pytorch_layers:
             x = layer(x)
         return x
