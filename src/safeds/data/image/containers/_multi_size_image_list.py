@@ -384,10 +384,10 @@ class _MultiSizeImageList(ImageList):
         if (width, height) not in self._image_list_dict:
             return self
         if len(self._image_list_dict) == 2:
-            image_list = self._image_list_dict[next(iter([key for key in list(self._image_list_dict.keys()) if key != (width, height)]))]._as_single_size_image_list()
-            image_list._tensor_positions_to_indices = torch.sort(torch.Tensor(image_list._tensor_positions_to_indices))[1].tolist()
-            image_list._indices_to_tensor_positions = image_list._calc_new_indices_to_tensor_positions()
-            return image_list
+            single_size_image_list = self._image_list_dict[next(iter([key for key in list(self._image_list_dict.keys()) if key != (width, height)]))]._as_single_size_image_list()
+            single_size_image_list._tensor_positions_to_indices = torch.sort(torch.Tensor(single_size_image_list._tensor_positions_to_indices))[1].tolist()
+            single_size_image_list._indices_to_tensor_positions = single_size_image_list._calc_new_indices_to_tensor_positions()
+            return single_size_image_list
 
         image_list = _MultiSizeImageList()
         for image_list_key, image_list_original in self._image_list_dict.items():
@@ -515,7 +515,7 @@ class _MultiSizeImageList(ImageList):
         return image_list
 
     def blur(self, radius: int) -> ImageList:
-        _check_blur_errors_and_warnings(radius, min(*self.widths, *self.heights), True)
+        _check_blur_errors_and_warnings(radius, min(*self.widths, *self.heights), plural=True)
         image_list = self._clone_without_image_dict()
         for image_list_key, image_list_original in self._image_list_dict.items():
             image_list._image_list_dict[image_list_key] = image_list_original.blur(radius)

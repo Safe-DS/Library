@@ -1,1 +1,1 @@
-"""Utilities for Images and ImageLists"""
+"""Utilities for Images and ImageLists."""

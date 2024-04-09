@@ -13,7 +13,7 @@ def _check_resize_errors(new_width: int, new_height: int) -> None:
         raise OutOfBoundsError(min(new_width, new_height), name="At least one of the new sizes new_width and new_height", lower_bound=ClosedBound(1))
 
 
-def _check_crop_errors_and_warnings(x: int, y: int, width: int, height: int, min_width: int, min_height: int, plural: True) -> None:
+def _check_crop_errors_and_warnings(x: int, y: int, width: int, height: int, min_width: int, min_height: int, plural: bool) -> None:
     if x < 0 or y < 0:
         raise OutOfBoundsError(min(x, y), name="At least one of the coordinates x and y", lower_bound=ClosedBound(0))
     if width <= 0 or height <= 0:

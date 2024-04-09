@@ -411,7 +411,7 @@ class Image:
         OutOfBoundsError
             If x or y are below 0 or if width or height are below 1
         """
-        _check_crop_errors_and_warnings(x, y, width, height, self.width, self.height, False)
+        _check_crop_errors_and_warnings(x, y, width, height, self.width, self.height, plural=False)
         return Image(func2.crop(self._image_tensor, y, x, height, width), device=self.device)
 
     def flip_vertically(self) -> Image:
@@ -465,7 +465,7 @@ class Image:
         OutOfBoundsError
             If factor is smaller than 0.
         """
-        _check_adjust_brightness_errors_and_warnings(factor, False)
+        _check_adjust_brightness_errors_and_warnings(factor, plural=False)
         if self.channel == 4:
             return Image(
                 torch.cat(
@@ -530,7 +530,7 @@ class Image:
         OutOfBoundsError
             If factor is smaller than 0.
         """
-        _check_adjust_contrast_errors_and_warnings(factor, False)
+        _check_adjust_contrast_errors_and_warnings(factor, plural=False)
         if self.channel == 4:
             return Image(
                 torch.cat(
@@ -568,7 +568,7 @@ class Image:
         OutOfBoundsError
             If factor is smaller than 0.
         """
-        _check_adjust_color_balance_errors_and_warnings(factor, self.channel, False)
+        _check_adjust_color_balance_errors_and_warnings(factor, self.channel, plural=False)
         return Image(
             self.convert_to_grayscale()._image_tensor * (1.0 - factor * 1.0) + self._image_tensor * (factor * 1.0),
             device=self.device,
@@ -596,7 +596,7 @@ class Image:
         OutOfBoundsError
             If radius is smaller than 0 or equal or greater than the smaller size of the image.
         """
-        _check_blur_errors_and_warnings(radius, min(self.width, self.height), False)
+        _check_blur_errors_and_warnings(radius, min(self.width, self.height), plural=False)
         return Image(func2.gaussian_blur(self._image_tensor, [radius * 2 + 1, radius * 2 + 1]), device=self.device)
 
     def sharpen(self, factor: float) -> Image:
@@ -623,7 +623,7 @@ class Image:
         OutOfBoundsError
             If factor is smaller than 0.
         """
-        _check_sharpen_errors_and_warnings(factor, False)
+        _check_sharpen_errors_and_warnings(factor, plural=False)
         if self.channel == 4:
             return Image(
                 torch.cat(

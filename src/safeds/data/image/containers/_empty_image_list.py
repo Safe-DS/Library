@@ -123,7 +123,7 @@ class _EmptyImageList(ImageList):
     def remove_image_by_index(self, index: int | list[int]) -> ImageList:
         raise IndexOutOfBoundsError(index)
 
-    def _remove_image_by_index_ignore_invalid(self, index: int | list[int]) -> ImageList:
+    def _remove_image_by_index_ignore_invalid(self, _index: int | list[int]) -> ImageList:
         _EmptyImageList._warn_empty_image_list()
         return _EmptyImageList()
 
@@ -151,7 +151,7 @@ class _EmptyImageList(ImageList):
 
     def crop(self, x: int, y: int, width: int, height: int) -> ImageList:
         _EmptyImageList._warn_empty_image_list()
-        _check_crop_errors_and_warnings(x, y, width, height, x + 1, y + 1, True)  # Disable x|y >= min_width|min_height check with min_width|min_height=x|y+1
+        _check_crop_errors_and_warnings(x, y, width, height, x + 1, y + 1, plural=True)  # Disable x|y >= min_width|min_height check with min_width|min_height=x|y+1
         return _EmptyImageList()
 
     def flip_vertically(self) -> ImageList:
@@ -164,7 +164,7 @@ class _EmptyImageList(ImageList):
 
     def adjust_brightness(self, factor: float) -> ImageList:
         _EmptyImageList._warn_empty_image_list()
-        _check_adjust_brightness_errors_and_warnings(factor, True)
+        _check_adjust_brightness_errors_and_warnings(factor, plural=True)
         return _EmptyImageList()
 
     def add_noise(self, standard_deviation: float) -> ImageList:
@@ -174,22 +174,22 @@ class _EmptyImageList(ImageList):
 
     def adjust_contrast(self, factor: float) -> ImageList:
         _EmptyImageList._warn_empty_image_list()
-        _check_adjust_contrast_errors_and_warnings(factor, True)
+        _check_adjust_contrast_errors_and_warnings(factor, plural=True)
         return _EmptyImageList()
 
     def adjust_color_balance(self, factor: float) -> ImageList:
         _EmptyImageList._warn_empty_image_list()
-        _check_adjust_color_balance_errors_and_warnings(factor, 0, True)  # Disable channel check with channel=0
+        _check_adjust_color_balance_errors_and_warnings(factor, 0, plural=True)  # Disable channel check with channel=0
         return _EmptyImageList()
 
     def blur(self, radius: int) -> ImageList:
         _EmptyImageList._warn_empty_image_list()
-        _check_blur_errors_and_warnings(radius, 1, True)
+        _check_blur_errors_and_warnings(radius, 1, plural=True)
         return _EmptyImageList()
 
     def sharpen(self, factor: float) -> ImageList:
         _EmptyImageList._warn_empty_image_list()
-        _check_sharpen_errors_and_warnings(factor, True)
+        _check_sharpen_errors_and_warnings(factor, plural=True)
         return _EmptyImageList()
 
     def invert_colors(self) -> ImageList:

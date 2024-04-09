@@ -581,7 +581,7 @@ class _SingleSizeImageList(ImageList):
             return func2.rgb_to_grayscale(tensor[:, 0:3], num_output_channels=3)
 
     def crop(self, x: int, y: int, width: int, height: int) -> ImageList:
-        _check_crop_errors_and_warnings(x, y, width, height, self.widths[0], self.heights[0], True)
+        _check_crop_errors_and_warnings(x, y, width, height, self.widths[0], self.heights[0], plural=True)
         image_list = self._clone_without_tensor()
         image_list._tensor = func2.crop(self._tensor, x, y, height, width)
         return image_list
@@ -597,7 +597,7 @@ class _SingleSizeImageList(ImageList):
         return image_list
 
     def adjust_brightness(self, factor: float) -> ImageList:
-        _check_adjust_brightness_errors_and_warnings(factor, True)
+        _check_adjust_brightness_errors_and_warnings(factor, plural=True)
         image_list = self._clone_without_tensor()
         if self.channel == 4:
             image_list._tensor = torch.cat(
@@ -615,7 +615,7 @@ class _SingleSizeImageList(ImageList):
         return image_list
 
     def adjust_contrast(self, factor: float) -> ImageList:
-        _check_adjust_contrast_errors_and_warnings(factor, True)
+        _check_adjust_contrast_errors_and_warnings(factor, plural=True)
         image_list = self._clone_without_tensor()
         if self.channel == 4:
             image_list._tensor = torch.cat(
@@ -627,7 +627,7 @@ class _SingleSizeImageList(ImageList):
         return image_list
 
     def adjust_color_balance(self, factor: float) -> ImageList:
-        _check_adjust_color_balance_errors_and_warnings(factor, self.channel, True)
+        _check_adjust_color_balance_errors_and_warnings(factor, self.channel, plural=True)
         image_list = self._clone_without_tensor()
         image_list._tensor = self.convert_to_grayscale()._as_single_size_image_list()._tensor * (
             1.0 - factor * 1.0
@@ -635,13 +635,13 @@ class _SingleSizeImageList(ImageList):
         return image_list
 
     def blur(self, radius: int) -> ImageList:
-        _check_blur_errors_and_warnings(radius, min(self.widths[0], self.heights[0]), True)
+        _check_blur_errors_and_warnings(radius, min(self.widths[0], self.heights[0]), plural=True)
         image_list = self._clone_without_tensor()
         image_list._tensor = func2.gaussian_blur(self._tensor, [radius * 2 + 1, radius * 2 + 1])
         return image_list
 
     def sharpen(self, factor: float) -> ImageList:
-        _check_sharpen_errors_and_warnings(factor, True)
+        _check_sharpen_errors_and_warnings(factor, plural=True)
         image_list = self._clone_without_tensor()
         if self.channel == 4:
             image_list._tensor = torch.cat(
