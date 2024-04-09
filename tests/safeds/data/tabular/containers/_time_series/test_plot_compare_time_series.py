@@ -52,7 +52,7 @@ def create_invalid_time_series_list() -> list[TimeSeries]:
     return [table1, table2]
 
 
-def test_legit_compare(snapshot_png: SnapshotAssertion) -> None:
+def test_legit_compare(snapshot_png_image: SnapshotAssertion) -> None:
     table = TimeSeries(
         {
             "time": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
@@ -64,7 +64,7 @@ def test_legit_compare(snapshot_png: SnapshotAssertion) -> None:
         feature_names=None,
     )
     plot = table.plot_compare_time_series(create_time_series_list())
-    assert plot == snapshot_png
+    assert plot == snapshot_png_image
 
 
 def test_should_raise_if_column_contains_non_numerical_values_x() -> None:
