@@ -4,9 +4,9 @@ import io
 import itertools
 
 import matplotlib.pyplot as plt
-import xxhash
 from statsmodels.tsa.arima.model import ARIMA
 
+from safeds._utils import _structural_hash
 from safeds.data.image.containers import Image
 from safeds.data.tabular.containers import Column, Table, TimeSeries
 from safeds.exceptions import (
@@ -30,11 +30,7 @@ class ArimaModelRegressor:
         hash:
             The hash value.
         """
-        return xxhash.xxh3_64(
-            self.__class__.__qualname__.encode("utf-8")
-            + (1 if self.is_fitted() else 0).to_bytes(1)
-            + (bytes((9, 9, 9)) if self._order is None else bytes(self._order)),
-        ).intdigest()
+        return _structural_hash(self.__class__.__qualname__, self.is_fitted(), self._order)
 
     def __init__(self) -> None:
         # Internal state
