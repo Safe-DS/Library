@@ -8,11 +8,11 @@ from typing import TYPE_CHECKING
 
 import torch
 import torch.nn.functional as func
-import xxhash
 from PIL.Image import open as pil_image_open
 from torch import Tensor
 
 from safeds._config import _get_device
+from safeds._utils import _structural_hash
 
 if TYPE_CHECKING:
     from torch.types import Device
@@ -119,7 +119,7 @@ class Image:
         hash : int
             The hash value.
         """
-        return xxhash.xxh3_64(self.width.to_bytes(8) + self.height.to_bytes(8) + self.channel.to_bytes(8)).intdigest()
+        return _structural_hash(self.width, self.height, self.channel)
 
     def __sizeof__(self) -> int:
         """
@@ -301,10 +301,12 @@ class Image:
         """
         if self.channel == 4:
             return Image(
-                torch.cat([
-                    func2.rgb_to_grayscale(self._image_tensor[0:3], num_output_channels=3),
-                    self._image_tensor[3].unsqueeze(dim=0),
-                ]),
+                torch.cat(
+                    [
+                        func2.rgb_to_grayscale(self._image_tensor[0:3], num_output_channels=3),
+                        self._image_tensor[3].unsqueeze(dim=0),
+                    ],
+                ),
                 device=self.device,
             )
         else:
@@ -391,10 +393,12 @@ class Image:
             )
         if self.channel == 4:
             return Image(
-                torch.cat([
-                    func2.adjust_brightness(self._image_tensor[0:3], factor * 1.0),
-                    self._image_tensor[3].unsqueeze(dim=0),
-                ]),
+                torch.cat(
+                    [
+                        func2.adjust_brightness(self._image_tensor[0:3], factor * 1.0),
+                        self._image_tensor[3].unsqueeze(dim=0),
+                    ],
+                ),
                 device=self.device,
             )
         else:
@@ -462,10 +466,12 @@ class Image:
             )
         if self.channel == 4:
             return Image(
-                torch.cat([
-                    func2.adjust_contrast(self._image_tensor[0:3], factor * 1.0),
-                    self._image_tensor[3].unsqueeze(dim=0),
-                ]),
+                torch.cat(
+                    [
+                        func2.adjust_contrast(self._image_tensor[0:3], factor * 1.0),
+                        self._image_tensor[3].unsqueeze(dim=0),
+                    ],
+                ),
                 device=self.device,
             )
         else:
@@ -562,10 +568,12 @@ class Image:
             )
         if self.channel == 4:
             return Image(
-                torch.cat([
-                    func2.adjust_sharpness(self._image_tensor[0:3], factor * 1.0),
-                    self._image_tensor[3].unsqueeze(dim=0),
-                ]),
+                torch.cat(
+                    [
+                        func2.adjust_sharpness(self._image_tensor[0:3], factor * 1.0),
+                        self._image_tensor[3].unsqueeze(dim=0),
+                    ],
+                ),
                 device=self.device,
             )
         else:

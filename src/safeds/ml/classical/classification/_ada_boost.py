@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING
 
 from sklearn.ensemble import AdaBoostClassifier as sk_AdaBoostClassifier
 
+from safeds._utils import _structural_hash
 from safeds.exceptions import ClosedBound, OpenBound, OutOfBoundsError
 from safeds.ml.classical._util_sklearn import fit, predict
 
@@ -35,6 +36,15 @@ class AdaBoostClassifier(Classifier):
     OutOfBoundsError
         If `maximum_number_of_learners` or `learning_rate` are less than or equal to 0.
     """
+
+    def __hash__(self) -> int:
+        return _structural_hash(
+            Classifier.__hash__(self),
+            self._target_name,
+            self._feature_names,
+            self._learning_rate,
+            self._maximum_number_of_learners,
+        )
 
     def __init__(
         self,

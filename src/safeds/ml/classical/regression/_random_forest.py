@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING
 
 from sklearn.ensemble import RandomForestRegressor as sk_RandomForestRegressor
 
+from safeds._utils import _structural_hash
 from safeds.exceptions import ClosedBound, OutOfBoundsError
 from safeds.ml.classical._util_sklearn import fit, predict
 
@@ -28,6 +29,9 @@ class RandomForestRegressor(Regressor):
     OutOfBoundsError
         If `number_of_trees` is less than 1.
     """
+
+    def __hash__(self) -> int:
+        return _structural_hash(Regressor.__hash__(self), self._target_name, self._feature_names, self._number_of_trees)
 
     def __init__(self, *, number_of_trees: int = 100) -> None:
         # Validation
