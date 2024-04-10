@@ -1,10 +1,12 @@
 from __future__ import annotations
 
+import sys
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
 from sklearn.svm import SVC as sk_SVC  # noqa: N811
 
+from safeds._utils import _structural_hash
 from safeds.exceptions import ClosedBound, OpenBound, OutOfBoundsError
 from safeds.ml.classical._util_sklearn import fit, predict
 from safeds.ml.classical.classification import Classifier
@@ -29,6 +31,33 @@ class SupportVectorMachineKernel(ABC):
         The kernel of the SupportVectorMachine.
         """
 
+    @abstractmethod
+    def __eq__(self, other: object) -> bool:
+        """
+        Compare two kernels.
+
+        Parameters
+        ----------
+        other:
+            other object to compare to
+
+        Returns
+        -------
+        equals:
+            Whether the two kernels are equal
+        """
+
+    def __hash__(self) -> int:
+        """
+        Return a deterministic hash value for this kernel.
+
+        Returns
+        -------
+        hash : int
+            The hash value.
+        """
+        return _structural_hash(self.__class__.__qualname__)
+
 
 class SupportVectorMachineClassifier(Classifier):
     """
@@ -46,6 +75,9 @@ class SupportVectorMachineClassifier(Classifier):
     OutOfBoundsError
         If `c` is less than or equal to 0.
     """
+
+    def __hash__(self) -> int:
+        return _structural_hash(Classifier.__hash__(self), self._target_name, self._feature_names, self._c, self.kernel)
 
     def __init__(self, *, c: float = 1.0, kernel: SupportVectorMachineKernel | None = None) -> None:
         # Internal state
@@ -96,6 +128,13 @@ class SupportVectorMachineClassifier(Classifier):
                 """
                 return "linear"
 
+            def __eq__(self, other: object) -> bool:
+                if not isinstance(other, SupportVectorMachineClassifier.Kernel.Linear):
+                    return NotImplemented
+                return True
+
+            __hash__ = SupportVectorMachineKernel.__hash__
+
         class Polynomial(SupportVectorMachineKernel):
             def __init__(self, degree: int):
                 if degree < 1:
@@ -113,6 +152,24 @@ class SupportVectorMachineClassifier(Classifier):
                 """
                 return "poly"
 
+            def __eq__(self, other: object) -> bool:
+                if not isinstance(other, SupportVectorMachineClassifier.Kernel.Polynomial):
+                    return NotImplemented
+                return self._degree == other._degree
+
+            def __hash__(self) -> int:
+                return _structural_hash(SupportVectorMachineKernel.__hash__(self), self._degree)
+
+            def __sizeof__(self) -> int:
+                """
+                Return the complete size of this object.
+
+                Returns
+                -------
+                Size of this object in bytes.
+                """
+                return sys.getsizeof(self._degree)
+
         class Sigmoid(SupportVectorMachineKernel):
             def _get_sklearn_kernel(self) -> str:
                 """
@@ -125,6 +182,13 @@ class SupportVectorMachineClassifier(Classifier):
                 """
                 return "sigmoid"
 
+            def __eq__(self, other: object) -> bool:
+                if not isinstance(other, SupportVectorMachineClassifier.Kernel.Sigmoid):
+                    return NotImplemented
+                return True
+
+            __hash__ = SupportVectorMachineKernel.__hash__
+
         class RadialBasisFunction(SupportVectorMachineKernel):
             def _get_sklearn_kernel(self) -> str:
                 """
@@ -136,6 +200,13 @@ class SupportVectorMachineClassifier(Classifier):
                     The name of the RBF kernel.
                 """
                 return "rbf"
+
+            def __eq__(self, other: object) -> bool:
+                if not isinstance(other, SupportVectorMachineClassifier.Kernel.RadialBasisFunction):
+                    return NotImplemented
+                return True
+
+            __hash__ = SupportVectorMachineKernel.__hash__
 
     def _get_kernel_name(self) -> str:
         """

@@ -7,12 +7,12 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 import torch
-import xxhash
 from PIL.Image import open as pil_image_open
 from torch import Tensor
 from torchvision.transforms import InterpolationMode
 
 from safeds._config import _get_device
+from safeds._utils import _structural_hash
 from safeds.data.image.utils._image_transformation_error_and_warning_checks import (
     _check_add_noise_errors,
     _check_adjust_brightness_errors_and_warnings,
@@ -135,7 +135,7 @@ class Image:
         hash : int
             The hash value.
         """
-        return xxhash.xxh3_64(self.width.to_bytes(8) + self.height.to_bytes(8) + self.channel.to_bytes(8)).intdigest()
+        return _structural_hash(self.width, self.height, self.channel)
 
     def __sizeof__(self) -> int:
         """

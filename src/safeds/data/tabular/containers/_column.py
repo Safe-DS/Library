@@ -10,8 +10,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import seaborn as sns
-import xxhash
 
+from safeds._utils import _structural_hash
 from safeds.data.image.containers import Image
 from safeds.data.tabular.typing import ColumnType
 from safeds.exceptions import (
@@ -201,7 +201,7 @@ class Column(Sequence[T]):
         hash : int
             The hash value.
         """
-        return xxhash.xxh3_64(self.name.encode("utf-8") + self.type.__repr__().encode("utf-8") + self.number_of_rows.to_bytes(8)).intdigest()
+        return _structural_hash(self.name, self.type.__repr__(), self.number_of_rows)
 
     def __iter__(self) -> Iterator[T]:
         r"""
