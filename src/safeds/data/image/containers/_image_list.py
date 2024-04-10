@@ -396,7 +396,7 @@ class ImageList(metaclass=ABCMeta):
         Parameters
         ----------
         path:
-            Either the path to a directory or a list of directories which has directories for either all different sizes or all different images
+            Either the path to a directory or a list of directories which has directories for either all different sizes or all different images. Any non-existant path will be created
 
         Raises
         ------
