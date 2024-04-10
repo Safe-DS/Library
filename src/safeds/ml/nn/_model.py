@@ -147,7 +147,7 @@ class NeuralNetworkClassifier:
         self._batch_size = 1
         self._is_fitted = False
         self._is_multi_class = layers[-1].output_size > 1
-        self._feature_names = None
+        self._feature_names: None | list[str] = None
 
     def fit(
         self,
@@ -267,7 +267,7 @@ class NeuralNetworkClassifier:
         """
         if not self._is_fitted:
             raise ModelNotFittedError
-        if not (test_data.column_names.sort()).__eq__(self._feature_names.sort()):
+        if not (test_data.column_names.sort()).__eq__(self._feature_names.sort() if self._feature_names is not None else None):
             raise TestTrainDataMismatchError
         dataloader = test_data._into_dataloader(self._batch_size)
         predictions = []
