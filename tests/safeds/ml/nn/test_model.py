@@ -87,7 +87,7 @@ class TestClassificationModel:
         )
         assert model.is_fitted
 
-    def test_should_raise_if__test_and_train_data_mismatch(self) -> None:
+    def test_should_raise_if_test_and_train_data_mismatch(self) -> None:
         model = NeuralNetworkClassifier([FNNLayer(input_size=1, output_size=1), FNNLayer(output_size=3)])
         model = model.fit(
             Table.from_dict({"a": [1, 0, 2], "b": [0, 15, 5]}).tag_columns("a"),
