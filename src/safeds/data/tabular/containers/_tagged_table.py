@@ -190,7 +190,7 @@ class TaggedTable(Table):
 
         Returns
         -------
-        hash : int
+        hash:
             The hash value.
         """
         return _structural_hash(self.target, self.features, Table.__hash__(self))
@@ -201,7 +201,8 @@ class TaggedTable(Table):
 
         Returns
         -------
-        Size of this object in bytes.
+        size:
+            Size of this object in bytes.
         """
         return Table.__sizeof__(self) + sys.getsizeof(self._features) + sys.getsizeof(self._target)
 

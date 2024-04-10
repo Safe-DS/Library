@@ -318,7 +318,7 @@ class _SingleSizeImageList(ImageList):
 
         Raises
         ------
-        ValueError:
+        ValueError
             if the given channel is not a valid channel option
         """
         if tensor.size(dim=-3) == channel:

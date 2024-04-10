@@ -198,7 +198,7 @@ class Column(Sequence[T]):
 
         Returns
         -------
-        hash : int
+        hash:
             The hash value.
         """
         return _structural_hash(self.name, self.type.__repr__(), self.number_of_rows)
@@ -266,7 +266,8 @@ class Column(Sequence[T]):
 
         Returns
         -------
-        Size of this object in bytes.
+        size:
+            Size of this object in bytes.
         """
         return sys.getsizeof(self._data) + sys.getsizeof(self._name) + sys.getsizeof(self._type)
 

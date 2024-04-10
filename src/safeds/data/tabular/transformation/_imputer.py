@@ -66,7 +66,8 @@ class Imputer(TableTransformer):
 
                 Returns
                 -------
-                Size of this object in bytes.
+                size:
+                    Size of this object in bytes.
                 """
                 return sys.getsizeof(self._value)
 

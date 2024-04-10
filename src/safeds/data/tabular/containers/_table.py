@@ -466,7 +466,7 @@ class Table:
 
         Returns
         -------
-        hash : int
+        hash:
             The hash value.
         """
         return _structural_hash(self._schema, self.number_of_rows)
@@ -496,7 +496,8 @@ class Table:
 
         Returns
         -------
-        Size of this object in bytes.
+        size:
+            Size of this object in bytes.
         """
         return sys.getsizeof(self._data) + sys.getsizeof(self._schema)
 

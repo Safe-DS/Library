@@ -18,7 +18,7 @@ class TableTransformer(ABC):
 
         Returns
         -------
-        hash : int
+        hash:
             The hash value.
         """
         added = self.get_names_of_added_columns() if self.is_fitted() else []

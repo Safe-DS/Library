@@ -180,7 +180,7 @@ class ImageList(metaclass=ABCMeta):
 
         Returns
         -------
-        hash : int
+        hash:
             The hash value.
         """
 
@@ -478,7 +478,7 @@ class ImageList(metaclass=ABCMeta):
 
         Parameters
         ----------
-        channel
+        channel:
             The new number of channels. 1 will result in grayscale images
 
         Returns
@@ -501,7 +501,7 @@ class ImageList(metaclass=ABCMeta):
 
         Parameters
         ----------
-        image_tensor
+        image_tensor:
             The new tensor to be added to the image list
 
         Returns
@@ -518,7 +518,7 @@ class ImageList(metaclass=ABCMeta):
 
         Parameters
         ----------
-        image
+        image:
             The image to be added to the image list
 
         Returns
@@ -537,7 +537,7 @@ class ImageList(metaclass=ABCMeta):
 
         Parameters
         ----------
-        images
+        images:
             The images to be added to the image list
 
         Returns
@@ -556,7 +556,7 @@ class ImageList(metaclass=ABCMeta):
 
         Parameters
         ----------
-        image
+        image:
             The image to be removed from the image list
 
         Returns
@@ -576,7 +576,7 @@ class ImageList(metaclass=ABCMeta):
 
         Parameters
         ----------
-        images
+        images:
             The images to be removed from the image list
 
         Returns
@@ -641,9 +641,9 @@ class ImageList(metaclass=ABCMeta):
 
         Parameters
         ----------
-        width
+        width:
             The width of the images to be removed from the image list
-        height
+        height:
             The height of the images to be removed from the image list
 
         Returns
@@ -701,7 +701,7 @@ class ImageList(metaclass=ABCMeta):
 
         Returns
         -------
-        image_list
+        image_list:
             The image list with all images resized to the given width and height.
 
         Raises
@@ -719,7 +719,7 @@ class ImageList(metaclass=ABCMeta):
 
         Returns
         -------
-        image_list
+        image_list:
             The image list with all images converted to grayscale.
         """
 
@@ -787,7 +787,7 @@ class ImageList(metaclass=ABCMeta):
 
         Parameters
         ----------
-        factor: float
+        factor:
             The brightness factor.
             1.0 will not change the brightness.
             Below 1.0 will result in a darker images.
@@ -814,7 +814,7 @@ class ImageList(metaclass=ABCMeta):
 
         Parameters
         ----------
-        standard_deviation : float
+        standard_deviation:
             The standard deviation of the normal distribution. Has to be bigger than or equal to 0.
 
         Returns
@@ -837,7 +837,7 @@ class ImageList(metaclass=ABCMeta):
 
         Parameters
         ----------
-        factor: float
+        factor:
             If factor > 1, increase contrast of images.
             If factor = 1, no changes will be made.
             If factor < 1, make images greyer.
@@ -863,7 +863,7 @@ class ImageList(metaclass=ABCMeta):
 
         Parameters
         ----------
-        factor: float
+        factor:
             Has to be bigger than or equal to 0.
             If 0 <= factor < 1, make images greyer.
             If factor = 1, no changes will be made.
@@ -889,7 +889,7 @@ class ImageList(metaclass=ABCMeta):
 
         Parameters
         ----------
-        radius : int
+        radius:
              Radius is directly proportional to the blur value. The radius is equal to the amount of pixels united in
              each direction. A radius of 1 will result in a united box of 9 pixels.
 
@@ -913,7 +913,7 @@ class ImageList(metaclass=ABCMeta):
 
         Parameters
         ----------
-        factor : float
+        factor:
             If factor > 1, increase the sharpness of the images.
             If factor = 1, no changes will be made.
             If factor < 1, blur the images.
