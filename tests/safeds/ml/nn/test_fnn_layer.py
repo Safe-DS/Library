@@ -19,6 +19,18 @@ def test_should_raise_if_input_size_out_of_bounds(input_size: int) -> None:
 
 
 @pytest.mark.parametrize(
+    "input_size",
+    [
+        1,
+        20,
+    ],
+    ids=["one", "twenty"],
+)
+def test_should_raise_if_input_size_doesnt_match(input_size: int) -> None:
+    assert FNNLayer(output_size=1, input_size=input_size).input_size == input_size
+
+
+@pytest.mark.parametrize(
     "activation_function",
     [
         "unknown_string",

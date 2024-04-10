@@ -12,7 +12,8 @@ from safeds.ml.nn._fnn_layer import Layer
 
 class NeuralNetworkRegressor:
     def __init__(self, layers: list[Layer]):
-        self._model = _PytorchModel(layers, is_for_classification=False)
+        self._model = _InternalModel(layers, is_for_classification=False)
+        self._input_size = self._model.input_size
         self._batch_size = 1
         self._is_fitted = False
         self._feature_names: None | list[str] = None
@@ -147,7 +148,8 @@ class NeuralNetworkRegressor:
 
 class NeuralNetworkClassifier:
     def __init__(self, layers: list[Layer]):
-        self._model = _PytorchModel(layers, is_for_classification=True)
+        self._model = _InternalModel(layers, is_for_classification=True)
+        self._input_size = self._model.input_size
         self._batch_size = 1
         self._is_fitted = False
         self._is_multi_class = layers[-1].output_size > 1
@@ -312,7 +314,7 @@ class NeuralNetworkClassifier:
         return self._is_fitted
 
 
-class _PytorchModel(nn.Module):
+class _InternalModel(nn.Module):
     def __init__(self, layers: list[Layer], is_for_classification: bool) -> None:
         super().__init__()
         self._layer_list = layers
@@ -332,6 +334,10 @@ class _PytorchModel(nn.Module):
             else:
                 internal_layers.append(layers[-1]._get_internal_layer(activation_function="sigmoid"))
         self._pytorch_layers = nn.Sequential(*internal_layers)
+
+    @property
+    def input_size(self) -> int:
+        return self._layer_list[0].input_size
 
     def forward(self, x: Tensor) -> Tensor:
         for layer in self._pytorch_layers:

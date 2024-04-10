@@ -34,6 +34,11 @@ class Layer(ABC):
 
     @property
     @abstractmethod
+    def input_size(self) -> int:
+        pass  # pragma: no cover
+
+    @property
+    @abstractmethod
     def output_size(self) -> int:
         pass  # pragma: no cover
 
@@ -69,6 +74,18 @@ class FNNLayer(Layer):
 
     def _get_internal_layer(self, activation_function: str) -> _InternalLayer:
         return _InternalLayer(self._input_size, self._output_size, activation_function)
+
+    @property
+    def input_size(self) -> int:
+        """
+        Get the input_size of this layer.
+
+        Returns
+        -------
+        result :
+            The amount of values being passed into this layer.
+        """
+        return self._input_size
 
     @property
     def output_size(self) -> int:
