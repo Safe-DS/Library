@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import sys
 import warnings
 from typing import Any
 
@@ -47,8 +48,27 @@ class Imputer(TableTransformer):
                 The given value to impute missing values.
             """
 
+            def __eq__(self, other: object) -> bool:
+                if not isinstance(other, Imputer.Strategy.Constant):
+                    return NotImplemented
+                if self is other:
+                    return True
+                return self._value == other._value
+
+            __hash__ = ImputerStrategy.__hash__
+
             def __init__(self, value: Any):
                 self._value = value
+
+            def __sizeof__(self) -> int:
+                """
+                Return the complete size of this object.
+
+                Returns
+                -------
+                Size of this object in bytes.
+                """
+                return sys.getsizeof(self._value)
 
             def __str__(self) -> str:
                 return f"Constant({self._value})"
@@ -60,6 +80,13 @@ class Imputer(TableTransformer):
         class Mean(ImputerStrategy):
             """An imputation strategy for imputing missing data with mean values."""
 
+            def __eq__(self, other: object) -> bool:
+                if not isinstance(other, Imputer.Strategy.Mean):
+                    return NotImplemented
+                return True
+
+            __hash__ = ImputerStrategy.__hash__
+
             def __str__(self) -> str:
                 return "Mean"
 
@@ -69,6 +96,13 @@ class Imputer(TableTransformer):
         class Median(ImputerStrategy):
             """An imputation strategy for imputing missing data with median values."""
 
+            def __eq__(self, other: object) -> bool:
+                if not isinstance(other, Imputer.Strategy.Median):
+                    return NotImplemented
+                return True
+
+            __hash__ = ImputerStrategy.__hash__
+
             def __str__(self) -> str:
                 return "Median"
 
@@ -77,6 +111,13 @@ class Imputer(TableTransformer):
 
         class Mode(ImputerStrategy):
             """An imputation strategy for imputing missing data with mode values. The lowest value will be used if there are multiple values with the same highest count."""
+
+            def __eq__(self, other: object) -> bool:
+                if not isinstance(other, Imputer.Strategy.Mode):
+                    return NotImplemented
+                return True
+
+            __hash__ = ImputerStrategy.__hash__
 
             def __str__(self) -> str:
                 return "Mode"

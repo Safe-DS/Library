@@ -6,6 +6,7 @@ from warnings import warn
 
 from sklearn.linear_model import ElasticNet as sk_ElasticNet
 
+from safeds._utils import _structural_hash
 from safeds.exceptions import ClosedBound, OutOfBoundsError
 from safeds.ml.classical._util_sklearn import fit, predict
 
@@ -33,6 +34,15 @@ class ElasticNetRegressor(Regressor):
     OutOfBoundsError
         If `alpha` is negative or `lasso_ratio` is not between 0 and 1.
     """
+
+    def __hash__(self) -> int:
+        return _structural_hash(
+            Regressor.__hash__(self),
+            self._target_name,
+            self._feature_names,
+            self._alpha,
+            self._lasso_ratio,
+        )
 
     def __init__(self, *, alpha: float = 1.0, lasso_ratio: float = 0.5) -> None:
         # Validation

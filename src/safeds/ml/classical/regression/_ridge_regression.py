@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING
 
 from sklearn.linear_model import Ridge as sk_Ridge
 
+from safeds._utils import _structural_hash
 from safeds.exceptions import ClosedBound, OutOfBoundsError
 from safeds.ml.classical._util_sklearn import fit, predict
 
@@ -30,6 +31,9 @@ class RidgeRegressor(Regressor):
     OutOfBoundsError
         If `alpha` is negative.
     """
+
+    def __hash__(self) -> int:
+        return _structural_hash(Regressor.__hash__(self), self._target_name, self._feature_names, self._alpha)
 
     def __init__(self, *, alpha: float = 1.0) -> None:
         # Validation

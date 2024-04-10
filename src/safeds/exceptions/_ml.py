@@ -89,3 +89,15 @@ class UntaggedTableError(Exception):
                 " features and which are the target to predict.\nUse Table.tag_column() to create a tagged table."
             ),
         )
+
+
+class NonTimeSeriesError(Exception):
+    """Raised when a table is used instead of a TimeSeries in a regression or classification."""
+
+    def __init__(self) -> None:
+        super().__init__(
+            (
+                "This method needs a time series.\nA time series is a table that additionally knows which columns are"
+                " time and which are the target to predict.\n"
+            ),
+        )

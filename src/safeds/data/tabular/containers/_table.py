@@ -14,11 +14,11 @@ import openpyxl
 import pandas as pd
 import seaborn as sns
 import torch
-import xxhash
 from pandas import DataFrame
 from scipy import stats
 from torch.utils.data import DataLoader, Dataset
 
+from safeds._utils import _structural_hash
 from safeds.data.image.containers import Image
 from safeds.data.tabular.typing import ColumnType, Schema
 from safeds.exceptions import (
@@ -469,7 +469,7 @@ class Table:
         hash : int
             The hash value.
         """
-        return xxhash.xxh3_64(hash(self._schema).to_bytes(8) + self.number_of_rows.to_bytes(8)).intdigest()
+        return _structural_hash(self._schema, self.number_of_rows)
 
     def __repr__(self) -> str:
         r"""
@@ -1057,7 +1057,7 @@ class Table:
         2  5  6
         """
         if isinstance(rows, Table):
-            if rows.number_of_rows == 0:
+            if rows.number_of_columns == 0:
                 return self
             if self.number_of_columns == 0:
                 return rows
@@ -1069,6 +1069,10 @@ class Table:
                         key={val: ix for ix, val in enumerate(self.column_names)}.__getitem__,
                     ),
                 )
+            if rows.number_of_rows == 0:
+                return self
+            if self.number_of_rows == 0:
+                return rows
 
             new_df = pd.concat([self._data, rows._data]).infer_objects()
             new_df.columns = self.column_names

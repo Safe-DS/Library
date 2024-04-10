@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING
 
 from sklearn.ensemble import GradientBoostingClassifier as sk_GradientBoostingClassifier
 
+from safeds._utils import _structural_hash
 from safeds.exceptions import ClosedBound, OpenBound, OutOfBoundsError
 from safeds.ml.classical._util_sklearn import fit, predict
 
@@ -33,6 +34,15 @@ class GradientBoostingClassifier(Classifier):
     OutOfBoundsError
         If `number_of_trees` or `learning_rate` is less than or equal to 0.
     """
+
+    def __hash__(self) -> int:
+        return _structural_hash(
+            Classifier.__hash__(self),
+            self._target_name,
+            self._feature_names,
+            self._learning_rate,
+            self._number_of_trees,
+        )
 
     def __init__(self, *, number_of_trees: int = 100, learning_rate: float = 0.1) -> None:
         # Validation
