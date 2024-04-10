@@ -900,7 +900,9 @@ class TaggedTable(Table):
                 new_item.append(row.get_value(column_name))
             all_rows.append(new_item.copy())
         return DataLoader(
-            dataset=_CustomDataset(np.array(all_rows), np.array(self.target)), batch_size=batch_size, shuffle=True,
+            dataset=_CustomDataset(np.array(all_rows), np.array(self.target)),
+            batch_size=batch_size,
+            shuffle=True,
         )
 
 
