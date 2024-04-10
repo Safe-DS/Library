@@ -7,11 +7,11 @@ from torch import Tensor, nn
 
 from safeds.data.tabular.containers import Column, Table, TaggedTable
 from safeds.exceptions import ClosedBound, ModelNotFittedError, OutOfBoundsError, TestTrainDataMismatchError
-from safeds.ml.nn._fnn_layer import FNNLayer, Layer
+from safeds.ml.nn._fnn_layer import Layer
 
 
 class NeuralNetworkRegressor:
-    def __init__(self, layers: list[Layer | FNNLayer]):
+    def __init__(self, layers: list[Layer]):
         self._model = _PytorchModel(layers, is_for_classification=False)
         self._batch_size = 1
         self._is_fitted = False
@@ -142,7 +142,7 @@ class NeuralNetworkRegressor:
 
 
 class NeuralNetworkClassifier:
-    def __init__(self, layers: list[Layer | FNNLayer]):
+    def __init__(self, layers: list[Layer]):
         self._model = _PytorchModel(layers, is_for_classification=True)
         self._batch_size = 1
         self._is_fitted = False
@@ -267,7 +267,7 @@ class NeuralNetworkClassifier:
         """
         if not self._is_fitted:
             raise ModelNotFittedError
-        if not sorted(test_data.column_names).__eq__(sorted(self._feature_names)):
+        if not (test_data.column_names.sort()).__eq__(self._feature_names.sort()):
             raise TestTrainDataMismatchError
         dataloader = test_data._into_dataloader(self._batch_size)
         predictions = []
@@ -306,7 +306,7 @@ class NeuralNetworkClassifier:
 
 
 class _PytorchModel(nn.Module):
-    def __init__(self, layers: list[Layer | FNNLayer], is_for_classification: bool) -> None:
+    def __init__(self, layers: list[Layer], is_for_classification: bool) -> None:
         super().__init__()
         self._layer_list = layers
         internal_layers = []
