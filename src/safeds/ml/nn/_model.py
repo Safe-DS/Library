@@ -16,6 +16,9 @@ class NeuralNetworkRegressor:
         self._batch_size = 1
         self._is_fitted = False
         self._feature_names: None | list[str] = None
+        self._total_number_of_batches_done = 0
+        self._total_number_of_epochs_done = 0
+        self._loss_sum = 0.0
 
     def fit(
         self,
@@ -62,34 +65,33 @@ class NeuralNetworkRegressor:
         if batch_size < 1:
             raise OutOfBoundsError(actual=batch_size, name="batch_size", lower_bound=ClosedBound(1))
         self._feature_names = train_data.features.column_names
+        self._batch_size = batch_size
         copied_model = copy.deepcopy(self)
 
-        copied_model._batch_size = batch_size
         dataloader = train_data._into_dataloader(copied_model._batch_size)
 
         loss_fn = nn.MSELoss()
 
         optimizer = torch.optim.SGD(copied_model._model.parameters(), lr=learning_rate)
-        loss_sum = 0.0
-        number_of_batches_done = 0
-        for epoch in range(epoch_size):
+        for _ in range(epoch_size):
             for x, y in iter(dataloader):
                 optimizer.zero_grad()
 
                 pred = copied_model._model(x)
 
                 loss = loss_fn(pred, y)
-                loss_sum += loss.item()
+                self._loss_sum += loss.item()
                 loss.backward()
                 optimizer.step()
-                number_of_batches_done += 1
+                self._total_number_of_batches_done += 1
                 if callback_on_batch_completion is not None:
                     callback_on_batch_completion(
-                        number_of_batches_done,
-                        loss_sum / (number_of_batches_done * batch_size),
+                        self._total_number_of_batches_done,
+                        self._loss_sum / (self._total_number_of_batches_done * batch_size),
                     )
+            self._total_number_of_epochs_done += 1
             if callback_on_epoch_completion is not None:
-                callback_on_epoch_completion(epoch + 1, loss_sum / (number_of_batches_done * batch_size))
+                callback_on_epoch_completion(self._total_number_of_epochs_done, self._loss_sum / (self._total_number_of_batches_done * batch_size))
         copied_model._is_fitted = True
         copied_model._model.eval()
         return copied_model
@@ -148,6 +150,9 @@ class NeuralNetworkClassifier:
         self._is_fitted = False
         self._is_multi_class = layers[-1].output_size > 1
         self._feature_names: None | list[str] = None
+        self._total_number_of_batches_done = 0
+        self._total_number_of_epochs_done = 0
+        self._loss_sum = 0.0
 
     def fit(
         self,
@@ -194,9 +199,9 @@ class NeuralNetworkClassifier:
         if batch_size < 1:
             raise OutOfBoundsError(actual=batch_size, name="batch_size", lower_bound=ClosedBound(1))
         self._feature_names = train_data.features.column_names
+        self._batch_size = batch_size
         copied_model = copy.deepcopy(self)
 
-        copied_model._batch_size = batch_size
         dataloader = train_data._into_dataloader(copied_model._batch_size)
 
         if self._is_multi_class:
@@ -205,9 +210,7 @@ class NeuralNetworkClassifier:
             loss_fn = nn.BCELoss()
 
         optimizer = torch.optim.SGD(copied_model._model.parameters(), lr=learning_rate)
-        loss_sum = 0.0
-        number_of_batches_done = 0
-        for epoch in range(epoch_size):
+        for _ in range(epoch_size):
             for x, y in iter(dataloader):
                 optimizer.zero_grad()
                 pred = copied_model._model(x)
@@ -229,17 +232,17 @@ class NeuralNetworkClassifier:
                     loss = loss_fn(pred, y_reshaped_as_tensor_to_fit_format_of_pred)
                 else:
                     loss = loss_fn(pred, y)
-                loss_sum += loss.item()
+                self._loss_sum += loss.item()
                 loss.backward()
                 optimizer.step()
-                number_of_batches_done += 1
+                self._total_number_of_batches_done += 1
                 if callback_on_batch_completion is not None:
                     callback_on_batch_completion(
-                        number_of_batches_done,
-                        loss_sum / (number_of_batches_done * batch_size),
+                        self._total_number_of_batches_done,
+                        self._loss_sum / (self._total_number_of_batches_done * batch_size),
                     )
             if callback_on_epoch_completion is not None:
-                callback_on_epoch_completion(epoch + 1, loss_sum / (number_of_batches_done * batch_size))
+                callback_on_epoch_completion(self._total_number_of_epochs_done + 1, self._loss_sum / (self._total_number_of_batches_done * batch_size))
         copied_model._is_fitted = True
         copied_model._model.eval()
         return copied_model
