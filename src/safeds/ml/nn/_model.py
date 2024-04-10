@@ -135,7 +135,7 @@ class NeuralNetworkRegressor:
 
 
 class NeuralNetworkClassifier:
-    def __init__(self, layers: list[FNNLayer]):
+    def __init__(self, layers: list):
         self._model = _PytorchModel(layers, is_for_classification=True)
         self._batch_size = 1
         self._is_fitted = False

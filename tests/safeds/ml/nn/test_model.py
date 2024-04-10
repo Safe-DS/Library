@@ -118,7 +118,7 @@ class TestClassificationModel:
 
     def test_should_raise_if_predict_function_returns_wrong_datatype_for_multiclass_classification_lstm(self) -> None:
         fitted_model = NeuralNetworkClassifier(
-            [LSTMLayer(input_size=1, output_size=8), FNNLayer(output_size=3)],
+            [LSTMLayer(input_size=1, output_size=8), LSTMLayer(output_size=3)],
         ).fit(
             Table.from_dict({"a": [0, 1, 2], "b": [0, 15, 51]}).tag_columns("a"),
         )
