@@ -1,7 +1,7 @@
 import pytest
 from safeds.data.tabular.containers import Table, TaggedTable
 from safeds.exceptions import ModelNotFittedError, OutOfBoundsError
-from safeds.ml.nn import LSTMLayer, FNNLayer, NeuralNetworkClassifier, NeuralNetworkRegressor
+from safeds.ml.nn import FNNLayer, LSTMLayer, NeuralNetworkClassifier, NeuralNetworkRegressor
 
 
 class TestClassificationModel:
