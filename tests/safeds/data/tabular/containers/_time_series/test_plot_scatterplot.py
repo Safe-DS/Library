@@ -4,7 +4,7 @@ from safeds.exceptions import NonNumericColumnError, UnknownColumnNameError
 from syrupy import SnapshotAssertion
 
 
-def test_should_return_table(snapshot_png: SnapshotAssertion) -> None:
+def test_should_return_table(snapshot_png_image: SnapshotAssertion) -> None:
     table = TimeSeries(
         {
             "time": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
@@ -16,10 +16,10 @@ def test_should_return_table(snapshot_png: SnapshotAssertion) -> None:
         feature_names=None,
     )
     plot = table.plot_scatterplot()
-    assert plot == snapshot_png
+    assert plot == snapshot_png_image
 
 
-def test_should_plot_feature(snapshot_png: SnapshotAssertion) -> None:
+def test_should_plot_feature(snapshot_png_image: SnapshotAssertion) -> None:
     table = TimeSeries(
         {
             "time": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
@@ -31,10 +31,10 @@ def test_should_plot_feature(snapshot_png: SnapshotAssertion) -> None:
         feature_names=None,
     )
     plot = table.plot_scatterplot(y_column_name="feature_1")
-    assert plot == snapshot_png
+    assert plot == snapshot_png_image
 
 
-def test_should_plot_feature_only_x(snapshot_png: SnapshotAssertion) -> None:
+def test_should_plot_feature_only_x(snapshot_png_image: SnapshotAssertion) -> None:
     table = TimeSeries(
         {
             "time": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
@@ -46,10 +46,10 @@ def test_should_plot_feature_only_x(snapshot_png: SnapshotAssertion) -> None:
         feature_names=None,
     )
     plot = table.plot_scatterplot(x_column_name="feature_1")
-    assert plot == snapshot_png
+    assert plot == snapshot_png_image
 
 
-def test_should_plot_feature_only_y_optional(snapshot_png: SnapshotAssertion) -> None:
+def test_should_plot_feature_only_y_optional(snapshot_png_image: SnapshotAssertion) -> None:
     table = TimeSeries(
         {
             "time": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
@@ -61,10 +61,10 @@ def test_should_plot_feature_only_y_optional(snapshot_png: SnapshotAssertion) ->
         feature_names=None,
     )
     plot = table.plot_scatterplot(y_column_name="feature_1")
-    assert plot == snapshot_png
+    assert plot == snapshot_png_image
 
 
-def test_should_plot_feature_both_set(snapshot_png: SnapshotAssertion) -> None:
+def test_should_plot_feature_both_set(snapshot_png_image: SnapshotAssertion) -> None:
     table = TimeSeries(
         {
             "time": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
@@ -76,7 +76,7 @@ def test_should_plot_feature_both_set(snapshot_png: SnapshotAssertion) -> None:
         feature_names=None,
     )
     plot = table.plot_scatterplot(x_column_name="feature_1", y_column_name="target")
-    assert plot == snapshot_png
+    assert plot == snapshot_png_image
 
 
 def test_should_raise_if_column_contains_non_numerical_values() -> None:

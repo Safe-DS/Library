@@ -13,9 +13,9 @@ from syrupy import SnapshotAssertion
     ],
     ids=["one column", "four columns (some non-numeric)", "four columns (all numeric)"],
 )
-def test_should_match_snapshot(table: Table, snapshot_png: SnapshotAssertion) -> None:
+def test_should_match_snapshot(table: Table, snapshot_png_image: SnapshotAssertion) -> None:
     boxplots = table.plot_boxplots()
-    assert boxplots == snapshot_png
+    assert boxplots == snapshot_png_image
 
 
 def test_should_raise_if_column_contains_non_numerical_values() -> None:
