@@ -461,7 +461,7 @@ class TimeSeries(Table):
             time_name=self.time.name,
             target_name=self._target.name,
             feature_names=self._feature_names
-            + [col.name for col in (columns.to_columns() if isinstance(columns, Table) else columns)],
+                          + [col.name for col in (columns.to_columns() if isinstance(columns, Table) else columns)],
         )
 
     def add_columns(self, columns: list[Column] | Table) -> TimeSeries:
@@ -882,8 +882,8 @@ class TimeSeries(Table):
                     self._feature_names
                     if old_column_name not in self._feature_names
                     else self._feature_names[: self._feature_names.index(old_column_name)]
-                    + [col.name for col in new_columns]
-                    + self._feature_names[self._feature_names.index(old_column_name) + 1 :]
+                         + [col.name for col in new_columns]
+                         + self._feature_names[self._feature_names.index(old_column_name) + 1:]
                 ),
             )
 
@@ -927,7 +927,7 @@ class TimeSeries(Table):
     def sort_columns(
         self,
         comparator: Callable[[Column, Column], int] = lambda col1, col2: (col1.name > col2.name)
-        - (col1.name < col2.name),
+                                                                         - (col1.name < col2.name),
     ) -> TimeSeries:
         """
         Sort the columns of a `TimeSeries` with the given comparator and return a new `TimeSeries`.
@@ -1275,3 +1275,25 @@ class TimeSeries(Table):
         buffer.seek(0)
         self._data = self._data.reset_index()
         return Image.from_bytes(buffer.read())
+
+    def to_tagged_table(self, window_size) -> TaggedTable:
+        """
+        Converts the time series into a TaggedTable, also it windows the target column and added it as a feature to the
+        TaggedTable.
+
+        Returns
+        -------
+        tagged_table :
+            The Time Series as a TaggedTable
+
+        Raises
+        ------
+        ValueError
+            If the target column is also a feature column.
+        ValueError
+            If no feature columns are specified.
+
+        """
+        table = self._as_table()
+        col = self.target._data
+
