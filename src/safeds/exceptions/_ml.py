@@ -73,7 +73,16 @@ class TestTrainDataMismatchError(Exception):
 
     def __init__(self) -> None:
         super().__init__(
-            ("The column names in the test table do not match with the feature columns names of the training data."),
+            "The column names in the test table do not match with the feature columns names of the training data.",
+        )
+
+
+class InputSizeError(Exception):
+    """Raised when the amount of features being passed to a network does not match with its input size."""
+
+    def __init__(self, table_size: int, input_layer_size: int) -> None:
+        super().__init__(
+                f"The amount of columns being passed to the network({table_size}) does not match with its input size({input_layer_size}). Consider changing the number of neurons in the first layer or reformatting the table.",
         )
 
 

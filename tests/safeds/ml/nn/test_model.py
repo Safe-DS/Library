@@ -1,6 +1,6 @@
 import pytest
 from safeds.data.tabular.containers import Table, TaggedTable
-from safeds.exceptions import ModelNotFittedError, OutOfBoundsError, TestTrainDataMismatchError
+from safeds.exceptions import ModelNotFittedError, OutOfBoundsError, TestTrainDataMismatchError, InputSizeError
 from safeds.ml.nn import FNNLayer, NeuralNetworkClassifier, NeuralNetworkRegressor
 
 
@@ -98,6 +98,15 @@ class TestClassificationModel:
         ):
             model.predict(
                 Table.from_dict({"a": [1], "c": [2]}),
+            )
+
+    def test_should_raise_if_table_size_and_input_size_mismatch(self) -> None:
+        model = NeuralNetworkClassifier([FNNLayer(input_size=1, output_size=1), FNNLayer(output_size=3)])
+        with pytest.raises(
+            InputSizeError,
+        ):
+            model.fit(
+                Table.from_dict({"a": [1, 0, 2], "b": [0, 15, 5], "c": [3, 33, 333]}).tag_columns("a"),
             )
 
     def test_should_raise_if_fit_doesnt_batch_callback(self) -> None:
@@ -210,6 +219,15 @@ class TestRegressionModel:
         ):
             model.predict(
                 Table.from_dict({"a": [1], "c": [2]}),
+            )
+
+    def test_should_raise_if_table_size_and_input_size_mismatch(self) -> None:
+        model = NeuralNetworkRegressor([FNNLayer(input_size=1, output_size=1), FNNLayer(output_size=3)])
+        with pytest.raises(
+            InputSizeError,
+        ):
+            model.fit(
+                Table.from_dict({"a": [1, 0, 2], "b": [0, 15, 5], "c": [3, 33, 333]}).tag_columns("a"),
             )
 
     def test_should_raise_if_fit_doesnt_batch_callback(self) -> None:

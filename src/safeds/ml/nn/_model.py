@@ -6,7 +6,13 @@ import torch
 from torch import Tensor, nn
 
 from safeds.data.tabular.containers import Column, Table, TaggedTable
-from safeds.exceptions import ClosedBound, ModelNotFittedError, OutOfBoundsError, TestTrainDataMismatchError
+from safeds.exceptions import (
+    ClosedBound,
+    InputSizeError,
+    ModelNotFittedError,
+    OutOfBoundsError,
+    TestTrainDataMismatchError,
+)
 from safeds.ml.nn._fnn_layer import Layer
 
 
@@ -65,6 +71,8 @@ class NeuralNetworkRegressor:
             raise OutOfBoundsError(actual=epoch_size, name="epoch_size", lower_bound=ClosedBound(1))
         if batch_size < 1:
             raise OutOfBoundsError(actual=batch_size, name="batch_size", lower_bound=ClosedBound(1))
+        if train_data.features.number_of_columns is not self._input_size:
+            raise InputSizeError(train_data.features.number_of_columns, self._input_size)
         self._feature_names = train_data.features.column_names
         self._batch_size = batch_size
         copied_model = copy.deepcopy(self)
@@ -205,6 +213,8 @@ class NeuralNetworkClassifier:
             raise OutOfBoundsError(actual=epoch_size, name="epoch_size", lower_bound=ClosedBound(1))
         if batch_size < 1:
             raise OutOfBoundsError(actual=batch_size, name="batch_size", lower_bound=ClosedBound(1))
+        if train_data.features.number_of_columns is not self._input_size:
+            raise InputSizeError(train_data.features.number_of_columns, self._input_size)
         self._feature_names = train_data.features.column_names
         self._batch_size = batch_size
         copied_model = copy.deepcopy(self)
