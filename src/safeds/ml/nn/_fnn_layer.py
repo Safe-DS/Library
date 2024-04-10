@@ -41,6 +41,7 @@ class Layer(ABC):
     def _set_input_size(self, input_size: int) -> None:
         pass  # pragma: no cover
 
+
 class FNNLayer(Layer):
     def __init__(self, output_size: int, input_size: int | None = None):
         """
