@@ -58,7 +58,7 @@ class NeuralNetworkRegressor:
         if batch_size < 1:
             raise OutOfBoundsError(actual=batch_size, name="batch_size", lower_bound=ClosedBound(1))
         copied_model = copy.deepcopy(self)
-        #shouldnt the line below done by deepcopy?
+        # shouldnt the line below done by deepcopy?
         copied_model._batch_size = batch_size
         dataloader = train_data._into_dataloader(copied_model._batch_size)
 
