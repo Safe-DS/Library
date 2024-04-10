@@ -378,7 +378,7 @@ class ImageList(metaclass=ABCMeta):
         Parameters
         ----------
         path:
-            Either the path to a directory or a list of directories which has directories for either all different sizes or all different images
+            Either the path to a directory or a list of directories which has directories for either all different sizes or all different images. Any non-existant path will be created
 
         Raises
         ------
@@ -412,7 +412,7 @@ class ImageList(metaclass=ABCMeta):
         Parameters
         ----------
         indices:
-            a list of all indices to include in the output
+            a list of all indices to include in the output. If None, all indices will be included
 
         Returns
         -------
