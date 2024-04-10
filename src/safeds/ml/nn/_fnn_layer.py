@@ -33,7 +33,6 @@ class Layer(ABC):
         pass  # pragma: no cover
 
     @abstractmethod
-    @property
     def output_size(self) -> int:
         pass  # pragma: no cover
 
