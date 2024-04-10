@@ -146,7 +146,9 @@ class _SingleSizeImageList(ImageList):
         )
 
     def __hash__(self) -> int:
-        return _structural_hash(self.widths[0], self.heights[0], self.channel, self.number_of_images, self._tensor_positions_to_indices)
+        return _structural_hash(
+            self.widths[0], self.heights[0], self.channel, self.number_of_images, self._tensor_positions_to_indices,
+        )
 
     def __sizeof__(self) -> int:
         return (
