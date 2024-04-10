@@ -23,8 +23,6 @@ if TYPE_CHECKING:
 
     from safeds.data.image.containers import Image
 
-import xxhash
-
 from safeds.data.image.containers._image_list import ImageList
 from safeds.data.image.containers._single_size_image_list import _SingleSizeImageList
 from safeds.exceptions import IndexOutOfBoundsError
