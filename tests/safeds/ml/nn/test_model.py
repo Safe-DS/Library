@@ -92,11 +92,13 @@ class TestClassificationModel:
         model = model.fit(
             Table.from_dict({"a": [1, 0, 2], "b": [0, 15, 5]}).tag_columns("a"),
         )
-        with pytest.raises(TestTrainDataMismatchError, match="The column names in the test table do not match with the feature columns names of the training data."):
+        with pytest.raises(
+            TestTrainDataMismatchError,
+            match="The column names in the test table do not match with the feature columns names of the training data.",
+        ):
             model.predict(
                 Table.from_dict({"a": [1], "c": [2]}),
             )
-
 
     def test_should_raise_if_fit_doesnt_batch_callback(self) -> None:
         model = NeuralNetworkClassifier([FNNLayer(input_size=1, output_size=1)])
@@ -202,7 +204,10 @@ class TestRegressionModel:
         model = model.fit(
             Table.from_dict({"a": [1, 0, 2], "b": [0, 15, 5]}).tag_columns("a"),
         )
-        with pytest.raises(TestTrainDataMismatchError, match="The column names in the test table do not match with the feature columns names of the training data."):
+        with pytest.raises(
+            TestTrainDataMismatchError,
+            match="The column names in the test table do not match with the feature columns names of the training data.",
+        ):
             model.predict(
                 Table.from_dict({"a": [1], "c": [2]}),
             )

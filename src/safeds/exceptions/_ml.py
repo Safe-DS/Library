@@ -73,9 +73,7 @@ class TestTrainDataMismatchError(Exception):
 
     def __init__(self) -> None:
         super().__init__(
-            (
-                "The column names in the test table do not match with the feature columns names of the training data."
-            ),
+            ("The column names in the test table do not match with the feature columns names of the training data."),
         )
 
 

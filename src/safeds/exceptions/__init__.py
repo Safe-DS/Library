@@ -30,8 +30,8 @@ from safeds.exceptions._ml import (
     ModelNotFittedError,
     NonTimeSeriesError,
     PredictionError,
-    UntaggedTableError,
     TestTrainDataMismatchError,
+    UntaggedTableError,
 )
 
 __all__ = [
