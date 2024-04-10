@@ -7,12 +7,12 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 import torch
-import xxhash
 from PIL.Image import open as pil_image_open
 from torch import Tensor
 from torchvision.transforms import InterpolationMode
 
 from safeds._config import _get_device
+from safeds._utils import _structural_hash
 from safeds.data.image.utils._image_transformation_error_and_warning_checks import (
     _check_add_noise_errors,
     _check_adjust_brightness_errors_and_warnings,
@@ -40,7 +40,7 @@ class Image:
 
     Parameters
     ----------
-    image_tensor : Tensor
+    image_tensor:
         The image data as tensor.
     """
 
@@ -60,14 +60,14 @@ class Image:
 
         Parameters
         ----------
-        path : str | Path
+        path:
             The path to the image file.
-        device: Device
+        device:
             The device where the tensor will be saved on. Defaults to the default device
 
         Returns
         -------
-        image : Image
+        image:
             The image.
 
         Raises
@@ -84,14 +84,14 @@ class Image:
 
         Parameters
         ----------
-        data : bytes
+        data:
             The data of the image.
-        device: Device
+        device:
             The device where the tensor will be saved on. Defaults to the default device
 
         Returns
         -------
-        image : Image
+        image:
             The image.
         """
         with warnings.catch_warnings():
@@ -132,10 +132,10 @@ class Image:
 
         Returns
         -------
-        hash : int
+        hash:
             The hash value.
         """
-        return xxhash.xxh3_64(self.width.to_bytes(8) + self.height.to_bytes(8) + self.channel.to_bytes(8)).intdigest()
+        return _structural_hash(self.width, self.height, self.channel)
 
     def __sizeof__(self) -> int:
         """
@@ -156,7 +156,7 @@ class Image:
 
         Returns
         -------
-        jpeg : bytes
+        jpeg:
             The image as JPEG.
         """
         if self.channel == 4:
@@ -175,7 +175,7 @@ class Image:
 
         Returns
         -------
-        png : bytes
+        png:
             The image as PNG.
         """
         buffer = io.BytesIO()
@@ -192,7 +192,7 @@ class Image:
 
         Returns
         -------
-        result : Image
+        result:
             The image on the given device
         """
         return Image(self._image_tensor, device)
@@ -208,7 +208,7 @@ class Image:
 
         Returns
         -------
-        width : int
+        width:
             The width of the image.
         """
         return self._image_tensor.size(dim=2)
@@ -220,7 +220,7 @@ class Image:
 
         Returns
         -------
-        height : int
+        height:
             The height of the image.
         """
         return self._image_tensor.size(dim=1)
@@ -232,7 +232,7 @@ class Image:
 
         Returns
         -------
-        channel : int
+        channel:
             The number of channels of the image.
         """
         return self._image_tensor.size(dim=0)
@@ -244,7 +244,7 @@ class Image:
 
         Returns
         -------
-        device : Device
+        device:
             The device of the image
         """
         return self._image_tensor.device
@@ -259,7 +259,7 @@ class Image:
 
         Parameters
         ----------
-        path : str | Path
+        path:
             The path to the JPEG file.
         """
         if self.channel == 4:
@@ -276,7 +276,7 @@ class Image:
 
         Parameters
         ----------
-        path : str | Path
+        path:
             The path to the PNG file.
         """
         Path(path).parent.mkdir(parents=True, exist_ok=True)
@@ -297,17 +297,17 @@ class Image:
 
         Parameters
         ----------
-        channel
+        channel:
             The new number of channels. 1 will result in a grayscale image.
 
         Returns
         -------
-        result :
+        result:
             The image with the given number of channels.
 
         Raises
         ------
-        ValueError:
+        ValueError
             if the given channel is not a valid channel option
         """
         if self.channel == channel:
@@ -374,7 +374,7 @@ class Image:
 
         Returns
         -------
-        result : Image
+        result:
             The grayscale image.
         """
         if self.channel == 4:
@@ -428,7 +428,7 @@ class Image:
 
         Returns
         -------
-        result : Image
+        result:
             The flipped image.
         """
         return Image(func2.vertical_flip(self._image_tensor), device=self.device)
@@ -441,7 +441,7 @@ class Image:
 
         Returns
         -------
-        result : Image
+        result:
             The flipped image.
         """
         return Image(func2.horizontal_flip(self._image_tensor), device=self.device)
@@ -454,7 +454,7 @@ class Image:
 
         Parameters
         ----------
-        factor: float
+        factor:
             The brightness factor.
             1.0 will not change the brightness.
             Below 1.0 will result in a darker image.
@@ -463,7 +463,7 @@ class Image:
 
         Returns
         -------
-        result: Image
+        result:
             The Image with adjusted brightness.
 
         Raises
@@ -493,12 +493,12 @@ class Image:
 
         Parameters
         ----------
-        standard_deviation : float
+        standard_deviation:
             The standard deviation of the normal distribution. Has to be bigger than or equal to 0.
 
         Returns
         -------
-        result : Image
+        result:
             The image with added noise.
 
         Raises
@@ -520,7 +520,7 @@ class Image:
 
         Parameters
         ----------
-        factor: float
+        factor:
             If factor > 1, increase contrast of image.
             If factor = 1, no changes will be made.
             If factor < 1, make image greyer.
@@ -528,7 +528,7 @@ class Image:
 
         Returns
         -------
-        image: Image
+        image:
             New image with adjusted contrast.
 
         Raises
@@ -558,7 +558,7 @@ class Image:
 
         Parameters
         ----------
-        factor: float
+        factor:
             Has to be bigger than or equal to 0.
             If 0 <= factor < 1, make image greyer.
             If factor = 1, no changes will be made.
@@ -566,7 +566,7 @@ class Image:
 
         Returns
         -------
-        image: Image
+        image:
             The new, adjusted image.
 
         Raises
@@ -588,13 +588,13 @@ class Image:
 
         Parameters
         ----------
-        radius : int
+        radius:
              Radius is directly proportional to the blur value. The radius is equal to the amount of pixels united in
              each direction. A radius of 1 will result in a united box of 9 pixels.
 
         Returns
         -------
-        result : Image
+        result:
             The blurred image.
 
         Raises
@@ -613,7 +613,7 @@ class Image:
 
         Parameters
         ----------
-        factor : float
+        factor:
             If factor > 1, increase the sharpness of the image.
             If factor = 1, no changes will be made.
             If factor < 1, blur the image.
@@ -621,7 +621,7 @@ class Image:
 
         Returns
         -------
-        result : Image
+        result:
             The image sharpened by the given factor.
 
         Raises
@@ -651,7 +651,7 @@ class Image:
 
         Returns
         -------
-        result : Image
+        result:
             The image with inverted colors.
         """
         if self.channel == 4:
@@ -670,7 +670,7 @@ class Image:
 
         Returns
         -------
-        result : Image
+        result:
             The image rotated 90 degrees clockwise.
         """
         return Image(func2.rotate(self._image_tensor, -90, expand=True), device=self.device)
@@ -683,7 +683,7 @@ class Image:
 
         Returns
         -------
-        result : Image
+        result:
             The image rotated 90 degrees counter-clockwise.
         """
         return Image(func2.rotate(self._image_tensor, 90, expand=True), device=self.device)
@@ -696,7 +696,7 @@ class Image:
 
         Returns
         -------
-        result : Image
+        result:
             The image with edges found.
         """
         kernel = (

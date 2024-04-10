@@ -3,6 +3,7 @@ from __future__ import annotations
 import warnings
 from typing import TYPE_CHECKING, Self
 
+from safeds._utils import _structural_hash
 from safeds.data.image.utils._image_transformation_error_and_warning_checks import (
     _check_add_noise_errors,
     _check_adjust_brightness_errors_and_warnings,
@@ -21,8 +22,6 @@ if TYPE_CHECKING:
     from torch import Tensor
 
     from safeds.data.image.containers import Image
-
-import xxhash
 
 from safeds.data.image.containers._image_list import ImageList
 from safeds.data.image.containers._single_size_image_list import _SingleSizeImageList
@@ -72,7 +71,7 @@ class _EmptyImageList(ImageList):
         return isinstance(other, _EmptyImageList)
 
     def __hash__(self) -> int:
-        return xxhash.xxh3_64("_EmptyImageList").intdigest()
+        return _structural_hash("_EmptyImageList")
 
     def __sizeof__(self) -> int:
         return 0

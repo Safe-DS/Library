@@ -3,10 +3,10 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
-import xxhash
 from sklearn.metrics import mean_absolute_error as sk_mean_absolute_error
 from sklearn.metrics import mean_squared_error as sk_mean_squared_error
 
+from safeds._utils import _structural_hash
 from safeds.data.tabular.containers import Column, Table, TaggedTable
 from safeds.exceptions import ColumnLengthMismatchError, UntaggedTableError
 
@@ -23,10 +23,10 @@ class Regressor(ABC):
 
         Returns
         -------
-        hash : int
+        hash:
             The hash value.
         """
-        return xxhash.xxh3_64(self.__class__.__qualname__.encode("utf-8") + (1 if self.is_fitted() else 0).to_bytes(1)).intdigest()
+        return _structural_hash(self.__class__.__qualname__, self.is_fitted())
 
     @abstractmethod
     def fit(self, training_set: TaggedTable) -> Regressor:

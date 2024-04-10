@@ -1,20 +1,18 @@
 from __future__ import annotations
 
 import copy
-import functools
-import operator
 import random
 import sys
 from pathlib import Path
 from typing import TYPE_CHECKING
 
 import torch
-import xxhash
 from torch import Tensor
 from torchvision.transforms import InterpolationMode
 from torchvision.transforms.v2 import functional as func2
 from torchvision.utils import save_image
 
+from safeds._utils import _structural_hash
 from safeds.data.image.containers._image import Image
 from safeds.data.image.containers._image_list import ImageList
 from safeds.data.image.utils._image_transformation_error_and_warning_checks import (
@@ -148,19 +146,7 @@ class _SingleSizeImageList(ImageList):
         )
 
     def __hash__(self) -> int:
-        return xxhash.xxh3_64(
-            self.widths[0].to_bytes(8)
-            + self.heights[0].to_bytes(8)
-            + self.channel.to_bytes(8)
-            + self.number_of_images.to_bytes(8)
-            + functools.reduce(
-                operator.add,
-                [
-                    xxhash.xxh3_64(index.to_bytes(8)).intdigest().to_bytes(8)
-                    for index in sorted(self._tensor_positions_to_indices)
-                ],
-            ),
-        ).intdigest()
+        return _structural_hash(self.widths[0], self.heights[0], self.channel, self.number_of_images, self._tensor_positions_to_indices)
 
     def __sizeof__(self) -> int:
         return (
@@ -332,7 +318,7 @@ class _SingleSizeImageList(ImageList):
 
         Raises
         ------
-        ValueError:
+        ValueError
             if the given channel is not a valid channel option
         """
         if tensor.size(dim=-3) == channel:

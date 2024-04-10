@@ -1,16 +1,14 @@
 from __future__ import annotations
 
 import copy
-import functools
-import operator
 import random
 import sys
 from typing import TYPE_CHECKING
 
 import torch
-import xxhash
 from torch import Tensor
 
+from safeds._utils import _structural_hash
 from safeds.data.image.containers import Image, ImageList
 from safeds.data.image.utils._image_transformation_error_and_warning_checks import (
     _check_blur_errors_and_warnings,
@@ -120,12 +118,7 @@ class _MultiSizeImageList(ImageList):
         return True
 
     def __hash__(self) -> int:
-        return xxhash.xxh3_64(
-            functools.reduce(
-                operator.add,
-                [hash(self._image_list_dict[image_size]).to_bytes(8) for image_size in sorted(self._image_list_dict)],
-            ),
-        ).intdigest()
+        return _structural_hash([self._image_list_dict[image_size] for image_size in sorted(self._image_list_dict)])
 
     def __sizeof__(self) -> int:
         return (

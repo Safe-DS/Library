@@ -3,7 +3,7 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
-import xxhash
+from safeds._utils import _structural_hash
 
 if TYPE_CHECKING:
     from safeds.data.tabular.containers import Table
@@ -18,10 +18,13 @@ class TableTransformer(ABC):
 
         Returns
         -------
-        hash : int
+        hash:
             The hash value.
         """
-        return xxhash.xxh3_64(self.__class__.__qualname__.encode("utf-8") + (1 if self.is_fitted() else 0).to_bytes(1)).intdigest()
+        added = self.get_names_of_added_columns() if self.is_fitted() else []
+        changed = self.get_names_of_changed_columns() if self.is_fitted() else []
+        removed = self.get_names_of_removed_columns() if self.is_fitted() else []
+        return _structural_hash(self.__class__.__qualname__, self.is_fitted(), added, changed, removed)
 
     @abstractmethod
     def fit(self, table: Table, column_names: list[str] | None) -> TableTransformer:
