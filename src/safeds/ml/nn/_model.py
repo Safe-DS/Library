@@ -119,7 +119,9 @@ class NeuralNetworkRegressor:
         """
         if not self._is_fitted:
             raise ModelNotFittedError
-        if not (sorted(test_data.column_names)).__eq__(sorted(self._feature_names) if self._feature_names is not None else None):
+        if not (sorted(test_data.column_names)).__eq__(
+            sorted(self._feature_names) if self._feature_names is not None else None,
+        ):
             raise TestTrainDataMismatchError
         dataloader = test_data._into_dataloader(self._batch_size)
         predictions = []
@@ -270,7 +272,9 @@ class NeuralNetworkClassifier:
         """
         if not self._is_fitted:
             raise ModelNotFittedError
-        if not (sorted(test_data.column_names)).__eq__(sorted(self._feature_names) if self._feature_names is not None else None):
+        if not (sorted(test_data.column_names)).__eq__(
+            sorted(self._feature_names) if self._feature_names is not None else None,
+        ):
             raise TestTrainDataMismatchError
         dataloader = test_data._into_dataloader(self._batch_size)
         predictions = []
