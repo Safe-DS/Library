@@ -903,8 +903,6 @@ class TaggedTable(Table):
         return DataLoader(dataset=_CustomDataset(np.array(all_rows), np.array(self.target)), batch_size=batch_size)
 
 
-
-
 class _CustomDataset(Dataset):
     def __init__(self, features: np.array, target: np.array):
         self.X = torch.from_numpy(features.astype(np.float32))
