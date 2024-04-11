@@ -5,9 +5,9 @@ from typing import TYPE_CHECKING
 
 import numpy as np
 import torch
-import xxhash
 from torch.utils.data import DataLoader, Dataset
 
+from safeds._utils import _structural_hash
 from safeds.data.tabular.containers import Column, Row, Table
 from safeds.exceptions import (
     ColumnIsTargetError,
@@ -190,12 +190,10 @@ class TaggedTable(Table):
 
         Returns
         -------
-        hash : int
+        hash:
             The hash value.
         """
-        return xxhash.xxh3_64(
-            hash(self.target).to_bytes(8) + hash(self.features).to_bytes(8) + Table.__hash__(self).to_bytes(8),
-        ).intdigest()
+        return _structural_hash(self.target, self.features, Table.__hash__(self))
 
     def __sizeof__(self) -> int:
         """
@@ -203,7 +201,8 @@ class TaggedTable(Table):
 
         Returns
         -------
-        Size of this object in bytes.
+        size:
+            Size of this object in bytes.
         """
         return Table.__sizeof__(self) + sys.getsizeof(self._features) + sys.getsizeof(self._target)
 

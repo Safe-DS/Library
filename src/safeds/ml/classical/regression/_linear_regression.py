@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING
 
 from sklearn.linear_model import LinearRegression as sk_LinearRegression
 
+from safeds._utils import _structural_hash
 from safeds.ml.classical._util_sklearn import fit, predict
 
 from ._regressor import Regressor
@@ -16,6 +17,9 @@ if TYPE_CHECKING:
 
 class LinearRegressionRegressor(Regressor):
     """Linear regression."""
+
+    def __hash__(self) -> int:
+        return _structural_hash(Regressor.__hash__(self), self._target_name, self._feature_names)
 
     def __init__(self) -> None:
         # Internal state

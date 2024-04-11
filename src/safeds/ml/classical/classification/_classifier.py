@@ -3,9 +3,9 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
-import xxhash
 from sklearn.metrics import accuracy_score as sk_accuracy_score
 
+from safeds._utils import _structural_hash
 from safeds.data.tabular.containers import Table, TaggedTable
 from safeds.exceptions import UntaggedTableError
 
@@ -24,10 +24,10 @@ class Classifier(ABC):
 
         Returns
         -------
-        hash : int
+        hash:
             The hash value.
         """
-        return xxhash.xxh3_64(self.__class__.__qualname__.encode("utf-8") + (1 if self.is_fitted() else 0).to_bytes(1)).intdigest()
+        return _structural_hash(self.__class__.__qualname__, self.is_fitted())
 
     @abstractmethod
     def fit(self, training_set: TaggedTable) -> Classifier:
