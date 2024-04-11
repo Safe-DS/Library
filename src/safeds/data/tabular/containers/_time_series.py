@@ -8,11 +8,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import torch
+from torch.utils.data import DataLoader, Dataset
 import seaborn as sns
 import xxhash
 
-from torch.utils.data import DataLoader, Dataset
-from safeds._utils import _structural_hash
 from safeds.data.image.containers import Image
 from safeds.data.tabular.containers import Column, Row, Table, TaggedTable
 from safeds.exceptions import (
@@ -1279,3 +1278,55 @@ class TimeSeries(Table):
         buffer.seek(0)
         self._data = self._data.reset_index()
         return Image.from_bytes(buffer.read())
+    def _into_dataloader_with_window(self, window_size: int, forecast_len: int, batch_size: int) -> DataLoader:
+        """
+        Return a Dataloader for the data stored in this time series, used for training neural networks.
+        It splits the target column into windows uses them as feature and creates targets for the time series, by
+        forecastlength.
+        The original table is not modified.
+        Parameters
+        ----------
+        batch_size
+            The size of data batches that should be loaded at one time.
+        Returns
+        -------
+        result :
+            The DataLoader.
+        """
+        target_np = self.target._data.to_numpy()
+
+        x_s = []
+        y_s = []
+
+        l = len(target_np)
+        # create feature windows and for that features targets lagged by forecast len
+        # every feature column wird auch gewindowed
+        # -> [i, win_size],[target]
+        feature_cols = self.features.to_columns()
+        for i in range(l - (forecast_len + window_size)):
+            window = target_np[i:i + window_size]
+            label = target_np[i + window_size + forecast_len]
+            for col in feature_cols:
+                data = col._data.to_numpy()
+                window = np.concatenate((window, data[i:i + window_size]))
+            x_s.append(window)
+            y_s.append(label)
+        print(np.array(x_s).shape)
+        print(np.array(y_s).shape)
+        print(x_s)
+        print(y_s)
+
+        return DataLoader(dataset=_CustomDataset(np.array(x_s), np.array(y_s)), batch_size=batch_size)
+
+
+class _CustomDataset(Dataset):
+    def __init__(self, features: np.array, target: np.array):
+        self.X = torch.from_numpy(features.astype(np.float32))
+        self.Y = torch.from_numpy(target.astype(np.float32))
+        self.len = self.X.shape[0]
+
+    def __getitem__(self, item: int) -> tuple[torch.Tensor, torch.Tensor]:
+        return self.X[item], self.Y[item].unsqueeze(-1)
+
+    def __len__(self) -> int:
+        return self.len
