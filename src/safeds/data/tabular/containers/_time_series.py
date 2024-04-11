@@ -1311,10 +1311,6 @@ class TimeSeries(Table):
                 window = np.concatenate((window, data[i:i + window_size]))
             x_s.append(window)
             y_s.append(label)
-        print(np.array(x_s).shape)
-        print(np.array(y_s).shape)
-        print(x_s)
-        print(y_s)
 
         return DataLoader(dataset=_CustomDataset(np.array(x_s), np.array(y_s)), batch_size=batch_size)
 
