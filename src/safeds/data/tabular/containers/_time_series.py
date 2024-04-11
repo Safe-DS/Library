@@ -1281,9 +1281,10 @@ class TimeSeries(Table):
     def _into_dataloader_with_window(self, window_size: int, forecast_len: int, batch_size: int) -> DataLoader:
         """
         Return a Dataloader for the data stored in this time series, used for training neural networks.
+
         It splits the target column into windows uses them as feature and creates targets for the time series, by
-        forecastlength.
-        The original table is not modified.
+        forecast length. The original table is not modified.
+
         Parameters
         ----------
         batch_size
@@ -1298,12 +1299,12 @@ class TimeSeries(Table):
         x_s = []
         y_s = []
 
-        l = len(target_np)
+        size = len(target_np)
         # create feature windows and for that features targets lagged by forecast len
         # every feature column wird auch gewindowed
         # -> [i, win_size],[target]
         feature_cols = self.features.to_columns()
-        for i in range(l - (forecast_len + window_size)):
+        for i in range(size - (forecast_len + window_size)):
             window = target_np[i:i + window_size]
             label = target_np[i + window_size + forecast_len]
             for col in feature_cols:
