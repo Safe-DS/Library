@@ -26,5 +26,8 @@ def test_into_dataloader_wo_features() -> None:
             "target": [1, 3, 2, 1, 3, 2, 1, 3, 2, 1],
         },
         "target", "time")
-    dataset._into_dataloader_with_window(3, 2, 1)
+    dataloader = dataset._into_dataloader_with_window(3, 2, 1)
+    for (data,target) in dataloader:
+        data[0]
+    len(dataloader)
     assert True
