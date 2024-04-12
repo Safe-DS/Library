@@ -1,3 +1,8 @@
+---
+hide:
+  - navigation
+---
+
 # Safe-DS Python Library
 
 A user-friendly library for Data Science (DS) in Python.
