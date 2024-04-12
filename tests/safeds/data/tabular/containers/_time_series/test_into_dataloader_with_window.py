@@ -33,7 +33,7 @@ def test_into_dataloader_wo_features() -> None:
     )
     dataset._into_dataloader_with_window(3, 2, 1)
     dataloader = dataset._into_dataloader_with_window(3, 2, 1)
-    for (data,target) in dataloader:
+    for (data, _) in dataloader:
         data[0]
     len(dataloader)
     assert True
