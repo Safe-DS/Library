@@ -1,4 +1,3 @@
-import pytest
 from safeds.data.tabular.containers import TimeSeries
 
 
@@ -33,7 +32,7 @@ def test_into_dataloader_wo_features() -> None:
     )
     dataset._into_dataloader_with_window(3, 2, 1)
     dataloader = dataset._into_dataloader_with_window(3, 2, 1)
-    for (data, _) in dataloader:
+    for data, _ in dataloader:
         data[0]
     len(dataloader)
     assert True
