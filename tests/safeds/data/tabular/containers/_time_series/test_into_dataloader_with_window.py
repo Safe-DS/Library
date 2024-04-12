@@ -11,7 +11,10 @@ def test_into_dataloader() -> None:
             "other": [3, 9, 12, 3, 9, 12, 3, 9, 12, 3],
             "target": [1, 3, 2, 1, 3, 2, 1, 3, 2, 1],
         },
-        "target", "time", ["feature_1", "feature_2"], )
+        "target",
+        "time",
+        ["feature_1", "feature_2"],
+    )
     dataset._into_dataloader_with_window(3, 2, 1)
     assert True
 
@@ -25,7 +28,10 @@ def test_into_dataloader_wo_features() -> None:
             "other": [3, 9, 12, 3, 9, 12, 3, 9, 12, 3],
             "target": [1, 3, 2, 1, 3, 2, 1, 3, 2, 1],
         },
-        "target", "time")
+        "target",
+        "time",
+    )
+    dataset._into_dataloader_with_window(3, 2, 1)
     dataloader = dataset._into_dataloader_with_window(3, 2, 1)
     for (data,target) in dataloader:
         data[0]

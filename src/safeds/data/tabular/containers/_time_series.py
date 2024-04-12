@@ -7,10 +7,10 @@ from typing import TYPE_CHECKING
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import torch
-from torch.utils.data import DataLoader, Dataset
 import seaborn as sns
+import torch
 import xxhash
+from torch.utils.data import DataLoader, Dataset
 
 from safeds.data.image.containers import Image
 from safeds.data.tabular.containers import Column, Row, Table, TaggedTable
@@ -1278,6 +1278,7 @@ class TimeSeries(Table):
         buffer.seek(0)
         self._data = self._data.reset_index()
         return Image.from_bytes(buffer.read())
+
     def _into_dataloader_with_window(self, window_size: int, forecast_len: int, batch_size: int) -> DataLoader:
         """
         Return a Dataloader for the data stored in this time series, used for training neural networks.
@@ -1289,6 +1290,7 @@ class TimeSeries(Table):
         ----------
         batch_size
             The size of data batches that should be loaded at one time.
+
         Returns
         -------
         result :
@@ -1305,11 +1307,11 @@ class TimeSeries(Table):
         # -> [i, win_size],[target]
         feature_cols = self.features.to_columns()
         for i in range(size - (forecast_len + window_size)):
-            window = target_np[i:i + window_size]
+            window = target_np[i : i + window_size]
             label = target_np[i + window_size + forecast_len]
             for col in feature_cols:
                 data = col._data.to_numpy()
-                window = np.concatenate((window, data[i:i + window_size]))
+                window = np.concatenate((window, data[i : i + window_size]))
             x_s.append(window)
             y_s.append(label)
 
