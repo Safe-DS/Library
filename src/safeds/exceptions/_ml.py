@@ -82,7 +82,7 @@ class InputSizeError(Exception):
 
     def __init__(self, table_size: int, input_layer_size: int) -> None:
         super().__init__(
-                f"The amount of columns being passed to the network({table_size}) does not match with its input size({input_layer_size}). Consider changing the number of neurons in the first layer or reformatting the table.",
+            f"The amount of columns being passed to the network({table_size}) does not match with its input size({input_layer_size}). Consider changing the number of neurons in the first layer or reformatting the table.",
         )
 
 
