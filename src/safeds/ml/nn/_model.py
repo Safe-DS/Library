@@ -13,7 +13,7 @@ from safeds.exceptions import (
     OutOfBoundsError,
     TestTrainDataMismatchError,
 )
-from safeds.ml.nn._fnn_layer import Layer
+from safeds.ml.nn._layer import Layer
 
 
 class NeuralNetworkRegressor:

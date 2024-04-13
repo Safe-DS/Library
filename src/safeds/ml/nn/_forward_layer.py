@@ -1,8 +1,7 @@
-from abc import ABC, abstractmethod
-
 from torch import Tensor, nn
 
 from safeds.exceptions import ClosedBound, OutOfBoundsError
+from safeds.ml.nn._layer import Layer
 
 
 class _InternalLayer(nn.Module):
@@ -23,31 +22,7 @@ class _InternalLayer(nn.Module):
         return self._fn(self._layer(x))
 
 
-class Layer(ABC):
-    @abstractmethod
-    def __init__(self) -> None:
-        pass  # pragma: no cover
-
-    @abstractmethod
-    def _get_internal_layer(self, activation_function: str) -> _InternalLayer:
-        pass  # pragma: no cover
-
-    @property
-    @abstractmethod
-    def input_size(self) -> int:
-        pass  # pragma: no cover
-
-    @property
-    @abstractmethod
-    def output_size(self) -> int:
-        pass  # pragma: no cover
-
-    @abstractmethod
-    def _set_input_size(self, input_size: int) -> None:
-        pass  # pragma: no cover
-
-
-class FNNLayer(Layer):
+class ForwardLayer(Layer):
     def __init__(self, output_size: int, input_size: int | None = None):
         """
         Create a FNN Layer.
