@@ -1,6 +1,6 @@
 import pytest
 from safeds.data.tabular.containers import Table, TaggedTable
-from safeds.exceptions import ModelNotFittedError, OutOfBoundsError, TestTrainDataMismatchError, InputSizeError
+from safeds.exceptions import InputSizeError, ModelNotFittedError, OutOfBoundsError, TestTrainDataMismatchError
 from safeds.ml.nn import ForwardLayer, NeuralNetworkClassifier, NeuralNetworkRegressor
 
 
