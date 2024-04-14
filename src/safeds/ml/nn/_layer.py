@@ -25,5 +25,3 @@ class Layer(ABC):
     @abstractmethod
     def _set_input_size(self, input_size: int) -> None:
         pass  # pragma: no cover
-
-
