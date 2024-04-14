@@ -7,12 +7,22 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 import torch
-import torch.nn.functional as func
 from PIL.Image import open as pil_image_open
 from torch import Tensor
+from torchvision.transforms import InterpolationMode
 
 from safeds._config import _get_device
 from safeds._utils import _structural_hash
+from safeds.data.image.utils._image_transformation_error_and_warning_checks import (
+    _check_add_noise_errors,
+    _check_adjust_brightness_errors_and_warnings,
+    _check_adjust_color_balance_errors_and_warnings,
+    _check_adjust_contrast_errors_and_warnings,
+    _check_blur_errors_and_warnings,
+    _check_crop_errors_and_warnings,
+    _check_resize_errors,
+    _check_sharpen_errors_and_warnings,
+)
 
 if TYPE_CHECKING:
     from torch.types import Device
@@ -21,7 +31,7 @@ from torchvision.transforms.v2 import PILToTensor
 from torchvision.transforms.v2 import functional as func2
 from torchvision.utils import save_image
 
-from safeds.exceptions import ClosedBound, IllegalFormatError, OutOfBoundsError
+from safeds.exceptions import IllegalFormatError
 
 
 class Image:
@@ -30,7 +40,7 @@ class Image:
 
     Parameters
     ----------
-    image_tensor : Tensor
+    image_tensor:
         The image data as tensor.
     """
 
@@ -50,15 +60,20 @@ class Image:
 
         Parameters
         ----------
-        path : str | Path
+        path:
             The path to the image file.
-        device: Device
+        device:
             The device where the tensor will be saved on. Defaults to the default device
 
         Returns
         -------
-        image : Image
+        image:
             The image.
+
+        Raises
+        ------
+        FileNotFoundError
+            If the file of the path cannot be found
         """
         return Image(image_tensor=Image._pil_to_tensor(pil_image_open(path)), device=device)
 
@@ -69,14 +84,14 @@ class Image:
 
         Parameters
         ----------
-        data : bytes
+        data:
             The data of the image.
-        device: Device
+        device:
             The device where the tensor will be saved on. Defaults to the default device
 
         Returns
         -------
-        image : Image
+        image:
             The image.
         """
         with warnings.catch_warnings():
@@ -96,11 +111,12 @@ class Image:
 
         Parameters
         ----------
-        other: The image to compare to.
+        other:
+            The image to compare to.
 
         Returns
         -------
-        equals : bool
+        equals:
             Whether the two images contain equal pixel data.
         """
         if not isinstance(other, Image):
@@ -116,7 +132,7 @@ class Image:
 
         Returns
         -------
-        hash : int
+        hash:
             The hash value.
         """
         return _structural_hash(self.width, self.height, self.channel)
@@ -127,7 +143,8 @@ class Image:
 
         Returns
         -------
-        Size of this object in bytes.
+        size:
+            Size of this object in bytes.
         """
         return sys.getsizeof(self._image_tensor) + self._image_tensor.element_size() * self._image_tensor.nelement()
 
@@ -139,7 +156,7 @@ class Image:
 
         Returns
         -------
-        jpeg : bytes
+        jpeg:
             The image as JPEG.
         """
         if self.channel == 4:
@@ -158,7 +175,7 @@ class Image:
 
         Returns
         -------
-        png : bytes
+        png:
             The image as PNG.
         """
         buffer = io.BytesIO()
@@ -175,7 +192,7 @@ class Image:
 
         Returns
         -------
-        result : Image
+        result:
             The image on the given device
         """
         return Image(self._image_tensor, device)
@@ -191,7 +208,7 @@ class Image:
 
         Returns
         -------
-        width : int
+        width:
             The width of the image.
         """
         return self._image_tensor.size(dim=2)
@@ -203,7 +220,7 @@ class Image:
 
         Returns
         -------
-        height : int
+        height:
             The height of the image.
         """
         return self._image_tensor.size(dim=1)
@@ -215,7 +232,7 @@ class Image:
 
         Returns
         -------
-        channel : int
+        channel:
             The number of channels of the image.
         """
         return self._image_tensor.size(dim=0)
@@ -227,7 +244,7 @@ class Image:
 
         Returns
         -------
-        device : Device
+        device:
             The device of the image
         """
         return self._image_tensor.device
@@ -242,7 +259,7 @@ class Image:
 
         Parameters
         ----------
-        path : str | Path
+        path:
             The path to the JPEG file.
         """
         if self.channel == 4:
@@ -259,7 +276,7 @@ class Image:
 
         Parameters
         ----------
-        path : str | Path
+        path:
             The path to the PNG file.
         """
         Path(path).parent.mkdir(parents=True, exist_ok=True)
@@ -272,19 +289,80 @@ class Image:
     # Transformations
     # ------------------------------------------------------------------------------------------------------------------
 
+    def change_channel(self, channel: int) -> Image:
+        """
+        Return a new `Image` that has the given number of channels.
+
+        The original image is not modified.
+
+        Parameters
+        ----------
+        channel:
+            The new number of channels. 1 will result in a grayscale image.
+
+        Returns
+        -------
+        result:
+            The image with the given number of channels.
+
+        Raises
+        ------
+        ValueError
+            if the given channel is not a valid channel option
+        """
+        if self.channel == channel:
+            image_tensor = self._image_tensor
+        elif self.channel == 1 and channel == 3:
+            image_tensor = torch.cat([self._image_tensor, self._image_tensor, self._image_tensor], dim=0)
+        elif self.channel == 1 and channel == 4:
+            image_tensor = torch.cat(
+                [
+                    self._image_tensor,
+                    self._image_tensor,
+                    self._image_tensor,
+                    torch.full(self._image_tensor.size(), 255).to(self.device),
+                ],
+                dim=0,
+            )
+        elif self.channel in (3, 4) and channel == 1:
+            image_tensor = self.convert_to_grayscale()._image_tensor[0:1]
+        elif self.channel == 3 and channel == 4:
+            image_tensor = torch.cat(
+                [self._image_tensor, torch.full(self._image_tensor[0:1].size(), 255).to(self.device)],
+                dim=0,
+            )
+        elif self.channel == 4 and channel == 3:
+            image_tensor = self._image_tensor[0:3]
+        else:
+            raise ValueError(f"Channel {channel} is not a valid channel option. Use either 1, 3 or 4")
+        return Image(image_tensor, device=self._image_tensor.device)
+
     def resize(self, new_width: int, new_height: int) -> Image:
         """
         Return a new `Image` that has been resized to a given size.
 
         The original image is not modified.
 
+        Parameters
+        ----------
+        new_width:
+            the new width of the image
+        new_height:
+            the new height of the image
+
         Returns
         -------
-        result : Image
+        result:
             The image with the given width and height.
+
+        Raises
+        ------
+        OutOfBoundsError
+            If new_width or new_height are below 1
         """
+        _check_resize_errors(new_width, new_height)
         return Image(
-            func.interpolate(self._image_tensor.unsqueeze(dim=1), size=(new_height, new_width)).squeeze(dim=1),
+            func2.resize(self._image_tensor, size=[new_height, new_width], interpolation=InterpolationMode.NEAREST),
             device=self._image_tensor.device,
         )
 
@@ -296,7 +374,7 @@ class Image:
 
         Returns
         -------
-        result : Image
+        result:
             The grayscale image.
         """
         if self.channel == 4:
@@ -320,17 +398,27 @@ class Image:
 
         Parameters
         ----------
-        x: the x coordinate of the top-left corner of the bounding rectangle
-        y: the y coordinate of the top-left corner of the bounding rectangle
-        width:  the width of the bounding rectangle
-        height:  the height of the bounding rectangle
+        x:
+            the x coordinate of the top-left corner of the bounding rectangle
+        y:
+            the y coordinate of the top-left corner of the bounding rectangle
+        width:
+            the width of the bounding rectangle
+        height:
+            the height of the bounding rectangle
 
         Returns
         -------
-        result : Image
+        result:
             The cropped image.
+
+        Raises
+        ------
+        OutOfBoundsError
+            If x or y are below 0 or if width or height are below 1
         """
-        return Image(func2.crop(self._image_tensor, x, y, height, width), device=self.device)
+        _check_crop_errors_and_warnings(x, y, width, height, self.width, self.height, plural=False)
+        return Image(func2.crop(self._image_tensor, y, x, height, width), device=self.device)
 
     def flip_vertically(self) -> Image:
         """
@@ -340,7 +428,7 @@ class Image:
 
         Returns
         -------
-        result : Image
+        result:
             The flipped image.
         """
         return Image(func2.vertical_flip(self._image_tensor), device=self.device)
@@ -353,7 +441,7 @@ class Image:
 
         Returns
         -------
-        result : Image
+        result:
             The flipped image.
         """
         return Image(func2.horizontal_flip(self._image_tensor), device=self.device)
@@ -366,7 +454,7 @@ class Image:
 
         Parameters
         ----------
-        factor: float
+        factor:
             The brightness factor.
             1.0 will not change the brightness.
             Below 1.0 will result in a darker image.
@@ -375,7 +463,7 @@ class Image:
 
         Returns
         -------
-        result: Image
+        result:
             The Image with adjusted brightness.
 
         Raises
@@ -383,14 +471,7 @@ class Image:
         OutOfBoundsError
             If factor is smaller than 0.
         """
-        if factor < 0:
-            raise OutOfBoundsError(factor, name="factor", lower_bound=ClosedBound(0))
-        elif factor == 1:
-            warnings.warn(
-                "Brightness adjustment factor is 1.0, this will not make changes to the image.",
-                UserWarning,
-                stacklevel=2,
-            )
+        _check_adjust_brightness_errors_and_warnings(factor, plural=False)
         if self.channel == 4:
             return Image(
                 torch.cat(
@@ -412,12 +493,12 @@ class Image:
 
         Parameters
         ----------
-        standard_deviation : float
+        standard_deviation:
             The standard deviation of the normal distribution. Has to be bigger than or equal to 0.
 
         Returns
         -------
-        result : Image
+        result:
             The image with added noise.
 
         Raises
@@ -425,8 +506,7 @@ class Image:
         OutOfBoundsError
             If standard_deviation is smaller than 0.
         """
-        if standard_deviation < 0:
-            raise OutOfBoundsError(standard_deviation, name="standard_deviation", lower_bound=ClosedBound(0))
+        _check_add_noise_errors(standard_deviation)
         return Image(
             self._image_tensor + torch.normal(0, standard_deviation, self._image_tensor.size()).to(self.device) * 255,
             device=self.device,
@@ -440,7 +520,7 @@ class Image:
 
         Parameters
         ----------
-        factor: float
+        factor:
             If factor > 1, increase contrast of image.
             If factor = 1, no changes will be made.
             If factor < 1, make image greyer.
@@ -448,7 +528,7 @@ class Image:
 
         Returns
         -------
-        image: Image
+        image:
             New image with adjusted contrast.
 
         Raises
@@ -456,14 +536,7 @@ class Image:
         OutOfBoundsError
             If factor is smaller than 0.
         """
-        if factor < 0:
-            raise OutOfBoundsError(factor, name="factor", lower_bound=ClosedBound(0))
-        elif factor == 1:
-            warnings.warn(
-                "Contrast adjustment factor is 1.0, this will not make changes to the image.",
-                UserWarning,
-                stacklevel=2,
-            )
+        _check_adjust_contrast_errors_and_warnings(factor, plural=False)
         if self.channel == 4:
             return Image(
                 torch.cat(
@@ -485,7 +558,7 @@ class Image:
 
         Parameters
         ----------
-        factor: float
+        factor:
             Has to be bigger than or equal to 0.
             If 0 <= factor < 1, make image greyer.
             If factor = 1, no changes will be made.
@@ -493,23 +566,15 @@ class Image:
 
         Returns
         -------
-        image: Image
+        image:
             The new, adjusted image.
+
+        Raises
+        ------
+        OutOfBoundsError
+            If factor is smaller than 0.
         """
-        if factor < 0:
-            raise OutOfBoundsError(factor, name="factor", lower_bound=ClosedBound(0))
-        elif factor == 1:
-            warnings.warn(
-                "Color adjustment factor is 1.0, this will not make changes to the image.",
-                UserWarning,
-                stacklevel=2,
-            )
-        elif self.channel == 1:
-            warnings.warn(
-                "Color adjustment will not have an affect on grayscale images with only one channel.",
-                UserWarning,
-                stacklevel=2,
-            )
+        _check_adjust_color_balance_errors_and_warnings(factor, self.channel, plural=False)
         return Image(
             self.convert_to_grayscale()._image_tensor * (1.0 - factor * 1.0) + self._image_tensor * (factor * 1.0),
             device=self.device,
@@ -523,15 +588,21 @@ class Image:
 
         Parameters
         ----------
-        radius : int
+        radius:
              Radius is directly proportional to the blur value. The radius is equal to the amount of pixels united in
              each direction. A radius of 1 will result in a united box of 9 pixels.
 
         Returns
         -------
-        result : Image
+        result:
             The blurred image.
+
+        Raises
+        ------
+        OutOfBoundsError
+            If radius is smaller than 0 or equal or greater than the smaller size of the image.
         """
+        _check_blur_errors_and_warnings(radius, min(self.width, self.height), plural=False)
         return Image(func2.gaussian_blur(self._image_tensor, [radius * 2 + 1, radius * 2 + 1]), device=self.device)
 
     def sharpen(self, factor: float) -> Image:
@@ -542,7 +613,7 @@ class Image:
 
         Parameters
         ----------
-        factor : float
+        factor:
             If factor > 1, increase the sharpness of the image.
             If factor = 1, no changes will be made.
             If factor < 1, blur the image.
@@ -550,7 +621,7 @@ class Image:
 
         Returns
         -------
-        result : Image
+        result:
             The image sharpened by the given factor.
 
         Raises
@@ -558,14 +629,7 @@ class Image:
         OutOfBoundsError
             If factor is smaller than 0.
         """
-        if factor < 0:
-            raise OutOfBoundsError(factor, name="factor", lower_bound=ClosedBound(0))
-        elif factor == 1:
-            warnings.warn(
-                "Sharpen factor is 1.0, this will not make changes to the image.",
-                UserWarning,
-                stacklevel=2,
-            )
+        _check_sharpen_errors_and_warnings(factor, plural=False)
         if self.channel == 4:
             return Image(
                 torch.cat(
@@ -587,7 +651,7 @@ class Image:
 
         Returns
         -------
-        result : Image
+        result:
             The image with inverted colors.
         """
         if self.channel == 4:
@@ -606,7 +670,7 @@ class Image:
 
         Returns
         -------
-        result : Image
+        result:
             The image rotated 90 degrees clockwise.
         """
         return Image(func2.rotate(self._image_tensor, -90, expand=True), device=self.device)
@@ -619,7 +683,7 @@ class Image:
 
         Returns
         -------
-        result : Image
+        result:
             The image rotated 90 degrees counter-clockwise.
         """
         return Image(func2.rotate(self._image_tensor, 90, expand=True), device=self.device)
@@ -632,7 +696,7 @@ class Image:
 
         Returns
         -------
-        result : Image
+        result:
             The image with edges found.
         """
         kernel = (

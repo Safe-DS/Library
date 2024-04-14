@@ -4,7 +4,7 @@ from safeds.exceptions import NonNumericColumnError, UnknownColumnNameError
 from syrupy import SnapshotAssertion
 
 
-def test_should_return_table(snapshot_png: SnapshotAssertion) -> None:
+def test_should_return_table(snapshot_png_image: SnapshotAssertion) -> None:
     table = TimeSeries(
         {
             "time": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
@@ -16,7 +16,7 @@ def test_should_return_table(snapshot_png: SnapshotAssertion) -> None:
         feature_names=None,
     )
     plot = table.plot_lineplot()
-    assert plot == snapshot_png
+    assert plot == snapshot_png_image
 
 
 def test_should_raise_if_column_contains_non_numerical_values_x() -> None:
@@ -42,7 +42,7 @@ def test_should_raise_if_column_contains_non_numerical_values_x() -> None:
         table.plot_lineplot(x_column_name="feature_1")
 
 
-def test_should_return_table_both(snapshot_png: SnapshotAssertion) -> None:
+def test_should_return_table_both(snapshot_png_image: SnapshotAssertion) -> None:
     table = TimeSeries(
         {
             "time": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
@@ -54,10 +54,10 @@ def test_should_return_table_both(snapshot_png: SnapshotAssertion) -> None:
         feature_names=None,
     )
     plot = table.plot_lineplot(x_column_name="feature_1", y_column_name="target")
-    assert plot == snapshot_png
+    assert plot == snapshot_png_image
 
 
-def test_should_plot_feature_y(snapshot_png: SnapshotAssertion) -> None:
+def test_should_plot_feature_y(snapshot_png_image: SnapshotAssertion) -> None:
     table = TimeSeries(
         {
             "time": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
@@ -69,10 +69,10 @@ def test_should_plot_feature_y(snapshot_png: SnapshotAssertion) -> None:
         feature_names=None,
     )
     plot = table.plot_lineplot(y_column_name="feature_1")
-    assert plot == snapshot_png
+    assert plot == snapshot_png_image
 
 
-def test_should_plot_feature_x(snapshot_png: SnapshotAssertion) -> None:
+def test_should_plot_feature_x(snapshot_png_image: SnapshotAssertion) -> None:
     table = TimeSeries(
         {
             "time": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
@@ -84,10 +84,10 @@ def test_should_plot_feature_x(snapshot_png: SnapshotAssertion) -> None:
         feature_names=None,
     )
     plot = table.plot_lineplot(x_column_name="feature_1")
-    assert plot == snapshot_png
+    assert plot == snapshot_png_image
 
 
-def test_should_plot_feature(snapshot_png: SnapshotAssertion) -> None:
+def test_should_plot_feature(snapshot_png_image: SnapshotAssertion) -> None:
     table = TimeSeries(
         {
             "time": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
@@ -99,7 +99,7 @@ def test_should_plot_feature(snapshot_png: SnapshotAssertion) -> None:
         feature_names=None,
     )
     plot = table.plot_lineplot(x_column_name="feature_1")
-    assert plot == snapshot_png
+    assert plot == snapshot_png_image
 
 
 def test_should_raise_if_column_contains_non_numerical_values() -> None:

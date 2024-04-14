@@ -71,7 +71,7 @@ class Schema:
 
         Returns
         -------
-        hash : int
+        hash:
             The hash value.
 
         Examples
@@ -108,7 +108,8 @@ class Schema:
 
         Returns
         -------
-        Size of this object in bytes.
+        size:
+            Size of this object in bytes.
         """
         return (
             sum(map(sys.getsizeof, self._schema.keys()))

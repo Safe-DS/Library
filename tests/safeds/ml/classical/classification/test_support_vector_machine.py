@@ -16,7 +16,7 @@ def kernels() -> list[SupportVectorMachineKernel]:
 
     Returns
     -------
-    kernels : list[SupportVectorMachineKernel]
+    kernels:
         The list of kernels to test.
     """
     return [

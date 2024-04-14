@@ -2,7 +2,7 @@ from typing import Any
 
 import matplotlib as mpl
 import pytest
-from safeds.data.image.containers import Image
+from safeds.data.image.containers import Image, ImageList
 from syrupy import SnapshotAssertion
 from syrupy.extensions.single_file import SingleFileSnapshotExtension
 from syrupy.types import SerializedData
@@ -19,7 +19,7 @@ class JPEGImageExtension(SingleFileSnapshotExtension):
 
 
 @pytest.fixture()
-def snapshot_jpeg(snapshot: SnapshotAssertion) -> SnapshotAssertion:
+def snapshot_jpeg_image(snapshot: SnapshotAssertion) -> SnapshotAssertion:
     return snapshot.use_extension(JPEGImageExtension)
 
 
@@ -31,5 +31,17 @@ class PNGImageSnapshotExtension(SingleFileSnapshotExtension):
 
 
 @pytest.fixture()
-def snapshot_png(snapshot: SnapshotAssertion) -> SnapshotAssertion:
+def snapshot_png_image(snapshot: SnapshotAssertion) -> SnapshotAssertion:
     return snapshot.use_extension(PNGImageSnapshotExtension)
+
+
+class PNGImageListSnapshotExtension(SingleFileSnapshotExtension):
+    _file_extension = "png"
+
+    def serialize(self, data: ImageList, **_kwargs: Any) -> SerializedData:
+        return data._repr_png_()
+
+
+@pytest.fixture()
+def snapshot_png_image_list(snapshot: SnapshotAssertion) -> SnapshotAssertion:
+    return snapshot.use_extension(PNGImageListSnapshotExtension)

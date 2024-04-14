@@ -45,7 +45,7 @@ class ImputerStrategy(ABC):
 
         Returns
         -------
-        hash : int
+        hash:
             The hash value.
         """
         return _structural_hash(self.__class__.__qualname__)

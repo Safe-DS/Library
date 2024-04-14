@@ -53,7 +53,7 @@ class SupportVectorMachineKernel(ABC):
 
         Returns
         -------
-        hash : int
+        hash:
             The hash value.
         """
         return _structural_hash(self.__class__.__qualname__)
@@ -166,7 +166,8 @@ class SupportVectorMachineRegressor(Regressor):
 
                 Returns
                 -------
-                Size of this object in bytes.
+                size:
+                    Size of this object in bytes.
                 """
                 return sys.getsizeof(self._degree)
 

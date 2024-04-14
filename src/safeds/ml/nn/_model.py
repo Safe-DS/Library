@@ -77,7 +77,7 @@ class NeuralNetworkRegressor:
         self._batch_size = batch_size
         copied_model = copy.deepcopy(self)
 
-        dataloader = train_data._into_dataloader(copied_model._batch_size)
+        dataloader = train_data._into_dataloader_with_classes(copied_model._batch_size, 1)
 
         loss_fn = nn.MSELoss()
 
@@ -164,7 +164,7 @@ class NeuralNetworkClassifier:
         self._input_size = self._model.input_size
         self._batch_size = 1
         self._is_fitted = False
-        self._is_multi_class = layers[-1].output_size > 1
+        self._num_of_classes = layers[-1].output_size
         self._feature_names: None | list[str] = None
         self._total_number_of_batches_done = 0
         self._total_number_of_epochs_done = 0
@@ -220,9 +220,10 @@ class NeuralNetworkClassifier:
         self._batch_size = batch_size
         copied_model = copy.deepcopy(self)
 
-        dataloader = train_data._into_dataloader(copied_model._batch_size)
+        dataloader = train_data._into_dataloader_with_classes(copied_model._batch_size, copied_model._num_of_classes)
 
-        if self._is_multi_class:
+        # if self._is_multi_class:
+        if self._num_of_classes > 1:
             loss_fn = nn.CrossEntropyLoss()
         else:
             loss_fn = nn.BCELoss()
@@ -301,10 +302,10 @@ class NeuralNetworkClassifier:
         with torch.no_grad():
             for x in dataloader:
                 elem = self._model(x)
-                if self._is_multi_class:
+                if self._num_of_classes > 1:
                     predictions += torch.argmax(elem, dim=1).tolist()
                 else:
-                    predictions += elem.round().tolist()
+                    predictions += elem.round().squeeze().tolist()
                 # for item in range(len(elem)):
                 #     if not self._is_multi_class:
                 #         if elem[item].item() < 0.5:

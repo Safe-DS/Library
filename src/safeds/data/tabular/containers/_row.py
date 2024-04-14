@@ -223,7 +223,7 @@ class Row(Mapping[str, Any]):
 
         Returns
         -------
-        hash : int
+        hash:
             The hash value.
         """
         return _structural_hash(self._schema, [str(self.get_value(value)) for value in self])
@@ -288,7 +288,8 @@ class Row(Mapping[str, Any]):
 
         Returns
         -------
-        Size of this object in bytes.
+        size:
+            Size of this object in bytes.
         """
         return sys.getsizeof(self._data) + sys.getsizeof(self._schema)
 
