@@ -141,8 +141,6 @@ class NeuralNetworkRegressor:
             for x in dataloader:
                 elem = self._model(x)
                 predictions += elem.squeeze(dim=1).tolist()
-                # for item in range(len(elem)):
-                #     predictions.append(elem[item].item())
         return test_data.add_column(Column("prediction", predictions)).tag_columns("prediction")
 
     @property
@@ -222,7 +220,6 @@ class NeuralNetworkClassifier:
 
         dataloader = train_data._into_dataloader_with_classes(copied_model._batch_size, copied_model._num_of_classes)
 
-        # if self._is_multi_class:
         if self._num_of_classes > 1:
             loss_fn = nn.CrossEntropyLoss()
         else:
@@ -233,28 +230,12 @@ class NeuralNetworkClassifier:
             for x, y in iter(dataloader):
                 optimizer.zero_grad()
                 pred = copied_model._model(x)
-                #if self._is_multi_class:
-                #    pred_size = Tensor.size(pred, dim=1)
-                #    predictions_for_all_items_of_batch = []
-                #    for value in range(len(y)):
-                #        list_of_probabilities_for_each_category = []
-                #        class_index = y[value].item()
-                #        for index in range(pred_size):
-                #            if index is int(class_index):
-                #                list_of_probabilities_for_each_category.append(1.0)
-                #            else:
-                #                list_of_probabilities_for_each_category.append(0.0)
-                #        predictions_for_all_items_of_batch.append(list_of_probabilities_for_each_category.copy())
-                #
-                #    y_reshaped_as_tensor_to_fit_format_of_pred = torch.tensor(predictions_for_all_items_of_batch)
-                #
-                #    loss = loss_fn(pred, y_reshaped_as_tensor_to_fit_format_of_pred)
-                #else:
-                #    loss = loss_fn(pred, y)
+
                 loss = loss_fn(pred, y)
                 self._loss_sum += loss.item()
                 loss.backward()
                 optimizer.step()
+
                 self._total_number_of_batches_done += 1
                 if callback_on_batch_completion is not None:
                     callback_on_batch_completion(
@@ -305,23 +286,11 @@ class NeuralNetworkClassifier:
                 if self._num_of_classes > 1:
                     predictions += torch.argmax(elem, dim=1).tolist()
                 else:
-                    predictions += elem.round().squeeze().tolist()
-                # for item in range(len(elem)):
-                #     if not self._is_multi_class:
-                #         if elem[item].item() < 0.5:
-                #             predicted_class = 0  # pragma: no cover
-                #         else:  # pragma: no cover
-                #             predicted_class = 1  # pragma: no cover
-                #         predictions.append(predicted_class)
-                #     else:
-                #         values = elem[item].tolist()
-                #         highest_value = 0
-                #         category_of_highest_value = 0
-                #         for index in range(len(values)):
-                #             if values[index] > highest_value:
-                #                 highest_value = values[index]
-                #                 category_of_highest_value = index
-                #         predictions.append(category_of_highest_value)
+                    p = elem.squeeze().round().tolist()
+                    if isinstance(p, float):
+                        predictions.append(p)
+                    else:
+                        predictions += p
         return test_data.add_column(Column("prediction", predictions)).tag_columns("prediction")
 
     @property

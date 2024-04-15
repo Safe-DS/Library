@@ -47,22 +47,40 @@ class TestClassificationModel:
         )
         assert isinstance(fitted_model, NeuralNetworkClassifier)
 
-    def test_should_raise_if_predict_function_returns_wrong_datatype(self) -> None:
+    @pytest.mark.parametrize(
+        "batch_size",
+        [
+            1,
+            2,
+        ],
+        ids=["one", "two"],
+    )
+    def test_should_raise_if_predict_function_returns_wrong_datatype(self, batch_size: int) -> None:
         fitted_model = NeuralNetworkClassifier(
             [ForwardLayer(input_size=1, output_size=8), ForwardLayer(output_size=1)],
         ).fit(
-            Table.from_dict({"a": [1, 0], "b": [0, 1]}).tag_columns("a"),
+            Table.from_dict({"a": [1, 0, 1, 0, 1, 0], "b": [0, 1, 0, 12, 3, 3]}).tag_columns("a"),
+            batch_size=batch_size,
         )
         predictions = fitted_model.predict(Table.from_dict({"b": [1, 0]}))
         assert isinstance(predictions, TaggedTable)
 
-    def test_should_raise_if_predict_function_returns_wrong_datatype_for_multiclass_classification(self) -> None:
+    @pytest.mark.parametrize(
+        "batch_size",
+        [
+            1,
+            2,
+        ],
+        ids=["one", "two"],
+    )
+    def test_should_raise_if_predict_function_returns_wrong_datatype_for_multiclass_classification(self, batch_size: int) -> None:
         fitted_model = NeuralNetworkClassifier(
             [ForwardLayer(input_size=1, output_size=8), ForwardLayer(output_size=3)],
         ).fit(
             Table.from_dict({"a": [0, 1, 2], "b": [0, 15, 51]}).tag_columns("a"),
+            batch_size=batch_size,
         )
-        predictions = fitted_model.predict(Table.from_dict({"b": [1]}))
+        predictions = fitted_model.predict(Table.from_dict({"b": [1, 4, 124]}))
         assert isinstance(predictions, TaggedTable)
 
     def test_should_raise_if_model_has_not_been_fitted(self) -> None:
@@ -181,17 +199,35 @@ class TestRegressionModel:
                 batch_size=batch_size,
             )
 
-    def test_should_raise_if_fit_function_returns_wrong_datatype(self) -> None:
+    @pytest.mark.parametrize(
+        "batch_size",
+        [
+            1,
+            2,
+        ],
+        ids=["one", "two"],
+    )
+    def test_should_raise_if_fit_function_returns_wrong_datatype(self, batch_size: int) -> None:
         fitted_model = NeuralNetworkRegressor([ForwardLayer(input_size=1, output_size=1)]).fit(
-            Table.from_dict({"a": [1], "b": [2]}).tag_columns("a"),
+            Table.from_dict({"a": [1, 0, 1], "b": [2, 3, 4]}).tag_columns("a"),
+            batch_size=batch_size,
         )
         assert isinstance(fitted_model, NeuralNetworkRegressor)
 
-    def test_should_raise_if_predict_function_returns_wrong_datatype(self) -> None:
+    @pytest.mark.parametrize(
+        "batch_size",
+        [
+            1,
+            2,
+        ],
+        ids=["one", "two"],
+    )
+    def test_should_raise_if_predict_function_returns_wrong_datatype(self, batch_size: int) -> None:
         fitted_model = NeuralNetworkRegressor([ForwardLayer(input_size=1, output_size=1)]).fit(
-            Table.from_dict({"a": [1], "b": [2]}).tag_columns("a"),
+            Table.from_dict({"a": [1, 0, 1], "b": [2, 3, 4]}).tag_columns("a"),
+            batch_size=batch_size,
         )
-        predictions = fitted_model.predict(Table.from_dict({"b": [1]}))
+        predictions = fitted_model.predict(Table.from_dict({"b": [5, 6, 7]}))
         assert isinstance(predictions, TaggedTable)
 
     def test_should_raise_if_model_has_not_been_fitted(self) -> None:
@@ -208,7 +244,7 @@ class TestRegressionModel:
         )
         assert model.is_fitted
 
-    def test_should_raise_if__test_and_train_data_mismatch(self) -> None:
+    def test_should_raise_if_test_and_train_data_mismatch(self) -> None:
         model = NeuralNetworkRegressor([ForwardLayer(input_size=1, output_size=1)])
         model = model.fit(
             Table.from_dict({"a": [1, 0, 2], "b": [0, 15, 5]}).tag_columns("a"),
