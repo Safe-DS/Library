@@ -3,7 +3,6 @@ from __future__ import annotations
 import sys
 from typing import TYPE_CHECKING
 
-import numpy as np
 import torch
 from torch import Tensor
 from torch.utils.data import DataLoader, Dataset
@@ -895,9 +894,22 @@ class TaggedTable(Table):
 
         """
         if num_of_classes <= 2:
-            return DataLoader(dataset=_CustomDataset(torch.Tensor(self.features._data.values), torch.Tensor(self.target._data).unsqueeze(dim=-1)), batch_size=batch_size, shuffle=True)
+            return DataLoader(
+                dataset=_CustomDataset(
+                    torch.Tensor(self.features._data.values), torch.Tensor(self.target._data).unsqueeze(dim=-1),
+                ),
+                batch_size=batch_size,
+                shuffle=True,
+            )
         else:
-            return DataLoader(dataset=_CustomDataset(torch.Tensor(self.features._data.values), torch.nn.functional.one_hot(torch.LongTensor(self.target._data), num_classes=num_of_classes)), batch_size=batch_size, shuffle=True)
+            return DataLoader(
+                dataset=_CustomDataset(
+                    torch.Tensor(self.features._data.values),
+                    torch.nn.functional.one_hot(torch.LongTensor(self.target._data), num_classes=num_of_classes),
+                ),
+                batch_size=batch_size,
+                shuffle=True,
+            )
 
 
 class _CustomDataset(Dataset):
