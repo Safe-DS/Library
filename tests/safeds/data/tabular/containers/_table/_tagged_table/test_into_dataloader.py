@@ -11,7 +11,7 @@ from torch.utils.data import DataLoader
                 "A": [1, 4],
                 "B": [2, 5],
                 "C": [3, 6],
-                "T": [0, 0],
+                "T": [0, 1],
             },
             "T",
             ["A", "B", "C"],
@@ -27,5 +27,5 @@ def test_should_create_dataloader(
     feature_names: list[str] | None,
 ) -> None:
     tagged_table = Table.from_dict(data).tag_columns(target_name, feature_names)
-    data_loader = tagged_table._into_dataloader(1)
+    data_loader = tagged_table._into_dataloader_with_classes(1, 2)
     assert isinstance(data_loader, DataLoader)
