@@ -74,7 +74,8 @@ class TestClassificationModel:
         ids=["one", "two"],
     )
     def test_should_raise_if_predict_function_returns_wrong_datatype_for_multiclass_classification(
-        self, batch_size: int,
+        self,
+        batch_size: int,
     ) -> None:
         fitted_model = NeuralNetworkClassifier(
             [ForwardLayer(input_size=1, output_size=8), ForwardLayer(output_size=3)],

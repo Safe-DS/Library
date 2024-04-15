@@ -896,7 +896,8 @@ class TaggedTable(Table):
         if num_of_classes <= 2:
             return DataLoader(
                 dataset=_CustomDataset(
-                    torch.Tensor(self.features._data.values), torch.Tensor(self.target._data).unsqueeze(dim=-1),
+                    torch.Tensor(self.features._data.values),
+                    torch.Tensor(self.target._data).unsqueeze(dim=-1),
                 ),
                 batch_size=batch_size,
                 shuffle=True,
