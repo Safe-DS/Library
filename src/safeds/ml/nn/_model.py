@@ -105,8 +105,7 @@ class NeuralNetworkRegressor:
             copied_model._total_number_of_epochs_done += 1
             if callback_on_epoch_completion is not None:
                 callback_on_epoch_completion(
-                    copied_model._total_number_of_epochs_done,
-                    loss_sum / amount_of_loss_values_calculated
+                    copied_model._total_number_of_epochs_done, loss_sum / amount_of_loss_values_calculated,
                 )
         copied_model._is_fitted = True
         copied_model._model.eval()
@@ -247,14 +246,12 @@ class NeuralNetworkClassifier:
                 copied_model._total_number_of_batches_done += 1
                 if callback_on_batch_completion is not None:
                     callback_on_batch_completion(
-                        copied_model._total_number_of_batches_done,
-                        loss_sum / amount_of_loss_values_calculated
+                        copied_model._total_number_of_batches_done, loss_sum / amount_of_loss_values_calculated,
                     )
             copied_model._total_number_of_epochs_done += 1
             if callback_on_epoch_completion is not None:
                 callback_on_epoch_completion(
-                    copied_model._total_number_of_epochs_done,
-                    loss_sum / amount_of_loss_values_calculated
+                    copied_model._total_number_of_epochs_done, loss_sum / amount_of_loss_values_calculated,
                 )
         copied_model._is_fitted = True
         copied_model._model.eval()
