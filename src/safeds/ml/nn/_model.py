@@ -16,16 +16,18 @@ if TYPE_CHECKING:
 
     from torch import Tensor, nn
 
+    from safeds.data.tabular.containers import Table, TimeSeries, TaggedTable
+
     from safeds.ml.nn._input_conversion import _InputConversion
     from safeds.ml.nn._layer import _Layer
     from safeds.ml.nn._output_conversion import _OutputConversion
 
-I = TypeVar("I")
-O = TypeVar("O")
+IT = TypeVar("IT", Table, TimeSeries)
+OT = TypeVar("OT", TaggedTable, TimeSeries)
 
 
-class NeuralNetworkRegressor(Generic[I, O]):
-    def __init__(self, input_conversion: _InputConversion[I], layers: list[_Layer], output_conversion: _OutputConversion[I, O]):
+class NeuralNetworkRegressor(Generic[IT, OT]):
+    def __init__(self, input_conversion: _InputConversion[IT], layers: list[_Layer], output_conversion: _OutputConversion[IT, OT]):
         self._input_conversion = input_conversion
         self._model = _create_internal_model(layers, is_for_classification=False)
         self._output_conversion = output_conversion
@@ -37,7 +39,7 @@ class NeuralNetworkRegressor(Generic[I, O]):
 
     def fit(
         self,
-        train_data: I,
+        train_data: IT,
         epoch_size: int = 25,
         batch_size: int = 1,
         learning_rate: float = 0.001,
@@ -123,7 +125,7 @@ class NeuralNetworkRegressor(Generic[I, O]):
         copied_model._model.eval()
         return copied_model
 
-    def predict(self, test_data: I) -> O:
+    def predict(self, test_data: IT) -> OT:
         """
         Make a prediction for the given test data.
 
@@ -171,8 +173,8 @@ class NeuralNetworkRegressor(Generic[I, O]):
         return self._is_fitted
 
 
-class NeuralNetworkClassifier(Generic[I, O]):
-    def __init__(self, input_conversion: _InputConversion[I], layers: list[_Layer], output_conversion: _OutputConversion[I, O]):
+class NeuralNetworkClassifier(Generic[IT, OT]):
+    def __init__(self, input_conversion: _InputConversion[IT], layers: list[_Layer], output_conversion: _OutputConversion[IT, OT]):
         self._input_conversion = input_conversion
         self._model = _create_internal_model(layers, is_for_classification=True)
         self._output_conversion = output_conversion
@@ -185,7 +187,7 @@ class NeuralNetworkClassifier(Generic[I, O]):
 
     def fit(
         self,
-        train_data: I,
+        train_data: IT,
         epoch_size: int = 25,
         batch_size: int = 1,
         learning_rate: float = 0.001,
@@ -274,7 +276,7 @@ class NeuralNetworkClassifier(Generic[I, O]):
         copied_model._model.eval()
         return copied_model
 
-    def predict(self, test_data: I) -> O:
+    def predict(self, test_data: IT) -> OT:
         """
         Make a prediction for the given test data.
 

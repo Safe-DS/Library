@@ -9,9 +9,7 @@ T = TypeVar('T', Table, TimeSeries)
 
 
 class _InputConversion(Generic[T], ABC):
-    """
-    The input conversion for a neural network, defines the input parameters for the neural network.
-    """
+    """The input conversion for a neural network, defines the input parameters for the neural network."""
 
     @property
     @abstractmethod

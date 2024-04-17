@@ -6,9 +6,7 @@ from safeds.data.tabular.containers import Table
 
 
 class InputConversionTable(_InputConversion[Table]):
-    """
-    The input conversion for a neural network, defines the input parameters for the neural network.
-    """
+    """The input conversion for a neural network, defines the input parameters for the neural network."""
 
     def __init__(self, feature_names: list[str], target_name: str) -> None:
         self._feature_names = feature_names
