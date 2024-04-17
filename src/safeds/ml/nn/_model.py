@@ -11,12 +11,12 @@ from safeds.exceptions import (
     TestTrainDataMismatchError,
 )
 
+from safeds.data.tabular.containers import Table, TimeSeries, TaggedTable
+
 if TYPE_CHECKING:
     from collections.abc import Callable
 
     from torch import Tensor, nn
-
-    from safeds.data.tabular.containers import Table, TimeSeries, TaggedTable
 
     from safeds.ml.nn._input_conversion import _InputConversion
     from safeds.ml.nn._layer import _Layer
@@ -28,9 +28,9 @@ OT = TypeVar("OT", TaggedTable, TimeSeries)
 
 class NeuralNetworkRegressor(Generic[IT, OT]):
     def __init__(self, input_conversion: _InputConversion[IT], layers: list[_Layer], output_conversion: _OutputConversion[IT, OT]):
-        self._input_conversion = input_conversion
+        self._input_conversion: _InputConversion[IT] = input_conversion
         self._model = _create_internal_model(layers, is_for_classification=False)
-        self._output_conversion = output_conversion
+        self._output_conversion: _OutputConversion[IT, OT] = output_conversion
         self._input_size = self._model.input_size
         self._batch_size = 1
         self._is_fitted = False
@@ -175,9 +175,9 @@ class NeuralNetworkRegressor(Generic[IT, OT]):
 
 class NeuralNetworkClassifier(Generic[IT, OT]):
     def __init__(self, input_conversion: _InputConversion[IT], layers: list[_Layer], output_conversion: _OutputConversion[IT, OT]):
-        self._input_conversion = input_conversion
+        self._input_conversion: _InputConversion[IT] = input_conversion
         self._model = _create_internal_model(layers, is_for_classification=True)
-        self._output_conversion = output_conversion
+        self._output_conversion: _OutputConversion[IT, OT] = output_conversion
         self._input_size = self._model.input_size
         self._batch_size = 1
         self._is_fitted = False
