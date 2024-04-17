@@ -1,7 +1,7 @@
 from torch import Tensor, nn
 
 from safeds.exceptions import ClosedBound, OutOfBoundsError
-from safeds.ml.nn._layer import Layer
+from safeds.ml.nn._layer import _Layer
 
 
 class _InternalLayer(nn.Module):
@@ -22,10 +22,10 @@ class _InternalLayer(nn.Module):
         return self._fn(self._layer(x))
 
 
-class ForwardLayer(Layer):
+class ForwardLayer(_Layer):
     def __init__(self, output_size: int, input_size: int | None = None):
         """
-        Create a FNN Layer.
+        Create a FNN _Layer.
 
         Parameters
         ----------

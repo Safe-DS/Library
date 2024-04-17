@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 from torch import nn
 
 
-class Layer(ABC):
+class _Layer(ABC):
     @abstractmethod
     def __init__(self) -> None:
         pass  # pragma: no cover

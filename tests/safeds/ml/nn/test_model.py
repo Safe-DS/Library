@@ -1,7 +1,8 @@
 import pytest
 from safeds.data.tabular.containers import Table, TaggedTable
 from safeds.exceptions import InputSizeError, ModelNotFittedError, OutOfBoundsError, TestTrainDataMismatchError
-from safeds.ml.nn import ForwardLayer, NeuralNetworkClassifier, NeuralNetworkRegressor
+from safeds.ml.nn import ForwardLayer, NeuralNetworkClassifier, NeuralNetworkRegressor, InputConversionTable, \
+    OutputConversionTable
 
 
 class TestClassificationModel:
@@ -17,8 +18,9 @@ class TestClassificationModel:
             OutOfBoundsError,
             match=rf"epoch_size \(={epoch_size}\) is not inside \[1, \u221e\)\.",
         ):
-            NeuralNetworkClassifier([ForwardLayer(1, 1)]).fit(
-                Table.from_dict({"a": [1], "b": [2]}).tag_columns("a"),
+            NeuralNetworkClassifier(InputConversionTable(["b"], "a"), [ForwardLayer(1, 1)],
+                                    OutputConversionTable()).fit(
+                Table.from_dict({"a": [1], "b": [2]}),
                 epoch_size=epoch_size,
             )
 
@@ -34,16 +36,19 @@ class TestClassificationModel:
             OutOfBoundsError,
             match=rf"batch_size \(={batch_size}\) is not inside \[1, \u221e\)\.",
         ):
-            NeuralNetworkClassifier([ForwardLayer(input_size=1, output_size=1)]).fit(
-                Table.from_dict({"a": [1], "b": [2]}).tag_columns("a"),
+            NeuralNetworkClassifier(InputConversionTable(["b"], "a"), [ForwardLayer(input_size=1, output_size=1)],
+                                    OutputConversionTable()).fit(
+                Table.from_dict({"a": [1], "b": [2]}),
                 batch_size=batch_size,
             )
 
     def test_should_raise_if_fit_function_returns_wrong_datatype(self) -> None:
         fitted_model = NeuralNetworkClassifier(
+            InputConversionTable(["b"], "a"),
             [ForwardLayer(input_size=1, output_size=8), ForwardLayer(output_size=1)],
+            OutputConversionTable()
         ).fit(
-            Table.from_dict({"a": [1], "b": [0]}).tag_columns("a"),
+            Table.from_dict({"a": [1], "b": [0]}),
         )
         assert isinstance(fitted_model, NeuralNetworkClassifier)
 
@@ -57,9 +62,11 @@ class TestClassificationModel:
     )
     def test_should_raise_if_predict_function_returns_wrong_datatype(self, batch_size: int) -> None:
         fitted_model = NeuralNetworkClassifier(
+            InputConversionTable(["b"], "a"),
             [ForwardLayer(input_size=1, output_size=8), ForwardLayer(output_size=1)],
+            OutputConversionTable()
         ).fit(
-            Table.from_dict({"a": [1, 0, 1, 0, 1, 0], "b": [0, 1, 0, 12, 3, 3]}).tag_columns("a"),
+            Table.from_dict({"a": [1, 0, 1, 0, 1, 0], "b": [0, 1, 0, 12, 3, 3]}),
             batch_size=batch_size,
         )
         predictions = fitted_model.predict(Table.from_dict({"b": [1, 0]}))
@@ -78,7 +85,9 @@ class TestClassificationModel:
         batch_size: int,
     ) -> None:
         fitted_model = NeuralNetworkClassifier(
+            InputConversionTable(["b"], "a"),
             [ForwardLayer(input_size=1, output_size=8), ForwardLayer(output_size=3)],
+            OutputConversionTable()
         ).fit(
             Table.from_dict({"a": [0, 1, 2], "b": [0, 15, 51]}).tag_columns("a"),
             batch_size=batch_size,
@@ -88,7 +97,8 @@ class TestClassificationModel:
 
     def test_should_raise_if_model_has_not_been_fitted(self) -> None:
         with pytest.raises(ModelNotFittedError, match="The model has not been fitted yet."):
-            NeuralNetworkClassifier([ForwardLayer(input_size=1, output_size=1)]).predict(
+            NeuralNetworkClassifier(InputConversionTable(["b"], "a"), [ForwardLayer(input_size=1, output_size=1)],
+                                    OutputConversionTable()).predict(
                 Table.from_dict({"a": [1]}),
             )
 
@@ -97,22 +107,26 @@ class TestClassificationModel:
                                         OutputConversionTable())
         assert not model.is_fitted
         model = model.fit(
-            Table.from_dict({"a": [1], "b": [0]}).tag_columns("a"),
+            Table.from_dict({"a": [1], "b": [0]}),
         )
         assert model.is_fitted
 
     def test_should_raise_if_is_fitted_is_set_correctly_for_multiclass_classification(self) -> None:
-        model = NeuralNetworkClassifier([ForwardLayer(input_size=1, output_size=1), ForwardLayer(output_size=3)])
+        model = NeuralNetworkClassifier(InputConversionTable(["b"], "a"),
+                                        [ForwardLayer(input_size=1, output_size=1), ForwardLayer(output_size=3)],
+                                        OutputConversionTable())
         assert not model.is_fitted
         model = model.fit(
-            Table.from_dict({"a": [1, 0, 2], "b": [0, 15, 5]}).tag_columns("a"),
+            Table.from_dict({"a": [1, 0, 2], "b": [0, 15, 5]}),
         )
         assert model.is_fitted
 
     def test_should_raise_if_test_and_train_data_mismatch(self) -> None:
-        model = NeuralNetworkClassifier([ForwardLayer(input_size=1, output_size=1), ForwardLayer(output_size=3)])
+        model = NeuralNetworkClassifier(InputConversionTable(["b"], "a"),
+                                        [ForwardLayer(input_size=1, output_size=1), ForwardLayer(output_size=3)],
+                                        OutputConversionTable())
         model = model.fit(
-            Table.from_dict({"a": [1, 0, 2], "b": [0, 15, 5]}).tag_columns("a"),
+            Table.from_dict({"a": [1, 0, 2], "b": [0, 15, 5]}),
         )
         with pytest.raises(
             TestTrainDataMismatchError,
@@ -130,11 +144,12 @@ class TestClassificationModel:
             InputSizeError,
         ):
             model.fit(
-                Table.from_dict({"a": [1, 0, 2], "b": [0, 15, 5], "c": [3, 33, 333]}).tag_columns("a"),
+                Table.from_dict({"a": [1, 0, 2], "b": [0, 15, 5], "c": [3, 33, 333]}),
             )
 
     def test_should_raise_if_fit_doesnt_batch_callback(self) -> None:
-        model = NeuralNetworkClassifier([ForwardLayer(input_size=1, output_size=1)])
+        model = NeuralNetworkClassifier(InputConversionTable(["b"], "a"), [ForwardLayer(input_size=1, output_size=1)],
+                                        OutputConversionTable())
 
         class Test:
             self.was_called = False
@@ -147,7 +162,7 @@ class TestClassificationModel:
                 return self.was_called
 
         obj = Test()
-        model.fit(Table.from_dict({"a": [1], "b": [0]}).tag_columns("a"), callback_on_batch_completion=obj.cb)
+        model.fit(Table.from_dict({"a": [1], "b": [0]}), callback_on_batch_completion=obj.cb)
 
         assert obj.callback_was_called() is True
 
@@ -165,7 +180,7 @@ class TestClassificationModel:
                 return self.was_called
 
         obj = Test()
-        model.fit(Table.from_dict({"a": [1], "b": [0]}).tag_columns("a"), callback_on_epoch_completion=obj.cb)
+        model.fit(Table.from_dict({"a": [1], "b": [0]}), callback_on_epoch_completion=obj.cb)
 
         assert obj.callback_was_called() is True
 
@@ -183,8 +198,9 @@ class TestRegressionModel:
             OutOfBoundsError,
             match=rf"epoch_size \(={epoch_size}\) is not inside \[1, \u221e\)\.",
         ):
-            NeuralNetworkRegressor([ForwardLayer(input_size=1, output_size=1)]).fit(
-                Table.from_dict({"a": [1], "b": [2]}).tag_columns("a"),
+            NeuralNetworkRegressor(InputConversionTable(["b"], "a"), [ForwardLayer(input_size=1, output_size=1)],
+                                   OutputConversionTable()).fit(
+                Table.from_dict({"a": [1], "b": [2]}),
                 epoch_size=epoch_size,
             )
 
@@ -215,8 +231,9 @@ class TestRegressionModel:
         ids=["one", "two"],
     )
     def test_should_raise_if_fit_function_returns_wrong_datatype(self, batch_size: int) -> None:
-        fitted_model = NeuralNetworkRegressor([ForwardLayer(input_size=1, output_size=1)]).fit(
-            Table.from_dict({"a": [1, 0, 1], "b": [2, 3, 4]}).tag_columns("a"),
+        fitted_model = NeuralNetworkRegressor(InputConversionTable(["b"], "a"),
+                                              [ForwardLayer(input_size=1, output_size=1)], OutputConversionTable()).fit(
+            Table.from_dict({"a": [1, 0, 1], "b": [2, 3, 4]}),
             batch_size=batch_size,
         )
         assert isinstance(fitted_model, NeuralNetworkRegressor)
@@ -230,8 +247,8 @@ class TestRegressionModel:
         ids=["one", "two"],
     )
     def test_should_raise_if_predict_function_returns_wrong_datatype(self, batch_size: int) -> None:
-        fitted_model = NeuralNetworkRegressor([ForwardLayer(input_size=1, output_size=1)]).fit(
-            Table.from_dict({"a": [1, 0, 1], "b": [2, 3, 4]}).tag_columns("a"),
+        fitted_model = NeuralNetworkRegressor(InputConversionTable(["b"], "a"), [ForwardLayer(input_size=1, output_size=1)], OutputConversionTable()).fit(
+            Table.from_dict({"a": [1, 0, 1], "b": [2, 3, 4]}),
             batch_size=batch_size,
         )
         predictions = fitted_model.predict(Table.from_dict({"b": [5, 6, 7]}))

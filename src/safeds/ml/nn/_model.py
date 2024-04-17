@@ -1,11 +1,11 @@
 import copy
 from collections.abc import Callable
-from typing import Self
+from typing import Self, Generic, TypeVar
 
 import torch
 from torch import Tensor, nn
 
-from safeds.data.tabular.containers import Column, Table, TaggedTable
+from safeds.data.tabular.containers import TaggedTable
 from safeds.exceptions import (
     ClosedBound,
     InputSizeError,
@@ -13,16 +13,22 @@ from safeds.exceptions import (
     OutOfBoundsError,
     TestTrainDataMismatchError,
 )
-from safeds.ml.nn._layer import Layer
+from safeds.ml.nn._input_conversion import _InputConversion
+from safeds.ml.nn._layer import _Layer
+from safeds.ml.nn._output_conversion import _OutputConversion
+
+I = TypeVar("I")
+O = TypeVar("O")
 
 
-class NeuralNetworkRegressor:
-    def __init__(self, layers: list[Layer]):
+class NeuralNetworkRegressor(Generic[I, O]):
+    def __init__(self, input_conversion: _InputConversion[I], layers: list[_Layer], output_conversion: _OutputConversion[I, O]):
+        self._input_conversion = input_conversion
         self._model = _InternalModel(layers, is_for_classification=False)
+        self._output_conversion = output_conversion
         self._input_size = self._model.input_size
         self._batch_size = 1
         self._is_fitted = False
-        self._feature_names: None | list[str] = None
         self._total_number_of_batches_done = 0
         self._total_number_of_epochs_done = 0
 
@@ -75,10 +81,9 @@ class NeuralNetworkRegressor:
 
         copied_model = copy.deepcopy(self)
 
-        copied_model._feature_names = train_data.features.column_names
         copied_model._batch_size = batch_size
 
-        dataloader = train_data._into_dataloader_with_classes(copied_model._batch_size, 1)
+        dataloader = copied_model._input_conversion._data_conversion_fit(train_data, copied_model._batch_size)
 
         loss_fn = nn.MSELoss()
 
@@ -112,7 +117,7 @@ class NeuralNetworkRegressor:
         copied_model._model.eval()
         return copied_model
 
-    def predict(self, test_data: Table) -> TaggedTable:
+    def predict(self, test_data: I) -> O:
         """
         Make a prediction for the given test data.
 
@@ -135,17 +140,19 @@ class NeuralNetworkRegressor:
         """
         if not self._is_fitted:
             raise ModelNotFittedError
-        if not (sorted(test_data.column_names)).__eq__(
-            sorted(self._feature_names) if self._feature_names is not None else None,
-        ):
+        if not self._input_conversion._is_data_valid(test_data):
             raise TestTrainDataMismatchError
-        dataloader = test_data._into_dataloader(self._batch_size)
+        # dataloader = test_data._into_dataloader(self._batch_size)
+        dataloader = self._input_conversion._data_conversion_predict(test_data, self._batch_size)
         predictions = []
+        # predictions: Tensor
         with torch.no_grad():
             for x in dataloader:
                 elem = self._model(x)
-                predictions += elem.squeeze(dim=1).tolist()
-        return test_data.add_column(Column("prediction", predictions)).tag_columns("prediction")
+                # predictions += elem.squeeze(dim=1).tolist()
+                predictions.append(elem.squeeze(dim=1))
+        # return test_data.add_column(Column("prediction", predictions)).tag_columns("prediction")
+        return self._output_conversion._data_conversion(test_data, torch.cat(predictions, dim=0))
 
     @property
     def is_fitted(self) -> bool:
@@ -167,13 +174,12 @@ class NeuralNetworkClassifier:
         self._batch_size = 1
         self._is_fitted = False
         self._num_of_classes = layers[-1].output_size
-        self._feature_names: None | list[str] = None
         self._total_number_of_batches_done = 0
         self._total_number_of_epochs_done = 0
 
     def fit(
         self,
-        train_data: TaggedTable,
+        train_data: I,
         epoch_size: int = 25,
         batch_size: int = 1,
         learning_rate: float = 0.001,
@@ -215,12 +221,11 @@ class NeuralNetworkClassifier:
             raise OutOfBoundsError(actual=epoch_size, name="epoch_size", lower_bound=ClosedBound(1))
         if batch_size < 1:
             raise OutOfBoundsError(actual=batch_size, name="batch_size", lower_bound=ClosedBound(1))
-        if train_data.features.number_of_columns is not self._input_size:
-            raise InputSizeError(train_data.features.number_of_columns, self._input_size)
+        if self._input_conversion._data_size is not self._input_size:
+            raise InputSizeError(self._input_conversion._data_size, self._input_size)
 
         copied_model = copy.deepcopy(self)
 
-        copied_model._feature_names = train_data.features.column_names
         copied_model._batch_size = batch_size
 
         dataloader = train_data._into_dataloader_with_classes(copied_model._batch_size, copied_model._num_of_classes)
@@ -283,9 +288,7 @@ class NeuralNetworkClassifier:
         """
         if not self._is_fitted:
             raise ModelNotFittedError
-        if not (sorted(test_data.column_names)).__eq__(
-            sorted(self._feature_names) if self._feature_names is not None else None,
-        ):
+        if not self._input_conversion._is_data_valid(test_data):
             raise TestTrainDataMismatchError
         dataloader = test_data._into_dataloader(self._batch_size)
         predictions = []
@@ -293,7 +296,7 @@ class NeuralNetworkClassifier:
             for x in dataloader:
                 elem = self._model(x)
                 if self._num_of_classes > 1:
-                    predictions += torch.argmax(elem, dim=1).tolist()
+                    predictions.append(torch.argmax(elem, dim=1))
                 else:
                     predictions.append(elem.squeeze(dim=1).round())
         #return test_data.add_column(Column("prediction", predictions)).tag_columns("prediction")
@@ -313,7 +316,7 @@ class NeuralNetworkClassifier:
 
 
 class _InternalModel(nn.Module):
-    def __init__(self, layers: list[Layer], is_for_classification: bool) -> None:
+    def __init__(self, layers: list[_Layer], is_for_classification: bool) -> None:
         super().__init__()
         self._layer_list = layers
         internal_layers = []
