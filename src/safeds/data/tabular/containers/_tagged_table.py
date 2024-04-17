@@ -3,10 +3,6 @@ from __future__ import annotations
 import sys
 from typing import TYPE_CHECKING
 
-import numpy as np
-import torch
-from torch.utils.data import DataLoader, Dataset
-
 from safeds._utils import _structural_hash
 from safeds.data.tabular.containers import Column, Row, Table
 from safeds.exceptions import (
@@ -18,6 +14,10 @@ from safeds.exceptions import (
 if TYPE_CHECKING:
     from collections.abc import Callable, Mapping, Sequence
     from typing import Any
+
+    import numpy as np
+    import torch
+    from torch.utils.data import DataLoader, Dataset
 
 
 class TaggedTable(Table):
@@ -893,6 +893,9 @@ class TaggedTable(Table):
             The DataLoader.
 
         """
+        import numpy as np
+        from torch.utils.data import DataLoader
+
         feature_rows = self.features.to_rows()
         all_rows = []
         for row in feature_rows:
@@ -900,17 +903,24 @@ class TaggedTable(Table):
             for column_name in row:
                 new_item.append(row.get_value(column_name))
             all_rows.append(new_item.copy())
-        return DataLoader(dataset=_CustomDataset(np.array(all_rows), np.array(self.target)), batch_size=batch_size)
+        return DataLoader(dataset=_create_dataset(np.array(all_rows), np.array(self.target)), batch_size=batch_size)
 
 
-class _CustomDataset(Dataset):
-    def __init__(self, features: np.array, target: np.array):
-        self.X = torch.from_numpy(features.astype(np.float32))
-        self.Y = torch.from_numpy(target.astype(np.float32))
-        self.len = self.X.shape[0]
+def _create_dataset(features: np.array, target: np.array) -> Dataset:
+    import numpy as np
+    import torch
+    from torch.utils.data import Dataset
 
-    def __getitem__(self, item: int) -> tuple[torch.Tensor, torch.Tensor]:
-        return self.X[item], self.Y[item].unsqueeze(-1)
+    class _CustomDataset(Dataset):
+        def __init__(self, features: np.array, target: np.array):
+            self.X = torch.from_numpy(features.astype(np.float32))
+            self.Y = torch.from_numpy(target.astype(np.float32))
+            self.len = self.X.shape[0]
 
-    def __len__(self) -> int:
-        return self.len
+        def __getitem__(self, item: int) -> tuple[torch.Tensor, torch.Tensor]:
+            return self.X[item], self.Y[item].unsqueeze(-1)
+
+        def __len__(self) -> int:
+            return self.len
+
+    return _CustomDataset(features, target)
