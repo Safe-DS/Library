@@ -2,8 +2,6 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from sklearn.tree import DecisionTreeClassifier as sk_DecisionTreeClassifier
-
 from safeds._utils import _structural_hash
 from safeds.ml.classical._util_sklearn import fit, predict
 
@@ -11,8 +9,10 @@ from ._classifier import Classifier
 
 if TYPE_CHECKING:
     from sklearn.base import ClassifierMixin
+    from sklearn.tree import DecisionTreeClassifier as sk_DecisionTreeClassifier
 
     from safeds.data.tabular.containers import Table, TaggedTable
+
 
 
 class DecisionTreeClassifier(Classifier):
@@ -111,4 +111,6 @@ class DecisionTreeClassifier(Classifier):
         return self._wrapped_classifier is not None
 
     def _get_sklearn_classifier(self) -> ClassifierMixin:
+        from sklearn.tree import DecisionTreeClassifier as sk_DecisionTreeClassifier
+
         return sk_DecisionTreeClassifier()

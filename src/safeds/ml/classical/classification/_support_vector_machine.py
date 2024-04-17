@@ -4,8 +4,6 @@ import sys
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
-from sklearn.svm import SVC as sk_SVC  # noqa: N811
-
 from safeds._utils import _structural_hash
 from safeds.exceptions import ClosedBound, OpenBound, OutOfBoundsError
 from safeds.ml.classical._util_sklearn import fit, predict
@@ -13,6 +11,7 @@ from safeds.ml.classical.classification import Classifier
 
 if TYPE_CHECKING:
     from sklearn.base import ClassifierMixin
+    from sklearn.svm import SVC as sk_SVC  # noqa: N811
 
     from safeds.data.tabular.containers import Table, TaggedTable
 
@@ -326,4 +325,6 @@ class SupportVectorMachineClassifier(Classifier):
         wrapped_classifier: ClassifierMixin
             The sklearn Classifier.
         """
+        from sklearn.svm import SVC as sk_SVC  # noqa: N811
+
         return sk_SVC(C=self._c)
