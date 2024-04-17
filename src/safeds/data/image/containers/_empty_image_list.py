@@ -1,9 +1,11 @@
 from __future__ import annotations
 
 import warnings
-from typing import TYPE_CHECKING, Self
+from typing import TYPE_CHECKING
 
 from safeds._utils import _structural_hash
+from safeds.data.image.containers._image_list import ImageList
+from safeds.data.image.containers._single_size_image_list import _SingleSizeImageList
 from safeds.data.image.utils._image_transformation_error_and_warning_checks import (
     _check_add_noise_errors,
     _check_adjust_brightness_errors_and_warnings,
@@ -15,6 +17,7 @@ from safeds.data.image.utils._image_transformation_error_and_warning_checks impo
     _check_resize_errors,
     _check_sharpen_errors_and_warnings,
 )
+from safeds.exceptions import IndexOutOfBoundsError
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -22,10 +25,6 @@ if TYPE_CHECKING:
     from torch import Tensor
 
     from safeds.data.image.containers import Image
-
-from safeds.data.image.containers._image_list import ImageList
-from safeds.data.image.containers._single_size_image_list import _SingleSizeImageList
-from safeds.exceptions import IndexOutOfBoundsError
 
 
 class _EmptyImageList(ImageList):
@@ -42,7 +41,7 @@ class _EmptyImageList(ImageList):
     | [from_files][safeds.data.image.containers._image_list.ImageList.from_files]   | Create an ImageList from a directory or a list of files. |
     """
 
-    _instance = None
+    _instance: ImageList | None = None
 
     @staticmethod
     def _warn_empty_image_list() -> None:
@@ -53,7 +52,7 @@ class _EmptyImageList(ImageList):
             stacklevel=2,
         )
 
-    def __new__(cls) -> Self:
+    def __new__(cls) -> ImageList:
         if cls._instance is None:
             cls._instance = super().__new__(cls)
         return cls._instance

@@ -7,16 +7,12 @@ from abc import ABCMeta, abstractmethod
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-import torch
-from PIL.Image import open as pil_image_open
-from torch import Tensor
-from torchvision.transforms.v2 import PILToTensor
-from torchvision.utils import make_grid, save_image
-
 from safeds.data.image.containers._image import Image
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
+
+    from torch import Tensor
 
     from safeds.data.image.containers._multi_size_image_list import _MultiSizeImageList
     from safeds.data.image.containers._single_size_image_list import _SingleSizeImageList
@@ -33,8 +29,6 @@ class ImageList(metaclass=ABCMeta):
     | [from_images][safeds.data.image.containers._image_list.ImageList.from_images] | Create an ImageList from a list of Images.               |
     | [from_files][safeds.data.image.containers._image_list.ImageList.from_files]   | Create an ImageList from a directory or a list of files. |
     """
-
-    _pil_to_tensor = PILToTensor()
 
     @staticmethod
     @abstractmethod
@@ -107,6 +101,9 @@ class ImageList(metaclass=ABCMeta):
         FileNotFoundError
             If the directory or one of the files of the path cannot be found
         """
+        from PIL.Image import open as pil_image_open
+        from torchvision.transforms.functional import pil_to_tensor
+
         from safeds.data.image.containers._empty_image_list import _EmptyImageList
         from safeds.data.image.containers._multi_size_image_list import _MultiSizeImageList
         from safeds.data.image.containers._single_size_image_list import _SingleSizeImageList
@@ -127,7 +124,7 @@ class ImageList(metaclass=ABCMeta):
             if p.is_dir():
                 path_list += sorted([p / name for name in os.listdir(p)])
             else:
-                image_tensors.append(ImageList._pil_to_tensor(pil_image_open(p)))
+                image_tensors.append(pil_to_tensor(pil_image_open(p)))
                 if fixed_size and (
                     image_tensors[0].size(dim=2) != image_tensors[-1].size(dim=2)
                     or image_tensors[0].size(dim=1) != image_tensors[-1].size(dim=1)
@@ -231,6 +228,9 @@ class ImageList(metaclass=ABCMeta):
         png:
             the png representation of this image list
         """
+        import torch
+        from torchvision.utils import make_grid, save_image
+
         from safeds.data.image.containers._empty_image_list import _EmptyImageList
 
         if isinstance(self, _EmptyImageList):
