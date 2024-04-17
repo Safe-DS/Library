@@ -269,6 +269,8 @@ class TimeSeries(Table):
         if len(self.target._data) == 0:
             self.target._data = pd.Series(name=target_name)
 
+        self._data = _data._data
+
     def __eq__(self, other: object) -> bool:
         """
         Compare two time series instances.

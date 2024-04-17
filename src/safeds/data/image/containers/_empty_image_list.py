@@ -41,7 +41,7 @@ class _EmptyImageList(ImageList):
     | [from_files][safeds.data.image.containers._image_list.ImageList.from_files]   | Create an ImageList from a directory or a list of files. |
     """
 
-    _instance: _EmptyImageList | None = None
+    _instance = None
 
     @staticmethod
     def _warn_empty_image_list() -> None:
