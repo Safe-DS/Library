@@ -103,6 +103,10 @@ ignore = [
     "D106",
     "D107",
 ]
+"__init__.py" = [
+    # runtime-import-in-type-checking-block: Does not work with apipkg.
+    "TCH004",
+]
 
 [pydocstyle]
 convention = "numpy"

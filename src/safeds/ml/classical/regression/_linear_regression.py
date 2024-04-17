@@ -2,8 +2,6 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from sklearn.linear_model import LinearRegression as sk_LinearRegression
-
 from safeds._utils import _structural_hash
 from safeds.ml.classical._util_sklearn import fit, predict
 
@@ -11,6 +9,7 @@ from ._regressor import Regressor
 
 if TYPE_CHECKING:
     from sklearn.base import RegressorMixin
+    from sklearn.linear_model import LinearRegression as sk_LinearRegression
 
     from safeds.data.tabular.containers import Table, TaggedTable
 
@@ -119,4 +118,6 @@ class LinearRegressionRegressor(Regressor):
         wrapped_regressor: RegressorMixin
             The sklearn Regressor.
         """
+        from sklearn.linear_model import LinearRegression as sk_LinearRegression
+
         return sk_LinearRegression(n_jobs=-1)

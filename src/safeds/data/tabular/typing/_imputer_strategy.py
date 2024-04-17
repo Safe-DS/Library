@@ -1,8 +1,12 @@
-from abc import ABC, abstractmethod
+from __future__ import annotations
 
-from sklearn.impute import SimpleImputer as sk_SimpleImputer
+from abc import ABC, abstractmethod
+from typing import TYPE_CHECKING
 
 from safeds._utils import _structural_hash
+
+if TYPE_CHECKING:
+    from sklearn.impute import SimpleImputer as sk_SimpleImputer
 
 
 class ImputerStrategy(ABC):

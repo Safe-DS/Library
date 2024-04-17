@@ -1,7 +1,6 @@
 from torch.utils.data import DataLoader
 
-from safeds.exceptions import InputSizeError
-from safeds.ml.nn._input_conversion import _InputConversion, T
+from safeds.ml.nn._input_conversion import _InputConversion
 
 from safeds.data.tabular.containers import Table
 

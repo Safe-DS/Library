@@ -3,9 +3,6 @@ from __future__ import annotations
 import sys
 from typing import TYPE_CHECKING
 
-import torch
-from torch import Tensor
-from torch.utils.data import DataLoader, Dataset
 
 from safeds._utils import _structural_hash
 from safeds.data.tabular.containers import Column, Row, Table
@@ -18,6 +15,10 @@ from safeds.exceptions import (
 if TYPE_CHECKING:
     from collections.abc import Callable, Mapping, Sequence
     from typing import Any
+
+    import torch
+    from torch import Tensor
+    from torch.utils.data import DataLoader, Dataset
 
 
 class TaggedTable(Table):
@@ -893,9 +894,12 @@ class TaggedTable(Table):
             The DataLoader.
 
         """
+        import torch
+        from torch.utils.data import DataLoader
+
         if num_of_classes <= 2:
             return DataLoader(
-                dataset=_CustomDataset(
+                dataset=_create_dataset(
                     torch.Tensor(self.features._data.values),
                     torch.Tensor(self.target._data).unsqueeze(dim=-1),
                 ),
@@ -904,7 +908,7 @@ class TaggedTable(Table):
             )
         else:
             return DataLoader(
-                dataset=_CustomDataset(
+                dataset=_create_dataset(
                     torch.Tensor(self.features._data.values),
                     torch.nn.functional.one_hot(torch.LongTensor(self.target._data), num_classes=num_of_classes),
                 ),
@@ -913,15 +917,20 @@ class TaggedTable(Table):
             )
 
 
-class _CustomDataset(Dataset):
+def _create_dataset(features: Tensor, target: Tensor) -> Dataset:
+    import torch
+    from torch.utils.data import Dataset
 
-    def __init__(self, features: Tensor, target: Tensor):
-        self.X = features.to(torch.float32)
-        self.Y = target.to(torch.float32)
-        self.len = self.X.size(dim=0)
+    class _CustomDataset(Dataset):
+        def __init__(self, features: Tensor, target: Tensor):
+            self.X = features.to(torch.float32)
+            self.Y = target.to(torch.float32)
+            self.len = self.X.size(dim=0)
 
-    def __getitem__(self, item: int) -> tuple[torch.Tensor, torch.Tensor]:
-        return self.X[item], self.Y[item]
+        def __getitem__(self, item: int) -> tuple[torch.Tensor, torch.Tensor]:
+            return self.X[item], self.Y[item]
 
-    def __len__(self) -> int:
-        return self.len
+        def __len__(self) -> int:
+            return self.len
+
+    return _CustomDataset(features, target)

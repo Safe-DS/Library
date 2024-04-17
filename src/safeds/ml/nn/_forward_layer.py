@@ -25,7 +25,7 @@ class _InternalLayer(nn.Module):
 class ForwardLayer(_Layer):
     def __init__(self, output_size: int, input_size: int | None = None):
         """
-        Create a FNN _Layer.
+        Create a FNN Layer.
 
         Parameters
         ----------

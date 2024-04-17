@@ -2,8 +2,6 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from sklearn.ensemble import AdaBoostRegressor as sk_AdaBoostRegressor
-
 from safeds._utils import _structural_hash
 from safeds.exceptions import ClosedBound, OpenBound, OutOfBoundsError
 from safeds.ml.classical._util_sklearn import fit, predict
@@ -12,6 +10,7 @@ from ._regressor import Regressor
 
 if TYPE_CHECKING:
     from sklearn.base import RegressorMixin
+    from sklearn.ensemble import AdaBoostRegressor as sk_AdaBoostRegressor
 
     from safeds.data.tabular.containers import Table, TaggedTable
 
@@ -205,6 +204,8 @@ class AdaBoostRegressor(Regressor):
         wrapped_regressor: RegressorMixin
             The sklearn Regressor.
         """
+        from sklearn.ensemble import AdaBoostRegressor as sk_AdaBoostRegressor
+
         learner = self._learner._get_sklearn_regressor() if self._learner is not None else None
         return sk_AdaBoostRegressor(
             estimator=learner,

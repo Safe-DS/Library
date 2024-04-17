@@ -1,11 +1,8 @@
+from __future__ import annotations
+
 import copy
-from collections.abc import Callable
-from typing import Self, Generic, TypeVar
+from typing import TYPE_CHECKING, Self, Generic, TypeVar
 
-import torch
-from torch import Tensor, nn
-
-from safeds.data.tabular.containers import TaggedTable
 from safeds.exceptions import (
     ClosedBound,
     InputSizeError,
@@ -13,9 +10,15 @@ from safeds.exceptions import (
     OutOfBoundsError,
     TestTrainDataMismatchError,
 )
-from safeds.ml.nn._input_conversion import _InputConversion
-from safeds.ml.nn._layer import _Layer
-from safeds.ml.nn._output_conversion import _OutputConversion
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
+
+    from torch import Tensor, nn
+
+    from safeds.ml.nn._input_conversion import _InputConversion
+    from safeds.ml.nn._layer import _Layer
+    from safeds.ml.nn._output_conversion import _OutputConversion
 
 I = TypeVar("I")
 O = TypeVar("O")
@@ -24,7 +27,7 @@ O = TypeVar("O")
 class NeuralNetworkRegressor(Generic[I, O]):
     def __init__(self, input_conversion: _InputConversion[I], layers: list[_Layer], output_conversion: _OutputConversion[I, O]):
         self._input_conversion = input_conversion
-        self._model = _InternalModel(layers, is_for_classification=False)
+        self._model = _create_internal_model(layers, is_for_classification=False)
         self._output_conversion = output_conversion
         self._input_size = self._model.input_size
         self._batch_size = 1
@@ -72,6 +75,9 @@ class NeuralNetworkRegressor(Generic[I, O]):
         trained_model :
             The trained Model
         """
+        import torch
+        from torch import nn
+
         if epoch_size < 1:
             raise OutOfBoundsError(actual=epoch_size, name="epoch_size", lower_bound=ClosedBound(1))
         if batch_size < 1:
@@ -138,20 +144,18 @@ class NeuralNetworkRegressor(Generic[I, O]):
         ModelNotFittedError
             If the model has not been fitted yet
         """
+        import torch
+
         if not self._is_fitted:
             raise ModelNotFittedError
         if not self._input_conversion._is_data_valid(test_data):
             raise TestTrainDataMismatchError
-        # dataloader = test_data._into_dataloader(self._batch_size)
         dataloader = self._input_conversion._data_conversion_predict(test_data, self._batch_size)
         predictions = []
-        # predictions: Tensor
         with torch.no_grad():
             for x in dataloader:
                 elem = self._model(x)
-                # predictions += elem.squeeze(dim=1).tolist()
                 predictions.append(elem.squeeze(dim=1))
-        # return test_data.add_column(Column("prediction", predictions)).tag_columns("prediction")
         return self._output_conversion._data_conversion(test_data, torch.cat(predictions, dim=0))
 
     @property
@@ -170,7 +174,7 @@ class NeuralNetworkRegressor(Generic[I, O]):
 class NeuralNetworkClassifier(Generic[I, O]):
     def __init__(self, input_conversion: _InputConversion[I], layers: list[_Layer], output_conversion: _OutputConversion[I, O]):
         self._input_conversion = input_conversion
-        self._model = _InternalModel(layers, is_for_classification=True)
+        self._model = _create_internal_model(layers, is_for_classification=True)
         self._output_conversion = output_conversion
         self._input_size = self._model.input_size
         self._batch_size = 1
@@ -219,6 +223,9 @@ class NeuralNetworkClassifier(Generic[I, O]):
         trained_model :
             The trained Model
         """
+        import torch
+        from torch import nn
+
         if epoch_size < 1:
             raise OutOfBoundsError(actual=epoch_size, name="epoch_size", lower_bound=ClosedBound(1))
         if batch_size < 1:
@@ -230,7 +237,6 @@ class NeuralNetworkClassifier(Generic[I, O]):
 
         copied_model._batch_size = batch_size
 
-        #dataloader = train_data._into_dataloader_with_classes(copied_model._batch_size, copied_model._num_of_classes)
         dataloader = copied_model._input_conversion._data_conversion_fit(train_data, copied_model._batch_size, copied_model._num_of_classes)
 
         if copied_model._num_of_classes > 1:
@@ -289,11 +295,12 @@ class NeuralNetworkClassifier(Generic[I, O]):
         ModelNotFittedError
             If the Model has not been fitted yet
         """
+        import torch
+
         if not self._is_fitted:
             raise ModelNotFittedError
         if not self._input_conversion._is_data_valid(test_data):
             raise TestTrainDataMismatchError
-        #dataloader = test_data._into_dataloader(self._batch_size)
         dataloader = self._input_conversion._data_conversion_predict(test_data, self._batch_size)
         predictions = []
         with torch.no_grad():
@@ -303,7 +310,6 @@ class NeuralNetworkClassifier(Generic[I, O]):
                     predictions.append(torch.argmax(elem, dim=1))
                 else:
                     predictions.append(elem.squeeze(dim=1).round())
-        #return test_data.add_column(Column("prediction", predictions)).tag_columns("prediction")
         return self._output_conversion._data_conversion(test_data, torch.cat(predictions, dim=0))
 
     @property
@@ -319,32 +325,38 @@ class NeuralNetworkClassifier(Generic[I, O]):
         return self._is_fitted
 
 
-class _InternalModel(nn.Module):
-    def __init__(self, layers: list[_Layer], is_for_classification: bool) -> None:
-        super().__init__()
-        self._layer_list = layers
-        internal_layers = []
-        previous_output_size = None
+def _create_internal_model(layers: list[_Layer], is_for_classification: bool) -> nn.Module:
+    from torch import nn
 
-        for layer in layers:
-            if previous_output_size is not None:
-                layer._set_input_size(previous_output_size)
-            internal_layers.append(layer._get_internal_layer(activation_function="relu"))
-            previous_output_size = layer.output_size
+    class _InternalModel(nn.Module):
+        def __init__(self, layers: list[_Layer], is_for_classification: bool) -> None:
 
-        if is_for_classification:
-            internal_layers.pop()
-            if layers[-1].output_size > 2:
-                internal_layers.append(layers[-1]._get_internal_layer(activation_function="softmax"))
-            else:
-                internal_layers.append(layers[-1]._get_internal_layer(activation_function="sigmoid"))
-        self._pytorch_layers = nn.Sequential(*internal_layers)
+            super().__init__()
+            self._layer_list = layers
+            internal_layers = []
+            previous_output_size = None
 
-    @property
-    def input_size(self) -> int:
-        return self._layer_list[0].input_size
+            for layer in layers:
+                if previous_output_size is not None:
+                    layer._set_input_size(previous_output_size)
+                internal_layers.append(layer._get_internal_layer(activation_function="relu"))
+                previous_output_size = layer.output_size
 
-    def forward(self, x: Tensor) -> Tensor:
-        for layer in self._pytorch_layers:
-            x = layer(x)
-        return x
+            if is_for_classification:
+                internal_layers.pop()
+                if layers[-1].output_size > 2:
+                    internal_layers.append(layers[-1]._get_internal_layer(activation_function="softmax"))
+                else:
+                    internal_layers.append(layers[-1]._get_internal_layer(activation_function="sigmoid"))
+            self._pytorch_layers = nn.Sequential(*internal_layers)
+
+        @property
+        def input_size(self) -> int:
+            return self._layer_list[0].input_size
+
+        def forward(self, x: Tensor) -> Tensor:
+            for layer in self._pytorch_layers:
+                x = layer(x)
+            return x
+
+    return _InternalModel(layers, is_for_classification)

@@ -6,11 +6,6 @@ from collections.abc import Sequence
 from numbers import Number
 from typing import TYPE_CHECKING, Any, TypeVar, overload
 
-import matplotlib.pyplot as plt
-import numpy as np
-import pandas as pd
-import seaborn as sns
-
 from safeds._utils import _structural_hash
 from safeds.data.image.containers import Image
 from safeds.data.tabular.typing import ColumnType
@@ -24,11 +19,11 @@ from safeds.exceptions import (
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterator
 
+    import pandas as pd
+
+
 T = TypeVar("T")
 R = TypeVar("R")
-
-# Enable copy-on-write for pandas dataframes
-pd.options.mode.copy_on_write = True
 
 
 class Column(Sequence[T]):
@@ -103,6 +98,11 @@ class Column(Sequence[T]):
         >>> from safeds.data.tabular.containers import Column
         >>> column = Column("test", [1, 2, 3])
         """
+        import pandas as pd
+
+        # Enable copy-on-write for pandas dataframes
+        pd.options.mode.copy_on_write = True
+
         if data is None:
             data = []
 
@@ -503,6 +503,8 @@ class Column(Sequence[T]):
         >>> column2.has_missing_values()
         False
         """
+        import numpy as np
+
         return self.any(lambda value: value is None or (isinstance(value, Number) and np.isnan(value)))
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -937,6 +939,9 @@ class Column(Sequence[T]):
         >>> column = Column("test", [1, 2, 3])
         >>> boxplot = column.plot_boxplot()
         """
+        import matplotlib.pyplot as plt
+        import seaborn as sns
+
         if not self.type.is_numeric():
             raise NonNumericColumnError(f"{self.name} is of type {self._type}.")
 
@@ -968,6 +973,9 @@ class Column(Sequence[T]):
         >>> column = Column("test", [1, 2, 3])
         >>> histogram = column.plot_histogram()
         """
+        import matplotlib.pyplot as plt
+        import seaborn as sns
+
         fig = plt.figure()
         ax = sns.histplot(data=self._data)
         ax.set_xticks(ax.get_xticks())

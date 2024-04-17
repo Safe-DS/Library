@@ -2,8 +2,6 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from sklearn.linear_model import LogisticRegression as sk_LogisticRegression
-
 from safeds._utils import _structural_hash
 from safeds.ml.classical._util_sklearn import fit, predict
 
@@ -11,6 +9,7 @@ from ._classifier import Classifier
 
 if TYPE_CHECKING:
     from sklearn.base import ClassifierMixin
+    from sklearn.linear_model import LogisticRegression as sk_LogisticRegression
 
     from safeds.data.tabular.containers import Table, TaggedTable
 
@@ -119,4 +118,6 @@ class LogisticRegressionClassifier(Classifier):
         wrapped_classifier: ClassifierMixin
             The sklearn Classifier.
         """
+        from sklearn.linear_model import LogisticRegression as sk_LogisticRegression
+
         return sk_LogisticRegression(n_jobs=-1)
