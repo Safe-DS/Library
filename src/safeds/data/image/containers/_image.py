@@ -38,7 +38,7 @@ class Image:
     _filter_edges_kernel_cache: Tensor | None = None
 
     @staticmethod
-    def _filter_edges_kernel():
+    def _filter_edges_kernel() -> Tensor:
         import torch
 
         if Image._filter_edges_kernel_cache is None:

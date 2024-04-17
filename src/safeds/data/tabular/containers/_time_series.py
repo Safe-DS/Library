@@ -242,9 +242,12 @@ class TimeSeries(Table):
         """
         import pandas as pd
 
+        # Enable copy-on-write for pandas dataframes
+        pd.options.mode.copy_on_write = True
+
         # Validate inputs
         super().__init__(data)
-        _data = Table(data)
+        _data: Table = Table(data)
         if feature_names is None:
             self._features = Table()
             self._feature_names = []

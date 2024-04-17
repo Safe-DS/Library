@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import warnings
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Self
 
 from safeds._utils import _structural_hash
 from safeds.data.image.containers._image_list import ImageList
@@ -41,7 +41,7 @@ class _EmptyImageList(ImageList):
     | [from_files][safeds.data.image.containers._image_list.ImageList.from_files]   | Create an ImageList from a directory or a list of files. |
     """
 
-    _instance: ImageList | None = None
+    _instance: _EmptyImageList | None = None
 
     @staticmethod
     def _warn_empty_image_list() -> None:
@@ -52,7 +52,7 @@ class _EmptyImageList(ImageList):
             stacklevel=2,
         )
 
-    def __new__(cls) -> ImageList:
+    def __new__(cls) -> Self:
         if cls._instance is None:
             cls._instance = super().__new__(cls)
         return cls._instance
