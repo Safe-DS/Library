@@ -244,12 +244,12 @@ class NeuralNetworkClassifier:
                 if callback_on_batch_completion is not None:
                     callback_on_batch_completion(
                         copied_model._total_number_of_batches_done,
-                        copied_model._loss_sum / (copied_model._total_number_of_batches_done * batch_size),
+                        copied_model._loss_sum / (copied_model._total_number_of_batches_done - (copied_model._total_number_of_epochs_done * copied_model._batch_size)),
                     )
             if callback_on_epoch_completion is not None:
                 callback_on_epoch_completion(
                     copied_model._total_number_of_epochs_done + 1,
-                    copied_model._loss_sum / (copied_model._total_number_of_batches_done * batch_size),
+                    copied_model._loss_sum,
                 )
             copied_model._loss_sum = 0.0
         copied_model._is_fitted = True
