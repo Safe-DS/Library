@@ -5,8 +5,6 @@ from dataclasses import dataclass
 from types import NoneType
 from typing import TYPE_CHECKING, Any
 
-import numpy as np
-
 if TYPE_CHECKING:
     import pandas as pd
 
@@ -47,6 +45,7 @@ class ColumnType(ABC):
         NotImplementedError
             If the given data type is not supported.
         """
+        import numpy as np
 
         def column_type_of_type(cell_type: Any) -> ColumnType:
             if cell_type == int or cell_type == np.int64 or cell_type == np.int32:
