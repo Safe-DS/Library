@@ -27,7 +27,10 @@ OT = TypeVar("OT", TaggedTable, TimeSeries)
 
 class NeuralNetworkRegressor(Generic[IT, OT]):
     def __init__(
-        self, input_conversion: _InputConversion[IT], layers: list[_Layer], output_conversion: _OutputConversion[IT, OT],
+        self,
+        input_conversion: _InputConversion[IT],
+        layers: list[_Layer],
+        output_conversion: _OutputConversion[IT, OT],
     ):
         self._input_conversion: _InputConversion[IT] = input_conversion
         self._model = _create_internal_model(layers, is_for_classification=False)
@@ -176,7 +179,10 @@ class NeuralNetworkRegressor(Generic[IT, OT]):
 
 class NeuralNetworkClassifier(Generic[IT, OT]):
     def __init__(
-        self, input_conversion: _InputConversion[IT], layers: list[_Layer], output_conversion: _OutputConversion[IT, OT],
+        self,
+        input_conversion: _InputConversion[IT],
+        layers: list[_Layer],
+        output_conversion: _OutputConversion[IT, OT],
     ):
         self._input_conversion: _InputConversion[IT] = input_conversion
         self._model = _create_internal_model(layers, is_for_classification=True)
@@ -243,7 +249,9 @@ class NeuralNetworkClassifier(Generic[IT, OT]):
         copied_model._batch_size = batch_size
 
         dataloader = copied_model._input_conversion._data_conversion_fit(
-            train_data, copied_model._batch_size, copied_model._num_of_classes,
+            train_data,
+            copied_model._batch_size,
+            copied_model._num_of_classes,
         )
 
         if copied_model._num_of_classes > 1:

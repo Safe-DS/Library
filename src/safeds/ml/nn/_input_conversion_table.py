@@ -17,7 +17,8 @@ class InputConversionTable(_InputConversion[Table]):
 
     def _data_conversion_fit(self, input_data: Table, batch_size: int, num_of_classes: int = 1) -> DataLoader:
         return input_data.tag_columns(self._target_name, self._feature_names)._into_dataloader_with_classes(
-            batch_size, num_of_classes,
+            batch_size,
+            num_of_classes,
         )
 
     def _data_conversion_predict(self, input_data: Table, batch_size: int) -> DataLoader:
