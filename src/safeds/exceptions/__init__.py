@@ -32,10 +32,12 @@ if TYPE_CHECKING:
         DatasetContainsTargetError,
         DatasetMissesDataError,
         DatasetMissesFeaturesError,
+        InputSizeError,
         LearningError,
         ModelNotFittedError,
         NonTimeSeriesError,
         PredictionError,
+        TestTrainDataMismatchError,
         UntaggedTableError,
     )
 
@@ -62,10 +64,12 @@ apipkg.initpkg(__name__, {
     "DatasetContainsTargetError": "._ml:DatasetContainsTargetError",
     "DatasetMissesDataError": "._ml:DatasetMissesDataError",
     "DatasetMissesFeaturesError": "._ml:DatasetMissesFeaturesError",
+    "InputSizeError": "._ml:InputSizeError",
     "LearningError": "._ml:LearningError",
     "ModelNotFittedError": "._ml:ModelNotFittedError",
     "NonTimeSeriesError": "._ml:NonTimeSeriesError",
     "PredictionError": "._ml:PredictionError",
+    "TestTrainDataMismatchError": "_ml:TestTrainDataMismatchError",
     "UntaggedTableError": "._ml:UntaggedTableError",
     # Other
     "Bound": "._generic:Bound",
@@ -96,10 +100,12 @@ __all__ = [
     "DatasetContainsTargetError",
     "DatasetMissesDataError",
     "DatasetMissesFeaturesError",
+    "InputSizeError",
     "LearningError",
     "ModelNotFittedError",
     "NonTimeSeriesError",
     "PredictionError",
+    "TestTrainDataMismatchError",
     "UntaggedTableError",
     # Other
     "Bound",

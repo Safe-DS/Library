@@ -5,17 +5,17 @@ from typing import TYPE_CHECKING
 import apipkg
 
 if TYPE_CHECKING:
-    from ._fnn_layer import FNNLayer
+    from ._forward_layer import ForwardLayer
     from ._model import NeuralNetworkClassifier, NeuralNetworkRegressor
 
 apipkg.initpkg(__name__, {
-    "FNNLayer": "._fnn_layer:FNNLayer",
+    "ForwardLayer": "._forward_layer:ForwardLayer",
     "NeuralNetworkClassifier": "._model:NeuralNetworkClassifier",
     "NeuralNetworkRegressor": "._model:NeuralNetworkRegressor",
 })
 
 __all__ = [
-    "FNNLayer",
+    "ForwardLayer",
     "NeuralNetworkClassifier",
     "NeuralNetworkRegressor",
 ]
