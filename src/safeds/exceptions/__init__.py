@@ -69,7 +69,7 @@ apipkg.initpkg(__name__, {
     "ModelNotFittedError": "._ml:ModelNotFittedError",
     "NonTimeSeriesError": "._ml:NonTimeSeriesError",
     "PredictionError": "._ml:PredictionError",
-    "TestTrainDataMismatchError": "_ml:TestTrainDataMismatchError",
+    "TestTrainDataMismatchError": "._ml:TestTrainDataMismatchError",
     "UntaggedTableError": "._ml:UntaggedTableError",
     # Other
     "Bound": "._generic:Bound",

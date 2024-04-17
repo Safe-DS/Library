@@ -16,7 +16,7 @@ if TYPE_CHECKING:
     from typing import Any
 
     import numpy as np
-    import torch
+    from torch import Tensor
     from torch.utils.data import DataLoader, Dataset
 
 
@@ -893,7 +893,7 @@ class TaggedTable(Table):
             The DataLoader.
 
         """
-        import numpy as np
+        import torch
         from torch.utils.data import DataLoader
 
         if num_of_classes <= 2:
@@ -917,7 +917,6 @@ class TaggedTable(Table):
 
 
 def _create_dataset(features: np.array, target: np.array) -> Dataset:
-    import numpy as np
     import torch
     from torch.utils.data import Dataset
 

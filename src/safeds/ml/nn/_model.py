@@ -15,7 +15,7 @@ from safeds.exceptions import (
 if TYPE_CHECKING:
     from collections.abc import Callable
 
-    from torch import nn
+    from torch import Tensor, nn
 
     from safeds.ml.nn._layer import Layer
 
@@ -221,7 +221,7 @@ class NeuralNetworkClassifier:
             The trained Model
         """
         import torch
-        from torch import Tensor, nn
+        from torch import nn
 
         if epoch_size < 1:
             raise OutOfBoundsError(actual=epoch_size, name="epoch_size", lower_bound=ClosedBound(1))
@@ -329,7 +329,7 @@ class NeuralNetworkClassifier:
         return self._is_fitted
 
 
-def _create_internal_model(fnn_layers: list[FNNLayer], is_for_classification: bool) -> nn.Module:
+def _create_internal_model(layers: list[Layer], is_for_classification: bool) -> nn.Module:
     from torch import nn
 
     class _InternalModel(nn.Module):
@@ -359,8 +359,8 @@ def _create_internal_model(fnn_layers: list[FNNLayer], is_for_classification: bo
             return self._layer_list[0].input_size
 
         def forward(self, x: Tensor) -> Tensor:
-                for layer in self._pytorch_layers:
-                    x = layer(x)
-                return x
+            for layer in self._pytorch_layers:
+                x = layer(x)
+            return x
 
-    return _InternalModel(fnn_layers, is_for_classification)
+    return _InternalModel(layers, is_for_classification)
