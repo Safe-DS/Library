@@ -1,4 +1,8 @@
-from torch.utils.data import DataLoader
+from __future__ import annotations
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from torch.utils.data import DataLoader
 
 from safeds.data.tabular.containers import Table
 from safeds.ml.nn._input_conversion import _InputConversion

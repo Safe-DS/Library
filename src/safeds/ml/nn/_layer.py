@@ -1,6 +1,10 @@
-from abc import ABC, abstractmethod
+from __future__ import annotations
 
-from torch import nn
+from abc import ABC, abstractmethod
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from torch import nn
 
 
 class _Layer(ABC):

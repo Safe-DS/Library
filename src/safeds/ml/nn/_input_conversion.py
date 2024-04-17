@@ -1,7 +1,9 @@
+from __future__ import annotations
 from abc import ABC, abstractmethod
-from typing import Generic, TypeVar
+from typing import Generic, TypeVar, TYPE_CHECKING
 
-from torch.utils.data import DataLoader
+if TYPE_CHECKING:
+    from torch.utils.data import DataLoader
 
 from safeds.data.tabular.containers import Table, TimeSeries
 

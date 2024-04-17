@@ -1,20 +1,21 @@
-from torch import Tensor, nn
+from torch import Tensor
+from torch.nn import Module, Linear, Sigmoid, ReLU, Softmax
 
 from safeds.exceptions import ClosedBound, OutOfBoundsError
 from safeds.ml.nn._layer import _Layer
 
 
-class _InternalLayer(nn.Module):
+class _InternalLayer(Module):
     def __init__(self, input_size: int, output_size: int, activation_function: str):
         super().__init__()
-        self._layer = nn.Linear(input_size, output_size)
+        self._layer = Linear(input_size, output_size)
         match activation_function:
             case "sigmoid":
-                self._fn = nn.Sigmoid()
+                self._fn = Sigmoid()
             case "relu":
-                self._fn = nn.ReLU()
+                self._fn = ReLU()
             case "softmax":
-                self._fn = nn.Softmax()
+                self._fn = Softmax()
             case _:
                 raise ValueError("Unknown Activation Function: " + activation_function)
 

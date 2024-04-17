@@ -1,7 +1,12 @@
+from __future__ import annotations
+
 from abc import ABC, abstractmethod
 from typing import Generic, TypeVar
 
-from torch import Tensor
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from torch import Tensor
 
 from safeds.data.tabular.containers import Table, TaggedTable, TimeSeries
 

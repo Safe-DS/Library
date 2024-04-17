@@ -1,4 +1,8 @@
-from torch import Tensor
+from __future__ import annotations
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from torch import Tensor
 
 from safeds.data.tabular.containers import Column, Table, TaggedTable
 from safeds.ml.nn._output_conversion import _OutputConversion
