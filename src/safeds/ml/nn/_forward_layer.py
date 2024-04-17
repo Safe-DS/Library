@@ -1,5 +1,5 @@
 from torch import Tensor
-from torch.nn import Module, Linear, Sigmoid, ReLU, Softmax
+from torch.nn import Linear, Module, ReLU, Sigmoid, Softmax
 
 from safeds.exceptions import ClosedBound, OutOfBoundsError
 from safeds.ml.nn._layer import _Layer
