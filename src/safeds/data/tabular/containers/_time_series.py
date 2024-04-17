@@ -464,7 +464,7 @@ class TimeSeries(Table):
             time_name=self.time.name,
             target_name=self._target.name,
             feature_names=self._feature_names
-                          + [col.name for col in (columns.to_columns() if isinstance(columns, Table) else columns)],
+            + [col.name for col in (columns.to_columns() if isinstance(columns, Table) else columns)],
         )
 
     def add_columns(self, columns: list[Column] | Table) -> TimeSeries:
@@ -885,8 +885,8 @@ class TimeSeries(Table):
                     self._feature_names
                     if old_column_name not in self._feature_names
                     else self._feature_names[: self._feature_names.index(old_column_name)]
-                         + [col.name for col in new_columns]
-                         + self._feature_names[self._feature_names.index(old_column_name) + 1:]
+                    + [col.name for col in new_columns]
+                    + self._feature_names[self._feature_names.index(old_column_name) + 1 :]
                 ),
             )
 
@@ -930,7 +930,7 @@ class TimeSeries(Table):
     def sort_columns(
         self,
         comparator: Callable[[Column, Column], int] = lambda col1, col2: (col1.name > col2.name)
-                                                                         - (col1.name < col2.name),
+        - (col1.name < col2.name),
     ) -> TimeSeries:
         """
         Sort the columns of a `TimeSeries` with the given comparator and return a new `TimeSeries`.
@@ -1307,11 +1307,11 @@ class TimeSeries(Table):
         # -> [i, win_size],[target]
         feature_cols = self.features.to_columns()
         for i in range(size - (forecast_len + window_size)):
-            window = target_np[i: i + window_size]
+            window = target_np[i : i + window_size]
             label = target_np[i + window_size + forecast_len]
             for col in feature_cols:
                 data = col._data.to_numpy()
-                window = np.concatenate((window, data[i: i + window_size]))
+                window = np.concatenate((window, data[i : i + window_size]))
             x_s.append(window)
             y_s.append(label)
 
