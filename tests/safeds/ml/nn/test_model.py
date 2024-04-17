@@ -167,7 +167,8 @@ class TestClassificationModel:
         assert obj.callback_was_called() is True
 
     def test_should_raise_if_fit_doesnt_epoch_callback(self) -> None:
-        model = NeuralNetworkClassifier([ForwardLayer(input_size=1, output_size=1)])
+        model = NeuralNetworkClassifier(InputConversionTable(["b"], "a"), [ForwardLayer(input_size=1, output_size=1)],
+                                        OutputConversionTable())
 
         class Test:
             self.was_called = False
@@ -269,9 +270,9 @@ class TestRegressionModel:
         assert model.is_fitted
 
     def test_should_raise_if_test_and_train_data_mismatch(self) -> None:
-        model = NeuralNetworkRegressor([ForwardLayer(input_size=1, output_size=1)])
+        model = NeuralNetworkRegressor(InputConversionTable(["b"], "a"), [ForwardLayer(input_size=1, output_size=1)], OutputConversionTable())
         model = model.fit(
-            Table.from_dict({"a": [1, 0, 2], "b": [0, 15, 5]}).tag_columns("a"),
+            Table.from_dict({"a": [1, 0, 2], "b": [0, 15, 5]}),
         )
         with pytest.raises(
             TestTrainDataMismatchError,
@@ -282,16 +283,16 @@ class TestRegressionModel:
             )
 
     def test_should_raise_if_table_size_and_input_size_mismatch(self) -> None:
-        model = NeuralNetworkRegressor([ForwardLayer(input_size=1, output_size=1), ForwardLayer(output_size=3)])
+        model = NeuralNetworkRegressor(InputConversionTable(["b", "c"], "a"), [ForwardLayer(input_size=1, output_size=1), ForwardLayer(output_size=3)], OutputConversionTable())
         with pytest.raises(
             InputSizeError,
         ):
             model.fit(
-                Table.from_dict({"a": [1, 0, 2], "b": [0, 15, 5], "c": [3, 33, 333]}).tag_columns("a"),
+                Table.from_dict({"a": [1, 0, 2], "b": [0, 15, 5], "c": [3, 33, 333]}),
             )
 
     def test_should_raise_if_fit_doesnt_batch_callback(self) -> None:
-        model = NeuralNetworkRegressor([ForwardLayer(input_size=1, output_size=1)])
+        model = NeuralNetworkRegressor(InputConversionTable(["b"], "a"), [ForwardLayer(input_size=1, output_size=1)], OutputConversionTable())
 
         class Test:
             self.was_called = False
@@ -304,12 +305,13 @@ class TestRegressionModel:
                 return self.was_called
 
         obj = Test()
-        model.fit(Table.from_dict({"a": [1], "b": [0]}).tag_columns("a"), callback_on_batch_completion=obj.cb)
+        model.fit(Table.from_dict({"a": [1], "b": [0]}), callback_on_batch_completion=obj.cb)
 
         assert obj.callback_was_called() is True
 
     def test_should_raise_if_fit_doesnt_epoch_callback(self) -> None:
-        model = NeuralNetworkRegressor([ForwardLayer(input_size=1, output_size=1)])
+        model = NeuralNetworkRegressor(InputConversionTable(["b"], "a"), [ForwardLayer(input_size=1, output_size=1)],
+                                       OutputConversionTable())
 
         class Test:
             self.was_called = False
@@ -322,6 +324,6 @@ class TestRegressionModel:
                 return self.was_called
 
         obj = Test()
-        model.fit(Table.from_dict({"a": [1], "b": [0]}).tag_columns("a"), callback_on_epoch_completion=obj.cb)
+        model.fit(Table.from_dict({"a": [1], "b": [0]}), callback_on_epoch_completion=obj.cb)
 
         assert obj.callback_was_called() is True

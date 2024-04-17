@@ -76,8 +76,8 @@ class NeuralNetworkRegressor(Generic[I, O]):
             raise OutOfBoundsError(actual=epoch_size, name="epoch_size", lower_bound=ClosedBound(1))
         if batch_size < 1:
             raise OutOfBoundsError(actual=batch_size, name="batch_size", lower_bound=ClosedBound(1))
-        if train_data.features.number_of_columns is not self._input_size:
-            raise InputSizeError(train_data.features.number_of_columns, self._input_size)
+        if self._input_conversion._data_size is not self._input_size:
+            raise InputSizeError(self._input_conversion._data_size, self._input_size)
 
         copied_model = copy.deepcopy(self)
 
@@ -167,9 +167,11 @@ class NeuralNetworkRegressor(Generic[I, O]):
         return self._is_fitted
 
 
-class NeuralNetworkClassifier:
-    def __init__(self, layers: list[Layer]):
+class NeuralNetworkClassifier(Generic[I, O]):
+    def __init__(self, input_conversion: _InputConversion[I], layers: list[_Layer], output_conversion: _OutputConversion[I, O]):
+        self._input_conversion = input_conversion
         self._model = _InternalModel(layers, is_for_classification=True)
+        self._output_conversion = output_conversion
         self._input_size = self._model.input_size
         self._batch_size = 1
         self._is_fitted = False
@@ -228,7 +230,8 @@ class NeuralNetworkClassifier:
 
         copied_model._batch_size = batch_size
 
-        dataloader = train_data._into_dataloader_with_classes(copied_model._batch_size, copied_model._num_of_classes)
+        #dataloader = train_data._into_dataloader_with_classes(copied_model._batch_size, copied_model._num_of_classes)
+        dataloader = copied_model._input_conversion._data_conversion_fit(train_data, copied_model._batch_size, copied_model._num_of_classes)
 
         if copied_model._num_of_classes > 1:
             loss_fn = nn.CrossEntropyLoss()
@@ -290,7 +293,8 @@ class NeuralNetworkClassifier:
             raise ModelNotFittedError
         if not self._input_conversion._is_data_valid(test_data):
             raise TestTrainDataMismatchError
-        dataloader = test_data._into_dataloader(self._batch_size)
+        #dataloader = test_data._into_dataloader(self._batch_size)
+        dataloader = self._input_conversion._data_conversion_predict(test_data, self._batch_size)
         predictions = []
         with torch.no_grad():
             for x in dataloader:
