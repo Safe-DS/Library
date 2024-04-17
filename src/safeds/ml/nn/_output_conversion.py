@@ -14,4 +14,4 @@ class _OutputConversion(Generic[IT, OT], ABC):
 
     @abstractmethod
     def _data_conversion(self, input_data: IT, output_data: Tensor) -> OT:
-        pass
+        pass  # pragma: no cover

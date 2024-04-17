@@ -14,16 +14,16 @@ class _InputConversion(Generic[T], ABC):
     @property
     @abstractmethod
     def _data_size(self) -> int:
-        pass
+        pass  # pragma: no cover
 
     @abstractmethod
     def _data_conversion_fit(self, input_data: T, batch_size: int, num_of_classes: int = 1) -> DataLoader:
-        pass
+        pass  # pragma: no cover
 
     @abstractmethod
     def _data_conversion_predict(self, input_data: T, batch_size: int) -> DataLoader:
-        pass
+        pass  # pragma: no cover
 
     @abstractmethod
     def _is_data_valid(self, input_data: T) -> bool:
-        pass
+        pass  # pragma: no cover
