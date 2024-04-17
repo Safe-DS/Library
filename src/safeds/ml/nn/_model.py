@@ -73,9 +73,11 @@ class NeuralNetworkRegressor:
             raise OutOfBoundsError(actual=batch_size, name="batch_size", lower_bound=ClosedBound(1))
         if train_data.features.number_of_columns is not self._input_size:
             raise InputSizeError(train_data.features.number_of_columns, self._input_size)
-        self._feature_names = train_data.features.column_names
-        self._batch_size = batch_size
+
         copied_model = copy.deepcopy(self)
+
+        copied_model._feature_names = train_data.features.column_names
+        copied_model._batch_size = batch_size
 
         dataloader = train_data._into_dataloader_with_classes(copied_model._batch_size, 1)
 
@@ -89,20 +91,20 @@ class NeuralNetworkRegressor:
                 pred = copied_model._model(x)
 
                 loss = loss_fn(pred, y)
-                self._loss_sum += loss.item()
+                copied_model._loss_sum += loss.item()
                 loss.backward()
                 optimizer.step()
-                self._total_number_of_batches_done += 1
+                copied_model._total_number_of_batches_done += 1
                 if callback_on_batch_completion is not None:
                     callback_on_batch_completion(
-                        self._total_number_of_batches_done,
-                        self._loss_sum / (self._total_number_of_batches_done * batch_size),
+                        copied_model._total_number_of_batches_done,
+                        copied_model._loss_sum / (copied_model._total_number_of_batches_done * batch_size),
                     )
-            self._total_number_of_epochs_done += 1
+            copied_model._total_number_of_epochs_done += 1
             if callback_on_epoch_completion is not None:
                 callback_on_epoch_completion(
-                    self._total_number_of_epochs_done,
-                    self._loss_sum / (self._total_number_of_batches_done * batch_size),
+                    copied_model._total_number_of_epochs_done,
+                    copied_model._loss_sum / (copied_model._total_number_of_batches_done * batch_size),
                 )
         copied_model._is_fitted = True
         copied_model._model.eval()
@@ -214,13 +216,15 @@ class NeuralNetworkClassifier:
             raise OutOfBoundsError(actual=batch_size, name="batch_size", lower_bound=ClosedBound(1))
         if train_data.features.number_of_columns is not self._input_size:
             raise InputSizeError(train_data.features.number_of_columns, self._input_size)
-        self._feature_names = train_data.features.column_names
-        self._batch_size = batch_size
+
         copied_model = copy.deepcopy(self)
+
+        copied_model._feature_names = train_data.features.column_names
+        copied_model._batch_size = batch_size
 
         dataloader = train_data._into_dataloader_with_classes(copied_model._batch_size, copied_model._num_of_classes)
 
-        if self._num_of_classes > 1:
+        if copied_model._num_of_classes > 1:
             loss_fn = nn.CrossEntropyLoss()
         else:
             loss_fn = nn.BCELoss()
@@ -232,21 +236,22 @@ class NeuralNetworkClassifier:
                 pred = copied_model._model(x)
 
                 loss = loss_fn(pred, y)
-                self._loss_sum += loss.item()
+                copied_model._loss_sum += loss.item()
                 loss.backward()
                 optimizer.step()
 
-                self._total_number_of_batches_done += 1
+                copied_model._total_number_of_batches_done += 1
                 if callback_on_batch_completion is not None:
                     callback_on_batch_completion(
-                        self._total_number_of_batches_done,
-                        self._loss_sum / (self._total_number_of_batches_done * batch_size),
+                        copied_model._total_number_of_batches_done,
+                        copied_model._loss_sum / (copied_model._total_number_of_batches_done * batch_size),
                     )
             if callback_on_epoch_completion is not None:
                 callback_on_epoch_completion(
-                    self._total_number_of_epochs_done + 1,
-                    self._loss_sum / (self._total_number_of_batches_done * batch_size),
+                    copied_model._total_number_of_epochs_done + 1,
+                    copied_model._loss_sum / (copied_model._total_number_of_batches_done * batch_size),
                 )
+            copied_model._loss_sum = 0.0
         copied_model._is_fitted = True
         copied_model._model.eval()
         return copied_model
