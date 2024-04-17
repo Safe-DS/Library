@@ -4,7 +4,6 @@ from typing import TYPE_CHECKING
 
 import apipkg
 
-
 if TYPE_CHECKING:
     from safeds.exceptions._data import (
         ColumnIsTargetError,

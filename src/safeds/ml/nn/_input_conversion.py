@@ -1,11 +1,11 @@
 from abc import ABC, abstractmethod
-from typing import TypeVar, Generic
+from typing import Generic, TypeVar
 
 from torch.utils.data import DataLoader
 
 from safeds.data.tabular.containers import Table, TimeSeries
 
-T = TypeVar('T', Table, TimeSeries)
+T = TypeVar("T", Table, TimeSeries)
 
 
 class _InputConversion(Generic[T], ABC):

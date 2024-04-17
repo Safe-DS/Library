@@ -1,9 +1,9 @@
 from abc import ABC, abstractmethod
-from typing import TypeVar, Generic
+from typing import Generic, TypeVar
 
 from torch import Tensor
 
-from safeds.data.tabular.containers import TaggedTable, TimeSeries, Table
+from safeds.data.tabular.containers import Table, TaggedTable, TimeSeries
 
 IT = TypeVar("IT", Table, TimeSeries)
 OT = TypeVar("OT", TaggedTable, TimeSeries)

@@ -1,8 +1,9 @@
 from __future__ import annotations
 
 import copy
-from typing import TYPE_CHECKING, Self, Generic, TypeVar
+from typing import TYPE_CHECKING, Generic, Self, TypeVar
 
+from safeds.data.tabular.containers import Table, TaggedTable, TimeSeries
 from safeds.exceptions import (
     ClosedBound,
     InputSizeError,
@@ -10,8 +11,6 @@ from safeds.exceptions import (
     OutOfBoundsError,
     TestTrainDataMismatchError,
 )
-
-from safeds.data.tabular.containers import Table, TimeSeries, TaggedTable
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -27,7 +26,9 @@ OT = TypeVar("OT", TaggedTable, TimeSeries)
 
 
 class NeuralNetworkRegressor(Generic[IT, OT]):
-    def __init__(self, input_conversion: _InputConversion[IT], layers: list[_Layer], output_conversion: _OutputConversion[IT, OT]):
+    def __init__(
+        self, input_conversion: _InputConversion[IT], layers: list[_Layer], output_conversion: _OutputConversion[IT, OT],
+    ):
         self._input_conversion: _InputConversion[IT] = input_conversion
         self._model = _create_internal_model(layers, is_for_classification=False)
         self._output_conversion: _OutputConversion[IT, OT] = output_conversion
@@ -174,7 +175,9 @@ class NeuralNetworkRegressor(Generic[IT, OT]):
 
 
 class NeuralNetworkClassifier(Generic[IT, OT]):
-    def __init__(self, input_conversion: _InputConversion[IT], layers: list[_Layer], output_conversion: _OutputConversion[IT, OT]):
+    def __init__(
+        self, input_conversion: _InputConversion[IT], layers: list[_Layer], output_conversion: _OutputConversion[IT, OT],
+    ):
         self._input_conversion: _InputConversion[IT] = input_conversion
         self._model = _create_internal_model(layers, is_for_classification=True)
         self._output_conversion: _OutputConversion[IT, OT] = output_conversion
@@ -239,7 +242,9 @@ class NeuralNetworkClassifier(Generic[IT, OT]):
 
         copied_model._batch_size = batch_size
 
-        dataloader = copied_model._input_conversion._data_conversion_fit(train_data, copied_model._batch_size, copied_model._num_of_classes)
+        dataloader = copied_model._input_conversion._data_conversion_fit(
+            train_data, copied_model._batch_size, copied_model._num_of_classes,
+        )
 
         if copied_model._num_of_classes > 1:
             loss_fn = nn.CrossEntropyLoss()

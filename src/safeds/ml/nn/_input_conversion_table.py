@@ -1,8 +1,7 @@
 from torch.utils.data import DataLoader
 
-from safeds.ml.nn._input_conversion import _InputConversion
-
 from safeds.data.tabular.containers import Table
+from safeds.ml.nn._input_conversion import _InputConversion
 
 
 class InputConversionTable(_InputConversion[Table]):
@@ -17,7 +16,9 @@ class InputConversionTable(_InputConversion[Table]):
         return len(self._feature_names)
 
     def _data_conversion_fit(self, input_data: Table, batch_size: int, num_of_classes: int = 1) -> DataLoader:
-        return input_data.tag_columns(self._target_name, self._feature_names)._into_dataloader_with_classes(batch_size, num_of_classes)
+        return input_data.tag_columns(self._target_name, self._feature_names)._into_dataloader_with_classes(
+            batch_size, num_of_classes,
+        )
 
     def _data_conversion_predict(self, input_data: Table, batch_size: int) -> DataLoader:
         return input_data._into_dataloader(batch_size)

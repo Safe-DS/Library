@@ -3,7 +3,6 @@ from __future__ import annotations
 import sys
 from typing import TYPE_CHECKING
 
-
 from safeds._utils import _structural_hash
 from safeds.data.tabular.containers import Column, Row, Table
 from safeds.exceptions import (
