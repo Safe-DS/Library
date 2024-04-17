@@ -14,7 +14,6 @@ if TYPE_CHECKING:
     from safeds.data.tabular.containers import Table, TaggedTable
 
 
-
 class LogisticRegressionClassifier(Classifier):
     """Regularized logistic regression."""
 

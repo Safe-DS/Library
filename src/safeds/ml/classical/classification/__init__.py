@@ -14,16 +14,19 @@ if TYPE_CHECKING:
     from ._random_forest import RandomForestClassifier
     from ._support_vector_machine import SupportVectorMachineClassifier
 
-apipkg.initpkg(__name__, {
-    "AdaBoostClassifier": "._ada_boost:AdaBoostClassifier",
-    "Classifier": "._classifier:Classifier",
-    "DecisionTreeClassifier": "._decision_tree:DecisionTreeClassifier",
-    "GradientBoostingClassifier": "._gradient_boosting:GradientBoostingClassifier",
-    "KNearestNeighborsClassifier": "._k_nearest_neighbors:KNearestNeighborsClassifier",
-    "LogisticRegressionClassifier": "._logistic_regression:LogisticRegressionClassifier",
-    "RandomForestClassifier": "._random_forest:RandomForestClassifier",
-    "SupportVectorMachineClassifier": "._support_vector_machine:SupportVectorMachineClassifier",
-})
+apipkg.initpkg(
+    __name__,
+    {
+        "AdaBoostClassifier": "._ada_boost:AdaBoostClassifier",
+        "Classifier": "._classifier:Classifier",
+        "DecisionTreeClassifier": "._decision_tree:DecisionTreeClassifier",
+        "GradientBoostingClassifier": "._gradient_boosting:GradientBoostingClassifier",
+        "KNearestNeighborsClassifier": "._k_nearest_neighbors:KNearestNeighborsClassifier",
+        "LogisticRegressionClassifier": "._logistic_regression:LogisticRegressionClassifier",
+        "RandomForestClassifier": "._random_forest:RandomForestClassifier",
+        "SupportVectorMachineClassifier": "._support_vector_machine:SupportVectorMachineClassifier",
+    },
+)
 
 __all__ = [
     "AdaBoostClassifier",

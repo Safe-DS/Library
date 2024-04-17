@@ -18,20 +18,23 @@ if TYPE_CHECKING:
     from ._ridge_regression import RidgeRegressor
     from ._support_vector_machine import SupportVectorMachineRegressor
 
-apipkg.initpkg(__name__, {
-    "AdaBoostRegressor": "._ada_boost:AdaBoostRegressor",
-    "ArimaModelRegressor": "._arima:ArimaModelRegressor",
-    "DecisionTreeRegressor": "._decision_tree:DecisionTreeRegressor",
-    "ElasticNetRegressor": "._elastic_net_regression:ElasticNetRegressor",
-    "GradientBoostingRegressor": "._gradient_boosting:GradientBoostingRegressor",
-    "KNearestNeighborsRegressor": "._k_nearest_neighbors:KNearestNeighborsRegressor",
-    "LassoRegressor": "._lasso_regression:LassoRegressor",
-    "LinearRegressionRegressor": "._linear_regression:LinearRegressionRegressor",
-    "RandomForestRegressor": "._random_forest:RandomForestRegressor",
-    "Regressor": "._regressor:Regressor",
-    "RidgeRegressor": "._ridge_regression:RidgeRegressor",
-    "SupportVectorMachineRegressor": "._support_vector_machine:SupportVectorMachineRegressor",
-})
+apipkg.initpkg(
+    __name__,
+    {
+        "AdaBoostRegressor": "._ada_boost:AdaBoostRegressor",
+        "ArimaModelRegressor": "._arima:ArimaModelRegressor",
+        "DecisionTreeRegressor": "._decision_tree:DecisionTreeRegressor",
+        "ElasticNetRegressor": "._elastic_net_regression:ElasticNetRegressor",
+        "GradientBoostingRegressor": "._gradient_boosting:GradientBoostingRegressor",
+        "KNearestNeighborsRegressor": "._k_nearest_neighbors:KNearestNeighborsRegressor",
+        "LassoRegressor": "._lasso_regression:LassoRegressor",
+        "LinearRegressionRegressor": "._linear_regression:LinearRegressionRegressor",
+        "RandomForestRegressor": "._random_forest:RandomForestRegressor",
+        "Regressor": "._regressor:Regressor",
+        "RidgeRegressor": "._ridge_regression:RidgeRegressor",
+        "SupportVectorMachineRegressor": "._support_vector_machine:SupportVectorMachineRegressor",
+    },
+)
 
 __all__ = [
     "AdaBoostRegressor",

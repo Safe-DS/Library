@@ -11,13 +11,16 @@ if TYPE_CHECKING:
     from ._tagged_table import TaggedTable
     from ._time_series import TimeSeries
 
-apipkg.initpkg(__name__, {
-    "Column": "._column:Column",
-    "Row": "._row:Row",
-    "Table": "._table:Table",
-    "TaggedTable": "._tagged_table:TaggedTable",
-    "TimeSeries": "._time_series:TimeSeries",
-})
+apipkg.initpkg(
+    __name__,
+    {
+        "Column": "._column:Column",
+        "Row": "._row:Row",
+        "Table": "._table:Table",
+        "TaggedTable": "._tagged_table:TaggedTable",
+        "TimeSeries": "._time_series:TimeSeries",
+    },
+)
 
 __all__ = [
     "Column",
