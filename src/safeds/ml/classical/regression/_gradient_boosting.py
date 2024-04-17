@@ -2,8 +2,6 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from sklearn.ensemble import GradientBoostingRegressor as sk_GradientBoostingRegressor
-
 from safeds._utils import _structural_hash
 from safeds.exceptions import ClosedBound, OpenBound, OutOfBoundsError
 from safeds.ml.classical._util_sklearn import fit, predict
@@ -12,6 +10,7 @@ from ._regressor import Regressor
 
 if TYPE_CHECKING:
     from sklearn.base import RegressorMixin
+    from sklearn.ensemble import GradientBoostingRegressor as sk_GradientBoostingRegressor
 
     from safeds.data.tabular.containers import Table, TaggedTable
 
@@ -176,4 +175,6 @@ class GradientBoostingRegressor(Regressor):
         wrapped_regressor: RegressorMixin
             The sklearn Regressor.
         """
+        from sklearn.ensemble import GradientBoostingRegressor as sk_GradientBoostingRegressor
+
         return sk_GradientBoostingRegressor(n_estimators=self._number_of_trees, learning_rate=self._learning_rate)

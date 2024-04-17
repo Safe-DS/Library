@@ -2,8 +2,6 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from sklearn.ensemble import RandomForestRegressor as sk_RandomForestRegressor
-
 from safeds._utils import _structural_hash
 from safeds.exceptions import ClosedBound, OutOfBoundsError
 from safeds.ml.classical._util_sklearn import fit, predict
@@ -12,6 +10,7 @@ from ._regressor import Regressor
 
 if TYPE_CHECKING:
     from sklearn.base import RegressorMixin
+    from sklearn.ensemble import RandomForestRegressor as sk_RandomForestRegressor
 
     from safeds.data.tabular.containers import Table, TaggedTable
 
@@ -150,4 +149,6 @@ class RandomForestRegressor(Regressor):
         wrapped_regressor: RegressorMixin
             The sklearn Regressor.
         """
+        from sklearn.ensemble import RandomForestRegressor as sk_RandomForestRegressor
+
         return sk_RandomForestRegressor(self._number_of_trees, n_jobs=-1)

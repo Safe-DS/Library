@@ -2,9 +2,7 @@ from __future__ import annotations
 
 import io
 import itertools
-
-import matplotlib.pyplot as plt
-from statsmodels.tsa.arima.model import ARIMA
+from typing import TYPE_CHECKING
 
 from safeds._utils import _structural_hash
 from safeds.data.image.containers import Image
@@ -16,6 +14,9 @@ from safeds.exceptions import (
     NonNumericColumnError,
     NonTimeSeriesError,
 )
+
+if TYPE_CHECKING:
+    from statsmodels.tsa.arima.model import ARIMA
 
 
 class ArimaModelRegressor:
@@ -67,6 +68,8 @@ class ArimaModelRegressor:
         DatasetMissesDataError
             If the training data contains no rows.
         """
+        from statsmodels.tsa.arima.model import ARIMA
+
         if not isinstance(time_series, TimeSeries) and isinstance(time_series, Table):
             raise NonTimeSeriesError
         if time_series.number_of_rows == 0:
@@ -173,6 +176,8 @@ class ArimaModelRegressor:
             If predicting with the given dataset failed.
 
         """
+        import matplotlib.pyplot as plt
+
         if not self.is_fitted() or self._arima is None:
             raise ModelNotFittedError
         test_data = test_series.target._data.to_numpy()
