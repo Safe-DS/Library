@@ -48,9 +48,9 @@ class ColumnType(ABC):
         import numpy as np
 
         def column_type_of_type(cell_type: Any) -> ColumnType:
-            if cell_type == int or cell_type == np.int64 or cell_type == np.int32:
+            if cell_type in (int, np.int64, np.int32):
                 return Integer(is_nullable)
-            if cell_type == float or cell_type == np.float64 or cell_type == np.float32:
+            if cell_type in (float, np.float64, np.float32):
                 return RealNumber(is_nullable)
             if cell_type == bool:
                 return Boolean(is_nullable)
