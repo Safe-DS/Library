@@ -6,11 +6,6 @@ import warnings
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-import torch
-from PIL.Image import open as pil_image_open
-from torch import Tensor
-from torchvision.transforms import InterpolationMode
-
 from safeds._config import _get_device
 from safeds._utils import _structural_hash
 from safeds.data.image.utils._image_transformation_error_and_warning_checks import (
@@ -23,15 +18,11 @@ from safeds.data.image.utils._image_transformation_error_and_warning_checks impo
     _check_resize_errors,
     _check_sharpen_errors_and_warnings,
 )
+from safeds.exceptions import IllegalFormatError
 
 if TYPE_CHECKING:
+    from torch import Tensor
     from torch.types import Device
-import torchvision
-from torchvision.transforms.v2 import PILToTensor
-from torchvision.transforms.v2 import functional as func2
-from torchvision.utils import save_image
-
-from safeds.exceptions import IllegalFormatError
 
 
 class Image:
@@ -44,17 +35,24 @@ class Image:
         The image data as tensor.
     """
 
-    _pil_to_tensor = PILToTensor()
-    _default_device = _get_device()
-    _FILTER_EDGES_KERNEL = (
-        torch.tensor([[-1.0, -1.0, -1.0], [-1.0, 8.0, -1.0], [-1.0, -1.0, -1.0]])
-        .unsqueeze(dim=0)
-        .unsqueeze(dim=0)
-        .to(_default_device)
-    )
+    _filter_edges_kernel_cache: Tensor | None = None
 
     @staticmethod
-    def from_file(path: str | Path, device: Device = _default_device) -> Image:
+    def _filter_edges_kernel():
+        import torch
+
+        if Image._filter_edges_kernel_cache is None:
+            Image._filter_edges_kernel_cache = (
+                torch.tensor([[-1.0, -1.0, -1.0], [-1.0, 8.0, -1.0], [-1.0, -1.0, -1.0]])
+                .unsqueeze(dim=0)
+                .unsqueeze(dim=0)
+                .to(_get_device())
+            )
+
+        return Image._filter_edges_kernel_cache
+
+    @staticmethod
+    def from_file(path: str | Path, device: Device = None) -> Image:
         """
         Create an image from a file.
 
@@ -75,10 +73,16 @@ class Image:
         FileNotFoundError
             If the file of the path cannot be found
         """
-        return Image(image_tensor=Image._pil_to_tensor(pil_image_open(path)), device=device)
+        from PIL.Image import open as pil_image_open
+        from torchvision.transforms.functional import pil_to_tensor
+
+        if device is None:
+            device = _get_device()
+
+        return Image(image_tensor=pil_to_tensor(pil_image_open(path)), device=device)
 
     @staticmethod
-    def from_bytes(data: bytes, device: Device = _default_device) -> Image:
+    def from_bytes(data: bytes, device: Device = None) -> Image:
         """
         Create an image from bytes.
 
@@ -94,15 +98,25 @@ class Image:
         image:
             The image.
         """
+        import torch
+        import torchvision
+
+        if device is None:
+            device = _get_device()
+
         with warnings.catch_warnings():
             warnings.filterwarnings(
                 "ignore",
                 message="The given buffer is not writable, and PyTorch does not support non-writable tensors.",
             )
             input_tensor = torch.frombuffer(data, dtype=torch.uint8)
+
         return Image(image_tensor=torchvision.io.decode_image(input_tensor), device=device)
 
-    def __init__(self, image_tensor: Tensor, device: Device = _default_device) -> None:
+    def __init__(self, image_tensor: Tensor, device: Device = None) -> None:
+        if device is None:
+            device = _get_device()
+
         self._image_tensor: Tensor = image_tensor.to(device)
 
     def __eq__(self, other: object) -> bool:
@@ -119,6 +133,8 @@ class Image:
         equals:
             Whether the two images contain equal pixel data.
         """
+        import torch
+
         if not isinstance(other, Image):
             return NotImplemented
         return (
@@ -159,6 +175,10 @@ class Image:
         jpeg:
             The image as JPEG.
         """
+        import torch
+        from torchvision.transforms.v2 import functional as func2
+        from torchvision.utils import save_image
+
         if self.channel == 4:
             return None
         buffer = io.BytesIO()
@@ -178,6 +198,10 @@ class Image:
         png:
             The image as PNG.
         """
+        import torch
+        from torchvision.transforms.v2 import functional as func2
+        from torchvision.utils import save_image
+
         buffer = io.BytesIO()
         if self.channel == 1:
             func2.to_pil_image(self._image_tensor, mode="L").save(buffer, format="png")
@@ -262,6 +286,10 @@ class Image:
         path:
             The path to the JPEG file.
         """
+        import torch
+        from torchvision.transforms.v2 import functional as func2
+        from torchvision.utils import save_image
+
         if self.channel == 4:
             raise IllegalFormatError("png")
         Path(path).parent.mkdir(parents=True, exist_ok=True)
@@ -279,6 +307,10 @@ class Image:
         path:
             The path to the PNG file.
         """
+        import torch
+        from torchvision.transforms.v2 import functional as func2
+        from torchvision.utils import save_image
+
         Path(path).parent.mkdir(parents=True, exist_ok=True)
         if self.channel == 1:
             func2.to_pil_image(self._image_tensor, mode="L").save(path, format="png")
@@ -310,6 +342,8 @@ class Image:
         ValueError
             if the given channel is not a valid channel option
         """
+        import torch
+
         if self.channel == channel:
             image_tensor = self._image_tensor
         elif self.channel == 1 and channel == 3:
@@ -360,6 +394,9 @@ class Image:
         OutOfBoundsError
             If new_width or new_height are below 1
         """
+        from torchvision.transforms import InterpolationMode
+        from torchvision.transforms.v2 import functional as func2
+
         _check_resize_errors(new_width, new_height)
         return Image(
             func2.resize(self._image_tensor, size=[new_height, new_width], interpolation=InterpolationMode.NEAREST),
@@ -377,6 +414,9 @@ class Image:
         result:
             The grayscale image.
         """
+        import torch
+        from torchvision.transforms.v2 import functional as func2
+
         if self.channel == 4:
             return Image(
                 torch.cat(
@@ -417,6 +457,8 @@ class Image:
         OutOfBoundsError
             If x or y are below 0 or if width or height are below 1
         """
+        from torchvision.transforms.v2 import functional as func2
+
         _check_crop_errors_and_warnings(x, y, width, height, self.width, self.height, plural=False)
         return Image(func2.crop(self._image_tensor, y, x, height, width), device=self.device)
 
@@ -431,6 +473,8 @@ class Image:
         result:
             The flipped image.
         """
+        from torchvision.transforms.v2 import functional as func2
+
         return Image(func2.vertical_flip(self._image_tensor), device=self.device)
 
     def flip_horizontally(self) -> Image:
@@ -444,6 +488,8 @@ class Image:
         result:
             The flipped image.
         """
+        from torchvision.transforms.v2 import functional as func2
+
         return Image(func2.horizontal_flip(self._image_tensor), device=self.device)
 
     def adjust_brightness(self, factor: float) -> Image:
@@ -471,6 +517,9 @@ class Image:
         OutOfBoundsError
             If factor is smaller than 0.
         """
+        import torch
+        from torchvision.transforms.v2 import functional as func2
+
         _check_adjust_brightness_errors_and_warnings(factor, plural=False)
         if self.channel == 4:
             return Image(
@@ -506,6 +555,8 @@ class Image:
         OutOfBoundsError
             If standard_deviation is smaller than 0.
         """
+        import torch
+
         _check_add_noise_errors(standard_deviation)
         return Image(
             self._image_tensor + torch.normal(0, standard_deviation, self._image_tensor.size()).to(self.device) * 255,
@@ -536,6 +587,9 @@ class Image:
         OutOfBoundsError
             If factor is smaller than 0.
         """
+        import torch
+        from torchvision.transforms.v2 import functional as func2
+
         _check_adjust_contrast_errors_and_warnings(factor, plural=False)
         if self.channel == 4:
             return Image(
@@ -602,6 +656,8 @@ class Image:
         OutOfBoundsError
             If radius is smaller than 0 or equal or greater than the smaller size of the image.
         """
+        from torchvision.transforms.v2 import functional as func2
+
         _check_blur_errors_and_warnings(radius, min(self.width, self.height), plural=False)
         return Image(func2.gaussian_blur(self._image_tensor, [radius * 2 + 1, radius * 2 + 1]), device=self.device)
 
@@ -629,6 +685,9 @@ class Image:
         OutOfBoundsError
             If factor is smaller than 0.
         """
+        import torch
+        from torchvision.transforms.v2 import functional as func2
+
         _check_sharpen_errors_and_warnings(factor, plural=False)
         if self.channel == 4:
             return Image(
@@ -654,6 +713,9 @@ class Image:
         result:
             The image with inverted colors.
         """
+        import torch
+        from torchvision.transforms.v2 import functional as func2
+
         if self.channel == 4:
             return Image(
                 torch.cat([func2.invert(self._image_tensor[0:3]), self._image_tensor[3].unsqueeze(dim=0)]),
@@ -673,6 +735,8 @@ class Image:
         result:
             The image rotated 90 degrees clockwise.
         """
+        from torchvision.transforms.v2 import functional as func2
+
         return Image(func2.rotate(self._image_tensor, -90, expand=True), device=self.device)
 
     def rotate_left(self) -> Image:
@@ -686,6 +750,8 @@ class Image:
         result:
             The image rotated 90 degrees counter-clockwise.
         """
+        from torchvision.transforms.v2 import functional as func2
+
         return Image(func2.rotate(self._image_tensor, 90, expand=True), device=self.device)
 
     def find_edges(self) -> Image:
@@ -699,10 +765,12 @@ class Image:
         result:
             The image with edges found.
         """
+        import torch
+
         kernel = (
-            Image._FILTER_EDGES_KERNEL
-            if self.device.type == Image._default_device
-            else Image._FILTER_EDGES_KERNEL.to(self.device)
+            Image._filter_edges_kernel()
+            if self.device.type == _get_device()
+            else Image._filter_edges_kernel().to(self.device)
         )
         edges_tensor = torch.clamp(
             torch.nn.functional.conv2d(

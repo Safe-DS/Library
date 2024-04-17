@@ -673,7 +673,7 @@ class _SingleSizeImageList(ImageList):
         return image_list
 
     def find_edges(self) -> ImageList:
-        kernel = Image._FILTER_EDGES_KERNEL.to("cpu")
+        kernel = Image._filter_edges_kernel().to("cpu")
         edges_tensor = torch.clamp(
             torch.nn.functional.conv2d(
                 self.convert_to_grayscale()._as_single_size_image_list()._tensor.float()[:, 0].unsqueeze(dim=1),
