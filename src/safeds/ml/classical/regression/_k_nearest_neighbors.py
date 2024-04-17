@@ -2,8 +2,6 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from sklearn.neighbors import KNeighborsRegressor as sk_KNeighborsRegressor
-
 from safeds._utils import _structural_hash
 from safeds.exceptions import ClosedBound, DatasetMissesDataError, OutOfBoundsError
 from safeds.ml.classical._util_sklearn import fit, predict
@@ -12,6 +10,7 @@ from ._regressor import Regressor
 
 if TYPE_CHECKING:
     from sklearn.base import RegressorMixin
+    from sklearn.neighbors import KNeighborsRegressor as sk_KNeighborsRegressor
 
     from safeds.data.tabular.containers import Table, TaggedTable
 
@@ -169,4 +168,6 @@ class KNearestNeighborsRegressor(Regressor):
         wrapped_regressor: RegressorMixin
             The sklearn Regressor.
         """
+        from sklearn.neighbors import KNeighborsRegressor as sk_KNeighborsRegressor
+
         return sk_KNeighborsRegressor(self._number_of_neighbors, n_jobs=-1)

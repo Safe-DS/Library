@@ -2,8 +2,6 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from sklearn.neighbors import KNeighborsClassifier as sk_KNeighborsClassifier
-
 from safeds._utils import _structural_hash
 from safeds.exceptions import ClosedBound, DatasetMissesDataError, OutOfBoundsError
 from safeds.ml.classical._util_sklearn import fit, predict
@@ -12,6 +10,7 @@ from ._classifier import Classifier
 
 if TYPE_CHECKING:
     from sklearn.base import ClassifierMixin
+    from sklearn.neighbors import KNeighborsClassifier as sk_KNeighborsClassifier
 
     from safeds.data.tabular.containers import Table, TaggedTable
 
@@ -168,4 +167,6 @@ class KNearestNeighborsClassifier(Classifier):
         wrapped_classifier: ClassifierMixin
             The sklearn Classifier.
         """
+        from sklearn.neighbors import KNeighborsClassifier as sk_KNeighborsClassifier
+
         return sk_KNeighborsClassifier(self._number_of_neighbors, n_jobs=-1)

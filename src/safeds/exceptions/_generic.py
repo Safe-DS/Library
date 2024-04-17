@@ -2,8 +2,6 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 
-from numpy import isinf, isnan
-
 
 class OutOfBoundsError(ValueError):
     """
@@ -52,6 +50,8 @@ class OutOfBoundsError(ValueError):
             * If actual does not lie outside the given interval.
             * If actual is not a real number.
         """
+        from numpy import isinf, isnan
+
         # Validate bound parameters:
         if lower_bound is None and upper_bound is None:
             raise ValueError("Illegal interval: Attempting to raise OutOfBoundsError, but no bounds given.")
@@ -112,6 +112,8 @@ class Bound(ABC):
         ValueError
             If value is nan or if value is +/-inf and the Bound type does not allow for infinite Bounds.
         """
+        from numpy import isnan
+
         if isnan(value):
             raise ValueError("Bound must be a real number, not nan.")
         self._value = value

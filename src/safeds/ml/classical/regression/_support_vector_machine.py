@@ -4,8 +4,6 @@ import sys
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
-from sklearn.svm import SVR as sk_SVR  # noqa: N811
-
 from safeds._utils import _structural_hash
 from safeds.exceptions import ClosedBound, OpenBound, OutOfBoundsError
 from safeds.ml.classical._util_sklearn import fit, predict
@@ -13,6 +11,7 @@ from safeds.ml.classical.regression import Regressor
 
 if TYPE_CHECKING:
     from sklearn.base import RegressorMixin
+    from sklearn.svm import SVR as sk_SVR  # noqa: N811
 
     from safeds.data.tabular.containers import Table, TaggedTable
 
@@ -326,4 +325,6 @@ class SupportVectorMachineRegressor(Regressor):
         wrapped_regressor: RegressorMixin
             The sklearn Regressor.
         """
+        from sklearn.svm import SVR as sk_SVR  # noqa: N811
+
         return sk_SVR(C=self._c)

@@ -3,8 +3,6 @@ import operator
 import struct
 from typing import Any
 
-import xxhash
-
 
 def _structural_hash(*value: Any) -> int:
     """
@@ -20,6 +18,8 @@ def _structural_hash(*value: Any) -> int:
     hash
         Deterministic hash value
     """
+    import xxhash
+
     return xxhash.xxh3_64(_value_to_bytes(value)).intdigest()
 
 

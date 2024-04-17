@@ -2,8 +2,6 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from sklearn.ensemble import GradientBoostingClassifier as sk_GradientBoostingClassifier
-
 from safeds._utils import _structural_hash
 from safeds.exceptions import ClosedBound, OpenBound, OutOfBoundsError
 from safeds.ml.classical._util_sklearn import fit, predict
@@ -12,6 +10,7 @@ from ._classifier import Classifier
 
 if TYPE_CHECKING:
     from sklearn.base import ClassifierMixin
+    from sklearn.ensemble import GradientBoostingClassifier as sk_GradientBoostingClassifier
 
     from safeds.data.tabular.containers import Table, TaggedTable
 
@@ -176,4 +175,6 @@ class GradientBoostingClassifier(Classifier):
         wrapped_classifier: ClassifierMixin
             The sklearn Classifier.
         """
+        from sklearn.ensemble import GradientBoostingClassifier as sk_GradientBoostingClassifier
+
         return sk_GradientBoostingClassifier(n_estimators=self._number_of_trees, learning_rate=self._learning_rate)
