@@ -85,6 +85,7 @@ class NeuralNetworkRegressor:
         optimizer = torch.optim.SGD(copied_model._model.parameters(), lr=learning_rate)
         for _ in range(epoch_size):
             loss_sum = 0.0
+            amount_of_loss_values_calculated = 0
             for x, y in iter(dataloader):
                 optimizer.zero_grad()
 
@@ -92,27 +93,20 @@ class NeuralNetworkRegressor:
 
                 loss = loss_fn(pred, y)
                 loss_sum += loss.item()
+                amount_of_loss_values_calculated += 1
                 loss.backward()
                 optimizer.step()
                 copied_model._total_number_of_batches_done += 1
                 if callback_on_batch_completion is not None:
                     callback_on_batch_completion(
                         copied_model._total_number_of_batches_done,
-                        loss_sum
-                        / (
-                            copied_model._total_number_of_batches_done
-                            - (copied_model._total_number_of_epochs_done * copied_model._batch_size)
-                        ),
+                        loss_sum / amount_of_loss_values_calculated,
                     )
             copied_model._total_number_of_epochs_done += 1
             if callback_on_epoch_completion is not None:
                 callback_on_epoch_completion(
                     copied_model._total_number_of_epochs_done,
-                    loss_sum
-                    / (
-                        copied_model._total_number_of_batches_done
-                        - ((copied_model._total_number_of_epochs_done-1) * copied_model._batch_size)
-                    ),
+                    loss_sum / amount_of_loss_values_calculated
                 )
         copied_model._is_fitted = True
         copied_model._model.eval()
@@ -239,12 +233,14 @@ class NeuralNetworkClassifier:
         optimizer = torch.optim.SGD(copied_model._model.parameters(), lr=learning_rate)
         for _ in range(epoch_size):
             loss_sum = 0.0
+            amount_of_loss_values_calculated = 0
             for x, y in iter(dataloader):
                 optimizer.zero_grad()
                 pred = copied_model._model(x)
 
                 loss = loss_fn(pred, y)
                 loss_sum += loss.item()
+                amount_of_loss_values_calculated += 1
                 loss.backward()
                 optimizer.step()
 
@@ -252,21 +248,13 @@ class NeuralNetworkClassifier:
                 if callback_on_batch_completion is not None:
                     callback_on_batch_completion(
                         copied_model._total_number_of_batches_done,
-                        loss_sum
-                        / (
-                            copied_model._total_number_of_batches_done
-                            - (copied_model._total_number_of_epochs_done * copied_model._batch_size)
-                        ),
+                        loss_sum / amount_of_loss_values_calculated
                     )
             copied_model._total_number_of_epochs_done += 1
             if callback_on_epoch_completion is not None:
                 callback_on_epoch_completion(
                     copied_model._total_number_of_epochs_done,
-                    loss_sum
-                    / (
-                        copied_model._total_number_of_batches_done
-                        - ((copied_model._total_number_of_epochs_done-1) * copied_model._batch_size)
-                    ),
+                    loss_sum / amount_of_loss_values_calculated
                 )
         copied_model._is_fitted = True
         copied_model._model.eval()
