@@ -1,14 +1,16 @@
 from __future__ import annotations
 
 import warnings
-
-from sklearn.preprocessing import OrdinalEncoder as sk_OrdinalEncoder
+from typing import TYPE_CHECKING
 
 from safeds.data.tabular.containers import Table
 from safeds.data.tabular.transformation._table_transformer import (
     InvertibleTableTransformer,
 )
 from safeds.exceptions import NonNumericColumnError, TransformerNotFittedError, UnknownColumnNameError
+
+if TYPE_CHECKING:
+    from sklearn.preprocessing import OrdinalEncoder as sk_OrdinalEncoder
 
 
 # noinspection PyProtectedMember
@@ -44,6 +46,8 @@ class LabelEncoder(InvertibleTableTransformer):
         ValueError
             If the table contains 0 rows.
         """
+        from sklearn.preprocessing import OrdinalEncoder as sk_OrdinalEncoder
+
         if column_names is None:
             column_names = table.column_names
         else:

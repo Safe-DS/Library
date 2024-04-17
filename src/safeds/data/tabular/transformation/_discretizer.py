@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from sklearn.preprocessing import KBinsDiscretizer as sk_KBinsDiscretizer
+from typing import TYPE_CHECKING
 
 from safeds.data.tabular.containers import Table
 from safeds.data.tabular.transformation._table_transformer import TableTransformer
@@ -11,6 +11,9 @@ from safeds.exceptions import (
     TransformerNotFittedError,
     UnknownColumnNameError,
 )
+
+if TYPE_CHECKING:
+    from sklearn.preprocessing import KBinsDiscretizer as sk_KBinsDiscretizer
 
 
 class Discretizer(TableTransformer):
@@ -63,6 +66,8 @@ class Discretizer(TableTransformer):
         UnknownColumnNameError
             If one of the columns, that should be fitted is not in the table.
         """
+        from sklearn.preprocessing import KBinsDiscretizer as sk_KBinsDiscretizer
+
         if table.number_of_rows == 0:
             raise ValueError("The Discretizer cannot be fitted because the table contains 0 rows")
 

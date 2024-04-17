@@ -1,10 +1,13 @@
 from __future__ import annotations
 
-from sklearn.preprocessing import MinMaxScaler as sk_MinMaxScaler
+from typing import TYPE_CHECKING
 
 from safeds.data.tabular.containers import Table
 from safeds.data.tabular.transformation._table_transformer import InvertibleTableTransformer
 from safeds.exceptions import NonNumericColumnError, TransformerNotFittedError, UnknownColumnNameError
+
+if TYPE_CHECKING:
+    from sklearn.preprocessing import MinMaxScaler as sk_MinMaxScaler
 
 
 class RangeScaler(InvertibleTableTransformer):
@@ -59,6 +62,8 @@ class RangeScaler(InvertibleTableTransformer):
         ValueError
             If the table contains 0 rows.
         """
+        from sklearn.preprocessing import MinMaxScaler as sk_MinMaxScaler
+
         if column_names is None:
             column_names = table.column_names
         else:
