@@ -6,21 +6,32 @@ import torch
 from torch import Tensor, nn
 
 from safeds.data.tabular.containers import Column, Table, TaggedTable
-from safeds.exceptions import ClosedBound, ModelNotFittedError, OutOfBoundsError
-from safeds.ml.nn._fnn_layer import FNNLayer
+from safeds.exceptions import (
+    ClosedBound,
+    InputSizeError,
+    ModelNotFittedError,
+    OutOfBoundsError,
+    TestTrainDataMismatchError,
+)
+from safeds.ml.nn._layer import Layer
 
 
 class NeuralNetworkRegressor:
-    def __init__(self, layers: list):
-        self._model = _PytorchModel(layers, is_for_classification=False)
+    def __init__(self, layers: list[Layer]):
+        self._model = _InternalModel(layers, is_for_classification=False)
+        self._input_size = self._model.input_size
         self._batch_size = 1
         self._is_fitted = False
+        self._feature_names: None | list[str] = None
+        self._total_number_of_batches_done = 0
+        self._total_number_of_epochs_done = 0
 
     def fit(
         self,
         train_data: TaggedTable,
         epoch_size: int = 25,
         batch_size: int = 1,
+        learning_rate: float = 0.001,
         callback_on_batch_completion: Callable[[int, float], None] | None = None,
         callback_on_epoch_completion: Callable[[int, float], None] | None = None,
     ) -> Self:
@@ -37,6 +48,8 @@ class NeuralNetworkRegressor:
             The number of times the training cycle should be done.
         batch_size
             The size of data batches that should be loaded at one time.
+        learning_rate
+            The learning rate of the neural network.
         callback_on_batch_completion
             Function used to view metrics while training. Gets called after a batch is completed with the index of the last batch and the overall loss average.
         callback_on_epoch_completion
@@ -57,33 +70,44 @@ class NeuralNetworkRegressor:
             raise OutOfBoundsError(actual=epoch_size, name="epoch_size", lower_bound=ClosedBound(1))
         if batch_size < 1:
             raise OutOfBoundsError(actual=batch_size, name="batch_size", lower_bound=ClosedBound(1))
+        if train_data.features.number_of_columns is not self._input_size:
+            raise InputSizeError(train_data.features.number_of_columns, self._input_size)
+
         copied_model = copy.deepcopy(self)
+
+        copied_model._feature_names = train_data.features.column_names
         copied_model._batch_size = batch_size
-        dataloader = train_data._into_dataloader(copied_model._batch_size)
+
+        dataloader = train_data._into_dataloader_with_classes(copied_model._batch_size, 1)
 
         loss_fn = nn.MSELoss()
 
-        optimizer = torch.optim.SGD(copied_model._model.parameters(), lr=0.05)
-        loss_sum = 0.0
-        number_of_batches_done = 0
-        for epoch in range(epoch_size):
-            for x, y in dataloader:
+        optimizer = torch.optim.SGD(copied_model._model.parameters(), lr=learning_rate)
+        for _ in range(epoch_size):
+            loss_sum = 0.0
+            amount_of_loss_values_calculated = 0
+            for x, y in iter(dataloader):
                 optimizer.zero_grad()
 
                 pred = copied_model._model(x)
 
                 loss = loss_fn(pred, y)
                 loss_sum += loss.item()
+                amount_of_loss_values_calculated += 1
                 loss.backward()
                 optimizer.step()
-                number_of_batches_done += 1
+                copied_model._total_number_of_batches_done += 1
                 if callback_on_batch_completion is not None:
                     callback_on_batch_completion(
-                        number_of_batches_done,
-                        loss_sum / (number_of_batches_done * batch_size),
+                        copied_model._total_number_of_batches_done,
+                        loss_sum / amount_of_loss_values_calculated,
                     )
+            copied_model._total_number_of_epochs_done += 1
             if callback_on_epoch_completion is not None:
-                callback_on_epoch_completion(epoch + 1, loss_sum / (number_of_batches_done * batch_size))
+                callback_on_epoch_completion(
+                    copied_model._total_number_of_epochs_done,
+                    loss_sum / amount_of_loss_values_calculated,
+                )
         copied_model._is_fitted = True
         copied_model._model.eval()
         return copied_model
@@ -111,13 +135,16 @@ class NeuralNetworkRegressor:
         """
         if not self._is_fitted:
             raise ModelNotFittedError
+        if not (sorted(test_data.column_names)).__eq__(
+            sorted(self._feature_names) if self._feature_names is not None else None,
+        ):
+            raise TestTrainDataMismatchError
         dataloader = test_data._into_dataloader(self._batch_size)
         predictions = []
         with torch.no_grad():
             for x in dataloader:
                 elem = self._model(x)
-                for item in range(len(elem)):
-                    predictions.append(elem[item].item())
+                predictions += elem.squeeze(dim=1).tolist()
         return test_data.add_column(Column("prediction", predictions)).tag_columns("prediction")
 
     @property
@@ -134,17 +161,22 @@ class NeuralNetworkRegressor:
 
 
 class NeuralNetworkClassifier:
-    def __init__(self, layers: list[FNNLayer]):
-        self._model = _PytorchModel(layers, is_for_classification=True)
+    def __init__(self, layers: list[Layer]):
+        self._model = _InternalModel(layers, is_for_classification=True)
+        self._input_size = self._model.input_size
         self._batch_size = 1
         self._is_fitted = False
-        self._is_multi_class = layers[-1].output_size > 1
+        self._num_of_classes = layers[-1].output_size
+        self._feature_names: None | list[str] = None
+        self._total_number_of_batches_done = 0
+        self._total_number_of_epochs_done = 0
 
     def fit(
         self,
         train_data: TaggedTable,
         epoch_size: int = 25,
         batch_size: int = 1,
+        learning_rate: float = 0.001,
         callback_on_batch_completion: Callable[[int, float], None] | None = None,
         callback_on_epoch_completion: Callable[[int, float], None] | None = None,
     ) -> Self:
@@ -161,6 +193,8 @@ class NeuralNetworkClassifier:
             The number of times the training cycle should be done.
         batch_size
             The size of data batches that should be loaded at one time.
+        learning_rate
+            The learning rate of the neural network.
         callback_on_batch_completion
             Function used to view metrics while training. Gets called after a batch is completed with the index of the last batch and the overall loss average.
         callback_on_epoch_completion
@@ -181,51 +215,47 @@ class NeuralNetworkClassifier:
             raise OutOfBoundsError(actual=epoch_size, name="epoch_size", lower_bound=ClosedBound(1))
         if batch_size < 1:
             raise OutOfBoundsError(actual=batch_size, name="batch_size", lower_bound=ClosedBound(1))
-        copied_model = copy.deepcopy(self)
-        copied_model._batch_size = batch_size
-        dataloader = train_data._into_dataloader(copied_model._batch_size)
+        if train_data.features.number_of_columns is not self._input_size:
+            raise InputSizeError(train_data.features.number_of_columns, self._input_size)
 
-        if self._is_multi_class:
+        copied_model = copy.deepcopy(self)
+
+        copied_model._feature_names = train_data.features.column_names
+        copied_model._batch_size = batch_size
+
+        dataloader = train_data._into_dataloader_with_classes(copied_model._batch_size, copied_model._num_of_classes)
+
+        if copied_model._num_of_classes > 1:
             loss_fn = nn.CrossEntropyLoss()
         else:
             loss_fn = nn.BCELoss()
 
-        optimizer = torch.optim.SGD(copied_model._model.parameters(), lr=0.05)
-        loss_sum = 0.0
-        number_of_batches_done = 0
-        for epoch in range(epoch_size):
-            for x, y in dataloader:
+        optimizer = torch.optim.SGD(copied_model._model.parameters(), lr=learning_rate)
+        for _ in range(epoch_size):
+            loss_sum = 0.0
+            amount_of_loss_values_calculated = 0
+            for x, y in iter(dataloader):
                 optimizer.zero_grad()
                 pred = copied_model._model(x)
-                if self._is_multi_class:
-                    pred_size = Tensor.size(pred, dim=1)
-                    predictions_for_all_items_of_batch = []
-                    for value in range(len(y)):
-                        list_of_probabilities_for_each_category = []
-                        class_index = y[value].item()
-                        for index in range(pred_size):
-                            if index is int(class_index):
-                                list_of_probabilities_for_each_category.append(1.0)
-                            else:
-                                list_of_probabilities_for_each_category.append(0.0)
-                        predictions_for_all_items_of_batch.append(list_of_probabilities_for_each_category.copy())
 
-                    y_reshaped_as_tensor_to_fit_format_of_pred = torch.tensor(predictions_for_all_items_of_batch)
-
-                    loss = loss_fn(pred, y_reshaped_as_tensor_to_fit_format_of_pred)
-                else:
-                    loss = loss_fn(pred, y)
+                loss = loss_fn(pred, y)
                 loss_sum += loss.item()
+                amount_of_loss_values_calculated += 1
                 loss.backward()
                 optimizer.step()
-                number_of_batches_done += 1
+
+                copied_model._total_number_of_batches_done += 1
                 if callback_on_batch_completion is not None:
                     callback_on_batch_completion(
-                        number_of_batches_done,
-                        loss_sum / (number_of_batches_done * batch_size),
+                        copied_model._total_number_of_batches_done,
+                        loss_sum / amount_of_loss_values_calculated,
                     )
+            copied_model._total_number_of_epochs_done += 1
             if callback_on_epoch_completion is not None:
-                callback_on_epoch_completion(epoch + 1, loss_sum / (number_of_batches_done * batch_size))
+                callback_on_epoch_completion(
+                    copied_model._total_number_of_epochs_done,
+                    loss_sum / amount_of_loss_values_calculated,
+                )
         copied_model._is_fitted = True
         copied_model._model.eval()
         return copied_model
@@ -253,27 +283,23 @@ class NeuralNetworkClassifier:
         """
         if not self._is_fitted:
             raise ModelNotFittedError
+        if not (sorted(test_data.column_names)).__eq__(
+            sorted(self._feature_names) if self._feature_names is not None else None,
+        ):
+            raise TestTrainDataMismatchError
         dataloader = test_data._into_dataloader(self._batch_size)
         predictions = []
         with torch.no_grad():
             for x in dataloader:
                 elem = self._model(x)
-                for item in range(len(elem)):
-                    if not self._is_multi_class:
-                        if elem[item].item() < 0.5:
-                            predicted_class = 0  # pragma: no cover
-                        else:  # pragma: no cover
-                            predicted_class = 1  # pragma: no cover
-                        predictions.append(predicted_class)
+                if self._num_of_classes > 1:
+                    predictions += torch.argmax(elem, dim=1).tolist()
+                else:
+                    p = elem.squeeze().round().tolist()
+                    if isinstance(p, float):
+                        predictions.append(p)
                     else:
-                        values = elem[item].tolist()
-                        highest_value = 0
-                        category_of_highest_value = 0
-                        for index in range(len(values)):
-                            if values[index] > highest_value:
-                                highest_value = values[index]
-                                category_of_highest_value = index
-                        predictions.append(category_of_highest_value)
+                        predictions += p
         return test_data.add_column(Column("prediction", predictions)).tag_columns("prediction")
 
     @property
@@ -289,14 +315,14 @@ class NeuralNetworkClassifier:
         return self._is_fitted
 
 
-class _PytorchModel(nn.Module):
-    def __init__(self, fnn_layers: list[FNNLayer], is_for_classification: bool) -> None:
+class _InternalModel(nn.Module):
+    def __init__(self, layers: list[Layer], is_for_classification: bool) -> None:
         super().__init__()
-        self._layer_list = fnn_layers
+        self._layer_list = layers
         internal_layers = []
         previous_output_size = None
 
-        for layer in fnn_layers:
+        for layer in layers:
             if previous_output_size is not None:
                 layer._set_input_size(previous_output_size)
             internal_layers.append(layer._get_internal_layer(activation_function="relu"))
@@ -304,13 +330,17 @@ class _PytorchModel(nn.Module):
 
         if is_for_classification:
             internal_layers.pop()
-            if fnn_layers[-1].output_size > 2:
-                internal_layers.append(fnn_layers[-1]._get_internal_layer(activation_function="softmax"))
+            if layers[-1].output_size > 2:
+                internal_layers.append(layers[-1]._get_internal_layer(activation_function="softmax"))
             else:
-                internal_layers.append(fnn_layers[-1]._get_internal_layer(activation_function="sigmoid"))
-        self._pytorch_layers = nn.ModuleList(internal_layers)
+                internal_layers.append(layers[-1]._get_internal_layer(activation_function="sigmoid"))
+        self._pytorch_layers = nn.Sequential(*internal_layers)
 
-    def forward(self, x: float) -> float:
+    @property
+    def input_size(self) -> int:
+        return self._layer_list[0].input_size
+
+    def forward(self, x: Tensor) -> Tensor:
         for layer in self._pytorch_layers:
             x = layer(x)
         return x

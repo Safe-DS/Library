@@ -1,6 +1,7 @@
-from torch import nn
+from torch import Tensor, nn
 
 from safeds.exceptions import ClosedBound, OutOfBoundsError
+from safeds.ml.nn._layer import Layer
 
 
 class _InternalLayer(nn.Module):
@@ -17,11 +18,11 @@ class _InternalLayer(nn.Module):
             case _:
                 raise ValueError("Unknown Activation Function: " + activation_function)
 
-    def forward(self, x: float) -> float:
+    def forward(self, x: Tensor) -> Tensor:
         return self._fn(self._layer(x))
 
 
-class FNNLayer:
+class ForwardLayer(Layer):
     def __init__(self, output_size: int, input_size: int | None = None):
         """
         Create a FNN Layer.
@@ -48,6 +49,18 @@ class FNNLayer:
 
     def _get_internal_layer(self, activation_function: str) -> _InternalLayer:
         return _InternalLayer(self._input_size, self._output_size, activation_function)
+
+    @property
+    def input_size(self) -> int:
+        """
+        Get the input_size of this layer.
+
+        Returns
+        -------
+        result :
+            The amount of values being passed into this layer.
+        """
+        return self._input_size
 
     @property
     def output_size(self) -> int:

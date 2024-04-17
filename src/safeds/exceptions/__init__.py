@@ -27,10 +27,12 @@ from safeds.exceptions._ml import (
     DatasetContainsTargetError,
     DatasetMissesDataError,
     DatasetMissesFeaturesError,
+    InputSizeError,
     LearningError,
     ModelNotFittedError,
     NonTimeSeriesError,
     PredictionError,
+    TestTrainDataMismatchError,
     UntaggedTableError,
 )
 
@@ -57,10 +59,12 @@ __all__ = [
     "DatasetContainsTargetError",
     "DatasetMissesDataError",
     "DatasetMissesFeaturesError",
+    "InputSizeError",
     "LearningError",
     "ModelNotFittedError",
     "NonTimeSeriesError",
     "PredictionError",
+    "TestTrainDataMismatchError",
     "UntaggedTableError",
     # Other
     "Bound",
