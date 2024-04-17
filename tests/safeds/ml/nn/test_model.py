@@ -93,7 +93,8 @@ class TestClassificationModel:
             )
 
     def test_should_raise_if_is_fitted_is_set_correctly_for_binary_classification(self) -> None:
-        model = NeuralNetworkClassifier([ForwardLayer(input_size=1, output_size=1)])
+        model = NeuralNetworkClassifier(InputConversionTable(["b"], "a"), [ForwardLayer(input_size=1, output_size=1)],
+                                        OutputConversionTable())
         assert not model.is_fitted
         model = model.fit(
             Table.from_dict({"a": [1], "b": [0]}).tag_columns("a"),
@@ -122,7 +123,9 @@ class TestClassificationModel:
             )
 
     def test_should_raise_if_table_size_and_input_size_mismatch(self) -> None:
-        model = NeuralNetworkClassifier([ForwardLayer(input_size=1, output_size=1), ForwardLayer(output_size=3)])
+        model = NeuralNetworkClassifier(InputConversionTable(["b", "c"], "a"),
+                                        [ForwardLayer(input_size=1, output_size=1), ForwardLayer(output_size=3)],
+                                        OutputConversionTable())
         with pytest.raises(
             InputSizeError,
         ):
@@ -197,8 +200,9 @@ class TestRegressionModel:
             OutOfBoundsError,
             match=rf"batch_size \(={batch_size}\) is not inside \[1, \u221e\)\.",
         ):
-            NeuralNetworkRegressor([ForwardLayer(input_size=1, output_size=1)]).fit(
-                Table.from_dict({"a": [1], "b": [2]}).tag_columns("a"),
+            NeuralNetworkRegressor(InputConversionTable(["b"], "a"), [ForwardLayer(input_size=1, output_size=1)],
+                                   OutputConversionTable()).fit(
+                Table.from_dict({"a": [1], "b": [2]}),
                 batch_size=batch_size,
             )
 
@@ -235,15 +239,15 @@ class TestRegressionModel:
 
     def test_should_raise_if_model_has_not_been_fitted(self) -> None:
         with pytest.raises(ModelNotFittedError, match="The model has not been fitted yet."):
-            NeuralNetworkRegressor([ForwardLayer(input_size=1, output_size=1)]).predict(
+            NeuralNetworkRegressor(InputConversionTable(["b"], "a"), [ForwardLayer(input_size=1, output_size=1)], OutputConversionTable()).predict(
                 Table.from_dict({"a": [1]}),
             )
 
     def test_should_raise_if_is_fitted_is_set_correctly(self) -> None:
-        model = NeuralNetworkRegressor([ForwardLayer(input_size=1, output_size=1)])
+        model = NeuralNetworkRegressor(InputConversionTable(["b"], "a"),[ForwardLayer(input_size=1, output_size=1)], OutputConversionTable())
         assert not model.is_fitted
         model = model.fit(
-            Table.from_dict({"a": [1], "b": [0]}).tag_columns("a"),
+            Table.from_dict({"a": [1], "b": [0]}),
         )
         assert model.is_fitted
 

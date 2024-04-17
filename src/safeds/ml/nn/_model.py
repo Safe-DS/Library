@@ -28,7 +28,7 @@ class NeuralNetworkRegressor:
 
     def fit(
         self,
-        train_data: TaggedTable,
+        train_data: I,
         epoch_size: int = 25,
         batch_size: int = 1,
         learning_rate: float = 0.001,
@@ -260,7 +260,7 @@ class NeuralNetworkClassifier:
         copied_model._model.eval()
         return copied_model
 
-    def predict(self, test_data: Table) -> TaggedTable:
+    def predict(self, test_data: I) -> O:
         """
         Make a prediction for the given test data.
 
@@ -295,12 +295,9 @@ class NeuralNetworkClassifier:
                 if self._num_of_classes > 1:
                     predictions += torch.argmax(elem, dim=1).tolist()
                 else:
-                    p = elem.squeeze().round().tolist()
-                    if isinstance(p, float):
-                        predictions.append(p)
-                    else:
-                        predictions += p
-        return test_data.add_column(Column("prediction", predictions)).tag_columns("prediction")
+                    predictions.append(elem.squeeze(dim=1).round())
+        #return test_data.add_column(Column("prediction", predictions)).tag_columns("prediction")
+        return self._output_conversion._data_conversion(test_data, torch.cat(predictions, dim=0))
 
     @property
     def is_fitted(self) -> bool:
