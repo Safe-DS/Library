@@ -9,7 +9,7 @@ from safeds.exceptions import (
     InputSizeError,
     ModelNotFittedError,
     OutOfBoundsError,
-    TestTrainDataMismatchError,
+    FeatureDataMismatchError,
 )
 
 if TYPE_CHECKING:
@@ -21,20 +21,21 @@ if TYPE_CHECKING:
     from safeds.ml.nn._layer import _Layer
     from safeds.ml.nn._output_conversion import _OutputConversion
 
-IT = TypeVar("IT", Table, TimeSeries)
-OT = TypeVar("OT", TaggedTable, TimeSeries)
+IFT = TypeVar("IFT", Table, TimeSeries)  # InputFitType
+IPT = TypeVar("IPT", Table, TimeSeries)  # InputPredictType
+OT = TypeVar("OT", TaggedTable, TimeSeries)  # OutputType
 
 
-class NeuralNetworkRegressor(Generic[IT, OT]):
+class NeuralNetworkRegressor(Generic[IFT, IPT, OT]):
     def __init__(
         self,
-        input_conversion: _InputConversion[IT],
+        input_conversion: _InputConversion[IFT, IPT],
         layers: list[_Layer],
-        output_conversion: _OutputConversion[IT, OT],
+        output_conversion: _OutputConversion[IPT, OT],
     ):
-        self._input_conversion: _InputConversion[IT] = input_conversion
+        self._input_conversion: _InputConversion[IFT, IPT] = input_conversion
         self._model = _create_internal_model(layers, is_for_classification=False)
-        self._output_conversion: _OutputConversion[IT, OT] = output_conversion
+        self._output_conversion: _OutputConversion[IPT, OT] = output_conversion
         self._input_size = self._model.input_size
         self._batch_size = 1
         self._is_fitted = False
@@ -43,7 +44,7 @@ class NeuralNetworkRegressor(Generic[IT, OT]):
 
     def fit(
         self,
-        train_data: IT,
+        train_data: IFT,
         epoch_size: int = 25,
         batch_size: int = 1,
         learning_rate: float = 0.001,
@@ -90,6 +91,8 @@ class NeuralNetworkRegressor(Generic[IT, OT]):
             raise OutOfBoundsError(actual=batch_size, name="batch_size", lower_bound=ClosedBound(1))
         if self._input_conversion._data_size is not self._input_size:
             raise InputSizeError(self._input_conversion._data_size, self._input_size)
+        if not self._input_conversion._is_fit_data_valid(train_data):
+            raise FeatureDataMismatchError
 
         copied_model = copy.deepcopy(self)
 
@@ -129,7 +132,7 @@ class NeuralNetworkRegressor(Generic[IT, OT]):
         copied_model._model.eval()
         return copied_model
 
-    def predict(self, test_data: IT) -> OT:
+    def predict(self, test_data: IPT) -> OT:
         """
         Make a prediction for the given test data.
 
@@ -154,8 +157,8 @@ class NeuralNetworkRegressor(Generic[IT, OT]):
 
         if not self._is_fitted:
             raise ModelNotFittedError
-        if not self._input_conversion._is_data_valid(test_data):
-            raise TestTrainDataMismatchError
+        if not self._input_conversion._is_predict_data_valid(test_data):
+            raise FeatureDataMismatchError
         dataloader = self._input_conversion._data_conversion_predict(test_data, self._batch_size)
         predictions = []
         with torch.no_grad():
@@ -177,16 +180,16 @@ class NeuralNetworkRegressor(Generic[IT, OT]):
         return self._is_fitted
 
 
-class NeuralNetworkClassifier(Generic[IT, OT]):
+class NeuralNetworkClassifier(Generic[IFT, IPT, OT]):
     def __init__(
         self,
-        input_conversion: _InputConversion[IT],
+        input_conversion: _InputConversion[IFT, IPT],
         layers: list[_Layer],
-        output_conversion: _OutputConversion[IT, OT],
+        output_conversion: _OutputConversion[IPT, OT],
     ):
-        self._input_conversion: _InputConversion[IT] = input_conversion
+        self._input_conversion: _InputConversion[IFT, IPT] = input_conversion
         self._model = _create_internal_model(layers, is_for_classification=True)
-        self._output_conversion: _OutputConversion[IT, OT] = output_conversion
+        self._output_conversion: _OutputConversion[IPT, OT] = output_conversion
         self._input_size = self._model.input_size
         self._batch_size = 1
         self._is_fitted = False
@@ -196,7 +199,7 @@ class NeuralNetworkClassifier(Generic[IT, OT]):
 
     def fit(
         self,
-        train_data: IT,
+        train_data: IFT,
         epoch_size: int = 25,
         batch_size: int = 1,
         learning_rate: float = 0.001,
@@ -243,6 +246,8 @@ class NeuralNetworkClassifier(Generic[IT, OT]):
             raise OutOfBoundsError(actual=batch_size, name="batch_size", lower_bound=ClosedBound(1))
         if self._input_conversion._data_size is not self._input_size:
             raise InputSizeError(self._input_conversion._data_size, self._input_size)
+        if not self._input_conversion._is_fit_data_valid(train_data):
+            raise FeatureDataMismatchError
 
         copied_model = copy.deepcopy(self)
 
@@ -289,7 +294,7 @@ class NeuralNetworkClassifier(Generic[IT, OT]):
         copied_model._model.eval()
         return copied_model
 
-    def predict(self, test_data: IT) -> OT:
+    def predict(self, test_data: IPT) -> OT:
         """
         Make a prediction for the given test data.
 
@@ -314,8 +319,8 @@ class NeuralNetworkClassifier(Generic[IT, OT]):
 
         if not self._is_fitted:
             raise ModelNotFittedError
-        if not self._input_conversion._is_data_valid(test_data):
-            raise TestTrainDataMismatchError
+        if not self._input_conversion._is_predict_data_valid(test_data):
+            raise FeatureDataMismatchError
         dataloader = self._input_conversion._data_conversion_predict(test_data, self._batch_size)
         predictions = []
         with torch.no_grad():

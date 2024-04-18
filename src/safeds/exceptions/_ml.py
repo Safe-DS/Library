@@ -68,12 +68,12 @@ class PredictionError(Exception):
         super().__init__(f"Error occurred while predicting: {reason}")
 
 
-class TestTrainDataMismatchError(Exception):
-    """Raised when the columns of the table passed to the predict method do not match with the feature columns of the training data."""
+class FeatureDataMismatchError(Exception):
+    """Raised when the columns of the table passed to the predict or fit method do not match with the specified features of the neural network."""
 
     def __init__(self) -> None:
         super().__init__(
-            "The column names in the test table do not match with the feature columns names of the training data.",
+            "The features in the given table do not match with the specified feature columns names of the neural network.",
         )
 
 
