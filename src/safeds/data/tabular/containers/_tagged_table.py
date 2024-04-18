@@ -15,7 +15,7 @@ if TYPE_CHECKING:
     from collections.abc import Callable, Mapping, Sequence
     from typing import Any
 
-    import numpy as np
+    import torch
     from torch import Tensor
     from torch.utils.data import DataLoader, Dataset
 
@@ -916,7 +916,7 @@ class TaggedTable(Table):
             )
 
 
-def _create_dataset(features: np.array, target: np.array) -> Dataset:
+def _create_dataset(features: Tensor, target: Tensor) -> Dataset:
     import torch
     from torch.utils.data import Dataset
 

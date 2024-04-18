@@ -1,28 +1,38 @@
-from torch import Tensor, nn
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from torch import Tensor, nn
 
 from safeds.exceptions import ClosedBound, OutOfBoundsError
-from safeds.ml.nn._layer import Layer
+from safeds.ml.nn._layer import _Layer
 
 
-class _InternalLayer(nn.Module):
-    def __init__(self, input_size: int, output_size: int, activation_function: str):
-        super().__init__()
-        self._layer = nn.Linear(input_size, output_size)
-        match activation_function:
-            case "sigmoid":
-                self._fn = nn.Sigmoid()
-            case "relu":
-                self._fn = nn.ReLU()
-            case "softmax":
-                self._fn = nn.Softmax()
-            case _:
-                raise ValueError("Unknown Activation Function: " + activation_function)
+def _create_internal_model(input_size: int, output_size: int, activation_function: str) -> nn.Module:
+    from torch import nn
 
-    def forward(self, x: Tensor) -> Tensor:
-        return self._fn(self._layer(x))
+    class _InternalLayer(nn.Module):
+        def __init__(self, input_size: int, output_size: int, activation_function: str):
+            super().__init__()
+            self._layer = nn.Linear(input_size, output_size)
+            match activation_function:
+                case "sigmoid":
+                    self._fn = nn.Sigmoid()
+                case "relu":
+                    self._fn = nn.ReLU()
+                case "softmax":
+                    self._fn = nn.Softmax()
+                case _:
+                    raise ValueError("Unknown Activation Function: " + activation_function)
+
+        def forward(self, x: Tensor) -> Tensor:
+            return self._fn(self._layer(x))
+
+    return _InternalLayer(input_size, output_size, activation_function)
 
 
-class ForwardLayer(Layer):
+class ForwardLayer(_Layer):
     def __init__(self, output_size: int, input_size: int | None = None):
         """
         Create a FNN Layer.
@@ -47,8 +57,8 @@ class ForwardLayer(Layer):
             raise OutOfBoundsError(actual=output_size, name="output_size", lower_bound=ClosedBound(1))
         self._output_size = output_size
 
-    def _get_internal_layer(self, activation_function: str) -> _InternalLayer:
-        return _InternalLayer(self._input_size, self._output_size, activation_function)
+    def _get_internal_layer(self, activation_function: str) -> nn.Module:
+        return _create_internal_model(self._input_size, self._output_size, activation_function)
 
     @property
     def input_size(self) -> int:

@@ -1,9 +1,13 @@
+from __future__ import annotations
+
 from abc import ABC, abstractmethod
+from typing import TYPE_CHECKING
 
-from torch import nn
+if TYPE_CHECKING:
+    from torch import nn
 
 
-class Layer(ABC):
+class _Layer(ABC):
     @abstractmethod
     def __init__(self) -> None:
         pass  # pragma: no cover
