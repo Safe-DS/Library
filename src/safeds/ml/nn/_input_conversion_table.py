@@ -13,6 +13,16 @@ class InputConversionTable(_InputConversion[TaggedTable, Table]):
     """The input conversion for a neural network, defines the input parameters for the neural network."""
 
     def __init__(self, feature_names: list[str], target_name: str) -> None:
+        """
+        The input conversion for a neural network, defines the input parameters for the neural network.
+
+        Parameters
+        ----------
+        feature_names
+            The names of the features for the input table, used as features for the training.
+        target_name
+            The name of the target for the input table, used as target for the training.
+        """
         self._feature_names = feature_names
         self._target_name = target_name
 

@@ -13,6 +13,14 @@ class OutputConversionTable(_OutputConversion[Table, TaggedTable]):
     """The output conversion for a neural network, defines the output parameters for the neural network."""
 
     def __init__(self, prediction_name: str = "prediction") -> None:
+        """
+        The output conversion for a neural network, defines the output parameters for the neural network.
+
+        Parameters
+        ----------
+        prediction_name
+            The name of the new column where the prediction will be stored.
+        """
         self._prediction_name = prediction_name
 
     def _data_conversion(self, input_data: Table, output_data: Tensor) -> TaggedTable:
