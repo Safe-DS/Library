@@ -1,6 +1,6 @@
 import pytest
 from safeds.data.tabular.containers import Table, TaggedTable
-from safeds.exceptions import InputSizeError, ModelNotFittedError, OutOfBoundsError, FeatureDataMismatchError
+from safeds.exceptions import FeatureDataMismatchError, InputSizeError, ModelNotFittedError, OutOfBoundsError
 from safeds.ml.nn import (
     ForwardLayer,
     InputConversionTable,

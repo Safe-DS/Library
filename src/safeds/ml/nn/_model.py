@@ -6,10 +6,10 @@ from typing import TYPE_CHECKING, Generic, Self, TypeVar
 from safeds.data.tabular.containers import Table, TaggedTable, TimeSeries
 from safeds.exceptions import (
     ClosedBound,
+    FeatureDataMismatchError,
     InputSizeError,
     ModelNotFittedError,
     OutOfBoundsError,
-    FeatureDataMismatchError,
 )
 
 if TYPE_CHECKING:
