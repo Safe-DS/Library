@@ -21,7 +21,7 @@ if TYPE_CHECKING:
     from safeds.ml.nn._layer import _Layer
     from safeds.ml.nn._output_conversion import _OutputConversion
 
-IFT = TypeVar("IFT", Table, TimeSeries)  # InputFitType
+IFT = TypeVar("IFT", TaggedTable, TimeSeries)  # InputFitType
 IPT = TypeVar("IPT", Table, TimeSeries)  # InputPredictType
 OT = TypeVar("OT", TaggedTable, TimeSeries)  # OutputType
 

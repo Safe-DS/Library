@@ -6,9 +6,9 @@ from typing import TYPE_CHECKING, Generic, TypeVar
 if TYPE_CHECKING:
     from torch.utils.data import DataLoader
 
-from safeds.data.tabular.containers import Table, TimeSeries
+from safeds.data.tabular.containers import Table, TimeSeries, TaggedTable
 
-FT = TypeVar("FT", Table, TimeSeries)
+FT = TypeVar("FT", TaggedTable, TimeSeries)
 PT = TypeVar("PT", Table, TimeSeries)
 
 
