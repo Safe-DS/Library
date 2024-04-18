@@ -14,7 +14,7 @@ class OutputConversionTable(_OutputConversion[Table, TaggedTable]):
 
     def __init__(self, prediction_name: str = "prediction") -> None:
         """
-        The output conversion for a neural network, defines the output parameters for the neural network.
+        Define the output parameters for the neural network in the output conversion.
 
         Parameters
         ----------

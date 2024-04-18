@@ -14,7 +14,7 @@ class InputConversionTable(_InputConversion[TaggedTable, Table]):
 
     def __init__(self, feature_names: list[str], target_name: str) -> None:
         """
-        The input conversion for a neural network, defines the input parameters for the neural network.
+        Define the input parameters for the neural network in the input conversion.
 
         Parameters
         ----------
