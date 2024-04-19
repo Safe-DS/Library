@@ -2,15 +2,15 @@ from __future__ import annotations
 
 import sys
 import warnings
-from typing import Any
-
-import pandas as pd
-from sklearn.impute import SimpleImputer as sk_SimpleImputer
+from typing import TYPE_CHECKING, Any
 
 from safeds.data.tabular.containers import Table
 from safeds.data.tabular.transformation._table_transformer import TableTransformer
 from safeds.data.tabular.typing import ImputerStrategy
 from safeds.exceptions import NonNumericColumnError, TransformerNotFittedError, UnknownColumnNameError
+
+if TYPE_CHECKING:
+    from sklearn.impute import SimpleImputer as sk_SimpleImputer
 
 
 class Imputer(TableTransformer):
@@ -160,6 +160,8 @@ class Imputer(TableTransformer):
         NonNumericColumnError
             If the strategy is set to either Mean or Median and the specified columns of the table contain non-numerical data.
         """
+        from sklearn.impute import SimpleImputer as sk_SimpleImputer
+
         if column_names is None:
             column_names = table.column_names
         else:
@@ -238,6 +240,8 @@ class Imputer(TableTransformer):
         ValueError
             If the table contains 0 rows.
         """
+        import pandas as pd
+
         # Transformer has not been fitted yet
         if self._wrapped_transformer is None or self._column_names is None:
             raise TransformerNotFittedError

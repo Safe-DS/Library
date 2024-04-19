@@ -2,8 +2,6 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from sklearn.ensemble import RandomForestClassifier as sk_RandomForestClassifier
-
 from safeds._utils import _structural_hash
 from safeds.exceptions import ClosedBound, OutOfBoundsError
 from safeds.ml.classical._util_sklearn import fit, predict
@@ -12,6 +10,7 @@ from ._classifier import Classifier
 
 if TYPE_CHECKING:
     from sklearn.base import ClassifierMixin
+    from sklearn.ensemble import RandomForestClassifier as sk_RandomForestClassifier
 
     from safeds.data.tabular.containers import Table, TaggedTable
 
@@ -155,4 +154,6 @@ class RandomForestClassifier(Classifier):
         wrapped_classifier: ClassifierMixin
             The sklearn Classifier.
         """
+        from sklearn.ensemble import RandomForestClassifier as sk_RandomForestClassifier
+
         return sk_RandomForestClassifier(self._number_of_trees, n_jobs=-1)

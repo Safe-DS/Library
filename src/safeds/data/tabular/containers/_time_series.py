@@ -4,6 +4,7 @@ import io
 import sys
 from typing import TYPE_CHECKING
 
+from safeds._utils import _structural_hash
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -175,6 +176,8 @@ class TimeSeries(Table):
         >>> test_table = Table({"date": ["01.01", "01.02", "01.03", "01.04"], "f1": ["a", "b", "c", "a"], "t": [1,2,3,4]})
         >>> timeseries = TimeSeries._from_table(test_table, "t", "date", ["f1"])
         """
+        import pandas as pd
+
         table = table._as_table()
         if feature_names is not None and time_name in feature_names:
             raise ValueError(f"Column '{time_name}' can not be time and feature column.")
@@ -245,9 +248,14 @@ class TimeSeries(Table):
         >>> from safeds.data.tabular.containers import TaggedTable
         >>> table = TaggedTable({"a": [1, 2, 3], "b": [4, 5, 6]}, "b", ["a"])
         """
+        import pandas as pd
+
+        # Enable copy-on-write for pandas dataframes
+        pd.options.mode.copy_on_write = True
+
         # Validate inputs
         super().__init__(data)
-        _data = Table(data)
+        _data: Table = Table(data)
         if feature_names is None:
             self._features = Table()
             self._feature_names = []
@@ -268,6 +276,8 @@ class TimeSeries(Table):
             self._time._data = pd.Series(name=time_name)
         if len(self.target._data) == 0:
             self.target._data = pd.Series(name=target_name)
+
+        self._data = _data._data
 
     def __eq__(self, other: object) -> bool:
         """
@@ -295,15 +305,10 @@ class TimeSeries(Table):
 
         Returns
         -------
-        hash : int
+        hash:
             The hash value.
         """
-        return xxhash.xxh3_64(
-            hash(self.time).to_bytes(8)
-            + hash(self.target).to_bytes(8)
-            + hash(self.features).to_bytes(8)
-            + Table.__hash__(self).to_bytes(8),
-        ).intdigest()
+        return _structural_hash(self.time, self.target, self.features, Table.__hash__(self))
 
     def __sizeof__(self) -> int:
         """
@@ -311,7 +316,8 @@ class TimeSeries(Table):
 
         Returns
         -------
-        Size of this object in bytes.
+        size:
+            Size of this object in bytes.
         """
         return Table.__sizeof__(self) + sys.getsizeof(self._time)
 
@@ -464,7 +470,7 @@ class TimeSeries(Table):
             time_name=self.time.name,
             target_name=self._target.name,
             feature_names=self._feature_names
-                          + [col.name for col in (columns.to_columns() if isinstance(columns, Table) else columns)],
+            + [col.name for col in (columns.to_columns() if isinstance(columns, Table) else columns)],
         )
 
     def add_columns(self, columns: list[Column] | Table) -> TimeSeries:
@@ -885,8 +891,8 @@ class TimeSeries(Table):
                     self._feature_names
                     if old_column_name not in self._feature_names
                     else self._feature_names[: self._feature_names.index(old_column_name)]
-                         + [col.name for col in new_columns]
-                         + self._feature_names[self._feature_names.index(old_column_name) + 1:]
+                    + [col.name for col in new_columns]
+                    + self._feature_names[self._feature_names.index(old_column_name) + 1 :]
                 ),
             )
 
@@ -930,7 +936,7 @@ class TimeSeries(Table):
     def sort_columns(
         self,
         comparator: Callable[[Column, Column], int] = lambda col1, col2: (col1.name > col2.name)
-                                                                         - (col1.name < col2.name),
+        - (col1.name < col2.name),
     ) -> TimeSeries:
         """
         Sort the columns of a `TimeSeries` with the given comparator and return a new `TimeSeries`.
@@ -1018,11 +1024,13 @@ class TimeSeries(Table):
 
         Examples
         --------
-                >>> from safeds.data.tabular.containers import TimeSeries
-                >>> table = TimeSeries({"time":[1, 2], "target": [3, 4], "feature":[2,2]}, target_name= "target", time_name="time", feature_names=["feature"], )
-                >>> image = table.plot_lagplot(lag = 1)
-
+        >>> from safeds.data.tabular.containers import TimeSeries
+        >>> table = TimeSeries({"time":[1, 2], "target": [3, 4], "feature":[2,2]}, target_name= "target", time_name="time", feature_names=["feature"], )
+        >>> image = table.plot_lagplot(lag = 1)
         """
+        import matplotlib.pyplot as plt
+        import pandas as pd
+
         if not self._target.type.is_numeric():
             raise NonNumericColumnError("This time series target contains non-numerical columns.")
         ax = pd.plotting.lag_plot(self._target._data, lag=lag)
@@ -1063,11 +1071,13 @@ class TimeSeries(Table):
 
         Examples
         --------
-                >>> from safeds.data.tabular.containers import TimeSeries
-                >>> table = TimeSeries({"time":[1, 2], "target": [3, 4], "feature":[2,2]}, target_name= "target", time_name="time", feature_names=["feature"], )
-                >>> image = table.plot_lineplot()
-
+        >>> from safeds.data.tabular.containers import TimeSeries
+        >>> table = TimeSeries({"time":[1, 2], "target": [3, 4], "feature":[2,2]}, target_name= "target", time_name="time", feature_names=["feature"], )
+        >>> image = table.plot_lineplot()
         """
+        import matplotlib.pyplot as plt
+        import seaborn as sns
+
         self._data.index.name = "index"
         if x_column_name is not None and not self.get_column(x_column_name).type.is_numeric():
             raise NonNumericColumnError("The time series plotted column contains non-numerical columns.")
@@ -1144,6 +1154,9 @@ class TimeSeries(Table):
                 >>> image = table.plot_scatterplot()
 
         """
+        import matplotlib.pyplot as plt
+        import seaborn as sns
+
         self._data.index.name = "index"
         if x_column_name is not None and not self.get_column(x_column_name).type.is_numeric():
             raise NonNumericColumnError("The time series plotted column contains non-numerical columns.")
@@ -1252,8 +1265,11 @@ class TimeSeries(Table):
         ------
         NonNumericColumnError
             if the target column contains non numerical values
-
         """
+        import matplotlib.pyplot as plt
+        import pandas as pd
+        import seaborn as sns
+
         if not self._target.type.is_numeric():
             raise NonNumericColumnError("The time series plotted column contains non-numerical columns.")
 

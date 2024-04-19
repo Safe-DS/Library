@@ -3,10 +3,6 @@ from __future__ import annotations
 import sys
 from typing import TYPE_CHECKING
 
-import numpy as np
-import torch
-from torch.utils.data import DataLoader, Dataset
-
 from safeds._utils import _structural_hash
 from safeds.data.tabular.containers import Column, Row, Table
 from safeds.exceptions import (
@@ -18,6 +14,10 @@ from safeds.exceptions import (
 if TYPE_CHECKING:
     from collections.abc import Callable, Mapping, Sequence
     from typing import Any
+
+    import torch
+    from torch import Tensor
+    from torch.utils.data import DataLoader, Dataset
 
 
 class TaggedTable(Table):
@@ -876,7 +876,7 @@ class TaggedTable(Table):
             feature_names=self.features.column_names,
         )
 
-    def _into_dataloader(self, batch_size: int) -> DataLoader:
+    def _into_dataloader_with_classes(self, batch_size: int, num_of_classes: int) -> DataLoader:
         """
         Return a Dataloader for the data stored in this table, used for training neural networks.
 
@@ -893,24 +893,43 @@ class TaggedTable(Table):
             The DataLoader.
 
         """
-        feature_rows = self.features.to_rows()
-        all_rows = []
-        for row in feature_rows:
-            new_item = []
-            for column_name in row:
-                new_item.append(row.get_value(column_name))
-            all_rows.append(new_item.copy())
-        return DataLoader(dataset=_CustomDataset(np.array(all_rows), np.array(self.target)), batch_size=batch_size)
+        import torch
+        from torch.utils.data import DataLoader
+
+        if num_of_classes <= 2:
+            return DataLoader(
+                dataset=_create_dataset(
+                    torch.Tensor(self.features._data.values),
+                    torch.Tensor(self.target._data).unsqueeze(dim=-1),
+                ),
+                batch_size=batch_size,
+                shuffle=True,
+            )
+        else:
+            return DataLoader(
+                dataset=_create_dataset(
+                    torch.Tensor(self.features._data.values),
+                    torch.nn.functional.one_hot(torch.LongTensor(self.target._data), num_classes=num_of_classes),
+                ),
+                batch_size=batch_size,
+                shuffle=True,
+            )
 
 
-class _CustomDataset(Dataset):
-    def __init__(self, features: np.array, target: np.array):
-        self.X = torch.from_numpy(features.astype(np.float32))
-        self.Y = torch.from_numpy(target.astype(np.float32))
-        self.len = self.X.shape[0]
+def _create_dataset(features: Tensor, target: Tensor) -> Dataset:
+    import torch
+    from torch.utils.data import Dataset
 
-    def __getitem__(self, item: int) -> tuple[torch.Tensor, torch.Tensor]:
-        return self.X[item], self.Y[item].unsqueeze(-1)
+    class _CustomDataset(Dataset):
+        def __init__(self, features: Tensor, target: Tensor):
+            self.X = features.to(torch.float32)
+            self.Y = target.to(torch.float32)
+            self.len = self.X.size(dim=0)
 
-    def __len__(self) -> int:
-        return self.len
+        def __getitem__(self, item: int) -> tuple[torch.Tensor, torch.Tensor]:
+            return self.X[item], self.Y[item]
+
+        def __len__(self) -> int:
+            return self.len
+
+    return _CustomDataset(features, target)

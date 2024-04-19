@@ -7,17 +7,6 @@ import warnings
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, TypeVar
 
-import Levenshtein
-import matplotlib.pyplot as plt
-import numpy as np
-import openpyxl
-import pandas as pd
-import seaborn as sns
-import torch
-from pandas import DataFrame
-from scipy import stats
-from torch.utils.data import DataLoader, Dataset
-
 from safeds._utils import _structural_hash
 from safeds.data.image.containers import Image
 from safeds.data.tabular.typing import ColumnType, Schema
@@ -37,13 +26,14 @@ from ._row import Row
 if TYPE_CHECKING:
     from collections.abc import Callable, Mapping, Sequence
 
+    import numpy as np
+    import pandas as pd
+    from torch.utils.data import DataLoader, Dataset
+
     from safeds.data.tabular.transformation import InvertibleTableTransformer, TableTransformer
 
     from ._tagged_table import TaggedTable
     from ._time_series import TimeSeries
-
-# Enable copy-on-write for pandas dataframes
-pd.options.mode.copy_on_write = True
 
 
 # noinspection PyProtectedMember
@@ -113,6 +103,8 @@ class Table:
         0  1  2  1
         1  0  0  7
         """
+        import pandas as pd
+
         path = Path(path)
         if path.suffix != ".csv":
             raise WrongFileExtensionError(path, ".csv")
@@ -158,6 +150,8 @@ class Table:
         1  2  5
         2  3  6
         """
+        import pandas as pd
+
         path = Path(path)
         excel_extensions = [".xls", ".xlsx", ".xlsm", ".xlsb", ".odf", ".ods", ".odt"]
         if path.suffix not in excel_extensions:
@@ -200,6 +194,8 @@ class Table:
         1  2  5
         2  3  6
         """
+        import pandas as pd
+
         path = Path(path)
         if path.suffix != ".json":
             raise WrongFileExtensionError(path, ".json")
@@ -276,6 +272,9 @@ class Table:
         1  2  5
         2  3  6
         """
+        import pandas as pd
+        from pandas import DataFrame
+
         dataframe: DataFrame = pd.DataFrame()
         column_names = []
 
@@ -321,6 +320,9 @@ class Table:
         0  1  2
         1  3  4
         """
+        import pandas as pd
+        from pandas import DataFrame
+
         if len(rows) == 0:
             return Table._from_pandas_dataframe(pd.DataFrame())
 
@@ -366,6 +368,8 @@ class Table:
            a  b
         0  1  2
         """
+        import pandas as pd
+
         data = data.reset_index(drop=True)
 
         result = object.__new__(Table)
@@ -408,6 +412,11 @@ class Table:
         1  2  5
         2  3  6
         """
+        import pandas as pd
+
+        # Enable copy-on-write for pandas dataframes
+        pd.options.mode.copy_on_write = True
+
         if data is None:
             data = {}
 
@@ -739,6 +748,8 @@ class Table:
         similar_columns: list[str]
             A list of all column names in the Table that are similar or equal to the given column name.
         """
+        import Levenshtein
+
         similar_columns = []
         similarity = 0.6
         i = 0
@@ -785,6 +796,8 @@ class Table:
         8              idness                 1.0                 1.0
         9           stability                 0.5                 0.5
         """
+        import pandas as pd
+
         if self.number_of_columns == 0:
             return Table(
                 {
@@ -996,6 +1009,9 @@ class Table:
         0  1  2
         1  3  4
         """
+        import numpy as np
+        import pandas as pd
+
         int_columns = []
 
         if self.number_of_columns == 0:
@@ -1057,6 +1073,8 @@ class Table:
         1  3  4
         2  5  6
         """
+        import pandas as pd
+
         if isinstance(rows, Table):
             if rows.number_of_columns == 0:
                 return self
@@ -1124,6 +1142,8 @@ class Table:
            a  b
         0  1  2
         """
+        import pandas as pd
+
         rows: list[Row] = [row for row in self.to_rows() if query(row)]
         if len(rows) == 0:
             result_table = Table._from_pandas_dataframe(pd.DataFrame(), self._schema)
@@ -1394,6 +1414,9 @@ class Table:
         9   0.0  0.00  0.0 -1000000
         10  0.0  0.00  0.0 -1000000
         """
+        import numpy as np
+        from scipy import stats
+
         table_without_nonnumericals = self.remove_columns_with_non_numerical_values()
         z_scores = np.absolute(stats.zscore(table_without_nonnumericals._data, nan_policy="omit"))
         filter_ = ((z_scores < 3) | np.isnan(z_scores)).all(axis=1)
@@ -1931,6 +1954,9 @@ class Table:
         >>> table = Table.from_dict({"temperature": [10, 15, 20, 25, 30], "sales": [54, 74, 90, 206, 210]})
         >>> image = table.plot_correlation_heatmap()
         """
+        import matplotlib.pyplot as plt
+        import seaborn as sns
+
         only_numerical = self.remove_columns_with_non_numerical_values()
 
         if self.number_of_rows == 0:
@@ -2005,6 +2031,9 @@ class Table:
         >>> table = Table.from_dict({"temperature": [10, 15, 20, 25, 30], "sales": [54, 74, 90, 206, 210]})
         >>> image = table.plot_lineplot("temperature", "sales")
         """
+        import matplotlib.pyplot as plt
+        import seaborn as sns
+
         if not self.has_column(x_column_name) or not self.has_column(y_column_name):
             similar_columns_x = self._get_similar_columns(x_column_name)
             similar_columns_y = self._get_similar_columns(y_column_name)
@@ -2063,6 +2092,9 @@ class Table:
         >>> table = Table.from_dict({"temperature": [10, 15, 20, 25, 30], "sales": [54, 74, 90, 206, 210]})
         >>> image = table.plot_scatterplot("temperature", "sales")
         """
+        import matplotlib.pyplot as plt
+        import seaborn as sns
+
         if not self.has_column(x_column_name) or not self.has_column(y_column_name):
             similar_columns_x = self._get_similar_columns(x_column_name)
             similar_columns_y = self._get_similar_columns(y_column_name)
@@ -2114,6 +2146,10 @@ class Table:
         >>> table = Table({"a":[1, 2], "b": [3, 42]})
         >>> image = table.plot_boxplots()
         """
+        import matplotlib.pyplot as plt
+        import pandas as pd
+        import seaborn as sns
+
         numerical_table = self.remove_columns_with_non_numerical_values()
         if numerical_table.number_of_columns == 0:
             raise NonNumericColumnError("This table contains only non-numerical columns.")
@@ -2156,6 +2192,10 @@ class Table:
         >>> table = Table({"a": [2, 3, 5, 1], "b": [54, 74, 90, 2014]})
         >>> image = table.plot_histograms()
         """
+        import matplotlib.pyplot as plt
+        import pandas as pd
+        import seaborn as sns
+
         col_wrap = min(self.number_of_columns, 3)
 
         data = pd.melt(self._data.map(lambda value: str(value)), value_vars=self.column_names)
@@ -2235,6 +2275,8 @@ class Table:
         >>> table = Table.from_dict({"a": [1, 2, 3], "b": [4, 5, 6]})
         >>> table.to_excel_file("./src/resources/to_excel_file.xlsx")
         """
+        import openpyxl
+
         path = Path(path)
         excel_extensions = [".xls", ".xlsx", ".xlsm", ".xlsb", ".odf", ".ods", ".odt"]
         if path.suffix not in excel_extensions:
@@ -2358,6 +2400,8 @@ class Table:
             'b': 30
         })]
         """
+        import pandas as pd
+
         return [
             Row._from_pandas_dataframe(
                 pd.DataFrame([list(series_row)], columns=self._schema.column_names),
@@ -2418,7 +2462,7 @@ class Table:
 
     def _into_dataloader(self, batch_size: int) -> DataLoader:
         """
-        Return a Dataloader for the data stored in this table, used for training neural networks.
+        Return a Dataloader for the data stored in this table, used for predicting with neural networks.
 
         The original table is not modified.
 
@@ -2433,6 +2477,9 @@ class Table:
             The DataLoader.
 
         """
+        import numpy as np
+        from torch.utils.data import DataLoader
+
         features = self.to_rows()
         all_rows = []
         for row in features:
@@ -2440,16 +2487,23 @@ class Table:
             for column_name in row:
                 new_item.append(row.get_value(column_name))
             all_rows.append(new_item.copy())
-        return DataLoader(dataset=_CustomDataset(np.array(all_rows)), batch_size=batch_size)
+        return DataLoader(dataset=_create_dataset(np.array(all_rows)), batch_size=batch_size)
 
 
-class _CustomDataset(Dataset):
-    def __init__(self, features: np.array):
-        self.X = torch.from_numpy(features.astype(np.float32))
-        self.len = self.X.shape[0]
+def _create_dataset(features: np.array) -> Dataset:
+    import numpy as np
+    import torch
+    from torch.utils.data import Dataset
 
-    def __getitem__(self, item: int) -> torch.Tensor:
-        return self.X[item]
+    class _CustomDataset(Dataset):
+        def __init__(self, features: np.array):
+            self.X = torch.from_numpy(features.astype(np.float32))
+            self.len = self.X.shape[0]
 
-    def __len__(self) -> int:
-        return self.len
+        def __getitem__(self, item: int) -> torch.Tensor:
+            return self.X[item]
+
+        def __len__(self) -> int:
+            return self.len
+
+    return _CustomDataset(features)

@@ -4,8 +4,6 @@ import warnings
 from collections import Counter
 from typing import Any
 
-import numpy as np
-
 from safeds.data.tabular.containers import Column, Table
 from safeds.data.tabular.transformation._table_transformer import (
     InvertibleTableTransformer,
@@ -93,6 +91,8 @@ class OneHotEncoder(InvertibleTableTransformer):
         ValueError
             If the table contains 0 rows.
         """
+        import numpy as np
+
         if column_names is None:
             column_names = table.column_names
         else:
@@ -178,6 +178,8 @@ class OneHotEncoder(InvertibleTableTransformer):
         ValueNotPresentWhenFittedError
             If a column in the to-be-transformed table contains a new value that was not already present in the table the OneHotEncoder was fitted on.
         """
+        import numpy as np
+
         # Transformer has not been fitted yet
         if self._column_names is None or self._value_to_column is None or self._value_to_column_nans is None:
             raise TransformerNotFittedError
@@ -264,6 +266,8 @@ class OneHotEncoder(InvertibleTableTransformer):
         ValueError
             If the table contains 0 rows.
         """
+        import numpy as np
+
         # Transformer has not been fitted yet
         if self._column_names is None or self._value_to_column is None or self._value_to_column_nans is None:
             raise TransformerNotFittedError

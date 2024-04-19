@@ -3,8 +3,6 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
-from sklearn.metrics import accuracy_score as sk_accuracy_score
-
 from safeds._utils import _structural_hash
 from safeds.data.tabular.containers import Table, TaggedTable
 from safeds.exceptions import UntaggedTableError
@@ -121,6 +119,8 @@ class Classifier(ABC):
         UntaggedTableError
             If the table is untagged.
         """
+        from sklearn.metrics import accuracy_score as sk_accuracy_score
+
         if not isinstance(validation_or_test_set, TaggedTable) and isinstance(validation_or_test_set, Table):
             raise UntaggedTableError
 
