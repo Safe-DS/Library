@@ -1,3 +1,5 @@
+import sys
+
 import pytest
 from safeds.exceptions import OutOfBoundsError
 from safeds.ml.nn import ForwardLayer
@@ -70,3 +72,70 @@ def test_should_raise_if_output_size_out_of_bounds(output_size: int) -> None:
 )
 def test_should_raise_if_output_size_doesnt_match(output_size: int) -> None:
     assert ForwardLayer(output_size=output_size, input_size=1).output_size == output_size
+
+
+@pytest.mark.parametrize(
+    ("layer1", "layer2"),
+    [
+        (
+            ForwardLayer(input_size=1, output_size=2),
+            ForwardLayer(input_size=1, output_size=2),
+        ),
+    ],
+    ids=["equal"],
+)
+def test_should_assert_that_forward_layers_are_equal(layer1: ForwardLayer, layer2: ForwardLayer) -> None:
+    assert layer1.__eq__(layer2)
+
+
+@pytest.mark.parametrize(
+    ("layer1", "layer2"),
+    [
+        (
+            ForwardLayer(input_size=1, output_size=2),
+            ForwardLayer(input_size=2, output_size=1),
+        ),
+    ],
+    ids=["not equal"],
+)
+def test_should_assert_that_forward_layers_are_not_equal(layer1: ForwardLayer, layer2: ForwardLayer) -> None:
+    assert not layer1.__eq__(layer2)
+
+
+@pytest.mark.parametrize(
+    ("layer1", "layer2"),
+    [
+        (
+            ForwardLayer(input_size=1, output_size=2),
+            ForwardLayer(input_size=1, output_size=2),
+        ),
+    ],
+    ids=["equal"],
+)
+def test_should_assert_that_equal_forward_layers_have_equal_hash(layer1: ForwardLayer, layer2: ForwardLayer) -> None:
+    assert layer1.__hash__() == layer2.__hash__()
+
+
+@pytest.mark.parametrize(
+    ("layer1", "layer2"),
+    [
+        (
+            ForwardLayer(input_size=1, output_size=2),
+            ForwardLayer(input_size=2, output_size=1),
+        ),
+    ],
+    ids=["not equal"],
+)
+def test_should_assert_that_different_forward_layers_have_different_hash(layer1: ForwardLayer, layer2: ForwardLayer) -> None:
+    assert layer1.__hash__() != layer2.__hash__()
+
+
+@pytest.mark.parametrize(
+    "layer",
+    [
+        ForwardLayer(input_size=1, output_size=1),
+    ],
+    ids=["one"],
+)
+def test_should_assert_that_layer_size_is_greater_than_normal_object(layer: ForwardLayer) -> None:
+    assert sys.getsizeof(layer) > sys.getsizeof(object())

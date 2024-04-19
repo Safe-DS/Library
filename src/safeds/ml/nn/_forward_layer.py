@@ -102,7 +102,7 @@ class ForwardLayer(_Layer):
         """
         return _structural_hash(self._input_size, self._output_size)
 
-    def __eq__(self, other: ForwardLayer) -> bool:
+    def __eq__(self, other: object) -> bool:
         """
         Compare two forward layer instances.
 
@@ -110,6 +110,8 @@ class ForwardLayer(_Layer):
         -------
         'True' if input and output size are equal, 'False' otherwise.
         """
+        if not isinstance(other, ForwardLayer):
+            return NotImplemented
         if self is other:
             return True
         return self._input_size == other._input_size and self._output_size == other._output_size
