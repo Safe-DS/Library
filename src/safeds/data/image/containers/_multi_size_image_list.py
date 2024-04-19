@@ -10,7 +10,7 @@ from torch import Tensor
 
 from safeds._utils import _structural_hash
 from safeds.data.image.containers import Image, ImageList
-from safeds.data.image.utils._image_transformation_error_and_warning_checks import (
+from safeds.data.image._utils._image_transformation_error_and_warning_checks import (
     _check_blur_errors_and_warnings,
     _check_remove_images_with_size_errors,
 )
