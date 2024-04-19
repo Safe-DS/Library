@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-
 if TYPE_CHECKING:
     from torch import Tensor, nn
 
@@ -118,6 +117,7 @@ class ForwardLayer(_Layer):
 
     def __sizeof__(self) -> int:
         import sys
+
         """
         Return the complete size of this object.
 
