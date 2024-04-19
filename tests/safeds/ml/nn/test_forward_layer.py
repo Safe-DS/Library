@@ -136,7 +136,8 @@ def test_should_assert_that_equal_forward_layers_have_equal_hash(layer1: Forward
     ids=["not equal"],
 )
 def test_should_assert_that_different_forward_layers_have_different_hash(
-    layer1: ForwardLayer, layer2: ForwardLayer,
+    layer1: ForwardLayer,
+    layer2: ForwardLayer,
 ) -> None:
     assert layer1.__hash__() != layer2.__hash__()
 
