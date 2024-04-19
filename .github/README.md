@@ -1,9 +1,9 @@
----
-hide:
-  - navigation
----
-
 # Safe-DS Python Library
+
+[![PyPI](https://img.shields.io/pypi/v/safe-ds)](https://pypi.org/project/safe-ds)
+[![Main](https://github.com/Safe-DS/Library/actions/workflows/main.yml/badge.svg)](https://github.com/Safe-DS/Library/actions/workflows/main.yml)
+[![codecov](https://codecov.io/gh/Safe-DS/Library/branch/main/graph/badge.svg?token=HVRP1633B1)](https://codecov.io/gh/Safe-DS/Library)
+[![Documentation Status](https://readthedocs.org/projects/safe-ds-stdlib/badge/?version=stable)](https://library.safeds.com)
 
 A user-friendly library for Data Science (DS) in Python.
 
@@ -30,6 +30,10 @@ Get the latest version from [PyPI](https://pypi.org/project/safe-ds):
 ```shell
 pip install safe-ds
 ```
+
+## Documentation
+
+You can find the full documentation [here](https://library.safeds.com).
 
 ## Contributing
 

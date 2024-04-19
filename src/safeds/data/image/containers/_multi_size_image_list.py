@@ -5,9 +5,6 @@ import random
 import sys
 from typing import TYPE_CHECKING
 
-import torch
-from torch import Tensor
-
 from safeds._utils import _structural_hash
 from safeds.data.image.containers import Image, ImageList
 from safeds.data.image._utils._image_transformation_error_and_warning_checks import (
@@ -22,6 +19,8 @@ from safeds.exceptions import (
 
 if TYPE_CHECKING:
     from pathlib import Path
+
+    from torch import Tensor
 
     from safeds.data.image.containers._single_size_image_list import _SingleSizeImageList
 
@@ -376,6 +375,8 @@ class _MultiSizeImageList(ImageList):
             return image_list
 
     def remove_images_with_size(self, width: int, height: int) -> ImageList:
+        import torch
+
         _check_remove_images_with_size_errors(width, height)
         if (width, height) not in self._image_list_dict:
             return self
@@ -445,6 +446,8 @@ class _MultiSizeImageList(ImageList):
         return image_list
 
     def resize(self, new_width: int, new_height: int) -> ImageList:
+        import torch
+
         from safeds.data.image.containers._single_size_image_list import _SingleSizeImageList
 
         image_list_tensors = []
@@ -466,6 +469,8 @@ class _MultiSizeImageList(ImageList):
         return image_list
 
     def crop(self, x: int, y: int, width: int, height: int) -> ImageList:
+        import torch
+
         from safeds.data.image.containers._single_size_image_list import _SingleSizeImageList
 
         image_list_tensors = []

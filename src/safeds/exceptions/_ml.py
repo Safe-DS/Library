@@ -68,6 +68,24 @@ class PredictionError(Exception):
         super().__init__(f"Error occurred while predicting: {reason}")
 
 
+class FeatureDataMismatchError(Exception):
+    """Raised when the columns of the table passed to the predict or fit method do not match with the specified features of the neural network."""
+
+    def __init__(self) -> None:
+        super().__init__(
+            "The features in the given table do not match with the specified feature columns names of the neural network.",
+        )
+
+
+class InputSizeError(Exception):
+    """Raised when the amount of features being passed to a network does not match with its input size."""
+
+    def __init__(self, table_size: int, input_layer_size: int) -> None:
+        super().__init__(
+            f"The amount of columns being passed to the network({table_size}) does not match with its input size({input_layer_size}). Consider changing the number of neurons in the first layer or reformatting the table.",
+        )
+
+
 class UntaggedTableError(Exception):
     """Raised when an untagged table is used instead of a TaggedTable in a regression or classification."""
 

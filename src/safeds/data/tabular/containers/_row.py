@@ -5,8 +5,6 @@ import sys
 from collections.abc import Callable, Mapping
 from typing import TYPE_CHECKING, Any
 
-import pandas as pd
-
 from safeds._utils import _structural_hash
 from safeds.data.tabular.typing import ColumnType, Schema
 from safeds.exceptions import UnknownColumnNameError
@@ -14,8 +12,7 @@ from safeds.exceptions import UnknownColumnNameError
 if TYPE_CHECKING:
     from collections.abc import Iterator
 
-# Enable copy-on-write for pandas dataframes
-pd.options.mode.copy_on_write = True
+    import pandas as pd
 
 
 class Row(Mapping[str, Any]):
@@ -121,6 +118,11 @@ class Row(Mapping[str, Any]):
         >>> from safeds.data.tabular.containers import Row
         >>> row = Row({"a": 1, "b": 2})
         """
+        import pandas as pd
+
+        # Enable copy-on-write for pandas dataframes
+        pd.options.mode.copy_on_write = True
+
         if data is None:
             data = {}
 

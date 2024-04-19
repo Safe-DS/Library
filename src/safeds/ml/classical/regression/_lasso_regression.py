@@ -3,8 +3,6 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 from warnings import warn
 
-from sklearn.linear_model import Lasso as sk_Lasso
-
 from safeds._utils import _structural_hash
 from safeds.exceptions import ClosedBound, OutOfBoundsError
 from safeds.ml.classical._util_sklearn import fit, predict
@@ -13,6 +11,7 @@ from ._regressor import Regressor
 
 if TYPE_CHECKING:
     from sklearn.base import RegressorMixin
+    from sklearn.linear_model import Lasso as sk_Lasso
 
     from safeds.data.tabular.containers import Table, TaggedTable
 
@@ -160,4 +159,6 @@ class LassoRegressor(Regressor):
         wrapped_regressor: RegressorMixin
             The sklearn Regressor.
         """
+        from sklearn.linear_model import Lasso as sk_Lasso
+
         return sk_Lasso(alpha=self._alpha)

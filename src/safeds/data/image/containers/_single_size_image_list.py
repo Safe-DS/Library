@@ -6,12 +6,6 @@ import sys
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-import torch
-from torch import Tensor
-from torchvision.transforms import InterpolationMode
-from torchvision.transforms.v2 import functional as func2
-from torchvision.utils import save_image
-
 from safeds._utils import _structural_hash
 from safeds.data.image.containers._image import Image
 from safeds.data.image.containers._image_list import ImageList
@@ -33,6 +27,8 @@ from safeds.exceptions import (
 )
 
 if TYPE_CHECKING:
+    from torch import Tensor
+
     from safeds.data.image.containers._multi_size_image_list import _MultiSizeImageList
 
 
@@ -51,12 +47,16 @@ class _SingleSizeImageList(ImageList):
     """
 
     def __init__(self) -> None:
+        import torch
+
         self._tensor: Tensor = torch.empty(0)
         self._tensor_positions_to_indices: list[int] = []  # list[tensor_position] = index
         self._indices_to_tensor_positions: dict[int, int] = {}  # {index: tensor_position}
 
     @staticmethod
     def _create_image_list(images: list[Tensor], indices: list[int]) -> ImageList:
+        import torch
+
         from safeds.data.image.containers._empty_image_list import _EmptyImageList
 
         if len(images) == 0:
@@ -129,6 +129,8 @@ class _SingleSizeImageList(ImageList):
         return _indices_to_tensor_positions
 
     def __eq__(self, other: object) -> bool:
+        import torch
+
         if not isinstance(other, ImageList):
             return NotImplemented
         if not isinstance(other, _SingleSizeImageList):
@@ -205,6 +207,10 @@ class _SingleSizeImageList(ImageList):
         )
 
     def to_jpeg_files(self, path: str | Path | list[str | Path]) -> None:
+        import torch
+        from torchvision.transforms.v2 import functional as func2
+        from torchvision.utils import save_image
+
         if self.channel == 4:
             raise IllegalFormatError("png")
         path_str: str | Path
@@ -248,6 +254,10 @@ class _SingleSizeImageList(ImageList):
                 )
 
     def to_png_files(self, path: str | Path | list[str | Path]) -> None:
+        import torch
+        from torchvision.transforms.v2 import functional as func2
+        from torchvision.utils import save_image
+
         path_str: str | Path
         if isinstance(path, list):
             if len(path) == self.number_of_images:
@@ -307,6 +317,8 @@ class _SingleSizeImageList(ImageList):
 
     @staticmethod
     def _change_channel_of_tensor(tensor: Tensor, channel: int) -> Tensor:
+        import torch
+
         """
         Change the channel of a tensor to the given channel.
 
@@ -343,6 +355,8 @@ class _SingleSizeImageList(ImageList):
             raise ValueError(f"Channel {channel} is not a valid channel option. Use either 1, 3 or 4")
 
     def _add_image_tensor(self, image_tensor: Tensor, index: int) -> ImageList:
+        import torch
+
         from safeds.data.image.containers._multi_size_image_list import _MultiSizeImageList
 
         if index in self._indices_to_tensor_positions:
@@ -404,6 +418,8 @@ class _SingleSizeImageList(ImageList):
             return image_list_multi
 
     def add_images(self, images: list[Image] | ImageList) -> ImageList:
+        import torch
+
         from safeds.data.image.containers._empty_image_list import _EmptyImageList
         from safeds.data.image.containers._multi_size_image_list import _MultiSizeImageList
 
@@ -555,6 +571,9 @@ class _SingleSizeImageList(ImageList):
         return image_list
 
     def resize(self, new_width: int, new_height: int) -> ImageList:
+        from torchvision.transforms import InterpolationMode
+        from torchvision.transforms.v2 import functional as func2
+
         _check_resize_errors(new_width, new_height)
         image_list = self._clone_without_tensor()
         image_list._tensor = func2.resize(
@@ -571,6 +590,9 @@ class _SingleSizeImageList(ImageList):
 
     @staticmethod
     def _convert_tensor_to_grayscale(tensor: Tensor) -> Tensor:
+        import torch
+        from torchvision.transforms.v2 import functional as func2
+
         if tensor.size(dim=-3) == 4:
             return torch.cat(
                 [func2.rgb_to_grayscale(tensor[:, 0:3], num_output_channels=3), tensor[:, 3].unsqueeze(dim=1)],
@@ -580,22 +602,31 @@ class _SingleSizeImageList(ImageList):
             return func2.rgb_to_grayscale(tensor[:, 0:3], num_output_channels=3)
 
     def crop(self, x: int, y: int, width: int, height: int) -> ImageList:
+        from torchvision.transforms.v2 import functional as func2
+
         _check_crop_errors_and_warnings(x, y, width, height, self.widths[0], self.heights[0], plural=True)
         image_list = self._clone_without_tensor()
         image_list._tensor = func2.crop(self._tensor, x, y, height, width)
         return image_list
 
     def flip_vertically(self) -> ImageList:
+        from torchvision.transforms.v2 import functional as func2
+
         image_list = self._clone_without_tensor()
         image_list._tensor = func2.vertical_flip(self._tensor)
         return image_list
 
     def flip_horizontally(self) -> ImageList:
+        from torchvision.transforms.v2 import functional as func2
+
         image_list = self._clone_without_tensor()
         image_list._tensor = func2.horizontal_flip(self._tensor)
         return image_list
 
     def adjust_brightness(self, factor: float) -> ImageList:
+        import torch
+        from torchvision.transforms.v2 import functional as func2
+
         _check_adjust_brightness_errors_and_warnings(factor, plural=True)
         image_list = self._clone_without_tensor()
         if self.channel == 4:
@@ -608,12 +639,17 @@ class _SingleSizeImageList(ImageList):
         return image_list
 
     def add_noise(self, standard_deviation: float) -> ImageList:
+        import torch
+
         _check_add_noise_errors(standard_deviation)
         image_list = self._clone_without_tensor()
         image_list._tensor = self._tensor + torch.normal(0, standard_deviation, self._tensor.size()) * 255
         return image_list
 
     def adjust_contrast(self, factor: float) -> ImageList:
+        import torch
+        from torchvision.transforms.v2 import functional as func2
+
         _check_adjust_contrast_errors_and_warnings(factor, plural=True)
         image_list = self._clone_without_tensor()
         if self.channel == 4:
@@ -634,12 +670,17 @@ class _SingleSizeImageList(ImageList):
         return image_list
 
     def blur(self, radius: int) -> ImageList:
+        from torchvision.transforms.v2 import functional as func2
+
         _check_blur_errors_and_warnings(radius, min(self.widths[0], self.heights[0]), plural=True)
         image_list = self._clone_without_tensor()
         image_list._tensor = func2.gaussian_blur(self._tensor, [radius * 2 + 1, radius * 2 + 1])
         return image_list
 
     def sharpen(self, factor: float) -> ImageList:
+        import torch
+        from torchvision.transforms.v2 import functional as func2
+
         _check_sharpen_errors_and_warnings(factor, plural=True)
         image_list = self._clone_without_tensor()
         if self.channel == 4:
@@ -652,6 +693,9 @@ class _SingleSizeImageList(ImageList):
         return image_list
 
     def invert_colors(self) -> ImageList:
+        import torch
+        from torchvision.transforms.v2 import functional as func2
+
         image_list = self._clone_without_tensor()
         if self.channel == 4:
             image_list._tensor = torch.cat(
@@ -663,17 +707,23 @@ class _SingleSizeImageList(ImageList):
         return image_list
 
     def rotate_right(self) -> ImageList:
+        from torchvision.transforms.v2 import functional as func2
+
         image_list = self._clone_without_tensor()
         image_list._tensor = func2.rotate(self._tensor, -90, expand=True)
         return image_list
 
     def rotate_left(self) -> ImageList:
+        from torchvision.transforms.v2 import functional as func2
+
         image_list = self._clone_without_tensor()
         image_list._tensor = func2.rotate(self._tensor, 90, expand=True)
         return image_list
 
     def find_edges(self) -> ImageList:
-        kernel = Image._FILTER_EDGES_KERNEL.to("cpu")
+        import torch
+
+        kernel = Image._filter_edges_kernel().to("cpu")
         edges_tensor = torch.clamp(
             torch.nn.functional.conv2d(
                 self.convert_to_grayscale()._as_single_size_image_list()._tensor.float()[:, 0].unsqueeze(dim=1),

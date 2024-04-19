@@ -1,3 +1,20 @@
+## [0.21.0](https://github.com/Safe-DS/Library/compare/v0.20.0...v0.21.0) (2024-04-17)
+
+
+### Features
+
+* add ARIMA model ([#577](https://github.com/Safe-DS/Library/issues/577)) ([8b9c7a9](https://github.com/Safe-DS/Library/commit/8b9c7a9295a2bfc0c425d247e76a38b4b79136b8)), closes [#570](https://github.com/Safe-DS/Library/issues/570)
+* Add ImageList class ([#534](https://github.com/Safe-DS/Library/issues/534)) ([3cb74a2](https://github.com/Safe-DS/Library/commit/3cb74a2a0acc0bdeb795c2d22d1cc02e9fb6b790)), closes [#528](https://github.com/Safe-DS/Library/issues/528) [#599](https://github.com/Safe-DS/Library/issues/599) [#600](https://github.com/Safe-DS/Library/issues/600)
+* more hash, sizeof and eq implementations ([#609](https://github.com/Safe-DS/Library/issues/609)) ([2bc0b0a](https://github.com/Safe-DS/Library/commit/2bc0b0a2ba0a5eda0d4c220210c59247d3a18ef2))
+
+
+### Performance Improvements
+
+* Add special case to `Table.add_rows` to increase performance ([#608](https://github.com/Safe-DS/Library/issues/608)) ([ffb8304](https://github.com/Safe-DS/Library/commit/ffb83042307dbe77baef6e24dbefb9691b02db15)), closes [#606](https://github.com/Safe-DS/Library/issues/606)
+* improve performance of model & forward layer ([#616](https://github.com/Safe-DS/Library/issues/616)) ([e856cd5](https://github.com/Safe-DS/Library/commit/e856cd50f806b84098a1b6caf206ccfb9955df58)), closes [#610](https://github.com/Safe-DS/Library/issues/610)
+* lazily import our modules and external libraries ([#624](https://github.com/Safe-DS/Library/issues/624)) ([20fc313](https://github.com/Safe-DS/Library/commit/20fc31395390a21ce052bea6dc295ed66ddef310))
+* treat Tables specially when calling add_rows ([#606](https://github.com/Safe-DS/Library/issues/606)) ([e555b85](https://github.com/Safe-DS/Library/commit/e555b85dbd3a5e967f6337faa3d2ac4a9e8d8208)), closes [#575](https://github.com/Safe-DS/Library/issues/575)
+
 ## [0.20.0](https://github.com/Safe-DS/Library/compare/v0.19.0...v0.20.0) (2024-04-03)
 
 
