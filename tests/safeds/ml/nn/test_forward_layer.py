@@ -107,7 +107,7 @@ def test_should_assert_that_forward_layer_is_equal_to_itself() -> None:
     ],
     ids=["ForwardLayer vs. None"],
 )
-def test_should_return_not_implemented_if_other_is_not_table(layer: ForwardLayer, other: Any) -> None:
+def test_should_return_not_implemented_if_other_is_not_forward_layer(layer: ForwardLayer, other: Any) -> None:
     assert (layer.__eq__(other)) is NotImplemented
 
 
