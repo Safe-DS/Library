@@ -1323,11 +1323,11 @@ class TimeSeries(Table):
         # -> [i, win_size],[target]
         feature_cols = self.features.to_columns()
         for i in range(size - (forecast_len + window_size)):
-            window = target_np[i: i + window_size]
+            window = target_np[i : i + window_size]
             label = target_np[i + window_size + forecast_len]
             for col in feature_cols:
                 data = col._data.to_numpy()
-                window = np.concatenate((window, data[i: i + window_size]))
+                window = np.concatenate((window, data[i : i + window_size]))
             x_s.append(window)
             y_s.append(label)
 
