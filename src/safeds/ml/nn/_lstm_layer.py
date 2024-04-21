@@ -1,36 +1,46 @@
-from torch import nn
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from torch import nn, Tensor
 
 from safeds.exceptions import ClosedBound, OutOfBoundsError
+from safeds.ml.nn._layer import _Layer
 
 
-class _InternalLayer(nn.Module):
-    def __init__(self, input_size: int, output_size: int, activation_function: str):
-        super().__init__()
-        self._layer = nn.LSTM(input_size, output_size)
-        match activation_function:
-            case "sigmoid":
-                self._fn = nn.Sigmoid()
-            case "relu":
-                self._fn = nn.ReLU()
-            case "softmax":
-                self._fn = nn.Softmax()
-            case _:
-                raise ValueError("Unknown Activation Function: " + activation_function)
+def _create_internal_model(input_size: int, output_size: int, activation_function: str) -> nn.Module:
+    from torch import nn
+    class _InternalLayer(nn.Module):
+        def __init__(self, input_size: int, output_size: int, activation_function: str):
+            super().__init__()
+            self._layer = nn.LSTM(input_size, output_size)
+            match activation_function:
+                case "sigmoid":
+                    self._fn = nn.Sigmoid()
+                case "relu":
+                    self._fn = nn.ReLU()
+                case "softmax":
+                    self._fn = nn.Softmax()
+                case _:
+                    raise ValueError("Unknown Activation Function: " + activation_function)
 
-    def forward(self, x: float) -> float:
-        return self._fn(self._layer(x)[0])
+        def forward(self, x: Tensor) -> Tensor:
+            return self._fn(self._layer(x)[0])
+
+    return _InternalLayer(input_size, output_size, activation_function)
 
 
-class LSTMLayer:
+class LSTMLayer(_Layer):
     def __init__(self, output_size: int, input_size: int | None = None):
         """
         Create a LSTM Layer.
 
         Parameters
         ----------
-        input_size
+        input_size:
             The number of neurons in the previous layer
-        output_size
+        output_size:
             The number of neurons in this layer
 
         Raises
@@ -46,8 +56,20 @@ class LSTMLayer:
             raise OutOfBoundsError(actual=output_size, name="output_size", lower_bound=ClosedBound(1))
         self._output_size = output_size
 
-    def _get_internal_layer(self, activation_function: str) -> _InternalLayer:
-        return _InternalLayer(self._input_size, self._output_size, activation_function)
+    def _get_internal_layer(self, activation_function: str) -> nn.Module:
+        return _create_internal_model(self._input_size, self._output_size, activation_function)
+
+    @property
+    def input_size(self) -> int:
+        """
+        Get the input_size of this layer.
+
+        Returns
+        -------
+        result:
+            The amount of values being passed into this layer.
+        """
+        return self._input_size
 
     @property
     def output_size(self) -> int:
@@ -56,7 +78,7 @@ class LSTMLayer:
 
         Returns
         -------
-        result :
+        result:
             The Number of Neurons in this layer.
         """
         return self._output_size

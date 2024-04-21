@@ -1612,7 +1612,7 @@ class Table:
     def sort_columns(
         self,
         comparator: Callable[[Column, Column], int] = lambda col1, col2: (col1.name > col2.name)
-        - (col1.name < col2.name),
+                                                                         - (col1.name < col2.name),
     ) -> Table:
         """
         Sort the columns of a `Table` with the given comparator and return a new `Table`.
@@ -2490,6 +2490,7 @@ class Table:
         return DataLoader(dataset=_create_dataset(np.array(all_rows)), batch_size=batch_size)
 
 
+# this cant be used in tagged table or time series, as it wont take a target column
 def _create_dataset(features: np.array) -> Dataset:
     import numpy as np
     import torch

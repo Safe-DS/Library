@@ -35,7 +35,7 @@ def _create_internal_model(input_size: int, output_size: int, activation_functio
 class ForwardLayer(_Layer):
     def __init__(self, output_size: int, input_size: int | None = None):
         """
-        Create a FNN Layer.
+        Create a Feed Forward Layer.
 
         Parameters
         ----------

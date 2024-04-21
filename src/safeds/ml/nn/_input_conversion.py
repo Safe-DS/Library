@@ -21,7 +21,7 @@ class _InputConversion(Generic[FT, PT], ABC):
         pass  # pragma: no cover
 
     @abstractmethod
-    def _data_conversion_fit(self, input_data: FT, batch_size: int, num_of_classes: int = 1) -> DataLoader:
+    def _data_conversion_fit(self, input_data: FT, batch_size: int) -> DataLoader:
         pass  # pragma: no cover
 
     @abstractmethod

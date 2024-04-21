@@ -5,14 +5,6 @@ import sys
 from typing import TYPE_CHECKING
 
 from safeds._utils import _structural_hash
-import matplotlib.pyplot as plt
-import numpy as np
-import pandas as pd
-import seaborn as sns
-import torch
-import xxhash
-from torch.utils.data import DataLoader, Dataset
-
 from safeds.data.image.containers import Image
 from safeds.data.tabular.containers import Column, Row, Table, TaggedTable
 from safeds.exceptions import (
@@ -25,8 +17,10 @@ from safeds.exceptions import (
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Mapping, Sequence
+    import numpy as np
     from pathlib import Path
     from typing import Any
+    from torch.utils.data import DataLoader, Dataset
 
 
 class TimeSeries(Table):
@@ -470,7 +464,7 @@ class TimeSeries(Table):
             time_name=self.time.name,
             target_name=self._target.name,
             feature_names=self._feature_names
-            + [col.name for col in (columns.to_columns() if isinstance(columns, Table) else columns)],
+                          + [col.name for col in (columns.to_columns() if isinstance(columns, Table) else columns)],
         )
 
     def add_columns(self, columns: list[Column] | Table) -> TimeSeries:
@@ -891,8 +885,8 @@ class TimeSeries(Table):
                     self._feature_names
                     if old_column_name not in self._feature_names
                     else self._feature_names[: self._feature_names.index(old_column_name)]
-                    + [col.name for col in new_columns]
-                    + self._feature_names[self._feature_names.index(old_column_name) + 1 :]
+                         + [col.name for col in new_columns]
+                         + self._feature_names[self._feature_names.index(old_column_name) + 1:]
                 ),
             )
 
@@ -936,7 +930,7 @@ class TimeSeries(Table):
     def sort_columns(
         self,
         comparator: Callable[[Column, Column], int] = lambda col1, col2: (col1.name > col2.name)
-        - (col1.name < col2.name),
+                                                                         - (col1.name < col2.name),
     ) -> TimeSeries:
         """
         Sort the columns of a `TimeSeries` with the given comparator and return a new `TimeSeries`.
@@ -1295,23 +1289,32 @@ class TimeSeries(Table):
         self._data = self._data.reset_index()
         return Image.from_bytes(buffer.read())
 
-    def _into_dataloader_with_window(self, window_size: int, forecast_len: int, batch_size: int) -> DataLoader:
+    def _into_dataloader_with_window(self, window_size: int, forecast_horizon: int, batch_size: int) -> DataLoader:
         """
         Return a Dataloader for the data stored in this time series, used for training neural networks.
 
-        It splits the target column into windows uses them as feature and creates targets for the time series, by
+        It splits the target column into windows, uses them as feature and creates targets for the time series, by
         forecast length. The original table is not modified.
 
         Parameters
         ----------
-        batch_size
+        window_size:
+            The size of the created windows
+
+        forecast_horizon:
+            The length of the forecast horizon, where all datapoints are collected until the given lag.
+
+        batch_size:
             The size of data batches that should be loaded at one time.
+
 
         Returns
         -------
-        result :
+        result:
             The DataLoader.
         """
+        import numpy as np
+        from torch.utils.data import DataLoader
         target_np = self.target._data.to_numpy()
 
         x_s = []
@@ -1322,26 +1325,90 @@ class TimeSeries(Table):
         # every feature column wird auch gewindowed
         # -> [i, win_size],[target]
         feature_cols = self.features.to_columns()
-        for i in range(size - (forecast_len + window_size)):
+        for i in range(size - (forecast_horizon + window_size)):
             window = target_np[i : i + window_size]
-            label = target_np[i + window_size + forecast_len]
+            label = target_np[i + window_size + forecast_horizon]
             for col in feature_cols:
                 data = col._data.to_numpy()
                 window = np.concatenate((window, data[i : i + window_size]))
             x_s.append(window)
             y_s.append(label)
 
-        return DataLoader(dataset=_CustomDataset(np.array(x_s), np.array(y_s)), batch_size=batch_size)
+        return DataLoader(dataset=_create_dataset(np.array(x_s), np.array(y_s)), batch_size=batch_size)
+
+    def _into_dataloader_with_window_predict(self, window_size: int, forecast_horizon: int,
+                                             batch_size: int) -> DataLoader:
+        """
+        Return a Dataloader for the data stored in this time series, used for training neural networks.
+
+        It splits the target column into windows, uses them as feature and creates targets for the time series, by
+        forecast length. The original table is not modified.
+
+        Parameters
+        ----------
+        window_size:
+            The size of the created windows
+
+        batch_size:
+            The size of data batches that should be loaded at one time.
 
 
-class _CustomDataset(Dataset):
-    def __init__(self, features: np.array, target: np.array):
-        self.X = torch.from_numpy(features.astype(np.float32))
-        self.Y = torch.from_numpy(target.astype(np.float32))
-        self.len = self.X.shape[0]
+        Returns
+        -------
+        result:
+            The DataLoader.
+        """
+        import numpy as np
+        from torch.utils.data import DataLoader
+        target_np = self.target._data.to_numpy()
 
-    def __getitem__(self, item: int) -> tuple[torch.Tensor, torch.Tensor]:
-        return self.X[item], self.Y[item].unsqueeze(-1)
+        x_s = []
 
-    def __len__(self) -> int:
-        return self.len
+        size = len(target_np)
+        feature_cols = self.features.to_columns()
+        for i in range(size - (forecast_horizon + window_size)):
+            window = target_np[i: i + window_size]
+            for col in feature_cols:
+                data = col._data.to_numpy()
+                window = np.concatenate((window, data[i: i + window_size]))
+            x_s.append(window)
+
+        return DataLoader(dataset=_create_dataset_predict(np.array(x_s)), batch_size=batch_size)
+
+
+def _create_dataset(features: np.array, target: np.array) -> Dataset:
+    import numpy as np
+    import torch
+    from torch.utils.data import Dataset
+
+    class _CustomDataset(Dataset):
+        def __init__(self, features_dataset: np.array, target_dataset: np.array):
+            self.X = torch.from_numpy(features_dataset.astype(np.float32))
+            self.Y = torch.from_numpy(target_dataset.astype(np.float32))
+            self.len = self.X.shape[0]
+
+        def __getitem__(self, item: int) -> tuple[torch.Tensor, torch.Tensor]:
+            return self.X[item], self.Y[item].unsqueeze(-1)
+
+        def __len__(self) -> int:
+            return self.len
+
+    return _CustomDataset(features, target)
+
+def _create_dataset_predict(features: np.array) -> Dataset:
+    import numpy as np
+    import torch
+    from torch.utils.data import Dataset
+
+    class _CustomDataset(Dataset):
+        def __init__(self, features: np.array):
+            self.X = torch.from_numpy(features.astype(np.float32))
+            self.len = self.X.shape[0]
+
+        def __getitem__(self, item: int) -> torch.Tensor:
+            return self.X[item]
+
+        def __len__(self) -> int:
+            return self.len
+
+    return _CustomDataset(features)
