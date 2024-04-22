@@ -107,7 +107,8 @@ class ForwardLayer(_Layer):
 
         Returns
         -------
-        'True' if input and output size are equal, 'False' otherwise.
+        equals:
+            'True' if input and output size are equal, 'False' otherwise.
         """
         if not isinstance(other, ForwardLayer):
             return NotImplemented
