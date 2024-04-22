@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from torch import Tensor, nn
 
+from safeds._utils import _structural_hash
 from safeds.exceptions import ClosedBound, OutOfBoundsError
 from safeds.ml.nn._layer import _Layer
 
@@ -88,3 +89,42 @@ class ForwardLayer(_Layer):
         if input_size < 1:
             raise OutOfBoundsError(actual=input_size, name="input_size", lower_bound=ClosedBound(1))
         self._input_size = input_size
+
+    def __hash__(self) -> int:
+        """
+        Return a deterministic hash value for this forward layer.
+
+        Returns
+        -------
+        hash:
+            the hash value
+        """
+        return _structural_hash(self._input_size, self._output_size)
+
+    def __eq__(self, other: object) -> bool:
+        """
+        Compare two forward layer instances.
+
+        Returns
+        -------
+        equals:
+            'True' if input and output size are equal, 'False' otherwise.
+        """
+        if not isinstance(other, ForwardLayer):
+            return NotImplemented
+        if self is other:
+            return True
+        return self._input_size == other._input_size and self._output_size == other._output_size
+
+    def __sizeof__(self) -> int:
+        import sys
+
+        """
+        Return the complete size of this object.
+
+        Returns
+        -------
+        size:
+            Size of this object in bytes.
+        """
+        return sys.getsizeof(self._input_size) + sys.getsizeof(self._output_size)
