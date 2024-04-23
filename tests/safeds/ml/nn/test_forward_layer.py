@@ -45,7 +45,7 @@ def test_should_raise_if_unknown_activation_function_is_passed(activation_functi
         ValueError,
         match=rf"Unknown Activation Function: {activation_function}",
     ):
-        ForwardLayer(output_size=1, input_size=1)._get_internal_layer(activation_function)
+        ForwardLayer(output_size=1, input_size=1)._get_internal_layer(activation_function=activation_function)
 
 
 @pytest.mark.parametrize(
