@@ -30,6 +30,6 @@ def test_lstm_model() -> None:
         OutputConversionTimeSeries("predicted", window_size=7, forecast_horizon=12),
     )
     trained_model = model.fit(train_ts)
-    predictions = trained_model.predict(test_ts)
+    trained_model.predict(test_ts)
     # suggest it ran through
     assert True
