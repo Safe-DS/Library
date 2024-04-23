@@ -18,6 +18,7 @@ from safeds.data.image._utils._image_transformation_error_and_warning_checks imp
     _check_resize_errors,
     _check_sharpen_errors_and_warnings,
 )
+from safeds.data.image.typing import ImageSize
 from safeds.exceptions import IllegalFormatError
 
 if TYPE_CHECKING:
@@ -260,6 +261,18 @@ class Image:
             The number of channels of the image.
         """
         return self._image_tensor.size(dim=0)
+
+    @property
+    def size(self) -> ImageSize:
+        """
+        Get the `ImageSize` of the image.
+
+        Returns
+        -------
+        image_size:
+            The size of the image.
+        """
+        return ImageSize(self.width, self.height, self.channel)
 
     @property
     def device(self) -> Device:

@@ -3,10 +3,13 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Generic, TypeVar
 
+from safeds.data.image.typing import ImageSize
+
 if TYPE_CHECKING:
     from torch.utils.data import DataLoader
 
 from safeds.data.tabular.containers import Table, TaggedTable, TimeSeries
+from safeds.data.image.containers import ImageDataset, ImageList
 
 FT = TypeVar("FT", TaggedTable, TimeSeries)
 PT = TypeVar("PT", Table, TimeSeries)
@@ -17,15 +20,15 @@ class _InputConversion(Generic[FT, PT], ABC):
 
     @property
     @abstractmethod
-    def _data_size(self) -> int:
+    def _data_size(self) -> int | ImageSize:
         pass  # pragma: no cover
 
     @abstractmethod
-    def _data_conversion_fit(self, input_data: FT, batch_size: int, num_of_classes: int = 1) -> DataLoader:
+    def _data_conversion_fit(self, input_data: FT, batch_size: int, num_of_classes: int = 1) -> DataLoader | ImageDataset:
         pass  # pragma: no cover
 
     @abstractmethod
-    def _data_conversion_predict(self, input_data: PT, batch_size: int) -> DataLoader:
+    def _data_conversion_predict(self, input_data: PT, batch_size: int) -> DataLoader | ImageList:
         pass  # pragma: no cover
 
     @abstractmethod

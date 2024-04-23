@@ -3,6 +3,7 @@ from __future__ import annotations
 import copy
 from typing import TYPE_CHECKING, Generic, Self, TypeVar
 
+from safeds.data.image.containers import ImageList, ImageDataset
 from safeds.data.tabular.containers import Table, TaggedTable, TimeSeries
 from safeds.exceptions import (
     ClosedBound,
@@ -11,6 +12,8 @@ from safeds.exceptions import (
     ModelNotFittedError,
     OutOfBoundsError,
 )
+from safeds.ml.nn import InputConversionImage, FlattenLayer
+from safeds.ml.nn._pooling2d_layer import _Pooling2DLayer
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -21,9 +24,9 @@ if TYPE_CHECKING:
     from safeds.ml.nn._layer import _Layer
     from safeds.ml.nn._output_conversion import _OutputConversion
 
-IFT = TypeVar("IFT", TaggedTable, TimeSeries)  # InputFitType
-IPT = TypeVar("IPT", Table, TimeSeries)  # InputPredictType
-OT = TypeVar("OT", TaggedTable, TimeSeries)  # OutputType
+IFT = TypeVar("IFT", TaggedTable, TimeSeries, ImageDataset)  # InputFitType
+IPT = TypeVar("IPT", Table, TimeSeries, ImageList)  # InputPredictType
+OT = TypeVar("OT", TaggedTable, TimeSeries, ImageDataset)  # OutputType
 
 
 class NeuralNetworkRegressor(Generic[IFT, IPT, OT]):
@@ -34,7 +37,7 @@ class NeuralNetworkRegressor(Generic[IFT, IPT, OT]):
         output_conversion: _OutputConversion[IPT, OT],
     ):
         self._input_conversion: _InputConversion[IFT, IPT] = input_conversion
-        self._model = _create_internal_model(layers, is_for_classification=False)
+        self._model = _create_internal_model(input_conversion, layers, is_for_classification=False)
         self._output_conversion: _OutputConversion[IPT, OT] = output_conversion
         self._input_size = self._model.input_size
         self._batch_size = 1
@@ -188,7 +191,7 @@ class NeuralNetworkClassifier(Generic[IFT, IPT, OT]):
         output_conversion: _OutputConversion[IPT, OT],
     ):
         self._input_conversion: _InputConversion[IFT, IPT] = input_conversion
-        self._model = _create_internal_model(layers, is_for_classification=True)
+        self._model = _create_internal_model(input_conversion, layers, is_for_classification=True)
         self._output_conversion: _OutputConversion[IPT, OT] = output_conversion
         self._input_size = self._model.input_size
         self._batch_size = 1
@@ -345,7 +348,7 @@ class NeuralNetworkClassifier(Generic[IFT, IPT, OT]):
         return self._is_fitted
 
 
-def _create_internal_model(layers: list[_Layer], is_for_classification: bool) -> nn.Module:
+def _create_internal_model(input_conversion: _InputConversion[IFT, IPT], layers: list[_Layer], is_for_classification: bool) -> nn.Module:
     from torch import nn
 
     class _InternalModel(nn.Module):
@@ -359,13 +362,18 @@ def _create_internal_model(layers: list[_Layer], is_for_classification: bool) ->
             for layer in layers:
                 if previous_output_size is not None:
                     layer._set_input_size(previous_output_size)
-                internal_layers.append(layer._get_internal_layer(activation_function="relu"))
+                elif isinstance(input_conversion, InputConversionImage):
+                    layer._set_input_size(input_conversion._data_size)
+                if isinstance(layer, FlattenLayer) or isinstance(layer, _Pooling2DLayer):
+                    internal_layers.append(layer._get_internal_layer())
+                else:
+                    internal_layers.append(layer._get_internal_layer(activation_function="relu"))
                 previous_output_size = layer.output_size
 
             if is_for_classification:
                 internal_layers.pop()
                 if layers[-1].output_size > 2:
-                    internal_layers.append(layers[-1]._get_internal_layer(activation_function="softmax"))
+                    internal_layers.append(layers[-1]._get_internal_layer(activation_function="none"))
                 else:
                     internal_layers.append(layers[-1]._get_internal_layer(activation_function="sigmoid"))
             self._pytorch_layers = nn.Sequential(*internal_layers)

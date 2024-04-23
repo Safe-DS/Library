@@ -20,6 +20,7 @@ from safeds.data.image._utils._image_transformation_error_and_warning_checks imp
     _check_resize_errors,
     _check_sharpen_errors_and_warnings,
 )
+from safeds.data.image.typing import ImageSize
 from safeds.exceptions import (
     DuplicateIndexError,
     IllegalFormatError,
@@ -48,6 +49,9 @@ class _SingleSizeImageList(ImageList):
 
     def __init__(self) -> None:
         import torch
+
+        self._next_batch_index = 0
+        self._batch_size = 1
 
         self._tensor: Tensor = torch.empty(0)
         self._tensor_positions_to_indices: list[int] = []  # list[tensor_position] = index
@@ -94,6 +98,40 @@ class _SingleSizeImageList(ImageList):
         image_list._indices_to_tensor_positions = image_list._calc_new_indices_to_tensor_positions()
 
         return image_list
+
+    @staticmethod
+    def _create_from_tensor(images_tensor: Tensor, indices: list[int]) -> _SingleSizeImageList:
+        if images_tensor.dim() != 4:
+            raise ValueError(f"Invalid Tensor. This Tensor requires 4 dimensions but has {images_tensor.dim()}")
+
+        image_list = _SingleSizeImageList()
+        image_list._tensor = images_tensor.detach().clone()
+        image_list._tensor_positions_to_indices = indices
+        image_list._indices_to_tensor_positions = image_list._calc_new_indices_to_tensor_positions()
+
+        return image_list
+
+    def __iter__(self) -> _SingleSizeImageList:
+        im_ds = copy.copy(self)
+        im_ds._next_batch_index = 0
+        return im_ds
+
+    def __next__(self) -> Tensor:
+        if self._next_batch_index * self._batch_size >= len(self):
+            raise StopIteration
+        self._next_batch_index += 1
+        return self._get_batch(self._next_batch_index - 1)
+
+    def _get_batch(self, batch_number: int, batch_size: int | None = None) -> Tensor:
+        import torch
+
+        if batch_size is None:
+            batch_size = self._batch_size
+        if batch_size * batch_number >= len(self):
+            raise IndexOutOfBoundsError(batch_size * batch_number)
+        max_index = batch_size * (batch_number + 1) if batch_size * (batch_number + 1) < len(self) else len(self)
+        input_tensor = self._tensor[[self._indices_to_tensor_positions[index] for index in range(batch_size * batch_number, max_index)]].to(torch.float32) / 255
+        return input_tensor
 
     def clone(self) -> ImageList:
         cloned_image_list = self._clone_without_tensor()
@@ -182,6 +220,10 @@ class _SingleSizeImageList(ImageList):
     @property
     def channel(self) -> int:
         return self._tensor.size(dim=1)
+
+    @property
+    def sizes(self) -> list[ImageSize]:
+        return [ImageSize(self._tensor.size(dim=3), self._tensor.size(dim=2), self._tensor.size(dim=1))] * self.number_of_images
 
     @property
     def number_of_sizes(self) -> int:

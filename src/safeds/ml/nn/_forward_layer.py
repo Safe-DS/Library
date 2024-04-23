@@ -23,11 +23,13 @@ def _create_internal_model(input_size: int, output_size: int, activation_functio
                     self._fn = nn.ReLU()
                 case "softmax":
                     self._fn = nn.Softmax()
+                case "none":
+                    self._fn = None
                 case _:
                     raise ValueError("Unknown Activation Function: " + activation_function)
 
         def forward(self, x: Tensor) -> Tensor:
-            return self._fn(self._layer(x))
+            return self._fn(self._layer(x)) if self._fn is not None else self._layer(x)
 
     return _InternalLayer(input_size, output_size, activation_function)
 
@@ -57,7 +59,7 @@ class ForwardLayer(_Layer):
             raise OutOfBoundsError(actual=output_size, name="output_size", lower_bound=ClosedBound(1))
         self._output_size = output_size
 
-    def _get_internal_layer(self, activation_function: str) -> nn.Module:
+    def _get_internal_layer(self, *, activation_function: str) -> nn.Module:
         return _create_internal_model(self._input_size, self._output_size, activation_function)
 
     @property

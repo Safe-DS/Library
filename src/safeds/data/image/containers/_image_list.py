@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, overload, Literal
 
 from safeds.data.image.containers._image import Image
+from safeds.data.image.typing import ImageSize
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
@@ -120,7 +121,7 @@ class ImageList(metaclass=ABCMeta):
             If the directory or one of the files of the path cannot be found
         """
         from PIL.Image import open as pil_image_open
-        from torchvision.transforms.functional import pil_to_tensor
+        from torchvision.transforms.v2.functional import pil_to_tensor
 
         from safeds.data.image.containers._empty_image_list import _EmptyImageList
         from safeds.data.image.containers._multi_size_image_list import _MultiSizeImageList
@@ -323,6 +324,18 @@ class ImageList(metaclass=ABCMeta):
         -------
         channel:
             The channel of all images
+        """
+
+    @property
+    @abstractmethod
+    def sizes(self) -> list[ImageSize]:
+        """
+        Return the sizes of all images
+
+        Returns
+        -------
+        sizes:
+            The sizes of all images
         """
 
     @property

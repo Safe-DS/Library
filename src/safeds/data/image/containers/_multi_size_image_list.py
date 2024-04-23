@@ -11,6 +11,7 @@ from safeds.data.image._utils._image_transformation_error_and_warning_checks imp
     _check_blur_errors_and_warnings,
     _check_remove_images_with_size_errors,
 )
+from safeds.data.image.typing import ImageSize
 from safeds.exceptions import (
     DuplicateIndexError,
     IllegalFormatError,
@@ -157,6 +158,15 @@ class _MultiSizeImageList(ImageList):
     @property
     def channel(self) -> int:
         return next(iter(self._image_list_dict.values())).channel
+
+    @property
+    def sizes(self) -> list[ImageSize]:
+        sizes = {}
+        for image_list in self._image_list_dict.values():
+            indices = image_list._as_single_size_image_list()._tensor_positions_to_indices
+            for i, index in enumerate(indices):
+                sizes[index] = image_list.sizes[i]
+        return [sizes[index] for index in sorted(sizes)]
 
     @property
     def number_of_sizes(self) -> int:
