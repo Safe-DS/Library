@@ -27,10 +27,10 @@ def test_lstm_model() -> None:
     model = NeuralNetworkRegressor(
         InputConversionTimeSeries(window_size=7, forecast_horizon=12, time_name="date", target_name="value"),
         [ForwardLayer(input_size=7, output_size=1)],
-        OutputConversionTimeSeries("predicted"),
+        OutputConversionTimeSeries("predicted", window_size=7, forecast_horizon=12),
     )
     trained_model = model.fit(train_ts)
     predictions = trained_model.predict(test_ts)
     print(predictions)
     # suggest it ran through
-    assert False
+    assert True
