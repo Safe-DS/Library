@@ -1339,7 +1339,10 @@ class TimeSeries(Table):
         return DataLoader(dataset=_create_dataset(np.array(x_s), np.array(y_s)), batch_size=batch_size)
 
     def _into_dataloader_with_window_predict(
-        self, window_size: int, forecast_horizon: int, batch_size: int,
+        self,
+        window_size: int,
+        forecast_horizon: int,
+        batch_size: int,
     ) -> DataLoader:
         """
         Return a Dataloader for the data stored in this time series, used for training neural networks.

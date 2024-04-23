@@ -1,4 +1,3 @@
-
 from safeds.data.tabular.containers import TimeSeries
 from safeds.ml.nn import (
     ForwardLayer,

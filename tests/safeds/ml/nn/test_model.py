@@ -345,7 +345,8 @@ class TestRegressionModel:
         assert not model.is_fitted
         model = model.fit(
             Table.from_dict({"target": [1, 1, 1, 1], "time": [0, 0, 0, 0], "feat": [0, 0, 0, 0]}).time_columns(
-                "target", "time",
+                "target",
+                "time",
             ),
         )
         assert model.is_fitted
