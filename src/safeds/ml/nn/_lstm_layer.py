@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from torch import nn, Tensor
+    from torch import Tensor, nn
 
 from safeds.exceptions import ClosedBound, OutOfBoundsError
 from safeds.ml.nn._layer import _Layer
@@ -11,6 +11,7 @@ from safeds.ml.nn._layer import _Layer
 
 def _create_internal_model(input_size: int, output_size: int, activation_function: str) -> nn.Module:
     from torch import nn
+
     class _InternalLayer(nn.Module):
         def __init__(self, input_size: int, output_size: int, activation_function: str):
             super().__init__()

@@ -1,16 +1,11 @@
-from typing import Any
 
-import pytest
 from safeds.data.tabular.containers import TimeSeries
-
 from safeds.ml.nn import (
     ForwardLayer,
     InputConversionTimeSeries,
     NeuralNetworkRegressor,
     OutputConversionTimeSeries,
-    LSTMLayer,
 )
-
 
 from tests.helpers import resolve_resource_path
 

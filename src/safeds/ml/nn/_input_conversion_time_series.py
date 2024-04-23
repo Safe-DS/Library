@@ -12,8 +12,14 @@ from safeds.ml.nn._input_conversion import _InputConversion
 class InputConversionTimeSeries(_InputConversion[TimeSeries, TimeSeries]):
     """The input conversion for a neural network, defines the input parameters for the neural network."""
 
-    def __init__(self, window_size: int, forecast_horizon: int, target_name: str, time_name: str,
-                 feature_names: list[str] | None = None) -> None:
+    def __init__(
+        self,
+        window_size: int,
+        forecast_horizon: int,
+        target_name: str,
+        time_name: str,
+        feature_names: list[str] | None = None,
+    ) -> None:
         """
         Define the input parameters for the neural network in the input conversion.
 
@@ -56,15 +62,14 @@ class InputConversionTimeSeries(_InputConversion[TimeSeries, TimeSeries]):
         )
 
     def _data_conversion_predict(self, input_data: TimeSeries, batch_size: int) -> DataLoader:
-        return input_data._into_dataloader_with_window_predict(
-            self._window_size,
-            self._forecast_horizon,
-            batch_size)
+        return input_data._into_dataloader_with_window_predict(self._window_size, self._forecast_horizon, batch_size)
 
     def _is_fit_data_valid(self, input_data: TimeSeries) -> bool:
-        return ((sorted(input_data.features.column_names)).__eq__(sorted(self._feature_names))
-                and input_data.target.name == self._target_name
-                and input_data.time.name == self._time_name)
+        return (
+            (sorted(input_data.features.column_names)).__eq__(sorted(self._feature_names))
+            and input_data.target.name == self._target_name
+            and input_data.time.name == self._time_name
+        )
 
     def _is_predict_data_valid(self, input_data: TimeSeries) -> bool:
         return self._is_fit_data_valid(input_data)
