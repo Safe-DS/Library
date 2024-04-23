@@ -1,15 +1,15 @@
 import pytest
-from safeds.data.tabular.containers import Table, TaggedTable, TimeSeries
+from safeds.data.tabular.containers import Table, TaggedTable
 from safeds.exceptions import FeatureDataMismatchError, InputSizeError, ModelNotFittedError, OutOfBoundsError
 from safeds.ml.nn import (
     ForwardLayer,
     InputConversionTable,
     InputConversionTimeSeries,
+    LSTMLayer,
     NeuralNetworkClassifier,
     NeuralNetworkRegressor,
     OutputConversionTable,
     OutputConversionTimeSeries,
-    LSTMLayer,
 )
 
 
@@ -344,8 +344,10 @@ class TestRegressionModel:
         )
         assert not model.is_fitted
         model = model.fit(
-            Table.from_dict({"target": [1, 1, 1, 1], "time": [0, 0, 0, 0], "feat": [0, 0, 0, 0]}).time_columns("target",
-                                                                                                               "time"),
+            Table.from_dict({"target": [1, 1, 1, 1], "time": [0, 0, 0, 0], "feat": [0, 0, 0, 0]}).time_columns(
+                "target",
+                "time",
+            ),
         )
         assert model.is_fitted
 

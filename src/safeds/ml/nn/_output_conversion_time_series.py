@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from torch import Tensor
 
-from safeds.data.tabular.containers import Column, TimeSeries, Table
+from safeds.data.tabular.containers import Column, Table, TimeSeries
 from safeds.ml.nn._output_conversion import _OutputConversion
 
 
@@ -26,10 +26,10 @@ class OutputConversionTimeSeries(_OutputConversion[TimeSeries, TimeSeries]):
         self._forecast_horizon = forecast_horizon
 
     def _data_conversion(self, input_data: TimeSeries, output_data: Tensor) -> TimeSeries:
-        input_data_table = Table.from_rows(input_data.to_rows()[self._window_size + self._forecast_horizon:])
+        input_data_table = Table.from_rows(input_data.to_rows()[self._window_size + self._forecast_horizon :])
 
         return input_data_table.add_column(Column(self._prediction_name, output_data.tolist())).time_columns(
             self._prediction_name,
             input_data.time.name,
-            input_data.features.column_names
+            input_data.features.column_names,
         )

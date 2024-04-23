@@ -17,9 +17,10 @@ from safeds.exceptions import (
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Mapping, Sequence
-    import numpy as np
     from pathlib import Path
     from typing import Any
+
+    import numpy as np
     from torch.utils.data import DataLoader, Dataset
 
 
@@ -464,7 +465,7 @@ class TimeSeries(Table):
             time_name=self.time.name,
             target_name=self._target.name,
             feature_names=self._feature_names
-                          + [col.name for col in (columns.to_columns() if isinstance(columns, Table) else columns)],
+            + [col.name for col in (columns.to_columns() if isinstance(columns, Table) else columns)],
         )
 
     def add_columns(self, columns: list[Column] | Table) -> TimeSeries:
@@ -885,8 +886,8 @@ class TimeSeries(Table):
                     self._feature_names
                     if old_column_name not in self._feature_names
                     else self._feature_names[: self._feature_names.index(old_column_name)]
-                         + [col.name for col in new_columns]
-                         + self._feature_names[self._feature_names.index(old_column_name) + 1:]
+                    + [col.name for col in new_columns]
+                    + self._feature_names[self._feature_names.index(old_column_name) + 1 :]
                 ),
             )
 
@@ -930,7 +931,7 @@ class TimeSeries(Table):
     def sort_columns(
         self,
         comparator: Callable[[Column, Column], int] = lambda col1, col2: (col1.name > col2.name)
-                                                                         - (col1.name < col2.name),
+        - (col1.name < col2.name),
     ) -> TimeSeries:
         """
         Sort the columns of a `TimeSeries` with the given comparator and return a new `TimeSeries`.
@@ -1315,6 +1316,7 @@ class TimeSeries(Table):
         """
         import numpy as np
         from torch.utils.data import DataLoader
+
         target_np = self.target._data.to_numpy()
 
         x_s = []
@@ -1336,8 +1338,12 @@ class TimeSeries(Table):
 
         return DataLoader(dataset=_create_dataset(np.array(x_s), np.array(y_s)), batch_size=batch_size)
 
-    def _into_dataloader_with_window_predict(self, window_size: int, forecast_horizon: int,
-                                             batch_size: int) -> DataLoader:
+    def _into_dataloader_with_window_predict(
+        self,
+        window_size: int,
+        forecast_horizon: int,
+        batch_size: int,
+    ) -> DataLoader:
         """
         Return a Dataloader for the data stored in this time series, used for training neural networks.
 
@@ -1360,16 +1366,17 @@ class TimeSeries(Table):
         """
         import numpy as np
         from torch.utils.data import DataLoader
+
         target_np = self.target._data.to_numpy()
         x_s = []
 
         size = len(target_np)
         feature_cols = self.features.to_columns()
         for i in range(size - (forecast_horizon + window_size)):
-            window = target_np[i: i + window_size]
+            window = target_np[i : i + window_size]
             for col in feature_cols:
                 data = col._data.to_numpy()
-                window = np.concatenate((window, data[i: i + window_size]))
+                window = np.concatenate((window, data[i : i + window_size]))
             x_s.append(window)
 
         return DataLoader(dataset=_create_dataset_predict(np.array(x_s)), batch_size=batch_size)
@@ -1393,6 +1400,7 @@ def _create_dataset(features: np.array, target: np.array) -> Dataset:
             return self.len
 
     return _CustomDataset(features, target)
+
 
 def _create_dataset_predict(features: np.array) -> Dataset:
     import numpy as np
