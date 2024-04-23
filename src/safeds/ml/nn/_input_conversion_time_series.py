@@ -39,7 +39,7 @@ class InputConversionTimeSeries(_InputConversion[TimeSeries, TimeSeries]):
     @property
     def _data_size(self) -> int:
         """
-        gives the size for the input of an internal layer
+        Gives the size for the input of an internal layer.
 
         Returns
         -------

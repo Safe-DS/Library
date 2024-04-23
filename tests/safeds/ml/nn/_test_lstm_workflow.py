@@ -31,6 +31,5 @@ def test_lstm_model() -> None:
     )
     trained_model = model.fit(train_ts)
     predictions = trained_model.predict(test_ts)
-    print(predictions)
     # suggest it ran through
     assert True
