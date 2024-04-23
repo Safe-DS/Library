@@ -13,7 +13,7 @@ class InputConversionTimeSeries(_InputConversion[TimeSeries, TimeSeries]):
     """The input conversion for a neural network, defines the input parameters for the neural network."""
 
     def __init__(self, window_size: int, forecast_horizon: int, target_name: str, time_name: str,
-                 feature_names: list[str] = None) -> None:
+                 feature_names: list[str] | None = None) -> None:
         """
         Define the input parameters for the neural network in the input conversion.
 
@@ -39,6 +39,7 @@ class InputConversionTimeSeries(_InputConversion[TimeSeries, TimeSeries]):
     @property
     def _data_size(self) -> int:
         """
+        gives the size for the input of an internal layer
 
         Returns
         -------
