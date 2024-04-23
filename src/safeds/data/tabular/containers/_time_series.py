@@ -1361,7 +1361,6 @@ class TimeSeries(Table):
         import numpy as np
         from torch.utils.data import DataLoader
         target_np = self.target._data.to_numpy()
-
         x_s = []
 
         size = len(target_np)
