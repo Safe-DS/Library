@@ -1219,10 +1219,25 @@ class TestSingleSizeImageList:
     @pytest.mark.parametrize(
         "tensor",
         [
-            torch.ones(4, 3, 1, 1)
+            torch.ones(4, 1, 1),
         ]
     )
-    def test_create_from_tensor(self, tensor: Tensor) -> None:
+    def test_create_from_tensor_3_dim(self, tensor: Tensor) -> None:
+        expected_tensor = tensor.unsqueeze(dim=1)
+        image_list = _SingleSizeImageList._create_from_tensor(tensor, list(range(tensor.size(0))))
+        assert image_list._tensor_positions_to_indices == list(range(tensor.size(0)))
+        assert len(image_list) == expected_tensor.size(0)
+        assert image_list.widths[0] == expected_tensor.size(3)
+        assert image_list.heights[0] == expected_tensor.size(2)
+        assert image_list.channel == expected_tensor.size(1)
+
+    @pytest.mark.parametrize(
+        "tensor",
+        [
+            torch.ones(4, 3, 1, 1),
+        ]
+    )
+    def test_create_from_tensor_4_dim(self, tensor: Tensor) -> None:
         image_list = _SingleSizeImageList._create_from_tensor(tensor, list(range(tensor.size(0))))
         assert image_list._tensor_positions_to_indices == list(range(tensor.size(0)))
         assert len(image_list) == tensor.size(0)
@@ -1234,21 +1249,46 @@ class TestSingleSizeImageList:
         "tensor",
         [
             torch.ones(4, 3, 1, 1, 1),
-            torch.ones(4, 3, 1)
+            torch.ones(4, 3)
         ],
-        ids=["5-dim", "3-dim"]
+        ids=["5-dim", "2-dim"]
     )
     def test_should_raise_from_invalid_tensor(self, tensor: Tensor) -> None:
-        with pytest.raises(ValueError, match=rf"Invalid Tensor. This Tensor requires 4 dimensions but has {tensor.dim()}"):
+        with pytest.raises(ValueError, match=rf"Invalid Tensor. This Tensor requires 3 or 4 dimensions but has {tensor.dim()}"):
             _SingleSizeImageList._create_from_tensor(tensor, list(range(tensor.size(0))))
 
     @pytest.mark.parametrize(
         "tensor",
         [
-            torch.randn(16, 4, 4, 4)
+            torch.randn(16, 4, 4),
         ]
     )
-    def test_get_batch_and_iterate(self, tensor: Tensor) -> None:
+    def test_get_batch_and_iterate_3_dim(self, tensor: Tensor) -> None:
+        expected_tensor = tensor.unsqueeze(dim=1)
+        image_list = _SingleSizeImageList._create_from_tensor(tensor, list(range(tensor.size(0))))
+        batch_size = math.ceil(expected_tensor.size(0) / 1.999)
+        assert image_list._get_batch(0, batch_size).size(0) == batch_size
+        assert torch.all(torch.eq(image_list._get_batch(0, 1), image_list._get_batch(0)))
+        assert torch.all(torch.eq(image_list._get_batch(0, batch_size), expected_tensor[:batch_size].to(torch.float32) / 255))
+        assert torch.all(torch.eq(image_list._get_batch(1, batch_size), expected_tensor[batch_size:].to(torch.float32) / 255))
+        iterate_image_list = iter(image_list)
+        assert iterate_image_list == image_list
+        assert iterate_image_list is not image_list
+        iterate_image_list._batch_size = batch_size
+        assert torch.all(torch.eq(image_list._get_batch(0, batch_size), next(iterate_image_list)))
+        assert torch.all(torch.eq(image_list._get_batch(1, batch_size), next(iterate_image_list)))
+        with pytest.raises(IndexOutOfBoundsError, match=rf"There is no element at index '{batch_size * 2}'."):
+            image_list._get_batch(2, batch_size)
+        with pytest.raises(StopIteration):
+            next(iterate_image_list)
+
+    @pytest.mark.parametrize(
+        "tensor",
+        [
+            torch.randn(16, 4, 4, 4),
+        ]
+    )
+    def test_get_batch_and_iterate_4_dim(self, tensor: Tensor) -> None:
         image_list = _SingleSizeImageList._create_from_tensor(tensor, list(range(tensor.size(0))))
         batch_size = math.ceil(tensor.size(0) / 1.999)
         assert image_list._get_batch(0, batch_size).size(0) == batch_size

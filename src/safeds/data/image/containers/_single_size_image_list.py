@@ -101,8 +101,10 @@ class _SingleSizeImageList(ImageList):
 
     @staticmethod
     def _create_from_tensor(images_tensor: Tensor, indices: list[int]) -> _SingleSizeImageList:
+        if images_tensor.dim() == 3:
+            images_tensor = images_tensor.unsqueeze(dim=1)
         if images_tensor.dim() != 4:
-            raise ValueError(f"Invalid Tensor. This Tensor requires 4 dimensions but has {images_tensor.dim()}")
+            raise ValueError(f"Invalid Tensor. This Tensor requires 3 or 4 dimensions but has {images_tensor.dim()}")
 
         image_list = _SingleSizeImageList()
         image_list._tensor = images_tensor.detach().clone()

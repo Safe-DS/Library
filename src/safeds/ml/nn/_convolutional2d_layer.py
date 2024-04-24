@@ -11,13 +11,16 @@ if TYPE_CHECKING:
 from safeds.ml.nn._layer import _Layer
 
 
-def _create_internal_model(input_size: int, output_size: int, kernel_size: int, activation_function: str, padding: int, stride: int) -> nn.Module:
+def _create_internal_model(input_size: int, output_size: int, kernel_size: int, activation_function: str, padding: int, stride: int, transpose: bool, output_padding: int = 0) -> nn.Module:
     from torch import nn
 
     class _InternalLayer(nn.Module):
-        def __init__(self, input_size: int, output_size: int, kernel_size: int, activation_function: str, padding: int, stride: int):
+        def __init__(self, input_size: int, output_size: int, kernel_size: int, activation_function: str, padding: int, stride: int, transpose: bool, output_padding: int):
             super().__init__()
-            self._layer = nn.Conv2d(in_channels=input_size, out_channels=output_size, kernel_size=kernel_size, padding=padding, stride=stride)
+            if transpose:
+                self._layer = nn.ConvTranspose2d(in_channels=input_size, out_channels=output_size, kernel_size=kernel_size, padding=padding, stride=stride, output_padding=output_padding)
+            else:
+                self._layer = nn.Conv2d(in_channels=input_size, out_channels=output_size, kernel_size=kernel_size, padding=padding, stride=stride)
             match activation_function:
                 case "sigmoid":
                     self._fn = nn.Sigmoid()
@@ -31,7 +34,7 @@ def _create_internal_model(input_size: int, output_size: int, kernel_size: int, 
         def forward(self, x: Tensor) -> Tensor:
             return self._fn(self._layer(x))
 
-    return _InternalLayer(input_size, output_size, kernel_size, activation_function, padding, stride)
+    return _InternalLayer(input_size, output_size, kernel_size, activation_function, padding, stride, transpose, output_padding)
 
 
 class Convolutional2DLayer(_Layer):
@@ -45,7 +48,7 @@ class Convolutional2DLayer(_Layer):
         self._padding = padding
 
     def _get_internal_layer(self, *, activation_function: str) -> nn.Module:
-        return _create_internal_model(self._input_size.channel, self._output_channel, self._kernel_size, activation_function, self._padding, self._stride)
+        return _create_internal_model(self._input_size.channel, self._output_channel, self._kernel_size, activation_function, self._padding, self._stride, False)
 
     @property
     def input_size(self) -> ImageSize:
@@ -76,3 +79,20 @@ class Convolutional2DLayer(_Layer):
         new_width = math.ceil((input_size.width + self._padding * 2 - self._kernel_size + 1) / (1.0 * self._stride))
         new_height = math.ceil((input_size.height + self._padding * 2 - self._kernel_size + 1) / (1.0 * self._stride))
         self._output_size = ImageSize(new_width, new_height, self._output_channel, _ignore_invalid_channel=True)
+
+
+class ConvolutionalTranspose2DLayer(Convolutional2DLayer):
+
+    def __init__(self, output_channel: int, kernel_size: int, *, stride: int = 1, padding: int = 0, output_padding: int = 0):
+        super().__init__(output_channel, kernel_size, stride=stride, padding=padding)
+        self._output_padding = output_padding
+
+    def _get_internal_layer(self, *, activation_function: str) -> nn.Module:
+        return _create_internal_model(self._input_size.channel, self._output_channel, self._kernel_size, activation_function, self._padding, self._stride, True, self._output_padding)
+
+    def _set_input_size(self, input_size: ImageSize) -> None:
+        self._input_size = input_size
+        new_width = (input_size.width - 1) * self._stride - 2 * self._padding + self._kernel_size + self._output_padding
+        new_height = (input_size.height - 1) * self._stride - 2 * self._padding + self._kernel_size + self._output_padding
+        self._output_size = ImageSize(new_width, new_height, self._output_channel, _ignore_invalid_channel=True)
+

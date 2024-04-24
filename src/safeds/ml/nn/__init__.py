@@ -6,7 +6,7 @@ import apipkg
 
 if TYPE_CHECKING:
     from ._pooling2d_layer import AvgPooling2DLayer
-    from ._convolutional2d_layer import Convolutional2DLayer
+    from ._convolutional2d_layer import Convolutional2DLayer, ConvolutionalTranspose2DLayer
     from ._flatten_layer import FlattenLayer
     from ._forward_layer import ForwardLayer
     from ._input_conversion_image import InputConversionImage
@@ -21,6 +21,7 @@ apipkg.initpkg(
     {
         "AvgPooling2DLayer": "._pooling2d_layer:AvgPooling2DLayer",
         "Convolutional2DLayer": "._convolutional2d_layer:Convolutional2DLayer",
+        "ConvolutionalTranspose2DLayer": "._convolutional2d_layer:ConvolutionalTranspose2DLayer",
         "FlattenLayer": "._flatten_layer:FlattenLayer",
         "ForwardLayer": "._forward_layer:ForwardLayer",
         "InputConversionImage": "._input_conversion_image:InputConversionImage",
@@ -38,6 +39,7 @@ apipkg.initpkg(
 __all__ = [
     "AvgPooling2DLayer",
     "Convolutional2DLayer",
+    "ConvolutionalTranspose2DLayer",
     "FlattenLayer",
     "ForwardLayer",
     "InputConversionImage",

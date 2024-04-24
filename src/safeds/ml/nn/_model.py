@@ -12,7 +12,8 @@ from safeds.exceptions import (
     ModelNotFittedError,
     OutOfBoundsError,
 )
-from safeds.ml.nn import InputConversionImage, FlattenLayer
+from safeds.ml.nn import InputConversionImage, FlattenLayer, OutputConversionImageToTable
+from safeds.ml.nn._output_conversion_image import OutputConversionImageToColumn
 from safeds.ml.nn._pooling2d_layer import _Pooling2DLayer
 
 if TYPE_CHECKING:
@@ -168,6 +169,10 @@ class NeuralNetworkRegressor(Generic[IFT, IPT, OT]):
             for x in dataloader:
                 elem = self._model(x)
                 predictions.append(elem.squeeze(dim=1))
+        if isinstance(self._output_conversion, OutputConversionImageToTable) and isinstance(self._input_conversion, InputConversionImage):
+            return self._output_conversion._data_conversion(test_data, torch.cat(predictions, dim=0), column_names=self._input_conversion._column_names)
+        if isinstance(self._output_conversion, OutputConversionImageToColumn) and isinstance(self._input_conversion, InputConversionImage):
+            return self._output_conversion._data_conversion(test_data, torch.cat(predictions, dim=0), column_name=self._input_conversion._column_name, one_hot_encoder=self._input_conversion._one_hot_encoder)
         return self._output_conversion._data_conversion(test_data, torch.cat(predictions, dim=0))
 
     @property
@@ -333,6 +338,10 @@ class NeuralNetworkClassifier(Generic[IFT, IPT, OT]):
                     predictions.append(torch.argmax(elem, dim=1))
                 else:
                     predictions.append(elem.squeeze(dim=1).round())
+        if isinstance(self._output_conversion, OutputConversionImageToTable) and isinstance(self._input_conversion, InputConversionImage):
+            return self._output_conversion._data_conversion(test_data, torch.cat(predictions, dim=0), column_names=self._input_conversion._column_names)
+        if isinstance(self._output_conversion, OutputConversionImageToColumn) and isinstance(self._input_conversion, InputConversionImage):
+            return self._output_conversion._data_conversion(test_data, torch.cat(predictions, dim=0), column_name=self._input_conversion._column_name, one_hot_encoder=self._input_conversion._one_hot_encoder)
         return self._output_conversion._data_conversion(test_data, torch.cat(predictions, dim=0))
 
     @property
