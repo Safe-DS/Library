@@ -2,6 +2,8 @@ import sys
 from typing import Any
 
 import pytest
+from torch import nn
+
 from safeds.exceptions import OutOfBoundsError
 from safeds.ml.nn import ForwardLayer
 
@@ -31,6 +33,21 @@ def test_should_raise_if_input_size_out_of_bounds(input_size: int) -> None:
 )
 def test_should_raise_if_input_size_doesnt_match(input_size: int) -> None:
     assert ForwardLayer(output_size=1, input_size=input_size).input_size == input_size
+
+
+@pytest.mark.parametrize(
+    ("activation_function", "expected_activation_function"),
+    [
+        ("sigmoid", nn.Sigmoid),
+        ("relu", nn.ReLU),
+        ("softmax", nn.Softmax),
+        ("none", None),
+    ],
+    ids=["sigmoid", "relu", "softmax", "none"],
+)
+def test_should_accept_activation_function(activation_function: str, expected_activation_function: type | None) -> None:
+    forward_layer = ForwardLayer(output_size=1, input_size=1)._get_internal_layer(activation_function=activation_function)
+    assert forward_layer._fn is None if expected_activation_function is None else isinstance(forward_layer._fn, expected_activation_function)
 
 
 @pytest.mark.parametrize(
