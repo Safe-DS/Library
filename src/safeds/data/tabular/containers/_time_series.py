@@ -1381,6 +1381,26 @@ class TimeSeries(Table):
 
         return DataLoader(dataset=_create_dataset_predict(np.array(x_s)), batch_size=batch_size)
 
+    def _as_table(self: TimeSeries) -> Table:
+        """
+        Return a new `Table` with the tagging removed.
+
+        The original TimeSeries is not modified.
+
+        Parameters
+        ----------
+        self:
+            The TimeSeries.
+
+        Returns
+        -------
+        table:
+            The table as an untagged Table, i.e. without the information about which columns are time,
+            features or target.
+
+        """
+        return Table.from_columns(super().to_columns())
+
 
 def _create_dataset(features: np.array, target: np.array) -> Dataset:
     import numpy as np

@@ -64,6 +64,8 @@ class RangeScaler(InvertibleTableTransformer):
         """
         from sklearn.preprocessing import MinMaxScaler as sk_MinMaxScaler
 
+
+
         if column_names is None:
             column_names = table.column_names
         else:

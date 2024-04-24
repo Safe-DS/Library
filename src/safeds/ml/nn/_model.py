@@ -101,15 +101,17 @@ class NeuralNetworkRegressor(Generic[IFT, IPT, OT]):
         dataloader = copied_model._input_conversion._data_conversion_fit(train_data, copied_model._batch_size)
 
         loss_fn = nn.MSELoss()
-
         optimizer = torch.optim.SGD(copied_model._model.parameters(), lr=learning_rate)
         for _ in range(epoch_size):
             loss_sum = 0.0
             amount_of_loss_values_calculated = 0
             for x, y in iter(dataloader):
                 optimizer.zero_grad()
-
+                #print("input:")
+                #print(str(x)+"\n")
                 pred = copied_model._model(x)
+
+                #print("output: "+str(pred)+ "\n")
 
                 loss = loss_fn(pred, y)
                 loss_sum += loss.item()
@@ -263,7 +265,6 @@ class NeuralNetworkClassifier(Generic[IFT, IPT, OT]):
             loss_fn = nn.CrossEntropyLoss()
         else:
             loss_fn = nn.BCELoss()
-
         optimizer = torch.optim.SGD(copied_model._model.parameters(), lr=learning_rate)
         for _ in range(epoch_size):
             loss_sum = 0.0
@@ -271,7 +272,6 @@ class NeuralNetworkClassifier(Generic[IFT, IPT, OT]):
             for x, y in iter(dataloader):
                 optimizer.zero_grad()
                 pred = copied_model._model(x)
-
                 loss = loss_fn(pred, y)
                 loss_sum += loss.item()
                 amount_of_loss_values_calculated += 1
