@@ -71,7 +71,7 @@ class TestImageToColumn:
 
         image_list, filenames = ImageList.from_files(resolve_resource_path(images_all()), return_filenames=True)
         image_list = image_list.resize(20, 20)
-        image_classes = Column("class", [re.search(r"(.*)\\(.*)\.", filename).group(2) for filename in filenames])
+        image_classes = Column("class", [re.search(r"(.*)[\\/](.*)\.", filename).group(2) for filename in filenames])
         image_dataset = ImageDataset(image_list, image_classes)
         print(image_dataset._output._tensor)
         print(image_dataset._output._tensor.size())
