@@ -155,7 +155,7 @@ class TestAllImageCombinations:
         assert image_list.channel == expected_channel
 
         # Test sizes
-        assert image_list.sizes == [image1.size, image2.size, image3.size]
+        assert image_list.sizes == [image1_with_expected_channel.size, image2_with_expected_channel.size, image3_with_expected_channel.size]
 
         # Test number_of_sizes
         assert image_list.number_of_sizes == len({(image.width, image.height) for image in [image1, image2, image3]})
