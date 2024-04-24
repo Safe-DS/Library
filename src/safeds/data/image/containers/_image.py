@@ -429,7 +429,8 @@ class Image:
             )
         else:
             return Image(
-                func2.rgb_to_grayscale(self._image_tensor[0:3], num_output_channels=self.channel), device=self.device,
+                func2.rgb_to_grayscale(self._image_tensor[0:3], num_output_channels=self.channel),
+                device=self.device,
             )
 
     def crop(self, x: int, y: int, width: int, height: int) -> Image:
