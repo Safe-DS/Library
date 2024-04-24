@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import copy
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, TypeVar, Generic
 
 from safeds._config import _get_device
 from safeds.data.image.containers import ImageList
@@ -13,10 +13,12 @@ from safeds.exceptions import NonNumericColumnError, OutputLengthMismatchError, 
 if TYPE_CHECKING:
     from torch import Tensor
 
+T = TypeVar("T", Table, ImageList)
 
-class ImageDataset:
 
-    def __init__(self, input_data: ImageList, output_data: ImageList | Table, batch_size=1, shuffle=False) -> None:
+class ImageDataset(Generic[T]):
+
+    def __init__(self, input_data: ImageList, output_data: T, batch_size=1, shuffle=False) -> None:
         import torch
 
         self._shuffle_tensor_indices = torch.LongTensor(list(range(len(input_data))))
@@ -71,6 +73,16 @@ class ImageDataset:
     def input_size(self) -> ImageSize:
         return self._input_size
 
+    def get_input(self) -> ImageList:
+        return self._input
+
+    def get_output(self) -> T:
+        output = self._output
+        if isinstance(output, _TableAsTensor):
+            return output._to_table()
+        else:
+            return output
+
     def _get_batch(self, batch_number: int, batch_size: int | None = None) -> tuple[Tensor, Tensor]:
         import torch
         from torch import Tensor
@@ -88,9 +100,9 @@ class ImageDataset:
             output_tensor = self._output._tensor[self._shuffle_tensor_indices[batch_size * batch_number:max_index]]
         return input_tensor, output_tensor
 
-    def shuffle(self) -> ImageDataset:
+    def shuffle(self) -> ImageDataset[T]:
         import torch
-        im_dataset: ImageDataset = copy.copy(self)
+        im_dataset: ImageDataset[T] = copy.copy(self)
         im_dataset._shuffle_tensor_indices = torch.randperm(len(self))
         im_dataset._next_batch_index = 0
         return im_dataset
@@ -101,6 +113,7 @@ class _TableAsTensor:
     def __init__(self, table: Table) -> None:
         import torch
 
+        self._column_names = table.column_names
         self._tensor = torch.Tensor(table._data.to_numpy(copy=True)).to(_get_device())
 
         if not torch.all(self._tensor.sum(dim=1) == torch.ones(self._tensor.size(dim=0))):
@@ -111,4 +124,8 @@ class _TableAsTensor:
         table_as_tensor = _TableAsTensor.__new__(_TableAsTensor)
         table_as_tensor._tensor = tensor
         return table_as_tensor
+
+    def _to_table(self) -> Table:
+        table = Table(dict(zip(self._column_names, self._tensor.T.tolist())))
+        return table
 

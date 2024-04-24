@@ -8,7 +8,7 @@ from safeds.data.image.containers import ImageList, ImageDataset
 from safeds.data.tabular.containers import Table
 from safeds.data.tabular.transformation import OneHotEncoder
 from safeds.ml.nn import NeuralNetworkClassifier, InputConversionImage, Convolutional2DLayer, MaxPooling2DLayer, \
-    FlattenLayer, ForwardLayer, OutputConversionImage
+    FlattenLayer, ForwardLayer, OutputConversionImageToTable
 from tests.helpers import resolve_resource_path, images_all
 
 
@@ -40,7 +40,7 @@ class TestImageToTable:
             ForwardLayer(len(one_hot_encoder.get_names_of_added_columns()))
         ]
         nn_original = NeuralNetworkClassifier(InputConversionImage(image_dataset.input_size), layers,
-                                              OutputConversionImage(False))
+                                              OutputConversionImageToTable())
         nn = nn_original.fit(image_dataset, epoch_size=2)
         assert str(nn_original._model.state_dict().values()) != str(nn._model.state_dict().values())
         assert nn._model.state_dict()["_pytorch_layers.3._layer.bias"].tolist() == layer_3_bias
