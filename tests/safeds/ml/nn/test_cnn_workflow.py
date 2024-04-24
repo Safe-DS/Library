@@ -28,7 +28,7 @@ class TestImageToTable:
 
         image_list, filenames = ImageList.from_files(resolve_resource_path(images_all()), return_filenames=True)
         image_list = image_list.resize(20, 20)
-        image_classes = Table({"class": [re.search(r"(.*)\\(.*)\.", filename).group(2) for filename in filenames]})
+        image_classes = Table({"class": [re.search(r"(.*)[\\/](.*)\.", filename).group(2) for filename in filenames]})
         one_hot_encoder = OneHotEncoder().fit(image_classes, ["class"])
         image_classes_one_hot_encoded = one_hot_encoder.transform(image_classes)
         image_dataset = ImageDataset(image_list, image_classes_one_hot_encoded)
