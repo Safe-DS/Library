@@ -28,7 +28,7 @@ class TestClassificationModel:
         ):
             NeuralNetworkClassifier(
                 InputConversionTable(["b"], "a"),
-                [ForwardLayer(1, 1)],
+                [ForwardLayer(1, 1), LSTMLayer(1, 1)],
                 OutputConversionTable(),
             ).fit(
                 Table.from_dict({"a": [1], "b": [2]}).tag_columns("a"),
@@ -49,7 +49,7 @@ class TestClassificationModel:
         ):
             NeuralNetworkClassifier(
                 InputConversionTable(["b"], "a"),
-                [ForwardLayer(input_size=1, output_size=1)],
+                [ForwardLayer(input_size=1, output_size=1), LSTMLayer(1, 1)],
                 OutputConversionTable(),
             ).fit(
                 Table.from_dict({"a": [1], "b": [2]}).tag_columns("a"),
@@ -59,7 +59,7 @@ class TestClassificationModel:
     def test_should_raise_if_fit_function_returns_wrong_datatype(self) -> None:
         fitted_model = NeuralNetworkClassifier(
             InputConversionTable(["b"], "a"),
-            [ForwardLayer(input_size=1, output_size=8), ForwardLayer(output_size=1)],
+            [ForwardLayer(input_size=1, output_size=8), ForwardLayer(output_size=1), LSTMLayer(1, 1)],
             OutputConversionTable(),
         ).fit(
             Table.from_dict({"a": [1], "b": [0]}).tag_columns("a"),
@@ -100,7 +100,7 @@ class TestClassificationModel:
     ) -> None:
         fitted_model = NeuralNetworkClassifier(
             InputConversionTable(["b"], "a"),
-            [ForwardLayer(input_size=1, output_size=8), ForwardLayer(output_size=3)],
+            [ForwardLayer(input_size=1, output_size=8), ForwardLayer(output_size=3), LSTMLayer(3, 1)],
             OutputConversionTable(),
         ).fit(
             Table.from_dict({"a": [0, 1, 2], "b": [0, 15, 51]}).tag_columns("a"),
@@ -122,7 +122,7 @@ class TestClassificationModel:
     def test_should_raise_if_is_fitted_is_set_correctly_for_binary_classification(self) -> None:
         model = NeuralNetworkClassifier(
             InputConversionTable(["b"], "a"),
-            [ForwardLayer(input_size=1, output_size=1)],
+            [ForwardLayer(input_size=1, output_size=1), LSTMLayer(1, 1)],
             OutputConversionTable(),
         )
         assert not model.is_fitted
@@ -134,7 +134,7 @@ class TestClassificationModel:
     def test_should_raise_if_is_fitted_is_set_correctly_for_multiclass_classification(self) -> None:
         model = NeuralNetworkClassifier(
             InputConversionTable(["b"], "a"),
-            [ForwardLayer(input_size=1, output_size=1), ForwardLayer(output_size=3)],
+            [ForwardLayer(input_size=1, output_size=1), ForwardLayer(output_size=3), LSTMLayer(output_size=3)],
             OutputConversionTable(),
         )
         assert not model.is_fitted
@@ -146,7 +146,7 @@ class TestClassificationModel:
     def test_should_raise_if_test_features_mismatch(self) -> None:
         model = NeuralNetworkClassifier(
             InputConversionTable(["b"], "a"),
-            [ForwardLayer(input_size=1, output_size=1), ForwardLayer(output_size=3)],
+            [ForwardLayer(input_size=1, output_size=1), ForwardLayer(output_size=3), LSTMLayer(output_size=3)],
             OutputConversionTable(),
         )
         model = model.fit(
@@ -163,7 +163,7 @@ class TestClassificationModel:
     def test_should_raise_if_train_features_mismatch(self) -> None:
         model = NeuralNetworkClassifier(
             InputConversionTable(["b"], "a"),
-            [ForwardLayer(input_size=1, output_size=1), ForwardLayer(output_size=3)],
+            [ForwardLayer(input_size=1, output_size=1), ForwardLayer(output_size=3), LSTMLayer(output_size=3)],
             OutputConversionTable(),
         )
         with pytest.raises(
@@ -177,7 +177,7 @@ class TestClassificationModel:
     def test_should_raise_if_table_size_and_input_size_mismatch(self) -> None:
         model = NeuralNetworkClassifier(
             InputConversionTable(["b", "c"], "a"),
-            [ForwardLayer(input_size=1, output_size=1), ForwardLayer(output_size=3)],
+            [ForwardLayer(input_size=1, output_size=1), ForwardLayer(output_size=3), LSTMLayer(output_size=3)],
             OutputConversionTable(),
         )
         with pytest.raises(
@@ -190,7 +190,7 @@ class TestClassificationModel:
     def test_should_raise_if_fit_doesnt_batch_callback(self) -> None:
         model = NeuralNetworkClassifier(
             InputConversionTable(["b"], "a"),
-            [ForwardLayer(input_size=1, output_size=1)],
+            [ForwardLayer(input_size=1, output_size=1), LSTMLayer(1, 1)],
             OutputConversionTable(),
         )
 
@@ -212,7 +212,7 @@ class TestClassificationModel:
     def test_should_raise_if_fit_doesnt_epoch_callback(self) -> None:
         model = NeuralNetworkClassifier(
             InputConversionTable(["b"], "a"),
-            [ForwardLayer(input_size=1, output_size=1)],
+            [ForwardLayer(input_size=1, output_size=1), LSTMLayer(1, 1)],
             OutputConversionTable(),
         )
 
