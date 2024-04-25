@@ -14,7 +14,8 @@ def test_should_raise_if_is_fitted_is_set_correctly_lstm() -> None:
         OutputConversionTimeSeries("predicted"),
     )
     ts = Table.from_dict({"target": [1, 1, 1, 1], "time": [0, 0, 0, 0], "feat": [0, 0, 0, 0]}).time_columns(
-        "target", "time", ["feat"])
+        "target", "time", ["feat"],
+    )
     assert not model.is_fitted
     model = model.fit(ts)
     model.predict(ts)
