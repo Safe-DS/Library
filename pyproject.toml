@@ -23,8 +23,8 @@ pillow = ">=9.5,<11.0"
 scikit-learn = "^1.2.0"
 seaborn = "^0.13.0"
 statsmodels = "^0.14.1"
-torch = {version = "^2.2.0", source = "torch_cuda121"}
-torchvision = {version = "^0.17.0", source = "torch_cuda121"}
+torch = {version = "^2.3.0", source = "torch_cuda121"}
+torchvision = {version = "^0.18.0", source = "torch_cuda121"}
 xxhash = "^3.4.1"
 
 [tool.poetry.group.dev.dependencies]
