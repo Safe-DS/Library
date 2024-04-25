@@ -1,5 +1,3 @@
-from typing import Any
-
 import pytest
 from safeds.data.tabular.containers import Table
 from safeds.data.tabular.transformation import StandardScaler
@@ -9,7 +7,6 @@ from safeds.ml.nn import (
     InputConversionTable,
     NeuralNetworkRegressor,
     OutputConversionTable,
-    LSTMLayer,
 )
 
 from tests.helpers import resolve_resource_path
@@ -36,6 +33,5 @@ def test_lstm_model() -> None:
     )
 
     fitted_model = model.fit(train_table.tag_columns("target", ["value"]), epoch_size=25, learning_rate=0.01)
-    predictions = fitted_model.predict(test_table.keep_only_columns(["value"]))
-    print(predictions)
-    assert False
+    fitted_model.predict(test_table.keep_only_columns(["value"]))
+    assert True

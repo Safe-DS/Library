@@ -36,7 +36,6 @@ def test_lstm_model() -> None:
     pred_ts = trained_model.predict(test_ts)
     #add predicted to column_names so it can get reverted
     ss_2._column_names = ["predicted", "value"]
-    reversed_ts = ss_2.inverse_transform(pred_ts._as_table().keep_only_columns(["predicted", "value"]))
-    print(reversed_ts)
+    ss_2.inverse_transform(pred_ts._as_table().keep_only_columns(["predicted", "value"]))
     # suggest it ran through
-    assert False
+    assert True
