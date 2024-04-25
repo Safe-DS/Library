@@ -1,7 +1,5 @@
-import pytest
 from safeds.data.tabular.containers import Table
 from safeds.data.tabular.transformation import StandardScaler
-
 from safeds.ml.nn import (
     ForwardLayer,
     InputConversionTable,

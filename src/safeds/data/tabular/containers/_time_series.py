@@ -1381,6 +1381,7 @@ class TimeSeries(Table):
 
         return DataLoader(dataset=_create_dataset_predict(np.array(x_s)), batch_size=batch_size)
 
+
 def _create_dataset(features: np.array, target: np.array) -> Dataset:
     import numpy as np
     import torch

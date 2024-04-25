@@ -1,9 +1,9 @@
 from safeds.data.tabular.containers import Table
 from safeds.ml.nn import (
     InputConversionTimeSeries,
+    LSTMLayer,
     NeuralNetworkRegressor,
     OutputConversionTimeSeries,
-    LSTMLayer,
 )
 
 
