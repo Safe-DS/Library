@@ -1785,7 +1785,7 @@ class Table:
 
         return TaggedTable._from_table(self, target_name, feature_names)
 
-    def time_columns(self, target_name: str, time_name: str, feature_names: list[str] | None = None) -> TimeSeries:
+    def _time_columns(self, target_name: str, time_name: str, feature_names: list[str] | None = None) -> TimeSeries:
         """
         Return a new `TimeSeries` with columns marked as a target and time column or feature columns.
 
@@ -1816,7 +1816,7 @@ class Table:
         --------
         >>> from safeds.data.tabular.containers import Table, TimeSeries
         >>> table = Table.from_dict({"time": ["01.01", "01.02", "01.03"], "price": [1.10, 1.19, 1.79], "amount_bought": [74, 72, 51]})
-        >>> tagged_table = table.time_columns(target_name="amount_bought",time_name = "time", feature_names=["price"])
+        >>> tagged_table = table._time_columns(target_name="amount_bought",time_name = "time", feature_names=["price"])
         """
         from ._time_series import TimeSeries
 

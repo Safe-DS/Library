@@ -28,7 +28,7 @@ class OutputConversionTimeSeries(_OutputConversion[TimeSeries, TimeSeries]):
     def _data_conversion(self, input_data: TimeSeries, output_data: Tensor) -> TimeSeries:
         input_data_table = Table.from_rows(input_data.to_rows()[self._window_size + self._forecast_horizon :])
 
-        return input_data_table.add_column(Column(self._prediction_name, output_data.tolist())).time_columns(
+        return input_data_table.add_column(Column(self._prediction_name, output_data.tolist()))._time_columns(
             self._prediction_name,
             input_data.time.name,
             input_data.features.column_names,

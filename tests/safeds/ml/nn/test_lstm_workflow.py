@@ -21,7 +21,7 @@ def test_lstm_model() -> None:
     rs = RangeScaler()
     ss_2 = RangeScaler()
     ss_2 = ss_2.fit(time_series._as_table(), ["value"])
-    time_series = rs.fit_and_transform(time_series._as_table(), ["value"]).time_columns(
+    time_series = rs.fit_and_transform(time_series._as_table(), ["value"])._time_columns(
         time_name=time_series.time.name,
         target_name=time_series.target.name,
         feature_names=time_series.features.column_names,
@@ -29,7 +29,7 @@ def test_lstm_model() -> None:
     train_ts, test_ts = time_series.split_rows(0.8)
 
     model = NeuralNetworkRegressor(
-        InputConversionTimeSeries(window_size=7, forecast_horizon=12, time_name="date", target_name="value"),
+        InputConversionTimeSeries(window_size=7, forecast_horizon=12),
         [ForwardLayer(input_size=7, output_size=256), ForwardLayer(input_size=256, output_size=1)],
         OutputConversionTimeSeries("predicted", window_size=7, forecast_horizon=12),
     )

@@ -9,26 +9,26 @@ from tests.helpers import assert_that_time_series_are_equal
     ("time_series", "column", "time_series_with_new_column"),
     [
         (
-            Table({"t": [1, 2], "f1": [1, 2], "target": [2, 3]}).time_columns(
+            Table({"t": [1, 2], "f1": [1, 2], "target": [2, 3]})._time_columns(
                 target_name="target",
                 time_name="t",
                 feature_names=["f1"],
             ),
             Column("f2", [4, 5]),
-            Table({"t": [1, 2], "f1": [1, 2], "target": [2, 3], "f2": [4, 5]}).time_columns(
+            Table({"t": [1, 2], "f1": [1, 2], "target": [2, 3], "f2": [4, 5]})._time_columns(
                 target_name="target",
                 time_name="t",
                 feature_names=["f1", "f2"],
             ),
         ),
         (
-            Table({"f1": [1, 2], "target": [2, 3], "other": [0, -1]}).time_columns(
+            Table({"f1": [1, 2], "target": [2, 3], "other": [0, -1]})._time_columns(
                 target_name="target",
                 time_name="other",
                 feature_names=["f1"],
             ),
             Column("f2", [4, 5]),
-            Table({"f1": [1, 2], "target": [2, 3], "other": [0, -1], "f2": [4, 5]}).time_columns(
+            Table({"f1": [1, 2], "target": [2, 3], "other": [0, -1], "f2": [4, 5]})._time_columns(
                 target_name="target",
                 time_name="other",
                 feature_names=["f1", "f2"],

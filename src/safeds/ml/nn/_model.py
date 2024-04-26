@@ -4,6 +4,8 @@ import copy
 from typing import TYPE_CHECKING, Generic, Self, TypeVar
 
 from safeds.data.tabular.containers import Table, TaggedTable, TimeSeries
+from safeds.ml.nn import (InputConversionTable, InputConversionTimeSeries, OutputConversionTable,
+                          OutputConversionTimeSeries)
 from safeds.exceptions import (
     ClosedBound,
     FeatureDataMismatchError,
@@ -41,6 +43,8 @@ class NeuralNetworkRegressor(Generic[IFT, IPT, OT]):
         self._is_fitted = False
         self._total_number_of_batches_done = 0
         self._total_number_of_epochs_done = 0
+        self._in_type = None
+        self._out_type = None
 
     def fit(
         self,
@@ -84,6 +88,15 @@ class NeuralNetworkRegressor(Generic[IFT, IPT, OT]):
         """
         import torch
         from torch import nn
+
+        # set parameters from data
+        if isinstance(self._input_conversion, InputConversionTable):
+            self._input_conversion._set_parameters(target_name=train_data.target.name,
+                                                   feature_names=train_data.features.column_names)
+        if isinstance(self._input_conversion, InputConversionTimeSeries):
+            self._input_conversion._set_parameters(target_name=train_data.target.name,
+                                                   feature_names=train_data.features.column_names,
+                                                   time_name=train_data.time.name)
 
         if epoch_size < 1:
             raise OutOfBoundsError(actual=epoch_size, name="epoch_size", lower_bound=ClosedBound(1))
@@ -241,6 +254,14 @@ class NeuralNetworkClassifier(Generic[IFT, IPT, OT]):
         """
         import torch
         from torch import nn
+
+        if isinstance(self._input_conversion, InputConversionTable):
+            self._input_conversion._set_parameters(target_name=train_data.target.name,
+                                                   feature_names=train_data.features.column_names)
+        if isinstance(self._input_conversion, InputConversionTimeSeries):
+            self._input_conversion._set_parameters(target_name=train_data.target.name,
+                                                   feature_names=train_data.features.column_names,
+                                                   time_name=train_data.time.name)
 
         if epoch_size < 1:
             raise OutOfBoundsError(actual=epoch_size, name="epoch_size", lower_bound=ClosedBound(1))

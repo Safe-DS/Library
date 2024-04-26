@@ -9,11 +9,11 @@ from safeds.ml.nn import (
 
 def test_should_raise_if_is_fitted_is_set_correctly_lstm() -> None:
     model = NeuralNetworkRegressor(
-        InputConversionTimeSeries(1, 1, "target", "time", ["feat"]),
+        InputConversionTimeSeries(1, 1),
         [LSTMLayer(input_size=2, output_size=1)],
         OutputConversionTimeSeries("predicted"),
     )
-    ts = Table.from_dict({"target": [1, 1, 1, 1], "time": [0, 0, 0, 0], "feat": [0, 0, 0, 0]}).time_columns(
+    ts = Table.from_dict({"target": [1, 1, 1, 1], "time": [0, 0, 0, 0], "feat": [0, 0, 0, 0]})._time_columns(
         "target",
         "time",
         ["feat"],

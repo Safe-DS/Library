@@ -9,33 +9,33 @@ from tests.helpers import assert_that_time_series_are_equal
     ("time_series", "columns", "time_series_with_new_columns"),
     [
         (
-            Table({"time": [0, 1], "f1": [1, 2], "target": [2, 3]}).time_columns(
+            Table({"time": [0, 1], "f1": [1, 2], "target": [2, 3]})._time_columns(
                 target_name="target",
                 time_name="time",
                 feature_names=["f1"],
             ),
             [Column("f2", [4, 5]), Column("f3", [6, 7])],
-            Table({"time": [0, 1], "f1": [1, 2], "target": [2, 3], "f2": [4, 5], "f3": [6, 7]}).time_columns(
+            Table({"time": [0, 1], "f1": [1, 2], "target": [2, 3], "f2": [4, 5], "f3": [6, 7]})._time_columns(
                 target_name="target",
                 time_name="time",
                 feature_names=["f1", "f2", "f3"],
             ),
         ),
         (
-            Table({"time": [0, 1], "f1": [1, 2], "target": [2, 3]}).time_columns(
+            Table({"time": [0, 1], "f1": [1, 2], "target": [2, 3]})._time_columns(
                 target_name="target",
                 time_name="time",
                 feature_names=["f1"],
             ),
             Table.from_columns([Column("f2", [4, 5]), Column("f3", [6, 7])]),
-            Table({"time": [0, 1], "f1": [1, 2], "target": [2, 3], "f2": [4, 5], "f3": [6, 7]}).time_columns(
+            Table({"time": [0, 1], "f1": [1, 2], "target": [2, 3], "f2": [4, 5], "f3": [6, 7]})._time_columns(
                 target_name="target",
                 time_name="time",
                 feature_names=["f1", "f2", "f3"],
             ),
         ),
         (
-            Table({"time": [0, 1], "f1": [1, 2], "target": [2, 3], "other": [0, -1]}).time_columns(
+            Table({"time": [0, 1], "f1": [1, 2], "target": [2, 3], "other": [0, -1]})._time_columns(
                 target_name="target",
                 time_name="time",
                 feature_names=["f1"],
@@ -48,7 +48,7 @@ from tests.helpers import assert_that_time_series_are_equal
                 "other": [0, -1],
                 "f2": [4, 5],
                 "f3": [6, 7],
-            }).time_columns(
+            })._time_columns(
                 target_name="target",
                 time_name="time",
                 feature_names=["f1", "f2", "f3"],

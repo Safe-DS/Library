@@ -29,6 +29,12 @@ class _InputConversion(Generic[FT, PT], ABC):
         pass  # pragma: no cover
 
     @abstractmethod
+    def _set_parameters(self, target_name: str,
+                        feature_names: list[str] | None = None,
+                        time_name: str = None, ):
+        pass  # pragma: no cover
+
+    @abstractmethod
     def _is_fit_data_valid(self, input_data: FT) -> bool:
         pass  # pragma: no cover
 

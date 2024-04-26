@@ -25,7 +25,7 @@ def test_lstm_model() -> None:
     train_table = ss.fit_and_transform(train_table, ["value"])
     test_table = ss.fit_and_transform(test_table, ["value"])
     model = NeuralNetworkRegressor(
-        InputConversionTable(["value"], "target"),
+        InputConversionTable(),
         [ForwardLayer(input_size=1, output_size=1)],
         OutputConversionTable("predicted"),
     )

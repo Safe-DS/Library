@@ -16,9 +16,6 @@ class InputConversionTimeSeries(_InputConversion[TimeSeries, TimeSeries]):
         self,
         window_size: int,
         forecast_horizon: int,
-        target_name: str,
-        time_name: str,
-        feature_names: list[str] | None = None,
     ) -> None:
         """
         Define the input parameters for the neural network in the input conversion.
@@ -29,18 +26,12 @@ class InputConversionTimeSeries(_InputConversion[TimeSeries, TimeSeries]):
             The size of the created windows
         forecast_horizon
             The forecast horizon defines the future lag of the predicted values
-        feature_names
-            The names of the features for the input table, used as features for the training.
-        target_name
-            The name of the target for the input table, used as target for the training.
         """
-        if feature_names is None:
-            feature_names = []
         self._window_size = window_size
         self._forecast_horizon = forecast_horizon
-        self._target_name = target_name
-        self._time_name = time_name
-        self._feature_names = feature_names
+        self._target_name = None
+        self._time_name = None
+        self._feature_names = None
 
     @property
     def _data_size(self) -> int:
@@ -61,6 +52,17 @@ class InputConversionTimeSeries(_InputConversion[TimeSeries, TimeSeries]):
             self._forecast_horizon,
             batch_size,
         )
+
+    def _set_parameters(self, target_name: str,
+                        feature_names: list[str] | None = None,
+                        time_name: str = None,
+                        ) -> None:
+        self._time_name = time_name
+        if feature_names is None:
+            self._feature_names = []
+        else:
+            self._feature_names = feature_names
+        self._target_name = target_name
 
     def _data_conversion_predict(self, input_data: TimeSeries, batch_size: int) -> DataLoader:
         return input_data._into_dataloader_with_window_predict(self._window_size, self._forecast_horizon, batch_size)
