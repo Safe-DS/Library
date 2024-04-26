@@ -100,7 +100,7 @@ class TestClassificationModel:
     ) -> None:
         fitted_model = NeuralNetworkClassifier(
             InputConversionTable(["b"], "a"),
-            [ForwardLayer(input_size=1, output_size=8), ForwardLayer(output_size=3), LSTMLayer(3, 1)],
+            [ForwardLayer(input_size=1, output_size=8), ForwardLayer(output_size=3)],
             OutputConversionTable(),
         ).fit(
             Table.from_dict({"a": [0, 1, 2], "b": [0, 15, 51]}).tag_columns("a"),
