@@ -28,6 +28,16 @@ IPT = TypeVar("IPT", Table, TimeSeries)  # InputPredictType
 OT = TypeVar("OT", TaggedTable, TimeSeries)  # OutputType
 
 
+def _set_instance_parameters(input_conversion, train_data) -> None:
+    if isinstance(input_conversion, InputConversionTable):
+        input_conversion._set_parameters(target_name=train_data.target.name,
+                                         feature_names=train_data.features.column_names)
+    if isinstance(input_conversion, InputConversionTimeSeries):
+        input_conversion._set_parameters(target_name=train_data.target.name,
+                                               feature_names=train_data.features.column_names,
+                                               time_name=train_data.time.name)
+
+
 class NeuralNetworkRegressor(Generic[IFT, IPT, OT]):
     def __init__(
         self,
@@ -90,13 +100,7 @@ class NeuralNetworkRegressor(Generic[IFT, IPT, OT]):
         from torch import nn
 
         # set parameters from data
-        if isinstance(self._input_conversion, InputConversionTable):
-            self._input_conversion._set_parameters(target_name=train_data.target.name,
-                                                   feature_names=train_data.features.column_names)
-        if isinstance(self._input_conversion, InputConversionTimeSeries):
-            self._input_conversion._set_parameters(target_name=train_data.target.name,
-                                                   feature_names=train_data.features.column_names,
-                                                   time_name=train_data.time.name)
+        _set_instance_parameters(self._input_conversion, train_data)
 
         if epoch_size < 1:
             raise OutOfBoundsError(actual=epoch_size, name="epoch_size", lower_bound=ClosedBound(1))
@@ -255,13 +259,7 @@ class NeuralNetworkClassifier(Generic[IFT, IPT, OT]):
         import torch
         from torch import nn
 
-        if isinstance(self._input_conversion, InputConversionTable):
-            self._input_conversion._set_parameters(target_name=train_data.target.name,
-                                                   feature_names=train_data.features.column_names)
-        if isinstance(self._input_conversion, InputConversionTimeSeries):
-            self._input_conversion._set_parameters(target_name=train_data.target.name,
-                                                   feature_names=train_data.features.column_names,
-                                                   time_name=train_data.time.name)
+        _set_instance_parameters(self._input_conversion, train_data)
 
         if epoch_size < 1:
             raise OutOfBoundsError(actual=epoch_size, name="epoch_size", lower_bound=ClosedBound(1))
