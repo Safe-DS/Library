@@ -44,7 +44,7 @@ class InputConversionTable(_InputConversion[TaggedTable, Table]):
         columns_with_missing_values = []
         columns_with_non_numerical_data = []
 
-        for col in input_data.features.to_columns():
+        for col in input_data.features.add_column(input_data.target).to_columns():
             if col.has_missing_values():
                 columns_with_missing_values.append(col.name)
             if not col.type.is_numeric():

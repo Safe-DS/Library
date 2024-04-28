@@ -209,12 +209,33 @@ class TestClassificationModel:
                 re.escape(
                     "The given Fit Data is invalid:\nThe following Columns contain missing values: ['b']\nThe following Columns contain non-numerical data: ['a', 'b']"),
             ),
+            (
+                Table.from_dict({"a": [1, 2, 3], "b": [1, 2, 3], "c": [0, None, 5]}).tag_columns("c"),
+                re.escape("The given Fit Data is invalid:\nThe following Columns contain missing values: ['c']\n"),
+            ),
+            (
+                Table.from_dict({"a": [1, 2, 3], "b": [1, 2, 3], "c": [0, "c", 5]}).tag_columns("c"),
+                re.escape("The given Fit Data is invalid:\nThe following Columns contain non-numerical data: ['c']"),
+            ),
+            (
+                Table.from_dict({"a": [1, 2, 3], "b": [1, 2, 3], "c": [0, "c", None]}).tag_columns("c"),
+                re.escape("The given Fit Data is invalid:\nThe following Columns contain missing values: ['c']\nThe following Columns contain non-numerical data: ['c']"),
+            ),
+            (
+                Table.from_dict({"a": [1, 2, "a"], "b": [1, "b", None], "c": [0, "c", None]}).tag_columns("c"),
+                re.escape(
+                    "The given Fit Data is invalid:\nThe following Columns contain missing values: ['b', 'c']\nThe following Columns contain non-numerical data: ['a', 'b', 'c']"),
+            ),
         ],
         ids=[
             "missing value feature",
             "non-numerical feature",
             "missing value and non-numerical features",
-            "mixed missing and non-numerical features"
+            "mixed missing and non-numerical features",
+            "missing value target",
+            "non-numerical target",
+            "missing value and non-numerical target",
+            "mixed missing and non-numerical features and target"
         ],
     )
     def test_should_catch_invalid_fit_data(self, table: TaggedTable, reason: str) -> None:
@@ -426,12 +447,33 @@ class TestRegressionModel:
                 re.escape(
                     "The given Fit Data is invalid:\nThe following Columns contain missing values: ['b']\nThe following Columns contain non-numerical data: ['a', 'b']"),
             ),
+            (
+                Table.from_dict({"a": [1, 2, 3], "b": [1, 2, 3], "c": [0, None, 5]}).tag_columns("c"),
+                re.escape("The given Fit Data is invalid:\nThe following Columns contain missing values: ['c']\n"),
+            ),
+            (
+                Table.from_dict({"a": [1, 2, 3], "b": [1, 2, 3], "c": [0, "c", 5]}).tag_columns("c"),
+                re.escape("The given Fit Data is invalid:\nThe following Columns contain non-numerical data: ['c']"),
+            ),
+            (
+                Table.from_dict({"a": [1, 2, 3], "b": [1, 2, 3], "c": [0, "c", None]}).tag_columns("c"),
+                re.escape("The given Fit Data is invalid:\nThe following Columns contain missing values: ['c']\nThe following Columns contain non-numerical data: ['c']"),
+            ),
+            (
+                Table.from_dict({"a": [1, 2, "a"], "b": [1, "b", None], "c": [0, "c", None]}).tag_columns("c"),
+                re.escape(
+                    "The given Fit Data is invalid:\nThe following Columns contain missing values: ['b', 'c']\nThe following Columns contain non-numerical data: ['a', 'b', 'c']"),
+            ),
         ],
         ids=[
             "missing value feature",
             "non-numerical feature",
             "missing value and non-numerical features",
-            "mixed missing and non-numerical features"
+            "mixed missing and non-numerical features",
+            "missing value target",
+            "non-numerical target",
+            "missing value and non-numerical target",
+            "mixed missing and non-numerical features and target"
         ],
     )
     def test_should_catch_invalid_fit_data(self, table: TaggedTable, reason: str) -> None:
