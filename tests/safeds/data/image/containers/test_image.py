@@ -3,6 +3,8 @@ import typing
 from pathlib import Path
 from tempfile import NamedTemporaryFile
 
+import PIL.Image
+import numpy as np
 import pytest
 import torch
 from safeds.data.image.containers import Image
@@ -96,6 +98,21 @@ class TestFromBytes:
         image = Image.from_file(resolve_resource_path(resource_path), device)
         image_copy = Image.from_bytes(image._repr_png_(), device)
         assert image == image_copy
+
+
+@pytest.mark.parametrize("device", get_devices(), ids=get_devices_ids())
+class TestToNumpyArray:
+
+    @pytest.mark.parametrize(
+        "resource_path",
+        images_all(),
+        ids=images_all_ids(),
+    )
+    def test_should_return_numpy_array(self, resource_path: str | Path, device: Device) -> None:
+        skip_if_device_not_available(device)
+        image_safeds = Image.from_file(resolve_resource_path(resource_path), device)
+        image_np = np.array(PIL.Image.open(resolve_resource_path(resource_path)))
+        assert np.all(np.array(image_safeds).squeeze() == image_np)
 
 
 @pytest.mark.parametrize("device", get_devices(), ids=get_devices_ids())
