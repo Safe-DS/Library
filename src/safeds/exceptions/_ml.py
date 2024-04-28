@@ -32,11 +32,13 @@ class DatasetMissesDataError(ValueError):
     def __init__(self) -> None:
         super().__init__("Dataset contains no rows")
 
+
 class InvalidFitDataError(Exception):
     """Raised when a Neural Network is fitted on invalid data."""
 
     def __init__(self, reason: str) -> None:
         super().__init__(f"The given Fit Data is invalid:\n{reason}")
+
 
 class LearningError(Exception):
     """
