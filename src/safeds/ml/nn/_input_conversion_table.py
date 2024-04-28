@@ -6,6 +6,7 @@ if TYPE_CHECKING:
     from torch.utils.data import DataLoader
 
 from safeds.data.tabular.containers import Table, TaggedTable
+from safeds.exceptions import InvalidFitDataError
 from safeds.ml.nn._input_conversion import _InputConversion
 
 
@@ -40,6 +41,23 @@ class InputConversionTable(_InputConversion[TaggedTable, Table]):
         return input_data._into_dataloader(batch_size)
 
     def _is_fit_data_valid(self, input_data: TaggedTable) -> bool:
+        columns_with_missing_values = []
+        columns_with_non_numerical_data = []
+
+        for col in input_data.features.to_columns():
+            if col.has_missing_values():
+                columns_with_missing_values.append(col.name)
+            if not col.type.is_numeric():
+                columns_with_non_numerical_data.append(col.name)
+
+        if len(columns_with_missing_values) > 0 or len(columns_with_non_numerical_data) > 0:
+            reason = ""
+            if len(columns_with_missing_values) > 0:
+                reason += f"The following Columns contain missing values: {columns_with_missing_values}\n"
+            if len(columns_with_non_numerical_data) > 0:
+                reason += f"The following Columns contain non-numerical data: {columns_with_non_numerical_data}"
+            raise InvalidFitDataError(reason)
+
         return (sorted(input_data.features.column_names)).__eq__(sorted(self._feature_names))
 
     def _is_predict_data_valid(self, input_data: Table) -> bool:
