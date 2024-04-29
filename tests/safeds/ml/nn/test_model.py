@@ -480,6 +480,7 @@ class TestRegressionModel:
             (InputConversionTable([], ""), [FlattenLayer()], OutputConversionTable(), r"You cannot use a 2-dimensional layer with 1-dimensional data."),
             (InputConversionImage(ImageSize(1, 1, 1)), [FlattenLayer()], OutputConversionTable(), r"The defined model uses an input conversion for images but no output conversion for images."),
             (InputConversionImage(ImageSize(1, 1, 1)), [FlattenLayer()], OutputConversionImageToImage(), r"The output data would be 1-dimensional but the provided output conversion uses 2-dimensional data."),
+            (InputConversionImage(ImageSize(1, 1, 1)), [FlattenLayer(), ForwardLayer(1)], OutputConversionImageToImage(), r"The output data would be 1-dimensional but the provided output conversion uses 2-dimensional data."),
             (InputConversionImage(ImageSize(1, 1, 1)), [FlattenLayer(), Convolutional2DLayer(1, 1)], OutputConversionImageToImage(), r"You cannot use a 2-dimensional layer with 1-dimensional data."),
             (InputConversionImage(ImageSize(1, 1, 1)), [FlattenLayer(), ConvolutionalTranspose2DLayer(1, 1)], OutputConversionImageToImage(), r"You cannot use a 2-dimensional layer with 1-dimensional data."),
             (InputConversionImage(ImageSize(1, 1, 1)), [FlattenLayer(), MaxPooling2DLayer(1)], OutputConversionImageToImage(), r"You cannot use a 2-dimensional layer with 1-dimensional data."),

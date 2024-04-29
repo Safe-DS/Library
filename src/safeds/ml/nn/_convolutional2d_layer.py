@@ -28,8 +28,6 @@ def _create_internal_model(input_size: int, output_size: int, kernel_size: int, 
                     self._fn = nn.ReLU()
                 case "softmax":
                     self._fn = nn.Softmax()
-                case _:
-                    raise ValueError("Unknown Activation Function: " + activation_function)
 
         def forward(self, x: Tensor) -> Tensor:
             return self._fn(self._layer(x))

@@ -59,10 +59,10 @@ class TestImageToColumnClassifier:
     @pytest.mark.parametrize(
         ("seed", "device", "layer_3_bias", "prediction_label"),
         [
-            (1234, device_cuda, [0.5805488228797913, -0.32433584332466125, 0.026305729523301125, 0.5804171562194824], ["grayscale"] * 7),
-            (4711, device_cuda, [-0.8114063143730164, -0.9443492889404297, 0.8557132482528687, -0.8482506275177002], ["white_square"] * 7),
-            (1234, device_cpu, [-0.6926037669181824, 0.33001941442489624, -0.32963910698890686, 0.5768917202949524], ["grayscale"] * 7),
-            (4711, device_cpu, [-0.9051575660705566, -0.8625037670135498, 0.24682046473026276, -0.2612163722515106], ["white_square"] * 7),
+            (1234, device_cuda, [0.5805736780166626, -0.32432740926742554, 0.02629312314093113, 0.5803964138031006], ["grayscale"] * 7),
+            (4711, device_cuda, [-0.8114045262336731, -0.9443488717079163, 0.8557113409042358, -0.8482510447502136], ["white_square"] * 7),
+            (1234, device_cpu, [-0.69260174036026, 0.33002084493637085, -0.32964015007019043, 0.5768893957138062], ["grayscale"] * 7),
+            (4711, device_cpu, [-0.9051562547683716, -0.8625034093856812, 0.24682027101516724, -0.26121777296066284], ["white_square"] * 7),
         ],
         ids=["seed-1234-cuda", "seed-4711-cuda", "seed-1234-cpu", "seed-4711-cpu"]
     )
@@ -74,7 +74,7 @@ class TestImageToColumnClassifier:
         image_list, filenames = ImageList.from_files(resolve_resource_path(images_all()), return_filenames=True)
         image_list = image_list.resize(20, 20)
         image_classes = Column("class", [re.search(r"(.*)[\\/](.*)\.", filename).group(2) for filename in filenames])
-        image_dataset = ImageDataset(image_list, image_classes)
+        image_dataset = ImageDataset(image_list, image_classes, shuffle=True)
 
         layers = [
             Convolutional2DLayer(1, 2),
