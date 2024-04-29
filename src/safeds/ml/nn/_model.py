@@ -4,8 +4,7 @@ import copy
 from typing import TYPE_CHECKING, Generic, Self, TypeVar
 
 from safeds.data.tabular.containers import Table, TaggedTable, TimeSeries
-from safeds.ml.nn import (InputConversionTable, InputConversionTimeSeries, OutputConversionTable,
-                          OutputConversionTimeSeries)
+from safeds.ml.nn import (InputConversionTable, InputConversionTimeSeries,)
 from safeds.exceptions import (
     ClosedBound,
     FeatureDataMismatchError,
@@ -28,7 +27,7 @@ IPT = TypeVar("IPT", Table, TimeSeries)  # InputPredictType
 OT = TypeVar("OT", TaggedTable, TimeSeries)  # OutputType
 
 
-def _set_instance_parameters(input_conversion: _InputConversion[IFT, IPT], train_data: IFT) -> None:
+def _set_instance_parameters(input_conversion: _InputConversion, train_data: IFT) -> None:
     if isinstance(input_conversion, InputConversionTable):
         input_conversion._set_parameters(target_name=train_data.target.name,
                                          time_name="",
