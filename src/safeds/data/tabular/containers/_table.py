@@ -2200,38 +2200,28 @@ class Table:
         import matplotlib.pyplot as plt
 
         n_cols = min(3, len(self.column_names))
-        n_rows = 1 if n_cols < 3 else len(self.column_names) // n_cols
+        n_rows = (len(self.column_names) + n_cols - 1) // n_cols  # Calculate the number of rows dynamically
 
-        if len(self.column_names) == 1:
-            one_col = True
-            fig, ax = plt.subplots()
-            fig.set_size_inches(3, 3)
-        else:
-            one_col = False
-            fig, axs = plt.subplots(n_rows, n_cols, tight_layout=True)
-            fig.set_size_inches(n_cols * 3, n_rows * 3)
+        fig, axs = plt.subplots(n_rows, n_cols, tight_layout=True, figsize=(n_cols * 3, n_rows * 3))
 
         col_names = self.column_names
-        for col in col_names:
-            if not one_col:
-                ax = axs.flatten()[col_names.index(col)]
-
+        for col, ax in zip(col_names, axs.flatten()):
             np_col = np.array(self.get_column(col))
             bins = len(pd.unique(np_col))
-            
-            if bins > n_bins:   # keep the number of bins if it is less than n_bins (default=10)
+
+            if bins > n_bins:
                 bins = n_bins
-                
+
             ax.set_title(col)
             ax.set_xlabel("")
             ax.set_ylabel("")
 
-            if self.get_column(col).all(lambda x: type(x) != str):
+            if self.get_column(col).all(lambda x: type(x) != str and not isinstance(x, bool)):
                 np_col = np_col[~np.isnan(np_col)]
                 min_val = np.min(np_col)
                 max_val = np.max(np_col)
 
-                if bins < len(pd.unique(np_col)): # if the number of unique values is greater than the number of bins
+                if bins < len(pd.unique(np_col)):
                     n, bin_edges = np.histogram(self.get_column(col), bins, range=(min_val, max_val))
 
                     bars = np.array([])
@@ -2239,7 +2229,7 @@ class Table:
                         bars = np.append(bars, f'{round(bin_edges[i], 2)}-{round(bin_edges[i+1], 2)}')
 
                     ax.bar(bars, n)
-                    ax.set_xticks(np.arange(len(n)), bars, rotation=45, horizontalalignment="right")            
+                    ax.set_xticks(np.arange(len(n)), bars, rotation=45, horizontalalignment="right")
                 else:
                     unique_values = np.unique(np_col)
                     n = np.array([np.sum(np_col == value) for value in unique_values])
@@ -2247,15 +2237,15 @@ class Table:
                     ax.bar(unique_values_str, n)
                     ax.set_xticks(np.arange(len(unique_values_str)), unique_values_str, rotation=45, horizontalalignment="right")
             else:
+                np_col = np_col.astype(str)
                 unique_values = np.unique(np_col)
                 n = np.array([np.sum(np_col == value) for value in unique_values])
                 ax.bar(unique_values, n)
                 ax.set_xticks(np.arange(len(unique_values)), unique_values, rotation=45, horizontalalignment="right")
 
-        # remove empty subplots
         for i in range(len(col_names), n_rows * n_cols):
-            fig.delaxes(axs[i // n_cols, i % n_cols])
-            
+            fig.delaxes(axs.flatten()[i])  # Remove empty subplots
+
         buffer = io.BytesIO()
         fig.savefig(buffer, format="png")
         plt.close()
