@@ -4,12 +4,14 @@ import copy
 from typing import TYPE_CHECKING, TypeVar, Generic
 
 from safeds.data.image.containers import ImageList
+from safeds.data.image.containers._empty_image_list import _EmptyImageList
+from safeds.data.image.containers._multi_size_image_list import _MultiSizeImageList
 from safeds.data.image.containers._single_size_image_list import _SingleSizeImageList
 from safeds.data.image.typing import ImageSize
 from safeds.data.tabular.containers import Table, Column
 from safeds.data.tabular.transformation import OneHotEncoder
 from safeds.exceptions import NonNumericColumnError, OutputLengthMismatchError, IndexOutOfBoundsError, \
-    TransformerNotFittedError
+    TransformerNotFittedError, OutOfBoundsError, ClosedBound
 
 if TYPE_CHECKING:
     from torch import Tensor
@@ -27,8 +29,10 @@ class ImageDataset(Generic[T]):
         self._batch_size = batch_size
         self._next_batch_index = 0
 
-        if not isinstance(input_data, _SingleSizeImageList):
+        if isinstance(input_data, _MultiSizeImageList):
             raise ValueError("The given input ImageList contains images of different sizes.")
+        elif isinstance(input_data, _EmptyImageList):
+            raise ValueError("The given input ImageList contains no images.")
         else:
             self._input_size = ImageSize(input_data.widths[0], input_data.heights[0], input_data.channel)
             self._input = input_data
@@ -101,7 +105,9 @@ class ImageDataset(Generic[T]):
 
         if batch_size is None:
             batch_size = self._batch_size
-        if batch_size * batch_number >= len(self._input):
+        if batch_size < 1:
+            raise OutOfBoundsError(batch_size, name="batch_size", lower_bound=ClosedBound(1))
+        if batch_number < 0 or batch_size * batch_number >= len(self._input):
             raise IndexOutOfBoundsError(batch_size * batch_number)
         max_index = batch_size * (batch_number + 1) if batch_size * (batch_number + 1) < len(self._input) else len(self._input)
         input_tensor = self._input._tensor[self._shuffle_tensor_indices[[self._input._indices_to_tensor_positions[index] for index in range(batch_size * batch_number, max_index)]]].to(torch.float32) / 255
@@ -136,7 +142,7 @@ class _TableAsTensor:
         if tensor.dim() != 2:
             raise ValueError(f"Tensor has an invalid amount of dimensions. Needed 2 dimensions but got {tensor.dim()}.")
         if tensor.size(dim=1) != len(column_names):
-            raise ValueError(f"Tensor and column_names have different amounts of classes ({tensor.size(dim=1)}!={column_names}.")
+            raise ValueError(f"Tensor and column_names have different amounts of classes ({tensor.size(dim=1)}!={len(column_names)}).")
         table_as_tensor = _TableAsTensor.__new__(_TableAsTensor)
         table_as_tensor._tensor = tensor
         table_as_tensor._column_names = column_names
@@ -164,7 +170,7 @@ class _ColumnAsTensor:
         if not one_hot_encoder.is_fitted():
             raise TransformerNotFittedError()
         if tensor.size(dim=1) != len(one_hot_encoder.get_names_of_added_columns()):
-            raise ValueError(f"Tensor and one_hot_encoder have different amounts of classes ({tensor.size(dim=1)}!={one_hot_encoder.get_names_of_added_columns()}.")
+            raise ValueError(f"Tensor and one_hot_encoder have different amounts of classes ({tensor.size(dim=1)}!={len(one_hot_encoder.get_names_of_added_columns())}).")
         table_as_tensor = _ColumnAsTensor.__new__(_ColumnAsTensor)
         table_as_tensor._tensor = tensor
         table_as_tensor._column_name = column_name

@@ -20,14 +20,16 @@ class InputConversionImage(_InputConversion[ImageDataset, ImageList]):
         Parameters
         ----------
         """
-        self._image_size = image_size
+        self._input_size = image_size
+        self._output_size = None
         self._one_hot_encoder: OneHotEncoder | None = None
         self._column_name: str | None = None
         self._column_names: list[str] | None = None
+        self._output_type = None
 
     @property
     def _data_size(self) -> ImageSize:
-        return self._image_size
+        return self._input_size
 
     def _data_conversion_fit(self, input_data: ImageDataset, batch_size: int, num_of_classes: int = 1) -> ImageDataset:
         return input_data
@@ -36,21 +38,23 @@ class InputConversionImage(_InputConversion[ImageDataset, ImageList]):
         return input_data
 
     def _is_fit_data_valid(self, input_data: ImageDataset) -> bool:
+        if self._output_type is None:
+            self._output_type = type(input_data._output)
+            self._output_size = input_data.output_size
+        elif not isinstance(input_data._output, self._output_type):
+            return False
         if isinstance(input_data._output, _ColumnAsTensor):
-            if self._one_hot_encoder is None:
+            if self._column_name is None and self._one_hot_encoder is None:
                 self._one_hot_encoder = input_data._output._one_hot_encoder
-            elif self._one_hot_encoder != input_data._output._one_hot_encoder:
-                return False
-            if self._column_name is None:
                 self._column_name = input_data._output._column_name
-            elif self._column_name != input_data._output._column_name:
+            elif self._column_name != input_data._output._column_name or self._one_hot_encoder != input_data._output._one_hot_encoder:
                 return False
-        if isinstance(input_data._output, _TableAsTensor):
+        elif isinstance(input_data._output, _TableAsTensor):
             if self._column_names is None:
                 self._column_names = input_data._output._column_names
             elif self._column_names != input_data._output._column_names:
                 return False
-        return input_data.input_size == self._image_size
+        return input_data.input_size == self._input_size and input_data.output_size == self._output_size
 
     def _is_predict_data_valid(self, input_data: ImageList) -> bool:
-        return isinstance(input_data, _SingleSizeImageList) and input_data.sizes[0] == self._image_size
+        return isinstance(input_data, _SingleSizeImageList) and input_data.sizes[0] == self._input_size

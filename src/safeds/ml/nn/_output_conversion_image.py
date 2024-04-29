@@ -23,7 +23,7 @@ class _OutputConversionImage(_OutputConversion[ImageList, ImageDataset[T]], ABC)
 
     @abstractmethod
     def _data_conversion(self, **kwargs) -> ImageDataset[T]:
-        pass
+        pass  # pragma: no cover
 
 
 class OutputConversionImageToColumn(_OutputConversionImage[Column]):
