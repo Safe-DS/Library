@@ -41,14 +41,16 @@ from tests.helpers import assert_that_time_series_are_equal
                 feature_names=["f1"],
             ),
             Table.from_columns([Column("f2", [4, 5]), Column("f3", [6, 7])]),
-            Table({
-                "time": [0, 1],
-                "f1": [1, 2],
-                "target": [2, 3],
-                "other": [0, -1],
-                "f2": [4, 5],
-                "f3": [6, 7],
-            })._time_columns(
+            Table(
+                {
+                    "time": [0, 1],
+                    "f1": [1, 2],
+                    "target": [2, 3],
+                    "other": [0, -1],
+                    "f2": [4, 5],
+                    "f3": [6, 7],
+                },
+            )._time_columns(
                 target_name="target",
                 time_name="time",
                 feature_names=["f1", "f2", "f3"],

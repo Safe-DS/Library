@@ -29,10 +29,12 @@ class _InputConversion(Generic[FT, PT], ABC):
         pass  # pragma: no cover
 
     @abstractmethod
-    def _set_parameters(self, target_name: str,
-                        time_name: str,
-                        feature_names: list[str] | None = None,
-                        ) -> None:
+    def _set_parameters(
+        self,
+        target_name: str,
+        time_name: str,
+        feature_names: list[str] | None = None,
+    ) -> None:
         pass  # pragma: no cover
 
     @abstractmethod

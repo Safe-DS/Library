@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, List
+from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from torch.utils.data import DataLoader
@@ -14,7 +14,7 @@ class InputConversionTable(_InputConversion[TaggedTable, Table]):
 
     def __init__(self) -> None:
         """Define the input parameters for the neural network in the input conversion."""
-        self._feature_names: List[str] = []
+        self._feature_names: list[str] = []
         self._target_name = ""
         self._time_name = ""
 
@@ -28,10 +28,12 @@ class InputConversionTable(_InputConversion[TaggedTable, Table]):
             num_of_classes,
         )
 
-    def _set_parameters(self, target_name: str,
-                        time_name: str,
-                        feature_names: list[str] | None = None,
-                        ) -> None:
+    def _set_parameters(
+        self,
+        target_name: str,
+        time_name: str,
+        feature_names: list[str] | None = None,
+    ) -> None:
         # time instance parameter won't be used, but is there for Linter
         self._time_name = time_name
         self._target_name = target_name

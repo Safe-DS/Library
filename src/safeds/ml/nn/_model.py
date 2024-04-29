@@ -4,13 +4,16 @@ import copy
 from typing import TYPE_CHECKING, Generic, Self, TypeVar
 
 from safeds.data.tabular.containers import Table, TaggedTable, TimeSeries
-from safeds.ml.nn import (InputConversionTable, InputConversionTimeSeries,)
 from safeds.exceptions import (
     ClosedBound,
     FeatureDataMismatchError,
     InputSizeError,
     ModelNotFittedError,
     OutOfBoundsError,
+)
+from safeds.ml.nn import (
+    InputConversionTable,
+    InputConversionTimeSeries,
 )
 
 if TYPE_CHECKING:
@@ -29,14 +32,15 @@ OT = TypeVar("OT", TaggedTable, TimeSeries)  # OutputType
 
 def _set_instance_parameters(input_conversion: _InputConversion, train_data: TaggedTable | TimeSeries) -> None:
     if isinstance(input_conversion, InputConversionTable) and isinstance(train_data, TaggedTable):
-        input_conversion._set_parameters(target_name=train_data.target.name,
-                                         time_name="",
-                                         feature_names=train_data.features.column_names)
+        input_conversion._set_parameters(
+            target_name=train_data.target.name, time_name="", feature_names=train_data.features.column_names,
+        )
     if isinstance(input_conversion, InputConversionTimeSeries) and isinstance(train_data, TimeSeries):
-        input_conversion._set_parameters(target_name=train_data.target.name,
-                                         time_name=train_data.time.name,
-                                         feature_names=train_data.features.column_names,
-                                         )
+        input_conversion._set_parameters(
+            target_name=train_data.target.name,
+            time_name=train_data.time.name,
+            feature_names=train_data.features.column_names,
+        )
 
 
 class NeuralNetworkRegressor(Generic[IFT, IPT, OT]):
