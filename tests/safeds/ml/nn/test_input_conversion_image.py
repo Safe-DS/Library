@@ -15,8 +15,6 @@ class TestIsFitDataValid:
         ("image_dataset_valid", "image_dataset_invalid"),
         [
             (ImageDataset(_test_image_list, Column("images", images_all())), ImageDataset(_test_image_list, _test_image_list)),
-            (ImageDataset(_test_image_list, Column("images", images_all())), ImageDataset(_test_image_list, _test_image_list)),
-            (ImageDataset(_test_image_list, Table({"a": [0, 0, 1, 1, 0, 1, 0], "b": [1, 1, 0, 0, 1, 0, 1]})), ImageDataset(_test_image_list, _test_image_list)),
             (ImageDataset(_test_image_list, Table({"a": [0, 0, 1, 1, 0, 1, 0], "b": [1, 1, 0, 0, 1, 0, 1]})), ImageDataset(_test_image_list, _test_image_list)),
             (ImageDataset(_test_image_list, _test_image_list), ImageDataset(_test_image_list, Column("images", images_all()))),
             (ImageDataset(_test_image_list, _test_image_list), ImageDataset(_test_image_list, Table({"a": [0, 0, 1, 1, 0, 1, 0], "b": [1, 1, 0, 0, 1, 0, 1]}))),

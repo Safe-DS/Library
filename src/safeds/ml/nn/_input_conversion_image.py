@@ -1,11 +1,15 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 from safeds.data.image.containers import ImageList
 from safeds.data.labeled.containers import ImageDataset
 from safeds.data.labeled.containers._image_dataset import _ColumnAsTensor, _TableAsTensor
 from safeds.data.image.containers._single_size_image_list import _SingleSizeImageList
-from safeds.data.image.typing import ImageSize
-from safeds.data.tabular.transformation import OneHotEncoder
+
+if TYPE_CHECKING:
+    from safeds.data.image.typing import ImageSize
+    from safeds.data.tabular.transformation import OneHotEncoder
 
 from safeds.ml.nn._input_conversion import _InputConversion
 
@@ -19,6 +23,8 @@ class InputConversionImage(_InputConversion[ImageDataset, ImageList]):
 
         Parameters
         ----------
+        image_size:
+            the size of the input images
         """
         self._input_size = image_size
         self._output_size = None
@@ -31,10 +37,10 @@ class InputConversionImage(_InputConversion[ImageDataset, ImageList]):
     def _data_size(self) -> ImageSize:
         return self._input_size
 
-    def _data_conversion_fit(self, input_data: ImageDataset, batch_size: int, num_of_classes: int = 1) -> ImageDataset:
+    def _data_conversion_fit(self, input_data: ImageDataset, batch_size: int, num_of_classes: int = 1) -> ImageDataset:  # noqa: ARG002
         return input_data
 
-    def _data_conversion_predict(self, input_data: ImageList, batch_size: int) -> ImageList:
+    def _data_conversion_predict(self, input_data: ImageList, batch_size: int) -> ImageList:  # noqa: ARG002
         return input_data
 
     def _is_fit_data_valid(self, input_data: ImageDataset) -> bool:

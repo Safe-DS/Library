@@ -12,7 +12,7 @@ if TYPE_CHECKING:
 
 class ImageSize:
     """
-    A container for image size data
+    A container for image size data.
 
     Parameters
     ----------
@@ -59,12 +59,36 @@ class ImageSize:
 
     @property
     def width(self) -> int:
+        """
+        Get the width of this `ImageSize` in pixels.
+
+        Returns
+        -------
+        width:
+            The width of this `ImageSize`.
+        """
         return self._width
 
     @property
     def height(self) -> int:
+        """
+        Get the height of this `ImageSize` in pixels.
+
+        Returns
+        -------
+        height:
+            The height of this `ImageSize`.
+        """
         return self._height
 
     @property
     def channel(self) -> int:
+        """
+        Get the channel of this `ImageSize` in pixels.
+
+        Returns
+        -------
+        channel:
+            The channel of this `ImageSize`.
+        """
         return self._channel

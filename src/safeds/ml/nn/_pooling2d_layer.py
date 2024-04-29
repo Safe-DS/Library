@@ -33,11 +33,24 @@ class _Pooling2DLayer(_Layer):
     def __init__(self, strategy: Literal["max", "avg"], kernel_size: int, *, stride: int = -1, padding: int = 0):
         """
         Create a Pooling 2D Layer.
+
+        Parameters
+        ----------
+        strategy:
+            the strategy of the pooling
+        kernel_size:
+            the size of the kernel
+        stride:
+            the stride of the pooling
+        padding:
+            the padding of the pooling
         """
         self._strategy = strategy
         self._kernel_size = kernel_size
         self._stride = stride if stride != -1 else kernel_size
         self._padding = padding
+        self._output_size = None
+        self._input_size = None
 
     def _get_internal_layer(self) -> nn.Module:
         return _create_internal_model(self._strategy, self._kernel_size, self._padding, self._stride)
@@ -64,22 +77,48 @@ class _Pooling2DLayer(_Layer):
         result:
             The Number of Neurons in this layer.
         """
+        if self._output_size is None and self._input_size is not None:
+            new_width = math.ceil((self.input_size.width + self._padding * 2 - self._kernel_size + 1) / (1.0 * self._stride))
+            new_height = math.ceil((self.input_size.height + self._padding * 2 - self._kernel_size + 1) / (1.0 * self._stride))
+            self._output_size = ImageSize(new_width, new_height, self._input_size.channel, _ignore_invalid_channel=True)
         return self._output_size
 
     def _set_input_size(self, input_size: ImageSize) -> None:
         self._input_size = input_size
-        new_width = math.ceil((input_size.width + self._padding * 2 - self._kernel_size + 1) / (1.0 * self._stride))
-        new_height = math.ceil((input_size.height + self._padding * 2 - self._kernel_size + 1) / (1.0 * self._stride))
-        self._output_size = ImageSize(new_width, new_height, self._input_size.channel, _ignore_invalid_channel=True)
+        self._output_size = None
 
 
 class MaxPooling2DLayer(_Pooling2DLayer):
 
     def __init__(self, kernel_size: int, *, stride: int = -1, padding: int = 0) -> None:
+        """
+        Create a maximum Pooling 2D Layer.
+
+        Parameters
+        ----------
+        kernel_size:
+            the size of the kernel
+        stride:
+            the stride of the pooling
+        padding:
+            the padding of the pooling
+        """
         super().__init__("max", kernel_size, stride=stride, padding=padding)
 
 
 class AvgPooling2DLayer(_Pooling2DLayer):
 
     def __init__(self, kernel_size: int, *, stride: int = -1, padding: int = 0) -> None:
+        """
+        Create a average Pooling 2D Layer.
+
+        Parameters
+        ----------
+        kernel_size:
+            the size of the kernel
+        stride:
+            the stride of the pooling
+        padding:
+            the padding of the pooling
+        """
         super().__init__("avg", kernel_size, stride=stride, padding=padding)

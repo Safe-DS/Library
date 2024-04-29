@@ -3,10 +3,10 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
-from safeds.data.image.typing import ImageSize
-
 if TYPE_CHECKING:
     from torch import nn
+
+    from safeds.data.image.typing import ImageSize
 
 
 class _Layer(ABC):

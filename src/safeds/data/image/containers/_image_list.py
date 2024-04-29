@@ -8,7 +8,6 @@ from pathlib import Path
 from typing import TYPE_CHECKING, overload, Literal
 
 from safeds.data.image.containers._image import Image
-from safeds.data.image.typing import ImageSize
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
@@ -17,6 +16,7 @@ if TYPE_CHECKING:
 
     from safeds.data.image.containers._multi_size_image_list import _MultiSizeImageList
     from safeds.data.image.containers._single_size_image_list import _SingleSizeImageList
+    from safeds.data.image.typing import ImageSize
 
 
 class ImageList(metaclass=ABCMeta):
@@ -330,7 +330,7 @@ class ImageList(metaclass=ABCMeta):
     @abstractmethod
     def sizes(self) -> list[ImageSize]:
         """
-        Return the sizes of all images
+        Return the sizes of all images.
 
         Returns
         -------

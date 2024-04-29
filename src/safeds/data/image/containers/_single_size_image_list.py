@@ -132,8 +132,7 @@ class _SingleSizeImageList(ImageList):
         if batch_size * batch_number >= len(self):
             raise IndexOutOfBoundsError(batch_size * batch_number)
         max_index = batch_size * (batch_number + 1) if batch_size * (batch_number + 1) < len(self) else len(self)
-        input_tensor = self._tensor[[self._indices_to_tensor_positions[index] for index in range(batch_size * batch_number, max_index)]].to(torch.float32) / 255
-        return input_tensor
+        return self._tensor[[self._indices_to_tensor_positions[index] for index in range(batch_size * batch_number, max_index)]].to(torch.float32) / 255
 
     def clone(self) -> ImageList:
         cloned_image_list = self._clone_without_tensor()

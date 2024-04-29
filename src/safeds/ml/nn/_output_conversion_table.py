@@ -23,7 +23,7 @@ class OutputConversionTable(_OutputConversion[Table, TaggedTable]):
         """
         self._prediction_name = prediction_name
 
-    def _data_conversion(self, input_data: Table, output_data: Tensor, **kwargs) -> TaggedTable:
+    def _data_conversion(self, input_data: Table, output_data: Tensor, **kwargs) -> TaggedTable:  # noqa: ARG002
         return input_data.add_column(Column(self._prediction_name, output_data.tolist())).tag_columns(
             self._prediction_name,
         )

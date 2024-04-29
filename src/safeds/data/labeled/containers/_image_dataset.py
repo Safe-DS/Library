@@ -20,6 +20,20 @@ T = TypeVar("T", Column, Table, ImageList)
 
 
 class ImageDataset(Generic[T]):
+    """
+    A Dataset for ImageLists as input and ImageLists, Tables or Columns as output.
+
+    Parameters
+    ----------
+    input_data:
+        the input ImageList
+    output_data:
+        the output data
+    batch_size:
+        the batch size used for training
+    shuffle:
+        weather the data should be shuffled after each epoch of training
+    """
 
     def __init__(self, input_data: ImageList, output_data: T, batch_size=1, shuffle=False) -> None:
         import torch
@@ -30,9 +44,9 @@ class ImageDataset(Generic[T]):
         self._next_batch_index = 0
 
         if isinstance(input_data, _MultiSizeImageList):
-            raise ValueError("The given input ImageList contains images of different sizes.")
+            raise ValueError("The given input ImageList contains images of different sizes.")  # noqa: TRY004
         elif isinstance(input_data, _EmptyImageList):
-            raise ValueError("The given input ImageList contains no images.")
+            raise ValueError("The given input ImageList contains no images.")  # noqa: TRY004
         else:
             self._input_size = ImageSize(input_data.widths[0], input_data.heights[0], input_data.channel)
             self._input = input_data
@@ -59,7 +73,7 @@ class ImageDataset(Generic[T]):
             _output = output_data.clone()._as_single_size_image_list()
             self._output_size = ImageSize(output_data.widths[0], output_data.heights[0], output_data.channel)
         else:
-            raise ValueError("The given output ImageList contains images of different sizes.")
+            raise ValueError("The given output ImageList contains images of different sizes.")  # noqa: TRY004
         self._output = _output
 
     def __iter__(self) -> ImageDataset:
@@ -81,16 +95,48 @@ class ImageDataset(Generic[T]):
 
     @property
     def input_size(self) -> ImageSize:
+        """
+        Get the input `ImageSize` of this dataset.
+
+        Returns
+        -------
+        input_size:
+            the input `ImageSize`
+        """
         return self._input_size
 
     @property
     def output_size(self) -> ImageSize | int:
+        """
+        Get the output size of this dataset.
+
+        Returns
+        -------
+        output_size:
+            the output size
+        """
         return self._output_size
 
     def get_input(self) -> ImageList:
+        """
+        Get the input data of this dataset.
+
+        Returns
+        -------
+        input:
+            the input data of this dataset
+        """
         return self._input
 
     def get_output(self) -> T:
+        """
+        Get the output data of this dataset.
+
+        Returns
+        -------
+        output:
+            the output data of this dataset
+        """
         output = self._output
         if isinstance(output, _TableAsTensor):
             return output._to_table()
@@ -119,6 +165,16 @@ class ImageDataset(Generic[T]):
         return input_tensor, output_tensor
 
     def shuffle(self) -> ImageDataset[T]:
+        """
+        Return a new `ImageDataset` with shuffled data.
+
+        The original dataset list is not modified.
+
+        Returns
+        -------
+        image_dataset:
+            the shuffled `ImageDataset`
+        """
         import torch
         im_dataset: ImageDataset[T] = copy.copy(self)
         im_dataset._shuffle_tensor_indices = torch.randperm(len(self))
@@ -149,8 +205,7 @@ class _TableAsTensor:
         return table_as_tensor
 
     def _to_table(self) -> Table:
-        table = Table(dict(zip(self._column_names, self._tensor.T.tolist())))
-        return table
+        return Table(dict(zip(self._column_names, self._tensor.T.tolist())))
 
 
 class _ColumnAsTensor:
@@ -168,7 +223,7 @@ class _ColumnAsTensor:
         if tensor.dim() != 2:
             raise ValueError(f"Tensor has an invalid amount of dimensions. Needed 2 dimensions but got {tensor.dim()}.")
         if not one_hot_encoder.is_fitted():
-            raise TransformerNotFittedError()
+            raise TransformerNotFittedError
         if tensor.size(dim=1) != len(one_hot_encoder.get_names_of_added_columns()):
             raise ValueError(f"Tensor and one_hot_encoder have different amounts of classes ({tensor.size(dim=1)}!={len(one_hot_encoder.get_names_of_added_columns())}).")
         table_as_tensor = _ColumnAsTensor.__new__(_ColumnAsTensor)

@@ -11,7 +11,6 @@ from safeds.data.image._utils._image_transformation_error_and_warning_checks imp
     _check_blur_errors_and_warnings,
     _check_remove_images_with_size_errors,
 )
-from safeds.data.image.typing import ImageSize
 from safeds.exceptions import (
     DuplicateIndexError,
     IllegalFormatError,
@@ -24,6 +23,7 @@ if TYPE_CHECKING:
     from torch import Tensor
 
     from safeds.data.image.containers._single_size_image_list import _SingleSizeImageList
+    from safeds.data.image.typing import ImageSize
 
 
 class _MultiSizeImageList(ImageList):

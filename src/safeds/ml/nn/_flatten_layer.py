@@ -2,10 +2,11 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from safeds.data.image.typing import ImageSize
 
 if TYPE_CHECKING:
     from torch import Tensor, nn
+
+    from safeds.data.image.typing import ImageSize
 
 from safeds.ml.nn._layer import _Layer
 
@@ -55,7 +56,10 @@ class FlattenLayer(_Layer):
         result :
             The Number of Neurons in this layer.
         """
-        return self._input_size.width * self._input_size.height * self._input_size.channel if self._input_size is not None else None
+        if self._output_size is None and self._input_size is not None:
+            self._output_size = self._input_size.width * self._input_size.height * self._input_size.channel
+        return self._output_size
 
     def _set_input_size(self, input_size: ImageSize) -> None:
         self._input_size = input_size
+        self._output_size = None

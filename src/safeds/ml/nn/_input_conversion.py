@@ -3,17 +3,17 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Generic, TypeVar
 
-from safeds.data.image.typing import ImageSize
-
 if TYPE_CHECKING:
     from torch.utils.data import DataLoader
+
+    from safeds.data.image.typing import ImageSize
 
 from safeds.data.tabular.containers import Table, TaggedTable, TimeSeries
 from safeds.data.image.containers import ImageList
 from safeds.data.labeled.containers import ImageDataset
 
-FT = TypeVar("FT", TaggedTable, TimeSeries)
-PT = TypeVar("PT", Table, TimeSeries)
+FT = TypeVar("FT", TaggedTable, TimeSeries, ImageDataset)
+PT = TypeVar("PT", Table, TimeSeries, ImageList)
 
 
 class _InputConversion(Generic[FT, PT], ABC):

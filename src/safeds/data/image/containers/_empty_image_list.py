@@ -17,7 +17,6 @@ from safeds.data.image._utils._image_transformation_error_and_warning_checks imp
     _check_resize_errors,
     _check_sharpen_errors_and_warnings,
 )
-from safeds.data.image.typing import ImageSize
 from safeds.exceptions import IndexOutOfBoundsError
 
 if TYPE_CHECKING:
@@ -26,6 +25,7 @@ if TYPE_CHECKING:
     from torch import Tensor
 
     from safeds.data.image.containers import Image
+    from safeds.data.image.typing import ImageSize
 
 
 class _EmptyImageList(ImageList):

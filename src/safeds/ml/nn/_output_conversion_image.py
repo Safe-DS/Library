@@ -8,10 +8,11 @@ from safeds.data.labeled.containers import ImageDataset
 from safeds.data.labeled.containers._image_dataset import _TableAsTensor, _ColumnAsTensor
 from safeds.data.image.containers._single_size_image_list import _SingleSizeImageList
 from safeds.data.tabular.containers import Table, Column
-from safeds.data.tabular.transformation import OneHotEncoder
 
 if TYPE_CHECKING:
     from torch import Tensor, LongTensor
+
+    from safeds.data.tabular.transformation import OneHotEncoder
 
 from safeds.ml.nn._output_conversion import _OutputConversion
 
@@ -32,9 +33,7 @@ class OutputConversionImageToColumn(_OutputConversionImage[Column]):
         import torch
 
         if not isinstance(input_data, _SingleSizeImageList):
-            raise ValueError("The given input ImageList contains images of different sizes.")
-
-        print(output_data)
+            raise ValueError("The given input ImageList contains images of different sizes.")  # noqa: TRY004
 
         output = torch.zeros(len(input_data), len(one_hot_encoder.get_names_of_added_columns()))
         output[torch.arange(len(input_data)), output_data] = 1
@@ -56,7 +55,7 @@ class OutputConversionImageToTable(_OutputConversionImage[Table]):
         import torch
 
         if not isinstance(input_data, _SingleSizeImageList):
-            raise ValueError("The given input ImageList contains images of different sizes.")
+            raise ValueError("The given input ImageList contains images of different sizes.")  # noqa: TRY004
 
         output = torch.zeros(len(input_data), len(column_names))
         output[torch.arange(len(input_data)), output_data] = 1
@@ -78,7 +77,7 @@ class OutputConversionImageToImage(_OutputConversionImage[ImageList]):
         import torch
 
         if not isinstance(input_data, _SingleSizeImageList):
-            raise ValueError("The given input ImageList contains images of different sizes.")
+            raise ValueError("The given input ImageList contains images of different sizes.")  # noqa: TRY004
 
         return ImageDataset[ImageList](input_data, _SingleSizeImageList._create_from_tensor((output_data * 255).to(torch.uint8), list(
             range(output_data.size(dim=0)))))
