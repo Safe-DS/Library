@@ -13,9 +13,7 @@ class InputConversionTable(_InputConversion[TaggedTable, Table]):
     """The input conversion for a neural network, defines the input parameters for the neural network."""
 
     def __init__(self) -> None:
-        """
-        Define the input parameters for the neural network in the input conversion.
-        """
+        """Define the input parameters for the neural network in the input conversion."""
         self._feature_names = None
         self._target_name = None
 
@@ -31,7 +29,7 @@ class InputConversionTable(_InputConversion[TaggedTable, Table]):
 
     def _set_parameters(self, target_name: str,
                         feature_names: list[str] | None = None,
-                        time_name: str = None, ):
+                        time_name: str |None = None, ):
         # time instance parameter won't be used, but is there for Linter
         self._time_name = time_name
         self._target_name = target_name
