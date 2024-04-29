@@ -10,7 +10,8 @@ from safeds.data.labeled.containers import ImageDataset
 from safeds.data.tabular.containers import Table, Column
 from safeds.data.tabular.transformation import OneHotEncoder
 from safeds.ml.nn import NeuralNetworkClassifier, InputConversionImage, Convolutional2DLayer, MaxPooling2DLayer, \
-    FlattenLayer, ForwardLayer, OutputConversionImageToTable, ConvolutionalTranspose2DLayer, NeuralNetworkRegressor
+    FlattenLayer, ForwardLayer, OutputConversionImageToTable, ConvolutionalTranspose2DLayer, NeuralNetworkRegressor, \
+    AvgPooling2DLayer
 from safeds.ml.nn._output_conversion_image import OutputConversionImageToColumn, OutputConversionImageToImage
 from tests.helpers import resolve_resource_path, images_all, device_cuda, device_cpu, skip_if_device_not_available
 
@@ -58,9 +59,9 @@ class TestImageToColumnClassifier:
     @pytest.mark.parametrize(
         ("seed", "device", "layer_3_bias", "prediction_label"),
         [
-            (1234, device_cuda, [0.5809096097946167, -0.32418742775917053, 0.026058292016386986, 0.5801554918289185], ["grayscale"] * 7),
-            (4711, device_cuda, [-0.8114155530929565, -0.9443624019622803, 0.8557258248329163, -0.848240852355957], ["white_square"] * 7),
-            (1234, device_cpu, [-0.6926110982894897, 0.33004942536354065, -0.32962560653686523, 0.5768553614616394], ["grayscale"] * 7),
+            (1234, device_cuda, [0.5805488228797913, -0.32433584332466125, 0.026305729523301125, 0.5804171562194824], ["grayscale"] * 7),
+            (4711, device_cuda, [-0.8114063143730164, -0.9443492889404297, 0.8557132482528687, -0.8482506275177002], ["white_square"] * 7),
+            (1234, device_cpu, [-0.6926037669181824, 0.33001941442489624, -0.32963910698890686, 0.5768917202949524], ["grayscale"] * 7),
             (4711, device_cpu, [-0.9051575660705566, -0.8625037670135498, 0.24682046473026276, -0.2612163722515106], ["white_square"] * 7),
         ],
         ids=["seed-1234-cuda", "seed-4711-cuda", "seed-1234-cpu", "seed-4711-cpu"]
@@ -74,12 +75,10 @@ class TestImageToColumnClassifier:
         image_list = image_list.resize(20, 20)
         image_classes = Column("class", [re.search(r"(.*)[\\/](.*)\.", filename).group(2) for filename in filenames])
         image_dataset = ImageDataset(image_list, image_classes)
-        print(image_dataset._output._tensor)
-        print(image_dataset._output._tensor.size())
 
         layers = [
             Convolutional2DLayer(1, 2),
-            MaxPooling2DLayer(10),
+            AvgPooling2DLayer(10),
             FlattenLayer(),
             ForwardLayer(image_dataset.output_size)
         ]

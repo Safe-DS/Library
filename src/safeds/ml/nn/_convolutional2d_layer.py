@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import math
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Literal
 
 from safeds.data.image.typing import ImageSize
 
@@ -11,11 +11,11 @@ if TYPE_CHECKING:
 from safeds.ml.nn._layer import _Layer
 
 
-def _create_internal_model(input_size: int, output_size: int, kernel_size: int, activation_function: str, padding: int, stride: int, transpose: bool, output_padding: int = 0) -> nn.Module:
+def _create_internal_model(input_size: int, output_size: int, kernel_size: int, activation_function: Literal["sigmoid", "relu", "softmax"], padding: int, stride: int, transpose: bool, output_padding: int = 0) -> nn.Module:
     from torch import nn
 
     class _InternalLayer(nn.Module):
-        def __init__(self, input_size: int, output_size: int, kernel_size: int, activation_function: str, padding: int, stride: int, transpose: bool, output_padding: int):
+        def __init__(self, input_size: int, output_size: int, kernel_size: int, activation_function: Literal["sigmoid", "relu", "softmax"], padding: int, stride: int, transpose: bool, output_padding: int):
             super().__init__()
             if transpose:
                 self._layer = nn.ConvTranspose2d(in_channels=input_size, out_channels=output_size, kernel_size=kernel_size, padding=padding, stride=stride, output_padding=output_padding)
@@ -47,7 +47,7 @@ class Convolutional2DLayer(_Layer):
         self._stride = stride
         self._padding = padding
 
-    def _get_internal_layer(self, *, activation_function: str) -> nn.Module:
+    def _get_internal_layer(self, *, activation_function: Literal["sigmoid", "relu", "softmax"]) -> nn.Module:
         return _create_internal_model(self._input_size.channel, self._output_channel, self._kernel_size, activation_function, self._padding, self._stride, False)
 
     @property
@@ -87,7 +87,7 @@ class ConvolutionalTranspose2DLayer(Convolutional2DLayer):
         super().__init__(output_channel, kernel_size, stride=stride, padding=padding)
         self._output_padding = output_padding
 
-    def _get_internal_layer(self, *, activation_function: str) -> nn.Module:
+    def _get_internal_layer(self, *, activation_function: Literal["sigmoid", "relu", "softmax"]) -> nn.Module:
         return _create_internal_model(self._input_size.channel, self._output_channel, self._kernel_size, activation_function, self._padding, self._stride, True, self._output_padding)
 
     def _set_input_size(self, input_size: ImageSize) -> None:

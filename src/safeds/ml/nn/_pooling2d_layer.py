@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import math
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Literal
 
 from safeds.data.image.typing import ImageSize
 
@@ -11,19 +11,17 @@ if TYPE_CHECKING:
 from safeds.ml.nn._layer import _Layer
 
 
-def _create_internal_model(strategy: str, kernel_size: int, padding: int, stride: int) -> nn.Module:
+def _create_internal_model(strategy: Literal["max", "avg"], kernel_size: int, padding: int, stride: int) -> nn.Module:
     from torch import nn
 
     class _InternalLayer(nn.Module):
-        def __init__(self, strategy: str, kernel_size: int, padding: int, stride: int):
+        def __init__(self, strategy: Literal["max", "avg"], kernel_size: int, padding: int, stride: int):
             super().__init__()
             match strategy:
                 case "max":
                     self._layer = nn.MaxPool2d(kernel_size=kernel_size, padding=padding, stride=stride)
                 case "avg":
                     self._layer = nn.AvgPool2d(kernel_size=kernel_size, padding=padding, stride=stride)
-                case _:
-                    raise ValueError(f"Unknown pooling strategy: {strategy}")
 
         def forward(self, x: Tensor) -> Tensor:
             return self._layer(x)
@@ -32,7 +30,7 @@ def _create_internal_model(strategy: str, kernel_size: int, padding: int, stride
 
 
 class _Pooling2DLayer(_Layer):
-    def __init__(self, strategy: str, kernel_size: int, *, stride: int = -1, padding: int = 0):
+    def __init__(self, strategy: Literal["max", "avg"], kernel_size: int, *, stride: int = -1, padding: int = 0):
         """
         Create a Pooling 2D Layer.
         """
