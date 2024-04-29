@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, List
 
 if TYPE_CHECKING:
     from torch.utils.data import DataLoader
@@ -31,7 +31,7 @@ class InputConversionTimeSeries(_InputConversion[TimeSeries, TimeSeries]):
         self._forecast_horizon = forecast_horizon
         self._target_name = None
         self._time_name = None
-        self._feature_names: [str] = []
+        self._feature_names: List[str] = []
 
     @property
     def _data_size(self) -> int:
@@ -57,7 +57,7 @@ class InputConversionTimeSeries(_InputConversion[TimeSeries, TimeSeries]):
                         time_name: str,
                         feature_names: list[str] | None = None,
                         ) -> None:
-        """Always set time_name in internal usage!"""
+        """Always set the time_name variable when used internally."""
         self._time_name = time_name
         if feature_names is None:
             self._feature_names = []
