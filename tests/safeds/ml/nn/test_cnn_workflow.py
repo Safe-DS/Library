@@ -5,7 +5,8 @@ import torch
 from syrupy import SnapshotAssertion
 from torch.types import Device
 
-from safeds.data.image.containers import ImageList, ImageDataset
+from safeds.data.image.containers import ImageList
+from safeds.data.labeled.containers import ImageDataset
 from safeds.data.tabular.containers import Table, Column
 from safeds.data.tabular.transformation import OneHotEncoder
 from safeds.ml.nn import NeuralNetworkClassifier, InputConversionImage, Convolutional2DLayer, MaxPooling2DLayer, \
@@ -14,7 +15,7 @@ from safeds.ml.nn._output_conversion_image import OutputConversionImageToColumn,
 from tests.helpers import resolve_resource_path, images_all, device_cuda, device_cpu, skip_if_device_not_available
 
 
-class TestImageToTable:
+class TestImageToTableClassifier:
 
     @pytest.mark.parametrize(
         ("seed", "device", "layer_3_bias", "prediction_label"),
@@ -52,7 +53,7 @@ class TestImageToTable:
         assert one_hot_encoder.inverse_transform(prediction.get_output()) == Table({"class": prediction_label})
 
 
-class TestImageToColumn:
+class TestImageToColumnClassifier:
 
     @pytest.mark.parametrize(
         ("seed", "device", "layer_3_bias", "prediction_label"),
@@ -91,7 +92,7 @@ class TestImageToColumn:
         assert prediction.get_output() == Column("class", prediction_label)
 
 
-class TestImageToImage:
+class TestImageToImageRegressor:
 
     @pytest.mark.parametrize(
         ("seed", "device", "layer_3_bias"),

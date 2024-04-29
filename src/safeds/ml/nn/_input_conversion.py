@@ -9,7 +9,8 @@ if TYPE_CHECKING:
     from torch.utils.data import DataLoader
 
 from safeds.data.tabular.containers import Table, TaggedTable, TimeSeries
-from safeds.data.image.containers import ImageDataset, ImageList
+from safeds.data.image.containers import ImageList
+from safeds.data.labeled.containers import ImageDataset
 
 FT = TypeVar("FT", TaggedTable, TimeSeries)
 PT = TypeVar("PT", Table, TimeSeries)

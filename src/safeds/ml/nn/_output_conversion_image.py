@@ -3,8 +3,9 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, TypeVar
 
-from safeds.data.image.containers import ImageDataset, ImageList
-from safeds.data.image.containers._image_dataset import _TableAsTensor, _ColumnAsTensor
+from safeds.data.image.containers import ImageList
+from safeds.data.labeled.containers import ImageDataset
+from safeds.data.labeled.containers._image_dataset import _TableAsTensor, _ColumnAsTensor
 from safeds.data.image.containers._single_size_image_list import _SingleSizeImageList
 from safeds.data.tabular.containers import Table, Column
 from safeds.data.tabular.transformation import OneHotEncoder

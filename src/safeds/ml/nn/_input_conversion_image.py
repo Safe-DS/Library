@@ -1,7 +1,8 @@
 from __future__ import annotations
 
-from safeds.data.image.containers import ImageDataset, ImageList
-from safeds.data.image.containers._image_dataset import _ColumnAsTensor, _TableAsTensor
+from safeds.data.image.containers import ImageList
+from safeds.data.labeled.containers import ImageDataset
+from safeds.data.labeled.containers._image_dataset import _ColumnAsTensor, _TableAsTensor
 from safeds.data.image.containers._single_size_image_list import _SingleSizeImageList
 from safeds.data.image.typing import ImageSize
 from safeds.data.tabular.transformation import OneHotEncoder

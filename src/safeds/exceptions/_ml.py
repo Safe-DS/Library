@@ -54,6 +54,13 @@ class ModelNotFittedError(Exception):
         super().__init__("The model has not been fitted yet.")
 
 
+class InvalidModelStructureError(Exception):
+    """Raised when the structure of the model is invalid."""
+
+    def __init__(self, reason: str) -> None:
+        super().__init__(f"The model structure is invalid: {reason}")
+
+
 class PredictionError(Exception):
     """
     Raised when an error occurred while prediction a target vector using a model.
