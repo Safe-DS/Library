@@ -31,11 +31,13 @@ OT = TypeVar("OT", TaggedTable, TimeSeries)  # OutputType
 def _set_instance_parameters(input_conversion, train_data) -> None:
     if isinstance(input_conversion, InputConversionTable):
         input_conversion._set_parameters(target_name=train_data.target.name,
+                                         time_name="",
                                          feature_names=train_data.features.column_names)
     if isinstance(input_conversion, InputConversionTimeSeries):
         input_conversion._set_parameters(target_name=train_data.target.name,
-                                               feature_names=train_data.features.column_names,
-                                               time_name=train_data.time.name)
+                                         time_name=train_data.time.name,
+                                         feature_names=train_data.features.column_names,
+                                         )
 
 
 class NeuralNetworkRegressor(Generic[IFT, IPT, OT]):

@@ -28,8 +28,9 @@ class InputConversionTable(_InputConversion[TaggedTable, Table]):
         )
 
     def _set_parameters(self, target_name: str,
+                        time_name: str,
                         feature_names: list[str] | None = None,
-                        time_name: str | None = None, ) -> None:
+                        ) -> None:
         # time instance parameter won't be used, but is there for Linter
         self._time_name = time_name
         self._target_name = target_name

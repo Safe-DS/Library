@@ -54,10 +54,10 @@ class InputConversionTimeSeries(_InputConversion[TimeSeries, TimeSeries]):
         )
 
     def _set_parameters(self, target_name: str,
+                        time_name: str,
                         feature_names: list[str] | None = None,
-                        time_name: str = "",
                         ) -> None:
-        """ always set time_name in internal usage! """
+        """Always set time_name in internal usage!"""
         self._time_name = time_name
         if feature_names is None:
             self._feature_names = []
