@@ -2177,9 +2177,14 @@ class Table:
         buffer.seek(0)
         return Image.from_bytes(buffer.read())
 
-    def plot_histograms(self) -> Image:
+    def plot_histograms(self, n_bins : int = 10) -> Image:
         """
         Plot a histogram for every column.
+
+        Parameters
+        ----------
+        n_bins : int
+            The number of bins to use in the histogram. Default is 10.
 
         Returns
         -------
@@ -2193,23 +2198,64 @@ class Table:
         >>> image = table.plot_histograms()
         """
         import matplotlib.pyplot as plt
-        import pandas as pd
-        import seaborn as sns
 
-        col_wrap = min(self.number_of_columns, 3)
+        n_cols = min(3, len(self.column_names))
+        n_rows = 1 if n_cols < 3 else len(self.column_names) // n_cols
 
-        data = pd.melt(self._data.map(lambda value: str(value)), value_vars=self.column_names)
-        grid = sns.FacetGrid(data=data, col="variable", col_wrap=col_wrap, sharex=False, sharey=False)
-        grid.map(sns.histplot, "value")
-        grid.set_xlabels("")
-        grid.set_ylabels("")
-        grid.set_titles("{col_name}")
-        for axes in grid.axes.flat:
-            axes.set_xticks(axes.get_xticks())
-            axes.set_xticklabels(axes.get_xticklabels(), rotation=45, horizontalalignment="right")
-        grid.tight_layout()
-        fig = grid.fig
+        if len(self.column_names) == 1:
+            one_col = True
+            fig, ax = plt.subplots()
+            fig.set_size_inches(3, 3)
+        else:
+            one_col = False
+            fig, axs = plt.subplots(n_rows, n_cols, tight_layout=True)
+            fig.set_size_inches(n_cols * 3, n_rows * 3)
 
+        col_names = self.column_names
+        for col in col_names:
+            if not one_col:
+                ax = axs.flatten()[col_names.index(col)]
+
+            np_col = np.array(self.get_column(col))
+            bins = len(pd.unique(np_col))
+            
+            if bins > n_bins:   # keep the number of bins if it is less than n_bins (default=10)
+                bins = n_bins
+                
+            ax.set_title(col)
+            ax.set_xlabel("")
+            ax.set_ylabel("")
+
+            if self.get_column(col).all(lambda x: type(x) != str):
+                np_col = np_col[~np.isnan(np_col)]
+                min_val = np.min(np_col)
+                max_val = np.max(np_col)
+
+                if bins < len(pd.unique(np_col)): # if the number of unique values is greater than the number of bins
+                    n, bin_edges = np.histogram(self.get_column(col), bins, range=(min_val, max_val))
+
+                    bars = np.array([])
+                    for i in range(len(n)):
+                        bars = np.append(bars, f'{round(bin_edges[i], 2)}-{round(bin_edges[i+1], 2)}')
+
+                    ax.bar(bars, n)
+                    ax.set_xticks(np.arange(len(n)), bars, rotation=45, horizontalalignment="right")            
+                else:
+                    unique_values = np.unique(np_col)
+                    n = np.array([np.sum(np_col == value) for value in unique_values])
+                    unique_values_str = [str(i) for i in unique_values]
+                    ax.bar(unique_values_str, n)
+                    ax.set_xticks(np.arange(len(unique_values_str)), unique_values_str, rotation=45, horizontalalignment="right")
+            else:
+                unique_values = np.unique(np_col)
+                n = np.array([np.sum(np_col == value) for value in unique_values])
+                ax.bar(unique_values, n)
+                ax.set_xticks(np.arange(len(unique_values)), unique_values, rotation=45, horizontalalignment="right")
+
+        # remove empty subplots
+        for i in range(len(col_names), n_rows * n_cols):
+            fig.delaxes(axs[i // n_cols, i % n_cols])
+            
         buffer = io.BytesIO()
         fig.savefig(buffer, format="png")
         plt.close()
