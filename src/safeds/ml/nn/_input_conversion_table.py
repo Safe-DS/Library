@@ -29,15 +29,14 @@ class InputConversionTable(_InputConversion[TaggedTable, Table]):
 
     def _set_parameters(self, target_name: str,
                         feature_names: list[str] | None = None,
-                        time_name: str |None = None, ):
+                        time_name: str | None = None, ) -> None:
         # time instance parameter won't be used, but is there for Linter
         self._time_name = time_name
         self._target_name = target_name
-        #normally this should never happen, because a TaggedTable does not have a empty feature list
+        # normally this should never happen, because a TaggedTable does not have a empty feature list
         if feature_names is None:
             feature_names = []
         self._feature_names = feature_names
-
 
     def _data_conversion_predict(self, input_data: Table, batch_size: int) -> DataLoader:
         return input_data._into_dataloader(batch_size)
