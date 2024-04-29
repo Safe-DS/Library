@@ -28,7 +28,7 @@ IPT = TypeVar("IPT", Table, TimeSeries)  # InputPredictType
 OT = TypeVar("OT", TaggedTable, TimeSeries)  # OutputType
 
 
-def _set_instance_parameters(input_conversion, train_data) -> None:
+def _set_instance_parameters(input_conversion: _InputConversion[IFT, IPT], train_data: IFT) -> None:
     if isinstance(input_conversion, InputConversionTable):
         input_conversion._set_parameters(target_name=train_data.target.name,
                                          time_name="",
