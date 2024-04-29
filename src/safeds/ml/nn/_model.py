@@ -33,7 +33,9 @@ OT = TypeVar("OT", TaggedTable, TimeSeries)  # OutputType
 def _set_instance_parameters(input_conversion: _InputConversion, train_data: TaggedTable | TimeSeries) -> None:
     if isinstance(input_conversion, InputConversionTable) and isinstance(train_data, TaggedTable):
         input_conversion._set_parameters(
-            target_name=train_data.target.name, time_name="", feature_names=train_data.features.column_names,
+            target_name=train_data.target.name,
+            time_name="",
+            feature_names=train_data.features.column_names,
         )
     if isinstance(input_conversion, InputConversionTimeSeries) and isinstance(train_data, TimeSeries):
         input_conversion._set_parameters(
