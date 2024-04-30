@@ -2183,7 +2183,7 @@ class Table:
 
         Parameters
         ----------
-        n_bins : int
+        n_bins:
             The number of bins to use in the histogram. Default is 10.
 
         Returns
