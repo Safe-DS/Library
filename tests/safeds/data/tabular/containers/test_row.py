@@ -346,7 +346,7 @@ class TestNumberOfColumns:
         ],
     )
     def test_should_return_the_number_of_columns(self, row: Row, expected: int) -> None:
-        assert row.number_of_column == expected
+        assert row.number_of_columns == expected
 
 
 class TestGetValue:
