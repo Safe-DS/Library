@@ -31,5 +31,5 @@ from safeds.data.tabular.containers import Table
     ids=["select by row1", "different types in column", "empty table", "table with no rows"],
 )
 def test_should_group_rows(table: Table, selector: Callable, expected: dict) -> None:
-    out = table.group_rows_by(selector)
+    out = table.group_rows(selector)
     assert out == expected
