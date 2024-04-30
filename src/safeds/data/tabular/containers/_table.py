@@ -2202,7 +2202,7 @@ class Table:
         import pandas as pd
 
         n_cols = min(3, len(self.column_names))
-        n_rows = (len(self.column_names) + n_cols - 1) // n_cols
+        n_rows = 1 + (self.number_of_columns - 1) // n_cols
 
         if n_cols == 1 and n_rows == 1:
             one_col = True
