@@ -2204,12 +2204,8 @@ class Table:
         n_cols = min(3, self.number_of_columns)
         n_rows = 1 + (self.number_of_columns - 1) // n_cols
 
-        if n_cols == 1 and n_rows == 1:
-            one_col = True
-            fig, axs = plt.subplots(1, 1, tight_layout=True, figsize=(3, 3))
-        else:
-            one_col = False
-            fig, axs = plt.subplots(n_rows, n_cols, tight_layout=True, figsize=(n_cols * 3, n_rows * 3))
+        one_col = n_cols == 1 and n_rows == 1
+        fig, axs = plt.subplots(n_rows, n_cols, tight_layout=True, figsize=(n_cols * 3, n_rows * 3))
 
         col_names = self.column_names
         for col, ax in zip(col_names, axs.flatten() if not one_col else [axs]):
