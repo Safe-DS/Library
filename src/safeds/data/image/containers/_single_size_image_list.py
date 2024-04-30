@@ -599,7 +599,7 @@ class _SingleSizeImageList(ImageList):
                 dim=1,
             )
         else:
-            return func2.rgb_to_grayscale(tensor[:, 0:3], num_output_channels=3)
+            return func2.rgb_to_grayscale(tensor[:, 0:3], num_output_channels=tensor.size(dim=-3))
 
     def crop(self, x: int, y: int, width: int, height: int) -> ImageList:
         from torchvision.transforms.v2 import functional as func2
