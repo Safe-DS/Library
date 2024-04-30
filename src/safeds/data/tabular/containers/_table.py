@@ -2202,10 +2202,15 @@ class Table:
         n_cols = min(3, len(self.column_names))
         n_rows = (len(self.column_names) + n_cols - 1) // n_cols  # Calculate the number of rows dynamically
 
-        fig, axs = plt.subplots(n_rows, n_cols, tight_layout=True, figsize=(n_cols * 3, n_rows * 3))
+        if n_cols == 1 and n_rows == 1:
+            oneCol = True
+            fig, axs = plt.subplots(1, 1, tight_layout=True, figsize=(3, 3))
+        else:
+            oneCol = False
+            fig, axs = plt.subplots(n_rows, n_cols, tight_layout=True, figsize=(n_cols * 3, n_rows * 3))
 
         col_names = self.column_names
-        for col, ax in zip(col_names, axs.flatten()):
+        for col, ax in zip(col_names, axs.flatten() if not oneCol else [axs]):
             np_col = np.array(self.get_column(col))
             bins = len(pd.unique(np_col))
 
