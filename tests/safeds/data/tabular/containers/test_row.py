@@ -202,7 +202,6 @@ class TestHash:
     @pytest.mark.parametrize(
         ("row1", "row2"),
         [
-
             (Row({"col1": 0}), Row({"col1": 1})),
             (Row({"col1": 0}), Row({"col2": 0})),
             (Row({"col1": 0}), Row({"col1": "a"})),
