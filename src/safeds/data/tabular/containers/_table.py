@@ -2202,7 +2202,7 @@ class Table:
         import pandas as pd
 
         n_cols = min(3, len(self.column_names))
-        n_rows = (len(self.column_names) + n_cols - 1) // n_cols  # Calculate the number of rows dynamically
+        n_rows = (len(self.column_names) + n_cols - 1) // n_cols
 
         if n_cols == 1 and n_rows == 1:
             one_col = True
@@ -2255,7 +2255,7 @@ class Table:
 
         buffer = io.BytesIO()
         fig.savefig(buffer, format="png")
-        plt.close()
+        plt.close()  # Prevents the figure from being displayed directly
         buffer.seek(0)
         return Image.from_bytes(buffer.read())
 
