@@ -2220,7 +2220,7 @@ class Table:
             ax.set_xlabel("")
             ax.set_ylabel("")
 
-            if self.get_column(col).all(lambda x: not isinstance(x, (str | bool))):
+            if self.get_column(col).type.is_numeric():
                 np_col = np_col[~np.isnan(np_col)]
                 min_val = np.min(np_col)
                 max_val = np.max(np_col)
