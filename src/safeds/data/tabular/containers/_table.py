@@ -2183,12 +2183,12 @@ class Table:
 
         Parameters
         ----------
-        n_bins:
+        number_of_bins:
             The number of bins to use in the histogram. Default is 10.
 
         Returns
         -------
-        plot: Image
+        plot:
             The plot as an image.
 
         Examples
@@ -2208,40 +2208,35 @@ class Table:
         fig, axs = plt.subplots(n_rows, n_cols, tight_layout=True, figsize=(n_cols * 3, n_rows * 3))
 
         col_names = self.column_names
-        for col, ax in zip(col_names, axs.flatten() if not one_col else [axs]):
-            np_col = np.array(self.get_column(col))
-            bins = min(n_bins, len(pd.unique(np_col)))
+        for col_name, ax in zip(col_names, axs.flatten() if not one_col else [axs]):
+            np_col = np.array(self.get_column(col_name))
+            bins = min(number_of_bins, len(pd.unique(np_col)))
 
-            ax.set_title(col)
+            ax.set_title(col_name)
             ax.set_xlabel("")
             ax.set_ylabel("")
 
-            if self.get_column(col).type.is_numeric():
+            if self.get_column(col_name).type.is_numeric():
                 np_col = np_col[~np.isnan(np_col)]
-                min_val = np.min(np_col)
-                max_val = np.max(np_col)
 
                 if bins < len(pd.unique(np_col)):
-                    n, bin_edges = np.histogram(self.get_column(col), bins, range=(min_val, max_val))
+                    min_val = np.min(np_col)
+                    max_val = np.max(np_col)
+                    hist, bin_edges = np.histogram(self.get_column(col_name), bins, range=(min_val, max_val))
 
                     bars = np.array([])
-                    for i in range(len(n)):
+                    for i in range(len(hist)):
                         bars = np.append(bars, f'{round(bin_edges[i], 2)}-{round(bin_edges[i+1], 2)}')
 
-                    ax.bar(bars, n)
-                    ax.set_xticks(np.arange(len(n)), bars, rotation=45, horizontalalignment="right")
-                else:
-                    unique_values = np.unique(np_col)
-                    n = np.array([np.sum(np_col == value) for value in unique_values])
-                    unique_values_str = [str(i) for i in unique_values]
-                    ax.bar(unique_values_str, n)
-                    ax.set_xticks(np.arange(len(unique_values_str)), unique_values_str, rotation=45, horizontalalignment="right")
-            else:
-                np_col = np_col.astype(str)
-                unique_values = np.unique(np_col)
-                n = np.array([np.sum(np_col == value) for value in unique_values])
-                ax.bar(unique_values, n)
-                ax.set_xticks(np.arange(len(unique_values)), unique_values, rotation=45, horizontalalignment="right")
+                    ax.bar(bars, hist)
+                    ax.set_xticks(np.arange(len(hist)), bars, rotation=45, horizontalalignment="right")
+                    continue
+
+            np_col = np_col.astype(str)
+            unique_values = np.unique(np_col)
+            hist = np.array([np.sum(np_col == value) for value in unique_values])
+            ax.bar(unique_values, hist)
+            ax.set_xticks(np.arange(len(unique_values)), unique_values, rotation=45, horizontalalignment="right")
 
         for i in range(len(col_names), n_rows * n_cols):
             fig.delaxes(axs.flatten()[i])  # Remove empty subplots
