@@ -1153,7 +1153,7 @@ class Table:
 
     _T = TypeVar("_T")
 
-    def group_rows_by(self, key_selector: Callable[[Row], _T]) -> dict[_T, Table]:
+    def group_rows(self, key_selector: Callable[[Row], _T]) -> dict[_T, Table]:
         """
         Return a dictionary with copies of the output tables as values and the keys from the key_selector.
 
