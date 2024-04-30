@@ -2228,14 +2228,14 @@ class Table:
                     for i in range(len(hist)):
                         bars = np.append(bars, f'{round(bin_edges[i], 2)}-{round(bin_edges[i+1], 2)}')
 
-                    ax.bar(bars, hist)
+                    ax.bar(bars, hist, edgecolor='black')
                     ax.set_xticks(np.arange(len(hist)), bars, rotation=45, horizontalalignment="right")
                     continue
 
             np_col = np_col.astype(str)
             unique_values = np.unique(np_col)
             hist = np.array([np.sum(np_col == value) for value in unique_values])
-            ax.bar(unique_values, hist)
+            ax.bar(unique_values, hist, edgecolor='black')
             ax.set_xticks(np.arange(len(unique_values)), unique_values, rotation=45, horizontalalignment="right")
 
         for i in range(len(col_names), n_rows * n_cols):
