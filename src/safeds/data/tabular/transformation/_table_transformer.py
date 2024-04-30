@@ -21,10 +21,10 @@ class TableTransformer(ABC):
         hash:
             The hash value.
         """
-        added = self.get_names_of_added_columns() if self.is_fitted() else []
-        changed = self.get_names_of_changed_columns() if self.is_fitted() else []
-        removed = self.get_names_of_removed_columns() if self.is_fitted() else []
-        return _structural_hash(self.__class__.__qualname__, self.is_fitted(), added, changed, removed)
+        added = self.get_names_of_added_columns() if self.is_fitted else []
+        changed = self.get_names_of_changed_columns() if self.is_fitted else []
+        removed = self.get_names_of_removed_columns() if self.is_fitted else []
+        return _structural_hash(self.__class__.__qualname__, self.is_fitted, added, changed, removed)
 
     @abstractmethod
     def fit(self, table: Table, column_names: list[str] | None) -> TableTransformer:
@@ -117,16 +117,10 @@ class TableTransformer(ABC):
             If the transformer has not been fitted yet.
         """
 
+    @property
     @abstractmethod
     def is_fitted(self) -> bool:
-        """
-        Check if the transformer is fitted.
-
-        Returns
-        -------
-        is_fitted : bool
-            Whether the transformer is fitted.
-        """
+        """Whether the transformer is fitted."""
 
     def fit_and_transform(self, table: Table, column_names: list[str] | None = None) -> Table:
         """

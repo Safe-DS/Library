@@ -25,7 +25,7 @@ class Classifier(ABC):
         hash:
             The hash value.
         """
-        return _structural_hash(self.__class__.__qualname__, self.is_fitted())
+        return _structural_hash(self.__class__.__qualname__, self.is_fitted)
 
     @abstractmethod
     def fit(self, training_set: TaggedTable) -> Classifier:
@@ -77,16 +77,10 @@ class Classifier(ABC):
             If predicting with the given dataset failed.
         """
 
+    @property
     @abstractmethod
     def is_fitted(self) -> bool:
-        """
-        Check if the classifier is fitted.
-
-        Returns
-        -------
-        is_fitted : bool
-            Whether the classifier is fitted.
-        """
+        """Whether the classifier is fitted."""
 
     @abstractmethod
     def _get_sklearn_classifier(self) -> ClassifierMixin:

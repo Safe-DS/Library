@@ -261,15 +261,9 @@ class Imputer(TableTransformer):
         )
         return Table._from_pandas_dataframe(data, table.schema)
 
+    @property
     def is_fitted(self) -> bool:
-        """
-        Check if the transformer is fitted.
-
-        Returns
-        -------
-        is_fitted : bool
-            Whether the transformer is fitted.
-        """
+        """Whether the transformer is fitted."""
         return self._wrapped_transformer is not None
 
     def get_names_of_added_columns(self) -> list[str]:
@@ -286,7 +280,7 @@ class Imputer(TableTransformer):
         TransformerNotFittedError
             If the transformer has not been fitted yet.
         """
-        if not self.is_fitted():
+        if not self.is_fitted:
             raise TransformerNotFittedError
         return []
 
@@ -323,6 +317,6 @@ class Imputer(TableTransformer):
         TransformerNotFittedError
             If the transformer has not been fitted yet.
         """
-        if not self.is_fitted():
+        if not self.is_fitted:
             raise TransformerNotFittedError
         return []

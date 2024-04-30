@@ -167,7 +167,7 @@ class TestIsFitted:
     @pytest.mark.parametrize("strategy", strategies(), ids=lambda x: x.__class__.__name__)
     def test_should_return_false_before_fitting(self, strategy: ImputerStrategy) -> None:
         transformer = Imputer(strategy)
-        assert not transformer.is_fitted()
+        assert not transformer.is_fitted
 
     @pytest.mark.parametrize("strategy", strategies(), ids=lambda x: x.__class__.__name__)
     def test_should_return_true_after_fitting(self, strategy: ImputerStrategy) -> None:
@@ -179,7 +179,7 @@ class TestIsFitted:
 
         transformer = Imputer(strategy)
         fitted_transformer = transformer.fit(table, None)
-        assert fitted_transformer.is_fitted()
+        assert fitted_transformer.is_fitted
 
 
 class TestFitAndTransform:

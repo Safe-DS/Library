@@ -31,7 +31,7 @@ class ArimaModelRegressor:
         hash:
             The hash value.
         """
-        return _structural_hash(self.__class__.__qualname__, self.is_fitted(), self._order)
+        return _structural_hash(self.__class__.__qualname__, self.is_fitted, self._order)
 
     def __init__(self) -> None:
         # Internal state
@@ -137,7 +137,7 @@ class ArimaModelRegressor:
         result_table = time_series._as_table()
         result_table = result_table.remove_columns([time_series.target.name])
         # Validation
-        if not self.is_fitted() or self._arima is None:
+        if not self.is_fitted or self._arima is None:
             raise ModelNotFittedError
 
         # forecast
@@ -178,7 +178,7 @@ class ArimaModelRegressor:
         """
         import matplotlib.pyplot as plt
 
-        if not self.is_fitted() or self._arima is None:
+        if not self.is_fitted or self._arima is None:
             raise ModelNotFittedError
         test_data = test_series.target._data.to_numpy()
         n_steps = len(test_data)
@@ -198,13 +198,7 @@ class ArimaModelRegressor:
         buffer.seek(0)
         return Image.from_bytes(buffer.read())
 
+    @property
     def is_fitted(self) -> bool:
-        """
-        Check if the classifier is fitted.
-
-        Returns
-        -------
-        is_fitted:
-            Whether the regressor is fitted.
-        """
+        """Whether the regressor is fitted."""
         return self._fitted

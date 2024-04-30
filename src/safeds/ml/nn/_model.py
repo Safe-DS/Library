@@ -169,14 +169,7 @@ class NeuralNetworkRegressor(Generic[IFT, IPT, OT]):
 
     @property
     def is_fitted(self) -> bool:
-        """
-        Check if the model is fitted.
-
-        Returns
-        -------
-        is_fitted
-            Whether the model is fitted.
-        """
+        """Whether the model is fitted."""
         return self._is_fitted
 
 
@@ -334,14 +327,7 @@ class NeuralNetworkClassifier(Generic[IFT, IPT, OT]):
 
     @property
     def is_fitted(self) -> bool:
-        """
-        Check if the model is fitted.
-
-        Returns
-        -------
-        is_fitted :
-            Whether the model is fitted.
-        """
+        """Whether the model is fitted."""
         return self._is_fitted
 
 

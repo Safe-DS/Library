@@ -339,15 +339,9 @@ class OneHotEncoder(InvertibleTableTransformer):
 
         return table.sort_columns(lambda col1, col2: column_names.index(col1.name) - column_names.index(col2.name))
 
+    @property
     def is_fitted(self) -> bool:
-        """
-        Check if the transformer is fitted.
-
-        Returns
-        -------
-        is_fitted : bool
-            Whether the transformer is fitted.
-        """
+        """Whether the transformer is fitted."""
         return (
             self._column_names is not None
             and self._value_to_column is not None
@@ -387,7 +381,7 @@ class OneHotEncoder(InvertibleTableTransformer):
         TransformerNotFittedError
             If the transformer has not been fitted yet.
         """
-        if not self.is_fitted():
+        if not self.is_fitted:
             raise TransformerNotFittedError
         return []
 

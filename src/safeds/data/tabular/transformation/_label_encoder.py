@@ -177,15 +177,9 @@ class LabelEncoder(InvertibleTableTransformer):
         data[self._column_names] = self._wrapped_transformer.inverse_transform(data[self._column_names])
         return Table._from_pandas_dataframe(data)
 
+    @property
     def is_fitted(self) -> bool:
-        """
-        Check if the transformer is fitted.
-
-        Returns
-        -------
-        is_fitted : bool
-            Whether the transformer is fitted.
-        """
+        """Whether the transformer is fitted."""
         return self._wrapped_transformer is not None
 
     def get_names_of_added_columns(self) -> list[str]:
@@ -202,7 +196,7 @@ class LabelEncoder(InvertibleTableTransformer):
         TransformerNotFittedError
             If the transformer has not been fitted yet.
         """
-        if not self.is_fitted():
+        if not self.is_fitted:
             raise TransformerNotFittedError
         return []
 
@@ -239,6 +233,6 @@ class LabelEncoder(InvertibleTableTransformer):
         TransformerNotFittedError
             If the transformer has not been fitted yet.
         """
-        if not self.is_fitted():
+        if not self.is_fitted:
             raise TransformerNotFittedError
         return []

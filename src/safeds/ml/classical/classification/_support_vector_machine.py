@@ -305,15 +305,9 @@ class SupportVectorMachineClassifier(Classifier):
         """
         return predict(self._wrapped_classifier, dataset, self._feature_names, self._target_name)
 
+    @property
     def is_fitted(self) -> bool:
-        """
-        Check if the classifier is fitted.
-
-        Returns
-        -------
-        is_fitted : bool
-            Whether the classifier is fitted.
-        """
+        """Whether the classifier is fitted."""
         return self._wrapped_classifier is not None
 
     def _get_sklearn_classifier(self) -> ClassifierMixin:
