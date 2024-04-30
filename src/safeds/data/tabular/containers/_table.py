@@ -2205,14 +2205,14 @@ class Table:
         n_rows = (len(self.column_names) + n_cols - 1) // n_cols  # Calculate the number of rows dynamically
 
         if n_cols == 1 and n_rows == 1:
-            oneCol = True
+            one_col = True
             fig, axs = plt.subplots(1, 1, tight_layout=True, figsize=(3, 3))
         else:
-            oneCol = False
+            one_col = False
             fig, axs = plt.subplots(n_rows, n_cols, tight_layout=True, figsize=(n_cols * 3, n_rows * 3))
 
         col_names = self.column_names
-        for col, ax in zip(col_names, axs.flatten() if not oneCol else [axs]):
+        for col, ax in zip(col_names, axs.flatten() if not one_col else [axs]):
             np_col = np.array(self.get_column(col))
             bins = len(pd.unique(np_col))
 
@@ -2223,7 +2223,7 @@ class Table:
             ax.set_xlabel("")
             ax.set_ylabel("")
 
-            if self.get_column(col).all(lambda x: type(x) != str and not isinstance(x, bool)):
+            if self.get_column(col).all(lambda x: type(x) != str and type(x) != bool):
                 np_col = np_col[~np.isnan(np_col)]
                 min_val = np.min(np_col)
                 max_val = np.max(np_col)
