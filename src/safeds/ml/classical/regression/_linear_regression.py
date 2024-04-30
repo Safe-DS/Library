@@ -98,15 +98,9 @@ class LinearRegressionRegressor(Regressor):
         """
         return predict(self._wrapped_regressor, dataset, self._feature_names, self._target_name)
 
+    @property
     def is_fitted(self) -> bool:
-        """
-        Check if the regressor is fitted.
-
-        Returns
-        -------
-        is_fitted : bool
-            Whether the regressor is fitted.
-        """
+        """Whether the regressor is fitted."""
         return self._wrapped_regressor is not None
 
     def _get_sklearn_regressor(self) -> RegressorMixin:

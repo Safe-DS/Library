@@ -23,7 +23,7 @@ class Regressor(ABC):
         hash:
             The hash value.
         """
-        return _structural_hash(self.__class__.__qualname__, self.is_fitted())
+        return _structural_hash(self.__class__.__qualname__, self.is_fitted)
 
     @abstractmethod
     def fit(self, training_set: TaggedTable) -> Regressor:
@@ -75,16 +75,10 @@ class Regressor(ABC):
             If predicting with the given dataset failed.
         """
 
+    @property
     @abstractmethod
     def is_fitted(self) -> bool:
-        """
-        Check if the classifier is fitted.
-
-        Returns
-        -------
-        is_fitted : bool
-            Whether the regressor is fitted.
-        """
+        """Whether the regressor is fitted."""
 
     @abstractmethod
     def _get_sklearn_regressor(self) -> RegressorMixin:
