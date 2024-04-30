@@ -2177,7 +2177,7 @@ class Table:
         buffer.seek(0)
         return Image.from_bytes(buffer.read())
 
-    def plot_histograms(self, n_bins : int = 10) -> Image:
+    def plot_histograms(self, *, number_of_bins : int = 10) -> Image:
         """
         Plot a histogram for every column.
 
