@@ -2214,10 +2214,7 @@ class Table:
         col_names = self.column_names
         for col, ax in zip(col_names, axs.flatten() if not one_col else [axs]):
             np_col = np.array(self.get_column(col))
-            bins = len(pd.unique(np_col))
-
-            if bins > n_bins:
-                bins = n_bins
+            bins = min(n_bins, len(pd.unique(np_col)))
 
             ax.set_title(col)
             ax.set_xlabel("")
