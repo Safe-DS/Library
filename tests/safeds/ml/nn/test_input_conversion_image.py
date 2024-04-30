@@ -27,7 +27,7 @@ class TestIsFitDataValid:
             (ImageDataset(_test_image_list, _test_image_list), ImageDataset(_test_image_list, _test_image_list.resize(20, 20))),
         ]
     )
-    def test_should_return_false_if_fit_data_is_invalid(self, image_dataset_valid: ImageDataset, image_dataset_invalid: ImageDataset):
+    def test_should_return_false_if_fit_data_is_invalid(self, image_dataset_valid: ImageDataset, image_dataset_invalid: ImageDataset) -> None:
         input_conversion = InputConversionImage(image_dataset_valid.input_size)
         assert input_conversion._is_fit_data_valid(image_dataset_valid)
         assert input_conversion._is_fit_data_valid(image_dataset_valid)

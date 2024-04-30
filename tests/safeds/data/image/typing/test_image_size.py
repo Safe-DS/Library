@@ -88,6 +88,16 @@ class TestSizeOf:
         assert sys.getsizeof(image_size) >= sys.getsizeof(0) * 3
 
 
+class TestStr:
+
+    @pytest.mark.parametrize(
+        "image_size",
+        [ImageSize(1, 2, 3)]
+    )
+    def test_should_size_be_greater_than_normal_object(self, image_size: ImageSize) -> None:
+        assert str(image_size) == f"{image_size.width}x{image_size.height}x{image_size.channel} (WxHxC)"
+
+
 class TestProperties:
 
     @pytest.mark.parametrize(
@@ -102,7 +112,7 @@ class TestProperties:
         "channel",
         [1, 3, 4]
     )
-    def test_width_height_channel(self, width: int, height: int, channel: int):
+    def test_width_height_channel(self, width: int, height: int, channel: int) -> None:
         image_size = ImageSize(width, height, channel)
         assert image_size.width == width
         assert image_size.height == height

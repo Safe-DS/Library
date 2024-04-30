@@ -4,6 +4,7 @@ from typing import Any
 import pytest
 from torch import nn
 
+from safeds.data.image.typing import ImageSize
 from safeds.exceptions import OutOfBoundsError
 from safeds.ml.nn import ForwardLayer
 
@@ -90,6 +91,12 @@ def test_should_raise_if_output_size_out_of_bounds(output_size: int) -> None:
 )
 def test_should_raise_if_output_size_doesnt_match(output_size: int) -> None:
     assert ForwardLayer(output_size=output_size, input_size=1).output_size == output_size
+
+
+def test_should_raise_if_input_size_is_set_with_image_size() -> None:
+    layer = ForwardLayer(1)
+    with pytest.raises(ValueError, match=r"The input_size of a forward layer has to be of type int."):
+        layer._set_input_size(ImageSize(1, 2, 3))
 
 
 @pytest.mark.parametrize(

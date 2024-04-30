@@ -44,6 +44,19 @@ class ImageSize:
 
     @staticmethod
     def from_image(image: Image) -> ImageSize:
+        """
+        Create a `ImageSize` of a given image.
+
+        Parameters
+        ----------
+        image:
+            the given image for the `ImageSize`
+
+        Returns
+        -------
+        image_size:
+            the calculated `ImageSize`
+        """
         return ImageSize(image.width, image.height, image.channel)
 
     def __eq__(self, other: object) -> bool:
@@ -51,11 +64,14 @@ class ImageSize:
             return NotImplemented
         return self._width == other._width and self._height == other._height and self._channel == other._channel
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return _structural_hash(self._width, self._height, self._channel)
 
-    def __sizeof__(self):
+    def __sizeof__(self) -> int:
         return sys.getsizeof(self._width) + sys.getsizeof(self._height) + sys.getsizeof(self._channel)
+
+    def __str__(self):
+        return f"{self._width}x{self._height}x{self._channel} (WxHxC)"
 
     @property
     def width(self) -> int:

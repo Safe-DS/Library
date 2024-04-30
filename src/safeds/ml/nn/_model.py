@@ -28,6 +28,10 @@ if TYPE_CHECKING:
     from safeds.ml.nn._layer import _Layer
     from safeds.ml.nn._output_conversion import _OutputConversion
 
+    from safeds.data.tabular.transformation import OneHotEncoder
+
+    from safeds.data.image.typing import ImageSize
+
 IFT = TypeVar("IFT", TaggedTable, TimeSeries, ImageDataset)  # InputFitType
 IPT = TypeVar("IPT", Table, TimeSeries, ImageList)  # InputPredictType
 OT = TypeVar("OT", TaggedTable, TimeSeries, ImageDataset)  # OutputType
@@ -288,7 +292,7 @@ class NeuralNetworkClassifier(Generic[IFT, IPT, OT]):
         self._input_size = self._model.input_size
         self._batch_size = 1
         self._is_fitted = False
-        self._num_of_classes = layers[-1].output_size
+        self._num_of_classes = int(layers[-1].output_size)
         self._total_number_of_batches_done = 0
         self._total_number_of_epochs_done = 0
 
@@ -426,9 +430,12 @@ class NeuralNetworkClassifier(Generic[IFT, IPT, OT]):
                 else:
                     predictions.append(elem.squeeze(dim=1).round())
         if isinstance(self._output_conversion, OutputConversionImageToTable) and isinstance(self._input_conversion, InputConversionImage):
-            return self._output_conversion._data_conversion(test_data, torch.cat(predictions, dim=0), column_names=self._input_conversion._column_names)
+            _column_names: list[str] = self._input_conversion._column_names
+            return self._output_conversion._data_conversion(test_data, torch.cat(predictions, dim=0), column_names=_column_names)
         if isinstance(self._output_conversion, OutputConversionImageToColumn) and isinstance(self._input_conversion, InputConversionImage):
-            return self._output_conversion._data_conversion(test_data, torch.cat(predictions, dim=0), column_name=self._input_conversion._column_name, one_hot_encoder=self._input_conversion._one_hot_encoder)
+            _column_name: str = self._input_conversion._column_name
+            _one_hot_encoder: OneHotEncoder = self._input_conversion._one_hot_encoder
+            return self._output_conversion._data_conversion(test_data, torch.cat(predictions, dim=0), column_name=_column_name, one_hot_encoder=_one_hot_encoder)
         return self._output_conversion._data_conversion(test_data, torch.cat(predictions, dim=0))
 
     @property
@@ -468,14 +475,14 @@ def _create_internal_model(input_conversion: _InputConversion[IFT, IPT], layers:
 
             if is_for_classification:
                 internal_layers.pop()
-                if layers[-1].output_size > 2:
+                if int(layers[-1].output_size) > 2:
                     internal_layers.append(layers[-1]._get_internal_layer(activation_function="none"))
                 else:
                     internal_layers.append(layers[-1]._get_internal_layer(activation_function="sigmoid"))
             self._pytorch_layers = nn.Sequential(*internal_layers)
 
         @property
-        def input_size(self) -> int:
+        def input_size(self) -> int | ImageSize:
             return self._layer_list[0].input_size
 
         def forward(self, x: Tensor) -> Tensor:

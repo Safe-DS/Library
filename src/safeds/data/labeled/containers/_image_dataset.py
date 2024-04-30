@@ -35,7 +35,7 @@ class ImageDataset(Generic[T]):
         weather the data should be shuffled after each epoch of training
     """
 
-    def __init__(self, input_data: ImageList, output_data: T, batch_size=1, shuffle=False) -> None:
+    def __init__(self, input_data: ImageList, output_data: T, batch_size: int = 1, shuffle: bool = False) -> None:
         import torch
 
         self._shuffle_tensor_indices = torch.LongTensor(list(range(len(input_data))))
@@ -49,7 +49,7 @@ class ImageDataset(Generic[T]):
             raise ValueError("The given input ImageList contains no images.")  # noqa: TRY004
         else:
             self._input_size = ImageSize(input_data.widths[0], input_data.heights[0], input_data.channel)
-            self._input = input_data
+            self._input: _SingleSizeImageList = input_data._as_single_size_image_list()
         if ((isinstance(output_data, Table) or isinstance(output_data, Column)) and len(input_data) != output_data.number_of_rows) or (isinstance(output_data, ImageList) and len(input_data) != len(output_data)):
             raise OutputLengthMismatchError(f"{len(input_data)} != {output_data.number_of_rows if isinstance(output_data, Table) else len(output_data)}")
         if isinstance(output_data, Table):
@@ -64,17 +64,19 @@ class ImageDataset(Generic[T]):
                 raise NonNumericColumnError(f"Columns {non_numerical_columns} are not numerical.")
             if len(wrong_interval_columns) > 0:
                 raise ValueError(f"Columns {wrong_interval_columns} have values outside of the interval [0, 1].")
-            _output = _TableAsTensor(output_data)
-            self._output_size = output_data.number_of_columns
+            _output: _TableAsTensor | _ColumnAsTensor | _SingleSizeImageList = _TableAsTensor(output_data)
+            _output_size: int | ImageSize = output_data.number_of_columns
         elif isinstance(output_data, Column):
-            _output = _ColumnAsTensor(output_data)
-            self._output_size = len(_output._one_hot_encoder.get_names_of_added_columns())
+            _column_as_tensor = _ColumnAsTensor(output_data)
+            _output_size = len(_column_as_tensor._one_hot_encoder.get_names_of_added_columns())
+            _output = _column_as_tensor
         elif isinstance(output_data, _SingleSizeImageList):
             _output = output_data.clone()._as_single_size_image_list()
-            self._output_size = ImageSize(output_data.widths[0], output_data.heights[0], output_data.channel)
+            _output_size = ImageSize(output_data.widths[0], output_data.heights[0], output_data.channel)
         else:
             raise ValueError("The given output ImageList contains images of different sizes.")  # noqa: TRY004
         self._output = _output
+        self._output_size = _output_size
 
     def __iter__(self) -> ImageDataset:
         if self._shuffle_after_epoch:
@@ -138,9 +140,9 @@ class ImageDataset(Generic[T]):
             the output data of this dataset
         """
         output = self._output
-        if isinstance(output, _TableAsTensor):
+        if self.__orig_class__.__args__[0] == _TableAsTensor:
             return output._to_table()
-        elif isinstance(output, _ColumnAsTensor):
+        elif self.__orig_class__.__args__[0] == _ColumnAsTensor:
             return output._to_column()
         else:
             return output

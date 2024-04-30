@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, TypeVar
+from typing import TYPE_CHECKING, TypeVar, Unpack, Any
 
 from safeds.data.image.containers import ImageList
 from safeds.data.labeled.containers import ImageDataset
@@ -23,13 +23,13 @@ class _OutputConversionImage(_OutputConversion[ImageList, ImageDataset[T]], ABC)
     """The output conversion for a neural network, defines the output parameters for the neural network."""
 
     @abstractmethod
-    def _data_conversion(self, **kwargs) -> ImageDataset[T]:
+    def _data_conversion(self, input_data: ImageList, output_data: Tensor, **kwargs: Unpack[dict[str, Any]]) -> ImageDataset[T]:
         pass  # pragma: no cover
 
 
 class OutputConversionImageToColumn(_OutputConversionImage[Column]):
 
-    def _data_conversion(self, input_data: ImageList, output_data: Tensor, *, column_name: str, one_hot_encoder: OneHotEncoder) -> ImageDataset[Column]:
+    def _data_conversion(self, input_data: ImageList, output_data: Tensor, column_name: str, one_hot_encoder: OneHotEncoder, **kwargs: Unpack[dict[str, Any]]) -> ImageDataset[Column]:
         import torch
 
         if not isinstance(input_data, _SingleSizeImageList):
@@ -51,7 +51,7 @@ class OutputConversionImageToColumn(_OutputConversionImage[Column]):
 
 class OutputConversionImageToTable(_OutputConversionImage[Table]):
 
-    def _data_conversion(self, input_data: ImageList, output_data: Tensor, *, column_names: list[str]) -> ImageDataset[Table]:
+    def _data_conversion(self, input_data: ImageList, output_data: Tensor, column_names: list[str], **kwargs: Unpack[dict[str, Any]]) -> ImageDataset[Table]:
         import torch
 
         if not isinstance(input_data, _SingleSizeImageList):
@@ -73,7 +73,7 @@ class OutputConversionImageToTable(_OutputConversionImage[Table]):
 
 class OutputConversionImageToImage(_OutputConversionImage[ImageList]):
 
-    def _data_conversion(self, input_data: ImageList, output_data: Tensor) -> ImageDataset[ImageList]:
+    def _data_conversion(self, input_data: ImageList, output_data: Tensor, **kwargs: Unpack[dict[str, Any]]) -> ImageDataset[ImageList]:
         import torch
 
         if not isinstance(input_data, _SingleSizeImageList):

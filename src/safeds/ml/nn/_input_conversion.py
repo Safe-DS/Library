@@ -3,6 +3,8 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Generic, TypeVar
 
+from safeds.data.image.containers._single_size_image_list import _SingleSizeImageList
+
 if TYPE_CHECKING:
     from torch.utils.data import DataLoader
 
@@ -29,7 +31,7 @@ class _InputConversion(Generic[FT, PT], ABC):
         pass  # pragma: no cover
 
     @abstractmethod
-    def _data_conversion_predict(self, input_data: PT, batch_size: int) -> DataLoader | ImageList:
+    def _data_conversion_predict(self, input_data: PT, batch_size: int) -> DataLoader | _SingleSizeImageList:
         pass  # pragma: no cover
 
     @abstractmethod

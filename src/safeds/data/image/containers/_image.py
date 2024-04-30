@@ -25,7 +25,7 @@ if TYPE_CHECKING:
     from torch import Tensor
     from torch.types import Device
 
-    from numpy import ndarray
+    from numpy import ndarray, dtype
 
 
 class Image:
@@ -167,7 +167,7 @@ class Image:
         """
         return sys.getsizeof(self._image_tensor) + self._image_tensor.element_size() * self._image_tensor.nelement()
 
-    def __array__(self, dtype=None) -> ndarray:
+    def __array__(self, numpy_dtype: str | dtype = None) -> ndarray:
         """
         Return the image as a numpy array.
 
@@ -178,7 +178,7 @@ class Image:
         """
         from numpy import uint8
 
-        return self._image_tensor.permute(1, 2, 0).detach().cpu().numpy().astype(uint8 if dtype is None else dtype)
+        return self._image_tensor.permute(1, 2, 0).detach().cpu().numpy().astype(uint8 if numpy_dtype is None else numpy_dtype)
 
     def _repr_jpeg_(self) -> bytes | None:
         """

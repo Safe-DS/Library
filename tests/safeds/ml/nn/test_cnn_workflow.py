@@ -12,6 +12,7 @@ from safeds.data.tabular.transformation import OneHotEncoder
 from safeds.ml.nn import NeuralNetworkClassifier, InputConversionImage, Convolutional2DLayer, MaxPooling2DLayer, \
     FlattenLayer, ForwardLayer, OutputConversionImageToTable, ConvolutionalTranspose2DLayer, NeuralNetworkRegressor, \
     AvgPooling2DLayer
+from safeds.ml.nn._layer import _Layer
 from safeds.ml.nn._output_conversion_image import OutputConversionImageToColumn, OutputConversionImageToImage
 from tests.helpers import resolve_resource_path, images_all, device_cuda, device_cpu, skip_if_device_not_available
 
@@ -28,14 +29,19 @@ class TestImageToTableClassifier:
         ],
         ids=["seed-1234-cuda", "seed-4711-cuda", "seed-1234-cpu", "seed-4711-cpu"]
     )
-    def test_should_train_and_predict_model(self, seed: int, layer_3_bias: list[float], prediction_label: list[str], device: Device):
+    def test_should_train_and_predict_model(self, seed: int, layer_3_bias: list[float], prediction_label: list[str], device: Device) -> None:
         skip_if_device_not_available(device)
         torch.set_default_device(device)
         torch.manual_seed(seed)
 
         image_list, filenames = ImageList.from_files(resolve_resource_path(images_all()), return_filenames=True)
         image_list = image_list.resize(20, 20)
-        image_classes = Table({"class": [re.search(r"(.*)[\\/](.*)\.", filename).group(2) for filename in filenames]})
+        classes = []
+        for filename in filenames:
+            groups = re.search(r"(.*)[\\/](.*)\.", filename)
+            if groups is not None:
+                classes.append(groups.group(2))
+        image_classes = Table({"class": classes})
         one_hot_encoder = OneHotEncoder().fit(image_classes, ["class"])
         image_classes_one_hot_encoded = one_hot_encoder.transform(image_classes)
         image_dataset = ImageDataset(image_list, image_classes_one_hot_encoded)
@@ -43,7 +49,7 @@ class TestImageToTableClassifier:
             Convolutional2DLayer(1, 2),
             MaxPooling2DLayer(10),
             FlattenLayer(),
-            ForwardLayer(image_dataset.output_size)
+            ForwardLayer(int(image_dataset.output_size))
         ]
         nn_original = NeuralNetworkClassifier(InputConversionImage(image_dataset.input_size), layers,
                                               OutputConversionImageToTable())
@@ -66,21 +72,26 @@ class TestImageToColumnClassifier:
         ],
         ids=["seed-1234-cuda", "seed-4711-cuda", "seed-1234-cpu", "seed-4711-cpu"]
     )
-    def test_should_train_and_predict_model(self, seed: int, layer_3_bias: list[float], prediction_label: list[str], device: Device):
+    def test_should_train_and_predict_model(self, seed: int, layer_3_bias: list[float], prediction_label: list[str], device: Device) -> None:
         skip_if_device_not_available(device)
         torch.set_default_device(device)
         torch.manual_seed(seed)
 
         image_list, filenames = ImageList.from_files(resolve_resource_path(images_all()), return_filenames=True)
         image_list = image_list.resize(20, 20)
-        image_classes = Column("class", [re.search(r"(.*)[\\/](.*)\.", filename).group(2) for filename in filenames])
+        classes = []
+        for filename in filenames:
+            groups = re.search(r"(.*)[\\/](.*)\.", filename)
+            if groups is not None:
+                classes.append(groups.group(2))
+        image_classes = Column("class", classes)
         image_dataset = ImageDataset(image_list, image_classes, shuffle=True)
 
         layers = [
             Convolutional2DLayer(1, 2),
             AvgPooling2DLayer(10),
             FlattenLayer(),
-            ForwardLayer(image_dataset.output_size)
+            ForwardLayer(int(image_dataset.output_size))
         ]
         nn_original = NeuralNetworkClassifier(InputConversionImage(image_dataset.input_size), layers,
                                               OutputConversionImageToColumn())
@@ -103,7 +114,7 @@ class TestImageToImageRegressor:
         ],
         ids=["seed-1234-cuda", "seed-4711-cuda", "seed-1234-cpu", "seed-4711-cpu"]
     )
-    def test_should_train_and_predict_model(self, seed: int, snapshot_png_image_list: SnapshotAssertion, layer_3_bias: list[float], device: Device):
+    def test_should_train_and_predict_model(self, seed: int, snapshot_png_image_list: SnapshotAssertion, layer_3_bias: list[float], device: Device) -> None:
         skip_if_device_not_available(device)
         torch.set_default_device(device)
         torch.manual_seed(seed)
@@ -113,7 +124,7 @@ class TestImageToImageRegressor:
         image_list_grayscale = image_list.convert_to_grayscale()
         image_dataset = ImageDataset(image_list, image_list_grayscale)
 
-        layers = [
+        layers: list[_Layer] = [
             Convolutional2DLayer(6, 2),
             Convolutional2DLayer(12, 2),
             ConvolutionalTranspose2DLayer(6, 2),

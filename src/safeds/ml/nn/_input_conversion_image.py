@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Type
 
 from safeds.data.image.containers import ImageList
 from safeds.data.labeled.containers import ImageDataset
@@ -27,11 +27,11 @@ class InputConversionImage(_InputConversion[ImageDataset, ImageList]):
             the size of the input images
         """
         self._input_size = image_size
-        self._output_size = None
+        self._output_size: ImageSize | int | None = None
         self._one_hot_encoder: OneHotEncoder | None = None
         self._column_name: str | None = None
         self._column_names: list[str] | None = None
-        self._output_type = None
+        self._output_type: Type | None = None
 
     @property
     def _data_size(self) -> ImageSize:
@@ -40,8 +40,8 @@ class InputConversionImage(_InputConversion[ImageDataset, ImageList]):
     def _data_conversion_fit(self, input_data: ImageDataset, batch_size: int, num_of_classes: int = 1) -> ImageDataset:  # noqa: ARG002
         return input_data
 
-    def _data_conversion_predict(self, input_data: ImageList, batch_size: int) -> ImageList:  # noqa: ARG002
-        return input_data
+    def _data_conversion_predict(self, input_data: ImageList, batch_size: int) -> _SingleSizeImageList:  # noqa: ARG002
+        return input_data._as_single_size_image_list()
 
     def _is_fit_data_valid(self, input_data: ImageDataset) -> bool:
         if self._output_type is None:

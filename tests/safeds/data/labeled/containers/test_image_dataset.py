@@ -1,5 +1,5 @@
 import math
-from typing import Type
+from typing import Type, TypeVar
 
 import pytest
 import torch
@@ -15,6 +15,9 @@ from safeds.data.tabular.transformation import OneHotEncoder
 from safeds.exceptions import OutputLengthMismatchError, NonNumericColumnError, IndexOutOfBoundsError, OutOfBoundsError, \
     TransformerNotFittedError
 from tests.helpers import resolve_resource_path, plane_png_path, white_square_png_path, images_all
+
+
+T = TypeVar("T", Column, Table, ImageList)
 
 
 class TestImageDatasetInit:
@@ -34,7 +37,7 @@ class TestImageDatasetInit:
             (ImageList.from_files(resolve_resource_path(plane_png_path)), Table({"a": [-1]}), ValueError, r"Columns \['a'\] have values outside of the interval \[0, 1\]."),
         ]
     )
-    def test_should_raise_with_invalid_data(self, input_data: ImageList, output_data: Column | Table | ImageList, error: Type[Exception], error_msg: str) -> None:
+    def test_should_raise_with_invalid_data(self, input_data: ImageList, output_data: T, error: Type[Exception], error_msg: str) -> None:
         with pytest.raises(error, match=error_msg):
             ImageDataset(input_data, output_data)
 
