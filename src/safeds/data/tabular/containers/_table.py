@@ -2198,6 +2198,8 @@ class Table:
         >>> image = table.plot_histograms()
         """
         import matplotlib.pyplot as plt
+        import numpy as np
+        import pandas as pd
 
         n_cols = min(3, len(self.column_names))
         n_rows = (len(self.column_names) + n_cols - 1) // n_cols  # Calculate the number of rows dynamically
