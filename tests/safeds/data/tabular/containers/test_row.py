@@ -202,7 +202,6 @@ class TestHash:
     @pytest.mark.parametrize(
         ("row1", "row2"),
         [
-
             (Row({"col1": 0}), Row({"col1": 1})),
             (Row({"col1": 0}), Row({"col2": 0})),
             (Row({"col1": 0}), Row({"col1": "a"})),
@@ -346,7 +345,7 @@ class TestNumberOfColumns:
         ],
     )
     def test_should_return_the_number_of_columns(self, row: Row, expected: int) -> None:
-        assert row.number_of_column == expected
+        assert row.number_of_columns == expected
 
 
 class TestGetValue:
