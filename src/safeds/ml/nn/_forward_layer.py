@@ -66,7 +66,7 @@ class ForwardLayer(_Layer):
         if "activation_function" not in kwargs:
             raise ValueError("The activation_function is not set. The internal layer can only be created when the activation_function is provided in the kwargs.")
         else:
-            activation_function: str = kwargs.get("activation_function")
+            activation_function: str = kwargs["activation_function"]
         return _create_internal_model(self._input_size, self._output_size, activation_function)
 
     @property

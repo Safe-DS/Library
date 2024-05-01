@@ -66,7 +66,7 @@ class Convolutional2DLayer(_Layer):
         if kwargs.get("activation_function") not in ["sigmoid", "relu", "softmax"]:
             raise ValueError(f"The activation_function '{kwargs.get('activation_function')}' is not supported. Please choose one of the following: ['sigmoid', 'relu', 'softmax'].")
         else:
-            activation_function: Literal["sigmoid", "relu", "softmax"] = kwargs.get("activation_function")
+            activation_function: Literal["sigmoid", "relu", "softmax"] = kwargs["activation_function"]
         return _create_internal_model(self._input_size.channel, self._output_channel, self._kernel_size, activation_function, self._padding, self._stride, transpose=False)
 
     @property
@@ -148,7 +148,7 @@ class ConvolutionalTranspose2DLayer(Convolutional2DLayer):
         if kwargs.get("activation_function") not in ["sigmoid", "relu", "softmax"]:
             raise ValueError(f"The activation_function '{kwargs.get('activation_function')}' is not supported. Please choose one of the following: ['sigmoid', 'relu', 'softmax'].")
         else:
-            activation_function: Literal["sigmoid", "relu", "softmax"] = kwargs.get("activation_function")
+            activation_function: Literal["sigmoid", "relu", "softmax"] = kwargs["activation_function"]
         return _create_internal_model(self._input_size.channel, self._output_channel, self._kernel_size, activation_function, self._padding, self._stride, transpose=True, output_padding=self._output_padding)
 
     @property

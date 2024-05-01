@@ -1,20 +1,6 @@
 from safeds.data.image.typing import ImageSize
 
 
-class DatasetContainsTargetError(ValueError):
-    """
-    Raised when a dataset contains the target column already.
-
-    Parameters
-    ----------
-    target_name: str
-        The name of the target column.
-    """
-
-    def __init__(self, target_name: str):
-        super().__init__(f"Dataset already contains the target column '{target_name}'.")
-
-
 class DatasetMissesFeaturesError(ValueError):
     """
     Raised when a dataset misses feature columns.

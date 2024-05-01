@@ -38,8 +38,8 @@ class OutputConversionImageToColumn(_OutputConversionImage[Column]):
             raise ValueError("The column_name is not set. The data can only be converted if the column_name is provided as `str` in the kwargs.")
         if "one_hot_encoder" not in kwargs or not isinstance(kwargs.get("one_hot_encoder"), OneHotEncoder):
             raise ValueError("The one_hot_encoder is not set. The data can only be converted if the one_hot_encoder is provided as `OneHotEncoder` in the kwargs.")
-        one_hot_encoder: OneHotEncoder = kwargs.get("one_hot_encoder")
-        column_name: str = kwargs.get("column_name")
+        one_hot_encoder: OneHotEncoder = kwargs["one_hot_encoder"]
+        column_name: str = kwargs["column_name"]
 
         output = torch.zeros(len(input_data), len(one_hot_encoder.get_names_of_added_columns()))
         output[torch.arange(len(input_data)), output_data] = 1
@@ -62,9 +62,9 @@ class OutputConversionImageToTable(_OutputConversionImage[Table]):
 
         if not isinstance(input_data, _SingleSizeImageList):
             raise ValueError("The given input ImageList contains images of different sizes.")  # noqa: TRY004
-        if "column_names" not in kwargs or not isinstance(kwargs.get("column_names"), list) and all(isinstance(element, str) for element in kwargs.get("column_names")):
+        if "column_names" not in kwargs or not isinstance(kwargs.get("column_names"), list) and all(isinstance(element, str) for element in kwargs["column_names"]):
             raise ValueError("The column_names are not set. The data can only be converted if the column_names are provided as `list[str]` in the kwargs.")
-        column_names: list[str] = kwargs.get("column_names")
+        column_names: list[str] = kwargs["column_names"]
 
         output = torch.zeros(len(input_data), len(column_names))
         output[torch.arange(len(input_data)), output_data] = 1
