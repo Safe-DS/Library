@@ -16,10 +16,10 @@ from safeds.ml.nn._output_conversion import _OutputConversion
 
 from safeds.data.tabular.transformation import OneHotEncoder
 
-T = TypeVar("T", Column, Table, ImageList)
+T = TypeVar("T", ImageDataset[Column], ImageDataset[Table], ImageDataset[ImageList])
 
 
-class _OutputConversionImage(_OutputConversion[ImageList, ImageDataset[T]], ABC):
+class _OutputConversionImage(_OutputConversion[ImageList, T], ABC):
     """The output conversion for a neural network, defines the output parameters for the neural network."""
 
     @abstractmethod

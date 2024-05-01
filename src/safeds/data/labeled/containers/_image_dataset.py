@@ -145,11 +145,11 @@ class ImageDataset(Generic[T]):
         """
         output = self._output
         if isinstance(output, _TableAsTensor):
-            return output._to_table()  # type: ignore[assignment]
+            return output._to_table()  # mypy: ignore[assignment] ignore[return-value]
         elif isinstance(output, _ColumnAsTensor):
-            return output._to_column()  # type: ignore[assignment]
+            return output._to_column()  # mypy: ignore[assignment] ignore[return-value]
         else:
-            return output  # type: ignore[assignment]
+            return output  # mypy: ignore[assignment] ignore[return-value]
 
     def _get_batch(self, batch_number: int, batch_size: int | None = None) -> tuple[Tensor, Tensor]:
         import torch
