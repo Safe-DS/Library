@@ -21,7 +21,7 @@ class _OutputConversionImage:
     pass  # pragma: no cover
 
 
-class OutputConversionImageToColumn(_OutputConversion[ImageList, ImageDataset[Column]], _OutputConversionImage):
+class OutputConversionImageToColumn(_OutputConversion[ImageList, ImageDataset], _OutputConversionImage):
 
     def _data_conversion(self, input_data: ImageList, output_data: Tensor, **kwargs: Any) -> ImageDataset[Column]:
         import torch
@@ -49,7 +49,7 @@ class OutputConversionImageToColumn(_OutputConversion[ImageList, ImageDataset[Co
         return im_dataset
 
 
-class OutputConversionImageToTable(_OutputConversion[ImageList, ImageDataset[Table]], _OutputConversionImage):
+class OutputConversionImageToTable(_OutputConversion[ImageList, ImageDataset], _OutputConversionImage):
 
     def _data_conversion(self, input_data: ImageList, output_data: Tensor, **kwargs: Any) -> ImageDataset[Table]:
         import torch
@@ -74,7 +74,7 @@ class OutputConversionImageToTable(_OutputConversion[ImageList, ImageDataset[Tab
         return im_dataset
 
 
-class OutputConversionImageToImage(_OutputConversion[ImageList, ImageDataset[ImageList]], _OutputConversionImage):
+class OutputConversionImageToImage(_OutputConversion[ImageList, ImageDataset], _OutputConversionImage):
 
     def _data_conversion(
         self, input_data: ImageList, output_data: Tensor, **kwargs: Any  # noqa: ARG002
