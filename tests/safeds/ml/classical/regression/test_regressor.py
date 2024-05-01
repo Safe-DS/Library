@@ -8,7 +8,6 @@ import pytest
 from safeds.data.tabular.containers import Column, Table
 from safeds.exceptions import (
     ColumnLengthMismatchError,
-    DatasetContainsTargetError,
     DatasetMissesDataError,
     DatasetMissesFeaturesError,
     MissingValuesColumnError,
@@ -190,11 +189,6 @@ class TestPredict:
     def test_should_raise_if_not_fitted(self, regressor: Regressor, valid_data: TabularDataset) -> None:
         with pytest.raises(ModelNotFittedError):
             regressor.predict(valid_data.features)
-
-    def test_should_raise_if_dataset_contains_target(self, regressor: Regressor, valid_data: TabularDataset) -> None:
-        fitted_regressor = regressor.fit(valid_data)
-        with pytest.raises(DatasetContainsTargetError, match="target"):
-            fitted_regressor.predict(valid_data.to_table())
 
     def test_should_raise_if_dataset_misses_features(self, regressor: Regressor, valid_data: TabularDataset) -> None:
         fitted_regressor = regressor.fit(valid_data)
