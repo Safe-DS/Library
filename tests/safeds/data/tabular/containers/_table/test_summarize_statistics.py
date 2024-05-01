@@ -11,7 +11,7 @@ from safeds.data.tabular.containers import Table
             Table({"col1": [1, 2, 1], "col2": ["a", "b", "c"]}),
             Table(
                 {
-                    "metrics": [
+                    "metric": [
                         "minimum",
                         "maximum",
                         "mean",
@@ -19,6 +19,8 @@ from safeds.data.tabular.containers import Table
                         "median",
                         "variance",
                         "standard deviation",
+                        "missing value count",
+                        "missing value ratio",
                         "idness",
                         "stability",
                     ],
@@ -30,6 +32,8 @@ from safeds.data.tabular.containers import Table
                         "1.0",
                         str(1.0 / 3),
                         str(stdev([1, 2, 1])),
+                        "0",
+                        "0.0",
                         str(2.0 / 3),
                         str(2.0 / 3),
                     ],
@@ -41,6 +45,8 @@ from safeds.data.tabular.containers import Table
                         "-",
                         "-",
                         "-",
+                        "0",
+                        "0.0",
                         "1.0",
                         str(1.0 / 3),
                     ],
@@ -51,7 +57,7 @@ from safeds.data.tabular.containers import Table
             Table(),
             Table(
                 {
-                    "metrics": [
+                    "metric": [
                         "minimum",
                         "maximum",
                         "mean",
@@ -59,6 +65,8 @@ from safeds.data.tabular.containers import Table
                         "median",
                         "variance",
                         "standard deviation",
+                        "missing value count",
+                        "missing value ratio",
                         "idness",
                         "stability",
                     ],
@@ -69,7 +77,7 @@ from safeds.data.tabular.containers import Table
             Table({"col": [], "gg": []}),
             Table(
                 {
-                    "metrics": [
+                    "metric": [
                         "minimum",
                         "maximum",
                         "mean",
@@ -77,10 +85,14 @@ from safeds.data.tabular.containers import Table
                         "median",
                         "variance",
                         "standard deviation",
+                        "missing value count",
+                        "missing value ratio",
                         "idness",
                         "stability",
                     ],
                     "col": [
+                        "-",
+                        "-",
                         "-",
                         "-",
                         "-",
@@ -101,6 +113,8 @@ from safeds.data.tabular.containers import Table
                         "-",
                         "-",
                         "-",
+                        "-",
+                        "-",
                     ],
                 },
             ),
@@ -109,7 +123,7 @@ from safeds.data.tabular.containers import Table
             Table({"col": [None, None]}),
             Table(
                 {
-                    "metrics": [
+                    "metric": [
                         "minimum",
                         "maximum",
                         "mean",
@@ -117,10 +131,12 @@ from safeds.data.tabular.containers import Table
                         "median",
                         "variance",
                         "standard deviation",
+                        "missing value count",
+                        "missing value ratio",
                         "idness",
                         "stability",
                     ],
-                    "col": ["-", "-", "-", "[]", "-", "-", "-", "0.0", "-"],
+                    "col": ["-", "-", "-", "[]", "-", "-", "-", "2", "1.0", "0.0", "-"],
                 },
             ),
         ),

@@ -786,23 +786,25 @@ class Table:
         >>> from safeds.data.tabular.containers import Table
         >>> table = Table.from_dict({"a": [1, 3], "b": [2, 4]})
         >>> table.summarize_statistics()
-                      metrics                   a                   b
-        0             minimum                   1                   2
-        1             maximum                   3                   4
-        2                mean                 2.0                 3.0
-        3                mode              [1, 3]              [2, 4]
-        4              median                 2.0                 3.0
-        5            variance                 2.0                 2.0
-        6  standard deviation  1.4142135623730951  1.4142135623730951
-        7              idness                 1.0                 1.0
-        8           stability                 0.5                 0.5
+                         metric                   a                   b
+        0               minimum                   1                   2
+        1               maximum                   3                   4
+        2                  mean                 2.0                 3.0
+        3                  mode              [1, 3]              [2, 4]
+        4                median                 2.0                 3.0
+        5              variance                 2.0                 2.0
+        6    standard deviation  1.4142135623730951  1.4142135623730951
+        7   missing value count                   0                   0
+        8   missing value ratio                 0.0                 0.0
+        9                idness                 1.0                 1.0
+        10            stability                 0.5                 0.5
         """
         import pandas as pd
 
         if self.number_of_columns == 0:
             return Table(
                 {
-                    "metrics": [
+                    "metric": [
                         "minimum",
                         "maximum",
                         "mean",
@@ -810,6 +812,8 @@ class Table:
                         "median",
                         "variance",
                         "standard deviation",
+                        "missing value count",
+                        "missing value ratio",
                         "idness",
                         "stability",
                     ],
@@ -818,7 +822,7 @@ class Table:
         elif self.number_of_rows == 0:
             table = Table(
                 {
-                    "metrics": [
+                    "metric": [
                         "minimum",
                         "maximum",
                         "mean",
@@ -826,13 +830,15 @@ class Table:
                         "median",
                         "variance",
                         "standard deviation",
+                        "missing value count",
+                        "missing value ratio",
                         "idness",
                         "stability",
                     ],
                 },
             )
             for name in self.column_names:
-                table = table.add_column(Column(name, ["-", "-", "-", "-", "-", "-", "-", "-", "-"]))
+                table = table.add_column(Column(name, ["-", "-", "-", "-", "-", "-","-","-", "-", "-", "-"]))
             return table
 
         columns = self.to_columns()
@@ -848,6 +854,8 @@ class Table:
                 "median": column.median,
                 "variance": column.variance,
                 "standard deviation": column.standard_deviation,
+                "missing value count": column.missing_value_count,
+                "missing value ratio": column.missing_value_ratio,
                 "idness": column.idness,
                 "stability": column.stability,
             }
@@ -862,7 +870,7 @@ class Table:
             result = pd.concat([result, pd.DataFrame(values)], axis=1)
 
         result = pd.concat([pd.DataFrame(list(statistics.keys())), result], axis=1)
-        result.columns = ["metrics", *self.column_names]
+        result.columns = ["metric", *self.column_names]
 
         return Table._from_pandas_dataframe(result)
 
