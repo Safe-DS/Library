@@ -14,7 +14,6 @@ from safeds.data.labeled.containers import TabularDataset
                 "target": [1, 3, 2],
             },
             "target",
-            ["feature_1", "feature_2"],
         ),
         TabularDataset(
             {
@@ -24,10 +23,10 @@ from safeds.data.labeled.containers import TabularDataset
                 "target": [1, 3, 2],
             },
             "target",
-            ["feature_1", "feature_2"],
+            ["other"],
         ),
     ],
-    ids=["normal", "table_with_column_as_non_feature"],
+    ids=["normal", "table_with_extra_column"],
 )
 def test_should_size_be_greater_than_normal_object(tabular_dataset: TabularDataset) -> None:
     assert sys.getsizeof(tabular_dataset) > sys.getsizeof(object())

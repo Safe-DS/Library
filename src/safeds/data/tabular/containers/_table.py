@@ -2412,7 +2412,7 @@ class Table:
             for (_, series_row) in self._data.iterrows()
         ]
 
-    def to_tabular_dataset(self, target_name: str, feature_names: list[str] | None = None) -> TabularDataset:
+    def to_tabular_dataset(self, target_name: str, extra_names: list[str] | None = None) -> TabularDataset:
         """
         Return a new `TabularDataset` with columns marked as a target column or feature columns.
 
@@ -2422,12 +2422,13 @@ class Table:
         ----------
         target_name:
             Name of the target column.
-        feature_names:
-            Names of the feature columns. If None, all columns except the target column are used.
+        extra_names:
+            Names of the columns that are neither features nor target. If None, no extra columns are used, i.e. all but
+            the target column are used as features.
 
         Returns
         -------
-        tabular_dataset:
+        dataset:
             A new tabular dataset with the given target and feature names.
 
         Raises
@@ -2441,11 +2442,11 @@ class Table:
         --------
         >>> from safeds.data.tabular.containers import Table
         >>> table = Table({"item": ["apple", "milk", "beer"], "price": [1.10, 1.19, 1.79], "amount_bought": [74, 72, 51]})
-        >>> tabular_dataset = table.to_tabular_dataset(target_name="amount_bought", feature_names=["item", "price"])
+        >>> dataset = table.to_tabular_dataset(target_name="amount_bought", extra_names=["item"])
         """
         from safeds.data.labeled.containers import TabularDataset
 
-        return TabularDataset._from_table(self, target_name, feature_names)
+        return TabularDataset._from_table(self, target_name, extra_names)
 
     # ------------------------------------------------------------------------------------------------------------------
     # IPython integration

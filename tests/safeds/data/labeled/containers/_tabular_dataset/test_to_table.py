@@ -14,7 +14,6 @@ from safeds.data.tabular.containers import Table
                     "target": [1, 3, 2],
                 },
                 "target",
-                ["feature_1", "feature_2"],
             ),
             Table(
                 {
@@ -33,7 +32,7 @@ from safeds.data.tabular.containers import Table
                     "target": [1, 3, 2],
                 },
                 "target",
-                ["feature_1", "feature_2"],
+                ["other"],
             ),
             Table(
                 {
@@ -45,7 +44,7 @@ from safeds.data.tabular.containers import Table
             ),
         ),
     ],
-    ids=["normal", "table_with_column_as_non_feature"],
+    ids=["normal", "table_with_extra_column"],
 )
 def test_should_return_table(tabular_dataset: TabularDataset, expected: Table) -> None:
     table = tabular_dataset.to_table()

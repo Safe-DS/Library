@@ -27,7 +27,7 @@ from safeds.data.tabular.containers import Table
                     "T": [0, 1],
                 },
                 target_name="T",
-                feature_names=["A", "C"],
+                extra_names=["B"],
             ),
             Table({"A": [1, 4], "C": [3, 6]}),
         ),
