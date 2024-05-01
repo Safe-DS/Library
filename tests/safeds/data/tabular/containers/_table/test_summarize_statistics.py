@@ -11,27 +11,29 @@ from safeds.data.tabular.containers import Table
             Table({"col1": [1, 2, 1], "col2": ["a", "b", "c"]}),
             Table(
                 {
-                    "metrics": [
-                        "maximum",
+                    "metric": [
                         "minimum",
+                        "maximum",
                         "mean",
                         "mode",
                         "median",
-                        "sum",
                         "variance",
                         "standard deviation",
+                        "missing value count",
+                        "missing value ratio",
                         "idness",
                         "stability",
                     ],
                     "col1": [
-                        "2",
                         "1",
+                        "2",
                         str(4.0 / 3),
                         "[1]",
                         "1.0",
-                        "4",
                         str(1.0 / 3),
                         str(stdev([1, 2, 1])),
+                        "0",
+                        "0.0",
                         str(2.0 / 3),
                         str(2.0 / 3),
                     ],
@@ -43,7 +45,8 @@ from safeds.data.tabular.containers import Table
                         "-",
                         "-",
                         "-",
-                        "-",
+                        "0",
+                        "0.0",
                         "1.0",
                         str(1.0 / 3),
                     ],
@@ -54,15 +57,16 @@ from safeds.data.tabular.containers import Table
             Table(),
             Table(
                 {
-                    "metrics": [
-                        "maximum",
+                    "metric": [
                         "minimum",
+                        "maximum",
                         "mean",
                         "mode",
                         "median",
-                        "sum",
                         "variance",
                         "standard deviation",
+                        "missing value count",
+                        "missing value ratio",
                         "idness",
                         "stability",
                     ],
@@ -73,19 +77,21 @@ from safeds.data.tabular.containers import Table
             Table({"col": [], "gg": []}),
             Table(
                 {
-                    "metrics": [
-                        "maximum",
+                    "metric": [
                         "minimum",
+                        "maximum",
                         "mean",
                         "mode",
                         "median",
-                        "sum",
                         "variance",
                         "standard deviation",
+                        "missing value count",
+                        "missing value ratio",
                         "idness",
                         "stability",
                     ],
                     "col": [
+                        "-",
                         "-",
                         "-",
                         "-",
@@ -108,6 +114,7 @@ from safeds.data.tabular.containers import Table
                         "-",
                         "-",
                         "-",
+                        "-",
                     ],
                 },
             ),
@@ -116,25 +123,31 @@ from safeds.data.tabular.containers import Table
             Table({"col": [None, None]}),
             Table(
                 {
-                    "metrics": [
-                        "maximum",
+                    "metric": [
                         "minimum",
+                        "maximum",
                         "mean",
                         "mode",
                         "median",
-                        "sum",
                         "variance",
                         "standard deviation",
+                        "missing value count",
+                        "missing value ratio",
                         "idness",
                         "stability",
                     ],
-                    "col": ["-", "-", "-", "[]", "-", "-", "-", "-", "0.0", "-"],
+                    "col": ["-", "-", "-", "[]", "-", "-", "-", "2", "1.0", "0.0", "-"],
                 },
             ),
         ),
     ],
-    ids=["Column of integers and Column of characters", "empty", "empty with columns", "Column of None"],
+    ids=[
+        "Column of integers and Column of characters",
+        "empty",
+        "empty with columns",
+        "Column of None",
+    ],
 )
 def test_should_summarize_statistics(table: Table, expected: Table) -> None:
-    assert expected.schema == table.summarize_statistics().schema
-    assert expected == table.summarize_statistics()
+    assert table.summarize_statistics().schema == expected.schema
+    assert table.summarize_statistics() == expected
