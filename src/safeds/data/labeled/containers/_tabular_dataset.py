@@ -44,7 +44,7 @@ class TabularDataset:
     --------
     >>> from safeds.data.tabular.containers import Table
     >>> table = Table({"col1": ["a", "b"], "col2": [1, 2]})
-    >>> tabular_dataset = table.tag_columns("col2", ["col1"])
+    >>> tabular_dataset = table.to_tabular_dataset("col2", ["col1"])
     """
 
     # ------------------------------------------------------------------------------------------------------------------

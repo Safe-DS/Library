@@ -26,6 +26,6 @@ def test_should_create_dataloader(
     target_name: str,
     feature_names: list[str] | None,
 ) -> None:
-    tabular_dataset = Table.from_dict(data).tag_columns(target_name, feature_names)
+    tabular_dataset = Table.from_dict(data).to_tabular_dataset(target_name, feature_names)
     data_loader = tabular_dataset._into_dataloader_with_classes(1, 2)
     assert isinstance(data_loader, DataLoader)

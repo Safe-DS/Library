@@ -63,7 +63,7 @@ def valid_data() -> TabularDataset:
             "feat2": [3, 6],
             "target": [0, 1],
         },
-    ).tag_columns(target_name="target", feature_names=["feat1", "feat2"])
+    ).to_tabular_dataset(target_name="target", feature_names=["feat1", "feat2"])
 
 
 @pytest.mark.parametrize("classifier", classifiers(), ids=lambda x: x.__class__.__name__)
@@ -93,7 +93,7 @@ class TestFit:
                         "feat2": [3, 6],
                         "target": [0, 1],
                     },
-                ).tag_columns(target_name="target", feature_names=["feat1", "feat2"]),
+                ).to_tabular_dataset(target_name="target", feature_names=["feat1", "feat2"]),
                 NonNumericColumnError,
                 (
                     r"Tried to do a numerical operation on one or multiple non-numerical columns: \n\{'feat1'\}\nYou"
@@ -110,7 +110,7 @@ class TestFit:
                         "feat2": [3, 6],
                         "target": [0, 1],
                     },
-                ).tag_columns(target_name="target", feature_names=["feat1", "feat2"]),
+                ).to_tabular_dataset(target_name="target", feature_names=["feat1", "feat2"]),
                 MissingValuesColumnError,
                 (
                     r"Tried to do an operation on one or multiple columns containing missing values: \n\{'feat1'\}\nYou"
@@ -127,7 +127,7 @@ class TestFit:
                         "feat2": [],
                         "target": [],
                     },
-                ).tag_columns(target_name="target", feature_names=["feat1", "feat2"]),
+                ).to_tabular_dataset(target_name="target", feature_names=["feat1", "feat2"]),
                 DatasetMissesDataError,
                 r"Dataset contains no rows",
             ),
@@ -332,7 +332,7 @@ class DummyClassifier(Classifier):
         feature = predicted.rename("feature")
         dataset = Table.from_columns([feature, predicted])
 
-        return dataset.tag_columns(target_name="predicted")
+        return dataset.to_tabular_dataset(target_name="predicted")
 
     @property
     def is_fitted(self) -> bool:
@@ -349,7 +349,7 @@ class TestAccuracy:
                 "predicted": [1, 2, 3, 4],
                 "expected": [1, 2, 3, 3],
             },
-        ).tag_columns(target_name="expected")
+        ).to_tabular_dataset(target_name="expected")
 
         assert DummyClassifier().accuracy(table) == 0.75
 
@@ -359,7 +359,7 @@ class TestAccuracy:
                 "predicted": ["1", "2", "3", "4"],
                 "expected": [1, 2, 3, 3],
             },
-        ).tag_columns(target_name="expected")
+        ).to_tabular_dataset(target_name="expected")
 
         assert DummyClassifier().accuracy(table) == 0.0
 
@@ -388,7 +388,7 @@ class TestPrecision:
                 "predicted": [1, 1, 0, 2],
                 "expected": [1, 0, 1, 2],
             },
-        ).tag_columns(target_name="expected")
+        ).to_tabular_dataset(target_name="expected")
 
         assert DummyClassifier().precision(table, 1) == 0.5
 
@@ -398,7 +398,7 @@ class TestPrecision:
                 "predicted": [1, "1", "0", "2"],
                 "expected": [1, 0, 1, 2],
             },
-        ).tag_columns(target_name="expected")
+        ).to_tabular_dataset(target_name="expected")
 
         assert DummyClassifier().precision(table, 1) == 1.0
 
@@ -408,7 +408,7 @@ class TestPrecision:
                 "predicted": ["lol", "1", "0", "2"],
                 "expected": [1, 0, 1, 2],
             },
-        ).tag_columns(target_name="expected")
+        ).to_tabular_dataset(target_name="expected")
 
         assert DummyClassifier().precision(table, 1) == 1.0
 
@@ -437,7 +437,7 @@ class TestRecall:
                 "predicted": [1, 1, 0, 2],
                 "expected": [1, 0, 1, 2],
             },
-        ).tag_columns(target_name="expected")
+        ).to_tabular_dataset(target_name="expected")
 
         assert DummyClassifier().recall(table, 1) == 0.5
 
@@ -447,7 +447,7 @@ class TestRecall:
                 "predicted": [1, "1", "0", "2"],
                 "expected": [1, 0, 1, 2],
             },
-        ).tag_columns(target_name="expected")
+        ).to_tabular_dataset(target_name="expected")
 
         assert DummyClassifier().recall(table, 1) == 0.5
 
@@ -457,7 +457,7 @@ class TestRecall:
                 "predicted": ["lol", "1", "0", "2"],
                 "expected": [2, 0, 5, 2],
             },
-        ).tag_columns(target_name="expected")
+        ).to_tabular_dataset(target_name="expected")
 
         assert DummyClassifier().recall(table, 1) == 1.0
 
@@ -486,7 +486,7 @@ class TestF1Score:
                 "predicted": [1, 1, 0, 2],
                 "expected": [1, 0, 1, 2],
             },
-        ).tag_columns(target_name="expected")
+        ).to_tabular_dataset(target_name="expected")
 
         assert DummyClassifier().f1_score(table, 1) == 0.5
 
@@ -496,7 +496,7 @@ class TestF1Score:
                 "predicted": [1, "1", "0", "2"],
                 "expected": [1, 0, 1, 2],
             },
-        ).tag_columns(target_name="expected")
+        ).to_tabular_dataset(target_name="expected")
 
         assert DummyClassifier().f1_score(table, 1) == pytest.approx(0.6666667)
 
@@ -506,7 +506,7 @@ class TestF1Score:
                 "predicted": ["lol", "1", "0", "2"],
                 "expected": [2, 0, 2, 2],
             },
-        ).tag_columns(target_name="expected")
+        ).to_tabular_dataset(target_name="expected")
 
         assert DummyClassifier().f1_score(table, 1) == 1.0
 

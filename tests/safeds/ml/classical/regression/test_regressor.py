@@ -74,7 +74,7 @@ def valid_data() -> TabularDataset:
             "feat2": [3, 6],
             "target": [0, 1],
         },
-    ).tag_columns(target_name="target", feature_names=["feat1", "feat2"])
+    ).to_tabular_dataset(target_name="target", feature_names=["feat1", "feat2"])
 
 
 @pytest.mark.parametrize("regressor", regressors(), ids=lambda x: x.__class__.__name__)
@@ -104,7 +104,7 @@ class TestFit:
                         "feat2": [3, 6],
                         "target": [0, 1],
                     },
-                ).tag_columns(target_name="target", feature_names=["feat1", "feat2"]),
+                ).to_tabular_dataset(target_name="target", feature_names=["feat1", "feat2"]),
                 NonNumericColumnError,
                 r"Tried to do a numerical operation on one or multiple non-numerical columns: \n\{'feat1'\}",
             ),
@@ -116,7 +116,7 @@ class TestFit:
                         "feat2": [3, 6],
                         "target": [0, 1],
                     },
-                ).tag_columns(target_name="target", feature_names=["feat1", "feat2"]),
+                ).to_tabular_dataset(target_name="target", feature_names=["feat1", "feat2"]),
                 MissingValuesColumnError,
                 r"Tried to do an operation on one or multiple columns containing missing values: \n\{'feat1'\}",
             ),
@@ -128,7 +128,7 @@ class TestFit:
                         "feat2": [],
                         "target": [],
                     },
-                ).tag_columns(target_name="target", feature_names=["feat1", "feat2"]),
+                ).to_tabular_dataset(target_name="target", feature_names=["feat1", "feat2"]),
                 DatasetMissesDataError,
                 r"Dataset contains no rows",
             ),
@@ -339,7 +339,7 @@ class DummyRegressor(Regressor):
         feature = predicted.rename("feature")
         dataset = Table.from_columns([feature, predicted])
 
-        return dataset.tag_columns(target_name="predicted")
+        return dataset.to_tabular_dataset(target_name="predicted")
 
     @property
     def is_fitted(self) -> bool:
@@ -366,7 +366,7 @@ class TestMeanAbsoluteError:
                 "predicted": predicted,
                 "expected": expected,
             },
-        ).tag_columns(
+        ).to_tabular_dataset(
             target_name="expected",
         )
 
@@ -397,7 +397,7 @@ class TestMeanSquaredError:
         ids=["perfect_prediction", "bad_prediction", "worst_prediction"],
     )
     def test_valid_data(self, predicted: list[float], expected: list[float], result: float) -> None:
-        table = Table({"predicted": predicted, "expected": expected}).tag_columns(
+        table = Table({"predicted": predicted, "expected": expected}).to_tabular_dataset(
             target_name="expected",
         )
 

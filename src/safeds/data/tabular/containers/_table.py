@@ -1752,41 +1752,6 @@ class Table:
             self.slice_rows(round(percentage_in_first * self.number_of_rows)),
         )
 
-    def tag_columns(self, target_name: str, feature_names: list[str] | None = None) -> TabularDataset:
-        """
-        Return a new `TabularDataset` with columns marked as a target column or feature columns.
-
-        The original table is not modified.
-
-        Parameters
-        ----------
-        target_name:
-            Name of the target column.
-        feature_names:
-            Names of the feature columns. If None, all columns except the target column are used.
-
-        Returns
-        -------
-        tabular_dataset:
-            A new tagged table with the given target and feature names.
-
-        Raises
-        ------
-        ValueError
-            If the target column is also a feature column.
-        ValueError
-            If no feature columns are specified.
-
-        Examples
-        --------
-        >>> from safeds.data.tabular.containers import Table
-        >>> table = Table({"item": ["apple", "milk", "beer"], "price": [1.10, 1.19, 1.79], "amount_bought": [74, 72, 51]})
-        >>> tabular_dataset = table.tag_columns(target_name="amount_bought", feature_names=["item", "price"])
-        """
-        from safeds.data.labeled.containers import TabularDataset
-
-        return TabularDataset._from_table(self, target_name, feature_names)
-
     def time_columns(self, target_name: str, time_name: str, feature_names: list[str] | None = None) -> TimeSeries:
         """
         Return a new `TimeSeries` with columns marked as a target and time column or feature columns.
@@ -2442,6 +2407,41 @@ class Table:
             )
             for (_, series_row) in self._data.iterrows()
         ]
+
+    def to_tabular_dataset(self, target_name: str, feature_names: list[str] | None = None) -> TabularDataset:
+        """
+        Return a new `TabularDataset` with columns marked as a target column or feature columns.
+
+        The original table is not modified.
+
+        Parameters
+        ----------
+        target_name:
+            Name of the target column.
+        feature_names:
+            Names of the feature columns. If None, all columns except the target column are used.
+
+        Returns
+        -------
+        tabular_dataset:
+            A new tabular dataset with the given target and feature names.
+
+        Raises
+        ------
+        ValueError
+            If the target column is also a feature column.
+        ValueError
+            If no feature columns are specified.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table
+        >>> table = Table({"item": ["apple", "milk", "beer"], "price": [1.10, 1.19, 1.79], "amount_bought": [74, 72, 51]})
+        >>> tabular_dataset = table.to_tabular_dataset(target_name="amount_bought", feature_names=["item", "price"])
+        """
+        from safeds.data.labeled.containers import TabularDataset
+
+        return TabularDataset._from_table(self, target_name, feature_names)
 
     # ------------------------------------------------------------------------------------------------------------------
     # IPython integration
