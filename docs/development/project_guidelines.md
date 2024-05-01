@@ -488,7 +488,6 @@ when adding new classes to it.
         "Column",
         "Row",
         "Table",
-        "TaggedTable",
     ]
     ```
 
@@ -497,7 +496,6 @@ when adding new classes to it.
     ```py
     __all__ = [
         "Table",
-        "TaggedTable",
         "Column",
         "Row",
     ]
