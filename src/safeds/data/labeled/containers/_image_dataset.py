@@ -140,9 +140,9 @@ class ImageDataset(Generic[T]):
             the output data of this dataset
         """
         output = self._output
-        if self.__orig_class__.__args__[0] == _TableAsTensor:
+        if isinstance(output, _TableAsTensor):
             return output._to_table()
-        elif self.__orig_class__.__args__[0] == _ColumnAsTensor:
+        elif isinstance(output, _ColumnAsTensor):
             return output._to_column()
         else:
             return output
@@ -224,7 +224,7 @@ class _ColumnAsTensor:
     def _from_tensor(tensor: Tensor, column_name: str, one_hot_encoder: OneHotEncoder) -> _ColumnAsTensor:
         if tensor.dim() != 2:
             raise ValueError(f"Tensor has an invalid amount of dimensions. Needed 2 dimensions but got {tensor.dim()}.")
-        if not one_hot_encoder.is_fitted():
+        if not one_hot_encoder.is_fitted:
             raise TransformerNotFittedError
         if tensor.size(dim=1) != len(one_hot_encoder.get_names_of_added_columns()):
             raise ValueError(f"Tensor and one_hot_encoder have different amounts of classes ({tensor.size(dim=1)}!={len(one_hot_encoder.get_names_of_added_columns())}).")

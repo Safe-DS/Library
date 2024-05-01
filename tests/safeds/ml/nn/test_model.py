@@ -2,7 +2,7 @@ import pytest
 
 from safeds.data.image.typing import ImageSize
 from safeds.data.labeled.containers import TabularDataset
-from safeds.data.tabular.containers import Table, TaggedTable
+from safeds.data.tabular.containers import Table
 from safeds.exceptions import FeatureDataMismatchError, InputSizeError, ModelNotFittedError, OutOfBoundsError, \
     InvalidModelStructureError
 from safeds.ml.nn import (
