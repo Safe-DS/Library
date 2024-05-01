@@ -183,8 +183,8 @@ class TimeSeries(Table):
 
         Examples
         --------
-        >>> from safeds.data.labeled.containers import TabularDataset
-        >>> table = TabularDataset({"a": [1, 2, 3], "b": [4, 5, 6]}, "b", ["a"])
+        >>> from safeds.data.tabular.containers import TimeSeries
+        >>> table = TimeSeries({"a": [1, 2, 3], "b": [4, 5, 6]}, "b", "a")
         """
         import pandas as pd
 
