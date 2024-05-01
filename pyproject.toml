@@ -34,7 +34,7 @@ syrupy = "^4.6.0"
 
 [tool.poetry.group.docs.dependencies]
 mkdocs = "^1.4.2"
-mkdocstrings = ">=0.20,<0.25"
+mkdocstrings = ">=0.20,<0.26"
 mkdocstrings-python = ">=0.8.3,<1.10.0"
 mkdocs-autorefs = ">=0.4.1,<1.1.0"
 mkdocs-exclude = "^1.0.2"
