@@ -20,7 +20,7 @@ class _OutputConversionImage(_OutputConversion[ImageList, ImageDataset], ABC):
 
     @abstractmethod
     def _data_conversion(self, input_data: ImageList, output_data: Tensor, **kwargs: Any) -> ImageDataset:
-        pass
+        pass  # pragma: no cover
 
 
 class OutputConversionImageToColumn(_OutputConversionImage):
