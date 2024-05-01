@@ -161,9 +161,16 @@ def predict(model: Any, dataset: Table, feature_names: list[str] | None, target_
             warnings.filterwarnings("ignore", message="X does not have valid feature names")
             predicted_target_vector = model.predict(dataset_df.values)
         result_set[target_name] = predicted_target_vector
+
+        extra_names = [
+            column_name
+            for column_name in dataset.column_names
+            if column_name != target_name and column_name not in feature_names
+        ]
+
         return Table._from_pandas_dataframe(result_set).to_tabular_dataset(
             target_name=target_name,
-            feature_names=feature_names,
+            extra_names=extra_names,
         )
     except ValueError as exception:
         raise PredictionError(str(exception)) from exception
