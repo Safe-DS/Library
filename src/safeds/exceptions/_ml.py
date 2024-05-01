@@ -86,15 +86,15 @@ class InputSizeError(Exception):
         )
 
 
-class FitOnTableError(TypeError):
+class PlainTableError(TypeError):
     """Raised when a plain table is used instead of a TabularDataset."""
 
     def __init__(self) -> None:
         super().__init__(
             (
-                "This method needs a tabular dataset.\n"
-                "A tabular dataset is a table that additionally knows which columns are features and which are the  target to predict.\n"
-                "Use Table.to_tabular_dataset() to create a tabular dataset."
+                "This method needs a tabular dataset. "
+                "It knows which columns are features and which are the target to predict.\n"
+                "Use `Table.to_tabular_dataset()` to create a tabular dataset."
             ),
         )
 

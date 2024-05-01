@@ -7,7 +7,7 @@ from safeds.exceptions import (
     DatasetContainsTargetError,
     DatasetMissesDataError,
     DatasetMissesFeaturesError,
-    FitOnTableError,
+    PlainTableError,
     LearningError,
     MissingValuesColumnError,
     ModelNotFittedError,
@@ -42,7 +42,7 @@ def fit(model: Any, tabular_dataset: TabularDataset) -> None:
         If the training data contains no rows.
     """
     if not isinstance(tabular_dataset, TabularDataset) and isinstance(tabular_dataset, Table):
-        raise FitOnTableError
+        raise PlainTableError
 
     if tabular_dataset._table.number_of_rows == 0:
         raise DatasetMissesDataError

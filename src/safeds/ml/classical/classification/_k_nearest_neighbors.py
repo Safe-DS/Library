@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING
 from safeds._utils import _structural_hash
 from safeds.data.labeled.containers import TabularDataset
 from safeds.data.tabular.containers import Table
-from safeds.exceptions import ClosedBound, DatasetMissesDataError, FitOnTableError, OutOfBoundsError
+from safeds.exceptions import ClosedBound, DatasetMissesDataError, PlainTableError, OutOfBoundsError
 from safeds.ml.classical._util_sklearn import fit, predict
 
 from ._classifier import Classifier
@@ -96,7 +96,7 @@ class KNearestNeighborsClassifier(Classifier):
             If the training data contains no rows.
         """
         if not isinstance(training_set, TabularDataset) and isinstance(training_set, Table):
-            raise FitOnTableError
+            raise PlainTableError
         if training_set._table.number_of_rows == 0:
             raise DatasetMissesDataError
         if self._number_of_neighbors > training_set._table.number_of_rows:

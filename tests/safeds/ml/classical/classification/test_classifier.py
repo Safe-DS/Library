@@ -10,7 +10,7 @@ from safeds.exceptions import (
     DatasetContainsTargetError,
     DatasetMissesDataError,
     DatasetMissesFeaturesError,
-    FitOnTableError,
+    PlainTableError,
     MissingValuesColumnError,
     ModelNotFittedError,
     NonNumericColumnError,
@@ -158,7 +158,7 @@ class TestFit:
         ids=["table"],
     )
     def test_should_raise_if_given_normal_table(self, classifier: Classifier, table: Table) -> None:
-        with pytest.raises(FitOnTableError):
+        with pytest.raises(PlainTableError):
             classifier.fit(table)  # type: ignore[arg-type]
 
 
@@ -377,7 +377,7 @@ class TestAccuracy:
         ids=["table"],
     )
     def test_should_raise_if_given_normal_table(self, table: Table) -> None:
-        with pytest.raises(FitOnTableError):
+        with pytest.raises(PlainTableError):
             DummyClassifier().accuracy(table)  # type: ignore[arg-type]
 
 
@@ -426,7 +426,7 @@ class TestPrecision:
         ids=["table"],
     )
     def test_should_raise_if_given_normal_table(self, table: Table) -> None:
-        with pytest.raises(FitOnTableError):
+        with pytest.raises(PlainTableError):
             DummyClassifier().precision(table, 1)  # type: ignore[arg-type]
 
 
@@ -475,7 +475,7 @@ class TestRecall:
         ids=["table"],
     )
     def test_should_raise_if_given_normal_table(self, table: Table) -> None:
-        with pytest.raises(FitOnTableError):
+        with pytest.raises(PlainTableError):
             DummyClassifier().recall(table, 1)  # type: ignore[arg-type]
 
 
@@ -524,5 +524,5 @@ class TestF1Score:
         ids=["table"],
     )
     def test_should_raise_if_given_normal_table(self, table: Table) -> None:
-        with pytest.raises(FitOnTableError):
+        with pytest.raises(PlainTableError):
             DummyClassifier().f1_score(table, 1)  # type: ignore[arg-type]

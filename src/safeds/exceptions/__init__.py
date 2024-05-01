@@ -33,11 +33,11 @@ if TYPE_CHECKING:
         DatasetMissesDataError,
         DatasetMissesFeaturesError,
         FeatureDataMismatchError,
-        FitOnTableError,
         InputSizeError,
         LearningError,
         ModelNotFittedError,
         NonTimeSeriesError,
+        PlainTableError,
         PredictionError,
     )
 
@@ -67,11 +67,11 @@ apipkg.initpkg(
         "DatasetMissesDataError": "._ml:DatasetMissesDataError",
         "DatasetMissesFeaturesError": "._ml:DatasetMissesFeaturesError",
         "FeatureDataMismatchError": "._ml:FeatureDataMismatchError",
-        "FitOnTableError": "._ml:FitOnTableError",
         "InputSizeError": "._ml:InputSizeError",
         "LearningError": "._ml:LearningError",
         "ModelNotFittedError": "._ml:ModelNotFittedError",
         "NonTimeSeriesError": "._ml:NonTimeSeriesError",
+        "PlainTableError": "._ml:PlainTableError",
         "PredictionError": "._ml:PredictionError",
         # Other
         "Bound": "._generic:Bound",
@@ -104,11 +104,11 @@ __all__ = [
     "DatasetMissesDataError",
     "DatasetMissesFeaturesError",
     "FeatureDataMismatchError",
-    "FitOnTableError",
     "InputSizeError",
     "LearningError",
     "ModelNotFittedError",
     "NonTimeSeriesError",
+    "PlainTableError",
     "PredictionError",
     # Other
     "Bound",

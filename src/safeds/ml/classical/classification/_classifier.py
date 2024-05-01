@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 from safeds._utils import _structural_hash
 from safeds.data.labeled.containers import TabularDataset
 from safeds.data.tabular.containers import Table
-from safeds.exceptions import FitOnTableError
+from safeds.exceptions import PlainTableError
 
 if TYPE_CHECKING:
     from typing import Any
@@ -117,7 +117,7 @@ class Classifier(ABC):
         from sklearn.metrics import accuracy_score as sk_accuracy_score
 
         if not isinstance(validation_or_test_set, TabularDataset) and isinstance(validation_or_test_set, Table):
-            raise FitOnTableError
+            raise PlainTableError
 
         expected_values = validation_or_test_set.target
         predicted_values = self.predict(validation_or_test_set.features).target
@@ -142,7 +142,7 @@ class Classifier(ABC):
             Return 1 if no positive predictions are made.
         """
         if not isinstance(validation_or_test_set, TabularDataset) and isinstance(validation_or_test_set, Table):
-            raise FitOnTableError
+            raise PlainTableError
 
         expected_values = validation_or_test_set.target
         predicted_values = self.predict(validation_or_test_set.features).target
@@ -179,7 +179,7 @@ class Classifier(ABC):
             Return 1 if there are no positive expectations.
         """
         if not isinstance(validation_or_test_set, TabularDataset) and isinstance(validation_or_test_set, Table):
-            raise FitOnTableError
+            raise PlainTableError
 
         expected_values = validation_or_test_set.target
         predicted_values = self.predict(validation_or_test_set.features).target
@@ -216,7 +216,7 @@ class Classifier(ABC):
             Return 1 if there are no positive expectations and predictions.
         """
         if not isinstance(validation_or_test_set, TabularDataset) and isinstance(validation_or_test_set, Table):
-            raise FitOnTableError
+            raise PlainTableError
 
         expected_values = validation_or_test_set.target
         predicted_values = self.predict(validation_or_test_set.features).target

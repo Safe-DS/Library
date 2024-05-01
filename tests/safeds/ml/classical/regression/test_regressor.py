@@ -11,7 +11,7 @@ from safeds.exceptions import (
     DatasetContainsTargetError,
     DatasetMissesDataError,
     DatasetMissesFeaturesError,
-    FitOnTableError,
+    PlainTableError,
     MissingValuesColumnError,
     ModelNotFittedError,
     NonNumericColumnError,
@@ -159,7 +159,7 @@ class TestFit:
         ids=["table"],
     )
     def test_should_raise_if_given_normal_table(self, regressor: Regressor, table: Table) -> None:
-        with pytest.raises(FitOnTableError):
+        with pytest.raises(PlainTableError):
             regressor.fit(table)  # type: ignore[arg-type]
 
 
@@ -386,7 +386,7 @@ class TestMeanAbsoluteError:
         ids=["table"],
     )
     def test_should_raise_if_given_normal_table(self, table: Table) -> None:
-        with pytest.raises(FitOnTableError):
+        with pytest.raises(PlainTableError):
             DummyRegressor().mean_absolute_error(table)  # type: ignore[arg-type]
 
 
@@ -417,7 +417,7 @@ class TestMeanSquaredError:
         ids=["table"],
     )
     def test_should_raise_if_given_normal_table(self, table: Table) -> None:
-        with pytest.raises(FitOnTableError):
+        with pytest.raises(PlainTableError):
             DummyRegressor().mean_squared_error(table)  # type: ignore[arg-type]
 
 

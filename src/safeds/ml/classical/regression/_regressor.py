@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 from safeds._utils import _structural_hash
 from safeds.data.labeled.containers import TabularDataset
 from safeds.data.tabular.containers import Column, Table
-from safeds.exceptions import ColumnLengthMismatchError, FitOnTableError
+from safeds.exceptions import ColumnLengthMismatchError, PlainTableError
 
 if TYPE_CHECKING:
     from sklearn.base import RegressorMixin
@@ -115,7 +115,7 @@ class Regressor(ABC):
         from sklearn.metrics import mean_squared_error as sk_mean_squared_error
 
         if not isinstance(validation_or_test_set, TabularDataset) and isinstance(validation_or_test_set, Table):
-            raise FitOnTableError
+            raise PlainTableError
         expected = validation_or_test_set.target
         predicted = self.predict(validation_or_test_set.features).target
 
@@ -145,7 +145,7 @@ class Regressor(ABC):
         from sklearn.metrics import mean_absolute_error as sk_mean_absolute_error
 
         if not isinstance(validation_or_test_set, TabularDataset) and isinstance(validation_or_test_set, Table):
-            raise FitOnTableError
+            raise PlainTableError
         expected = validation_or_test_set.target
         predicted = self.predict(validation_or_test_set.features).target
 
