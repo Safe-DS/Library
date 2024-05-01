@@ -166,6 +166,7 @@ class TabularDataset:
 
         self._features: Table = self._table.keep_only_columns(feature_names)
         self._target: Column = self._table.get_column(target_name)
+        self._extras: Table = self._table.remove_columns([*feature_names, target_name])
 
     def __eq__(self, other: object) -> bool:
         """
@@ -210,27 +211,22 @@ class TabularDataset:
 
     @property
     def features(self) -> Table:
-        """
-        Get the feature columns of the tabular dataset.
-
-        Returns
-        -------
-        features:
-            The table containing the feature columns.
-        """
+        """The feature columns of the tabular dataset."""
         return self._features
 
     @property
     def target(self) -> Column:
-        """
-        Get the target column of the tabular dataset.
-
-        Returns
-        -------
-        target:
-            The target column.
-        """
+        """The target column of the tabular dataset."""
         return self._target
+
+    @property
+    def extras(self) -> Table:
+        """
+        Additional columns of the tabular dataset that are neither features nor target.
+
+        These can be used to store additional information about instances, such as IDs.
+        """
+        return self._extras
 
     # ------------------------------------------------------------------------------------------------------------------
     # Conversion
