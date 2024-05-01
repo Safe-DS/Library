@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Any, TypeVar, Generic
+from abc import ABC
+from typing import TYPE_CHECKING, Any
 
 from safeds.data.image.containers import ImageList
 from safeds.data.image.containers._single_size_image_list import _SingleSizeImageList
@@ -16,10 +16,8 @@ from safeds.ml.nn._output_conversion import _OutputConversion
 
 from safeds.data.tabular.transformation import OneHotEncoder
 
-T = TypeVar("T", ImageDataset[Column], ImageDataset[Table], ImageDataset[ImageList])
 
-
-class _OutputConversionImage:
+class _OutputConversionImage(_OutputConversion, ABC):
     pass  # pragma: no cover
 
 

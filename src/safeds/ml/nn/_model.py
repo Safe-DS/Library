@@ -32,7 +32,7 @@ if TYPE_CHECKING:
 
 IFT = TypeVar("IFT", TabularDataset, TimeSeries, ImageDataset)  # InputFitType
 IPT = TypeVar("IPT", Table, TimeSeries, ImageList)  # InputPredictType
-OT = TypeVar("OT", TabularDataset, TimeSeries, ImageDataset)  # OutputType
+OT = TypeVar("OT", TabularDataset, TimeSeries, ImageDataset[Column], ImageDataset[Table], ImageDataset[ImageList])  # OutputType
 
 
 class NeuralNetworkRegressor(Generic[IFT, IPT, OT]):
