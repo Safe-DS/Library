@@ -354,7 +354,7 @@ class TimeSeries(Table):
         return self._time
 
     # ------------------------------------------------------------------------------------------------------------------
-    # Overriden methods from TaggedTable class:
+    # Overridden methods from Table class
     # ------------------------------------------------------------------------------------------------------------------
     def _as_table(self: TimeSeries) -> Table:
         """

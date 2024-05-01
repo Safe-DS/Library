@@ -1754,7 +1754,7 @@ class Table:
 
     def tag_columns(self, target_name: str, feature_names: list[str] | None = None) -> TabularDataset:
         """
-        Return a new `TaggedTable` with columns marked as a target column or feature columns.
+        Return a new `TabularDataset` with columns marked as a target column or feature columns.
 
         The original table is not modified.
 

@@ -315,7 +315,7 @@ class DummyClassifier(Classifier):
     """
     Dummy classifier to test metrics.
 
-    Metrics methods expect a `TaggedTable` as input with two columns:
+    Metrics methods expect a `TabularDataset` as input with two columns:
 
     - `predicted`: The predicted targets.
     - `expected`: The correct targets.

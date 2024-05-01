@@ -87,7 +87,7 @@ class InputSizeError(Exception):
 
 
 class UntaggedTableError(Exception):
-    """Raised when an untagged table is used instead of a TaggedTable in a regression or classification."""
+    """Raised when an untagged table is used instead of a TabularDataset in a regression or classification."""
 
     def __init__(self) -> None:
         super().__init__(

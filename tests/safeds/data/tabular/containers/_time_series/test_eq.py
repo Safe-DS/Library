@@ -94,7 +94,7 @@ def test_should_return_true_if_objects_are_identical(table1: TimeSeries) -> None
         "TimeSeries vs. None",
         "TimeSeries vs. Row",
         "TimeSeries vs. Table",
-        "TimeSeries vs. TaggedTable",
+        "TimeSeries vs. TabularDataset",
     ],
 )
 def test_should_return_not_implemented_if_other_is_not_time_series(table: TimeSeries, other: Any) -> None:

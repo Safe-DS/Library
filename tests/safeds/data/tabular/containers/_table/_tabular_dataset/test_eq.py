@@ -38,10 +38,10 @@ def test_should_return_whether_two_tagged_tables_are_equal(table1: TabularDatase
         (TabularDataset({"a": [1, 2, 3], "b": [4, 5, 6]}, "b", ["a"]), Table())
     ],
     ids=[
-        "TaggedTable vs. None",
-        "TaggedTable vs. Row",
-        "TaggedTable vs. Table",
+        "TabularDataset vs. None",
+        "TabularDataset vs. Row",
+        "TabularDataset vs. Table",
     ],
 )
-def test_should_return_not_implemented_if_other_is_not_tagged_table(table: TabularDataset, other: Any) -> None:
+def test_should_return_not_implemented_if_other_is_not_tabular_dataset(table: TabularDataset, other: Any) -> None:
     assert (table.__eq__(other)) is NotImplemented

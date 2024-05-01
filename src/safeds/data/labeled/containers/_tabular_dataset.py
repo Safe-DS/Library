@@ -238,20 +238,14 @@ class TabularDataset:
 
     def to_table(self) -> Table:
         """
-        Return a new `Table` with the tagging removed.
+        Return a new `Table` containing the feature columns and the target column.
 
-        The original TaggedTable is not modified.
-
-        Parameters
-        ----------
-        self:
-            The TaggedTable.
+        The original `TabularDataset` is not modified.
 
         Returns
         -------
         table:
-            The table as an untagged Table, i.e. without the information about which columns are features or target.
-
+            A table containing the feature columns and the target column.
         """
         return self._table
 
