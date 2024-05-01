@@ -5,14 +5,17 @@ from safeds.data.labeled.containers import TabularDataset
 @pytest.mark.parametrize(
     ("table1", "table2"),
     [
-        (TabularDataset({"a": [], "b": []}, "b", ["a"]), TabularDataset({"a": [], "b": []}, "b", ["a"])),
         (
-            TabularDataset({"a": [1, 2, 3], "b": [4, 5, 6]}, "b", ["a"]),
-            TabularDataset({"a": [1, 2, 3], "b": [4, 5, 6]}, "b", ["a"]),
+            TabularDataset({"a": [], "b": []}, "b"),
+            TabularDataset({"a": [], "b": []}, "b"),
         ),
         (
-            TabularDataset({"a": [1, 2, 3], "b": [4, 5, 6]}, "b", ["a"]),
-            TabularDataset({"a": [1, 1, 3], "b": [4, 5, 6]}, "b", ["a"]),
+            TabularDataset({"a": [1, 2, 3], "b": [4, 5, 6]}, "b"),
+            TabularDataset({"a": [1, 2, 3], "b": [4, 5, 6]}, "b"),
+        ),
+        (
+            TabularDataset({"a": [1, 2, 3], "b": [4, 5, 6]}, "b"),
+            TabularDataset({"a": [1, 1, 3], "b": [4, 5, 6]}, "b"),
         ),
     ],
     ids=[
@@ -29,20 +32,23 @@ def test_should_return_same_hash_for_equal_tabular_datasets(table1: TabularDatas
     ("table1", "table2"),
     [
         (
-            TabularDataset({"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9]}, "b", ["a"]),
-            TabularDataset({"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9]}, "c", ["a"]),
-        ),
-        (
-            TabularDataset({"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9]}, "b", ["a"]),
-            TabularDataset({"a": [1, 2, 3], "b": [4, 5, 6], "d": [7, 8, 9]}, "b", ["a"]),
-        ),
-        (
-            TabularDataset({"a": [1, 2, 3], "b": [4, 5, 6]}, "b", ["a"]),
-            TabularDataset({"a": ["1", "2", "3"], "b": [4, 5, 6]}, "b", ["a"]),
-        ),
-        (
-            TabularDataset({"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9]}, "b", ["a"]),
             TabularDataset({"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9]}, "b", ["c"]),
+            TabularDataset({"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9]}, "c", ["b"]),
+        ),
+        (
+            TabularDataset({"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9]}, "b", ["c"]),
+            TabularDataset({"a": [1, 2, 3], "b": [4, 5, 6], "d": [7, 8, 9]}, "b", ["d"]),
+        ),
+        (
+            TabularDataset(
+                {"a": [1, 2, 3], "b": [4, 5, 6]},
+                "b",
+            ),
+            TabularDataset({"a": ["1", "2", "3"], "b": [4, 5, 6]}, "b"),
+        ),
+        (
+            TabularDataset({"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9]}, "b", ["c"]),
+            TabularDataset({"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9]}, "b", ["a"]),
         ),
     ],
     ids=[

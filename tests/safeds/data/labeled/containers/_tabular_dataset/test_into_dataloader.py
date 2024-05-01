@@ -4,7 +4,7 @@ from torch.utils.data import DataLoader
 
 
 @pytest.mark.parametrize(
-    ("data", "target_name", "feature_names"),
+    ("data", "target_name", "extra_names"),
     [
         (
             {
@@ -14,7 +14,7 @@ from torch.utils.data import DataLoader
                 "T": [0, 1],
             },
             "T",
-            ["A", "B", "C"],
+            [],
         ),
     ],
     ids=[
@@ -24,8 +24,8 @@ from torch.utils.data import DataLoader
 def test_should_create_dataloader(
     data: dict[str, list[int]],
     target_name: str,
-    feature_names: list[str] | None,
+    extra_names: list[str] | None,
 ) -> None:
-    tabular_dataset = Table.from_dict(data).to_tabular_dataset(target_name, feature_names)
+    tabular_dataset = Table.from_dict(data).to_tabular_dataset(target_name, extra_names)
     data_loader = tabular_dataset._into_dataloader_with_classes(1, 2)
     assert isinstance(data_loader, DataLoader)

@@ -5,7 +5,7 @@ from safeds.exceptions import UnknownColumnNameError
 
 
 @pytest.mark.parametrize(
-    ("data", "target_name", "feature_names", "error", "error_msg"),
+    ("data", "target_name", "extra_names", "error", "error_msg"),
     [
         (
             {
@@ -15,7 +15,7 @@ from safeds.exceptions import UnknownColumnNameError
                 "T": [0, 1],
             },
             "T",
-            ["A", "B", "C", "D", "E"],
+            ["D", "E"],
             UnknownColumnNameError,
             r"Could not find column\(s\) 'D, E'",
         ),
@@ -27,7 +27,7 @@ from safeds.exceptions import UnknownColumnNameError
                 "T": [0, 1],
             },
             "D",
-            ["A", "B", "C"],
+            [],
             UnknownColumnNameError,
             r"Could not find column\(s\) 'D'",
         ),
@@ -39,54 +39,10 @@ from safeds.exceptions import UnknownColumnNameError
                 "T": [0, 1],
             },
             "A",
-            ["A", "B", "C"],
+            ["A"],
             ValueError,
-            r"Column 'A' cannot be both feature and target.",
+            r"Column 'A' cannot be both target and extra.",
         ),
-        (
-            {
-                "A": [1, 4],
-                "B": [2, 5],
-                "C": [3, 6],
-                "T": [0, 1],
-            },
-            "D",
-            [],
-            ValueError,
-            r"At least one feature column must be specified.",
-        ),
-        (
-            {
-                "A": [1, 4],
-            },
-            "A",
-            None,
-            ValueError,
-            r"At least one feature column must be specified.",
-        ),
-    ],
-    ids=[
-        "feature_does_not_exist",
-        "target_does_not_exist",
-        "target_and_feature_overlap",
-        "features_are_empty-explicitly",
-        "features_are_empty_implicitly",
-    ],
-)
-def test_should_raise_error(
-    data: dict[str, list[int]],
-    target_name: str,
-    feature_names: list[str] | None,
-    error: type[Exception],
-    error_msg: str,
-) -> None:
-    with pytest.raises(error, match=error_msg):
-        TabularDataset(data, target_name=target_name, feature_names=feature_names)
-
-
-@pytest.mark.parametrize(
-    ("data", "target_name", "feature_names"),
-    [
         (
             {
                 "A": [1, 4],
@@ -96,6 +52,122 @@ def test_should_raise_error(
             },
             "T",
             ["A", "B", "C"],
+            ValueError,
+            r"At least one feature column must remain.",
+        ),
+        (
+            {
+                "A": [1, 4],
+            },
+            "A",
+            [],
+            ValueError,
+            r"At least one feature column must remain.",
+        ),
+        (
+            Table(
+                {
+                    "A": [1, 4],
+                    "B": [2, 5],
+                    "C": [3, 6],
+                    "T": [0, 1],
+                },
+            ),
+            "T",
+            ["D", "E"],
+            UnknownColumnNameError,
+            r"Could not find column\(s\) 'D, E'",
+        ),
+        (
+            Table(
+                {
+                    "A": [1, 4],
+                    "B": [2, 5],
+                    "C": [3, 6],
+                    "T": [0, 1],
+                },
+            ),
+            "D",
+            [],
+            UnknownColumnNameError,
+            r"Could not find column\(s\) 'D'",
+        ),
+        (
+            Table(
+                {
+                    "A": [1, 4],
+                    "B": [2, 5],
+                    "C": [3, 6],
+                    "T": [0, 1],
+                },
+            ),
+            "A",
+            ["A"],
+            ValueError,
+            r"Column 'A' cannot be both target and extra.",
+        ),
+        (
+            Table(
+                {
+                    "A": [1, 4],
+                    "B": [2, 5],
+                    "C": [3, 6],
+                    "T": [0, 1],
+                },
+            ),
+            "T",
+            ["A", "B", "C"],
+            ValueError,
+            r"At least one feature column must remain.",
+        ),
+        (
+            Table(
+                {
+                    "A": [1, 4],
+                },
+            ),
+            "A",
+            [],
+            ValueError,
+            r"At least one feature column must remain.",
+        ),
+    ],
+    ids=[
+        "dict_extra_does_not_exist",
+        "dict_target_does_not_exist",
+        "dict_target_and_extra_overlap",
+        "dict_features_are_empty_explicitly",
+        "dict_features_are_empty_implicitly",
+        "table_extra_does_not_exist",
+        "table_target_does_not_exist",
+        "table_target_and_extra_overlap",
+        "table_features_are_empty_explicitly",
+        "table_features_are_empty_implicitly",
+    ],
+)
+def test_should_raise_error(
+    data: dict[str, list[int]],
+    target_name: str,
+    extra_names: list[str] | None,
+    error: type[Exception],
+    error_msg: str,
+) -> None:
+    with pytest.raises(error, match=error_msg):
+        TabularDataset(data, target_name=target_name, extra_names=extra_names)
+
+
+@pytest.mark.parametrize(
+    ("data", "target_name", "extra_names"),
+    [
+        (
+            {
+                "A": [1, 4],
+                "B": [2, 5],
+                "C": [3, 6],
+                "T": [0, 1],
+            },
+            "T",
+            [],
         ),
         (
             {
@@ -117,24 +189,66 @@ def test_should_raise_error(
             "T",
             None,
         ),
+        (
+            Table(
+                {
+                    "A": [1, 4],
+                    "B": [2, 5],
+                    "C": [3, 6],
+                    "T": [0, 1],
+                },
+            ),
+            "T",
+            [],
+        ),
+        (
+            Table(
+                {
+                    "A": [1, 4],
+                    "B": [2, 5],
+                    "C": [3, 6],
+                    "T": [0, 1],
+                },
+            ),
+            "T",
+            ["A", "C"],
+        ),
+        (
+            Table(
+                {
+                    "A": [1, 4],
+                    "B": [2, 5],
+                    "C": [3, 6],
+                    "T": [0, 1],
+                },
+            ),
+            "T",
+            None,
+        ),
     ],
     ids=[
-        "create_tabular_dataset",
-        "tabular_dataset_not_all_columns_are_features",
-        "tabular_dataset_with_feature_names_as_None",
+        "dict_create_tabular_dataset",
+        "dict_tabular_dataset_not_all_columns_are_features",
+        "dict_tabular_dataset_with_extra_names_as_None",
+        "table_create_tabular_dataset",
+        "table_tabular_dataset_not_all_columns_are_features",
+        "table_tabular_dataset_with_extra_names_as_None",
     ],
 )
 def test_should_create_a_tabular_dataset(
-    data: dict[str, list[int]],
+    data: Table | dict[str, list[int]],
     target_name: str,
-    feature_names: list[str] | None,
+    extra_names: list[str] | None,
 ) -> None:
-    tabular_dataset = TabularDataset(data, target_name=target_name, feature_names=feature_names)
-    if feature_names is None:
-        feature_names = list(data.keys())
-        feature_names.remove(target_name)
+    tabular_dataset = TabularDataset(data, target_name=target_name, extra_names=extra_names)
+    if not isinstance(data, Table):
+        data = Table(data)
+
+    if extra_names is None:
+        extra_names = []
+
     assert isinstance(tabular_dataset, TabularDataset)
-    assert tabular_dataset._features.column_names == feature_names
+    assert tabular_dataset._extras.column_names == extra_names
     assert tabular_dataset._target.name == target_name
-    assert tabular_dataset._features == Table(data).keep_only_columns(feature_names)
-    assert tabular_dataset._target == Table(data).get_column(target_name)
+    assert tabular_dataset._extras == data.keep_only_columns(extra_names)
+    assert tabular_dataset._target == data.get_column(target_name)

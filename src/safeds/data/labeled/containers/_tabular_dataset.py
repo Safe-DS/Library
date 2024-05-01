@@ -5,9 +5,6 @@ from typing import TYPE_CHECKING
 
 from safeds._utils import _structural_hash
 from safeds.data.tabular.containers import Column, Table
-from safeds.exceptions import (
-    UnknownColumnNameError,
-)
 
 if TYPE_CHECKING:
     from collections.abc import Mapping, Sequence
@@ -22,97 +19,36 @@ class TabularDataset:
     """
     A tabular dataset maps feature columns to a target column.
 
+    Create a tabular dataset from a mapping of column names to their values.
+
     Parameters
     ----------
     data:
         The data.
     target_name:
         Name of the target column.
-    feature_names:
-        Names of the feature columns. If None, all columns except the target column are used.
+    extra_names:
+        Names of the columns that are neither features nor target. If None, no extra columns are used, i.e. all but
+        the target column are used as features.
 
     Raises
     ------
     ColumnLengthMismatchError
         If columns have different lengths.
     ValueError
-        If the target column is also a feature column.
+        If the target column is also an extra column.
     ValueError
-        If no feature columns are specified.
+        If no feature columns remains.
 
     Examples
     --------
-    >>> from safeds.data.tabular.containers import Table
-    >>> table = Table({"col1": ["a", "b"], "col2": [1, 2]})
-    >>> tabular_dataset = table.to_tabular_dataset("col2", ["col1"])
+    >>> from safeds.data.labeled.containers import TabularDataset
+    >>> dataset = TabularDataset(
+    ...     {"id": [1, 2, 3], "feature": [4, 5, 6], "target": [1, 2, 3]},
+    ...     target_name="target",
+    ...     extra_names=["id"]
+    ... )
     """
-
-    # ------------------------------------------------------------------------------------------------------------------
-    # Creation
-    # ------------------------------------------------------------------------------------------------------------------
-
-    @staticmethod
-    def _from_table(
-        table: Table,
-        target_name: str,
-        feature_names: list[str] | None = None,
-    ) -> TabularDataset:
-        """
-        Create a tabular dataset from a table.
-
-        Parameters
-        ----------
-        table:
-            The table.
-        target_name:
-            Name of the target column.
-        feature_names:
-            Names of the feature columns. If None, all columns except the target column are used.
-
-        Returns
-        -------
-        tabular_dataset:
-            The created tabular dataset.
-
-        Raises
-        ------
-        UnknownColumnNameError
-            If target_name matches none of the column names.
-        ValueError
-            If the target column is also a feature column.
-        ValueError
-            If no feature columns are specified.
-
-        Examples
-        --------
-        >>> from safeds.data.labeled.containers import TabularDataset
-        >>> from safeds.data.tabular.containers import Table
-        >>> table = Table({"col1": ["a", "b", "c", "a"], "col2": [1, 2, 3, 4]})
-        >>> tabular_dataset = TabularDataset._from_table(table, "col2", ["col1"])
-        """
-        table = table._as_table()
-        if target_name not in table.column_names:
-            raise UnknownColumnNameError([target_name])
-
-        # If no feature names are specified, use all columns except the target column
-        if feature_names is None:
-            feature_names = table.column_names
-            feature_names.remove(target_name)
-
-        # Validate inputs
-        if target_name in feature_names:
-            raise ValueError(f"Column '{target_name}' cannot be both feature and target.")
-        if len(feature_names) == 0:
-            raise ValueError("At least one feature column must be specified.")
-
-        # Create result
-        result = object.__new__(TabularDataset)
-
-        result._table = table
-        result._features = table.keep_only_columns(feature_names)
-        result._target = table.get_column(target_name)
-
-        return result
 
     # ------------------------------------------------------------------------------------------------------------------
     # Dunder methods
@@ -120,52 +56,30 @@ class TabularDataset:
 
     def __init__(
         self,
-        data: Mapping[str, Sequence[Any]],
+        data: Table | Mapping[str, Sequence[Any]],
         target_name: str,
-        feature_names: list[str] | None = None,
+        extra_names: list[str] | None = None,
     ):
-        """
-        Create a tabular dataset from a mapping of column names to their values.
+        # Preprocess inputs
+        if not isinstance(data, Table):
+            data = Table(data)
+        if extra_names is None:
+            extra_names = []
 
-        Parameters
-        ----------
-        data:
-            The data.
-        target_name:
-            Name of the target column.
-        feature_names:
-            Names of the feature columns. If None, all columns except the target column are used.
-
-        Raises
-        ------
-        ColumnLengthMismatchError
-            If columns have different lengths.
-        ValueError
-            If the target column is also a feature column.
-        ValueError
-            If no feature columns are specified.
-
-        Examples
-        --------
-        >>> from safeds.data.labeled.containers import TabularDataset
-        >>> table = TabularDataset({"a": [1, 2, 3], "b": [4, 5, 6]}, "b", ["a"])
-        """
-        self._table = Table(data)
-
-        # If no feature names are specified, use all columns except the target column
-        if feature_names is None:
-            feature_names = self._table.column_names
-            if target_name in feature_names:
-                feature_names.remove(target_name)
+        # Derive feature names
+        feature_names = [name for name in data.column_names if name not in {target_name, *extra_names}]
 
         # Validate inputs
-        if target_name in feature_names:
-            raise ValueError(f"Column '{target_name}' cannot be both feature and target.")
+        if target_name in extra_names:
+            raise ValueError(f"Column '{target_name}' cannot be both target and extra.")
         if len(feature_names) == 0:
-            raise ValueError("At least one feature column must be specified.")
+            raise ValueError("At least one feature column must remain.")
 
-        self._features: Table = self._table.keep_only_columns(feature_names)
-        self._target: Column = self._table.get_column(target_name)
+        # Set attributes
+        self._table: Table = data
+        self._features: Table = data.keep_only_columns(feature_names)
+        self._target: Column = data.get_column(target_name)
+        self._extras: Table = data.keep_only_columns(extra_names)
 
     def __eq__(self, other: object) -> bool:
         """
@@ -210,27 +124,22 @@ class TabularDataset:
 
     @property
     def features(self) -> Table:
-        """
-        Get the feature columns of the tabular dataset.
-
-        Returns
-        -------
-        features:
-            The table containing the feature columns.
-        """
+        """The feature columns of the tabular dataset."""
         return self._features
 
     @property
     def target(self) -> Column:
-        """
-        Get the target column of the tabular dataset.
-
-        Returns
-        -------
-        target:
-            The target column.
-        """
+        """The target column of the tabular dataset."""
         return self._target
+
+    @property
+    def extras(self) -> Table:
+        """
+        Additional columns of the tabular dataset that are neither features nor target.
+
+        These can be used to store additional information about instances, such as IDs.
+        """
+        return self._extras
 
     # ------------------------------------------------------------------------------------------------------------------
     # Conversion

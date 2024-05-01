@@ -74,7 +74,7 @@ def valid_data() -> TabularDataset:
             "feat2": [3, 6],
             "target": [0, 1],
         },
-    ).to_tabular_dataset(target_name="target", feature_names=["feat1", "feat2"])
+    ).to_tabular_dataset(target_name="target", extra_names=["id"])
 
 
 @pytest.mark.parametrize("regressor", regressors(), ids=lambda x: x.__class__.__name__)
@@ -104,7 +104,7 @@ class TestFit:
                         "feat2": [3, 6],
                         "target": [0, 1],
                     },
-                ).to_tabular_dataset(target_name="target", feature_names=["feat1", "feat2"]),
+                ).to_tabular_dataset(target_name="target", extra_names=["id"]),
                 NonNumericColumnError,
                 r"Tried to do a numerical operation on one or multiple non-numerical columns: \n\{'feat1'\}",
             ),
@@ -116,7 +116,7 @@ class TestFit:
                         "feat2": [3, 6],
                         "target": [0, 1],
                     },
-                ).to_tabular_dataset(target_name="target", feature_names=["feat1", "feat2"]),
+                ).to_tabular_dataset(target_name="target", extra_names=["id"]),
                 MissingValuesColumnError,
                 r"Tried to do an operation on one or multiple columns containing missing values: \n\{'feat1'\}",
             ),
@@ -128,7 +128,7 @@ class TestFit:
                         "feat2": [],
                         "target": [],
                     },
-                ).to_tabular_dataset(target_name="target", feature_names=["feat1", "feat2"]),
+                ).to_tabular_dataset(target_name="target", extra_names=["id"]),
                 DatasetMissesDataError,
                 r"Dataset contains no rows",
             ),

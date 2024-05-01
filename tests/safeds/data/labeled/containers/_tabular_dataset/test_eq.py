@@ -8,35 +8,39 @@ from safeds.data.tabular.containers import Row, Table
 @pytest.mark.parametrize(
     ("table1", "table2", "expected"),
     [
-        (TabularDataset({"a": [], "b": []}, "b", ["a"]), TabularDataset({"a": [], "b": []}, "b", ["a"]), True),
         (
-            TabularDataset({"a": [1, 2, 3], "b": [4, 5, 6]}, "b", ["a"]),
-            TabularDataset({"a": [1, 2, 3], "b": [4, 5, 6]}, "b", ["a"]),
+            TabularDataset({"a": [], "b": []}, "b"),
+            TabularDataset({"a": [], "b": []}, "b"),
             True,
         ),
         (
-            TabularDataset({"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9]}, "b", ["a"]),
-            TabularDataset({"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9]}, "c", ["a"]),
-            False,
+            TabularDataset({"a": [1, 2, 3], "b": [4, 5, 6]}, "b"),
+            TabularDataset({"a": [1, 2, 3], "b": [4, 5, 6]}, "b"),
+            True,
         ),
         (
-            TabularDataset({"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9]}, "b", ["a"]),
-            TabularDataset({"a": [1, 2, 3], "b": [4, 5, 6], "d": [7, 8, 9]}, "b", ["a"]),
-            False,
-        ),
-        (
-            TabularDataset({"a": [1, 2, 3], "b": [4, 5, 6]}, "b", ["a"]),
-            TabularDataset({"a": [1, 1, 3], "b": [4, 5, 6]}, "b", ["a"]),
-            False,
-        ),
-        (
-            TabularDataset({"a": [1, 2, 3], "b": [4, 5, 6]}, "b", ["a"]),
-            TabularDataset({"a": ["1", "2", "3"], "b": [4, 5, 6]}, "b", ["a"]),
-            False,
-        ),
-        (
-            TabularDataset({"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9]}, "b", ["a"]),
             TabularDataset({"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9]}, "b", ["c"]),
+            TabularDataset({"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9]}, "c", ["b"]),
+            False,
+        ),
+        (
+            TabularDataset({"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9]}, "b", ["c"]),
+            TabularDataset({"a": [1, 2, 3], "b": [4, 5, 6], "d": [7, 8, 9]}, "b", ["d"]),
+            False,
+        ),
+        (
+            TabularDataset({"a": [1, 2, 3], "b": [4, 5, 6]}, "b"),
+            TabularDataset({"a": [1, 1, 3], "b": [4, 5, 6]}, "b"),
+            False,
+        ),
+        (
+            TabularDataset({"a": [1, 2, 3], "b": [4, 5, 6]}, "b"),
+            TabularDataset({"a": ["1", "2", "3"], "b": [4, 5, 6]}, "b"),
+            False,
+        ),
+        (
+            TabularDataset({"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9]}, "b", ["c"]),
+            TabularDataset({"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9]}, "b", ["a"]),
             False,
         ),
     ],
@@ -61,9 +65,9 @@ def test_should_return_whether_two_tabular_datasets_are_equal(
 @pytest.mark.parametrize(
     ("table", "other"),
     [
-        (TabularDataset({"a": [1, 2, 3], "b": [4, 5, 6]}, "b", ["a"]), None),
-        (TabularDataset({"a": [1, 2, 3], "b": [4, 5, 6]}, "b", ["a"]), Row()),
-        (TabularDataset({"a": [1, 2, 3], "b": [4, 5, 6]}, "b", ["a"]), Table()),
+        (TabularDataset({"a": [1, 2, 3], "b": [4, 5, 6]}, "b"), None),
+        (TabularDataset({"a": [1, 2, 3], "b": [4, 5, 6]}, "b"), Row()),
+        (TabularDataset({"a": [1, 2, 3], "b": [4, 5, 6]}, "b"), Table()),
     ],
     ids=[
         "TabularDataset vs. None",
