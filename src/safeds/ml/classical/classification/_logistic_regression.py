@@ -34,12 +34,12 @@ class LogisticRegressionClassifier(Classifier):
 
         Parameters
         ----------
-        training_set : TaggedTable
+        training_set:
             The training data containing the feature and target vectors.
 
         Returns
         -------
-        fitted_classifier : LogisticRegressionClassifier
+        fitted_classifier:
             The fitted classifier.
 
         Raises
@@ -71,12 +71,12 @@ class LogisticRegressionClassifier(Classifier):
 
         Parameters
         ----------
-        dataset : Table
+        dataset:
             The dataset containing the feature vectors.
 
         Returns
         -------
-        table : TaggedTable
+        table:
             A dataset containing the given feature vectors and the predicted target vector.
 
         Raises
@@ -109,7 +109,7 @@ class LogisticRegressionClassifier(Classifier):
 
         Returns
         -------
-        wrapped_classifier: ClassifierMixin
+        wrapped_classifier:
             The sklearn Classifier.
         """
         from sklearn.linear_model import LogisticRegression as sk_LogisticRegression

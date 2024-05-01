@@ -21,12 +21,12 @@ class AdaBoostClassifier(Classifier):
 
     Parameters
     ----------
-    learner: Classifier | None
+    learner:
         The learner from which the boosted ensemble is built.
-    maximum_number_of_learners: int
+    maximum_number_of_learners:
         The maximum number of learners at which boosting is terminated. In case of perfect fit, the learning procedure
         is stopped early. Has to be greater than 0.
-    learning_rate : float
+    learning_rate:
         Weight applied to each classifier at each boosting iteration. A higher learning rate increases the contribution
         of each classifier. Has to be greater than 0.
 
@@ -79,7 +79,7 @@ class AdaBoostClassifier(Classifier):
 
         Returns
         -------
-        result: Classifier | None
+        result:
             The base learner.
         """
         return self._learner
@@ -91,7 +91,7 @@ class AdaBoostClassifier(Classifier):
 
         Returns
         -------
-        result: int
+        result:
             The maximum number of learners.
         """
         return self._maximum_number_of_learners
@@ -103,7 +103,7 @@ class AdaBoostClassifier(Classifier):
 
         Returns
         -------
-        result: float
+        result:
             The learning rate.
         """
         return self._learning_rate
@@ -116,12 +116,12 @@ class AdaBoostClassifier(Classifier):
 
         Parameters
         ----------
-        training_set : TaggedTable
+        training_set:
             The training data containing the feature and target vectors.
 
         Returns
         -------
-        fitted_classifier : AdaBoostClassifier
+        fitted_classifier:
             The fitted classifier.
 
         Raises
@@ -157,12 +157,12 @@ class AdaBoostClassifier(Classifier):
 
         Parameters
         ----------
-        dataset : Table
+        dataset:
             The dataset containing the feature vectors.
 
         Returns
         -------
-        table : TaggedTable
+        table:
             A dataset containing the given feature vectors and the predicted target vector.
 
         Raises
@@ -195,7 +195,7 @@ class AdaBoostClassifier(Classifier):
 
         Returns
         -------
-        wrapped_classifier: ClassifierMixin
+        wrapped_classifier:
             The sklearn Classifier.
         """
         from sklearn.ensemble import AdaBoostClassifier as sk_AdaBoostClassifier

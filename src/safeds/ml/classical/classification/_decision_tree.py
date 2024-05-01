@@ -34,12 +34,12 @@ class DecisionTreeClassifier(Classifier):
 
         Parameters
         ----------
-        training_set : TaggedTable
+        training_set:
             The training data containing the feature and target vectors.
 
         Returns
         -------
-        fitted_classifier : DecisionTreeClassifier
+        fitted_classifier:
             The fitted classifier.
 
         Raises
@@ -71,12 +71,12 @@ class DecisionTreeClassifier(Classifier):
 
         Parameters
         ----------
-        dataset : Table
+        dataset:
             The dataset containing the feature vectors.
 
         Returns
         -------
-        table : TaggedTable
+        table:
             A dataset containing the given feature vectors and the predicted target vector.
 
         Raises

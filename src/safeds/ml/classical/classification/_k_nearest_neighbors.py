@@ -21,7 +21,7 @@ class KNearestNeighborsClassifier(Classifier):
 
     Parameters
     ----------
-    number_of_neighbors : int
+    number_of_neighbors:
         The number of neighbors to use for interpolation. Has to be greater than 0 (validated in the constructor) and
         less than or equal to the sample size (validated when calling `fit`).
 
@@ -59,7 +59,7 @@ class KNearestNeighborsClassifier(Classifier):
 
         Returns
         -------
-        result: int
+        result:
             The number of neighbors.
         """
         return self._number_of_neighbors
@@ -72,12 +72,12 @@ class KNearestNeighborsClassifier(Classifier):
 
         Parameters
         ----------
-        training_set : TaggedTable
+        training_set:
             The training data containing the feature and target vectors.
 
         Returns
         -------
-        fitted_classifier : KNearestNeighborsClassifier
+        fitted_classifier:
             The fitted classifier.
 
         Raises
@@ -120,12 +120,12 @@ class KNearestNeighborsClassifier(Classifier):
 
         Parameters
         ----------
-        dataset : Table
+        dataset:
             The dataset containing the feature vectors.
 
         Returns
         -------
-        table : TaggedTable
+        table:
             A dataset containing the given feature vectors and the predicted target vector.
 
         Raises
@@ -158,7 +158,7 @@ class KNearestNeighborsClassifier(Classifier):
 
         Returns
         -------
-        wrapped_classifier: ClassifierMixin
+        wrapped_classifier:
             The sklearn Classifier.
         """
         from sklearn.neighbors import KNeighborsClassifier as sk_KNeighborsClassifier
