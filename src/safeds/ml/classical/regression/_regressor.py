@@ -34,12 +34,12 @@ class Regressor(ABC):
 
         Parameters
         ----------
-        training_set : TaggedTable
+        training_set:
             The training data containing the feature and target vectors.
 
         Returns
         -------
-        fitted_regressor : Regressor
+        fitted_regressor:
             The fitted regressor.
 
         Raises
@@ -55,12 +55,12 @@ class Regressor(ABC):
 
         Parameters
         ----------
-        dataset : Table
+        dataset:
             The dataset containing the feature vectors.
 
         Returns
         -------
-        table : TaggedTable
+        table:
             A dataset containing the given feature vectors and the predicted target vector.
 
         Raises
@@ -87,7 +87,7 @@ class Regressor(ABC):
 
         Returns
         -------
-        wrapped_regressor: RegressorMixin
+        wrapped_regressor:
             The sklearn Regressor.
         """
 
@@ -98,12 +98,12 @@ class Regressor(ABC):
 
         Parameters
         ----------
-        validation_or_test_set : TaggedTable
+        validation_or_test_set:
             The validation or test set.
 
         Returns
         -------
-        mean_squared_error : float
+        mean_squared_error:
             The calculated mean squared error (the average of the distance of each individual row squared).
 
         Raises
@@ -128,12 +128,12 @@ class Regressor(ABC):
 
         Parameters
         ----------
-        validation_or_test_set : TaggedTable
+        validation_or_test_set:
             The validation or test set.
 
         Returns
         -------
-        mean_absolute_error : float
+        mean_absolute_error:
             The calculated mean absolute error (the average of the distance of each individual row).
 
         Raises

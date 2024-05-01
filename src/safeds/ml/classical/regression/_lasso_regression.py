@@ -21,7 +21,7 @@ class LassoRegressor(Regressor):
 
     Parameters
     ----------
-    alpha : float
+    alpha:
         Controls the regularization of the model. The higher the value, the more regularized it becomes.
 
     Raises
@@ -62,7 +62,7 @@ class LassoRegressor(Regressor):
 
         Returns
         -------
-        result: float
+        result:
             The regularization of the model.
         """
         return self._alpha
@@ -75,12 +75,12 @@ class LassoRegressor(Regressor):
 
         Parameters
         ----------
-        training_set : TaggedTable
+        training_set:
             The training data containing the feature and target vectors.
 
         Returns
         -------
-        fitted_regressor : LassoRegressor
+        fitted_regressor:
             The fitted regressor.
 
         Raises
@@ -112,12 +112,12 @@ class LassoRegressor(Regressor):
 
         Parameters
         ----------
-        dataset : Table
+        dataset:
             The dataset containing the feature vectors.
 
         Returns
         -------
-        table : TaggedTable
+        table:
             A dataset containing the given feature vectors and the predicted target vector.
 
         Raises
@@ -150,7 +150,7 @@ class LassoRegressor(Regressor):
 
         Returns
         -------
-        wrapped_regressor: RegressorMixin
+        wrapped_regressor:
             The sklearn Regressor.
         """
         from sklearn.linear_model import Lasso as sk_Lasso

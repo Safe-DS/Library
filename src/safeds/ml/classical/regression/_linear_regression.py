@@ -34,12 +34,12 @@ class LinearRegressionRegressor(Regressor):
 
         Parameters
         ----------
-        training_set : TaggedTable
+        training_set:
             The training data containing the feature and target vectors.
 
         Returns
         -------
-        fitted_regressor : LinearRegressionRegressor
+        fitted_regressor:
             The fitted regressor.
 
         Raises
@@ -71,12 +71,12 @@ class LinearRegressionRegressor(Regressor):
 
         Parameters
         ----------
-        dataset : Table
+        dataset:
             The dataset containing the feature vectors.
 
         Returns
         -------
-        table : TaggedTable
+        table:
             A dataset containing the given feature vectors and the predicted target vector.
 
         Raises
@@ -109,7 +109,7 @@ class LinearRegressionRegressor(Regressor):
 
         Returns
         -------
-        wrapped_regressor: RegressorMixin
+        wrapped_regressor:
             The sklearn Regressor.
         """
         from sklearn.linear_model import LinearRegression as sk_LinearRegression

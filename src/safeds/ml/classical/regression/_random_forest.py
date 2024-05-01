@@ -20,7 +20,7 @@ class RandomForestRegressor(Regressor):
 
     Parameters
     ----------
-    number_of_trees : int
+    number_of_trees:
         The number of trees to be used in the random forest. Has to be greater than 0.
 
     Raises
@@ -52,7 +52,7 @@ class RandomForestRegressor(Regressor):
 
         Returns
         -------
-        result: int
+        result:
             The number of trees.
         """
         return self._number_of_trees
@@ -65,12 +65,12 @@ class RandomForestRegressor(Regressor):
 
         Parameters
         ----------
-        training_set : TaggedTable
+        training_set:
             The training data containing the feature and target vectors.
 
         Returns
         -------
-        fitted_regressor : RandomForestRegressor
+        fitted_regressor:
             The fitted regressor.
 
         Raises
@@ -102,12 +102,12 @@ class RandomForestRegressor(Regressor):
 
         Parameters
         ----------
-        dataset : Table
+        dataset:
             The dataset containing the feature vectors.
 
         Returns
         -------
-        table : TaggedTable
+        table:
             A dataset containing the given feature vectors and the predicted target vector.
 
         Raises
@@ -140,7 +140,7 @@ class RandomForestRegressor(Regressor):
 
         Returns
         -------
-        wrapped_regressor: RegressorMixin
+        wrapped_regressor:
             The sklearn Regressor.
         """
         from sklearn.ensemble import RandomForestRegressor as sk_RandomForestRegressor

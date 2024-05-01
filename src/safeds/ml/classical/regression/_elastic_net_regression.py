@@ -22,9 +22,9 @@ class ElasticNetRegressor(Regressor):
 
     Parameters
     ----------
-    alpha : float
+    alpha:
         Controls the regularization of the model. The higher the value, the more regularized it becomes.
-    lasso_ratio: float
+    lasso_ratio:
         Number between 0 and 1 that controls the ratio between Lasso and Ridge regularization. If 0, only Ridge
         regularization is used. If 1, only Lasso regularization is used.
 
@@ -96,7 +96,7 @@ class ElasticNetRegressor(Regressor):
 
         Returns
         -------
-        result: float
+        result:
             The regularization of the model.
         """
         return self._alpha
@@ -108,7 +108,7 @@ class ElasticNetRegressor(Regressor):
 
         Returns
         -------
-        result: float
+        result:
             The ratio between Lasso and Ridge regularization.
         """
         return self._lasso_ratio
@@ -121,12 +121,12 @@ class ElasticNetRegressor(Regressor):
 
         Parameters
         ----------
-        training_set : TaggedTable
+        training_set:
             The training data containing the feature and target vectors.
 
         Returns
         -------
-        fitted_regressor : ElasticNetRegressor
+        fitted_regressor:
             The fitted regressor.
 
         Raises
@@ -158,12 +158,12 @@ class ElasticNetRegressor(Regressor):
 
         Parameters
         ----------
-        dataset : Table
+        dataset:
             The dataset containing the feature vectors.
 
         Returns
         -------
-        table : TaggedTable
+        table:
             A dataset containing the given feature vectors and the predicted target vector.
 
         Raises
@@ -196,7 +196,7 @@ class ElasticNetRegressor(Regressor):
 
         Returns
         -------
-        wrapped_regressor: RegressorMixin
+        wrapped_regressor:
             The sklearn Regressor.
         """
         from sklearn.linear_model import ElasticNet as sk_ElasticNet
