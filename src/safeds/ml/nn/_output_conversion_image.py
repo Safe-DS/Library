@@ -19,15 +19,11 @@ from safeds.data.tabular.transformation import OneHotEncoder
 T = TypeVar("T", ImageDataset[Column], ImageDataset[Table], ImageDataset[ImageList])
 
 
-class _OutputConversionImage(_OutputConversion[ImageList, T], ABC):
-    """The output conversion for a neural network, defines the output parameters for the neural network."""
-
-    @abstractmethod
-    def _data_conversion(self, input_data: ImageList, output_data: Tensor, **kwargs: Any) -> T:
-        pass  # pragma: no cover
+class _OutputConversionImage:
+    pass  # pragma: no cover
 
 
-class OutputConversionImageToColumn(_OutputConversionImage[ImageDataset[Column]]):
+class OutputConversionImageToColumn(_OutputConversion[ImageList, ImageDataset[Column]], _OutputConversionImage):
 
     def _data_conversion(self, input_data: ImageList, output_data: Tensor, **kwargs: Any) -> ImageDataset[Column]:
         import torch
@@ -55,7 +51,7 @@ class OutputConversionImageToColumn(_OutputConversionImage[ImageDataset[Column]]
         return im_dataset
 
 
-class OutputConversionImageToTable(_OutputConversionImage[ImageDataset[Table]]):
+class OutputConversionImageToTable(_OutputConversion[ImageList, ImageDataset[Table]], _OutputConversionImage):
 
     def _data_conversion(self, input_data: ImageList, output_data: Tensor, **kwargs: Any) -> ImageDataset[Table]:
         import torch
@@ -80,7 +76,7 @@ class OutputConversionImageToTable(_OutputConversionImage[ImageDataset[Table]]):
         return im_dataset
 
 
-class OutputConversionImageToImage(_OutputConversionImage[ImageDataset[ImageList]]):
+class OutputConversionImageToImage(_OutputConversion[ImageList, ImageDataset[ImageList]], _OutputConversionImage):
 
     def _data_conversion(
         self, input_data: ImageList, output_data: Tensor, **kwargs: Any  # noqa: ARG002
