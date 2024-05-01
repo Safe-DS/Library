@@ -58,29 +58,29 @@ class NeuralNetworkRegressor(Generic[IFT, IPT, OT]):
 
         Parameters
         ----------
-        train_data
+        train_data:
             The data the network should be trained on.
-        epoch_size
+        epoch_size:
             The number of times the training cycle should be done.
-        batch_size
+        batch_size:
             The size of data batches that should be loaded at one time.
-        learning_rate
+        learning_rate:
             The learning rate of the neural network.
-        callback_on_batch_completion
+        callback_on_batch_completion:
             Function used to view metrics while training. Gets called after a batch is completed with the index of the last batch and the overall loss average.
-        callback_on_epoch_completion
+        callback_on_epoch_completion:
             Function used to view metrics while training. Gets called after an epoch is completed with the index of the last epoch and the overall loss average.
+
+        Returns
+        -------
+        trained_model:
+            The trained Model
 
         Raises
         ------
         ValueError
             If epoch_size < 1
             If batch_size < 1
-
-        Returns
-        -------
-        trained_model :
-            The trained Model
         """
         import torch
         from torch import nn
@@ -140,12 +140,12 @@ class NeuralNetworkRegressor(Generic[IFT, IPT, OT]):
 
         Parameters
         ----------
-        test_data
+        test_data:
             The data the network should predict.
 
         Returns
         -------
-        prediction :
+        prediction:
             The given test_data with an added "prediction" column at the end
 
         Raises
@@ -206,29 +206,29 @@ class NeuralNetworkClassifier(Generic[IFT, IPT, OT]):
 
         Parameters
         ----------
-        train_data
+        train_data:
             The data the network should be trained on.
-        epoch_size
+        epoch_size:
             The number of times the training cycle should be done.
-        batch_size
+        batch_size:
             The size of data batches that should be loaded at one time.
-        learning_rate
+        learning_rate:
             The learning rate of the neural network.
-        callback_on_batch_completion
+        callback_on_batch_completion:
             Function used to view metrics while training. Gets called after a batch is completed with the index of the last batch and the overall loss average.
-        callback_on_epoch_completion
+        callback_on_epoch_completion:
             Function used to view metrics while training. Gets called after an epoch is completed with the index of the last epoch and the overall loss average.
+
+        Returns
+        -------
+        trained_model:
+            The trained Model
 
         Raises
         ------
         ValueError
             If epoch_size < 1
             If batch_size < 1
-
-        Returns
-        -------
-        trained_model :
-            The trained Model
         """
         import torch
         from torch import nn
@@ -295,12 +295,12 @@ class NeuralNetworkClassifier(Generic[IFT, IPT, OT]):
 
         Parameters
         ----------
-        test_data
+        test_data:
             The data the network should predict.
 
         Returns
         -------
-        prediction :
+        prediction:
             The given test_data with an added "prediction" column at the end
 
         Raises

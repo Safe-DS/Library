@@ -18,7 +18,7 @@ class OutputConversionTable(_OutputConversion[Table, TaggedTable]):
 
         Parameters
         ----------
-        prediction_name
+        prediction_name:
             The name of the new column where the prediction will be stored.
         """
         self._prediction_name = prediction_name
