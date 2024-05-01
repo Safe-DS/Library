@@ -553,12 +553,12 @@ class TestSortColumns:
         [
             (
                 Row({"b": 1, "a": 2}),
-                lambda col1, col2: (col1[0] > col2[0]) - (col1[0] < col2[0]),
+                lambda name_1, _value_1, name_2, _value_2: (name_1 > name_2) - (name_1 < name_2),
                 Row({"a": 2, "b": 1}),
             ),
             (
                 Row({"a": 2, "b": 1}),
-                lambda col1, col2: (col2[0] > col1[0]) - (col2[0] < col1[0]),
+                lambda name_1, _value_1, name_2, _value_2: (name_2 > name_1) - (name_2 < name_1),
                 Row({"b": 1, "a": 2}),
             ),
             (Row(), lambda col1, col2: (col1[0] > col2[0]) - (col1[0] < col2[0]), Row()),
@@ -569,7 +569,7 @@ class TestSortColumns:
             "empty rows",
         ],
     )
-    def test_should_sort_columns(self, row: Row, comparator: Callable[[tuple, tuple], int], expected: Row) -> None:
+    def test_should_sort_columns(self, row: Row, comparator: Callable[[str, Any, str, Any], int], expected: Row) -> None:
         row = row.sort_columns(comparator)
         assert row == expected
 
