@@ -19,7 +19,7 @@ class Choice(Collection[T]):
 
         Parameters
         ----------
-        *args: tuple[T, ...]
+        *args:
             The values to choose from.
         """
         self.elements = list(args)
@@ -30,12 +30,12 @@ class Choice(Collection[T]):
 
         Parameters
         ----------
-        value: Any
+        value:
             The value to check.
 
         Returns
         -------
-        is_in_choice : bool
+        is_in_choice:
             Whether the value is in this choice.
         """
         return value in self.elements
@@ -46,7 +46,7 @@ class Choice(Collection[T]):
 
         Returns
         -------
-        iterator : Iterator[T]
+        iterator:
             An iterator over the values of this choice.
         """
         return iter(self.elements)
@@ -57,7 +57,7 @@ class Choice(Collection[T]):
 
         Returns
         -------
-        number_of_values : int
+        number_of_values:
             The number of values in this choice.
         """
         return len(self.elements)

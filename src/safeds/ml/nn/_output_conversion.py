@@ -4,15 +4,15 @@ from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Generic, TypeVar, Unpack, Any
 
 from safeds.data.image.containers import ImageList
-from safeds.data.labeled.containers import ImageDataset
+from safeds.data.labeled.containers import ImageDataset, TabularDataset
 
 if TYPE_CHECKING:
     from torch import Tensor
 
-from safeds.data.tabular.containers import Table, TaggedTable, TimeSeries
+from safeds.data.tabular.containers import Table, TimeSeries
 
 IT = TypeVar("IT", Table, TimeSeries, ImageList)
-OT = TypeVar("OT", TaggedTable, TimeSeries, ImageDataset)
+OT = TypeVar("OT", TabularDataset, TimeSeries, ImageDataset)
 
 
 class _OutputConversion(Generic[IT, OT], ABC):

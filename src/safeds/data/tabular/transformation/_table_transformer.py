@@ -21,10 +21,10 @@ class TableTransformer(ABC):
         hash:
             The hash value.
         """
-        added = self.get_names_of_added_columns() if self.is_fitted() else []
-        changed = self.get_names_of_changed_columns() if self.is_fitted() else []
-        removed = self.get_names_of_removed_columns() if self.is_fitted() else []
-        return _structural_hash(self.__class__.__qualname__, self.is_fitted(), added, changed, removed)
+        added = self.get_names_of_added_columns() if self.is_fitted else []
+        changed = self.get_names_of_changed_columns() if self.is_fitted else []
+        removed = self.get_names_of_removed_columns() if self.is_fitted else []
+        return _structural_hash(self.__class__.__qualname__, self.is_fitted, added, changed, removed)
 
     @abstractmethod
     def fit(self, table: Table, column_names: list[str] | None) -> TableTransformer:
@@ -35,14 +35,14 @@ class TableTransformer(ABC):
 
         Parameters
         ----------
-        table : Table
+        table:
             The table used to fit the transformer.
-        column_names : list[str] | None
+        column_names:
             The list of columns from the table used to fit the transformer. If `None`, all columns are used.
 
         Returns
         -------
-        fitted_transformer : TableTransformer
+        fitted_transformer:
             The fitted transformer.
         """
 
@@ -55,12 +55,12 @@ class TableTransformer(ABC):
 
         Parameters
         ----------
-        table : Table
+        table:
             The table to which the learned transformation is applied.
 
         Returns
         -------
-        transformed_table : Table
+        transformed_table:
             The transformed table.
 
         Raises
@@ -76,7 +76,7 @@ class TableTransformer(ABC):
 
         Returns
         -------
-        added_columns : list[str]
+        added_columns:
             A list of names of the added columns, ordered as they will appear in the table.
 
         Raises
@@ -92,7 +92,7 @@ class TableTransformer(ABC):
 
         Returns
         -------
-        changed_columns : list[str]
+        changed_columns:
              A list of names of changed columns, ordered as they appear in the table.
 
         Raises
@@ -108,7 +108,7 @@ class TableTransformer(ABC):
 
         Returns
         -------
-        removed_columns : list[str]
+        removed_columns:
             A list of names of the removed columns, ordered as they appear in the table the transformer was fitted on.
 
         Raises
@@ -117,16 +117,10 @@ class TableTransformer(ABC):
             If the transformer has not been fitted yet.
         """
 
+    @property
     @abstractmethod
     def is_fitted(self) -> bool:
-        """
-        Check if the transformer is fitted.
-
-        Returns
-        -------
-        is_fitted : bool
-            Whether the transformer is fitted.
-        """
+        """Whether the transformer is fitted."""
 
     def fit_and_transform(self, table: Table, column_names: list[str] | None = None) -> Table:
         """
@@ -136,14 +130,14 @@ class TableTransformer(ABC):
 
         Parameters
         ----------
-        table : Table
+        table:
             The table used to fit the transformer. The transformer is then applied to this table.
-        column_names : list[str] | None
+        column_names:
             The list of columns from the table used to fit the transformer. If `None`, all columns are used.
 
         Returns
         -------
-        transformed_table : Table
+        transformed_table:
             The transformed table.
         """
         return self.fit(table, column_names).transform(table)
@@ -159,14 +153,14 @@ class InvertibleTableTransformer(TableTransformer):
 
         Parameters
         ----------
-        table : Table
+        table:
             The table used to fit the transformer.
-        column_names : list[str] | None
+        column_names:
             The list of columns from the table used to fit the transformer. If `None`, all columns are used.
 
         Returns
         -------
-        fitted_transformer : InvertibleTableTransformer
+        fitted_transformer:
             The fitted transformer.
         """
 
@@ -179,12 +173,12 @@ class InvertibleTableTransformer(TableTransformer):
 
         Parameters
         ----------
-        transformed_table : Table
+        transformed_table:
             The table to be transformed back to the original version.
 
         Returns
         -------
-        table : Table
+        table:
             The original table.
 
         Raises

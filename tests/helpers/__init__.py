@@ -1,6 +1,6 @@
 from ._assertions import (
     assert_that_tables_are_close,
-    assert_that_tagged_tables_are_equal,
+    assert_that_tabular_datasets_are_equal,
     assert_that_time_series_are_equal,
 )
 from ._devices import (
@@ -37,7 +37,7 @@ from ._resources import resolve_resource_path
 
 __all__ = [
     "assert_that_tables_are_close",
-    "assert_that_tagged_tables_are_equal",
+    "assert_that_tabular_datasets_are_equal",
     "assert_that_time_series_are_equal",
     "device_cpu",
     "device_cuda",

@@ -1,5 +1,5 @@
 import pytest
-from safeds.data.tabular.containers import Column, Table, TaggedTable, TimeSeries
+from safeds.data.tabular.containers import Column, Table, TimeSeries
 from safeds.exceptions import ColumnSizeError, DuplicateColumnNameError
 
 from tests.helpers import assert_that_time_series_are_equal
@@ -49,10 +49,15 @@ def test_should_add_column_as_feature(
 
 
 @pytest.mark.parametrize(
-    ("tagged_table", "column", "error_msg"),
+    ("time_series", "column", "error_msg"),
     [
         (
-            TaggedTable({"A": [1, 2, 3], "B": [4, 5, 6]}, target_name="B", feature_names=["A"]),
+            TimeSeries(
+                {"time": [0, 1, 2], "A": [1, 2, 3], "B": [4, 5, 6]},
+                target_name="B",
+                time_name="time",
+                feature_names=["A"],
+            ),
             Column("A", [7, 8, 9]),
             r"Column 'A' already exists.",
         ),
@@ -60,12 +65,12 @@ def test_should_add_column_as_feature(
     ids=["column_already_exists"],
 )
 def test_should_raise_duplicate_column_name_if_column_already_exists(
-    tagged_table: TaggedTable,
+    time_series: TimeSeries,
     column: Column,
     error_msg: str,
 ) -> None:
     with pytest.raises(DuplicateColumnNameError, match=error_msg):
-        tagged_table.add_column_as_feature(column)
+        time_series.add_column_as_feature(column)
 
 
 # here starts the second test for errors

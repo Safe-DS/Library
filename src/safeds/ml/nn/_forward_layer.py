@@ -44,9 +44,9 @@ class ForwardLayer(_Layer):
 
         Parameters
         ----------
-        input_size
+        input_size:
             The number of neurons in the previous layer
-        output_size
+        output_size:
             The number of neurons in this layer
 
         Raises
@@ -72,7 +72,7 @@ class ForwardLayer(_Layer):
 
         Returns
         -------
-        result :
+        result:
             The amount of values being passed into this layer.
         """
         return self._input_size
@@ -84,7 +84,7 @@ class ForwardLayer(_Layer):
 
         Returns
         -------
-        result :
+        result:
             The Number of Neurons in this layer.
         """
         return self._output_size
@@ -123,8 +123,6 @@ class ForwardLayer(_Layer):
         return self._input_size == other._input_size and self._output_size == other._output_size
 
     def __sizeof__(self) -> int:
-        import sys
-
         """
         Return the complete size of this object.
 
@@ -133,4 +131,6 @@ class ForwardLayer(_Layer):
         size:
             Size of this object in bytes.
         """
+        import sys
+
         return sys.getsizeof(self._input_size) + sys.getsizeof(self._output_size)

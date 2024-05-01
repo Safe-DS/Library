@@ -11,7 +11,8 @@ if TYPE_CHECKING:
     from sklearn.base import ClassifierMixin
     from sklearn.linear_model import LogisticRegression as sk_LogisticRegression
 
-    from safeds.data.tabular.containers import Table, TaggedTable
+    from safeds.data.labeled.containers import TabularDataset
+    from safeds.data.tabular.containers import Table
 
 
 class LogisticRegressionClassifier(Classifier):
@@ -26,7 +27,7 @@ class LogisticRegressionClassifier(Classifier):
         self._feature_names: list[str] | None = None
         self._target_name: str | None = None
 
-    def fit(self, training_set: TaggedTable) -> LogisticRegressionClassifier:
+    def fit(self, training_set: TabularDataset) -> LogisticRegressionClassifier:
         """
         Create a copy of this classifier and fit it with the given training data.
 
@@ -34,20 +35,20 @@ class LogisticRegressionClassifier(Classifier):
 
         Parameters
         ----------
-        training_set : TaggedTable
+        training_set:
             The training data containing the feature and target vectors.
 
         Returns
         -------
-        fitted_classifier : LogisticRegressionClassifier
+        fitted_classifier:
             The fitted classifier.
 
         Raises
         ------
         LearningError
             If the training data contains invalid values or if the training failed.
-        UntaggedTableError
-            If the table is untagged.
+        TypeError
+            If a table is passed instead of a tabular dataset.
         NonNumericColumnError
             If the training data contains non-numerical values.
         MissingValuesColumnError
@@ -65,26 +66,24 @@ class LogisticRegressionClassifier(Classifier):
 
         return result
 
-    def predict(self, dataset: Table) -> TaggedTable:
+    def predict(self, dataset: Table) -> TabularDataset:
         """
         Predict a target vector using a dataset containing feature vectors. The model has to be trained first.
 
         Parameters
         ----------
-        dataset : Table
+        dataset:
             The dataset containing the feature vectors.
 
         Returns
         -------
-        table : TaggedTable
+        table:
             A dataset containing the given feature vectors and the predicted target vector.
 
         Raises
         ------
         ModelNotFittedError
             If the model has not been fitted yet.
-        DatasetContainsTargetError
-            If the dataset contains the target column already.
         DatasetMissesFeaturesError
             If the dataset misses feature columns.
         PredictionError
@@ -98,15 +97,9 @@ class LogisticRegressionClassifier(Classifier):
         """
         return predict(self._wrapped_classifier, dataset, self._feature_names, self._target_name)
 
+    @property
     def is_fitted(self) -> bool:
-        """
-        Check if the classifier is fitted.
-
-        Returns
-        -------
-        is_fitted : bool
-            Whether the classifier is fitted.
-        """
+        """Whether the classifier is fitted."""
         return self._wrapped_classifier is not None
 
     def _get_sklearn_classifier(self) -> ClassifierMixin:
@@ -115,7 +108,7 @@ class LogisticRegressionClassifier(Classifier):
 
         Returns
         -------
-        wrapped_classifier: ClassifierMixin
+        wrapped_classifier:
             The sklearn Classifier.
         """
         from sklearn.linear_model import LogisticRegression as sk_LogisticRegression

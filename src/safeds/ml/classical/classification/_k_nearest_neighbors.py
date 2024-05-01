@@ -3,7 +3,9 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from safeds._utils import _structural_hash
-from safeds.exceptions import ClosedBound, DatasetMissesDataError, OutOfBoundsError
+from safeds.data.labeled.containers import TabularDataset
+from safeds.data.tabular.containers import Table
+from safeds.exceptions import ClosedBound, DatasetMissesDataError, OutOfBoundsError, PlainTableError
 from safeds.ml.classical._util_sklearn import fit, predict
 
 from ._classifier import Classifier
@@ -12,8 +14,6 @@ if TYPE_CHECKING:
     from sklearn.base import ClassifierMixin
     from sklearn.neighbors import KNeighborsClassifier as sk_KNeighborsClassifier
 
-    from safeds.data.tabular.containers import Table, TaggedTable
-
 
 class KNearestNeighborsClassifier(Classifier):
     """
@@ -21,7 +21,7 @@ class KNearestNeighborsClassifier(Classifier):
 
     Parameters
     ----------
-    number_of_neighbors : int
+    number_of_neighbors:
         The number of neighbors to use for interpolation. Has to be greater than 0 (validated in the constructor) and
         less than or equal to the sample size (validated when calling `fit`).
 
@@ -59,12 +59,12 @@ class KNearestNeighborsClassifier(Classifier):
 
         Returns
         -------
-        result: int
+        result:
             The number of neighbors.
         """
         return self._number_of_neighbors
 
-    def fit(self, training_set: TaggedTable) -> KNearestNeighborsClassifier:
+    def fit(self, training_set: TabularDataset) -> KNearestNeighborsClassifier:
         """
         Create a copy of this classifier and fit it with the given training data.
 
@@ -72,12 +72,12 @@ class KNearestNeighborsClassifier(Classifier):
 
         Parameters
         ----------
-        training_set : TaggedTable
+        training_set:
             The training data containing the feature and target vectors.
 
         Returns
         -------
-        fitted_classifier : KNearestNeighborsClassifier
+        fitted_classifier:
             The fitted classifier.
 
         Raises
@@ -86,8 +86,8 @@ class KNearestNeighborsClassifier(Classifier):
             If `number_of_neighbors` is greater than the sample size.
         LearningError
             If the training data contains invalid values or if the training failed.
-        UntaggedTableError
-            If the table is untagged.
+        TypeError
+            If a table is passed instead of a tabular dataset.
         NonNumericColumnError
             If the training data contains non-numerical values.
         MissingValuesColumnError
@@ -95,13 +95,15 @@ class KNearestNeighborsClassifier(Classifier):
         DatasetMissesDataError
             If the training data contains no rows.
         """
-        if training_set.number_of_rows == 0:
+        if not isinstance(training_set, TabularDataset) and isinstance(training_set, Table):
+            raise PlainTableError
+        if training_set._table.number_of_rows == 0:
             raise DatasetMissesDataError
-        if self._number_of_neighbors > training_set.number_of_rows:
+        if self._number_of_neighbors > training_set._table.number_of_rows:
             raise ValueError(
                 (
                     f"The parameter 'number_of_neighbors' ({self._number_of_neighbors}) has to be less than or equal to"
-                    f" the sample size ({training_set.number_of_rows})."
+                    f" the sample size ({training_set._table.number_of_rows})."
                 ),
             )
         wrapped_classifier = self._get_sklearn_classifier()
@@ -114,26 +116,24 @@ class KNearestNeighborsClassifier(Classifier):
 
         return result
 
-    def predict(self, dataset: Table) -> TaggedTable:
+    def predict(self, dataset: Table) -> TabularDataset:
         """
         Predict a target vector using a dataset containing feature vectors. The model has to be trained first.
 
         Parameters
         ----------
-        dataset : Table
+        dataset:
             The dataset containing the feature vectors.
 
         Returns
         -------
-        table : TaggedTable
+        table:
             A dataset containing the given feature vectors and the predicted target vector.
 
         Raises
         ------
         ModelNotFittedError
             If the model has not been fitted yet.
-        DatasetContainsTargetError
-            If the dataset contains the target column already.
         DatasetMissesFeaturesError
             If the dataset misses feature columns.
         PredictionError
@@ -147,15 +147,9 @@ class KNearestNeighborsClassifier(Classifier):
         """
         return predict(self._wrapped_classifier, dataset, self._feature_names, self._target_name)
 
+    @property
     def is_fitted(self) -> bool:
-        """
-        Check if the classifier is fitted.
-
-        Returns
-        -------
-        is_fitted : bool
-            Whether the classifier is fitted.
-        """
+        """Whether the classifier is fitted."""
         return self._wrapped_classifier is not None
 
     def _get_sklearn_classifier(self) -> ClassifierMixin:
@@ -164,7 +158,7 @@ class KNearestNeighborsClassifier(Classifier):
 
         Returns
         -------
-        wrapped_classifier: ClassifierMixin
+        wrapped_classifier:
             The sklearn Classifier.
         """
         from sklearn.neighbors import KNeighborsClassifier as sk_KNeighborsClassifier

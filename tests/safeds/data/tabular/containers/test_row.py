@@ -202,7 +202,6 @@ class TestHash:
     @pytest.mark.parametrize(
         ("row1", "row2"),
         [
-
             (Row({"col1": 0}), Row({"col1": 1})),
             (Row({"col1": 0}), Row({"col2": 0})),
             (Row({"col1": 0}), Row({"col1": "a"})),
@@ -346,7 +345,7 @@ class TestNumberOfColumns:
         ],
     )
     def test_should_return_the_number_of_columns(self, row: Row, expected: int) -> None:
-        assert row.number_of_column == expected
+        assert row.number_of_columns == expected
 
 
 class TestGetValue:
@@ -554,12 +553,12 @@ class TestSortColumns:
         [
             (
                 Row({"b": 1, "a": 2}),
-                lambda col1, col2: (col1[0] > col2[0]) - (col1[0] < col2[0]),
+                lambda name_1, _value_1, name_2, _value_2: (name_1 > name_2) - (name_1 < name_2),
                 Row({"a": 2, "b": 1}),
             ),
             (
                 Row({"a": 2, "b": 1}),
-                lambda col1, col2: (col2[0] > col1[0]) - (col2[0] < col1[0]),
+                lambda name_1, _value_1, name_2, _value_2: (name_2 > name_1) - (name_2 < name_1),
                 Row({"b": 1, "a": 2}),
             ),
             (Row(), lambda col1, col2: (col1[0] > col2[0]) - (col1[0] < col2[0]), Row()),
@@ -570,7 +569,12 @@ class TestSortColumns:
             "empty rows",
         ],
     )
-    def test_should_sort_columns(self, row: Row, comparator: Callable[[tuple, tuple], int], expected: Row) -> None:
+    def test_should_sort_columns(
+        self,
+        row: Row,
+        comparator: Callable[[str, Any, str, Any], int],
+        expected: Row,
+    ) -> None:
         row = row.sort_columns(comparator)
         assert row == expected
 

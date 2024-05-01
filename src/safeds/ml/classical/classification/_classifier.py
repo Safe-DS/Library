@@ -4,8 +4,9 @@ from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
 from safeds._utils import _structural_hash
-from safeds.data.tabular.containers import Table, TaggedTable
-from safeds.exceptions import UntaggedTableError
+from safeds.data.labeled.containers import TabularDataset
+from safeds.data.tabular.containers import Table
+from safeds.exceptions import PlainTableError
 
 if TYPE_CHECKING:
     from typing import Any
@@ -25,10 +26,10 @@ class Classifier(ABC):
         hash:
             The hash value.
         """
-        return _structural_hash(self.__class__.__qualname__, self.is_fitted())
+        return _structural_hash(self.__class__.__qualname__, self.is_fitted)
 
     @abstractmethod
-    def fit(self, training_set: TaggedTable) -> Classifier:
+    def fit(self, training_set: TabularDataset) -> Classifier:
         """
         Create a copy of this classifier and fit it with the given training data.
 
@@ -36,12 +37,12 @@ class Classifier(ABC):
 
         Parameters
         ----------
-        training_set : TaggedTable
+        training_set:
             The training data containing the feature and target vectors.
 
         Returns
         -------
-        fitted_classifier : Classifier
+        fitted_classifier:
             The fitted classifier.
 
         Raises
@@ -51,42 +52,34 @@ class Classifier(ABC):
         """
 
     @abstractmethod
-    def predict(self, dataset: Table) -> TaggedTable:
+    def predict(self, dataset: Table) -> TabularDataset:
         """
         Predict a target vector using a dataset containing feature vectors. The model has to be trained first.
 
         Parameters
         ----------
-        dataset : Table
+        dataset:
             The dataset containing the feature vectors.
 
         Returns
         -------
-        table : TaggedTable
+        table:
             A dataset containing the given feature vectors and the predicted target vector.
 
         Raises
         ------
         ModelNotFittedError
             If the model has not been fitted yet.
-        DatasetContainsTargetError
-            If the dataset contains the target column already.
         DatasetMissesFeaturesError
             If the dataset misses feature columns.
         PredictionError
             If predicting with the given dataset failed.
         """
 
+    @property
     @abstractmethod
     def is_fitted(self) -> bool:
-        """
-        Check if the classifier is fitted.
-
-        Returns
-        -------
-        is_fitted : bool
-            Whether the classifier is fitted.
-        """
+        """Whether the classifier is fitted."""
 
     @abstractmethod
     def _get_sklearn_classifier(self) -> ClassifierMixin:
@@ -95,59 +88,59 @@ class Classifier(ABC):
 
         Returns
         -------
-        wrapped_classifier: ClassifierMixin
+        wrapped_classifier:
             The sklearn Classifier.
         """
 
     # noinspection PyProtectedMember
-    def accuracy(self, validation_or_test_set: TaggedTable) -> float:
+    def accuracy(self, validation_or_test_set: TabularDataset) -> float:
         """
         Compute the accuracy of the classifier on the given data.
 
         Parameters
         ----------
-        validation_or_test_set : TaggedTable
+        validation_or_test_set:
             The validation or test set.
 
         Returns
         -------
-        accuracy : float
+        accuracy:
             The calculated accuracy score, i.e. the percentage of equal data.
 
         Raises
         ------
-        UntaggedTableError
-            If the table is untagged.
+        TypeError
+            If a table is passed instead of a tabular dataset.
         """
         from sklearn.metrics import accuracy_score as sk_accuracy_score
 
-        if not isinstance(validation_or_test_set, TaggedTable) and isinstance(validation_or_test_set, Table):
-            raise UntaggedTableError
+        if not isinstance(validation_or_test_set, TabularDataset) and isinstance(validation_or_test_set, Table):
+            raise PlainTableError
 
         expected_values = validation_or_test_set.target
         predicted_values = self.predict(validation_or_test_set.features).target
 
         return sk_accuracy_score(expected_values._data, predicted_values._data)
 
-    def precision(self, validation_or_test_set: TaggedTable, positive_class: Any) -> float:
+    def precision(self, validation_or_test_set: TabularDataset, positive_class: Any) -> float:
         """
         Compute the classifier's precision on the given data.
 
         Parameters
         ----------
-        validation_or_test_set : TaggedTable
+        validation_or_test_set:
             The validation or test set.
-        positive_class : Any
+        positive_class:
             The class to be considered positive. All other classes are considered negative.
 
         Returns
         -------
-        precision : float
+        precision:
             The calculated precision score, i.e. the ratio of correctly predicted positives to all predicted positives.
             Return 1 if no positive predictions are made.
         """
-        if not isinstance(validation_or_test_set, TaggedTable) and isinstance(validation_or_test_set, Table):
-            raise UntaggedTableError
+        if not isinstance(validation_or_test_set, TabularDataset) and isinstance(validation_or_test_set, Table):
+            raise PlainTableError
 
         expected_values = validation_or_test_set.target
         predicted_values = self.predict(validation_or_test_set.features).target
@@ -166,25 +159,25 @@ class Classifier(ABC):
             return 1.0
         return n_true_positives / (n_true_positives + n_false_positives)
 
-    def recall(self, validation_or_test_set: TaggedTable, positive_class: Any) -> float:
+    def recall(self, validation_or_test_set: TabularDataset, positive_class: Any) -> float:
         """
         Compute the classifier's recall on the given data.
 
         Parameters
         ----------
-        validation_or_test_set : TaggedTable
+        validation_or_test_set:
             The validation or test set.
-        positive_class : Any
+        positive_class:
             The class to be considered positive. All other classes are considered negative.
 
         Returns
         -------
-        recall : float
+        recall:
             The calculated recall score, i.e. the ratio of correctly predicted positives to all expected positives.
             Return 1 if there are no positive expectations.
         """
-        if not isinstance(validation_or_test_set, TaggedTable) and isinstance(validation_or_test_set, Table):
-            raise UntaggedTableError
+        if not isinstance(validation_or_test_set, TabularDataset) and isinstance(validation_or_test_set, Table):
+            raise PlainTableError
 
         expected_values = validation_or_test_set.target
         predicted_values = self.predict(validation_or_test_set.features).target
@@ -203,25 +196,25 @@ class Classifier(ABC):
             return 1.0
         return n_true_positives / (n_true_positives + n_false_negatives)
 
-    def f1_score(self, validation_or_test_set: TaggedTable, positive_class: Any) -> float:
+    def f1_score(self, validation_or_test_set: TabularDataset, positive_class: Any) -> float:
         """
         Compute the classifier's $F_1$-score on the given data.
 
         Parameters
         ----------
-        validation_or_test_set : TaggedTable
+        validation_or_test_set:
             The validation or test set.
-        positive_class : Any
+        positive_class:
             The class to be considered positive. All other classes are considered negative.
 
         Returns
         -------
-        f1_score : float
+        f1_score:
             The calculated $F_1$-score, i.e. the harmonic mean between precision and recall.
             Return 1 if there are no positive expectations and predictions.
         """
-        if not isinstance(validation_or_test_set, TaggedTable) and isinstance(validation_or_test_set, Table):
-            raise UntaggedTableError
+        if not isinstance(validation_or_test_set, TabularDataset) and isinstance(validation_or_test_set, Table):
+            raise PlainTableError
 
         expected_values = validation_or_test_set.target
         predicted_values = self.predict(validation_or_test_set.features).target

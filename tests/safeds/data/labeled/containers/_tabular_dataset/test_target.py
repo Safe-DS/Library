@@ -1,12 +1,13 @@
 import pytest
-from safeds.data.tabular.containers import Column, TaggedTable
+from safeds.data.labeled.containers import TabularDataset
+from safeds.data.tabular.containers import Column
 
 
 @pytest.mark.parametrize(
-    ("tagged_table", "target_column"),
+    ("tabular_dataset", "target_column"),
     [
         (
-            TaggedTable(
+            TabularDataset(
                 {
                     "A": [1, 4],
                     "B": [2, 5],
@@ -20,5 +21,5 @@ from safeds.data.tabular.containers import Column, TaggedTable
     ],
     ids=["target"],
 )
-def test_should_return_target(tagged_table: TaggedTable, target_column: Column) -> None:
-    assert tagged_table.target == target_column
+def test_should_return_target(tabular_dataset: TabularDataset, target_column: Column) -> None:
+    assert tabular_dataset.target == target_column

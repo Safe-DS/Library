@@ -1,3 +1,30 @@
+## [0.22.0](https://github.com/Safe-DS/Library/compare/v0.21.0...v0.22.0) (2024-05-01)
+
+
+### Features
+
+* `is_fitted` is now always a property ([#662](https://github.com/Safe-DS/Library/issues/662)) ([b1db881](https://github.com/Safe-DS/Library/commit/b1db8812f3105e93f9b1423d51c785499014bbaa)), closes [#586](https://github.com/Safe-DS/Library/issues/586)
+* add `Column.missing_value_count` ([#682](https://github.com/Safe-DS/Library/issues/682)) ([f084916](https://github.com/Safe-DS/Library/commit/f08491689552132a2be93bbe923cb15c3010ee54)), closes [#642](https://github.com/Safe-DS/Library/issues/642)
+* Add `InputConversion` & `OutputConversion` for nn interface ([#625](https://github.com/Safe-DS/Library/issues/625)) ([fd723f7](https://github.com/Safe-DS/Library/commit/fd723f7fc9198e4b8c62b9c5ebefe4e5dac81ad3)), closes [#621](https://github.com/Safe-DS/Library/issues/621)
+* Add hash,eq and sizeof in ForwardLayer ([#634](https://github.com/Safe-DS/Library/issues/634)) ([72f7fde](https://github.com/Safe-DS/Library/commit/72f7fdea123645d3c4f9d304fbd249bf5e5f8ab3)), closes [#633](https://github.com/Safe-DS/Library/issues/633)
+* allow using tables that already contain target for prediction ([#687](https://github.com/Safe-DS/Library/issues/687)) ([e9f1cfb](https://github.com/Safe-DS/Library/commit/e9f1cfb72bfc952d7be149056dc1d6939e443d88)), closes [#636](https://github.com/Safe-DS/Library/issues/636)
+* callback `Row.sort_columns` takes four parameters instead of two tuples ([#683](https://github.com/Safe-DS/Library/issues/683)) ([9c3e3de](https://github.com/Safe-DS/Library/commit/9c3e3de6b458c29cc76b14ac8131df008cb5a7e2)), closes [#584](https://github.com/Safe-DS/Library/issues/584)
+* rename `group_rows_by` in `Table` to `group_rows` ([#661](https://github.com/Safe-DS/Library/issues/661)) ([c1644b7](https://github.com/Safe-DS/Library/commit/c1644b72763d302e91bf3e6064659ac5f00a2730)), closes [#611](https://github.com/Safe-DS/Library/issues/611)
+* rename `number_of_column` in `Row` to `number_of_columns` ([#660](https://github.com/Safe-DS/Library/issues/660)) ([0a08296](https://github.com/Safe-DS/Library/commit/0a08296d25de673e9995f5aec7c808d2e25996b5)), closes [#646](https://github.com/Safe-DS/Library/issues/646)
+* rework `TaggedTable` ([#680](https://github.com/Safe-DS/Library/issues/680)) ([db2b613](https://github.com/Safe-DS/Library/commit/db2b61365b4a035d9b58f7725f82836821e08b71)), closes [#647](https://github.com/Safe-DS/Library/issues/647)
+* show missing value count/ratio in summarized statistics ([#684](https://github.com/Safe-DS/Library/issues/684)) ([74b8a35](https://github.com/Safe-DS/Library/commit/74b8a3528bfa8315eb617e269cdc6cfd718d0e8f)), closes [#619](https://github.com/Safe-DS/Library/issues/619)
+* specify `extras` instead of `features` in `to_tabular_dataset` ([#685](https://github.com/Safe-DS/Library/issues/685)) ([841657f](https://github.com/Safe-DS/Library/commit/841657f6f7ba7b726fc11dda0c0678d91551adbb)), closes [#623](https://github.com/Safe-DS/Library/issues/623)
+
+
+### Bug Fixes
+
+* actually use `kernel` of support vector machines for training ([#681](https://github.com/Safe-DS/Library/issues/681)) ([09c5082](https://github.com/Safe-DS/Library/commit/09c5082215b399a4853fe6dac2a0e44a7915f8f5)), closes [#602](https://github.com/Safe-DS/Library/issues/602)
+
+
+### Performance Improvements
+
+* Faster plot_histograms and more reliable plots ([#659](https://github.com/Safe-DS/Library/issues/659)) ([b5f0a12](https://github.com/Safe-DS/Library/commit/b5f0a12c4d406a4dbe6f92d313be9ae537cb47f8))
+
 ## [0.21.0](https://github.com/Safe-DS/Library/compare/v0.20.0...v0.21.0) (2024-04-17)
 
 

@@ -21,7 +21,7 @@ class DatasetMissesFeaturesError(ValueError):
 
     Parameters
     ----------
-    missing_feature_names: list[str]
+    missing_feature_names:
         The names of the missing feature columns.
     """
 
@@ -42,7 +42,7 @@ class LearningError(Exception):
 
     Parameters
     ----------
-    reason: str
+    reason:
         The reason for the error.
     """
 
@@ -70,7 +70,7 @@ class PredictionError(Exception):
 
     Parameters
     ----------
-    reason: str
+    reason:
         The reason for the error.
     """
 
@@ -96,14 +96,15 @@ class InputSizeError(Exception):
         )
 
 
-class UntaggedTableError(Exception):
-    """Raised when an untagged table is used instead of a TaggedTable in a regression or classification."""
+class PlainTableError(TypeError):
+    """Raised when a plain table is used instead of a TabularDataset."""
 
     def __init__(self) -> None:
         super().__init__(
             (
-                "This method needs a tagged table.\nA tagged table is a table that additionally knows which columns are"
-                " features and which are the target to predict.\nUse Table.tag_column() to create a tagged table."
+                "This method needs a tabular dataset. "
+                "It knows which columns are features and which are the target to predict.\n"
+                "Use `Table.to_tabular_dataset()` to create a tabular dataset."
             ),
         )
 

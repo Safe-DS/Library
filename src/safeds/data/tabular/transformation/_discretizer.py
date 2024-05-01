@@ -22,7 +22,7 @@ class Discretizer(TableTransformer):
 
     Parameters
     ----------
-    number_of_bins
+    number_of_bins:
         The number of bins to be created.
 
     Raises
@@ -47,14 +47,14 @@ class Discretizer(TableTransformer):
 
         Parameters
         ----------
-        table
+        table:
             The table used to fit the transformer.
-        column_names
+        column_names:
             The list of columns from the table used to fit the transformer. If `None`, all columns are used.
 
         Returns
         -------
-        fitted_transformer :
+        fitted_transformer:
             The fitted transformer.
 
         Raises
@@ -104,12 +104,12 @@ class Discretizer(TableTransformer):
 
         Parameters
         ----------
-        table
+        table:
             The table to which the learned transformation is applied.
 
         Returns
         -------
-        transformed_table :
+        transformed_table:
             The transformed table.
 
         Raises
@@ -149,15 +149,9 @@ class Discretizer(TableTransformer):
         data[self._column_names] = self._wrapped_transformer.transform(data[self._column_names])
         return Table._from_pandas_dataframe(data)
 
+    @property
     def is_fitted(self) -> bool:
-        """
-        Check if the transformer is fitted.
-
-        Returns
-        -------
-        is_fitted :
-            Whether the transformer is fitted.
-        """
+        """Whether the transformer is fitted."""
         return self._wrapped_transformer is not None
 
     def get_names_of_added_columns(self) -> list[str]:
@@ -166,7 +160,7 @@ class Discretizer(TableTransformer):
 
         Returns
         -------
-        added_columns :
+        added_columns:
             A list of names of the added columns, ordered as they will appear in the table.
 
         Raises
@@ -174,7 +168,7 @@ class Discretizer(TableTransformer):
         TransformerNotFittedError
             If the transformer has not been fitted yet.
         """
-        if not self.is_fitted():
+        if not self.is_fitted:
             raise TransformerNotFittedError
         return []
 
@@ -185,7 +179,7 @@ class Discretizer(TableTransformer):
 
         Returns
         -------
-        changed_columns :
+        changed_columns:
              The list of (potentially) changed column names, as passed to fit.
 
         Raises
@@ -203,7 +197,7 @@ class Discretizer(TableTransformer):
 
         Returns
         -------
-        removed_columns :
+        removed_columns:
             A list of names of the removed columns, ordered as they appear in the table the Discretizer was fitted on.
 
         Raises
@@ -211,6 +205,6 @@ class Discretizer(TableTransformer):
         TransformerNotFittedError
             If the transformer has not been fitted yet.
         """
-        if not self.is_fitted():
+        if not self.is_fitted:
             raise TransformerNotFittedError
         return []

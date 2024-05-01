@@ -10,11 +10,11 @@ if TYPE_CHECKING:
 
     from safeds.data.image.typing import ImageSize
 
-from safeds.data.tabular.containers import Table, TaggedTable, TimeSeries
+from safeds.data.tabular.containers import Table, TimeSeries
 from safeds.data.image.containers import ImageList
-from safeds.data.labeled.containers import ImageDataset
+from safeds.data.labeled.containers import ImageDataset, TabularDataset
 
-FT = TypeVar("FT", TaggedTable, TimeSeries, ImageDataset)
+FT = TypeVar("FT", TabularDataset, TimeSeries, ImageDataset)
 PT = TypeVar("PT", Table, TimeSeries, ImageList)
 
 

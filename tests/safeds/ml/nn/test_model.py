@@ -1,6 +1,7 @@
 import pytest
 
 from safeds.data.image.typing import ImageSize
+from safeds.data.labeled.containers import TabularDataset
 from safeds.data.tabular.containers import Table, TaggedTable
 from safeds.exceptions import FeatureDataMismatchError, InputSizeError, ModelNotFittedError, OutOfBoundsError, \
     InvalidModelStructureError
@@ -36,7 +37,7 @@ class TestClassificationModel:
                 [ForwardLayer(1, 1)],
                 OutputConversionTable(),
             ).fit(
-                Table.from_dict({"a": [1], "b": [2]}).tag_columns("a"),
+                Table.from_dict({"a": [1], "b": [2]}).to_tabular_dataset("a"),
                 epoch_size=epoch_size,
             )
 
@@ -57,7 +58,7 @@ class TestClassificationModel:
                 [ForwardLayer(input_size=1, output_size=1)],
                 OutputConversionTable(),
             ).fit(
-                Table.from_dict({"a": [1], "b": [2]}).tag_columns("a"),
+                Table.from_dict({"a": [1], "b": [2]}).to_tabular_dataset("a"),
                 batch_size=batch_size,
             )
 
@@ -67,7 +68,7 @@ class TestClassificationModel:
             [ForwardLayer(input_size=1, output_size=8), ForwardLayer(output_size=1)],
             OutputConversionTable(),
         ).fit(
-            Table.from_dict({"a": [1], "b": [0]}).tag_columns("a"),
+            Table.from_dict({"a": [1], "b": [0]}).to_tabular_dataset("a"),
         )
         assert isinstance(fitted_model, NeuralNetworkClassifier)
 
@@ -85,11 +86,11 @@ class TestClassificationModel:
             [ForwardLayer(input_size=1, output_size=8), ForwardLayer(output_size=1)],
             OutputConversionTable(),
         ).fit(
-            Table.from_dict({"a": [1, 0, 1, 0, 1, 0], "b": [0, 1, 0, 12, 3, 3]}).tag_columns("a"),
+            Table.from_dict({"a": [1, 0, 1, 0, 1, 0], "b": [0, 1, 0, 12, 3, 3]}).to_tabular_dataset("a"),
             batch_size=batch_size,
         )
         predictions = fitted_model.predict(Table.from_dict({"b": [1, 0]}))
-        assert isinstance(predictions, TaggedTable)
+        assert isinstance(predictions, TabularDataset)
 
     @pytest.mark.parametrize(
         "batch_size",
@@ -108,11 +109,11 @@ class TestClassificationModel:
             [ForwardLayer(input_size=1, output_size=8), ForwardLayer(output_size=3)],
             OutputConversionTable(),
         ).fit(
-            Table.from_dict({"a": [0, 1, 2], "b": [0, 15, 51]}).tag_columns("a"),
+            Table.from_dict({"a": [0, 1, 2], "b": [0, 15, 51]}).to_tabular_dataset("a"),
             batch_size=batch_size,
         )
         predictions = fitted_model.predict(Table.from_dict({"b": [1, 4, 124]}))
-        assert isinstance(predictions, TaggedTable)
+        assert isinstance(predictions, TabularDataset)
 
     def test_should_raise_if_model_has_not_been_fitted(self) -> None:
         with pytest.raises(ModelNotFittedError, match="The model has not been fitted yet."):
@@ -132,7 +133,7 @@ class TestClassificationModel:
         )
         assert not model.is_fitted
         model = model.fit(
-            Table.from_dict({"a": [1], "b": [0]}).tag_columns("a"),
+            Table.from_dict({"a": [1], "b": [0]}).to_tabular_dataset("a"),
         )
         assert model.is_fitted
 
@@ -144,7 +145,7 @@ class TestClassificationModel:
         )
         assert not model.is_fitted
         model = model.fit(
-            Table.from_dict({"a": [1, 0, 2], "b": [0, 15, 5]}).tag_columns("a"),
+            Table.from_dict({"a": [1, 0, 2], "b": [0, 15, 5]}).to_tabular_dataset("a"),
         )
         assert model.is_fitted
 
@@ -155,7 +156,7 @@ class TestClassificationModel:
             OutputConversionTable(),
         )
         model = model.fit(
-            Table.from_dict({"a": [1, 0, 2], "b": [0, 15, 5]}).tag_columns("a"),
+            Table.from_dict({"a": [1, 0, 2], "b": [0, 15, 5]}).to_tabular_dataset("a"),
         )
         with pytest.raises(
             FeatureDataMismatchError,
@@ -176,7 +177,7 @@ class TestClassificationModel:
             match="The features in the given table do not match with the specified feature columns names of the neural network.",
         ):
             model.fit(
-                Table.from_dict({"a": [1, 0, 2], "b": [0, 15, 5]}).tag_columns("b"),
+                Table.from_dict({"a": [1, 0, 2], "b": [0, 15, 5]}).to_tabular_dataset("b"),
             )
 
     def test_should_raise_if_table_size_and_input_size_mismatch(self) -> None:
@@ -189,7 +190,7 @@ class TestClassificationModel:
             InputSizeError,
         ):
             model.fit(
-                Table.from_dict({"a": [1, 0, 2], "b": [0, 15, 5], "c": [3, 33, 333]}).tag_columns("a"),
+                Table.from_dict({"a": [1, 0, 2], "b": [0, 15, 5], "c": [3, 33, 333]}).to_tabular_dataset("a"),
             )
 
     def test_should_raise_if_fit_doesnt_batch_callback(self) -> None:
@@ -210,7 +211,7 @@ class TestClassificationModel:
                 return self.was_called
 
         obj = Test()
-        model.fit(Table.from_dict({"a": [1], "b": [0]}).tag_columns("a"), callback_on_batch_completion=obj.cb)
+        model.fit(Table.from_dict({"a": [1], "b": [0]}).to_tabular_dataset("a"), callback_on_batch_completion=obj.cb)
 
         assert obj.callback_was_called() is True
 
@@ -232,7 +233,7 @@ class TestClassificationModel:
                 return self.was_called
 
         obj = Test()
-        model.fit(Table.from_dict({"a": [1], "b": [0]}).tag_columns("a"), callback_on_epoch_completion=obj.cb)
+        model.fit(Table.from_dict({"a": [1], "b": [0]}).to_tabular_dataset("a"), callback_on_epoch_completion=obj.cb)
 
         assert obj.callback_was_called() is True
 
@@ -295,7 +296,7 @@ class TestRegressionModel:
                 [ForwardLayer(input_size=1, output_size=1)],
                 OutputConversionTable(),
             ).fit(
-                Table.from_dict({"a": [1], "b": [2]}).tag_columns("a"),
+                Table.from_dict({"a": [1], "b": [2]}).to_tabular_dataset("a"),
                 epoch_size=epoch_size,
             )
 
@@ -316,7 +317,7 @@ class TestRegressionModel:
                 [ForwardLayer(input_size=1, output_size=1)],
                 OutputConversionTable(),
             ).fit(
-                Table.from_dict({"a": [1], "b": [2]}).tag_columns("a"),
+                Table.from_dict({"a": [1], "b": [2]}).to_tabular_dataset("a"),
                 batch_size=batch_size,
             )
 
@@ -334,7 +335,7 @@ class TestRegressionModel:
             [ForwardLayer(input_size=1, output_size=1)],
             OutputConversionTable(),
         ).fit(
-            Table.from_dict({"a": [1, 0, 1], "b": [2, 3, 4]}).tag_columns("a"),
+            Table.from_dict({"a": [1, 0, 1], "b": [2, 3, 4]}).to_tabular_dataset("a"),
             batch_size=batch_size,
         )
         assert isinstance(fitted_model, NeuralNetworkRegressor)
@@ -353,11 +354,11 @@ class TestRegressionModel:
             [ForwardLayer(input_size=1, output_size=1)],
             OutputConversionTable(),
         ).fit(
-            Table.from_dict({"a": [1, 0, 1], "b": [2, 3, 4]}).tag_columns("a"),
+            Table.from_dict({"a": [1, 0, 1], "b": [2, 3, 4]}).to_tabular_dataset("a"),
             batch_size=batch_size,
         )
         predictions = fitted_model.predict(Table.from_dict({"b": [5, 6, 7]}))
-        assert isinstance(predictions, TaggedTable)
+        assert isinstance(predictions, TabularDataset)
 
     def test_should_raise_if_model_has_not_been_fitted(self) -> None:
         with pytest.raises(ModelNotFittedError, match="The model has not been fitted yet."):
@@ -377,7 +378,7 @@ class TestRegressionModel:
         )
         assert not model.is_fitted
         model = model.fit(
-            Table.from_dict({"a": [1], "b": [0]}).tag_columns("a"),
+            Table.from_dict({"a": [1], "b": [0]}).to_tabular_dataset("a"),
         )
         assert model.is_fitted
 
@@ -388,7 +389,7 @@ class TestRegressionModel:
             OutputConversionTable(),
         )
         model = model.fit(
-            Table.from_dict({"a": [1, 0, 2], "b": [0, 15, 5]}).tag_columns("a"),
+            Table.from_dict({"a": [1, 0, 2], "b": [0, 15, 5]}).to_tabular_dataset("a"),
         )
         with pytest.raises(
             FeatureDataMismatchError,
@@ -409,7 +410,7 @@ class TestRegressionModel:
             match="The features in the given table do not match with the specified feature columns names of the neural network.",
         ):
             model.fit(
-                Table.from_dict({"a": [1, 0, 2], "b": [0, 15, 5]}).tag_columns("b"),
+                Table.from_dict({"a": [1, 0, 2], "b": [0, 15, 5]}).to_tabular_dataset("b"),
             )
 
     def test_should_raise_if_table_size_and_input_size_mismatch(self) -> None:
@@ -422,7 +423,7 @@ class TestRegressionModel:
             InputSizeError,
         ):
             model.fit(
-                Table.from_dict({"a": [1, 0, 2], "b": [0, 15, 5], "c": [3, 33, 333]}).tag_columns("a"),
+                Table.from_dict({"a": [1, 0, 2], "b": [0, 15, 5], "c": [3, 33, 333]}).to_tabular_dataset("a"),
             )
 
     def test_should_raise_if_fit_doesnt_batch_callback(self) -> None:
@@ -443,7 +444,7 @@ class TestRegressionModel:
                 return self.was_called
 
         obj = Test()
-        model.fit(Table.from_dict({"a": [1], "b": [0]}).tag_columns("a"), callback_on_batch_completion=obj.cb)
+        model.fit(Table.from_dict({"a": [1], "b": [0]}).to_tabular_dataset("a"), callback_on_batch_completion=obj.cb)
 
         assert obj.callback_was_called() is True
 
@@ -465,7 +466,7 @@ class TestRegressionModel:
                 return self.was_called
 
         obj = Test()
-        model.fit(Table.from_dict({"a": [1], "b": [0]}).tag_columns("a"), callback_on_epoch_completion=obj.cb)
+        model.fit(Table.from_dict({"a": [1], "b": [0]}).to_tabular_dataset("a"), callback_on_epoch_completion=obj.cb)
 
         assert obj.callback_was_called() is True
 

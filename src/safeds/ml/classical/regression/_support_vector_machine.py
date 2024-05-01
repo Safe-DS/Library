@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import sys
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from safeds._utils import _structural_hash
 from safeds.exceptions import ClosedBound, OpenBound, OutOfBoundsError
@@ -11,24 +11,18 @@ from safeds.ml.classical.regression import Regressor
 
 if TYPE_CHECKING:
     from sklearn.base import RegressorMixin
-    from sklearn.svm import SVR as sk_SVR  # noqa: N811
+    from sklearn.svm import SVC as sk_SVR  # noqa: N811
 
-    from safeds.data.tabular.containers import Table, TaggedTable
+    from safeds.data.labeled.containers import TabularDataset
+    from safeds.data.tabular.containers import Table
 
 
 class SupportVectorMachineKernel(ABC):
     """The abstract base class of the different subclasses supported by the `Kernel`."""
 
     @abstractmethod
-    def _get_sklearn_kernel(self) -> object:
-        """
-        Get the kernel of the given SupportVectorMachine.
-
-        Returns
-        -------
-        object
-        The kernel of the SupportVectorMachine.
-        """
+    def _get_sklearn_arguments(self) -> dict[str, Any]:
+        """Return the arguments to pass to scikit-learn."""
 
     @abstractmethod
     def __eq__(self, other: object) -> bool:
@@ -64,9 +58,9 @@ class SupportVectorMachineRegressor(Regressor):
 
     Parameters
     ----------
-    c: float
+    c:
         The strength of regularization. Must be strictly positive.
-    kernel: SupportVectorMachineKernel | None
+    kernel:
         The type of kernel to be used. Defaults to None.
 
     Raises
@@ -79,16 +73,20 @@ class SupportVectorMachineRegressor(Regressor):
         return _structural_hash(Regressor.__hash__(self), self._target_name, self._feature_names, self._c, self.kernel)
 
     def __init__(self, *, c: float = 1.0, kernel: SupportVectorMachineKernel | None = None) -> None:
+        # Inputs
+        if c <= 0:
+            raise OutOfBoundsError(c, name="c", lower_bound=OpenBound(0))
+        if kernel is None:
+            kernel = self.Kernel.RadialBasisFunction()
+
         # Internal state
         self._wrapped_regressor: sk_SVR | None = None
         self._feature_names: list[str] | None = None
         self._target_name: str | None = None
 
         # Hyperparameters
-        if c <= 0:
-            raise OutOfBoundsError(c, name="c", lower_bound=OpenBound(0))
-        self._c = c
-        self._kernel = kernel
+        self._c: float = c
+        self._kernel: SupportVectorMachineKernel = kernel
 
     @property
     def c(self) -> float:
@@ -97,35 +95,29 @@ class SupportVectorMachineRegressor(Regressor):
 
         Returns
         -------
-        result: float
+        result:
             The regularization strength.
         """
         return self._c
 
     @property
-    def kernel(self) -> SupportVectorMachineKernel | None:
+    def kernel(self) -> SupportVectorMachineKernel:
         """
         Get the type of kernel used.
 
         Returns
         -------
-        result: SupportVectorMachineKernel | None
+        result:
             The type of kernel used.
         """
         return self._kernel
 
     class Kernel:
         class Linear(SupportVectorMachineKernel):
-            def _get_sklearn_kernel(self) -> str:
-                """
-                Get the name of the linear kernel.
-
-                Returns
-                -------
-                result: str
-                    The name of the linear kernel.
-                """
-                return "linear"
+            def _get_sklearn_arguments(self) -> dict[str, Any]:
+                return {
+                    "kernel": "linear",
+                }
 
             def __eq__(self, other: object) -> bool:
                 if not isinstance(other, SupportVectorMachineRegressor.Kernel.Linear):
@@ -140,16 +132,16 @@ class SupportVectorMachineRegressor(Regressor):
                     raise OutOfBoundsError(degree, name="degree", lower_bound=ClosedBound(1))
                 self._degree = degree
 
-            def _get_sklearn_kernel(self) -> str:
-                """
-                Get the name of the polynomial kernel.
+            @property
+            def degree(self) -> int:
+                """The degree of the polynomial kernel."""
+                return self._degree
 
-                Returns
-                -------
-                result: str
-                    The name of the polynomial kernel.
-                """
-                return "poly"
+            def _get_sklearn_arguments(self) -> dict[str, Any]:
+                return {
+                    "kernel": "poly",
+                    "degree": self._degree,
+                }
 
             def __eq__(self, other: object) -> bool:
                 if not isinstance(other, SupportVectorMachineRegressor.Kernel.Polynomial):
@@ -171,16 +163,10 @@ class SupportVectorMachineRegressor(Regressor):
                 return sys.getsizeof(self._degree)
 
         class Sigmoid(SupportVectorMachineKernel):
-            def _get_sklearn_kernel(self) -> str:
-                """
-                Get the name of the sigmoid kernel.
-
-                Returns
-                -------
-                result: str
-                    The name of the sigmoid kernel.
-                """
-                return "sigmoid"
+            def _get_sklearn_arguments(self) -> dict[str, Any]:
+                return {
+                    "kernel": "sigmoid",
+                }
 
             def __eq__(self, other: object) -> bool:
                 if not isinstance(other, SupportVectorMachineRegressor.Kernel.Sigmoid):
@@ -190,16 +176,10 @@ class SupportVectorMachineRegressor(Regressor):
             __hash__ = SupportVectorMachineKernel.__hash__
 
         class RadialBasisFunction(SupportVectorMachineKernel):
-            def _get_sklearn_kernel(self) -> str:
-                """
-                Get the name of the radial basis function (RBF) kernel.
-
-                Returns
-                -------
-                result: str
-                    The name of the RBF kernel.
-                """
-                return "rbf"
+            def _get_sklearn_arguments(self) -> dict[str, Any]:
+                return {
+                    "kernel": "rbf",
+                }
 
             def __eq__(self, other: object) -> bool:
                 if not isinstance(other, SupportVectorMachineRegressor.Kernel.RadialBasisFunction):
@@ -208,32 +188,7 @@ class SupportVectorMachineRegressor(Regressor):
 
             __hash__ = SupportVectorMachineKernel.__hash__
 
-    def _get_kernel_name(self) -> str:
-        """
-        Get the name of the kernel.
-
-        Returns
-        -------
-        result: str
-            The name of the kernel.
-
-        Raises
-        ------
-        TypeError
-            If the kernel type is invalid.
-        """
-        if isinstance(self.kernel, SupportVectorMachineRegressor.Kernel.Linear):
-            return "linear"
-        elif isinstance(self.kernel, SupportVectorMachineRegressor.Kernel.Polynomial):
-            return "poly"
-        elif isinstance(self.kernel, SupportVectorMachineRegressor.Kernel.Sigmoid):
-            return "sigmoid"
-        elif isinstance(self.kernel, SupportVectorMachineRegressor.Kernel.RadialBasisFunction):
-            return "rbf"
-        else:
-            raise TypeError("Invalid kernel type.")
-
-    def fit(self, training_set: TaggedTable) -> SupportVectorMachineRegressor:
+    def fit(self, training_set: TabularDataset) -> SupportVectorMachineRegressor:
         """
         Create a copy of this regressor and fit it with the given training data.
 
@@ -241,20 +196,20 @@ class SupportVectorMachineRegressor(Regressor):
 
         Parameters
         ----------
-        training_set : TaggedTable
+        training_set:
             The training data containing the feature and target vectors.
 
         Returns
         -------
-        fitted_regressor : SupportVectorMachineRegressor
+        fitted_regressor:
             The fitted regressor.
 
         Raises
         ------
         LearningError
             If the training data contains invalid values or if the training failed.
-        UntaggedTableError
-            If the table is untagged.
+        TypeError
+            If a table is passed instead of a tabular dataset.
         NonNumericColumnError
             If the training data contains non-numerical values.
         MissingValuesColumnError
@@ -272,26 +227,24 @@ class SupportVectorMachineRegressor(Regressor):
 
         return result
 
-    def predict(self, dataset: Table) -> TaggedTable:
+    def predict(self, dataset: Table) -> TabularDataset:
         """
         Predict a target vector using a dataset containing feature vectors. The model has to be trained first.
 
         Parameters
         ----------
-        dataset : Table
+        dataset:
             The dataset containing the feature vectors.
 
         Returns
         -------
-        table : TaggedTable
+        table:
             A dataset containing the given feature vectors and the predicted target vector.
 
         Raises
         ------
         ModelNotFittedError
             If the model has not been fitted yet.
-        DatasetContainsTargetError
-            If the dataset contains the target column already.
         DatasetMissesFeaturesError
             If the dataset misses feature columns.
         PredictionError
@@ -305,15 +258,9 @@ class SupportVectorMachineRegressor(Regressor):
         """
         return predict(self._wrapped_regressor, dataset, self._feature_names, self._target_name)
 
+    @property
     def is_fitted(self) -> bool:
-        """
-        Check if the regressor is fitted.
-
-        Returns
-        -------
-        is_fitted : bool
-            Whether the regressor is fitted.
-        """
+        """Whether the regressor is fitted."""
         return self._wrapped_regressor is not None
 
     def _get_sklearn_regressor(self) -> RegressorMixin:
@@ -322,9 +269,9 @@ class SupportVectorMachineRegressor(Regressor):
 
         Returns
         -------
-        wrapped_regressor: RegressorMixin
+        wrapped_regressor:
             The sklearn Regressor.
         """
-        from sklearn.svm import SVR as sk_SVR  # noqa: N811
+        from sklearn.svm import SVC as sk_SVR  # noqa: N811
 
-        return sk_SVR(C=self._c)
+        return sk_SVR(C=self._c, **(self._kernel._get_sklearn_arguments()))

@@ -141,7 +141,7 @@ class TestTransform:
 class TestIsFitted:
     def test_should_return_false_before_fitting(self) -> None:
         transformer = OneHotEncoder()
-        assert not transformer.is_fitted()
+        assert not transformer.is_fitted
 
     @pytest.mark.parametrize(
         "table",
@@ -171,7 +171,7 @@ class TestIsFitted:
                 category=UserWarning,
             )
             fitted_transformer = transformer.fit(table, None)
-        assert fitted_transformer.is_fitted()
+        assert fitted_transformer.is_fitted
 
 
 class TestFitAndTransform:

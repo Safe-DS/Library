@@ -10,12 +10,12 @@ def _structural_hash(*value: Any) -> int:
 
     Parameters
     ----------
-    value
+    value:
         Variable amount of values to hash
 
     Returns
     -------
-    hash
+    hash:
         Deterministic hash value
     """
     import xxhash
@@ -29,12 +29,12 @@ def _value_to_bytes(value: Any) -> bytes:
 
     Parameters
     ----------
-    value
+    value:
         Object to convert to a byte representation for deterministic structural hashing
 
     Returns
     -------
-    bytes
+    bytes:
         Byte representation of the provided value
     """
     if value is None:

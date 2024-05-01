@@ -3,7 +3,9 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from safeds._utils import _structural_hash
-from safeds.exceptions import ClosedBound, DatasetMissesDataError, OutOfBoundsError
+from safeds.data.labeled.containers import TabularDataset
+from safeds.data.tabular.containers import Table
+from safeds.exceptions import ClosedBound, DatasetMissesDataError, OutOfBoundsError, PlainTableError
 from safeds.ml.classical._util_sklearn import fit, predict
 
 from ._regressor import Regressor
@@ -12,8 +14,6 @@ if TYPE_CHECKING:
     from sklearn.base import RegressorMixin
     from sklearn.neighbors import KNeighborsRegressor as sk_KNeighborsRegressor
 
-    from safeds.data.tabular.containers import Table, TaggedTable
-
 
 class KNearestNeighborsRegressor(Regressor):
     """
@@ -21,7 +21,7 @@ class KNearestNeighborsRegressor(Regressor):
 
     Parameters
     ----------
-    number_of_neighbors : int
+    number_of_neighbors:
         The number of neighbors to use for interpolation. Has to be greater than 0 (validated in the constructor) and
         less than or equal to the sample size (validated when calling `fit`).
 
@@ -59,12 +59,12 @@ class KNearestNeighborsRegressor(Regressor):
 
         Returns
         -------
-        result: int
+        result:
             The number of neighbors.
         """
         return self._number_of_neighbors
 
-    def fit(self, training_set: TaggedTable) -> KNearestNeighborsRegressor:
+    def fit(self, training_set: TabularDataset) -> KNearestNeighborsRegressor:
         """
         Create a copy of this regressor and fit it with the given training data.
 
@@ -72,12 +72,12 @@ class KNearestNeighborsRegressor(Regressor):
 
         Parameters
         ----------
-        training_set : TaggedTable
+        training_set:
             The training data containing the feature and target vectors.
 
         Returns
         -------
-        fitted_regressor : KNearestNeighborsRegressor
+        fitted_regressor:
             The fitted regressor.
 
         Raises
@@ -86,8 +86,8 @@ class KNearestNeighborsRegressor(Regressor):
             If `number_of_neighbors` is greater than the sample size.
         LearningError
             If the training data contains invalid values or if the training failed.
-        UntaggedTableError
-            If the table is untagged.
+        TypeError
+            If a table is passed instead of a tabular dataset.
         NonNumericColumnError
             If the training data contains non-numerical values.
         MissingValuesColumnError
@@ -95,13 +95,16 @@ class KNearestNeighborsRegressor(Regressor):
         DatasetMissesDataError
             If the training data contains no rows.
         """
-        if training_set.number_of_rows == 0:
+        if not isinstance(training_set, TabularDataset) and isinstance(training_set, Table):
+            raise PlainTableError
+
+        if training_set._table.number_of_rows == 0:
             raise DatasetMissesDataError
-        if self._number_of_neighbors > training_set.number_of_rows:
+        if self._number_of_neighbors > training_set._table.number_of_rows:
             raise ValueError(
                 (
                     f"The parameter 'number_of_neighbors' ({self._number_of_neighbors}) has to be less than or equal to"
-                    f" the sample size ({training_set.number_of_rows})."
+                    f" the sample size ({training_set._table.number_of_rows})."
                 ),
             )
 
@@ -115,26 +118,24 @@ class KNearestNeighborsRegressor(Regressor):
 
         return result
 
-    def predict(self, dataset: Table) -> TaggedTable:
+    def predict(self, dataset: Table) -> TabularDataset:
         """
         Predict a target vector using a dataset containing feature vectors. The model has to be trained first.
 
         Parameters
         ----------
-        dataset : Table
+        dataset:
             The dataset containing the feature vectors.
 
         Returns
         -------
-        table : TaggedTable
+        table:
             A dataset containing the given feature vectors and the predicted target vector.
 
         Raises
         ------
         ModelNotFittedError
             If the model has not been fitted yet.
-        DatasetContainsTargetError
-            If the dataset contains the target column already.
         DatasetMissesFeaturesError
             If the dataset misses feature columns.
         PredictionError
@@ -148,15 +149,9 @@ class KNearestNeighborsRegressor(Regressor):
         """
         return predict(self._wrapped_regressor, dataset, self._feature_names, self._target_name)
 
+    @property
     def is_fitted(self) -> bool:
-        """
-        Check if the regressor is fitted.
-
-        Returns
-        -------
-        is_fitted : bool
-            Whether the regressor is fitted.
-        """
+        """Whether the regressor is fitted."""
         return self._wrapped_regressor is not None
 
     def _get_sklearn_regressor(self) -> RegressorMixin:
@@ -165,7 +160,7 @@ class KNearestNeighborsRegressor(Regressor):
 
         Returns
         -------
-        wrapped_regressor: RegressorMixin
+        wrapped_regressor:
             The sklearn Regressor.
         """
         from sklearn.neighbors import KNeighborsRegressor as sk_KNeighborsRegressor

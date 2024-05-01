@@ -97,7 +97,7 @@ class TestTransform:
 class TestIsFitted:
     def test_should_return_false_before_fitting(self) -> None:
         transformer = StandardScaler()
-        assert not transformer.is_fitted()
+        assert not transformer.is_fitted
 
     def test_should_return_true_after_fitting(self) -> None:
         table = Table(
@@ -108,7 +108,7 @@ class TestIsFitted:
 
         transformer = StandardScaler()
         fitted_transformer = transformer.fit(table, None)
-        assert fitted_transformer.is_fitted()
+        assert fitted_transformer.is_fitted
 
 
 class TestFitAndTransformOnMultipleTables:

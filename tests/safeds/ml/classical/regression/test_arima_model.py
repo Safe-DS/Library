@@ -62,7 +62,7 @@ def test_should_not_change_input_regressor() -> None:
     valid_data = create_test_data()
     model = ArimaModelRegressor()
     model.fit(valid_data)
-    assert not model.is_fitted()
+    assert not model.is_fitted
 
 
 def test_should_not_change_input_table() -> None:
@@ -144,9 +144,9 @@ def test_should_raise_on_invalid_data(
             },
         ),
     ],
-    ids=["untagged_table"],
+    ids=["table"],
 )
-def test_should_raise_if_table_is_not_tagged(table: Table) -> None:
+def test_should_raise_if_given_normal_table(table: Table) -> None:
     model = ArimaModelRegressor()
     with pytest.raises(NonTimeSeriesError):
         model.fit(table)  # type: ignore[arg-type]
@@ -184,13 +184,13 @@ def test_should_raise_if_not_fitted() -> None:
 
 def test_if_fitted_not_fitted() -> None:
     model = ArimaModelRegressor()
-    assert not model.is_fitted()
+    assert not model.is_fitted
 
 
 def test_if_fitted_fitted() -> None:
     model = ArimaModelRegressor()
     model = model.fit(create_test_data())
-    assert model.is_fitted()
+    assert model.is_fitted
 
 
 def test_should_raise_if_horizon_too_small_plot() -> None:

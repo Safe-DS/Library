@@ -30,9 +30,9 @@ if TYPE_CHECKING:
     import pandas as pd
     from torch.utils.data import DataLoader, Dataset
 
+    from safeds.data.labeled.containers import TabularDataset
     from safeds.data.tabular.transformation import InvertibleTableTransformer, TableTransformer
 
-    from ._tagged_table import TaggedTable
     from ._time_series import TimeSeries
 
 
@@ -55,7 +55,7 @@ class Table:
 
     Parameters
     ----------
-    data : Mapping[str, Sequence[Any]] | None
+    data:
         The data. If None, an empty table is created.
 
     Raises
@@ -80,12 +80,12 @@ class Table:
 
         Parameters
         ----------
-        path : str | Path
+        path:
             The path to the CSV file.
 
         Returns
         -------
-        table : Table
+        table:
             The table created from the CSV file.
 
         Raises
@@ -126,12 +126,12 @@ class Table:
 
         Parameters
         ----------
-        path : str | Path
+        path:
             The path to the Excel file.
 
         Returns
         -------
-        table : Table
+        table:
             The table created from the Excel file.
 
         Raises
@@ -170,12 +170,12 @@ class Table:
 
         Parameters
         ----------
-        path : str | Path
+        path:
             The path to the JSON file.
 
         Returns
         -------
-        table : Table
+        table:
             The table created from the JSON file.
 
         Raises
@@ -215,12 +215,12 @@ class Table:
 
         Parameters
         ----------
-        data : dict[str, list[Any]]
+        data:
             The data.
 
         Returns
         -------
-        table : Table
+        table:
             The generated table.
 
         Raises
@@ -246,12 +246,12 @@ class Table:
 
         Parameters
         ----------
-        columns : list[Column]
+        columns:
             The columns to be combined. They need to have the same size.
 
         Returns
         -------
-        table : Table
+        table:
             The generated table.
 
         Raises
@@ -297,12 +297,12 @@ class Table:
 
         Parameters
         ----------
-        rows : list[Row]
+        rows:
             The rows to be combined. They need to have a matching schema.
 
         Returns
         -------
-        table : Table
+        table:
             The generated table.
 
         Raises
@@ -350,14 +350,14 @@ class Table:
 
         Parameters
         ----------
-        data : pd.DataFrame
+        data:
             The data.
-        schema : Schema | None
+        schema:
             The schema. If None, the schema is inferred from the data.
 
         Returns
         -------
-        table : Table
+        table:
             The created table.
 
         Examples
@@ -395,7 +395,7 @@ class Table:
 
         Parameters
         ----------
-        data : Mapping[str, Sequence[Any]] | None
+        data:
             The data. If None, an empty table is created.
 
         Raises
@@ -441,7 +441,8 @@ class Table:
 
         Returns
         -------
-        'True' if contents are equal, 'False' otherwise.
+        equals:
+            'True' if contents are equal, 'False' otherwise.
 
         Examples
         --------
@@ -486,7 +487,8 @@ class Table:
 
         Returns
         -------
-        A string representation of the table in only one line.
+        representation:
+            A string representation of the table in only one line.
 
         Examples
         --------
@@ -528,7 +530,7 @@ class Table:
 
         Returns
         -------
-        column_names : list[str]
+        column_names:
             The list of the column names.
 
         Examples
@@ -547,7 +549,7 @@ class Table:
 
         Returns
         -------
-        number_of_columns : int
+        number_of_columns:
             The number of columns.
 
         Examples
@@ -566,7 +568,7 @@ class Table:
 
         Returns
         -------
-        number_of_rows : int
+        number_of_rows:
             The number of rows.
 
         Examples
@@ -585,7 +587,7 @@ class Table:
 
         Returns
         -------
-        schema : Schema
+        schema:
             The schema.
 
         Examples
@@ -614,12 +616,12 @@ class Table:
 
         Parameters
         ----------
-        column_name : str
+        column_name:
             The name of the column.
 
         Returns
         -------
-        column : Column
+        column:
             The column.
 
         Raises
@@ -651,12 +653,12 @@ class Table:
 
         Parameters
         ----------
-        column_name : str
+        column_name:
             The name of the column.
 
         Returns
         -------
-        contains : bool
+        contains:
             True if the column exists.
 
         Examples
@@ -678,12 +680,12 @@ class Table:
 
         Parameters
         ----------
-        column_name : str
+        column_name:
             The name of the column to be queried.
 
         Returns
         -------
-        type : ColumnType
+        type:
             The type of the column.
 
         Raises
@@ -706,12 +708,12 @@ class Table:
 
         Parameters
         ----------
-        index : int
+        index:
             The index.
 
         Returns
         -------
-        row : Row
+        row:
             The row of the table at the index.
 
         Raises
@@ -740,12 +742,12 @@ class Table:
 
         Parameters
         ----------
-        column_name : str
+        column_name:
             The name to compare the Table's column names to.
 
         Returns
         -------
-        similar_columns: list[str]
+        similar_columns:
             A list of all column names in the Table that are similar or equal to the given column name.
         """
         import Levenshtein
@@ -776,7 +778,7 @@ class Table:
 
         Returns
         -------
-        result : Table
+        result:
             The table with statistics.
 
         Examples
@@ -784,32 +786,34 @@ class Table:
         >>> from safeds.data.tabular.containers import Table
         >>> table = Table.from_dict({"a": [1, 3], "b": [2, 4]})
         >>> table.summarize_statistics()
-                      metrics                   a                   b
-        0             maximum                   3                   4
-        1             minimum                   1                   2
-        2                mean                 2.0                 3.0
-        3                mode              [1, 3]              [2, 4]
-        4              median                 2.0                 3.0
-        5                 sum                   4                   6
-        6            variance                 2.0                 2.0
-        7  standard deviation  1.4142135623730951  1.4142135623730951
-        8              idness                 1.0                 1.0
-        9           stability                 0.5                 0.5
+                         metric                   a                   b
+        0               minimum                   1                   2
+        1               maximum                   3                   4
+        2                  mean                 2.0                 3.0
+        3                  mode              [1, 3]              [2, 4]
+        4                median                 2.0                 3.0
+        5              variance                 2.0                 2.0
+        6    standard deviation  1.4142135623730951  1.4142135623730951
+        7   missing value count                   0                   0
+        8   missing value ratio                 0.0                 0.0
+        9                idness                 1.0                 1.0
+        10            stability                 0.5                 0.5
         """
         import pandas as pd
 
         if self.number_of_columns == 0:
             return Table(
                 {
-                    "metrics": [
-                        "maximum",
+                    "metric": [
                         "minimum",
+                        "maximum",
                         "mean",
                         "mode",
                         "median",
-                        "sum",
                         "variance",
                         "standard deviation",
+                        "missing value count",
+                        "missing value ratio",
                         "idness",
                         "stability",
                     ],
@@ -818,22 +822,23 @@ class Table:
         elif self.number_of_rows == 0:
             table = Table(
                 {
-                    "metrics": [
-                        "maximum",
+                    "metric": [
                         "minimum",
+                        "maximum",
                         "mean",
                         "mode",
                         "median",
-                        "sum",
                         "variance",
                         "standard deviation",
+                        "missing value count",
+                        "missing value ratio",
                         "idness",
                         "stability",
                     ],
                 },
             )
             for name in self.column_names:
-                table = table.add_column(Column(name, ["-", "-", "-", "-", "-", "-", "-", "-", "-", "-"]))
+                table = table.add_column(Column(name, ["-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-"]))
             return table
 
         columns = self.to_columns()
@@ -842,14 +847,15 @@ class Table:
 
         for column in columns:
             statistics = {
-                "maximum": column.maximum,
                 "minimum": column.minimum,
+                "maximum": column.maximum,
                 "mean": column.mean,
                 "mode": column.mode,
                 "median": column.median,
-                "sum": column.sum,
                 "variance": column.variance,
                 "standard deviation": column.standard_deviation,
+                "missing value count": column.missing_value_count,
+                "missing value ratio": column.missing_value_ratio,
                 "idness": column.idness,
                 "stability": column.stability,
             }
@@ -864,7 +870,7 @@ class Table:
             result = pd.concat([result, pd.DataFrame(values)], axis=1)
 
         result = pd.concat([pd.DataFrame(list(statistics.keys())), result], axis=1)
-        result.columns = ["metrics", *self.column_names]
+        result.columns = ["metric", *self.column_names]
 
         return Table._from_pandas_dataframe(result)
 
@@ -881,7 +887,7 @@ class Table:
 
         Returns
         -------
-        table: Table
+        table:
             The table, as an instance of the Table class.
         """
         return self
@@ -894,7 +900,7 @@ class Table:
 
         Returns
         -------
-        result : Table
+        result:
             The table with the column attached.
 
         Raises
@@ -933,12 +939,12 @@ class Table:
 
         Parameters
         ----------
-        columns : list[Column] or Table
+        columns:
             The columns to be added.
 
         Returns
         -------
-        result: Table
+        result:
             A new table combining the original table and the given columns.
 
         Raises
@@ -986,12 +992,12 @@ class Table:
 
         Parameters
         ----------
-        row : Row
+        row:
             The row to be added.
 
         Returns
         -------
-        table : Table
+        table:
             A new table with the added row at the end.
 
         Raises
@@ -1048,12 +1054,12 @@ class Table:
 
         Parameters
         ----------
-        rows : list[Row] or Table
+        rows:
             The rows to be added.
 
         Returns
         -------
-        result : Table
+        result:
             A new table which combines the original table and the given rows.
 
         Raises
@@ -1126,12 +1132,12 @@ class Table:
 
         Parameters
         ----------
-        query : lambda function
+        query:
             A Callable that is applied to all rows.
 
         Returns
         -------
-        table : Table
+        table:
             A table containing only the rows filtered by the query.
 
         Examples
@@ -1153,7 +1159,7 @@ class Table:
 
     _T = TypeVar("_T")
 
-    def group_rows_by(self, key_selector: Callable[[Row], _T]) -> dict[_T, Table]:
+    def group_rows(self, key_selector: Callable[[Row], _T]) -> dict[_T, Table]:
         """
         Return a dictionary with copies of the output tables as values and the keys from the key_selector.
 
@@ -1161,12 +1167,12 @@ class Table:
 
         Parameters
         ----------
-        key_selector : Callable[[Row], _T]
+        key_selector:
             A Callable that is applied to all rows and returns the key of the group.
 
         Returns
         -------
-        dictionary : dict
+        dictionary:
             A dictionary containing the new tables as values and the selected keys as keys.
         """
         dictionary: dict[Table._T, Table] = {}
@@ -1187,12 +1193,12 @@ class Table:
 
         Parameters
         ----------
-        column_names : list[str]
+        column_names:
             A list containing only the columns to be kept.
 
         Returns
         -------
-        table : Table
+        table:
             A table containing only the given column(s).
 
         Raises
@@ -1232,12 +1238,12 @@ class Table:
 
         Parameters
         ----------
-        column_names : list[str]
+        column_names:
             A list containing all columns to be dropped.
 
         Returns
         -------
-        table : Table
+        table:
             A table without the given columns.
 
         Raises
@@ -1283,7 +1289,7 @@ class Table:
 
         Returns
         -------
-        table : Table
+        table:
             A table without the columns that contain missing values.
 
         Raises
@@ -1312,7 +1318,7 @@ class Table:
 
         Returns
         -------
-        table : Table
+        table:
             A table without the columns that contain non-numerical values.
 
         Raises
@@ -1339,7 +1345,7 @@ class Table:
 
         Returns
         -------
-        result : Table
+        result:
             The table with the duplicate rows removed.
 
         Examples
@@ -1363,7 +1369,7 @@ class Table:
 
         Returns
         -------
-        table : Table
+        table:
             A table without the rows that contain missing values.
 
         Examples
@@ -1389,7 +1395,7 @@ class Table:
 
         Returns
         -------
-        new_table : Table
+        new_table:
             A new table without rows containing outliers.
 
         Examples
@@ -1431,14 +1437,14 @@ class Table:
 
         Parameters
         ----------
-        old_name : str
+        old_name:
             The old name of the target column.
-        new_name : str
+        new_name:
             The new name of the target column.
 
         Returns
         -------
-        table : Table
+        table:
             The Table with the renamed column.
 
         Raises
@@ -1478,15 +1484,15 @@ class Table:
 
         Parameters
         ----------
-        old_column_name : str
+        old_column_name:
             The name of the column to be replaced.
 
-        new_columns : list[Column]
+        new_columns:
             The list of new columns replacing the old column.
 
         Returns
         -------
-        result : Table
+        result:
             A table with the old column replaced by the new columns.
 
         Raises
@@ -1536,7 +1542,7 @@ class Table:
 
         Returns
         -------
-        result : Table
+        result:
             The shuffled Table.
 
         Examples
@@ -1568,11 +1574,11 @@ class Table:
 
         Parameters
         ----------
-        start : int | None
+        start:
             The first index of the range to be copied into a new table, None by default.
-        end : int | None
+        end:
             The last index of the range to be copied into a new table, None by default.
-        step : int
+        step:
             The step size used to iterate through the table, 1 by default.
 
         Returns
@@ -1630,12 +1636,12 @@ class Table:
 
         Parameters
         ----------
-        comparator : Callable[[Column, Column], int]
+        comparator:
             The function used to compare two columns.
 
         Returns
         -------
-        new_table : Table
+        new_table:
             A new table with sorted columns.
 
         Examples
@@ -1672,12 +1678,12 @@ class Table:
 
         Parameters
         ----------
-        comparator : Callable[[Row, Row], int]
+        comparator:
             The function used to compare two rows.
 
         Returns
         -------
-        new_table : Table
+        new_table:
             A new table with sorted rows.
 
         Examples
@@ -1712,12 +1718,12 @@ class Table:
 
         Parameters
         ----------
-        percentage_in_first : float
+        percentage_in_first:
             The desired size of the first table in percentage to the given table; must be between 0 and 1.
 
         Returns
         -------
-        result : (Table, Table)
+        result:
             A tuple containing the two resulting tables. The first table has the specified size, the second table
             contains the rest of the data.
 
@@ -1750,41 +1756,6 @@ class Table:
             self.slice_rows(round(percentage_in_first * self.number_of_rows)),
         )
 
-    def tag_columns(self, target_name: str, feature_names: list[str] | None = None) -> TaggedTable:
-        """
-        Return a new `TaggedTable` with columns marked as a target column or feature columns.
-
-        The original table is not modified.
-
-        Parameters
-        ----------
-        target_name : str
-            Name of the target column.
-        feature_names : list[str] | None
-            Names of the feature columns. If None, all columns except the target column are used.
-
-        Returns
-        -------
-        tagged_table : TaggedTable
-            A new tagged table with the given target and feature names.
-
-        Raises
-        ------
-        ValueError
-            If the target column is also a feature column.
-        ValueError
-            If no feature columns are specified.
-
-        Examples
-        --------
-        >>> from safeds.data.tabular.containers import Table, TaggedTable
-        >>> table = Table.from_dict({"item": ["apple", "milk", "beer"], "price": [1.10, 1.19, 1.79], "amount_bought": [74, 72, 51]})
-        >>> tagged_table = table.tag_columns(target_name="amount_bought", feature_names=["item", "price"])
-        """
-        from ._tagged_table import TaggedTable
-
-        return TaggedTable._from_table(self, target_name, feature_names)
-
     def time_columns(self, target_name: str, time_name: str, feature_names: list[str] | None = None) -> TimeSeries:
         """
         Return a new `TimeSeries` with columns marked as a target and time column or feature columns.
@@ -1793,16 +1764,16 @@ class Table:
 
         Parameters
         ----------
-        target_name : str
+        target_name:
             Name of the target column.
-        time_name : str
+        time_name:
             Name of the time column.
-        feature_names : list[str] | None
+        feature_names:
             Names of the feature columns. If None, all columns except the target and time columns are used.
 
         Returns
         -------
-        time_series : TimeSeries
+        time_series:
             A new time series with the given target, time and feature names.
 
         Raises
@@ -1816,7 +1787,7 @@ class Table:
         --------
         >>> from safeds.data.tabular.containers import Table, TimeSeries
         >>> table = Table.from_dict({"time": ["01.01", "01.02", "01.03"], "price": [1.10, 1.19, 1.79], "amount_bought": [74, 72, 51]})
-        >>> tagged_table = table.time_columns(target_name="amount_bought",time_name = "time", feature_names=["price"])
+        >>> tabular_dataset = table.time_columns(target_name="amount_bought",time_name = "time", feature_names=["price"])
         """
         from ._time_series import TimeSeries
 
@@ -1830,7 +1801,7 @@ class Table:
 
         Returns
         -------
-        result : Table
+        result:
             The table with the transformed column.
 
         Raises
@@ -1863,12 +1834,12 @@ class Table:
 
         Parameters
         ----------
-        transformer : TableTransformer
+        transformer:
             The transformer which transforms the given table.
 
         Returns
         -------
-        transformed_table : Table
+        transformed_table:
             The transformed table.
 
         Raises
@@ -1901,12 +1872,12 @@ class Table:
 
         Parameters
         ----------
-        transformer : InvertibleTableTransformer
+        transformer:
             A transformer that was fitted with columns, which are all present in the table.
 
         Returns
         -------
-        table : Table
+        table:
             The original table.
 
         Raises
@@ -1945,7 +1916,7 @@ class Table:
 
         Returns
         -------
-        plot: Image
+        plot:
             The plot as an image.
 
         Examples
@@ -2010,14 +1981,14 @@ class Table:
 
         Parameters
         ----------
-        x_column_name : str
+        x_column_name:
             The column name of the column to be plotted on the x-Axis.
-        y_column_name : str
+        y_column_name:
             The column name of the column to be plotted on the y-Axis.
 
         Returns
         -------
-        plot: Image
+        plot:
             The plot as an image.
 
         Raises
@@ -2071,14 +2042,14 @@ class Table:
 
         Parameters
         ----------
-        x_column_name : str
+        x_column_name:
             The column name of the column to be plotted on the x-Axis.
-        y_column_name : str
+        y_column_name:
             The column name of the column to be plotted on the y-Axis.
 
         Returns
         -------
-        plot: Image
+        plot:
             The plot as an image.
 
         Raises
@@ -2132,7 +2103,7 @@ class Table:
 
         Returns
         -------
-        plot: Image
+        plot:
             The plot as an image.
 
         Raises
@@ -2177,13 +2148,18 @@ class Table:
         buffer.seek(0)
         return Image.from_bytes(buffer.read())
 
-    def plot_histograms(self) -> Image:
+    def plot_histograms(self, *, number_of_bins: int = 10) -> Image:
         """
         Plot a histogram for every column.
 
+        Parameters
+        ----------
+        number_of_bins:
+            The number of bins to use in the histogram. Default is 10.
+
         Returns
         -------
-        plot: Image
+        plot:
             The plot as an image.
 
         Examples
@@ -2193,26 +2169,52 @@ class Table:
         >>> image = table.plot_histograms()
         """
         import matplotlib.pyplot as plt
+        import numpy as np
         import pandas as pd
-        import seaborn as sns
 
-        col_wrap = min(self.number_of_columns, 3)
+        n_cols = min(3, self.number_of_columns)
+        n_rows = 1 + (self.number_of_columns - 1) // n_cols
 
-        data = pd.melt(self._data.map(lambda value: str(value)), value_vars=self.column_names)
-        grid = sns.FacetGrid(data=data, col="variable", col_wrap=col_wrap, sharex=False, sharey=False)
-        grid.map(sns.histplot, "value")
-        grid.set_xlabels("")
-        grid.set_ylabels("")
-        grid.set_titles("{col_name}")
-        for axes in grid.axes.flat:
-            axes.set_xticks(axes.get_xticks())
-            axes.set_xticklabels(axes.get_xticklabels(), rotation=45, horizontalalignment="right")
-        grid.tight_layout()
-        fig = grid.fig
+        one_col = n_cols == 1 and n_rows == 1
+        fig, axs = plt.subplots(n_rows, n_cols, tight_layout=True, figsize=(n_cols * 3, n_rows * 3))
+
+        col_names = self.column_names
+        for col_name, ax in zip(col_names, axs.flatten() if not one_col else [axs], strict=False):
+            np_col = np.array(self.get_column(col_name))
+            bins = min(number_of_bins, len(pd.unique(np_col)))
+
+            ax.set_title(col_name)
+            ax.set_xlabel("")
+            ax.set_ylabel("")
+
+            if self.get_column(col_name).type.is_numeric():
+                np_col = np_col[~np.isnan(np_col)]
+
+                if bins < len(pd.unique(np_col)):
+                    min_val = np.min(np_col)
+                    max_val = np.max(np_col)
+                    hist, bin_edges = np.histogram(self.get_column(col_name), bins, range=(min_val, max_val))
+
+                    bars = np.array([])
+                    for i in range(len(hist)):
+                        bars = np.append(bars, f"{round(bin_edges[i], 2)}-{round(bin_edges[i+1], 2)}")
+
+                    ax.bar(bars, hist, edgecolor="black")
+                    ax.set_xticks(np.arange(len(hist)), bars, rotation=45, horizontalalignment="right")
+                    continue
+
+            np_col = np_col.astype(str)
+            unique_values = np.unique(np_col)
+            hist = np.array([np.sum(np_col == value) for value in unique_values])
+            ax.bar(unique_values, hist, edgecolor="black")
+            ax.set_xticks(np.arange(len(unique_values)), unique_values, rotation=45, horizontalalignment="right")
+
+        for i in range(len(col_names), n_rows * n_cols):
+            fig.delaxes(axs.flatten()[i])  # Remove empty subplots
 
         buffer = io.BytesIO()
         fig.savefig(buffer, format="png")
-        plt.close()
+        plt.close()  # Prevents the figure from being displayed directly
         buffer.seek(0)
         return Image.from_bytes(buffer.read())
 
@@ -2229,7 +2231,7 @@ class Table:
 
         Parameters
         ----------
-        path : str | Path
+        path:
             The path to the output file.
 
         Raises
@@ -2261,7 +2263,7 @@ class Table:
 
         Parameters
         ----------
-        path : str | Path
+        path:
             The path to the output file.
 
         Raises
@@ -2300,7 +2302,7 @@ class Table:
 
         Parameters
         ----------
-        path : str | Path
+        path:
             The path to the output file.
 
         Raises
@@ -2328,7 +2330,7 @@ class Table:
 
         Returns
         -------
-        data : dict[str, list[Any]]
+        data:
             Dictionary representation of the table.
 
         Examples
@@ -2349,7 +2351,7 @@ class Table:
 
         Returns
         -------
-        output : str
+        output:
             The generated HTML.
 
         Examples
@@ -2366,7 +2368,7 @@ class Table:
 
         Returns
         -------
-        columns : list[Columns]
+        columns:
             List of columns.
 
         Examples
@@ -2384,7 +2386,7 @@ class Table:
 
         Returns
         -------
-        rows : list[Row]
+        rows:
             List of rows.
 
         Examples
@@ -2410,6 +2412,42 @@ class Table:
             for (_, series_row) in self._data.iterrows()
         ]
 
+    def to_tabular_dataset(self, target_name: str, extra_names: list[str] | None = None) -> TabularDataset:
+        """
+        Return a new `TabularDataset` with columns marked as a target column or feature columns.
+
+        The original table is not modified.
+
+        Parameters
+        ----------
+        target_name:
+            Name of the target column.
+        extra_names:
+            Names of the columns that are neither features nor target. If None, no extra columns are used, i.e. all but
+            the target column are used as features.
+
+        Returns
+        -------
+        dataset:
+            A new tabular dataset with the given target and feature names.
+
+        Raises
+        ------
+        ValueError
+            If the target column is also a feature column.
+        ValueError
+            If no feature columns are specified.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table
+        >>> table = Table({"item": ["apple", "milk", "beer"], "price": [1.10, 1.19, 1.79], "amount_bought": [74, 72, 51]})
+        >>> dataset = table.to_tabular_dataset(target_name="amount_bought", extra_names=["item"])
+        """
+        from safeds.data.labeled.containers import TabularDataset
+
+        return TabularDataset(self, target_name, extra_names)
+
     # ------------------------------------------------------------------------------------------------------------------
     # IPython integration
     # ------------------------------------------------------------------------------------------------------------------
@@ -2420,7 +2458,7 @@ class Table:
 
         Returns
         -------
-        output : str
+        output:
             The generated HTML.
         """
         return self._data.to_html(max_rows=self._data.shape[0], max_cols=self._data.shape[1], notebook=True)
@@ -2443,14 +2481,14 @@ class Table:
 
         Parameters
         ----------
-        nan_as_null : bool
+        nan_as_null:
             Whether to replace missing values in the data with `NaN`.
-        allow_copy : bool
+        allow_copy:
             Whether memory may be copied to create the DataFrame exchange object.
 
         Returns
         -------
-        dataframe
+        dataframe:
             A DataFrame object that conforms to the dataframe interchange protocol.
         """
         if not allow_copy:
@@ -2468,12 +2506,12 @@ class Table:
 
         Parameters
         ----------
-        batch_size
+        batch_size:
             The size of data batches that should be loaded at one time.
 
         Returns
         -------
-        result :
+        result:
             The DataLoader.
 
         """

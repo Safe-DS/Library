@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 
 from safeds._utils import _structural_hash
 from safeds.data.image.containers import Image
-from safeds.data.tabular.containers import Column, Row, Table, TaggedTable
+from safeds.data.tabular.containers import Column, Row, Table
 from safeds.exceptions import (
     ColumnIsTargetError,
     ColumnIsTimeError,
@@ -41,13 +41,10 @@ class TimeSeries(Table):
         ----------
         path:
             The path to the CSV file.
-
         target_name:
             The name of the target column
-
         time_name:
             The name of the time column
-
         feature_names:
             The name(s) of the column(s)
 
@@ -78,57 +75,6 @@ class TimeSeries(Table):
         )
 
     @staticmethod
-    def _from_tagged_table(
-        tagged_table: TaggedTable,
-        time_name: str,
-    ) -> TimeSeries:
-        """Create a time series from a tagged table.
-
-        Parameters
-        ----------
-        tagged_table: TaggedTable
-            The tagged table.
-        time_name: str
-            Name of the time column.
-
-        Returns
-        -------
-        time_series : TimeSeries
-            the created time series
-
-        Raises
-        ------
-        UnknownColumnNameError
-            If time_name matches none of the column names.
-        Value Error
-            If time column is also a feature column
-
-        Examples
-        --------
-        >>> from safeds.data.tabular.containers import Table, TimeSeries
-        >>> tagged_table = TaggedTable({"date": ["01.01", "01.02", "01.03", "01.04"], "col1": ["a", "b", "c", "a"]}, "col1" )
-        >>> timeseries = TimeSeries._from_tagged_table(tagged_table, time_name = "date")
-        """
-        if time_name not in tagged_table.column_names:
-            raise UnknownColumnNameError([time_name])
-        table = tagged_table._as_table()
-        # make sure that the time_name is not part of the features
-        result = object.__new__(TimeSeries)
-        feature_names = tagged_table.features.column_names
-        if time_name in feature_names:
-            feature_names.remove(time_name)
-
-        if time_name == tagged_table.target.name:
-            raise ValueError(f"Column '{time_name}' cannot be both time column and target.")
-
-        result._data = table._data
-        result._schema = table.schema
-        result._time = table.get_column(time_name)
-        result._features = table.keep_only_columns(feature_names)
-        result._target = table.get_column(tagged_table.target.name)
-        return result
-
-    @staticmethod
     def _from_table(
         table: Table,
         target_name: str,
@@ -139,18 +85,18 @@ class TimeSeries(Table):
 
         Parameters
         ----------
-        table : Table
+        table:
             The table.
-        target_name : str
+        target_name:
             Name of the target column.
-        time_name: str
+        time_name:
             Name of the date column.
-        feature_names : list[str] | None
+        feature_names:
             Names of the feature columns. If None, all columns except the target and time columns are used.
 
         Returns
         -------
-        time_series : TimeSeries
+        time_series:
             the created time series
 
         Raises
@@ -215,13 +161,13 @@ class TimeSeries(Table):
 
         Parameters
         ----------
-        data : Mapping[str, Sequence[Any]]
+        data:
             The data.
-        target_name : str
+        target_name:
             Name of the target column.
-        time_name : str
+        time_name:
             Name of the time column
-        feature_names : list[str] | None
+        feature_names:
             Names of the feature columns. If None, all columns except the target and time columns are used.
 
         Raises
@@ -237,8 +183,8 @@ class TimeSeries(Table):
 
         Examples
         --------
-        >>> from safeds.data.tabular.containers import TaggedTable
-        >>> table = TaggedTable({"a": [1, 2, 3], "b": [4, 5, 6]}, "b", ["a"])
+        >>> from safeds.data.tabular.containers import TimeSeries
+        >>> table = TimeSeries({"a": [1, 2, 3], "b": [4, 5, 6]}, "b", "a")
         """
         import pandas as pd
 
@@ -277,7 +223,8 @@ class TimeSeries(Table):
 
         Returns
         -------
-        'True' if contents are equal, 'False' otherwise.
+        equals:
+            'True' if contents are equal, 'False' otherwise.
         """
         if not isinstance(other, TimeSeries):
             return NotImplemented
@@ -320,11 +267,11 @@ class TimeSeries(Table):
     @property
     def target(self) -> Column:
         """
-        Get the target column of the tagged table.
+        Get the target column of the time series.
 
         Returns
         -------
-        Column
+        target:
             The target column.
         """
         return self._target
@@ -332,11 +279,11 @@ class TimeSeries(Table):
     @property
     def features(self) -> Table:
         """
-        Get the feature columns of the tagged table.
+        Get the feature columns of the time series.
 
         Returns
         -------
-        Table
+        features:
             The table containing the feature columns.
         """
         return self._features
@@ -348,29 +295,30 @@ class TimeSeries(Table):
 
         Returns
         -------
-        Column
+        time:
             The time column.
         """
         return self._time
 
     # ------------------------------------------------------------------------------------------------------------------
-    # Overriden methods from TaggedTable class:
+    # Overridden methods from Table class
     # ------------------------------------------------------------------------------------------------------------------
     def _as_table(self: TimeSeries) -> Table:
         """
-        Return a new `Table` with the tagging removed.
+        Return a new plain `Table`.
 
         The original time series is not modified.
 
         Parameters
         ----------
-        self: TimeSeries
+        self:
             The Time Series.
 
         Returns
         -------
-        table: Table
-            The time series as an untagged Table, i.e. without the information about which columns are features, target or time.
+        table:
+            The time series as an plain Table, i.e. without the information about which columns are features, target or
+            time.
 
         """
         return Table.from_columns(super().to_columns())
@@ -383,12 +331,12 @@ class TimeSeries(Table):
 
         Parameters
         ----------
-        column : Column
+        column:
             The column to be added.
 
         Returns
         -------
-        result : TimeSeries
+        result:
             The time series with the column attached as neither target nor feature column.
 
         Raises
@@ -412,12 +360,12 @@ class TimeSeries(Table):
 
         Parameters
         ----------
-        column : Column
+        column:
             The column to be added.
 
         Returns
         -------
-        result : TimeSeries
+        result:
             The time series with the attached feature column.
 
         Raises
@@ -442,12 +390,12 @@ class TimeSeries(Table):
 
         Parameters
         ----------
-        columns : list[Column] | Table
+        columns:
             The columns to be added as features.
 
         Returns
         -------
-        result : TimeSeries
+        result:
             The time series with the attached feature columns.
 
         Raises
@@ -473,12 +421,12 @@ class TimeSeries(Table):
 
         Parameters
         ----------
-        columns : list[Column] or Table
+        columns:
             The columns to be added.
 
         Returns
         -------
-        result: TimeSeries
+        result:
             A new time series combining the original table and the given columns as neither target nor feature columns.
 
         Raises
@@ -503,12 +451,12 @@ class TimeSeries(Table):
 
         Parameters
         ----------
-        row : Row
+        row:
             The row to be added.
 
         Returns
         -------
-        table : TimeSeries
+        table:
             A new time series with the added row at the end.
 
         Raises
@@ -531,12 +479,12 @@ class TimeSeries(Table):
 
         Parameters
         ----------
-        rows : list[Row] or Table
+        rows:
             The rows to be added.
 
         Returns
         -------
-        result : TimeSeries
+        result:
             A new time series which combines the original time series and the given rows.
 
         Raises
@@ -559,12 +507,12 @@ class TimeSeries(Table):
 
         Parameters
         ----------
-        query : lambda function
+        query:
             A Callable that is applied to all rows.
 
         Returns
         -------
-        result: TimeSeries
+        result:
             A time series containing only the rows to match the query.
         """
         return TimeSeries._from_table(
@@ -582,12 +530,12 @@ class TimeSeries(Table):
 
         Parameters
         ----------
-        column_names : list[str]
+        column_names:
             A list containing the columns to be kept.
 
         Returns
         -------
-        table : TimeSeries
+        table:
             A time series containing only the given column(s).
 
         Raises
@@ -619,12 +567,12 @@ class TimeSeries(Table):
 
         Parameters
         ----------
-        column_names : list[str]
+        column_names:
             The names of all columns to be dropped.
 
         Returns
         -------
-        table : TimeSeries
+        table:
             A time series without the given columns.
 
         Raises
@@ -660,7 +608,7 @@ class TimeSeries(Table):
 
         Returns
         -------
-        table : TimeSeries
+        table:
             A time series without the columns that contain missing values.
 
         Raises
@@ -695,7 +643,7 @@ class TimeSeries(Table):
 
         Returns
         -------
-        table : TimeSeries
+        table:
             A time series without the columns that contain non-numerical values.
 
         Raises
@@ -730,7 +678,7 @@ class TimeSeries(Table):
 
         Returns
         -------
-        result : TimeSeries
+        result:
             The time series with the duplicate rows removed.
         """
         return TimeSeries._from_table(
@@ -748,7 +696,7 @@ class TimeSeries(Table):
 
         Returns
         -------
-        table : TimeSeries
+        table:
             A time series without the rows that contain missing values.
         """
         return TimeSeries._from_table(
@@ -770,7 +718,7 @@ class TimeSeries(Table):
 
         Returns
         -------
-        new_time_series : TimeSeries
+        new_time_series:
             A new time series without rows containing outliers.
         """
         return TimeSeries._from_table(
@@ -788,14 +736,14 @@ class TimeSeries(Table):
 
         Parameters
         ----------
-        old_name : str
+        old_name:
             The old name of the column.
-        new_name : str
+        new_name:
             The new name of the column.
 
         Returns
         -------
-        table : TimeSeries
+        table:
             The time series with the renamed column.
 
         Raises
@@ -828,14 +776,14 @@ class TimeSeries(Table):
 
         Parameters
         ----------
-        old_column_name : str
+        old_column_name:
             The name of the column to be replaced.
-        new_columns : list[Column]
+        new_columns:
             The new columns replacing the old column.
 
         Returns
         -------
-        result : TimeSeries
+        result:
             A time series with the old column replaced by the new columns.
 
         Raises
@@ -901,16 +849,16 @@ class TimeSeries(Table):
 
         Parameters
         ----------
-        start : int | None
+        start:
             The first index of the range to be copied into a new time series, None by default.
-        end : int | None
+        end:
             The last index of the range to be copied into a new time series, None by default.
-        step : int
+        step:
             The step size used to iterate through the time series, 1 by default.
 
         Returns
         -------
-        result : TimeSeries
+        result:
             The resulting time series.
 
         Raises
@@ -946,12 +894,12 @@ class TimeSeries(Table):
 
         Parameters
         ----------
-        comparator : Callable[[Column, Column], int]
+        comparator:
             The function used to compare two columns.
 
         Returns
         -------
-        new_time_series : TimeSeries
+        new_time_series:
             A new time series with sorted columns.
         """
         sorted_table = super().sort_columns(comparator)
@@ -980,7 +928,7 @@ class TimeSeries(Table):
 
         Returns
         -------
-        result : TimeSeries
+        result:
             The time series with the transformed column.
 
         Raises
