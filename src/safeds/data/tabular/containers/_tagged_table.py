@@ -26,11 +26,11 @@ class TaggedTable(Table):
 
     Parameters
     ----------
-    data : Mapping[str, Sequence[Any]]
+    data:
         The data.
-    target_name : str
+    target_name:
         Name of the target column.
-    feature_names : list[str] | None
+    feature_names:
         Names of the feature columns. If None, all columns except the target column are used.
 
     Raises
@@ -64,16 +64,16 @@ class TaggedTable(Table):
 
         Parameters
         ----------
-        table : Table
+        table:
             The table.
-        target_name : str
+        target_name:
             Name of the target column.
-        feature_names : list[str] | None
+        feature_names:
             Names of the feature columns. If None, all columns except the target column are used.
 
         Returns
         -------
-        tagged_table : TaggedTable
+        tagged_table:
             The created table.
 
         Raises
@@ -131,11 +131,11 @@ class TaggedTable(Table):
 
         Parameters
         ----------
-        data : Mapping[str, Sequence[Any]]
+        data:
             The data.
-        target_name : str
+        target_name:
             Name of the target column.
-        feature_names : list[str] | None
+        feature_names:
             Names of the feature columns. If None, all columns except the target column are used.
 
         Raises
@@ -176,7 +176,8 @@ class TaggedTable(Table):
 
         Returns
         -------
-        'True' if contents and tags are equal, 'False' otherwise.
+        equals:
+            'True' if contents and tags are equal, 'False' otherwise.
         """
         if not isinstance(other, TaggedTable):
             return NotImplemented
@@ -217,7 +218,7 @@ class TaggedTable(Table):
 
         Returns
         -------
-        Table
+        features:
             The table containing the feature columns.
         """
         return self._features
@@ -229,7 +230,7 @@ class TaggedTable(Table):
 
         Returns
         -------
-        Column
+        target:
             The target column.
         """
         return self._target
@@ -246,12 +247,12 @@ class TaggedTable(Table):
 
         Parameters
         ----------
-        column : Column
+        column:
             The column to be added.
 
         Returns
         -------
-        result : TaggedTable
+        result:
             The table with the attached feature column.
 
         Raises
@@ -275,12 +276,12 @@ class TaggedTable(Table):
 
         Parameters
         ----------
-        columns : list[Column] | Table
+        columns:
             The columns to be added as features.
 
         Returns
         -------
-        result : TaggedTable
+        result:
             The table with the attached feature columns.
 
         Raises
@@ -309,12 +310,12 @@ class TaggedTable(Table):
 
         Parameters
         ----------
-        self: TaggedTable
+        self:
             The TaggedTable.
 
         Returns
         -------
-        table: Table
+        table:
             The table as an untagged Table, i.e. without the information about which columns are features or target.
 
         """
@@ -328,12 +329,12 @@ class TaggedTable(Table):
 
         Parameters
         ----------
-        column : Column
+        column:
             The column to be added.
 
         Returns
         -------
-        result : TaggedTable
+        result:
             The table with the column attached as neither target nor feature column.
 
         Raises
@@ -357,12 +358,12 @@ class TaggedTable(Table):
 
         Parameters
         ----------
-        columns : list[Column] or Table
+        columns:
             The columns to be added.
 
         Returns
         -------
-        result: TaggedTable
+        result:
             A new table combining the original table and the given columns as neither target nor feature columns.
 
         Raises
@@ -386,12 +387,12 @@ class TaggedTable(Table):
 
         Parameters
         ----------
-        row : Row
+        row:
             The row to be added.
 
         Returns
         -------
-        table : TaggedTable
+        table:
             A new tagged table with the added row at the end.
 
         Raises
@@ -409,12 +410,12 @@ class TaggedTable(Table):
 
         Parameters
         ----------
-        rows : list[Row] or Table
+        rows:
             The rows to be added.
 
         Returns
         -------
-        result : TaggedTable
+        result:
             A new tagged table which combines the original table and the given rows.
 
         Raises
@@ -432,12 +433,12 @@ class TaggedTable(Table):
 
         Parameters
         ----------
-        query : lambda function
+        query:
             A Callable that is applied to all rows.
 
         Returns
         -------
-        result : TaggedTable
+        result:
             A new tagged table containing only the rows to match the query.
         """
         return TaggedTable._from_table(
@@ -454,12 +455,12 @@ class TaggedTable(Table):
 
         Parameters
         ----------
-        column_names : list[str]
+        column_names:
             A list containing only the columns to be kept.
 
         Returns
         -------
-        table : TaggedTable
+        table:
             A table containing only the given column(s).
 
         Raises
@@ -490,12 +491,12 @@ class TaggedTable(Table):
 
         Parameters
         ----------
-        column_names : list[str]
+        column_names:
             The names of all columns to be dropped.
 
         Returns
         -------
-        table : TaggedTable
+        table:
             A table without the given columns.
 
         Raises
@@ -528,7 +529,7 @@ class TaggedTable(Table):
 
         Returns
         -------
-        table : TaggedTable
+        table:
             A table without the columns that contain missing values.
 
         Raises
@@ -560,7 +561,7 @@ class TaggedTable(Table):
 
         Returns
         -------
-        table : TaggedTable
+        table:
             A table without the columns that contain non-numerical values.
 
         Raises
@@ -592,7 +593,7 @@ class TaggedTable(Table):
 
         Returns
         -------
-        result : TaggedTable
+        result:
             The table with the duplicate rows removed.
         """
         return TaggedTable._from_table(
@@ -609,7 +610,7 @@ class TaggedTable(Table):
 
         Returns
         -------
-        table : TaggedTable
+        table:
             A table without the rows that contain missing values.
         """
         return TaggedTable._from_table(
@@ -630,7 +631,7 @@ class TaggedTable(Table):
 
         Returns
         -------
-        new_table : TaggedTable
+        new_table:
             A new table without rows containing outliers.
         """
         return TaggedTable._from_table(
@@ -647,14 +648,14 @@ class TaggedTable(Table):
 
         Parameters
         ----------
-        old_name : str
+        old_name:
             The old name of the target column.
-        new_name : str
+        new_name:
             The new name of the target column.
 
         Returns
         -------
-        table : TaggedTable
+        table:
             The Table with the renamed column.
 
         Raises
@@ -688,14 +689,14 @@ class TaggedTable(Table):
 
         Parameters
         ----------
-        old_column_name : str
+        old_column_name:
             The name of the column to be replaced.
-        new_columns : list[Column]
+        new_columns:
             The new columns replacing the old column.
 
         Returns
         -------
-        result : TaggedTable
+        result:
             A table with the old column replaced by the new column.
 
         Raises
@@ -741,7 +742,7 @@ class TaggedTable(Table):
 
         Returns
         -------
-        result : TaggedTable
+        result:
             The shuffled Table.
         """
         return TaggedTable._from_table(
@@ -763,16 +764,16 @@ class TaggedTable(Table):
 
         Parameters
         ----------
-        start : int | None
+        start:
             The first index of the range to be copied into a new table, None by default.
-        end : int | None
+        end:
             The last index of the range to be copied into a new table, None by default.
-        step : int
+        step:
             The step size used to iterate through the table, 1 by default.
 
         Returns
         -------
-        result : TaggedTable
+        result:
             The resulting table.
 
         Raises
@@ -807,12 +808,12 @@ class TaggedTable(Table):
 
         Parameters
         ----------
-        comparator : Callable[[Column, Column], int]
+        comparator:
             The function used to compare two columns.
 
         Returns
         -------
-        new_table : TaggedTable
+        new_table:
             A new table with sorted columns.
         """
         sorted_table = super().sort_columns(comparator)
@@ -840,12 +841,12 @@ class TaggedTable(Table):
 
         Parameters
         ----------
-        comparator : Callable[[Row, Row], int]
+        comparator:
             The function used to compare two rows.
 
         Returns
         -------
-        new_table : TaggedTable
+        new_table:
             A new table with sorted rows.
         """
         return TaggedTable._from_table(
@@ -862,7 +863,7 @@ class TaggedTable(Table):
 
         Returns
         -------
-        result : TaggedTable
+        result:
             The table with the transformed column.
 
         Raises
@@ -884,12 +885,12 @@ class TaggedTable(Table):
 
         Parameters
         ----------
-        batch_size
+        batch_size:
             The size of data batches that should be loaded at one time.
 
         Returns
         -------
-        result :
+        result:
             The DataLoader.
 
         """

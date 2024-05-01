@@ -41,13 +41,10 @@ class TimeSeries(Table):
         ----------
         path:
             The path to the CSV file.
-
         target_name:
             The name of the target column
-
         time_name:
             The name of the time column
-
         feature_names:
             The name(s) of the column(s)
 
@@ -86,14 +83,14 @@ class TimeSeries(Table):
 
         Parameters
         ----------
-        tagged_table: TaggedTable
+        tagged_table:
             The tagged table.
-        time_name: str
+        time_name:
             Name of the time column.
 
         Returns
         -------
-        time_series : TimeSeries
+        time_series:
             the created time series
 
         Raises
@@ -139,18 +136,18 @@ class TimeSeries(Table):
 
         Parameters
         ----------
-        table : Table
+        table:
             The table.
-        target_name : str
+        target_name:
             Name of the target column.
-        time_name: str
+        time_name:
             Name of the date column.
-        feature_names : list[str] | None
+        feature_names:
             Names of the feature columns. If None, all columns except the target and time columns are used.
 
         Returns
         -------
-        time_series : TimeSeries
+        time_series:
             the created time series
 
         Raises
@@ -215,13 +212,13 @@ class TimeSeries(Table):
 
         Parameters
         ----------
-        data : Mapping[str, Sequence[Any]]
+        data:
             The data.
-        target_name : str
+        target_name:
             Name of the target column.
-        time_name : str
+        time_name:
             Name of the time column
-        feature_names : list[str] | None
+        feature_names:
             Names of the feature columns. If None, all columns except the target and time columns are used.
 
         Raises
@@ -277,7 +274,8 @@ class TimeSeries(Table):
 
         Returns
         -------
-        'True' if contents are equal, 'False' otherwise.
+        equals:
+            'True' if contents are equal, 'False' otherwise.
         """
         if not isinstance(other, TimeSeries):
             return NotImplemented
@@ -324,7 +322,7 @@ class TimeSeries(Table):
 
         Returns
         -------
-        Column
+        target:
             The target column.
         """
         return self._target
@@ -336,7 +334,7 @@ class TimeSeries(Table):
 
         Returns
         -------
-        Table
+        features:
             The table containing the feature columns.
         """
         return self._features
@@ -348,7 +346,7 @@ class TimeSeries(Table):
 
         Returns
         -------
-        Column
+        time:
             The time column.
         """
         return self._time
@@ -364,12 +362,12 @@ class TimeSeries(Table):
 
         Parameters
         ----------
-        self: TimeSeries
+        self:
             The Time Series.
 
         Returns
         -------
-        table: Table
+        table:
             The time series as an untagged Table, i.e. without the information about which columns are features, target or time.
 
         """
@@ -383,12 +381,12 @@ class TimeSeries(Table):
 
         Parameters
         ----------
-        column : Column
+        column:
             The column to be added.
 
         Returns
         -------
-        result : TimeSeries
+        result:
             The time series with the column attached as neither target nor feature column.
 
         Raises
@@ -412,12 +410,12 @@ class TimeSeries(Table):
 
         Parameters
         ----------
-        column : Column
+        column:
             The column to be added.
 
         Returns
         -------
-        result : TimeSeries
+        result:
             The time series with the attached feature column.
 
         Raises
@@ -442,12 +440,12 @@ class TimeSeries(Table):
 
         Parameters
         ----------
-        columns : list[Column] | Table
+        columns:
             The columns to be added as features.
 
         Returns
         -------
-        result : TimeSeries
+        result:
             The time series with the attached feature columns.
 
         Raises
@@ -473,12 +471,12 @@ class TimeSeries(Table):
 
         Parameters
         ----------
-        columns : list[Column] or Table
+        columns:
             The columns to be added.
 
         Returns
         -------
-        result: TimeSeries
+        result:
             A new time series combining the original table and the given columns as neither target nor feature columns.
 
         Raises
@@ -503,12 +501,12 @@ class TimeSeries(Table):
 
         Parameters
         ----------
-        row : Row
+        row:
             The row to be added.
 
         Returns
         -------
-        table : TimeSeries
+        table:
             A new time series with the added row at the end.
 
         Raises
@@ -531,12 +529,12 @@ class TimeSeries(Table):
 
         Parameters
         ----------
-        rows : list[Row] or Table
+        rows:
             The rows to be added.
 
         Returns
         -------
-        result : TimeSeries
+        result:
             A new time series which combines the original time series and the given rows.
 
         Raises
@@ -559,12 +557,12 @@ class TimeSeries(Table):
 
         Parameters
         ----------
-        query : lambda function
+        query:
             A Callable that is applied to all rows.
 
         Returns
         -------
-        result: TimeSeries
+        result:
             A time series containing only the rows to match the query.
         """
         return TimeSeries._from_table(
@@ -582,12 +580,12 @@ class TimeSeries(Table):
 
         Parameters
         ----------
-        column_names : list[str]
+        column_names:
             A list containing the columns to be kept.
 
         Returns
         -------
-        table : TimeSeries
+        table:
             A time series containing only the given column(s).
 
         Raises
@@ -619,12 +617,12 @@ class TimeSeries(Table):
 
         Parameters
         ----------
-        column_names : list[str]
+        column_names:
             The names of all columns to be dropped.
 
         Returns
         -------
-        table : TimeSeries
+        table:
             A time series without the given columns.
 
         Raises
@@ -660,7 +658,7 @@ class TimeSeries(Table):
 
         Returns
         -------
-        table : TimeSeries
+        table:
             A time series without the columns that contain missing values.
 
         Raises
@@ -695,7 +693,7 @@ class TimeSeries(Table):
 
         Returns
         -------
-        table : TimeSeries
+        table:
             A time series without the columns that contain non-numerical values.
 
         Raises
@@ -730,7 +728,7 @@ class TimeSeries(Table):
 
         Returns
         -------
-        result : TimeSeries
+        result:
             The time series with the duplicate rows removed.
         """
         return TimeSeries._from_table(
@@ -748,7 +746,7 @@ class TimeSeries(Table):
 
         Returns
         -------
-        table : TimeSeries
+        table:
             A time series without the rows that contain missing values.
         """
         return TimeSeries._from_table(
@@ -770,7 +768,7 @@ class TimeSeries(Table):
 
         Returns
         -------
-        new_time_series : TimeSeries
+        new_time_series:
             A new time series without rows containing outliers.
         """
         return TimeSeries._from_table(
@@ -788,14 +786,14 @@ class TimeSeries(Table):
 
         Parameters
         ----------
-        old_name : str
+        old_name:
             The old name of the column.
-        new_name : str
+        new_name:
             The new name of the column.
 
         Returns
         -------
-        table : TimeSeries
+        table:
             The time series with the renamed column.
 
         Raises
@@ -828,14 +826,14 @@ class TimeSeries(Table):
 
         Parameters
         ----------
-        old_column_name : str
+        old_column_name:
             The name of the column to be replaced.
-        new_columns : list[Column]
+        new_columns:
             The new columns replacing the old column.
 
         Returns
         -------
-        result : TimeSeries
+        result:
             A time series with the old column replaced by the new columns.
 
         Raises
@@ -901,16 +899,16 @@ class TimeSeries(Table):
 
         Parameters
         ----------
-        start : int | None
+        start:
             The first index of the range to be copied into a new time series, None by default.
-        end : int | None
+        end:
             The last index of the range to be copied into a new time series, None by default.
-        step : int
+        step:
             The step size used to iterate through the time series, 1 by default.
 
         Returns
         -------
-        result : TimeSeries
+        result:
             The resulting time series.
 
         Raises
@@ -946,12 +944,12 @@ class TimeSeries(Table):
 
         Parameters
         ----------
-        comparator : Callable[[Column, Column], int]
+        comparator:
             The function used to compare two columns.
 
         Returns
         -------
-        new_time_series : TimeSeries
+        new_time_series:
             A new time series with sorted columns.
         """
         sorted_table = super().sort_columns(comparator)
@@ -980,7 +978,7 @@ class TimeSeries(Table):
 
         Returns
         -------
-        result : TimeSeries
+        result:
             The time series with the transformed column.
 
         Raises
