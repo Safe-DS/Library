@@ -30,7 +30,9 @@ class TestOutputConversionImageToColumn:
             match=r"The column_name is not set. The data can only be converted if the column_name is provided as `str` in the kwargs.",
         ):
             OutputConversionImageToColumn()._data_conversion(
-                input_data=_SingleSizeImageList(), output_data=torch.empty(1), one_hot_encoder=OneHotEncoder(),
+                input_data=_SingleSizeImageList(),
+                output_data=torch.empty(1),
+                one_hot_encoder=OneHotEncoder(),
             )
 
     def test_should_raise_if_one_hot_encoder_not_set(self) -> None:
@@ -39,7 +41,9 @@ class TestOutputConversionImageToColumn:
             match=r"The one_hot_encoder is not set. The data can only be converted if the one_hot_encoder is provided as `OneHotEncoder` in the kwargs.",
         ):
             OutputConversionImageToColumn()._data_conversion(
-                input_data=_SingleSizeImageList(), output_data=torch.empty(1), column_name="column_name",
+                input_data=_SingleSizeImageList(),
+                output_data=torch.empty(1),
+                column_name="column_name",
             )
 
 
@@ -51,5 +55,6 @@ class TestOutputConversionImageToTable:
             match=r"The column_names are not set. The data can only be converted if the column_names are provided as `list\[str\]` in the kwargs.",
         ):
             OutputConversionImageToTable()._data_conversion(
-                input_data=_SingleSizeImageList(), output_data=torch.empty(1),
+                input_data=_SingleSizeImageList(),
+                output_data=torch.empty(1),
             )

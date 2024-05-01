@@ -65,7 +65,14 @@ def _create_internal_model(
             return self._fn(self._layer(x))
 
     return _InternalLayer(
-        input_size, output_size, kernel_size, activation_function, padding, stride, transpose, output_padding,
+        input_size,
+        output_size,
+        kernel_size,
+        activation_function,
+        padding,
+        stride,
+        transpose,
+        output_padding,
     )
 
 
@@ -175,7 +182,13 @@ class Convolutional2DLayer(_Layer):
 class ConvolutionalTranspose2DLayer(Convolutional2DLayer):
 
     def __init__(
-        self, output_channel: int, kernel_size: int, *, stride: int = 1, padding: int = 0, output_padding: int = 0,
+        self,
+        output_channel: int,
+        kernel_size: int,
+        *,
+        stride: int = 1,
+        padding: int = 0,
+        output_padding: int = 0,
     ):
         """
         Create a Convolutional Transpose 2D Layer.

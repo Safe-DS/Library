@@ -56,10 +56,9 @@ class ImageDataset(Generic[T]):
         else:
             self._input_size: ImageSize = ImageSize(input_data.widths[0], input_data.heights[0], input_data.channel)
             self._input: _SingleSizeImageList = input_data._as_single_size_image_list()
-        if (
-            (isinstance(output_data, Column | Table))
-            and len(input_data) != output_data.number_of_rows
-        ) or (isinstance(output_data, ImageList) and len(input_data) != len(output_data)):
+        if ((isinstance(output_data, Column | Table)) and len(input_data) != output_data.number_of_rows) or (
+            isinstance(output_data, ImageList) and len(input_data) != len(output_data)
+        ):
             if isinstance(output_data, Table):
                 output_len = output_data.number_of_rows
             else:
@@ -281,5 +280,7 @@ class _ColumnAsTensor:
         return table_as_tensor
 
     def _to_column(self) -> Column:
-        table = Table(dict(zip(self._one_hot_encoder.get_names_of_added_columns(), self._tensor.T.tolist(), strict=False)))
+        table = Table(
+            dict(zip(self._one_hot_encoder.get_names_of_added_columns(), self._tensor.T.tolist(), strict=False)),
+        )
         return self._one_hot_encoder.inverse_transform(table).get_column(self._column_name)

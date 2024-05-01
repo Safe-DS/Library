@@ -98,7 +98,12 @@ class TestConvolutional2DLayer:
         ],
     )
     def test_should_raise_if_activation_function_not_set(
-        self, conv_type: type[Convolutional2DLayer], output_channel: int, kernel_size: int, stride: int, padding: int,
+        self,
+        conv_type: type[Convolutional2DLayer],
+        output_channel: int,
+        kernel_size: int,
+        stride: int,
+        padding: int,
     ) -> None:
         layer = conv_type(output_channel, kernel_size, stride=stride, padding=padding)
         input_size = ImageSize(10, 20, 30, _ignore_invalid_channel=True)
@@ -117,7 +122,12 @@ class TestConvolutional2DLayer:
         ],
     )
     def test_should_raise_if_unsupported_activation_function_is_set(
-        self, conv_type: type[Convolutional2DLayer], output_channel: int, kernel_size: int, stride: int, padding: int,
+        self,
+        conv_type: type[Convolutional2DLayer],
+        output_channel: int,
+        kernel_size: int,
+        stride: int,
+        padding: int,
     ) -> None:
         layer = conv_type(output_channel, kernel_size, stride=stride, padding=padding)
         input_size = ImageSize(10, 20, 30, _ignore_invalid_channel=True)
@@ -136,7 +146,12 @@ class TestConvolutional2DLayer:
         ],
     )
     def test_should_raise_if_input_size_is_set_with_int(
-        self, conv_type: type[Convolutional2DLayer], output_channel: int, kernel_size: int, stride: int, padding: int,
+        self,
+        conv_type: type[Convolutional2DLayer],
+        output_channel: int,
+        kernel_size: int,
+        stride: int,
+        padding: int,
     ) -> None:
         layer = conv_type(output_channel, kernel_size, stride=stride, padding=padding)
         with pytest.raises(TypeError, match=r"The input_size of a convolution layer has to be of type ImageSize."):
