@@ -17,7 +17,7 @@ from safeds.ml.nn._output_conversion import _OutputConversion
 from safeds.data.tabular.transformation import OneHotEncoder
 
 
-class _OutputConversionImage(_OutputConversion, ABC):
+class _OutputConversionImage:
     pass  # pragma: no cover
 
 
