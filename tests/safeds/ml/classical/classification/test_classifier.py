@@ -4,16 +4,15 @@ import itertools
 from typing import TYPE_CHECKING, Any
 
 import pytest
-from safeds.data.labeled.containers import TabularDataset
 from safeds.data.tabular.containers import Table
 from safeds.exceptions import (
     DatasetContainsTargetError,
     DatasetMissesDataError,
     DatasetMissesFeaturesError,
-    PlainTableError,
     MissingValuesColumnError,
     ModelNotFittedError,
     NonNumericColumnError,
+    PlainTableError,
 )
 from safeds.ml.classical.classification import (
     AdaBoostClassifier,
@@ -28,6 +27,7 @@ from safeds.ml.classical.classification import (
 
 if TYPE_CHECKING:
     from _pytest.fixtures import FixtureRequest
+    from safeds.data.labeled.containers import TabularDataset
     from sklearn.base import ClassifierMixin
 
 
