@@ -62,52 +62,47 @@ class TestKernel:
         assert fitted_model._wrapped_regressor is not None
         assert isinstance(fitted_model.kernel, SupportVectorMachineRegressor.Kernel.Linear)
 
-    def test_should_get_sklearn_kernel_linear(self) -> None:
+    def test_should_get_sklearn_arguments_linear(self) -> None:
         svm = SupportVectorMachineRegressor(c=2, kernel=SupportVectorMachineRegressor.Kernel.Linear())
         assert isinstance(svm.kernel, SupportVectorMachineRegressor.Kernel.Linear)
-        linear_kernel = svm.kernel._get_sklearn_kernel()
-        assert linear_kernel == "linear"
+        linear_kernel = svm.kernel._get_sklearn_arguments()
+        assert linear_kernel == {
+            "kernel": "linear",
+        }
 
     @pytest.mark.parametrize("degree", [-1, 0], ids=["minus_one", "zero"])
     def test_should_raise_if_degree_less_than_1(self, degree: int) -> None:
         with pytest.raises(OutOfBoundsError, match=rf"degree \(={degree}\) is not inside \[1, \u221e\)\."):
             SupportVectorMachineRegressor.Kernel.Polynomial(degree=degree)
 
-    def test_should_get_sklearn_kernel_polynomial(self) -> None:
+    def test_should_get_sklearn_arguments_polynomial(self) -> None:
         svm = SupportVectorMachineRegressor(c=2, kernel=SupportVectorMachineRegressor.Kernel.Polynomial(degree=2))
         assert isinstance(svm.kernel, SupportVectorMachineRegressor.Kernel.Polynomial)
-        poly_kernel = svm.kernel._get_sklearn_kernel()
-        assert poly_kernel == "poly"
+        poly_kernel = svm.kernel._get_sklearn_arguments()
+        assert poly_kernel == {
+            "kernel": "poly",
+            "degree": 2,
+        }
 
-    def test_should_get_sklearn_kernel_sigmoid(self) -> None:
+    def test_should_get_degree(self) -> None:
+        kernel = SupportVectorMachineRegressor.Kernel.Polynomial(degree=3)
+        assert kernel.degree == 3
+
+    def test_should_get_sklearn_arguments_sigmoid(self) -> None:
         svm = SupportVectorMachineRegressor(c=2, kernel=SupportVectorMachineRegressor.Kernel.Sigmoid())
         assert isinstance(svm.kernel, SupportVectorMachineRegressor.Kernel.Sigmoid)
-        sigmoid_kernel = svm.kernel._get_sklearn_kernel()
-        assert sigmoid_kernel == "sigmoid"
+        sigmoid_kernel = svm.kernel._get_sklearn_arguments()
+        assert sigmoid_kernel == {
+            "kernel": "sigmoid",
+        }
 
-    def test_should_get_sklearn_kernel_rbf(self) -> None:
+    def test_should_get_sklearn_arguments_rbf(self) -> None:
         svm = SupportVectorMachineRegressor(c=2, kernel=SupportVectorMachineRegressor.Kernel.RadialBasisFunction())
         assert isinstance(svm.kernel, SupportVectorMachineRegressor.Kernel.RadialBasisFunction)
-        rbf_kernel = svm.kernel._get_sklearn_kernel()
-        assert rbf_kernel == "rbf"
-
-    def test_should_get_kernel_name(self) -> None:
-        svm = SupportVectorMachineRegressor(c=2, kernel=SupportVectorMachineRegressor.Kernel.Linear())
-        assert svm._get_kernel_name() == "linear"
-
-        svm = SupportVectorMachineRegressor(c=2, kernel=SupportVectorMachineRegressor.Kernel.Polynomial(degree=2))
-        assert svm._get_kernel_name() == "poly"
-
-        svm = SupportVectorMachineRegressor(c=2, kernel=SupportVectorMachineRegressor.Kernel.Sigmoid())
-        assert svm._get_kernel_name() == "sigmoid"
-
-        svm = SupportVectorMachineRegressor(c=2, kernel=SupportVectorMachineRegressor.Kernel.RadialBasisFunction())
-        assert svm._get_kernel_name() == "rbf"
-
-    def test_should_get_kernel_name_invalid_kernel_type(self) -> None:
-        svm = SupportVectorMachineRegressor(c=2)
-        with pytest.raises(TypeError, match="Invalid kernel type."):
-            svm._get_kernel_name()
+        rbf_kernel = svm.kernel._get_sklearn_arguments()
+        assert rbf_kernel == {
+            "kernel": "rbf",
+        }
 
     @pytest.mark.parametrize(
         ("kernel1", "kernel2"),
