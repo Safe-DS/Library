@@ -141,8 +141,6 @@ class GradientBoostingRegressor(Regressor):
         ------
         ModelNotFittedError
             If the model has not been fitted yet.
-        DatasetContainsTargetError
-            If the dataset contains the target column already.
         DatasetMissesFeaturesError
             If the dataset misses feature columns.
         PredictionError

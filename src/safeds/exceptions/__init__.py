@@ -29,7 +29,6 @@ if TYPE_CHECKING:
         OutOfBoundsError,
     )
     from safeds.exceptions._ml import (
-        DatasetContainsTargetError,
         DatasetMissesDataError,
         DatasetMissesFeaturesError,
         FeatureDataMismatchError,
@@ -63,7 +62,6 @@ apipkg.initpkg(
         "ValueNotPresentWhenFittedError": "._data:ValueNotPresentWhenFittedError",
         "WrongFileExtensionError": "._data:WrongFileExtensionError",
         # ML exceptions
-        "DatasetContainsTargetError": "._ml:DatasetContainsTargetError",
         "DatasetMissesDataError": "._ml:DatasetMissesDataError",
         "DatasetMissesFeaturesError": "._ml:DatasetMissesFeaturesError",
         "FeatureDataMismatchError": "._ml:FeatureDataMismatchError",
@@ -100,7 +98,6 @@ __all__ = [
     "ValueNotPresentWhenFittedError",
     "WrongFileExtensionError",
     # ML exceptions
-    "DatasetContainsTargetError",
     "DatasetMissesDataError",
     "DatasetMissesFeaturesError",
     "FeatureDataMismatchError",

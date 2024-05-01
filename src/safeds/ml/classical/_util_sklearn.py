@@ -4,7 +4,6 @@ from typing import Any
 from safeds.data.labeled.containers import TabularDataset
 from safeds.data.tabular.containers import Table
 from safeds.exceptions import (
-    DatasetContainsTargetError,
     DatasetMissesDataError,
     DatasetMissesFeaturesError,
     LearningError,
@@ -102,8 +101,6 @@ def predict(model: Any, dataset: Table, feature_names: list[str] | None, target_
     ------
     ModelNotFittedError
         If the model has not been fitted yet.
-    DatasetContainsTargetError
-        If the dataset contains the target column already.
     DatasetMissesFeaturesError
         If the dataset misses feature columns.
     PredictionError
@@ -118,8 +115,6 @@ def predict(model: Any, dataset: Table, feature_names: list[str] | None, target_
     # Validation
     if model is None or target_name is None or feature_names is None:
         raise ModelNotFittedError
-    if dataset.has_column(target_name):
-        raise DatasetContainsTargetError(target_name)
     missing_feature_names = [feature_name for feature_name in feature_names if not dataset.has_column(feature_name)]
     if missing_feature_names:
         raise DatasetMissesFeaturesError(missing_feature_names)
