@@ -104,6 +104,7 @@ class TimeSeries(Table):
 
         Examples
         --------
+        >>> from safeds.data.labeled.containers import TabularDataset
         >>> from safeds.data.tabular.containers import Table, TimeSeries
         >>> tabular_dataset = TabularDataset({"date": ["01.01", "01.02", "01.03", "01.04"], "col1": ["a", "b", "c", "a"]}, "col1" )
         >>> timeseries = TimeSeries._from_tabular_dataset(tabular_dataset, time_name = "date")
