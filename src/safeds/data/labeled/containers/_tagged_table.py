@@ -233,10 +233,10 @@ class TaggedTable:
         return self._target
 
     # ------------------------------------------------------------------------------------------------------------------
-    # Overridden methods from Table class:
+    # Conversion
     # ------------------------------------------------------------------------------------------------------------------
 
-    def _as_table(self: TaggedTable) -> Table:
+    def to_table(self) -> Table:
         """
         Return a new `Table` with the tagging removed.
 

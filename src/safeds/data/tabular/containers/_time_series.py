@@ -110,7 +110,7 @@ class TimeSeries(Table):
         """
         if time_name not in tagged_table._table.column_names:
             raise UnknownColumnNameError([time_name])
-        table = tagged_table._as_table()
+        table = tagged_table.to_table()
         # make sure that the time_name is not part of the features
         result = object.__new__(TimeSeries)
         feature_names = tagged_table.features.column_names

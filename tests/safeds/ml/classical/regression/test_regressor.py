@@ -194,7 +194,7 @@ class TestPredict:
     def test_should_raise_if_dataset_contains_target(self, regressor: Regressor, valid_data: TaggedTable) -> None:
         fitted_regressor = regressor.fit(valid_data)
         with pytest.raises(DatasetContainsTargetError, match="target"):
-            fitted_regressor.predict(valid_data._as_table())
+            fitted_regressor.predict(valid_data.to_table())
 
     def test_should_raise_if_dataset_misses_features(self, regressor: Regressor, valid_data: TaggedTable) -> None:
         fitted_regressor = regressor.fit(valid_data)

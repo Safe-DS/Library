@@ -48,6 +48,6 @@ from safeds.data.tabular.containers import Table
     ids=["normal", "table_with_column_as_non_feature"],
 )
 def test_should_return_table(tagged_table: TaggedTable, expected: Table) -> None:
-    table = tagged_table._as_table()
+    table = tagged_table.to_table()
     assert table.schema == expected.schema
     assert table == expected

@@ -193,7 +193,7 @@ class TestPredict:
     def test_should_raise_if_dataset_contains_target(self, classifier: Classifier, valid_data: TaggedTable) -> None:
         fitted_classifier = classifier.fit(valid_data)
         with pytest.raises(DatasetContainsTargetError, match="target"):
-            fitted_classifier.predict(valid_data._as_table())
+            fitted_classifier.predict(valid_data.to_table())
 
     def test_should_raise_if_dataset_misses_features(self, classifier: Classifier, valid_data: TaggedTable) -> None:
         fitted_classifier = classifier.fit(valid_data)
