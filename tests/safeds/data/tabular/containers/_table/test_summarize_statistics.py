@@ -12,8 +12,8 @@ from safeds.data.tabular.containers import Table
             Table(
                 {
                     "metrics": [
-                        "maximum",
                         "minimum",
+                        "maximum",
                         "mean",
                         "mode",
                         "median",
@@ -23,8 +23,8 @@ from safeds.data.tabular.containers import Table
                         "stability",
                     ],
                     "col1": [
-                        "2",
                         "1",
+                        "2",
                         str(4.0 / 3),
                         "[1]",
                         "1.0",
@@ -52,8 +52,8 @@ from safeds.data.tabular.containers import Table
             Table(
                 {
                     "metrics": [
-                        "maximum",
                         "minimum",
+                        "maximum",
                         "mean",
                         "mode",
                         "median",
@@ -70,8 +70,8 @@ from safeds.data.tabular.containers import Table
             Table(
                 {
                     "metrics": [
-                        "maximum",
                         "minimum",
+                        "maximum",
                         "mean",
                         "mode",
                         "median",
@@ -110,8 +110,8 @@ from safeds.data.tabular.containers import Table
             Table(
                 {
                     "metrics": [
-                        "maximum",
                         "minimum",
+                        "maximum",
                         "mean",
                         "mode",
                         "median",

@@ -787,8 +787,8 @@ class Table:
         >>> table = Table.from_dict({"a": [1, 3], "b": [2, 4]})
         >>> table.summarize_statistics()
                       metrics                   a                   b
-        0             maximum                   3                   4
-        1             minimum                   1                   2
+        0             minimum                   1                   2
+        1             maximum                   3                   4
         2                mean                 2.0                 3.0
         3                mode              [1, 3]              [2, 4]
         4              median                 2.0                 3.0
@@ -803,8 +803,8 @@ class Table:
             return Table(
                 {
                     "metrics": [
-                        "maximum",
                         "minimum",
+                        "maximum",
                         "mean",
                         "mode",
                         "median",
@@ -819,8 +819,8 @@ class Table:
             table = Table(
                 {
                     "metrics": [
-                        "maximum",
                         "minimum",
+                        "maximum",
                         "mean",
                         "mode",
                         "median",
@@ -841,8 +841,8 @@ class Table:
 
         for column in columns:
             statistics = {
-                "maximum": column.maximum,
                 "minimum": column.minimum,
+                "maximum": column.maximum,
                 "mean": column.mean,
                 "mode": column.mode,
                 "median": column.median,
