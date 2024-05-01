@@ -507,10 +507,13 @@ class Row(Mapping[str, Any]):
         new_row:
             A new row with sorted columns.
         """
+        def cmp(column_1: tuple[str, Any], column_2: tuple[str, Any]) -> int:
+            return comparator(column_1[0], column_1[1], column_2[0], column_2[1])
+
         sorted_row_dict = dict(
             sorted(
                 self.to_dict().items(),
-                key=functools.cmp_to_key(lambda col1, col2: comparator(col1[0], col1[1], col2[0], col2[1])),
+                key=functools.cmp_to_key(cmp),
             ),
         )
         return Row.from_dict(sorted_row_dict)
