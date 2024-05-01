@@ -20,7 +20,6 @@ if TYPE_CHECKING:
     from pathlib import Path
     from typing import Any
 
-    from safeds.data.labeled.containers import TabularDataset
 
 
 class TimeSeries(Table):

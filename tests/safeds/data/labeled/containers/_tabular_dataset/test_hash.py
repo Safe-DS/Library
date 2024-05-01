@@ -40,7 +40,10 @@ def test_should_return_same_hash_for_equal_tabular_datasets(table1: TabularDatas
             TabularDataset({"a": [1, 2, 3], "b": [4, 5, 6], "d": [7, 8, 9]}, "b", ["d"]),
         ),
         (
-            TabularDataset({"a": [1, 2, 3], "b": [4, 5, 6]}, "b",),
+            TabularDataset(
+                {"a": [1, 2, 3], "b": [4, 5, 6]},
+                "b",
+            ),
             TabularDataset({"a": ["1", "2", "3"], "b": [4, 5, 6]}, "b"),
         ),
         (
