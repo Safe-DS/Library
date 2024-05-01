@@ -39,12 +39,12 @@ class MLModelRaiseValueErrorOnFitAndPredict:
 
 
 def test_should_raise_learning_error() -> None:
-    tagged_table = Table({"col1": [1, 2], "col2": [3, 4], "col3": [5, 6]}).tag_columns("col3")
+    tabular_dataset = Table({"col1": [1, 2], "col2": [3, 4], "col3": [5, 6]}).tag_columns("col3")
     with pytest.raises(
         LearningError,
         match=r"Error occurred while learning: Raise ValueError \(LearningError\) in fit for Test",
     ):
-        fit(MLModelRaiseValueErrorOnFitAndPredict(), tagged_table)
+        fit(MLModelRaiseValueErrorOnFitAndPredict(), tabular_dataset)
 
 
 def test_should_raise_prediction_error() -> None:

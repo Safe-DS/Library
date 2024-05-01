@@ -1767,7 +1767,7 @@ class Table:
 
         Returns
         -------
-        tagged_table:
+        tabular_dataset:
             A new tagged table with the given target and feature names.
 
         Raises
@@ -1781,7 +1781,7 @@ class Table:
         --------
         >>> from safeds.data.tabular.containers import Table
         >>> table = Table({"item": ["apple", "milk", "beer"], "price": [1.10, 1.19, 1.79], "amount_bought": [74, 72, 51]})
-        >>> tagged_table = table.tag_columns(target_name="amount_bought", feature_names=["item", "price"])
+        >>> tabular_dataset = table.tag_columns(target_name="amount_bought", feature_names=["item", "price"])
         """
         from safeds.data.labeled.containers import TabularDataset
 
@@ -1818,7 +1818,7 @@ class Table:
         --------
         >>> from safeds.data.tabular.containers import Table, TimeSeries
         >>> table = Table.from_dict({"time": ["01.01", "01.02", "01.03"], "price": [1.10, 1.19, 1.79], "amount_bought": [74, 72, 51]})
-        >>> tagged_table = table.time_columns(target_name="amount_bought",time_name = "time", feature_names=["price"])
+        >>> tabular_dataset = table.time_columns(target_name="amount_bought",time_name = "time", feature_names=["price"])
         """
         from ._time_series import TimeSeries
 

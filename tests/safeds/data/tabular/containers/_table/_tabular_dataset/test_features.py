@@ -4,7 +4,7 @@ from safeds.data.tabular.containers import Table
 
 
 @pytest.mark.parametrize(
-    ("tagged_table", "features"),
+    ("tabular_dataset", "features"),
     [
         (
             TabularDataset(
@@ -34,5 +34,5 @@ from safeds.data.tabular.containers import Table
     ],
     ids=["only_target_and_features", "target_features_and_other"],
 )
-def test_should_return_features(tagged_table: TabularDataset, features: Table) -> None:
-    assert tagged_table.features == features
+def test_should_return_features(tabular_dataset: TabularDataset, features: Table) -> None:
+    assert tabular_dataset.features == features

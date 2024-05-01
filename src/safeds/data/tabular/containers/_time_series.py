@@ -77,15 +77,15 @@ class TimeSeries(Table):
         )
 
     @staticmethod
-    def _from_tagged_table(
-        tagged_table: TabularDataset,
+    def _from_tabular_dataset(
+        tabular_dataset: TabularDataset,
         time_name: str,
     ) -> TimeSeries:
         """Create a time series from a tagged table.
 
         Parameters
         ----------
-        tagged_table:
+        tabular_dataset:
             The tagged table.
         time_name:
             Name of the time column.
@@ -105,26 +105,26 @@ class TimeSeries(Table):
         Examples
         --------
         >>> from safeds.data.tabular.containers import Table, TimeSeries
-        >>> tagged_table = TabularDataset({"date": ["01.01", "01.02", "01.03", "01.04"], "col1": ["a", "b", "c", "a"]}, "col1" )
-        >>> timeseries = TimeSeries._from_tagged_table(tagged_table, time_name = "date")
+        >>> tabular_dataset = TabularDataset({"date": ["01.01", "01.02", "01.03", "01.04"], "col1": ["a", "b", "c", "a"]}, "col1" )
+        >>> timeseries = TimeSeries._from_tabular_dataset(tabular_dataset, time_name = "date")
         """
-        if time_name not in tagged_table._table.column_names:
+        if time_name not in tabular_dataset._table.column_names:
             raise UnknownColumnNameError([time_name])
-        table = tagged_table.to_table()
+        table = tabular_dataset.to_table()
         # make sure that the time_name is not part of the features
         result = object.__new__(TimeSeries)
-        feature_names = tagged_table.features.column_names
+        feature_names = tabular_dataset.features.column_names
         if time_name in feature_names:
             feature_names.remove(time_name)
 
-        if time_name == tagged_table.target.name:
+        if time_name == tabular_dataset.target.name:
             raise ValueError(f"Column '{time_name}' cannot be both time column and target.")
 
         result._data = table._data
         result._schema = table.schema
         result._time = table.get_column(time_name)
         result._features = table.keep_only_columns(feature_names)
-        result._target = table.get_column(tagged_table.target.name)
+        result._target = table.get_column(tabular_dataset.target.name)
         return result
 
     @staticmethod

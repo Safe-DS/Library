@@ -17,7 +17,7 @@ from safeds.exceptions import (
 
 
 # noinspection PyProtectedMember
-def fit(model: Any, tagged_table: TabularDataset) -> None:
+def fit(model: Any, tabular_dataset: TabularDataset) -> None:
     """
     Fit a model for a given tagged table.
 
@@ -25,7 +25,7 @@ def fit(model: Any, tagged_table: TabularDataset) -> None:
     ----------
     model:
         Classifier or Regression from scikit-learn.
-    tagged_table:
+    tabular_dataset:
         The tagged table containing the feature and target vectors.
 
     Raises
@@ -41,14 +41,14 @@ def fit(model: Any, tagged_table: TabularDataset) -> None:
     DatasetMissesDataError
         If the training data contains no rows.
     """
-    if not isinstance(tagged_table, TabularDataset) and isinstance(tagged_table, Table):
+    if not isinstance(tabular_dataset, TabularDataset) and isinstance(tabular_dataset, Table):
         raise FitOnTableError
 
-    if tagged_table._table.number_of_rows == 0:
+    if tabular_dataset._table.number_of_rows == 0:
         raise DatasetMissesDataError
 
-    non_numerical_column_names = set(tagged_table.features.column_names) - set(
-        tagged_table.features.remove_columns_with_non_numerical_values().column_names,
+    non_numerical_column_names = set(tabular_dataset.features.column_names) - set(
+        tabular_dataset.features.remove_columns_with_non_numerical_values().column_names,
     )
     if len(non_numerical_column_names) != 0:
         raise NonNumericColumnError(
@@ -58,8 +58,8 @@ def fit(model: Any, tagged_table: TabularDataset) -> None:
             " different values\nor is ordinal, you should use the LabelEncoder.",
         )
 
-    null_containing_column_names = set(tagged_table.features.column_names) - set(
-        tagged_table.features.remove_columns_with_missing_values().column_names,
+    null_containing_column_names = set(tabular_dataset.features.column_names) - set(
+        tabular_dataset.features.remove_columns_with_missing_values().column_names,
     )
     if len(null_containing_column_names) != 0:
         raise MissingValuesColumnError(
@@ -70,8 +70,8 @@ def fit(model: Any, tagged_table: TabularDataset) -> None:
 
     try:
         model.fit(
-            tagged_table.features._data,
-            tagged_table.target._data,
+            tabular_dataset.features._data,
+            tabular_dataset.target._data,
         )
     except ValueError as exception:
         raise LearningError(str(exception)) from exception

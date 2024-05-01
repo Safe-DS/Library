@@ -5,7 +5,7 @@ from safeds.data.labeled.containers import TabularDataset
 
 
 @pytest.mark.parametrize(
-    "tagged_table",
+    "tabular_dataset",
     [
 
             TabularDataset(
@@ -31,5 +31,5 @@ from safeds.data.labeled.containers import TabularDataset
     ],
     ids=["normal", "table_with_column_as_non_feature"],
 )
-def test_should_size_be_greater_than_normal_object(tagged_table: TabularDataset) -> None:
-    assert sys.getsizeof(tagged_table) > sys.getsizeof(object())
+def test_should_size_be_greater_than_normal_object(tabular_dataset: TabularDataset) -> None:
+    assert sys.getsizeof(tabular_dataset) > sys.getsizeof(object())

@@ -4,7 +4,7 @@ from safeds.data.tabular.containers import Table
 
 
 @pytest.mark.parametrize(
-    ("tagged_table", "expected"),
+    ("tabular_dataset", "expected"),
     [
         (
             TabularDataset(
@@ -47,7 +47,7 @@ from safeds.data.tabular.containers import Table
     ],
     ids=["normal", "table_with_column_as_non_feature"],
 )
-def test_should_return_table(tagged_table: TabularDataset, expected: Table) -> None:
-    table = tagged_table.to_table()
+def test_should_return_table(tabular_dataset: TabularDataset, expected: Table) -> None:
+    table = tabular_dataset.to_table()
     assert table.schema == expected.schema
     assert table == expected

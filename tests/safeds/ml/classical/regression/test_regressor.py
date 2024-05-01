@@ -156,9 +156,9 @@ class TestFit:
                 },
             ),
         ],
-        ids=["untagged_table"],
+        ids=["table"],
     )
-    def test_should_raise_if_table_is_not_tagged(self, regressor: Regressor, table: Table) -> None:
+    def test_should_raise_if_given_normal_table(self, regressor: Regressor, table: Table) -> None:
         with pytest.raises(FitOnTableError):
             regressor.fit(table)  # type: ignore[arg-type]
 
@@ -383,9 +383,9 @@ class TestMeanAbsoluteError:
                 },
             ),
         ],
-        ids=["untagged_table"],
+        ids=["table"],
     )
-    def test_should_raise_if_table_is_not_tagged(self, table: Table) -> None:
+    def test_should_raise_if_given_normal_table(self, table: Table) -> None:
         with pytest.raises(FitOnTableError):
             DummyRegressor().mean_absolute_error(table)  # type: ignore[arg-type]
 
@@ -414,9 +414,9 @@ class TestMeanSquaredError:
                 },
             ),
         ],
-        ids=["untagged_table"],
+        ids=["table"],
     )
-    def test_should_raise_if_table_is_not_tagged(self, table: Table) -> None:
+    def test_should_raise_if_given_normal_table(self, table: Table) -> None:
         with pytest.raises(FitOnTableError):
             DummyRegressor().mean_squared_error(table)  # type: ignore[arg-type]
 

@@ -44,7 +44,7 @@ class TabularDataset:
     --------
     >>> from safeds.data.tabular.containers import Table
     >>> table = Table({"col1": ["a", "b"], "col2": [1, 2]})
-    >>> tagged_table = table.tag_columns("col2", ["col1"])
+    >>> tabular_dataset = table.tag_columns("col2", ["col1"])
     """
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -71,7 +71,7 @@ class TabularDataset:
 
         Returns
         -------
-        tagged_table:
+        tabular_dataset:
             The created table.
 
         Raises
@@ -88,7 +88,7 @@ class TabularDataset:
         >>> from safeds.data.labeled.containers import TabularDataset
         >>> from safeds.data.tabular.containers import Table
         >>> table = Table({"col1": ["a", "b", "c", "a"], "col2": [1, 2, 3, 4]})
-        >>> tagged_table = TabularDataset._from_table(table, "col2", ["col1"])
+        >>> tabular_dataset = TabularDataset._from_table(table, "col2", ["col1"])
         """
         table = table._as_table()
         if target_name not in table.column_names:

@@ -25,7 +25,7 @@ def assert_that_tables_are_close(table1: Table, table2: Table) -> None:
             assert entry_1 == pytest.approx(entry_2)
 
 
-def assert_that_tagged_tables_are_equal(table1: TabularDataset, table2: TabularDataset) -> None:
+def assert_that_tabular_datasets_are_equal(table1: TabularDataset, table2: TabularDataset) -> None:
     """
     Assert that two tagged tables are equal.
 

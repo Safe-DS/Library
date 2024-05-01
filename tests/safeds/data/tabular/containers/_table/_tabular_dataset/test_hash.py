@@ -15,7 +15,7 @@ from safeds.data.labeled.containers import TabularDataset
         "different values",
     ],
 )
-def test_should_return_same_hash_for_equal_tagged_tables(table1: TabularDataset, table2: TabularDataset) -> None:
+def test_should_return_same_hash_for_equal_tabular_datasets(table1: TabularDataset, table2: TabularDataset) -> None:
     assert hash(table1) == hash(table2)
 
 
@@ -34,5 +34,5 @@ def test_should_return_same_hash_for_equal_tagged_tables(table1: TabularDataset,
         "different features",
     ],
 )
-def test_should_return_different_hash_for_unequal_tagged_tables(table1: TabularDataset, table2: TabularDataset) -> None:
+def test_should_return_different_hash_for_unequal_tabular_datasets(table1: TabularDataset, table2: TabularDataset) -> None:
     assert hash(table1) != hash(table2)

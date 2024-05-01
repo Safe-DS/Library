@@ -134,13 +134,13 @@ def test_should_raise_error(
             None,
         ),
     ],
-    ids=["create_tagged_table", "tagged_table_not_all_columns_are_features", "tagged_table_with_feature_names_as_None"],
+    ids=["create_tabular_dataset", "tabular_dataset_not_all_columns_are_features", "tabular_dataset_with_feature_names_as_None"],
 )
-def test_should_create_a_tagged_table(table: Table, target_name: str, feature_names: list[str] | None) -> None:
-    tagged_table = TabularDataset._from_table(table, target_name=target_name, feature_names=feature_names)
+def test_should_create_a_tabular_dataset(table: Table, target_name: str, feature_names: list[str] | None) -> None:
+    tabular_dataset = TabularDataset._from_table(table, target_name=target_name, feature_names=feature_names)
     feature_names = feature_names if feature_names is not None else table.remove_columns([target_name]).column_names
-    assert isinstance(tagged_table, TabularDataset)
-    assert tagged_table._features.column_names == feature_names
-    assert tagged_table._target.name == target_name
-    assert tagged_table._features == table.keep_only_columns(feature_names)
-    assert tagged_table._target == table.get_column(target_name)
+    assert isinstance(tabular_dataset, TabularDataset)
+    assert tabular_dataset._features.column_names == feature_names
+    assert tabular_dataset._target.name == target_name
+    assert tabular_dataset._features == table.keep_only_columns(feature_names)
+    assert tabular_dataset._target == table.get_column(target_name)

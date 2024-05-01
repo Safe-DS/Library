@@ -60,7 +60,7 @@ from safeds.data.tabular.containers import Row, Table, TimeSeries
         "different time",
     ],
 )
-def test_should_return_whether_two_tagged_tables_are_equal(
+def test_should_return_whether_two_tabular_datasets_are_equal(
     table1: TimeSeries,
     table2: TimeSeries,
     expected: bool,
