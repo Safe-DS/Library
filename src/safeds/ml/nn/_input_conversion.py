@@ -27,7 +27,10 @@ class _InputConversion(Generic[FT, PT], ABC):
 
     @abstractmethod
     def _data_conversion_fit(
-        self, input_data: FT, batch_size: int, num_of_classes: int = 1,
+        self,
+        input_data: FT,
+        batch_size: int,
+        num_of_classes: int = 1,
     ) -> DataLoader | ImageDataset:
         pass  # pragma: no cover
 

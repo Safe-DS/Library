@@ -87,7 +87,11 @@ class TestImageDatasetInit:
         ],
     )
     def test_should_raise_with_invalid_data(
-        self, input_data: ImageList, output_data: T, error: type[Exception], error_msg: str,
+        self,
+        input_data: ImageList,
+        output_data: T,
+        error: type[Exception],
+        error_msg: str,
     ) -> None:
         with pytest.raises(error, match=error_msg):
             ImageDataset(input_data, output_data)
@@ -187,7 +191,11 @@ class TestColumnAsTensor:
         ],
     )
     def test_should_raise_from_tensor(
-        self, tensor: Tensor, one_hot_encoder: OneHotEncoder, error: type[Exception], error_msg: str,
+        self,
+        tensor: Tensor,
+        one_hot_encoder: OneHotEncoder,
+        error: type[Exception],
+        error_msg: str,
     ) -> None:
         with pytest.raises(error, match=error_msg):
             _ColumnAsTensor._from_tensor(tensor, "a", one_hot_encoder)

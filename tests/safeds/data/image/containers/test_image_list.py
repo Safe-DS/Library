@@ -458,7 +458,8 @@ class TestFromFiles:
         torch.set_default_device(torch.device("cpu"))
         image_list = ImageList.from_files(resolve_resource_path(resource_path))
         image_list_returned_filenames, filenames = ImageList.from_files(
-            resolve_resource_path(resource_path), return_filenames=True,
+            resolve_resource_path(resource_path),
+            return_filenames=True,
         )
         assert image_list == snapshot_png_image_list
         assert image_list == image_list_returned_filenames
@@ -1253,7 +1254,8 @@ class TestSingleSizeImageList:
     @pytest.mark.parametrize("tensor", [torch.ones(4, 3, 1, 1, 1), torch.ones(4, 3)], ids=["5-dim", "2-dim"])
     def test_should_raise_from_invalid_tensor(self, tensor: Tensor) -> None:
         with pytest.raises(
-            ValueError, match=rf"Invalid Tensor. This Tensor requires 3 or 4 dimensions but has {tensor.dim()}",
+            ValueError,
+            match=rf"Invalid Tensor. This Tensor requires 3 or 4 dimensions but has {tensor.dim()}",
         ):
             _SingleSizeImageList._create_from_tensor(tensor, list(range(tensor.size(0))))
 

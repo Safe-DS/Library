@@ -89,7 +89,10 @@ class OutputConversionImageToTable(_OutputConversionImage):
 class OutputConversionImageToImage(_OutputConversionImage):
 
     def _data_conversion(
-        self, input_data: ImageList, output_data: Tensor, **kwargs: Any,  # noqa: ARG002
+        self,
+        input_data: ImageList,
+        output_data: Tensor,
+        **kwargs: Any,  # noqa: ARG002
     ) -> ImageDataset[ImageList]:
         import torch
 
@@ -99,6 +102,7 @@ class OutputConversionImageToImage(_OutputConversionImage):
         return ImageDataset[ImageList](
             input_data,
             _SingleSizeImageList._create_from_tensor(
-                (output_data * 255).to(torch.uint8), list(range(output_data.size(dim=0))),
+                (output_data * 255).to(torch.uint8),
+                list(range(output_data.size(dim=0))),
             ),
         )

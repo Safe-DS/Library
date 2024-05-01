@@ -79,9 +79,7 @@ class NeuralNetworkRegressor(Generic[IFT, IPT, OT]):
                 )
             data_dimensions = 2
             for layer in layers:
-                if data_dimensions == 2 and (
-                    isinstance(layer, Convolutional2DLayer | _Pooling2DLayer)
-                ):
+                if data_dimensions == 2 and (isinstance(layer, Convolutional2DLayer | _Pooling2DLayer)):
                     continue
                 elif data_dimensions == 2 and isinstance(layer, FlattenLayer):
                     data_dimensions = 1
@@ -89,9 +87,11 @@ class NeuralNetworkRegressor(Generic[IFT, IPT, OT]):
                     continue
                 else:
                     raise InvalidModelStructureError(
-                        "The 2-dimensional data has to be flattened before using a 1-dimensional layer."
-                        if data_dimensions == 2
-                        else "You cannot use a 2-dimensional layer with 1-dimensional data.",
+                        (
+                            "The 2-dimensional data has to be flattened before using a 1-dimensional layer."
+                            if data_dimensions == 2
+                            else "You cannot use a 2-dimensional layer with 1-dimensional data."
+                        ),
                     )
             if data_dimensions == 1 and isinstance(output_conversion, OutputConversionImageToImage):
                 raise InvalidModelStructureError(
@@ -103,9 +103,7 @@ class NeuralNetworkRegressor(Generic[IFT, IPT, OT]):
             )
         else:
             for layer in layers:
-                if (
-                    isinstance(layer, Convolutional2DLayer | FlattenLayer | _Pooling2DLayer)
-                ):
+                if isinstance(layer, Convolutional2DLayer | FlattenLayer | _Pooling2DLayer):
                     raise InvalidModelStructureError("You cannot use a 2-dimensional layer with 1-dimensional data.")
 
         self._input_conversion: _InputConversion[IFT, IPT] = input_conversion
@@ -241,7 +239,9 @@ class NeuralNetworkRegressor(Generic[IFT, IPT, OT]):
                 elem = self._model(x)
                 predictions.append(elem.squeeze(dim=1))
         return self._output_conversion._data_conversion(
-            test_data, torch.cat(predictions, dim=0), **self._input_conversion._get_output_configuration(),
+            test_data,
+            torch.cat(predictions, dim=0),
+            **self._input_conversion._get_output_configuration(),
         )
 
     @property
@@ -286,9 +286,7 @@ class NeuralNetworkClassifier(Generic[IFT, IPT, OT]):
                 )
             data_dimensions = 2
             for layer in layers:
-                if data_dimensions == 2 and (
-                    isinstance(layer, Convolutional2DLayer | _Pooling2DLayer)
-                ):
+                if data_dimensions == 2 and (isinstance(layer, Convolutional2DLayer | _Pooling2DLayer)):
                     continue
                 elif data_dimensions == 2 and isinstance(layer, FlattenLayer):
                     data_dimensions = 1
@@ -296,9 +294,11 @@ class NeuralNetworkClassifier(Generic[IFT, IPT, OT]):
                     continue
                 else:
                     raise InvalidModelStructureError(
-                        "The 2-dimensional data has to be flattened before using a 1-dimensional layer."
-                        if data_dimensions == 2
-                        else "You cannot use a 2-dimensional layer with 1-dimensional data.",
+                        (
+                            "The 2-dimensional data has to be flattened before using a 1-dimensional layer."
+                            if data_dimensions == 2
+                            else "You cannot use a 2-dimensional layer with 1-dimensional data."
+                        ),
                     )
             if data_dimensions == 2 and (
                 isinstance(output_conversion, OutputConversionImageToColumn | OutputConversionImageToTable)
@@ -312,9 +312,7 @@ class NeuralNetworkClassifier(Generic[IFT, IPT, OT]):
             )
         else:
             for layer in layers:
-                if (
-                    isinstance(layer, Convolutional2DLayer | FlattenLayer | _Pooling2DLayer)
-                ):
+                if isinstance(layer, Convolutional2DLayer | FlattenLayer | _Pooling2DLayer):
                     raise InvalidModelStructureError("You cannot use a 2-dimensional layer with 1-dimensional data.")
 
         self._input_conversion: _InputConversion[IFT, IPT] = input_conversion
@@ -463,7 +461,9 @@ class NeuralNetworkClassifier(Generic[IFT, IPT, OT]):
                 else:
                     predictions.append(elem.squeeze(dim=1).round())
         return self._output_conversion._data_conversion(
-            test_data, torch.cat(predictions, dim=0), **self._input_conversion._get_output_configuration(),
+            test_data,
+            torch.cat(predictions, dim=0),
+            **self._input_conversion._get_output_configuration(),
         )
 
     @property
@@ -473,7 +473,9 @@ class NeuralNetworkClassifier(Generic[IFT, IPT, OT]):
 
 
 def _create_internal_model(
-    input_conversion: _InputConversion[IFT, IPT], layers: list[_Layer], is_for_classification: bool,
+    input_conversion: _InputConversion[IFT, IPT],
+    layers: list[_Layer],
+    is_for_classification: bool,
 ) -> nn.Module:
     from torch import nn
 

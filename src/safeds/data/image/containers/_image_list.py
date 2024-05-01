@@ -91,18 +91,21 @@ class ImageList(metaclass=ABCMeta):
     @staticmethod
     @overload
     def from_files(
-        path: str | Path | Sequence[str | Path], return_filenames: Literal[True],
+        path: str | Path | Sequence[str | Path],
+        return_filenames: Literal[True],
     ) -> tuple[ImageList, list[str]]: ...
 
     @staticmethod
     @overload
     def from_files(
-        path: str | Path | Sequence[str | Path], return_filenames: bool,
+        path: str | Path | Sequence[str | Path],
+        return_filenames: bool,
     ) -> ImageList | tuple[ImageList, list[str]]: ...
 
     @staticmethod
     def from_files(
-        path: str | Path | Sequence[str | Path], return_filenames: bool = False,
+        path: str | Path | Sequence[str | Path],
+        return_filenames: bool = False,
     ) -> ImageList | tuple[ImageList, list[str]]:
         """
         Create an ImageList from a directory or a list of files.
