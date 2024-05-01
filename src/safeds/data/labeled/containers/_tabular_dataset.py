@@ -51,56 +51,23 @@ class TabularDataset:
     """
 
     # ------------------------------------------------------------------------------------------------------------------
-    # Creation
-    # ------------------------------------------------------------------------------------------------------------------
-
-    @staticmethod
-    def _from_table(
-        table: Table,
-        target_name: str,
-        extra_names: list[str] | None = None,
-    ) -> TabularDataset:
-        """Create a tabular dataset from a table."""
-        # Preprocess inputs
-        if extra_names is None:
-            extra_names = []
-
-        # Derive feature names
-        feature_names = [name for name in table.column_names if name not in {target_name, *extra_names}]
-
-        # Validate inputs
-        if target_name in extra_names:
-            raise ValueError(f"Column '{target_name}' cannot be both target and extra.")
-        if len(feature_names) == 0:
-            raise ValueError("At least one feature column must remain.")
-
-        # Create result
-        result = object.__new__(TabularDataset)
-
-        result._table = table
-        result._features = table.keep_only_columns(feature_names)
-        result._target = table.get_column(target_name)
-        result._extras = table.keep_only_columns(extra_names)
-
-        return result
-
-    # ------------------------------------------------------------------------------------------------------------------
     # Dunder methods
     # ------------------------------------------------------------------------------------------------------------------
 
     def __init__(
         self,
-        data: Mapping[str, Sequence[Any]],
+        data: Table | Mapping[str, Sequence[Any]],
         target_name: str,
         extra_names: list[str] | None = None,
     ):
         # Preprocess inputs
+        if not isinstance(data, Table):
+            data = Table(data)
         if extra_names is None:
             extra_names = []
 
         # Derive feature names
-        table = Table(data)
-        feature_names = [name for name in table.column_names if name not in {target_name, *extra_names}]
+        feature_names = [name for name in data.column_names if name not in {target_name, *extra_names}]
 
         # Validate inputs
         if target_name in extra_names:
@@ -109,10 +76,10 @@ class TabularDataset:
             raise ValueError("At least one feature column must remain.")
 
         # Set attributes
-        self._table: Table = table
-        self._features: Table = table.keep_only_columns(feature_names)
-        self._target: Column = table.get_column(target_name)
-        self._extras: Table = table.keep_only_columns(extra_names)
+        self._table: Table = data
+        self._features: Table = data.keep_only_columns(feature_names)
+        self._target: Column = data.get_column(target_name)
+        self._extras: Table = data.keep_only_columns(extra_names)
 
     def __eq__(self, other: object) -> bool:
         """

@@ -64,13 +64,85 @@ from safeds.exceptions import UnknownColumnNameError
             ValueError,
             r"At least one feature column must remain.",
         ),
+        (
+            Table(
+                {
+                    "A": [1, 4],
+                    "B": [2, 5],
+                    "C": [3, 6],
+                    "T": [0, 1],
+                },
+            ),
+            "T",
+            ["D", "E"],
+            UnknownColumnNameError,
+            r"Could not find column\(s\) 'D, E'",
+        ),
+        (
+            Table(
+                {
+                    "A": [1, 4],
+                    "B": [2, 5],
+                    "C": [3, 6],
+                    "T": [0, 1],
+                },
+            ),
+            "D",
+            [],
+            UnknownColumnNameError,
+            r"Could not find column\(s\) 'D'",
+        ),
+        (
+            Table(
+                {
+                    "A": [1, 4],
+                    "B": [2, 5],
+                    "C": [3, 6],
+                    "T": [0, 1],
+                },
+            ),
+            "A",
+            ["A"],
+            ValueError,
+            r"Column 'A' cannot be both target and extra.",
+        ),
+        (
+            Table(
+                {
+                    "A": [1, 4],
+                    "B": [2, 5],
+                    "C": [3, 6],
+                    "T": [0, 1],
+                },
+            ),
+            "T",
+            ["A", "B", "C"],
+            ValueError,
+            r"At least one feature column must remain.",
+        ),
+        (
+            Table(
+                {
+                    "A": [1, 4],
+                },
+            ),
+            "A",
+            [],
+            ValueError,
+            r"At least one feature column must remain.",
+        ),
     ],
     ids=[
-        "extra_does_not_exist",
-        "target_does_not_exist",
-        "target_and_extra_overlap",
-        "features_are_empty_explicitly",
-        "features_are_empty_implicitly",
+        "dict_extra_does_not_exist",
+        "dict_target_does_not_exist",
+        "dict_target_and_extra_overlap",
+        "dict_features_are_empty_explicitly",
+        "dict_features_are_empty_implicitly",
+        "table_extra_does_not_exist",
+        "table_target_does_not_exist",
+        "table_target_and_extra_overlap",
+        "table_features_are_empty_explicitly",
+        "table_features_are_empty_implicitly",
     ],
 )
 def test_should_raise_error(
@@ -117,20 +189,60 @@ def test_should_raise_error(
             "T",
             None,
         ),
+        (
+            Table(
+                {
+                    "A": [1, 4],
+                    "B": [2, 5],
+                    "C": [3, 6],
+                    "T": [0, 1],
+                },
+            ),
+            "T",
+            [],
+        ),
+        (
+            Table(
+                {
+                    "A": [1, 4],
+                    "B": [2, 5],
+                    "C": [3, 6],
+                    "T": [0, 1],
+                },
+            ),
+            "T",
+            ["A", "C"],
+        ),
+        (
+            Table(
+                {
+                    "A": [1, 4],
+                    "B": [2, 5],
+                    "C": [3, 6],
+                    "T": [0, 1],
+                },
+            ),
+            "T",
+            None,
+        ),
     ],
     ids=[
-        "create_tabular_dataset",
-        "tabular_dataset_not_all_columns_are_features",
-        "tabular_dataset_with_extra_names_as_None",
+        "dict_create_tabular_dataset",
+        "dict_tabular_dataset_not_all_columns_are_features",
+        "dict_tabular_dataset_with_extra_names_as_None",
+        "table_create_tabular_dataset",
+        "table_tabular_dataset_not_all_columns_are_features",
+        "table_tabular_dataset_with_extra_names_as_None",
     ],
 )
 def test_should_create_a_tabular_dataset(
-    data: dict[str, list[int]],
+    data: Table | dict[str, list[int]],
     target_name: str,
     extra_names: list[str] | None,
 ) -> None:
     tabular_dataset = TabularDataset(data, target_name=target_name, extra_names=extra_names)
-    table = Table(data)
+    if not isinstance(data, Table):
+        data = Table(data)
 
     if extra_names is None:
         extra_names = []
@@ -138,5 +250,5 @@ def test_should_create_a_tabular_dataset(
     assert isinstance(tabular_dataset, TabularDataset)
     assert tabular_dataset._extras.column_names == extra_names
     assert tabular_dataset._target.name == target_name
-    assert tabular_dataset._extras == table.keep_only_columns(extra_names)
-    assert tabular_dataset._target == table.get_column(target_name)
+    assert tabular_dataset._extras == data.keep_only_columns(extra_names)
+    assert tabular_dataset._target == data.get_column(target_name)

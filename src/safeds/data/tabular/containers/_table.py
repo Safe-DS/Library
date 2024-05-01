@@ -2446,7 +2446,7 @@ class Table:
         """
         from safeds.data.labeled.containers import TabularDataset
 
-        return TabularDataset._from_table(self, target_name, extra_names)
+        return TabularDataset(self, target_name, extra_names)
 
     # ------------------------------------------------------------------------------------------------------------------
     # IPython integration
