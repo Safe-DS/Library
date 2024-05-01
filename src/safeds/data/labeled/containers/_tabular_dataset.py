@@ -58,7 +58,7 @@ class TabularDataset:
         feature_names: list[str] | None = None,
     ) -> TabularDataset:
         """
-        Create a tagged table from a table.
+        Create a tabular dataset from a table.
 
         Parameters
         ----------
@@ -72,7 +72,7 @@ class TabularDataset:
         Returns
         -------
         tabular_dataset:
-            The created table.
+            The created tabular dataset.
 
         Raises
         ------
@@ -125,7 +125,7 @@ class TabularDataset:
         feature_names: list[str] | None = None,
     ):
         """
-        Create a tagged table from a mapping of column names to their values.
+        Create a tabular dataset from a mapping of column names to their values.
 
         Parameters
         ----------
@@ -169,12 +169,12 @@ class TabularDataset:
 
     def __eq__(self, other: object) -> bool:
         """
-        Compare two tagged table instances.
+        Compare two tabular datasets.
 
         Returns
         -------
         equals:
-            'True' if contents and tags are equal, 'False' otherwise.
+            'True' if features and targets are equal, 'False' otherwise.
         """
         if not isinstance(other, TabularDataset):
             return NotImplemented
@@ -184,7 +184,7 @@ class TabularDataset:
 
     def __hash__(self) -> int:
         """
-        Return a deterministic hash value for this tagged table.
+        Return a deterministic hash value for this tabular dataset.
 
         Returns
         -------
@@ -211,7 +211,7 @@ class TabularDataset:
     @property
     def features(self) -> Table:
         """
-        Get the feature columns of the tagged table.
+        Get the feature columns of the tabular dataset.
 
         Returns
         -------
@@ -223,7 +223,7 @@ class TabularDataset:
     @property
     def target(self) -> Column:
         """
-        Get the target column of the tagged table.
+        Get the target column of the tabular dataset.
 
         Returns
         -------

@@ -19,19 +19,19 @@ from safeds.exceptions import (
 # noinspection PyProtectedMember
 def fit(model: Any, tabular_dataset: TabularDataset) -> None:
     """
-    Fit a model for a given tagged table.
+    Fit a model for a given tabular dataset.
 
     Parameters
     ----------
     model:
         Classifier or Regression from scikit-learn.
     tabular_dataset:
-        The tagged table containing the feature and target vectors.
+        The tabular dataset containing the feature and target vectors.
 
     Raises
     ------
     LearningError
-        If the tagged table contains invalid values or if the training failed.
+        If the tabular dataset contains invalid values or if the training failed.
     TypeError
         If a table is passed instead of a tabular dataset.
     NonNumericColumnError

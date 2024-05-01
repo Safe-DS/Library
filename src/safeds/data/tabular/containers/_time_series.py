@@ -81,12 +81,12 @@ class TimeSeries(Table):
         tabular_dataset: TabularDataset,
         time_name: str,
     ) -> TimeSeries:
-        """Create a time series from a tagged table.
+        """Create a time series from a tabular dataset.
 
         Parameters
         ----------
         tabular_dataset:
-            The tagged table.
+            The tabular dataset.
         time_name:
             Name of the time column.
 
@@ -320,7 +320,7 @@ class TimeSeries(Table):
     @property
     def target(self) -> Column:
         """
-        Get the target column of the tagged table.
+        Get the target column of the time series.
 
         Returns
         -------
@@ -332,7 +332,7 @@ class TimeSeries(Table):
     @property
     def features(self) -> Table:
         """
-        Get the feature columns of the tagged table.
+        Get the feature columns of the time series.
 
         Returns
         -------
@@ -358,7 +358,7 @@ class TimeSeries(Table):
     # ------------------------------------------------------------------------------------------------------------------
     def _as_table(self: TimeSeries) -> Table:
         """
-        Return a new `Table` with the tagging removed.
+        Return a new plain `Table`.
 
         The original time series is not modified.
 
@@ -370,7 +370,8 @@ class TimeSeries(Table):
         Returns
         -------
         table:
-            The time series as an untagged Table, i.e. without the information about which columns are features, target or time.
+            The time series as an plain Table, i.e. without the information about which columns are features, target or
+            time.
 
         """
         return Table.from_columns(super().to_columns())
