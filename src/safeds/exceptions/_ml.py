@@ -86,14 +86,15 @@ class InputSizeError(Exception):
         )
 
 
-class UntaggedTableError(Exception):
+class FitOnTableError(TypeError):
     """Raised when an untagged table is used instead of a TabularDataset in a regression or classification."""
 
     def __init__(self) -> None:
         super().__init__(
             (
-                "This method needs a tagged table.\nA tagged table is a table that additionally knows which columns are"
-                " features and which are the target to predict.\nUse Table.tag_column() to create a tagged table."
+                "This method needs a tabular dataset.\n"
+                "A tabular dataset is a table that additionally knows which columns are features and which are the  target to predict.\n"
+                "Use Table.tag_column() to create a tabular dataset."
             ),
         )
 

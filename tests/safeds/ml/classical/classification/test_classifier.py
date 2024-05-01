@@ -10,10 +10,10 @@ from safeds.exceptions import (
     DatasetContainsTargetError,
     DatasetMissesDataError,
     DatasetMissesFeaturesError,
+    FitOnTableError,
     MissingValuesColumnError,
     ModelNotFittedError,
     NonNumericColumnError,
-    UntaggedTableError,
 )
 from safeds.ml.classical.classification import (
     AdaBoostClassifier,
@@ -158,7 +158,7 @@ class TestFit:
         ids=["untagged_table"],
     )
     def test_should_raise_if_table_is_not_tagged(self, classifier: Classifier, table: Table) -> None:
-        with pytest.raises(UntaggedTableError):
+        with pytest.raises(FitOnTableError):
             classifier.fit(table)  # type: ignore[arg-type]
 
 
@@ -377,7 +377,7 @@ class TestAccuracy:
         ids=["untagged_table"],
     )
     def test_should_raise_if_table_is_not_tagged(self, table: Table) -> None:
-        with pytest.raises(UntaggedTableError):
+        with pytest.raises(FitOnTableError):
             DummyClassifier().accuracy(table)  # type: ignore[arg-type]
 
 
@@ -426,7 +426,7 @@ class TestPrecision:
         ids=["untagged_table"],
     )
     def test_should_raise_if_table_is_not_tagged(self, table: Table) -> None:
-        with pytest.raises(UntaggedTableError):
+        with pytest.raises(FitOnTableError):
             DummyClassifier().precision(table, 1)  # type: ignore[arg-type]
 
 
@@ -475,7 +475,7 @@ class TestRecall:
         ids=["untagged_table"],
     )
     def test_should_raise_if_table_is_not_tagged(self, table: Table) -> None:
-        with pytest.raises(UntaggedTableError):
+        with pytest.raises(FitOnTableError):
             DummyClassifier().recall(table, 1)  # type: ignore[arg-type]
 
 
@@ -524,5 +524,5 @@ class TestF1Score:
         ids=["untagged_table"],
     )
     def test_should_raise_if_table_is_not_tagged(self, table: Table) -> None:
-        with pytest.raises(UntaggedTableError):
+        with pytest.raises(FitOnTableError):
             DummyClassifier().f1_score(table, 1)  # type: ignore[arg-type]

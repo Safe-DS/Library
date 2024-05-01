@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 from safeds._utils import _structural_hash
 from safeds.data.labeled.containers import TabularDataset
 from safeds.data.tabular.containers import Table
-from safeds.exceptions import UntaggedTableError
+from safeds.exceptions import FitOnTableError
 
 if TYPE_CHECKING:
     from typing import Any
@@ -111,13 +111,13 @@ class Classifier(ABC):
 
         Raises
         ------
-        UntaggedTableError
-            If the table is untagged.
+        TypeError
+            If a table is passed instead of a tabular dataset.
         """
         from sklearn.metrics import accuracy_score as sk_accuracy_score
 
         if not isinstance(validation_or_test_set, TabularDataset) and isinstance(validation_or_test_set, Table):
-            raise UntaggedTableError
+            raise FitOnTableError
 
         expected_values = validation_or_test_set.target
         predicted_values = self.predict(validation_or_test_set.features).target
@@ -142,7 +142,7 @@ class Classifier(ABC):
             Return 1 if no positive predictions are made.
         """
         if not isinstance(validation_or_test_set, TabularDataset) and isinstance(validation_or_test_set, Table):
-            raise UntaggedTableError
+            raise FitOnTableError
 
         expected_values = validation_or_test_set.target
         predicted_values = self.predict(validation_or_test_set.features).target
@@ -179,7 +179,7 @@ class Classifier(ABC):
             Return 1 if there are no positive expectations.
         """
         if not isinstance(validation_or_test_set, TabularDataset) and isinstance(validation_or_test_set, Table):
-            raise UntaggedTableError
+            raise FitOnTableError
 
         expected_values = validation_or_test_set.target
         predicted_values = self.predict(validation_or_test_set.features).target
@@ -216,7 +216,7 @@ class Classifier(ABC):
             Return 1 if there are no positive expectations and predictions.
         """
         if not isinstance(validation_or_test_set, TabularDataset) and isinstance(validation_or_test_set, Table):
-            raise UntaggedTableError
+            raise FitOnTableError
 
         expected_values = validation_or_test_set.target
         predicted_values = self.predict(validation_or_test_set.features).target

@@ -7,12 +7,12 @@ from safeds.exceptions import (
     DatasetContainsTargetError,
     DatasetMissesDataError,
     DatasetMissesFeaturesError,
+    FitOnTableError,
     LearningError,
     MissingValuesColumnError,
     ModelNotFittedError,
     NonNumericColumnError,
     PredictionError,
-    UntaggedTableError,
 )
 
 
@@ -32,8 +32,8 @@ def fit(model: Any, tagged_table: TabularDataset) -> None:
     ------
     LearningError
         If the tagged table contains invalid values or if the training failed.
-    UntaggedTableError
-        If the table is untagged.
+    TypeError
+        If a table is passed instead of a tabular dataset.
     NonNumericColumnError
         If the training data contains non-numerical values.
     MissingValuesColumnError
@@ -42,7 +42,7 @@ def fit(model: Any, tagged_table: TabularDataset) -> None:
         If the training data contains no rows.
     """
     if not isinstance(tagged_table, TabularDataset) and isinstance(tagged_table, Table):
-        raise UntaggedTableError
+        raise FitOnTableError
 
     if tagged_table._table.number_of_rows == 0:
         raise DatasetMissesDataError

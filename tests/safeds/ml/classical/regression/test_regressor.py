@@ -11,10 +11,10 @@ from safeds.exceptions import (
     DatasetContainsTargetError,
     DatasetMissesDataError,
     DatasetMissesFeaturesError,
+    FitOnTableError,
     MissingValuesColumnError,
     ModelNotFittedError,
     NonNumericColumnError,
-    UntaggedTableError,
 )
 from safeds.ml.classical.regression import (
     AdaBoostRegressor,
@@ -159,7 +159,7 @@ class TestFit:
         ids=["untagged_table"],
     )
     def test_should_raise_if_table_is_not_tagged(self, regressor: Regressor, table: Table) -> None:
-        with pytest.raises(UntaggedTableError):
+        with pytest.raises(FitOnTableError):
             regressor.fit(table)  # type: ignore[arg-type]
 
 
@@ -386,7 +386,7 @@ class TestMeanAbsoluteError:
         ids=["untagged_table"],
     )
     def test_should_raise_if_table_is_not_tagged(self, table: Table) -> None:
-        with pytest.raises(UntaggedTableError):
+        with pytest.raises(FitOnTableError):
             DummyRegressor().mean_absolute_error(table)  # type: ignore[arg-type]
 
 
@@ -417,7 +417,7 @@ class TestMeanSquaredError:
         ids=["untagged_table"],
     )
     def test_should_raise_if_table_is_not_tagged(self, table: Table) -> None:
-        with pytest.raises(UntaggedTableError):
+        with pytest.raises(FitOnTableError):
             DummyRegressor().mean_squared_error(table)  # type: ignore[arg-type]
 
 

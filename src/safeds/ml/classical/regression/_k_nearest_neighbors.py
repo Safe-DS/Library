@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING
 from safeds._utils import _structural_hash
 from safeds.data.labeled.containers import TabularDataset
 from safeds.data.tabular.containers import Table
-from safeds.exceptions import ClosedBound, DatasetMissesDataError, OutOfBoundsError, UntaggedTableError
+from safeds.exceptions import ClosedBound, DatasetMissesDataError, FitOnTableError, OutOfBoundsError
 from safeds.ml.classical._util_sklearn import fit, predict
 
 from ._regressor import Regressor
@@ -86,8 +86,8 @@ class KNearestNeighborsRegressor(Regressor):
             If `number_of_neighbors` is greater than the sample size.
         LearningError
             If the training data contains invalid values or if the training failed.
-        UntaggedTableError
-            If the table is untagged.
+        TypeError
+            If a table is passed instead of a tabular dataset.
         NonNumericColumnError
             If the training data contains non-numerical values.
         MissingValuesColumnError
@@ -96,7 +96,7 @@ class KNearestNeighborsRegressor(Regressor):
             If the training data contains no rows.
         """
         if not isinstance(training_set, TabularDataset) and isinstance(training_set, Table):
-            raise UntaggedTableError
+            raise FitOnTableError
 
         if training_set._table.number_of_rows == 0:
             raise DatasetMissesDataError
