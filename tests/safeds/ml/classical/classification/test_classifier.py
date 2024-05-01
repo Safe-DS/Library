@@ -4,7 +4,7 @@ import itertools
 from typing import TYPE_CHECKING, Any
 
 import pytest
-from safeds.data.labeled.containers import TaggedTable
+from safeds.data.labeled.containers import TabularDataset
 from safeds.data.tabular.containers import Table
 from safeds.exceptions import (
     DatasetContainsTargetError,
@@ -55,7 +55,7 @@ def classifiers() -> list[Classifier]:
 
 
 @pytest.fixture()
-def valid_data() -> TaggedTable:
+def valid_data() -> TabularDataset:
     return Table(
         {
             "id": [1, 4],
@@ -68,11 +68,11 @@ def valid_data() -> TaggedTable:
 
 @pytest.mark.parametrize("classifier", classifiers(), ids=lambda x: x.__class__.__name__)
 class TestFit:
-    def test_should_succeed_on_valid_data(self, classifier: Classifier, valid_data: TaggedTable) -> None:
+    def test_should_succeed_on_valid_data(self, classifier: Classifier, valid_data: TabularDataset) -> None:
         classifier.fit(valid_data)
         assert True  # This asserts that the fit method succeeds
 
-    def test_should_not_change_input_classifier(self, classifier: Classifier, valid_data: TaggedTable) -> None:
+    def test_should_not_change_input_classifier(self, classifier: Classifier, valid_data: TabularDataset) -> None:
         classifier.fit(valid_data)
         assert not classifier.is_fitted
 
@@ -137,7 +137,7 @@ class TestFit:
     def test_should_raise_on_invalid_data(
         self,
         classifier: Classifier,
-        invalid_data: TaggedTable,
+        invalid_data: TabularDataset,
         expected_error: Any,
         expected_error_msg: str,
     ) -> None:
@@ -164,17 +164,17 @@ class TestFit:
 
 @pytest.mark.parametrize("classifier", classifiers(), ids=lambda x: x.__class__.__name__)
 class TestPredict:
-    def test_should_include_features_of_input_table(self, classifier: Classifier, valid_data: TaggedTable) -> None:
+    def test_should_include_features_of_input_table(self, classifier: Classifier, valid_data: TabularDataset) -> None:
         fitted_classifier = classifier.fit(valid_data)
         prediction = fitted_classifier.predict(valid_data.features)
         assert prediction.features == valid_data.features
 
-    def test_should_include_complete_input_table(self, classifier: Classifier, valid_data: TaggedTable) -> None:
+    def test_should_include_complete_input_table(self, classifier: Classifier, valid_data: TabularDataset) -> None:
         fitted_regressor = classifier.fit(valid_data)
         prediction = fitted_regressor.predict(valid_data.features)
         assert prediction.features == valid_data.features
 
-    def test_should_set_correct_target_name(self, classifier: Classifier, valid_data: TaggedTable) -> None:
+    def test_should_set_correct_target_name(self, classifier: Classifier, valid_data: TabularDataset) -> None:
         fitted_classifier = classifier.fit(valid_data)
         prediction = fitted_classifier.predict(valid_data.features)
         assert prediction.target.name == "target"
@@ -186,16 +186,16 @@ class TestPredict:
         fitted_classifier.predict(valid_data.features)
         assert valid_data == valid_data_copy
 
-    def test_should_raise_if_not_fitted(self, classifier: Classifier, valid_data: TaggedTable) -> None:
+    def test_should_raise_if_not_fitted(self, classifier: Classifier, valid_data: TabularDataset) -> None:
         with pytest.raises(ModelNotFittedError):
             classifier.predict(valid_data.features)
 
-    def test_should_raise_if_dataset_contains_target(self, classifier: Classifier, valid_data: TaggedTable) -> None:
+    def test_should_raise_if_dataset_contains_target(self, classifier: Classifier, valid_data: TabularDataset) -> None:
         fitted_classifier = classifier.fit(valid_data)
         with pytest.raises(DatasetContainsTargetError, match="target"):
             fitted_classifier.predict(valid_data.to_table())
 
-    def test_should_raise_if_dataset_misses_features(self, classifier: Classifier, valid_data: TaggedTable) -> None:
+    def test_should_raise_if_dataset_misses_features(self, classifier: Classifier, valid_data: TabularDataset) -> None:
         fitted_classifier = classifier.fit(valid_data)
         with pytest.raises(DatasetMissesFeaturesError, match="[feat1, feat2]"):
             fitted_classifier.predict(valid_data.features.remove_columns(["feat1", "feat2"]))
@@ -242,7 +242,7 @@ class TestPredict:
     def test_should_raise_on_invalid_data(
         self,
         classifier: Classifier,
-        valid_data: TaggedTable,
+        valid_data: TabularDataset,
         invalid_data: Table,
         expected_error: Any,
         expected_error_msg: str,
@@ -257,7 +257,7 @@ class TestIsFitted:
     def test_should_return_false_before_fitting(self, classifier: Classifier) -> None:
         assert not classifier.is_fitted
 
-    def test_should_return_true_after_fitting(self, classifier: Classifier, valid_data: TaggedTable) -> None:
+    def test_should_return_true_after_fitting(self, classifier: Classifier, valid_data: TabularDataset) -> None:
         fitted_classifier = classifier.fit(valid_data)
         assert fitted_classifier.is_fitted
 
@@ -291,7 +291,7 @@ class TestHash:
     def test_should_return_different_hash_for_same_classifier_fit(
         self,
         classifier1: Classifier,
-        valid_data: TaggedTable,
+        valid_data: TabularDataset,
     ) -> None:
         regressor1_fit = classifier1.fit(valid_data)
         assert hash(classifier1) != hash(regressor1_fit)
@@ -305,7 +305,7 @@ class TestHash:
         self,
         classifier1: Classifier,
         classifier2: Classifier,
-        valid_data: TaggedTable,
+        valid_data: TabularDataset,
     ) -> None:
         classifier1_fit = classifier1.fit(valid_data)
         assert hash(classifier1_fit) != hash(classifier2)
@@ -323,10 +323,10 @@ class DummyClassifier(Classifier):
     `target_name` must be set to `"expected"`.
     """
 
-    def fit(self, training_set: TaggedTable) -> DummyClassifier:  # noqa: ARG002
+    def fit(self, training_set: TabularDataset) -> DummyClassifier:  # noqa: ARG002
         return self
 
-    def predict(self, dataset: Table) -> TaggedTable:
+    def predict(self, dataset: Table) -> TabularDataset:
         # Needed until https://github.com/Safe-DS/Library/issues/75 is fixed
         predicted = dataset.get_column("predicted")
         feature = predicted.rename("feature")

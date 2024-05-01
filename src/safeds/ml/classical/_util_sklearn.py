@@ -1,7 +1,7 @@
 import warnings
 from typing import Any
 
-from safeds.data.labeled.containers import TaggedTable
+from safeds.data.labeled.containers import TabularDataset
 from safeds.data.tabular.containers import Table
 from safeds.exceptions import (
     DatasetContainsTargetError,
@@ -17,7 +17,7 @@ from safeds.exceptions import (
 
 
 # noinspection PyProtectedMember
-def fit(model: Any, tagged_table: TaggedTable) -> None:
+def fit(model: Any, tagged_table: TabularDataset) -> None:
     """
     Fit a model for a given tagged table.
 
@@ -41,7 +41,7 @@ def fit(model: Any, tagged_table: TaggedTable) -> None:
     DatasetMissesDataError
         If the training data contains no rows.
     """
-    if not isinstance(tagged_table, TaggedTable) and isinstance(tagged_table, Table):
+    if not isinstance(tagged_table, TabularDataset) and isinstance(tagged_table, Table):
         raise UntaggedTableError
 
     if tagged_table._table.number_of_rows == 0:
@@ -78,7 +78,7 @@ def fit(model: Any, tagged_table: TaggedTable) -> None:
 
 
 # noinspection PyProtectedMember
-def predict(model: Any, dataset: Table, feature_names: list[str] | None, target_name: str | None) -> TaggedTable:
+def predict(model: Any, dataset: Table, feature_names: list[str] | None, target_name: str | None) -> TabularDataset:
     """
     Predict a target vector using a dataset containing feature vectors. The model has to be trained first.
 
@@ -123,7 +123,7 @@ def predict(model: Any, dataset: Table, feature_names: list[str] | None, target_
     missing_feature_names = [feature_name for feature_name in feature_names if not dataset.has_column(feature_name)]
     if missing_feature_names:
         raise DatasetMissesFeaturesError(missing_feature_names)
-    if isinstance(dataset, TaggedTable):
+    if isinstance(dataset, TabularDataset):
         dataset = dataset.features  # Cast to Table type, so Python will call the right methods...
 
     if dataset.number_of_rows == 0:

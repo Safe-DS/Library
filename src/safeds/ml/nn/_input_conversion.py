@@ -6,10 +6,10 @@ from typing import TYPE_CHECKING, Generic, TypeVar
 if TYPE_CHECKING:
     from torch.utils.data import DataLoader
 
-from safeds.data.labeled.containers import TaggedTable
+from safeds.data.labeled.containers import TabularDataset
 from safeds.data.tabular.containers import Table, TimeSeries
 
-FT = TypeVar("FT", TaggedTable, TimeSeries)
+FT = TypeVar("FT", TabularDataset, TimeSeries)
 PT = TypeVar("PT", Table, TimeSeries)
 
 

@@ -12,7 +12,7 @@ if TYPE_CHECKING:
     from sklearn.base import ClassifierMixin
     from sklearn.ensemble import RandomForestClassifier as sk_RandomForestClassifier
 
-    from safeds.data.labeled.containers import TaggedTable
+    from safeds.data.labeled.containers import TabularDataset
     from safeds.data.tabular.containers import Table
 
 
@@ -63,7 +63,7 @@ class RandomForestClassifier(Classifier):
         """
         return self._number_of_trees
 
-    def fit(self, training_set: TaggedTable) -> RandomForestClassifier:
+    def fit(self, training_set: TabularDataset) -> RandomForestClassifier:
         """
         Create a copy of this classifier and fit it with the given training data.
 
@@ -102,7 +102,7 @@ class RandomForestClassifier(Classifier):
 
         return result
 
-    def predict(self, dataset: Table) -> TaggedTable:
+    def predict(self, dataset: Table) -> TabularDataset:
         """
         Predict a target vector using a dataset containing feature vectors. The model has to be trained first.
 

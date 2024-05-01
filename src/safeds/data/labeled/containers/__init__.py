@@ -5,15 +5,15 @@ from typing import TYPE_CHECKING
 import apipkg
 
 if TYPE_CHECKING:
-    from ._tabular_dataset import TaggedTable
+    from ._tabular_dataset import TabularDataset
 
 apipkg.initpkg(
     __name__,
     {
-        "TaggedTable": "._tabular_dataset:TaggedTable",
+        "TabularDataset": "._tabular_dataset:TabularDataset",
     },
 )
 
 __all__ = [
-    "TaggedTable",
+    "TabularDataset",
 ]

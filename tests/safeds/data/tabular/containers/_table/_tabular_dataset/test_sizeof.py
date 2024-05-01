@@ -1,14 +1,14 @@
 import sys
 
 import pytest
-from safeds.data.labeled.containers import TaggedTable
+from safeds.data.labeled.containers import TabularDataset
 
 
 @pytest.mark.parametrize(
     "tagged_table",
     [
 
-            TaggedTable(
+            TabularDataset(
                 {
                     "feature_1": [3, 9, 6],
                     "feature_2": [6, 12, 9],
@@ -18,7 +18,7 @@ from safeds.data.labeled.containers import TaggedTable
                 ["feature_1", "feature_2"],
             ),
 
-            TaggedTable(
+            TabularDataset(
                 {
                     "feature_1": [3, 9, 6],
                     "feature_2": [6, 12, 9],
@@ -31,5 +31,5 @@ from safeds.data.labeled.containers import TaggedTable
     ],
     ids=["normal", "table_with_column_as_non_feature"],
 )
-def test_should_size_be_greater_than_normal_object(tagged_table: TaggedTable) -> None:
+def test_should_size_be_greater_than_normal_object(tagged_table: TabularDataset) -> None:
     assert sys.getsizeof(tagged_table) > sys.getsizeof(object())

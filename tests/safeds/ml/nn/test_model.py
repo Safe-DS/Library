@@ -1,5 +1,5 @@
 import pytest
-from safeds.data.labeled.containers import TaggedTable
+from safeds.data.labeled.containers import TabularDataset
 from safeds.data.tabular.containers import Table
 from safeds.exceptions import FeatureDataMismatchError, InputSizeError, ModelNotFittedError, OutOfBoundsError
 from safeds.ml.nn import (
@@ -82,7 +82,7 @@ class TestClassificationModel:
             batch_size=batch_size,
         )
         predictions = fitted_model.predict(Table.from_dict({"b": [1, 0]}))
-        assert isinstance(predictions, TaggedTable)
+        assert isinstance(predictions, TabularDataset)
 
     @pytest.mark.parametrize(
         "batch_size",
@@ -105,7 +105,7 @@ class TestClassificationModel:
             batch_size=batch_size,
         )
         predictions = fitted_model.predict(Table.from_dict({"b": [1, 4, 124]}))
-        assert isinstance(predictions, TaggedTable)
+        assert isinstance(predictions, TabularDataset)
 
     def test_should_raise_if_model_has_not_been_fitted(self) -> None:
         with pytest.raises(ModelNotFittedError, match="The model has not been fitted yet."):
@@ -310,7 +310,7 @@ class TestRegressionModel:
             batch_size=batch_size,
         )
         predictions = fitted_model.predict(Table.from_dict({"b": [5, 6, 7]}))
-        assert isinstance(predictions, TaggedTable)
+        assert isinstance(predictions, TabularDataset)
 
     def test_should_raise_if_model_has_not_been_fitted(self) -> None:
         with pytest.raises(ModelNotFittedError, match="The model has not been fitted yet."):

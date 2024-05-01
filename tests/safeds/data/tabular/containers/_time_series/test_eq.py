@@ -1,7 +1,7 @@
 from typing import Any
 
 import pytest
-from safeds.data.labeled.containers import TaggedTable
+from safeds.data.labeled.containers import TabularDataset
 from safeds.data.tabular.containers import Row, Table, TimeSeries
 
 
@@ -87,7 +87,7 @@ def test_should_return_true_if_objects_are_identical(table1: TimeSeries) -> None
         (TimeSeries({"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9]}, "b", "c", ["a"]), Table()),
         (
             TimeSeries({"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9]}, "b", "c", ["a"]),
-            TaggedTable({"a": [1, 2, 3], "b": [4, 5, 6]}, "b", ["a"]),
+            TabularDataset({"a": [1, 2, 3], "b": [4, 5, 6]}, "b", ["a"]),
         ),
     ],
     ids=[

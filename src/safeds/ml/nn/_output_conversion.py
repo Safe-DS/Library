@@ -6,11 +6,11 @@ from typing import TYPE_CHECKING, Generic, TypeVar
 if TYPE_CHECKING:
     from torch import Tensor
 
-from safeds.data.labeled.containers import TaggedTable
+from safeds.data.labeled.containers import TabularDataset
 from safeds.data.tabular.containers import Table, TimeSeries
 
 IT = TypeVar("IT", Table, TimeSeries)
-OT = TypeVar("OT", TaggedTable, TimeSeries)
+OT = TypeVar("OT", TabularDataset, TimeSeries)
 
 
 class _OutputConversion(Generic[IT, OT], ABC):

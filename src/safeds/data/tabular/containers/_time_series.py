@@ -20,7 +20,7 @@ if TYPE_CHECKING:
     from pathlib import Path
     from typing import Any
 
-    from safeds.data.labeled.containers import TaggedTable
+    from safeds.data.labeled.containers import TabularDataset
 
 
 class TimeSeries(Table):
@@ -78,7 +78,7 @@ class TimeSeries(Table):
 
     @staticmethod
     def _from_tagged_table(
-        tagged_table: TaggedTable,
+        tagged_table: TabularDataset,
         time_name: str,
     ) -> TimeSeries:
         """Create a time series from a tagged table.
@@ -105,7 +105,7 @@ class TimeSeries(Table):
         Examples
         --------
         >>> from safeds.data.tabular.containers import Table, TimeSeries
-        >>> tagged_table = TaggedTable({"date": ["01.01", "01.02", "01.03", "01.04"], "col1": ["a", "b", "c", "a"]}, "col1" )
+        >>> tagged_table = TabularDataset({"date": ["01.01", "01.02", "01.03", "01.04"], "col1": ["a", "b", "c", "a"]}, "col1" )
         >>> timeseries = TimeSeries._from_tagged_table(tagged_table, time_name = "date")
         """
         if time_name not in tagged_table._table.column_names:
@@ -236,8 +236,8 @@ class TimeSeries(Table):
 
         Examples
         --------
-        >>> from safeds.data.labeled.containers import TaggedTable
-        >>> table = TaggedTable({"a": [1, 2, 3], "b": [4, 5, 6]}, "b", ["a"])
+        >>> from safeds.data.labeled.containers import TabularDataset
+        >>> table = TabularDataset({"a": [1, 2, 3], "b": [4, 5, 6]}, "b", ["a"])
         """
         import pandas as pd
 

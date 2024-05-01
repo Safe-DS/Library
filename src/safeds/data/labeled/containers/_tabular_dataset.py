@@ -18,9 +18,9 @@ if TYPE_CHECKING:
     from torch.utils.data import DataLoader, Dataset
 
 
-class TaggedTable:
+class TabularDataset:
     """
-    A tagged table is a table that additionally knows which columns are features and which are the target to predict.
+    A tabular dataset maps feature columns to a target column.
 
     Parameters
     ----------
@@ -56,7 +56,7 @@ class TaggedTable:
         table: Table,
         target_name: str,
         feature_names: list[str] | None = None,
-    ) -> TaggedTable:
+    ) -> TabularDataset:
         """
         Create a tagged table from a table.
 
@@ -85,10 +85,10 @@ class TaggedTable:
 
         Examples
         --------
-        >>> from safeds.data.labeled.containers import TaggedTable
+        >>> from safeds.data.labeled.containers import TabularDataset
         >>> from safeds.data.tabular.containers import Table
         >>> table = Table({"col1": ["a", "b", "c", "a"], "col2": [1, 2, 3, 4]})
-        >>> tagged_table = TaggedTable._from_table(table, "col2", ["col1"])
+        >>> tagged_table = TabularDataset._from_table(table, "col2", ["col1"])
         """
         table = table._as_table()
         if target_name not in table.column_names:
@@ -106,7 +106,7 @@ class TaggedTable:
             raise ValueError("At least one feature column must be specified.")
 
         # Create result
-        result = object.__new__(TaggedTable)
+        result = object.__new__(TabularDataset)
 
         result._table = table
         result._features = table.keep_only_columns(feature_names)
@@ -147,8 +147,8 @@ class TaggedTable:
 
         Examples
         --------
-        >>> from safeds.data.labeled.containers import TaggedTable
-        >>> table = TaggedTable({"a": [1, 2, 3], "b": [4, 5, 6]}, "b", ["a"])
+        >>> from safeds.data.labeled.containers import TabularDataset
+        >>> table = TabularDataset({"a": [1, 2, 3], "b": [4, 5, 6]}, "b", ["a"])
         """
         self._table = Table(data)
 
@@ -176,7 +176,7 @@ class TaggedTable:
         equals:
             'True' if contents and tags are equal, 'False' otherwise.
         """
-        if not isinstance(other, TaggedTable):
+        if not isinstance(other, TabularDataset):
             return NotImplemented
         if self is other:
             return True

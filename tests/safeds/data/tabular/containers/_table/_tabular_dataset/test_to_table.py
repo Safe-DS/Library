@@ -1,5 +1,5 @@
 import pytest
-from safeds.data.labeled.containers import TaggedTable
+from safeds.data.labeled.containers import TabularDataset
 from safeds.data.tabular.containers import Table
 
 
@@ -7,7 +7,7 @@ from safeds.data.tabular.containers import Table
     ("tagged_table", "expected"),
     [
         (
-            TaggedTable(
+            TabularDataset(
                 {
                     "feature_1": [3, 9, 6],
                     "feature_2": [6, 12, 9],
@@ -25,7 +25,7 @@ from safeds.data.tabular.containers import Table
             ),
         ),
         (
-            TaggedTable(
+            TabularDataset(
                 {
                     "feature_1": [3, 9, 6],
                     "feature_2": [6, 12, 9],
@@ -47,7 +47,7 @@ from safeds.data.tabular.containers import Table
     ],
     ids=["normal", "table_with_column_as_non_feature"],
 )
-def test_should_return_table(tagged_table: TaggedTable, expected: Table) -> None:
+def test_should_return_table(tagged_table: TabularDataset, expected: Table) -> None:
     table = tagged_table.to_table()
     assert table.schema == expected.schema
     assert table == expected

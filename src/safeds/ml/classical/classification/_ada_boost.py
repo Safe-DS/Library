@@ -12,7 +12,7 @@ if TYPE_CHECKING:
     from sklearn.base import ClassifierMixin
     from sklearn.ensemble import AdaBoostClassifier as sk_AdaBoostClassifier
 
-    from safeds.data.labeled.containers import TaggedTable
+    from safeds.data.labeled.containers import TabularDataset
     from safeds.data.tabular.containers import Table
 
 
@@ -109,7 +109,7 @@ class AdaBoostClassifier(Classifier):
         """
         return self._learning_rate
 
-    def fit(self, training_set: TaggedTable) -> AdaBoostClassifier:
+    def fit(self, training_set: TabularDataset) -> AdaBoostClassifier:
         """
         Create a copy of this classifier and fit it with the given training data.
 
@@ -152,7 +152,7 @@ class AdaBoostClassifier(Classifier):
 
         return result
 
-    def predict(self, dataset: Table) -> TaggedTable:
+    def predict(self, dataset: Table) -> TabularDataset:
         """
         Predict a target vector using a dataset containing feature vectors. The model has to be trained first.
 

@@ -1,22 +1,22 @@
 import pytest
-from safeds.data.labeled.containers import TaggedTable
+from safeds.data.labeled.containers import TabularDataset
 from safeds.data.tabular.containers import Table
 from safeds.exceptions import OutOfBoundsError
 from safeds.ml.classical.regression import ElasticNetRegressor
 
 
 @pytest.fixture()
-def training_set() -> TaggedTable:
+def training_set() -> TabularDataset:
     table = Table({"col1": [1, 2, 3, 4], "col2": [1, 2, 3, 4]})
     return table.tag_columns(target_name="col1", feature_names=["col2"])
 
 
 class TestAlpha:
-    def test_should_be_passed_to_fitted_model(self, training_set: TaggedTable) -> None:
+    def test_should_be_passed_to_fitted_model(self, training_set: TabularDataset) -> None:
         fitted_model = ElasticNetRegressor(alpha=1).fit(training_set)
         assert fitted_model.alpha == 1
 
-    def test_should_be_passed_to_sklearn(self, training_set: TaggedTable) -> None:
+    def test_should_be_passed_to_sklearn(self, training_set: TabularDataset) -> None:
         fitted_model = ElasticNetRegressor(alpha=1).fit(training_set)
         assert fitted_model._wrapped_regressor is not None
         assert fitted_model._wrapped_regressor.alpha == 1
@@ -41,11 +41,11 @@ class TestAlpha:
 
 
 class TestLassoRatio:
-    def test_should_be_passed_to_fitted_model(self, training_set: TaggedTable) -> None:
+    def test_should_be_passed_to_fitted_model(self, training_set: TabularDataset) -> None:
         fitted_model = ElasticNetRegressor(lasso_ratio=0.3).fit(training_set)
         assert fitted_model.lasso_ratio == 0.3
 
-    def test_should_be_passed_to_sklearn(self, training_set: TaggedTable) -> None:
+    def test_should_be_passed_to_sklearn(self, training_set: TabularDataset) -> None:
         fitted_model = ElasticNetRegressor(lasso_ratio=0.3).fit(training_set)
         assert fitted_model._wrapped_regressor is not None
         assert fitted_model._wrapped_regressor.l1_ratio == 0.3

@@ -12,7 +12,7 @@ if TYPE_CHECKING:
     from sklearn.base import RegressorMixin
     from sklearn.ensemble import RandomForestRegressor as sk_RandomForestRegressor
 
-    from safeds.data.labeled.containers import TaggedTable
+    from safeds.data.labeled.containers import TabularDataset
     from safeds.data.tabular.containers import Table
 
 
@@ -58,7 +58,7 @@ class RandomForestRegressor(Regressor):
         """
         return self._number_of_trees
 
-    def fit(self, training_set: TaggedTable) -> RandomForestRegressor:
+    def fit(self, training_set: TabularDataset) -> RandomForestRegressor:
         """
         Create a copy of this regressor and fit it with the given training data.
 
@@ -97,7 +97,7 @@ class RandomForestRegressor(Regressor):
 
         return result
 
-    def predict(self, dataset: Table) -> TaggedTable:
+    def predict(self, dataset: Table) -> TabularDataset:
         """
         Predict a target vector using a dataset containing feature vectors. The model has to be trained first.
 

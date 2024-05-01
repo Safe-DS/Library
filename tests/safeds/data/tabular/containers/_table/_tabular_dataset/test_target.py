@@ -1,5 +1,5 @@
 import pytest
-from safeds.data.labeled.containers import TaggedTable
+from safeds.data.labeled.containers import TabularDataset
 from safeds.data.tabular.containers import Column
 
 
@@ -7,7 +7,7 @@ from safeds.data.tabular.containers import Column
     ("tagged_table", "target_column"),
     [
         (
-            TaggedTable(
+            TabularDataset(
                 {
                     "A": [1, 4],
                     "B": [2, 5],
@@ -21,5 +21,5 @@ from safeds.data.tabular.containers import Column
     ],
     ids=["target"],
 )
-def test_should_return_target(tagged_table: TaggedTable, target_column: Column) -> None:
+def test_should_return_target(tagged_table: TabularDataset, target_column: Column) -> None:
     assert tagged_table.target == target_column

@@ -30,7 +30,7 @@ if TYPE_CHECKING:
     import pandas as pd
     from torch.utils.data import DataLoader, Dataset
 
-    from safeds.data.labeled.containers import TaggedTable
+    from safeds.data.labeled.containers import TabularDataset
     from safeds.data.tabular.transformation import InvertibleTableTransformer, TableTransformer
 
     from ._time_series import TimeSeries
@@ -1752,7 +1752,7 @@ class Table:
             self.slice_rows(round(percentage_in_first * self.number_of_rows)),
         )
 
-    def tag_columns(self, target_name: str, feature_names: list[str] | None = None) -> TaggedTable:
+    def tag_columns(self, target_name: str, feature_names: list[str] | None = None) -> TabularDataset:
         """
         Return a new `TaggedTable` with columns marked as a target column or feature columns.
 
@@ -1783,9 +1783,9 @@ class Table:
         >>> table = Table({"item": ["apple", "milk", "beer"], "price": [1.10, 1.19, 1.79], "amount_bought": [74, 72, 51]})
         >>> tagged_table = table.tag_columns(target_name="amount_bought", feature_names=["item", "price"])
         """
-        from safeds.data.labeled.containers import TaggedTable
+        from safeds.data.labeled.containers import TabularDataset
 
-        return TaggedTable._from_table(self, target_name, feature_names)
+        return TabularDataset._from_table(self, target_name, feature_names)
 
     def time_columns(self, target_name: str, time_name: str, feature_names: list[str] | None = None) -> TimeSeries:
         """

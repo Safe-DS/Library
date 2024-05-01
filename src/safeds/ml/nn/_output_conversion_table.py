@@ -5,12 +5,12 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from torch import Tensor
 
-from safeds.data.labeled.containers import TaggedTable
+from safeds.data.labeled.containers import TabularDataset
 from safeds.data.tabular.containers import Column, Table
 from safeds.ml.nn._output_conversion import _OutputConversion
 
 
-class OutputConversionTable(_OutputConversion[Table, TaggedTable]):
+class OutputConversionTable(_OutputConversion[Table, TabularDataset]):
     """The output conversion for a neural network, defines the output parameters for the neural network."""
 
     def __init__(self, prediction_name: str = "prediction") -> None:
@@ -24,7 +24,7 @@ class OutputConversionTable(_OutputConversion[Table, TaggedTable]):
         """
         self._prediction_name = prediction_name
 
-    def _data_conversion(self, input_data: Table, output_data: Tensor) -> TaggedTable:
+    def _data_conversion(self, input_data: Table, output_data: Tensor) -> TabularDataset:
         return input_data.add_column(Column(self._prediction_name, output_data.tolist())).tag_columns(
             self._prediction_name,
         )

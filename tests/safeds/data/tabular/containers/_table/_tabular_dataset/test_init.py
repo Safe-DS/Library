@@ -1,5 +1,5 @@
 import pytest
-from safeds.data.labeled.containers import TaggedTable
+from safeds.data.labeled.containers import TabularDataset
 from safeds.data.tabular.containers import Table
 from safeds.exceptions import UnknownColumnNameError
 
@@ -81,7 +81,7 @@ def test_should_raise_error(
     error_msg: str,
 ) -> None:
     with pytest.raises(error, match=error_msg):
-        TaggedTable(data, target_name=target_name, feature_names=feature_names)
+        TabularDataset(data, target_name=target_name, feature_names=feature_names)
 
 
 @pytest.mark.parametrize(
@@ -125,11 +125,11 @@ def test_should_create_a_tagged_table(
     target_name: str,
     feature_names: list[str] | None,
 ) -> None:
-    tagged_table = TaggedTable(data, target_name=target_name, feature_names=feature_names)
+    tagged_table = TabularDataset(data, target_name=target_name, feature_names=feature_names)
     if feature_names is None:
         feature_names = list(data.keys())
         feature_names.remove(target_name)
-    assert isinstance(tagged_table, TaggedTable)
+    assert isinstance(tagged_table, TabularDataset)
     assert tagged_table._features.column_names == feature_names
     assert tagged_table._target.name == target_name
     assert tagged_table._features == Table(data).keep_only_columns(feature_names)

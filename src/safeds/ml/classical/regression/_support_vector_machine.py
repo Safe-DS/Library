@@ -13,7 +13,7 @@ if TYPE_CHECKING:
     from sklearn.base import RegressorMixin
     from sklearn.svm import SVR as sk_SVR  # noqa: N811
 
-    from safeds.data.labeled.containers import TaggedTable
+    from safeds.data.labeled.containers import TabularDataset
     from safeds.data.tabular.containers import Table
 
 
@@ -234,7 +234,7 @@ class SupportVectorMachineRegressor(Regressor):
         else:
             raise TypeError("Invalid kernel type.")
 
-    def fit(self, training_set: TaggedTable) -> SupportVectorMachineRegressor:
+    def fit(self, training_set: TabularDataset) -> SupportVectorMachineRegressor:
         """
         Create a copy of this regressor and fit it with the given training data.
 
@@ -273,7 +273,7 @@ class SupportVectorMachineRegressor(Regressor):
 
         return result
 
-    def predict(self, dataset: Table) -> TaggedTable:
+    def predict(self, dataset: Table) -> TabularDataset:
         """
         Predict a target vector using a dataset containing feature vectors. The model has to be trained first.
 
