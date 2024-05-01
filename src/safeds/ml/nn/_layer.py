@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Unpack, Any, TypedDict
+from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
     from torch import nn
@@ -15,7 +15,7 @@ class _Layer(ABC):
         pass  # pragma: no cover
 
     @abstractmethod
-    def _get_internal_layer(self, **kwargs: Unpack[TypedDict[str, Any]]) -> nn.Module:
+    def _get_internal_layer(self, **kwargs: Any) -> nn.Module:
         pass  # pragma: no cover
 
     @property

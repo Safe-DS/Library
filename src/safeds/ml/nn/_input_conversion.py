@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Generic, TypeVar, TypedDict, Any
+from typing import TYPE_CHECKING, Generic, TypeVar, Any
 
 if TYPE_CHECKING:
     from torch.utils.data import DataLoader
@@ -42,5 +42,5 @@ class _InputConversion(Generic[FT, PT], ABC):
         pass  # pragma: no cover
 
     @abstractmethod
-    def _get_output_configuration(self) -> TypedDict[str, Any]:
+    def _get_output_configuration(self) -> dict[str, Any]:
         pass  # pragma: no cover

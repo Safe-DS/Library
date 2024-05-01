@@ -52,9 +52,9 @@ class TestConvolutional2DLayer:
     def test_should_raise_if_input_size_not_set(self, activation_function: Literal["sigmoid", "relu", "softmax"], conv_type: Type[Convolutional2DLayer], output_channel: int, kernel_size: int, stride: int, padding: int) -> None:
         layer = conv_type(output_channel, kernel_size, stride=stride, padding=padding)
         with pytest.raises(ValueError, match=r"The input_size is not yet set."):
-            layer.input_size  # noqa B018
+            layer.input_size  # noqa: B018
         with pytest.raises(ValueError, match=r"The input_size is not yet set. The layer cannot compute the output_size if the input_size is not set."):
-            layer.output_size  # noqa B018
+            layer.output_size  # noqa: B018
         with pytest.raises(ValueError, match=r"The input_size is not yet set. The internal layer can only be created when the input_size is set."):
             layer._get_internal_layer(activation_function=activation_function)
 

@@ -283,7 +283,7 @@ class NeuralNetworkClassifier(Generic[IFT, IPT, OT]):
         self._input_size = self._model.input_size
         self._batch_size = 1
         self._is_fitted = False
-        self._num_of_classes = layers[-1].output_size if isinstance(layers[-1].output_size, int) else -1  # Is always int but linter doesn´t know
+        self._num_of_classes = layers[-1].output_size if isinstance(layers[-1].output_size, int) else -1  # Is always int but linter doesn't know
         self._total_number_of_batches_done = 0
         self._total_number_of_epochs_done = 0
 
@@ -420,7 +420,6 @@ class NeuralNetworkClassifier(Generic[IFT, IPT, OT]):
                     predictions.append(torch.argmax(elem, dim=1))
                 else:
                     predictions.append(elem.squeeze(dim=1).round())
-        print(self._input_conversion._get_output_configuration())
         return self._output_conversion._data_conversion(test_data, torch.cat(predictions, dim=0), **self._input_conversion._get_output_configuration())
 
     @property

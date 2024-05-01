@@ -18,9 +18,9 @@ class TestFlattenLayer:
     def test_should_raise_if_input_size_not_set(self) -> None:
         layer = FlattenLayer()
         with pytest.raises(ValueError, match=r"The input_size is not yet set."):
-            layer.input_size  # noqa B018
+            layer.input_size  # noqa: B018
         with pytest.raises(ValueError, match=r"The input_size is not yet set. The layer cannot compute the output_size if the input_size is not set."):
-            layer.output_size  # noqa B018
+            layer.output_size  # noqa: B018
 
     def test_should_raise_if_input_size_is_set_with_int(self) -> None:
         layer = FlattenLayer()

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Unpack, Any, TypedDict
+from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
     from torch import Tensor
@@ -24,7 +24,7 @@ class OutputConversionTable(_OutputConversion[Table, TabularDataset]):
         """
         self._prediction_name = prediction_name
 
-    def _data_conversion(self, input_data: Table, output_data: Tensor, **kwargs: Unpack[dict[str, Any]]) -> TabularDataset:
+    def _data_conversion(self, input_data: Table, output_data: Tensor, **kwargs: Any) -> TabularDataset:  # noqa: ARG002
         return input_data.add_column(Column(self._prediction_name, output_data.tolist())).to_tabular_dataset(
             self._prediction_name,
         )

@@ -30,7 +30,7 @@ class FlattenLayer(_Layer):
         self._input_size: ImageSize | None = None
         self._output_size: int | None = None
 
-    def _get_internal_layer(self, **kwargs: Unpack[TypedDict[str, Any]]) -> nn.Module:  # noqa: ARG002
+    def _get_internal_layer(self, **kwargs: Any) -> nn.Module:  # noqa: ARG002
         return _create_internal_model()
 
     @property

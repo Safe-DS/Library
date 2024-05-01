@@ -58,14 +58,16 @@ class Convolutional2DLayer(_Layer):
         self._input_size: ImageSize | None = None
         self._output_size: ImageSize | None = None
 
-    def _get_internal_layer(self, **kwargs: Unpack[TypedDict[str, Any]]) -> nn.Module:  # noqa: ARG002
+    def _get_internal_layer(self, **kwargs: Any) -> nn.Module:  # noqa: ARG002
         if self._input_size is None:
             raise ValueError("The input_size is not yet set. The internal layer can only be created when the input_size is set.")
         if "activation_function" not in kwargs:
             raise ValueError("The activation_function is not set. The internal layer can only be created when the activation_function is provided in the kwargs.")
         if kwargs.get("activation_function") not in ["sigmoid", "relu", "softmax"]:
             raise ValueError(f"The activation_function '{kwargs.get('activation_function')}' is not supported. Please choose one of the following: ['sigmoid', 'relu', 'softmax'].")
-        return _create_internal_model(self._input_size.channel, self._output_channel, self._kernel_size, kwargs.get("activation_function"), self._padding, self._stride, transpose=False)
+        else:
+            activation_function: Literal["sigmoid", "relu", "softmax"] = kwargs.get("activation_function")
+        return _create_internal_model(self._input_size.channel, self._output_channel, self._kernel_size, activation_function, self._padding, self._stride, transpose=False)
 
     @property
     def input_size(self) -> ImageSize:
@@ -138,14 +140,16 @@ class ConvolutionalTranspose2DLayer(Convolutional2DLayer):
         super().__init__(output_channel, kernel_size, stride=stride, padding=padding)
         self._output_padding = output_padding
 
-    def _get_internal_layer(self, **kwargs: Unpack[dict[str, Any]]) -> nn.Module:  # noqa: ARG002
+    def _get_internal_layer(self, **kwargs: Any) -> nn.Module:  # noqa: ARG002
         if self._input_size is None:
             raise ValueError("The input_size is not yet set. The internal layer can only be created when the input_size is set.")
         if "activation_function" not in kwargs:
             raise ValueError("The activation_function is not set. The internal layer can only be created when the activation_function is provided in the kwargs.")
         if kwargs.get("activation_function") not in ["sigmoid", "relu", "softmax"]:
             raise ValueError(f"The activation_function '{kwargs.get('activation_function')}' is not supported. Please choose one of the following: ['sigmoid', 'relu', 'softmax'].")
-        return _create_internal_model(self._input_size.channel, self._output_channel, self._kernel_size, kwargs.get("activation_function"), self._padding, self._stride, transpose=True, output_padding=self._output_padding)
+        else:
+            activation_function: Literal["sigmoid", "relu", "softmax"] = kwargs.get("activation_function")
+        return _create_internal_model(self._input_size.channel, self._output_channel, self._kernel_size, activation_function, self._padding, self._stride, transpose=True, output_padding=self._output_padding)
 
     @property
     def output_size(self) -> ImageSize:

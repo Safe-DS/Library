@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Any, TypedDict, Unpack, TypeVar
+from typing import TYPE_CHECKING, Any, TypeVar
 
 from safeds.data.image.containers import ImageList
 from safeds.data.image.containers._single_size_image_list import _SingleSizeImageList
@@ -23,13 +23,13 @@ class _OutputConversionImage(_OutputConversion[ImageList, ImageDataset[T]], ABC)
     """The output conversion for a neural network, defines the output parameters for the neural network."""
 
     @abstractmethod
-    def _data_conversion(self, input_data: ImageList, output_data: Tensor, **kwargs: Unpack[TypedDict[str, Any]]) -> ImageDataset[T]:
+    def _data_conversion(self, input_data: ImageList, output_data: Tensor, **kwargs: Any) -> ImageDataset[T]:
         pass  # pragma: no cover
 
 
 class OutputConversionImageToColumn(_OutputConversionImage[Column]):
 
-    def _data_conversion(self, input_data: ImageList, output_data: Tensor, **kwargs: Unpack[TypedDict[str, Any]]) -> ImageDataset[Column]:
+    def _data_conversion(self, input_data: ImageList, output_data: Tensor, **kwargs: Any) -> ImageDataset[Column]:
         import torch
 
         if not isinstance(input_data, _SingleSizeImageList):
@@ -57,12 +57,12 @@ class OutputConversionImageToColumn(_OutputConversionImage[Column]):
 
 class OutputConversionImageToTable(_OutputConversionImage[Table]):
 
-    def _data_conversion(self, input_data: ImageList, output_data: Tensor, **kwargs: Unpack[TypedDict[str, Any]]) -> ImageDataset[Table]:
+    def _data_conversion(self, input_data: ImageList, output_data: Tensor, **kwargs: Any) -> ImageDataset[Table]:
         import torch
 
         if not isinstance(input_data, _SingleSizeImageList):
             raise ValueError("The given input ImageList contains images of different sizes.")  # noqa: TRY004
-        if "column_names" not in kwargs or not isinstance(kwargs.get("column_names"), list) and all([isinstance(element, str) for element in kwargs.get("column_names")]):
+        if "column_names" not in kwargs or not isinstance(kwargs.get("column_names"), list) and all(isinstance(element, str) for element in kwargs.get("column_names")):
             raise ValueError("The column_names are not set. The data can only be converted if the column_names are provided as `list[str]` in the kwargs.")
         column_names: list[str] = kwargs.get("column_names")
 
@@ -83,7 +83,7 @@ class OutputConversionImageToTable(_OutputConversionImage[Table]):
 class OutputConversionImageToImage(_OutputConversionImage[ImageList]):
 
     def _data_conversion(
-        self, input_data: ImageList, output_data: Tensor, **kwargs: Unpack[TypedDict[str, Any]]  # noqa: ARG002
+        self, input_data: ImageList, output_data: Tensor, **kwargs: Any  # noqa: ARG002
     ) -> ImageDataset[ImageList]:
         import torch
 

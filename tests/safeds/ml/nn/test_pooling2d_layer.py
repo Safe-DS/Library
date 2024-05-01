@@ -36,9 +36,9 @@ class TestPooling2DLayer:
     def test_should_raise_if_input_size_not_set(self, strategy: Literal["max", "avg"]) -> None:
         layer = _Pooling2DLayer(strategy, 2, stride=2, padding=2)
         with pytest.raises(ValueError, match=r"The input_size is not yet set."):
-            layer.input_size  # noqa B018
+            layer.input_size  # noqa: B018
         with pytest.raises(ValueError, match=r"The input_size is not yet set. The layer cannot compute the output_size if the input_size is not set."):
-            layer.output_size  # noqa B018
+            layer.output_size  # noqa: B018
 
     @pytest.mark.parametrize(
         "strategy",

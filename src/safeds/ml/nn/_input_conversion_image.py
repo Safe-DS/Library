@@ -1,11 +1,11 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Type, TypedDict, Any
+from typing import TYPE_CHECKING, Type, Any
 
 from safeds.data.image.containers import ImageList
+from safeds.data.image.containers._single_size_image_list import _SingleSizeImageList
 from safeds.data.labeled.containers import ImageDataset
 from safeds.data.labeled.containers._image_dataset import _ColumnAsTensor, _TableAsTensor
-from safeds.data.image.containers._single_size_image_list import _SingleSizeImageList
 
 if TYPE_CHECKING:
     from safeds.data.image.typing import ImageSize
@@ -67,5 +67,5 @@ class InputConversionImage(_InputConversion[ImageDataset, ImageList]):
     def _is_predict_data_valid(self, input_data: ImageList) -> bool:
         return isinstance(input_data, _SingleSizeImageList) and input_data.sizes[0] == self._input_size
 
-    def _get_output_configuration(self) -> TypedDict[str, Any]:
+    def _get_output_configuration(self) -> dict[str, Any]:
         return {"column_names": self._column_names, "column_name": self._column_name, "one_hot_encoder": self._one_hot_encoder}

@@ -51,7 +51,10 @@ class ImageDataset(Generic[T]):
             self._input_size: ImageSize = ImageSize(input_data.widths[0], input_data.heights[0], input_data.channel)
             self._input: _SingleSizeImageList = input_data._as_single_size_image_list()
         if ((isinstance(output_data, Table) or isinstance(output_data, Column)) and len(input_data) != output_data.number_of_rows) or (isinstance(output_data, ImageList) and len(input_data) != len(output_data)):
-            output_len = output_data.number_of_rows if isinstance(output_data, Table) else len(output_data)
+            if isinstance(output_data, Table):
+                output_len = output_data.number_of_rows
+            else:
+                output_len = len(output_data)
             raise OutputLengthMismatchError(f"{len(input_data)} != {output_len}")
         if isinstance(output_data, Table):
             non_numerical_columns = []
@@ -141,14 +144,12 @@ class ImageDataset(Generic[T]):
             the output data of this dataset
         """
         output = self._output
-        safeds_output: T
         if isinstance(output, _TableAsTensor):
-            safeds_output = output._to_table()
+            return output._to_table()  # type: ignore
         elif isinstance(output, _ColumnAsTensor):
-            safeds_output = output._to_column()
+            return output._to_column()  # type: ignore
         else:
-            safeds_output = output
-        return safeds_output
+            return output  # type: ignore
 
     def _get_batch(self, batch_number: int, batch_size: int | None = None) -> tuple[Tensor, Tensor]:
         import torch
