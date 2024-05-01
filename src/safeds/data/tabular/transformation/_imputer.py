@@ -19,7 +19,7 @@ class Imputer(TableTransformer):
 
     Parameters
     ----------
-    strategy : ImputerStrategy
+    strategy:
         The strategy used to impute missing values. Use the classes nested inside `Imputer.Strategy` to specify it.
 
     Examples
@@ -44,7 +44,7 @@ class Imputer(TableTransformer):
 
             Parameters
             ----------
-            value :
+            value:
                 The given value to impute missing values.
             """
 
@@ -111,7 +111,11 @@ class Imputer(TableTransformer):
                 imputer.strategy = "median"
 
         class Mode(ImputerStrategy):
-            """An imputation strategy for imputing missing data with mode values. The lowest value will be used if there are multiple values with the same highest count."""
+            """
+            An imputation strategy for imputing missing data with mode values.
+
+            The lowest value will be used if there are multiple values with the same highest count.
+            """
 
             def __eq__(self, other: object) -> bool:
                 if not isinstance(other, Imputer.Strategy.Mode):
@@ -141,14 +145,14 @@ class Imputer(TableTransformer):
 
         Parameters
         ----------
-        table : Table
+        table:
             The table used to fit the transformer.
-        column_names : list[str] | None
+        column_names:
             The list of columns from the table used to fit the transformer. If `None`, all columns are used.
 
         Returns
         -------
-        fitted_transformer : TableTransformer
+        fitted_transformer:
             The fitted transformer.
 
         Raises
@@ -223,12 +227,12 @@ class Imputer(TableTransformer):
 
         Parameters
         ----------
-        table : Table
+        table:
             The table to which the learned transformation is applied.
 
         Returns
         -------
-        transformed_table : Table
+        transformed_table:
             The transformed table.
 
         Raises
@@ -272,7 +276,7 @@ class Imputer(TableTransformer):
 
         Returns
         -------
-        added_columns : list[str]
+        added_columns:
             A list of names of the added columns, ordered as they will appear in the table.
 
         Raises
@@ -291,7 +295,7 @@ class Imputer(TableTransformer):
 
         Returns
         -------
-        changed_columns : list[str]
+        changed_columns:
              The list of (potentially) changed column names, as passed to fit.
 
         Raises
@@ -309,7 +313,7 @@ class Imputer(TableTransformer):
 
         Returns
         -------
-        removed_columns : list[str]
+        removed_columns:
             A list of names of the removed columns, ordered as they appear in the table the Imputer was fitted on.
 
         Raises

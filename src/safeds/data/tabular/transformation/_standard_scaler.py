@@ -25,14 +25,14 @@ class StandardScaler(InvertibleTableTransformer):
 
         Parameters
         ----------
-        table : Table
+        table:
             The table used to fit the transformer.
-        column_names : list[str] | None
+        column_names:
             The list of columns from the table used to fit the transformer. If `None`, all columns are used.
 
         Returns
         -------
-        fitted_transformer : TableTransformer
+        fitted_transformer:
             The fitted transformer.
 
         Raises
@@ -90,12 +90,12 @@ class StandardScaler(InvertibleTableTransformer):
 
         Parameters
         ----------
-        table : Table
+        table:
             The table to which the learned transformation is applied.
 
         Returns
         -------
-        transformed_table : Table
+        transformed_table:
             The transformed table.
 
         Raises
@@ -151,12 +151,12 @@ class StandardScaler(InvertibleTableTransformer):
 
         Parameters
         ----------
-        transformed_table : Table
+        transformed_table:
             The table to be transformed back to the original version.
 
         Returns
         -------
-        table : Table
+        table:
             The original table.
 
         Raises
@@ -216,7 +216,7 @@ class StandardScaler(InvertibleTableTransformer):
 
         Returns
         -------
-        added_columns : list[str]
+        added_columns:
             A list of names of the added columns, ordered as they will appear in the table.
 
         Raises
@@ -235,7 +235,7 @@ class StandardScaler(InvertibleTableTransformer):
 
         Returns
         -------
-        changed_columns : list[str]
+        changed_columns:
              The list of (potentially) changed column names, as passed to fit.
 
         Raises
@@ -253,7 +253,7 @@ class StandardScaler(InvertibleTableTransformer):
 
         Returns
         -------
-        removed_columns : list[str]
+        removed_columns:
             A list of names of the removed columns, ordered as they appear in the table the StandardScaler was fitted on.
 
         Raises

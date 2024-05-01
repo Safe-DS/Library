@@ -22,9 +22,9 @@ def fit(model: Any, tagged_table: TaggedTable) -> None:
 
     Parameters
     ----------
-    model
+    model:
         Classifier or Regression from scikit-learn.
-    tagged_table : TaggedTable
+    tagged_table:
         The tagged table containing the feature and target vectors.
 
     Raises
@@ -83,18 +83,18 @@ def predict(model: Any, dataset: Table, feature_names: list[str] | None, target_
 
     Parameters
     ----------
-    model
+    model:
         Classifier or regressor from scikit-learn.
-    dataset : Table
+    dataset:
         The dataset containing the features.
-    target_name : str | None
+    target_name:
         The name of the target column.
-    feature_names : list[str] | None
+    feature_names:
         The names of the feature columns.
 
     Returns
     -------
-    table : TaggedTable
+    table:
         A dataset containing the given features and the predicted target.
 
     Raises

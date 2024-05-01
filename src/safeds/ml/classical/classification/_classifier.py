@@ -36,12 +36,12 @@ class Classifier(ABC):
 
         Parameters
         ----------
-        training_set : TaggedTable
+        training_set:
             The training data containing the feature and target vectors.
 
         Returns
         -------
-        fitted_classifier : Classifier
+        fitted_classifier:
             The fitted classifier.
 
         Raises
@@ -57,12 +57,12 @@ class Classifier(ABC):
 
         Parameters
         ----------
-        dataset : Table
+        dataset:
             The dataset containing the feature vectors.
 
         Returns
         -------
-        table : TaggedTable
+        table:
             A dataset containing the given feature vectors and the predicted target vector.
 
         Raises
@@ -89,7 +89,7 @@ class Classifier(ABC):
 
         Returns
         -------
-        wrapped_classifier: ClassifierMixin
+        wrapped_classifier:
             The sklearn Classifier.
         """
 
@@ -100,12 +100,12 @@ class Classifier(ABC):
 
         Parameters
         ----------
-        validation_or_test_set : TaggedTable
+        validation_or_test_set:
             The validation or test set.
 
         Returns
         -------
-        accuracy : float
+        accuracy:
             The calculated accuracy score, i.e. the percentage of equal data.
 
         Raises
@@ -129,14 +129,14 @@ class Classifier(ABC):
 
         Parameters
         ----------
-        validation_or_test_set : TaggedTable
+        validation_or_test_set:
             The validation or test set.
-        positive_class : Any
+        positive_class:
             The class to be considered positive. All other classes are considered negative.
 
         Returns
         -------
-        precision : float
+        precision:
             The calculated precision score, i.e. the ratio of correctly predicted positives to all predicted positives.
             Return 1 if no positive predictions are made.
         """
@@ -166,14 +166,14 @@ class Classifier(ABC):
 
         Parameters
         ----------
-        validation_or_test_set : TaggedTable
+        validation_or_test_set:
             The validation or test set.
-        positive_class : Any
+        positive_class:
             The class to be considered positive. All other classes are considered negative.
 
         Returns
         -------
-        recall : float
+        recall:
             The calculated recall score, i.e. the ratio of correctly predicted positives to all expected positives.
             Return 1 if there are no positive expectations.
         """
@@ -203,14 +203,14 @@ class Classifier(ABC):
 
         Parameters
         ----------
-        validation_or_test_set : TaggedTable
+        validation_or_test_set:
             The validation or test set.
-        positive_class : Any
+        positive_class:
             The class to be considered positive. All other classes are considered negative.
 
         Returns
         -------
-        f1_score : float
+        f1_score:
             The calculated $F_1$-score, i.e. the harmonic mean between precision and recall.
             Return 1 if there are no positive expectations and predictions.
         """

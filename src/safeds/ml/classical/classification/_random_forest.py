@@ -20,7 +20,7 @@ class RandomForestClassifier(Classifier):
 
     Parameters
     ----------
-    number_of_trees : int
+    number_of_trees:
         The number of trees to be used in the random forest. Has to be greater than 0.
 
     Raises
@@ -57,7 +57,7 @@ class RandomForestClassifier(Classifier):
 
         Returns
         -------
-        result: int
+        result:
             The number of trees.
         """
         return self._number_of_trees
@@ -70,12 +70,12 @@ class RandomForestClassifier(Classifier):
 
         Parameters
         ----------
-        training_set : TaggedTable
+        training_set:
             The training data containing the feature and target vectors.
 
         Returns
         -------
-        fitted_classifier : RandomForestClassifier
+        fitted_classifier:
             The fitted classifier.
 
         Raises
@@ -107,12 +107,12 @@ class RandomForestClassifier(Classifier):
 
         Parameters
         ----------
-        dataset : Table
+        dataset:
             The dataset containing the feature vectors.
 
         Returns
         -------
-        table : TaggedTable
+        table:
             A dataset containing the given feature vectors and the predicted target vector.
 
         Raises
@@ -145,7 +145,7 @@ class RandomForestClassifier(Classifier):
 
         Returns
         -------
-        wrapped_classifier: ClassifierMixin
+        wrapped_classifier:
             The sklearn Classifier.
         """
         from sklearn.ensemble import RandomForestClassifier as sk_RandomForestClassifier

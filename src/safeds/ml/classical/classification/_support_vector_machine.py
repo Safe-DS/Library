@@ -26,8 +26,8 @@ class SupportVectorMachineKernel(ABC):
 
         Returns
         -------
-        object
-        The kernel of the SupportVectorMachine.
+        kernel:
+            The kernel of the SupportVectorMachine.
         """
 
     @abstractmethod
@@ -64,9 +64,9 @@ class SupportVectorMachineClassifier(Classifier):
 
     Parameters
     ----------
-    c: float
+    c:
         The strength of regularization. Must be strictly positive.
-    kernel: SupportVectorMachineKernel | None
+    kernel:
         The type of kernel to be used. Defaults to None.
 
     Raises
@@ -97,7 +97,7 @@ class SupportVectorMachineClassifier(Classifier):
 
         Returns
         -------
-        result: float
+        result:
             The regularization strength.
         """
         return self._c
@@ -109,7 +109,7 @@ class SupportVectorMachineClassifier(Classifier):
 
         Returns
         -------
-        result: SupportVectorMachineKernel | None
+        result:
             The type of kernel used.
         """
         return self._kernel
@@ -122,7 +122,7 @@ class SupportVectorMachineClassifier(Classifier):
 
                 Returns
                 -------
-                result: str
+                result:
                     The name of the linear kernel.
                 """
                 return "linear"
@@ -146,7 +146,7 @@ class SupportVectorMachineClassifier(Classifier):
 
                 Returns
                 -------
-                result: str
+                result:
                     The name of the polynomial kernel.
                 """
                 return "poly"
@@ -177,7 +177,7 @@ class SupportVectorMachineClassifier(Classifier):
 
                 Returns
                 -------
-                result: str
+                result:
                     The name of the sigmoid kernel.
                 """
                 return "sigmoid"
@@ -196,7 +196,7 @@ class SupportVectorMachineClassifier(Classifier):
 
                 Returns
                 -------
-                result: str
+                result:
                     The name of the RBF kernel.
                 """
                 return "rbf"
@@ -214,7 +214,7 @@ class SupportVectorMachineClassifier(Classifier):
 
         Returns
         -------
-        result: str
+        result:
             The name of the kernel.
 
         Raises
@@ -241,12 +241,12 @@ class SupportVectorMachineClassifier(Classifier):
 
         Parameters
         ----------
-        training_set : TaggedTable
+        training_set:
             The training data containing the feature and target vectors.
 
         Returns
         -------
-        fitted_classifier : SupportVectorMachineClassifier
+        fitted_classifier:
             The fitted classifier.
 
         Raises
@@ -278,12 +278,12 @@ class SupportVectorMachineClassifier(Classifier):
 
         Parameters
         ----------
-        dataset : Table
+        dataset:
             The dataset containing the feature vectors.
 
         Returns
         -------
-        table : TaggedTable
+        table:
             A dataset containing the given feature vectors and the predicted target vector.
 
         Raises
@@ -316,7 +316,7 @@ class SupportVectorMachineClassifier(Classifier):
 
         Returns
         -------
-        wrapped_classifier: ClassifierMixin
+        wrapped_classifier:
             The sklearn Classifier.
         """
         from sklearn.svm import SVC as sk_SVC  # noqa: N811

@@ -21,7 +21,7 @@ class ColumnType(ABC):
 
         Parameters
         ----------
-        is_nullable
+        is_nullable:
             Whether the columntype is nullable.
         """
 
@@ -32,12 +32,12 @@ class ColumnType(ABC):
 
         Parameters
         ----------
-        data : pd.Series
+        data:
             The data to be checked.
 
         Returns
         -------
-        column_type : ColumnType
+        column_type:
             The ColumnType.
 
         Raises
@@ -98,7 +98,7 @@ class ColumnType(ABC):
 
         Returns
         -------
-        is_nullable : bool
+        is_nullable:
             True if the column is nullable.
         """
 
@@ -109,7 +109,7 @@ class ColumnType(ABC):
 
         Returns
         -------
-        is_numeric : bool
+        is_numeric:
             True if the column is numeric.
         """
 
@@ -121,7 +121,7 @@ class Anything(ColumnType):
 
     Parameters
     ----------
-    is_nullable : bool
+    is_nullable:
         Whether the type also allows null values.
     """
 
@@ -142,7 +142,7 @@ class Anything(ColumnType):
 
         Returns
         -------
-        is_nullable : bool
+        is_nullable:
             True if the column is nullable.
         """
         return self._is_nullable
@@ -153,7 +153,7 @@ class Anything(ColumnType):
 
         Returns
         -------
-        is_numeric : bool
+        is_numeric:
             True if the column is numeric.
         """
         return False
@@ -166,7 +166,7 @@ class Boolean(ColumnType):
 
     Parameters
     ----------
-    is_nullable : bool
+    is_nullable:
         Whether the type also allows null values.
     """
 
@@ -187,7 +187,7 @@ class Boolean(ColumnType):
 
         Returns
         -------
-        is_nullable : bool
+        is_nullable:
             True if the column is nullable.
         """
         return self._is_nullable
@@ -198,7 +198,7 @@ class Boolean(ColumnType):
 
         Returns
         -------
-        is_numeric : bool
+        is_numeric:
             True if the column is numeric.
         """
         return False
@@ -211,7 +211,7 @@ class RealNumber(ColumnType):
 
     Parameters
     ----------
-    is_nullable : bool
+    is_nullable:
         Whether the type also allows null values.
     """
 
@@ -232,7 +232,7 @@ class RealNumber(ColumnType):
 
         Returns
         -------
-        is_nullable : bool
+        is_nullable:
             True if the column is nullable.
         """
         return self._is_nullable
@@ -243,7 +243,7 @@ class RealNumber(ColumnType):
 
         Returns
         -------
-        is_numeric : bool
+        is_numeric:
             True if the column is numeric.
         """
         return True
@@ -256,7 +256,7 @@ class Integer(ColumnType):
 
     Parameters
     ----------
-    is_nullable : bool
+    is_nullable:
         Whether the type also allows null values.
     """
 
@@ -277,7 +277,7 @@ class Integer(ColumnType):
 
         Returns
         -------
-        is_nullable : bool
+        is_nullable:
             True if the column is nullable.
         """
         return self._is_nullable
@@ -288,7 +288,7 @@ class Integer(ColumnType):
 
         Returns
         -------
-        is_numeric : bool
+        is_numeric:
             True if the column is numeric.
         """
         return True
@@ -301,7 +301,7 @@ class String(ColumnType):
 
     Parameters
     ----------
-    is_nullable : bool
+    is_nullable:
         Whether the type also allows null values.
     """
 
@@ -322,7 +322,7 @@ class String(ColumnType):
 
         Returns
         -------
-        is_nullable : bool
+        is_nullable:
             True if the column is nullable.
         """
         return self._is_nullable
@@ -333,7 +333,7 @@ class String(ColumnType):
 
         Returns
         -------
-        is_numeric : bool
+        is_numeric:
             True if the column is numeric.
         """
         return False
@@ -360,7 +360,7 @@ class Nothing(ColumnType):
 
         Returns
         -------
-        is_nullable : bool
+        is_nullable:
             True if the column is nullable.
         """
         return True
@@ -371,7 +371,7 @@ class Nothing(ColumnType):
 
         Returns
         -------
-        is_numeric : bool
+        is_numeric:
             True if the column is numeric.
         """
         return False

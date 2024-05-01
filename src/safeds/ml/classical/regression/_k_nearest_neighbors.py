@@ -21,7 +21,7 @@ class KNearestNeighborsRegressor(Regressor):
 
     Parameters
     ----------
-    number_of_neighbors : int
+    number_of_neighbors:
         The number of neighbors to use for interpolation. Has to be greater than 0 (validated in the constructor) and
         less than or equal to the sample size (validated when calling `fit`).
 
@@ -59,7 +59,7 @@ class KNearestNeighborsRegressor(Regressor):
 
         Returns
         -------
-        result: int
+        result:
             The number of neighbors.
         """
         return self._number_of_neighbors
@@ -72,12 +72,12 @@ class KNearestNeighborsRegressor(Regressor):
 
         Parameters
         ----------
-        training_set : TaggedTable
+        training_set:
             The training data containing the feature and target vectors.
 
         Returns
         -------
-        fitted_regressor : KNearestNeighborsRegressor
+        fitted_regressor:
             The fitted regressor.
 
         Raises
@@ -121,12 +121,12 @@ class KNearestNeighborsRegressor(Regressor):
 
         Parameters
         ----------
-        dataset : Table
+        dataset:
             The dataset containing the feature vectors.
 
         Returns
         -------
-        table : TaggedTable
+        table:
             A dataset containing the given feature vectors and the predicted target vector.
 
         Raises
@@ -159,7 +159,7 @@ class KNearestNeighborsRegressor(Regressor):
 
         Returns
         -------
-        wrapped_regressor: RegressorMixin
+        wrapped_regressor:
             The sklearn Regressor.
         """
         from sklearn.neighbors import KNeighborsRegressor as sk_KNeighborsRegressor

@@ -34,12 +34,12 @@ class DecisionTreeRegressor(Regressor):
 
         Parameters
         ----------
-        training_set : TaggedTable
+        training_set:
             The training data containing the feature and target vectors.
 
         Returns
         -------
-        fitted_regressor : DecisionTreeRegressor
+        fitted_regressor:
             The fitted regressor.
 
         Raises
@@ -71,12 +71,12 @@ class DecisionTreeRegressor(Regressor):
 
         Parameters
         ----------
-        dataset : Table
+        dataset:
             The dataset containing the feature vectors.
 
         Returns
         -------
-        table : TaggedTable
+        table:
             A dataset containing the given feature vectors and the predicted target vector.
 
         Raises
@@ -109,7 +109,7 @@ class DecisionTreeRegressor(Regressor):
 
         Returns
         -------
-        wrapped_regressor: RegressorMixin
+        wrapped_regressor:
             The sklearn Regressor.
         """
         from sklearn.tree import DecisionTreeRegressor as sk_DecisionTreeRegressor

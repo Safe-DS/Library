@@ -21,10 +21,10 @@ class GradientBoostingRegressor(Regressor):
 
     Parameters
     ----------
-    number_of_trees: int
+    number_of_trees:
         The number of boosting stages to perform. Gradient boosting is fairly robust to over-fitting so a large
         number usually results in better performance.
-    learning_rate : float
+    learning_rate:
         The larger the value, the more the model is influenced by each additional tree. If the learning rate is too
         low, the model might underfit. If the learning rate is too high, the model might overfit.
 
@@ -66,7 +66,7 @@ class GradientBoostingRegressor(Regressor):
 
         Returns
         -------
-        result: int
+        result:
             The number of trees.
         """
         return self._number_of_trees
@@ -78,7 +78,7 @@ class GradientBoostingRegressor(Regressor):
 
         Returns
         -------
-        result: float
+        result:
             The learning rate.
         """
         return self._learning_rate
@@ -91,12 +91,12 @@ class GradientBoostingRegressor(Regressor):
 
         Parameters
         ----------
-        training_set : TaggedTable
+        training_set:
             The training data containing the feature and target vectors.
 
         Returns
         -------
-        fitted_regressor : GradientBoostingRegressor
+        fitted_regressor:
             The fitted regressor.
 
         Raises
@@ -128,12 +128,12 @@ class GradientBoostingRegressor(Regressor):
 
         Parameters
         ----------
-        dataset : Table
+        dataset:
             The dataset containing the feature vectors.
 
         Returns
         -------
-        table : TaggedTable
+        table:
             A dataset containing the given feature vectors and the predicted target vector.
 
         Raises
@@ -166,7 +166,7 @@ class GradientBoostingRegressor(Regressor):
 
         Returns
         -------
-        wrapped_regressor: RegressorMixin
+        wrapped_regressor:
             The sklearn Regressor.
         """
         from sklearn.ensemble import GradientBoostingRegressor as sk_GradientBoostingRegressor

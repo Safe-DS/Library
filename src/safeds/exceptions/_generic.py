@@ -9,13 +9,13 @@ class OutOfBoundsError(ValueError):
 
     Parameters
     ----------
-    actual: float
+    actual:
         The actual value that is outside its expected range.
-    name: str | None
+    name:
         The name of the offending variable.
-    lower_bound: Bound | None
+    lower_bound:
         The lower bound of the expected range. Use None if there is no lower Bound.
-    upper_bound: Bound | None
+    upper_bound:
         The upper bound of the expected range. Use None if there is no upper Bound.
     """
 
@@ -32,13 +32,13 @@ class OutOfBoundsError(ValueError):
 
         Parameters
         ----------
-        actual: float
+        actual:
             The actual value that is outside its expected range.
-        name: str | None
+        name:
             The name of the offending variable.
-        lower_bound: Bound | None
+        lower_bound:
             The lower bound of the expected range. Use None if there is no lower Bound.
-        upper_bound: Bound | None
+        upper_bound:
             The upper bound of the expected range. Use None if there is no upper Bound.
 
         Raises
@@ -94,7 +94,7 @@ class Bound(ABC):
 
     Parameters
     ----------
-    value: float
+    value:
         The value of the Bound.
     """
 
@@ -104,7 +104,7 @@ class Bound(ABC):
 
         Parameters
         ----------
-        value: float
+        value:
             The value of the Bound.
 
         Raises
@@ -142,7 +142,7 @@ class Bound(ABC):
 
         Parameters
         ----------
-        actual: float
+        actual:
             The actual value that should be checked for not exceeding the Bound.
         """
 
@@ -153,7 +153,7 @@ class Bound(ABC):
 
         Parameters
         ----------
-        actual: float
+        actual:
             The actual value that should be checked for not exceeding the Bound.
         """
 
@@ -164,7 +164,7 @@ class ClosedBound(Bound):
 
     Parameters
     ----------
-    value: float
+    value:
         The value of the Bound.
     """
 
@@ -174,7 +174,7 @@ class ClosedBound(Bound):
 
         Parameters
         ----------
-        value: float
+        value:
             The value of the ClosedBound.
 
         Raises
@@ -200,7 +200,7 @@ class ClosedBound(Bound):
 
         Parameters
         ----------
-        actual: float
+        actual:
             The actual value that should be checked for not exceeding the Bound.
         """
         return actual >= self.value
@@ -211,7 +211,7 @@ class ClosedBound(Bound):
 
         Parameters
         ----------
-        actual: float
+        actual:
             The actual value that should be checked for not exceeding the Bound.
         """
         return actual <= self.value
@@ -223,7 +223,7 @@ class OpenBound(Bound):
 
     Parameters
     ----------
-    value: float
+    value:
         The value of the OpenBound.
     """
 
@@ -233,7 +233,7 @@ class OpenBound(Bound):
 
         Parameters
         ----------
-        value: float
+        value:
             The value of the OpenBound.
 
         Raises
@@ -266,7 +266,7 @@ class OpenBound(Bound):
 
         Parameters
         ----------
-        actual: float
+        actual:
             The actual value that should be checked for not exceeding the Bound.
         """
         return actual > self.value
@@ -277,7 +277,7 @@ class OpenBound(Bound):
 
         Parameters
         ----------
-        actual: float
+        actual:
             The actual value that should be checked for not exceeding the Bound.
         """
         return actual < self.value
