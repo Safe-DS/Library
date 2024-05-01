@@ -14,7 +14,8 @@ if TYPE_CHECKING:
     from sklearn.base import RegressorMixin
     from sklearn.linear_model import ElasticNet as sk_ElasticNet
 
-    from safeds.data.tabular.containers import Table, TaggedTable
+    from safeds.data.labeled.containers import TaggedTable
+    from safeds.data.tabular.containers import Table
 
 
 class ElasticNetRegressor(Regressor):

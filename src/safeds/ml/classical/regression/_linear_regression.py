@@ -11,7 +11,8 @@ if TYPE_CHECKING:
     from sklearn.base import RegressorMixin
     from sklearn.linear_model import LinearRegression as sk_LinearRegression
 
-    from safeds.data.tabular.containers import Table, TaggedTable
+    from safeds.data.labeled.containers import TaggedTable
+    from safeds.data.tabular.containers import Table
 
 
 class LinearRegressionRegressor(Regressor):

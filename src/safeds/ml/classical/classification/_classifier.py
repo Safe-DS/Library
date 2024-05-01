@@ -4,7 +4,8 @@ from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
 from safeds._utils import _structural_hash
-from safeds.data.tabular.containers import Table, TaggedTable
+from safeds.data.labeled.containers import TaggedTable
+from safeds.data.tabular.containers import Table
 from safeds.exceptions import UntaggedTableError
 
 if TYPE_CHECKING:

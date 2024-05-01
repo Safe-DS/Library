@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 
 from safeds._utils import _structural_hash
 from safeds.data.image.containers import Image
-from safeds.data.tabular.containers import Column, Row, Table, TaggedTable
+from safeds.data.tabular.containers import Column, Row, Table
 from safeds.exceptions import (
     ColumnIsTargetError,
     ColumnIsTimeError,
@@ -19,6 +19,8 @@ if TYPE_CHECKING:
     from collections.abc import Callable, Mapping, Sequence
     from pathlib import Path
     from typing import Any
+
+    from safeds.data.labeled.containers import TaggedTable
 
 
 class TimeSeries(Table):
@@ -106,7 +108,7 @@ class TimeSeries(Table):
         >>> tagged_table = TaggedTable({"date": ["01.01", "01.02", "01.03", "01.04"], "col1": ["a", "b", "c", "a"]}, "col1" )
         >>> timeseries = TimeSeries._from_tagged_table(tagged_table, time_name = "date")
         """
-        if time_name not in tagged_table.column_names:
+        if time_name not in tagged_table._table.column_names:
             raise UnknownColumnNameError([time_name])
         table = tagged_table._as_table()
         # make sure that the time_name is not part of the features
@@ -234,7 +236,7 @@ class TimeSeries(Table):
 
         Examples
         --------
-        >>> from safeds.data.tabular.containers import TaggedTable
+        >>> from safeds.data.labeled.containers import TaggedTable
         >>> table = TaggedTable({"a": [1, 2, 3], "b": [4, 5, 6]}, "b", ["a"])
         """
         import pandas as pd

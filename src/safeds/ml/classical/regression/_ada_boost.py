@@ -12,7 +12,8 @@ if TYPE_CHECKING:
     from sklearn.base import RegressorMixin
     from sklearn.ensemble import AdaBoostRegressor as sk_AdaBoostRegressor
 
-    from safeds.data.tabular.containers import Table, TaggedTable
+    from safeds.data.labeled.containers import TaggedTable
+    from safeds.data.tabular.containers import Table
 
 
 class AdaBoostRegressor(Regressor):

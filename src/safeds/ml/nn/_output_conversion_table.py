@@ -5,7 +5,8 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from torch import Tensor
 
-from safeds.data.tabular.containers import Column, Table, TaggedTable
+from safeds.data.labeled.containers import TaggedTable
+from safeds.data.tabular.containers import Column, Table
 from safeds.ml.nn._output_conversion import _OutputConversion
 
 

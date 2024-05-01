@@ -11,7 +11,8 @@ if TYPE_CHECKING:
     from sklearn.base import ClassifierMixin
     from sklearn.linear_model import LogisticRegression as sk_LogisticRegression
 
-    from safeds.data.tabular.containers import Table, TaggedTable
+    from safeds.data.labeled.containers import TaggedTable
+    from safeds.data.tabular.containers import Table
 
 
 class LogisticRegressionClassifier(Classifier):

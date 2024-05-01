@@ -1,5 +1,6 @@
 import pytest
-from safeds.data.tabular.containers import Table, TaggedTable, TimeSeries
+from safeds.data.labeled.containers import TaggedTable
+from safeds.data.tabular.containers import Table, TimeSeries
 from safeds.exceptions import UnknownColumnNameError
 
 

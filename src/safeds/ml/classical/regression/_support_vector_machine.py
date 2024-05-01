@@ -13,7 +13,8 @@ if TYPE_CHECKING:
     from sklearn.base import RegressorMixin
     from sklearn.svm import SVR as sk_SVR  # noqa: N811
 
-    from safeds.data.tabular.containers import Table, TaggedTable
+    from safeds.data.labeled.containers import TaggedTable
+    from safeds.data.tabular.containers import Table
 
 
 class SupportVectorMachineKernel(ABC):

@@ -3,7 +3,8 @@ from __future__ import annotations
 import copy
 from typing import TYPE_CHECKING, Generic, Self, TypeVar
 
-from safeds.data.tabular.containers import Table, TaggedTable, TimeSeries
+from safeds.data.labeled.containers import TaggedTable
+from safeds.data.tabular.containers import Table, TimeSeries
 from safeds.exceptions import (
     ClosedBound,
     FeatureDataMismatchError,

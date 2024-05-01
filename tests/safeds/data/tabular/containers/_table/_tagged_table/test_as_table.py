@@ -1,5 +1,6 @@
 import pytest
-from safeds.data.tabular.containers import Table, TaggedTable
+from safeds.data.labeled.containers import TaggedTable
+from safeds.data.tabular.containers import Table
 
 
 @pytest.mark.parametrize(

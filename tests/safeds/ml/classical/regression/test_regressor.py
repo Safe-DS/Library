@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, Any
 
 import pandas as pd
 import pytest
-from safeds.data.tabular.containers import Column, Table, TaggedTable
+from safeds.data.tabular.containers import Column, Table
 from safeds.exceptions import (
     ColumnLengthMismatchError,
     DatasetContainsTargetError,
@@ -35,6 +35,7 @@ from safeds.ml.classical.regression._regressor import _check_metrics_preconditio
 
 if TYPE_CHECKING:
     from _pytest.fixtures import FixtureRequest
+    from safeds.data.labeled.containers import TaggedTable
     from sklearn.base import RegressorMixin
 
 
@@ -193,7 +194,7 @@ class TestPredict:
     def test_should_raise_if_dataset_contains_target(self, regressor: Regressor, valid_data: TaggedTable) -> None:
         fitted_regressor = regressor.fit(valid_data)
         with pytest.raises(DatasetContainsTargetError, match="target"):
-            fitted_regressor.predict(valid_data)
+            fitted_regressor.predict(valid_data._as_table())
 
     def test_should_raise_if_dataset_misses_features(self, regressor: Regressor, valid_data: TaggedTable) -> None:
         fitted_regressor = regressor.fit(valid_data)

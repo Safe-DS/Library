@@ -30,9 +30,9 @@ if TYPE_CHECKING:
     import pandas as pd
     from torch.utils.data import DataLoader, Dataset
 
+    from safeds.data.labeled.containers import TaggedTable
     from safeds.data.tabular.transformation import InvertibleTableTransformer, TableTransformer
 
-    from ._tagged_table import TaggedTable
     from ._time_series import TimeSeries
 
 
@@ -1779,11 +1779,11 @@ class Table:
 
         Examples
         --------
-        >>> from safeds.data.tabular.containers import Table, TaggedTable
-        >>> table = Table.from_dict({"item": ["apple", "milk", "beer"], "price": [1.10, 1.19, 1.79], "amount_bought": [74, 72, 51]})
+        >>> from safeds.data.tabular.containers import Table
+        >>> table = Table({"item": ["apple", "milk", "beer"], "price": [1.10, 1.19, 1.79], "amount_bought": [74, 72, 51]})
         >>> tagged_table = table.tag_columns(target_name="amount_bought", feature_names=["item", "price"])
         """
-        from ._tagged_table import TaggedTable
+        from safeds.data.labeled.containers._tagged_table import TaggedTable
 
         return TaggedTable._from_table(self, target_name, feature_names)
 

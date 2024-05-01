@@ -12,7 +12,8 @@ if TYPE_CHECKING:
     from sklearn.base import ClassifierMixin
     from sklearn.ensemble import RandomForestClassifier as sk_RandomForestClassifier
 
-    from safeds.data.tabular.containers import Table, TaggedTable
+    from safeds.data.labeled.containers import TaggedTable
+    from safeds.data.tabular.containers import Table
 
 
 class RandomForestClassifier(Classifier):

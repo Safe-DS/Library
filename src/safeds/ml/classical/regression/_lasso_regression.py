@@ -13,7 +13,8 @@ if TYPE_CHECKING:
     from sklearn.base import RegressorMixin
     from sklearn.linear_model import Lasso as sk_Lasso
 
-    from safeds.data.tabular.containers import Table, TaggedTable
+    from safeds.data.labeled.containers import TaggedTable
+    from safeds.data.tabular.containers import Table
 
 
 class LassoRegressor(Regressor):

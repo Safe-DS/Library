@@ -1,7 +1,8 @@
 from typing import Any
 
 import pytest
-from safeds.data.tabular.containers import Row, Table, TaggedTable, TimeSeries
+from safeds.data.labeled.containers import TaggedTable
+from safeds.data.tabular.containers import Row, Table, TimeSeries
 
 
 @pytest.mark.parametrize(
@@ -96,5 +97,5 @@ def test_should_return_true_if_objects_are_identical(table1: TimeSeries) -> None
         "TimeSeries vs. TaggedTable",
     ],
 )
-def test_should_return_not_implemented_if_other_is_not_tagged_table(table: TimeSeries, other: Any) -> None:
+def test_should_return_not_implemented_if_other_is_not_time_series(table: TimeSeries, other: Any) -> None:
     assert (table.__eq__(other)) is NotImplemented

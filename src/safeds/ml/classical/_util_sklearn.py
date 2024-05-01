@@ -1,7 +1,8 @@
 import warnings
 from typing import Any
 
-from safeds.data.tabular.containers import Table, TaggedTable
+from safeds.data.labeled.containers import TaggedTable
+from safeds.data.tabular.containers import Table
 from safeds.exceptions import (
     DatasetContainsTargetError,
     DatasetMissesDataError,
@@ -43,7 +44,7 @@ def fit(model: Any, tagged_table: TaggedTable) -> None:
     if not isinstance(tagged_table, TaggedTable) and isinstance(tagged_table, Table):
         raise UntaggedTableError
 
-    if tagged_table.number_of_rows == 0:
+    if tagged_table._table.number_of_rows == 0:
         raise DatasetMissesDataError
 
     non_numerical_column_names = set(tagged_table.features.column_names) - set(

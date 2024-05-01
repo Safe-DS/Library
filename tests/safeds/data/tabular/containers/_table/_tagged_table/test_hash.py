@@ -1,7 +1,5 @@
-from typing import Any
-
 import pytest
-from safeds.data.tabular.containers import Row, Table, TaggedTable
+from safeds.data.labeled.containers import TaggedTable
 
 
 @pytest.mark.parametrize(
@@ -33,7 +31,7 @@ def test_should_return_same_hash_for_equal_tagged_tables(table1: TaggedTable, ta
         "different target",
         "different column names",
         "different types",
-        "different features"
+        "different features",
     ],
 )
 def test_should_return_different_hash_for_unequal_tagged_tables(table1: TaggedTable, table2: TaggedTable) -> None:

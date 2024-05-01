@@ -3,7 +3,9 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from safeds._utils import _structural_hash
-from safeds.exceptions import ClosedBound, DatasetMissesDataError, OutOfBoundsError
+from safeds.data.labeled.containers import TaggedTable
+from safeds.data.tabular.containers import Table
+from safeds.exceptions import ClosedBound, DatasetMissesDataError, OutOfBoundsError, UntaggedTableError
 from safeds.ml.classical._util_sklearn import fit, predict
 
 from ._classifier import Classifier
@@ -11,8 +13,6 @@ from ._classifier import Classifier
 if TYPE_CHECKING:
     from sklearn.base import ClassifierMixin
     from sklearn.neighbors import KNeighborsClassifier as sk_KNeighborsClassifier
-
-    from safeds.data.tabular.containers import Table, TaggedTable
 
 
 class KNearestNeighborsClassifier(Classifier):
@@ -95,13 +95,15 @@ class KNearestNeighborsClassifier(Classifier):
         DatasetMissesDataError
             If the training data contains no rows.
         """
-        if training_set.number_of_rows == 0:
+        if not isinstance(training_set, TaggedTable) and isinstance(training_set, Table):
+            raise UntaggedTableError
+        if training_set._table.number_of_rows == 0:
             raise DatasetMissesDataError
-        if self._number_of_neighbors > training_set.number_of_rows:
+        if self._number_of_neighbors > training_set._table.number_of_rows:
             raise ValueError(
                 (
                     f"The parameter 'number_of_neighbors' ({self._number_of_neighbors}) has to be less than or equal to"
-                    f" the sample size ({training_set.number_of_rows})."
+                    f" the sample size ({training_set._table.number_of_rows})."
                 ),
             )
         wrapped_classifier = self._get_sklearn_classifier()

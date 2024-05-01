@@ -12,7 +12,8 @@ if TYPE_CHECKING:
     from sklearn.base import RegressorMixin
     from sklearn.ensemble import RandomForestRegressor as sk_RandomForestRegressor
 
-    from safeds.data.tabular.containers import Table, TaggedTable
+    from safeds.data.labeled.containers import TaggedTable
+    from safeds.data.tabular.containers import Table
 
 
 class RandomForestRegressor(Regressor):

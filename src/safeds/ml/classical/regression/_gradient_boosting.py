@@ -12,7 +12,8 @@ if TYPE_CHECKING:
     from sklearn.base import RegressorMixin
     from sklearn.ensemble import GradientBoostingRegressor as sk_GradientBoostingRegressor
 
-    from safeds.data.tabular.containers import Table, TaggedTable
+    from safeds.data.labeled.containers import TaggedTable
+    from safeds.data.tabular.containers import Table
 
 
 class GradientBoostingRegressor(Regressor):

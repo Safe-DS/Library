@@ -13,7 +13,8 @@ if TYPE_CHECKING:
     from sklearn.base import ClassifierMixin
     from sklearn.svm import SVC as sk_SVC  # noqa: N811
 
-    from safeds.data.tabular.containers import Table, TaggedTable
+    from safeds.data.labeled.containers import TaggedTable
+    from safeds.data.tabular.containers import Table
 
 
 class SupportVectorMachineKernel(ABC):

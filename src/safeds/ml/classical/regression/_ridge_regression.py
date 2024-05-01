@@ -13,7 +13,8 @@ if TYPE_CHECKING:
     from sklearn.base import RegressorMixin
     from sklearn.linear_model import Ridge as sk_Ridge
 
-    from safeds.data.tabular.containers import Table, TaggedTable
+    from safeds.data.labeled.containers import TaggedTable
+    from safeds.data.tabular.containers import Table
 
 
 class RidgeRegressor(Regressor):

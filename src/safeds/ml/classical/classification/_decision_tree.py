@@ -11,7 +11,8 @@ if TYPE_CHECKING:
     from sklearn.base import ClassifierMixin
     from sklearn.tree import DecisionTreeClassifier as sk_DecisionTreeClassifier
 
-    from safeds.data.tabular.containers import Table, TaggedTable
+    from safeds.data.labeled.containers import TaggedTable
+    from safeds.data.tabular.containers import Table
 
 
 class DecisionTreeClassifier(Classifier):

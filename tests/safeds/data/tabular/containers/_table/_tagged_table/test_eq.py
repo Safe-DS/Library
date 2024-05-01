@@ -1,7 +1,8 @@
 from typing import Any
 
 import pytest
-from safeds.data.tabular.containers import Row, Table, TaggedTable
+from safeds.data.labeled.containers import TaggedTable
+from safeds.data.tabular.containers import Row, Table
 
 
 @pytest.mark.parametrize(

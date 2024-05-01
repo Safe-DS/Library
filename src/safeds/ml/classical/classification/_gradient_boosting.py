@@ -12,7 +12,8 @@ if TYPE_CHECKING:
     from sklearn.base import ClassifierMixin
     from sklearn.ensemble import GradientBoostingClassifier as sk_GradientBoostingClassifier
 
-    from safeds.data.tabular.containers import Table, TaggedTable
+    from safeds.data.labeled.containers import TaggedTable
+    from safeds.data.tabular.containers import Table
 
 
 class GradientBoostingClassifier(Classifier):

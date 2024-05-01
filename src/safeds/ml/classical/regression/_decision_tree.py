@@ -11,7 +11,8 @@ if TYPE_CHECKING:
     from sklearn.base import RegressorMixin
     from sklearn.tree import DecisionTreeRegressor as sk_DecisionTreeRegressor
 
-    from safeds.data.tabular.containers import Table, TaggedTable
+    from safeds.data.labeled.containers import TaggedTable
+    from safeds.data.tabular.containers import Table
 
 
 class DecisionTreeRegressor(Regressor):

@@ -42,7 +42,7 @@ class TaggedTable:
 
     Examples
     --------
-    >>> from safeds.data.tabular.containers import Table, TaggedTable
+    >>> from safeds.data.tabular.containers import Table
     >>> table = Table({"col1": ["a", "b"], "col2": [1, 2]})
     >>> tagged_table = table.tag_columns("col2", ["col1"])
     """
@@ -85,7 +85,8 @@ class TaggedTable:
 
         Examples
         --------
-        >>> from safeds.data.tabular.containers import Table, TaggedTable
+        >>> from safeds.data.labeled.containers import TaggedTable
+        >>> from safeds.data.tabular.containers import Table
         >>> table = Table({"col1": ["a", "b", "c", "a"], "col2": [1, 2, 3, 4]})
         >>> tagged_table = TaggedTable._from_table(table, "col2", ["col1"])
         """
@@ -107,8 +108,7 @@ class TaggedTable:
         # Create result
         result = object.__new__(TaggedTable)
 
-        result._data = table._data
-        result._schema = table.schema
+        result._table = table
         result._features = table.keep_only_columns(feature_names)
         result._target = table.get_column(target_name)
 
@@ -147,7 +147,7 @@ class TaggedTable:
 
         Examples
         --------
-        >>> from safeds.data.tabular.containers import TaggedTable
+        >>> from safeds.data.labeled.containers import TaggedTable
         >>> table = TaggedTable({"a": [1, 2, 3], "b": [4, 5, 6]}, "b", ["a"])
         """
         self._table = Table(data)
