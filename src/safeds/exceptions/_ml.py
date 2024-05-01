@@ -4,7 +4,7 @@ class DatasetContainsTargetError(ValueError):
 
     Parameters
     ----------
-    target_name: str
+    target_name:
         The name of the target column.
     """
 
@@ -18,7 +18,7 @@ class DatasetMissesFeaturesError(ValueError):
 
     Parameters
     ----------
-    missing_feature_names: list[str]
+    missing_feature_names:
         The names of the missing feature columns.
     """
 
@@ -39,7 +39,7 @@ class LearningError(Exception):
 
     Parameters
     ----------
-    reason: str
+    reason:
         The reason for the error.
     """
 
@@ -60,7 +60,7 @@ class PredictionError(Exception):
 
     Parameters
     ----------
-    reason: str
+    reason:
         The reason for the error.
     """
 

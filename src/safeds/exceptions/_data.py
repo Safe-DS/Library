@@ -12,7 +12,7 @@ class UnknownColumnNameError(KeyError):
 
     Parameters
     ----------
-    column_names : list[str]
+    column_names:
         The name of the column that was tried to be accessed.
     """
 
@@ -59,7 +59,7 @@ class DuplicateColumnNameError(Exception):
 
     Parameters
     ----------
-    column_name : str
+    column_name:
         The name of the column that resulted in a duplicate.
     """
 
@@ -73,7 +73,7 @@ class IndexOutOfBoundsError(IndexError):
 
     Parameters
     ----------
-    index : int | list[int] | slice
+    index:
         The wrongly used index.
     """
 
@@ -96,7 +96,7 @@ class DuplicateIndexError(IndexError):
 
     Parameters
     ----------
-    index : int
+    index:
         The wrongly added index.
     """
 
@@ -110,9 +110,9 @@ class ColumnSizeError(Exception):
 
     Parameters
     ----------
-    expected_size : str
+    expected_size:
         The expected size of the column as an expression (e.g. 2, >0, !=0).
-    actual_size : str
+    actual_size:
         The actual size of the column as an expression (e.g. 2, >0, !=0).
     """
 
