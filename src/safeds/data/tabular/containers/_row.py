@@ -476,8 +476,10 @@ class Row(Mapping[str, Any]):
 
     def sort_columns(
         self,
-        comparator: Callable[[str, Any, str, Any], int] =
-            lambda name_1, _value_1, name_2, _value_2: (name_1[0] > name_2[0]) - (name_1[0] < name_2[0]),
+        comparator: Callable[[str, Any, str, Any], int] = lambda name_1, _value_1, name_2, _value_2: (
+            name_1[0] > name_2[0]
+        )
+        - (name_1[0] < name_2[0]),
     ) -> Row:
         """
         Sort the columns of a `Row` with the given comparator and return a new `Row`.
@@ -507,6 +509,7 @@ class Row(Mapping[str, Any]):
         new_row:
             A new row with sorted columns.
         """
+
         def cmp(column_1: tuple[str, Any], column_2: tuple[str, Any]) -> int:
             return comparator(column_1[0], column_1[1], column_2[0], column_2[1])
 
