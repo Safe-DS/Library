@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 
 from safeds._utils import _structural_hash
 from safeds.data.image.containers import Image
-from safeds.data.tabular.containers import Column, Row, Table, TaggedTable
+from safeds.data.tabular.containers import Column, Row, Table
 from safeds.exceptions import (
     ColumnIsTargetError,
     ColumnIsTimeError,
@@ -19,6 +19,8 @@ if TYPE_CHECKING:
     from collections.abc import Callable, Mapping, Sequence
     from pathlib import Path
     from typing import Any
+
+    from safeds.data.labeled.containers import TabularDataset
 
 
 class TimeSeries(Table):
@@ -75,16 +77,16 @@ class TimeSeries(Table):
         )
 
     @staticmethod
-    def _from_tagged_table(
-        tagged_table: TaggedTable,
+    def _from_tabular_dataset(
+        tabular_dataset: TabularDataset,
         time_name: str,
     ) -> TimeSeries:
-        """Create a time series from a tagged table.
+        """Create a time series from a tabular dataset.
 
         Parameters
         ----------
-        tagged_table:
-            The tagged table.
+        tabular_dataset:
+            The tabular dataset.
         time_name:
             Name of the time column.
 
@@ -102,27 +104,28 @@ class TimeSeries(Table):
 
         Examples
         --------
+        >>> from safeds.data.labeled.containers import TabularDataset
         >>> from safeds.data.tabular.containers import Table, TimeSeries
-        >>> tagged_table = TaggedTable({"date": ["01.01", "01.02", "01.03", "01.04"], "col1": ["a", "b", "c", "a"]}, "col1" )
-        >>> timeseries = TimeSeries._from_tagged_table(tagged_table, time_name = "date")
+        >>> tabular_dataset = TabularDataset({"date": ["01.01", "01.02", "01.03", "01.04"], "col1": ["a", "b", "c", "a"]}, "col1" )
+        >>> timeseries = TimeSeries._from_tabular_dataset(tabular_dataset, time_name = "date")
         """
-        if time_name not in tagged_table.column_names:
+        if time_name not in tabular_dataset._table.column_names:
             raise UnknownColumnNameError([time_name])
-        table = tagged_table._as_table()
+        table = tabular_dataset.to_table()
         # make sure that the time_name is not part of the features
         result = object.__new__(TimeSeries)
-        feature_names = tagged_table.features.column_names
+        feature_names = tabular_dataset.features.column_names
         if time_name in feature_names:
             feature_names.remove(time_name)
 
-        if time_name == tagged_table.target.name:
+        if time_name == tabular_dataset.target.name:
             raise ValueError(f"Column '{time_name}' cannot be both time column and target.")
 
         result._data = table._data
         result._schema = table.schema
         result._time = table.get_column(time_name)
         result._features = table.keep_only_columns(feature_names)
-        result._target = table.get_column(tagged_table.target.name)
+        result._target = table.get_column(tabular_dataset.target.name)
         return result
 
     @staticmethod
@@ -234,8 +237,8 @@ class TimeSeries(Table):
 
         Examples
         --------
-        >>> from safeds.data.tabular.containers import TaggedTable
-        >>> table = TaggedTable({"a": [1, 2, 3], "b": [4, 5, 6]}, "b", ["a"])
+        >>> from safeds.data.labeled.containers import TabularDataset
+        >>> table = TabularDataset({"a": [1, 2, 3], "b": [4, 5, 6]}, "b", ["a"])
         """
         import pandas as pd
 
@@ -318,7 +321,7 @@ class TimeSeries(Table):
     @property
     def target(self) -> Column:
         """
-        Get the target column of the tagged table.
+        Get the target column of the time series.
 
         Returns
         -------
@@ -330,7 +333,7 @@ class TimeSeries(Table):
     @property
     def features(self) -> Table:
         """
-        Get the feature columns of the tagged table.
+        Get the feature columns of the time series.
 
         Returns
         -------
@@ -352,11 +355,11 @@ class TimeSeries(Table):
         return self._time
 
     # ------------------------------------------------------------------------------------------------------------------
-    # Overriden methods from TaggedTable class:
+    # Overridden methods from Table class
     # ------------------------------------------------------------------------------------------------------------------
     def _as_table(self: TimeSeries) -> Table:
         """
-        Return a new `Table` with the tagging removed.
+        Return a new plain `Table`.
 
         The original time series is not modified.
 
@@ -368,7 +371,8 @@ class TimeSeries(Table):
         Returns
         -------
         table:
-            The time series as an untagged Table, i.e. without the information about which columns are features, target or time.
+            The time series as an plain Table, i.e. without the information about which columns are features, target or
+            time.
 
         """
         return Table.from_columns(super().to_columns())

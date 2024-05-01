@@ -1,7 +1,8 @@
 import sys
 
 import pytest
-from safeds.data.tabular.containers import Table, TaggedTable
+from safeds.data.labeled.containers import TabularDataset
+from safeds.data.tabular.containers import Table
 from safeds.exceptions import OutOfBoundsError
 from safeds.ml.classical.regression import SupportVectorMachineRegressor
 from safeds.ml.classical.regression._support_vector_machine import SupportVectorMachineKernel
@@ -28,17 +29,17 @@ def kernels() -> list[SupportVectorMachineKernel]:
 
 
 @pytest.fixture()
-def training_set() -> TaggedTable:
+def training_set() -> TabularDataset:
     table = Table({"col1": [1, 2, 3, 4], "col2": [1, 2, 3, 4]})
-    return table.tag_columns(target_name="col1", feature_names=["col2"])
+    return table.to_tabular_dataset(target_name="col1", feature_names=["col2"])
 
 
 class TestC:
-    def test_should_be_passed_to_fitted_model(self, training_set: TaggedTable) -> None:
+    def test_should_be_passed_to_fitted_model(self, training_set: TabularDataset) -> None:
         fitted_model = SupportVectorMachineRegressor(c=2).fit(training_set=training_set)
         assert fitted_model.c == 2
 
-    def test_should_be_passed_to_sklearn(self, training_set: TaggedTable) -> None:
+    def test_should_be_passed_to_sklearn(self, training_set: TabularDataset) -> None:
         fitted_model = SupportVectorMachineRegressor(c=2).fit(training_set)
         assert fitted_model._wrapped_regressor is not None
         assert fitted_model._wrapped_regressor.C == 2
@@ -50,12 +51,12 @@ class TestC:
 
 
 class TestKernel:
-    def test_should_be_passed_to_fitted_model(self, training_set: TaggedTable) -> None:
+    def test_should_be_passed_to_fitted_model(self, training_set: TabularDataset) -> None:
         kernel = SupportVectorMachineRegressor.Kernel.Linear()
         fitted_model = SupportVectorMachineRegressor(c=2, kernel=kernel).fit(training_set=training_set)
         assert isinstance(fitted_model.kernel, SupportVectorMachineRegressor.Kernel.Linear)
 
-    def test_should_be_passed_to_sklearn(self, training_set: TaggedTable) -> None:
+    def test_should_be_passed_to_sklearn(self, training_set: TabularDataset) -> None:
         kernel = SupportVectorMachineRegressor.Kernel.Linear()
         fitted_model = SupportVectorMachineRegressor(c=2, kernel=kernel).fit(training_set)
         assert fitted_model._wrapped_regressor is not None

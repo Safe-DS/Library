@@ -12,7 +12,8 @@ if TYPE_CHECKING:
     from sklearn.base import RegressorMixin
     from sklearn.ensemble import AdaBoostRegressor as sk_AdaBoostRegressor
 
-    from safeds.data.tabular.containers import Table, TaggedTable
+    from safeds.data.labeled.containers import TabularDataset
+    from safeds.data.tabular.containers import Table
 
 
 class AdaBoostRegressor(Regressor):
@@ -108,7 +109,7 @@ class AdaBoostRegressor(Regressor):
         """
         return self._learning_rate
 
-    def fit(self, training_set: TaggedTable) -> AdaBoostRegressor:
+    def fit(self, training_set: TabularDataset) -> AdaBoostRegressor:
         """
         Create a copy of this regressor and fit it with the given training data.
 
@@ -128,8 +129,8 @@ class AdaBoostRegressor(Regressor):
         ------
         LearningError
             If the training data contains invalid values or if the training failed.
-        UntaggedTableError
-            If the table is untagged.
+        TypeError
+            If a table is passed instead of a tabular dataset.
         NonNumericColumnError
             If the training data contains non-numerical values.
         MissingValuesColumnError
@@ -151,7 +152,7 @@ class AdaBoostRegressor(Regressor):
 
         return result
 
-    def predict(self, dataset: Table) -> TaggedTable:
+    def predict(self, dataset: Table) -> TabularDataset:
         """
         Predict a target vector using a dataset containing feature vectors. The model has to be trained first.
 

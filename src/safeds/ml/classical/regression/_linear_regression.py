@@ -11,7 +11,8 @@ if TYPE_CHECKING:
     from sklearn.base import RegressorMixin
     from sklearn.linear_model import LinearRegression as sk_LinearRegression
 
-    from safeds.data.tabular.containers import Table, TaggedTable
+    from safeds.data.labeled.containers import TabularDataset
+    from safeds.data.tabular.containers import Table
 
 
 class LinearRegressionRegressor(Regressor):
@@ -26,7 +27,7 @@ class LinearRegressionRegressor(Regressor):
         self._feature_names: list[str] | None = None
         self._target_name: str | None = None
 
-    def fit(self, training_set: TaggedTable) -> LinearRegressionRegressor:
+    def fit(self, training_set: TabularDataset) -> LinearRegressionRegressor:
         """
         Create a copy of this regressor and fit it with the given training data.
 
@@ -46,8 +47,8 @@ class LinearRegressionRegressor(Regressor):
         ------
         LearningError
             If the training data contains invalid values or if the training failed.
-        UntaggedTableError
-            If the table is untagged.
+        TypeError
+            If a table is passed instead of a tabular dataset.
         NonNumericColumnError
             If the training data contains non-numerical values.
         MissingValuesColumnError
@@ -65,7 +66,7 @@ class LinearRegressionRegressor(Regressor):
 
         return result
 
-    def predict(self, dataset: Table) -> TaggedTable:
+    def predict(self, dataset: Table) -> TabularDataset:
         """
         Predict a target vector using a dataset containing feature vectors. The model has to be trained first.
 

@@ -5,11 +5,12 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from torch.utils.data import DataLoader
 
-from safeds.data.tabular.containers import Table, TaggedTable
+from safeds.data.labeled.containers import TabularDataset
+from safeds.data.tabular.containers import Table
 from safeds.ml.nn._input_conversion import _InputConversion
 
 
-class InputConversionTable(_InputConversion[TaggedTable, Table]):
+class InputConversionTable(_InputConversion[TabularDataset, Table]):
     """The input conversion for a neural network, defines the input parameters for the neural network."""
 
     def __init__(self, feature_names: list[str], target_name: str) -> None:
@@ -30,7 +31,7 @@ class InputConversionTable(_InputConversion[TaggedTable, Table]):
     def _data_size(self) -> int:
         return len(self._feature_names)
 
-    def _data_conversion_fit(self, input_data: TaggedTable, batch_size: int, num_of_classes: int = 1) -> DataLoader:
+    def _data_conversion_fit(self, input_data: TabularDataset, batch_size: int, num_of_classes: int = 1) -> DataLoader:
         return input_data._into_dataloader_with_classes(
             batch_size,
             num_of_classes,
@@ -39,7 +40,7 @@ class InputConversionTable(_InputConversion[TaggedTable, Table]):
     def _data_conversion_predict(self, input_data: Table, batch_size: int) -> DataLoader:
         return input_data._into_dataloader(batch_size)
 
-    def _is_fit_data_valid(self, input_data: TaggedTable) -> bool:
+    def _is_fit_data_valid(self, input_data: TabularDataset) -> bool:
         return (sorted(input_data.features.column_names)).__eq__(sorted(self._feature_names))
 
     def _is_predict_data_valid(self, input_data: Table) -> bool:

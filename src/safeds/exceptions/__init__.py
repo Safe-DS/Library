@@ -37,8 +37,8 @@ if TYPE_CHECKING:
         LearningError,
         ModelNotFittedError,
         NonTimeSeriesError,
+        PlainTableError,
         PredictionError,
-        UntaggedTableError,
     )
 
 apipkg.initpkg(
@@ -71,8 +71,8 @@ apipkg.initpkg(
         "LearningError": "._ml:LearningError",
         "ModelNotFittedError": "._ml:ModelNotFittedError",
         "NonTimeSeriesError": "._ml:NonTimeSeriesError",
+        "PlainTableError": "._ml:PlainTableError",
         "PredictionError": "._ml:PredictionError",
-        "UntaggedTableError": "._ml:UntaggedTableError",
         # Other
         "Bound": "._generic:Bound",
         "ClosedBound": "._generic:ClosedBound",
@@ -108,8 +108,8 @@ __all__ = [
     "LearningError",
     "ModelNotFittedError",
     "NonTimeSeriesError",
+    "PlainTableError",
     "PredictionError",
-    "UntaggedTableError",
     # Other
     "Bound",
     "ClosedBound",

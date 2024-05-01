@@ -13,7 +13,8 @@ if TYPE_CHECKING:
     from sklearn.base import RegressorMixin
     from sklearn.linear_model import Ridge as sk_Ridge
 
-    from safeds.data.tabular.containers import Table, TaggedTable
+    from safeds.data.labeled.containers import TabularDataset
+    from safeds.data.tabular.containers import Table
 
 
 class RidgeRegressor(Regressor):
@@ -68,7 +69,7 @@ class RidgeRegressor(Regressor):
         """
         return self._alpha
 
-    def fit(self, training_set: TaggedTable) -> RidgeRegressor:
+    def fit(self, training_set: TabularDataset) -> RidgeRegressor:
         """
         Create a copy of this regressor and fit it with the given training data.
 
@@ -88,8 +89,8 @@ class RidgeRegressor(Regressor):
         ------
         LearningError
             If the training data contains invalid values or if the training failed.
-        UntaggedTableError
-            If the table is untagged.
+        TypeError
+            If a table is passed instead of a tabular dataset.
         NonNumericColumnError
             If the training data contains non-numerical values.
         MissingValuesColumnError
@@ -107,7 +108,7 @@ class RidgeRegressor(Regressor):
 
         return result
 
-    def predict(self, dataset: Table) -> TaggedTable:
+    def predict(self, dataset: Table) -> TabularDataset:
         """
         Predict a target vector using a dataset containing feature vectors. The model has to be trained first.
 

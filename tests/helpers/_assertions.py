@@ -1,5 +1,6 @@
 import pytest
-from safeds.data.tabular.containers import Table, TaggedTable, TimeSeries
+from safeds.data.labeled.containers import TabularDataset
+from safeds.data.tabular.containers import Table, TimeSeries
 
 
 def assert_that_tables_are_close(table1: Table, table2: Table) -> None:
@@ -24,18 +25,18 @@ def assert_that_tables_are_close(table1: Table, table2: Table) -> None:
             assert entry_1 == pytest.approx(entry_2)
 
 
-def assert_that_tagged_tables_are_equal(table1: TaggedTable, table2: TaggedTable) -> None:
+def assert_that_tabular_datasets_are_equal(table1: TabularDataset, table2: TabularDataset) -> None:
     """
-    Assert that two tagged tables are equal.
+    Assert that two tabular datasets are equal.
 
     Parameters
     ----------
-    table1: TaggedTable
+    table1: TabularDataset
         The first table.
-    table2: TaggedTable
+    table2: TabularDataset
         The table to compare the first table to.
     """
-    assert table1.schema == table2.schema
+    assert table1._table.schema == table2._table.schema
     assert table1.features == table2.features
     assert table1.target == table2.target
     assert table1 == table2

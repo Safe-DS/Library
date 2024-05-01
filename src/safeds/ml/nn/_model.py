@@ -3,7 +3,8 @@ from __future__ import annotations
 import copy
 from typing import TYPE_CHECKING, Generic, Self, TypeVar
 
-from safeds.data.tabular.containers import Table, TaggedTable, TimeSeries
+from safeds.data.labeled.containers import TabularDataset
+from safeds.data.tabular.containers import Table, TimeSeries
 from safeds.exceptions import (
     ClosedBound,
     FeatureDataMismatchError,
@@ -21,9 +22,9 @@ if TYPE_CHECKING:
     from safeds.ml.nn._layer import _Layer
     from safeds.ml.nn._output_conversion import _OutputConversion
 
-IFT = TypeVar("IFT", TaggedTable, TimeSeries)  # InputFitType
+IFT = TypeVar("IFT", TabularDataset, TimeSeries)  # InputFitType
 IPT = TypeVar("IPT", Table, TimeSeries)  # InputPredictType
-OT = TypeVar("OT", TaggedTable, TimeSeries)  # OutputType
+OT = TypeVar("OT", TabularDataset, TimeSeries)  # OutputType
 
 
 class NeuralNetworkRegressor(Generic[IFT, IPT, OT]):

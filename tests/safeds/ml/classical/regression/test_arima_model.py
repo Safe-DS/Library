@@ -144,9 +144,9 @@ def test_should_raise_on_invalid_data(
             },
         ),
     ],
-    ids=["untagged_table"],
+    ids=["table"],
 )
-def test_should_raise_if_table_is_not_tagged(table: Table) -> None:
+def test_should_raise_if_given_normal_table(table: Table) -> None:
     model = ArimaModelRegressor()
     with pytest.raises(NonTimeSeriesError):
         model.fit(table)  # type: ignore[arg-type]

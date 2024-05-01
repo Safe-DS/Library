@@ -11,7 +11,8 @@ if TYPE_CHECKING:
     from sklearn.base import RegressorMixin
     from sklearn.tree import DecisionTreeRegressor as sk_DecisionTreeRegressor
 
-    from safeds.data.tabular.containers import Table, TaggedTable
+    from safeds.data.labeled.containers import TabularDataset
+    from safeds.data.tabular.containers import Table
 
 
 class DecisionTreeRegressor(Regressor):
@@ -26,7 +27,7 @@ class DecisionTreeRegressor(Regressor):
         self._feature_names: list[str] | None = None
         self._target_name: str | None = None
 
-    def fit(self, training_set: TaggedTable) -> DecisionTreeRegressor:
+    def fit(self, training_set: TabularDataset) -> DecisionTreeRegressor:
         """
         Create a copy of this regressor and fit it with the given training data.
 
@@ -46,8 +47,8 @@ class DecisionTreeRegressor(Regressor):
         ------
         LearningError
             If the training data contains invalid values or if the training failed.
-        UntaggedTableError
-            If the table is untagged.
+        TypeError
+            If a table is passed instead of a tabular dataset.
         NonNumericColumnError
             If the training data contains non-numerical values.
         MissingValuesColumnError
@@ -65,7 +66,7 @@ class DecisionTreeRegressor(Regressor):
 
         return result
 
-    def predict(self, dataset: Table) -> TaggedTable:
+    def predict(self, dataset: Table) -> TabularDataset:
         """
         Predict a target vector using a dataset containing feature vectors. The model has to be trained first.
 

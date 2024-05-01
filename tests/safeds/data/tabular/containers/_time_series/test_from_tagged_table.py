@@ -1,5 +1,6 @@
 import pytest
-from safeds.data.tabular.containers import Table, TaggedTable, TimeSeries
+from safeds.data.labeled.containers import TabularDataset
+from safeds.data.tabular.containers import Table, TimeSeries
 from safeds.exceptions import UnknownColumnNameError
 
 
@@ -121,8 +122,8 @@ def test_should_raise_error(
     error_msg: str,
 ) -> None:
     with pytest.raises(error, match=error_msg):
-        TimeSeries._from_tagged_table(
-            TaggedTable._from_table(table, target_name=target_name, feature_names=feature_names),
+        TimeSeries._from_tabular_dataset(
+            TabularDataset._from_table(table, target_name=target_name, feature_names=feature_names),
             time_name=time_name,
         )
 
@@ -173,7 +174,11 @@ def test_should_raise_error(
             None,
         ),
     ],
-    ids=["create_tagged_table", "tagged_table_not_all_columns_are_features", "tagged_table_with_feature_names_as_None"],
+    ids=[
+        "create_tabular_dataset",
+        "tabular_dataset_not_all_columns_are_features",
+        "tabular_dataset_with_feature_names_as_None",
+    ],
 )
 def test_should_create_a_time_series(
     table: Table,
@@ -181,8 +186,8 @@ def test_should_create_a_time_series(
     time_name: str,
     feature_names: list[str] | None,
 ) -> None:
-    tagged_table = TaggedTable._from_table(table, target_name=target_name, feature_names=feature_names)
-    time_series = TimeSeries._from_tagged_table(tagged_table, time_name=time_name)
+    tabular_dataset = TabularDataset._from_table(table, target_name=target_name, feature_names=feature_names)
+    time_series = TimeSeries._from_tabular_dataset(tabular_dataset, time_name=time_name)
     feature_names = (
         feature_names if feature_names is not None else table.remove_columns([target_name, time_name]).column_names
     )

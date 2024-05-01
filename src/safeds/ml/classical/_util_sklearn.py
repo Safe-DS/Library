@@ -1,7 +1,8 @@
 import warnings
 from typing import Any
 
-from safeds.data.tabular.containers import Table, TaggedTable
+from safeds.data.labeled.containers import TabularDataset
+from safeds.data.tabular.containers import Table
 from safeds.exceptions import (
     DatasetContainsTargetError,
     DatasetMissesDataError,
@@ -10,29 +11,29 @@ from safeds.exceptions import (
     MissingValuesColumnError,
     ModelNotFittedError,
     NonNumericColumnError,
+    PlainTableError,
     PredictionError,
-    UntaggedTableError,
 )
 
 
 # noinspection PyProtectedMember
-def fit(model: Any, tagged_table: TaggedTable) -> None:
+def fit(model: Any, tabular_dataset: TabularDataset) -> None:
     """
-    Fit a model for a given tagged table.
+    Fit a model for a given tabular dataset.
 
     Parameters
     ----------
     model:
         Classifier or Regression from scikit-learn.
-    tagged_table:
-        The tagged table containing the feature and target vectors.
+    tabular_dataset:
+        The tabular dataset containing the feature and target vectors.
 
     Raises
     ------
     LearningError
-        If the tagged table contains invalid values or if the training failed.
-    UntaggedTableError
-        If the table is untagged.
+        If the tabular dataset contains invalid values or if the training failed.
+    TypeError
+        If a table is passed instead of a tabular dataset.
     NonNumericColumnError
         If the training data contains non-numerical values.
     MissingValuesColumnError
@@ -40,14 +41,14 @@ def fit(model: Any, tagged_table: TaggedTable) -> None:
     DatasetMissesDataError
         If the training data contains no rows.
     """
-    if not isinstance(tagged_table, TaggedTable) and isinstance(tagged_table, Table):
-        raise UntaggedTableError
+    if not isinstance(tabular_dataset, TabularDataset) and isinstance(tabular_dataset, Table):
+        raise PlainTableError
 
-    if tagged_table.number_of_rows == 0:
+    if tabular_dataset._table.number_of_rows == 0:
         raise DatasetMissesDataError
 
-    non_numerical_column_names = set(tagged_table.features.column_names) - set(
-        tagged_table.features.remove_columns_with_non_numerical_values().column_names,
+    non_numerical_column_names = set(tabular_dataset.features.column_names) - set(
+        tabular_dataset.features.remove_columns_with_non_numerical_values().column_names,
     )
     if len(non_numerical_column_names) != 0:
         raise NonNumericColumnError(
@@ -57,8 +58,8 @@ def fit(model: Any, tagged_table: TaggedTable) -> None:
             " different values\nor is ordinal, you should use the LabelEncoder.",
         )
 
-    null_containing_column_names = set(tagged_table.features.column_names) - set(
-        tagged_table.features.remove_columns_with_missing_values().column_names,
+    null_containing_column_names = set(tabular_dataset.features.column_names) - set(
+        tabular_dataset.features.remove_columns_with_missing_values().column_names,
     )
     if len(null_containing_column_names) != 0:
         raise MissingValuesColumnError(
@@ -69,15 +70,15 @@ def fit(model: Any, tagged_table: TaggedTable) -> None:
 
     try:
         model.fit(
-            tagged_table.features._data,
-            tagged_table.target._data,
+            tabular_dataset.features._data,
+            tabular_dataset.target._data,
         )
     except ValueError as exception:
         raise LearningError(str(exception)) from exception
 
 
 # noinspection PyProtectedMember
-def predict(model: Any, dataset: Table, feature_names: list[str] | None, target_name: str | None) -> TaggedTable:
+def predict(model: Any, dataset: Table, feature_names: list[str] | None, target_name: str | None) -> TabularDataset:
     """
     Predict a target vector using a dataset containing feature vectors. The model has to be trained first.
 
@@ -122,7 +123,7 @@ def predict(model: Any, dataset: Table, feature_names: list[str] | None, target_
     missing_feature_names = [feature_name for feature_name in feature_names if not dataset.has_column(feature_name)]
     if missing_feature_names:
         raise DatasetMissesFeaturesError(missing_feature_names)
-    if isinstance(dataset, TaggedTable):
+    if isinstance(dataset, TabularDataset):
         dataset = dataset.features  # Cast to Table type, so Python will call the right methods...
 
     if dataset.number_of_rows == 0:
@@ -160,7 +161,7 @@ def predict(model: Any, dataset: Table, feature_names: list[str] | None, target_
             warnings.filterwarnings("ignore", message="X does not have valid feature names")
             predicted_target_vector = model.predict(dataset_df.values)
         result_set[target_name] = predicted_target_vector
-        return Table._from_pandas_dataframe(result_set).tag_columns(
+        return Table._from_pandas_dataframe(result_set).to_tabular_dataset(
             target_name=target_name,
             feature_names=feature_names,
         )

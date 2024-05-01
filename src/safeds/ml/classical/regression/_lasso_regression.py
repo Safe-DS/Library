@@ -13,7 +13,8 @@ if TYPE_CHECKING:
     from sklearn.base import RegressorMixin
     from sklearn.linear_model import Lasso as sk_Lasso
 
-    from safeds.data.tabular.containers import Table, TaggedTable
+    from safeds.data.labeled.containers import TabularDataset
+    from safeds.data.tabular.containers import Table
 
 
 class LassoRegressor(Regressor):
@@ -67,7 +68,7 @@ class LassoRegressor(Regressor):
         """
         return self._alpha
 
-    def fit(self, training_set: TaggedTable) -> LassoRegressor:
+    def fit(self, training_set: TabularDataset) -> LassoRegressor:
         """
         Create a copy of this regressor and fit it with the given training data.
 
@@ -87,8 +88,8 @@ class LassoRegressor(Regressor):
         ------
         LearningError
             If the training data contains invalid values or if the training failed.
-        UntaggedTableError
-            If the table is untagged.
+        TypeError
+            If a table is passed instead of a tabular dataset.
         NonNumericColumnError
             If the training data contains non-numerical values.
         MissingValuesColumnError
@@ -106,7 +107,7 @@ class LassoRegressor(Regressor):
 
         return result
 
-    def predict(self, dataset: Table) -> TaggedTable:
+    def predict(self, dataset: Table) -> TabularDataset:
         """
         Predict a target vector using a dataset containing feature vectors. The model has to be trained first.
 

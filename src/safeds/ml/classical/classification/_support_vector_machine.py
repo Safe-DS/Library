@@ -13,7 +13,8 @@ if TYPE_CHECKING:
     from sklearn.base import ClassifierMixin
     from sklearn.svm import SVC as sk_SVC  # noqa: N811
 
-    from safeds.data.tabular.containers import Table, TaggedTable
+    from safeds.data.labeled.containers import TabularDataset
+    from safeds.data.tabular.containers import Table
 
 
 class SupportVectorMachineKernel(ABC):
@@ -233,7 +234,7 @@ class SupportVectorMachineClassifier(Classifier):
         else:
             raise TypeError("Invalid kernel type.")
 
-    def fit(self, training_set: TaggedTable) -> SupportVectorMachineClassifier:
+    def fit(self, training_set: TabularDataset) -> SupportVectorMachineClassifier:
         """
         Create a copy of this classifier and fit it with the given training data.
 
@@ -253,8 +254,8 @@ class SupportVectorMachineClassifier(Classifier):
         ------
         LearningError
             If the training data contains invalid values or if the training failed.
-        UntaggedTableError
-            If the table is untagged.
+        TypeError
+            If a table is passed instead of a tabular dataset.
         NonNumericColumnError
             If the training data contains non-numerical values.
         MissingValuesColumnError
@@ -272,7 +273,7 @@ class SupportVectorMachineClassifier(Classifier):
 
         return result
 
-    def predict(self, dataset: Table) -> TaggedTable:
+    def predict(self, dataset: Table) -> TabularDataset:
         """
         Predict a target vector using a dataset containing feature vectors. The model has to be trained first.
 

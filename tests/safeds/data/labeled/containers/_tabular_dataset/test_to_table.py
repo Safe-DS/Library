@@ -1,12 +1,13 @@
 import pytest
-from safeds.data.tabular.containers import Table, TaggedTable
+from safeds.data.labeled.containers import TabularDataset
+from safeds.data.tabular.containers import Table
 
 
 @pytest.mark.parametrize(
-    ("tagged_table", "expected"),
+    ("tabular_dataset", "expected"),
     [
         (
-            TaggedTable(
+            TabularDataset(
                 {
                     "feature_1": [3, 9, 6],
                     "feature_2": [6, 12, 9],
@@ -24,7 +25,7 @@ from safeds.data.tabular.containers import Table, TaggedTable
             ),
         ),
         (
-            TaggedTable(
+            TabularDataset(
                 {
                     "feature_1": [3, 9, 6],
                     "feature_2": [6, 12, 9],
@@ -46,7 +47,7 @@ from safeds.data.tabular.containers import Table, TaggedTable
     ],
     ids=["normal", "table_with_column_as_non_feature"],
 )
-def test_should_return_table(tagged_table: TaggedTable, expected: Table) -> None:
-    table = tagged_table._as_table()
+def test_should_return_table(tabular_dataset: TabularDataset, expected: Table) -> None:
+    table = tabular_dataset.to_table()
     assert table.schema == expected.schema
     assert table == expected
