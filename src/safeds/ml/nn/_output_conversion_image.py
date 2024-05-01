@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Any, TypeVar
+from typing import TYPE_CHECKING, Any, TypeVar, Generic
 
 from safeds.data.image.containers import ImageList
 from safeds.data.image.containers._single_size_image_list import _SingleSizeImageList
@@ -19,15 +19,15 @@ from safeds.data.tabular.transformation import OneHotEncoder
 T = TypeVar("T", ImageDataset[Column], ImageDataset[Table], ImageDataset[ImageList])
 
 
-class _OutputConversionImage(_OutputConversion[ImageList, T], ABC):
+class _OutputConversionImage(_OutputConversion[ImageList, Generic[T]], ABC):
     """The output conversion for a neural network, defines the output parameters for the neural network."""
 
     @abstractmethod
-    def _data_conversion(self, input_data: ImageList, output_data: Tensor, **kwargs: Any) -> ImageDataset[T]:
+    def _data_conversion(self, input_data: ImageList, output_data: Tensor, **kwargs: Any) -> T:
         pass  # pragma: no cover
 
 
-class OutputConversionImageToColumn(_OutputConversionImage[Column]):
+class OutputConversionImageToColumn(_OutputConversionImage[ImageDataset[Column]]):
 
     def _data_conversion(self, input_data: ImageList, output_data: Tensor, **kwargs: Any) -> ImageDataset[Column]:
         import torch
@@ -55,7 +55,7 @@ class OutputConversionImageToColumn(_OutputConversionImage[Column]):
         return im_dataset
 
 
-class OutputConversionImageToTable(_OutputConversionImage[Table]):
+class OutputConversionImageToTable(_OutputConversionImage[ImageDataset[Table]]):
 
     def _data_conversion(self, input_data: ImageList, output_data: Tensor, **kwargs: Any) -> ImageDataset[Table]:
         import torch
@@ -80,7 +80,7 @@ class OutputConversionImageToTable(_OutputConversionImage[Table]):
         return im_dataset
 
 
-class OutputConversionImageToImage(_OutputConversionImage[ImageList]):
+class OutputConversionImageToImage(_OutputConversionImage[ImageDataset[ImageList]]):
 
     def _data_conversion(
         self, input_data: ImageList, output_data: Tensor, **kwargs: Any  # noqa: ARG002

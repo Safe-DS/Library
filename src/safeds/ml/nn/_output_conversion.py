@@ -12,7 +12,7 @@ if TYPE_CHECKING:
 from safeds.data.tabular.containers import Table, TimeSeries, Column
 
 IT = TypeVar("IT", Table, TimeSeries, ImageList)
-OT = TypeVar("OT", TabularDataset, TimeSeries, ImageDataset[Column], ImageDataset[Table], ImageDataset[ImageList])
+OT = TypeVar("OT", TabularDataset, TimeSeries, ImageDataset)
 
 
 class _OutputConversion(Generic[IT, OT], ABC):
