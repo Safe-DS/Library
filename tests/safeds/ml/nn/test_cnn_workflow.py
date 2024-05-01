@@ -60,7 +60,7 @@ class TestImageToTableClassifier:
         nn = nn_original.fit(image_dataset, epoch_size=2)
         assert str(nn_original._model.state_dict().values()) != str(nn._model.state_dict().values())
         assert nn._model.state_dict()["_pytorch_layers.3._layer.bias"].tolist() == layer_3_bias
-        prediction = nn.predict(image_dataset.get_input())
+        prediction: ImageDataset = nn.predict(image_dataset.get_input())
         assert one_hot_encoder.inverse_transform(prediction.get_output()) == Table({"class": prediction_label})
 
 
@@ -103,7 +103,7 @@ class TestImageToColumnClassifier:
         nn = nn_original.fit(image_dataset, epoch_size=2)
         assert str(nn_original._model.state_dict().values()) != str(nn._model.state_dict().values())
         assert nn._model.state_dict()["_pytorch_layers.3._layer.bias"].tolist() == layer_3_bias
-        prediction = nn.predict(image_dataset.get_input())
+        prediction: ImageDataset = nn.predict(image_dataset.get_input())
         assert prediction.get_output() == Column("class", prediction_label)
 
 
@@ -140,5 +140,5 @@ class TestImageToImageRegressor:
         nn = nn_original.fit(image_dataset, epoch_size=20)
         assert str(nn_original._model.state_dict().values()) != str(nn._model.state_dict().values())
         assert nn._model.state_dict()["_pytorch_layers.3._layer.bias"].tolist() == layer_3_bias
-        prediction = nn.predict(image_dataset.get_input())
+        prediction: ImageDataset = nn.predict(image_dataset.get_input())
         assert prediction.get_output() == snapshot_png_image_list
