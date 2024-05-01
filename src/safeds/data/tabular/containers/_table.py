@@ -792,11 +792,10 @@ class Table:
         2                mean                 2.0                 3.0
         3                mode              [1, 3]              [2, 4]
         4              median                 2.0                 3.0
-        5                 sum                   4                   6
-        6            variance                 2.0                 2.0
-        7  standard deviation  1.4142135623730951  1.4142135623730951
-        8              idness                 1.0                 1.0
-        9           stability                 0.5                 0.5
+        5            variance                 2.0                 2.0
+        6  standard deviation  1.4142135623730951  1.4142135623730951
+        7              idness                 1.0                 1.0
+        8           stability                 0.5                 0.5
         """
         import pandas as pd
 
@@ -809,7 +808,6 @@ class Table:
                         "mean",
                         "mode",
                         "median",
-                        "sum",
                         "variance",
                         "standard deviation",
                         "idness",
@@ -826,7 +824,6 @@ class Table:
                         "mean",
                         "mode",
                         "median",
-                        "sum",
                         "variance",
                         "standard deviation",
                         "idness",
@@ -835,7 +832,7 @@ class Table:
                 },
             )
             for name in self.column_names:
-                table = table.add_column(Column(name, ["-", "-", "-", "-", "-", "-", "-", "-", "-", "-"]))
+                table = table.add_column(Column(name, ["-", "-", "-", "-", "-", "-", "-", "-", "-"]))
             return table
 
         columns = self.to_columns()
@@ -849,7 +846,6 @@ class Table:
                 "mean": column.mean,
                 "mode": column.mode,
                 "median": column.median,
-                "sum": column.sum,
                 "variance": column.variance,
                 "standard deviation": column.standard_deviation,
                 "idness": column.idness,
