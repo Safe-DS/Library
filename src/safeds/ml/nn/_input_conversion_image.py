@@ -38,7 +38,10 @@ class InputConversionImage(_InputConversion[ImageDataset, ImageList]):
         return self._input_size
 
     def _data_conversion_fit(
-        self, input_data: ImageDataset, batch_size: int, num_of_classes: int = 1,  # noqa: ARG002
+        self,
+        input_data: ImageDataset,
+        batch_size: int,  # noqa: ARG002
+        num_of_classes: int = 1,  # noqa: ARG002
     ) -> ImageDataset:
         return input_data
 

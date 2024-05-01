@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Any
 
 from safeds.data.image.containers import ImageList
@@ -15,11 +16,14 @@ from safeds.data.tabular.transformation import OneHotEncoder
 from safeds.ml.nn._output_conversion import _OutputConversion
 
 
-class _OutputConversionImage:
-    pass  # pragma: no cover
+class _OutputConversionImage(_OutputConversion[ImageList, ImageDataset], ABC):
+
+    @abstractmethod
+    def _data_conversion(self, input_data: ImageList, output_data: Tensor, **kwargs: Any) -> ImageDataset:
+        pass
 
 
-class OutputConversionImageToColumn(_OutputConversion[ImageList, ImageDataset], _OutputConversionImage):
+class OutputConversionImageToColumn(_OutputConversionImage):
 
     def _data_conversion(self, input_data: ImageList, output_data: Tensor, **kwargs: Any) -> ImageDataset[Column]:
         import torch
@@ -51,7 +55,7 @@ class OutputConversionImageToColumn(_OutputConversion[ImageList, ImageDataset], 
         return im_dataset
 
 
-class OutputConversionImageToTable(_OutputConversion[ImageList, ImageDataset], _OutputConversionImage):
+class OutputConversionImageToTable(_OutputConversionImage):
 
     def _data_conversion(self, input_data: ImageList, output_data: Tensor, **kwargs: Any) -> ImageDataset[Table]:
         import torch
@@ -82,7 +86,7 @@ class OutputConversionImageToTable(_OutputConversion[ImageList, ImageDataset], _
         return im_dataset
 
 
-class OutputConversionImageToImage(_OutputConversion[ImageList, ImageDataset], _OutputConversionImage):
+class OutputConversionImageToImage(_OutputConversionImage):
 
     def _data_conversion(
         self, input_data: ImageList, output_data: Tensor, **kwargs: Any,  # noqa: ARG002
