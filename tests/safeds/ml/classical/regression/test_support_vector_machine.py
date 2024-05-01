@@ -31,7 +31,7 @@ def kernels() -> list[SupportVectorMachineKernel]:
 @pytest.fixture()
 def training_set() -> TabularDataset:
     table = Table({"col1": [1, 2, 3, 4], "col2": [1, 2, 3, 4]})
-    return table.to_tabular_dataset(target_name="col1", feature_names=["col2"])
+    return table.to_tabular_dataset(target_name="col1")
 
 
 class TestC:
