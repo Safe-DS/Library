@@ -68,10 +68,14 @@ class OneHotEncoder(InvertibleTableTransformer):
     def __hash__(self) -> int:
         return super().__hash__()
 
-    def __eq__(self, other: Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         if not isinstance(other, OneHotEncoder):
             return NotImplemented
-        return self._column_names == other._column_names and self._value_to_column == other._value_to_column and self._value_to_column_nans == other._value_to_column_nans
+        return (
+            self._column_names == other._column_names
+            and self._value_to_column == other._value_to_column
+            and self._value_to_column_nans == other._value_to_column_nans
+        )
 
     # noinspection PyProtectedMember
     def fit(self, table: Table, column_names: list[str] | None) -> OneHotEncoder:

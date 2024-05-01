@@ -62,9 +62,11 @@ class ForwardLayer(_Layer):
             raise OutOfBoundsError(actual=output_size, name="output_size", lower_bound=ClosedBound(1))
         self._output_size = output_size
 
-    def _get_internal_layer(self, **kwargs: Any) -> nn.Module:  # noqa: ARG002
+    def _get_internal_layer(self, **kwargs: Any) -> nn.Module:
         if "activation_function" not in kwargs:
-            raise ValueError("The activation_function is not set. The internal layer can only be created when the activation_function is provided in the kwargs.")
+            raise ValueError(
+                "The activation_function is not set. The internal layer can only be created when the activation_function is provided in the kwargs.",
+            )
         else:
             activation_function: str = kwargs["activation_function"]
         return _create_internal_model(self._input_size, self._output_size, activation_function)

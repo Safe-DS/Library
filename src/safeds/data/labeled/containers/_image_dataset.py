@@ -1,17 +1,23 @@
 from __future__ import annotations
 
 import copy
-from typing import TYPE_CHECKING, TypeVar, Generic
+from typing import TYPE_CHECKING, Generic, TypeVar
 
 from safeds.data.image.containers import ImageList
 from safeds.data.image.containers._empty_image_list import _EmptyImageList
 from safeds.data.image.containers._multi_size_image_list import _MultiSizeImageList
 from safeds.data.image.containers._single_size_image_list import _SingleSizeImageList
 from safeds.data.image.typing import ImageSize
-from safeds.data.tabular.containers import Table, Column
+from safeds.data.tabular.containers import Column, Table
 from safeds.data.tabular.transformation import OneHotEncoder
-from safeds.exceptions import NonNumericColumnError, OutputLengthMismatchError, IndexOutOfBoundsError, \
-    TransformerNotFittedError, OutOfBoundsError, ClosedBound
+from safeds.exceptions import (
+    ClosedBound,
+    IndexOutOfBoundsError,
+    NonNumericColumnError,
+    OutOfBoundsError,
+    OutputLengthMismatchError,
+    TransformerNotFittedError,
+)
 
 if TYPE_CHECKING:
     from torch import Tensor
@@ -50,7 +56,10 @@ class ImageDataset(Generic[T]):
         else:
             self._input_size: ImageSize = ImageSize(input_data.widths[0], input_data.heights[0], input_data.channel)
             self._input: _SingleSizeImageList = input_data._as_single_size_image_list()
-        if ((isinstance(output_data, Table) or isinstance(output_data, Column)) and len(input_data) != output_data.number_of_rows) or (isinstance(output_data, ImageList) and len(input_data) != len(output_data)):
+        if (
+            (isinstance(output_data, Column | Table))
+            and len(input_data) != output_data.number_of_rows
+        ) or (isinstance(output_data, ImageList) and len(input_data) != len(output_data)):
             if isinstance(output_data, Table):
                 output_len = output_data.number_of_rows
             else:
@@ -62,7 +71,10 @@ class ImageDataset(Generic[T]):
             for column_name in output_data.column_names:
                 if not output_data.get_column_type(column_name).is_numeric():
                     non_numerical_columns.append(column_name)
-                elif output_data.get_column(column_name).minimum() < 0 or output_data.get_column(column_name).maximum() > 1:
+                elif (
+                    output_data.get_column(column_name).minimum() < 0
+                    or output_data.get_column(column_name).maximum() > 1
+                ):
                     wrong_interval_columns.append(column_name)
             if len(non_numerical_columns) > 0:
                 raise NonNumericColumnError(f"Columns {non_numerical_columns} are not numerical.")
@@ -153,7 +165,6 @@ class ImageDataset(Generic[T]):
 
     def _get_batch(self, batch_number: int, batch_size: int | None = None) -> tuple[Tensor, Tensor]:
         import torch
-        from torch import Tensor
 
         if batch_size is None:
             batch_size = self._batch_size
@@ -161,13 +172,35 @@ class ImageDataset(Generic[T]):
             raise OutOfBoundsError(batch_size, name="batch_size", lower_bound=ClosedBound(1))
         if batch_number < 0 or batch_size * batch_number >= len(self._input):
             raise IndexOutOfBoundsError(batch_size * batch_number)
-        max_index = batch_size * (batch_number + 1) if batch_size * (batch_number + 1) < len(self._input) else len(self._input)
-        input_tensor = self._input._tensor[self._shuffle_tensor_indices[[self._input._indices_to_tensor_positions[index] for index in range(batch_size * batch_number, max_index)]]].to(torch.float32) / 255
+        max_index = (
+            batch_size * (batch_number + 1) if batch_size * (batch_number + 1) < len(self._input) else len(self._input)
+        )
+        input_tensor = (
+            self._input._tensor[
+                self._shuffle_tensor_indices[
+                    [
+                        self._input._indices_to_tensor_positions[index]
+                        for index in range(batch_size * batch_number, max_index)
+                    ]
+                ]
+            ].to(torch.float32)
+            / 255
+        )
         output_tensor: Tensor
         if isinstance(self._output, _SingleSizeImageList):
-            output_tensor = self._output._tensor[self._shuffle_tensor_indices[[self._output._indices_to_tensor_positions[index] for index in range(batch_size * batch_number, max_index)]]].to(torch.float32) / 255
+            output_tensor = (
+                self._output._tensor[
+                    self._shuffle_tensor_indices[
+                        [
+                            self._output._indices_to_tensor_positions[index]
+                            for index in range(batch_size * batch_number, max_index)
+                        ]
+                    ]
+                ].to(torch.float32)
+                / 255
+            )
         else:  # _output is instance of _TableAsTensor
-            output_tensor = self._output._tensor[self._shuffle_tensor_indices[batch_size * batch_number:max_index]]
+            output_tensor = self._output._tensor[self._shuffle_tensor_indices[batch_size * batch_number : max_index]]
         return input_tensor, output_tensor
 
     def shuffle(self) -> ImageDataset[T]:
@@ -182,6 +215,7 @@ class ImageDataset(Generic[T]):
             the shuffled `ImageDataset`
         """
         import torch
+
         im_dataset: ImageDataset[T] = copy.copy(self)
         im_dataset._shuffle_tensor_indices = torch.randperm(len(self))
         im_dataset._next_batch_index = 0
@@ -197,21 +231,25 @@ class _TableAsTensor:
         self._tensor = torch.Tensor(table._data.to_numpy(copy=True)).to(torch.get_default_device())
 
         if not torch.all(self._tensor.sum(dim=1) == torch.ones(self._tensor.size(dim=0))):
-            raise ValueError("The given table is not correctly one hot encoded as it contains rows that have a sum not equal to 1.")
+            raise ValueError(
+                "The given table is not correctly one hot encoded as it contains rows that have a sum not equal to 1.",
+            )
 
     @staticmethod
     def _from_tensor(tensor: Tensor, column_names: list[str]) -> _TableAsTensor:
         if tensor.dim() != 2:
             raise ValueError(f"Tensor has an invalid amount of dimensions. Needed 2 dimensions but got {tensor.dim()}.")
         if tensor.size(dim=1) != len(column_names):
-            raise ValueError(f"Tensor and column_names have different amounts of classes ({tensor.size(dim=1)}!={len(column_names)}).")
+            raise ValueError(
+                f"Tensor and column_names have different amounts of classes ({tensor.size(dim=1)}!={len(column_names)}).",
+            )
         table_as_tensor = _TableAsTensor.__new__(_TableAsTensor)
         table_as_tensor._tensor = tensor
         table_as_tensor._column_names = column_names
         return table_as_tensor
 
     def _to_table(self) -> Table:
-        return Table(dict(zip(self._column_names, self._tensor.T.tolist())))
+        return Table(dict(zip(self._column_names, self._tensor.T.tolist(), strict=False)))
 
 
 class _ColumnAsTensor:
@@ -222,7 +260,9 @@ class _ColumnAsTensor:
         self._column_name = column.name
         column_as_table = Table.from_columns([column])
         self._one_hot_encoder = OneHotEncoder().fit(column_as_table, [self._column_name])
-        self._tensor = torch.Tensor(self._one_hot_encoder.transform(column_as_table)._data.to_numpy(copy=True)).to(torch.get_default_device())
+        self._tensor = torch.Tensor(self._one_hot_encoder.transform(column_as_table)._data.to_numpy(copy=True)).to(
+            torch.get_default_device(),
+        )
 
     @staticmethod
     def _from_tensor(tensor: Tensor, column_name: str, one_hot_encoder: OneHotEncoder) -> _ColumnAsTensor:
@@ -231,7 +271,9 @@ class _ColumnAsTensor:
         if not one_hot_encoder.is_fitted:
             raise TransformerNotFittedError
         if tensor.size(dim=1) != len(one_hot_encoder.get_names_of_added_columns()):
-            raise ValueError(f"Tensor and one_hot_encoder have different amounts of classes ({tensor.size(dim=1)}!={len(one_hot_encoder.get_names_of_added_columns())}).")
+            raise ValueError(
+                f"Tensor and one_hot_encoder have different amounts of classes ({tensor.size(dim=1)}!={len(one_hot_encoder.get_names_of_added_columns())}).",
+            )
         table_as_tensor = _ColumnAsTensor.__new__(_ColumnAsTensor)
         table_as_tensor._tensor = tensor
         table_as_tensor._column_name = column_name
@@ -239,5 +281,5 @@ class _ColumnAsTensor:
         return table_as_tensor
 
     def _to_column(self) -> Column:
-        table = Table(dict(zip(self._one_hot_encoder.get_names_of_added_columns(), self._tensor.T.tolist())))
+        table = Table(dict(zip(self._one_hot_encoder.get_names_of_added_columns(), self._tensor.T.tolist(), strict=False)))
         return self._one_hot_encoder.inverse_transform(table).get_column(self._column_name)

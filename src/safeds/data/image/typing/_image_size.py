@@ -4,7 +4,7 @@ import sys
 from typing import TYPE_CHECKING
 
 from safeds._utils import _structural_hash
-from safeds.exceptions import OutOfBoundsError, ClosedBound
+from safeds.exceptions import ClosedBound, OutOfBoundsError
 
 if TYPE_CHECKING:
     from safeds.data.image.containers import Image

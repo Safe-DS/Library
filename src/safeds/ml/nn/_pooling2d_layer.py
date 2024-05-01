@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import math
-from typing import TYPE_CHECKING, Literal, Unpack, Any, TypedDict
+from typing import TYPE_CHECKING, Any, Literal
 
 from safeds.data.image.typing import ImageSize
 
@@ -90,10 +90,16 @@ class _Pooling2DLayer(_Layer):
             If the input_size is not yet set
         """
         if self._input_size is None:
-            raise ValueError("The input_size is not yet set. The layer cannot compute the output_size if the input_size is not set.")
+            raise ValueError(
+                "The input_size is not yet set. The layer cannot compute the output_size if the input_size is not set.",
+            )
         if self._output_size is None:
-            new_width = math.ceil((self.input_size.width + self._padding * 2 - self._kernel_size + 1) / (1.0 * self._stride))
-            new_height = math.ceil((self.input_size.height + self._padding * 2 - self._kernel_size + 1) / (1.0 * self._stride))
+            new_width = math.ceil(
+                (self.input_size.width + self._padding * 2 - self._kernel_size + 1) / (1.0 * self._stride),
+            )
+            new_height = math.ceil(
+                (self.input_size.height + self._padding * 2 - self._kernel_size + 1) / (1.0 * self._stride),
+            )
             self._output_size = ImageSize(new_width, new_height, self._input_size.channel, _ignore_invalid_channel=True)
         return self._output_size
 

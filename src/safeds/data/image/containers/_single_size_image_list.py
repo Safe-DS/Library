@@ -7,8 +7,6 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 from safeds._utils import _structural_hash
-from safeds.data.image.containers._image import Image
-from safeds.data.image.containers._image_list import ImageList
 from safeds.data.image._utils._image_transformation_error_and_warning_checks import (
     _check_add_noise_errors,
     _check_adjust_brightness_errors_and_warnings,
@@ -20,6 +18,8 @@ from safeds.data.image._utils._image_transformation_error_and_warning_checks imp
     _check_resize_errors,
     _check_sharpen_errors_and_warnings,
 )
+from safeds.data.image.containers._image import Image
+from safeds.data.image.containers._image_list import ImageList
 from safeds.data.image.typing import ImageSize
 from safeds.exceptions import (
     DuplicateIndexError,
@@ -132,7 +132,12 @@ class _SingleSizeImageList(ImageList):
         if batch_size * batch_number >= len(self):
             raise IndexOutOfBoundsError(batch_size * batch_number)
         max_index = batch_size * (batch_number + 1) if batch_size * (batch_number + 1) < len(self) else len(self)
-        return self._tensor[[self._indices_to_tensor_positions[index] for index in range(batch_size * batch_number, max_index)]].to(torch.float32) / 255
+        return (
+            self._tensor[
+                [self._indices_to_tensor_positions[index] for index in range(batch_size * batch_number, max_index)]
+            ].to(torch.float32)
+            / 255
+        )
 
     def clone(self) -> ImageList:
         cloned_image_list = self._clone_without_tensor()
@@ -224,7 +229,9 @@ class _SingleSizeImageList(ImageList):
 
     @property
     def sizes(self) -> list[ImageSize]:
-        return [ImageSize(self._tensor.size(dim=3), self._tensor.size(dim=2), self._tensor.size(dim=1))] * self.number_of_images
+        return [
+            ImageSize(self._tensor.size(dim=3), self._tensor.size(dim=2), self._tensor.size(dim=1)),
+        ] * self.number_of_images
 
     @property
     def number_of_sizes(self) -> int:

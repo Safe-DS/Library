@@ -5,16 +5,19 @@ from typing import TYPE_CHECKING
 import apipkg
 
 if TYPE_CHECKING:
-    from ._pooling2d_layer import AvgPooling2DLayer
     from ._convolutional2d_layer import Convolutional2DLayer, ConvolutionalTranspose2DLayer
     from ._flatten_layer import FlattenLayer
     from ._forward_layer import ForwardLayer
     from ._input_conversion_image import InputConversionImage
     from ._input_conversion_table import InputConversionTable
-    from ._pooling2d_layer import MaxPooling2DLayer
     from ._model import NeuralNetworkClassifier, NeuralNetworkRegressor
-    from ._output_conversion_image import OutputConversionImageToImage, OutputConversionImageToTable, OutputConversionImageToColumn
+    from ._output_conversion_image import (
+        OutputConversionImageToColumn,
+        OutputConversionImageToImage,
+        OutputConversionImageToTable,
+    )
     from ._output_conversion_table import OutputConversionTable
+    from ._pooling2d_layer import AvgPooling2DLayer, MaxPooling2DLayer
 
 apipkg.initpkg(
     __name__,

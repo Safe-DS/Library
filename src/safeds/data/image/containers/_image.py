@@ -22,10 +22,9 @@ from safeds.data.image.typing import ImageSize
 from safeds.exceptions import IllegalFormatError
 
 if TYPE_CHECKING:
+    from numpy import dtype, ndarray
     from torch import Tensor
     from torch.types import Device
-
-    from numpy import ndarray, dtype
 
 
 class Image:
@@ -178,7 +177,13 @@ class Image:
         """
         from numpy import uint8
 
-        return self._image_tensor.permute(1, 2, 0).detach().cpu().numpy().astype(uint8 if numpy_dtype is None else numpy_dtype)
+        return (
+            self._image_tensor.permute(1, 2, 0)
+            .detach()
+            .cpu()
+            .numpy()
+            .astype(uint8 if numpy_dtype is None else numpy_dtype)
+        )
 
     def _repr_jpeg_(self) -> bytes | None:
         """

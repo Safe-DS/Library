@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import math
-from typing import TYPE_CHECKING, Literal, Unpack, Any, TypedDict
+from typing import TYPE_CHECKING, Any, Literal
 
 from safeds.data.image.typing import ImageSize
 
@@ -11,16 +11,48 @@ if TYPE_CHECKING:
 from safeds.ml.nn._layer import _Layer
 
 
-def _create_internal_model(input_size: int, output_size: int, kernel_size: int, activation_function: Literal["sigmoid", "relu", "softmax"], padding: int, stride: int, transpose: bool, output_padding: int = 0) -> nn.Module:
+def _create_internal_model(
+    input_size: int,
+    output_size: int,
+    kernel_size: int,
+    activation_function: Literal["sigmoid", "relu", "softmax"],
+    padding: int,
+    stride: int,
+    transpose: bool,
+    output_padding: int = 0,
+) -> nn.Module:
     from torch import nn
 
     class _InternalLayer(nn.Module):
-        def __init__(self, input_size: int, output_size: int, kernel_size: int, activation_function: Literal["sigmoid", "relu", "softmax"], padding: int, stride: int, transpose: bool, output_padding: int):
+        def __init__(
+            self,
+            input_size: int,
+            output_size: int,
+            kernel_size: int,
+            activation_function: Literal["sigmoid", "relu", "softmax"],
+            padding: int,
+            stride: int,
+            transpose: bool,
+            output_padding: int,
+        ):
             super().__init__()
             if transpose:
-                self._layer = nn.ConvTranspose2d(in_channels=input_size, out_channels=output_size, kernel_size=kernel_size, padding=padding, stride=stride, output_padding=output_padding)
+                self._layer = nn.ConvTranspose2d(
+                    in_channels=input_size,
+                    out_channels=output_size,
+                    kernel_size=kernel_size,
+                    padding=padding,
+                    stride=stride,
+                    output_padding=output_padding,
+                )
             else:
-                self._layer = nn.Conv2d(in_channels=input_size, out_channels=output_size, kernel_size=kernel_size, padding=padding, stride=stride)
+                self._layer = nn.Conv2d(
+                    in_channels=input_size,
+                    out_channels=output_size,
+                    kernel_size=kernel_size,
+                    padding=padding,
+                    stride=stride,
+                )
             match activation_function:
                 case "sigmoid":
                     self._fn = nn.Sigmoid()
@@ -32,7 +64,9 @@ def _create_internal_model(input_size: int, output_size: int, kernel_size: int, 
         def forward(self, x: Tensor) -> Tensor:
             return self._fn(self._layer(x))
 
-    return _InternalLayer(input_size, output_size, kernel_size, activation_function, padding, stride, transpose, output_padding)
+    return _InternalLayer(
+        input_size, output_size, kernel_size, activation_function, padding, stride, transpose, output_padding,
+    )
 
 
 class Convolutional2DLayer(_Layer):
@@ -58,16 +92,30 @@ class Convolutional2DLayer(_Layer):
         self._input_size: ImageSize | None = None
         self._output_size: ImageSize | None = None
 
-    def _get_internal_layer(self, **kwargs: Any) -> nn.Module:  # noqa: ARG002
+    def _get_internal_layer(self, **kwargs: Any) -> nn.Module:
         if self._input_size is None:
-            raise ValueError("The input_size is not yet set. The internal layer can only be created when the input_size is set.")
+            raise ValueError(
+                "The input_size is not yet set. The internal layer can only be created when the input_size is set.",
+            )
         if "activation_function" not in kwargs:
-            raise ValueError("The activation_function is not set. The internal layer can only be created when the activation_function is provided in the kwargs.")
+            raise ValueError(
+                "The activation_function is not set. The internal layer can only be created when the activation_function is provided in the kwargs.",
+            )
         if kwargs.get("activation_function") not in ["sigmoid", "relu", "softmax"]:
-            raise ValueError(f"The activation_function '{kwargs.get('activation_function')}' is not supported. Please choose one of the following: ['sigmoid', 'relu', 'softmax'].")
+            raise ValueError(
+                f"The activation_function '{kwargs.get('activation_function')}' is not supported. Please choose one of the following: ['sigmoid', 'relu', 'softmax'].",
+            )
         else:
             activation_function: Literal["sigmoid", "relu", "softmax"] = kwargs["activation_function"]
-        return _create_internal_model(self._input_size.channel, self._output_channel, self._kernel_size, activation_function, self._padding, self._stride, transpose=False)
+        return _create_internal_model(
+            self._input_size.channel,
+            self._output_channel,
+            self._kernel_size,
+            activation_function,
+            self._padding,
+            self._stride,
+            transpose=False,
+        )
 
     @property
     def input_size(self) -> ImageSize:
@@ -104,10 +152,16 @@ class Convolutional2DLayer(_Layer):
             If the input_size is not yet set
         """
         if self._input_size is None:
-            raise ValueError("The input_size is not yet set. The layer cannot compute the output_size if the input_size is not set.")
+            raise ValueError(
+                "The input_size is not yet set. The layer cannot compute the output_size if the input_size is not set.",
+            )
         if self._output_size is None:
-            new_width = math.ceil((self._input_size.width + self._padding * 2 - self._kernel_size + 1) / (1.0 * self._stride))
-            new_height = math.ceil((self._input_size.height + self._padding * 2 - self._kernel_size + 1) / (1.0 * self._stride))
+            new_width = math.ceil(
+                (self._input_size.width + self._padding * 2 - self._kernel_size + 1) / (1.0 * self._stride),
+            )
+            new_height = math.ceil(
+                (self._input_size.height + self._padding * 2 - self._kernel_size + 1) / (1.0 * self._stride),
+            )
             self._output_size = ImageSize(new_width, new_height, self._output_channel, _ignore_invalid_channel=True)
         return self._output_size
 
@@ -120,7 +174,9 @@ class Convolutional2DLayer(_Layer):
 
 class ConvolutionalTranspose2DLayer(Convolutional2DLayer):
 
-    def __init__(self, output_channel: int, kernel_size: int, *, stride: int = 1, padding: int = 0, output_padding: int = 0):
+    def __init__(
+        self, output_channel: int, kernel_size: int, *, stride: int = 1, padding: int = 0, output_padding: int = 0,
+    ):
         """
         Create a Convolutional Transpose 2D Layer.
 
@@ -140,23 +196,50 @@ class ConvolutionalTranspose2DLayer(Convolutional2DLayer):
         super().__init__(output_channel, kernel_size, stride=stride, padding=padding)
         self._output_padding = output_padding
 
-    def _get_internal_layer(self, **kwargs: Any) -> nn.Module:  # noqa: ARG002
+    def _get_internal_layer(self, **kwargs: Any) -> nn.Module:
         if self._input_size is None:
-            raise ValueError("The input_size is not yet set. The internal layer can only be created when the input_size is set.")
+            raise ValueError(
+                "The input_size is not yet set. The internal layer can only be created when the input_size is set.",
+            )
         if "activation_function" not in kwargs:
-            raise ValueError("The activation_function is not set. The internal layer can only be created when the activation_function is provided in the kwargs.")
+            raise ValueError(
+                "The activation_function is not set. The internal layer can only be created when the activation_function is provided in the kwargs.",
+            )
         if kwargs.get("activation_function") not in ["sigmoid", "relu", "softmax"]:
-            raise ValueError(f"The activation_function '{kwargs.get('activation_function')}' is not supported. Please choose one of the following: ['sigmoid', 'relu', 'softmax'].")
+            raise ValueError(
+                f"The activation_function '{kwargs.get('activation_function')}' is not supported. Please choose one of the following: ['sigmoid', 'relu', 'softmax'].",
+            )
         else:
             activation_function: Literal["sigmoid", "relu", "softmax"] = kwargs["activation_function"]
-        return _create_internal_model(self._input_size.channel, self._output_channel, self._kernel_size, activation_function, self._padding, self._stride, transpose=True, output_padding=self._output_padding)
+        return _create_internal_model(
+            self._input_size.channel,
+            self._output_channel,
+            self._kernel_size,
+            activation_function,
+            self._padding,
+            self._stride,
+            transpose=True,
+            output_padding=self._output_padding,
+        )
 
     @property
     def output_size(self) -> ImageSize:
         if self._input_size is None:
-            raise ValueError("The input_size is not yet set. The layer cannot compute the output_size if the input_size is not set.")
+            raise ValueError(
+                "The input_size is not yet set. The layer cannot compute the output_size if the input_size is not set.",
+            )
         if self._output_size is None:
-            new_width = (self.input_size.width - 1) * self._stride - 2 * self._padding + self._kernel_size + self._output_padding
-            new_height = (self.input_size.height - 1) * self._stride - 2 * self._padding + self._kernel_size + self._output_padding
+            new_width = (
+                (self.input_size.width - 1) * self._stride
+                - 2 * self._padding
+                + self._kernel_size
+                + self._output_padding
+            )
+            new_height = (
+                (self.input_size.height - 1) * self._stride
+                - 2 * self._padding
+                + self._kernel_size
+                + self._output_padding
+            )
             self._output_size = ImageSize(new_width, new_height, self._output_channel, _ignore_invalid_channel=True)
         return self._output_size

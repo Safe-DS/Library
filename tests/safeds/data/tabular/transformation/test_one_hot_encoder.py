@@ -26,7 +26,7 @@ class TestEq:
         [
             (Table({"a": ["a", "b", "c"], "b": ["a", "b", "c"]}), Table({"a": ["a", "b", "c"], "aa": ["a", "b", "c"]})),
             (Table({"a": ["a", "b", "c"], "b": ["a", "b", "c"]}), Table({"a": ["a", "b", "c"], "b": ["a", "b", "d"]})),
-        ]
+        ],
     )
     def test_should_be_not_equal(self, table1: Table, table2: Table) -> None:
         assert OneHotEncoder().fit(table1, None) != OneHotEncoder().fit(table2, None)

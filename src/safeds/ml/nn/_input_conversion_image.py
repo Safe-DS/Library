@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Type, Any
+from typing import TYPE_CHECKING, Any
 
 from safeds.data.image.containers import ImageList
 from safeds.data.image.containers._single_size_image_list import _SingleSizeImageList
@@ -31,14 +31,14 @@ class InputConversionImage(_InputConversion[ImageDataset, ImageList]):
         self._one_hot_encoder: OneHotEncoder | None = None
         self._column_name: str | None = None
         self._column_names: list[str] | None = None
-        self._output_type: Type | None = None
+        self._output_type: type | None = None
 
     @property
     def _data_size(self) -> ImageSize:
         return self._input_size
 
     def _data_conversion_fit(
-        self, input_data: ImageDataset, batch_size: int, num_of_classes: int = 1  # noqa: ARG002
+        self, input_data: ImageDataset, batch_size: int, num_of_classes: int = 1,  # noqa: ARG002
     ) -> ImageDataset:
         return input_data
 
@@ -55,7 +55,10 @@ class InputConversionImage(_InputConversion[ImageDataset, ImageList]):
             if self._column_name is None and self._one_hot_encoder is None:
                 self._one_hot_encoder = input_data._output._one_hot_encoder
                 self._column_name = input_data._output._column_name
-            elif self._column_name != input_data._output._column_name or self._one_hot_encoder != input_data._output._one_hot_encoder:
+            elif (
+                self._column_name != input_data._output._column_name
+                or self._one_hot_encoder != input_data._output._one_hot_encoder
+            ):
                 return False
         elif isinstance(input_data._output, _TableAsTensor):
             if self._column_names is None:
@@ -68,4 +71,8 @@ class InputConversionImage(_InputConversion[ImageDataset, ImageList]):
         return isinstance(input_data, _SingleSizeImageList) and input_data.sizes[0] == self._input_size
 
     def _get_output_configuration(self) -> dict[str, Any]:
-        return {"column_names": self._column_names, "column_name": self._column_name, "one_hot_encoder": self._one_hot_encoder}
+        return {
+            "column_names": self._column_names,
+            "column_name": self._column_name,
+            "one_hot_encoder": self._one_hot_encoder,
+        }

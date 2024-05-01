@@ -1,10 +1,9 @@
-from typing import Literal, Type
+from typing import Literal
 
 import pytest
-from torch import nn
-
 from safeds.data.image.typing import ImageSize
 from safeds.ml.nn._pooling2d_layer import _Pooling2DLayer
+from torch import nn
 
 
 class TestPooling2DLayer:
@@ -16,7 +15,7 @@ class TestPooling2DLayer:
             ("avg", nn.AvgPool2d),
         ],
     )
-    def test_should_create_pooling_layer(self, strategy: Literal["max", "avg"], torch_layer: Type[nn.Module]) -> None:
+    def test_should_create_pooling_layer(self, strategy: Literal["max", "avg"], torch_layer: type[nn.Module]) -> None:
         layer = _Pooling2DLayer(strategy, 2, stride=2, padding=2)
         input_size = ImageSize(10, 20, 30, _ignore_invalid_channel=True)
         with pytest.raises(TypeError, match=r"The input_size of a pooling layer has to be of type ImageSize."):
@@ -37,7 +36,10 @@ class TestPooling2DLayer:
         layer = _Pooling2DLayer(strategy, 2, stride=2, padding=2)
         with pytest.raises(ValueError, match=r"The input_size is not yet set."):
             layer.input_size  # noqa: B018
-        with pytest.raises(ValueError, match=r"The input_size is not yet set. The layer cannot compute the output_size if the input_size is not set."):
+        with pytest.raises(
+            ValueError,
+            match=r"The input_size is not yet set. The layer cannot compute the output_size if the input_size is not set.",
+        ):
             layer.output_size  # noqa: B018
 
     @pytest.mark.parametrize(

@@ -3,8 +3,8 @@ import typing
 from pathlib import Path
 from tempfile import NamedTemporaryFile
 
-import PIL.Image
 import numpy as np
+import PIL.Image
 import pytest
 import torch
 from safeds.data.image.containers import Image
@@ -16,6 +16,8 @@ from torch.types import Device
 
 from tests.helpers import (
     device_cuda,
+    get_devices,
+    get_devices_ids,
     grayscale_jpg_id,
     grayscale_jpg_path,
     grayscale_png_id,
@@ -31,10 +33,11 @@ from tests.helpers import (
     resolve_resource_path,
     rgba_png_id,
     rgba_png_path,
+    skip_if_device_not_available,
     white_square_jpg_id,
     white_square_jpg_path,
     white_square_png_id,
-    white_square_png_path, get_devices, get_devices_ids, skip_if_device_not_available,
+    white_square_png_path,
 )
 
 

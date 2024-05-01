@@ -2,11 +2,10 @@ import sys
 from typing import Any
 
 import pytest
-from torch import nn
-
 from safeds.data.image.typing import ImageSize
 from safeds.exceptions import OutOfBoundsError
 from safeds.ml.nn import ForwardLayer
+from torch import nn
 
 
 @pytest.mark.parametrize(
@@ -47,8 +46,14 @@ def test_should_raise_if_input_size_doesnt_match(input_size: int) -> None:
     ids=["sigmoid", "relu", "softmax", "none"],
 )
 def test_should_accept_activation_function(activation_function: str, expected_activation_function: type | None) -> None:
-    forward_layer = ForwardLayer(output_size=1, input_size=1)._get_internal_layer(activation_function=activation_function)
-    assert forward_layer._fn is None if expected_activation_function is None else isinstance(forward_layer._fn, expected_activation_function)
+    forward_layer = ForwardLayer(output_size=1, input_size=1)._get_internal_layer(
+        activation_function=activation_function,
+    )
+    assert (
+        forward_layer._fn is None
+        if expected_activation_function is None
+        else isinstance(forward_layer._fn, expected_activation_function)
+    )
 
 
 @pytest.mark.parametrize(
@@ -101,7 +106,10 @@ def test_should_raise_if_input_size_is_set_with_image_size() -> None:
 
 def test_should_raise_if_activation_function_not_set() -> None:
     layer = ForwardLayer(1)
-    with pytest.raises(ValueError, match=r"The activation_function is not set. The internal layer can only be created when the activation_function is provided in the kwargs."):
+    with pytest.raises(
+        ValueError,
+        match=r"The activation_function is not set. The internal layer can only be created when the activation_function is provided in the kwargs.",
+    ):
         layer._get_internal_layer()
 
 

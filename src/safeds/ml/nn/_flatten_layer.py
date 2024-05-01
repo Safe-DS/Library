@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Unpack, Any, TypedDict
+from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
     from torch import Tensor, nn
@@ -68,7 +68,9 @@ class FlattenLayer(_Layer):
             If the input_size is not yet set
         """
         if self._input_size is None:
-            raise ValueError("The input_size is not yet set. The layer cannot compute the output_size if the input_size is not set.")
+            raise ValueError(
+                "The input_size is not yet set. The layer cannot compute the output_size if the input_size is not set.",
+            )
         if self._output_size is None:
             self._output_size = self._input_size.width * self._input_size.height * self._input_size.channel
         return self._output_size

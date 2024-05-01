@@ -5,7 +5,7 @@ import math
 import os
 from abc import ABCMeta, abstractmethod
 from pathlib import Path
-from typing import TYPE_CHECKING, overload, Literal
+from typing import TYPE_CHECKING, Literal, overload
 
 from safeds.data.image.containers._image import Image
 
@@ -90,14 +90,20 @@ class ImageList(metaclass=ABCMeta):
 
     @staticmethod
     @overload
-    def from_files(path: str | Path | Sequence[str | Path], return_filenames: Literal[True]) -> tuple[ImageList, list[str]]: ...
+    def from_files(
+        path: str | Path | Sequence[str | Path], return_filenames: Literal[True],
+    ) -> tuple[ImageList, list[str]]: ...
 
     @staticmethod
     @overload
-    def from_files(path: str | Path | Sequence[str | Path], return_filenames: bool) -> ImageList | tuple[ImageList, list[str]]: ...
+    def from_files(
+        path: str | Path | Sequence[str | Path], return_filenames: bool,
+    ) -> ImageList | tuple[ImageList, list[str]]: ...
 
     @staticmethod
-    def from_files(path: str | Path | Sequence[str | Path], return_filenames: bool = False) -> ImageList | tuple[ImageList, list[str]]:
+    def from_files(
+        path: str | Path | Sequence[str | Path], return_filenames: bool = False,
+    ) -> ImageList | tuple[ImageList, list[str]]:
         """
         Create an ImageList from a directory or a list of files.
 
