@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, TypedDict, Any
 
 if TYPE_CHECKING:
     from torch.utils.data import DataLoader
@@ -45,3 +45,6 @@ class InputConversionTable(_InputConversion[TabularDataset, Table]):
 
     def _is_predict_data_valid(self, input_data: Table) -> bool:
         return (sorted(input_data.column_names)).__eq__(sorted(self._feature_names))
+
+    def _get_output_configuration(self) -> TypedDict[str, Any]:
+        return {}

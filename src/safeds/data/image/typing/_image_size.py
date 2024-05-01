@@ -70,7 +70,7 @@ class ImageSize:
     def __sizeof__(self) -> int:
         return sys.getsizeof(self._width) + sys.getsizeof(self._height) + sys.getsizeof(self._channel)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self._width}x{self._height}x{self._channel} (WxHxC)"
 
     @property

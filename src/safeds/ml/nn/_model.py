@@ -15,8 +15,8 @@ from safeds.exceptions import (
     OutOfBoundsError,
 )
 from safeds.ml.nn import InputConversionImage, FlattenLayer, OutputConversionImageToTable, Convolutional2DLayer, \
-    ForwardLayer, OutputConversionImageToImage
-from safeds.ml.nn._output_conversion_image import OutputConversionImageToColumn, _OutputConversionImage
+    ForwardLayer, OutputConversionImageToImage, OutputConversionImageToColumn
+from safeds.ml.nn._output_conversion_image import _OutputConversionImage
 from safeds.ml.nn._pooling2d_layer import _Pooling2DLayer
 
 if TYPE_CHECKING:
@@ -27,8 +27,6 @@ if TYPE_CHECKING:
     from safeds.ml.nn._input_conversion import _InputConversion
     from safeds.ml.nn._layer import _Layer
     from safeds.ml.nn._output_conversion import _OutputConversion
-
-    from safeds.data.tabular.transformation import OneHotEncoder
 
     from safeds.data.image.typing import ImageSize
 
@@ -220,7 +218,7 @@ class NeuralNetworkRegressor(Generic[IFT, IPT, OT]):
             for x in dataloader:
                 elem = self._model(x)
                 predictions.append(elem.squeeze(dim=1))
-        return self._output_conversion._data_conversion(test_data, torch.cat(predictions, dim=0))
+        return self._output_conversion._data_conversion(test_data, torch.cat(predictions, dim=0), **self._input_conversion._get_output_configuration())
 
     @property
     def is_fitted(self) -> bool:
@@ -285,7 +283,7 @@ class NeuralNetworkClassifier(Generic[IFT, IPT, OT]):
         self._input_size = self._model.input_size
         self._batch_size = 1
         self._is_fitted = False
-        self._num_of_classes = int(layers[-1].output_size)
+        self._num_of_classes = layers[-1].output_size if isinstance(layers[-1].output_size, int) else -1  # Is always int but linter doesn´t know
         self._total_number_of_batches_done = 0
         self._total_number_of_epochs_done = 0
 
@@ -422,14 +420,8 @@ class NeuralNetworkClassifier(Generic[IFT, IPT, OT]):
                     predictions.append(torch.argmax(elem, dim=1))
                 else:
                     predictions.append(elem.squeeze(dim=1).round())
-        if isinstance(self._output_conversion, OutputConversionImageToTable) and isinstance(self._input_conversion, InputConversionImage):
-            _column_names: list[str] = self._input_conversion._column_names
-            return self._output_conversion._data_conversion(test_data, torch.cat(predictions, dim=0), column_names=_column_names)
-        if isinstance(self._output_conversion, OutputConversionImageToColumn) and isinstance(self._input_conversion, InputConversionImage):
-            _column_name: str = self._input_conversion._column_name
-            _one_hot_encoder: OneHotEncoder = self._input_conversion._one_hot_encoder
-            return self._output_conversion._data_conversion(test_data, torch.cat(predictions, dim=0), column_name=_column_name, one_hot_encoder=_one_hot_encoder)
-        return self._output_conversion._data_conversion(test_data, torch.cat(predictions, dim=0))
+        print(self._input_conversion._get_output_configuration())
+        return self._output_conversion._data_conversion(test_data, torch.cat(predictions, dim=0), **self._input_conversion._get_output_configuration())
 
     @property
     def is_fitted(self) -> bool:
@@ -461,7 +453,7 @@ def _create_internal_model(input_conversion: _InputConversion[IFT, IPT], layers:
 
             if is_for_classification:
                 internal_layers.pop()
-                if int(layers[-1].output_size) > 2:
+                if isinstance(layers[-1].output_size, int) and layers[-1].output_size > 2:
                     internal_layers.append(layers[-1]._get_internal_layer(activation_function="none"))
                 else:
                     internal_layers.append(layers[-1]._get_internal_layer(activation_function="sigmoid"))

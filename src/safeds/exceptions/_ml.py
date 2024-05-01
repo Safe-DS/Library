@@ -90,9 +90,9 @@ class FeatureDataMismatchError(Exception):
 class InputSizeError(Exception):
     """Raised when the amount of features being passed to a network does not match with its input size."""
 
-    def __init__(self, table_size: int, input_layer_size: int | ImageSize) -> None:
+    def __init__(self, data_size: int | ImageSize, input_layer_size: int | ImageSize) -> None:
         super().__init__(
-            f"The amount of columns being passed to the network({table_size}) does not match with its input size({input_layer_size}). Consider changing the number of neurons in the first layer or reformatting the table.",
+            f"The data size being passed to the network({data_size}) does not match with its input size({input_layer_size}). Consider changing the data size of the model or reformatting the data.",
         )
 
 

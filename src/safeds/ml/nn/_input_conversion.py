@@ -1,14 +1,13 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Generic, TypeVar
-
-from safeds.data.image.containers._single_size_image_list import _SingleSizeImageList
+from typing import TYPE_CHECKING, Generic, TypeVar, TypedDict, Any
 
 if TYPE_CHECKING:
     from torch.utils.data import DataLoader
 
     from safeds.data.image.typing import ImageSize
+    from safeds.data.image.containers._single_size_image_list import _SingleSizeImageList
 
 from safeds.data.tabular.containers import Table, TimeSeries
 from safeds.data.image.containers import ImageList
@@ -40,4 +39,8 @@ class _InputConversion(Generic[FT, PT], ABC):
 
     @abstractmethod
     def _is_predict_data_valid(self, input_data: PT) -> bool:
+        pass  # pragma: no cover
+
+    @abstractmethod
+    def _get_output_configuration(self) -> TypedDict[str, Any]:
         pass  # pragma: no cover

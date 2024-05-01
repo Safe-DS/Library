@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Unpack, Any
+from typing import TYPE_CHECKING, Unpack, Any, TypedDict
 
 if TYPE_CHECKING:
     from torch import Tensor

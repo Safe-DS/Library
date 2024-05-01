@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Type
+from typing import TYPE_CHECKING, Type, TypedDict, Any
 
 from safeds.data.image.containers import ImageList
 from safeds.data.labeled.containers import ImageDataset
@@ -37,7 +37,9 @@ class InputConversionImage(_InputConversion[ImageDataset, ImageList]):
     def _data_size(self) -> ImageSize:
         return self._input_size
 
-    def _data_conversion_fit(self, input_data: ImageDataset, batch_size: int, num_of_classes: int = 1) -> ImageDataset:  # noqa: ARG002
+    def _data_conversion_fit(
+        self, input_data: ImageDataset, batch_size: int, num_of_classes: int = 1  # noqa: ARG002
+    ) -> ImageDataset:
         return input_data
 
     def _data_conversion_predict(self, input_data: ImageList, batch_size: int) -> _SingleSizeImageList:  # noqa: ARG002
@@ -64,3 +66,6 @@ class InputConversionImage(_InputConversion[ImageDataset, ImageList]):
 
     def _is_predict_data_valid(self, input_data: ImageList) -> bool:
         return isinstance(input_data, _SingleSizeImageList) and input_data.sizes[0] == self._input_size
+
+    def _get_output_configuration(self) -> TypedDict[str, Any]:
+        return {"column_names": self._column_names, "column_name": self._column_name, "one_hot_encoder": self._one_hot_encoder}

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import math
-from typing import TYPE_CHECKING, Literal, Unpack, Any
+from typing import TYPE_CHECKING, Literal, Unpack, Any, TypedDict
 
 from safeds.data.image.typing import ImageSize
 
@@ -52,7 +52,7 @@ class _Pooling2DLayer(_Layer):
         self._input_size: ImageSize | None = None
         self._output_size: ImageSize | None = None
 
-    def _get_internal_layer(self, **kwargs: Unpack[dict[str, Any]]) -> nn.Module:  # noqa: ARG002
+    def _get_internal_layer(self, **kwargs: Unpack[TypedDict[str, Any]]) -> nn.Module:  # noqa: ARG002
         return _create_internal_model(self._strategy, self._kernel_size, self._padding, self._stride)
 
     @property
@@ -99,7 +99,7 @@ class _Pooling2DLayer(_Layer):
 
     def _set_input_size(self, input_size: int | ImageSize) -> None:
         if isinstance(input_size, int):
-            raise ValueError("The input_size of a pooling layer has to be of type ImageSize.")
+            raise TypeError("The input_size of a pooling layer has to be of type ImageSize.")
         self._input_size = input_size
         self._output_size = None
 

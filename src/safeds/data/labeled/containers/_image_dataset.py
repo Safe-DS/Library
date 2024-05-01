@@ -38,20 +38,21 @@ class ImageDataset(Generic[T]):
     def __init__(self, input_data: ImageList, output_data: T, batch_size: int = 1, shuffle: bool = False) -> None:
         import torch
 
-        self._shuffle_tensor_indices = torch.LongTensor(list(range(len(input_data))))
-        self._shuffle_after_epoch = shuffle
-        self._batch_size = batch_size
-        self._next_batch_index = 0
+        self._shuffle_tensor_indices: torch.LongTensor = torch.LongTensor(list(range(len(input_data))))
+        self._shuffle_after_epoch: bool = shuffle
+        self._batch_size: int = batch_size
+        self._next_batch_index: int = 0
 
         if isinstance(input_data, _MultiSizeImageList):
             raise ValueError("The given input ImageList contains images of different sizes.")  # noqa: TRY004
         elif isinstance(input_data, _EmptyImageList):
             raise ValueError("The given input ImageList contains no images.")  # noqa: TRY004
         else:
-            self._input_size = ImageSize(input_data.widths[0], input_data.heights[0], input_data.channel)
+            self._input_size: ImageSize = ImageSize(input_data.widths[0], input_data.heights[0], input_data.channel)
             self._input: _SingleSizeImageList = input_data._as_single_size_image_list()
         if ((isinstance(output_data, Table) or isinstance(output_data, Column)) and len(input_data) != output_data.number_of_rows) or (isinstance(output_data, ImageList) and len(input_data) != len(output_data)):
-            raise OutputLengthMismatchError(f"{len(input_data)} != {output_data.number_of_rows if isinstance(output_data, Table) else len(output_data)}")
+            output_len = output_data.number_of_rows if isinstance(output_data, Table) else len(output_data)
+            raise OutputLengthMismatchError(f"{len(input_data)} != {output_len}")
         if isinstance(output_data, Table):
             non_numerical_columns = []
             wrong_interval_columns = []
@@ -140,12 +141,14 @@ class ImageDataset(Generic[T]):
             the output data of this dataset
         """
         output = self._output
+        safeds_output: T
         if isinstance(output, _TableAsTensor):
-            return output._to_table()
+            safeds_output = output._to_table()
         elif isinstance(output, _ColumnAsTensor):
-            return output._to_column()
+            safeds_output = output._to_column()
         else:
-            return output
+            safeds_output = output
+        return safeds_output
 
     def _get_batch(self, batch_number: int, batch_size: int | None = None) -> tuple[Tensor, Tensor]:
         import torch

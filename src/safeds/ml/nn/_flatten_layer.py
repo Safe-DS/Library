@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Unpack, Any
+from typing import TYPE_CHECKING, Unpack, Any, TypedDict
 
 if TYPE_CHECKING:
     from torch import Tensor, nn
@@ -30,7 +30,7 @@ class FlattenLayer(_Layer):
         self._input_size: ImageSize | None = None
         self._output_size: int | None = None
 
-    def _get_internal_layer(self, **kwargs: Unpack[dict[str, Any]]) -> nn.Module:  # noqa: ARG002
+    def _get_internal_layer(self, **kwargs: Unpack[TypedDict[str, Any]]) -> nn.Module:  # noqa: ARG002
         return _create_internal_model()
 
     @property
@@ -75,6 +75,6 @@ class FlattenLayer(_Layer):
 
     def _set_input_size(self, input_size: int | ImageSize) -> None:
         if isinstance(input_size, int):
-            raise ValueError("The input_size of a flatten layer has to be of type ImageSize.")
+            raise TypeError("The input_size of a flatten layer has to be of type ImageSize.")
         self._input_size = input_size
         self._output_size = None

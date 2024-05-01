@@ -1,4 +1,5 @@
 import re
+from typing import TYPE_CHECKING
 
 import pytest
 import torch
@@ -12,9 +13,11 @@ from safeds.data.tabular.transformation import OneHotEncoder
 from safeds.ml.nn import NeuralNetworkClassifier, InputConversionImage, Convolutional2DLayer, MaxPooling2DLayer, \
     FlattenLayer, ForwardLayer, OutputConversionImageToTable, ConvolutionalTranspose2DLayer, NeuralNetworkRegressor, \
     AvgPooling2DLayer
-from safeds.ml.nn._layer import _Layer
 from safeds.ml.nn._output_conversion_image import OutputConversionImageToColumn, OutputConversionImageToImage
 from tests.helpers import resolve_resource_path, images_all, device_cuda, device_cpu, skip_if_device_not_available
+
+if TYPE_CHECKING:
+    from safeds.ml.nn._layer import _Layer
 
 
 class TestImageToTableClassifier:
@@ -45,11 +48,12 @@ class TestImageToTableClassifier:
         one_hot_encoder = OneHotEncoder().fit(image_classes, ["class"])
         image_classes_one_hot_encoded = one_hot_encoder.transform(image_classes)
         image_dataset = ImageDataset(image_list, image_classes_one_hot_encoded)
+        num_of_classes: int = image_dataset.output_size if isinstance(image_dataset.output_size, int) else 0
         layers = [
             Convolutional2DLayer(1, 2),
             MaxPooling2DLayer(10),
             FlattenLayer(),
-            ForwardLayer(int(image_dataset.output_size))
+            ForwardLayer(num_of_classes)
         ]
         nn_original = NeuralNetworkClassifier(InputConversionImage(image_dataset.input_size), layers,
                                               OutputConversionImageToTable())
@@ -86,12 +90,13 @@ class TestImageToColumnClassifier:
                 classes.append(groups.group(2))
         image_classes = Column("class", classes)
         image_dataset = ImageDataset(image_list, image_classes, shuffle=True)
+        num_of_classes: int = image_dataset.output_size if isinstance(image_dataset.output_size, int) else 0
 
         layers = [
             Convolutional2DLayer(1, 2),
             AvgPooling2DLayer(10),
             FlattenLayer(),
-            ForwardLayer(int(image_dataset.output_size))
+            ForwardLayer(num_of_classes)
         ]
         nn_original = NeuralNetworkClassifier(InputConversionImage(image_dataset.input_size), layers,
                                               OutputConversionImageToColumn())

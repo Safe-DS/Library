@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Generic, TypeVar, Unpack, Any
+from typing import TYPE_CHECKING, Generic, TypeVar, Unpack, Any, TypedDict
 
 from safeds.data.image.containers import ImageList
 from safeds.data.labeled.containers import ImageDataset, TabularDataset
@@ -19,5 +19,5 @@ class _OutputConversion(Generic[IT, OT], ABC):
     """The output conversion for a neural network, defines the output parameters for the neural network."""
 
     @abstractmethod
-    def _data_conversion(self, input_data: IT, output_data: Tensor, **kwargs: Unpack[dict[str, Any]]) -> OT:
+    def _data_conversion(self, input_data: IT, output_data: Tensor, **kwargs: Unpack[TypedDict[str, Any]]) -> OT:
         pass  # pragma: no cover
