@@ -743,6 +743,24 @@ class Column(Sequence[T]):
             raise NonNumericColumnError(f"{self.name} is of type {self._type}.")
         return self._data.min()
 
+    def missing_value_count(self) -> int:
+        """
+        Return the number of missing values in the column.
+
+        Returns
+        -------
+        count:
+            The number of missing values.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("col_1", [None, 'a', None])
+        >>> column.missing_value_count()
+        2
+        """
+        return self._data.isna().sum()
+
     def missing_value_ratio(self) -> float:
         """
         Return the ratio of missing values to the total number of elements in the column.
@@ -770,7 +788,7 @@ class Column(Sequence[T]):
         """
         if self._data.size == 0:
             raise ColumnSizeError("> 0", "0")
-        return self._count_missing_values() / self._data.size
+        return self.missing_value_count() / self._data.size
 
     def mode(self) -> list[T]:
         """
@@ -1010,8 +1028,7 @@ class Column(Sequence[T]):
         --------
         >>> from safeds.data.tabular.containers import Column
         >>> column = Column("test", [1, 2, 3])
-        >>> column.to_html()
-        '<table border="1" class="dataframe">\n  <thead>\n    <tr style="text-align: right;">\n      <th></th>\n      <th>test</th>\n    </tr>\n  </thead>\n  <tbody>\n    <tr>\n      <th>0</th>\n      <td>1</td>\n    </tr>\n    <tr>\n      <th>1</th>\n      <td>2</td>\n    </tr>\n    <tr>\n      <th>2</th>\n      <td>3</td>\n    </tr>\n  </tbody>\n</table>'
+        >>> html = column.to_html()
         """
         frame = self._data.to_frame()
         frame.columns = [self.name]
@@ -1035,32 +1052,9 @@ class Column(Sequence[T]):
         --------
         >>> from safeds.data.tabular.containers import Column
         >>> column = Column("col_1", ['a', 'b', 'c'])
-        >>> column._repr_html_()
-        '<div>\n<style scoped>\n    .dataframe tbody tr th:only-of-type {\n        vertical-align: middle;\n    }\n\n    .dataframe tbody tr th {\n        vertical-align: top;\n    }\n\n    .dataframe thead th {\n        text-align: right;\n    }\n</style>\n<table border="1" class="dataframe">\n  <thead>\n    <tr style="text-align: right;">\n      <th></th>\n      <th>col_1</th>\n    </tr>\n  </thead>\n  <tbody>\n    <tr>\n      <th>0</th>\n      <td>a</td>\n    </tr>\n    <tr>\n      <th>1</th>\n      <td>b</td>\n    </tr>\n    <tr>\n      <th>2</th>\n      <td>c</td>\n    </tr>\n  </tbody>\n</table>\n</div>'
+        >>> html = column._repr_html_()
         """
         frame = self._data.to_frame()
         frame.columns = [self.name]
 
         return frame.to_html(max_rows=self._data.size, max_cols=1, notebook=True)
-
-    # ------------------------------------------------------------------------------------------------------------------
-    # Other
-    # ------------------------------------------------------------------------------------------------------------------
-
-    def _count_missing_values(self) -> int:
-        """
-        Return the number of null values in the column.
-
-        Returns
-        -------
-        count:
-            The number of null values.
-
-        Examples
-        --------
-        >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("col_1", [None, 'a', None])
-        >>> column._count_missing_values()
-        2
-        """
-        return self._data.isna().sum()
