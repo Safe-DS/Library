@@ -838,7 +838,7 @@ class Table:
                 },
             )
             for name in self.column_names:
-                table = table.add_column(Column(name, ["-", "-", "-", "-", "-", "-","-","-", "-", "-", "-"]))
+                table = table.add_column(Column(name, ["-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-"]))
             return table
 
         columns = self.to_columns()
