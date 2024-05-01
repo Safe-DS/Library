@@ -62,7 +62,7 @@ class TestKernel:
         assert fitted_model._wrapped_regressor is not None
         assert isinstance(fitted_model.kernel, SupportVectorMachineRegressor.Kernel.Linear)
 
-    def test_should_get_sklearn_kernel_linear(self) -> None:
+    def test_should_get_sklearn_arguments_linear(self) -> None:
         svm = SupportVectorMachineRegressor(c=2, kernel=SupportVectorMachineRegressor.Kernel.Linear())
         assert isinstance(svm.kernel, SupportVectorMachineRegressor.Kernel.Linear)
         linear_kernel = svm.kernel._get_sklearn_arguments()
@@ -75,7 +75,7 @@ class TestKernel:
         with pytest.raises(OutOfBoundsError, match=rf"degree \(={degree}\) is not inside \[1, \u221e\)\."):
             SupportVectorMachineRegressor.Kernel.Polynomial(degree=degree)
 
-    def test_should_get_sklearn_kernel_polynomial(self) -> None:
+    def test_should_get_sklearn_arguments_polynomial(self) -> None:
         svm = SupportVectorMachineRegressor(c=2, kernel=SupportVectorMachineRegressor.Kernel.Polynomial(degree=2))
         assert isinstance(svm.kernel, SupportVectorMachineRegressor.Kernel.Polynomial)
         poly_kernel = svm.kernel._get_sklearn_arguments()
@@ -84,7 +84,11 @@ class TestKernel:
             "degree": 2,
         }
 
-    def test_should_get_sklearn_kernel_sigmoid(self) -> None:
+    def test_should_get_degree(self) -> None:
+        kernel = SupportVectorMachineRegressor.Kernel.Polynomial(degree=3)
+        assert kernel.degree == 3
+
+    def test_should_get_sklearn_arguments_sigmoid(self) -> None:
         svm = SupportVectorMachineRegressor(c=2, kernel=SupportVectorMachineRegressor.Kernel.Sigmoid())
         assert isinstance(svm.kernel, SupportVectorMachineRegressor.Kernel.Sigmoid)
         sigmoid_kernel = svm.kernel._get_sklearn_arguments()
@@ -92,7 +96,7 @@ class TestKernel:
             "kernel": "sigmoid",
         }
 
-    def test_should_get_sklearn_kernel_rbf(self) -> None:
+    def test_should_get_sklearn_arguments_rbf(self) -> None:
         svm = SupportVectorMachineRegressor(c=2, kernel=SupportVectorMachineRegressor.Kernel.RadialBasisFunction())
         assert isinstance(svm.kernel, SupportVectorMachineRegressor.Kernel.RadialBasisFunction)
         rbf_kernel = svm.kernel._get_sklearn_arguments()
