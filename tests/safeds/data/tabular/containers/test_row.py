@@ -570,7 +570,10 @@ class TestSortColumns:
         ],
     )
     def test_should_sort_columns(
-        self, row: Row, comparator: Callable[[str, Any, str, Any], int], expected: Row,
+        self,
+        row: Row,
+        comparator: Callable[[str, Any, str, Any], int],
+        expected: Row,
     ) -> None:
         row = row.sort_columns(comparator)
         assert row == expected
