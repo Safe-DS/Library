@@ -137,7 +137,11 @@ def test_should_raise_error(
             None,
         ),
     ],
-    ids=["create_tabular_dataset", "tabular_dataset_not_all_columns_are_features", "tabular_dataset_with_feature_names_as_None"],
+    ids=[
+        "create_tabular_dataset",
+        "tabular_dataset_not_all_columns_are_features",
+        "tabular_dataset_with_feature_names_as_None",
+    ],
 )
 def test_should_create_a_time_series(
     data: dict[str, list[int]],

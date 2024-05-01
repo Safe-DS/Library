@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING
 from safeds._utils import _structural_hash
 from safeds.data.labeled.containers import TabularDataset
 from safeds.data.tabular.containers import Table
-from safeds.exceptions import ClosedBound, DatasetMissesDataError, PlainTableError, OutOfBoundsError
+from safeds.exceptions import ClosedBound, DatasetMissesDataError, OutOfBoundsError, PlainTableError
 from safeds.ml.classical._util_sklearn import fit, predict
 
 from ._classifier import Classifier

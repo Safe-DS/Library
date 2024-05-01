@@ -7,11 +7,11 @@ from safeds.exceptions import (
     DatasetContainsTargetError,
     DatasetMissesDataError,
     DatasetMissesFeaturesError,
-    PlainTableError,
     LearningError,
     MissingValuesColumnError,
     ModelNotFittedError,
     NonNumericColumnError,
+    PlainTableError,
     PredictionError,
 )
 

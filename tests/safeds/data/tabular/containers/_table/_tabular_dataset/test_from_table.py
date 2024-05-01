@@ -134,7 +134,11 @@ def test_should_raise_error(
             None,
         ),
     ],
-    ids=["create_tabular_dataset", "tabular_dataset_not_all_columns_are_features", "tabular_dataset_with_feature_names_as_None"],
+    ids=[
+        "create_tabular_dataset",
+        "tabular_dataset_not_all_columns_are_features",
+        "tabular_dataset_with_feature_names_as_None",
+    ],
 )
 def test_should_create_a_tabular_dataset(table: Table, target_name: str, feature_names: list[str] | None) -> None:
     tabular_dataset = TabularDataset._from_table(table, target_name=target_name, feature_names=feature_names)
