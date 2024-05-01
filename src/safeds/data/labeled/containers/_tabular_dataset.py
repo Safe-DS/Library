@@ -288,6 +288,21 @@ class TabularDataset:
                 shuffle=True,
             )
 
+    # ------------------------------------------------------------------------------------------------------------------
+    # IPython integration
+    # ------------------------------------------------------------------------------------------------------------------
+
+    def _repr_html_(self) -> str:
+        """
+        Return an HTML representation of the tabular dataset.
+
+        Returns
+        -------
+        output:
+            The generated HTML.
+        """
+        return self._table._repr_html_()
+
 
 def _create_dataset(features: Tensor, target: Tensor) -> Dataset:
     import torch
