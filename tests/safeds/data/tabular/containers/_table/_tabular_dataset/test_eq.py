@@ -51,7 +51,9 @@ from safeds.data.tabular.containers import Row, Table
     ],
 )
 def test_should_return_whether_two_tabular_datasets_are_equal(
-    table1: TabularDataset, table2: TabularDataset, expected: bool,
+    table1: TabularDataset,
+    table2: TabularDataset,
+    expected: bool,
 ) -> None:
     assert (table1.__eq__(table2)) == expected
 

@@ -53,6 +53,7 @@ def test_should_return_same_hash_for_equal_tabular_datasets(table1: TabularDatas
     ],
 )
 def test_should_return_different_hash_for_unequal_tabular_datasets(
-    table1: TabularDataset, table2: TabularDataset,
+    table1: TabularDataset,
+    table2: TabularDataset,
 ) -> None:
     assert hash(table1) != hash(table2)
