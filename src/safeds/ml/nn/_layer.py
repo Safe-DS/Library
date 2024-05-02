@@ -7,7 +7,7 @@ if TYPE_CHECKING:
     from torch import nn
 
 
-class _Layer(ABC):
+class Layer(ABC):
     @abstractmethod
     def __init__(self) -> None:
         pass  # pragma: no cover
