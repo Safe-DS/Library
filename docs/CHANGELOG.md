@@ -1,3 +1,10 @@
+## [0.22.1](https://github.com/Safe-DS/Library/compare/v0.22.0...v0.22.1) (2024-05-02)
+
+
+### Bug Fixes
+
+* make `_Layer`, `_InputConversion`, `_OutputConversion` public ([#692](https://github.com/Safe-DS/Library/issues/692)) ([eb226f4](https://github.com/Safe-DS/Library/commit/eb226f4e83267ab6c3b1fa1b862aeda8a55b1ff8)), closes [#690](https://github.com/Safe-DS/Library/issues/690) [#691](https://github.com/Safe-DS/Library/issues/691)
+
 ## [0.22.0](https://github.com/Safe-DS/Library/compare/v0.21.0...v0.22.0) (2024-05-01)
 
 
