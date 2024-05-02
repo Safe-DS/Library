@@ -13,7 +13,7 @@ IT = TypeVar("IT", Table, TimeSeriesDataset)
 OT = TypeVar("OT", TabularDataset, TimeSeriesDataset)
 
 
-class _OutputConversion(Generic[IT, OT], ABC):
+class OutputConversion(Generic[IT, OT], ABC):
     """The output conversion for a neural network, defines the output parameters for the neural network."""
 
     @abstractmethod

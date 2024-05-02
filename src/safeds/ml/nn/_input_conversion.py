@@ -13,7 +13,7 @@ FT = TypeVar("FT", TabularDataset, TimeSeriesDataset)
 PT = TypeVar("PT", Table, TimeSeriesDataset)
 
 
-class _InputConversion(Generic[FT, PT], ABC):
+class InputConversion(Generic[FT, PT], ABC):
     """The input conversion for a neural network, defines the input parameters for the neural network."""
 
     @property
