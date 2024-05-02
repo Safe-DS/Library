@@ -35,7 +35,7 @@ if TYPE_CHECKING:
         InputSizeError,
         LearningError,
         ModelNotFittedError,
-        NonTimeSeriesError,
+        NonTimeSeriesDatasetError,
         PlainTableError,
         PredictionError,
     )
@@ -68,7 +68,7 @@ apipkg.initpkg(
         "InputSizeError": "._ml:InputSizeError",
         "LearningError": "._ml:LearningError",
         "ModelNotFittedError": "._ml:ModelNotFittedError",
-        "NonTimeSeriesError": "._ml:NonTimeSeriesError",
+        "NonTimeSeriesDatasetError": "._ml:NonTimeSeriesDatasetError",
         "PlainTableError": "._ml:PlainTableError",
         "PredictionError": "._ml:PredictionError",
         # Other
@@ -104,7 +104,7 @@ __all__ = [
     "InputSizeError",
     "LearningError",
     "ModelNotFittedError",
-    "NonTimeSeriesError",
+    "NonTimeSeriesDatasetError",
     "PlainTableError",
     "PredictionError",
     # Other

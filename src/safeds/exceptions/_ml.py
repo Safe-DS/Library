@@ -85,13 +85,8 @@ class PlainTableError(TypeError):
         )
 
 
-class NonTimeSeriesError(Exception):
-    """Raised when a table is used instead of a TimeSeries in a regression or classification."""
+class NonTimeSeriesDatasetError(TypeError):
+    """Exception raised when a 'TimeSeriesDataset' is exprected."""
 
     def __init__(self) -> None:
-        super().__init__(
-            (
-                "This method needs a time series.\nA time series is a table that additionally knows which columns are"
-                " time and which are the target to predict.\n"
-            ),
-        )
+        super().__init__(f"Expected a instance of TimeSeriesDataset, got something else instead.")

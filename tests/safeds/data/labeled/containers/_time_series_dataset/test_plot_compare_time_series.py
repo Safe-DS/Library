@@ -1,11 +1,10 @@
 import pytest
-from safeds.data.tabular.containers import TimeSeries
+from safeds.data.labeled.containers import TimeSeriesDataset
 from safeds.exceptions import NonNumericColumnError
 from syrupy import SnapshotAssertion
 
-
-def create_time_series_list() -> list[TimeSeries]:
-    table1 = TimeSeries(
+def create_time_series_list() -> list[TimeSeriesDataset]:
+    table1 = TimeSeriesDataset(
         {
             "time": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
             "feature_1": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
@@ -13,9 +12,8 @@ def create_time_series_list() -> list[TimeSeries]:
         },
         target_name="target",
         time_name="time",
-        feature_names=None,
     )
-    table2 = TimeSeries(
+    table2 = TimeSeriesDataset(
         {
             "time": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
             "feature_1": [4, 5, 6, 7, 8, 9, 10, 11, 12, 13],
@@ -23,13 +21,12 @@ def create_time_series_list() -> list[TimeSeries]:
         },
         target_name="target",
         time_name="time",
-        feature_names=None,
     )
     return [table1, table2]
 
 
-def create_invalid_time_series_list() -> list[TimeSeries]:
-    table1 = TimeSeries(
+def create_invalid_time_series_list() -> list[TimeSeriesDataset]:
+    table1 = TimeSeriesDataset(
         {
             "time": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
             "feature_1": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
@@ -37,9 +34,8 @@ def create_invalid_time_series_list() -> list[TimeSeries]:
         },
         target_name="target",
         time_name="time",
-        feature_names=None,
     )
-    table2 = TimeSeries(
+    table2 = TimeSeriesDataset(
         {
             "time": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
             "feature_1": [4, 5, 6, 7, 8, 9, 10, 11, 12, 13],
@@ -47,13 +43,12 @@ def create_invalid_time_series_list() -> list[TimeSeries]:
         },
         target_name="target",
         time_name="time",
-        feature_names=None,
     )
     return [table1, table2]
 
 
 def test_legit_compare(snapshot_png_image: SnapshotAssertion) -> None:
-    table = TimeSeries(
+    table = TimeSeriesDataset(
         {
             "time": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
             "feature_1": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
@@ -61,14 +56,13 @@ def test_legit_compare(snapshot_png_image: SnapshotAssertion) -> None:
         },
         target_name="target",
         time_name="time",
-        feature_names=None,
     )
     plot = table.plot_compare_time_series(create_time_series_list())
     assert plot == snapshot_png_image
 
 
 def test_should_raise_if_column_contains_non_numerical_values_x() -> None:
-    table = TimeSeries(
+    table = TimeSeriesDataset(
         {
             "time": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
             "feature_1": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
@@ -76,7 +70,6 @@ def test_should_raise_if_column_contains_non_numerical_values_x() -> None:
         },
         target_name="target",
         time_name="time",
-        feature_names=None,
     )
     with pytest.raises(
         NonNumericColumnError,
@@ -91,7 +84,7 @@ def test_should_raise_if_column_contains_non_numerical_values_x() -> None:
 
 
 def test_with_non_valid_list() -> None:
-    table = TimeSeries(
+    table = TimeSeriesDataset(
         {
             "time": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
             "feature_1": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
@@ -99,7 +92,6 @@ def test_with_non_valid_list() -> None:
         },
         target_name="target",
         time_name="time",
-        feature_names=None,
     )
     with pytest.raises(
         NonNumericColumnError,

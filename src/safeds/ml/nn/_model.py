@@ -3,8 +3,8 @@ from __future__ import annotations
 import copy
 from typing import TYPE_CHECKING, Generic, Self, TypeVar
 
-from safeds.data.labeled.containers import TabularDataset
-from safeds.data.tabular.containers import Table, TimeSeries
+from safeds.data.labeled.containers import TabularDataset, TimeSeriesDataset
+from safeds.data.tabular.containers import Table
 from safeds.exceptions import (
     ClosedBound,
     FeatureDataMismatchError,
@@ -26,19 +26,19 @@ if TYPE_CHECKING:
     from safeds.ml.nn._layer import _Layer
     from safeds.ml.nn._output_conversion import _OutputConversion
 
-IFT = TypeVar("IFT", TabularDataset, TimeSeries)  # InputFitType
-IPT = TypeVar("IPT", Table, TimeSeries)  # InputPredictType
-OT = TypeVar("OT", TabularDataset, TimeSeries)  # OutputType
+IFT = TypeVar("IFT", TabularDataset, TimeSeriesDataset)  # InputFitType
+IPT = TypeVar("IPT", Table, TimeSeriesDataset)  # InputPredictType
+OT = TypeVar("OT", TabularDataset, TimeSeriesDataset)  # OutputType
 
 
-def _set_instance_parameters(input_conversion: _InputConversion, train_data: TaggedTable | TimeSeries) -> None:
-    if isinstance(input_conversion, InputConversionTable) and isinstance(train_data, TaggedTable):
+def _set_instance_parameters(input_conversion: _InputConversion, train_data: TabularDataset | TimeSeriesDataset) -> None:
+    if isinstance(input_conversion, InputConversionTable) and isinstance(train_data, TabularDataset):
         input_conversion._set_parameters(
             target_name=train_data.target.name,
             time_name="",
             feature_names=train_data.features.column_names,
         )
-    if isinstance(input_conversion, InputConversionTimeSeries) and isinstance(train_data, TimeSeries):
+    if isinstance(input_conversion, InputConversionTimeSeries) and isinstance(train_data, TimeSeriesDataset):
         input_conversion._set_parameters(
             target_name=train_data.target.name,
             time_name=train_data.time.name,
@@ -116,8 +116,6 @@ class NeuralNetworkRegressor(Generic[IFT, IPT, OT]):
             raise OutOfBoundsError(actual=batch_size, name="batch_size", lower_bound=ClosedBound(1))
         if self._input_conversion._data_size is not self._input_size:
             raise InputSizeError(self._input_conversion._data_size, self._input_size)
-        if not self._input_conversion._is_fit_data_valid(train_data):
-            raise FeatureDataMismatchError
 
         copied_model = copy.deepcopy(self)
 

@@ -1,13 +1,14 @@
 from typing import Any
 
 import pytest
-from safeds.data.tabular.containers import Table, TimeSeries
+from safeds.data.labeled.containers import TimeSeriesDataset
+from safeds.data.tabular.containers import Table
 from safeds.exceptions import (
     DatasetMissesDataError,
     MissingValuesColumnError,
     ModelNotFittedError,
     NonNumericColumnError,
-    NonTimeSeriesError,
+    NonTimeSeriesDatasetError,
 )
 from safeds.ml.classical.regression import ArimaModelRegressor, LassoRegressor
 
@@ -17,30 +18,28 @@ from tests.helpers import resolve_resource_path
 def test_arima_model() -> None:
     # Create a DataFrame
     _inflation_path = "_datas/US_Inflation_rates.csv"
-    time_series = TimeSeries.timeseries_from_csv_file(
+    time_series = Table.from_csv_file(
         path=resolve_resource_path(_inflation_path),
-        target_name="value",
-        time_name="date",
     )
     train_ts, test_ts = time_series.split_rows(0.8)
     model = ArimaModelRegressor()
-    trained_model = model.fit(train_ts)
-    predicted_ts = trained_model.predict(test_ts)
-    predicted_ts.plot_compare_time_series([test_ts])
+    trained_model = model.fit(train_ts.to_time_series_dataset("value", "date"))
+    predicted_ts = trained_model.predict(test_ts.to_time_series_dataset("value", "date"))
+    predicted_ts.plot_compare_time_series([test_ts.to_time_series_dataset("value", "date")])
     # suggest it ran through
     assert True
 
 
-def create_test_data() -> TimeSeries:
-    return TimeSeries(
+def create_test_data() -> TimeSeriesDataset:
+    return TimeSeriesDataset(
         {"time": [1, 2, 3, 4, 5, 6, 7, 8, 9], "value": [1, 2, 3, 4, 5, 6, 7, 8, 9]},
         time_name="time",
         target_name="value",
     )
 
 
-def create_test_data_with_feature() -> TimeSeries:
-    return TimeSeries(
+def create_test_data_with_feature() -> TimeSeriesDataset:
+    return TimeSeriesDataset(
         {
             "time": [1, 2, 3, 4, 5, 6, 7, 8, 9],
             "value": [1, 2, 3, 4, 5, 6, 7, 8, 9],
@@ -92,7 +91,7 @@ def test_should_succeed_on_valid_data_plot() -> None:
                     "feat2": [3, 6],
                     "target": ["0", 1],
                 },
-            )._time_columns(target_name="target", feature_names=["feat1", "feat2"], time_name="id"),
+            ).to_time_series_dataset(target_name="target", time_name="id"),
             NonNumericColumnError,
             r"Tried to do a numerical operation on one or multiple non-numerical columns: \ntarget",
         ),
@@ -104,7 +103,7 @@ def test_should_succeed_on_valid_data_plot() -> None:
                     "feat2": [3, 6],
                     "target": [None, 1],
                 },
-            )._time_columns(target_name="target", feature_names=["feat1", "feat2"], time_name="id"),
+            ).to_time_series_dataset(target_name="target", time_name="id"),
             MissingValuesColumnError,
             r"Tried to do an operation on one or multiple columns containing missing values: \ntarget\nYou can use the Imputer to replace the missing values based on different strategies.\nIf you want toremove the missing values entirely you can use the method `TimeSeries.remove_rows_with_missing_values`.",
         ),
@@ -116,7 +115,7 @@ def test_should_succeed_on_valid_data_plot() -> None:
                     "feat2": [],
                     "target": [],
                 },
-            )._time_columns(target_name="target", feature_names=["feat1", "feat2"], time_name="id"),
+            ).to_time_series_dataset(target_name="target", time_name="id"),
             DatasetMissesDataError,
             r"Dataset contains no rows",
         ),
@@ -124,7 +123,7 @@ def test_should_succeed_on_valid_data_plot() -> None:
     ids=["non-numerical data", "missing values in data", "no rows in data"],
 )
 def test_should_raise_on_invalid_data(
-    invalid_data: TimeSeries,
+    invalid_data: TimeSeriesDataset,
     expected_error: Any,
     expected_error_msg: str,
 ) -> None:
@@ -148,7 +147,7 @@ def test_should_raise_on_invalid_data(
 )
 def test_should_raise_if_given_normal_table(table: Table) -> None:
     model = ArimaModelRegressor()
-    with pytest.raises(NonTimeSeriesError):
+    with pytest.raises(NonTimeSeriesDatasetError):
         model.fit(table)  # type: ignore[arg-type]
 
 

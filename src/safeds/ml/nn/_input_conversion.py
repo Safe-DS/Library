@@ -6,11 +6,11 @@ from typing import TYPE_CHECKING, Generic, TypeVar
 if TYPE_CHECKING:
     from torch.utils.data import DataLoader
 
-from safeds.data.labeled.containers import TabularDataset
-from safeds.data.tabular.containers import Table, TimeSeries
+from safeds.data.labeled.containers import TabularDataset, TimeSeriesDataset
+from safeds.data.tabular.containers import Table
 
-FT = TypeVar("FT", TabularDataset, TimeSeries)
-PT = TypeVar("PT", Table, TimeSeries)
+FT = TypeVar("FT", TabularDataset, TimeSeriesDataset)
+PT = TypeVar("PT", Table, TimeSeriesDataset)
 
 
 class _InputConversion(Generic[FT, PT], ABC):

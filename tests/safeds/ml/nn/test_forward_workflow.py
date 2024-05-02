@@ -30,6 +30,6 @@ def test_lstm_model() -> None:
         OutputConversionTable("predicted"),
     )
 
-    fitted_model = model.fit(train_table.tag_columns("target", ["value"]), epoch_size=25, learning_rate=0.01)
+    fitted_model = model.fit(train_table.to_tabular_dataset("target"), epoch_size=25, learning_rate=0.01)
     fitted_model.predict(test_table.keep_only_columns(["value"]))
     assert True

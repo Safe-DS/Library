@@ -1,109 +1,25 @@
 import pytest
-from safeds.data.tabular.containers import TimeSeries
+from safeds.data.labeled.containers import TimeSeriesDataset
 from safeds.exceptions import NonNumericColumnError, UnknownColumnNameError
 from syrupy import SnapshotAssertion
 
 
 def test_should_return_table(snapshot_png_image: SnapshotAssertion) -> None:
-    table = TimeSeries(
+    table = TimeSeriesDataset(
         {
             "time": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
             "feature_1": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-            "target": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+            "target": [9, 10, 11, 12, 13, 14, 15, 16, 17, 18],
         },
         target_name="target",
         time_name="time",
-        feature_names=None,
     )
-    plot = table.plot_scatterplot()
+    plot = table.plot_lineplot()
     assert plot == snapshot_png_image
-
-
-def test_should_plot_feature(snapshot_png_image: SnapshotAssertion) -> None:
-    table = TimeSeries(
-        {
-            "time": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-            "feature_1": [10, 9, 8, 7, 6, 5, 4, 3, 2, 1],
-            "target": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-        },
-        target_name="target",
-        time_name="time",
-        feature_names=None,
-    )
-    plot = table.plot_scatterplot(y_column_name="feature_1")
-    assert plot == snapshot_png_image
-
-
-def test_should_plot_feature_only_x(snapshot_png_image: SnapshotAssertion) -> None:
-    table = TimeSeries(
-        {
-            "time": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-            "feature_1": [10, 9, 8, 7, 6, 5, 4, 3, 2, 1],
-            "target": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-        },
-        target_name="target",
-        time_name="time",
-        feature_names=None,
-    )
-    plot = table.plot_scatterplot(x_column_name="feature_1")
-    assert plot == snapshot_png_image
-
-
-def test_should_plot_feature_only_y_optional(snapshot_png_image: SnapshotAssertion) -> None:
-    table = TimeSeries(
-        {
-            "time": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-            "feature_1": [10, 9, 8, 7, 6, 5, 4, 3, 2, 1],
-            "target": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-        },
-        target_name="target",
-        time_name="time",
-        feature_names=None,
-    )
-    plot = table.plot_scatterplot(y_column_name="feature_1")
-    assert plot == snapshot_png_image
-
-
-def test_should_plot_feature_both_set(snapshot_png_image: SnapshotAssertion) -> None:
-    table = TimeSeries(
-        {
-            "time": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-            "feature_1": [1, 2, 1, 2, 1, 2, 1, 2, 1, 1],
-            "target": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-        },
-        target_name="target",
-        time_name="time",
-        feature_names=None,
-    )
-    plot = table.plot_scatterplot(x_column_name="feature_1", y_column_name="target")
-    assert plot == snapshot_png_image
-
-
-def test_should_raise_if_column_contains_non_numerical_values() -> None:
-    table = TimeSeries(
-        {
-            "time": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-            "feature_1": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
-            "target": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-        },
-        target_name="target",
-        time_name="time",
-        feature_names=None,
-    )
-    with pytest.raises(
-        NonNumericColumnError,
-        match=(
-            r"Tried to do a numerical operation on one or multiple non-numerical columns: \nThe time series plotted"
-            r" column"
-            r" contains"
-            r" non-numerical columns."
-        ),
-    ):
-        table.plot_scatterplot(y_column_name="feature_1")
 
 
 def test_should_raise_if_column_contains_non_numerical_values_x() -> None:
-    table = TimeSeries(
+    table = TimeSeriesDataset(
         {
             "time": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
             "feature_1": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
@@ -111,7 +27,6 @@ def test_should_raise_if_column_contains_non_numerical_values_x() -> None:
         },
         target_name="target",
         time_name="time",
-        feature_names=None,
     )
     with pytest.raises(
         NonNumericColumnError,
@@ -122,14 +37,92 @@ def test_should_raise_if_column_contains_non_numerical_values_x() -> None:
             r" non-numerical columns."
         ),
     ):
-        table.plot_scatterplot(x_column_name="feature_1")
+        table.plot_lineplot(x_column_name="feature_1")
+
+
+def test_should_return_table_both(snapshot_png_image: SnapshotAssertion) -> None:
+    table = TimeSeriesDataset(
+        {
+            "time": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+            "feature_1": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+            "target": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+        },
+        target_name="target",
+        time_name="time",
+    )
+    plot = table.plot_lineplot(x_column_name="feature_1", y_column_name="target")
+    assert plot == snapshot_png_image
+
+
+def test_should_plot_feature_y(snapshot_png_image: SnapshotAssertion) -> None:
+    table = TimeSeriesDataset(
+        {
+            "time": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+            "feature_1": [10, 9, 8, 7, 6, 5, 4, 3, 2, 1],
+            "target": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+        },
+        target_name="target",
+        time_name="time",
+    )
+    plot = table.plot_lineplot(y_column_name="feature_1")
+    assert plot == snapshot_png_image
+
+
+def test_should_plot_feature_x(snapshot_png_image: SnapshotAssertion) -> None:
+    table = TimeSeriesDataset(
+        {
+            "time": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+            "feature_1": [10, 9, 8, 7, 6, 5, 4, 3, 2, 1],
+            "target": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+        },
+        target_name="target",
+        time_name="time",
+    )
+    plot = table.plot_lineplot(x_column_name="feature_1")
+    assert plot == snapshot_png_image
+
+
+def test_should_plot_feature(snapshot_png_image: SnapshotAssertion) -> None:
+    table = TimeSeriesDataset(
+        {
+            "time": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+            "feature_1": [2, 4, 6, 8, 10, 12, 14, 16, 18, 20],
+            "target": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+        },
+        target_name="target",
+        time_name="time",
+    )
+    plot = table.plot_lineplot(x_column_name="feature_1")
+    assert plot == snapshot_png_image
+
+
+def test_should_raise_if_column_contains_non_numerical_values() -> None:
+    table = TimeSeriesDataset(
+        {
+            "time": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+            "feature_1": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+            "target": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
+        },
+        target_name="target",
+        time_name="time",
+    )
+    with pytest.raises(
+        NonNumericColumnError,
+        match=(
+            r"Tried to do a numerical operation on one or multiple non-numerical columns: \nThe time series plotted"
+            r" column"
+            r" contains"
+            r" non-numerical columns."
+        ),
+    ):
+        table.plot_lineplot(x_column_name="target")
 
 
 @pytest.mark.parametrize(
     ("time_series", "name", "error", "error_msg"),
     [
         (
-            TimeSeries(
+            TimeSeriesDataset(
                 {
                     "time": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
                     "feature_1": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
@@ -137,7 +130,6 @@ def test_should_raise_if_column_contains_non_numerical_values_x() -> None:
                 },
                 target_name="target",
                 time_name="time",
-                feature_names=None,
             ),
             "feature_1",
             NonNumericColumnError,
@@ -147,7 +139,7 @@ def test_should_raise_if_column_contains_non_numerical_values_x() -> None:
             r" non-numerical columns.",
         ),
         (
-            TimeSeries(
+            TimeSeriesDataset(
                 {
                     "time": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
                     "feature_1": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
@@ -155,7 +147,6 @@ def test_should_raise_if_column_contains_non_numerical_values_x() -> None:
                 },
                 target_name="target",
                 time_name="time",
-                feature_names=None,
             ),
             "feature_3",
             UnknownColumnNameError,
@@ -165,7 +156,7 @@ def test_should_raise_if_column_contains_non_numerical_values_x() -> None:
     ids=["feature_not_numerical", "feature_does_not_exist"],
 )
 def test_should_raise_error_optional_parameter(
-    time_series: TimeSeries,
+    time_series: TimeSeriesDataset,
     name: str,
     error: type[Exception],
     error_msg: str,
@@ -174,14 +165,14 @@ def test_should_raise_error_optional_parameter(
         error,
         match=error_msg,
     ):
-        time_series.plot_scatterplot(x_column_name=name)
+        time_series.plot_lineplot(x_column_name=name)
 
 
 @pytest.mark.parametrize(
     ("time_series", "name", "error", "error_msg"),
     [
         (
-            TimeSeries(
+            TimeSeriesDataset(
                 {
                     "time": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
                     "feature_1": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
@@ -189,7 +180,6 @@ def test_should_raise_error_optional_parameter(
                 },
                 target_name="target",
                 time_name="time",
-                feature_names=None,
             ),
             "feature_1",
             NonNumericColumnError,
@@ -199,7 +189,7 @@ def test_should_raise_error_optional_parameter(
             r" non-numerical columns.",
         ),
         (
-            TimeSeries(
+            TimeSeriesDataset(
                 {
                     "time": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
                     "feature_1": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
@@ -207,7 +197,6 @@ def test_should_raise_error_optional_parameter(
                 },
                 target_name="target",
                 time_name="time",
-                feature_names=None,
             ),
             "feature_3",
             UnknownColumnNameError,
@@ -217,7 +206,7 @@ def test_should_raise_error_optional_parameter(
     ids=["feature_not_numerical", "feature_does_not_exist"],
 )
 def test_should_raise_error_optional_parameter_y(
-    time_series: TimeSeries,
+    time_series: TimeSeriesDataset,
     name: str,
     error: type[Exception],
     error_msg: str,
@@ -226,29 +215,11 @@ def test_should_raise_error_optional_parameter_y(
         error,
         match=error_msg,
     ):
-        time_series.plot_scatterplot(y_column_name=name)
-
-
-def test_should_raise_if_column_does_not_exist_y() -> None:
-    table = TimeSeries(
-        {
-            "time": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-            "feature_1": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-            "target": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-        },
-        target_name="target",
-        time_name="time",
-        feature_names=None,
-    )
-    with pytest.raises(
-        UnknownColumnNameError,
-        match=r"Could not find column\(s\) '2'.",
-    ):
-        table.plot_scatterplot(x_column_name="target", y_column_name="2")
+        time_series.plot_lineplot(y_column_name=name)
 
 
 def test_should_raise_if_column_does_not_exist_x() -> None:
-    table = TimeSeries(
+    table = TimeSeriesDataset(
         {
             "time": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
             "feature_1": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
@@ -256,10 +227,26 @@ def test_should_raise_if_column_does_not_exist_x() -> None:
         },
         target_name="target",
         time_name="time",
-        feature_names=None,
     )
     with pytest.raises(
         UnknownColumnNameError,
         match=r"Could not find column\(s\) '2'.",
     ):
-        table.plot_scatterplot(x_column_name="2")
+        table.plot_lineplot(x_column_name="target", y_column_name="2")
+
+
+def test_should_raise_if_column_does_not_exist_y() -> None:
+    table = TimeSeriesDataset(
+        {
+            "time": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+            "feature_1": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+            "target": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+        },
+        target_name="target",
+        time_name="time",
+    )
+    with pytest.raises(
+        UnknownColumnNameError,
+        match=r"Could not find column\(s\) '2'.",
+    ):
+        table.plot_lineplot(x_column_name="2", y_column_name="target")
