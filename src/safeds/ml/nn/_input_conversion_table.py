@@ -37,9 +37,7 @@ class InputConversionTable(_InputConversion[TaggedTable, Table]):
         # time instance parameter won't be used, but is there for Linter
         self._time_name = time_name
         self._target_name = target_name
-        # normally this should never happen, because a TaggedTable does not have a empty feature list
-        if feature_names is None:
-            feature_names = []
+
         self._feature_names = feature_names
 
     def _data_conversion_predict(self, input_data: Table, batch_size: int) -> DataLoader:

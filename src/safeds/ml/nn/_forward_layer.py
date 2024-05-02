@@ -32,7 +32,7 @@ def _create_internal_model(input_size: int, output_size: int, activation_functio
 
     return _InternalLayer(input_size, output_size, activation_function)
 
- 
+
 class ForwardLayer(_Layer):
     def __init__(self, output_size: int, input_size: int | None = None):
         """

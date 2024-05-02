@@ -1,4 +1,6 @@
-from safeds.data.tabular.containers import TimeSeries
+from syrupy import SnapshotAssertion
+
+from safeds.data.tabular.containers import TimeSeries, Table
 from safeds.data.tabular.transformation import RangeScaler
 from safeds.ml.nn import (
     ForwardLayer,
@@ -10,7 +12,7 @@ from safeds.ml.nn import (
 from tests.helpers import resolve_resource_path
 
 
-def test_lstm_model() -> None:
+def test_lstm_model(snapshot_png_image: SnapshotAssertion) -> None:
     # Create a DataFrame
     _inflation_path = "_datas/US_Inflation_rates.csv"
     time_series = TimeSeries.timeseries_from_csv_file(
@@ -18,6 +20,7 @@ def test_lstm_model() -> None:
         target_name="value",
         time_name="date",
     )
+    test_values = Table.from_rows(time_series.to_rows()[-165:])._time_columns("value", "date")
     rs = RangeScaler()
     ss_2 = RangeScaler()
     ss_2 = ss_2.fit(time_series._as_table(), ["value"])
@@ -36,8 +39,15 @@ def test_lstm_model() -> None:
     trained_model = model.fit(train_ts, epoch_size=25)
 
     pred_ts = trained_model.predict(test_ts)
-    # add predicted to column_names so it can get reverted
     ss_2._column_names = ["predicted", "value"]
-    ss_2.inverse_transform(pred_ts._as_table().keep_only_columns(["predicted", "value"]))
+    ts = ((ss_2.inverse_transform(pred_ts._as_table().keep_only_columns(["predicted", "value"])).
+          add_column(test_values.get_column("date"))).
+          _time_columns("predicted", "date"))
+    ts = ts.rename_column("value", "values")
+    test_values = test_values.rename_column("value", "values")
     # suggest it ran through
+
+    assert ts.plot_compare_time_series([test_values]) == snapshot_png_image
+    assert ts.plot_lineplot() == snapshot_png_image
+    assert test_values.plot_lineplot() == snapshot_png_image
     assert True

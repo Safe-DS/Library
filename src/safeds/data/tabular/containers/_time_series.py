@@ -1276,7 +1276,6 @@ class TimeSeries(Table):
                 raise NonNumericColumnError("The time series plotted column contains non-numerical columns.")
             data[ts.target.name + " " + str(index)] = ts.target._data
         fig = plt.figure()
-
         data = pd.melt(data, [self.time.name])
         sns.lineplot(x=self.time.name, y="value", hue="variable", data=data)
         plt.title("Multiple Series Plot")
@@ -1287,7 +1286,6 @@ class TimeSeries(Table):
         fig.savefig(buffer, format="png")
         plt.close()  # Prevents the figure from being displayed directly
         buffer.seek(0)
-        self._data = self._data.reset_index()
         return Image.from_bytes(buffer.read())
 
     def _into_dataloader_with_window(self, window_size: int, forecast_horizon: int, batch_size: int) -> DataLoader:

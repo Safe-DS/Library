@@ -61,10 +61,7 @@ class InputConversionTimeSeries(_InputConversion[TimeSeries, TimeSeries]):
     ) -> None:
         """Set the time_name variable for internal usage."""
         self._time_name = time_name
-        if feature_names is None:
-            self._feature_names = []
-        else:
-            self._feature_names = feature_names
+        self._feature_names = feature_names
         self._target_name = target_name
 
     def _data_conversion_predict(self, input_data: TimeSeries, batch_size: int) -> DataLoader:
