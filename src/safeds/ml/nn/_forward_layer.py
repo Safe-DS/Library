@@ -9,7 +9,7 @@ if TYPE_CHECKING:
 
 from safeds._utils import _structural_hash
 from safeds.exceptions import ClosedBound, OutOfBoundsError
-from safeds.ml.nn._layer import _Layer
+from safeds.ml.nn._layer import Layer
 
 
 def _create_internal_model(input_size: int, output_size: int, activation_function: str) -> nn.Module:
@@ -37,7 +37,7 @@ def _create_internal_model(input_size: int, output_size: int, activation_functio
     return _InternalLayer(input_size, output_size, activation_function)
 
 
-class ForwardLayer(_Layer):
+class ForwardLayer(Layer):
     def __init__(self, output_size: int, input_size: int | None = None):
         """
         Create a FNN Layer.

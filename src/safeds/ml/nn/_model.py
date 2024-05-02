@@ -32,9 +32,9 @@ if TYPE_CHECKING:
     from torch import Tensor, nn
 
     from safeds.data.image.typing import ImageSize
-    from safeds.ml.nn._input_conversion import _InputConversion
-    from safeds.ml.nn._layer import _Layer
-    from safeds.ml.nn._output_conversion import _OutputConversion
+    from safeds.ml.nn._input_conversion import InputConversion
+    from safeds.ml.nn._layer import Layer
+    from safeds.ml.nn._output_conversion import OutputConversion
 
 IFT = TypeVar("IFT", TabularDataset, TimeSeries, ImageDataset)  # InputFitType
 IPT = TypeVar("IPT", Table, TimeSeries, ImageList)  # InputPredictType
@@ -62,9 +62,9 @@ class NeuralNetworkRegressor(Generic[IFT, IPT, OT]):
 
     def __init__(
         self,
-        input_conversion: _InputConversion[IFT, IPT],
-        layers: list[_Layer],
-        output_conversion: _OutputConversion[IPT, OT],
+        input_conversion: InputConversion[IFT, IPT],
+        layers: list[Layer],
+        output_conversion: OutputConversion[IPT, OT],
     ):
         if len(layers) == 0:
             raise InvalidModelStructureError("You need to provide at least one layer to a neural network.")
@@ -106,9 +106,9 @@ class NeuralNetworkRegressor(Generic[IFT, IPT, OT]):
                 if isinstance(layer, Convolutional2DLayer | FlattenLayer | _Pooling2DLayer):
                     raise InvalidModelStructureError("You cannot use a 2-dimensional layer with 1-dimensional data.")
 
-        self._input_conversion: _InputConversion[IFT, IPT] = input_conversion
+        self._input_conversion: InputConversion[IFT, IPT] = input_conversion
         self._model = _create_internal_model(input_conversion, layers, is_for_classification=False)
-        self._output_conversion: _OutputConversion[IPT, OT] = output_conversion
+        self._output_conversion: OutputConversion[IPT, OT] = output_conversion
         self._input_size = self._model.input_size
         self._batch_size = 1
         self._is_fitted = False
@@ -271,9 +271,9 @@ class NeuralNetworkClassifier(Generic[IFT, IPT, OT]):
 
     def __init__(
         self,
-        input_conversion: _InputConversion[IFT, IPT],
-        layers: list[_Layer],
-        output_conversion: _OutputConversion[IPT, OT],
+        input_conversion: InputConversion[IFT, IPT],
+        layers: list[Layer],
+        output_conversion: OutputConversion[IPT, OT],
     ):
         if len(layers) == 0:
             raise InvalidModelStructureError("You need to provide at least one layer to a neural network.")
@@ -315,9 +315,9 @@ class NeuralNetworkClassifier(Generic[IFT, IPT, OT]):
                 if isinstance(layer, Convolutional2DLayer | FlattenLayer | _Pooling2DLayer):
                     raise InvalidModelStructureError("You cannot use a 2-dimensional layer with 1-dimensional data.")
 
-        self._input_conversion: _InputConversion[IFT, IPT] = input_conversion
+        self._input_conversion: InputConversion[IFT, IPT] = input_conversion
         self._model = _create_internal_model(input_conversion, layers, is_for_classification=True)
-        self._output_conversion: _OutputConversion[IPT, OT] = output_conversion
+        self._output_conversion: OutputConversion[IPT, OT] = output_conversion
         self._input_size = self._model.input_size
         self._batch_size = 1
         self._is_fitted = False
@@ -473,14 +473,14 @@ class NeuralNetworkClassifier(Generic[IFT, IPT, OT]):
 
 
 def _create_internal_model(
-    input_conversion: _InputConversion[IFT, IPT],
-    layers: list[_Layer],
+    input_conversion: InputConversion[IFT, IPT],
+    layers: list[Layer],
     is_for_classification: bool,
 ) -> nn.Module:
     from torch import nn
 
     class _InternalModel(nn.Module):
-        def __init__(self, layers: list[_Layer], is_for_classification: bool) -> None:
+        def __init__(self, layers: list[Layer], is_for_classification: bool) -> None:
 
             super().__init__()
             self._layer_list = layers

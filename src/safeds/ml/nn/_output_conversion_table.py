@@ -7,10 +7,10 @@ if TYPE_CHECKING:
 
 from safeds.data.labeled.containers import TabularDataset
 from safeds.data.tabular.containers import Column, Table
-from safeds.ml.nn._output_conversion import _OutputConversion
+from safeds.ml.nn._output_conversion import OutputConversion
 
 
-class OutputConversionTable(_OutputConversion[Table, TabularDataset]):
+class OutputConversionTable(OutputConversion[Table, TabularDataset]):
     """The output conversion for a neural network, defines the output parameters for the neural network."""
 
     def __init__(self, prediction_name: str = "prediction") -> None:

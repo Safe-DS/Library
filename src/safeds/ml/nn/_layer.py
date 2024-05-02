@@ -9,7 +9,7 @@ if TYPE_CHECKING:
     from safeds.data.image.typing import ImageSize
 
 
-class _Layer(ABC):
+class Layer(ABC):
     @abstractmethod
     def __init__(self) -> None:
         pass  # pragma: no cover

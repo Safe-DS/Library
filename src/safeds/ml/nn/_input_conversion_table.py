@@ -7,10 +7,10 @@ if TYPE_CHECKING:
 
 from safeds.data.labeled.containers import TabularDataset
 from safeds.data.tabular.containers import Table
-from safeds.ml.nn._input_conversion import _InputConversion
+from safeds.ml.nn._input_conversion import InputConversion
 
 
-class InputConversionTable(_InputConversion[TabularDataset, Table]):
+class InputConversionTable(InputConversion[TabularDataset, Table]):
     """The input conversion for a neural network, defines the input parameters for the neural network."""
 
     def __init__(self, feature_names: list[str], target_name: str) -> None:
