@@ -68,6 +68,8 @@ plugins:
             - src
           options:
             docstring_style: numpy
+            filters:
+              - "!^_"  # Hide internal & dunder methods
             show_if_no_docstring: true
   - gen-files:
       scripts:
