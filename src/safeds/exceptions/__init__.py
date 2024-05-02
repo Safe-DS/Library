@@ -29,7 +29,6 @@ if TYPE_CHECKING:
         OutOfBoundsError,
     )
     from safeds.exceptions._ml import (
-        DatasetContainsTargetError,
         DatasetMissesDataError,
         DatasetMissesFeaturesError,
         FeatureDataMismatchError,
@@ -37,8 +36,8 @@ if TYPE_CHECKING:
         LearningError,
         ModelNotFittedError,
         NonTimeSeriesError,
+        PlainTableError,
         PredictionError,
-        UntaggedTableError,
     )
 
 apipkg.initpkg(
@@ -63,7 +62,6 @@ apipkg.initpkg(
         "ValueNotPresentWhenFittedError": "._data:ValueNotPresentWhenFittedError",
         "WrongFileExtensionError": "._data:WrongFileExtensionError",
         # ML exceptions
-        "DatasetContainsTargetError": "._ml:DatasetContainsTargetError",
         "DatasetMissesDataError": "._ml:DatasetMissesDataError",
         "DatasetMissesFeaturesError": "._ml:DatasetMissesFeaturesError",
         "FeatureDataMismatchError": "._ml:FeatureDataMismatchError",
@@ -71,8 +69,8 @@ apipkg.initpkg(
         "LearningError": "._ml:LearningError",
         "ModelNotFittedError": "._ml:ModelNotFittedError",
         "NonTimeSeriesError": "._ml:NonTimeSeriesError",
+        "PlainTableError": "._ml:PlainTableError",
         "PredictionError": "._ml:PredictionError",
-        "UntaggedTableError": "._ml:UntaggedTableError",
         # Other
         "Bound": "._generic:Bound",
         "ClosedBound": "._generic:ClosedBound",
@@ -100,7 +98,6 @@ __all__ = [
     "ValueNotPresentWhenFittedError",
     "WrongFileExtensionError",
     # ML exceptions
-    "DatasetContainsTargetError",
     "DatasetMissesDataError",
     "DatasetMissesFeaturesError",
     "FeatureDataMismatchError",
@@ -108,8 +105,8 @@ __all__ = [
     "LearningError",
     "ModelNotFittedError",
     "NonTimeSeriesError",
+    "PlainTableError",
     "PredictionError",
-    "UntaggedTableError",
     # Other
     "Bound",
     "ClosedBound",

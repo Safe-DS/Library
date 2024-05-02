@@ -21,7 +21,7 @@ class Row(Mapping[str, Any]):
 
     Parameters
     ----------
-    data : Mapping[str, Any] | None
+    data:
         The data. If None, an empty row is created.
 
     Examples
@@ -41,12 +41,12 @@ class Row(Mapping[str, Any]):
 
         Parameters
         ----------
-        data : dict[str, Any]
+        data:
             The data.
 
         Returns
         -------
-        row : Row
+        row:
             The created row.
 
         Examples
@@ -63,14 +63,14 @@ class Row(Mapping[str, Any]):
 
         Parameters
         ----------
-        data : pd.DataFrame
+        data:
             The data.
-        schema : Schema | None
+        schema:
             The schema. If None, the schema is inferred from the data.
 
         Returns
         -------
-        row : Row
+        row:
             The created row.
 
         Raises
@@ -110,7 +110,7 @@ class Row(Mapping[str, Any]):
 
         Parameters
         ----------
-        data : Mapping[str, Any] | None
+        data:
             The data. If None, an empty row is created.
 
         Examples
@@ -138,12 +138,12 @@ class Row(Mapping[str, Any]):
 
         Parameters
         ----------
-        obj : Any
+        obj:
             The object.
 
         Returns
         -------
-        has_column : bool
+        has_column:
             True, if the row contains the object as key, False otherwise.
 
         Examples
@@ -164,12 +164,12 @@ class Row(Mapping[str, Any]):
 
         Parameters
         ----------
-        other : Any
+        other:
             The other object.
 
         Returns
         -------
-        equal : bool
+        equal:
             True if the other object is an identical row. False if the other object is a different row. NotImplemented
             if the other object is not a row.
 
@@ -197,12 +197,12 @@ class Row(Mapping[str, Any]):
 
         Parameters
         ----------
-        column_name : str
+        column_name:
             The column name.
 
         Returns
         -------
-        value : Any
+        value:
             The column value.
 
         Raises
@@ -236,7 +236,7 @@ class Row(Mapping[str, Any]):
 
         Returns
         -------
-        iterator : Iterator[Any]
+        iterator:
             The iterator.
 
         Examples
@@ -254,7 +254,7 @@ class Row(Mapping[str, Any]):
 
         Returns
         -------
-        number_of_columns : int
+        number_of_columns:
             The number of columns.
 
         Examples
@@ -272,7 +272,7 @@ class Row(Mapping[str, Any]):
 
         Returns
         -------
-        representation : str
+        representation:
             The string representation.
 
         Examples
@@ -301,7 +301,7 @@ class Row(Mapping[str, Any]):
 
         Returns
         -------
-        representation : str
+        representation:
             The string representation.
 
         Examples
@@ -332,7 +332,7 @@ class Row(Mapping[str, Any]):
 
         Returns
         -------
-        column_names : list[str]
+        column_names:
             The column names.
 
         Examples
@@ -345,20 +345,20 @@ class Row(Mapping[str, Any]):
         return self._schema.column_names
 
     @property
-    def number_of_column(self) -> int:
+    def number_of_columns(self) -> int:
         """
         Return the number of columns in this row.
 
         Returns
         -------
-        number_of_column : int
+        number_of_columns:
             The number of columns.
 
         Examples
         --------
         >>> from safeds.data.tabular.containers import Row
         >>> row = Row({"a": 1, "b": 2})
-        >>> row.number_of_column
+        >>> row.number_of_columns
         2
         """
         return self._data.shape[1]
@@ -370,7 +370,7 @@ class Row(Mapping[str, Any]):
 
         Returns
         -------
-        schema : Schema
+        schema:
             The schema.
 
         Examples
@@ -391,12 +391,12 @@ class Row(Mapping[str, Any]):
 
         Parameters
         ----------
-        column_name : str
+        column_name:
             The column name.
 
         Returns
         -------
-        value : Any
+        value:
             The column value.
 
         Raises
@@ -422,12 +422,12 @@ class Row(Mapping[str, Any]):
 
         Parameters
         ----------
-        column_name : str
+        column_name:
             The column name.
 
         Returns
         -------
-        has_column : bool
+        has_column:
             True, if the row contains the column, False otherwise.
 
         Examples
@@ -448,12 +448,12 @@ class Row(Mapping[str, Any]):
 
         Parameters
         ----------
-        column_name : str
+        column_name:
             The column name.
 
         Returns
         -------
-        type : ColumnType
+        type:
             The type of the column.
 
         Raises
@@ -476,13 +476,22 @@ class Row(Mapping[str, Any]):
 
     def sort_columns(
         self,
-        comparator: Callable[[tuple, tuple], int] = lambda col1, col2: (col1[0] > col2[0]) - (col1[0] < col2[0]),
+        comparator: Callable[[str, Any, str, Any], int] = lambda name_1, _value_1, name_2, _value_2: (
+            name_1[0] > name_2[0]
+        )
+        - (name_1[0] < name_2[0]),
     ) -> Row:
         """
         Sort the columns of a `Row` with the given comparator and return a new `Row`.
 
-        The original row is not modified. The comparator is a function that takes two tuples of (ColumnName,
-        Value) `col1` and `col2` and returns an integer:
+        The original row is not modified. The comparator is a function with four parameters:
+
+        * `name_1` is the name of the first column.
+        * `value_1` is the value of the first column.
+        * `name_2` is the name of the second column.
+        * `value_2` is the value of the second column.
+
+        It should return an integer, indicating the desired order of the columns:
 
         * If `col1` should be ordered before `col2`, the function should return a negative number.
         * If `col1` should be ordered after `col2`, the function should return a positive number.
@@ -492,15 +501,24 @@ class Row(Mapping[str, Any]):
 
         Parameters
         ----------
-        comparator : Callable[[tuple, tuple], int]
+        comparator:
             The function used to compare two tuples of (ColumnName, Value).
 
         Returns
         -------
-        new_row : Row
+        new_row:
             A new row with sorted columns.
         """
-        sorted_row_dict = dict(sorted(self.to_dict().items(), key=functools.cmp_to_key(comparator)))
+
+        def cmp(column_1: tuple[str, Any], column_2: tuple[str, Any]) -> int:
+            return comparator(column_1[0], column_1[1], column_2[0], column_2[1])
+
+        sorted_row_dict = dict(
+            sorted(
+                self.to_dict().items(),
+                key=functools.cmp_to_key(cmp),
+            ),
+        )
         return Row.from_dict(sorted_row_dict)
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -513,7 +531,7 @@ class Row(Mapping[str, Any]):
 
         Returns
         -------
-        data : dict[str, Any]
+        data:
             Dictionary representation of the row.
 
         Examples
@@ -531,7 +549,7 @@ class Row(Mapping[str, Any]):
 
         Returns
         -------
-        output : str
+        output:
             The generated HTML.
 
         Examples
@@ -552,7 +570,7 @@ class Row(Mapping[str, Any]):
 
         Returns
         -------
-        output : str
+        output:
             The generated HTML.
         """
         return self._data.to_html(max_rows=1, max_cols=self._data.shape[1], notebook=True)

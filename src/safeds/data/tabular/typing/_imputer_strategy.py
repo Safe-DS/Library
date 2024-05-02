@@ -23,7 +23,7 @@ class ImputerStrategy(ABC):
 
         Parameters
         ----------
-        imputer: SimpleImputer
+        imputer:
             The imputer to augment.
         """
 

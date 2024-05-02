@@ -9,4 +9,4 @@ from safeds.data.tabular.containers import Column
 )
 def test_should_count_missing_values(values: list, expected: float) -> None:
     column = Column("A", values)
-    assert column._count_missing_values() == expected
+    assert column.missing_value_count() == expected

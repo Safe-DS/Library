@@ -12,7 +12,7 @@ class UnknownColumnNameError(KeyError):
 
     Parameters
     ----------
-    column_names : list[str]
+    column_names:
         The name of the column that was tried to be accessed.
     """
 
@@ -59,7 +59,7 @@ class DuplicateColumnNameError(Exception):
 
     Parameters
     ----------
-    column_name : str
+    column_name:
         The name of the column that resulted in a duplicate.
     """
 
@@ -73,7 +73,7 @@ class IndexOutOfBoundsError(IndexError):
 
     Parameters
     ----------
-    index : int | list[int] | slice
+    index:
         The wrongly used index.
     """
 
@@ -96,7 +96,7 @@ class DuplicateIndexError(IndexError):
 
     Parameters
     ----------
-    index : int
+    index:
         The wrongly added index.
     """
 
@@ -110,9 +110,9 @@ class ColumnSizeError(Exception):
 
     Parameters
     ----------
-    expected_size : str
+    expected_size:
         The expected size of the column as an expression (e.g. 2, >0, !=0).
-    actual_size : str
+    actual_size:
         The actual size of the column as an expression (e.g. 2, >0, !=0).
     """
 
@@ -164,14 +164,14 @@ class IllegalSchemaModificationError(Exception):
 
 
 class ColumnIsTargetError(IllegalSchemaModificationError):
-    """Exception raised in overriden methods of the Table class when removing tagged Columns from a TaggedTable."""
+    """Exception raised when removing the target column of a TimeSeries."""
 
     def __init__(self, column_name: str) -> None:
         super().__init__(f'Column "{column_name}" is the target column and cannot be removed.')
 
 
 class ColumnIsTimeError(IllegalSchemaModificationError):
-    """Exception raised in overriden methods of the Table class when removing Time Columns from a TimeSeries."""
+    """Exception raised when removing the time column of a TimeSeries."""
 
     def __init__(self, column_name: str) -> None:
         super().__init__(f'Column "{column_name}" is the time column and cannot be removed.')

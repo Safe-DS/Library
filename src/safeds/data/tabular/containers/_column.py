@@ -32,9 +32,9 @@ class Column(Sequence[T]):
 
     Parameters
     ----------
-    name : str
+    name:
         The name of the column.
-    data : Sequence[T]
+    data:
         The data.
 
     Examples
@@ -54,14 +54,14 @@ class Column(Sequence[T]):
 
         Parameters
         ----------
-        data : pd.Series
+        data:
             The data.
-        type_ : ColumnType | None
+        type_:
             The type. If None, the type is inferred from the data.
 
         Returns
         -------
-        column : Column
+        column:
             The created column.
 
         Examples
@@ -88,9 +88,9 @@ class Column(Sequence[T]):
 
         Parameters
         ----------
-        name : str
+        name:
             The name of the column.
-        data : Sequence[T] | None
+        data:
             The data. If None, an empty column is created.
 
         Examples
@@ -120,12 +120,12 @@ class Column(Sequence[T]):
 
         Parameters
         ----------
-        other : object
+        other:
             The other object.
 
         Returns
         -------
-        equal : bool
+        equal:
             True if the other object is an identical column. False if the other object is a different column.
             NotImplemented if the other object is not a column.
 
@@ -159,12 +159,12 @@ class Column(Sequence[T]):
 
         Parameters
         ----------
-        index : int | slice
+        index:
             The index of the row, or a slice specifying the start and end index.
 
         Returns
         -------
-        value : Any
+        value:
             The single row's value, or rows' values.
 
         Raises
@@ -209,7 +209,7 @@ class Column(Sequence[T]):
 
         Returns
         -------
-        iterator : Iterator[Any]
+        iterator:
             The iterator.
 
         Examples
@@ -230,7 +230,7 @@ class Column(Sequence[T]):
 
         Returns
         -------
-        n_rows : int
+        n_rows:
             The size of the column.
 
         Examples
@@ -248,7 +248,7 @@ class Column(Sequence[T]):
 
         Returns
         -------
-        representation : str
+        representation:
             The string representation.
 
         Examples
@@ -277,7 +277,7 @@ class Column(Sequence[T]):
 
         Returns
         -------
-        representation : str
+        representation:
             The string representation.
 
         Examples
@@ -300,7 +300,7 @@ class Column(Sequence[T]):
 
         Returns
         -------
-        name : str
+        name:
             The name of the column.
 
         Examples
@@ -319,7 +319,7 @@ class Column(Sequence[T]):
 
         Returns
         -------
-        number_of_rows : int
+        number_of_rows:
             The number of elements.
         """
         return len(self._data)
@@ -331,7 +331,7 @@ class Column(Sequence[T]):
 
         Returns
         -------
-        type : ColumnType
+        type:
             The type of the column.
 
         Examples
@@ -357,7 +357,7 @@ class Column(Sequence[T]):
 
         Returns
         -------
-        unique_values : list[T]
+        unique_values:
             List of unique values in the column.
 
         Examples
@@ -375,12 +375,12 @@ class Column(Sequence[T]):
 
         Parameters
         ----------
-        index : int
+        index:
             Index of requested element.
 
         Returns
         -------
-        value
+        value:
             Value at index in column.
 
         Raises
@@ -410,12 +410,12 @@ class Column(Sequence[T]):
 
         Parameters
         ----------
-        predicate : Callable[[T], bool])
+        predicate:
             Callable that is used to find matches.
 
         Returns
         -------
-        result : bool
+        result:
             True if all match.
 
         Examples
@@ -436,12 +436,12 @@ class Column(Sequence[T]):
 
         Parameters
         ----------
-        predicate : Callable[[T], bool])
+        predicate:
             Callable that is used to find matches.
 
         Returns
         -------
-        result : bool
+        result:
             True if any match.
 
         Examples
@@ -462,12 +462,12 @@ class Column(Sequence[T]):
 
         Parameters
         ----------
-        predicate : Callable[[T], bool])
+        predicate:
             Callable that is used to find matches.
 
         Returns
         -------
-        result : bool
+        result:
             True if none match.
 
         Examples
@@ -489,7 +489,7 @@ class Column(Sequence[T]):
 
         Returns
         -------
-        missing_values_exist : bool
+        missing_values_exist:
             True if missing values exist.
 
         Examples
@@ -519,12 +519,12 @@ class Column(Sequence[T]):
 
         Parameters
         ----------
-        new_name : str
+        new_name:
             The new name of the column.
 
         Returns
         -------
-        column : Column
+        column:
             A new column with the new name.
 
         Examples
@@ -544,12 +544,12 @@ class Column(Sequence[T]):
 
         Parameters
         ----------
-        transformer : Callable[[T], R]
+        transformer:
             Function that will be applied to all data points.
 
         Returns
         -------
-        transformed_column: Column
+        transformed_column:
             The transformed column.
 
         Examples
@@ -570,7 +570,7 @@ class Column(Sequence[T]):
 
         Returns
         -------
-        correlation : float
+        correlation:
             Correlation between the two columns.
 
         Raises
@@ -615,7 +615,7 @@ class Column(Sequence[T]):
 
         Returns
         -------
-        idness : float
+        idness:
             The idness of the column.
 
         Raises
@@ -644,7 +644,7 @@ class Column(Sequence[T]):
 
         Returns
         -------
-        max : float
+        max:
             The maximum value.
 
         Raises
@@ -669,7 +669,7 @@ class Column(Sequence[T]):
 
         Returns
         -------
-        mean : float
+        mean:
             The mean value.
 
         Raises
@@ -694,7 +694,7 @@ class Column(Sequence[T]):
 
         Returns
         -------
-        median : float
+        median:
             The median value.
 
         Raises
@@ -724,7 +724,7 @@ class Column(Sequence[T]):
 
         Returns
         -------
-        min : float
+        min:
             The minimum value.
 
         Raises
@@ -743,13 +743,31 @@ class Column(Sequence[T]):
             raise NonNumericColumnError(f"{self.name} is of type {self._type}.")
         return self._data.min()
 
+    def missing_value_count(self) -> int:
+        """
+        Return the number of missing values in the column.
+
+        Returns
+        -------
+        count:
+            The number of missing values.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("col_1", [None, 'a', None])
+        >>> column.missing_value_count()
+        2
+        """
+        return self._data.isna().sum()
+
     def missing_value_ratio(self) -> float:
         """
         Return the ratio of missing values to the total number of elements in the column.
 
         Returns
         -------
-        ratio : float
+        ratio:
             The ratio of missing values to the total number of elements in the column.
 
         Raises
@@ -770,7 +788,7 @@ class Column(Sequence[T]):
         """
         if self._data.size == 0:
             raise ColumnSizeError("> 0", "0")
-        return self._count_missing_values() / self._data.size
+        return self.missing_value_count() / self._data.size
 
     def mode(self) -> list[T]:
         """
@@ -778,7 +796,7 @@ class Column(Sequence[T]):
 
         Returns
         -------
-        mode: list[T]
+        mode:
             Returns a list with the most common values.
 
         Examples
@@ -808,7 +826,7 @@ class Column(Sequence[T]):
 
         Returns
         -------
-        stability : float
+        stability:
             The stability of the column.
 
         Raises
@@ -841,7 +859,7 @@ class Column(Sequence[T]):
 
         Returns
         -------
-        sum : float
+        sum:
             The standard deviation of all values.
 
         Raises
@@ -870,7 +888,7 @@ class Column(Sequence[T]):
 
         Returns
         -------
-        sum : float
+        sum:
             The sum of all values.
 
         Raises
@@ -895,7 +913,7 @@ class Column(Sequence[T]):
 
         Returns
         -------
-        sum : float
+        sum:
             The variance of all values.
 
         Raises
@@ -925,7 +943,7 @@ class Column(Sequence[T]):
 
         Returns
         -------
-        plot: Image
+        plot:
             The plot as an image.
 
         Raises
@@ -964,7 +982,7 @@ class Column(Sequence[T]):
 
         Returns
         -------
-        plot: Image
+        plot:
             The plot as an image.
 
         Examples
@@ -1003,15 +1021,14 @@ class Column(Sequence[T]):
 
         Returns
         -------
-        output : str
+        output:
             The generated HTML.
 
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
         >>> column = Column("test", [1, 2, 3])
-        >>> column.to_html()
-        '<table border="1" class="dataframe">\n  <thead>\n    <tr style="text-align: right;">\n      <th></th>\n      <th>test</th>\n    </tr>\n  </thead>\n  <tbody>\n    <tr>\n      <th>0</th>\n      <td>1</td>\n    </tr>\n    <tr>\n      <th>1</th>\n      <td>2</td>\n    </tr>\n    <tr>\n      <th>2</th>\n      <td>3</td>\n    </tr>\n  </tbody>\n</table>'
+        >>> html = column.to_html()
         """
         frame = self._data.to_frame()
         frame.columns = [self.name]
@@ -1028,39 +1045,16 @@ class Column(Sequence[T]):
 
         Returns
         -------
-        output : str
+        output:
             The generated HTML.
 
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
         >>> column = Column("col_1", ['a', 'b', 'c'])
-        >>> column._repr_html_()
-        '<div>\n<style scoped>\n    .dataframe tbody tr th:only-of-type {\n        vertical-align: middle;\n    }\n\n    .dataframe tbody tr th {\n        vertical-align: top;\n    }\n\n    .dataframe thead th {\n        text-align: right;\n    }\n</style>\n<table border="1" class="dataframe">\n  <thead>\n    <tr style="text-align: right;">\n      <th></th>\n      <th>col_1</th>\n    </tr>\n  </thead>\n  <tbody>\n    <tr>\n      <th>0</th>\n      <td>a</td>\n    </tr>\n    <tr>\n      <th>1</th>\n      <td>b</td>\n    </tr>\n    <tr>\n      <th>2</th>\n      <td>c</td>\n    </tr>\n  </tbody>\n</table>\n</div>'
+        >>> html = column._repr_html_()
         """
         frame = self._data.to_frame()
         frame.columns = [self.name]
 
         return frame.to_html(max_rows=self._data.size, max_cols=1, notebook=True)
-
-    # ------------------------------------------------------------------------------------------------------------------
-    # Other
-    # ------------------------------------------------------------------------------------------------------------------
-
-    def _count_missing_values(self) -> int:
-        """
-        Return the number of null values in the column.
-
-        Returns
-        -------
-        count : int
-            The number of null values.
-
-        Examples
-        --------
-        >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("col_1", [None, 'a', None])
-        >>> column._count_missing_values()
-        2
-        """
-        return self._data.isna().sum()

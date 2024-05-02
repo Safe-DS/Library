@@ -5,16 +5,15 @@ from typing import TYPE_CHECKING, Any
 
 import pandas as pd
 import pytest
-from safeds.data.tabular.containers import Column, Table, TaggedTable
+from safeds.data.tabular.containers import Column, Table
 from safeds.exceptions import (
     ColumnLengthMismatchError,
-    DatasetContainsTargetError,
     DatasetMissesDataError,
     DatasetMissesFeaturesError,
     MissingValuesColumnError,
     ModelNotFittedError,
     NonNumericColumnError,
-    UntaggedTableError,
+    PlainTableError,
 )
 from safeds.ml.classical.regression import (
     AdaBoostRegressor,
@@ -35,6 +34,7 @@ from safeds.ml.classical.regression._regressor import _check_metrics_preconditio
 
 if TYPE_CHECKING:
     from _pytest.fixtures import FixtureRequest
+    from safeds.data.labeled.containers import TabularDataset
     from sklearn.base import RegressorMixin
 
 
@@ -65,7 +65,7 @@ def regressors() -> list[Regressor]:
 
 
 @pytest.fixture()
-def valid_data() -> TaggedTable:
+def valid_data() -> TabularDataset:
     return Table(
         {
             "id": [1, 4],
@@ -73,18 +73,18 @@ def valid_data() -> TaggedTable:
             "feat2": [3, 6],
             "target": [0, 1],
         },
-    ).tag_columns(target_name="target", feature_names=["feat1", "feat2"])
+    ).to_tabular_dataset(target_name="target", extra_names=["id"])
 
 
 @pytest.mark.parametrize("regressor", regressors(), ids=lambda x: x.__class__.__name__)
 class TestFit:
-    def test_should_succeed_on_valid_data(self, regressor: Regressor, valid_data: TaggedTable) -> None:
+    def test_should_succeed_on_valid_data(self, regressor: Regressor, valid_data: TabularDataset) -> None:
         regressor.fit(valid_data)
         assert True  # This asserts that the fit method succeeds
 
-    def test_should_not_change_input_regressor(self, regressor: Regressor, valid_data: TaggedTable) -> None:
+    def test_should_not_change_input_regressor(self, regressor: Regressor, valid_data: TabularDataset) -> None:
         regressor.fit(valid_data)
-        assert not regressor.is_fitted()
+        assert not regressor.is_fitted
 
     def test_should_not_change_input_table(self, regressor: Regressor, request: FixtureRequest) -> None:
         valid_data = request.getfixturevalue("valid_data")
@@ -103,7 +103,7 @@ class TestFit:
                         "feat2": [3, 6],
                         "target": [0, 1],
                     },
-                ).tag_columns(target_name="target", feature_names=["feat1", "feat2"]),
+                ).to_tabular_dataset(target_name="target", extra_names=["id"]),
                 NonNumericColumnError,
                 r"Tried to do a numerical operation on one or multiple non-numerical columns: \n\{'feat1'\}",
             ),
@@ -115,7 +115,7 @@ class TestFit:
                         "feat2": [3, 6],
                         "target": [0, 1],
                     },
-                ).tag_columns(target_name="target", feature_names=["feat1", "feat2"]),
+                ).to_tabular_dataset(target_name="target", extra_names=["id"]),
                 MissingValuesColumnError,
                 r"Tried to do an operation on one or multiple columns containing missing values: \n\{'feat1'\}",
             ),
@@ -127,7 +127,7 @@ class TestFit:
                         "feat2": [],
                         "target": [],
                     },
-                ).tag_columns(target_name="target", feature_names=["feat1", "feat2"]),
+                ).to_tabular_dataset(target_name="target", extra_names=["id"]),
                 DatasetMissesDataError,
                 r"Dataset contains no rows",
             ),
@@ -137,7 +137,7 @@ class TestFit:
     def test_should_raise_on_invalid_data(
         self,
         regressor: Regressor,
-        invalid_data: TaggedTable,
+        invalid_data: TabularDataset,
         expected_error: Any,
         expected_error_msg: str,
     ) -> None:
@@ -155,26 +155,26 @@ class TestFit:
                 },
             ),
         ],
-        ids=["untagged_table"],
+        ids=["table"],
     )
-    def test_should_raise_if_table_is_not_tagged(self, regressor: Regressor, table: Table) -> None:
-        with pytest.raises(UntaggedTableError):
+    def test_should_raise_if_given_normal_table(self, regressor: Regressor, table: Table) -> None:
+        with pytest.raises(PlainTableError):
             regressor.fit(table)  # type: ignore[arg-type]
 
 
 @pytest.mark.parametrize("regressor", regressors(), ids=lambda x: x.__class__.__name__)
 class TestPredict:
-    def test_should_include_features_of_input_table(self, regressor: Regressor, valid_data: TaggedTable) -> None:
+    def test_should_include_features_of_input_table(self, regressor: Regressor, valid_data: TabularDataset) -> None:
         fitted_regressor = regressor.fit(valid_data)
         prediction = fitted_regressor.predict(valid_data.features)
         assert prediction.features == valid_data.features
 
-    def test_should_include_complete_input_table(self, regressor: Regressor, valid_data: TaggedTable) -> None:
+    def test_should_include_complete_input_table(self, regressor: Regressor, valid_data: TabularDataset) -> None:
         fitted_regressor = regressor.fit(valid_data)
         prediction = fitted_regressor.predict(valid_data.features)
         assert prediction.features == valid_data.features
 
-    def test_should_set_correct_target_name(self, regressor: Regressor, valid_data: TaggedTable) -> None:
+    def test_should_set_correct_target_name(self, regressor: Regressor, valid_data: TabularDataset) -> None:
         fitted_regressor = regressor.fit(valid_data)
         prediction = fitted_regressor.predict(valid_data.features)
         assert prediction.target.name == "target"
@@ -186,16 +186,11 @@ class TestPredict:
         fitted_classifier.predict(valid_data.features)
         assert valid_data == valid_data_copy
 
-    def test_should_raise_if_not_fitted(self, regressor: Regressor, valid_data: TaggedTable) -> None:
+    def test_should_raise_if_not_fitted(self, regressor: Regressor, valid_data: TabularDataset) -> None:
         with pytest.raises(ModelNotFittedError):
             regressor.predict(valid_data.features)
 
-    def test_should_raise_if_dataset_contains_target(self, regressor: Regressor, valid_data: TaggedTable) -> None:
-        fitted_regressor = regressor.fit(valid_data)
-        with pytest.raises(DatasetContainsTargetError, match="target"):
-            fitted_regressor.predict(valid_data)
-
-    def test_should_raise_if_dataset_misses_features(self, regressor: Regressor, valid_data: TaggedTable) -> None:
+    def test_should_raise_if_dataset_misses_features(self, regressor: Regressor, valid_data: TabularDataset) -> None:
         fitted_regressor = regressor.fit(valid_data)
         with pytest.raises(DatasetMissesFeaturesError, match="[feat1, feat2]"):
             fitted_regressor.predict(valid_data.features.remove_columns(["feat1", "feat2"]))
@@ -252,7 +247,7 @@ class TestPredict:
     def test_should_raise_on_invalid_data(
         self,
         regressor: Regressor,
-        valid_data: TaggedTable,
+        valid_data: TabularDataset,
         invalid_data: Table,
         expected_error: Any,
         expected_error_msg: str,
@@ -265,11 +260,11 @@ class TestPredict:
 @pytest.mark.parametrize("regressor", regressors(), ids=lambda x: x.__class__.__name__)
 class TestIsFitted:
     def test_should_return_false_before_fitting(self, regressor: Regressor) -> None:
-        assert not regressor.is_fitted()
+        assert not regressor.is_fitted
 
-    def test_should_return_true_after_fitting(self, regressor: Regressor, valid_data: TaggedTable) -> None:
+    def test_should_return_true_after_fitting(self, regressor: Regressor, valid_data: TabularDataset) -> None:
         fitted_regressor = regressor.fit(valid_data)
-        assert fitted_regressor.is_fitted()
+        assert fitted_regressor.is_fitted
 
 
 class TestHash:
@@ -297,7 +292,7 @@ class TestHash:
     def test_should_return_different_hash_for_same_regressor_fit(
         self,
         regressor1: Regressor,
-        valid_data: TaggedTable,
+        valid_data: TabularDataset,
     ) -> None:
         regressor1_fit = regressor1.fit(valid_data)
         assert hash(regressor1) != hash(regressor1_fit)
@@ -311,7 +306,7 @@ class TestHash:
         self,
         regressor1: Regressor,
         regressor2: Regressor,
-        valid_data: TaggedTable,
+        valid_data: TabularDataset,
     ) -> None:
         regressor1_fit = regressor1.fit(valid_data)
         assert hash(regressor1_fit) != hash(regressor2)
@@ -321,7 +316,7 @@ class DummyRegressor(Regressor):
     """
     Dummy regressor to test metrics.
 
-    Metrics methods expect a `TaggedTable` as input with two columns:
+    Metrics methods expect a `TabularDataset` as input with two columns:
 
     - `predicted`: The predicted targets.
     - `expected`: The correct targets.
@@ -329,17 +324,18 @@ class DummyRegressor(Regressor):
     `target_name` must be set to `"expected"`.
     """
 
-    def fit(self, training_set: TaggedTable) -> DummyRegressor:  # noqa: ARG002
+    def fit(self, training_set: TabularDataset) -> DummyRegressor:  # noqa: ARG002
         return self
 
-    def predict(self, dataset: Table) -> TaggedTable:
+    def predict(self, dataset: Table) -> TabularDataset:
         # Needed until https://github.com/Safe-DS/Library/issues/75 is fixed
         predicted = dataset.get_column("predicted")
         feature = predicted.rename("feature")
         dataset = Table.from_columns([feature, predicted])
 
-        return dataset.tag_columns(target_name="predicted")
+        return dataset.to_tabular_dataset(target_name="predicted")
 
+    @property
     def is_fitted(self) -> bool:
         return True
 
@@ -364,7 +360,7 @@ class TestMeanAbsoluteError:
                 "predicted": predicted,
                 "expected": expected,
             },
-        ).tag_columns(
+        ).to_tabular_dataset(
             target_name="expected",
         )
 
@@ -381,10 +377,10 @@ class TestMeanAbsoluteError:
                 },
             ),
         ],
-        ids=["untagged_table"],
+        ids=["table"],
     )
-    def test_should_raise_if_table_is_not_tagged(self, table: Table) -> None:
-        with pytest.raises(UntaggedTableError):
+    def test_should_raise_if_given_normal_table(self, table: Table) -> None:
+        with pytest.raises(PlainTableError):
             DummyRegressor().mean_absolute_error(table)  # type: ignore[arg-type]
 
 
@@ -395,7 +391,7 @@ class TestMeanSquaredError:
         ids=["perfect_prediction", "bad_prediction", "worst_prediction"],
     )
     def test_valid_data(self, predicted: list[float], expected: list[float], result: float) -> None:
-        table = Table({"predicted": predicted, "expected": expected}).tag_columns(
+        table = Table({"predicted": predicted, "expected": expected}).to_tabular_dataset(
             target_name="expected",
         )
 
@@ -412,10 +408,10 @@ class TestMeanSquaredError:
                 },
             ),
         ],
-        ids=["untagged_table"],
+        ids=["table"],
     )
-    def test_should_raise_if_table_is_not_tagged(self, table: Table) -> None:
-        with pytest.raises(UntaggedTableError):
+    def test_should_raise_if_given_normal_table(self, table: Table) -> None:
+        with pytest.raises(PlainTableError):
             DummyRegressor().mean_squared_error(table)  # type: ignore[arg-type]
 
 

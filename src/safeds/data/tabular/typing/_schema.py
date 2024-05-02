@@ -20,7 +20,7 @@ class Schema:
 
     Parameters
     ----------
-    schema : dict[str, ColumnType]
+    schema:
         Map from column names to data types.
 
     Examples
@@ -42,12 +42,12 @@ class Schema:
 
         Parameters
         ----------
-        dataframe : pd.DataFrame
+        dataframe:
             The dataframe.
 
         Returns
         -------
-        schema : Schema
+        schema:
             The schema.
         """
         names = dataframe.columns
@@ -90,7 +90,7 @@ class Schema:
 
         Returns
         -------
-        representation : str
+        representation:
             The string representation.
 
         Examples
@@ -123,7 +123,7 @@ class Schema:
 
         Returns
         -------
-        string : str
+        string:
             The string representation.
 
         Examples
@@ -150,7 +150,7 @@ class Schema:
 
         Returns
         -------
-        column_names : list[str]
+        column_names:
             The column names.
 
         Examples
@@ -168,12 +168,12 @@ class Schema:
 
         Parameters
         ----------
-        column_name : str
+        column_name:
             The name of the column.
 
         Returns
         -------
-        contains : bool
+        contains:
             True if the schema contains the column.
 
         Examples
@@ -194,12 +194,12 @@ class Schema:
 
         Parameters
         ----------
-        column_name : str
+        column_name:
             The name of the column.
 
         Returns
         -------
-        type : ColumnType
+        type:
             The type of the column.
 
         Raises
@@ -228,7 +228,7 @@ class Schema:
 
         Returns
         -------
-        data : dict[str, ColumnType]
+        data:
             Dictionary representation of the schema.
 
         Examples
@@ -256,12 +256,12 @@ class Schema:
 
         Parameters
         ----------
-        schemas : list[Schema]
+        schemas:
             the list of schemas you want to merge
 
         Returns
         -------
-        schema : Schema
+        schema:
             the new merged schema
 
         Raises
@@ -313,7 +313,7 @@ class Schema:
 
         Returns
         -------
-        markdown : str
+        markdown:
             The Markdown representation.
         """
         if len(self._schema) == 0:

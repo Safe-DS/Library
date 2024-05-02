@@ -1,7 +1,8 @@
 from typing import Any
 
 import pytest
-from safeds.data.tabular.containers import Row, Table, TaggedTable, TimeSeries
+from safeds.data.labeled.containers import TabularDataset
+from safeds.data.tabular.containers import Row, Table, TimeSeries
 
 
 @pytest.mark.parametrize(
@@ -59,7 +60,7 @@ from safeds.data.tabular.containers import Row, Table, TaggedTable, TimeSeries
         "different time",
     ],
 )
-def test_should_return_whether_two_tagged_tables_are_equal(
+def test_should_return_whether_two_tabular_datasets_are_equal(
     table1: TimeSeries,
     table2: TimeSeries,
     expected: bool,
@@ -86,15 +87,15 @@ def test_should_return_true_if_objects_are_identical(table1: TimeSeries) -> None
         (TimeSeries({"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9]}, "b", "c", ["a"]), Table()),
         (
             TimeSeries({"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9]}, "b", "c", ["a"]),
-            TaggedTable({"a": [1, 2, 3], "b": [4, 5, 6]}, "b", ["a"]),
+            TabularDataset({"a": [1, 2, 3], "b": [4, 5, 6]}, "b"),
         ),
     ],
     ids=[
         "TimeSeries vs. None",
         "TimeSeries vs. Row",
         "TimeSeries vs. Table",
-        "TimeSeries vs. TaggedTable",
+        "TimeSeries vs. TabularDataset",
     ],
 )
-def test_should_return_not_implemented_if_other_is_not_tagged_table(table: TimeSeries, other: Any) -> None:
+def test_should_return_not_implemented_if_other_is_not_time_series(table: TimeSeries, other: Any) -> None:
     assert (table.__eq__(other)) is NotImplemented

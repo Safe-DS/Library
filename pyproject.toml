@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "safe-ds"
-version = "0.21.0"
+version = "0.22.0"
 description = "A user-friendly library for Data Science in Python."
 authors = ["Lars Reimann <mail@larsreimann.com>"]
 license = "MIT"
@@ -34,8 +34,8 @@ syrupy = "^4.6.0"
 
 [tool.poetry.group.docs.dependencies]
 mkdocs = "^1.4.2"
-mkdocstrings = ">=0.20,<0.25"
-mkdocstrings-python = ">=0.8.3,<1.10.0"
+mkdocstrings = ">=0.20,<0.26"
+mkdocstrings-python = ">=0.8.3,<1.11.0"
 mkdocs-autorefs = ">=0.4.1,<1.1.0"
 mkdocs-exclude = "^1.0.2"
 mkdocs-gen-files = ">=0.4,<0.6"

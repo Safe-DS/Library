@@ -1,22 +1,23 @@
 import pytest
-from safeds.data.tabular.containers import Table, TaggedTable
+from safeds.data.labeled.containers import TabularDataset
+from safeds.data.tabular.containers import Table
 from safeds.exceptions import OutOfBoundsError
 from safeds.ml.classical.regression import AdaBoostRegressor
 
 
 @pytest.fixture()
-def training_set() -> TaggedTable:
+def training_set() -> TabularDataset:
     table = Table({"col1": [1, 2, 3, 4], "col2": [1, 2, 3, 4]})
-    return table.tag_columns(target_name="col1", feature_names=["col2"])
+    return table.to_tabular_dataset(target_name="col1")
 
 
 class TestLearner:
-    def test_should_be_passed_to_fitted_model(self, training_set: TaggedTable) -> None:
+    def test_should_be_passed_to_fitted_model(self, training_set: TabularDataset) -> None:
         learner = AdaBoostRegressor()
         fitted_model = AdaBoostRegressor(learner=learner).fit(training_set)
         assert fitted_model.learner == learner
 
-    def test_should_be_passed_to_sklearn(self, training_set: TaggedTable) -> None:
+    def test_should_be_passed_to_sklearn(self, training_set: TabularDataset) -> None:
         learner = AdaBoostRegressor()
         fitted_model = AdaBoostRegressor(learner=learner).fit(training_set)
         assert fitted_model._wrapped_regressor is not None
@@ -24,11 +25,11 @@ class TestLearner:
 
 
 class TestMaximumNumberOfLearners:
-    def test_should_be_passed_to_fitted_model(self, training_set: TaggedTable) -> None:
+    def test_should_be_passed_to_fitted_model(self, training_set: TabularDataset) -> None:
         fitted_model = AdaBoostRegressor(maximum_number_of_learners=2).fit(training_set)
         assert fitted_model.maximum_number_of_learners == 2
 
-    def test_should_be_passed_to_sklearn(self, training_set: TaggedTable) -> None:
+    def test_should_be_passed_to_sklearn(self, training_set: TabularDataset) -> None:
         fitted_model = AdaBoostRegressor(maximum_number_of_learners=2).fit(training_set)
         assert fitted_model._wrapped_regressor is not None
         assert fitted_model._wrapped_regressor.n_estimators == 2
@@ -43,11 +44,11 @@ class TestMaximumNumberOfLearners:
 
 
 class TestLearningRate:
-    def test_should_be_passed_to_fitted_model(self, training_set: TaggedTable) -> None:
+    def test_should_be_passed_to_fitted_model(self, training_set: TabularDataset) -> None:
         fitted_model = AdaBoostRegressor(learning_rate=2).fit(training_set)
         assert fitted_model.learning_rate == 2
 
-    def test_should_be_passed_to_sklearn(self, training_set: TaggedTable) -> None:
+    def test_should_be_passed_to_sklearn(self, training_set: TabularDataset) -> None:
         fitted_model = AdaBoostRegressor(learning_rate=2).fit(training_set)
         assert fitted_model._wrapped_regressor is not None
         assert fitted_model._wrapped_regressor.learning_rate == 2

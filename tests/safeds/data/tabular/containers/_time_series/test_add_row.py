@@ -62,7 +62,7 @@ def test_should_raise_an_error_if_row_schema_invalid(
         time_series.add_row(row)
 
 
-# the original tests throw a warning here aswell( test_add_row in tagged_table)
+# the original tests throw a warning here aswell( test_add_row in tabular_dataset)
 @pytest.mark.parametrize(
     ("time_series", "row", "expected_time_series"),
     [

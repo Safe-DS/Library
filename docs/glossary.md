@@ -117,9 +117,9 @@ It is analyzed to uncover the meaningful information in the larger data set.
 Supervised Learning is a subcategory of ML. This approach uses algorithms to learn given data.
 Those Algorithms might be able to find hidden meaning in data - without being told where to look.
 
-## Tagged Table
-In addition to a regular table, a Tagged Table will mark one column as tagged, meaning that
-an applied algorithm will train to predict its entries. The marked column is referred to as ["target"](#target).
+## Tabular Dataset
+In addition to a regular table, a tabular dataset will mark one column as ["target"](#target), meaning that an applied
+algorithm will train to predict its entries.
 
 ## Target
 The target variable of a dataset is the feature of a dataset about which you want to gain a deeper understanding.

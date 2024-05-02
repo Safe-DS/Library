@@ -12,7 +12,8 @@ if TYPE_CHECKING:
     from sklearn.base import RegressorMixin
     from sklearn.ensemble import GradientBoostingRegressor as sk_GradientBoostingRegressor
 
-    from safeds.data.tabular.containers import Table, TaggedTable
+    from safeds.data.labeled.containers import TabularDataset
+    from safeds.data.tabular.containers import Table
 
 
 class GradientBoostingRegressor(Regressor):
@@ -21,10 +22,10 @@ class GradientBoostingRegressor(Regressor):
 
     Parameters
     ----------
-    number_of_trees: int
+    number_of_trees:
         The number of boosting stages to perform. Gradient boosting is fairly robust to over-fitting so a large
         number usually results in better performance.
-    learning_rate : float
+    learning_rate:
         The larger the value, the more the model is influenced by each additional tree. If the learning rate is too
         low, the model might underfit. If the learning rate is too high, the model might overfit.
 
@@ -66,7 +67,7 @@ class GradientBoostingRegressor(Regressor):
 
         Returns
         -------
-        result: int
+        result:
             The number of trees.
         """
         return self._number_of_trees
@@ -78,12 +79,12 @@ class GradientBoostingRegressor(Regressor):
 
         Returns
         -------
-        result: float
+        result:
             The learning rate.
         """
         return self._learning_rate
 
-    def fit(self, training_set: TaggedTable) -> GradientBoostingRegressor:
+    def fit(self, training_set: TabularDataset) -> GradientBoostingRegressor:
         """
         Create a copy of this regressor and fit it with the given training data.
 
@@ -91,20 +92,20 @@ class GradientBoostingRegressor(Regressor):
 
         Parameters
         ----------
-        training_set : TaggedTable
+        training_set:
             The training data containing the feature and target vectors.
 
         Returns
         -------
-        fitted_regressor : GradientBoostingRegressor
+        fitted_regressor:
             The fitted regressor.
 
         Raises
         ------
         LearningError
             If the training data contains invalid values or if the training failed.
-        UntaggedTableError
-            If the table is untagged.
+        TypeError
+            If a table is passed instead of a tabular dataset.
         NonNumericColumnError
             If the training data contains non-numerical values.
         MissingValuesColumnError
@@ -122,26 +123,24 @@ class GradientBoostingRegressor(Regressor):
 
         return result
 
-    def predict(self, dataset: Table) -> TaggedTable:
+    def predict(self, dataset: Table) -> TabularDataset:
         """
         Predict a target vector using a dataset containing feature vectors. The model has to be trained first.
 
         Parameters
         ----------
-        dataset : Table
+        dataset:
             The dataset containing the feature vectors.
 
         Returns
         -------
-        table : TaggedTable
+        table:
             A dataset containing the given feature vectors and the predicted target vector.
 
         Raises
         ------
         ModelNotFittedError
             If the model has not been fitted yet.
-        DatasetContainsTargetError
-            If the dataset contains the target column already.
         DatasetMissesFeaturesError
             If the dataset misses feature columns.
         PredictionError
@@ -155,15 +154,9 @@ class GradientBoostingRegressor(Regressor):
         """
         return predict(self._wrapped_regressor, dataset, self._feature_names, self._target_name)
 
+    @property
     def is_fitted(self) -> bool:
-        """
-        Check if the regressor is fitted.
-
-        Returns
-        -------
-        is_fitted : bool
-            Whether the regressor is fitted.
-        """
+        """Whether the regressor is fitted."""
         return self._wrapped_regressor is not None
 
     def _get_sklearn_regressor(self) -> RegressorMixin:
@@ -172,7 +165,7 @@ class GradientBoostingRegressor(Regressor):
 
         Returns
         -------
-        wrapped_regressor: RegressorMixin
+        wrapped_regressor:
             The sklearn Regressor.
         """
         from sklearn.ensemble import GradientBoostingRegressor as sk_GradientBoostingRegressor
