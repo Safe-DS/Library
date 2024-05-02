@@ -6,10 +6,10 @@ if TYPE_CHECKING:
     from torch import Tensor
 from safeds.data.labeled.containers import TimeSeriesDataset
 from safeds.data.tabular.containers import Column, Table
-from safeds.ml.nn._output_conversion import _OutputConversion
+from safeds.ml.nn._output_conversion import OutputConversion
 
 
-class OutputConversionTimeSeries(_OutputConversion[TimeSeriesDataset, TimeSeriesDataset]):
+class OutputConversionTimeSeries(OutputConversion[TimeSeriesDataset, TimeSeriesDataset]):
     """The output conversion for a neural network, defines the output parameters for the neural network."""
 
     def __init__(self, prediction_name: str = "prediction_nn", window_size: int = 1, forecast_horizon: int = 1) -> None:

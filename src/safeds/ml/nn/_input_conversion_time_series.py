@@ -6,10 +6,10 @@ if TYPE_CHECKING:
     from torch.utils.data import DataLoader
 
 from safeds.data.labeled.containers import TimeSeriesDataset
-from safeds.ml.nn._input_conversion import _InputConversion
+from safeds.ml.nn._input_conversion import InputConversion
 
 
-class InputConversionTimeSeries(_InputConversion[TimeSeriesDataset, TimeSeriesDataset]):
+class InputConversionTimeSeries(InputConversion[TimeSeriesDataset, TimeSeriesDataset]):
     """The input conversion for a neural network, defines the input parameters for the neural network."""
 
     def __init__(

@@ -9,6 +9,7 @@ if TYPE_CHECKING:
     from ._input_conversion import InputConversion
     from ._input_conversion_table import InputConversionTable
     from ._input_conversion_time_series import InputConversionTimeSeries
+    from ._layer import Layer
     from ._lstm_layer import LSTMLayer
     from ._model import NeuralNetworkClassifier, NeuralNetworkRegressor
     from ._output_conversion import OutputConversion
