@@ -47,11 +47,11 @@ class Imputer(TableTransformer):
 
         @abstractmethod
         def __eq__(self, other: object) -> bool:
-            pass
+            pass  # pragma: no cover
 
         @abstractmethod
         def __hash__(self) -> int:
-            pass
+            pass  # pragma: no cover
 
         @abstractmethod
         def _apply(self, imputer: sk_SimpleImputer) -> None:
@@ -74,22 +74,22 @@ class Imputer(TableTransformer):
             value:
                 The value to replace missing values.
             """
-            return _Constant(value)
+            return _Constant(value)  # pragma: no cover
 
         @staticmethod
         def Mean() -> Imputer.Strategy:  # noqa: N802
             """Replace missing values with the mean of each column."""
-            return _Mean()
+            return _Mean()  # pragma: no cover
 
         @staticmethod
         def Median() -> Imputer.Strategy:  # noqa: N802
             """Replace missing values with the median of each column."""
-            return _Median()
+            return _Median()  # pragma: no cover
 
         @staticmethod
         def Mode() -> Imputer.Strategy:  # noqa: N802
             """Replace missing values with the mode of each column."""
-            return _Mode()
+            return _Mode()  # pragma: no cover
 
     def __init__(self, strategy: Imputer.Strategy, *, value_to_replace: float | str | None = None):
         if value_to_replace is None:
