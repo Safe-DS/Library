@@ -1013,6 +1013,61 @@ class Column(Sequence[T]):
         buffer.seek(0)
         return Image.from_bytes(buffer.read())
 
+    def plot_compare_columns(self, column_list: list[Column]) -> Image:
+        """
+        Creates a plot of columns and compares their numerical values. As the x-axis an ID is used.
+
+        Parameters
+        ----------
+        column_list:
+            A list of time columns to be plotted.
+
+        Returns
+        -------
+        plot:
+              A plot with all the Columns plotted by the ID on the x-axis.
+
+        Raises
+        ------
+        NonNumericColumnError
+            if the target column contains non numerical values
+
+        ValueError
+            if the columns do not have the same size
+        >>> from safeds.data.tabular.containers import Column
+        >>> col1 =Column("target", [4, 5, 6, 7, 8, 9, 10, 11, 12, 13])
+        >>> col2 =Column("target", [42, 51, 63, 71, 83, 91, 10, 11, 12, 13])
+        >>> image = col1.plot_compare_columns([col2])
+        """
+        import matplotlib.pyplot as plt
+        import pandas as pd
+        import seaborn as sns
+
+        data = pd.DataFrame()
+        column_list.append(self)
+        size = len(column_list[0])
+        data["INDEX"] = pd.DataFrame({'INDEX': range(size)})
+        for index, col in enumerate(column_list):
+            if not col.type.is_numeric():
+                raise NonNumericColumnError("The time series plotted column contains non-numerical columns.")
+            if len(col) != size:
+                raise ValueError("The columns must have the same size.")
+            data[col.name + " " + str(index)] = col._data
+
+        fig = plt.figure()
+        data = pd.melt(data, ["INDEX"])
+        print(data)
+        sns.lineplot(x="INDEX", y="value", hue="variable", data=data)
+        plt.title("Multiple Series Plot")
+        plt.xlabel("Time")
+
+        plt.tight_layout()
+        buffer = io.BytesIO()
+        fig.savefig(buffer, format="png")
+        plt.close()  # Prevents the figure from being displayed directly
+        buffer.seek(0)
+        return Image.from_bytes(buffer.read())
+
     # ------------------------------------------------------------------------------------------------------------------
     # Conversion
     # ------------------------------------------------------------------------------------------------------------------

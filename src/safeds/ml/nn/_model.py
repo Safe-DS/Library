@@ -31,7 +31,7 @@ IPT = TypeVar("IPT", Table, TimeSeriesDataset)  # InputPredictType
 OT = TypeVar("OT", TabularDataset, TimeSeriesDataset)  # OutputType
 
 
-def _set_instance_parameters(input_conversion: _InputConversion, train_data: TabularDataset | TimeSeriesDataset) -> None:
+def _set_instance_parameters(input_conversion: InputConversion, train_data: TabularDataset | TimeSeriesDataset) -> None:
     if isinstance(input_conversion, InputConversionTable) and isinstance(train_data, TabularDataset):
         input_conversion._set_parameters(
             target_name=train_data.target.name,
