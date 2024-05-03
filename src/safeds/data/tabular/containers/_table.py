@@ -109,7 +109,7 @@ class Table:
         if path.suffix != ".csv":
             raise WrongFileExtensionError(path, ".csv")
         if path.exists():
-            with path.open() as f:
+            with path.open(encoding="utf-8") as f:
                 if f.read().replace("\n", "") == "":
                     return Table()
 
@@ -200,7 +200,7 @@ class Table:
         if path.suffix != ".json":
             raise WrongFileExtensionError(path, ".json")
         if path.exists():
-            with path.open() as f:
+            with path.open(encoding="utf-8") as f:
                 if f.read().replace("\n", "") in ("", "{}"):
                     return Table()
 

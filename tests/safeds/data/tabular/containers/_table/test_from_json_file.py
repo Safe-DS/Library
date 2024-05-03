@@ -10,8 +10,8 @@ from tests.helpers import resolve_resource_path
 @pytest.mark.parametrize(
     ("path", "expected"),
     [
-        ("table.json", Table({"A": [1], "B": [2]})),
-        (Path("table.json"), Table({"A": [1], "B": [2]})),
+        ("table.json", Table({"A": ["❔"], "B": [2]})),
+        (Path("table.json"), Table({"A": ["❔"], "B": [2]})),
         (Path("emptytable.json"), Table()),
     ],
     ids=["by string", "by path", "empty"],
