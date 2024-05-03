@@ -24,7 +24,7 @@ from safeds.data.tabular.containers import Row, Table
             False,
         ),
         (
-            TimeSeriesDataset({"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9]}, "b", "a",  ["c"]),
+            TimeSeriesDataset({"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9]}, "b", "a", ["c"]),
             TimeSeriesDataset({"a": [1, 2, 3], "b": [4, 5, 6], "d": [7, 8, 9]}, "b", "a", ["d"]),
             False,
         ),
@@ -39,7 +39,7 @@ from safeds.data.tabular.containers import Row, Table
             False,
         ),
         (
-            TimeSeriesDataset({"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9]}, "b","a", ["c"]),
+            TimeSeriesDataset({"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9]}, "b", "a", ["c"]),
             TimeSeriesDataset({"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9]}, "b", "c", ["a"]),
             False,
         ),

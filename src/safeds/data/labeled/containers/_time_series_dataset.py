@@ -1,16 +1,10 @@
 from __future__ import annotations
 
-import io
 import sys
 from typing import TYPE_CHECKING
 
 from safeds._utils import _structural_hash
-from safeds.data.image.containers import Image
 from safeds.data.tabular.containers import Column, Table
-from safeds.exceptions import (
-    NonNumericColumnError,
-    UnknownColumnNameError,
-)
 
 if TYPE_CHECKING:
     from collections.abc import Mapping, Sequence
@@ -18,7 +12,6 @@ if TYPE_CHECKING:
 
     import numpy as np
     import torch
-    from torch import Tensor
     from torch.utils.data import DataLoader, Dataset
 
 
@@ -107,8 +100,12 @@ class TimeSeriesDataset:
             return NotImplemented
         if self is other:
             return True
-        return (self.target == other.target and self.features == other.features and self._table == other._table
-                and self.time == other.time)
+        return (
+            self.target == other.target
+            and self.features == other.features
+            and self._table == other._table
+            and self.time == other.time
+        )
 
     def __hash__(self) -> int:
         """
@@ -130,8 +127,12 @@ class TimeSeriesDataset:
         size:
             Size of this object in bytes.
         """
-        return (sys.getsizeof(self._target) + sys.getsizeof(self._features) + sys.getsizeof(self._table) +
-                sys.getsizeof(self._time))
+        return (
+            sys.getsizeof(self._target)
+            + sys.getsizeof(self._features)
+            + sys.getsizeof(self._table)
+            + sys.getsizeof(self._time)
+        )
 
     # ------------------------------------------------------------------------------------------------------------------
     # Properties
@@ -216,11 +217,11 @@ class TimeSeriesDataset:
         # -> [i, win_size],[target]
         feature_cols = self.features.to_columns()
         for i in range(size - (forecast_horizon + window_size)):
-            window = target_np[i: i + window_size]
+            window = target_np[i : i + window_size]
             label = target_np[i + window_size + forecast_horizon]
             for col in feature_cols:
                 data = col._data.to_numpy()
-                window = np.concatenate((window, data[i: i + window_size]))
+                window = np.concatenate((window, data[i : i + window_size]))
             x_s.append(window)
             y_s.append(label)
 
@@ -261,10 +262,10 @@ class TimeSeriesDataset:
         size = len(target_np)
         feature_cols = self.features.to_columns()
         for i in range(size - (forecast_horizon + window_size)):
-            window = target_np[i: i + window_size]
+            window = target_np[i : i + window_size]
             for col in feature_cols:
                 data = col._data.to_numpy()
-                window = np.concatenate((window, data[i: i + window_size]))
+                window = np.concatenate((window, data[i : i + window_size]))
             x_s.append(window)
 
         return DataLoader(dataset=_create_dataset_predict(np.array(x_s)), batch_size=batch_size)
@@ -283,6 +284,7 @@ class TimeSeriesDataset:
             The generated HTML.
         """
         return self._table._repr_html_()
+
 
 def _create_dataset(features: np.array, target: np.array) -> Dataset:
     import numpy as np

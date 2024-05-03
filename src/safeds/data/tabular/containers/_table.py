@@ -33,7 +33,6 @@ if TYPE_CHECKING:
     from safeds.data.labeled.containers import TabularDataset, TimeSeriesDataset
     from safeds.data.tabular.transformation import InvertibleTableTransformer, TableTransformer
 
-    from ._time_series import TimeSeries
 
 
 # noinspection PyProtectedMember
@@ -1618,7 +1617,7 @@ class Table:
     def sort_columns(
         self,
         comparator: Callable[[Column, Column], int] = lambda col1, col2: (col1.name > col2.name)
-                                                                         - (col1.name < col2.name),
+        - (col1.name < col2.name),
     ) -> Table:
         """
         Sort the columns of a `Table` with the given comparator and return a new `Table`.
@@ -1965,6 +1964,7 @@ class Table:
         """
         import matplotlib.pyplot as plt
         import pandas as pd
+
         to_be_plotted = self.get_column(column_name)
         if not to_be_plotted.type.is_numeric():
             raise NonNumericColumnError("This time series target contains non-numerical columns.")
@@ -1975,7 +1975,6 @@ class Table:
         plt.close()  # Prevents the figure from being displayed directly
         buffer.seek(0)
         return Image.from_bytes(buffer.read())
-
 
     def plot_lineplot(self, x_column_name: str, y_column_name: str) -> Image:
         """
@@ -2453,8 +2452,9 @@ class Table:
 
         return TabularDataset(self, target_name, extra_names)
 
-    def to_time_series_dataset(self, target_name: str, time_name: str,
-                               extra_names: list[str] | None = None) -> TimeSeriesDataset:
+    def to_time_series_dataset(
+        self, target_name: str, time_name: str, extra_names: list[str] | None = None,
+    ) -> TimeSeriesDataset:
         """
         Return a new `TimeSeriesDataset` with columns marked as a target column, time or feature columns.
 

@@ -10,7 +10,7 @@ def test_should_return_table(snapshot_png_image: SnapshotAssertion) -> None:
             "time": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
             "feature_1": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
             "target": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-        }
+        },
     )
     lag_plot = table.plot_lagplot(1, "target")
     assert lag_plot == snapshot_png_image
@@ -22,7 +22,8 @@ def test_should_raise_if_column_contains_non_numerical_values() -> None:
             "time": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
             "feature_1": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
             "target": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
-        })
+        },
+    )
     with pytest.raises(
         NonNumericColumnError,
         match=(

@@ -135,7 +135,7 @@ def test_should_raise_error(
 
 
 @pytest.mark.parametrize(
-    ("data", "target_name","time_name", "extra_names"),
+    ("data", "target_name", "time_name", "extra_names"),
     [
         (
             {
@@ -231,7 +231,7 @@ def test_should_create_a_tabular_dataset(
     time_name: str,
     extra_names: list[str] | None,
 ) -> None:
-    tabular_dataset = TimeSeriesDataset(data, target_name=target_name,time_name=time_name, extra_names=extra_names)
+    tabular_dataset = TimeSeriesDataset(data, target_name=target_name, time_name=time_name, extra_names=extra_names)
     if not isinstance(data, Table):
         data = Table(data)
 

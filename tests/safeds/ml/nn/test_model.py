@@ -336,6 +336,7 @@ class TestRegressionModel:
             model.predict(
                 Table.from_dict({"a": [1], "c": [2]}),
             )
+
     def test_should_raise_if_table_size_and_input_size_mismatch(self) -> None:
         model = NeuralNetworkRegressor(
             InputConversionTable(),

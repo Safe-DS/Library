@@ -26,7 +26,7 @@ from safeds.data.tabular.containers import Table
                     "B": [2, 5],
                     "C": [3, 6],
                     "T": [0, 1],
-                    "time": [0,0],
+                    "time": [0, 0],
                 },
                 target_name="T",
                 time_name="time",

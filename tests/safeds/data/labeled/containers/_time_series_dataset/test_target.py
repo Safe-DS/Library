@@ -15,7 +15,7 @@ from safeds.data.tabular.containers import Column
                     "T": [0, 1],
                 },
                 target_name="T",
-                time_name="A"
+                time_name="A",
             ),
             Column("T", [0, 1]),
         ),

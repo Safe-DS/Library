@@ -1046,7 +1046,7 @@ class Column(Sequence[T]):
         data = pd.DataFrame()
         column_list.append(self)
         size = len(column_list[0])
-        data["INDEX"] = pd.DataFrame({'INDEX': range(size)})
+        data["INDEX"] = pd.DataFrame({"INDEX": range(size)})
         for index, col in enumerate(column_list):
             if not col.type.is_numeric():
                 raise NonNumericColumnError("The time series plotted column contains non-numerical columns.")
