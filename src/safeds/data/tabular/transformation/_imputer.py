@@ -365,3 +365,11 @@ class _Mode(Imputer.Strategy):
 
     def _apply(self, imputer: sk_SimpleImputer) -> None:
         imputer.strategy = "most_frequent"
+
+
+# Override the methods with classes, so they can be used in `isinstance` calls. Unlike methods, classes define a type.
+# This is needed for the DSL, where imputer strategies are modeled using an enum.
+Imputer.Strategy.Constant = _Constant
+Imputer.Strategy.Mean = _Mean
+Imputer.Strategy.Median = _Median
+Imputer.Strategy.Mode = _Mode
