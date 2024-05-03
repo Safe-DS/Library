@@ -34,18 +34,18 @@ class TestFlattenLayer:
 
     class TestEq:
 
-        def test_should_be_equal(self):
+        def test_should_be_equal(self) -> None:
             assert FlattenLayer() == FlattenLayer()
 
-        def test_should_be_not_implemented(self):
+        def test_should_be_not_implemented(self) -> None:
             assert FlattenLayer().__eq__(Table()) is NotImplemented
 
     class TestHash:
 
-        def test_hash_should_be_equal(self):
+        def test_hash_should_be_equal(self) -> None:
             assert hash(FlattenLayer()) == hash(FlattenLayer())
 
     class TestSizeOf:
 
-        def test_should_size_be_greater_than_normal_object(self):
+        def test_should_size_be_greater_than_normal_object(self) -> None:
             assert sys.getsizeof(FlattenLayer()) > sys.getsizeof(object())

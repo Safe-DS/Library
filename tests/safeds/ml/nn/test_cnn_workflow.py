@@ -26,7 +26,7 @@ from torch.types import Device
 from tests.helpers import device_cpu, device_cuda, images_all, resolve_resource_path, skip_if_device_not_available
 
 if TYPE_CHECKING:
-    from safeds.ml.nn._layer import _Layer
+    from safeds.ml.nn import Layer
 
 
 class TestImageToTableClassifier:
@@ -192,7 +192,7 @@ class TestImageToImageRegressor:
         image_list_grayscale = image_list.convert_to_grayscale()
         image_dataset = ImageDataset(image_list, image_list_grayscale)
 
-        layers: list[_Layer] = [
+        layers: list[Layer] = [
             Convolutional2DLayer(6, 2),
             Convolutional2DLayer(12, 2),
             ConvolutionalTranspose2DLayer(6, 2),
