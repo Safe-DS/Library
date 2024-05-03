@@ -94,7 +94,7 @@ class TabularDataset:
             return NotImplemented
         if self is other:
             return True
-        return self.target == other.target and self.features == other.features and self._table == other._table
+        return self.target == other.target and self.features == other.features and self._extras == other._extras
 
     def __hash__(self) -> int:
         """
@@ -105,7 +105,7 @@ class TabularDataset:
         hash:
             The hash value.
         """
-        return _structural_hash(self.target, self.features, self._table)
+        return _structural_hash(self.target, self.features, self._extras)
 
     def __sizeof__(self) -> int:
         """
@@ -116,7 +116,7 @@ class TabularDataset:
         size:
             Size of this object in bytes.
         """
-        return sys.getsizeof(self._target) + sys.getsizeof(self._features) + sys.getsizeof(self._table)
+        return sys.getsizeof(self._target) + sys.getsizeof(self._features) + sys.getsizeof(self._table) + sys.getsizeof(self._extras)
 
     # ------------------------------------------------------------------------------------------------------------------
     # Properties
