@@ -18,9 +18,10 @@ from safeds.exceptions import (
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterator
-    from safeds.data.tabular.containers import Table
 
     import pandas as pd
+
+    from safeds.data.tabular.containers import Table
 
 
 T = TypeVar("T")
