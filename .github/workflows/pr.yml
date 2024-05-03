@@ -13,12 +13,17 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        platform:
+          - ubuntu-latest
+          - macos-latest
+          - windows-latest
         python-version:
           - "3.11"
           - "3.12"
     uses: lars-reimann/.github/.github/workflows/poetry-codecov-reusable.yml@main
     with:
       working-directory: .
+      platform: ${{ matrix.platform }}
       python-version: ${{ matrix.python-version }}
       module-name: safeds
       coverage: ${{ matrix.python-version == '3.11' }}
