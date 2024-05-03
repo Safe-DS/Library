@@ -21,6 +21,8 @@ if TYPE_CHECKING:
 
     import pandas as pd
 
+    from safeds.data.tabular.containers import Table
+
 
 T = TypeVar("T")
 R = TypeVar("R")
@@ -1015,8 +1017,22 @@ class Column(Sequence[T]):
     # Conversion
     # ------------------------------------------------------------------------------------------------------------------
 
+    def to_table(self) -> Table:
+        """
+        Create a table that contains only this column.
+
+        Returns
+        -------
+        table:
+            The table with this column.
+        """
+        # Must be imported here to avoid circular imports
+        from safeds.data.tabular.containers import Table
+
+        return Table.from_columns([self])
+
     def to_html(self) -> str:
-        r"""
+        """
         Return an HTML representation of the column.
 
         Returns
@@ -1040,7 +1056,7 @@ class Column(Sequence[T]):
     # ------------------------------------------------------------------------------------------------------------------
 
     def _repr_html_(self) -> str:
-        r"""
+        """
         Return an HTML representation of the column.
 
         Returns
