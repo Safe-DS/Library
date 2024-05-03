@@ -14,52 +14,6 @@ if TYPE_CHECKING:
     from sklearn.impute import SimpleImputer as sk_SimpleImputer
 
 
-class ImputerStrategy(ABC):
-    """
-    The abstract base class of the different imputation strategies supported by the `Imputer`.
-
-    This class is only needed for type annotations. Use the subclasses nested inside `Imputer.Strategy` instead.
-    """
-
-    @abstractmethod
-    def _augment_imputer(self, imputer: sk_SimpleImputer) -> None:
-        """
-        Set the imputer strategy of the given imputer.
-
-        Parameters
-        ----------
-        imputer:
-            The imputer to augment.
-        """
-
-    @abstractmethod
-    def __eq__(self, other: object) -> bool:
-        """
-        Compare two imputer strategies.
-
-        Parameters
-        ----------
-        other:
-            other object to compare to
-
-        Returns
-        -------
-        equals:
-            Whether the two imputer strategies are equal
-        """
-
-    def __hash__(self) -> int:
-        """
-        Return a deterministic hash value for this imputer strategy.
-
-        Returns
-        -------
-        hash:
-            The hash value.
-        """
-        return _structural_hash(self.__class__.__qualname__)
-
-
 class Imputer(TableTransformer):
     """
     Replace missing values with the given strategy.
@@ -84,100 +38,60 @@ class Imputer(TableTransformer):
     >>> transformed_table = transformer.fit_and_transform(table)
     """
 
-    class Strategy:
-        class Constant(ImputerStrategy):
+    class Strategy(ABC):
+        """
+        The abstract base class of the different imputation strategies supported by the `Imputer`.
+
+        This class is only needed for type annotations. Use the subclasses nested inside `Imputer.Strategy` instead.
+        """
+
+        @abstractmethod
+        def __eq__(self, other: object) -> bool:
+            pass
+
+        @abstractmethod
+        def __hash__(self) -> int:
+            pass
+
+        @abstractmethod
+        def _apply(self, imputer: sk_SimpleImputer) -> None:
             """
-            An imputation strategy for imputing missing data with given constant values.
+            Set the imputer strategy of the given imputer.
+
+            Parameters
+            ----------
+            imputer:
+                The imputer to augment.
+            """
+
+        @staticmethod
+        def Constant(value: Any) -> Imputer.Strategy:  # noqa: N802
+            """
+            Replace missing values with the given constant value.
 
             Parameters
             ----------
             value:
-                The given value to impute missing values.
+                The value to replace missing values.
             """
+            return _Constant(value)
 
-            def __eq__(self, other: object) -> bool:
-                if not isinstance(other, Imputer.Strategy.Constant):
-                    return NotImplemented
-                if self is other:
-                    return True
-                return self._value == other._value
+        @staticmethod
+        def Mean() -> Imputer.Strategy:  # noqa: N802
+            """Replace missing values with the mean of each column."""
+            return _Mean()
 
-            __hash__ = ImputerStrategy.__hash__
+        @staticmethod
+        def Median() -> Imputer.Strategy:  # noqa: N802
+            """Replace missing values with the median of each column."""
+            return _Median()
 
-            def __init__(self, value: Any):
-                self._value = value
+        @staticmethod
+        def Mode() -> Imputer.Strategy:  # noqa: N802
+            """Replace missing values with the mode of each column."""
+            return _Mode()
 
-            def __sizeof__(self) -> int:
-                """
-                Return the complete size of this object.
-
-                Returns
-                -------
-                size:
-                    Size of this object in bytes.
-                """
-                return sys.getsizeof(self._value)
-
-            def __str__(self) -> str:
-                return f"Constant({self._value})"
-
-            def _augment_imputer(self, imputer: sk_SimpleImputer) -> None:
-                imputer.strategy = "constant"
-                imputer.fill_value = self._value
-
-        class Mean(ImputerStrategy):
-            """An imputation strategy for imputing missing data with mean values."""
-
-            def __eq__(self, other: object) -> bool:
-                if not isinstance(other, Imputer.Strategy.Mean):
-                    return NotImplemented
-                return True
-
-            __hash__ = ImputerStrategy.__hash__
-
-            def __str__(self) -> str:
-                return "Mean"
-
-            def _augment_imputer(self, imputer: sk_SimpleImputer) -> None:
-                imputer.strategy = "mean"
-
-        class Median(ImputerStrategy):
-            """An imputation strategy for imputing missing data with median values."""
-
-            def __eq__(self, other: object) -> bool:
-                if not isinstance(other, Imputer.Strategy.Median):
-                    return NotImplemented
-                return True
-
-            __hash__ = ImputerStrategy.__hash__
-
-            def __str__(self) -> str:
-                return "Median"
-
-            def _augment_imputer(self, imputer: sk_SimpleImputer) -> None:
-                imputer.strategy = "median"
-
-        class Mode(ImputerStrategy):
-            """
-            An imputation strategy for imputing missing data with mode values.
-
-            The lowest value will be used if there are multiple values with the same highest count.
-            """
-
-            def __eq__(self, other: object) -> bool:
-                if not isinstance(other, Imputer.Strategy.Mode):
-                    return NotImplemented
-                return True
-
-            __hash__ = ImputerStrategy.__hash__
-
-            def __str__(self) -> str:
-                return "Mode"
-
-            def _augment_imputer(self, imputer: sk_SimpleImputer) -> None:
-                imputer.strategy = "most_frequent"
-
-    def __init__(self, strategy: ImputerStrategy):
+    def __init__(self, strategy: Imputer.Strategy):
         self._strategy = strategy
 
         self._wrapped_transformer: sk_SimpleImputer | None = None
@@ -223,7 +137,7 @@ class Imputer(TableTransformer):
         if table.number_of_rows == 0:
             raise ValueError("The Imputer cannot be fitted because the table contains 0 rows")
 
-        if (isinstance(self._strategy, Imputer.Strategy.Mean | Imputer.Strategy.Median)) and table.keep_only_columns(
+        if (isinstance(self._strategy, _Mean | _Median)) and table.keep_only_columns(
             column_names,
         ).remove_columns_with_non_numerical_values().number_of_columns < len(
             column_names,
@@ -241,7 +155,7 @@ class Imputer(TableTransformer):
                 ),
             )
 
-        if isinstance(self._strategy, Imputer.Strategy.Mode):
+        if isinstance(self._strategy, _Mode):
             multiple_most_frequent = {}
             for name in column_names:
                 if len(table.get_column(name).mode()) > 1:
@@ -256,7 +170,7 @@ class Imputer(TableTransformer):
                 )
 
         wrapped_transformer = sk_SimpleImputer()
-        self._strategy._augment_imputer(wrapped_transformer)
+        self._strategy._apply(wrapped_transformer)
         wrapped_transformer.fit(table._data[column_names])
 
         result = Imputer(self._strategy)
@@ -335,7 +249,6 @@ class Imputer(TableTransformer):
             raise TransformerNotFittedError
         return []
 
-    # (Must implement abstract method, cannot instantiate class otherwise.)
     def get_names_of_changed_columns(self) -> list[str]:
         """
          Get the names of all columns that may have been changed by the Imputer.
@@ -350,7 +263,7 @@ class Imputer(TableTransformer):
         TransformerNotFittedError
             If the transformer has not been fitted yet.
         """
-        if self._column_names is None:
+        if not self.is_fitted:
             raise TransformerNotFittedError
         return self._column_names
 
@@ -371,3 +284,84 @@ class Imputer(TableTransformer):
         if not self.is_fitted:
             raise TransformerNotFittedError
         return []
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+# Imputation strategies
+# ----------------------------------------------------------------------------------------------------------------------
+
+class _Constant(Imputer.Strategy):
+    def __init__(self, value: Any):
+        self._value = value
+
+    @property
+    def value(self) -> Any:
+        return self._value
+
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, _Constant):
+            return NotImplemented
+        if self is other:
+            return True
+        return self._value == other._value
+
+    def __hash__(self):
+        return _structural_hash(str(self))
+
+    def __sizeof__(self) -> int:
+        return sys.getsizeof(self._value)
+
+    def __str__(self) -> str:
+        return f"Constant({self._value})"
+
+    def _apply(self, imputer: sk_SimpleImputer) -> None:
+        imputer.strategy = "constant"
+        imputer.fill_value = self._value
+
+
+class _Mean(Imputer.Strategy):
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, _Mean):
+            return NotImplemented
+        return True
+
+    def __hash__(self):
+        return _structural_hash(str(self))
+
+    def __str__(self) -> str:
+        return "Mean"
+
+    def _apply(self, imputer: sk_SimpleImputer) -> None:
+        imputer.strategy = "mean"
+
+
+class _Median(Imputer.Strategy):
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, _Median):
+            return NotImplemented
+        return True
+
+    def __hash__(self):
+        return _structural_hash(str(self))
+
+    def __str__(self) -> str:
+        return "Median"
+
+    def _apply(self, imputer: sk_SimpleImputer) -> None:
+        imputer.strategy = "median"
+
+
+class _Mode(Imputer.Strategy):
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, _Mode):
+            return NotImplemented
+        return True
+
+    def __hash__(self):
+        return _structural_hash(str(self))
+
+    def __str__(self) -> str:
+        return "Mode"
+
+    def _apply(self, imputer: sk_SimpleImputer) -> None:
+        imputer.strategy = "most_frequent"

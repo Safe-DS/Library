@@ -4,11 +4,11 @@ import warnings
 import pytest
 from safeds.data.tabular.containers import Table
 from safeds.data.tabular.transformation import Imputer
-from safeds.data.tabular.typing import ImputerStrategy
+from safeds.data.tabular.transformation._imputer import _Mode
 from safeds.exceptions import NonNumericColumnError, TransformerNotFittedError, UnknownColumnNameError
 
 
-def strategies() -> list[ImputerStrategy]:
+def strategies() -> list[Imputer.Strategy]:
     """
     Return the list of imputer strategies to test.
 
@@ -17,7 +17,7 @@ def strategies() -> list[ImputerStrategy]:
 
     Returns
     -------
-    strategies : list[ImputerStrategy]
+    strategies : list[Imputer.Strategy]
         The list of classifiers to test.
     """
     return [Imputer.Strategy.Constant(2), Imputer.Strategy.Mean(), Imputer.Strategy.Median(), Imputer.Strategy.Mode()]
@@ -35,13 +35,13 @@ class TestStrategy:
             ],
             ids=["Constant", "Mean", "Median", "Mode"],
         )
-        def test_should_return_correct_string_representation(self, strategy: ImputerStrategy, expected: str) -> None:
+        def test_should_return_correct_string_representation(self, strategy: Imputer.Strategy, expected: str) -> None:
             assert str(strategy) == expected
 
 
 class TestFit:
     @pytest.mark.parametrize("strategy", strategies(), ids=lambda x: x.__class__.__name__)
-    def test_should_raise_if_column_not_found(self, strategy: ImputerStrategy) -> None:
+    def test_should_raise_if_column_not_found(self, strategy: Imputer.Strategy) -> None:
         table = Table(
             {
                 "a": [1, 3, None],
@@ -52,7 +52,7 @@ class TestFit:
             Imputer(strategy).fit(table, ["b", "c"])
 
     @pytest.mark.parametrize("strategy", strategies(), ids=lambda x: x.__class__.__name__)
-    def test_should_raise_if_table_contains_no_rows(self, strategy: ImputerStrategy) -> None:
+    def test_should_raise_if_table_contains_no_rows(self, strategy: Imputer.Strategy) -> None:
         with pytest.raises(ValueError, match=r"The Imputer cannot be fitted because the table contains 0 rows"):
             Imputer(strategy).fit(Table({"col1": []}), ["col1"])
 
@@ -68,7 +68,7 @@ class TestFit:
         self,
         table: Table,
         col_names: list[str],
-        strategy: ImputerStrategy,
+        strategy: Imputer.Strategy,
     ) -> None:
         with pytest.raises(
             NonNumericColumnError,
@@ -100,7 +100,7 @@ class TestFit:
             Imputer(Imputer.Strategy.Mode()).fit(table, None)
 
     @pytest.mark.parametrize("strategy", strategies(), ids=lambda x: x.__class__.__name__)
-    def test_should_not_change_original_transformer(self, strategy: ImputerStrategy) -> None:
+    def test_should_not_change_original_transformer(self, strategy: Imputer.Strategy) -> None:
         table = Table(
             {
                 "a": [1, 3, 3, None],
@@ -116,7 +116,7 @@ class TestFit:
 
 class TestTransform:
     @pytest.mark.parametrize("strategy", strategies(), ids=lambda x: x.__class__.__name__)
-    def test_should_raise_if_column_not_found(self, strategy: ImputerStrategy) -> None:
+    def test_should_raise_if_column_not_found(self, strategy: Imputer.Strategy) -> None:
         table_to_fit = Table(
             {
                 "a": [1, 3, 3, None],
@@ -124,7 +124,7 @@ class TestTransform:
             },
         )
 
-        if isinstance(strategy, Imputer.Strategy.Mode):
+        if isinstance(strategy, _Mode):
             with warnings.catch_warnings():
                 warnings.filterwarnings(
                     action="ignore",
@@ -145,12 +145,12 @@ class TestTransform:
             transformer.transform(table_to_transform)
 
     @pytest.mark.parametrize("strategy", strategies(), ids=lambda x: x.__class__.__name__)
-    def test_should_raise_if_table_contains_no_rows(self, strategy: ImputerStrategy) -> None:
+    def test_should_raise_if_table_contains_no_rows(self, strategy: Imputer.Strategy) -> None:
         with pytest.raises(ValueError, match=r"The Imputer cannot transform the table because it contains 0 rows"):
             Imputer(strategy).fit(Table({"col1": [1, 2, 2]}), ["col1"]).transform(Table({"col1": []}))
 
     @pytest.mark.parametrize("strategy", strategies(), ids=lambda x: x.__class__.__name__)
-    def test_should_raise_if_not_fitted(self, strategy: ImputerStrategy) -> None:
+    def test_should_raise_if_not_fitted(self, strategy: Imputer.Strategy) -> None:
         table = Table(
             {
                 "a": [1, 3, None],
@@ -165,12 +165,12 @@ class TestTransform:
 
 class TestIsFitted:
     @pytest.mark.parametrize("strategy", strategies(), ids=lambda x: x.__class__.__name__)
-    def test_should_return_false_before_fitting(self, strategy: ImputerStrategy) -> None:
+    def test_should_return_false_before_fitting(self, strategy: Imputer.Strategy) -> None:
         transformer = Imputer(strategy)
         assert not transformer.is_fitted
 
     @pytest.mark.parametrize("strategy", strategies(), ids=lambda x: x.__class__.__name__)
-    def test_should_return_true_after_fitting(self, strategy: ImputerStrategy) -> None:
+    def test_should_return_true_after_fitting(self, strategy: Imputer.Strategy) -> None:
         table = Table(
             {
                 "a": [1, 3, 3, None],
@@ -282,10 +282,10 @@ class TestFitAndTransform:
         self,
         table: Table,
         column_names: list[str] | None,
-        strategy: ImputerStrategy,
+        strategy: Imputer.Strategy,
         expected: Table,
     ) -> None:
-        if isinstance(strategy, Imputer.Strategy.Mode):
+        if isinstance(strategy, _Mode):
             with warnings.catch_warnings():
                 warnings.filterwarnings(
                     action="ignore",
@@ -297,7 +297,7 @@ class TestFitAndTransform:
             assert Imputer(strategy).fit_and_transform(table, column_names) == expected
 
     @pytest.mark.parametrize("strategy", strategies(), ids=lambda x: x.__class__.__name__)
-    def test_should_not_change_original_table(self, strategy: ImputerStrategy) -> None:
+    def test_should_not_change_original_table(self, strategy: Imputer.Strategy) -> None:
         table = Table(
             {
                 "a": [1, None, None],
@@ -315,7 +315,7 @@ class TestFitAndTransform:
         assert table == expected
 
     @pytest.mark.parametrize("strategy", strategies(), ids=lambda x: x.__class__.__name__)
-    def test_get_names_of_added_columns(self, strategy: ImputerStrategy) -> None:
+    def test_get_names_of_added_columns(self, strategy: Imputer.Strategy) -> None:
         transformer = Imputer(strategy=strategy)
         with pytest.raises(TransformerNotFittedError):
             transformer.get_names_of_added_columns()
@@ -330,7 +330,7 @@ class TestFitAndTransform:
         assert transformer.get_names_of_added_columns() == []
 
     @pytest.mark.parametrize("strategy", strategies(), ids=lambda x: x.__class__.__name__)
-    def test_get_names_of_changed_columns(self, strategy: ImputerStrategy) -> None:
+    def test_get_names_of_changed_columns(self, strategy: Imputer.Strategy) -> None:
         transformer = Imputer(strategy=strategy)
         with pytest.raises(TransformerNotFittedError):
             transformer.get_names_of_changed_columns()
@@ -344,7 +344,7 @@ class TestFitAndTransform:
         assert transformer.get_names_of_changed_columns() == ["a", "b"]
 
     @pytest.mark.parametrize("strategy", strategies(), ids=lambda x: x.__class__.__name__)
-    def test_get_names_of_removed_columns(self, strategy: ImputerStrategy) -> None:
+    def test_get_names_of_removed_columns(self, strategy: Imputer.Strategy) -> None:
         transformer = Imputer(strategy=strategy)
         with pytest.raises(TransformerNotFittedError):
             transformer.get_names_of_removed_columns()
@@ -367,8 +367,8 @@ class TestHash:
     )
     def test_should_return_same_hash_for_equal_strategy(
         self,
-        strategy1: ImputerStrategy,
-        strategy2: ImputerStrategy,
+        strategy1: Imputer.Strategy,
+        strategy2: Imputer.Strategy,
     ) -> None:
         assert hash(strategy1) == hash(strategy2)
 
@@ -379,8 +379,8 @@ class TestHash:
     )
     def test_should_return_different_hash_for_unequal_strategy(
         self,
-        strategy1: ImputerStrategy,
-        strategy2: ImputerStrategy,
+        strategy1: Imputer.Strategy,
+        strategy2: Imputer.Strategy,
     ) -> None:
         assert hash(strategy1) != hash(strategy2)
 
@@ -394,8 +394,8 @@ class TestEq:
     )
     def test_equal_strategy(
         self,
-        strategy1: ImputerStrategy,
-        strategy2: ImputerStrategy,
+        strategy1: Imputer.Strategy,
+        strategy2: Imputer.Strategy,
     ) -> None:
         assert strategy1 == strategy2
 
@@ -406,7 +406,7 @@ class TestEq:
     )
     def test_equal_identity_strategy(
         self,
-        strategy: ImputerStrategy,
+        strategy: Imputer.Strategy,
     ) -> None:
         assert strategy == strategy  # noqa: PLR0124
 
@@ -417,8 +417,8 @@ class TestEq:
     )
     def test_unequal_strategy(
         self,
-        strategy1: ImputerStrategy,
-        strategy2: ImputerStrategy,
+        strategy1: Imputer.Strategy,
+        strategy2: Imputer.Strategy,
     ) -> None:
         assert strategy1 != strategy2
 
@@ -431,6 +431,6 @@ class TestSizeof:
     )
     def test_sizeof_strategy(
         self,
-        strategy: ImputerStrategy,
+        strategy: Imputer.Strategy,
     ) -> None:
         assert sys.getsizeof(strategy) > sys.getsizeof(object())
