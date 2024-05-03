@@ -305,6 +305,7 @@ class Imputer(TableTransformer):
 # Imputation strategies
 # ----------------------------------------------------------------------------------------------------------------------
 
+
 class _Constant(Imputer.Strategy):
     def __init__(self, value: Any):
         self._value = value

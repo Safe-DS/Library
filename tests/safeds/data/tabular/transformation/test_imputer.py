@@ -315,9 +315,14 @@ class TestFitAndTransform:
                     message=r"There are multiple most frequent values in a column given to the Imputer\..*",
                     category=UserWarning,
                 )
-                assert Imputer(strategy, value_to_replace=value_to_replace).fit_and_transform(table, column_names) == expected
+                assert (
+                    Imputer(strategy, value_to_replace=value_to_replace).fit_and_transform(table, column_names)
+                    == expected
+                )
         else:
-            assert Imputer(strategy, value_to_replace=value_to_replace).fit_and_transform(table, column_names) == expected
+            assert (
+                Imputer(strategy, value_to_replace=value_to_replace).fit_and_transform(table, column_names) == expected
+            )
 
     @pytest.mark.parametrize("strategy", strategies(), ids=lambda x: x.__class__.__name__)
     def test_should_not_change_original_table(self, strategy: Imputer.Strategy) -> None:
