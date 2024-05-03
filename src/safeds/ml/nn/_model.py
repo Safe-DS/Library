@@ -32,9 +32,7 @@ if TYPE_CHECKING:
     from torch import Tensor, nn
 
     from safeds.data.image.typing import ImageSize
-    from safeds.ml.nn._input_conversion import InputConversion
-    from safeds.ml.nn._layer import Layer
-    from safeds.ml.nn._output_conversion import OutputConversion
+    from safeds.ml.nn import InputConversion, Layer, OutputConversion
 
 IFT = TypeVar("IFT", TabularDataset, TimeSeries, ImageDataset)  # InputFitType
 IPT = TypeVar("IPT", Table, TimeSeries, ImageList)  # InputPredictType

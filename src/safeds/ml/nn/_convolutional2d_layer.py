@@ -8,7 +8,7 @@ from safeds.data.image.typing import ImageSize
 if TYPE_CHECKING:
     from torch import Tensor, nn
 
-from safeds.ml.nn._layer import _Layer
+from safeds.ml.nn import Layer
 
 
 def _create_internal_model(
@@ -76,7 +76,7 @@ def _create_internal_model(
     )
 
 
-class Convolutional2DLayer(_Layer):
+class Convolutional2DLayer(Layer):
     def __init__(self, output_channel: int, kernel_size: int, *, stride: int = 1, padding: int = 0):
         """
         Create a Convolutional 2D Layer.

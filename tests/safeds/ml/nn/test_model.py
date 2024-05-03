@@ -24,9 +24,7 @@ from safeds.ml.nn import (
     OutputConversionImageToTable,
     OutputConversionTable,
 )
-from safeds.ml.nn._input_conversion import _InputConversion
-from safeds.ml.nn._layer import _Layer
-from safeds.ml.nn._output_conversion import _OutputConversion
+from safeds.ml.nn import InputConversion, Layer, OutputConversion
 from safeds.ml.nn._output_conversion_image import OutputConversionImageToColumn
 
 
@@ -441,9 +439,9 @@ class TestClassificationModel:
     )
     def test_should_raise_if_model_has_invalid_structure(
         self,
-        input_conversion: _InputConversion,
-        layers: list[_Layer],
-        output_conversion: _OutputConversion,
+        input_conversion: InputConversion,
+        layers: list[Layer],
+        output_conversion: OutputConversion,
         error_msg: str,
     ) -> None:
         with pytest.raises(InvalidModelStructureError, match=error_msg):
@@ -757,9 +755,9 @@ class TestRegressionModel:
     )
     def test_should_raise_if_model_has_invalid_structure(
         self,
-        input_conversion: _InputConversion,
-        layers: list[_Layer],
-        output_conversion: _OutputConversion,
+        input_conversion: InputConversion,
+        layers: list[Layer],
+        output_conversion: OutputConversion,
         error_msg: str,
     ) -> None:
         with pytest.raises(InvalidModelStructureError, match=error_msg):

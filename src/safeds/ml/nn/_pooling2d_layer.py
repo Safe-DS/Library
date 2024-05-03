@@ -8,7 +8,7 @@ from safeds.data.image.typing import ImageSize
 if TYPE_CHECKING:
     from torch import Tensor, nn
 
-from safeds.ml.nn._layer import _Layer
+from safeds.ml.nn import Layer
 
 
 def _create_internal_model(strategy: Literal["max", "avg"], kernel_size: int, padding: int, stride: int) -> nn.Module:
@@ -29,7 +29,7 @@ def _create_internal_model(strategy: Literal["max", "avg"], kernel_size: int, pa
     return _InternalLayer(strategy, kernel_size, padding, stride)
 
 
-class _Pooling2DLayer(_Layer):
+class _Pooling2DLayer(Layer):
     def __init__(self, strategy: Literal["max", "avg"], kernel_size: int, *, stride: int = -1, padding: int = 0):
         """
         Create a Pooling 2D Layer.

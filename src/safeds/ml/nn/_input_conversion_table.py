@@ -7,7 +7,7 @@ if TYPE_CHECKING:
 
 from safeds.data.labeled.containers import TabularDataset
 from safeds.data.tabular.containers import Table
-from safeds.ml.nn._input_conversion import InputConversion
+from safeds.ml.nn import InputConversion
 
 
 class InputConversionTable(InputConversion[TabularDataset, Table]):

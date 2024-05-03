@@ -9,7 +9,7 @@ if TYPE_CHECKING:
 
 from safeds._utils import _structural_hash
 from safeds.exceptions import ClosedBound, OutOfBoundsError
-from safeds.ml.nn._layer import Layer
+from safeds.ml.nn import Layer
 
 
 def _create_internal_model(input_size: int, output_size: int, activation_function: str) -> nn.Module:

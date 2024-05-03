@@ -13,10 +13,10 @@ if TYPE_CHECKING:
     from torch import Tensor
 
 from safeds.data.tabular.transformation import OneHotEncoder
-from safeds.ml.nn._output_conversion import _OutputConversion
+from safeds.ml.nn import OutputConversion
 
 
-class _OutputConversionImage(_OutputConversion[ImageList, ImageDataset], ABC):
+class _OutputConversionImage(OutputConversion[ImageList, ImageDataset], ABC):
 
     @abstractmethod
     def _data_conversion(self, input_data: ImageList, output_data: Tensor, **kwargs: Any) -> ImageDataset:

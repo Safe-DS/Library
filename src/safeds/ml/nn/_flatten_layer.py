@@ -7,7 +7,7 @@ if TYPE_CHECKING:
 
     from safeds.data.image.typing import ImageSize
 
-from safeds.ml.nn._layer import _Layer
+from safeds.ml.nn import Layer
 
 
 def _create_internal_model() -> nn.Module:
@@ -24,7 +24,7 @@ def _create_internal_model() -> nn.Module:
     return _InternalLayer()
 
 
-class FlattenLayer(_Layer):
+class FlattenLayer(Layer):
     def __init__(self) -> None:
         """Create a Flatten Layer."""
         self._input_size: ImageSize | None = None

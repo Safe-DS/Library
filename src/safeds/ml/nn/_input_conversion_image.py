@@ -11,10 +11,10 @@ if TYPE_CHECKING:
     from safeds.data.image.typing import ImageSize
     from safeds.data.tabular.transformation import OneHotEncoder
 
-from safeds.ml.nn._input_conversion import _InputConversion
+from safeds.ml.nn import InputConversion
 
 
-class InputConversionImage(_InputConversion[ImageDataset, ImageList]):
+class InputConversionImage(InputConversion[ImageDataset, ImageList]):
     """The input conversion for a neural network, defines the input parameters for the neural network."""
 
     def __init__(self, image_size: ImageSize) -> None:
