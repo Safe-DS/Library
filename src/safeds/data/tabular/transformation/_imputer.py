@@ -16,12 +16,12 @@ if TYPE_CHECKING:
 
 class Imputer(TableTransformer):
     """
-    Replace missing values with the given strategy.
+    Replace missing values using the given strategy.
 
     Parameters
     ----------
     strategy:
-        The strategy used to impute missing values. Use the classes nested inside `Imputer.Strategy` to specify it.
+        How to replace missing values.
 
     Examples
     --------
@@ -39,11 +39,7 @@ class Imputer(TableTransformer):
     """
 
     class Strategy(ABC):
-        """
-        The abstract base class of the different imputation strategies supported by the `Imputer`.
-
-        This class is only needed for type annotations. Use the subclasses nested inside `Imputer.Strategy` instead.
-        """
+        """Various strategies to replace missing values. Use the static methods to create instances of this class."""
 
         @abstractmethod
         def __eq__(self, other: object) -> bool:
