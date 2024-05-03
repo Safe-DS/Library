@@ -20,7 +20,7 @@ def test_lstm_model() -> None:
         path=resolve_resource_path(_inflation_path))
     #test_values = Table.from_rows(table.to_rows()[-165:])
     rs = RangeScaler()
-    ss_2 = RangeScaler()
+    #ss_2 = RangeScaler()
     #ss_2 = ss_2.fit(table, ["value"])
     table = rs.fit_and_transform(table, ["value"])
     train_table, test_table = table.split_rows(0.8)

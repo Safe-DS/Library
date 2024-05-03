@@ -31,7 +31,6 @@ class InputConversionTimeSeries(InputConversion[TimeSeriesDataset, TimeSeriesDat
         self._forecast_horizon = forecast_horizon
         self._target_name: str = ""
         self._time_name: str = ""
-        self._feature_names: list[str] | None = []
 
     @property
     def _data_size(self) -> int:
