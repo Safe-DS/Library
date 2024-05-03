@@ -10,8 +10,8 @@ from tests.helpers import resolve_resource_path
 @pytest.mark.parametrize(
     ("path", "expected"),
     [
-        ("table.csv", Table({"A": [1], "B": [2]})),
-        (Path("table.csv"), Table({"A": [1], "B": [2]})),
+        ("table.csv", Table({"A": ["❔"], "B": [2]})),
+        (Path("table.csv"), Table({"A": ["❔"], "B": [2]})),
         ("emptytable.csv", Table()),
     ],
     ids=["by String", "by path", "empty"],
