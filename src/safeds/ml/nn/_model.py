@@ -266,8 +266,7 @@ class NeuralNetworkClassifier(Generic[IFT, IPT, OT]):
             raise OutOfBoundsError(actual=batch_size, name="batch_size", lower_bound=ClosedBound(1))
         if self._input_conversion._data_size is not self._input_size:
             raise InputSizeError(self._input_conversion._data_size, self._input_size)
-        if not self._input_conversion._is_fit_data_valid(train_data):
-            raise FeatureDataMismatchError
+
 
         copied_model = copy.deepcopy(self)
 

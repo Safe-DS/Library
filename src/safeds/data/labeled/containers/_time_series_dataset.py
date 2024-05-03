@@ -98,8 +98,6 @@ class TimeSeriesDataset:
         """
         if not isinstance(other, TimeSeriesDataset):
             return NotImplemented
-        if self is other:
-            return True
         return (
             self.target == other.target
             and self.features == other.features

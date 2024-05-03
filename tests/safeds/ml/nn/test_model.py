@@ -4,6 +4,7 @@ from safeds.data.tabular.containers import Table
 from safeds.exceptions import FeatureDataMismatchError, InputSizeError, ModelNotFittedError, OutOfBoundsError
 from safeds.ml.nn import (
     ForwardLayer,
+    LSTMLayer,
     InputConversionTable,
     NeuralNetworkClassifier,
     NeuralNetworkRegressor,
@@ -104,6 +105,14 @@ class TestClassificationModel:
             Table.from_dict({"a": [0, 1, 2], "b": [0, 15, 51]}).to_tabular_dataset("a"),
             batch_size=batch_size,
         )
+        NeuralNetworkClassifier(
+            InputConversionTable(),
+            [ForwardLayer(input_size=1, output_size=8), LSTMLayer(output_size=3)],
+            OutputConversionTable(),
+        ).fit(
+            Table.from_dict({"a": [0, 1, 2], "b": [0, 15, 51]}).to_tabular_dataset("a"),
+            batch_size=batch_size,
+        )
         predictions = fitted_model.predict(Table.from_dict({"b": [1, 4, 124]}))
         assert isinstance(predictions, TabularDataset)
 
@@ -116,6 +125,13 @@ class TestClassificationModel:
             ).predict(
                 Table.from_dict({"a": [1]}),
             )
+            NeuralNetworkClassifier(
+                InputConversionTable(),
+                [LSTMLayer(input_size=1, output_size=1)],
+                OutputConversionTable(),
+            ).predict(
+                Table.from_dict({"a": [1]}),
+            )
 
     def test_should_raise_if_is_fitted_is_set_correctly_for_binary_classification(self) -> None:
         model = NeuralNetworkClassifier(
@@ -123,11 +139,21 @@ class TestClassificationModel:
             [ForwardLayer(input_size=1, output_size=1)],
             OutputConversionTable(),
         )
+        model_2 = NeuralNetworkClassifier(
+            InputConversionTable(),
+            [LSTMLayer(input_size=1, output_size=1)],
+            OutputConversionTable(),
+        )
         assert not model.is_fitted
+        assert not model_2.is_fitted
         model = model.fit(
             Table.from_dict({"a": [1], "b": [0]}).to_tabular_dataset("a"),
         )
+        model_2 = model_2.fit(
+            Table.from_dict({"a": [1], "b": [0]}).to_tabular_dataset("a"),
+        )
         assert model.is_fitted
+        assert model_2.is_fitted
 
     def test_should_raise_if_is_fitted_is_set_correctly_for_multiclass_classification(self) -> None:
         model = NeuralNetworkClassifier(
@@ -135,11 +161,21 @@ class TestClassificationModel:
             [ForwardLayer(input_size=1, output_size=1), ForwardLayer(output_size=3)],
             OutputConversionTable(),
         )
+        model_2 = NeuralNetworkClassifier(
+            InputConversionTable(),
+            [ForwardLayer(input_size=1, output_size=1), LSTMLayer(output_size=3)],
+            OutputConversionTable(),
+        )
         assert not model.is_fitted
+        assert not model_2.is_fitted
         model = model.fit(
             Table.from_dict({"a": [1, 0, 2], "b": [0, 15, 5]}).to_tabular_dataset("a"),
         )
+        model_2 = model_2.fit(
+            Table.from_dict({"a": [1, 0, 2], "b": [0, 15, 5]}).to_tabular_dataset("a"),
+        )
         assert model.is_fitted
+        assert model_2.is_fitted
 
     def test_should_raise_if_test_features_mismatch(self) -> None:
         model = NeuralNetworkClassifier(
