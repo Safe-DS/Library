@@ -5,7 +5,7 @@ from safeds.ml.nn import (
 
 
 def test_should_raise_if_is_fitted_is_set_correctly_lstm() -> None:
-    IT = InputConversionTable()
-    IT._feature_names = ["b"]
-    assert IT._is_fit_data_valid(TabularDataset({"a": [1], "b": [1]}, "a"))
+    it = InputConversionTable()
+    it._feature_names = ["b"]
+    assert it._is_fit_data_valid(TabularDataset({"a": [1], "b": [1]}, "a"))
 
