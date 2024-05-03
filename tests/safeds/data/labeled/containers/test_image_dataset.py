@@ -110,10 +110,25 @@ class TestEq:
     @pytest.mark.parametrize(
         ("image_dataset1", "image_dataset2"),
         [
-            (ImageDataset(ImageList.from_files(resolve_resource_path(plane_png_path)), Column("images", [1])), ImageDataset(ImageList.from_files(resolve_resource_path(plane_png_path)), Column("images", [1]))),
-            (ImageDataset(ImageList.from_files(resolve_resource_path(plane_png_path)), Table({"images": [1]})), ImageDataset(ImageList.from_files(resolve_resource_path(plane_png_path)), Table({"images": [1]}))),
-            (ImageDataset(ImageList.from_files(resolve_resource_path(plane_png_path)), ImageList.from_files(resolve_resource_path(plane_png_path))), ImageDataset(ImageList.from_files(resolve_resource_path(plane_png_path)), ImageList.from_files(resolve_resource_path(plane_png_path)))),
-        ]
+            (
+                ImageDataset(ImageList.from_files(resolve_resource_path(plane_png_path)), Column("images", [1])),
+                ImageDataset(ImageList.from_files(resolve_resource_path(plane_png_path)), Column("images", [1])),
+            ),
+            (
+                ImageDataset(ImageList.from_files(resolve_resource_path(plane_png_path)), Table({"images": [1]})),
+                ImageDataset(ImageList.from_files(resolve_resource_path(plane_png_path)), Table({"images": [1]})),
+            ),
+            (
+                ImageDataset(
+                    ImageList.from_files(resolve_resource_path(plane_png_path)),
+                    ImageList.from_files(resolve_resource_path(plane_png_path)),
+                ),
+                ImageDataset(
+                    ImageList.from_files(resolve_resource_path(plane_png_path)),
+                    ImageList.from_files(resolve_resource_path(plane_png_path)),
+                ),
+            ),
+        ],
     )
     def test_should_be_equal(self, image_dataset1: ImageDataset, image_dataset2: ImageDataset) -> None:
         assert image_dataset1 == image_dataset2
@@ -123,8 +138,11 @@ class TestEq:
         [
             ImageDataset(ImageList.from_files(resolve_resource_path(plane_png_path)), Column("images", [1])),
             ImageDataset(ImageList.from_files(resolve_resource_path(plane_png_path)), Table({"images": [1]})),
-            ImageDataset(ImageList.from_files(resolve_resource_path(plane_png_path)), ImageList.from_files(resolve_resource_path(plane_png_path))),
-        ]
+            ImageDataset(
+                ImageList.from_files(resolve_resource_path(plane_png_path)),
+                ImageList.from_files(resolve_resource_path(plane_png_path)),
+            ),
+        ],
     )
     @pytest.mark.parametrize(
         "image_dataset2",
@@ -132,12 +150,20 @@ class TestEq:
             ImageDataset(ImageList.from_files(resolve_resource_path(plane_png_path)), Column("ims", [1])),
             ImageDataset(ImageList.from_files(resolve_resource_path(plane_png_path)), Table({"ims": [1]})),
             ImageDataset(ImageList.from_files(resolve_resource_path(plane_png_path)), Column("images", [0])),
-            ImageDataset(ImageList.from_files(resolve_resource_path(plane_png_path)), Table({"images": [0], "others": [1]})),
-            ImageDataset(ImageList.from_files(resolve_resource_path(plane_png_path)), ImageList.from_files(resolve_resource_path(white_square_png_path))),
+            ImageDataset(
+                ImageList.from_files(resolve_resource_path(plane_png_path)), Table({"images": [0], "others": [1]}),
+            ),
+            ImageDataset(
+                ImageList.from_files(resolve_resource_path(plane_png_path)),
+                ImageList.from_files(resolve_resource_path(white_square_png_path)),
+            ),
             ImageDataset(ImageList.from_files(resolve_resource_path(white_square_png_path)), Column("images", [1])),
             ImageDataset(ImageList.from_files(resolve_resource_path(white_square_png_path)), Table({"images": [1]})),
-            ImageDataset(ImageList.from_files(resolve_resource_path(white_square_png_path)), ImageList.from_files(resolve_resource_path(plane_png_path))),
-        ]
+            ImageDataset(
+                ImageList.from_files(resolve_resource_path(white_square_png_path)),
+                ImageList.from_files(resolve_resource_path(plane_png_path)),
+            ),
+        ],
     )
     def test_should_not_be_equal(self, image_dataset1: ImageDataset, image_dataset2: ImageDataset) -> None:
         assert image_dataset1 != image_dataset2
@@ -153,10 +179,25 @@ class TestHash:
     @pytest.mark.parametrize(
         ("image_dataset1", "image_dataset2"),
         [
-            (ImageDataset(ImageList.from_files(resolve_resource_path(plane_png_path)), Column("images", [1])), ImageDataset(ImageList.from_files(resolve_resource_path(plane_png_path)), Column("images", [1]))),
-            (ImageDataset(ImageList.from_files(resolve_resource_path(plane_png_path)), Table({"images": [1]})), ImageDataset(ImageList.from_files(resolve_resource_path(plane_png_path)), Table({"images": [1]}))),
-            (ImageDataset(ImageList.from_files(resolve_resource_path(plane_png_path)), ImageList.from_files(resolve_resource_path(plane_png_path))), ImageDataset(ImageList.from_files(resolve_resource_path(plane_png_path)), ImageList.from_files(resolve_resource_path(plane_png_path)))),
-        ]
+            (
+                ImageDataset(ImageList.from_files(resolve_resource_path(plane_png_path)), Column("images", [1])),
+                ImageDataset(ImageList.from_files(resolve_resource_path(plane_png_path)), Column("images", [1])),
+            ),
+            (
+                ImageDataset(ImageList.from_files(resolve_resource_path(plane_png_path)), Table({"images": [1]})),
+                ImageDataset(ImageList.from_files(resolve_resource_path(plane_png_path)), Table({"images": [1]})),
+            ),
+            (
+                ImageDataset(
+                    ImageList.from_files(resolve_resource_path(plane_png_path)),
+                    ImageList.from_files(resolve_resource_path(plane_png_path)),
+                ),
+                ImageDataset(
+                    ImageList.from_files(resolve_resource_path(plane_png_path)),
+                    ImageList.from_files(resolve_resource_path(plane_png_path)),
+                ),
+            ),
+        ],
     )
     def test_hash_should_be_equal(self, image_dataset1: ImageDataset, image_dataset2: ImageDataset) -> None:
         assert hash(image_dataset1) == hash(image_dataset2)
@@ -166,8 +207,11 @@ class TestHash:
         [
             ImageDataset(ImageList.from_files(resolve_resource_path(plane_png_path)), Column("images", [1])),
             ImageDataset(ImageList.from_files(resolve_resource_path(plane_png_path)), Table({"images": [1]})),
-            ImageDataset(ImageList.from_files(resolve_resource_path(plane_png_path)), ImageList.from_files(resolve_resource_path(plane_png_path))),
-        ]
+            ImageDataset(
+                ImageList.from_files(resolve_resource_path(plane_png_path)),
+                ImageList.from_files(resolve_resource_path(plane_png_path)),
+            ),
+        ],
     )
     @pytest.mark.parametrize(
         "image_dataset2",
@@ -175,12 +219,20 @@ class TestHash:
             ImageDataset(ImageList.from_files(resolve_resource_path(plane_png_path)), Column("ims", [1])),
             ImageDataset(ImageList.from_files(resolve_resource_path(plane_png_path)), Table({"ims": [1]})),
             ImageDataset(ImageList.from_files(resolve_resource_path(plane_png_path)), Column("images", [0])),
-            ImageDataset(ImageList.from_files(resolve_resource_path(plane_png_path)), Table({"images": [0], "others": [1]})),
-            ImageDataset(ImageList.from_files(resolve_resource_path(plane_png_path)), ImageList.from_files(resolve_resource_path(white_square_png_path))),
+            ImageDataset(
+                ImageList.from_files(resolve_resource_path(plane_png_path)), Table({"images": [0], "others": [1]}),
+            ),
+            ImageDataset(
+                ImageList.from_files(resolve_resource_path(plane_png_path)),
+                ImageList.from_files(resolve_resource_path(white_square_png_path)),
+            ),
             ImageDataset(ImageList.from_files(resolve_resource_path(white_square_png_path)), Column("images", [1])),
             ImageDataset(ImageList.from_files(resolve_resource_path(white_square_png_path)), Table({"images": [1]})),
-            ImageDataset(ImageList.from_files(resolve_resource_path(white_square_png_path)), ImageList.from_files(resolve_resource_path(plane_png_path))),
-        ]
+            ImageDataset(
+                ImageList.from_files(resolve_resource_path(white_square_png_path)),
+                ImageList.from_files(resolve_resource_path(plane_png_path)),
+            ),
+        ],
     )
     def test_hash_should_not_be_equal(self, image_dataset1: ImageDataset, image_dataset2: ImageDataset) -> None:
         assert hash(image_dataset1) != hash(image_dataset2)
@@ -193,8 +245,11 @@ class TestSizeOf:
         [
             ImageDataset(ImageList.from_files(resolve_resource_path(plane_png_path)), Column("images", [1])),
             ImageDataset(ImageList.from_files(resolve_resource_path(plane_png_path)), Table({"images": [1]})),
-            ImageDataset(ImageList.from_files(resolve_resource_path(plane_png_path)), ImageList.from_files(resolve_resource_path(plane_png_path))),
-        ]
+            ImageDataset(
+                ImageList.from_files(resolve_resource_path(plane_png_path)),
+                ImageList.from_files(resolve_resource_path(plane_png_path)),
+            ),
+        ],
     )
     def test_should_size_be_greater_than_normal_object(self, image_dataset: ImageDataset) -> None:
         assert sys.getsizeof(image_dataset) > sys.getsizeof(object())

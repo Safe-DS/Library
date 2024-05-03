@@ -4,7 +4,7 @@ from typing import Literal
 import pytest
 from safeds.data.image.typing import ImageSize
 from safeds.data.tabular.containers import Table
-from safeds.ml.nn import MaxPooling2DLayer, AvgPooling2DLayer
+from safeds.ml.nn import AvgPooling2DLayer, MaxPooling2DLayer
 from safeds.ml.nn._pooling2d_layer import _Pooling2DLayer
 from torch import nn
 
@@ -66,9 +66,11 @@ class TestPooling2DLayer:
                 (MaxPooling2DLayer(2, stride=3, padding=4), MaxPooling2DLayer(2, stride=3, padding=4)),
                 (AvgPooling2DLayer(2), AvgPooling2DLayer(2)),
                 (AvgPooling2DLayer(2, stride=3, padding=4), AvgPooling2DLayer(2, stride=3, padding=4)),
-            ]
+            ],
         )
-        def test_should_be_equal(self, pooling_2d_layer_1: _Pooling2DLayer, pooling_2d_layer_2: _Pooling2DLayer) -> None:
+        def test_should_be_equal(
+            self, pooling_2d_layer_1: _Pooling2DLayer, pooling_2d_layer_2: _Pooling2DLayer,
+        ) -> None:
             assert pooling_2d_layer_1 == pooling_2d_layer_2
 
         @pytest.mark.parametrize(
@@ -78,7 +80,7 @@ class TestPooling2DLayer:
                 MaxPooling2DLayer(2, stride=3, padding=4),
                 AvgPooling2DLayer(2),
                 AvgPooling2DLayer(2, stride=3, padding=4),
-            ]
+            ],
         )
         @pytest.mark.parametrize(
             "pooling_2d_layer_2",
@@ -91,9 +93,11 @@ class TestPooling2DLayer:
                 AvgPooling2DLayer(1, stride=3, padding=4),
                 AvgPooling2DLayer(2, stride=1, padding=4),
                 AvgPooling2DLayer(2, stride=3, padding=1),
-            ]
+            ],
         )
-        def test_should_not_be_equal(self, pooling_2d_layer_1: _Pooling2DLayer, pooling_2d_layer_2: _Pooling2DLayer) -> None:
+        def test_should_not_be_equal(
+            self, pooling_2d_layer_1: _Pooling2DLayer, pooling_2d_layer_2: _Pooling2DLayer,
+        ) -> None:
             assert pooling_2d_layer_1 != pooling_2d_layer_2
 
         def test_should_be_not_implemented(self) -> None:
@@ -114,9 +118,11 @@ class TestPooling2DLayer:
                 (MaxPooling2DLayer(2, stride=3, padding=4), MaxPooling2DLayer(2, stride=3, padding=4)),
                 (AvgPooling2DLayer(2), AvgPooling2DLayer(2)),
                 (AvgPooling2DLayer(2, stride=3, padding=4), AvgPooling2DLayer(2, stride=3, padding=4)),
-            ]
+            ],
         )
-        def test_hash_should_be_equal(self, pooling_2d_layer_1: _Pooling2DLayer, pooling_2d_layer_2: _Pooling2DLayer) -> None:
+        def test_hash_should_be_equal(
+            self, pooling_2d_layer_1: _Pooling2DLayer, pooling_2d_layer_2: _Pooling2DLayer,
+        ) -> None:
             assert hash(pooling_2d_layer_1) == hash(pooling_2d_layer_2)
 
         @pytest.mark.parametrize(
@@ -126,7 +132,7 @@ class TestPooling2DLayer:
                 MaxPooling2DLayer(2, stride=3, padding=4),
                 AvgPooling2DLayer(2),
                 AvgPooling2DLayer(2, stride=3, padding=4),
-            ]
+            ],
         )
         @pytest.mark.parametrize(
             "pooling_2d_layer_2",
@@ -139,9 +145,11 @@ class TestPooling2DLayer:
                 AvgPooling2DLayer(1, stride=3, padding=4),
                 AvgPooling2DLayer(2, stride=1, padding=4),
                 AvgPooling2DLayer(2, stride=3, padding=1),
-            ]
+            ],
         )
-        def test_hash_should_not_be_equal(self, pooling_2d_layer_1: _Pooling2DLayer, pooling_2d_layer_2: _Pooling2DLayer) -> None:
+        def test_hash_should_not_be_equal(
+            self, pooling_2d_layer_1: _Pooling2DLayer, pooling_2d_layer_2: _Pooling2DLayer,
+        ) -> None:
             assert hash(pooling_2d_layer_1) != hash(pooling_2d_layer_2)
 
     class TestSizeOf:
@@ -153,8 +161,7 @@ class TestPooling2DLayer:
                 MaxPooling2DLayer(2, stride=3, padding=4),
                 AvgPooling2DLayer(2),
                 AvgPooling2DLayer(2, stride=3, padding=4),
-            ]
+            ],
         )
         def test_should_size_be_greater_than_normal_object(self, pooling_2d_layer: _Pooling2DLayer) -> None:
             assert sys.getsizeof(pooling_2d_layer) > sys.getsizeof(object())
-

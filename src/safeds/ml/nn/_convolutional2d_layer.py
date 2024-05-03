@@ -189,7 +189,9 @@ class Convolutional2DLayer(Layer):
         hash:
             the hash value
         """
-        return _structural_hash(self._output_channel, self._kernel_size, self._stride, self._padding, self._input_size, self._output_size)
+        return _structural_hash(
+            self._output_channel, self._kernel_size, self._stride, self._padding, self._input_size, self._output_size,
+        )
 
     def __eq__(self, other: object) -> bool:
         """

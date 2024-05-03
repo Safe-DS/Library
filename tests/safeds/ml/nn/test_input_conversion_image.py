@@ -81,19 +81,14 @@ class TestEq:
 
     @pytest.mark.parametrize(
         ("input_conversion_image1", "input_conversion_image2"),
-        [
-            (InputConversionImage(ImageSize(1, 2, 3)), InputConversionImage(ImageSize(1, 2, 3)))
-        ]
+        [(InputConversionImage(ImageSize(1, 2, 3)), InputConversionImage(ImageSize(1, 2, 3)))],
     )
-    def test_should_be_equal(self, input_conversion_image1: InputConversionImage, input_conversion_image2: InputConversionImage) -> None:
+    def test_should_be_equal(
+        self, input_conversion_image1: InputConversionImage, input_conversion_image2: InputConversionImage,
+    ) -> None:
         assert input_conversion_image1 == input_conversion_image2
 
-    @pytest.mark.parametrize(
-        "input_conversion_image1",
-        [
-            InputConversionImage(ImageSize(1, 2, 3))
-        ]
-    )
+    @pytest.mark.parametrize("input_conversion_image1", [InputConversionImage(ImageSize(1, 2, 3))])
     @pytest.mark.parametrize(
         "input_conversion_image2",
         [
@@ -101,9 +96,11 @@ class TestEq:
             InputConversionImage(ImageSize(1, 1, 3)),
             InputConversionImage(ImageSize(1, 2, 1)),
             InputConversionImage(ImageSize(1, 2, 4)),
-        ]
+        ],
     )
-    def test_should_not_be_equal(self, input_conversion_image1: InputConversionImage, input_conversion_image2: InputConversionImage) -> None:
+    def test_should_not_be_equal(
+        self, input_conversion_image1: InputConversionImage, input_conversion_image2: InputConversionImage,
+    ) -> None:
         assert input_conversion_image1 != input_conversion_image2
 
     def test_should_be_not_implemented(self) -> None:
@@ -116,19 +113,14 @@ class TestHash:
 
     @pytest.mark.parametrize(
         ("input_conversion_image1", "input_conversion_image2"),
-        [
-            (InputConversionImage(ImageSize(1, 2, 3)), InputConversionImage(ImageSize(1, 2, 3)))
-        ]
+        [(InputConversionImage(ImageSize(1, 2, 3)), InputConversionImage(ImageSize(1, 2, 3)))],
     )
-    def test_hash_should_be_equal(self, input_conversion_image1: InputConversionImage, input_conversion_image2: InputConversionImage) -> None:
+    def test_hash_should_be_equal(
+        self, input_conversion_image1: InputConversionImage, input_conversion_image2: InputConversionImage,
+    ) -> None:
         assert hash(input_conversion_image1) == hash(input_conversion_image2)
 
-    @pytest.mark.parametrize(
-        "input_conversion_image1",
-        [
-            InputConversionImage(ImageSize(1, 2, 3))
-        ]
-    )
+    @pytest.mark.parametrize("input_conversion_image1", [InputConversionImage(ImageSize(1, 2, 3))])
     @pytest.mark.parametrize(
         "input_conversion_image2",
         [
@@ -136,20 +128,16 @@ class TestHash:
             InputConversionImage(ImageSize(1, 1, 3)),
             InputConversionImage(ImageSize(1, 2, 1)),
             InputConversionImage(ImageSize(1, 2, 4)),
-        ]
+        ],
     )
-    def test_hash_should_not_be_equal(self, input_conversion_image1: InputConversionImage, input_conversion_image2: InputConversionImage) -> None:
+    def test_hash_should_not_be_equal(
+        self, input_conversion_image1: InputConversionImage, input_conversion_image2: InputConversionImage,
+    ) -> None:
         assert hash(input_conversion_image1) != hash(input_conversion_image2)
 
 
 class TestSizeOf:
 
-    @pytest.mark.parametrize(
-        "input_conversion_image",
-        [
-            InputConversionImage(ImageSize(1, 2, 3))
-        ]
-    )
+    @pytest.mark.parametrize("input_conversion_image", [InputConversionImage(ImageSize(1, 2, 3))])
     def test_should_size_be_greater_than_normal_object(self, input_conversion_image: InputConversionImage) -> None:
         assert sys.getsizeof(input_conversion_image) > sys.getsizeof(object())
-

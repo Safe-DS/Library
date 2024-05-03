@@ -15,16 +15,18 @@ from safeds.ml.nn import (
     ConvolutionalTranspose2DLayer,
     FlattenLayer,
     ForwardLayer,
+    InputConversion,
     InputConversionImage,
     InputConversionTable,
+    Layer,
     MaxPooling2DLayer,
     NeuralNetworkClassifier,
     NeuralNetworkRegressor,
+    OutputConversion,
     OutputConversionImageToImage,
     OutputConversionImageToTable,
     OutputConversionTable,
 )
-from safeds.ml.nn import InputConversion, Layer, OutputConversion
 from safeds.ml.nn._output_conversion_image import OutputConversionImageToColumn
 
 

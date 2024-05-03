@@ -91,7 +91,14 @@ class InputConversionImage(InputConversion[ImageDataset, ImageList]):
         hash:
             the hash value
         """
-        return _structural_hash(self._input_size, self._output_size, self._one_hot_encoder, self._column_name, self._column_names, self._output_type)
+        return _structural_hash(
+            self._input_size,
+            self._output_size,
+            self._one_hot_encoder,
+            self._column_name,
+            self._column_names,
+            self._output_type,
+        )
 
     def __eq__(self, other: object) -> bool:
         """

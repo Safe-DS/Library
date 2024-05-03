@@ -128,7 +128,13 @@ class ImageDataset(Generic[T]):
         """
         if not isinstance(other, ImageDataset):
             return NotImplemented
-        return (self is other) or (self._shuffle_after_epoch == other._shuffle_after_epoch and self._batch_size == other._batch_size and isinstance(other._output, type(self._output)) and (self._input == other._input) and (self._output == other._output))
+        return (self is other) or (
+            self._shuffle_after_epoch == other._shuffle_after_epoch
+            and self._batch_size == other._batch_size
+            and isinstance(other._output, type(self._output))
+            and (self._input == other._input)
+            and (self._output == other._output)
+        )
 
     def __hash__(self) -> int:
         """
@@ -291,7 +297,9 @@ class _TableAsTensor:
 
         if not isinstance(other, _TableAsTensor):
             return NotImplemented
-        return (self is other) or (self._column_names == other._column_names and torch.all(torch.eq(self._tensor, other._tensor)).item())
+        return (self is other) or (
+            self._column_names == other._column_names and torch.all(torch.eq(self._tensor, other._tensor)).item()
+        )
 
     def __hash__(self) -> int:
         return _structural_hash(self._tensor.size(), self._column_names)
@@ -337,7 +345,11 @@ class _ColumnAsTensor:
 
         if not isinstance(other, _ColumnAsTensor):
             return NotImplemented
-        return (self is other) or (self._column_name == other._column_name and self._one_hot_encoder == other._one_hot_encoder and torch.all(torch.eq(self._tensor, other._tensor)).item())
+        return (self is other) or (
+            self._column_name == other._column_name
+            and self._one_hot_encoder == other._one_hot_encoder
+            and torch.all(torch.eq(self._tensor, other._tensor)).item()
+        )
 
     def __hash__(self) -> int:
         return _structural_hash(self._tensor.size(), self._column_name, self._one_hot_encoder)
