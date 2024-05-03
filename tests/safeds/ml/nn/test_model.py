@@ -125,7 +125,7 @@ class TestClassificationModel:
             ).predict(
                 Table.from_dict({"a": [1]}),
             )
-            
+
 
     def test_should_raise_if_is_fitted_is_set_correctly_for_binary_classification(self) -> None:
         model = NeuralNetworkClassifier(
