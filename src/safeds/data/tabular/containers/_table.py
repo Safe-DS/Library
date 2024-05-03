@@ -1959,7 +1959,7 @@ class Table:
         --------
         >>> from safeds.data.tabular.containers import Table
         >>> table = Table({"time":[1, 2], "target": [3, 4], "feature":[2,2]} )
-        >>> image = table.plot_lagplot(lag = 1)
+        >>> image = table.plot_lagplot(1, "target")
         """
         import matplotlib.pyplot as plt
         import pandas as pd
@@ -2488,7 +2488,7 @@ class Table:
         --------
         >>> from safeds.data.tabular.containers import Table
         >>> table = Table({"day": [0, 1, 2], "price": [1.10, 1.19, 1.79], "amount_bought": [74, 72, 51]})
-        >>> dataset = table.to_tabular_dataset(target_name="amount_bought", time_name= "day")
+        >>> dataset = table.to_time_series_dataset(target_name="amount_bought", time_name= "day")
         """
         from safeds.data.labeled.containers import TimeSeriesDataset
 
