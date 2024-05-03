@@ -151,7 +151,8 @@ class TestEq:
             ImageDataset(ImageList.from_files(resolve_resource_path(plane_png_path)), Table({"ims": [1]})),
             ImageDataset(ImageList.from_files(resolve_resource_path(plane_png_path)), Column("images", [0])),
             ImageDataset(
-                ImageList.from_files(resolve_resource_path(plane_png_path)), Table({"images": [0], "others": [1]}),
+                ImageList.from_files(resolve_resource_path(plane_png_path)),
+                Table({"images": [0], "others": [1]}),
             ),
             ImageDataset(
                 ImageList.from_files(resolve_resource_path(plane_png_path)),
@@ -220,7 +221,8 @@ class TestHash:
             ImageDataset(ImageList.from_files(resolve_resource_path(plane_png_path)), Table({"ims": [1]})),
             ImageDataset(ImageList.from_files(resolve_resource_path(plane_png_path)), Column("images", [0])),
             ImageDataset(
-                ImageList.from_files(resolve_resource_path(plane_png_path)), Table({"images": [0], "others": [1]}),
+                ImageList.from_files(resolve_resource_path(plane_png_path)),
+                Table({"images": [0], "others": [1]}),
             ),
             ImageDataset(
                 ImageList.from_files(resolve_resource_path(plane_png_path)),

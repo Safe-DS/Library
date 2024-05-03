@@ -69,7 +69,9 @@ class TestPooling2DLayer:
             ],
         )
         def test_should_be_equal(
-            self, pooling_2d_layer_1: _Pooling2DLayer, pooling_2d_layer_2: _Pooling2DLayer,
+            self,
+            pooling_2d_layer_1: _Pooling2DLayer,
+            pooling_2d_layer_2: _Pooling2DLayer,
         ) -> None:
             assert pooling_2d_layer_1 == pooling_2d_layer_2
 
@@ -96,7 +98,9 @@ class TestPooling2DLayer:
             ],
         )
         def test_should_not_be_equal(
-            self, pooling_2d_layer_1: _Pooling2DLayer, pooling_2d_layer_2: _Pooling2DLayer,
+            self,
+            pooling_2d_layer_1: _Pooling2DLayer,
+            pooling_2d_layer_2: _Pooling2DLayer,
         ) -> None:
             assert pooling_2d_layer_1 != pooling_2d_layer_2
 
@@ -121,7 +125,9 @@ class TestPooling2DLayer:
             ],
         )
         def test_hash_should_be_equal(
-            self, pooling_2d_layer_1: _Pooling2DLayer, pooling_2d_layer_2: _Pooling2DLayer,
+            self,
+            pooling_2d_layer_1: _Pooling2DLayer,
+            pooling_2d_layer_2: _Pooling2DLayer,
         ) -> None:
             assert hash(pooling_2d_layer_1) == hash(pooling_2d_layer_2)
 
@@ -148,7 +154,9 @@ class TestPooling2DLayer:
             ],
         )
         def test_hash_should_not_be_equal(
-            self, pooling_2d_layer_1: _Pooling2DLayer, pooling_2d_layer_2: _Pooling2DLayer,
+            self,
+            pooling_2d_layer_1: _Pooling2DLayer,
+            pooling_2d_layer_2: _Pooling2DLayer,
         ) -> None:
             assert hash(pooling_2d_layer_1) != hash(pooling_2d_layer_2)
 

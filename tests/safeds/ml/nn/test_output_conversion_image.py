@@ -21,7 +21,9 @@ class TestDataConversionImage:
         ],
     )
     def test_should_raise_if_input_data_is_multi_size(
-        self, output_conversion: _OutputConversionImage, kwargs: dict,
+        self,
+        output_conversion: _OutputConversionImage,
+        kwargs: dict,
     ) -> None:
         with pytest.raises(ValueError, match=r"The given input ImageList contains images of different sizes."):
             output_conversion._data_conversion(input_data=_MultiSizeImageList(), output_data=torch.empty(1), **kwargs)
@@ -37,7 +39,9 @@ class TestDataConversionImage:
             ],
         )
         def test_should_be_equal(
-            self, output_conversion_image1: _OutputConversionImage, output_conversion_image2: _OutputConversionImage,
+            self,
+            output_conversion_image1: _OutputConversionImage,
+            output_conversion_image2: _OutputConversionImage,
         ) -> None:
             assert output_conversion_image1 == output_conversion_image2
 
@@ -67,7 +71,9 @@ class TestDataConversionImage:
             ],
         )
         def test_hash_should_be_equal(
-            self, output_conversion_image1: _OutputConversionImage, output_conversion_image2: _OutputConversionImage,
+            self,
+            output_conversion_image1: _OutputConversionImage,
+            output_conversion_image2: _OutputConversionImage,
         ) -> None:
             assert hash(output_conversion_image1) == hash(output_conversion_image2)
 
@@ -90,7 +96,8 @@ class TestDataConversionImage:
             ],
         )
         def test_should_size_be_greater_than_normal_object(
-            self, output_conversion_image: _OutputConversionImage,
+            self,
+            output_conversion_image: _OutputConversionImage,
         ) -> None:
             assert sys.getsizeof(output_conversion_image) > sys.getsizeof(object())
 

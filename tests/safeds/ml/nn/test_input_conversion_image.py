@@ -84,7 +84,9 @@ class TestEq:
         [(InputConversionImage(ImageSize(1, 2, 3)), InputConversionImage(ImageSize(1, 2, 3)))],
     )
     def test_should_be_equal(
-        self, input_conversion_image1: InputConversionImage, input_conversion_image2: InputConversionImage,
+        self,
+        input_conversion_image1: InputConversionImage,
+        input_conversion_image2: InputConversionImage,
     ) -> None:
         assert input_conversion_image1 == input_conversion_image2
 
@@ -99,7 +101,9 @@ class TestEq:
         ],
     )
     def test_should_not_be_equal(
-        self, input_conversion_image1: InputConversionImage, input_conversion_image2: InputConversionImage,
+        self,
+        input_conversion_image1: InputConversionImage,
+        input_conversion_image2: InputConversionImage,
     ) -> None:
         assert input_conversion_image1 != input_conversion_image2
 
@@ -116,7 +120,9 @@ class TestHash:
         [(InputConversionImage(ImageSize(1, 2, 3)), InputConversionImage(ImageSize(1, 2, 3)))],
     )
     def test_hash_should_be_equal(
-        self, input_conversion_image1: InputConversionImage, input_conversion_image2: InputConversionImage,
+        self,
+        input_conversion_image1: InputConversionImage,
+        input_conversion_image2: InputConversionImage,
     ) -> None:
         assert hash(input_conversion_image1) == hash(input_conversion_image2)
 
@@ -131,7 +137,9 @@ class TestHash:
         ],
     )
     def test_hash_should_not_be_equal(
-        self, input_conversion_image1: InputConversionImage, input_conversion_image2: InputConversionImage,
+        self,
+        input_conversion_image1: InputConversionImage,
+        input_conversion_image2: InputConversionImage,
     ) -> None:
         assert hash(input_conversion_image1) != hash(input_conversion_image2)
 

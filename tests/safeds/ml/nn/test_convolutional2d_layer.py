@@ -200,7 +200,9 @@ class TestConvolutional2DLayer:
             ],
         )
         def test_should_not_be_equal(
-            self, conv2dlayer1: Convolutional2DLayer, conv2dlayer2: Convolutional2DLayer,
+            self,
+            conv2dlayer1: Convolutional2DLayer,
+            conv2dlayer2: Convolutional2DLayer,
         ) -> None:
             assert conv2dlayer1 != conv2dlayer2
             assert conv2dlayer2 != conv2dlayer1
@@ -226,7 +228,9 @@ class TestConvolutional2DLayer:
             ],
         )
         def test_hash_should_be_equal(
-            self, conv2dlayer1: Convolutional2DLayer, conv2dlayer2: Convolutional2DLayer,
+            self,
+            conv2dlayer1: Convolutional2DLayer,
+            conv2dlayer2: Convolutional2DLayer,
         ) -> None:
             assert hash(conv2dlayer1) == hash(conv2dlayer2)
 
@@ -254,7 +258,9 @@ class TestConvolutional2DLayer:
             ],
         )
         def test_hash_should_not_be_equal(
-            self, conv2dlayer1: Convolutional2DLayer, conv2dlayer2: Convolutional2DLayer,
+            self,
+            conv2dlayer1: Convolutional2DLayer,
+            conv2dlayer2: Convolutional2DLayer,
         ) -> None:
             assert hash(conv2dlayer1) != hash(conv2dlayer2)
 
