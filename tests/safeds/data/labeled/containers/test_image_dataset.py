@@ -259,6 +259,9 @@ class TestTableAsTensor:
         with pytest.raises(ValueError, match=error_msg):
             _TableAsTensor._from_tensor(tensor, ["a", "b"])
 
+    def test_eq_should_be_not_implemented(self) -> None:
+        assert _TableAsTensor(Table()).__eq__(Table()) is NotImplemented
+
 
 class TestColumnAsTensor:
 
@@ -295,3 +298,6 @@ class TestColumnAsTensor:
     ) -> None:
         with pytest.raises(error, match=error_msg):
             _ColumnAsTensor._from_tensor(tensor, "a", one_hot_encoder)
+
+    def test_eq_should_be_not_implemented(self) -> None:
+        assert _ColumnAsTensor(Column("column", [1])).__eq__(Table()) is NotImplemented
