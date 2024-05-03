@@ -12,9 +12,9 @@ from tests.helpers import resolve_resource_path
     [
         (
             "table.csv",
-            TimeSeries({"A": [1], "B": [2]}, time_name="A", target_name="B"),
+            TimeSeries({"A": ["❔"], "B": [2]}, time_name="A", target_name="B"),
         ),
-        (Path("table.csv"), TimeSeries({"A": [1], "B": [2]}, time_name="A", target_name="B")),
+        (Path("table.csv"), TimeSeries({"A": ["❔"], "B": [2]}, time_name="A", target_name="B")),
     ],
     ids=["by String", "by path"],
 )
