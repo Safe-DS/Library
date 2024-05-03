@@ -116,7 +116,12 @@ class TabularDataset:
         size:
             Size of this object in bytes.
         """
-        return sys.getsizeof(self._target) + sys.getsizeof(self._features) + sys.getsizeof(self._table) + sys.getsizeof(self._extras)
+        return (
+            sys.getsizeof(self._target)
+            + sys.getsizeof(self._features)
+            + sys.getsizeof(self._table)
+            + sys.getsizeof(self._extras)
+        )
 
     # ------------------------------------------------------------------------------------------------------------------
     # Properties
