@@ -1,4 +1,3 @@
-
 from safeds.data.tabular.containers import Table
 from safeds.data.tabular.transformation import RangeScaler
 from safeds.ml.nn import (

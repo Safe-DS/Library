@@ -34,7 +34,6 @@ if TYPE_CHECKING:
     from safeds.data.tabular.transformation import InvertibleTableTransformer, TableTransformer
 
 
-
 # noinspection PyProtectedMember
 class Table:
     """
@@ -2453,7 +2452,10 @@ class Table:
         return TabularDataset(self, target_name, extra_names)
 
     def to_time_series_dataset(
-        self, target_name: str, time_name: str, extra_names: list[str] | None = None,
+        self,
+        target_name: str,
+        time_name: str,
+        extra_names: list[str] | None = None,
     ) -> TimeSeriesDataset:
         """
         Return a new `TimeSeriesDataset` with columns marked as a target column, time or feature columns.

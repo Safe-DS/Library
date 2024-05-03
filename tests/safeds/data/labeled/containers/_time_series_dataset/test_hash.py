@@ -25,7 +25,8 @@ from safeds.data.labeled.containers import TimeSeriesDataset
     ],
 )
 def test_should_return_same_hash_for_equal_tabular_datasets(
-    table1: TimeSeriesDataset, table2: TimeSeriesDataset,
+    table1: TimeSeriesDataset,
+    table2: TimeSeriesDataset,
 ) -> None:
     assert hash(table1) == hash(table2)
 

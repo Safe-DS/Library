@@ -46,7 +46,10 @@ class InputConversionTimeSeries(InputConversion[TimeSeriesDataset, TimeSeriesDat
         return (len(self._feature_names) + 1) * self._window_size
 
     def _data_conversion_fit(
-        self, input_data: TimeSeriesDataset, batch_size: int, num_of_classes: int = 1,
+        self,
+        input_data: TimeSeriesDataset,
+        batch_size: int,
+        num_of_classes: int = 1,
     ) -> DataLoader:
         self._num_of_classes = num_of_classes
         return input_data._into_dataloader_with_window(
