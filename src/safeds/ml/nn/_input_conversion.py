@@ -34,7 +34,7 @@ class InputConversion(Generic[FT, PT], ABC):
         self,
         target_name: str,
         time_name: str,
-        feature_names: list[str] | None = None,
+        feature_names: list[str],
     ) -> None:
         pass  # pragma: no cover
 

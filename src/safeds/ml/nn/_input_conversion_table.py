@@ -17,6 +17,7 @@ class InputConversionTable(InputConversion[TabularDataset, Table]):
         """Define the input parameters for the neural network in the input conversion."""
         self._target_name = ""
         self._time_name = ""
+        self._feature_names: list[str] = []
 
     @property
     def _data_size(self) -> int:
@@ -32,7 +33,7 @@ class InputConversionTable(InputConversion[TabularDataset, Table]):
         self,
         target_name: str,
         time_name: str,
-        feature_names: list[str] | None = None,
+        feature_names: list[str],
     ) -> None:
         # time instance parameter won't be used, but is there for Linter
         self._time_name = time_name

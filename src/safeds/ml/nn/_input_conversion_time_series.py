@@ -31,6 +31,7 @@ class InputConversionTimeSeries(InputConversion[TimeSeriesDataset, TimeSeriesDat
         self._forecast_horizon = forecast_horizon
         self._target_name: str = ""
         self._time_name: str = ""
+        self._feature_names: list[str] = []
 
     @property
     def _data_size(self) -> int:
@@ -56,7 +57,7 @@ class InputConversionTimeSeries(InputConversion[TimeSeriesDataset, TimeSeriesDat
         self,
         target_name: str,
         time_name: str,
-        feature_names: list[str] | None = None,
+        feature_names: list[str],
     ) -> None:
         """Set the time_name variable for internal usage."""
         self._time_name = time_name
