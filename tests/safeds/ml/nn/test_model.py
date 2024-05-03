@@ -4,8 +4,8 @@ from safeds.data.tabular.containers import Table
 from safeds.exceptions import FeatureDataMismatchError, InputSizeError, ModelNotFittedError, OutOfBoundsError
 from safeds.ml.nn import (
     ForwardLayer,
-    LSTMLayer,
     InputConversionTable,
+    LSTMLayer,
     NeuralNetworkClassifier,
     NeuralNetworkRegressor,
     OutputConversionTable,
@@ -125,7 +125,6 @@ class TestClassificationModel:
             ).predict(
                 Table.from_dict({"a": [1]}),
             )
-
 
     def test_should_raise_if_is_fitted_is_set_correctly_for_binary_classification(self) -> None:
         model = NeuralNetworkClassifier(

@@ -267,7 +267,6 @@ class NeuralNetworkClassifier(Generic[IFT, IPT, OT]):
         if self._input_conversion._data_size is not self._input_size:
             raise InputSizeError(self._input_conversion._data_size, self._input_size)
 
-
         copied_model = copy.deepcopy(self)
 
         copied_model._batch_size = batch_size
