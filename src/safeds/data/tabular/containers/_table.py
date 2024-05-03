@@ -1756,7 +1756,6 @@ class Table:
             self.slice_rows(round(percentage_in_first * self.number_of_rows)),
         )
 
-
     def transform_column(self, name: str, transformer: Callable[[Row], Any]) -> Table:
         """
         Return a new `Table` with the provided column transformed by calling the provided transformer.
@@ -1935,6 +1934,48 @@ class Table:
         plt.close()  # Prevents the figure from being displayed directly
         buffer.seek(0)
         return Image.from_bytes(buffer.read())
+
+    def plot_lagplot(self, lag: int, column_name: str) -> Image:
+        """
+        Plot a lagplot for a given column.
+
+        Parameters
+        ----------
+        lag:
+            The amount of lag used to plot
+
+        column_name:
+            The name of the plotted column
+
+        Returns
+        -------
+        plot:
+            The plot as an image.
+
+        Raises
+        ------
+        NonNumericColumnError
+            If the tcolumn contains non-numerical values.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table
+        >>> table = Table({"time":[1, 2], "target": [3, 4], "feature":[2,2]} )
+        >>> image = table.plot_lagplot(lag = 1)
+        """
+        import matplotlib.pyplot as plt
+        import pandas as pd
+        to_be_plotted = self.get_column(column_name)
+        if not to_be_plotted.type.is_numeric():
+            raise NonNumericColumnError("This time series target contains non-numerical columns.")
+        ax = pd.plotting.lag_plot(to_be_plotted._data, lag=lag)
+        fig = ax.figure
+        buffer = io.BytesIO()
+        fig.savefig(buffer, format="png")
+        plt.close()  # Prevents the figure from being displayed directly
+        buffer.seek(0)
+        return Image.from_bytes(buffer.read())
+
 
     def plot_lineplot(self, x_column_name: str, y_column_name: str) -> Image:
         """
@@ -2412,7 +2453,8 @@ class Table:
 
         return TabularDataset(self, target_name, extra_names)
 
-    def to_time_series_dataset(self, target_name: str, time_name: str, extra_names: list[str] | None = None) -> TimeSeriesDataset:
+    def to_time_series_dataset(self, target_name: str, time_name: str,
+                               extra_names: list[str] | None = None) -> TimeSeriesDataset:
         """
         Return a new `TimeSeriesDataset` with columns marked as a target column, time or feature columns.
 

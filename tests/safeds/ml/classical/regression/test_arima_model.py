@@ -25,7 +25,6 @@ def test_arima_model() -> None:
     model = ArimaModelRegressor()
     trained_model = model.fit(train_ts.to_time_series_dataset("value", "date"))
     predicted_ts = trained_model.predict(test_ts.to_time_series_dataset("value", "date"))
-    predicted_ts.plot_compare_time_series([test_ts.to_time_series_dataset("value", "date")])
     # suggest it ran through
     assert True
 

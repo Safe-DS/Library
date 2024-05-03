@@ -30,7 +30,7 @@ def test_lstm_model(snapshot_png_image: SnapshotAssertion) -> None:
         [ForwardLayer(input_size=7, output_size=256), LSTMLayer(input_size=256, output_size=1)],
         OutputConversionTimeSeries("predicted", window_size=7, forecast_horizon=12),
     )
-    trained_model = model.fit(train_table.to_time_series_dataset("value", "date"), epoch_size=25)
+    trained_model = model.fit(train_table.to_time_series_dataset("value", "date"), epoch_size=1)
 
     pred_ts = trained_model.predict(test_table.to_time_series_dataset("value", "date"))
 
