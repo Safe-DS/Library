@@ -184,7 +184,7 @@ class TestIsFitted:
 
 class TestFitAndTransform:
     @pytest.mark.parametrize(
-        ("table", "column_names", "strategy", "expected"),
+        ("table", "column_names", "strategy", "value_to_replace", "expected"),
         [
             (
                 Table(
@@ -194,6 +194,7 @@ class TestFitAndTransform:
                 ),
                 None,
                 Imputer.Strategy.Constant(0.0),
+                None,
                 Table(
                     {
                         "a": [1.0, 3.0, 0.0],
@@ -208,6 +209,7 @@ class TestFitAndTransform:
                 ),
                 None,
                 Imputer.Strategy.Mean(),
+                None,
                 Table(
                     {
                         "a": [1.0, 3.0, 2.0],
@@ -222,6 +224,7 @@ class TestFitAndTransform:
                 ),
                 None,
                 Imputer.Strategy.Median(),
+                None,
                 Table(
                     {
                         "a": [1.0, 3.0, 1.0, 1.0],
@@ -236,6 +239,7 @@ class TestFitAndTransform:
                 ),
                 None,
                 Imputer.Strategy.Mode(),
+                None,
                 Table(
                     {
                         "a": [1.0, 3.0, 3.0, 3.0],
@@ -251,6 +255,7 @@ class TestFitAndTransform:
                 ),
                 ["a"],
                 Imputer.Strategy.Constant(0.0),
+                None,
                 Table(
                     {
                         "a": [1.0, 3.0, 0.0],
@@ -266,7 +271,23 @@ class TestFitAndTransform:
                 ),
                 ["a"],
                 Imputer.Strategy.Mode(),
+                None,
                 Table({"a": [1.0, 1.0, 2.0, 2.0, 1.0]}),
+            ),
+            (
+                Table(
+                    {
+                        "a": [0.0, 1.0, 2.0],
+                    },
+                ),
+                None,
+                Imputer.Strategy.Constant(1.0),
+                0.0,
+                Table(
+                    {
+                        "a": [1.0, 1.0, 2.0],
+                    },
+                ),
             ),
         ],
         ids=[
@@ -276,6 +297,7 @@ class TestFitAndTransform:
             "mode strategy",
             "constant strategy multiple columns",
             "mode strategy multiple most frequent values",
+            "other value to replace",
         ],
     )
     def test_should_return_transformed_table(
@@ -283,6 +305,7 @@ class TestFitAndTransform:
         table: Table,
         column_names: list[str] | None,
         strategy: Imputer.Strategy,
+        value_to_replace: float | str | None,
         expected: Table,
     ) -> None:
         if isinstance(strategy, _Mode):
@@ -292,9 +315,9 @@ class TestFitAndTransform:
                     message=r"There are multiple most frequent values in a column given to the Imputer\..*",
                     category=UserWarning,
                 )
-                assert Imputer(strategy).fit_and_transform(table, column_names) == expected
+                assert Imputer(strategy, value_to_replace=value_to_replace).fit_and_transform(table, column_names) == expected
         else:
-            assert Imputer(strategy).fit_and_transform(table, column_names) == expected
+            assert Imputer(strategy, value_to_replace=value_to_replace).fit_and_transform(table, column_names) == expected
 
     @pytest.mark.parametrize("strategy", strategies(), ids=lambda x: x.__class__.__name__)
     def test_should_not_change_original_table(self, strategy: Imputer.Strategy) -> None:

@@ -5,6 +5,8 @@ import warnings
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Any
 
+import pandas as pd
+
 from safeds._utils import _structural_hash
 from safeds.data.tabular.containers import Table
 from safeds.data.tabular.transformation._table_transformer import TableTransformer
@@ -22,6 +24,8 @@ class Imputer(TableTransformer):
     ----------
     strategy:
         How to replace missing values.
+    value_to_replace:
+        The value that should be replaced.
 
     Examples
     --------
@@ -87,11 +91,30 @@ class Imputer(TableTransformer):
             """Replace missing values with the mode of each column."""
             return _Mode()
 
-    def __init__(self, strategy: Imputer.Strategy):
+    def __init__(self, strategy: Imputer.Strategy, *, value_to_replace: float | str | None = None):
+        if value_to_replace is None:
+            value_to_replace = pd.NA
+
         self._strategy = strategy
+        self._value_to_replace = value_to_replace
 
         self._wrapped_transformer: sk_SimpleImputer | None = None
         self._column_names: list[str] | None = None
+
+    @property
+    def strategy(self) -> Imputer.Strategy:
+        """The strategy used to replace missing values."""
+        return self._strategy
+
+    @property
+    def value_to_replace(self) -> Any:
+        """The value that should be replaced."""
+        return self._value_to_replace
+
+    @property
+    def is_fitted(self) -> bool:
+        """Whether the transformer is fitted."""
+        return self._wrapped_transformer is not None
 
     # noinspection PyProtectedMember
     def fit(self, table: Table, column_names: list[str] | None) -> Imputer:
@@ -167,6 +190,7 @@ class Imputer(TableTransformer):
 
         wrapped_transformer = sk_SimpleImputer()
         self._strategy._apply(wrapped_transformer)
+        wrapped_transformer.missing_values = self._value_to_replace
         wrapped_transformer.fit(table._data[column_names])
 
         result = Imputer(self._strategy)
@@ -221,11 +245,6 @@ class Imputer(TableTransformer):
             columns=self._column_names,
         )
         return Table._from_pandas_dataframe(data, table.schema)
-
-    @property
-    def is_fitted(self) -> bool:
-        """Whether the transformer is fitted."""
-        return self._wrapped_transformer is not None
 
     def get_names_of_added_columns(self) -> list[str]:
         """
@@ -364,7 +383,7 @@ class _Mode(Imputer.Strategy):
 
 
 # Override the methods with classes, so they can be used in `isinstance` calls. Unlike methods, classes define a type.
-# This is needed for the DSL, where imputer strategies are modeled using an enum.
+# This is needed for the DSL, where imputer strategies are variants of an enum.
 Imputer.Strategy.Constant = _Constant
 Imputer.Strategy.Mean = _Mean
 Imputer.Strategy.Median = _Median
