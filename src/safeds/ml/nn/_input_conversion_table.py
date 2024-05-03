@@ -15,7 +15,7 @@ class InputConversionTable(InputConversion[TabularDataset, Table]):
 
     def __init__(self) -> None:
         """Define the input parameters for the neural network in the input conversion."""
-        self._feature_names: list[str] = []
+        self._feature_names: list[str] | None = []
         self._target_name = ""
         self._time_name = ""
 

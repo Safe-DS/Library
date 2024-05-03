@@ -1015,7 +1015,7 @@ class Column(Sequence[T]):
 
     def plot_compare_columns(self, column_list: list[Column]) -> Image:
         """
-        Creates a plot of columns and compares their numerical values. As the x-axis an ID is used.
+        Create a plot comparing the numerical values of columns using IDs as the x-axis.
 
         Parameters
         ----------
@@ -1056,7 +1056,6 @@ class Column(Sequence[T]):
 
         fig = plt.figure()
         data = pd.melt(data, ["INDEX"])
-        print(data)
         sns.lineplot(x="INDEX", y="value", hue="variable", data=data)
         plt.title("Multiple Series Plot")
         plt.xlabel("Time")
