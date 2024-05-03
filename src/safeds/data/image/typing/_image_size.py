@@ -62,7 +62,7 @@ class ImageSize:
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, ImageSize):
             return NotImplemented
-        return self._width == other._width and self._height == other._height and self._channel == other._channel
+        return (self is other) or (self._width == other._width and self._height == other._height and self._channel == other._channel)
 
     def __hash__(self) -> int:
         return _structural_hash(self._width, self._height, self._channel)

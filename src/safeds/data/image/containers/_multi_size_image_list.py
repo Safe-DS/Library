@@ -112,6 +112,8 @@ class _MultiSizeImageList(ImageList):
             return NotImplemented
         if not isinstance(other, _MultiSizeImageList) or set(other._image_list_dict) != set(self._image_list_dict):
             return False
+        if self is other:
+            return True
         for image_list_key, image_list_value in self._image_list_dict.items():
             if image_list_value != other._image_list_dict[image_list_key]:
                 return False

@@ -1,5 +1,8 @@
+import sys
+
 import pytest
 from safeds.data.image.typing import ImageSize
+from safeds.data.tabular.containers import Table
 from safeds.ml.nn import FlattenLayer
 from torch import nn
 
@@ -28,3 +31,21 @@ class TestFlattenLayer:
         layer = FlattenLayer()
         with pytest.raises(TypeError, match=r"The input_size of a flatten layer has to be of type ImageSize."):
             layer._set_input_size(1)
+
+    class TestEq:
+
+        def test_should_be_equal(self):
+            assert FlattenLayer() == FlattenLayer()
+
+        def test_should_be_not_implemented(self):
+            assert FlattenLayer().__eq__(Table()) is NotImplemented
+
+    class TestHash:
+
+        def test_hash_should_be_equal(self):
+            assert hash(FlattenLayer()) == hash(FlattenLayer())
+
+    class TestSizeOf:
+
+        def test_should_size_be_greater_than_normal_object(self):
+            assert sys.getsizeof(FlattenLayer()) > sys.getsizeof(object())

@@ -1,7 +1,9 @@
 from __future__ import annotations
 
+import sys
 from typing import TYPE_CHECKING, Any
 
+from safeds._utils import _structural_hash
 from safeds.data.image.containers import ImageList
 from safeds.data.image.containers._single_size_image_list import _SingleSizeImageList
 from safeds.data.labeled.containers import ImageDataset
@@ -79,3 +81,57 @@ class InputConversionImage(InputConversion[ImageDataset, ImageList]):
             "column_name": self._column_name,
             "one_hot_encoder": self._one_hot_encoder,
         }
+
+    def __hash__(self) -> int:
+        """
+        Return a deterministic hash value for this InputConversionImage.
+
+        Returns
+        -------
+        hash:
+            the hash value
+        """
+        return _structural_hash(self._input_size, self._output_size, self._one_hot_encoder, self._column_name, self._column_names, self._output_type)
+
+    def __eq__(self, other: object) -> bool:
+        """
+        Compare two InputConversionImage instances.
+
+        Parameters
+        ----------
+        other:
+            The InputConversionImage instance to compare to.
+
+        Returns
+        -------
+        equals:
+            Whether the instances are the same.
+        """
+        if not isinstance(other, InputConversionImage):
+            return NotImplemented
+        return (self is other) or (
+            self._input_size == other._input_size
+            and self._output_size == other._output_size
+            and self._one_hot_encoder == other._one_hot_encoder
+            and self._column_name == other._column_name
+            and self._column_names == other._column_names
+            and self._output_type == other._output_type
+        )
+
+    def __sizeof__(self) -> int:
+        """
+        Return the complete size of this object.
+
+        Returns
+        -------
+        size:
+            Size of this object in bytes.
+        """
+        return (
+            sys.getsizeof(self._input_size)
+            + sys.getsizeof(self._output_size)
+            + sys.getsizeof(self._one_hot_encoder)
+            + sys.getsizeof(self._column_name)
+            + sys.getsizeof(self._column_names)
+            + sys.getsizeof(self._output_type)
+        )

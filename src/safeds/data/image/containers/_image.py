@@ -139,7 +139,7 @@ class Image:
 
         if not isinstance(other, Image):
             return NotImplemented
-        return (
+        return (self is other) or (
             self._image_tensor.size() == other._image_tensor.size()
             and torch.all(torch.eq(self._image_tensor, other._set_device(self.device)._image_tensor)).item()
         )

@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 import copy
+import sys
 from typing import TYPE_CHECKING, Generic, TypeVar
 
+from safeds._utils import _structural_hash
 from safeds.data.image.containers import ImageList
 from safeds.data.image.containers._empty_image_list import _EmptyImageList
 from safeds.data.image.containers._multi_size_image_list import _MultiSizeImageList
@@ -109,6 +111,56 @@ class ImageDataset(Generic[T]):
 
     def __len__(self) -> int:
         return self._input.number_of_images
+
+    def __eq__(self, other: object) -> bool:
+        """
+        Compare two image datasets.
+
+        Parameters
+        ----------
+        other:
+            The image dataset to compare to.
+
+        Returns
+        -------
+        equals:
+            Whether the two image datasets are the same.
+        """
+        if not isinstance(other, ImageDataset):
+            return NotImplemented
+        return (self is other) or (self._shuffle_after_epoch == other._shuffle_after_epoch and self._batch_size == other._batch_size and isinstance(other._output, type(self._output)) and (self._input == other._input) and (self._output == other._output))
+
+    def __hash__(self) -> int:
+        """
+        Return a deterministic hash value for this image dataset.
+
+        Returns
+        -------
+        hash:
+            the hash value
+        """
+        return _structural_hash(self._input, self._output, self._shuffle_after_epoch, self._batch_size)
+
+    def __sizeof__(self) -> int:
+        """
+        Return the complete size of this object.
+
+        Returns
+        -------
+        size:
+            Size of this object in bytes.
+        """
+        return (
+            sys.getsizeof(self._shuffle_tensor_indices)
+            + self._shuffle_tensor_indices.element_size() * self._shuffle_tensor_indices.nelement()
+            + sys.getsizeof(self._input)
+            + sys.getsizeof(self._output)
+            + sys.getsizeof(self._input_size)
+            + sys.getsizeof(self._output_size)
+            + sys.getsizeof(self._shuffle_after_epoch)
+            + sys.getsizeof(self._batch_size)
+            + sys.getsizeof(self._next_batch_index)
+        )
 
     @property
     def input_size(self) -> ImageSize:
@@ -234,6 +286,23 @@ class _TableAsTensor:
                 "The given table is not correctly one hot encoded as it contains rows that have a sum not equal to 1.",
             )
 
+    def __eq__(self, other: object) -> bool:
+        import torch
+
+        if not isinstance(other, _TableAsTensor):
+            return NotImplemented
+        return (self is other) or (self._column_names == other._column_names and torch.all(torch.eq(self._tensor, other._tensor)).item())
+
+    def __hash__(self) -> int:
+        return _structural_hash(self._tensor.size(), self._column_names)
+
+    def __sizeof__(self) -> int:
+        return (
+            sys.getsizeof(self._tensor)
+            + self._tensor.element_size() * self._tensor.nelement()
+            + sys.getsizeof(self._column_names)
+        )
+
     @staticmethod
     def _from_tensor(tensor: Tensor, column_names: list[str]) -> _TableAsTensor:
         if tensor.dim() != 2:
@@ -261,6 +330,24 @@ class _ColumnAsTensor:
         self._one_hot_encoder = OneHotEncoder().fit(column_as_table, [self._column_name])
         self._tensor = torch.Tensor(self._one_hot_encoder.transform(column_as_table)._data.to_numpy(copy=True)).to(
             torch.get_default_device(),
+        )
+
+    def __eq__(self, other: object) -> bool:
+        import torch
+
+        if not isinstance(other, _ColumnAsTensor):
+            return NotImplemented
+        return (self is other) or (self._column_name == other._column_name and self._one_hot_encoder == other._one_hot_encoder and torch.all(torch.eq(self._tensor, other._tensor)).item())
+
+    def __hash__(self) -> int:
+        return _structural_hash(self._tensor.size(), self._column_name, self._one_hot_encoder)
+
+    def __sizeof__(self) -> int:
+        return (
+            sys.getsizeof(self._tensor)
+            + self._tensor.element_size() * self._tensor.nelement()
+            + sys.getsizeof(self._column_name)
+            + sys.getsizeof(self._one_hot_encoder)
         )
 
     @staticmethod

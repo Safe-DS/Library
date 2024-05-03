@@ -333,7 +333,7 @@ class TestEQ:
         images_all(),
         ids=images_all_ids(),
     )
-    def test_should_raise(self, resource_path: str, device: Device) -> None:
+    def test_should_be_not_implemented(self, resource_path: str, device: Device) -> None:
         skip_if_device_not_available(device)
         image = Image.from_file(resolve_resource_path(resource_path), device)
         other = Table()

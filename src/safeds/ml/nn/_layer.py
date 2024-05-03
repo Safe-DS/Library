@@ -31,3 +31,15 @@ class Layer(ABC):
     @abstractmethod
     def _set_input_size(self, input_size: int | ImageSize) -> None:
         pass  # pragma: no cover
+
+    @abstractmethod
+    def __hash__(self) -> int:
+        pass  # pragma: no cover
+
+    @abstractmethod
+    def __eq__(self, other: object) -> bool:
+        pass  # pragma: no cover
+
+    @abstractmethod
+    def __sizeof__(self) -> int:
+        pass  # pragma: no cover

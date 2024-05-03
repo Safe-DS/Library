@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 import math
+import sys
 from typing import TYPE_CHECKING, Any, Literal
 
+from safeds._utils import _structural_hash
 from safeds.data.image.typing import ImageSize
 
 if TYPE_CHECKING:
@@ -108,6 +110,60 @@ class _Pooling2DLayer(Layer):
             raise TypeError("The input_size of a pooling layer has to be of type ImageSize.")
         self._input_size = input_size
         self._output_size = None
+
+    def __hash__(self) -> int:
+        """
+        Return a deterministic hash value for this pooling 2d layer.
+
+        Returns
+        -------
+        hash:
+            the hash value
+        """
+        return _structural_hash(self._strategy, self._kernel_size, self._stride, self._padding, self._input_size, self._output_size)
+
+    def __eq__(self, other: object) -> bool:
+        """
+        Compare two pooling 2d layer.
+
+        Parameters
+        ----------
+        other:
+            The pooling 2d layer to compare to.
+
+        Returns
+        -------
+        equals:
+            Whether the two pooling 2d layer are the same.
+        """
+        if not isinstance(other, type(self)):
+            return NotImplemented
+        return (self is other) or (
+            self._input_size == other._input_size
+            and self._output_size == other._output_size
+            and self._strategy == other._strategy
+            and self._kernel_size == other._kernel_size
+            and self._stride == other._stride
+            and self._padding == other._padding
+        )
+
+    def __sizeof__(self) -> int:
+        """
+        Return the complete size of this object.
+
+        Returns
+        -------
+        size:
+            Size of this object in bytes.
+        """
+        return (
+            sys.getsizeof(self._input_size)
+            + sys.getsizeof(self._output_size)
+            + sys.getsizeof(self._strategy)
+            + sys.getsizeof(self._kernel_size)
+            + sys.getsizeof(self._stride)
+            + sys.getsizeof(self._padding)
+        )
 
 
 class MaxPooling2DLayer(_Pooling2DLayer):

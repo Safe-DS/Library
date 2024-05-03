@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 import math
+import sys
 from typing import TYPE_CHECKING, Any, Literal
 
+from safeds._utils import _structural_hash
 from safeds.data.image.typing import ImageSize
 
 if TYPE_CHECKING:
@@ -178,6 +180,60 @@ class Convolutional2DLayer(Layer):
         self._input_size = input_size
         self._output_size = None
 
+    def __hash__(self) -> int:
+        """
+        Return a deterministic hash value for this convolutional 2d layer.
+
+        Returns
+        -------
+        hash:
+            the hash value
+        """
+        return _structural_hash(self._output_channel, self._kernel_size, self._stride, self._padding, self._input_size, self._output_size)
+
+    def __eq__(self, other: object) -> bool:
+        """
+        Compare two convolutional 2d layer.
+
+        Parameters
+        ----------
+        other:
+            The convolutional 2d layer to compare to.
+
+        Returns
+        -------
+        equals:
+            Whether the two convolutional 2d layer are the same.
+        """
+        if not isinstance(other, Convolutional2DLayer) or isinstance(other, ConvolutionalTranspose2DLayer):
+            return NotImplemented
+        return (self is other) or (
+            self._output_channel == other._output_channel
+            and self._kernel_size == other._kernel_size
+            and self._stride == other._stride
+            and self._padding == other._padding
+            and self._input_size == other._input_size
+            and self._output_size == other._output_size
+        )
+
+    def __sizeof__(self) -> int:
+        """
+        Return the complete size of this object.
+
+        Returns
+        -------
+        size:
+            Size of this object in bytes.
+        """
+        return (
+            sys.getsizeof(self._output_channel)
+            + sys.getsizeof(self._kernel_size)
+            + sys.getsizeof(self._stride)
+            + sys.getsizeof(self._padding)
+            + sys.getsizeof(self._input_size)
+            + sys.getsizeof(self._output_size)
+        )
+
 
 class ConvolutionalTranspose2DLayer(Convolutional2DLayer):
 
@@ -256,3 +312,51 @@ class ConvolutionalTranspose2DLayer(Convolutional2DLayer):
             )
             self._output_size = ImageSize(new_width, new_height, self._output_channel, _ignore_invalid_channel=True)
         return self._output_size
+
+    def __hash__(self) -> int:
+        """
+        Return a deterministic hash value for this convolutional transpose 2d layer.
+
+        Returns
+        -------
+        hash:
+            the hash value
+        """
+        return _structural_hash(super().__hash__(), self._output_padding)
+
+    def __eq__(self, other: object) -> bool:
+        """
+        Compare two convolutional transpose 2d layer.
+
+        Parameters
+        ----------
+        other:
+            The convolutional transpose 2d layer to compare to.
+
+        Returns
+        -------
+        equals:
+            Whether the two convolutional transpose 2d layer are the same.
+        """
+        if not isinstance(other, ConvolutionalTranspose2DLayer):
+            return NotImplemented
+        return (self is other) or (
+            self._output_channel == other._output_channel
+            and self._kernel_size == other._kernel_size
+            and self._stride == other._stride
+            and self._padding == other._padding
+            and self._input_size == other._input_size
+            and self._output_size == other._output_size
+            and self._output_padding == other._output_padding
+        )
+
+    def __sizeof__(self) -> int:
+        """
+        Return the complete size of this object.
+
+        Returns
+        -------
+        size:
+            Size of this object in bytes.
+        """
+        return sys.getsizeof(self._output_padding) + super().__sizeof__()

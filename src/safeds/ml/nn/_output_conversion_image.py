@@ -3,6 +3,7 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Any
 
+from safeds._utils import _structural_hash
 from safeds.data.image.containers import ImageList
 from safeds.data.image.containers._single_size_image_list import _SingleSizeImageList
 from safeds.data.labeled.containers import ImageDataset
@@ -21,6 +22,46 @@ class _OutputConversionImage(OutputConversion[ImageList, ImageDataset], ABC):
     @abstractmethod
     def _data_conversion(self, input_data: ImageList, output_data: Tensor, **kwargs: Any) -> ImageDataset:
         pass  # pragma: no cover
+
+    def __hash__(self) -> int:
+        """
+        Return a deterministic hash value for this OutputConversionImage.
+
+        Returns
+        -------
+        hash:
+            the hash value
+        """
+        return _structural_hash(self.__class__.__name__)
+
+    def __eq__(self, other: object) -> bool:
+        """
+        Compare two OutputConversionImage instances.
+
+        Parameters
+        ----------
+        other:
+            The OutputConversionImage instance to compare to.
+
+        Returns
+        -------
+        equals:
+            Whether the instances are the same.
+        """
+        if not isinstance(other, type(self)):
+            return NotImplemented
+        return True
+
+    def __sizeof__(self) -> int:
+        """
+        Return the complete size of this object.
+
+        Returns
+        -------
+        size:
+            Size of this object in bytes.
+        """
+        return 0
 
 
 class OutputConversionImageToColumn(_OutputConversionImage):

@@ -1,3 +1,4 @@
+import sys
 from typing import Literal
 
 import pytest
@@ -156,3 +157,105 @@ class TestConvolutional2DLayer:
         layer = conv_type(output_channel, kernel_size, stride=stride, padding=padding)
         with pytest.raises(TypeError, match=r"The input_size of a convolution layer has to be of type ImageSize."):
             layer._set_input_size(1)
+
+    class TestEq:
+
+        @pytest.mark.parametrize(
+            ("conv2dlayer1", "conv2dlayer2"),
+            [
+                (Convolutional2DLayer(1, 2), Convolutional2DLayer(1, 2)),
+                (Convolutional2DLayer(1, 2, stride=3, padding=4), Convolutional2DLayer(1, 2, stride=3, padding=4)),
+                (ConvolutionalTranspose2DLayer(1, 2), ConvolutionalTranspose2DLayer(1, 2)),
+                (ConvolutionalTranspose2DLayer(1, 2, stride=3, padding=4, output_padding=5), ConvolutionalTranspose2DLayer(1, 2, stride=3, padding=4, output_padding=5)),
+            ]
+        )
+        def test_should_be_equal(self, conv2dlayer1: Convolutional2DLayer, conv2dlayer2: Convolutional2DLayer) -> None:
+            assert conv2dlayer1 == conv2dlayer2
+            assert conv2dlayer2 == conv2dlayer1
+
+        @pytest.mark.parametrize(
+            "conv2dlayer1",
+            [
+                Convolutional2DLayer(1, 2),
+                Convolutional2DLayer(1, 2, stride=3, padding=4),
+                ConvolutionalTranspose2DLayer(1, 2),
+                ConvolutionalTranspose2DLayer(1, 2, stride=3, padding=4, output_padding=5),
+            ]
+        )
+        @pytest.mark.parametrize(
+            "conv2dlayer2",
+            [
+                Convolutional2DLayer(2, 2),
+                Convolutional2DLayer(1, 1),
+                Convolutional2DLayer(1, 2, stride=4, padding=4),
+                Convolutional2DLayer(1, 2, stride=3, padding=3),
+                ConvolutionalTranspose2DLayer(1, 1),
+                ConvolutionalTranspose2DLayer(2, 2),
+                ConvolutionalTranspose2DLayer(1, 2, stride=4, padding=4, output_padding=5),
+                ConvolutionalTranspose2DLayer(1, 2, stride=3, padding=3, output_padding=5),
+                ConvolutionalTranspose2DLayer(1, 2, stride=3, padding=4, output_padding=4),
+            ]
+        )
+        def test_should_not_be_equal(self, conv2dlayer1: Convolutional2DLayer, conv2dlayer2: Convolutional2DLayer) -> None:
+            assert conv2dlayer1 != conv2dlayer2
+            assert conv2dlayer2 != conv2dlayer1
+
+        def test_should_be_not_implemented(self) -> None:
+            conv2dlayer = Convolutional2DLayer(1, 2)
+            convtranspose2dlayer = ConvolutionalTranspose2DLayer(1, 2)
+            assert conv2dlayer.__eq__(convtranspose2dlayer) is NotImplemented
+            assert convtranspose2dlayer.__eq__(conv2dlayer) is NotImplemented
+
+    class TestHash:
+
+        @pytest.mark.parametrize(
+            ("conv2dlayer1", "conv2dlayer2"),
+            [
+                (Convolutional2DLayer(1, 2), Convolutional2DLayer(1, 2)),
+                (Convolutional2DLayer(1, 2, stride=3, padding=4), Convolutional2DLayer(1, 2, stride=3, padding=4)),
+                (ConvolutionalTranspose2DLayer(1, 2), ConvolutionalTranspose2DLayer(1, 2)),
+                (ConvolutionalTranspose2DLayer(1, 2, stride=3, padding=4, output_padding=5), ConvolutionalTranspose2DLayer(1, 2, stride=3, padding=4, output_padding=5)),
+            ]
+        )
+        def test_hash_should_be_equal(self, conv2dlayer1: Convolutional2DLayer, conv2dlayer2: Convolutional2DLayer) -> None:
+            assert hash(conv2dlayer1) == hash(conv2dlayer2)
+
+        @pytest.mark.parametrize(
+            "conv2dlayer1",
+            [
+                Convolutional2DLayer(1, 2),
+                Convolutional2DLayer(1, 2, stride=3, padding=4),
+                ConvolutionalTranspose2DLayer(1, 2),
+                ConvolutionalTranspose2DLayer(1, 2, stride=3, padding=4, output_padding=5),
+            ]
+        )
+        @pytest.mark.parametrize(
+            "conv2dlayer2",
+            [
+                Convolutional2DLayer(2, 2),
+                Convolutional2DLayer(1, 1),
+                Convolutional2DLayer(1, 2, stride=4, padding=4),
+                Convolutional2DLayer(1, 2, stride=3, padding=3),
+                ConvolutionalTranspose2DLayer(1, 1),
+                ConvolutionalTranspose2DLayer(2, 2),
+                ConvolutionalTranspose2DLayer(1, 2, stride=4, padding=4, output_padding=5),
+                ConvolutionalTranspose2DLayer(1, 2, stride=3, padding=3, output_padding=5),
+                ConvolutionalTranspose2DLayer(1, 2, stride=3, padding=4, output_padding=4),
+            ]
+        )
+        def test_hash_should_not_be_equal(self, conv2dlayer1: Convolutional2DLayer, conv2dlayer2: Convolutional2DLayer) -> None:
+            assert hash(conv2dlayer1) != hash(conv2dlayer2)
+
+    class TestSizeOf:
+
+        @pytest.mark.parametrize(
+            "conv2dlayer",
+            [
+                Convolutional2DLayer(1, 2),
+                Convolutional2DLayer(1, 2, stride=3, padding=4),
+                ConvolutionalTranspose2DLayer(1, 2),
+                ConvolutionalTranspose2DLayer(1, 2, stride=3, padding=4, output_padding=5),
+            ]
+        )
+        def test_should_size_be_greater_than_normal_object(self, conv2dlayer: Convolutional2DLayer) -> None:
+            assert sys.getsizeof(conv2dlayer) > sys.getsizeof(object())

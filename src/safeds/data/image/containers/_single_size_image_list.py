@@ -179,7 +179,7 @@ class _SingleSizeImageList(ImageList):
             return NotImplemented
         if not isinstance(other, _SingleSizeImageList):
             return False
-        return (
+        return (self is other) or (
             self._tensor.size() == other._tensor.size()
             and set(self._tensor_positions_to_indices) == set(self._tensor_positions_to_indices)
             and set(self._indices_to_tensor_positions) == set(self._indices_to_tensor_positions)
