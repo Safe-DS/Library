@@ -278,7 +278,7 @@ class Imputer(TableTransformer):
         TransformerNotFittedError
             If the transformer has not been fitted yet.
         """
-        if not self.is_fitted:
+        if self._column_names is None:
             raise TransformerNotFittedError
         return self._column_names
 
@@ -320,7 +320,7 @@ class _Constant(Imputer.Strategy):
             return True
         return self._value == other._value
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return _structural_hash(str(self))
 
     def __sizeof__(self) -> int:
@@ -340,7 +340,7 @@ class _Mean(Imputer.Strategy):
             return NotImplemented
         return True
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return _structural_hash(str(self))
 
     def __str__(self) -> str:
@@ -356,7 +356,7 @@ class _Median(Imputer.Strategy):
             return NotImplemented
         return True
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return _structural_hash(str(self))
 
     def __str__(self) -> str:
@@ -372,7 +372,7 @@ class _Mode(Imputer.Strategy):
             return NotImplemented
         return True
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return _structural_hash(str(self))
 
     def __str__(self) -> str:
@@ -384,7 +384,7 @@ class _Mode(Imputer.Strategy):
 
 # Override the methods with classes, so they can be used in `isinstance` calls. Unlike methods, classes define a type.
 # This is needed for the DSL, where imputer strategies are variants of an enum.
-Imputer.Strategy.Constant = _Constant
-Imputer.Strategy.Mean = _Mean
-Imputer.Strategy.Median = _Median
-Imputer.Strategy.Mode = _Mode
+Imputer.Strategy.Constant = _Constant  # type: ignore[method-assign]
+Imputer.Strategy.Mean = _Mean  # type: ignore[method-assign]
+Imputer.Strategy.Median = _Median  # type: ignore[method-assign]
+Imputer.Strategy.Mode = _Mode  # type: ignore[method-assign]
