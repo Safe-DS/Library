@@ -11,7 +11,6 @@ concurrency:
 jobs:
   poetry-with-codecov:
     strategy:
-      fail-fast: false
       matrix:
         platform:
           - "ubuntu-latest"
