@@ -15,7 +15,7 @@ jobs:
       matrix:
         platform:
           - "ubuntu-latest"
-          # - "macos-latest" # Intel Macs are no longer supported by Torch
+          - "macos-latest"
           - "windows-latest"
         python-version:
           - "3.11"
