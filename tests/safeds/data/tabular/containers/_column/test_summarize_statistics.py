@@ -1,7 +1,7 @@
 from statistics import stdev
 
 import pytest
-from safeds.data.tabular.containers import Table, Column
+from safeds.data.tabular.containers import Column, Table
 
 
 @pytest.mark.parametrize(
@@ -96,7 +96,7 @@ from safeds.data.tabular.containers import Table, Column
         ),
     ],
     ids=[
-        "Column of integers", 
+        "Column of integers",
         "Column of characters",
         "Column of None",
     ],
