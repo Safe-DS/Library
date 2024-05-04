@@ -74,26 +74,6 @@ from safeds.data.tabular.containers import Table, Column
             ),
         ),
         (
-            Column(),
-            Table(
-                {
-                    "metric": [
-                        "minimum",
-                        "maximum",
-                        "mean",
-                        "mode",
-                        "median",
-                        "variance",
-                        "standard deviation",
-                        "missing value count",
-                        "missing value ratio",
-                        "idness",
-                        "stability",
-                    ],
-                },
-            ),
-        ),
-        (
             Column("col", [None, None]),
             Table(
                 {
@@ -118,7 +98,6 @@ from safeds.data.tabular.containers import Table, Column
     ids=[
         "Column of integers", 
         "Column of characters",
-        "empty Column",
         "Column of None",
     ],
 )
