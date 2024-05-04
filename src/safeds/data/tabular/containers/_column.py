@@ -406,39 +406,6 @@ class Column(Sequence[T]):
     # Information
     # ------------------------------------------------------------------------------------------------------------------
 
-    def summarize_statistics(self) -> Table:
-        """
-        Return a table with a number of statistical key values.
-
-        The original Column is not modified.
-
-        Returns
-        -------
-        result:
-            The table with statistics.
-
-        Examples
-        --------
-        >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("a", [1, 3])
-        >>> column.summarize_statistics()
-                         metric                   a
-        0               minimum                   1
-        1               maximum                   3
-        2                  mean                 2.0
-        3                  mode              [1, 3]
-        4                median                 2.0
-        5              variance                 2.0
-        6    standard deviation  1.4142135623730951
-        7   missing value count                   0
-        8   missing value ratio                 0.0
-        9                idness                 1.0
-        10            stability                 0.5
-        """
-        from safeds.data.tabular.containers import Table
-
-        return Table({self._name: self._data}).summarize_statistics()
-
     def all(self, predicate: Callable[[T], bool]) -> bool:
         """
         Check if all values have a given property.
@@ -598,6 +565,39 @@ class Column(Sequence[T]):
     # ------------------------------------------------------------------------------------------------------------------
     # Statistics
     # ------------------------------------------------------------------------------------------------------------------
+
+    def summarize_statistics(self) -> Table:
+        """
+        Return a table with a number of statistical key values.
+
+        The original Column is not modified.
+
+        Returns
+        -------
+        statistics:
+            The table with statistics.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("a", [1, 3])
+        >>> column.summarize_statistics()
+                         metric                   a
+        0               minimum                   1
+        1               maximum                   3
+        2                  mean                 2.0
+        3                  mode              [1, 3]
+        4                median                 2.0
+        5              variance                 2.0
+        6    standard deviation  1.4142135623730951
+        7   missing value count                   0
+        8   missing value ratio                 0.0
+        9                idness                 1.0
+        10            stability                 0.5
+        """
+        from safeds.data.tabular.containers import Table
+
+        return Table({self._name: self._data}).summarize_statistics()
 
     def correlation_with(self, other_column: Column) -> float:
         """
