@@ -144,13 +144,15 @@ class TestFitAndTransform:
         ],
         ids=["one_column", "two_columns"],
     )
-    def test_should_return_transformed_table(
+    def test_should_return_fitted_transformer_and_transformed_table(
         self,
         table: Table,
         column_names: list[str] | None,
         expected: Table,
     ) -> None:
-        assert RangeScaler().fit_and_transform(table, column_names) == expected
+        fitted_transformer, transformed_table = RangeScaler().fit_and_transform(table, column_names)
+        assert fitted_transformer.is_fitted
+        assert transformed_table == expected
 
     @pytest.mark.parametrize(
         ("table", "column_names", "expected"),
@@ -186,13 +188,18 @@ class TestFitAndTransform:
         ],
         ids=["one_column", "two_columns"],
     )
-    def test_should_return_transformed_table_with_correct_range(
+    def test_should_return_fitted_transformer_and_transformed_table_with_correct_range(
         self,
         table: Table,
         column_names: list[str] | None,
         expected: Table,
     ) -> None:
-        assert RangeScaler(minimum=-10.0, maximum=10.0).fit_and_transform(table, column_names) == expected
+        fitted_transformer, transformed_table = RangeScaler(minimum=-10.0, maximum=10.0).fit_and_transform(
+            table,
+            column_names,
+        )
+        assert fitted_transformer.is_fitted
+        assert transformed_table == expected
 
     def test_should_not_change_original_table(self) -> None:
         table = Table(

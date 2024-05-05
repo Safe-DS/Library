@@ -413,7 +413,7 @@ class TestFitAndTransform:
             "other value to replace",
         ],
     )
-    def test_should_return_transformed_table(
+    def test_should_return_fitted_transformer_and_transformed_table(
         self,
         table: Table,
         column_names: list[str] | None,
@@ -421,21 +421,19 @@ class TestFitAndTransform:
         value_to_replace: float | str | None,
         expected: Table,
     ) -> None:
-        if isinstance(strategy, _Mode):
-            with warnings.catch_warnings():
-                warnings.filterwarnings(
-                    action="ignore",
-                    message=r"There are multiple most frequent values in a column given to the Imputer\..*",
-                    category=UserWarning,
-                )
-                assert (
-                    Imputer(strategy, value_to_replace=value_to_replace).fit_and_transform(table, column_names)
-                    == expected
-                )
-        else:
-            assert (
-                Imputer(strategy, value_to_replace=value_to_replace).fit_and_transform(table, column_names) == expected
+        with warnings.catch_warnings():
+            warnings.filterwarnings(
+                action="ignore",
+                message=r"There are multiple most frequent values in a column given to the Imputer\..*",
+                category=UserWarning,
             )
+            fitted_transformer, transformed_table = Imputer(
+                strategy,
+                value_to_replace=value_to_replace,
+            ).fit_and_transform(table, column_names)
+
+        assert fitted_transformer.is_fitted
+        assert transformed_table == expected
 
     @pytest.mark.parametrize("strategy", strategies(), ids=lambda x: x.__class__.__name__)
     def test_should_not_change_original_table(self, strategy: Imputer.Strategy) -> None:
