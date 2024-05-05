@@ -343,10 +343,12 @@ class TestSummarizeMetrics:
             (
                 [1, 2],
                 [1, 2],
-                Table({
-                    "metric": ["accuracy", "precision", "recall", "f1_score"],
-                    "value": [1.0, 1.0, 1.0, 1.0],
-                }),
+                Table(
+                    {
+                        "metric": ["accuracy", "precision", "recall", "f1_score"],
+                        "value": [1.0, 1.0, 1.0, 1.0],
+                    },
+                ),
             ),
         ],
     )

@@ -350,10 +350,12 @@ class TestSummarizeMetrics:
             (
                 [1, 2],
                 [1, 2],
-                Table({
-                    "metric": ["mean_absolute_error", "mean_squared_error"],
-                    "value": [0.0, 0.0],
-                }),
+                Table(
+                    {
+                        "metric": ["mean_absolute_error", "mean_squared_error"],
+                        "value": [0.0, 0.0],
+                    },
+                ),
             ),
         ],
     )

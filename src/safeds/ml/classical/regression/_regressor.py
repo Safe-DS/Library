@@ -116,10 +116,12 @@ class Regressor(ABC):
         mean_absolute_error = self.mean_absolute_error(validation_or_test_set)
         mean_squared_error = self.mean_squared_error(validation_or_test_set)
 
-        return Table({
-            "metric": ["mean_absolute_error", "mean_squared_error"],
-            "value": [mean_absolute_error, mean_squared_error],
-        })
+        return Table(
+            {
+                "metric": ["mean_absolute_error", "mean_squared_error"],
+                "value": [mean_absolute_error, mean_squared_error],
+            },
+        )
 
     def mean_absolute_error(self, validation_or_test_set: TabularDataset) -> float:
         """
