@@ -105,7 +105,9 @@ class TestHash:
         ids=lambda x: x.__class__.__name__,
     )
     def test_should_return_same_hash_for_equal_transformer(
-        self, transformer1: TableTransformer, transformer2: TableTransformer,
+        self,
+        transformer1: TableTransformer,
+        transformer2: TableTransformer,
     ) -> None:
         assert hash(transformer1) == hash(transformer2)
 
@@ -115,20 +117,26 @@ class TestHash:
         ids=lambda x: x.__class__.__name__,
     )
     def test_should_return_different_hash_for_unequal_transformer(
-        self, transformer1: TableTransformer, transformer2: TableTransformer,
+        self,
+        transformer1: TableTransformer,
+        transformer2: TableTransformer,
     ) -> None:
         assert hash(transformer1) != hash(transformer2)
 
     @pytest.mark.parametrize("transformer1", transformers_numeric(), ids=lambda x: x.__class__.__name__)
     def test_should_return_different_hash_for_same_numeric_transformer_fit(
-        self, transformer1: TableTransformer, valid_data_numeric: Table,
+        self,
+        transformer1: TableTransformer,
+        valid_data_numeric: Table,
     ) -> None:
         transformer1_fit = transformer1.fit(valid_data_numeric, ["col1"])
         assert hash(transformer1) != hash(transformer1_fit)
 
     @pytest.mark.parametrize("transformer1", transformers_non_numeric(), ids=lambda x: x.__class__.__name__)
     def test_should_return_different_hash_for_same_non_numeric_transformer_fit(
-        self, transformer1: TableTransformer, valid_data_non_numeric: Table,
+        self,
+        transformer1: TableTransformer,
+        valid_data_non_numeric: Table,
     ) -> None:
         transformer1_fit = transformer1.fit(valid_data_non_numeric, ["col1"])
         assert hash(transformer1) != hash(transformer1_fit)
@@ -139,7 +147,10 @@ class TestHash:
         ids=lambda x: x.__class__.__name__,
     )
     def test_should_return_different_hash_for_numeric_transformer_fit(
-        self, transformer1: TableTransformer, transformer2: TableTransformer, valid_data_numeric: Table,
+        self,
+        transformer1: TableTransformer,
+        transformer2: TableTransformer,
+        valid_data_numeric: Table,
     ) -> None:
         transformer1_fit = transformer1.fit(valid_data_numeric, ["col1"])
         assert hash(transformer2) != hash(transformer1_fit)
@@ -150,14 +161,19 @@ class TestHash:
         ids=lambda x: x.__class__.__name__,
     )
     def test_should_return_different_hash_for_non_numeric_transformer_fit(
-        self, transformer1: TableTransformer, transformer2: TableTransformer, valid_data_non_numeric: Table,
+        self,
+        transformer1: TableTransformer,
+        transformer2: TableTransformer,
+        valid_data_non_numeric: Table,
     ) -> None:
         transformer1_fit = transformer1.fit(valid_data_non_numeric, ["col1"])
         assert hash(transformer2) != hash(transformer1_fit)
 
     @pytest.mark.parametrize("transformer2", transformers(), ids=lambda x: x.__class__.__name__)
     def test_should_return_different_hash_for_imputer_fit(
-        self, transformer2: TableTransformer, valid_data_imputer: Table,
+        self,
+        transformer2: TableTransformer,
+        valid_data_imputer: Table,
     ) -> None:
         transformer1 = Imputer(strategy=Imputer.Strategy.Mode())
         transformer1_fit = transformer1.fit(valid_data_imputer, ["col1"])
