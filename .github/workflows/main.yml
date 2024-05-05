@@ -9,14 +9,19 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        platform:
+          - "ubuntu-latest"
+          # - "macos-latest" # Intel Macs are no longer supported by Torch
+          - "windows-latest"
         python-version:
           - "3.11"
           - "3.12"
     uses: lars-reimann/.github/.github/workflows/poetry-codecov-reusable.yml@main
     with:
       working-directory: .
+      platform: ${{ matrix.platform }}
       python-version: ${{ matrix.python-version }}
       module-name: safeds
-      coverage: ${{ matrix.python-version == '3.11' }}
+      coverage: ${{ matrix.platform == 'ubuntu-latest' && matrix.python-version == '3.11' }}
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}

@@ -1124,19 +1124,27 @@ class Table:
 
     def filter_rows(self, query: Callable[[Row], bool]) -> Table:
         """
-        Return a new table with rows filtered by Callable (e.g. lambda function).
+        Return a new table containing only the rows that satisfy the query.
 
         The original table is not modified.
+
+        !!! warning "Deprecated"
+            Use [keep_only_rows][safeds.data.tabular.containers._table.Table.keep_only_rows] instead.
 
         Parameters
         ----------
         query:
-            A Callable that is applied to all rows.
+            A callable that returns True if a row should be included in the new table.
 
         Returns
         -------
         table:
-            A table containing only the rows filtered by the query.
+            A table containing only the rows that satisfy the query.
+
+        See Also
+        --------
+        [remove_rows][safeds.data.tabular.containers._table.Table.remove_rows]:
+            Remove rows that satifsfy a query.
 
         Examples
         --------
@@ -1146,14 +1154,12 @@ class Table:
            a  b
         0  1  2
         """
-        import pandas as pd
-
-        rows: list[Row] = [row for row in self.to_rows() if query(row)]
-        if len(rows) == 0:
-            result_table = Table._from_pandas_dataframe(pd.DataFrame(), self._schema)
-        else:
-            result_table = self.from_rows(rows)
-        return result_table
+        warnings.warn(
+            "This method is deprecated and will be removed in a future version. Use `Table.keep_only_rows` instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        return self.keep_only_rows(query)
 
     _T = TypeVar("_T")
 
@@ -1334,6 +1340,82 @@ class Table:
         1  0
         """
         return Table.from_columns([column for column in self.to_columns() if column.type.is_numeric()])
+
+    def keep_only_rows(self, query: Callable[[Row], bool]) -> Table:
+        """
+        Return a new table containing only the rows that satisfy the query.
+
+        The original table is not modified.
+
+        Parameters
+        ----------
+        query:
+            A callable that returns True if a row should be included in the new table.
+
+        Returns
+        -------
+        table:
+            A table containing only the rows that satisfy the query.
+
+        See Also
+        --------
+        [remove_rows][safeds.data.tabular.containers._table.Table.remove_rows]:
+            Remove rows that satifsfy a query.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table
+        >>> table = Table.from_dict({"a": [1, 3], "b": [2, 4]})
+        >>> table.keep_only_rows(lambda x: x["a"] < 2)
+           a  b
+        0  1  2
+        """
+        import pandas as pd
+
+        rows: list[Row] = [row for row in self.to_rows() if query(row)]
+        if len(rows) == 0:
+            result_table = Table._from_pandas_dataframe(pd.DataFrame(), self._schema)
+        else:
+            result_table = self.from_rows(rows)
+        return result_table
+
+    def remove_rows(self, query: Callable[[Row], bool]) -> Table:
+        """
+        Return a new table without the rows that satisfy the query.
+
+        The original table is not modified.
+
+        Parameters
+        ----------
+        query:
+            A callable that returns True if the row should be removed.
+
+        Returns
+        -------
+        table:
+            A table without the rows that satisfy the query.
+
+        See Also
+        --------
+        [keep_only_rows][safeds.data.tabular.containers._table.Table.keep_only_rows]:
+            Create a table containing only the rows that satisfy a query.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table
+        >>> table = Table.from_dict({"a": [1, 3], "b": [2, 4]})
+        >>> table.remove_rows(lambda x: x["a"] < 2)
+           a  b
+        0  3  4
+        """
+        import pandas as pd
+
+        rows: list[Row] = [row for row in self.to_rows() if not query(row)]
+        if len(rows) == 0:
+            result_table = Table._from_pandas_dataframe(pd.DataFrame(), self._schema)
+        else:
+            result_table = self.from_rows(rows)
+        return result_table
 
     def remove_duplicate_rows(self) -> Table:
         """
