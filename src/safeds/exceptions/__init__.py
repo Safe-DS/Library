@@ -6,14 +6,11 @@ import apipkg
 
 if TYPE_CHECKING:
     from safeds.exceptions._data import (
-        ColumnIsTargetError,
-        ColumnIsTimeError,
         ColumnLengthMismatchError,
         ColumnSizeError,
         DuplicateColumnNameError,
         DuplicateIndexError,
         IllegalFormatError,
-        IllegalSchemaModificationError,
         IndexOutOfBoundsError,
         MissingValuesColumnError,
         NonNumericColumnError,
@@ -82,14 +79,11 @@ __all__ = [
     # Generic exceptions
     "OutOfBoundsError",
     # Data exceptions
-    "ColumnIsTargetError",
-    "ColumnIsTimeError",
     "ColumnLengthMismatchError",
     "ColumnSizeError",
     "DuplicateColumnNameError",
     "DuplicateIndexError",
     "IllegalFormatError",
-    "IllegalSchemaModificationError",
     "IndexOutOfBoundsError",
     "MissingValuesColumnError",
     "NonNumericColumnError",
