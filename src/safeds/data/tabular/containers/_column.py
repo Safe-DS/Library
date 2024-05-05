@@ -149,12 +149,10 @@ class Column(Sequence[T]):
         return self.name == other.name and self._data.equals(other._data)
 
     @overload
-    def __getitem__(self, index: int) -> T:
-        ...
+    def __getitem__(self, index: int) -> T: ...
 
     @overload
-    def __getitem__(self, index: slice) -> Column[T]:
-        ...
+    def __getitem__(self, index: slice) -> Column[T]: ...
 
     def __getitem__(self, index: int | slice) -> T | Column[T]:
         """
@@ -1109,6 +1107,7 @@ class Column(Sequence[T]):
         ----------
         lag:
             The amount of lag used to plot
+
         Returns
         -------
         plot:
