@@ -194,7 +194,9 @@ class TestFitAndTransform:
         column_names: list[str] | None,
         expected: Table,
     ) -> None:
-        fitted_transformer, transformed_table = RangeScaler(minimum=-10.0, maximum=10.0).fit_and_transform(table, column_names)
+        fitted_transformer, transformed_table = RangeScaler(minimum=-10.0, maximum=10.0).fit_and_transform(
+            table, column_names,
+        )
         assert fitted_transformer.is_fitted
         assert transformed_table == expected
 
