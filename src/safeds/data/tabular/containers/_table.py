@@ -896,6 +896,9 @@ class Table:
 
         The original table is not modified.
 
+        !!! warning "Deprecated"
+            Use [add_columns][safeds.data.tabular.containers._table.Table.add_columns] instead.
+
         Returns
         -------
         result:
@@ -918,16 +921,13 @@ class Table:
         0  1  2  d
         1  3  4  e
         """
-        if self.has_column(column.name):
-            raise DuplicateColumnNameError(column.name)
+        warnings.warn(
+            "This method is deprecated and will be removed in a future version. Use `Table.add_columns` instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
 
-        if column.number_of_rows != self.number_of_rows and self.number_of_columns != 0:
-            raise ColumnSizeError(str(self.number_of_rows), str(column._data.size))
-
-        result = self._data.reset_index(drop=True)
-        result.columns = self._schema.column_names
-        result[column.name] = column._data
-        return Table._from_pandas_dataframe(result)
+        return self.add_columns([column])
 
     def add_columns(self, columns: list[Column] | Table) -> Table:
         """
@@ -988,6 +988,9 @@ class Table:
 
         The original table is not modified.
 
+        !!! warning "Deprecated"
+            Use [add_rows][safeds.data.tabular.containers._table.Table.add_rows] instead.
+
         Parameters
         ----------
         row:
@@ -1013,6 +1016,12 @@ class Table:
         0  1  2
         1  3  4
         """
+        warnings.warn(
+            "This method is deprecated and will be removed in a future version. Use `Table.add_rows` instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+
         import numpy as np
         import pandas as pd
 
@@ -1159,6 +1168,7 @@ class Table:
             DeprecationWarning,
             stacklevel=2,
         )
+
         return self.keep_only_rows(query)
 
     _T = TypeVar("_T")
@@ -2218,8 +2228,12 @@ class Table:
         n_cols = min(3, self.number_of_columns)
         n_rows = 1 + (self.number_of_columns - 1) // n_cols
 
-        one_col = n_cols == 1 and n_rows == 1
-        fig, axs = plt.subplots(n_rows, n_cols, tight_layout=True, figsize=(n_cols * 3, n_rows * 3))
+        if n_cols == 1 and n_rows == 1:
+            fig, axs = plt.subplots(1, 1, tight_layout=True)
+            one_col = True
+        else:
+            fig, axs = plt.subplots(n_rows, n_cols, tight_layout=True, figsize=(n_cols * 3, n_rows * 3))
+            one_col = False
 
         col_names = self.column_names
         for col_name, ax in zip(col_names, axs.flatten() if not one_col else [axs], strict=False):

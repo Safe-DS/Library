@@ -31,7 +31,8 @@ Get the latest version from [PyPI](https://pypi.org/project/safe-ds):
 pip install safe-ds
 ```
 
-On a Windows PC with an NVIDIA graphics card, you may also want to install the CUDA versions of `torch` and `torchvision`:
+On a Windows PC with an NVIDIA graphics card, you may also want to install the CUDA versions of `torch` and
+`torchvision`:
 
 ```shell
 pip install --upgrade torch torchvision --index-url https://download.pytorch.org/whl/cu121
