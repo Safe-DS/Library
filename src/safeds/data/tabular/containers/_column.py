@@ -1011,9 +1011,14 @@ class Column(Sequence[T]):
         buffer.seek(0)
         return Image.from_bytes(buffer.read())
 
-    def plot_histogram(self) -> Image:
+    def plot_histogram(self, *, number_of_bins: int = 10) -> Image:
         """
         Plot a column in a histogram.
+
+        Parameters
+        ----------
+        number_of_bins:
+            The number of bins to use in the histogram. Default is 10.
 
         Returns
         -------
@@ -1026,25 +1031,9 @@ class Column(Sequence[T]):
         >>> column = Column("test", [1, 2, 3])
         >>> histogram = column.plot_histogram()
         """
-        import matplotlib.pyplot as plt
-        import seaborn as sns
-
-        fig = plt.figure()
-        ax = sns.histplot(data=self._data)
-        ax.set_xticks(ax.get_xticks())
-        ax.set(xlabel=self.name)
-        ax.set_xticklabels(
-            ax.get_xticklabels(),
-            rotation=45,
-            horizontalalignment="right",
-        )  # rotate the labels of the x Axis to prevent the chance of overlapping of the labels
-        plt.tight_layout()
-
-        buffer = io.BytesIO()
-        fig.savefig(buffer, format="png")
-        plt.close()  # Prevents the figure from being displayed directly
-        buffer.seek(0)
-        return Image.from_bytes(buffer.read())
+        from safeds.data.tabular.containers import Table
+        
+        return Table({self._name: self._data}).plot_histograms(number_of_bins=number_of_bins)
 
     # ------------------------------------------------------------------------------------------------------------------
     # Conversion
