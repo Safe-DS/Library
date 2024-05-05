@@ -156,27 +156,6 @@ class WrongFileExtensionError(Exception):
         )
 
 
-class IllegalSchemaModificationError(Exception):
-    """Exception raised when modifying a schema in a way that is inconsistent with the subclass's requirements."""
-
-    def __init__(self, msg: str) -> None:
-        super().__init__(f"Illegal schema modification: {msg}")
-
-
-class ColumnIsTargetError(IllegalSchemaModificationError):
-    """Exception raised when removing the target column of a TimeSeries."""
-
-    def __init__(self, column_name: str) -> None:
-        super().__init__(f'Column "{column_name}" is the target column and cannot be removed.')
-
-
-class ColumnIsTimeError(IllegalSchemaModificationError):
-    """Exception raised when removing the time column of a TimeSeries."""
-
-    def __init__(self, column_name: str) -> None:
-        super().__init__(f'Column "{column_name}" is the time column and cannot be removed.')
-
-
 class IllegalFormatError(Exception):
     """Exception raised when a format is not legal."""
 

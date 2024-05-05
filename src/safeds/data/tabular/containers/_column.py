@@ -23,7 +23,6 @@ if TYPE_CHECKING:
 
     from safeds.data.tabular.containers import Table
 
-
 T = TypeVar("T")
 R = TypeVar("R")
 
@@ -150,10 +149,12 @@ class Column(Sequence[T]):
         return self.name == other.name and self._data.equals(other._data)
 
     @overload
-    def __getitem__(self, index: int) -> T: ...
+    def __getitem__(self, index: int) -> T:
+        ...
 
     @overload
-    def __getitem__(self, index: slice) -> Column[T]: ...
+    def __getitem__(self, index: slice) -> Column[T]:
+        ...
 
     def __getitem__(self, index: int | slice) -> T | Column[T]:
         """
@@ -1061,6 +1062,43 @@ class Column(Sequence[T]):
         plt.xlabel("Time")
 
         plt.tight_layout()
+        buffer = io.BytesIO()
+        fig.savefig(buffer, format="png")
+        plt.close()  # Prevents the figure from being displayed directly
+        buffer.seek(0)
+        return Image.from_bytes(buffer.read())
+
+    def plot_lagplot(self, lag: int) -> Image:
+        """
+        Plot a lagplot for the given column.
+
+        Parameters
+        ----------
+        lag:
+            The amount of lag used to plot
+        Returns
+        -------
+        plot:
+            The plot as an image.
+
+        Raises
+        ------
+        NonNumericColumnError
+            If the tcolumn contains non-numerical values.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table
+        >>> table = Column("values", [1,2,3,4,3,2])
+        >>> image = table.plot_lagplot(2)
+        """
+        import matplotlib.pyplot as plt
+        import pandas as pd
+
+        if not self.type.is_numeric():
+            raise NonNumericColumnError("This time series target contains non-numerical columns.")
+        ax = pd.plotting.lag_plot(self._data, lag=lag)
+        fig = ax.figure
         buffer = io.BytesIO()
         fig.savefig(buffer, format="png")
         plt.close()  # Prevents the figure from being displayed directly

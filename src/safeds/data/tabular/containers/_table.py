@@ -1933,48 +1933,6 @@ class Table:
         buffer.seek(0)
         return Image.from_bytes(buffer.read())
 
-    def plot_lagplot(self, lag: int, column_name: str) -> Image:
-        """
-        Plot a lagplot for a given column.
-
-        Parameters
-        ----------
-        lag:
-            The amount of lag used to plot
-
-        column_name:
-            The name of the plotted column
-
-        Returns
-        -------
-        plot:
-            The plot as an image.
-
-        Raises
-        ------
-        NonNumericColumnError
-            If the tcolumn contains non-numerical values.
-
-        Examples
-        --------
-        >>> from safeds.data.tabular.containers import Table
-        >>> table = Table({"time":[1, 2], "target": [3, 4], "feature":[2,2]} )
-        >>> image = table.plot_lagplot(1, "target")
-        """
-        import matplotlib.pyplot as plt
-        import pandas as pd
-
-        to_be_plotted = self.get_column(column_name)
-        if not to_be_plotted.type.is_numeric():
-            raise NonNumericColumnError("This time series target contains non-numerical columns.")
-        ax = pd.plotting.lag_plot(to_be_plotted._data, lag=lag)
-        fig = ax.figure
-        buffer = io.BytesIO()
-        fig.savefig(buffer, format="png")
-        plt.close()  # Prevents the figure from being displayed directly
-        buffer.seek(0)
-        return Image.from_bytes(buffer.read())
-
     def plot_lineplot(self, x_column_name: str, y_column_name: str) -> Image:
         """
         Plot two columns against each other in a lineplot.
