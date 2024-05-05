@@ -1,9 +1,16 @@
 import itertools
 
 import pytest
-
 from safeds.data.tabular.containers import Table
-from safeds.data.tabular.transformation import TableTransformer, StandardScaler, RangeScaler, OneHotEncoder, LabelEncoder, Discretizer, Imputer
+from safeds.data.tabular.transformation import (
+    Discretizer,
+    Imputer,
+    LabelEncoder,
+    OneHotEncoder,
+    RangeScaler,
+    StandardScaler,
+    TableTransformer,
+)
 
 
 def transformers_numeric() -> list[TableTransformer]:
@@ -21,7 +28,7 @@ def transformers_numeric() -> list[TableTransformer]:
     return [
         StandardScaler(),
         RangeScaler(),
-        Discretizer()
+        Discretizer(),
     ]
 
 
@@ -39,7 +46,7 @@ def transformers_non_numeric() -> list[TableTransformer]:
     """
     return [
         OneHotEncoder(),
-        LabelEncoder()
+        LabelEncoder(),
     ]
 
 
@@ -56,7 +63,7 @@ def transformers() -> list[TableTransformer]:
         The list of all transformers to test.
     """
     return transformers_numeric() + transformers_non_numeric() + [
-        Imputer(strategy=Imputer.Strategy.Mode())
+        Imputer(strategy=Imputer.Strategy.Mode()),
     ]
 
 

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Self
 
 from safeds._utils import _structural_hash
 
@@ -26,8 +26,13 @@ class TableTransformer(ABC):
         removed = self.get_names_of_removed_columns() if self.is_fitted else []
         return _structural_hash(self.__class__.__qualname__, self.is_fitted, added, changed, removed)
 
+    @property
     @abstractmethod
-    def fit(self, table: Table, column_names: list[str] | None) -> TableTransformer:
+    def is_fitted(self) -> bool:
+        """Whether the transformer is fitted."""
+
+    @abstractmethod
+    def fit(self, table: Table, column_names: list[str] | None) -> Self:
         """
         Learn a transformation for a set of columns in a table.
 
@@ -117,16 +122,11 @@ class TableTransformer(ABC):
             If the transformer has not been fitted yet.
         """
 
-    @property
-    @abstractmethod
-    def is_fitted(self) -> bool:
-        """Whether the transformer is fitted."""
-
-    def fit_and_transform(self, table: Table, column_names: list[str] | None = None) -> Table:
+    def fit_and_transform(self, table: Table, column_names: list[str] | None = None) -> tuple[Self, Table]:
         """
         Learn a transformation for a set of columns in a table and apply the learned transformation to the same table.
 
-        The table is not modified. If you also need the fitted transformer, use `fit` and `transform` separately.
+        Neither the transformer nor the table are modified.
 
         Parameters
         ----------
@@ -137,32 +137,18 @@ class TableTransformer(ABC):
 
         Returns
         -------
+        fitted_transformer:
+            The fitted transformer.
         transformed_table:
             The transformed table.
         """
-        return self.fit(table, column_names).transform(table)
+        fitted_transformer = self.fit(table, column_names)
+        transformed_table = fitted_transformer.transform(table)
+        return fitted_transformer, transformed_table
 
 
 class InvertibleTableTransformer(TableTransformer):
     """A `TableTransformer` that can also undo the learned transformation after it has been applied."""
-
-    @abstractmethod
-    def fit(self, table: Table, column_names: list[str] | None) -> InvertibleTableTransformer:
-        """
-        Learn a transformation for a set of columns in a table.
-
-        Parameters
-        ----------
-        table:
-            The table used to fit the transformer.
-        column_names:
-            The list of columns from the table used to fit the transformer. If `None`, all columns are used.
-
-        Returns
-        -------
-        fitted_transformer:
-            The fitted transformer.
-        """
 
     @abstractmethod
     def inverse_transform(self, transformed_table: Table) -> Table:
