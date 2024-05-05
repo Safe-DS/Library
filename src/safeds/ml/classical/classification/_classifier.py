@@ -92,7 +92,43 @@ class Classifier(ABC):
             The sklearn Classifier.
         """
 
-    # noinspection PyProtectedMember
+    # ------------------------------------------------------------------------------------------------------------------
+    # Metrics
+    # ------------------------------------------------------------------------------------------------------------------
+
+    def summarize_metrics(self, validation_or_test_set: TabularDataset, positive_class: Any) -> Table:
+        """
+        Summarize the classifier's metrics on the given data.
+
+        Parameters
+        ----------
+        validation_or_test_set:
+            The validation or test set.
+        positive_class:
+            The class to be considered positive. All other classes are considered negative.
+
+        Returns
+        -------
+        metrics:
+            A table containing the classifier's metrics.
+
+        Raises
+        ------
+        TypeError
+            If a table is passed instead of a tabular dataset.
+        """
+        accuracy = self.accuracy(validation_or_test_set)
+        precision = self.precision(validation_or_test_set, positive_class)
+        recall = self.recall(validation_or_test_set, positive_class)
+        f1_score = self.f1_score(validation_or_test_set, positive_class)
+
+        return Table(
+            {
+                "metric": ["accuracy", "precision", "recall", "f1_score"],
+                "value": [accuracy, precision, recall, f1_score],
+            },
+        )
+
     def accuracy(self, validation_or_test_set: TabularDataset) -> float:
         """
         Compute the accuracy of the classifier on the given data.

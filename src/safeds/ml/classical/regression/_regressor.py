@@ -90,6 +90,66 @@ class Regressor(ABC):
             The sklearn Regressor.
         """
 
+    # ------------------------------------------------------------------------------------------------------------------
+    # Metrics
+    # ------------------------------------------------------------------------------------------------------------------
+
+    def summarize_metrics(self, validation_or_test_set: TabularDataset) -> Table:
+        """
+        Summarize the regressor's metrics on the given data.
+
+        Parameters
+        ----------
+        validation_or_test_set:
+            The validation or test set.
+
+        Returns
+        -------
+        metrics:
+            A table containing the regressor's metrics.
+
+        Raises
+        ------
+        TypeError
+            If a table is passed instead of a tabular dataset.
+        """
+        mean_absolute_error = self.mean_absolute_error(validation_or_test_set)
+        mean_squared_error = self.mean_squared_error(validation_or_test_set)
+
+        return Table({
+            "metric": ["mean_absolute_error", "mean_squared_error"],
+            "value": [mean_absolute_error, mean_squared_error],
+        })
+
+    def mean_absolute_error(self, validation_or_test_set: TabularDataset) -> float:
+        """
+        Compute the mean absolute error (MAE) of the regressor on the given data.
+
+        Parameters
+        ----------
+        validation_or_test_set:
+            The validation or test set.
+
+        Returns
+        -------
+        mean_absolute_error:
+            The calculated mean absolute error (the average of the distance of each individual row).
+
+        Raises
+        ------
+        TypeError
+            If a table is passed instead of a tabular dataset.
+        """
+        from sklearn.metrics import mean_absolute_error as sk_mean_absolute_error
+
+        if not isinstance(validation_or_test_set, TabularDataset) and isinstance(validation_or_test_set, Table):
+            raise PlainTableError
+        expected = validation_or_test_set.target
+        predicted = self.predict(validation_or_test_set.features).target
+
+        _check_metrics_preconditions(predicted, expected)
+        return sk_mean_absolute_error(expected._data, predicted._data)
+
     # noinspection PyProtectedMember
     def mean_squared_error(self, validation_or_test_set: TabularDataset) -> float:
         """
@@ -119,36 +179,6 @@ class Regressor(ABC):
 
         _check_metrics_preconditions(predicted, expected)
         return sk_mean_squared_error(expected._data, predicted._data)
-
-    # noinspection PyProtectedMember
-    def mean_absolute_error(self, validation_or_test_set: TabularDataset) -> float:
-        """
-        Compute the mean absolute error (MAE) of the regressor on the given data.
-
-        Parameters
-        ----------
-        validation_or_test_set:
-            The validation or test set.
-
-        Returns
-        -------
-        mean_absolute_error:
-            The calculated mean absolute error (the average of the distance of each individual row).
-
-        Raises
-        ------
-        TypeError
-            If a table is passed instead of a tabular dataset.
-        """
-        from sklearn.metrics import mean_absolute_error as sk_mean_absolute_error
-
-        if not isinstance(validation_or_test_set, TabularDataset) and isinstance(validation_or_test_set, Table):
-            raise PlainTableError
-        expected = validation_or_test_set.target
-        predicted = self.predict(validation_or_test_set.features).target
-
-        _check_metrics_preconditions(predicted, expected)
-        return sk_mean_absolute_error(expected._data, predicted._data)
 
 
 # noinspection PyProtectedMember
