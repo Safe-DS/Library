@@ -1,0 +1,2 @@
+class ExperimentalPolarsColumn:
+    pass

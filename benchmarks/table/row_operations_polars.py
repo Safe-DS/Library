@@ -24,13 +24,13 @@ REPETITIONS = 10
 
 
 def _run_remove_duplicate_rows() -> None:
-    table.remove_duplicate_rows()
+    table.remove_duplicate_rows()._lazy_frame.collect()
 
 
-# def _run_remove_rows_with_missing_values() -> None:
-#     table.remove_rows_with_missing_values()
-#
-#
+def _run_remove_rows_with_missing_values() -> None:
+    table.remove_rows_with_missing_values()._lazy_frame.collect()
+
+
 # def _run_remove_rows_with_outliers() -> None:
 #     table.remove_rows_with_outliers()
 #
@@ -85,10 +85,10 @@ if __name__ == "__main__":
             _run_remove_duplicate_rows,
             number=REPETITIONS,
         ),
-        # "remove_rows_with_missing_values": timeit(
-        #     _run_remove_rows_with_missing_values,
-        #     number=REPETITIONS,
-        # ),
+        "remove_rows_with_missing_values": timeit(
+            _run_remove_rows_with_missing_values,
+            number=REPETITIONS,
+        ),
         # "remove_rows_with_outliers": timeit(
         #     _run_remove_rows_with_outliers,
         #     number=REPETITIONS,
