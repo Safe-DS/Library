@@ -20,8 +20,7 @@ from tests.helpers import (
     images_all_ids,
     images_asymmetric,
     images_asymmetric_ids,
-    os_linux,
-    os_windows,
+    os_mac,
     plane_jpg_id,
     plane_jpg_path,
     plane_png_id,
@@ -33,7 +32,7 @@ from tests.helpers import (
     white_square_jpg_id,
     white_square_jpg_path,
     white_square_png_id,
-    white_square_png_path, os_mac,
+    white_square_png_path,
 )
 
 _device_cuda = torch.device("cuda")
