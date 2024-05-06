@@ -120,7 +120,11 @@ if __name__ == "__main__":
     }
 
     # Print the timings
-    print(Table({  # noqa: T201
-        "method": list(timings.keys()),
-        "timing": list(timings.values()),
-    }))
+    print(
+        Table(
+            {  # noqa: T201
+                "method": list(timings.keys()),
+                "timing": list(timings.values()),
+            }
+        )
+    )

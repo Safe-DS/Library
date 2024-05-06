@@ -28,7 +28,9 @@ def create_synthetic_table(
     Table
         A Table with random numerical data.
     """
-    return Table({
-        f"column_{i}": [randrange(min_value, max_value) for _ in range(number_of_rows)]
-        for i in range(number_of_columns)
-    })
+    return Table(
+        {
+            f"column_{i}": [randrange(min_value, max_value) for _ in range(number_of_rows)]
+            for i in range(number_of_columns)
+        }
+    )
