@@ -17,7 +17,7 @@ if TYPE_CHECKING:
 
 class TimeSeriesDataset:
     """
-    A time series dataset maps feature and time columns to a target column. Not like the TableDataset a TimeSeries needs contain one target and one time column, but can have empty features.
+    A time series dataset maps feature and time columns to a target column. Not like the TableDataset a TimeSeries needs to contain one target and one time column, but can have empty features.
 
     Create a tabular dataset from a mapping of column names to their values.
 
@@ -40,7 +40,7 @@ class TimeSeriesDataset:
     ValueError
         If the target column is also an extra column.
     ValueError
-        If no feature columns remains.
+        If no feature column remains.
 
     Examples
     --------
