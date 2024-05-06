@@ -4,9 +4,7 @@ import warnings
 from typing import TYPE_CHECKING, Self
 
 from safeds._utils import _structural_hash
-from safeds.data.image.containers._image_list import ImageList
-from safeds.data.image.containers._single_size_image_list import _SingleSizeImageList
-from safeds.data.image.utils._image_transformation_error_and_warning_checks import (
+from safeds.data.image._utils._image_transformation_error_and_warning_checks import (
     _check_add_noise_errors,
     _check_adjust_brightness_errors_and_warnings,
     _check_adjust_color_balance_errors_and_warnings,
@@ -17,6 +15,8 @@ from safeds.data.image.utils._image_transformation_error_and_warning_checks impo
     _check_resize_errors,
     _check_sharpen_errors_and_warnings,
 )
+from safeds.data.image.containers._image_list import ImageList
+from safeds.data.image.containers._single_size_image_list import _SingleSizeImageList
 from safeds.exceptions import IndexOutOfBoundsError
 
 if TYPE_CHECKING:
@@ -25,6 +25,7 @@ if TYPE_CHECKING:
     from torch import Tensor
 
     from safeds.data.image.containers import Image
+    from safeds.data.image.typing import ImageSize
 
 
 class _EmptyImageList(ImageList):
@@ -90,6 +91,10 @@ class _EmptyImageList(ImageList):
     @property
     def channel(self) -> int:
         return NotImplemented
+
+    @property
+    def sizes(self) -> list[ImageSize]:
+        return []
 
     @property
     def number_of_sizes(self) -> int:

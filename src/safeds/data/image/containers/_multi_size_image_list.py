@@ -6,11 +6,11 @@ import sys
 from typing import TYPE_CHECKING
 
 from safeds._utils import _structural_hash
-from safeds.data.image.containers import Image, ImageList
-from safeds.data.image.utils._image_transformation_error_and_warning_checks import (
+from safeds.data.image._utils._image_transformation_error_and_warning_checks import (
     _check_blur_errors_and_warnings,
     _check_remove_images_with_size_errors,
 )
+from safeds.data.image.containers import Image, ImageList
 from safeds.exceptions import (
     DuplicateIndexError,
     IllegalFormatError,
@@ -23,6 +23,7 @@ if TYPE_CHECKING:
     from torch import Tensor
 
     from safeds.data.image.containers._single_size_image_list import _SingleSizeImageList
+    from safeds.data.image.typing import ImageSize
 
 
 class _MultiSizeImageList(ImageList):
@@ -111,6 +112,8 @@ class _MultiSizeImageList(ImageList):
             return NotImplemented
         if not isinstance(other, _MultiSizeImageList) or set(other._image_list_dict) != set(self._image_list_dict):
             return False
+        if self is other:
+            return True
         for image_list_key, image_list_value in self._image_list_dict.items():
             if image_list_value != other._image_list_dict[image_list_key]:
                 return False
@@ -157,6 +160,15 @@ class _MultiSizeImageList(ImageList):
     @property
     def channel(self) -> int:
         return next(iter(self._image_list_dict.values())).channel
+
+    @property
+    def sizes(self) -> list[ImageSize]:
+        sizes = {}
+        for image_list in self._image_list_dict.values():
+            indices = image_list._as_single_size_image_list()._tensor_positions_to_indices
+            for i, index in enumerate(indices):
+                sizes[index] = image_list.sizes[i]
+        return [sizes[index] for index in sorted(sizes)]
 
     @property
     def number_of_sizes(self) -> int:

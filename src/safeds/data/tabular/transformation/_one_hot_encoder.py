@@ -65,6 +65,18 @@ class OneHotEncoder(InvertibleTableTransformer):
         # Maps nan values (str of old column) to corresponding new column name
         self._value_to_column_nans: dict[str, str] | None = None
 
+    def __hash__(self) -> int:
+        return super().__hash__()
+
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, OneHotEncoder):
+            return NotImplemented
+        return (
+            self._column_names == other._column_names
+            and self._value_to_column == other._value_to_column
+            and self._value_to_column_nans == other._value_to_column_nans
+        )
+
     def fit(self, table: Table, column_names: list[str] | None) -> OneHotEncoder:
         """
         Learn a transformation for a set of columns in a table.
@@ -212,7 +224,7 @@ class OneHotEncoder(InvertibleTableTransformer):
                     values_not_present_when_fitted.append((value, old_column_name))
 
             for new_column in self._column_names[old_column_name]:
-                table = table.add_column(Column(new_column, encoded_values[new_column]))
+                table = table.add_columns([Column(new_column, encoded_values[new_column])])
 
         if len(values_not_present_when_fitted) > 0:
             raise ValueNotPresentWhenFittedError(values_not_present_when_fitted)

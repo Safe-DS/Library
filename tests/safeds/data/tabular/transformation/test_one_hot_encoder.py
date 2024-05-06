@@ -11,6 +11,27 @@ from safeds.exceptions import (
 )
 
 
+class TestEq:
+
+    def test_should_be_not_implemented(self) -> None:
+        assert OneHotEncoder().__eq__(Table()) is NotImplemented
+
+    def test_should_be_equal(self) -> None:
+        table1 = Table({"a": ["a", "b", "c"], "b": ["a", "b", "c"]})
+        table2 = Table({"b": ["a", "b", "c"], "a": ["a", "b", "c"]})
+        assert OneHotEncoder().fit(table1, None) == OneHotEncoder().fit(table2, None)
+
+    @pytest.mark.parametrize(
+        ("table1", "table2"),
+        [
+            (Table({"a": ["a", "b", "c"], "b": ["a", "b", "c"]}), Table({"a": ["a", "b", "c"], "aa": ["a", "b", "c"]})),
+            (Table({"a": ["a", "b", "c"], "b": ["a", "b", "c"]}), Table({"a": ["a", "b", "c"], "b": ["a", "b", "d"]})),
+        ],
+    )
+    def test_should_be_not_equal(self, table1: Table, table2: Table) -> None:
+        assert OneHotEncoder().fit(table1, None) != OneHotEncoder().fit(table2, None)
+
+
 class TestFit:
     def test_should_raise_if_column_not_found(self) -> None:
         table = Table(

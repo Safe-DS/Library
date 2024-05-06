@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING
 
 from safeds._config import _get_device
 from safeds._utils import _structural_hash
-from safeds.data.image.utils._image_transformation_error_and_warning_checks import (
+from safeds.data.image._utils._image_transformation_error_and_warning_checks import (
     _check_add_noise_errors,
     _check_adjust_brightness_errors_and_warnings,
     _check_adjust_color_balance_errors_and_warnings,
@@ -18,9 +18,11 @@ from safeds.data.image.utils._image_transformation_error_and_warning_checks impo
     _check_resize_errors,
     _check_sharpen_errors_and_warnings,
 )
+from safeds.data.image.typing import ImageSize
 from safeds.exceptions import IllegalFormatError
 
 if TYPE_CHECKING:
+    from numpy import dtype, ndarray
     from torch import Tensor
     from torch.types import Device
 
@@ -137,7 +139,7 @@ class Image:
 
         if not isinstance(other, Image):
             return NotImplemented
-        return (
+        return (self is other) or (
             self._image_tensor.size() == other._image_tensor.size()
             and torch.all(torch.eq(self._image_tensor, other._set_device(self.device)._image_tensor)).item()
         )
@@ -163,6 +165,25 @@ class Image:
             Size of this object in bytes.
         """
         return sys.getsizeof(self._image_tensor) + self._image_tensor.element_size() * self._image_tensor.nelement()
+
+    def __array__(self, numpy_dtype: str | dtype = None) -> ndarray:
+        """
+        Return the image as a numpy array.
+
+        Returns
+        -------
+        numpy_array:
+            The image as numpy array.
+        """
+        from numpy import uint8
+
+        return (
+            self._image_tensor.permute(1, 2, 0)
+            .detach()
+            .cpu()
+            .numpy()
+            .astype(uint8 if numpy_dtype is None else numpy_dtype)
+        )
 
     def _repr_jpeg_(self) -> bytes | None:
         """
@@ -260,6 +281,18 @@ class Image:
             The number of channels of the image.
         """
         return self._image_tensor.size(dim=0)
+
+    @property
+    def size(self) -> ImageSize:
+        """
+        Get the `ImageSize` of the image.
+
+        Returns
+        -------
+        image_size:
+            The size of the image.
+        """
+        return ImageSize(self.width, self.height, self.channel)
 
     @property
     def device(self) -> Device:

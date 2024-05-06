@@ -1,14 +1,33 @@
 import pytest
+from safeds.data.image.typing import ImageSize
 from safeds.data.labeled.containers import TabularDataset
 from safeds.data.tabular.containers import Table
-from safeds.exceptions import FeatureDataMismatchError, InputSizeError, ModelNotFittedError, OutOfBoundsError
+from safeds.exceptions import (
+    FeatureDataMismatchError,
+    InputSizeError,
+    InvalidModelStructureError,
+    ModelNotFittedError,
+    OutOfBoundsError,
+)
 from safeds.ml.nn import (
+    AvgPooling2DLayer,
+    Convolutional2DLayer,
+    ConvolutionalTranspose2DLayer,
+    FlattenLayer,
     ForwardLayer,
+    InputConversion,
+    InputConversionImage,
     InputConversionTable,
+    Layer,
+    MaxPooling2DLayer,
     NeuralNetworkClassifier,
     NeuralNetworkRegressor,
+    OutputConversion,
+    OutputConversionImageToImage,
+    OutputConversionImageToTable,
     OutputConversionTable,
 )
+from safeds.ml.nn._output_conversion_image import OutputConversionImageToColumn
 
 
 class TestClassificationModel:
@@ -229,6 +248,207 @@ class TestClassificationModel:
 
         assert obj.callback_was_called() is True
 
+    @pytest.mark.parametrize(
+        ("input_conversion", "layers", "output_conversion", "error_msg"),
+        [
+            (
+                InputConversionTable([], ""),
+                [FlattenLayer()],
+                OutputConversionImageToTable(),
+                r"The defined model uses an output conversion for images but no input conversion for images.",
+            ),
+            (
+                InputConversionTable([], ""),
+                [FlattenLayer()],
+                OutputConversionImageToColumn(),
+                r"The defined model uses an output conversion for images but no input conversion for images.",
+            ),
+            (
+                InputConversionTable([], ""),
+                [FlattenLayer()],
+                OutputConversionImageToImage(),
+                r"A NeuralNetworkClassifier cannot be used with images as output.",
+            ),
+            (
+                InputConversionTable([], ""),
+                [Convolutional2DLayer(1, 1)],
+                OutputConversionTable(),
+                r"You cannot use a 2-dimensional layer with 1-dimensional data.",
+            ),
+            (
+                InputConversionTable([], ""),
+                [ConvolutionalTranspose2DLayer(1, 1)],
+                OutputConversionTable(),
+                r"You cannot use a 2-dimensional layer with 1-dimensional data.",
+            ),
+            (
+                InputConversionTable([], ""),
+                [MaxPooling2DLayer(1)],
+                OutputConversionTable(),
+                r"You cannot use a 2-dimensional layer with 1-dimensional data.",
+            ),
+            (
+                InputConversionTable([], ""),
+                [AvgPooling2DLayer(1)],
+                OutputConversionTable(),
+                r"You cannot use a 2-dimensional layer with 1-dimensional data.",
+            ),
+            (
+                InputConversionTable([], ""),
+                [FlattenLayer()],
+                OutputConversionTable(),
+                r"You cannot use a 2-dimensional layer with 1-dimensional data.",
+            ),
+            (
+                InputConversionImage(ImageSize(1, 1, 1)),
+                [FlattenLayer()],
+                OutputConversionTable(),
+                r"The defined model uses an input conversion for images but no output conversion for images.",
+            ),
+            (
+                InputConversionImage(ImageSize(1, 1, 1)),
+                [Convolutional2DLayer(1, 1)],
+                OutputConversionImageToTable(),
+                r"The output data would be 2-dimensional but the provided output conversion uses 1-dimensional data.",
+            ),
+            (
+                InputConversionImage(ImageSize(1, 1, 1)),
+                [Convolutional2DLayer(1, 1)],
+                OutputConversionImageToColumn(),
+                r"The output data would be 2-dimensional but the provided output conversion uses 1-dimensional data.",
+            ),
+            (
+                InputConversionImage(ImageSize(1, 1, 1)),
+                [ConvolutionalTranspose2DLayer(1, 1)],
+                OutputConversionImageToTable(),
+                r"The output data would be 2-dimensional but the provided output conversion uses 1-dimensional data.",
+            ),
+            (
+                InputConversionImage(ImageSize(1, 1, 1)),
+                [ConvolutionalTranspose2DLayer(1, 1)],
+                OutputConversionImageToColumn(),
+                r"The output data would be 2-dimensional but the provided output conversion uses 1-dimensional data.",
+            ),
+            (
+                InputConversionImage(ImageSize(1, 1, 1)),
+                [MaxPooling2DLayer(1)],
+                OutputConversionImageToTable(),
+                r"The output data would be 2-dimensional but the provided output conversion uses 1-dimensional data.",
+            ),
+            (
+                InputConversionImage(ImageSize(1, 1, 1)),
+                [MaxPooling2DLayer(1)],
+                OutputConversionImageToColumn(),
+                r"The output data would be 2-dimensional but the provided output conversion uses 1-dimensional data.",
+            ),
+            (
+                InputConversionImage(ImageSize(1, 1, 1)),
+                [AvgPooling2DLayer(1)],
+                OutputConversionImageToTable(),
+                r"The output data would be 2-dimensional but the provided output conversion uses 1-dimensional data.",
+            ),
+            (
+                InputConversionImage(ImageSize(1, 1, 1)),
+                [AvgPooling2DLayer(1)],
+                OutputConversionImageToColumn(),
+                r"The output data would be 2-dimensional but the provided output conversion uses 1-dimensional data.",
+            ),
+            (
+                InputConversionImage(ImageSize(1, 1, 1)),
+                [FlattenLayer(), Convolutional2DLayer(1, 1)],
+                OutputConversionImageToTable(),
+                r"You cannot use a 2-dimensional layer with 1-dimensional data.",
+            ),
+            (
+                InputConversionImage(ImageSize(1, 1, 1)),
+                [FlattenLayer(), Convolutional2DLayer(1, 1)],
+                OutputConversionImageToColumn(),
+                r"You cannot use a 2-dimensional layer with 1-dimensional data.",
+            ),
+            (
+                InputConversionImage(ImageSize(1, 1, 1)),
+                [FlattenLayer(), ConvolutionalTranspose2DLayer(1, 1)],
+                OutputConversionImageToTable(),
+                r"You cannot use a 2-dimensional layer with 1-dimensional data.",
+            ),
+            (
+                InputConversionImage(ImageSize(1, 1, 1)),
+                [FlattenLayer(), ConvolutionalTranspose2DLayer(1, 1)],
+                OutputConversionImageToColumn(),
+                r"You cannot use a 2-dimensional layer with 1-dimensional data.",
+            ),
+            (
+                InputConversionImage(ImageSize(1, 1, 1)),
+                [FlattenLayer(), MaxPooling2DLayer(1)],
+                OutputConversionImageToTable(),
+                r"You cannot use a 2-dimensional layer with 1-dimensional data.",
+            ),
+            (
+                InputConversionImage(ImageSize(1, 1, 1)),
+                [FlattenLayer(), MaxPooling2DLayer(1)],
+                OutputConversionImageToColumn(),
+                r"You cannot use a 2-dimensional layer with 1-dimensional data.",
+            ),
+            (
+                InputConversionImage(ImageSize(1, 1, 1)),
+                [FlattenLayer(), AvgPooling2DLayer(1)],
+                OutputConversionImageToTable(),
+                r"You cannot use a 2-dimensional layer with 1-dimensional data.",
+            ),
+            (
+                InputConversionImage(ImageSize(1, 1, 1)),
+                [FlattenLayer(), AvgPooling2DLayer(1)],
+                OutputConversionImageToColumn(),
+                r"You cannot use a 2-dimensional layer with 1-dimensional data.",
+            ),
+            (
+                InputConversionImage(ImageSize(1, 1, 1)),
+                [FlattenLayer(), FlattenLayer()],
+                OutputConversionImageToTable(),
+                r"You cannot use a 2-dimensional layer with 1-dimensional data.",
+            ),
+            (
+                InputConversionImage(ImageSize(1, 1, 1)),
+                [FlattenLayer(), FlattenLayer()],
+                OutputConversionImageToColumn(),
+                r"You cannot use a 2-dimensional layer with 1-dimensional data.",
+            ),
+            (
+                InputConversionImage(ImageSize(1, 1, 1)),
+                [ForwardLayer(1)],
+                OutputConversionImageToTable(),
+                r"The 2-dimensional data has to be flattened before using a 1-dimensional layer.",
+            ),
+            (
+                InputConversionImage(ImageSize(1, 1, 1)),
+                [ForwardLayer(1)],
+                OutputConversionImageToColumn(),
+                r"The 2-dimensional data has to be flattened before using a 1-dimensional layer.",
+            ),
+            (
+                InputConversionImage(ImageSize(1, 1, 1)),
+                [],
+                OutputConversionImageToTable(),
+                r"You need to provide at least one layer to a neural network.",
+            ),
+            (
+                InputConversionImage(ImageSize(1, 1, 1)),
+                [],
+                OutputConversionImageToColumn(),
+                r"You need to provide at least one layer to a neural network.",
+            ),
+        ],
+    )
+    def test_should_raise_if_model_has_invalid_structure(
+        self,
+        input_conversion: InputConversion,
+        layers: list[Layer],
+        output_conversion: OutputConversion,
+        error_msg: str,
+    ) -> None:
+        with pytest.raises(InvalidModelStructureError, match=error_msg):
+            NeuralNetworkClassifier(input_conversion, layers, output_conversion)
+
 
 class TestRegressionModel:
     @pytest.mark.parametrize(
@@ -421,3 +641,126 @@ class TestRegressionModel:
         model.fit(Table.from_dict({"a": [1], "b": [0]}).to_tabular_dataset("a"), callback_on_epoch_completion=obj.cb)
 
         assert obj.callback_was_called() is True
+
+    @pytest.mark.parametrize(
+        ("input_conversion", "layers", "output_conversion", "error_msg"),
+        [
+            (
+                InputConversionTable([], ""),
+                [FlattenLayer()],
+                OutputConversionImageToImage(),
+                r"The defined model uses an output conversion for images but no input conversion for images.",
+            ),
+            (
+                InputConversionTable([], ""),
+                [Convolutional2DLayer(1, 1)],
+                OutputConversionTable(),
+                r"You cannot use a 2-dimensional layer with 1-dimensional data.",
+            ),
+            (
+                InputConversionTable([], ""),
+                [ConvolutionalTranspose2DLayer(1, 1)],
+                OutputConversionTable(),
+                r"You cannot use a 2-dimensional layer with 1-dimensional data.",
+            ),
+            (
+                InputConversionTable([], ""),
+                [MaxPooling2DLayer(1)],
+                OutputConversionTable(),
+                r"You cannot use a 2-dimensional layer with 1-dimensional data.",
+            ),
+            (
+                InputConversionTable([], ""),
+                [AvgPooling2DLayer(1)],
+                OutputConversionTable(),
+                r"You cannot use a 2-dimensional layer with 1-dimensional data.",
+            ),
+            (
+                InputConversionTable([], ""),
+                [FlattenLayer()],
+                OutputConversionTable(),
+                r"You cannot use a 2-dimensional layer with 1-dimensional data.",
+            ),
+            (
+                InputConversionImage(ImageSize(1, 1, 1)),
+                [FlattenLayer()],
+                OutputConversionTable(),
+                r"The defined model uses an input conversion for images but no output conversion for images.",
+            ),
+            (
+                InputConversionImage(ImageSize(1, 1, 1)),
+                [FlattenLayer()],
+                OutputConversionImageToImage(),
+                r"The output data would be 1-dimensional but the provided output conversion uses 2-dimensional data.",
+            ),
+            (
+                InputConversionImage(ImageSize(1, 1, 1)),
+                [FlattenLayer(), ForwardLayer(1)],
+                OutputConversionImageToImage(),
+                r"The output data would be 1-dimensional but the provided output conversion uses 2-dimensional data.",
+            ),
+            (
+                InputConversionImage(ImageSize(1, 1, 1)),
+                [FlattenLayer(), Convolutional2DLayer(1, 1)],
+                OutputConversionImageToImage(),
+                r"You cannot use a 2-dimensional layer with 1-dimensional data.",
+            ),
+            (
+                InputConversionImage(ImageSize(1, 1, 1)),
+                [FlattenLayer(), ConvolutionalTranspose2DLayer(1, 1)],
+                OutputConversionImageToImage(),
+                r"You cannot use a 2-dimensional layer with 1-dimensional data.",
+            ),
+            (
+                InputConversionImage(ImageSize(1, 1, 1)),
+                [FlattenLayer(), MaxPooling2DLayer(1)],
+                OutputConversionImageToImage(),
+                r"You cannot use a 2-dimensional layer with 1-dimensional data.",
+            ),
+            (
+                InputConversionImage(ImageSize(1, 1, 1)),
+                [FlattenLayer(), AvgPooling2DLayer(1)],
+                OutputConversionImageToImage(),
+                r"You cannot use a 2-dimensional layer with 1-dimensional data.",
+            ),
+            (
+                InputConversionImage(ImageSize(1, 1, 1)),
+                [FlattenLayer(), FlattenLayer()],
+                OutputConversionImageToImage(),
+                r"You cannot use a 2-dimensional layer with 1-dimensional data.",
+            ),
+            (
+                InputConversionImage(ImageSize(1, 1, 1)),
+                [ForwardLayer(1)],
+                OutputConversionImageToImage(),
+                r"The 2-dimensional data has to be flattened before using a 1-dimensional layer.",
+            ),
+            (
+                InputConversionImage(ImageSize(1, 1, 1)),
+                [],
+                OutputConversionImageToImage(),
+                r"You need to provide at least one layer to a neural network.",
+            ),
+            (
+                InputConversionImage(ImageSize(1, 1, 1)),
+                [FlattenLayer()],
+                OutputConversionImageToTable(),
+                r"A NeuralNetworkRegressor cannot be used with images as input and 1-dimensional data as output.",
+            ),
+            (
+                InputConversionImage(ImageSize(1, 1, 1)),
+                [FlattenLayer()],
+                OutputConversionImageToColumn(),
+                r"A NeuralNetworkRegressor cannot be used with images as input and 1-dimensional data as output.",
+            ),
+        ],
+    )
+    def test_should_raise_if_model_has_invalid_structure(
+        self,
+        input_conversion: InputConversion,
+        layers: list[Layer],
+        output_conversion: OutputConversion,
+        error_msg: str,
+    ) -> None:
+        with pytest.raises(InvalidModelStructureError, match=error_msg):
+            NeuralNetworkRegressor(input_conversion, layers, output_conversion)
