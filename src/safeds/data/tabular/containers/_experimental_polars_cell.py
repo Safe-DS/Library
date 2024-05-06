@@ -48,7 +48,7 @@ class ExperimentalPolarsCell(ABC, Generic[T]):
     # Comparison ---------------------------------------------------------------
 
     @abstractmethod
-    def __eq__(self, other: object) -> ExperimentalPolarsCell[bool]:
+    def __eq__(self, other: object) -> ExperimentalPolarsCell[bool]:  # type: ignore[override]
         ...
 
     @abstractmethod
@@ -68,7 +68,7 @@ class ExperimentalPolarsCell(ABC, Generic[T]):
         ...
 
     @abstractmethod
-    def __ne__(self, other: object) -> ExperimentalPolarsCell[bool]:
+    def __ne__(self, other: object) -> ExperimentalPolarsCell[bool]:  # type: ignore[override]
         ...
 
     # Numeric operators --------------------------------------------------------

@@ -63,46 +63,46 @@ class ExperimentalPolarsColumn(ExperimentalPolarsCell[T], Sequence[T]):
         return _wrap(self._series.__invert__())
 
     def __and__(self, other: bool | ExperimentalPolarsCell[bool]) -> ExperimentalPolarsCell[bool]:
-        other = _normalize_boolean_operation_operands(self, other)
-        if other is None:
+        right_operand = _normalize_boolean_operation_operands(self, other)
+        if right_operand is None:
             return NotImplemented
 
-        return _wrap(self._series.__and__(other))
+        return _wrap(self._series.__and__(right_operand))
 
     def __rand__(self, other: bool | ExperimentalPolarsCell[bool]) -> ExperimentalPolarsCell[bool]:
-        other = _normalize_boolean_operation_operands(self, other)
-        if other is None:
+        right_operand = _normalize_boolean_operation_operands(self, other)
+        if right_operand is None:
             return NotImplemented
 
-        return _wrap(self._series.__rand__(other))
+        return _wrap(self._series.__rand__(right_operand))
 
     def __or__(self, other: bool | ExperimentalPolarsCell[bool]) -> ExperimentalPolarsCell[bool]:
-        other = _normalize_boolean_operation_operands(self, other)
-        if other is None:
+        right_operand = _normalize_boolean_operation_operands(self, other)
+        if right_operand is None:
             return NotImplemented
 
-        return _wrap(self._series.__or__(other))
+        return _wrap(self._series.__or__(right_operand))
 
     def __ror__(self, other: bool | ExperimentalPolarsCell[bool]) -> ExperimentalPolarsCell[bool]:
-        other = _normalize_boolean_operation_operands(self, other)
-        if other is None:
+        right_operand = _normalize_boolean_operation_operands(self, other)
+        if right_operand is None:
             return NotImplemented
 
-        return _wrap(self._series.__ror__(other))
+        return _wrap(self._series.__ror__(right_operand))
 
     def __xor__(self, other: bool | ExperimentalPolarsCell[bool]) -> ExperimentalPolarsCell[bool]:
-        other = _normalize_boolean_operation_operands(self, other)
-        if other is None:
+        right_operand = _normalize_boolean_operation_operands(self, other)
+        if right_operand is None:
             return NotImplemented
 
-        return _wrap(self._series.__xor__(other))
+        return _wrap(self._series.__xor__(right_operand))
 
     def __rxor__(self, other: bool | ExperimentalPolarsCell[bool]) -> ExperimentalPolarsCell[bool]:
-        other = _normalize_boolean_operation_operands(self, other)
-        if other is None:
+        right_operand = _normalize_boolean_operation_operands(self, other)
+        if right_operand is None:
             return NotImplemented
 
-        return _wrap(self._series.__rxor__(other))
+        return _wrap(self._series.__rxor__(right_operand))
 
     # Collection ---------------------------------------------------------------
 
@@ -110,9 +110,9 @@ class ExperimentalPolarsColumn(ExperimentalPolarsCell[T], Sequence[T]):
     def __getitem__(self, index: int) -> T: ...
 
     @overload
-    def __getitem__(self, index: slice) -> T: ...
+    def __getitem__(self, index: slice) -> ExperimentalPolarsColumn[T]: ...
 
-    def __getitem__(self, index: int | slice) -> T:
+    def __getitem__(self, index: int | slice) -> T | ExperimentalPolarsColumn[T]:
         return self._series.__getitem__(index)
 
     def __len__(self) -> int:
@@ -120,7 +120,7 @@ class ExperimentalPolarsColumn(ExperimentalPolarsCell[T], Sequence[T]):
 
     # Comparison ---------------------------------------------------------------
 
-    def __eq__(self, other: object) -> ExperimentalPolarsCell[bool]:
+    def __eq__(self, other: object) -> ExperimentalPolarsCell[bool]:  # type: ignore[override]
         other = _unwrap(other)
         return _wrap(self._series.__eq__(other))
 
@@ -140,7 +140,7 @@ class ExperimentalPolarsColumn(ExperimentalPolarsCell[T], Sequence[T]):
         other = _unwrap(other)
         return _wrap(self._series.__lt__(other))
 
-    def __ne__(self, other: object) -> ExperimentalPolarsCell[bool]:
+    def __ne__(self, other: object) -> ExperimentalPolarsCell[bool]:  # type: ignore[override]
         other = _unwrap(other)
         return _wrap(self._series.__ne__(other))
 
