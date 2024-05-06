@@ -3,8 +3,9 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any, Literal
 
 from safeds._utils import _check_and_normalize_file_path
-from safeds.data.tabular.containers import Table
 from safeds.exceptions import ColumnLengthMismatchError
+
+from ._table import Table
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Mapping, Sequence
@@ -28,12 +29,13 @@ class ExperimentalPolarsTable:
 
     To create a `Table` call the constructor or use one of the following static methods:
 
-    | Method                                                                                                             | Description                            |
-    | ------------------------------------------------------------------------------------------------------------------ | -------------------------------------- |
-    | [from_csv_file][safeds.data.tabular.containers._experimental_polars_table.ExperimentalPolarsTable.from_csv_file]   | Create a table from a CSV file.        |
-    | [from_json_file][safeds.data.tabular.containers._experimental_polars_table.ExperimentalPolarsTable.from_json_file] | Create a table from a JSON file.       |
-    | [from_dict][safeds.data.tabular.containers._experimental_polars_table.ExperimentalPolarsTable.from_dict]           | Create a table from a dictionary.      |
-    | [from_columns][safeds.data.tabular.containers._experimental_polars_table.ExperimentalPolarsTable.from_columns]     | Create a table from a list of columns. |
+    | Method                                                                                                                   | Description                            |
+    | ------------------------------------------------------------------------------------------------------------------------ | -------------------------------------- |
+    | [from_csv_file][safeds.data.tabular.containers._experimental_polars_table.ExperimentalPolarsTable.from_csv_file]         | Create a table from a CSV file.        |
+    | [from_json_file][safeds.data.tabular.containers._experimental_polars_table.ExperimentalPolarsTable.from_json_file]       | Create a table from a JSON file.       |
+    | [from_parquet_file][safeds.data.tabular.containers._experimental_polars_table.ExperimentalPolarsTable.from_parquet_file] | Create a table from a Parquet file.    |
+    | [from_columns][safeds.data.tabular.containers._experimental_polars_table.ExperimentalPolarsTable.from_columns]           | Create a table from a list of columns. |
+    | [from_dict][safeds.data.tabular.containers._experimental_polars_table.ExperimentalPolarsTable.from_dict]                 | Create a table from a dictionary.      |
 
     Parameters
     ----------
@@ -212,7 +214,7 @@ class ExperimentalPolarsTable:
     @property
     def column_names(self) -> list[str]:
         """
-        Names of the columns in the table.
+        The names of the columns in the table.
 
         Examples
         --------
@@ -353,6 +355,11 @@ class ExperimentalPolarsTable:
     def remove_duplicate_rows(self) -> ExperimentalPolarsTable:
         """
         Remove duplicate rows from the table.
+
+        Returns
+        -------
+        filtered_table:
+            The table without duplicate rows.
 
         Examples
         --------

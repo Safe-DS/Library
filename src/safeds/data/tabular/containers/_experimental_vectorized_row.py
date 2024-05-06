@@ -1,68 +1,68 @@
 from __future__ import annotations
 
-from abc import ABC, abstractmethod
-from collections.abc import Iterator, Mapping
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
+
+from ._experimental_polars_row import ExperimentalPolarsRow
+from ._experimental_vectorized_cell import _VectorizedCell
 
 if TYPE_CHECKING:
     from safeds.data.tabular.typing import ColumnType, Schema
 
-    from ._experimental_polars_cell import ExperimentalPolarsCell
+    from ._experimental_polars_table import ExperimentalPolarsTable
 
 
-class ExperimentalPolarsRow(ABC, Mapping[str, Any]):
-    """A row is a one-dimensional collection of named, heterogeneous values."""
+class _VectorizedRow(ExperimentalPolarsRow):
+    """
+    A row is a one-dimensional collection of named, heterogeneous values.
+
+    This implementation treats an entire table as a row, where each column is a "cell" in the row. This greatly speeds
+    up operations on the row.
+    """
 
     # ------------------------------------------------------------------------------------------------------------------
     # Dunder methods
     # ------------------------------------------------------------------------------------------------------------------
 
-    def __contains__(self, name: Any) -> bool:
-        return self.has_column(name)
+    def __init__(self, table: ExperimentalPolarsTable):
+        self._table: ExperimentalPolarsTable = table
 
-    @abstractmethod
-    def __eq__(self, other: object) -> bool: ...
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, _VectorizedRow):
+            return NotImplemented
+        if self is other:
+            return True
+        return self._table == other._table
 
-    def __getitem__(self, name: str) -> ExperimentalPolarsCell:
-        return self.get_value(name)
+    def __hash__(self) -> int:
+        return self._table.__hash__()
 
-    @abstractmethod
-    def __hash__(self) -> int: ...
-
-    def __iter__(self) -> Iterator[Any]:
-        return iter(self.column_names)
-
-    def __len__(self) -> int:
-        return self.number_of_columns
-
-    @abstractmethod
-    def __sizeof__(self) -> int: ...
+    def __sizeof__(self) -> int:
+        return self._table.__sizeof__()
 
     # ------------------------------------------------------------------------------------------------------------------
     # Properties
     # ------------------------------------------------------------------------------------------------------------------
 
     @property
-    @abstractmethod
     def column_names(self) -> list[str]:
         """The names of the columns in the row."""
+        return self._table.column_names
 
     @property
-    @abstractmethod
     def number_of_columns(self) -> int:
         """The number of columns in the row."""
+        return self._table.number_of_columns
 
     @property
-    @abstractmethod
     def schema(self) -> Schema:  # TODO: rethink return type
         """The schema of the row."""
+        return self._table.schema
 
     # ------------------------------------------------------------------------------------------------------------------
     # Column operations
     # ------------------------------------------------------------------------------------------------------------------
 
-    @abstractmethod
-    def get_value(self, name: str) -> ExperimentalPolarsCell:
+    def get_value(self, name: str) -> _VectorizedCell:
         """
         Get the value of the specified column.
 
@@ -76,8 +76,8 @@ class ExperimentalPolarsRow(ABC, Mapping[str, Any]):
         value:
             The value of the column.
         """
+        return _VectorizedCell(self._table.get_column(name))
 
-    @abstractmethod
     def get_column_type(self, name: str) -> ColumnType:  # TODO: rethink return type
         """
         Get the type of the specified column.
@@ -92,8 +92,8 @@ class ExperimentalPolarsRow(ABC, Mapping[str, Any]):
         type:
             The type of the column.
         """
+        return self._table.get_column_type(name)
 
-    @abstractmethod
     def has_column(self, name: str) -> bool:
         """
         Check if the row has a column with the specified name.
@@ -108,3 +108,4 @@ class ExperimentalPolarsRow(ABC, Mapping[str, Any]):
         has_column:
             Whether the row has a column with the specified name.
         """
+        return self._table.has_column(name)
