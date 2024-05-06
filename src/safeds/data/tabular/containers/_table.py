@@ -122,6 +122,10 @@ class Table:
 
         Valid file extensions are `.xls`, '.xlsx', `.xlsm`, `.xlsb`, `.odf`, `.ods` and `.odt`.
 
+        !!! warning "Deprecated"
+            Convert your data to a CSV file and use
+            [Table.from_csv_file][safeds.data.tabular.containers._table.Table.from_csv_file] instead.
+
         Parameters
         ----------
         path:
@@ -148,6 +152,13 @@ class Table:
         1  2  5
         2  3  6
         """
+        warnings.warn(
+            "This method is deprecated and will be removed in a future version. "
+            "Convert your data to a CSV file and use `Table.from_csv_file` instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+
         import pandas as pd
 
         path = Path(path)
@@ -2318,6 +2329,9 @@ class Table:
         If the file and/or the directories do not exist, they will be created. If the file already exists, it will be
         overwritten.
 
+        !!! warning "Deprecated"
+            Use [`to_csv_file`][safeds.data.tabular.containers._table.Table.to_csv_file] instead.
+
         Parameters
         ----------
         path:
@@ -2334,6 +2348,12 @@ class Table:
         >>> table = Table.from_dict({"a": [1, 2, 3], "b": [4, 5, 6]})
         >>> table.to_excel_file("./src/resources/to_excel_file.xlsx")
         """
+        warnings.warn(
+            "This method is deprecated and will be removed in a future version. Use `Table.to_csv_file` instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+
         import openpyxl
 
         path = Path(path)

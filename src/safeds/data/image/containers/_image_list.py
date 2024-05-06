@@ -142,7 +142,7 @@ class ImageList(metaclass=ABCMeta):
             return _MultiSizeImageList._create_image_list(image_tensors, indices)
 
     @abstractmethod
-    def clone(self) -> ImageList:
+    def _clone(self) -> ImageList:
         """
         Clone your ImageList to a new instance.
 

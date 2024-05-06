@@ -13,7 +13,6 @@ if TYPE_CHECKING:
     from sklearn.preprocessing import OrdinalEncoder as sk_OrdinalEncoder
 
 
-# noinspection PyProtectedMember
 class LabelEncoder(InvertibleTableTransformer):
     """The LabelEncoder encodes one or more given columns into labels."""
 
