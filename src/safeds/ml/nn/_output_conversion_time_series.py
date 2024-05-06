@@ -42,7 +42,7 @@ class OutputConversionTimeSeries(OutputConversion[TimeSeriesDataset, TimeSeriesD
         """
         if not isinstance(other, type(self)):
             return NotImplemented
-        return self._prediction_name == other
+        return self._prediction_name == other._prediction_name
 
     def __sizeof__(self) -> int:
         """
