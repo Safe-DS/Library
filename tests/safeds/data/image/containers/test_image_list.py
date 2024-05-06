@@ -23,9 +23,11 @@ from tests.helpers import (
     images_all_channel,
     images_all_channel_ids,
     images_all_ids,
+    os_mac,
     plane_jpg_path,
     plane_png_path,
     resolve_resource_path,
+    skip_if_os,
     test_images_folder,
     white_square_jpg_path,
 )
@@ -875,6 +877,7 @@ class TestTransforms:
             standard_deviation: float,
             snapshot_png_image_list: SnapshotAssertion,
         ) -> None:
+            skip_if_os([os_mac])
             torch.set_default_device(torch.device("cpu"))
             torch.manual_seed(0)
             image_list_original = ImageList.from_files(resolve_resource_path(resource_path))

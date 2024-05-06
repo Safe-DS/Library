@@ -11,11 +11,10 @@ concurrency:
 jobs:
   poetry-with-codecov:
     strategy:
-      fail-fast: false
       matrix:
         platform:
           - "ubuntu-latest"
-          # - "macos-latest" # Intel Macs are no longer supported by Torch
+          - "macos-latest"
           - "windows-latest"
         python-version:
           - "3.11"

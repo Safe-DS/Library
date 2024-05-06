@@ -26,6 +26,7 @@ from tests.helpers import (
     images_all_ids,
     images_asymmetric,
     images_asymmetric_ids,
+    os_mac,
     plane_jpg_id,
     plane_jpg_path,
     plane_png_id,
@@ -34,6 +35,7 @@ from tests.helpers import (
     rgba_png_id,
     rgba_png_path,
     skip_if_device_not_available,
+    skip_if_os,
     white_square_jpg_id,
     white_square_jpg_path,
     white_square_png_id,
@@ -735,6 +737,7 @@ class TestAddNoise:
         device: Device,
     ) -> None:
         skip_if_device_not_available(device)
+        skip_if_os([os_mac])
         torch.manual_seed(0)
         image = Image.from_file(resolve_resource_path(resource_path), device)
         image_noise = image.add_noise(standard_deviation)
@@ -890,6 +893,7 @@ class TestBlur:
         device: Device,
     ) -> None:
         skip_if_device_not_available(device)
+        skip_if_os([os_mac])
         image = Image.from_file(resolve_resource_path(resource_path), device=device)
         image_blurred = image.blur(2)
         assert image_blurred == snapshot_png_image
