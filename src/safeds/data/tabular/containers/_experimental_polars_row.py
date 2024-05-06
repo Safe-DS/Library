@@ -19,15 +19,13 @@ class ExperimentalPolarsRow(ABC, Mapping[str, Any]):
         return self.has_column(name)
 
     @abstractmethod
-    def __eq__(self, other: object) -> bool:
-        ...
+    def __eq__(self, other: object) -> bool: ...
 
     def __getitem__(self, name: str) -> ExperimentalPolarsCell:
         return self.get_value(name)
 
     @abstractmethod
-    def __hash__(self) -> int:
-        ...
+    def __hash__(self) -> int: ...
 
     def __iter__(self) -> Iterator[Any]:
         return iter(self.column_names)
@@ -36,8 +34,7 @@ class ExperimentalPolarsRow(ABC, Mapping[str, Any]):
         return self.number_of_columns
 
     @abstractmethod
-    def __sizeof__(self) -> int:
-        ...
+    def __sizeof__(self) -> int: ...
 
     # ------------------------------------------------------------------------------------------------------------------
     # Properties
