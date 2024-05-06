@@ -1,4 +1,5 @@
 import platform
+
 import pytest
 
 os_windows = "Windows"

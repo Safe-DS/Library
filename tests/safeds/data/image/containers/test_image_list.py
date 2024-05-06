@@ -21,11 +21,14 @@ from tests.helpers import (
     images_all_channel,
     images_all_channel_ids,
     images_all_ids,
+    os_linux,
+    os_windows,
     plane_jpg_path,
     plane_png_path,
     resolve_resource_path,
+    skip_os_dependent,
     test_images_folder,
-    white_square_jpg_path, skip_os_dependent, os_windows, os_linux,
+    white_square_jpg_path,
 )
 
 
