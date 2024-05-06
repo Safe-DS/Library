@@ -1,11 +1,13 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import Any
-from collections.abc import Mapping, Iterator
+from collections.abc import Iterator, Mapping
+from typing import TYPE_CHECKING, Any
 
-from safeds.data.tabular.containers import ExperimentalPolarsCell
-from safeds.data.tabular.typing import Schema, ColumnType
+if TYPE_CHECKING:
+    from safeds.data.tabular.typing import ColumnType, Schema
+
+    from ._experimental_polars_cell import ExperimentalPolarsCell
 
 
 class ExperimentalPolarsRow(ABC, Mapping[str, Any]):

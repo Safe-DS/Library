@@ -1,8 +1,14 @@
 from __future__ import annotations
 
-from safeds.data.tabular.containers import ExperimentalPolarsRow, ExperimentalPolarsTable
-from safeds.data.tabular.containers._experimental_vectorized_cell import _VectorizedCell
-from safeds.data.tabular.typing import Schema, ColumnType
+from typing import TYPE_CHECKING
+
+from ._experimental_polars_row import ExperimentalPolarsRow
+from ._experimental_vectorized_cell import _VectorizedCell
+
+if TYPE_CHECKING:
+    from safeds.data.tabular.typing import ColumnType, Schema
+
+    from ._experimental_polars_table import ExperimentalPolarsTable
 
 
 class _VectorizedRow(ExperimentalPolarsRow):

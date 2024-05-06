@@ -1,4 +1,5 @@
-from safeds.data.tabular.containers import ExperimentalPolarsCell, ExperimentalPolarsColumn
+from ._experimental_polars_cell import ExperimentalPolarsCell
+from ._experimental_polars_column import ExperimentalPolarsColumn
 
 
 class _VectorizedCell(ExperimentalPolarsCell):

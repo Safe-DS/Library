@@ -3,8 +3,9 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any, Literal
 
 from safeds._utils import _check_and_normalize_file_path
-from safeds.data.tabular.containers import Table
 from safeds.exceptions import ColumnLengthMismatchError
+
+from ._table import Table
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Mapping, Sequence
