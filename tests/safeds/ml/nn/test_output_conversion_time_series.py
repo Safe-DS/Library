@@ -27,3 +27,66 @@ def test_output_conversion_time_series_2() -> None:
         ot = OutputConversionTimeSeries()
         ot._data_conversion(input_data=Table({"a": [1], "c": [1], "b": [1]}).to_time_series_dataset("a", "b")
                             , output_data=torch.Tensor([0]), window_size=2, kappa=3)
+
+
+class TestEq:
+
+    @pytest.mark.parametrize(
+        ("output_conversion_ts1", "output_conversion_ts2"),
+        [
+            (OutputConversionTimeSeries(), OutputConversionTimeSeries()),
+            (OutputConversionTimeSeries(), OutputConversionTimeSeries()),
+            (OutputConversionTimeSeries(), OutputConversionTimeSeries()),
+        ],
+    )
+    def test_should_be_equal(
+        self,
+        output_conversion_ts1: OutputConversionTimeSeries,
+        output_conversion_ts2: OutputConversionTimeSeries,
+    ) -> None:
+        assert output_conversion_ts1 == output_conversion_ts2
+
+
+class TestHash:
+
+    @pytest.mark.parametrize(
+        ("output_conversion_ts1", "output_conversion_ts2"),
+        [
+            (OutputConversionTimeSeries(), OutputConversionTimeSeries()),
+            (OutputConversionTimeSeries(), OutputConversionTimeSeries()),
+            (OutputConversionTimeSeries(), OutputConversionTimeSeries()),
+        ],
+    )
+    def test_hash_should_be_equal(
+        self,
+        output_conversion_ts1: OutputConversionTimeSeries,
+        output_conversion_ts2: OutputConversionTimeSeries,
+    ) -> None:
+        assert hash(output_conversion_ts1) == hash(output_conversion_ts2)
+
+    def test_hash_should_not_be_equal(self) -> None:
+        output_conversion_ts1 = OutputConversionTimeSeries("1")
+        output_conversion_ts2 = OutputConversionTimeSeries("2")
+        output_conversion_ts3 = OutputConversionTimeSeries("3")
+        assert hash(output_conversion_ts1) != hash(output_conversion_ts3)
+        assert hash(output_conversion_ts2) != hash(output_conversion_ts1)
+        assert hash(output_conversion_ts3) != hash(output_conversion_ts2)
+
+
+class TestSizeOf:
+
+    @pytest.mark.parametrize(
+        "output_conversion_ts",
+        [
+            OutputConversionTimeSeries("1"),
+            OutputConversionTimeSeries("2"),
+            OutputConversionTimeSeries("3"),
+        ],
+    )
+    def test_should_size_be_greater_than_normal_object(
+        self,
+        output_conversion_ts: OutputConversionTimeSeries,
+    ) -> None:
+        assert sys.getsizeof(output_conversion_ts) > sys.getsizeof(object())
+
+

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import sys
 from typing import TYPE_CHECKING, Any
 
 from safeds._utils import _structural_hash
@@ -15,18 +16,18 @@ class OutputConversionTimeSeries(OutputConversion[TimeSeriesDataset, TimeSeriesD
     """The output conversion for a neural network, defines the output parameters for the neural network."""
     def __hash__(self) -> int:
         """
-        Return a deterministic hash value for this OutputConversionImage.
+        Return a deterministic hash value for this OutputConversionTimeSeries instance.
 
         Returns
         -------
         hash:
             the hash value
         """
-        return _structural_hash(self.__class__.__name__)
+        return _structural_hash(self.__class__.__name__ + self._prediction_name)
 
     def __eq__(self, other: object) -> bool:
         """
-        Compare two OutputConversionImage instances.
+        Compare two OutputConversionTimeSeries instances.
 
         Parameters
         ----------
@@ -40,7 +41,7 @@ class OutputConversionTimeSeries(OutputConversion[TimeSeriesDataset, TimeSeriesD
         """
         if not isinstance(other, type(self)):
             return NotImplemented
-        return True
+        return self._prediction_name == other
 
     def __sizeof__(self) -> int:
         """
@@ -51,7 +52,7 @@ class OutputConversionTimeSeries(OutputConversion[TimeSeriesDataset, TimeSeriesD
         size:
             Size of this object in bytes.
         """
-        return 0
+        return sys.getsizeof(self._prediction_name)
 
     def __init__(self, prediction_name: str = "prediction_nn") -> None:
         """
