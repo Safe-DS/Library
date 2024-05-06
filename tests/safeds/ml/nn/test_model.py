@@ -221,7 +221,6 @@ class TestClassificationModel:
             )
             learned_model.fit(Table.from_dict({"k": [0.1, 0, 0.2], "l": [0, 0.15, 0.5]}).to_tabular_dataset("k"))
 
-
     def test_should_raise_if_table_size_and_input_size_mismatch(self) -> None:
         model = NeuralNetworkClassifier(
             InputConversionTable(),

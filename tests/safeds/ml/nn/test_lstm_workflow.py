@@ -27,4 +27,3 @@ def test_lstm_model() -> None:
     trained_model = model.fit(train_table.to_time_series_dataset("value", "date"), epoch_size=1)
 
     trained_model.predict(test_table.to_time_series_dataset("value", "date"))
-

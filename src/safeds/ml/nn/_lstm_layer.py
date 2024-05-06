@@ -134,10 +134,7 @@ class LSTMLayer(Layer):
         """
         if not isinstance(other, LSTMLayer):
             return NotImplemented
-        return (self is other) or (
-            self._input_size == other._input_size
-            and self._output_size == other._output_size
-        )
+        return (self is other) or (self._input_size == other._input_size and self._output_size == other._output_size)
 
     def __sizeof__(self) -> int:
         """

@@ -59,8 +59,6 @@ class InputConversionTimeSeries(InputConversion[TimeSeriesDataset, TimeSeriesDat
             batch_size,
         )
 
-
-
     def _data_conversion_predict(self, input_data: TimeSeriesDataset, batch_size: int) -> DataLoader:
         return input_data._into_dataloader_with_window_predict(self._window_size, self._forecast_horizon, batch_size)
 
@@ -81,4 +79,3 @@ class InputConversionTimeSeries(InputConversion[TimeSeriesDataset, TimeSeriesDat
 
     def _get_output_configuration(self) -> dict[str, Any]:
         return {"window_size": self._window_size, "forecast_horizon": self._forecast_horizon}  # pragma: no cover
-
