@@ -2,8 +2,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from ._experimental_polars_column import ExperimentalPolarsColumn
 from ._experimental_polars_row import ExperimentalPolarsRow
-from ._experimental_vectorized_cell import _VectorizedCell
 
 if TYPE_CHECKING:
     from safeds.data.tabular.typing import ColumnType, Schema
@@ -62,7 +62,7 @@ class _VectorizedRow(ExperimentalPolarsRow):
     # Column operations
     # ------------------------------------------------------------------------------------------------------------------
 
-    def get_value(self, name: str) -> _VectorizedCell:
+    def get_value(self, name: str) -> ExperimentalPolarsColumn:
         """
         Get the value of the specified column.
 
@@ -76,7 +76,7 @@ class _VectorizedRow(ExperimentalPolarsRow):
         value:
             The value of the column.
         """
-        return _VectorizedCell(self._table.get_column(name))
+        return self._table.get_column(name)
 
     def get_column_type(self, name: str) -> ColumnType:  # TODO: rethink return type
         """
