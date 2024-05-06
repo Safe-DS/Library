@@ -2,12 +2,12 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from ._experimental_polars_column import ExperimentalPolarsColumn
 from ._experimental_polars_row import ExperimentalPolarsRow
 
 if TYPE_CHECKING:
     from safeds.data.tabular.typing import ColumnType, Schema
 
+    from ._experimental_polars_column import ExperimentalPolarsColumn
     from ._experimental_polars_table import ExperimentalPolarsTable
 
 
