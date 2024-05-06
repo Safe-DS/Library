@@ -1,9 +1,10 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import Generic, TypeVar
+from typing import Any, Generic, TypeVar
 
 T = TypeVar("T")
+P = TypeVar("P")
 R = TypeVar("R")
 
 
@@ -14,6 +15,36 @@ class ExperimentalPolarsCell(ABC, Generic[T]):
     # Dunder methods
     # ------------------------------------------------------------------------------------------------------------------
 
+    # "Boolean" operators (actually bitwise) -----------------------------------
+
+    @abstractmethod
+    def __invert__(self) -> ExperimentalPolarsCell[bool]:
+        ...
+
+    @abstractmethod
+    def __and__(self, other: bool | ExperimentalPolarsCell[bool]) -> ExperimentalPolarsCell[bool]:
+        ...
+
+    @abstractmethod
+    def __rand__(self, other: bool | ExperimentalPolarsCell[bool]) -> ExperimentalPolarsCell[bool]:
+        ...
+
+    @abstractmethod
+    def __or__(self, other: bool | ExperimentalPolarsCell[bool]) -> ExperimentalPolarsCell[bool]:
+        ...
+
+    @abstractmethod
+    def __ror__(self, other: bool | ExperimentalPolarsCell[bool]) -> ExperimentalPolarsCell[bool]:
+        ...
+
+    @abstractmethod
+    def __xor__(self, other: bool | ExperimentalPolarsCell[bool]) -> ExperimentalPolarsCell[bool]:
+        ...
+
+    @abstractmethod
+    def __rxor__(self, other: bool | ExperimentalPolarsCell[bool]) -> ExperimentalPolarsCell[bool]:
+        ...
+
     # Comparison ---------------------------------------------------------------
 
     @abstractmethod
@@ -21,114 +52,22 @@ class ExperimentalPolarsCell(ABC, Generic[T]):
         ...
 
     @abstractmethod
-    def __ge__(self, other) -> ExperimentalPolarsCell[bool]:
+    def __ge__(self, other: Any) -> ExperimentalPolarsCell[bool]:
         ...
 
     @abstractmethod
-    def __gt__(self, other) -> ExperimentalPolarsCell[bool]:
+    def __gt__(self, other: Any) -> ExperimentalPolarsCell[bool]:
         ...
 
     @abstractmethod
-    def __le__(self, other) -> ExperimentalPolarsCell[bool]:
+    def __le__(self, other: Any) -> ExperimentalPolarsCell[bool]:
         ...
 
     @abstractmethod
-    def __lt__(self, other) -> ExperimentalPolarsCell[bool]:
+    def __lt__(self, other: Any) -> ExperimentalPolarsCell[bool]:
         ...
 
-    # Numeric operators (left operand) -----------------------------------------
-
-    @abstractmethod
-    def __add__(self, other) -> ExperimentalPolarsCell[R]:
-        ...
-
-    @abstractmethod
-    def __and__(self, other) -> ExperimentalPolarsCell[R]:
-        ...
-
-    @abstractmethod
-    def __floordiv__(self, other) -> ExperimentalPolarsCell[R]:
-        ...
-
-    @abstractmethod
-    def __matmul__(self, other) -> ExperimentalPolarsCell[R]:
-        ...
-
-    @abstractmethod
-    def __mod__(self, other) -> ExperimentalPolarsCell[R]:
-        ...
-
-    @abstractmethod
-    def __mul__(self, other) -> ExperimentalPolarsCell[R]:
-        ...
-
-    @abstractmethod
-    def __or__(self, other) -> ExperimentalPolarsCell[R]:
-        ...
-
-    @abstractmethod
-    def __pow__(self, other) -> ExperimentalPolarsCell[R]:
-        ...
-
-    @abstractmethod
-    def __sub__(self, other) -> ExperimentalPolarsCell[R]:
-        ...
-
-    @abstractmethod
-    def __truediv__(self, other) -> ExperimentalPolarsCell[R]:
-        ...
-
-    @abstractmethod
-    def __xor__(self, other) -> ExperimentalPolarsCell[R]:
-        ...
-
-    # Numeric operators (right operand) ----------------------------------------
-
-    @abstractmethod
-    def __radd__(self, other) -> ExperimentalPolarsCell[R]:
-        ...
-
-    @abstractmethod
-    def __rand__(self, other) -> ExperimentalPolarsCell[R]:
-        ...
-
-    @abstractmethod
-    def __rfloordiv__(self, other) -> ExperimentalPolarsCell[R]:
-        ...
-
-    @abstractmethod
-    def __rmatmul__(self, other) -> ExperimentalPolarsCell[R]:
-        ...
-
-    @abstractmethod
-    def __rmod__(self, other) -> ExperimentalPolarsCell[R]:
-        ...
-
-    @abstractmethod
-    def __rmul__(self, other) -> ExperimentalPolarsCell[R]:
-        ...
-
-    @abstractmethod
-    def __ror__(self, other) -> ExperimentalPolarsCell[R]:
-        ...
-
-    @abstractmethod
-    def __rpow__(self, other) -> ExperimentalPolarsCell[R]:
-        ...
-
-    @abstractmethod
-    def __rsub__(self, other) -> ExperimentalPolarsCell[R]:
-        ...
-
-    @abstractmethod
-    def __rtruediv__(self, other) -> ExperimentalPolarsCell[R]:
-        ...
-
-    @abstractmethod
-    def __rxor__(self, other) -> ExperimentalPolarsCell[R]:
-        ...
-
-    # Unary operators ----------------------------------------------------------
+    # Numeric operators --------------------------------------------------------
 
     @abstractmethod
     def __abs__(self) -> ExperimentalPolarsCell[R]:
@@ -143,7 +82,59 @@ class ExperimentalPolarsCell(ABC, Generic[T]):
         ...
 
     @abstractmethod
-    def __invert__(self) -> ExperimentalPolarsCell[R]:
+    def __add__(self, other: Any) -> ExperimentalPolarsCell[R]:
+        ...
+
+    @abstractmethod
+    def __radd__(self, other: Any) -> ExperimentalPolarsCell[R]:
+        ...
+
+    @abstractmethod
+    def __floordiv__(self, other: Any) -> ExperimentalPolarsCell[R]:
+        ...
+
+    @abstractmethod
+    def __rfloordiv__(self, other: Any) -> ExperimentalPolarsCell[R]:
+        ...
+
+    @abstractmethod
+    def __mod__(self, other: Any) -> ExperimentalPolarsCell[R]:
+        ...
+
+    @abstractmethod
+    def __rmod__(self, other: Any) -> ExperimentalPolarsCell[R]:
+        ...
+
+    @abstractmethod
+    def __mul__(self, other: Any) -> ExperimentalPolarsCell[R]:
+        ...
+
+    @abstractmethod
+    def __rmul__(self, other: Any) -> ExperimentalPolarsCell[R]:
+        ...
+
+    @abstractmethod
+    def __pow__(self, other: float | ExperimentalPolarsCell[P]) -> ExperimentalPolarsCell[R]:
+        ...
+
+    @abstractmethod
+    def __rpow__(self, other: float | ExperimentalPolarsCell[P]) -> ExperimentalPolarsCell[R]:
+        ...
+
+    @abstractmethod
+    def __sub__(self, other: Any) -> ExperimentalPolarsCell[R]:
+        ...
+
+    @abstractmethod
+    def __rsub__(self, other: Any) -> ExperimentalPolarsCell[R]:
+        ...
+
+    @abstractmethod
+    def __truediv__(self, other: Any) -> ExperimentalPolarsCell[R]:
+        ...
+
+    @abstractmethod
+    def __rtruediv__(self, other: Any) -> ExperimentalPolarsCell[R]:
         ...
 
     # Other --------------------------------------------------------------------
