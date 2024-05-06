@@ -89,7 +89,7 @@ class ImageDataset(Generic[T]):
             _output_size = len(_column_as_tensor._one_hot_encoder.get_names_of_added_columns())
             _output = _column_as_tensor
         elif isinstance(output_data, _SingleSizeImageList):
-            _output = output_data.clone()._as_single_size_image_list()
+            _output = output_data._clone()._as_single_size_image_list()
             _output_size = ImageSize(output_data.widths[0], output_data.heights[0], output_data.channel)
         else:
             raise ValueError("The given output ImageList contains images of different sizes.")  # noqa: TRY004

@@ -224,7 +224,7 @@ class OneHotEncoder(InvertibleTableTransformer):
                     values_not_present_when_fitted.append((value, old_column_name))
 
             for new_column in self._column_names[old_column_name]:
-                table = table.add_column(Column(new_column, encoded_values[new_column]))
+                table = table.add_columns([Column(new_column, encoded_values[new_column])])
 
         if len(values_not_present_when_fitted) > 0:
             raise ValueNotPresentWhenFittedError(values_not_present_when_fitted)
