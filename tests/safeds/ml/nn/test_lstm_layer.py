@@ -7,6 +7,7 @@ from safeds.exceptions import OutOfBoundsError
 from safeds.ml.nn import LSTMLayer
 from torch import nn
 
+
 @pytest.mark.parametrize(
     "input_size",
     [
@@ -31,12 +32,11 @@ def test_should_raise_if_input_size_out_of_bounds(input_size: int) -> None:
     ids=["one", "twenty"],
 )
 def test_should_raise_if_input_size_doesnt_match(input_size: int) -> None:
-    from torch import nn
+
     assert LSTMLayer(output_size=1, input_size=input_size).input_size == input_size
 
 
 @pytest.mark.parametrize(
-
     ("activation_function", "expected_activation_function"),
     [
         ("sigmoid", nn.Sigmoid),
@@ -70,7 +70,6 @@ def test_should_raise_if_unknown_activation_function_is_passed(activation_functi
         match=rf"Unknown Activation Function: {activation_function}",
     ):
         LSTMLayer(output_size=1, input_size=1)._get_internal_layer(activation_function=activation_function)
-
 
 
 @pytest.mark.parametrize(

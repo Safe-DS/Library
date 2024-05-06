@@ -13,6 +13,7 @@ from safeds.ml.nn._output_conversion import OutputConversion
 
 class OutputConversionTimeSeries(OutputConversion[TimeSeriesDataset, TimeSeriesDataset]):
     """The output conversion for a neural network, defines the output parameters for the neural network."""
+
     def __hash__(self) -> int:
         """
         Return a deterministic hash value for this OutputConversionImage.
