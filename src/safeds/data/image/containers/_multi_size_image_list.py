@@ -88,10 +88,10 @@ class _MultiSizeImageList(ImageList):
 
         return image_list
 
-    def clone(self) -> ImageList:
+    def _clone(self) -> ImageList:
         cloned_image_list = self._clone_without_image_dict()
         for image_list_size, image_list in self._image_list_dict.items():
-            cloned_image_list._image_list_dict[image_list_size] = image_list.clone()
+            cloned_image_list._image_list_dict[image_list_size] = image_list._clone()
         return cloned_image_list
 
     def _clone_without_image_dict(self) -> _MultiSizeImageList:
@@ -258,7 +258,7 @@ class _MultiSizeImageList(ImageList):
         if index in self._indices_to_image_size_dict:
             raise DuplicateIndexError(index)
 
-        image_list = self.clone()._as_multi_size_image_list()
+        image_list = self._clone()._as_multi_size_image_list()
         size = (image_tensor.size(dim=2), image_tensor.size(dim=1))
         image_list._indices_to_image_size_dict[index] = size
 
@@ -308,7 +308,7 @@ class _MultiSizeImageList(ImageList):
                     images_with_size[size] = [image]
                     indices_for_images_with_size[size] = [current_index]
                 current_index += 1
-        image_list = self.clone()._as_multi_size_image_list()
+        image_list = self._clone()._as_multi_size_image_list()
         smallest_channel = max_channel = self.channel
         for size, ims in (images_with_size | image_list_with_size).items():
             new_indices = indices_for_images_with_size[size]
@@ -446,7 +446,7 @@ class _MultiSizeImageList(ImageList):
         random.shuffle(new_indices)
         current_index = 0
         for image_list_key, image_list_original in self._image_list_dict.items():
-            new_image_list = image_list_original.clone()._as_single_size_image_list()
+            new_image_list = image_list_original._clone()._as_single_size_image_list()
             new_image_list._tensor_positions_to_indices = new_indices[
                 current_index : current_index + len(image_list_original)
             ]

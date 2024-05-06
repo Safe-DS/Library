@@ -284,13 +284,15 @@ class TestFitAndTransform:
             "column with nans",
         ],
     )
-    def test_should_return_transformed_table(
+    def test_should_return_fitted_transformer_and_transformed_table(
         self,
         table: Table,
         column_names: list[str] | None,
         expected: Table,
     ) -> None:
-        assert OneHotEncoder().fit_and_transform(table, column_names) == expected
+        fitted_transformer, transformed_table = OneHotEncoder().fit_and_transform(table, column_names)
+        assert fitted_transformer.is_fitted
+        assert transformed_table == expected
 
     def test_should_not_change_original_table(self) -> None:
         table = Table(

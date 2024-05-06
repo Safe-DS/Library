@@ -177,7 +177,7 @@ class ImageList(metaclass=ABCMeta):
             return image_list
 
     @abstractmethod
-    def clone(self) -> ImageList:
+    def _clone(self) -> ImageList:
         """
         Clone your ImageList to a new instance.
 

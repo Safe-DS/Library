@@ -49,7 +49,7 @@ class OneHotEncoder(InvertibleTableTransformer):
     >>> from safeds.data.tabular.transformation import OneHotEncoder
     >>> table = Table({"col1": ["a", "b", "c", "a"]})
     >>> transformer = OneHotEncoder()
-    >>> transformer.fit_and_transform(table, ["col1"])
+    >>> transformer.fit_and_transform(table, ["col1"])[1]
        col1__a  col1__b  col1__c
     0      1.0      0.0      0.0
     1      0.0      1.0      0.0
@@ -77,7 +77,6 @@ class OneHotEncoder(InvertibleTableTransformer):
             and self._value_to_column_nans == other._value_to_column_nans
         )
 
-    # noinspection PyProtectedMember
     def fit(self, table: Table, column_names: list[str] | None) -> OneHotEncoder:
         """
         Learn a transformation for a set of columns in a table.
@@ -162,7 +161,6 @@ class OneHotEncoder(InvertibleTableTransformer):
 
         return result
 
-    # noinspection PyProtectedMember
     def transform(self, table: Table) -> Table:
         """
         Apply the learned transformation to a table.
@@ -250,7 +248,6 @@ class OneHotEncoder(InvertibleTableTransformer):
         # Apply sorting and return:
         return table.sort_columns(lambda col1, col2: column_names.index(col1.name) - column_names.index(col2.name))
 
-    # noinspection PyProtectedMember
     def inverse_transform(self, transformed_table: Table) -> Table:
         """
         Undo the learned transformation.

@@ -109,7 +109,7 @@ class Table:
         if path.suffix != ".csv":
             raise WrongFileExtensionError(path, ".csv")
         if path.exists():
-            with path.open() as f:
+            with path.open(encoding="utf-8") as f:
                 if f.read().replace("\n", "") == "":
                     return Table()
 
@@ -123,6 +123,10 @@ class Table:
         Read data from an Excel file into a table.
 
         Valid file extensions are `.xls`, '.xlsx', `.xlsm`, `.xlsb`, `.odf`, `.ods` and `.odt`.
+
+        !!! warning "Deprecated"
+            Convert your data to a CSV file and use
+            [Table.from_csv_file][safeds.data.tabular.containers._table.Table.from_csv_file] instead.
 
         Parameters
         ----------
@@ -150,6 +154,13 @@ class Table:
         1  2  5
         2  3  6
         """
+        warnings.warn(
+            "This method is deprecated and will be removed in a future version. "
+            "Convert your data to a CSV file and use `Table.from_csv_file` instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+
         import pandas as pd
 
         path = Path(path)
@@ -200,7 +211,7 @@ class Table:
         if path.suffix != ".json":
             raise WrongFileExtensionError(path, ".json")
         if path.exists():
-            with path.open() as f:
+            with path.open(encoding="utf-8") as f:
                 if f.read().replace("\n", "") in ("", "{}"):
                     return Table()
 
@@ -898,6 +909,9 @@ class Table:
 
         The original table is not modified.
 
+        !!! warning "Deprecated"
+            Use [add_columns][safeds.data.tabular.containers._table.Table.add_columns] instead.
+
         Returns
         -------
         result:
@@ -920,16 +934,13 @@ class Table:
         0  1  2  d
         1  3  4  e
         """
-        if self.has_column(column.name):
-            raise DuplicateColumnNameError(column.name)
+        warnings.warn(
+            "This method is deprecated and will be removed in a future version. Use `Table.add_columns` instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
 
-        if column.number_of_rows != self.number_of_rows and self.number_of_columns != 0:
-            raise ColumnSizeError(str(self.number_of_rows), str(column._data.size))
-
-        result = self._data.reset_index(drop=True)
-        result.columns = self._schema.column_names
-        result[column.name] = column._data
-        return Table._from_pandas_dataframe(result)
+        return self.add_columns([column])
 
     def add_columns(self, columns: list[Column] | Table) -> Table:
         """
@@ -990,6 +1001,9 @@ class Table:
 
         The original table is not modified.
 
+        !!! warning "Deprecated"
+            Use [add_rows][safeds.data.tabular.containers._table.Table.add_rows] instead.
+
         Parameters
         ----------
         row:
@@ -1015,6 +1029,12 @@ class Table:
         0  1  2
         1  3  4
         """
+        warnings.warn(
+            "This method is deprecated and will be removed in a future version. Use `Table.add_rows` instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+
         import numpy as np
         import pandas as pd
 
@@ -1126,19 +1146,27 @@ class Table:
 
     def filter_rows(self, query: Callable[[Row], bool]) -> Table:
         """
-        Return a new table with rows filtered by Callable (e.g. lambda function).
+        Return a new table containing only the rows that satisfy the query.
 
         The original table is not modified.
+
+        !!! warning "Deprecated"
+            Use [keep_only_rows][safeds.data.tabular.containers._table.Table.keep_only_rows] instead.
 
         Parameters
         ----------
         query:
-            A Callable that is applied to all rows.
+            A callable that returns True if a row should be included in the new table.
 
         Returns
         -------
         table:
-            A table containing only the rows filtered by the query.
+            A table containing only the rows that satisfy the query.
+
+        See Also
+        --------
+        [remove_rows][safeds.data.tabular.containers._table.Table.remove_rows]:
+            Remove rows that satifsfy a query.
 
         Examples
         --------
@@ -1148,14 +1176,13 @@ class Table:
            a  b
         0  1  2
         """
-        import pandas as pd
+        warnings.warn(
+            "This method is deprecated and will be removed in a future version. Use `Table.keep_only_rows` instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
 
-        rows: list[Row] = [row for row in self.to_rows() if query(row)]
-        if len(rows) == 0:
-            result_table = Table._from_pandas_dataframe(pd.DataFrame(), self._schema)
-        else:
-            result_table = self.from_rows(rows)
-        return result_table
+        return self.keep_only_rows(query)
 
     _T = TypeVar("_T")
 
@@ -1336,6 +1363,82 @@ class Table:
         1  0
         """
         return Table.from_columns([column for column in self.to_columns() if column.type.is_numeric()])
+
+    def keep_only_rows(self, query: Callable[[Row], bool]) -> Table:
+        """
+        Return a new table containing only the rows that satisfy the query.
+
+        The original table is not modified.
+
+        Parameters
+        ----------
+        query:
+            A callable that returns True if a row should be included in the new table.
+
+        Returns
+        -------
+        table:
+            A table containing only the rows that satisfy the query.
+
+        See Also
+        --------
+        [remove_rows][safeds.data.tabular.containers._table.Table.remove_rows]:
+            Remove rows that satifsfy a query.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table
+        >>> table = Table.from_dict({"a": [1, 3], "b": [2, 4]})
+        >>> table.keep_only_rows(lambda x: x["a"] < 2)
+           a  b
+        0  1  2
+        """
+        import pandas as pd
+
+        rows: list[Row] = [row for row in self.to_rows() if query(row)]
+        if len(rows) == 0:
+            result_table = Table._from_pandas_dataframe(pd.DataFrame(), self._schema)
+        else:
+            result_table = self.from_rows(rows)
+        return result_table
+
+    def remove_rows(self, query: Callable[[Row], bool]) -> Table:
+        """
+        Return a new table without the rows that satisfy the query.
+
+        The original table is not modified.
+
+        Parameters
+        ----------
+        query:
+            A callable that returns True if the row should be removed.
+
+        Returns
+        -------
+        table:
+            A table without the rows that satisfy the query.
+
+        See Also
+        --------
+        [keep_only_rows][safeds.data.tabular.containers._table.Table.keep_only_rows]:
+            Create a table containing only the rows that satisfy a query.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table
+        >>> table = Table.from_dict({"a": [1, 3], "b": [2, 4]})
+        >>> table.remove_rows(lambda x: x["a"] < 2)
+           a  b
+        0  3  4
+        """
+        import pandas as pd
+
+        rows: list[Row] = [row for row in self.to_rows() if not query(row)]
+        if len(rows) == 0:
+            result_table = Table._from_pandas_dataframe(pd.DataFrame(), self._schema)
+        else:
+            result_table = self.from_rows(rows)
+        return result_table
 
     def remove_duplicate_rows(self) -> Table:
         """
@@ -2175,8 +2278,12 @@ class Table:
         n_cols = min(3, self.number_of_columns)
         n_rows = 1 + (self.number_of_columns - 1) // n_cols
 
-        one_col = n_cols == 1 and n_rows == 1
-        fig, axs = plt.subplots(n_rows, n_cols, tight_layout=True, figsize=(n_cols * 3, n_rows * 3))
+        if n_cols == 1 and n_rows == 1:
+            fig, axs = plt.subplots(1, 1, tight_layout=True)
+            one_col = True
+        else:
+            fig, axs = plt.subplots(n_rows, n_cols, tight_layout=True, figsize=(n_cols * 3, n_rows * 3))
+            one_col = False
 
         col_names = self.column_names
         for col_name, ax in zip(col_names, axs.flatten() if not one_col else [axs], strict=False):
@@ -2261,6 +2368,9 @@ class Table:
         If the file and/or the directories do not exist, they will be created. If the file already exists, it will be
         overwritten.
 
+        !!! warning "Deprecated"
+            Use [`to_csv_file`][safeds.data.tabular.containers._table.Table.to_csv_file] instead.
+
         Parameters
         ----------
         path:
@@ -2277,6 +2387,12 @@ class Table:
         >>> table = Table.from_dict({"a": [1, 2, 3], "b": [4, 5, 6]})
         >>> table.to_excel_file("./src/resources/to_excel_file.xlsx")
         """
+        warnings.warn(
+            "This method is deprecated and will be removed in a future version. Use `Table.to_csv_file` instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+
         import openpyxl
 
         path = Path(path)
