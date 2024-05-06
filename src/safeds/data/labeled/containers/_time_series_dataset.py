@@ -98,10 +98,10 @@ class TimeSeriesDataset:
         """
         if not isinstance(other, TimeSeriesDataset):
             return NotImplemented
-        return (
+        return (self is other)or(
             self.target == other.target
             and self.features == other.features
-            and self._table == other._table
+            and self.extras == other.extras
             and self.time == other.time
         )
 
@@ -114,7 +114,7 @@ class TimeSeriesDataset:
         hash:
             The hash value.
         """
-        return _structural_hash(self.target, self.features, self._table, self.time)
+        return _structural_hash(self.target, self.features, self.extras, self.time)
 
     def __sizeof__(self) -> int:
         """

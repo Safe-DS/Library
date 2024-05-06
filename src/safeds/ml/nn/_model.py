@@ -64,6 +64,7 @@ class NeuralNetworkRegressor(Generic[IFT, IPT, OT]):
         self._in_type = None
         self._out_type = None
 
+
     def fit(
         self,
         train_data: IFT,

@@ -29,6 +29,7 @@ class InputConversionTimeSeries(InputConversion[TimeSeriesDataset, TimeSeriesDat
         """
         self._window_size = window_size
         self._forecast_horizon = forecast_horizon
+        self._first = True
         self._target_name: str = ""
         self._time_name: str = ""
         self._feature_names: list[str] = []
@@ -73,6 +74,9 @@ class InputConversionTimeSeries(InputConversion[TimeSeriesDataset, TimeSeriesDat
         return input_data._into_dataloader_with_window_predict(self._window_size, self._forecast_horizon, batch_size)
 
     def _is_fit_data_valid(self, input_data: TimeSeriesDataset) -> bool:
+        if self._first:
+            self._set_parameters(input_data.target.name, input_data.time.name, input_data.features.column_names)
+            self._first = False
         return (
             (sorted(input_data.features.column_names)).__eq__(sorted(self._feature_names))
             and input_data.target.name == self._target_name
