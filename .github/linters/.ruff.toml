@@ -1,3 +1,4 @@
+extend-exclude = ["benchmarks"]
 line-length = 120
 target-version = "py311"
 
