@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from safeds.data.tabular.containers import ExperimentalPolarsRow, ExperimentalPolarsTable
-from safeds.data.tabular.containers._vectorized_cell import _VectorizedCell
+from safeds.data.tabular.containers._experimental_vectorized_cell import _VectorizedCell
 from safeds.data.tabular.typing import Schema, ColumnType
 
 
