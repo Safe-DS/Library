@@ -20,6 +20,7 @@ matplotlib = "^3.6.3"
 openpyxl = "^3.1.2"
 pandas = "^2.0.0"
 pillow = ">=9.5,<11.0"
+polars = {extras = ["pyarrow"], version = "^0.20.23"}
 scikit-learn = "^1.2.0"
 seaborn = "^0.13.0"
 statsmodels = "^0.14.1"
@@ -66,6 +67,18 @@ priority = "explicit"
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
 
+[tool.black]
+line-length = 120
+
+[tool.coverage.report]
+exclude_also = [
+    "if\\s+(typing\\.)?TYPE_CHECKING:",
+    "\\.\\.\\.",
+]
+omit = [
+    "*experimental*.py"
+]
+
 [tool.pytest.ini_options]
 addopts = "--snapshot-warn-unused"
 filterwarnings = [
@@ -73,5 +86,119 @@ filterwarnings = [
     "ignore:Jupyter is migrating its paths to use standard platformdirs"
 ]
 
-[tool.black]
+[tool.ruff]
+extend-exclude = ["benchmarks/**/*.py"]
 line-length = 120
+target-version = "py311"
+
+[tool.ruff.lint]
+ignore-init-module-imports = true
+
+select = [
+    "F",
+    "E",
+    "W",
+    "I",
+    "N",
+    "D",
+    "UP",
+    "YTT",
+    "BLE",
+    "FBT",
+    "B",
+    "A",
+    "COM",
+    "C4",
+    "DTZ",
+    "T10",
+    "ISC",
+    "ICN",
+    "G",
+    "INP",
+    "PIE",
+    "T20",
+    "PYI",
+    "PT",
+    "Q",
+    "RSE",
+    "RET",
+    "SLF",
+    "SIM",
+    "TID",
+    "TCH",
+    "INT",
+    "ARG",
+    "PTH",
+    "PD",
+    "PGH",
+    "PL",
+    "TRY",
+    "NPY",
+    "RUF"
+]
+ignore = [
+    # line-too-long (handled by black)
+    "E501",
+    # tab-indentation (handled by black)
+    "W191",
+    # trailing-whitespace (handled by black)
+    "W291",
+    # missing-newline-at-end-of-file (handled by black)
+    "W292",
+    # blank-line-with-witespace (handled by black)
+    "W293",
+    # boolean-positional-arg-in-function-definition (we leave it to the call-site)
+    "FBT001",
+    # boolean-default-value-in-function-definition (we leave it to the call-site)
+    "FBT002",
+    # builtin-attribute-shadowing (not an issue)
+    "A003",
+    # implicit-return (can add a return even though all cases are covered)
+    "RET503",
+    # superfluous-else-return (sometimes it's more readable)
+    "RET505",
+    # superfluous-else-raise (sometimes it's more readable)
+    "RET506",
+    # superfluous-else-continue (sometimes it's more readable)
+    "RET507",
+    # superfluous-else-break (sometimes it's more readable)
+    "RET508",
+    # private-member-access (we cannot always avoid it if we want a clean API)
+    "SLF001",
+    # if-else-block-instead-of-if-exp (an if-else block can be more readable)
+    "SIM108",
+    # compare-to-empty-string (sometimes it's better to be explicit)
+    "PLC1901",
+    # too-many-return-statements
+    "PLR0911",
+    # too-many-branches
+    "PLR0912",
+    # too-many-arguments
+    "PLR0913",
+    # too-many-statements
+    "PLR0915",
+    # magic-value-comparison
+    "PLR2004",
+    # raise-vanilla-args
+    "TRY003",
+]
+
+[tool.ruff.lint.per-file-ignores]
+"*test*.py" = [
+    # Undocumented declarations
+    "D100",
+    "D101",
+    "D102",
+    "D103",
+    "D104",
+    "D105",
+    "D106",
+    "D107",
+]
+"__init__.py" = [
+    # runtime-import-in-type-checking-block: Does not work with apipkg.
+    "TCH004",
+]
+
+[tool.ruff.lint.pydocstyle]
+convention = "numpy"

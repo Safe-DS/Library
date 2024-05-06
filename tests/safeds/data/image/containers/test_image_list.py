@@ -1,3 +1,4 @@
+import math
 import random
 import sys
 import tempfile
@@ -13,6 +14,7 @@ from safeds.data.image.containers._single_size_image_list import _SingleSizeImag
 from safeds.data.tabular.containers import Table
 from safeds.exceptions import DuplicateIndexError, IllegalFormatError, IndexOutOfBoundsError, OutOfBoundsError
 from syrupy import SnapshotAssertion
+from torch import Tensor
 
 from tests.helpers import (
     grayscale_jpg_path,
@@ -152,6 +154,13 @@ class TestAllImageCombinations:
 
         # Test channel
         assert image_list.channel == expected_channel
+
+        # Test sizes
+        assert image_list.sizes == [
+            image1_with_expected_channel.size,
+            image2_with_expected_channel.size,
+            image3_with_expected_channel.size,
+        ]
 
         # Test number_of_sizes
         assert image_list.number_of_sizes == len({(image.width, image.height) for image in [image1, image2, image3]})
@@ -450,7 +459,13 @@ class TestFromFiles:
     def test_from_files_creation(self, resource_path: str | Path, snapshot_png_image_list: SnapshotAssertion) -> None:
         torch.set_default_device(torch.device("cpu"))
         image_list = ImageList.from_files(resolve_resource_path(resource_path))
+        image_list_returned_filenames, filenames = ImageList.from_files(
+            resolve_resource_path(resource_path),
+            return_filenames=True,
+        )
         assert image_list == snapshot_png_image_list
+        assert image_list == image_list_returned_filenames
+        assert len(image_list) == len(filenames)
 
     @pytest.mark.parametrize(
         "resource_path",
@@ -602,6 +617,7 @@ class TestToJpegFiles:
             assert set(image_list.widths) == set(image_list_loaded.widths)
             assert set(image_list.heights) == set(image_list_loaded.heights)
             assert image_list.channel == image_list_loaded.channel
+            assert set(image_list.sizes) == set(image_list_loaded.sizes)
 
             for tmp_dir in tmp_dirs:
                 tmp_dir.cleanup()
@@ -696,6 +712,7 @@ class TestToPngFiles:
             assert set(image_list.widths) == set(image_list_loaded.widths)
             assert set(image_list.heights) == set(image_list_loaded.heights)
             assert image_list.channel == image_list_loaded.channel
+            assert set(image_list.sizes) == set(image_list_loaded.sizes)
 
             for tmp_dir in tmp_dirs:
                 tmp_dir.cleanup()
@@ -1206,6 +1223,99 @@ class TestErrorsAndWarningsWithEmptyImageList:
             assert image_list_original == image_list_clone
 
 
+class TestSingleSizeImageList:
+
+    @pytest.mark.parametrize(
+        "tensor",
+        [
+            torch.ones(4, 1, 1),
+        ],
+    )
+    def test_create_from_tensor_3_dim(self, tensor: Tensor) -> None:
+        expected_tensor = tensor.unsqueeze(dim=1)
+        image_list = _SingleSizeImageList._create_from_tensor(tensor, list(range(tensor.size(0))))
+        assert image_list._tensor_positions_to_indices == list(range(tensor.size(0)))
+        assert len(image_list) == expected_tensor.size(0)
+        assert image_list.widths[0] == expected_tensor.size(3)
+        assert image_list.heights[0] == expected_tensor.size(2)
+        assert image_list.channel == expected_tensor.size(1)
+
+    @pytest.mark.parametrize(
+        "tensor",
+        [
+            torch.ones(4, 3, 1, 1),
+        ],
+    )
+    def test_create_from_tensor_4_dim(self, tensor: Tensor) -> None:
+        image_list = _SingleSizeImageList._create_from_tensor(tensor, list(range(tensor.size(0))))
+        assert image_list._tensor_positions_to_indices == list(range(tensor.size(0)))
+        assert len(image_list) == tensor.size(0)
+        assert image_list.widths[0] == tensor.size(3)
+        assert image_list.heights[0] == tensor.size(2)
+        assert image_list.channel == tensor.size(1)
+
+    @pytest.mark.parametrize("tensor", [torch.ones(4, 3, 1, 1, 1), torch.ones(4, 3)], ids=["5-dim", "2-dim"])
+    def test_should_raise_from_invalid_tensor(self, tensor: Tensor) -> None:
+        with pytest.raises(
+            ValueError,
+            match=rf"Invalid Tensor. This Tensor requires 3 or 4 dimensions but has {tensor.dim()}",
+        ):
+            _SingleSizeImageList._create_from_tensor(tensor, list(range(tensor.size(0))))
+
+    @pytest.mark.parametrize(
+        "tensor",
+        [
+            torch.randn(16, 4, 4),
+        ],
+    )
+    def test_get_batch_and_iterate_3_dim(self, tensor: Tensor) -> None:
+        expected_tensor = tensor.unsqueeze(dim=1)
+        image_list = _SingleSizeImageList._create_from_tensor(tensor, list(range(tensor.size(0))))
+        batch_size = math.ceil(expected_tensor.size(0) / 1.999)
+        assert image_list._get_batch(0, batch_size).size(0) == batch_size
+        assert torch.all(torch.eq(image_list._get_batch(0, 1), image_list._get_batch(0)))
+        assert torch.all(
+            torch.eq(image_list._get_batch(0, batch_size), expected_tensor[:batch_size].to(torch.float32) / 255),
+        )
+        assert torch.all(
+            torch.eq(image_list._get_batch(1, batch_size), expected_tensor[batch_size:].to(torch.float32) / 255),
+        )
+        iterate_image_list = iter(image_list)
+        assert iterate_image_list == image_list
+        assert iterate_image_list is not image_list
+        iterate_image_list._batch_size = batch_size
+        assert torch.all(torch.eq(image_list._get_batch(0, batch_size), next(iterate_image_list)))
+        assert torch.all(torch.eq(image_list._get_batch(1, batch_size), next(iterate_image_list)))
+        with pytest.raises(IndexOutOfBoundsError, match=rf"There is no element at index '{batch_size * 2}'."):
+            image_list._get_batch(2, batch_size)
+        with pytest.raises(StopIteration):
+            next(iterate_image_list)
+
+    @pytest.mark.parametrize(
+        "tensor",
+        [
+            torch.randn(16, 4, 4, 4),
+        ],
+    )
+    def test_get_batch_and_iterate_4_dim(self, tensor: Tensor) -> None:
+        image_list = _SingleSizeImageList._create_from_tensor(tensor, list(range(tensor.size(0))))
+        batch_size = math.ceil(tensor.size(0) / 1.999)
+        assert image_list._get_batch(0, batch_size).size(0) == batch_size
+        assert torch.all(torch.eq(image_list._get_batch(0, 1), image_list._get_batch(0)))
+        assert torch.all(torch.eq(image_list._get_batch(0, batch_size), tensor[:batch_size].to(torch.float32) / 255))
+        assert torch.all(torch.eq(image_list._get_batch(1, batch_size), tensor[batch_size:].to(torch.float32) / 255))
+        iterate_image_list = iter(image_list)
+        assert iterate_image_list == image_list
+        assert iterate_image_list is not image_list
+        iterate_image_list._batch_size = batch_size
+        assert torch.all(torch.eq(image_list._get_batch(0, batch_size), next(iterate_image_list)))
+        assert torch.all(torch.eq(image_list._get_batch(1, batch_size), next(iterate_image_list)))
+        with pytest.raises(IndexOutOfBoundsError, match=rf"There is no element at index '{batch_size * 2}'."):
+            image_list._get_batch(2, batch_size)
+        with pytest.raises(StopIteration):
+            next(iterate_image_list)
+
+
 class TestEmptyImageList:
 
     def test_warn_empty_image_list(self) -> None:
@@ -1266,6 +1376,9 @@ class TestEmptyImageList:
 
     def test_channel(self) -> None:
         assert _EmptyImageList().channel is NotImplemented
+
+    def test_sizes(self) -> None:
+        assert _EmptyImageList().sizes == []
 
     def test_number_of_sizes(self) -> None:
         assert _EmptyImageList().number_of_sizes == 0
