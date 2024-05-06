@@ -57,7 +57,7 @@ class TestEq:
         ("output_conversion_ts1", "output_conversion_ts2"),
         [
             (OutputConversionTimeSeries(), Table()),
-            (OutputConversionTimeSeries("2"), OutputConversionTimeSeries(1)),
+            (OutputConversionTimeSeries("2"), OutputConversionTimeSeries("1")),
         ],
     )
     def test_should_not_be_equal(
