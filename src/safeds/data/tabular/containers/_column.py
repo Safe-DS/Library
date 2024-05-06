@@ -21,6 +21,8 @@ if TYPE_CHECKING:
 
     import pandas as pd
 
+    from safeds.data.tabular.containers import Table
+
 
 T = TypeVar("T")
 R = TypeVar("R")
@@ -564,6 +566,39 @@ class Column(Sequence[T]):
     # Statistics
     # ------------------------------------------------------------------------------------------------------------------
 
+    def summarize_statistics(self) -> Table:
+        """
+        Return a table with a number of statistical key values.
+
+        The original Column is not modified.
+
+        Returns
+        -------
+        statistics:
+            The table with statistics.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("a", [1, 3])
+        >>> column.summarize_statistics()
+                         metric                   a
+        0               minimum                   1
+        1               maximum                   3
+        2                  mean                 2.0
+        3                  mode              [1, 3]
+        4                median                 2.0
+        5              variance                 2.0
+        6    standard deviation  1.4142135623730951
+        7   missing value count                   0
+        8   missing value ratio                 0.0
+        9                idness                 1.0
+        10            stability                 0.5
+        """
+        from safeds.data.tabular.containers import Table
+
+        return Table({self._name: self._data}).summarize_statistics()
+
     def correlation_with(self, other_column: Column) -> float:
         """
         Calculate Pearson correlation between this and another column. Both columns have to be numerical.
@@ -976,9 +1011,14 @@ class Column(Sequence[T]):
         buffer.seek(0)
         return Image.from_bytes(buffer.read())
 
-    def plot_histogram(self) -> Image:
+    def plot_histogram(self, *, number_of_bins: int = 10) -> Image:
         """
         Plot a column in a histogram.
+
+        Parameters
+        ----------
+        number_of_bins:
+            The number of bins to use in the histogram. Default is 10.
 
         Returns
         -------
@@ -991,32 +1031,30 @@ class Column(Sequence[T]):
         >>> column = Column("test", [1, 2, 3])
         >>> histogram = column.plot_histogram()
         """
-        import matplotlib.pyplot as plt
-        import seaborn as sns
-
-        fig = plt.figure()
-        ax = sns.histplot(data=self._data)
-        ax.set_xticks(ax.get_xticks())
-        ax.set(xlabel=self.name)
-        ax.set_xticklabels(
-            ax.get_xticklabels(),
-            rotation=45,
-            horizontalalignment="right",
-        )  # rotate the labels of the x Axis to prevent the chance of overlapping of the labels
-        plt.tight_layout()
-
-        buffer = io.BytesIO()
-        fig.savefig(buffer, format="png")
-        plt.close()  # Prevents the figure from being displayed directly
-        buffer.seek(0)
-        return Image.from_bytes(buffer.read())
+        from safeds.data.tabular.containers import Table
+        
+        return Table({self._name: self._data}).plot_histograms(number_of_bins=number_of_bins)
 
     # ------------------------------------------------------------------------------------------------------------------
     # Conversion
     # ------------------------------------------------------------------------------------------------------------------
 
+    def to_table(self) -> Table:
+        """
+        Create a table that contains only this column.
+
+        Returns
+        -------
+        table:
+            The table with this column.
+        """
+        # Must be imported here to avoid circular imports
+        from safeds.data.tabular.containers import Table
+
+        return Table.from_columns([self])
+
     def to_html(self) -> str:
-        r"""
+        """
         Return an HTML representation of the column.
 
         Returns
@@ -1040,7 +1078,7 @@ class Column(Sequence[T]):
     # ------------------------------------------------------------------------------------------------------------------
 
     def _repr_html_(self) -> str:
-        r"""
+        """
         Return an HTML representation of the column.
 
         Returns

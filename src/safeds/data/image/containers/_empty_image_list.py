@@ -61,7 +61,7 @@ class _EmptyImageList(ImageList):
     def _create_image_list(images: list[Tensor], indices: list[int]) -> ImageList:
         raise NotImplementedError
 
-    def clone(self) -> ImageList:
+    def _clone(self) -> ImageList:
         return _EmptyImageList()
 
     def __eq__(self, other: object) -> bool:

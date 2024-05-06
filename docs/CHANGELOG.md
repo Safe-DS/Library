@@ -1,3 +1,17 @@
+## [0.23.0](https://github.com/Safe-DS/Library/compare/v0.22.1...v0.23.0) (2024-05-04)
+
+
+### Features
+
+* add `Column.to_table` ([#705](https://github.com/Safe-DS/Library/issues/705)) ([36e4a7a](https://github.com/Safe-DS/Library/commit/36e4a7abc03bb826a4f55bf02575e45fd5412bf8)), closes [#695](https://github.com/Safe-DS/Library/issues/695)
+* added Column.summarize_statistics() ([#715](https://github.com/Safe-DS/Library/issues/715)) ([71730a9](https://github.com/Safe-DS/Library/commit/71730a99a8af16b3e1e0e3c478250768785ca4d9)), closes [#701](https://github.com/Safe-DS/Library/issues/701)
+* replace other values than NaN with imputer ([#707](https://github.com/Safe-DS/Library/issues/707)) ([4a059e0](https://github.com/Safe-DS/Library/commit/4a059e09a4c66397cf266f71c4248543e2e972e5)), closes [#643](https://github.com/Safe-DS/Library/issues/643)
+
+
+### Bug Fixes
+
+* use UTF-8 encoding when opening files ([#704](https://github.com/Safe-DS/Library/issues/704)) ([f8c27bc](https://github.com/Safe-DS/Library/commit/f8c27bcd5e1edb0243a1d785740b1883b477db4b))
+
 ## [0.22.1](https://github.com/Safe-DS/Library/compare/v0.22.0...v0.22.1) (2024-05-02)
 
 

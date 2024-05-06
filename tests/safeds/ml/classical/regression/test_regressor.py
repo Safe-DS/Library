@@ -343,6 +343,52 @@ class DummyRegressor(Regressor):
         pass
 
 
+class TestSummarizeMetrics:
+    @pytest.mark.parametrize(
+        ("predicted", "expected", "result"),
+        [
+            (
+                [1, 2],
+                [1, 2],
+                Table(
+                    {
+                        "metric": ["mean_absolute_error", "mean_squared_error"],
+                        "value": [0.0, 0.0],
+                    },
+                ),
+            ),
+        ],
+    )
+    def test_valid_data(self, predicted: list[float], expected: list[float], result: Table) -> None:
+        table = Table(
+            {
+                "predicted": predicted,
+                "expected": expected,
+            },
+        ).to_tabular_dataset(
+            target_name="expected",
+        )
+
+        assert DummyRegressor().summarize_metrics(table) == result
+
+    @pytest.mark.parametrize(
+        "table",
+        [
+            Table(
+                {
+                    "a": [1.0, 0.0, 0.0, 0.0],
+                    "b": [0.0, 1.0, 1.0, 0.0],
+                    "c": [0.0, 0.0, 0.0, 1.0],
+                },
+            ),
+        ],
+        ids=["table"],
+    )
+    def test_should_raise_if_given_normal_table(self, table: Table) -> None:
+        with pytest.raises(PlainTableError):
+            DummyRegressor().summarize_metrics(table)  # type: ignore[arg-type]
+
+
 class TestMeanAbsoluteError:
     @pytest.mark.parametrize(
         ("predicted", "expected", "result"),

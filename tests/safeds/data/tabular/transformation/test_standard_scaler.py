@@ -111,21 +111,15 @@ class TestIsFitted:
         assert fitted_transformer.is_fitted
 
 
-class TestFitAndTransformOnMultipleTables:
+class TestFitAndTransform:
     @pytest.mark.parametrize(
-        ("fit_and_transform_table", "only_transform_table", "column_names", "expected_1", "expected_2"),
+        ("table", "column_names", "expected"),
         [
             (
                 Table(
                     {
                         "col1": [0.0, 0.0, 1.0, 1.0],
                         "col2": [0.0, 0.0, 1.0, 1.0],
-                    },
-                ),
-                Table(
-                    {
-                        "col1": [2],
-                        "col2": [2],
                     },
                 ),
                 None,
@@ -135,30 +129,20 @@ class TestFitAndTransformOnMultipleTables:
                         "col2": [-1.0, -1.0, 1.0, 1.0],
                     },
                 ),
-                Table(
-                    {
-                        "col1": [3.0],
-                        "col2": [3.0],
-                    },
-                ),
             ),
         ],
         ids=["two_columns"],
     )
-    def test_should_return_transformed_tables(
+    def test_should_return_fitted_transformer_and_transformed_table(
         self,
-        fit_and_transform_table: Table,
-        only_transform_table: Table,
+        table: Table,
         column_names: list[str] | None,
-        expected_1: Table,
-        expected_2: Table,
+        expected: Table,
     ) -> None:
-        s = StandardScaler().fit(fit_and_transform_table, column_names)
-        assert s.fit_and_transform(fit_and_transform_table, column_names) == expected_1
-        assert s.transform(only_transform_table) == expected_2
+        fitted_transformer, transformed_table = StandardScaler().fit_and_transform(table, column_names)
+        assert fitted_transformer.is_fitted
+        assert_that_tables_are_close(transformed_table, expected)
 
-
-class TestFitAndTransform:
     def test_should_not_change_original_table(self) -> None:
         table = Table(
             {
