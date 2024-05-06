@@ -34,7 +34,6 @@ class ExperimentalPolarsTable:
     | [from_json_file][safeds.data.tabular.containers._experimental_polars_table.ExperimentalPolarsTable.from_json_file] | Create a table from a JSON file.       |
     | [from_dict][safeds.data.tabular.containers._experimental_polars_table.ExperimentalPolarsTable.from_dict]           | Create a table from a dictionary.      |
     | [from_columns][safeds.data.tabular.containers._experimental_polars_table.ExperimentalPolarsTable.from_columns]     | Create a table from a list of columns. |
-    | [from_rows][safeds.data.tabular.containers._experimental_polars_table.ExperimentalPolarsTable.from_rows]           | Create a table from a list of rows.    |
 
     Parameters
     ----------
