@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
+from safeds.data.image.typing import ImageSize
+
 if TYPE_CHECKING:
     from torch import Tensor, nn
 
@@ -95,7 +97,7 @@ class LSTMLayer(Layer):
         """
         return self._output_size
 
-    def _set_input_size(self, input_size: int) -> None:
+    def _set_input_size(self, input_size: int| ImageSize) -> None:
         if input_size < 1:
             raise OutOfBoundsError(actual=input_size, name="input_size", lower_bound=ClosedBound(1))
         self._input_size = input_size
