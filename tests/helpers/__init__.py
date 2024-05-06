@@ -2,6 +2,13 @@ from ._assertions import (
     assert_that_tables_are_close,
     assert_that_tabular_datasets_are_equal,
 )
+from ._devices import (
+    device_cpu,
+    device_cuda,
+    get_devices,
+    get_devices_ids,
+    skip_if_device_not_available,
+)
 from ._images import (
     grayscale_jpg_id,
     grayscale_jpg_path,
@@ -25,21 +32,29 @@ from ._images import (
     white_square_png_id,
     white_square_png_path,
 )
+from ._operating_systems import os_linux, os_mac, os_windows, skip_if_os
 from ._resources import resolve_resource_path
 
 __all__ = [
     "assert_that_tables_are_close",
     "assert_that_tabular_datasets_are_equal",
+    "device_cpu",
+    "device_cuda",
     "grayscale_jpg_id",
     "grayscale_jpg_path",
     "grayscale_png_id",
     "grayscale_png_path",
+    "get_devices",
+    "get_devices_ids",
     "images_all",
     "images_all_channel",
     "images_all_channel_ids",
     "images_all_ids",
     "images_asymmetric",
     "images_asymmetric_ids",
+    "os_linux",
+    "os_mac",
+    "os_windows",
     "plane_jpg_id",
     "plane_jpg_path",
     "plane_png_id",
@@ -47,6 +62,8 @@ __all__ = [
     "resolve_resource_path",
     "rgba_png_id",
     "rgba_png_path",
+    "skip_if_device_not_available",
+    "skip_if_os",
     "test_images_folder",
     "white_square_jpg_id",
     "white_square_jpg_path",

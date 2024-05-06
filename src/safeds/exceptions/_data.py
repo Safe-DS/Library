@@ -127,6 +127,13 @@ class ColumnLengthMismatchError(Exception):
         super().__init__(f"The length of at least one column differs: \n{column_info}")
 
 
+class OutputLengthMismatchError(Exception):
+    """Exception raised when the lengths of the input and output container does not match."""
+
+    def __init__(self, output_info: str):
+        super().__init__(f"The length of the output container differs: \n{output_info}")
+
+
 class TransformerNotFittedError(Exception):
     """Raised when a transformer is used before fitting it."""
 
@@ -146,7 +153,7 @@ class ValueNotPresentWhenFittedError(Exception):
         )
 
 
-class WrongFileExtensionError(Exception):
+class WrongFileExtensionError(ValueError):
     """Exception raised when the file has the wrong file extension."""
 
     def __init__(self, file: str | Path, file_extension: str | list[str]) -> None:

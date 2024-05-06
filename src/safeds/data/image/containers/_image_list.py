@@ -5,7 +5,7 @@ import math
 import os
 from abc import ABCMeta, abstractmethod
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Literal, overload
 
 from safeds.data.image.containers._image import Image
 
@@ -16,6 +16,7 @@ if TYPE_CHECKING:
 
     from safeds.data.image.containers._multi_size_image_list import _MultiSizeImageList
     from safeds.data.image.containers._single_size_image_list import _SingleSizeImageList
+    from safeds.data.image.typing import ImageSize
 
 
 class ImageList(metaclass=ABCMeta):
@@ -80,7 +81,32 @@ class ImageList(metaclass=ABCMeta):
         return _SingleSizeImageList._create_image_list([image._image_tensor for image in images], indices)
 
     @staticmethod
-    def from_files(path: str | Path | Sequence[str | Path]) -> ImageList:
+    @overload
+    def from_files(path: str | Path | Sequence[str | Path]) -> ImageList: ...
+
+    @staticmethod
+    @overload
+    def from_files(path: str | Path | Sequence[str | Path], return_filenames: Literal[False]) -> ImageList: ...
+
+    @staticmethod
+    @overload
+    def from_files(
+        path: str | Path | Sequence[str | Path],
+        return_filenames: Literal[True],
+    ) -> tuple[ImageList, list[str]]: ...
+
+    @staticmethod
+    @overload
+    def from_files(
+        path: str | Path | Sequence[str | Path],
+        return_filenames: bool,
+    ) -> ImageList | tuple[ImageList, list[str]]: ...
+
+    @staticmethod
+    def from_files(
+        path: str | Path | Sequence[str | Path],
+        return_filenames: bool = False,
+    ) -> ImageList | tuple[ImageList, list[str]]:
         """
         Create an ImageList from a directory or a list of files.
 
@@ -90,6 +116,8 @@ class ImageList(metaclass=ABCMeta):
         ----------
         path:
             the path to the directory or a list of files
+        return_filenames:
+            if True the output will be a tuple which contains a list of the filenames in order of the images
 
         Returns
         -------
@@ -102,7 +130,7 @@ class ImageList(metaclass=ABCMeta):
             If the directory or one of the files of the path cannot be found
         """
         from PIL.Image import open as pil_image_open
-        from torchvision.transforms.functional import pil_to_tensor
+        from torchvision.transforms.v2.functional import pil_to_tensor
 
         from safeds.data.image.containers._empty_image_list import _EmptyImageList
         from safeds.data.image.containers._multi_size_image_list import _MultiSizeImageList
@@ -112,6 +140,7 @@ class ImageList(metaclass=ABCMeta):
             return _EmptyImageList()
 
         image_tensors = []
+        file_names = []
         fixed_size = True
 
         path_list: list[str | Path]
@@ -125,6 +154,7 @@ class ImageList(metaclass=ABCMeta):
                 path_list += sorted([p / name for name in os.listdir(p)])
             else:
                 image_tensors.append(pil_to_tensor(pil_image_open(p)))
+                file_names.append(str(p))
                 if fixed_size and (
                     image_tensors[0].size(dim=2) != image_tensors[-1].size(dim=2)
                     or image_tensors[0].size(dim=1) != image_tensors[-1].size(dim=1)
@@ -137,9 +167,14 @@ class ImageList(metaclass=ABCMeta):
         indices = list(range(len(image_tensors)))
 
         if fixed_size:
-            return _SingleSizeImageList._create_image_list(image_tensors, indices)
+            image_list = _SingleSizeImageList._create_image_list(image_tensors, indices)
         else:
-            return _MultiSizeImageList._create_image_list(image_tensors, indices)
+            image_list = _MultiSizeImageList._create_image_list(image_tensors, indices)
+
+        if return_filenames:
+            return image_list, file_names
+        else:
+            return image_list
 
     @abstractmethod
     def _clone(self) -> ImageList:
@@ -298,6 +333,18 @@ class ImageList(metaclass=ABCMeta):
         -------
         channel:
             The channel of all images
+        """
+
+    @property
+    @abstractmethod
+    def sizes(self) -> list[ImageSize]:
+        """
+        Return the sizes of all images.
+
+        Returns
+        -------
+        sizes:
+            The sizes of all images
         """
 
     @property
