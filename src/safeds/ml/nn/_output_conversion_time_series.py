@@ -40,8 +40,8 @@ class OutputConversionTimeSeries(OutputConversion[TimeSeriesDataset, TimeSeriesD
         equals:
             Whether the instances are the same.
         """
-        if not isinstance(other, type(self)):
-            return NotImplemented
+        if not isinstance(other, OutputConversionTimeSeries):
+            return False
         return self._prediction_name == other._prediction_name
 
     def __sizeof__(self) -> int:

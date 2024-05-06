@@ -53,6 +53,20 @@ class TestEq:
     ) -> None:
         assert output_conversion_ts1 == output_conversion_ts2
 
+    @pytest.mark.parametrize(
+        ("output_conversion_ts1", "output_conversion_ts2"),
+        [
+            (OutputConversionTimeSeries(), Table()),
+            (OutputConversionTimeSeries("2"), OutputConversionTimeSeries(1)),
+        ],
+    )
+    def test_should_not_be_equal(
+        self,
+        output_conversion_ts1: OutputConversionTimeSeries,
+        output_conversion_ts2: OutputConversionTimeSeries,
+    ) -> None:
+        assert output_conversion_ts1 != output_conversion_ts2
+
 
 class TestHash:
 
