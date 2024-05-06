@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Literal, TypeVar
+from typing import TYPE_CHECKING, Any, Literal
 
 from safeds._utils import _check_and_normalize_file_path
 from safeds.data.tabular.containers import Table
@@ -370,7 +370,9 @@ class ExperimentalPolarsTable:
         │ 2   ┆ 5   │
         └─────┴─────┘
         """
-        return ExperimentalPolarsTable._from_polars_lazy_frame(self._lazy_frame.unique())
+        return ExperimentalPolarsTable._from_polars_lazy_frame(
+            self._lazy_frame.unique(maintain_order=True),
+        )
 
     def remove_rows(
         self,
@@ -447,7 +449,6 @@ class ExperimentalPolarsTable:
         name: str,
         *,
         descending: bool = False,
-        maintain_order_if_equal: bool = False,
     ) -> ExperimentalPolarsTable:
         raise NotImplementedError
 
