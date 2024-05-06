@@ -40,7 +40,7 @@ def _create_internal_model(input_size: int, output_size: int, activation_functio
 
 
 class LSTMLayer(Layer):
-    def __init__(self, output_size: int, input_size: int | None = None):
+    def __init__(self, output_size: int, input_size: int | ImageSize | None = None):
         """
         Create a LSTM Layer.
 
@@ -97,7 +97,7 @@ class LSTMLayer(Layer):
         """
         return self._output_size
 
-    def _set_input_size(self, input_size: int| ImageSize) -> None:
+    def _set_input_size(self, input_size: int | ImageSize) -> None:
         if input_size < 1:
             raise OutOfBoundsError(actual=input_size, name="input_size", lower_bound=ClosedBound(1))
         self._input_size = input_size
