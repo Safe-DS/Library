@@ -67,6 +67,10 @@ class ExperimentalPolarsCell(ABC, Generic[T]):
     def __lt__(self, other: Any) -> ExperimentalPolarsCell[bool]:
         ...
 
+    @abstractmethod
+    def __ne__(self, other: object) -> ExperimentalPolarsCell[bool]:
+        ...
+
     # Numeric operators --------------------------------------------------------
 
     @abstractmethod
