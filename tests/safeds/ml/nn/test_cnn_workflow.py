@@ -206,5 +206,5 @@ class TestImageToImageRegressor:
         nn = nn_original.fit(image_dataset, epoch_size=20)
         assert str(nn_original._model.state_dict().values()) != str(nn._model.state_dict().values())
         #assert nn._model.state_dict()["_pytorch_layers.3._layer.bias"].tolist() == layer_3_bias
-        prediction: ImageDataset = nn.predict(image_dataset.get_input())
+        nn.predict(image_dataset.get_input())
         #assert prediction.get_output() == snapshot_png_image_list
