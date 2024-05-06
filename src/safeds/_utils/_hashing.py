@@ -4,13 +4,13 @@ import struct
 from typing import Any
 
 
-def _structural_hash(*value: Any) -> int:
+def _structural_hash(*values: Any) -> int:
     """
     Calculate a deterministic hash value, based on the provided values.
 
     Parameters
     ----------
-    value:
+    values:
         Variable amount of values to hash
 
     Returns
@@ -20,7 +20,7 @@ def _structural_hash(*value: Any) -> int:
     """
     import xxhash
 
-    return xxhash.xxh3_64(_value_to_bytes(value)).intdigest()
+    return xxhash.xxh3_64(_value_to_bytes(values)).intdigest()
 
 
 def _value_to_bytes(value: Any) -> bytes:
