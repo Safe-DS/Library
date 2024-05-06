@@ -21,8 +21,6 @@ if TYPE_CHECKING:
     from ._experimental_polars_column import ExperimentalPolarsColumn
     from ._experimental_polars_row import ExperimentalPolarsRow
 
-_T: TypeVar = TypeVar("_T")
-
 
 class ExperimentalPolarsTable:
     """
@@ -427,13 +425,13 @@ class ExperimentalPolarsTable:
     def remove_rows_with_outliers(
         self,
         column_names: list[str] | None = None,
-    ):
+    ) -> ExperimentalPolarsTable:
         raise NotImplementedError
 
     def shuffle_rows(self) -> ExperimentalPolarsTable:
         raise NotImplementedError
 
-    def slice_rows(self, start: int = 0, end: int | None = None):
+    def slice_rows(self, start: int = 0, end: int | None = None) -> ExperimentalPolarsTable:
         raise NotImplementedError
 
     def sort_rows(
