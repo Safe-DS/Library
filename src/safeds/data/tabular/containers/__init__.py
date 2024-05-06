@@ -5,11 +5,10 @@ from typing import TYPE_CHECKING
 import apipkg
 
 if TYPE_CHECKING:
-    from _exerimental_polars_row import ExperimentalPolarsRow
-
     from ._column import Column
     from ._experimental_polars_cell import ExperimentalPolarsCell
     from ._experimental_polars_column import ExperimentalPolarsColumn
+    from _experimental_polars_row import ExperimentalPolarsRow
     from ._experimental_polars_table import ExperimentalPolarsTable
     from ._row import Row
     from ._table import Table
