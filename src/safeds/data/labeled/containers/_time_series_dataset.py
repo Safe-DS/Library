@@ -40,7 +40,7 @@ class TimeSeriesDataset:
     ValueError
         If the target column is also an extra column.
     ValueError
-        If no feature columns remains.
+        If no feature column remains.
 
     Examples
     --------
