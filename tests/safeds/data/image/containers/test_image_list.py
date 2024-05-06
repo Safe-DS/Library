@@ -61,7 +61,7 @@ class TestAllImageCombinations:
         image3_with_expected_channel = image3.change_channel(expected_channel)
 
         # Test clone
-        image_list_clone = image_list.clone()
+        image_list_clone = image_list._clone()
         assert image_list_clone is not image_list
         assert image_list_clone == image_list
 
@@ -732,7 +732,7 @@ class TestShuffleImages:
     def test_shuffle_images(self, resource_path: list[str], snapshot_png_image_list: SnapshotAssertion) -> None:
         torch.set_default_device(_get_device())
         image_list_original = ImageList.from_files(resolve_resource_path(resource_path))
-        image_list_clone = image_list_original.clone()
+        image_list_clone = image_list_original._clone()
         random.seed(420)
         image_list_shuffled = image_list_original.shuffle_images()
         random.seed()
@@ -816,7 +816,7 @@ class TestTransformsEqualImageTransforms:
                 resolve_resource_path(resource_path3),
             ],
         )
-        image_list_clone = image_list_original.clone()
+        image_list_clone = image_list_original._clone()
 
         if isinstance(attributes, list):
             image_list_transformed = getattr(image_list_original, method)(*attributes)
@@ -862,7 +862,7 @@ class TestTransforms:
             torch.set_default_device(torch.device("cpu"))
             torch.manual_seed(0)
             image_list_original = ImageList.from_files(resolve_resource_path(resource_path))
-            image_list_clone = image_list_original.clone()
+            image_list_clone = image_list_original._clone()
             image_list_noise = image_list_original.add_noise(standard_deviation)
             assert image_list_noise == snapshot_png_image_list
             assert image_list_original is not image_list_clone
@@ -919,7 +919,7 @@ class TestErrorsAndWarningsWithoutEmptyImageList:
             resource_path: list[str],
         ) -> None:
             image_list_original = ImageList.from_files(resolve_resource_path(resource_path)).change_channel(1)
-            image_list_clone = image_list_original.clone()
+            image_list_clone = image_list_original._clone()
             with pytest.warns(
                 UserWarning,
                 match="Color adjustment will not have an affect on grayscale images with only one channel.",
@@ -1033,7 +1033,7 @@ class TestErrorsAndWarningsWithEmptyImageList:
             standard_deviation: float,
         ) -> None:
             image_list_original = ImageList.from_files(resolve_resource_path(resource_path))
-            image_list_clone = image_list_original.clone()
+            image_list_clone = image_list_original._clone()
             with pytest.raises(
                 OutOfBoundsError,
                 match=rf"standard_deviation \(={standard_deviation}\) is not inside \[0, \u221e\)\.",
@@ -1054,7 +1054,7 @@ class TestErrorsAndWarningsWithEmptyImageList:
             factor: float,
         ) -> None:
             image_list_original = ImageList.from_files(resolve_resource_path(resource_path))
-            image_list_clone = image_list_original.clone()
+            image_list_clone = image_list_original._clone()
             with pytest.raises(OutOfBoundsError, match=r"factor \(=-1\) is not inside \[0, \u221e\)."):
                 image_list_original.adjust_brightness(factor)
             assert image_list_original == image_list_clone
@@ -1064,7 +1064,7 @@ class TestErrorsAndWarningsWithEmptyImageList:
             resource_path: list[str],
         ) -> None:
             image_list_original = ImageList.from_files(resolve_resource_path(resource_path))
-            image_list_clone = image_list_original.clone()
+            image_list_clone = image_list_original._clone()
             with pytest.warns(
                 UserWarning,
                 match="Brightness adjustment factor is 1.0, this will not make changes to the images.",
@@ -1086,7 +1086,7 @@ class TestErrorsAndWarningsWithEmptyImageList:
             factor: float,
         ) -> None:
             image_list_original = ImageList.from_files(resolve_resource_path(resource_path))
-            image_list_clone = image_list_original.clone()
+            image_list_clone = image_list_original._clone()
             with pytest.raises(OutOfBoundsError, match=r"factor \(=-1\) is not inside \[0, \u221e\)."):
                 image_list_original.adjust_contrast(factor)
             assert image_list_original == image_list_clone
@@ -1096,7 +1096,7 @@ class TestErrorsAndWarningsWithEmptyImageList:
             resource_path: list[str],
         ) -> None:
             image_list_original = ImageList.from_files(resolve_resource_path(resource_path))
-            image_list_clone = image_list_original.clone()
+            image_list_clone = image_list_original._clone()
             with pytest.warns(
                 UserWarning,
                 match="Contrast adjustment factor is 1.0, this will not make changes to the images.",
@@ -1118,7 +1118,7 @@ class TestErrorsAndWarningsWithEmptyImageList:
             factor: float,
         ) -> None:
             image_list_original = ImageList.from_files(resolve_resource_path(resource_path))
-            image_list_clone = image_list_original.clone()
+            image_list_clone = image_list_original._clone()
             with pytest.raises(OutOfBoundsError, match=r"factor \(=-1\) is not inside \[0, \u221e\)."):
                 image_list_original.adjust_color_balance(factor)
             assert image_list_original == image_list_clone
@@ -1128,7 +1128,7 @@ class TestErrorsAndWarningsWithEmptyImageList:
             resource_path: list[str],
         ) -> None:
             image_list_original = ImageList.from_files(resolve_resource_path(resource_path))
-            image_list_clone = image_list_original.clone()
+            image_list_clone = image_list_original._clone()
             with pytest.warns(
                 UserWarning,
                 match="Color adjustment factor is 1.0, this will not make changes to the images.",
@@ -1141,7 +1141,7 @@ class TestErrorsAndWarningsWithEmptyImageList:
 
         def test_should_raise_radius_out_of_bounds(self, resource_path: str) -> None:
             image_list_original = ImageList.from_files(resolve_resource_path(resource_path))
-            image_list_clone = image_list_original.clone()
+            image_list_clone = image_list_original._clone()
             with pytest.raises(
                 OutOfBoundsError,
                 match=rf"radius \(=-1\) is not inside \[0, {'0' if isinstance(image_list_original, _EmptyImageList) else min(*image_list_original.widths, *image_list_original.heights) - 1}\].",
@@ -1162,7 +1162,7 @@ class TestErrorsAndWarningsWithEmptyImageList:
 
         def test_should_not_blur(self, resource_path: str) -> None:
             image_list_original = ImageList.from_files(resolve_resource_path(resource_path))
-            image_list_clone = image_list_original.clone()
+            image_list_clone = image_list_original._clone()
             with pytest.warns(
                 UserWarning,
                 match="Blur radius is 0, this will not make changes to the images.",
@@ -1184,7 +1184,7 @@ class TestErrorsAndWarningsWithEmptyImageList:
             factor: float,
         ) -> None:
             image_list_original = ImageList.from_files(resolve_resource_path(resource_path))
-            image_list_clone = image_list_original.clone()
+            image_list_clone = image_list_original._clone()
             with pytest.raises(OutOfBoundsError, match=r"factor \(=-1\) is not inside \[0, \u221e\)."):
                 image_list_original.sharpen(factor)
             assert image_list_original == image_list_clone
@@ -1194,7 +1194,7 @@ class TestErrorsAndWarningsWithEmptyImageList:
             resource_path: list[str],
         ) -> None:
             image_list_original = ImageList.from_files(resolve_resource_path(resource_path))
-            image_list_clone = image_list_original.clone()
+            image_list_clone = image_list_original._clone()
             with pytest.warns(
                 UserWarning,
                 match="Sharpen factor is 1.0, this will not make changes to the images.",
@@ -1235,8 +1235,8 @@ class TestEmptyImageList:
             assert ImageList.from_files([tmpdir]) == _EmptyImageList()
 
     def test_clone(self) -> None:
-        assert _EmptyImageList() == _EmptyImageList().clone()
-        assert _EmptyImageList() is _EmptyImageList().clone()  # Singleton
+        assert _EmptyImageList() == _EmptyImageList()._clone()
+        assert _EmptyImageList() is _EmptyImageList()._clone()  # Singleton
 
     def test_repr_png(self) -> None:
         with pytest.raises(TypeError, match=r"You cannot display an empty ImageList"):

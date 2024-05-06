@@ -95,7 +95,7 @@ class _SingleSizeImageList(ImageList):
 
         return image_list
 
-    def clone(self) -> ImageList:
+    def _clone(self) -> ImageList:
         cloned_image_list = self._clone_without_tensor()
         cloned_image_list._tensor = self._tensor.detach().clone()
         return cloned_image_list
@@ -565,7 +565,7 @@ class _SingleSizeImageList(ImageList):
         return image_list
 
     def shuffle_images(self) -> ImageList:
-        image_list = self.clone()._as_single_size_image_list()
+        image_list = self._clone()._as_single_size_image_list()
         random.shuffle(image_list._tensor_positions_to_indices)
         image_list._indices_to_tensor_positions = image_list._calc_new_indices_to_tensor_positions()
         return image_list

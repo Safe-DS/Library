@@ -197,13 +197,15 @@ class TestFitAndTransform:
         ],
         ids=["None", "col1"],
     )
-    def test_should_return_transformed_table(
+    def test_should_return_fitted_transformer_and_transformed_table(
         self,
         table: Table,
         column_names: list[str] | None,
         expected: Table,
     ) -> None:
-        assert Discretizer().fit_and_transform(table, column_names) == expected
+        fitted_transformer, transformed_table = Discretizer().fit_and_transform(table, column_names)
+        assert fitted_transformer.is_fitted
+        assert transformed_table == expected
 
     @pytest.mark.parametrize(
         ("table", "number_of_bins", "expected"),
@@ -243,7 +245,9 @@ class TestFitAndTransform:
         number_of_bins: int,
         expected: Table,
     ) -> None:
-        assert Discretizer(number_of_bins).fit_and_transform(table, ["col1"]) == expected
+        fitted_transformer, transformed_table = Discretizer(number_of_bins).fit_and_transform(table, ["col1"])
+        assert fitted_transformer.is_fitted
+        assert transformed_table == expected
 
     def test_should_not_change_original_table(self) -> None:
         table = Table(

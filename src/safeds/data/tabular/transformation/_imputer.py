@@ -116,7 +116,6 @@ class Imputer(TableTransformer):
         """Whether the transformer is fitted."""
         return self._wrapped_transformer is not None
 
-    # noinspection PyProtectedMember
     def fit(self, table: Table, column_names: list[str] | None) -> Imputer:
         """
         Learn a transformation for a set of columns in a table.
@@ -199,7 +198,6 @@ class Imputer(TableTransformer):
 
         return result
 
-    # noinspection PyProtectedMember
     def transform(self, table: Table) -> Table:
         """
         Apply the learned transformation to a table.
