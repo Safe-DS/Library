@@ -19,7 +19,7 @@ def test_lstm_model() -> None:
     rs = RangeScaler()
     # ss_2 = RangeScaler()
     # ss_2 = ss_2.fit(table, ["value"])
-    table = rs.fit_and_transform(table, ["value"])
+    _, table = rs.fit_and_transform(table, ["value"])
     train_table, test_table = table.split_rows(0.8)
 
     model = NeuralNetworkRegressor(

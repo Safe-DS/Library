@@ -18,12 +18,12 @@ def test_lstm_model() -> None:
     )
     table_1 = table_1.remove_columns(["date"])
     table_2 = Table.from_rows(table_1.to_rows()[:-14])
-    table_2 = table_2.add_column(Table.from_rows(table_1.to_rows()[14:]).get_column("value").rename("target"))
+    table_2 = table_2.add_columns([Table.from_rows(table_1.to_rows()[14:]).get_column("value").rename("target")])
     train_table, test_table = table_2.split_rows(0.8)
 
     ss = StandardScaler()
-    train_table = ss.fit_and_transform(train_table, ["value"])
-    test_table = ss.fit_and_transform(test_table, ["value"])
+    _, train_table = ss.fit_and_transform(train_table, ["value"])
+    _, test_table = ss.fit_and_transform(test_table, ["value"])
     model = NeuralNetworkRegressor(
         InputConversionTable(),
         [ForwardLayer(input_size=1, output_size=1)],
