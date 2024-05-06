@@ -30,7 +30,7 @@ from tests.helpers import (
     white_square_jpg_id,
     white_square_jpg_path,
     white_square_png_id,
-    white_square_png_path,
+    white_square_png_path, skip_os_dependent, os_windows, os_linux,
 )
 
 _device_cuda = torch.device("cuda")
@@ -727,6 +727,7 @@ class TestAddNoise:
         snapshot_png_image: SnapshotAssertion,
         device: Device,
     ) -> None:
+        skip_os_dependent([os_windows, os_linux])
         _skip_if_device_not_available(device)
         torch.manual_seed(0)
         image = Image.from_file(resolve_resource_path(resource_path), device)
@@ -882,6 +883,7 @@ class TestBlur:
         snapshot_png_image: SnapshotAssertion,
         device: Device,
     ) -> None:
+        skip_os_dependent([os_windows, os_linux])
         _skip_if_device_not_available(device)
         image = Image.from_file(resolve_resource_path(resource_path), device=device)
         image_blurred = image.blur(2)

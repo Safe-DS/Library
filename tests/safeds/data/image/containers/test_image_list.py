@@ -25,7 +25,7 @@ from tests.helpers import (
     plane_png_path,
     resolve_resource_path,
     test_images_folder,
-    white_square_jpg_path,
+    white_square_jpg_path, skip_os_dependent, os_windows, os_linux,
 )
 
 
@@ -858,6 +858,7 @@ class TestTransforms:
             standard_deviation: float,
             snapshot_png_image_list: SnapshotAssertion,
         ) -> None:
+            skip_os_dependent([os_windows, os_linux])
             torch.set_default_device(torch.device("cpu"))
             torch.manual_seed(0)
             image_list_original = ImageList.from_files(resolve_resource_path(resource_path))

@@ -26,6 +26,7 @@ from ._images import (
     white_square_png_id,
     white_square_png_path,
 )
+from ._operating_systems import os_linux, os_mac, os_windows, skip_os_dependent
 from ._resources import resolve_resource_path
 
 __all__ = [
@@ -42,6 +43,9 @@ __all__ = [
     "images_all_ids",
     "images_asymmetric",
     "images_asymmetric_ids",
+    "os_linux",
+    "os_mac",
+    "os_windows",
     "plane_jpg_id",
     "plane_jpg_path",
     "plane_png_id",
@@ -49,6 +53,7 @@ __all__ = [
     "resolve_resource_path",
     "rgba_png_id",
     "rgba_png_path",
+    "skip_os_dependent",
     "test_images_folder",
     "white_square_jpg_id",
     "white_square_jpg_path",
