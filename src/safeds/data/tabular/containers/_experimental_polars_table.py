@@ -87,10 +87,16 @@ class ExperimentalPolarsTable:
         Examples
         --------
         >>> from safeds.data.tabular.containers import ExperimentalPolarsTable
-        >>> table = ExperimentalPolarsTable.from_csv_file("./src/resources/from_csv_file.csv")
-           a  b  c
-        0  1  2  1
-        1  0  0  7
+        >>> ExperimentalPolarsTable.from_csv_file("./src/resources/from_csv_file.csv")
+        shape: (2, 3)
+        ┌─────┬─────┬─────┐
+        │ a   ┆ b   ┆ c   │
+        │ --- ┆ --- ┆ --- │
+        │ i64 ┆ i64 ┆ i64 │
+        ╞═════╪═════╪═════╡
+        │ 1   ┆ 2   ┆ 1   │
+        │ 0   ┆ 0   ┆ 7   │
+        └─────┴─────┴─────┘
         """
         import polars as pl
 
@@ -120,11 +126,18 @@ class ExperimentalPolarsTable:
         Examples
         --------
         >>> from safeds.data.tabular.containers import ExperimentalPolarsTable
-        >>> d = {'a': [1, 2], 'b': [3, 4]}
-        >>> ExperimentalPolarsTable.from_dict(d)
-           a  b
-        0  1  3
-        1  2  4
+        >>> data = {'a': [1, 2, 3], 'b': [4, 5, 6]}
+        >>> ExperimentalPolarsTable.from_dict(data)
+        shape: (3, 2)
+        ┌─────┬─────┐
+        │ a   ┆ b   │
+        │ --- ┆ --- │
+        │ i64 ┆ i64 │
+        ╞═════╪═════╡
+        │ 1   ┆ 4   │
+        │ 2   ┆ 5   │
+        │ 3   ┆ 6   │
+        └─────┴─────┘
         """
         return ExperimentalPolarsTable(data)
 
@@ -181,13 +194,19 @@ class ExperimentalPolarsTable:
         raise NotImplementedError
 
     def __repr__(self) -> str:
-        raise NotImplementedError
+        if self._data_frame is None:
+            self._data_frame = self._lazy_frame.collect()
+
+        return self._data_frame.__repr__()
 
     def __sizeof__(self) -> int:
         raise NotImplementedError
 
     def __str__(self) -> str:
-        raise NotImplementedError
+        if self._data_frame is None:
+            self._data_frame = self._lazy_frame.collect()
+
+        return self._data_frame.__str__()
 
     # ------------------------------------------------------------------------------------------------------------------
     # Properties
@@ -279,6 +298,8 @@ class ExperimentalPolarsTable:
         """
         Return a new table with a column renamed.
 
+        Note that the original table is not modified.
+
         Parameters
         ----------
         old_name:
@@ -296,6 +317,16 @@ class ExperimentalPolarsTable:
         >>> from safeds.data.tabular.containers import ExperimentalPolarsTable
         >>> table = ExperimentalPolarsTable({"a": [1, 2, 3], "b": [4, 5, 6]})
         >>> table.rename_column("a", "A")
+        shape: (3, 2)
+        ┌─────┬─────┐
+        │ A   ┆ b   │
+        │ --- ┆ --- │
+        │ i64 ┆ i64 │
+        ╞═════╪═════╡
+        │ 1   ┆ 4   │
+        │ 2   ┆ 5   │
+        │ 3   ┆ 6   │
+        └─────┴─────┘
         """
         # TODO: raises?
         return ExperimentalPolarsTable._from_polars_lazy_frame(
@@ -331,9 +362,15 @@ class ExperimentalPolarsTable:
         >>> from safeds.data.tabular.containers import ExperimentalPolarsTable
         >>> table = ExperimentalPolarsTable({"a": [1, 2, 2], "b": [4, 5, 5]})
         >>> table.remove_duplicate_rows()
-           a  b
-        0  1  4
-        1  2  5
+        shape: (2, 2)
+        ┌─────┬─────┐
+        │ a   ┆ b   │
+        │ --- ┆ --- │
+        │ i64 ┆ i64 │
+        ╞═════╪═════╡
+        │ 1   ┆ 4   │
+        │ 2   ┆ 5   │
+        └─────┴─────┘
         """
         return ExperimentalPolarsTable._from_polars_lazy_frame(self._lazy_frame.unique())
 
@@ -357,6 +394,8 @@ class ExperimentalPolarsTable:
         """
         Remove rows with missing values from the table.
 
+        Note that the original table is not modified.
+
         Parameters
         ----------
         column_names:
@@ -372,8 +411,14 @@ class ExperimentalPolarsTable:
         >>> from safeds.data.tabular.containers import ExperimentalPolarsTable
         >>> table = ExperimentalPolarsTable({"a": [1, None, 3], "b": [4, 5, None]})
         >>> table.remove_rows_with_missing_values()
-           a  b
-        0  1  4
+        shape: (1, 2)
+        ┌─────┬─────┐
+        │ a   ┆ b   │
+        │ --- ┆ --- │
+        │ i64 ┆ i64 │
+        ╞═════╪═════╡
+        │ 1   ┆ 4   │
+        └─────┴─────┘
         """
         return ExperimentalPolarsTable._from_polars_lazy_frame(
             self._lazy_frame.drop_nulls(subset=column_names),
@@ -491,10 +536,7 @@ class ExperimentalPolarsTable:
         path = _check_and_normalize_file_path(path, ".csv", [".csv"])
         path.parent.mkdir(parents=True, exist_ok=True)
 
-        if self._data_frame is None:
-            self._data_frame = self._lazy_frame.collect()
-
-        self._data_frame.write_csv(path)  # TODO: replace with LazyFrame.sink_csv once stable
+        self._lazy_frame.sink_csv(path)
 
     def to_dict(self) -> dict[str, list[Any]]:
         """
@@ -619,7 +661,7 @@ class ExperimentalPolarsTable:
         --------
         >>> from safeds.data.tabular.containers import ExperimentalPolarsTable
         >>> table = ExperimentalPolarsTable({"a": [1, 2, 3], "b": [4, 5, 6]})
-        >>> table.temporary_to_old_table()
+        >>> old_table = table.temporary_to_old_table()
         """
         if self._data_frame is None:
             self._data_frame = self._lazy_frame.collect()
@@ -641,6 +683,8 @@ class ExperimentalPolarsTable:
 
         The specification of the dataframe interchange protocol can be found
         [here](https://data-apis.org/dataframe-protocol/latest/index.html).
+
+        Note that this operation must fully load the data into memory, which can be expensive.
 
         Parameters
         ----------
@@ -667,6 +711,8 @@ class ExperimentalPolarsTable:
     def _repr_html_(self) -> str:
         """
         Return a compact HTML representation of the table for IPython.
+
+        Note that this operation must fully load the data into memory, which can be expensive.
 
         Returns
         -------
