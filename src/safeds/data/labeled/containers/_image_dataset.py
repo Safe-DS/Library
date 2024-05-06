@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import copy
 import sys
+import warnings
 from typing import TYPE_CHECKING, Generic, TypeVar
 
 from safeds._utils import _structural_hash
@@ -335,7 +336,9 @@ class _ColumnAsTensor:
 
         self._column_name = column.name
         column_as_table = Table.from_columns([column])
-        self._one_hot_encoder = OneHotEncoder().fit(column_as_table, [self._column_name])
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", message=rf"The columns \['{self._column_name}'\] contain numerical data. The OneHotEncoder is designed to encode non-numerical values into numerical values", category=UserWarning)
+            self._one_hot_encoder = OneHotEncoder().fit(column_as_table, [self._column_name])
         self._tensor = torch.Tensor(self._one_hot_encoder.transform(column_as_table)._data.to_numpy(copy=True)).to(
             torch.get_default_device(),
         )

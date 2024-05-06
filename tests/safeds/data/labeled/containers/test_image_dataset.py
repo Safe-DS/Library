@@ -1,5 +1,6 @@
 import math
 import sys
+import warnings
 from typing import TypeVar
 
 import pytest
@@ -358,3 +359,8 @@ class TestColumnAsTensor:
 
     def test_eq_should_be_not_implemented(self) -> None:
         assert _ColumnAsTensor(Column("column", [1])).__eq__(Table()) is NotImplemented
+
+    def test_should_not_warn(self) -> None:
+        with warnings.catch_warnings():
+            warnings.filterwarnings("error")
+            _ColumnAsTensor(Column("column", [1, 2, 3]))
