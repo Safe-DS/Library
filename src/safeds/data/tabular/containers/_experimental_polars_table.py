@@ -1,18 +1,27 @@
 from __future__ import annotations
 
-from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Literal, TypeVar
 
+from safeds._utils import _check_and_normalize_file_path
 from safeds.data.tabular.containers import Table
-from safeds.exceptions import ColumnLengthMismatchError, WrongFileExtensionError
+from safeds.exceptions import ColumnLengthMismatchError
 
 if TYPE_CHECKING:
-    from collections.abc import Mapping, Sequence
+    from collections.abc import Callable, Mapping, Sequence
+    from pathlib import Path
 
     from polars import DataFrame, LazyFrame
 
+    from safeds.data.image.containers import Image
     from safeds.data.labeled.containers import TabularDataset
-    from safeds.data.tabular.containers._experimental_polars_column import ExperimentalPolarsColumn
+    from safeds.data.tabular.transformation import InvertibleTableTransformer, TableTransformer
+    from safeds.data.tabular.typing import ColumnType, Schema
+
+    from ._experimental_polars_cell import ExperimentalPolarsCell
+    from ._experimental_polars_column import ExperimentalPolarsColumn
+    from ._experimental_polars_row import ExperimentalPolarsRow
+
+_T: TypeVar = TypeVar("_T")
 
 
 class ExperimentalPolarsTable:
@@ -50,6 +59,10 @@ class ExperimentalPolarsTable:
     # ------------------------------------------------------------------------------------------------------------------
 
     @staticmethod
+    def from_columns(columns: list[ExperimentalPolarsColumn]) -> ExperimentalPolarsTable:
+        raise NotImplementedError
+
+    @staticmethod
     def from_csv_file(path: str | Path) -> ExperimentalPolarsTable:
         """
         Create a table from a CSV file.
@@ -68,7 +81,7 @@ class ExperimentalPolarsTable:
         ------
         FileNotFoundError
             If no file exists at the given path.
-        WrongFileExtensionError
+        ValueError
             If the path has an extension that is not ".csv".
 
         Examples
@@ -81,14 +94,7 @@ class ExperimentalPolarsTable:
         """
         import polars as pl
 
-        # Handle file extension
-        path = Path(path)
-        if path.suffix == "":
-            path = path.with_suffix(".csv")
-        elif path.suffix != ".csv":
-            raise WrongFileExtensionError(path, ".csv")
-
-        # Read CSV file
+        path = _check_and_normalize_file_path(path, ".csv", [".csv"], check_if_file_exists=True)
         return ExperimentalPolarsTable._from_polars_lazy_frame(pl.scan_csv(path))
 
     @staticmethod
@@ -121,6 +127,14 @@ class ExperimentalPolarsTable:
         1  2  4
         """
         return ExperimentalPolarsTable(data)
+
+    @staticmethod
+    def from_json_file(path: str | Path) -> ExperimentalPolarsTable:
+        raise NotImplementedError
+
+    @staticmethod
+    def from_parquet_file(path: str | Path) -> ExperimentalPolarsTable:
+        raise NotImplementedError
 
     @staticmethod
     def _from_polars_dataframe(data: DataFrame) -> ExperimentalPolarsTable:
@@ -160,19 +174,59 @@ class ExperimentalPolarsTable:
         self._lazy_frame: pl.LazyFrame = pl.LazyFrame(data)
         self._data_frame: pl.DataFrame | None = None
 
+    def __eq__(self, other: object) -> bool:
+        raise NotImplementedError
+
+    def __hash__(self) -> int:
+        raise NotImplementedError
+
+    def __repr__(self) -> str:
+        raise NotImplementedError
+
+    def __sizeof__(self) -> int:
+        raise NotImplementedError
+
+    def __str__(self) -> str:
+        raise NotImplementedError
+
     # ------------------------------------------------------------------------------------------------------------------
     # Properties
     # ------------------------------------------------------------------------------------------------------------------
+
+    @property
+    def column_names(self) -> list[str]:
+        """
+        Names of the columns in the table.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import ExperimentalPolarsTable
+        >>> table = ExperimentalPolarsTable({"a": [1, 2, 3], "b": [4, 5, 6]})
+        >>> table.column_names
+        ['a', 'b']
+        """
+        return self._lazy_frame.columns
+
+    @property
+    def number_of_columns(self) -> int:
+        """
+        The number of columns in the table.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import ExperimentalPolarsTable
+        >>> table = ExperimentalPolarsTable({"a": [1, 2, 3], "b": [4, 5, 6]})
+        >>> table.number_of_columns
+        2
+        """
+        return self._lazy_frame.width
 
     @property
     def number_of_rows(self) -> int:
         """
         The number of rows in the table.
 
-        Returns
-        -------
-        number_of_rows:
-            The number of rows.
+        Note that this operation must fully load the data into memory, which can be expensive.
 
         Examples
         --------
@@ -186,9 +240,87 @@ class ExperimentalPolarsTable:
 
         return self._data_frame.height
 
+    @property
+    def schema(self) -> Schema:  # TODO: rethink return type
+        raise NotImplementedError
+
+    # ------------------------------------------------------------------------------------------------------------------
+    # Column operations
+    # ------------------------------------------------------------------------------------------------------------------
+
+    def add_columns(
+        self,
+        columns: ExperimentalPolarsColumn | list[ExperimentalPolarsColumn],
+    ) -> ExperimentalPolarsTable:
+        raise NotImplementedError
+
+    def get_column(self, name: str) -> ExperimentalPolarsColumn:
+        raise NotImplementedError
+
+    def get_column_type(self, name: str) -> ColumnType:  # TODO rethink return type
+        raise NotImplementedError
+
+    def has_column(self, name: str) -> bool:
+        raise NotImplementedError
+
+    def remove_columns(self, names: list[str]) -> ExperimentalPolarsTable:
+        raise NotImplementedError
+
+    def remove_columns_except(self, names: list[str]) -> ExperimentalPolarsTable:
+        raise NotImplementedError
+
+    def remove_columns_with_missing_values(self) -> ExperimentalPolarsTable:
+        raise NotImplementedError
+
+    def remove_columns_with_non_numerical_values(self) -> ExperimentalPolarsTable:
+        raise NotImplementedError
+
+    def rename_column(self, old_name: str, new_name: str) -> ExperimentalPolarsTable:
+        """
+        Return a new table with a column renamed.
+
+        Parameters
+        ----------
+        old_name:
+            The name of the column to rename.
+        new_name:
+            The new name of the column.
+
+        Returns
+        -------
+        new_table:
+            The table with the column renamed.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import ExperimentalPolarsTable
+        >>> table = ExperimentalPolarsTable({"a": [1, 2, 3], "b": [4, 5, 6]})
+        >>> table.rename_column("a", "A")
+        """
+        # TODO: raises?
+        return ExperimentalPolarsTable._from_polars_lazy_frame(
+            self._lazy_frame.rename({old_name: new_name}),
+        )
+
+    def replace_column(
+        self,
+        old_name: str,
+        new_columns: ExperimentalPolarsColumn | list[ExperimentalPolarsColumn],
+    ) -> ExperimentalPolarsTable:
+        raise NotImplementedError
+
+    def transform_column(
+        self,
+        name: str,
+        transformer: Callable[[ExperimentalPolarsRow], ExperimentalPolarsCell],
+    ) -> ExperimentalPolarsTable:
+        raise NotImplementedError
+
     # ------------------------------------------------------------------------------------------------------------------
     # Row operations
     # ------------------------------------------------------------------------------------------------------------------
+
+    # TODO: Rethink group_rows/group_rows_by_column. They should not return a dict.
 
     def remove_duplicate_rows(self) -> ExperimentalPolarsTable:
         """
@@ -205,9 +337,35 @@ class ExperimentalPolarsTable:
         """
         return ExperimentalPolarsTable._from_polars_lazy_frame(self._lazy_frame.unique())
 
-    def remove_rows_with_missing_values(self) -> ExperimentalPolarsTable:
+    def remove_rows(
+        self,
+        query: Callable[[ExperimentalPolarsRow], ExperimentalPolarsCell[bool]],
+    ) -> ExperimentalPolarsTable:
+        raise NotImplementedError
+
+    def remove_rows_by_column(
+        self,
+        name: str,
+        query: Callable[[ExperimentalPolarsCell], ExperimentalPolarsCell[bool]],
+    ) -> ExperimentalPolarsTable:
+        raise NotImplementedError
+
+    def remove_rows_with_missing_values(
+        self,
+        column_names: list[str] | None = None,
+    ) -> ExperimentalPolarsTable:
         """
         Remove rows with missing values from the table.
+
+        Parameters
+        ----------
+        column_names:
+            Names of the columns to consider. If None, all columns are considered.
+
+        Returns
+        -------
+        filtered_table:
+            The table without rows containing missing values in the specified columns.
 
         Examples
         --------
@@ -217,45 +375,88 @@ class ExperimentalPolarsTable:
            a  b
         0  1  4
         """
-        return ExperimentalPolarsTable._from_polars_lazy_frame(self._lazy_frame.drop_nulls())
+        return ExperimentalPolarsTable._from_polars_lazy_frame(
+            self._lazy_frame.drop_nulls(subset=column_names),
+        )
 
-    # def slice_rows(self, start: int = 0, size: int | None = None) -> ExperimentalPolarsTable:
-    #     """
-    #     Slice the rows of the table.
-    #
-    #     Parameters
-    #     ----------
-    #     start:
-    #         The start index.
-    #     size:
-    #         The size of the slice. If None, all rows from the start index are included.
-    #
-    #     Returns
-    #     -------
-    #     table:
-    #         The sliced table.
-    #
-    #     Examples
-    #     --------
-    #     >>> from safeds.data.tabular.containers import ExperimentalPolarsTable
-    #     >>> table = ExperimentalPolarsTable({"a": [1, 2, 3], "b": [4, 5, 6]})
-    #     >>> table.slice_rows(start=1, end=3)
-    #        a  b
-    #     0  2  5
-    #     1  3  6
-    #     """
-    #
-    #
-    #
-    #     if end is None:
-    #         end = self.number_of_rows
-    #
-    #     if end < start:
-    #         raise IndexOutOfBoundsError(slice(start, end))
-    #     if start < 0 or end < 0 or start > self.number_of_rows or end > self.number_of_rows:
-    #         raise IndexOutOfBoundsError(start if start < 0 or start > self.number_of_rows else end)
-    #
-    #     return self._lazy_frame.slice(start, end)
+    def remove_rows_with_outliers(
+        self,
+        column_names: list[str] | None = None,
+    ):
+        raise NotImplementedError
+
+    def shuffle_rows(self) -> ExperimentalPolarsTable:
+        raise NotImplementedError
+
+    def slice_rows(self, start: int = 0, end: int | None = None):
+        raise NotImplementedError
+
+    def sort_rows(
+        self,
+        key_selector: Callable[[ExperimentalPolarsRow], ExperimentalPolarsCell],
+        *,
+        descending: bool = False,
+    ) -> ExperimentalPolarsTable:
+        raise NotImplementedError
+
+    def sort_rows_by_column(
+        self,
+        name: str,
+        *,
+        descending: bool = False,
+        maintain_order_if_equal: bool = False,
+    ) -> ExperimentalPolarsTable:
+        raise NotImplementedError
+
+    def split_rows(
+        self,
+        percentage_in_first: float,
+        *,
+        shuffle: bool = True,
+    ) -> tuple[ExperimentalPolarsTable, ExperimentalPolarsTable]:
+        raise NotImplementedError
+
+    # ------------------------------------------------------------------------------------------------------------------
+    # Table operations
+    # ------------------------------------------------------------------------------------------------------------------
+
+    def add_table_as_columns(self, other: ExperimentalPolarsTable) -> ExperimentalPolarsTable:
+        raise NotImplementedError
+
+    def add_table_as_rows(self, other: ExperimentalPolarsTable) -> ExperimentalPolarsTable:
+        raise NotImplementedError
+
+    def inverse_transform_table(self, fitted_transformer: InvertibleTableTransformer) -> ExperimentalPolarsTable:
+        raise NotImplementedError
+
+    def transform_table(self, fitted_transformer: TableTransformer) -> ExperimentalPolarsTable:
+        raise NotImplementedError
+
+    # ------------------------------------------------------------------------------------------------------------------
+    # Statistics
+    # ------------------------------------------------------------------------------------------------------------------
+
+    def summarize_statistics(self) -> ExperimentalPolarsTable:
+        raise NotImplementedError
+
+    # ------------------------------------------------------------------------------------------------------------------
+    # Visualization
+    # ------------------------------------------------------------------------------------------------------------------
+
+    def plot_boxplots(self) -> Image:
+        raise NotImplementedError
+
+    def plot_correlation_heatmap(self) -> Image:
+        raise NotImplementedError
+
+    def plot_histograms(self, *, number_of_bins: int = 10) -> Image:
+        raise NotImplementedError
+
+    def plot_lineplot(self, x_name: str, y_name: str) -> Image:
+        raise NotImplementedError
+
+    def plot_scatterplot(self, x_name: str, y_name: str) -> Image:
+        raise NotImplementedError
 
     # ------------------------------------------------------------------------------------------------------------------
     # Export
@@ -278,7 +479,7 @@ class ExperimentalPolarsTable:
 
         Raises
         ------
-        WrongFileExtensionError
+        ValueError
             If the path has an extension that is not ".csv".
 
         Examples
@@ -287,21 +488,13 @@ class ExperimentalPolarsTable:
         >>> table = ExperimentalPolarsTable({"a": [1, 2, 3], "b": [4, 5, 6]})
         >>> table.to_csv_file("./src/resources/to_csv_file.csv")
         """
-        # Handle file extension
-        path = Path(path)
-        if path.suffix == "":
-            path = path.with_suffix(".csv")
-        elif path.suffix != ".csv":
-            raise WrongFileExtensionError(path, ".csv")
-
-        # Ensure that parent directories exist
+        path = _check_and_normalize_file_path(path, ".csv", [".csv"])
         path.parent.mkdir(parents=True, exist_ok=True)
 
-        # Write CSV to file
         if self._data_frame is None:
             self._data_frame = self._lazy_frame.collect()
 
-        self._data_frame.write_csv(path)
+        self._data_frame.write_csv(path)  # TODO: replace with LazyFrame.sink_csv once stable
 
     def to_dict(self) -> dict[str, list[Any]]:
         """
@@ -324,21 +517,32 @@ class ExperimentalPolarsTable:
 
         return self._data_frame.to_dict(as_series=False)
 
-    def to_json_file(self, path: str | Path) -> None:
+    def to_json_file(
+        self,
+        path: str | Path,
+        *,
+        orientation: Literal["column", "row"] = "column",
+    ) -> None:
         """
         Write the table to a JSON file.
 
         If the file and/or the parent directories do not exist, they will be created. If the file exists already, it
         will be overwritten.
 
+        Note that this operation must fully load the data into memory, which can be expensive.
+
         Parameters
         ----------
         path:
             The path to the JSON file. If the file extension is omitted, it is assumed to be ".json".
+        orientation:
+            The orientation of the JSON file. If "column", the JSON file will be structured as a list of columns. If
+            "row", the JSON file will be structured as a list of rows. Row orientation is more human-readable, but
+            slower and less memory-efficient.
 
         Raises
         ------
-        WrongFileExtensionError
+        ValueError
             If the path has an extension that is not ".json".
 
         Examples
@@ -347,21 +551,17 @@ class ExperimentalPolarsTable:
         >>> table = ExperimentalPolarsTable({"a": [1, 2, 3], "b": [4, 5, 6]})
         >>> table.to_json_file("./src/resources/to_json_file.json")
         """
-        # Handle file extension
-        path = Path(path)
-        if path.suffix == "":
-            path = path.with_suffix(".json")
-        elif path.suffix != ".json":
-            raise WrongFileExtensionError(path, ".json")
-
-        # Ensure that parent directories exist
+        path = _check_and_normalize_file_path(path, ".json", [".json"])
         path.parent.mkdir(parents=True, exist_ok=True)
 
         # Write JSON to file
         if self._data_frame is None:
             self._data_frame = self._lazy_frame.collect()
 
-        self._data_frame.write_json(path)
+        self._data_frame.write_json(path, row_oriented=(orientation == "row"))
+
+    def to_parquet_file(self, path: str | Path) -> None:
+        raise NotImplementedError
 
     def to_tabular_dataset(self, target_name: str, extra_names: list[str] | None = None) -> TabularDataset:
         """
