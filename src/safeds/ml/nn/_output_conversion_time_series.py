@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
+from safeds._utils import _structural_hash
+
 if TYPE_CHECKING:
     from torch import Tensor
 from safeds.data.labeled.containers import TimeSeriesDataset
@@ -11,6 +13,45 @@ from safeds.ml.nn._output_conversion import OutputConversion
 
 class OutputConversionTimeSeries(OutputConversion[TimeSeriesDataset, TimeSeriesDataset]):
     """The output conversion for a neural network, defines the output parameters for the neural network."""
+    def __hash__(self) -> int:
+        """
+        Return a deterministic hash value for this OutputConversionImage.
+
+        Returns
+        -------
+        hash:
+            the hash value
+        """
+        return _structural_hash(self.__class__.__name__)
+
+    def __eq__(self, other: object) -> bool:
+        """
+        Compare two OutputConversionImage instances.
+
+        Parameters
+        ----------
+        other:
+            The OutputConversionImage instance to compare to.
+
+        Returns
+        -------
+        equals:
+            Whether the instances are the same.
+        """
+        if not isinstance(other, type(self)):
+            return NotImplemented
+        return True
+
+    def __sizeof__(self) -> int:
+        """
+        Return the complete size of this object.
+
+        Returns
+        -------
+        size:
+            Size of this object in bytes.
+        """
+        return 0
 
     def __init__(self, prediction_name: str = "prediction_nn") -> None:
         """
