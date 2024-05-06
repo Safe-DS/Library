@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
     from torch.utils.data import DataLoader
@@ -59,23 +59,16 @@ class InputConversionTimeSeries(InputConversion[TimeSeriesDataset, TimeSeriesDat
             batch_size,
         )
 
-    def _set_parameters(
-        self,
-        target_name: str,
-        time_name: str,
-        feature_names: list[str],
-    ) -> None:
-        """Set the time_name variable for internal usage."""
-        self._time_name = time_name
-        self._feature_names = feature_names
-        self._target_name = target_name
+
 
     def _data_conversion_predict(self, input_data: TimeSeriesDataset, batch_size: int) -> DataLoader:
         return input_data._into_dataloader_with_window_predict(self._window_size, self._forecast_horizon, batch_size)
 
     def _is_fit_data_valid(self, input_data: TimeSeriesDataset) -> bool:
         if self._first:
-            self._set_parameters(input_data.target.name, input_data.time.name, input_data.features.column_names)
+            self._time_name = input_data.time.name
+            self._feature_names = input_data.features.column_names
+            self._target_name = input_data.target.name
             self._first = False
         return (
             (sorted(input_data.features.column_names)).__eq__(sorted(self._feature_names))
@@ -85,3 +78,7 @@ class InputConversionTimeSeries(InputConversion[TimeSeriesDataset, TimeSeriesDat
 
     def _is_predict_data_valid(self, input_data: TimeSeriesDataset) -> bool:
         return self._is_fit_data_valid(input_data)
+
+    def _get_output_configuration(self) -> dict[str, Any]:
+        return {"window_size": self._window_size, "forecast_horizon": self._forecast_horizon}  # pragma: no cover
+

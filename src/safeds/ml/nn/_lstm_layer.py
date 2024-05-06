@@ -5,6 +5,9 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from torch import Tensor, nn
 
+import sys
+
+from safeds._utils import _structural_hash
 from safeds.exceptions import ClosedBound, OutOfBoundsError
 from safeds.ml.nn import Layer
 
@@ -23,11 +26,13 @@ def _create_internal_model(input_size: int, output_size: int, activation_functio
                     self._fn = nn.ReLU()
                 case "softmax":
                     self._fn = nn.Softmax()
+                case "none":
+                    self._fn = None
                 case _:
                     raise ValueError("Unknown Activation Function: " + activation_function)
 
         def forward(self, x: Tensor) -> Tensor:
-            return self._fn(self._layer(x)[0])
+            return self._fn(self._layer(x)[0]) if self._fn is not None else self._layer(x)[0]
 
     return _InternalLayer(input_size, output_size, activation_function)
 
@@ -88,3 +93,52 @@ class LSTMLayer(Layer):
         if input_size < 1:
             raise OutOfBoundsError(actual=input_size, name="input_size", lower_bound=ClosedBound(1))
         self._input_size = input_size
+
+
+    def __hash__(self) -> int:
+        """
+        Return a deterministic hash value for this LSTM layer.
+
+        Returns
+        -------
+        hash:
+            the hash value
+        """
+        return _structural_hash(
+            self._input_size,
+            self._output_size,
+        )  # pragma: no cover
+
+
+    def __eq__(self, other: object) -> bool:
+        """
+        Compare two convolutional transpose 2d layer.
+
+        Parameters
+        ----------
+        other:
+            The convolutional transpose 2d layer to compare to.
+
+        Returns
+        -------
+        equals:
+            Whether the two convolutional transpose 2d layer are the same.
+        """
+        if not isinstance(other, LSTMLayer):
+            return NotImplemented
+        return (self is other) or (
+            self._input_size == other._input_size
+            and self._output_size == other._output_size
+        )
+
+    def __sizeof__(self) -> int:
+        """
+        Return the complete size of this object.
+
+        Returns
+        -------
+        size:
+            Size of this object in bytes.
+        """
+        return sys.getsizeof(self._input_size) + sys.getsizeof(self._output_size)
+

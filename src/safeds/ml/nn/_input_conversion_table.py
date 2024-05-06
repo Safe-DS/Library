@@ -18,6 +18,7 @@ class InputConversionTable(InputConversion[TabularDataset, Table]):
         self._target_name = ""
         self._time_name = ""
         self._feature_names: list[str] = []
+        self._first = True
 
     @property
     def _data_size(self) -> int:
@@ -29,22 +30,14 @@ class InputConversionTable(InputConversion[TabularDataset, Table]):
             num_of_classes,
         )
 
-    def _set_parameters(
-        self,
-        target_name: str,
-        time_name: str,
-        feature_names: list[str],
-    ) -> None:
-        # time instance parameter won't be used, but is there for Linter
-        self._time_name = time_name
-        self._target_name = target_name
-
-        self._feature_names = feature_names
-
     def _data_conversion_predict(self, input_data: Table, batch_size: int) -> DataLoader:
         return input_data._into_dataloader(batch_size)
 
     def _is_fit_data_valid(self, input_data: TabularDataset) -> bool:
+        if self._first:
+            self._feature_names = input_data.features.column_names
+            self._target_name = input_data.target.name
+            self._first = False
         return (sorted(input_data.features.column_names)).__eq__(sorted(self._feature_names))
 
     def _is_predict_data_valid(self, input_data: Table) -> bool:

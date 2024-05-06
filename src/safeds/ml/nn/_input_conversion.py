@@ -6,13 +6,11 @@ from typing import TYPE_CHECKING, Any, Generic, TypeVar
 if TYPE_CHECKING:
     from torch.utils.data import DataLoader
 
-from safeds.data.labeled.containers import TabularDataset, TimeSeriesDataset
-from safeds.data.tabular.containers import Table
-    from safeds.data.image.containers._single_size_image_list import _SingleSizeImageList
-    from safeds.data.image.typing import ImageSize
+from safeds.data.image.containers._single_size_image_list import _SingleSizeImageList
+from safeds.data.image.typing import ImageSize
 
 from safeds.data.image.containers import ImageList
-from safeds.data.labeled.containers import ImageDataset, TabularDataset
+from safeds.data.labeled.containers import ImageDataset, TabularDataset, TimeSeriesDataset
 from safeds.data.tabular.containers import Table
 
 FT = TypeVar("FT", TabularDataset, TimeSeriesDataset, ImageDataset)

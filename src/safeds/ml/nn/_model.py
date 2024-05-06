@@ -163,14 +163,15 @@ class NeuralNetworkRegressor(Generic[IFT, IPT, OT]):
         import torch
         from torch import nn
 
+        if not self._input_conversion._is_fit_data_valid(train_data):
+            raise FeatureDataMismatchError
         if epoch_size < 1:
             raise OutOfBoundsError(actual=epoch_size, name="epoch_size", lower_bound=ClosedBound(1))
         if batch_size < 1:
             raise OutOfBoundsError(actual=batch_size, name="batch_size", lower_bound=ClosedBound(1))
         if self._input_conversion._data_size is not self._input_size:
             raise InputSizeError(self._input_conversion._data_size, self._input_size)
-        if not self._input_conversion._is_fit_data_valid(train_data):
-            raise FeatureDataMismatchError
+
 
         copied_model = copy.deepcopy(self)
 
@@ -375,14 +376,14 @@ class NeuralNetworkClassifier(Generic[IFT, IPT, OT]):
         import torch
         from torch import nn
 
+        if not self._input_conversion._is_fit_data_valid(train_data):
+            raise FeatureDataMismatchError
         if epoch_size < 1:
             raise OutOfBoundsError(actual=epoch_size, name="epoch_size", lower_bound=ClosedBound(1))
         if batch_size < 1:
             raise OutOfBoundsError(actual=batch_size, name="batch_size", lower_bound=ClosedBound(1))
         if self._input_conversion._data_size is not self._input_size:
             raise InputSizeError(self._input_conversion._data_size, self._input_size)
-        if not self._input_conversion._is_fit_data_valid(train_data):
-            raise FeatureDataMismatchError
 
         copied_model = copy.deepcopy(self)
 
