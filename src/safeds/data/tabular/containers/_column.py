@@ -1031,7 +1031,7 @@ class Column(Sequence[T]):
         >>> histogram = column.plot_histogram()
         """
         from safeds.data.tabular.containers import Table
-        
+
         return Table({self._name: self._data}).plot_histograms(number_of_bins=number_of_bins)
 
     def plot_compare_columns(self, column_list: list[Column]) -> Image:
