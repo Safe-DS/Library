@@ -119,7 +119,6 @@ class TabularDataset:
         return (
             sys.getsizeof(self._target)
             + sys.getsizeof(self._features)
-            + sys.getsizeof(self._table)
             + sys.getsizeof(self._extras)
         )
 
