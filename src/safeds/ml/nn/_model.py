@@ -19,12 +19,9 @@ from safeds.ml.nn import (
     FlattenLayer,
     ForwardLayer,
     InputConversionImage,
-    InputConversionTable,
-    InputConversionTimeSeries,
     OutputConversionImageToColumn,
     OutputConversionImageToImage,
     OutputConversionImageToTable,
-    OutputConversionTimeSeries
 )
 from safeds.ml.nn._output_conversion_image import _OutputConversionImage
 from safeds.ml.nn._pooling2d_layer import _Pooling2DLayer
@@ -38,7 +35,6 @@ if TYPE_CHECKING:
     from safeds.ml.nn._layer import Layer
     from safeds.ml.nn._output_conversion import OutputConversion
     from safeds.data.image.typing import ImageSize
-
 
 
 IFT = TypeVar("IFT", TabularDataset, TimeSeriesDataset, ImageDataset)  # InputFitType
@@ -171,7 +167,6 @@ class NeuralNetworkRegressor(Generic[IFT, IPT, OT]):
             raise OutOfBoundsError(actual=batch_size, name="batch_size", lower_bound=ClosedBound(1))
         if self._input_conversion._data_size is not self._input_size:
             raise InputSizeError(self._input_conversion._data_size, self._input_size)
-
 
         copied_model = copy.deepcopy(self)
 

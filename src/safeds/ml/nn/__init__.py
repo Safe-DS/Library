@@ -48,7 +48,8 @@ apipkg.initpkg(
         "OutputConversionImageToColumn": "._output_conversion_image:OutputConversionImageToColumn",
         "OutputConversionImageToImage": "._output_conversion_image:OutputConversionImageToImage",
         "OutputConversionImageToTable": "._output_conversion_image:OutputConversionImageToTable",
-    },)
+    },
+)
 
 __all__ = [
     "AvgPooling2DLayer",

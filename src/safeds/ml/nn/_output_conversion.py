@@ -9,7 +9,7 @@ from safeds.data.labeled.containers import ImageDataset, TabularDataset
 if TYPE_CHECKING:
     from torch import Tensor
 
-from safeds.data.labeled.containers import TabularDataset, TimeSeriesDataset
+from safeds.data.labeled.containers import TimeSeriesDataset
 from safeds.data.tabular.containers import Table
 
 IT = TypeVar("IT", Table, TimeSeriesDataset, ImageList)
