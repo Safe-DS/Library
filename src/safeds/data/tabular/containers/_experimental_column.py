@@ -432,32 +432,34 @@ class ExperimentalColumn(Sequence[T]):
         """
         from ._experimental_table import ExperimentalTable
 
-        return ExperimentalTable({
-            "metric": [
-                "min",
-                "max",
-                "mean",
-                "median",
-                "standard deviation",
-                "distinct value count",
-                "missing value count",
-                "missing value ratio",
-                "idness",
-                "stability",
-            ],
-            self.name: [
-                self.min(),
-                self.max(),
-                self.mean(),
-                self.median(),
-                self.standard_deviation(),
-                self.distinct_value_count(),
-                self.missing_value_count(),
-                self.missing_value_ratio(),
-                self.idness(),
-                self.stability(),
-            ],
-        })
+        return ExperimentalTable(
+            {
+                "metric": [
+                    "min",
+                    "max",
+                    "mean",
+                    "median",
+                    "standard deviation",
+                    "distinct value count",
+                    "missing value count",
+                    "missing value ratio",
+                    "idness",
+                    "stability",
+                ],
+                self.name: [
+                    self.min(),
+                    self.max(),
+                    self.mean(),
+                    self.median(),
+                    self.standard_deviation(),
+                    self.distinct_value_count(),
+                    self.missing_value_count(),
+                    self.missing_value_ratio(),
+                    self.idness(),
+                    self.stability(),
+                ],
+            }
+        )
 
     def correlation_with(self, other: ExperimentalColumn) -> float:
         """

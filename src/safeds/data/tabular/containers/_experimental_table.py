@@ -413,7 +413,7 @@ class ExperimentalTable:
             )
 
         prefix = new_frame.select(self.column_names[:index])
-        suffix = new_frame.select(self.column_names[index + 1:])
+        suffix = new_frame.select(self.column_names[index + 1 :])
 
         return ExperimentalTable._from_polars_dataframe(
             prefix.hstack([column._series for column in new_columns]).hstack(suffix),
