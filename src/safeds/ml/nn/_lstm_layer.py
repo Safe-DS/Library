@@ -56,7 +56,6 @@ class LSTMLayer(Layer):
         ValueError
             If input_size < 1
             If output_size < 1
-
         """
         if input_size is not None:
             self._set_input_size(input_size=input_size)
