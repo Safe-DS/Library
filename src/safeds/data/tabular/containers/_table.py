@@ -7,6 +7,7 @@ import warnings
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, TypeVar
 
+from safeds._config import _init_default_device, _get_device
 from safeds._utils import _structural_hash
 from safeds.data.image.containers import Image
 from safeds.data.tabular.typing import ColumnType, Schema
@@ -28,6 +29,7 @@ if TYPE_CHECKING:
 
     import numpy as np
     import pandas as pd
+    import torch
     from torch.utils.data import DataLoader, Dataset
 
     from safeds.data.labeled.containers import TabularDataset, TimeSeriesDataset
@@ -2636,7 +2638,10 @@ class Table:
 
         """
         import numpy as np
+        import torch
         from torch.utils.data import DataLoader
+
+        _init_default_device()
 
         features = self.to_rows()
         all_rows = []
@@ -2645,7 +2650,11 @@ class Table:
             for column_name in row:
                 new_item.append(row.get_value(column_name))
             all_rows.append(new_item.copy())
-        return DataLoader(dataset=_create_dataset(np.array(all_rows)), batch_size=batch_size)
+        return DataLoader(
+            dataset=_create_dataset(np.array(all_rows)),
+            batch_size=batch_size,
+            generator=torch.Generator(device=_get_device()),
+        )
 
 
 def _create_dataset(features: np.array) -> Dataset:
@@ -2653,9 +2662,11 @@ def _create_dataset(features: np.array) -> Dataset:
     import torch
     from torch.utils.data import Dataset
 
+    _init_default_device()
+
     class _CustomDataset(Dataset):
         def __init__(self, features: np.array):
-            self.X = torch.from_numpy(features.astype(np.float32))
+            self.X = torch.from_numpy(features.astype(np.float32)).to(_get_device())
             self.len = self.X.shape[0]
 
         def __getitem__(self, item: int) -> torch.Tensor:

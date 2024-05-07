@@ -5,6 +5,7 @@ import random
 import sys
 from typing import TYPE_CHECKING
 
+from safeds._config import _init_default_device
 from safeds._utils import _structural_hash
 from safeds.data.image._utils._image_transformation_error_and_warning_checks import (
     _check_blur_errors_and_warnings,
@@ -389,6 +390,8 @@ class _MultiSizeImageList(ImageList):
     def remove_images_with_size(self, width: int, height: int) -> ImageList:
         import torch
 
+        _init_default_device()
+
         _check_remove_images_with_size_errors(width, height)
         if (width, height) not in self._image_list_dict:
             return self
@@ -460,6 +463,8 @@ class _MultiSizeImageList(ImageList):
     def resize(self, new_width: int, new_height: int) -> ImageList:
         import torch
 
+        _init_default_device()
+
         from safeds.data.image.containers._single_size_image_list import _SingleSizeImageList
 
         image_list_tensors = []
@@ -482,6 +487,8 @@ class _MultiSizeImageList(ImageList):
 
     def crop(self, x: int, y: int, width: int, height: int) -> ImageList:
         import torch
+
+        _init_default_device()
 
         from safeds.data.image.containers._single_size_image_list import _SingleSizeImageList
 

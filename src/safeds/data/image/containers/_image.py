@@ -6,7 +6,7 @@ import warnings
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-from safeds._config import _get_device
+from safeds._config import _get_device, _init_default_device
 from safeds._utils import _structural_hash
 from safeds.data.image._utils._image_transformation_error_and_warning_checks import (
     _check_add_noise_errors,
@@ -24,7 +24,6 @@ from safeds.exceptions import IllegalFormatError
 if TYPE_CHECKING:
     from numpy import dtype, ndarray
     from torch import Tensor
-    from torch.types import Device
 
 
 class Image:
@@ -43,6 +42,8 @@ class Image:
     def _filter_edges_kernel() -> Tensor:
         import torch
 
+        _init_default_device()
+
         if Image._filter_edges_kernel_cache is None:
             Image._filter_edges_kernel_cache = (
                 torch.tensor([[-1.0, -1.0, -1.0], [-1.0, 8.0, -1.0], [-1.0, -1.0, -1.0]])
@@ -50,11 +51,13 @@ class Image:
                 .unsqueeze(dim=0)
                 .to(_get_device())
             )
+        if Image._filter_edges_kernel_cache.device != _get_device():
+            Image._filter_edges_kernel_cache = Image._filter_edges_kernel_cache.to(_get_device())  # pragma: no cover
 
         return Image._filter_edges_kernel_cache
 
     @staticmethod
-    def from_file(path: str | Path, device: Device = None) -> Image:
+    def from_file(path: str | Path) -> Image:
         """
         Create an image from a file.
 
@@ -62,8 +65,6 @@ class Image:
         ----------
         path:
             The path to the image file.
-        device:
-            The device where the tensor will be saved on. Defaults to the default device
 
         Returns
         -------
@@ -78,13 +79,12 @@ class Image:
         from PIL.Image import open as pil_image_open
         from torchvision.transforms.functional import pil_to_tensor
 
-        if device is None:
-            device = _get_device()
+        _init_default_device()
 
-        return Image(image_tensor=pil_to_tensor(pil_image_open(path)), device=device)
+        return Image(image_tensor=pil_to_tensor(pil_image_open(path)))
 
     @staticmethod
-    def from_bytes(data: bytes, device: Device = None) -> Image:
+    def from_bytes(data: bytes) -> Image:
         """
         Create an image from bytes.
 
@@ -92,8 +92,6 @@ class Image:
         ----------
         data:
             The data of the image.
-        device:
-            The device where the tensor will be saved on. Defaults to the default device
 
         Returns
         -------
@@ -103,8 +101,7 @@ class Image:
         import torch
         import torchvision
 
-        if device is None:
-            device = _get_device()
+        _init_default_device()
 
         with warnings.catch_warnings():
             warnings.filterwarnings(
@@ -113,13 +110,10 @@ class Image:
             )
             input_tensor = torch.frombuffer(data, dtype=torch.uint8)
 
-        return Image(image_tensor=torchvision.io.decode_image(input_tensor), device=device)
+        return Image(image_tensor=torchvision.io.decode_image(input_tensor).to(_get_device()))
 
-    def __init__(self, image_tensor: Tensor, device: Device = None) -> None:
-        if device is None:
-            device = _get_device()
-
-        self._image_tensor: Tensor = image_tensor.to(device)
+    def __init__(self, image_tensor: Tensor) -> None:
+        self._image_tensor: Tensor = image_tensor
 
     def __eq__(self, other: object) -> bool:
         """
@@ -137,11 +131,13 @@ class Image:
         """
         import torch
 
+        _init_default_device()
+
         if not isinstance(other, Image):
             return NotImplemented
         return (self is other) or (
             self._image_tensor.size() == other._image_tensor.size()
-            and torch.all(torch.eq(self._image_tensor, other._set_device(self.device)._image_tensor)).item()
+            and torch.all(torch.eq(self._image_tensor, other._image_tensor)).item()
         )
 
     def __hash__(self) -> int:
@@ -200,6 +196,8 @@ class Image:
         from torchvision.transforms.v2 import functional as func2
         from torchvision.utils import save_image
 
+        _init_default_device()
+
         if self.channel == 4:
             return None
         buffer = io.BytesIO()
@@ -223,6 +221,8 @@ class Image:
         from torchvision.transforms.v2 import functional as func2
         from torchvision.utils import save_image
 
+        _init_default_device()
+
         buffer = io.BytesIO()
         if self.channel == 1:
             func2.to_pil_image(self._image_tensor, mode="L").save(buffer, format="png")
@@ -230,17 +230,6 @@ class Image:
             save_image(self._image_tensor.to(torch.float32) / 255, buffer, format="png")
         buffer.seek(0)
         return buffer.read()
-
-    def _set_device(self, device: Device) -> Image:
-        """
-        Set the device where the image will be saved on.
-
-        Returns
-        -------
-        result:
-            The image on the given device
-        """
-        return Image(self._image_tensor, device)
 
     # ------------------------------------------------------------------------------------------------------------------
     # Properties
@@ -294,18 +283,6 @@ class Image:
         """
         return ImageSize(self.width, self.height, self.channel)
 
-    @property
-    def device(self) -> Device:
-        """
-        Get the device where the image is saved on.
-
-        Returns
-        -------
-        device:
-            The device of the image
-        """
-        return self._image_tensor.device
-
     # ------------------------------------------------------------------------------------------------------------------
     # Conversion
     # ------------------------------------------------------------------------------------------------------------------
@@ -322,6 +299,8 @@ class Image:
         import torch
         from torchvision.transforms.v2 import functional as func2
         from torchvision.utils import save_image
+
+        _init_default_device()
 
         if self.channel == 4:
             raise IllegalFormatError("png")
@@ -343,6 +322,8 @@ class Image:
         import torch
         from torchvision.transforms.v2 import functional as func2
         from torchvision.utils import save_image
+
+        _init_default_device()
 
         Path(path).parent.mkdir(parents=True, exist_ok=True)
         if self.channel == 1:
@@ -377,6 +358,8 @@ class Image:
         """
         import torch
 
+        _init_default_device()
+
         if self.channel == channel:
             image_tensor = self._image_tensor
         elif self.channel == 1 and channel == 3:
@@ -387,7 +370,7 @@ class Image:
                     self._image_tensor,
                     self._image_tensor,
                     self._image_tensor,
-                    torch.full(self._image_tensor.size(), 255).to(self.device),
+                    torch.full(self._image_tensor.size(), 255),
                 ],
                 dim=0,
             )
@@ -395,14 +378,14 @@ class Image:
             image_tensor = self.convert_to_grayscale()._image_tensor[0:1]
         elif self.channel == 3 and channel == 4:
             image_tensor = torch.cat(
-                [self._image_tensor, torch.full(self._image_tensor[0:1].size(), 255).to(self.device)],
+                [self._image_tensor, torch.full(self._image_tensor[0:1].size(), 255)],
                 dim=0,
             )
         elif self.channel == 4 and channel == 3:
             image_tensor = self._image_tensor[0:3]
         else:
             raise ValueError(f"Channel {channel} is not a valid channel option. Use either 1, 3 or 4")
-        return Image(image_tensor, device=self._image_tensor.device)
+        return Image(image_tensor)
 
     def resize(self, new_width: int, new_height: int) -> Image:
         """
@@ -430,10 +413,11 @@ class Image:
         from torchvision.transforms import InterpolationMode
         from torchvision.transforms.v2 import functional as func2
 
+        _init_default_device()
+
         _check_resize_errors(new_width, new_height)
         return Image(
             func2.resize(self._image_tensor, size=[new_height, new_width], interpolation=InterpolationMode.NEAREST),
-            device=self._image_tensor.device,
         )
 
     def convert_to_grayscale(self) -> Image:
@@ -450,6 +434,8 @@ class Image:
         import torch
         from torchvision.transforms.v2 import functional as func2
 
+        _init_default_device()
+
         if self.channel == 4:
             return Image(
                 torch.cat(
@@ -458,12 +444,10 @@ class Image:
                         self._image_tensor[3].unsqueeze(dim=0),
                     ],
                 ),
-                device=self.device,
             )
         else:
             return Image(
                 func2.rgb_to_grayscale(self._image_tensor[0:3], num_output_channels=self.channel),
-                device=self.device,
             )
 
     def crop(self, x: int, y: int, width: int, height: int) -> Image:
@@ -495,8 +479,10 @@ class Image:
         """
         from torchvision.transforms.v2 import functional as func2
 
+        _init_default_device()
+
         _check_crop_errors_and_warnings(x, y, width, height, self.width, self.height, plural=False)
-        return Image(func2.crop(self._image_tensor, y, x, height, width), device=self.device)
+        return Image(func2.crop(self._image_tensor, y, x, height, width))
 
     def flip_vertically(self) -> Image:
         """
@@ -511,7 +497,9 @@ class Image:
         """
         from torchvision.transforms.v2 import functional as func2
 
-        return Image(func2.vertical_flip(self._image_tensor), device=self.device)
+        _init_default_device()
+
+        return Image(func2.vertical_flip(self._image_tensor))
 
     def flip_horizontally(self) -> Image:
         """
@@ -526,7 +514,9 @@ class Image:
         """
         from torchvision.transforms.v2 import functional as func2
 
-        return Image(func2.horizontal_flip(self._image_tensor), device=self.device)
+        _init_default_device()
+
+        return Image(func2.horizontal_flip(self._image_tensor))
 
     def adjust_brightness(self, factor: float) -> Image:
         """
@@ -556,6 +546,8 @@ class Image:
         import torch
         from torchvision.transforms.v2 import functional as func2
 
+        _init_default_device()
+
         _check_adjust_brightness_errors_and_warnings(factor, plural=False)
         if self.channel == 4:
             return Image(
@@ -565,10 +557,9 @@ class Image:
                         self._image_tensor[3].unsqueeze(dim=0),
                     ],
                 ),
-                device=self.device,
             )
         else:
-            return Image(func2.adjust_brightness(self._image_tensor, factor * 1.0), device=self.device)
+            return Image(func2.adjust_brightness(self._image_tensor, factor * 1.0))
 
     def add_noise(self, standard_deviation: float) -> Image:
         """
@@ -593,10 +584,11 @@ class Image:
         """
         import torch
 
+        _init_default_device()
+
         _check_add_noise_errors(standard_deviation)
         return Image(
-            self._image_tensor + torch.normal(0, standard_deviation, self._image_tensor.size()).to(self.device) * 255,
-            device=self.device,
+            self._image_tensor + torch.normal(0, standard_deviation, self._image_tensor.size()).to(_get_device()) * 255,
         )
 
     def adjust_contrast(self, factor: float) -> Image:
@@ -626,6 +618,8 @@ class Image:
         import torch
         from torchvision.transforms.v2 import functional as func2
 
+        _init_default_device()
+
         _check_adjust_contrast_errors_and_warnings(factor, plural=False)
         if self.channel == 4:
             return Image(
@@ -635,10 +629,9 @@ class Image:
                         self._image_tensor[3].unsqueeze(dim=0),
                     ],
                 ),
-                device=self.device,
             )
         else:
-            return Image(func2.adjust_contrast(self._image_tensor, factor * 1.0), device=self.device)
+            return Image(func2.adjust_contrast(self._image_tensor, factor * 1.0))
 
     def adjust_color_balance(self, factor: float) -> Image:
         """
@@ -667,7 +660,6 @@ class Image:
         _check_adjust_color_balance_errors_and_warnings(factor, self.channel, plural=False)
         return Image(
             self.convert_to_grayscale()._image_tensor * (1.0 - factor * 1.0) + self._image_tensor * (factor * 1.0),
-            device=self.device,
         )
 
     def blur(self, radius: int) -> Image:
@@ -694,8 +686,10 @@ class Image:
         """
         from torchvision.transforms.v2 import functional as func2
 
+        _init_default_device()
+
         _check_blur_errors_and_warnings(radius, min(self.width, self.height), plural=False)
-        return Image(func2.gaussian_blur(self._image_tensor, [radius * 2 + 1, radius * 2 + 1]), device=self.device)
+        return Image(func2.gaussian_blur(self._image_tensor, [radius * 2 + 1, radius * 2 + 1]))
 
     def sharpen(self, factor: float) -> Image:
         """
@@ -724,6 +718,8 @@ class Image:
         import torch
         from torchvision.transforms.v2 import functional as func2
 
+        _init_default_device()
+
         _check_sharpen_errors_and_warnings(factor, plural=False)
         if self.channel == 4:
             return Image(
@@ -733,10 +729,9 @@ class Image:
                         self._image_tensor[3].unsqueeze(dim=0),
                     ],
                 ),
-                device=self.device,
             )
         else:
-            return Image(func2.adjust_sharpness(self._image_tensor, factor * 1.0), device=self.device)
+            return Image(func2.adjust_sharpness(self._image_tensor, factor * 1.0))
 
     def invert_colors(self) -> Image:
         """
@@ -752,13 +747,14 @@ class Image:
         import torch
         from torchvision.transforms.v2 import functional as func2
 
+        _init_default_device()
+
         if self.channel == 4:
             return Image(
                 torch.cat([func2.invert(self._image_tensor[0:3]), self._image_tensor[3].unsqueeze(dim=0)]),
-                device=self.device,
             )
         else:
-            return Image(func2.invert(self._image_tensor), device=self.device)
+            return Image(func2.invert(self._image_tensor))
 
     def rotate_right(self) -> Image:
         """
@@ -773,7 +769,9 @@ class Image:
         """
         from torchvision.transforms.v2 import functional as func2
 
-        return Image(func2.rotate(self._image_tensor, -90, expand=True), device=self.device)
+        _init_default_device()
+
+        return Image(func2.rotate(self._image_tensor, -90, expand=True))
 
     def rotate_left(self) -> Image:
         """
@@ -788,7 +786,9 @@ class Image:
         """
         from torchvision.transforms.v2 import functional as func2
 
-        return Image(func2.rotate(self._image_tensor, 90, expand=True), device=self.device)
+        _init_default_device()
+
+        return Image(func2.rotate(self._image_tensor, 90, expand=True))
 
     def find_edges(self) -> Image:
         """
@@ -803,26 +803,22 @@ class Image:
         """
         import torch
 
-        kernel = (
-            Image._filter_edges_kernel()
-            if self.device.type == _get_device()
-            else Image._filter_edges_kernel().to(self.device)
-        )
+        _init_default_device()
+
         edges_tensor = torch.clamp(
             torch.nn.functional.conv2d(
                 self.convert_to_grayscale()._image_tensor.float()[0].unsqueeze(dim=0),
-                kernel,
+                Image._filter_edges_kernel(),
                 padding="same",
             ).squeeze(dim=1),
             0,
             255,
         ).to(torch.uint8)
         if self.channel == 3:
-            return Image(edges_tensor.repeat(3, 1, 1), device=self.device)
+            return Image(edges_tensor.repeat(3, 1, 1))
         elif self.channel == 4:
             return Image(
                 torch.cat([edges_tensor.repeat(3, 1, 1), self._image_tensor[3].unsqueeze(dim=0)]),
-                device=self.device,
             )
         else:
-            return Image(edges_tensor, device=self.device)
+            return Image(edges_tensor)

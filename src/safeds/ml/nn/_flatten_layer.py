@@ -3,6 +3,7 @@ from __future__ import annotations
 import sys
 from typing import TYPE_CHECKING, Any
 
+from safeds._config import _init_default_device
 from safeds._utils import _structural_hash
 
 if TYPE_CHECKING:
@@ -15,6 +16,8 @@ from safeds.ml.nn import Layer
 
 def _create_internal_model() -> nn.Module:
     from torch import nn
+
+    _init_default_device()
 
     class _InternalLayer(nn.Module):
         def __init__(self) -> None:

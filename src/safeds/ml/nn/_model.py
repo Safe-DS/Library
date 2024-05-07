@@ -3,8 +3,9 @@ from __future__ import annotations
 import copy
 from typing import TYPE_CHECKING, Generic, Self, TypeVar
 
+from safeds._config import _init_default_device
 from safeds.data.image.containers import ImageList
-from safeds.data.labeled.containers import TabularDataset, TimeSeriesDataset, ImageDataset
+from safeds.data.labeled.containers import ImageDataset, TabularDataset, TimeSeriesDataset
 from safeds.data.tabular.containers import Table
 from safeds.exceptions import (
     ClosedBound,
@@ -31,10 +32,8 @@ if TYPE_CHECKING:
 
     from torch import Tensor, nn
 
-    from safeds.ml.nn._input_conversion import InputConversion
-    from safeds.ml.nn._layer import Layer
-    from safeds.ml.nn._output_conversion import OutputConversion
     from safeds.data.image.typing import ImageSize
+    from safeds.ml.nn import InputConversion, Layer, OutputConversion
 
 
 IFT = TypeVar("IFT", TabularDataset, TimeSeriesDataset, ImageDataset)  # InputFitType
@@ -159,6 +158,8 @@ class NeuralNetworkRegressor(Generic[IFT, IPT, OT]):
         import torch
         from torch import nn
 
+        _init_default_device()
+
         if not self._input_conversion._is_fit_data_valid(train_data):
             raise FeatureDataMismatchError
         if epoch_size < 1:
@@ -228,6 +229,8 @@ class NeuralNetworkRegressor(Generic[IFT, IPT, OT]):
             If the model has not been fitted yet
         """
         import torch
+
+        _init_default_device()
 
         if not self._is_fitted:
             raise ModelNotFittedError
@@ -371,6 +374,8 @@ class NeuralNetworkClassifier(Generic[IFT, IPT, OT]):
         import torch
         from torch import nn
 
+        _init_default_device()
+
         if not self._input_conversion._is_fit_data_valid(train_data):
             raise FeatureDataMismatchError
         if epoch_size < 1:
@@ -394,6 +399,7 @@ class NeuralNetworkClassifier(Generic[IFT, IPT, OT]):
             loss_fn = nn.CrossEntropyLoss()
         else:
             loss_fn = nn.BCELoss()
+
         optimizer = torch.optim.SGD(copied_model._model.parameters(), lr=learning_rate)
         for _ in range(epoch_size):
             loss_sum = 0.0
@@ -401,6 +407,7 @@ class NeuralNetworkClassifier(Generic[IFT, IPT, OT]):
             for x, y in iter(dataloader):
                 optimizer.zero_grad()
                 pred = copied_model._model(x)
+
                 loss = loss_fn(pred, y)
                 loss_sum += loss.item()
                 amount_of_loss_values_calculated += 1
@@ -446,6 +453,8 @@ class NeuralNetworkClassifier(Generic[IFT, IPT, OT]):
         """
         import torch
 
+        _init_default_device()
+
         if not self._is_fitted:
             raise ModelNotFittedError
         if not self._input_conversion._is_predict_data_valid(test_data):
@@ -477,6 +486,8 @@ def _create_internal_model(
     is_for_classification: bool,
 ) -> nn.Module:
     from torch import nn
+
+    _init_default_device()
 
     class _InternalModel(nn.Module):
         def __init__(self, layers: list[Layer], is_for_classification: bool) -> None:

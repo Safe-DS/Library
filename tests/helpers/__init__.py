@@ -3,11 +3,11 @@ from ._assertions import (
     assert_that_tabular_datasets_are_equal,
 )
 from ._devices import (
+    configure_test_with_device,
     device_cpu,
     device_cuda,
     get_devices,
     get_devices_ids,
-    skip_if_device_not_available,
 )
 from ._images import (
     grayscale_jpg_id,
@@ -38,6 +38,7 @@ from ._resources import resolve_resource_path
 __all__ = [
     "assert_that_tables_are_close",
     "assert_that_tabular_datasets_are_equal",
+    "configure_test_with_device",
     "device_cpu",
     "device_cuda",
     "grayscale_jpg_id",
@@ -62,7 +63,6 @@ __all__ = [
     "resolve_resource_path",
     "rgba_png_id",
     "rgba_png_path",
-    "skip_if_device_not_available",
     "skip_if_os",
     "test_images_folder",
     "white_square_jpg_id",

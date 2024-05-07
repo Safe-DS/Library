@@ -1,3 +1,7 @@
+import pytest
+from torch.types import Device
+
+from safeds._config import _get_device
 from safeds.data.tabular.containers import Table
 from safeds.data.tabular.transformation import StandardScaler
 from safeds.ml.nn import (
@@ -7,10 +11,13 @@ from safeds.ml.nn import (
     OutputConversionTable,
 )
 
-from tests.helpers import resolve_resource_path
+from tests.helpers import resolve_resource_path, get_devices, get_devices_ids, configure_test_with_device
 
 
-def test_lstm_model() -> None:
+@pytest.mark.parametrize("device", get_devices(), ids=get_devices_ids())
+def test_forward_model(device: Device) -> None:
+    configure_test_with_device(device)
+
     # Create a DataFrame
     _inflation_path = "_datas/US_Inflation_rates.csv"
     table_1 = Table.from_csv_file(
@@ -32,4 +39,4 @@ def test_lstm_model() -> None:
 
     fitted_model = model.fit(train_table.to_tabular_dataset("target"), epoch_size=1, learning_rate=0.01)
     fitted_model.predict(test_table.keep_only_columns(["value"]))
-    assert True
+    assert model._model.state_dict()["_pytorch_layers.0._layer.weight"].device == _get_device()

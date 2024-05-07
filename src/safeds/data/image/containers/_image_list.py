@@ -7,6 +7,7 @@ from abc import ABCMeta, abstractmethod
 from pathlib import Path
 from typing import TYPE_CHECKING, Literal, overload
 
+from safeds._config import _init_default_device
 from safeds.data.image.containers._image import Image
 
 if TYPE_CHECKING:
@@ -131,6 +132,8 @@ class ImageList(metaclass=ABCMeta):
         """
         from PIL.Image import open as pil_image_open
         from torchvision.transforms.v2.functional import pil_to_tensor
+
+        _init_default_device()
 
         from safeds.data.image.containers._empty_image_list import _EmptyImageList
         from safeds.data.image.containers._multi_size_image_list import _MultiSizeImageList
@@ -265,6 +268,8 @@ class ImageList(metaclass=ABCMeta):
         """
         import torch
         from torchvision.utils import make_grid, save_image
+
+        _init_default_device()
 
         from safeds.data.image.containers._empty_image_list import _EmptyImageList
 
