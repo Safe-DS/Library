@@ -8,7 +8,7 @@ from ._experimental_lazy_cell import _LazyCell
 from ._experimental_row import ExperimentalRow
 
 if TYPE_CHECKING:
-    from safeds.data.tabular.typing import Schema
+    from safeds.data.tabular.typing import ExperimentalSchema
     from safeds.data.tabular.typing._experimental_data_type import ExperimentalDataType
 
     from ._experimental_table import ExperimentalTable
@@ -58,7 +58,7 @@ class _LazyVectorizedRow(ExperimentalRow):
         return self._table.number_of_columns
 
     @property
-    def schema(self) -> Schema:  # TODO: rethink return type
+    def schema(self) -> ExperimentalSchema:
         return self._table.schema
 
     # ------------------------------------------------------------------------------------------------------------------

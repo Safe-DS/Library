@@ -5,7 +5,7 @@ from collections.abc import Iterator, Mapping
 from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
-    from safeds.data.tabular.typing import Schema
+    from safeds.data.tabular.typing import ExperimentalSchema
     from safeds.data.tabular.typing._experimental_data_type import ExperimentalDataType
 
     from ._experimental_cell import ExperimentalCell
@@ -55,7 +55,7 @@ class ExperimentalRow(ABC, Mapping[str, Any]):
 
     @property
     @abstractmethod
-    def schema(self) -> Schema:  # TODO: rethink return type
+    def schema(self) -> ExperimentalSchema:
         """The schema of the row."""
 
     # ------------------------------------------------------------------------------------------------------------------

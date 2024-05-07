@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, TypeVar
 
-from safeds.data.tabular.typing._experimental_data_type import _PolarsDataType
+from safeds.data.tabular.typing._experimental_polars_data_type import _PolarsDataType
 
 from ._experimental_cell import ExperimentalCell
 

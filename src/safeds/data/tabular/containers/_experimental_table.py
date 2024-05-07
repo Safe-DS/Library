@@ -4,7 +4,8 @@ from typing import TYPE_CHECKING, Any, Literal
 
 from safeds._utils import _check_and_normalize_file_path
 from safeds._utils._random import _get_random_seed
-from safeds.data.tabular.typing._experimental_data_type import _PolarsDataType
+from safeds.data.tabular.typing._experimental_polars_data_type import _PolarsDataType
+from safeds.data.tabular.typing._experimental_polars_schema import _PolarsSchema
 from safeds.exceptions import (
     ClosedBound,
     ColumnLengthMismatchError,
@@ -28,7 +29,7 @@ if TYPE_CHECKING:
     from safeds.data.image.containers import Image
     from safeds.data.labeled.containers import TabularDataset
     from safeds.data.tabular.transformation import InvertibleTableTransformer, TableTransformer
-    from safeds.data.tabular.typing import Schema
+    from safeds.data.tabular.typing import ExperimentalSchema
     from safeds.data.tabular.typing._experimental_data_type import ExperimentalDataType
 
     from ._experimental_cell import ExperimentalCell
@@ -271,8 +272,8 @@ class ExperimentalTable:
         return self._data_frame.height
 
     @property
-    def schema(self) -> Schema:  # TODO: rethink return type
-        raise NotImplementedError
+    def schema(self) -> ExperimentalSchema:
+        return _PolarsSchema(self._lazy_frame.schema)
 
     # ------------------------------------------------------------------------------------------------------------------
     # Column operations

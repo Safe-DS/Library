@@ -4,7 +4,7 @@ from collections.abc import Callable, Iterator, Sequence
 from typing import TYPE_CHECKING, Any, TypeVar, overload
 
 from safeds._utils import _structural_hash
-from safeds.data.tabular.typing._experimental_data_type import _PolarsDataType
+from safeds.data.tabular.typing._experimental_polars_data_type import _PolarsDataType
 from safeds.exceptions import IndexOutOfBoundsError
 
 from ._column import Column
