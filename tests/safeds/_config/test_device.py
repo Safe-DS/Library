@@ -5,6 +5,7 @@ from torch.types import Device
 from safeds._config import _get_device
 from safeds._config._device import _set_default_device
 from tests.helpers import get_devices, get_devices_ids, configure_test_with_device
+from tests.helpers._devices import _skip_if_device_not_available
 
 
 @pytest.mark.parametrize("device", get_devices(), ids=get_devices_ids())
@@ -16,6 +17,7 @@ def test_default_device(device: Device) -> None:
 
 @pytest.mark.parametrize("device", get_devices(), ids=get_devices_ids())
 def test_set_default_device(device: Device) -> None:
+    _skip_if_device_not_available(device)
     _set_default_device(device)
     assert _get_device().type == device.type
     assert torch.get_default_device().type == device.type
