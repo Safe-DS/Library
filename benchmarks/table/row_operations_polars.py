@@ -1,6 +1,6 @@
 from timeit import timeit
 
-from safeds.data.tabular.containers import Table
+from safeds.data.tabular.containers import ExperimentalTable
 
 from benchmarks.table.utils import create_synthetic_table_polars
 
@@ -99,7 +99,7 @@ if __name__ == "__main__":
 
     # Print the timings
     print(
-        Table(
+        ExperimentalTable(
             {
                 "method": list(timings.keys()),
                 "timing": list(timings.values()),
