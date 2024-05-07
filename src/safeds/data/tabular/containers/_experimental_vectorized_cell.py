@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, TypeVar
 
+from safeds._utils import _structural_hash
 from safeds.data.tabular.typing._experimental_polars_data_type import _PolarsDataType
 
 from ._experimental_cell import ExperimentalCell
@@ -198,10 +199,14 @@ class _VectorizedCell(ExperimentalCell[T]):
     # Other --------------------------------------------------------------------
 
     def __hash__(self) -> int:
-        raise NotImplementedError
+        return _structural_hash(
+            self._series.name,
+            self.type.__repr__(),
+            self._series.len(),
+        )
 
     def __sizeof__(self) -> int:
-        raise NotImplementedError
+        return self._series.estimated_size()
 
     # ------------------------------------------------------------------------------------------------------------------
     # Properties
