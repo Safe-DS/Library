@@ -71,7 +71,7 @@ class ArimaModelRegressor:
         """
         from statsmodels.tsa.arima.model import ARIMA
 
-        if not isinstance(time_series, TimeSeriesDataset) and isinstance(time_series, Table):
+        if not isinstance(time_series, TimeSeriesDataset):
             raise NonTimeSeriesDatasetError
         table = time_series.to_table()
         if table.number_of_rows == 0:
