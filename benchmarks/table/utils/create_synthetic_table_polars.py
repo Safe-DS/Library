@@ -1,6 +1,6 @@
 from random import randrange
 
-from safeds.data.tabular.containers import ExperimentalPolarsTable
+from safeds.data.tabular.containers import ExperimentalTable
 
 
 def create_synthetic_table_polars(
@@ -9,7 +9,7 @@ def create_synthetic_table_polars(
     *,
     min_value: int = 0,
     max_value: int = 1000,
-) -> ExperimentalPolarsTable:
+) -> ExperimentalTable:
     """Create a synthetic Table with random numerical data.
 
     Parameters
@@ -28,7 +28,7 @@ def create_synthetic_table_polars(
     Table
         A Table with random numerical data.
     """
-    return ExperimentalPolarsTable(
+    return ExperimentalTable(
         {
             f"column_{i}": [randrange(min_value, max_value) for _ in range(number_of_rows)]
             for i in range(number_of_columns)

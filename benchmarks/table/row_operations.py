@@ -7,20 +7,8 @@ from benchmarks.table.utils import create_synthetic_table
 REPETITIONS = 10
 
 
-def _run_add_rows() -> None:
-    table.add_rows(table)
-
-
-def _run_get_row() -> None:
-    table.get_row(0)
-
-
 def _run_group_rows() -> None:
     table.group_rows(lambda row: row.get_value("column_0") % 2 == 0)
-
-
-def _run_keep_only_rows() -> None:
-    table.keep_only_rows(lambda row: row.get_value("column_0") % 2 == 0)
 
 
 def _run_remove_duplicate_rows() -> None:
@@ -59,26 +47,18 @@ def _run_to_rows() -> None:
     table.to_rows()
 
 
+def _run_transform_column() -> None:
+    table.transform_column("column_0", lambda row: row.get_value("column_0") * 2)
+
+
 if __name__ == "__main__":
     # Create a synthetic Table
     table = create_synthetic_table(1000, 50)
 
     # Run the benchmarks
     timings: dict[str, float] = {
-        "add_rows": timeit(
-            _run_add_rows,
-            number=REPETITIONS,
-        ),
-        "get_row": timeit(
-            _run_get_row,
-            number=REPETITIONS,
-        ),
         "group_rows": timeit(
             _run_group_rows,
-            number=REPETITIONS,
-        ),
-        "keep_only_rows": timeit(
-            _run_keep_only_rows,
             number=REPETITIONS,
         ),
         "remove_duplicate_rows": timeit(
@@ -115,6 +95,10 @@ if __name__ == "__main__":
         ),
         "to_rows": timeit(
             _run_to_rows,
+            number=REPETITIONS,
+        ),
+        "transform_colum": timeit(
+            _run_transform_column,
             number=REPETITIONS,
         ),
     }

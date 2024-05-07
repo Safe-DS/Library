@@ -5,12 +5,13 @@ from collections.abc import Iterator, Mapping
 from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
-    from safeds.data.tabular.typing import ColumnType, Schema
+    from safeds.data.tabular.typing import ExperimentalSchema
+    from safeds.data.tabular.typing._experimental_data_type import ExperimentalDataType
 
-    from ._experimental_polars_cell import ExperimentalPolarsCell
+    from ._experimental_cell import ExperimentalCell
 
 
-class ExperimentalPolarsRow(ABC, Mapping[str, Any]):
+class ExperimentalRow(ABC, Mapping[str, Any]):
     """A row is a one-dimensional collection of named, heterogeneous values."""
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -23,7 +24,7 @@ class ExperimentalPolarsRow(ABC, Mapping[str, Any]):
     @abstractmethod
     def __eq__(self, other: object) -> bool: ...
 
-    def __getitem__(self, name: str) -> ExperimentalPolarsCell:
+    def __getitem__(self, name: str) -> ExperimentalCell:
         return self.get_value(name)
 
     @abstractmethod
@@ -54,7 +55,7 @@ class ExperimentalPolarsRow(ABC, Mapping[str, Any]):
 
     @property
     @abstractmethod
-    def schema(self) -> Schema:  # TODO: rethink return type
+    def schema(self) -> ExperimentalSchema:
         """The schema of the row."""
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -62,7 +63,7 @@ class ExperimentalPolarsRow(ABC, Mapping[str, Any]):
     # ------------------------------------------------------------------------------------------------------------------
 
     @abstractmethod
-    def get_value(self, name: str) -> ExperimentalPolarsCell:
+    def get_value(self, name: str) -> ExperimentalCell:
         """
         Get the value of the specified column.
 
@@ -78,7 +79,7 @@ class ExperimentalPolarsRow(ABC, Mapping[str, Any]):
         """
 
     @abstractmethod
-    def get_column_type(self, name: str) -> ColumnType:  # TODO: rethink return type
+    def get_column_type(self, name: str) -> ExperimentalDataType:
         """
         Get the type of the specified column.
 
