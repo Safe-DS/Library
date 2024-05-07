@@ -1,7 +1,15 @@
+from typing import Type
+
 import pytest
+from torch.types import Device
+
+from safeds._config import _get_device
 from safeds.data.tabular.containers import Table
 from safeds.data.labeled.containers import TimeSeriesDataset
 from torch.utils.data import DataLoader
+
+from safeds.exceptions import OutOfBoundsError
+from tests.helpers import get_devices, get_devices_ids, configure_test_with_device
 
 
 @pytest.mark.parametrize(
@@ -23,14 +31,55 @@ from torch.utils.data import DataLoader
         "test",
     ],
 )
+@pytest.mark.parametrize("device", get_devices(), ids=get_devices_ids())
 def test_should_create_dataloader(
     data: dict[str, list[int]],
     target_name: str,
     time_name: str,
     extra_names: list[str] | None,
+    device: Device,
 ) -> None:
+    configure_test_with_device(device)
     tabular_dataset = Table.from_dict(data).to_time_series_dataset(target_name, time_name, extra_names)
     data_loader = tabular_dataset._into_dataloader_with_window(1, 1, 1)
+    batch = next(iter(data_loader))
+    assert batch[0].device == _get_device()
+    assert batch[1].device == _get_device()
+    assert isinstance(data_loader, DataLoader)
+
+
+@pytest.mark.parametrize(
+    ("data", "target_name", "time_name", "extra_names"),
+    [
+        (
+            {
+                "A": [1, 4, 3],
+                "B": [2, 5, 4],
+                "C": [3, 6, 5],
+                "T": [0, 1, 6],
+            },
+            "T",
+            "B",
+            [],
+        ),
+    ],
+    ids=[
+        "test",
+    ],
+)
+@pytest.mark.parametrize("device", get_devices(), ids=get_devices_ids())
+def test_should_create_dataloader_predict(
+    data: dict[str, list[int]],
+    target_name: str,
+    time_name: str,
+    extra_names: list[str] | None,
+    device: Device,
+) -> None:
+    configure_test_with_device(device)
+    tabular_dataset = Table.from_dict(data).to_time_series_dataset(target_name, time_name, extra_names)
+    data_loader = tabular_dataset._into_dataloader_with_window_predict(1, 1, 1)
+    batch = next(iter(data_loader))
+    assert batch[0].device == _get_device()
     assert isinstance(data_loader, DataLoader)
 
 
@@ -62,8 +111,8 @@ def test_should_create_dataloader(
             ).to_time_series_dataset("T", "B"),
             1,
             0,
-            ValueError,
-            r"forecast_horizon must be greater than or equal to 1",
+            OutOfBoundsError,
+            r"forecast_horizon \(=0\) is not inside \[1, \u221e\).",
         ),
         (
             Table(
@@ -76,8 +125,8 @@ def test_should_create_dataloader(
             ).to_time_series_dataset("T", "B"),
             0,
             1,
-            ValueError,
-            r"window_size must be greater than or equal to 1",
+            OutOfBoundsError,
+            r"window_size \(=0\) is not inside \[1, \u221e\).",
         ),
     ],
     ids=[
@@ -86,12 +135,83 @@ def test_should_create_dataloader(
         "window_size",
     ],
 )
+@pytest.mark.parametrize("device", get_devices(), ids=get_devices_ids())
 def test_should_create_dataloader_invalid(
     data: TimeSeriesDataset,
     window_size: int,
     forecast_horizon: int,
-    error_type: ValueError,
+    error_type: Type[ValueError],
     error_msg: str,
+    device: Device,
 ) -> None:
+    configure_test_with_device(device)
     with pytest.raises(error_type, match=error_msg):
         data._into_dataloader_with_window(window_size=window_size, forecast_horizon=forecast_horizon, batch_size=1)
+
+
+@pytest.mark.parametrize(
+    ("data", "window_size", "forecast_horizon", "error_type", "error_msg"),
+    [
+        (
+            Table(
+                {
+                    "A": [1, 4],
+                    "B": [2, 5],
+                    "C": [3, 6],
+                    "T": [0, 1],
+                }
+            ).to_time_series_dataset("T", "B"),
+            1,
+            2,
+            ValueError,
+            r"Can not create windows with window size less then forecast horizon \+ window_size",
+        ),
+        (
+            Table(
+                {
+                    "A": [1, 4],
+                    "B": [2, 5],
+                    "C": [3, 6],
+                    "T": [0, 1],
+                }
+            ).to_time_series_dataset("T", "B"),
+            1,
+            0,
+            OutOfBoundsError,
+            r"forecast_horizon \(=0\) is not inside \[1, \u221e\).",
+        ),
+        (
+            Table(
+                {
+                    "A": [1, 4],
+                    "B": [2, 5],
+                    "C": [3, 6],
+                    "T": [0, 1],
+                }
+            ).to_time_series_dataset("T", "B"),
+            0,
+            1,
+            OutOfBoundsError,
+            r"window_size \(=0\) is not inside \[1, \u221e\).",
+        ),
+    ],
+    ids=[
+        "forecast_and_window",
+        "forecast",
+        "window_size",
+    ],
+)
+@pytest.mark.parametrize("device", get_devices(), ids=get_devices_ids())
+def test_should_create_dataloader_predict_invalid(
+    data: TimeSeriesDataset,
+    window_size: int,
+    forecast_horizon: int,
+    error_type: Type[ValueError],
+    error_msg: str,
+    device: Device,
+) -> None:
+    configure_test_with_device(device)
+    with pytest.raises(error_type, match=error_msg):
+        data._into_dataloader_with_window_predict(
+            window_size=window_size, forecast_horizon=forecast_horizon, batch_size=1
+        )

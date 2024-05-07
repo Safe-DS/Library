@@ -14,7 +14,7 @@ from tests.helpers import (
     images_all_ids,
     plane_png_path,
     resolve_resource_path,
-    skip_if_device_not_available,
+    configure_test_with_device,
 )
 
 
@@ -23,8 +23,8 @@ class TestFromImage:
     @pytest.mark.parametrize("device", get_devices(), ids=get_devices_ids())
     @pytest.mark.parametrize("resource_path", images_all(), ids=images_all_ids())
     def test_should_create(self, resource_path: str, device: Device) -> None:
-        skip_if_device_not_available(device)
-        image = Image.from_file(resolve_resource_path(resource_path), device)
+        configure_test_with_device(device)
+        image = Image.from_file(resolve_resource_path(resource_path))
         expected_image_size = ImageSize(image.width, image.height, image.channel)
         assert ImageSize.from_image(image) == expected_image_size
 

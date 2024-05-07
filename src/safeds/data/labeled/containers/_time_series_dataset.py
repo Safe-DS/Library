@@ -3,8 +3,10 @@ from __future__ import annotations
 import sys
 from typing import TYPE_CHECKING
 
+from safeds._config import _init_default_device
 from safeds._utils import _structural_hash
 from safeds.data.tabular.containers import Column, Table
+from safeds.exceptions import OutOfBoundsError, ClosedBound
 
 if TYPE_CHECKING:
     from collections.abc import Mapping, Sequence
@@ -194,8 +196,10 @@ class TimeSeriesDataset:
 
         Raises
         ------
+        OutOfBoundsError:
+            If window_size or forecast_horizon is below 1
         ValueError:
-            If the size is smaller or even than forecast_horizon+window_size
+            If the size is smaller or even than forecast_horizon + window_size
 
         Returns
         -------
@@ -205,6 +209,8 @@ class TimeSeriesDataset:
         import torch
         from torch.utils.data import DataLoader
 
+        _init_default_device()
+
         target_tensor = torch.tensor(self.target._data.values, dtype=torch.float32)
 
         x_s = []
@@ -212,9 +218,9 @@ class TimeSeriesDataset:
 
         size = target_tensor.size(0)
         if window_size < 1:
-            raise ValueError("window_size must be greater than or equal to 1")
+            raise OutOfBoundsError(actual=window_size, name="window_size", lower_bound=ClosedBound(1))
         if forecast_horizon < 1:
-            raise ValueError("forecast_horizon must be greater than or equal to 1")
+            raise OutOfBoundsError(actual=forecast_horizon, name="forecast_horizon", lower_bound=ClosedBound(1))
         if size <= forecast_horizon + window_size:
             raise ValueError("Can not create windows with window size less then forecast horizon + window_size")
         # create feature windows and for that features targets lagged by forecast len
@@ -253,6 +259,13 @@ class TimeSeriesDataset:
         batch_size:
             The size of data batches that should be loaded at one time.
 
+        Raises
+        ------
+        OutOfBoundsError:
+            If window_size or forecast_horizon is below 1
+        ValueError:
+            If the size is smaller or even than forecast_horizon + window_size
+
         Returns
         -------
         result:
@@ -261,10 +274,19 @@ class TimeSeriesDataset:
         import torch
         from torch.utils.data import DataLoader
 
+        _init_default_device()
+
         target_tensor = torch.tensor(self.target._data.values, dtype=torch.float32)
         x_s = []
 
         size = target_tensor.size(0)
+        if window_size < 1:
+            raise OutOfBoundsError(actual=window_size, name="window_size", lower_bound=ClosedBound(1))
+        if forecast_horizon < 1:
+            raise OutOfBoundsError(actual=forecast_horizon, name="forecast_horizon", lower_bound=ClosedBound(1))
+        if size <= forecast_horizon + window_size:
+            raise ValueError("Can not create windows with window size less then forecast horizon + window_size")
+
         feature_cols = self.features.to_columns()
         for i in range(size - (forecast_horizon + window_size)):
             window = target_tensor[i : i + window_size]
@@ -297,6 +319,8 @@ class TimeSeriesDataset:
 def _create_dataset(features: torch.Tensor, target: torch.Tensor) -> Dataset:
     from torch.utils.data import Dataset
 
+    _init_default_device()
+
     class _CustomDataset(Dataset):
         def __init__(self, features_dataset: torch.Tensor, target_dataset: torch.Tensor):
             self.X = features_dataset
@@ -314,6 +338,8 @@ def _create_dataset(features: torch.Tensor, target: torch.Tensor) -> Dataset:
 
 def _create_dataset_predict(features: torch.Tensor) -> Dataset:
     from torch.utils.data import Dataset
+
+    _init_default_device()
 
     class _CustomDataset(Dataset):
         def __init__(self, features: torch.Tensor):

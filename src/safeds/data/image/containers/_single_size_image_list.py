@@ -6,6 +6,7 @@ import sys
 from pathlib import Path
 from typing import TYPE_CHECKING
 
+from safeds._config import _init_default_device, _get_device
 from safeds._utils import _structural_hash
 from safeds.data.image._utils._image_transformation_error_and_warning_checks import (
     _check_add_noise_errors,
@@ -50,6 +51,8 @@ class _SingleSizeImageList(ImageList):
     def __init__(self) -> None:
         import torch
 
+        _init_default_device()
+
         self._next_batch_index = 0
         self._batch_size = 1
 
@@ -60,6 +63,8 @@ class _SingleSizeImageList(ImageList):
     @staticmethod
     def _create_image_list(images: list[Tensor], indices: list[int]) -> ImageList:
         import torch
+
+        _init_default_device()
 
         from safeds.data.image.containers._empty_image_list import _EmptyImageList
 
@@ -127,6 +132,8 @@ class _SingleSizeImageList(ImageList):
     def _get_batch(self, batch_number: int, batch_size: int | None = None) -> Tensor:
         import torch
 
+        _init_default_device()
+
         if batch_size is None:
             batch_size = self._batch_size
         if batch_size * batch_number >= len(self):
@@ -174,6 +181,8 @@ class _SingleSizeImageList(ImageList):
 
     def __eq__(self, other: object) -> bool:
         import torch
+
+        _init_default_device()
 
         if not isinstance(other, ImageList):
             return NotImplemented
@@ -261,6 +270,8 @@ class _SingleSizeImageList(ImageList):
         from torchvision.transforms.v2 import functional as func2
         from torchvision.utils import save_image
 
+        _init_default_device()
+
         if self.channel == 4:
             raise IllegalFormatError("png")
         path_str: str | Path
@@ -307,6 +318,8 @@ class _SingleSizeImageList(ImageList):
         import torch
         from torchvision.transforms.v2 import functional as func2
         from torchvision.utils import save_image
+
+        _init_default_device()
 
         path_str: str | Path
         if isinstance(path, list):
@@ -369,6 +382,8 @@ class _SingleSizeImageList(ImageList):
     def _change_channel_of_tensor(tensor: Tensor, channel: int) -> Tensor:
         import torch
 
+        _init_default_device()
+
         """
         Change the channel of a tensor to the given channel.
 
@@ -406,6 +421,8 @@ class _SingleSizeImageList(ImageList):
 
     def _add_image_tensor(self, image_tensor: Tensor, index: int) -> ImageList:
         import torch
+
+        _init_default_device()
 
         from safeds.data.image.containers._multi_size_image_list import _MultiSizeImageList
 
@@ -469,6 +486,8 @@ class _SingleSizeImageList(ImageList):
 
     def add_images(self, images: list[Image] | ImageList) -> ImageList:
         import torch
+
+        _init_default_device()
 
         from safeds.data.image.containers._empty_image_list import _EmptyImageList
         from safeds.data.image.containers._multi_size_image_list import _MultiSizeImageList
@@ -624,6 +643,8 @@ class _SingleSizeImageList(ImageList):
         from torchvision.transforms import InterpolationMode
         from torchvision.transforms.v2 import functional as func2
 
+        _init_default_device()
+
         _check_resize_errors(new_width, new_height)
         image_list = self._clone_without_tensor()
         image_list._tensor = func2.resize(
@@ -643,6 +664,8 @@ class _SingleSizeImageList(ImageList):
         import torch
         from torchvision.transforms.v2 import functional as func2
 
+        _init_default_device()
+
         if tensor.size(dim=-3) == 4:
             return torch.cat(
                 [func2.rgb_to_grayscale(tensor[:, 0:3], num_output_channels=3), tensor[:, 3].unsqueeze(dim=1)],
@@ -654,6 +677,8 @@ class _SingleSizeImageList(ImageList):
     def crop(self, x: int, y: int, width: int, height: int) -> ImageList:
         from torchvision.transforms.v2 import functional as func2
 
+        _init_default_device()
+
         _check_crop_errors_and_warnings(x, y, width, height, self.widths[0], self.heights[0], plural=True)
         image_list = self._clone_without_tensor()
         image_list._tensor = func2.crop(self._tensor, x, y, height, width)
@@ -662,12 +687,16 @@ class _SingleSizeImageList(ImageList):
     def flip_vertically(self) -> ImageList:
         from torchvision.transforms.v2 import functional as func2
 
+        _init_default_device()
+
         image_list = self._clone_without_tensor()
         image_list._tensor = func2.vertical_flip(self._tensor)
         return image_list
 
     def flip_horizontally(self) -> ImageList:
         from torchvision.transforms.v2 import functional as func2
+
+        _init_default_device()
 
         image_list = self._clone_without_tensor()
         image_list._tensor = func2.horizontal_flip(self._tensor)
@@ -676,6 +705,8 @@ class _SingleSizeImageList(ImageList):
     def adjust_brightness(self, factor: float) -> ImageList:
         import torch
         from torchvision.transforms.v2 import functional as func2
+
+        _init_default_device()
 
         _check_adjust_brightness_errors_and_warnings(factor, plural=True)
         image_list = self._clone_without_tensor()
@@ -691,14 +722,20 @@ class _SingleSizeImageList(ImageList):
     def add_noise(self, standard_deviation: float) -> ImageList:
         import torch
 
+        _init_default_device()
+
         _check_add_noise_errors(standard_deviation)
         image_list = self._clone_without_tensor()
-        image_list._tensor = self._tensor + torch.normal(0, standard_deviation, self._tensor.size()) * 255
+        image_list._tensor = (
+            self._tensor + torch.normal(0, standard_deviation, self._tensor.size()).to(_get_device()) * 255
+        )
         return image_list
 
     def adjust_contrast(self, factor: float) -> ImageList:
         import torch
         from torchvision.transforms.v2 import functional as func2
+
+        _init_default_device()
 
         _check_adjust_contrast_errors_and_warnings(factor, plural=True)
         image_list = self._clone_without_tensor()
@@ -722,6 +759,8 @@ class _SingleSizeImageList(ImageList):
     def blur(self, radius: int) -> ImageList:
         from torchvision.transforms.v2 import functional as func2
 
+        _init_default_device()
+
         _check_blur_errors_and_warnings(radius, min(self.widths[0], self.heights[0]), plural=True)
         image_list = self._clone_without_tensor()
         image_list._tensor = func2.gaussian_blur(self._tensor, [radius * 2 + 1, radius * 2 + 1])
@@ -730,6 +769,8 @@ class _SingleSizeImageList(ImageList):
     def sharpen(self, factor: float) -> ImageList:
         import torch
         from torchvision.transforms.v2 import functional as func2
+
+        _init_default_device()
 
         _check_sharpen_errors_and_warnings(factor, plural=True)
         image_list = self._clone_without_tensor()
@@ -746,6 +787,8 @@ class _SingleSizeImageList(ImageList):
         import torch
         from torchvision.transforms.v2 import functional as func2
 
+        _init_default_device()
+
         image_list = self._clone_without_tensor()
         if self.channel == 4:
             image_list._tensor = torch.cat(
@@ -759,12 +802,16 @@ class _SingleSizeImageList(ImageList):
     def rotate_right(self) -> ImageList:
         from torchvision.transforms.v2 import functional as func2
 
+        _init_default_device()
+
         image_list = self._clone_without_tensor()
         image_list._tensor = func2.rotate(self._tensor, -90, expand=True)
         return image_list
 
     def rotate_left(self) -> ImageList:
         from torchvision.transforms.v2 import functional as func2
+
+        _init_default_device()
 
         image_list = self._clone_without_tensor()
         image_list._tensor = func2.rotate(self._tensor, 90, expand=True)
@@ -773,7 +820,9 @@ class _SingleSizeImageList(ImageList):
     def find_edges(self) -> ImageList:
         import torch
 
-        kernel = Image._filter_edges_kernel().to("cpu")
+        _init_default_device()
+
+        kernel = Image._filter_edges_kernel()
         edges_tensor = torch.clamp(
             torch.nn.functional.conv2d(
                 self.convert_to_grayscale()._as_single_size_image_list()._tensor.float()[:, 0].unsqueeze(dim=1),

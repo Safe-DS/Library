@@ -1,3 +1,7 @@
+import pytest
+from torch.types import Device
+
+from safeds._config import _get_device
 from safeds.data.tabular.containers import Table
 from safeds.data.tabular.transformation import RangeScaler
 from safeds.ml.nn import (
@@ -8,10 +12,13 @@ from safeds.ml.nn import (
     OutputConversionTimeSeries,
 )
 
-from tests.helpers import resolve_resource_path
+from tests.helpers import resolve_resource_path, get_devices, get_devices_ids, configure_test_with_device
 
 
-def test_lstm_model() -> None:
+@pytest.mark.parametrize("device", get_devices(), ids=get_devices_ids())
+def test_lstm_model(device: Device) -> None:
+    configure_test_with_device(device)
+
     # Create a DataFrame
     _inflation_path = "_datas/US_Inflation_rates.csv"
     table = Table.from_csv_file(path=resolve_resource_path(_inflation_path))
@@ -27,3 +34,4 @@ def test_lstm_model() -> None:
     trained_model = model.fit(train_table.to_time_series_dataset("value", "date"), epoch_size=1)
 
     trained_model.predict(test_table.to_time_series_dataset("value", "date"))
+    assert model._model.state_dict()["_pytorch_layers.0._layer.weight"].device == _get_device()

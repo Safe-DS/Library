@@ -5,6 +5,9 @@ from typing import TypeVar
 
 import pytest
 import torch
+from torch.types import Device
+
+from safeds._config import _get_device
 from safeds.data.image.containers import ImageList
 from safeds.data.image.containers._empty_image_list import _EmptyImageList
 from safeds.data.image.containers._multi_size_image_list import _MultiSizeImageList
@@ -21,11 +24,20 @@ from safeds.exceptions import (
 )
 from torch import Tensor
 
-from tests.helpers import images_all, plane_png_path, resolve_resource_path, white_square_png_path
+from tests.helpers import (
+    images_all,
+    plane_png_path,
+    resolve_resource_path,
+    white_square_png_path,
+    get_devices,
+    get_devices_ids,
+    configure_test_with_device,
+)
 
 T = TypeVar("T", Column, Table, ImageList)
 
 
+@pytest.mark.parametrize("device", get_devices(), ids=get_devices_ids())
 class TestImageDatasetInit:
 
     @pytest.mark.parametrize(
@@ -89,178 +101,176 @@ class TestImageDatasetInit:
         ],
     )
     def test_should_raise_with_invalid_data(
-        self,
-        input_data: ImageList,
-        output_data: T,
-        error: type[Exception],
-        error_msg: str,
+        self, input_data: ImageList, output_data: T, error: type[Exception], error_msg: str, device: Device
     ) -> None:
+        configure_test_with_device(device)
         with pytest.raises(error, match=error_msg):
             ImageDataset(input_data, output_data)
 
 
+@pytest.mark.parametrize("device", get_devices(), ids=get_devices_ids())
 class TestLength:
 
-    def test_should_return_length(self) -> None:
+    def test_should_return_length(self, device: Device) -> None:
+        configure_test_with_device(device)
         image_dataset = ImageDataset(ImageList.from_files(resolve_resource_path(plane_png_path)), Column("images", [1]))
         assert len(image_dataset) == 1
+        assert image_dataset._input._tensor.device == _get_device()
+        assert image_dataset._output._tensor.device == _get_device()
 
 
+@pytest.mark.parametrize("device", get_devices(), ids=get_devices_ids())
 class TestEq:
 
     @pytest.mark.parametrize(
-        ("image_dataset1", "image_dataset2"),
+        "image_dataset_output",
         [
-            (
-                ImageDataset(ImageList.from_files(resolve_resource_path(plane_png_path)), Column("images", [1])),
-                ImageDataset(ImageList.from_files(resolve_resource_path(plane_png_path)), Column("images", [1])),
-            ),
-            (
-                ImageDataset(ImageList.from_files(resolve_resource_path(plane_png_path)), Table({"images": [1]})),
-                ImageDataset(ImageList.from_files(resolve_resource_path(plane_png_path)), Table({"images": [1]})),
-            ),
-            (
-                ImageDataset(
-                    ImageList.from_files(resolve_resource_path(plane_png_path)),
-                    ImageList.from_files(resolve_resource_path(plane_png_path)),
-                ),
-                ImageDataset(
-                    ImageList.from_files(resolve_resource_path(plane_png_path)),
-                    ImageList.from_files(resolve_resource_path(plane_png_path)),
-                ),
-            ),
+            Column("images", [1]),
+            Table({"images": [1]}),
+            plane_png_path,
         ],
     )
-    def test_should_be_equal(self, image_dataset1: ImageDataset, image_dataset2: ImageDataset) -> None:
+    def test_should_be_equal(self, image_dataset_output: str | Column | Table, device: Device) -> None:
+        configure_test_with_device(device)
+        image_dataset1 = ImageDataset(ImageList.from_files(resolve_resource_path(plane_png_path)), ImageList.from_files(resolve_resource_path(image_dataset_output)) if isinstance(image_dataset_output, str) else image_dataset_output)  # type: ignore[type-var]
+        image_dataset2 = ImageDataset(ImageList.from_files(resolve_resource_path(plane_png_path)), ImageList.from_files(resolve_resource_path(image_dataset_output)) if isinstance(image_dataset_output, str) else image_dataset_output)  # type: ignore[type-var]
+        assert image_dataset1 is not image_dataset2
         assert image_dataset1 == image_dataset2
+        assert image_dataset1._input._tensor.device == _get_device()
+        assert image_dataset1._output._tensor.device == _get_device()
+        assert image_dataset2._input._tensor.device == _get_device()
+        assert image_dataset2._output._tensor.device == _get_device()
 
     @pytest.mark.parametrize(
-        "image_dataset1",
+        "image_dataset1_output",
         [
-            ImageDataset(ImageList.from_files(resolve_resource_path(plane_png_path)), Column("images", [1])),
-            ImageDataset(ImageList.from_files(resolve_resource_path(plane_png_path)), Table({"images": [1]})),
-            ImageDataset(
-                ImageList.from_files(resolve_resource_path(plane_png_path)),
-                ImageList.from_files(resolve_resource_path(plane_png_path)),
-            ),
+            Column("images", [1]),
+            Table({"images": [1]}),
+            plane_png_path,
         ],
     )
     @pytest.mark.parametrize(
-        "image_dataset2",
+        ("image_dataset2_input", "image_dataset2_output"),
         [
-            ImageDataset(ImageList.from_files(resolve_resource_path(plane_png_path)), Column("ims", [1])),
-            ImageDataset(ImageList.from_files(resolve_resource_path(plane_png_path)), Table({"ims": [1]})),
-            ImageDataset(ImageList.from_files(resolve_resource_path(plane_png_path)), Column("images", [0])),
-            ImageDataset(
-                ImageList.from_files(resolve_resource_path(plane_png_path)),
-                Table({"images": [0], "others": [1]}),
-            ),
-            ImageDataset(
-                ImageList.from_files(resolve_resource_path(plane_png_path)),
-                ImageList.from_files(resolve_resource_path(white_square_png_path)),
-            ),
-            ImageDataset(ImageList.from_files(resolve_resource_path(white_square_png_path)), Column("images", [1])),
-            ImageDataset(ImageList.from_files(resolve_resource_path(white_square_png_path)), Table({"images": [1]})),
-            ImageDataset(
-                ImageList.from_files(resolve_resource_path(white_square_png_path)),
-                ImageList.from_files(resolve_resource_path(plane_png_path)),
-            ),
+            (plane_png_path, Column("ims", [1])),
+            (plane_png_path, Table({"ims": [1]})),
+            (plane_png_path, Column("images", [0])),
+            (plane_png_path, Table({"images": [0], "others": [1]})),
+            (plane_png_path, white_square_png_path),
+            (white_square_png_path, Column("images", [1])),
+            (white_square_png_path, Table({"images": [1]})),
+            (white_square_png_path, plane_png_path),
         ],
     )
-    def test_should_not_be_equal(self, image_dataset1: ImageDataset, image_dataset2: ImageDataset) -> None:
+    def test_should_not_be_equal(
+        self,
+        image_dataset1_output: str | Column | Table,
+        image_dataset2_input: str,
+        image_dataset2_output: str | Column | Table,
+        device: Device,
+    ) -> None:
+        configure_test_with_device(device)
+        image_dataset1 = ImageDataset(ImageList.from_files(resolve_resource_path(plane_png_path)), ImageList.from_files(resolve_resource_path(image_dataset1_output)) if isinstance(image_dataset1_output, str) else image_dataset1_output)  # type: ignore[type-var]
+        image_dataset2 = ImageDataset(ImageList.from_files(resolve_resource_path(image_dataset2_input)), ImageList.from_files(resolve_resource_path(image_dataset2_output)) if isinstance(image_dataset2_output, str) else image_dataset2_output)  # type: ignore[type-var]
         assert image_dataset1 != image_dataset2
+        assert image_dataset1._input._tensor.device == _get_device()
+        assert image_dataset1._output._tensor.device == _get_device()
+        assert image_dataset2._input._tensor.device == _get_device()
+        assert image_dataset2._output._tensor.device == _get_device()
 
-    def test_should_be_not_implemented(self) -> None:
+    def test_should_be_not_implemented(self, device: Device) -> None:
+        configure_test_with_device(device)
         image_dataset = ImageDataset(ImageList.from_files(resolve_resource_path(plane_png_path)), Column("images", [1]))
         other = Table()
         assert image_dataset.__eq__(other) is NotImplemented
 
 
+@pytest.mark.parametrize("device", get_devices(), ids=get_devices_ids())
 class TestHash:
 
     @pytest.mark.parametrize(
-        ("image_dataset1", "image_dataset2"),
+        "image_dataset_output",
         [
-            (
-                ImageDataset(ImageList.from_files(resolve_resource_path(plane_png_path)), Column("images", [1])),
-                ImageDataset(ImageList.from_files(resolve_resource_path(plane_png_path)), Column("images", [1])),
-            ),
-            (
-                ImageDataset(ImageList.from_files(resolve_resource_path(plane_png_path)), Table({"images": [1]})),
-                ImageDataset(ImageList.from_files(resolve_resource_path(plane_png_path)), Table({"images": [1]})),
-            ),
-            (
-                ImageDataset(
-                    ImageList.from_files(resolve_resource_path(plane_png_path)),
-                    ImageList.from_files(resolve_resource_path(plane_png_path)),
-                ),
-                ImageDataset(
-                    ImageList.from_files(resolve_resource_path(plane_png_path)),
-                    ImageList.from_files(resolve_resource_path(plane_png_path)),
-                ),
-            ),
+            Column("images", [1]),
+            Table({"images": [1]}),
+            plane_png_path,
         ],
     )
-    def test_hash_should_be_equal(self, image_dataset1: ImageDataset, image_dataset2: ImageDataset) -> None:
+    def test_hash_should_be_equal(self, image_dataset_output: str | Column | Table, device: Device) -> None:
+        configure_test_with_device(device)
+        image_dataset1 = ImageDataset(ImageList.from_files(resolve_resource_path(plane_png_path)), ImageList.from_files(resolve_resource_path(image_dataset_output)) if isinstance(image_dataset_output, str) else image_dataset_output)  # type: ignore[type-var]
+        image_dataset2 = ImageDataset(ImageList.from_files(resolve_resource_path(plane_png_path)), ImageList.from_files(resolve_resource_path(image_dataset_output)) if isinstance(image_dataset_output, str) else image_dataset_output)  # type: ignore[type-var]
+        assert image_dataset1 is not image_dataset2
         assert hash(image_dataset1) == hash(image_dataset2)
+        assert image_dataset1._input._tensor.device == _get_device()
+        assert image_dataset1._output._tensor.device == _get_device()
+        assert image_dataset2._input._tensor.device == _get_device()
+        assert image_dataset2._output._tensor.device == _get_device()
 
     @pytest.mark.parametrize(
-        "image_dataset1",
+        "image_dataset1_output",
         [
-            ImageDataset(ImageList.from_files(resolve_resource_path(plane_png_path)), Column("images", [1])),
-            ImageDataset(ImageList.from_files(resolve_resource_path(plane_png_path)), Table({"images": [1]})),
-            ImageDataset(
-                ImageList.from_files(resolve_resource_path(plane_png_path)),
-                ImageList.from_files(resolve_resource_path(plane_png_path)),
-            ),
+            Column("images", [1]),
+            Table({"images": [1]}),
+            plane_png_path,
         ],
     )
     @pytest.mark.parametrize(
-        "image_dataset2",
+        ("image_dataset2_input", "image_dataset2_output"),
         [
-            ImageDataset(ImageList.from_files(resolve_resource_path(plane_png_path)), Column("ims", [1])),
-            ImageDataset(ImageList.from_files(resolve_resource_path(plane_png_path)), Table({"ims": [1]})),
-            ImageDataset(ImageList.from_files(resolve_resource_path(plane_png_path)), Column("images", [0])),
-            ImageDataset(
-                ImageList.from_files(resolve_resource_path(plane_png_path)),
-                Table({"images": [0], "others": [1]}),
-            ),
-            ImageDataset(
-                ImageList.from_files(resolve_resource_path(plane_png_path)),
-                ImageList.from_files(resolve_resource_path(white_square_png_path)),
-            ),
-            ImageDataset(ImageList.from_files(resolve_resource_path(white_square_png_path)), Column("images", [1])),
-            ImageDataset(ImageList.from_files(resolve_resource_path(white_square_png_path)), Table({"images": [1]})),
-            ImageDataset(
-                ImageList.from_files(resolve_resource_path(white_square_png_path)),
-                ImageList.from_files(resolve_resource_path(plane_png_path)),
-            ),
+            (plane_png_path, Column("ims", [1])),
+            (plane_png_path, Table({"ims": [1]})),
+            (plane_png_path, Column("images", [0])),
+            (plane_png_path, Table({"images": [0], "others": [1]})),
+            (plane_png_path, white_square_png_path),
+            (white_square_png_path, Column("images", [1])),
+            (white_square_png_path, Table({"images": [1]})),
+            (white_square_png_path, plane_png_path),
         ],
     )
-    def test_hash_should_not_be_equal(self, image_dataset1: ImageDataset, image_dataset2: ImageDataset) -> None:
+    def test_hash_should_not_be_equal(
+        self,
+        image_dataset1_output: str | Column | Table,
+        image_dataset2_input: str,
+        image_dataset2_output: str | Column | Table,
+        device: Device,
+    ) -> None:
+        configure_test_with_device(device)
+        image_dataset1 = ImageDataset(ImageList.from_files(resolve_resource_path(plane_png_path)), ImageList.from_files(resolve_resource_path(image_dataset1_output)) if isinstance(image_dataset1_output, str) else image_dataset1_output)  # type: ignore[type-var]
+        image_dataset2 = ImageDataset(ImageList.from_files(resolve_resource_path(image_dataset2_input)), ImageList.from_files(resolve_resource_path(image_dataset2_output)) if isinstance(image_dataset2_output, str) else image_dataset2_output)  # type: ignore[type-var]
         assert hash(image_dataset1) != hash(image_dataset2)
+        assert image_dataset1._input._tensor.device == _get_device()
+        assert image_dataset1._output._tensor.device == _get_device()
+        assert image_dataset2._input._tensor.device == _get_device()
+        assert image_dataset2._output._tensor.device == _get_device()
 
 
+@pytest.mark.parametrize("device", get_devices(), ids=get_devices_ids())
 class TestSizeOf:
 
     @pytest.mark.parametrize(
-        "image_dataset",
+        "image_dataset_output",
         [
-            ImageDataset(ImageList.from_files(resolve_resource_path(plane_png_path)), Column("images", [1])),
-            ImageDataset(ImageList.from_files(resolve_resource_path(plane_png_path)), Table({"images": [1]})),
-            ImageDataset(
-                ImageList.from_files(resolve_resource_path(plane_png_path)),
-                ImageList.from_files(resolve_resource_path(plane_png_path)),
-            ),
+            Column("images", [1]),
+            Table({"images": [1]}),
+            plane_png_path,
         ],
     )
-    def test_should_size_be_greater_than_normal_object(self, image_dataset: ImageDataset) -> None:
+    def test_should_size_be_greater_than_normal_object(
+        self, image_dataset_output: str | Column | Table, device: Device
+    ) -> None:
+        configure_test_with_device(device)
+        image_dataset = ImageDataset(ImageList.from_files(resolve_resource_path(plane_png_path)), ImageList.from_files(resolve_resource_path(image_dataset_output)) if isinstance(image_dataset_output, str) else image_dataset_output)  # type: ignore[type-var]
         assert sys.getsizeof(image_dataset) > sys.getsizeof(object())
+        assert image_dataset._input._tensor.device == _get_device()
+        assert image_dataset._output._tensor.device == _get_device()
 
 
+@pytest.mark.parametrize("device", get_devices(), ids=get_devices_ids())
 class TestShuffle:
 
-    def test_should_be_different_order(self) -> None:
+    def test_should_be_different_order(self, device: Device) -> None:
+        configure_test_with_device(device)
         torch.manual_seed(1234)
         image_list = ImageList.from_files(resolve_resource_path(images_all())).resize(10, 10)
         image_dataset = ImageDataset(image_list, Column("images", images_all()))
@@ -269,8 +279,11 @@ class TestShuffle:
         batch_shuffled = image_dataset_shuffled._get_batch(0, len(image_dataset))
         assert not torch.all(torch.eq(batch[0], batch_shuffled[0]))
         assert not torch.all(torch.eq(batch[1], batch_shuffled[1]))
+        assert image_dataset._input._tensor.device == _get_device()
+        assert image_dataset._output._tensor.device == _get_device()
 
 
+@pytest.mark.parametrize("device", get_devices(), ids=get_devices_ids())
 class TestBatch:
 
     @pytest.mark.parametrize(
@@ -283,22 +296,34 @@ class TestBatch:
             (4, math.ceil(len(images_all()) / 4)),
         ],
     )
-    def test_should_raise_index_out_of_bounds_error(self, batch_number: int, batch_size: int) -> None:
+    def test_should_raise_index_out_of_bounds_error(self, batch_number: int, batch_size: int, device: Device) -> None:
+        configure_test_with_device(device)
         image_list = ImageList.from_files(resolve_resource_path(images_all())).resize(10, 10)
         image_dataset = ImageDataset(image_list, Column("images", images_all()))
         with pytest.raises(IndexOutOfBoundsError):
             image_dataset._get_batch(batch_number, batch_size)
 
-    def test_should_raise_out_of_bounds_error(self) -> None:
+    def test_should_raise_out_of_bounds_error(self, device: Device) -> None:
+        configure_test_with_device(device)
         image_list = ImageList.from_files(resolve_resource_path(images_all())).resize(10, 10)
         image_dataset = ImageDataset(image_list, Column("images", images_all()))
         with pytest.raises(OutOfBoundsError):
             image_dataset._get_batch(0, -1)
 
+    def test_get_batch_device(self, device: Device) -> None:
+        configure_test_with_device(device)
+        image_list = ImageList.from_files(resolve_resource_path(images_all())).resize(10, 10)
+        image_dataset = ImageDataset(image_list, Column("images", images_all()))
+        batch = image_dataset._get_batch(0)
+        assert batch[0].device == _get_device()
+        assert batch[1].device == _get_device()
 
+
+@pytest.mark.parametrize("device", get_devices(), ids=get_devices_ids())
 class TestTableAsTensor:
 
-    def test_should_raise_if_not_one_hot_encoded(self) -> None:
+    def test_should_raise_if_not_one_hot_encoded(self, device: Device) -> None:
+        configure_test_with_device(device)
         with pytest.raises(
             ValueError,
             match=r"The given table is not correctly one hot encoded as it contains rows that have a sum not equal to 1.",
@@ -313,14 +338,18 @@ class TestTableAsTensor:
             (torch.randn(10, 10), r"Tensor and column_names have different amounts of classes \(10!=2\)."),
         ],
     )
-    def test_should_raise_from_tensor(self, tensor: Tensor, error_msg: str) -> None:
+    def test_should_raise_from_tensor(self, tensor: Tensor, error_msg: str, device: Device) -> None:
+        configure_test_with_device(device)
+        tensor = tensor.to(_get_device())
         with pytest.raises(ValueError, match=error_msg):
             _TableAsTensor._from_tensor(tensor, ["a", "b"])
 
-    def test_eq_should_be_not_implemented(self) -> None:
+    def test_eq_should_be_not_implemented(self, device: Device) -> None:
+        configure_test_with_device(device)
         assert _TableAsTensor(Table()).__eq__(Table()) is NotImplemented
 
 
+@pytest.mark.parametrize("device", get_devices(), ids=get_devices_ids())
 class TestColumnAsTensor:
 
     @pytest.mark.parametrize(
@@ -353,14 +382,19 @@ class TestColumnAsTensor:
         one_hot_encoder: OneHotEncoder,
         error: type[Exception],
         error_msg: str,
+        device: Device,
     ) -> None:
+        configure_test_with_device(device)
+        tensor = tensor.to(_get_device())
         with pytest.raises(error, match=error_msg):
             _ColumnAsTensor._from_tensor(tensor, "a", one_hot_encoder)
 
-    def test_eq_should_be_not_implemented(self) -> None:
+    def test_eq_should_be_not_implemented(self, device: Device) -> None:
+        configure_test_with_device(device)
         assert _ColumnAsTensor(Column("column", [1])).__eq__(Table()) is NotImplemented
 
-    def test_should_not_warn(self) -> None:
+    def test_should_not_warn(self, device: Device) -> None:
+        configure_test_with_device(device)
         with warnings.catch_warnings():
             warnings.filterwarnings("error")
             _ColumnAsTensor(Column("column", [1, 2, 3]))
