@@ -196,7 +196,6 @@ class TimeSeriesDataset:
         ValueError:
             If the size is smaller or even than forecast_horizon+window_size
 
-
         Returns
         -------
         result:
