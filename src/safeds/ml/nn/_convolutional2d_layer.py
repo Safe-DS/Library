@@ -25,6 +25,7 @@ def _create_internal_model(
     output_padding: int = 0,
 ) -> nn.Module:
     from torch import nn
+
     _init_default_device()
 
     class _InternalLayer(nn.Module):

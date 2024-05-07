@@ -16,6 +16,7 @@ from safeds.ml.nn import Layer
 
 def _create_internal_model() -> nn.Module:
     from torch import nn
+
     _init_default_device()
 
     class _InternalLayer(nn.Module):

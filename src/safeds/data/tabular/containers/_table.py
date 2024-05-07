@@ -2636,6 +2636,7 @@ class Table:
         import numpy as np
         import torch
         from torch.utils.data import DataLoader
+
         _init_default_device()
 
         features = self.to_rows()
@@ -2645,13 +2646,18 @@ class Table:
             for column_name in row:
                 new_item.append(row.get_value(column_name))
             all_rows.append(new_item.copy())
-        return DataLoader(dataset=_create_dataset(np.array(all_rows)), batch_size=batch_size, generator=torch.Generator(device=_get_device()))
+        return DataLoader(
+            dataset=_create_dataset(np.array(all_rows)),
+            batch_size=batch_size,
+            generator=torch.Generator(device=_get_device()),
+        )
 
 
 def _create_dataset(features: np.array) -> Dataset:
     import numpy as np
     import torch
     from torch.utils.data import Dataset
+
     _init_default_device()
 
     class _CustomDataset(Dataset):

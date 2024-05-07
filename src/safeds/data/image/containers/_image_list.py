@@ -132,6 +132,7 @@ class ImageList(metaclass=ABCMeta):
         """
         from PIL.Image import open as pil_image_open
         from torchvision.transforms.v2.functional import pil_to_tensor
+
         _init_default_device()
 
         from safeds.data.image.containers._empty_image_list import _EmptyImageList
@@ -267,6 +268,7 @@ class ImageList(metaclass=ABCMeta):
         """
         import torch
         from torchvision.utils import make_grid, save_image
+
         _init_default_device()
 
         from safeds.data.image.containers._empty_image_list import _EmptyImageList

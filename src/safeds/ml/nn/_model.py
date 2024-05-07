@@ -156,6 +156,7 @@ class NeuralNetworkRegressor(Generic[IFT, IPT, OT]):
         """
         import torch
         from torch import nn
+
         _init_default_device()
 
         if epoch_size < 1:
@@ -227,6 +228,7 @@ class NeuralNetworkRegressor(Generic[IFT, IPT, OT]):
             If the model has not been fitted yet
         """
         import torch
+
         _init_default_device()
 
         if not self._is_fitted:
@@ -370,6 +372,7 @@ class NeuralNetworkClassifier(Generic[IFT, IPT, OT]):
         """
         import torch
         from torch import nn
+
         _init_default_device()
 
         if epoch_size < 1:
@@ -448,6 +451,7 @@ class NeuralNetworkClassifier(Generic[IFT, IPT, OT]):
             If the Model has not been fitted yet
         """
         import torch
+
         _init_default_device()
 
         if not self._is_fitted:
@@ -481,6 +485,7 @@ def _create_internal_model(
     is_for_classification: bool,
 ) -> nn.Module:
     from torch import nn
+
     _init_default_device()
 
     class _InternalModel(nn.Module):

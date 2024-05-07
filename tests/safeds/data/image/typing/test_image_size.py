@@ -13,7 +13,8 @@ from tests.helpers import (
     images_all,
     images_all_ids,
     plane_png_path,
-    resolve_resource_path, configure_test_with_device,
+    resolve_resource_path,
+    configure_test_with_device,
 )
 
 

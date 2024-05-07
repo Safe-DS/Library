@@ -178,6 +178,7 @@ class TabularDataset:
         """
         import torch
         from torch.utils.data import DataLoader
+
         _init_default_device()
 
         if num_of_classes <= 2:
@@ -194,7 +195,9 @@ class TabularDataset:
             return DataLoader(
                 dataset=_create_dataset(
                     torch.Tensor(self.features._data.values).to(_get_device()),
-                    torch.nn.functional.one_hot(torch.LongTensor(self.target._data).to(_get_device()), num_classes=num_of_classes),
+                    torch.nn.functional.one_hot(
+                        torch.LongTensor(self.target._data).to(_get_device()), num_classes=num_of_classes
+                    ),
                 ),
                 batch_size=batch_size,
                 shuffle=True,
@@ -220,6 +223,7 @@ class TabularDataset:
 def _create_dataset(features: Tensor, target: Tensor) -> Dataset:
     import torch
     from torch.utils.data import Dataset
+
     _init_default_device()
 
     class _CustomDataset(Dataset):

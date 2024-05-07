@@ -30,7 +30,10 @@ from tests.helpers import (
     resolve_resource_path,
     skip_if_os,
     test_images_folder,
-    white_square_jpg_path, get_devices, get_devices_ids, configure_test_with_device,
+    white_square_jpg_path,
+    get_devices,
+    get_devices_ids,
+    configure_test_with_device,
 )
 
 
@@ -459,7 +462,9 @@ class TestFromFiles:
             *[s + "-path" for s in images_all_ids()],
         ],
     )
-    def test_from_files_creation(self, resource_path: str | Path, snapshot_png_image_list: SnapshotAssertion, device: Device) -> None:
+    def test_from_files_creation(
+        self, resource_path: str | Path, snapshot_png_image_list: SnapshotAssertion, device: Device
+    ) -> None:
         configure_test_with_device(device)
         image_list = ImageList.from_files(resolve_resource_path(resource_path))
         image_list_returned_filenames, filenames = ImageList.from_files(
@@ -612,7 +617,9 @@ class TestToJpegFiles:
         ],
         ids=["all-jpg-images", "jpg-planes", "jpg-grayscale"],
     )
-    def test_should_save_images_in_directories_for_different_sizes(self, resource_path: list[str], device: Device) -> None:
+    def test_should_save_images_in_directories_for_different_sizes(
+        self, resource_path: list[str], device: Device
+    ) -> None:
         configure_test_with_device(device)
         image_list = ImageList.from_files(resolve_resource_path(resource_path))
 
@@ -712,7 +719,9 @@ class TestToPngFiles:
         [images_all(), [plane_png_path, plane_jpg_path], [grayscale_png_path, grayscale_png_path]],
         ids=["all-images", "planes", "grayscale"],
     )
-    def test_should_save_images_in_directories_for_different_sizes(self, resource_path: list[str], device: Device) -> None:
+    def test_should_save_images_in_directories_for_different_sizes(
+        self, resource_path: list[str], device: Device
+    ) -> None:
         configure_test_with_device(device)
         image_list = ImageList.from_files(resolve_resource_path(resource_path))
 
@@ -765,7 +774,9 @@ class TestShuffleImages:
         [images_all(), [plane_png_path, plane_jpg_path] * 2],
         ids=["all-images", "planes"],
     )
-    def test_shuffle_images(self, resource_path: list[str], snapshot_png_image_list: SnapshotAssertion, device: Device) -> None:
+    def test_shuffle_images(
+        self, resource_path: list[str], snapshot_png_image_list: SnapshotAssertion, device: Device
+    ) -> None:
         configure_test_with_device(device)
         image_list_original = ImageList.from_files(resolve_resource_path(resource_path))
         image_list_clone = image_list_original._clone()
@@ -1018,7 +1029,9 @@ class TestErrorsAndWarningsWithEmptyImageList:
             [(-10, 10), (10, -10), (-10, -10)],
             ids=["invalid width", "invalid height", "invalid width and height"],
         )
-        def test_should_raise_negative_size(self, resource_path: list[str], width: int, height: int, device: Device) -> None:
+        def test_should_raise_negative_size(
+            self, resource_path: list[str], width: int, height: int, device: Device
+        ) -> None:
             configure_test_with_device(device)
             image_list = ImageList.from_files(resolve_resource_path(resource_path))
             with pytest.raises(
@@ -1034,7 +1047,9 @@ class TestErrorsAndWarningsWithEmptyImageList:
             [(-10, 10), (10, -10), (-10, -10)],
             ids=["invalid width", "invalid height", "invalid width and height"],
         )
-        def test_should_raise_new_size(self, resource_path: list[str], new_width: int, new_height: int, device: Device) -> None:
+        def test_should_raise_new_size(
+            self, resource_path: list[str], new_width: int, new_height: int, device: Device
+        ) -> None:
             configure_test_with_device(device)
             image_list = ImageList.from_files(resolve_resource_path(resource_path))
             with pytest.raises(
@@ -1050,7 +1065,9 @@ class TestErrorsAndWarningsWithEmptyImageList:
             [(-10, 1), (1, -10), (-10, -1)],
             ids=["invalid width", "invalid height", "invalid width and height"],
         )
-        def test_should_raise_invalid_size(self, resource_path: list[str], new_width: int, new_height: int, device: Device) -> None:
+        def test_should_raise_invalid_size(
+            self, resource_path: list[str], new_width: int, new_height: int, device: Device
+        ) -> None:
             configure_test_with_device(device)
             image_list = ImageList.from_files(resolve_resource_path(resource_path))
             with pytest.raises(
@@ -1064,7 +1081,9 @@ class TestErrorsAndWarningsWithEmptyImageList:
             [(-10, 1), (1, -10), (-10, -1)],
             ids=["invalid x", "invalid y", "invalid x and y"],
         )
-        def test_should_raise_invalid_coordinates(self, resource_path: list[str], new_x: int, new_y: int, device: Device) -> None:
+        def test_should_raise_invalid_coordinates(
+            self, resource_path: list[str], new_x: int, new_y: int, device: Device
+        ) -> None:
             configure_test_with_device(device)
             image_list = ImageList.from_files(resolve_resource_path(resource_path))
             with pytest.raises(
@@ -1081,10 +1100,7 @@ class TestErrorsAndWarningsWithEmptyImageList:
             ids=["sigma below zero"],
         )
         def test_should_raise_standard_deviation(
-            self,
-            resource_path: list[str],
-            standard_deviation: float,
-            device: Device
+            self, resource_path: list[str], standard_deviation: float, device: Device
         ) -> None:
             configure_test_with_device(device)
             image_list_original = ImageList.from_files(resolve_resource_path(resource_path))

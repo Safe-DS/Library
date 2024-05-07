@@ -47,6 +47,7 @@ class ImageDataset(Generic[T]):
 
     def __init__(self, input_data: ImageList, output_data: T, batch_size: int = 1, shuffle: bool = False) -> None:
         import torch
+
         _init_default_device()
 
         self._shuffle_tensor_indices: torch.LongTensor = torch.LongTensor(list(range(len(input_data))))
@@ -225,6 +226,7 @@ class ImageDataset(Generic[T]):
 
     def _get_batch(self, batch_number: int, batch_size: int | None = None) -> tuple[Tensor, Tensor]:
         import torch
+
         _init_default_device()
 
         if batch_size is None:
@@ -276,6 +278,7 @@ class ImageDataset(Generic[T]):
             the shuffled `ImageDataset`
         """
         import torch
+
         _init_default_device()
 
         im_dataset: ImageDataset[T] = copy.copy(self)
@@ -288,6 +291,7 @@ class _TableAsTensor:
 
     def __init__(self, table: Table) -> None:
         import torch
+
         _init_default_device()
 
         self._column_names = table.column_names
@@ -300,6 +304,7 @@ class _TableAsTensor:
 
     def __eq__(self, other: object) -> bool:
         import torch
+
         _init_default_device()
 
         if not isinstance(other, _TableAsTensor):
@@ -339,6 +344,7 @@ class _ColumnAsTensor:
 
     def __init__(self, column: Column) -> None:
         import torch
+
         _init_default_device()
 
         self._column_name = column.name
@@ -356,6 +362,7 @@ class _ColumnAsTensor:
 
     def __eq__(self, other: object) -> bool:
         import torch
+
         _init_default_device()
 
         if not isinstance(other, _ColumnAsTensor):
