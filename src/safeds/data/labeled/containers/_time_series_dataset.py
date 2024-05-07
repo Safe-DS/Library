@@ -214,20 +214,20 @@ class TimeSeriesDataset:
             raise ValueError("window_size must be greater than or equal to 1")
         if forecast_horizon < 1:
             raise ValueError("forecast_horizon must be greater than or equal to 1")
-        if size <= forecast_horizon+window_size:
+        if size <= forecast_horizon + window_size:
             raise ValueError("Can not create windows with window size less then forecast horizon + window_size")
         # create feature windows and for that features targets lagged by forecast len
         # every feature column wird auch gewindowed
         # -> [i, win_size],[target]
         feature_cols = self.features.to_columns()
         for i in range(size - (forecast_horizon + window_size)):
-            window = target_tensor[i: i + window_size]
+            window = target_tensor[i : i + window_size]
             label = target_tensor[i + window_size + forecast_horizon]
             print(window)
             print(label)
             for col in feature_cols:
                 data = torch.tensor(col._data.values, dtype=torch.float32)
-                window = torch.cat((window, data[i: i + window_size]), dim=0)
+                window = torch.cat((window, data[i : i + window_size]), dim=0)
             x_s.append(window)
             y_s.append(label)
         x_s_tensor = torch.stack(x_s)
@@ -268,10 +268,10 @@ class TimeSeriesDataset:
         size = target_tensor.size(0)
         feature_cols = self.features.to_columns()
         for i in range(size - (forecast_horizon + window_size)):
-            window = target_tensor[i: i + window_size]
+            window = target_tensor[i : i + window_size]
             for col in feature_cols:
                 data = torch.tensor(col._data.values, dtype=torch.float32)
-                window = torch.cat((window, data[i: i + window_size]), dim=-1)
+                window = torch.cat((window, data[i : i + window_size]), dim=-1)
             x_s.append(window)
 
         x_s_tensor = torch.stack(x_s)
@@ -296,7 +296,6 @@ class TimeSeriesDataset:
 
 
 def _create_dataset(features: torch.Tensor, target: torch.Tensor) -> Dataset:
-    import torch
     from torch.utils.data import Dataset
 
     class _CustomDataset(Dataset):
@@ -315,7 +314,6 @@ def _create_dataset(features: torch.Tensor, target: torch.Tensor) -> Dataset:
 
 
 def _create_dataset_predict(features: torch.Tensor) -> Dataset:
-    import torch
     from torch.utils.data import Dataset
 
     class _CustomDataset(Dataset):

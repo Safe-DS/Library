@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING
 from safeds._utils import _structural_hash
 from safeds.data.image.containers import Image
 from safeds.data.labeled.containers import TimeSeriesDataset
-from safeds.data.tabular.containers import Column, Table
+from safeds.data.tabular.containers import Column
 from safeds.exceptions import (
     DatasetMissesDataError,
     MissingValuesColumnError,
