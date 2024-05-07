@@ -79,7 +79,7 @@ def test_should_create_dataloader(
         "window_size",
     ],
 )
-def test_should_create_dataloader(
+def test_should_create_dataloader_invalid(
     data: TimeSeriesDataset,
     window_size: str,
     forecast_horizon: str,
