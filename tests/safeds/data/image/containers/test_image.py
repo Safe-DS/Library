@@ -40,7 +40,9 @@ from tests.helpers import (
     white_square_jpg_id,
     white_square_jpg_path,
     white_square_png_id,
-    white_square_png_path, device_cpu, device_cuda,
+    white_square_png_path,
+    device_cpu,
+    device_cuda,
 )
 
 
@@ -1051,7 +1053,6 @@ class TestFilterEdgesKernel:
         assert Image._filter_edges_kernel().device == _get_device()
         configure_test_with_device(device_cpu)
         assert Image._filter_edges_kernel().device == _get_device()
-
 
 
 @pytest.mark.parametrize("device", get_devices(), ids=get_devices_ids())
