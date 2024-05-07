@@ -130,8 +130,8 @@ class TestEq:
     )
     def test_should_be_equal(self, image_dataset_output: str | Column | Table, device: Device) -> None:
         configure_test_with_device(device)
-        image_dataset1 = ImageDataset(ImageList.from_files(resolve_resource_path(plane_png_path)), ImageList.from_files(resolve_resource_path(image_dataset_output)) if isinstance(image_dataset_output, str) else image_dataset_output)
-        image_dataset2 = ImageDataset(ImageList.from_files(resolve_resource_path(plane_png_path)), ImageList.from_files(resolve_resource_path(image_dataset_output)) if isinstance(image_dataset_output, str) else image_dataset_output)
+        image_dataset1 = ImageDataset(ImageList.from_files(resolve_resource_path(plane_png_path)), ImageList.from_files(resolve_resource_path(image_dataset_output)) if isinstance(image_dataset_output, str) else image_dataset_output)  # type: ignore[type-var]
+        image_dataset2 = ImageDataset(ImageList.from_files(resolve_resource_path(plane_png_path)), ImageList.from_files(resolve_resource_path(image_dataset_output)) if isinstance(image_dataset_output, str) else image_dataset_output)  # type: ignore[type-var]
         assert image_dataset1 is not image_dataset2
         assert image_dataset1 == image_dataset2
         assert image_dataset1._input._tensor.device == _get_device()
@@ -162,8 +162,8 @@ class TestEq:
     )
     def test_should_not_be_equal(self, image_dataset1_output: str | Column | Table, image_dataset2_input: str, image_dataset2_output: str | Column | Table, device: Device) -> None:
         configure_test_with_device(device)
-        image_dataset1 = ImageDataset(ImageList.from_files(resolve_resource_path(plane_png_path)), ImageList.from_files(resolve_resource_path(image_dataset1_output)) if isinstance(image_dataset1_output, str) else image_dataset1_output)
-        image_dataset2 = ImageDataset(ImageList.from_files(resolve_resource_path(image_dataset2_input)), ImageList.from_files(resolve_resource_path(image_dataset2_output)) if isinstance(image_dataset2_output, str) else image_dataset2_output)
+        image_dataset1 = ImageDataset(ImageList.from_files(resolve_resource_path(plane_png_path)), ImageList.from_files(resolve_resource_path(image_dataset1_output)) if isinstance(image_dataset1_output, str) else image_dataset1_output)  # type: ignore[type-var]
+        image_dataset2 = ImageDataset(ImageList.from_files(resolve_resource_path(image_dataset2_input)), ImageList.from_files(resolve_resource_path(image_dataset2_output)) if isinstance(image_dataset2_output, str) else image_dataset2_output)  # type: ignore[type-var]
         assert image_dataset1 != image_dataset2
         assert image_dataset1._input._tensor.device == _get_device()
         assert image_dataset1._output._tensor.device == _get_device()
@@ -190,8 +190,8 @@ class TestHash:
     )
     def test_hash_should_be_equal(self, image_dataset_output: str | Column | Table, device: Device) -> None:
         configure_test_with_device(device)
-        image_dataset1 = ImageDataset(ImageList.from_files(resolve_resource_path(plane_png_path)), ImageList.from_files(resolve_resource_path(image_dataset_output)) if isinstance(image_dataset_output, str) else image_dataset_output)
-        image_dataset2 = ImageDataset(ImageList.from_files(resolve_resource_path(plane_png_path)), ImageList.from_files(resolve_resource_path(image_dataset_output)) if isinstance(image_dataset_output, str) else image_dataset_output)
+        image_dataset1 = ImageDataset(ImageList.from_files(resolve_resource_path(plane_png_path)), ImageList.from_files(resolve_resource_path(image_dataset_output)) if isinstance(image_dataset_output, str) else image_dataset_output)  # type: ignore[type-var]
+        image_dataset2 = ImageDataset(ImageList.from_files(resolve_resource_path(plane_png_path)), ImageList.from_files(resolve_resource_path(image_dataset_output)) if isinstance(image_dataset_output, str) else image_dataset_output)  # type: ignore[type-var]
         assert image_dataset1 is not image_dataset2
         assert hash(image_dataset1) == hash(image_dataset2)
         assert image_dataset1._input._tensor.device == _get_device()
@@ -222,8 +222,8 @@ class TestHash:
     )
     def test_hash_should_not_be_equal(self, image_dataset1_output: str | Column | Table, image_dataset2_input: str, image_dataset2_output: str | Column | Table, device: Device) -> None:
         configure_test_with_device(device)
-        image_dataset1 = ImageDataset(ImageList.from_files(resolve_resource_path(plane_png_path)), ImageList.from_files(resolve_resource_path(image_dataset1_output)) if isinstance(image_dataset1_output, str) else image_dataset1_output)
-        image_dataset2 = ImageDataset(ImageList.from_files(resolve_resource_path(image_dataset2_input)), ImageList.from_files(resolve_resource_path(image_dataset2_output)) if isinstance(image_dataset2_output, str) else image_dataset2_output)
+        image_dataset1 = ImageDataset(ImageList.from_files(resolve_resource_path(plane_png_path)), ImageList.from_files(resolve_resource_path(image_dataset1_output)) if isinstance(image_dataset1_output, str) else image_dataset1_output)  # type: ignore[type-var]
+        image_dataset2 = ImageDataset(ImageList.from_files(resolve_resource_path(image_dataset2_input)), ImageList.from_files(resolve_resource_path(image_dataset2_output)) if isinstance(image_dataset2_output, str) else image_dataset2_output)  # type: ignore[type-var]
         assert hash(image_dataset1) != hash(image_dataset2)
         assert image_dataset1._input._tensor.device == _get_device()
         assert image_dataset1._output._tensor.device == _get_device()
@@ -244,7 +244,7 @@ class TestSizeOf:
     )
     def test_should_size_be_greater_than_normal_object(self, image_dataset_output: str | Column | Table, device: Device) -> None:
         configure_test_with_device(device)
-        image_dataset = ImageDataset(ImageList.from_files(resolve_resource_path(plane_png_path)), ImageList.from_files(resolve_resource_path(image_dataset_output)) if isinstance(image_dataset_output, str) else image_dataset_output)
+        image_dataset = ImageDataset(ImageList.from_files(resolve_resource_path(plane_png_path)), ImageList.from_files(resolve_resource_path(image_dataset_output)) if isinstance(image_dataset_output, str) else image_dataset_output)  # type: ignore[type-var]
         assert sys.getsizeof(image_dataset) > sys.getsizeof(object())
         assert image_dataset._input._tensor.device == _get_device()
         assert image_dataset._output._tensor.device == _get_device()
