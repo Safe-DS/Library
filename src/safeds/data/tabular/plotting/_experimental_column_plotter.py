@@ -9,7 +9,7 @@ if TYPE_CHECKING:
 
 class ExperimentalColumnPlotter:
     def __init__(self, column: ExperimentalColumn):
-        self.column: ExperimentalColumn = column
+        self._column: ExperimentalColumn = column
 
     def box_plot(self) -> Image:
         raise NotImplementedError

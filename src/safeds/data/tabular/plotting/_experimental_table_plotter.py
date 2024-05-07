@@ -9,7 +9,7 @@ if TYPE_CHECKING:
 
 class ExperimentalTablePlotter:
     def __init__(self, table: ExperimentalTable):
-        self.table: ExperimentalTable = table
+        self._table: ExperimentalTable = table
 
     def box_plots(self) -> Image:
         raise NotImplementedError
