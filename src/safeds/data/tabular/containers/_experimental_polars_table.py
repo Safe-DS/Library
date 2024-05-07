@@ -44,7 +44,7 @@ class ExperimentalPolarsTable:
     Parameters
     ----------
     data:
-        The data. If None, an empty table is created.
+        The data of the table. If None, an empty table is created.
 
     Raises
     ------
@@ -444,7 +444,7 @@ class ExperimentalPolarsTable:
 
         mask = query(_VectorizedRow(self))
         if not isinstance(mask, _VectorizedCell) or mask._series.dtype != pl.Boolean:
-            raise TypeError("The query function must return a boolean cell.")
+            raise TypeError("The query must return a boolean cell.")
 
         return ExperimentalPolarsTable._from_polars_lazy_frame(
             self._lazy_frame.filter(mask._series),

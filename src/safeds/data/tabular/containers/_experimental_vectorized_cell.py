@@ -7,6 +7,8 @@ from ._experimental_polars_cell import ExperimentalPolarsCell
 if TYPE_CHECKING:
     import polars as pl
 
+    from safeds.data.tabular.typing import ColumnType
+
     from ._experimental_polars_column import ExperimentalPolarsColumn
 
 T = TypeVar("T")
@@ -194,6 +196,25 @@ class _VectorizedCell(ExperimentalPolarsCell[T]):
 
     def __sizeof__(self) -> int:
         raise NotImplementedError
+
+    # ------------------------------------------------------------------------------------------------------------------
+    # Properties
+    # ------------------------------------------------------------------------------------------------------------------
+
+    @property
+    def type(self) -> ColumnType:
+        raise NotImplementedError
+
+    # ------------------------------------------------------------------------------------------------------------------
+    # Internal
+    # ------------------------------------------------------------------------------------------------------------------
+
+    def _equals(self, other: object) -> bool:
+        if not isinstance(other, _VectorizedCell):
+            return NotImplemented
+        if self is other:
+            return True
+        return self._series.equals(other._series)
 
 
 def _normalize_boolean_operation_operands(

@@ -1,7 +1,10 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import Any, Generic, TypeVar
+from typing import TYPE_CHECKING, Any, Generic, TypeVar
+
+if TYPE_CHECKING:
+    from safeds.data.tabular.typing import ColumnType
 
 T = TypeVar("T")
 P = TypeVar("P")
@@ -120,3 +123,24 @@ class ExperimentalPolarsCell(ABC, Generic[T]):
 
     @abstractmethod
     def __sizeof__(self) -> int: ...
+
+    # ------------------------------------------------------------------------------------------------------------------
+    # Properties
+    # ------------------------------------------------------------------------------------------------------------------
+
+    @property
+    @abstractmethod
+    def type(self) -> ColumnType:  # TODO: rethink return type
+        """The type of the column."""
+
+    # ------------------------------------------------------------------------------------------------------------------
+    # Internal
+    # ------------------------------------------------------------------------------------------------------------------
+
+    @abstractmethod
+    def _equals(self, other: object) -> bool:
+        """
+        Check if this cell is equal to another object.
+
+        This method is needed because the `__eq__` method is used for element-wise comparisons.
+        """

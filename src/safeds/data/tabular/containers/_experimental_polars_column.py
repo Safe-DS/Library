@@ -3,7 +3,12 @@ from __future__ import annotations
 from collections.abc import Callable, Iterator, Sequence
 from typing import TYPE_CHECKING, Any, TypeVar, overload
 
+from safeds._utils import _structural_hash
+from safeds.exceptions import IndexOutOfBoundsError
+
 from ._column import Column
+from ._experimental_polars_table import ExperimentalPolarsTable
+from ._experimental_vectorized_cell import _VectorizedCell
 
 if TYPE_CHECKING:
     from polars import Series
@@ -11,7 +16,8 @@ if TYPE_CHECKING:
     from safeds.data.image.containers import Image
     from safeds.data.tabular.typing import ColumnType
 
-    from ._experimental_polars_table import ExperimentalPolarsTable
+    from ._experimental_polars_cell import ExperimentalPolarsCell
+
 
 T = TypeVar("T")
 R = TypeVar("R")
@@ -26,12 +32,12 @@ class ExperimentalPolarsColumn(Sequence[T]):
     name:
         The name of the column.
     data:
-        The data. If None, an empty column is created.
+        The data of the column. If None, an empty column is created.
 
     Examples
     --------
-    >>> from safeds.data.tabular.containers import Column
-    >>> column = Column("test", [1, 2, 3])
+    >>> from safeds.data.tabular.containers import ExperimentalPolarsColumn
+    >>> column = ExperimentalPolarsColumn("test", [1, 2, 3])
     """
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -60,7 +66,11 @@ class ExperimentalPolarsColumn(Sequence[T]):
         return self._series.__contains__(item)
 
     def __eq__(self, other: object) -> bool:
-        raise NotImplementedError
+        if not isinstance(other, ExperimentalPolarsColumn):
+            return NotImplemented
+        if self is other:
+            return True
+        return self._series.equals(other._series)
 
     @overload
     def __getitem__(self, index: int) -> T: ...
@@ -72,7 +82,11 @@ class ExperimentalPolarsColumn(Sequence[T]):
         return self._series.__getitem__(index)
 
     def __hash__(self) -> int:
-        raise NotImplementedError
+        return _structural_hash(
+            self.name,
+            self.type.__repr__(),
+            self.number_of_rows,
+        )
 
     def __iter__(self) -> Iterator[T]:
         return self._series.__iter__()
@@ -84,7 +98,7 @@ class ExperimentalPolarsColumn(Sequence[T]):
         return self._series.__repr__()
 
     def __sizeof__(self) -> int:
-        raise NotImplementedError
+        return self._series.estimated_size()
 
     def __str__(self) -> str:
         return self._series.__str__()
@@ -112,39 +126,108 @@ class ExperimentalPolarsColumn(Sequence[T]):
     # Value operations
     # ------------------------------------------------------------------------------------------------------------------
 
-    def get_unique_values(self) -> list[T]:
-        raise NotImplementedError
-
     def get_value(self, index: int) -> T:
-        raise NotImplementedError
+        """
+        Return the column value at specified index.
+
+        Indexing starts at 0.
+
+        Parameters
+        ----------
+        index:
+            Index of requested value.
+
+        Returns
+        -------
+        value:
+            Value at index.
+
+        Raises
+        ------
+        IndexError
+            If the given index does not exist in the column.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("test", [1, 2, 3])
+        >>> column.get_value(1)
+        2
+        """
+        if index < 0 or index >= self.number_of_rows:
+            raise IndexOutOfBoundsError(index)
+
+        return self._series[index]
 
     # ------------------------------------------------------------------------------------------------------------------
     # Reductions
     # ------------------------------------------------------------------------------------------------------------------
 
-    def all(self, predicate: Callable[[T], bool]) -> bool:
-        raise NotImplementedError
+    def all(self, predicate: Callable[[ExperimentalPolarsCell[T]], ExperimentalPolarsCell[bool]]) -> bool:
+        import polars as pl
 
-    def any(self, predicate: Callable[[T], bool]) -> bool:
-        raise NotImplementedError
+        result = predicate(_VectorizedCell(self))
+        if not isinstance(result, _VectorizedCell) or not result._series.dtype == pl.Boolean:
+            raise ValueError("The predicate must return a boolean cell.")
 
-    def count(self, predicate: Callable[[T], bool]) -> int:
-        raise NotImplementedError
+        return result._series.all()
 
-    def none(self, predicate: Callable[[T], bool]) -> bool:
-        raise NotImplementedError
+    def any(self, predicate: Callable[[ExperimentalPolarsCell[T]], ExperimentalPolarsCell[bool]]) -> bool:
+        import polars as pl
+
+        result = predicate(_VectorizedCell(self))
+        if not isinstance(result, _VectorizedCell) or not result._series.dtype == pl.Boolean:
+            raise ValueError("The predicate must return a boolean cell.")
+
+        return result._series.any()
+
+    def count(self, predicate: Callable[[ExperimentalPolarsCell[T]], ExperimentalPolarsCell[bool]]) -> int:
+        import polars as pl
+
+        result = predicate(_VectorizedCell(self))
+        if not isinstance(result, _VectorizedCell) or not result._series.dtype == pl.Boolean:
+            raise ValueError("The predicate must return a boolean cell.")
+
+        return result._series.sum()
+
+    def none(self, predicate: Callable[[ExperimentalPolarsCell[T]], ExperimentalPolarsCell[bool]]) -> bool:
+        import polars as pl
+
+        result = predicate(_VectorizedCell(self))
+        if not isinstance(result, _VectorizedCell) or not result._series.dtype == pl.Boolean:
+            raise ValueError("The predicate must return a boolean cell.")
+
+        return (~result._series).all()
 
     # ------------------------------------------------------------------------------------------------------------------
     # Transformations
     # ------------------------------------------------------------------------------------------------------------------
 
     def remove_duplicate_values(self) -> ExperimentalPolarsColumn[T]:
-        raise NotImplementedError
+        """
+        Return a list of all unique values in the column.
+
+        Returns
+        -------
+        unique_values:
+            List of unique values in the column.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import ExperimentalPolarsColumn
+        >>> column = ExperimentalPolarsColumn("test", [1, 2, 3, 2, 4, 3])
+        >>> column.remove_duplicate_values()
+        [1, 2, 3, 4]
+        """
+        return self._from_polars_series(self._series.unique(maintain_order=True))
 
     def rename(self, new_name: str) -> ExperimentalPolarsColumn[T]:
-        raise NotImplementedError
+        return self._from_polars_series(self._series.rename(new_name))
 
-    def transform(self, transformer: Callable[[T], R]) -> ExperimentalPolarsColumn[R]:
+    def transform(
+        self,
+        transformer: Callable[[ExperimentalPolarsCell[T]], ExperimentalPolarsCell[R]],
+    ) -> ExperimentalPolarsColumn[R]:
         raise NotImplementedError
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -161,34 +244,37 @@ class ExperimentalPolarsColumn(Sequence[T]):
         raise NotImplementedError
 
     def max(self) -> T:
-        raise NotImplementedError
+        return self._series.max()
 
     def mean(self) -> T:
-        raise NotImplementedError
+        return self._series.mean()
 
     def median(self) -> T:
-        raise NotImplementedError
+        return self._series.median()
 
     def min(self) -> T:
-        raise NotImplementedError
+        return self._series.min()
 
     def missing_value_count(self) -> int:
-        raise NotImplementedError
+        return self._series.null_count()
 
     def missing_value_ratio(self) -> float:
-        raise NotImplementedError
+        if self.number_of_rows == 0:
+            return 0.0
 
-    def mode(self) -> T:
-        raise NotImplementedError
+        return self._series.null_count() / self.number_of_rows
+
+    def mode(self) -> ExperimentalPolarsColumn[T]:
+        return self._from_polars_series(self._series.mode())
 
     def stability(self) -> float:
         raise NotImplementedError
 
     def standard_deviation(self) -> float:
-        raise NotImplementedError
+        return self._series.std()
 
     def variance(self) -> float:
-        raise NotImplementedError
+        return self._series.var()
 
     # ------------------------------------------------------------------------------------------------------------------
     # Visualization
@@ -205,7 +291,15 @@ class ExperimentalPolarsColumn(Sequence[T]):
     # ------------------------------------------------------------------------------------------------------------------
 
     def to_table(self) -> ExperimentalPolarsTable:
-        raise NotImplementedError
+        """
+        Create a table that contains only this column.
+
+        Returns
+        -------
+        table:
+            The table with this column.
+        """
+        return ExperimentalPolarsTable._from_polars_dataframe(self._series.to_frame())
 
     def temporary_to_old_column(self) -> Column:
         """
@@ -229,4 +323,14 @@ class ExperimentalPolarsColumn(Sequence[T]):
     # ------------------------------------------------------------------------------------------------------------------
 
     def _repr_html_(self) -> str:
-        raise NotImplementedError
+        """
+        Return a compact HTML representation of the column for IPython.
+
+        Note that this operation must fully load the data into memory, which can be expensive.
+
+        Returns
+        -------
+        html:
+            The generated HTML.
+        """
+        return self._series._repr_html_()
