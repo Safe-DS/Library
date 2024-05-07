@@ -52,7 +52,7 @@ class Image:
                 .to(_get_device())
             )
         if Image._filter_edges_kernel_cache.device != _get_device():
-            Image._filter_edges_kernel_cache = Image._filter_edges_kernel_cache.to(_get_device())
+            Image._filter_edges_kernel_cache = Image._filter_edges_kernel_cache.to(_get_device())  # pragma: no cover
 
         return Image._filter_edges_kernel_cache
 
