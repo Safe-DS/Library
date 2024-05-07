@@ -32,30 +32,26 @@ if TYPE_CHECKING:
 class TestImageToTableClassifier:
 
     @pytest.mark.parametrize(
-        ("seed", "device", "layer_3_bias", "prediction_label"),
+        ("seed", "device", "prediction_label"),
         [
             (
                 1234,
                 device_cuda,
-                [0.5809096097946167, -0.32418742775917053, 0.026058292016386986, 0.5801554918289185],
                 ["grayscale"] * 7,
             ),
             (
                 4711,
                 device_cuda,
-                [-0.8114155530929565, -0.9443624019622803, 0.8557258248329163, -0.848240852355957],
                 ["white_square"] * 7,
             ),
             (
                 1234,
                 device_cpu,
-                [-0.6926110982894897, 0.33004942536354065, -0.32962560653686523, 0.5768553614616394],
                 ["grayscale"] * 7,
             ),
             (
                 4711,
                 device_cpu,
-                [-0.9051575660705566, -0.8625037670135498, 0.24682046473026276, -0.2612163722515106],
                 ["white_square"] * 7,
             ),
         ],
@@ -64,7 +60,6 @@ class TestImageToTableClassifier:
     def test_should_train_and_predict_model(
         self,
         seed: int,
-        layer_3_bias: list[float],
         prediction_label: list[str],
         device: Device,
     ) -> None:
@@ -92,7 +87,7 @@ class TestImageToTableClassifier:
         )
         nn = nn_original.fit(image_dataset, epoch_size=2)
         assert str(nn_original._model.state_dict().values()) != str(nn._model.state_dict().values())
-        # assert nn._model.state_dict()["_pytorch_layers.3._layer.bias"].tolist() == layer_3_bias
+        assert not torch.all(torch.eq(nn_original._model.state_dict()["_pytorch_layers.3._layer.bias"], nn._model.state_dict()["_pytorch_layers.3._layer.bias"])).item()
         prediction: ImageDataset = nn.predict(image_dataset.get_input())
         assert one_hot_encoder.inverse_transform(prediction.get_output()) == Table({"class": prediction_label})
 
@@ -100,30 +95,26 @@ class TestImageToTableClassifier:
 class TestImageToColumnClassifier:
 
     @pytest.mark.parametrize(
-        ("seed", "device", "layer_3_bias", "prediction_label"),
+        ("seed", "device", "prediction_label"),
         [
             (
                 1234,
                 device_cuda,
-                [0.5805736780166626, -0.32432740926742554, 0.02629312314093113, 0.5803964138031006],
                 ["grayscale"] * 7,
             ),
             (
                 4711,
                 device_cuda,
-                [-0.8114045262336731, -0.9443488717079163, 0.8557113409042358, -0.8482510447502136],
                 ["white_square"] * 7,
             ),
             (
                 1234,
                 device_cpu,
-                [-0.69260174036026, 0.33002084493637085, -0.32964015007019043, 0.5768893957138062],
                 ["grayscale"] * 7,
             ),
             (
                 4711,
                 device_cpu,
-                [-0.9051562547683716, -0.8625034093856812, 0.24682027101516724, -0.26121777296066284],
                 ["white_square"] * 7,
             ),
         ],
@@ -132,7 +123,6 @@ class TestImageToColumnClassifier:
     def test_should_train_and_predict_model(
         self,
         seed: int,
-        layer_3_bias: list[float],
         prediction_label: list[str],
         device: Device,
     ) -> None:
@@ -159,7 +149,7 @@ class TestImageToColumnClassifier:
         )
         nn = nn_original.fit(image_dataset, epoch_size=2)
         assert str(nn_original._model.state_dict().values()) != str(nn._model.state_dict().values())
-        # assert nn._model.state_dict()["_pytorch_layers.3._layer.bias"].tolist() == layer_3_bias
+        assert not torch.all(torch.eq(nn_original._model.state_dict()["_pytorch_layers.3._layer.bias"], nn._model.state_dict()["_pytorch_layers.3._layer.bias"])).item()
         prediction: ImageDataset = nn.predict(image_dataset.get_input())
         assert prediction.get_output() == Column("class", prediction_label)
 
@@ -167,12 +157,12 @@ class TestImageToColumnClassifier:
 class TestImageToImageRegressor:
 
     @pytest.mark.parametrize(
-        ("seed", "device", "layer_3_bias"),
+        ("seed", "device"),
         [
-            (1234, device_cuda, [0.13570494949817657, 0.02420804090797901, -0.1311846673488617, 0.22676928341388702]),
-            (4711, device_cuda, [0.11234158277511597, 0.13972002267837524, -0.07925988733768463, 0.07342307269573212]),
-            (1234, device_cpu, [-0.1637762188911438, 0.02012808807194233, -0.22295698523521423, 0.1689515858888626]),
-            (4711, device_cpu, [-0.030541712418198586, -0.15364733338356018, 0.1741572618484497, 0.015837203711271286]),
+            (1234, device_cuda),
+            (4711, device_cuda),
+            (1234, device_cpu),
+            (4711, device_cpu),
         ],
         ids=["seed-1234-cuda", "seed-4711-cuda", "seed-1234-cpu", "seed-4711-cpu"],
     )
@@ -180,7 +170,6 @@ class TestImageToImageRegressor:
         self,
         seed: int,
         snapshot_png_image_list: SnapshotAssertion,
-        layer_3_bias: list[float],
         device: Device,
     ) -> None:
         skip_if_device_not_available(device)
@@ -205,6 +194,6 @@ class TestImageToImageRegressor:
         )
         nn = nn_original.fit(image_dataset, epoch_size=20)
         assert str(nn_original._model.state_dict().values()) != str(nn._model.state_dict().values())
-        # assert nn._model.state_dict()["_pytorch_layers.3._layer.bias"].tolist() == layer_3_bias
-        nn.predict(image_dataset.get_input())
-        # assert prediction.get_output() == snapshot_png_image_list
+        assert not torch.all(torch.eq(nn_original._model.state_dict()["_pytorch_layers.3._layer.bias"], nn._model.state_dict()["_pytorch_layers.3._layer.bias"])).item()
+        prediction = nn.predict(image_dataset.get_input())
+        assert isinstance(prediction.get_output(), ImageList)
