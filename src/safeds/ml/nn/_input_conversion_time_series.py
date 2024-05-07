@@ -42,7 +42,6 @@ class InputConversionTimeSeries(InputConversion[TimeSeriesDataset, TimeSeriesDat
         Returns
         -------
         The size of the input for the neural network
-
         """
         return (len(self._feature_names) + 1) * self._window_size
 
