@@ -46,7 +46,7 @@ def _run_split_rows() -> None:
 
 
 def _run_transform_column() -> None:
-    table.transform_column("column_0", lambda value: value * 2)._lazy_frame.collect()
+    table.transform_column("column_0", lambda value, row: value * 2 + row.get_value("column_1"))._lazy_frame.collect()
 
 
 if __name__ == "__main__":
@@ -106,15 +106,3 @@ if __name__ == "__main__":
             }
         )
     )
-
-# 0                        group_rows  4.801467
-# 1             remove_duplicate_rows  0.287240
-# 2   remove_rows_with_missing_values  0.279085
-# 3         remove_rows_with_outliers  0.706546
-# 4                       remove_rows  3.040592
-# 5                      shuffle_rows  0.267581
-# 6                        slice_rows  0.143297
-# 7                         sort_rows  4.613575
-# 8                        split_rows  0.274414
-# 9                           to_rows  2.710391
-# 10                  transform_colum  3.191619

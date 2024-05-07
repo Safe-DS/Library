@@ -7,7 +7,6 @@ from safeds._utils import _structural_hash
 from safeds.exceptions import IndexOutOfBoundsError
 
 from ._column import Column
-from ._experimental_polars_table import ExperimentalPolarsTable
 from ._experimental_vectorized_cell import _VectorizedCell
 
 if TYPE_CHECKING:
@@ -17,6 +16,7 @@ if TYPE_CHECKING:
     from safeds.data.tabular.typing import ColumnType
 
     from ._experimental_polars_cell import ExperimentalPolarsCell
+    from ._experimental_polars_table import ExperimentalPolarsTable
 
 
 T = TypeVar("T")
@@ -128,9 +128,7 @@ class ExperimentalPolarsColumn(Sequence[T]):
 
     def get_value(self, index: int) -> T:
         """
-        Return the column value at specified index.
-
-        Indexing starts at 0.
+        Return the column value at specified index. Indexing starts at 0.
 
         Parameters
         ----------
@@ -290,6 +288,17 @@ class ExperimentalPolarsColumn(Sequence[T]):
     # Export
     # ------------------------------------------------------------------------------------------------------------------
 
+    def to_list(self) -> list[T]:
+        """
+        Return the values of the column in a list.
+
+        Returns
+        -------
+        values:
+            The values of the column in a list.
+        """
+        return self._series.to_list()
+
     def to_table(self) -> ExperimentalPolarsTable:
         """
         Create a table that contains only this column.
@@ -299,6 +308,8 @@ class ExperimentalPolarsColumn(Sequence[T]):
         table:
             The table with this column.
         """
+        from ._experimental_polars_table import ExperimentalPolarsTable
+
         return ExperimentalPolarsTable._from_polars_dataframe(self._series.to_frame())
 
     def temporary_to_old_column(self) -> Column:

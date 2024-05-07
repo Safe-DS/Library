@@ -7,6 +7,8 @@ from safeds._utils import _check_and_normalize_file_path
 from safeds._utils._random import _get_random_seed
 from safeds.exceptions import ClosedBound, ColumnLengthMismatchError, OutOfBoundsError, UnknownColumnNameError
 
+from ._experimental_lazy_cell import _LazyCell
+from ._experimental_lazy_vectorized_row import _LazyVectorizedRow
 from ._experimental_polars_column import ExperimentalPolarsColumn
 from ._experimental_vectorized_cell import _VectorizedCell
 from ._experimental_vectorized_row import _VectorizedRow
@@ -440,14 +442,12 @@ class ExperimentalPolarsTable:
         self,
         query: Callable[[ExperimentalPolarsRow], ExperimentalPolarsCell[bool]],
     ) -> ExperimentalPolarsTable:
-        import polars as pl
-
-        mask = query(_VectorizedRow(self))
-        if not isinstance(mask, _VectorizedCell) or mask._series.dtype != pl.Boolean:
+        mask = query(_LazyVectorizedRow(self))
+        if not isinstance(mask, _LazyCell):
             raise TypeError("The query must return a boolean cell.")
 
         return ExperimentalPolarsTable._from_polars_lazy_frame(
-            self._lazy_frame.filter(mask._series),
+            self._lazy_frame.filter(mask._expression),
         )
 
     def remove_rows_by_column(
@@ -523,13 +523,13 @@ class ExperimentalPolarsTable:
         *,
         descending: bool = False,
     ) -> ExperimentalPolarsTable:
-        key = key_selector(_VectorizedRow(self))
-        if not isinstance(key, _VectorizedCell):
+        key = key_selector(_LazyVectorizedRow(self))
+        if not isinstance(key, _LazyCell):
             raise TypeError("The key selector must return a cell.")
 
         return ExperimentalPolarsTable._from_polars_lazy_frame(
             self._lazy_frame.sort(
-                key._series,
+                key._expression,
                 descending=descending,
                 maintain_order=True,
             ),
