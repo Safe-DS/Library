@@ -1046,7 +1046,7 @@ class Column(Sequence[T]):
         Returns
         -------
         plot:
-              A plot with all the Columns plotted by the ID on the x-axis.
+            A plot with all the Columns plotted by the ID on the x-axis.
 
         Raises
         ------
@@ -1054,6 +1054,7 @@ class Column(Sequence[T]):
             if the target column contains non numerical values
         ValueError
             if the columns do not have the same size
+
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
@@ -1106,7 +1107,7 @@ class Column(Sequence[T]):
         Raises
         ------
         NonNumericColumnError
-            If the tcolumn contains non-numerical values.
+            If the column contains non-numerical values.
 
         Examples
         --------

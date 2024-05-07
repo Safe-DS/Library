@@ -22,9 +22,9 @@ class InputConversionTimeSeries(InputConversion[TimeSeriesDataset, TimeSeriesDat
 
         Parameters
         ----------
-        window_size
+        window_size:
             The size of the created windows
-        forecast_horizon
+        forecast_horizon:
             The forecast horizon defines the future lag of the predicted values
         """
         self._window_size = window_size
@@ -41,7 +41,9 @@ class InputConversionTimeSeries(InputConversion[TimeSeriesDataset, TimeSeriesDat
 
         Returns
         -------
-        The size of the input for the neural network
+        size:
+            The size of the input for the neural network
+
         """
         return (len(self._feature_names) + 1) * self._window_size
 

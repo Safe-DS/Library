@@ -33,7 +33,7 @@ class OutputConversionTimeSeries(OutputConversion[TimeSeriesDataset, TimeSeriesD
         Parameters
         ----------
         other:
-            The OutputConversionImage instance to compare to.
+            The OutputConversionTimeSeries instance to compare to.
 
         Returns
         -------
@@ -61,7 +61,7 @@ class OutputConversionTimeSeries(OutputConversion[TimeSeriesDataset, TimeSeriesD
 
         Parameters
         ----------
-        prediction_name
+        prediction_name:
             The name of the new column where the prediction will be stored.
         """
         self._prediction_name = prediction_name
