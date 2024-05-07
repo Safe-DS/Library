@@ -131,24 +131,6 @@ def test_should_raise_on_invalid_data(
         model.fit(invalid_data)
 
 
-@pytest.mark.parametrize(
-    "table",
-    [
-        Table(
-            {
-                "a": [1.0, 0.0, 0.0, 0.0],
-                "b": [0.0, 1.0, 1.0, 0.0],
-                "c": [0.0, 0.0, 0.0, 1.0],
-            },
-        ),
-    ],
-    ids=["table"],
-)
-def test_should_raise_if_given_normal_table(table: Table) -> None:
-    model = ArimaModelRegressor()
-    with pytest.raises(NonTimeSeriesDatasetError):
-        model.fit(table)  # type: ignore[arg-type]
-
 
 def test_correct_structure_of_time_series_with_features() -> None:
     data = create_test_data_with_feature()

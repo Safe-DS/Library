@@ -21,3 +21,10 @@ def test_should_raise_if_is_fitted_is_set_correctly_lstm() -> None:
     model = model.fit(ts)
     model.predict(ts)
     assert model.is_fitted
+
+
+def test_get_output_config() -> None:
+    test_val = {"window_size": 1, "forecast_horizon": 1}
+    it = InputConversionTimeSeries(1, 1)
+    di = it._get_output_configuration()
+    assert di == test_val
