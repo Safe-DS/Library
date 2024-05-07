@@ -4,6 +4,7 @@ from collections.abc import Callable, Iterator, Sequence
 from typing import TYPE_CHECKING, Any, TypeVar, overload
 
 from safeds._utils import _structural_hash
+from safeds.data.tabular.plotting._experimental_column_plotter import ExperimentalColumnPlotter
 from safeds.data.tabular.typing._experimental_polars_data_type import _PolarsDataType
 from safeds.exceptions import IndexOutOfBoundsError
 
@@ -13,7 +14,6 @@ from ._experimental_vectorized_cell import _VectorizedCell
 if TYPE_CHECKING:
     from polars import Series
 
-    from safeds.data.image.containers import Image
     from safeds.data.tabular.typing._experimental_data_type import ExperimentalDataType
 
     from ._experimental_cell import ExperimentalCell
@@ -110,6 +110,16 @@ class ExperimentalColumn(Sequence[T]):
     # ------------------------------------------------------------------------------------------------------------------
 
     @property
+    def is_numeric(self) -> bool:
+        """Whether the column is numeric."""
+        return self._series.dtype.is_numeric()
+
+    @property
+    def is_temporal(self) -> bool:
+        """Whether the column is temporal."""
+        return self._series.dtype.is_temporal()
+
+    @property
     def name(self) -> str:
         """The name of the column."""
         return self._series.name
@@ -118,6 +128,11 @@ class ExperimentalColumn(Sequence[T]):
     def number_of_rows(self) -> int:
         """The number of rows in the column."""
         return self._series.len()
+
+    @property
+    def plot(self) -> ExperimentalColumnPlotter:
+        """The plotter for the column."""
+        return ExperimentalColumnPlotter(self)
 
     @property
     def type(self) -> ExperimentalDataType:
@@ -437,16 +452,6 @@ class ExperimentalColumn(Sequence[T]):
 
     def variance(self) -> float:
         return self._series.var()
-
-    # ------------------------------------------------------------------------------------------------------------------
-    # Visualization
-    # ------------------------------------------------------------------------------------------------------------------
-
-    def plot_boxplot(self) -> Image:
-        raise NotImplementedError
-
-    def plot_histogram(self) -> Image:
-        raise NotImplementedError
 
     # ------------------------------------------------------------------------------------------------------------------
     # Export

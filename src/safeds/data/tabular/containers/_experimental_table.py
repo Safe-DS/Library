@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING, Any, Literal
 
 from safeds._utils import _check_and_normalize_file_path
 from safeds._utils._random import _get_random_seed
+from safeds.data.tabular.plotting._experimental_table_plotter import ExperimentalTablePlotter
 from safeds.data.tabular.typing._experimental_polars_data_type import _PolarsDataType
 from safeds.data.tabular.typing._experimental_polars_schema import _PolarsSchema
 from safeds.exceptions import (
@@ -26,7 +27,6 @@ if TYPE_CHECKING:
 
     from polars import DataFrame, LazyFrame
 
-    from safeds.data.image.containers import Image
     from safeds.data.labeled.containers import TabularDataset
     from safeds.data.tabular.transformation import InvertibleTableTransformer, TableTransformer
     from safeds.data.tabular.typing import ExperimentalSchema
@@ -270,6 +270,10 @@ class ExperimentalTable:
             self._data_frame = self._lazy_frame.collect()
 
         return self._data_frame.height
+
+    @property
+    def plot(self) -> ExperimentalTablePlotter:
+        return ExperimentalTablePlotter(self)
 
     @property
     def schema(self) -> ExperimentalSchema:
@@ -607,25 +611,6 @@ class ExperimentalTable:
     # ------------------------------------------------------------------------------------------------------------------
 
     def summarize_statistics(self) -> ExperimentalTable:
-        raise NotImplementedError
-
-    # ------------------------------------------------------------------------------------------------------------------
-    # Visualization
-    # ------------------------------------------------------------------------------------------------------------------
-
-    def plot_boxplots(self) -> Image:
-        raise NotImplementedError
-
-    def plot_correlation_heatmap(self) -> Image:
-        raise NotImplementedError
-
-    def plot_histograms(self, *, number_of_bins: int = 10) -> Image:
-        raise NotImplementedError
-
-    def plot_lineplot(self, x_name: str, y_name: str) -> Image:
-        raise NotImplementedError
-
-    def plot_scatterplot(self, x_name: str, y_name: str) -> Image:
         raise NotImplementedError
 
     # ------------------------------------------------------------------------------------------------------------------
