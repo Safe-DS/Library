@@ -27,10 +27,10 @@ def _run_remove_rows() -> None:
 #     table.shuffle_rows()
 #
 #
-# def _run_slice_rows() -> None:
-#     table.slice_rows(end=table.number_of_rows // 2)
-#
-#
+def _run_slice_rows() -> None:
+    table.slice_rows(length=table.number_of_rows // 2)._lazy_frame.collect()
+
+
 def _run_sort_rows() -> None:
     table.sort_rows(lambda row: row.get_value("column_0"))._lazy_frame.collect()
 
@@ -72,10 +72,10 @@ if __name__ == "__main__":
         #     _run_shuffle_rows,
         #     number=REPETITIONS,
         # ),
-        # "slice_rows": timeit(
-        #     _run_slice_rows,
-        #     number=REPETITIONS,
-        # ),
+        "slice_rows": timeit(
+            _run_slice_rows,
+            number=REPETITIONS,
+        ),
         "sort_rows": timeit(
             _run_sort_rows,
             number=REPETITIONS,
@@ -110,7 +110,7 @@ if __name__ == "__main__":
 # 6         remove_rows_with_outliers  0.566346
 # 7                       remove_rows  2.746695  0.002014
 # 8                      shuffle_rows  0.253078
-# 9                        slice_rows  0.129017
+# 9                        slice_rows  0.129017  0.000668
 # 10                        sort_rows  4.117939  0.002693
 # 10              sort_rows_by_column  4.117939  0.001585
 # 11                       split_rows  0.257560

@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any, Literal
 
 from safeds._utils import _check_and_normalize_file_path
-from safeds.exceptions import ColumnLengthMismatchError
+from safeds.exceptions import ColumnLengthMismatchError, IndexOutOfBoundsError
 
 from ._experimental_polars_column import ExperimentalPolarsColumn
 from ._experimental_vectorized_cell import _VectorizedCell
@@ -408,7 +408,7 @@ class ExperimentalPolarsTable:
 
     def remove_rows_with_missing_values(
         self,
-        column_names: list[str] | None = None,
+        subset_names: list[str] | None = None,
     ) -> ExperimentalPolarsTable:
         """
         Remove rows with missing values from the table.
@@ -417,7 +417,7 @@ class ExperimentalPolarsTable:
 
         Parameters
         ----------
-        column_names:
+        subset_names:
             Names of the columns to consider. If None, all columns are considered.
 
         Returns
@@ -440,20 +440,22 @@ class ExperimentalPolarsTable:
         └─────┴─────┘
         """
         return ExperimentalPolarsTable._from_polars_lazy_frame(
-            self._lazy_frame.drop_nulls(subset=column_names),
+            self._lazy_frame.drop_nulls(subset=subset_names),
         )
 
     def remove_rows_with_outliers(
         self,
-        column_names: list[str] | None = None,
+        subset_names: list[str] | None = None,
     ) -> ExperimentalPolarsTable:
         raise NotImplementedError
 
     def shuffle_rows(self) -> ExperimentalPolarsTable:
         raise NotImplementedError
 
-    def slice_rows(self, start: int = 0, end: int | None = None) -> ExperimentalPolarsTable:
-        raise NotImplementedError
+    def slice_rows(self, start: int = 0, length: int | None = None) -> ExperimentalPolarsTable:
+        return ExperimentalPolarsTable._from_polars_lazy_frame(
+            self._lazy_frame.slice(start, length),
+        )
 
     def sort_rows(
         self,
