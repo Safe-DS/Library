@@ -45,8 +45,9 @@ def _run_split_rows() -> None:
     table_2._lazy_frame.collect()
 
 
-# def _run_transform_column() -> None:
-#     table.transform_column("column_0", lambda row: row.get_value("column_0") * 2)
+def _run_transform_column() -> None:
+    table.transform_column("column_0", lambda value: value * 2)._lazy_frame.collect()
+
 
 if __name__ == "__main__":
     # Create a synthetic Table
@@ -90,10 +91,10 @@ if __name__ == "__main__":
             _run_split_rows,
             number=REPETITIONS,
         ),
-        # "transform_column": timeit(
-        #     _run_transform_column,
-        #     number=REPETITIONS,
-        # ),
+        "transform_column": timeit(
+            _run_transform_column,
+            number=REPETITIONS,
+        ),
     }
 
     # Print the timings
@@ -116,4 +117,4 @@ if __name__ == "__main__":
 # 10                        sort_rows  4.117939  0.002693
 # 10              sort_rows_by_column  4.117939  0.001585
 # 11                       split_rows  0.257560  0.001564
-# 13                  transform_colum  2.994108
+# 13                  transform_colum  2.994108  0.001423

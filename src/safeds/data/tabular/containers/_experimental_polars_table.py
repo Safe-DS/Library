@@ -1,10 +1,11 @@
 from __future__ import annotations
 
+import inspect
 from typing import TYPE_CHECKING, Any, Literal
 
 from safeds._utils import _check_and_normalize_file_path
 from safeds._utils._random import _get_random_seed
-from safeds.exceptions import ColumnLengthMismatchError, OutOfBoundsError, ClosedBound
+from safeds.exceptions import ClosedBound, ColumnLengthMismatchError, OutOfBoundsError, UnknownColumnNameError
 
 from ._experimental_polars_column import ExperimentalPolarsColumn
 from ._experimental_vectorized_cell import _VectorizedCell
@@ -285,13 +286,22 @@ class ExperimentalPolarsTable:
         raise NotImplementedError
 
     def has_column(self, name: str) -> bool:
-        raise NotImplementedError
+        return name in self.column_names
 
-    def remove_columns(self, names: list[str]) -> ExperimentalPolarsTable:
-        raise NotImplementedError
+    def remove_columns(self, names: str | list[str]) -> ExperimentalPolarsTable:
+        if isinstance(names, str):
+            names = [names]
 
-    def remove_columns_except(self, names: list[str]) -> ExperimentalPolarsTable:
-        raise NotImplementedError
+        return ExperimentalPolarsTable._from_polars_lazy_frame(
+            self._lazy_frame.drop(names),
+        )
+
+    def remove_columns_except(self, names: str | list[str]) -> ExperimentalPolarsTable:
+        if isinstance(names, str):
+            names = [names]
+
+        names_set = set(names)
+        return self.remove_columns([name for name in self.column_names if name not in names_set])
 
     def remove_columns_with_missing_values(self) -> ExperimentalPolarsTable:
         raise NotImplementedError
@@ -343,14 +353,54 @@ class ExperimentalPolarsTable:
         old_name: str,
         new_columns: ExperimentalPolarsColumn | list[ExperimentalPolarsColumn],
     ) -> ExperimentalPolarsTable:
-        raise NotImplementedError
+        if isinstance(new_columns, ExperimentalPolarsColumn):
+            new_columns = [new_columns]
+
+        if len(new_columns) == 0:
+            return self.remove_columns(old_name)
+
+        if self._data_frame is None:
+            self._data_frame = self._lazy_frame.collect()
+
+        new_frame = self._data_frame
+        index = new_frame.get_column_index(old_name)
+
+        if len(new_columns) == 1:
+            return ExperimentalPolarsTable._from_polars_dataframe(
+                new_frame.replace_column(index, new_columns[0]._series),
+            )
+
+        prefix = new_frame.select(self.column_names[:index])
+        suffix = new_frame.select(self.column_names[index + 1:])
+
+        return ExperimentalPolarsTable._from_polars_dataframe(
+            prefix.hstack([column._series for column in new_columns]).hstack(suffix),
+        )
 
     def transform_column(
         self,
         name: str,
-        transformer: Callable[[ExperimentalPolarsCell, ExperimentalPolarsRow], ExperimentalPolarsCell],
+        transformer: (
+            Callable[[ExperimentalPolarsCell], ExperimentalPolarsCell] |
+            Callable[[ExperimentalPolarsCell, ExperimentalPolarsRow], ExperimentalPolarsCell]
+        ),
     ) -> ExperimentalPolarsTable:
-        raise NotImplementedError
+        if not self.has_column(name):
+            raise UnknownColumnNameError([name])  # TODO: in the error, compute similar column names
+
+        transformer_parameter_count = len(inspect.signature(transformer).parameters)
+        if transformer_parameter_count == 1:
+            transformed_column = transformer(_VectorizedCell(self.get_column(name)))
+        else:
+            transformed_column = transformer(_VectorizedCell(self.get_column(name)), _VectorizedRow(self))
+
+        if not isinstance(transformed_column, _VectorizedCell):
+            raise TypeError("The transformer must return a cell.")
+
+        return self.replace_column(
+            name,
+            ExperimentalPolarsColumn._from_polars_series(transformed_column._series),
+        )
 
     # ------------------------------------------------------------------------------------------------------------------
     # Row operations
