@@ -5,6 +5,9 @@ from typing import TYPE_CHECKING, Any, Literal
 from safeds._utils import _check_and_normalize_file_path
 from safeds.exceptions import ColumnLengthMismatchError
 
+from ._experimental_polars_column import ExperimentalPolarsColumn
+from ._experimental_vectorized_cell import _VectorizedCell
+from ._experimental_vectorized_row import _VectorizedRow
 from ._table import Table
 
 if TYPE_CHECKING:
@@ -19,7 +22,6 @@ if TYPE_CHECKING:
     from safeds.data.tabular.typing import ColumnType, Schema
 
     from ._experimental_polars_cell import ExperimentalPolarsCell
-    from ._experimental_polars_column import ExperimentalPolarsColumn
     from ._experimental_polars_row import ExperimentalPolarsRow
 
 
@@ -273,7 +275,10 @@ class ExperimentalPolarsTable:
         raise NotImplementedError
 
     def get_column(self, name: str) -> ExperimentalPolarsColumn:
-        raise NotImplementedError
+        if self._data_frame is None:
+            self._data_frame = self._lazy_frame.collect()
+
+        return ExperimentalPolarsColumn._from_polars_series(self._data_frame.get_column(name))
 
     def get_column_type(self, name: str) -> ColumnType:  # TODO rethink return type
         raise NotImplementedError
@@ -342,7 +347,7 @@ class ExperimentalPolarsTable:
     def transform_column(
         self,
         name: str,
-        transformer: Callable[[ExperimentalPolarsRow], ExperimentalPolarsCell],
+        transformer: Callable[[ExperimentalPolarsCell, ExperimentalPolarsRow], ExperimentalPolarsCell],
     ) -> ExperimentalPolarsTable:
         raise NotImplementedError
 
@@ -384,7 +389,15 @@ class ExperimentalPolarsTable:
         self,
         query: Callable[[ExperimentalPolarsRow], ExperimentalPolarsCell[bool]],
     ) -> ExperimentalPolarsTable:
-        raise NotImplementedError
+        import polars as pl
+
+        mask = query(_VectorizedRow(self))
+        if not isinstance(mask, _VectorizedCell) or mask._series.dtype != pl.Boolean:
+            raise ValueError("The query function must return a boolean cell.")
+
+        return ExperimentalPolarsTable._from_polars_lazy_frame(
+            self._lazy_frame.filter(mask._series),
+        )
 
     def remove_rows_by_column(
         self,

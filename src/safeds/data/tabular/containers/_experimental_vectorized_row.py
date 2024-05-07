@@ -60,7 +60,7 @@ class _VectorizedRow(ExperimentalPolarsRow):
     # ------------------------------------------------------------------------------------------------------------------
 
     def get_value(self, name: str) -> _VectorizedCell:
-        return _VectorizedCell._from_column(self._table.get_column(name))
+        return _VectorizedCell(self._table.get_column(name))
 
     def get_column_type(self, name: str) -> ColumnType:  # TODO: rethink return type
         return self._table.get_column_type(name)

@@ -59,6 +59,10 @@ def _run_to_rows() -> None:
     table.to_rows()
 
 
+def _run_transform_column() -> None:
+    table.transform_column("column_0", lambda row: row.get_value("column_0") * 2)
+
+
 if __name__ == "__main__":
     # Create a synthetic Table
     table = create_synthetic_table(1000, 50)
@@ -115,6 +119,10 @@ if __name__ == "__main__":
         ),
         "to_rows": timeit(
             _run_to_rows,
+            number=REPETITIONS,
+        ),
+        "transform_colum": timeit(
+            _run_transform_column,
             number=REPETITIONS,
         ),
     }

@@ -7,22 +7,6 @@ from benchmarks.table.utils import create_synthetic_table_polars
 REPETITIONS = 10
 
 
-# def _run_add_rows() -> None:
-#     table.add_rows(table)
-#
-#
-# def _run_get_row() -> None:
-#     table.get_row(0)
-#
-#
-# def _run_group_rows() -> None:
-#     table.group_rows(lambda row: row.get_value("column_0") % 2 == 0)
-#
-#
-# def _run_keep_only_rows() -> None:
-#     table.keep_only_rows(lambda row: row.get_value("column_0") % 2 == 0)
-
-
 def _run_remove_duplicate_rows() -> None:
     table.remove_duplicate_rows()._lazy_frame.collect()
 
@@ -33,10 +17,10 @@ def _run_remove_rows_with_missing_values() -> None:
 
 # def _run_remove_rows_with_outliers() -> None:
 #     table.remove_rows_with_outliers()
-#
-#
-# def _run_remove_rows() -> None:
-#     table.remove_rows(lambda row: row.get_value("column_0") % 2 == 0)
+
+
+def _run_remove_rows() -> None:
+    table.remove_rows(lambda row: row.get_value("column_0") % 2 == 0)._lazy_frame.collect()
 #
 #
 # def _run_shuffle_rows() -> None:
@@ -55,9 +39,8 @@ def _run_remove_rows_with_missing_values() -> None:
 #     table.split_rows(0.5)
 #
 #
-# def _run_to_rows() -> None:
-#     table.to_rows()
-
+# def _run_transform_column() -> None:
+#     table.transform_column("column_0", lambda row: row.get_value("column_0") * 2)
 
 if __name__ == "__main__":
     # Create a synthetic Table
@@ -65,22 +48,6 @@ if __name__ == "__main__":
 
     # Run the benchmarks
     timings: dict[str, float] = {
-        # "add_rows": timeit(
-        #     _run_add_rows,
-        #     number=REPETITIONS,
-        # ),
-        # "get_row": timeit(
-        #     _run_get_row,
-        #     number=REPETITIONS,
-        # ),
-        # "group_rows": timeit(
-        #     _run_group_rows,
-        #     number=REPETITIONS,
-        # ),
-        # "keep_only_rows": timeit(
-        #     _run_keep_only_rows,
-        #     number=REPETITIONS,
-        # ),
         "remove_duplicate_rows": timeit(
             _run_remove_duplicate_rows,
             number=REPETITIONS,
@@ -93,10 +60,10 @@ if __name__ == "__main__":
         #     _run_remove_rows_with_outliers,
         #     number=REPETITIONS,
         # ),
-        # "remove_rows": timeit(
-        #     _run_remove_rows,
-        #     number=REPETITIONS,
-        # ),
+        "remove_rows": timeit(
+            _run_remove_rows,
+            number=REPETITIONS,
+        ),
         # "shuffle_rows": timeit(
         #     _run_shuffle_rows,
         #     number=REPETITIONS,
@@ -113,8 +80,8 @@ if __name__ == "__main__":
         #     _run_split_rows,
         #     number=REPETITIONS,
         # ),
-        # "to_rows": timeit(
-        #     _run_to_rows,
+        # "transform_column": timeit(
+        #     _run_transform_column,
         #     number=REPETITIONS,
         # ),
     }
@@ -128,3 +95,14 @@ if __name__ == "__main__":
             }
         )
     )
+
+#                              method    pandas    polars
+# 4             remove_duplicate_rows  0.270062  0.007441
+# 5   remove_rows_with_missing_values  0.255554  0.009031
+# 6         remove_rows_with_outliers  0.566346
+# 7                       remove_rows  2.746695  0.002014
+# 8                      shuffle_rows  0.253078
+# 9                        slice_rows  0.129017
+# 10                        sort_rows  4.117939
+# 11                       split_rows  0.257560
+# 13                  transform_colum  2.994108
