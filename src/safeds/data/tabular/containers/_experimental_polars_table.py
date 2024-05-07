@@ -4,7 +4,13 @@ from typing import TYPE_CHECKING, Any, Literal
 
 from safeds._utils import _check_and_normalize_file_path
 from safeds._utils._random import _get_random_seed
-from safeds.exceptions import ClosedBound, ColumnLengthMismatchError, OutOfBoundsError, UnknownColumnNameError
+from safeds.exceptions import (
+    ClosedBound,
+    ColumnLengthMismatchError,
+    DuplicateColumnNameError,
+    OutOfBoundsError,
+    UnknownColumnNameError,
+)
 
 from ._experimental_lazy_cell import _LazyCell
 from ._experimental_lazy_vectorized_row import _LazyVectorizedRow
@@ -275,6 +281,22 @@ class ExperimentalPolarsTable:
         columns: ExperimentalPolarsColumn | list[ExperimentalPolarsColumn],
     ) -> ExperimentalPolarsTable:
         raise NotImplementedError
+
+    def compute_column(
+        self,
+        name: str,
+        computer: Callable[[ExperimentalPolarsRow], ExperimentalPolarsCell],
+    ) -> ExperimentalPolarsTable:
+        if self.has_column(name):
+            raise DuplicateColumnNameError(name)
+
+        computed_column = computer(_LazyVectorizedRow(self))
+        if not isinstance(computed_column, _LazyCell):
+            raise TypeError("The computer must return a cell.")
+
+        return self._from_polars_lazy_frame(
+            self._lazy_frame.with_columns(name, computed_column._expression),
+        )
 
     def get_column(self, name: str) -> ExperimentalPolarsColumn:
         if self._data_frame is None:
