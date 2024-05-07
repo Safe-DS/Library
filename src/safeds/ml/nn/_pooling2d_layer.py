@@ -4,6 +4,7 @@ import math
 import sys
 from typing import TYPE_CHECKING, Any, Literal
 
+from safeds._config import _init_default_device
 from safeds._utils import _structural_hash
 from safeds.data.image.typing import ImageSize
 
@@ -15,6 +16,7 @@ from safeds.ml.nn import Layer
 
 def _create_internal_model(strategy: Literal["max", "avg"], kernel_size: int, padding: int, stride: int) -> nn.Module:
     from torch import nn
+    _init_default_device()
 
     class _InternalLayer(nn.Module):
         def __init__(self, strategy: Literal["max", "avg"], kernel_size: int, padding: int, stride: int):

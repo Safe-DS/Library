@@ -3,6 +3,7 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Any
 
+from safeds._config import _init_default_device
 from safeds._utils import _structural_hash
 from safeds.data.image.containers import ImageList
 from safeds.data.image.containers._single_size_image_list import _SingleSizeImageList
@@ -68,6 +69,7 @@ class OutputConversionImageToColumn(_OutputConversionImage):
 
     def _data_conversion(self, input_data: ImageList, output_data: Tensor, **kwargs: Any) -> ImageDataset[Column]:
         import torch
+        _init_default_device()
 
         if not isinstance(input_data, _SingleSizeImageList):
             raise ValueError("The given input ImageList contains images of different sizes.")  # noqa: TRY004
@@ -100,6 +102,7 @@ class OutputConversionImageToTable(_OutputConversionImage):
 
     def _data_conversion(self, input_data: ImageList, output_data: Tensor, **kwargs: Any) -> ImageDataset[Table]:
         import torch
+        _init_default_device()
 
         if not isinstance(input_data, _SingleSizeImageList):
             raise ValueError("The given input ImageList contains images of different sizes.")  # noqa: TRY004
@@ -136,6 +139,7 @@ class OutputConversionImageToImage(_OutputConversionImage):
         **kwargs: Any,  # noqa: ARG002
     ) -> ImageDataset[ImageList]:
         import torch
+        _init_default_device()
 
         if not isinstance(input_data, _SingleSizeImageList):
             raise ValueError("The given input ImageList contains images of different sizes.")  # noqa: TRY004

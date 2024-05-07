@@ -3,6 +3,7 @@ from __future__ import annotations
 import sys
 from typing import TYPE_CHECKING
 
+from safeds._config import _init_default_device, _get_device
 from safeds._utils import _structural_hash
 from safeds.data.tabular.containers import Column, Table
 
@@ -177,24 +178,27 @@ class TabularDataset:
         """
         import torch
         from torch.utils.data import DataLoader
+        _init_default_device()
 
         if num_of_classes <= 2:
             return DataLoader(
                 dataset=_create_dataset(
-                    torch.Tensor(self.features._data.values),
-                    torch.Tensor(self.target._data).unsqueeze(dim=-1),
+                    torch.Tensor(self.features._data.values).to(_get_device()),
+                    torch.Tensor(self.target._data).to(_get_device()).unsqueeze(dim=-1),
                 ),
                 batch_size=batch_size,
                 shuffle=True,
+                generator=torch.Generator(device=_get_device()),
             )
         else:
             return DataLoader(
                 dataset=_create_dataset(
-                    torch.Tensor(self.features._data.values),
-                    torch.nn.functional.one_hot(torch.LongTensor(self.target._data), num_classes=num_of_classes),
+                    torch.Tensor(self.features._data.values).to(_get_device()),
+                    torch.nn.functional.one_hot(torch.LongTensor(self.target._data).to(_get_device()), num_classes=num_of_classes),
                 ),
                 batch_size=batch_size,
                 shuffle=True,
+                generator=torch.Generator(device=_get_device()),
             )
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -216,6 +220,7 @@ class TabularDataset:
 def _create_dataset(features: Tensor, target: Tensor) -> Dataset:
     import torch
     from torch.utils.data import Dataset
+    _init_default_device()
 
     class _CustomDataset(Dataset):
         def __init__(self, features: Tensor, target: Tensor):

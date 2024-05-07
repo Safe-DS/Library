@@ -3,6 +3,8 @@ from typing import TYPE_CHECKING
 
 import pytest
 import torch
+
+from safeds._config import _get_device
 from safeds.data.image.containers import ImageList
 from safeds.data.labeled.containers import ImageDataset
 from safeds.data.tabular.containers import Column, Table
@@ -23,7 +25,7 @@ from safeds.ml.nn._output_conversion_image import OutputConversionImageToColumn,
 from syrupy import SnapshotAssertion
 from torch.types import Device
 
-from tests.helpers import device_cpu, device_cuda, images_all, resolve_resource_path, skip_if_device_not_available
+from tests.helpers import device_cpu, device_cuda, images_all, resolve_resource_path, configure_test_with_device
 
 if TYPE_CHECKING:
     from safeds.ml.nn import Layer
@@ -68,8 +70,7 @@ class TestImageToTableClassifier:
         prediction_label: list[str],
         device: Device,
     ) -> None:
-        skip_if_device_not_available(device)
-        torch.set_default_device(device)
+        configure_test_with_device(device)
         torch.manual_seed(seed)
 
         image_list, filenames = ImageList.from_files(resolve_resource_path(images_all()), return_filenames=True)
@@ -95,6 +96,7 @@ class TestImageToTableClassifier:
         assert nn._model.state_dict()["_pytorch_layers.3._layer.bias"].tolist() == layer_3_bias
         prediction: ImageDataset = nn.predict(image_dataset.get_input())
         assert one_hot_encoder.inverse_transform(prediction.get_output()) == Table({"class": prediction_label})
+        assert prediction._output._tensor.device == _get_device()
 
 
 class TestImageToColumnClassifier:
@@ -136,8 +138,7 @@ class TestImageToColumnClassifier:
         prediction_label: list[str],
         device: Device,
     ) -> None:
-        skip_if_device_not_available(device)
-        torch.set_default_device(device)
+        configure_test_with_device(device)
         torch.manual_seed(seed)
 
         image_list, filenames = ImageList.from_files(resolve_resource_path(images_all()), return_filenames=True)
@@ -162,6 +163,7 @@ class TestImageToColumnClassifier:
         assert nn._model.state_dict()["_pytorch_layers.3._layer.bias"].tolist() == layer_3_bias
         prediction: ImageDataset = nn.predict(image_dataset.get_input())
         assert prediction.get_output() == Column("class", prediction_label)
+        assert prediction._output._tensor.device == _get_device()
 
 
 class TestImageToImageRegressor:
@@ -183,8 +185,7 @@ class TestImageToImageRegressor:
         layer_3_bias: list[float],
         device: Device,
     ) -> None:
-        skip_if_device_not_available(device)
-        torch.set_default_device(device)
+        configure_test_with_device(device)
         torch.manual_seed(seed)
 
         image_list = ImageList.from_files(resolve_resource_path(images_all()))
@@ -208,3 +209,4 @@ class TestImageToImageRegressor:
         assert nn._model.state_dict()["_pytorch_layers.3._layer.bias"].tolist() == layer_3_bias
         prediction: ImageDataset = nn.predict(image_dataset.get_input())
         assert prediction.get_output() == snapshot_png_image_list
+        assert prediction._output._tensor.device == _get_device()

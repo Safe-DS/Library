@@ -6,7 +6,8 @@ from pathlib import Path
 
 import pytest
 import torch
-from safeds._config import _get_device
+from torch.types import Device
+
 from safeds.data.image.containers import Image, ImageList
 from safeds.data.image.containers._empty_image_list import _EmptyImageList
 from safeds.data.image.containers._multi_size_image_list import _MultiSizeImageList
@@ -29,18 +30,19 @@ from tests.helpers import (
     resolve_resource_path,
     skip_if_os,
     test_images_folder,
-    white_square_jpg_path,
+    white_square_jpg_path, get_devices, get_devices_ids, configure_test_with_device,
 )
 
 
+@pytest.mark.parametrize("resource_path3", images_all(), ids=images_all_ids())
+@pytest.mark.parametrize("resource_path2", images_all(), ids=images_all_ids())
+@pytest.mark.parametrize("resource_path1", images_all(), ids=images_all_ids())
+@pytest.mark.parametrize("device", get_devices(), ids=get_devices_ids())
 class TestAllImageCombinations:
 
-    @pytest.mark.parametrize("resource_path3", images_all(), ids=images_all_ids())
-    @pytest.mark.parametrize("resource_path2", images_all(), ids=images_all_ids())
-    @pytest.mark.parametrize("resource_path1", images_all(), ids=images_all_ids())
-    def test_from_files(self, resource_path1: str, resource_path2: str, resource_path3: str) -> None:
+    def test_from_files(self, resource_path1: str, resource_path2: str, resource_path3: str, device: Device) -> None:
         # Setup
-        torch.set_default_device(_get_device())
+        configure_test_with_device(device)
 
         image_list = ImageList.from_files(
             [
@@ -435,6 +437,7 @@ class TestAllImageCombinations:
         assert image_list == image_list_clone
 
 
+@pytest.mark.parametrize("device", get_devices(), ids=get_devices_ids())
 class TestFromFiles:
 
     @pytest.mark.parametrize(
@@ -456,8 +459,8 @@ class TestFromFiles:
             *[s + "-path" for s in images_all_ids()],
         ],
     )
-    def test_from_files_creation(self, resource_path: str | Path, snapshot_png_image_list: SnapshotAssertion) -> None:
-        torch.set_default_device(torch.device("cpu"))
+    def test_from_files_creation(self, resource_path: str | Path, snapshot_png_image_list: SnapshotAssertion, device: Device) -> None:
+        configure_test_with_device(device)
         image_list = ImageList.from_files(resolve_resource_path(resource_path))
         image_list_returned_filenames, filenames = ImageList.from_files(
             resolve_resource_path(resource_path),
@@ -479,11 +482,13 @@ class TestFromFiles:
         ],
         ids=["dir-str", "dir-path", "list-str", "list-path", "list-str-last-missing", "list-path-last-missing"],
     )
-    def test_should_raise_if_one_file_or_directory_not_found(self, resource_path: str | Path) -> None:
+    def test_should_raise_if_one_file_or_directory_not_found(self, resource_path: str | Path, device: Device) -> None:
+        configure_test_with_device(device)
         with pytest.raises(FileNotFoundError):
             ImageList.from_files(resolve_resource_path(resource_path))
 
 
+@pytest.mark.parametrize("device", get_devices(), ids=get_devices_ids())
 class TestToImages:
 
     @pytest.mark.parametrize(
@@ -491,8 +496,8 @@ class TestToImages:
         [images_all(), [plane_png_path, plane_jpg_path] * 2],
         ids=["all-images", "planes"],
     )
-    def test_should_return_images(self, resource_path: list[str]) -> None:
-        torch.set_default_device(torch.device("cpu"))
+    def test_should_return_images(self, resource_path: list[str], device: Device) -> None:
+        configure_test_with_device(device)
         image_list_all = ImageList.from_files(resolve_resource_path(resource_path))
         image_list_select = ImageList.from_files(resolve_resource_path(resource_path[::2]))
         assert image_list_all.to_images(list(range(0, len(image_list_all), 2))) == image_list_select.to_images()
@@ -502,8 +507,8 @@ class TestToImages:
         [images_all(), [plane_png_path, plane_jpg_path]],
         ids=["all-images", "planes"],
     )
-    def test_from_files_creation(self, resource_path: list[str]) -> None:
-        torch.set_default_device(torch.device("cpu"))
+    def test_from_files_creation(self, resource_path: list[str], device: Device) -> None:
+        configure_test_with_device(device)
         image_list = ImageList.from_files(resolve_resource_path(resource_path))
         bracket_open = r"\["
         bracket_close = r"\]"
@@ -514,6 +519,7 @@ class TestToImages:
             image_list.to_images(list(range(2, 2 + len(image_list))))
 
 
+@pytest.mark.parametrize("device", get_devices(), ids=get_devices_ids())
 class TestToJpegFiles:
 
     @pytest.mark.parametrize(
@@ -521,7 +527,8 @@ class TestToJpegFiles:
         [images_all(), [plane_png_path, plane_jpg_path]],
         ids=["all-images", "planes"],
     )
-    def test_should_raise_if_alpha_channel(self, resource_path: list[str]) -> None:
+    def test_should_raise_if_alpha_channel(self, resource_path: list[str], device: Device) -> None:
+        configure_test_with_device(device)
         image_list = ImageList.from_files(resolve_resource_path(resource_path))
         with (
             tempfile.TemporaryDirectory() as tmpdir,
@@ -546,7 +553,8 @@ class TestToJpegFiles:
         ],
         ids=["all-jpg-images", "jpg-planes", "jpg-grayscale"],
     )
-    def test_should_raise_if_invalid_path(self, resource_path: list[str]) -> None:
+    def test_should_raise_if_invalid_path(self, resource_path: list[str], device: Device) -> None:
+        configure_test_with_device(device)
         image_list = ImageList.from_files(resolve_resource_path(resource_path))
         with pytest.raises(
             ValueError,
@@ -571,7 +579,8 @@ class TestToJpegFiles:
         ],
         ids=["all-jpg-images", "jpg-planes", "jpg-grayscale"],
     )
-    def test_should_save_images_in_directory(self, resource_path: list[str]) -> None:
+    def test_should_save_images_in_directory(self, resource_path: list[str], device: Device) -> None:
+        configure_test_with_device(device)
         image_list = ImageList.from_files(resolve_resource_path(resource_path))
         with tempfile.TemporaryDirectory() as tmpdir:
             image_list.to_jpeg_files(tmpdir)
@@ -603,7 +612,8 @@ class TestToJpegFiles:
         ],
         ids=["all-jpg-images", "jpg-planes", "jpg-grayscale"],
     )
-    def test_should_save_images_in_directories_for_different_sizes(self, resource_path: list[str]) -> None:
+    def test_should_save_images_in_directories_for_different_sizes(self, resource_path: list[str], device: Device) -> None:
+        configure_test_with_device(device)
         image_list = ImageList.from_files(resolve_resource_path(resource_path))
 
         with tempfile.TemporaryDirectory() as tmp_parent_dir:
@@ -639,7 +649,8 @@ class TestToJpegFiles:
         ],
         ids=["all-jpg-images", "jpg-planes", "jpg-grayscale"],
     )
-    def test_should_save_images_in_files(self, resource_path: list[str]) -> None:
+    def test_should_save_images_in_files(self, resource_path: list[str], device: Device) -> None:
+        configure_test_with_device(device)
         image_list = ImageList.from_files(resolve_resource_path(resource_path))
 
         with tempfile.TemporaryDirectory() as tmp_parent_dir:
@@ -663,6 +674,7 @@ class TestToJpegFiles:
                 assert im_saved.channel == im_loaded.channel
 
 
+@pytest.mark.parametrize("device", get_devices(), ids=get_devices_ids())
 class TestToPngFiles:
 
     @pytest.mark.parametrize(
@@ -670,7 +682,8 @@ class TestToPngFiles:
         [images_all(), [plane_png_path, plane_jpg_path], [grayscale_png_path, grayscale_png_path]],
         ids=["all-images", "planes", "grayscale"],
     )
-    def test_should_raise_if_invalid_path(self, resource_path: list[str]) -> None:
+    def test_should_raise_if_invalid_path(self, resource_path: list[str], device: Device) -> None:
+        configure_test_with_device(device)
         image_list = ImageList.from_files(resolve_resource_path(resource_path))
         with pytest.raises(
             ValueError,
@@ -683,7 +696,8 @@ class TestToPngFiles:
         [images_all(), [plane_png_path, plane_jpg_path], [grayscale_png_path, grayscale_png_path]],
         ids=["all-images", "planes", "grayscale"],
     )
-    def test_should_save_images_in_directory(self, resource_path: list[str]) -> None:
+    def test_should_save_images_in_directory(self, resource_path: list[str], device: Device) -> None:
+        configure_test_with_device(device)
         image_list = ImageList.from_files(resolve_resource_path(resource_path))
         with tempfile.TemporaryDirectory() as tmpdir:
             image_list.to_png_files(tmpdir)
@@ -698,7 +712,8 @@ class TestToPngFiles:
         [images_all(), [plane_png_path, plane_jpg_path], [grayscale_png_path, grayscale_png_path]],
         ids=["all-images", "planes", "grayscale"],
     )
-    def test_should_save_images_in_directories_for_different_sizes(self, resource_path: list[str]) -> None:
+    def test_should_save_images_in_directories_for_different_sizes(self, resource_path: list[str], device: Device) -> None:
+        configure_test_with_device(device)
         image_list = ImageList.from_files(resolve_resource_path(resource_path))
 
         with tempfile.TemporaryDirectory() as tmp_parent_dir:
@@ -722,7 +737,8 @@ class TestToPngFiles:
         [images_all(), [plane_png_path, plane_jpg_path], [grayscale_png_path, grayscale_png_path]],
         ids=["all-images", "planes", "grayscale"],
     )
-    def test_should_save_images_in_files(self, resource_path: list[str]) -> None:
+    def test_should_save_images_in_files(self, resource_path: list[str], device: Device) -> None:
+        configure_test_with_device(device)
         image_list = ImageList.from_files(resolve_resource_path(resource_path))
 
         with tempfile.TemporaryDirectory() as tmp_parent_dir:
@@ -741,6 +757,7 @@ class TestToPngFiles:
             assert image_list == image_list_loaded
 
 
+@pytest.mark.parametrize("device", get_devices(), ids=get_devices_ids())
 class TestShuffleImages:
 
     @pytest.mark.parametrize(
@@ -748,8 +765,8 @@ class TestShuffleImages:
         [images_all(), [plane_png_path, plane_jpg_path] * 2],
         ids=["all-images", "planes"],
     )
-    def test_shuffle_images(self, resource_path: list[str], snapshot_png_image_list: SnapshotAssertion) -> None:
-        torch.set_default_device(_get_device())
+    def test_shuffle_images(self, resource_path: list[str], snapshot_png_image_list: SnapshotAssertion, device: Device) -> None:
+        configure_test_with_device(device)
         image_list_original = ImageList.from_files(resolve_resource_path(resource_path))
         image_list_clone = image_list_original._clone()
         random.seed(420)
@@ -766,6 +783,7 @@ class TestShuffleImages:
 @pytest.mark.parametrize("resource_path3", images_all_channel(), ids=images_all_channel_ids())
 @pytest.mark.parametrize("resource_path2", images_all_channel(), ids=images_all_channel_ids())
 @pytest.mark.parametrize("resource_path1", images_all_channel(), ids=images_all_channel_ids())
+@pytest.mark.parametrize("device", get_devices(), ids=get_devices_ids())
 class TestTransformsEqualImageTransforms:
 
     @pytest.mark.parametrize(
@@ -826,8 +844,9 @@ class TestTransformsEqualImageTransforms:
         resource_path1: str,
         resource_path2: str,
         resource_path3: str,
+        device: Device,
     ) -> None:
-        torch.set_default_device(torch.device("cpu"))
+        configure_test_with_device(device)
         image_list_original = ImageList.from_files(
             [
                 resolve_resource_path(resource_path1),
@@ -860,6 +879,7 @@ class TestTransformsEqualImageTransforms:
     [images_all(), [plane_png_path, plane_jpg_path] * 2],
     ids=["all-images", "planes"],
 )
+@pytest.mark.parametrize("device", get_devices(), ids=get_devices_ids())
 class TestTransforms:
     class TestAddNoise:
         @pytest.mark.parametrize(
@@ -876,9 +896,10 @@ class TestTransforms:
             resource_path: list[str],
             standard_deviation: float,
             snapshot_png_image_list: SnapshotAssertion,
+            device: Device,
         ) -> None:
             skip_if_os([os_mac])
-            torch.set_default_device(torch.device("cpu"))
+            configure_test_with_device(device)
             torch.manual_seed(0)
             image_list_original = ImageList.from_files(resolve_resource_path(resource_path))
             image_list_clone = image_list_original._clone()
@@ -893,19 +914,21 @@ class TestTransforms:
     [images_all(), [plane_png_path, plane_jpg_path] * 2],
     ids=["SingleSizeImageList", "MultiSizeImageList"],
 )
+@pytest.mark.parametrize("device", get_devices(), ids=get_devices_ids())
 class TestErrorsAndWarningsWithoutEmptyImageList:
 
     class TestAddImageTensor:
 
-        def test_should_raise(self, resource_path: list[str]) -> None:
-            torch.set_default_device(torch.device("cpu"))
+        def test_should_raise(self, resource_path: list[str], device: Device) -> None:
+            configure_test_with_device(device)
             image_list = ImageList.from_files(resolve_resource_path(resource_path))
             with pytest.raises(DuplicateIndexError, match=r"The index '0' is already in use."):
                 image_list._add_image_tensor(image_list.to_images([0])[0]._image_tensor, 0)
 
     class TestEquals:
 
-        def test_should_raise(self, resource_path: list[str]) -> None:
+        def test_should_raise(self, resource_path: list[str], device: Device) -> None:
+            configure_test_with_device(device)
             image_list_original = ImageList.from_files(resolve_resource_path(resource_path))
             assert (image_list_original.__eq__(image_list_original.to_images([0]))) is NotImplemented
 
@@ -921,7 +944,9 @@ class TestErrorsAndWarningsWithoutEmptyImageList:
             resource_path: list[str],
             new_x: int,
             new_y: int,
+            device: Device,
         ) -> None:
+            configure_test_with_device(device)
             image_list = ImageList.from_files(resolve_resource_path(resource_path))
             image_blank_tensor = torch.zeros((image_list.number_of_images, image_list.channel, 1, 1))
             with pytest.warns(
@@ -936,7 +961,9 @@ class TestErrorsAndWarningsWithoutEmptyImageList:
         def test_should_not_adjust_color_balance_channel_1(
             self,
             resource_path: list[str],
+            device: Device,
         ) -> None:
+            configure_test_with_device(device)
             image_list_original = ImageList.from_files(resolve_resource_path(resource_path)).change_channel(1)
             image_list_clone = image_list_original._clone()
             with pytest.warns(
@@ -955,6 +982,7 @@ class TestErrorsAndWarningsWithoutEmptyImageList:
     [images_all(), [plane_png_path, plane_jpg_path] * 2, []],
     ids=["SingleSizeImageList", "MultiSizeImageList", "EmptyImageList"],
 )
+@pytest.mark.parametrize("device", get_devices(), ids=get_devices_ids())
 class TestErrorsAndWarningsWithEmptyImageList:
 
     class TestChangeChannel:
@@ -964,7 +992,8 @@ class TestErrorsAndWarningsWithEmptyImageList:
             [-1, 0, 2, 5],
             ids=["channel-negative-1", "channel-0", "channel-2", "channel-5"],
         )
-        def test_should_raise(self, resource_path: list[str], channel: int) -> None:
+        def test_should_raise(self, resource_path: list[str], channel: int, device: Device) -> None:
+            configure_test_with_device(device)
             image_list = ImageList.from_files(resolve_resource_path(resource_path))
             with pytest.raises(
                 ValueError,
@@ -974,7 +1003,8 @@ class TestErrorsAndWarningsWithEmptyImageList:
 
     class TestRemoveImageByIndex:
 
-        def test_should_raise_invalid_index(self, resource_path: list[str]) -> None:
+        def test_should_raise_invalid_index(self, resource_path: list[str], device: Device) -> None:
+            configure_test_with_device(device)
             image_list = ImageList.from_files(resolve_resource_path(resource_path))
             with pytest.raises(IndexOutOfBoundsError):
                 image_list.remove_image_by_index(-1)
@@ -988,7 +1018,8 @@ class TestErrorsAndWarningsWithEmptyImageList:
             [(-10, 10), (10, -10), (-10, -10)],
             ids=["invalid width", "invalid height", "invalid width and height"],
         )
-        def test_should_raise_negative_size(self, resource_path: list[str], width: int, height: int) -> None:
+        def test_should_raise_negative_size(self, resource_path: list[str], width: int, height: int, device: Device) -> None:
+            configure_test_with_device(device)
             image_list = ImageList.from_files(resolve_resource_path(resource_path))
             with pytest.raises(
                 OutOfBoundsError,
@@ -1003,7 +1034,8 @@ class TestErrorsAndWarningsWithEmptyImageList:
             [(-10, 10), (10, -10), (-10, -10)],
             ids=["invalid width", "invalid height", "invalid width and height"],
         )
-        def test_should_raise_new_size(self, resource_path: list[str], new_width: int, new_height: int) -> None:
+        def test_should_raise_new_size(self, resource_path: list[str], new_width: int, new_height: int, device: Device) -> None:
+            configure_test_with_device(device)
             image_list = ImageList.from_files(resolve_resource_path(resource_path))
             with pytest.raises(
                 OutOfBoundsError,
@@ -1018,7 +1050,8 @@ class TestErrorsAndWarningsWithEmptyImageList:
             [(-10, 1), (1, -10), (-10, -1)],
             ids=["invalid width", "invalid height", "invalid width and height"],
         )
-        def test_should_raise_invalid_size(self, resource_path: list[str], new_width: int, new_height: int) -> None:
+        def test_should_raise_invalid_size(self, resource_path: list[str], new_width: int, new_height: int, device: Device) -> None:
+            configure_test_with_device(device)
             image_list = ImageList.from_files(resolve_resource_path(resource_path))
             with pytest.raises(
                 OutOfBoundsError,
@@ -1031,7 +1064,8 @@ class TestErrorsAndWarningsWithEmptyImageList:
             [(-10, 1), (1, -10), (-10, -1)],
             ids=["invalid x", "invalid y", "invalid x and y"],
         )
-        def test_should_raise_invalid_coordinates(self, resource_path: list[str], new_x: int, new_y: int) -> None:
+        def test_should_raise_invalid_coordinates(self, resource_path: list[str], new_x: int, new_y: int, device: Device) -> None:
+            configure_test_with_device(device)
             image_list = ImageList.from_files(resolve_resource_path(resource_path))
             with pytest.raises(
                 OutOfBoundsError,
@@ -1050,7 +1084,9 @@ class TestErrorsAndWarningsWithEmptyImageList:
             self,
             resource_path: list[str],
             standard_deviation: float,
+            device: Device
         ) -> None:
+            configure_test_with_device(device)
             image_list_original = ImageList.from_files(resolve_resource_path(resource_path))
             image_list_clone = image_list_original._clone()
             with pytest.raises(
@@ -1071,7 +1107,9 @@ class TestErrorsAndWarningsWithEmptyImageList:
             self,
             resource_path: list[str],
             factor: float,
+            device: Device,
         ) -> None:
+            configure_test_with_device(device)
             image_list_original = ImageList.from_files(resolve_resource_path(resource_path))
             image_list_clone = image_list_original._clone()
             with pytest.raises(OutOfBoundsError, match=r"factor \(=-1\) is not inside \[0, \u221e\)."):
@@ -1081,7 +1119,9 @@ class TestErrorsAndWarningsWithEmptyImageList:
         def test_should_not_brighten(
             self,
             resource_path: list[str],
+            device: Device,
         ) -> None:
+            configure_test_with_device(device)
             image_list_original = ImageList.from_files(resolve_resource_path(resource_path))
             image_list_clone = image_list_original._clone()
             with pytest.warns(
@@ -1103,7 +1143,9 @@ class TestErrorsAndWarningsWithEmptyImageList:
             self,
             resource_path: list[str],
             factor: float,
+            device: Device,
         ) -> None:
+            configure_test_with_device(device)
             image_list_original = ImageList.from_files(resolve_resource_path(resource_path))
             image_list_clone = image_list_original._clone()
             with pytest.raises(OutOfBoundsError, match=r"factor \(=-1\) is not inside \[0, \u221e\)."):
@@ -1113,7 +1155,9 @@ class TestErrorsAndWarningsWithEmptyImageList:
         def test_should_not_adjust(
             self,
             resource_path: list[str],
+            device: Device,
         ) -> None:
+            configure_test_with_device(device)
             image_list_original = ImageList.from_files(resolve_resource_path(resource_path))
             image_list_clone = image_list_original._clone()
             with pytest.warns(
@@ -1135,7 +1179,9 @@ class TestErrorsAndWarningsWithEmptyImageList:
             self,
             resource_path: list[str],
             factor: float,
+            device: Device,
         ) -> None:
+            configure_test_with_device(device)
             image_list_original = ImageList.from_files(resolve_resource_path(resource_path))
             image_list_clone = image_list_original._clone()
             with pytest.raises(OutOfBoundsError, match=r"factor \(=-1\) is not inside \[0, \u221e\)."):
@@ -1145,7 +1191,9 @@ class TestErrorsAndWarningsWithEmptyImageList:
         def test_should_not_adjust_color_balance_factor_1(
             self,
             resource_path: list[str],
+            device: Device,
         ) -> None:
+            configure_test_with_device(device)
             image_list_original = ImageList.from_files(resolve_resource_path(resource_path))
             image_list_clone = image_list_original._clone()
             with pytest.warns(
@@ -1158,7 +1206,8 @@ class TestErrorsAndWarningsWithEmptyImageList:
 
     class TestBlur:
 
-        def test_should_raise_radius_out_of_bounds(self, resource_path: str) -> None:
+        def test_should_raise_radius_out_of_bounds(self, resource_path: str, device: Device) -> None:
+            configure_test_with_device(device)
             image_list_original = ImageList.from_files(resolve_resource_path(resource_path))
             image_list_clone = image_list_original._clone()
             with pytest.raises(
@@ -1179,7 +1228,8 @@ class TestErrorsAndWarningsWithEmptyImageList:
                 )
             assert image_list_original == image_list_clone
 
-        def test_should_not_blur(self, resource_path: str) -> None:
+        def test_should_not_blur(self, resource_path: str, device: Device) -> None:
+            configure_test_with_device(device)
             image_list_original = ImageList.from_files(resolve_resource_path(resource_path))
             image_list_clone = image_list_original._clone()
             with pytest.warns(
@@ -1201,7 +1251,9 @@ class TestErrorsAndWarningsWithEmptyImageList:
             self,
             resource_path: list[str],
             factor: float,
+            device: Device,
         ) -> None:
+            configure_test_with_device(device)
             image_list_original = ImageList.from_files(resolve_resource_path(resource_path))
             image_list_clone = image_list_original._clone()
             with pytest.raises(OutOfBoundsError, match=r"factor \(=-1\) is not inside \[0, \u221e\)."):
@@ -1211,7 +1263,9 @@ class TestErrorsAndWarningsWithEmptyImageList:
         def test_should_not_adjust(
             self,
             resource_path: list[str],
+            device: Device,
         ) -> None:
+            configure_test_with_device(device)
             image_list_original = ImageList.from_files(resolve_resource_path(resource_path))
             image_list_clone = image_list_original._clone()
             with pytest.warns(
@@ -1223,6 +1277,7 @@ class TestErrorsAndWarningsWithEmptyImageList:
             assert image_list_original == image_list_clone
 
 
+@pytest.mark.parametrize("device", get_devices(), ids=get_devices_ids())
 class TestSingleSizeImageList:
 
     @pytest.mark.parametrize(
@@ -1231,7 +1286,9 @@ class TestSingleSizeImageList:
             torch.ones(4, 1, 1),
         ],
     )
-    def test_create_from_tensor_3_dim(self, tensor: Tensor) -> None:
+    def test_create_from_tensor_3_dim(self, tensor: Tensor, device: Device) -> None:
+        configure_test_with_device(device)
+        tensor = tensor.to(device)
         expected_tensor = tensor.unsqueeze(dim=1)
         image_list = _SingleSizeImageList._create_from_tensor(tensor, list(range(tensor.size(0))))
         assert image_list._tensor_positions_to_indices == list(range(tensor.size(0)))
@@ -1246,7 +1303,9 @@ class TestSingleSizeImageList:
             torch.ones(4, 3, 1, 1),
         ],
     )
-    def test_create_from_tensor_4_dim(self, tensor: Tensor) -> None:
+    def test_create_from_tensor_4_dim(self, tensor: Tensor, device: Device) -> None:
+        configure_test_with_device(device)
+        tensor = tensor.to(device)
         image_list = _SingleSizeImageList._create_from_tensor(tensor, list(range(tensor.size(0))))
         assert image_list._tensor_positions_to_indices == list(range(tensor.size(0)))
         assert len(image_list) == tensor.size(0)
@@ -1255,7 +1314,9 @@ class TestSingleSizeImageList:
         assert image_list.channel == tensor.size(1)
 
     @pytest.mark.parametrize("tensor", [torch.ones(4, 3, 1, 1, 1), torch.ones(4, 3)], ids=["5-dim", "2-dim"])
-    def test_should_raise_from_invalid_tensor(self, tensor: Tensor) -> None:
+    def test_should_raise_from_invalid_tensor(self, tensor: Tensor, device: Device) -> None:
+        configure_test_with_device(device)
+        tensor = tensor.to(device)
         with pytest.raises(
             ValueError,
             match=rf"Invalid Tensor. This Tensor requires 3 or 4 dimensions but has {tensor.dim()}",
@@ -1268,7 +1329,9 @@ class TestSingleSizeImageList:
             torch.randn(16, 4, 4),
         ],
     )
-    def test_get_batch_and_iterate_3_dim(self, tensor: Tensor) -> None:
+    def test_get_batch_and_iterate_3_dim(self, tensor: Tensor, device: Device) -> None:
+        configure_test_with_device(device)
+        tensor = tensor.to(device)
         expected_tensor = tensor.unsqueeze(dim=1)
         image_list = _SingleSizeImageList._create_from_tensor(tensor, list(range(tensor.size(0))))
         batch_size = math.ceil(expected_tensor.size(0) / 1.999)
@@ -1297,7 +1360,9 @@ class TestSingleSizeImageList:
             torch.randn(16, 4, 4, 4),
         ],
     )
-    def test_get_batch_and_iterate_4_dim(self, tensor: Tensor) -> None:
+    def test_get_batch_and_iterate_4_dim(self, tensor: Tensor, device: Device) -> None:
+        configure_test_with_device(device)
+        tensor = tensor.to(device)
         image_list = _SingleSizeImageList._create_from_tensor(tensor, list(range(tensor.size(0))))
         batch_size = math.ceil(tensor.size(0) / 1.999)
         assert image_list._get_batch(0, batch_size).size(0) == batch_size
@@ -1316,16 +1381,19 @@ class TestSingleSizeImageList:
             next(iterate_image_list)
 
 
+@pytest.mark.parametrize("device", get_devices(), ids=get_devices_ids())
 class TestEmptyImageList:
 
-    def test_warn_empty_image_list(self) -> None:
+    def test_warn_empty_image_list(self, device: Device) -> None:
+        configure_test_with_device(device)
         with pytest.warns(
             UserWarning,
             match=r"You are using an empty ImageList. This method changes nothing if used on an empty ImageList.",
         ):
             _EmptyImageList._warn_empty_image_list()
 
-    def test_create_image_list_in_empty_image_list(self) -> None:
+    def test_create_image_list_in_empty_image_list(self, device: Device) -> None:
+        configure_test_with_device(device)
         with pytest.raises(NotImplementedError):
             _EmptyImageList._create_image_list([], [])
 
@@ -1334,87 +1402,108 @@ class TestEmptyImageList:
         [_SingleSizeImageList(), _MultiSizeImageList()],
         ids=["SingleSizeImageList", "MultiSizeImageList"],
     )
-    def test_create_image_list(self, image_list: ImageList) -> None:
+    def test_create_image_list(self, image_list: ImageList, device: Device) -> None:
+        configure_test_with_device(device)
         assert isinstance(image_list._create_image_list([], []), _EmptyImageList)
 
-    def test_from_images(self) -> None:
+    def test_from_images(self, device: Device) -> None:
+        configure_test_with_device(device)
         assert ImageList.from_images([]) == _EmptyImageList()
 
-    def test_from_files(self) -> None:
+    def test_from_files(self, device: Device) -> None:
+        configure_test_with_device(device)
         assert ImageList.from_files([]) == _EmptyImageList()
         with tempfile.TemporaryDirectory() as tmpdir:
             assert ImageList.from_files(tmpdir) == _EmptyImageList()
             assert ImageList.from_files([tmpdir]) == _EmptyImageList()
 
-    def test_clone(self) -> None:
+    def test_clone(self, device: Device) -> None:
+        configure_test_with_device(device)
         assert _EmptyImageList() == _EmptyImageList()._clone()
         assert _EmptyImageList() is _EmptyImageList()._clone()  # Singleton
 
-    def test_repr_png(self) -> None:
+    def test_repr_png(self, device: Device) -> None:
+        configure_test_with_device(device)
         with pytest.raises(TypeError, match=r"You cannot display an empty ImageList"):
             ImageList.from_images([])._repr_png_()
 
-    def test_eq(self) -> None:
+    def test_eq(self, device: Device) -> None:
+        configure_test_with_device(device)
         assert _EmptyImageList() == _EmptyImageList()
         assert _EmptyImageList().__eq__(Table()) is NotImplemented
 
-    def test_hash(self) -> None:
+    def test_hash(self, device: Device) -> None:
+        configure_test_with_device(device)
         assert hash(_EmptyImageList()) == hash(_EmptyImageList())
 
-    def test_sizeof(self) -> None:
+    def test_sizeof(self, device: Device) -> None:
+        configure_test_with_device(device)
         assert sys.getsizeof(_EmptyImageList()) >= 0
         assert _EmptyImageList().__sizeof__() == 0
 
-    def test_number_of_images(self) -> None:
+    def test_number_of_images(self, device: Device) -> None:
+        configure_test_with_device(device)
         assert _EmptyImageList().number_of_images == 0
 
-    def test_widths(self) -> None:
+    def test_widths(self, device: Device) -> None:
+        configure_test_with_device(device)
         assert _EmptyImageList().widths == []
 
-    def test_heights(self) -> None:
+    def test_heights(self, device: Device) -> None:
+        configure_test_with_device(device)
         assert _EmptyImageList().heights == []
 
-    def test_channel(self) -> None:
+    def test_channel(self, device: Device) -> None:
+        configure_test_with_device(device)
         assert _EmptyImageList().channel is NotImplemented
 
-    def test_sizes(self) -> None:
+    def test_sizes(self, device: Device) -> None:
+        configure_test_with_device(device)
         assert _EmptyImageList().sizes == []
 
-    def test_number_of_sizes(self) -> None:
+    def test_number_of_sizes(self, device: Device) -> None:
+        configure_test_with_device(device)
         assert _EmptyImageList().number_of_sizes == 0
 
-    def test_get_image(self) -> None:
+    def test_get_image(self, device: Device) -> None:
+        configure_test_with_device(device)
         with pytest.raises(IndexOutOfBoundsError, match=r"There is no element at index '0'."):
             _EmptyImageList().get_image(0)
 
-    def test_index(self) -> None:
-        assert _EmptyImageList().index(Image.from_file(resolve_resource_path(plane_png_path), _get_device())) == []
+    def test_index(self, device: Device) -> None:
+        configure_test_with_device(device)
+        assert _EmptyImageList().index(Image.from_file(resolve_resource_path(plane_png_path))) == []
 
-    def test_has_image(self) -> None:
-        assert not _EmptyImageList().has_image(Image.from_file(resolve_resource_path(plane_png_path), _get_device()))
-        assert Image.from_file(resolve_resource_path(plane_png_path), _get_device()) not in _EmptyImageList()
+    def test_has_image(self, device: Device) -> None:
+        configure_test_with_device(device)
+        assert not _EmptyImageList().has_image(Image.from_file(resolve_resource_path(plane_png_path)))
+        assert Image.from_file(resolve_resource_path(plane_png_path)) not in _EmptyImageList()
 
-    def test_to_jpeg_file(self) -> None:
+    def test_to_jpeg_file(self, device: Device) -> None:
+        configure_test_with_device(device)
         with pytest.warns(UserWarning, match="You are using an empty ImageList. No files will be saved."):
             _EmptyImageList().to_jpeg_files("path")
 
-    def test_to_png_file(self) -> None:
+    def test_to_png_file(self, device: Device) -> None:
+        configure_test_with_device(device)
         with pytest.warns(UserWarning, match="You are using an empty ImageList. No files will be saved."):
             _EmptyImageList().to_png_files("path")
 
-    def test_to_images(self) -> None:
+    def test_to_images(self, device: Device) -> None:
+        configure_test_with_device(device)
         assert _EmptyImageList().to_images() == []
         assert _EmptyImageList().to_images([0]) == []
 
     @pytest.mark.parametrize("resource_path", images_all(), ids=images_all_ids())
-    def test_add_image_tensor(self, resource_path: str) -> None:
-        torch.set_default_device(_get_device())
+    def test_add_image_tensor(self, resource_path: str, device: Device) -> None:
+        configure_test_with_device(device)
         assert _EmptyImageList()._add_image_tensor(
-            Image.from_file(resolve_resource_path(resource_path), _get_device())._image_tensor,
+            Image.from_file(resolve_resource_path(resource_path))._image_tensor,
             0,
         ) == ImageList.from_files(resolve_resource_path(resource_path))
 
-    def test_remove_image_by_index(self) -> None:
+    def test_remove_image_by_index(self, device: Device) -> None:
+        configure_test_with_device(device)
         with pytest.raises(IndexOutOfBoundsError):
             _EmptyImageList().remove_image_by_index(0)
 
@@ -1483,8 +1572,8 @@ class TestEmptyImageList:
             "find_edges",
         ],
     )
-    def test_transform_is_still_empty_image_list(self, method: str, attributes: list) -> None:
-        torch.set_default_device(torch.device("cpu"))
+    def test_transform_is_still_empty_image_list(self, method: str, attributes: list, device: Device) -> None:
+        configure_test_with_device(device)
         image_list = _EmptyImageList()
 
         with pytest.warns(

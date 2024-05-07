@@ -5,6 +5,7 @@ import sys
 import warnings
 from typing import TYPE_CHECKING, Generic, TypeVar
 
+from safeds._config import _init_default_device
 from safeds._utils import _structural_hash
 from safeds.data.image.containers import ImageList
 from safeds.data.image.containers._empty_image_list import _EmptyImageList
@@ -46,6 +47,7 @@ class ImageDataset(Generic[T]):
 
     def __init__(self, input_data: ImageList, output_data: T, batch_size: int = 1, shuffle: bool = False) -> None:
         import torch
+        _init_default_device()
 
         self._shuffle_tensor_indices: torch.LongTensor = torch.LongTensor(list(range(len(input_data))))
         self._shuffle_after_epoch: bool = shuffle
@@ -223,6 +225,7 @@ class ImageDataset(Generic[T]):
 
     def _get_batch(self, batch_number: int, batch_size: int | None = None) -> tuple[Tensor, Tensor]:
         import torch
+        _init_default_device()
 
         if batch_size is None:
             batch_size = self._batch_size
@@ -273,6 +276,7 @@ class ImageDataset(Generic[T]):
             the shuffled `ImageDataset`
         """
         import torch
+        _init_default_device()
 
         im_dataset: ImageDataset[T] = copy.copy(self)
         im_dataset._shuffle_tensor_indices = torch.randperm(len(self))
@@ -284,6 +288,7 @@ class _TableAsTensor:
 
     def __init__(self, table: Table) -> None:
         import torch
+        _init_default_device()
 
         self._column_names = table.column_names
         self._tensor = torch.Tensor(table._data.to_numpy(copy=True)).to(torch.get_default_device())
@@ -295,6 +300,7 @@ class _TableAsTensor:
 
     def __eq__(self, other: object) -> bool:
         import torch
+        _init_default_device()
 
         if not isinstance(other, _TableAsTensor):
             return NotImplemented
@@ -333,6 +339,7 @@ class _ColumnAsTensor:
 
     def __init__(self, column: Column) -> None:
         import torch
+        _init_default_device()
 
         self._column_name = column.name
         column_as_table = Table.from_columns([column])
@@ -349,6 +356,7 @@ class _ColumnAsTensor:
 
     def __eq__(self, other: object) -> bool:
         import torch
+        _init_default_device()
 
         if not isinstance(other, _ColumnAsTensor):
             return NotImplemented

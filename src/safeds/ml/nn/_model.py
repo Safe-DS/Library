@@ -3,6 +3,7 @@ from __future__ import annotations
 import copy
 from typing import TYPE_CHECKING, Generic, Self, TypeVar
 
+from safeds._config import _init_default_device
 from safeds.data.image.containers import ImageList
 from safeds.data.labeled.containers import ImageDataset, TabularDataset
 from safeds.data.tabular.containers import Table, TimeSeries
@@ -155,6 +156,7 @@ class NeuralNetworkRegressor(Generic[IFT, IPT, OT]):
         """
         import torch
         from torch import nn
+        _init_default_device()
 
         if epoch_size < 1:
             raise OutOfBoundsError(actual=epoch_size, name="epoch_size", lower_bound=ClosedBound(1))
@@ -225,6 +227,7 @@ class NeuralNetworkRegressor(Generic[IFT, IPT, OT]):
             If the model has not been fitted yet
         """
         import torch
+        _init_default_device()
 
         if not self._is_fitted:
             raise ModelNotFittedError
@@ -367,6 +370,7 @@ class NeuralNetworkClassifier(Generic[IFT, IPT, OT]):
         """
         import torch
         from torch import nn
+        _init_default_device()
 
         if epoch_size < 1:
             raise OutOfBoundsError(actual=epoch_size, name="epoch_size", lower_bound=ClosedBound(1))
@@ -444,6 +448,7 @@ class NeuralNetworkClassifier(Generic[IFT, IPT, OT]):
             If the Model has not been fitted yet
         """
         import torch
+        _init_default_device()
 
         if not self._is_fitted:
             raise ModelNotFittedError
@@ -476,6 +481,7 @@ def _create_internal_model(
     is_for_classification: bool,
 ) -> nn.Module:
     from torch import nn
+    _init_default_device()
 
     class _InternalModel(nn.Module):
         def __init__(self, layers: list[Layer], is_for_classification: bool) -> None:
