@@ -7,6 +7,8 @@ import numpy as np
 import PIL.Image
 import pytest
 import torch
+
+from safeds._config import _get_device
 from safeds.data.image.containers import Image
 from safeds.data.image.typing import ImageSize
 from safeds.data.tabular.containers import Table
@@ -38,7 +40,7 @@ from tests.helpers import (
     white_square_jpg_id,
     white_square_jpg_path,
     white_square_png_id,
-    white_square_png_path,
+    white_square_png_path, device_cpu, device_cuda,
 )
 
 
@@ -1037,6 +1039,19 @@ class TestFindEdges:
         image_edges = image.find_edges()
         assert image_edges == snapshot_png_image
         _assert_width_height_channel(image, image_edges)
+
+
+class TestFilterEdgesKernel:
+
+    def test_should_kernel_change_device(self) -> None:
+        assert Image._filter_edges_kernel().device == _get_device()
+        configure_test_with_device(device_cpu)
+        assert Image._filter_edges_kernel().device == _get_device()
+        configure_test_with_device(device_cuda)
+        assert Image._filter_edges_kernel().device == _get_device()
+        configure_test_with_device(device_cpu)
+        assert Image._filter_edges_kernel().device == _get_device()
+
 
 
 @pytest.mark.parametrize("device", get_devices(), ids=get_devices_ids())
