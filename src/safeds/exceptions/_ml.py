@@ -95,8 +95,3 @@ class PlainTableError(TypeError):
         )
 
 
-class NonTimeSeriesDatasetError(TypeError):
-    """Exception raised when a 'TimeSeriesDataset' is exprected."""
-
-    def __init__(self) -> None:
-        super().__init__("Expected an instance of TimeSeriesDataset, got something else instead.")

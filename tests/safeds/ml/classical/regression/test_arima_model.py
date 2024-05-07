@@ -8,7 +8,6 @@ from safeds.exceptions import (
     MissingValuesColumnError,
     ModelNotFittedError,
     NonNumericColumnError,
-    NonTimeSeriesDatasetError,
 )
 from safeds.ml.classical.regression import ArimaModelRegressor, LassoRegressor
 

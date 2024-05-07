@@ -34,7 +34,6 @@ if TYPE_CHECKING:
         InvalidModelStructureError,
         LearningError,
         ModelNotFittedError,
-        NonTimeSeriesDatasetError,
         PlainTableError,
         PredictionError,
     )
@@ -69,7 +68,6 @@ apipkg.initpkg(
         "InvalidModelStructureError": "._ml:InvalidModelStructureError",
         "LearningError": "._ml:LearningError",
         "ModelNotFittedError": "._ml:ModelNotFittedError",
-        "NonTimeSeriesDatasetError": "._ml:NonTimeSeriesDatasetError",
         "PlainTableError": "._ml:PlainTableError",
         "PredictionError": "._ml:PredictionError",
         # Other
@@ -104,7 +102,6 @@ __all__ = [
     "InvalidModelStructureError",
     "LearningError",
     "ModelNotFittedError",
-    "NonTimeSeriesDatasetError",
     "PlainTableError",
     "PredictionError",
     # Other

@@ -13,7 +13,6 @@ from safeds.exceptions import (
     MissingValuesColumnError,
     ModelNotFittedError,
     NonNumericColumnError,
-    NonTimeSeriesDatasetError,
 )
 
 if TYPE_CHECKING:
