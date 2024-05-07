@@ -458,7 +458,7 @@ class ExperimentalColumn(Sequence[T]):
                     self.idness(),
                     self.stability(),
                 ],
-            }
+            },
         )
 
     def correlation_with(self, other: ExperimentalColumn) -> float:
