@@ -187,10 +187,8 @@ class TimeSeriesDataset:
         ----------
         window_size:
             The size of the created windows
-
         forecast_horizon:
             The length of the forecast horizon, where all datapoints are collected until the given lag.
-
         batch_size:
             The size of data batches that should be loaded at one time.
 
