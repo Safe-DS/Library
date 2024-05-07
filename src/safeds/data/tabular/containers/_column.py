@@ -1052,7 +1052,6 @@ class Column(Sequence[T]):
         ------
         NonNumericColumnError
             if the target column contains non numerical values
-
         ValueError
             if the columns do not have the same size
         Examples
