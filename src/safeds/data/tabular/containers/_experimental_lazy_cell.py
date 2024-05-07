@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, TypeVar
 
+from safeds._utils import _structural_hash
+
 from ._experimental_cell import ExperimentalCell
 
 if TYPE_CHECKING:
@@ -153,10 +155,10 @@ class _LazyCell(ExperimentalCell[T]):
     # Other --------------------------------------------------------------------
 
     def __hash__(self) -> int:
-        raise NotImplementedError
+        return _structural_hash(self._expression.meta.serialize())
 
     def __sizeof__(self) -> int:
-        raise NotImplementedError
+        return self._expression.__sizeof__()
 
     # ------------------------------------------------------------------------------------------------------------------
     # Internal

@@ -11,7 +11,7 @@ class ExperimentalTablePlotter:
     def __init__(self, table: ExperimentalTable):
         self.table: ExperimentalTable = table
 
-    def boxplots(self) -> Image:
+    def box_plots(self) -> Image:
         raise NotImplementedError
 
     def correlation_heatmap(self) -> Image:
@@ -20,8 +20,10 @@ class ExperimentalTablePlotter:
     def histograms(self, *, number_of_bins: int = 10) -> Image:
         raise NotImplementedError
 
-    def lineplot(self, x_name: str, y_name: str) -> Image:
+    def line_plot(self, x_name: str, y_name: str) -> Image:
         raise NotImplementedError
 
-    def scatterplot(self, x_name: str, y_name: str) -> Image:
+    def scatter_plot(self, x_name: str, y_name: str) -> Image:
         raise NotImplementedError
+
+    # TODO: equivalent to Column.plot_compare_columns that takes a list of column names (index_plot)?

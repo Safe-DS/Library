@@ -11,8 +11,11 @@ class ExperimentalColumnPlotter:
     def __init__(self, column: ExperimentalColumn):
         self.column: ExperimentalColumn = column
 
-    def boxplot(self) -> Image:
+    def box_plot(self) -> Image:
         raise NotImplementedError
 
     def histogram(self) -> Image:
+        raise NotImplementedError
+
+    def lag_plot(self) -> Image:
         raise NotImplementedError
