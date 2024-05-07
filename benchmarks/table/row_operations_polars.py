@@ -46,7 +46,7 @@ def _run_split_rows() -> None:
 
 
 def _run_transform_column() -> None:
-    table.transform_column("column_0", lambda value, row: value * 2 + row.get_value("column_1"))._lazy_frame.collect()
+    table.transform_column("column_0", lambda value: value * 2)._lazy_frame.collect()
 
 
 if __name__ == "__main__":

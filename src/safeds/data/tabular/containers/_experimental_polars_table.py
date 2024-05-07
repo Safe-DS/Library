@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import inspect
 from typing import TYPE_CHECKING, Any, Literal
 
 from safeds._utils import _check_and_normalize_file_path
@@ -11,7 +10,6 @@ from ._experimental_lazy_cell import _LazyCell
 from ._experimental_lazy_vectorized_row import _LazyVectorizedRow
 from ._experimental_polars_column import ExperimentalPolarsColumn
 from ._experimental_vectorized_cell import _VectorizedCell
-from ._experimental_vectorized_row import _VectorizedRow
 from ._table import Table
 
 if TYPE_CHECKING:
@@ -382,20 +380,12 @@ class ExperimentalPolarsTable:
     def transform_column(
         self,
         name: str,
-        transformer: (
-            Callable[[ExperimentalPolarsCell], ExperimentalPolarsCell] |
-            Callable[[ExperimentalPolarsCell, ExperimentalPolarsRow], ExperimentalPolarsCell]
-        ),
+        transformer: Callable[[ExperimentalPolarsCell], ExperimentalPolarsCell],
     ) -> ExperimentalPolarsTable:
         if not self.has_column(name):
             raise UnknownColumnNameError([name])  # TODO: in the error, compute similar column names
 
-        transformer_parameter_count = len(inspect.signature(transformer).parameters)
-        if transformer_parameter_count == 1:
-            transformed_column = transformer(_VectorizedCell(self.get_column(name)))
-        else:
-            transformed_column = transformer(_VectorizedCell(self.get_column(name)), _VectorizedRow(self))
-
+        transformed_column = transformer(_VectorizedCell(self.get_column(name)))
         if not isinstance(transformed_column, _VectorizedCell):
             raise TypeError("The transformer must return a cell.")
 
