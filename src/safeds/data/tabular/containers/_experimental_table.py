@@ -12,9 +12,9 @@ from safeds.exceptions import (
     UnknownColumnNameError,
 )
 
+from ._experimental_column import ExperimentalPolarsColumn
 from ._experimental_lazy_cell import _LazyCell
 from ._experimental_lazy_vectorized_row import _LazyVectorizedRow
-from ._experimental_polars_column import ExperimentalPolarsColumn
 from ._experimental_vectorized_cell import _VectorizedCell
 from ._table import Table
 
@@ -29,8 +29,8 @@ if TYPE_CHECKING:
     from safeds.data.tabular.transformation import InvertibleTableTransformer, TableTransformer
     from safeds.data.tabular.typing import ColumnType, Schema
 
-    from ._experimental_polars_cell import ExperimentalPolarsCell
-    from ._experimental_polars_row import ExperimentalPolarsRow
+    from ._experimental_cell import ExperimentalPolarsCell
+    from ._experimental_row import ExperimentalPolarsRow
 
 
 class ExperimentalPolarsTable:

@@ -5,12 +5,12 @@ from typing import TYPE_CHECKING
 from safeds.exceptions import UnknownColumnNameError
 
 from ._experimental_lazy_cell import _LazyCell
-from ._experimental_polars_row import ExperimentalPolarsRow
+from ._experimental_row import ExperimentalPolarsRow
 
 if TYPE_CHECKING:
     from safeds.data.tabular.typing import ColumnType, Schema
 
-    from ._experimental_polars_table import ExperimentalPolarsTable
+    from ._experimental_table import ExperimentalPolarsTable
 
 
 class _LazyVectorizedRow(ExperimentalPolarsRow):

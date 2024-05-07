@@ -2,14 +2,14 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, TypeVar
 
-from ._experimental_polars_cell import ExperimentalPolarsCell
+from ._experimental_cell import ExperimentalPolarsCell
 
 if TYPE_CHECKING:
     import polars as pl
 
     from safeds.data.tabular.typing import ColumnType
 
-    from ._experimental_polars_column import ExperimentalPolarsColumn
+    from ._experimental_column import ExperimentalPolarsColumn
 
 T = TypeVar("T")
 P = TypeVar("P")

@@ -15,8 +15,8 @@ if TYPE_CHECKING:
     from safeds.data.image.containers import Image
     from safeds.data.tabular.typing import ColumnType
 
-    from ._experimental_polars_cell import ExperimentalPolarsCell
-    from ._experimental_polars_table import ExperimentalPolarsTable
+    from ._experimental_cell import ExperimentalPolarsCell
+    from ._experimental_table import ExperimentalPolarsTable
 
 
 T = TypeVar("T")

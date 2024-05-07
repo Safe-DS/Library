@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, TypeVar
 
-from ._experimental_polars_cell import ExperimentalPolarsCell
+from ._experimental_cell import ExperimentalPolarsCell
 
 if TYPE_CHECKING:
     import polars as pl
