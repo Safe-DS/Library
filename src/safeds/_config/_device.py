@@ -17,6 +17,7 @@ def _get_device() -> Device:
 
 def _init_default_device() -> None:
     import torch
+
     global _default_device
 
     if _default_device is None:

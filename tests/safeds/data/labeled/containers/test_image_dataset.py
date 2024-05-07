@@ -24,8 +24,15 @@ from safeds.exceptions import (
 )
 from torch import Tensor
 
-from tests.helpers import images_all, plane_png_path, resolve_resource_path, white_square_png_path, get_devices, \
-    get_devices_ids, configure_test_with_device
+from tests.helpers import (
+    images_all,
+    plane_png_path,
+    resolve_resource_path,
+    white_square_png_path,
+    get_devices,
+    get_devices_ids,
+    configure_test_with_device,
+)
 
 T = TypeVar("T", Column, Table, ImageList)
 
@@ -94,12 +101,7 @@ class TestImageDatasetInit:
         ],
     )
     def test_should_raise_with_invalid_data(
-        self,
-        input_data: ImageList,
-        output_data: T,
-        error: type[Exception],
-        error_msg: str,
-        device: Device
+        self, input_data: ImageList, output_data: T, error: type[Exception], error_msg: str, device: Device
     ) -> None:
         configure_test_with_device(device)
         with pytest.raises(error, match=error_msg):
@@ -160,7 +162,13 @@ class TestEq:
             (white_square_png_path, plane_png_path),
         ],
     )
-    def test_should_not_be_equal(self, image_dataset1_output: str | Column | Table, image_dataset2_input: str, image_dataset2_output: str | Column | Table, device: Device) -> None:
+    def test_should_not_be_equal(
+        self,
+        image_dataset1_output: str | Column | Table,
+        image_dataset2_input: str,
+        image_dataset2_output: str | Column | Table,
+        device: Device,
+    ) -> None:
         configure_test_with_device(device)
         image_dataset1 = ImageDataset(ImageList.from_files(resolve_resource_path(plane_png_path)), ImageList.from_files(resolve_resource_path(image_dataset1_output)) if isinstance(image_dataset1_output, str) else image_dataset1_output)  # type: ignore[type-var]
         image_dataset2 = ImageDataset(ImageList.from_files(resolve_resource_path(image_dataset2_input)), ImageList.from_files(resolve_resource_path(image_dataset2_output)) if isinstance(image_dataset2_output, str) else image_dataset2_output)  # type: ignore[type-var]
@@ -220,7 +228,13 @@ class TestHash:
             (white_square_png_path, plane_png_path),
         ],
     )
-    def test_hash_should_not_be_equal(self, image_dataset1_output: str | Column | Table, image_dataset2_input: str, image_dataset2_output: str | Column | Table, device: Device) -> None:
+    def test_hash_should_not_be_equal(
+        self,
+        image_dataset1_output: str | Column | Table,
+        image_dataset2_input: str,
+        image_dataset2_output: str | Column | Table,
+        device: Device,
+    ) -> None:
         configure_test_with_device(device)
         image_dataset1 = ImageDataset(ImageList.from_files(resolve_resource_path(plane_png_path)), ImageList.from_files(resolve_resource_path(image_dataset1_output)) if isinstance(image_dataset1_output, str) else image_dataset1_output)  # type: ignore[type-var]
         image_dataset2 = ImageDataset(ImageList.from_files(resolve_resource_path(image_dataset2_input)), ImageList.from_files(resolve_resource_path(image_dataset2_output)) if isinstance(image_dataset2_output, str) else image_dataset2_output)  # type: ignore[type-var]
@@ -242,7 +256,9 @@ class TestSizeOf:
             plane_png_path,
         ],
     )
-    def test_should_size_be_greater_than_normal_object(self, image_dataset_output: str | Column | Table, device: Device) -> None:
+    def test_should_size_be_greater_than_normal_object(
+        self, image_dataset_output: str | Column | Table, device: Device
+    ) -> None:
         configure_test_with_device(device)
         image_dataset = ImageDataset(ImageList.from_files(resolve_resource_path(plane_png_path)), ImageList.from_files(resolve_resource_path(image_dataset_output)) if isinstance(image_dataset_output, str) else image_dataset_output)  # type: ignore[type-var]
         assert sys.getsizeof(image_dataset) > sys.getsizeof(object())

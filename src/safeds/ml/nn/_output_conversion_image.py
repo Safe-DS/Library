@@ -69,6 +69,7 @@ class OutputConversionImageToColumn(_OutputConversionImage):
 
     def _data_conversion(self, input_data: ImageList, output_data: Tensor, **kwargs: Any) -> ImageDataset[Column]:
         import torch
+
         _init_default_device()
 
         if not isinstance(input_data, _SingleSizeImageList):
@@ -102,6 +103,7 @@ class OutputConversionImageToTable(_OutputConversionImage):
 
     def _data_conversion(self, input_data: ImageList, output_data: Tensor, **kwargs: Any) -> ImageDataset[Table]:
         import torch
+
         _init_default_device()
 
         if not isinstance(input_data, _SingleSizeImageList):
@@ -139,6 +141,7 @@ class OutputConversionImageToImage(_OutputConversionImage):
         **kwargs: Any,  # noqa: ARG002
     ) -> ImageDataset[ImageList]:
         import torch
+
         _init_default_device()
 
         if not isinstance(input_data, _SingleSizeImageList):

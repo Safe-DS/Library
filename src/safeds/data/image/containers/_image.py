@@ -41,6 +41,7 @@ class Image:
     @staticmethod
     def _filter_edges_kernel() -> Tensor:
         import torch
+
         _init_default_device()
 
         if Image._filter_edges_kernel_cache is None:
@@ -77,6 +78,7 @@ class Image:
         """
         from PIL.Image import open as pil_image_open
         from torchvision.transforms.functional import pil_to_tensor
+
         _init_default_device()
 
         return Image(image_tensor=pil_to_tensor(pil_image_open(path)))
@@ -98,6 +100,7 @@ class Image:
         """
         import torch
         import torchvision
+
         _init_default_device()
 
         with warnings.catch_warnings():
@@ -127,6 +130,7 @@ class Image:
             Whether the two images contain equal pixel data.
         """
         import torch
+
         _init_default_device()
 
         if not isinstance(other, Image):
@@ -191,6 +195,7 @@ class Image:
         import torch
         from torchvision.transforms.v2 import functional as func2
         from torchvision.utils import save_image
+
         _init_default_device()
 
         if self.channel == 4:
@@ -215,6 +220,7 @@ class Image:
         import torch
         from torchvision.transforms.v2 import functional as func2
         from torchvision.utils import save_image
+
         _init_default_device()
 
         buffer = io.BytesIO()
@@ -293,6 +299,7 @@ class Image:
         import torch
         from torchvision.transforms.v2 import functional as func2
         from torchvision.utils import save_image
+
         _init_default_device()
 
         if self.channel == 4:
@@ -315,6 +322,7 @@ class Image:
         import torch
         from torchvision.transforms.v2 import functional as func2
         from torchvision.utils import save_image
+
         _init_default_device()
 
         Path(path).parent.mkdir(parents=True, exist_ok=True)
@@ -349,6 +357,7 @@ class Image:
             if the given channel is not a valid channel option
         """
         import torch
+
         _init_default_device()
 
         if self.channel == channel:
@@ -403,6 +412,7 @@ class Image:
         """
         from torchvision.transforms import InterpolationMode
         from torchvision.transforms.v2 import functional as func2
+
         _init_default_device()
 
         _check_resize_errors(new_width, new_height)
@@ -423,6 +433,7 @@ class Image:
         """
         import torch
         from torchvision.transforms.v2 import functional as func2
+
         _init_default_device()
 
         if self.channel == 4:
@@ -467,6 +478,7 @@ class Image:
             If x or y are below 0 or if width or height are below 1
         """
         from torchvision.transforms.v2 import functional as func2
+
         _init_default_device()
 
         _check_crop_errors_and_warnings(x, y, width, height, self.width, self.height, plural=False)
@@ -484,6 +496,7 @@ class Image:
             The flipped image.
         """
         from torchvision.transforms.v2 import functional as func2
+
         _init_default_device()
 
         return Image(func2.vertical_flip(self._image_tensor))
@@ -500,6 +513,7 @@ class Image:
             The flipped image.
         """
         from torchvision.transforms.v2 import functional as func2
+
         _init_default_device()
 
         return Image(func2.horizontal_flip(self._image_tensor))
@@ -531,6 +545,7 @@ class Image:
         """
         import torch
         from torchvision.transforms.v2 import functional as func2
+
         _init_default_device()
 
         _check_adjust_brightness_errors_and_warnings(factor, plural=False)
@@ -568,6 +583,7 @@ class Image:
             If standard_deviation is smaller than 0.
         """
         import torch
+
         _init_default_device()
 
         _check_add_noise_errors(standard_deviation)
@@ -601,6 +617,7 @@ class Image:
         """
         import torch
         from torchvision.transforms.v2 import functional as func2
+
         _init_default_device()
 
         _check_adjust_contrast_errors_and_warnings(factor, plural=False)
@@ -668,6 +685,7 @@ class Image:
             If radius is smaller than 0 or equal or greater than the smaller size of the image.
         """
         from torchvision.transforms.v2 import functional as func2
+
         _init_default_device()
 
         _check_blur_errors_and_warnings(radius, min(self.width, self.height), plural=False)
@@ -699,6 +717,7 @@ class Image:
         """
         import torch
         from torchvision.transforms.v2 import functional as func2
+
         _init_default_device()
 
         _check_sharpen_errors_and_warnings(factor, plural=False)
@@ -727,6 +746,7 @@ class Image:
         """
         import torch
         from torchvision.transforms.v2 import functional as func2
+
         _init_default_device()
 
         if self.channel == 4:
@@ -748,6 +768,7 @@ class Image:
             The image rotated 90 degrees clockwise.
         """
         from torchvision.transforms.v2 import functional as func2
+
         _init_default_device()
 
         return Image(func2.rotate(self._image_tensor, -90, expand=True))
@@ -764,6 +785,7 @@ class Image:
             The image rotated 90 degrees counter-clockwise.
         """
         from torchvision.transforms.v2 import functional as func2
+
         _init_default_device()
 
         return Image(func2.rotate(self._image_tensor, 90, expand=True))
@@ -780,6 +802,7 @@ class Image:
             The image with edges found.
         """
         import torch
+
         _init_default_device()
 
         edges_tensor = torch.clamp(

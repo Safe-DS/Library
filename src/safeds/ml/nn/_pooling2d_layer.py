@@ -16,6 +16,7 @@ from safeds.ml.nn import Layer
 
 def _create_internal_model(strategy: Literal["max", "avg"], kernel_size: int, padding: int, stride: int) -> nn.Module:
     from torch import nn
+
     _init_default_device()
 
     class _InternalLayer(nn.Module):
