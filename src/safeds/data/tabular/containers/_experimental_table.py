@@ -331,7 +331,7 @@ class ExperimentalTable:
     def remove_columns_with_missing_values(self) -> ExperimentalTable:
         raise NotImplementedError
 
-    def remove_columns_with_non_numerical_values(self) -> ExperimentalTable:
+    def remove_columns_with_non_numeric_values(self) -> ExperimentalTable:
         raise NotImplementedError
 
     def rename_column(self, old_name: str, new_name: str) -> ExperimentalTable:
