@@ -255,7 +255,6 @@ class TimeSeriesDataset:
         batch_size:
             The size of data batches that should be loaded at one time.
 
-
         Returns
         -------
         result:
