@@ -106,15 +106,3 @@ if __name__ == "__main__":
             }
         )
     )
-
-#                              method    pandas    polars
-# 4             remove_duplicate_rows  0.270062  0.007441
-# 5   remove_rows_with_missing_values  0.255554  0.009031
-# 6         remove_rows_with_outliers  0.566346
-# 7                       remove_rows  2.746695  0.002014
-# 8                      shuffle_rows  0.253078  0.001381
-# 9                        slice_rows  0.129017  0.000668
-# 10                        sort_rows  4.117939  0.002693
-# 10              sort_rows_by_column  4.117939  0.001585
-# 11                       split_rows  0.257560  0.001564
-# 13                  transform_colum  2.994108  0.001423
