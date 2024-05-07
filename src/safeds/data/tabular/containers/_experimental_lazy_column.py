@@ -3,7 +3,7 @@
 
 from abc import ABC
 
-from safeds.data.tabular.containers import ExperimentalPolarsCell
+from ._experimental_polars_cell import ExperimentalPolarsCell
 
 
 class _LazyColumn(ExperimentalPolarsCell, ABC):

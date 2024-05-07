@@ -1,12 +1,20 @@
 from __future__ import annotations
 
-from collections.abc import Iterator, Sequence
+from collections.abc import Callable, Iterator, Sequence
 from typing import TYPE_CHECKING, Any, TypeVar, overload
+
+from ._column import Column
 
 if TYPE_CHECKING:
     from polars import Series
 
+    from safeds.data.image.containers import Image
+    from safeds.data.tabular.typing import ColumnType
+
+    from ._experimental_polars_table import ExperimentalPolarsTable
+
 T = TypeVar("T")
+R = TypeVar("R")
 
 
 class ExperimentalPolarsColumn(Sequence[T]):
@@ -70,7 +78,7 @@ class ExperimentalPolarsColumn(Sequence[T]):
         return self._series.__iter__()
 
     def __len__(self) -> int:
-        return self._series.__len__()
+        return self.number_of_rows
 
     def __repr__(self) -> str:
         return self._series.__repr__()
@@ -80,3 +88,145 @@ class ExperimentalPolarsColumn(Sequence[T]):
 
     def __str__(self) -> str:
         return self._series.__str__()
+
+    # ------------------------------------------------------------------------------------------------------------------
+    # Properties
+    # ------------------------------------------------------------------------------------------------------------------
+
+    @property
+    def name(self) -> str:
+        """The name of the column."""
+        return self._series.name
+
+    @property
+    def number_of_rows(self) -> int:
+        """The number of rows in the column."""
+        return self._series.len()
+
+    @property
+    def type(self) -> ColumnType:  # TODO: rethink return type
+        """The type of the column."""
+        raise NotImplementedError
+
+    # ------------------------------------------------------------------------------------------------------------------
+    # Value operations
+    # ------------------------------------------------------------------------------------------------------------------
+
+    def get_unique_values(self) -> list[T]:
+        raise NotImplementedError
+
+    def get_value(self, index: int) -> T:
+        raise NotImplementedError
+
+    # ------------------------------------------------------------------------------------------------------------------
+    # Reductions
+    # ------------------------------------------------------------------------------------------------------------------
+
+    def all(self, predicate: Callable[[T], bool]) -> bool:
+        raise NotImplementedError
+
+    def any(self, predicate: Callable[[T], bool]) -> bool:
+        raise NotImplementedError
+
+    def count(self, predicate: Callable[[T], bool]) -> int:
+        raise NotImplementedError
+
+    def none(self, predicate: Callable[[T], bool]) -> bool:
+        raise NotImplementedError
+
+    # ------------------------------------------------------------------------------------------------------------------
+    # Transformations
+    # ------------------------------------------------------------------------------------------------------------------
+
+    def remove_duplicate_values(self) -> ExperimentalPolarsColumn[T]:
+        raise NotImplementedError
+
+    def rename(self, new_name: str) -> ExperimentalPolarsColumn[T]:
+        raise NotImplementedError
+
+    def transform(self, transformer: Callable[[T], R]) -> ExperimentalPolarsColumn[R]:
+        raise NotImplementedError
+
+    # ------------------------------------------------------------------------------------------------------------------
+    # Statistics
+    # ------------------------------------------------------------------------------------------------------------------
+
+    def summarize_statistics(self) -> ExperimentalPolarsTable:
+        raise NotImplementedError
+
+    def correlation_with(self, other: ExperimentalPolarsColumn) -> float:
+        raise NotImplementedError
+
+    def idness(self) -> float:
+        raise NotImplementedError
+
+    def max(self) -> T:
+        raise NotImplementedError
+
+    def mean(self) -> T:
+        raise NotImplementedError
+
+    def median(self) -> T:
+        raise NotImplementedError
+
+    def min(self) -> T:
+        raise NotImplementedError
+
+    def missing_value_count(self) -> int:
+        raise NotImplementedError
+
+    def missing_value_ratio(self) -> float:
+        raise NotImplementedError
+
+    def mode(self) -> T:
+        raise NotImplementedError
+
+    def stability(self) -> float:
+        raise NotImplementedError
+
+    def standard_deviation(self) -> float:
+        raise NotImplementedError
+
+    def variance(self) -> float:
+        raise NotImplementedError
+
+    # ------------------------------------------------------------------------------------------------------------------
+    # Visualization
+    # ------------------------------------------------------------------------------------------------------------------
+
+    def plot_boxplot(self) -> Image:
+        raise NotImplementedError
+
+    def plot_histogram(self) -> Image:
+        raise NotImplementedError
+
+    # ------------------------------------------------------------------------------------------------------------------
+    # Export
+    # ------------------------------------------------------------------------------------------------------------------
+
+    def to_table(self) -> ExperimentalPolarsTable:
+        raise NotImplementedError
+
+    def temporary_to_old_column(self) -> Column:
+        """
+        Convert the column to the old column format. This method is temporary and will be removed in a later version.
+
+        Returns
+        -------
+        old_column:
+            The column in the old format.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import ExperimentalPolarsColumn
+        >>> column = ExperimentalPolarsColumn("a": [1, 2, 3])
+        >>> old_column = column.temporary_to_old_column()
+        """
+        return Column._from_pandas_series(self._series.to_pandas())
+
+    # ------------------------------------------------------------------------------------------------------------------
+    # IPython integration
+    # ------------------------------------------------------------------------------------------------------------------
+
+    def _repr_html_(self) -> str:
+        raise NotImplementedError

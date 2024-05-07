@@ -5,9 +5,7 @@ from typing import TYPE_CHECKING, Any, TypeVar
 from ._experimental_polars_cell import ExperimentalPolarsCell
 
 if TYPE_CHECKING:
-    from collections.abc import Sequence
-
-    from polars import Series
+    import polars as pl
 
     from ._experimental_polars_column import ExperimentalPolarsColumn
 
@@ -23,16 +21,8 @@ class _VectorizedCell(ExperimentalPolarsCell[T]):
     This implementation treats an entire column as a cell. This greatly speeds up operations on the cell.
     """
 
-    # ------------------------------------------------------------------------------------------------------------------
-    # Import
-    # ------------------------------------------------------------------------------------------------------------------
-
     @staticmethod
-    def _from_column(data: ExperimentalPolarsColumn[T]) -> _VectorizedCell[T]:
-        return _VectorizedCell._from_polars_series(data._series)
-
-    @staticmethod
-    def _from_polars_series(data: Series) -> _VectorizedCell:
+    def _from_polars_series(data: pl.Series) -> _VectorizedCell:
         result = object.__new__(_VectorizedCell)
         result._series = data
         return result
@@ -41,13 +31,8 @@ class _VectorizedCell(ExperimentalPolarsCell[T]):
     # Dunder methods
     # ------------------------------------------------------------------------------------------------------------------
 
-    def __init__(self, name: str, data: Sequence[T] | None = None) -> None:
-        import polars as pl
-
-        if data is None:
-            data = []
-
-        self._series: pl.Series = pl.Series(name, data)
+    def __init__(self, column: ExperimentalPolarsColumn[T]) -> None:
+        self._series: pl.Series = column._series
 
     # "Boolean" operators (actually bitwise) -----------------------------------
 
@@ -214,7 +199,7 @@ class _VectorizedCell(ExperimentalPolarsCell[T]):
 def _normalize_boolean_operation_operands(
     left_operand: _VectorizedCell,
     right_operand: bool | ExperimentalPolarsCell[bool],
-) -> Series | None:
+) -> pl.Series | None:
     """
     Normalize the operands of a boolean operation (not, and, or, xor).
 
@@ -232,7 +217,7 @@ def _normalize_boolean_operation_operands(
         return right_operand._series
 
 
-def _wrap(other: Series) -> Any:
+def _wrap(other: pl.Series) -> Any:
     return _VectorizedCell._from_polars_series(other)
 
 

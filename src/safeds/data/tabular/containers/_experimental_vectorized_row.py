@@ -3,12 +3,12 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from ._experimental_polars_row import ExperimentalPolarsRow
+from ._experimental_vectorized_cell import _VectorizedCell
 
 if TYPE_CHECKING:
     from safeds.data.tabular.typing import ColumnType, Schema
 
     from ._experimental_polars_table import ExperimentalPolarsTable
-    from ._experimental_vectorized_cell import _VectorizedCell
 
 
 class _VectorizedRow(ExperimentalPolarsRow):
