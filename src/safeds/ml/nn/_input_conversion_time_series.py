@@ -79,4 +79,4 @@ class InputConversionTimeSeries(InputConversion[TimeSeriesDataset, TimeSeriesDat
         return self._is_fit_data_valid(input_data)
 
     def _get_output_configuration(self) -> dict[str, Any]:
-        return {"window_size": self._window_size, "forecast_horizon": self._forecast_horizon}  # pragma: no cover
+        return {"window_size": self._window_size, "forecast_horizon": self._forecast_horizon}
