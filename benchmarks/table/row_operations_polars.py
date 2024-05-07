@@ -31,10 +31,14 @@ def _run_remove_rows() -> None:
 #     table.slice_rows(end=table.number_of_rows // 2)
 #
 #
-# def _run_sort_rows() -> None:
-#     table.sort_rows(lambda row1, row2: row1.get_value("column_0") - row2.get_value("column_0"))
-#
-#
+def _run_sort_rows() -> None:
+    table.sort_rows(lambda row: row.get_value("column_0"))._lazy_frame.collect()
+
+
+def _run_sort_rows_by_column() -> None:
+    table.sort_rows_by_column("column_0")._lazy_frame.collect()
+
+
 # def _run_split_rows() -> None:
 #     table.split_rows(0.5)
 #
@@ -72,10 +76,14 @@ if __name__ == "__main__":
         #     _run_slice_rows,
         #     number=REPETITIONS,
         # ),
-        # "sort_rows": timeit(
-        #     _run_sort_rows,
-        #     number=REPETITIONS,
-        # ),
+        "sort_rows": timeit(
+            _run_sort_rows,
+            number=REPETITIONS,
+        ),
+        "sort_rows_by_column": timeit(
+            _run_sort_rows_by_column,
+            number=REPETITIONS,
+        ),
         # "split_rows": timeit(
         #     _run_split_rows,
         #     number=REPETITIONS,
@@ -103,6 +111,7 @@ if __name__ == "__main__":
 # 7                       remove_rows  2.746695  0.002014
 # 8                      shuffle_rows  0.253078
 # 9                        slice_rows  0.129017
-# 10                        sort_rows  4.117939
+# 10                        sort_rows  4.117939  0.002693
+# 10              sort_rows_by_column  4.117939  0.001585
 # 11                       split_rows  0.257560
 # 13                  transform_colum  2.994108

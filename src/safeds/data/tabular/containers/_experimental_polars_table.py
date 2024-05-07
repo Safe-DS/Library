@@ -393,7 +393,7 @@ class ExperimentalPolarsTable:
 
         mask = query(_VectorizedRow(self))
         if not isinstance(mask, _VectorizedCell) or mask._series.dtype != pl.Boolean:
-            raise ValueError("The query function must return a boolean cell.")
+            raise TypeError("The query function must return a boolean cell.")
 
         return ExperimentalPolarsTable._from_polars_lazy_frame(
             self._lazy_frame.filter(mask._series),
@@ -461,7 +461,17 @@ class ExperimentalPolarsTable:
         *,
         descending: bool = False,
     ) -> ExperimentalPolarsTable:
-        raise NotImplementedError
+        key = key_selector(_VectorizedRow(self))
+        if not isinstance(key, _VectorizedCell):
+            raise TypeError("The key selector must return a cell.")
+
+        return ExperimentalPolarsTable._from_polars_lazy_frame(
+            self._lazy_frame.sort(
+                key._series,
+                descending=descending,
+                maintain_order=True,
+            ),
+        )
 
     def sort_rows_by_column(
         self,
@@ -469,7 +479,13 @@ class ExperimentalPolarsTable:
         *,
         descending: bool = False,
     ) -> ExperimentalPolarsTable:
-        raise NotImplementedError
+        return ExperimentalPolarsTable._from_polars_lazy_frame(
+            self._lazy_frame.sort(
+                name,
+                descending=descending,
+                maintain_order=True,
+            ),
+        )
 
     def split_rows(
         self,
