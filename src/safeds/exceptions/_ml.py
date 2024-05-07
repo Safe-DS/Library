@@ -93,5 +93,3 @@ class PlainTableError(TypeError):
                 "Use `Table.to_tabular_dataset()` to create a tabular dataset."
             ),
         )
-
-
