@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, Literal
 
-from safeds._utils import _check_and_normalize_file_path
+from safeds._utils import _check_and_normalize_file_path, _structural_hash
 from safeds._utils._random import _get_random_seed
 from safeds.data.tabular.plotting._experimental_table_plotter import ExperimentalTablePlotter
 from safeds.data.tabular.typing._experimental_polars_data_type import _PolarsDataType
@@ -42,13 +42,13 @@ class ExperimentalTable:
 
     To create a `Table` call the constructor or use one of the following static methods:
 
-    | Method                                                                                                                   | Description                            |
-    | ------------------------------------------------------------------------------------------------------------------------ | -------------------------------------- |
-    | [from_csv_file][safeds.data.tabular.containers._experimental_polars_table.ExperimentalPolarsTable.from_csv_file]         | Create a table from a CSV file.        |
-    | [from_json_file][safeds.data.tabular.containers._experimental_polars_table.ExperimentalPolarsTable.from_json_file]       | Create a table from a JSON file.       |
-    | [from_parquet_file][safeds.data.tabular.containers._experimental_polars_table.ExperimentalPolarsTable.from_parquet_file] | Create a table from a Parquet file.    |
-    | [from_columns][safeds.data.tabular.containers._experimental_polars_table.ExperimentalPolarsTable.from_columns]           | Create a table from a list of columns. |
-    | [from_dict][safeds.data.tabular.containers._experimental_polars_table.ExperimentalPolarsTable.from_dict]                 | Create a table from a dictionary.      |
+    | Method                                                                                                      | Description                            |
+    | ----------------------------------------------------------------------------------------------------------- | -------------------------------------- |
+    | [from_csv_file][safeds.data.tabular.containers._experimental_table.ExperimentalTable.from_csv_file]         | Create a table from a CSV file.        |
+    | [from_json_file][safeds.data.tabular.containers._experimental_table.ExperimentalTable.from_json_file]       | Create a table from a JSON file.       |
+    | [from_parquet_file][safeds.data.tabular.containers._experimental_table.ExperimentalTable.from_parquet_file] | Create a table from a Parquet file.    |
+    | [from_columns][safeds.data.tabular.containers._experimental_table.ExperimentalTable.from_columns]           | Create a table from a list of columns. |
+    | [from_dict][safeds.data.tabular.containers._experimental_table.ExperimentalTable.from_dict]                 | Create a table from a dictionary.      |
 
     Parameters
     ----------
@@ -200,10 +200,20 @@ class ExperimentalTable:
         self._data_frame: pl.DataFrame | None = None
 
     def __eq__(self, other: object) -> bool:
-        raise NotImplementedError
+        if not isinstance(other, ExperimentalTable):
+            return False
+        if self is other:
+            return True
+
+        if self._data_frame is None:
+            self._data_frame = self._lazy_frame.collect()
+        if other._data_frame is None:
+            other._data_frame = other._lazy_frame.collect()
+
+        return self._data_frame.frame_equal(other._data_frame)
 
     def __hash__(self) -> int:
-        raise NotImplementedError
+        return _structural_hash(self.schema, self.number_of_rows)
 
     def __repr__(self) -> str:
         if self._data_frame is None:
@@ -212,7 +222,10 @@ class ExperimentalTable:
         return self._data_frame.__repr__()
 
     def __sizeof__(self) -> int:
-        raise NotImplementedError
+        if self._data_frame is None:
+            self._data_frame = self._lazy_frame.collect()
+
+        return self._data_frame.estimated_size()
 
     def __str__(self) -> str:
         if self._data_frame is None:

@@ -193,6 +193,7 @@ class TimeSeriesDataset:
             The size of data batches that should be loaded at one time.
 
         Raises
+        ------
         ValueError:
             If the size is smaller or even than forecast_horizon+window_size
 

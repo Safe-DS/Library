@@ -31,7 +31,7 @@ class UnknownColumnNameError(KeyError):
         super().__init__(_UnknownColumnNameErrorMessage(error_message))
 
 
-class NonNumericColumnError(Exception):
+class NonNumericColumnError(TypeError):
     """Exception raised for trying to do numerical operations on a non-numerical column."""
 
     def __init__(self, column_info: str, help_msg: str | None = None) -> None:
