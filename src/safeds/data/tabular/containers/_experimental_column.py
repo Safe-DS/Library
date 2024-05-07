@@ -4,6 +4,7 @@ from collections.abc import Callable, Iterator, Sequence
 from typing import TYPE_CHECKING, Any, TypeVar, overload
 
 from safeds._utils import _structural_hash
+from safeds.data.tabular.typing._experimental_data_type import _PolarsDataType
 from safeds.exceptions import IndexOutOfBoundsError
 
 from ._column import Column
@@ -13,17 +14,17 @@ if TYPE_CHECKING:
     from polars import Series
 
     from safeds.data.image.containers import Image
-    from safeds.data.tabular.typing import ColumnType
+    from safeds.data.tabular.typing._experimental_data_type import ExperimentalDataType
 
-    from ._experimental_cell import ExperimentalPolarsCell
-    from ._experimental_table import ExperimentalPolarsTable
+    from ._experimental_cell import ExperimentalCell
+    from ._experimental_table import ExperimentalTable
 
 
 T = TypeVar("T")
 R = TypeVar("R")
 
 
-class ExperimentalPolarsColumn(Sequence[T]):
+class ExperimentalColumn(Sequence[T]):
     """
     A column is a named, one-dimensional collection of homogeneous values.
 
@@ -36,8 +37,9 @@ class ExperimentalPolarsColumn(Sequence[T]):
 
     Examples
     --------
-    >>> from safeds.data.tabular.containers import ExperimentalPolarsColumn
-    >>> column = ExperimentalPolarsColumn("test", [1, 2, 3])
+    >>> from safeds.data.tabular.containers import ExperimentalColumn
+    >>> ExperimentalColumn("test", [1, 2, 3])
+    Column("test", [1, 2, 3])
     """
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -45,8 +47,8 @@ class ExperimentalPolarsColumn(Sequence[T]):
     # ------------------------------------------------------------------------------------------------------------------
 
     @staticmethod
-    def _from_polars_series(data: Series) -> ExperimentalPolarsColumn:
-        result = object.__new__(ExperimentalPolarsColumn)
+    def _from_polars_series(data: Series) -> ExperimentalColumn:
+        result = object.__new__(ExperimentalColumn)
         result._series = data
         return result
 
@@ -66,7 +68,7 @@ class ExperimentalPolarsColumn(Sequence[T]):
         return self._series.__contains__(item)
 
     def __eq__(self, other: object) -> bool:
-        if not isinstance(other, ExperimentalPolarsColumn):
+        if not isinstance(other, ExperimentalColumn):
             return NotImplemented
         if self is other:
             return True
@@ -76,9 +78,9 @@ class ExperimentalPolarsColumn(Sequence[T]):
     def __getitem__(self, index: int) -> T: ...
 
     @overload
-    def __getitem__(self, index: slice) -> ExperimentalPolarsColumn[T]: ...
+    def __getitem__(self, index: slice) -> ExperimentalColumn[T]: ...
 
-    def __getitem__(self, index: int | slice) -> T | ExperimentalPolarsColumn[T]:
+    def __getitem__(self, index: int | slice) -> T | ExperimentalColumn[T]:
         return self._series.__getitem__(index)
 
     def __hash__(self) -> int:
@@ -118,9 +120,9 @@ class ExperimentalPolarsColumn(Sequence[T]):
         return self._series.len()
 
     @property
-    def type(self) -> ColumnType:  # TODO: rethink return type
+    def type(self) -> ExperimentalDataType:
         """The type of the column."""
-        raise NotImplementedError
+        return _PolarsDataType(self._series.dtype)
 
     # ------------------------------------------------------------------------------------------------------------------
     # Value operations
@@ -147,8 +149,8 @@ class ExperimentalPolarsColumn(Sequence[T]):
 
         Examples
         --------
-        >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("test", [1, 2, 3])
+        >>> from safeds.data.tabular.containers import ExperimentalColumn
+        >>> column = ExperimentalColumn("test", [1, 2, 3])
         >>> column.get_value(1)
         2
         """
@@ -161,39 +163,151 @@ class ExperimentalPolarsColumn(Sequence[T]):
     # Reductions
     # ------------------------------------------------------------------------------------------------------------------
 
-    def all(self, predicate: Callable[[ExperimentalPolarsCell[T]], ExperimentalPolarsCell[bool]]) -> bool:
+    def all(self, predicate: Callable[[ExperimentalCell[T]], ExperimentalCell[bool]]) -> bool:
+        """
+        Return whether all values in the column satisfy the predicate.
+
+        Parameters
+        ----------
+        predicate:
+            The predicate to apply to each value.
+
+        Returns
+        -------
+        all_satisfy_predicate:
+            Whether all values in the column satisfy the predicate.
+
+        Raises
+        ------
+        TypeError
+            If the predicate does not return a boolean cell.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import ExperimentalColumn
+        >>> column = ExperimentalColumn("test", [1, 2, 3])
+        >>> column.all(lambda cell: cell > 0)
+        True
+
+        >>> column.all(lambda cell: cell < 3)
+        False
+        """
         import polars as pl
 
         result = predicate(_VectorizedCell(self))
-        if not isinstance(result, _VectorizedCell) or not result._series.dtype == pl.Boolean:
-            raise ValueError("The predicate must return a boolean cell.")
+        if not isinstance(result, _VectorizedCell) or not result._series.dtype.is_(pl.Boolean):
+            raise TypeError("The predicate must return a boolean cell.")
 
         return result._series.all()
 
-    def any(self, predicate: Callable[[ExperimentalPolarsCell[T]], ExperimentalPolarsCell[bool]]) -> bool:
+    def any(self, predicate: Callable[[ExperimentalCell[T]], ExperimentalCell[bool]]) -> bool:
+        """
+        Return whether any value in the column satisfies the predicate.
+
+        Parameters
+        ----------
+        predicate:
+            The predicate to apply to each value.
+
+        Returns
+        -------
+        any_satisfy_predicate:
+            Whether any value in the column satisfies the predicate.
+
+        Raises
+        ------
+        TypeError
+            If the predicate does not return a boolean cell.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import ExperimentalColumn
+        >>> column = ExperimentalColumn("test", [1, 2, 3])
+        >>> column.any(lambda cell: cell > 2)
+        True
+
+        >>> column.any(lambda cell: cell < 0)
+        False
+        """
         import polars as pl
 
         result = predicate(_VectorizedCell(self))
-        if not isinstance(result, _VectorizedCell) or not result._series.dtype == pl.Boolean:
-            raise ValueError("The predicate must return a boolean cell.")
+        if not isinstance(result, _VectorizedCell) or not result._series.dtype.is_(pl.Boolean):
+            raise TypeError("The predicate must return a boolean cell.")
 
         return result._series.any()
 
-    def count(self, predicate: Callable[[ExperimentalPolarsCell[T]], ExperimentalPolarsCell[bool]]) -> int:
+    def count(self, predicate: Callable[[ExperimentalCell[T]], ExperimentalCell[bool]]) -> int:
+        """
+        Return how many values in the column satisfy the predicate.
+
+        Parameters
+        ----------
+        predicate:
+            The predicate to apply to each value.
+
+        Returns
+        -------
+        count:
+            The number of values in the column that satisfy the predicate.
+
+        Raises
+        ------
+        TypeError
+            If the predicate does not return a boolean cell.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import ExperimentalColumn
+        >>> column = ExperimentalColumn("test", [1, 2, 3])
+        >>> column.count(lambda cell: cell > 1)
+        2
+
+        >>> column.count(lambda cell: cell < 0)
+        0
+        """
         import polars as pl
 
         result = predicate(_VectorizedCell(self))
-        if not isinstance(result, _VectorizedCell) or not result._series.dtype == pl.Boolean:
-            raise ValueError("The predicate must return a boolean cell.")
+        if not isinstance(result, _VectorizedCell) or not result._series.dtype.is_(pl.Boolean):
+            raise TypeError("The predicate must return a boolean cell.")
 
         return result._series.sum()
 
-    def none(self, predicate: Callable[[ExperimentalPolarsCell[T]], ExperimentalPolarsCell[bool]]) -> bool:
+    def none(self, predicate: Callable[[ExperimentalCell[T]], ExperimentalCell[bool]]) -> bool:
+        """
+        Return whether no value in the column satisfies the predicate.
+
+        Parameters
+        ----------
+        predicate:
+            The predicate to apply to each value.
+
+        Returns
+        -------
+        none_satisfy_predicate:
+            Whether no value in the column satisfies the predicate.
+
+        Raises
+        ------
+        TypeError
+            If the predicate does not return a boolean cell.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import ExperimentalColumn
+        >>> column = ExperimentalColumn("test", [1, 2, 3])
+        >>> column.none(lambda cell: cell < 0)
+        True
+
+        >>> column.none(lambda cell: cell > 2)
+        False
+        """
         import polars as pl
 
         result = predicate(_VectorizedCell(self))
-        if not isinstance(result, _VectorizedCell) or not result._series.dtype == pl.Boolean:
-            raise ValueError("The predicate must return a boolean cell.")
+        if not isinstance(result, _VectorizedCell) or not result._series.dtype.is_(pl.Boolean):
+            raise TypeError("The predicate must return a boolean cell.")
 
         return (~result._series).all()
 
@@ -201,41 +315,91 @@ class ExperimentalPolarsColumn(Sequence[T]):
     # Transformations
     # ------------------------------------------------------------------------------------------------------------------
 
-    def remove_duplicate_values(self) -> ExperimentalPolarsColumn[T]:
+    def remove_duplicate_values(self) -> ExperimentalColumn[T]:
         """
-        Return a list of all unique values in the column.
+        Return a new column with duplicate values removed.
+
+        The original column is not modified.
 
         Returns
         -------
         unique_values:
-            List of unique values in the column.
+            A new column with duplicate values removed.
 
         Examples
         --------
-        >>> from safeds.data.tabular.containers import ExperimentalPolarsColumn
-        >>> column = ExperimentalPolarsColumn("test", [1, 2, 3, 2, 4, 3])
+        >>> from safeds.data.tabular.containers import ExperimentalColumn
+        >>> column = ExperimentalColumn("test", [1, 2, 3, 2, 4, 3])
         >>> column.remove_duplicate_values()
         [1, 2, 3, 4]
         """
         return self._from_polars_series(self._series.unique(maintain_order=True))
 
-    def rename(self, new_name: str) -> ExperimentalPolarsColumn[T]:
+    def rename(self, new_name: str) -> ExperimentalColumn[T]:
+        """
+        Return a new column with a new name.
+
+        The original column is not modified.
+
+        Parameters
+        ----------
+        new_name:
+            The new name of the column.
+
+        Returns
+        -------
+        renamed_column:
+            A new column with the new name.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import ExperimentalColumn
+        >>> column = ExperimentalColumn("test", [1, 2, 3])
+        >>> column.rename("new_name")
+        [1, 2, 3]
+        """
         return self._from_polars_series(self._series.rename(new_name))
 
     def transform(
         self,
-        transformer: Callable[[ExperimentalPolarsCell[T]], ExperimentalPolarsCell[R]],
-    ) -> ExperimentalPolarsColumn[R]:
-        raise NotImplementedError
+        transformer: Callable[[ExperimentalCell[T]], ExperimentalCell[R]],
+    ) -> ExperimentalColumn[R]:
+        """
+        Return a new column with values transformed by the transformer.
+
+        The original column is not modified.
+
+        Parameters
+        ----------
+        transformer:
+            The transformer to apply to each value.
+
+        Returns
+        -------
+        transformed_column:
+            A new column with transformed values.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import ExperimentalColumn
+        >>> column = ExperimentalColumn("test", [1, 2, 3])
+        >>> column.transform(lambda cell: cell * 2)
+        [2, 4, 6]
+        """
+        result = transformer(_VectorizedCell(self))
+        if not isinstance(result, _VectorizedCell):
+            raise TypeError("The transformer must return a cell.")
+
+        return self._from_polars_series(result._series)
 
     # ------------------------------------------------------------------------------------------------------------------
     # Statistics
     # ------------------------------------------------------------------------------------------------------------------
 
-    def summarize_statistics(self) -> ExperimentalPolarsTable:
+    def summarize_statistics(self) -> ExperimentalTable:
         raise NotImplementedError
 
-    def correlation_with(self, other: ExperimentalPolarsColumn) -> float:
+    def correlation_with(self, other: ExperimentalColumn) -> float:
         raise NotImplementedError
 
     def idness(self) -> float:
@@ -262,7 +426,7 @@ class ExperimentalPolarsColumn(Sequence[T]):
 
         return self._series.null_count() / self.number_of_rows
 
-    def mode(self) -> ExperimentalPolarsColumn[T]:
+    def mode(self) -> ExperimentalColumn[T]:
         return self._from_polars_series(self._series.mode())
 
     def stability(self) -> float:
@@ -296,10 +460,17 @@ class ExperimentalPolarsColumn(Sequence[T]):
         -------
         values:
             The values of the column in a list.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import ExperimentalColumn
+        >>> column = ExperimentalColumn("test", [1, 2, 3])
+        >>> column.to_list()
+        [1, 2, 3]
         """
         return self._series.to_list()
 
-    def to_table(self) -> ExperimentalPolarsTable:
+    def to_table(self) -> ExperimentalTable:
         """
         Create a table that contains only this column.
 
@@ -307,10 +478,17 @@ class ExperimentalPolarsColumn(Sequence[T]):
         -------
         table:
             The table with this column.
-        """
-        from ._experimental_polars_table import ExperimentalPolarsTable
 
-        return ExperimentalPolarsTable._from_polars_dataframe(self._series.to_frame())
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import ExperimentalColumn
+        >>> column = ExperimentalColumn("test", [1, 2, 3])
+        >>> column.to_table()
+        x
+        """
+        from ._experimental_table import ExperimentalTable
+
+        return ExperimentalTable._from_polars_dataframe(self._series.to_frame())
 
     def temporary_to_old_column(self) -> Column:
         """
@@ -323,8 +501,8 @@ class ExperimentalPolarsColumn(Sequence[T]):
 
         Examples
         --------
-        >>> from safeds.data.tabular.containers import ExperimentalPolarsColumn
-        >>> column = ExperimentalPolarsColumn("a": [1, 2, 3])
+        >>> from safeds.data.tabular.containers import ExperimentalColumn
+        >>> column = ExperimentalColumn("a": [1, 2, 3])
         >>> old_column = column.temporary_to_old_column()
         """
         return Column._from_pandas_series(self._series.to_pandas())

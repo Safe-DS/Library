@@ -6,10 +6,10 @@ import apipkg
 
 if TYPE_CHECKING:
     from ._column import Column
-    from ._experimental_cell import ExperimentalPolarsCell
-    from ._experimental_column import ExperimentalPolarsColumn
-    from ._experimental_row import ExperimentalPolarsRow
-    from ._experimental_table import ExperimentalPolarsTable
+    from ._experimental_cell import ExperimentalCell
+    from ._experimental_column import ExperimentalColumn
+    from ._experimental_row import ExperimentalRow
+    from ._experimental_table import ExperimentalTable
     from ._row import Row
     from ._table import Table
 
@@ -28,10 +28,10 @@ apipkg.initpkg(
 
 __all__ = [
     "Column",
-    "ExperimentalPolarsCell",
-    "ExperimentalPolarsColumn",
-    "ExperimentalPolarsRow",
-    "ExperimentalPolarsTable",
+    "ExperimentalCell",
+    "ExperimentalColumn",
+    "ExperimentalRow",
+    "ExperimentalTable",
     "Row",
     "Table",
 ]

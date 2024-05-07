@@ -5,15 +5,16 @@ from typing import TYPE_CHECKING
 from safeds.exceptions import UnknownColumnNameError
 
 from ._experimental_lazy_cell import _LazyCell
-from ._experimental_row import ExperimentalPolarsRow
+from ._experimental_row import ExperimentalRow
 
 if TYPE_CHECKING:
-    from safeds.data.tabular.typing import ColumnType, Schema
+    from safeds.data.tabular.typing import Schema
+    from safeds.data.tabular.typing._experimental_data_type import ExperimentalDataType
 
-    from ._experimental_table import ExperimentalPolarsTable
+    from ._experimental_table import ExperimentalTable
 
 
-class _LazyVectorizedRow(ExperimentalPolarsRow):
+class _LazyVectorizedRow(ExperimentalRow):
     """
     A row is a one-dimensional collection of named, heterogeneous values.
 
@@ -28,8 +29,8 @@ class _LazyVectorizedRow(ExperimentalPolarsRow):
     # Dunder methods
     # ------------------------------------------------------------------------------------------------------------------
 
-    def __init__(self, table: ExperimentalPolarsTable):
-        self._table: ExperimentalPolarsTable = table
+    def __init__(self, table: ExperimentalTable):
+        self._table: ExperimentalTable = table
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, _LazyVectorizedRow):
@@ -72,7 +73,7 @@ class _LazyVectorizedRow(ExperimentalPolarsRow):
 
         return _LazyCell(pl.col(name))
 
-    def get_column_type(self, name: str) -> ColumnType:  # TODO: rethink return type
+    def get_column_type(self, name: str) -> ExperimentalDataType:
         return self._table.get_column_type(name)
 
     def has_column(self, name: str) -> bool:
