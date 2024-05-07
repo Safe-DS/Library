@@ -5,8 +5,8 @@ from typing import TYPE_CHECKING, Generic, Self, TypeVar
 
 from safeds._config import _init_default_device
 from safeds.data.image.containers import ImageList
-from safeds.data.labeled.containers import ImageDataset, TabularDataset
-from safeds.data.tabular.containers import Table, TimeSeries
+from safeds.data.labeled.containers import ImageDataset, TabularDataset, TimeSeriesDataset
+from safeds.data.tabular.containers import Table
 from safeds.exceptions import (
     ClosedBound,
     FeatureDataMismatchError,
@@ -35,9 +35,10 @@ if TYPE_CHECKING:
     from safeds.data.image.typing import ImageSize
     from safeds.ml.nn import InputConversion, Layer, OutputConversion
 
-IFT = TypeVar("IFT", TabularDataset, TimeSeries, ImageDataset)  # InputFitType
-IPT = TypeVar("IPT", Table, TimeSeries, ImageList)  # InputPredictType
-OT = TypeVar("OT", TabularDataset, TimeSeries, ImageDataset)  # OutputType
+
+IFT = TypeVar("IFT", TabularDataset, TimeSeriesDataset, ImageDataset)  # InputFitType
+IPT = TypeVar("IPT", Table, TimeSeriesDataset, ImageList)  # InputPredictType
+OT = TypeVar("OT", TabularDataset, TimeSeriesDataset, ImageDataset)  # OutputType
 
 
 class NeuralNetworkRegressor(Generic[IFT, IPT, OT]):
@@ -159,14 +160,14 @@ class NeuralNetworkRegressor(Generic[IFT, IPT, OT]):
 
         _init_default_device()
 
+        if not self._input_conversion._is_fit_data_valid(train_data):
+            raise FeatureDataMismatchError
         if epoch_size < 1:
             raise OutOfBoundsError(actual=epoch_size, name="epoch_size", lower_bound=ClosedBound(1))
         if batch_size < 1:
             raise OutOfBoundsError(actual=batch_size, name="batch_size", lower_bound=ClosedBound(1))
         if self._input_conversion._data_size is not self._input_size:
             raise InputSizeError(self._input_conversion._data_size, self._input_size)
-        if not self._input_conversion._is_fit_data_valid(train_data):
-            raise FeatureDataMismatchError
 
         copied_model = copy.deepcopy(self)
 
@@ -375,14 +376,14 @@ class NeuralNetworkClassifier(Generic[IFT, IPT, OT]):
 
         _init_default_device()
 
+        if not self._input_conversion._is_fit_data_valid(train_data):
+            raise FeatureDataMismatchError
         if epoch_size < 1:
             raise OutOfBoundsError(actual=epoch_size, name="epoch_size", lower_bound=ClosedBound(1))
         if batch_size < 1:
             raise OutOfBoundsError(actual=batch_size, name="batch_size", lower_bound=ClosedBound(1))
         if self._input_conversion._data_size is not self._input_size:
             raise InputSizeError(self._input_conversion._data_size, self._input_size)
-        if not self._input_conversion._is_fit_data_valid(train_data):
-            raise FeatureDataMismatchError
 
         copied_model = copy.deepcopy(self)
 

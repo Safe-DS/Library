@@ -6,14 +6,11 @@ import apipkg
 
 if TYPE_CHECKING:
     from safeds.exceptions._data import (
-        ColumnIsTargetError,
-        ColumnIsTimeError,
         ColumnLengthMismatchError,
         ColumnSizeError,
         DuplicateColumnNameError,
         DuplicateIndexError,
         IllegalFormatError,
-        IllegalSchemaModificationError,
         IndexOutOfBoundsError,
         MissingValuesColumnError,
         NonNumericColumnError,
@@ -37,7 +34,6 @@ if TYPE_CHECKING:
         InvalidModelStructureError,
         LearningError,
         ModelNotFittedError,
-        NonTimeSeriesError,
         PlainTableError,
         PredictionError,
     )
@@ -72,7 +68,6 @@ apipkg.initpkg(
         "InvalidModelStructureError": "._ml:InvalidModelStructureError",
         "LearningError": "._ml:LearningError",
         "ModelNotFittedError": "._ml:ModelNotFittedError",
-        "NonTimeSeriesError": "._ml:NonTimeSeriesError",
         "PlainTableError": "._ml:PlainTableError",
         "PredictionError": "._ml:PredictionError",
         # Other
@@ -86,14 +81,11 @@ __all__ = [
     # Generic exceptions
     "OutOfBoundsError",
     # Data exceptions
-    "ColumnIsTargetError",
-    "ColumnIsTimeError",
     "ColumnLengthMismatchError",
     "ColumnSizeError",
     "DuplicateColumnNameError",
     "DuplicateIndexError",
     "IllegalFormatError",
-    "IllegalSchemaModificationError",
     "IndexOutOfBoundsError",
     "MissingValuesColumnError",
     "NonNumericColumnError",
@@ -110,7 +102,6 @@ __all__ = [
     "InvalidModelStructureError",
     "LearningError",
     "ModelNotFittedError",
-    "NonTimeSeriesError",
     "PlainTableError",
     "PredictionError",
     # Other

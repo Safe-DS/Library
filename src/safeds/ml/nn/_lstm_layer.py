@@ -8,6 +8,8 @@ from safeds.data.image.typing import ImageSize
 if TYPE_CHECKING:
     from torch import Tensor, nn
 
+import sys
+
 from safeds._utils import _structural_hash
 from safeds.exceptions import ClosedBound, OutOfBoundsError
 from safeds.ml.nn import Layer
@@ -21,7 +23,7 @@ def _create_internal_model(input_size: int, output_size: int, activation_functio
     class _InternalLayer(nn.Module):
         def __init__(self, input_size: int, output_size: int, activation_function: str):
             super().__init__()
-            self._layer = nn.Linear(input_size, output_size)
+            self._layer = nn.LSTM(input_size, output_size)
             match activation_function:
                 case "sigmoid":
                     self._fn = nn.Sigmoid()
@@ -35,15 +37,15 @@ def _create_internal_model(input_size: int, output_size: int, activation_functio
                     raise ValueError("Unknown Activation Function: " + activation_function)
 
         def forward(self, x: Tensor) -> Tensor:
-            return self._fn(self._layer(x)) if self._fn is not None else self._layer(x)
+            return self._fn(self._layer(x)[0]) if self._fn is not None else self._layer(x)[0]
 
     return _InternalLayer(input_size, output_size, activation_function)
 
 
-class ForwardLayer(Layer):
+class LSTMLayer(Layer):
     def __init__(self, output_size: int, input_size: int | None = None):
         """
-        Create a Feed Forward Layer.
+        Create a LSTM Layer.
 
         Parameters
         ----------
@@ -57,7 +59,6 @@ class ForwardLayer(Layer):
         ValueError
             If input_size < 1
             If output_size < 1
-
         """
         if input_size is not None:
             self._set_input_size(input_size=input_size)
@@ -107,29 +108,35 @@ class ForwardLayer(Layer):
 
     def __hash__(self) -> int:
         """
-        Return a deterministic hash value for this forward layer.
+        Return a deterministic hash value for this LSTM layer.
 
         Returns
         -------
         hash:
             the hash value
         """
-        return _structural_hash(self._input_size, self._output_size)
+        return _structural_hash(
+            self._input_size,
+            self._output_size,
+        )  # pragma: no cover
 
     def __eq__(self, other: object) -> bool:
         """
-        Compare two forward layer instances.
+        Compare two lstm layer.
+
+        Parameters
+        ----------
+        other:
+            The lstm layer to compare to.
 
         Returns
         -------
         equals:
-            'True' if input and output size are equal, 'False' otherwise.
+            Whether the two lstm layer are the same.
         """
-        if not isinstance(other, ForwardLayer):
+        if not isinstance(other, LSTMLayer):
             return NotImplemented
-        if self is other:
-            return True
-        return self._input_size == other._input_size and self._output_size == other._output_size
+        return (self is other) or (self._input_size == other._input_size and self._output_size == other._output_size)
 
     def __sizeof__(self) -> int:
         """
@@ -140,6 +147,4 @@ class ForwardLayer(Layer):
         size:
             Size of this object in bytes.
         """
-        import sys
-
         return sys.getsizeof(self._input_size) + sys.getsizeof(self._output_size)

@@ -1,6 +1,6 @@
 import pytest
 from safeds.data.labeled.containers import TabularDataset
-from safeds.data.tabular.containers import Table, TimeSeries
+from safeds.data.tabular.containers import Table
 
 
 def assert_that_tables_are_close(table1: Table, table2: Table) -> None:
@@ -39,23 +39,4 @@ def assert_that_tabular_datasets_are_equal(table1: TabularDataset, table2: Tabul
     assert table1._table.schema == table2._table.schema
     assert table1.features == table2.features
     assert table1.target == table2.target
-    assert table1 == table2
-
-
-def assert_that_time_series_are_equal(table1: TimeSeries, table2: TimeSeries) -> None:
-    """
-    Assert that two time series are equal.
-
-    Parameters
-    ----------
-    table1: TimeSeries
-        The first timeseries.
-    table2: TimeSeries
-        The timeseries to compare the first timeseries to.
-    """
-    assert table1.schema == table2.schema
-    assert table1._feature_names == table2._feature_names
-    assert table1.features == table2.features
-    assert table1.target == table2.target
-    assert table1.time == table2.time
     assert table1 == table2

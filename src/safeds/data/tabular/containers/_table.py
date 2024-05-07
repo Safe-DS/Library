@@ -32,10 +32,8 @@ if TYPE_CHECKING:
     import torch
     from torch.utils.data import DataLoader, Dataset
 
-    from safeds.data.labeled.containers import TabularDataset
+    from safeds.data.labeled.containers import TabularDataset, TimeSeriesDataset
     from safeds.data.tabular.transformation import InvertibleTableTransformer, TableTransformer
-
-    from ._time_series import TimeSeries
 
 
 # noinspection PyProtectedMember
@@ -1861,43 +1859,6 @@ class Table:
             self.slice_rows(round(percentage_in_first * self.number_of_rows)),
         )
 
-    def time_columns(self, target_name: str, time_name: str, feature_names: list[str] | None = None) -> TimeSeries:
-        """
-        Return a new `TimeSeries` with columns marked as a target and time column or feature columns.
-
-        The original table is not modified.
-
-        Parameters
-        ----------
-        target_name:
-            Name of the target column.
-        time_name:
-            Name of the time column.
-        feature_names:
-            Names of the feature columns. If None, all columns except the target and time columns are used.
-
-        Returns
-        -------
-        time_series:
-            A new time series with the given target, time and feature names.
-
-        Raises
-        ------
-        ValueError
-            If the target column is also a feature column.
-        ValueError
-            If there is no other column than the specified target and time columns left to be a feature column
-
-        Examples
-        --------
-        >>> from safeds.data.tabular.containers import Table, TimeSeries
-        >>> table = Table.from_dict({"time": ["01.01", "01.02", "01.03"], "price": [1.10, 1.19, 1.79], "amount_bought": [74, 72, 51]})
-        >>> tabular_dataset = table.time_columns(target_name="amount_bought",time_name = "time", feature_names=["price"])
-        """
-        from ._time_series import TimeSeries
-
-        return TimeSeries._from_table(self, target_name, time_name, feature_names)
-
     def transform_column(self, name: str, transformer: Callable[[Row], Any]) -> Table:
         """
         Return a new `Table` with the provided column transformed by calling the provided transformer.
@@ -2306,7 +2267,7 @@ class Table:
 
                     bars = np.array([])
                     for i in range(len(hist)):
-                        bars = np.append(bars, f"{round(bin_edges[i], 2)}-{round(bin_edges[i+1], 2)}")
+                        bars = np.append(bars, f"{round(bin_edges[i], 2)}-{round(bin_edges[i + 1], 2)}")
 
                     ax.bar(bars, hist, edgecolor="black")
                     ax.set_xticks(np.arange(len(hist)), bars, rotation=45, horizontalalignment="right")
@@ -2565,6 +2526,49 @@ class Table:
         from safeds.data.labeled.containers import TabularDataset
 
         return TabularDataset(self, target_name, extra_names)
+
+    def to_time_series_dataset(
+        self,
+        target_name: str,
+        time_name: str,
+        extra_names: list[str] | None = None,
+    ) -> TimeSeriesDataset:
+        """
+        Return a new `TimeSeriesDataset` with columns marked as a target column, time or feature columns.
+
+        The original table is not modified.
+
+        Parameters
+        ----------
+        target_name:
+            Name of the target column.
+        time_name:
+            Name of the time column.
+        extra_names:
+            Names of the columns that are neither features nor target. If None, no extra columns are used, i.e. all but
+            the target column are used as features.
+
+        Returns
+        -------
+        dataset:
+            A new time series dataset with the given target and feature names.
+
+        Raises
+        ------
+        ValueError
+            If the target column is also a feature column.
+        ValueError
+            If the time column is also a feature column.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table
+        >>> table = Table({"day": [0, 1, 2], "price": [1.10, 1.19, 1.79], "amount_bought": [74, 72, 51]})
+        >>> dataset = table.to_time_series_dataset(target_name="amount_bought", time_name= "day")
+        """
+        from safeds.data.labeled.containers import TimeSeriesDataset
+
+        return TimeSeriesDataset(self, target_name, time_name, extra_names)
 
     # ------------------------------------------------------------------------------------------------------------------
     # IPython integration

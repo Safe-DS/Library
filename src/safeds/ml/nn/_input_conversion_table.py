@@ -13,19 +13,12 @@ from safeds.ml.nn import InputConversion
 class InputConversionTable(InputConversion[TabularDataset, Table]):
     """The input conversion for a neural network, defines the input parameters for the neural network."""
 
-    def __init__(self, feature_names: list[str], target_name: str) -> None:
-        """
-        Define the input parameters for the neural network in the input conversion.
-
-        Parameters
-        ----------
-        feature_names:
-            The names of the features for the input table, used as features for the training.
-        target_name:
-            The name of the target for the input table, used as target for the training.
-        """
-        self._feature_names = feature_names
-        self._target_name = target_name
+    def __init__(self) -> None:
+        """Define the input parameters for the neural network in the input conversion."""
+        self._target_name = ""
+        self._time_name = ""
+        self._feature_names: list[str] = []
+        self._first = True
 
     @property
     def _data_size(self) -> int:
@@ -41,6 +34,10 @@ class InputConversionTable(InputConversion[TabularDataset, Table]):
         return input_data._into_dataloader(batch_size)
 
     def _is_fit_data_valid(self, input_data: TabularDataset) -> bool:
+        if self._first:
+            self._feature_names = input_data.features.column_names
+            self._target_name = input_data.target.name
+            self._first = False
         return (sorted(input_data.features.column_names)).__eq__(sorted(self._feature_names))
 
     def _is_predict_data_valid(self, input_data: Table) -> bool:

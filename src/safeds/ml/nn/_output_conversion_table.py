@@ -25,6 +25,6 @@ class OutputConversionTable(OutputConversion[Table, TabularDataset]):
         self._prediction_name = prediction_name
 
     def _data_conversion(self, input_data: Table, output_data: Tensor, **kwargs: Any) -> TabularDataset:  # noqa: ARG002
-        return input_data.add_column(Column(self._prediction_name, output_data.tolist())).to_tabular_dataset(
+        return input_data.add_columns([Column(self._prediction_name, output_data.tolist())]).to_tabular_dataset(
             self._prediction_name,
         )
