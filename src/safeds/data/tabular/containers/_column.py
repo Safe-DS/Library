@@ -1055,6 +1055,8 @@ class Column(Sequence[T]):
 
         ValueError
             if the columns do not have the same size
+        Examples
+        --------
         >>> from safeds.data.tabular.containers import Column
         >>> col1 =Column("target", [4, 5, 6, 7, 8, 9, 10, 11, 12, 13])
         >>> col2 =Column("target", [42, 51, 63, 71, 83, 91, 10, 11, 12, 13])
