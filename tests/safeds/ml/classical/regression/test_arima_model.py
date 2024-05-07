@@ -130,7 +130,6 @@ def test_should_raise_on_invalid_data(
         model.fit(invalid_data)
 
 
-
 def test_correct_structure_of_time_series_with_features() -> None:
     data = create_test_data_with_feature()
     model = ArimaModelRegressor()
