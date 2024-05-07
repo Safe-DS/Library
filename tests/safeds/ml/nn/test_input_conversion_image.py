@@ -149,5 +149,3 @@ class TestSizeOf:
     @pytest.mark.parametrize("input_conversion_image", [InputConversionImage(ImageSize(1, 2, 3))])
     def test_should_size_be_greater_than_normal_object(self, input_conversion_image: InputConversionImage) -> None:
         assert sys.getsizeof(input_conversion_image) > sys.getsizeof(object())
-
-

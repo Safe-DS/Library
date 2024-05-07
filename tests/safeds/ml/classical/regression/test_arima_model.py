@@ -8,7 +8,6 @@ from safeds.exceptions import (
     MissingValuesColumnError,
     ModelNotFittedError,
     NonNumericColumnError,
-    NonTimeSeriesDatasetError,
 )
 from safeds.ml.classical.regression import ArimaModelRegressor, LassoRegressor
 
@@ -129,7 +128,6 @@ def test_should_raise_on_invalid_data(
     model = ArimaModelRegressor()
     with pytest.raises(expected_error, match=expected_error_msg):
         model.fit(invalid_data)
-
 
 
 def test_correct_structure_of_time_series_with_features() -> None:
