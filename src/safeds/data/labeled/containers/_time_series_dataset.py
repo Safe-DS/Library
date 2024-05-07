@@ -16,9 +16,9 @@ if TYPE_CHECKING:
 
 class TimeSeriesDataset:
     """
-    A time series dataset maps feature and time columns to a target column. Not like the TableDataset a TimeSeries needs to contain one target and one time column, but can have empty features.
+    A time series dataset maps feature and time columns to a target column. Not like the TabularDataset a TimeSeries needs to contain one target and one time column, but can have empty features.
 
-    Create a tabular dataset from a mapping of column names to their values.
+    Create a time series dataset from a mapping of column names to their values.
 
     Parameters
     ----------
@@ -88,12 +88,12 @@ class TimeSeriesDataset:
 
     def __eq__(self, other: object) -> bool:
         """
-        Compare two tabular datasets.
+        Compare two time series datasets.
 
         Returns
         -------
         equals:
-            'True' if features and targets are equal, 'False' otherwise.
+            'True' if features, time, target and extras are equal, 'False' otherwise.
         """
         if not isinstance(other, TimeSeriesDataset):
             return NotImplemented
@@ -106,7 +106,7 @@ class TimeSeriesDataset:
 
     def __hash__(self) -> int:
         """
-        Return a deterministic hash value for this tabular dataset.
+        Return a deterministic hash value for this time series dataset.
 
         Returns
         -------
@@ -165,14 +165,14 @@ class TimeSeriesDataset:
 
     def to_table(self) -> Table:
         """
-        Return a new `Table` containing the feature columns and the target column.
+        Return a new `Table` containing the feature columns, the target column, the time column and the extra columns.
 
-        The original `TabularDataset` is not modified.
+        The original `TimeSeriesDataset` is not modified.
 
         Returns
         -------
         table:
-            A table containing the feature columns and the target column.
+            A table containing the feature columns, the target column, the time column and the extra columns.
         """
         return self._table
 
@@ -181,7 +181,7 @@ class TimeSeriesDataset:
         Return a Dataloader for the data stored in this time series, used for training neural networks.
 
         It splits the target column into windows, uses them as feature and creates targets for the time series, by
-        forecast length. The original table is not modified.
+        forecast length. The original time series dataset is not modified.
 
         Parameters
         ----------
@@ -223,8 +223,6 @@ class TimeSeriesDataset:
         for i in range(size - (forecast_horizon + window_size)):
             window = target_tensor[i : i + window_size]
             label = target_tensor[i + window_size + forecast_horizon]
-            print(window)
-            print(label)
             for col in feature_cols:
                 data = torch.tensor(col._data.values, dtype=torch.float32)
                 window = torch.cat((window, data[i : i + window_size]), dim=0)
@@ -245,7 +243,7 @@ class TimeSeriesDataset:
         Return a Dataloader for the data stored in this time series, used for training neural networks.
 
         It splits the target column into windows, uses them as feature and creates targets for the time series, by
-        forecast length. The original table is not modified.
+        forecast length. The original time series dataset is not modified.
 
         Parameters
         ----------
@@ -285,7 +283,7 @@ class TimeSeriesDataset:
 
     def _repr_html_(self) -> str:
         """
-        Return an HTML representation of the tabular dataset.
+        Return an HTML representation of the time series dataset.
 
         Returns
         -------

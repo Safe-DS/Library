@@ -2549,7 +2549,7 @@ class Table:
         Returns
         -------
         dataset:
-            A new tabular dataset with the given target and feature names.
+            A new time series dataset with the given target and feature names.
 
         Raises
         ------

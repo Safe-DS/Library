@@ -119,17 +119,17 @@ class LSTMLayer(Layer):
 
     def __eq__(self, other: object) -> bool:
         """
-        Compare two convolutional transpose 2d layer.
+        Compare two lstm layer.
 
         Parameters
         ----------
         other:
-            The convolutional transpose 2d layer to compare to.
+            The lstm layer to compare to.
 
         Returns
         -------
         equals:
-            Whether the two convolutional transpose 2d layer are the same.
+            Whether the two lstm layer are the same.
         """
         if not isinstance(other, LSTMLayer):
             return NotImplemented
