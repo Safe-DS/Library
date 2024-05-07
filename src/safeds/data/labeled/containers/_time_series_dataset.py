@@ -127,7 +127,7 @@ class TimeSeriesDataset:
         return (
             sys.getsizeof(self._target)
             + sys.getsizeof(self._features)
-            + sys.getsizeof(self._table)
+            + sys.getsizeof(self.extras)
             + sys.getsizeof(self._time)
         )
 
