@@ -6,13 +6,13 @@ from typing import TYPE_CHECKING
 
 from safeds._utils import _structural_hash
 from safeds.data.image.containers import Image
-from safeds.data.tabular.containers import Column, Table, TimeSeries
+from safeds.data.labeled.containers import TimeSeriesDataset
+from safeds.data.tabular.containers import Column
 from safeds.exceptions import (
     DatasetMissesDataError,
     MissingValuesColumnError,
     ModelNotFittedError,
     NonNumericColumnError,
-    NonTimeSeriesError,
 )
 
 if TYPE_CHECKING:
@@ -39,7 +39,7 @@ class ArimaModelRegressor:
         self._order: tuple[int, int, int] | None = None
         self._fitted = False
 
-    def fit(self, time_series: TimeSeries) -> ArimaModelRegressor:
+    def fit(self, time_series: TimeSeriesDataset) -> ArimaModelRegressor:
         """
         Create a copy of this ARIMA Model and fit it with the given training data.
 
@@ -70,9 +70,8 @@ class ArimaModelRegressor:
         """
         from statsmodels.tsa.arima.model import ARIMA
 
-        if not isinstance(time_series, TimeSeries) and isinstance(time_series, Table):
-            raise NonTimeSeriesError
-        if time_series.number_of_rows == 0:
+        table = time_series.to_table()
+        if table.number_of_rows == 0:
             raise DatasetMissesDataError
         if not time_series.target.type.is_numeric():
             raise NonNumericColumnError(time_series.target.name)
@@ -109,7 +108,7 @@ class ArimaModelRegressor:
         fitted_arima._fitted = True
         return fitted_arima
 
-    def predict(self, time_series: TimeSeries) -> TimeSeries:
+    def predict(self, time_series: TimeSeriesDataset) -> TimeSeriesDataset:
         """
         Predict a target vector using a time series target column. The model has to be trained first.
 
@@ -134,7 +133,7 @@ class ArimaModelRegressor:
         """
         # make a table without
         forecast_horizon = len(time_series.target._data)
-        result_table = time_series._as_table()
+        result_table = time_series.to_table()
         result_table = result_table.remove_columns([time_series.target.name])
         # Validation
         if not self.is_fitted or self._arima is None:
@@ -147,14 +146,13 @@ class ArimaModelRegressor:
 
         # create new TimeSeries
         result_table = result_table.add_column(target_column)
-        return TimeSeries._from_table(
-            result_table,
-            time_name=time_series.time.name,
+        return result_table.to_time_series_dataset(
             target_name=time_series.target.name + " " + "forecasted",
-            feature_names=time_series.features.column_names,
+            time_name=time_series.time.name,
+            extra_names=time_series.extras.column_names,
         )
 
-    def plot_predictions(self, test_series: TimeSeries) -> Image:
+    def plot_predictions(self, test_series: TimeSeriesDataset) -> Image:
         """
         Plot the predictions of the trained model to the given target of the time series. So you can see the predictions and the actual values in one plot.
 

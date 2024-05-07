@@ -23,7 +23,6 @@ if TYPE_CHECKING:
 
     from safeds.data.tabular.containers import Table
 
-
 T = TypeVar("T")
 R = TypeVar("R")
 
@@ -1032,8 +1031,102 @@ class Column(Sequence[T]):
         >>> histogram = column.plot_histogram()
         """
         from safeds.data.tabular.containers import Table
-        
+
         return Table({self._name: self._data}).plot_histograms(number_of_bins=number_of_bins)
+
+    def plot_compare_columns(self, column_list: list[Column]) -> Image:
+        """
+        Create a plot comparing the numerical values of columns using IDs as the x-axis.
+
+        Parameters
+        ----------
+        column_list:
+            A list of time columns to be plotted.
+
+        Returns
+        -------
+        plot:
+            A plot with all the Columns plotted by the ID on the x-axis.
+
+        Raises
+        ------
+        NonNumericColumnError
+            if the target column contains non numerical values
+        ValueError
+            if the columns do not have the same size
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> col1 =Column("target", [4, 5, 6, 7, 8, 9, 10, 11, 12, 13])
+        >>> col2 =Column("target", [42, 51, 63, 71, 83, 91, 10, 11, 12, 13])
+        >>> image = col1.plot_compare_columns([col2])
+        """
+        import matplotlib.pyplot as plt
+        import pandas as pd
+        import seaborn as sns
+
+        data = pd.DataFrame()
+        column_list.append(self)
+        size = len(column_list[0])
+        data["INDEX"] = pd.DataFrame({"INDEX": range(size)})
+        for index, col in enumerate(column_list):
+            if not col.type.is_numeric():
+                raise NonNumericColumnError("The time series plotted column contains non-numerical columns.")
+            if len(col) != size:
+                raise ValueError("The columns must have the same size.")
+            data[col.name + " " + str(index)] = col._data
+
+        fig = plt.figure()
+        data = pd.melt(data, ["INDEX"])
+        sns.lineplot(x="INDEX", y="value", hue="variable", data=data)
+        plt.title("Multiple Series Plot")
+        plt.xlabel("Time")
+
+        plt.tight_layout()
+        buffer = io.BytesIO()
+        fig.savefig(buffer, format="png")
+        plt.close()  # Prevents the figure from being displayed directly
+        buffer.seek(0)
+        return Image.from_bytes(buffer.read())
+
+    def plot_lagplot(self, lag: int) -> Image:
+        """
+        Plot a lagplot for the given column.
+
+        Parameters
+        ----------
+        lag:
+            The amount of lag used to plot
+
+        Returns
+        -------
+        plot:
+            The plot as an image.
+
+        Raises
+        ------
+        NonNumericColumnError
+            If the column contains non-numerical values.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table
+        >>> table = Column("values", [1,2,3,4,3,2])
+        >>> image = table.plot_lagplot(2)
+        """
+        import matplotlib.pyplot as plt
+        import pandas as pd
+
+        if not self.type.is_numeric():
+            raise NonNumericColumnError("This time series target contains non-numerical columns.")
+        ax = pd.plotting.lag_plot(self._data, lag=lag)
+        fig = ax.figure
+        buffer = io.BytesIO()
+        fig.savefig(buffer, format="png")
+        plt.close()  # Prevents the figure from being displayed directly
+        buffer.seek(0)
+        return Image.from_bytes(buffer.read())
 
     # ------------------------------------------------------------------------------------------------------------------
     # Conversion

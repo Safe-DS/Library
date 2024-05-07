@@ -9,10 +9,11 @@ from safeds.data.labeled.containers import ImageDataset, TabularDataset
 if TYPE_CHECKING:
     from torch import Tensor
 
-from safeds.data.tabular.containers import Table, TimeSeries
+from safeds.data.labeled.containers import TimeSeriesDataset
+from safeds.data.tabular.containers import Table
 
-IT = TypeVar("IT", Table, TimeSeries, ImageList)
-OT = TypeVar("OT", TabularDataset, TimeSeries, ImageDataset)
+IT = TypeVar("IT", Table, TimeSeriesDataset, ImageList)
+OT = TypeVar("OT", TabularDataset, TimeSeriesDataset, ImageDataset)
 
 
 class OutputConversion(Generic[IT, OT], ABC):

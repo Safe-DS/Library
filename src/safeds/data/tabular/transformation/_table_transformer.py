@@ -137,10 +137,8 @@ class TableTransformer(ABC):
 
         Returns
         -------
-        fitted_transformer:
-            The fitted transformer.
-        transformed_table:
-            The transformed table.
+        fitted_transformer, transformed_table:
+            The fitted transformer and the transformed table.:
         """
         fitted_transformer = self.fit(table, column_names)
         transformed_table = fitted_transformer.transform(table)

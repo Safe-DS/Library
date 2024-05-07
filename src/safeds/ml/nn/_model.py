@@ -4,8 +4,8 @@ import copy
 from typing import TYPE_CHECKING, Generic, Self, TypeVar
 
 from safeds.data.image.containers import ImageList
-from safeds.data.labeled.containers import ImageDataset, TabularDataset
-from safeds.data.tabular.containers import Table, TimeSeries
+from safeds.data.labeled.containers import TabularDataset, TimeSeriesDataset, ImageDataset
+from safeds.data.tabular.containers import Table
 from safeds.exceptions import (
     ClosedBound,
     FeatureDataMismatchError,
@@ -31,12 +31,15 @@ if TYPE_CHECKING:
 
     from torch import Tensor, nn
 
+    from safeds.ml.nn._input_conversion import InputConversion
+    from safeds.ml.nn._layer import Layer
+    from safeds.ml.nn._output_conversion import OutputConversion
     from safeds.data.image.typing import ImageSize
-    from safeds.ml.nn import InputConversion, Layer, OutputConversion
 
-IFT = TypeVar("IFT", TabularDataset, TimeSeries, ImageDataset)  # InputFitType
-IPT = TypeVar("IPT", Table, TimeSeries, ImageList)  # InputPredictType
-OT = TypeVar("OT", TabularDataset, TimeSeries, ImageDataset)  # OutputType
+
+IFT = TypeVar("IFT", TabularDataset, TimeSeriesDataset, ImageDataset)  # InputFitType
+IPT = TypeVar("IPT", Table, TimeSeriesDataset, ImageList)  # InputPredictType
+OT = TypeVar("OT", TabularDataset, TimeSeriesDataset, ImageDataset)  # OutputType
 
 
 class NeuralNetworkRegressor(Generic[IFT, IPT, OT]):
@@ -156,14 +159,14 @@ class NeuralNetworkRegressor(Generic[IFT, IPT, OT]):
         import torch
         from torch import nn
 
+        if not self._input_conversion._is_fit_data_valid(train_data):
+            raise FeatureDataMismatchError
         if epoch_size < 1:
             raise OutOfBoundsError(actual=epoch_size, name="epoch_size", lower_bound=ClosedBound(1))
         if batch_size < 1:
             raise OutOfBoundsError(actual=batch_size, name="batch_size", lower_bound=ClosedBound(1))
         if self._input_conversion._data_size is not self._input_size:
             raise InputSizeError(self._input_conversion._data_size, self._input_size)
-        if not self._input_conversion._is_fit_data_valid(train_data):
-            raise FeatureDataMismatchError
 
         copied_model = copy.deepcopy(self)
 
@@ -368,14 +371,14 @@ class NeuralNetworkClassifier(Generic[IFT, IPT, OT]):
         import torch
         from torch import nn
 
+        if not self._input_conversion._is_fit_data_valid(train_data):
+            raise FeatureDataMismatchError
         if epoch_size < 1:
             raise OutOfBoundsError(actual=epoch_size, name="epoch_size", lower_bound=ClosedBound(1))
         if batch_size < 1:
             raise OutOfBoundsError(actual=batch_size, name="batch_size", lower_bound=ClosedBound(1))
         if self._input_conversion._data_size is not self._input_size:
             raise InputSizeError(self._input_conversion._data_size, self._input_size)
-        if not self._input_conversion._is_fit_data_valid(train_data):
-            raise FeatureDataMismatchError
 
         copied_model = copy.deepcopy(self)
 
@@ -391,7 +394,6 @@ class NeuralNetworkClassifier(Generic[IFT, IPT, OT]):
             loss_fn = nn.CrossEntropyLoss()
         else:
             loss_fn = nn.BCELoss()
-
         optimizer = torch.optim.SGD(copied_model._model.parameters(), lr=learning_rate)
         for _ in range(epoch_size):
             loss_sum = 0.0
@@ -399,7 +401,6 @@ class NeuralNetworkClassifier(Generic[IFT, IPT, OT]):
             for x, y in iter(dataloader):
                 optimizer.zero_grad()
                 pred = copied_model._model(x)
-
                 loss = loss_fn(pred, y)
                 loss_sum += loss.item()
                 amount_of_loss_values_calculated += 1
