@@ -3,7 +3,8 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any, Literal
 
 from safeds._utils import _check_and_normalize_file_path
-from safeds.exceptions import ColumnLengthMismatchError, IndexOutOfBoundsError
+from safeds._utils._random import _get_random_seed
+from safeds.exceptions import ColumnLengthMismatchError, OutOfBoundsError, ClosedBound
 
 from ._experimental_polars_column import ExperimentalPolarsColumn
 from ._experimental_vectorized_cell import _VectorizedCell
@@ -450,7 +451,16 @@ class ExperimentalPolarsTable:
         raise NotImplementedError
 
     def shuffle_rows(self) -> ExperimentalPolarsTable:
-        raise NotImplementedError
+        if self._data_frame is None:
+            self._data_frame = self._lazy_frame.collect()
+
+        return ExperimentalPolarsTable._from_polars_dataframe(
+            self._data_frame.sample(
+                fraction=1,
+                shuffle=True,
+                seed=_get_random_seed(),
+            ),
+        )
 
     def slice_rows(self, start: int = 0, length: int | None = None) -> ExperimentalPolarsTable:
         return ExperimentalPolarsTable._from_polars_lazy_frame(
@@ -495,7 +505,21 @@ class ExperimentalPolarsTable:
         *,
         shuffle: bool = True,
     ) -> tuple[ExperimentalPolarsTable, ExperimentalPolarsTable]:
-        raise NotImplementedError
+        if percentage_in_first < 0 or percentage_in_first > 1:
+            raise OutOfBoundsError(
+                actual=percentage_in_first,
+                name="percentage_in_first",
+                lower_bound=ClosedBound(0),
+                upper_bound=ClosedBound(1),
+            )
+
+        input_table = self.shuffle_rows() if shuffle else self
+        number_of_rows_in_first = round(percentage_in_first * input_table.number_of_rows)
+
+        return (
+            input_table.slice_rows(length=number_of_rows_in_first),
+            input_table.slice_rows(start=number_of_rows_in_first),
+        )
 
     # ------------------------------------------------------------------------------------------------------------------
     # Table operations
