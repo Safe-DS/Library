@@ -19,7 +19,6 @@ from safeds.exceptions import (
 from ._experimental_column import ExperimentalColumn
 from ._experimental_lazy_cell import _LazyCell
 from ._experimental_lazy_vectorized_row import _LazyVectorizedRow
-from ._experimental_vectorized_cell import _VectorizedCell
 from ._table import Table
 
 if TYPE_CHECKING:
@@ -532,13 +531,12 @@ class ExperimentalTable:
         if not self.has_column(name):
             raise UnknownColumnNameError([name])  # TODO: in the error, compute similar column names
 
-        transformed_column = transformer(_VectorizedCell(self.get_column(name)))
-        if not isinstance(transformed_column, _VectorizedCell):
-            raise TypeError("The transformer must return a cell.")
+        import polars as pl
 
-        return self.replace_column(
-            name,
-            ExperimentalColumn._from_polars_series(transformed_column._series),
+        transformed_column = transformer(_LazyCell(pl.col(name)))
+
+        return ExperimentalTable._from_polars_lazy_frame(
+            self._lazy_frame.with_columns(transformed_column._polars_expression),
         )
 
     # ------------------------------------------------------------------------------------------------------------------
