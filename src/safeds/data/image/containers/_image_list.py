@@ -3,6 +3,7 @@ from __future__ import annotations
 import io
 import math
 import os
+import random
 from abc import ABCMeta, abstractmethod
 from pathlib import Path
 from threading import Thread
@@ -10,6 +11,7 @@ from typing import TYPE_CHECKING, Literal, overload
 
 from safeds._config import _init_default_device
 from safeds.data.image.containers._image import Image
+from safeds.exceptions import OutOfBoundsError, ClosedBound
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
@@ -88,12 +90,26 @@ class ImageList(metaclass=ABCMeta):
 
     @staticmethod
     @overload
-    def from_files(path: str | Path | Sequence[str | Path], return_filenames: Literal[False]) -> ImageList: ...
+    def from_files(path: str | Path | Sequence[str | Path], *, load_percentage: float) -> ImageList: ...
+
+    @staticmethod
+    @overload
+    def from_files(path: str | Path | Sequence[str | Path], *, return_filenames: Literal[False]) -> ImageList: ...
 
     @staticmethod
     @overload
     def from_files(
         path: str | Path | Sequence[str | Path],
+        *,
+        return_filenames: Literal[False],
+        load_percentage: float,
+    ) -> ImageList: ...
+
+    @staticmethod
+    @overload
+    def from_files(
+        path: str | Path | Sequence[str | Path],
+        *,
         return_filenames: Literal[True],
     ) -> tuple[ImageList, list[str]]: ...
 
@@ -101,13 +117,34 @@ class ImageList(metaclass=ABCMeta):
     @overload
     def from_files(
         path: str | Path | Sequence[str | Path],
+        *,
+        return_filenames: Literal[True],
+        load_percentage: float,
+    ) -> tuple[ImageList, list[str]]: ...
+
+    @staticmethod
+    @overload
+    def from_files(
+        path: str | Path | Sequence[str | Path],
+        *,
         return_filenames: bool,
+    ) -> ImageList | tuple[ImageList, list[str]]: ...
+
+    @staticmethod
+    @overload
+    def from_files(
+        path: str | Path | Sequence[str | Path],
+        *,
+        return_filenames: bool,
+        load_percentage: float,
     ) -> ImageList | tuple[ImageList, list[str]]: ...
 
     @staticmethod
     def from_files(
         path: str | Path | Sequence[str | Path],
+        *,
         return_filenames: bool = False,
+        load_percentage: float = 1.0,
     ) -> ImageList | tuple[ImageList, list[str]]:
         """
         Create an ImageList from a directory or a list of files.
@@ -120,6 +157,8 @@ class ImageList(metaclass=ABCMeta):
             the path to the directory or a list of files
         return_filenames:
             if True the output will be a tuple which contains a list of the filenames in order of the images
+        load_percentage:
+            what percentage of the data given will be loaded. If below 1 the files will be shuffled before loading
 
         Returns
         -------
@@ -130,6 +169,8 @@ class ImageList(metaclass=ABCMeta):
         ------
         FileNotFoundError
             If the directory or one of the files of the path cannot be found
+        OutOfBoundsError
+            If load_percentage is not between 0 and 1
         """
         from PIL.Image import open as pil_image_open
 
@@ -138,6 +179,9 @@ class ImageList(metaclass=ABCMeta):
         from safeds.data.image.containers._empty_image_list import _EmptyImageList
         from safeds.data.image.containers._multi_size_image_list import _MultiSizeImageList
         from safeds.data.image.containers._single_size_image_list import _SingleSizeImageList
+
+        if load_percentage < 0 or load_percentage > 1:
+            raise OutOfBoundsError(load_percentage, name="load_percentage", lower_bound=ClosedBound(0), upper_bound=ClosedBound(1))
 
         if isinstance(path, list) and len(path) == 0:
             return _EmptyImageList()
@@ -157,6 +201,10 @@ class ImageList(metaclass=ABCMeta):
                 file_names.append(str(p))
             else:
                 raise FileNotFoundError(f"No such file or directory: '{path}'")
+
+        if load_percentage < 1:
+            random.shuffle(file_names)
+            file_names = file_names[:round(len(file_names) * load_percentage)]
 
         num_of_files = len(file_names)
 

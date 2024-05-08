@@ -462,7 +462,7 @@ class TestFromFiles:
             *[s + "-path" for s in images_all_ids()],
         ],
     )
-    def test_from_files_creation(
+    def test_from_files_creation_return_filenames(
         self, resource_path: str | Path, snapshot_png_image_list: SnapshotAssertion, device: Device
     ) -> None:
         configure_test_with_device(device)
@@ -474,6 +474,37 @@ class TestFromFiles:
         assert image_list == snapshot_png_image_list
         assert image_list == image_list_returned_filenames
         assert len(image_list) == len(filenames)
+
+    @pytest.mark.parametrize(
+        "resource_path",
+        [
+            images_all(),
+            str(test_images_folder),
+            *images_all(),
+            [Path(im) for im in images_all()],
+            test_images_folder,
+            *[Path(im) for im in images_all()],
+        ],
+        ids=[
+            "all-images",
+            "images_folder",
+            *images_all_ids(),
+            "all-images-path",
+            "images_folder-path",
+            *[s + "-path" for s in images_all_ids()],
+        ],
+    )
+    def test_from_files_creation_load_percentage(
+        self, resource_path: str | Path, snapshot_png_image_list: SnapshotAssertion, device: Device
+    ) -> None:
+        configure_test_with_device(device)
+        image_list = ImageList.from_files(resolve_resource_path(resource_path))
+        image_list_load_percentage = ImageList.from_files(
+            resolve_resource_path(resource_path),
+            load_percentage=0.5,
+        )
+        assert image_list == snapshot_png_image_list
+        assert len(image_list_load_percentage) == round(len(image_list) * 0.5)
 
     @pytest.mark.parametrize(
         "resource_path",
@@ -491,6 +522,20 @@ class TestFromFiles:
         configure_test_with_device(device)
         with pytest.raises(FileNotFoundError):
             ImageList.from_files(resolve_resource_path(resource_path))
+
+    @pytest.mark.parametrize(
+        "resource_path",
+        [images_all(), [plane_png_path, plane_jpg_path] * 2],
+        ids=["all-images", "planes"],
+    )
+    @pytest.mark.parametrize(
+        "load_percentage",
+        [-1.0, 2.0],
+    )
+    def test_should_raise_if_load_percentage_out_of_bounds(self, resource_path: str | Path, load_percentage: float, device: Device) -> None:
+        configure_test_with_device(device)
+        with pytest.raises(OutOfBoundsError, match=rf"load_percentage \(={load_percentage}\) is not inside \[0, 1\]."):
+            ImageList.from_files(resolve_resource_path(resource_path), load_percentage=load_percentage)
 
 
 @pytest.mark.parametrize("device", get_devices(), ids=get_devices_ids())
