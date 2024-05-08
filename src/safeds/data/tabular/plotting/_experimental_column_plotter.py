@@ -100,17 +100,21 @@ class ExperimentalColumnPlotter:
         >>> table = ExperimentalColumn("values", [1,2,3,4,3,2])
         >>> image = table.plot.lag_plot(2)
         """
-        import matplotlib.pyplot as plt
-
         if not self._column.is_numeric:
             raise NonNumericColumnError("This time series target contains non-numerical columns.")
 
-        x_column_name = "y(t)"
-        y_column_name = f"y(t + {lag})"
+        import matplotlib.pyplot as plt
 
         fig, ax = plt.subplots()
-        ax.scatter(x=self._column[:-lag], y=self._column[lag:])
-        ax.set(xlabel=x_column_name, ylabel=y_column_name)
+        series = self._column._series
+        ax.scatter(
+            x=series.slice(0, len(self._column) - lag),
+            y=series.slice(lag),
+        )
+        ax.set(
+            xlabel="y(t)",
+            ylabel=f"y(t + {lag})",
+        )
 
         buffer = io.BytesIO()
         fig.savefig(buffer, format="png")
