@@ -61,7 +61,13 @@ class _MultiSizeImageList(ImageList):
         for single_size_image_list in single_size_image_lists:
             image_size = (single_size_image_list.widths[0], single_size_image_list.heights[0])
             image_list._image_list_dict[image_size] = single_size_image_list
-            image_list._indices_to_image_size_dict.update(zip(single_size_image_list._indices_to_tensor_positions.keys(), [image_size] * len(single_size_image_list), strict=False))
+            image_list._indices_to_image_size_dict.update(
+                zip(
+                    single_size_image_list._indices_to_tensor_positions.keys(),
+                    [image_size] * len(single_size_image_list),
+                    strict=False,
+                )
+            )
             if max_channel is None:
                 max_channel = single_size_image_list.channel
             elif max_channel < single_size_image_list.channel:
@@ -73,7 +79,9 @@ class _MultiSizeImageList(ImageList):
         if different_channels:
             for size in image_list._image_list_dict:
                 if max_channel is not None and image_list._image_list_dict[size].channel != max_channel:
-                    image_list._image_list_dict[size] = image_list._image_list_dict[size].change_channel(int(max_channel))
+                    image_list._image_list_dict[size] = image_list._image_list_dict[size].change_channel(
+                        int(max_channel)
+                    )
         return image_list
 
     @staticmethod

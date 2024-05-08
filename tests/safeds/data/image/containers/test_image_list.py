@@ -532,7 +532,9 @@ class TestFromFiles:
         "load_percentage",
         [-1.0, 2.0],
     )
-    def test_should_raise_if_load_percentage_out_of_bounds(self, resource_path: str | Path, load_percentage: float, device: Device) -> None:
+    def test_should_raise_if_load_percentage_out_of_bounds(
+        self, resource_path: str | Path, load_percentage: float, device: Device
+    ) -> None:
         configure_test_with_device(device)
         with pytest.raises(OutOfBoundsError, match=rf"load_percentage \(={load_percentage}\) is not inside \[0, 1\]."):
             ImageList.from_files(resolve_resource_path(resource_path), load_percentage=load_percentage)

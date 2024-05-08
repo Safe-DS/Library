@@ -181,7 +181,9 @@ class ImageList(metaclass=ABCMeta):
         from safeds.data.image.containers._single_size_image_list import _SingleSizeImageList
 
         if load_percentage < 0 or load_percentage > 1:
-            raise OutOfBoundsError(load_percentage, name="load_percentage", lower_bound=ClosedBound(0), upper_bound=ClosedBound(1))
+            raise OutOfBoundsError(
+                load_percentage, name="load_percentage", lower_bound=ClosedBound(0), upper_bound=ClosedBound(1)
+            )
 
         if isinstance(path, list) and len(path) == 0:
             return _EmptyImageList()
@@ -204,7 +206,7 @@ class ImageList(metaclass=ABCMeta):
 
         if load_percentage < 1:
             random.shuffle(file_names)
-            file_names = file_names[:max(round(len(file_names) * load_percentage), 1) if load_percentage > 0 else 0]
+            file_names = file_names[: max(round(len(file_names) * load_percentage), 1) if load_percentage > 0 else 0]
 
         num_of_files = len(file_names)
 
@@ -241,7 +243,15 @@ class ImageList(metaclass=ABCMeta):
         single_sized_image_lists = []
         thread_packages = []
         for size, image_files in image_sizes.items():
-            im_list, packages = _SingleSizeImageList._create_image_list_from_files(image_files, image_count[size], max_channel, size[0], size[1], image_indices[size], num_of_files_per_thread)
+            im_list, packages = _SingleSizeImageList._create_image_list_from_files(
+                image_files,
+                image_count[size],
+                max_channel,
+                size[0],
+                size[1],
+                image_indices[size],
+                num_of_files_per_thread,
+            )
             single_sized_image_lists.append(im_list._as_single_size_image_list())
             thread_packages += packages
         thread_packages.sort(key=lambda x: len(x), reverse=True)
@@ -274,8 +284,16 @@ class ImageList(metaclass=ABCMeta):
 
     class _FromFileThreadPackage:
 
-        def __init__(self, im_files: list[str], im_channel: int, to_channel: int, im_width: int, im_height: int,
-                     tensor: Tensor, start_index: int) -> None:
+        def __init__(
+            self,
+            im_files: list[str],
+            im_channel: int,
+            to_channel: int,
+            im_width: int,
+            im_height: int,
+            tensor: Tensor,
+            start_index: int,
+        ) -> None:
             self._im_files = im_files
             self._im_channel = im_channel
             self._to_channel = to_channel
@@ -295,8 +313,11 @@ class ImageList(metaclass=ABCMeta):
             for index, im in enumerate(self._im_files):
                 self._tensor[index + self._start_index, 0:tensor_channel] = read_image(im)
             if self._to_channel == 4 and self._im_channel < 4:
-                torch.full((num_of_files, 1, self._im_height, self._im_width), 255,
-                           out=self._tensor[self._start_index:self._start_index + num_of_files, 3:4])
+                torch.full(
+                    (num_of_files, 1, self._im_height, self._im_width),
+                    255,
+                    out=self._tensor[self._start_index : self._start_index + num_of_files, 3:4],
+                )
 
         def __len__(self) -> int:
             return len(self._im_files)
