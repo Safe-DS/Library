@@ -78,9 +78,9 @@ class ExperimentalTabularDataset:
 
         # Set attributes
         self._table: ExperimentalTable = data
-        self._features: ExperimentalTable = data.remove_columns_by_name(feature_names, keep_only_listed=True)
+        self._features: ExperimentalTable = data.remove_columns_except(feature_names)
         self._target: ExperimentalColumn = data.get_column(target_name)
-        self._extras: ExperimentalTable = data.remove_columns_by_name(extra_names, keep_only_listed=True)
+        self._extras: ExperimentalTable = data.remove_columns_except(extra_names)
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, ExperimentalTabularDataset):

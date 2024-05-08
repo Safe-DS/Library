@@ -406,21 +406,28 @@ class ExperimentalTable:
     def has_column(self, name: str) -> bool:
         return name in self.column_names
 
-    def remove_columns_by_name(
+    def remove_columns(
         self,
         names: str | list[str],
-        *,
-        keep_only_listed: bool = False,
+        /,
     ) -> ExperimentalTable:
         if isinstance(names, str):
             names = [names]
 
-        if keep_only_listed:
-            names_to_keep = set(names)  # perf: Comprehensions evaluate their condition every iteration
-            names = [name for name in self.column_names if name not in names_to_keep]
-
         return ExperimentalTable._from_polars_lazy_frame(
             self._lazy_frame.drop(names),
+        )
+
+    def remove_columns_except(
+        self,
+        names: str | list[str],
+        /,
+    ) -> ExperimentalTable:
+        if isinstance(names, str):
+            names = [names]
+
+        return ExperimentalTable._from_polars_lazy_frame(
+            self._lazy_frame.select(names),
         )
 
     def remove_columns_with_missing_values(self) -> ExperimentalTable:
@@ -487,7 +494,7 @@ class ExperimentalTable:
             new_columns = [new_columns]
 
         if len(new_columns) == 0:
-            return self.remove_columns_by_name(old_name)
+            return self.remove_columns(old_name)
 
         new_frame = self._data_frame
         index = new_frame.get_column_index(old_name)

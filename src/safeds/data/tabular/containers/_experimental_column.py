@@ -12,7 +12,7 @@ from ._column import Column
 from ._experimental_vectorized_cell import _VectorizedCell
 
 if TYPE_CHECKING:
-    from polars import Series, InvalidOperationError
+    from polars import Series
 
     from safeds.data.tabular.typing._experimental_data_type import ExperimentalDataType
 
