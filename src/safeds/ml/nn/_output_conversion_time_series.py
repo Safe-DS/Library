@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import sys
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, List
 
 from safeds._utils import _structural_hash
 
@@ -82,7 +82,7 @@ class OutputConversionTimeSeries(OutputConversion[TimeSeriesDataset, TimeSeriesD
         input_data_table = Table.from_rows(input_data_table.to_rows()[window_size + forecast_horizon:])
         transposed_data = output_data.t()
         data = transposed_data.tolist()
-        col_list = []
+        col_list: List[Column] = []
         if isinstance(data[0], list):
             for index, col in enumerate(data):
                 col_list.append(Column(self._prediction_name + " "+str(index), col))

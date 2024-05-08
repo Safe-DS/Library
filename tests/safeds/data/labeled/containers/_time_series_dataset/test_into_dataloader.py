@@ -218,7 +218,7 @@ def test_should_create_dataloader_predict_invalid(
         )
 
 
-def test_continues_dataloader():
+def test_continues_dataloader() -> None:
     ts = (Table({"a": [1, 2, 3, 4, 5, 6, 7], "b": [1, 2, 3, 4, 5, 6, 7], "c": [1, 2, 3, 4, 5, 6, 7]}).
           to_time_series_dataset("a", "b"))
     dl = ts._into_dataloader_with_window(1, 2, 1, True)
