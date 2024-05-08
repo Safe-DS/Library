@@ -56,9 +56,42 @@ class _SingleSizeImageList(ImageList):
         self._next_batch_index = 0
         self._batch_size = 1
 
-        self._tensor: Tensor = torch.empty(0)
+        self._tensor: Tensor = torch.empty([])
         self._tensor_positions_to_indices: list[int] = []  # list[tensor_position] = index
         self._indices_to_tensor_positions: dict[int, int] = {}  # {index: tensor_position}
+
+    @staticmethod
+    def _create_image_list_from_files(images: dict[int, list[str]], number_of_images: int, max_channel: int, width: int, height: int, indices: dict[int, list[int]]) -> ImageList:
+        import torch
+        from torchvision.io import read_image
+
+        _init_default_device()
+
+        from safeds.data.image.containers._empty_image_list import _EmptyImageList
+
+        if len(images) == 0 or number_of_images == 0:
+            return _EmptyImageList()
+
+        image_list = _SingleSizeImageList()
+
+        images_tensor = torch.empty(number_of_images, max_channel, height, width, dtype=torch.uint8, device=_get_device())
+
+        num_saved_images = 0
+
+        for c in images:
+            c_len = len(images[c])
+            t_channel = max(c, min(max_channel, 3))
+            for index, im in enumerate(images[c]):
+                images_tensor[index + num_saved_images, 0:t_channel] = read_image(im)
+            if max_channel == 4 and c < 4:
+                torch.full((c_len, 1, height, width), 255, out=images_tensor[num_saved_images:num_saved_images + c_len, 3:4])
+
+            num_saved_images += c_len
+
+        image_list._tensor = images_tensor
+        image_list._tensor_positions_to_indices = [i for j in indices.values() for i in j]
+        image_list._indices_to_tensor_positions = image_list._calc_new_indices_to_tensor_positions()
+        return image_list
 
     @staticmethod
     def _create_image_list(images: list[Tensor], indices: list[int]) -> ImageList:
@@ -374,6 +407,8 @@ class _SingleSizeImageList(ImageList):
         return [Image(self._tensor[self._indices_to_tensor_positions[index]]) for index in indices]
 
     def change_channel(self, channel: int) -> ImageList:
+        if channel == self.channel:
+            return self
         image_list = self._clone_without_tensor()
         image_list._tensor = _SingleSizeImageList._change_channel_of_tensor(self._tensor, channel)
         return image_list

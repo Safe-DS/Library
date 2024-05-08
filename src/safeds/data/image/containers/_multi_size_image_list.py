@@ -46,6 +46,37 @@ class _MultiSizeImageList(ImageList):
         self._indices_to_image_size_dict: dict[int, tuple[int, int]] = {}  # {index: image_size}
 
     @staticmethod
+    def _create_from_single_sized_image_lists(single_size_image_lists: list[_SingleSizeImageList]) -> ImageList:
+        from safeds.data.image.containers._empty_image_list import _EmptyImageList
+
+        if len(single_size_image_lists) == 0:
+            return _EmptyImageList()
+        elif len(single_size_image_lists) == 1:
+            return single_size_image_lists[0]
+
+        different_channels: bool = False
+        max_channel: None | int = None
+
+        image_list = _MultiSizeImageList()
+        for single_size_image_list in single_size_image_lists:
+            image_size = (single_size_image_list.widths[0], single_size_image_list.heights[0])
+            image_list._image_list_dict[image_size] = single_size_image_list
+            image_list._indices_to_image_size_dict.update(zip(single_size_image_list._indices_to_tensor_positions.keys(), [image_size] * len(single_size_image_list), strict=False))
+            if max_channel is None:
+                max_channel = single_size_image_list.channel
+            elif max_channel < single_size_image_list.channel:
+                different_channels = True
+                max_channel = single_size_image_list.channel
+            elif max_channel > single_size_image_list.channel:
+                different_channels = True
+
+        if different_channels:
+            for size in image_list._image_list_dict:
+                if image_list._image_list_dict[size].channel != max_channel:
+                    image_list._image_list_dict[size] = image_list._image_list_dict[size].change_channel(max_channel)
+        return image_list
+
+    @staticmethod
     def _create_image_list(images: list[Tensor], indices: list[int]) -> ImageList:
         from safeds.data.image.containers._empty_image_list import _EmptyImageList
         from safeds.data.image.containers._single_size_image_list import _SingleSizeImageList

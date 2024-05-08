@@ -786,6 +786,7 @@ class TestShuffleImages:
         assert len(image_list_shuffled) == len(resource_path)
         for index in range(len(resource_path)):
             assert image_list_shuffled.get_image(index) in image_list_original
+        assert image_list_shuffled != image_list_original
         assert image_list_shuffled == snapshot_png_image_list
         assert image_list_original is not image_list_clone
         assert image_list_original == image_list_clone

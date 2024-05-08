@@ -131,7 +131,6 @@ class ImageList(metaclass=ABCMeta):
             If the directory or one of the files of the path cannot be found
         """
         from PIL.Image import open as pil_image_open
-        from torchvision.transforms.v2.functional import pil_to_tensor
 
         _init_default_device()
 
@@ -142,9 +141,7 @@ class ImageList(metaclass=ABCMeta):
         if isinstance(path, list) and len(path) == 0:
             return _EmptyImageList()
 
-        image_tensors = []
         file_names = []
-        fixed_size = True
 
         path_list: list[str | Path]
         if isinstance(path, Path | str):
@@ -155,24 +152,48 @@ class ImageList(metaclass=ABCMeta):
             p = Path(path_list.pop(0))
             if p.is_dir():
                 path_list += sorted([p / name for name in os.listdir(p)])
-            else:
-                image_tensors.append(pil_to_tensor(pil_image_open(p)))
+            elif p.is_file():
                 file_names.append(str(p))
-                if fixed_size and (
-                    image_tensors[0].size(dim=2) != image_tensors[-1].size(dim=2)
-                    or image_tensors[0].size(dim=1) != image_tensors[-1].size(dim=1)
-                ):
-                    fixed_size = False
+            else:
+                raise FileNotFoundError(f"No such file or directory: '{path}'")
 
-        if len(image_tensors) == 0:
+        num_of_files = len(file_names)
+
+        if num_of_files == 0:
             return _EmptyImageList()
 
-        indices = list(range(len(image_tensors)))
+        image_sizes: dict[tuple[int, int], dict[int, list[str]]] = {}
+        image_indices: dict[tuple[int, int], dict[int, list[int]]] = {}
+        image_count: dict[tuple[int, int], int] = {}
+        max_channel = -1
 
-        if fixed_size:
-            image_list = _SingleSizeImageList._create_image_list(image_tensors, indices)
+        for i, filename in enumerate(file_names):
+            im = pil_image_open(filename)
+            im_channel = len(im.getbands())
+            im_size = (im.width, im.height)
+            if im_channel > max_channel:
+                max_channel = im_channel
+            if im_size not in image_sizes:
+                image_sizes[im_size] = {im_channel: [filename]}
+                image_indices[im_size] = {im_channel: [i]}
+                image_count[im_size] = 1
+            elif im_channel not in image_sizes[im_size]:
+                image_sizes[im_size][im_channel] = [filename]
+                image_indices[im_size][im_channel] = [i]
+                image_count[im_size] += 1
+            else:
+                image_sizes[im_size][im_channel].append(filename)
+                image_indices[im_size][im_channel].append(i)
+                image_count[im_size] += 1
+
+        single_sized_image_lists = []
+        for size, image_files in image_sizes.items():
+            single_sized_image_lists.append(_SingleSizeImageList._create_image_list_from_files(image_files, image_count[size], max_channel, size[0], size[1], image_indices[size])._as_single_size_image_list())
+
+        if len(single_sized_image_lists) == 1:
+            image_list = single_sized_image_lists[0]
         else:
-            image_list = _MultiSizeImageList._create_image_list(image_tensors, indices)
+            image_list = _MultiSizeImageList._create_from_single_sized_image_lists(single_sized_image_lists)
 
         if return_filenames:
             return image_list, file_names
