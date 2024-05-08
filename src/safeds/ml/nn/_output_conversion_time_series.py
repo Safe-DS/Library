@@ -67,6 +67,7 @@ class OutputConversionTimeSeries(OutputConversion[TimeSeriesDataset, TimeSeriesD
         self._prediction_name = prediction_name
 
     def _data_conversion(self, input_data: TimeSeriesDataset, output_data: Tensor, **kwargs: Any) -> TimeSeriesDataset:
+        import numpy as np
         if "window_size" not in kwargs or not isinstance(kwargs.get("window_size"), int):
             raise ValueError(
                 "The window_size is not set. The data can only be converted if the window_size is provided as `int` in the kwargs.",
@@ -78,12 +79,20 @@ class OutputConversionTimeSeries(OutputConversion[TimeSeriesDataset, TimeSeriesD
         window_size: int = kwargs["window_size"]
         forecast_horizon: int = kwargs["forecast_horizon"]
         input_data_table = input_data.to_table()
-        input_data_table = Table.from_rows(input_data_table.to_rows()[window_size + forecast_horizon :])
+        input_data_table = Table.from_rows(input_data_table.to_rows()[window_size + forecast_horizon:])
+        transposed_data = output_data.t()
+        data = transposed_data.tolist()
+        col_list = []
+        if isinstance(data[0], list):
+            for index, col in enumerate(data):
+                col_list.append(Column(self._prediction_name + " "+str(index), col))
+        else:
+            col_list.append(Column(self._prediction_name + " 0", data))
 
         return input_data_table.add_columns(
-            [Column(self._prediction_name, output_data.tolist())]
+            col_list
         ).to_time_series_dataset(
-            target_name=self._prediction_name,
+            target_name=self._prediction_name + " 0",
             time_name=input_data.time.name,
             extra_names=input_data.extras.column_names,
         )

@@ -16,6 +16,7 @@ class InputConversionTimeSeries(InputConversion[TimeSeriesDataset, TimeSeriesDat
         self,
         window_size: int,
         forecast_horizon: int,
+        continues: bool = False,
     ) -> None:
         """
         Define the input parameters for the neural network in the input conversion.
@@ -33,6 +34,7 @@ class InputConversionTimeSeries(InputConversion[TimeSeriesDataset, TimeSeriesDat
         self._target_name: str = ""
         self._time_name: str = ""
         self._feature_names: list[str] = []
+        self._continues: bool = continues
 
     @property
     def _data_size(self) -> int:
@@ -58,6 +60,7 @@ class InputConversionTimeSeries(InputConversion[TimeSeriesDataset, TimeSeriesDat
             self._window_size,
             self._forecast_horizon,
             batch_size,
+            continues=self._continues
         )
 
     def _data_conversion_predict(self, input_data: TimeSeriesDataset, batch_size: int) -> DataLoader:

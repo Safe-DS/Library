@@ -6,6 +6,7 @@ from torch.types import Device
 from safeds._config import _get_device
 from safeds.data.tabular.containers import Table
 from safeds.data.labeled.containers import TimeSeriesDataset
+import torch
 from torch.utils.data import DataLoader
 
 from safeds.exceptions import OutOfBoundsError
@@ -215,3 +216,13 @@ def test_should_create_dataloader_predict_invalid(
         data._into_dataloader_with_window_predict(
             window_size=window_size, forecast_horizon=forecast_horizon, batch_size=1
         )
+
+
+def test_continues_dataloader():
+    ts = (Table({"a": [1, 2, 3, 4, 5, 6, 7], "b": [1, 2, 3, 4, 5, 6, 7], "c": [1, 2, 3, 4, 5, 6, 7]}).
+          to_time_series_dataset("a", "b"))
+    dl = ts._into_dataloader_with_window(1, 2, 1, True)
+    dl_2 = ts._into_dataloader_with_window(1, 2, 1, False)
+    assert len(dl_2.dataset.Y) == len(dl.dataset.Y)
+    # 4mal 2er Arrays mit 1er Einträgen
+    assert dl.dataset.Y.shape == torch.Size([4, 2, 1])
