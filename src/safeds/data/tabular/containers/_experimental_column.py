@@ -39,7 +39,15 @@ class ExperimentalColumn(Sequence[T]):
     --------
     >>> from safeds.data.tabular.containers import ExperimentalColumn
     >>> ExperimentalColumn("test", [1, 2, 3])
-    Column('test', [1, 2, 3])
+    +------+
+    | test |
+    |  --- |
+    |  i64 |
+    +======+
+    |    1 |
+    |    2 |
+    |    3 |
+    +------+
     """
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -97,20 +105,13 @@ class ExperimentalColumn(Sequence[T]):
         return self.number_of_rows
 
     def __repr__(self) -> str:
-        import polars as pl
-
-        if self.number_of_rows <= 50:
-            data = self._series.to_list()
-        else:
-            data = f"[{', '.join(self._series.slice(0, 50).cast(pl.String).to_list())}, ...]"
-
-        return f"Column({self.name!r}, {data})"
+        return self.to_table().__repr__()
 
     def __sizeof__(self) -> int:
         return self._series.estimated_size()
 
     def __str__(self) -> str:
-        return self.__repr__()
+        return self.to_table().__str__()
 
     # ------------------------------------------------------------------------------------------------------------------
     # Properties
@@ -376,7 +377,15 @@ class ExperimentalColumn(Sequence[T]):
         >>> from safeds.data.tabular.containers import ExperimentalColumn
         >>> column = ExperimentalColumn("test", [1, 2, 3])
         >>> column.rename("new_name")
-        Column('new_name', [1, 2, 3])
+        +----------+
+        | new_name |
+        |      --- |
+        |      i64 |
+        +==========+
+        |        1 |
+        |        2 |
+        |        3 |
+        +----------+
         """
         return self._from_polars_series(self._series.rename(new_name))
 
@@ -404,7 +413,15 @@ class ExperimentalColumn(Sequence[T]):
         >>> from safeds.data.tabular.containers import ExperimentalColumn
         >>> column = ExperimentalColumn("test", [1, 2, 3])
         >>> column.transform(lambda cell: 2 * cell)
-        Column('test', [2, 4, 6])
+        +------+
+        | test |
+        |  --- |
+        |  i64 |
+        +======+
+        |    2 |
+        |    4 |
+        |    6 |
+        +------+
         """
         result = transformer(_VectorizedCell(self))
         if not isinstance(result, _VectorizedCell):
@@ -430,22 +447,21 @@ class ExperimentalColumn(Sequence[T]):
         >>> from safeds.data.tabular.containers import ExperimentalColumn
         >>> column = ExperimentalColumn("a", [1, 3])
         >>> column.summarize_statistics()
-        shape: (9, 2)
-        ┌──────────────────────┬──────────┐
-        │ metric               ┆ a        │
-        │ ---                  ┆ ---      │
-        │ str                  ┆ f64      │
-        ╞══════════════════════╪══════════╡
-        │ min                  ┆ 1.0      │
-        │ max                  ┆ 3.0      │
-        │ mean                 ┆ 2.0      │
-        │ median               ┆ 2.0      │
-        │ standard deviation   ┆ 1.414214 │
-        │ distinct value count ┆ 2.0      │
-        │ idness               ┆ 1.0      │
-        │ missing value ratio  ┆ 0.0      │
-        │ stability            ┆ 0.5      │
-        └──────────────────────┴──────────┘
+        +----------------------+--------------------+
+        | metric               | a                  |
+        | ---                  | ---                |
+        | str                  | str                |
+        +===========================================+
+        | min                  | 1                  |
+        | max                  | 3                  |
+        | mean                 | 2.0                |
+        | median               | 2.0                |
+        | standard deviation   | 1.4142135623730951 |
+        | distinct value count | 2                  |
+        | idness               | 1.0                |
+        | missing value ratio  | 0.0                |
+        | stability            | 0.5                |
+        +----------------------+--------------------+
         """
         from ._experimental_table import ExperimentalTable
 
@@ -701,7 +717,14 @@ class ExperimentalColumn(Sequence[T]):
         >>> from safeds.data.tabular.containers import ExperimentalColumn
         >>> column = ExperimentalColumn("test", [3, 1, 2, 1, 3])
         >>> column.mode()
-        Column('test', [1, 3])
+        +------+
+        | test |
+        |  --- |
+        |  i64 |
+        +======+
+        |    1 |
+        |    3 |
+        +------+
         """
         return self._from_polars_series(self._series.mode().sort())
 
@@ -823,16 +846,15 @@ class ExperimentalColumn(Sequence[T]):
         >>> from safeds.data.tabular.containers import ExperimentalColumn
         >>> column = ExperimentalColumn("test", [1, 2, 3])
         >>> column.to_table()
-        shape: (3, 1)
-        ┌──────┐
-        │ test │
-        │ ---  │
-        │ i64  │
-        ╞══════╡
-        │ 1    │
-        │ 2    │
-        │ 3    │
-        └──────┘
+        +------+
+        | test |
+        |  --- |
+        |  i64 |
+        +======+
+        |    1 |
+        |    2 |
+        |    3 |
+        +------+
         """
         from ._experimental_table import ExperimentalTable
 

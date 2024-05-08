@@ -318,7 +318,7 @@ class ExperimentalOneHotEncoder(ExperimentalInvertibleTableTransformer):
         table = transformed_table
 
         for column_name, encoded_column in original_columns.items():
-            table = table.add_column(Column(column_name, encoded_column))
+            table = table.add_columns(Column(column_name, encoded_column))
 
         # Drop old column names:
         table = table.remove_columns(list(self._value_to_column.values()))

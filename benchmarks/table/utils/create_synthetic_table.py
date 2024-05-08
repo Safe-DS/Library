@@ -10,7 +10,8 @@ def create_synthetic_table(
     min_value: int = 0,
     max_value: int = 1000,
 ) -> Table:
-    """Create a synthetic Table with random numerical data.
+    """
+    Create a synthetic Table with random numerical data.
 
     Parameters
     ----------

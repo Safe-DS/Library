@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, Literal
 
+from safeds._config._polars import _get_polars_config
 from safeds._utils import _check_and_normalize_file_path, _structural_hash
 from safeds._utils._random import _get_random_seed
 from safeds.data.labeled.containers import ExperimentalTabularDataset
@@ -109,15 +110,14 @@ class ExperimentalTable:
         --------
         >>> from safeds.data.tabular.containers import ExperimentalTable
         >>> ExperimentalTable.from_csv_file("./src/resources/from_csv_file.csv")
-        shape: (2, 3)
-        ┌─────┬─────┬─────┐
-        │ a   ┆ b   ┆ c   │
-        │ --- ┆ --- ┆ --- │
-        │ i64 ┆ i64 ┆ i64 │
-        ╞═════╪═════╪═════╡
-        │ 1   ┆ 2   ┆ 1   │
-        │ 0   ┆ 0   ┆ 7   │
-        └─────┴─────┴─────┘
+        +-----+-----+-----+
+        |   a |   b |   c |
+        | --- | --- | --- |
+        | i64 | i64 | i64 |
+        +=================+
+        |   1 |   2 |   1 |
+        |   0 |   0 |   7 |
+        +-----+-----+-----+
         """
         import polars as pl
 
@@ -149,16 +149,15 @@ class ExperimentalTable:
         >>> from safeds.data.tabular.containers import ExperimentalTable
         >>> data = {'a': [1, 2, 3], 'b': [4, 5, 6]}
         >>> ExperimentalTable.from_dict(data)
-        shape: (3, 2)
-        ┌─────┬─────┐
-        │ a   ┆ b   │
-        │ --- ┆ --- │
-        │ i64 ┆ i64 │
-        ╞═════╪═════╡
-        │ 1   ┆ 4   │
-        │ 2   ┆ 5   │
-        │ 3   ┆ 6   │
-        └─────┴─────┘
+        +-----+-----+
+        |   a |   b |
+        | --- | --- |
+        | i64 | i64 |
+        +===========+
+        |   1 |   4 |
+        |   2 |   5 |
+        |   3 |   6 |
+        +-----+-----+
         """
         return ExperimentalTable(data)
 
@@ -187,16 +186,16 @@ class ExperimentalTable:
         Examples
         --------
         >>> from safeds.data.tabular.containers import ExperimentalTable
-        >>> ExperimentalTable.from_json_file("./src/resources/from_json_file.json")
-        shape: (2, 3)
-        ┌─────┬─────┬─────┐
-        │ a   ┆ b   ┆ c   │
-        │ --- ┆ --- ┆ --- │
-        │ i64 ┆ i64 ┆ i64 │
-        ╞═════╪═════╪═════╡
-        │ 1   ┆ 2   ┆ 1   │
-        │ 0   ┆ 0   ┆ 7   │
-        └─────┴─────┴─────┘
+        >>> ExperimentalTable.from_json_file("./src/resources/from_json_file_2.json")
+        +-----+-----+
+        |   a |   b |
+        | --- | --- |
+        | i64 | i64 |
+        +===========+
+        |   1 |   4 |
+        |   2 |   5 |
+        |   3 |   6 |
+        +-----+-----+
         """
         import polars as pl
 
@@ -229,15 +228,15 @@ class ExperimentalTable:
         --------
         >>> from safeds.data.tabular.containers import ExperimentalTable
         >>> ExperimentalTable.from_parquet_file("./src/resources/from_parquet_file.parquet")
-        shape: (2, 3)
-        ┌─────┬─────┬─────┐
-        │ a   ┆ b   ┆ c   │
-        │ --- ┆ --- ┆ --- │
-        │ i64 ┆ i64 ┆ i64 │
-        ╞═════╪═════╪═════╡
-        │ 1   ┆ 2   ┆ 1   │
-        │ 0   ┆ 0   ┆ 7   │
-        └─────┴─────┴─────┘
+        +-----+-----+
+        |   a |   b |
+        | --- | --- |
+        | i64 | i64 |
+        +===========+
+        |   1 |   4 |
+        |   2 |   5 |
+        |   3 |   6 |
+        +-----+-----+
         """
         import polars as pl
 
@@ -294,13 +293,15 @@ class ExperimentalTable:
         return _structural_hash(self.schema, self.number_of_rows)
 
     def __repr__(self) -> str:
-        return self._data_frame.__repr__()
+        with _get_polars_config():
+            return self._data_frame.__repr__()
 
     def __sizeof__(self) -> int:
         return self._data_frame.estimated_size()
 
     def __str__(self) -> str:
-        return self._data_frame.__str__()
+        with _get_polars_config():
+            return self._data_frame.__str__()
 
     # ------------------------------------------------------------------------------------------------------------------
     # Properties
@@ -469,16 +470,15 @@ class ExperimentalTable:
         >>> from safeds.data.tabular.containers import ExperimentalTable
         >>> table = ExperimentalTable({"a": [1, 2, 3], "b": [4, 5, 6]})
         >>> table.rename_column("a", "A")
-        shape: (3, 2)
-        ┌─────┬─────┐
-        │ A   ┆ b   │
-        │ --- ┆ --- │
-        │ i64 ┆ i64 │
-        ╞═════╪═════╡
-        │ 1   ┆ 4   │
-        │ 2   ┆ 5   │
-        │ 3   ┆ 6   │
-        └─────┴─────┘
+        +-----+-----+
+        |   A |   b |
+        | --- | --- |
+        | i64 | i64 |
+        +===========+
+        |   1 |   4 |
+        |   2 |   5 |
+        |   3 |   6 |
+        +-----+-----+
         """
         # TODO: raises?
         return ExperimentalTable._from_polars_lazy_frame(
@@ -547,15 +547,14 @@ class ExperimentalTable:
         >>> from safeds.data.tabular.containers import ExperimentalTable
         >>> table = ExperimentalTable({"a": [1, 2, 2], "b": [4, 5, 5]})
         >>> table.remove_duplicate_rows()
-        shape: (2, 2)
-        ┌─────┬─────┐
-        │ a   ┆ b   │
-        │ --- ┆ --- │
-        │ i64 ┆ i64 │
-        ╞═════╪═════╡
-        │ 1   ┆ 4   │
-        │ 2   ┆ 5   │
-        └─────┴─────┘
+        +-----+-----+
+        |   a |   b |
+        | --- | --- |
+        | i64 | i64 |
+        +===========+
+        |   1 |   4 |
+        |   2 |   5 |
+        +-----+-----+
         """
         return ExperimentalTable._from_polars_lazy_frame(
             self._lazy_frame.unique(maintain_order=True),
@@ -611,14 +610,13 @@ class ExperimentalTable:
         >>> from safeds.data.tabular.containers import ExperimentalTable
         >>> table = ExperimentalTable({"a": [1, None, 3], "b": [4, 5, None]})
         >>> table.remove_rows_with_missing_values()
-        shape: (1, 2)
-        ┌─────┬─────┐
-        │ a   ┆ b   │
-        │ --- ┆ --- │
-        │ i64 ┆ i64 │
-        ╞═════╪═════╡
-        │ 1   ┆ 4   │
-        └─────┴─────┘
+        +-----+-----+
+        |   a |   b |
+        | --- | --- |
+        | i64 | i64 |
+        +===========+
+        |   1 |   4 |
+        +-----+-----+
         """
         return ExperimentalTable._from_polars_lazy_frame(
             self._lazy_frame.drop_nulls(subset=subset_names),
@@ -819,7 +817,7 @@ class ExperimentalTable:
         --------
         >>> from safeds.data.tabular.containers import ExperimentalTable
         >>> table = ExperimentalTable({"a": [1, 2, 3], "b": [4, 5, 6]})
-        >>> table.to_json_file("./src/resources/to_json_file.json")
+        >>> table.to_json_file("./src/resources/to_json_file_2.json")
         """
         path = _check_and_normalize_file_path(path, ".json", [".json"])
         path.parent.mkdir(parents=True, exist_ok=True)

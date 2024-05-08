@@ -5,13 +5,13 @@ from typing import TYPE_CHECKING
 import apipkg
 
 if TYPE_CHECKING:
-    from ._device import _get_device, _init_default_device
+    from ._torch import _get_device, _init_default_device
 
 apipkg.initpkg(
     __name__,
     {
-        "_get_device": "._device:_get_device",
-        "_init_default_device": "._device:_init_default_device",
+        "_get_device": "._torch:_get_device",
+        "_init_default_device": "._torch:_init_default_device",
     },
 )
 

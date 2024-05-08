@@ -18,7 +18,7 @@ def _get_device() -> Device:
 def _init_default_device() -> None:
     import torch
 
-    global _default_device
+    global _default_device  # noqa: PLW0603
 
     if _default_device is None:
         _default_device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
@@ -28,7 +28,7 @@ def _init_default_device() -> None:
 
 def _set_default_device(device: Device) -> None:
     # This changes all future tensors, but not any tensor that already exists
-    global _default_device
+    global _default_device  # noqa: PLW0603
 
     _default_device = device
     _init_default_device()
