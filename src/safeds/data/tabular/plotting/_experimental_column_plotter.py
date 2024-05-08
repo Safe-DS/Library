@@ -3,6 +3,7 @@ from __future__ import annotations
 import io
 from typing import TYPE_CHECKING
 
+from safeds._utils import _figure_to_image
 from safeds.data.image.containers import Image
 from safeds.exceptions import NonNumericColumnError
 
@@ -116,8 +117,4 @@ class ExperimentalColumnPlotter:
             ylabel=f"y(t + {lag})",
         )
 
-        buffer = io.BytesIO()
-        fig.savefig(buffer, format="png")
-        plt.close()  # Prevents the figure from being displayed directly
-        buffer.seek(0)
-        return Image.from_bytes(buffer.read())
+        return _figure_to_image(fig)
