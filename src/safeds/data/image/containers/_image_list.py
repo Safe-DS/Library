@@ -204,7 +204,7 @@ class ImageList(metaclass=ABCMeta):
 
         if load_percentage < 1:
             random.shuffle(file_names)
-            file_names = file_names[:round(len(file_names) * load_percentage)]
+            file_names = file_names[:max(round(len(file_names) * load_percentage), 1) if load_percentage > 0 else 0]
 
         num_of_files = len(file_names)
 

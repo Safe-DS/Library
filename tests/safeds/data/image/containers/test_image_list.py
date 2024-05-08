@@ -503,8 +503,8 @@ class TestFromFiles:
             resolve_resource_path(resource_path),
             load_percentage=0.5,
         )
-        assert image_list == snapshot_png_image_list
-        assert len(image_list_load_percentage) == round(len(image_list) * 0.5)
+        assert image_list_load_percentage == snapshot_png_image_list
+        assert len(image_list_load_percentage) == max(round(len(image_list) * 0.5), 1)
 
     @pytest.mark.parametrize(
         "resource_path",
