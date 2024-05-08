@@ -626,7 +626,23 @@ class ExperimentalTable:
         self,
         subset_names: list[str] | None = None,
     ) -> ExperimentalTable:
-        raise NotImplementedError
+        if subset_names is None:
+            subset_names = self.column_names
+
+        import polars as pl
+        import polars.selectors as cs
+
+        non_outlier_mask = pl.all_horizontal(
+            self._data_frame
+                .select(cs.numeric() & cs.by_name(subset_names))
+                .select(
+                    ((pl.all() - pl.all().mean()) / pl.all().std()) <= 3,
+                ),
+        )
+
+        return ExperimentalTable._from_polars_lazy_frame(
+            self._lazy_frame.filter(non_outlier_mask),
+        )
 
     def shuffle_rows(self) -> ExperimentalTable:
         return ExperimentalTable._from_polars_data_frame(
