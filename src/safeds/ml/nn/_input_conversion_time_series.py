@@ -57,10 +57,7 @@ class InputConversionTimeSeries(InputConversion[TimeSeriesDataset, TimeSeriesDat
     ) -> DataLoader:
         self._num_of_classes = num_of_classes
         return input_data._into_dataloader_with_window(
-            self._window_size,
-            self._forecast_horizon,
-            batch_size,
-            continues=self._continues
+            self._window_size, self._forecast_horizon, batch_size, continues=self._continues
         )
 
     def _data_conversion_predict(self, input_data: TimeSeriesDataset, batch_size: int) -> DataLoader:
