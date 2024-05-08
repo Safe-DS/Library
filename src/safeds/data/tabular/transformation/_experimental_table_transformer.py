@@ -143,30 +143,3 @@ class ExperimentalTableTransformer(ABC):
         fitted_transformer = self.fit(table, column_names)
         transformed_table = fitted_transformer.transform(table)
         return fitted_transformer, transformed_table
-
-
-class ExperimentalInvertibleTableTransformer(ExperimentalTableTransformer):
-    """A `TableTransformer` that can also undo the learned transformation after it has been applied."""
-
-    @abstractmethod
-    def inverse_transform(self, transformed_table: ExperimentalTable) -> ExperimentalTable:
-        """
-        Undo the learned transformation.
-
-        The table is not modified.
-
-        Parameters
-        ----------
-        transformed_table:
-            The table to be transformed back to the original version.
-
-        Returns
-        -------
-        table:
-            The original table.
-
-        Raises
-        ------
-        TransformerNotFittedError
-            If the transformer has not been fitted yet.
-        """

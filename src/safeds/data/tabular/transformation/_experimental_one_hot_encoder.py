@@ -4,7 +4,7 @@ import warnings
 from collections import Counter
 from typing import Any
 
-from safeds.data.tabular.containers import Column, ExperimentalTable, Table
+from safeds.data.tabular.containers import Column, ExperimentalTable
 from safeds.exceptions import (
     NonNumericColumnError,
     TransformerNotFittedError,
@@ -12,7 +12,7 @@ from safeds.exceptions import (
     ValueNotPresentWhenFittedError,
 )
 
-from ._experimental_table_transformer import ExperimentalInvertibleTableTransformer
+from ._experimental_invertible_table_transformer import ExperimentalInvertibleTableTransformer
 
 
 class ExperimentalOneHotEncoder(ExperimentalInvertibleTableTransformer):

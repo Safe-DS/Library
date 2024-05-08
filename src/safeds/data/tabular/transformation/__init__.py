@@ -8,11 +8,12 @@ if TYPE_CHECKING:
     from ._discretizer import Discretizer
     from ._experimental_discretizer import ExperimentalDiscretizer
     from ._experimental_imputer import ExperimentalImputer
+    from ._experimental_invertible_table_transformer import ExperimentalInvertibleTableTransformer
     from ._experimental_label_encoder import ExperimentalLabelEncoder
     from ._experimental_one_hot_encoder import ExperimentalOneHotEncoder
     from ._experimental_range_scaler import ExperimentalRangeScaler
     from ._experimental_standard_scaler import ExperimentalStandardScaler
-    from ._experimental_table_transformer import ExperimentalInvertibleTableTransformer, ExperimentalTableTransformer
+    from ._experimental_table_transformer import ExperimentalTableTransformer
     from ._imputer import Imputer
     from ._label_encoder import LabelEncoder
     from ._one_hot_encoder import OneHotEncoder
@@ -26,12 +27,12 @@ apipkg.initpkg(
         "Discretizer": "._discretizer:Discretizer",
         "ExperimentalDiscretizer": "._experimental_discretizer:ExperimentalDiscretizer",
         "ExperimentalImputer": "._experimental_imputer:ExperimentalImputer",
+        "ExperimentalInvertibleTableTransformer": "._experimental_invertible_table_transformer:ExperimentalInvertibleTableTransformer",
         "ExperimentalLabelEncoder": "._experimental_label_encoder:ExperimentalLabelEncoder",
         "ExperimentalOneHotEncoder": "._experimental_one_hot_encoder:Experimental",
         "ExperimentalRangeScaler": "._experimental_range_scaler:ExperimentalRangeScaler",
         "ExperimentalStandardScaler": "._experimental_standard_scaler:ExperimentalStandardScaler",
         "ExperimentalTableTransformer": "._experimental_table_transformer:ExperimentalTableTransformer",
-        "ExperimentalInvertibleTableTransformer": "._experimental_table_transformer:ExperimentalInvertibleTableTransformer",
         "Imputer": "._imputer:Imputer",
         "InvertibleTableTransformer": "._table_transformer:InvertibleTableTransformer",
         "LabelEncoder": "._label_encoder:LabelEncoder",
@@ -46,12 +47,12 @@ __all__ = [
     "Discretizer",
     "ExperimentalDiscretizer",
     "ExperimentalImputer",
+    "ExperimentalInvertibleTableTransformer",
     "ExperimentalLabelEncoder",
     "ExperimentalOneHotEncoder",
     "ExperimentalRangeScaler",
     "ExperimentalStandardScaler",
     "ExperimentalTableTransformer",
-    "ExperimentalInvertibleTableTransformer",
     "Imputer",
     "InvertibleTableTransformer",
     "LabelEncoder",

@@ -3,13 +3,14 @@ from __future__ import annotations
 import warnings
 from typing import TYPE_CHECKING
 
-from safeds.data.tabular.containers import ExperimentalTable, Table
 from safeds.exceptions import NonNumericColumnError, TransformerNotFittedError, UnknownColumnNameError
 
-from ._experimental_table_transformer import ExperimentalInvertibleTableTransformer
+from ._experimental_invertible_table_transformer import ExperimentalInvertibleTableTransformer
 
 if TYPE_CHECKING:
     from sklearn.preprocessing import OrdinalEncoder as sk_OrdinalEncoder
+
+    from safeds.data.tabular.containers import ExperimentalTable
 
 
 class ExperimentalLabelEncoder(ExperimentalInvertibleTableTransformer):

@@ -8,13 +8,14 @@ from typing import TYPE_CHECKING, Any
 import pandas as pd
 
 from safeds._utils import _structural_hash
-from safeds.data.tabular.containers import ExperimentalTable, Table
 from safeds.exceptions import NonNumericColumnError, TransformerNotFittedError, UnknownColumnNameError
 
 from ._experimental_table_transformer import ExperimentalTableTransformer
 
 if TYPE_CHECKING:
     from sklearn.impute import SimpleImputer as sk_SimpleImputer
+
+    from safeds.data.tabular.containers import ExperimentalTable
 
 
 class ExperimentalImputer(ExperimentalTableTransformer):

@@ -2,13 +2,14 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from safeds.data.tabular.containers import ExperimentalTable, Table
 from safeds.exceptions import NonNumericColumnError, TransformerNotFittedError, UnknownColumnNameError
 
-from ._experimental_table_transformer import ExperimentalInvertibleTableTransformer
+from ._experimental_invertible_table_transformer import ExperimentalInvertibleTableTransformer
 
 if TYPE_CHECKING:
     from sklearn.preprocessing import MinMaxScaler as sk_MinMaxScaler
+
+    from safeds.data.tabular.containers import ExperimentalTable
 
 
 class ExperimentalRangeScaler(ExperimentalInvertibleTableTransformer):

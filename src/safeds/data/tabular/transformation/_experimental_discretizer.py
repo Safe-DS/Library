@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from safeds.data.tabular.containers import ExperimentalTable, Table
 from safeds.exceptions import (
     ClosedBound,
     NonNumericColumnError,
@@ -15,6 +14,8 @@ from ._experimental_table_transformer import ExperimentalTableTransformer
 
 if TYPE_CHECKING:
     from sklearn.preprocessing import KBinsDiscretizer as sk_KBinsDiscretizer
+
+    from safeds.data.tabular.containers import ExperimentalTable
 
 
 class ExperimentalDiscretizer(ExperimentalTableTransformer):
@@ -85,7 +86,7 @@ class ExperimentalDiscretizer(ExperimentalTableTransformer):
                 )
 
             for column in column_names:
-                if not table.get_column(column).type.is_numeric():
+                if not table.get_column(column).type.is_numeric:
                     raise NonNumericColumnError(f"{column} is of type {table.get_column(column).type}.")
 
         wrapped_transformer = sk_KBinsDiscretizer(n_bins=self._number_of_bins, encode="ordinal")
@@ -142,7 +143,7 @@ class ExperimentalDiscretizer(ExperimentalTableTransformer):
             )
 
         for column in self._column_names:
-            if not table.get_column(column).type.is_numeric():
+            if not table.get_column(column).type.is_numeric:
                 raise NonNumericColumnError(f"{column} is of type {table.get_column(column).type}.")
 
         data = table._data.reset_index(drop=True)
@@ -173,7 +174,6 @@ class ExperimentalDiscretizer(ExperimentalTableTransformer):
             raise TransformerNotFittedError
         return []
 
-    # (Must implement abstract method, cannot instantiate class otherwise.)
     def get_names_of_changed_columns(self) -> list[str]:
         """
          Get the names of all columns that may have been changed by the Discretizer.
