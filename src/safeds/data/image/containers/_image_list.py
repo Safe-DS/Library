@@ -5,6 +5,7 @@ import math
 import os
 from abc import ABCMeta, abstractmethod
 from pathlib import Path
+from threading import Thread
 from typing import TYPE_CHECKING, Literal, overload
 
 from safeds._config import _init_default_device
@@ -186,9 +187,31 @@ class ImageList(metaclass=ABCMeta):
                 image_indices[im_size][im_channel].append(i)
                 image_count[im_size] += 1
 
+        num_of_threads = min(math.ceil(num_of_files / 1000), 100)
+        num_of_files_per_thread = math.ceil(num_of_files / num_of_threads)
+
         single_sized_image_lists = []
+        thread_packages = []
         for size, image_files in image_sizes.items():
-            single_sized_image_lists.append(_SingleSizeImageList._create_image_list_from_files(image_files, image_count[size], max_channel, size[0], size[1], image_indices[size])._as_single_size_image_list())
+            im_list, packages = _SingleSizeImageList._create_image_list_from_files(image_files, image_count[size], max_channel, size[0], size[1], image_indices[size], num_of_files_per_thread)
+            single_sized_image_lists.append(im_list._as_single_size_image_list())
+            thread_packages += packages
+        thread_packages.sort(key=lambda x: len(x), reverse=True)
+
+        threads: list[None | ImageList._FromImageThread] = [None] * num_of_threads
+        for thread_index in range(num_of_threads):
+            current_thread_workload = 0
+            current_thread_packages = []
+            while current_thread_workload < num_of_files_per_thread and len(thread_packages) > 0:
+                next_package = thread_packages.pop()
+                current_thread_packages.append(next_package)
+                current_thread_workload += len(next_package)
+            if thread_index == num_of_threads - 1 and len(thread_packages) > 0:
+                current_thread_packages += thread_packages
+            threads[thread_index] = ImageList._FromImageThread(current_thread_packages)
+            threads[thread_index].start()
+        for thread in threads:
+            thread.join()
 
         if len(single_sized_image_lists) == 1:
             image_list = single_sized_image_lists[0]
@@ -199,6 +222,45 @@ class ImageList(metaclass=ABCMeta):
             return image_list, file_names
         else:
             return image_list
+
+    class _FromFileThreadPackage:
+
+        def __init__(self, im_files: list[str], im_channel: int, to_channel: int, im_width: int, im_height: int,
+                     tensor: Tensor, start_index: int) -> None:
+            self._im_files = im_files
+            self._im_channel = im_channel
+            self._to_channel = to_channel
+            self._im_width = im_width
+            self._im_height = im_height
+            self._tensor = tensor
+            self._start_index = start_index
+
+        def load_files(self) -> None:
+            import torch
+            from torchvision.io import read_image
+
+            _init_default_device()
+
+            num_of_files = len(self._im_files)
+            tensor_channel = max(self._im_channel, min(self._to_channel, 3))
+            for index, im in enumerate(self._im_files):
+                self._tensor[index + self._start_index, 0:tensor_channel] = read_image(im)
+            if self._to_channel == 4 and self._im_channel < 4:
+                torch.full((num_of_files, 1, self._im_height, self._im_width), 255,
+                           out=self._tensor[self._start_index:self._start_index + num_of_files, 3:4])
+
+        def __len__(self) -> int:
+            return len(self._im_files)
+
+    class _FromImageThread(Thread):
+
+        def __init__(self, packages: list[ImageList._FromFileThreadPackage]) -> None:
+            super().__init__()
+            self._packages = packages
+
+        def run(self):
+            for pck in self._packages:
+                pck.load_files()
 
     @abstractmethod
     def _clone(self) -> ImageList:

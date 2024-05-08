@@ -61,37 +61,41 @@ class _SingleSizeImageList(ImageList):
         self._indices_to_tensor_positions: dict[int, int] = {}  # {index: tensor_position}
 
     @staticmethod
-    def _create_image_list_from_files(images: dict[int, list[str]], number_of_images: int, max_channel: int, width: int, height: int, indices: dict[int, list[int]]) -> ImageList:
+    def _create_image_list_from_files(images: dict[int, list[str]], number_of_images: int, max_channel: int, width: int, height: int, indices: dict[int, list[int]], max_files_per_thread_package: int) -> tuple[ImageList, list[ImageList._FromFileThreadPackage]]:
         import torch
-        from torchvision.io import read_image
 
         _init_default_device()
 
         from safeds.data.image.containers._empty_image_list import _EmptyImageList
 
         if len(images) == 0 or number_of_images == 0:
-            return _EmptyImageList()
+            return _EmptyImageList(), []
 
         image_list = _SingleSizeImageList()
 
         images_tensor = torch.empty(number_of_images, max_channel, height, width, dtype=torch.uint8, device=_get_device())
 
-        num_saved_images = 0
-
-        for c in images:
-            c_len = len(images[c])
-            t_channel = max(c, min(max_channel, 3))
-            for index, im in enumerate(images[c]):
-                images_tensor[index + num_saved_images, 0:t_channel] = read_image(im)
-            if max_channel == 4 and c < 4:
-                torch.full((c_len, 1, height, width), 255, out=images_tensor[num_saved_images:num_saved_images + c_len, 3:4])
-
-            num_saved_images += c_len
+        thread_packages: list[ImageList._FromFileThreadPackage] = []
+        current_thread_channel: int | None = None
+        current_thread_channel_files: list[str] = []
+        current_thread_start_index: int = 0
+        while number_of_images - current_thread_start_index > 0:
+            num_of_files = min(max_files_per_thread_package, number_of_images - current_thread_start_index)
+            while num_of_files > 0:
+                if current_thread_channel is None or len(current_thread_channel_files) == 0:
+                    current_thread_channel = next(iter(images.keys()))
+                    current_thread_channel_files = images.pop(current_thread_channel)
+                next_package_size = min(num_of_files, len(current_thread_channel_files))
+                package = ImageList._FromFileThreadPackage(current_thread_channel_files[:next_package_size], current_thread_channel, max_channel, width, height, images_tensor, current_thread_start_index)
+                current_thread_start_index += next_package_size
+                num_of_files -= next_package_size
+                current_thread_channel_files = current_thread_channel_files[next_package_size:]
+                thread_packages.append(package)
 
         image_list._tensor = images_tensor
         image_list._tensor_positions_to_indices = [i for j in indices.values() for i in j]
         image_list._indices_to_tensor_positions = image_list._calc_new_indices_to_tensor_positions()
-        return image_list
+        return image_list, thread_packages
 
     @staticmethod
     def _create_image_list(images: list[Tensor], indices: list[int]) -> ImageList:
