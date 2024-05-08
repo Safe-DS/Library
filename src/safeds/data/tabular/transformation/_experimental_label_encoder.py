@@ -3,14 +3,13 @@ from __future__ import annotations
 import warnings
 from typing import TYPE_CHECKING
 
+from safeds.data.tabular.containers import ExperimentalTable
 from safeds.exceptions import NonNumericColumnError, TransformerNotFittedError, UnknownColumnNameError
 
 from ._experimental_invertible_table_transformer import ExperimentalInvertibleTableTransformer
 
 if TYPE_CHECKING:
     from sklearn.preprocessing import OrdinalEncoder as sk_OrdinalEncoder
-
-    from safeds.data.tabular.containers import ExperimentalTable
 
 
 class ExperimentalLabelEncoder(ExperimentalInvertibleTableTransformer):
@@ -57,17 +56,23 @@ class ExperimentalLabelEncoder(ExperimentalInvertibleTableTransformer):
         if table.number_of_rows == 0:
             raise ValueError("The LabelEncoder cannot transform the table because it contains 0 rows")
 
-        if table.keep_only_columns(column_names).remove_columns_with_non_numerical_values().number_of_columns > 0:
+        if table.remove_columns_except(column_names).remove_non_numeric_columns().number_of_columns > 0:
             warnings.warn(
                 "The columns"
-                f" {table.keep_only_columns(column_names).remove_columns_with_non_numerical_values().column_names} contain"
+                f" {table.remove_columns_except(column_names).remove_non_numeric_columns().column_names} contain"
                 " numerical data. The LabelEncoder is designed to encode non-numerical values into numerical values",
                 UserWarning,
                 stacklevel=2,
             )
 
+        # TODO: use polars Enum type instead:
+        # my_enum = pl.Enum(['A', 'B', 'C']) <-- create this from the given order
+        # my_data = pl.Series(['A', 'A', 'B'], dtype=my_enum)
         wrapped_transformer = sk_OrdinalEncoder()
-        wrapped_transformer.fit(table._data[column_names])
+        wrapped_transformer.set_output(transform="polars")
+        wrapped_transformer.fit(
+            table.remove_columns_except(column_names)._data_frame,
+        )
 
         result = ExperimentalLabelEncoder()
         result._wrapped_transformer = wrapped_transformer
@@ -112,10 +117,12 @@ class ExperimentalLabelEncoder(ExperimentalInvertibleTableTransformer):
         if table.number_of_rows == 0:
             raise ValueError("The LabelEncoder cannot transform the table because it contains 0 rows")
 
-        data = table._data.reset_index(drop=True)
-        data.columns = table.column_names
-        data[self._column_names] = self._wrapped_transformer.transform(data[self._column_names])
-        return Table._from_pandas_dataframe(data)
+        new_data = self._wrapped_transformer.transform(
+            table.remove_columns_except(self._column_names)._data_frame,
+        )
+        return ExperimentalTable._from_polars_lazy_frame(
+            table._lazy_frame.update(new_data),
+        )
 
     def inverse_transform(self, transformed_table: ExperimentalTable) -> ExperimentalTable:
         """
@@ -130,7 +137,7 @@ class ExperimentalLabelEncoder(ExperimentalInvertibleTableTransformer):
 
         Returns
         -------
-        table:
+        original_table:
             The original table.
 
         Raises
@@ -155,26 +162,28 @@ class ExperimentalLabelEncoder(ExperimentalInvertibleTableTransformer):
         if transformed_table.number_of_rows == 0:
             raise ValueError("The LabelEncoder cannot inverse transform the table because it contains 0 rows")
 
-        if transformed_table.keep_only_columns(
+        if transformed_table.remove_columns_except(
             self._column_names,
-        ).remove_columns_with_non_numerical_values().number_of_columns < len(self._column_names):
+        ).remove_non_numeric_columns().number_of_columns < len(self._column_names):
             raise NonNumericColumnError(
                 str(
                     sorted(
                         set(self._column_names)
                         - set(
-                            transformed_table.keep_only_columns(self._column_names)
-                            .remove_columns_with_non_numerical_values()
+                            transformed_table.remove_columns_except(self._column_names)
+                            .remove_non_numeric_columns()
                             .column_names,
                         ),
                     ),
                 ),
             )
 
-        data = transformed_table._data.reset_index(drop=True)
-        data.columns = transformed_table.column_names
-        data[self._column_names] = self._wrapped_transformer.inverse_transform(data[self._column_names])
-        return Table._from_pandas_dataframe(data)
+        new_data = self._wrapped_transformer.inverse_transform(
+            transformed_table.remove_columns_except(self._column_names)._data_frame,
+        )
+        return ExperimentalTable._from_polars_lazy_frame(
+            transformed_table._lazy_frame.update(new_data),
+        )
 
     @property
     def is_fitted(self) -> bool:

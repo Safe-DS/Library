@@ -210,7 +210,7 @@ def predict(
                 " remove the missing values entirely you can use the method `Table.remove_rows_with_missing_values`.",
             )
 
-        dataset_df = dataset.remove_columns_by_name(feature_names, keep_only_listed=True)
+        dataset_df = dataset.remove_columns_except(feature_names)
 
         try:
             with warnings.catch_warnings():

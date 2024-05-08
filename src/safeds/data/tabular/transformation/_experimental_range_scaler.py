@@ -77,16 +77,16 @@ class ExperimentalRangeScaler(ExperimentalInvertibleTableTransformer):
             raise ValueError("The RangeScaler cannot be fitted because the table contains 0 rows")
 
         if (
-            table.keep_only_columns(column_names).remove_columns_with_non_numerical_values().number_of_columns
-            < table.keep_only_columns(column_names).number_of_columns
+            table.remove_columns_except(column_names).remove_non_numeric_columns().number_of_columns
+            < table.remove_columns_except(column_names).number_of_columns
         ):
             raise NonNumericColumnError(
                 str(
                     sorted(
-                        set(table.keep_only_columns(column_names).column_names)
+                        set(table.remove_columns_except(column_names).column_names)
                         - set(
-                            table.keep_only_columns(column_names)
-                            .remove_columns_with_non_numerical_values()
+                            table.remove_columns_except(column_names)
+                            .remove_non_numeric_columns()
                             .column_names,
                         ),
                     ),
@@ -94,7 +94,10 @@ class ExperimentalRangeScaler(ExperimentalInvertibleTableTransformer):
             )
 
         wrapped_transformer = sk_MinMaxScaler((self._minimum, self._maximum))
-        wrapped_transformer.fit(table._data[column_names])
+        wrapped_transformer.set_output(transform="polars")
+        wrapped_transformer.fit(
+            table.remove_columns_except(column_names)._data_frame,
+        )
 
         result = ExperimentalRangeScaler()
         result._wrapped_transformer = wrapped_transformer
@@ -142,26 +145,28 @@ class ExperimentalRangeScaler(ExperimentalInvertibleTableTransformer):
             raise ValueError("The RangeScaler cannot transform the table because it contains 0 rows")
 
         if (
-            table.keep_only_columns(self._column_names).remove_columns_with_non_numerical_values().number_of_columns
-            < table.keep_only_columns(self._column_names).number_of_columns
+            table.remove_columns_except(self._column_names).remove_non_numeric_columns().number_of_columns
+            < table.remove_columns_except(self._column_names).number_of_columns
         ):
             raise NonNumericColumnError(
                 str(
                     sorted(
-                        set(table.keep_only_columns(self._column_names).column_names)
+                        set(table.remove_columns_except(self._column_names).column_names)
                         - set(
-                            table.keep_only_columns(self._column_names)
-                            .remove_columns_with_non_numerical_values()
+                            table.remove_columns_except(self._column_names)
+                            .remove_non_numeric_columns()
                             .column_names,
                         ),
                     ),
                 ),
             )
 
-        data = table._data.reset_index(drop=True)
-        data.columns = table.column_names
-        data[self._column_names] = self._wrapped_transformer.transform(data[self._column_names])
-        return Table._from_pandas_dataframe(data)
+        new_data = self._wrapped_transformer.transform(
+            table.remove_columns_except(self._column_names)._data_frame,
+        )
+        return ExperimentalTable._from_polars_lazy_frame(
+            table._lazy_frame.update(new_data),
+        )
 
     def inverse_transform(self, transformed_table: ExperimentalTable) -> ExperimentalTable:
         """
@@ -176,7 +181,7 @@ class ExperimentalRangeScaler(ExperimentalInvertibleTableTransformer):
 
         Returns
         -------
-        table:
+        original_table:
             The original table.
 
         Raises
@@ -202,28 +207,30 @@ class ExperimentalRangeScaler(ExperimentalInvertibleTableTransformer):
             raise ValueError("The RangeScaler cannot transform the table because it contains 0 rows")
 
         if (
-            transformed_table.keep_only_columns(self._column_names)
-            .remove_columns_with_non_numerical_values()
+            transformed_table.remove_columns_except(self._column_names)
+            .remove_non_numeric_columns()
             .number_of_columns
-            < transformed_table.keep_only_columns(self._column_names).number_of_columns
+            < transformed_table.remove_columns_except(self._column_names).number_of_columns
         ):
             raise NonNumericColumnError(
                 str(
                     sorted(
-                        set(transformed_table.keep_only_columns(self._column_names).column_names)
+                        set(transformed_table.remove_columns_except(self._column_names).column_names)
                         - set(
-                            transformed_table.keep_only_columns(self._column_names)
-                            .remove_columns_with_non_numerical_values()
+                            transformed_table.remove_columns_except(self._column_names)
+                            .remove_non_numeric_columns()
                             .column_names,
                         ),
                     ),
                 ),
             )
 
-        data = transformed_table._data.reset_index(drop=True)
-        data.columns = transformed_table.column_names
-        data[self._column_names] = self._wrapped_transformer.inverse_transform(data[self._column_names])
-        return Table._from_pandas_dataframe(data)
+        new_data = self._wrapped_transformer.inverse_transform(
+            transformed_table.remove_columns_except(self._column_names)._data_frame,
+        )
+        return ExperimentalTable._from_polars_lazy_frame(
+            transformed_table._lazy_frame.update(new_data),
+        )
 
     @property
     def is_fitted(self) -> bool:

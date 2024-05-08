@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from safeds.data.tabular.containers import ExperimentalTable
 from safeds.exceptions import (
     ClosedBound,
     NonNumericColumnError,
@@ -14,8 +15,6 @@ from ._experimental_table_transformer import ExperimentalTableTransformer
 
 if TYPE_CHECKING:
     from sklearn.preprocessing import KBinsDiscretizer as sk_KBinsDiscretizer
-
-    from safeds.data.tabular.containers import ExperimentalTable
 
 
 class ExperimentalDiscretizer(ExperimentalTableTransformer):
@@ -90,7 +89,10 @@ class ExperimentalDiscretizer(ExperimentalTableTransformer):
                     raise NonNumericColumnError(f"{column} is of type {table.get_column(column).type}.")
 
         wrapped_transformer = sk_KBinsDiscretizer(n_bins=self._number_of_bins, encode="ordinal")
-        wrapped_transformer.fit(table._data[column_names])
+        wrapped_transformer.set_output(transform="polars")
+        wrapped_transformer.fit(
+            table.remove_columns_except(column_names)._data_frame,
+        )
 
         result = ExperimentalDiscretizer(self._number_of_bins)
         result._wrapped_transformer = wrapped_transformer
@@ -146,10 +148,12 @@ class ExperimentalDiscretizer(ExperimentalTableTransformer):
             if not table.get_column(column).type.is_numeric:
                 raise NonNumericColumnError(f"{column} is of type {table.get_column(column).type}.")
 
-        data = table._data.reset_index(drop=True)
-        data.columns = table.column_names
-        data[self._column_names] = self._wrapped_transformer.transform(data[self._column_names])
-        return Table._from_pandas_dataframe(data)
+        new_data = self._wrapped_transformer.transform(
+            table.remove_columns_except(self._column_names)._data_frame,
+        )
+        return ExperimentalTable._from_polars_lazy_frame(
+            table._lazy_frame.update(new_data),
+        )
 
     @property
     def is_fitted(self) -> bool:

@@ -12,6 +12,10 @@ if TYPE_CHECKING:
 class ExperimentalTableTransformer(ABC):
     """Learn a transformation for a set of columns in a `Table` and transform another `Table` with the same columns."""
 
+    # ------------------------------------------------------------------------------------------------------------------
+    # Dunder methods
+    # ------------------------------------------------------------------------------------------------------------------
+
     def __hash__(self) -> int:
         """
         Return a deterministic hash value for a table transformer.
@@ -26,10 +30,18 @@ class ExperimentalTableTransformer(ABC):
         removed = self.get_names_of_removed_columns() if self.is_fitted else []
         return _structural_hash(self.__class__.__qualname__, self.is_fitted, added, changed, removed)
 
+    # ------------------------------------------------------------------------------------------------------------------
+    # Properties
+    # ------------------------------------------------------------------------------------------------------------------
+
     @property
     @abstractmethod
     def is_fitted(self) -> bool:
         """Whether the transformer is fitted."""
+
+    # ------------------------------------------------------------------------------------------------------------------
+    # Methods
+    # ------------------------------------------------------------------------------------------------------------------
 
     @abstractmethod
     def fit(self, table: ExperimentalTable, column_names: list[str] | None) -> Self:
@@ -122,7 +134,10 @@ class ExperimentalTableTransformer(ABC):
             If the transformer has not been fitted yet.
         """
 
-    def fit_and_transform(self, table: ExperimentalTable, column_names: list[str] | None = None) -> tuple[Self, ExperimentalTable]:
+    def fit_and_transform(
+        self,
+        table: ExperimentalTable, column_names: list[str] | None = None
+    ) -> tuple[Self, ExperimentalTable]:
         """
         Learn a transformation for a set of columns in a table and apply the learned transformation to the same table.
 
@@ -137,8 +152,10 @@ class ExperimentalTableTransformer(ABC):
 
         Returns
         -------
-        fitted_transformer, transformed_table:
-            The fitted transformer and the transformed table.:
+        fitted_transformer:
+            The fitted transformer.
+        transformed_table:
+            The transformed table.
         """
         fitted_transformer = self.fit(table, column_names)
         transformed_table = fitted_transformer.transform(table)

@@ -26,7 +26,7 @@ class ExperimentalInvertibleTableTransformer(ExperimentalTableTransformer):
 
         Returns
         -------
-        table:
+        original_table:
             The original table.
 
         Raises

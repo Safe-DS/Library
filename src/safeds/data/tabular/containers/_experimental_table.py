@@ -248,14 +248,14 @@ class ExperimentalTable:
     def _from_polars_data_frame(data: pl.DataFrame) -> ExperimentalTable:
         result = object.__new__(ExperimentalTable)
         result._lazy_frame = data.lazy()
-        result._data_frame_cache = data
+        result.__data_frame_cache = data
         return result
 
     @staticmethod
     def _from_polars_lazy_frame(data: pl.LazyFrame) -> ExperimentalTable:
         result = object.__new__(ExperimentalTable)
         result._lazy_frame = data
-        result._data_frame_cache = None
+        result.__data_frame_cache = None
         return result
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -280,7 +280,7 @@ class ExperimentalTable:
 
         # Implementation
         self._lazy_frame: pl.LazyFrame = pl.LazyFrame(data)
-        self._data_frame_cache: pl.DataFrame | None = None
+        self.__data_frame_cache: pl.DataFrame | None = None
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, ExperimentalTable):
@@ -308,10 +308,10 @@ class ExperimentalTable:
 
     @property
     def _data_frame(self) -> pl.DataFrame:
-        if self._data_frame_cache is None:
-            self._data_frame_cache = self._lazy_frame.collect()
+        if self.__data_frame_cache is None:
+            self.__data_frame_cache = self._lazy_frame.collect()
 
-        return self._data_frame_cache
+        return self.__data_frame_cache
 
     @property
     def column_names(self) -> list[str]:

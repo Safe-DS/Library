@@ -150,6 +150,24 @@ class ExperimentalColumn(Sequence[T]):
     # Value operations
     # ------------------------------------------------------------------------------------------------------------------
 
+    def get_distinct_values(self) -> list[T]:
+        """
+        Return the distinct values in the column.
+
+        Returns
+        -------
+        distinct_values:
+            The distinct values in the column.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import ExperimentalColumn
+        >>> column = ExperimentalColumn("test", [1, 2, 3, 2])
+        >>> column.get_distinct_values()
+        [1, 2, 3]
+        """
+        return self._series.unique().sort().to_list()
+
     def get_value(self, index: int) -> T:
         """
         Return the column value at specified index. Indexing starts at 0.
