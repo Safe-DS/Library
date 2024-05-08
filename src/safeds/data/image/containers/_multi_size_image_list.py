@@ -72,8 +72,8 @@ class _MultiSizeImageList(ImageList):
 
         if different_channels:
             for size in image_list._image_list_dict:
-                if image_list._image_list_dict[size].channel != max_channel:
-                    image_list._image_list_dict[size] = image_list._image_list_dict[size].change_channel(max_channel)
+                if max_channel is not None and image_list._image_list_dict[size].channel != max_channel:
+                    image_list._image_list_dict[size] = image_list._image_list_dict[size].change_channel(int(max_channel))
         return image_list
 
     @staticmethod

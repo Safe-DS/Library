@@ -246,7 +246,7 @@ class ImageList(metaclass=ABCMeta):
             thread_packages += packages
         thread_packages.sort(key=lambda x: len(x), reverse=True)
 
-        threads: list[None | ImageList._FromImageThread] = [None] * num_of_threads
+        threads: list[ImageList._FromImageThread] = []
         for thread_index in range(num_of_threads):
             current_thread_workload = 0
             current_thread_packages = []
@@ -256,13 +256,14 @@ class ImageList(metaclass=ABCMeta):
                 current_thread_workload += len(next_package)
             if thread_index == num_of_threads - 1 and len(thread_packages) > 0:
                 current_thread_packages += thread_packages
-            threads[thread_index] = ImageList._FromImageThread(current_thread_packages)
-            threads[thread_index].start()
+            thread = ImageList._FromImageThread(current_thread_packages)
+            threads.append(thread)
+            thread.start()
         for thread in threads:
             thread.join()
 
         if len(single_sized_image_lists) == 1:
-            image_list = single_sized_image_lists[0]
+            image_list: ImageList = single_sized_image_lists[0]
         else:
             image_list = _MultiSizeImageList._create_from_single_sized_image_lists(single_sized_image_lists)
 
@@ -306,7 +307,7 @@ class ImageList(metaclass=ABCMeta):
             super().__init__()
             self._packages = packages
 
-        def run(self):
+        def run(self) -> None:
             for pck in self._packages:
                 pck.load_files()
 
