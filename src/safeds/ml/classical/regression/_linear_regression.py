@@ -11,8 +11,8 @@ if TYPE_CHECKING:
     from sklearn.base import RegressorMixin
     from sklearn.linear_model import LinearRegression as sk_LinearRegression
 
-    from safeds.data.labeled.containers import TabularDataset
-    from safeds.data.tabular.containers import Table
+    from safeds.data.labeled.containers import ExperimentalTabularDataset, TabularDataset
+    from safeds.data.tabular.containers import ExperimentalTable, Table
 
 
 class LinearRegressionRegressor(Regressor):
@@ -27,7 +27,7 @@ class LinearRegressionRegressor(Regressor):
         self._feature_names: list[str] | None = None
         self._target_name: str | None = None
 
-    def fit(self, training_set: TabularDataset) -> LinearRegressionRegressor:
+    def fit(self, training_set: TabularDataset | ExperimentalTabularDataset) -> LinearRegressionRegressor:
         """
         Create a copy of this regressor and fit it with the given training data.
 
@@ -66,7 +66,7 @@ class LinearRegressionRegressor(Regressor):
 
         return result
 
-    def predict(self, dataset: Table) -> TabularDataset:
+    def predict(self, dataset: Table | ExperimentalTable | ExperimentalTabularDataset) -> TabularDataset:
         """
         Predict a target vector using a dataset containing feature vectors. The model has to be trained first.
 

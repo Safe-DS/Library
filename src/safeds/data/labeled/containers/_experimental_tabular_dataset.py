@@ -139,7 +139,7 @@ class ExperimentalTabularDataset:
 
     def _repr_html_(self) -> str:
         """
-        Return an HTML representation of the tabular dataset.
+        Return a compact HTML representation of the tabular dataset for IPython.
 
         Returns
         -------

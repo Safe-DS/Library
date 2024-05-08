@@ -3,8 +3,8 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from safeds._utils import _structural_hash
-from safeds.data.labeled.containers import TabularDataset
-from safeds.data.tabular.containers import Table
+from safeds.data.labeled.containers import ExperimentalTabularDataset, TabularDataset
+from safeds.data.tabular.containers import ExperimentalTable, Table
 from safeds.exceptions import ClosedBound, DatasetMissesDataError, OutOfBoundsError, PlainTableError
 from safeds.ml.classical._util_sklearn import fit, predict
 
@@ -64,7 +64,7 @@ class KNearestNeighborsClassifier(Classifier):
         """
         return self._number_of_neighbors
 
-    def fit(self, training_set: TabularDataset) -> KNearestNeighborsClassifier:
+    def fit(self, training_set: TabularDataset | ExperimentalTabularDataset) -> KNearestNeighborsClassifier:
         """
         Create a copy of this classifier and fit it with the given training data.
 
@@ -116,7 +116,7 @@ class KNearestNeighborsClassifier(Classifier):
 
         return result
 
-    def predict(self, dataset: Table) -> TabularDataset:
+    def predict(self, dataset: Table | ExperimentalTable | ExperimentalTabularDataset) -> TabularDataset:
         """
         Predict a target vector using a dataset containing feature vectors. The model has to be trained first.
 

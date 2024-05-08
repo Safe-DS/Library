@@ -13,8 +13,8 @@ if TYPE_CHECKING:
     from sklearn.base import RegressorMixin
     from sklearn.linear_model import Lasso as sk_Lasso
 
-    from safeds.data.labeled.containers import TabularDataset
-    from safeds.data.tabular.containers import Table
+    from safeds.data.labeled.containers import ExperimentalTabularDataset, TabularDataset
+    from safeds.data.tabular.containers import ExperimentalTable, Table
 
 
 class LassoRegressor(Regressor):
@@ -68,7 +68,7 @@ class LassoRegressor(Regressor):
         """
         return self._alpha
 
-    def fit(self, training_set: TabularDataset) -> LassoRegressor:
+    def fit(self, training_set: TabularDataset | ExperimentalTabularDataset) -> LassoRegressor:
         """
         Create a copy of this regressor and fit it with the given training data.
 
@@ -107,7 +107,7 @@ class LassoRegressor(Regressor):
 
         return result
 
-    def predict(self, dataset: Table) -> TabularDataset:
+    def predict(self, dataset: Table | ExperimentalTable | ExperimentalTabularDataset) -> TabularDataset:
         """
         Predict a target vector using a dataset containing feature vectors. The model has to be trained first.
 
