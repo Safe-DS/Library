@@ -542,14 +542,21 @@ class TestFromFiles:
 
     def test_create_from_single_sized_image_lists_one_image_list(self, device: Device) -> None:
         configure_test_with_device(device)
-        assert isinstance(_MultiSizeImageList()._create_from_single_sized_image_lists([ImageList.from_files(resolve_resource_path(plane_png_path))._as_single_size_image_list()]), _SingleSizeImageList)
+        assert isinstance(
+            _MultiSizeImageList()._create_from_single_sized_image_lists(
+                [ImageList.from_files(resolve_resource_path(plane_png_path))._as_single_size_image_list()]
+            ),
+            _SingleSizeImageList,
+        )
 
     @pytest.mark.parametrize(
         "resource_path",
         [images_all()],
         ids=["all-images"],
     )
-    def test_create_from_single_sized_image_lists(self, resource_path: str | Path, snapshot_png_image_list: SnapshotAssertion, device: Device) -> None:
+    def test_create_from_single_sized_image_lists(
+        self, resource_path: str | Path, snapshot_png_image_list: SnapshotAssertion, device: Device
+    ) -> None:
         configure_test_with_device(device)
         image_lists = ImageList.from_files(resolve_resource_path(resource_path))
         single_sized_image_lists = []
@@ -1507,7 +1514,9 @@ class TestEmptyImageList:
 
     def test_create_image_list_from_files(self, device: Device) -> None:
         configure_test_with_device(device)
-        assert isinstance(_SingleSizeImageList()._create_image_list_from_files({}, 0, 4, 1, 1, {}, 5)[0], _EmptyImageList)
+        assert isinstance(
+            _SingleSizeImageList()._create_image_list_from_files({}, 0, 4, 1, 1, {}, 5)[0], _EmptyImageList
+        )
 
     def test_create_from_single_sized_image_lists(self, device: Device) -> None:
         configure_test_with_device(device)
