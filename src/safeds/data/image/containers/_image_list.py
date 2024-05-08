@@ -158,7 +158,7 @@ class ImageList(metaclass=ABCMeta):
         return_filenames:
             if True the output will be a tuple which contains a list of the filenames in order of the images
         load_percentage:
-            what percentage of the data given will be loaded. If below 1 the files will be shuffled before loading
+            the percentage of the given data being loaded. If below 1 the files will be shuffled before loading
 
         Returns
         -------
