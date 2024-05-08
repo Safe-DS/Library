@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING, Any, Literal
 
 from safeds._utils import _check_and_normalize_file_path, _structural_hash
 from safeds._utils._random import _get_random_seed
+from safeds.data.labeled.containers import ExperimentalTabularDataset
 from safeds.data.tabular.plotting._experimental_table_plotter import ExperimentalTablePlotter
 from safeds.data.tabular.typing._experimental_polars_data_type import _PolarsDataType
 from safeds.data.tabular.typing._experimental_polars_schema import _PolarsSchema
@@ -27,7 +28,6 @@ if TYPE_CHECKING:
 
     import polars as pl
 
-    from safeds.data.labeled.containers import TabularDataset
     from safeds.data.tabular.transformation import InvertibleTableTransformer, TableTransformer
     from safeds.data.tabular.typing import ExperimentalSchema
     from safeds.data.tabular.typing._experimental_data_type import ExperimentalDataType
@@ -432,8 +432,8 @@ class ExperimentalTable:
             names = [names]
 
         if keep_only_listed:
-            names_set = set(names)
-            names = [name for name in self.column_names if name not in names_set]
+            names_to_keep = set(names)  # perf: Comprehensions evaluate their condition every iteration
+            names = [name for name in self.column_names if name not in names_to_keep]
 
         return ExperimentalTable._from_polars_lazy_frame(
             self._lazy_frame.drop(names),
@@ -742,11 +742,14 @@ class ExperimentalTable:
         )
 
     def inverse_transform_table(self, fitted_transformer: InvertibleTableTransformer) -> ExperimentalTable:
-        """Not implemented yet. Convert to the old table implementation first using `temporary_to_old_table`."""
+        # TODO: more efficient implementation
+        # old_table = self.temporary_to_old_table().inverse_transform_table(fitted_transformer)
+        # return ExperimentalTable._from_polars_data_frame(
+        #     pl.DataFrame(old_table.)
+        # )
         raise NotImplementedError
 
     def transform_table(self, fitted_transformer: TableTransformer) -> ExperimentalTable:
-        """Not implemented yet. Convert to the old table implementation first using `temporary_to_old_table`."""
         raise NotImplementedError
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -897,14 +900,14 @@ class ExperimentalTable:
 
         self._lazy_frame.sink_parquet(path)
 
-    def to_tabular_dataset(self, target_name: str, extra_names: list[str] | None = None) -> TabularDataset:
+    def to_tabular_dataset(self, target_name: str, extra_names: list[str] | None = None) -> ExperimentalTabularDataset:
         """
         Return a new `TabularDataset` with columns marked as a target, feature, or extra.
 
         * The target column is the column that a model should predict.
         * Feature columns are columns that a model should use to make predictions.
         * Extra columns are columns that are neither feature nor target. They can be used to provide additional context,
-          like an ID or name column.
+          like an ID column.
 
         Feature columns are implicitly defined as all columns except the target and extra columns. If no extra columns
         are specified, all columns except the target column are used as features.
@@ -941,10 +944,7 @@ class ExperimentalTable:
         ... )
         >>> dataset = table.to_tabular_dataset(target_name="amount_bought", extra_names=["item"])
         """
-        from safeds.data.labeled.containers import TabularDataset
-
-        # TODO: more efficient implementation
-        return TabularDataset(self.temporary_to_old_table(), target_name, extra_names)
+        return ExperimentalTabularDataset(self, target_name, extra_names)
 
     def temporary_to_old_table(self) -> Table:
         """
