@@ -15,9 +15,13 @@ def _run_remove_non_numeric_columns() -> None:
     table.remove_non_numeric_columns()._lazy_frame.collect()
 
 
+def _run_summarize_statistics() -> None:
+    table.summarize_statistics()._lazy_frame.collect()
+
+
 if __name__ == "__main__":
     # Create a synthetic Table
-    table = create_synthetic_table_polars(100, 50000)
+    table = create_synthetic_table_polars(100, 5000)
 
     # Run the benchmarks
     timings: dict[str, float] = {
@@ -27,6 +31,10 @@ if __name__ == "__main__":
         ),
         "remove_non_numeric_columns": timeit(
             _run_remove_non_numeric_columns,
+            number=REPETITIONS,
+        ),
+        "summarize_statistics": timeit(
+            _run_summarize_statistics,
             number=REPETITIONS,
         ),
     }

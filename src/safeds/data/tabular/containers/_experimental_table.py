@@ -754,11 +754,17 @@ class ExperimentalTable:
     # ------------------------------------------------------------------------------------------------------------------
 
     def summarize_statistics(self) -> ExperimentalTable:
-        if not self._data_frame:
-            self._data_frame = self._lazy_frame.collect()
+        if self.number_of_columns == 0:
+            return ExperimentalTable()
+
+        head = self.get_column(self.column_names[0]).summarize_statistics()
+        tail = [
+            self.get_column(name).summarize_statistics().get_column(name)._series
+            for name in self.column_names[1:]
+        ]
 
         return ExperimentalTable._from_polars_data_frame(
-            []
+            head._lazy_frame.collect().hstack(tail, in_place=True),
         )
 
     # ------------------------------------------------------------------------------------------------------------------

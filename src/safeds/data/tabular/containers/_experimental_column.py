@@ -12,7 +12,7 @@ from ._column import Column
 from ._experimental_vectorized_cell import _VectorizedCell
 
 if TYPE_CHECKING:
-    from polars import Series
+    from polars import Series, InvalidOperationError
 
     from safeds.data.tabular.typing._experimental_data_type import ExperimentalDataType
 
@@ -412,7 +412,7 @@ class ExperimentalColumn(Sequence[T]):
         >>> from safeds.data.tabular.containers import ExperimentalColumn
         >>> column = ExperimentalColumn("a", [1, 3])
         >>> column.summarize_statistics()
-        shape: (10, 2)
+        shape: (9, 2)
         ┌──────────────────────┬──────────┐
         │ metric               ┆ a        │
         │ ---                  ┆ ---      │
@@ -424,13 +424,16 @@ class ExperimentalColumn(Sequence[T]):
         │ median               ┆ 2.0      │
         │ standard deviation   ┆ 1.414214 │
         │ distinct value count ┆ 2.0      │
-        │ missing value count  ┆ 0.0      │
-        │ missing value ratio  ┆ 0.0      │
         │ idness               ┆ 1.0      │
+        │ missing value ratio  ┆ 0.0      │
         │ stability            ┆ 0.5      │
         └──────────────────────┴──────────┘
         """
         from ._experimental_table import ExperimentalTable
+
+        mean = self.mean() or "-"
+        median = self.median() or "-"
+        standard_deviation = self.standard_deviation() or "-"
 
         return ExperimentalTable(
             {
@@ -441,22 +444,20 @@ class ExperimentalColumn(Sequence[T]):
                     "median",
                     "standard deviation",
                     "distinct value count",
-                    "missing value count",
-                    "missing value ratio",
                     "idness",
+                    "missing value ratio",
                     "stability",
                 ],
                 self.name: [
-                    self.min(),
-                    self.max(),
-                    self.mean(),
-                    self.median(),
-                    self.standard_deviation(),
-                    self.distinct_value_count(),
-                    self.missing_value_count(),
-                    self.missing_value_ratio(),
-                    self.idness(),
-                    self.stability(),
+                    str(self.min()),
+                    str(self.max()),
+                    str(mean),
+                    str(median),
+                    str(standard_deviation),
+                    str(self.distinct_value_count()),
+                    str(self.idness()),
+                    str(self.missing_value_ratio()),
+                    str(self.stability()),
                 ],
             },
         )
@@ -716,7 +717,7 @@ class ExperimentalColumn(Sequence[T]):
 
         return mode_count / non_missing.len()
 
-    def standard_deviation(self) -> float:
+    def standard_deviation(self) -> float | None:
         """
         Return the standard deviation of the values in the column.
 
@@ -725,7 +726,8 @@ class ExperimentalColumn(Sequence[T]):
         Returns
         -------
         standard_deviation:
-            The standard deviation of the values in the column.
+            The standard deviation of the values in the column. If no standard deviation can be calculated due to the
+            type of the column, None is returned.
 
         Examples
         --------
@@ -734,9 +736,14 @@ class ExperimentalColumn(Sequence[T]):
         >>> column.standard_deviation()
         1.0
         """
-        return self._series.std()
+        from polars.exceptions import InvalidOperationError
 
-    def variance(self) -> float:
+        try:
+            return self._series.std()
+        except InvalidOperationError:
+            return None
+
+    def variance(self) -> float | None:
         """
         Return the variance of the values in the column.
 
@@ -745,7 +752,8 @@ class ExperimentalColumn(Sequence[T]):
         Returns
         -------
         variance:
-            The variance of the values in the column.
+            The variance of the values in the column. If no variance can be calculated due to the type of the column,
+            None is returned.
 
         Examples
         --------
@@ -754,7 +762,12 @@ class ExperimentalColumn(Sequence[T]):
         >>> column.variance()
         1.0
         """
-        return self._series.var()
+        from polars.exceptions import InvalidOperationError
+
+        try:
+            return self._series.var()
+        except InvalidOperationError:
+            return None
 
     # ------------------------------------------------------------------------------------------------------------------
     # Export
