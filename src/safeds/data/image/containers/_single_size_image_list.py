@@ -61,7 +61,15 @@ class _SingleSizeImageList(ImageList):
         self._indices_to_tensor_positions: dict[int, int] = {}  # {index: tensor_position}
 
     @staticmethod
-    def _create_image_list_from_files(images: dict[int, list[str]], number_of_images: int, max_channel: int, width: int, height: int, indices: dict[int, list[int]], max_files_per_thread_package: int) -> tuple[ImageList, list[ImageList._FromFileThreadPackage]]:
+    def _create_image_list_from_files(
+        images: dict[int, list[str]],
+        number_of_images: int,
+        max_channel: int,
+        width: int,
+        height: int,
+        indices: dict[int, list[int]],
+        max_files_per_thread_package: int,
+    ) -> tuple[ImageList, list[ImageList._FromFileThreadPackage]]:
         import torch
 
         _init_default_device()
@@ -73,7 +81,9 @@ class _SingleSizeImageList(ImageList):
 
         image_list = _SingleSizeImageList()
 
-        images_tensor = torch.empty(number_of_images, max_channel, height, width, dtype=torch.uint8, device=_get_device())
+        images_tensor = torch.empty(
+            number_of_images, max_channel, height, width, dtype=torch.uint8, device=_get_device()
+        )
 
         thread_packages: list[ImageList._FromFileThreadPackage] = []
         current_thread_channel: int | None = None
@@ -86,7 +96,15 @@ class _SingleSizeImageList(ImageList):
                     current_thread_channel = next(iter(images.keys()))
                     current_thread_channel_files = images.pop(current_thread_channel)
                 next_package_size = min(num_of_files, len(current_thread_channel_files))
-                package = ImageList._FromFileThreadPackage(current_thread_channel_files[:next_package_size], current_thread_channel, max_channel, width, height, images_tensor, current_thread_start_index)
+                package = ImageList._FromFileThreadPackage(
+                    current_thread_channel_files[:next_package_size],
+                    current_thread_channel,
+                    max_channel,
+                    width,
+                    height,
+                    images_tensor,
+                    current_thread_start_index,
+                )
                 current_thread_start_index += next_package_size
                 num_of_files -= next_package_size
                 current_thread_channel_files = current_thread_channel_files[next_package_size:]
