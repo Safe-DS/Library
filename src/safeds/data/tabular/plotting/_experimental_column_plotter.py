@@ -1,17 +1,31 @@
 from __future__ import annotations
 
-import io
 from typing import TYPE_CHECKING
 
 from safeds._utils import _figure_to_image
-from safeds.data.image.containers import Image
 from safeds.exceptions import NonNumericColumnError
 
 if TYPE_CHECKING:
+    from safeds.data.image.containers import Image
     from safeds.data.tabular.containers import ExperimentalColumn
 
 
 class ExperimentalColumnPlotter:
+    """
+    A class that contains plotting methods for a column.
+
+    Parameters
+    ----------
+    column:
+        The column to plot.
+
+    Examples
+    --------
+    >>> from safeds.data.tabular.containers import ExperimentalColumn
+    >>> column = ExperimentalColumn("test", [1, 2, 3])
+    >>> plotter = column.plot
+    """
+
     def __init__(self, column: ExperimentalColumn):
         self._column: ExperimentalColumn = column
 
@@ -35,24 +49,25 @@ class ExperimentalColumnPlotter:
         >>> column = ExperimentalColumn("test", [1, 2, 3])
         >>> boxplot = column.plot.box_plot()
         """
-        import matplotlib.pyplot as plt
-        import seaborn as sns
-
         if not self._column.is_numeric:
             raise NonNumericColumnError(f"{self._column.name} is of type {self._column.type}.")
 
-        fig = plt.figure()
-        ax = sns.boxplot(data=self._column)
+        import matplotlib.pyplot as plt
+
+        fig, ax = plt.subplots()
+        plot = ax.boxplot(
+            self._column._series,
+            patch_artist=True,
+        )
+        plt.setp(plot["boxes"], facecolor="lightsteelblue")
+        plt.setp(plot["medians"], color="red")
+
         ax.set(title=self._column.name)
         ax.set_xticks([])
-        ax.set_ylabel("")
-        plt.tight_layout()
+        ax.yaxis.grid(visible=True)
+        fig.tight_layout()
 
-        buffer = io.BytesIO()
-        fig.savefig(buffer, format="png")
-        plt.close()  # Prevents the figure from being displayed directly
-        buffer.seek(0)
-        return Image.from_bytes(buffer.read())
+        return _figure_to_image(fig)
 
     def histogram(self, *, number_of_bins: int = 10) -> Image:
         """
@@ -116,5 +131,6 @@ class ExperimentalColumnPlotter:
             xlabel="y(t)",
             ylabel=f"y(t + {lag})",
         )
+        fig.tight_layout()
 
         return _figure_to_image(fig)
