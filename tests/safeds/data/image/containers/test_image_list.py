@@ -953,13 +953,14 @@ class TestTransformsEqualImageTransforms:
         assert image_list_original == image_list_clone
 
 
-@pytest.mark.parametrize(
-    "resource_path",
-    [images_all(), [plane_png_path, plane_jpg_path] * 2],
-    ids=["all-images", "planes"],
-)
+
 @pytest.mark.parametrize("device", get_devices(), ids=get_devices_ids())
 class TestTransforms:
+    @pytest.mark.parametrize(
+        "resource_path",
+        [images_all(), [plane_png_path, plane_jpg_path] * 2],
+        ids=["all-images", "planes"],
+    )
     class TestAddNoise:
         @pytest.mark.parametrize(
             "standard_deviation",
@@ -986,6 +987,20 @@ class TestTransforms:
             assert image_list_noise == snapshot_png_image_list
             assert image_list_original is not image_list_clone
             assert image_list_original == image_list_clone
+
+    @pytest.mark.parametrize(
+        "channel_in",
+        [1, 3, 4],
+    )
+    @pytest.mark.parametrize(
+        "channel_out",
+        [1, 3, 4],
+    )
+    def test_change_channel_of_tensor(self, channel_in: int, channel_out: int, device: Device) -> None:
+        configure_test_with_device(device)
+        tensor = torch.ones((5, channel_in, 5, 5))
+        tensor_changed_channel = _SingleSizeImageList._change_channel_of_tensor(tensor, channel_out)
+        assert tensor_changed_channel.size(dim=-3) == channel_out
 
 
 @pytest.mark.parametrize(
