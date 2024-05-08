@@ -248,14 +248,14 @@ class ExperimentalTable:
     def _from_polars_data_frame(data: pl.DataFrame) -> ExperimentalTable:
         result = object.__new__(ExperimentalTable)
         result._lazy_frame = data.lazy()
-        result._data_frame = data
+        result._data_frame_cache = data
         return result
 
     @staticmethod
     def _from_polars_lazy_frame(data: pl.LazyFrame) -> ExperimentalTable:
         result = object.__new__(ExperimentalTable)
         result._lazy_frame = data
-        result._data_frame = None
+        result._data_frame_cache = None
         return result
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -280,7 +280,7 @@ class ExperimentalTable:
 
         # Implementation
         self._lazy_frame: pl.LazyFrame = pl.LazyFrame(data)
-        self._data_frame: pl.DataFrame | None = None
+        self._data_frame_cache: pl.DataFrame | None = None
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, ExperimentalTable):
@@ -288,37 +288,30 @@ class ExperimentalTable:
         if self is other:
             return True
 
-        if self._data_frame is None:
-            self._data_frame = self._lazy_frame.collect()
-        if other._data_frame is None:
-            other._data_frame = other._lazy_frame.collect()
-
         return self._data_frame.frame_equal(other._data_frame)
 
     def __hash__(self) -> int:
         return _structural_hash(self.schema, self.number_of_rows)
 
     def __repr__(self) -> str:
-        if self._data_frame is None:
-            self._data_frame = self._lazy_frame.collect()
-
         return self._data_frame.__repr__()
 
     def __sizeof__(self) -> int:
-        if self._data_frame is None:
-            self._data_frame = self._lazy_frame.collect()
-
         return self._data_frame.estimated_size()
 
     def __str__(self) -> str:
-        if self._data_frame is None:
-            self._data_frame = self._lazy_frame.collect()
-
         return self._data_frame.__str__()
 
     # ------------------------------------------------------------------------------------------------------------------
     # Properties
     # ------------------------------------------------------------------------------------------------------------------
+
+    @property
+    def _data_frame(self) -> pl.DataFrame:
+        if self._data_frame_cache is None:
+            self._data_frame_cache = self._lazy_frame.collect()
+
+        return self._data_frame_cache
 
     @property
     def column_names(self) -> list[str]:
@@ -362,9 +355,6 @@ class ExperimentalTable:
         >>> table.number_of_rows
         3
         """
-        if self._data_frame is None:
-            self._data_frame = self._lazy_frame.collect()
-
         return self._data_frame.height
 
     @property
@@ -389,9 +379,6 @@ class ExperimentalTable:
         if len(columns) == 0:
             return self
 
-        if self._data_frame is None:
-            self._data_frame = self._lazy_frame.collect()
-
         return ExperimentalTable._from_polars_data_frame(
             self._data_frame.hstack([column._series for column in columns]),
         )
@@ -411,9 +398,6 @@ class ExperimentalTable:
         )
 
     def get_column(self, name: str) -> ExperimentalColumn:
-        if self._data_frame is None:
-            self._data_frame = self._lazy_frame.collect()
-
         return ExperimentalColumn._from_polars_series(self._data_frame.get_column(name))
 
     def get_column_type(self, name: str) -> ExperimentalDataType:
@@ -441,9 +425,6 @@ class ExperimentalTable:
 
     def remove_columns_with_missing_values(self) -> ExperimentalTable:
         import polars as pl
-
-        if self._data_frame is None:
-            self._data_frame = self._lazy_frame.collect()
 
         return ExperimentalTable._from_polars_lazy_frame(
             pl.LazyFrame(
@@ -507,9 +488,6 @@ class ExperimentalTable:
 
         if len(new_columns) == 0:
             return self.remove_columns_by_name(old_name)
-
-        if self._data_frame is None:
-            self._data_frame = self._lazy_frame.collect()
 
         new_frame = self._data_frame
         index = new_frame.get_column_index(old_name)
@@ -646,9 +624,6 @@ class ExperimentalTable:
         raise NotImplementedError
 
     def shuffle_rows(self) -> ExperimentalTable:
-        if self._data_frame is None:
-            self._data_frame = self._lazy_frame.collect()
-
         return ExperimentalTable._from_polars_data_frame(
             self._data_frame.sample(
                 fraction=1,
@@ -719,17 +694,11 @@ class ExperimentalTable:
     # ------------------------------------------------------------------------------------------------------------------
 
     def add_table_as_columns(self, other: ExperimentalTable) -> ExperimentalTable:
-        if self._data_frame is None:
-            self._data_frame = self._lazy_frame.collect()
-
         return ExperimentalTable._from_polars_data_frame(
             self._data_frame.hstack(other._data_frame),
         )
 
     def add_table_as_rows(self, other: ExperimentalTable) -> ExperimentalTable:
-        if self._data_frame is None:
-            self._data_frame = self._lazy_frame.collect()
-
         return ExperimentalTable._from_polars_data_frame(
             self._data_frame.vstack(other._data_frame),
         )
@@ -763,9 +732,6 @@ class ExperimentalTable:
     # ------------------------------------------------------------------------------------------------------------------
 
     def to_columns(self) -> list[ExperimentalColumn]:
-        if self._data_frame is None:
-            self._data_frame = self._lazy_frame.collect()
-
         return [ExperimentalColumn._from_polars_series(column) for column in self._data_frame.get_columns()]
 
     def to_csv_file(self, path: str | Path) -> None:
@@ -812,9 +778,6 @@ class ExperimentalTable:
         >>> table.to_dict()
         {'a': [1, 2, 3], 'b': [4, 5, 6]}
         """
-        if self._data_frame is None:
-            self._data_frame = self._lazy_frame.collect()
-
         return self._data_frame.to_dict(as_series=False)
 
     def to_json_file(
@@ -855,9 +818,6 @@ class ExperimentalTable:
         path.parent.mkdir(parents=True, exist_ok=True)
 
         # Write JSON to file
-        if self._data_frame is None:
-            self._data_frame = self._lazy_frame.collect()
-
         self._data_frame.write_json(path, row_oriented=(orientation == "row"))
 
     def to_parquet_file(self, path: str | Path) -> None:
@@ -949,9 +909,6 @@ class ExperimentalTable:
         >>> table = ExperimentalTable({"a": [1, 2, 3], "b": [4, 5, 6]})
         >>> old_table = table.temporary_to_old_table()
         """
-        if self._data_frame is None:
-            self._data_frame = self._lazy_frame.collect()
-
         return Table._from_pandas_dataframe(self._data_frame.to_pandas())
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -985,9 +942,6 @@ class ExperimentalTable:
         dataframe:
             A dataframe object that conforms to the dataframe interchange protocol.
         """
-        if self._data_frame is None:
-            self._data_frame = self._lazy_frame.collect()
-
         return self._data_frame.__dataframe__(allow_copy=allow_copy)
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -1005,7 +959,4 @@ class ExperimentalTable:
         html:
             The generated HTML.
         """
-        if self._data_frame is None:
-            self._data_frame = self._lazy_frame.collect()
-
         return self._data_frame._repr_html_()
