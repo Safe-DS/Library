@@ -27,7 +27,10 @@ if TYPE_CHECKING:
 
     import polars as pl
 
-    from safeds.data.tabular.transformation import InvertibleTableTransformer, TableTransformer
+    from safeds.data.tabular.transformation import (
+        ExperimentalInvertibleTableTransformer,
+        ExperimentalTableTransformer,
+    )
     from safeds.data.tabular.typing import ExperimentalSchema
     from safeds.data.tabular.typing._experimental_data_type import ExperimentalDataType
 
@@ -731,16 +734,11 @@ class ExperimentalTable:
             self._data_frame.vstack(other._data_frame),
         )
 
-    def inverse_transform_table(self, fitted_transformer: InvertibleTableTransformer) -> ExperimentalTable:
-        # TODO: more efficient implementation
-        # old_table = self.temporary_to_old_table().inverse_transform_table(fitted_transformer)
-        # return ExperimentalTable._from_polars_data_frame(
-        #     pl.DataFrame(old_table.)
-        # )
-        raise NotImplementedError
+    def inverse_transform_table(self, fitted_transformer: ExperimentalInvertibleTableTransformer) -> ExperimentalTable:
+        return fitted_transformer.inverse_transform(self)
 
-    def transform_table(self, fitted_transformer: TableTransformer) -> ExperimentalTable:
-        raise NotImplementedError
+    def transform_table(self, fitted_transformer: ExperimentalTableTransformer) -> ExperimentalTable:
+        return fitted_transformer.transform(self)
 
     # ------------------------------------------------------------------------------------------------------------------
     # Statistics
