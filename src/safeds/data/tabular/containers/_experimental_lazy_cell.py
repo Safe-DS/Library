@@ -164,6 +164,10 @@ class _LazyCell(ExperimentalCell[T]):
     # Internal
     # ------------------------------------------------------------------------------------------------------------------
 
+    @property
+    def _polars_expression(self) -> pl.Expr:
+        return self._expression
+
     def _equals(self, other: object) -> bool:
         if not isinstance(other, _LazyCell):
             return NotImplemented

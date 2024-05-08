@@ -1,7 +1,10 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import Any, Generic, TypeVar
+from typing import TYPE_CHECKING, Any, Generic, TypeVar
+
+if TYPE_CHECKING:
+    import polars as pl
 
 T = TypeVar("T")
 P = TypeVar("P")
@@ -128,6 +131,11 @@ class ExperimentalCell(ABC, Generic[T]):
     # ------------------------------------------------------------------------------------------------------------------
     # Internal
     # ------------------------------------------------------------------------------------------------------------------
+
+    @property
+    @abstractmethod
+    def _polars_expression(self) -> pl.Expr | pl.Series:
+        """The Polars expression that corresponds to this cell."""
 
     @abstractmethod
     def _equals(self, other: object) -> bool:

@@ -1,11 +1,11 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, overload
 
 from safeds._utils import _structural_hash
-from safeds.data.labeled.containers import TabularDataset
-from safeds.data.tabular.containers import Table
+from safeds.data.labeled.containers import ExperimentalTabularDataset, TabularDataset
+from safeds.data.tabular.containers import Table, ExperimentalTable
 from safeds.exceptions import PlainTableError
 
 if TYPE_CHECKING:
@@ -29,7 +29,7 @@ class Classifier(ABC):
         return _structural_hash(self.__class__.__qualname__, self.is_fitted)
 
     @abstractmethod
-    def fit(self, training_set: TabularDataset) -> Classifier:
+    def fit(self, training_set: TabularDataset | ExperimentalTabularDataset) -> Classifier:
         """
         Create a copy of this classifier and fit it with the given training data.
 
@@ -51,8 +51,17 @@ class Classifier(ABC):
             If the training data contains invalid values or if the training failed.
         """
 
+    @overload
+    def predict(self, dataset: Table) -> TabularDataset: ...
+
+    @overload
+    def predict(self, dataset: ExperimentalTable | ExperimentalTabularDataset) -> ExperimentalTabularDataset: ...
+
     @abstractmethod
-    def predict(self, dataset: Table) -> TabularDataset:
+    def predict(
+        self,
+        dataset: Table | ExperimentalTable | ExperimentalTabularDataset,
+    ) -> TabularDataset | ExperimentalTabularDataset:
         """
         Predict a target vector using a dataset containing feature vectors. The model has to be trained first.
 

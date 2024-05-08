@@ -220,6 +220,10 @@ class _VectorizedCell(ExperimentalCell[T]):
     # Internal
     # ------------------------------------------------------------------------------------------------------------------
 
+    @property
+    def _polars_expression(self) -> pl.Series:
+        return self._series
+
     def _equals(self, other: object) -> bool:
         if not isinstance(other, _VectorizedCell):
             return NotImplemented

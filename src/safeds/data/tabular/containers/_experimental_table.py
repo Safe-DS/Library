@@ -403,11 +403,9 @@ class ExperimentalTable:
             raise DuplicateColumnNameError(name)
 
         computed_column = computer(_LazyVectorizedRow(self))
-        if not isinstance(computed_column, _LazyCell):
-            raise TypeError("The computer must return a cell.")
 
         return self._from_polars_lazy_frame(
-            self._lazy_frame.with_columns(name, computed_column._expression),
+            self._lazy_frame.with_columns(name, computed_column._polars_expression),
         )
 
     def get_column(self, name: str) -> ExperimentalColumn:
@@ -582,11 +580,9 @@ class ExperimentalTable:
         query: Callable[[ExperimentalRow], ExperimentalCell[bool]],
     ) -> ExperimentalTable:
         mask = query(_LazyVectorizedRow(self))
-        if not isinstance(mask, _LazyCell):
-            raise TypeError("The query must return a boolean cell.")
 
         return ExperimentalTable._from_polars_lazy_frame(
-            self._lazy_frame.filter(mask._expression),
+            self._lazy_frame.filter(mask._polars_expression),
         )
 
     def remove_rows_by_column(
@@ -600,11 +596,9 @@ class ExperimentalTable:
             raise UnknownColumnNameError([name])
 
         mask = query(_LazyCell(pl.col(name)))
-        if not isinstance(mask, _LazyCell):
-            raise TypeError("The query must return a cell.")
 
         return ExperimentalTable._from_polars_lazy_frame(
-            self._lazy_frame.filter(mask._expression),
+            self._lazy_frame.filter(mask._polars_expression),
         )
 
     def remove_rows_with_missing_values(
@@ -674,12 +668,10 @@ class ExperimentalTable:
         descending: bool = False,
     ) -> ExperimentalTable:
         key = key_selector(_LazyVectorizedRow(self))
-        if not isinstance(key, _LazyCell):
-            raise TypeError("The key selector must return a cell.")
 
         return ExperimentalTable._from_polars_lazy_frame(
             self._lazy_frame.sort(
-                key._expression,
+                key._polars_expression,
                 descending=descending,
                 maintain_order=True,
             ),
