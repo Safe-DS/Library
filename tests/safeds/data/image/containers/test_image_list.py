@@ -462,7 +462,7 @@ class TestFromFiles:
             *[s + "-path" for s in images_all_ids()],
         ],
     )
-    def test_from_files_creation(
+    def test_from_files_creation_return_filenames(
         self, resource_path: str | Path, snapshot_png_image_list: SnapshotAssertion, device: Device
     ) -> None:
         configure_test_with_device(device)
@@ -474,6 +474,38 @@ class TestFromFiles:
         assert image_list == snapshot_png_image_list
         assert image_list == image_list_returned_filenames
         assert len(image_list) == len(filenames)
+
+    @pytest.mark.parametrize(
+        "resource_path",
+        [
+            images_all(),
+            str(test_images_folder),
+            *images_all(),
+            [Path(im) for im in images_all()],
+            test_images_folder,
+            *[Path(im) for im in images_all()],
+        ],
+        ids=[
+            "all-images",
+            "images_folder",
+            *images_all_ids(),
+            "all-images-path",
+            "images_folder-path",
+            *[s + "-path" for s in images_all_ids()],
+        ],
+    )
+    def test_from_files_creation_load_percentage(
+        self, resource_path: str | Path, snapshot_png_image_list: SnapshotAssertion, device: Device
+    ) -> None:
+        random.seed(420)
+        configure_test_with_device(device)
+        image_list = ImageList.from_files(resolve_resource_path(resource_path))
+        image_list_load_percentage = ImageList.from_files(
+            resolve_resource_path(resource_path),
+            load_percentage=0.5,
+        )
+        assert image_list_load_percentage == snapshot_png_image_list
+        assert len(image_list_load_percentage) == max(round(len(image_list) * 0.5), 1)
 
     @pytest.mark.parametrize(
         "resource_path",
@@ -491,6 +523,48 @@ class TestFromFiles:
         configure_test_with_device(device)
         with pytest.raises(FileNotFoundError):
             ImageList.from_files(resolve_resource_path(resource_path))
+
+    @pytest.mark.parametrize(
+        "resource_path",
+        [images_all(), [plane_png_path, plane_jpg_path] * 2],
+        ids=["all-images", "planes"],
+    )
+    @pytest.mark.parametrize(
+        "load_percentage",
+        [-1.0, 2.0],
+    )
+    def test_should_raise_if_load_percentage_out_of_bounds(
+        self, resource_path: str | Path, load_percentage: float, device: Device
+    ) -> None:
+        configure_test_with_device(device)
+        with pytest.raises(OutOfBoundsError, match=rf"load_percentage \(={load_percentage}\) is not inside \[0, 1\]."):
+            ImageList.from_files(resolve_resource_path(resource_path), load_percentage=load_percentage)
+
+    def test_create_from_single_sized_image_lists_one_image_list(self, device: Device) -> None:
+        configure_test_with_device(device)
+        assert isinstance(
+            _MultiSizeImageList()._create_from_single_sized_image_lists(
+                [ImageList.from_files(resolve_resource_path(plane_png_path))._as_single_size_image_list()]
+            ),
+            _SingleSizeImageList,
+        )
+
+    @pytest.mark.parametrize(
+        "resource_path",
+        [images_all()],
+        ids=["all-images"],
+    )
+    def test_create_from_single_sized_image_lists(
+        self, resource_path: str | Path, snapshot_png_image_list: SnapshotAssertion, device: Device
+    ) -> None:
+        configure_test_with_device(device)
+        image_lists = ImageList.from_files(resolve_resource_path(resource_path))
+        single_sized_image_lists = []
+        for i, i_list in enumerate(image_lists._as_multi_size_image_list()._image_list_dict.values()):
+            single_sized_image_lists.append(i_list.change_channel([1, 3, 4][i % 3])._as_single_size_image_list())
+        multi_sized_image_list = _MultiSizeImageList()._create_from_single_sized_image_lists(single_sized_image_lists)
+        assert isinstance(multi_sized_image_list, _MultiSizeImageList)
+        assert multi_sized_image_list == snapshot_png_image_list
 
 
 @pytest.mark.parametrize("device", get_devices(), ids=get_devices_ids())
@@ -786,6 +860,7 @@ class TestShuffleImages:
         assert len(image_list_shuffled) == len(resource_path)
         for index in range(len(resource_path)):
             assert image_list_shuffled.get_image(index) in image_list_original
+        assert image_list_shuffled != image_list_original
         assert image_list_shuffled == snapshot_png_image_list
         assert image_list_original is not image_list_clone
         assert image_list_original == image_list_clone
@@ -885,13 +960,13 @@ class TestTransformsEqualImageTransforms:
         assert image_list_original == image_list_clone
 
 
-@pytest.mark.parametrize(
-    "resource_path",
-    [images_all(), [plane_png_path, plane_jpg_path] * 2],
-    ids=["all-images", "planes"],
-)
 @pytest.mark.parametrize("device", get_devices(), ids=get_devices_ids())
 class TestTransforms:
+    @pytest.mark.parametrize(
+        "resource_path",
+        [images_all(), [plane_png_path, plane_jpg_path] * 2],
+        ids=["all-images", "planes"],
+    )
     class TestAddNoise:
         @pytest.mark.parametrize(
             "standard_deviation",
@@ -918,6 +993,20 @@ class TestTransforms:
             assert image_list_noise == snapshot_png_image_list
             assert image_list_original is not image_list_clone
             assert image_list_original == image_list_clone
+
+    @pytest.mark.parametrize(
+        "channel_in",
+        [1, 3, 4],
+    )
+    @pytest.mark.parametrize(
+        "channel_out",
+        [1, 3, 4],
+    )
+    def test_change_channel_of_tensor(self, channel_in: int, channel_out: int, device: Device) -> None:
+        configure_test_with_device(device)
+        tensor = torch.ones((5, channel_in, 5, 5))
+        tensor_changed_channel = _SingleSizeImageList._change_channel_of_tensor(tensor, channel_out)
+        assert tensor_changed_channel.size(dim=-3) == channel_out
 
 
 @pytest.mark.parametrize(
@@ -1421,6 +1510,16 @@ class TestEmptyImageList:
     def test_create_image_list(self, image_list: ImageList, device: Device) -> None:
         configure_test_with_device(device)
         assert isinstance(image_list._create_image_list([], []), _EmptyImageList)
+
+    def test_create_image_list_from_files(self, device: Device) -> None:
+        configure_test_with_device(device)
+        assert isinstance(
+            _SingleSizeImageList()._create_image_list_from_files({}, 0, 4, 1, 1, {}, 5)[0], _EmptyImageList
+        )
+
+    def test_create_from_single_sized_image_lists(self, device: Device) -> None:
+        configure_test_with_device(device)
+        assert isinstance(_MultiSizeImageList()._create_from_single_sized_image_lists([]), _EmptyImageList)
 
     def test_from_images(self, device: Device) -> None:
         configure_test_with_device(device)

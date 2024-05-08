@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import io
+import os.path
 import sys
 import warnings
 from pathlib import Path
@@ -76,12 +77,14 @@ class Image:
         FileNotFoundError
             If the file of the path cannot be found
         """
-        from PIL.Image import open as pil_image_open
-        from torchvision.transforms.functional import pil_to_tensor
+        from torchvision.io import read_image
 
         _init_default_device()
 
-        return Image(image_tensor=pil_to_tensor(pil_image_open(path)))
+        if not os.path.isfile(path):
+            raise FileNotFoundError(f"No such file or directory: '{path}'")
+
+        return Image(image_tensor=read_image(str(path)).to(_get_device()))
 
     @staticmethod
     def from_bytes(data: bytes) -> Image:
