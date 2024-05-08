@@ -960,7 +960,6 @@ class TestTransformsEqualImageTransforms:
         assert image_list_original == image_list_clone
 
 
-
 @pytest.mark.parametrize("device", get_devices(), ids=get_devices_ids())
 class TestTransforms:
     @pytest.mark.parametrize(
