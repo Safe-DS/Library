@@ -2,32 +2,38 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from ._experimental_polars_row import ExperimentalPolarsRow
+from safeds.exceptions import UnknownColumnNameError
+
+from ._experimental_lazy_cell import _LazyCell
+from ._experimental_row import ExperimentalRow
 
 if TYPE_CHECKING:
-    from safeds.data.tabular.typing import ColumnType, Schema
+    from safeds.data.tabular.typing import ExperimentalSchema
+    from safeds.data.tabular.typing._experimental_data_type import ExperimentalDataType
 
-    from ._experimental_polars_column import ExperimentalPolarsColumn
-    from ._experimental_polars_table import ExperimentalPolarsTable
+    from ._experimental_table import ExperimentalTable
 
 
-class _VectorizedRow(ExperimentalPolarsRow):
+class _LazyVectorizedRow(ExperimentalRow):
     """
     A row is a one-dimensional collection of named, heterogeneous values.
 
     This implementation treats an entire table as a row, where each column is a "cell" in the row. This greatly speeds
     up operations on the row.
+
+    Moreover, accessing a column only builds an expression that will be evaluated when needed. This is useful when later
+    operations remove more rows or columns, so we don't do unnecessary work upfront.
     """
 
     # ------------------------------------------------------------------------------------------------------------------
     # Dunder methods
     # ------------------------------------------------------------------------------------------------------------------
 
-    def __init__(self, table: ExperimentalPolarsTable):
-        self._table: ExperimentalPolarsTable = table
+    def __init__(self, table: ExperimentalTable):
+        self._table: ExperimentalTable = table
 
     def __eq__(self, other: object) -> bool:
-        if not isinstance(other, _VectorizedRow):
+        if not isinstance(other, _LazyVectorizedRow):
             return NotImplemented
         if self is other:
             return True
@@ -45,67 +51,30 @@ class _VectorizedRow(ExperimentalPolarsRow):
 
     @property
     def column_names(self) -> list[str]:
-        """The names of the columns in the row."""
         return self._table.column_names
 
     @property
     def number_of_columns(self) -> int:
-        """The number of columns in the row."""
         return self._table.number_of_columns
 
     @property
-    def schema(self) -> Schema:  # TODO: rethink return type
-        """The schema of the row."""
+    def schema(self) -> ExperimentalSchema:
         return self._table.schema
 
     # ------------------------------------------------------------------------------------------------------------------
     # Column operations
     # ------------------------------------------------------------------------------------------------------------------
 
-    def get_value(self, name: str) -> ExperimentalPolarsColumn:
-        """
-        Get the value of the specified column.
+    def get_value(self, name: str) -> _LazyCell:
+        import polars as pl
 
-        Parameters
-        ----------
-        name:
-            The name of the column.
+        if not self._table.has_column(name):
+            raise UnknownColumnNameError([name])
 
-        Returns
-        -------
-        value:
-            The value of the column.
-        """
-        return self._table.get_column(name)
+        return _LazyCell(pl.col(name))
 
-    def get_column_type(self, name: str) -> ColumnType:  # TODO: rethink return type
-        """
-        Get the type of the specified column.
-
-        Parameters
-        ----------
-        name:
-            The name of the column.
-
-        Returns
-        -------
-        type:
-            The type of the column.
-        """
+    def get_column_type(self, name: str) -> ExperimentalDataType:
         return self._table.get_column_type(name)
 
     def has_column(self, name: str) -> bool:
-        """
-        Check if the row has a column with the specified name.
-
-        Parameters
-        ----------
-        name:
-            The name of the column.
-
-        Returns
-        -------
-        has_column:
-            Whether the row has a column with the specified name.
-        """
         return self._table.has_column(name)

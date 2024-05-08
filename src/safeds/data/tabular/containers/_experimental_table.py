@@ -2,9 +2,23 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, Literal
 
-from safeds._utils import _check_and_normalize_file_path
-from safeds.exceptions import ColumnLengthMismatchError
+from safeds._utils import _check_and_normalize_file_path, _structural_hash
+from safeds._utils._random import _get_random_seed
+from safeds.data.tabular.plotting._experimental_table_plotter import ExperimentalTablePlotter
+from safeds.data.tabular.typing._experimental_polars_data_type import _PolarsDataType
+from safeds.data.tabular.typing._experimental_polars_schema import _PolarsSchema
+from safeds.exceptions import (
+    ClosedBound,
+    ColumnLengthMismatchError,
+    DuplicateColumnNameError,
+    OutOfBoundsError,
+    UnknownColumnNameError,
+)
 
+from ._experimental_column import ExperimentalColumn
+from ._experimental_lazy_cell import _LazyCell
+from ._experimental_lazy_vectorized_row import _LazyVectorizedRow
+from ._experimental_vectorized_cell import _VectorizedCell
 from ._table import Table
 
 if TYPE_CHECKING:
@@ -13,34 +27,33 @@ if TYPE_CHECKING:
 
     from polars import DataFrame, LazyFrame
 
-    from safeds.data.image.containers import Image
     from safeds.data.labeled.containers import TabularDataset
     from safeds.data.tabular.transformation import InvertibleTableTransformer, TableTransformer
-    from safeds.data.tabular.typing import ColumnType, Schema
+    from safeds.data.tabular.typing import ExperimentalSchema
+    from safeds.data.tabular.typing._experimental_data_type import ExperimentalDataType
 
-    from ._experimental_polars_cell import ExperimentalPolarsCell
-    from ._experimental_polars_column import ExperimentalPolarsColumn
-    from ._experimental_polars_row import ExperimentalPolarsRow
+    from ._experimental_cell import ExperimentalCell
+    from ._experimental_row import ExperimentalRow
 
 
-class ExperimentalPolarsTable:
+class ExperimentalTable:
     """
     A table is a two-dimensional collection of data. It can either be seen as a list of rows or as a list of columns.
 
     To create a `Table` call the constructor or use one of the following static methods:
 
-    | Method                                                                                                                   | Description                            |
-    | ------------------------------------------------------------------------------------------------------------------------ | -------------------------------------- |
-    | [from_csv_file][safeds.data.tabular.containers._experimental_polars_table.ExperimentalPolarsTable.from_csv_file]         | Create a table from a CSV file.        |
-    | [from_json_file][safeds.data.tabular.containers._experimental_polars_table.ExperimentalPolarsTable.from_json_file]       | Create a table from a JSON file.       |
-    | [from_parquet_file][safeds.data.tabular.containers._experimental_polars_table.ExperimentalPolarsTable.from_parquet_file] | Create a table from a Parquet file.    |
-    | [from_columns][safeds.data.tabular.containers._experimental_polars_table.ExperimentalPolarsTable.from_columns]           | Create a table from a list of columns. |
-    | [from_dict][safeds.data.tabular.containers._experimental_polars_table.ExperimentalPolarsTable.from_dict]                 | Create a table from a dictionary.      |
+    | Method                                                                                                      | Description                            |
+    | ----------------------------------------------------------------------------------------------------------- | -------------------------------------- |
+    | [from_csv_file][safeds.data.tabular.containers._experimental_table.ExperimentalTable.from_csv_file]         | Create a table from a CSV file.        |
+    | [from_json_file][safeds.data.tabular.containers._experimental_table.ExperimentalTable.from_json_file]       | Create a table from a JSON file.       |
+    | [from_parquet_file][safeds.data.tabular.containers._experimental_table.ExperimentalTable.from_parquet_file] | Create a table from a Parquet file.    |
+    | [from_columns][safeds.data.tabular.containers._experimental_table.ExperimentalTable.from_columns]           | Create a table from a list of columns. |
+    | [from_dict][safeds.data.tabular.containers._experimental_table.ExperimentalTable.from_dict]                 | Create a table from a dictionary.      |
 
     Parameters
     ----------
     data:
-        The data. If None, an empty table is created.
+        The data of the table. If None, an empty table is created.
 
     Raises
     ------
@@ -49,8 +62,8 @@ class ExperimentalPolarsTable:
 
     Examples
     --------
-    >>> from safeds.data.tabular.containers import ExperimentalPolarsTable
-    >>> table = ExperimentalPolarsTable({"a": [1, 2, 3], "b": [4, 5, 6]})
+    >>> from safeds.data.tabular.containers import ExperimentalTable
+    >>> table = ExperimentalTable({"a": [1, 2, 3], "b": [4, 5, 6]})
     """
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -58,11 +71,11 @@ class ExperimentalPolarsTable:
     # ------------------------------------------------------------------------------------------------------------------
 
     @staticmethod
-    def from_columns(columns: list[ExperimentalPolarsColumn]) -> ExperimentalPolarsTable:
+    def from_columns(columns: ExperimentalColumn | list[ExperimentalColumn]) -> ExperimentalTable:
         raise NotImplementedError
 
     @staticmethod
-    def from_csv_file(path: str | Path) -> ExperimentalPolarsTable:
+    def from_csv_file(path: str | Path) -> ExperimentalTable:
         """
         Create a table from a CSV file.
 
@@ -85,8 +98,8 @@ class ExperimentalPolarsTable:
 
         Examples
         --------
-        >>> from safeds.data.tabular.containers import ExperimentalPolarsTable
-        >>> ExperimentalPolarsTable.from_csv_file("./src/resources/from_csv_file.csv")
+        >>> from safeds.data.tabular.containers import ExperimentalTable
+        >>> ExperimentalTable.from_csv_file("./src/resources/from_csv_file.csv")
         shape: (2, 3)
         ┌─────┬─────┬─────┐
         │ a   ┆ b   ┆ c   │
@@ -100,10 +113,10 @@ class ExperimentalPolarsTable:
         import polars as pl
 
         path = _check_and_normalize_file_path(path, ".csv", [".csv"], check_if_file_exists=True)
-        return ExperimentalPolarsTable._from_polars_lazy_frame(pl.scan_csv(path))
+        return ExperimentalTable._from_polars_lazy_frame(pl.scan_csv(path))
 
     @staticmethod
-    def from_dict(data: dict[str, list[Any]]) -> ExperimentalPolarsTable:
+    def from_dict(data: dict[str, list[Any]]) -> ExperimentalTable:
         """
         Create a table from a dictionary that maps column names to column values.
 
@@ -124,9 +137,9 @@ class ExperimentalPolarsTable:
 
         Examples
         --------
-        >>> from safeds.data.tabular.containers import ExperimentalPolarsTable
+        >>> from safeds.data.tabular.containers import ExperimentalTable
         >>> data = {'a': [1, 2, 3], 'b': [4, 5, 6]}
-        >>> ExperimentalPolarsTable.from_dict(data)
+        >>> ExperimentalTable.from_dict(data)
         shape: (3, 2)
         ┌─────┬─────┐
         │ a   ┆ b   │
@@ -138,26 +151,26 @@ class ExperimentalPolarsTable:
         │ 3   ┆ 6   │
         └─────┴─────┘
         """
-        return ExperimentalPolarsTable(data)
+        return ExperimentalTable(data)
 
     @staticmethod
-    def from_json_file(path: str | Path) -> ExperimentalPolarsTable:
+    def from_json_file(path: str | Path) -> ExperimentalTable:
         raise NotImplementedError
 
     @staticmethod
-    def from_parquet_file(path: str | Path) -> ExperimentalPolarsTable:
+    def from_parquet_file(path: str | Path) -> ExperimentalTable:
         raise NotImplementedError
 
     @staticmethod
-    def _from_polars_dataframe(data: DataFrame) -> ExperimentalPolarsTable:
-        result = object.__new__(ExperimentalPolarsTable)
+    def _from_polars_dataframe(data: DataFrame) -> ExperimentalTable:
+        result = object.__new__(ExperimentalTable)
         result._lazy_frame = data.lazy()
         result._data_frame = data
         return result
 
     @staticmethod
-    def _from_polars_lazy_frame(data: LazyFrame) -> ExperimentalPolarsTable:
-        result = object.__new__(ExperimentalPolarsTable)
+    def _from_polars_lazy_frame(data: LazyFrame) -> ExperimentalTable:
+        result = object.__new__(ExperimentalTable)
         result._lazy_frame = data
         result._data_frame = None
         return result
@@ -187,10 +200,20 @@ class ExperimentalPolarsTable:
         self._data_frame: pl.DataFrame | None = None
 
     def __eq__(self, other: object) -> bool:
-        raise NotImplementedError
+        if not isinstance(other, ExperimentalTable):
+            return False
+        if self is other:
+            return True
+
+        if self._data_frame is None:
+            self._data_frame = self._lazy_frame.collect()
+        if other._data_frame is None:
+            other._data_frame = other._lazy_frame.collect()
+
+        return self._data_frame.frame_equal(other._data_frame)
 
     def __hash__(self) -> int:
-        raise NotImplementedError
+        return _structural_hash(self.schema, self.number_of_rows)
 
     def __repr__(self) -> str:
         if self._data_frame is None:
@@ -199,7 +222,10 @@ class ExperimentalPolarsTable:
         return self._data_frame.__repr__()
 
     def __sizeof__(self) -> int:
-        raise NotImplementedError
+        if self._data_frame is None:
+            self._data_frame = self._lazy_frame.collect()
+
+        return self._data_frame.estimated_size()
 
     def __str__(self) -> str:
         if self._data_frame is None:
@@ -218,8 +244,8 @@ class ExperimentalPolarsTable:
 
         Examples
         --------
-        >>> from safeds.data.tabular.containers import ExperimentalPolarsTable
-        >>> table = ExperimentalPolarsTable({"a": [1, 2, 3], "b": [4, 5, 6]})
+        >>> from safeds.data.tabular.containers import ExperimentalTable
+        >>> table = ExperimentalTable({"a": [1, 2, 3], "b": [4, 5, 6]})
         >>> table.column_names
         ['a', 'b']
         """
@@ -232,8 +258,8 @@ class ExperimentalPolarsTable:
 
         Examples
         --------
-        >>> from safeds.data.tabular.containers import ExperimentalPolarsTable
-        >>> table = ExperimentalPolarsTable({"a": [1, 2, 3], "b": [4, 5, 6]})
+        >>> from safeds.data.tabular.containers import ExperimentalTable
+        >>> table = ExperimentalTable({"a": [1, 2, 3], "b": [4, 5, 6]})
         >>> table.number_of_columns
         2
         """
@@ -248,8 +274,8 @@ class ExperimentalPolarsTable:
 
         Examples
         --------
-        >>> from safeds.data.tabular.containers import ExperimentalPolarsTable
-        >>> table = ExperimentalPolarsTable({"a": [1, 2, 3], "b": [4, 5, 6]})
+        >>> from safeds.data.tabular.containers import ExperimentalTable
+        >>> table = ExperimentalTable({"a": [1, 2, 3], "b": [4, 5, 6]})
         >>> table.number_of_rows
         3
         """
@@ -259,8 +285,12 @@ class ExperimentalPolarsTable:
         return self._data_frame.height
 
     @property
-    def schema(self) -> Schema:  # TODO: rethink return type
-        raise NotImplementedError
+    def plot(self) -> ExperimentalTablePlotter:
+        return ExperimentalTablePlotter(self)
+
+    @property
+    def schema(self) -> ExperimentalSchema:
+        return _PolarsSchema(self._lazy_frame.schema)
 
     # ------------------------------------------------------------------------------------------------------------------
     # Column operations
@@ -268,32 +298,60 @@ class ExperimentalPolarsTable:
 
     def add_columns(
         self,
-        columns: ExperimentalPolarsColumn | list[ExperimentalPolarsColumn],
-    ) -> ExperimentalPolarsTable:
+        columns: ExperimentalColumn | list[ExperimentalColumn],
+    ) -> ExperimentalTable:
         raise NotImplementedError
 
-    def get_column(self, name: str) -> ExperimentalPolarsColumn:
-        raise NotImplementedError
+    def compute_column(
+        self,
+        name: str,
+        computer: Callable[[ExperimentalRow], ExperimentalCell],
+    ) -> ExperimentalTable:
+        if self.has_column(name):
+            raise DuplicateColumnNameError(name)
 
-    def get_column_type(self, name: str) -> ColumnType:  # TODO rethink return type
-        raise NotImplementedError
+        computed_column = computer(_LazyVectorizedRow(self))
+        if not isinstance(computed_column, _LazyCell):
+            raise TypeError("The computer must return a cell.")
+
+        return self._from_polars_lazy_frame(
+            self._lazy_frame.with_columns(name, computed_column._expression),
+        )
+
+    def get_column(self, name: str) -> ExperimentalColumn:
+        if self._data_frame is None:
+            self._data_frame = self._lazy_frame.collect()
+
+        return ExperimentalColumn._from_polars_series(self._data_frame.get_column(name))
+
+    def get_column_type(self, name: str) -> ExperimentalDataType:
+        return _PolarsDataType(self._lazy_frame.schema[name])
 
     def has_column(self, name: str) -> bool:
+        return name in self.column_names
+
+    def remove_columns(self, names: str | list[str]) -> ExperimentalTable:
+        if isinstance(names, str):
+            names = [names]
+
+        return ExperimentalTable._from_polars_lazy_frame(
+            self._lazy_frame.drop(names),
+        )
+
+    def remove_columns_except(self, names: str | list[str]) -> ExperimentalTable:
+        if isinstance(names, str):
+            names = [names]
+
+        names_set = set(names)
+        return self.remove_columns([name for name in self.column_names if name not in names_set])
+
+    def remove_columns_with_missing_values(self) -> ExperimentalTable:
         raise NotImplementedError
 
-    def remove_columns(self, names: list[str]) -> ExperimentalPolarsTable:
+    def remove_columns_with_non_numeric_values(self) -> ExperimentalTable:
         raise NotImplementedError
 
-    def remove_columns_except(self, names: list[str]) -> ExperimentalPolarsTable:
-        raise NotImplementedError
-
-    def remove_columns_with_missing_values(self) -> ExperimentalPolarsTable:
-        raise NotImplementedError
-
-    def remove_columns_with_non_numerical_values(self) -> ExperimentalPolarsTable:
-        raise NotImplementedError
-
-    def rename_column(self, old_name: str, new_name: str) -> ExperimentalPolarsTable:
+    def rename_column(self, old_name: str, new_name: str) -> ExperimentalTable:
         """
         Return a new table with a column renamed.
 
@@ -313,8 +371,8 @@ class ExperimentalPolarsTable:
 
         Examples
         --------
-        >>> from safeds.data.tabular.containers import ExperimentalPolarsTable
-        >>> table = ExperimentalPolarsTable({"a": [1, 2, 3], "b": [4, 5, 6]})
+        >>> from safeds.data.tabular.containers import ExperimentalTable
+        >>> table = ExperimentalTable({"a": [1, 2, 3], "b": [4, 5, 6]})
         >>> table.rename_column("a", "A")
         shape: (3, 2)
         ┌─────┬─────┐
@@ -328,23 +386,55 @@ class ExperimentalPolarsTable:
         └─────┴─────┘
         """
         # TODO: raises?
-        return ExperimentalPolarsTable._from_polars_lazy_frame(
+        return ExperimentalTable._from_polars_lazy_frame(
             self._lazy_frame.rename({old_name: new_name}),
         )
 
     def replace_column(
         self,
         old_name: str,
-        new_columns: ExperimentalPolarsColumn | list[ExperimentalPolarsColumn],
-    ) -> ExperimentalPolarsTable:
-        raise NotImplementedError
+        new_columns: ExperimentalColumn | list[ExperimentalColumn],
+    ) -> ExperimentalTable:
+        if isinstance(new_columns, ExperimentalColumn):
+            new_columns = [new_columns]
+
+        if len(new_columns) == 0:
+            return self.remove_columns(old_name)
+
+        if self._data_frame is None:
+            self._data_frame = self._lazy_frame.collect()
+
+        new_frame = self._data_frame
+        index = new_frame.get_column_index(old_name)
+
+        if len(new_columns) == 1:
+            return ExperimentalTable._from_polars_dataframe(
+                new_frame.replace_column(index, new_columns[0]._series),
+            )
+
+        prefix = new_frame.select(self.column_names[:index])
+        suffix = new_frame.select(self.column_names[index + 1 :])
+
+        return ExperimentalTable._from_polars_dataframe(
+            prefix.hstack([column._series for column in new_columns]).hstack(suffix),
+        )
 
     def transform_column(
         self,
         name: str,
-        transformer: Callable[[ExperimentalPolarsRow], ExperimentalPolarsCell],
-    ) -> ExperimentalPolarsTable:
-        raise NotImplementedError
+        transformer: Callable[[ExperimentalCell], ExperimentalCell],
+    ) -> ExperimentalTable:
+        if not self.has_column(name):
+            raise UnknownColumnNameError([name])  # TODO: in the error, compute similar column names
+
+        transformed_column = transformer(_VectorizedCell(self.get_column(name)))
+        if not isinstance(transformed_column, _VectorizedCell):
+            raise TypeError("The transformer must return a cell.")
+
+        return self.replace_column(
+            name,
+            ExperimentalColumn._from_polars_series(transformed_column._series),
+        )
 
     # ------------------------------------------------------------------------------------------------------------------
     # Row operations
@@ -352,7 +442,7 @@ class ExperimentalPolarsTable:
 
     # TODO: Rethink group_rows/group_rows_by_column. They should not return a dict.
 
-    def remove_duplicate_rows(self) -> ExperimentalPolarsTable:
+    def remove_duplicate_rows(self) -> ExperimentalTable:
         """
         Remove duplicate rows from the table.
 
@@ -363,8 +453,8 @@ class ExperimentalPolarsTable:
 
         Examples
         --------
-        >>> from safeds.data.tabular.containers import ExperimentalPolarsTable
-        >>> table = ExperimentalPolarsTable({"a": [1, 2, 2], "b": [4, 5, 5]})
+        >>> from safeds.data.tabular.containers import ExperimentalTable
+        >>> table = ExperimentalTable({"a": [1, 2, 2], "b": [4, 5, 5]})
         >>> table.remove_duplicate_rows()
         shape: (2, 2)
         ┌─────┬─────┐
@@ -376,27 +466,33 @@ class ExperimentalPolarsTable:
         │ 2   ┆ 5   │
         └─────┴─────┘
         """
-        return ExperimentalPolarsTable._from_polars_lazy_frame(
+        return ExperimentalTable._from_polars_lazy_frame(
             self._lazy_frame.unique(maintain_order=True),
         )
 
     def remove_rows(
         self,
-        query: Callable[[ExperimentalPolarsRow], ExperimentalPolarsCell[bool]],
-    ) -> ExperimentalPolarsTable:
-        raise NotImplementedError
+        query: Callable[[ExperimentalRow], ExperimentalCell[bool]],
+    ) -> ExperimentalTable:
+        mask = query(_LazyVectorizedRow(self))
+        if not isinstance(mask, _LazyCell):
+            raise TypeError("The query must return a boolean cell.")
+
+        return ExperimentalTable._from_polars_lazy_frame(
+            self._lazy_frame.filter(mask._expression),
+        )
 
     def remove_rows_by_column(
         self,
         name: str,
-        query: Callable[[ExperimentalPolarsCell], ExperimentalPolarsCell[bool]],
-    ) -> ExperimentalPolarsTable:
+        query: Callable[[ExperimentalCell], ExperimentalCell[bool]],
+    ) -> ExperimentalTable:
         raise NotImplementedError
 
     def remove_rows_with_missing_values(
         self,
-        column_names: list[str] | None = None,
-    ) -> ExperimentalPolarsTable:
+        subset_names: list[str] | None = None,
+    ) -> ExperimentalTable:
         """
         Remove rows with missing values from the table.
 
@@ -404,7 +500,7 @@ class ExperimentalPolarsTable:
 
         Parameters
         ----------
-        column_names:
+        subset_names:
             Names of the columns to consider. If None, all columns are considered.
 
         Returns
@@ -414,8 +510,8 @@ class ExperimentalPolarsTable:
 
         Examples
         --------
-        >>> from safeds.data.tabular.containers import ExperimentalPolarsTable
-        >>> table = ExperimentalPolarsTable({"a": [1, None, 3], "b": [4, 5, None]})
+        >>> from safeds.data.tabular.containers import ExperimentalTable
+        >>> table = ExperimentalTable({"a": [1, None, 3], "b": [4, 5, None]})
         >>> table.remove_rows_with_missing_values()
         shape: (1, 2)
         ┌─────┬─────┐
@@ -426,93 +522,115 @@ class ExperimentalPolarsTable:
         │ 1   ┆ 4   │
         └─────┴─────┘
         """
-        return ExperimentalPolarsTable._from_polars_lazy_frame(
-            self._lazy_frame.drop_nulls(subset=column_names),
+        return ExperimentalTable._from_polars_lazy_frame(
+            self._lazy_frame.drop_nulls(subset=subset_names),
         )
 
     def remove_rows_with_outliers(
         self,
-        column_names: list[str] | None = None,
-    ) -> ExperimentalPolarsTable:
+        subset_names: list[str] | None = None,
+    ) -> ExperimentalTable:
         raise NotImplementedError
 
-    def shuffle_rows(self) -> ExperimentalPolarsTable:
-        raise NotImplementedError
+    def shuffle_rows(self) -> ExperimentalTable:
+        if self._data_frame is None:
+            self._data_frame = self._lazy_frame.collect()
 
-    def slice_rows(self, start: int = 0, end: int | None = None) -> ExperimentalPolarsTable:
-        raise NotImplementedError
+        return ExperimentalTable._from_polars_dataframe(
+            self._data_frame.sample(
+                fraction=1,
+                shuffle=True,
+                seed=_get_random_seed(),
+            ),
+        )
+
+    def slice_rows(self, start: int = 0, length: int | None = None) -> ExperimentalTable:
+        return ExperimentalTable._from_polars_lazy_frame(
+            self._lazy_frame.slice(start, length),
+        )
 
     def sort_rows(
         self,
-        key_selector: Callable[[ExperimentalPolarsRow], ExperimentalPolarsCell],
+        key_selector: Callable[[ExperimentalRow], ExperimentalCell],
         *,
         descending: bool = False,
-    ) -> ExperimentalPolarsTable:
-        raise NotImplementedError
+    ) -> ExperimentalTable:
+        key = key_selector(_LazyVectorizedRow(self))
+        if not isinstance(key, _LazyCell):
+            raise TypeError("The key selector must return a cell.")
+
+        return ExperimentalTable._from_polars_lazy_frame(
+            self._lazy_frame.sort(
+                key._expression,
+                descending=descending,
+                maintain_order=True,
+            ),
+        )
 
     def sort_rows_by_column(
         self,
         name: str,
         *,
         descending: bool = False,
-    ) -> ExperimentalPolarsTable:
-        raise NotImplementedError
+    ) -> ExperimentalTable:
+        return ExperimentalTable._from_polars_lazy_frame(
+            self._lazy_frame.sort(
+                name,
+                descending=descending,
+                maintain_order=True,
+            ),
+        )
 
     def split_rows(
         self,
         percentage_in_first: float,
         *,
         shuffle: bool = True,
-    ) -> tuple[ExperimentalPolarsTable, ExperimentalPolarsTable]:
-        raise NotImplementedError
+    ) -> tuple[ExperimentalTable, ExperimentalTable]:
+        if percentage_in_first < 0 or percentage_in_first > 1:
+            raise OutOfBoundsError(
+                actual=percentage_in_first,
+                name="percentage_in_first",
+                lower_bound=ClosedBound(0),
+                upper_bound=ClosedBound(1),
+            )
+
+        input_table = self.shuffle_rows() if shuffle else self
+        number_of_rows_in_first = round(percentage_in_first * input_table.number_of_rows)
+
+        return (
+            input_table.slice_rows(length=number_of_rows_in_first),
+            input_table.slice_rows(start=number_of_rows_in_first),
+        )
 
     # ------------------------------------------------------------------------------------------------------------------
     # Table operations
     # ------------------------------------------------------------------------------------------------------------------
 
-    def add_table_as_columns(self, other: ExperimentalPolarsTable) -> ExperimentalPolarsTable:
+    def add_table_as_columns(self, other: ExperimentalTable) -> ExperimentalTable:
         raise NotImplementedError
 
-    def add_table_as_rows(self, other: ExperimentalPolarsTable) -> ExperimentalPolarsTable:
+    def add_table_as_rows(self, other: ExperimentalTable) -> ExperimentalTable:
         raise NotImplementedError
 
-    def inverse_transform_table(self, fitted_transformer: InvertibleTableTransformer) -> ExperimentalPolarsTable:
+    def inverse_transform_table(self, fitted_transformer: InvertibleTableTransformer) -> ExperimentalTable:
         raise NotImplementedError
 
-    def transform_table(self, fitted_transformer: TableTransformer) -> ExperimentalPolarsTable:
+    def transform_table(self, fitted_transformer: TableTransformer) -> ExperimentalTable:
         raise NotImplementedError
 
     # ------------------------------------------------------------------------------------------------------------------
     # Statistics
     # ------------------------------------------------------------------------------------------------------------------
 
-    def summarize_statistics(self) -> ExperimentalPolarsTable:
-        raise NotImplementedError
-
-    # ------------------------------------------------------------------------------------------------------------------
-    # Visualization
-    # ------------------------------------------------------------------------------------------------------------------
-
-    def plot_boxplots(self) -> Image:
-        raise NotImplementedError
-
-    def plot_correlation_heatmap(self) -> Image:
-        raise NotImplementedError
-
-    def plot_histograms(self, *, number_of_bins: int = 10) -> Image:
-        raise NotImplementedError
-
-    def plot_lineplot(self, x_name: str, y_name: str) -> Image:
-        raise NotImplementedError
-
-    def plot_scatterplot(self, x_name: str, y_name: str) -> Image:
+    def summarize_statistics(self) -> ExperimentalTable:
         raise NotImplementedError
 
     # ------------------------------------------------------------------------------------------------------------------
     # Export
     # ------------------------------------------------------------------------------------------------------------------
 
-    def to_columns(self) -> list[ExperimentalPolarsColumn]:
+    def to_columns(self) -> list[ExperimentalColumn]:
         raise NotImplementedError
 
     def to_csv_file(self, path: str | Path) -> None:
@@ -534,8 +652,8 @@ class ExperimentalPolarsTable:
 
         Examples
         --------
-        >>> from safeds.data.tabular.containers import ExperimentalPolarsTable
-        >>> table = ExperimentalPolarsTable({"a": [1, 2, 3], "b": [4, 5, 6]})
+        >>> from safeds.data.tabular.containers import ExperimentalTable
+        >>> table = ExperimentalTable({"a": [1, 2, 3], "b": [4, 5, 6]})
         >>> table.to_csv_file("./src/resources/to_csv_file.csv")
         """
         path = _check_and_normalize_file_path(path, ".csv", [".csv"])
@@ -554,8 +672,8 @@ class ExperimentalPolarsTable:
 
         Examples
         --------
-        >>> from safeds.data.tabular.containers import ExperimentalPolarsTable
-        >>> table = ExperimentalPolarsTable({"a": [1, 2, 3], "b": [4, 5, 6]})
+        >>> from safeds.data.tabular.containers import ExperimentalTable
+        >>> table = ExperimentalTable({"a": [1, 2, 3], "b": [4, 5, 6]})
         >>> table.to_dict()
         {'a': [1, 2, 3], 'b': [4, 5, 6]}
         """
@@ -594,8 +712,8 @@ class ExperimentalPolarsTable:
 
         Examples
         --------
-        >>> from safeds.data.tabular.containers import ExperimentalPolarsTable
-        >>> table = ExperimentalPolarsTable({"a": [1, 2, 3], "b": [4, 5, 6]})
+        >>> from safeds.data.tabular.containers import ExperimentalTable
+        >>> table = ExperimentalTable({"a": [1, 2, 3], "b": [4, 5, 6]})
         >>> table.to_json_file("./src/resources/to_json_file.json")
         """
         path = _check_and_normalize_file_path(path, ".json", [".json"])
@@ -644,8 +762,8 @@ class ExperimentalPolarsTable:
 
         Examples
         --------
-        >>> from safeds.data.tabular.containers import ExperimentalPolarsTable
-        >>> table = ExperimentalPolarsTable({"item": ["apple", "milk", "beer"], "price": [1.10, 1.19, 1.79], "amount_bought": [74, 72, 51]})
+        >>> from safeds.data.tabular.containers import ExperimentalTable
+        >>> table = ExperimentalTable({"item": ["apple", "milk", "beer"], "price": [1.10, 1.19, 1.79], "amount_bought": [74, 72, 51]})
         >>> dataset = table.to_tabular_dataset(target_name="amount_bought", extra_names=["item"])
         """
         from safeds.data.labeled.containers import TabularDataset
@@ -664,8 +782,8 @@ class ExperimentalPolarsTable:
 
         Examples
         --------
-        >>> from safeds.data.tabular.containers import ExperimentalPolarsTable
-        >>> table = ExperimentalPolarsTable({"a": [1, 2, 3], "b": [4, 5, 6]})
+        >>> from safeds.data.tabular.containers import ExperimentalTable
+        >>> table = ExperimentalTable({"a": [1, 2, 3], "b": [4, 5, 6]})
         >>> old_table = table.temporary_to_old_table()
         """
         if self._data_frame is None:
