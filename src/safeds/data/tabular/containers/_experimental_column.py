@@ -494,7 +494,7 @@ class ExperimentalColumn(Sequence[T]):
         """
         import polars as pl
 
-        return pl.DataFrame({"a": self._series, "b": other._series}).corr()["a"][1]
+        return pl.DataFrame({"a": self._series, "b": other._series}).corr().item(row=1, column="a")
 
     def distinct_value_count(self) -> int:
         """
@@ -805,7 +805,7 @@ class ExperimentalColumn(Sequence[T]):
         """
         from ._experimental_table import ExperimentalTable
 
-        return ExperimentalTable._from_polars_dataframe(self._series.to_frame())
+        return ExperimentalTable._from_polars_data_frame(self._series.to_frame())
 
     def temporary_to_old_column(self) -> Column:
         """

@@ -23,6 +23,10 @@ def _run_remove_rows() -> None:
     table.remove_rows(lambda row: row.get_value("column_0") % 2 == 0)._lazy_frame.collect()
 
 
+def _run_remove_rows_by_column() -> None:
+    table.remove_rows_by_column("column_0", lambda cell: cell % 2 == 0)._lazy_frame.collect()
+
+
 def _run_shuffle_rows() -> None:
     table.shuffle_rows()._lazy_frame.collect()
 
@@ -51,7 +55,7 @@ def _run_transform_column() -> None:
 
 if __name__ == "__main__":
     # Create a synthetic Table
-    table = create_synthetic_table_polars(1000, 50)
+    table = create_synthetic_table_polars(100000, 50)
 
     # Run the benchmarks
     timings: dict[str, float] = {
@@ -69,6 +73,10 @@ if __name__ == "__main__":
         # ),
         "remove_rows": timeit(
             _run_remove_rows,
+            number=REPETITIONS,
+        ),
+        "remove_rows_by_column": timeit(
+            _run_remove_rows_by_column,
             number=REPETITIONS,
         ),
         "shuffle_rows": timeit(
