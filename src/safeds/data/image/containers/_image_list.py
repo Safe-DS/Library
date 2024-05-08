@@ -255,7 +255,7 @@ class ImageList(metaclass=ABCMeta):
                 current_thread_packages.append(next_package)
                 current_thread_workload += len(next_package)
             if thread_index == num_of_threads - 1 and len(thread_packages) > 0:
-                current_thread_packages += thread_packages
+                current_thread_packages += thread_packages  # pragma: no cover
             thread = ImageList._FromImageThread(current_thread_packages)
             threads.append(thread)
             thread.start()

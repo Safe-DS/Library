@@ -497,6 +497,7 @@ class TestFromFiles:
     def test_from_files_creation_load_percentage(
         self, resource_path: str | Path, snapshot_png_image_list: SnapshotAssertion, device: Device
     ) -> None:
+        random.seed(420)
         configure_test_with_device(device)
         image_list = ImageList.from_files(resolve_resource_path(resource_path))
         image_list_load_percentage = ImageList.from_files(
@@ -536,6 +537,25 @@ class TestFromFiles:
         configure_test_with_device(device)
         with pytest.raises(OutOfBoundsError, match=rf"load_percentage \(={load_percentage}\) is not inside \[0, 1\]."):
             ImageList.from_files(resolve_resource_path(resource_path), load_percentage=load_percentage)
+
+    def test_create_from_single_sized_image_lists_one_image_list(self, device: Device) -> None:
+        configure_test_with_device(device)
+        assert isinstance(_MultiSizeImageList()._create_from_single_sized_image_lists([ImageList.from_files(resolve_resource_path(plane_png_path))._as_single_size_image_list()]), _SingleSizeImageList)
+
+    @pytest.mark.parametrize(
+        "resource_path",
+        [images_all()],
+        ids=["all-images"],
+    )
+    def test_create_from_single_sized_image_lists(self, resource_path: str | Path, snapshot_png_image_list: SnapshotAssertion, device: Device) -> None:
+        configure_test_with_device(device)
+        image_lists = ImageList.from_files(resolve_resource_path(resource_path))
+        single_sized_image_lists = []
+        for i, i_list in enumerate(image_lists._as_multi_size_image_list()._image_list_dict.values()):
+            single_sized_image_lists.append(i_list.change_channel([1, 3, 4][i % 3])._as_single_size_image_list())
+        multi_sized_image_list = _MultiSizeImageList()._create_from_single_sized_image_lists(single_sized_image_lists)
+        assert isinstance(multi_sized_image_list, _MultiSizeImageList)
+        assert multi_sized_image_list == snapshot_png_image_list
 
 
 @pytest.mark.parametrize("device", get_devices(), ids=get_devices_ids())
@@ -1467,6 +1487,14 @@ class TestEmptyImageList:
     def test_create_image_list(self, image_list: ImageList, device: Device) -> None:
         configure_test_with_device(device)
         assert isinstance(image_list._create_image_list([], []), _EmptyImageList)
+
+    def test_create_image_list_from_files(self, device: Device) -> None:
+        configure_test_with_device(device)
+        assert isinstance(_SingleSizeImageList()._create_image_list_from_files({}, 0, 4, 1, 1, {}, 5)[0], _EmptyImageList)
+
+    def test_create_from_single_sized_image_lists(self, device: Device) -> None:
+        configure_test_with_device(device)
+        assert isinstance(_MultiSizeImageList()._create_from_single_sized_image_lists([]), _EmptyImageList)
 
     def test_from_images(self, device: Device) -> None:
         configure_test_with_device(device)
