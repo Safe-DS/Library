@@ -21,7 +21,7 @@ R = TypeVar("R")
 
 class _VectorizedCell(ExperimentalCell[T]):
     """
-    A cell is a single value in a table.
+    A single value in a table.
 
     This implementation treats an entire column as a cell. This greatly speeds up operations on the cell.
     """

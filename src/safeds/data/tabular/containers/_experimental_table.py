@@ -38,7 +38,7 @@ if TYPE_CHECKING:
 
 class ExperimentalTable:
     """
-    A table is a two-dimensional collection of data. It can either be seen as a list of rows or as a list of columns.
+    A two-dimensional collection of data. It can either be seen as a list of rows or as a list of columns.
 
     To create a `Table` call the constructor or use one of the following static methods:
 
@@ -754,7 +754,12 @@ class ExperimentalTable:
     # ------------------------------------------------------------------------------------------------------------------
 
     def summarize_statistics(self) -> ExperimentalTable:
-        raise NotImplementedError
+        if not self._data_frame:
+            self._data_frame = self._lazy_frame.collect()
+
+        return ExperimentalTable._from_polars_data_frame(
+            []
+        )
 
     # ------------------------------------------------------------------------------------------------------------------
     # Export
@@ -859,7 +864,32 @@ class ExperimentalTable:
         self._data_frame.write_json(path, row_oriented=(orientation == "row"))
 
     def to_parquet_file(self, path: str | Path) -> None:
-        raise NotImplementedError
+        """
+        Write the table to a Parquet file.
+
+        If the file and/or the parent directories do not exist, they will be created. If the file exists already, it
+        will be overwritten.
+
+        Parameters
+        ----------
+        path:
+            The path to the Parquet file. If the file extension is omitted, it is assumed to be ".parquet".
+
+        Raises
+        ------
+        ValueError
+            If the path has an extension that is not ".parquet".
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import ExperimentalTable
+        >>> table = ExperimentalTable({"a": [1, 2, 3], "b": [4, 5, 6]})
+        >>> table.to_parquet_file("./src/resources/to_parquet_file.parquet")
+        """
+        path = _check_and_normalize_file_path(path, ".parquet", [".parquet"])
+        path.parent.mkdir(parents=True, exist_ok=True)
+
+        self._lazy_frame.sink_parquet(path)
 
     def to_tabular_dataset(self, target_name: str, extra_names: list[str] | None = None) -> TabularDataset:
         """

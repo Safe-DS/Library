@@ -16,7 +16,7 @@ if TYPE_CHECKING:
 
 class _LazyVectorizedRow(ExperimentalRow):
     """
-    A row is a one-dimensional collection of named, heterogeneous values.
+    A one-dimensional collection of named, heterogeneous values.
 
     This implementation treats an entire table as a row, where each column is a "cell" in the row. This greatly speeds
     up operations on the row.

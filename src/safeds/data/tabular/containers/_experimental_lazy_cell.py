@@ -16,7 +16,7 @@ R = TypeVar("R")
 
 class _LazyCell(ExperimentalCell[T]):
     """
-    A cell is a single value in a table.
+    A single value in a table.
 
     This implementation only builds an expression that will be evaluated when needed.
     """

@@ -9,7 +9,11 @@ R = TypeVar("R")
 
 
 class ExperimentalCell(ABC, Generic[T]):
-    """A cell is a single value in a table."""
+    """
+    A single value in a table.
+
+    This class cannot be instantiated directly. It is only used for arguments of callbacks.
+    """
 
     # ------------------------------------------------------------------------------------------------------------------
     # Dunder methods
