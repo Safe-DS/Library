@@ -79,7 +79,7 @@ def fit(model: Any, tabular_dataset: TabularDataset | ExperimentalTabularDataset
             )
         else:  # pragma: no cover
             model.fit(
-                tabular_dataset.features.__dataframe__(),
+                tabular_dataset.features._data_frame,
                 tabular_dataset.target._series,
             )
     except ValueError as exception:
@@ -194,7 +194,9 @@ def predict(
         if dataset.number_of_rows == 0:
             raise DatasetMissesDataError
 
-        non_numerical_column_names_2 = dataset.remove_non_numeric_columns().column_names
+        non_numerical_column_names_2 = set(dataset.column_names) - set(
+            dataset.remove_non_numeric_columns().column_names,
+        )
         if len(non_numerical_column_names_2) != 0:
             raise NonNumericColumnError(
                 str(non_numerical_column_names_2),
@@ -203,7 +205,9 @@ def predict(
                 " different values\nor is ordinal, you should use the LabelEncoder.\n",
             )
 
-        null_containing_column_names_2 = dataset.remove_columns_with_missing_values().column_names
+        null_containing_column_names_2 = set(dataset.column_names) - set(
+            dataset.remove_columns_with_missing_values().column_names,
+        )
         if len(null_containing_column_names_2) != 0:
             raise MissingValuesColumnError(
                 str(null_containing_column_names_2),
@@ -216,8 +220,10 @@ def predict(
         try:
             with warnings.catch_warnings():
                 warnings.filterwarnings("ignore", message="X does not have valid feature names")
-                predicted_target_vector = model.predict(dataset_df.__dataframe__())
-            dataset_df.add_columns(ExperimentalColumn(target_name, predicted_target_vector))
+                predicted_target_vector = model.predict(dataset_df._data_frame)
+            output = dataset.remove_columns(target_name).add_columns(
+                ExperimentalColumn(target_name, predicted_target_vector),
+            )
 
             extra_names = [
                 column_name
@@ -226,7 +232,7 @@ def predict(
             ]
 
             return TabularDataset(
-                dataset_df.to_dict(),
+                output.to_dict(),
                 target_name=target_name,
                 extra_names=extra_names,
             )

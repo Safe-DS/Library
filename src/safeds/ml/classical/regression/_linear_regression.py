@@ -14,7 +14,7 @@ if TYPE_CHECKING:
     from safeds.data.labeled.containers import ExperimentalTabularDataset, TabularDataset
     from safeds.data.tabular.containers import ExperimentalTable, Table
 
-
+# TODO: rename to linear regressor
 class LinearRegressionRegressor(Regressor):
     """Linear regression."""
 

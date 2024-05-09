@@ -92,8 +92,14 @@ class ExperimentalTabularDataset:
     def __hash__(self) -> int:
         return _structural_hash(self.target, self.features, self._extras)
 
+    def __repr__(self) -> str:
+        return self._table.__repr__()
+
     def __sizeof__(self) -> int:
         return sys.getsizeof(self._target) + sys.getsizeof(self._features) + sys.getsizeof(self._extras)
+
+    def __str__(self) -> str:
+        return self._table.__str__()
 
     # ------------------------------------------------------------------------------------------------------------------
     # Properties
