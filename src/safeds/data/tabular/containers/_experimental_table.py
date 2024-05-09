@@ -964,7 +964,9 @@ class ExperimentalTable:
 
     def remove_duplicate_rows(self) -> ExperimentalTable:
         """
-        Remove duplicate rows from the table.
+        Return a new table without duplicate rows.
+
+        **Note:** The original table is not modified.
 
         Returns
         -------
@@ -994,7 +996,7 @@ class ExperimentalTable:
         query: Callable[[ExperimentalRow], ExperimentalCell[bool]],
     ) -> ExperimentalTable:
         """
-        Remove rows from the table that satisfy a condition.
+        Return a new table without rows that satisfy a condition.
 
         **Note:** The original table is not modified.
 
@@ -1034,7 +1036,7 @@ class ExperimentalTable:
         query: Callable[[ExperimentalCell], ExperimentalCell[bool]],
     ) -> ExperimentalTable:
         """
-        Remove rows from the table that satisfy a condition on a specific column.
+        Return a new table without rows that satisfy a condition on a specific column.
 
         **Note:** The original table is not modified.
 
@@ -1082,16 +1084,16 @@ class ExperimentalTable:
 
     def remove_rows_with_missing_values(
         self,
-        subset_names: list[str] | None = None,
+        column_names: list[str] | None = None,
     ) -> ExperimentalTable:
         """
-        Remove rows with missing values in at least one the specified columns from the table.
+        Return a new table without rows containing missing values in the specified columns.
 
         **Note:** The original table is not modified.
 
         Parameters
         ----------
-        subset_names:
+        column_names:
             Names of the columns to consider. If None, all columns are considered.
 
         Returns
@@ -1113,30 +1115,34 @@ class ExperimentalTable:
         +-----+-----+
         """
         return ExperimentalTable._from_polars_lazy_frame(
-            self._lazy_frame.drop_nulls(subset=subset_names),
+            self._lazy_frame.drop_nulls(subset=column_names),
         )
 
     def remove_rows_with_outliers(
         self,
-        subset_names: list[str] | None = None,
+        column_names: list[str] | None = None,
         *,
         z_score_threshold: float = 3,
     ) -> ExperimentalTable:
         """
-        Remove rows with outliers in at least one of the specified columns from the table.
+        Return a new table without rows containing outliers in the specified columns.
 
         Whether a data point is an outlier in a column is determined by its z-score. The z-score the distance of the
         data point from the mean of the column divided by the standard deviation of the column. If the z-score is
         greater than the given threshold, the data point is considered an outlier. Missing values are ignored during the
         calculation of the z-score.
 
+        The z-score is only defined for numeric columns. Non-numeric columns are ignored, even if they are specified in
+        `column_names`.
 
+        **Notes:**
 
-        **Note:** The original table is not modified.
+        * The original table is not modified.
+        * This operation must fully load the data into memory, which can be expensive.
 
         Parameters
         ----------
-        subset_names:
+        column_names:
             Names of the columns to consider. If None, all numeric columns are considered.
         z_score_threshold:
             The z-score threshold for detecting outliers.
@@ -1170,15 +1176,15 @@ class ExperimentalTable:
         | null |   8 |
         +------+-----+
         """
-        if subset_names is None:
-            subset_names = self.column_names
+        if column_names is None:
+            column_names = self.column_names
 
         import polars as pl
         import polars.selectors as cs
 
         non_outlier_mask = pl.all_horizontal(
             self._data_frame
-                .select(cs.numeric() & cs.by_name(subset_names))
+                .select(cs.numeric() & cs.by_name(column_names))
                 .select(
                     pl.all().is_null() | (((pl.all() - pl.all().mean()) / pl.all().std()).abs() <= z_score_threshold),
                 ),
@@ -1189,6 +1195,31 @@ class ExperimentalTable:
         )
 
     def shuffle_rows(self) -> ExperimentalTable:
+        """
+        Return a new table with the rows shuffled.
+
+        **Note:** The original table is not modified.
+
+        Returns
+        -------
+        new_table:
+            The table with the rows shuffled.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import ExperimentalTable
+        >>> table = ExperimentalTable({"a": [1, 2, 3], "b": [4, 5, 6]})
+        >>> table.shuffle_rows()
+        +-----+-----+
+        |   a |   b |
+        | --- | --- |
+        | i64 | i64 |
+        +===========+
+        |   3 |   6 |
+        |   2 |   5 |
+        |   1 |   4 |
+        +-----+-----+
+        """
         return ExperimentalTable._from_polars_data_frame(
             self._data_frame.sample(
                 fraction=1,
@@ -1198,6 +1229,46 @@ class ExperimentalTable:
         )
 
     def slice_rows(self, start: int = 0, length: int | None = None) -> ExperimentalTable:
+        """
+        Return a new table with a slice of rows.
+
+        **Note:** The original table is not modified.
+
+        Parameters
+        ----------
+        start:
+            The start index of the slice.
+        length:
+            The length of the slice. If None, the slice contains all rows starting from `start`.
+
+        Returns
+        -------
+        new_table:
+            The table with the slice of rows.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import ExperimentalTable
+        >>> table = ExperimentalTable({"a": [1, 2, 3], "b": [4, 5, 6]})
+        >>> table.slice_rows(start=1)
+        +-----+-----+
+        |   a |   b |
+        | --- | --- |
+        | i64 | i64 |
+        +===========+
+        |   2 |   5 |
+        |   3 |   6 |
+        +-----+-----+
+
+        >>> table.slice_rows(start=1, length=1)
+        +-----+-----+
+        |   a |   b |
+        | --- | --- |
+        | i64 | i64 |
+        +===========+
+        |   2 |   5 |
+        +-----+-----+
+        """
         return ExperimentalTable._from_polars_lazy_frame(
             self._lazy_frame.slice(start, length),
         )
@@ -1208,6 +1279,38 @@ class ExperimentalTable:
         *,
         descending: bool = False,
     ) -> ExperimentalTable:
+        """
+        Return a new table with the rows sorted.
+
+        **Note:** The original table is not modified.
+
+        Parameters
+        ----------
+        key_selector:
+            The function that selects the key to sort by.
+        descending:
+            Whether to sort in descending order.
+
+        Returns
+        -------
+        new_table:
+            The table with the rows sorted.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import ExperimentalTable
+        >>> table = ExperimentalTable({"a": [2, 1, 3], "b": [1, 1, 2]})
+        >>> table.sort_rows(lambda row: row.get_value("a") - row.get_value("b"))
+        +-----+-----+
+        |   a |   b |
+        | --- | --- |
+        | i64 | i64 |
+        +===========+
+        |   1 |   1 |
+        |   2 |   1 |
+        |   3 |   2 |
+        +-----+-----+
+        """
         key = key_selector(_LazyVectorizedRow(self))
 
         return ExperimentalTable._from_polars_lazy_frame(
@@ -1224,6 +1327,46 @@ class ExperimentalTable:
         *,
         descending: bool = False,
     ) -> ExperimentalTable:
+        """
+        Return a new table with the rows sorted by a specific column.
+
+        **Note:** The original table is not modified.
+
+        Parameters
+        ----------
+        name:
+            The name of the column to sort by.
+        descending:
+            Whether to sort in descending order.
+
+        Returns
+        -------
+        new_table:
+            The table with the rows sorted by the specified column.
+
+        Raises
+        ------
+        KeyError
+            If the column does not exist.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import ExperimentalTable
+        >>> table = ExperimentalTable({"a": [2, 1, 3], "b": [1, 1, 2]})
+        >>> table.sort_rows_by_column("a")
+        +-----+-----+
+        |   a |   b |
+        | --- | --- |
+        | i64 | i64 |
+        +===========+
+        |   1 |   1 |
+        |   2 |   1 |
+        |   3 |   2 |
+        +-----+-----+
+        """
+        if not self.has_column(name):
+            raise UnknownColumnNameError([name])
+
         return ExperimentalTable._from_polars_lazy_frame(
             self._lazy_frame.sort(
                 name,
@@ -1238,6 +1381,58 @@ class ExperimentalTable:
         *,
         shuffle: bool = True,
     ) -> tuple[ExperimentalTable, ExperimentalTable]:
+        """
+        Create two tables by splitting the rows of the current table.
+
+        The first table contains a percentage of the rows specified by `percentage_in_first`, and the second table
+        contains the remaining rows.
+
+        **Note:** The original table is not modified.
+
+        Parameters
+        ----------
+        percentage_in_first:
+            The percentage of rows to include in the first table. Must be between 0 and 1.
+        shuffle:
+            Whether to shuffle the rows before splitting.
+
+        Returns
+        -------
+        first_table:
+            The first table.
+        second_table:
+            The second table.
+
+        Raises
+        ------
+        ValueError
+            If `percentage_in_first` is not between 0 and 1.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import ExperimentalTable
+        >>> table = ExperimentalTable({"a": [1, 2, 3, 4, 5], "b": [6, 7, 8, 9, 10]})
+        >>> first_table, second_table = table.split_rows(0.6)
+        >>> first_table
+        +-----+-----+
+        |   a |   b |
+        | --- | --- |
+        | i64 | i64 |
+        +===========+
+        |   1 |   6 |
+        |   4 |   9 |
+        |   3 |   8 |
+        +-----+-----+
+        >>> second_table
+        +-----+-----+
+        |   a |   b |
+        | --- | --- |
+        | i64 | i64 |
+        +===========+
+        |   5 |  10 |
+        |   2 |   7 |
+        +-----+-----+
+        """
         if percentage_in_first < 0 or percentage_in_first > 1:
             raise OutOfBoundsError(
                 actual=percentage_in_first,
@@ -1259,11 +1454,86 @@ class ExperimentalTable:
     # ------------------------------------------------------------------------------------------------------------------
 
     def add_table_as_columns(self, other: ExperimentalTable) -> ExperimentalTable:
+        """
+        Return a new table with the columns of another table added.
+
+        **Notes:**
+
+        * The original tables are not modified.
+        * This operation must fully load the data into memory, which can be expensive.
+
+        Parameters
+        ----------
+        other:
+            The table to add as columns.
+
+        Returns
+        -------
+        new_table:
+            The table with the columns added.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import ExperimentalTable
+        >>> table1 = ExperimentalTable({"a": [1, 2, 3]})
+        >>> table2 = ExperimentalTable({"b": [4, 5, 6]})
+        >>> table1.add_table_as_columns(table2)
+        +-----+-----+
+        |   a |   b |
+        | --- | --- |
+        | i64 | i64 |
+        +===========+
+        |   1 |   4 |
+        |   2 |   5 |
+        |   3 |   6 |
+        +-----+-----+
+        """
+        # TODO: raises?
+
         return ExperimentalTable._from_polars_data_frame(
             self._data_frame.hstack(other._data_frame),
         )
 
     def add_table_as_rows(self, other: ExperimentalTable) -> ExperimentalTable:
+        """
+        Return a new table with the rows of another table added.
+
+        **Notes:**
+
+        * The original tables are not modified.
+        * This operation must fully load the data into memory, which can be expensive.
+
+        Parameters
+        ----------
+        other:
+            The table to add as rows.
+
+        Returns
+        -------
+        new_table:
+            The table with the rows added.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import ExperimentalTable
+        >>> table1 = ExperimentalTable({"a": [1, 2, 3]})
+        >>> table2 = ExperimentalTable({"a": [4, 5, 6]})
+        >>> table1.add_table_as_rows(table2)
+        +-----+
+        |   a |
+        | --- |
+        | i64 |
+        +=====+
+        |   1 |
+        |   2 |
+        |   3 |
+        |   4 |
+        |   5 |
+        |   6 |
+        +-----+
+        """
+        # TODO: raises?
+
         return ExperimentalTable._from_polars_data_frame(
             self._data_frame.vstack(other._data_frame),
         )
