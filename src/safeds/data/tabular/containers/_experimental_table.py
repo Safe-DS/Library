@@ -60,7 +60,7 @@ class ExperimentalTable:
 
     Raises
     ------
-    ColumnLengthMismatchError
+    ValueError
         If columns have different lengths.
 
     Examples
@@ -75,7 +75,38 @@ class ExperimentalTable:
 
     @staticmethod
     def from_columns(columns: ExperimentalColumn | list[ExperimentalColumn]) -> ExperimentalTable:
+        """
+        Create a table from a list of columns.
+
+        Parameters
+        ----------
+        columns:
+            The columns.
+
+        Returns
+        -------
+        table:
+            The created table.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import ExperimentalColumn, ExperimentalTable
+        >>> a = ExperimentalColumn("a", [1, 2, 3])
+        >>> b = ExperimentalColumn("b", [4, 5, 6])
+        >>> ExperimentalTable.from_columns([a, b])
+        +-----+-----+
+        |   a |   b |
+        | --- | --- |
+        | i64 | i64 |
+        +===========+
+        |   1 |   4 |
+        |   2 |   5 |
+        |   3 |   6 |
+        +-----+-----+
+        """
         import polars as pl
+
+        # TODO: raises
 
         if isinstance(columns, ExperimentalColumn):
             columns = [columns]
@@ -141,7 +172,7 @@ class ExperimentalTable:
 
         Raises
         ------
-        ColumnLengthMismatchError
+        ValueError
             If columns have different lengths.
 
         Examples
@@ -347,7 +378,7 @@ class ExperimentalTable:
         """
         The number of rows in the table.
 
-        Note that this operation must fully load the data into memory, which can be expensive.
+        **Note:** This operation must fully load the data into memory, which can be expensive.
 
         Examples
         --------
@@ -360,10 +391,12 @@ class ExperimentalTable:
 
     @property
     def plot(self) -> ExperimentalTablePlotter:
+        """The plotter for the table."""
         return ExperimentalTablePlotter(self)
 
     @property
     def schema(self) -> ExperimentalSchema:
+        """The schema of the table."""
         return _PolarsSchema(self._lazy_frame.schema)
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -374,6 +407,40 @@ class ExperimentalTable:
         self,
         columns: ExperimentalColumn | list[ExperimentalColumn],
     ) -> ExperimentalTable:
+        """
+        Return a new table with additional columns.
+
+        **Notes:**
+
+        * The original table is not modified.
+        * This operation must fully load the data into memory, which can be expensive.
+
+        Parameters
+        ----------
+        columns:
+            The columns to add.
+
+        Returns
+        -------
+        new_table:
+            The table with the additional columns.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import ExperimentalColumn, ExperimentalTable
+        >>> table = ExperimentalTable({"a": [1, 2, 3]})
+        >>> new_column = ExperimentalColumn("b", [4, 5, 6])
+        >>> table.add_columns(new_column)
+        +-----+-----+
+        |   a |   b |
+        | --- | --- |
+        | i64 | i64 |
+        +===========+
+        |   1 |   4 |
+        |   2 |   5 |
+        |   3 |   6 |
+        +-----+-----+
+        """
         if isinstance(columns, ExperimentalColumn):
             columns = [columns]
 
@@ -384,27 +451,148 @@ class ExperimentalTable:
             self._data_frame.hstack([column._series for column in columns]),
         )
 
-    def compute_column(
+    def add_computed_column(
         self,
         name: str,
         computer: Callable[[ExperimentalRow], ExperimentalCell],
     ) -> ExperimentalTable:
+        """
+        Return a new table with an additional computed column.
+
+        **Note:** The original table is not modified.
+
+        Parameters
+        ----------
+        name:
+            The name of the new column.
+        computer:
+            The function that computes the values of the new column.
+
+        Returns
+        -------
+        new_table:
+            The table with the computed column.
+
+        Raises
+        ------
+        ValueError
+            If the column name already exists.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import ExperimentalTable
+        >>> table = ExperimentalTable({"a": [1, 2, 3], "b": [4, 5, 6]})
+        >>> table.add_computed_column("c", lambda row: row.get_value("a") + row.get_value("b"))
+        +-----+-----+-----+
+        |   a |   b |   c |
+        | --- | --- | --- |
+        | i64 | i64 | i64 |
+        +=================+
+        |   1 |   4 |   5 |
+        |   2 |   5 |   7 |
+        |   3 |   6 |   9 |
+        +-----+-----+-----+
+        """
         if self.has_column(name):
             raise DuplicateColumnNameError(name)
 
         computed_column = computer(_LazyVectorizedRow(self))
 
         return self._from_polars_lazy_frame(
-            self._lazy_frame.with_columns(name, computed_column._polars_expression),
+            self._lazy_frame.with_columns(computed_column._polars_expression.alias(name)),
         )
 
     def get_column(self, name: str) -> ExperimentalColumn:
+        """
+        Get a column from the table.
+
+        Parameters
+        ----------
+        name:
+            The name of the column.
+
+        Returns
+        -------
+        column:
+            The column.
+
+        Raises
+        ------
+        KeyError
+            If the column does not exist.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import ExperimentalTable
+        >>> table = ExperimentalTable({"a": [1, 2, 3], "b": [4, 5, 6]})
+        >>> table.get_column("a")
+        +-----+
+        |   a |
+        | --- |
+        | i64 |
+        +=====+
+        |   1 |
+        |   2 |
+        |   3 |
+        +-----+
+        """
+        if not self.has_column(name):
+            raise UnknownColumnNameError([name])
+
         return ExperimentalColumn._from_polars_series(self._data_frame.get_column(name))
 
     def get_column_type(self, name: str) -> ExperimentalDataType:
+        """
+        Get the data type of a column.
+
+        Parameters
+        ----------
+        name:
+            The name of the column.
+
+        Returns
+        -------
+        type:
+            The data type of the column.
+
+        Raises
+        ------
+        KeyError
+            If the column does not exist.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import ExperimentalTable
+        >>> table = ExperimentalTable({"a": [1, 2, 3], "b": [4, 5, 6]})
+        >>> table.get_column_type("a")
+        Int64
+        """
+        if not self.has_column(name):
+            raise UnknownColumnNameError([name])
+
         return _PolarsDataType(self._lazy_frame.schema[name])
 
     def has_column(self, name: str) -> bool:
+        """
+        Check if the table has a column with a specific name.
+
+        Parameters
+        ----------
+        name:
+            The name of the column.
+
+        Returns
+        -------
+        has_column:
+            Whether the table has a column with the specified name.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import ExperimentalTable
+        >>> table = ExperimentalTable({"a": [1, 2, 3], "b": [4, 5, 6]})
+        >>> table.has_column("a")
+        True
+        """
         return name in self.column_names
 
     def remove_columns(
@@ -412,8 +600,45 @@ class ExperimentalTable:
         names: str | list[str],
         /,
     ) -> ExperimentalTable:
+        """
+        Return a new table without the specified columns.
+
+        **Note:** The original table is not modified.
+
+        Parameters
+        ----------
+        names:
+            The names of the columns to remove.
+
+        Returns
+        -------
+        new_table:
+            The table with the columns removed.
+
+        Raises
+        ------
+        KeyError
+            If a column does not exist.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import ExperimentalTable
+        >>> table = ExperimentalTable({"a": [1, 2, 3], "b": [4, 5, 6]})
+        >>> table.remove_columns("a")
+        +-----+
+        |   b |
+        | --- |
+        | i64 |
+        +=====+
+        |   4 |
+        |   5 |
+        |   6 |
+        +-----+
+        """
         if isinstance(names, str):
             names = [names]
+
+        # TODO: raises?
 
         return ExperimentalTable._from_polars_lazy_frame(
             self._lazy_frame.drop(names),
@@ -424,14 +649,77 @@ class ExperimentalTable:
         names: str | list[str],
         /,
     ) -> ExperimentalTable:
+        """
+        Return a new table with only the specified columns.
+
+        Parameters
+        ----------
+        names:
+            The names of the columns to keep.
+
+        Returns
+        -------
+        new_table:
+            The table with only the specified columns.
+
+        Raises
+        ------
+        KeyError
+            If a column does not exist.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import ExperimentalTable
+        >>> table = ExperimentalTable({"a": [1, 2, 3], "b": [4, 5, 6]})
+        >>> table.remove_columns_except("a")
+        +-----+
+        |   a |
+        | --- |
+        | i64 |
+        +=====+
+        |   1 |
+        |   2 |
+        |   3 |
+        +-----+
+        """
         if isinstance(names, str):
             names = [names]
+
+        # TODO: raises?
 
         return ExperimentalTable._from_polars_lazy_frame(
             self._lazy_frame.select(names),
         )
 
     def remove_columns_with_missing_values(self) -> ExperimentalTable:
+        """
+        Return a new table without columns that contain missing values.
+
+        **Notes:**
+
+        * The original table is not modified.
+        * This operation must fully load the data into memory, which can be expensive.
+
+        Returns
+        -------
+        new_table:
+            The table without columns containing missing values.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import ExperimentalTable
+        >>> table = ExperimentalTable({"a": [1, 2, 3], "b": [4, 5, None]})
+        >>> table.remove_columns_with_missing_values()
+        +-----+
+        |   a |
+        | --- |
+        | i64 |
+        +=====+
+        |   1 |
+        |   2 |
+        |   3 |
+        +-----+
+        """
         import polars as pl
 
         return ExperimentalTable._from_polars_lazy_frame(
@@ -441,6 +729,31 @@ class ExperimentalTable:
         )
 
     def remove_non_numeric_columns(self) -> ExperimentalTable:
+        """
+        Return a new table without non-numeric columns.
+
+        **Note:** The original table is not modified.
+
+        Returns
+        -------
+        new_table:
+            The table without non-numeric columns.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import ExperimentalTable
+        >>> table = ExperimentalTable({"a": [1, 2, 3], "b": ["4", "5", "6"]})
+        >>> table.remove_non_numeric_columns()
+        +-----+
+        |   a |
+        | --- |
+        | i64 |
+        +=====+
+        |   1 |
+        |   2 |
+        |   3 |
+        +-----+
+        """
         import polars.selectors as cs
 
         return ExperimentalTable._from_polars_lazy_frame(
@@ -451,7 +764,7 @@ class ExperimentalTable:
         """
         Return a new table with a column renamed.
 
-        Note that the original table is not modified.
+        **Note:** The original table is not modified.
 
         Parameters
         ----------
@@ -465,13 +778,18 @@ class ExperimentalTable:
         new_table:
             The table with the column renamed.
 
+        Raises
+        ------
+        KeyError
+            If no column with the old name exists.
+
         Examples
         --------
         >>> from safeds.data.tabular.containers import ExperimentalTable
         >>> table = ExperimentalTable({"a": [1, 2, 3], "b": [4, 5, 6]})
-        >>> table.rename_column("a", "A")
+        >>> table.rename_column("a", "c")
         +-----+-----+
-        |   A |   b |
+        |   c |   b |
         | --- | --- |
         | i64 | i64 |
         +===========+
@@ -480,7 +798,9 @@ class ExperimentalTable:
         |   3 |   6 |
         +-----+-----+
         """
-        # TODO: raises?
+        if not self.has_column(old_name):
+            raise UnknownColumnNameError([old_name])
+
         return ExperimentalTable._from_polars_lazy_frame(
             self._lazy_frame.rename({old_name: new_name}),
         )
@@ -490,20 +810,90 @@ class ExperimentalTable:
         old_name: str,
         new_columns: ExperimentalColumn | list[ExperimentalColumn],
     ) -> ExperimentalTable:
+        """
+        Return a new table with a column replaced by zero or more columns.
+
+        **Note:**
+
+        * The original table is not modified.
+        * If a column is replaced by multiple columns, this operation must fully load the data into memory, which can be
+          expensive.
+
+        Parameters
+        ----------
+        old_name:
+            The name of the column to replace.
+        new_columns:
+            The new column or columns.
+
+        Returns
+        -------
+        new_table:
+            The table with the column replaced.
+
+        Raises
+        ------
+        KeyError
+            If no column with the old name exists.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import ExperimentalColumn, ExperimentalTable
+        >>> table = ExperimentalTable({"a": [1, 2, 3], "b": [4, 5, 6]})
+        >>> table.replace_column("a", [])
+        +-----+
+        |   b |
+        | --- |
+        | i64 |
+        +=====+
+        |   4 |
+        |   5 |
+        |   6 |
+        +-----+
+
+        >>> column1 = ExperimentalColumn("c", [7, 8, 9])
+        >>> table.replace_column("a", column1)
+        +-----+-----+
+        |   c |   b |
+        | --- | --- |
+        | i64 | i64 |
+        +===========+
+        |   7 |   4 |
+        |   8 |   5 |
+        |   9 |   6 |
+        +-----+-----+
+
+        >>> column2 = ExperimentalColumn("d", [10, 11, 12])
+        >>> table.replace_column("a", [column1, column2])
+        +-----+-----+-----+
+        |   c |   d |   b |
+        | --- | --- | --- |
+        | i64 | i64 | i64 |
+        +=================+
+        |   7 |  10 |   4 |
+        |   8 |  11 |   5 |
+        |   9 |  12 |   6 |
+        +-----+-----+-----+
+        """
+        if not self.has_column(old_name):
+            raise UnknownColumnNameError([old_name])
+
         if isinstance(new_columns, ExperimentalColumn):
             new_columns = [new_columns]
 
         if len(new_columns) == 0:
             return self.remove_columns(old_name)
 
-        new_frame = self._data_frame
-        index = new_frame.get_column_index(old_name)
-
         if len(new_columns) == 1:
-            return ExperimentalTable._from_polars_data_frame(
-                new_frame.replace_column(index, new_columns[0]._series),
+            new_column = new_columns[0]
+            return ExperimentalTable._from_polars_lazy_frame(
+                self._lazy_frame
+                    .with_columns(new_column._series.alias(old_name))
+                    .rename({old_name: new_column.name}),
             )
 
+        new_frame = self._data_frame
+        index = new_frame.get_column_index(old_name)
         prefix = new_frame.select(self.column_names[:index])
         suffix = new_frame.select(self.column_names[index + 1:])
 
@@ -593,7 +983,7 @@ class ExperimentalTable:
         """
         Remove rows with missing values from the table.
 
-        Note that the original table is not modified.
+        **Note:** The original table is not modified.
 
         Parameters
         ----------
@@ -813,7 +1203,7 @@ class ExperimentalTable:
         If the file and/or the parent directories do not exist, they will be created. If the file exists already, it
         will be overwritten.
 
-        Note that this operation must fully load the data into memory, which can be expensive.
+        **Note:** This operation must fully load the data into memory, which can be expensive.
 
         Parameters
         ----------
@@ -948,7 +1338,7 @@ class ExperimentalTable:
         The specification of the dataframe interchange protocol can be found
         [here](https://data-apis.org/dataframe-protocol/latest/index.html).
 
-        Note that this operation must fully load the data into memory, which can be expensive.
+        **Note:** This operation must fully load the data into memory, which can be expensive.
 
         Parameters
         ----------
@@ -973,7 +1363,7 @@ class ExperimentalTable:
         """
         Return a compact HTML representation of the table for IPython.
 
-        Note that this operation must fully load the data into memory, which can be expensive.
+        **Note:** This operation must fully load the data into memory, which can be expensive.
 
         Returns
         -------
