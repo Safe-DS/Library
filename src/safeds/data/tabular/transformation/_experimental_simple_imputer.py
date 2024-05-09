@@ -240,7 +240,7 @@ class ExperimentalSimpleImputer(ExperimentalTableTransformer):
 
         new_data = self._wrapped_transformer.transform(table.remove_columns_except(self._column_names)._data_frame)
         return ExperimentalTable._from_polars_lazy_frame(
-            table._lazy_frame.update(new_data),
+            table._lazy_frame.update(new_data.lazy()),
         )
 
     def get_names_of_added_columns(self) -> list[str]:

@@ -152,7 +152,7 @@ class ExperimentalDiscretizer(ExperimentalTableTransformer):
             table.remove_columns_except(self._column_names)._data_frame,
         )
         return ExperimentalTable._from_polars_lazy_frame(
-            table._lazy_frame.update(new_data),
+            table._lazy_frame.update(new_data.lazy()),
         )
 
     @property

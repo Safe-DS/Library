@@ -146,7 +146,7 @@ class ExperimentalStandardScaler(ExperimentalInvertibleTableTransformer):
             table.remove_columns_except(self._column_names)._data_frame,
         )
         return ExperimentalTable._from_polars_lazy_frame(
-            table._lazy_frame.update(new_data),
+            table._lazy_frame.update(new_data.lazy()),
         )
 
     def inverse_transform(self, transformed_table: ExperimentalTable) -> ExperimentalTable:
@@ -209,8 +209,8 @@ class ExperimentalStandardScaler(ExperimentalInvertibleTableTransformer):
         new_data = self._wrapped_transformer.inverse_transform(
             transformed_table.remove_columns_except(self._column_names)._data_frame,
         )
-        return ExperimentalTable._from_polars_lazy_frame(
-            transformed_table._lazy_frame.update(new_data),
+        return ExperimentalTable._from_polars_data_frame(
+            transformed_table._data_frame.update(new_data),
         )
 
     @property

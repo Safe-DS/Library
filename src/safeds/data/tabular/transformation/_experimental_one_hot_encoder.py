@@ -4,7 +4,7 @@ import warnings
 from collections import Counter
 from typing import Any
 
-from safeds.data.tabular.containers import Column, ExperimentalColumn, ExperimentalTable
+from safeds.data.tabular.containers import ExperimentalColumn, ExperimentalTable
 from safeds.exceptions import (
     NonNumericColumnError,
     TransformerNotFittedError,
@@ -268,8 +268,6 @@ class ExperimentalOneHotEncoder(ExperimentalInvertibleTableTransformer):
         ValueError
             If the table contains 0 rows.
         """
-        import numpy as np
-
         # Transformer has not been fitted yet
         if self._column_names is None or self._value_to_column is None or self._value_to_column_nans is None:
             raise TransformerNotFittedError
@@ -313,12 +311,12 @@ class ExperimentalOneHotEncoder(ExperimentalInvertibleTableTransformer):
             constructed_column = self._value_to_column_nans[original_column_name]
             for i in range(transformed_table.number_of_rows):
                 if transformed_table.get_column(constructed_column)[i] == 1.0:
-                    original_columns[original_column_name][i] = np.nan
+                    original_columns[original_column_name][i] = None
 
         table = transformed_table
 
         for column_name, encoded_column in original_columns.items():
-            table = table.add_columns(Column(column_name, encoded_column))
+            table = table.add_columns(ExperimentalColumn(column_name, encoded_column))
 
         # Drop old column names:
         table = table.remove_columns(list(self._value_to_column.values()))

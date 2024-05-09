@@ -1539,9 +1539,80 @@ class ExperimentalTable:
         )
 
     def inverse_transform_table(self, fitted_transformer: ExperimentalInvertibleTableTransformer) -> ExperimentalTable:
+        """
+        Return a new table inverse-transformed by a **fitted, invertible** transformer.
+
+        **Notes:**
+
+        * The original table is not modified.
+        * Depending on the transformer, this operation might fully load the data into memory, which can be expensive.
+
+        Parameters
+        ----------
+        fitted_transformer:
+            The fitted, invertible transformer to apply.
+
+        Returns
+        -------
+        new_table:
+            The inverse-transformed table.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import ExperimentalTable
+        >>> from safeds.data.tabular.transformation import ExperimentalRangeScaler
+        >>> table = ExperimentalTable({"a": [1, 2, 3]})
+        >>> transformer, transformed_table = ExperimentalRangeScaler(min_=0, max_=1).fit_and_transform(table, ["a"])
+        >>> transformed_table.inverse_transform_table(transformer)
+        +---------+
+        |       a |
+        |     --- |
+        |     f64 |
+        +=========+
+        | 1.00000 |
+        | 2.00000 |
+        | 3.00000 |
+        +---------+
+        """
         return fitted_transformer.inverse_transform(self)
 
     def transform_table(self, fitted_transformer: ExperimentalTableTransformer) -> ExperimentalTable:
+        """
+        Return a new table transformed by a **fitted** transformer.
+
+        **Notes:**
+
+        * The original table is not modified.
+        * Depending on the transformer, this operation might fully load the data into memory, which can be expensive.
+
+
+        Parameters
+        ----------
+        fitted_transformer:
+            The fitted transformer to apply.
+
+        Returns
+        -------
+        new_table:
+            The transformed table.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import ExperimentalTable
+        >>> from safeds.data.tabular.transformation import ExperimentalRangeScaler
+        >>> table = ExperimentalTable({"a": [1, 2, 3]})
+        >>> transformer = ExperimentalRangeScaler(min_=0, max_=1).fit(table, ["a"])
+        >>> table.transform_table(transformer)
+        +---------+
+        |       a |
+        |     --- |
+        |     f64 |
+        +=========+
+        | 0.00000 |
+        | 0.50000 |
+        | 1.00000 |
+        +---------+
+        """
         return fitted_transformer.transform(self)
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -1549,6 +1620,35 @@ class ExperimentalTable:
     # ------------------------------------------------------------------------------------------------------------------
 
     def summarize_statistics(self) -> ExperimentalTable:
+        """
+        Return a table with important statistics about this table.
+
+        Returns
+        -------
+        statistics:
+            The table with statistics.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import ExperimentalTable
+        >>> table = ExperimentalTable({"a": [1, 3]})
+        >>> table.summarize_statistics()
+        +----------------------+--------------------+
+        | metric               | a                  |
+        | ---                  | ---                |
+        | str                  | str                |
+        +===========================================+
+        | min                  | 1                  |
+        | max                  | 3                  |
+        | mean                 | 2.0                |
+        | median               | 2.0                |
+        | standard deviation   | 1.4142135623730951 |
+        | distinct value count | 2                  |
+        | idness               | 1.0                |
+        | missing value ratio  | 0.0                |
+        | stability            | 0.5                |
+        +----------------------+--------------------+
+        """
         if self.number_of_columns == 0:
             return ExperimentalTable()
 
@@ -1567,6 +1667,20 @@ class ExperimentalTable:
     # ------------------------------------------------------------------------------------------------------------------
 
     def to_columns(self) -> list[ExperimentalColumn]:
+        """
+        Return the data of the table as a list of columns.
+
+        Returns
+        -------
+        columns:
+            List of columns.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import ExperimentalTable
+        >>> table = ExperimentalTable({"a": [1, 2, 3], "b": [4, 5, 6]})
+        >>> columns = table.to_columns()
+        """
         return [ExperimentalColumn._from_polars_series(column) for column in self._data_frame.get_columns()]
 
     def to_csv_file(self, path: str | Path) -> None:
