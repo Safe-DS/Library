@@ -3,7 +3,7 @@ from __future__ import annotations
 import sys
 from typing import TYPE_CHECKING
 
-from safeds._config import _init_default_device, _get_device
+from safeds._config import _get_device, _init_default_device
 from safeds._utils import _structural_hash
 from safeds.data.tabular.containers import Column, Table
 
@@ -196,7 +196,8 @@ class TabularDataset:
                 dataset=_create_dataset(
                     torch.Tensor(self.features._data.values).to(_get_device()),
                     torch.nn.functional.one_hot(
-                        torch.LongTensor(self.target._data).to(_get_device()), num_classes=num_of_classes
+                        torch.LongTensor(self.target._data).to(_get_device()),
+                        num_classes=num_of_classes,
                     ),
                 ),
                 batch_size=batch_size,

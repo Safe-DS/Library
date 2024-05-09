@@ -4,8 +4,8 @@ from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
 from safeds._utils import _structural_hash
-from safeds.data.labeled.containers import TabularDataset
-from safeds.data.tabular.containers import Table
+from safeds.data.labeled.containers import ExperimentalTabularDataset, TabularDataset
+from safeds.data.tabular.containers import ExperimentalTable, Table
 from safeds.exceptions import PlainTableError
 
 if TYPE_CHECKING:
@@ -29,7 +29,7 @@ class Classifier(ABC):
         return _structural_hash(self.__class__.__qualname__, self.is_fitted)
 
     @abstractmethod
-    def fit(self, training_set: TabularDataset) -> Classifier:
+    def fit(self, training_set: TabularDataset | ExperimentalTabularDataset) -> Classifier:
         """
         Create a copy of this classifier and fit it with the given training data.
 
@@ -52,7 +52,10 @@ class Classifier(ABC):
         """
 
     @abstractmethod
-    def predict(self, dataset: Table) -> TabularDataset:
+    def predict(
+        self,
+        dataset: Table | ExperimentalTable | ExperimentalTabularDataset,
+    ) -> TabularDataset:
         """
         Predict a target vector using a dataset containing feature vectors. The model has to be trained first.
 
@@ -96,7 +99,11 @@ class Classifier(ABC):
     # Metrics
     # ------------------------------------------------------------------------------------------------------------------
 
-    def summarize_metrics(self, validation_or_test_set: TabularDataset, positive_class: Any) -> Table:
+    def summarize_metrics(
+        self,
+        validation_or_test_set: TabularDataset | ExperimentalTabularDataset,
+        positive_class: Any,
+    ) -> Table:
         """
         Summarize the classifier's metrics on the given data.
 
@@ -129,7 +136,7 @@ class Classifier(ABC):
             },
         )
 
-    def accuracy(self, validation_or_test_set: TabularDataset) -> float:
+    def accuracy(self, validation_or_test_set: TabularDataset | ExperimentalTabularDataset) -> float:
         """
         Compute the accuracy of the classifier on the given data.
 
@@ -153,12 +160,20 @@ class Classifier(ABC):
         if not isinstance(validation_or_test_set, TabularDataset) and isinstance(validation_or_test_set, Table):
             raise PlainTableError
 
-        expected_values = validation_or_test_set.target
-        predicted_values = self.predict(validation_or_test_set.features).target
+        if isinstance(validation_or_test_set, TabularDataset):
+            expected_values = validation_or_test_set.target
+        else:  # pragma: no cover
+            expected_values = validation_or_test_set.target._series
+        predicted_values = self.predict(validation_or_test_set.features).target._data
 
-        return sk_accuracy_score(expected_values._data, predicted_values._data)
+        # TODO: more efficient implementation using polars
+        return sk_accuracy_score(expected_values._data, predicted_values)
 
-    def precision(self, validation_or_test_set: TabularDataset, positive_class: Any) -> float:
+    def precision(
+        self,
+        validation_or_test_set: TabularDataset | ExperimentalTabularDataset,
+        positive_class: Any,
+    ) -> float:
         """
         Compute the classifier's precision on the given data.
 
@@ -184,6 +199,7 @@ class Classifier(ABC):
         n_true_positives = 0
         n_false_positives = 0
 
+        # TODO: more efficient implementation using polars
         for expected_value, predicted_value in zip(expected_values, predicted_values, strict=True):
             if predicted_value == positive_class:
                 if expected_value == positive_class:
@@ -195,7 +211,7 @@ class Classifier(ABC):
             return 1.0
         return n_true_positives / (n_true_positives + n_false_positives)
 
-    def recall(self, validation_or_test_set: TabularDataset, positive_class: Any) -> float:
+    def recall(self, validation_or_test_set: TabularDataset | ExperimentalTabularDataset, positive_class: Any) -> float:
         """
         Compute the classifier's recall on the given data.
 
@@ -221,6 +237,7 @@ class Classifier(ABC):
         n_true_positives = 0
         n_false_negatives = 0
 
+        # TODO: more efficient implementation using polars
         for expected_value, predicted_value in zip(expected_values, predicted_values, strict=True):
             if predicted_value == positive_class:
                 if expected_value == positive_class:
@@ -232,7 +249,11 @@ class Classifier(ABC):
             return 1.0
         return n_true_positives / (n_true_positives + n_false_negatives)
 
-    def f1_score(self, validation_or_test_set: TabularDataset, positive_class: Any) -> float:
+    def f1_score(
+        self,
+        validation_or_test_set: TabularDataset | ExperimentalTabularDataset,
+        positive_class: Any,
+    ) -> float:
         """
         Compute the classifier's $F_1$-score on the given data.
 
@@ -259,6 +280,7 @@ class Classifier(ABC):
         n_false_negatives = 0
         n_false_positives = 0
 
+        # TODO: more efficient implementation using polars
         for expected_value, predicted_value in zip(expected_values, predicted_values, strict=True):
             if predicted_value == positive_class:
                 if expected_value == positive_class:

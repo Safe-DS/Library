@@ -13,15 +13,15 @@ if TYPE_CHECKING:
     from sklearn.base import ClassifierMixin
     from sklearn.svm import SVC as sk_SVC  # noqa: N811
 
-    from safeds.data.labeled.containers import TabularDataset
-    from safeds.data.tabular.containers import Table
+    from safeds.data.labeled.containers import ExperimentalTabularDataset, TabularDataset
+    from safeds.data.tabular.containers import ExperimentalTable, Table
 
 
 class SupportVectorMachineKernel(ABC):
     """The abstract base class of the different subclasses supported by the `Kernel`."""
 
     @abstractmethod
-    def _get_sklearn_arguments(self) -> dict[str, Any]:
+    def _get_sklearn_arguments(self) -> dict[str, Any]:  # TODO: use apply pattern (imputer strategy) instead
         """Return the arguments to pass to scikit-learn."""
 
     @abstractmethod
@@ -188,7 +188,7 @@ class SupportVectorMachineClassifier(Classifier):
 
             __hash__ = SupportVectorMachineKernel.__hash__
 
-    def fit(self, training_set: TabularDataset) -> SupportVectorMachineClassifier:
+    def fit(self, training_set: TabularDataset | ExperimentalTabularDataset) -> SupportVectorMachineClassifier:
         """
         Create a copy of this classifier and fit it with the given training data.
 
@@ -227,7 +227,7 @@ class SupportVectorMachineClassifier(Classifier):
 
         return result
 
-    def predict(self, dataset: Table) -> TabularDataset:
+    def predict(self, dataset: Table | ExperimentalTable | ExperimentalTabularDataset) -> TabularDataset:
         """
         Predict a target vector using a dataset containing feature vectors. The model has to be trained first.
 

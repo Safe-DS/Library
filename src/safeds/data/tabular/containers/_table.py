@@ -7,7 +7,7 @@ import warnings
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, TypeVar
 
-from safeds._config import _init_default_device, _get_device
+from safeds._config import _get_device, _init_default_device
 from safeds._utils import _structural_hash
 from safeds.data.image.containers import Image
 from safeds.data.tabular.typing import ColumnType, Schema

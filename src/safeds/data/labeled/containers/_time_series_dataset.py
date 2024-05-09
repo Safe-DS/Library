@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 from safeds._config import _init_default_device
 from safeds._utils import _structural_hash
 from safeds.data.tabular.containers import Column, Table
-from safeds.exceptions import OutOfBoundsError, ClosedBound
+from safeds.exceptions import ClosedBound, OutOfBoundsError
 
 if TYPE_CHECKING:
     from collections.abc import Mapping, Sequence

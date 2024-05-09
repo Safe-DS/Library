@@ -1,10 +1,9 @@
 import pytest
 import torch
+from safeds._config import _get_device, _init_default_device, _set_default_device
 from torch.types import Device
 
-from safeds._config import _get_device, _init_default_device
-from safeds._config._device import _set_default_device
-from tests.helpers import get_devices, get_devices_ids, configure_test_with_device, device_cuda, device_cpu
+from tests.helpers import configure_test_with_device, device_cpu, device_cuda, get_devices, get_devices_ids
 from tests.helpers._devices import _skip_if_device_not_available
 
 

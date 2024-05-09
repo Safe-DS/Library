@@ -4,8 +4,8 @@ from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
 from safeds._utils import _structural_hash
-from safeds.data.labeled.containers import TabularDataset
-from safeds.data.tabular.containers import Column, Table
+from safeds.data.labeled.containers import ExperimentalTabularDataset, TabularDataset
+from safeds.data.tabular.containers import Column, ExperimentalColumn, ExperimentalTable, Table
 from safeds.exceptions import ColumnLengthMismatchError, PlainTableError
 
 if TYPE_CHECKING:
@@ -27,7 +27,7 @@ class Regressor(ABC):
         return _structural_hash(self.__class__.__qualname__, self.is_fitted)
 
     @abstractmethod
-    def fit(self, training_set: TabularDataset) -> Regressor:
+    def fit(self, training_set: TabularDataset | ExperimentalTabularDataset) -> Regressor:
         """
         Create a copy of this regressor and fit it with the given training data.
 
@@ -50,7 +50,7 @@ class Regressor(ABC):
         """
 
     @abstractmethod
-    def predict(self, dataset: Table) -> TabularDataset:
+    def predict(self, dataset: Table | ExperimentalTable | ExperimentalTabularDataset) -> TabularDataset:
         """
         Predict a target vector using a dataset containing feature vectors. The model has to be trained first.
 
@@ -94,7 +94,7 @@ class Regressor(ABC):
     # Metrics
     # ------------------------------------------------------------------------------------------------------------------
 
-    def summarize_metrics(self, validation_or_test_set: TabularDataset) -> Table:
+    def summarize_metrics(self, validation_or_test_set: TabularDataset | ExperimentalTabularDataset) -> Table:
         """
         Summarize the regressor's metrics on the given data.
 
@@ -123,7 +123,7 @@ class Regressor(ABC):
             },
         )
 
-    def mean_absolute_error(self, validation_or_test_set: TabularDataset) -> float:
+    def mean_absolute_error(self, validation_or_test_set: TabularDataset | ExperimentalTabularDataset) -> float:
         """
         Compute the mean absolute error (MAE) of the regressor on the given data.
 
@@ -146,14 +146,24 @@ class Regressor(ABC):
 
         if not isinstance(validation_or_test_set, TabularDataset) and isinstance(validation_or_test_set, Table):
             raise PlainTableError
-        expected = validation_or_test_set.target
-        predicted = self.predict(validation_or_test_set.features).target
 
-        _check_metrics_preconditions(predicted, expected)
-        return sk_mean_absolute_error(expected._data, predicted._data)
+        if isinstance(validation_or_test_set, TabularDataset):
+            expected = validation_or_test_set.target
+            predicted = self.predict(validation_or_test_set.features).target
+
+            # TODO: more efficient implementation using polars
+            _check_metrics_preconditions(predicted, expected)
+            return sk_mean_absolute_error(expected._data, predicted._data)
+        elif isinstance(validation_or_test_set, ExperimentalTabularDataset):  # pragma: no cover
+            expected_2 = validation_or_test_set.target
+            predicted_2 = self.predict(validation_or_test_set.features).target
+
+            # TODO: more efficient implementation using polars
+            _check_metrics_preconditions_experimental(predicted_2, expected_2)
+            return sk_mean_absolute_error(expected_2._series, predicted_2._data)
 
     # noinspection PyProtectedMember
-    def mean_squared_error(self, validation_or_test_set: TabularDataset) -> float:
+    def mean_squared_error(self, validation_or_test_set: TabularDataset | ExperimentalTabularDataset) -> float:
         """
         Compute the mean squared error (MSE) on the given data.
 
@@ -176,14 +186,23 @@ class Regressor(ABC):
 
         if not isinstance(validation_or_test_set, TabularDataset) and isinstance(validation_or_test_set, Table):
             raise PlainTableError
-        expected = validation_or_test_set.target
-        predicted = self.predict(validation_or_test_set.features).target
 
-        _check_metrics_preconditions(predicted, expected)
-        return sk_mean_squared_error(expected._data, predicted._data)
+        if isinstance(validation_or_test_set, TabularDataset):
+            expected = validation_or_test_set.target
+            predicted = self.predict(validation_or_test_set.features).target
+
+            # TODO: more efficient implementation using polars
+            _check_metrics_preconditions(predicted, expected)
+            return sk_mean_squared_error(expected._data, predicted._data)
+        elif isinstance(validation_or_test_set, ExperimentalTabularDataset):  # pragma: no cover
+            expected_2 = validation_or_test_set.target
+            predicted_2 = self.predict(validation_or_test_set.features).target
+
+            # TODO: more efficient implementation using polars
+            _check_metrics_preconditions_experimental(predicted_2, expected_2)
+            return sk_mean_squared_error(expected_2._series, predicted_2._data)
 
 
-# noinspection PyProtectedMember
 def _check_metrics_preconditions(actual: Column, expected: Column) -> None:
     if not actual.type.is_numeric():
         raise TypeError(f"Column 'actual' is not numerical but {actual.type}.")
@@ -193,4 +212,21 @@ def _check_metrics_preconditions(actual: Column, expected: Column) -> None:
     if actual._data.size != expected._data.size:
         raise ColumnLengthMismatchError(
             "\n".join([f"{column.name}: {column._data.size}" for column in [actual, expected]]),
+        )
+
+
+def _check_metrics_preconditions_experimental(actual: Column, expected: ExperimentalColumn) -> None:  # pragma: no cover
+    if not actual.type.is_numeric():
+        raise TypeError(f"Column 'actual' is not numerical but {actual.type}.")
+    if not expected.type.is_numeric:
+        raise TypeError(f"Column 'expected' is not numerical but {expected.type}.")
+
+    if actual.number_of_rows != expected.number_of_rows:
+        raise ColumnLengthMismatchError(
+            "\n".join(
+                [
+                    f"{actual.name}: {actual.number_of_rows}",
+                    f"{expected.name}: {expected.number_of_rows}",
+                ],
+            ),
         )

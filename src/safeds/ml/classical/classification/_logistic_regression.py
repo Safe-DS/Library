@@ -11,8 +11,8 @@ if TYPE_CHECKING:
     from sklearn.base import ClassifierMixin
     from sklearn.linear_model import LogisticRegression as sk_LogisticRegression
 
-    from safeds.data.labeled.containers import TabularDataset
-    from safeds.data.tabular.containers import Table
+    from safeds.data.labeled.containers import ExperimentalTabularDataset, TabularDataset
+    from safeds.data.tabular.containers import ExperimentalTable, Table
 
 
 class LogisticRegressionClassifier(Classifier):
@@ -27,7 +27,7 @@ class LogisticRegressionClassifier(Classifier):
         self._feature_names: list[str] | None = None
         self._target_name: str | None = None
 
-    def fit(self, training_set: TabularDataset) -> LogisticRegressionClassifier:
+    def fit(self, training_set: TabularDataset | ExperimentalTabularDataset) -> LogisticRegressionClassifier:
         """
         Create a copy of this classifier and fit it with the given training data.
 
@@ -66,7 +66,7 @@ class LogisticRegressionClassifier(Classifier):
 
         return result
 
-    def predict(self, dataset: Table) -> TabularDataset:
+    def predict(self, dataset: Table | ExperimentalTable | ExperimentalTabularDataset) -> TabularDataset:
         """
         Predict a target vector using a dataset containing feature vectors. The model has to be trained first.
 

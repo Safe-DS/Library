@@ -12,8 +12,8 @@ if TYPE_CHECKING:
     from sklearn.base import RegressorMixin
     from sklearn.tree import DecisionTreeRegressor as sk_DecisionTreeRegressor
 
-    from safeds.data.labeled.containers import TabularDataset
-    from safeds.data.tabular.containers import Table
+    from safeds.data.labeled.containers import ExperimentalTabularDataset, TabularDataset
+    from safeds.data.tabular.containers import ExperimentalTable, Table
 
 
 class DecisionTreeRegressor(Regressor):
@@ -77,7 +77,7 @@ class DecisionTreeRegressor(Regressor):
         """The minimum number of samples that must remain in the leaves of the tree."""
         return self._minimum_number_of_samples_in_leaves
 
-    def fit(self, training_set: TabularDataset) -> DecisionTreeRegressor:
+    def fit(self, training_set: TabularDataset | ExperimentalTabularDataset) -> DecisionTreeRegressor:
         """
         Create a copy of this regressor and fit it with the given training data.
 
@@ -119,7 +119,7 @@ class DecisionTreeRegressor(Regressor):
 
         return result
 
-    def predict(self, dataset: Table) -> TabularDataset:
+    def predict(self, dataset: Table | ExperimentalTable | ExperimentalTabularDataset) -> TabularDataset:
         """
         Predict a target vector using a dataset containing feature vectors. The model has to be trained first.
 

@@ -21,7 +21,7 @@ R = TypeVar("R")
 
 class _VectorizedCell(ExperimentalCell[T]):
     """
-    A cell is a single value in a table.
+    A single value in a table.
 
     This implementation treats an entire column as a cell. This greatly speeds up operations on the cell.
     """
@@ -126,6 +126,12 @@ class _VectorizedCell(ExperimentalCell[T]):
     def __abs__(self) -> ExperimentalCell[R]:
         return _wrap(self._series.__abs__())
 
+    def __ceil__(self) -> ExperimentalCell[R]:
+        return _wrap(self._series.ceil())
+
+    def __floor__(self) -> ExperimentalCell[R]:
+        return _wrap(self._series.floor())
+
     def __neg__(self) -> ExperimentalCell[R]:
         return _wrap(self._series.__neg__())
 
@@ -219,6 +225,10 @@ class _VectorizedCell(ExperimentalCell[T]):
     # ------------------------------------------------------------------------------------------------------------------
     # Internal
     # ------------------------------------------------------------------------------------------------------------------
+
+    @property
+    def _polars_expression(self) -> pl.Series:
+        return self._series
 
     def _equals(self, other: object) -> bool:
         if not isinstance(other, _VectorizedCell):

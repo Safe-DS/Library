@@ -16,7 +16,7 @@ R = TypeVar("R")
 
 class _LazyCell(ExperimentalCell[T]):
     """
-    A cell is a single value in a table.
+    A single value in a table.
 
     This implementation only builds an expression that will be evaluated when needed.
     """
@@ -81,6 +81,12 @@ class _LazyCell(ExperimentalCell[T]):
 
     def __abs__(self) -> ExperimentalCell[R]:
         return _wrap(self._expression.__abs__())
+
+    def __ceil__(self) -> ExperimentalCell[R]:
+        return _wrap(self._expression.ceil())
+
+    def __floor__(self) -> ExperimentalCell[R]:
+        return _wrap(self._expression.floor())
 
     def __neg__(self) -> ExperimentalCell[R]:
         return _wrap(self._expression.__neg__())
@@ -163,6 +169,10 @@ class _LazyCell(ExperimentalCell[T]):
     # ------------------------------------------------------------------------------------------------------------------
     # Internal
     # ------------------------------------------------------------------------------------------------------------------
+
+    @property
+    def _polars_expression(self) -> pl.Expr:
+        return self._expression
 
     def _equals(self, other: object) -> bool:
         if not isinstance(other, _LazyCell):

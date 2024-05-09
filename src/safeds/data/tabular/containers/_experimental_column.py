@@ -26,7 +26,7 @@ R = TypeVar("R")
 
 class ExperimentalColumn(Sequence[T]):
     """
-    A column is a named, one-dimensional collection of homogeneous values.
+    A named, one-dimensional collection of homogeneous values.
 
     Parameters
     ----------
@@ -39,7 +39,15 @@ class ExperimentalColumn(Sequence[T]):
     --------
     >>> from safeds.data.tabular.containers import ExperimentalColumn
     >>> ExperimentalColumn("test", [1, 2, 3])
-    Column('test', [1, 2, 3])
+    +------+
+    | test |
+    |  --- |
+    |  i64 |
+    +======+
+    |    1 |
+    |    2 |
+    |    3 |
+    +------+
     """
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -97,20 +105,13 @@ class ExperimentalColumn(Sequence[T]):
         return self.number_of_rows
 
     def __repr__(self) -> str:
-        import polars as pl
-
-        if self.number_of_rows <= 50:
-            data = self._series.to_list()
-        else:
-            data = f"[{', '.join(self._series.slice(0, 50).cast(pl.String).to_list())}, ...]"
-
-        return f"Column({self.name!r}, {data})"
+        return self.to_table().__repr__()
 
     def __sizeof__(self) -> int:
         return self._series.estimated_size()
 
     def __str__(self) -> str:
-        return self.__repr__()
+        return self.to_table().__str__()
 
     # ------------------------------------------------------------------------------------------------------------------
     # Properties
@@ -149,6 +150,24 @@ class ExperimentalColumn(Sequence[T]):
     # ------------------------------------------------------------------------------------------------------------------
     # Value operations
     # ------------------------------------------------------------------------------------------------------------------
+
+    def get_distinct_values(self) -> list[T]:
+        """
+        Return the distinct values in the column.
+
+        Returns
+        -------
+        distinct_values:
+            The distinct values in the column.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import ExperimentalColumn
+        >>> column = ExperimentalColumn("test", [1, 2, 3, 2])
+        >>> column.get_distinct_values()
+        [1, 2, 3]
+        """
+        return self._series.unique().sort().to_list()
 
     def get_value(self, index: int) -> T:
         """
@@ -358,7 +377,15 @@ class ExperimentalColumn(Sequence[T]):
         >>> from safeds.data.tabular.containers import ExperimentalColumn
         >>> column = ExperimentalColumn("test", [1, 2, 3])
         >>> column.rename("new_name")
-        Column('new_name', [1, 2, 3])
+        +----------+
+        | new_name |
+        |      --- |
+        |      i64 |
+        +==========+
+        |        1 |
+        |        2 |
+        |        3 |
+        +----------+
         """
         return self._from_polars_series(self._series.rename(new_name))
 
@@ -386,7 +413,15 @@ class ExperimentalColumn(Sequence[T]):
         >>> from safeds.data.tabular.containers import ExperimentalColumn
         >>> column = ExperimentalColumn("test", [1, 2, 3])
         >>> column.transform(lambda cell: 2 * cell)
-        Column('test', [2, 4, 6])
+        +------+
+        | test |
+        |  --- |
+        |  i64 |
+        +======+
+        |    2 |
+        |    4 |
+        |    6 |
+        +------+
         """
         result = transformer(_VectorizedCell(self))
         if not isinstance(result, _VectorizedCell):
@@ -412,25 +447,28 @@ class ExperimentalColumn(Sequence[T]):
         >>> from safeds.data.tabular.containers import ExperimentalColumn
         >>> column = ExperimentalColumn("a", [1, 3])
         >>> column.summarize_statistics()
-        shape: (10, 2)
-        ┌──────────────────────┬──────────┐
-        │ metric               ┆ a        │
-        │ ---                  ┆ ---      │
-        │ str                  ┆ f64      │
-        ╞══════════════════════╪══════════╡
-        │ min                  ┆ 1.0      │
-        │ max                  ┆ 3.0      │
-        │ mean                 ┆ 2.0      │
-        │ median               ┆ 2.0      │
-        │ standard deviation   ┆ 1.414214 │
-        │ distinct value count ┆ 2.0      │
-        │ missing value count  ┆ 0.0      │
-        │ missing value ratio  ┆ 0.0      │
-        │ idness               ┆ 1.0      │
-        │ stability            ┆ 0.5      │
-        └──────────────────────┴──────────┘
+        +----------------------+--------------------+
+        | metric               | a                  |
+        | ---                  | ---                |
+        | str                  | str                |
+        +===========================================+
+        | min                  | 1                  |
+        | max                  | 3                  |
+        | mean                 | 2.0                |
+        | median               | 2.0                |
+        | standard deviation   | 1.4142135623730951 |
+        | distinct value count | 2                  |
+        | idness               | 1.0                |
+        | missing value ratio  | 0.0                |
+        | stability            | 0.5                |
+        +----------------------+--------------------+
         """
         from ._experimental_table import ExperimentalTable
+
+        # TODO: turn this around (call table method, implement in table; allows parallelization)
+        mean = self.mean() or "-"
+        median = self.median() or "-"
+        standard_deviation = self.standard_deviation() or "-"
 
         return ExperimentalTable(
             {
@@ -441,24 +479,22 @@ class ExperimentalColumn(Sequence[T]):
                     "median",
                     "standard deviation",
                     "distinct value count",
-                    "missing value count",
-                    "missing value ratio",
                     "idness",
+                    "missing value ratio",
                     "stability",
                 ],
                 self.name: [
-                    self.min(),
-                    self.max(),
-                    self.mean(),
-                    self.median(),
-                    self.standard_deviation(),
-                    self.distinct_value_count(),
-                    self.missing_value_count(),
-                    self.missing_value_ratio(),
-                    self.idness(),
-                    self.stability(),
+                    str(self.min()),
+                    str(self.max()),
+                    str(mean),
+                    str(median),
+                    str(standard_deviation),
+                    str(self.distinct_value_count()),
+                    str(self.idness()),
+                    str(self.missing_value_ratio()),
+                    str(self.stability()),
                 ],
-            }
+            },
         )
 
     def correlation_with(self, other: ExperimentalColumn) -> float:
@@ -494,7 +530,7 @@ class ExperimentalColumn(Sequence[T]):
         """
         import polars as pl
 
-        return pl.DataFrame({"a": self._series, "b": other._series}).corr()["a"][1]
+        return pl.DataFrame({"a": self._series, "b": other._series}).corr().item(row=1, column="a")
 
     def distinct_value_count(self) -> int:
         """
@@ -682,7 +718,14 @@ class ExperimentalColumn(Sequence[T]):
         >>> from safeds.data.tabular.containers import ExperimentalColumn
         >>> column = ExperimentalColumn("test", [3, 1, 2, 1, 3])
         >>> column.mode()
-        Column('test', [1, 3])
+        +------+
+        | test |
+        |  --- |
+        |  i64 |
+        +======+
+        |    1 |
+        |    3 |
+        +------+
         """
         return self._from_polars_series(self._series.mode().sort())
 
@@ -716,7 +759,7 @@ class ExperimentalColumn(Sequence[T]):
 
         return mode_count / non_missing.len()
 
-    def standard_deviation(self) -> float:
+    def standard_deviation(self) -> float | None:
         """
         Return the standard deviation of the values in the column.
 
@@ -725,7 +768,8 @@ class ExperimentalColumn(Sequence[T]):
         Returns
         -------
         standard_deviation:
-            The standard deviation of the values in the column.
+            The standard deviation of the values in the column. If no standard deviation can be calculated due to the
+            type of the column, None is returned.
 
         Examples
         --------
@@ -734,9 +778,14 @@ class ExperimentalColumn(Sequence[T]):
         >>> column.standard_deviation()
         1.0
         """
-        return self._series.std()
+        from polars.exceptions import InvalidOperationError
 
-    def variance(self) -> float:
+        try:
+            return self._series.std()
+        except InvalidOperationError:
+            return None
+
+    def variance(self) -> float | None:
         """
         Return the variance of the values in the column.
 
@@ -745,7 +794,8 @@ class ExperimentalColumn(Sequence[T]):
         Returns
         -------
         variance:
-            The variance of the values in the column.
+            The variance of the values in the column. If no variance can be calculated due to the type of the column,
+            None is returned.
 
         Examples
         --------
@@ -754,7 +804,12 @@ class ExperimentalColumn(Sequence[T]):
         >>> column.variance()
         1.0
         """
-        return self._series.var()
+        from polars.exceptions import InvalidOperationError
+
+        try:
+            return self._series.var()
+        except InvalidOperationError:
+            return None
 
     # ------------------------------------------------------------------------------------------------------------------
     # Export
@@ -792,20 +847,19 @@ class ExperimentalColumn(Sequence[T]):
         >>> from safeds.data.tabular.containers import ExperimentalColumn
         >>> column = ExperimentalColumn("test", [1, 2, 3])
         >>> column.to_table()
-        shape: (3, 1)
-        ┌──────┐
-        │ test │
-        │ ---  │
-        │ i64  │
-        ╞══════╡
-        │ 1    │
-        │ 2    │
-        │ 3    │
-        └──────┘
+        +------+
+        | test |
+        |  --- |
+        |  i64 |
+        +======+
+        |    1 |
+        |    2 |
+        |    3 |
+        +------+
         """
         from ._experimental_table import ExperimentalTable
 
-        return ExperimentalTable._from_polars_dataframe(self._series.to_frame())
+        return ExperimentalTable._from_polars_data_frame(self._series.to_frame())
 
     def temporary_to_old_column(self) -> Column:
         """

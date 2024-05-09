@@ -12,7 +12,11 @@ if TYPE_CHECKING:
 
 
 class ExperimentalRow(ABC, Mapping[str, Any]):
-    """A row is a one-dimensional collection of named, heterogeneous values."""
+    """
+    A one-dimensional collection of named, heterogeneous values.
+
+    This class cannot be instantiated directly. It is only used for arguments of callbacks.
+    """
 
     # ------------------------------------------------------------------------------------------------------------------
     # Dunder methods

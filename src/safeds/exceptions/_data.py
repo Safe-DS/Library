@@ -53,7 +53,7 @@ class MissingValuesColumnError(Exception):
         )
 
 
-class DuplicateColumnNameError(Exception):
+class DuplicateColumnNameError(ValueError):
     """
     Exception raised for trying to modify a table resulting in a duplicate column name.
 
@@ -120,7 +120,7 @@ class ColumnSizeError(Exception):
         super().__init__(f"Expected a column of size {expected_size} but got column of size {actual_size}.")
 
 
-class ColumnLengthMismatchError(Exception):
+class ColumnLengthMismatchError(ValueError):
     """Exception raised when the lengths of two or more columns do not match."""
 
     def __init__(self, column_info: str):

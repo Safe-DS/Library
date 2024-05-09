@@ -1,6 +1,8 @@
 from timeit import timeit
 
-from safeds.data.tabular.containers import Table
+import polars as pl
+
+from safeds.data.tabular.containers import ExperimentalTable
 
 from benchmarks.table.utils import create_synthetic_table_polars
 
@@ -15,12 +17,16 @@ def _run_remove_rows_with_missing_values() -> None:
     table.remove_rows_with_missing_values()._lazy_frame.collect()
 
 
-# def _run_remove_rows_with_outliers() -> None:
-#     table.remove_rows_with_outliers()
+def _run_remove_rows_with_outliers() -> None:
+    table.remove_rows_with_outliers()
 
 
 def _run_remove_rows() -> None:
     table.remove_rows(lambda row: row.get_value("column_0") % 2 == 0)._lazy_frame.collect()
+
+
+def _run_remove_rows_by_column() -> None:
+    table.remove_rows_by_column("column_0", lambda cell: cell % 2 == 0)._lazy_frame.collect()
 
 
 def _run_shuffle_rows() -> None:
@@ -63,12 +69,16 @@ if __name__ == "__main__":
             _run_remove_rows_with_missing_values,
             number=REPETITIONS,
         ),
-        # "remove_rows_with_outliers": timeit(
-        #     _run_remove_rows_with_outliers,
-        #     number=REPETITIONS,
-        # ),
+        "remove_rows_with_outliers": timeit(
+            _run_remove_rows_with_outliers,
+            number=REPETITIONS,
+        ),
         "remove_rows": timeit(
             _run_remove_rows,
+            number=REPETITIONS,
+        ),
+        "remove_rows_by_column": timeit(
+            _run_remove_rows_by_column,
             number=REPETITIONS,
         ),
         "shuffle_rows": timeit(
@@ -98,11 +108,14 @@ if __name__ == "__main__":
     }
 
     # Print the timings
-    print(
-        Table(
-            {
-                "method": list(timings.keys()),
-                "timing": list(timings.values()),
-            }
+    with pl.Config(
+        tbl_rows=-1,
+    ):
+        print(
+            ExperimentalTable(
+                {
+                    "method": list(timings.keys()),
+                    "timing": list(timings.values()),
+                }
+            )
         )
-    )
