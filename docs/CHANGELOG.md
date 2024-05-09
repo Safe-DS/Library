@@ -1,3 +1,36 @@
+## [0.24.0](https://github.com/Safe-DS/Library/compare/v0.23.0...v0.24.0) (2024-05-09)
+
+
+### Features
+
+* `Column.plot_histogram()` using `Table.plot_histograms` for consistent results ([#726](https://github.com/Safe-DS/Library/issues/726)) ([576492c](https://github.com/Safe-DS/Library/commit/576492cde80de2be4ab16b9926106beab13872f1))
+* `Regressor.summarize_metrics` and `Classifier.summarize_metrics` ([#729](https://github.com/Safe-DS/Library/issues/729)) ([1cc14b1](https://github.com/Safe-DS/Library/commit/1cc14b16a5394e98bd64ad0aa39562af5c89b94d)), closes [#713](https://github.com/Safe-DS/Library/issues/713)
+* `Table.keep_only_rows` ([#721](https://github.com/Safe-DS/Library/issues/721)) ([923a6c2](https://github.com/Safe-DS/Library/commit/923a6c29f9c9b6dc59a10b5746d71c6cff029f69))
+* `Table.remove_rows` ([#720](https://github.com/Safe-DS/Library/issues/720)) ([a1cdaef](https://github.com/Safe-DS/Library/commit/a1cdaef259e9f889f8fb0355ef69d4666faa9c94)), closes [#698](https://github.com/Safe-DS/Library/issues/698)
+* Add `ImageDataset` and Layer for ConvolutionalNeuralNetworks ([#645](https://github.com/Safe-DS/Library/issues/645)) ([5b6d219](https://github.com/Safe-DS/Library/commit/5b6d21988dd4513add7ef0068670d7b0cb9d6a9f)), closes [#579](https://github.com/Safe-DS/Library/issues/579) [#580](https://github.com/Safe-DS/Library/issues/580) [#581](https://github.com/Safe-DS/Library/issues/581)
+* added load_percentage parameter to ImageList.from_files to load a subset of the given files ([#739](https://github.com/Safe-DS/Library/issues/739)) ([0564b52](https://github.com/Safe-DS/Library/commit/0564b523c46df74ac235c22783dcbf3d515ed122)), closes [#736](https://github.com/Safe-DS/Library/issues/736)
+* added rnn layer and TimeSeries conversion ([#615](https://github.com/Safe-DS/Library/issues/615)) ([6cad203](https://github.com/Safe-DS/Library/commit/6cad203c951bd1a6f11bbaa8c513df6ed0ad226e)), closes [#614](https://github.com/Safe-DS/Library/issues/614) [#648](https://github.com/Safe-DS/Library/issues/648) [#656](https://github.com/Safe-DS/Library/issues/656) [#601](https://github.com/Safe-DS/Library/issues/601)
+* Basic implementation of cell with polars ([#734](https://github.com/Safe-DS/Library/issues/734)) ([004630b](https://github.com/Safe-DS/Library/commit/004630b8195f3fca0d04311186c71abe486b8bf2)), closes [#712](https://github.com/Safe-DS/Library/issues/712)
+* deprecate `Table.add_column` and `Table.add_row` ([#723](https://github.com/Safe-DS/Library/issues/723)) ([5dd9d02](https://github.com/Safe-DS/Library/commit/5dd9d026e404e02bfe0905e8328d5b621f36c219)), closes [#722](https://github.com/Safe-DS/Library/issues/722)
+* deprecated `Table.from_excel_file` and `Table.to_excel_file` ([#728](https://github.com/Safe-DS/Library/issues/728)) ([c89e0bf](https://github.com/Safe-DS/Library/commit/c89e0bf4b2ecdd1d9be2694331c399994e565a06)), closes [#727](https://github.com/Safe-DS/Library/issues/727)
+* Larger histogram plot if table only has one column ([#716](https://github.com/Safe-DS/Library/issues/716)) ([31ffd12](https://github.com/Safe-DS/Library/commit/31ffd12fbf3526f2150b67109931d1a103eb462d))
+* polars implementation of a column ([#738](https://github.com/Safe-DS/Library/issues/738)) ([732aa48](https://github.com/Safe-DS/Library/commit/732aa480372fb8ce7c8d522c3f4ccddb4383b73f)), closes [#712](https://github.com/Safe-DS/Library/issues/712)
+* polars implementation of a row ([#733](https://github.com/Safe-DS/Library/issues/733)) ([ff627f6](https://github.com/Safe-DS/Library/commit/ff627f66e45e3cdac5c5c956346251222566664d)), closes [#712](https://github.com/Safe-DS/Library/issues/712)
+* polars implementation of table ([#744](https://github.com/Safe-DS/Library/issues/744)) ([fc49895](https://github.com/Safe-DS/Library/commit/fc498953ad30dbff5547557d35c06f8c3267cd79)), closes [#638](https://github.com/Safe-DS/Library/issues/638) [#641](https://github.com/Safe-DS/Library/issues/641) [#649](https://github.com/Safe-DS/Library/issues/649) [#712](https://github.com/Safe-DS/Library/issues/712)
+* regularization for decision trees and random forests ([#730](https://github.com/Safe-DS/Library/issues/730)) ([102de2d](https://github.com/Safe-DS/Library/commit/102de2d90a129d33c78f58597d590df1f0da3ad3)), closes [#700](https://github.com/Safe-DS/Library/issues/700)
+* Remove device information in image class ([#735](https://github.com/Safe-DS/Library/issues/735)) ([d783caa](https://github.com/Safe-DS/Library/commit/d783caa11bb2dc0e466e781eb55df6ed8a8b51a3)), closes [#524](https://github.com/Safe-DS/Library/issues/524)
+* return fitted transformer and transformed table from `fit_and_transform` ([#724](https://github.com/Safe-DS/Library/issues/724)) ([2960d35](https://github.com/Safe-DS/Library/commit/2960d3558851691bb6986cbb05dcfa514b6f3ab6)), closes [#613](https://github.com/Safe-DS/Library/issues/613)
+
+
+### Bug Fixes
+
+* make `Image.clone` internal ([#725](https://github.com/Safe-DS/Library/issues/725)) ([215a472](https://github.com/Safe-DS/Library/commit/215a4726cd0e3615b95329f317433e3c48bd208d)), closes [#626](https://github.com/Safe-DS/Library/issues/626)
+
+
+### Performance Improvements
+
+* improved performance of `TabularDataset.__eq__` by a factor of up to 2 ([#697](https://github.com/Safe-DS/Library/issues/697)) ([cd7f55b](https://github.com/Safe-DS/Library/commit/cd7f55ba4f882c2af9233dece53d8e8b6191a6fb))
+
 ## [0.23.0](https://github.com/Safe-DS/Library/compare/v0.22.1...v0.23.0) (2024-05-04)
 
 
