@@ -2,6 +2,9 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from safeds._utils import _figure_to_image
+from safeds.exceptions import NonNumericColumnError, UnknownColumnNameError
+
 if TYPE_CHECKING:
     from safeds.data.image.containers import Image
     from safeds.data.tabular.containers import ExperimentalTable
@@ -21,10 +24,106 @@ class ExperimentalTablePlotter:
         raise NotImplementedError
 
     def line_plot(self, x_name: str, y_name: str) -> Image:
-        raise NotImplementedError
+        # TODO: extract validation
+        missing_columns = []
+        if not self._table.has_column(x_name):
+            missing_columns.append(x_name)
+        if not self._table.has_column(y_name):
+            missing_columns.append(y_name)
+        if missing_columns:
+            raise UnknownColumnNameError(missing_columns)
+
+        # TODO: pass list of columns names
+        if not self._table.get_column(x_name).is_numeric:
+            raise NonNumericColumnError(x_name)
+        if not self._table.get_column(y_name).is_numeric:
+            raise NonNumericColumnError(y_name)
+
+        import matplotlib.pyplot as plt
+
+        fig, ax = plt.subplots()
+        ax.plot(
+            self._table.get_column(x_name)._series,
+            self._table.get_column(y_name)._series,
+        )
+        ax.set(
+            xlabel=x_name,
+            ylabel=y_name,
+        )
+        ax.set_xticks(ax.get_xticks())
+        ax.set_xticklabels(
+            ax.get_xticklabels(),
+            rotation=45,
+            horizontalalignment="right",
+        )  # rotate the labels of the x Axis to prevent the chance of overlapping of the labels
+        fig.tight_layout()
+
+        return _figure_to_image(fig)
 
     def scatter_plot(self, x_name: str, y_name: str) -> Image:
-        raise NotImplementedError
+        """
+        Create a scatter plot for two columns in the table.
+
+        Parameters
+        ----------
+        x_name:
+            The name of the column to be plotted on the x-axis.
+        y_name:
+            The name of the column to be plotted on the y-axis.
+
+        Returns
+        -------
+        scatter_plot:
+            The plot as an image.
+
+        Raises
+        ------
+        KeyError
+            If a column does not exist.
+        TypeError
+            If a column is not numeric.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import ExperimentalColumn
+        >>> table = ExperimentalColumn("values", [1,2,3,4,3,2])
+        >>> image = table.plot.lag_plot(2)
+        """
+        # TODO: extract validation
+        missing_columns = []
+        if not self._table.has_column(x_name):
+            missing_columns.append(x_name)
+        if not self._table.has_column(y_name):
+            missing_columns.append(y_name)
+        if missing_columns:
+            raise UnknownColumnNameError(missing_columns)
+
+        # TODO: pass list of columns names
+        if not self._table.get_column(x_name).is_numeric:
+            raise NonNumericColumnError(x_name)
+        if not self._table.get_column(y_name).is_numeric:
+            raise NonNumericColumnError(y_name)
+
+        import matplotlib.pyplot as plt
+
+        fig, ax = plt.subplots()
+        ax.scatter(
+            x=self._table.get_column(x_name)._series,
+            y=self._table.get_column(y_name)._series,
+        )
+        ax.set(
+            xlabel=x_name,
+            ylabel=y_name,
+        )
+        ax.set_xticks(ax.get_xticks())
+        ax.set_xticklabels(
+            ax.get_xticklabels(),
+            rotation=45,
+            horizontalalignment="right",
+        )  # rotate the labels of the x Axis to prevent the chance of overlapping of the labels
+        fig.tight_layout()
+
+        return _figure_to_image(fig)
 
     # TODO: equivalent to Column.plot_compare_columns that takes a list of column names (index_plot)?
 
@@ -83,131 +182,6 @@ class ExperimentalTablePlotter:
     #             cmap="vlag",
     #         )
     #         plt.tight_layout()
-    #
-    #     buffer = io.BytesIO()
-    #     fig.savefig(buffer, format="png")
-    #     plt.close()  # Prevents the figure from being displayed directly
-    #     buffer.seek(0)
-    #     return Image.from_bytes(buffer.read())
-    #
-    # def plot_lineplot(self, x_column_name: str, y_column_name: str) -> Image:
-    #     """
-    #     Plot two columns against each other in a lineplot.
-    #
-    #     If there are multiple x-values for a y-value, the resulting plot will consist of a line representing the mean
-    #     and the lower-transparency area around the line representing the 95% confidence interval.
-    #
-    #     Parameters
-    #     ----------
-    #     x_column_name:
-    #         The column name of the column to be plotted on the x-Axis.
-    #     y_column_name:
-    #         The column name of the column to be plotted on the y-Axis.
-    #
-    #     Returns
-    #     -------
-    #     plot:
-    #         The plot as an image.
-    #
-    #     Raises
-    #     ------
-    #     UnknownColumnNameError
-    #         If either of the columns do not exist.
-    #
-    #     Examples
-    #     --------
-    #     >>> from safeds.data.tabular.containers import Table
-    #     >>> table = Table.from_dict({"temperature": [10, 15, 20, 25, 30], "sales": [54, 74, 90, 206, 210]})
-    #     >>> image = table.plot_lineplot("temperature", "sales")
-    #     """
-    #     import matplotlib.pyplot as plt
-    #     import seaborn as sns
-    #
-    #     if not self.has_column(x_column_name) or not self.has_column(y_column_name):
-    #         similar_columns_x = self._get_similar_columns(x_column_name)
-    #         similar_columns_y = self._get_similar_columns(y_column_name)
-    #         raise UnknownColumnNameError(
-    #             ([x_column_name] if not self.has_column(x_column_name) else [])
-    #             + ([y_column_name] if not self.has_column(y_column_name) else []),
-    #             (similar_columns_x if not self.has_column(x_column_name) else [])
-    #             + (similar_columns_y if not self.has_column(y_column_name) else []),
-    #             )
-    #
-    #     fig = plt.figure()
-    #     ax = sns.lineplot(
-    #         data=self._data,
-    #         x=x_column_name,
-    #         y=y_column_name,
-    #     )
-    #     ax.set(xlabel=x_column_name, ylabel=y_column_name)
-    #     ax.set_xticks(ax.get_xticks())
-    #     ax.set_xticklabels(
-    #         ax.get_xticklabels(),
-    #         rotation=45,
-    #         horizontalalignment="right",
-    #     )  # rotate the labels of the x Axis to prevent the chance of overlapping of the labels
-    #     plt.tight_layout()
-    #
-    #     buffer = io.BytesIO()
-    #     fig.savefig(buffer, format="png")
-    #     plt.close()  # Prevents the figure from being displayed directly
-    #     buffer.seek(0)
-    #     return Image.from_bytes(buffer.read())
-    #
-    # def plot_scatterplot(self, x_column_name: str, y_column_name: str) -> Image:
-    #     """
-    #     Plot two columns against each other in a scatterplot.
-    #
-    #     Parameters
-    #     ----------
-    #     x_column_name:
-    #         The column name of the column to be plotted on the x-Axis.
-    #     y_column_name:
-    #         The column name of the column to be plotted on the y-Axis.
-    #
-    #     Returns
-    #     -------
-    #     plot:
-    #         The plot as an image.
-    #
-    #     Raises
-    #     ------
-    #     UnknownColumnNameError
-    #         If either of the columns do not exist.
-    #
-    #     Examples
-    #     --------
-    #     >>> from safeds.data.tabular.containers import Table
-    #     >>> table = Table.from_dict({"temperature": [10, 15, 20, 25, 30], "sales": [54, 74, 90, 206, 210]})
-    #     >>> image = table.plot_scatterplot("temperature", "sales")
-    #     """
-    #     import matplotlib.pyplot as plt
-    #     import seaborn as sns
-    #
-    #     if not self.has_column(x_column_name) or not self.has_column(y_column_name):
-    #         similar_columns_x = self._get_similar_columns(x_column_name)
-    #         similar_columns_y = self._get_similar_columns(y_column_name)
-    #         raise UnknownColumnNameError(
-    #             ([x_column_name] if not self.has_column(x_column_name) else [])
-    #             + ([y_column_name] if not self.has_column(y_column_name) else []),
-    #             (similar_columns_x if not self.has_column(x_column_name) else [])
-    #             + (similar_columns_y if not self.has_column(y_column_name) else []),
-    #             )
-    #
-    #     fig = plt.figure()
-    #     ax = sns.scatterplot(
-    #         data=self._data,
-    #         x=x_column_name,
-    #         y=y_column_name,
-    #     )
-    #     ax.set(xlabel=x_column_name, ylabel=y_column_name)
-    #     ax.set_xticks(ax.get_xticks())
-    #     ax.set_xticklabels(
-    #         ax.get_xticklabels(),
-    #         rotation=45,
-    #         horizontalalignment="right",
-    #     )  # rotate the labels of the x Axis to prevent the chance of overlapping of the labels
-    #     plt.tight_layout()
     #
     #     buffer = io.BytesIO()
     #     fig.savefig(buffer, format="png")
