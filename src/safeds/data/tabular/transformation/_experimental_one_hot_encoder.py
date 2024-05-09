@@ -113,13 +113,7 @@ class ExperimentalOneHotEncoder(ExperimentalInvertibleTableTransformer):
         if table.number_of_rows == 0:
             raise ValueError("The OneHotEncoder cannot be fitted because the table contains 0 rows")
 
-        if (
-            table
-            .remove_columns_except(column_names)
-            .remove_non_numeric_columns()
-            .number_of_columns
-            > 0
-        ):
+        if table.remove_columns_except(column_names).remove_non_numeric_columns().number_of_columns > 0:
             warnings.warn(
                 "The columns"
                 f" {table.remove_columns_except(column_names).remove_non_numeric_columns().column_names} contain"

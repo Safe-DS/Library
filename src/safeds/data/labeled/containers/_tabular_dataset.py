@@ -196,7 +196,8 @@ class TabularDataset:
                 dataset=_create_dataset(
                     torch.Tensor(self.features._data.values).to(_get_device()),
                     torch.nn.functional.one_hot(
-                        torch.LongTensor(self.target._data).to(_get_device()), num_classes=num_of_classes,
+                        torch.LongTensor(self.target._data).to(_get_device()),
+                        num_classes=num_of_classes,
                     ),
                 ),
                 batch_size=batch_size,

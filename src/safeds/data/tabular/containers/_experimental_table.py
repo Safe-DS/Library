@@ -885,9 +885,7 @@ class ExperimentalTable:
         if len(new_columns) == 1:
             new_column = new_columns[0]
             return ExperimentalTable._from_polars_lazy_frame(
-                self._lazy_frame
-                    .with_columns(new_column._series.alias(old_name))
-                    .rename({old_name: new_column.name}),
+                self._lazy_frame.with_columns(new_column._series.alias(old_name)).rename({old_name: new_column.name}),
             )
 
         import polars as pl
@@ -898,7 +896,7 @@ class ExperimentalTable:
             self._lazy_frame.select(
                 *[pl.col(name) for name in self.column_names[:index]],
                 *[column._series for column in new_columns],
-                *[pl.col(name) for name in self.column_names[index + 1:]],
+                *[pl.col(name) for name in self.column_names[index + 1 :]],
             ),
         )
 
@@ -1183,11 +1181,9 @@ class ExperimentalTable:
         import polars.selectors as cs
 
         non_outlier_mask = pl.all_horizontal(
-            self._data_frame
-                .select(cs.numeric() & cs.by_name(column_names))
-                .select(
-                    pl.all().is_null() | (((pl.all() - pl.all().mean()) / pl.all().std()).abs() <= z_score_threshold),
-                ),
+            self._data_frame.select(cs.numeric() & cs.by_name(column_names)).select(
+                pl.all().is_null() | (((pl.all() - pl.all().mean()) / pl.all().std()).abs() <= z_score_threshold),
+            ),
         )
 
         return ExperimentalTable._from_polars_lazy_frame(
@@ -1653,10 +1649,7 @@ class ExperimentalTable:
             return ExperimentalTable()
 
         head = self.get_column(self.column_names[0]).summarize_statistics()
-        tail = [
-            self.get_column(name).summarize_statistics().get_column(name)._series
-            for name in self.column_names[1:]
-        ]
+        tail = [self.get_column(name).summarize_statistics().get_column(name)._series for name in self.column_names[1:]]
 
         return ExperimentalTable._from_polars_data_frame(
             head._lazy_frame.collect().hstack(tail, in_place=True),

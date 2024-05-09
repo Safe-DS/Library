@@ -166,9 +166,7 @@ class ExperimentalSimpleImputer(ExperimentalTableTransformer):
                     sorted(
                         set(table.remove_columns_except(column_names).column_names)
                         - set(
-                            table.remove_columns_except(column_names)
-                            .remove_non_numeric_columns()
-                            .column_names,
+                            table.remove_columns_except(column_names).remove_non_numeric_columns().column_names,
                         ),
                     ),
                 ),

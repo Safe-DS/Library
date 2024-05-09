@@ -90,7 +90,8 @@ def fit(model: Any, tabular_dataset: TabularDataset | ExperimentalTabularDataset
 def predict(
     model: Any,
     dataset: Table | ExperimentalTable | ExperimentalTabularDataset,
-    feature_names: list[str] | None, target_name: str | None,
+    feature_names: list[str] | None,
+    target_name: str | None,
 ) -> TabularDataset:
     """
     Predict a target vector using a dataset containing feature vectors. The model has to be trained first.

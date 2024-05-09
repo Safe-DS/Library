@@ -84,9 +84,7 @@ class ExperimentalRangeScaler(ExperimentalInvertibleTableTransformer):
                     sorted(
                         set(table.remove_columns_except(column_names).column_names)
                         - set(
-                            table.remove_columns_except(column_names)
-                            .remove_non_numeric_columns()
-                            .column_names,
+                            table.remove_columns_except(column_names).remove_non_numeric_columns().column_names,
                         ),
                     ),
                 ),
@@ -152,9 +150,7 @@ class ExperimentalRangeScaler(ExperimentalInvertibleTableTransformer):
                     sorted(
                         set(table.remove_columns_except(self._column_names).column_names)
                         - set(
-                            table.remove_columns_except(self._column_names)
-                            .remove_non_numeric_columns()
-                            .column_names,
+                            table.remove_columns_except(self._column_names).remove_non_numeric_columns().column_names,
                         ),
                     ),
                 ),
@@ -206,9 +202,7 @@ class ExperimentalRangeScaler(ExperimentalInvertibleTableTransformer):
             raise ValueError("The RangeScaler cannot transform the table because it contains 0 rows")
 
         if (
-            transformed_table.remove_columns_except(self._column_names)
-            .remove_non_numeric_columns()
-            .number_of_columns
+            transformed_table.remove_columns_except(self._column_names).remove_non_numeric_columns().number_of_columns
             < transformed_table.remove_columns_except(self._column_names).number_of_columns
         ):
             raise NonNumericColumnError(
@@ -226,9 +220,11 @@ class ExperimentalRangeScaler(ExperimentalInvertibleTableTransformer):
 
         import polars as pl
 
-        new_data = pl.DataFrame(self._wrapped_transformer.inverse_transform(
-            transformed_table.remove_columns_except(self._column_names)._data_frame,
-        ))
+        new_data = pl.DataFrame(
+            self._wrapped_transformer.inverse_transform(
+                transformed_table.remove_columns_except(self._column_names)._data_frame,
+            )
+        )
 
         name_mapping = dict(zip(new_data.columns, self._column_names, strict=True))
 

@@ -66,9 +66,7 @@ class ExperimentalStandardScaler(ExperimentalInvertibleTableTransformer):
                     sorted(
                         set(table.remove_columns_except(column_names).column_names)
                         - set(
-                            table.remove_columns_except(column_names)
-                            .remove_non_numeric_columns()
-                            .column_names,
+                            table.remove_columns_except(column_names).remove_non_numeric_columns().column_names,
                         ),
                     ),
                 ),
@@ -134,9 +132,7 @@ class ExperimentalStandardScaler(ExperimentalInvertibleTableTransformer):
                     sorted(
                         set(table.remove_columns_except(self._column_names).column_names)
                         - set(
-                            table.remove_columns_except(self._column_names)
-                            .remove_non_numeric_columns()
-                            .column_names,
+                            table.remove_columns_except(self._column_names).remove_non_numeric_columns().column_names,
                         ),
                     ),
                 ),
@@ -188,9 +184,7 @@ class ExperimentalStandardScaler(ExperimentalInvertibleTableTransformer):
             raise ValueError("The StandardScaler cannot transform the table because it contains 0 rows")
 
         if (
-            transformed_table.remove_columns_except(self._column_names)
-            .remove_non_numeric_columns()
-            .number_of_columns
+            transformed_table.remove_columns_except(self._column_names).remove_non_numeric_columns().number_of_columns
             < transformed_table.remove_columns_except(self._column_names).number_of_columns
         ):
             raise NonNumericColumnError(
