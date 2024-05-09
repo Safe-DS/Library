@@ -816,8 +816,6 @@ class ExperimentalTable:
         **Note:**
 
         * The original table is not modified.
-        * If a column is replaced by multiple columns, this operation must fully load the data into memory, which can be
-          expensive.
 
         Parameters
         ----------
@@ -892,13 +890,16 @@ class ExperimentalTable:
                     .rename({old_name: new_column.name}),
             )
 
-        new_frame = self._data_frame
-        index = new_frame.get_column_index(old_name)
-        prefix = new_frame.select(self.column_names[:index])
-        suffix = new_frame.select(self.column_names[index + 1:])
+        import polars as pl
 
-        return ExperimentalTable._from_polars_data_frame(
-            prefix.hstack([column._series for column in new_columns]).hstack(suffix),
+        index = self.column_names.index(old_name)
+
+        return ExperimentalTable._from_polars_lazy_frame(
+            self._lazy_frame.select(
+                *[pl.col(name) for name in self.column_names[:index]],
+                *[column._series for column in new_columns],
+                *[pl.col(name) for name in self.column_names[index + 1:]],
+            ),
         )
 
     def transform_column(
