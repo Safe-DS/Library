@@ -1,5 +1,7 @@
 from timeit import timeit
 
+import polars as pl
+
 from safeds.data.tabular.containers import ExperimentalTable
 
 from benchmarks.table.utils import create_synthetic_table_polars
@@ -15,8 +17,8 @@ def _run_remove_rows_with_missing_values() -> None:
     table.remove_rows_with_missing_values()._lazy_frame.collect()
 
 
-# def _run_remove_rows_with_outliers() -> None:
-#     table.remove_rows_with_outliers()
+def _run_remove_rows_with_outliers() -> None:
+    table.remove_rows_with_outliers()
 
 
 def _run_remove_rows() -> None:
@@ -55,7 +57,7 @@ def _run_transform_column() -> None:
 
 if __name__ == "__main__":
     # Create a synthetic Table
-    table = create_synthetic_table_polars(100000, 50)
+    table = create_synthetic_table_polars(1000, 50)
 
     # Run the benchmarks
     timings: dict[str, float] = {
@@ -67,10 +69,10 @@ if __name__ == "__main__":
             _run_remove_rows_with_missing_values,
             number=REPETITIONS,
         ),
-        # "remove_rows_with_outliers": timeit(
-        #     _run_remove_rows_with_outliers,
-        #     number=REPETITIONS,
-        # ),
+        "remove_rows_with_outliers": timeit(
+            _run_remove_rows_with_outliers,
+            number=REPETITIONS,
+        ),
         "remove_rows": timeit(
             _run_remove_rows,
             number=REPETITIONS,
@@ -106,11 +108,14 @@ if __name__ == "__main__":
     }
 
     # Print the timings
-    print(
-        ExperimentalTable(
-            {
-                "method": list(timings.keys()),
-                "timing": list(timings.values()),
-            }
+    with pl.Config(
+        tbl_rows=-1,
+    ):
+        print(
+            ExperimentalTable(
+                {
+                    "method": list(timings.keys()),
+                    "timing": list(timings.values()),
+                }
+            )
         )
-    )
