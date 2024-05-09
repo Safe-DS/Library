@@ -15,8 +15,6 @@ JSON_PRETTIER_FILE_EXTENSIONS:
   - .html
 #  - .md
 
-PYTHON_RUFF_CONFIG_FILE: pyproject.toml
-
 # Commands
 PRE_COMMANDS:
   - command: npm i @lars-reimann/prettier-config
