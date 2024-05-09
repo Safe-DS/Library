@@ -7,7 +7,6 @@ import numpy as np
 import PIL.Image
 import pytest
 import torch
-
 from safeds._config import _get_device
 from safeds.data.image.containers import Image
 from safeds.data.image.typing import ImageSize
@@ -18,6 +17,8 @@ from torch.types import Device
 
 from tests.helpers import (
     configure_test_with_device,
+    device_cpu,
+    device_cuda,
     get_devices,
     get_devices_ids,
     grayscale_jpg_id,
@@ -41,8 +42,6 @@ from tests.helpers import (
     white_square_jpg_path,
     white_square_png_id,
     white_square_png_path,
-    device_cpu,
-    device_cuda,
 )
 
 
