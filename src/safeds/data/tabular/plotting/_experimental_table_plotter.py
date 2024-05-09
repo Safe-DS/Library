@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import warnings
 from typing import TYPE_CHECKING
 
 from safeds._utils import _figure_to_image
@@ -15,10 +16,111 @@ class ExperimentalTablePlotter:
         self._table: ExperimentalTable = table
 
     def box_plots(self) -> Image:
-        raise NotImplementedError
+        """
+        Plot a boxplot for every numerical column.
+
+        Returns
+        -------
+        plot:
+            The plot as an image.
+
+        Raises
+        ------
+        NonNumericColumnError
+            If the table contains only non-numerical columns.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table
+        >>> table = Table({"a":[1, 2], "b": [3, 42]})
+        >>> image = table.plot_boxplots()
+        """
+        # TOOD: implement using matplotlib and polars
+        import matplotlib.pyplot as plt
+        import seaborn as sns
+
+        numerical_table = self._table.remove_non_numeric_columns()
+        if numerical_table.number_of_columns == 0:
+            raise NonNumericColumnError("This table contains only non-numerical columns.")
+        col_wrap = min(numerical_table.number_of_columns, 3)
+
+        data = numerical_table._lazy_frame.melt(value_vars=numerical_table.column_names).collect()
+        grid = sns.FacetGrid(data, col="variable", col_wrap=col_wrap, sharex=False, sharey=False)
+        with warnings.catch_warnings():
+            warnings.filterwarnings(
+                "ignore",
+                message="Using the boxplot function without specifying `order` is likely to produce an incorrect plot.",
+            )
+            grid.map(sns.boxplot, "variable", "value")
+        grid.set_xlabels("")
+        grid.set_ylabels("")
+        grid.set_titles("{col_name}")
+        for axes in grid.axes.flat:
+            axes.set_xticks([])
+        plt.tight_layout()
+        fig = grid.fig
+
+        return _figure_to_image(fig)
 
     def correlation_heatmap(self) -> Image:
-        raise NotImplementedError
+        """
+        Plot a correlation heatmap for all numerical columns of this `Table`.
+
+        Returns
+        -------
+        plot:
+            The plot as an image.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table
+        >>> table = Table.from_dict({"temperature": [10, 15, 20, 25, 30], "sales": [54, 74, 90, 206, 210]})
+        >>> image = table.plot_correlation_heatmap()
+        """
+        # TODO: implement using matplotlib and polars
+        #  https://stackoverflow.com/questions/33282368/plotting-a-2d-heatmap
+        import matplotlib.pyplot as plt
+        import seaborn as sns
+
+        only_numerical = self._table.remove_non_numeric_columns()
+
+        if self._table.number_of_rows == 0:
+            warnings.warn(
+                "An empty table has been used. A correlation heatmap on an empty table will show nothing.",
+                stacklevel=2,
+            )
+
+            with warnings.catch_warnings():
+                warnings.filterwarnings(
+                    "ignore",
+                    message=(
+                        "Attempting to set identical low and high (xlims|ylims) makes transformation singular;"
+                        " automatically expanding."
+                    ),
+                )
+                fig = plt.figure()
+                sns.heatmap(
+                    data=only_numerical._data_frame.corr(),
+                    vmin=-1,
+                    vmax=1,
+                    xticklabels=only_numerical.column_names,
+                    yticklabels=only_numerical.column_names,
+                    cmap="vlag",
+                )
+                plt.tight_layout()
+        else:
+            fig = plt.figure()
+            sns.heatmap(
+                data=only_numerical._data_frame.corr(),
+                vmin=-1,
+                vmax=1,
+                xticklabels=only_numerical.column_names,
+                yticklabels=only_numerical.column_names,
+                cmap="vlag",
+            )
+            plt.tight_layout()
+
+        return _figure_to_image(fig)
 
     def histograms(self, *, number_of_bins: int = 10) -> Image:
         """
@@ -40,6 +142,7 @@ class ExperimentalTablePlotter:
         >>> table = Table({"a": [2, 3, 5, 1], "b": [54, 74, 90, 2014]})
         >>> image = table.plot_histograms()
         """
+        # TODO: implement using polars
         import matplotlib.pyplot as plt
         import numpy as np
         import pandas as pd
@@ -194,6 +297,7 @@ class ExperimentalTablePlotter:
         ... )
         >>> image = table.plot.scatter_plot("a", "b")
         """
+        # TODO: merge with line_plot?
         # TODO: extract validation
         missing_columns = []
         if not self._table.has_column(x_name):
@@ -231,118 +335,3 @@ class ExperimentalTablePlotter:
         return _figure_to_image(fig)
 
     # TODO: equivalent to Column.plot_compare_columns that takes a list of column names (index_plot)?
-
-    # def plot_correlation_heatmap(self) -> Image:
-    #     """
-    #     Plot a correlation heatmap for all numerical columns of this `Table`.
-    #
-    #     Returns
-    #     -------
-    #     plot:
-    #         The plot as an image.
-    #
-    #     Examples
-    #     --------
-    #     >>> from safeds.data.tabular.containers import Table
-    #     >>> table = Table.from_dict({"temperature": [10, 15, 20, 25, 30], "sales": [54, 74, 90, 206, 210]})
-    #     >>> image = table.plot_correlation_heatmap()
-    #     """
-    #     import matplotlib.pyplot as plt
-    #     import seaborn as sns
-    #
-    #     only_numerical = self.remove_columns_with_non_numerical_values()
-    #
-    #     if self.number_of_rows == 0:
-    #         warnings.warn(
-    #             "An empty table has been used. A correlation heatmap on an empty table will show nothing.",
-    #             stacklevel=2,
-    #         )
-    #
-    #         with warnings.catch_warnings():
-    #             warnings.filterwarnings(
-    #                 "ignore",
-    #                 message=(
-    #                     "Attempting to set identical low and high (xlims|ylims) makes transformation singular;"
-    #                     " automatically expanding."
-    #                 ),
-    #             )
-    #             fig = plt.figure()
-    #             sns.heatmap(
-    #                 data=only_numerical._data.corr(),
-    #                 vmin=-1,
-    #                 vmax=1,
-    #                 xticklabels=only_numerical.column_names,
-    #                 yticklabels=only_numerical.column_names,
-    #                 cmap="vlag",
-    #             )
-    #             plt.tight_layout()
-    #     else:
-    #         fig = plt.figure()
-    #         sns.heatmap(
-    #             data=only_numerical._data.corr(),
-    #             vmin=-1,
-    #             vmax=1,
-    #             xticklabels=only_numerical.column_names,
-    #             yticklabels=only_numerical.column_names,
-    #             cmap="vlag",
-    #         )
-    #         plt.tight_layout()
-    #
-    #     buffer = io.BytesIO()
-    #     fig.savefig(buffer, format="png")
-    #     plt.close()  # Prevents the figure from being displayed directly
-    #     buffer.seek(0)
-    #     return Image.from_bytes(buffer.read())
-    #
-    # def plot_boxplots(self) -> Image:
-    #     """
-    #     Plot a boxplot for every numerical column.
-    #
-    #     Returns
-    #     -------
-    #     plot:
-    #         The plot as an image.
-    #
-    #     Raises
-    #     ------
-    #     NonNumericColumnError
-    #         If the table contains only non-numerical columns.
-    #
-    #     Examples
-    #     --------
-    #     >>> from safeds.data.tabular.containers import Table
-    #     >>> table = Table({"a":[1, 2], "b": [3, 42]})
-    #     >>> image = table.plot_boxplots()
-    #     """
-    #     import matplotlib.pyplot as plt
-    #     import pandas as pd
-    #     import seaborn as sns
-    #
-    #     numerical_table = self.remove_columns_with_non_numerical_values()
-    #     if numerical_table.number_of_columns == 0:
-    #         raise NonNumericColumnError("This table contains only non-numerical columns.")
-    #     col_wrap = min(numerical_table.number_of_columns, 3)
-    #
-    #     data = pd.melt(numerical_table._data, value_vars=numerical_table.column_names)
-    #     grid = sns.FacetGrid(data, col="variable", col_wrap=col_wrap, sharex=False, sharey=False)
-    #     with warnings.catch_warnings():
-    #         warnings.filterwarnings(
-    #             "ignore",
-    #             message="Using the boxplot function without specifying `order` is likely to produce an incorrect plot.",
-    #         )
-    #         grid.map(sns.boxplot, "variable", "value")
-    #     grid.set_xlabels("")
-    #     grid.set_ylabels("")
-    #     grid.set_titles("{col_name}")
-    #     for axes in grid.axes.flat:
-    #         axes.set_xticks([])
-    #     plt.tight_layout()
-    #     fig = grid.fig
-    #
-    #     buffer = io.BytesIO()
-    #     fig.savefig(buffer, format="png")
-    #     plt.close()  # Prevents the figure from being displayed directly
-    #     buffer.seek(0)
-    #     return Image.from_bytes(buffer.read())
-    #
-    # def plot_histograms(self, *, number_of_bins: int = 10) -> Image:
