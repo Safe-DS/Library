@@ -506,6 +506,8 @@ class ExperimentalTable:
         """
         Get a column from the table.
 
+        **Note:** This operation must fully load the data into memory, which can be expensive.
+
         Parameters
         ----------
         name:
@@ -813,9 +815,7 @@ class ExperimentalTable:
         """
         Return a new table with a column replaced by zero or more columns.
 
-        **Note:**
-
-        * The original table is not modified.
+        **Note:** The original table is not modified.
 
         Parameters
         ----------
@@ -907,6 +907,44 @@ class ExperimentalTable:
         name: str,
         transformer: Callable[[ExperimentalCell], ExperimentalCell],
     ) -> ExperimentalTable:
+        """
+        Return a new table with a column transformed.
+
+        **Note:** The original table is not modified.
+
+        Parameters
+        ----------
+        name:
+            The name of the column to transform.
+
+        transformer:
+            The function that transforms the column.
+
+        Returns
+        -------
+        new_table:
+            The table with the transformed column.
+
+        Raises
+        ------
+        KeyError
+            If no column with the specified name exists.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import ExperimentalTable
+        >>> table = ExperimentalTable({"a": [1, 2, 3], "b": [4, 5, 6]})
+        >>> table.transform_column("a", lambda cell: cell + 1)
+        +-----+-----+
+        |   a |   b |
+        | --- | --- |
+        | i64 | i64 |
+        +===========+
+        |   2 |   4 |
+        |   3 |   5 |
+        |   4 |   6 |
+        +-----+-----+
+        """
         if not self.has_column(name):
             raise UnknownColumnNameError([name])  # TODO: in the error, compute similar column names
 
@@ -930,7 +968,7 @@ class ExperimentalTable:
 
         Returns
         -------
-        filtered_table:
+        new_table:
             The table without duplicate rows.
 
         Examples
@@ -955,10 +993,39 @@ class ExperimentalTable:
         self,
         query: Callable[[ExperimentalRow], ExperimentalCell[bool]],
     ) -> ExperimentalTable:
+        """
+        Remove rows from the table that satisfy a condition.
+
+        **Note:** The original table is not modified.
+
+        Parameters
+        ----------
+        query:
+            The function that determines which rows to remove.
+
+        Returns
+        -------
+        new_table:
+            The table without the specified rows.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import ExperimentalTable
+        >>> table = ExperimentalTable({"a": [1, 2, 3], "b": [4, 5, 6]})
+        >>> table.remove_rows(lambda row: row.get_value("a") == 2)
+        +-----+-----+
+        |   a |   b |
+        | --- | --- |
+        | i64 | i64 |
+        +===========+
+        |   1 |   4 |
+        |   3 |   6 |
+        +-----+-----+
+        """
         mask = query(_LazyVectorizedRow(self))
 
         return ExperimentalTable._from_polars_lazy_frame(
-            self._lazy_frame.filter(mask._polars_expression),
+            self._lazy_frame.filter(~mask._polars_expression),
         )
 
     def remove_rows_by_column(
@@ -966,6 +1033,42 @@ class ExperimentalTable:
         name: str,
         query: Callable[[ExperimentalCell], ExperimentalCell[bool]],
     ) -> ExperimentalTable:
+        """
+        Remove rows from the table that satisfy a condition on a specific column.
+
+        **Note:** The original table is not modified.
+
+        Parameters
+        ----------
+        name:
+            The name of the column.
+        query:
+            The function that determines which rows to remove.
+
+        Returns
+        -------
+        new_table:
+            The table without the specified rows.
+
+        Raises
+        ------
+        KeyError
+            If the column does not exist.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import ExperimentalTable
+        >>> table = ExperimentalTable({"a": [1, 2, 3], "b": [4, 5, 6]})
+        >>> table.remove_rows_by_column("a", lambda cell: cell == 2)
+        +-----+-----+
+        |   a |   b |
+        | --- | --- |
+        | i64 | i64 |
+        +===========+
+        |   1 |   4 |
+        |   3 |   6 |
+        +-----+-----+
+        """
         import polars as pl
 
         if not self.has_column(name):
@@ -974,7 +1077,7 @@ class ExperimentalTable:
         mask = query(_LazyCell(pl.col(name)))
 
         return ExperimentalTable._from_polars_lazy_frame(
-            self._lazy_frame.filter(mask._polars_expression),
+            self._lazy_frame.filter(~mask._polars_expression),
         )
 
     def remove_rows_with_missing_values(
@@ -982,7 +1085,7 @@ class ExperimentalTable:
         subset_names: list[str] | None = None,
     ) -> ExperimentalTable:
         """
-        Remove rows with missing values from the table.
+        Remove rows with missing values in at least one the specified columns from the table.
 
         **Note:** The original table is not modified.
 
@@ -993,7 +1096,7 @@ class ExperimentalTable:
 
         Returns
         -------
-        filtered_table:
+        new_table:
             The table without rows containing missing values in the specified columns.
 
         Examples
@@ -1016,7 +1119,57 @@ class ExperimentalTable:
     def remove_rows_with_outliers(
         self,
         subset_names: list[str] | None = None,
+        *,
+        z_score_threshold: float = 3,
     ) -> ExperimentalTable:
+        """
+        Remove rows with outliers in at least one of the specified columns from the table.
+
+        Whether a data point is an outlier in a column is determined by its z-score. The z-score the distance of the
+        data point from the mean of the column divided by the standard deviation of the column. If the z-score is
+        greater than the given threshold, the data point is considered an outlier. Missing values are ignored during the
+        calculation of the z-score.
+
+
+
+        **Note:** The original table is not modified.
+
+        Parameters
+        ----------
+        subset_names:
+            Names of the columns to consider. If None, all numeric columns are considered.
+        z_score_threshold:
+            The z-score threshold for detecting outliers.
+
+        Returns
+        -------
+        new_table:
+            The table without rows containing outliers in the specified columns.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import ExperimentalTable
+        >>> table = ExperimentalTable(
+        ...     {
+        ...         "a": [1, 2, 3, 4, 5, 6, 1000, None],
+        ...         "b": [1, 2, 3, 4, 5, 6,    7,    8],
+        ...     }
+        ... )
+        >>> table.remove_rows_with_outliers(z_score_threshold=2)
+        +------+-----+
+        |    a |   b |
+        |  --- | --- |
+        |  i64 | i64 |
+        +============+
+        |    1 |   1 |
+        |    2 |   2 |
+        |    3 |   3 |
+        |    4 |   4 |
+        |    5 |   5 |
+        |    6 |   6 |
+        | null |   8 |
+        +------+-----+
+        """
         if subset_names is None:
             subset_names = self.column_names
 
@@ -1027,7 +1180,7 @@ class ExperimentalTable:
             self._data_frame
                 .select(cs.numeric() & cs.by_name(subset_names))
                 .select(
-                    ((pl.all() - pl.all().mean()) / pl.all().std()) <= 3,
+                    pl.all().is_null() | (((pl.all() - pl.all().mean()) / pl.all().std()).abs() <= z_score_threshold),
                 ),
         )
 
