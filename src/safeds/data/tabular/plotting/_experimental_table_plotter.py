@@ -21,9 +21,109 @@ class ExperimentalTablePlotter:
         raise NotImplementedError
 
     def histograms(self, *, number_of_bins: int = 10) -> Image:
-        raise NotImplementedError
+        """
+        Plot a histogram for every column.
+
+        Parameters
+        ----------
+        number_of_bins:
+            The number of bins to use in the histogram. Default is 10.
+
+        Returns
+        -------
+        plot:
+            The plot as an image.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table
+        >>> table = Table({"a": [2, 3, 5, 1], "b": [54, 74, 90, 2014]})
+        >>> image = table.plot_histograms()
+        """
+        import matplotlib.pyplot as plt
+        import numpy as np
+        import pandas as pd
+
+        n_cols = min(3, self._table.number_of_columns)
+        n_rows = 1 + (self._table.number_of_columns - 1) // n_cols
+
+        if n_cols == 1 and n_rows == 1:
+            fig, axs = plt.subplots(1, 1, tight_layout=True)
+            one_col = True
+        else:
+            fig, axs = plt.subplots(n_rows, n_cols, tight_layout=True, figsize=(n_cols * 3, n_rows * 3))
+            one_col = False
+
+        col_names = self._table.column_names
+        for col_name, ax in zip(col_names, axs.flatten() if not one_col else [axs], strict=False):
+            np_col = np.array(self._table.get_column(col_name))
+            bins = min(number_of_bins, len(pd.unique(np_col)))
+
+            ax.set_title(col_name)
+            ax.set_xlabel("")
+            ax.set_ylabel("")
+
+            if self._table.get_column(col_name).type.is_numeric:
+                np_col = np_col[~np.isnan(np_col)]
+
+                if bins < len(pd.unique(np_col)):
+                    min_val = np.min(np_col)
+                    max_val = np.max(np_col)
+                    hist, bin_edges = np.histogram(self._table.get_column(col_name), bins, range=(min_val, max_val))
+
+                    bars = np.array([])
+                    for i in range(len(hist)):
+                        bars = np.append(bars, f"{round(bin_edges[i], 2)}-{round(bin_edges[i + 1], 2)}")
+
+                    ax.bar(bars, hist, edgecolor="black")
+                    ax.set_xticks(np.arange(len(hist)), bars, rotation=45, horizontalalignment="right")
+                    continue
+
+            np_col = np_col.astype(str)
+            unique_values = np.unique(np_col)
+            hist = np.array([np.sum(np_col == value) for value in unique_values])
+            ax.bar(unique_values, hist, edgecolor="black")
+            ax.set_xticks(np.arange(len(unique_values)), unique_values, rotation=45, horizontalalignment="right")
+
+        for i in range(len(col_names), n_rows * n_cols):
+            fig.delaxes(axs.flatten()[i])  # Remove empty subplots
+
+        return _figure_to_image(fig)
 
     def line_plot(self, x_name: str, y_name: str) -> Image:
+        """
+        Create a line plot for two columns in the table.
+
+        Parameters
+        ----------
+        x_name:
+            The name of the column to be plotted on the x-axis.
+        y_name:
+            The name of the column to be plotted on the y-axis.
+
+        Returns
+        -------
+        line_plot:
+            The plot as an image.
+
+        Raises
+        ------
+        KeyError
+            If a column does not exist.
+        TypeError
+            If a column is not numeric.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import ExperimentalTable
+        >>> table = ExperimentalTable(
+        ...     {
+        ...         "a": [1, 2, 3, 4, 5],
+        ...         "b": [2, 3, 4, 5, 6],
+        ...     }
+        ... )
+        >>> image = table.plot.line_plot("a", "b")
+        """
         # TODO: extract validation
         missing_columns = []
         if not self._table.has_column(x_name):
@@ -85,9 +185,14 @@ class ExperimentalTablePlotter:
 
         Examples
         --------
-        >>> from safeds.data.tabular.containers import ExperimentalColumn
-        >>> table = ExperimentalColumn("values", [1,2,3,4,3,2])
-        >>> image = table.plot.lag_plot(2)
+        >>> from safeds.data.tabular.containers import ExperimentalTable
+        >>> table = ExperimentalTable(
+        ...     {
+        ...         "a": [1, 2, 3, 4, 5],
+        ...         "b": [2, 3, 4, 5, 6],
+        ...     }
+        ... )
+        >>> image = table.plot.scatter_plot("a", "b")
         """
         # TODO: extract validation
         missing_columns = []
@@ -241,75 +346,3 @@ class ExperimentalTablePlotter:
     #     return Image.from_bytes(buffer.read())
     #
     # def plot_histograms(self, *, number_of_bins: int = 10) -> Image:
-    #     """
-    #     Plot a histogram for every column.
-    #
-    #     Parameters
-    #     ----------
-    #     number_of_bins:
-    #         The number of bins to use in the histogram. Default is 10.
-    #
-    #     Returns
-    #     -------
-    #     plot:
-    #         The plot as an image.
-    #
-    #     Examples
-    #     --------
-    #     >>> from safeds.data.tabular.containers import Table
-    #     >>> table = Table({"a": [2, 3, 5, 1], "b": [54, 74, 90, 2014]})
-    #     >>> image = table.plot_histograms()
-    #     """
-    #     import matplotlib.pyplot as plt
-    #     import numpy as np
-    #     import pandas as pd
-    #
-    #     n_cols = min(3, self.number_of_columns)
-    #     n_rows = 1 + (self.number_of_columns - 1) // n_cols
-    #
-    #     if n_cols == 1 and n_rows == 1:
-    #         fig, axs = plt.subplots(1, 1, tight_layout=True)
-    #         one_col = True
-    #     else:
-    #         fig, axs = plt.subplots(n_rows, n_cols, tight_layout=True, figsize=(n_cols * 3, n_rows * 3))
-    #         one_col = False
-    #
-    #     col_names = self.column_names
-    #     for col_name, ax in zip(col_names, axs.flatten() if not one_col else [axs], strict=False):
-    #         np_col = np.array(self.get_column(col_name))
-    #         bins = min(number_of_bins, len(pd.unique(np_col)))
-    #
-    #         ax.set_title(col_name)
-    #         ax.set_xlabel("")
-    #         ax.set_ylabel("")
-    #
-    #         if self.get_column(col_name).type.is_numeric():
-    #             np_col = np_col[~np.isnan(np_col)]
-    #
-    #             if bins < len(pd.unique(np_col)):
-    #                 min_val = np.min(np_col)
-    #                 max_val = np.max(np_col)
-    #                 hist, bin_edges = np.histogram(self.get_column(col_name), bins, range=(min_val, max_val))
-    #
-    #                 bars = np.array([])
-    #                 for i in range(len(hist)):
-    #                     bars = np.append(bars, f"{round(bin_edges[i], 2)}-{round(bin_edges[i + 1], 2)}")
-    #
-    #                 ax.bar(bars, hist, edgecolor="black")
-    #                 ax.set_xticks(np.arange(len(hist)), bars, rotation=45, horizontalalignment="right")
-    #                 continue
-    #
-    #         np_col = np_col.astype(str)
-    #         unique_values = np.unique(np_col)
-    #         hist = np.array([np.sum(np_col == value) for value in unique_values])
-    #         ax.bar(unique_values, hist, edgecolor="black")
-    #         ax.set_xticks(np.arange(len(unique_values)), unique_values, rotation=45, horizontalalignment="right")
-    #
-    #     for i in range(len(col_names), n_rows * n_cols):
-    #         fig.delaxes(axs.flatten()[i])  # Remove empty subplots
-    #
-    #     buffer = io.BytesIO()
-    #     fig.savefig(buffer, format="png")
-    #     plt.close()  # Prevents the figure from being displayed directly
-    #     buffer.seek(0)
-    #     return Image.from_bytes(buffer.read())

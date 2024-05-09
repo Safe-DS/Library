@@ -465,6 +465,7 @@ class ExperimentalColumn(Sequence[T]):
         """
         from ._experimental_table import ExperimentalTable
 
+        # TODO: turn this around (call table method, implement in table; allows parallelization)
         mean = self.mean() or "-"
         median = self.median() or "-"
         standard_deviation = self.standard_deviation() or "-"

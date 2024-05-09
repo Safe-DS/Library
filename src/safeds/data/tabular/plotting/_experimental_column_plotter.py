@@ -113,8 +113,8 @@ class ExperimentalColumnPlotter:
         Examples
         --------
         >>> from safeds.data.tabular.containers import ExperimentalColumn
-        >>> table = ExperimentalColumn("values", [1,2,3,4,3,2])
-        >>> image = table.plot.lag_plot(2)
+        >>> column = ExperimentalColumn("values", [1, 2, 3, 4])
+        >>> image = column.plot.lag_plot(2)
         """
         if not self._column.is_numeric:
             raise NonNumericColumnError("This time series target contains non-numerical columns.")
