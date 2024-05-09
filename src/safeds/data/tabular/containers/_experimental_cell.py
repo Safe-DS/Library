@@ -73,6 +73,12 @@ class ExperimentalCell(ABC, Generic[T]):
     def __abs__(self) -> ExperimentalCell[R]: ...
 
     @abstractmethod
+    def __ceil__(self) -> ExperimentalCell[R]: ...
+
+    @abstractmethod
+    def __floor__(self) -> ExperimentalCell[R]: ...
+
+    @abstractmethod
     def __neg__(self) -> ExperimentalCell[R]: ...
 
     @abstractmethod
@@ -275,6 +281,46 @@ class ExperimentalCell(ABC, Generic[T]):
         +---------+
         """
         return self.__abs__()
+
+    def ceil(self) -> ExperimentalCell[R]:
+        """
+        Round up to the nearest integer.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import ExperimentalColumn
+        >>> column = ExperimentalColumn("example", [1.1, 2.9])
+        >>> column.transform(lambda cell: cell.ceil())
+        +---------+
+        | example |
+        |     --- |
+        |     f64 |
+        +=========+
+        | 2.00000 |
+        | 3.00000 |
+        +---------+
+        """
+        return self.__ceil__()
+
+    def floor(self) -> ExperimentalCell[R]:
+        """
+        Round down to the nearest integer.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import ExperimentalColumn
+        >>> column = ExperimentalColumn("example", [1.1, 2.9])
+        >>> column.transform(lambda cell: cell.floor())
+        +---------+
+        | example |
+        |     --- |
+        |     f64 |
+        +=========+
+        | 1.00000 |
+        | 2.00000 |
+        +---------+
+        """
+        return self.__floor__()
 
     def neg(self) -> ExperimentalCell[R]:
         """

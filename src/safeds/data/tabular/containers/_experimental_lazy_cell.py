@@ -82,6 +82,12 @@ class _LazyCell(ExperimentalCell[T]):
     def __abs__(self) -> ExperimentalCell[R]:
         return _wrap(self._expression.__abs__())
 
+    def __ceil__(self) -> ExperimentalCell[R]:
+        return _wrap(self._expression.ceil())
+
+    def __floor__(self) -> ExperimentalCell[R]:
+        return _wrap(self._expression.floor())
+
     def __neg__(self) -> ExperimentalCell[R]:
         return _wrap(self._expression.__neg__())
 

@@ -126,6 +126,12 @@ class _VectorizedCell(ExperimentalCell[T]):
     def __abs__(self) -> ExperimentalCell[R]:
         return _wrap(self._series.__abs__())
 
+    def __ceil__(self) -> ExperimentalCell[R]:
+        return _wrap(self._series.ceil())
+
+    def __floor__(self) -> ExperimentalCell[R]:
+        return _wrap(self._series.floor())
+
     def __neg__(self) -> ExperimentalCell[R]:
         return _wrap(self._series.__neg__())
 
