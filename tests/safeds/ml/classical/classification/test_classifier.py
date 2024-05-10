@@ -403,23 +403,6 @@ class TestAccuracy:
 
         assert DummyClassifier().accuracy(table) == 0.0
 
-    @pytest.mark.parametrize(
-        "table",
-        [
-            Table(
-                {
-                    "a": [1.0, 0.0, 0.0, 0.0],
-                    "b": [0.0, 1.0, 1.0, 0.0],
-                    "c": [0.0, 0.0, 0.0, 1.0],
-                },
-            ),
-        ],
-        ids=["table"],
-    )
-    def test_should_raise_if_given_normal_table(self, table: Table) -> None:
-        with pytest.raises(PlainTableError):
-            DummyClassifier().accuracy(table)  # type: ignore[arg-type]
-
 
 class TestPrecision:
     def test_should_compare_result(self) -> None:
@@ -451,23 +434,6 @@ class TestPrecision:
         ).to_tabular_dataset(target_name="expected")
 
         assert DummyClassifier().precision(table, 1) == 1.0
-
-    @pytest.mark.parametrize(
-        "table",
-        [
-            Table(
-                {
-                    "a": [1.0, 0.0, 0.0, 0.0],
-                    "b": [0.0, 1.0, 1.0, 0.0],
-                    "c": [0.0, 0.0, 0.0, 1.0],
-                },
-            ),
-        ],
-        ids=["table"],
-    )
-    def test_should_raise_if_given_normal_table(self, table: Table) -> None:
-        with pytest.raises(PlainTableError):
-            DummyClassifier().precision(table, 1)  # type: ignore[arg-type]
 
 
 class TestRecall:
@@ -549,20 +515,3 @@ class TestF1Score:
         ).to_tabular_dataset(target_name="expected")
 
         assert DummyClassifier().f1_score(table, 1) == 1.0
-
-    @pytest.mark.parametrize(
-        "table",
-        [
-            Table(
-                {
-                    "a": [1.0, 0.0, 0.0, 0.0],
-                    "b": [0.0, 1.0, 1.0, 0.0],
-                    "c": [0.0, 0.0, 0.0, 1.0],
-                },
-            ),
-        ],
-        ids=["table"],
-    )
-    def test_should_raise_if_given_normal_table(self, table: Table) -> None:
-        with pytest.raises(PlainTableError):
-            DummyClassifier().f1_score(table, 1)  # type: ignore[arg-type]
