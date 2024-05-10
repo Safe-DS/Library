@@ -540,9 +540,7 @@ class Table:
         |   3 |
         +-----+
         """
-        if not self.has_column(name):
-            raise UnknownColumnNameError([name])
-
+        self._check_columns_exist(name)
         return Column._from_polars_series(self._data_frame.get_column(name))
 
     def get_column_type(self, name: str) -> DataType:
@@ -571,9 +569,7 @@ class Table:
         >>> table.get_column_type("a")
         Int64
         """
-        if not self.has_column(name):
-            raise UnknownColumnNameError([name])
-
+        self._check_columns_exist(name)
         return _PolarsDataType(self._lazy_frame.schema[name])
 
     def has_column(self, name: str) -> bool:
@@ -642,7 +638,7 @@ class Table:
         if isinstance(names, str):
             names = [names]
 
-        # TODO: raises?
+        self._check_columns_exist(names)
 
         return Table._from_polars_lazy_frame(
             self._lazy_frame.drop(names),
@@ -689,7 +685,7 @@ class Table:
         if isinstance(names, str):
             names = [names]
 
-        # TODO: raises?
+        self._check_columns_exist(names)
 
         return Table._from_polars_lazy_frame(
             self._lazy_frame.select(names),
@@ -802,8 +798,7 @@ class Table:
         |   3 |   6 |
         +-----+-----+
         """
-        if not self.has_column(old_name):
-            raise UnknownColumnNameError([old_name])
+        self._check_columns_exist(old_name)
 
         return Table._from_polars_lazy_frame(
             self._lazy_frame.rename({old_name: new_name}),
@@ -875,8 +870,7 @@ class Table:
         |   9 |  12 |   6 |
         +-----+-----+-----+
         """
-        if not self.has_column(old_name):
-            raise UnknownColumnNameError([old_name])
+        self._check_columns_exist(old_name)
 
         if isinstance(new_columns, Column):
             new_columns = [new_columns]
@@ -945,8 +939,7 @@ class Table:
         |   4 |   6 |
         +-----+-----+
         """
-        if not self.has_column(name):
-            raise UnknownColumnNameError([name])  # TODO: in the error, compute similar column names
+        self._check_columns_exist(name)
 
         import polars as pl
 
@@ -1071,10 +1064,9 @@ class Table:
         |   3 |   6 |
         +-----+-----+
         """
-        import polars as pl
+        self._check_columns_exist(name)
 
-        if not self.has_column(name):
-            raise UnknownColumnNameError([name])
+        import polars as pl
 
         mask = query(_LazyCell(pl.col(name)))
 
@@ -1362,8 +1354,7 @@ class Table:
         |   3 |   2 |
         +-----+-----+
         """
-        if not self.has_column(name):
-            raise UnknownColumnNameError([name])
+        self._check_columns_exist(name)
 
         return Table._from_polars_lazy_frame(
             self._lazy_frame.sort(
@@ -1930,6 +1921,36 @@ class Table:
             The generated HTML.
         """
         return self._data_frame._repr_html_()
+
+    # ------------------------------------------------------------------------------------------------------------------
+    # Internal
+    # ------------------------------------------------------------------------------------------------------------------
+
+    def _check_columns_exist(self, requested_names: str | list[str]) -> None:
+        """
+        Check if the specified column names exist in the table and raise an error if they do not.
+
+        Parameters
+        ----------
+        requested_names:
+            The column names to check.
+
+        Raises
+        ------
+        KeyError
+            If a column name does not exist.
+        """
+        if isinstance(requested_names, str):
+            requested_names = [requested_names]
+
+        if len(requested_names) > 1:
+            known_names = set(self.column_names)
+        else:
+            known_names = self.column_names
+
+        unknown_names = [name for name in requested_names if name not in known_names]
+        if unknown_names:
+            raise UnknownColumnNameError(unknown_names)  # TODO: in the error, compute similar column names
 
     # TODO
     def _into_dataloader(self, batch_size: int) -> DataLoader:
