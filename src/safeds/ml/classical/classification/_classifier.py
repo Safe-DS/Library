@@ -4,6 +4,7 @@ from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
 from safeds._utils import _structural_hash
+from safeds.data.labeled.containers import TabularDataset
 from safeds.data.tabular.containers import Table
 
 if TYPE_CHECKING:
@@ -11,29 +12,63 @@ if TYPE_CHECKING:
 
     from sklearn.base import ClassifierMixin
 
-    from safeds.data.labeled.containers import TabularDataset
 
 
 class Classifier(ABC):
     """Abstract base class for all classifiers."""
 
+    # ------------------------------------------------------------------------------------------------------------------
+    # Dunder methods
+    # ------------------------------------------------------------------------------------------------------------------
+
     def __hash__(self) -> int:
+        return _structural_hash(self.__class__.__qualname__, self.is_fitted)
+
+    # ------------------------------------------------------------------------------------------------------------------
+    # Properties
+    # ------------------------------------------------------------------------------------------------------------------
+
+    @property
+    @abstractmethod
+    def is_fitted(self) -> bool:
+        """Whether the classifier is fitted."""
+
+    # ------------------------------------------------------------------------------------------------------------------
+    # Getters
+    # ------------------------------------------------------------------------------------------------------------------
+
+    @abstractmethod
+    def get_feature_names(self) -> list[str]:
         """
-        Return a deterministic hash value for a classifier.
+        Return the names of the feature columns.
 
         Returns
         -------
-        hash:
-            The hash value.
+        feature_names:
+            The names of the feature columns.
         """
-        return _structural_hash(self.__class__.__qualname__, self.is_fitted)
+
+    @abstractmethod
+    def get_target_name(self) -> str:
+        """
+        Return the name of the target column.
+
+        Returns
+        -------
+        target_name:
+            The name of the target column.
+        """
+
+    # ------------------------------------------------------------------------------------------------------------------
+    # Training and prediction
+    # ------------------------------------------------------------------------------------------------------------------
 
     @abstractmethod
     def fit(self, training_set: TabularDataset) -> Classifier:
         """
         Create a copy of this classifier and fit it with the given training data.
 
-        This classifier is not modified.
+        **Note:** This classifier is not modified.
 
         Parameters
         ----------
@@ -57,7 +92,7 @@ class Classifier(ABC):
         dataset: Table | TabularDataset,
     ) -> TabularDataset:
         """
-        Predict a target vector using a dataset containing feature vectors. The model has to be trained first.
+        Predict a target vector using a dataset containing feature vectors. The model has to be fitted first.
 
         Parameters
         ----------
@@ -77,22 +112,6 @@ class Classifier(ABC):
             If the dataset misses feature columns.
         PredictionError
             If predicting with the given dataset failed.
-        """
-
-    @property
-    @abstractmethod
-    def is_fitted(self) -> bool:
-        """Whether the classifier is fitted."""
-
-    @abstractmethod
-    def _get_sklearn_classifier(self) -> ClassifierMixin:
-        """
-        Return a new wrapped Classifier from sklearn.
-
-        Returns
-        -------
-        wrapped_classifier:
-            The sklearn Classifier.
         """
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -155,13 +174,19 @@ class Classifier(ABC):
         TypeError
             If a table is passed instead of a tabular dataset.
         """
+        if isinstance(validation_or_test_set, TabularDataset):
+            validation_or_test_set = validation_or_test_set.to_table()
+
         from sklearn.metrics import accuracy_score as sk_accuracy_score
 
-        expected_values = validation_or_test_set.target._series
-        predicted_values = self.predict(validation_or_test_set.features).target._series
+        features = validation_or_test_set.remove_columns_except(self.get_feature_names())
+        prediction = self.predict(features)
+
+        predicted_values = prediction.target._series
+        expected_values = validation_or_test_set.get_column(self.get_target_name())._series
 
         # TODO: more efficient implementation using polars
-        return sk_accuracy_score(expected_values._data, predicted_values)
+        return sk_accuracy_score(expected_values, predicted_values)
 
     def precision(
         self,
@@ -278,3 +303,18 @@ class Classifier(ABC):
         if (2 * n_true_positives + n_false_positives + n_false_negatives) == 0:
             return 1.0
         return 2 * n_true_positives / (2 * n_true_positives + n_false_positives + n_false_negatives)
+
+    # ------------------------------------------------------------------------------------------------------------------
+    # Internal
+    # ------------------------------------------------------------------------------------------------------------------
+
+    @abstractmethod
+    def _get_sklearn_classifier(self) -> ClassifierMixin:
+        """
+        Return a new wrapped Classifier from sklearn.
+
+        Returns
+        -------
+        wrapped_classifier:
+            The sklearn Classifier.
+        """

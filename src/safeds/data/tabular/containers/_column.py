@@ -857,7 +857,7 @@ class Column(Sequence[T]):
         |    3 |
         +------+
         """
-        from _table import Table
+        from ._table import Table
 
         return Table._from_polars_data_frame(self._series.to_frame())
 

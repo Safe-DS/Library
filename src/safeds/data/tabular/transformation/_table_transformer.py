@@ -135,7 +135,7 @@ class TableTransformer(ABC):
         """
 
     def fit_and_transform(
-        self, table: Table, column_names: list[str] | None = None
+        self, table: Table, column_names: list[str] | None = None,
     ) -> tuple[Self, Table]:
         """
         Learn a transformation for a set of columns in a table and apply the learned transformation to the same table.
