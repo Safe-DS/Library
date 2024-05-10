@@ -941,30 +941,6 @@ class Table:
 
     _T = TypeVar("_T")
 
-    def group_rows(self, key_selector: Callable[[Row], _T]) -> dict[_T, Table]:
-        """
-        Return a dictionary with copies of the output tables as values and the keys from the key_selector.
-
-        The original table is not modified.
-
-        Parameters
-        ----------
-        key_selector:
-            A Callable that is applied to all rows and returns the key of the group.
-
-        Returns
-        -------
-        dictionary:
-            A dictionary containing the new tables as values and the selected keys as keys.
-        """
-        dictionary: dict[Table._T, Table] = {}
-        for row in self.to_rows():
-            if key_selector(row) in dictionary:
-                dictionary[key_selector(row)] = dictionary[key_selector(row)].add_row(row)
-            else:
-                dictionary[key_selector(row)] = Table.from_rows([row])
-        return dictionary
-
     def keep_only_columns(self, column_names: list[str]) -> Table:
         """
         Return a new table with only the given column(s).
