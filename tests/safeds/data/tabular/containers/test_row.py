@@ -1,6 +1,5 @@
 import re
 import sys
-from collections.abc import Callable
 from typing import Any
 
 import pandas as pd
@@ -453,53 +452,6 @@ class TestToDict:
         assert row.to_dict() == expected
 
 
-class TestToHtml:
-    @pytest.mark.parametrize(
-        "row",
-        [
-            Row(),
-            Row({"a": 1, "b": 2}),
-        ],
-        ids=[
-            "empty",
-            "non-empty",
-        ],
-    )
-    def test_should_contain_table_element(self, row: Row) -> None:
-        pattern = r"<table.*?>.*?</table>"
-        assert re.search(pattern, row.to_html(), flags=re.S) is not None
-
-    @pytest.mark.parametrize(
-        "row",
-        [
-            Row(),
-            Row({"a": 1, "b": 2}),
-        ],
-        ids=[
-            "empty",
-            "non-empty",
-        ],
-    )
-    def test_should_contain_th_element_for_each_column_name(self, row: Row) -> None:
-        for column_name in row.column_names:
-            assert f"<th>{column_name}</th>" in row.to_html()
-
-    @pytest.mark.parametrize(
-        "row",
-        [
-            Row(),
-            Row({"a": 1, "b": 2}),
-        ],
-        ids=[
-            "empty",
-            "non-empty",
-        ],
-    )
-    def test_should_contain_td_element_for_each_value(self, row: Row) -> None:
-        for value in row.values():
-            assert f"<td>{value}</td>" in row.to_html()
-
-
 class TestReprHtml:
     @pytest.mark.parametrize(
         "row",
@@ -545,51 +497,6 @@ class TestReprHtml:
     def test_should_contain_td_element_for_each_value(self, row: Row) -> None:
         for value in row.values():
             assert f"<td>{value}</td>" in row._repr_html_()
-
-
-class TestSortColumns:
-    @pytest.mark.parametrize(
-        ("row", "comparator", "expected"),
-        [
-            (
-                Row({"b": 1, "a": 2}),
-                lambda name_1, _value_1, name_2, _value_2: (name_1 > name_2) - (name_1 < name_2),
-                Row({"a": 2, "b": 1}),
-            ),
-            (
-                Row({"a": 2, "b": 1}),
-                lambda name_1, _value_1, name_2, _value_2: (name_2 > name_1) - (name_2 < name_1),
-                Row({"b": 1, "a": 2}),
-            ),
-            (Row(), lambda col1, col2: (col1[0] > col2[0]) - (col1[0] < col2[0]), Row()),
-        ],
-        ids=[
-            "sort descending by first element",
-            "sort ascending by first element",
-            "empty rows",
-        ],
-    )
-    def test_should_sort_columns(
-        self,
-        row: Row,
-        comparator: Callable[[str, Any, str, Any], int],
-        expected: Row,
-    ) -> None:
-        row = row.sort_columns(comparator)
-        assert row == expected
-
-    @pytest.mark.parametrize(
-        "row",
-        [
-            (Row({"b": 1, "a": 2})),
-        ],
-        ids=[
-            "sort descending by first element",
-        ],
-    )
-    def test_should_sort_table_out_of_place(self, row: Row) -> None:
-        sorted_row = row.sort_columns()
-        assert sorted_row != row
 
 
 class TestSizeof:

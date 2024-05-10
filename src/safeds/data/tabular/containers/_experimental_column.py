@@ -502,6 +502,7 @@ class ExperimentalColumn(Sequence[T]):
         Calculate the Pearson correlation between this column and another column.
 
         The Pearson correlation is a value between -1 and 1 that indicates how much the two columns are linearly related:
+
         * A correlation of -1 indicates a perfect negative linear relationship.
         * A correlation of 0 indicates no linear relationship.
         * A correlation of 1 indicates a perfect positive linear relationship.

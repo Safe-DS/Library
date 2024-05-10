@@ -1,8 +1,7 @@
 from __future__ import annotations
 
-import functools
 import sys
-from collections.abc import Callable, Mapping
+from collections.abc import Mapping
 from typing import TYPE_CHECKING, Any
 
 from safeds._utils import _structural_hash
@@ -471,57 +470,6 @@ class Row(Mapping[str, Any]):
         return self._schema.get_column_type(column_name)
 
     # ------------------------------------------------------------------------------------------------------------------
-    # Transformations
-    # ------------------------------------------------------------------------------------------------------------------
-
-    def sort_columns(
-        self,
-        comparator: Callable[[str, Any, str, Any], int] = lambda name_1, _value_1, name_2, _value_2: (
-            name_1[0] > name_2[0]
-        )
-        - (name_1[0] < name_2[0]),
-    ) -> Row:
-        """
-        Sort the columns of a `Row` with the given comparator and return a new `Row`.
-
-        The original row is not modified. The comparator is a function with four parameters:
-
-        * `name_1` is the name of the first column.
-        * `value_1` is the value of the first column.
-        * `name_2` is the name of the second column.
-        * `value_2` is the value of the second column.
-
-        It should return an integer, indicating the desired order of the columns:
-
-        * If `col1` should be ordered before `col2`, the function should return a negative number.
-        * If `col1` should be ordered after `col2`, the function should return a positive number.
-        * If the original order of `col1` and `col2` should be kept, the function should return 0.
-
-        If no comparator is given, the columns will be sorted alphabetically by their name.
-
-        Parameters
-        ----------
-        comparator:
-            The function used to compare two tuples of (ColumnName, Value).
-
-        Returns
-        -------
-        new_row:
-            A new row with sorted columns.
-        """
-
-        def cmp(column_1: tuple[str, Any], column_2: tuple[str, Any]) -> int:
-            return comparator(column_1[0], column_1[1], column_2[0], column_2[1])
-
-        sorted_row_dict = dict(
-            sorted(
-                self.to_dict().items(),
-                key=functools.cmp_to_key(cmp),
-            ),
-        )
-        return Row.from_dict(sorted_row_dict)
-
-    # ------------------------------------------------------------------------------------------------------------------
     # Conversion
     # ------------------------------------------------------------------------------------------------------------------
 
@@ -542,23 +490,6 @@ class Row(Mapping[str, Any]):
         {'a': 1, 'b': 2}
         """
         return {column_name: self.get_value(column_name) for column_name in self.column_names}
-
-    def to_html(self) -> str:
-        """
-        Return an HTML representation of the row.
-
-        Returns
-        -------
-        output:
-            The generated HTML.
-
-        Examples
-        --------
-        >>> from safeds.data.tabular.containers import Row
-        >>> row = Row({"a": 1, "b": 2})
-        >>> html = row.to_html()
-        """
-        return self._data.to_html(max_rows=1, max_cols=self._data.shape[1])
 
     # ------------------------------------------------------------------------------------------------------------------
     # IPython integration

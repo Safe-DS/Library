@@ -916,31 +916,6 @@ class Column(Sequence[T]):
             raise NonNumericColumnError(f"{self.name} is of type {self._type}.")
         return self._data.std()
 
-    def sum(self) -> float:
-        """
-        Return the sum of the column. The column has to be numerical.
-
-        Returns
-        -------
-        sum:
-            The sum of all values.
-
-        Raises
-        ------
-        NonNumericColumnError
-            If the data contains non-numerical data.
-
-        Examples
-        --------
-        >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("test", [1, 2, 3])
-        >>> column.sum()
-        6
-        """
-        if not self.type.is_numeric():
-            raise NonNumericColumnError(f"{self.name} is of type {self._type}.")
-        return self._data.sum()
-
     def variance(self) -> float:
         """
         Return the variance of the column. The column has to be numerical.

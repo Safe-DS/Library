@@ -118,63 +118,6 @@ class Table:
             raise FileNotFoundError(f'File "{path}" does not exist')
 
     @staticmethod
-    def from_excel_file(path: str | Path) -> Table:
-        """
-        Read data from an Excel file into a table.
-
-        Valid file extensions are `.xls`, '.xlsx', `.xlsm`, `.xlsb`, `.odf`, `.ods` and `.odt`.
-
-        !!! warning "Deprecated"
-            Convert your data to a CSV file and use
-            [Table.from_csv_file][safeds.data.tabular.containers._table.Table.from_csv_file] instead.
-
-        Parameters
-        ----------
-        path:
-            The path to the Excel file.
-
-        Returns
-        -------
-        table:
-            The table created from the Excel file.
-
-        Raises
-        ------
-        FileNotFoundError
-            If the specified file does not exist.
-        WrongFileExtensionError
-            If the file is not an Excel file.
-
-        Examples
-        --------
-        >>> from safeds.data.tabular.containers import Table
-        >>> Table.from_excel_file('./src/resources/from_excel_file.xlsx')
-           a  b
-        0  1  4
-        1  2  5
-        2  3  6
-        """
-        warnings.warn(
-            "This method is deprecated and will be removed in a future version. "
-            "Convert your data to a CSV file and use `Table.from_csv_file` instead.",
-            DeprecationWarning,
-            stacklevel=2,
-        )
-
-        import pandas as pd
-
-        path = Path(path)
-        excel_extensions = [".xls", ".xlsx", ".xlsm", ".xlsb", ".odf", ".ods", ".odt"]
-        if path.suffix not in excel_extensions:
-            raise WrongFileExtensionError(path, excel_extensions)
-        try:
-            return Table._from_pandas_dataframe(
-                pd.read_excel(path, engine="openpyxl", usecols=lambda colname: "Unnamed" not in colname),
-            )
-        except FileNotFoundError as exception:
-            raise FileNotFoundError(f'File "{path}" does not exist') from exception
-
-    @staticmethod
     def from_json_file(path: str | Path) -> Table:
         """
         Read data from a JSON file into a table.
@@ -713,40 +656,6 @@ class Table:
         """
         return self._schema.get_column_type(column_name)
 
-    def get_row(self, index: int) -> Row:
-        """
-        Return the row at a specified index.
-
-        Parameters
-        ----------
-        index:
-            The index.
-
-        Returns
-        -------
-        row:
-            The row of the table at the index.
-
-        Raises
-        ------
-        IndexOutOfBoundsError
-            If no row at the specified index exists in this table.
-
-        Examples
-        --------
-        >>> from safeds.data.tabular.containers import Table
-        >>> table = Table.from_dict({"a": [1, 3], "b": [2, 4]})
-        >>> table.get_row(0)
-        Row({
-            'a': 1,
-            'b': 2
-        })
-        """
-        if len(self._data.index) - 1 < index or index < 0:
-            raise IndexOutOfBoundsError(index)
-
-        return Row._from_pandas_dataframe(self._data.iloc[[index]], self._schema)
-
     def _get_similar_columns(self, column_name: str) -> list[str]:
         """
         Get all the column names in a Table that are similar to a given name.
@@ -990,160 +899,6 @@ class Table:
             result[column.name] = column._data
         return Table._from_pandas_dataframe(result)
 
-    def add_row(self, row: Row) -> Table:
-        """
-        Return a new `Table` with an added Row attached.
-
-        If the table happens to be empty beforehand, respective columns will be added automatically.
-
-        The order of columns of the new row will be adjusted to the order of columns in the table.
-        The new table will contain the merged schema.
-
-        The original table is not modified.
-
-        !!! warning "Deprecated"
-            Use [add_rows][safeds.data.tabular.containers._table.Table.add_rows] instead.
-
-        Parameters
-        ----------
-        row:
-            The row to be added.
-
-        Returns
-        -------
-        table:
-            A new table with the added row at the end.
-
-        Raises
-        ------
-        UnknownColumnNameError
-            If the row has different column names than the table.
-
-        Examples
-        --------
-        >>> from safeds.data.tabular.containers import Row, Table
-        >>> table = Table.from_dict({"a": [1], "b": [2]})
-        >>> row = Row.from_dict({"a": 3, "b": 4})
-        >>> table.add_row(row)
-           a  b
-        0  1  2
-        1  3  4
-        """
-        warnings.warn(
-            "This method is deprecated and will be removed in a future version. Use `Table.add_rows` instead.",
-            DeprecationWarning,
-            stacklevel=2,
-        )
-
-        import numpy as np
-        import pandas as pd
-
-        int_columns = []
-
-        if self.number_of_columns == 0:
-            return Table.from_rows([row])
-        if len(set(self.column_names) - set(row.column_names)) > 0:
-            raise UnknownColumnNameError(
-                sorted(
-                    set(self.column_names) - set(row.column_names),
-                    key={val: ix for ix, val in enumerate(self.column_names)}.__getitem__,
-                ),
-            )
-
-        if self.number_of_rows == 0:
-            int_columns = list(filter(lambda name: isinstance(row[name], int | np.int64 | np.int32), row.column_names))
-
-        new_df = pd.concat([self._data, row._data]).infer_objects()
-        new_df.columns = self.column_names
-        schema = Schema._merge_multiple_schemas([self.schema, row.schema])
-        result = Table._from_pandas_dataframe(new_df, schema)
-
-        for column in int_columns:
-            result = result.replace_column(column, [result.get_column(column).transform(lambda it: int(it))])
-
-        return result
-
-    def add_rows(self, rows: list[Row] | Table) -> Table:
-        """
-        Return a new `Table` with multiple added Rows attached.
-
-        The order of columns of the new rows will be adjusted to the order of columns in the table.
-        The new table will contain the merged schema.
-
-        The original table is not modified.
-
-        Parameters
-        ----------
-        rows:
-            The rows to be added.
-
-        Returns
-        -------
-        result:
-            A new table which combines the original table and the given rows.
-
-        Raises
-        ------
-        UnknownColumnNameError
-            If at least one of the rows have different column names than the table.
-
-        Examples
-        --------
-        >>> from safeds.data.tabular.containers import Row, Table
-        >>> table = Table.from_dict({"a": [1], "b": [2]})
-        >>> row1 = Row.from_dict({"a": 3, "b": 4})
-        >>> row2 = Row.from_dict({"a": 5, "b": 6})
-        >>> table.add_rows([row1, row2])
-           a  b
-        0  1  2
-        1  3  4
-        2  5  6
-        """
-        import pandas as pd
-
-        if isinstance(rows, Table):
-            if rows.number_of_columns == 0:
-                return self
-            if self.number_of_columns == 0:
-                return rows
-            different_column_names = set(self.column_names) - set(rows.column_names)
-            if len(different_column_names) > 0:
-                raise UnknownColumnNameError(
-                    sorted(
-                        different_column_names,
-                        key={val: ix for ix, val in enumerate(self.column_names)}.__getitem__,
-                    ),
-                )
-            if rows.number_of_rows == 0:
-                return self
-            if self.number_of_rows == 0:
-                return rows
-
-            new_df = pd.concat([self._data, rows._data]).infer_objects()
-            new_df.columns = self.column_names
-            schema = Schema._merge_multiple_schemas([self.schema, rows.schema])
-            return Table._from_pandas_dataframe(new_df, schema)
-
-        if len(rows) == 0:
-            return self
-
-        different_column_names = set()
-        for row in rows:
-            different_column_names.update(set(self.column_names) - set(row.column_names))
-        if len(different_column_names) > 0:
-            raise UnknownColumnNameError(
-                sorted(
-                    different_column_names,
-                    key={val: ix for ix, val in enumerate(self.column_names)}.__getitem__,
-                ),
-            )
-
-        result = self
-        for row in rows:
-            result = result.add_row(row)
-
-        return result
-
     def filter_rows(self, query: Callable[[Row], bool]) -> Table:
         """
         Return a new table containing only the rows that satisfy the query.
@@ -1185,30 +940,6 @@ class Table:
         return self.keep_only_rows(query)
 
     _T = TypeVar("_T")
-
-    def group_rows(self, key_selector: Callable[[Row], _T]) -> dict[_T, Table]:
-        """
-        Return a dictionary with copies of the output tables as values and the keys from the key_selector.
-
-        The original table is not modified.
-
-        Parameters
-        ----------
-        key_selector:
-            A Callable that is applied to all rows and returns the key of the group.
-
-        Returns
-        -------
-        dictionary:
-            A dictionary containing the new tables as values and the selected keys as keys.
-        """
-        dictionary: dict[Table._T, Table] = {}
-        for row in self.to_rows():
-            if key_selector(row) in dictionary:
-                dictionary[key_selector(row)] = dictionary[key_selector(row)].add_row(row)
-            else:
-                dictionary[key_selector(row)] = Table.from_rows([row])
-        return dictionary
 
     def keep_only_columns(self, column_names: list[str]) -> Table:
         """
@@ -2323,55 +2054,6 @@ class Table:
         data_to_csv.columns = self._schema.column_names
         data_to_csv.to_csv(path, index=False)
 
-    def to_excel_file(self, path: str | Path) -> None:
-        """
-        Write the data from the table into an Excel file.
-
-        Valid file extensions are `.xls`, '.xlsx', `.xlsm`, `.xlsb`, `.odf`, `.ods` and `.odt`.
-        If the file and/or the directories do not exist, they will be created. If the file already exists, it will be
-        overwritten.
-
-        !!! warning "Deprecated"
-            Use [`to_csv_file`][safeds.data.tabular.containers._table.Table.to_csv_file] instead.
-
-        Parameters
-        ----------
-        path:
-            The path to the output file.
-
-        Raises
-        ------
-        WrongFileExtensionError
-            If the file is not an Excel file.
-
-        Examples
-        --------
-        >>> from safeds.data.tabular.containers import Table
-        >>> table = Table.from_dict({"a": [1, 2, 3], "b": [4, 5, 6]})
-        >>> table.to_excel_file("./src/resources/to_excel_file.xlsx")
-        """
-        warnings.warn(
-            "This method is deprecated and will be removed in a future version. Use `Table.to_csv_file` instead.",
-            DeprecationWarning,
-            stacklevel=2,
-        )
-
-        import openpyxl
-
-        path = Path(path)
-        excel_extensions = [".xls", ".xlsx", ".xlsm", ".xlsb", ".odf", ".ods", ".odt"]
-        if path.suffix not in excel_extensions:
-            raise WrongFileExtensionError(path, excel_extensions)
-
-        # Create Excel metadata in the file
-        tmp_table_file = openpyxl.Workbook()
-        tmp_table_file.save(path)
-
-        path.parent.mkdir(parents=True, exist_ok=True)
-        data_to_excel = self._data.reset_index(drop=True)
-        data_to_excel.columns = self._schema.column_names
-        data_to_excel.to_excel(path)
-
     def to_json_file(self, path: str | Path) -> None:
         """
         Write the data from the table into a JSON file.
@@ -2423,23 +2105,6 @@ class Table:
         True
         """
         return {column_name: list(self.get_column(column_name)) for column_name in self.column_names}
-
-    def to_html(self) -> str:
-        """
-        Return an HTML representation of the table.
-
-        Returns
-        -------
-        output:
-            The generated HTML.
-
-        Examples
-        --------
-        >>> from safeds.data.tabular.containers import Table
-        >>> table = Table({"a": [1, 2, 3], "b": [4, 5, 6]})
-        >>> html = table.to_html()
-        """
-        return self._data.to_html(max_rows=self._data.shape[0], max_cols=self._data.shape[1])
 
     def to_columns(self) -> list[Column]:
         """
