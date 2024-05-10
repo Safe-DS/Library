@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING
 
 from safeds._utils import _structural_hash
 from safeds.data.labeled.containers import TabularDataset
-from safeds.data.tabular.containers import Table
+from safeds.exceptions import ModelNotFittedError
 from safeds.ml.metrics import ClassificationMetrics
 
 if TYPE_CHECKING:
@@ -13,6 +13,7 @@ if TYPE_CHECKING:
 
     from sklearn.base import ClassifierMixin
 
+    from safeds.data.tabular.containers import Table
 
 
 class Classifier(ABC):
@@ -47,6 +48,11 @@ class Classifier(ABC):
         -------
         feature_names:
             The names of the feature columns.
+
+        Raises
+        ------
+        ModelNotFittedError
+            If the model has not been fitted yet.
         """
 
     @abstractmethod
@@ -58,6 +64,11 @@ class Classifier(ABC):
         -------
         target_name:
             The name of the target column.
+
+        Raises
+        ------
+        ModelNotFittedError
+            If the model has not been fitted yet.
         """
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -74,7 +85,7 @@ class Classifier(ABC):
         Parameters
         ----------
         training_set:
-            The training data containing the feature and target vectors.
+            The training data containing the features and target.
 
         Returns
         -------
@@ -93,7 +104,7 @@ class Classifier(ABC):
         dataset: Table | TabularDataset,
     ) -> TabularDataset:
         """
-        Predict a target vector using a dataset containing feature vectors. The model has to be fitted first.
+        Predict the target values on the given dataset.
 
         Parameters
         ----------
@@ -103,7 +114,7 @@ class Classifier(ABC):
         Returns
         -------
         table:
-            A dataset containing the given feature vectors and the predicted target vector.
+            A dataset containing the given features and the predicted target.
 
         Raises
         ------
@@ -141,24 +152,25 @@ class Classifier(ABC):
 
         Raises
         ------
-        TypeError
-            If a table is passed instead of a tabular dataset.
+        ModelNotFittedError
+            If the model has not been fitted yet.
         """
-        accuracy = self.accuracy(validation_or_test_set)
-        precision = self.precision(validation_or_test_set, positive_class)
-        recall = self.recall(validation_or_test_set, positive_class)
-        f1_score = self.f1_score(validation_or_test_set, positive_class)
+        if not self.is_fitted:
+            raise ModelNotFittedError
 
-        return Table(
-            {
-                "metric": ["accuracy", "precision", "recall", "f1_score"],
-                "value": [accuracy, precision, recall, f1_score],
-            },
+        validation_or_test_set = _extract_table(validation_or_test_set)
+
+        return ClassificationMetrics.summarize(
+            self.predict(validation_or_test_set),
+            validation_or_test_set.get_column(self.get_target_name()),
+            positive_class,
         )
 
     def accuracy(self, validation_or_test_set: Table | TabularDataset) -> float:
         """
         Compute the accuracy of the classifier on the given data.
+
+        The accuracy is the proportion of correctly predicted target values.
 
         Parameters
         ----------
@@ -168,83 +180,22 @@ class Classifier(ABC):
         Returns
         -------
         accuracy:
-            The calculated accuracy score, i.e. the percentage of equal data.
+            The classifier's accuracy.
 
         Raises
         ------
-        TypeError
-            If a table is passed instead of a tabular dataset.
+        ModelNotFittedError
+            If the model has not been fitted yet.
         """
-        if isinstance(validation_or_test_set, TabularDataset):
-            validation_or_test_set = validation_or_test_set.to_table()
+        if not self.is_fitted:
+            raise ModelNotFittedError
 
-        features = validation_or_test_set.remove_columns_except(self.get_feature_names())
-        prediction = self.predict(features)
+        validation_or_test_set = _extract_table(validation_or_test_set)
 
-        predicted_values = prediction.target
-        expected_values = validation_or_test_set.get_column(self.get_target_name())
-
-        return ClassificationMetrics.accuracy(predicted_values, expected_values)
-
-    def precision(
-        self,
-        validation_or_test_set: Table | TabularDataset,
-        positive_class: Any,
-    ) -> float:
-        """
-        Compute the classifier's precision on the given data.
-
-        Parameters
-        ----------
-        validation_or_test_set:
-            The validation or test set.
-        positive_class:
-            The class to be considered positive. All other classes are considered negative.
-
-        Returns
-        -------
-        precision:
-            The calculated precision score, i.e. the ratio of correctly predicted positives to all predicted positives.
-            Return 1 if no positive predictions are made.
-        """
-        if isinstance(validation_or_test_set, TabularDataset):
-            validation_or_test_set = validation_or_test_set.to_table()
-
-        features = validation_or_test_set.remove_columns_except(self.get_feature_names())
-        prediction = self.predict(features)
-
-        predicted_values = prediction.target
-        expected_values = validation_or_test_set.get_column(self.get_target_name())
-
-        return ClassificationMetrics.precision(predicted_values, expected_values, positive_class)
-
-    def recall(self, validation_or_test_set: Table | TabularDataset, positive_class: Any) -> float:
-        """
-        Compute the classifier's recall on the given data.
-
-        Parameters
-        ----------
-        validation_or_test_set:
-            The validation or test set.
-        positive_class:
-            The class to be considered positive. All other classes are considered negative.
-
-        Returns
-        -------
-        recall:
-            The calculated recall score, i.e. the ratio of correctly predicted positives to all expected positives.
-            Return 1 if there are no positive expectations.
-        """
-        if isinstance(validation_or_test_set, TabularDataset):
-            validation_or_test_set = validation_or_test_set.to_table()
-
-        features = validation_or_test_set.remove_columns_except(self.get_feature_names())
-        prediction = self.predict(features)
-
-        predicted_values = prediction.target
-        expected_values = validation_or_test_set.get_column(self.get_target_name())
-
-        return ClassificationMetrics.recall(predicted_values, expected_values, positive_class)
+        return ClassificationMetrics.accuracy(
+            self.predict(validation_or_test_set),
+            validation_or_test_set.get_column(self.get_target_name()),
+        )
 
     def f1_score(
         self,
@@ -252,7 +203,9 @@ class Classifier(ABC):
         positive_class: Any,
     ) -> float:
         """
-        Compute the classifier's $F_1$-score on the given data.
+        Compute the classifier's $F_1$ score on the given data.
+
+        The $F_1$ score is the harmonic mean of precision and recall.
 
         Parameters
         ----------
@@ -264,19 +217,95 @@ class Classifier(ABC):
         Returns
         -------
         f1_score:
-            The calculated $F_1$-score, i.e. the harmonic mean between precision and recall.
-            Return 1 if there are no positive expectations and predictions.
+            The classifier's $F_1$ score.
+
+        Raises
+        ------
+        ModelNotFittedError
+            If the model has not been fitted yet.
         """
-        if isinstance(validation_or_test_set, TabularDataset):
-            validation_or_test_set = validation_or_test_set.to_table()
+        if not self.is_fitted:
+            raise ModelNotFittedError
 
-        features = validation_or_test_set.remove_columns_except(self.get_feature_names())
-        prediction = self.predict(features)
+        validation_or_test_set = _extract_table(validation_or_test_set)
 
-        predicted_values = prediction.target
-        expected_values = validation_or_test_set.get_column(self.get_target_name())
+        return ClassificationMetrics.f1_score(
+            self.predict(validation_or_test_set),
+            validation_or_test_set.get_column(self.get_target_name()),
+            positive_class,
+        )
 
-        return ClassificationMetrics.f1_score(predicted_values, expected_values, positive_class)
+    def precision(
+        self,
+        validation_or_test_set: Table | TabularDataset,
+        positive_class: Any,
+    ) -> float:
+        """
+        Compute the classifier's precision on the given data.
+
+        The precision is the proportion of positive predictions that were correct.
+
+        Parameters
+        ----------
+        validation_or_test_set:
+            The validation or test set.
+        positive_class:
+            The class to be considered positive. All other classes are considered negative.
+
+        Returns
+        -------
+        precision:
+            The classifier's precision.
+
+        Raises
+        ------
+        ModelNotFittedError
+            If the model has not been fitted yet.
+        """
+        if not self.is_fitted:
+            raise ModelNotFittedError
+
+        validation_or_test_set = _extract_table(validation_or_test_set)
+
+        return ClassificationMetrics.precision(
+            self.predict(validation_or_test_set),
+            validation_or_test_set.get_column(self.get_target_name()),
+            positive_class,
+        )
+
+    def recall(self, validation_or_test_set: Table | TabularDataset, positive_class: Any) -> float:
+        """
+        Compute the classifier's recall on the given data.
+
+        The recall is the proportion of actual positives that were predicted correctly.
+
+        Parameters
+        ----------
+        validation_or_test_set:
+            The validation or test set.
+        positive_class:
+            The class to be considered positive. All other classes are considered negative.
+
+        Returns
+        -------
+        recall:
+            The classifier's recall.
+
+        Raises
+        ------
+        ModelNotFittedError
+            If the model has not been fitted yet.
+        """
+        if not self.is_fitted:
+            raise ModelNotFittedError
+
+        validation_or_test_set = _extract_table(validation_or_test_set)
+
+        return ClassificationMetrics.recall(
+            self.predict(validation_or_test_set),
+            validation_or_test_set.get_column(self.get_target_name()),
+            positive_class,
+        )
 
     # ------------------------------------------------------------------------------------------------------------------
     # Internal
@@ -292,3 +321,11 @@ class Classifier(ABC):
         wrapped_classifier:
             The sklearn Classifier.
         """
+
+
+def _extract_table(table_or_dataset: Table | TabularDataset) -> Table:
+    """Extract the table from the given table or dataset."""
+    if isinstance(table_or_dataset, TabularDataset):
+        return table_or_dataset.to_table()
+    else:
+        return table_or_dataset

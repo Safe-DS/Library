@@ -13,60 +13,6 @@ if TYPE_CHECKING:
 class ClassificationMetrics:
 
     @staticmethod
-    def accuracy(predicted: Column | TabularDataset, expected: Column | TabularDataset) -> float:
-        expected = _extract_target(expected)
-        predicted = _extract_target(predicted)
-        _check_column_length(predicted, expected)
-
-        if expected.number_of_rows == 0:
-            return 1.0  # Everything was predicted correctly
-
-        return expected._series.eq(predicted._series).sum() / expected.number_of_rows
-
-    @staticmethod
-    def f1_score(predicted: Column | TabularDataset, expected: Column | TabularDataset, positive_class: Any) -> float:
-        predicted = _extract_target(predicted)
-        expected = _extract_target(expected)
-        _check_column_length(predicted, expected)
-
-        true_positives = (expected._series.eq(positive_class) & predicted._series.eq(positive_class)).sum()
-        false_positives = (expected._series.ne(positive_class) & predicted._series.eq(positive_class)).sum()
-        false_negatives = (expected._series.eq(positive_class) & predicted._series.ne(positive_class)).sum()
-
-        if true_positives + false_positives + false_negatives == 0:
-            return 1.0  # Only true negatives
-
-        return 2 * true_positives / (2 * true_positives + false_positives + false_negatives)
-
-    @staticmethod
-    def precision(predicted: Column | TabularDataset, expected: Column | TabularDataset, positive_class: Any) -> float:
-        expected = _extract_target(expected)
-        predicted = _extract_target(predicted)
-        _check_column_length(predicted, expected)
-
-        true_positives = (expected._series.eq(positive_class) & predicted._series.eq(positive_class)).sum()
-        predicted_positives = predicted._series.eq(positive_class).sum()
-
-        if predicted_positives == 0:
-            return 1.0  # All positive predictions were correct
-
-        return true_positives / predicted_positives
-
-    @staticmethod
-    def recall(predicted: Column | TabularDataset, expected: Column | TabularDataset, positive_class: Any) -> float:
-        expected = _extract_target(expected)
-        predicted = _extract_target(predicted)
-        _check_column_length(predicted, expected)
-
-        true_positives = (expected._series.eq(positive_class) & predicted._series.eq(positive_class)).sum()
-        actual_positives = expected._series.eq(positive_class).sum()
-
-        if actual_positives == 0:
-            return 1.0  # All actual positives were predicted correctly
-
-        return true_positives / actual_positives
-
-    @staticmethod
     def summarize(predicted: Column | TabularDataset, expected: Column | TabularDataset, positive_class: Any) -> Table:
         """
         Summarize classification metrics on the given data.
@@ -83,7 +29,7 @@ class ClassificationMetrics:
         Returns
         -------
         metrics:
-            A table containing the classifier's metrics.
+            A table containing the classification metrics.
         """
         accuracy = ClassificationMetrics.accuracy(predicted, expected)
         precision = ClassificationMetrics.precision(predicted, expected, positive_class)
@@ -97,14 +43,159 @@ class ClassificationMetrics:
             },
         )
 
+    @staticmethod
+    def accuracy(predicted: Column | TabularDataset, expected: Column | TabularDataset) -> float:
+        """
+        Compute the accuracy on the given data.
+
+        The accuracy is the proportion of correctly predicted target values.
+
+        Parameters
+        ----------
+        predicted:
+            The predicted target values produced by the classifier.
+        expected:
+            The expected target values.
+
+        Returns
+        -------
+        accuracy:
+            The calculated accuracy.
+        """
+        expected = _extract_target(expected)
+        predicted = _extract_target(predicted)
+        _check_equal_length(predicted, expected)
+
+        if expected.number_of_rows == 0:
+            return 1.0  # Everything was predicted correctly (since there is nothing to predict)
+
+        return expected._series.eq(predicted._series).sum() / expected.number_of_rows
+
+    @staticmethod
+    def f1_score(predicted: Column | TabularDataset, expected: Column | TabularDataset, positive_class: Any) -> float:
+        """
+        Compute the $F_1$ score on the given data.
+
+        The $F_1$ score is the harmonic mean of precision and recall.
+
+        Parameters
+        ----------
+        predicted:
+            The predicted target values produced by the classifier.
+        expected:
+            The expected target values.
+        positive_class:
+            The class to be considered positive. All other classes are considered negative.
+
+        Returns
+        -------
+        f1_score:
+            The calculated $F_1$ score.
+        """
+        predicted = _extract_target(predicted)
+        expected = _extract_target(expected)
+        _check_equal_length(predicted, expected)
+
+        true_positives = (expected._series.eq(positive_class) & predicted._series.eq(positive_class)).sum()
+        false_positives = (expected._series.ne(positive_class) & predicted._series.eq(positive_class)).sum()
+        false_negatives = (expected._series.eq(positive_class) & predicted._series.ne(positive_class)).sum()
+
+        if true_positives + false_positives + false_negatives == 0:
+            return 1.0  # Only true negatives (so all predictions are correct)
+
+        return 2 * true_positives / (2 * true_positives + false_positives + false_negatives)
+
+    @staticmethod
+    def precision(predicted: Column | TabularDataset, expected: Column | TabularDataset, positive_class: Any) -> float:
+        """
+        Compute the precision on the given data.
+
+        The precision is the proportion of positive predictions that were correct.
+
+        Parameters
+        ----------
+        predicted:
+            The predicted target values produced by the classifier.
+        expected:
+            The expected target values.
+        positive_class:
+            The class to be considered positive. All other classes are considered negative.
+
+        Returns
+        -------
+        precision:
+            The calculated precision.
+        """
+        expected = _extract_target(expected)
+        predicted = _extract_target(predicted)
+        _check_equal_length(predicted, expected)
+
+        true_positives = (expected._series.eq(positive_class) & predicted._series.eq(positive_class)).sum()
+        predicted_positives = predicted._series.eq(positive_class).sum()
+
+        if predicted_positives == 0:
+            return 1.0  # All positive predictions were correct (since there are none)
+
+        return true_positives / predicted_positives
+
+    @staticmethod
+    def recall(predicted: Column | TabularDataset, expected: Column | TabularDataset, positive_class: Any) -> float:
+        """
+        Compute the recall on the given data.
+
+        The recall is the proportion of actual positives that were predicted correctly.
+
+        Parameters
+        ----------
+        predicted:
+            The predicted target values produced by the classifier.
+        expected:
+            The expected target values.
+        positive_class:
+            The class to be considered positive. All other classes are considered negative.
+
+        Returns
+        -------
+        recall:
+            The calculated recall.
+        """
+        expected = _extract_target(expected)
+        predicted = _extract_target(predicted)
+        _check_equal_length(predicted, expected)
+
+        true_positives = (expected._series.eq(positive_class) & predicted._series.eq(positive_class)).sum()
+        actual_positives = expected._series.eq(positive_class).sum()
+
+        if actual_positives == 0:
+            return 1.0  # All actual positives were predicted correctly (since there are none)
+
+        return true_positives / actual_positives
+
 
 def _extract_target(column_or_dataset: Column | TabularDataset) -> Column:
+    """Extract the target column from the given column or dataset."""
     if isinstance(column_or_dataset, TabularDataset):
         return column_or_dataset.target
     else:
         return column_or_dataset
 
 
-def _check_column_length(expected: Column, predicted: Column) -> None:
-    if expected.number_of_rows != predicted.number_of_rows:
+# TODO: collect validation in one place?
+def _check_equal_length(column1: Column, column2: Column) -> None:
+    """
+    Check if the columns have the same length and raise an error if they do not.
+
+    Parameters
+    ----------
+    column1:
+        The first column.
+    column2:
+        The second column.
+
+    Raises
+    ------
+    ValueError
+        If the columns have different lengths.
+    """
+    if column1.number_of_rows != column2.number_of_rows:
         ColumnLengthMismatchError("")  # TODO: pass list of columns to exception, let it handle the formatting
