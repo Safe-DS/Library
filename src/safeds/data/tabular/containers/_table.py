@@ -118,63 +118,6 @@ class Table:
             raise FileNotFoundError(f'File "{path}" does not exist')
 
     @staticmethod
-    def from_excel_file(path: str | Path) -> Table:
-        """
-        Read data from an Excel file into a table.
-
-        Valid file extensions are `.xls`, '.xlsx', `.xlsm`, `.xlsb`, `.odf`, `.ods` and `.odt`.
-
-        !!! warning "Deprecated"
-            Convert your data to a CSV file and use
-            [Table.from_csv_file][safeds.data.tabular.containers._table.Table.from_csv_file] instead.
-
-        Parameters
-        ----------
-        path:
-            The path to the Excel file.
-
-        Returns
-        -------
-        table:
-            The table created from the Excel file.
-
-        Raises
-        ------
-        FileNotFoundError
-            If the specified file does not exist.
-        WrongFileExtensionError
-            If the file is not an Excel file.
-
-        Examples
-        --------
-        >>> from safeds.data.tabular.containers import Table
-        >>> Table.from_excel_file('./src/resources/from_excel_file.xlsx')
-           a  b
-        0  1  4
-        1  2  5
-        2  3  6
-        """
-        warnings.warn(
-            "This method is deprecated and will be removed in a future version. "
-            "Convert your data to a CSV file and use `Table.from_csv_file` instead.",
-            DeprecationWarning,
-            stacklevel=2,
-        )
-
-        import pandas as pd
-
-        path = Path(path)
-        excel_extensions = [".xls", ".xlsx", ".xlsm", ".xlsb", ".odf", ".ods", ".odt"]
-        if path.suffix not in excel_extensions:
-            raise WrongFileExtensionError(path, excel_extensions)
-        try:
-            return Table._from_pandas_dataframe(
-                pd.read_excel(path, engine="openpyxl", usecols=lambda colname: "Unnamed" not in colname),
-            )
-        except FileNotFoundError as exception:
-            raise FileNotFoundError(f'File "{path}" does not exist') from exception
-
-    @staticmethod
     def from_json_file(path: str | Path) -> Table:
         """
         Read data from a JSON file into a table.
@@ -2322,55 +2265,6 @@ class Table:
         data_to_csv = self._data.reset_index(drop=True)
         data_to_csv.columns = self._schema.column_names
         data_to_csv.to_csv(path, index=False)
-
-    def to_excel_file(self, path: str | Path) -> None:
-        """
-        Write the data from the table into an Excel file.
-
-        Valid file extensions are `.xls`, '.xlsx', `.xlsm`, `.xlsb`, `.odf`, `.ods` and `.odt`.
-        If the file and/or the directories do not exist, they will be created. If the file already exists, it will be
-        overwritten.
-
-        !!! warning "Deprecated"
-            Use [`to_csv_file`][safeds.data.tabular.containers._table.Table.to_csv_file] instead.
-
-        Parameters
-        ----------
-        path:
-            The path to the output file.
-
-        Raises
-        ------
-        WrongFileExtensionError
-            If the file is not an Excel file.
-
-        Examples
-        --------
-        >>> from safeds.data.tabular.containers import Table
-        >>> table = Table.from_dict({"a": [1, 2, 3], "b": [4, 5, 6]})
-        >>> table.to_excel_file("./src/resources/to_excel_file.xlsx")
-        """
-        warnings.warn(
-            "This method is deprecated and will be removed in a future version. Use `Table.to_csv_file` instead.",
-            DeprecationWarning,
-            stacklevel=2,
-        )
-
-        import openpyxl
-
-        path = Path(path)
-        excel_extensions = [".xls", ".xlsx", ".xlsm", ".xlsb", ".odf", ".ods", ".odt"]
-        if path.suffix not in excel_extensions:
-            raise WrongFileExtensionError(path, excel_extensions)
-
-        # Create Excel metadata in the file
-        tmp_table_file = openpyxl.Workbook()
-        tmp_table_file.save(path)
-
-        path.parent.mkdir(parents=True, exist_ok=True)
-        data_to_excel = self._data.reset_index(drop=True)
-        data_to_excel.columns = self._schema.column_names
-        data_to_excel.to_excel(path)
 
     def to_json_file(self, path: str | Path) -> None:
         """
