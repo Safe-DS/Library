@@ -1449,54 +1449,6 @@ class Table:
         new_df.columns = self._schema.column_names
         return Table._from_pandas_dataframe(new_df)
 
-    def sort_columns(
-        self,
-        comparator: Callable[[Column, Column], int] = lambda col1, col2: (col1.name > col2.name)
-        - (col1.name < col2.name),
-    ) -> Table:
-        """
-        Sort the columns of a `Table` with the given comparator and return a new `Table`.
-
-        The comparator is a function that takes two columns `col1` and `col2` and
-        returns an integer:
-
-        * If `col1` should be ordered before `col2`, the function should return a negative number.
-        * If `col1` should be ordered after `col2`, the function should return a positive number.
-        * If the original order of `col1` and `col2` should be kept, the function should return 0.
-
-        If no comparator is given, the columns will be sorted alphabetically by their name.
-
-        The original table is not modified.
-
-        Parameters
-        ----------
-        comparator:
-            The function used to compare two columns.
-
-        Returns
-        -------
-        new_table:
-            A new table with sorted columns.
-
-        Examples
-        --------
-        >>> from safeds.data.tabular.containers import Table
-        >>> table = Table.from_dict({"a": [1], "b": [2] })
-        >>> table.sort_columns(lambda col1, col2: 1)
-           a  b
-        0  1  2
-        >>> table.sort_columns(lambda col1, col2: -1)
-           b  a
-        0  2  1
-        >>> table2 = Table.from_dict({"b": [2], "a": [1]})
-        >>> table2.sort_columns()
-           a  b
-        0  1  2
-        """
-        columns = self.to_columns()
-        columns.sort(key=functools.cmp_to_key(comparator))
-        return Table.from_columns(columns)
-
     def sort_rows(self, comparator: Callable[[Row, Row], int]) -> Table:
         """
         Sort the rows of a `Table` with the given comparator and return a new `Table`.
