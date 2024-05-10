@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from safeds.data.tabular.containers import ExperimentalTable
+from safeds.data.tabular.containers import Table
 from safeds.exceptions import (
     ClosedBound,
     NonNumericColumnError,
@@ -11,13 +11,13 @@ from safeds.exceptions import (
     UnknownColumnNameError,
 )
 
-from ._experimental_table_transformer import ExperimentalTableTransformer
+from ._table_transformer import TableTransformer
 
 if TYPE_CHECKING:
     from sklearn.preprocessing import KBinsDiscretizer as sk_KBinsDiscretizer
 
 
-class Discretizer(ExperimentalTableTransformer):
+class Discretizer(TableTransformer):
     """
     The Discretizer bins continuous data into intervals.
 
@@ -40,7 +40,7 @@ class Discretizer(ExperimentalTableTransformer):
             raise OutOfBoundsError(number_of_bins, name="number_of_bins", lower_bound=ClosedBound(2))
         self._number_of_bins = number_of_bins
 
-    def fit(self, table: ExperimentalTable, column_names: list[str] | None) -> ExperimentalDiscretizer:
+    def fit(self, table: Table, column_names: list[str] | None) -> Discretizer:
         """
         Learn a transformation for a set of columns in a table.
 
@@ -94,13 +94,13 @@ class Discretizer(ExperimentalTableTransformer):
             table.remove_columns_except(column_names)._data_frame,
         )
 
-        result = ExperimentalDiscretizer(self._number_of_bins)
+        result = Discretizer(self._number_of_bins)
         result._wrapped_transformer = wrapped_transformer
         result._column_names = column_names
 
         return result
 
-    def transform(self, table: ExperimentalTable) -> ExperimentalTable:
+    def transform(self, table: Table) -> Table:
         """
         Apply the learned transformation to a table.
 
@@ -151,7 +151,7 @@ class Discretizer(ExperimentalTableTransformer):
         new_data = self._wrapped_transformer.transform(
             table.remove_columns_except(self._column_names)._data_frame,
         )
-        return ExperimentalTable._from_polars_lazy_frame(
+        return Table._from_polars_lazy_frame(
             table._lazy_frame.update(new_data.lazy()),
         )
 

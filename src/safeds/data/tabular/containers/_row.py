@@ -5,10 +5,9 @@ from collections.abc import Iterator, Mapping
 from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
-    from safeds.data.tabular.typing import ExperimentalSchema
-    from safeds.data.tabular.typing._experimental_data_type import ExperimentalDataType
+    from safeds.data.tabular.typing import DataType, Schema
 
-    from ._experimental_cell import ExperimentalCell
+    from ._cell import Cell
 
 
 class Row(ABC, Mapping[str, Any]):
@@ -28,7 +27,7 @@ class Row(ABC, Mapping[str, Any]):
     @abstractmethod
     def __eq__(self, other: object) -> bool: ...
 
-    def __getitem__(self, name: str) -> ExperimentalCell:
+    def __getitem__(self, name: str) -> Cell:
         return self.get_value(name)
 
     @abstractmethod
@@ -59,7 +58,7 @@ class Row(ABC, Mapping[str, Any]):
 
     @property
     @abstractmethod
-    def schema(self) -> ExperimentalSchema:
+    def schema(self) -> Schema:
         """The schema of the row."""
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -67,7 +66,7 @@ class Row(ABC, Mapping[str, Any]):
     # ------------------------------------------------------------------------------------------------------------------
 
     @abstractmethod
-    def get_value(self, name: str) -> ExperimentalCell:
+    def get_value(self, name: str) -> Cell:
         """
         Get the value of the specified column.
 
@@ -83,7 +82,7 @@ class Row(ABC, Mapping[str, Any]):
         """
 
     @abstractmethod
-    def get_column_type(self, name: str) -> ExperimentalDataType:
+    def get_column_type(self, name: str) -> DataType:
         """
         Get the type of the specified column.
 

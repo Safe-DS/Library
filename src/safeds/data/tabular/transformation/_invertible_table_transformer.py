@@ -3,17 +3,17 @@ from __future__ import annotations
 from abc import abstractmethod
 from typing import TYPE_CHECKING
 
-from ._experimental_table_transformer import ExperimentalTableTransformer
+from ._table_transformer import TableTransformer
 
 if TYPE_CHECKING:
-    from safeds.data.tabular.containers import ExperimentalTable
+    from safeds.data.tabular.containers import Table
 
 
-class InvertibleTableTransformer(ExperimentalTableTransformer):
+class InvertibleTableTransformer(TableTransformer):
     """A `TableTransformer` that can also undo the learned transformation after it has been applied."""
 
     @abstractmethod
-    def inverse_transform(self, transformed_table: ExperimentalTable) -> ExperimentalTable:
+    def inverse_transform(self, transformed_table: Table) -> Table:
         """
         Undo the learned transformation.
 

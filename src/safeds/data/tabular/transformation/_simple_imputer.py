@@ -8,16 +8,16 @@ from typing import TYPE_CHECKING, Any
 import pandas as pd
 
 from safeds._utils import _structural_hash
-from safeds.data.tabular.containers import ExperimentalTable
+from safeds.data.tabular.containers import Table
 from safeds.exceptions import NonNumericColumnError, TransformerNotFittedError, UnknownColumnNameError
 
-from ._experimental_table_transformer import ExperimentalTableTransformer
+from ._table_transformer import TableTransformer
 
 if TYPE_CHECKING:
     from sklearn.impute import SimpleImputer as sk_SimpleImputer
 
 
-class SimpleImputer(ExperimentalTableTransformer):
+class SimpleImputer(TableTransformer):
     """
     Replace missing values using the given strategy.
 
@@ -31,7 +31,7 @@ class SimpleImputer(ExperimentalTableTransformer):
     Examples
     --------
     >>> from safeds.data.tabular.containers import Column, Table
-    >>> from safeds.data.tabular.transformation import Imputer
+    >>> from safeds.data.tabular.transformation import SimpleImputer
     >>>
     >>> table = Table.from_columns(
     ...     [
@@ -39,7 +39,7 @@ class SimpleImputer(ExperimentalTableTransformer):
     ...         Column("b", [None, 2, 3]),
     ...     ],
     ... )
-    >>> transformer = Imputer(Imputer.Strategy.Constant(0))
+    >>> transformer = SimpleImputer(SimpleImputer.Strategy.Constant(0))
     >>> transformed_table = transformer.fit_and_transform(table)
     """
 
@@ -66,7 +66,7 @@ class SimpleImputer(ExperimentalTableTransformer):
             """
 
         @staticmethod
-        def Constant(value: Any) -> ExperimentalSimpleImputer.Strategy:  # noqa: N802
+        def Constant(value: Any) -> SimpleImputer.Strategy:  # noqa: N802
             """
             Replace missing values with the given constant value.
 
@@ -78,21 +78,21 @@ class SimpleImputer(ExperimentalTableTransformer):
             return _Constant(value)  # pragma: no cover
 
         @staticmethod
-        def Mean() -> ExperimentalSimpleImputer.Strategy:  # noqa: N802
+        def Mean() -> SimpleImputer.Strategy:  # noqa: N802
             """Replace missing values with the mean of each column."""
             return _Mean()  # pragma: no cover
 
         @staticmethod
-        def Median() -> ExperimentalSimpleImputer.Strategy:  # noqa: N802
+        def Median() -> SimpleImputer.Strategy:  # noqa: N802
             """Replace missing values with the median of each column."""
             return _Median()  # pragma: no cover
 
         @staticmethod
-        def Mode() -> ExperimentalSimpleImputer.Strategy:  # noqa: N802
+        def Mode() -> SimpleImputer.Strategy:  # noqa: N802
             """Replace missing values with the mode of each column."""
             return _Mode()  # pragma: no cover
 
-    def __init__(self, strategy: ExperimentalSimpleImputer.Strategy, *, value_to_replace: float | str | None = None):
+    def __init__(self, strategy: SimpleImputer.Strategy, *, value_to_replace: float | str | None = None):
         if value_to_replace is None:
             value_to_replace = pd.NA
 
@@ -103,7 +103,7 @@ class SimpleImputer(ExperimentalTableTransformer):
         self._column_names: list[str] | None = None
 
     @property
-    def strategy(self) -> ExperimentalSimpleImputer.Strategy:
+    def strategy(self) -> SimpleImputer.Strategy:
         """The strategy used to replace missing values."""
         return self._strategy
 
@@ -117,7 +117,7 @@ class SimpleImputer(ExperimentalTableTransformer):
         """Whether the transformer is fitted."""
         return self._wrapped_transformer is not None
 
-    def fit(self, table: ExperimentalTable, column_names: list[str] | None) -> ExperimentalSimpleImputer:
+    def fit(self, table: Table, column_names: list[str] | None) -> SimpleImputer:
         """
         Learn a transformation for a set of columns in a table.
 
@@ -142,7 +142,8 @@ class SimpleImputer(ExperimentalTableTransformer):
         ValueError
             If the table contains 0 rows
         NonNumericColumnError
-            If the strategy is set to either Mean or Median and the specified columns of the table contain non-numerical data.
+            If the strategy is set to either Mean or Median and the specified columns of the table contain non-numerical
+            data.
         """
         from sklearn.impute import SimpleImputer as sk_SimpleImputer
 
@@ -193,13 +194,13 @@ class SimpleImputer(ExperimentalTableTransformer):
             table.remove_columns_except(column_names)._data_frame,
         )
 
-        result = ExperimentalSimpleImputer(self._strategy)
+        result = SimpleImputer(self._strategy)
         result._wrapped_transformer = wrapped_transformer
         result._column_names = column_names
 
         return result
 
-    def transform(self, table: ExperimentalTable) -> ExperimentalTable:
+    def transform(self, table: Table) -> Table:
         """
         Apply the learned transformation to a table.
 
@@ -237,7 +238,7 @@ class SimpleImputer(ExperimentalTableTransformer):
             raise ValueError("The Imputer cannot transform the table because it contains 0 rows")
 
         new_data = self._wrapped_transformer.transform(table.remove_columns_except(self._column_names)._data_frame)
-        return ExperimentalTable._from_polars_lazy_frame(
+        return Table._from_polars_lazy_frame(
             table._lazy_frame.update(new_data.lazy()),
         )
 
@@ -301,7 +302,7 @@ class SimpleImputer(ExperimentalTableTransformer):
 # ----------------------------------------------------------------------------------------------------------------------
 
 
-class _Constant(ExperimentalSimpleImputer.Strategy):
+class _Constant(SimpleImputer.Strategy):
     def __init__(self, value: Any):
         self._value = value
 
@@ -330,7 +331,7 @@ class _Constant(ExperimentalSimpleImputer.Strategy):
         imputer.fill_value = self._value
 
 
-class _Mean(ExperimentalSimpleImputer.Strategy):
+class _Mean(SimpleImputer.Strategy):
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, _Mean):
             return NotImplemented
@@ -346,7 +347,7 @@ class _Mean(ExperimentalSimpleImputer.Strategy):
         imputer.strategy = "mean"
 
 
-class _Median(ExperimentalSimpleImputer.Strategy):
+class _Median(SimpleImputer.Strategy):
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, _Median):
             return NotImplemented
@@ -362,7 +363,7 @@ class _Median(ExperimentalSimpleImputer.Strategy):
         imputer.strategy = "median"
 
 
-class _Mode(ExperimentalSimpleImputer.Strategy):
+class _Mode(SimpleImputer.Strategy):
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, _Mode):
             return NotImplemented
@@ -380,7 +381,7 @@ class _Mode(ExperimentalSimpleImputer.Strategy):
 
 # Override the methods with classes, so they can be used in `isinstance` calls. Unlike methods, classes define a type.
 # This is needed for the DSL, where imputer strategies are variants of an enum.
-ExperimentalSimpleImputer.Strategy.Constant = _Constant  # type: ignore[method-assign]
-ExperimentalSimpleImputer.Strategy.Mean = _Mean  # type: ignore[method-assign]
-ExperimentalSimpleImputer.Strategy.Median = _Median  # type: ignore[method-assign]
-ExperimentalSimpleImputer.Strategy.Mode = _Mode  # type: ignore[method-assign]
+SimpleImputer.Strategy.Constant = _Constant  # type: ignore[method-assign]
+SimpleImputer.Strategy.Mean = _Mean  # type: ignore[method-assign]
+SimpleImputer.Strategy.Median = _Median  # type: ignore[method-assign]
+SimpleImputer.Strategy.Mode = _Mode  # type: ignore[method-assign]

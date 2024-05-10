@@ -8,12 +8,27 @@ from safeds.exceptions import NonNumericColumnError, UnknownColumnNameError
 
 if TYPE_CHECKING:
     from safeds.data.image.containers import Image
-    from safeds.data.tabular.containers import ExperimentalTable
+    from safeds.data.tabular.containers import Table
 
 
 class TablePlotter:
-    def __init__(self, table: ExperimentalTable):
-        self._table: ExperimentalTable = table
+    """
+    A class that contains plotting methods for a table.
+
+    Parameters
+    ----------
+    table:
+        The table to plot.
+
+    Examples
+    --------
+    >>> from safeds.data.tabular.containers import Table
+    >>> table = Table("test", [1, 2, 3])
+    >>> plotter = table.plot
+    """
+
+    def __init__(self, table: Table):
+        self._table: Table = table
 
     def box_plots(self) -> Image:
         """
@@ -33,7 +48,7 @@ class TablePlotter:
         --------
         >>> from safeds.data.tabular.containers import Table
         >>> table = Table({"a":[1, 2], "b": [3, 42]})
-        >>> image = table.plot_boxplots()
+        >>> image = table.plot.box_plots()
         """
         # TOOD: implement using matplotlib and polars
         import matplotlib.pyplot as plt
@@ -75,7 +90,7 @@ class TablePlotter:
         --------
         >>> from safeds.data.tabular.containers import Table
         >>> table = Table.from_dict({"temperature": [10, 15, 20, 25, 30], "sales": [54, 74, 90, 206, 210]})
-        >>> image = table.plot_correlation_heatmap()
+        >>> image = table.plot.correlation_heatmap()
         """
         # TODO: implement using matplotlib and polars
         #  https://stackoverflow.com/questions/33282368/plotting-a-2d-heatmap
@@ -140,7 +155,7 @@ class TablePlotter:
         --------
         >>> from safeds.data.tabular.containers import Table
         >>> table = Table({"a": [2, 3, 5, 1], "b": [54, 74, 90, 2014]})
-        >>> image = table.plot_histograms()
+        >>> image = table.plot.histograms()
         """
         # TODO: implement using polars
         import matplotlib.pyplot as plt
@@ -218,8 +233,8 @@ class TablePlotter:
 
         Examples
         --------
-        >>> from safeds.data.tabular.containers import ExperimentalTable
-        >>> table = ExperimentalTable(
+        >>> from safeds.data.tabular.containers import Table
+        >>> table = Table(
         ...     {
         ...         "a": [1, 2, 3, 4, 5],
         ...         "b": [2, 3, 4, 5, 6],
@@ -288,8 +303,8 @@ class TablePlotter:
 
         Examples
         --------
-        >>> from safeds.data.tabular.containers import ExperimentalTable
-        >>> table = ExperimentalTable(
+        >>> from safeds.data.tabular.containers import Table
+        >>> table = Table(
         ...     {
         ...         "a": [1, 2, 3, 4, 5],
         ...         "b": [2, 3, 4, 5, 6],

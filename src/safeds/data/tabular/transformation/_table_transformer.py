@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Self
 from safeds._utils import _structural_hash
 
 if TYPE_CHECKING:
-    from safeds.data.tabular.containers import ExperimentalTable
+    from safeds.data.tabular.containers import Table
 
 
 class TableTransformer(ABC):
@@ -44,7 +44,7 @@ class TableTransformer(ABC):
     # ------------------------------------------------------------------------------------------------------------------
 
     @abstractmethod
-    def fit(self, table: ExperimentalTable, column_names: list[str] | None) -> Self:
+    def fit(self, table: Table, column_names: list[str] | None) -> Self:
         """
         Learn a transformation for a set of columns in a table.
 
@@ -64,7 +64,7 @@ class TableTransformer(ABC):
         """
 
     @abstractmethod
-    def transform(self, table: ExperimentalTable) -> ExperimentalTable:
+    def transform(self, table: Table) -> Table:
         """
         Apply the learned transformation to a table.
 
@@ -135,8 +135,8 @@ class TableTransformer(ABC):
         """
 
     def fit_and_transform(
-        self, table: ExperimentalTable, column_names: list[str] | None = None
-    ) -> tuple[Self, ExperimentalTable]:
+        self, table: Table, column_names: list[str] | None = None
+    ) -> tuple[Self, Table]:
         """
         Learn a transformation for a set of columns in a table and apply the learned transformation to the same table.
 

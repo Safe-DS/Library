@@ -1,5 +1,7 @@
 from timeit import timeit
 
+import polars as pl
+
 from safeds.data.tabular.containers import Table
 
 from benchmarks.table.utils import create_synthetic_table
@@ -7,16 +9,12 @@ from benchmarks.table.utils import create_synthetic_table
 REPETITIONS = 10
 
 
-def _run_group_rows() -> None:
-    table.group_rows(lambda row: row.get_value("column_0") % 2 == 0)
-
-
 def _run_remove_duplicate_rows() -> None:
-    table.remove_duplicate_rows()
+    table.remove_duplicate_rows()._lazy_frame.collect()
 
 
 def _run_remove_rows_with_missing_values() -> None:
-    table.remove_rows_with_missing_values()
+    table.remove_rows_with_missing_values()._lazy_frame.collect()
 
 
 def _run_remove_rows_with_outliers() -> None:
@@ -24,31 +22,37 @@ def _run_remove_rows_with_outliers() -> None:
 
 
 def _run_remove_rows() -> None:
-    table.remove_rows(lambda row: row.get_value("column_0") % 2 == 0)
+    table.remove_rows(lambda row: row.get_value("column_0") % 2 == 0)._lazy_frame.collect()
+
+
+def _run_remove_rows_by_column() -> None:
+    table.remove_rows_by_column("column_0", lambda cell: cell % 2 == 0)._lazy_frame.collect()
 
 
 def _run_shuffle_rows() -> None:
-    table.shuffle_rows()
+    table.shuffle_rows()._lazy_frame.collect()
 
 
 def _run_slice_rows() -> None:
-    table.slice_rows(end=table.number_of_rows // 2)
+    table.slice_rows(length=table.number_of_rows // 2)._lazy_frame.collect()
 
 
 def _run_sort_rows() -> None:
-    table.sort_rows(lambda row1, row2: row1.get_value("column_0") - row2.get_value("column_0"))
+    table.sort_rows(lambda row: row.get_value("column_0"))._lazy_frame.collect()
+
+
+def _run_sort_rows_by_column() -> None:
+    table.sort_rows_by_column("column_0")._lazy_frame.collect()
 
 
 def _run_split_rows() -> None:
-    table.split_rows(0.5)
-
-
-def _run_to_rows() -> None:
-    table.to_rows()
+    table_1, table_2 = table.split_rows(0.5)
+    table_1._lazy_frame.collect()
+    table_2._lazy_frame.collect()
 
 
 def _run_transform_column() -> None:
-    table.transform_column("column_0", lambda row: row.get_value("column_0") * 2)
+    table.transform_column("column_0", lambda value: value * 2)._lazy_frame.collect()
 
 
 if __name__ == "__main__":
@@ -57,10 +61,6 @@ if __name__ == "__main__":
 
     # Run the benchmarks
     timings: dict[str, float] = {
-        "group_rows": timeit(
-            _run_group_rows,
-            number=REPETITIONS,
-        ),
         "remove_duplicate_rows": timeit(
             _run_remove_duplicate_rows,
             number=REPETITIONS,
@@ -77,6 +77,10 @@ if __name__ == "__main__":
             _run_remove_rows,
             number=REPETITIONS,
         ),
+        "remove_rows_by_column": timeit(
+            _run_remove_rows_by_column,
+            number=REPETITIONS,
+        ),
         "shuffle_rows": timeit(
             _run_shuffle_rows,
             number=REPETITIONS,
@@ -89,26 +93,29 @@ if __name__ == "__main__":
             _run_sort_rows,
             number=REPETITIONS,
         ),
+        "sort_rows_by_column": timeit(
+            _run_sort_rows_by_column,
+            number=REPETITIONS,
+        ),
         "split_rows": timeit(
             _run_split_rows,
             number=REPETITIONS,
         ),
-        "to_rows": timeit(
-            _run_to_rows,
-            number=REPETITIONS,
-        ),
-        "transform_colum": timeit(
+        "transform_column": timeit(
             _run_transform_column,
             number=REPETITIONS,
         ),
     }
 
     # Print the timings
-    print(
-        Table(
-            {  # noqa: T201
-                "method": list(timings.keys()),
-                "timing": list(timings.values()),
-            }
+    with pl.Config(
+        tbl_rows=-1,
+    ):
+        print(
+            Table(
+                {
+                    "method": list(timings.keys()),
+                    "timing": list(timings.values()),
+                }
+            )
         )
-    )

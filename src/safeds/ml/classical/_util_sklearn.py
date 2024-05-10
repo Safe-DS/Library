@@ -1,8 +1,8 @@
 import warnings
 from typing import Any
 
-from safeds.data.labeled.containers import ExperimentalTabularDataset, TabularDataset
-from safeds.data.tabular.containers import ExperimentalColumn, ExperimentalTable, Table
+from safeds.data.labeled.containers import ExperimentalTabularDataset
+from safeds.data.tabular.containers import ExperimentalColumn, ExperimentalTable
 from safeds.exceptions import (
     DatasetMissesDataError,
     DatasetMissesFeaturesError,

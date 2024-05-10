@@ -37,8 +37,8 @@ class DataType(ABC):
 
         Examples
         --------
-        >>> from safeds.data.tabular.containers import ExperimentalTable
-        >>> table = ExperimentalTable(
+        >>> from safeds.data.tabular.containers import Table
+        >>> table = Table(
         ...     {
         ...         "A": [1, 2, 3],
         ...         "B": ["a", "b", "c"]
@@ -60,8 +60,8 @@ class DataType(ABC):
         Examples
         --------
         >>> from datetime import datetime
-        >>> from safeds.data.tabular.containers import ExperimentalTable
-        >>> table = ExperimentalTable(
+        >>> from safeds.data.tabular.containers import Table
+        >>> table = Table(
         ...     {
         ...         "A": [datetime.now(), datetime.now(), datetime.now()],
         ...         "B": ["a", "b", "c"]

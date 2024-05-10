@@ -2,23 +2,23 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from safeds.data.tabular.containers import ExperimentalTable
+from safeds.data.tabular.containers import Table
 from safeds.exceptions import NonNumericColumnError, TransformerNotFittedError, UnknownColumnNameError
 
-from ._experimental_invertible_table_transformer import ExperimentalInvertibleTableTransformer
+from ._invertible_table_transformer import InvertibleTableTransformer
 
 if TYPE_CHECKING:
     from sklearn.preprocessing import StandardScaler as sk_StandardScaler
 
 
-class StandardScaler(ExperimentalInvertibleTableTransformer):
+class StandardScaler(InvertibleTableTransformer):
     """The StandardScaler transforms column values to a range by removing the mean and scaling to unit variance."""
 
     def __init__(self) -> None:
         self._column_names: list[str] | None = None
         self._wrapped_transformer: sk_StandardScaler | None = None
 
-    def fit(self, table: ExperimentalTable, column_names: list[str] | None) -> ExperimentalStandardScaler:
+    def fit(self, table: Table, column_names: list[str] | None) -> StandardScaler:
         """
         Learn a transformation for a set of columns in a table.
 
@@ -78,13 +78,13 @@ class StandardScaler(ExperimentalInvertibleTableTransformer):
             table.remove_columns_except(column_names)._data_frame,
         )
 
-        result = ExperimentalStandardScaler()
+        result = StandardScaler()
         result._wrapped_transformer = wrapped_transformer
         result._column_names = column_names
 
         return result
 
-    def transform(self, table: ExperimentalTable) -> ExperimentalTable:
+    def transform(self, table: Table) -> Table:
         """
         Apply the learned transformation to a table.
 
@@ -141,11 +141,11 @@ class StandardScaler(ExperimentalInvertibleTableTransformer):
         new_data = self._wrapped_transformer.transform(
             table.remove_columns_except(self._column_names)._data_frame,
         )
-        return ExperimentalTable._from_polars_lazy_frame(
+        return Table._from_polars_lazy_frame(
             table._lazy_frame.update(new_data.lazy()),
         )
 
-    def inverse_transform(self, transformed_table: ExperimentalTable) -> ExperimentalTable:
+    def inverse_transform(self, transformed_table: Table) -> Table:
         """
         Undo the learned transformation.
 
@@ -203,7 +203,7 @@ class StandardScaler(ExperimentalInvertibleTableTransformer):
         new_data = self._wrapped_transformer.inverse_transform(
             transformed_table.remove_columns_except(self._column_names)._data_frame,
         )
-        return ExperimentalTable._from_polars_data_frame(
+        return Table._from_polars_data_frame(
             transformed_table._data_frame.update(new_data),
         )
 
@@ -230,7 +230,6 @@ class StandardScaler(ExperimentalInvertibleTableTransformer):
             raise TransformerNotFittedError
         return []
 
-    # (Must implement abstract method, cannot instantiate class otherwise.)
     def get_names_of_changed_columns(self) -> list[str]:
         """
          Get the names of all columns that may have been changed by the StandardScaler.

@@ -2,13 +2,13 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from ._experimental_data_type import ExperimentalDataType
+from ._data_type import DataType
 
 if TYPE_CHECKING:
     import polars as pl
 
 
-class _PolarsDataType(ExperimentalDataType):
+class _PolarsDataType(DataType):
     """
     The type of a column or cell in a table.
 

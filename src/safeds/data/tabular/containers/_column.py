@@ -4,20 +4,19 @@ from collections.abc import Callable, Iterator, Sequence
 from typing import TYPE_CHECKING, Any, TypeVar, overload
 
 from safeds._utils import _structural_hash
-from safeds.data.tabular.plotting._experimental_column_plotter import ExperimentalColumnPlotter
-from safeds.data.tabular.typing._experimental_polars_data_type import _PolarsDataType
+from safeds.data.tabular.plotting import ColumnPlotter
+from safeds.data.tabular.typing._polars_data_type import _PolarsDataType
 from safeds.exceptions import IndexOutOfBoundsError
 
-from ._column import Column
-from ._experimental_vectorized_cell import _VectorizedCell
+from ._vectorized_cell import _VectorizedCell
 
 if TYPE_CHECKING:
     from polars import Series
 
-    from safeds.data.tabular.typing._experimental_data_type import ExperimentalDataType
+    from safeds.data.tabular.typing import DataType
 
-    from ._experimental_cell import ExperimentalCell
-    from ._experimental_table import ExperimentalTable
+    from ._cell import Cell
+    from ._table import Table
 
 
 T = TypeVar("T")
@@ -37,8 +36,8 @@ class Column(Sequence[T]):
 
     Examples
     --------
-    >>> from safeds.data.tabular.containers import ExperimentalColumn
-    >>> ExperimentalColumn("test", [1, 2, 3])
+    >>> from safeds.data.tabular.containers import Column
+    >>> Column("test", [1, 2, 3])
     +------+
     | test |
     |  --- |
@@ -55,8 +54,8 @@ class Column(Sequence[T]):
     # ------------------------------------------------------------------------------------------------------------------
 
     @staticmethod
-    def _from_polars_series(data: Series) -> ExperimentalColumn:
-        result = object.__new__(ExperimentalColumn)
+    def _from_polars_series(data: Series) -> Column:
+        result = object.__new__(Column)
         result._series = data
         return result
 
@@ -76,7 +75,7 @@ class Column(Sequence[T]):
         return self._series.__contains__(item)
 
     def __eq__(self, other: object) -> bool:
-        if not isinstance(other, ExperimentalColumn):
+        if not isinstance(other, Column):
             return NotImplemented
         if self is other:
             return True
@@ -86,9 +85,9 @@ class Column(Sequence[T]):
     def __getitem__(self, index: int) -> T: ...
 
     @overload
-    def __getitem__(self, index: slice) -> ExperimentalColumn[T]: ...
+    def __getitem__(self, index: slice) -> Column[T]: ...
 
-    def __getitem__(self, index: int | slice) -> T | ExperimentalColumn[T]:
+    def __getitem__(self, index: int | slice) -> T | Column[T]:
         return self._series.__getitem__(index)
 
     def __hash__(self) -> int:
@@ -138,12 +137,12 @@ class Column(Sequence[T]):
         return self._series.len()
 
     @property
-    def plot(self) -> ExperimentalColumnPlotter:
+    def plot(self) -> ColumnPlotter:
         """The plotter for the column."""
-        return ExperimentalColumnPlotter(self)
+        return ColumnPlotter(self)
 
     @property
-    def type(self) -> ExperimentalDataType:
+    def type(self) -> DataType:
         """The type of the column."""
         return _PolarsDataType(self._series.dtype)
 
@@ -162,8 +161,8 @@ class Column(Sequence[T]):
 
         Examples
         --------
-        >>> from safeds.data.tabular.containers import ExperimentalColumn
-        >>> column = ExperimentalColumn("test", [1, 2, 3, 2])
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("test", [1, 2, 3, 2])
         >>> column.get_distinct_values()
         [1, 2, 3]
         """
@@ -190,8 +189,8 @@ class Column(Sequence[T]):
 
         Examples
         --------
-        >>> from safeds.data.tabular.containers import ExperimentalColumn
-        >>> column = ExperimentalColumn("test", [1, 2, 3])
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("test", [1, 2, 3])
         >>> column.get_value(1)
         2
         """
@@ -204,7 +203,7 @@ class Column(Sequence[T]):
     # Reductions
     # ------------------------------------------------------------------------------------------------------------------
 
-    def all(self, predicate: Callable[[ExperimentalCell[T]], ExperimentalCell[bool]]) -> bool:
+    def all(self, predicate: Callable[[Cell[T]], Cell[bool]]) -> bool:
         """
         Return whether all values in the column satisfy the predicate.
 
@@ -225,8 +224,8 @@ class Column(Sequence[T]):
 
         Examples
         --------
-        >>> from safeds.data.tabular.containers import ExperimentalColumn
-        >>> column = ExperimentalColumn("test", [1, 2, 3])
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("test", [1, 2, 3])
         >>> column.all(lambda cell: cell > 0)
         True
 
@@ -241,7 +240,7 @@ class Column(Sequence[T]):
 
         return result._series.all()
 
-    def any(self, predicate: Callable[[ExperimentalCell[T]], ExperimentalCell[bool]]) -> bool:
+    def any(self, predicate: Callable[[Cell[T]], Cell[bool]]) -> bool:
         """
         Return whether any value in the column satisfies the predicate.
 
@@ -262,8 +261,8 @@ class Column(Sequence[T]):
 
         Examples
         --------
-        >>> from safeds.data.tabular.containers import ExperimentalColumn
-        >>> column = ExperimentalColumn("test", [1, 2, 3])
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("test", [1, 2, 3])
         >>> column.any(lambda cell: cell > 2)
         True
 
@@ -278,7 +277,7 @@ class Column(Sequence[T]):
 
         return result._series.any()
 
-    def count(self, predicate: Callable[[ExperimentalCell[T]], ExperimentalCell[bool]]) -> int:
+    def count(self, predicate: Callable[[Cell[T]], Cell[bool]]) -> int:
         """
         Return how many values in the column satisfy the predicate.
 
@@ -299,8 +298,8 @@ class Column(Sequence[T]):
 
         Examples
         --------
-        >>> from safeds.data.tabular.containers import ExperimentalColumn
-        >>> column = ExperimentalColumn("test", [1, 2, 3])
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("test", [1, 2, 3])
         >>> column.count(lambda cell: cell > 1)
         2
 
@@ -315,7 +314,7 @@ class Column(Sequence[T]):
 
         return result._series.sum()
 
-    def none(self, predicate: Callable[[ExperimentalCell[T]], ExperimentalCell[bool]]) -> bool:
+    def none(self, predicate: Callable[[Cell[T]], Cell[bool]]) -> bool:
         """
         Return whether no value in the column satisfies the predicate.
 
@@ -336,8 +335,8 @@ class Column(Sequence[T]):
 
         Examples
         --------
-        >>> from safeds.data.tabular.containers import ExperimentalColumn
-        >>> column = ExperimentalColumn("test", [1, 2, 3])
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("test", [1, 2, 3])
         >>> column.none(lambda cell: cell < 0)
         True
 
@@ -356,7 +355,7 @@ class Column(Sequence[T]):
     # Transformations
     # ------------------------------------------------------------------------------------------------------------------
 
-    def rename(self, new_name: str) -> ExperimentalColumn[T]:
+    def rename(self, new_name: str) -> Column[T]:
         """
         Return a new column with a new name.
 
@@ -374,8 +373,8 @@ class Column(Sequence[T]):
 
         Examples
         --------
-        >>> from safeds.data.tabular.containers import ExperimentalColumn
-        >>> column = ExperimentalColumn("test", [1, 2, 3])
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("test", [1, 2, 3])
         >>> column.rename("new_name")
         +----------+
         | new_name |
@@ -391,8 +390,8 @@ class Column(Sequence[T]):
 
     def transform(
         self,
-        transformer: Callable[[ExperimentalCell[T]], ExperimentalCell[R]],
-    ) -> ExperimentalColumn[R]:
+        transformer: Callable[[Cell[T]], Cell[R]],
+    ) -> Column[R]:
         """
         Return a new column with values transformed by the transformer.
 
@@ -410,8 +409,8 @@ class Column(Sequence[T]):
 
         Examples
         --------
-        >>> from safeds.data.tabular.containers import ExperimentalColumn
-        >>> column = ExperimentalColumn("test", [1, 2, 3])
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("test", [1, 2, 3])
         >>> column.transform(lambda cell: 2 * cell)
         +------+
         | test |
@@ -433,7 +432,7 @@ class Column(Sequence[T]):
     # Statistics
     # ------------------------------------------------------------------------------------------------------------------
 
-    def summarize_statistics(self) -> ExperimentalTable:
+    def summarize_statistics(self) -> Table:
         """
         Return a table with important statistics about the column.
 
@@ -444,8 +443,8 @@ class Column(Sequence[T]):
 
         Examples
         --------
-        >>> from safeds.data.tabular.containers import ExperimentalColumn
-        >>> column = ExperimentalColumn("a", [1, 3])
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("a", [1, 3])
         >>> column.summarize_statistics()
         +----------------------+--------------------+
         | metric               | a                  |
@@ -463,14 +462,14 @@ class Column(Sequence[T]):
         | stability            | 0.5                |
         +----------------------+--------------------+
         """
-        from ._experimental_table import ExperimentalTable
+        from _table import Table
 
         # TODO: turn this around (call table method, implement in table; allows parallelization)
         mean = self.mean() or "-"
         median = self.median() or "-"
         standard_deviation = self.standard_deviation() or "-"
 
-        return ExperimentalTable(
+        return Table(
             {
                 "metric": [
                     "min",
@@ -497,7 +496,7 @@ class Column(Sequence[T]):
             },
         )
 
-    def correlation_with(self, other: ExperimentalColumn) -> float:
+    def correlation_with(self, other: Column) -> float:
         """
         Calculate the Pearson correlation between this column and another column.
 
@@ -519,13 +518,13 @@ class Column(Sequence[T]):
 
         Examples
         --------
-        >>> from safeds.data.tabular.containers import ExperimentalColumn
-        >>> column1 = ExperimentalColumn("test", [1, 2, 3])
-        >>> column2 = ExperimentalColumn("test", [2, 4, 6])
+        >>> from safeds.data.tabular.containers import Column
+        >>> column1 = Column("test", [1, 2, 3])
+        >>> column2 = Column("test", [2, 4, 6])
         >>> column1.correlation_with(column2)
         1.0
 
-        >>> column4 = ExperimentalColumn("test", [3, 2, 1])
+        >>> column4 = Column("test", [3, 2, 1])
         >>> column1.correlation_with(column4)
         -1.0
         """
@@ -544,8 +543,8 @@ class Column(Sequence[T]):
 
         Examples
         --------
-        >>> from safeds.data.tabular.containers import ExperimentalColumn
-        >>> column = ExperimentalColumn("test", [1, 2, 3, 2])
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("test", [1, 2, 3, 2])
         >>> column.distinct_value_count()
         3
         """
@@ -573,12 +572,12 @@ class Column(Sequence[T]):
 
         Examples
         --------
-        >>> from safeds.data.tabular.containers import ExperimentalColumn
-        >>> column1 = ExperimentalColumn("test", [1, 2, 3])
+        >>> from safeds.data.tabular.containers import Column
+        >>> column1 = Column("test", [1, 2, 3])
         >>> column1.idness()
         1.0
 
-        >>> column2 = ExperimentalColumn("test", [1, 2, 3, 2])
+        >>> column2 = Column("test", [1, 2, 3, 2])
         >>> column2.idness()
         0.75
         """
@@ -598,8 +597,8 @@ class Column(Sequence[T]):
 
         Examples
         --------
-        >>> from safeds.data.tabular.containers import ExperimentalColumn
-        >>> column = ExperimentalColumn("test", [1, 2, 3])
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("test", [1, 2, 3])
         >>> column.max()
         3
         """
@@ -618,8 +617,8 @@ class Column(Sequence[T]):
 
         Examples
         --------
-        >>> from safeds.data.tabular.containers import ExperimentalColumn
-        >>> column = ExperimentalColumn("test", [1, 2, 3])
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("test", [1, 2, 3])
         >>> column.mean()
         2.0
         """
@@ -639,8 +638,8 @@ class Column(Sequence[T]):
 
         Examples
         --------
-        >>> from safeds.data.tabular.containers import ExperimentalColumn
-        >>> column = ExperimentalColumn("test", [1, 2, 3])
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("test", [1, 2, 3])
         >>> column.median()
         2.0
         """
@@ -657,8 +656,8 @@ class Column(Sequence[T]):
 
         Examples
         --------
-        >>> from safeds.data.tabular.containers import ExperimentalColumn
-        >>> column = ExperimentalColumn("test", [1, 2, 3])
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("test", [1, 2, 3])
         >>> column.min()
         1
         """
@@ -675,8 +674,8 @@ class Column(Sequence[T]):
 
         Examples
         --------
-        >>> from safeds.data.tabular.containers import ExperimentalColumn
-        >>> column = ExperimentalColumn("test", [1, None, 3])
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("test", [1, None, 3])
         >>> column.missing_value_count()
         1
         """
@@ -702,7 +701,7 @@ class Column(Sequence[T]):
 
         return self._series.null_count() / self.number_of_rows
 
-    def mode(self) -> ExperimentalColumn[T]:
+    def mode(self) -> Column[T]:
         """
         Return the mode of the values in the column.
 
@@ -716,8 +715,8 @@ class Column(Sequence[T]):
 
         Examples
         --------
-        >>> from safeds.data.tabular.containers import ExperimentalColumn
-        >>> column = ExperimentalColumn("test", [3, 1, 2, 1, 3])
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("test", [3, 1, 2, 1, 3])
         >>> column.mode()
         +------+
         | test |
@@ -747,8 +746,8 @@ class Column(Sequence[T]):
 
         Examples
         --------
-        >>> from safeds.data.tabular.containers import ExperimentalColumn
-        >>> column = ExperimentalColumn("test", [1, 1, 2, 3, None])
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("test", [1, 1, 2, 3, None])
         >>> column.stability()
         0.5
         """
@@ -774,8 +773,8 @@ class Column(Sequence[T]):
 
         Examples
         --------
-        >>> from safeds.data.tabular.containers import ExperimentalColumn
-        >>> column = ExperimentalColumn("test", [1, 2, 3])
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("test", [1, 2, 3])
         >>> column.standard_deviation()
         1.0
         """
@@ -800,8 +799,8 @@ class Column(Sequence[T]):
 
         Examples
         --------
-        >>> from safeds.data.tabular.containers import ExperimentalColumn
-        >>> column = ExperimentalColumn("test", [1, 2, 3])
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("test", [1, 2, 3])
         >>> column.variance()
         1.0
         """
@@ -827,14 +826,14 @@ class Column(Sequence[T]):
 
         Examples
         --------
-        >>> from safeds.data.tabular.containers import ExperimentalColumn
-        >>> column = ExperimentalColumn("test", [1, 2, 3])
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("test", [1, 2, 3])
         >>> column.to_list()
         [1, 2, 3]
         """
         return self._series.to_list()
 
-    def to_table(self) -> ExperimentalTable:
+    def to_table(self) -> Table:
         """
         Create a table that contains only this column.
 
@@ -845,8 +844,8 @@ class Column(Sequence[T]):
 
         Examples
         --------
-        >>> from safeds.data.tabular.containers import ExperimentalColumn
-        >>> column = ExperimentalColumn("test", [1, 2, 3])
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("test", [1, 2, 3])
         >>> column.to_table()
         +------+
         | test |
@@ -858,26 +857,9 @@ class Column(Sequence[T]):
         |    3 |
         +------+
         """
-        from ._experimental_table import ExperimentalTable
+        from _table import Table
 
-        return ExperimentalTable._from_polars_data_frame(self._series.to_frame())
-
-    def temporary_to_old_column(self) -> Column:
-        """
-        Convert the column to the old column format. This method is temporary and will be removed in a later version.
-
-        Returns
-        -------
-        old_column:
-            The column in the old format.
-
-        Examples
-        --------
-        >>> from safeds.data.tabular.containers import ExperimentalColumn
-        >>> column = ExperimentalColumn("a", [1, 2, 3])
-        >>> old_column = column.temporary_to_old_column()
-        """
-        return Column._from_pandas_series(self._series.to_pandas())
+        return Table._from_polars_data_frame(self._series.to_frame())
 
     # ------------------------------------------------------------------------------------------------------------------
     # IPython integration

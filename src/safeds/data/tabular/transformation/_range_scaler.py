@@ -2,16 +2,16 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from safeds.data.tabular.containers import ExperimentalTable
+from safeds.data.tabular.containers import Table
 from safeds.exceptions import NonNumericColumnError, TransformerNotFittedError, UnknownColumnNameError
 
-from ._experimental_invertible_table_transformer import ExperimentalInvertibleTableTransformer
+from ._invertible_table_transformer import InvertibleTableTransformer
 
 if TYPE_CHECKING:
     from sklearn.preprocessing import MinMaxScaler as sk_MinMaxScaler
 
 
-class RangeScaler(ExperimentalInvertibleTableTransformer):
+class RangeScaler(InvertibleTableTransformer):
     """
     The RangeScaler transforms column values by scaling each value to a given range.
 
@@ -36,7 +36,7 @@ class RangeScaler(ExperimentalInvertibleTableTransformer):
         self._minimum = min_
         self._maximum = max_
 
-    def fit(self, table: ExperimentalTable, column_names: list[str] | None) -> ExperimentalRangeScaler:
+    def fit(self, table: Table, column_names: list[str] | None) -> RangeScaler:
         """
         Learn a transformation for a set of columns in a table.
 
@@ -96,13 +96,13 @@ class RangeScaler(ExperimentalInvertibleTableTransformer):
             table.remove_columns_except(column_names)._data_frame,
         )
 
-        result = ExperimentalRangeScaler()
+        result = RangeScaler()
         result._wrapped_transformer = wrapped_transformer
         result._column_names = column_names
 
         return result
 
-    def transform(self, table: ExperimentalTable) -> ExperimentalTable:
+    def transform(self, table: Table) -> Table:
         """
         Apply the learned transformation to a table.
 
@@ -159,11 +159,11 @@ class RangeScaler(ExperimentalInvertibleTableTransformer):
         new_data = self._wrapped_transformer.transform(
             table.remove_columns_except(self._column_names)._data_frame,
         )
-        return ExperimentalTable._from_polars_lazy_frame(
+        return Table._from_polars_lazy_frame(
             table._lazy_frame.update(new_data.lazy()),
         )
 
-    def inverse_transform(self, transformed_table: ExperimentalTable) -> ExperimentalTable:
+    def inverse_transform(self, transformed_table: Table) -> Table:
         """
         Undo the learned transformation.
 
@@ -230,7 +230,7 @@ class RangeScaler(ExperimentalInvertibleTableTransformer):
 
         new_data = new_data.rename(name_mapping)
 
-        return ExperimentalTable._from_polars_data_frame(
+        return Table._from_polars_data_frame(
             transformed_table._data_frame.update(new_data),
         )
 

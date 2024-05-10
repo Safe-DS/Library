@@ -6,16 +6,16 @@ from typing import TYPE_CHECKING
 from safeds._utils import _structural_hash
 from safeds.exceptions import UnknownColumnNameError
 
-from ._experimental_polars_data_type import _PolarsDataType
-from ._experimental_schema import ExperimentalSchema
+from ._polars_data_type import _PolarsDataType
+from ._schema import Schema
 
 if TYPE_CHECKING:
     import polars as pl
 
-    from safeds.data.tabular.typing import ExperimentalDataType
+    from safeds.data.tabular.typing import DataType
 
 
-class _PolarsSchema(ExperimentalSchema):
+class _PolarsSchema(Schema):
     """
     The schema of a row or table.
 
@@ -72,7 +72,7 @@ class _PolarsSchema(ExperimentalSchema):
     # Getters
     # ------------------------------------------------------------------------------------------------------------------
 
-    def get_column_type(self, name: str) -> ExperimentalDataType:
+    def get_column_type(self, name: str) -> DataType:
         if not self.has_column(name):
             raise UnknownColumnNameError([name])
         return _PolarsDataType(self._schema[name])
@@ -84,7 +84,7 @@ class _PolarsSchema(ExperimentalSchema):
     # Conversion
     # ------------------------------------------------------------------------------------------------------------------
 
-    def to_dict(self) -> dict[str, ExperimentalDataType]:
+    def to_dict(self) -> dict[str, DataType]:
         return {name: _PolarsDataType(type_) for name, type_ in self._schema.items()}
 
     # ------------------------------------------------------------------------------------------------------------------

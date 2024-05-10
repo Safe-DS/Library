@@ -13,8 +13,8 @@ if TYPE_CHECKING:
     from sklearn.base import ClassifierMixin
     from sklearn.svm import SVC as sk_SVC  # noqa: N811
 
-    from safeds.data.labeled.containers import ExperimentalTabularDataset, TabularDataset
-    from safeds.data.tabular.containers import ExperimentalTable, Table
+    from safeds.data.labeled.containers import TabularDataset
+    from safeds.data.tabular.containers import Table
 
 
 class SupportVectorMachineKernel(ABC):
@@ -188,7 +188,7 @@ class SupportVectorMachineClassifier(Classifier):
 
             __hash__ = SupportVectorMachineKernel.__hash__
 
-    def fit(self, training_set: TabularDataset | ExperimentalTabularDataset) -> SupportVectorMachineClassifier:
+    def fit(self, training_set: TabularDataset) -> SupportVectorMachineClassifier:
         """
         Create a copy of this classifier and fit it with the given training data.
 
@@ -227,7 +227,7 @@ class SupportVectorMachineClassifier(Classifier):
 
         return result
 
-    def predict(self, dataset: Table | ExperimentalTable | ExperimentalTabularDataset) -> TabularDataset:
+    def predict(self, dataset: Table | TabularDataset) -> TabularDataset:
         """
         Predict a target vector using a dataset containing feature vectors. The model has to be trained first.
 

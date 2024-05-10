@@ -25,106 +25,106 @@ class Cell(ABC, Generic[T]):
     # "Boolean" operators (actually bitwise) -----------------------------------
 
     @abstractmethod
-    def __invert__(self) -> ExperimentalCell[bool]: ...
+    def __invert__(self) -> Cell[bool]: ...
 
     @abstractmethod
-    def __and__(self, other: bool | ExperimentalCell[bool]) -> ExperimentalCell[bool]: ...
+    def __and__(self, other: bool | Cell[bool]) -> Cell[bool]: ...
 
     @abstractmethod
-    def __rand__(self, other: bool | ExperimentalCell[bool]) -> ExperimentalCell[bool]: ...
+    def __rand__(self, other: bool | Cell[bool]) -> Cell[bool]: ...
 
     @abstractmethod
-    def __or__(self, other: bool | ExperimentalCell[bool]) -> ExperimentalCell[bool]: ...
+    def __or__(self, other: bool | Cell[bool]) -> Cell[bool]: ...
 
     @abstractmethod
-    def __ror__(self, other: bool | ExperimentalCell[bool]) -> ExperimentalCell[bool]: ...
+    def __ror__(self, other: bool | Cell[bool]) -> Cell[bool]: ...
 
     @abstractmethod
-    def __xor__(self, other: bool | ExperimentalCell[bool]) -> ExperimentalCell[bool]: ...
+    def __xor__(self, other: bool | Cell[bool]) -> Cell[bool]: ...
 
     @abstractmethod
-    def __rxor__(self, other: bool | ExperimentalCell[bool]) -> ExperimentalCell[bool]: ...
+    def __rxor__(self, other: bool | Cell[bool]) -> Cell[bool]: ...
 
     # Comparison ---------------------------------------------------------------
 
     @abstractmethod
-    def __eq__(self, other: object) -> ExperimentalCell[bool]:  # type: ignore[override]
+    def __eq__(self, other: object) -> Cell[bool]:  # type: ignore[override]
         ...
 
     @abstractmethod
-    def __ge__(self, other: Any) -> ExperimentalCell[bool]: ...
+    def __ge__(self, other: Any) -> Cell[bool]: ...
 
     @abstractmethod
-    def __gt__(self, other: Any) -> ExperimentalCell[bool]: ...
+    def __gt__(self, other: Any) -> Cell[bool]: ...
 
     @abstractmethod
-    def __le__(self, other: Any) -> ExperimentalCell[bool]: ...
+    def __le__(self, other: Any) -> Cell[bool]: ...
 
     @abstractmethod
-    def __lt__(self, other: Any) -> ExperimentalCell[bool]: ...
+    def __lt__(self, other: Any) -> Cell[bool]: ...
 
     @abstractmethod
-    def __ne__(self, other: object) -> ExperimentalCell[bool]:  # type: ignore[override]
+    def __ne__(self, other: object) -> Cell[bool]:  # type: ignore[override]
         ...
 
     # Numeric operators --------------------------------------------------------
 
     @abstractmethod
-    def __abs__(self) -> ExperimentalCell[R]: ...
+    def __abs__(self) -> Cell[R]: ...
 
     @abstractmethod
-    def __ceil__(self) -> ExperimentalCell[R]: ...
+    def __ceil__(self) -> Cell[R]: ...
 
     @abstractmethod
-    def __floor__(self) -> ExperimentalCell[R]: ...
+    def __floor__(self) -> Cell[R]: ...
 
     @abstractmethod
-    def __neg__(self) -> ExperimentalCell[R]: ...
+    def __neg__(self) -> Cell[R]: ...
 
     @abstractmethod
-    def __pos__(self) -> ExperimentalCell[R]: ...
+    def __pos__(self) -> Cell[R]: ...
 
     @abstractmethod
-    def __add__(self, other: Any) -> ExperimentalCell[R]: ...
+    def __add__(self, other: Any) -> Cell[R]: ...
 
     @abstractmethod
-    def __radd__(self, other: Any) -> ExperimentalCell[R]: ...
+    def __radd__(self, other: Any) -> Cell[R]: ...
 
     @abstractmethod
-    def __floordiv__(self, other: Any) -> ExperimentalCell[R]: ...
+    def __floordiv__(self, other: Any) -> Cell[R]: ...
 
     @abstractmethod
-    def __rfloordiv__(self, other: Any) -> ExperimentalCell[R]: ...
+    def __rfloordiv__(self, other: Any) -> Cell[R]: ...
 
     @abstractmethod
-    def __mod__(self, other: Any) -> ExperimentalCell[R]: ...
+    def __mod__(self, other: Any) -> Cell[R]: ...
 
     @abstractmethod
-    def __rmod__(self, other: Any) -> ExperimentalCell[R]: ...
+    def __rmod__(self, other: Any) -> Cell[R]: ...
 
     @abstractmethod
-    def __mul__(self, other: Any) -> ExperimentalCell[R]: ...
+    def __mul__(self, other: Any) -> Cell[R]: ...
 
     @abstractmethod
-    def __rmul__(self, other: Any) -> ExperimentalCell[R]: ...
+    def __rmul__(self, other: Any) -> Cell[R]: ...
 
     @abstractmethod
-    def __pow__(self, other: float | ExperimentalCell[P]) -> ExperimentalCell[R]: ...
+    def __pow__(self, other: float | Cell[P]) -> Cell[R]: ...
 
     @abstractmethod
-    def __rpow__(self, other: float | ExperimentalCell[P]) -> ExperimentalCell[R]: ...
+    def __rpow__(self, other: float | Cell[P]) -> Cell[R]: ...
 
     @abstractmethod
-    def __sub__(self, other: Any) -> ExperimentalCell[R]: ...
+    def __sub__(self, other: Any) -> Cell[R]: ...
 
     @abstractmethod
-    def __rsub__(self, other: Any) -> ExperimentalCell[R]: ...
+    def __rsub__(self, other: Any) -> Cell[R]: ...
 
     @abstractmethod
-    def __truediv__(self, other: Any) -> ExperimentalCell[R]: ...
+    def __truediv__(self, other: Any) -> Cell[R]: ...
 
     @abstractmethod
-    def __rtruediv__(self, other: Any) -> ExperimentalCell[R]: ...
+    def __rtruediv__(self, other: Any) -> Cell[R]: ...
 
     # Other --------------------------------------------------------------------
 
@@ -138,14 +138,14 @@ class Cell(ABC, Generic[T]):
     # Boolean operations
     # ------------------------------------------------------------------------------------------------------------------
 
-    def not_(self) -> ExperimentalCell[bool]:
+    def not_(self) -> Cell[bool]:
         """
         Negate a boolean. This is equivalent to the `~` operator.
 
         Examples
         --------
-        >>> from safeds.data.tabular.containers import ExperimentalColumn
-        >>> column = ExperimentalColumn("example", [True, False])
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("example", [True, False])
         >>> column.transform(lambda cell: cell.not_())
         +---------+
         | example |
@@ -168,14 +168,14 @@ class Cell(ABC, Generic[T]):
         """
         return self.__invert__()
 
-    def and_(self, other: bool | ExperimentalCell[bool]) -> ExperimentalCell[bool]:
+    def and_(self, other: bool | Cell[bool]) -> Cell[bool]:
         """
         Perform a boolean AND operation. This is equivalent to the `&` operator.
 
         Examples
         --------
-        >>> from safeds.data.tabular.containers import ExperimentalColumn
-        >>> column = ExperimentalColumn("example", [True, False])
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("example", [True, False])
         >>> column.transform(lambda cell: cell.and_(False))
         +---------+
         | example |
@@ -198,14 +198,14 @@ class Cell(ABC, Generic[T]):
         """
         return self.__and__(other)
 
-    def or_(self, other: bool | ExperimentalCell[bool]) -> ExperimentalCell[bool]:
+    def or_(self, other: bool | Cell[bool]) -> Cell[bool]:
         """
         Perform a boolean OR operation. This is equivalent to the `|` operator.
 
         Examples
         --------
-        >>> from safeds.data.tabular.containers import ExperimentalColumn
-        >>> column = ExperimentalColumn("example", [True, False])
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("example", [True, False])
         >>> column.transform(lambda cell: cell.or_(True))
         +---------+
         | example |
@@ -228,14 +228,14 @@ class Cell(ABC, Generic[T]):
         """
         return self.__or__(other)
 
-    def xor(self, other: bool | ExperimentalCell[bool]) -> ExperimentalCell[bool]:
+    def xor(self, other: bool | Cell[bool]) -> Cell[bool]:
         """
         Perform a boolean XOR operation. This is equivalent to the `^` operator.
 
         Examples
         --------
-        >>> from safeds.data.tabular.containers import ExperimentalColumn
-        >>> column = ExperimentalColumn("example", [True, False])
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("example", [True, False])
         >>> column.transform(lambda cell: cell.xor(True))
         +---------+
         | example |
@@ -262,14 +262,14 @@ class Cell(ABC, Generic[T]):
     # Numeric operations
     # ------------------------------------------------------------------------------------------------------------------
 
-    def abs(self) -> ExperimentalCell[R]:
+    def abs(self) -> Cell[R]:
         """
         Get the absolute value.
 
         Examples
         --------
-        >>> from safeds.data.tabular.containers import ExperimentalColumn
-        >>> column = ExperimentalColumn("example", [1, -2])
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("example", [1, -2])
         >>> column.transform(lambda cell: cell.abs())
         +---------+
         | example |
@@ -282,14 +282,14 @@ class Cell(ABC, Generic[T]):
         """
         return self.__abs__()
 
-    def ceil(self) -> ExperimentalCell[R]:
+    def ceil(self) -> Cell[R]:
         """
         Round up to the nearest integer.
 
         Examples
         --------
-        >>> from safeds.data.tabular.containers import ExperimentalColumn
-        >>> column = ExperimentalColumn("example", [1.1, 2.9])
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("example", [1.1, 2.9])
         >>> column.transform(lambda cell: cell.ceil())
         +---------+
         | example |
@@ -302,14 +302,14 @@ class Cell(ABC, Generic[T]):
         """
         return self.__ceil__()
 
-    def floor(self) -> ExperimentalCell[R]:
+    def floor(self) -> Cell[R]:
         """
         Round down to the nearest integer.
 
         Examples
         --------
-        >>> from safeds.data.tabular.containers import ExperimentalColumn
-        >>> column = ExperimentalColumn("example", [1.1, 2.9])
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("example", [1.1, 2.9])
         >>> column.transform(lambda cell: cell.floor())
         +---------+
         | example |
@@ -322,14 +322,14 @@ class Cell(ABC, Generic[T]):
         """
         return self.__floor__()
 
-    def neg(self) -> ExperimentalCell[R]:
+    def neg(self) -> Cell[R]:
         """
         Negate the value.
 
         Examples
         --------
-        >>> from safeds.data.tabular.containers import ExperimentalColumn
-        >>> column = ExperimentalColumn("example", [1, -2])
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("example", [1, -2])
         >>> column.transform(lambda cell: cell.neg())
         +---------+
         | example |
@@ -342,14 +342,14 @@ class Cell(ABC, Generic[T]):
         """
         return self.__neg__()
 
-    def add(self, other: Any) -> ExperimentalCell[R]:
+    def add(self, other: Any) -> Cell[R]:
         """
         Add a value. This is equivalent to the `+` operator.
 
         Examples
         --------
-        >>> from safeds.data.tabular.containers import ExperimentalColumn
-        >>> column = ExperimentalColumn("example", [1, 2])
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("example", [1, 2])
         >>> column.transform(lambda cell: cell.add(3))
         +---------+
         | example |
@@ -372,14 +372,14 @@ class Cell(ABC, Generic[T]):
         """
         return self.__add__(other)
 
-    def mod(self, other: Any) -> ExperimentalCell[R]:
+    def mod(self, other: Any) -> Cell[R]:
         """
         Perform a modulo operation. This is equivalent to the `%` operator.
 
         Examples
         --------
-        >>> from safeds.data.tabular.containers import ExperimentalColumn
-        >>> column = ExperimentalColumn("example", [5, 6])
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("example", [5, 6])
         >>> column.transform(lambda cell: cell.mod(3))
         +---------+
         | example |
@@ -402,14 +402,14 @@ class Cell(ABC, Generic[T]):
         """
         return self.__mod__(other)
 
-    def mul(self, other: Any) -> ExperimentalCell[R]:
+    def mul(self, other: Any) -> Cell[R]:
         """
         Multiply by a value. This is equivalent to the `*` operator.
 
         Examples
         --------
-        >>> from safeds.data.tabular.containers import ExperimentalColumn
-        >>> column = ExperimentalColumn("example", [2, 3])
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("example", [2, 3])
         >>> column.transform(lambda cell: cell.mul(4))
         +---------+
         | example |
@@ -432,14 +432,14 @@ class Cell(ABC, Generic[T]):
         """
         return self.__mul__(other)
 
-    def pow(self, other: float | ExperimentalCell[P]) -> ExperimentalCell[R]:
+    def pow(self, other: float | Cell[P]) -> Cell[R]:
         """
         Raise to a power. This is equivalent to the `**` operator.
 
         Examples
         --------
-        >>> from safeds.data.tabular.containers import ExperimentalColumn
-        >>> column = ExperimentalColumn("example", [2, 3])
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("example", [2, 3])
         >>> column.transform(lambda cell: cell.pow(3))
         +---------+
         | example |
@@ -462,14 +462,14 @@ class Cell(ABC, Generic[T]):
         """
         return self.__pow__(other)
 
-    def sub(self, other: Any) -> ExperimentalCell[R]:
+    def sub(self, other: Any) -> Cell[R]:
         """
         Subtract a value. This is equivalent to the `-` operator.
 
         Examples
         --------
-        >>> from safeds.data.tabular.containers import ExperimentalColumn
-        >>> column = ExperimentalColumn("example", [5, 6])
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("example", [5, 6])
         >>> column.transform(lambda cell: cell.sub(3))
         +---------+
         | example |
@@ -492,14 +492,14 @@ class Cell(ABC, Generic[T]):
         """
         return self.__sub__(other)
 
-    def div(self, other: Any) -> ExperimentalCell[R]:
+    def div(self, other: Any) -> Cell[R]:
         """
         Divide by a value. This is equivalent to the `/` operator.
 
         Examples
         --------
-        >>> from safeds.data.tabular.containers import ExperimentalColumn
-        >>> column = ExperimentalColumn("example", [6, 8])
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("example", [6, 8])
         >>> column.transform(lambda cell: cell.div(2))
         +---------+
         | example |
@@ -526,14 +526,14 @@ class Cell(ABC, Generic[T]):
     # Comparison operations
     # ------------------------------------------------------------------------------------------------------------------
 
-    def eq(self, other: Any) -> ExperimentalCell[bool]:
+    def eq(self, other: Any) -> Cell[bool]:
         """
         Check if equal to a value. This is equivalent to the `==` operator.
 
         Examples
         --------
-        >>> from safeds.data.tabular.containers import ExperimentalColumn
-        >>> column = ExperimentalColumn("example", [1, 2])
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("example", [1, 2])
         >>> column.transform(lambda cell: cell.eq(2))
         +---------+
         | example |
@@ -556,14 +556,14 @@ class Cell(ABC, Generic[T]):
         """
         return self.__eq__(other)
 
-    def ge(self, other: Any) -> ExperimentalCell[bool]:
+    def ge(self, other: Any) -> Cell[bool]:
         """
         Check if greater than or equal to a value. This is equivalent to the `>=` operator.
 
         Examples
         --------
-        >>> from safeds.data.tabular.containers import ExperimentalColumn
-        >>> column = ExperimentalColumn("example", [1, 2])
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("example", [1, 2])
         >>> column.transform(lambda cell: cell.ge(2))
         +---------+
         | example |
@@ -586,14 +586,14 @@ class Cell(ABC, Generic[T]):
         """
         return self.__ge__(other)
 
-    def gt(self, other: Any) -> ExperimentalCell[bool]:
+    def gt(self, other: Any) -> Cell[bool]:
         """
         Check if greater than a value. This is equivalent to the `>` operator.
 
         Examples
         --------
-        >>> from safeds.data.tabular.containers import ExperimentalColumn
-        >>> column = ExperimentalColumn("example", [1, 2])
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("example", [1, 2])
         >>> column.transform(lambda cell: cell.gt(2))
         +---------+
         | example |
@@ -616,14 +616,14 @@ class Cell(ABC, Generic[T]):
         """
         return self.__gt__(other)
 
-    def le(self, other: Any) -> ExperimentalCell[bool]:
+    def le(self, other: Any) -> Cell[bool]:
         """
         Check if less than or equal to a value. This is equivalent to the `<=` operator.
 
         Examples
         --------
-        >>> from safeds.data.tabular.containers import ExperimentalColumn
-        >>> column = ExperimentalColumn("example", [1, 2])
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("example", [1, 2])
         >>> column.transform(lambda cell: cell.le(2))
         +---------+
         | example |
@@ -646,14 +646,14 @@ class Cell(ABC, Generic[T]):
         """
         return self.__le__(other)
 
-    def lt(self, other: Any) -> ExperimentalCell[bool]:
+    def lt(self, other: Any) -> Cell[bool]:
         """
         Check if less than a value. This is equivalent to the `<` operator.
 
         Examples
         --------
-        >>> from safeds.data.tabular.containers import ExperimentalColumn
-        >>> column = ExperimentalColumn("example", [1, 2])
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("example", [1, 2])
         >>> column.transform(lambda cell: cell.lt(2))
         +---------+
         | example |

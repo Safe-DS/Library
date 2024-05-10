@@ -13,7 +13,7 @@ from safeds.exceptions import UnknownColumnNameError
     ],
     ids=["multiply by 2"],
 )
-def test_should_transform_column(table: Table, table_transformed: Table) -> None:
+def test_should_transform_column(table: Table_transformed: Table) -> None:
     result = table.transform_column("A", lambda row: row.get_value("A") * 2)
 
     assert result.schema == table_transformed.schema

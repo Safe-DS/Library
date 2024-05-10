@@ -5,15 +5,13 @@ from typing import TYPE_CHECKING
 
 from safeds._config import _init_default_device
 from safeds._utils import _structural_hash
-from safeds.data.tabular.containers import Column, Table
 from safeds.exceptions import ClosedBound, OutOfBoundsError
 
 if TYPE_CHECKING:
-    from collections.abc import Mapping, Sequence
-    from typing import Any
-
     import torch
     from torch.utils.data import DataLoader, Dataset
+
+    from safeds.data.tabular.containers import Column, Table
 
 
 class TimeSeriesDataset:
@@ -59,14 +57,12 @@ class TimeSeriesDataset:
     # ------------------------------------------------------------------------------------------------------------------
     def __init__(
         self,
-        data: Table | Mapping[str, Sequence[Any]],
+        data: Table,
         target_name: str,
         time_name: str,
         extra_names: list[str] | None = None,
     ):
         # Preprocess inputs
-        if not isinstance(data, Table):
-            data = Table(data)
         if extra_names is None:
             extra_names = []
 
@@ -83,10 +79,10 @@ class TimeSeriesDataset:
 
         # Set attributes
         self._table: Table = data
-        self._features: Table = data.keep_only_columns(feature_names)
+        self._features: Table = data.remove_columns_except(feature_names)
         self._target: Column = data.get_column(target_name)
         self._time: Column = data.get_column(time_name)
-        self._extras: Table = data.keep_only_columns(extra_names)
+        self._extras: Table = data.remove_columns_except(extra_names)
 
     def __eq__(self, other: object) -> bool:
         """

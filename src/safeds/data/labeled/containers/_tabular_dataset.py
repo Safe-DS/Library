@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 from safeds._utils import _structural_hash
 
 if TYPE_CHECKING:
-    from safeds.data.tabular.containers import ExperimentalColumn, ExperimentalTable
+    from safeds.data.tabular.containers import Column, Table
 
 
 class TabularDataset:
@@ -45,11 +45,14 @@ class TabularDataset:
     Examples
     --------
     >>> from safeds.data.labeled.containers import TabularDataset
-    >>> dataset = TabularDataset(
-    ...     {"id": [1, 2, 3], "feature": [4, 5, 6], "target": [1, 2, 3]},
-    ...     target_name="target",
-    ...     extra_names=["id"]
+    >>> table = Table(
+    ...     {
+    ...         "id": [1, 2, 3],
+    ...         "feature": [4, 5, 6],
+    ...         "target": [1, 2, 3],
+    ...     },
     ... )
+    >>> dataset = table.to_tabular_dataset(target_name="target", extra_names=["id"])
     """
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -58,7 +61,7 @@ class TabularDataset:
 
     def __init__(
         self,
-        data: ExperimentalTable,
+        data: Table,
         target_name: str,
         extra_names: list[str] | None = None,
     ):
@@ -77,13 +80,13 @@ class TabularDataset:
             raise ValueError("At least one feature column must remain.")
 
         # Set attributes
-        self._table: ExperimentalTable = data
-        self._features: ExperimentalTable = data.remove_columns_except(feature_names)
-        self._target: ExperimentalColumn = data.get_column(target_name)
-        self._extras: ExperimentalTable = data.remove_columns_except(extra_names)
+        self._table: Table = data
+        self._features: Table = data.remove_columns_except(feature_names)
+        self._target: Column = data.get_column(target_name)
+        self._extras: Table = data.remove_columns_except(extra_names)
 
     def __eq__(self, other: object) -> bool:
-        if not isinstance(other, ExperimentalTabularDataset):
+        if not isinstance(other, TabularDataset):
             return NotImplemented
         if self is other:
             return True
@@ -106,17 +109,17 @@ class TabularDataset:
     # ------------------------------------------------------------------------------------------------------------------
 
     @property
-    def features(self) -> ExperimentalTable:
+    def features(self) -> Table:
         """The feature columns of the tabular dataset."""
         return self._features
 
     @property
-    def target(self) -> ExperimentalColumn:
+    def target(self) -> Column:
         """The target column of the tabular dataset."""
         return self._target
 
     @property
-    def extras(self) -> ExperimentalTable:
+    def extras(self) -> Table:
         """
         Additional columns of the tabular dataset that are neither features nor target.
 
@@ -128,7 +131,7 @@ class TabularDataset:
     # Conversion
     # ------------------------------------------------------------------------------------------------------------------
 
-    def to_table(self) -> ExperimentalTable:
+    def to_table(self) -> Table:
         """
         Return a table containing all columns of the tabular dataset.
 
@@ -153,3 +156,69 @@ class TabularDataset:
             The generated HTML.
         """
         return self._table._repr_html_()
+
+# def _into_dataloader_with_classes(self, batch_size: int, num_of_classes: int) -> DataLoader:
+#     """
+#     Return a Dataloader for the data stored in this table, used for training neural networks.
+#
+#     The original table is not modified.
+#
+#     Parameters
+#     ----------
+#     batch_size:
+#         The size of data batches that should be loaded at one time.
+#
+#     Returns
+#     -------
+#     result:
+#         The DataLoader.
+#
+#     """
+#     import torch
+#     from torch.utils.data import DataLoader
+#
+#     _init_default_device()
+#
+#     if num_of_classes <= 2:
+#         return DataLoader(
+#             dataset=_create_dataset(
+#                 torch.Tensor(self.features._data.values).to(_get_device()),
+#                 torch.Tensor(self.target._data).to(_get_device()).unsqueeze(dim=-1),
+#             ),
+#             batch_size=batch_size,
+#             shuffle=True,
+#             generator=torch.Generator(device=_get_device()),
+#         )
+#     else:
+#         return DataLoader(
+#             dataset=_create_dataset(
+#                 torch.Tensor(self.features._data.values).to(_get_device()),
+#                 torch.nn.functional.one_hot(
+#                     torch.LongTensor(self.target._data).to(_get_device()),
+#                     num_classes=num_of_classes,
+#                 ),
+#             ),
+#             batch_size=batch_size,
+#             shuffle=True,
+#             generator=torch.Generator(device=_get_device()),
+#         )
+#
+# def _create_dataset(features: Tensor, target: Tensor) -> Dataset:
+#     import torch
+#     from torch.utils.data import Dataset
+#
+#     _init_default_device()
+#
+#     class _CustomDataset(Dataset):
+#         def __init__(self, features: Tensor, target: Tensor):
+#             self.X = features.to(torch.float32)
+#             self.Y = target.to(torch.float32)
+#             self.len = self.X.size(dim=0)
+#
+#         def __getitem__(self, item: int) -> tuple[torch.Tensor, torch.Tensor]:
+#             return self.X[item], self.Y[item]
+#
+#         def __len__(self) -> int:
+#             return self.len
+#
+#     return _CustomDataset(features, target)

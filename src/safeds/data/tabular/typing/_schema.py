@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from safeds.data.tabular.typing import ExperimentalDataType
+    from ._data_type import DataType
 
 
 class Schema(ABC):
@@ -46,8 +46,8 @@ class Schema(ABC):
 
         Examples
         --------
-        >>> from safeds.data.tabular.containers import ExperimentalTable
-        >>> table = ExperimentalTable({"A": [1, 2, 3], "B": ["a", "b", "c"]})
+        >>> from safeds.data.tabular.containers import Table
+        >>> table = Table({"A": [1, 2, 3], "B": ["a", "b", "c"]})
         >>> table.schema.column_names
         ['A', 'B']
         """
@@ -57,7 +57,7 @@ class Schema(ABC):
     # ------------------------------------------------------------------------------------------------------------------
 
     @abstractmethod
-    def get_column_type(self, name: str) -> ExperimentalDataType:
+    def get_column_type(self, name: str) -> DataType:
         """
         Return the type of the given column.
 
@@ -78,8 +78,8 @@ class Schema(ABC):
 
         Examples
         --------
-        >>> from safeds.data.tabular.containers import ExperimentalTable
-        >>> table = ExperimentalTable({"A": [1, 2, 3], "B": ["a", "b", "c"]})
+        >>> from safeds.data.tabular.containers import Table
+        >>> table = Table({"A": [1, 2, 3], "B": ["a", "b", "c"]})
         >>> type_ = table.schema.get_column_type("A")
         """
 
@@ -100,8 +100,8 @@ class Schema(ABC):
 
         Examples
         --------
-        >>> from safeds.data.tabular.containers import ExperimentalTable
-        >>> table = ExperimentalTable({"A": [1, 2, 3], "B": ["a", "b", "c"]})
+        >>> from safeds.data.tabular.containers import Table
+        >>> table = Table({"A": [1, 2, 3], "B": ["a", "b", "c"]})
         >>> table.schema.has_column("A")
         True
 
@@ -114,7 +114,7 @@ class Schema(ABC):
     # ------------------------------------------------------------------------------------------------------------------
 
     @abstractmethod
-    def to_dict(self) -> dict[str, ExperimentalDataType]:
+    def to_dict(self) -> dict[str, DataType]:
         """
         Return a dictionary that maps column names to column types.
 
@@ -125,8 +125,8 @@ class Schema(ABC):
 
         Examples
         --------
-        >>> from safeds.data.tabular.containers import ExperimentalTable
-        >>> table = ExperimentalTable({"A": [1, 2, 3], "B": ["a", "b", "c"]})
+        >>> from safeds.data.tabular.containers import Table
+        >>> table = Table({"A": [1, 2, 3], "B": ["a", "b", "c"]})
         >>> dict_ = table.schema.to_dict()
         """
 

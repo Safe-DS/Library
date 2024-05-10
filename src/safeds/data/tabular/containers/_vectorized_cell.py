@@ -3,23 +3,23 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any, TypeVar
 
 from safeds._utils import _structural_hash
-from safeds.data.tabular.typing._experimental_polars_data_type import _PolarsDataType
+from safeds.data.tabular.typing._polars_data_type import _PolarsDataType
 
-from ._experimental_cell import ExperimentalCell
+from ._cell import Cell
 
 if TYPE_CHECKING:
     import polars as pl
 
-    from safeds.data.tabular.typing._experimental_data_type import ExperimentalDataType
+    from safeds.data.tabular.typing import DataType
 
-    from ._experimental_column import ExperimentalColumn
+    from ._column import Column
 
 T = TypeVar("T")
 P = TypeVar("P")
 R = TypeVar("R")
 
 
-class _VectorizedCell(ExperimentalCell[T]):
+class _VectorizedCell(Cell[T]):
     """
     A single value in a table.
 
@@ -40,12 +40,12 @@ class _VectorizedCell(ExperimentalCell[T]):
     # Dunder methods
     # ------------------------------------------------------------------------------------------------------------------
 
-    def __init__(self, column: ExperimentalColumn[T]) -> None:
+    def __init__(self, column: Column[T]) -> None:
         self._series: pl.Series = column._series
 
     # "Boolean" operators (actually bitwise) -----------------------------------
 
-    def __invert__(self) -> ExperimentalCell[bool]:
+    def __invert__(self) -> Cell[bool]:
         import polars as pl
 
         if self._series.dtype != pl.Boolean:
@@ -53,42 +53,42 @@ class _VectorizedCell(ExperimentalCell[T]):
 
         return _wrap(self._series.__invert__())
 
-    def __and__(self, other: bool | ExperimentalCell[bool]) -> ExperimentalCell[bool]:
+    def __and__(self, other: bool | Cell[bool]) -> Cell[bool]:
         right_operand = _normalize_boolean_operation_operands(self, other)
         if right_operand is None:
             return NotImplemented
 
         return _wrap(self._series.__and__(right_operand))
 
-    def __rand__(self, other: bool | ExperimentalCell[bool]) -> ExperimentalCell[bool]:
+    def __rand__(self, other: bool | Cell[bool]) -> Cell[bool]:
         right_operand = _normalize_boolean_operation_operands(self, other)
         if right_operand is None:
             return NotImplemented
 
         return _wrap(self._series.__rand__(right_operand))
 
-    def __or__(self, other: bool | ExperimentalCell[bool]) -> ExperimentalCell[bool]:
+    def __or__(self, other: bool | Cell[bool]) -> Cell[bool]:
         right_operand = _normalize_boolean_operation_operands(self, other)
         if right_operand is None:
             return NotImplemented
 
         return _wrap(self._series.__or__(right_operand))
 
-    def __ror__(self, other: bool | ExperimentalCell[bool]) -> ExperimentalCell[bool]:
+    def __ror__(self, other: bool | Cell[bool]) -> Cell[bool]:
         right_operand = _normalize_boolean_operation_operands(self, other)
         if right_operand is None:
             return NotImplemented
 
         return _wrap(self._series.__ror__(right_operand))
 
-    def __xor__(self, other: bool | ExperimentalCell[bool]) -> ExperimentalCell[bool]:
+    def __xor__(self, other: bool | Cell[bool]) -> Cell[bool]:
         right_operand = _normalize_boolean_operation_operands(self, other)
         if right_operand is None:
             return NotImplemented
 
         return _wrap(self._series.__xor__(right_operand))
 
-    def __rxor__(self, other: bool | ExperimentalCell[bool]) -> ExperimentalCell[bool]:
+    def __rxor__(self, other: bool | Cell[bool]) -> Cell[bool]:
         right_operand = _normalize_boolean_operation_operands(self, other)
         if right_operand is None:
             return NotImplemented
@@ -97,100 +97,100 @@ class _VectorizedCell(ExperimentalCell[T]):
 
     # Comparison ---------------------------------------------------------------
 
-    def __eq__(self, other: object) -> ExperimentalCell[bool]:  # type: ignore[override]
+    def __eq__(self, other: object) -> Cell[bool]:  # type: ignore[override]
         other = _unwrap(other)
         return _wrap(self._series.__eq__(other))
 
-    def __ge__(self, other: Any) -> ExperimentalCell[bool]:
+    def __ge__(self, other: Any) -> Cell[bool]:
         other = _unwrap(other)
         return _wrap(self._series.__ge__(other))
 
-    def __gt__(self, other: Any) -> ExperimentalCell[bool]:
+    def __gt__(self, other: Any) -> Cell[bool]:
         other = _unwrap(other)
         return _wrap(self._series.__gt__(other))
 
-    def __le__(self, other: Any) -> ExperimentalCell[bool]:
+    def __le__(self, other: Any) -> Cell[bool]:
         other = _unwrap(other)
         return _wrap(self._series.__le__(other))
 
-    def __lt__(self, other: Any) -> ExperimentalCell[bool]:
+    def __lt__(self, other: Any) -> Cell[bool]:
         other = _unwrap(other)
         return _wrap(self._series.__lt__(other))
 
-    def __ne__(self, other: object) -> ExperimentalCell[bool]:  # type: ignore[override]
+    def __ne__(self, other: object) -> Cell[bool]:  # type: ignore[override]
         other = _unwrap(other)
         return _wrap(self._series.__ne__(other))
 
     # Numeric operators --------------------------------------------------------
 
-    def __abs__(self) -> ExperimentalCell[R]:
+    def __abs__(self) -> Cell[R]:
         return _wrap(self._series.__abs__())
 
-    def __ceil__(self) -> ExperimentalCell[R]:
+    def __ceil__(self) -> Cell[R]:
         return _wrap(self._series.ceil())
 
-    def __floor__(self) -> ExperimentalCell[R]:
+    def __floor__(self) -> Cell[R]:
         return _wrap(self._series.floor())
 
-    def __neg__(self) -> ExperimentalCell[R]:
+    def __neg__(self) -> Cell[R]:
         return _wrap(self._series.__neg__())
 
-    def __pos__(self) -> ExperimentalCell[R]:
+    def __pos__(self) -> Cell[R]:
         return _wrap(self._series.__pos__())
 
-    def __add__(self, other: Any) -> ExperimentalCell[R]:
+    def __add__(self, other: Any) -> Cell[R]:
         other = _unwrap(other)
         return _wrap(self._series.__add__(other))
 
-    def __radd__(self, other: Any) -> ExperimentalCell[R]:
+    def __radd__(self, other: Any) -> Cell[R]:
         other = _unwrap(other)
         return _wrap(self._series.__radd__(other))
 
-    def __floordiv__(self, other: Any) -> ExperimentalCell[R]:
+    def __floordiv__(self, other: Any) -> Cell[R]:
         other = _unwrap(other)
         return _wrap(self._series.__floordiv__(other))
 
-    def __rfloordiv__(self, other: Any) -> ExperimentalCell[R]:
+    def __rfloordiv__(self, other: Any) -> Cell[R]:
         other = _unwrap(other)
         return _wrap(self._series.__rfloordiv__(other))
 
-    def __mod__(self, other: Any) -> ExperimentalCell[R]:
+    def __mod__(self, other: Any) -> Cell[R]:
         other = _unwrap(other)
         return _wrap(self._series.__mod__(other))
 
-    def __rmod__(self, other: Any) -> ExperimentalCell[R]:
+    def __rmod__(self, other: Any) -> Cell[R]:
         other = _unwrap(other)
         return _wrap(self._series.__rmod__(other))
 
-    def __mul__(self, other: Any) -> ExperimentalCell[R]:
+    def __mul__(self, other: Any) -> Cell[R]:
         other = _unwrap(other)
         return _wrap(self._series.__mul__(other))
 
-    def __rmul__(self, other: Any) -> ExperimentalCell[R]:
+    def __rmul__(self, other: Any) -> Cell[R]:
         other = _unwrap(other)
         return _wrap(self._series.__rmul__(other))
 
-    def __pow__(self, other: float | ExperimentalCell[P]) -> ExperimentalCell[R]:
+    def __pow__(self, other: float | Cell[P]) -> Cell[R]:
         other = _unwrap(other)
         return _wrap(self._series.__pow__(other))
 
-    def __rpow__(self, other: float | ExperimentalCell[P]) -> ExperimentalCell[R]:
+    def __rpow__(self, other: float | Cell[P]) -> Cell[R]:
         other = _unwrap(other)
         return _wrap(self._series.__rpow__(other))
 
-    def __sub__(self, other: Any) -> ExperimentalCell[R]:
+    def __sub__(self, other: Any) -> Cell[R]:
         other = _unwrap(other)
         return _wrap(self._series.__sub__(other))
 
-    def __rsub__(self, other: Any) -> ExperimentalCell[R]:
+    def __rsub__(self, other: Any) -> Cell[R]:
         other = _unwrap(other)
         return _wrap(self._series.__rsub__(other))
 
-    def __truediv__(self, other: Any) -> ExperimentalCell[R]:
+    def __truediv__(self, other: Any) -> Cell[R]:
         other = _unwrap(other)
         return _wrap(self._series.__truediv__(other))
 
-    def __rtruediv__(self, other: Any) -> ExperimentalCell[R]:
+    def __rtruediv__(self, other: Any) -> Cell[R]:
         other = _unwrap(other)
         return _wrap(self._series.__rtruediv__(other))
 
@@ -219,7 +219,7 @@ class _VectorizedCell(ExperimentalCell[T]):
     # ------------------------------------------------------------------------------------------------------------------
 
     @property
-    def type(self) -> ExperimentalDataType:
+    def type(self) -> DataType:
         return _PolarsDataType(self._series.dtype)
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -240,7 +240,7 @@ class _VectorizedCell(ExperimentalCell[T]):
 
 def _normalize_boolean_operation_operands(
     left_operand: _VectorizedCell,
-    right_operand: bool | ExperimentalCell[bool],
+    right_operand: bool | Cell[bool],
 ) -> pl.Series | None:
     """
     Normalize the operands of a boolean operation (not, and, or, xor).

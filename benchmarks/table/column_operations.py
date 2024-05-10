@@ -1,8 +1,8 @@
 from timeit import timeit
 
-from safeds.data.tabular.containers import ExperimentalTable
+from safeds.data.tabular.containers import Table
 
-from benchmarks.table.utils import create_synthetic_table_polars
+from benchmarks.table.utils import create_synthetic_table
 
 REPETITIONS = 10
 
@@ -21,7 +21,7 @@ def _run_summarize_statistics() -> None:
 
 if __name__ == "__main__":
     # Create a synthetic Table
-    table = create_synthetic_table_polars(100, 5000)
+    table = create_synthetic_table(100, 5000)
 
     # Run the benchmarks
     timings: dict[str, float] = {
@@ -41,7 +41,7 @@ if __name__ == "__main__":
 
     # Print the timings
     print(
-        ExperimentalTable(
+        Table(
             {
                 "method": list(timings.keys()),
                 "timing": list(timings.values()),

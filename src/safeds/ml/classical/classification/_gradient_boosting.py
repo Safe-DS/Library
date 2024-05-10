@@ -12,8 +12,8 @@ if TYPE_CHECKING:
     from sklearn.base import ClassifierMixin
     from sklearn.ensemble import GradientBoostingClassifier as sk_GradientBoostingClassifier
 
-    from safeds.data.labeled.containers import ExperimentalTabularDataset, TabularDataset
-    from safeds.data.tabular.containers import ExperimentalTable, Table
+    from safeds.data.labeled.containers import TabularDataset
+    from safeds.data.tabular.containers import Table
 
 
 class GradientBoostingClassifier(Classifier):
@@ -84,7 +84,7 @@ class GradientBoostingClassifier(Classifier):
         """
         return self._learning_rate
 
-    def fit(self, training_set: TabularDataset | ExperimentalTabularDataset) -> GradientBoostingClassifier:
+    def fit(self, training_set: TabularDataset) -> GradientBoostingClassifier:
         """
         Create a copy of this classifier and fit it with the given training data.
 
@@ -123,7 +123,7 @@ class GradientBoostingClassifier(Classifier):
 
         return result
 
-    def predict(self, dataset: Table | ExperimentalTable | ExperimentalTabularDataset) -> TabularDataset:
+    def predict(self, dataset: Table | TabularDataset) -> TabularDataset:
         """
         Predict a target vector using a dataset containing feature vectors. The model has to be trained first.
 

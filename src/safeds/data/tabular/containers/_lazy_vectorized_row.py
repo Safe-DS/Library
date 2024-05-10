@@ -4,17 +4,16 @@ from typing import TYPE_CHECKING
 
 from safeds.exceptions import UnknownColumnNameError
 
-from ._experimental_lazy_cell import _LazyCell
-from ._experimental_row import ExperimentalRow
+from ._lazy_cell import _LazyCell
+from ._row import Row
 
 if TYPE_CHECKING:
-    from safeds.data.tabular.typing import ExperimentalSchema
-    from safeds.data.tabular.typing._experimental_data_type import ExperimentalDataType
+    from safeds.data.tabular.typing import DataType, Schema
 
-    from ._experimental_table import ExperimentalTable
+    from ._table import Table
 
 
-class _LazyVectorizedRow(ExperimentalRow):
+class _LazyVectorizedRow(Row):
     """
     A one-dimensional collection of named, heterogeneous values.
 
@@ -29,8 +28,8 @@ class _LazyVectorizedRow(ExperimentalRow):
     # Dunder methods
     # ------------------------------------------------------------------------------------------------------------------
 
-    def __init__(self, table: ExperimentalTable):
-        self._table: ExperimentalTable = table
+    def __init__(self, table: Table):
+        self._table: Table = table
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, _LazyVectorizedRow):
@@ -58,7 +57,7 @@ class _LazyVectorizedRow(ExperimentalRow):
         return self._table.number_of_columns
 
     @property
-    def schema(self) -> ExperimentalSchema:
+    def schema(self) -> Schema:
         return self._table.schema
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -73,7 +72,7 @@ class _LazyVectorizedRow(ExperimentalRow):
 
         return _LazyCell(pl.col(name))
 
-    def get_column_type(self, name: str) -> ExperimentalDataType:
+    def get_column_type(self, name: str) -> DataType:
         return self._table.get_column_type(name)
 
     def has_column(self, name: str) -> bool:

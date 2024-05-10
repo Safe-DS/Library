@@ -4,7 +4,7 @@ import warnings
 from collections import Counter
 from typing import Any
 
-from safeds.data.tabular.containers import ExperimentalColumn, ExperimentalTable
+from safeds.data.tabular.containers import Column, Table
 from safeds.exceptions import (
     NonNumericColumnError,
     TransformerNotFittedError,
@@ -12,10 +12,10 @@ from safeds.exceptions import (
     ValueNotPresentWhenFittedError,
 )
 
-from ._experimental_invertible_table_transformer import ExperimentalInvertibleTableTransformer
+from ._invertible_table_transformer import InvertibleTableTransformer
 
 
-class OneHotEncoder(ExperimentalInvertibleTableTransformer):
+class OneHotEncoder(InvertibleTableTransformer):
     """
     A way to deal with categorical features that is particularly useful for unordered (i.e. nominal) data.
 
@@ -68,7 +68,7 @@ class OneHotEncoder(ExperimentalInvertibleTableTransformer):
         return super().__hash__()
 
     def __eq__(self, other: object) -> bool:
-        if not isinstance(other, ExperimentalOneHotEncoder):
+        if not isinstance(other, OneHotEncoder):
             return NotImplemented
         return (
             self._column_names == other._column_names
@@ -76,7 +76,7 @@ class OneHotEncoder(ExperimentalInvertibleTableTransformer):
             and self._value_to_column_nans == other._value_to_column_nans
         )
 
-    def fit(self, table: ExperimentalTable, column_names: list[str] | None) -> ExperimentalOneHotEncoder:
+    def fit(self, table: Table, column_names: list[str] | None) -> OneHotEncoder:
         """
         Learn a transformation for a set of columns in a table.
 
@@ -122,7 +122,7 @@ class OneHotEncoder(ExperimentalInvertibleTableTransformer):
                 stacklevel=2,
             )
 
-        result = ExperimentalOneHotEncoder()
+        result = OneHotEncoder()
 
         result._column_names = {}
         result._value_to_column = {}
@@ -151,7 +151,7 @@ class OneHotEncoder(ExperimentalInvertibleTableTransformer):
 
         return result
 
-    def transform(self, table: ExperimentalTable) -> ExperimentalTable:
+    def transform(self, table: Table) -> Table:
         """
         Apply the learned transformation to a table.
 
@@ -176,7 +176,8 @@ class OneHotEncoder(ExperimentalInvertibleTableTransformer):
         ValueError
             If the table contains 0 rows.
         ValueNotPresentWhenFittedError
-            If a column in the to-be-transformed table contains a new value that was not already present in the table the OneHotEncoder was fitted on.
+            If a column in the to-be-transformed table contains a new value that was not already present in the table
+            the OneHotEncoder was fitted on.
         """
         import numpy as np
 
@@ -214,7 +215,7 @@ class OneHotEncoder(ExperimentalInvertibleTableTransformer):
                     values_not_present_when_fitted.append((value, old_column_name))
 
             for new_column in self._column_names[old_column_name]:
-                table = table.add_columns([ExperimentalColumn(new_column, encoded_values[new_column])])
+                table = table.add_columns([Column(new_column, encoded_values[new_column])])
 
         if len(values_not_present_when_fitted) > 0:
             raise ValueNotPresentWhenFittedError(values_not_present_when_fitted)
@@ -235,7 +236,7 @@ class OneHotEncoder(ExperimentalInvertibleTableTransformer):
         # plus we need to prevent the table from possibly having 0 columns temporarily.)
         return table.remove_columns(list(self._column_names.keys()))
 
-    def inverse_transform(self, transformed_table: ExperimentalTable) -> ExperimentalTable:
+    def inverse_transform(self, transformed_table: Table) -> Table:
         """
         Undo the learned transformation.
 
@@ -310,7 +311,7 @@ class OneHotEncoder(ExperimentalInvertibleTableTransformer):
         table = transformed_table
 
         for column_name, encoded_column in original_columns.items():
-            table = table.add_columns(ExperimentalColumn(column_name, encoded_column))
+            table = table.add_columns(Column(column_name, encoded_column))
 
         # Drop old column names:
         table = table.remove_columns(list(self._value_to_column.values()))

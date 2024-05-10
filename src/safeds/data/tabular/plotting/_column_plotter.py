@@ -7,7 +7,7 @@ from safeds.exceptions import NonNumericColumnError
 
 if TYPE_CHECKING:
     from safeds.data.image.containers import Image
-    from safeds.data.tabular.containers import ExperimentalColumn
+    from safeds.data.tabular.containers import Column
 
 
 class ColumnPlotter:
@@ -21,13 +21,13 @@ class ColumnPlotter:
 
     Examples
     --------
-    >>> from safeds.data.tabular.containers import ExperimentalColumn
-    >>> column = ExperimentalColumn("test", [1, 2, 3])
+    >>> from safeds.data.tabular.containers import Column
+    >>> column = Column("test", [1, 2, 3])
     >>> plotter = column.plot
     """
 
-    def __init__(self, column: ExperimentalColumn):
-        self._column: ExperimentalColumn = column
+    def __init__(self, column: Column):
+        self._column: Column = column
 
     def box_plot(self) -> Image:
         """
@@ -45,8 +45,8 @@ class ColumnPlotter:
 
         Examples
         --------
-        >>> from safeds.data.tabular.containers import ExperimentalColumn
-        >>> column = ExperimentalColumn("test", [1, 2, 3])
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("test", [1, 2, 3])
         >>> boxplot = column.plot.box_plot()
         """
         if not self._column.is_numeric:
@@ -85,8 +85,8 @@ class ColumnPlotter:
 
         Examples
         --------
-        >>> from safeds.data.tabular.containers import ExperimentalColumn
-        >>> column = ExperimentalColumn("test", [1, 2, 3])
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("test", [1, 2, 3])
         >>> histogram = column.plot.histogram()
         """
         return self._column.to_table().plot.histograms(number_of_bins=number_of_bins)
@@ -112,8 +112,8 @@ class ColumnPlotter:
 
         Examples
         --------
-        >>> from safeds.data.tabular.containers import ExperimentalColumn
-        >>> column = ExperimentalColumn("values", [1, 2, 3, 4])
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("values", [1, 2, 3, 4])
         >>> image = column.plot.lag_plot(2)
         """
         if not self._column.is_numeric:

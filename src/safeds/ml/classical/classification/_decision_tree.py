@@ -12,8 +12,8 @@ if TYPE_CHECKING:
     from sklearn.base import ClassifierMixin
     from sklearn.tree import DecisionTreeClassifier as sk_DecisionTreeClassifier
 
-    from safeds.data.labeled.containers import ExperimentalTabularDataset, TabularDataset
-    from safeds.data.tabular.containers import ExperimentalTable, Table
+    from safeds.data.labeled.containers import TabularDataset
+    from safeds.data.tabular.containers import Table
 
 
 class DecisionTreeClassifier(Classifier):
@@ -77,7 +77,7 @@ class DecisionTreeClassifier(Classifier):
         """The minimum number of samples that must remain in the leaves of the tree."""
         return self._minimum_number_of_samples_in_leaves
 
-    def fit(self, training_set: TabularDataset | ExperimentalTabularDataset) -> DecisionTreeClassifier:
+    def fit(self, training_set: TabularDataset) -> DecisionTreeClassifier:
         """
         Create a copy of this classifier and fit it with the given training data.
 
@@ -119,7 +119,7 @@ class DecisionTreeClassifier(Classifier):
 
         return result
 
-    def predict(self, dataset: Table | ExperimentalTable | ExperimentalTabularDataset) -> TabularDataset:
+    def predict(self, dataset: Table | TabularDataset) -> TabularDataset:
         """
         Predict a target vector using a dataset containing feature vectors. The model has to be trained first.
 

@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING, Any, TypeVar
 
 from safeds._utils import _structural_hash
 
-from ._experimental_cell import ExperimentalCell
+from ._cell import Cell
 
 if TYPE_CHECKING:
     import polars as pl
@@ -14,7 +14,7 @@ P = TypeVar("P")
 R = TypeVar("R")
 
 
-class _LazyCell(ExperimentalCell[T]):
+class _LazyCell(Cell[T]):
     """
     A single value in a table.
 
@@ -30,123 +30,123 @@ class _LazyCell(ExperimentalCell[T]):
 
     # "Boolean" operators (actually bitwise) -----------------------------------
 
-    def __invert__(self) -> ExperimentalCell[bool]:
+    def __invert__(self) -> Cell[bool]:
         return _wrap(self._expression.__invert__())
 
-    def __and__(self, other: bool | ExperimentalCell[bool]) -> ExperimentalCell[bool]:
+    def __and__(self, other: bool | Cell[bool]) -> Cell[bool]:
         return _wrap(self._expression.__and__(other))
 
-    def __rand__(self, other: bool | ExperimentalCell[bool]) -> ExperimentalCell[bool]:
+    def __rand__(self, other: bool | Cell[bool]) -> Cell[bool]:
         return _wrap(self._expression.__rand__(other))
 
-    def __or__(self, other: bool | ExperimentalCell[bool]) -> ExperimentalCell[bool]:
+    def __or__(self, other: bool | Cell[bool]) -> Cell[bool]:
         return _wrap(self._expression.__or__(other))
 
-    def __ror__(self, other: bool | ExperimentalCell[bool]) -> ExperimentalCell[bool]:
+    def __ror__(self, other: bool | Cell[bool]) -> Cell[bool]:
         return _wrap(self._expression.__ror__(other))
 
-    def __xor__(self, other: bool | ExperimentalCell[bool]) -> ExperimentalCell[bool]:
+    def __xor__(self, other: bool | Cell[bool]) -> Cell[bool]:
         return _wrap(self._expression.__xor__(other))
 
-    def __rxor__(self, other: bool | ExperimentalCell[bool]) -> ExperimentalCell[bool]:
+    def __rxor__(self, other: bool | Cell[bool]) -> Cell[bool]:
         return _wrap(self._expression.__rxor__(other))
 
     # Comparison ---------------------------------------------------------------
 
-    def __eq__(self, other: object) -> ExperimentalCell[bool]:  # type: ignore[override]
+    def __eq__(self, other: object) -> Cell[bool]:  # type: ignore[override]
         other = _unwrap(other)
         return _wrap(self._expression.__eq__(other))
 
-    def __ge__(self, other: Any) -> ExperimentalCell[bool]:
+    def __ge__(self, other: Any) -> Cell[bool]:
         other = _unwrap(other)
         return _wrap(self._expression.__ge__(other))
 
-    def __gt__(self, other: Any) -> ExperimentalCell[bool]:
+    def __gt__(self, other: Any) -> Cell[bool]:
         other = _unwrap(other)
         return _wrap(self._expression.__gt__(other))
 
-    def __le__(self, other: Any) -> ExperimentalCell[bool]:
+    def __le__(self, other: Any) -> Cell[bool]:
         other = _unwrap(other)
         return _wrap(self._expression.__le__(other))
 
-    def __lt__(self, other: Any) -> ExperimentalCell[bool]:
+    def __lt__(self, other: Any) -> Cell[bool]:
         other = _unwrap(other)
         return _wrap(self._expression.__lt__(other))
 
-    def __ne__(self, other: object) -> ExperimentalCell[bool]:  # type: ignore[override]
+    def __ne__(self, other: object) -> Cell[bool]:  # type: ignore[override]
         other = _unwrap(other)
         return _wrap(self._expression.__ne__(other))
 
     # Numeric operators --------------------------------------------------------
 
-    def __abs__(self) -> ExperimentalCell[R]:
+    def __abs__(self) -> Cell[R]:
         return _wrap(self._expression.__abs__())
 
-    def __ceil__(self) -> ExperimentalCell[R]:
+    def __ceil__(self) -> Cell[R]:
         return _wrap(self._expression.ceil())
 
-    def __floor__(self) -> ExperimentalCell[R]:
+    def __floor__(self) -> Cell[R]:
         return _wrap(self._expression.floor())
 
-    def __neg__(self) -> ExperimentalCell[R]:
+    def __neg__(self) -> Cell[R]:
         return _wrap(self._expression.__neg__())
 
-    def __pos__(self) -> ExperimentalCell[R]:
+    def __pos__(self) -> Cell[R]:
         return _wrap(self._expression.__pos__())
 
-    def __add__(self, other: Any) -> ExperimentalCell[R]:
+    def __add__(self, other: Any) -> Cell[R]:
         other = _unwrap(other)
         return _wrap(self._expression.__add__(other))
 
-    def __radd__(self, other: Any) -> ExperimentalCell[R]:
+    def __radd__(self, other: Any) -> Cell[R]:
         other = _unwrap(other)
         return _wrap(self._expression.__radd__(other))
 
-    def __floordiv__(self, other: Any) -> ExperimentalCell[R]:
+    def __floordiv__(self, other: Any) -> Cell[R]:
         other = _unwrap(other)
         return _wrap(self._expression.__floordiv__(other))
 
-    def __rfloordiv__(self, other: Any) -> ExperimentalCell[R]:
+    def __rfloordiv__(self, other: Any) -> Cell[R]:
         other = _unwrap(other)
         return _wrap(self._expression.__rfloordiv__(other))
 
-    def __mod__(self, other: Any) -> ExperimentalCell[R]:
+    def __mod__(self, other: Any) -> Cell[R]:
         other = _unwrap(other)
         return _wrap(self._expression.__mod__(other))
 
-    def __rmod__(self, other: Any) -> ExperimentalCell[R]:
+    def __rmod__(self, other: Any) -> Cell[R]:
         other = _unwrap(other)
         return _wrap(self._expression.__rmod__(other))
 
-    def __mul__(self, other: Any) -> ExperimentalCell[R]:
+    def __mul__(self, other: Any) -> Cell[R]:
         other = _unwrap(other)
         return _wrap(self._expression.__mul__(other))
 
-    def __rmul__(self, other: Any) -> ExperimentalCell[R]:
+    def __rmul__(self, other: Any) -> Cell[R]:
         other = _unwrap(other)
         return _wrap(self._expression.__rmul__(other))
 
-    def __pow__(self, other: float | ExperimentalCell[P]) -> ExperimentalCell[R]:
+    def __pow__(self, other: float | Cell[P]) -> Cell[R]:
         other = _unwrap(other)
         return _wrap(self._expression.__pow__(other))
 
-    def __rpow__(self, other: float | ExperimentalCell[P]) -> ExperimentalCell[R]:
+    def __rpow__(self, other: float | Cell[P]) -> Cell[R]:
         other = _unwrap(other)
         return _wrap(self._expression.__rpow__(other))
 
-    def __sub__(self, other: Any) -> ExperimentalCell[R]:
+    def __sub__(self, other: Any) -> Cell[R]:
         other = _unwrap(other)
         return _wrap(self._expression.__sub__(other))
 
-    def __rsub__(self, other: Any) -> ExperimentalCell[R]:
+    def __rsub__(self, other: Any) -> Cell[R]:
         other = _unwrap(other)
         return _wrap(self._expression.__rsub__(other))
 
-    def __truediv__(self, other: Any) -> ExperimentalCell[R]:
+    def __truediv__(self, other: Any) -> Cell[R]:
         other = _unwrap(other)
         return _wrap(self._expression.__truediv__(other))
 
-    def __rtruediv__(self, other: Any) -> ExperimentalCell[R]:
+    def __rtruediv__(self, other: Any) -> Cell[R]:
         other = _unwrap(other)
         return _wrap(self._expression.__rtruediv__(other))
 
