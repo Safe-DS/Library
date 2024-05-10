@@ -17,7 +17,7 @@ if TYPE_CHECKING:
     from sklearn.preprocessing import KBinsDiscretizer as sk_KBinsDiscretizer
 
 
-class ExperimentalDiscretizer(ExperimentalTableTransformer):
+class Discretizer(ExperimentalTableTransformer):
     """
     The Discretizer bins continuous data into intervals.
 

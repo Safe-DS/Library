@@ -9,7 +9,7 @@ if TYPE_CHECKING:
     from safeds.data.tabular.containers import ExperimentalTable
 
 
-class ExperimentalTableTransformer(ABC):
+class TableTransformer(ABC):
     """Learn a transformation for a set of columns in a `Table` and transform another `Table` with the same columns."""
 
     # ------------------------------------------------------------------------------------------------------------------

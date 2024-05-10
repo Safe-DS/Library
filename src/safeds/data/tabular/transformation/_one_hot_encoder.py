@@ -15,7 +15,7 @@ from safeds.exceptions import (
 from ._experimental_invertible_table_transformer import ExperimentalInvertibleTableTransformer
 
 
-class ExperimentalOneHotEncoder(ExperimentalInvertibleTableTransformer):
+class OneHotEncoder(ExperimentalInvertibleTableTransformer):
     """
     A way to deal with categorical features that is particularly useful for unordered (i.e. nominal) data.
 

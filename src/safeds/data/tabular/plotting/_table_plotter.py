@@ -11,7 +11,7 @@ if TYPE_CHECKING:
     from safeds.data.tabular.containers import ExperimentalTable
 
 
-class ExperimentalTablePlotter:
+class TablePlotter:
     def __init__(self, table: ExperimentalTable):
         self._table: ExperimentalTable = table
 

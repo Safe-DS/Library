@@ -11,7 +11,7 @@ if TYPE_CHECKING:
     from ._experimental_cell import ExperimentalCell
 
 
-class ExperimentalRow(ABC, Mapping[str, Any]):
+class Row(ABC, Mapping[str, Any]):
     """
     A one-dimensional collection of named, heterogeneous values.
 

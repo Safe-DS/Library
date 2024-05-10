@@ -12,7 +12,7 @@ if TYPE_CHECKING:
     from sklearn.preprocessing import OrdinalEncoder as sk_OrdinalEncoder
 
 
-class ExperimentalLabelEncoder(ExperimentalInvertibleTableTransformer):
+class LabelEncoder(ExperimentalInvertibleTableTransformer):
     """The LabelEncoder encodes one or more given columns into labels."""
 
     def __init__(self) -> None:

@@ -11,7 +11,7 @@ if TYPE_CHECKING:
     from sklearn.preprocessing import StandardScaler as sk_StandardScaler
 
 
-class ExperimentalStandardScaler(ExperimentalInvertibleTableTransformer):
+class StandardScaler(ExperimentalInvertibleTableTransformer):
     """The StandardScaler transforms column values to a range by removing the mean and scaling to unit variance."""
 
     def __init__(self) -> None:

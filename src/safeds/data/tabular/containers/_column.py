@@ -24,7 +24,7 @@ T = TypeVar("T")
 R = TypeVar("R")
 
 
-class ExperimentalColumn(Sequence[T]):
+class Column(Sequence[T]):
     """
     A named, one-dimensional collection of homogeneous values.
 

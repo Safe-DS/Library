@@ -11,7 +11,7 @@ if TYPE_CHECKING:
     from sklearn.preprocessing import MinMaxScaler as sk_MinMaxScaler
 
 
-class ExperimentalRangeScaler(ExperimentalInvertibleTableTransformer):
+class RangeScaler(ExperimentalInvertibleTableTransformer):
     """
     The RangeScaler transforms column values by scaling each value to a given range.
 

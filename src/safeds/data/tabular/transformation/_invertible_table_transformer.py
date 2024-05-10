@@ -9,7 +9,7 @@ if TYPE_CHECKING:
     from safeds.data.tabular.containers import ExperimentalTable
 
 
-class ExperimentalInvertibleTableTransformer(ExperimentalTableTransformer):
+class InvertibleTableTransformer(ExperimentalTableTransformer):
     """A `TableTransformer` that can also undo the learned transformation after it has been applied."""
 
     @abstractmethod

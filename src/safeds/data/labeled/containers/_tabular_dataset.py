@@ -9,7 +9,7 @@ if TYPE_CHECKING:
     from safeds.data.tabular.containers import ExperimentalColumn, ExperimentalTable
 
 
-class ExperimentalTabularDataset:
+class TabularDataset:
     """
     A dataset containing tabular data. It can be used to train machine learning models.
 

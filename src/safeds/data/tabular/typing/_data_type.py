@@ -3,7 +3,7 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 
 
-class ExperimentalDataType(ABC):
+class DataType(ABC):
     """The type of a column or cell in a table."""
 
     # ------------------------------------------------------------------------------------------------------------------

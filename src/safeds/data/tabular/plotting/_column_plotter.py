@@ -10,7 +10,7 @@ if TYPE_CHECKING:
     from safeds.data.tabular.containers import ExperimentalColumn
 
 
-class ExperimentalColumnPlotter:
+class ColumnPlotter:
     """
     A class that contains plotting methods for a column.
 

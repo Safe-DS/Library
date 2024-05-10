@@ -11,7 +11,7 @@ P = TypeVar("P")
 R = TypeVar("R")
 
 
-class ExperimentalCell(ABC, Generic[T]):
+class Cell(ABC, Generic[T]):
     """
     A single value in a table.
 

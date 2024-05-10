@@ -7,7 +7,7 @@ if TYPE_CHECKING:
     from safeds.data.tabular.typing import ExperimentalDataType
 
 
-class ExperimentalSchema(ABC):
+class Schema(ABC):
     """The schema of a row or table."""
 
     # ------------------------------------------------------------------------------------------------------------------

@@ -17,7 +17,7 @@ if TYPE_CHECKING:
     from sklearn.impute import SimpleImputer as sk_SimpleImputer
 
 
-class ExperimentalSimpleImputer(ExperimentalTableTransformer):
+class SimpleImputer(ExperimentalTableTransformer):
     """
     Replace missing values using the given strategy.
 

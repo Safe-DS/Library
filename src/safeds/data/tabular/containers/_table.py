@@ -39,7 +39,7 @@ if TYPE_CHECKING:
     from ._experimental_row import ExperimentalRow
 
 
-class ExperimentalTable:
+class Table:
     """
     A two-dimensional collection of data. It can either be seen as a list of rows or as a list of columns.
 
