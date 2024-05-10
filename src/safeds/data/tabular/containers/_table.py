@@ -656,40 +656,6 @@ class Table:
         """
         return self._schema.get_column_type(column_name)
 
-    def get_row(self, index: int) -> Row:
-        """
-        Return the row at a specified index.
-
-        Parameters
-        ----------
-        index:
-            The index.
-
-        Returns
-        -------
-        row:
-            The row of the table at the index.
-
-        Raises
-        ------
-        IndexOutOfBoundsError
-            If no row at the specified index exists in this table.
-
-        Examples
-        --------
-        >>> from safeds.data.tabular.containers import Table
-        >>> table = Table.from_dict({"a": [1, 3], "b": [2, 4]})
-        >>> table.get_row(0)
-        Row({
-            'a': 1,
-            'b': 2
-        })
-        """
-        if len(self._data.index) - 1 < index or index < 0:
-            raise IndexOutOfBoundsError(index)
-
-        return Row._from_pandas_dataframe(self._data.iloc[[index]], self._schema)
-
     def _get_similar_columns(self, column_name: str) -> list[str]:
         """
         Get all the column names in a Table that are similar to a given name.
