@@ -60,15 +60,39 @@ def _run_accuracy_old() -> None:
 
 
 def _run_accuracy_new() -> None:
-    ClassificationMetrics.accuracy(table.get_column("predicted"), table.get_column("expected"))
+    ClassificationMetrics.accuracy(table.get_column("expected"), table.get_column("predicted"))
+
+
+def _run_f1_score_old() -> None:
+    DummyClassifier().f1_score(table, 1)
+
+
+def _run_f1_score_new() -> None:
+    ClassificationMetrics.f1_score(table.get_column("expected"), table.get_column("predicted"), 1)
+
+
+def _run_precision_old() -> None:
+    DummyClassifier().precision(table, 1)
+
+
+def _run_precision_new() -> None:
+    ClassificationMetrics.precision(table.get_column("expected"), table.get_column("predicted"), 1)
+
+
+def _run_recall_old() -> None:
+    DummyClassifier().recall(table, 1)
+
+
+def _run_recall_new() -> None:
+    ClassificationMetrics.recall(table.get_column("expected"), table.get_column("predicted"), 1)
 
 
 if __name__ == "__main__":
     # Create a synthetic Table
     table = (
         create_synthetic_table(10000, 2)
-            .rename_column("column_0", "predicted")
-            .rename_column("column_1", "expected")
+        .rename_column("column_0", "predicted")
+        .rename_column("column_1", "expected")
     )
 
     # Run the benchmarks
@@ -79,6 +103,30 @@ if __name__ == "__main__":
         ),
         "accuracy_new": timeit(
             _run_accuracy_new,
+            number=REPETITIONS,
+        ),
+        "f1_score_old": timeit(
+            _run_f1_score_old,
+            number=REPETITIONS,
+        ),
+        "f1_score_new": timeit(
+            _run_f1_score_new,
+            number=REPETITIONS,
+        ),
+        "precision_old": timeit(
+            _run_precision_old,
+            number=REPETITIONS,
+        ),
+        "precision_new": timeit(
+            _run_precision_new,
+            number=REPETITIONS,
+        ),
+        "recall_old": timeit(
+            _run_recall_old,
+            number=REPETITIONS,
+        ),
+        "recall_new": timeit(
+            _run_recall_new,
             number=REPETITIONS,
         ),
     }

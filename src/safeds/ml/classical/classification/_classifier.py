@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING
 from safeds._utils import _structural_hash
 from safeds.data.labeled.containers import TabularDataset
 from safeds.data.tabular.containers import Table
+from safeds.ml.metrics import ClassificationMetrics
 
 if TYPE_CHECKING:
     from typing import Any
@@ -177,16 +178,13 @@ class Classifier(ABC):
         if isinstance(validation_or_test_set, TabularDataset):
             validation_or_test_set = validation_or_test_set.to_table()
 
-        from sklearn.metrics import accuracy_score as sk_accuracy_score
-
         features = validation_or_test_set.remove_columns_except(self.get_feature_names())
         prediction = self.predict(features)
 
-        predicted_values = prediction.target._series
-        expected_values = validation_or_test_set.get_column(self.get_target_name())._series
+        predicted_values = prediction.target
+        expected_values = validation_or_test_set.get_column(self.get_target_name())
 
-        # TODO: more efficient implementation using polars
-        return sk_accuracy_score(expected_values, predicted_values)
+        return ClassificationMetrics.accuracy(predicted_values, expected_values)
 
     def precision(
         self,
@@ -209,23 +207,16 @@ class Classifier(ABC):
             The calculated precision score, i.e. the ratio of correctly predicted positives to all predicted positives.
             Return 1 if no positive predictions are made.
         """
-        expected_values = validation_or_test_set.target
-        predicted_values = self.predict(validation_or_test_set.features).target
+        if isinstance(validation_or_test_set, TabularDataset):
+            validation_or_test_set = validation_or_test_set.to_table()
 
-        n_true_positives = 0
-        n_false_positives = 0
+        features = validation_or_test_set.remove_columns_except(self.get_feature_names())
+        prediction = self.predict(features)
 
-        # TODO: more efficient implementation using polars
-        for expected_value, predicted_value in zip(expected_values, predicted_values, strict=True):
-            if predicted_value == positive_class:
-                if expected_value == positive_class:
-                    n_true_positives += 1
-                else:
-                    n_false_positives += 1
+        predicted_values = prediction.target
+        expected_values = validation_or_test_set.get_column(self.get_target_name())
 
-        if (n_true_positives + n_false_positives) == 0:
-            return 1.0
-        return n_true_positives / (n_true_positives + n_false_positives)
+        return ClassificationMetrics.precision(predicted_values, expected_values, positive_class)
 
     def recall(self, validation_or_test_set: Table | TabularDataset, positive_class: Any) -> float:
         """
@@ -244,23 +235,16 @@ class Classifier(ABC):
             The calculated recall score, i.e. the ratio of correctly predicted positives to all expected positives.
             Return 1 if there are no positive expectations.
         """
-        expected_values = validation_or_test_set.target
-        predicted_values = self.predict(validation_or_test_set.features).target
+        if isinstance(validation_or_test_set, TabularDataset):
+            validation_or_test_set = validation_or_test_set.to_table()
 
-        n_true_positives = 0
-        n_false_negatives = 0
+        features = validation_or_test_set.remove_columns_except(self.get_feature_names())
+        prediction = self.predict(features)
 
-        # TODO: more efficient implementation using polars
-        for expected_value, predicted_value in zip(expected_values, predicted_values, strict=True):
-            if predicted_value == positive_class:
-                if expected_value == positive_class:
-                    n_true_positives += 1
-            elif expected_value == positive_class:
-                n_false_negatives += 1
+        predicted_values = prediction.target
+        expected_values = validation_or_test_set.get_column(self.get_target_name())
 
-        if (n_true_positives + n_false_negatives) == 0:
-            return 1.0
-        return n_true_positives / (n_true_positives + n_false_negatives)
+        return ClassificationMetrics.recall(predicted_values, expected_values, positive_class)
 
     def f1_score(
         self,
@@ -283,26 +267,16 @@ class Classifier(ABC):
             The calculated $F_1$-score, i.e. the harmonic mean between precision and recall.
             Return 1 if there are no positive expectations and predictions.
         """
-        expected_values = validation_or_test_set.target
-        predicted_values = self.predict(validation_or_test_set.features).target
+        if isinstance(validation_or_test_set, TabularDataset):
+            validation_or_test_set = validation_or_test_set.to_table()
 
-        n_true_positives = 0
-        n_false_negatives = 0
-        n_false_positives = 0
+        features = validation_or_test_set.remove_columns_except(self.get_feature_names())
+        prediction = self.predict(features)
 
-        # TODO: more efficient implementation using polars
-        for expected_value, predicted_value in zip(expected_values, predicted_values, strict=True):
-            if predicted_value == positive_class:
-                if expected_value == positive_class:
-                    n_true_positives += 1
-                else:
-                    n_false_positives += 1
-            elif expected_value == positive_class:
-                n_false_negatives += 1
+        predicted_values = prediction.target
+        expected_values = validation_or_test_set.get_column(self.get_target_name())
 
-        if (2 * n_true_positives + n_false_positives + n_false_negatives) == 0:
-            return 1.0
-        return 2 * n_true_positives / (2 * n_true_positives + n_false_positives + n_false_negatives)
+        return ClassificationMetrics.f1_score(predicted_values, expected_values, positive_class)
 
     # ------------------------------------------------------------------------------------------------------------------
     # Internal
