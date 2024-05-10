@@ -492,23 +492,6 @@ class Row(Mapping[str, Any]):
         """
         return {column_name: self.get_value(column_name) for column_name in self.column_names}
 
-    def to_html(self) -> str:
-        """
-        Return an HTML representation of the row.
-
-        Returns
-        -------
-        output:
-            The generated HTML.
-
-        Examples
-        --------
-        >>> from safeds.data.tabular.containers import Row
-        >>> row = Row({"a": 1, "b": 2})
-        >>> html = row.to_html()
-        """
-        return self._data.to_html(max_rows=1, max_cols=self._data.shape[1])
-
     # ------------------------------------------------------------------------------------------------------------------
     # IPython integration
     # ------------------------------------------------------------------------------------------------------------------
