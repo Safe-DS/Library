@@ -1,4 +1,4 @@
-import pandas as pd
+import polars as pl
 import pytest
 from safeds.data.tabular.containers import Column
 
@@ -6,16 +6,15 @@ from safeds.data.tabular.containers import Column
 @pytest.mark.parametrize(
     ("series", "expected"),
     [
-        (pd.Series([]), []),
-        (pd.Series([True, False, True]), [True, False, True]),
-        (pd.Series([1, 2, 3]), [1, 2, 3]),
-        (pd.Series([1.0, 2.0, 3.0]), [1.0, 2.0, 3.0]),
-        (pd.Series(["a", "b", "c"]), ["a", "b", "c"]),
-        (pd.Series([1, 2.0, "a", True]), [1, 2.0, "a", True]),
+        (pl.Series([]), []),
+        (pl.Series([True, False, True]), [True, False, True]),
+        (pl.Series([1, 2, 3]), [1, 2, 3]),
+        (pl.Series([1.0, 2.0, 3.0]), [1.0, 2.0, 3.0]),
+        (pl.Series(["a", "b", "c"]), ["a", "b", "c"]),
     ],
-    ids=["empty", "boolean", "integer", "real number", "string", "mixed"],
+    ids=["empty", "boolean", "integer", "real number", "string"],
 )
-def test_should_store_the_data(series: pd.Series, expected: Column) -> None:
+def test_should_store_the_data(series: pl.Series, expected: Column) -> None:
     assert list(Column._from_polars_series(series)) == expected
 
 # TODO

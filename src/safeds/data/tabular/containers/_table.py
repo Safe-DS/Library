@@ -2,13 +2,14 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, Literal
 
+from safeds._config import _get_device, _init_default_device
 from safeds._config._polars import _get_polars_config
 from safeds._utils import _check_and_normalize_file_path, _structural_hash
 from safeds._utils._random import _get_random_seed
 from safeds.data.labeled.containers import TabularDataset, TimeSeriesDataset
 from safeds.data.tabular.plotting import TablePlotter
-from safeds.data.tabular.typing._polars_schema import _PolarsSchema
 from safeds.data.tabular.typing._polars_data_type import _PolarsDataType
+from safeds.data.tabular.typing._polars_schema import _PolarsSchema
 from safeds.exceptions import (
     ClosedBound,
     ColumnLengthMismatchError,
@@ -26,6 +27,9 @@ if TYPE_CHECKING:
     from pathlib import Path
 
     import polars as pl
+    import torch
+    from torch import Tensor
+    from torch.utils.data import DataLoader, Dataset
 
     from safeds.data.tabular.transformation import (
         InvertibleTableTransformer,
@@ -1926,3 +1930,52 @@ class Table:
             The generated HTML.
         """
         return self._data_frame._repr_html_()
+
+    # TODO
+    def _into_dataloader(self, batch_size: int) -> DataLoader:
+        """
+        Return a Dataloader for the data stored in this table, used for predicting with neural networks.
+
+        The original table is not modified.
+
+        Parameters
+        ----------
+        batch_size:
+            The size of data batches that should be loaded at one time.
+
+        Returns
+        -------
+        result:
+            The DataLoader.
+
+        """
+        import polars as pl
+        import torch
+        from torch.utils.data import DataLoader
+
+        _init_default_device()
+
+        return DataLoader(
+            dataset=_create_dataset(self._data_frame.to_torch(dtype=pl.Float32)),
+            batch_size=batch_size,
+            generator=torch.Generator(device=_get_device()),
+        )
+
+# TODO
+def _create_dataset(features: Tensor) -> Dataset:
+    from torch.utils.data import Dataset
+
+    _init_default_device()
+
+    class _CustomDataset(Dataset):
+        def __init__(self, features: np.array):
+            self.X = features
+            self.len = self.X.shape[0]
+
+        def __getitem__(self, item: int) -> torch.Tensor:
+            return self.X[item]
+
+        def __len__(self) -> int:
+            return self.len
+
+    return _CustomDataset(features)

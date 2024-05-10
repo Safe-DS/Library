@@ -462,7 +462,7 @@ class Column(Sequence[T]):
         | stability            | 0.5                |
         +----------------------+--------------------+
         """
-        from _table import Table
+        from ._table import Table
 
         # TODO: turn this around (call table method, implement in table; allows parallelization)
         mean = self.mean() or "-"

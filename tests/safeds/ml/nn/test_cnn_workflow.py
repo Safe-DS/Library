@@ -3,7 +3,6 @@ from typing import TYPE_CHECKING
 
 import pytest
 import torch
-
 from safeds._config import _get_device
 from safeds.data.image.containers import ImageList
 from safeds.data.labeled.containers import ImageDataset
@@ -25,7 +24,7 @@ from safeds.ml.nn._output_conversion_image import OutputConversionImageToColumn,
 from syrupy import SnapshotAssertion
 from torch.types import Device
 
-from tests.helpers import device_cpu, device_cuda, images_all, resolve_resource_path, configure_test_with_device
+from tests.helpers import configure_test_with_device, device_cpu, device_cuda, images_all, resolve_resource_path
 
 if TYPE_CHECKING:
     from safeds.ml.nn import Layer

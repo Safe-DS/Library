@@ -3,10 +3,14 @@ from __future__ import annotations
 import sys
 from typing import TYPE_CHECKING, Any
 
+from safeds._config import _get_device, _init_default_device
 from safeds._utils import _structural_hash
 
 if TYPE_CHECKING:
     from collections.abc import Mapping, Sequence
+
+    from torch import Tensor
+    from torch.utils.data import DataLoader, Dataset
 
     from safeds.data.tabular.containers import Column, Table
 
@@ -163,68 +167,70 @@ class TabularDataset:
         """
         return self._table._repr_html_()
 
-# def _into_dataloader_with_classes(self, batch_size: int, num_of_classes: int) -> DataLoader:
-#     """
-#     Return a Dataloader for the data stored in this table, used for training neural networks.
-#
-#     The original table is not modified.
-#
-#     Parameters
-#     ----------
-#     batch_size:
-#         The size of data batches that should be loaded at one time.
-#
-#     Returns
-#     -------
-#     result:
-#         The DataLoader.
-#
-#     """
-#     import torch
-#     from torch.utils.data import DataLoader
-#
-#     _init_default_device()
-#
-#     if num_of_classes <= 2:
-#         return DataLoader(
-#             dataset=_create_dataset(
-#                 torch.Tensor(self.features._data.values).to(_get_device()),
-#                 torch.Tensor(self.target._data).to(_get_device()).unsqueeze(dim=-1),
-#             ),
-#             batch_size=batch_size,
-#             shuffle=True,
-#             generator=torch.Generator(device=_get_device()),
-#         )
-#     else:
-#         return DataLoader(
-#             dataset=_create_dataset(
-#                 torch.Tensor(self.features._data.values).to(_get_device()),
-#                 torch.nn.functional.one_hot(
-#                     torch.LongTensor(self.target._data).to(_get_device()),
-#                     num_classes=num_of_classes,
-#                 ),
-#             ),
-#             batch_size=batch_size,
-#             shuffle=True,
-#             generator=torch.Generator(device=_get_device()),
-#         )
-#
-# def _create_dataset(features: Tensor, target: Tensor) -> Dataset:
-#     import torch
-#     from torch.utils.data import Dataset
-#
-#     _init_default_device()
-#
-#     class _CustomDataset(Dataset):
-#         def __init__(self, features: Tensor, target: Tensor):
-#             self.X = features.to(torch.float32)
-#             self.Y = target.to(torch.float32)
-#             self.len = self.X.size(dim=0)
-#
-#         def __getitem__(self, item: int) -> tuple[torch.Tensor, torch.Tensor]:
-#             return self.X[item], self.Y[item]
-#
-#         def __len__(self) -> int:
-#             return self.len
-#
-#     return _CustomDataset(features, target)
+    # TODO
+    def _into_dataloader_with_classes(self, batch_size: int, num_of_classes: int) -> DataLoader:
+        """
+        Return a Dataloader for the data stored in this table, used for training neural networks.
+
+        The original table is not modified.
+
+        Parameters
+        ----------
+        batch_size:
+            The size of data batches that should be loaded at one time.
+
+        Returns
+        -------
+        result:
+            The DataLoader.
+
+        """
+        import torch
+        from torch.utils.data import DataLoader
+
+        _init_default_device()
+
+        if num_of_classes <= 2:
+            return DataLoader(
+                dataset=_create_dataset(
+                    torch.Tensor(self.features._data_frame.to_numpy()).to(_get_device()),
+                    torch.Tensor(self.target._series.to_numpy()).to(_get_device()).unsqueeze(dim=-1),
+                ),
+                batch_size=batch_size,
+                shuffle=True,
+                generator=torch.Generator(device=_get_device()),
+            )
+        else:
+            return DataLoader(
+                dataset=_create_dataset(
+                    torch.Tensor(self.features._data_frame.to_numpy()).to(_get_device()),
+                    torch.nn.functional.one_hot(
+                        torch.LongTensor(self.target._series.to_numpy()).to(_get_device()),
+                        num_classes=num_of_classes,
+                    ),
+                ),
+                batch_size=batch_size,
+                shuffle=True,
+                generator=torch.Generator(device=_get_device()),
+            )
+
+# TODO
+def _create_dataset(features: Tensor, target: Tensor) -> Dataset:
+    import torch
+    from torch.utils.data import Dataset
+
+    _init_default_device()
+
+    class _CustomDataset(Dataset):
+        def __init__(self, features: Tensor, target: Tensor):
+            self.X = features.to(torch.float32)
+            self.Y = target.to(torch.float32)
+            self.len = self.X.size(dim=0)
+
+        def __getitem__(self, item: int) -> tuple[torch.Tensor, torch.Tensor]:
+            return self.X[item], self.Y[item]
+
+        def __len__(self) -> int:
+            return self.len
+
+    return _CustomDataset(features, target)

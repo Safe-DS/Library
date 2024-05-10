@@ -6,7 +6,6 @@ from typing import TYPE_CHECKING
 
 from safeds._utils import _structural_hash
 from safeds.data.image.containers import Image
-from safeds.data.labeled.containers import TimeSeriesDataset
 from safeds.data.tabular.containers import Column
 from safeds.exceptions import (
     DatasetMissesDataError,
@@ -17,6 +16,8 @@ from safeds.exceptions import (
 
 if TYPE_CHECKING:
     from statsmodels.tsa.arima.model import ARIMA
+
+    from safeds.data.labeled.containers import TimeSeriesDataset
 
 
 class ArimaModelRegressor:
@@ -73,9 +74,9 @@ class ArimaModelRegressor:
         table = time_series.to_table()
         if table.number_of_rows == 0:
             raise DatasetMissesDataError
-        if not time_series.target.type.is_numeric():
+        if not time_series.target.type.is_numeric:
             raise NonNumericColumnError(time_series.target.name)
-        if time_series.target.has_missing_values():
+        if time_series.target.missing_value_count() > 0:
             raise MissingValuesColumnError(
                 time_series.target.name,
                 "You can use the Imputer to replace the missing values based on different strategies.\nIf you want to"
@@ -91,7 +92,7 @@ class ArimaModelRegressor:
         best_param = (0, 0, 0)
         for param in pdq:
             # Create and fit an ARIMA model with the current parameters
-            mod = ARIMA(time_series.target._data.values, order=param)
+            mod = ARIMA(time_series.target._series.to_numpy(), order=param)
 
             # I wasnt able to invoke an learning Error
             # Add try catch when an learning error is found
@@ -132,7 +133,7 @@ class ArimaModelRegressor:
             If predicting with the given dataset failed.
         """
         # make a table without
-        forecast_horizon = len(time_series.target._data)
+        forecast_horizon = len(time_series.target._series.to_numpy())
         result_table = time_series.to_table()
         result_table = result_table.remove_columns([time_series.target.name])
         # Validation
@@ -145,7 +146,7 @@ class ArimaModelRegressor:
         target_column: Column = Column(name=time_series.target.name + " " + "forecasted", data=forecast_results)
 
         # create new TimeSeries
-        result_table = result_table.add_column(target_column)
+        result_table = result_table.add_columns(target_column)
         return result_table.to_time_series_dataset(
             target_name=time_series.target.name + " " + "forecasted",
             time_name=time_series.time.name,
@@ -178,7 +179,7 @@ class ArimaModelRegressor:
 
         if not self.is_fitted or self._arima is None:
             raise ModelNotFittedError
-        test_data = test_series.target._data.to_numpy()
+        test_data = test_series.target._series.to_numpy()
         n_steps = len(test_data)
         forecast_results = self._arima.forecast(steps=n_steps)
 

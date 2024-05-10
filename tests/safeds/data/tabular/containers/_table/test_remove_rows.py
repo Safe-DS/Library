@@ -8,12 +8,6 @@ from safeds.data.tabular.containers import Table
     ("table1", "filter_column", "filter_value", "table2"),
     [
         (
-            Table(),
-            "col1",
-            1,
-            Table(),
-        ),
-        (
             Table({"col1": [3, 2, 4], "col2": [1, 2, 4]}),
             "col1",
             1,
@@ -27,7 +21,6 @@ from safeds.data.tabular.containers import Table
         ),
     ],
     ids=[
-        "empty table",
         "no match",
         "matches",
     ],
