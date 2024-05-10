@@ -1,6 +1,5 @@
 import re
 import sys
-from collections.abc import Callable
 from typing import Any
 
 import pandas as pd

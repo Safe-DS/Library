@@ -1,8 +1,7 @@
 from __future__ import annotations
 
-import functools
 import sys
-from collections.abc import Callable, Mapping
+from collections.abc import Mapping
 from typing import TYPE_CHECKING, Any
 
 from safeds._utils import _structural_hash
