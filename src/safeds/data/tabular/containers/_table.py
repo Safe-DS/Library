@@ -2124,6 +2124,38 @@ class Table:
         """
         return [self.get_column(name) for name in self._schema.column_names]
 
+    def to_rows(self) -> list[Row]:
+        """
+        Return a list of the rows.
+
+        Returns
+        -------
+        rows:
+            List of rows.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table
+        >>> table = Table.from_dict({"a":[1, 2],"b":[20, 30]})
+        >>> table.to_rows()
+        [Row({
+            'a': 1,
+            'b': 20
+        }), Row({
+            'a': 2,
+            'b': 30
+        })]
+        """
+        import pandas as pd
+
+        return [
+            Row._from_pandas_dataframe(
+                pd.DataFrame([list(series_row)], columns=self._schema.column_names),
+                self._schema,
+            )
+            for (_, series_row) in self._data.iterrows()
+        ]
+
     def to_tabular_dataset(self, target_name: str, extra_names: list[str] | None = None) -> TabularDataset:
         """
         Return a new `TabularDataset` with columns marked as a target column or feature columns.
