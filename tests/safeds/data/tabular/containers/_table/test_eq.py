@@ -1,7 +1,7 @@
 from typing import Any
 
 import pytest
-from safeds.data.tabular.containers import Row, Table
+from safeds.data.tabular.containers import Column, Table
 
 
 @pytest.mark.parametrize(
@@ -43,11 +43,11 @@ def test_should_return_true_if_objects_are_identical(table: Table) -> None:
     ("table", "other"),
     [
         (Table({"col1": [1]}), None),
-        (Table({"col1": [1]}), Row()),
+        (Table({"col1": [1]}), Column("a")),
     ],
     ids=[
         "Table vs. None",
-        "Table vs. Row",
+        "Table vs. Column",
     ],
 )
 def test_should_return_not_implemented_if_other_is_not_table(table: Table, other: Any) -> None:

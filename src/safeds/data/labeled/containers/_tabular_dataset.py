@@ -1,11 +1,13 @@
 from __future__ import annotations
 
 import sys
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from safeds._utils import _structural_hash
 
 if TYPE_CHECKING:
+    from collections.abc import Mapping, Sequence
+
     from safeds.data.tabular.containers import Column, Table
 
 
@@ -61,16 +63,20 @@ class TabularDataset:
 
     def __init__(
         self,
-        data: Table,
+        data: Table | Mapping[str, Sequence[Any]],
         target_name: str,
         extra_names: list[str] | None = None,
     ):
+        from safeds.data.tabular.containers import Table
+
         # Preprocess inputs
+        if not isinstance(data, Table):
+            data = Table(data)
         if extra_names is None:
             extra_names = []
 
-        # Derive feature names
-        non_feature_names = {target_name, *extra_names}  # perf: Comprehensions evaluate their condition every iteration
+        # Derive feature names (build the set once, since comprehensions evaluate their condition every iteration)
+        non_feature_names = {target_name, *extra_names}
         feature_names = [name for name in data.column_names if name not in non_feature_names]
 
         # Validate inputs

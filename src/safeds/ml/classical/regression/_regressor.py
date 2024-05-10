@@ -4,12 +4,13 @@ from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
 from safeds._utils import _structural_hash
-from safeds.data.labeled.containers import TabularDataset
-from safeds.data.tabular.containers import Column, Column, Table
-from safeds.exceptions import ColumnLengthMismatchError, PlainTableError
+from safeds.data.tabular.containers import Column, Table
+from safeds.exceptions import ColumnLengthMismatchError
 
 if TYPE_CHECKING:
     from sklearn.base import RegressorMixin
+
+    from safeds.data.labeled.containers import TabularDataset
 
 
 class Regressor(ABC):
@@ -144,25 +145,13 @@ class Regressor(ABC):
         """
         from sklearn.metrics import mean_absolute_error as sk_mean_absolute_error
 
-        if not isinstance(validation_or_test_set, TabularDataset) and isinstance(validation_or_test_set, Table):
-            raise PlainTableError
+        expected = validation_or_test_set.target
+        predicted = self.predict(validation_or_test_set.features).target
 
-        if isinstance(validation_or_test_set, TabularDataset):
-            expected = validation_or_test_set.target
-            predicted = self.predict(validation_or_test_set.features).target
+        # TODO: more efficient implementation using polars
+        _check_metrics_preconditions(predicted, expected)
+        return sk_mean_absolute_error(expected._series, predicted._series)
 
-            # TODO: more efficient implementation using polars
-            _check_metrics_preconditions(predicted, expected)
-            return sk_mean_absolute_error(expected._data, predicted._data)
-        elif isinstance(validation_or_test_set, TabularDataset):  # pragma: no cover
-            expected_2 = validation_or_test_set.target
-            predicted_2 = self.predict(validation_or_test_set.features).target
-
-            # TODO: more efficient implementation using polars
-            _check_metrics_preconditions_experimental(predicted_2, expected_2)
-            return sk_mean_absolute_error(expected_2._series, predicted_2._data)
-
-    # noinspection PyProtectedMember
     def mean_squared_error(self, validation_or_test_set: Table | TabularDataset) -> float:
         """
         Compute the mean squared error (MSE) on the given data.
@@ -184,27 +173,16 @@ class Regressor(ABC):
         """
         from sklearn.metrics import mean_squared_error as sk_mean_squared_error
 
-        if not isinstance(validation_or_test_set, TabularDataset) and isinstance(validation_or_test_set, Table):
-            raise PlainTableError
+        expected_2 = validation_or_test_set.target
+        predicted_2 = self.predict(validation_or_test_set.features).target
 
-        if isinstance(validation_or_test_set, TabularDataset):
-            expected = validation_or_test_set.target
-            predicted = self.predict(validation_or_test_set.features).target
-
-            # TODO: more efficient implementation using polars
-            _check_metrics_preconditions(predicted, expected)
-            return sk_mean_squared_error(expected._data, predicted._data)
-        elif isinstance(validation_or_test_set, TabularDataset):  # pragma: no cover
-            expected_2 = validation_or_test_set.target
-            predicted_2 = self.predict(validation_or_test_set.features).target
-
-            # TODO: more efficient implementation using polars
-            _check_metrics_preconditions_experimental(predicted_2, expected_2)
-            return sk_mean_squared_error(expected_2._series, predicted_2._data)
+        # TODO: more efficient implementation using polars
+        _check_metrics_preconditions(predicted_2, expected_2)
+        return sk_mean_squared_error(expected_2._series, predicted_2._series)
 
 
-def _check_metrics_preconditions_experimental(actual: Column, expected: Column) -> None:  # pragma: no cover
-    if not actual.type.is_numeric():
+def _check_metrics_preconditions(actual: Column, expected: Column) -> None:  # pragma: no cover
+    if not actual.type.is_numeric:
         raise TypeError(f"Column 'actual' is not numerical but {actual.type}.")
     if not expected.type.is_numeric:
         raise TypeError(f"Column 'expected' is not numerical but {expected.type}.")

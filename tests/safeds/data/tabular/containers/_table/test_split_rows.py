@@ -1,7 +1,5 @@
-import pandas as pd
 import pytest
 from safeds.data.tabular.containers import Table
-from safeds.data.tabular.typing import Integer, Nothing, Schema
 
 
 @pytest.mark.parametrize(
@@ -15,14 +13,14 @@ from safeds.data.tabular.typing import Integer, Nothing, Schema
         ),
         (
             Table({"col1": [1, 2, 1], "col2": [1, 2, 4]}),
-            Table._from_pandas_dataframe(pd.DataFrame(), Schema({"col1": Nothing(), "col2": Nothing()})),
+            Table(),
             Table({"col1": [1, 2, 1], "col2": [1, 2, 4]}),
             0,
         ),
         (
             Table({"col1": [1, 2, 1], "col2": [1, 2, 4]}),
             Table({"col1": [1, 2, 1], "col2": [1, 2, 4]}),
-            Table._from_pandas_dataframe(pd.DataFrame(), Schema({"col1": Integer(), "col2": Integer()})),
+            Table(),
             1,
         ),
     ],

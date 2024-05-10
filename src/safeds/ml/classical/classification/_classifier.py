@@ -4,14 +4,14 @@ from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
 from safeds._utils import _structural_hash
-from safeds.data.labeled.containers import TabularDataset
 from safeds.data.tabular.containers import Table
-from safeds.exceptions import PlainTableError
 
 if TYPE_CHECKING:
     from typing import Any
 
     from sklearn.base import ClassifierMixin
+
+    from safeds.data.labeled.containers import TabularDataset
 
 
 class Classifier(ABC):
@@ -157,14 +157,8 @@ class Classifier(ABC):
         """
         from sklearn.metrics import accuracy_score as sk_accuracy_score
 
-        if not isinstance(validation_or_test_set, TabularDataset) and isinstance(validation_or_test_set, Table):
-            raise PlainTableError
-
-        if isinstance(validation_or_test_set, TabularDataset):
-            expected_values = validation_or_test_set.target
-        else:  # pragma: no cover
-            expected_values = validation_or_test_set.target._series
-        predicted_values = self.predict(validation_or_test_set.features).target._data
+        expected_values = validation_or_test_set.target._series
+        predicted_values = self.predict(validation_or_test_set.features).target._series
 
         # TODO: more efficient implementation using polars
         return sk_accuracy_score(expected_values._data, predicted_values)
@@ -190,9 +184,6 @@ class Classifier(ABC):
             The calculated precision score, i.e. the ratio of correctly predicted positives to all predicted positives.
             Return 1 if no positive predictions are made.
         """
-        if not isinstance(validation_or_test_set, TabularDataset) and isinstance(validation_or_test_set, Table):
-            raise PlainTableError
-
         expected_values = validation_or_test_set.target
         predicted_values = self.predict(validation_or_test_set.features).target
 
@@ -228,9 +219,6 @@ class Classifier(ABC):
             The calculated recall score, i.e. the ratio of correctly predicted positives to all expected positives.
             Return 1 if there are no positive expectations.
         """
-        if not isinstance(validation_or_test_set, TabularDataset) and isinstance(validation_or_test_set, Table):
-            raise PlainTableError
-
         expected_values = validation_or_test_set.target
         predicted_values = self.predict(validation_or_test_set.features).target
 
@@ -270,9 +258,6 @@ class Classifier(ABC):
             The calculated $F_1$-score, i.e. the harmonic mean between precision and recall.
             Return 1 if there are no positive expectations and predictions.
         """
-        if not isinstance(validation_or_test_set, TabularDataset) and isinstance(validation_or_test_set, Table):
-            raise PlainTableError
-
         expected_values = validation_or_test_set.target
         predicted_values = self.predict(validation_or_test_set.features).target
 

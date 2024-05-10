@@ -2,7 +2,7 @@ from typing import Any
 
 import pytest
 from safeds.data.labeled.containers import TimeSeriesDataset
-from safeds.data.tabular.containers import Row, Table
+from safeds.data.tabular.containers import Table
 
 
 @pytest.mark.parametrize(
@@ -66,12 +66,10 @@ def test_should_return_whether_two_tabular_datasets_are_equal(
     ("table", "other"),
     [
         (TimeSeriesDataset({"a": [1, 2, 3], "b": [4, 5, 6], "c": [0, 0, 0]}, "b", "c"), None),
-        (TimeSeriesDataset({"a": [1, 2, 3], "b": [4, 5, 6], "c": [0, 0, 0]}, "b", "c"), Row()),
         (TimeSeriesDataset({"a": [1, 2, 3], "b": [4, 5, 6], "c": [0, 0, 0]}, "b", "c"), Table()),
     ],
     ids=[
         "TabularDataset vs. None",
-        "TabularDataset vs. Row",
         "TabularDataset vs. Table",
     ],
 )

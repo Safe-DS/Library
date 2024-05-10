@@ -223,7 +223,7 @@ class RangeScaler(InvertibleTableTransformer):
         new_data = pl.DataFrame(
             self._wrapped_transformer.inverse_transform(
                 transformed_table.remove_columns_except(self._column_names)._data_frame,
-            )
+            ),
         )
 
         name_mapping = dict(zip(new_data.columns, self._column_names, strict=True))

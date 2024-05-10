@@ -1,7 +1,7 @@
-import pandas as pd
+from typing import Any
+
 import pytest
 from safeds.data.tabular.containers import Table
-from safeds.data.tabular.typing import ColumnType, Schema
 
 
 @pytest.mark.parametrize(
@@ -11,7 +11,7 @@ from safeds.data.tabular.typing import ColumnType, Schema
             Table(),
             "col1",
             1,
-            Table._from_pandas_dataframe(pd.DataFrame(), Schema({})),
+            Table(),
         ),
         (
             Table({"col1": [3, 2, 4], "col2": [1, 2, 4]}),
@@ -32,7 +32,7 @@ from safeds.data.tabular.typing import ColumnType, Schema
         "matches",
     ],
 )
-def test_should_remove_rows(table1: Table, filter_column: str, filter_value: ColumnType, table2: Table) -> None:
+def test_should_remove_rows(table1: Table, filter_column: str, filter_value: Any, table2: Table) -> None:
     table1 = table1.remove_rows(lambda row: row.get_value(filter_column) == filter_value)
     assert table1.schema == table2.schema
     assert table2 == table1

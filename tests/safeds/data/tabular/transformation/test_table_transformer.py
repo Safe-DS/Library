@@ -4,10 +4,10 @@ import pytest
 from safeds.data.tabular.containers import Table
 from safeds.data.tabular.transformation import (
     Discretizer,
-    Imputer,
     LabelEncoder,
     OneHotEncoder,
     RangeScaler,
+    SimpleImputer,
     StandardScaler,
     TableTransformer,
 )
@@ -66,7 +66,7 @@ def transformers() -> list[TableTransformer]:
         transformers_numeric()
         + transformers_non_numeric()
         + [
-            Imputer(strategy=Imputer.Strategy.Mode()),
+            SimpleImputer(strategy=SimpleImputer.Strategy.Mode()),
         ]
     )
 
@@ -175,6 +175,6 @@ class TestHash:
         transformer2: TableTransformer,
         valid_data_imputer: Table,
     ) -> None:
-        transformer1 = Imputer(strategy=Imputer.Strategy.Mode())
+        transformer1 = SimpleImputer(strategy=SimpleImputer.Strategy.Mode())
         transformer1_fit = transformer1.fit(valid_data_imputer, ["col1"])
         assert hash(transformer2) != hash(transformer1_fit)

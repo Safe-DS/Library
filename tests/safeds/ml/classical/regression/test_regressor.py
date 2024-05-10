@@ -29,7 +29,6 @@ from safeds.ml.classical.regression import (
     SupportVectorMachineRegressor,
 )
 
-# noinspection PyProtectedMember
 from safeds.ml.classical.regression._regressor import _check_metrics_preconditions
 
 if TYPE_CHECKING:
