@@ -10,6 +10,7 @@ if TYPE_CHECKING:
     from ._gradient_boosting_base import _GradientBoostingBase
     from ._k_nearest_neighbors_base import _KNearestNeighborsBase
     from ._random_forest_base import _RandomForestBase
+    from ._support_vector_machine_base import _SupportVectorMachineBase
 
 apipkg.initpkg(
     __name__,
@@ -19,6 +20,7 @@ apipkg.initpkg(
         "_GradientBoostingBase": "._gradient_boosting_base:_GradientBoostingBase",
         "_KNearestNeighborsBase": "._k_nearest_neighbors_base:_KNearestNeighborsBase",
         "_RandomForestBase": "._random_forest_base:_RandomForestBase",
+        "_SupportVectorMachineBase": "._support_vector_machine_base:_SupportVectorMachineBase",
     },
 )
 
@@ -28,4 +30,5 @@ __all__ = [
     "_GradientBoostingBase",
     "_KNearestNeighborsBase",
     "_RandomForestBase",
+    "_SupportVectorMachineBase",
 ]
