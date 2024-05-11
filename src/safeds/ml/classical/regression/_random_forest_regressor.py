@@ -5,18 +5,18 @@ from typing import TYPE_CHECKING
 from safeds._utils import _get_random_seed, _structural_hash
 from safeds.exceptions import ClosedBound, OutOfBoundsError
 
-from ._classifier import Classifier
+from ._regressor import Regressor
 
 if TYPE_CHECKING:
-    from sklearn.base import ClassifierMixin
+    from sklearn.base import RegressorMixin
 
     from safeds.data.labeled.containers import TabularDataset
     from safeds.data.tabular.containers import Table
 
 
-class RandomForestClassifier(Classifier):
+class RandomForestRegressor(Regressor):
     """
-    Random forest classification.
+    Random forest regression.
 
     Parameters
     ----------
@@ -46,7 +46,7 @@ class RandomForestClassifier(Classifier):
         *,
         number_of_trees: int = 100,
         maximum_depth: int | None = None,
-        minimum_number_of_samples_in_leaves: int = 1,
+        minimum_number_of_samples_in_leaves: int = 5,
     ) -> None:
         super().__init__()
 
@@ -104,17 +104,17 @@ class RandomForestClassifier(Classifier):
     def _check_additional_predict_preconditions(self, dataset: Table | TabularDataset):
         pass
 
-    def _clone(self) -> RandomForestClassifier:
-        return RandomForestClassifier(
+    def _clone(self) -> RandomForestRegressor:
+        return RandomForestRegressor(
             number_of_trees=self._number_of_trees,
             maximum_depth=self._maximum_depth,
             minimum_number_of_samples_in_leaves=self._minimum_number_of_samples_in_leaves,
         )
 
-    def _get_sklearn_model(self) -> ClassifierMixin:
-        from sklearn.ensemble import RandomForestClassifier as SklearnRandomForestClassifier
+    def _get_sklearn_model(self) -> RegressorMixin:
+        from sklearn.ensemble import RandomForestRegressor as SklearnRandomForestRegressor
 
-        return SklearnRandomForestClassifier(
+        return SklearnRandomForestRegressor(
             n_estimators=self._number_of_trees,
             max_depth=self._maximum_depth,
             min_samples_leaf=self._minimum_number_of_samples_in_leaves,

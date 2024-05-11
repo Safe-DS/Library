@@ -1,95 +1,19 @@
 from __future__ import annotations
 
-from abc import ABC, abstractmethod
+from abc import ABC
 from typing import TYPE_CHECKING
 
-from safeds._utils import _structural_hash
 from safeds.data.tabular.containers import Column, Table
 from safeds.exceptions import ColumnLengthMismatchError
+from safeds.ml.classical import SupervisedModel
 
 if TYPE_CHECKING:
-    from sklearn.base import RegressorMixin
 
     from safeds.data.labeled.containers import TabularDataset
 
 
-class Regressor(ABC):
-    """Abstract base class for all regressors."""
-
-    def __hash__(self) -> int:
-        """
-        Return a deterministic hash value for a regressor.
-
-        Returns
-        -------
-        hash:
-            The hash value.
-        """
-        return _structural_hash(self.__class__.__qualname__, self.is_fitted)
-
-    @abstractmethod
-    def fit(self, training_set: TabularDataset) -> Regressor:
-        """
-        Create a copy of this regressor and fit it with the given training data.
-
-        This regressor is not modified.
-
-        Parameters
-        ----------
-        training_set:
-            The training data containing the feature and target vectors.
-
-        Returns
-        -------
-        fitted_regressor:
-            The fitted regressor.
-
-        Raises
-        ------
-        LearningError
-            If the training data contains invalid values or if the training failed.
-        """
-
-    @abstractmethod
-    def predict(self, dataset: Table | TabularDataset) -> TabularDataset:
-        """
-        Predict a target vector using a dataset containing feature vectors. The model has to be trained first.
-
-        Parameters
-        ----------
-        dataset:
-            The dataset containing the feature vectors.
-
-        Returns
-        -------
-        table:
-            A dataset containing the given feature vectors and the predicted target vector.
-
-        Raises
-        ------
-        ModelNotFittedError
-            If the model has not been fitted yet.
-        DatasetMissesFeaturesError
-            If the dataset misses feature columns.
-        PredictionError
-            If predicting with the given dataset failed.
-        """
-
-    @property
-    @abstractmethod
-    def is_fitted(self) -> bool:
-        """Whether the regressor is fitted."""
-
-    @abstractmethod
-    def _get_sklearn_regressor(self) -> RegressorMixin:
-        """
-        Return a new wrapped Regressor from sklearn.
-
-        Returns
-        -------
-        wrapped_regressor:
-            The sklearn Regressor.
-        """
+class Regressor(SupervisedModel, ABC):
+    """A model for regression tasks."""
 
     # ------------------------------------------------------------------------------------------------------------------
     # Metrics

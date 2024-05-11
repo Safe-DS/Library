@@ -5,18 +5,18 @@ from typing import TYPE_CHECKING
 from safeds._utils import _structural_hash
 from safeds.exceptions import ClosedBound, OpenBound, OutOfBoundsError
 
-from ._classifier import Classifier
+from ._regressor import Regressor
 
 if TYPE_CHECKING:
-    from sklearn.base import ClassifierMixin
+    from sklearn.base import RegressorMixin
 
     from safeds.data.labeled.containers import TabularDataset
     from safeds.data.tabular.containers import Table
 
 
-class AdaBoostClassifier(Classifier):
+class AdaBoostRegressor(Regressor):
     """
-    Ada Boost classification.
+    Ada Boost regression.
 
     Parameters
     ----------
@@ -26,8 +26,8 @@ class AdaBoostClassifier(Classifier):
         The maximum number of learners at which boosting is terminated. In case of perfect fit, the learning procedure
         is stopped early. Has to be greater than 0.
     learning_rate:
-        Weight applied to each classifier at each boosting iteration. A higher learning rate increases the contribution
-        of each classifier. Has to be greater than 0.
+        Weight applied to each regressor at each boosting iteration. A higher learning rate increases the contribution
+        of each regressor. Has to be greater than 0.
 
     Raises
     ------
@@ -42,7 +42,7 @@ class AdaBoostClassifier(Classifier):
     def __init__(
         self,
         *,
-        learner: Classifier | None = None,
+        learner: Regressor | None = None,
         maximum_number_of_learners: int = 50,
         learning_rate: float = 1.0,
     ) -> None:
@@ -59,7 +59,7 @@ class AdaBoostClassifier(Classifier):
             raise OutOfBoundsError(learning_rate, name="learning_rate", lower_bound=OpenBound(0))
 
         # Hyperparameters
-        self._learner: Classifier | None = learner
+        self._learner: Regressor | None = learner
         self._maximum_number_of_learners: int = maximum_number_of_learners
         self._learning_rate: float = learning_rate
 
@@ -76,7 +76,7 @@ class AdaBoostClassifier(Classifier):
     # ------------------------------------------------------------------------------------------------------------------
 
     @property
-    def learner(self) -> Classifier | None:
+    def learner(self) -> Regressor | None:
         """The base learner used for training the ensemble."""
         return self._learner
 
@@ -100,18 +100,18 @@ class AdaBoostClassifier(Classifier):
     def _check_additional_predict_preconditions(self, dataset: Table | TabularDataset):
         pass
 
-    def _clone(self) -> AdaBoostClassifier:
-        return AdaBoostClassifier(
+    def _clone(self) -> AdaBoostRegressor:
+        return AdaBoostRegressor(
             learner=self.learner,
             maximum_number_of_learners=self.maximum_number_of_learners,
             learning_rate=self._learning_rate,
         )
 
-    def _get_sklearn_model(self) -> ClassifierMixin:
-        from sklearn.ensemble import AdaBoostClassifier as SklearnAdaBoostClassifier
+    def _get_sklearn_model(self) -> RegressorMixin:
+        from sklearn.ensemble import AdaBoostRegressor as SklearnAdaBoostRegressor
 
         learner = self.learner._get_sklearn_model() if self.learner is not None else None
-        return SklearnAdaBoostClassifier(
+        return SklearnAdaBoostRegressor(
             estimator=learner,
             n_estimators=self.maximum_number_of_learners,
             learning_rate=self._learning_rate,

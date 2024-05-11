@@ -144,9 +144,9 @@ class SupervisedModel(ABC):
         ModelNotFittedError
             If the model has not been fitted yet.
         """
-        return self.get_feature_schema().column_names
+        return self.get_features_schema().column_names
 
-    def get_feature_schema(self) -> Schema:
+    def get_features_schema(self) -> Schema:
         """
         Return the schema of the feature columns.
 

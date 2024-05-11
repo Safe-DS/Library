@@ -2,19 +2,19 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from safeds._utils import _get_random_seed, _structural_hash
+from safeds._utils import _structural_hash
 
-from ._classifier import Classifier
+from ._regressor import Regressor
 
 if TYPE_CHECKING:
-    from sklearn.base import ClassifierMixin
+    from sklearn.base import RegressorMixin
 
     from safeds.data.labeled.containers import TabularDataset
     from safeds.data.tabular.containers import Table
 
 
-class LogisticClassifier(Classifier):
-    """Regularized logistic regression for classification."""
+class LinearRegressor(Regressor):
+    """Linear regression."""
 
     # ------------------------------------------------------------------------------------------------------------------
     # Dunder methods
@@ -38,13 +38,10 @@ class LogisticClassifier(Classifier):
     def _check_additional_predict_preconditions(self, dataset: Table | TabularDataset):
         pass
 
-    def _clone(self) -> LogisticClassifier:
-        return LogisticClassifier()
+    def _clone(self) -> LinearRegressor:
+        return LinearRegressor()
 
-    def _get_sklearn_model(self) -> ClassifierMixin:
-        from sklearn.linear_model import LogisticRegression as SklearnLogisticRegression
+    def _get_sklearn_model(self) -> RegressorMixin:
+        from sklearn.linear_model import LinearRegression as sk_LinearRegression
 
-        return SklearnLogisticRegression(
-            random_state=_get_random_seed(),
-            n_jobs=-1,
-        )
+        return sk_LinearRegression(n_jobs=-1)

@@ -4,19 +4,19 @@ import sys
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
-from safeds._utils import _get_random_seed, _structural_hash
+from safeds._utils import _structural_hash
 from safeds.exceptions import ClosedBound, OpenBound, OutOfBoundsError
-from safeds.ml.classical.classification import Classifier
+from safeds.ml.classical.regression import Regressor
 
 if TYPE_CHECKING:
-    from sklearn.base import ClassifierMixin
-    from sklearn.svm import SVC as SklearnSVC  # noqa: N811
+    from sklearn.base import RegressorMixin
+    from sklearn.svm import SVR as SklearnSVR  # noqa: N811
 
     from safeds.data.labeled.containers import TabularDataset
     from safeds.data.tabular.containers import Table
 
 
-class SupportVectorClassifier(Classifier):
+class SupportVectorRegressor(Regressor):
     """
     Support vector machine for classification.
 
@@ -50,16 +50,16 @@ class SupportVectorClassifier(Classifier):
         def __str__(self) -> str: ...
 
         @abstractmethod
-        def _apply(self, model: SklearnSVC) -> None:
+        def _apply(self, model: SklearnSVR) -> None:
             """Set the kernel of the given model."""
 
         @staticmethod
-        def Linear() -> SupportVectorClassifier.Kernel:  # noqa: N802
+        def Linear() -> SupportVectorRegressor.Kernel:  # noqa: N802
             """A linear kernel."""  # noqa: D401
             raise NotImplementedError  # pragma: no cover
 
         @staticmethod
-        def Polynomial(degree: int) -> SupportVectorClassifier.Kernel:  # noqa: N802
+        def Polynomial(degree: int) -> SupportVectorRegressor.Kernel:  # noqa: N802
             """
             A polynomial kernel.
 
@@ -76,12 +76,12 @@ class SupportVectorClassifier(Classifier):
             raise NotImplementedError  # pragma: no cover
 
         @staticmethod
-        def RadialBasisFunction() -> SupportVectorClassifier.Kernel:  # noqa: N802
+        def RadialBasisFunction() -> SupportVectorRegressor.Kernel:  # noqa: N802
             """A radial basis function kernel."""  # noqa: D401
             raise NotImplementedError  # pragma: no cover
 
         @staticmethod
-        def Sigmoid() -> SupportVectorClassifier.Kernel:  # noqa: N802
+        def Sigmoid() -> SupportVectorRegressor.Kernel:  # noqa: N802
             """A sigmoid kernel."""  # noqa: D401
             raise NotImplementedError  # pragma: no cover
 
@@ -93,7 +93,7 @@ class SupportVectorClassifier(Classifier):
         self,
         *,
         c: float = 1.0,
-        kernel: SupportVectorClassifier.Kernel | None = None,
+        kernel: SupportVectorRegressor.Kernel | None = None,
     ) -> None:
         super().__init__()
 
@@ -101,15 +101,15 @@ class SupportVectorClassifier(Classifier):
         if c <= 0:
             raise OutOfBoundsError(c, name="c", lower_bound=OpenBound(0))
         if kernel is None:
-            kernel = SupportVectorClassifier.Kernel.RadialBasisFunction()
+            kernel = SupportVectorRegressor.Kernel.RadialBasisFunction()
 
         # Hyperparameters
         self._c: float = c
-        self._kernel: SupportVectorClassifier.Kernel = kernel
+        self._kernel: SupportVectorRegressor.Kernel = kernel
 
     def __hash__(self) -> int:
         return _structural_hash(
-            Classifier.__hash__(self),
+            Regressor.__hash__(self),
             self._c,
             self.kernel,
         )
@@ -131,7 +131,7 @@ class SupportVectorClassifier(Classifier):
         return self._c
 
     @property
-    def kernel(self) -> SupportVectorClassifier.Kernel:
+    def kernel(self) -> SupportVectorRegressor.Kernel:
         """
         Get the type of kernel used.
 
@@ -152,26 +152,25 @@ class SupportVectorClassifier(Classifier):
     def _check_additional_predict_preconditions(self, dataset: Table | TabularDataset):
         pass
 
-    def _clone(self) -> SupportVectorClassifier:
-        return SupportVectorClassifier(
+    def _clone(self) -> SupportVectorRegressor:
+        return SupportVectorRegressor(
             c=self._c,
             kernel=self._kernel,
         )
 
-    def _get_sklearn_model(self) -> ClassifierMixin:
+    def _get_sklearn_model(self) -> RegressorMixin:
         """
-        Return a new wrapped Classifier from sklearn.
+        Return a new wrapped Regressor from sklearn.
 
         Returns
         -------
         wrapped_classifier:
-            The sklearn Classifier.
+            The sklearn Regressor.
         """
-        from sklearn.svm import SVC as SklearnSVC  # noqa: N811
+        from sklearn.svm import SVR as SklearnSVR  # noqa: N811
 
-        result = SklearnSVC(
+        result = SklearnSVR(
             C=self._c,
-            random_state=_get_random_seed(),
         )
         self._kernel._apply(result)
         return result
@@ -181,7 +180,7 @@ class SupportVectorClassifier(Classifier):
 # Kernels
 # ----------------------------------------------------------------------------------------------------------------------
 
-class _Linear(SupportVectorClassifier.Kernel):
+class _Linear(SupportVectorRegressor.Kernel):
 
     # ------------------------------------------------------------------------------------------------------------------
     # Dunder methods
@@ -202,11 +201,11 @@ class _Linear(SupportVectorClassifier.Kernel):
     # Template methods
     # ------------------------------------------------------------------------------------------------------------------
 
-    def _apply(self, model: SklearnSVC) -> None:
+    def _apply(self, model: SklearnSVR) -> None:
         model.kernel = "linear"
 
 
-class _Polynomial(SupportVectorClassifier.Kernel):
+class _Polynomial(SupportVectorRegressor.Kernel):
 
     # ------------------------------------------------------------------------------------------------------------------
     # Dunder methods
@@ -248,12 +247,12 @@ class _Polynomial(SupportVectorClassifier.Kernel):
     # Template methods
     # ------------------------------------------------------------------------------------------------------------------
 
-    def _apply(self, model: SklearnSVC) -> None:
+    def _apply(self, model: SklearnSVR) -> None:
         model.kernel = "poly"
         model.degree = self._degree
 
 
-class _RadialBasisFunction(SupportVectorClassifier.Kernel):
+class _RadialBasisFunction(SupportVectorRegressor.Kernel):
 
     # ------------------------------------------------------------------------------------------------------------------
     # Dunder methods
@@ -274,11 +273,11 @@ class _RadialBasisFunction(SupportVectorClassifier.Kernel):
     # Template methods
     # ------------------------------------------------------------------------------------------------------------------
 
-    def _apply(self, model: SklearnSVC) -> None:
+    def _apply(self, model: SklearnSVR) -> None:
         model.kernel = "rbf"
 
 
-class _Sigmoid(SupportVectorClassifier.Kernel):
+class _Sigmoid(SupportVectorRegressor.Kernel):
 
     # ------------------------------------------------------------------------------------------------------------------
     # Dunder methods
@@ -299,13 +298,13 @@ class _Sigmoid(SupportVectorClassifier.Kernel):
     # Template methods
     # ------------------------------------------------------------------------------------------------------------------
 
-    def _apply(self, model: SklearnSVC) -> None:
+    def _apply(self, model: SklearnSVR) -> None:
         model.kernel = "sigmoid"
 
 
 # Override the methods with classes, so they can be used in `isinstance` calls. Unlike methods, classes define a type.
 # This is needed for the DSL, where SVM kernels are variants of an enum.
-SupportVectorClassifier.Kernel.Linear = _Linear  # type: ignore[method-assign]
-SupportVectorClassifier.Kernel.Polynomial = _Polynomial  # type: ignore[method-assign]
-SupportVectorClassifier.Kernel.RadialBasisFunction = _RadialBasisFunction  # type: ignore[method-assign]
-SupportVectorClassifier.Kernel.Sigmoid = _Sigmoid  # type: ignore[method-assign]
+SupportVectorRegressor.Kernel.Linear = _Linear  # type: ignore[method-assign]
+SupportVectorRegressor.Kernel.Polynomial = _Polynomial  # type: ignore[method-assign]
+SupportVectorRegressor.Kernel.RadialBasisFunction = _RadialBasisFunction  # type: ignore[method-assign]
+SupportVectorRegressor.Kernel.Sigmoid = _Sigmoid  # type: ignore[method-assign]
