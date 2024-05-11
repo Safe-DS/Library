@@ -12,7 +12,7 @@ if TYPE_CHECKING:
 
 class SupportVectorRegressor(Regressor, _SupportVectorMachineBase):
     """
-    Support vector machine for classification.
+    Support vector machine for regression.
 
     Parameters
     ----------
