@@ -15,8 +15,8 @@ class _DecisionTreeBase(ABC):
     @abstractmethod
     def __init__(
         self,
-        maximum_depth: int,
-        minimum_number_of_samples_in_leaves,
+        maximum_depth: int | None,
+        minimum_number_of_samples_in_leaves: int,
     ) -> None:
         # Validation
         if maximum_depth is not None and maximum_depth < 1:

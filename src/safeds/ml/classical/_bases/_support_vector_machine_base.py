@@ -13,7 +13,6 @@ if TYPE_CHECKING:
 
 
 class _SupportVectorMachineBase(ABC):
-
     # ------------------------------------------------------------------------------------------------------------------
     # Inner classes
     # ------------------------------------------------------------------------------------------------------------------
@@ -102,27 +101,15 @@ class _SupportVectorMachineBase(ABC):
 
     @property
     def c(self) -> float:
-        """
-        Get the regularization strength.
-
-        Returns
-        -------
-        result:
-            The regularization strength.
-        """
+        """The regularization strength."""
         return self._c
 
+    # This property is abstract, so subclasses must declare a public return type.
     @property
+    @abstractmethod
     def kernel(self) -> _SupportVectorMachineBase.Kernel:
-        """
-        Get the type of kernel used.
+        """The type of kernel used."""
 
-        Returns
-        -------
-        result:
-            The type of kernel used.
-        """
-        return self._kernel
 
 # ----------------------------------------------------------------------------------------------------------------------
 # Kernels
