@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from safeds._utils import _structural_hash
-from safeds.exceptions import ClosedBound, OutOfBoundsError
+from safeds.ml.classical._bases import _KNearestNeighborsBase
 
 from ._regressor import Regressor
 
@@ -14,7 +14,7 @@ if TYPE_CHECKING:
     from safeds.data.tabular.containers import Table
 
 
-class KNearestNeighborsRegressor(Regressor):
+class KNearestNeighborsRegressor(Regressor, _KNearestNeighborsBase):
     """
     K-nearest-neighbors regression.
 
@@ -35,36 +35,18 @@ class KNearestNeighborsRegressor(Regressor):
     # ------------------------------------------------------------------------------------------------------------------
 
     def __init__(self, number_of_neighbors: int) -> None:
-        super().__init__()
-
-        # Validation
-        if number_of_neighbors < 1:
-            raise OutOfBoundsError(number_of_neighbors, name="number_of_neighbors", lower_bound=ClosedBound(1))
-
-        # Hyperparameters
-        self._number_of_neighbors = number_of_neighbors
+        # Initialize superclasses
+        Regressor.__init__(self)
+        _KNearestNeighborsBase.__init__(
+            self,
+            number_of_neighbors=number_of_neighbors,
+        )
 
     def __hash__(self) -> int:
         return _structural_hash(
-            super().__hash__(),
-            self._number_of_neighbors,
+            Regressor.__hash__(self),
+            _KNearestNeighborsBase.__hash__(self),
         )
-
-    # ------------------------------------------------------------------------------------------------------------------
-    # Properties
-    # ------------------------------------------------------------------------------------------------------------------
-
-    @property
-    def number_of_neighbors(self) -> int:
-        """
-        Get the number of neighbors used for interpolation.
-
-        Returns
-        -------
-        result:
-            The number of neighbors.
-        """
-        return self._number_of_neighbors
 
     # ------------------------------------------------------------------------------------------------------------------
     # Template methods

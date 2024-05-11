@@ -1,9 +1,10 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Self
+from typing import TYPE_CHECKING
 
 from safeds._utils import _structural_hash
 from safeds.exceptions import ClosedBound, OpenBound, OutOfBoundsError
+from safeds.ml.classical._bases import _GradientBoostingBase
 
 from ._classifier import Classifier
 
@@ -14,7 +15,7 @@ if TYPE_CHECKING:
     from safeds.data.tabular.containers import Table
 
 
-class GradientBoostingClassifier(Classifier):
+class GradientBoostingClassifier(Classifier, _GradientBoostingBase):
     """
     Gradient boosting classification.
 
@@ -37,39 +38,25 @@ class GradientBoostingClassifier(Classifier):
     # Dunder methods
     # ------------------------------------------------------------------------------------------------------------------
 
-    def __init__(self, *, number_of_trees: int = 100, learning_rate: float = 0.1) -> None:
-        super().__init__()
-
-        # Validation
-        if number_of_trees < 1:
-            raise OutOfBoundsError(number_of_trees, name="number_of_trees", lower_bound=ClosedBound(1))
-        if learning_rate <= 0:
-            raise OutOfBoundsError(learning_rate, name="learning_rate", lower_bound=OpenBound(0))
-
-        # Hyperparameters
-        self._number_of_trees = number_of_trees
-        self._learning_rate = learning_rate
+    def __init__(
+        self,
+        *,
+        number_of_trees: int = 100,
+        learning_rate: float = 0.1,
+    ) -> None:
+        # Initialize superclasses
+        Classifier.__init__(self)
+        _GradientBoostingBase.__init__(
+            self,
+            number_of_trees=number_of_trees,
+            learning_rate=learning_rate,
+        )
 
     def __hash__(self) -> int:
         return _structural_hash(
-            super().__hash__(),
-            self._number_of_trees,
-            self._learning_rate,
+            Classifier.__hash__(self),
+            _GradientBoostingBase.__hash__(self),
         )
-
-    # ------------------------------------------------------------------------------------------------------------------
-    # Properties
-    # ------------------------------------------------------------------------------------------------------------------
-
-    @property
-    def number_of_trees(self) -> int:
-        """The number of trees (estimators) in the ensemble."""
-        return self._number_of_trees
-
-    @property
-    def learning_rate(self) -> float:
-        """The learning rate."""
-        return self._learning_rate
 
     # ------------------------------------------------------------------------------------------------------------------
     # Template methods

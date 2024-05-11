@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from safeds._utils import _structural_hash
-from safeds.exceptions import ClosedBound, OpenBound, OutOfBoundsError
+from safeds.ml.classical._bases import _AdaBoostBase
 
 from ._regressor import Regressor
 
@@ -14,7 +14,7 @@ if TYPE_CHECKING:
     from safeds.data.tabular.containers import Table
 
 
-class AdaBoostRegressor(Regressor):
+class AdaBoostRegressor(Regressor, _AdaBoostBase):
     """
     Ada Boost regression.
 
@@ -46,29 +46,22 @@ class AdaBoostRegressor(Regressor):
         maximum_number_of_learners: int = 50,
         learning_rate: float = 1.0,
     ) -> None:
-        super().__init__()
-
-        # Validation
-        if maximum_number_of_learners < 1:
-            raise OutOfBoundsError(
-                maximum_number_of_learners,
-                name="maximum_number_of_learners",
-                lower_bound=ClosedBound(1),
-            )
-        if learning_rate <= 0:
-            raise OutOfBoundsError(learning_rate, name="learning_rate", lower_bound=OpenBound(0))
+        # Initialize superclasses
+        Regressor.__init__(self)
+        _AdaBoostBase.__init__(
+            self,
+            maximum_number_of_learners=maximum_number_of_learners,
+            learning_rate=learning_rate,
+        )
 
         # Hyperparameters
         self._learner: Regressor | None = learner
-        self._maximum_number_of_learners: int = maximum_number_of_learners
-        self._learning_rate: float = learning_rate
 
     def __hash__(self) -> int:
         return _structural_hash(
-            super().__hash__(),
+            Regressor.__hash__(self),
+            _AdaBoostBase.__hash__(self),
             self._learner,
-            self._maximum_number_of_learners,
-            self._learning_rate,
         )
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -79,16 +72,6 @@ class AdaBoostRegressor(Regressor):
     def learner(self) -> Regressor | None:
         """The base learner used for training the ensemble."""
         return self._learner
-
-    @property
-    def maximum_number_of_learners(self) -> int:
-        """The maximum number of learners in the ensemble."""
-        return self._maximum_number_of_learners
-
-    @property
-    def learning_rate(self) -> float:
-        """The learning rate."""
-        return self._learning_rate
 
     # ------------------------------------------------------------------------------------------------------------------
     # Template methods
@@ -103,7 +86,7 @@ class AdaBoostRegressor(Regressor):
     def _clone(self) -> AdaBoostRegressor:
         return AdaBoostRegressor(
             learner=self.learner,
-            maximum_number_of_learners=self.maximum_number_of_learners,
+            maximum_number_of_learners=self._maximum_number_of_learners,
             learning_rate=self._learning_rate,
         )
 
@@ -113,6 +96,6 @@ class AdaBoostRegressor(Regressor):
         learner = self.learner._get_sklearn_model() if self.learner is not None else None
         return SklearnAdaBoostRegressor(
             estimator=learner,
-            n_estimators=self.maximum_number_of_learners,
+            n_estimators=self._maximum_number_of_learners,
             learning_rate=self._learning_rate,
         )
