@@ -44,11 +44,11 @@ class OutOfBoundsError(ValueError):
         Raises
         ------
         ValueError
-            * If one of the given Bounds is +/-inf. (For infinite Bounds, pass None instead.)
-            * If one of the given Bounds is nan.
-            * If upper_bound < lower_bound.
-            * If actual does not lie outside the given interval.
-            * If actual is not a real number.
+            - If one of the given Bounds is +/-inf. (For infinite Bounds, pass None instead.)
+            - If one of the given Bounds is nan.
+            - If upper_bound < lower_bound.
+            - If actual does not lie outside the given interval.
+            - If actual is not a real number.
         """
         from numpy import isinf, isnan
 

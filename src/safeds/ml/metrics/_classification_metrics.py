@@ -11,6 +11,7 @@ if TYPE_CHECKING:
 
 
 class ClassificationMetrics:
+    """A collection of classification metrics."""
 
     @staticmethod
     def summarize(predicted: Column | TabularDataset, expected: Column | TabularDataset, positive_class: Any) -> Table:
@@ -31,6 +32,10 @@ class ClassificationMetrics:
         metrics:
             A table containing the classification metrics.
         """
+        expected = _extract_target(expected)
+        predicted = _extract_target(predicted)
+        _check_equal_length(predicted, expected)
+
         accuracy = ClassificationMetrics.accuracy(predicted, expected)
         precision = ClassificationMetrics.precision(predicted, expected, positive_class)
         recall = ClassificationMetrics.recall(predicted, expected, positive_class)
@@ -48,7 +53,8 @@ class ClassificationMetrics:
         """
         Compute the accuracy on the given data.
 
-        The accuracy is the proportion of correctly predicted target values.
+        The accuracy is the proportion of predicted target values that were correct. The **higher** the accuracy, the
+        better. Results range from 0.0 to 1.0.
 
         Parameters
         ----------
@@ -69,14 +75,15 @@ class ClassificationMetrics:
         if expected.number_of_rows == 0:
             return 1.0  # Everything was predicted correctly (since there is nothing to predict)
 
-        return expected._series.eq(predicted._series).sum() / expected.number_of_rows
+        return expected._series.eq(predicted._series).mean()
 
     @staticmethod
     def f1_score(predicted: Column | TabularDataset, expected: Column | TabularDataset, positive_class: Any) -> float:
         """
-        Compute the $F_1$ score on the given data.
+        Compute the F₁ score on the given data.
 
-        The $F_1$ score is the harmonic mean of precision and recall.
+        The F₁ score is the harmonic mean of precision and recall. The **higher** the F₁ score, the better the
+        classifier. Results range from 0.0 to 1.0.
 
         Parameters
         ----------
@@ -90,7 +97,7 @@ class ClassificationMetrics:
         Returns
         -------
         f1_score:
-            The calculated $F_1$ score.
+            The calculated F₁ score.
         """
         predicted = _extract_target(predicted)
         expected = _extract_target(expected)
@@ -110,7 +117,8 @@ class ClassificationMetrics:
         """
         Compute the precision on the given data.
 
-        The precision is the proportion of positive predictions that were correct.
+        The precision is the proportion of positive predictions that were correct. The **higher** the precision, the
+        better the classifier. Results range from 0.0 to 1.0.
 
         Parameters
         ----------
@@ -143,7 +151,8 @@ class ClassificationMetrics:
         """
         Compute the recall on the given data.
 
-        The recall is the proportion of actual positives that were predicted correctly.
+        The recall is the proportion of actual positives that were predicted correctly. The **higher** the recall, the
+        better the classifier. Results range from 0.0 to 1.0.
 
         Parameters
         ----------

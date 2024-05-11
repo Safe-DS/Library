@@ -21,9 +21,9 @@ class TabularDataset:
 
     Columns in a tabular dataset are divided into three categories:
 
-    * The target column is the column that a model should predict.
-    * Feature columns are columns that a model should use to make predictions.
-    * Extra columns are columns that are neither feature nor target. They can be used to provide additional context,
+    - The target column is the column that a model should predict.
+    - Feature columns are columns that a model should use to make predictions.
+    - Extra columns are columns that are neither feature nor target. They can be used to provide additional context,
       like an ID column.
 
     Feature columns are implicitly defined as all columns except the target and extra columns. If no extra columns

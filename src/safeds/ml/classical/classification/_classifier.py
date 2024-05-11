@@ -29,6 +29,8 @@ class Classifier(SupervisedModel, ABC):
         """
         Summarize the classifier's metrics on the given data.
 
+        **Note:** The model must be fitted.
+
         Parameters
         ----------
         validation_or_test_set:
@@ -61,7 +63,10 @@ class Classifier(SupervisedModel, ABC):
         """
         Compute the accuracy of the classifier on the given data.
 
-        The accuracy is the proportion of correctly predicted target values.
+        The accuracy is the proportion of predicted target values that were correct. The **higher** the accuracy, the
+        better. Results range from 0.0 to 1.0.
+
+        **Note:** The model must be fitted.
 
         Parameters
         ----------
@@ -94,9 +99,12 @@ class Classifier(SupervisedModel, ABC):
         positive_class: Any,
     ) -> float:
         """
-        Compute the classifier's $F_1$ score on the given data.
+        Compute the classifier's F₁ score on the given data.
 
-        The $F_1$ score is the harmonic mean of precision and recall.
+        The F₁ score is the harmonic mean of precision and recall. The **higher** the F₁ score, the better the
+        classifier. Results range from 0.0 to 1.0.
+
+        **Note:** The model must be fitted.
 
         Parameters
         ----------
@@ -108,7 +116,7 @@ class Classifier(SupervisedModel, ABC):
         Returns
         -------
         f1_score:
-            The classifier's $F_1$ score.
+            The classifier's F₁ score.
 
         Raises
         ------
@@ -134,7 +142,10 @@ class Classifier(SupervisedModel, ABC):
         """
         Compute the classifier's precision on the given data.
 
-        The precision is the proportion of positive predictions that were correct.
+        The precision is the proportion of positive predictions that were correct. The **higher** the precision, the
+        better the classifier. Results range from 0.0 to 1.0.
+
+        **Note:** The model must be fitted.
 
         Parameters
         ----------
@@ -168,7 +179,10 @@ class Classifier(SupervisedModel, ABC):
         """
         Compute the classifier's recall on the given data.
 
-        The recall is the proportion of actual positives that were predicted correctly.
+        The recall is the proportion of actual positives that were predicted correctly. The **higher** the recall, the
+        better the classifier. Results range from 0.0 to 1.0.
+
+        **Note:** The model must be fitted.
 
         Parameters
         ----------

@@ -414,8 +414,8 @@ class Table:
 
         **Notes:**
 
-        * The original table is not modified.
-        * This operation must fully load the data into memory, which can be expensive.
+        - The original table is not modified.
+        - This operation must fully load the data into memory, which can be expensive.
 
         Parameters
         ----------
@@ -697,8 +697,8 @@ class Table:
 
         **Notes:**
 
-        * The original table is not modified.
-        * This operation must fully load the data into memory, which can be expensive.
+        - The original table is not modified.
+        - This operation must fully load the data into memory, which can be expensive.
 
         Returns
         -------
@@ -1129,8 +1129,8 @@ class Table:
 
         **Notes:**
 
-        * The original table is not modified.
-        * This operation must fully load the data into memory, which can be expensive.
+        - The original table is not modified.
+        - This operation must fully load the data into memory, which can be expensive.
 
         Parameters
         ----------
@@ -1448,8 +1448,8 @@ class Table:
 
         **Notes:**
 
-        * The original tables are not modified.
-        * This operation must fully load the data into memory, which can be expensive.
+        - The original tables are not modified.
+        - This operation must fully load the data into memory, which can be expensive.
 
         Parameters
         ----------
@@ -1489,8 +1489,8 @@ class Table:
 
         **Notes:**
 
-        * The original tables are not modified.
-        * This operation must fully load the data into memory, which can be expensive.
+        - The original tables are not modified.
+        - This operation must fully load the data into memory, which can be expensive.
 
         Parameters
         ----------
@@ -1533,8 +1533,8 @@ class Table:
 
         **Notes:**
 
-        * The original table is not modified.
-        * Depending on the transformer, this operation might fully load the data into memory, which can be expensive.
+        - The original table is not modified.
+        - Depending on the transformer, this operation might fully load the data into memory, which can be expensive.
 
         Parameters
         ----------
@@ -1571,9 +1571,8 @@ class Table:
 
         **Notes:**
 
-        * The original table is not modified.
-        * Depending on the transformer, this operation might fully load the data into memory, which can be expensive.
-
+        - The original table is not modified.
+        - Depending on the transformer, this operation might fully load the data into memory, which can be expensive.
 
         Parameters
         ----------
@@ -1787,9 +1786,9 @@ class Table:
         """
         Return a new `TabularDataset` with columns marked as a target, feature, or extra.
 
-        * The target column is the column that a model should predict.
-        * Feature columns are columns that a model should use to make predictions.
-        * Extra columns are columns that are neither feature nor target. They can be used to provide additional context,
+        - The target column is the column that a model should predict.
+        - Feature columns are columns that a model should use to make predictions.
+        - Extra columns are columns that are neither feature nor target. They can be used to provide additional context,
           like an ID column.
 
         Feature columns are implicitly defined as all columns except the target and extra columns. If no extra columns
