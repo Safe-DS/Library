@@ -5,26 +5,26 @@ from typing import TYPE_CHECKING
 import apipkg
 
 if TYPE_CHECKING:
-    from ._ada_boost import AdaBoostClassifier
+    from ._ada_boost_classifier import AdaBoostClassifier
     from ._classifier import Classifier
-    from ._decision_tree import DecisionTreeClassifier
-    from ._gradient_boosting import GradientBoostingClassifier
-    from ._k_nearest_neighbors import KNearestNeighborsClassifier
-    from ._logistic_regression import LogisticRegressionClassifier
-    from ._random_forest import RandomForestClassifier
-    from ._support_vector_machine import SupportVectorMachineClassifier
+    from ._decision_tree_classifier import DecisionTreeClassifier
+    from ._gradient_boosting_classifier import GradientBoostingClassifier
+    from ._k_nearest_neighbors_classifier import KNearestNeighborsClassifier
+    from ._logistic_classifier import LogisticClassifier
+    from ._random_forest_classifier import RandomForestClassifier
+    from ._support_vector_classifier import SupportVectorClassifier
 
 apipkg.initpkg(
     __name__,
     {
-        "AdaBoostClassifier": "._ada_boost:AdaBoostClassifier",
+        "AdaBoostClassifier": "._ada_boost_classifier:AdaBoostClassifier",
         "Classifier": "._classifier:Classifier",
-        "DecisionTreeClassifier": "._decision_tree:DecisionTreeClassifier",
-        "GradientBoostingClassifier": "._gradient_boosting:GradientBoostingClassifier",
-        "KNearestNeighborsClassifier": "._k_nearest_neighbors:KNearestNeighborsClassifier",
-        "LogisticRegressionClassifier": "._logistic_regression:LogisticRegressionClassifier",
-        "RandomForestClassifier": "._random_forest:RandomForestClassifier",
-        "SupportVectorMachineClassifier": "._support_vector_machine:SupportVectorMachineClassifier",
+        "DecisionTreeClassifier": "._decision_tree_classifier:DecisionTreeClassifier",
+        "GradientBoostingClassifier": "._gradient_boosting_classifier:GradientBoostingClassifier",
+        "KNearestNeighborsClassifier": "._k_nearest_neighbors_classifier:KNearestNeighborsClassifier",
+        "LogisticClassifier": "._logistic_classifier:LogisticClassifier",
+        "RandomForestClassifier": "._random_forest_classifier:RandomForestClassifier",
+        "SupportVectorClassifier": "._support_vector_classifier:SupportVectorClassifier",
     },
 )
 
@@ -34,7 +34,7 @@ __all__ = [
     "DecisionTreeClassifier",
     "GradientBoostingClassifier",
     "KNearestNeighborsClassifier",
-    "LogisticRegressionClassifier",
+    "LogisticClassifier",
     "RandomForestClassifier",
-    "SupportVectorMachineClassifier",
+    "SupportVectorClassifier",
 ]

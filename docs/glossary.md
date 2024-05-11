@@ -53,7 +53,7 @@ It is analogous to a column within a table.
 Linear Regression is the supervised Machine Learning model in which the model finds the best fit linear line between the independent and dependent variable
 i.e. it finds the linear relationship between the dependent and independent variable.
 
-Implemented in Safe-DS as [LinearRegression][safeds.ml.classical.regression.LinearRegressionRegressor].
+Implemented in Safe-DS as [LinearRegressor[safeds.ml.classical.regression.LinearRegressor].
 
 ## Machine Learning (ML)
 Machine Learning is a generic term for artificially generating knowledge through experience.

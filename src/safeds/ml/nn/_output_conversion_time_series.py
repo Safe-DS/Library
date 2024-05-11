@@ -81,7 +81,7 @@ class OutputConversionTimeSeries(OutputConversion[TimeSeriesDataset, TimeSeriesD
         input_data_table = Table.from_rows(input_data_table.to_rows()[window_size + forecast_horizon :])
 
         return input_data_table.add_columns(
-            [Column(self._prediction_name, output_data.tolist())]
+            [Column(self._prediction_name, output_data.tolist())],
         ).to_time_series_dataset(
             target_name=self._prediction_name,
             time_name=input_data.time.name,

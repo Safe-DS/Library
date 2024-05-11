@@ -1,507 +1,114 @@
 from __future__ import annotations
 
-import sys
-from collections.abc import Mapping
+from abc import ABC, abstractmethod
+from collections.abc import Iterator, Mapping
 from typing import TYPE_CHECKING, Any
 
-from safeds._utils import _structural_hash
-from safeds.data.tabular.typing import ColumnType, Schema
-from safeds.exceptions import UnknownColumnNameError
-
 if TYPE_CHECKING:
-    from collections.abc import Iterator
+    from safeds.data.tabular.typing import DataType, Schema
 
-    import pandas as pd
+    from ._cell import Cell
 
 
-class Row(Mapping[str, Any]):
+class Row(ABC, Mapping[str, Any]):
     """
-    A row is a collection of named values.
+    A one-dimensional collection of named, heterogeneous values.
 
-    Parameters
-    ----------
-    data:
-        The data. If None, an empty row is created.
-
-    Examples
-    --------
-    >>> from safeds.data.tabular.containers import Row
-    >>> row = Row({"a": 1, "b": 2})
+    This class cannot be instantiated directly. It is only used for arguments of callbacks.
     """
-
-    # ------------------------------------------------------------------------------------------------------------------
-    # Creation
-    # ------------------------------------------------------------------------------------------------------------------
-
-    @staticmethod
-    def from_dict(data: dict[str, Any]) -> Row:
-        """
-        Create a row from a dictionary that maps column names to column values.
-
-        Parameters
-        ----------
-        data:
-            The data.
-
-        Returns
-        -------
-        row:
-            The created row.
-
-        Examples
-        --------
-        >>> from safeds.data.tabular.containers import Row
-        >>> row = Row.from_dict({"a": 1, "b": 2})
-        """
-        return Row(data)
-
-    @staticmethod
-    def _from_pandas_dataframe(data: pd.DataFrame, schema: Schema | None = None) -> Row:
-        """
-        Create a row from a `pandas.DataFrame`.
-
-        Parameters
-        ----------
-        data:
-            The data.
-        schema:
-            The schema. If None, the schema is inferred from the data.
-
-        Returns
-        -------
-        row:
-            The created row.
-
-        Raises
-        ------
-        ValueError
-            If the dataframe does not contain exactly one row.
-
-        Examples
-        --------
-        >>> import pandas as pd
-        >>> from safeds.data.tabular.containers import Row
-        >>> row = Row._from_pandas_dataframe(pd.DataFrame({"a": [1], "b": [2]}))
-        """
-        if data.shape[0] != 1:
-            raise ValueError("The dataframe has to contain exactly one row.")
-
-        data = data.reset_index(drop=True)
-
-        result = object.__new__(Row)
-        result._data = data
-
-        if schema is None:
-            # noinspection PyProtectedMember
-            result._schema = Schema._from_pandas_dataframe(data)
-        else:
-            result._schema = schema
-
-        return result
 
     # ------------------------------------------------------------------------------------------------------------------
     # Dunder methods
     # ------------------------------------------------------------------------------------------------------------------
 
-    def __init__(self, data: Mapping[str, Any] | None = None) -> None:
-        """
-        Create a row from a mapping of column names to column values.
+    def __contains__(self, name: Any) -> bool:
+        return self.has_column(name)
 
-        Parameters
-        ----------
-        data:
-            The data. If None, an empty row is created.
+    @abstractmethod
+    def __eq__(self, other: object) -> bool: ...
 
-        Examples
-        --------
-        >>> from safeds.data.tabular.containers import Row
-        >>> row = Row({"a": 1, "b": 2})
-        """
-        import pandas as pd
+    def __getitem__(self, name: str) -> Cell:
+        return self.get_value(name)
 
-        # Enable copy-on-write for pandas dataframes
-        pd.options.mode.copy_on_write = True
-
-        if data is None:
-            data = {}
-
-        data = {key: [value] for key, value in data.items()}
-
-        self._data: pd.DataFrame = pd.DataFrame(data)
-        # noinspection PyProtectedMember
-        self._schema: Schema = Schema._from_pandas_dataframe(self._data)
-
-    def __contains__(self, obj: Any) -> bool:
-        """
-        Check whether the row contains an object as key.
-
-        Parameters
-        ----------
-        obj:
-            The object.
-
-        Returns
-        -------
-        has_column:
-            True, if the row contains the object as key, False otherwise.
-
-        Examples
-        --------
-        >>> from safeds.data.tabular.containers import Row
-        >>> row = Row({"a": 1, "b": 2})
-        >>> "a" in row
-        True
-
-        >>> "c" in row
-        False
-        """
-        return isinstance(obj, str) and self.has_column(obj)
-
-    def __eq__(self, other: object) -> bool:
-        """
-        Check whether this row is equal to another object.
-
-        Parameters
-        ----------
-        other:
-            The other object.
-
-        Returns
-        -------
-        equal:
-            True if the other object is an identical row. False if the other object is a different row. NotImplemented
-            if the other object is not a row.
-
-        Examples
-        --------
-        >>> from safeds.data.tabular.containers import Row
-        >>> row1 = Row({"a": 1, "b": 2})
-        >>> row2 = Row({"a": 1, "b": 2})
-        >>> row1 == row2
-        True
-
-        >>> row3 = Row({"a": 1, "b": 3})
-        >>> row1 == row3
-        False
-        """
-        if not isinstance(other, Row):
-            return NotImplemented
-        if self is other:
-            return True
-        return self._schema == other._schema and self._data.equals(other._data)
-
-    def __getitem__(self, column_name: str) -> Any:
-        """
-        Return the value of a specified column.
-
-        Parameters
-        ----------
-        column_name:
-            The column name.
-
-        Returns
-        -------
-        value:
-            The column value.
-
-        Raises
-        ------
-        UnknownColumnNameError
-            If the row does not contain the specified column.
-
-        Examples
-        --------
-        >>> from safeds.data.tabular.containers import Row
-        >>> row = Row({"a": 1, "b": 2})
-        >>> row["a"]
-        1
-        """
-        return self.get_value(column_name)
-
-    def __hash__(self) -> int:
-        """
-        Return a deterministic hash value for this row.
-
-        Returns
-        -------
-        hash:
-            The hash value.
-        """
-        return _structural_hash(self._schema, [str(self.get_value(value)) for value in self])
+    @abstractmethod
+    def __hash__(self) -> int: ...
 
     def __iter__(self) -> Iterator[Any]:
-        """
-        Create an iterator for the column names of this row.
-
-        Returns
-        -------
-        iterator:
-            The iterator.
-
-        Examples
-        --------
-        >>> from safeds.data.tabular.containers import Row
-        >>> row = Row({"a": 1, "b": 2})
-        >>> list(row)
-        ['a', 'b']
-        """
         return iter(self.column_names)
 
     def __len__(self) -> int:
-        """
-        Return the number of columns in this row.
+        return self.number_of_columns
 
-        Returns
-        -------
-        number_of_columns:
-            The number of columns.
-
-        Examples
-        --------
-        >>> from safeds.data.tabular.containers import Row
-        >>> row = Row({"a": 1, "b": 2})
-        >>> len(row)
-        2
-        """
-        return self._data.shape[1]
-
-    def __repr__(self) -> str:
-        """
-        Return an unambiguous string representation of this row.
-
-        Returns
-        -------
-        representation:
-            The string representation.
-
-        Examples
-        --------
-        >>> from safeds.data.tabular.containers import Row
-        >>> row = Row({"a": 1})
-        >>> repr(row)
-        "Row({'a': 1})"
-        """
-        return f"Row({self!s})"
-
-    def __sizeof__(self) -> int:
-        """
-        Return the complete size of this object.
-
-        Returns
-        -------
-        size:
-            Size of this object in bytes.
-        """
-        return sys.getsizeof(self._data) + sys.getsizeof(self._schema)
-
-    def __str__(self) -> str:
-        """
-        Return a user-friendly string representation of this row.
-
-        Returns
-        -------
-        representation:
-            The string representation.
-
-        Examples
-        --------
-        >>> from safeds.data.tabular.containers import Row
-        >>> row = Row({"a": 1})
-        >>> str(row)
-        "{'a': 1}"
-        """
-        match len(self):
-            case 0:
-                return "{}"
-            case 1:
-                return str(self.to_dict())
-            case _:
-                lines = (f"    {name!r}: {value!r}" for name, value in self.to_dict().items())
-                joined = ",\n".join(lines)
-                return f"{{\n{joined}\n}}"
+    @abstractmethod
+    def __sizeof__(self) -> int: ...
 
     # ------------------------------------------------------------------------------------------------------------------
     # Properties
     # ------------------------------------------------------------------------------------------------------------------
 
     @property
+    @abstractmethod
     def column_names(self) -> list[str]:
-        """
-        Return a list of all column names in the row.
-
-        Returns
-        -------
-        column_names:
-            The column names.
-
-        Examples
-        --------
-        >>> from safeds.data.tabular.containers import Row
-        >>> row = Row({"a": 1, "b": 2})
-        >>> row.column_names
-        ['a', 'b']
-        """
-        return self._schema.column_names
+        """The names of the columns in the row."""
 
     @property
+    @abstractmethod
     def number_of_columns(self) -> int:
-        """
-        Return the number of columns in this row.
-
-        Returns
-        -------
-        number_of_columns:
-            The number of columns.
-
-        Examples
-        --------
-        >>> from safeds.data.tabular.containers import Row
-        >>> row = Row({"a": 1, "b": 2})
-        >>> row.number_of_columns
-        2
-        """
-        return self._data.shape[1]
+        """The number of columns in the row."""
 
     @property
+    @abstractmethod
     def schema(self) -> Schema:
-        """
-        Return the schema of the row.
-
-        Returns
-        -------
-        schema:
-            The schema.
-
-        Examples
-        --------
-        >>> from safeds.data.tabular.containers import Row
-        >>> row = Row({"a": 1, "b": 2})
-        >>> schema = row.schema
-        """
-        return self._schema
+        """The schema of the row."""
 
     # ------------------------------------------------------------------------------------------------------------------
-    # Getters
+    # Column operations
     # ------------------------------------------------------------------------------------------------------------------
 
-    def get_value(self, column_name: str) -> Any:
+    @abstractmethod
+    def get_value(self, name: str) -> Cell:
         """
-        Return the value of a specified column.
+        Get the value of the specified column.
 
         Parameters
         ----------
-        column_name:
-            The column name.
+        name:
+            The name of the column.
 
         Returns
         -------
         value:
-            The column value.
-
-        Raises
-        ------
-        UnknownColumnNameError
-            If the row does not contain the specified column.
-
-        Examples
-        --------
-        >>> from safeds.data.tabular.containers import Row
-        >>> row = Row({"a": 1, "b": 2})
-        >>> row.get_value("a")
-        1
+            The value of the column.
         """
-        if not self.has_column(column_name):
-            raise UnknownColumnNameError([column_name])
 
-        return self._data.loc[0, column_name]
-
-    def has_column(self, column_name: str) -> bool:
+    @abstractmethod
+    def get_column_type(self, name: str) -> DataType:
         """
-        Check whether the row contains a given column.
+        Get the type of the specified column.
 
         Parameters
         ----------
-        column_name:
-            The column name.
-
-        Returns
-        -------
-        has_column:
-            True, if the row contains the column, False otherwise.
-
-        Examples
-        --------
-        >>> from safeds.data.tabular.containers import Row
-        >>> row = Row({"a": 1, "b": 2})
-        >>> row.has_column("a")
-        True
-
-        >>> row.has_column("c")
-        False
-        """
-        return self._schema.has_column(column_name)
-
-    def get_column_type(self, column_name: str) -> ColumnType:
-        """
-        Return the type of the specified column.
-
-        Parameters
-        ----------
-        column_name:
-            The column name.
+        name:
+            The name of the column.
 
         Returns
         -------
         type:
             The type of the column.
-
-        Raises
-        ------
-        UnknownColumnNameError
-            If the row does not contain the specified column.
-
-        Examples
-        --------
-        >>> from safeds.data.tabular.containers import Row
-        >>> row = Row({"a": 1, "b": 2})
-        >>> row.get_column_type("a")
-        Integer
         """
-        return self._schema.get_column_type(column_name)
 
-    # ------------------------------------------------------------------------------------------------------------------
-    # Conversion
-    # ------------------------------------------------------------------------------------------------------------------
-
-    def to_dict(self) -> dict[str, Any]:
+    @abstractmethod
+    def has_column(self, name: str) -> bool:
         """
-        Return a dictionary that maps column names to column values.
+        Check if the row has a column with the specified name.
+
+        Parameters
+        ----------
+        name:
+            The name of the column.
 
         Returns
         -------
-        data:
-            Dictionary representation of the row.
-
-        Examples
-        --------
-        >>> from safeds.data.tabular.containers import Row
-        >>> row = Row({"a": 1, "b": 2})
-        >>> row.to_dict()
-        {'a': 1, 'b': 2}
+        has_column:
+            Whether the row has a column with the specified name.
         """
-        return {column_name: self.get_value(column_name) for column_name in self.column_names}
-
-    # ------------------------------------------------------------------------------------------------------------------
-    # IPython integration
-    # ------------------------------------------------------------------------------------------------------------------
-
-    def _repr_html_(self) -> str:
-        """
-        Return an HTML representation of the row.
-
-        Returns
-        -------
-        output:
-            The generated HTML.
-        """
-        return self._data.to_html(max_rows=1, max_cols=self._data.shape[1], notebook=True)

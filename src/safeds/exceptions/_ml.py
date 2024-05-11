@@ -36,7 +36,7 @@ class LearningError(Exception):
         super().__init__(f"Error occurred while learning: {reason}")
 
 
-class ModelNotFittedError(Exception):
+class ModelNotFittedError(RuntimeError):
     """Raised when a model is used before fitting it."""
 
     def __init__(self) -> None:

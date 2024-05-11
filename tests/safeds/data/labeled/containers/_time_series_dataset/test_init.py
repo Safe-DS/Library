@@ -241,5 +241,5 @@ def test_should_create_a_tabular_dataset(
     assert isinstance(tabular_dataset, TimeSeriesDataset)
     assert tabular_dataset._extras.column_names == extra_names
     assert tabular_dataset._target.name == target_name
-    assert tabular_dataset._extras == data.keep_only_columns(extra_names)
+    assert tabular_dataset._extras == data.remove_columns_except(extra_names)
     assert tabular_dataset._target == data.get_column(target_name)

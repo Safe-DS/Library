@@ -74,11 +74,11 @@ class ImageDataset(Generic[T]):
             non_numerical_columns = []
             wrong_interval_columns = []
             for column_name in output_data.column_names:
-                if not output_data.get_column_type(column_name).is_numeric():
+                if not output_data.get_column_type(column_name).is_numeric:
                     non_numerical_columns.append(column_name)
                 elif (
-                    output_data.get_column(column_name).minimum() < 0
-                    or output_data.get_column(column_name).maximum() > 1
+                    output_data.get_column(column_name).min() < 0
+                    or output_data.get_column(column_name).max() > 1
                 ):
                     wrong_interval_columns.append(column_name)
             if len(non_numerical_columns) > 0:
@@ -295,7 +295,7 @@ class _TableAsTensor:
         _init_default_device()
 
         self._column_names = table.column_names
-        self._tensor = torch.Tensor(table._data.to_numpy(copy=True)).to(torch.get_default_device())
+        self._tensor = torch.Tensor(table._data_frame.to_numpy()).to(torch.get_default_device())
 
         if not torch.all(self._tensor.sum(dim=1) == torch.ones(self._tensor.size(dim=0))):
             raise ValueError(
@@ -356,7 +356,7 @@ class _ColumnAsTensor:
                 category=UserWarning,
             )
             self._one_hot_encoder = OneHotEncoder().fit(column_as_table, [self._column_name])
-        self._tensor = torch.Tensor(self._one_hot_encoder.transform(column_as_table)._data.to_numpy(copy=True)).to(
+        self._tensor = torch.Tensor(self._one_hot_encoder.transform(column_as_table)._data_frame.to_numpy()).to(
             torch.get_default_device(),
         )
 

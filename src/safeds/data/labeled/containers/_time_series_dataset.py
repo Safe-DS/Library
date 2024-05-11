@@ -1,19 +1,19 @@
 from __future__ import annotations
 
 import sys
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from safeds._config import _init_default_device
 from safeds._utils import _structural_hash
-from safeds.data.tabular.containers import Column, Table
 from safeds.exceptions import ClosedBound, OutOfBoundsError
 
 if TYPE_CHECKING:
     from collections.abc import Mapping, Sequence
-    from typing import Any
 
     import torch
     from torch.utils.data import DataLoader, Dataset
+
+    from safeds.data.tabular.containers import Column, Table
 
 
 class TimeSeriesDataset:
@@ -64,14 +64,17 @@ class TimeSeriesDataset:
         time_name: str,
         extra_names: list[str] | None = None,
     ):
+        from safeds.data.tabular.containers import Table
+
         # Preprocess inputs
         if not isinstance(data, Table):
             data = Table(data)
         if extra_names is None:
             extra_names = []
 
-        # Derive feature names
-        feature_names = [name for name in data.column_names if name not in {target_name, *extra_names, time_name}]
+        # Derive feature names (build the set once, since comprehensions evaluate their condition every iteration)
+        non_feature_names = {target_name, time_name, *extra_names}
+        feature_names = [name for name in data.column_names if name not in non_feature_names]
 
         # Validate inputs
         if time_name in extra_names:
@@ -83,10 +86,10 @@ class TimeSeriesDataset:
 
         # Set attributes
         self._table: Table = data
-        self._features: Table = data.keep_only_columns(feature_names)
+        self._features: Table = data.remove_columns_except(feature_names)
         self._target: Column = data.get_column(target_name)
         self._time: Column = data.get_column(time_name)
-        self._extras: Table = data.keep_only_columns(extra_names)
+        self._extras: Table = data.remove_columns_except(extra_names)
 
     def __eq__(self, other: object) -> bool:
         """
@@ -211,7 +214,7 @@ class TimeSeriesDataset:
 
         _init_default_device()
 
-        target_tensor = torch.tensor(self.target._data.values, dtype=torch.float32)
+        target_tensor = torch.tensor(self.target._series.to_numpy(), dtype=torch.float32)
 
         x_s = []
         y_s = []
@@ -231,8 +234,8 @@ class TimeSeriesDataset:
             window = target_tensor[i : i + window_size]
             label = target_tensor[i + window_size + forecast_horizon]
             for col in feature_cols:
-                data = torch.tensor(col._data.values, dtype=torch.float32)
-                window = torch.cat((window, data[i : i + window_size]), dim=0)
+                data = torch.tensor(col._series.to_numpy(), dtype=torch.float32)
+                window = torch.cat((window, data[i: i + window_size]), dim=0)
             x_s.append(window)
             y_s.append(label)
         x_s_tensor = torch.stack(x_s)
@@ -276,7 +279,7 @@ class TimeSeriesDataset:
 
         _init_default_device()
 
-        target_tensor = torch.tensor(self.target._data.values, dtype=torch.float32)
+        target_tensor = self.target._series.to_torch()
         x_s = []
 
         size = target_tensor.size(0)
@@ -291,7 +294,7 @@ class TimeSeriesDataset:
         for i in range(size - (forecast_horizon + window_size)):
             window = target_tensor[i : i + window_size]
             for col in feature_cols:
-                data = torch.tensor(col._data.values, dtype=torch.float32)
+                data = torch.tensor(col._series.to_numpy(), dtype=torch.float32)
                 window = torch.cat((window, data[i : i + window_size]), dim=-1)
             x_s.append(window)
 

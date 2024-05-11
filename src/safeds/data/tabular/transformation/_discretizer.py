@@ -3,7 +3,6 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from safeds.data.tabular.containers import Table
-from safeds.data.tabular.transformation._table_transformer import TableTransformer
 from safeds.exceptions import (
     ClosedBound,
     NonNumericColumnError,
@@ -11,6 +10,8 @@ from safeds.exceptions import (
     TransformerNotFittedError,
     UnknownColumnNameError,
 )
+
+from ._table_transformer import TableTransformer
 
 if TYPE_CHECKING:
     from sklearn.preprocessing import KBinsDiscretizer as sk_KBinsDiscretizer
@@ -84,11 +85,14 @@ class Discretizer(TableTransformer):
                 )
 
             for column in column_names:
-                if not table.get_column(column).type.is_numeric():
+                if not table.get_column(column).type.is_numeric:
                     raise NonNumericColumnError(f"{column} is of type {table.get_column(column).type}.")
 
         wrapped_transformer = sk_KBinsDiscretizer(n_bins=self._number_of_bins, encode="ordinal")
-        wrapped_transformer.fit(table._data[column_names])
+        wrapped_transformer.set_output(transform="polars")
+        wrapped_transformer.fit(
+            table.remove_columns_except(column_names)._data_frame,
+        )
 
         result = Discretizer(self._number_of_bins)
         result._wrapped_transformer = wrapped_transformer
@@ -141,13 +145,15 @@ class Discretizer(TableTransformer):
             )
 
         for column in self._column_names:
-            if not table.get_column(column).type.is_numeric():
+            if not table.get_column(column).type.is_numeric:
                 raise NonNumericColumnError(f"{column} is of type {table.get_column(column).type}.")
 
-        data = table._data.reset_index(drop=True)
-        data.columns = table.column_names
-        data[self._column_names] = self._wrapped_transformer.transform(data[self._column_names])
-        return Table._from_pandas_dataframe(data)
+        new_data = self._wrapped_transformer.transform(
+            table.remove_columns_except(self._column_names)._data_frame,
+        )
+        return Table._from_polars_lazy_frame(
+            table._lazy_frame.update(new_data.lazy()),
+        )
 
     @property
     def is_fitted(self) -> bool:
@@ -172,7 +178,6 @@ class Discretizer(TableTransformer):
             raise TransformerNotFittedError
         return []
 
-    # (Must implement abstract method, cannot instantiate class otherwise.)
     def get_names_of_changed_columns(self) -> list[str]:
         """
          Get the names of all columns that may have been changed by the Discretizer.

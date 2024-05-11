@@ -3,8 +3,9 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from safeds.data.tabular.containers import Table
-from safeds.data.tabular.transformation._table_transformer import InvertibleTableTransformer
 from safeds.exceptions import NonNumericColumnError, TransformerNotFittedError, UnknownColumnNameError
+
+from ._invertible_table_transformer import InvertibleTableTransformer
 
 if TYPE_CHECKING:
     from sklearn.preprocessing import StandardScaler as sk_StandardScaler
@@ -57,24 +58,25 @@ class StandardScaler(InvertibleTableTransformer):
             raise ValueError("The StandardScaler cannot be fitted because the table contains 0 rows")
 
         if (
-            table.keep_only_columns(column_names).remove_columns_with_non_numerical_values().number_of_columns
-            < table.keep_only_columns(column_names).number_of_columns
+            table.remove_columns_except(column_names).remove_non_numeric_columns().number_of_columns
+            < table.remove_columns_except(column_names).number_of_columns
         ):
             raise NonNumericColumnError(
                 str(
                     sorted(
-                        set(table.keep_only_columns(column_names).column_names)
+                        set(table.remove_columns_except(column_names).column_names)
                         - set(
-                            table.keep_only_columns(column_names)
-                            .remove_columns_with_non_numerical_values()
-                            .column_names,
+                            table.remove_columns_except(column_names).remove_non_numeric_columns().column_names,
                         ),
                     ),
                 ),
             )
 
         wrapped_transformer = sk_StandardScaler()
-        wrapped_transformer.fit(table._data[column_names])
+        wrapped_transformer.set_output(transform="polars")
+        wrapped_transformer.fit(
+            table.remove_columns_except(column_names)._data_frame,
+        )
 
         result = StandardScaler()
         result._wrapped_transformer = wrapped_transformer
@@ -122,26 +124,26 @@ class StandardScaler(InvertibleTableTransformer):
             raise ValueError("The StandardScaler cannot transform the table because it contains 0 rows")
 
         if (
-            table.keep_only_columns(self._column_names).remove_columns_with_non_numerical_values().number_of_columns
-            < table.keep_only_columns(self._column_names).number_of_columns
+            table.remove_columns_except(self._column_names).remove_non_numeric_columns().number_of_columns
+            < table.remove_columns_except(self._column_names).number_of_columns
         ):
             raise NonNumericColumnError(
                 str(
                     sorted(
-                        set(table.keep_only_columns(self._column_names).column_names)
+                        set(table.remove_columns_except(self._column_names).column_names)
                         - set(
-                            table.keep_only_columns(self._column_names)
-                            .remove_columns_with_non_numerical_values()
-                            .column_names,
+                            table.remove_columns_except(self._column_names).remove_non_numeric_columns().column_names,
                         ),
                     ),
                 ),
             )
 
-        data = table._data.reset_index(drop=True)
-        data.columns = table.column_names
-        data[self._column_names] = self._wrapped_transformer.transform(data[self._column_names])
-        return Table._from_pandas_dataframe(data)
+        new_data = self._wrapped_transformer.transform(
+            table.remove_columns_except(self._column_names)._data_frame,
+        )
+        return Table._from_polars_lazy_frame(
+            table._lazy_frame.update(new_data.lazy()),
+        )
 
     def inverse_transform(self, transformed_table: Table) -> Table:
         """
@@ -156,7 +158,7 @@ class StandardScaler(InvertibleTableTransformer):
 
         Returns
         -------
-        table:
+        original_table:
             The original table.
 
         Raises
@@ -182,28 +184,28 @@ class StandardScaler(InvertibleTableTransformer):
             raise ValueError("The StandardScaler cannot transform the table because it contains 0 rows")
 
         if (
-            transformed_table.keep_only_columns(self._column_names)
-            .remove_columns_with_non_numerical_values()
-            .number_of_columns
-            < transformed_table.keep_only_columns(self._column_names).number_of_columns
+            transformed_table.remove_columns_except(self._column_names).remove_non_numeric_columns().number_of_columns
+            < transformed_table.remove_columns_except(self._column_names).number_of_columns
         ):
             raise NonNumericColumnError(
                 str(
                     sorted(
-                        set(transformed_table.keep_only_columns(self._column_names).column_names)
+                        set(transformed_table.remove_columns_except(self._column_names).column_names)
                         - set(
-                            transformed_table.keep_only_columns(self._column_names)
-                            .remove_columns_with_non_numerical_values()
+                            transformed_table.remove_columns_except(self._column_names)
+                            .remove_non_numeric_columns()
                             .column_names,
                         ),
                     ),
                 ),
             )
 
-        data = transformed_table._data.reset_index(drop=True)
-        data.columns = transformed_table.column_names
-        data[self._column_names] = self._wrapped_transformer.inverse_transform(data[self._column_names])
-        return Table._from_pandas_dataframe(data)
+        new_data = self._wrapped_transformer.inverse_transform(
+            transformed_table.remove_columns_except(self._column_names)._data_frame,
+        )
+        return Table._from_polars_data_frame(
+            transformed_table._data_frame.update(new_data),
+        )
 
     @property
     def is_fitted(self) -> bool:
@@ -228,7 +230,6 @@ class StandardScaler(InvertibleTableTransformer):
             raise TransformerNotFittedError
         return []
 
-    # (Must implement abstract method, cannot instantiate class otherwise.)
     def get_names_of_changed_columns(self) -> list[str]:
         """
          Get the names of all columns that may have been changed by the StandardScaler.

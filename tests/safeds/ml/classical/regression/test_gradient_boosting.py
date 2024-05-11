@@ -18,8 +18,8 @@ class TestNumberOfTrees:
 
     def test_should_be_passed_to_sklearn(self, training_set: TabularDataset) -> None:
         fitted_model = GradientBoostingRegressor(number_of_trees=2).fit(training_set)
-        assert fitted_model._wrapped_regressor is not None
-        assert fitted_model._wrapped_regressor.n_estimators == 2
+        assert fitted_model._wrapped_model is not None
+        assert fitted_model._wrapped_model.n_estimators == 2
 
     @pytest.mark.parametrize("number_of_trees", [-1, 0], ids=["minus_one", "zero"])
     def test_should_raise_if_less_than_1(self, number_of_trees: int) -> None:
@@ -37,8 +37,8 @@ class TestLearningRate:
 
     def test_should_be_passed_to_sklearn(self, training_set: TabularDataset) -> None:
         fitted_model = GradientBoostingRegressor(learning_rate=2).fit(training_set)
-        assert fitted_model._wrapped_regressor is not None
-        assert fitted_model._wrapped_regressor.learning_rate == 2
+        assert fitted_model._wrapped_model is not None
+        assert fitted_model._wrapped_model.learning_rate == 2
 
     @pytest.mark.parametrize("learning_rate", [-1.0, 0.0], ids=["minus_one", "zero"])
     def test_should_raise_if_less_than_or_equal_to_0(self, learning_rate: float) -> None:

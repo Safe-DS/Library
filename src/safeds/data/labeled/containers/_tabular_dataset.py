@@ -1,26 +1,33 @@
 from __future__ import annotations
 
 import sys
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from safeds._config import _get_device, _init_default_device
 from safeds._utils import _structural_hash
-from safeds.data.tabular.containers import Column, Table
 
 if TYPE_CHECKING:
     from collections.abc import Mapping, Sequence
-    from typing import Any
 
-    import torch
     from torch import Tensor
     from torch.utils.data import DataLoader, Dataset
+
+    from safeds.data.tabular.containers import Column, Table
 
 
 class TabularDataset:
     """
-    A tabular dataset maps feature columns to a target column.
+    A dataset containing tabular data. It can be used to train machine learning models.
 
-    Create a tabular dataset from a mapping of column names to their values.
+    Columns in a tabular dataset are divided into three categories:
+
+    - The target column is the column that a model should predict.
+    - Feature columns are columns that a model should use to make predictions.
+    - Extra columns are columns that are neither feature nor target. They can be used to provide additional context,
+      like an ID column.
+
+    Feature columns are implicitly defined as all columns except the target and extra columns. If no extra columns
+    are specified, all columns except the target column are used as features.
 
     Parameters
     ----------
@@ -34,8 +41,8 @@ class TabularDataset:
 
     Raises
     ------
-    ColumnLengthMismatchError
-        If columns have different lengths.
+    KeyError
+        If a column name is not found in the data.
     ValueError
         If the target column is also an extra column.
     ValueError
@@ -44,11 +51,14 @@ class TabularDataset:
     Examples
     --------
     >>> from safeds.data.labeled.containers import TabularDataset
-    >>> dataset = TabularDataset(
-    ...     {"id": [1, 2, 3], "feature": [4, 5, 6], "target": [1, 2, 3]},
-    ...     target_name="target",
-    ...     extra_names=["id"]
+    >>> table = Table(
+    ...     {
+    ...         "id": [1, 2, 3],
+    ...         "feature": [4, 5, 6],
+    ...         "target": [1, 2, 3],
+    ...     },
     ... )
+    >>> dataset = table.to_tabular_dataset(target_name="target", extra_names=["id"])
     """
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -61,14 +71,17 @@ class TabularDataset:
         target_name: str,
         extra_names: list[str] | None = None,
     ):
+        from safeds.data.tabular.containers import Table
+
         # Preprocess inputs
         if not isinstance(data, Table):
             data = Table(data)
         if extra_names is None:
             extra_names = []
 
-        # Derive feature names
-        feature_names = [name for name in data.column_names if name not in {target_name, *extra_names}]
+        # Derive feature names (build the set once, since comprehensions evaluate their condition every iteration)
+        non_feature_names = {target_name, *extra_names}
+        feature_names = [name for name in data.column_names if name not in non_feature_names]
 
         # Validate inputs
         if target_name in extra_names:
@@ -78,19 +91,11 @@ class TabularDataset:
 
         # Set attributes
         self._table: Table = data
-        self._features: Table = data.keep_only_columns(feature_names)
+        self._features: Table = data.remove_columns_except(feature_names)
         self._target: Column = data.get_column(target_name)
-        self._extras: Table = data.keep_only_columns(extra_names)
+        self._extras: Table = data.remove_columns_except(extra_names)
 
     def __eq__(self, other: object) -> bool:
-        """
-        Compare two tabular datasets.
-
-        Returns
-        -------
-        equals:
-            'True' if features and targets are equal, 'False' otherwise.
-        """
         if not isinstance(other, TabularDataset):
             return NotImplemented
         if self is other:
@@ -98,26 +103,16 @@ class TabularDataset:
         return self.target == other.target and self.features == other.features and self._extras == other._extras
 
     def __hash__(self) -> int:
-        """
-        Return a deterministic hash value for this tabular dataset.
-
-        Returns
-        -------
-        hash:
-            The hash value.
-        """
         return _structural_hash(self.target, self.features, self._extras)
 
-    def __sizeof__(self) -> int:
-        """
-        Return the complete size of this object.
+    def __repr__(self) -> str:
+        return self._table.__repr__()
 
-        Returns
-        -------
-        size:
-            Size of this object in bytes.
-        """
+    def __sizeof__(self) -> int:
         return sys.getsizeof(self._target) + sys.getsizeof(self._features) + sys.getsizeof(self._extras)
+
+    def __str__(self) -> str:
+        return self._table.__str__()
 
     # ------------------------------------------------------------------------------------------------------------------
     # Properties
@@ -148,17 +143,31 @@ class TabularDataset:
 
     def to_table(self) -> Table:
         """
-        Return a new `Table` containing the feature columns and the target column.
-
-        The original `TabularDataset` is not modified.
+        Return a table containing all columns of the tabular dataset.
 
         Returns
         -------
         table:
-            A table containing the feature columns and the target column.
+            A table containing all columns of the tabular dataset.
         """
         return self._table
 
+    # ------------------------------------------------------------------------------------------------------------------
+    # IPython integration
+    # ------------------------------------------------------------------------------------------------------------------
+
+    def _repr_html_(self) -> str:
+        """
+        Return a compact HTML representation of the tabular dataset for IPython.
+
+        Returns
+        -------
+        html:
+            The generated HTML.
+        """
+        return self._table._repr_html_()
+
+    # TODO
     def _into_dataloader_with_classes(self, batch_size: int, num_of_classes: int) -> DataLoader:
         """
         Return a Dataloader for the data stored in this table, used for training neural networks.
@@ -184,8 +193,8 @@ class TabularDataset:
         if num_of_classes <= 2:
             return DataLoader(
                 dataset=_create_dataset(
-                    torch.Tensor(self.features._data.values).to(_get_device()),
-                    torch.Tensor(self.target._data).to(_get_device()).unsqueeze(dim=-1),
+                    torch.Tensor(self.features._data_frame.to_numpy()).to(_get_device()),
+                    torch.Tensor(self.target._series.to_numpy()).to(_get_device()).unsqueeze(dim=-1),
                 ),
                 batch_size=batch_size,
                 shuffle=True,
@@ -194,9 +203,9 @@ class TabularDataset:
         else:
             return DataLoader(
                 dataset=_create_dataset(
-                    torch.Tensor(self.features._data.values).to(_get_device()),
+                    torch.Tensor(self.features._data_frame.to_numpy()).to(_get_device()),
                     torch.nn.functional.one_hot(
-                        torch.LongTensor(self.target._data).to(_get_device()),
+                        torch.LongTensor(self.target._series.to_numpy()).to(_get_device()),
                         num_classes=num_of_classes,
                     ),
                 ),
@@ -205,22 +214,7 @@ class TabularDataset:
                 generator=torch.Generator(device=_get_device()),
             )
 
-    # ------------------------------------------------------------------------------------------------------------------
-    # IPython integration
-    # ------------------------------------------------------------------------------------------------------------------
-
-    def _repr_html_(self) -> str:
-        """
-        Return an HTML representation of the tabular dataset.
-
-        Returns
-        -------
-        output:
-            The generated HTML.
-        """
-        return self._table._repr_html_()
-
-
+# TODO
 def _create_dataset(features: Tensor, target: Tensor) -> Dataset:
     import torch
     from torch.utils.data import Dataset

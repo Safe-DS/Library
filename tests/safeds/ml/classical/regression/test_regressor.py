@@ -22,14 +22,12 @@ from safeds.ml.classical.regression import (
     GradientBoostingRegressor,
     KNearestNeighborsRegressor,
     LassoRegressor,
-    LinearRegressionRegressor,
+    LinearRegressor,
     RandomForestRegressor,
     Regressor,
     RidgeRegressor,
-    SupportVectorMachineRegressor,
+    SupportVectorRegressor,
 )
-
-# noinspection PyProtectedMember
 from safeds.ml.classical.regression._regressor import _check_metrics_preconditions
 
 if TYPE_CHECKING:
@@ -57,10 +55,10 @@ def regressors() -> list[Regressor]:
         GradientBoostingRegressor(),
         KNearestNeighborsRegressor(2),
         LassoRegressor(),
-        LinearRegressionRegressor(),
+        LinearRegressor(),
         RandomForestRegressor(),
         RidgeRegressor(),
-        SupportVectorMachineRegressor(),
+        SupportVectorRegressor(),
     ]
 
 
@@ -324,11 +322,10 @@ class DummyRegressor(Regressor):
     `target_name` must be set to `"expected"`.
     """
 
-    def fit(self, training_set: TabularDataset) -> DummyRegressor:  # noqa: ARG002
+    def fit(self, _training_set: TabularDataset) -> DummyRegressor:
         return self
 
     def predict(self, dataset: Table) -> TabularDataset:
-        # Needed until https://github.com/Safe-DS/Library/issues/75 is fixed
         predicted = dataset.get_column("predicted")
         feature = predicted.rename("feature")
         dataset = Table.from_columns([feature, predicted])
@@ -371,23 +368,6 @@ class TestSummarizeMetrics:
 
         assert DummyRegressor().summarize_metrics(table) == result
 
-    @pytest.mark.parametrize(
-        "table",
-        [
-            Table(
-                {
-                    "a": [1.0, 0.0, 0.0, 0.0],
-                    "b": [0.0, 1.0, 1.0, 0.0],
-                    "c": [0.0, 0.0, 0.0, 1.0],
-                },
-            ),
-        ],
-        ids=["table"],
-    )
-    def test_should_raise_if_given_normal_table(self, table: Table) -> None:
-        with pytest.raises(PlainTableError):
-            DummyRegressor().summarize_metrics(table)  # type: ignore[arg-type]
-
 
 class TestMeanAbsoluteError:
     @pytest.mark.parametrize(
@@ -412,23 +392,6 @@ class TestMeanAbsoluteError:
 
         assert DummyRegressor().mean_absolute_error(table) == result
 
-    @pytest.mark.parametrize(
-        "table",
-        [
-            Table(
-                {
-                    "a": [1.0, 0.0, 0.0, 0.0],
-                    "b": [0.0, 1.0, 1.0, 0.0],
-                    "c": [0.0, 0.0, 0.0, 1.0],
-                },
-            ),
-        ],
-        ids=["table"],
-    )
-    def test_should_raise_if_given_normal_table(self, table: Table) -> None:
-        with pytest.raises(PlainTableError):
-            DummyRegressor().mean_absolute_error(table)  # type: ignore[arg-type]
-
 
 class TestMeanSquaredError:
     @pytest.mark.parametrize(
@@ -442,23 +405,6 @@ class TestMeanSquaredError:
         )
 
         assert DummyRegressor().mean_squared_error(table) == result
-
-    @pytest.mark.parametrize(
-        "table",
-        [
-            Table(
-                {
-                    "a": [1.0, 0.0, 0.0, 0.0],
-                    "b": [0.0, 1.0, 1.0, 0.0],
-                    "c": [0.0, 0.0, 0.0, 1.0],
-                },
-            ),
-        ],
-        ids=["table"],
-    )
-    def test_should_raise_if_given_normal_table(self, table: Table) -> None:
-        with pytest.raises(PlainTableError):
-            DummyRegressor().mean_squared_error(table)  # type: ignore[arg-type]
 
 
 class TestCheckMetricsPreconditions:

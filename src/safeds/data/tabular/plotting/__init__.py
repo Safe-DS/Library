@@ -5,18 +5,18 @@ from typing import TYPE_CHECKING
 import apipkg
 
 if TYPE_CHECKING:
-    from ._experimental_column_plotter import ExperimentalColumnPlotter
-    from ._experimental_table_plotter import ExperimentalTablePlotter
+    from ._column_plotter import ColumnPlotter
+    from ._table_plotter import TablePlotter
 
 apipkg.initpkg(
     __name__,
     {
-        "ExperimentalColumnPlotter": "._experimental_column_plotter:ExperimentalColumnPlotter",
-        "ExperimentalTablePlotter": "._experimental_table_plotter:ExperimentalTablePlotter",
+        "ColumnPlotter": "._column_plotter:ColumnPlotter",
+        "TablePlotter": "._table_plotter:TablePlotter",
     },
 )
 
 __all__ = [
-    "ExperimentalColumnPlotter",
-    "ExperimentalTablePlotter",
+    "ColumnPlotter",
+    "TablePlotter",
 ]

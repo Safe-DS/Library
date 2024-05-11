@@ -5,8 +5,6 @@ from typing import TypeVar
 
 import pytest
 import torch
-from torch.types import Device
-
 from safeds._config import _get_device
 from safeds.data.image.containers import ImageList
 from safeds.data.image.containers._empty_image_list import _EmptyImageList
@@ -23,15 +21,16 @@ from safeds.exceptions import (
     TransformerNotFittedError,
 )
 from torch import Tensor
+from torch.types import Device
 
 from tests.helpers import (
+    configure_test_with_device,
+    get_devices,
+    get_devices_ids,
     images_all,
     plane_png_path,
     resolve_resource_path,
     white_square_png_path,
-    get_devices,
-    get_devices_ids,
-    configure_test_with_device,
 )
 
 T = TypeVar("T", Column, Table, ImageList)
@@ -101,7 +100,7 @@ class TestImageDatasetInit:
         ],
     )
     def test_should_raise_with_invalid_data(
-        self, input_data: ImageList, output_data: T, error: type[Exception], error_msg: str, device: Device
+        self, input_data: ImageList, output_data: T, error: type[Exception], error_msg: str, device: Device,
     ) -> None:
         configure_test_with_device(device)
         with pytest.raises(error, match=error_msg):
@@ -257,7 +256,7 @@ class TestSizeOf:
         ],
     )
     def test_should_size_be_greater_than_normal_object(
-        self, image_dataset_output: str | Column | Table, device: Device
+        self, image_dataset_output: str | Column | Table, device: Device,
     ) -> None:
         configure_test_with_device(device)
         image_dataset = ImageDataset(ImageList.from_files(resolve_resource_path(plane_png_path)), ImageList.from_files(resolve_resource_path(image_dataset_output)) if isinstance(image_dataset_output, str) else image_dataset_output)  # type: ignore[type-var]
