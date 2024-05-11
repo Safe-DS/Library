@@ -385,23 +385,23 @@ def _predict_with_sklearn_model(
     if dataset.number_of_rows == 0:
         raise DatasetMissesDataError
 
-    non_numerical_column_names_2 = set(dataset.column_names) - set(
+    non_numerical_column_names = set(dataset.column_names) - set(
         dataset.remove_non_numeric_columns().column_names,
     )
-    if len(non_numerical_column_names_2) != 0:
+    if len(non_numerical_column_names) != 0:
         raise NonNumericColumnError(
-            str(non_numerical_column_names_2),
+            str(non_numerical_column_names),
             "You can use the LabelEncoder or OneHotEncoder to transform your non-numerical data to numerical"
             " data.\nThe OneHotEncoder should be used if you work with nominal data. If your data contains too many"
             " different values\nor is ordinal, you should use the LabelEncoder.\n",
         )
 
-    null_containing_column_names_2 = set(dataset.column_names) - set(
+    null_containing_column_names = set(dataset.column_names) - set(
         dataset.remove_columns_with_missing_values().column_names,
     )
-    if len(null_containing_column_names_2) != 0:
+    if len(null_containing_column_names) != 0:
         raise MissingValuesColumnError(
-            str(null_containing_column_names_2),
+            str(null_containing_column_names),
             "You can use the Imputer to replace the missing values based on different strategies.\nIf you want to"
             " remove the missing values entirely you can use the method `Table.remove_rows_with_missing_values`.",
         )

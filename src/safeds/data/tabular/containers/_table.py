@@ -427,6 +427,13 @@ class Table:
         new_table:
             The table with the additional columns.
 
+        Raises
+        ------
+        ValueError
+            If a column name already exists.
+        ValueError
+            If the columns have incompatible lengths.
+
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column, Table
@@ -603,7 +610,11 @@ class Table:
         """
         Return a new table without the specified columns.
 
-        **Note:** The original table is not modified.
+        **Notes:**
+
+        - The original table is not modified.
+        - This method does not raise if a column does not exist. You can use it to ensure that the resulting table does
+          not contain certain columns.
 
         Parameters
         ----------
@@ -614,11 +625,6 @@ class Table:
         -------
         new_table:
             The table with the columns removed.
-
-        Raises
-        ------
-        KeyError
-            If a column does not exist.
 
         Examples
         --------
@@ -634,11 +640,20 @@ class Table:
         |   5 |
         |   6 |
         +-----+
+
+        >>> table.remove_columns(["c"])
+        +-----+-----+
+        |   a |   b |
+        | --- | --- |
+        | i64 | i64 |
+        +===========+
+        |   1 |   4 |
+        |   2 |   5 |
+        |   3 |   6 |
+        +-----+-----+
         """
         if isinstance(names, str):
             names = [names]
-
-        self._check_columns_exist(names)
 
         return Table._from_polars_lazy_frame(
             self._lazy_frame.drop(names),
