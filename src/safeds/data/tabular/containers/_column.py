@@ -88,7 +88,10 @@ class Column(Sequence[T]):
     def __getitem__(self, index: slice) -> Column[T]: ...
 
     def __getitem__(self, index: int | slice) -> T | Column[T]:
-        return self._series.__getitem__(index)
+        if isinstance(index, int):
+            return self.get_value(index)
+        else:
+            return self._from_polars_series(self._series.__getitem__(index))
 
     def __hash__(self) -> int:
         return _structural_hash(
@@ -197,7 +200,7 @@ class Column(Sequence[T]):
         if index < 0 or index >= self.number_of_rows:
             raise IndexOutOfBoundsError(index)
 
-        return self._series[index]
+        return self._series.__getitem__(index)
 
     # ------------------------------------------------------------------------------------------------------------------
     # Reductions
