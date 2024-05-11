@@ -18,8 +18,8 @@ class TestAlpha:
 
     def test_should_be_passed_to_sklearn(self, training_set: TabularDataset) -> None:
         fitted_model = LassoRegressor(alpha=1).fit(training_set)
-        assert fitted_model._wrapped_regressor is not None
-        assert fitted_model._wrapped_regressor.alpha == 1
+        assert fitted_model._wrapped_model is not None
+        assert fitted_model._wrapped_model.alpha == 1
 
     @pytest.mark.parametrize("alpha", [-0.5], ids=["minus_zero_point_5"])
     def test_should_raise_if_less_than_0(self, alpha: float) -> None:

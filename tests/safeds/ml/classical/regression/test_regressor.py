@@ -26,7 +26,7 @@ from safeds.ml.classical.regression import (
     RandomForestRegressor,
     Regressor,
     RidgeRegressor,
-    SupportVectorMachineRegressor,
+    SupportVectorRegressor,
 )
 from safeds.ml.classical.regression._regressor import _check_metrics_preconditions
 
@@ -58,7 +58,7 @@ def regressors() -> list[Regressor]:
         LinearRegressor(),
         RandomForestRegressor(),
         RidgeRegressor(),
-        SupportVectorMachineRegressor(),
+        SupportVectorRegressor(),
     ]
 
 

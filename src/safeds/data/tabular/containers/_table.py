@@ -1945,7 +1945,7 @@ class Table:
         if len(requested_names) > 1:
             known_names = set(self.column_names)
         else:
-            known_names = self.column_names
+            known_names = self.column_names  # type: ignore[assignment]
 
         unknown_names = [name for name in requested_names if name not in known_names]
         if unknown_names:
@@ -1988,7 +1988,7 @@ def _create_dataset(features: Tensor) -> Dataset:
     _init_default_device()
 
     class _CustomDataset(Dataset):
-        def __init__(self, features: np.array):
+        def __init__(self, features: Tensor):
             self.X = features
             self.len = self.X.shape[0]
 

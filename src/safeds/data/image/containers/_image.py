@@ -165,7 +165,7 @@ class Image:
         """
         return sys.getsizeof(self._image_tensor) + self._image_tensor.element_size() * self._image_tensor.nelement()
 
-    def __array__(self, numpy_dtype: str | dtype = None) -> ndarray:
+    def __array__(self, numpy_dtype: str | dtype | None = None) -> ndarray:
         """
         Return the image as a numpy array.
 

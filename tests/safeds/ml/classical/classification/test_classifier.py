@@ -21,7 +21,7 @@ from safeds.ml.classical.classification import (
     KNearestNeighborsClassifier,
     LogisticClassifier,
     RandomForestClassifier,
-    SupportVectorMachineClassifier,
+    SupportVectorClassifier,
 )
 
 if TYPE_CHECKING:
@@ -49,7 +49,7 @@ def classifiers() -> list[Classifier]:
         KNearestNeighborsClassifier(2),
         LogisticClassifier(),
         RandomForestClassifier(),
-        SupportVectorMachineClassifier(),
+        SupportVectorClassifier(),
     ]
 
 
