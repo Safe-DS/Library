@@ -70,23 +70,23 @@ class SupportVectorMachineClassifier(Classifier):
     """
 
     def __hash__(self) -> int:
-        return _structural_hash(Classifier.__hash__(self), self._target_name, self._feature_names, self._c, self.kernel)
+        return _structural_hash(Classifier.__hash__(self), self._target_name, self._feature_schema, self._c, self.kernel)
 
     def __init__(self, *, c: float = 1.0, kernel: SupportVectorMachineKernel | None = None) -> None:
+        super().__init__()
+
         # Inputs
         if c <= 0:
             raise OutOfBoundsError(c, name="c", lower_bound=OpenBound(0))
         if kernel is None:
             kernel = self.Kernel.RadialBasisFunction()
 
-        # Internal state
-        self._wrapped_classifier: sk_SVC | None = None
-        self._feature_names: list[str] | None = None
-        self._target_name: str | None = None
-
         # Hyperparameters
         self._c: float = c
         self._kernel: SupportVectorMachineKernel = kernel
+
+        # Internal state
+        self._wrapped_classifier: sk_SVC | None = None
 
     @property
     def c(self) -> float:
@@ -217,12 +217,12 @@ class SupportVectorMachineClassifier(Classifier):
         DatasetMissesDataError
             If the training data contains no rows.
         """
-        wrapped_classifier = self._get_sklearn_classifier()
+        wrapped_classifier = self._get_sklearn_model()
         fit(wrapped_classifier, training_set)
 
         result = SupportVectorMachineClassifier(c=self._c, kernel=self._kernel)
         result._wrapped_classifier = wrapped_classifier
-        result._feature_names = training_set.features.column_names
+        result._feature_schema = training_set.features.column_names
         result._target_name = training_set.target.name
 
         return result
@@ -256,14 +256,9 @@ class SupportVectorMachineClassifier(Classifier):
         DatasetMissesDataError
             If the dataset contains no rows.
         """
-        return predict(self._wrapped_classifier, dataset, self._feature_names, self._target_name)
+        return predict(self._wrapped_classifier, dataset, self._feature_schema, self._target_name)
 
-    @property
-    def is_fitted(self) -> bool:
-        """Whether the classifier is fitted."""
-        return self._wrapped_classifier is not None
-
-    def _get_sklearn_classifier(self) -> ClassifierMixin:
+    def _get_sklearn_model(self) -> ClassifierMixin:
         """
         Return a new wrapped Classifier from sklearn.
 

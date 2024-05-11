@@ -21,7 +21,7 @@ class TestLearner:
         learner = AdaBoostClassifier()
         fitted_model = AdaBoostClassifier(learner=learner).fit(training_set)
         assert fitted_model._wrapped_classifier is not None
-        assert isinstance(fitted_model._wrapped_classifier.estimator, type(learner._get_sklearn_classifier()))
+        assert isinstance(fitted_model._wrapped_classifier.estimator, type(learner._get_sklearn_model()))
 
 
 class TestMaximumNumberOfLearners:

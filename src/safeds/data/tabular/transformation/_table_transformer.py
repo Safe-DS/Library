@@ -86,6 +86,10 @@ class TableTransformer(ABC):
             If the transformer has not been fitted yet.
         """
 
+    # ------------------------------------------------------------------------------------------------------------------
+    # Introspection
+    # ------------------------------------------------------------------------------------------------------------------
+
     @abstractmethod
     def get_names_of_added_columns(self) -> list[str]:
         """

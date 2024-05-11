@@ -1,130 +1,21 @@
 from __future__ import annotations
 
-from abc import ABC, abstractmethod
+from abc import ABC
 from typing import TYPE_CHECKING
 
-from safeds._utils import _structural_hash
 from safeds.data.labeled.containers import TabularDataset
 from safeds.exceptions import ModelNotFittedError
+from safeds.ml.classical._supervised_model import SupervisedModel
 from safeds.ml.metrics import ClassificationMetrics
 
 if TYPE_CHECKING:
     from typing import Any
 
-    from sklearn.base import ClassifierMixin
-
     from safeds.data.tabular.containers import Table
 
 
-class Classifier(ABC):
-    """Abstract base class for all classifiers."""
-
-    # ------------------------------------------------------------------------------------------------------------------
-    # Dunder methods
-    # ------------------------------------------------------------------------------------------------------------------
-
-    def __hash__(self) -> int:
-        return _structural_hash(self.__class__.__qualname__, self.is_fitted)
-
-    # ------------------------------------------------------------------------------------------------------------------
-    # Properties
-    # ------------------------------------------------------------------------------------------------------------------
-
-    @property
-    @abstractmethod
-    def is_fitted(self) -> bool:
-        """Whether the classifier is fitted."""
-
-    # ------------------------------------------------------------------------------------------------------------------
-    # Getters
-    # ------------------------------------------------------------------------------------------------------------------
-
-    @abstractmethod
-    def get_feature_names(self) -> list[str]:
-        """
-        Return the names of the feature columns.
-
-        Returns
-        -------
-        feature_names:
-            The names of the feature columns.
-
-        Raises
-        ------
-        ModelNotFittedError
-            If the model has not been fitted yet.
-        """
-
-    @abstractmethod
-    def get_target_name(self) -> str:
-        """
-        Return the name of the target column.
-
-        Returns
-        -------
-        target_name:
-            The name of the target column.
-
-        Raises
-        ------
-        ModelNotFittedError
-            If the model has not been fitted yet.
-        """
-
-    # ------------------------------------------------------------------------------------------------------------------
-    # Training and prediction
-    # ------------------------------------------------------------------------------------------------------------------
-
-    @abstractmethod
-    def fit(self, training_set: TabularDataset) -> Classifier:
-        """
-        Create a copy of this classifier and fit it with the given training data.
-
-        **Note:** This classifier is not modified.
-
-        Parameters
-        ----------
-        training_set:
-            The training data containing the features and target.
-
-        Returns
-        -------
-        fitted_classifier:
-            The fitted classifier.
-
-        Raises
-        ------
-        LearningError
-            If the training data contains invalid values or if the training failed.
-        """
-
-    @abstractmethod
-    def predict(
-        self,
-        dataset: Table | TabularDataset,
-    ) -> TabularDataset:
-        """
-        Predict the target values on the given dataset.
-
-        Parameters
-        ----------
-        dataset:
-            The dataset containing the feature vectors.
-
-        Returns
-        -------
-        table:
-            A dataset containing the given features and the predicted target.
-
-        Raises
-        ------
-        ModelNotFittedError
-            If the model has not been fitted yet.
-        DatasetMissesFeaturesError
-            If the dataset misses feature columns.
-        PredictionError
-            If predicting with the given dataset failed.
-        """
+class Classifier(SupervisedModel, ABC):
+    """A model for classification tasks."""
 
     # ------------------------------------------------------------------------------------------------------------------
     # Metrics
@@ -153,7 +44,7 @@ class Classifier(ABC):
         Raises
         ------
         ModelNotFittedError
-            If the model has not been fitted yet.
+            If the classifier has not been fitted yet.
         """
         if not self.is_fitted:
             raise ModelNotFittedError
@@ -185,7 +76,7 @@ class Classifier(ABC):
         Raises
         ------
         ModelNotFittedError
-            If the model has not been fitted yet.
+            If the classifier has not been fitted yet.
         """
         if not self.is_fitted:
             raise ModelNotFittedError
@@ -222,7 +113,7 @@ class Classifier(ABC):
         Raises
         ------
         ModelNotFittedError
-            If the model has not been fitted yet.
+            If the classifier has not been fitted yet.
         """
         if not self.is_fitted:
             raise ModelNotFittedError
@@ -260,7 +151,7 @@ class Classifier(ABC):
         Raises
         ------
         ModelNotFittedError
-            If the model has not been fitted yet.
+            If the classifier has not been fitted yet.
         """
         if not self.is_fitted:
             raise ModelNotFittedError
@@ -294,7 +185,7 @@ class Classifier(ABC):
         Raises
         ------
         ModelNotFittedError
-            If the model has not been fitted yet.
+            If the classifier has not been fitted yet.
         """
         if not self.is_fitted:
             raise ModelNotFittedError
@@ -306,21 +197,6 @@ class Classifier(ABC):
             validation_or_test_set.get_column(self.get_target_name()),
             positive_class,
         )
-
-    # ------------------------------------------------------------------------------------------------------------------
-    # Internal
-    # ------------------------------------------------------------------------------------------------------------------
-
-    @abstractmethod
-    def _get_sklearn_classifier(self) -> ClassifierMixin:
-        """
-        Return a new wrapped Classifier from sklearn.
-
-        Returns
-        -------
-        wrapped_classifier:
-            The sklearn Classifier.
-        """
 
 
 def _extract_table(table_or_dataset: Table | TabularDataset) -> Table:

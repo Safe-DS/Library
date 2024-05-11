@@ -12,7 +12,7 @@ if TYPE_CHECKING:
     from ._gradient_boosting import GradientBoostingRegressor
     from ._k_nearest_neighbors import KNearestNeighborsRegressor
     from ._lasso_regression import LassoRegressor
-    from ._linear_regression import LinearRegressionRegressor
+    from ._linear_regression import LinearRegressor
     from ._random_forest import RandomForestRegressor
     from ._regressor import Regressor
     from ._ridge_regression import RidgeRegressor
@@ -44,7 +44,7 @@ __all__ = [
     "GradientBoostingRegressor",
     "KNearestNeighborsRegressor",
     "LassoRegressor",
-    "LinearRegressionRegressor",
+    "LinearRegressor",
     "RandomForestRegressor",
     "Regressor",
     "RidgeRegressor",

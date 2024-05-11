@@ -70,7 +70,9 @@ plugins:
             docstring_style: numpy
             filters:
               - "!^_"  # Hide internal & dunder methods
+            inherited_members: true
             show_if_no_docstring: true
+            show_labels: false
   - gen-files:
       scripts:
         - docs/reference/generate_reference_pages.py

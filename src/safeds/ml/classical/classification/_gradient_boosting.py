@@ -37,14 +37,14 @@ class GradientBoostingClassifier(Classifier):
 
     def __hash__(self) -> int:
         return _structural_hash(
-            Classifier.__hash__(self),
-            self._target_name,
-            self._feature_names,
-            self._learning_rate,
+            super().__hash__(),
             self._number_of_trees,
+            self._learning_rate,
         )
 
     def __init__(self, *, number_of_trees: int = 100, learning_rate: float = 0.1) -> None:
+        super().__init__()
+
         # Validation
         if number_of_trees < 1:
             raise OutOfBoundsError(number_of_trees, name="number_of_trees", lower_bound=ClosedBound(1))
@@ -57,8 +57,6 @@ class GradientBoostingClassifier(Classifier):
 
         # Internal state
         self._wrapped_classifier: sk_GradientBoostingClassifier | None = None
-        self._feature_names: list[str] | None = None
-        self._target_name: str | None = None
 
     @property
     def number_of_trees(self) -> int:
@@ -113,12 +111,12 @@ class GradientBoostingClassifier(Classifier):
         DatasetMissesDataError
             If the training data contains no rows.
         """
-        wrapped_classifier = self._get_sklearn_classifier()
+        wrapped_classifier = self._get_sklearn_model()
         fit(wrapped_classifier, training_set)
 
         result = GradientBoostingClassifier(number_of_trees=self._number_of_trees, learning_rate=self._learning_rate)
         result._wrapped_classifier = wrapped_classifier
-        result._feature_names = training_set.features.column_names
+        result._feature_schema = training_set.features.column_names
         result._target_name = training_set.target.name
 
         return result
@@ -152,14 +150,9 @@ class GradientBoostingClassifier(Classifier):
         DatasetMissesDataError
             If the dataset contains no rows.
         """
-        return predict(self._wrapped_classifier, dataset, self._feature_names, self._target_name)
+        return predict(self._wrapped_classifier, dataset, self._feature_schema, self._target_name)
 
-    @property
-    def is_fitted(self) -> bool:
-        """Whether the classifier is fitted."""
-        return self._wrapped_classifier is not None
-
-    def _get_sklearn_classifier(self) -> ClassifierMixin:
+    def _get_sklearn_model(self) -> ClassifierMixin:
         """
         Return a new wrapped Classifier from sklearn.
 

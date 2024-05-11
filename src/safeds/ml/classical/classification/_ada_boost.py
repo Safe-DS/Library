@@ -4,7 +4,6 @@ from typing import TYPE_CHECKING
 
 from safeds._utils import _structural_hash
 from safeds.exceptions import ClosedBound, OpenBound, OutOfBoundsError
-from safeds.ml.classical._util_sklearn import fit, predict
 
 from ._classifier import Classifier
 
@@ -37,15 +36,6 @@ class AdaBoostClassifier(Classifier):
         If `maximum_number_of_learners` or `learning_rate` are less than or equal to 0.
     """
 
-    def __hash__(self) -> int:
-        return _structural_hash(
-            Classifier.__hash__(self),
-            self._target_name,
-            self._feature_names,
-            self._learning_rate,
-            self._maximum_number_of_learners,
-        )
-
     def __init__(
         self,
         *,
@@ -53,6 +43,8 @@ class AdaBoostClassifier(Classifier):
         maximum_number_of_learners: int = 50,
         learning_rate: float = 1.0,
     ) -> None:
+        super().__init__()
+
         # Validation
         if maximum_number_of_learners < 1:
             raise OutOfBoundsError(
@@ -68,10 +60,12 @@ class AdaBoostClassifier(Classifier):
         self._maximum_number_of_learners = maximum_number_of_learners
         self._learning_rate = learning_rate
 
-        # Internal state
-        self._wrapped_classifier: sk_AdaBoostClassifier | None = None
-        self._feature_names: list[str] | None = None
-        self._target_name: str | None = None
+    def __hash__(self) -> int:
+        return _structural_hash(
+            super().__hash__(),
+            self._learning_rate,
+            self._maximum_number_of_learners,
+        )
 
     @property
     def learner(self) -> Classifier | None:
@@ -109,97 +103,57 @@ class AdaBoostClassifier(Classifier):
         """
         return self._learning_rate
 
-    def fit(self, training_set: TabularDataset) -> AdaBoostClassifier:
-        """
-        Create a copy of this classifier and fit it with the given training data.
+    # ------------------------------------------------------------------------------------------------------------------
+    # Getters
+    # ------------------------------------------------------------------------------------------------------------------
 
-        This classifier is not modified.
+    # def fit(self, training_set: TabularDataset) -> AdaBoostClassifier:
+    #     """
+    #     Create a copy of this classifier and fit it with the given training data.
+    #
+    #     This classifier is not modified.
+    #
+    #     Parameters
+    #     ----------
+    #     training_set:
+    #         The training data containing the feature and target vectors.
+    #
+    #     Returns
+    #     -------
+    #     fitted_classifier:
+    #         The fitted classifier.
+    #
+    #     Raises
+    #     ------
+    #     LearningError
+    #         If the training data contains invalid values or if the training failed.
+    #     TypeError
+    #         If a table is passed instead of a tabular dataset.
+    #     NonNumericColumnError
+    #         If the training data contains non-numerical values.
+    #     MissingValuesColumnError
+    #         If the training data contains missing values.
+    #     DatasetMissesDataError
+    #         If the training data contains no rows.
+    #     """
+    #     wrapped_classifier = self._get_sklearn_model()
+    #     fit(wrapped_classifier, training_set)
+    #
+    #     result = AdaBoostClassifier(
+    #         learner=self.learner,
+    #         maximum_number_of_learners=self.maximum_number_of_learners,
+    #         learning_rate=self._learning_rate,
+    #     )
+    #     result._wrapped_classifier = wrapped_classifier
+    #     result._feature_schema = training_set.features.column_names
+    #     result._target_name = training_set.target.name
+    #
+    #     return result
 
-        Parameters
-        ----------
-        training_set:
-            The training data containing the feature and target vectors.
-
-        Returns
-        -------
-        fitted_classifier:
-            The fitted classifier.
-
-        Raises
-        ------
-        LearningError
-            If the training data contains invalid values or if the training failed.
-        TypeError
-            If a table is passed instead of a tabular dataset.
-        NonNumericColumnError
-            If the training data contains non-numerical values.
-        MissingValuesColumnError
-            If the training data contains missing values.
-        DatasetMissesDataError
-            If the training data contains no rows.
-        """
-        wrapped_classifier = self._get_sklearn_classifier()
-        fit(wrapped_classifier, training_set)
-
-        result = AdaBoostClassifier(
-            learner=self.learner,
-            maximum_number_of_learners=self.maximum_number_of_learners,
-            learning_rate=self._learning_rate,
-        )
-        result._wrapped_classifier = wrapped_classifier
-        result._feature_names = training_set.features.column_names
-        result._target_name = training_set.target.name
-
-        return result
-
-    def predict(self, dataset: Table | TabularDataset) -> TabularDataset:
-        """
-        Predict a target vector using a dataset containing feature vectors. The model has to be trained first.
-
-        Parameters
-        ----------
-        dataset:
-            The dataset containing the feature vectors.
-
-        Returns
-        -------
-        table:
-            A dataset containing the given feature vectors and the predicted target vector.
-
-        Raises
-        ------
-        ModelNotFittedError
-            If the model has not been fitted yet.
-        DatasetMissesFeaturesError
-            If the dataset misses feature columns.
-        PredictionError
-            If predicting with the given dataset failed.
-        NonNumericColumnError
-            If the dataset contains non-numerical values.
-        MissingValuesColumnError
-            If the dataset contains missing values.
-        DatasetMissesDataError
-            If the dataset contains no rows.
-        """
-        return predict(self._wrapped_classifier, dataset, self._feature_names, self._target_name)
-
-    @property
-    def is_fitted(self) -> bool:
-        """Whether the classifier is fitted."""
-        return self._wrapped_classifier is not None
-
-    def _get_sklearn_classifier(self) -> ClassifierMixin:
-        """
-        Return a new wrapped Classifier from sklearn.
-
-        Returns
-        -------
-        wrapped_classifier:
-            The sklearn Classifier.
-        """
+    def _get_sklearn_model(self) -> ClassifierMixin:
         from sklearn.ensemble import AdaBoostClassifier as sk_AdaBoostClassifier
 
-        learner = self.learner._get_sklearn_classifier() if self.learner is not None else None
+        learner = self.learner._get_sklearn_model() if self.learner is not None else None
         return sk_AdaBoostClassifier(
             estimator=learner,
             n_estimators=self.maximum_number_of_learners,

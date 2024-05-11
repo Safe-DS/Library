@@ -46,6 +46,8 @@ class RandomForestClassifier(Classifier):
         maximum_depth: int | None = None,
         minimum_number_of_samples_in_leaves: int = 1,
     ) -> None:
+        super().__init__()
+
         # Validation
         if number_of_trees < 1:
             raise OutOfBoundsError(number_of_trees, name="number_of_trees", lower_bound=ClosedBound(1))
@@ -65,13 +67,11 @@ class RandomForestClassifier(Classifier):
 
         # Internal state
         self._wrapped_classifier: sk_RandomForestClassifier | None = None
-        self._feature_names: list[str] | None = None
-        self._target_name: str | None = None
 
     def __hash__(self) -> int:
         return _structural_hash(
             Classifier.__hash__(self),
-            self._feature_names,
+            self._feature_schema,
             self._target_name,
             self._number_of_trees,
             self._maximum_depth,
@@ -122,7 +122,7 @@ class RandomForestClassifier(Classifier):
         DatasetMissesDataError
             If the training data contains no rows.
         """
-        wrapped_classifier = self._get_sklearn_classifier()
+        wrapped_classifier = self._get_sklearn_model()
         fit(wrapped_classifier, training_set)
 
         result = RandomForestClassifier(
@@ -131,7 +131,7 @@ class RandomForestClassifier(Classifier):
             minimum_number_of_samples_in_leaves=self._minimum_number_of_samples_in_leaves,
         )
         result._wrapped_classifier = wrapped_classifier
-        result._feature_names = training_set.features.column_names
+        result._feature_schema = training_set.features.column_names
         result._target_name = training_set.target.name
 
         return result
@@ -165,14 +165,9 @@ class RandomForestClassifier(Classifier):
         DatasetMissesDataError
             If the dataset contains no rows.
         """
-        return predict(self._wrapped_classifier, dataset, self._feature_names, self._target_name)
+        return predict(self._wrapped_classifier, dataset, self._feature_schema, self._target_name)
 
-    @property
-    def is_fitted(self) -> bool:
-        """Whether the classifier is fitted."""
-        return self._wrapped_classifier is not None
-
-    def _get_sklearn_classifier(self) -> ClassifierMixin:
+    def _get_sklearn_model(self) -> ClassifierMixin:
         """
         Return a new wrapped Classifier from sklearn.
 

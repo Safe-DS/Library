@@ -4,7 +4,6 @@ from typing import TYPE_CHECKING
 
 from safeds._utils import _structural_hash
 from safeds.exceptions import ClosedBound, OutOfBoundsError
-from safeds.ml.classical._util_sklearn import fit, predict
 
 from ._classifier import Classifier
 
@@ -41,6 +40,8 @@ class DecisionTreeClassifier(Classifier):
         maximum_depth: int | None = None,
         minimum_number_of_samples_in_leaves: int = 1,
     ) -> None:
+        super().__init__()
+
         # Validation
         if maximum_depth is not None and maximum_depth < 1:
             raise OutOfBoundsError(maximum_depth, name="maximum_depth", lower_bound=ClosedBound(1))
@@ -57,14 +58,12 @@ class DecisionTreeClassifier(Classifier):
 
         # Internal state
         self._wrapped_classifier: sk_DecisionTreeClassifier | None = None
-        self._feature_names: list[str] | None = None
-        self._target_name: str | None = None
 
     def __hash__(self) -> int:
         return _structural_hash(
-            Classifier.__hash__(self),
-            self._feature_names,
-            self._target_name,
+            super().__hash__(),
+            self._maximum_depth,
+            self._minimum_number_of_samples_in_leaves,
         )
 
     @property
@@ -106,7 +105,7 @@ class DecisionTreeClassifier(Classifier):
         DatasetMissesDataError
             If the training data contains no rows.
         """
-        wrapped_classifier = self._get_sklearn_classifier()
+        wrapped_classifier = self._get_sklearn_model()
         fit(wrapped_classifier, training_set)
 
         result = DecisionTreeClassifier(
@@ -114,7 +113,7 @@ class DecisionTreeClassifier(Classifier):
             minimum_number_of_samples_in_leaves=self._minimum_number_of_samples_in_leaves,
         )
         result._wrapped_classifier = wrapped_classifier
-        result._feature_names = training_set.features.column_names
+        result._feature_schema = training_set.features.column_names
         result._target_name = training_set.target.name
 
         return result
@@ -148,14 +147,9 @@ class DecisionTreeClassifier(Classifier):
         DatasetMissesDataError
             If the dataset contains no rows.
         """
-        return predict(self._wrapped_classifier, dataset, self._feature_names, self._target_name)
+        return predict(self._wrapped_classifier, dataset, self._feature_schema, self._target_name)
 
-    @property
-    def is_fitted(self) -> bool:
-        """Whether the classifier is fitted."""
-        return self._wrapped_classifier is not None
-
-    def _get_sklearn_classifier(self) -> ClassifierMixin:
+    def _get_sklearn_model(self) -> ClassifierMixin:
         from sklearn.tree import DecisionTreeClassifier as sk_DecisionTreeClassifier
 
         return sk_DecisionTreeClassifier(

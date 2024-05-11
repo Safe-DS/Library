@@ -332,7 +332,7 @@ class DummyClassifier(Classifier):
     def is_fitted(self) -> bool:
         return True
 
-    def _get_sklearn_classifier(self) -> ClassifierMixin:
+    def _get_sklearn_model(self) -> ClassifierMixin:
         pass
 
 
