@@ -44,26 +44,20 @@ class SimpleImputer(TableTransformer):
     """
 
     class Strategy(ABC):
-        """Various strategies to replace missing values. Use the static methods to create instances of this class."""
+        """Various strategies to replace missing values. Use the inner classes to create instances of this class."""
 
         @abstractmethod
-        def __eq__(self, other: object) -> bool:
-            pass  # pragma: no cover
+        def __eq__(self, other: object) -> bool: ...
 
         @abstractmethod
-        def __hash__(self) -> int:
-            pass  # pragma: no cover
+        def __hash__(self) -> int: ...
+
+        @abstractmethod
+        def __str__(self) -> str: ...
 
         @abstractmethod
         def _apply(self, imputer: sk_SimpleImputer) -> None:
-            """
-            Set the imputer strategy of the given imputer.
-
-            Parameters
-            ----------
-            imputer:
-                The imputer to augment.
-            """
+            """Set the imputer strategy of the given imputer."""
 
         @staticmethod
         def Constant(value: Any) -> SimpleImputer.Strategy:  # noqa: N802
@@ -75,22 +69,22 @@ class SimpleImputer(TableTransformer):
             value:
                 The value to replace missing values.
             """
-            return _Constant(value)  # pragma: no cover
+            return _Constant(value)
 
         @staticmethod
         def Mean() -> SimpleImputer.Strategy:  # noqa: N802
             """Replace missing values with the mean of each column."""
-            return _Mean()  # pragma: no cover
+            return _Mean()
 
         @staticmethod
         def Median() -> SimpleImputer.Strategy:  # noqa: N802
             """Replace missing values with the median of each column."""
-            return _Median()  # pragma: no cover
+            return _Median()
 
         @staticmethod
         def Mode() -> SimpleImputer.Strategy:  # noqa: N802
             """Replace missing values with the mode of each column."""
-            return _Mode()  # pragma: no cover
+            return _Mode()
 
     def __init__(self, strategy: SimpleImputer.Strategy, *, value_to_replace: float | str | None = None):
         if value_to_replace is None:

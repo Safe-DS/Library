@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING
 
 from safeds.data.labeled.containers import TabularDataset
 from safeds.exceptions import ModelNotFittedError
-from safeds.ml.classical._supervised_model import SupervisedModel
+from safeds.ml.classical import SupervisedModel
 from safeds.ml.metrics import ClassificationMetrics
 
 if TYPE_CHECKING:

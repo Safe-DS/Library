@@ -19,7 +19,7 @@ from safeds.ml.classical.classification import (
     DecisionTreeClassifier,
     GradientBoostingClassifier,
     KNearestNeighborsClassifier,
-    LogisticRegressionClassifier,
+    LogisticClassifier,
     RandomForestClassifier,
     SupportVectorMachineClassifier,
 )
@@ -47,7 +47,7 @@ def classifiers() -> list[Classifier]:
         DecisionTreeClassifier(),
         GradientBoostingClassifier(),
         KNearestNeighborsClassifier(2),
-        LogisticRegressionClassifier(),
+        LogisticClassifier(),
         RandomForestClassifier(),
         SupportVectorMachineClassifier(),
     ]

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Self
 
 from safeds._utils import _structural_hash
 from safeds.exceptions import ClosedBound, OpenBound, OutOfBoundsError
@@ -9,7 +9,6 @@ from ._classifier import Classifier
 
 if TYPE_CHECKING:
     from sklearn.base import ClassifierMixin
-    from sklearn.ensemble import AdaBoostClassifier as sk_AdaBoostClassifier
 
     from safeds.data.labeled.containers import TabularDataset
     from safeds.data.tabular.containers import Table
@@ -35,6 +34,10 @@ class AdaBoostClassifier(Classifier):
     OutOfBoundsError
         If `maximum_number_of_learners` or `learning_rate` are less than or equal to 0.
     """
+
+    # ------------------------------------------------------------------------------------------------------------------
+    # Dunder methods
+    # ------------------------------------------------------------------------------------------------------------------
 
     def __init__(
         self,
@@ -63,98 +66,51 @@ class AdaBoostClassifier(Classifier):
     def __hash__(self) -> int:
         return _structural_hash(
             super().__hash__(),
-            self._learning_rate,
             self._maximum_number_of_learners,
+            self._learning_rate,
         )
+
+    # ------------------------------------------------------------------------------------------------------------------
+    # Properties
+    # ------------------------------------------------------------------------------------------------------------------
 
     @property
     def learner(self) -> Classifier | None:
-        """
-        Get the base learner used for training the ensemble.
-
-        Returns
-        -------
-        result:
-            The base learner.
-        """
+        """The base learner used for training the ensemble."""
         return self._learner
 
     @property
     def maximum_number_of_learners(self) -> int:
-        """
-        Get the maximum number of learners in the ensemble.
-
-        Returns
-        -------
-        result:
-            The maximum number of learners.
-        """
+        """The maximum number of learners in the ensemble."""
         return self._maximum_number_of_learners
 
     @property
     def learning_rate(self) -> float:
-        """
-        Get the learning rate.
-
-        Returns
-        -------
-        result:
-            The learning rate.
-        """
+        """The learning rate."""
         return self._learning_rate
 
     # ------------------------------------------------------------------------------------------------------------------
-    # Getters
+    # Template methods
     # ------------------------------------------------------------------------------------------------------------------
 
-    # def fit(self, training_set: TabularDataset) -> AdaBoostClassifier:
-    #     """
-    #     Create a copy of this classifier and fit it with the given training data.
-    #
-    #     This classifier is not modified.
-    #
-    #     Parameters
-    #     ----------
-    #     training_set:
-    #         The training data containing the feature and target vectors.
-    #
-    #     Returns
-    #     -------
-    #     fitted_classifier:
-    #         The fitted classifier.
-    #
-    #     Raises
-    #     ------
-    #     LearningError
-    #         If the training data contains invalid values or if the training failed.
-    #     TypeError
-    #         If a table is passed instead of a tabular dataset.
-    #     NonNumericColumnError
-    #         If the training data contains non-numerical values.
-    #     MissingValuesColumnError
-    #         If the training data contains missing values.
-    #     DatasetMissesDataError
-    #         If the training data contains no rows.
-    #     """
-    #     wrapped_classifier = self._get_sklearn_model()
-    #     fit(wrapped_classifier, training_set)
-    #
-    #     result = AdaBoostClassifier(
-    #         learner=self.learner,
-    #         maximum_number_of_learners=self.maximum_number_of_learners,
-    #         learning_rate=self._learning_rate,
-    #     )
-    #     result._wrapped_classifier = wrapped_classifier
-    #     result._feature_schema = training_set.features.column_names
-    #     result._target_name = training_set.target.name
-    #
-    #     return result
+    def _check_additional_fit_preconditions(self, training_set: TabularDataset):
+        pass
+
+    def _check_additional_predict_preconditions(self, dataset: Table | TabularDataset):
+        pass
+
+    def _clone(self) -> Self:
+        return AdaBoostClassifier(
+            learner=self.learner,
+            maximum_number_of_learners=self.maximum_number_of_learners,
+            learning_rate=self._learning_rate,
+        )
 
     def _get_sklearn_model(self) -> ClassifierMixin:
-        from sklearn.ensemble import AdaBoostClassifier as sk_AdaBoostClassifier
+        from sklearn.ensemble import AdaBoostClassifier as SklearnAdaBoostClassifier
 
         learner = self.learner._get_sklearn_model() if self.learner is not None else None
-        return sk_AdaBoostClassifier(
+        return SklearnAdaBoostClassifier(
             estimator=learner,
             n_estimators=self.maximum_number_of_learners,
             learning_rate=self._learning_rate,

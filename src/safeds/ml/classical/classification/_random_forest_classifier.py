@@ -1,16 +1,14 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Self
 
-from safeds._utils import _structural_hash
+from safeds._utils import _get_random_seed, _structural_hash
 from safeds.exceptions import ClosedBound, OutOfBoundsError
-from safeds.ml.classical._util_sklearn import fit, predict
 
 from ._classifier import Classifier
 
 if TYPE_CHECKING:
     from sklearn.base import ClassifierMixin
-    from sklearn.ensemble import RandomForestClassifier as sk_RandomForestClassifier
 
     from safeds.data.labeled.containers import TabularDataset
     from safeds.data.tabular.containers import Table
@@ -39,6 +37,10 @@ class RandomForestClassifier(Classifier):
         If `minimum_number_of_samples_in_leaves` is less than 1.
     """
 
+    # ------------------------------------------------------------------------------------------------------------------
+    # Dunder methods
+    # ------------------------------------------------------------------------------------------------------------------
+
     def __init__(
         self,
         *,
@@ -65,18 +67,17 @@ class RandomForestClassifier(Classifier):
         self._maximum_depth: int | None = maximum_depth
         self._minimum_number_of_samples_in_leaves: int = minimum_number_of_samples_in_leaves
 
-        # Internal state
-        self._wrapped_classifier: sk_RandomForestClassifier | None = None
-
     def __hash__(self) -> int:
         return _structural_hash(
             Classifier.__hash__(self),
-            self._feature_schema,
-            self._target_name,
             self._number_of_trees,
             self._maximum_depth,
             self._minimum_number_of_samples_in_leaves,
         )
+
+    # ------------------------------------------------------------------------------------------------------------------
+    # Properties
+    # ------------------------------------------------------------------------------------------------------------------
 
     @property
     def number_of_trees(self) -> int:
@@ -93,94 +94,30 @@ class RandomForestClassifier(Classifier):
         """The minimum number of samples that must remain in the leaves of each tree."""
         return self._minimum_number_of_samples_in_leaves
 
-    def fit(self, training_set: TabularDataset) -> RandomForestClassifier:
-        """
-        Create a copy of this classifier and fit it with the given training data.
+    # ------------------------------------------------------------------------------------------------------------------
+    # Template methods
+    # ------------------------------------------------------------------------------------------------------------------
 
-        This classifier is not modified.
+    def _check_additional_fit_preconditions(self, training_set: TabularDataset):
+        pass
 
-        Parameters
-        ----------
-        training_set:
-            The training data containing the feature and target vectors.
+    def _check_additional_predict_preconditions(self, dataset: Table | TabularDataset):
+        pass
 
-        Returns
-        -------
-        fitted_classifier:
-            The fitted classifier.
-
-        Raises
-        ------
-        LearningError
-            If the training data contains invalid values or if the training failed.
-        TypeError
-            If a table is passed instead of a tabular dataset.
-        NonNumericColumnError
-            If the training data contains non-numerical values.
-        MissingValuesColumnError
-            If the training data contains missing values.
-        DatasetMissesDataError
-            If the training data contains no rows.
-        """
-        wrapped_classifier = self._get_sklearn_model()
-        fit(wrapped_classifier, training_set)
-
-        result = RandomForestClassifier(
+    def _clone(self) -> Self:
+        return RandomForestClassifier(
             number_of_trees=self._number_of_trees,
             maximum_depth=self._maximum_depth,
             minimum_number_of_samples_in_leaves=self._minimum_number_of_samples_in_leaves,
         )
-        result._wrapped_classifier = wrapped_classifier
-        result._feature_schema = training_set.features.column_names
-        result._target_name = training_set.target.name
-
-        return result
-
-    def predict(self, dataset: Table | TabularDataset) -> TabularDataset:
-        """
-        Predict a target vector using a dataset containing feature vectors. The model has to be trained first.
-
-        Parameters
-        ----------
-        dataset:
-            The dataset containing the feature vectors.
-
-        Returns
-        -------
-        table:
-            A dataset containing the given feature vectors and the predicted target vector.
-
-        Raises
-        ------
-        ModelNotFittedError
-            If the model has not been fitted yet.
-        DatasetMissesFeaturesError
-            If the dataset misses feature columns.
-        PredictionError
-            If predicting with the given dataset failed.
-        NonNumericColumnError
-            If the dataset contains non-numerical values.
-        MissingValuesColumnError
-            If the dataset contains missing values.
-        DatasetMissesDataError
-            If the dataset contains no rows.
-        """
-        return predict(self._wrapped_classifier, dataset, self._feature_schema, self._target_name)
 
     def _get_sklearn_model(self) -> ClassifierMixin:
-        """
-        Return a new wrapped Classifier from sklearn.
+        from sklearn.ensemble import RandomForestClassifier as SklearnRandomForestClassifier
 
-        Returns
-        -------
-        wrapped_classifier:
-            The sklearn Classifier.
-        """
-        from sklearn.ensemble import RandomForestClassifier as sk_RandomForestClassifier
-
-        return sk_RandomForestClassifier(
+        return SklearnRandomForestClassifier(
             n_estimators=self._number_of_trees,
             max_depth=self._maximum_depth,
             min_samples_leaf=self._minimum_number_of_samples_in_leaves,
+            random_state=_get_random_seed(),
             n_jobs=-1,
         )
