@@ -9,9 +9,6 @@ from safeds.ml.classical.classification import Classifier
 if TYPE_CHECKING:
     from sklearn.base import ClassifierMixin
 
-    from safeds.data.labeled.containers import TabularDataset
-    from safeds.data.tabular.containers import Table
-
 
 class SupportVectorClassifier(Classifier, _SupportVectorMachineBase):
     """
@@ -57,12 +54,6 @@ class SupportVectorClassifier(Classifier, _SupportVectorMachineBase):
     # ------------------------------------------------------------------------------------------------------------------
     # Template methods
     # ------------------------------------------------------------------------------------------------------------------
-
-    def _check_additional_fit_preconditions(self, training_set: TabularDataset):
-        pass
-
-    def _check_additional_predict_preconditions(self, dataset: Table | TabularDataset):
-        pass
 
     def _clone(self) -> SupportVectorClassifier:
         return SupportVectorClassifier(

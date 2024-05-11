@@ -10,9 +10,6 @@ from ._regressor import Regressor
 if TYPE_CHECKING:
     from sklearn.base import RegressorMixin
 
-    from safeds.data.labeled.containers import TabularDataset
-    from safeds.data.tabular.containers import Table
-
 
 class AdaBoostRegressor(Regressor, _AdaBoostBase):
     """
@@ -76,12 +73,6 @@ class AdaBoostRegressor(Regressor, _AdaBoostBase):
     # ------------------------------------------------------------------------------------------------------------------
     # Template methods
     # ------------------------------------------------------------------------------------------------------------------
-
-    def _check_additional_fit_preconditions(self, training_set: TabularDataset):
-        pass
-
-    def _check_additional_predict_preconditions(self, dataset: Table | TabularDataset):
-        pass
 
     def _clone(self) -> AdaBoostRegressor:
         return AdaBoostRegressor(

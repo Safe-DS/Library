@@ -216,8 +216,7 @@ class SupervisedModel(ABC):
     # Template methods
     # ------------------------------------------------------------------------------------------------------------------
 
-    @abstractmethod
-    def _check_additional_fit_preconditions(self, training_set: TabularDataset):
+    def _check_additional_fit_preconditions(self, training_set: TabularDataset):  # noqa: B027
         """
         Check additional preconditions for fitting the model and raise an error if any are violated.
 
@@ -227,8 +226,7 @@ class SupervisedModel(ABC):
             The training data containing the features and target.
         """
 
-    @abstractmethod
-    def _check_additional_predict_preconditions(self, dataset: Table | TabularDataset):
+    def _check_additional_predict_preconditions(self, dataset: Table | TabularDataset):  # noqa: B027
         """
         Check additional preconditions for predicting with the model and raise an error if any are violated.
 

@@ -11,7 +11,6 @@ if TYPE_CHECKING:
     from sklearn.base import RegressorMixin
 
     from safeds.data.labeled.containers import TabularDataset
-    from safeds.data.tabular.containers import Table
 
 
 class KNearestNeighborsRegressor(Regressor, _KNearestNeighborsBase):
@@ -60,9 +59,6 @@ class KNearestNeighborsRegressor(Regressor, _KNearestNeighborsBase):
                     f" the sample size ({training_set._table.number_of_rows})."
                 ),
             )
-
-    def _check_additional_predict_preconditions(self, dataset: Table | TabularDataset):
-        pass
 
     def _clone(self) -> KNearestNeighborsRegressor:
         return KNearestNeighborsRegressor(

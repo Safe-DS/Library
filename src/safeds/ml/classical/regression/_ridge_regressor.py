@@ -11,9 +11,6 @@ from ._regressor import Regressor
 if TYPE_CHECKING:
     from sklearn.base import RegressorMixin
 
-    from safeds.data.labeled.containers import TabularDataset
-    from safeds.data.tabular.containers import Table
-
 
 class RidgeRegressor(Regressor):
     """
@@ -78,12 +75,6 @@ class RidgeRegressor(Regressor):
     # ------------------------------------------------------------------------------------------------------------------
     # Template methods
     # ------------------------------------------------------------------------------------------------------------------
-
-    def _check_additional_fit_preconditions(self, training_set: TabularDataset):
-        pass
-
-    def _check_additional_predict_preconditions(self, dataset: Table | TabularDataset):
-        pass
 
     def _clone(self) -> RidgeRegressor:
         return RidgeRegressor(alpha=self._alpha)

@@ -9,9 +9,6 @@ from safeds.ml.classical.regression import Regressor
 if TYPE_CHECKING:
     from sklearn.base import RegressorMixin
 
-    from safeds.data.labeled.containers import TabularDataset
-    from safeds.data.tabular.containers import Table
-
 
 class SupportVectorRegressor(Regressor, _SupportVectorMachineBase):
     """
@@ -58,12 +55,6 @@ class SupportVectorRegressor(Regressor, _SupportVectorMachineBase):
     # Template methods
     # ------------------------------------------------------------------------------------------------------------------
 
-    def _check_additional_fit_preconditions(self, training_set: TabularDataset):
-        pass
-
-    def _check_additional_predict_preconditions(self, dataset: Table | TabularDataset):
-        pass
-
     def _clone(self) -> SupportVectorRegressor:
         return SupportVectorRegressor(
             c=self._c,
@@ -71,14 +62,6 @@ class SupportVectorRegressor(Regressor, _SupportVectorMachineBase):
         )
 
     def _get_sklearn_model(self) -> RegressorMixin:
-        """
-        Return a new wrapped Regressor from sklearn.
-
-        Returns
-        -------
-        wrapped_classifier:
-            The sklearn Regressor.
-        """
         from sklearn.svm import SVR as SklearnSVR  # noqa: N811
 
         result = SklearnSVR(

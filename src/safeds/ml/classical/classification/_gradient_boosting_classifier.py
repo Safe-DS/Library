@@ -3,7 +3,6 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from safeds._utils import _structural_hash
-from safeds.exceptions import ClosedBound, OpenBound, OutOfBoundsError
 from safeds.ml.classical._bases import _GradientBoostingBase
 
 from ._classifier import Classifier
@@ -61,12 +60,6 @@ class GradientBoostingClassifier(Classifier, _GradientBoostingBase):
     # ------------------------------------------------------------------------------------------------------------------
     # Template methods
     # ------------------------------------------------------------------------------------------------------------------
-
-    def _check_additional_fit_preconditions(self, training_set: TabularDataset):
-        pass
-
-    def _check_additional_predict_preconditions(self, dataset: Table | TabularDataset):
-        pass
 
     def _clone(self) -> GradientBoostingClassifier:
         return GradientBoostingClassifier(

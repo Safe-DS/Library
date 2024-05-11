@@ -9,9 +9,6 @@ from ._classifier import Classifier
 if TYPE_CHECKING:
     from sklearn.base import ClassifierMixin
 
-    from safeds.data.labeled.containers import TabularDataset
-    from safeds.data.tabular.containers import Table
-
 
 class LogisticClassifier(Classifier):
     """Regularized logistic regression for classification."""
@@ -31,12 +28,6 @@ class LogisticClassifier(Classifier):
     # ------------------------------------------------------------------------------------------------------------------
     # Template methods
     # ------------------------------------------------------------------------------------------------------------------
-
-    def _check_additional_fit_preconditions(self, training_set: TabularDataset):
-        pass
-
-    def _check_additional_predict_preconditions(self, dataset: Table | TabularDataset):
-        pass
 
     def _clone(self) -> LogisticClassifier:
         return LogisticClassifier()
