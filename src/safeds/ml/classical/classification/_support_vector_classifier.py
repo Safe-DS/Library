@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import sys
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Any, Self
+from typing import TYPE_CHECKING
 
 from safeds._utils import _get_random_seed, _structural_hash
 from safeds.exceptions import ClosedBound, OpenBound, OutOfBoundsError
@@ -56,7 +56,7 @@ class SupportVectorClassifier(Classifier):
         @staticmethod
         def Linear() -> SupportVectorClassifier.Kernel:  # noqa: N802
             """A linear kernel."""  # noqa: D401
-            return _Linear()
+            raise NotImplementedError  # pragma: no cover
 
         @staticmethod
         def Polynomial(degree: int) -> SupportVectorClassifier.Kernel:  # noqa: N802
@@ -73,17 +73,17 @@ class SupportVectorClassifier(Classifier):
             ValueError
                 If `degree` is not greater than 0.
             """  # noqa: D401
-            return _Polynomial(degree)
+            raise NotImplementedError  # pragma: no cover
 
         @staticmethod
         def RadialBasisFunction() -> SupportVectorClassifier.Kernel:  # noqa: N802
             """A radial basis function kernel."""  # noqa: D401
-            return _RadialBasisFunction()
+            raise NotImplementedError  # pragma: no cover
 
         @staticmethod
         def Sigmoid() -> SupportVectorClassifier.Kernel:  # noqa: N802
             """A sigmoid kernel."""  # noqa: D401
-            return _Sigmoid()
+            raise NotImplementedError  # pragma: no cover
 
     # ------------------------------------------------------------------------------------------------------------------
     # Dunder methods
@@ -152,7 +152,7 @@ class SupportVectorClassifier(Classifier):
     def _check_additional_predict_preconditions(self, dataset: Table | TabularDataset):
         pass
 
-    def _clone(self) -> Self:
+    def _clone(self) -> SupportVectorClassifier:
         return SupportVectorClassifier(
             c=self._c,
             kernel=self._kernel,

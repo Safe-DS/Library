@@ -24,7 +24,7 @@ class SupervisedModel(ABC):
 
     # The decorator is needed so the class really cannot be instantiated
     @abstractmethod
-    def __init__(self):
+    def __init__(self) -> None:
         self._feature_schema: Schema | None = None
         self._target_name: str | None = None
         self._target_type: DataType | None = None

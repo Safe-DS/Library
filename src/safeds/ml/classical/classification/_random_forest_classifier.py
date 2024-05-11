@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Self
+from typing import TYPE_CHECKING
 
 from safeds._utils import _get_random_seed, _structural_hash
 from safeds.exceptions import ClosedBound, OutOfBoundsError
@@ -104,7 +104,7 @@ class RandomForestClassifier(Classifier):
     def _check_additional_predict_preconditions(self, dataset: Table | TabularDataset):
         pass
 
-    def _clone(self) -> Self:
+    def _clone(self) -> RandomForestClassifier:
         return RandomForestClassifier(
             number_of_trees=self._number_of_trees,
             maximum_depth=self._maximum_depth,

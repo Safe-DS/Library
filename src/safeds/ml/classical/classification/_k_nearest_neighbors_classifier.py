@@ -82,7 +82,7 @@ class KNearestNeighborsClassifier(Classifier):
     def _check_additional_predict_preconditions(self, dataset: Table | TabularDataset):
         pass
 
-    def _clone(self) -> Self:
+    def _clone(self) -> KNearestNeighborsClassifier:
         return KNearestNeighborsClassifier(
             number_of_neighbors=self._number_of_neighbors,
         )

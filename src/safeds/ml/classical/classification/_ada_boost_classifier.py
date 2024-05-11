@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Self
+from typing import TYPE_CHECKING
 
 from safeds._utils import _structural_hash
 from safeds.exceptions import ClosedBound, OpenBound, OutOfBoundsError
@@ -99,7 +99,7 @@ class AdaBoostClassifier(Classifier):
     def _check_additional_predict_preconditions(self, dataset: Table | TabularDataset):
         pass
 
-    def _clone(self) -> Self:
+    def _clone(self) -> AdaBoostClassifier:
         return AdaBoostClassifier(
             learner=self.learner,
             maximum_number_of_learners=self.maximum_number_of_learners,

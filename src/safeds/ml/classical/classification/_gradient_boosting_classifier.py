@@ -81,7 +81,7 @@ class GradientBoostingClassifier(Classifier):
     def _check_additional_predict_preconditions(self, dataset: Table | TabularDataset):
         pass
 
-    def _clone(self) -> Self:
+    def _clone(self) -> GradientBoostingClassifier:
         return GradientBoostingClassifier(
             number_of_trees=self._number_of_trees,
             learning_rate=self._learning_rate,

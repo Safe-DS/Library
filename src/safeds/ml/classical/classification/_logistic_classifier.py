@@ -42,7 +42,7 @@ class LogisticClassifier(Classifier):
     def _check_additional_predict_preconditions(self, dataset: Table | TabularDataset):
         pass
 
-    def _clone(self) -> Self:
+    def _clone(self) -> LogisticClassifier:
         return LogisticClassifier()
 
     def _get_sklearn_model(self) -> ClassifierMixin:

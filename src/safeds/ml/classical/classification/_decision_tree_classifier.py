@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Self
+from typing import TYPE_CHECKING
 
 from safeds._utils import _structural_hash
 from safeds.exceptions import ClosedBound, OutOfBoundsError
@@ -90,7 +90,7 @@ class DecisionTreeClassifier(Classifier):
     def _check_additional_predict_preconditions(self, dataset: Table | TabularDataset):
         pass
 
-    def _clone(self) -> Self:
+    def _clone(self) -> DecisionTreeClassifier:
         return DecisionTreeClassifier(
             maximum_depth=self._maximum_depth,
             minimum_number_of_samples_in_leaves=self._minimum_number_of_samples_in_leaves,
