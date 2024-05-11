@@ -91,7 +91,7 @@ class TestImageToTableClassifier:
             torch.eq(
                 nn_original._model.state_dict()["_pytorch_layers.3._layer.bias"],
                 nn._model.state_dict()["_pytorch_layers.3._layer.bias"],
-            )
+            ),
         ).item()
         prediction: ImageDataset = nn.predict(image_dataset.get_input())
         assert one_hot_encoder.inverse_transform(prediction.get_output()) == Table({"class": prediction_label})
@@ -158,7 +158,7 @@ class TestImageToColumnClassifier:
             torch.eq(
                 nn_original._model.state_dict()["_pytorch_layers.3._layer.bias"],
                 nn._model.state_dict()["_pytorch_layers.3._layer.bias"],
-            )
+            ),
         ).item()
         prediction: ImageDataset = nn.predict(image_dataset.get_input())
         assert prediction.get_output() == Column("class", prediction_label)
@@ -208,7 +208,7 @@ class TestImageToImageRegressor:
             torch.eq(
                 nn_original._model.state_dict()["_pytorch_layers.3._layer.bias"],
                 nn._model.state_dict()["_pytorch_layers.3._layer.bias"],
-            )
+            ),
         ).item()
         prediction = nn.predict(image_dataset.get_input())
         assert isinstance(prediction.get_output(), ImageList)

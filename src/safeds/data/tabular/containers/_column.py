@@ -568,11 +568,6 @@ class Column(Sequence[T]):
         idness:
             The idness of the column.
 
-        Raises
-        ------
-        ColumnSizeError
-            If this column is empty.
-
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
@@ -585,7 +580,7 @@ class Column(Sequence[T]):
         0.75
         """
         if self.number_of_rows == 0:
-            return 1.0
+            return 1.0  # All values are unique (since there are none)
 
         return self.distinct_value_count() / self.number_of_rows
 
@@ -700,7 +695,7 @@ class Column(Sequence[T]):
             The ratio of missing values in the column.
         """
         if self.number_of_rows == 0:
-            return 1.0
+            return 1.0  # All values are missing (since there are none)
 
         return self._series.null_count() / self.number_of_rows
 
@@ -756,7 +751,7 @@ class Column(Sequence[T]):
         """
         non_missing = self._series.drop_nulls()
         if non_missing.len() == 0:
-            return 1.0
+            return 1.0  # All non-null values are the same (since there is are none)
 
         mode_count = non_missing.unique_counts().max()
 

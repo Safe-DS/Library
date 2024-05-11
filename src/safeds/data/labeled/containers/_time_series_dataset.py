@@ -214,7 +214,7 @@ class TimeSeriesDataset:
 
         _init_default_device()
 
-        target_tensor = torch.tensor(self.target._series.values, dtype=torch.float32)
+        target_tensor = torch.tensor(self.target._series.to_numpy(), dtype=torch.float32)
 
         x_s = []
         y_s = []
@@ -234,8 +234,8 @@ class TimeSeriesDataset:
             window = target_tensor[i : i + window_size]
             label = target_tensor[i + window_size + forecast_horizon]
             for col in feature_cols:
-                data = torch.tensor(col._series.values, dtype=torch.float32)
-                window = torch.cat((window, data[i : i + window_size]), dim=0)
+                data = torch.tensor(col._series.to_numpy(), dtype=torch.float32)
+                window = torch.cat((window, data[i: i + window_size]), dim=0)
             x_s.append(window)
             y_s.append(label)
         x_s_tensor = torch.stack(x_s)
@@ -294,7 +294,7 @@ class TimeSeriesDataset:
         for i in range(size - (forecast_horizon + window_size)):
             window = target_tensor[i : i + window_size]
             for col in feature_cols:
-                data = torch.tensor(col._series.values, dtype=torch.float32)
+                data = torch.tensor(col._series.to_numpy(), dtype=torch.float32)
                 window = torch.cat((window, data[i : i + window_size]), dim=-1)
             x_s.append(window)
 

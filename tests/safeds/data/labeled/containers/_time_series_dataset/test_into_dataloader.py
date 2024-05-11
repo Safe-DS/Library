@@ -1,15 +1,12 @@
-from typing import Type
-
 import pytest
-from torch.types import Device
-
 from safeds._config import _get_device
-from safeds.data.tabular.containers import Table
 from safeds.data.labeled.containers import TimeSeriesDataset
+from safeds.data.tabular.containers import Table
+from safeds.exceptions import OutOfBoundsError
+from torch.types import Device
 from torch.utils.data import DataLoader
 
-from safeds.exceptions import OutOfBoundsError
-from tests.helpers import get_devices, get_devices_ids, configure_test_with_device
+from tests.helpers import configure_test_with_device, get_devices, get_devices_ids
 
 
 @pytest.mark.parametrize(
@@ -93,7 +90,7 @@ def test_should_create_dataloader_predict(
                     "B": [2, 5],
                     "C": [3, 6],
                     "T": [0, 1],
-                }
+                },
             ).to_time_series_dataset("T", "B"),
             1,
             2,
@@ -107,7 +104,7 @@ def test_should_create_dataloader_predict(
                     "B": [2, 5],
                     "C": [3, 6],
                     "T": [0, 1],
-                }
+                },
             ).to_time_series_dataset("T", "B"),
             1,
             0,
@@ -121,7 +118,7 @@ def test_should_create_dataloader_predict(
                     "B": [2, 5],
                     "C": [3, 6],
                     "T": [0, 1],
-                }
+                },
             ).to_time_series_dataset("T", "B"),
             0,
             1,
@@ -140,7 +137,7 @@ def test_should_create_dataloader_invalid(
     data: TimeSeriesDataset,
     window_size: int,
     forecast_horizon: int,
-    error_type: Type[ValueError],
+    error_type: type[ValueError],
     error_msg: str,
     device: Device,
 ) -> None:
@@ -159,7 +156,7 @@ def test_should_create_dataloader_invalid(
                     "B": [2, 5],
                     "C": [3, 6],
                     "T": [0, 1],
-                }
+                },
             ).to_time_series_dataset("T", "B"),
             1,
             2,
@@ -173,7 +170,7 @@ def test_should_create_dataloader_invalid(
                     "B": [2, 5],
                     "C": [3, 6],
                     "T": [0, 1],
-                }
+                },
             ).to_time_series_dataset("T", "B"),
             1,
             0,
@@ -187,7 +184,7 @@ def test_should_create_dataloader_invalid(
                     "B": [2, 5],
                     "C": [3, 6],
                     "T": [0, 1],
-                }
+                },
             ).to_time_series_dataset("T", "B"),
             0,
             1,
@@ -206,12 +203,12 @@ def test_should_create_dataloader_predict_invalid(
     data: TimeSeriesDataset,
     window_size: int,
     forecast_horizon: int,
-    error_type: Type[ValueError],
+    error_type: type[ValueError],
     error_msg: str,
     device: Device,
 ) -> None:
     configure_test_with_device(device)
     with pytest.raises(error_type, match=error_msg):
         data._into_dataloader_with_window_predict(
-            window_size=window_size, forecast_horizon=forecast_horizon, batch_size=1
+            window_size=window_size, forecast_horizon=forecast_horizon, batch_size=1,
         )
