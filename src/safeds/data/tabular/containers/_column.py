@@ -738,9 +738,18 @@ class Column(Sequence[T]):
 
         return pl.DataFrame({"a": self._series, "b": other._series}).corr().item(row=1, column="a")
 
-    def distinct_value_count(self) -> int:
+    def distinct_value_count(
+        self,
+        *,
+        ignore_missing_values: bool = True,
+    ) -> int:
         """
         Return the number of distinct values in the column.
+
+        Parameters
+        ----------
+        ignore_missing_values:
+            Whether to ignore missing values when counting distinct values.
 
         Returns
         -------
@@ -754,14 +763,17 @@ class Column(Sequence[T]):
         >>> column.distinct_value_count()
         3
         """
-        return self._series.n_unique()
+        if ignore_missing_values:
+            return self._series.drop_nulls().n_unique()
+        else:
+            return self._series.n_unique()
 
     def idness(self) -> float:
         """
         Calculate the idness of this column.
 
-        We define the idness as the number of distinct values divided by the number of rows. If the column is empty,
-        the idness is 1.0.
+        We define the idness as the number of distinct values (including missing values) divided by the number of rows.
+        If the column is empty, the idness is 1.0.
 
         A high idness indicates that the column most values in the column are unique. In this case, you must be careful
         when using the column for analysis, as a model may learn a mapping from this column to the target.
@@ -785,7 +797,7 @@ class Column(Sequence[T]):
         if self.number_of_rows == 0:
             return 1.0  # All values are unique (since there are none)
 
-        return self.distinct_value_count() / self.number_of_rows
+        return self.distinct_value_count(ignore_missing_values=False) / self.number_of_rows
 
     def max(self) -> T:
         """
