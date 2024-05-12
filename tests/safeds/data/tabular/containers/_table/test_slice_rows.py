@@ -1,5 +1,4 @@
 import pytest
-from _pytest.python_api import raises
 from safeds.data.tabular.containers import Table
 from safeds.exceptions import IndexOutOfBoundsError
 
@@ -25,6 +24,7 @@ def test_should_slice_rows(table: Table, test_table: Table, second_test_table: T
     assert second_new_table == second_test_table
     assert third_new_table.schema == table.schema
     assert third_new_table == table  # TODO: parameterize this test
+
 
 # TODO: there's now another interface
 # @pytest.mark.parametrize(

@@ -9,7 +9,6 @@ from safeds.data.tabular.containers import Column
         ([1, 2, 3], 1),
         ([1, 2, 3, None], 1),
         ([None, None], None),
-
     ],
     ids=[
         "empty",

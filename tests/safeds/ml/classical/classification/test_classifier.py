@@ -349,8 +349,6 @@ class DummyClassifier(Classifier):
         pass
 
 
-
-
 class TestSummarizeMetrics:
     @pytest.mark.parametrize(
         ("predicted", "expected", "result"),

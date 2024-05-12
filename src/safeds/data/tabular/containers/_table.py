@@ -907,7 +907,7 @@ class Table:
             self._lazy_frame.select(
                 *[pl.col(name) for name in self.column_names[:index]],
                 *[column._series for column in new_columns],
-                *[pl.col(name) for name in self.column_names[index + 1:]],
+                *[pl.col(name) for name in self.column_names[index + 1 :]],
             ),
         )
 
@@ -1998,6 +1998,7 @@ class Table:
             batch_size=batch_size,
             generator=torch.Generator(device=_get_device()),
         )
+
 
 # TODO
 def _create_dataset(features: Tensor) -> Dataset:

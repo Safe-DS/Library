@@ -76,10 +76,9 @@ class ImageDataset(Generic[T]):
             for column_name in output_data.column_names:
                 if not output_data.get_column_type(column_name).is_numeric:
                     non_numerical_columns.append(column_name)
-                elif (
-                    (output_data.get_column(column_name).min() or 0) < 0
-                    or (output_data.get_column(column_name).max() or 0) > 1
-                ):
+                elif (output_data.get_column(column_name).min() or 0) < 0 or (
+                    output_data.get_column(column_name).max() or 0
+                ) > 1:
                     wrong_interval_columns.append(column_name)
             if len(non_numerical_columns) > 0:
                 raise NonNumericColumnError(f"Columns {non_numerical_columns} are not numerical.")

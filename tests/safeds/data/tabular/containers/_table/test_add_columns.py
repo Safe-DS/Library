@@ -1,6 +1,5 @@
 import pytest
 from safeds.data.tabular.containers import Column, Table
-from safeds.exceptions import ColumnSizeError, DuplicateColumnNameError
 
 
 @pytest.mark.parametrize(
@@ -52,6 +51,7 @@ def test_should_add_columns_from_table(table1: Table, table2: Table, expected: T
     table1 = table1.add_table_as_columns(table2)  # TODO: move to separate test file
     assert table1.schema == expected.schema
     assert table1 == expected
+
 
 #  TODO - separate test for add_table_as_columns and a new one here
 # @pytest.mark.parametrize(
