@@ -4,6 +4,7 @@ import itertools
 from typing import TYPE_CHECKING, Any, Self
 
 import pytest
+from safeds.data.labeled.containers import TabularDataset
 from safeds.data.tabular.containers import Table
 from safeds.exceptions import (
     DatasetMissesDataError,
@@ -26,7 +27,6 @@ from safeds.ml.classical.classification import (
 
 if TYPE_CHECKING:
     from _pytest.fixtures import FixtureRequest
-    from safeds.data.labeled.containers import TabularDataset
     from sklearn.base import ClassifierMixin
 
 
@@ -318,7 +318,9 @@ class DummyClassifier(Classifier):
     """
 
     def __init__(self) -> None:
-        pass
+        super().__init__()
+
+        self._target_name = "expected"
 
     def __hash__(self) -> int:
         raise NotImplementedError
@@ -493,6 +495,7 @@ class TestRecall:
         ],
         ids=["table"],
     )
+    # TODO: no longer raises (and that's correct)
     def test_should_raise_if_given_normal_table(self, table: Table) -> None:
         with pytest.raises(PlainTableError):
             DummyClassifier().recall(table, 1)  # type: ignore[arg-type]

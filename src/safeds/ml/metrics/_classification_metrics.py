@@ -72,10 +72,15 @@ class ClassificationMetrics:
         predicted = _extract_target(predicted)
         _check_equal_length(predicted, expected)
 
+        from polars.exceptions import ComputeError
+
         if expected.number_of_rows == 0:
             return 1.0  # Everything was predicted correctly (since there is nothing to predict)
 
-        return expected._series.eq(predicted._series).mean()
+        try:
+            return expected._series.eq_missing(predicted._series).mean()
+        except ComputeError:
+            return 0.0  # Types are not compatible, so no prediction can be correct
 
     @staticmethod
     def f1_score(predicted: Column | TabularDataset, expected: Column | TabularDataset, positive_class: Any) -> float:
