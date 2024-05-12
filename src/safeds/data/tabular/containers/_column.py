@@ -6,7 +6,12 @@ from typing import TYPE_CHECKING, Any, Literal, TypeVar, overload
 from safeds._utils import _structural_hash
 from safeds.data.tabular.plotting import ColumnPlotter
 from safeds.data.tabular.typing._polars_data_type import _PolarsDataType
-from safeds.exceptions import IndexOutOfBoundsError
+from safeds.exceptions import (
+    ColumnLengthMismatchError,
+    IndexOutOfBoundsError,
+    MissingValuesColumnError,
+    NonNumericColumnError,
+)
 
 from ._lazy_cell import _LazyCell
 
@@ -430,17 +435,17 @@ class Column(Sequence[T]):
         --------
         >>> from safeds.data.tabular.containers import Column
         >>> column = Column("test", [1, 2, 3])
-        >>> column.count(lambda cell: cell > 1)
+        >>> column.count_if(lambda cell: cell > 1)
         2
 
-        >>> column.count(lambda cell: cell < 0)
+        >>> column.count_if(lambda cell: cell < 0)
         0
         """
         import polars as pl
 
         # Expressions only work on data frames/lazy frames, so we wrap the polars series first
         expression = predicate(_LazyCell(pl.col(self.name)))._polars_expression
-        series = self._series.to_frame().select(expression).get_column(self.name)
+        series = self._series.to_frame().select(expression.alias(self.name)).get_column(self.name)
 
         if ignore_unknown or series.null_count() == 0:
             return series.sum()
@@ -597,7 +602,7 @@ class Column(Sequence[T]):
 
         # Expressions only work on data frames/lazy frames, so we wrap the polars series first
         expression = transformer(_LazyCell(pl.col(self.name)))._polars_expression
-        series = self._series.to_frame().select(expression).get_column(self.name)
+        series = self._series.to_frame().select(expression.alias(self.name)).get_column(self.name)
 
         return self._from_polars_series(series)
 
@@ -619,28 +624,49 @@ class Column(Sequence[T]):
         >>> from safeds.data.tabular.containers import Column
         >>> column = Column("a", [1, 3])
         >>> column.summarize_statistics()
-        +----------------------+--------------------+
-        | metric               | a                  |
-        | ---                  | ---                |
-        | str                  | str                |
-        +===========================================+
-        | min                  | 1                  |
-        | max                  | 3                  |
-        | mean                 | 2.0                |
-        | median               | 2.0                |
-        | standard deviation   | 1.4142135623730951 |
-        | distinct value count | 2                  |
-        | idness               | 1.0                |
-        | missing value ratio  | 0.0                |
-        | stability            | 0.5                |
-        +----------------------+--------------------+
+        +----------------------+---------+
+        | metric               |       a |
+        | ---                  |     --- |
+        | str                  |     f64 |
+        +================================+
+        | min                  | 1.00000 |
+        | max                  | 3.00000 |
+        | mean                 | 2.00000 |
+        | median               | 2.00000 |
+        | standard deviation   | 1.41421 |
+        | distinct value count | 2.00000 |
+        | idness               | 1.00000 |
+        | missing value ratio  | 0.00000 |
+        | stability            | 0.50000 |
+        +----------------------+---------+
         """
         from ._table import Table
 
         # TODO: turn this around (call table method, implement in table; allows parallelization)
-        mean = self.mean() or "-"
-        median = self.median() or "-"
-        standard_deviation = self.standard_deviation() or "-"
+        if self.is_numeric:
+            values = [
+                self.min(),
+                self.max(),
+                self.mean(),
+                self.median(),
+                self.standard_deviation(),
+                self.distinct_value_count(),
+                self.idness(),
+                self.missing_value_ratio(),
+                self.stability(),
+            ]
+        else:
+            values = [
+                str(self.min() or "-"),
+                str(self.max() or "-"),
+                "-",
+                "-",
+                "-",
+                str(self.distinct_value_count()),
+                str(self.idness()),
+                str(self.missing_value_ratio()),
+                str(self.stability()),
+            ]
 
         return Table(
             {
@@ -655,17 +681,7 @@ class Column(Sequence[T]):
                     "missing value ratio",
                     "stability",
                 ],
-                self.name: [
-                    str(self.min()),
-                    str(self.max()),
-                    str(mean),
-                    str(median),
-                    str(standard_deviation),
-                    str(self.distinct_value_count()),
-                    str(self.idness()),
-                    str(self.missing_value_ratio()),
-                    str(self.stability()),
-                ],
+                self.name: values,
             },
         )
 
@@ -690,6 +706,15 @@ class Column(Sequence[T]):
         correlation:
             The Pearson correlation between the two columns.
 
+        Raises
+        ------
+        TypeError
+            If one of the columns is not numeric.
+        ValueError
+            If the columns have different lengths.
+        ValueError
+            If one of the columns has missing values.
+
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
@@ -703,6 +728,13 @@ class Column(Sequence[T]):
         -1.0
         """
         import polars as pl
+
+        if not self.is_numeric or not other.is_numeric:
+            raise NonNumericColumnError("")  # TODO: Add column names to error message
+        if self.number_of_rows != other.number_of_rows:
+            raise ColumnLengthMismatchError("")  # TODO: Add column names to error message
+        if self.missing_value_count() > 0 or other.missing_value_count() > 0:
+            raise MissingValuesColumnError("")  # TODO: Add column names to error message
 
         return pl.DataFrame({"a": self._series, "b": other._series}).corr().item(row=1, column="a")
 
@@ -771,7 +803,13 @@ class Column(Sequence[T]):
         >>> column.max()
         3
         """
-        return self._series.max()
+        from polars.exceptions import InvalidOperationError
+
+        try:
+            # Fails for Null columns
+            return self._series.max()
+        except InvalidOperationError:
+            return None  # Return None to indicate that we don't know the maximum (consistent with mean and median)
 
     def mean(self) -> T:
         """
@@ -784,6 +822,11 @@ class Column(Sequence[T]):
         mean:
             The mean of the values in the column.
 
+        Raises
+        ------
+        TypeError
+            If the column is not numeric.
+
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
@@ -791,6 +834,9 @@ class Column(Sequence[T]):
         >>> column.mean()
         2.0
         """
+        if not self.is_numeric:
+            raise NonNumericColumnError("")  # TODO: Add column name to error message
+
         return self._series.mean()
 
     def median(self) -> T:
@@ -805,6 +851,11 @@ class Column(Sequence[T]):
         median:
             The median of the values in the column.
 
+        Raises
+        ------
+        TypeError
+            If the column is not numeric.
+
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
@@ -812,9 +863,12 @@ class Column(Sequence[T]):
         >>> column.median()
         2.0
         """
+        if not self.is_numeric:
+            raise NonNumericColumnError("")  # TODO: Add column name to error message
+
         return self._series.median()
 
-    def min(self) -> T:
+    def min(self) -> T | None:
         """
         Return the minimum value in the column.
 
@@ -830,7 +884,13 @@ class Column(Sequence[T]):
         >>> column.min()
         1
         """
-        return self._series.min()
+        from polars.exceptions import InvalidOperationError
+
+        try:
+            # Fails for Null columns
+            return self._series.min()
+        except InvalidOperationError:
+            return None  # Return None to indicate that we don't know the maximum (consistent with mean and median)
 
     def missing_value_count(self) -> int:
         """
@@ -928,7 +988,7 @@ class Column(Sequence[T]):
 
         return mode_count / non_missing.len()
 
-    def standard_deviation(self) -> float | None:
+    def standard_deviation(self) -> float:
         """
         Return the standard deviation of the values in the column.
 
@@ -940,6 +1000,11 @@ class Column(Sequence[T]):
             The standard deviation of the values in the column. If no standard deviation can be calculated due to the
             type of the column, None is returned.
 
+        Raises
+        ------
+        TypeError
+            If the column is not numeric.
+
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
@@ -947,18 +1012,21 @@ class Column(Sequence[T]):
         >>> column.standard_deviation()
         1.0
         """
-        from polars.exceptions import InvalidOperationError
+        if not self.is_numeric:
+            raise NonNumericColumnError("")  # TODO: Add column name to error message
 
-        try:
-            return self._series.std()
-        except InvalidOperationError:
-            return None
+        return self._series.std()
 
-    def variance(self) -> float | None:
+    def variance(self) -> float:
         """
         Return the variance of the values in the column.
 
         The variance is the average of the squared differences from the mean.
+
+        Raises
+        ------
+        TypeError
+            If the column is not numeric.
 
         Returns
         -------
@@ -973,12 +1041,10 @@ class Column(Sequence[T]):
         >>> column.variance()
         1.0
         """
-        from polars.exceptions import InvalidOperationError
+        if not self.is_numeric:
+            raise NonNumericColumnError("")  # TODO: Add column name to error message
 
-        try:
-            return self._series.var()
-        except InvalidOperationError:
-            return None
+        return self._series.var()
 
     # ------------------------------------------------------------------------------------------------------------------
     # Export

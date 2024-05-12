@@ -1636,21 +1636,21 @@ class Table:
         >>> from safeds.data.tabular.containers import Table
         >>> table = Table({"a": [1, 3]})
         >>> table.summarize_statistics()
-        +----------------------+--------------------+
-        | metric               | a                  |
-        | ---                  | ---                |
-        | str                  | str                |
-        +===========================================+
-        | min                  | 1                  |
-        | max                  | 3                  |
-        | mean                 | 2.0                |
-        | median               | 2.0                |
-        | standard deviation   | 1.4142135623730951 |
-        | distinct value count | 2                  |
-        | idness               | 1.0                |
-        | missing value ratio  | 0.0                |
-        | stability            | 0.5                |
-        +----------------------+--------------------+
+        +----------------------+---------+
+        | metric               |       a |
+        | ---                  |     --- |
+        | str                  |     f64 |
+        +================================+
+        | min                  | 1.00000 |
+        | max                  | 3.00000 |
+        | mean                 | 2.00000 |
+        | median               | 2.00000 |
+        | standard deviation   | 1.41421 |
+        | distinct value count | 2.00000 |
+        | idness               | 1.00000 |
+        | missing value ratio  | 0.00000 |
+        | stability            | 0.50000 |
+        +----------------------+---------+
         """
         if self.number_of_columns == 0:
             return Table()
