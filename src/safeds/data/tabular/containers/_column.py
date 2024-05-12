@@ -9,7 +9,6 @@ from safeds.data.tabular.typing._polars_data_type import _PolarsDataType
 from safeds.exceptions import IndexOutOfBoundsError
 
 from ._lazy_cell import _LazyCell
-from ._vectorized_cell import _VectorizedCell
 
 if TYPE_CHECKING:
     from polars import Series
