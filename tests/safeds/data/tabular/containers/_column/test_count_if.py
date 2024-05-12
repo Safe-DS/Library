@@ -5,14 +5,14 @@ from safeds.data.tabular.containers import Column
 @pytest.mark.parametrize(
     ("values", "expected"),
     [
-        ([], False),
-        ([1], True),
-        ([2], False),
-        ([None], False),
-        ([1, None], True),
-        ([2, None], False),
-        ([1, 2], True),
-        ([1, 2, None], True),
+        ([], 0),
+        ([1], 1),
+        ([2], 0),
+        ([None], 0),
+        ([1, None], 1),
+        ([2, None], 0),
+        ([1, 2], 1),
+        ([1, 2, None], 1),
     ],
     ids=[
         "empty",
@@ -27,23 +27,23 @@ from safeds.data.tabular.containers import Column
 )
 def test_should_handle_boolean_logic(
     values: list,
-    expected: bool,
+    expected: int,
 ) -> None:
     column = Column("a", values)
-    assert column.any(lambda value: value < 2) == expected
+    assert column.count_if(lambda value: value < 2) == expected
 
 
 @pytest.mark.parametrize(
     ("values", "expected"),
     [
-        ([], False),
-        ([1], True),
-        ([2], False),
+        ([], 0),
+        ([1], 1),
+        ([2], 0),
         ([None], None),
-        ([1, None], True),
+        ([1, None], None),
         ([2, None], None),
-        ([1, 2], True),
-        ([1, 2, None], True),
+        ([1, 2], 1),
+        ([1, 2, None], None),
     ],
     ids=[
         "empty",
@@ -58,7 +58,7 @@ def test_should_handle_boolean_logic(
 )
 def test_should_handle_kleene_logic(
     values: list,
-    expected: bool | None,
+    expected: int | None,
 ) -> None:
     column = Column("a", values)
-    assert column.any(lambda value: value < 2, ignore_unknown=False) == expected
+    assert column.count_if(lambda value: value < 2, ignore_unknown=False) == expected

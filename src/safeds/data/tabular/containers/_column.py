@@ -92,7 +92,11 @@ class Column(Sequence[T]):
         if isinstance(index, int):
             return self.get_value(index)
         else:
-            if index.start < 0 or index.stop < 0 or index.step < 0:
+            start = index.start or 0
+            stop = index.stop or self.number_of_rows
+            step = index.step or 1
+
+            if start < 0 or stop < 0 or step < 0:
                 raise IndexError("Negative values for start/stop/step of slices are not supported.")
             return self._from_polars_series(self._series.__getitem__(index))
 
@@ -369,14 +373,49 @@ class Column(Sequence[T]):
         expression = predicate(_LazyCell(pl.col(self.name)))._polars_expression.any(ignore_nulls=ignore_unknown)
         return self._series.to_frame().select(expression).item()
 
-    def count(self, predicate: Callable[[Cell[T]], Cell[bool]]) -> int:
+    @overload
+    def count_if(
+        self,
+        predicate: Callable[[Cell[T]], Cell[bool | None]],
+        *,
+        ignore_unknown: Literal[True] = ...,
+    ) -> int: ...
+
+    @overload
+    def count_if(
+        self,
+        predicate: Callable[[Cell[T]], Cell[bool | None]],
+        *,
+        ignore_unknown: bool,
+    ) -> int | None: ...
+
+    def count_if(
+        self,
+        predicate: Callable[[Cell[T]], Cell[bool | None]],
+        *,
+        ignore_unknown: bool = True,
+    ) -> int | None:
         """
         Return how many values in the column satisfy the predicate.
+
+        The predicate can return one of three values:
+
+        * True, if the value satisfies the predicate.
+        * False, if the value does not satisfy the predicate.
+        * None, if the truthiness of the predicate is unknown, e.g. due to missing values.
+
+        By default, cases where the truthiness of the predicate is unknown are ignored and this method returns how
+        often the predicate returns True.
+
+        You can instead enable Kleene logic by setting `ignore_unknown=False`. In this case, this method returns None if
+        the predicate returns None at least once. Otherwise, it still returns how often the predicate returns True.
 
         Parameters
         ----------
         predicate:
             The predicate to apply to each value.
+        ignore_unknown:
+            Whether to ignore cases where the truthiness of the predicate is unknown.
 
         Returns
         -------
@@ -400,11 +439,14 @@ class Column(Sequence[T]):
         """
         import polars as pl
 
-        result = predicate(_VectorizedCell(self))
-        if not isinstance(result, _VectorizedCell) or not result._series.dtype.is_(pl.Boolean):
-            raise TypeError("The predicate must return a boolean cell.")
+        # Expressions only work on data frames/lazy frames, so we wrap the polars series first
+        expression = predicate(_LazyCell(pl.col(self.name)))._polars_expression
+        series = self._series.to_frame().select(expression).get_column(self.name)
 
-        return result._series.sum()
+        if ignore_unknown or series.null_count() == 0:
+            return series.sum()
+        else:
+            return None
 
     @overload
     def none(
@@ -552,11 +594,13 @@ class Column(Sequence[T]):
         |    6 |
         +------+
         """
-        result = transformer(_VectorizedCell(self))
-        if not isinstance(result, _VectorizedCell):
-            raise TypeError("The transformer must return a cell.")
+        import polars as pl
 
-        return self._from_polars_series(result._series)
+        # Expressions only work on data frames/lazy frames, so we wrap the polars series first
+        expression = transformer(_LazyCell(pl.col(self.name)))._polars_expression
+        series = self._series.to_frame().select(expression).get_column(self.name)
+
+        return self._from_polars_series(series)
 
     # ------------------------------------------------------------------------------------------------------------------
     # Statistics
@@ -994,8 +1038,6 @@ class Column(Sequence[T]):
     def _repr_html_(self) -> str:
         """
         Return a compact HTML representation of the column for IPython.
-
-        Note that this operation must fully load the data into memory, which can be expensive.
 
         Returns
         -------

@@ -27,7 +27,7 @@ from safeds.data.tabular.containers import Column
 )
 def test_should_handle_boolean_logic(
     values: list,
-    expected: bool | None,
+    expected: bool,
 ) -> None:
     column = Column("a", values)
     assert column.all(lambda value: value < 2) == expected

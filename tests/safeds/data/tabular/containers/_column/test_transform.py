@@ -12,7 +12,8 @@ from safeds.data.tabular.containers import Column
     ids=["empty", "integers", "floats"],
 )
 def test_should_transform_column(column: Column, expected: Column) -> None:
-    assert column.transform(lambda it: it + 1) == expected
+    new_column = column.transform(lambda it: it + 1)
+    assert new_column == expected
 
 
 @pytest.mark.parametrize(
