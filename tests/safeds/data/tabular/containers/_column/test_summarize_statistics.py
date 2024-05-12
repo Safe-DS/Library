@@ -86,7 +86,7 @@ from safeds.data.tabular.containers import Column, Table
                         "-",
                         "-",
                         "-",
-                        "1",
+                        "0",
                         "0.5",
                         "1.0",
                         "1.0",

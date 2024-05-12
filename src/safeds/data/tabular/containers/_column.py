@@ -164,9 +164,18 @@ class Column(Sequence[T]):
     # Value operations
     # ------------------------------------------------------------------------------------------------------------------
 
-    def get_distinct_values(self) -> list[T]:
+    def get_distinct_values(
+        self,
+        *,
+        ignore_missing_values: bool = True,
+    ) -> Sequence[T]:
         """
         Return the distinct values in the column.
+
+        Parameters
+        ----------
+        ignore_missing_values:
+            Whether to ignore missing values.
 
         Returns
         -------
@@ -185,9 +194,18 @@ class Column(Sequence[T]):
         if self.number_of_rows == 0:
             return []  # polars raises otherwise
         elif self._series.dtype == pl.Null:
-            return [None]  # polars raises otherwise
+            # polars raises otherwise
+            if ignore_missing_values:
+                return []
+            else:
+                return [None]
+
+        if ignore_missing_values:
+            series = self._series.drop_nulls()
         else:
-            return self._series.unique(maintain_order=True).to_list()
+            series = self._series
+
+        return series.unique().sort().to_list()
 
     def get_value(self, index: int) -> T:
         """
@@ -942,7 +960,11 @@ class Column(Sequence[T]):
 
         return self._series.null_count() / self.number_of_rows
 
-    def mode(self) -> Column[T]:
+    def mode(
+        self,
+        *,
+        ignore_missing_values: bool = True,
+    ) -> Sequence[T]:
         """
         Return the mode of the values in the column.
 
@@ -968,7 +990,23 @@ class Column(Sequence[T]):
         |    3 |
         +------+
         """
-        return self._from_polars_series(self._series.mode().sort())
+        import polars as pl
+
+        if self.number_of_rows == 0:
+            return []  # polars raises otherwise
+        elif self._series.dtype == pl.Null:
+            # polars raises otherwise
+            if ignore_missing_values:
+                return []
+            else:
+                return [None]
+
+        if ignore_missing_values:
+            series = self._series.drop_nulls()
+        else:
+            series = self._series
+
+        return series.mode().sort().to_list()
 
     def stability(self) -> float:
         """
