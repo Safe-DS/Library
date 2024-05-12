@@ -54,7 +54,7 @@ class KNearestNeighborsClassifier(Classifier, _KNearestNeighborsBase):
     # Template methods
     # ------------------------------------------------------------------------------------------------------------------
 
-    def _check_additional_fit_preconditions(self, training_set: TabularDataset):
+    def _check_additional_fit_preconditions(self, training_set: TabularDataset) -> None:
         if self._number_of_neighbors > training_set._table.number_of_rows:
             raise ValueError(
                 (

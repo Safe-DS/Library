@@ -96,8 +96,8 @@ class ImageDataset(Generic[T]):
             _output_size = ImageSize(output_data.widths[0], output_data.heights[0], output_data.channel)
         else:
             raise ValueError("The given output ImageList contains images of different sizes.")  # noqa: TRY004
-        self._output = _output
-        self._output_size = _output_size
+        self._output = _output  # type: ignore[var-annotated]  # TODO: check what the type should be
+        self._output_size = _output_size  # type: ignore[var-annotated]  # TODO: check what the type should be
 
     def __iter__(self) -> ImageDataset:
         if self._shuffle_after_epoch:

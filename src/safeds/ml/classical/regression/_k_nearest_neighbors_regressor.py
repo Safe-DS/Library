@@ -51,7 +51,7 @@ class KNearestNeighborsRegressor(Regressor, _KNearestNeighborsBase):
     # Template methods
     # ------------------------------------------------------------------------------------------------------------------
 
-    def _check_additional_fit_preconditions(self, training_set: TabularDataset):
+    def _check_additional_fit_preconditions(self, training_set: TabularDataset) -> None:
         if self._number_of_neighbors > training_set.to_table().number_of_rows:
             raise ValueError(
                 (
