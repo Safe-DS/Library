@@ -49,7 +49,7 @@ def test_should_add_columns(table1: Table, columns: list[Column], expected: Tabl
     ids=["add a table with 2 columns", "empty add filled", "filled add empty", "rowless"],
 )
 def test_should_add_columns_from_table(table1: Table, table2: Table, expected: Table) -> None:
-    table1 = table1.add_columns(table2)
+    table1 = table1.add_table_as_columns(table2)  # TODO: move to separate test file
     assert table1.schema == expected.schema
     assert table1 == expected
 

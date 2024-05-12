@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import itertools
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Self
 
 import pandas as pd
 import pytest
@@ -33,7 +33,7 @@ from safeds.ml.classical.regression._regressor import _check_metrics_preconditio
 if TYPE_CHECKING:
     from _pytest.fixtures import FixtureRequest
     from safeds.data.labeled.containers import TabularDataset
-    from sklearn.base import RegressorMixin
+    from sklearn.base import RegressorMixin, ClassifierMixin
 
 
 def regressors() -> list[Regressor]:
@@ -322,10 +322,25 @@ class DummyRegressor(Regressor):
     `target_name` must be set to `"expected"`.
     """
 
+    def __init__(self) -> None:
+        pass
+
+    def __hash__(self) -> int:
+        raise NotImplementedError
+
+    def _clone(self) -> Self:
+        return self
+
+    def _get_sklearn_model(self) -> ClassifierMixin | RegressorMixin:
+        pass
+
     def fit(self, _training_set: TabularDataset) -> DummyRegressor:
         return self
 
-    def predict(self, dataset: Table) -> TabularDataset:
+    def predict(self, dataset: Table | TabularDataset) -> TabularDataset:
+        if isinstance(dataset, TabularDataset):
+            dataset = dataset.to_table()
+
         predicted = dataset.get_column("predicted")
         feature = predicted.rename("feature")
         dataset = Table.from_columns([feature, predicted])
@@ -335,9 +350,6 @@ class DummyRegressor(Regressor):
     @property
     def is_fitted(self) -> bool:
         return True
-
-    def _get_sklearn_regressor(self) -> RegressorMixin:
-        pass
 
 
 class TestSummarizeMetrics:

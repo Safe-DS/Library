@@ -6,12 +6,12 @@ from typing import TYPE_CHECKING, Any, Generic, TypeVar
 if TYPE_CHECKING:
     import polars as pl
 
-T = TypeVar("T")
+T_co = TypeVar("T_co", covariant=True)
 P = TypeVar("P")
-R = TypeVar("R")
+R_co = TypeVar("R_co", covariant=True)
 
 
-class Cell(ABC, Generic[T]):
+class Cell(ABC, Generic[T_co]):
     """
     A single value in a table.
 
@@ -70,61 +70,61 @@ class Cell(ABC, Generic[T]):
     # Numeric operators --------------------------------------------------------
 
     @abstractmethod
-    def __abs__(self) -> Cell[R]: ...
+    def __abs__(self) -> Cell[R_co]: ...
 
     @abstractmethod
-    def __ceil__(self) -> Cell[R]: ...
+    def __ceil__(self) -> Cell[R_co]: ...
 
     @abstractmethod
-    def __floor__(self) -> Cell[R]: ...
+    def __floor__(self) -> Cell[R_co]: ...
 
     @abstractmethod
-    def __neg__(self) -> Cell[R]: ...
+    def __neg__(self) -> Cell[R_co]: ...
 
     @abstractmethod
-    def __pos__(self) -> Cell[R]: ...
+    def __pos__(self) -> Cell[R_co]: ...
 
     @abstractmethod
-    def __add__(self, other: Any) -> Cell[R]: ...
+    def __add__(self, other: Any) -> Cell[R_co]: ...
 
     @abstractmethod
-    def __radd__(self, other: Any) -> Cell[R]: ...
+    def __radd__(self, other: Any) -> Cell[R_co]: ...
 
     @abstractmethod
-    def __floordiv__(self, other: Any) -> Cell[R]: ...
+    def __floordiv__(self, other: Any) -> Cell[R_co]: ...
 
     @abstractmethod
-    def __rfloordiv__(self, other: Any) -> Cell[R]: ...
+    def __rfloordiv__(self, other: Any) -> Cell[R_co]: ...
 
     @abstractmethod
-    def __mod__(self, other: Any) -> Cell[R]: ...
+    def __mod__(self, other: Any) -> Cell[R_co]: ...
 
     @abstractmethod
-    def __rmod__(self, other: Any) -> Cell[R]: ...
+    def __rmod__(self, other: Any) -> Cell[R_co]: ...
 
     @abstractmethod
-    def __mul__(self, other: Any) -> Cell[R]: ...
+    def __mul__(self, other: Any) -> Cell[R_co]: ...
 
     @abstractmethod
-    def __rmul__(self, other: Any) -> Cell[R]: ...
+    def __rmul__(self, other: Any) -> Cell[R_co]: ...
 
     @abstractmethod
-    def __pow__(self, other: float | Cell[P]) -> Cell[R]: ...
+    def __pow__(self, other: float | Cell[P]) -> Cell[R_co]: ...
 
     @abstractmethod
-    def __rpow__(self, other: float | Cell[P]) -> Cell[R]: ...
+    def __rpow__(self, other: float | Cell[P]) -> Cell[R_co]: ...
 
     @abstractmethod
-    def __sub__(self, other: Any) -> Cell[R]: ...
+    def __sub__(self, other: Any) -> Cell[R_co]: ...
 
     @abstractmethod
-    def __rsub__(self, other: Any) -> Cell[R]: ...
+    def __rsub__(self, other: Any) -> Cell[R_co]: ...
 
     @abstractmethod
-    def __truediv__(self, other: Any) -> Cell[R]: ...
+    def __truediv__(self, other: Any) -> Cell[R_co]: ...
 
     @abstractmethod
-    def __rtruediv__(self, other: Any) -> Cell[R]: ...
+    def __rtruediv__(self, other: Any) -> Cell[R_co]: ...
 
     # Other --------------------------------------------------------------------
 
@@ -262,7 +262,7 @@ class Cell(ABC, Generic[T]):
     # Numeric operations
     # ------------------------------------------------------------------------------------------------------------------
 
-    def abs(self) -> Cell[R]:
+    def abs(self) -> Cell[R_co]:
         """
         Get the absolute value.
 
@@ -282,7 +282,7 @@ class Cell(ABC, Generic[T]):
         """
         return self.__abs__()
 
-    def ceil(self) -> Cell[R]:
+    def ceil(self) -> Cell[R_co]:
         """
         Round up to the nearest integer.
 
@@ -302,7 +302,7 @@ class Cell(ABC, Generic[T]):
         """
         return self.__ceil__()
 
-    def floor(self) -> Cell[R]:
+    def floor(self) -> Cell[R_co]:
         """
         Round down to the nearest integer.
 
@@ -322,7 +322,7 @@ class Cell(ABC, Generic[T]):
         """
         return self.__floor__()
 
-    def neg(self) -> Cell[R]:
+    def neg(self) -> Cell[R_co]:
         """
         Negate the value.
 
@@ -342,7 +342,7 @@ class Cell(ABC, Generic[T]):
         """
         return self.__neg__()
 
-    def add(self, other: Any) -> Cell[R]:
+    def add(self, other: Any) -> Cell[R_co]:
         """
         Add a value. This is equivalent to the `+` operator.
 
@@ -372,7 +372,7 @@ class Cell(ABC, Generic[T]):
         """
         return self.__add__(other)
 
-    def mod(self, other: Any) -> Cell[R]:
+    def mod(self, other: Any) -> Cell[R_co]:
         """
         Perform a modulo operation. This is equivalent to the `%` operator.
 
@@ -402,7 +402,7 @@ class Cell(ABC, Generic[T]):
         """
         return self.__mod__(other)
 
-    def mul(self, other: Any) -> Cell[R]:
+    def mul(self, other: Any) -> Cell[R_co]:
         """
         Multiply by a value. This is equivalent to the `*` operator.
 
@@ -432,7 +432,7 @@ class Cell(ABC, Generic[T]):
         """
         return self.__mul__(other)
 
-    def pow(self, other: float | Cell[P]) -> Cell[R]:
+    def pow(self, other: float | Cell[P]) -> Cell[R_co]:
         """
         Raise to a power. This is equivalent to the `**` operator.
 
@@ -462,7 +462,7 @@ class Cell(ABC, Generic[T]):
         """
         return self.__pow__(other)
 
-    def sub(self, other: Any) -> Cell[R]:
+    def sub(self, other: Any) -> Cell[R_co]:
         """
         Subtract a value. This is equivalent to the `-` operator.
 
@@ -492,7 +492,7 @@ class Cell(ABC, Generic[T]):
         """
         return self.__sub__(other)
 
-    def div(self, other: Any) -> Cell[R]:
+    def div(self, other: Any) -> Cell[R_co]:
         """
         Divide by a value. This is equivalent to the `/` operator.
 

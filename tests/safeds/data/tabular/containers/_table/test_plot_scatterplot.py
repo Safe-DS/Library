@@ -6,7 +6,7 @@ from syrupy import SnapshotAssertion
 
 def test_should_match_snapshot(snapshot_png_image: SnapshotAssertion) -> None:
     table = Table({"A": [1, 2, 3], "B": [2, 4, 7]})
-    scatterplot = table.plot_scatterplot("A", "B")
+    scatterplot = table.plot.scatter_plot("A", "B")
     assert scatterplot == snapshot_png_image
 
 
@@ -22,4 +22,4 @@ def test_should_match_snapshot(snapshot_png_image: SnapshotAssertion) -> None:
 )
 def test_should_raise_if_column_does_not_exist(table: Table, col1: str, col2: str, error_message: str) -> None:
     with pytest.raises(UnknownColumnNameError, match=error_message):
-        table.plot_scatterplot(col1, col2)
+        table.plot.scatter_plot(col1, col2)

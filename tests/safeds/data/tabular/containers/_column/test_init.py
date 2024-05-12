@@ -1,9 +1,11 @@
+from typing import Any
+
 import pytest
 from safeds.data.tabular.containers import Column
 
 
 def test_should_store_the_name() -> None:
-    column = Column("a", [])
+    column: Column[Any] = Column("a", [])
     assert column.name == "a"
 
 

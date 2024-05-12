@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import itertools
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Self
 
 import pytest
 from safeds.data.tabular.containers import Table
@@ -317,11 +317,22 @@ class DummyClassifier(Classifier):
     `target_name` must be set to `"expected"`.
     """
 
+    def __init__(self) -> None:
+        pass
+
+    def __hash__(self) -> int:
+        raise NotImplementedError
+
+    def _clone(self) -> Self:
+        return self
+
     def fit(self, training_set: TabularDataset) -> DummyClassifier:  # noqa: ARG002
         return self
 
-    def predict(self, dataset: Table) -> TabularDataset:
-        # Needed until https://github.com/Safe-DS/Library/issues/75 is fixed
+    def predict(self, dataset: Table | TabularDataset) -> TabularDataset:
+        if isinstance(dataset, TabularDataset):
+            dataset = dataset.to_table()
+
         predicted = dataset.get_column("predicted")
         feature = predicted.rename("feature")
         dataset = Table.from_columns([feature, predicted])
@@ -334,6 +345,8 @@ class DummyClassifier(Classifier):
 
     def _get_sklearn_model(self) -> ClassifierMixin:
         pass
+
+
 
 
 class TestSummarizeMetrics:

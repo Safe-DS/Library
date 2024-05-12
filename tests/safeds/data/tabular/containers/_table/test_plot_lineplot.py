@@ -6,7 +6,7 @@ from syrupy import SnapshotAssertion
 
 def test_should_match_snapshot(snapshot_png_image: SnapshotAssertion) -> None:
     table = Table({"A": [1, 2, 3], "B": [2, 4, 7]})
-    lineplot = table.plot_lineplot("A", "B")
+    lineplot = table.plot.line_plot("A", "B")
     assert lineplot == snapshot_png_image
 
 
@@ -22,7 +22,7 @@ def test_should_match_snapshot(snapshot_png_image: SnapshotAssertion) -> None:
 def test_should_raise_if_column_does_not_exist(table: Table, x: str, y: str) -> None:
     table = Table({"A": [1, 2, 3], "B": [2, 4, 7]})
     with pytest.raises(UnknownColumnNameError):
-        table.plot_lineplot(x, y)
+        table.plot.line_plot(x, y)
 
 
 @pytest.mark.parametrize(
@@ -37,4 +37,4 @@ def test_should_raise_if_column_does_not_exist(table: Table, x: str, y: str) -> 
 def test_should_raise_if_column_does_not_exist_error_message(x: str, y: str, error_message: str) -> None:
     table = Table({"A": [1, 2, 3], "B": [2, 4, 7]})
     with pytest.raises(UnknownColumnNameError, match=error_message):
-        table.plot_lineplot(x, y)
+        table.plot.line_plot(x, y)

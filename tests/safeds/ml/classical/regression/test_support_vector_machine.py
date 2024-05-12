@@ -51,18 +51,18 @@ class TestC:
 
 class TestKernel:
     def test_should_be_passed_to_fitted_model(self, training_set: TabularDataset) -> None:
-        kernel = SupportVectorRegressor.Kernel.Linear()
+        kernel = SupportVectorRegressor.Kernel.linear()
         fitted_model = SupportVectorRegressor(c=2, kernel=kernel).fit(training_set=training_set)
         assert isinstance(fitted_model.kernel, SupportVectorRegressor.Kernel.Linear)
 
     def test_should_be_passed_to_sklearn(self, training_set: TabularDataset) -> None:
-        kernel = SupportVectorRegressor.Kernel.Linear()
+        kernel = SupportVectorRegressor.Kernel.linear()
         fitted_model = SupportVectorRegressor(c=2, kernel=kernel).fit(training_set)
         assert fitted_model._wrapped_model is not None
         assert isinstance(fitted_model.kernel, SupportVectorRegressor.Kernel.Linear)
 
     def test_should_get_sklearn_arguments_linear(self) -> None:
-        svm = SupportVectorRegressor(c=2, kernel=SupportVectorRegressor.Kernel.Linear())
+        svm = SupportVectorRegressor(c=2, kernel=SupportVectorRegressor.Kernel.linear())
         assert isinstance(svm.kernel, SupportVectorRegressor.Kernel.Linear)
         linear_kernel = svm.kernel._get_sklearn_arguments()
         assert linear_kernel == {
@@ -72,10 +72,10 @@ class TestKernel:
     @pytest.mark.parametrize("degree", [-1, 0], ids=["minus_one", "zero"])
     def test_should_raise_if_degree_less_than_1(self, degree: int) -> None:
         with pytest.raises(OutOfBoundsError, match=rf"degree \(={degree}\) is not inside \[1, \u221e\)\."):
-            SupportVectorRegressor.Kernel.Polynomial(degree=degree)
+            SupportVectorRegressor.Kernel.polynomial(degree=degree)
 
     def test_should_get_sklearn_arguments_polynomial(self) -> None:
-        svm = SupportVectorRegressor(c=2, kernel=SupportVectorRegressor.Kernel.Polynomial(degree=2))
+        svm = SupportVectorRegressor(c=2, kernel=SupportVectorRegressor.Kernel.polynomial(degree=2))
         assert isinstance(svm.kernel, SupportVectorRegressor.Kernel.Polynomial)
         poly_kernel = svm.kernel._get_sklearn_arguments()
         assert poly_kernel == {
@@ -84,11 +84,11 @@ class TestKernel:
         }
 
     def test_should_get_degree(self) -> None:
-        kernel = SupportVectorRegressor.Kernel.Polynomial(degree=3)
+        kernel = SupportVectorRegressor.Kernel.polynomial(degree=3)
         assert kernel.degree == 3
 
     def test_should_get_sklearn_arguments_sigmoid(self) -> None:
-        svm = SupportVectorRegressor(c=2, kernel=SupportVectorRegressor.Kernel.Sigmoid())
+        svm = SupportVectorRegressor(c=2, kernel=SupportVectorRegressor.Kernel.sigmoid())
         assert isinstance(svm.kernel, SupportVectorRegressor.Kernel.Sigmoid)
         sigmoid_kernel = svm.kernel._get_sklearn_arguments()
         assert sigmoid_kernel == {
