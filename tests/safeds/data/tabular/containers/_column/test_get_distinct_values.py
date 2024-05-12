@@ -10,20 +10,22 @@ if TYPE_CHECKING:
 
 
 @pytest.mark.parametrize(
-    ("values", "unique_values"),
+    ("values", "expected"),
     [
         ([], []),
+        ([None, None, None], [None]),
         ([1, 2, 3], [1, 2, 3]),
         ([1, 1, 2, 3], [1, 2, 3]),
         (["a", "b", "b", "c"], ["a", "b", "c"]),
     ],
     ids=[
         "empty",
+        "only missing",
         "no duplicates",
         "integer duplicates",
         "string duplicates",
     ],
 )
-def test_should_list_unique_values(values: list[Any], unique_values: list[Any]) -> None:
+def test_should_list_unique_values(values: list[Any], expected: list[Any]) -> None:
     column: Column = Column("", values)
-    assert column.get_distinct_values() == unique_values
+    assert column.get_distinct_values() == expected

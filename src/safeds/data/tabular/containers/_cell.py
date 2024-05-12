@@ -682,7 +682,7 @@ class Cell(ABC, Generic[T]):
 
     @property
     @abstractmethod
-    def _polars_expression(self) -> pl.Expr | pl.Series:
+    def _polars_expression(self) -> pl.Expr:
         """The Polars expression that corresponds to this cell."""
 
     @abstractmethod

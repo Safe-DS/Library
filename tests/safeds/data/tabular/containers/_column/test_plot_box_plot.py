@@ -18,11 +18,11 @@ from syrupy import SnapshotAssertion
     ],
 )
 def test_should_match_snapshot(column: Column, snapshot_png_image: SnapshotAssertion) -> None:
-    boxplot = column.plot.box_plot()
-    assert boxplot == snapshot_png_image
+    box_plot = column.plot.box_plot()
+    assert box_plot == snapshot_png_image
 
 
 def test_should_raise_if_column_contains_non_numerical_values() -> None:
-    column = Column("a", ["1", "2", "3"])
+    column = Column("a", ["A", "B", "C"])
     with pytest.raises(NonNumericColumnError):
         column.plot.box_plot()

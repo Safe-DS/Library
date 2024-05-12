@@ -115,7 +115,8 @@ class ColumnPlotter:
         >>> column = Column("values", [1, 2, 3, 4])
         >>> image = column.plot.lag_plot(2)
         """
-        if not self._column.is_numeric:
+        if self._column.number_of_rows > 0 and not self._column.is_numeric:
+            # TODO better error message
             raise NonNumericColumnError("This time series target contains non-numerical columns.")
 
         import matplotlib.pyplot as plt
@@ -123,7 +124,7 @@ class ColumnPlotter:
         fig, ax = plt.subplots()
         series = self._column._series
         ax.scatter(
-            x=series.slice(0, len(self._column) - lag),
+            x=series.slice(0, max(len(self._column) - lag, 0)),
             y=series.slice(lag),
         )
         ax.set(

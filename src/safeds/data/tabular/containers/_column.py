@@ -1,13 +1,14 @@
 from __future__ import annotations
 
 from collections.abc import Callable, Iterator, Sequence
-from typing import TYPE_CHECKING, Any, TypeVar, overload
+from typing import TYPE_CHECKING, Any, TypeVar, overload, Literal
 
 from safeds._utils import _structural_hash
 from safeds.data.tabular.plotting import ColumnPlotter
 from safeds.data.tabular.typing._polars_data_type import _PolarsDataType
 from safeds.exceptions import IndexOutOfBoundsError
 
+from ._lazy_cell import _LazyCell
 from ._vectorized_cell import _VectorizedCell
 
 if TYPE_CHECKING:
@@ -171,7 +172,14 @@ class Column(Sequence[T]):
         >>> column.get_distinct_values()
         [1, 2, 3]
         """
-        return self._series.unique().sort().to_list()
+        import polars as pl
+
+        if self.number_of_rows == 0:
+            return []  # polars raises otherwise
+        elif self._series.dtype == pl.Null:
+            return [None]  # polars raises otherwise
+        else:
+            return self._series.unique(maintain_order=True).to_list()
 
     def get_value(self, index: int) -> T:
         """
@@ -211,14 +219,44 @@ class Column(Sequence[T]):
     # Reductions
     # ------------------------------------------------------------------------------------------------------------------
 
-    def all(self, predicate: Callable[[Cell[T]], Cell[bool]]) -> bool:
+    @overload
+    def all(
+        self,
+        predicate: Callable[[Cell[T]], Cell[bool]],
+        *,
+        use_kleene_logic: Literal[False] = ...,
+    ) -> bool: ...
+
+    @overload
+    def all(
+        self,
+        predicate: Callable[[Cell[T]], Cell[bool]],
+        *,
+        use_kleene_logic: bool,
+    ) -> bool | None: ...
+
+    def all(
+        self,
+        predicate: Callable[[Cell[T]], Cell[bool]],
+        *,
+        use_kleene_logic: bool = False,
+    ) -> bool | None:
         """
         Return whether all values in the column satisfy the predicate.
+
+        By default, this method returns either True or False. Cases where the truthiness of the predicate is unknown
+        (e.g. due to missing values), are ignored. This implies, that if the truthiness of the predicate is unknown for
+        _all_ values, the result of this method is True.
+
+        You can instead enable Kleene logic by setting `use_kleene_logic=True`. In this case, the method returns None,
+        indicating an unknown result, if the truthiness of the predicate is unknown for _any_ value.
 
         Parameters
         ----------
         predicate:
             The predicate to apply to each value.
+        use_kleene_logic:
+            Whether to use Kleene logic instead of boolean logic.
 
         Returns
         -------
@@ -242,11 +280,9 @@ class Column(Sequence[T]):
         """
         import polars as pl
 
-        result = predicate(_VectorizedCell(self))
-        if not isinstance(result, _VectorizedCell) or not result._series.dtype.is_(pl.Boolean):
-            raise TypeError("The predicate must return a boolean cell.")
-
-        return result._series.all()
+        # Expressions only work on data frames/lazy frames, so we wrap the polars series first
+        expression = predicate(_LazyCell(pl.col(self.name)))._polars_expression.all(ignore_nulls=not use_kleene_logic)
+        return self._series.to_frame().select(expression).item()
 
     def any(self, predicate: Callable[[Cell[T]], Cell[bool]]) -> bool:
         """
@@ -279,11 +315,9 @@ class Column(Sequence[T]):
         """
         import polars as pl
 
-        result = predicate(_VectorizedCell(self))
-        if not isinstance(result, _VectorizedCell) or not result._series.dtype.is_(pl.Boolean):
-            raise TypeError("The predicate must return a boolean cell.")
-
-        return result._series.any()
+        # Expressions only work on data frames/lazy frames, so we wrap the polars series first
+        expression = predicate(_LazyCell(pl.col(self.name)))._polars_expression.any()
+        return self._series.to_frame().select(expression).item()
 
     def count(self, predicate: Callable[[Cell[T]], Cell[bool]]) -> int:
         """

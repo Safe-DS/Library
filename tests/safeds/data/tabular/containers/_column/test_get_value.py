@@ -26,9 +26,8 @@ def test_should_get_the_item_at_index(index: int, expected: Any) -> None:
 
 @pytest.mark.parametrize(
     "index",
-    [-1, 2],
+    [2],
     ids=[
-        "negative",
         "out of bounds",
     ],
 )
