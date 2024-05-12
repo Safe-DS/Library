@@ -52,11 +52,11 @@ class KNearestNeighborsRegressor(Regressor, _KNearestNeighborsBase):
     # ------------------------------------------------------------------------------------------------------------------
 
     def _check_additional_fit_preconditions(self, training_set: TabularDataset):
-        if self._number_of_neighbors > training_set._table.number_of_rows:
+        if self._number_of_neighbors > training_set.to_table().number_of_rows:
             raise ValueError(
                 (
                     f"The parameter 'number_of_neighbors' ({self._number_of_neighbors}) has to be less than or equal to"
-                    f" the sample size ({training_set._table.number_of_rows})."
+                    f" the sample size ({training_set.to_table().number_of_rows})."
                 ),
             )
 

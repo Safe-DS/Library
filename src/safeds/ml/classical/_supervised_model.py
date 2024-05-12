@@ -83,6 +83,11 @@ class SupervisedModel(ABC):
         LearningError
             If the training data contains invalid values or if the training failed.
         """
+        if not isinstance(training_set, TabularDataset) and isinstance(training_set, Table):
+            raise PlainTableError
+        if training_set.to_table().number_of_rows == 0:
+            raise DatasetMissesDataError
+
         self._check_additional_fit_preconditions(training_set)
 
         wrapped_model = self._get_sklearn_model()
@@ -296,12 +301,6 @@ def _fit_sklearn_model_in_place(model: Any, tabular_dataset: TabularDataset) -> 
     DatasetMissesDataError
         If the training data contains no rows.
     """
-    if not isinstance(tabular_dataset, TabularDataset) and isinstance(tabular_dataset, Table):
-        raise PlainTableError
-
-    if tabular_dataset._table.number_of_rows == 0:
-        raise DatasetMissesDataError
-
     non_numerical_column_names = set(tabular_dataset.features.column_names) - set(
         tabular_dataset.features.remove_non_numeric_columns().column_names,
     )

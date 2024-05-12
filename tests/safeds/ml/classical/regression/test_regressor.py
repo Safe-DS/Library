@@ -3,8 +3,8 @@ from __future__ import annotations
 import itertools
 from typing import TYPE_CHECKING, Any, Self
 
-import pandas as pd
 import pytest
+from safeds.data.labeled.containers import TabularDataset
 from safeds.data.tabular.containers import Column, Table
 from safeds.exceptions import (
     ColumnLengthMismatchError,
@@ -32,8 +32,7 @@ from safeds.ml.classical.regression._regressor import _check_metrics_preconditio
 
 if TYPE_CHECKING:
     from _pytest.fixtures import FixtureRequest
-    from safeds.data.labeled.containers import TabularDataset
-    from sklearn.base import RegressorMixin, ClassifierMixin
+    from sklearn.base import ClassifierMixin, RegressorMixin
 
 
 def regressors() -> list[Regressor]:
@@ -323,7 +322,9 @@ class DummyRegressor(Regressor):
     """
 
     def __init__(self) -> None:
-        pass
+        super().__init__()
+
+        self._target_name = "expected"
 
     def __hash__(self) -> int:
         raise NotImplementedError
@@ -361,8 +362,18 @@ class TestSummarizeMetrics:
                 [1, 2],
                 Table(
                     {
-                        "metric": ["mean_absolute_error", "mean_squared_error"],
-                        "value": [0.0, 0.0],
+                        "metric": [
+                            "coefficient_of_determination",
+                            "mean_absolute_error",
+                            "mean_squared_error",
+                            "median_absolute_deviation",
+                        ],
+                        "value": [
+                            1.0,
+                            0.0,
+                            0.0,
+                            0.0,
+                        ],
                     },
                 ),
             ),
@@ -434,7 +445,7 @@ class TestCheckMetricsPreconditions:
         expected: list[str | int],
         error: type[Exception],
     ) -> None:
-        actual_column: Column = Column("actual", pd.Series(actual))
-        expected_column: Column = Column("expected", pd.Series(expected))
+        actual_column: Column = Column("actual", actual)
+        expected_column: Column = Column("expected", expected)
         with pytest.raises(error):
             _check_metrics_preconditions(actual_column, expected_column)
