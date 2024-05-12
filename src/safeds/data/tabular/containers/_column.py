@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Callable, Iterator, Sequence
-from typing import TYPE_CHECKING, Any, TypeVar, overload, Literal
+from typing import TYPE_CHECKING, Any, Literal, TypeVar, overload
 
 from safeds._utils import _structural_hash
 from safeds.data.tabular.plotting import ColumnPlotter
@@ -222,41 +222,51 @@ class Column(Sequence[T]):
     @overload
     def all(
         self,
-        predicate: Callable[[Cell[T]], Cell[bool]],
+        predicate: Callable[[Cell[T]], Cell[bool | None]],
         *,
-        use_kleene_logic: Literal[False] = ...,
+        ignore_unknown: Literal[True] = ...,
     ) -> bool: ...
 
     @overload
     def all(
         self,
-        predicate: Callable[[Cell[T]], Cell[bool]],
+        predicate: Callable[[Cell[T]], Cell[bool | None]],
         *,
-        use_kleene_logic: bool,
+        ignore_unknown: bool,
     ) -> bool | None: ...
 
     def all(
         self,
-        predicate: Callable[[Cell[T]], Cell[bool]],
+        predicate: Callable[[Cell[T]], Cell[bool | None]],
         *,
-        use_kleene_logic: bool = False,
+        ignore_unknown: bool = True,
     ) -> bool | None:
         """
         Return whether all values in the column satisfy the predicate.
 
-        By default, this method returns either True or False. Cases where the truthiness of the predicate is unknown
-        (e.g. due to missing values), are ignored. This implies, that if the truthiness of the predicate is unknown for
-        _all_ values, the result of this method is True.
+        The predicate can return one of three values:
 
-        You can instead enable Kleene logic by setting `use_kleene_logic=True`. In this case, the method returns None,
-        indicating an unknown result, if the truthiness of the predicate is unknown for _any_ value.
+        * True, if the value satisfies the predicate.
+        * False, if the value does not satisfy the predicate.
+        * None, if the truthiness of the predicate is unknown, e.g. due to missing values.
+
+        By default, cases where the truthiness of the predicate is unknown are ignored and this method returns
+
+        * True, if the predicate always returns True or None.
+        * False, if the predicate returns False at least once.
+
+        You can instead enable Kleene logic by setting `ignore_unknown=False`. In this case, this method returns
+
+        * True, if the predicate always returns True.
+        * False, if the predicate returns False at least once.
+        * None, if the predicate never returns False, but at least once None.
 
         Parameters
         ----------
         predicate:
             The predicate to apply to each value.
-        use_kleene_logic:
-            Whether to use Kleene logic instead of boolean logic.
+        ignore_unknown:
+            Whether to ignore cases where the truthiness of the predicate is unknown.
 
         Returns
         -------
@@ -281,17 +291,57 @@ class Column(Sequence[T]):
         import polars as pl
 
         # Expressions only work on data frames/lazy frames, so we wrap the polars series first
-        expression = predicate(_LazyCell(pl.col(self.name)))._polars_expression.all(ignore_nulls=not use_kleene_logic)
+        expression = predicate(_LazyCell(pl.col(self.name)))._polars_expression.all(ignore_nulls=ignore_unknown)
         return self._series.to_frame().select(expression).item()
 
-    def any(self, predicate: Callable[[Cell[T]], Cell[bool]]) -> bool:
+    @overload
+    def any(
+        self,
+        predicate: Callable[[Cell[T]], Cell[bool | None]],
+        *,
+        ignore_unknown: Literal[True] = ...,
+    ) -> bool: ...
+
+    @overload
+    def any(
+        self,
+        predicate: Callable[[Cell[T]], Cell[bool | None]],
+        *,
+        ignore_unknown: bool,
+    ) -> bool | None: ...
+
+    def any(
+        self,
+        predicate: Callable[[Cell[T]], Cell[bool | None]],
+        *,
+        ignore_unknown: bool = True,
+    ) -> bool | None:
         """
         Return whether any value in the column satisfies the predicate.
+
+        The predicate can return one of three values:
+
+        * True, if the value satisfies the predicate.
+        * False, if the value does not satisfy the predicate.
+        * None, if the truthiness of the predicate is unknown, e.g. due to missing values.
+
+        By default, cases where the truthiness of the predicate is unknown are ignored and this method returns
+
+        * True, if the predicate returns True at least once.
+        * False, if the predicate always returns False or None.
+
+        You can instead enable Kleene logic by setting `ignore_unknown=False`. In this case, this method returns
+
+        * True, if the predicate returns True at least once.
+        * False, if the predicate always returns False.
+        * None, if the predicate never returns True, but at least once None.
 
         Parameters
         ----------
         predicate:
             The predicate to apply to each value.
+        ignore_unknown:
+            Whether to ignore cases where the truthiness of the predicate is unknown.
 
         Returns
         -------
@@ -316,7 +366,7 @@ class Column(Sequence[T]):
         import polars as pl
 
         # Expressions only work on data frames/lazy frames, so we wrap the polars series first
-        expression = predicate(_LazyCell(pl.col(self.name)))._polars_expression.any()
+        expression = predicate(_LazyCell(pl.col(self.name)))._polars_expression.any(ignore_nulls=ignore_unknown)
         return self._series.to_frame().select(expression).item()
 
     def count(self, predicate: Callable[[Cell[T]], Cell[bool]]) -> int:
@@ -356,14 +406,54 @@ class Column(Sequence[T]):
 
         return result._series.sum()
 
-    def none(self, predicate: Callable[[Cell[T]], Cell[bool]]) -> bool:
+    @overload
+    def none(
+        self,
+        predicate: Callable[[Cell[T]], Cell[bool | None]],
+        *,
+        ignore_unknown: Literal[True] = ...,
+    ) -> bool: ...
+
+    @overload
+    def none(
+        self,
+        predicate: Callable[[Cell[T]], Cell[bool | None]],
+        *,
+        ignore_unknown: bool,
+    ) -> bool | None: ...
+
+    def none(
+        self,
+        predicate: Callable[[Cell[T]], Cell[bool | None]],
+        *,
+        ignore_unknown: bool = True,
+    ) -> bool | None:
         """
         Return whether no value in the column satisfies the predicate.
+
+        The predicate can return one of three values:
+
+        * True, if the value satisfies the predicate.
+        * False, if the value does not satisfy the predicate.
+        * None, if the truthiness of the predicate is unknown, e.g. due to missing values.
+
+        By default, cases where the truthiness of the predicate is unknown are ignored and this method returns
+
+        * True, if the predicate always returns False or None.
+        * False, if the predicate returns True at least once.
+
+        You can instead enable Kleene logic by setting `ignore_unknown=False`. In this case, this method returns
+
+        * True, if the predicate always returns False.
+        * False, if the predicate returns True at least once.
+        * None, if the predicate never returns True, but at least once None.
 
         Parameters
         ----------
         predicate:
             The predicate to apply to each value.
+        ignore_unknown:
+            Whether to ignore cases where the truthiness of the predicate is unknown.
 
         Returns
         -------
@@ -385,13 +475,11 @@ class Column(Sequence[T]):
         >>> column.none(lambda cell: cell > 2)
         False
         """
-        import polars as pl
+        any_ = self.any(predicate, ignore_unknown=ignore_unknown)
+        if any_ is None:
+            return None
 
-        result = predicate(_VectorizedCell(self))
-        if not isinstance(result, _VectorizedCell) or not result._series.dtype.is_(pl.Boolean):
-            raise TypeError("The predicate must return a boolean cell.")
-
-        return (~result._series).all()
+        return not any_
 
     # ------------------------------------------------------------------------------------------------------------------
     # Transformations
@@ -542,7 +630,8 @@ class Column(Sequence[T]):
         """
         Calculate the Pearson correlation between this column and another column.
 
-        The Pearson correlation is a value between -1 and 1 that indicates how much the two columns are linearly related:
+        The Pearson correlation is a value between -1 and 1 that indicates how much the two columns are linearly
+        related:
 
         - A correlation of -1 indicates a perfect negative linear relationship.
         - A correlation of 0 indicates no linear relationship.
