@@ -164,11 +164,25 @@ class Column(Sequence[T]):
     # Value operations
     # ------------------------------------------------------------------------------------------------------------------
 
+    @overload
+    def get_distinct_values(
+        self,
+        *,
+        ignore_missing_values: Literal[True] = ...,
+    ) -> Sequence[T]: ...
+
+    @overload
+    def get_distinct_values(
+        self,
+        *,
+        ignore_missing_values: bool,
+    ) -> Sequence[T | None]: ...
+
     def get_distinct_values(
         self,
         *,
         ignore_missing_values: bool = True,
-    ) -> Sequence[T]:
+    ) -> Sequence[T | None]:
         """
         Return the distinct values in the column.
 
@@ -662,7 +676,7 @@ class Column(Sequence[T]):
 
         # TODO: turn this around (call table method, implement in table; allows parallelization)
         if self.is_numeric:
-            values = [
+            values: list[Any] = [
                 self.min(),
                 self.max(),
                 self.mean(),
@@ -817,7 +831,7 @@ class Column(Sequence[T]):
 
         return self.distinct_value_count(ignore_missing_values=False) / self.number_of_rows
 
-    def max(self) -> T:
+    def max(self) -> T | None:
         """
         Return the maximum value in the column.
 
@@ -960,11 +974,25 @@ class Column(Sequence[T]):
 
         return self._series.null_count() / self.number_of_rows
 
+    @overload
+    def mode(
+        self,
+        *,
+        ignore_missing_values: Literal[True] = ...,
+    ) -> Sequence[T]: ...
+
+    @overload
+    def mode(
+        self,
+        *,
+        ignore_missing_values: bool,
+    ) -> Sequence[T | None]: ...
+
     def mode(
         self,
         *,
         ignore_missing_values: bool = True,
-    ) -> Sequence[T]:
+    ) -> Sequence[T | None]:
         """
         Return the mode of the values in the column.
 
