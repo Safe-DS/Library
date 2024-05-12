@@ -14,8 +14,8 @@ from safeds.data.tabular.containers import Column, Table
         (Column("a", [1, 2, 3]), Column("a", ["1", "2", "3"]), False),
     ],
     ids=[
-        "empty columns",
-        "equal columns",
+        "equal (empty)",
+        "equal (non-empty)",
         "different names",
         "different values",
         "different types",

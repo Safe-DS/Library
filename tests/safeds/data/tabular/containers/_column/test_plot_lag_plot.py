@@ -9,7 +9,7 @@ def test_should_return_table(snapshot_png_image: SnapshotAssertion) -> None:
         "target",
         [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
     )
-    lag_plot = col.plot_lagplot(1)
+    lag_plot = col.plot.lag_plot(1)
     assert lag_plot == snapshot_png_image
 
 
@@ -26,4 +26,4 @@ def test_should_raise_if_column_contains_non_numerical_values() -> None:
             r" non-numerical columns."
         ),
     ):
-        table.plot_lagplot(2)
+        table.plot.lag_plot(2)

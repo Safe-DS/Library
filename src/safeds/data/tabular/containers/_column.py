@@ -91,6 +91,8 @@ class Column(Sequence[T]):
         if isinstance(index, int):
             return self.get_value(index)
         else:
+            if index.start < 0 or index.stop < 0 or index.step < 0:
+                raise IndexError("Negative values for start/stop/step of slices are not supported.")
             return self._from_polars_series(self._series.__getitem__(index))
 
     def __hash__(self) -> int:
@@ -173,7 +175,10 @@ class Column(Sequence[T]):
 
     def get_value(self, index: int) -> T:
         """
-        Return the column value at specified index. Indexing starts at 0.
+        Return the column value at specified index.
+
+        Nonnegative indices are counted from the beginning (starting at 0), negative indices from the end (starting at
+        -1).
 
         Parameters
         ----------
@@ -188,7 +193,7 @@ class Column(Sequence[T]):
         Raises
         ------
         IndexError
-            If the given index does not exist in the column.
+            If the index is out of bounds.
 
         Examples
         --------
@@ -197,7 +202,7 @@ class Column(Sequence[T]):
         >>> column.get_value(1)
         2
         """
-        if index < 0 or index >= self.number_of_rows:
+        if index < -self.number_of_rows or index >= self.number_of_rows:
             raise IndexOutOfBoundsError(index)
 
         return self._series.__getitem__(index)
