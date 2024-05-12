@@ -85,7 +85,7 @@ class TestKernel:
         }
 
     def test_should_get_degree(self) -> None:
-        kernel = SupportVectorClassifier.Kernel.polynomial(degree=3)
+        kernel = _Polynomial(degree=3)
         assert kernel.degree == 3
 
     def test_should_get_sklearn_arguments_sigmoid(self) -> None:

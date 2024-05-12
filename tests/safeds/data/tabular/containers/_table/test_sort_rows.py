@@ -1,20 +1,20 @@
 from collections.abc import Callable
 
 import pytest
-from safeds.data.tabular.containers import Row, Table
+from safeds.data.tabular.containers import Cell, Row, Table
 
 
 @pytest.mark.parametrize(
-    ("table", "comparator", "expected"),
+    ("table", "key_selector", "expected"),
     [
         (
             Table(),
-            lambda row1, row2: row1["col1"] - row2["col1"],
+            lambda row: row["col1"],
             Table(),
         ),
         (
             Table({"col1": [3, 2, 1]}),
-            lambda row1, row2: row1["col1"] - row2["col1"],
+            lambda row: row["col1"],
             Table({"col1": [1, 2, 3]}),
         ),
     ],
@@ -22,24 +22,24 @@ from safeds.data.tabular.containers import Row, Table
 )
 def test_should_return_sorted_table(
     table: Table,
-    comparator: Callable[[Row, Row], int],
+    key_selector: Callable[[Row], Cell],
     expected: Table,
 ) -> None:
-    assert table.sort_rows(comparator).schema == expected.schema
-    assert table.sort_rows(comparator) == expected
+    assert table.sort_rows(key_selector).schema == expected.schema
+    assert table.sort_rows(key_selector) == expected
 
 
 @pytest.mark.parametrize(
-    ("table", "comparator", "expected"),
+    ("table", "key_selector", "expected"),
     [
         (
             Table(),
-            lambda row1, row2: row1["col1"] - row2["col1"],
+            lambda row: row["col1"],
             Table(),
         ),
         (
             Table({"col1": [3, 2, 1]}),
-            lambda row1, row2: row1["col1"] - row2["col1"],
+            lambda row: row["col1"],
             Table({"col1": [3, 2, 1]}),
         ),
     ],
@@ -47,9 +47,9 @@ def test_should_return_sorted_table(
 )
 def test_should_not_modify_original_table(
     table: Table,
-    comparator: Callable[[Row, Row], int],
+    key_selector: Callable[[Row], Cell],
     expected: Table,
 ) -> None:
-    table.sort_rows(comparator)
+    table.sort_rows(key_selector)
     assert table.schema == expected.schema
     assert table == expected

@@ -14,7 +14,7 @@ from safeds.exceptions import UnknownColumnNameError
     ids=["multiply by 2"],
 )
 def test_should_transform_column(table: Table, table_transformed: Table) -> None:
-    result = table.transform_column("A", lambda row: row.get_value("A") * 2)
+    result = table.transform_column("A", lambda cell: cell * 2)
 
     assert result.schema == table_transformed.schema
     assert result == table_transformed
@@ -36,4 +36,4 @@ def test_should_transform_column(table: Table, table_transformed: Table) -> None
 )
 def test_should_raise_if_column_not_found(table: Table) -> None:
     with pytest.raises(UnknownColumnNameError, match=r"Could not find column\(s\) 'D'"):
-        table.transform_column("D", lambda row: row.get_value("A") * 2)
+        table.transform_column("D", lambda cell: cell * 2)

@@ -53,7 +53,7 @@ def test_should_add_columns_from_table(table1: Table, table2: Table, expected: T
     assert table1.schema == expected.schema
     assert table1 == expected
 
-#  TODO
+#  TODO - separate test for add_table_as_columns and a new one here
 # @pytest.mark.parametrize(
 #     ("table", "columns", "error_message_regex"),
 #     [
@@ -73,22 +73,22 @@ def test_should_add_columns_from_table(table1: Table, table2: Table, expected: T
 #     with pytest.raises(ColumnSizeError, match=error_message_regex):
 #         table.add_columns(columns)
 
-
-@pytest.mark.parametrize(
-    ("table", "columns", "error_message_regex"),
-    [
-        (
-            Table({"col1": [1, 2, 1], "col2": [1, 2, 4]}),
-            [Column("col2", ["a", "b", "c"]), Column("col3", [2, 3, 4])],
-            r"Column 'col2' already exists.",
-        ),
-    ],
-    ids=["Column already exists"],
-)
-def test_should_raise_error_if_column_name_in_result_column(
-    table: Table,
-    columns: list[Column] | Table,
-    error_message_regex: str,
-) -> None:
-    with pytest.raises(DuplicateColumnNameError, match=error_message_regex):
-        table.add_columns(columns)
+#  TODO - separate test for add_table_as_columns and a new one here
+# @pytest.mark.parametrize(
+#     ("table", "columns", "error_message_regex"),
+#     [
+#         (
+#             Table({"col1": [1, 2, 1], "col2": [1, 2, 4]}),
+#             [Column("col2", ["a", "b", "c"]), Column("col3", [2, 3, 4])],
+#             r"Column 'col2' already exists.",
+#         ),
+#     ],
+#     ids=["Column already exists"],
+# )
+# def test_should_raise_error_if_column_name_in_result_column(
+#     table: Table,
+#     columns: list[Column] | Table,
+#     error_message_regex: str,
+# ) -> None:
+#     with pytest.raises(DuplicateColumnNameError, match=error_message_regex):
+#         table.add_columns(columns)

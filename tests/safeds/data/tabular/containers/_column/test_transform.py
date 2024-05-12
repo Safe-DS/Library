@@ -1,3 +1,5 @@
+from typing import Any
+
 import pytest
 from safeds.data.tabular.containers import Column
 
@@ -12,7 +14,7 @@ from safeds.data.tabular.containers import Column
     ids=["empty", "integers", "floats"],
 )
 def test_should_transform_column(column: Column, expected: Column) -> None:
-    new_column = column.transform(lambda it: it + 1)
+    new_column: Column[Any] = column.transform(lambda it: it + 1)
     assert new_column == expected
 
 

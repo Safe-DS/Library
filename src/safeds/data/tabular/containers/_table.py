@@ -1316,6 +1316,9 @@ class Table:
         |   3 |   2 |
         +-----+-----+
         """
+        if self.number_of_rows == 0:
+            return self
+
         key = key_selector(_LazyVectorizedRow(self))
 
         return Table._from_polars_lazy_frame(

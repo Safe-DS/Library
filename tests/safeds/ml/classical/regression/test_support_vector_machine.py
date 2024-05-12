@@ -4,6 +4,7 @@ import pytest
 from safeds.data.labeled.containers import TabularDataset
 from safeds.data.tabular.containers import Table
 from safeds.exceptions import OutOfBoundsError
+from safeds.ml.classical._bases._support_vector_machine_base import _Linear, _Polynomial, _RadialBasisFunction, _Sigmoid
 from safeds.ml.classical.regression import SupportVectorRegressor
 
 
@@ -53,17 +54,17 @@ class TestKernel:
     def test_should_be_passed_to_fitted_model(self, training_set: TabularDataset) -> None:
         kernel = SupportVectorRegressor.Kernel.linear()
         fitted_model = SupportVectorRegressor(c=2, kernel=kernel).fit(training_set=training_set)
-        assert isinstance(fitted_model.kernel, SupportVectorRegressor.Kernel.Linear)
+        assert isinstance(fitted_model.kernel, _Linear)
 
     def test_should_be_passed_to_sklearn(self, training_set: TabularDataset) -> None:
         kernel = SupportVectorRegressor.Kernel.linear()
         fitted_model = SupportVectorRegressor(c=2, kernel=kernel).fit(training_set)
         assert fitted_model._wrapped_model is not None
-        assert isinstance(fitted_model.kernel, SupportVectorRegressor.Kernel.Linear)
+        assert isinstance(fitted_model.kernel, _Linear)
 
     def test_should_get_sklearn_arguments_linear(self) -> None:
         svm = SupportVectorRegressor(c=2, kernel=SupportVectorRegressor.Kernel.linear())
-        assert isinstance(svm.kernel, SupportVectorRegressor.Kernel.Linear)
+        assert isinstance(svm.kernel, _Linear)
         linear_kernel = svm.kernel._get_sklearn_arguments()
         assert linear_kernel == {
             "kernel": "linear",
@@ -76,7 +77,7 @@ class TestKernel:
 
     def test_should_get_sklearn_arguments_polynomial(self) -> None:
         svm = SupportVectorRegressor(c=2, kernel=SupportVectorRegressor.Kernel.polynomial(degree=2))
-        assert isinstance(svm.kernel, SupportVectorRegressor.Kernel.Polynomial)
+        assert isinstance(svm.kernel, _Polynomial)
         poly_kernel = svm.kernel._get_sklearn_arguments()
         assert poly_kernel == {
             "kernel": "poly",
@@ -84,20 +85,20 @@ class TestKernel:
         }
 
     def test_should_get_degree(self) -> None:
-        kernel = SupportVectorRegressor.Kernel.polynomial(degree=3)
+        kernel = _Polynomial(degree=3)
         assert kernel.degree == 3
 
     def test_should_get_sklearn_arguments_sigmoid(self) -> None:
         svm = SupportVectorRegressor(c=2, kernel=SupportVectorRegressor.Kernel.sigmoid())
-        assert isinstance(svm.kernel, SupportVectorRegressor.Kernel.Sigmoid)
+        assert isinstance(svm.kernel, _Sigmoid)
         sigmoid_kernel = svm.kernel._get_sklearn_arguments()
         assert sigmoid_kernel == {
             "kernel": "sigmoid",
         }
 
     def test_should_get_sklearn_arguments_rbf(self) -> None:
-        svm = SupportVectorRegressor(c=2, kernel=SupportVectorRegressor.Kernel.RadialBasisFunction())
-        assert isinstance(svm.kernel, SupportVectorRegressor.Kernel.RadialBasisFunction)
+        svm = SupportVectorRegressor(c=2, kernel=SupportVectorRegressor.Kernel.radial_basis_function())
+        assert isinstance(svm.kernel, _RadialBasisFunction)
         rbf_kernel = svm.kernel._get_sklearn_arguments()
         assert rbf_kernel == {
             "kernel": "rbf",

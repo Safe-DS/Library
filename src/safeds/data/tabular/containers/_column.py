@@ -24,11 +24,11 @@ if TYPE_CHECKING:
     from ._table import Table
 
 
-T = TypeVar("T")
-R = TypeVar("R")
+T_co = TypeVar("T_co", covariant=True)
+R_co = TypeVar("R_co", covariant=True)
 
 
-class Column(Sequence[T]):
+class Column(Sequence[T_co]):
     """
     A named, one-dimensional collection of homogeneous values.
 
@@ -68,7 +68,7 @@ class Column(Sequence[T]):
     # Dunder methods
     # ------------------------------------------------------------------------------------------------------------------
 
-    def __init__(self, name: str, data: Sequence[T] | None = None) -> None:
+    def __init__(self, name: str, data: Sequence[T_co] | None = None) -> None:
         import polars as pl
 
         if data is None:
@@ -87,12 +87,12 @@ class Column(Sequence[T]):
         return self._series.equals(other._series)
 
     @overload
-    def __getitem__(self, index: int) -> T: ...
+    def __getitem__(self, index: int) -> T_co: ...
 
     @overload
-    def __getitem__(self, index: slice) -> Column[T]: ...
+    def __getitem__(self, index: slice) -> Column[T_co]: ...
 
-    def __getitem__(self, index: int | slice) -> T | Column[T]:
+    def __getitem__(self, index: int | slice) -> T_co | Column[T_co]:
         if isinstance(index, int):
             return self.get_value(index)
         else:
@@ -111,7 +111,7 @@ class Column(Sequence[T]):
             self.number_of_rows,
         )
 
-    def __iter__(self) -> Iterator[T]:
+    def __iter__(self) -> Iterator[T_co]:
         return self._series.__iter__()
 
     def __len__(self) -> int:
@@ -169,20 +169,20 @@ class Column(Sequence[T]):
         self,
         *,
         ignore_missing_values: Literal[True] = ...,
-    ) -> Sequence[T]: ...
+    ) -> Sequence[T_co]: ...
 
     @overload
     def get_distinct_values(
         self,
         *,
         ignore_missing_values: bool,
-    ) -> Sequence[T | None]: ...
+    ) -> Sequence[T_co | None]: ...
 
     def get_distinct_values(
         self,
         *,
         ignore_missing_values: bool = True,
-    ) -> Sequence[T | None]:
+    ) -> Sequence[T_co | None]:
         """
         Return the distinct values in the column.
 
@@ -221,7 +221,7 @@ class Column(Sequence[T]):
 
         return series.unique().sort().to_list()
 
-    def get_value(self, index: int) -> T:
+    def get_value(self, index: int) -> T_co:
         """
         Return the column value at specified index.
 
@@ -262,7 +262,7 @@ class Column(Sequence[T]):
     @overload
     def all(
         self,
-        predicate: Callable[[Cell[T]], Cell[bool | None]],
+        predicate: Callable[[Cell[T_co]], Cell[bool | None]],
         *,
         ignore_unknown: Literal[True] = ...,
     ) -> bool: ...
@@ -270,14 +270,14 @@ class Column(Sequence[T]):
     @overload
     def all(
         self,
-        predicate: Callable[[Cell[T]], Cell[bool | None]],
+        predicate: Callable[[Cell[T_co]], Cell[bool | None]],
         *,
         ignore_unknown: bool,
     ) -> bool | None: ...
 
     def all(
         self,
-        predicate: Callable[[Cell[T]], Cell[bool | None]],
+        predicate: Callable[[Cell[T_co]], Cell[bool | None]],
         *,
         ignore_unknown: bool = True,
     ) -> bool | None:
@@ -337,7 +337,7 @@ class Column(Sequence[T]):
     @overload
     def any(
         self,
-        predicate: Callable[[Cell[T]], Cell[bool | None]],
+        predicate: Callable[[Cell[T_co]], Cell[bool | None]],
         *,
         ignore_unknown: Literal[True] = ...,
     ) -> bool: ...
@@ -345,14 +345,14 @@ class Column(Sequence[T]):
     @overload
     def any(
         self,
-        predicate: Callable[[Cell[T]], Cell[bool | None]],
+        predicate: Callable[[Cell[T_co]], Cell[bool | None]],
         *,
         ignore_unknown: bool,
     ) -> bool | None: ...
 
     def any(
         self,
-        predicate: Callable[[Cell[T]], Cell[bool | None]],
+        predicate: Callable[[Cell[T_co]], Cell[bool | None]],
         *,
         ignore_unknown: bool = True,
     ) -> bool | None:
@@ -412,7 +412,7 @@ class Column(Sequence[T]):
     @overload
     def count_if(
         self,
-        predicate: Callable[[Cell[T]], Cell[bool | None]],
+        predicate: Callable[[Cell[T_co]], Cell[bool | None]],
         *,
         ignore_unknown: Literal[True] = ...,
     ) -> int: ...
@@ -420,14 +420,14 @@ class Column(Sequence[T]):
     @overload
     def count_if(
         self,
-        predicate: Callable[[Cell[T]], Cell[bool | None]],
+        predicate: Callable[[Cell[T_co]], Cell[bool | None]],
         *,
         ignore_unknown: bool,
     ) -> int | None: ...
 
     def count_if(
         self,
-        predicate: Callable[[Cell[T]], Cell[bool | None]],
+        predicate: Callable[[Cell[T_co]], Cell[bool | None]],
         *,
         ignore_unknown: bool = True,
     ) -> int | None:
@@ -487,7 +487,7 @@ class Column(Sequence[T]):
     @overload
     def none(
         self,
-        predicate: Callable[[Cell[T]], Cell[bool | None]],
+        predicate: Callable[[Cell[T_co]], Cell[bool | None]],
         *,
         ignore_unknown: Literal[True] = ...,
     ) -> bool: ...
@@ -495,14 +495,14 @@ class Column(Sequence[T]):
     @overload
     def none(
         self,
-        predicate: Callable[[Cell[T]], Cell[bool | None]],
+        predicate: Callable[[Cell[T_co]], Cell[bool | None]],
         *,
         ignore_unknown: bool,
     ) -> bool | None: ...
 
     def none(
         self,
-        predicate: Callable[[Cell[T]], Cell[bool | None]],
+        predicate: Callable[[Cell[T_co]], Cell[bool | None]],
         *,
         ignore_unknown: bool = True,
     ) -> bool | None:
@@ -563,7 +563,7 @@ class Column(Sequence[T]):
     # Transformations
     # ------------------------------------------------------------------------------------------------------------------
 
-    def rename(self, new_name: str) -> Column[T]:
+    def rename(self, new_name: str) -> Column[T_co]:
         """
         Return a new column with a new name.
 
@@ -598,8 +598,8 @@ class Column(Sequence[T]):
 
     def transform(
         self,
-        transformer: Callable[[Cell[T]], Cell[R]],
-    ) -> Column[R]:
+        transformer: Callable[[Cell[T_co]], Cell[R_co]],
+    ) -> Column[R_co]:
         """
         Return a new column with values transformed by the transformer.
 
@@ -831,7 +831,7 @@ class Column(Sequence[T]):
 
         return self.distinct_value_count(ignore_missing_values=False) / self.number_of_rows
 
-    def max(self) -> T | None:
+    def max(self) -> T_co | None:
         """
         Return the maximum value in the column.
 
@@ -855,7 +855,7 @@ class Column(Sequence[T]):
         except InvalidOperationError:
             return None  # Return None to indicate that we don't know the maximum (consistent with mean and median)
 
-    def mean(self) -> T:
+    def mean(self) -> T_co:
         """
         Return the mean of the values in the column.
 
@@ -883,7 +883,7 @@ class Column(Sequence[T]):
 
         return self._series.mean()
 
-    def median(self) -> T:
+    def median(self) -> T_co:
         """
         Return the median of the values in the column.
 
@@ -912,7 +912,7 @@ class Column(Sequence[T]):
 
         return self._series.median()
 
-    def min(self) -> T | None:
+    def min(self) -> T_co | None:
         """
         Return the minimum value in the column.
 
@@ -979,20 +979,20 @@ class Column(Sequence[T]):
         self,
         *,
         ignore_missing_values: Literal[True] = ...,
-    ) -> Sequence[T]: ...
+    ) -> Sequence[T_co]: ...
 
     @overload
     def mode(
         self,
         *,
         ignore_missing_values: bool,
-    ) -> Sequence[T | None]: ...
+    ) -> Sequence[T_co | None]: ...
 
     def mode(
         self,
         *,
         ignore_missing_values: bool = True,
-    ) -> Sequence[T | None]:
+    ) -> Sequence[T_co | None]:
         """
         Return the mode of the values in the column.
 
@@ -1128,7 +1128,7 @@ class Column(Sequence[T]):
     # Export
     # ------------------------------------------------------------------------------------------------------------------
 
-    def to_list(self) -> list[T]:
+    def to_list(self) -> list[T_co]:
         """
         Return the values of the column in a list.
 
