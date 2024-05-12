@@ -14,7 +14,7 @@ from syrupy import SnapshotAssertion
     ids=["one column", "four columns (some non-numeric)", "four columns (all numeric)"],
 )
 def test_should_match_snapshot(table: Table, snapshot_png_image: SnapshotAssertion) -> None:
-    boxplots = table.plot_boxplots()
+    boxplots = table.plot.box_plots()
     assert boxplots == snapshot_png_image
 
 
@@ -27,9 +27,9 @@ def test_should_raise_if_column_contains_non_numerical_values() -> None:
             r" non-numerical columns."
         ),
     ):
-        table.plot_boxplots()
+        table.plot.box_plots()
 
 
 def test_should_fail_on_empty_table() -> None:
     with pytest.raises(NonNumericColumnError):
-        Table().plot_boxplots()
+        Table().plot.box_plots()

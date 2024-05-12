@@ -316,7 +316,7 @@ class Table:
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, Table):
-            return False
+            return NotImplemented
         if self is other:
             return True
 

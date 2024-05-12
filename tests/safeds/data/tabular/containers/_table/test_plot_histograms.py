@@ -25,10 +25,10 @@ from syrupy import SnapshotAssertion
     ids=["one column", "four columns", "two columns with compressed visualization"],
 )
 def test_should_match_snapshot(table: Table, snapshot_png_image: SnapshotAssertion) -> None:
-    histograms = table.plot_histograms()
+    histograms = table.plot.histograms()
     assert histograms == snapshot_png_image
 
 
 def test_should_fail_on_empty_table() -> None:
     with pytest.raises(ZeroDivisionError):
-        Table().plot_histograms()
+        Table().plot.histograms()
