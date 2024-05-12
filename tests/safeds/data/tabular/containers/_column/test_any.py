@@ -1,25 +1,64 @@
-from collections.abc import Callable
-
 import pytest
 from safeds.data.tabular.containers import Column
 
 
 @pytest.mark.parametrize(
-    ("column", "predicate", "expected"),
+    ("values", "expected"),
     [
-        (Column("a", []), lambda value: value == 1, False),
-        (Column("a", [1]), lambda value: value == 1, True),
-        (Column("a", [1, 2]), lambda value: value == 1, True),
+        ([], False),
+        ([1], True),
+        ([2], False),
+        ([None], False),
+        ([1, None], True),
+        ([2, None], False),
+        ([1, 2], True),
+        ([1, 2, None], True),
     ],
     ids=[
         "empty",
-        "predicate always true",
-        "predicate sometimes true",
+        "always true",
+        "always false",
+        "always unknown",
+        "true and unknown",
+        "false and unknown",
+        "true and false",
+        "true and false and unknown",
     ],
 )
-def test_should_return_true_if_any_values_satisfy_the_predicate(
-    column: Column,
-    predicate: Callable,
+def test_should_handle_boolean_logic(
+    values: list,
     expected: bool,
 ) -> None:
-    assert column.any(predicate) == expected
+    column = Column("a", values)
+    assert column.any(lambda value: value < 2) == expected
+
+
+@pytest.mark.parametrize(
+    ("values", "expected"),
+    [
+        ([], False),
+        ([1], True),
+        ([2], False),
+        ([None], None),
+        ([1, None], True),
+        ([2, None], None),
+        ([1, 2], True),
+        ([1, 2, None], True),
+    ],
+    ids=[
+        "empty",
+        "always true",
+        "always false",
+        "always unknown",
+        "true and unknown",
+        "false and unknown",
+        "true and false",
+        "true and false and unknown",
+    ],
+)
+def test_should_handle_kleene_logic(
+    values: list,
+    expected: bool | None,
+) -> None:
+    column = Column("a", values)
+    assert column.any(lambda value: value < 2, ignore_unknown=False) == expected

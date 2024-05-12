@@ -16,7 +16,7 @@ from safeds.exceptions import NonNumericColumnError
         "some missing values",
     ],
 )
-def test_should_return_the_median_value(values: list, expected: int) -> None:
+def test_should_return_median_value(values: list, expected: int) -> None:
     column = Column("A", values)
     assert column.median() == expected
 

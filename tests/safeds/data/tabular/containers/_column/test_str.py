@@ -5,9 +5,18 @@ from safeds.data.tabular.containers import Column
 @pytest.mark.parametrize(
     ("column", "expected"),
     [
-        (Column("a", []), "'a': []"),
-        (Column("a", [0]), "'a': [0]"),
-        (Column("a", [0, "1"]), "'a': [0, '1']"),
+        (
+            Column("a", []),
+            "+------+\n" "| a    |\n" "| ---  |\n" "| null |\n" "+======+\n" "+------+",
+        ),
+        (
+            Column("a", [0]),
+            "+-----+\n" "|   a |\n" "| --- |\n" "| i64 |\n" "+=====+\n" "|   0 |\n" "+-----+",
+        ),
+        (
+            Column("a", [0, "1"]),
+            "+------+\n" "| a    |\n" "| ---  |\n" "| str  |\n" "+======+\n" "| null |\n" "| 1    |\n" "+------+",
+        ),
     ],
     ids=[
         "empty",
@@ -16,4 +25,4 @@ from safeds.data.tabular.containers import Column
     ],
 )
 def test_should_return_a_string_representation(column: Column, expected: str) -> None:
-    assert str(column) == expected
+    assert repr(column) == expected

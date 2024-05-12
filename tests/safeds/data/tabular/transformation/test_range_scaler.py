@@ -7,7 +7,7 @@ from safeds.exceptions import NonNumericColumnError, TransformerNotFittedError, 
 class TestInit:
     def test_should_raise_value_error(self) -> None:
         with pytest.raises(ValueError, match='Parameter "maximum" must be higher than parameter "minimum".'):
-            _ = RangeScaler(minimum=10, maximum=0)
+            _ = RangeScaler(min_=10, max_=0)
 
 
 class TestFit:
@@ -194,7 +194,7 @@ class TestFitAndTransform:
         column_names: list[str] | None,
         expected: Table,
     ) -> None:
-        fitted_transformer, transformed_table = RangeScaler(minimum=-10.0, maximum=10.0).fit_and_transform(
+        fitted_transformer, transformed_table = RangeScaler(min_=-10.0, max_=10.0).fit_and_transform(
             table,
             column_names,
         )

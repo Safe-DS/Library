@@ -1,14 +1,19 @@
 from __future__ import annotations
 
 from collections.abc import Callable, Iterator, Sequence
-from typing import TYPE_CHECKING, Any, TypeVar, overload
+from typing import TYPE_CHECKING, Any, Literal, TypeVar, overload
 
 from safeds._utils import _structural_hash
 from safeds.data.tabular.plotting import ColumnPlotter
 from safeds.data.tabular.typing._polars_data_type import _PolarsDataType
-from safeds.exceptions import IndexOutOfBoundsError
+from safeds.exceptions import (
+    ColumnLengthMismatchError,
+    IndexOutOfBoundsError,
+    MissingValuesColumnError,
+    NonNumericColumnError,
+)
 
-from ._vectorized_cell import _VectorizedCell
+from ._lazy_cell import _LazyCell
 
 if TYPE_CHECKING:
     from polars import Series
@@ -19,11 +24,11 @@ if TYPE_CHECKING:
     from ._table import Table
 
 
-T = TypeVar("T")
-R = TypeVar("R")
+T_co = TypeVar("T_co", covariant=True)
+R_co = TypeVar("R_co", covariant=True)
 
 
-class Column(Sequence[T]):
+class Column(Sequence[T_co]):
     """
     A named, one-dimensional collection of homogeneous values.
 
@@ -63,7 +68,7 @@ class Column(Sequence[T]):
     # Dunder methods
     # ------------------------------------------------------------------------------------------------------------------
 
-    def __init__(self, name: str, data: Sequence[T] | None = None) -> None:
+    def __init__(self, name: str, data: Sequence[T_co] | None = None) -> None:
         import polars as pl
 
         if data is None:
@@ -82,15 +87,21 @@ class Column(Sequence[T]):
         return self._series.equals(other._series)
 
     @overload
-    def __getitem__(self, index: int) -> T: ...
+    def __getitem__(self, index: int) -> T_co: ...
 
     @overload
-    def __getitem__(self, index: slice) -> Column[T]: ...
+    def __getitem__(self, index: slice) -> Column[T_co]: ...
 
-    def __getitem__(self, index: int | slice) -> T | Column[T]:
+    def __getitem__(self, index: int | slice) -> T_co | Column[T_co]:
         if isinstance(index, int):
             return self.get_value(index)
         else:
+            start = index.start or 0
+            stop = index.stop or self.number_of_rows
+            step = index.step or 1
+
+            if start < 0 or stop < 0 or step < 0:
+                raise IndexError("Negative values for start/stop/step of slices are not supported.")
             return self._from_polars_series(self._series.__getitem__(index))
 
     def __hash__(self) -> int:
@@ -100,7 +111,7 @@ class Column(Sequence[T]):
             self.number_of_rows,
         )
 
-    def __iter__(self) -> Iterator[T]:
+    def __iter__(self) -> Iterator[T_co]:
         return self._series.__iter__()
 
     def __len__(self) -> int:
@@ -153,9 +164,32 @@ class Column(Sequence[T]):
     # Value operations
     # ------------------------------------------------------------------------------------------------------------------
 
-    def get_distinct_values(self) -> list[T]:
+    @overload
+    def get_distinct_values(
+        self,
+        *,
+        ignore_missing_values: Literal[True] = ...,
+    ) -> Sequence[T_co]: ...
+
+    @overload
+    def get_distinct_values(
+        self,
+        *,
+        ignore_missing_values: bool,
+    ) -> Sequence[T_co | None]: ...
+
+    def get_distinct_values(
+        self,
+        *,
+        ignore_missing_values: bool = True,
+    ) -> Sequence[T_co | None]:
         """
         Return the distinct values in the column.
+
+        Parameters
+        ----------
+        ignore_missing_values:
+            Whether to ignore missing values.
 
         Returns
         -------
@@ -169,11 +203,30 @@ class Column(Sequence[T]):
         >>> column.get_distinct_values()
         [1, 2, 3]
         """
-        return self._series.unique().sort().to_list()
+        import polars as pl
 
-    def get_value(self, index: int) -> T:
+        if self.number_of_rows == 0:
+            return []  # polars raises otherwise
+        elif self._series.dtype == pl.Null:
+            # polars raises otherwise
+            if ignore_missing_values:
+                return []
+            else:
+                return [None]
+
+        if ignore_missing_values:
+            series = self._series.drop_nulls()
+        else:
+            series = self._series
+
+        return series.unique().sort().to_list()
+
+    def get_value(self, index: int) -> T_co:
         """
-        Return the column value at specified index. Indexing starts at 0.
+        Return the column value at specified index.
+
+        Nonnegative indices are counted from the beginning (starting at 0), negative indices from the end (starting at
+        -1).
 
         Parameters
         ----------
@@ -188,7 +241,7 @@ class Column(Sequence[T]):
         Raises
         ------
         IndexError
-            If the given index does not exist in the column.
+            If the index is out of bounds.
 
         Examples
         --------
@@ -197,7 +250,7 @@ class Column(Sequence[T]):
         >>> column.get_value(1)
         2
         """
-        if index < 0 or index >= self.number_of_rows:
+        if index < -self.number_of_rows or index >= self.number_of_rows:
             raise IndexOutOfBoundsError(index)
 
         return self._series.__getitem__(index)
@@ -206,14 +259,54 @@ class Column(Sequence[T]):
     # Reductions
     # ------------------------------------------------------------------------------------------------------------------
 
-    def all(self, predicate: Callable[[Cell[T]], Cell[bool]]) -> bool:
+    @overload
+    def all(
+        self,
+        predicate: Callable[[Cell[T_co]], Cell[bool | None]],
+        *,
+        ignore_unknown: Literal[True] = ...,
+    ) -> bool: ...
+
+    @overload
+    def all(
+        self,
+        predicate: Callable[[Cell[T_co]], Cell[bool | None]],
+        *,
+        ignore_unknown: bool,
+    ) -> bool | None: ...
+
+    def all(
+        self,
+        predicate: Callable[[Cell[T_co]], Cell[bool | None]],
+        *,
+        ignore_unknown: bool = True,
+    ) -> bool | None:
         """
         Return whether all values in the column satisfy the predicate.
+
+        The predicate can return one of three values:
+
+        * True, if the value satisfies the predicate.
+        * False, if the value does not satisfy the predicate.
+        * None, if the truthiness of the predicate is unknown, e.g. due to missing values.
+
+        By default, cases where the truthiness of the predicate is unknown are ignored and this method returns
+
+        * True, if the predicate always returns True or None.
+        * False, if the predicate returns False at least once.
+
+        You can instead enable Kleene logic by setting `ignore_unknown=False`. In this case, this method returns
+
+        * True, if the predicate always returns True.
+        * False, if the predicate returns False at least once.
+        * None, if the predicate never returns False, but at least once None.
 
         Parameters
         ----------
         predicate:
             The predicate to apply to each value.
+        ignore_unknown:
+            Whether to ignore cases where the truthiness of the predicate is unknown.
 
         Returns
         -------
@@ -237,20 +330,58 @@ class Column(Sequence[T]):
         """
         import polars as pl
 
-        result = predicate(_VectorizedCell(self))
-        if not isinstance(result, _VectorizedCell) or not result._series.dtype.is_(pl.Boolean):
-            raise TypeError("The predicate must return a boolean cell.")
+        # Expressions only work on data frames/lazy frames, so we wrap the polars series first
+        expression = predicate(_LazyCell(pl.col(self.name)))._polars_expression.all(ignore_nulls=ignore_unknown)
+        return self._series.to_frame().select(expression).item()
 
-        return result._series.all()
+    @overload
+    def any(
+        self,
+        predicate: Callable[[Cell[T_co]], Cell[bool | None]],
+        *,
+        ignore_unknown: Literal[True] = ...,
+    ) -> bool: ...
 
-    def any(self, predicate: Callable[[Cell[T]], Cell[bool]]) -> bool:
+    @overload
+    def any(
+        self,
+        predicate: Callable[[Cell[T_co]], Cell[bool | None]],
+        *,
+        ignore_unknown: bool,
+    ) -> bool | None: ...
+
+    def any(
+        self,
+        predicate: Callable[[Cell[T_co]], Cell[bool | None]],
+        *,
+        ignore_unknown: bool = True,
+    ) -> bool | None:
         """
         Return whether any value in the column satisfies the predicate.
+
+        The predicate can return one of three values:
+
+        * True, if the value satisfies the predicate.
+        * False, if the value does not satisfy the predicate.
+        * None, if the truthiness of the predicate is unknown, e.g. due to missing values.
+
+        By default, cases where the truthiness of the predicate is unknown are ignored and this method returns
+
+        * True, if the predicate returns True at least once.
+        * False, if the predicate always returns False or None.
+
+        You can instead enable Kleene logic by setting `ignore_unknown=False`. In this case, this method returns
+
+        * True, if the predicate returns True at least once.
+        * False, if the predicate always returns False.
+        * None, if the predicate never returns True, but at least once None.
 
         Parameters
         ----------
         predicate:
             The predicate to apply to each value.
+        ignore_unknown:
+            Whether to ignore cases where the truthiness of the predicate is unknown.
 
         Returns
         -------
@@ -274,20 +405,53 @@ class Column(Sequence[T]):
         """
         import polars as pl
 
-        result = predicate(_VectorizedCell(self))
-        if not isinstance(result, _VectorizedCell) or not result._series.dtype.is_(pl.Boolean):
-            raise TypeError("The predicate must return a boolean cell.")
+        # Expressions only work on data frames/lazy frames, so we wrap the polars series first
+        expression = predicate(_LazyCell(pl.col(self.name)))._polars_expression.any(ignore_nulls=ignore_unknown)
+        return self._series.to_frame().select(expression).item()
 
-        return result._series.any()
+    @overload
+    def count_if(
+        self,
+        predicate: Callable[[Cell[T_co]], Cell[bool | None]],
+        *,
+        ignore_unknown: Literal[True] = ...,
+    ) -> int: ...
 
-    def count(self, predicate: Callable[[Cell[T]], Cell[bool]]) -> int:
+    @overload
+    def count_if(
+        self,
+        predicate: Callable[[Cell[T_co]], Cell[bool | None]],
+        *,
+        ignore_unknown: bool,
+    ) -> int | None: ...
+
+    def count_if(
+        self,
+        predicate: Callable[[Cell[T_co]], Cell[bool | None]],
+        *,
+        ignore_unknown: bool = True,
+    ) -> int | None:
         """
         Return how many values in the column satisfy the predicate.
+
+        The predicate can return one of three values:
+
+        * True, if the value satisfies the predicate.
+        * False, if the value does not satisfy the predicate.
+        * None, if the truthiness of the predicate is unknown, e.g. due to missing values.
+
+        By default, cases where the truthiness of the predicate is unknown are ignored and this method returns how
+        often the predicate returns True.
+
+        You can instead enable Kleene logic by setting `ignore_unknown=False`. In this case, this method returns None if
+        the predicate returns None at least once. Otherwise, it still returns how often the predicate returns True.
 
         Parameters
         ----------
         predicate:
             The predicate to apply to each value.
+        ignore_unknown:
+            Whether to ignore cases where the truthiness of the predicate is unknown.
 
         Returns
         -------
@@ -303,28 +467,71 @@ class Column(Sequence[T]):
         --------
         >>> from safeds.data.tabular.containers import Column
         >>> column = Column("test", [1, 2, 3])
-        >>> column.count(lambda cell: cell > 1)
+        >>> column.count_if(lambda cell: cell > 1)
         2
 
-        >>> column.count(lambda cell: cell < 0)
+        >>> column.count_if(lambda cell: cell < 0)
         0
         """
         import polars as pl
 
-        result = predicate(_VectorizedCell(self))
-        if not isinstance(result, _VectorizedCell) or not result._series.dtype.is_(pl.Boolean):
-            raise TypeError("The predicate must return a boolean cell.")
+        # Expressions only work on data frames/lazy frames, so we wrap the polars series first
+        expression = predicate(_LazyCell(pl.col(self.name)))._polars_expression
+        series = self._series.to_frame().select(expression.alias(self.name)).get_column(self.name)
 
-        return result._series.sum()
+        if ignore_unknown or series.null_count() == 0:
+            return series.sum()
+        else:
+            return None
 
-    def none(self, predicate: Callable[[Cell[T]], Cell[bool]]) -> bool:
+    @overload
+    def none(
+        self,
+        predicate: Callable[[Cell[T_co]], Cell[bool | None]],
+        *,
+        ignore_unknown: Literal[True] = ...,
+    ) -> bool: ...
+
+    @overload
+    def none(
+        self,
+        predicate: Callable[[Cell[T_co]], Cell[bool | None]],
+        *,
+        ignore_unknown: bool,
+    ) -> bool | None: ...
+
+    def none(
+        self,
+        predicate: Callable[[Cell[T_co]], Cell[bool | None]],
+        *,
+        ignore_unknown: bool = True,
+    ) -> bool | None:
         """
         Return whether no value in the column satisfies the predicate.
+
+        The predicate can return one of three values:
+
+        * True, if the value satisfies the predicate.
+        * False, if the value does not satisfy the predicate.
+        * None, if the truthiness of the predicate is unknown, e.g. due to missing values.
+
+        By default, cases where the truthiness of the predicate is unknown are ignored and this method returns
+
+        * True, if the predicate always returns False or None.
+        * False, if the predicate returns True at least once.
+
+        You can instead enable Kleene logic by setting `ignore_unknown=False`. In this case, this method returns
+
+        * True, if the predicate always returns False.
+        * False, if the predicate returns True at least once.
+        * None, if the predicate never returns True, but at least once None.
 
         Parameters
         ----------
         predicate:
             The predicate to apply to each value.
+        ignore_unknown:
+            Whether to ignore cases where the truthiness of the predicate is unknown.
 
         Returns
         -------
@@ -346,19 +553,17 @@ class Column(Sequence[T]):
         >>> column.none(lambda cell: cell > 2)
         False
         """
-        import polars as pl
+        any_ = self.any(predicate, ignore_unknown=ignore_unknown)
+        if any_ is None:
+            return None
 
-        result = predicate(_VectorizedCell(self))
-        if not isinstance(result, _VectorizedCell) or not result._series.dtype.is_(pl.Boolean):
-            raise TypeError("The predicate must return a boolean cell.")
-
-        return (~result._series).all()
+        return not any_
 
     # ------------------------------------------------------------------------------------------------------------------
     # Transformations
     # ------------------------------------------------------------------------------------------------------------------
 
-    def rename(self, new_name: str) -> Column[T]:
+    def rename(self, new_name: str) -> Column[T_co]:
         """
         Return a new column with a new name.
 
@@ -393,8 +598,8 @@ class Column(Sequence[T]):
 
     def transform(
         self,
-        transformer: Callable[[Cell[T]], Cell[R]],
-    ) -> Column[R]:
+        transformer: Callable[[Cell[T_co]], Cell[R_co]],
+    ) -> Column[R_co]:
         """
         Return a new column with values transformed by the transformer.
 
@@ -425,11 +630,13 @@ class Column(Sequence[T]):
         |    6 |
         +------+
         """
-        result = transformer(_VectorizedCell(self))
-        if not isinstance(result, _VectorizedCell):
-            raise TypeError("The transformer must return a cell.")
+        import polars as pl
 
-        return self._from_polars_series(result._series)
+        # Expressions only work on data frames/lazy frames, so we wrap the polars series first
+        expression = transformer(_LazyCell(pl.col(self.name)))._polars_expression
+        series = self._series.to_frame().select(expression.alias(self.name)).get_column(self.name)
+
+        return self._from_polars_series(series)
 
     # ------------------------------------------------------------------------------------------------------------------
     # Statistics
@@ -449,28 +656,49 @@ class Column(Sequence[T]):
         >>> from safeds.data.tabular.containers import Column
         >>> column = Column("a", [1, 3])
         >>> column.summarize_statistics()
-        +----------------------+--------------------+
-        | metric               | a                  |
-        | ---                  | ---                |
-        | str                  | str                |
-        +===========================================+
-        | min                  | 1                  |
-        | max                  | 3                  |
-        | mean                 | 2.0                |
-        | median               | 2.0                |
-        | standard deviation   | 1.4142135623730951 |
-        | distinct value count | 2                  |
-        | idness               | 1.0                |
-        | missing value ratio  | 0.0                |
-        | stability            | 0.5                |
-        +----------------------+--------------------+
+        +----------------------+---------+
+        | metric               |       a |
+        | ---                  |     --- |
+        | str                  |     f64 |
+        +================================+
+        | min                  | 1.00000 |
+        | max                  | 3.00000 |
+        | mean                 | 2.00000 |
+        | median               | 2.00000 |
+        | standard deviation   | 1.41421 |
+        | distinct value count | 2.00000 |
+        | idness               | 1.00000 |
+        | missing value ratio  | 0.00000 |
+        | stability            | 0.50000 |
+        +----------------------+---------+
         """
         from ._table import Table
 
         # TODO: turn this around (call table method, implement in table; allows parallelization)
-        mean = self.mean() or "-"
-        median = self.median() or "-"
-        standard_deviation = self.standard_deviation() or "-"
+        if self.is_numeric:
+            values: list[Any] = [
+                self.min(),
+                self.max(),
+                self.mean(),
+                self.median(),
+                self.standard_deviation(),
+                self.distinct_value_count(),
+                self.idness(),
+                self.missing_value_ratio(),
+                self.stability(),
+            ]
+        else:
+            values = [
+                str(self.min() or "-"),
+                str(self.max() or "-"),
+                "-",
+                "-",
+                "-",
+                str(self.distinct_value_count()),
+                str(self.idness()),
+                str(self.missing_value_ratio()),
+                str(self.stability()),
+            ]
 
         return Table(
             {
@@ -485,17 +713,7 @@ class Column(Sequence[T]):
                     "missing value ratio",
                     "stability",
                 ],
-                self.name: [
-                    str(self.min()),
-                    str(self.max()),
-                    str(mean),
-                    str(median),
-                    str(standard_deviation),
-                    str(self.distinct_value_count()),
-                    str(self.idness()),
-                    str(self.missing_value_ratio()),
-                    str(self.stability()),
-                ],
+                self.name: values,
             },
         )
 
@@ -503,7 +721,8 @@ class Column(Sequence[T]):
         """
         Calculate the Pearson correlation between this column and another column.
 
-        The Pearson correlation is a value between -1 and 1 that indicates how much the two columns are linearly related:
+        The Pearson correlation is a value between -1 and 1 that indicates how much the two columns are linearly
+        related:
 
         - A correlation of -1 indicates a perfect negative linear relationship.
         - A correlation of 0 indicates no linear relationship.
@@ -519,6 +738,15 @@ class Column(Sequence[T]):
         correlation:
             The Pearson correlation between the two columns.
 
+        Raises
+        ------
+        TypeError
+            If one of the columns is not numeric.
+        ValueError
+            If the columns have different lengths.
+        ValueError
+            If one of the columns has missing values.
+
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
@@ -533,11 +761,27 @@ class Column(Sequence[T]):
         """
         import polars as pl
 
+        if not self.is_numeric or not other.is_numeric:
+            raise NonNumericColumnError("")  # TODO: Add column names to error message
+        if self.number_of_rows != other.number_of_rows:
+            raise ColumnLengthMismatchError("")  # TODO: Add column names to error message
+        if self.missing_value_count() > 0 or other.missing_value_count() > 0:
+            raise MissingValuesColumnError("")  # TODO: Add column names to error message
+
         return pl.DataFrame({"a": self._series, "b": other._series}).corr().item(row=1, column="a")
 
-    def distinct_value_count(self) -> int:
+    def distinct_value_count(
+        self,
+        *,
+        ignore_missing_values: bool = True,
+    ) -> int:
         """
         Return the number of distinct values in the column.
+
+        Parameters
+        ----------
+        ignore_missing_values:
+            Whether to ignore missing values when counting distinct values.
 
         Returns
         -------
@@ -551,14 +795,17 @@ class Column(Sequence[T]):
         >>> column.distinct_value_count()
         3
         """
-        return self._series.n_unique()
+        if ignore_missing_values:
+            return self._series.drop_nulls().n_unique()
+        else:
+            return self._series.n_unique()
 
     def idness(self) -> float:
         """
         Calculate the idness of this column.
 
-        We define the idness as the number of distinct values divided by the number of rows. If the column is empty,
-        the idness is 1.0.
+        We define the idness as the number of distinct values (including missing values) divided by the number of rows.
+        If the column is empty, the idness is 1.0.
 
         A high idness indicates that the column most values in the column are unique. In this case, you must be careful
         when using the column for analysis, as a model may learn a mapping from this column to the target.
@@ -582,9 +829,9 @@ class Column(Sequence[T]):
         if self.number_of_rows == 0:
             return 1.0  # All values are unique (since there are none)
 
-        return self.distinct_value_count() / self.number_of_rows
+        return self.distinct_value_count(ignore_missing_values=False) / self.number_of_rows
 
-    def max(self) -> T:
+    def max(self) -> T_co | None:
         """
         Return the maximum value in the column.
 
@@ -600,9 +847,15 @@ class Column(Sequence[T]):
         >>> column.max()
         3
         """
-        return self._series.max()
+        from polars.exceptions import InvalidOperationError
 
-    def mean(self) -> T:
+        try:
+            # Fails for Null columns
+            return self._series.max()
+        except InvalidOperationError:
+            return None  # Return None to indicate that we don't know the maximum (consistent with mean and median)
+
+    def mean(self) -> T_co:
         """
         Return the mean of the values in the column.
 
@@ -613,6 +866,11 @@ class Column(Sequence[T]):
         mean:
             The mean of the values in the column.
 
+        Raises
+        ------
+        TypeError
+            If the column is not numeric.
+
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
@@ -620,9 +878,12 @@ class Column(Sequence[T]):
         >>> column.mean()
         2.0
         """
+        if not self.is_numeric:
+            raise NonNumericColumnError("")  # TODO: Add column name to error message
+
         return self._series.mean()
 
-    def median(self) -> T:
+    def median(self) -> T_co:
         """
         Return the median of the values in the column.
 
@@ -634,6 +895,11 @@ class Column(Sequence[T]):
         median:
             The median of the values in the column.
 
+        Raises
+        ------
+        TypeError
+            If the column is not numeric.
+
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
@@ -641,9 +907,12 @@ class Column(Sequence[T]):
         >>> column.median()
         2.0
         """
+        if not self.is_numeric:
+            raise NonNumericColumnError("")  # TODO: Add column name to error message
+
         return self._series.median()
 
-    def min(self) -> T:
+    def min(self) -> T_co | None:
         """
         Return the minimum value in the column.
 
@@ -659,7 +928,13 @@ class Column(Sequence[T]):
         >>> column.min()
         1
         """
-        return self._series.min()
+        from polars.exceptions import InvalidOperationError
+
+        try:
+            # Fails for Null columns
+            return self._series.min()
+        except InvalidOperationError:
+            return None  # Return None to indicate that we don't know the maximum (consistent with mean and median)
 
     def missing_value_count(self) -> int:
         """
@@ -699,7 +974,25 @@ class Column(Sequence[T]):
 
         return self._series.null_count() / self.number_of_rows
 
-    def mode(self) -> Column[T]:
+    @overload
+    def mode(
+        self,
+        *,
+        ignore_missing_values: Literal[True] = ...,
+    ) -> Sequence[T_co]: ...
+
+    @overload
+    def mode(
+        self,
+        *,
+        ignore_missing_values: bool,
+    ) -> Sequence[T_co | None]: ...
+
+    def mode(
+        self,
+        *,
+        ignore_missing_values: bool = True,
+    ) -> Sequence[T_co | None]:
         """
         Return the mode of the values in the column.
 
@@ -725,7 +1018,23 @@ class Column(Sequence[T]):
         |    3 |
         +------+
         """
-        return self._from_polars_series(self._series.mode().sort())
+        import polars as pl
+
+        if self.number_of_rows == 0:
+            return []  # polars raises otherwise
+        elif self._series.dtype == pl.Null:
+            # polars raises otherwise
+            if ignore_missing_values:
+                return []
+            else:
+                return [None]
+
+        if ignore_missing_values:
+            series = self._series.drop_nulls()
+        else:
+            series = self._series
+
+        return series.mode().sort().to_list()
 
     def stability(self) -> float:
         """
@@ -757,7 +1066,7 @@ class Column(Sequence[T]):
 
         return mode_count / non_missing.len()
 
-    def standard_deviation(self) -> float | None:
+    def standard_deviation(self) -> float:
         """
         Return the standard deviation of the values in the column.
 
@@ -769,6 +1078,11 @@ class Column(Sequence[T]):
             The standard deviation of the values in the column. If no standard deviation can be calculated due to the
             type of the column, None is returned.
 
+        Raises
+        ------
+        TypeError
+            If the column is not numeric.
+
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
@@ -776,18 +1090,21 @@ class Column(Sequence[T]):
         >>> column.standard_deviation()
         1.0
         """
-        from polars.exceptions import InvalidOperationError
+        if not self.is_numeric:
+            raise NonNumericColumnError("")  # TODO: Add column name to error message
 
-        try:
-            return self._series.std()
-        except InvalidOperationError:
-            return None
+        return self._series.std()
 
-    def variance(self) -> float | None:
+    def variance(self) -> float:
         """
         Return the variance of the values in the column.
 
         The variance is the average of the squared differences from the mean.
+
+        Raises
+        ------
+        TypeError
+            If the column is not numeric.
 
         Returns
         -------
@@ -802,18 +1119,16 @@ class Column(Sequence[T]):
         >>> column.variance()
         1.0
         """
-        from polars.exceptions import InvalidOperationError
+        if not self.is_numeric:
+            raise NonNumericColumnError("")  # TODO: Add column name to error message
 
-        try:
-            return self._series.var()
-        except InvalidOperationError:
-            return None
+        return self._series.var()
 
     # ------------------------------------------------------------------------------------------------------------------
     # Export
     # ------------------------------------------------------------------------------------------------------------------
 
-    def to_list(self) -> list[T]:
+    def to_list(self) -> list[T_co]:
         """
         Return the values of the column in a list.
 
@@ -866,8 +1181,6 @@ class Column(Sequence[T]):
     def _repr_html_(self) -> str:
         """
         Return a compact HTML representation of the column for IPython.
-
-        Note that this operation must fully load the data into memory, which can be expensive.
 
         Returns
         -------

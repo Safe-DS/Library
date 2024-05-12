@@ -1,5 +1,5 @@
 import pytest
-from pandas.core.interchange.from_dataframe import from_dataframe
+from polars import from_dataframe
 from safeds.data.tabular.containers import Table
 
 
@@ -16,7 +16,7 @@ from safeds.data.tabular.containers import Table
 )
 def test_should_restore_table_from_exchange_object(table: Table) -> None:
     exchange_object = table.__dataframe__()
-    restored = Table._from_pandas_dataframe(from_dataframe(exchange_object))
+    restored = Table._from_polars_data_frame(from_dataframe(exchange_object))
 
     assert restored.schema == table.schema
     assert restored == table

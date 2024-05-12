@@ -76,10 +76,9 @@ class ImageDataset(Generic[T]):
             for column_name in output_data.column_names:
                 if not output_data.get_column_type(column_name).is_numeric:
                     non_numerical_columns.append(column_name)
-                elif (
-                    output_data.get_column(column_name).min() < 0
-                    or output_data.get_column(column_name).max() > 1
-                ):
+                elif (output_data.get_column(column_name).min() or 0) < 0 or (
+                    output_data.get_column(column_name).max() or 0
+                ) > 1:
                     wrong_interval_columns.append(column_name)
             if len(non_numerical_columns) > 0:
                 raise NonNumericColumnError(f"Columns {non_numerical_columns} are not numerical.")
@@ -96,8 +95,8 @@ class ImageDataset(Generic[T]):
             _output_size = ImageSize(output_data.widths[0], output_data.heights[0], output_data.channel)
         else:
             raise ValueError("The given output ImageList contains images of different sizes.")  # noqa: TRY004
-        self._output = _output
-        self._output_size = _output_size
+        self._output = _output  # type: ignore[var-annotated]  # TODO: check what the type should be
+        self._output_size = _output_size  # type: ignore[var-annotated]  # TODO: check what the type should be
 
     def __iter__(self) -> ImageDataset:
         if self._shuffle_after_epoch:

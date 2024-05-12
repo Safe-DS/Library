@@ -1,21 +1,20 @@
-from typing import Any
-
 import pytest
 from safeds.data.tabular.containers import Column
-from safeds.exceptions import ColumnSizeError
 
 
 @pytest.mark.parametrize(
     ("values", "expected"),
-    [([1, 2, 3], 0), ([1, 2, 3, None], 1 / 4), ([None, None, None], 1)],
-    ids=["no missing values", "some missing values", "all missing values"],
+    [
+        ([1, 2, 3], 0),
+        ([1, 2, 3, None], 1 / 4),
+        ([None, None, None], 1),
+    ],
+    ids=[
+        "no missing values",
+        "some missing values",
+        "only missing values",
+    ],
 )
-def test_should_return_ratio_of_null_values_to_number_of_elements(values: list, expected: float) -> None:
-    column = Column("A", values)
+def test_should_count_missing_values(values: list, expected: float) -> None:
+    column = Column("count", values)
     assert column.missing_value_ratio() == expected
-
-
-def test_should_raise_if_column_is_empty() -> None:
-    column: Column[Any] = Column("A", [])
-    with pytest.raises(ColumnSizeError):
-        column.missing_value_ratio()

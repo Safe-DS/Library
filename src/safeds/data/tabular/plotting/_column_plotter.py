@@ -49,18 +49,17 @@ class ColumnPlotter:
         >>> column = Column("test", [1, 2, 3])
         >>> boxplot = column.plot.box_plot()
         """
-        if not self._column.is_numeric:
+        if self._column.number_of_rows > 0 and not self._column.is_numeric:
+            # TODO better error message
             raise NonNumericColumnError(f"{self._column.name} is of type {self._column.type}.")
 
         import matplotlib.pyplot as plt
 
         fig, ax = plt.subplots()
-        plot = ax.boxplot(
+        ax.boxplot(
             self._column._series,
             patch_artist=True,
         )
-        plt.setp(plot["boxes"], facecolor="lightsteelblue")
-        plt.setp(plot["medians"], color="red")
 
         ax.set(title=self._column.name)
         ax.set_xticks([])
@@ -116,7 +115,8 @@ class ColumnPlotter:
         >>> column = Column("values", [1, 2, 3, 4])
         >>> image = column.plot.lag_plot(2)
         """
-        if not self._column.is_numeric:
+        if self._column.number_of_rows > 0 and not self._column.is_numeric:
+            # TODO better error message
             raise NonNumericColumnError("This time series target contains non-numerical columns.")
 
         import matplotlib.pyplot as plt
@@ -124,7 +124,7 @@ class ColumnPlotter:
         fig, ax = plt.subplots()
         series = self._column._series
         ax.scatter(
-            x=series.slice(0, len(self._column) - lag),
+            x=series.slice(0, max(len(self._column) - lag, 0)),
             y=series.slice(lag),
         )
         ax.set(

@@ -1,10 +1,10 @@
 from __future__ import annotations
 
 import itertools
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Self
 
-import pandas as pd
 import pytest
+from safeds.data.labeled.containers import TabularDataset
 from safeds.data.tabular.containers import Column, Table
 from safeds.exceptions import (
     ColumnLengthMismatchError,
@@ -32,8 +32,7 @@ from safeds.ml.classical.regression._regressor import _check_metrics_preconditio
 
 if TYPE_CHECKING:
     from _pytest.fixtures import FixtureRequest
-    from safeds.data.labeled.containers import TabularDataset
-    from sklearn.base import RegressorMixin
+    from sklearn.base import ClassifierMixin, RegressorMixin
 
 
 def regressors() -> list[Regressor]:
@@ -322,10 +321,27 @@ class DummyRegressor(Regressor):
     `target_name` must be set to `"expected"`.
     """
 
+    def __init__(self) -> None:
+        super().__init__()
+
+        self._target_name = "expected"
+
+    def __hash__(self) -> int:
+        raise NotImplementedError
+
+    def _clone(self) -> Self:
+        return self
+
+    def _get_sklearn_model(self) -> ClassifierMixin | RegressorMixin:
+        pass
+
     def fit(self, _training_set: TabularDataset) -> DummyRegressor:
         return self
 
-    def predict(self, dataset: Table) -> TabularDataset:
+    def predict(self, dataset: Table | TabularDataset) -> TabularDataset:
+        if isinstance(dataset, TabularDataset):
+            dataset = dataset.to_table()
+
         predicted = dataset.get_column("predicted")
         feature = predicted.rename("feature")
         dataset = Table.from_columns([feature, predicted])
@@ -335,9 +351,6 @@ class DummyRegressor(Regressor):
     @property
     def is_fitted(self) -> bool:
         return True
-
-    def _get_sklearn_regressor(self) -> RegressorMixin:
-        pass
 
 
 class TestSummarizeMetrics:
@@ -349,8 +362,18 @@ class TestSummarizeMetrics:
                 [1, 2],
                 Table(
                     {
-                        "metric": ["mean_absolute_error", "mean_squared_error"],
-                        "value": [0.0, 0.0],
+                        "metric": [
+                            "coefficient_of_determination",
+                            "mean_absolute_error",
+                            "mean_squared_error",
+                            "median_absolute_deviation",
+                        ],
+                        "value": [
+                            1.0,
+                            0.0,
+                            0.0,
+                            0.0,
+                        ],
                     },
                 ),
             ),
@@ -422,7 +445,7 @@ class TestCheckMetricsPreconditions:
         expected: list[str | int],
         error: type[Exception],
     ) -> None:
-        actual_column: Column = Column("actual", pd.Series(actual))
-        expected_column: Column = Column("expected", pd.Series(expected))
+        actual_column: Column = Column("actual", actual)
+        expected_column: Column = Column("expected", expected)
         with pytest.raises(error):
             _check_metrics_preconditions(actual_column, expected_column)

@@ -11,7 +11,7 @@ from syrupy import SnapshotAssertion
     ids=["normal"],
 )
 def test_should_match_snapshot(table: Table, snapshot_png_image: SnapshotAssertion) -> None:
-    correlation_heatmap = table.plot_correlation_heatmap()
+    correlation_heatmap = table.plot.correlation_heatmap()
     assert correlation_heatmap == snapshot_png_image
 
 
@@ -20,4 +20,4 @@ def test_should_warn_about_empty_table() -> None:
         UserWarning,
         match=r"An empty table has been used. A correlation heatmap on an empty table will show nothing.",
     ):
-        Table().plot_correlation_heatmap()
+        Table().plot.correlation_heatmap()

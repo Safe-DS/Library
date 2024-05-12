@@ -21,7 +21,7 @@ class TestLearner:
         learner = AdaBoostRegressor()
         fitted_model = AdaBoostRegressor(learner=learner).fit(training_set)
         assert fitted_model._wrapped_model is not None
-        assert isinstance(fitted_model._wrapped_model.estimator, type(learner._get_sklearn_regressor()))
+        assert isinstance(fitted_model._wrapped_model.estimator, type(learner._get_sklearn_model()))
 
 
 class TestMaximumNumberOfLearners:

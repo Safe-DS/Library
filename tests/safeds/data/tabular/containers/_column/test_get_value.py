@@ -6,22 +6,28 @@ from safeds.exceptions import IndexOutOfBoundsError
 
 
 @pytest.mark.parametrize(
-    ("column", "index", "expected"),
+    ("index", "expected"),
     [
-        (Column("a", [0, 1]), 0, 0),
-        (Column("a", [0, 1]), 1, 1),
+        (0, 0),
+        (1, 1),
+        (-2, 0),
+        (-1, 1),
     ],
-    ids=["first item", "second item"],
+    ids=[
+        "first item (positive index)",
+        "last item (positive index)",
+        "first item (negative index)",
+        "last item (negative index)",
+    ],
 )
-def test_should_get_the_item_at_index(column: Column, index: int, expected: Any) -> None:
-    assert column.get_value(index) == expected
+def test_should_get_the_item_at_index(index: int, expected: Any) -> None:
+    assert Column("a", [0, 1])[index] == expected
 
 
 @pytest.mark.parametrize(
     "index",
-    [-1, 2],
+    [2],
     ids=[
-        "negative",
         "out of bounds",
     ],
 )
