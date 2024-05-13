@@ -235,7 +235,7 @@ class TimeSeriesDataset:
             label = target_tensor[i + window_size + forecast_horizon]
             for col in feature_cols:
                 data = torch.tensor(col._series.to_numpy(), dtype=torch.float32)
-                window = torch.cat((window, data[i: i + window_size]), dim=0)
+                window = torch.cat((window, data[i : i + window_size]), dim=0)
             x_s.append(window)
             y_s.append(label)
         x_s_tensor = torch.stack(x_s)
