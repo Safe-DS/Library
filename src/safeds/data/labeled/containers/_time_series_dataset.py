@@ -3,7 +3,7 @@ from __future__ import annotations
 import sys
 from typing import TYPE_CHECKING, Any
 
-from safeds._config import _init_default_device
+from safeds._config import _get_device, _init_default_device
 from safeds._utils import _structural_hash
 from safeds.exceptions import ClosedBound, OutOfBoundsError
 
@@ -279,7 +279,7 @@ class TimeSeriesDataset:
 
         _init_default_device()
 
-        target_tensor = self.target._series.to_torch()
+        target_tensor = self.target._series.to_torch().to(_get_device())
         x_s = []
 
         size = target_tensor.size(0)

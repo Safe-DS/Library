@@ -1994,7 +1994,7 @@ class Table:
         _init_default_device()
 
         return DataLoader(
-            dataset=_create_dataset(self._data_frame.to_torch(dtype=pl.Float32)),
+            dataset=_create_dataset(self._data_frame.to_torch(dtype=pl.Float32).to(_get_device())),
             batch_size=batch_size,
             generator=torch.Generator(device=_get_device()),
         )
