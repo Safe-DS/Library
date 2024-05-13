@@ -8,7 +8,7 @@ from safeds._utils import _structural_hash
 if TYPE_CHECKING:
     from torch import Tensor
 from safeds.data.labeled.containers import TimeSeriesDataset
-from safeds.data.tabular.containers import Column, Table
+from safeds.data.tabular.containers import Column
 from safeds.ml.nn._output_conversion import OutputConversion
 
 
@@ -78,7 +78,7 @@ class OutputConversionTimeSeries(OutputConversion[TimeSeriesDataset, TimeSeriesD
         window_size: int = kwargs["window_size"]
         forecast_horizon: int = kwargs["forecast_horizon"]
         input_data_table = input_data.to_table()
-        input_data_table = input_data_table.slice_rows(start=window_size+forecast_horizon)
+        input_data_table = input_data_table.slice_rows(start=window_size + forecast_horizon)
 
         return input_data_table.add_columns(
             [Column(self._prediction_name, output_data.tolist())],
