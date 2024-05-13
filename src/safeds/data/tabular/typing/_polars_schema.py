@@ -5,7 +5,6 @@ from typing import TYPE_CHECKING
 
 from safeds._utils import _structural_hash
 from safeds._validation import _check_columns_exist
-from safeds.exceptions import ColumnNotFoundError
 
 from ._polars_data_type import _PolarsDataType
 from ._schema import Schema

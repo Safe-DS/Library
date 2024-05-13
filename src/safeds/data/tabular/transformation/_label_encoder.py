@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING
 
 from safeds._validation import _check_columns_exist
 from safeds.data.tabular.containers import Table
-from safeds.exceptions import ColumnNotFoundError, NonNumericColumnError, TransformerNotFittedError
+from safeds.exceptions import NonNumericColumnError, TransformerNotFittedError
 
 from ._invertible_table_transformer import InvertibleTableTransformer
 

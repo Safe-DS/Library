@@ -210,5 +210,7 @@ def test_should_create_dataloader_predict_invalid(
     configure_test_with_device(device)
     with pytest.raises(error_type, match=error_msg):
         data._into_dataloader_with_window_predict(
-            window_size=window_size, forecast_horizon=forecast_horizon, batch_size=1,
+            window_size=window_size,
+            forecast_horizon=forecast_horizon,
+            batch_size=1,
         )

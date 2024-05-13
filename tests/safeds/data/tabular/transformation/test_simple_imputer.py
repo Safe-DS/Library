@@ -134,7 +134,9 @@ class TestStrategyClass:
             ],
             ids=lambda x: x.__class__.__name__,
         )
-        def test_should_return_correct_string_representation(self, strategy: SimpleImputer.Strategy, expected: str) -> None:
+        def test_should_return_correct_string_representation(
+            self, strategy: SimpleImputer.Strategy, expected: str
+        ) -> None:
             assert str(strategy) == expected
 
 
@@ -154,7 +156,10 @@ class TestValueToReplaceProperty:
         [0],
     )
     def test_should_return_correct_value_to_replace(self, value_to_replace: float | str | None) -> None:
-        assert SimpleImputer(SimpleImputer.Strategy.Mode(), value_to_replace=value_to_replace).value_to_replace == value_to_replace
+        assert (
+            SimpleImputer(SimpleImputer.Strategy.Mode(), value_to_replace=value_to_replace).value_to_replace
+            == value_to_replace
+        )
 
 
 class TestFit:

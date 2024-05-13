@@ -24,9 +24,11 @@ def test_forward_model(device: Device) -> None:
     )
     table_1 = table_1.remove_columns(["date"])
     table_2 = table_1.slice_rows(length=table_1.number_of_rows - 14)
-    table_2 = table_2.add_columns([
-        table_1.slice_rows(start=14).get_column("value").rename("target"),
-    ])
+    table_2 = table_2.add_columns(
+        [
+            table_1.slice_rows(start=14).get_column("value").rename("target"),
+        ]
+    )
     train_table, test_table = table_2.split_rows(0.8)
 
     ss = StandardScaler()

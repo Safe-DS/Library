@@ -3,7 +3,6 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from safeds._validation import _check_columns_exist
-from safeds.exceptions import ColumnNotFoundError
 
 from ._lazy_cell import _LazyCell
 from ._row import Row

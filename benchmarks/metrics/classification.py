@@ -30,9 +30,7 @@ def _run_recall() -> None:
 if __name__ == "__main__":
     # Create a synthetic Table
     table = (
-        create_synthetic_table(10000, 2)
-        .rename_column("column_0", "predicted")
-        .rename_column("column_1", "expected")
+        create_synthetic_table(10000, 2).rename_column("column_0", "predicted").rename_column("column_1", "expected")
     )
 
     # Run the benchmarks

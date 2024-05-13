@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING
 
 from safeds._utils import _figure_to_image
 from safeds._validation import _check_columns_exist
-from safeds.exceptions import NonNumericColumnError, ColumnNotFoundError
+from safeds.exceptions import NonNumericColumnError
 
 if TYPE_CHECKING:
     from safeds.data.image.containers import Image
