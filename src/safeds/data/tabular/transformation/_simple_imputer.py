@@ -10,7 +10,7 @@ import pandas as pd
 from safeds._utils import _structural_hash
 from safeds._validation import _check_columns_exist
 from safeds.data.tabular.containers import Table
-from safeds.exceptions import NonNumericColumnError, TransformerNotFittedError, ColumnNotFoundError
+from safeds.exceptions import NonNumericColumnError, TransformerNotFittedError
 
 from ._table_transformer import TableTransformer
 
@@ -148,7 +148,7 @@ class SimpleImputer(TableTransformer):
             _check_columns_exist(table, column_names)
 
         if table.number_of_rows == 0:
-            raise ValueError("The Imputer cannot be fitted because the table contains 0 rows")
+            raise ValueError("The SimpleImputer cannot be fitted because the table contains 0 rows")
 
         if (isinstance(self._strategy, _Mean | _Median)) and table.remove_columns_except(
             column_names,

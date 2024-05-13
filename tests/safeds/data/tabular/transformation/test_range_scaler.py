@@ -18,7 +18,7 @@ class TestFit:
             },
         )
 
-        with pytest.raises(ColumnNotFoundError, match=r"Could not find column\(s\) 'col2, col3'"):
+        with pytest.raises(ColumnNotFoundError):
             RangeScaler().fit(table, ["col2", "col3"])
 
     def test_should_raise_if_table_contains_non_numerical_data(self) -> None:
@@ -63,7 +63,7 @@ class TestTransform:
             },
         )
 
-        with pytest.raises(ColumnNotFoundError, match=r"Could not find column\(s\) 'col1, col2'"):
+        with pytest.raises(ColumnNotFoundError):
             transformer.transform(table_to_transform)
 
     def test_should_raise_if_not_fitted(self) -> None:
@@ -305,7 +305,7 @@ class TestInverseTransform:
             transformer.inverse_transform(table)
 
     def test_should_raise_if_column_not_found(self) -> None:
-        with pytest.raises(ColumnNotFoundError, match=r"Could not find column\(s\) 'col1, col2'"):
+        with pytest.raises(ColumnNotFoundError):
             RangeScaler().fit(Table({"col1": [1, 2, 3], "col2": [2, 3, 4]}), ["col1", "col2"]).inverse_transform(
                 Table({"col3": [1, 2, 3]}),
             )

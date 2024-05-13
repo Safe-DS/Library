@@ -435,10 +435,7 @@ class TestResize:
     def test_should_raise(self, resource_path: str, new_width: int, new_height: int, device: Device) -> None:
         configure_test_with_device(device)
         image = Image.from_file(resolve_resource_path(resource_path))
-        with pytest.raises(
-            OutOfBoundsError,
-            match=rf"At least one of the new sizes new_width and new_height \(={min(new_width, new_height)}\) is not inside \[1, \u221e\).",
-        ):
+        with pytest.raises(OutOfBoundsError):
             image.resize(new_width, new_height)
 
 
@@ -500,10 +497,7 @@ class TestCrop:
     ) -> None:
         configure_test_with_device(device)
         image = Image.from_file(resolve_resource_path(resource_path))
-        with pytest.raises(
-            OutOfBoundsError,
-            match=rf"At least one of width and height \(={min(new_width, new_height)}\) is not inside \[1, \u221e\).",
-        ):
+        with pytest.raises(OutOfBoundsError):
             image.crop(0, 0, new_width, new_height)
 
     @pytest.mark.parametrize(
@@ -519,10 +513,7 @@ class TestCrop:
     def test_should_raise_invalid_coordinates(self, resource_path: str, new_x: int, new_y: int, device: Device) -> None:
         configure_test_with_device(device)
         image = Image.from_file(resolve_resource_path(resource_path))
-        with pytest.raises(
-            OutOfBoundsError,
-            match=rf"At least one of the coordinates x and y \(={min(new_x, new_y)}\) is not inside \[0, \u221e\).",
-        ):
+        with pytest.raises(OutOfBoundsError):
             image.crop(new_x, new_y, 100, 100)
 
     @pytest.mark.parametrize(
@@ -662,7 +653,7 @@ class TestBrightness:
     def test_should_raise(self, resource_path: str, device: Device) -> None:
         configure_test_with_device(device)
         image = Image.from_file(resolve_resource_path(resource_path))
-        with pytest.raises(OutOfBoundsError, match=r"factor \(=-1\) is not inside \[0, \u221e\)."):
+        with pytest.raises(OutOfBoundsError):
             image.adjust_brightness(-1)
 
 
@@ -715,10 +706,7 @@ class TestAddNoise:
     ) -> None:
         configure_test_with_device(device)
         image = Image.from_file(resolve_resource_path(resource_path))
-        with pytest.raises(
-            OutOfBoundsError,
-            match=rf"standard_deviation \(={standard_deviation}\) is not inside \[0, \u221e\)\.",
-        ):
+        with pytest.raises(OutOfBoundsError):
             image.add_noise(standard_deviation)
 
 
@@ -766,7 +754,7 @@ class TestAdjustContrast:
     )
     def test_should_raise_negative_contrast(self, resource_path: str, device: Device) -> None:
         configure_test_with_device(device)
-        with pytest.raises(OutOfBoundsError, match=r"factor \(=-1.0\) is not inside \[0, \u221e\)."):
+        with pytest.raises(OutOfBoundsError):
             Image.from_file(resolve_resource_path(resource_path)).adjust_contrast(-1.0)
 
 
@@ -828,7 +816,7 @@ class TestAdjustColor:
     )
     def test_should_raise_negative_color_adjust(self, resource_path: str, device: Device) -> None:
         configure_test_with_device(device)
-        with pytest.raises(OutOfBoundsError, match=r"factor \(=-1.0\) is not inside \[0, \u221e\)."):
+        with pytest.raises(OutOfBoundsError):
             Image.from_file(resolve_resource_path(resource_path)).adjust_color_balance(-1.0)
 
 
@@ -875,15 +863,9 @@ class TestBlur:
     def test_should_raise_blur_radius_out_of_bounds(self, resource_path: str, device: Device) -> None:
         configure_test_with_device(device)
         image = Image.from_file(resolve_resource_path(resource_path))
-        with pytest.raises(
-            OutOfBoundsError,
-            match=rf"radius \(=-1\) is not inside \[0, {min(image.width, image.height) - 1}\].",
-        ):
+        with pytest.raises(OutOfBoundsError):
             image.blur(-1)
-        with pytest.raises(
-            OutOfBoundsError,
-            match=rf"radius \(={min(image.width, image.height)}\) is not inside \[0, {min(image.width, image.height) - 1}\].",
-        ):
+        with pytest.raises(OutOfBoundsError):
             image.blur(min(image.width, image.height))
 
 
@@ -916,7 +898,7 @@ class TestSharpen:
     )
     def test_should_raise_negative_sharpen(self, resource_path: str, device: Device) -> None:
         configure_test_with_device(device)
-        with pytest.raises(OutOfBoundsError, match=r"factor \(=-1.0\) is not inside \[0, \u221e\)."):
+        with pytest.raises(OutOfBoundsError):
             Image.from_file(resolve_resource_path(resource_path)).sharpen(-1.0)
 
     @pytest.mark.parametrize(

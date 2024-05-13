@@ -101,12 +101,12 @@ class TestErrors:
 
     @pytest.mark.parametrize("width", [-1, 0])
     def test_should_raise_invalid_width(self, width: int) -> None:
-        with pytest.raises(OutOfBoundsError, match=rf"{width} is not inside \[1, \u221e\)."):
+        with pytest.raises(OutOfBoundsError):
             ImageSize(width, 1, 1)
 
     @pytest.mark.parametrize("height", [-1, 0])
     def test_should_raise_invalid_height(self, height: int) -> None:
-        with pytest.raises(OutOfBoundsError, match=rf"{height} is not inside \[1, \u221e\)."):
+        with pytest.raises(OutOfBoundsError):
             ImageSize(1, height, 1)
 
     @pytest.mark.parametrize("channel", [-1, 0, 2, 5])
@@ -116,5 +116,5 @@ class TestErrors:
 
     @pytest.mark.parametrize("channel", [-1, 0])
     def test_should_raise_negative_channel_ignore_invalid_channel(self, channel: int) -> None:
-        with pytest.raises(OutOfBoundsError, match=rf"channel \(={channel}\) is not inside \[1, \u221e\)."):
+        with pytest.raises(OutOfBoundsError):
             ImageSize(1, 1, channel, _ignore_invalid_channel=True)

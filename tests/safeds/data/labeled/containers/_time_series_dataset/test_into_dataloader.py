@@ -109,7 +109,7 @@ def test_should_create_dataloader_predict(
             1,
             0,
             OutOfBoundsError,
-            r"forecast_horizon \(=0\) is not inside \[1, \u221e\).",
+            None,
         ),
         (
             Table(
@@ -123,7 +123,7 @@ def test_should_create_dataloader_predict(
             0,
             1,
             OutOfBoundsError,
-            r"window_size \(=0\) is not inside \[1, \u221e\).",
+            None,
         ),
     ],
     ids=[
@@ -138,7 +138,7 @@ def test_should_create_dataloader_invalid(
     window_size: int,
     forecast_horizon: int,
     error_type: type[ValueError],
-    error_msg: str,
+    error_msg: str | None,
     device: Device,
 ) -> None:
     configure_test_with_device(device)

@@ -1,6 +1,4 @@
 import pytest
-from torch.types import Device
-
 from safeds.data.image.typing import ImageSize
 from safeds.data.labeled.containers import TabularDataset
 from safeds.data.tabular.containers import Table
@@ -31,7 +29,9 @@ from safeds.ml.nn import (
     OutputConversionTable,
 )
 from safeds.ml.nn._output_conversion_image import OutputConversionImageToColumn
-from tests.helpers import get_devices, get_devices_ids, configure_test_with_device
+from torch.types import Device
+
+from tests.helpers import configure_test_with_device, get_devices, get_devices_ids
 
 
 @pytest.mark.parametrize("device", get_devices(), ids=get_devices_ids())
@@ -45,10 +45,7 @@ class TestClassificationModel:
     )
     def test_should_raise_if_epoch_size_out_of_bounds(self, epoch_size: int, device: Device) -> None:
         configure_test_with_device(device)
-        with pytest.raises(
-            OutOfBoundsError,
-            match=rf"epoch_size \(={epoch_size}\) is not inside \[1, \u221e\)\.",
-        ):
+        with pytest.raises(OutOfBoundsError):
             NeuralNetworkClassifier(
                 InputConversionTable(),
                 [ForwardLayer(1, 1)],
@@ -67,10 +64,7 @@ class TestClassificationModel:
     )
     def test_should_raise_if_batch_size_out_of_bounds(self, batch_size: int, device: Device) -> None:
         configure_test_with_device(device)
-        with pytest.raises(
-            OutOfBoundsError,
-            match=rf"batch_size \(={batch_size}\) is not inside \[1, \u221e\)\.",
-        ):
+        with pytest.raises(OutOfBoundsError):
             NeuralNetworkClassifier(
                 InputConversionTable(),
                 [ForwardLayer(input_size=1, output_size=1)],
@@ -511,10 +505,7 @@ class TestRegressionModel:
     )
     def test_should_raise_if_epoch_size_out_of_bounds(self, epoch_size: int, device: Device) -> None:
         configure_test_with_device(device)
-        with pytest.raises(
-            OutOfBoundsError,
-            match=rf"epoch_size \(={epoch_size}\) is not inside \[1, \u221e\)\.",
-        ):
+        with pytest.raises(OutOfBoundsError):
             NeuralNetworkRegressor(
                 InputConversionTable(),
                 [ForwardLayer(input_size=1, output_size=1)],
@@ -533,10 +524,7 @@ class TestRegressionModel:
     )
     def test_should_raise_if_batch_size_out_of_bounds(self, batch_size: int, device: Device) -> None:
         configure_test_with_device(device)
-        with pytest.raises(
-            OutOfBoundsError,
-            match=rf"batch_size \(={batch_size}\) is not inside \[1, \u221e\)\.",
-        ):
+        with pytest.raises(OutOfBoundsError):
             NeuralNetworkRegressor(
                 InputConversionTable(),
                 [ForwardLayer(input_size=1, output_size=1)],

@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, Any
 
 from safeds._config import _get_device, _init_default_device
 from safeds._utils import _structural_hash
-from safeds.exceptions import _ClosedBound, OutOfBoundsError
+from safeds._validation import _check_bounds, _ClosedBound
 
 if TYPE_CHECKING:
     from collections.abc import Mapping, Sequence
@@ -220,10 +220,8 @@ class TimeSeriesDataset:
         y_s = []
 
         size = target_tensor.size(0)
-        if window_size < 1:
-            raise OutOfBoundsError(actual=window_size, name="window_size", lower_bound=_ClosedBound(1))
-        if forecast_horizon < 1:
-            raise OutOfBoundsError(actual=forecast_horizon, name="forecast_horizon", lower_bound=_ClosedBound(1))
+        _check_bounds("window_size", window_size, lower_bound=_ClosedBound(1))
+        _check_bounds("forecast_horizon", forecast_horizon, lower_bound=_ClosedBound(1))
         if size <= forecast_horizon + window_size:
             raise ValueError("Can not create windows with window size less then forecast horizon + window_size")
         # create feature windows and for that features targets lagged by forecast len
@@ -283,10 +281,8 @@ class TimeSeriesDataset:
         x_s = []
 
         size = target_tensor.size(0)
-        if window_size < 1:
-            raise OutOfBoundsError(actual=window_size, name="window_size", lower_bound=_ClosedBound(1))
-        if forecast_horizon < 1:
-            raise OutOfBoundsError(actual=forecast_horizon, name="forecast_horizon", lower_bound=_ClosedBound(1))
+        _check_bounds("window_size", window_size, lower_bound=_ClosedBound(1))
+        _check_bounds("forecast_horizon", forecast_horizon, lower_bound=_ClosedBound(1))
         if size <= forecast_horizon + window_size:
             raise ValueError("Can not create windows with window size less then forecast horizon + window_size")
 

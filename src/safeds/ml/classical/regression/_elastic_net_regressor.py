@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING
 from warnings import warn
 
 from safeds._utils import _structural_hash
-from safeds.exceptions import _ClosedBound, OutOfBoundsError
+from safeds._validation import _check_bounds, _ClosedBound
 
 from ._regressor import Regressor
 
@@ -38,8 +38,7 @@ class ElasticNetRegressor(Regressor):
         super().__init__()
 
         # Validation
-        if alpha < 0:
-            raise OutOfBoundsError(alpha, name="alpha", lower_bound=_ClosedBound(0))
+        _check_bounds("alpha", alpha, lower_bound=_ClosedBound(0))
         if alpha == 0:
             warn(
                 (
@@ -49,14 +48,9 @@ class ElasticNetRegressor(Regressor):
                 UserWarning,
                 stacklevel=2,
             )
-        if lasso_ratio < 0 or lasso_ratio > 1:
-            raise OutOfBoundsError(
-                lasso_ratio,
-                name="lasso_ratio",
-                lower_bound=_ClosedBound(0),
-                upper_bound=_ClosedBound(1),
-            )
-        elif lasso_ratio == 0:
+
+        _check_bounds("lasso_ratio", lasso_ratio, lower_bound=_ClosedBound(0), upper_bound=_ClosedBound(1))
+        if lasso_ratio == 0:
             warnings.warn(
                 (
                     "ElasticNetRegression with lasso_ratio = 0 is essentially RidgeRegression."

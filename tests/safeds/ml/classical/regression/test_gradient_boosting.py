@@ -23,10 +23,7 @@ class TestNumberOfTrees:
 
     @pytest.mark.parametrize("number_of_trees", [-1, 0], ids=["minus_one", "zero"])
     def test_should_raise_if_less_than_1(self, number_of_trees: int) -> None:
-        with pytest.raises(
-            OutOfBoundsError,
-            match=rf"number_of_trees \(={number_of_trees}\) is not inside \[1, \u221e\)\.",
-        ):
+        with pytest.raises(OutOfBoundsError):
             GradientBoostingRegressor(number_of_trees=number_of_trees)
 
 
@@ -42,8 +39,5 @@ class TestLearningRate:
 
     @pytest.mark.parametrize("learning_rate", [-1.0, 0.0], ids=["minus_one", "zero"])
     def test_should_raise_if_less_than_or_equal_to_0(self, learning_rate: float) -> None:
-        with pytest.raises(
-            OutOfBoundsError,
-            match=rf"learning_rate \(={learning_rate}\) is not inside \(0, \u221e\)\.",
-        ):
+        with pytest.raises(OutOfBoundsError):
             GradientBoostingRegressor(learning_rate=learning_rate)

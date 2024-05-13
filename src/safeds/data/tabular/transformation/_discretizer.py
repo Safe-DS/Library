@@ -2,14 +2,11 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from safeds._validation import _check_columns_exist
+from safeds._validation import _check_bounds, _check_columns_exist, _ClosedBound
 from safeds.data.tabular.containers import Table
 from safeds.exceptions import (
-    _ClosedBound,
     NonNumericColumnError,
-    OutOfBoundsError,
     TransformerNotFittedError,
-    ColumnNotFoundError,
 )
 
 from ._table_transformer import TableTransformer
@@ -34,11 +31,10 @@ class Discretizer(TableTransformer):
     """
 
     def __init__(self, number_of_bins: int = 5):
+        _check_bounds("number_of_bins", number_of_bins, lower_bound=_ClosedBound(2))
+
         self._column_names: list[str] | None = None
         self._wrapped_transformer: sk_KBinsDiscretizer | None = None
-
-        if number_of_bins < 2:
-            raise OutOfBoundsError(number_of_bins, name="number_of_bins", lower_bound=_ClosedBound(2))
         self._number_of_bins = number_of_bins
 
     def fit(self, table: Table, column_names: list[str] | None) -> Discretizer:

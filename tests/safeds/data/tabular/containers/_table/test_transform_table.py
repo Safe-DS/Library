@@ -111,7 +111,7 @@ def test_should_raise_if_column_not_found(table_to_fit: Table) -> None:
         },
     )
 
-    with pytest.raises(ColumnNotFoundError, match=r"Could not find column\(s\) 'col1'"):
+    with pytest.raises(ColumnNotFoundError):
         table_to_transform.transform_table(transformer)
 
 

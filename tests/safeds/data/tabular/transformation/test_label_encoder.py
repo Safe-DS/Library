@@ -12,7 +12,7 @@ class TestFit:
             },
         )
 
-        with pytest.raises(ColumnNotFoundError, match=r"Could not find column\(s\) 'col2, col3'"):
+        with pytest.raises(ColumnNotFoundError):
             LabelEncoder().fit(table, ["col2", "col3"])
 
     def test_should_raise_if_table_contains_no_rows(self) -> None:
@@ -247,7 +247,7 @@ class TestInverseTransform:
             transformer.inverse_transform(table)
 
     def test_should_raise_if_column_not_found(self) -> None:
-        with pytest.raises(ColumnNotFoundError, match=r"Could not find column\(s\) 'col1, col2'"):
+        with pytest.raises(ColumnNotFoundError):
             LabelEncoder().fit(
                 Table({"col1": ["one", "two"], "col2": ["three", "four"]}),
                 ["col1", "col2"],

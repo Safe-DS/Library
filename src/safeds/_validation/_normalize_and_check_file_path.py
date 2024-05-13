@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from safeds.exceptions import WrongFileExtensionError
+from safeds.exceptions import FileExtensionError
 
 
 def _normalize_and_check_file_path(
@@ -44,7 +44,7 @@ def _normalize_and_check_file_path(
     if not path.suffix:
         path = path.with_suffix(canonical_file_extension)
     elif path.suffix not in valid_file_extensions:
-        raise WrongFileExtensionError(path, valid_file_extensions)
+        raise FileExtensionError(path, valid_file_extensions)
 
     # Check if file exists
     if check_if_file_exists and not path.is_file():

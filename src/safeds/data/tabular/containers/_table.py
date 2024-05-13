@@ -6,16 +6,14 @@ from safeds._config import _get_device, _init_default_device
 from safeds._config._polars import _get_polars_config
 from safeds._utils import _structural_hash
 from safeds._utils._random import _get_random_seed
-from safeds._validation import _check_columns_exist, _normalize_and_check_file_path
+from safeds._validation import _check_bounds, _check_columns_exist, _ClosedBound, _normalize_and_check_file_path
 from safeds.data.labeled.containers import TabularDataset, TimeSeriesDataset
 from safeds.data.tabular.plotting import TablePlotter
 from safeds.data.tabular.typing._polars_data_type import _PolarsDataType
 from safeds.data.tabular.typing._polars_schema import _PolarsSchema
 from safeds.exceptions import (
-    _ClosedBound,
     ColumnLengthMismatchError,
     DuplicateColumnNameError,
-    OutOfBoundsError,
 )
 
 from ._column import Column
@@ -122,7 +120,7 @@ class Table:
             raise ColumnLengthMismatchError("") from None  # TODO: message
 
     @staticmethod
-    def from_csv_file(path: str | Path) -> Table:
+    def from_csv_file(path: str | Path, *, separator: str = ",") -> Table:
         """
         Create a table from a CSV file.
 
@@ -130,6 +128,8 @@ class Table:
         ----------
         path:
             The path to the CSV file. If the file extension is omitted, it is assumed to be ".csv".
+        separator:
+            The separator between the values in the CSV file.
 
         Returns
         -------
@@ -159,7 +159,8 @@ class Table:
         import polars as pl
 
         path = _normalize_and_check_file_path(path, ".csv", [".csv"], check_if_file_exists=True)
-        return Table._from_polars_lazy_frame(pl.scan_csv(path))
+
+        return Table._from_polars_lazy_frame(pl.scan_csv(path, separator=separator))
 
     @staticmethod
     def from_dict(data: dict[str, list[Any]]) -> Table:
@@ -1444,13 +1445,12 @@ class Table:
         |   2 |   7 |
         +-----+-----+
         """
-        if percentage_in_first < 0 or percentage_in_first > 1:
-            raise OutOfBoundsError(
-                actual=percentage_in_first,
-                name="percentage_in_first",
-                lower_bound=_ClosedBound(0),
-                upper_bound=_ClosedBound(1),
-            )
+        _check_bounds(
+            "percentage_in_first",
+            percentage_in_first,
+            lower_bound=_ClosedBound(0),
+            upper_bound=_ClosedBound(1),
+        )
 
         input_table = self.shuffle_rows() if shuffle else self
         number_of_rows_in_first = round(percentage_in_first * input_table.number_of_rows)

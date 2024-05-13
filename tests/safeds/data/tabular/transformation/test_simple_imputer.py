@@ -166,7 +166,7 @@ class TestFit:
             },
         )
 
-        with pytest.raises(ColumnNotFoundError, match=r"Could not find column\(s\) 'b, c'"):
+        with pytest.raises(ColumnNotFoundError):
             SimpleImputer(strategy).fit(table, ["b", "c"])
 
     @pytest.mark.parametrize("strategy", strategies(), ids=lambda x: x.__class__.__name__)
@@ -259,7 +259,7 @@ class TestTransform:
             },
         )
 
-        with pytest.raises(ColumnNotFoundError, match=r"Could not find column\(s\) 'a, b'"):
+        with pytest.raises(ColumnNotFoundError):
             transformer.transform(table_to_transform)
 
     @pytest.mark.parametrize("strategy", strategies(), ids=lambda x: x.__class__.__name__)

@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 
 from safeds._config import _init_default_device
+from safeds._validation import _check_bounds, _ClosedBound
 from safeds.data.image.typing import ImageSize
 
 if TYPE_CHECKING:
@@ -11,7 +12,6 @@ if TYPE_CHECKING:
 import sys
 
 from safeds._utils import _structural_hash
-from safeds.exceptions import _ClosedBound, OutOfBoundsError
 from safeds.ml.nn import Layer
 
 
@@ -62,8 +62,9 @@ class LSTMLayer(Layer):
         """
         if input_size is not None:
             self._set_input_size(input_size=input_size)
-        if output_size < 1:
-            raise OutOfBoundsError(actual=output_size, name="output_size", lower_bound=_ClosedBound(1))
+
+        _check_bounds("output_size", output_size, lower_bound=_ClosedBound(1))
+
         self._output_size = output_size
 
     def _get_internal_layer(self, **kwargs: Any) -> nn.Module:
@@ -102,8 +103,9 @@ class LSTMLayer(Layer):
     def _set_input_size(self, input_size: int | ImageSize) -> None:
         if isinstance(input_size, ImageSize):
             raise TypeError("The input_size of a forward layer has to be of type int.")
-        if input_size < 1:
-            raise OutOfBoundsError(actual=input_size, name="input_size", lower_bound=_ClosedBound(1))
+
+        _check_bounds("input_size", input_size, lower_bound=_ClosedBound(1))
+
         self._input_size = input_size
 
     def __hash__(self) -> int:

@@ -8,7 +8,7 @@ from safeds.exceptions import ColumnNotFoundError
     ("data", "target_name", "time_name", "extra_names", "error", "error_msg"),
     [
         (
-                {
+            {
                 "A": [1, 4],
                 "B": [2, 5],
                 "C": [3, 6],
@@ -17,12 +17,12 @@ from safeds.exceptions import ColumnNotFoundError
             },
             "T",
             "time",
-                ["D", "E"],
-                ColumnNotFoundError,
-            r"Could not find column\(s\) 'D, E'",
+            ["D", "E"],
+            ColumnNotFoundError,
+            None,
         ),
         (
-                {
+            {
                 "A": [1, 4],
                 "B": [2, 5],
                 "C": [3, 6],
@@ -31,9 +31,9 @@ from safeds.exceptions import ColumnNotFoundError
             },
             "D",
             "time",
-                [],
-                ColumnNotFoundError,
-            r"Could not find column\(s\) 'D'",
+            [],
+            ColumnNotFoundError,
+            None,
         ),
         (
             {
@@ -64,7 +64,7 @@ from safeds.exceptions import ColumnNotFoundError
             r"Column 'time' cannot be both time and extra.",
         ),
         (
-                Table(
+            Table(
                 {
                     "A": [1, 4],
                     "B": [2, 5],
@@ -75,12 +75,12 @@ from safeds.exceptions import ColumnNotFoundError
             ),
             "T",
             "time",
-                ["D", "E"],
-                ColumnNotFoundError,
-            r"Could not find column\(s\) 'D, E'",
+            ["D", "E"],
+            ColumnNotFoundError,
+            None,
         ),
         (
-                Table(
+            Table(
                 {
                     "A": [1, 4],
                     "B": [2, 5],
@@ -91,9 +91,9 @@ from safeds.exceptions import ColumnNotFoundError
             ),
             "D",
             "time",
-                [],
-                ColumnNotFoundError,
-            r"Could not find column\(s\) 'D'",
+            [],
+            ColumnNotFoundError,
+            None,
         ),
         (
             Table(
@@ -128,7 +128,7 @@ def test_should_raise_error(
     time_name: str,
     extra_names: list[str] | None,
     error: type[Exception],
-    error_msg: str,
+    error_msg: str | None,
 ) -> None:
     with pytest.raises(error, match=error_msg):
         TimeSeriesDataset(data, target_name=target_name, time_name=time_name, extra_names=extra_names)

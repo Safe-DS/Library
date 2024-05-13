@@ -128,7 +128,7 @@ class ValueNotPresentWhenFittedError(Exception):
         )
 
 
-class WrongFileExtensionError(ValueError):
+class FileExtensionError(ValueError):
     """Exception raised when the file has the wrong file extension."""
 
     def __init__(self, file: str | Path, file_extension: str | list[str]) -> None:
