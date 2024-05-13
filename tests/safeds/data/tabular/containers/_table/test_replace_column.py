@@ -3,7 +3,7 @@ from safeds.data.tabular.containers import Column, Table
 from safeds.exceptions import (
     ColumnSizeError,
     DuplicateColumnNameError,
-    UnknownColumnNameError,
+    ColumnNotFoundError,
 )
 
 
@@ -76,7 +76,7 @@ def test_should_replace_column(table: Table, column_name: str, columns: list[Col
 @pytest.mark.parametrize(
     ("old_column_name", "column", "error", "error_message"),
     [
-        ("D", [Column("C", ["d", "e", "f"])], UnknownColumnNameError, r"Could not find column\(s\) 'D'"),
+        ("D", [Column("C", ["d", "e", "f"])], ColumnNotFoundError, r"Could not find column\(s\) 'D'"),
         (
             "C",
             [Column("B", ["d", "e", "f"]), Column("D", [3, 2, 1])],
@@ -111,5 +111,5 @@ def test_should_raise_error(
 
 
 def test_should_fail_on_empty_table() -> None:
-    with pytest.raises(UnknownColumnNameError):
+    with pytest.raises(ColumnNotFoundError):
         Table().replace_column("col", [Column("a", [1, 2])])

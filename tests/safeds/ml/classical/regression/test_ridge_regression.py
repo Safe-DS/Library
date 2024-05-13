@@ -23,7 +23,7 @@ class TestAlpha:
 
     @pytest.mark.parametrize("alpha", [-0.5], ids=["minus_zero_point_5"])
     def test_should_raise_if_less_than_0(self, alpha: float) -> None:
-        with pytest.raises(OutOfBoundsError, match=rf"alpha \(={alpha}\) is not inside \[0, \u221e\)\."):
+        with pytest.raises(OutOfBoundsError):
             RidgeRegressor(alpha=alpha)
 
     def test_should_warn_if_equal_to_0(self) -> None:

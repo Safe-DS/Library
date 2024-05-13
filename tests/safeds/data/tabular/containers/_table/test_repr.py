@@ -5,15 +5,43 @@ from safeds.data.tabular.containers import Table
 @pytest.mark.parametrize(
     ("table", "expected"),
     [
-        (Table(), "Empty DataFrame\nColumns: []\nIndex: []"),
-        (Table({"col1": [0]}), "   col1\n0     0"),
-        (Table({"col1": [0, "1"], "col2": ["a", "b"]}), "  col1 col2\n0    0    a\n1    1    b"),
+        (
+            Table({"col1": [1, 2, 1], "col2": [1, 2, 4]}),
+            "+------+------+\n"
+            "| col1 | col2 |\n"
+            "|  --- |  --- |\n"
+            "|  i64 |  i64 |\n"
+            "+=============+\n"
+            "|    1 |    1 |\n"
+            "|    2 |    2 |\n"
+            "|    1 |    4 |\n"
+            "+------+------+",
+        ),
+        (
+            Table({"col1": [], "col2": []}),
+            "+------+------+\n"
+            "| col1 | col2 |\n"
+            "| ---  | ---  |\n"
+            "| null | null |\n"
+            "+=============+\n"
+            "+------+------+",
+        ),
+        (
+            Table(),
+            "++\n++\n++",
+        ),
+        (
+            Table({"col1": [1], "col2": [1]}),
+            "+------+------+\n"
+            "| col1 | col2 |\n"
+            "|  --- |  --- |\n"
+            "|  i64 |  i64 |\n"
+            "+=============+\n"
+            "|    1 |    1 |\n"
+            "+------+------+",
+        ),
     ],
-    ids=[
-        "empty table",
-        "table with one row",
-        "table with multiple rows",
-    ],
+    ids=["multiple rows", "rowless table", "empty table", "one row"],
 )
 def test_should_return_a_string_representation(table: Table, expected: str) -> None:
     assert repr(table) == expected

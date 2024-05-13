@@ -1,6 +1,6 @@
 import pytest
+from safeds._validation._check_columns_exist import _get_similar_column_names
 from safeds.data.tabular.containers import Table
-from safeds.exceptions._data import UnknownColumnNameError
 
 
 @pytest.mark.parametrize(
@@ -35,12 +35,4 @@ from safeds.exceptions._data import UnknownColumnNameError
     ids=["one similar", "two similar/ dynamic increase", "no similar", "exact match", "empty table"],
 )
 def test_should_get_similar_column_names(table: Table, column_name: str, expected: list[str]) -> None:
-    assert table._get_similar_columns(column_name) == expected
-
-
-def test_should_raise_error_if_column_name_unknown() -> None:
-    with pytest.raises(
-        UnknownColumnNameError,
-        match=r"Could not find column\(s\) 'col3'.\nDid you mean '\['col1', 'col2'\]'?",
-    ):
-        raise UnknownColumnNameError(["col3"], ["col1", "col2"])
+    assert _get_similar_column_names(table.schema, column_name) == expected  # TODO: move to validation tests

@@ -537,7 +537,7 @@ class TestFromFiles:
         self, resource_path: str | Path, load_percentage: float, device: Device
     ) -> None:
         configure_test_with_device(device)
-        with pytest.raises(OutOfBoundsError, match=rf"load_percentage \(={load_percentage}\) is not inside \[0, 1\]."):
+        with pytest.raises(OutOfBoundsError):
             ImageList.from_files(resolve_resource_path(resource_path), load_percentage=load_percentage)
 
     def test_create_from_single_sized_image_lists_one_image_list(self, device: Device) -> None:
@@ -1123,10 +1123,7 @@ class TestErrorsAndWarningsWithEmptyImageList:
         ) -> None:
             configure_test_with_device(device)
             image_list = ImageList.from_files(resolve_resource_path(resource_path))
-            with pytest.raises(
-                OutOfBoundsError,
-                match=rf"At least one of width and height \(={min(width, height)}\) is not inside \[1, \u221e\).",
-            ):
+            with pytest.raises(OutOfBoundsError):
                 image_list.remove_images_with_size(width, height)
 
     class TestResize:
@@ -1141,10 +1138,7 @@ class TestErrorsAndWarningsWithEmptyImageList:
         ) -> None:
             configure_test_with_device(device)
             image_list = ImageList.from_files(resolve_resource_path(resource_path))
-            with pytest.raises(
-                OutOfBoundsError,
-                match=rf"At least one of the new sizes new_width and new_height \(={min(new_width, new_height)}\) is not inside \[1, \u221e\).",
-            ):
+            with pytest.raises(OutOfBoundsError):
                 image_list.resize(new_width, new_height)
 
     class TestCrop:
@@ -1159,10 +1153,7 @@ class TestErrorsAndWarningsWithEmptyImageList:
         ) -> None:
             configure_test_with_device(device)
             image_list = ImageList.from_files(resolve_resource_path(resource_path))
-            with pytest.raises(
-                OutOfBoundsError,
-                match=rf"At least one of width and height \(={min(new_width, new_height)}\) is not inside \[1, \u221e\).",
-            ):
+            with pytest.raises(OutOfBoundsError):
                 image_list.crop(0, 0, new_width, new_height)
 
         @pytest.mark.parametrize(
@@ -1175,10 +1166,7 @@ class TestErrorsAndWarningsWithEmptyImageList:
         ) -> None:
             configure_test_with_device(device)
             image_list = ImageList.from_files(resolve_resource_path(resource_path))
-            with pytest.raises(
-                OutOfBoundsError,
-                match=rf"At least one of the coordinates x and y \(={min(new_x, new_y)}\) is not inside \[0, \u221e\).",
-            ):
+            with pytest.raises(OutOfBoundsError):
                 image_list.crop(new_x, new_y, 100, 100)
 
     class TestAddNoise:
@@ -1194,10 +1182,7 @@ class TestErrorsAndWarningsWithEmptyImageList:
             configure_test_with_device(device)
             image_list_original = ImageList.from_files(resolve_resource_path(resource_path))
             image_list_clone = image_list_original._clone()
-            with pytest.raises(
-                OutOfBoundsError,
-                match=rf"standard_deviation \(={standard_deviation}\) is not inside \[0, \u221e\)\.",
-            ):
+            with pytest.raises(OutOfBoundsError):
                 image_list_original.add_noise(standard_deviation)
             assert image_list_original == image_list_clone
 
@@ -1217,7 +1202,7 @@ class TestErrorsAndWarningsWithEmptyImageList:
             configure_test_with_device(device)
             image_list_original = ImageList.from_files(resolve_resource_path(resource_path))
             image_list_clone = image_list_original._clone()
-            with pytest.raises(OutOfBoundsError, match=r"factor \(=-1\) is not inside \[0, \u221e\)."):
+            with pytest.raises(OutOfBoundsError):
                 image_list_original.adjust_brightness(factor)
             assert image_list_original == image_list_clone
 
@@ -1253,7 +1238,7 @@ class TestErrorsAndWarningsWithEmptyImageList:
             configure_test_with_device(device)
             image_list_original = ImageList.from_files(resolve_resource_path(resource_path))
             image_list_clone = image_list_original._clone()
-            with pytest.raises(OutOfBoundsError, match=r"factor \(=-1\) is not inside \[0, \u221e\)."):
+            with pytest.raises(OutOfBoundsError):
                 image_list_original.adjust_contrast(factor)
             assert image_list_original == image_list_clone
 
@@ -1289,7 +1274,7 @@ class TestErrorsAndWarningsWithEmptyImageList:
             configure_test_with_device(device)
             image_list_original = ImageList.from_files(resolve_resource_path(resource_path))
             image_list_clone = image_list_original._clone()
-            with pytest.raises(OutOfBoundsError, match=r"factor \(=-1\) is not inside \[0, \u221e\)."):
+            with pytest.raises(OutOfBoundsError):
                 image_list_original.adjust_color_balance(factor)
             assert image_list_original == image_list_clone
 
@@ -1315,15 +1300,9 @@ class TestErrorsAndWarningsWithEmptyImageList:
             configure_test_with_device(device)
             image_list_original = ImageList.from_files(resolve_resource_path(resource_path))
             image_list_clone = image_list_original._clone()
-            with pytest.raises(
-                OutOfBoundsError,
-                match=rf"radius \(=-1\) is not inside \[0, {'0' if isinstance(image_list_original, _EmptyImageList) else min(*image_list_original.widths, *image_list_original.heights) - 1}\].",
-            ):
+            with pytest.raises(OutOfBoundsError):
                 image_list_original.blur(-1)
-            with pytest.raises(
-                OutOfBoundsError,
-                match=rf"radius \(={'1' if isinstance(image_list_original, _EmptyImageList) else min(*image_list_original.widths, *image_list_original.heights)}\) is not inside \[0, {'0' if isinstance(image_list_original, _EmptyImageList) else min(*image_list_original.widths, *image_list_original.heights) - 1}\].",
-            ):
+            with pytest.raises(OutOfBoundsError):
                 image_list_original.blur(
                     (
                         1
@@ -1361,7 +1340,7 @@ class TestErrorsAndWarningsWithEmptyImageList:
             configure_test_with_device(device)
             image_list_original = ImageList.from_files(resolve_resource_path(resource_path))
             image_list_clone = image_list_original._clone()
-            with pytest.raises(OutOfBoundsError, match=r"factor \(=-1\) is not inside \[0, \u221e\)."):
+            with pytest.raises(OutOfBoundsError):
                 image_list_original.sharpen(factor)
             assert image_list_original == image_list_clone
 

@@ -4,7 +4,7 @@ import sys
 from typing import TYPE_CHECKING
 
 from safeds._utils import _structural_hash
-from safeds.exceptions import UnknownColumnNameError
+from safeds._validation import _check_columns_exist
 
 from ._polars_data_type import _PolarsDataType
 from ._schema import Schema
@@ -73,8 +73,8 @@ class _PolarsSchema(Schema):
     # ------------------------------------------------------------------------------------------------------------------
 
     def get_column_type(self, name: str) -> DataType:
-        if not self.has_column(name):
-            raise UnknownColumnNameError([name])
+        _check_columns_exist(self, [name])
+
         return _PolarsDataType(self._schema[name])
 
     def has_column(self, name: str) -> bool:

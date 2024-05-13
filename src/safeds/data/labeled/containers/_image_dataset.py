@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING, Generic, TypeVar
 
 from safeds._config import _get_device, _init_default_device
 from safeds._utils import _structural_hash
+from safeds._validation import _check_bounds, _ClosedBound
 from safeds.data.image.containers import ImageList
 from safeds.data.image.containers._empty_image_list import _EmptyImageList
 from safeds.data.image.containers._multi_size_image_list import _MultiSizeImageList
@@ -15,10 +16,8 @@ from safeds.data.image.typing import ImageSize
 from safeds.data.tabular.containers import Column, Table
 from safeds.data.tabular.transformation import OneHotEncoder
 from safeds.exceptions import (
-    ClosedBound,
     IndexOutOfBoundsError,
     NonNumericColumnError,
-    OutOfBoundsError,
     OutputLengthMismatchError,
     TransformerNotFittedError,
 )
@@ -230,8 +229,9 @@ class ImageDataset(Generic[T]):
 
         if batch_size is None:
             batch_size = self._batch_size
-        if batch_size < 1:
-            raise OutOfBoundsError(batch_size, name="batch_size", lower_bound=ClosedBound(1))
+
+        _check_bounds("batch_size", batch_size, lower_bound=_ClosedBound(1))
+
         if batch_number < 0 or batch_size * batch_number >= len(self._input):
             raise IndexOutOfBoundsError(batch_size * batch_number)
         max_index = (

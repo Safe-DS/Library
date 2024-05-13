@@ -3,7 +3,7 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 
 from safeds._utils import _structural_hash
-from safeds.exceptions import ClosedBound, OutOfBoundsError
+from safeds._validation import _check_bounds, _ClosedBound
 
 
 class _RandomForestBase(ABC):
@@ -20,16 +20,13 @@ class _RandomForestBase(ABC):
         minimum_number_of_samples_in_leaves: int,
     ) -> None:
         # Validation
-        if number_of_trees < 1:
-            raise OutOfBoundsError(number_of_trees, name="number_of_trees", lower_bound=ClosedBound(1))
-        if maximum_depth is not None and maximum_depth < 1:
-            raise OutOfBoundsError(maximum_depth, name="maximum_depth", lower_bound=ClosedBound(1))
-        if minimum_number_of_samples_in_leaves < 1:
-            raise OutOfBoundsError(
-                minimum_number_of_samples_in_leaves,
-                name="minimum_number_of_samples_in_leaves",
-                lower_bound=ClosedBound(1),
-            )
+        _check_bounds("number_of_trees", number_of_trees, lower_bound=_ClosedBound(1))
+        _check_bounds("maximum_depth", maximum_depth, lower_bound=_ClosedBound(1))
+        _check_bounds(
+            "minimum_number_of_samples_in_leaves",
+            minimum_number_of_samples_in_leaves,
+            lower_bound=_ClosedBound(1),
+        )
 
         # Hyperparameters
         self._number_of_trees: int = number_of_trees

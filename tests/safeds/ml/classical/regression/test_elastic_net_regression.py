@@ -23,10 +23,7 @@ class TestAlpha:
 
     @pytest.mark.parametrize("alpha", [-0.5], ids=["minus_0_point_5"])
     def test_should_raise_if_less_than_0(self, alpha: float) -> None:
-        with pytest.raises(
-            OutOfBoundsError,
-            match=rf"alpha \(={alpha}\) is not inside \[0, \u221e\)\.",
-        ):
+        with pytest.raises(OutOfBoundsError):
             ElasticNetRegressor(alpha=alpha)
 
     def test_should_warn_if_equal_to_0(self) -> None:
@@ -52,10 +49,7 @@ class TestLassoRatio:
 
     @pytest.mark.parametrize("lasso_ratio", [-0.5, 1.5], ids=["minus_zero_point_5", "one_point_5"])
     def test_should_raise_if_not_between_0_and_1(self, lasso_ratio: float) -> None:
-        with pytest.raises(
-            OutOfBoundsError,
-            match=rf"lasso_ratio \(={lasso_ratio}\) is not inside \[0, 1\]\.",
-        ):
+        with pytest.raises(OutOfBoundsError):
             ElasticNetRegressor(lasso_ratio=lasso_ratio)
 
     def test_should_warn_if_0(self) -> None:

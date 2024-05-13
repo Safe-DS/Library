@@ -3,7 +3,7 @@ from tempfile import NamedTemporaryFile
 
 import pytest
 from safeds.data.tabular.containers import Table
-from safeds.exceptions import WrongFileExtensionError
+from safeds.exceptions import FileExtensionError
 
 from tests.helpers import resolve_resource_path
 
@@ -51,7 +51,7 @@ def test_should_raise_error_if_wrong_file_extension() -> None:
     with NamedTemporaryFile(suffix=".invalid_file_extension") as tmp_table_file:
         tmp_table_file.close()
         with Path(tmp_table_file.name).open("w", encoding="utf-8") as tmp_file, pytest.raises(
-            WrongFileExtensionError,
+            FileExtensionError,
             match=(
                 r".invalid_file_extension has a wrong file extension. Please provide a file with the following"
                 r" extension\(s\): .csv"

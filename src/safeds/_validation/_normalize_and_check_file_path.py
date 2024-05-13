@@ -1,15 +1,17 @@
+from __future__ import annotations
+
 from pathlib import Path
 
-from safeds.exceptions import WrongFileExtensionError
+from safeds.exceptions import FileExtensionError
 
 
-def _check_and_normalize_file_path(
+def _normalize_and_check_file_path(
     path: str | Path,
     canonical_file_extension: str,
-    valid_file_extensions: list[str],  # Should be ordered to ensure consistent error messages.
+    valid_file_extensions: list[str],
     *,
     check_if_file_exists: bool = False,
-) -> Path:  # pragma: no cover
+) -> Path:
     """
     Check if the provided path is a valid file path and normalize it.
 
@@ -42,7 +44,7 @@ def _check_and_normalize_file_path(
     if not path.suffix:
         path = path.with_suffix(canonical_file_extension)
     elif path.suffix not in valid_file_extensions:
-        raise WrongFileExtensionError(path, valid_file_extensions)
+        raise FileExtensionError(path, valid_file_extensions)
 
     # Check if file exists
     if check_if_file_exists and not path.is_file():

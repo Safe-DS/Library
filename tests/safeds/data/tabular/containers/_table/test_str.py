@@ -7,11 +7,39 @@ from safeds.data.tabular.containers import Table
     [
         (
             Table({"col1": [1, 2, 1], "col2": [1, 2, 4]}),
-            "   col1  col2\n0     1     1\n1     2     2\n2     1     4",
+            "+------+------+\n"
+            "| col1 | col2 |\n"
+            "|  --- |  --- |\n"
+            "|  i64 |  i64 |\n"
+            "+=============+\n"
+            "|    1 |    1 |\n"
+            "|    2 |    2 |\n"
+            "|    1 |    4 |\n"
+            "+------+------+",
         ),
-        (Table({"col1": [], "col2": []}), "Empty DataFrame\nColumns: [col1, col2]\nIndex: []"),
-        (Table(), "Empty DataFrame\nColumns: []\nIndex: []"),
-        (Table({"col1": [1], "col2": [1]}), "   col1  col2\n0     1     1"),
+        (
+            Table({"col1": [], "col2": []}),
+            "+------+------+\n"
+            "| col1 | col2 |\n"
+            "| ---  | ---  |\n"
+            "| null | null |\n"
+            "+=============+\n"
+            "+------+------+",
+        ),
+        (
+            Table(),
+            "++\n++\n++",
+        ),
+        (
+            Table({"col1": [1], "col2": [1]}),
+            "+------+------+\n"
+            "| col1 | col2 |\n"
+            "|  --- |  --- |\n"
+            "|  i64 |  i64 |\n"
+            "+=============+\n"
+            "|    1 |    1 |\n"
+            "+------+------+",
+        ),
     ],
     ids=["multiple rows", "rowless table", "empty table", "one row"],
 )

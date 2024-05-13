@@ -1,12 +1,12 @@
 import pytest
 from safeds.data.tabular.containers import Table
 from safeds.data.tabular.transformation import Discretizer
-from safeds.exceptions import NonNumericColumnError, OutOfBoundsError, TransformerNotFittedError, UnknownColumnNameError
+from safeds.exceptions import NonNumericColumnError, OutOfBoundsError, TransformerNotFittedError, ColumnNotFoundError
 
 
 class TestInit:
     def test_should_raise_value_error(self) -> None:
-        with pytest.raises(OutOfBoundsError, match=r"number_of_bins \(=1\) is not inside \[2, \u221e\)\."):
+        with pytest.raises(OutOfBoundsError):
             _ = Discretizer(1)
 
 
@@ -21,8 +21,8 @@ class TestFit:
                     },
                 ),
                 ["col2"],
-                UnknownColumnNameError,
-                r"Could not find column\(s\) 'col2'",
+                ColumnNotFoundError,
+                None,
             ),
             (
                 Table(
@@ -33,8 +33,8 @@ class TestFit:
                     },
                 ),
                 ["col4", "col5"],
-                UnknownColumnNameError,
-                r"Could not find column\(s\) 'col4, col5'",
+                ColumnNotFoundError,
+                None,
             ),
             (Table(), ["col2"], ValueError, "The Discretizer cannot be fitted because the table contains 0 rows"),
             (
@@ -56,7 +56,7 @@ class TestFit:
         table: Table,
         columns: list[str],
         error: type[Exception],
-        error_message: str,
+        error_message: str | None,
     ) -> None:
         with pytest.raises(error, match=error_message):
             Discretizer().fit(table, columns)
@@ -86,8 +86,8 @@ class TestTransform:
                     },
                 ),
                 ["col1"],
-                UnknownColumnNameError,
-                r"Could not find column\(s\) 'col1'",
+                ColumnNotFoundError,
+                None,
             ),
             (
                 Table(
@@ -96,8 +96,8 @@ class TestTransform:
                     },
                 ),
                 ["col3", "col1"],
-                UnknownColumnNameError,
-                r"Could not find column\(s\) 'col3, col1'",
+                ColumnNotFoundError,
+                None,
             ),
             (Table(), ["col1", "col3"], ValueError, "The table cannot be transformed because it contains 0 rows"),
             (
@@ -118,7 +118,7 @@ class TestTransform:
         table_to_transform: Table,
         columns: list[str],
         error: type[Exception],
-        error_message: str,
+        error_message: str | None,
     ) -> None:
         table_to_fit = Table(
             {

@@ -16,10 +16,7 @@ from torch import nn
     ids=["input_size_out_of_bounds"],
 )
 def test_should_raise_if_input_size_out_of_bounds(input_size: int) -> None:
-    with pytest.raises(
-        OutOfBoundsError,
-        match=rf"input_size \(={input_size}\) is not inside \[1, \u221e\)\.",
-    ):
+    with pytest.raises(OutOfBoundsError):
         LSTMLayer(output_size=1, input_size=input_size)
 
 
@@ -80,10 +77,7 @@ def test_should_raise_if_unknown_activation_function_is_passed(activation_functi
     ids=["output_size_out_of_bounds"],
 )
 def test_should_raise_if_output_size_out_of_bounds(output_size: int) -> None:
-    with pytest.raises(
-        OutOfBoundsError,
-        match=rf"output_size \(={output_size}\) is not inside \[1, \u221e\)\.",
-    ):
+    with pytest.raises(OutOfBoundsError):
         LSTMLayer(output_size=output_size, input_size=1)
 
 

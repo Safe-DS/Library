@@ -1,6 +1,4 @@
 import pytest
-from torch.types import Device
-
 from safeds._config import _get_device
 from safeds.data.tabular.containers import Table
 from safeds.data.tabular.transformation import RangeScaler
@@ -11,8 +9,9 @@ from safeds.ml.nn import (
     NeuralNetworkRegressor,
     OutputConversionTimeSeries,
 )
+from torch.types import Device
 
-from tests.helpers import resolve_resource_path, get_devices, get_devices_ids, configure_test_with_device
+from tests.helpers import configure_test_with_device, get_devices, get_devices_ids, resolve_resource_path
 
 
 @pytest.mark.parametrize("device", get_devices(), ids=get_devices_ids())

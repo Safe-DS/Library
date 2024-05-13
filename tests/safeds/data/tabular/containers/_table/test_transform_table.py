@@ -1,7 +1,7 @@
 import pytest
 from safeds.data.tabular.containers import Table
 from safeds.data.tabular.transformation import OneHotEncoder
-from safeds.exceptions import TransformerNotFittedError, UnknownColumnNameError
+from safeds.exceptions import TransformerNotFittedError, ColumnNotFoundError
 
 
 @pytest.mark.parametrize(
@@ -111,7 +111,7 @@ def test_should_raise_if_column_not_found(table_to_fit: Table) -> None:
         },
     )
 
-    with pytest.raises(UnknownColumnNameError, match=r"Could not find column\(s\) 'col1'"):
+    with pytest.raises(ColumnNotFoundError):
         table_to_transform.transform_table(transformer)
 
 

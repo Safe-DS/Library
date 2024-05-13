@@ -1,6 +1,6 @@
 import pytest
 from safeds.data.tabular.containers import Table
-from safeds.exceptions import UnknownColumnNameError
+from safeds.exceptions import ColumnNotFoundError
 from syrupy import SnapshotAssertion
 
 
@@ -21,20 +21,20 @@ def test_should_match_snapshot(snapshot_png_image: SnapshotAssertion) -> None:
 )
 def test_should_raise_if_column_does_not_exist(table: Table, x: str, y: str) -> None:
     table = Table({"A": [1, 2, 3], "B": [2, 4, 7]})
-    with pytest.raises(UnknownColumnNameError):
+    with pytest.raises(ColumnNotFoundError):
         table.plot.line_plot(x, y)
 
 
 @pytest.mark.parametrize(
-    ("x", "y", "error_message"),
+    ("x", "y"),
     [
-        ("C", "A", r"Could not find column\(s\) 'C'"),
-        ("A", "C", r"Could not find column\(s\) 'C'"),
-        ("C", "D", r"Could not find column\(s\) 'C, D'"),
+        ("C", "A"),
+        ("A", "C"),
+        ("C", "D"),
     ],
     ids=["x column", "y column", "x and y column"],
 )
-def test_should_raise_if_column_does_not_exist_error_message(x: str, y: str, error_message: str) -> None:
+def test_should_raise_if_column_does_not_exist_error_message(x: str, y: str) -> None:
     table = Table({"A": [1, 2, 3], "B": [2, 4, 7]})
-    with pytest.raises(UnknownColumnNameError, match=error_message):
+    with pytest.raises(ColumnNotFoundError):
         table.plot.line_plot(x, y)

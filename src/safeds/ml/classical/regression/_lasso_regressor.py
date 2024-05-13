@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 from warnings import warn
 
 from safeds._utils import _structural_hash
-from safeds.exceptions import ClosedBound, OutOfBoundsError
+from safeds._validation import _check_bounds, _ClosedBound
 
 from ._regressor import Regressor
 
@@ -34,8 +34,7 @@ class LassoRegressor(Regressor):
         super().__init__()
 
         # Validation
-        if alpha < 0:
-            raise OutOfBoundsError(alpha, name="alpha", lower_bound=ClosedBound(0))
+        _check_bounds("alpha", alpha, lower_bound=_ClosedBound(0))
         if alpha == 0:
             warn(
                 (

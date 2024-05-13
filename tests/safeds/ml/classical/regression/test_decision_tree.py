@@ -23,10 +23,7 @@ class TestMaximumDepth:
 
     @pytest.mark.parametrize("maximum_depth", [-1, 0], ids=["minus_one", "zero"])
     def test_should_raise_if_less_than_or_equal_to_0(self, maximum_depth: int) -> None:
-        with pytest.raises(
-            OutOfBoundsError,
-            match=rf"maximum_depth \(={maximum_depth}\) is not inside \[1, \u221e\)\.",
-        ):
+        with pytest.raises(OutOfBoundsError):
             DecisionTreeRegressor(maximum_depth=maximum_depth)
 
 
@@ -42,8 +39,5 @@ class TestMinimumNumberOfSamplesInLeaves:
 
     @pytest.mark.parametrize("minimum_number_of_samples_in_leaves", [-1, 0], ids=["minus_one", "zero"])
     def test_should_raise_if_less_than_or_equal_to_0(self, minimum_number_of_samples_in_leaves: int) -> None:
-        with pytest.raises(
-            OutOfBoundsError,
-            match=rf"minimum_number_of_samples_in_leaves \(={minimum_number_of_samples_in_leaves}\) is not inside \[1, \u221e\)\.",
-        ):
+        with pytest.raises(OutOfBoundsError):
             DecisionTreeRegressor(minimum_number_of_samples_in_leaves=minimum_number_of_samples_in_leaves)

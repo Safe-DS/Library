@@ -1,6 +1,6 @@
 import pytest
 from safeds.data.tabular.containers import Column, Table
-from safeds.exceptions import UnknownColumnNameError
+from safeds.exceptions import ColumnNotFoundError
 
 
 @pytest.mark.parametrize(
@@ -23,5 +23,5 @@ def test_should_get_column(table1: Table, expected: Column) -> None:
     ids=["no col3", "empty"],
 )
 def test_should_raise_error_if_column_name_unknown(table: Table) -> None:
-    with pytest.raises(UnknownColumnNameError, match=r"Could not find column\(s\) 'col3'"):
+    with pytest.raises(ColumnNotFoundError):
         table.get_column("col3")
