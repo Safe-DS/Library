@@ -5,7 +5,7 @@ import pytest
 from safeds.data.tabular.containers import Table
 from safeds.data.tabular.transformation import SimpleImputer
 from safeds.data.tabular.transformation._simple_imputer import _Mode
-from safeds.exceptions import NonNumericColumnError, TransformerNotFittedError, UnknownColumnNameError
+from safeds.exceptions import NonNumericColumnError, TransformerNotFittedError, ColumnNotFoundError
 
 
 def strategies() -> list[SimpleImputer.Strategy]:
@@ -134,7 +134,9 @@ class TestStrategyClass:
             ],
             ids=lambda x: x.__class__.__name__,
         )
-        def test_should_return_correct_string_representation(self, strategy: SimpleImputer.Strategy, expected: str) -> None:
+        def test_should_return_correct_string_representation(
+            self, strategy: SimpleImputer.Strategy, expected: str
+        ) -> None:
             assert str(strategy) == expected
 
 
@@ -154,7 +156,10 @@ class TestValueToReplaceProperty:
         [0],
     )
     def test_should_return_correct_value_to_replace(self, value_to_replace: float | str | None) -> None:
-        assert SimpleImputer(SimpleImputer.Strategy.Mode(), value_to_replace=value_to_replace).value_to_replace == value_to_replace
+        assert (
+            SimpleImputer(SimpleImputer.Strategy.Mode(), value_to_replace=value_to_replace).value_to_replace
+            == value_to_replace
+        )
 
 
 class TestFit:
@@ -166,7 +171,7 @@ class TestFit:
             },
         )
 
-        with pytest.raises(UnknownColumnNameError, match=r"Could not find column\(s\) 'b, c'"):
+        with pytest.raises(ColumnNotFoundError):
             SimpleImputer(strategy).fit(table, ["b", "c"])
 
     @pytest.mark.parametrize("strategy", strategies(), ids=lambda x: x.__class__.__name__)
@@ -259,7 +264,7 @@ class TestTransform:
             },
         )
 
-        with pytest.raises(UnknownColumnNameError, match=r"Could not find column\(s\) 'a, b'"):
+        with pytest.raises(ColumnNotFoundError):
             transformer.transform(table_to_transform)
 
     @pytest.mark.parametrize("strategy", strategies(), ids=lambda x: x.__class__.__name__)

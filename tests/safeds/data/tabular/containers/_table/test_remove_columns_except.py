@@ -1,6 +1,6 @@
 import pytest
 from safeds.data.tabular.containers import Table
-from safeds.exceptions import UnknownColumnNameError
+from safeds.exceptions import ColumnNotFoundError
 
 
 @pytest.mark.parametrize(
@@ -50,5 +50,5 @@ def test_should_remove_all_except_listed_columns(table: Table, column_names: lis
 
 @pytest.mark.parametrize("table", [Table({"A": [1], "B": [2]}), Table()], ids=["table", "empty"])
 def test_should_raise_error_if_column_name_unknown(table: Table) -> None:
-    with pytest.raises(UnknownColumnNameError, match=r"Could not find column\(s\) 'C'"):
+    with pytest.raises(ColumnNotFoundError):
         table.remove_columns_except(["C"])

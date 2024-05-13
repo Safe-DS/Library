@@ -3,7 +3,7 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 
 from safeds._utils import _structural_hash
-from safeds.exceptions import ClosedBound, OutOfBoundsError
+from safeds._validation import _check_bounds, _ClosedBound
 
 
 class _KNearestNeighborsBase(ABC):
@@ -18,8 +18,7 @@ class _KNearestNeighborsBase(ABC):
         number_of_neighbors: int,
     ) -> None:
         # Validation
-        if number_of_neighbors < 1:
-            raise OutOfBoundsError(number_of_neighbors, name="number_of_neighbors", lower_bound=ClosedBound(1))
+        _check_bounds("number_of_neighbors", number_of_neighbors, lower_bound=_ClosedBound(1))
 
         # Hyperparameters
         self._number_of_neighbors = number_of_neighbors

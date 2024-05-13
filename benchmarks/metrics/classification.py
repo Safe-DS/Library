@@ -1,14 +1,12 @@
 from __future__ import annotations
 
 from timeit import timeit
-from typing import TYPE_CHECKING
 
 import polars as pl
 
 from benchmarks.table.utils import create_synthetic_table
 from safeds.data.tabular.containers import Table
 from safeds.ml.metrics import ClassificationMetrics
-
 
 REPETITIONS = 10
 
@@ -32,9 +30,7 @@ def _run_recall() -> None:
 if __name__ == "__main__":
     # Create a synthetic Table
     table = (
-        create_synthetic_table(10000, 2)
-        .rename_column("column_0", "predicted")
-        .rename_column("column_1", "expected")
+        create_synthetic_table(10000, 2).rename_column("column_0", "predicted").rename_column("column_1", "expected")
     )
 
     # Run the benchmarks

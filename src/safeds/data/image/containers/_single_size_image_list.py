@@ -437,10 +437,6 @@ class _SingleSizeImageList(ImageList):
 
     @staticmethod
     def _change_channel_of_tensor(tensor: Tensor, channel: int) -> Tensor:
-        import torch
-
-        _init_default_device()
-
         """
         Change the channel of a tensor to the given channel.
 
@@ -461,6 +457,10 @@ class _SingleSizeImageList(ImageList):
         ValueError
             if the given channel is not a valid channel option
         """
+        import torch
+
+        _init_default_device()
+
         if tensor.size(dim=-3) == channel:
             return tensor.detach().clone()
         elif tensor.size(dim=-3) == 1 and channel == 3:

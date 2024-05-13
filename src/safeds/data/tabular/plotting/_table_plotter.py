@@ -4,7 +4,8 @@ import warnings
 from typing import TYPE_CHECKING
 
 from safeds._utils import _figure_to_image
-from safeds.exceptions import NonNumericColumnError, UnknownColumnNameError
+from safeds._validation import _check_columns_exist
+from safeds.exceptions import NonNumericColumnError
 
 if TYPE_CHECKING:
     from safeds.data.image.containers import Image
@@ -242,16 +243,9 @@ class TablePlotter:
         ... )
         >>> image = table.plot.line_plot("a", "b")
         """
-        # TODO: extract validation
-        missing_columns = []
-        if not self._table.has_column(x_name):
-            missing_columns.append(x_name)
-        if not self._table.has_column(y_name):
-            missing_columns.append(y_name)
-        if missing_columns:
-            raise UnknownColumnNameError(missing_columns)
+        _check_columns_exist(self._table, [x_name, y_name])
 
-        # TODO: pass list of columns names
+        # TODO: pass list of columns names + extract validation
         if not self._table.get_column(x_name).is_numeric:
             raise NonNumericColumnError(x_name)
         if not self._table.get_column(y_name).is_numeric:
@@ -312,17 +306,9 @@ class TablePlotter:
         ... )
         >>> image = table.plot.scatter_plot("a", "b")
         """
-        # TODO: merge with line_plot?
-        # TODO: extract validation
-        missing_columns = []
-        if not self._table.has_column(x_name):
-            missing_columns.append(x_name)
-        if not self._table.has_column(y_name):
-            missing_columns.append(y_name)
-        if missing_columns:
-            raise UnknownColumnNameError(missing_columns)
+        _check_columns_exist(self._table, [x_name, y_name])
 
-        # TODO: pass list of columns names
+        # TODO: pass list of columns names + extract validation
         if not self._table.get_column(x_name).is_numeric:
             raise NonNumericColumnError(x_name)
         if not self._table.get_column(y_name).is_numeric:

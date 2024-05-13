@@ -1,7 +1,7 @@
 import pytest
 from safeds.data.labeled.containers import TimeSeriesDataset
 from safeds.data.tabular.containers import Table
-from safeds.exceptions import UnknownColumnNameError
+from safeds.exceptions import ColumnNotFoundError
 
 
 @pytest.mark.parametrize(
@@ -18,8 +18,8 @@ from safeds.exceptions import UnknownColumnNameError
             "T",
             "time",
             ["D", "E"],
-            UnknownColumnNameError,
-            r"Could not find column\(s\) 'D, E'",
+            ColumnNotFoundError,
+            None,
         ),
         (
             {
@@ -32,8 +32,8 @@ from safeds.exceptions import UnknownColumnNameError
             "D",
             "time",
             [],
-            UnknownColumnNameError,
-            r"Could not find column\(s\) 'D'",
+            ColumnNotFoundError,
+            None,
         ),
         (
             {
@@ -76,8 +76,8 @@ from safeds.exceptions import UnknownColumnNameError
             "T",
             "time",
             ["D", "E"],
-            UnknownColumnNameError,
-            r"Could not find column\(s\) 'D, E'",
+            ColumnNotFoundError,
+            None,
         ),
         (
             Table(
@@ -92,8 +92,8 @@ from safeds.exceptions import UnknownColumnNameError
             "D",
             "time",
             [],
-            UnknownColumnNameError,
-            r"Could not find column\(s\) 'D'",
+            ColumnNotFoundError,
+            None,
         ),
         (
             Table(
@@ -128,7 +128,7 @@ def test_should_raise_error(
     time_name: str,
     extra_names: list[str] | None,
     error: type[Exception],
-    error_msg: str,
+    error_msg: str | None,
 ) -> None:
     with pytest.raises(error, match=error_msg):
         TimeSeriesDataset(data, target_name=target_name, time_name=time_name, extra_names=extra_names)

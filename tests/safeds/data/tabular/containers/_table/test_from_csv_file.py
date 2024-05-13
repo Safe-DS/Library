@@ -2,7 +2,7 @@ from pathlib import Path
 
 import pytest
 from safeds.data.tabular.containers import Table
-from safeds.exceptions import WrongFileExtensionError
+from safeds.exceptions import FileExtensionError
 
 from tests.helpers import resolve_resource_path
 
@@ -56,5 +56,5 @@ def test_should_raise_error_if_file_not_found(path: str | Path, expected_error_m
     ids=["by String", "by path"],
 )
 def test_should_raise_error_if_wrong_file_extension(path: str | Path, expected_error_message: str) -> None:
-    with pytest.raises(WrongFileExtensionError, match=expected_error_message):
+    with pytest.raises(FileExtensionError, match=expected_error_message):
         Table.from_csv_file(resolve_resource_path(path))

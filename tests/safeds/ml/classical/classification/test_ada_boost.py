@@ -36,10 +36,7 @@ class TestMaximumNumberOfLearners:
 
     @pytest.mark.parametrize("maximum_number_of_learners", [-1, 0], ids=["minus_one", "zero"])
     def test_should_raise_if_less_than_or_equal_to_0(self, maximum_number_of_learners: int) -> None:
-        with pytest.raises(
-            OutOfBoundsError,
-            match=rf"maximum_number_of_learners \(={maximum_number_of_learners}\) is not inside \[1, \u221e\)\.",
-        ):
+        with pytest.raises(OutOfBoundsError):
             AdaBoostClassifier(maximum_number_of_learners=maximum_number_of_learners)
 
 
@@ -55,8 +52,5 @@ class TestLearningRate:
 
     @pytest.mark.parametrize("learning_rate", [-1.0, 0.0], ids=["minus_one", "zero"])
     def test_should_raise_if_less_than_or_equal_to_0(self, learning_rate: float) -> None:
-        with pytest.raises(
-            OutOfBoundsError,
-            match=rf"learning_rate \(={learning_rate}\) is not inside \(0, \u221e\)\.",
-        ):
+        with pytest.raises(OutOfBoundsError):
             AdaBoostClassifier(learning_rate=learning_rate)

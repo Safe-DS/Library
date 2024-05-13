@@ -2,13 +2,11 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from safeds._validation import _check_bounds, _check_columns_exist, _ClosedBound
 from safeds.data.tabular.containers import Table
 from safeds.exceptions import (
-    ClosedBound,
     NonNumericColumnError,
-    OutOfBoundsError,
     TransformerNotFittedError,
-    UnknownColumnNameError,
 )
 
 from ._table_transformer import TableTransformer
@@ -33,11 +31,10 @@ class Discretizer(TableTransformer):
     """
 
     def __init__(self, number_of_bins: int = 5):
+        _check_bounds("number_of_bins", number_of_bins, lower_bound=_ClosedBound(2))
+
         self._column_names: list[str] | None = None
         self._wrapped_transformer: sk_KBinsDiscretizer | None = None
-
-        if number_of_bins < 2:
-            raise OutOfBoundsError(number_of_bins, name="number_of_bins", lower_bound=ClosedBound(2))
         self._number_of_bins = number_of_bins
 
     def fit(self, table: Table, column_names: list[str] | None) -> Discretizer:
@@ -75,14 +72,7 @@ class Discretizer(TableTransformer):
         if column_names is None:
             column_names = table.column_names
         else:
-            missing_columns = set(column_names) - set(table.column_names)
-            if len(missing_columns) > 0:
-                raise UnknownColumnNameError(
-                    sorted(
-                        missing_columns,
-                        key={val: ix for ix, val in enumerate(column_names)}.__getitem__,
-                    ),
-                )
+            _check_columns_exist(table, column_names)
 
             for column in column_names:
                 if not table.get_column(column).type.is_numeric:
@@ -135,14 +125,7 @@ class Discretizer(TableTransformer):
             raise ValueError("The table cannot be transformed because it contains 0 rows")
 
         # Input table does not contain all columns used to fit the transformer
-        missing_columns = set(self._column_names) - set(table.column_names)
-        if len(missing_columns) > 0:
-            raise UnknownColumnNameError(
-                sorted(
-                    missing_columns,
-                    key={val: ix for ix, val in enumerate(self._column_names)}.__getitem__,
-                ),
-            )
+        _check_columns_exist(table, self._column_names)
 
         for column in self._column_names:
             if not table.get_column(column).type.is_numeric:

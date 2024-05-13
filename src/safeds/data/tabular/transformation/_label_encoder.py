@@ -3,8 +3,9 @@ from __future__ import annotations
 import warnings
 from typing import TYPE_CHECKING
 
+from safeds._validation import _check_columns_exist
 from safeds.data.tabular.containers import Table
-from safeds.exceptions import NonNumericColumnError, TransformerNotFittedError, UnknownColumnNameError
+from safeds.exceptions import NonNumericColumnError, TransformerNotFittedError
 
 from ._invertible_table_transformer import InvertibleTableTransformer
 
@@ -49,9 +50,7 @@ class LabelEncoder(InvertibleTableTransformer):
         if column_names is None:
             column_names = table.column_names
         else:
-            missing_columns = sorted(set(column_names) - set(table.column_names))
-            if len(missing_columns) > 0:
-                raise UnknownColumnNameError(missing_columns)
+            _check_columns_exist(table, column_names)
 
         if table.number_of_rows == 0:
             raise ValueError("The LabelEncoder cannot transform the table because it contains 0 rows")
@@ -110,9 +109,7 @@ class LabelEncoder(InvertibleTableTransformer):
             raise TransformerNotFittedError
 
         # Input table does not contain all columns used to fit the transformer
-        missing_columns = sorted(set(self._column_names) - set(table.column_names))
-        if len(missing_columns) > 0:
-            raise UnknownColumnNameError(missing_columns)
+        _check_columns_exist(table, self._column_names)
 
         if table.number_of_rows == 0:
             raise ValueError("The LabelEncoder cannot transform the table because it contains 0 rows")
@@ -155,9 +152,7 @@ class LabelEncoder(InvertibleTableTransformer):
         if self._wrapped_transformer is None or self._column_names is None:
             raise TransformerNotFittedError
 
-        missing_columns = sorted(set(self._column_names) - set(transformed_table.column_names))
-        if len(missing_columns) > 0:
-            raise UnknownColumnNameError(missing_columns)
+        _check_columns_exist(transformed_table, self._column_names)
 
         if transformed_table.number_of_rows == 0:
             raise ValueError("The LabelEncoder cannot inverse transform the table because it contains 0 rows")

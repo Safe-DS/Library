@@ -46,7 +46,7 @@ class TestC:
 
     @pytest.mark.parametrize("c", [-1.0, 0.0], ids=["minus_one", "zero"])
     def test_should_raise_if_less_than_or_equal_to_0(self, c: float) -> None:
-        with pytest.raises(OutOfBoundsError, match=rf"c \(={c}\) is not inside \(0, \u221e\)\."):
+        with pytest.raises(OutOfBoundsError):
             SupportVectorRegressor(c=c)
 
 
@@ -72,7 +72,7 @@ class TestKernel:
 
     @pytest.mark.parametrize("degree", [-1, 0], ids=["minus_one", "zero"])
     def test_should_raise_if_degree_less_than_1(self, degree: int) -> None:
-        with pytest.raises(OutOfBoundsError, match=rf"degree \(={degree}\) is not inside \[1, \u221e\)\."):
+        with pytest.raises(OutOfBoundsError):
             SupportVectorRegressor.Kernel.polynomial(degree=degree)
 
     # def test_should_get_sklearn_arguments_polynomial(self) -> None:

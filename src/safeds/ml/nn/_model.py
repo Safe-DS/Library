@@ -4,16 +4,15 @@ import copy
 from typing import TYPE_CHECKING, Generic, Self, TypeVar
 
 from safeds._config import _init_default_device
+from safeds._validation import _check_bounds, _ClosedBound
 from safeds.data.image.containers import ImageList
 from safeds.data.labeled.containers import ImageDataset, TabularDataset, TimeSeriesDataset
 from safeds.data.tabular.containers import Table
 from safeds.exceptions import (
-    ClosedBound,
     FeatureDataMismatchError,
     InputSizeError,
     InvalidModelStructureError,
     ModelNotFittedError,
-    OutOfBoundsError,
 )
 from safeds.ml.nn import (
     Convolutional2DLayer,
@@ -162,10 +161,10 @@ class NeuralNetworkRegressor(Generic[IFT, IPT, OT]):
 
         if not self._input_conversion._is_fit_data_valid(train_data):
             raise FeatureDataMismatchError
-        if epoch_size < 1:
-            raise OutOfBoundsError(actual=epoch_size, name="epoch_size", lower_bound=ClosedBound(1))
-        if batch_size < 1:
-            raise OutOfBoundsError(actual=batch_size, name="batch_size", lower_bound=ClosedBound(1))
+
+        _check_bounds("epoch_size", epoch_size, lower_bound=_ClosedBound(1))
+        _check_bounds("batch_size", batch_size, lower_bound=_ClosedBound(1))
+
         if self._input_conversion._data_size is not self._input_size:
             raise InputSizeError(self._input_conversion._data_size, self._input_size)
 
@@ -378,10 +377,10 @@ class NeuralNetworkClassifier(Generic[IFT, IPT, OT]):
 
         if not self._input_conversion._is_fit_data_valid(train_data):
             raise FeatureDataMismatchError
-        if epoch_size < 1:
-            raise OutOfBoundsError(actual=epoch_size, name="epoch_size", lower_bound=ClosedBound(1))
-        if batch_size < 1:
-            raise OutOfBoundsError(actual=batch_size, name="batch_size", lower_bound=ClosedBound(1))
+
+        _check_bounds("epoch_size", epoch_size, lower_bound=_ClosedBound(1))
+        _check_bounds("batch_size", batch_size, lower_bound=_ClosedBound(1))
+
         if self._input_conversion._data_size is not self._input_size:
             raise InputSizeError(self._input_conversion._data_size, self._input_size)
 
