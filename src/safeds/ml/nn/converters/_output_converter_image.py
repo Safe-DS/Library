@@ -12,7 +12,7 @@ from safeds.data.labeled.containers._image_dataset import _ColumnAsTensor, _Tabl
 from safeds.data.tabular.containers import Column, Table
 from safeds.data.tabular.transformation import OneHotEncoder
 
-from ._output_conversion import OutputConversion
+from ._output_converter import OutputConversion
 
 if TYPE_CHECKING:
     from torch import Tensor

@@ -11,7 +11,7 @@ from safeds.ml.nn.converters import (
     OutputConversionImageToImage,
     OutputConversionImageToTable,
 )
-from safeds.ml.nn.converters._output_conversion_image import _OutputConversionImage
+from safeds.ml.nn.converters._output_converter_image import _OutputConversionImage
 
 
 class TestDataConversionImage:

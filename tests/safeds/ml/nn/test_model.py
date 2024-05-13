@@ -22,7 +22,7 @@ from safeds.ml.nn.converters import (
     OutputConversionImageToTable,
     OutputConversionTable,
 )
-from safeds.ml.nn.converters._output_conversion_image import OutputConversionImageToColumn
+from safeds.ml.nn.converters._output_converter_image import OutputConversionImageToColumn
 from safeds.ml.nn.layers import (
     AveragePooling2DLayer,
     Convolutional2DLayer,

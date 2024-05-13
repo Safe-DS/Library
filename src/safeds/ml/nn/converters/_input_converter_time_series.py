@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING, Any
 
 from safeds.data.labeled.containers import TimeSeriesDataset
 
-from ._input_conversion import InputConversion
+from ._input_converter import InputConversion
 
 if TYPE_CHECKING:
     from torch.utils.data import DataLoader
