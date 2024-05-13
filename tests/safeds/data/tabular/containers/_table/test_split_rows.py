@@ -1,3 +1,5 @@
+import re
+
 import pytest
 from safeds.data.tabular.containers import Table
 
@@ -41,16 +43,17 @@ def test_should_split_table(
 
 
 @pytest.mark.parametrize(
-    "percentage_in_first",
+    ("percentage_in_first", "error_msg"),
     [
-        -1.0,
-        2.0,
+        (-1.0, re.escape("percentage_in_first must be in [0, 1] but was -1.0.")),
+        (2.0, re.escape("percentage_in_first must be in [0, 1] but was 2.0.")),
     ],
     ids=["-100%", "200%"],
 )
-def test_should_raise_if_value_not_in_range(percentage_in_first: float) -> None:
+def test_should_raise_if_value_not_in_range(percentage_in_first: float, error_msg: str) -> None:
+    from safeds.exceptions import OutOfBoundsError
     table = Table({"col1": [1, 2, 1], "col2": [1, 2, 4]})
-    with pytest.raises(ValueError, match=r"is not inside \[0, 1\]"):
+    with pytest.raises(OutOfBoundsError, match=error_msg):
         table.split_rows(percentage_in_first)
 
 
