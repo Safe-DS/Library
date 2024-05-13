@@ -1391,7 +1391,7 @@ class Table:
         self,
         percentage_in_first: float,
         *,
-        shuffle: bool = True,
+        shuffle: bool = False,
     ) -> tuple[Table, Table]:
         """
         Create two tables by splitting the rows of the current table.
@@ -1454,9 +1454,8 @@ class Table:
 
         input_table = self.shuffle_rows() if shuffle else self
         number_of_rows_in_first = round(percentage_in_first * input_table.number_of_rows)
-
         return (
-            input_table.slice_rows(length=number_of_rows_in_first),
+            input_table.slice_rows(start=0, length=number_of_rows_in_first),
             input_table.slice_rows(start=number_of_rows_in_first),
         )
 
