@@ -5,7 +5,7 @@ import sys
 import warnings
 from typing import TYPE_CHECKING, Generic, TypeVar
 
-from safeds._config import _init_default_device
+from safeds._config import _get_device, _init_default_device
 from safeds._utils import _structural_hash
 from safeds.data.image.containers import ImageList
 from safeds.data.image.containers._empty_image_list import _EmptyImageList
@@ -294,7 +294,7 @@ class _TableAsTensor:
         _init_default_device()
 
         self._column_names = table.column_names
-        self._tensor = torch.Tensor(table._data_frame.to_numpy()).to(torch.get_default_device())
+        self._tensor = torch.Tensor(table._data_frame.to_torch()).to(_get_device())
 
         if not torch.all(self._tensor.sum(dim=1) == torch.ones(self._tensor.size(dim=0))):
             raise ValueError(
@@ -355,8 +355,8 @@ class _ColumnAsTensor:
                 category=UserWarning,
             )
             self._one_hot_encoder = OneHotEncoder().fit(column_as_table, [self._column_name])
-        self._tensor = torch.Tensor(self._one_hot_encoder.transform(column_as_table)._data_frame.to_numpy()).to(
-            torch.get_default_device(),
+        self._tensor = torch.Tensor(self._one_hot_encoder.transform(column_as_table)._data_frame.to_torch()).to(
+            _get_device(),
         )
 
     def __eq__(self, other: object) -> bool:

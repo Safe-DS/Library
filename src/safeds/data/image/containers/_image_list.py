@@ -10,6 +10,7 @@ from threading import Thread
 from typing import TYPE_CHECKING, Literal, overload
 
 from safeds._config import _init_default_device
+from safeds._utils import _get_random_seed
 from safeds.data.image.containers._image import Image
 from safeds.exceptions import OutOfBoundsError, ClosedBound
 
@@ -175,6 +176,8 @@ class ImageList(metaclass=ABCMeta):
         from PIL.Image import open as pil_image_open
 
         _init_default_device()
+
+        random.seed(_get_random_seed())
 
         from safeds.data.image.containers._empty_image_list import _EmptyImageList
         from safeds.data.image.containers._multi_size_image_list import _MultiSizeImageList

@@ -3,7 +3,7 @@ from __future__ import annotations
 import sys
 from typing import TYPE_CHECKING, Any
 
-from safeds._config import _init_default_device
+from safeds._config import _get_device, _init_default_device
 from safeds._utils import _structural_hash
 from safeds.exceptions import ClosedBound, OutOfBoundsError
 
@@ -235,7 +235,7 @@ class TimeSeriesDataset:
             label = target_tensor[i + window_size + forecast_horizon]
             for col in feature_cols:
                 data = torch.tensor(col._series.to_numpy(), dtype=torch.float32)
-                window = torch.cat((window, data[i: i + window_size]), dim=0)
+                window = torch.cat((window, data[i : i + window_size]), dim=0)
             x_s.append(window)
             y_s.append(label)
         x_s_tensor = torch.stack(x_s)
@@ -279,7 +279,7 @@ class TimeSeriesDataset:
 
         _init_default_device()
 
-        target_tensor = self.target._series.to_torch()
+        target_tensor = self.target._series.to_torch().to(_get_device())
         x_s = []
 
         size = target_tensor.size(0)

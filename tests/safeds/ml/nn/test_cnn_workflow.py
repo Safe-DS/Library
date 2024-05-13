@@ -38,22 +38,22 @@ class TestImageToTableClassifier:
             (
                 1234,
                 device_cuda,
-                ["grayscale"] * 7,
+                ["white_square"] * 7,
             ),
             (
                 4711,
                 device_cuda,
-                ["white_square"] * 7,
+                ["rgba"] * 7,
             ),
             (
                 1234,
                 device_cpu,
-                ["grayscale"] * 7,
+                ["white_square"] * 7,
             ),
             (
                 4711,
                 device_cpu,
-                ["white_square"] * 7,
+                ["rgba"] * 7,
             ),
         ],
         ids=["seed-1234-cuda", "seed-4711-cuda", "seed-1234-cpu", "seed-4711-cpu"],
@@ -106,22 +106,22 @@ class TestImageToColumnClassifier:
             (
                 1234,
                 device_cuda,
-                ["grayscale"] * 7,
+                ["white_square"] * 7,
             ),
             (
                 4711,
                 device_cuda,
-                ["white_square"] * 7,
+                ["rgba"] * 7,
             ),
             (
                 1234,
                 device_cpu,
-                ["grayscale"] * 7,
+                ["white_square"] * 7,
             ),
             (
                 4711,
                 device_cpu,
-                ["white_square"] * 7,
+                ["rgba"] * 7,
             ),
         ],
         ids=["seed-1234-cuda", "seed-4711-cuda", "seed-1234-cpu", "seed-4711-cpu"],
