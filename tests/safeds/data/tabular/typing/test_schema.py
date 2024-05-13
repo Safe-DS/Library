@@ -7,7 +7,7 @@
 # import pandas as pd
 # import pytest
 # from safeds.data.tabular.typing import Schema
-# from safeds.exceptions import UnknownColumnNameError
+# from safeds.exceptions import ColumnNotFoundError
 #
 # if TYPE_CHECKING:
 #     from collections.abc import Iterable
@@ -233,7 +233,7 @@
 #
 #     def test_should_raise_if_column_does_not_exist(self) -> None:
 #         schema = Schema({"A": Integer()})
-#         with pytest.raises(UnknownColumnNameError):
+#         with pytest.raises(ColumnNotFoundError):
 #             schema.get_column_type("B")
 #
 #
@@ -280,7 +280,7 @@
 #         ids=["different_column_names"],
 #     )
 #     def test_should_raise_if_column_names_are_different(self, schemas: list[Schema], error_msg_regex: str) -> None:
-#         with pytest.raises(UnknownColumnNameError, match=error_msg_regex):
+#         with pytest.raises(ColumnNotFoundError, match=error_msg_regex):
 #             Schema._merge_multiple_schemas(schemas)
 #
 #     @pytest.mark.parametrize(

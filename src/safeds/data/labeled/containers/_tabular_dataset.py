@@ -41,7 +41,7 @@ class TabularDataset:
 
     Raises
     ------
-    KeyError
+    ColumnNotFoundError
         If a column name is not found in the data.
     ValueError
         If the target column is also an extra column.
@@ -213,6 +213,7 @@ class TabularDataset:
                 shuffle=True,
                 generator=torch.Generator(device=_get_device()),
             )
+
 
 # TODO
 def _create_dataset(features: Tensor, target: Tensor) -> Dataset:

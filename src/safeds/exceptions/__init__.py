@@ -5,7 +5,6 @@ from ._data import (
     ColumnSizeError,
     DuplicateColumnNameError,
     DuplicateIndexError,
-    FileExtensionError,
     IllegalFormatError,
     IndexOutOfBoundsError,
     MissingValuesColumnError,
@@ -35,6 +34,10 @@ class ColumnNotFoundError(SafeDsError):
     """Exception raised when trying to access an invalid column name."""
 
 
+class FileExtensionError(SafeDsError):
+    """Exception raised when a path has the wrong file extension."""
+
+
 class OutOfBoundsError(SafeDsError):
     """Exception raised when a value is outside its expected range."""
 
@@ -42,6 +45,7 @@ class OutOfBoundsError(SafeDsError):
 __all__ = [
     "SafeDsError",
     "ColumnNotFoundError",
+    "FileExtensionError",
     "OutOfBoundsError",
     # TODO
     # Data exceptions
@@ -56,7 +60,6 @@ __all__ = [
     "OutputLengthMismatchError",
     "TransformerNotFittedError",
     "ValueNotPresentWhenFittedError",
-    "FileExtensionError",
     # ML exceptions
     "DatasetMissesDataError",
     "DatasetMissesFeaturesError",

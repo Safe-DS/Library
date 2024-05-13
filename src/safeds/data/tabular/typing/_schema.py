@@ -73,7 +73,7 @@ class Schema(ABC):
 
         Raises
         ------
-        UnknownColumnNameError
+        ColumnNotFoundError
             If the specified column name does not exist.
 
         Examples

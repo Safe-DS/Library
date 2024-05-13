@@ -9,7 +9,7 @@ from safeds.data.image.containers._single_size_image_list import _SingleSizeImag
 from safeds.data.labeled.containers import ImageDataset
 from safeds.data.labeled.containers._image_dataset import _ColumnAsTensor, _TableAsTensor
 
-from ._input_conversion import InputConversion
+from ._input_converter import InputConversion
 
 if TYPE_CHECKING:
     from safeds.data.image.typing import ImageSize

@@ -54,7 +54,7 @@ class _SupportVectorMachineBase(ABC):
 
             Raises
             ------
-            ValueError
+            OutOfBoundsError
                 If `degree` is not greater than 0.
             """
             raise NotImplementedError  # pragma: no cover

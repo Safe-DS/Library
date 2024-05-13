@@ -227,7 +227,7 @@ class TablePlotter:
 
         Raises
         ------
-        KeyError
+        ColumnNotFoundError
             If a column does not exist.
         TypeError
             If a column is not numeric.
@@ -290,7 +290,7 @@ class TablePlotter:
 
         Raises
         ------
-        KeyError
+        ColumnNotFoundError
             If a column does not exist.
         TypeError
             If a column is not numeric.

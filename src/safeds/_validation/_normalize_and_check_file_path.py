@@ -44,10 +44,15 @@ def _normalize_and_check_file_path(
     if not path.suffix:
         path = path.with_suffix(canonical_file_extension)
     elif path.suffix not in valid_file_extensions:
-        raise FileExtensionError(path, valid_file_extensions)
+        message = _build_file_extension_error_message(path.suffix, valid_file_extensions)
+        raise FileExtensionError(message)
 
     # Check if file exists
     if check_if_file_exists and not path.is_file():
         raise FileNotFoundError(f"File not found: {path}")
 
     return path
+
+
+def _build_file_extension_error_message(actual_file_extension: str, valid_file_extensions: list[str]) -> str:
+    return f"Expected path with extension in {valid_file_extensions} but got {actual_file_extension}."

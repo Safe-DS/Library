@@ -39,7 +39,7 @@ class StandardScaler(InvertibleTableTransformer):
 
         Raises
         ------
-        UnknownColumnNameError
+        ColumnNotFoundError
             If column_names contain a column name that is missing in the table.
         NonNumericColumnError
             If at least one of the specified columns in the table contains non-numerical data.
@@ -103,7 +103,7 @@ class StandardScaler(InvertibleTableTransformer):
         ------
         TransformerNotFittedError
             If the transformer has not been fitted yet.
-        UnknownColumnNameError
+        ColumnNotFoundError
             If the input table does not contain all columns used to fit the transformer.
         NonNumericColumnError
             If at least one of the columns in the input table that is used to fit contains non-numerical data.
@@ -162,7 +162,7 @@ class StandardScaler(InvertibleTableTransformer):
         ------
         TransformerNotFittedError
             If the transformer has not been fitted yet.
-        UnknownColumnNameError
+        ColumnNotFoundError
             If the input table does not contain all columns used to fit the transformer.
         NonNumericColumnError
             If the transformed columns of the input table contain non-numerical data.

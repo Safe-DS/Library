@@ -1,10 +1,5 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from pathlib import Path
-
 
 class NonNumericColumnError(TypeError):
     """Exception raised for trying to do numerical operations on a non-numerical column."""
@@ -125,16 +120,6 @@ class ValueNotPresentWhenFittedError(Exception):
         super().__init__(
             "Value(s) not present in the table the transformer was fitted on:"
             f" {line_break}{line_break.join(values_info)}",
-        )
-
-
-class FileExtensionError(ValueError):
-    """Exception raised when the file has the wrong file extension."""
-
-    def __init__(self, file: str | Path, file_extension: str | list[str]) -> None:
-        super().__init__(
-            f"The file {file} has a wrong file extension. Please provide a file with the following extension(s):"
-            f" {sorted(file_extension)}",
         )
 
 

@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, Any
 from safeds.data.labeled.containers import TabularDataset
 from safeds.data.tabular.containers import Table
 
-from ._input_conversion import InputConversion
+from ._input_converter import InputConversion
 
 if TYPE_CHECKING:
     from torch.utils.data import DataLoader
