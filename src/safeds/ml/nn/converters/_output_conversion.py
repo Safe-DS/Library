@@ -4,13 +4,11 @@ from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Any, Generic, TypeVar
 
 from safeds.data.image.containers import ImageList
-from safeds.data.labeled.containers import ImageDataset, TabularDataset
+from safeds.data.labeled.containers import ImageDataset, TabularDataset, TimeSeriesDataset
+from safeds.data.tabular.containers import Table
 
 if TYPE_CHECKING:
     from torch import Tensor
-
-from safeds.data.labeled.containers import TimeSeriesDataset
-from safeds.data.tabular.containers import Table
 
 IT = TypeVar("IT", Table, TimeSeriesDataset, ImageList)
 OT = TypeVar("OT", TabularDataset, TimeSeriesDataset, ImageDataset)

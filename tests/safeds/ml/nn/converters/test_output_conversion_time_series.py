@@ -1,7 +1,8 @@
-import pytest
 import sys
+
+import pytest
 from safeds.data.tabular.containers import Table
-from safeds.ml.nn import OutputConversionTimeSeries
+from safeds.ml.nn.converters import OutputConversionTimeSeries
 
 
 def test_output_conversion_time_series() -> None:

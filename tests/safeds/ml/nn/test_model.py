@@ -10,25 +10,29 @@ from safeds.exceptions import (
     OutOfBoundsError,
 )
 from safeds.ml.nn import (
-    AvgPooling2DLayer,
-    Convolutional2DLayer,
-    ConvolutionalTranspose2DLayer,
-    FlattenLayer,
-    ForwardLayer,
+    NeuralNetworkClassifier,
+    NeuralNetworkRegressor,
+)
+from safeds.ml.nn.converters import (
     InputConversion,
     InputConversionImage,
     InputConversionTable,
-    Layer,
-    LSTMLayer,
-    MaxPooling2DLayer,
-    NeuralNetworkClassifier,
-    NeuralNetworkRegressor,
     OutputConversion,
     OutputConversionImageToImage,
     OutputConversionImageToTable,
     OutputConversionTable,
 )
-from safeds.ml.nn._output_conversion_image import OutputConversionImageToColumn
+from safeds.ml.nn.converters._output_conversion_image import OutputConversionImageToColumn
+from safeds.ml.nn.layers import (
+    AveragePooling2DLayer,
+    Convolutional2DLayer,
+    ConvolutionalTranspose2DLayer,
+    FlattenLayer,
+    ForwardLayer,
+    Layer,
+    LSTMLayer,
+    MaxPooling2DLayer,
+)
 from torch.types import Device
 
 from tests.helpers import configure_test_with_device, get_devices, get_devices_ids
@@ -331,7 +335,7 @@ class TestClassificationModel:
             ),
             (
                 InputConversionTable(),
-                [AvgPooling2DLayer(1)],
+                [AveragePooling2DLayer(1)],
                 OutputConversionTable(),
                 r"You cannot use a 2-dimensional layer with 1-dimensional data.",
             ),
@@ -385,13 +389,13 @@ class TestClassificationModel:
             ),
             (
                 InputConversionImage(ImageSize(1, 1, 1)),
-                [AvgPooling2DLayer(1)],
+                [AveragePooling2DLayer(1)],
                 OutputConversionImageToTable(),
                 r"The output data would be 2-dimensional but the provided output conversion uses 1-dimensional data.",
             ),
             (
                 InputConversionImage(ImageSize(1, 1, 1)),
-                [AvgPooling2DLayer(1)],
+                [AveragePooling2DLayer(1)],
                 OutputConversionImageToColumn(),
                 r"The output data would be 2-dimensional but the provided output conversion uses 1-dimensional data.",
             ),
@@ -433,13 +437,13 @@ class TestClassificationModel:
             ),
             (
                 InputConversionImage(ImageSize(1, 1, 1)),
-                [FlattenLayer(), AvgPooling2DLayer(1)],
+                [FlattenLayer(), AveragePooling2DLayer(1)],
                 OutputConversionImageToTable(),
                 r"You cannot use a 2-dimensional layer with 1-dimensional data.",
             ),
             (
                 InputConversionImage(ImageSize(1, 1, 1)),
-                [FlattenLayer(), AvgPooling2DLayer(1)],
+                [FlattenLayer(), AveragePooling2DLayer(1)],
                 OutputConversionImageToColumn(),
                 r"You cannot use a 2-dimensional layer with 1-dimensional data.",
             ),
@@ -724,7 +728,7 @@ class TestRegressionModel:
             ),
             (
                 InputConversionTable(),
-                [AvgPooling2DLayer(1)],
+                [AveragePooling2DLayer(1)],
                 OutputConversionTable(),
                 r"You cannot use a 2-dimensional layer with 1-dimensional data.",
             ),
@@ -772,7 +776,7 @@ class TestRegressionModel:
             ),
             (
                 InputConversionImage(ImageSize(1, 1, 1)),
-                [FlattenLayer(), AvgPooling2DLayer(1)],
+                [FlattenLayer(), AveragePooling2DLayer(1)],
                 OutputConversionImageToImage(),
                 r"You cannot use a 2-dimensional layer with 1-dimensional data.",
             ),

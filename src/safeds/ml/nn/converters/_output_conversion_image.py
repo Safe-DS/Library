@@ -10,12 +10,12 @@ from safeds.data.image.containers._single_size_image_list import _SingleSizeImag
 from safeds.data.labeled.containers import ImageDataset
 from safeds.data.labeled.containers._image_dataset import _ColumnAsTensor, _TableAsTensor
 from safeds.data.tabular.containers import Column, Table
+from safeds.data.tabular.transformation import OneHotEncoder
+
+from ._output_conversion import OutputConversion
 
 if TYPE_CHECKING:
     from torch import Tensor
-
-from safeds.data.tabular.transformation import OneHotEncoder
-from safeds.ml.nn import OutputConversion
 
 
 class _OutputConversionImage(OutputConversion[ImageList, ImageDataset], ABC):

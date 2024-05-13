@@ -3,7 +3,7 @@ import sys
 import pytest
 from safeds.data.image.typing import ImageSize
 from safeds.data.tabular.containers import Table
-from safeds.ml.nn import FlattenLayer
+from safeds.ml.nn.layers import FlattenLayer
 from torch import nn
 
 

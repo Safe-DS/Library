@@ -14,17 +14,19 @@ from safeds.exceptions import (
     InvalidModelStructureError,
     ModelNotFittedError,
 )
-from safeds.ml.nn import (
-    Convolutional2DLayer,
-    FlattenLayer,
-    ForwardLayer,
+from safeds.ml.nn.converters import (
     InputConversionImage,
     OutputConversionImageToColumn,
     OutputConversionImageToImage,
     OutputConversionImageToTable,
 )
-from safeds.ml.nn._output_conversion_image import _OutputConversionImage
-from safeds.ml.nn._pooling2d_layer import _Pooling2DLayer
+from safeds.ml.nn.converters._output_conversion_image import _OutputConversionImage
+from safeds.ml.nn.layers import (
+    Convolutional2DLayer,
+    FlattenLayer,
+    ForwardLayer,
+)
+from safeds.ml.nn.layers._pooling2d_layer import _Pooling2DLayer
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -32,7 +34,8 @@ if TYPE_CHECKING:
     from torch import Tensor, nn
 
     from safeds.data.image.typing import ImageSize
-    from safeds.ml.nn import InputConversion, Layer, OutputConversion
+    from safeds.ml.nn.converters import InputConversion, OutputConversion
+    from safeds.ml.nn.layers import Layer
 
 
 IFT = TypeVar("IFT", TabularDataset, TimeSeriesDataset, ImageDataset)  # InputFitType

@@ -3,15 +3,15 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Any, Generic, TypeVar
 
-if TYPE_CHECKING:
-    from torch.utils.data import DataLoader
-
-from safeds.data.image.containers._single_size_image_list import _SingleSizeImageList
-from safeds.data.image.typing import ImageSize
-
 from safeds.data.image.containers import ImageList
 from safeds.data.labeled.containers import ImageDataset, TabularDataset, TimeSeriesDataset
 from safeds.data.tabular.containers import Table
+
+if TYPE_CHECKING:
+    from torch.utils.data import DataLoader
+
+    from safeds.data.image.containers._single_size_image_list import _SingleSizeImageList
+    from safeds.data.image.typing import ImageSize
 
 FT = TypeVar("FT", TabularDataset, TimeSeriesDataset, ImageDataset)
 PT = TypeVar("PT", Table, TimeSeriesDataset, ImageList)

@@ -4,8 +4,8 @@ from typing import Literal
 import pytest
 from safeds.data.image.typing import ImageSize
 from safeds.data.tabular.containers import Table
-from safeds.ml.nn import AvgPooling2DLayer, MaxPooling2DLayer
-from safeds.ml.nn._pooling2d_layer import _Pooling2DLayer
+from safeds.ml.nn.layers import AveragePooling2DLayer, MaxPooling2DLayer
+from safeds.ml.nn.layers._pooling2d_layer import _Pooling2DLayer
 from torch import nn
 
 
@@ -64,8 +64,8 @@ class TestPooling2DLayer:
             [
                 (MaxPooling2DLayer(2), MaxPooling2DLayer(2)),
                 (MaxPooling2DLayer(2, stride=3, padding=4), MaxPooling2DLayer(2, stride=3, padding=4)),
-                (AvgPooling2DLayer(2), AvgPooling2DLayer(2)),
-                (AvgPooling2DLayer(2, stride=3, padding=4), AvgPooling2DLayer(2, stride=3, padding=4)),
+                (AveragePooling2DLayer(2), AveragePooling2DLayer(2)),
+                (AveragePooling2DLayer(2, stride=3, padding=4), AveragePooling2DLayer(2, stride=3, padding=4)),
             ],
         )
         def test_should_be_equal(
@@ -80,8 +80,8 @@ class TestPooling2DLayer:
             [
                 MaxPooling2DLayer(2),
                 MaxPooling2DLayer(2, stride=3, padding=4),
-                AvgPooling2DLayer(2),
-                AvgPooling2DLayer(2, stride=3, padding=4),
+                AveragePooling2DLayer(2),
+                AveragePooling2DLayer(2, stride=3, padding=4),
             ],
         )
         @pytest.mark.parametrize(
@@ -91,10 +91,10 @@ class TestPooling2DLayer:
                 MaxPooling2DLayer(1, stride=3, padding=4),
                 MaxPooling2DLayer(2, stride=1, padding=4),
                 MaxPooling2DLayer(2, stride=3, padding=1),
-                AvgPooling2DLayer(1),
-                AvgPooling2DLayer(1, stride=3, padding=4),
-                AvgPooling2DLayer(2, stride=1, padding=4),
-                AvgPooling2DLayer(2, stride=3, padding=1),
+                AveragePooling2DLayer(1),
+                AveragePooling2DLayer(1, stride=3, padding=4),
+                AveragePooling2DLayer(2, stride=1, padding=4),
+                AveragePooling2DLayer(2, stride=3, padding=1),
             ],
         )
         def test_should_not_be_equal(
@@ -106,7 +106,7 @@ class TestPooling2DLayer:
 
         def test_should_be_not_implemented(self) -> None:
             max_pooling_2d_layer = MaxPooling2DLayer(1)
-            avg_pooling_2d_layer = AvgPooling2DLayer(1)
+            avg_pooling_2d_layer = AveragePooling2DLayer(1)
             other = Table()
             assert max_pooling_2d_layer.__eq__(other) is NotImplemented
             assert max_pooling_2d_layer.__eq__(avg_pooling_2d_layer) is NotImplemented
@@ -120,8 +120,8 @@ class TestPooling2DLayer:
             [
                 (MaxPooling2DLayer(2), MaxPooling2DLayer(2)),
                 (MaxPooling2DLayer(2, stride=3, padding=4), MaxPooling2DLayer(2, stride=3, padding=4)),
-                (AvgPooling2DLayer(2), AvgPooling2DLayer(2)),
-                (AvgPooling2DLayer(2, stride=3, padding=4), AvgPooling2DLayer(2, stride=3, padding=4)),
+                (AveragePooling2DLayer(2), AveragePooling2DLayer(2)),
+                (AveragePooling2DLayer(2, stride=3, padding=4), AveragePooling2DLayer(2, stride=3, padding=4)),
             ],
         )
         def test_hash_should_be_equal(
@@ -136,8 +136,8 @@ class TestPooling2DLayer:
             [
                 MaxPooling2DLayer(2),
                 MaxPooling2DLayer(2, stride=3, padding=4),
-                AvgPooling2DLayer(2),
-                AvgPooling2DLayer(2, stride=3, padding=4),
+                AveragePooling2DLayer(2),
+                AveragePooling2DLayer(2, stride=3, padding=4),
             ],
         )
         @pytest.mark.parametrize(
@@ -147,10 +147,10 @@ class TestPooling2DLayer:
                 MaxPooling2DLayer(1, stride=3, padding=4),
                 MaxPooling2DLayer(2, stride=1, padding=4),
                 MaxPooling2DLayer(2, stride=3, padding=1),
-                AvgPooling2DLayer(1),
-                AvgPooling2DLayer(1, stride=3, padding=4),
-                AvgPooling2DLayer(2, stride=1, padding=4),
-                AvgPooling2DLayer(2, stride=3, padding=1),
+                AveragePooling2DLayer(1),
+                AveragePooling2DLayer(1, stride=3, padding=4),
+                AveragePooling2DLayer(2, stride=1, padding=4),
+                AveragePooling2DLayer(2, stride=3, padding=1),
             ],
         )
         def test_hash_should_not_be_equal(
@@ -167,8 +167,8 @@ class TestPooling2DLayer:
             [
                 MaxPooling2DLayer(2),
                 MaxPooling2DLayer(2, stride=3, padding=4),
-                AvgPooling2DLayer(2),
-                AvgPooling2DLayer(2, stride=3, padding=4),
+                AveragePooling2DLayer(2),
+                AveragePooling2DLayer(2, stride=3, padding=4),
             ],
         )
         def test_should_size_be_greater_than_normal_object(self, pooling_2d_layer: _Pooling2DLayer) -> None:

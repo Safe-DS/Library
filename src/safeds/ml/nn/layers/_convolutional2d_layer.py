@@ -8,10 +8,10 @@ from safeds._config import _init_default_device
 from safeds._utils import _structural_hash
 from safeds.data.image.typing import ImageSize
 
+from ._layer import Layer
+
 if TYPE_CHECKING:
     from torch import Tensor, nn
-
-from safeds.ml.nn import Layer
 
 
 def _create_internal_model(

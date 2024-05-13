@@ -5,7 +5,7 @@ from safeds.data.image.containers import ImageList
 from safeds.data.image.typing import ImageSize
 from safeds.data.labeled.containers import ImageDataset
 from safeds.data.tabular.containers import Column, Table
-from safeds.ml.nn import InputConversionImage
+from safeds.ml.nn.converters import InputConversionImage
 
 from tests.helpers import images_all, resolve_resource_path
 

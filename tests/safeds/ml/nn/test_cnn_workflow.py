@@ -9,25 +9,30 @@ from safeds.data.labeled.containers import ImageDataset
 from safeds.data.tabular.containers import Column, Table
 from safeds.data.tabular.transformation import OneHotEncoder
 from safeds.ml.nn import (
-    AvgPooling2DLayer,
+    NeuralNetworkClassifier,
+    NeuralNetworkRegressor,
+)
+from safeds.ml.nn.converters import (
+    InputConversionImage,
+    OutputConversionImageToColumn,
+    OutputConversionImageToImage,
+    OutputConversionImageToTable,
+)
+from safeds.ml.nn.layers import (
+    AveragePooling2DLayer,
     Convolutional2DLayer,
     ConvolutionalTranspose2DLayer,
     FlattenLayer,
     ForwardLayer,
-    InputConversionImage,
     MaxPooling2DLayer,
-    NeuralNetworkClassifier,
-    NeuralNetworkRegressor,
-    OutputConversionImageToTable,
 )
-from safeds.ml.nn._output_conversion_image import OutputConversionImageToColumn, OutputConversionImageToImage
 from syrupy import SnapshotAssertion
 from torch.types import Device
 
 from tests.helpers import configure_test_with_device, device_cpu, device_cuda, images_all, resolve_resource_path
 
 if TYPE_CHECKING:
-    from safeds.ml.nn import Layer
+    from safeds.ml.nn.layers import Layer
 
 
 class TestImageToTableClassifier:
@@ -146,7 +151,7 @@ class TestImageToColumnClassifier:
         image_dataset = ImageDataset(image_list, image_classes, shuffle=True)
         num_of_classes: int = image_dataset.output_size if isinstance(image_dataset.output_size, int) else 0
 
-        layers = [Convolutional2DLayer(1, 2), AvgPooling2DLayer(10), FlattenLayer(), ForwardLayer(num_of_classes)]
+        layers = [Convolutional2DLayer(1, 2), AveragePooling2DLayer(10), FlattenLayer(), ForwardLayer(num_of_classes)]
         nn_original = NeuralNetworkClassifier(
             InputConversionImage(image_dataset.input_size),
             layers,

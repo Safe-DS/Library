@@ -2,12 +2,13 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
-if TYPE_CHECKING:
-    from torch.utils.data import DataLoader
-
 from safeds.data.labeled.containers import TabularDataset
 from safeds.data.tabular.containers import Table
-from safeds.ml.nn import InputConversion
+
+from ._input_conversion import InputConversion
+
+if TYPE_CHECKING:
+    from torch.utils.data import DataLoader
 
 
 class InputConversionTable(InputConversion[TabularDataset, Table]):
