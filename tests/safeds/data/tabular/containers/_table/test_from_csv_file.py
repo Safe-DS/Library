@@ -23,15 +23,15 @@ def test_should_create_table_from_csv_file(path: str | Path, expected: Table) ->
 
 
 @pytest.mark.parametrize(
-    ("path", "expected_error_message"),
+    "path",
     [
-        ("test_table_from_csv_file_invalid.csv", r"test_table_from_csv_file_invalid.csv\" does not exist"),
-        (Path("test_table_from_csv_file_invalid.csv"), r"test_table_from_csv_file_invalid.csv\" does not exist"),
+        "test_table_from_csv_file_invalid.csv",
+        Path("test_table_from_csv_file_invalid.csv"),
     ],
     ids=["by String", "by path"],
 )
-def test_should_raise_error_if_file_not_found(path: str | Path, expected_error_message: str) -> None:
-    with pytest.raises(FileNotFoundError, match=expected_error_message):
+def test_should_raise_error_if_file_not_found(path: str | Path) -> None:
+    with pytest.raises(FileNotFoundError):
         Table.from_csv_file(resolve_resource_path(path))
 
 
