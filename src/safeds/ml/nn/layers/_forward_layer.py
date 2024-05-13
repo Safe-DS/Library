@@ -54,7 +54,7 @@ class ForwardLayer(Layer):
 
         Raises
         ------
-        ValueError
+        OutOfBoundsError
             If input_size < 1
             If output_size < 1
 

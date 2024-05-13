@@ -199,9 +199,9 @@ class TimeSeriesDataset:
 
         Raises
         ------
-        OutOfBoundsError:
+        OutOfBoundsError
             If window_size or forecast_horizon is below 1
-        ValueError:
+        ValueError
             If the size is smaller or even than forecast_horizon + window_size
 
         Returns
@@ -262,9 +262,9 @@ class TimeSeriesDataset:
 
         Raises
         ------
-        OutOfBoundsError:
+        OutOfBoundsError
             If window_size or forecast_horizon is below 1
-        ValueError:
+        ValueError
             If the size is smaller or even than forecast_horizon + window_size
 
         Returns

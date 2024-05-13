@@ -1417,7 +1417,7 @@ class Table:
 
         Raises
         ------
-        ValueError
+        OutOfBoundsError
             If `percentage_in_first` is not between 0 and 1.
 
         Examples

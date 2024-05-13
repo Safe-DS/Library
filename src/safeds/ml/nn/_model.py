@@ -153,7 +153,7 @@ class NeuralNetworkRegressor(Generic[IFT, IPT, OT]):
 
         Raises
         ------
-        ValueError
+        OutOfBoundsError
             If epoch_size < 1
             If batch_size < 1
         """
