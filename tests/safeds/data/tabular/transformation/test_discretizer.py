@@ -49,7 +49,7 @@ class TestFit:
                 "Tried to do a numerical operation on one or multiple non-numerical columns: \ncol2 is of type String.",
             ),
         ],
-        ids=["UnknownColumnNameError", "multiple missing columns", "ValueError", "NonNumericColumnError"],
+        ids=["ColumnNotFoundError", "multiple missing columns", "ValueError", "NonNumericColumnError"],
     )
     def test_should_raise_errors(
         self,
@@ -111,7 +111,7 @@ class TestTransform:
                 "Tried to do a numerical operation on one or multiple non-numerical columns: \ncol1 is of type String.",
             ),
         ],
-        ids=["UnknownColumnNameError", "multiple missing columns", "ValueError", "NonNumericColumnError"],
+        ids=["ColumnNotFoundError", "multiple missing columns", "ValueError", "NonNumericColumnError"],
     )
     def test_should_raise_errors(
         self,

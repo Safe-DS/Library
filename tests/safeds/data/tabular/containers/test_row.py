@@ -7,7 +7,7 @@
 # import pytest
 # from safeds.data.tabular.containers import Row, Table
 # from safeds.data.tabular.typing import ColumnType, Integer, Schema, String
-# from safeds.exceptions import UnknownColumnNameError
+# from safeds.exceptions import ColumnNotFoundError
 #
 #
 # class TestFromDict:
@@ -243,7 +243,7 @@
 #         ],
 #     )
 #     def test_should_raise_if_column_does_not_exist(self, row: Row, column_name: str) -> None:
-#         with pytest.raises(UnknownColumnNameError):
+#         with pytest.raises(ColumnNotFoundError):
 #             # noinspection PyStatementEffect
 #             row[column_name]
 #
@@ -375,7 +375,7 @@
 #         ],
 #     )
 #     def test_should_raise_if_column_does_not_exist(self, row: Row, column_name: str) -> None:
-#         with pytest.raises(UnknownColumnNameError):
+#         with pytest.raises(ColumnNotFoundError):
 #             row.get_value(column_name)
 #
 #
@@ -424,7 +424,7 @@
 #         ],
 #     )
 #     def test_should_raise_if_column_does_not_exist(self, row: Row, column_name: str) -> None:
-#         with pytest.raises(UnknownColumnNameError):
+#         with pytest.raises(ColumnNotFoundError):
 #             row.get_column_type(column_name)
 #
 #

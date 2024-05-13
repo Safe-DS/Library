@@ -132,7 +132,7 @@ class SimpleImputer(TableTransformer):
 
         Raises
         ------
-        UnknownColumnNameError
+        ColumnNotFoundError
             If column_names contain a column name that is missing in the table
         ValueError
             If the table contains 0 rows
@@ -213,7 +213,7 @@ class SimpleImputer(TableTransformer):
         ------
         TransformerNotFittedError
             If the transformer has not been fitted yet.
-        UnknownColumnNameError
+        ColumnNotFoundError
             If the input table does not contain all columns used to fit the transformer.
         ValueError
             If the table contains 0 rows.

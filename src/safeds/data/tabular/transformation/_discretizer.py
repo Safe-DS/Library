@@ -61,7 +61,7 @@ class Discretizer(TableTransformer):
             If the table is empty.
         NonNumericColumnError
             If one of the columns, that should be fitted is non-numeric.
-        UnknownColumnNameError
+        ColumnNotFoundError
             If one of the columns, that should be fitted is not in the table.
         """
         from sklearn.preprocessing import KBinsDiscretizer as sk_KBinsDiscretizer
@@ -112,7 +112,7 @@ class Discretizer(TableTransformer):
             If the transformer has not been fitted yet.
         ValueError
             If the table is empty.
-        UnknownColumnNameError
+        ColumnNotFoundError
             If one of the columns, that should be transformed is not in the table.
         NonNumericColumnError
             If one of the columns, that should be fitted is non-numeric.

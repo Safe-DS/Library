@@ -90,7 +90,7 @@ def test_should_replace_column(table: Table, column_name: str, columns: list[Col
             r"Expected a column of size 3 but got column of size 2.",
         ),
     ],
-    ids=["UnknownColumnNameError", "DuplicateColumnNameError", "ColumnSizeError"],
+    ids=["ColumnNotFoundError", "DuplicateColumnNameError", "ColumnSizeError"],
 )
 def test_should_raise_error(
     old_column_name: str,

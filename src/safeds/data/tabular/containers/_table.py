@@ -242,7 +242,7 @@ class Table:
         try:
             return Table._from_polars_data_frame(pl.read_json(path))
         except pl.PolarsPanicError:
-            # Can happen if the JSON file is empty
+            # Can happen if the JSON file is empty (https://github.com/pola-rs/polars/issues/10234)
             return Table()
 
     @staticmethod
@@ -557,7 +557,7 @@ class Table:
 
         Raises
         ------
-        KeyError
+        ColumnNotFoundError
             If the column does not exist.
 
         Examples
@@ -594,7 +594,7 @@ class Table:
 
         Raises
         ------
-        KeyError
+        ColumnNotFoundError
             If the column does not exist.
 
         Examples
@@ -707,7 +707,7 @@ class Table:
 
         Raises
         ------
-        KeyError
+        ColumnNotFoundError
             If a column does not exist.
 
         Examples
@@ -823,7 +823,7 @@ class Table:
 
         Raises
         ------
-        KeyError
+        ColumnNotFoundError
             If no column with the old name exists.
 
         Examples
@@ -871,7 +871,7 @@ class Table:
 
         Raises
         ------
-        KeyError
+        ColumnNotFoundError
             If no column with the old name exists.
 
         Examples
@@ -964,7 +964,7 @@ class Table:
 
         Raises
         ------
-        KeyError
+        ColumnNotFoundError
             If no column with the specified name exists.
 
         Examples
@@ -1090,7 +1090,7 @@ class Table:
 
         Raises
         ------
-        KeyError
+        ColumnNotFoundError
             If the column does not exist.
 
         Examples
@@ -1382,7 +1382,7 @@ class Table:
 
         Raises
         ------
-        KeyError
+        ColumnNotFoundError
             If the column does not exist.
 
         Examples

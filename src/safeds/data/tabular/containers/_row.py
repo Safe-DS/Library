@@ -79,6 +79,11 @@ class Row(ABC, Mapping[str, Any]):
         -------
         value:
             The value of the column.
+
+        Raises
+        ------
+        ColumnNotFoundError
+            If the column name does not exist.
         """
 
     @abstractmethod
@@ -95,6 +100,11 @@ class Row(ABC, Mapping[str, Any]):
         -------
         type:
             The type of the column.
+
+        Raises
+        ------
+        ColumnNotFoundError
+            If the column name does not exist.
         """
 
     @abstractmethod

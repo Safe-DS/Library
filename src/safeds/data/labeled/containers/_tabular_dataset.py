@@ -41,7 +41,7 @@ class TabularDataset:
 
     Raises
     ------
-    KeyError
+    ColumnNotFoundError
         If a column name is not found in the data.
     ValueError
         If the target column is also an extra column.
