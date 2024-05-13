@@ -494,6 +494,8 @@ class Table:
         except pl.DuplicateError:
             # polars already validates this, so we don't need to do it again upfront (performance)
             _check_columns_dont_exist(self, [column.name for column in columns])
+            return Table()  # pragma: no cover
+
 
     def add_computed_column(
         self,
