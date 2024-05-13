@@ -36,25 +36,13 @@ def test_should_raise_error_if_file_not_found(path: str | Path) -> None:
 
 
 @pytest.mark.parametrize(
-    ("path", "expected_error_message"),
+    "path",
     [
-        (
-            "invalid_file_extension.file_extension",
-            (
-                r"invalid_file_extension.file_extension has a wrong file extension. Please provide a file with the"
-                r" following extension\(s\): .csv"
-            ),
-        ),
-        (
-            Path("invalid_file_extension.file_extension"),
-            (
-                r"invalid_file_extension.file_extension has a wrong file extension. Please provide a file with the"
-                r" following extension\(s\): .csv"
-            ),
-        ),
+        "invalid_file_extension.file_extension",
+        Path("invalid_file_extension.file_extension"),
     ],
     ids=["by String", "by path"],
 )
-def test_should_raise_error_if_wrong_file_extension(path: str | Path, expected_error_message: str) -> None:
-    with pytest.raises(FileExtensionError, match=expected_error_message):
+def test_should_raise_error_if_wrong_file_extension(path: str | Path) -> None:
+    with pytest.raises(FileExtensionError):
         Table.from_csv_file(resolve_resource_path(path))

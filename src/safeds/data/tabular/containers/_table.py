@@ -238,7 +238,12 @@ class Table:
         import polars as pl
 
         path = _normalize_and_check_file_path(path, ".json", [".json"], check_if_file_exists=True)
-        return Table._from_polars_data_frame(pl.read_json(path))
+
+        try:
+            return Table._from_polars_data_frame(pl.read_json(path))
+        except pl.PolarsPanicError:
+            # Can happen if the JSON file is empty
+            return Table()
 
     @staticmethod
     def from_parquet_file(path: str | Path) -> Table:
@@ -347,8 +352,14 @@ class Table:
 
     @property
     def _data_frame(self) -> pl.DataFrame:
+        import polars as pl
+
         if self.__data_frame_cache is None:
-            self.__data_frame_cache = self._lazy_frame.collect()
+            try:
+                self.__data_frame_cache = self._lazy_frame.collect()
+            except pl.NoDataError:
+                # Can happen if e.g. a CSV file is empty
+                self.__data_frame_cache = pl.DataFrame()
 
         return self.__data_frame_cache
 
@@ -364,7 +375,7 @@ class Table:
         >>> table.column_names
         ['a', 'b']
         """
-        return self._lazy_frame.columns
+        return self.schema.column_names
 
     @property
     def number_of_columns(self) -> int:
@@ -378,7 +389,13 @@ class Table:
         >>> table.number_of_columns
         2
         """
-        return self._lazy_frame.width
+        import polars as pl
+
+        try:
+            return self._lazy_frame.width
+        except pl.NoDataError:
+            # Can happen if e.g. a CSV file is empty
+            return 0
 
     @property
     def number_of_rows(self) -> int:
@@ -404,7 +421,13 @@ class Table:
     @property
     def schema(self) -> Schema:
         """The schema of the table."""
-        return _PolarsSchema(self._lazy_frame.schema)
+        import polars as pl
+
+        try:
+            return _PolarsSchema(self._lazy_frame.schema)
+        except pl.NoDataError:
+            # Can happen if e.g. a CSV file is empty
+            return _PolarsSchema({})
 
     # ------------------------------------------------------------------------------------------------------------------
     # Column operations
