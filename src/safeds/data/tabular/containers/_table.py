@@ -7,13 +7,14 @@ from safeds._config._polars import _get_polars_config
 from safeds._utils import _structural_hash
 from safeds._utils._random import _get_random_seed
 from safeds._validation import _check_bounds, _check_columns_exist, _ClosedBound, _normalize_and_check_file_path
+from safeds._validation._check_columns_dont_exist import _check_columns_dont_exist
 from safeds.data.labeled.containers import TabularDataset, TimeSeriesDataset
 from safeds.data.tabular.plotting import TablePlotter
 from safeds.data.tabular.typing._polars_data_type import _PolarsDataType
 from safeds.data.tabular.typing._polars_schema import _PolarsSchema
 from safeds.exceptions import (
     ColumnLengthMismatchError,
-    DuplicateColumnNameError,
+    DuplicateColumnError,
 )
 
 from ._column import Column
@@ -115,7 +116,7 @@ class Table:
                 pl.LazyFrame([column._series for column in columns]),
             )
         except DuplicateError:
-            raise DuplicateColumnNameError("") from None  # TODO: message
+            raise DuplicateColumnError("") from None  # TODO: message
         except ShapeError:
             raise ColumnLengthMismatchError("") from None  # TODO: message
 
@@ -357,9 +358,9 @@ class Table:
         if self.__data_frame_cache is None:
             try:
                 self.__data_frame_cache = self._lazy_frame.collect()
-            except pl.NoDataError:
-                # Can happen if e.g. a CSV file is empty
-                self.__data_frame_cache = pl.DataFrame()
+            except (pl.NoDataError, pl.PolarsPanicError):
+                # Can happen for some operations on empty tables
+                return pl.DataFrame()
 
         return self.__data_frame_cache
 
@@ -393,8 +394,8 @@ class Table:
 
         try:
             return self._lazy_frame.width
-        except pl.NoDataError:
-            # Can happen if e.g. a CSV file is empty
+        except (pl.NoDataError, pl.PolarsPanicError):
+            # Can happen for some operations on empty tables
             return 0
 
     @property
@@ -425,8 +426,8 @@ class Table:
 
         try:
             return _PolarsSchema(self._lazy_frame.schema)
-        except pl.NoDataError:
-            # Can happen if e.g. a CSV file is empty
+        except (pl.NoDataError, pl.PolarsPanicError):
+            # Can happen for some operations on empty tables
             return _PolarsSchema({})
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -478,15 +479,21 @@ class Table:
         |   3 |   6 |
         +-----+-----+
         """
+        import polars as pl
+
         if isinstance(columns, Column):
             columns = [columns]
 
         if len(columns) == 0:
             return self
 
-        return Table._from_polars_data_frame(
-            self._data_frame.hstack([column._series for column in columns]),
-        )
+        try:
+            return Table._from_polars_data_frame(
+                self._data_frame.hstack([column._series for column in columns]),
+            )
+        except pl.DuplicateError:
+            # polars already validates this, so we don't need to do it again upfront (performance)
+            _check_columns_dont_exist(self, [column.name for column in columns])
 
     def add_computed_column(
         self,
@@ -531,7 +538,7 @@ class Table:
         +-----+-----+-----+
         """
         if self.has_column(name):
-            raise DuplicateColumnNameError(name)
+            raise DuplicateColumnError(name)
 
         computed_column = computer(_LazyVectorizedRow(self))
 
@@ -842,6 +849,7 @@ class Table:
         +-----+-----+
         """
         _check_columns_exist(self, old_name)
+        _check_columns_dont_exist(self, new_name)
 
         return Table._from_polars_lazy_frame(
             self._lazy_frame.rename({old_name: new_name}),

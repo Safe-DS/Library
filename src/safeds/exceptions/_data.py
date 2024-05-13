@@ -23,7 +23,7 @@ class MissingValuesColumnError(Exception):
         )
 
 
-class DuplicateColumnNameError(ValueError):
+class DuplicateColumnError(ValueError):
     """
     Exception raised for trying to modify a table resulting in a duplicate column name.
 

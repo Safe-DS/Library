@@ -1,6 +1,6 @@
 import pytest
 from safeds.data.tabular.containers import Column, Table
-from safeds.exceptions import ColumnLengthMismatchError, DuplicateColumnNameError
+from safeds.exceptions import ColumnLengthMismatchError, DuplicateColumnError
 
 
 @pytest.mark.parametrize(
@@ -35,5 +35,5 @@ def test_should_raise_error_if_column_lengths_mismatch() -> None:
 
 
 def test_should_raise_error_if_duplicate_column_name() -> None:
-    with pytest.raises(DuplicateColumnNameError):
+    with pytest.raises(DuplicateColumnError):
         Table.from_columns([Column("col1", []), Column("col1", [])])

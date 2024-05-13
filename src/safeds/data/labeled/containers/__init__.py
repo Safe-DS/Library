@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING
 import apipkg
 
 if TYPE_CHECKING:
+    from ._dataset import Dataset
     from ._image_dataset import ImageDataset
     from ._tabular_dataset import TabularDataset
     from ._time_series_dataset import TimeSeriesDataset
@@ -12,6 +13,7 @@ if TYPE_CHECKING:
 apipkg.initpkg(
     __name__,
     {
+        "Dataset": "._dataset:Dataset",
         "ImageDataset": "._image_dataset:ImageDataset",
         "TabularDataset": "._tabular_dataset:TabularDataset",
         "TimeSeriesDataset": "._time_series_dataset:TimeSeriesDataset",
@@ -19,6 +21,7 @@ apipkg.initpkg(
 )
 
 __all__ = [
+    "Dataset",
     "ImageDataset",
     "TabularDataset",
     "TimeSeriesDataset",

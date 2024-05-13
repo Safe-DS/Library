@@ -1,9 +1,9 @@
 import pytest
 from safeds.data.tabular.containers import Column, Table
 from safeds.exceptions import (
-    ColumnSizeError,
-    DuplicateColumnNameError,
     ColumnNotFoundError,
+    ColumnSizeError,
+    DuplicateColumnError,
 )
 
 
@@ -76,11 +76,11 @@ def test_should_replace_column(table: Table, column_name: str, columns: list[Col
 @pytest.mark.parametrize(
     ("old_column_name", "column", "error", "error_message"),
     [
-        ("D", [Column("C", ["d", "e", "f"])], ColumnNotFoundError, r"Could not find column\(s\) 'D'"),
+        ("D", [Column("C", ["d", "e", "f"])], ColumnNotFoundError, None),
         (
             "C",
             [Column("B", ["d", "e", "f"]), Column("D", [3, 2, 1])],
-            DuplicateColumnNameError,
+            DuplicateColumnError,
             r"Column 'B' already exists.",
         ),
         (
@@ -90,13 +90,13 @@ def test_should_replace_column(table: Table, column_name: str, columns: list[Col
             r"Expected a column of size 3 but got column of size 2.",
         ),
     ],
-    ids=["ColumnNotFoundError", "DuplicateColumnNameError", "ColumnSizeError"],
+    ids=["ColumnNotFoundError", "DuplicateColumnError", "ColumnSizeError"],
 )
 def test_should_raise_error(
     old_column_name: str,
     column: list[Column],
     error: type[Exception],
-    error_message: str,
+    error_message: str | None,
 ) -> None:
     input_table: Table = Table(
         {

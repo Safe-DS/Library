@@ -90,5 +90,5 @@ def test_should_add_columns_from_table(table1: Table, table2: Table, expected: T
 #     columns: list[Column] | Table,
 #     error_message_regex: str,
 # ) -> None:
-#     with pytest.raises(DuplicateColumnNameError, match=error_message_regex):
+#     with pytest.raises(DuplicateColumnError, match=error_message_regex):
 #         table.add_columns(columns)
