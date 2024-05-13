@@ -6,8 +6,12 @@ from safeds.data.image.containers._multi_size_image_list import _MultiSizeImageL
 from safeds.data.image.containers._single_size_image_list import _SingleSizeImageList
 from safeds.data.tabular.containers import Table
 from safeds.data.tabular.transformation import OneHotEncoder
-from safeds.ml.nn import OutputConversionImageToColumn, OutputConversionImageToImage, OutputConversionImageToTable
-from safeds.ml.nn._output_conversion_image import _OutputConversionImage
+from safeds.ml.nn.converters import (
+    OutputConversionImageToColumn,
+    OutputConversionImageToImage,
+    OutputConversionImageToTable,
+)
+from safeds.ml.nn.converters._output_conversion_image import _OutputConversionImage
 
 
 class TestDataConversionImage:

@@ -3,10 +3,14 @@ from safeds._config import _get_device
 from safeds.data.tabular.containers import Table
 from safeds.data.tabular.transformation import StandardScaler
 from safeds.ml.nn import (
-    ForwardLayer,
-    InputConversionTable,
     NeuralNetworkRegressor,
+)
+from safeds.ml.nn.converters import (
+    InputConversionTable,
     OutputConversionTable,
+)
+from safeds.ml.nn.layers import (
+    ForwardLayer,
 )
 from torch.types import Device
 

@@ -2,12 +2,13 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
-if TYPE_CHECKING:
-    from torch import Tensor
-
 from safeds.data.labeled.containers import TabularDataset
 from safeds.data.tabular.containers import Column, Table
-from safeds.ml.nn import OutputConversion
+
+from ._output_conversion import OutputConversion
+
+if TYPE_CHECKING:
+    from torch import Tensor
 
 
 class OutputConversionTable(OutputConversion[Table, TabularDataset]):

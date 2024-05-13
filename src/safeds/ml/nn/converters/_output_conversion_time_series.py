@@ -4,12 +4,13 @@ import sys
 from typing import TYPE_CHECKING, Any
 
 from safeds._utils import _structural_hash
+from safeds.data.labeled.containers import TimeSeriesDataset
+from safeds.data.tabular.containers import Column
+
+from ._output_conversion import OutputConversion
 
 if TYPE_CHECKING:
     from torch import Tensor
-from safeds.data.labeled.containers import TimeSeriesDataset
-from safeds.data.tabular.containers import Column
-from safeds.ml.nn._output_conversion import OutputConversion
 
 
 class OutputConversionTimeSeries(OutputConversion[TimeSeriesDataset, TimeSeriesDataset]):

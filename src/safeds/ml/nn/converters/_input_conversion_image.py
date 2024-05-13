@@ -9,11 +9,11 @@ from safeds.data.image.containers._single_size_image_list import _SingleSizeImag
 from safeds.data.labeled.containers import ImageDataset
 from safeds.data.labeled.containers._image_dataset import _ColumnAsTensor, _TableAsTensor
 
+from ._input_conversion import InputConversion
+
 if TYPE_CHECKING:
     from safeds.data.image.typing import ImageSize
     from safeds.data.tabular.transformation import OneHotEncoder
-
-from safeds.ml.nn import InputConversion
 
 
 class InputConversionImage(InputConversion[ImageDataset, ImageList]):

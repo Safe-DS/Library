@@ -2,11 +2,12 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
+from safeds.data.labeled.containers import TimeSeriesDataset
+
+from ._input_conversion import InputConversion
+
 if TYPE_CHECKING:
     from torch.utils.data import DataLoader
-
-from safeds.data.labeled.containers import TimeSeriesDataset
-from safeds.ml.nn._input_conversion import InputConversion
 
 
 class InputConversionTimeSeries(InputConversion[TimeSeriesDataset, TimeSeriesDataset]):

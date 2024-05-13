@@ -4,7 +4,7 @@ from typing import Any
 import pytest
 from safeds.data.image.typing import ImageSize
 from safeds.exceptions import OutOfBoundsError
-from safeds.ml.nn import LSTMLayer
+from safeds.ml.nn.layers import LSTMLayer
 from torch import nn
 
 

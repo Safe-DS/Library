@@ -8,10 +8,10 @@ from safeds._config import _init_default_device
 from safeds._utils import _structural_hash
 from safeds.data.image.typing import ImageSize
 
+from ._layer import Layer
+
 if TYPE_CHECKING:
     from torch import Tensor, nn
-
-from safeds.ml.nn import Layer
 
 
 def _create_internal_model(strategy: Literal["max", "avg"], kernel_size: int, padding: int, stride: int) -> nn.Module:
@@ -194,7 +194,7 @@ class MaxPooling2DLayer(_Pooling2DLayer):
         super().__init__("max", kernel_size, stride=stride, padding=padding)
 
 
-class AvgPooling2DLayer(_Pooling2DLayer):
+class AveragePooling2DLayer(_Pooling2DLayer):
 
     def __init__(self, kernel_size: int, *, stride: int = -1, padding: int = 0) -> None:
         """

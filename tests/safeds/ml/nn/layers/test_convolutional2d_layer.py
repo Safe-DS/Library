@@ -3,7 +3,7 @@ from typing import Literal
 
 import pytest
 from safeds.data.image.typing import ImageSize
-from safeds.ml.nn import Convolutional2DLayer, ConvolutionalTranspose2DLayer
+from safeds.ml.nn.layers import Convolutional2DLayer, ConvolutionalTranspose2DLayer
 from torch import nn
 
 

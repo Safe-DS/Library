@@ -3,11 +3,15 @@ from safeds._config import _get_device
 from safeds.data.tabular.containers import Table
 from safeds.data.tabular.transformation import RangeScaler
 from safeds.ml.nn import (
-    ForwardLayer,
-    InputConversionTimeSeries,
-    LSTMLayer,
     NeuralNetworkRegressor,
+)
+from safeds.ml.nn.converters import (
+    InputConversionTimeSeries,
     OutputConversionTimeSeries,
+)
+from safeds.ml.nn.layers import (
+    ForwardLayer,
+    LSTMLayer,
 )
 from torch.types import Device
 
