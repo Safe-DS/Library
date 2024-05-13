@@ -9,7 +9,7 @@ from safeds.exceptions import IndexOutOfBoundsError
         (
             Table({"col1": [1, 2, 1], "col2": [1, 2, 4]}),
             Table({"col1": [1, 2], "col2": [1, 2]}),
-            Table({"col1": [1, 2, 1], "col2": [1, 2,4]}),
+            Table({"col1": [1, 2, 1], "col2": [1, 2, 4]}),
         ),
     ],
     ids=["Table with three rows"],
