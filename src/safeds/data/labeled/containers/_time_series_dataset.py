@@ -322,8 +322,8 @@ def _create_dataset(features: torch.Tensor, target: torch.Tensor) -> Dataset:
 
     class _CustomDataset(Dataset):
         def __init__(self, features_dataset: torch.Tensor, target_dataset: torch.Tensor):
-            self.X = features_dataset
-            self.Y = target_dataset.unsqueeze(-1)
+            self.X = features_dataset.float()
+            self.Y = target_dataset.unsqueeze(-1).float()
             self.len = self.X.shape[0]
 
         def __getitem__(self, item: int) -> tuple[torch.Tensor, torch.Tensor]:
@@ -341,8 +341,8 @@ def _create_dataset_predict(features: torch.Tensor) -> Dataset:
     _init_default_device()
 
     class _CustomDataset(Dataset):
-        def __init__(self, features: torch.Tensor):
-            self.X = features
+        def __init__(self, datas: torch.Tensor):
+            self.X = datas.float()
             self.len = self.X.shape[0]
 
         def __getitem__(self, item: int) -> torch.Tensor:
