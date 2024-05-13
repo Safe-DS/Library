@@ -11,7 +11,8 @@ if TYPE_CHECKING:
     from collections.abc import Mapping, Sequence
 
     import torch
-    from torch.utils.data import DataLoader, Dataset
+    from torch.utils.data import DataLoader
+    from torch.utils.data import Dataset as TorchDataset
 
     from safeds.data.tabular.containers import Column, Table
 
@@ -315,12 +316,12 @@ class TimeSeriesDataset:
         return self._table._repr_html_()
 
 
-def _create_dataset(features: torch.Tensor, target: torch.Tensor) -> Dataset:
-    from torch.utils.data import Dataset
+def _create_dataset(features: torch.Tensor, target: torch.Tensor) -> TorchDataset:
+    from torch.utils.data import Dataset as TorchDataset
 
     _init_default_device()
 
-    class _CustomDataset(Dataset):
+    class _CustomDataset(TorchDataset):
         def __init__(self, features_dataset: torch.Tensor, target_dataset: torch.Tensor):
             self.X = features_dataset.float()
             self.Y = target_dataset.unsqueeze(-1).float()
@@ -335,12 +336,12 @@ def _create_dataset(features: torch.Tensor, target: torch.Tensor) -> Dataset:
     return _CustomDataset(features, target)
 
 
-def _create_dataset_predict(features: torch.Tensor) -> Dataset:
-    from torch.utils.data import Dataset
+def _create_dataset_predict(features: torch.Tensor) -> TorchDataset:
+    from torch.utils.data import Dataset as TorchDataset
 
     _init_default_device()
 
-    class _CustomDataset(Dataset):
+    class _CustomDataset(TorchDataset):
         def __init__(self, datas: torch.Tensor):
             self.X = datas.float()
             self.len = self.X.shape[0]
