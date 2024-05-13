@@ -78,7 +78,7 @@ class OutputConversionTimeSeries(OutputConversion[TimeSeriesDataset, TimeSeriesD
         window_size: int = kwargs["window_size"]
         forecast_horizon: int = kwargs["forecast_horizon"]
         input_data_table = input_data.to_table()
-        input_data_table = Table.from_rows(input_data_table.to_rows()[window_size + forecast_horizon :])
+        input_data_table = input_data_table.slice_rows(start=window_size+forecast_horizon)
 
         return input_data_table.add_columns(
             [Column(self._prediction_name, output_data.tolist())],
