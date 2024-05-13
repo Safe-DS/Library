@@ -496,7 +496,6 @@ class Table:
             _check_columns_dont_exist(self, [column.name for column in columns])
             return Table()  # pragma: no cover
 
-
     def add_computed_column(
         self,
         name: str,
@@ -946,7 +945,7 @@ class Table:
             self._lazy_frame.select(
                 *[pl.col(name) for name in self.column_names[:index]],
                 *[column._series for column in new_columns],
-                *[pl.col(name) for name in self.column_names[index + 1:]],
+                *[pl.col(name) for name in self.column_names[index + 1 :]],
             ),
         )
 
