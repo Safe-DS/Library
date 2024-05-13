@@ -32,7 +32,7 @@ def test_should_split_table(
     result_train_table: Table,
     percentage_in_first: int,
 ) -> None:
-    #test if schema stayed the same
+    # test if schema stayed the same
     schema = table.schema
     train_table, test_table = table.split_rows(percentage_in_first)
     assert result_test_table == test_table
