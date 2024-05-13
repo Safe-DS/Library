@@ -22,13 +22,15 @@ from safeds.exceptions import (
     TransformerNotFittedError,
 )
 
+from ._dataset import Dataset
+
 if TYPE_CHECKING:
     from torch import Tensor
 
 T = TypeVar("T", Column, Table, ImageList)
 
 
-class ImageDataset(Generic[T]):
+class ImageDataset(Generic[T], Dataset):
     """
     A Dataset for ImageLists as input and ImageLists, Tables or Columns as output.
 

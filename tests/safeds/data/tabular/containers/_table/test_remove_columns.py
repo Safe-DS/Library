@@ -1,6 +1,5 @@
 import pytest
 from safeds.data.tabular.containers import Table
-from safeds.exceptions import ColumnNotFoundError
 
 
 @pytest.mark.parametrize(
@@ -10,17 +9,18 @@ from safeds.exceptions import ColumnNotFoundError
         (Table({"col1": [1, 2, 1], "col2": [1, 2, 4]}), Table(), ["col1", "col2"]),
         (Table({"col1": [1, 2, 1], "col2": [1, 2, 4]}), Table({"col1": [1, 2, 1], "col2": [1, 2, 4]}), []),
         (Table(), Table(), []),
+        (Table(), Table(), ["col1"]),
     ],
-    ids=["one column", "multiple columns", "no columns", "empty"],
+    ids=[
+        "one column",
+        "multiple columns",
+        "no columns",
+        "empty",
+        "missing columns",
+    ],
 )
 def test_should_remove_table_columns(table: Table, expected: Table, columns: list[str]) -> None:
     table = table.remove_columns(columns)
     assert table.schema == expected.schema
     assert table == expected
     assert table.number_of_rows == expected.number_of_rows
-
-
-@pytest.mark.parametrize("table", [Table({"A": [1], "B": [2]}), Table()], ids=["normal", "empty"])
-def test_should_raise_if_column_not_found(table: Table) -> None:
-    with pytest.raises(ColumnNotFoundError):
-        table.remove_columns(["C"])

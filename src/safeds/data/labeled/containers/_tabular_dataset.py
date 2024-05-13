@@ -6,16 +6,19 @@ from typing import TYPE_CHECKING, Any
 from safeds._config import _get_device, _init_default_device
 from safeds._utils import _structural_hash
 
+from ._dataset import Dataset
+
 if TYPE_CHECKING:
     from collections.abc import Mapping, Sequence
 
     from torch import Tensor
-    from torch.utils.data import DataLoader, Dataset
+    from torch.utils.data import DataLoader
+    from torch.utils.data import Dataset as TorchDataset
 
     from safeds.data.tabular.containers import Column, Table
 
 
-class TabularDataset:
+class TabularDataset(Dataset):
     """
     A dataset containing tabular data. It can be used to train machine learning models.
 
@@ -216,13 +219,13 @@ class TabularDataset:
 
 
 # TODO
-def _create_dataset(features: Tensor, target: Tensor) -> Dataset:
+def _create_dataset(features: Tensor, target: Tensor) -> TorchDataset:
     import torch
-    from torch.utils.data import Dataset
+    from torch.utils.data import Dataset as TorchDataset
 
     _init_default_device()
 
-    class _CustomDataset(Dataset):
+    class _CustomDataset(TorchDataset):
         def __init__(self, features: Tensor, target: Tensor):
             self.X = features.to(torch.float32)
             self.Y = target.to(torch.float32)

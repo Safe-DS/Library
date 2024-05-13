@@ -3,7 +3,7 @@
 from ._data import (
     ColumnLengthMismatchError,
     ColumnSizeError,
-    DuplicateColumnNameError,
+    DuplicateColumnError,
     DuplicateIndexError,
     IllegalFormatError,
     IndexOutOfBoundsError,
@@ -27,7 +27,7 @@ from ._ml import (
 
 
 class SafeDsError(Exception):
-    """Base class for all exceptions raised by Safe-DS."""
+    """Base class for all exceptions defined by Safe-DS."""
 
 
 class ColumnNotFoundError(SafeDsError):
@@ -51,7 +51,7 @@ __all__ = [
     # Data exceptions
     "ColumnLengthMismatchError",
     "ColumnSizeError",
-    "DuplicateColumnNameError",
+    "DuplicateColumnError",
     "DuplicateIndexError",
     "IllegalFormatError",
     "IndexOutOfBoundsError",
