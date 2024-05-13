@@ -81,7 +81,7 @@ def test_should_replace_column(table: Table, column_name: str, columns: list[Col
             "C",
             [Column("B", ["d", "e", "f"]), Column("D", [3, 2, 1])],
             DuplicateColumnError,
-            r"Column 'B' already exists.",
+            None,
         ),
         (
             "C",

@@ -849,8 +849,7 @@ class Table:
         +-----+-----+
         """
         _check_columns_exist(self, old_name)
-        if old_name != new_name:
-            _check_columns_dont_exist(self, new_name)
+        _check_columns_dont_exist(self, new_name, old_name=old_name)
 
         return Table._from_polars_lazy_frame(
             self._lazy_frame.rename({old_name: new_name}),
@@ -923,6 +922,7 @@ class Table:
         +-----+-----+-----+
         """
         _check_columns_exist(self, old_name)
+        _check_columns_dont_exist(self, [column.name for column in new_columns], old_name=old_name)
 
         if isinstance(new_columns, Column):
             new_columns = [new_columns]
