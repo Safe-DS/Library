@@ -6,31 +6,6 @@ if TYPE_CHECKING:
     from pathlib import Path
 
 
-class UnknownColumnNameError(KeyError):
-    """
-    Exception raised for trying to access an invalid column name.
-
-    Parameters
-    ----------
-    column_names:
-        The name of the column that was tried to be accessed.
-    """
-
-    def __init__(self, column_names: list[str], similar_columns: list[str] | None = None):
-        class _UnknownColumnNameErrorMessage(
-            str,
-        ):  # This class is necessary for the newline character in a KeyError exception. See https://stackoverflow.com/a/70114007
-            def __repr__(self) -> str:
-                return str(self)
-
-        error_message = f"Could not find column(s) '{', '.join(column_names)}'."
-
-        if similar_columns is not None and len(similar_columns) > 0:
-            error_message += f"\nDid you mean '{similar_columns}'?"
-
-        super().__init__(_UnknownColumnNameErrorMessage(error_message))
-
-
 class NonNumericColumnError(TypeError):
     """Exception raised for trying to do numerical operations on a non-numerical column."""
 
@@ -159,7 +134,7 @@ class WrongFileExtensionError(ValueError):
     def __init__(self, file: str | Path, file_extension: str | list[str]) -> None:
         super().__init__(
             f"The file {file} has a wrong file extension. Please provide a file with the following extension(s):"
-            f" {file_extension}",
+            f" {sorted(file_extension)}",
         )
 
 

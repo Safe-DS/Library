@@ -6,7 +6,7 @@ from safeds.data.tabular.transformation import OneHotEncoder
 from safeds.exceptions import (
     NonNumericColumnError,
     TransformerNotFittedError,
-    UnknownColumnNameError,
+    ColumnNotFoundError,
     ValueNotPresentWhenFittedError,
 )
 
@@ -40,7 +40,7 @@ class TestFit:
             },
         )
 
-        with pytest.raises(UnknownColumnNameError, match=r"Could not find column\(s\) 'col2, col3'"):
+        with pytest.raises(ColumnNotFoundError, match=r"Could not find column\(s\) 'col2, col3'"):
             OneHotEncoder().fit(table, ["col2", "col3"])
 
     def test_should_raise_if_table_contains_no_rows(self) -> None:
@@ -99,7 +99,7 @@ class TestTransform:
             },
         )
 
-        with pytest.raises(UnknownColumnNameError, match=r"Could not find column\(s\) 'col1, col2'"):
+        with pytest.raises(ColumnNotFoundError, match=r"Could not find column\(s\) 'col1, col2'"):
             transformer.transform(table_to_transform)
 
     def test_should_raise_if_not_fitted(self) -> None:
@@ -468,7 +468,7 @@ class TestInverseTransform:
             transformer.inverse_transform(table)
 
     def test_should_raise_if_column_not_found(self) -> None:
-        with pytest.raises(UnknownColumnNameError, match=r"Could not find column\(s\) 'col1__one, col1__two'"):
+        with pytest.raises(ColumnNotFoundError, match=r"Could not find column\(s\) 'col1__one, col1__two'"):
             OneHotEncoder().fit(Table({"col1": ["one", "two"]}), ["col1"]).inverse_transform(
                 Table({"col1": [1.0, 0.0]}),
             )

@@ -1,6 +1,6 @@
 import pytest
 from safeds.data.tabular.containers import Table
-from safeds.exceptions import UnknownColumnNameError
+from safeds.exceptions import ColumnNotFoundError
 from syrupy import SnapshotAssertion
 
 
@@ -21,5 +21,5 @@ def test_should_match_snapshot(snapshot_png_image: SnapshotAssertion) -> None:
     ids=["First argument doesn't exist", "Second argument doesn't exist", "Both arguments do not exist", "empty"],
 )
 def test_should_raise_if_column_does_not_exist(table: Table, col1: str, col2: str, error_message: str) -> None:
-    with pytest.raises(UnknownColumnNameError, match=error_message):
+    with pytest.raises(ColumnNotFoundError, match=error_message):
         table.plot.scatter_plot(col1, col2)

@@ -8,8 +8,9 @@ from typing import TYPE_CHECKING, Any
 import pandas as pd
 
 from safeds._utils import _structural_hash
+from safeds._validation import _check_columns_exist
 from safeds.data.tabular.containers import Table
-from safeds.exceptions import NonNumericColumnError, TransformerNotFittedError, UnknownColumnNameError
+from safeds.exceptions import NonNumericColumnError, TransformerNotFittedError, ColumnNotFoundError
 
 from ._table_transformer import TableTransformer
 
@@ -144,9 +145,7 @@ class SimpleImputer(TableTransformer):
         if column_names is None:
             column_names = table.column_names
         else:
-            missing_columns = sorted(set(column_names) - set(table.column_names))
-            if len(missing_columns) > 0:
-                raise UnknownColumnNameError(missing_columns)
+            _check_columns_exist(table, column_names)
 
         if table.number_of_rows == 0:
             raise ValueError("The Imputer cannot be fitted because the table contains 0 rows")
@@ -224,9 +223,7 @@ class SimpleImputer(TableTransformer):
             raise TransformerNotFittedError
 
         # Input table does not contain all columns used to fit the transformer
-        missing_columns = sorted(set(self._column_names) - set(table.column_names))
-        if len(missing_columns) > 0:
-            raise UnknownColumnNameError(missing_columns)
+        _check_columns_exist(table, self._column_names)
 
         if table.number_of_rows == 0:
             raise ValueError("The Imputer cannot transform the table because it contains 0 rows")

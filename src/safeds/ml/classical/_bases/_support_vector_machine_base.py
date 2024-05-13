@@ -5,7 +5,7 @@ from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
 from safeds._utils import _structural_hash
-from safeds.exceptions import ClosedBound, OpenBound, OutOfBoundsError
+from safeds.exceptions import _ClosedBound, _OpenBound, OutOfBoundsError
 
 if TYPE_CHECKING:
     from sklearn.svm import SVC as SklearnSVC  # noqa: N811
@@ -81,7 +81,7 @@ class _SupportVectorMachineBase(ABC):
     ) -> None:
         # Validation
         if c <= 0:
-            raise OutOfBoundsError(c, name="c", lower_bound=OpenBound(0))
+            raise OutOfBoundsError(c, name="c", lower_bound=_OpenBound(0))
         if kernel is None:
             kernel = _SupportVectorMachineBase.Kernel.radial_basis_function()
 
@@ -148,7 +148,7 @@ class _Polynomial(_SupportVectorMachineBase.Kernel):
 
     def __init__(self, degree: int):
         if degree < 1:
-            raise OutOfBoundsError(degree, name="degree", lower_bound=ClosedBound(1))
+            raise OutOfBoundsError(degree, name="degree", lower_bound=_ClosedBound(1))
 
         self._degree = degree
 

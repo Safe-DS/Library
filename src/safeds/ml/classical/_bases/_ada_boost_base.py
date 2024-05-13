@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
 from safeds._utils import _structural_hash
-from safeds.exceptions import ClosedBound, OpenBound, OutOfBoundsError
+from safeds.exceptions import _ClosedBound, _OpenBound, OutOfBoundsError
 
 if TYPE_CHECKING:
     from safeds.ml.classical import SupervisedModel
@@ -27,10 +27,10 @@ class _AdaBoostBase(ABC):
             raise OutOfBoundsError(
                 maximum_number_of_learners,
                 name="maximum_number_of_learners",
-                lower_bound=ClosedBound(1),
+                lower_bound=_ClosedBound(1),
             )
         if learning_rate <= 0:
-            raise OutOfBoundsError(learning_rate, name="learning_rate", lower_bound=OpenBound(0))
+            raise OutOfBoundsError(learning_rate, name="learning_rate", lower_bound=_OpenBound(0))
 
         # Hyperparameters
         self._maximum_number_of_learners: int = maximum_number_of_learners

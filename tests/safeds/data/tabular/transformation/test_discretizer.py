@@ -1,7 +1,7 @@
 import pytest
 from safeds.data.tabular.containers import Table
 from safeds.data.tabular.transformation import Discretizer
-from safeds.exceptions import NonNumericColumnError, OutOfBoundsError, TransformerNotFittedError, UnknownColumnNameError
+from safeds.exceptions import NonNumericColumnError, OutOfBoundsError, TransformerNotFittedError, ColumnNotFoundError
 
 
 class TestInit:
@@ -15,25 +15,25 @@ class TestFit:
         ("table", "columns", "error", "error_message"),
         [
             (
-                Table(
+                    Table(
                     {
                         "col1": [0.0, 5.0, 5.0, 10.0],
                     },
                 ),
-                ["col2"],
-                UnknownColumnNameError,
+                    ["col2"],
+                    ColumnNotFoundError,
                 r"Could not find column\(s\) 'col2'",
             ),
             (
-                Table(
+                    Table(
                     {
                         "col1": [0.0, 5.0, 5.0, 10.0],
                         "col2": [0.0, 5.0, 5.0, 10.0],
                         "col3": [0.0, 5.0, 5.0, 10.0],
                     },
                 ),
-                ["col4", "col5"],
-                UnknownColumnNameError,
+                    ["col4", "col5"],
+                    ColumnNotFoundError,
                 r"Could not find column\(s\) 'col4, col5'",
             ),
             (Table(), ["col2"], ValueError, "The Discretizer cannot be fitted because the table contains 0 rows"),
@@ -80,23 +80,23 @@ class TestTransform:
         ("table_to_transform", "columns", "error", "error_message"),
         [
             (
-                Table(
+                    Table(
                     {
                         "col2": ["a", "b", "c"],
                     },
                 ),
-                ["col1"],
-                UnknownColumnNameError,
+                    ["col1"],
+                    ColumnNotFoundError,
                 r"Could not find column\(s\) 'col1'",
             ),
             (
-                Table(
+                    Table(
                     {
                         "col2": ["a", "b", "c"],
                     },
                 ),
-                ["col3", "col1"],
-                UnknownColumnNameError,
+                    ["col3", "col1"],
+                    ColumnNotFoundError,
                 r"Could not find column\(s\) 'col3, col1'",
             ),
             (Table(), ["col1", "col3"], ValueError, "The table cannot be transformed because it contains 0 rows"),

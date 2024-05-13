@@ -3,7 +3,7 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 
 from safeds._utils import _structural_hash
-from safeds.exceptions import ClosedBound, OpenBound, OutOfBoundsError
+from safeds.exceptions import _ClosedBound, _OpenBound, OutOfBoundsError
 
 
 class _GradientBoostingBase(ABC):
@@ -20,9 +20,9 @@ class _GradientBoostingBase(ABC):
     ) -> None:
         # Validation
         if number_of_trees < 1:
-            raise OutOfBoundsError(number_of_trees, name="number_of_trees", lower_bound=ClosedBound(1))
+            raise OutOfBoundsError(number_of_trees, name="number_of_trees", lower_bound=_ClosedBound(1))
         if learning_rate <= 0:
-            raise OutOfBoundsError(learning_rate, name="learning_rate", lower_bound=OpenBound(0))
+            raise OutOfBoundsError(learning_rate, name="learning_rate", lower_bound=_OpenBound(0))
 
         # Hyperparameters
         self._number_of_trees = number_of_trees

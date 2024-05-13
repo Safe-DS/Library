@@ -4,18 +4,18 @@ from typing import TYPE_CHECKING, Any, Literal
 
 from safeds._config import _get_device, _init_default_device
 from safeds._config._polars import _get_polars_config
-from safeds._utils import _check_and_normalize_file_path, _structural_hash
+from safeds._utils import _structural_hash
 from safeds._utils._random import _get_random_seed
+from safeds._validation import _check_columns_exist, _normalize_and_check_file_path
 from safeds.data.labeled.containers import TabularDataset, TimeSeriesDataset
 from safeds.data.tabular.plotting import TablePlotter
 from safeds.data.tabular.typing._polars_data_type import _PolarsDataType
 from safeds.data.tabular.typing._polars_schema import _PolarsSchema
 from safeds.exceptions import (
-    ClosedBound,
+    _ClosedBound,
     ColumnLengthMismatchError,
     DuplicateColumnNameError,
     OutOfBoundsError,
-    UnknownColumnNameError,
 )
 
 from ._column import Column
@@ -107,15 +107,19 @@ class Table:
         +-----+-----+
         """
         import polars as pl
-
-        # TODO: raises
+        from polars.exceptions import DuplicateError, ShapeError
 
         if isinstance(columns, Column):
             columns = [columns]
 
-        return Table._from_polars_lazy_frame(
-            pl.LazyFrame([column._series for column in columns]),
-        )
+        try:
+            return Table._from_polars_lazy_frame(
+                pl.LazyFrame([column._series for column in columns]),
+            )
+        except DuplicateError:
+            raise DuplicateColumnNameError("") from None  # TODO: message
+        except ShapeError:
+            raise ColumnLengthMismatchError("") from None  # TODO: message
 
     @staticmethod
     def from_csv_file(path: str | Path) -> Table:
@@ -154,7 +158,7 @@ class Table:
         """
         import polars as pl
 
-        path = _check_and_normalize_file_path(path, ".csv", [".csv"], check_if_file_exists=True)
+        path = _normalize_and_check_file_path(path, ".csv", [".csv"], check_if_file_exists=True)
         return Table._from_polars_lazy_frame(pl.scan_csv(path))
 
     @staticmethod
@@ -232,7 +236,7 @@ class Table:
         """
         import polars as pl
 
-        path = _check_and_normalize_file_path(path, ".json", [".json"], check_if_file_exists=True)
+        path = _normalize_and_check_file_path(path, ".json", [".json"], check_if_file_exists=True)
         return Table._from_polars_data_frame(pl.read_json(path))
 
     @staticmethod
@@ -273,7 +277,7 @@ class Table:
         """
         import polars as pl
 
-        path = _check_and_normalize_file_path(path, ".parquet", [".parquet"], check_if_file_exists=True)
+        path = _normalize_and_check_file_path(path, ".parquet", [".parquet"], check_if_file_exists=True)
         return Table._from_polars_lazy_frame(pl.scan_parquet(path))
 
     @staticmethod
@@ -547,7 +551,7 @@ class Table:
         |   3 |
         +-----+
         """
-        self._check_columns_exist(name)
+        _check_columns_exist(self, name)
         return Column._from_polars_series(self._data_frame.get_column(name))
 
     def get_column_type(self, name: str) -> DataType:
@@ -576,7 +580,7 @@ class Table:
         >>> table.get_column_type("a")
         Int64
         """
-        self._check_columns_exist(name)
+        _check_columns_exist(self, name)
         return _PolarsDataType(self._lazy_frame.schema[name])
 
     def has_column(self, name: str) -> bool:
@@ -700,7 +704,7 @@ class Table:
         if isinstance(names, str):
             names = [names]
 
-        self._check_columns_exist(names)
+        _check_columns_exist(self, names)
 
         return Table._from_polars_lazy_frame(
             self._lazy_frame.select(names),
@@ -813,7 +817,7 @@ class Table:
         |   3 |   6 |
         +-----+-----+
         """
-        self._check_columns_exist(old_name)
+        _check_columns_exist(self, old_name)
 
         return Table._from_polars_lazy_frame(
             self._lazy_frame.rename({old_name: new_name}),
@@ -885,7 +889,7 @@ class Table:
         |   9 |  12 |   6 |
         +-----+-----+-----+
         """
-        self._check_columns_exist(old_name)
+        _check_columns_exist(self, old_name)
 
         if isinstance(new_columns, Column):
             new_columns = [new_columns]
@@ -954,14 +958,14 @@ class Table:
         |   4 |   6 |
         +-----+-----+
         """
-        self._check_columns_exist(name)
+        _check_columns_exist(self, name)
 
         import polars as pl
 
-        transformed_column = transformer(_LazyCell(pl.col(name)))
+        expression = transformer(_LazyCell(pl.col(name)))
 
         return Table._from_polars_lazy_frame(
-            self._lazy_frame.with_columns(transformed_column._polars_expression),
+            self._lazy_frame.with_columns(expression._polars_expression),
         )
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -1079,7 +1083,7 @@ class Table:
         |   3 |   6 |
         +-----+-----+
         """
-        self._check_columns_exist(name)
+        _check_columns_exist(self, name)
 
         import polars as pl
 
@@ -1372,7 +1376,7 @@ class Table:
         |   3 |   2 |
         +-----+-----+
         """
-        self._check_columns_exist(name)
+        _check_columns_exist(self, name)
 
         return Table._from_polars_lazy_frame(
             self._lazy_frame.sort(
@@ -1444,8 +1448,8 @@ class Table:
             raise OutOfBoundsError(
                 actual=percentage_in_first,
                 name="percentage_in_first",
-                lower_bound=ClosedBound(0),
-                upper_bound=ClosedBound(1),
+                lower_bound=_ClosedBound(0),
+                upper_bound=_ClosedBound(1),
             )
 
         input_table = self.shuffle_rows() if shuffle else self
@@ -1709,7 +1713,7 @@ class Table:
         >>> table = Table({"a": [1, 2, 3], "b": [4, 5, 6]})
         >>> table.to_csv_file("./src/resources/to_csv_file.csv")
         """
-        path = _check_and_normalize_file_path(path, ".csv", [".csv"])
+        path = _normalize_and_check_file_path(path, ".csv", [".csv"])
         path.parent.mkdir(parents=True, exist_ok=True)
 
         self._lazy_frame.sink_csv(path)
@@ -1766,7 +1770,7 @@ class Table:
         >>> table = Table({"a": [1, 2, 3], "b": [4, 5, 6]})
         >>> table.to_json_file("./src/resources/to_json_file_2.json")
         """
-        path = _check_and_normalize_file_path(path, ".json", [".json"])
+        path = _normalize_and_check_file_path(path, ".json", [".json"])
         path.parent.mkdir(parents=True, exist_ok=True)
 
         # Write JSON to file
@@ -1795,7 +1799,7 @@ class Table:
         >>> table = Table({"a": [1, 2, 3], "b": [4, 5, 6]})
         >>> table.to_parquet_file("./src/resources/to_parquet_file.parquet")
         """
-        path = _check_and_normalize_file_path(path, ".parquet", [".parquet"])
+        path = _normalize_and_check_file_path(path, ".parquet", [".parquet"])
         path.parent.mkdir(parents=True, exist_ok=True)
 
         self._lazy_frame.sink_parquet(path)
@@ -1942,32 +1946,6 @@ class Table:
     # ------------------------------------------------------------------------------------------------------------------
     # Internal
     # ------------------------------------------------------------------------------------------------------------------
-
-    def _check_columns_exist(self, requested_names: str | list[str]) -> None:
-        """
-        Check if the specified column names exist in the table and raise an error if they do not.
-
-        Parameters
-        ----------
-        requested_names:
-            The column names to check.
-
-        Raises
-        ------
-        KeyError
-            If a column name does not exist.
-        """
-        if isinstance(requested_names, str):
-            requested_names = [requested_names]
-
-        if len(requested_names) > 1:
-            known_names = set(self.column_names)
-        else:
-            known_names = self.column_names  # type: ignore[assignment]
-
-        unknown_names = [name for name in requested_names if name not in known_names]
-        if unknown_names:
-            raise UnknownColumnNameError(unknown_names)  # TODO: in the error, compute similar column names
 
     # TODO
     def _into_dataloader(self, batch_size: int) -> DataLoader:

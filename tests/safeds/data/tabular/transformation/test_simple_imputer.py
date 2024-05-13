@@ -5,7 +5,7 @@ import pytest
 from safeds.data.tabular.containers import Table
 from safeds.data.tabular.transformation import SimpleImputer
 from safeds.data.tabular.transformation._simple_imputer import _Mode
-from safeds.exceptions import NonNumericColumnError, TransformerNotFittedError, UnknownColumnNameError
+from safeds.exceptions import NonNumericColumnError, TransformerNotFittedError, ColumnNotFoundError
 
 
 def strategies() -> list[SimpleImputer.Strategy]:
@@ -166,7 +166,7 @@ class TestFit:
             },
         )
 
-        with pytest.raises(UnknownColumnNameError, match=r"Could not find column\(s\) 'b, c'"):
+        with pytest.raises(ColumnNotFoundError, match=r"Could not find column\(s\) 'b, c'"):
             SimpleImputer(strategy).fit(table, ["b", "c"])
 
     @pytest.mark.parametrize("strategy", strategies(), ids=lambda x: x.__class__.__name__)
@@ -259,7 +259,7 @@ class TestTransform:
             },
         )
 
-        with pytest.raises(UnknownColumnNameError, match=r"Could not find column\(s\) 'a, b'"):
+        with pytest.raises(ColumnNotFoundError, match=r"Could not find column\(s\) 'a, b'"):
             transformer.transform(table_to_transform)
 
     @pytest.mark.parametrize("strategy", strategies(), ids=lambda x: x.__class__.__name__)

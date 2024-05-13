@@ -1,5 +1,5 @@
 import pytest
-from safeds.exceptions import UnknownColumnNameError
+from safeds.exceptions import ColumnNotFoundError
 
 
 @pytest.mark.parametrize(
@@ -38,5 +38,5 @@ def test_empty_similar_columns(
     similar_columns: list[str],
     expected_error_message: str,
 ) -> None:
-    with pytest.raises(UnknownColumnNameError, match=expected_error_message):
-        raise UnknownColumnNameError(column_names, similar_columns)
+    with pytest.raises(ColumnNotFoundError, match=expected_error_message):
+        raise ColumnNotFoundError(column_names, similar_columns)

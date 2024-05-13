@@ -2,7 +2,7 @@ import re
 
 import pytest
 from numpy import isinf, isnan
-from safeds.exceptions import Bound, ClosedBound, OpenBound, OutOfBoundsError
+from safeds.exceptions import _Bound, _ClosedBound, _OpenBound, OutOfBoundsError
 
 
 @pytest.mark.parametrize(
@@ -14,30 +14,30 @@ from safeds.exceptions import Bound, ClosedBound, OpenBound, OutOfBoundsError
 @pytest.mark.parametrize(
     ("lower_bound", "match_lower"),
     [
-        (ClosedBound(-1), "[-1"),
-        (OpenBound(-1), "(-1"),
+        (_ClosedBound(-1), "[-1"),
+        (_OpenBound(-1), "(-1"),
         (None, "(-\u221e"),
-        (OpenBound(float("-inf")), "(-\u221e"),
-        (OpenBound(float("inf")), "(\u221e"),
+        (_OpenBound(float("-inf")), "(-\u221e"),
+        (_OpenBound(float("inf")), "(\u221e"),
     ],
     ids=["lb_closed_-1", "lb_open_-1", "lb_none", "lb_neg_inf", "lb_inf"],
 )
 @pytest.mark.parametrize(
     ("upper_bound", "match_upper"),
     [
-        (ClosedBound(1), "1]"),
-        (OpenBound(1), "1)"),
+        (_ClosedBound(1), "1]"),
+        (_OpenBound(1), "1)"),
         (None, "\u221e)"),
-        (OpenBound(float("-inf")), "-\u221e)"),
-        (OpenBound(float("inf")), "\u221e)"),
+        (_OpenBound(float("-inf")), "-\u221e)"),
+        (_OpenBound(float("inf")), "\u221e)"),
     ],
     ids=["ub_closed_-1", "ub_open_-1", "ub_none", "ub_neg_inf", "ub_inf"],
 )
 def test_should_raise_out_of_bounds_error(
     actual: float,
     variable_name: str | None,
-    lower_bound: Bound | None,
-    upper_bound: Bound | None,
+    lower_bound: _Bound | None,
+    upper_bound: _Bound | None,
     match_lower: str,
     match_upper: str,
 ) -> None:
@@ -92,18 +92,18 @@ def test_should_raise_out_of_bounds_error(
 @pytest.mark.parametrize(
     ("value", "expected_value", "bound", "lower_bound"),
     [
-        (2, True, ClosedBound(2), False),
-        (2, True, ClosedBound(2), True),
-        (2, True, ClosedBound(3), False),
-        (2, True, ClosedBound(1), True),
-        (2, False, OpenBound(2), False),
-        (2, False, OpenBound(2), True),
-        (2, False, OpenBound(1), False),
-        (2, False, OpenBound(3), True),
-        (2, False, OpenBound(float("inf")), True),
-        (2, True, OpenBound(float("inf")), False),
-        (2, True, OpenBound(float("-inf")), True),
-        (2, False, OpenBound(float("-inf")), False),
+        (2, True, _ClosedBound(2), False),
+        (2, True, _ClosedBound(2), True),
+        (2, True, _ClosedBound(3), False),
+        (2, True, _ClosedBound(1), True),
+        (2, False, _OpenBound(2), False),
+        (2, False, _OpenBound(2), True),
+        (2, False, _OpenBound(1), False),
+        (2, False, _OpenBound(3), True),
+        (2, False, _OpenBound(float("inf")), True),
+        (2, True, _OpenBound(float("inf")), False),
+        (2, True, _OpenBound(float("-inf")), True),
+        (2, False, _OpenBound(float("-inf")), False),
     ],
     ids=[
         "ex_false-close_2-upper",
@@ -123,7 +123,7 @@ def test_should_raise_out_of_bounds_error(
 def test_should_return_true_if_value_in_bounds(
     value: float,
     expected_value: bool,
-    bound: Bound,
+    bound: _Bound,
     lower_bound: bool,
 ) -> None:
     if lower_bound:
@@ -136,12 +136,12 @@ def test_should_return_true_if_value_in_bounds(
 def test_should_raise_value_error(value: float) -> None:
     if isnan(value):
         with pytest.raises(ValueError, match="Bound must be a real number, not nan."):
-            ClosedBound(value)
+            _ClosedBound(value)
         with pytest.raises(ValueError, match="Bound must be a real number, not nan."):
-            OpenBound(value)
+            _OpenBound(value)
     else:
         with pytest.raises(ValueError, match=r"ClosedBound must be a real number, not \+\/\-inf\."):
-            ClosedBound(value)
+            _ClosedBound(value)
 
 
 @pytest.mark.parametrize("actual", [float("nan"), float("-inf"), float("inf")], ids=["nan", "neg_inf", "inf"])
@@ -150,4 +150,4 @@ def test_should_raise_value_error_because_invalid_actual(actual: float) -> None:
         ValueError,
         match="Attempting to raise OutOfBoundsError with actual value not being a real number.",
     ):
-        raise OutOfBoundsError(actual, lower_bound=ClosedBound(-1), upper_bound=ClosedBound(1))
+        raise OutOfBoundsError(actual, lower_bound=_ClosedBound(-1), upper_bound=_ClosedBound(1))

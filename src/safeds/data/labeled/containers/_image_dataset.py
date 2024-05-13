@@ -15,7 +15,7 @@ from safeds.data.image.typing import ImageSize
 from safeds.data.tabular.containers import Column, Table
 from safeds.data.tabular.transformation import OneHotEncoder
 from safeds.exceptions import (
-    ClosedBound,
+    _ClosedBound,
     IndexOutOfBoundsError,
     NonNumericColumnError,
     OutOfBoundsError,
@@ -231,7 +231,7 @@ class ImageDataset(Generic[T]):
         if batch_size is None:
             batch_size = self._batch_size
         if batch_size < 1:
-            raise OutOfBoundsError(batch_size, name="batch_size", lower_bound=ClosedBound(1))
+            raise OutOfBoundsError(batch_size, name="batch_size", lower_bound=_ClosedBound(1))
         if batch_number < 0 or batch_size * batch_number >= len(self._input):
             raise IndexOutOfBoundsError(batch_size * batch_number)
         max_index = (

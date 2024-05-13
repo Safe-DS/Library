@@ -3,9 +3,13 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 
 
-class OutOfBoundsError(ValueError):
+class OutOfBoundsError(ValueError, ABC):
+    """A value is outside its expected range."""
+
+
+class _OutOfBoundsError(ValueError):
     """
-    A generic exception that can be used to signal that a (float) value is outside its expected range.
+    A value is outside its expected range.
 
     Parameters
     ----------
@@ -24,8 +28,8 @@ class OutOfBoundsError(ValueError):
         actual: float,
         *,
         name: str | None = None,
-        lower_bound: Bound | None = None,
-        upper_bound: Bound | None = None,
+        lower_bound: _Bound | None = None,
+        upper_bound: _Bound | None = None,
     ):
         """
         Initialize an OutOfBoundsError.
@@ -63,8 +67,8 @@ class OutOfBoundsError(ValueError):
         if isinf(actual) or isnan(actual):
             raise ValueError("Attempting to raise OutOfBoundsError with actual value not being a real number.")
         # Use local variables with stricter types to help static analysis:
-        _lower_bound: Bound = lower_bound if lower_bound is not None else OpenBound(float("-inf"))
-        _upper_bound: Bound = upper_bound if upper_bound is not None else OpenBound(float("inf"))
+        _lower_bound: _Bound = lower_bound if lower_bound is not None else _OpenBound(float("-inf"))
+        _upper_bound: _Bound = upper_bound if upper_bound is not None else _OpenBound(float("inf"))
         # Check bounds:
         if _upper_bound.value < _lower_bound.value:
             raise ValueError(
@@ -88,7 +92,7 @@ class OutOfBoundsError(ValueError):
         )
 
 
-class Bound(ABC):
+class _Bound(ABC):
     """
     Abstract base class for (lower or upper) Bounds on a float value.
 
@@ -158,7 +162,7 @@ class Bound(ABC):
         """
 
 
-class ClosedBound(Bound):
+class _ClosedBound(_Bound):
     """
     A closed Bound, i.e. the value on the border belongs to the range.
 
@@ -217,7 +221,7 @@ class ClosedBound(Bound):
         return actual <= self.value
 
 
-class OpenBound(Bound):
+class _OpenBound(_Bound):
     """
     An open Bound, i.e. the value on the border does not belong to the range.
 

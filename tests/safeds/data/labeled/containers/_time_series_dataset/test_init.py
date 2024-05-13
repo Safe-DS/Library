@@ -1,14 +1,14 @@
 import pytest
 from safeds.data.labeled.containers import TimeSeriesDataset
 from safeds.data.tabular.containers import Table
-from safeds.exceptions import UnknownColumnNameError
+from safeds.exceptions import ColumnNotFoundError
 
 
 @pytest.mark.parametrize(
     ("data", "target_name", "time_name", "extra_names", "error", "error_msg"),
     [
         (
-            {
+                {
                 "A": [1, 4],
                 "B": [2, 5],
                 "C": [3, 6],
@@ -17,12 +17,12 @@ from safeds.exceptions import UnknownColumnNameError
             },
             "T",
             "time",
-            ["D", "E"],
-            UnknownColumnNameError,
+                ["D", "E"],
+                ColumnNotFoundError,
             r"Could not find column\(s\) 'D, E'",
         ),
         (
-            {
+                {
                 "A": [1, 4],
                 "B": [2, 5],
                 "C": [3, 6],
@@ -31,8 +31,8 @@ from safeds.exceptions import UnknownColumnNameError
             },
             "D",
             "time",
-            [],
-            UnknownColumnNameError,
+                [],
+                ColumnNotFoundError,
             r"Could not find column\(s\) 'D'",
         ),
         (
@@ -64,7 +64,7 @@ from safeds.exceptions import UnknownColumnNameError
             r"Column 'time' cannot be both time and extra.",
         ),
         (
-            Table(
+                Table(
                 {
                     "A": [1, 4],
                     "B": [2, 5],
@@ -75,12 +75,12 @@ from safeds.exceptions import UnknownColumnNameError
             ),
             "T",
             "time",
-            ["D", "E"],
-            UnknownColumnNameError,
+                ["D", "E"],
+                ColumnNotFoundError,
             r"Could not find column\(s\) 'D, E'",
         ),
         (
-            Table(
+                Table(
                 {
                     "A": [1, 4],
                     "B": [2, 5],
@@ -91,8 +91,8 @@ from safeds.exceptions import UnknownColumnNameError
             ),
             "D",
             "time",
-            [],
-            UnknownColumnNameError,
+                [],
+                ColumnNotFoundError,
             r"Could not find column\(s\) 'D'",
         ),
         (

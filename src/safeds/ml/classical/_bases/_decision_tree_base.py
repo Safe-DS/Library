@@ -3,7 +3,7 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 
 from safeds._utils import _structural_hash
-from safeds.exceptions import ClosedBound, OutOfBoundsError
+from safeds.exceptions import _ClosedBound, OutOfBoundsError
 
 
 class _DecisionTreeBase(ABC):
@@ -20,12 +20,12 @@ class _DecisionTreeBase(ABC):
     ) -> None:
         # Validation
         if maximum_depth is not None and maximum_depth < 1:
-            raise OutOfBoundsError(maximum_depth, name="maximum_depth", lower_bound=ClosedBound(1))
+            raise OutOfBoundsError(maximum_depth, name="maximum_depth", lower_bound=_ClosedBound(1))
         if minimum_number_of_samples_in_leaves < 1:
             raise OutOfBoundsError(
                 minimum_number_of_samples_in_leaves,
                 name="minimum_number_of_samples_in_leaves",
-                lower_bound=ClosedBound(1),
+                lower_bound=_ClosedBound(1),
             )
 
         # Hyperparameters

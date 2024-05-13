@@ -4,7 +4,7 @@ import sys
 from typing import TYPE_CHECKING
 
 from safeds._utils import _structural_hash
-from safeds.exceptions import ClosedBound, OutOfBoundsError
+from safeds.exceptions import _ClosedBound, OutOfBoundsError
 
 if TYPE_CHECKING:
     from safeds.data.image.containers import Image
@@ -33,11 +33,11 @@ class ImageSize:
 
     def __init__(self, width: int, height: int, channel: int, *, _ignore_invalid_channel: bool = False) -> None:
         if width < 1 or height < 1:
-            raise OutOfBoundsError(min(width, height), lower_bound=ClosedBound(1))
+            raise OutOfBoundsError(min(width, height), lower_bound=_ClosedBound(1))
         elif not _ignore_invalid_channel and channel not in (1, 3, 4):
             raise ValueError(f"Channel {channel} is not a valid channel option. Use either 1, 3 or 4")
         elif channel < 1:
-            raise OutOfBoundsError(channel, name="channel", lower_bound=ClosedBound(1))
+            raise OutOfBoundsError(channel, name="channel", lower_bound=_ClosedBound(1))
         self._width = width
         self._height = height
         self._channel = channel

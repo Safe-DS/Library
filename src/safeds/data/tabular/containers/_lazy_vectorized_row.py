@@ -2,7 +2,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from safeds.exceptions import UnknownColumnNameError
+from safeds._validation import _check_columns_exist
+from safeds.exceptions import ColumnNotFoundError
 
 from ._lazy_cell import _LazyCell
 from ._row import Row
@@ -67,8 +68,7 @@ class _LazyVectorizedRow(Row):
     def get_value(self, name: str) -> _LazyCell:
         import polars as pl
 
-        if not self._table.has_column(name):
-            raise UnknownColumnNameError([name])
+        _check_columns_exist(self._table, name)
 
         return _LazyCell(pl.col(name))
 

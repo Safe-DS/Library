@@ -12,7 +12,7 @@ from typing import TYPE_CHECKING, Literal, overload
 from safeds._config import _init_default_device
 from safeds._utils import _get_random_seed
 from safeds.data.image.containers._image import Image
-from safeds.exceptions import OutOfBoundsError, ClosedBound
+from safeds.exceptions import OutOfBoundsError, _ClosedBound
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
@@ -185,7 +185,7 @@ class ImageList(metaclass=ABCMeta):
 
         if load_percentage < 0 or load_percentage > 1:
             raise OutOfBoundsError(
-                load_percentage, name="load_percentage", lower_bound=ClosedBound(0), upper_bound=ClosedBound(1)
+                load_percentage, name="load_percentage", lower_bound=_ClosedBound(0), upper_bound=_ClosedBound(1)
             )
 
         if isinstance(path, list) and len(path) == 0:

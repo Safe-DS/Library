@@ -5,7 +5,8 @@ from typing import TYPE_CHECKING
 import apipkg
 
 if TYPE_CHECKING:
-    from safeds.exceptions._data import (
+    from ._column_not_found_error import ColumnNotFoundError
+    from ._data import (
         ColumnLengthMismatchError,
         ColumnSizeError,
         DuplicateColumnNameError,
@@ -16,17 +17,13 @@ if TYPE_CHECKING:
         NonNumericColumnError,
         OutputLengthMismatchError,
         TransformerNotFittedError,
-        UnknownColumnNameError,
         ValueNotPresentWhenFittedError,
         WrongFileExtensionError,
     )
-    from safeds.exceptions._generic import (
-        Bound,
-        ClosedBound,
-        OpenBound,
+    from ._generic import (
         OutOfBoundsError,
     )
-    from safeds.exceptions._ml import (
+    from ._ml import (
         DatasetMissesDataError,
         DatasetMissesFeaturesError,
         FeatureDataMismatchError,
@@ -41,6 +38,7 @@ if TYPE_CHECKING:
 apipkg.initpkg(
     __name__,
     {
+        "ColumnNotFoundError": "._column_not_found_error:ColumnNotFoundError",
         # Generic exceptions
         "OutOfBoundsError": "._generic:OutOfBoundsError",
         # Data exceptions
@@ -57,7 +55,6 @@ apipkg.initpkg(
         "NonNumericColumnError": "._data:NonNumericColumnError",
         "OutputLengthMismatchError": "._data:OutputLengthMismatchError",
         "TransformerNotFittedError": "._data:TransformerNotFittedError",
-        "UnknownColumnNameError": "._data:UnknownColumnNameError",
         "ValueNotPresentWhenFittedError": "._data:ValueNotPresentWhenFittedError",
         "WrongFileExtensionError": "._data:WrongFileExtensionError",
         # ML exceptions
@@ -78,6 +75,7 @@ apipkg.initpkg(
 )
 
 __all__ = [
+    "ColumnNotFoundError",
     # Generic exceptions
     "OutOfBoundsError",
     # Data exceptions
@@ -91,7 +89,7 @@ __all__ = [
     "NonNumericColumnError",
     "OutputLengthMismatchError",
     "TransformerNotFittedError",
-    "UnknownColumnNameError",
+    "ColumnNotFoundError",
     "ValueNotPresentWhenFittedError",
     "WrongFileExtensionError",
     # ML exceptions
@@ -104,8 +102,4 @@ __all__ = [
     "ModelNotFittedError",
     "PlainTableError",
     "PredictionError",
-    # Other
-    "Bound",
-    "ClosedBound",
-    "OpenBound",
 ]

@@ -4,11 +4,11 @@ import warnings
 from collections import Counter
 from typing import Any
 
+from safeds._validation import _check_columns_exist
 from safeds.data.tabular.containers import Column, Table
 from safeds.exceptions import (
     NonNumericColumnError,
     TransformerNotFittedError,
-    UnknownColumnNameError,
     ValueNotPresentWhenFittedError,
 )
 
@@ -106,9 +106,7 @@ class OneHotEncoder(InvertibleTableTransformer):
         if column_names is None:
             column_names = table.column_names
         else:
-            missing_columns = sorted(set(column_names) - set(table.column_names))
-            if len(missing_columns) > 0:
-                raise UnknownColumnNameError(missing_columns)
+            _check_columns_exist(table, column_names)
 
         if table.number_of_rows == 0:
             raise ValueError("The OneHotEncoder cannot be fitted because the table contains 0 rows")
@@ -186,9 +184,7 @@ class OneHotEncoder(InvertibleTableTransformer):
             raise TransformerNotFittedError
 
         # Input table does not contain all columns used to fit the transformer
-        missing_columns = sorted(set(self._column_names.keys()) - set(table.column_names))
-        if len(missing_columns) > 0:
-            raise UnknownColumnNameError(missing_columns)
+        _check_columns_exist(table, list(self._column_names.keys()))
 
         if table.number_of_rows == 0:
             raise ValueError("The LabelEncoder cannot transform the table because it contains 0 rows")
@@ -269,9 +265,7 @@ class OneHotEncoder(InvertibleTableTransformer):
 
         _transformed_column_names = [item for sublist in self._column_names.values() for item in sublist]
 
-        missing_columns = sorted(set(_transformed_column_names) - set(transformed_table.column_names))
-        if len(missing_columns) > 0:
-            raise UnknownColumnNameError(missing_columns)
+        _check_columns_exist(transformed_table, _transformed_column_names)
 
         if transformed_table.number_of_rows == 0:
             raise ValueError("The OneHotEncoder cannot inverse transform the table because it contains 0 rows")

@@ -1,6 +1,6 @@
 import pytest
 from safeds.data.tabular.containers import Table
-from safeds.exceptions import UnknownColumnNameError
+from safeds.exceptions import ColumnNotFoundError
 
 
 @pytest.mark.parametrize(
@@ -35,5 +35,5 @@ def test_should_transform_column(table: Table, table_transformed: Table) -> None
     ids=["column not found", "empty"],
 )
 def test_should_raise_if_column_not_found(table: Table) -> None:
-    with pytest.raises(UnknownColumnNameError, match=r"Could not find column\(s\) 'D'"):
+    with pytest.raises(ColumnNotFoundError, match=r"Could not find column\(s\) 'D'"):
         table.transform_column("D", lambda cell: cell * 2)
