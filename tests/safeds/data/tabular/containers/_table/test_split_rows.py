@@ -52,6 +52,7 @@ def test_should_split_table(
 )
 def test_should_raise_if_value_not_in_range(percentage_in_first: float, error_msg: str) -> None:
     from safeds.exceptions import OutOfBoundsError
+
     table = Table({"col1": [1, 2, 1], "col2": [1, 2, 4]})
     with pytest.raises(OutOfBoundsError, match=error_msg):
         table.split_rows(percentage_in_first)
