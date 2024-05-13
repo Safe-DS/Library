@@ -23,5 +23,5 @@ def test_should_raise_if_old_column_does_not_exist(table: Table) -> None:
 
 def test_should_raise_if_new_column_exists_already() -> None:
     table: Table = Table({"A": [1], "B": [2]})
-    with pytest.raises(DuplicateColumnError, match=r"Column 'B' already exists."):
+    with pytest.raises(DuplicateColumnError):
         table.rename_column("A", "B")

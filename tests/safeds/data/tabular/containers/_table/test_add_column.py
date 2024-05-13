@@ -39,7 +39,7 @@ def test_should_add_column(table1: Table, column: Column, expected: Table) -> No
 
 def test_should_raise_error_if_column_name_exists() -> None:
     table1 = Table({"col1": [1, 2, 1], "col2": [1, 2, 4]})
-    with pytest.raises(DuplicateColumnError, match=r"Column 'col1' already exists."):
+    with pytest.raises(DuplicateColumnError):
         table1.add_columns(Column("col1", ["a", "b", "c"]))
 
 

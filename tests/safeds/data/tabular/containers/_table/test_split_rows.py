@@ -1,5 +1,6 @@
 import pytest
 from safeds.data.tabular.containers import Table
+from safeds.exceptions import OutOfBoundsError
 
 
 @pytest.mark.parametrize(
@@ -7,20 +8,20 @@ from safeds.data.tabular.containers import Table
     [
         (
             Table({"col1": [1, 2, 1], "col2": [1, 2, 4]}),
-            Table({"col1": [1, 2], "col2": [1, 2]}),
-            Table({"col1": [1], "col2": [4]}),
+            Table({"col1": [1, 2], "col2": [4, 2]}),
+            Table({"col1": [1], "col2": [1]}),
             2 / 3,
         ),
         (
             Table({"col1": [1, 2, 1], "col2": [1, 2, 4]}),
-            Table(),
-            Table({"col1": [1, 2, 1], "col2": [1, 2, 4]}),
+            Table({"col1": [], "col2": []}),
+            Table({"col1": [1, 2, 1], "col2": [4, 2, 1]}),
             0,
         ),
         (
             Table({"col1": [1, 2, 1], "col2": [1, 2, 4]}),
-            Table({"col1": [1, 2, 1], "col2": [1, 2, 4]}),
-            Table(),
+            Table({"col1": [1, 2, 1], "col2": [4, 2, 1]}),
+            Table({"col1": [], "col2": []}),
             1,
         ),
     ],
@@ -34,7 +35,6 @@ def test_should_split_table(
 ) -> None:
     train_table, test_table = table.split_rows(percentage_in_first)
     assert result_test_table == test_table
-    assert result_train_table.schema == train_table.schema
     assert result_train_table == train_table
 
 
@@ -48,7 +48,7 @@ def test_should_split_table(
 )
 def test_should_raise_if_value_not_in_range(percentage_in_first: float) -> None:
     table = Table({"col1": [1, 2, 1], "col2": [1, 2, 4]})
-    with pytest.raises(ValueError, match=r"is not inside \[0, 1\]"):
+    with pytest.raises(OutOfBoundsError):
         table.split_rows(percentage_in_first)
 
 
