@@ -239,7 +239,6 @@ class NeuralNetworkRegressor(Generic[IFT, IPT, OT]):
         predictions = []
         with torch.no_grad():
             for x in dataloader:
-                print(x.type())
                 elem = self._model(x)
                 predictions.append(elem.squeeze(dim=1))
         return self._output_conversion._data_conversion(
