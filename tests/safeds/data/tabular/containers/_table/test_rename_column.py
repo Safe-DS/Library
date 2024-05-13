@@ -1,6 +1,6 @@
 import pytest
 from safeds.data.tabular.containers import Table
-from safeds.exceptions import DuplicateColumnError, ColumnNotFoundError
+from safeds.exceptions import ColumnNotFoundError, DuplicateColumnError
 
 
 @pytest.mark.parametrize(
