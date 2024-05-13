@@ -1391,7 +1391,7 @@ class Table:
         self,
         percentage_in_first: float,
         *,
-        shuffle: bool = False,
+        shuffle: bool = True,
     ) -> tuple[Table, Table]:
         """
         Create two tables by splitting the rows of the current table.
