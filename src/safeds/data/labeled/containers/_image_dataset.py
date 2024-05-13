@@ -294,7 +294,10 @@ class _TableAsTensor:
         _init_default_device()
 
         self._column_names = table.column_names
-        self._tensor = torch.Tensor(table._data_frame.to_torch()).to(_get_device())
+        if table.number_of_rows == 0:
+            self._tensor = torch.empty((0, table.number_of_columns), dtype=torch.float32).to(_get_device())
+        else:
+            self._tensor = table._data_frame.to_torch().to(_get_device())
 
         if not torch.all(self._tensor.sum(dim=1) == torch.ones(self._tensor.size(dim=0))):
             raise ValueError(
