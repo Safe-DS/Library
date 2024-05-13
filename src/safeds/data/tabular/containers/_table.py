@@ -359,7 +359,7 @@ class Table:
             try:
                 self.__data_frame_cache = self._lazy_frame.collect()
             except (pl.NoDataError, pl.PolarsPanicError):
-                # Can happen for some operations on empty tables
+                # Can happen for some operations on empty tables (e.g. https://github.com/pola-rs/polars/issues/16202)
                 return pl.DataFrame()
 
         return self.__data_frame_cache
@@ -395,7 +395,7 @@ class Table:
         try:
             return self._lazy_frame.width
         except (pl.NoDataError, pl.PolarsPanicError):
-            # Can happen for some operations on empty tables
+            # Can happen for some operations on empty tables (e.g. https://github.com/pola-rs/polars/issues/16202)
             return 0
 
     @property
@@ -427,7 +427,7 @@ class Table:
         try:
             return _PolarsSchema(self._lazy_frame.schema)
         except (pl.NoDataError, pl.PolarsPanicError):
-            # Can happen for some operations on empty tables
+            # Can happen for some operations on empty tables (e.g. https://github.com/pola-rs/polars/issues/16202)
             return _PolarsSchema({})
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -943,7 +943,7 @@ class Table:
             self._lazy_frame.select(
                 *[pl.col(name) for name in self.column_names[:index]],
                 *[column._series for column in new_columns],
-                *[pl.col(name) for name in self.column_names[index + 1 :]],
+                *[pl.col(name) for name in self.column_names[index + 1:]],
             ),
         )
 
@@ -1280,12 +1280,18 @@ class Table:
         start:
             The start index of the slice.
         length:
-            The length of the slice. If None, the slice contains all rows starting from `start`.
+            The length of the slice. If None, the slice contains all rows starting from `start`. Must greater than or
+            equal to 0.
 
         Returns
         -------
         new_table:
             The table with the slice of rows.
+
+        Raises
+        ------
+        OutOfBoundsError
+            If length is less than 0.
 
         Examples
         --------
@@ -1310,6 +1316,8 @@ class Table:
         |   2 |   5 |
         +-----+-----+
         """
+        _check_bounds("length", length, lower_bound=_ClosedBound(0))
+
         return Table._from_polars_lazy_frame(
             self._lazy_frame.slice(start, length),
         )
