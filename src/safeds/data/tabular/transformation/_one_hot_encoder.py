@@ -4,6 +4,7 @@ import warnings
 from collections import Counter
 from typing import Any
 
+from safeds._utils import _structural_hash
 from safeds._validation import _check_columns_exist
 from safeds.data.tabular.containers import Column, Table
 from safeds.exceptions import (
@@ -61,7 +62,7 @@ class OneHotEncoder(InvertibleTableTransformer):
     # ------------------------------------------------------------------------------------------------------------------
 
     def __init__(self) -> None:
-        super().__init__()
+        InvertibleTableTransformer.__init__(self)
 
         # Maps each old column to (list of) new columns created from it:
         self._column_map: dict[str, list[str]] | None = None
@@ -80,7 +81,12 @@ class OneHotEncoder(InvertibleTableTransformer):
         )
 
     def __hash__(self) -> int:
-        return super().__hash__()
+        return _structural_hash(
+            InvertibleTableTransformer.__hash__(self),
+            self._column_map,
+            self._value_to_column,
+            self._value_to_column_nans,
+        )
 
     # ------------------------------------------------------------------------------------------------------------------
     # Learning and transformation
