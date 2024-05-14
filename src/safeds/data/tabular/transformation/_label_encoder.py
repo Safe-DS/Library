@@ -137,7 +137,7 @@ class LabelEncoder(InvertibleTableTransformer):
         import polars as pl
 
         # Used in favor of is_fitted, so the type checker is happy
-        if self._mapping is None:
+        if self._column_names is None or self._mapping is None:
             raise TransformerNotFittedError
 
         _check_columns_exist(table, self._column_names)
@@ -179,7 +179,7 @@ class LabelEncoder(InvertibleTableTransformer):
         import polars as pl
 
         # Used in favor of is_fitted, so the type checker is happy
-        if self._inverse_mapping is None:
+        if self._column_names is None or self._inverse_mapping is None:
             raise TransformerNotFittedError
 
         _check_columns_exist(transformed_table, self._column_names)
