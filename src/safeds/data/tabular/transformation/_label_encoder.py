@@ -21,9 +21,16 @@ class LabelEncoder(InvertibleTableTransformer):
     # ------------------------------------------------------------------------------------------------------------------
 
     def __init__(self) -> None:
-        super().__init__()
+        InvertibleTableTransformer.__init__(self)
 
         self._wrapped_transformer: sk_OrdinalEncoder | None = None
+
+    def __hash__(self) -> int:
+        return super().__hash__()
+
+    # ------------------------------------------------------------------------------------------------------------------
+    # Learning and transformation
+    # ------------------------------------------------------------------------------------------------------------------
 
     def fit(self, table: Table, column_names: list[str] | None) -> LabelEncoder:
         """

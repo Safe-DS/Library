@@ -95,8 +95,8 @@ class SimpleImputer(TableTransformer):
     # Dunder methods
     # ------------------------------------------------------------------------------------------------------------------
 
-    def __init__(self, strategy: SimpleImputer.Strategy, *, value_to_replace: float | str | None = None):
-        super().__init__()
+    def __init__(self, strategy: SimpleImputer.Strategy, *, value_to_replace: float | str | None = None) -> None:
+        TableTransformer.__init__(self)
 
         if value_to_replace is None:
             value_to_replace = pd.NA
@@ -105,6 +105,13 @@ class SimpleImputer(TableTransformer):
         self._value_to_replace = value_to_replace
 
         self._wrapped_transformer: sk_SimpleImputer | None = None
+
+    def __hash__(self) -> int:
+        return _structural_hash(
+            SimpleImputer.__hash__(self),
+            self._strategy,
+            self._value_to_replace,
+        )
 
     # ------------------------------------------------------------------------------------------------------------------
     # Properties

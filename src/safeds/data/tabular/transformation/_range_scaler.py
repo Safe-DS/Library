@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from safeds._utils import _structural_hash
 from safeds._validation import _check_columns_exist
 from safeds.data.tabular.containers import Table
 from safeds.exceptions import NonNumericColumnError, TransformerNotFittedError
@@ -28,14 +29,39 @@ class RangeScaler(InvertibleTableTransformer):
     # Dunder methods
     # ------------------------------------------------------------------------------------------------------------------
 
-    def __init__(self, min_: float = 0.0, max_: float = 1.0):
-        super().__init__()
+    def __init__(self, min_: float = 0.0, max_: float = 1.0) -> None:
+        InvertibleTableTransformer.__init__(self)
 
         if min_ >= max_:
-            raise ValueError('Parameter "max_" must be greate than parameter "min_".')
+            raise ValueError('Parameter "max_" must be greater than parameter "min_".')
 
-        self._minimum = min_
-        self._maximum = max_
+        self._min = min_
+        self._max = max_
+
+    def __hash__(self) -> int:
+        return _structural_hash(
+            InvertibleTableTransformer.__hash__(self),
+            self._min,
+            self._max,
+        )
+
+    # ------------------------------------------------------------------------------------------------------------------
+    # Properties
+    # ------------------------------------------------------------------------------------------------------------------
+
+    @property
+    def min(self) -> float:
+        """The minimum of the new range after the transformation."""
+        return self._min
+
+    @property
+    def max(self) -> float:
+        """The maximum of the new range after the transformation."""
+        return self._max
+
+    # ------------------------------------------------------------------------------------------------------------------
+    # Learning and transformation
+    # ------------------------------------------------------------------------------------------------------------------
 
     def fit(self, table: Table, column_names: list[str] | None) -> RangeScaler:
         """
@@ -89,7 +115,7 @@ class RangeScaler(InvertibleTableTransformer):
                 ),
             )
 
-        wrapped_transformer = sk_MinMaxScaler((self._minimum, self._maximum))
+        wrapped_transformer = sk_MinMaxScaler((self._min, self._max))
         wrapped_transformer.set_output(transform="polars")
         wrapped_transformer.fit(
             table.remove_columns_except(column_names)._data_frame,

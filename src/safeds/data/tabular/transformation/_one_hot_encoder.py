@@ -70,9 +70,6 @@ class OneHotEncoder(InvertibleTableTransformer):
         # Maps nan values (str of old column) to corresponding new column name
         self._value_to_column_nans: dict[str, str] | None = None
 
-    def __hash__(self) -> int:
-        return super().__hash__()
-
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, OneHotEncoder):
             return NotImplemented
@@ -81,6 +78,13 @@ class OneHotEncoder(InvertibleTableTransformer):
             and self._value_to_column == other._value_to_column
             and self._value_to_column_nans == other._value_to_column_nans
         )
+
+    def __hash__(self) -> int:
+        return super().__hash__()
+
+    # ------------------------------------------------------------------------------------------------------------------
+    # Learning and transformation
+    # ------------------------------------------------------------------------------------------------------------------
 
     def fit(self, table: Table, column_names: list[str] | None) -> OneHotEncoder:
         """

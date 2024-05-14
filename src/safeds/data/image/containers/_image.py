@@ -78,6 +78,9 @@ class Image:
         """
         from torchvision.io import read_image
 
+        if isinstance(path, str):
+            path = Path(path)
+
         _init_default_device()
 
         if not path.is_file():

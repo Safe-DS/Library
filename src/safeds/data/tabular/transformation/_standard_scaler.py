@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from safeds._utils import _structural_hash
 from safeds._validation import _check_columns_exist
 from safeds.data.tabular.containers import Table
 from safeds.exceptions import NonNumericColumnError, TransformerNotFittedError
@@ -15,11 +16,23 @@ if TYPE_CHECKING:
 class StandardScaler(InvertibleTableTransformer):
     """The StandardScaler transforms column values to a range by removing the mean and scaling to unit variance."""
 
-    def __init__(self) -> None:
-        super().__init__()
+    # ------------------------------------------------------------------------------------------------------------------
+    # Dunder methods
+    # ------------------------------------------------------------------------------------------------------------------
 
-        self._column_names: list[str] | None = None
+    def __init__(self) -> None:
+        InvertibleTableTransformer.__init__(self)
+
         self._wrapped_transformer: sk_StandardScaler | None = None
+
+    def __hash__(self) -> int:
+        return _structural_hash(
+            InvertibleTableTransformer.__hash__(self),
+        )
+
+    # ------------------------------------------------------------------------------------------------------------------
+    # Learning and transformation
+    # ------------------------------------------------------------------------------------------------------------------
 
     def fit(self, table: Table, column_names: list[str] | None) -> StandardScaler:
         """

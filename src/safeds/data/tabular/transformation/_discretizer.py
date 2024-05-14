@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from safeds._utils import _structural_hash
 from safeds._validation import _check_bounds, _check_columns_exist, _ClosedBound
 from safeds.data.tabular.containers import Table
 from safeds.exceptions import (
@@ -34,13 +35,19 @@ class Discretizer(TableTransformer):
     # Dunder methods
     # ------------------------------------------------------------------------------------------------------------------
 
-    def __init__(self, number_of_bins: int = 5):
-        super().__init__()
+    def __init__(self, number_of_bins: int = 5) -> None:
+        TableTransformer.__init__(self)
 
         _check_bounds("number_of_bins", number_of_bins, lower_bound=_ClosedBound(2))
 
         self._wrapped_transformer: sk_KBinsDiscretizer | None = None
         self._number_of_bins = number_of_bins
+
+    def __hash__(self) -> int:
+        return _structural_hash(
+            TableTransformer.__hash__(self),
+            self._number_of_bins,
+        )
 
     # ------------------------------------------------------------------------------------------------------------------
     # Properties
@@ -49,6 +56,10 @@ class Discretizer(TableTransformer):
     @property
     def number_of_bins(self) -> int:
         return self._number_of_bins
+
+    # ------------------------------------------------------------------------------------------------------------------
+    # Learning and transformation
+    # ------------------------------------------------------------------------------------------------------------------
 
     def fit(self, table: Table, column_names: list[str] | None) -> Discretizer:
         """

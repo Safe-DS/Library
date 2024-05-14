@@ -357,6 +357,8 @@ class _ColumnAsTensor:
                 message=rf"The columns \['{self._column_name}'\] contain numerical data. The OneHotEncoder is designed to encode non-numerical values into numerical values",
                 category=UserWarning,
             )
+            # TODO: should not one-hot-encode the target. label encoding without order is sufficient. should also not
+            #  be done automatically?
             self._one_hot_encoder = OneHotEncoder().fit(column_as_table, [self._column_name])
         self._tensor = torch.Tensor(self._one_hot_encoder.transform(column_as_table)._data_frame.to_torch()).to(
             _get_device(),
