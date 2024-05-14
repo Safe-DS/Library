@@ -78,7 +78,7 @@ omit = [
 ]
 
 [tool.pytest.ini_options]
-addopts = "--snapshot-warn-unused"
+addopts = "--snapshot-warn-unused --tb=short"
 filterwarnings = [
     "ignore:Deprecated call to `pkg_resources.declare_namespace",
     "ignore:Jupyter is migrating its paths to use standard platformdirs"

@@ -34,6 +34,10 @@ class ColumnNotFoundError(SafeDsError):
     """Exception raised when trying to access an invalid column name."""
 
 
+class ColumnTypeError(SafeDsError):
+    """Exception raised when a column has the wrong type."""
+
+
 class FileExtensionError(SafeDsError):
     """Exception raised when a path has the wrong file extension."""
 
@@ -45,6 +49,7 @@ class OutOfBoundsError(SafeDsError):
 __all__ = [
     "SafeDsError",
     "ColumnNotFoundError",
+    "ColumnTypeError",
     "FileExtensionError",
     "OutOfBoundsError",
     # TODO

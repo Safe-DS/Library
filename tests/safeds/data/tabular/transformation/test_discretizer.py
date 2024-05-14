@@ -1,7 +1,7 @@
 import pytest
 from safeds.data.tabular.containers import Table
 from safeds.data.tabular.transformation import Discretizer
-from safeds.exceptions import NonNumericColumnError, OutOfBoundsError, TransformerNotFittedError, ColumnNotFoundError
+from safeds.exceptions import ColumnNotFoundError, NonNumericColumnError, OutOfBoundsError, TransformerNotFittedError
 
 
 class TestInit:
@@ -265,41 +265,3 @@ class TestFitAndTransform:
         )
 
         assert table == expected
-
-    def test_get_names_of_added_columns(self) -> None:
-        transformer = Discretizer()
-        with pytest.raises(TransformerNotFittedError, match=r"The transformer has not been fitted yet."):
-            transformer.get_names_of_added_columns()
-
-        table = Table(
-            {
-                "a": [0.0],
-            },
-        )
-        transformer = transformer.fit(table, None)
-        assert transformer.get_names_of_added_columns() == []
-
-    def test_get_names_of_changed_columns(self) -> None:
-        transformer = Discretizer()
-        with pytest.raises(TransformerNotFittedError, match=r"The transformer has not been fitted yet."):
-            transformer.get_names_of_changed_columns()
-        table = Table(
-            {
-                "a": [0.0],
-            },
-        )
-        transformer = transformer.fit(table, None)
-        assert transformer.get_names_of_changed_columns() == ["a"]
-
-    def test_get_names_of_removed_columns(self) -> None:
-        transformer = Discretizer()
-        with pytest.raises(TransformerNotFittedError, match=r"The transformer has not been fitted yet."):
-            transformer.get_names_of_removed_columns()
-
-        table = Table(
-            {
-                "a": [0.0],
-            },
-        )
-        transformer = transformer.fit(table, None)
-        assert transformer.get_names_of_removed_columns() == []

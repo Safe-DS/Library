@@ -36,7 +36,6 @@ if TYPE_CHECKING:
 
 
 class TestImageToTableClassifier:
-
     @pytest.mark.parametrize(
         ("seed", "device", "prediction_label"),
         [
@@ -104,7 +103,6 @@ class TestImageToTableClassifier:
 
 
 class TestImageToColumnClassifier:
-
     @pytest.mark.parametrize(
         ("seed", "device", "prediction_label"),
         [
@@ -171,7 +169,6 @@ class TestImageToColumnClassifier:
 
 
 class TestImageToImageRegressor:
-
     @pytest.mark.parametrize(
         ("seed", "device"),
         [

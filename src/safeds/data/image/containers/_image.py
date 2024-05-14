@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import io
-import os.path
 import sys
 import warnings
 from pathlib import Path
@@ -79,9 +78,12 @@ class Image:
         """
         from torchvision.io import read_image
 
+        if isinstance(path, str):
+            path = Path(path)
+
         _init_default_device()
 
-        if not os.path.isfile(path):
+        if not path.is_file():
             raise FileNotFoundError(f"No such file or directory: '{path}'")
 
         return Image(image_tensor=read_image(str(path)).to(_get_device()))

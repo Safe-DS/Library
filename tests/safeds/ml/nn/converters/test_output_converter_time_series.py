@@ -38,7 +38,6 @@ def test_output_conversion_time_series_2() -> None:
 
 
 class TestEq:
-
     @pytest.mark.parametrize(
         ("output_conversion_ts1", "output_conversion_ts2"),
         [
@@ -70,7 +69,6 @@ class TestEq:
 
 
 class TestHash:
-
     @pytest.mark.parametrize(
         ("output_conversion_ts1", "output_conversion_ts2"),
         [
@@ -96,7 +94,6 @@ class TestHash:
 
 
 class TestSizeOf:
-
     @pytest.mark.parametrize(
         "output_conversion_ts",
         [

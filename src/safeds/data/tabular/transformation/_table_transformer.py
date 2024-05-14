@@ -16,31 +16,30 @@ class TableTransformer(ABC):
     # Dunder methods
     # ------------------------------------------------------------------------------------------------------------------
 
-    def __hash__(self) -> int:
-        """
-        Return a deterministic hash value for a table transformer.
+    # The decorator is needed so the class really cannot be instantiated
+    @abstractmethod
+    def __init__(self) -> None:
+        self._column_names: list[str] | None = None
 
-        Returns
-        -------
-        hash:
-            The hash value.
-        """
-        added = self.get_names_of_added_columns() if self.is_fitted else []
-        changed = self.get_names_of_changed_columns() if self.is_fitted else []
-        removed = self.get_names_of_removed_columns() if self.is_fitted else []
-        return _structural_hash(self.__class__.__qualname__, self.is_fitted, added, changed, removed)
+    # The decorator ensures that the method is overridden in all subclasses
+    @abstractmethod
+    def __hash__(self) -> int:
+        return _structural_hash(
+            self.__class__.__qualname__,
+            self._column_names,
+        )
 
     # ------------------------------------------------------------------------------------------------------------------
     # Properties
     # ------------------------------------------------------------------------------------------------------------------
 
     @property
-    @abstractmethod
     def is_fitted(self) -> bool:
         """Whether the transformer is fitted."""
+        return self._column_names is not None
 
     # ------------------------------------------------------------------------------------------------------------------
-    # Methods
+    # Learning and transformation
     # ------------------------------------------------------------------------------------------------------------------
 
     @abstractmethod
@@ -86,60 +85,10 @@ class TableTransformer(ABC):
             If the transformer has not been fitted yet.
         """
 
-    # ------------------------------------------------------------------------------------------------------------------
-    # Introspection
-    # ------------------------------------------------------------------------------------------------------------------
-
-    @abstractmethod
-    def get_names_of_added_columns(self) -> list[str]:
-        """
-        Get the names of all new columns that have been added by the transformer.
-
-        Returns
-        -------
-        added_columns:
-            A list of names of the added columns, ordered as they will appear in the table.
-
-        Raises
-        ------
-        TransformerNotFittedError
-            If the transformer has not been fitted yet.
-        """
-
-    @abstractmethod
-    def get_names_of_changed_columns(self) -> list[str]:
-        """
-         Get the names of all columns that have been changed by the transformer.
-
-        Returns
-        -------
-        changed_columns:
-             A list of names of changed columns, ordered as they appear in the table.
-
-        Raises
-        ------
-         TransformerNotFittedError
-             If the transformer has not been fitted yet.
-        """
-
-    @abstractmethod
-    def get_names_of_removed_columns(self) -> list[str]:
-        """
-        Get the names of all columns that have been removed by the transformer.
-
-        Returns
-        -------
-        removed_columns:
-            A list of names of the removed columns, ordered as they appear in the table the transformer was fitted on.
-
-        Raises
-        ------
-        TransformerNotFittedError
-            If the transformer has not been fitted yet.
-        """
-
     def fit_and_transform(
-        self, table: Table, column_names: list[str] | None = None,
+        self,
+        table: Table,
+        column_names: list[str] | None = None,
     ) -> tuple[Self, Table]:
         """
         Learn a transformation for a set of columns in a table and apply the learned transformation to the same table.

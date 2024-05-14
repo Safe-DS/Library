@@ -89,7 +89,7 @@ class ImageDataset(Generic[T], Dataset):
             _output_size: int | ImageSize = output_data.number_of_columns
         elif isinstance(output_data, Column):
             _column_as_tensor = _ColumnAsTensor(output_data)
-            _output_size = len(_column_as_tensor._one_hot_encoder.get_names_of_added_columns())
+            _output_size = len(_column_as_tensor._one_hot_encoder._get_names_of_added_columns())
             _output = _column_as_tensor
         elif isinstance(output_data, _SingleSizeImageList):
             _output = output_data._clone()._as_single_size_image_list()
@@ -289,7 +289,6 @@ class ImageDataset(Generic[T], Dataset):
 
 
 class _TableAsTensor:
-
     def __init__(self, table: Table) -> None:
         import torch
 
@@ -345,7 +344,6 @@ class _TableAsTensor:
 
 
 class _ColumnAsTensor:
-
     def __init__(self, column: Column) -> None:
         import torch
 
@@ -359,6 +357,8 @@ class _ColumnAsTensor:
                 message=rf"The columns \['{self._column_name}'\] contain numerical data. The OneHotEncoder is designed to encode non-numerical values into numerical values",
                 category=UserWarning,
             )
+            # TODO: should not one-hot-encode the target. label encoding without order is sufficient. should also not
+            #  be done automatically?
             self._one_hot_encoder = OneHotEncoder().fit(column_as_table, [self._column_name])
         self._tensor = torch.Tensor(self._one_hot_encoder.transform(column_as_table)._data_frame.to_torch()).to(
             _get_device(),
@@ -394,9 +394,9 @@ class _ColumnAsTensor:
             raise ValueError(f"Tensor has an invalid amount of dimensions. Needed 2 dimensions but got {tensor.dim()}.")
         if not one_hot_encoder.is_fitted:
             raise TransformerNotFittedError
-        if tensor.size(dim=1) != len(one_hot_encoder.get_names_of_added_columns()):
+        if tensor.size(dim=1) != len(one_hot_encoder._get_names_of_added_columns()):
             raise ValueError(
-                f"Tensor and one_hot_encoder have different amounts of classes ({tensor.size(dim=1)}!={len(one_hot_encoder.get_names_of_added_columns())}).",
+                f"Tensor and one_hot_encoder have different amounts of classes ({tensor.size(dim=1)}!={len(one_hot_encoder._get_names_of_added_columns())}).",
             )
         table_as_tensor = _ColumnAsTensor.__new__(_ColumnAsTensor)
         table_as_tensor._tensor = tensor
@@ -406,6 +406,6 @@ class _ColumnAsTensor:
 
     def _to_column(self) -> Column:
         table = Table(
-            dict(zip(self._one_hot_encoder.get_names_of_added_columns(), self._tensor.T.tolist(), strict=False)),
+            dict(zip(self._one_hot_encoder._get_names_of_added_columns(), self._tensor.T.tolist(), strict=False)),
         )
         return self._one_hot_encoder.inverse_transform(table).get_column(self._column_name)

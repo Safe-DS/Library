@@ -109,7 +109,6 @@ class TestFromBytes:
 
 @pytest.mark.parametrize("device", get_devices(), ids=get_devices_ids())
 class TestToNumpyArray:
-
     @pytest.mark.parametrize(
         "resource_path",
         images_all(),
@@ -192,9 +191,12 @@ class TestToJpegFile:
         image = Image.from_file(resolve_resource_path(resource_path))
         with NamedTemporaryFile(suffix=".jpg") as tmp_jpeg_file:
             tmp_jpeg_file.close()
-            with Path(tmp_jpeg_file.name).open("w", encoding="utf-8") as tmp_file, pytest.raises(
-                IllegalFormatError,
-                match=r"This format is illegal. Use one of the following formats: png",
+            with (
+                Path(tmp_jpeg_file.name).open("w", encoding="utf-8") as tmp_file,
+                pytest.raises(
+                    IllegalFormatError,
+                    match=r"This format is illegal. Use one of the following formats: png",
+                ),
             ):
                 image.to_jpeg_file(tmp_file.name)
 
@@ -1025,7 +1027,6 @@ class TestFindEdges:
 
 
 class TestFilterEdgesKernel:
-
     def test_should_kernel_change_device(self) -> None:
         assert Image._filter_edges_kernel().device == _get_device()
         configure_test_with_device(device_cpu)

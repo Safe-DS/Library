@@ -10,9 +10,6 @@ from ._classifier import Classifier
 if TYPE_CHECKING:
     from sklearn.base import ClassifierMixin
 
-    from safeds.data.labeled.containers import TabularDataset
-    from safeds.data.tabular.containers import Table
-
 
 class GradientBoostingClassifier(Classifier, _GradientBoostingBase):
     """

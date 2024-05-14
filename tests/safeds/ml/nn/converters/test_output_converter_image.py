@@ -15,7 +15,6 @@ from safeds.ml.nn.converters._output_converter_image import _OutputConversionIma
 
 
 class TestDataConversionImage:
-
     @pytest.mark.parametrize(
         ("output_conversion", "kwargs"),
         [
@@ -33,7 +32,6 @@ class TestDataConversionImage:
             output_conversion._data_conversion(input_data=_MultiSizeImageList(), output_data=torch.empty(1), **kwargs)
 
     class TestEq:
-
         @pytest.mark.parametrize(
             ("output_conversion_image1", "output_conversion_image2"),
             [
@@ -65,7 +63,6 @@ class TestDataConversionImage:
             assert output_conversion_image_to_column.__eq__(output_conversion_image_to_image) is NotImplemented
 
     class TestHash:
-
         @pytest.mark.parametrize(
             ("output_conversion_image1", "output_conversion_image2"),
             [
@@ -90,7 +87,6 @@ class TestDataConversionImage:
             assert hash(output_conversion_image_to_table) != hash(output_conversion_image_to_column)
 
     class TestSizeOf:
-
         @pytest.mark.parametrize(
             "output_conversion_image",
             [
@@ -107,7 +103,6 @@ class TestDataConversionImage:
 
 
 class TestOutputConversionImageToColumn:
-
     def test_should_raise_if_column_name_not_set(self) -> None:
         with pytest.raises(
             ValueError,
@@ -132,7 +127,6 @@ class TestOutputConversionImageToColumn:
 
 
 class TestOutputConversionImageToTable:
-
     def test_should_raise_if_column_names_not_set(self) -> None:
         with pytest.raises(
             ValueError,

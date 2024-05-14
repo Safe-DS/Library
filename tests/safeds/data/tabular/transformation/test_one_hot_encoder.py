@@ -4,15 +4,14 @@ import pytest
 from safeds.data.tabular.containers import Table
 from safeds.data.tabular.transformation import OneHotEncoder
 from safeds.exceptions import (
+    ColumnNotFoundError,
     NonNumericColumnError,
     TransformerNotFittedError,
-    ColumnNotFoundError,
     ValueNotPresentWhenFittedError,
 )
 
 
 class TestEq:
-
     def test_should_be_not_implemented(self) -> None:
         assert OneHotEncoder().__eq__(Table()) is NotImplemented
 
@@ -310,45 +309,6 @@ class TestFitAndTransform:
         )
 
         assert table == expected
-
-    def test_get_names_of_added_columns(self) -> None:
-        transformer = OneHotEncoder()
-        with pytest.raises(TransformerNotFittedError):
-            transformer.get_names_of_added_columns()
-
-        table = Table(
-            {"a__b": ["c", "d"], "a": ["b__c", "d"], "b": ["a", float("nan")]},
-        )
-        added_columns = ["a__b__c", "a__b__d", "a__b__c#2", "a__d", "b__a", "b__nan"]
-
-        transformer = transformer.fit(table, None)
-        assert transformer.get_names_of_added_columns() == added_columns
-
-    def test_get_names_of_changed_columns(self) -> None:
-        transformer = OneHotEncoder()
-        with pytest.raises(TransformerNotFittedError):
-            transformer.get_names_of_changed_columns()
-
-        table = Table(
-            {
-                "a": ["b"],
-            },
-        )
-        transformer = transformer.fit(table, None)
-        assert transformer.get_names_of_changed_columns() == []
-
-    def test_get_names_of_removed_columns(self) -> None:
-        transformer = OneHotEncoder()
-        with pytest.raises(TransformerNotFittedError):
-            transformer.get_names_of_removed_columns()
-
-        table = Table(
-            {
-                "a": ["b"],
-            },
-        )
-        transformer = transformer.fit(table, None)
-        assert transformer.get_names_of_removed_columns() == ["a"]
 
 
 class TestInverseTransform:

@@ -283,7 +283,6 @@ class ImageList(metaclass=ABCMeta):
             return image_list
 
     class _FromFileThreadPackage:
-
         def __init__(
             self,
             im_files: list[str],
@@ -323,7 +322,6 @@ class ImageList(metaclass=ABCMeta):
             return len(self._im_files)
 
     class _FromImageThread(Thread):
-
         def __init__(self, packages: list[ImageList._FromFileThreadPackage]) -> None:
             super().__init__()
             self._packages = packages

@@ -19,7 +19,6 @@ if TYPE_CHECKING:
 
 
 class _OutputConversionImage(OutputConversion[ImageList, ImageDataset], ABC):
-
     @abstractmethod
     def _data_conversion(self, input_data: ImageList, output_data: Tensor, **kwargs: Any) -> ImageDataset:
         pass  # pragma: no cover
@@ -66,7 +65,6 @@ class _OutputConversionImage(OutputConversion[ImageList, ImageDataset], ABC):
 
 
 class OutputConversionImageToColumn(_OutputConversionImage):
-
     def _data_conversion(self, input_data: ImageList, output_data: Tensor, **kwargs: Any) -> ImageDataset[Column]:
         import torch
 
@@ -85,7 +83,7 @@ class OutputConversionImageToColumn(_OutputConversionImage):
         one_hot_encoder: OneHotEncoder = kwargs["one_hot_encoder"]
         column_name: str = kwargs["column_name"]
 
-        output = torch.zeros(len(input_data), len(one_hot_encoder.get_names_of_added_columns()))
+        output = torch.zeros(len(input_data), len(one_hot_encoder._get_names_of_added_columns()))
         output[torch.arange(len(input_data)), output_data] = 1
 
         im_dataset: ImageDataset[Column] = ImageDataset[Column].__new__(ImageDataset)
@@ -100,7 +98,6 @@ class OutputConversionImageToColumn(_OutputConversionImage):
 
 
 class OutputConversionImageToTable(_OutputConversionImage):
-
     def _data_conversion(self, input_data: ImageList, output_data: Tensor, **kwargs: Any) -> ImageDataset[Table]:
         import torch
 
@@ -133,7 +130,6 @@ class OutputConversionImageToTable(_OutputConversionImage):
 
 
 class OutputConversionImageToImage(_OutputConversionImage):
-
     def _data_conversion(
         self,
         input_data: ImageList,

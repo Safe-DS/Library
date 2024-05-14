@@ -323,7 +323,7 @@ class Table:
 
         # Implementation
         self._lazy_frame: pl.LazyFrame = pl.LazyFrame(data)
-        self.__data_frame_cache: pl.DataFrame | None = None
+        self.__data_frame_cache: pl.DataFrame | None = None  # Scramble the name to prevent access from outside
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, Table):
@@ -1033,6 +1033,9 @@ class Table:
         |   2 |   5 |
         +-----+-----+
         """
+        if self.number_of_columns == 0:
+            return self  # Workaround for https://github.com/pola-rs/polars/issues/16207
+
         return Table._from_polars_lazy_frame(
             self._lazy_frame.unique(maintain_order=True),
         )
@@ -1221,6 +1224,8 @@ class Table:
         | null |   8 |
         +------+-----+
         """
+        if self.number_of_rows == 0:
+            return self  # polars raises a ComputeError for tables without rows
         if column_names is None:
             column_names = self.column_names
 
@@ -1440,7 +1445,10 @@ class Table:
         The first table contains a percentage of the rows specified by `percentage_in_first`, and the second table
         contains the remaining rows.
 
-        **Note:** The original table is not modified.
+        **Notes:**
+
+        - The original table is not modified.
+        - By default, the rows are shuffled before splitting. You can disable this by setting `shuffle` to False.
 
         Parameters
         ----------

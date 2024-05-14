@@ -38,7 +38,6 @@ T = TypeVar("T", Column, Table, ImageList)
 
 @pytest.mark.parametrize("device", get_devices(), ids=get_devices_ids())
 class TestImageDatasetInit:
-
     @pytest.mark.parametrize(
         ("input_data", "output_data", "error", "error_msg"),
         [
@@ -100,7 +99,12 @@ class TestImageDatasetInit:
         ],
     )
     def test_should_raise_with_invalid_data(
-        self, input_data: ImageList, output_data: T, error: type[Exception], error_msg: str, device: Device,
+        self,
+        input_data: ImageList,
+        output_data: T,
+        error: type[Exception],
+        error_msg: str,
+        device: Device,
     ) -> None:
         configure_test_with_device(device)
         with pytest.raises(error, match=error_msg):
@@ -109,7 +113,6 @@ class TestImageDatasetInit:
 
 @pytest.mark.parametrize("device", get_devices(), ids=get_devices_ids())
 class TestLength:
-
     def test_should_return_length(self, device: Device) -> None:
         configure_test_with_device(device)
         image_dataset = ImageDataset(ImageList.from_files(resolve_resource_path(plane_png_path)), Column("images", [1]))
@@ -120,7 +123,6 @@ class TestLength:
 
 @pytest.mark.parametrize("device", get_devices(), ids=get_devices_ids())
 class TestEq:
-
     @pytest.mark.parametrize(
         "image_dataset_output",
         [
@@ -131,8 +133,22 @@ class TestEq:
     )
     def test_should_be_equal(self, image_dataset_output: str | Column | Table, device: Device) -> None:
         configure_test_with_device(device)
-        image_dataset1 = ImageDataset(ImageList.from_files(resolve_resource_path(plane_png_path)), ImageList.from_files(resolve_resource_path(image_dataset_output)) if isinstance(image_dataset_output, str) else image_dataset_output)  # type: ignore[type-var]
-        image_dataset2 = ImageDataset(ImageList.from_files(resolve_resource_path(plane_png_path)), ImageList.from_files(resolve_resource_path(image_dataset_output)) if isinstance(image_dataset_output, str) else image_dataset_output)  # type: ignore[type-var]
+        image_dataset1 = ImageDataset(
+            ImageList.from_files(resolve_resource_path(plane_png_path)),
+            (
+                ImageList.from_files(resolve_resource_path(image_dataset_output))
+                if isinstance(image_dataset_output, str)
+                else image_dataset_output
+            ),
+        )  # type: ignore[type-var]
+        image_dataset2 = ImageDataset(
+            ImageList.from_files(resolve_resource_path(plane_png_path)),
+            (
+                ImageList.from_files(resolve_resource_path(image_dataset_output))
+                if isinstance(image_dataset_output, str)
+                else image_dataset_output
+            ),
+        )  # type: ignore[type-var]
         assert image_dataset1 is not image_dataset2
         assert image_dataset1 == image_dataset2
         assert image_dataset1._input._tensor.device == _get_device()
@@ -169,8 +185,22 @@ class TestEq:
         device: Device,
     ) -> None:
         configure_test_with_device(device)
-        image_dataset1 = ImageDataset(ImageList.from_files(resolve_resource_path(plane_png_path)), ImageList.from_files(resolve_resource_path(image_dataset1_output)) if isinstance(image_dataset1_output, str) else image_dataset1_output)  # type: ignore[type-var]
-        image_dataset2 = ImageDataset(ImageList.from_files(resolve_resource_path(image_dataset2_input)), ImageList.from_files(resolve_resource_path(image_dataset2_output)) if isinstance(image_dataset2_output, str) else image_dataset2_output)  # type: ignore[type-var]
+        image_dataset1 = ImageDataset(
+            ImageList.from_files(resolve_resource_path(plane_png_path)),
+            (
+                ImageList.from_files(resolve_resource_path(image_dataset1_output))
+                if isinstance(image_dataset1_output, str)
+                else image_dataset1_output
+            ),
+        )  # type: ignore[type-var]
+        image_dataset2 = ImageDataset(
+            ImageList.from_files(resolve_resource_path(image_dataset2_input)),
+            (
+                ImageList.from_files(resolve_resource_path(image_dataset2_output))
+                if isinstance(image_dataset2_output, str)
+                else image_dataset2_output
+            ),
+        )  # type: ignore[type-var]
         assert image_dataset1 != image_dataset2
         assert image_dataset1._input._tensor.device == _get_device()
         assert image_dataset1._output._tensor.device == _get_device()
@@ -186,7 +216,6 @@ class TestEq:
 
 @pytest.mark.parametrize("device", get_devices(), ids=get_devices_ids())
 class TestHash:
-
     @pytest.mark.parametrize(
         "image_dataset_output",
         [
@@ -197,8 +226,22 @@ class TestHash:
     )
     def test_hash_should_be_equal(self, image_dataset_output: str | Column | Table, device: Device) -> None:
         configure_test_with_device(device)
-        image_dataset1 = ImageDataset(ImageList.from_files(resolve_resource_path(plane_png_path)), ImageList.from_files(resolve_resource_path(image_dataset_output)) if isinstance(image_dataset_output, str) else image_dataset_output)  # type: ignore[type-var]
-        image_dataset2 = ImageDataset(ImageList.from_files(resolve_resource_path(plane_png_path)), ImageList.from_files(resolve_resource_path(image_dataset_output)) if isinstance(image_dataset_output, str) else image_dataset_output)  # type: ignore[type-var]
+        image_dataset1 = ImageDataset(
+            ImageList.from_files(resolve_resource_path(plane_png_path)),
+            (
+                ImageList.from_files(resolve_resource_path(image_dataset_output))
+                if isinstance(image_dataset_output, str)
+                else image_dataset_output
+            ),
+        )  # type: ignore[type-var]
+        image_dataset2 = ImageDataset(
+            ImageList.from_files(resolve_resource_path(plane_png_path)),
+            (
+                ImageList.from_files(resolve_resource_path(image_dataset_output))
+                if isinstance(image_dataset_output, str)
+                else image_dataset_output
+            ),
+        )  # type: ignore[type-var]
         assert image_dataset1 is not image_dataset2
         assert hash(image_dataset1) == hash(image_dataset2)
         assert image_dataset1._input._tensor.device == _get_device()
@@ -235,8 +278,22 @@ class TestHash:
         device: Device,
     ) -> None:
         configure_test_with_device(device)
-        image_dataset1 = ImageDataset(ImageList.from_files(resolve_resource_path(plane_png_path)), ImageList.from_files(resolve_resource_path(image_dataset1_output)) if isinstance(image_dataset1_output, str) else image_dataset1_output)  # type: ignore[type-var]
-        image_dataset2 = ImageDataset(ImageList.from_files(resolve_resource_path(image_dataset2_input)), ImageList.from_files(resolve_resource_path(image_dataset2_output)) if isinstance(image_dataset2_output, str) else image_dataset2_output)  # type: ignore[type-var]
+        image_dataset1 = ImageDataset(
+            ImageList.from_files(resolve_resource_path(plane_png_path)),
+            (
+                ImageList.from_files(resolve_resource_path(image_dataset1_output))
+                if isinstance(image_dataset1_output, str)
+                else image_dataset1_output
+            ),
+        )  # type: ignore[type-var]
+        image_dataset2 = ImageDataset(
+            ImageList.from_files(resolve_resource_path(image_dataset2_input)),
+            (
+                ImageList.from_files(resolve_resource_path(image_dataset2_output))
+                if isinstance(image_dataset2_output, str)
+                else image_dataset2_output
+            ),
+        )  # type: ignore[type-var]
         assert hash(image_dataset1) != hash(image_dataset2)
         assert image_dataset1._input._tensor.device == _get_device()
         assert image_dataset1._output._tensor.device == _get_device()
@@ -246,7 +303,6 @@ class TestHash:
 
 @pytest.mark.parametrize("device", get_devices(), ids=get_devices_ids())
 class TestSizeOf:
-
     @pytest.mark.parametrize(
         "image_dataset_output",
         [
@@ -256,10 +312,19 @@ class TestSizeOf:
         ],
     )
     def test_should_size_be_greater_than_normal_object(
-        self, image_dataset_output: str | Column | Table, device: Device,
+        self,
+        image_dataset_output: str | Column | Table,
+        device: Device,
     ) -> None:
         configure_test_with_device(device)
-        image_dataset = ImageDataset(ImageList.from_files(resolve_resource_path(plane_png_path)), ImageList.from_files(resolve_resource_path(image_dataset_output)) if isinstance(image_dataset_output, str) else image_dataset_output)  # type: ignore[type-var]
+        image_dataset = ImageDataset(
+            ImageList.from_files(resolve_resource_path(plane_png_path)),
+            (
+                ImageList.from_files(resolve_resource_path(image_dataset_output))
+                if isinstance(image_dataset_output, str)
+                else image_dataset_output
+            ),
+        )  # type: ignore[type-var]
         assert sys.getsizeof(image_dataset) > sys.getsizeof(object())
         assert image_dataset._input._tensor.device == _get_device()
         assert image_dataset._output._tensor.device == _get_device()
@@ -267,7 +332,6 @@ class TestSizeOf:
 
 @pytest.mark.parametrize("device", get_devices(), ids=get_devices_ids())
 class TestShuffle:
-
     def test_should_be_different_order(self, device: Device) -> None:
         configure_test_with_device(device)
         torch.manual_seed(1234)
@@ -284,7 +348,6 @@ class TestShuffle:
 
 @pytest.mark.parametrize("device", get_devices(), ids=get_devices_ids())
 class TestBatch:
-
     @pytest.mark.parametrize(
         ("batch_number", "batch_size"),
         [
@@ -320,7 +383,6 @@ class TestBatch:
 
 @pytest.mark.parametrize("device", get_devices(), ids=get_devices_ids())
 class TestTableAsTensor:
-
     def test_should_raise_if_not_one_hot_encoded(self, device: Device) -> None:
         configure_test_with_device(device)
         with pytest.raises(
@@ -350,7 +412,6 @@ class TestTableAsTensor:
 
 @pytest.mark.parametrize("device", get_devices(), ids=get_devices_ids())
 class TestColumnAsTensor:
-
     @pytest.mark.parametrize(
         ("tensor", "one_hot_encoder", "error", "error_msg"),
         [

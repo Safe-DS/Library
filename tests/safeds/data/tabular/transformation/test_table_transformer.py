@@ -66,7 +66,7 @@ def transformers() -> list[TableTransformer]:
         transformers_numeric()
         + transformers_non_numeric()
         + [
-            SimpleImputer(strategy=SimpleImputer.Strategy.Mode()),
+            SimpleImputer(strategy=SimpleImputer.Strategy.mode()),
         ]
     )
 
@@ -175,6 +175,6 @@ class TestHash:
         transformer2: TableTransformer,
         valid_data_imputer: Table,
     ) -> None:
-        transformer1 = SimpleImputer(strategy=SimpleImputer.Strategy.Mode())
+        transformer1 = SimpleImputer(strategy=SimpleImputer.Strategy.mode())
         transformer1_fit = transformer1.fit(valid_data_imputer, ["col1"])
         assert hash(transformer2) != hash(transformer1_fit)

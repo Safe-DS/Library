@@ -59,7 +59,7 @@ class SupervisedModel(ABC):
         return None not in (self._feature_schema, self._target_name, self._target_type, self._wrapped_model)
 
     # ------------------------------------------------------------------------------------------------------------------
-    # Machine learning
+    # Learning and prediction
     # ------------------------------------------------------------------------------------------------------------------
 
     def fit(self, training_set: TabularDataset) -> Self:

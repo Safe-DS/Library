@@ -8,7 +8,6 @@ from torch import nn
 
 
 class TestFlattenLayer:
-
     def test_should_create_flatten_layer(self) -> None:
         layer = FlattenLayer()
         input_size = ImageSize(10, 20, 30, _ignore_invalid_channel=True)
@@ -33,7 +32,6 @@ class TestFlattenLayer:
             layer._set_input_size(1)
 
     class TestEq:
-
         def test_should_be_equal(self) -> None:
             assert FlattenLayer() == FlattenLayer()
 
@@ -41,11 +39,9 @@ class TestFlattenLayer:
             assert FlattenLayer().__eq__(Table()) is NotImplemented
 
     class TestHash:
-
         def test_hash_should_be_equal(self) -> None:
             assert hash(FlattenLayer()) == hash(FlattenLayer())
 
     class TestSizeOf:
-
         def test_should_size_be_greater_than_normal_object(self) -> None:
             assert sys.getsizeof(FlattenLayer()) > sys.getsizeof(object())

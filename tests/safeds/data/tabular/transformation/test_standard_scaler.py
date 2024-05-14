@@ -1,9 +1,9 @@
 import pytest
 from safeds.data.tabular.containers import Table
 from safeds.data.tabular.transformation import StandardScaler
-from safeds.exceptions import NonNumericColumnError, TransformerNotFittedError, ColumnNotFoundError
+from safeds.exceptions import ColumnNotFoundError, ColumnTypeError, TransformerNotFittedError
 
-from tests.helpers import assert_that_tables_are_close
+from tests.helpers import assert_tables_equal
 
 
 class TestFit:
@@ -18,10 +18,7 @@ class TestFit:
             StandardScaler().fit(table, ["col2", "col3"])
 
     def test_should_raise_if_table_contains_non_numerical_data(self) -> None:
-        with pytest.raises(
-            NonNumericColumnError,
-            match=r"Tried to do a numerical operation on one or multiple non-numerical columns: \n\['col1', 'col2'\]",
-        ):
+        with pytest.raises(ColumnTypeError):
             StandardScaler().fit(
                 Table({"col1": ["one", "two", "apple"], "col2": ["three", "four", "banana"]}),
                 ["col1", "col2"],
@@ -29,7 +26,7 @@ class TestFit:
 
     def test_should_raise_if_table_contains_no_rows(self) -> None:
         with pytest.raises(ValueError, match=r"The StandardScaler cannot be fitted because the table contains 0 rows"):
-            StandardScaler().fit(Table({"col1": []}), ["col1"])
+            StandardScaler().fit(Table({"col1": []}), None)
 
     def test_should_not_change_original_transformer(self) -> None:
         table = Table(
@@ -41,8 +38,9 @@ class TestFit:
         transformer = StandardScaler()
         transformer.fit(table, None)
 
-        assert transformer._wrapped_transformer is None
         assert transformer._column_names is None
+        assert transformer._data_mean is None
+        assert transformer._data_standard_deviation is None
 
 
 class TestTransform:
@@ -78,20 +76,10 @@ class TestTransform:
             transformer.transform(table)
 
     def test_should_raise_if_table_contains_non_numerical_data(self) -> None:
-        with pytest.raises(
-            NonNumericColumnError,
-            match=r"Tried to do a numerical operation on one or multiple non-numerical columns: \n\['col1', 'col2'\]",
-        ):
+        with pytest.raises(ColumnTypeError):
             StandardScaler().fit(Table({"col1": [1, 2, 3], "col2": [2, 3, 4]}), ["col1", "col2"]).transform(
                 Table({"col1": ["a", "b", "c"], "col2": ["b", "c", "e"]}),
             )
-
-    def test_should_raise_if_table_contains_no_rows(self) -> None:
-        with pytest.raises(
-            ValueError,
-            match=r"The StandardScaler cannot transform the table because it contains 0 rows",
-        ):
-            StandardScaler().fit(Table({"col1": [1, 2, 3]}), ["col1"]).transform(Table({"col1": []}))
 
 
 class TestIsFitted:
@@ -141,7 +129,7 @@ class TestFitAndTransform:
     ) -> None:
         fitted_transformer, transformed_table = StandardScaler().fit_and_transform(table, column_names)
         assert fitted_transformer.is_fitted
-        assert_that_tables_are_close(transformed_table, expected)
+        assert_tables_equal(transformed_table, expected)
 
     def test_should_not_change_original_table(self) -> None:
         table = Table(
@@ -159,44 +147,6 @@ class TestFitAndTransform:
         )
 
         assert table == expected
-
-    def test_get_names_of_added_columns(self) -> None:
-        transformer = StandardScaler()
-        with pytest.raises(TransformerNotFittedError):
-            transformer.get_names_of_added_columns()
-
-        table = Table(
-            {
-                "a": [0.0],
-            },
-        )
-        transformer = transformer.fit(table, None)
-        assert transformer.get_names_of_added_columns() == []
-
-    def test_get_names_of_changed_columns(self) -> None:
-        transformer = StandardScaler()
-        with pytest.raises(TransformerNotFittedError):
-            transformer.get_names_of_changed_columns()
-        table = Table(
-            {
-                "a": [0.0],
-            },
-        )
-        transformer = transformer.fit(table, None)
-        assert transformer.get_names_of_changed_columns() == ["a"]
-
-    def test_get_names_of_removed_columns(self) -> None:
-        transformer = StandardScaler()
-        with pytest.raises(TransformerNotFittedError):
-            transformer.get_names_of_removed_columns()
-
-        table = Table(
-            {
-                "a": [0.0],
-            },
-        )
-        transformer = transformer.fit(table, None)
-        assert transformer.get_names_of_removed_columns() == []
 
 
 class TestInverseTransform:
@@ -233,7 +183,7 @@ class TestInverseTransform:
             },
         )
 
-        assert_that_tables_are_close(transformed_table, expected)
+        assert_tables_equal(transformed_table, expected)
 
     def test_should_raise_if_not_fitted(self) -> None:
         table = Table(
@@ -254,17 +204,7 @@ class TestInverseTransform:
             )
 
     def test_should_raise_if_table_contains_non_numerical_data(self) -> None:
-        with pytest.raises(
-            NonNumericColumnError,
-            match=r"Tried to do a numerical operation on one or multiple non-numerical columns: \n\['col1', 'col2'\]",
-        ):
+        with pytest.raises(ColumnTypeError):
             StandardScaler().fit(Table({"col1": [1, 2, 4], "col2": [2, 3, 4]}), ["col1", "col2"]).inverse_transform(
                 Table({"col1": ["one", "two", "apple"], "col2": ["three", "four", "banana"]}),
             )
-
-    def test_should_raise_if_table_contains_no_rows(self) -> None:
-        with pytest.raises(
-            ValueError,
-            match=r"The StandardScaler cannot transform the table because it contains 0 rows",
-        ):
-            StandardScaler().fit(Table({"col1": [1, 2, 4]}), ["col1"]).inverse_transform(Table({"col1": []}))

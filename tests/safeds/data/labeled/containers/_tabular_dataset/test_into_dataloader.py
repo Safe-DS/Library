@@ -1,11 +1,10 @@
 import pytest
-from torch.types import Device
-
 from safeds._config import _get_device
 from safeds.data.tabular.containers import Table
+from torch.types import Device
 from torch.utils.data import DataLoader
 
-from tests.helpers import get_devices, get_devices_ids, configure_test_with_device
+from tests.helpers import configure_test_with_device, get_devices, get_devices_ids
 
 
 @pytest.mark.parametrize(

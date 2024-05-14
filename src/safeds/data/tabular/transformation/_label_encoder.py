@@ -1,24 +1,54 @@
 from __future__ import annotations
 
 import warnings
-from typing import TYPE_CHECKING
+from typing import Any
 
+from safeds._utils import _structural_hash
 from safeds._validation import _check_columns_exist
+from safeds._validation._check_columns_are_numeric import _check_columns_are_numeric
 from safeds.data.tabular.containers import Table
-from safeds.exceptions import NonNumericColumnError, TransformerNotFittedError
+from safeds.exceptions import TransformerNotFittedError
 
 from ._invertible_table_transformer import InvertibleTableTransformer
 
-if TYPE_CHECKING:
-    from sklearn.preprocessing import OrdinalEncoder as sk_OrdinalEncoder
-
 
 class LabelEncoder(InvertibleTableTransformer):
-    """The LabelEncoder encodes one or more given columns into labels."""
+    """
+    The LabelEncoder encodes one or more given columns into labels.
 
-    def __init__(self) -> None:
-        self._wrapped_transformer: sk_OrdinalEncoder | None = None
-        self._column_names: list[str] | None = None
+    Parameters
+    ----------
+    partial_order:
+        The partial order of the labels. The labels are encoded in the order of the given list. Additional values are
+        encoded as the next integer after the last value in the list in the order they appear in the data.
+    """
+
+    # ------------------------------------------------------------------------------------------------------------------
+    # Dunder methods
+    # ------------------------------------------------------------------------------------------------------------------
+
+    def __init__(self, *, partial_order: list[Any] | None = None) -> None:
+        super().__init__()
+
+        if partial_order is None:
+            partial_order = []
+
+        # Parameters
+        self._partial_order = partial_order
+
+        # Internal state
+        self._mapping: dict[str, dict[Any, int]] | None = None
+        self._inverse_mapping: dict[str, dict[int, Any]] | None = None
+
+    def __hash__(self) -> int:
+        return _structural_hash(
+            super().__hash__(),
+            self._partial_order,
+        )
+
+    # ------------------------------------------------------------------------------------------------------------------
+    # Learning and transformation
+    # ------------------------------------------------------------------------------------------------------------------
 
     def fit(self, table: Table, column_names: list[str] | None) -> LabelEncoder:
         """
@@ -45,8 +75,6 @@ class LabelEncoder(InvertibleTableTransformer):
         ValueError
             If the table contains 0 rows.
         """
-        from sklearn.preprocessing import OrdinalEncoder as sk_OrdinalEncoder
-
         if column_names is None:
             column_names = table.column_names
         else:
@@ -55,27 +83,29 @@ class LabelEncoder(InvertibleTableTransformer):
         if table.number_of_rows == 0:
             raise ValueError("The LabelEncoder cannot transform the table because it contains 0 rows")
 
-        if table.remove_columns_except(column_names).remove_non_numeric_columns().number_of_columns > 0:
-            warnings.warn(
-                "The columns"
-                f" {table.remove_columns_except(column_names).remove_non_numeric_columns().column_names} contain"
-                " numerical data. The LabelEncoder is designed to encode non-numerical values into numerical values",
-                UserWarning,
-                stacklevel=2,
-            )
+        _warn_if_columns_are_numeric(table, column_names)
 
-        # TODO: use polars Enum type instead:
-        # my_enum = pl.Enum(['A', 'B', 'C']) <-- create this from the given order
-        # my_data = pl.Series(['A', 'A', 'B'], dtype=my_enum)
-        wrapped_transformer = sk_OrdinalEncoder()
-        wrapped_transformer.set_output(transform="polars")
-        wrapped_transformer.fit(
-            table.remove_columns_except(column_names)._data_frame,
-        )
+        # Learn the transformation
+        mapping = {}
+        reverse_mapping = {}
 
-        result = LabelEncoder()
-        result._wrapped_transformer = wrapped_transformer
+        for name in column_names:
+            # Remember partial order
+            mapping[name] = {value: index for index, value in enumerate(self._partial_order)}
+            reverse_mapping[name] = {index: value for value, index in mapping[name].items()}
+
+            unique_values = table.get_column(name).get_distinct_values()
+            for value in unique_values:
+                if value not in mapping[name]:
+                    label = len(mapping[name])
+                    mapping[name][value] = label
+                    reverse_mapping[name][label] = value
+
+        # Create a copy with the learned transformation
+        result = LabelEncoder(partial_order=self._partial_order)
         result._column_names = column_names
+        result._mapping = mapping
+        result._inverse_mapping = reverse_mapping
 
         return result
 
@@ -104,21 +134,18 @@ class LabelEncoder(InvertibleTableTransformer):
         ValueError
             If the table contains 0 rows.
         """
-        # Transformer has not been fitted yet
-        if self._wrapped_transformer is None or self._column_names is None:
+        import polars as pl
+
+        # Used in favor of is_fitted, so the type checker is happy
+        if self._column_names is None or self._mapping is None:
             raise TransformerNotFittedError
 
-        # Input table does not contain all columns used to fit the transformer
         _check_columns_exist(table, self._column_names)
 
-        if table.number_of_rows == 0:
-            raise ValueError("The LabelEncoder cannot transform the table because it contains 0 rows")
+        columns = [pl.col(name).replace(self._mapping[name], return_dtype=pl.UInt32) for name in self._column_names]
 
-        new_data = self._wrapped_transformer.transform(
-            table.remove_columns_except(self._column_names)._data_frame,
-        )
         return Table._from_polars_lazy_frame(
-            table._lazy_frame.update(new_data.lazy()),
+            table._lazy_frame.with_columns(columns),
         )
 
     def inverse_transform(self, transformed_table: Table) -> Table:
@@ -143,99 +170,35 @@ class LabelEncoder(InvertibleTableTransformer):
             If the transformer has not been fitted yet.
         ColumnNotFoundError
             If the input table does not contain all columns used to fit the transformer.
-        NonNumericColumnError
+        ColumnTypeError
             If the specified columns of the input table contain non-numerical data.
-        ValueError
-            If the table contains 0 rows.
         """
-        # Transformer has not been fitted yet
-        if self._wrapped_transformer is None or self._column_names is None:
+        import polars as pl
+
+        # Used in favor of is_fitted, so the type checker is happy
+        if self._column_names is None or self._inverse_mapping is None:
             raise TransformerNotFittedError
 
         _check_columns_exist(transformed_table, self._column_names)
-
-        if transformed_table.number_of_rows == 0:
-            raise ValueError("The LabelEncoder cannot inverse transform the table because it contains 0 rows")
-
-        if transformed_table.remove_columns_except(
+        _check_columns_are_numeric(
+            transformed_table,
             self._column_names,
-        ).remove_non_numeric_columns().number_of_columns < len(self._column_names):
-            raise NonNumericColumnError(
-                str(
-                    sorted(
-                        set(self._column_names)
-                        - set(
-                            transformed_table.remove_columns_except(self._column_names)
-                            .remove_non_numeric_columns()
-                            .column_names,
-                        ),
-                    ),
-                ),
-            )
-
-        new_data = self._wrapped_transformer.inverse_transform(
-            transformed_table.remove_columns_except(self._column_names)._data_frame,
+            operation="inverse-transform with a LabelEncoder",
         )
+
+        columns = [pl.col(name).replace(self._inverse_mapping[name]) for name in self._column_names]
+
         return Table._from_polars_lazy_frame(
-            transformed_table._lazy_frame.update(new_data.lazy()),
+            transformed_table._lazy_frame.with_columns(columns),
         )
 
-    @property
-    def is_fitted(self) -> bool:
-        """Whether the transformer is fitted."""
-        return self._wrapped_transformer is not None
 
-    def get_names_of_added_columns(self) -> list[str]:
-        """
-        Get the names of all new columns that have been added by the LabelEncoder.
-
-        Returns
-        -------
-        added_columns:
-            A list of names of the added columns, ordered as they will appear in the table.
-
-        Raises
-        ------
-        TransformerNotFittedError
-            If the transformer has not been fitted yet.
-        """
-        if not self.is_fitted:
-            raise TransformerNotFittedError
-        return []
-
-    # (Must implement abstract method, cannot instantiate class otherwise.)
-    def get_names_of_changed_columns(self) -> list[str]:
-        """
-         Get the names of all columns that may have been changed by the LabelEncoder.
-
-        Returns
-        -------
-        changed_columns:
-             The list of (potentially) changed column names, as passed to fit.
-
-        Raises
-        ------
-        TransformerNotFittedError
-            If the transformer has not been fitted yet.
-        """
-        if self._column_names is None:
-            raise TransformerNotFittedError
-        return self._column_names
-
-    def get_names_of_removed_columns(self) -> list[str]:
-        """
-        Get the names of all columns that have been removed by the LabelEncoder.
-
-        Returns
-        -------
-        removed_columns:
-            A list of names of the removed columns, ordered as they appear in the table the LabelEncoder was fitted on.
-
-        Raises
-        ------
-        TransformerNotFittedError
-            If the transformer has not been fitted yet.
-        """
-        if not self.is_fitted:
-            raise TransformerNotFittedError
-        return []
+def _warn_if_columns_are_numeric(table: Table, column_names: list[str]) -> None:
+    numeric_columns = table.remove_columns_except(column_names).remove_non_numeric_columns().column_names
+    if numeric_columns:
+        warnings.warn(
+            f"The columns {numeric_columns} contain numerical data. "
+            "The LabelEncoder is designed to encode non-numerical values into numerical values",
+            UserWarning,
+            stacklevel=2,
+        )

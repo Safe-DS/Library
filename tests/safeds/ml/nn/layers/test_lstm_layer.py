@@ -29,7 +29,6 @@ def test_should_raise_if_input_size_out_of_bounds(input_size: int) -> None:
     ids=["one", "twenty"],
 )
 def test_should_raise_if_input_size_doesnt_match(input_size: int) -> None:
-
     assert LSTMLayer(output_size=1, input_size=input_size).input_size == input_size
 
 
