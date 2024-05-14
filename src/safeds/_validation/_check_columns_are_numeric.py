@@ -50,12 +50,10 @@ def _check_columns_are_numeric(
         known_names = table_or_schema.column_names
 
     non_numeric_names = [
-        name
-        for name in column_names
-        if name in known_names and not table_or_schema.get_column_type(name).is_numeric
+        name for name in column_names if name in known_names and not table_or_schema.get_column_type(name).is_numeric
     ]
     if non_numeric_names:
-        message = _build_error_message( non_numeric_names, operation)
+        message = _build_error_message(non_numeric_names, operation)
         raise ColumnTypeError(message)
 
 

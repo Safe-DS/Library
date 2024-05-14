@@ -135,7 +135,9 @@ class TestStrategyClass:
             ids=lambda x: x.__class__.__name__,
         )
         def test_should_return_correct_string_representation(
-            self, strategy: SimpleImputer.Strategy, expected: str,
+            self,
+            strategy: SimpleImputer.Strategy,
+            expected: str,
         ) -> None:
             assert str(strategy) == expected
 

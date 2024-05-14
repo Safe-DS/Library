@@ -62,11 +62,7 @@ class StandardScaler(InvertibleTableTransformer):
             If the table contains 0 rows.
         """
         if column_names is None:
-            column_names = [
-                name
-                for name in table.column_names
-                if table.get_column_type(name).is_numeric
-            ]
+            column_names = [name for name in table.column_names if table.get_column_type(name).is_numeric]
         else:
             _check_columns_exist(table, column_names)
             _check_columns_are_numeric(table, column_names, operation="fit a StandardScaler")

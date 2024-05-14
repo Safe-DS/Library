@@ -82,7 +82,12 @@ class _SingleSizeImageList(ImageList):
         image_list = _SingleSizeImageList()
 
         images_tensor = torch.empty(
-            number_of_images, max_channel, height, width, dtype=torch.uint8, device=_get_device(),
+            number_of_images,
+            max_channel,
+            height,
+            width,
+            dtype=torch.uint8,
+            device=_get_device(),
         )
 
         thread_packages: list[ImageList._FromFileThreadPackage] = []
