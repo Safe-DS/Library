@@ -7,6 +7,7 @@ from safeds._utils import _structural_hash
 
 if TYPE_CHECKING:
     from safeds.data.tabular.containers import Table
+    from safeds.data.tabular.typing import Schema
 
 
 class TableTransformer(ABC):
@@ -16,31 +17,43 @@ class TableTransformer(ABC):
     # Dunder methods
     # ------------------------------------------------------------------------------------------------------------------
 
-    def __hash__(self) -> int:
-        """
-        Return a deterministic hash value for a table transformer.
+    # The decorator is needed so the class really cannot be instantiated
+    @abstractmethod
+    def __init__(self) -> None:
+        # Schema of input table
+        self._input: Schema | None = None
 
-        Returns
-        -------
-        hash:
-            The hash value.
-        """
-        added = self.get_names_of_added_columns() if self.is_fitted else []
-        changed = self.get_names_of_changed_columns() if self.is_fitted else []
-        removed = self.get_names_of_removed_columns() if self.is_fitted else []
-        return _structural_hash(self.__class__.__qualname__, self.is_fitted, added, changed, removed)
+        # Schema of added columns
+        self._added: Schema | None = None
+
+        # Map of column names to the schema of their replacements
+        self._replaced: dict[str, Schema] | None = None
+
+        # Names of columns that were removed
+        self._removed: list[str] | None = None
+
+    # The decorator ensures that the method is overridden in all subclasses
+    @abstractmethod
+    def __hash__(self) -> int:
+        return _structural_hash(
+            self.__class__.__qualname__,
+            self._input,
+            self._added,
+            self._replaced,
+            self._removed,
+        )
 
     # ------------------------------------------------------------------------------------------------------------------
     # Properties
     # ------------------------------------------------------------------------------------------------------------------
 
     @property
-    @abstractmethod
     def is_fitted(self) -> bool:
         """Whether the transformer is fitted."""
+        return None not in (self._input, self._added, self._replaced, self._removed)
 
     # ------------------------------------------------------------------------------------------------------------------
-    # Methods
+    # Learning and transformation
     # ------------------------------------------------------------------------------------------------------------------
 
     @abstractmethod
@@ -86,58 +99,6 @@ class TableTransformer(ABC):
             If the transformer has not been fitted yet.
         """
 
-    # ------------------------------------------------------------------------------------------------------------------
-    # Introspection
-    # ------------------------------------------------------------------------------------------------------------------
-
-    @abstractmethod
-    def get_names_of_added_columns(self) -> list[str]:
-        """
-        Get the names of all new columns that have been added by the transformer.
-
-        Returns
-        -------
-        added_columns:
-            A list of names of the added columns, ordered as they will appear in the table.
-
-        Raises
-        ------
-        TransformerNotFittedError
-            If the transformer has not been fitted yet.
-        """
-
-    @abstractmethod
-    def get_names_of_changed_columns(self) -> list[str]:
-        """
-         Get the names of all columns that have been changed by the transformer.
-
-        Returns
-        -------
-        changed_columns:
-             A list of names of changed columns, ordered as they appear in the table.
-
-        Raises
-        ------
-         TransformerNotFittedError
-             If the transformer has not been fitted yet.
-        """
-
-    @abstractmethod
-    def get_names_of_removed_columns(self) -> list[str]:
-        """
-        Get the names of all columns that have been removed by the transformer.
-
-        Returns
-        -------
-        removed_columns:
-            A list of names of the removed columns, ordered as they appear in the table the transformer was fitted on.
-
-        Raises
-        ------
-        TransformerNotFittedError
-            If the transformer has not been fitted yet.
-        """
-
     def fit_and_transform(
         self,
         table: Table,
@@ -165,3 +126,38 @@ class TableTransformer(ABC):
         fitted_transformer = self.fit(table, column_names)
         transformed_table = fitted_transformer.transform(table)
         return fitted_transformer, transformed_table
+
+    # ------------------------------------------------------------------------------------------------------------------
+    # Template methods
+    # ------------------------------------------------------------------------------------------------------------------
+
+    def _check_additional_fit_preconditions(self, table: Table) -> None:  # noqa: B027
+        """
+        Check additional preconditions for fitting the transformer and raise an error if any are violated.
+
+        Parameters
+        ----------
+        table:
+            The table used to fit the transformer.
+        """
+
+    def _check_additional_transform_preconditions(self, table: Table) -> None:  # noqa: B027
+        """
+        Check additional preconditions for transforming with the transformer and raise an error if any are violated.
+
+        Parameters
+        ----------
+        table:
+            The table to which the learned transformation is applied.
+        """
+
+    @abstractmethod
+    def _clone(self) -> Self:
+        """
+        Return a new instance of this transformer with the same settings.
+
+        Returns
+        -------
+        clone:
+            A new instance of this transformer.
+        """
