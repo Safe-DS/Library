@@ -7,7 +7,6 @@ from safeds._utils import _structural_hash
 
 if TYPE_CHECKING:
     from safeds.data.tabular.containers import Table
-    from safeds.data.tabular.typing import Schema
 
 
 class TableTransformer(ABC):
@@ -17,30 +16,12 @@ class TableTransformer(ABC):
     # Dunder methods
     # ------------------------------------------------------------------------------------------------------------------
 
-    # The decorator is needed so the class really cannot be instantiated
-    @abstractmethod
-    def __init__(self) -> None:
-        # Schema of input table
-        self._input: Schema | None = None
-
-        # Schema of added columns
-        self._added: Schema | None = None
-
-        # Map of column names to the schema of their replacements
-        self._replaced: dict[str, Schema] | None = None
-
-        # Names of columns that were removed
-        self._removed: list[str] | None = None
-
     # The decorator ensures that the method is overridden in all subclasses
     @abstractmethod
     def __hash__(self) -> int:
         return _structural_hash(
             self.__class__.__qualname__,
-            self._input,
-            self._added,
-            self._replaced,
-            self._removed,
+            self.is_fitted,
         )
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -48,9 +29,9 @@ class TableTransformer(ABC):
     # ------------------------------------------------------------------------------------------------------------------
 
     @property
+    @abstractmethod
     def is_fitted(self) -> bool:
         """Whether the transformer is fitted."""
-        return None not in (self._input, self._added, self._replaced, self._removed)
 
     # ------------------------------------------------------------------------------------------------------------------
     # Learning and transformation
@@ -126,38 +107,3 @@ class TableTransformer(ABC):
         fitted_transformer = self.fit(table, column_names)
         transformed_table = fitted_transformer.transform(table)
         return fitted_transformer, transformed_table
-
-    # ------------------------------------------------------------------------------------------------------------------
-    # Template methods
-    # ------------------------------------------------------------------------------------------------------------------
-
-    def _check_additional_fit_preconditions(self, table: Table) -> None:  # noqa: B027
-        """
-        Check additional preconditions for fitting the transformer and raise an error if any are violated.
-
-        Parameters
-        ----------
-        table:
-            The table used to fit the transformer.
-        """
-
-    def _check_additional_transform_preconditions(self, table: Table) -> None:  # noqa: B027
-        """
-        Check additional preconditions for transforming with the transformer and raise an error if any are violated.
-
-        Parameters
-        ----------
-        table:
-            The table to which the learned transformation is applied.
-        """
-
-    @abstractmethod
-    def _clone(self) -> Self:
-        """
-        Return a new instance of this transformer with the same settings.
-
-        Returns
-        -------
-        clone:
-            A new instance of this transformer.
-        """
