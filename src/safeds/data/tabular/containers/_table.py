@@ -1445,7 +1445,10 @@ class Table:
         The first table contains a percentage of the rows specified by `percentage_in_first`, and the second table
         contains the remaining rows.
 
-        **Note:** The original table is not modified.
+        **Notes:**
+
+        - The original table is not modified.
+        - By default, the rows are shuffled before splitting. You can disable this by setting `shuffle` to False.
 
         Parameters
         ----------
