@@ -1,11 +1,17 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 from safeds._utils import _structural_hash
 from safeds._validation import _check_columns_exist
+from safeds._validation._check_columns_are_numeric import _check_columns_are_numeric
 from safeds.data.tabular.containers import Table
-from safeds.exceptions import NonNumericColumnError, TransformerNotFittedError
+from safeds.exceptions import TransformerNotFittedError
 
 from ._invertible_table_transformer import InvertibleTableTransformer
+
+if TYPE_CHECKING:
+    import polars as pl
 
 
 class RangeScaler(InvertibleTableTransformer):
@@ -35,14 +41,21 @@ class RangeScaler(InvertibleTableTransformer):
         if min_ >= max_:
             raise ValueError('Parameter "max_" must be greater than parameter "min_".')
 
-        self._min = min_
-        self._max = max_
+        # Parameters
+        self._min: float = min_
+        self._max: float = max_
+
+        # Internal state
+        self._data_min: pl.DataFrame | None = None
+        self._data_max: pl.DataFrame | None = None
 
     def __hash__(self) -> int:
         return _structural_hash(
             InvertibleTableTransformer.__hash__(self),
             self._min,
             self._max,
+            self._data_min,
+            self._data_max,
         )
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -74,7 +87,7 @@ class RangeScaler(InvertibleTableTransformer):
         table:
             The table used to fit the transformer.
         column_names:
-            The list of columns from the table used to fit the transformer. If `None`, all columns are used.
+            The list of columns from the table used to fit the transformer. If None, all numeric columns are used.
 
         Returns
         -------
@@ -85,45 +98,33 @@ class RangeScaler(InvertibleTableTransformer):
         ------
         ColumnNotFoundError
             If column_names contain a column name that is missing in the table.
-        NonNumericColumnError
-            If at least one of the specified columns in the table contains non-numerical data.
+        ColumnTypeError
+            If at least one of the specified columns in the table is not numeric.
         ValueError
             If the table contains 0 rows.
         """
-        from sklearn.preprocessing import MinMaxScaler as sk_MinMaxScaler
-
         if column_names is None:
-            column_names = table.column_names
+            column_names = [
+                name
+                for name in table.column_names
+                if table.get_column_type(name).is_numeric
+            ]
         else:
             _check_columns_exist(table, column_names)
+            _check_columns_are_numeric(table, column_names, operation="fit a RangeScaler")
 
         if table.number_of_rows == 0:
             raise ValueError("The RangeScaler cannot be fitted because the table contains 0 rows")
 
-        if (
-            table.remove_columns_except(column_names).remove_non_numeric_columns().number_of_columns
-            < table.remove_columns_except(column_names).number_of_columns
-        ):
-            raise NonNumericColumnError(
-                str(
-                    sorted(
-                        set(table.remove_columns_except(column_names).column_names)
-                        - set(
-                            table.remove_columns_except(column_names).remove_non_numeric_columns().column_names,
-                        ),
-                    ),
-                ),
-            )
+        # Learn the transformation
+        _data_min = table._lazy_frame.select(column_names).min().collect()
+        _data_max = table._lazy_frame.select(column_names).max().collect()
 
-        wrapped_transformer = sk_MinMaxScaler((self._min, self._max))
-        wrapped_transformer.set_output(transform="polars")
-        wrapped_transformer.fit(
-            table.remove_columns_except(column_names)._data_frame,
-        )
-
-        result = RangeScaler()
-        result._wrapped_transformer = wrapped_transformer
+        # Create a copy with the learned transformation
+        result = RangeScaler(min_=self._min, max_=self._max)
         result._column_names = column_names
+        result._data_min = _data_min
+        result._data_max = _data_max
 
         return result
 
@@ -149,41 +150,30 @@ class RangeScaler(InvertibleTableTransformer):
             If the transformer has not been fitted yet.
         ColumnNotFoundError
             If the input table does not contain all columns used to fit the transformer.
-        NonNumericColumnError
+        ColumnTypeError
             If at least one of the columns in the input table that is used to fit contains non-numerical data.
-        ValueError
-            If the table contains 0 rows.
         """
-        # Transformer has not been fitted yet
-        if self._wrapped_transformer is None or self._column_names is None:
+        import polars as pl
+
+        # Used in favor of is_fitted, so the type checker is happy
+        if self._column_names is None or self._data_min is None or self._data_max is None:
             raise TransformerNotFittedError
 
-        # Input table does not contain all columns used to fit the transformer
         _check_columns_exist(table, self._column_names)
+        _check_columns_are_numeric(table, self._column_names, operation="transform with a RangeScaler")
 
-        if table.number_of_rows == 0:
-            raise ValueError("The RangeScaler cannot transform the table because it contains 0 rows")
-
-        if (
-            table.remove_columns_except(self._column_names).remove_non_numeric_columns().number_of_columns
-            < table.remove_columns_except(self._column_names).number_of_columns
-        ):
-            raise NonNumericColumnError(
-                str(
-                    sorted(
-                        set(table.remove_columns_except(self._column_names).column_names)
-                        - set(
-                            table.remove_columns_except(self._column_names).remove_non_numeric_columns().column_names,
-                        ),
-                    ),
-                ),
+        columns = [
+            (
+                (pl.col(name) - self._data_min.get_column(name))
+                / (self._data_max.get_column(name) - self._data_min.get_column(name))
+                * (self._max - self._min)
+                + self._min
             )
+            for name in self._column_names
+        ]
 
-        new_data = self._wrapped_transformer.transform(
-            table.remove_columns_except(self._column_names)._data_frame,
-        )
         return Table._from_polars_lazy_frame(
-            table._lazy_frame.update(new_data.lazy()),
+            table._lazy_frame.with_columns(columns),
         )
 
     def inverse_transform(self, transformed_table: Table) -> Table:
@@ -213,44 +203,29 @@ class RangeScaler(InvertibleTableTransformer):
         ValueError
             If the table contains 0 rows.
         """
-        # Transformer has not been fitted yet
-        if self._wrapped_transformer is None or self._column_names is None:
+        import polars as pl
+
+        # Used in favor of is_fitted, so the type checker is happy
+        if self._column_names is None or self._data_min is None or self._data_max is None:
             raise TransformerNotFittedError
 
         _check_columns_exist(transformed_table, self._column_names)
-
-        if transformed_table.number_of_rows == 0:
-            raise ValueError("The RangeScaler cannot transform the table because it contains 0 rows")
-
-        if (
-            transformed_table.remove_columns_except(self._column_names).remove_non_numeric_columns().number_of_columns
-            < transformed_table.remove_columns_except(self._column_names).number_of_columns
-        ):
-            raise NonNumericColumnError(
-                str(
-                    sorted(
-                        set(transformed_table.remove_columns_except(self._column_names).column_names)
-                        - set(
-                            transformed_table.remove_columns_except(self._column_names)
-                            .remove_non_numeric_columns()
-                            .column_names,
-                        ),
-                    ),
-                ),
-            )
-
-        import polars as pl
-
-        new_data = pl.DataFrame(
-            self._wrapped_transformer.inverse_transform(
-                transformed_table.remove_columns_except(self._column_names)._data_frame,
-            ),
+        _check_columns_are_numeric(
+            transformed_table,
+            self._column_names,
+            operation="inverse-transform with a RangeScaler",
         )
 
-        name_mapping = dict(zip(new_data.columns, self._column_names, strict=True))
+        columns = [
+            (
+                (pl.col(name) - self._min)
+                / (self._max - self._min)
+                * (self._data_max.get_column(name) - self._data_min.get_column(name))
+                + self._data_min.get_column(name)
+            )
+            for name in self._column_names
+        ]
 
-        new_data = new_data.rename(name_mapping)
-
-        return Table._from_polars_data_frame(
-            transformed_table._data_frame.update(new_data),
+        return Table._from_polars_lazy_frame(
+            transformed_table._lazy_frame.with_columns(columns),
         )

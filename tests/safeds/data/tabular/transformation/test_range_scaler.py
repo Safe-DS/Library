@@ -1,12 +1,12 @@
 import pytest
 from safeds.data.tabular.containers import Table
 from safeds.data.tabular.transformation import RangeScaler
-from safeds.exceptions import ColumnNotFoundError, NonNumericColumnError, TransformerNotFittedError
+from safeds.exceptions import ColumnNotFoundError, ColumnTypeError, TransformerNotFittedError
 
 
 class TestInit:
     def test_should_raise_value_error(self) -> None:
-        with pytest.raises(ValueError, match='Parameter "maximum" must be higher than parameter "minimum".'):
+        with pytest.raises(ValueError, match='Parameter "max_" must be greater than parameter "min_".'):
             _ = RangeScaler(min_=10, max_=0)
 
 
@@ -22,15 +22,12 @@ class TestFit:
             RangeScaler().fit(table, ["col2", "col3"])
 
     def test_should_raise_if_table_contains_non_numerical_data(self) -> None:
-        with pytest.raises(
-            NonNumericColumnError,
-            match=r"Tried to do a numerical operation on one or multiple non-numerical columns: \n\['col1', 'col2'\]",
-        ):
+        with pytest.raises(ColumnTypeError):
             RangeScaler().fit(Table({"col1": ["a", "b"], "col2": [1, "c"]}), ["col1", "col2"])
 
     def test_should_raise_if_table_contains_no_rows(self) -> None:
         with pytest.raises(ValueError, match=r"The RangeScaler cannot be fitted because the table contains 0 rows"):
-            RangeScaler().fit(Table({"col1": []}), ["col1"])
+            RangeScaler().fit(Table({"col1": []}), None)
 
     def test_should_not_change_original_transformer(self) -> None:
         table = Table(
@@ -42,8 +39,9 @@ class TestFit:
         transformer = RangeScaler()
         transformer.fit(table, None)
 
-        assert transformer._wrapped_transformer is None
         assert transformer._column_names is None
+        assert transformer._data_min is None
+        assert transformer._data_max is None
 
 
 class TestTransform:
@@ -79,17 +77,10 @@ class TestTransform:
             transformer.transform(table)
 
     def test_should_raise_if_table_contains_non_numerical_data(self) -> None:
-        with pytest.raises(
-            NonNumericColumnError,
-            match=r"Tried to do a numerical operation on one or multiple non-numerical columns: \n\['col1', 'col2'\]",
-        ):
+        with pytest.raises(ColumnTypeError):
             RangeScaler().fit(Table({"col1": [1, 2, 3], "col2": [2, 3, 4]}), ["col1", "col2"]).transform(
                 Table({"col1": ["a", "b", "c"], "col2": ["c", "d", "e"]}),
             )
-
-    def test_should_raise_if_table_contains_no_rows(self) -> None:
-        with pytest.raises(ValueError, match=r"The RangeScaler cannot transform the table because it contains 0 rows"):
-            RangeScaler().fit(Table({"col1": [1, 2, 3]}), ["col1"]).transform(Table({"col1": []}))
 
 
 class TestIsFitted:
@@ -273,14 +264,7 @@ class TestInverseTransform:
             )
 
     def test_should_raise_if_table_contains_non_numerical_data(self) -> None:
-        with pytest.raises(
-            NonNumericColumnError,
-            match=r"Tried to do a numerical operation on one or multiple non-numerical columns: \n\['col1', 'col2'\]",
-        ):
+        with pytest.raises(ColumnTypeError):
             RangeScaler().fit(Table({"col1": [1, 2, 3], "col2": [2, 3, 4]}), ["col1", "col2"]).inverse_transform(
                 Table({"col1": ["1", "2", "three"], "col2": [1, 2, "four"]}),
             )
-
-    def test_should_raise_if_table_contains_no_rows(self) -> None:
-        with pytest.raises(ValueError, match=r"The RangeScaler cannot transform the table because it contains 0 rows"):
-            RangeScaler().fit(Table({"col1": [1, 2, 3]}), ["col1"]).inverse_transform(Table({"col1": []}))
