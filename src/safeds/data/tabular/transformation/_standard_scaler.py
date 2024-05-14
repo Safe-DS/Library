@@ -16,6 +16,8 @@ class StandardScaler(InvertibleTableTransformer):
     """The StandardScaler transforms column values to a range by removing the mean and scaling to unit variance."""
 
     def __init__(self) -> None:
+        super().__init__()
+
         self._column_names: list[str] | None = None
         self._wrapped_transformer: sk_StandardScaler | None = None
 
@@ -204,59 +206,4 @@ class StandardScaler(InvertibleTableTransformer):
 
     @property
     def is_fitted(self) -> bool:
-        """Whether the transformer is fitted."""
         return self._wrapped_transformer is not None
-
-    def get_names_of_added_columns(self) -> list[str]:
-        """
-        Get the names of all new columns that have been added by the StandardScaler.
-
-        Returns
-        -------
-        added_columns:
-            A list of names of the added columns, ordered as they will appear in the table.
-
-        Raises
-        ------
-        TransformerNotFittedError
-            If the transformer has not been fitted yet.
-        """
-        if not self.is_fitted:
-            raise TransformerNotFittedError
-        return []
-
-    def get_names_of_changed_columns(self) -> list[str]:
-        """
-         Get the names of all columns that may have been changed by the StandardScaler.
-
-        Returns
-        -------
-        changed_columns:
-             The list of (potentially) changed column names, as passed to fit.
-
-        Raises
-        ------
-        TransformerNotFittedError
-            If the transformer has not been fitted yet.
-        """
-        if self._column_names is None:
-            raise TransformerNotFittedError
-        return self._column_names
-
-    def get_names_of_removed_columns(self) -> list[str]:
-        """
-        Get the names of all columns that have been removed by the StandardScaler.
-
-        Returns
-        -------
-        removed_columns:
-            A list of names of the removed columns, ordered as they appear in the table the StandardScaler was fitted on.
-
-        Raises
-        ------
-        TransformerNotFittedError
-            If the transformer has not been fitted yet.
-        """
-        if not self.is_fitted:
-            raise TransformerNotFittedError
-        return []

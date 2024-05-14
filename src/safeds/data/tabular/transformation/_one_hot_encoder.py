@@ -57,6 +57,8 @@ class OneHotEncoder(InvertibleTableTransformer):
     """
 
     def __init__(self) -> None:
+        super().__init__()
+
         # Maps each old column to (list of) new columns created from it:
         self._column_names: dict[str, list[str]] | None = None
         # Maps concrete values (tuples of old column and value) to corresponding new column names:
@@ -310,67 +312,3 @@ class OneHotEncoder(InvertibleTableTransformer):
         # Drop old column names:
         table = table.remove_columns(list(self._value_to_column.values()))
         return table.remove_columns(list(self._value_to_column_nans.values()))
-
-    @property
-    def is_fitted(self) -> bool:
-        """Whether the transformer is fitted."""
-        return (
-            self._column_names is not None
-            and self._value_to_column is not None
-            and self._value_to_column_nans is not None
-        )
-
-    def get_names_of_added_columns(self) -> list[str]:
-        """
-        Get the names of all new columns that have been added by the OneHotEncoder.
-
-        Returns
-        -------
-        added_columns:
-            A list of names of the added columns, ordered as they will appear in the table.
-
-        Raises
-        ------
-        TransformerNotFittedError
-            If the transformer has not been fitted yet.
-        """
-        if self._column_names is None:
-            raise TransformerNotFittedError
-        return [name for column_names in self._column_names.values() for name in column_names]
-
-    # (Must implement abstract method, cannot instantiate class otherwise.)
-    def get_names_of_changed_columns(self) -> list[str]:
-        """
-         Get the names of all columns that have been changed by the OneHotEncoder (none).
-
-        Returns
-        -------
-        changed_columns:
-             The empty list.
-
-        Raises
-        ------
-        TransformerNotFittedError
-            If the transformer has not been fitted yet.
-        """
-        if not self.is_fitted:
-            raise TransformerNotFittedError
-        return []
-
-    def get_names_of_removed_columns(self) -> list[str]:
-        """
-        Get the names of all columns that have been removed by the OneHotEncoder.
-
-        Returns
-        -------
-        removed_columns:
-            A list of names of the removed columns, ordered as they appear in the table the OneHotEncoder was fitted on.
-
-        Raises
-        ------
-        TransformerNotFittedError
-            If the transformer has not been fitted yet.
-        """
-        if self._column_names is None:
-            raise TransformerNotFittedError
-        return list(self._column_names.keys())

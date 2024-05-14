@@ -16,12 +16,17 @@ class TableTransformer(ABC):
     # Dunder methods
     # ------------------------------------------------------------------------------------------------------------------
 
+    # The decorator is needed so the class really cannot be instantiated
+    @abstractmethod
+    def __init__(self) -> None:
+        self._column_names: list[str] | None = None
+
     # The decorator ensures that the method is overridden in all subclasses
     @abstractmethod
     def __hash__(self) -> int:
         return _structural_hash(
             self.__class__.__qualname__,
-            self.is_fitted,
+            self._column_names,
         )
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -29,9 +34,9 @@ class TableTransformer(ABC):
     # ------------------------------------------------------------------------------------------------------------------
 
     @property
-    @abstractmethod
     def is_fitted(self) -> bool:
         """Whether the transformer is fitted."""
+        return self._column_names is not None
 
     # ------------------------------------------------------------------------------------------------------------------
     # Learning and transformation

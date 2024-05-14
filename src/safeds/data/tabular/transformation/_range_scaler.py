@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
 
 from safeds._validation import _check_columns_exist
 from safeds.data.tabular.containers import Table
@@ -8,8 +7,6 @@ from safeds.exceptions import NonNumericColumnError, TransformerNotFittedError
 
 from ._invertible_table_transformer import InvertibleTableTransformer
 
-if TYPE_CHECKING:
-    from sklearn.preprocessing import MinMaxScaler as sk_MinMaxScaler
 
 
 class RangeScaler(InvertibleTableTransformer):
@@ -29,11 +26,16 @@ class RangeScaler(InvertibleTableTransformer):
         If the given minimum is greater or equal to the given maximum
     """
 
+    # ------------------------------------------------------------------------------------------------------------------
+    # Dunder methods
+    # ------------------------------------------------------------------------------------------------------------------
+
     def __init__(self, min_: float = 0.0, max_: float = 1.0):
-        self._column_names: list[str] | None = None
-        self._wrapped_transformer: sk_MinMaxScaler | None = None
+        super().__init__()
+
         if min_ >= max_:
-            raise ValueError('Parameter "maximum" must be higher than parameter "minimum".')
+            raise ValueError('Parameter "max_" must be greate than parameter "min_".')
+
         self._minimum = min_
         self._maximum = max_
 
@@ -228,63 +230,3 @@ class RangeScaler(InvertibleTableTransformer):
         return Table._from_polars_data_frame(
             transformed_table._data_frame.update(new_data),
         )
-
-    @property
-    def is_fitted(self) -> bool:
-        """Whether the transformer is fitted."""
-        return self._wrapped_transformer is not None
-
-    def get_names_of_added_columns(self) -> list[str]:
-        """
-        Get the names of all new columns that have been added by the RangeScaler.
-
-        Returns
-        -------
-        added_columns:
-            A list of names of the added columns, ordered as they will appear in the table.
-
-        Raises
-        ------
-        TransformerNotFittedError
-            If the transformer has not been fitted yet.
-        """
-        if not self.is_fitted:
-            raise TransformerNotFittedError
-        return []
-
-    # (Must implement abstract method, cannot instantiate class otherwise.)
-    def get_names_of_changed_columns(self) -> list[str]:
-        """
-         Get the names of all columns that may have been changed by the RangeScaler.
-
-        Returns
-        -------
-        changed_columns:
-             The list of (potentially) changed column names, as passed to fit.
-
-        Raises
-        ------
-        TransformerNotFittedError
-            If the transformer has not been fitted yet.
-        """
-        if self._column_names is None:
-            raise TransformerNotFittedError
-        return self._column_names
-
-    def get_names_of_removed_columns(self) -> list[str]:
-        """
-        Get the names of all columns that have been removed by the RangeScaler.
-
-        Returns
-        -------
-        removed_columns:
-            A list of names of the removed columns, ordered as they appear in the table the RangeScaler was fitted on.
-
-        Raises
-        ------
-        TransformerNotFittedError
-            If the transformer has not been fitted yet.
-        """
-        if not self.is_fitted:
-            raise TransformerNotFittedError
-        return []

@@ -88,6 +88,8 @@ class SimpleImputer(TableTransformer):
             return _Mode()
 
     def __init__(self, strategy: SimpleImputer.Strategy, *, value_to_replace: float | str | None = None):
+        super().__init__()
+
         if value_to_replace is None:
             value_to_replace = pd.NA
 
@@ -98,6 +100,10 @@ class SimpleImputer(TableTransformer):
         self._column_names: list[str] | None = None
 
     @property
+    def is_fitted(self) -> bool:
+        return self._wrapped_transformer is not None
+
+    @property
     def strategy(self) -> SimpleImputer.Strategy:
         """The strategy used to replace missing values."""
         return self._strategy
@@ -106,11 +112,6 @@ class SimpleImputer(TableTransformer):
     def value_to_replace(self) -> Any:
         """The value that should be replaced."""
         return self._value_to_replace
-
-    @property
-    def is_fitted(self) -> bool:
-        """Whether the transformer is fitted."""
-        return self._wrapped_transformer is not None
 
     def fit(self, table: Table, column_names: list[str] | None) -> SimpleImputer:
         """
@@ -232,60 +233,6 @@ class SimpleImputer(TableTransformer):
         return Table._from_polars_lazy_frame(
             table._lazy_frame.update(new_data.lazy()),
         )
-
-    def get_names_of_added_columns(self) -> list[str]:
-        """
-        Get the names of all new columns that have been added by the Imputer.
-
-        Returns
-        -------
-        added_columns:
-            A list of names of the added columns, ordered as they will appear in the table.
-
-        Raises
-        ------
-        TransformerNotFittedError
-            If the transformer has not been fitted yet.
-        """
-        if not self.is_fitted:
-            raise TransformerNotFittedError
-        return []
-
-    def get_names_of_changed_columns(self) -> list[str]:
-        """
-         Get the names of all columns that may have been changed by the Imputer.
-
-        Returns
-        -------
-        changed_columns:
-             The list of (potentially) changed column names, as passed to fit.
-
-        Raises
-        ------
-        TransformerNotFittedError
-            If the transformer has not been fitted yet.
-        """
-        if self._column_names is None:
-            raise TransformerNotFittedError
-        return self._column_names
-
-    def get_names_of_removed_columns(self) -> list[str]:
-        """
-        Get the names of all columns that have been removed by the Imputer.
-
-        Returns
-        -------
-        removed_columns:
-            A list of names of the removed columns, ordered as they appear in the table the Imputer was fitted on.
-
-        Raises
-        ------
-        TransformerNotFittedError
-            If the transformer has not been fitted yet.
-        """
-        if not self.is_fitted:
-            raise TransformerNotFittedError
-        return []
 
 
 # ----------------------------------------------------------------------------------------------------------------------
