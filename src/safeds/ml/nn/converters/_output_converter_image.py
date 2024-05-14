@@ -83,7 +83,7 @@ class OutputConversionImageToColumn(_OutputConversionImage):
         one_hot_encoder: OneHotEncoder = kwargs["one_hot_encoder"]
         column_name: str = kwargs["column_name"]
 
-        output = torch.zeros(len(input_data), len(one_hot_encoder.get_names_of_added_columns()))
+        output = torch.zeros(len(input_data), len(one_hot_encoder._get_names_of_added_columns()))
         output[torch.arange(len(input_data)), output_data] = 1
 
         im_dataset: ImageDataset[Column] = ImageDataset[Column].__new__(ImageDataset)
