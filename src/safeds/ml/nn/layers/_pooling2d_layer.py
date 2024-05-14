@@ -177,7 +177,6 @@ class _Pooling2DLayer(Layer):
 
 
 class MaxPooling2DLayer(_Pooling2DLayer):
-
     def __init__(self, kernel_size: int, *, stride: int = -1, padding: int = 0) -> None:
         """
         Create a maximum Pooling 2D Layer.
@@ -195,7 +194,6 @@ class MaxPooling2DLayer(_Pooling2DLayer):
 
 
 class AveragePooling2DLayer(_Pooling2DLayer):
-
     def __init__(self, kernel_size: int, *, stride: int = -1, padding: int = 0) -> None:
         """
         Create a average Pooling 2D Layer.

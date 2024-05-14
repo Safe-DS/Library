@@ -246,7 +246,6 @@ class Convolutional2DLayer(Layer):
 
 
 class ConvolutionalTranspose2DLayer(Convolutional2DLayer):
-
     def __init__(
         self,
         output_channel: int,

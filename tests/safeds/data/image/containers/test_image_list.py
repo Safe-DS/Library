@@ -42,7 +42,6 @@ from tests.helpers import (
 @pytest.mark.parametrize("resource_path1", images_all(), ids=images_all_ids())
 @pytest.mark.parametrize("device", get_devices(), ids=get_devices_ids())
 class TestAllImageCombinations:
-
     def test_from_files(self, resource_path1: str, resource_path2: str, resource_path3: str, device: Device) -> None:
         # Setup
         configure_test_with_device(device)
@@ -442,7 +441,6 @@ class TestAllImageCombinations:
 
 @pytest.mark.parametrize("device", get_devices(), ids=get_devices_ids())
 class TestFromFiles:
-
     @pytest.mark.parametrize(
         "resource_path",
         [
@@ -569,7 +567,6 @@ class TestFromFiles:
 
 @pytest.mark.parametrize("device", get_devices(), ids=get_devices_ids())
 class TestToImages:
-
     @pytest.mark.parametrize(
         "resource_path",
         [images_all(), [plane_png_path, plane_jpg_path] * 2],
@@ -600,7 +597,6 @@ class TestToImages:
 
 @pytest.mark.parametrize("device", get_devices(), ids=get_devices_ids())
 class TestToJpegFiles:
-
     @pytest.mark.parametrize(
         "resource_path",
         [images_all(), [plane_png_path, plane_jpg_path]],
@@ -757,7 +753,6 @@ class TestToJpegFiles:
 
 @pytest.mark.parametrize("device", get_devices(), ids=get_devices_ids())
 class TestToPngFiles:
-
     @pytest.mark.parametrize(
         "resource_path",
         [images_all(), [plane_png_path, plane_jpg_path], [grayscale_png_path, grayscale_png_path]],
@@ -842,7 +837,6 @@ class TestToPngFiles:
 
 @pytest.mark.parametrize("device", get_devices(), ids=get_devices_ids())
 class TestShuffleImages:
-
     @pytest.mark.parametrize(
         "resource_path",
         [images_all(), [plane_png_path, plane_jpg_path] * 2],
@@ -871,7 +865,6 @@ class TestShuffleImages:
 @pytest.mark.parametrize("resource_path1", images_all_channel(), ids=images_all_channel_ids())
 @pytest.mark.parametrize("device", get_devices(), ids=get_devices_ids())
 class TestTransformsEqualImageTransforms:
-
     @pytest.mark.parametrize(
         ("method", "attributes"),
         [
@@ -1016,9 +1009,7 @@ class TestTransforms:
 )
 @pytest.mark.parametrize("device", get_devices(), ids=get_devices_ids())
 class TestErrorsAndWarningsWithoutEmptyImageList:
-
     class TestAddImageTensor:
-
         def test_should_raise(self, resource_path: list[str], device: Device) -> None:
             configure_test_with_device(device)
             image_list = ImageList.from_files(resolve_resource_path(resource_path))
@@ -1026,14 +1017,12 @@ class TestErrorsAndWarningsWithoutEmptyImageList:
                 image_list._add_image_tensor(image_list.to_images([0])[0]._image_tensor, 0)
 
     class TestEquals:
-
         def test_should_raise(self, resource_path: list[str], device: Device) -> None:
             configure_test_with_device(device)
             image_list_original = ImageList.from_files(resolve_resource_path(resource_path))
             assert (image_list_original.__eq__(image_list_original.to_images([0]))) is NotImplemented
 
     class TestCrop:
-
         @pytest.mark.parametrize(
             ("new_x", "new_y"),
             [(10000, 1), (1, 10000), (10000, 10000)],
@@ -1057,7 +1046,6 @@ class TestErrorsAndWarningsWithoutEmptyImageList:
                 assert torch.all(torch.eq(cropped_image_list._as_single_size_image_list()._tensor, image_blank_tensor))
 
     class TestAdjustColorBalance:
-
         def test_should_not_adjust_color_balance_channel_1(
             self,
             resource_path: list[str],
@@ -1084,9 +1072,7 @@ class TestErrorsAndWarningsWithoutEmptyImageList:
 )
 @pytest.mark.parametrize("device", get_devices(), ids=get_devices_ids())
 class TestErrorsAndWarningsWithEmptyImageList:
-
     class TestChangeChannel:
-
         @pytest.mark.parametrize(
             "channel",
             [-1, 0, 2, 5],
@@ -1102,7 +1088,6 @@ class TestErrorsAndWarningsWithEmptyImageList:
                 image_list.change_channel(channel)
 
     class TestRemoveImageByIndex:
-
         def test_should_raise_invalid_index(self, resource_path: list[str], device: Device) -> None:
             configure_test_with_device(device)
             image_list = ImageList.from_files(resolve_resource_path(resource_path))
@@ -1112,7 +1097,6 @@ class TestErrorsAndWarningsWithEmptyImageList:
                 image_list.remove_image_by_index(len(image_list))
 
     class TestRemoveImagesWithSize:
-
         @pytest.mark.parametrize(
             ("width", "height"),
             [(-10, 10), (10, -10), (-10, -10)],
@@ -1127,7 +1111,6 @@ class TestErrorsAndWarningsWithEmptyImageList:
                 image_list.remove_images_with_size(width, height)
 
     class TestResize:
-
         @pytest.mark.parametrize(
             ("new_width", "new_height"),
             [(-10, 10), (10, -10), (-10, -10)],
@@ -1142,7 +1125,6 @@ class TestErrorsAndWarningsWithEmptyImageList:
                 image_list.resize(new_width, new_height)
 
     class TestCrop:
-
         @pytest.mark.parametrize(
             ("new_width", "new_height"),
             [(-10, 1), (1, -10), (-10, -1)],
@@ -1170,7 +1152,6 @@ class TestErrorsAndWarningsWithEmptyImageList:
                 image_list.crop(new_x, new_y, 100, 100)
 
     class TestAddNoise:
-
         @pytest.mark.parametrize(
             "standard_deviation",
             [-1],
@@ -1187,7 +1168,6 @@ class TestErrorsAndWarningsWithEmptyImageList:
             assert image_list_original == image_list_clone
 
     class TestAdjustBrightness:
-
         @pytest.mark.parametrize(
             "factor",
             [-1],
@@ -1223,7 +1203,6 @@ class TestErrorsAndWarningsWithEmptyImageList:
             assert image_list_original == image_list_clone
 
     class TestAdjustContrast:
-
         @pytest.mark.parametrize(
             "factor",
             [-1],
@@ -1259,7 +1238,6 @@ class TestErrorsAndWarningsWithEmptyImageList:
             assert image_list_original == image_list_clone
 
     class TestAdjustColorBalance:
-
         @pytest.mark.parametrize(
             "factor",
             [-1],
@@ -1295,7 +1273,6 @@ class TestErrorsAndWarningsWithEmptyImageList:
             assert image_list_original == image_list_clone
 
     class TestBlur:
-
         def test_should_raise_radius_out_of_bounds(self, resource_path: str, device: Device) -> None:
             configure_test_with_device(device)
             image_list_original = ImageList.from_files(resolve_resource_path(resource_path))
@@ -1325,7 +1302,6 @@ class TestErrorsAndWarningsWithEmptyImageList:
             assert image_list_original == image_list_clone
 
     class TestSharpen:
-
         @pytest.mark.parametrize(
             "factor",
             [-1],
@@ -1363,7 +1339,6 @@ class TestErrorsAndWarningsWithEmptyImageList:
 
 @pytest.mark.parametrize("device", get_devices(), ids=get_devices_ids())
 class TestSingleSizeImageList:
-
     @pytest.mark.parametrize(
         "tensor",
         [
@@ -1467,7 +1442,6 @@ class TestSingleSizeImageList:
 
 @pytest.mark.parametrize("device", get_devices(), ids=get_devices_ids())
 class TestEmptyImageList:
-
     def test_warn_empty_image_list(self, device: Device) -> None:
         configure_test_with_device(device)
         with pytest.warns(

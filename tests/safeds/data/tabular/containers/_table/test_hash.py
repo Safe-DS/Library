@@ -30,11 +30,7 @@ def test_should_return_same_hash_for_equal_tables(table1: Table, table2: Table) 
         (Table({"col1": [1, 2, 3]}), Table({"col1": ["1", "2", "3"]})),
         (Table({"col1": [1, 2, 3]}), Table({"col1": [1, 2, 3, 4]})),
     ],
-    ids=[
-        "different column names",
-        "different types",
-        "different number of rows"
-    ],
+    ids=["different column names", "different types", "different number of rows"],
 )
 def test_should_return_different_hash_for_unequal_tables(table1: Table, table2: Table) -> None:
     assert hash(table1) != hash(table2)

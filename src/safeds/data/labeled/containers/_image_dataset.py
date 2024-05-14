@@ -289,7 +289,6 @@ class ImageDataset(Generic[T], Dataset):
 
 
 class _TableAsTensor:
-
     def __init__(self, table: Table) -> None:
         import torch
 
@@ -345,7 +344,6 @@ class _TableAsTensor:
 
 
 class _ColumnAsTensor:
-
     def __init__(self, column: Column) -> None:
         import torch
 

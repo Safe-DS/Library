@@ -19,7 +19,6 @@ from tests.helpers import (
 
 
 class TestFromImage:
-
     @pytest.mark.parametrize("device", get_devices(), ids=get_devices_ids())
     @pytest.mark.parametrize("resource_path", images_all(), ids=images_all_ids())
     def test_should_create(self, resource_path: str, device: Device) -> None:
@@ -30,7 +29,6 @@ class TestFromImage:
 
 
 class TestEq:
-
     @pytest.mark.parametrize(("image_size", "width", "height", "channel"), [(ImageSize(1, 2, 3), 1, 2, 3)])
     def test_should_be_equal(self, image_size: ImageSize, width: int, height: int, channel: int) -> None:
         assert image_size == ImageSize(width, height, channel)
@@ -52,7 +50,6 @@ class TestEq:
 
 
 class TestHash:
-
     @pytest.mark.parametrize(
         "resource_path",
         images_all(),
@@ -68,21 +65,18 @@ class TestHash:
 
 
 class TestSizeOf:
-
     @pytest.mark.parametrize("image_size", [ImageSize(1, 2, 3)])
     def test_should_size_be_greater_than_normal_object(self, image_size: ImageSize) -> None:
         assert sys.getsizeof(image_size) >= sys.getsizeof(0) * 3
 
 
 class TestStr:
-
     @pytest.mark.parametrize("image_size", [ImageSize(1, 2, 3)])
     def test_should_size_be_greater_than_normal_object(self, image_size: ImageSize) -> None:
         assert str(image_size) == f"{image_size.width}x{image_size.height}x{image_size.channel} (WxHxC)"
 
 
 class TestProperties:
-
     @pytest.mark.parametrize("width", list(range(1, 5)))
     @pytest.mark.parametrize("height", list(range(1, 5)))
     @pytest.mark.parametrize("channel", [1, 3, 4])
@@ -98,7 +92,6 @@ class TestProperties:
 
 
 class TestErrors:
-
     @pytest.mark.parametrize("width", [-1, 0])
     def test_should_raise_invalid_width(self, width: int) -> None:
         with pytest.raises(OutOfBoundsError):

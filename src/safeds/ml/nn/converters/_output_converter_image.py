@@ -19,7 +19,6 @@ if TYPE_CHECKING:
 
 
 class _OutputConversionImage(OutputConversion[ImageList, ImageDataset], ABC):
-
     @abstractmethod
     def _data_conversion(self, input_data: ImageList, output_data: Tensor, **kwargs: Any) -> ImageDataset:
         pass  # pragma: no cover
@@ -66,7 +65,6 @@ class _OutputConversionImage(OutputConversion[ImageList, ImageDataset], ABC):
 
 
 class OutputConversionImageToColumn(_OutputConversionImage):
-
     def _data_conversion(self, input_data: ImageList, output_data: Tensor, **kwargs: Any) -> ImageDataset[Column]:
         import torch
 
@@ -100,7 +98,6 @@ class OutputConversionImageToColumn(_OutputConversionImage):
 
 
 class OutputConversionImageToTable(_OutputConversionImage):
-
     def _data_conversion(self, input_data: ImageList, output_data: Tensor, **kwargs: Any) -> ImageDataset[Table]:
         import torch
 
@@ -133,7 +130,6 @@ class OutputConversionImageToTable(_OutputConversionImage):
 
 
 class OutputConversionImageToImage(_OutputConversionImage):
-
     def _data_conversion(
         self,
         input_data: ImageList,

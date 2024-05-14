@@ -10,7 +10,6 @@ from torch import nn
 
 
 class TestPooling2DLayer:
-
     @pytest.mark.parametrize(
         ("strategy", "torch_layer"),
         [
@@ -58,7 +57,6 @@ class TestPooling2DLayer:
             layer._set_input_size(1)
 
     class TestEq:
-
         @pytest.mark.parametrize(
             ("pooling_2d_layer_1", "pooling_2d_layer_2"),
             [
@@ -114,7 +112,6 @@ class TestPooling2DLayer:
             assert avg_pooling_2d_layer.__eq__(max_pooling_2d_layer) is NotImplemented
 
     class TestHash:
-
         @pytest.mark.parametrize(
             ("pooling_2d_layer_1", "pooling_2d_layer_2"),
             [
@@ -161,7 +158,6 @@ class TestPooling2DLayer:
             assert hash(pooling_2d_layer_1) != hash(pooling_2d_layer_2)
 
     class TestSizeOf:
-
         @pytest.mark.parametrize(
             "pooling_2d_layer",
             [

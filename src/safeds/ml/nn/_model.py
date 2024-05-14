@@ -493,7 +493,6 @@ def _create_internal_model(
 
     class _InternalModel(nn.Module):
         def __init__(self, layers: list[Layer], is_for_classification: bool) -> None:
-
             super().__init__()
             self._layer_list = layers
             internal_layers = []

@@ -8,7 +8,6 @@ from torch import nn
 
 
 class TestConvolutional2DLayer:
-
     @pytest.mark.parametrize(
         ("activation_function", "activation_layer"),
         [("sigmoid", nn.Sigmoid), ("relu", nn.ReLU), ("softmax", nn.Softmax)],
@@ -159,7 +158,6 @@ class TestConvolutional2DLayer:
             layer._set_input_size(1)
 
     class TestEq:
-
         @pytest.mark.parametrize(
             ("conv2dlayer1", "conv2dlayer2"),
             [
@@ -214,7 +212,6 @@ class TestConvolutional2DLayer:
             assert convtranspose2dlayer.__eq__(conv2dlayer) is NotImplemented
 
     class TestHash:
-
         @pytest.mark.parametrize(
             ("conv2dlayer1", "conv2dlayer2"),
             [
@@ -265,7 +262,6 @@ class TestConvolutional2DLayer:
             assert hash(conv2dlayer1) != hash(conv2dlayer2)
 
     class TestSizeOf:
-
         @pytest.mark.parametrize(
             "conv2dlayer",
             [

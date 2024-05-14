@@ -13,7 +13,6 @@ _test_image_list = ImageList.from_files(resolve_resource_path(images_all())).res
 
 
 class TestIsFitDataValid:
-
     @pytest.mark.parametrize(
         ("image_dataset_valid", "image_dataset_invalid"),
         [
@@ -78,7 +77,6 @@ class TestIsFitDataValid:
 
 
 class TestEq:
-
     @pytest.mark.parametrize(
         ("input_conversion_image1", "input_conversion_image2"),
         [(InputConversionImage(ImageSize(1, 2, 3)), InputConversionImage(ImageSize(1, 2, 3)))],
@@ -114,7 +112,6 @@ class TestEq:
 
 
 class TestHash:
-
     @pytest.mark.parametrize(
         ("input_conversion_image1", "input_conversion_image2"),
         [(InputConversionImage(ImageSize(1, 2, 3)), InputConversionImage(ImageSize(1, 2, 3)))],
@@ -145,7 +142,6 @@ class TestHash:
 
 
 class TestSizeOf:
-
     @pytest.mark.parametrize("input_conversion_image", [InputConversionImage(ImageSize(1, 2, 3))])
     def test_should_size_be_greater_than_normal_object(self, input_conversion_image: InputConversionImage) -> None:
         assert sys.getsizeof(input_conversion_image) > sys.getsizeof(object())

@@ -12,7 +12,6 @@ from safeds.exceptions import (
 
 
 class TestEq:
-
     def test_should_be_not_implemented(self) -> None:
         assert OneHotEncoder().__eq__(Table()) is NotImplemented
 
