@@ -36,7 +36,7 @@ class RangeScaler(InvertibleTableTransformer):
     # ------------------------------------------------------------------------------------------------------------------
 
     def __init__(self, min_: float = 0.0, max_: float = 1.0) -> None:
-        InvertibleTableTransformer.__init__(self)
+        super().__init__()
 
         if min_ >= max_:
             raise ValueError('Parameter "max_" must be greater than parameter "min_".')
@@ -51,7 +51,7 @@ class RangeScaler(InvertibleTableTransformer):
 
     def __hash__(self) -> int:
         return _structural_hash(
-            InvertibleTableTransformer.__hash__(self),
+            super().__hash__(),
             self._min,
             self._max,
         )

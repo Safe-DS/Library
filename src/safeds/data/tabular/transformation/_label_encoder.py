@@ -21,7 +21,7 @@ class LabelEncoder(InvertibleTableTransformer):
     # ------------------------------------------------------------------------------------------------------------------
 
     def __init__(self) -> None:
-        InvertibleTableTransformer.__init__(self)
+        super().__init__()
 
         self._wrapped_transformer: sk_OrdinalEncoder | None = None
 

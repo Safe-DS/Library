@@ -96,7 +96,7 @@ class SimpleImputer(TableTransformer):
     # ------------------------------------------------------------------------------------------------------------------
 
     def __init__(self, strategy: SimpleImputer.Strategy, *, value_to_replace: float | str | None = None) -> None:
-        TableTransformer.__init__(self)
+        super().__init__()
 
         if value_to_replace is None:
             value_to_replace = pd.NA
@@ -108,7 +108,7 @@ class SimpleImputer(TableTransformer):
 
     def __hash__(self) -> int:
         return _structural_hash(
-            TableTransformer.__hash__(self),
+            super().__hash__(),
             self._strategy,
             self._value_to_replace,
         )

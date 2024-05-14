@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from safeds._utils import _structural_hash
 from safeds._validation import _check_columns_exist
 from safeds._validation._check_columns_are_numeric import _check_columns_are_numeric
 from safeds.data.tabular.containers import Table
@@ -22,16 +21,14 @@ class StandardScaler(InvertibleTableTransformer):
     # ------------------------------------------------------------------------------------------------------------------
 
     def __init__(self) -> None:
-        InvertibleTableTransformer.__init__(self)
+        super().__init__()
 
         # Internal state
         self._data_mean: pl.DataFrame | None = None
         self._data_standard_deviation: pl.DataFrame | None = None
 
     def __hash__(self) -> int:
-        return _structural_hash(
-            InvertibleTableTransformer.__hash__(self),
-        )
+        return super().__hash__()
 
     # ------------------------------------------------------------------------------------------------------------------
     # Learning and transformation

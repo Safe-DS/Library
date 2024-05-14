@@ -62,7 +62,7 @@ class OneHotEncoder(InvertibleTableTransformer):
     # ------------------------------------------------------------------------------------------------------------------
 
     def __init__(self) -> None:
-        InvertibleTableTransformer.__init__(self)
+        super().__init__()
 
         # Maps each old column to (list of) new columns created from it:
         self._column_map: dict[str, list[str]] | None = None
@@ -82,7 +82,7 @@ class OneHotEncoder(InvertibleTableTransformer):
 
     def __hash__(self) -> int:
         return _structural_hash(
-            InvertibleTableTransformer.__hash__(self),
+            super().__hash__(),
             self._column_map,
             self._value_to_column,
             self._value_to_column_nans,
