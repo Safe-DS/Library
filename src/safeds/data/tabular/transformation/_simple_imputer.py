@@ -108,7 +108,7 @@ class SimpleImputer(TableTransformer):
 
     def __hash__(self) -> int:
         return _structural_hash(
-            SimpleImputer.__hash__(self),
+            TableTransformer.__hash__(self),
             self._strategy,
             self._value_to_replace,
         )
