@@ -54,8 +54,6 @@ class RangeScaler(InvertibleTableTransformer):
             InvertibleTableTransformer.__hash__(self),
             self._min,
             self._max,
-            self._data_min,
-            self._data_max,
         )
 
     # ------------------------------------------------------------------------------------------------------------------
