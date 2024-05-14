@@ -56,7 +56,7 @@ class StandardScaler(InvertibleTableTransformer):
         ------
         ColumnNotFoundError
             If column_names contain a column name that is missing in the table.
-        NonNumericColumnError
+        ColumnTypeError
             If at least one of the specified columns in the table contains non-numerical data.
         ValueError
             If the table contains 0 rows.
@@ -108,10 +108,8 @@ class StandardScaler(InvertibleTableTransformer):
             If the transformer has not been fitted yet.
         ColumnNotFoundError
             If the input table does not contain all columns used to fit the transformer.
-        NonNumericColumnError
+        ColumnTypeError
             If at least one of the columns in the input table that is used to fit contains non-numerical data.
-        ValueError
-            If the table contains 0 rows.
         """
         import polars as pl
 
@@ -153,10 +151,8 @@ class StandardScaler(InvertibleTableTransformer):
             If the transformer has not been fitted yet.
         ColumnNotFoundError
             If the input table does not contain all columns used to fit the transformer.
-        NonNumericColumnError
+        ColumnTypeError
             If the transformed columns of the input table contain non-numerical data.
-        ValueError
-            If the table contains 0 rows.
         """
         import polars as pl
 

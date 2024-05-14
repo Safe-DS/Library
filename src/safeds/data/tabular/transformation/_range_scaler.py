@@ -196,10 +196,8 @@ class RangeScaler(InvertibleTableTransformer):
             If the transformer has not been fitted yet.
         ColumnNotFoundError
             If the input table does not contain all columns used to fit the transformer.
-        NonNumericColumnError
+        ColumnTypeError
             If the transformed columns of the input table contain non-numerical data.
-        ValueError
-            If the table contains 0 rows.
         """
         import polars as pl
 
