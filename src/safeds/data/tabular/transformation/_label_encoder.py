@@ -7,7 +7,7 @@ from safeds._utils import _structural_hash
 from safeds._validation import _check_columns_exist
 from safeds._validation._check_columns_are_numeric import _check_columns_are_numeric
 from safeds.data.tabular.containers import Table
-from safeds.exceptions import NonNumericColumnError, TransformerNotFittedError
+from safeds.exceptions import TransformerNotFittedError
 
 from ._invertible_table_transformer import InvertibleTableTransformer
 
