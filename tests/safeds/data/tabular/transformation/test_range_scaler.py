@@ -1,7 +1,7 @@
 import pytest
 from safeds.data.tabular.containers import Table
 from safeds.data.tabular.transformation import RangeScaler
-from safeds.exceptions import NonNumericColumnError, TransformerNotFittedError, ColumnNotFoundError
+from safeds.exceptions import ColumnNotFoundError, NonNumericColumnError, TransformerNotFittedError
 
 
 class TestInit:

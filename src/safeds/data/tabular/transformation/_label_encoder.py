@@ -16,6 +16,10 @@ if TYPE_CHECKING:
 class LabelEncoder(InvertibleTableTransformer):
     """The LabelEncoder encodes one or more given columns into labels."""
 
+    # ------------------------------------------------------------------------------------------------------------------
+    # Dunder methods
+    # ------------------------------------------------------------------------------------------------------------------
+
     def __init__(self) -> None:
         super().__init__()
 

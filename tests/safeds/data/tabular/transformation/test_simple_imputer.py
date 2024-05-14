@@ -5,7 +5,7 @@ import pytest
 from safeds.data.tabular.containers import Table
 from safeds.data.tabular.transformation import SimpleImputer
 from safeds.data.tabular.transformation._simple_imputer import _Mode
-from safeds.exceptions import NonNumericColumnError, TransformerNotFittedError, ColumnNotFoundError
+from safeds.exceptions import ColumnNotFoundError, NonNumericColumnError, TransformerNotFittedError
 
 
 def strategies() -> list[SimpleImputer.Strategy]:
@@ -21,25 +21,25 @@ def strategies() -> list[SimpleImputer.Strategy]:
         The list of classifiers to test.
     """
     return [
-        SimpleImputer.Strategy.Constant(2),
-        SimpleImputer.Strategy.Mean(),
-        SimpleImputer.Strategy.Median(),
-        SimpleImputer.Strategy.Mode(),
+        SimpleImputer.Strategy.constant(2),
+        SimpleImputer.Strategy.mean(),
+        SimpleImputer.Strategy.median(),
+        SimpleImputer.Strategy.mode(),
     ]
 
 
 class TestStrategyClass:
     def test_should_be_able_to_get_value_of_constant_strategy(self) -> None:
-        assert SimpleImputer.Strategy.Constant(1).value == 1  # type: ignore[attr-defined]
+        assert SimpleImputer.Strategy.constant(1).value == 1  # type: ignore[attr-defined]
 
     @pytest.mark.parametrize(
         ("strategy", "type_", "expected"),
         [
-            (SimpleImputer.Strategy.Constant(0), SimpleImputer.Strategy.Constant, True),
-            (SimpleImputer.Strategy.Mean(), SimpleImputer.Strategy.Mean, True),
-            (SimpleImputer.Strategy.Median(), SimpleImputer.Strategy.Median, True),
-            (SimpleImputer.Strategy.Mode(), SimpleImputer.Strategy.Mode, True),
-            (SimpleImputer.Strategy.Mode(), SimpleImputer.Strategy.Mean, False),
+            (SimpleImputer.Strategy.constant(0), SimpleImputer.Strategy.constant, True),
+            (SimpleImputer.Strategy.mean(), SimpleImputer.Strategy.mean, True),
+            (SimpleImputer.Strategy.median(), SimpleImputer.Strategy.median, True),
+            (SimpleImputer.Strategy.mode(), SimpleImputer.Strategy.mode, True),
+            (SimpleImputer.Strategy.mode(), SimpleImputer.Strategy.mean, False),
         ],
     )
     def test_should_be_able_to_use_strategy_in_isinstance(
@@ -114,7 +114,7 @@ class TestStrategyClass:
     class TestSizeof:
         @pytest.mark.parametrize(
             "strategy",
-            ([SimpleImputer.Strategy.Constant(1)]),
+            ([SimpleImputer.Strategy.constant(1)]),
             ids=lambda x: x.__class__.__name__,
         )
         def test_sizeof_strategy(
@@ -127,15 +127,15 @@ class TestStrategyClass:
         @pytest.mark.parametrize(
             ("strategy", "expected"),
             [
-                (SimpleImputer.Strategy.Constant(0), "Constant(0)"),
-                (SimpleImputer.Strategy.Mean(), "Mean"),
-                (SimpleImputer.Strategy.Median(), "Median"),
-                (SimpleImputer.Strategy.Mode(), "Mode"),
+                (SimpleImputer.Strategy.constant(0), "Constant(0)"),
+                (SimpleImputer.Strategy.mean(), "Mean"),
+                (SimpleImputer.Strategy.median(), "Median"),
+                (SimpleImputer.Strategy.mode(), "Mode"),
             ],
             ids=lambda x: x.__class__.__name__,
         )
         def test_should_return_correct_string_representation(
-            self, strategy: SimpleImputer.Strategy, expected: str
+            self, strategy: SimpleImputer.Strategy, expected: str,
         ) -> None:
             assert str(strategy) == expected
 
@@ -157,7 +157,7 @@ class TestValueToReplaceProperty:
     )
     def test_should_return_correct_value_to_replace(self, value_to_replace: float | str | None) -> None:
         assert (
-            SimpleImputer(SimpleImputer.Strategy.Mode(), value_to_replace=value_to_replace).value_to_replace
+            SimpleImputer(SimpleImputer.Strategy.mode(), value_to_replace=value_to_replace).value_to_replace
             == value_to_replace
         )
 
@@ -182,8 +182,8 @@ class TestFit:
     @pytest.mark.parametrize(
         ("table", "col_names", "strategy"),
         [
-            (Table({"col1": [1, None, "ok"], "col2": [1, 2, "3"]}), ["col1", "col2"], SimpleImputer.Strategy.Mean()),
-            (Table({"col1": [1, None, "ok"], "col2": [1, 2, "3"]}), ["col1", "col2"], SimpleImputer.Strategy.Median()),
+            (Table({"col1": [1, None, "ok"], "col2": [1, 2, "3"]}), ["col1", "col2"], SimpleImputer.Strategy.mean()),
+            (Table({"col1": [1, None, "ok"], "col2": [1, 2, "3"]}), ["col1", "col2"], SimpleImputer.Strategy.median()),
         ],
         ids=["Strategy Mean", "Strategy Median"],
     )
@@ -220,7 +220,7 @@ class TestFit:
                 rf" values:\n{most_frequent}"
             ),
         ):
-            SimpleImputer(SimpleImputer.Strategy.Mode()).fit(table, None)
+            SimpleImputer(SimpleImputer.Strategy.mode()).fit(table, None)
 
     @pytest.mark.parametrize("strategy", strategies(), ids=lambda x: x.__class__.__name__)
     def test_should_not_change_original_transformer(self, strategy: SimpleImputer.Strategy) -> None:
@@ -316,7 +316,7 @@ class TestFitAndTransform:
                     },
                 ),
                 None,
-                SimpleImputer.Strategy.Constant(0.0),
+                SimpleImputer.Strategy.constant(0.0),
                 None,
                 Table(
                     {
@@ -331,7 +331,7 @@ class TestFitAndTransform:
                     },
                 ),
                 None,
-                SimpleImputer.Strategy.Mean(),
+                SimpleImputer.Strategy.mean(),
                 None,
                 Table(
                     {
@@ -346,7 +346,7 @@ class TestFitAndTransform:
                     },
                 ),
                 None,
-                SimpleImputer.Strategy.Median(),
+                SimpleImputer.Strategy.median(),
                 None,
                 Table(
                     {
@@ -361,7 +361,7 @@ class TestFitAndTransform:
                     },
                 ),
                 None,
-                SimpleImputer.Strategy.Mode(),
+                SimpleImputer.Strategy.mode(),
                 None,
                 Table(
                     {
@@ -377,7 +377,7 @@ class TestFitAndTransform:
                     },
                 ),
                 ["a"],
-                SimpleImputer.Strategy.Constant(0.0),
+                SimpleImputer.Strategy.constant(0.0),
                 None,
                 Table(
                     {
@@ -393,7 +393,7 @@ class TestFitAndTransform:
                     },
                 ),
                 ["a"],
-                SimpleImputer.Strategy.Mode(),
+                SimpleImputer.Strategy.mode(),
                 None,
                 Table({"a": [1.0, 1.0, 2.0, 2.0, 1.0]}),
             ),
@@ -404,7 +404,7 @@ class TestFitAndTransform:
                     },
                 ),
                 None,
-                SimpleImputer.Strategy.Constant(1.0),
+                SimpleImputer.Strategy.constant(1.0),
                 0.0,
                 Table(
                     {

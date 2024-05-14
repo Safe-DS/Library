@@ -61,7 +61,7 @@ from syrupy import SnapshotAssertion
                     "g",
                     "a",
                 ],
-            }
+            },
         ),
     ],
     ids=["one column", "four columns", "two columns with compressed visualization"],

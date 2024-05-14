@@ -71,14 +71,6 @@ class SupportVectorClassifier(Classifier, _SupportVectorMachineBase):
         )
 
     def _get_sklearn_model(self) -> ClassifierMixin:
-        """
-        Return a new wrapped Classifier from sklearn.
-
-        Returns
-        -------
-        wrapped_classifier:
-            The sklearn Classifier.
-        """
         from sklearn.svm import SVC as SklearnSVC  # noqa: N811
 
         result = SklearnSVC(

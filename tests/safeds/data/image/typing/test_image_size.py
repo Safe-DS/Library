@@ -8,13 +8,13 @@ from safeds.exceptions import OutOfBoundsError
 from torch.types import Device
 
 from tests.helpers import (
+    configure_test_with_device,
     get_devices,
     get_devices_ids,
     images_all,
     images_all_ids,
     plane_png_path,
     resolve_resource_path,
-    configure_test_with_device,
 )
 
 

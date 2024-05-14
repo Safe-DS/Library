@@ -40,12 +40,16 @@ class SimpleImputer(TableTransformer):
     ...         Column("b", [None, 2, 3]),
     ...     ],
     ... )
-    >>> transformer = SimpleImputer(SimpleImputer.Strategy.Constant(0))
+    >>> transformer = SimpleImputer(SimpleImputer.Strategy.constant(0))
     >>> transformed_table = transformer.fit_and_transform(table)
     """
 
     class Strategy(ABC):
-        """Various strategies to replace missing values. Use the inner classes to create instances of this class."""
+        """
+        Various strategies to replace missing values.
+
+        Use the static factory methods to create instances of this class.
+        """
 
         @abstractmethod
         def __eq__(self, other: object) -> bool: ...
@@ -61,7 +65,7 @@ class SimpleImputer(TableTransformer):
             """Set the imputer strategy of the given imputer."""
 
         @staticmethod
-        def Constant(value: Any) -> SimpleImputer.Strategy:  # noqa: N802
+        def constant(value: Any) -> SimpleImputer.Strategy:
             """
             Replace missing values with the given constant value.
 
@@ -73,19 +77,23 @@ class SimpleImputer(TableTransformer):
             return _Constant(value)
 
         @staticmethod
-        def Mean() -> SimpleImputer.Strategy:  # noqa: N802
+        def mean() -> SimpleImputer.Strategy:
             """Replace missing values with the mean of each column."""
             return _Mean()
 
         @staticmethod
-        def Median() -> SimpleImputer.Strategy:  # noqa: N802
+        def median() -> SimpleImputer.Strategy:
             """Replace missing values with the median of each column."""
             return _Median()
 
         @staticmethod
-        def Mode() -> SimpleImputer.Strategy:  # noqa: N802
+        def mode() -> SimpleImputer.Strategy:
             """Replace missing values with the mode of each column."""
             return _Mode()
+
+    # ------------------------------------------------------------------------------------------------------------------
+    # Dunder methods
+    # ------------------------------------------------------------------------------------------------------------------
 
     def __init__(self, strategy: SimpleImputer.Strategy, *, value_to_replace: float | str | None = None):
         super().__init__()
@@ -97,11 +105,10 @@ class SimpleImputer(TableTransformer):
         self._value_to_replace = value_to_replace
 
         self._wrapped_transformer: sk_SimpleImputer | None = None
-        self._column_names: list[str] | None = None
 
-    @property
-    def is_fitted(self) -> bool:
-        return self._wrapped_transformer is not None
+    # ------------------------------------------------------------------------------------------------------------------
+    # Properties
+    # ------------------------------------------------------------------------------------------------------------------
 
     @property
     def strategy(self) -> SimpleImputer.Strategy:
@@ -112,6 +119,10 @@ class SimpleImputer(TableTransformer):
     def value_to_replace(self) -> Any:
         """The value that should be replaced."""
         return self._value_to_replace
+
+    # ------------------------------------------------------------------------------------------------------------------
+    # Learning and transformation
+    # ------------------------------------------------------------------------------------------------------------------
 
     def fit(self, table: Table, column_names: list[str] | None) -> SimpleImputer:
         """
@@ -319,7 +330,7 @@ class _Mode(SimpleImputer.Strategy):
 
 # Override the methods with classes, so they can be used in `isinstance` calls. Unlike methods, classes define a type.
 # This is needed for the DSL, where imputer strategies are variants of an enum.
-SimpleImputer.Strategy.Constant = _Constant  # type: ignore[method-assign]
-SimpleImputer.Strategy.Mean = _Mean  # type: ignore[method-assign]
-SimpleImputer.Strategy.Median = _Median  # type: ignore[method-assign]
-SimpleImputer.Strategy.Mode = _Mode  # type: ignore[method-assign]
+SimpleImputer.Strategy.constant = _Constant  # type: ignore[method-assign]
+SimpleImputer.Strategy.mean = _Mean  # type: ignore[method-assign]
+SimpleImputer.Strategy.median = _Median  # type: ignore[method-assign]
+SimpleImputer.Strategy.mode = _Mode  # type: ignore[method-assign]

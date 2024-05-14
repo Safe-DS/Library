@@ -6,7 +6,7 @@ import sys
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-from safeds._config import _init_default_device, _get_device
+from safeds._config import _get_device, _init_default_device
 from safeds._utils import _structural_hash
 from safeds.data.image._utils._image_transformation_error_and_warning_checks import (
     _check_add_noise_errors,
@@ -82,7 +82,7 @@ class _SingleSizeImageList(ImageList):
         image_list = _SingleSizeImageList()
 
         images_tensor = torch.empty(
-            number_of_images, max_channel, height, width, dtype=torch.uint8, device=_get_device()
+            number_of_images, max_channel, height, width, dtype=torch.uint8, device=_get_device(),
         )
 
         thread_packages: list[ImageList._FromFileThreadPackage] = []

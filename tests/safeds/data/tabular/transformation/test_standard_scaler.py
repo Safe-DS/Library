@@ -1,7 +1,7 @@
 import pytest
 from safeds.data.tabular.containers import Table
 from safeds.data.tabular.transformation import StandardScaler
-from safeds.exceptions import NonNumericColumnError, TransformerNotFittedError, ColumnNotFoundError
+from safeds.exceptions import ColumnNotFoundError, NonNumericColumnError, TransformerNotFittedError
 
 from tests.helpers import assert_that_tables_are_close
 
