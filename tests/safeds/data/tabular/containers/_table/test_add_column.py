@@ -1,6 +1,6 @@
 import pytest
 from safeds.data.tabular.containers import Column, Table
-from safeds.exceptions import ColumnSizeError, DuplicateColumnError
+from safeds.exceptions import DuplicateColumnError
 
 # TODO: merge into add_columns file
 
@@ -41,6 +41,7 @@ def test_should_raise_error_if_column_name_exists() -> None:
     table1 = Table({"col1": [1, 2, 1], "col2": [1, 2, 4]})
     with pytest.raises(DuplicateColumnError):
         table1.add_columns(Column("col1", ["a", "b", "c"]))
+
 
 # TODO
 # def test_should_raise_error_if_column_size_invalid() -> None:

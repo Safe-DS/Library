@@ -14,6 +14,7 @@ def test_should_match_snapshot(table: Table, snapshot_png_image: SnapshotAsserti
     correlation_heatmap = table.plot.correlation_heatmap()
     assert correlation_heatmap == snapshot_png_image
 
+
 #  TODO
 # def test_should_warn_about_empty_table() -> None:
 #     with pytest.warns(
