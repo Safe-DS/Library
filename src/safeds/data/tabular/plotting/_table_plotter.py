@@ -116,7 +116,7 @@ class TablePlotter:
             )
             fig = plt.figure()
             sns.heatmap(
-                data=only_numerical.corr().to_pandas(),
+                data=only_numerical.corr().to_numpy(),
                 vmin=-1,
                 vmax=1,
                 xticklabels=only_numerical.columns,
