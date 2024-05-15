@@ -177,11 +177,13 @@ class TablePlotter:
                     *(pl.Series(range(bin_count + 1)) / bin_count * (max_val - min_val) + min_val),
                 ]
 
-                bars = [
-                    f"{round((bins[i] + bins[i + 1]) / 2, 2)}"
-                    for i in range(len(bins) - 1)
-                ]
-                hist = column._series.hist(bins=bins).slice(1, length=maximum_number_of_bins).get_column("count")
+                bars = [f"{round((bins[i] + bins[i + 1]) / 2, 2)}" for i in range(len(bins) - 1)]
+                hist = (
+                    column._series.hist(bins=bins)
+                    .slice(1, length=maximum_number_of_bins)
+                    .get_column("count")
+                    .to_numpy()
+                )
 
                 ax.bar(bars, hist, edgecolor="black")
                 ax.set_xticks(range(len(hist)), bars, rotation=45, horizontalalignment="right")
@@ -189,8 +191,8 @@ class TablePlotter:
                 value_counts = (
                     column._series.drop_nulls().value_counts().sort(column.name).slice(0, length=maximum_number_of_bins)
                 )
-                distinct_values = value_counts.get_column(column.name).cast(pl.String)
-                hist = value_counts.get_column("count")
+                distinct_values = value_counts.get_column(column.name).cast(pl.String).to_numpy()
+                hist = value_counts.get_column("count").to_numpy()
                 ax.bar(distinct_values, hist, edgecolor="black")
                 ax.set_xticks(range(len(distinct_values)), distinct_values, rotation=45, horizontalalignment="right")
 
@@ -244,11 +246,15 @@ class TablePlotter:
         import matplotlib.pyplot as plt
         import polars as pl
 
-        grouped = self._table._lazy_frame.group_by(x_name, maintain_order=True).agg(
-            mean=pl.mean(y_name),
-            count=pl.count(y_name),
-            standard_deviation=pl.std(y_name, ddof=0),
-        ).collect()
+        grouped = (
+            self._table._lazy_frame.group_by(x_name, maintain_order=True)
+            .agg(
+                mean=pl.mean(y_name),
+                count=pl.count(y_name),
+                standard_deviation=pl.std(y_name, ddof=0),
+            )
+            .collect()
+        )
 
         x = grouped.get_column(x_name)
         y = grouped.get_column("mean")
