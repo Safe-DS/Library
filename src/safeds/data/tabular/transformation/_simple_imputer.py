@@ -1,20 +1,16 @@
 from __future__ import annotations
 
 import sys
-import warnings
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Any
+from typing import Any
 
 from safeds._utils import _structural_hash
 from safeds._validation import _check_columns_exist
 from safeds._validation._check_columns_are_numeric import _check_columns_are_numeric
 from safeds.data.tabular.containers import Table
-from safeds.exceptions import NonNumericColumnError, TransformerNotFittedError
+from safeds.exceptions import TransformerNotFittedError
 
 from ._table_transformer import TableTransformer
-
-if TYPE_CHECKING:
-    import polars as pl
 
 
 class SimpleImputer(TableTransformer):
@@ -215,9 +211,7 @@ class SimpleImputer(TableTransformer):
         _check_columns_exist(table, self._column_names)
 
         columns = [
-            (
-                pl.col(name).replace(old=self._value_to_replace, new=self._replacement[name])
-            )
+            (pl.col(name).replace(old=self._value_to_replace, new=self._replacement[name]))
             for name in self._column_names
         ]
 
@@ -256,10 +250,7 @@ class _Constant(SimpleImputer.Strategy):
         return f"Constant({self._value})"
 
     def _get_replacement(self, table: Table) -> dict[str, Any]:
-        return {
-            name: self._value
-            for name in table.column_names
-        }
+        return {name: self._value for name in table.column_names}
 
 
 class _Mean(SimpleImputer.Strategy):
@@ -307,10 +298,7 @@ class _Mode(SimpleImputer.Strategy):
         return "Mode"
 
     def _get_replacement(self, table: Table) -> dict[str, Any]:
-        return {
-            name: table.get_column(name).mode()[0]
-            for name in table.column_names
-        }
+        return {name: table.get_column(name).mode()[0] for name in table.column_names}
 
 
 # Override the methods with classes, so they can be used in `isinstance` calls. Unlike methods, classes define a type.

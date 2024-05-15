@@ -234,12 +234,13 @@ class OneHotEncoder(InvertibleTableTransformer):
         )
 
         expressions = [
-            pl.coalesce([
-                # The pl.lit is needed, so strings are not interpreted as column names
-                pl.when(pl.col(new_column_name) == 1).then(pl.lit(value))
-                for new_column_name, value in self._mapping[column_name]
-            ]).alias(column_name)
-
+            pl.coalesce(
+                [
+                    # The pl.lit is needed, so strings are not interpreted as column names
+                    pl.when(pl.col(new_column_name) == 1).then(pl.lit(value))
+                    for new_column_name, value in self._mapping[column_name]
+                ],
+            ).alias(column_name)
             for column_name in self._mapping
         ]
 

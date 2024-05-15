@@ -5,7 +5,7 @@ import pytest
 from safeds.data.tabular.containers import Table
 from safeds.data.tabular.transformation import SimpleImputer
 from safeds.data.tabular.transformation._simple_imputer import _Mode
-from safeds.exceptions import ColumnNotFoundError, NonNumericColumnError, TransformerNotFittedError, ColumnTypeError
+from safeds.exceptions import ColumnNotFoundError, ColumnTypeError, TransformerNotFittedError
 
 
 def strategies() -> list[SimpleImputer.Strategy]:
@@ -179,7 +179,7 @@ class TestFit:
     @pytest.mark.parametrize("strategy", strategies(), ids=lambda x: x.__class__.__name__)
     def test_should_raise_if_table_contains_no_rows(self, strategy: SimpleImputer.Strategy) -> None:
         with pytest.raises(ValueError, match=r"The SimpleImputer cannot be fitted because the table contains 0 rows"):
-            SimpleImputer(strategy).fit(Table({"col1": []}),  None)
+            SimpleImputer(strategy).fit(Table({"col1": []}), None)
 
     @pytest.mark.parametrize(
         ("table", "col_names", "strategy"),
