@@ -170,8 +170,8 @@ class TablePlotter:
             ax.set_ylabel("")
 
             if column.is_numeric and len(distinct_values) > maximum_number_of_bins:
-                min_val = column.min() - 1e-6  # Otherwise the minimum value is not included in the first bin
-                max_val = column.max()
+                min_val = (column.min() or 0) - 1e-6  # Otherwise the minimum value is not included in the first bin
+                max_val = column.max() or 0
                 bin_count = min(maximum_number_of_bins, len(distinct_values))
                 bins = [
                     *(pl.Series(range(bin_count + 1)) / bin_count * (max_val - min_val) + min_val),
