@@ -51,7 +51,7 @@ class TablePlotter:
         >>> table = Table({"a":[1, 2], "b": [3, 42]})
         >>> image = table.plot.box_plots()
         """
-        # TOOD: implement using matplotlib and polars
+        # TODO: implement using matplotlib and polars
         import matplotlib.pyplot as plt
         import seaborn as sns
 
@@ -98,7 +98,7 @@ class TablePlotter:
         import matplotlib.pyplot as plt
         import seaborn as sns
 
-        only_numerical = self._table.remove_non_numeric_columns()
+        only_numerical = self._table.remove_non_numeric_columns()._data_frame
 
         if self._table.number_of_rows == 0:
             warnings.warn(
@@ -106,32 +106,21 @@ class TablePlotter:
                 stacklevel=2,
             )
 
-            with warnings.catch_warnings():
-                warnings.filterwarnings(
-                    "ignore",
-                    message=(
-                        "Attempting to set identical low and high (xlims|ylims) makes transformation singular;"
-                        " automatically expanding."
-                    ),
-                )
-                fig = plt.figure()
-                sns.heatmap(
-                    data=only_numerical._data_frame.corr(),
-                    vmin=-1,
-                    vmax=1,
-                    xticklabels=only_numerical.column_names,
-                    yticklabels=only_numerical.column_names,
-                    cmap="vlag",
-                )
-                plt.tight_layout()
-        else:
+        with warnings.catch_warnings():
+            warnings.filterwarnings(
+                "ignore",
+                message=(
+                    "Attempting to set identical low and high (xlims|ylims) makes transformation singular;"
+                    " automatically expanding."
+                ),
+            )
             fig = plt.figure()
             sns.heatmap(
-                data=only_numerical._data_frame.corr(),
+                data=only_numerical.corr().to_pandas(),
                 vmin=-1,
                 vmax=1,
-                xticklabels=only_numerical.column_names,
-                yticklabels=only_numerical.column_names,
+                xticklabels=only_numerical.columns,
+                yticklabels=only_numerical.columns,
                 cmap="vlag",
             )
             plt.tight_layout()

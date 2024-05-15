@@ -87,7 +87,7 @@ plugins:
   - search
   - mkdocs-jupyter:
       include: ["*.ipynb"]
-      execute: false # TODO: Enable execution
+      execute: true
       allow_errors: false
   - exclude:
       glob:
