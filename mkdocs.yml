@@ -12,6 +12,7 @@ nav:
   - Tutorials:
     - Data Processing: tutorials/data_processing.ipynb
     - Image processing: tutorials/image_processing.ipynb
+    - ImageList processing: tutorials/image_list_processing.ipynb
     - Data Visualization: tutorials/data_visualization.ipynb
     - Classification: tutorials/classification.ipynb
     - Regression: tutorials/regression.ipynb
