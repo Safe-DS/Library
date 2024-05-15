@@ -1033,9 +1033,6 @@ class Table:
         |   2 |   5 |
         +-----+-----+
         """
-        if self.number_of_columns == 0:
-            return self  # Workaround for https://github.com/pola-rs/polars/issues/16207
-
         return Table._from_polars_lazy_frame(
             self._lazy_frame.unique(maintain_order=True),
         )
