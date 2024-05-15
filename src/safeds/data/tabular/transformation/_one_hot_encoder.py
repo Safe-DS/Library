@@ -78,11 +78,20 @@ class OneHotEncoder(InvertibleTableTransformer):
         self._new_column_names: list[str] | None = None
         self._mapping: dict[str, list[tuple[str, Any]]] | None = None  # Column name -> (new column name, value)[]
 
+    def __eq__(self, other):
+        if not isinstance(other, OneHotEncoder):
+            return NotImplemented
+        elif self is other:
+            return True
+
+        return self._separator == other._separator and self._mapping == other._mapping
+
     def __hash__(self) -> int:
         return _structural_hash(
             super().__hash__(),
             self._separator,
-            # Leave out the internal state for faster hashing
+            # TODO: Leave out the internal state for faster hashing
+            self._mapping,
         )
 
     # ------------------------------------------------------------------------------------------------------------------

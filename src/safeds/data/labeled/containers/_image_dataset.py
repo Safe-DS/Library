@@ -290,6 +290,7 @@ class ImageDataset(Generic[T], Dataset):
 
 class _TableAsTensor:
     def __init__(self, table: Table) -> None:
+        import polars as pl
         import torch
 
         _init_default_device()
@@ -298,7 +299,7 @@ class _TableAsTensor:
         if table.number_of_rows == 0:
             self._tensor = torch.empty((0, table.number_of_columns), dtype=torch.float32).to(_get_device())
         else:
-            self._tensor = table._data_frame.to_torch().to(_get_device())
+            self._tensor = table._data_frame.to_torch(dtype=pl.Float32).to(_get_device())
 
         if not torch.all(self._tensor.sum(dim=1) == torch.ones(self._tensor.size(dim=0))):
             raise ValueError(
@@ -345,6 +346,7 @@ class _TableAsTensor:
 
 class _ColumnAsTensor:
     def __init__(self, column: Column) -> None:
+        import polars as pl
         import torch
 
         _init_default_device()
@@ -360,9 +362,9 @@ class _ColumnAsTensor:
             # TODO: should not one-hot-encode the target. label encoding without order is sufficient. should also not
             #  be done automatically?
             self._one_hot_encoder = OneHotEncoder().fit(column_as_table, [self._column_name])
-        self._tensor = torch.Tensor(self._one_hot_encoder.transform(column_as_table)._data_frame.to_torch()).to(
-            _get_device(),
-        )
+        self._tensor = torch.Tensor(
+            self._one_hot_encoder.transform(column_as_table)._data_frame.to_torch(dtype=pl.Float32),
+        ).to(_get_device())
 
     def __eq__(self, other: object) -> bool:
         import torch
