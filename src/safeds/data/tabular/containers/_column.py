@@ -1009,14 +1009,7 @@ class Column(Sequence[T_co]):
         >>> from safeds.data.tabular.containers import Column
         >>> column = Column("test", [3, 1, 2, 1, 3])
         >>> column.mode()
-        +------+
-        | test |
-        |  --- |
-        |  i64 |
-        +======+
-        |    1 |
-        |    3 |
-        +------+
+        [1, 3]
         """
         import polars as pl
 

@@ -24,7 +24,7 @@ class TablePlotter:
     Examples
     --------
     >>> from safeds.data.tabular.containers import Table
-    >>> table = Table("test", [1, 2, 3])
+    >>> table = Table({"test": [1, 2, 3]})
     >>> plotter = table.plot
     """
 
