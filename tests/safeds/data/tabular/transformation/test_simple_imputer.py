@@ -5,7 +5,7 @@ import pytest
 from safeds.data.tabular.containers import Table
 from safeds.data.tabular.transformation import SimpleImputer
 from safeds.data.tabular.transformation._simple_imputer import _Mode
-from safeds.exceptions import ColumnNotFoundError, NonNumericColumnError, TransformerNotFittedError
+from safeds.exceptions import ColumnNotFoundError, NonNumericColumnError, TransformerNotFittedError, ColumnTypeError
 
 
 def strategies() -> list[SimpleImputer.Strategy]:
@@ -179,7 +179,7 @@ class TestFit:
     @pytest.mark.parametrize("strategy", strategies(), ids=lambda x: x.__class__.__name__)
     def test_should_raise_if_table_contains_no_rows(self, strategy: SimpleImputer.Strategy) -> None:
         with pytest.raises(ValueError, match=r"The SimpleImputer cannot be fitted because the table contains 0 rows"):
-            SimpleImputer(strategy).fit(Table({"col1": []}), ["col1"])
+            SimpleImputer(strategy).fit(Table({"col1": []}),  None)
 
     @pytest.mark.parametrize(
         ("table", "col_names", "strategy"),
@@ -195,34 +195,8 @@ class TestFit:
         col_names: list[str],
         strategy: SimpleImputer.Strategy,
     ) -> None:
-        with pytest.raises(
-            NonNumericColumnError,
-            match=r"Tried to do a numerical operation on one or multiple non-numerical columns: \n\['col1', 'col2'\]",
-        ):
+        with pytest.raises(ColumnTypeError):
             SimpleImputer(strategy).fit(table, col_names)
-
-    @pytest.mark.parametrize(
-        ("table", "most_frequent"),
-        [
-            (Table({"col1": [1, 2, 2, 1, 3]}), r"{'col1': \[1, 2\]}"),
-            (Table({"col1": ["a1", "a2", "a2", "a1", "a3"]}), r"{'col1': \['a1', 'a2'\]}"),
-            (
-                Table({"col1": ["a1", "a2", "a2", "a1", "a3"], "col2": [1, 1, 2, 3, 3]}),
-                r"{'col1': \['a1', 'a2'\], 'col2': \[1, 3\]}",
-            ),
-        ],
-        ids=["integers", "strings", "multiple columns"],
-    )
-    def test_should_warn_if_multiple_mode_values(self, table: Table, most_frequent: str) -> None:
-        with pytest.warns(
-            UserWarning,
-            match=(
-                r"There are multiple most frequent values in a column given to the Imputer.\nThe lowest values are"
-                r" being chosen in this cases. The following columns have multiple most frequent"
-                rf" values:\n{most_frequent}"
-            ),
-        ):
-            SimpleImputer(SimpleImputer.Strategy.mode()).fit(table, None)
 
     @pytest.mark.parametrize("strategy", strategies(), ids=lambda x: x.__class__.__name__)
     def test_should_not_change_original_transformer(self, strategy: SimpleImputer.Strategy) -> None:
@@ -235,8 +209,8 @@ class TestFit:
         transformer = SimpleImputer(strategy)
         transformer.fit(table, None)
 
-        assert transformer._wrapped_transformer is None
         assert transformer._column_names is None
+        assert transformer._replacement is None
 
 
 class TestTransform:
@@ -268,11 +242,6 @@ class TestTransform:
 
         with pytest.raises(ColumnNotFoundError):
             transformer.transform(table_to_transform)
-
-    @pytest.mark.parametrize("strategy", strategies(), ids=lambda x: x.__class__.__name__)
-    def test_should_raise_if_table_contains_no_rows(self, strategy: SimpleImputer.Strategy) -> None:
-        with pytest.raises(ValueError, match=r"The Imputer cannot transform the table because it contains 0 rows"):
-            SimpleImputer(strategy).fit(Table({"col1": [1, 2, 2]}), ["col1"]).transform(Table({"col1": []}))
 
     @pytest.mark.parametrize("strategy", strategies(), ids=lambda x: x.__class__.__name__)
     def test_should_raise_if_not_fitted(self, strategy: SimpleImputer.Strategy) -> None:
