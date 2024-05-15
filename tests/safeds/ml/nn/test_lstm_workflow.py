@@ -44,5 +44,6 @@ def test_lstm_model(device: Device) -> None:
     trained_model_2 = model_2.fit(train_table.to_time_series_dataset("value", "date"), epoch_size=1)
 
     trained_model.predict(test_table.to_time_series_dataset("value", "date"))
-    trained_model_2.predict(test_table.to_time_series_dataset("value", "date"))
+    pred = trained_model_2.predict(test_table.to_time_series_dataset("value", "date"))
+    print(pred.to_table().get_column("predicted"))
     assert model._model.state_dict()["_pytorch_layers.0._layer.weight"].device == _get_device()
