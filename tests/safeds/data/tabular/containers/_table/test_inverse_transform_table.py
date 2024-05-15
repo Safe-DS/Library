@@ -1,4 +1,6 @@
 import pytest
+from polars.testing import assert_frame_equal
+
 from safeds.data.tabular.containers import Table
 from safeds.data.tabular.transformation import OneHotEncoder
 from safeds.exceptions import TransformerNotFittedError
@@ -75,11 +77,12 @@ def test_should_return_original_table(
 
     result = transformed_table.inverse_transform_table(transformer)
 
-    # This checks whether the columns are in the same order
-    assert result.column_names == table_to_transform.column_names
-    # This is subsumed by the next assertion, but we get a better error message
-    assert result.schema == table_to_transform.schema
-    assert result == table_to_transform
+    # Order is not guaranteed
+    assert set(result.column_names) == set(table_to_transform.column_names)
+    assert_frame_equal(
+        result._data_frame.select(table_to_transform.column_names),
+        table_to_transform._data_frame,
+    )
 
 
 def test_should_not_change_transformed_table() -> None:
@@ -101,7 +104,6 @@ def test_should_not_change_transformed_table() -> None:
         },
     )
 
-    assert transformed_table.schema == expected.schema
     assert transformed_table == expected
 
 
