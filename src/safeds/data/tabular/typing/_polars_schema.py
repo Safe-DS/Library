@@ -37,7 +37,7 @@ class _PolarsSchema(Schema):
         return self._schema == other._schema
 
     def __hash__(self) -> int:
-        return _structural_hash(str(self._schema))
+        return _structural_hash(tuple(self._schema.keys()), [str(type_) for type_ in self._schema.values()])
 
     def __repr__(self) -> str:
         return f"Schema({self!s})"

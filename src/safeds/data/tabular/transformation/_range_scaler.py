@@ -54,6 +54,7 @@ class RangeScaler(InvertibleTableTransformer):
             super().__hash__(),
             self._min,
             self._max,
+            # Leave out the internal state for faster hashing
         )
 
     # ------------------------------------------------------------------------------------------------------------------
