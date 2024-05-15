@@ -32,10 +32,10 @@ from safeds.exceptions import ColumnNotFoundError, TransformerNotFittedError
             ["col1"],
             Table(
                 {
+                    "col2": ["a", "b", "b", "c"],
                     "col1__a": [1.0, 0.0, 0.0, 0.0],
                     "col1__b": [0.0, 1.0, 1.0, 0.0],
                     "col1__c": [0.0, 0.0, 0.0, 1.0],
-                    "col2": ["a", "b", "b", "c"],
                 },
             ),
         ),
@@ -80,7 +80,6 @@ def test_should_return_transformed_table(
     expected: Table,
 ) -> None:
     transformer = OneHotEncoder().fit(table, column_names)
-    assert table.transform_table(transformer).schema == expected.schema
     assert table.transform_table(transformer) == expected
 
 

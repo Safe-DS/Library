@@ -53,7 +53,7 @@ class TabularDataset(Dataset):
 
     Examples
     --------
-    >>> from safeds.data.labeled.containers import TabularDataset
+    >>> from safeds.data.tabular.containers import Table
     >>> table = Table(
     ...     {
     ...         "id": [1, 2, 3],

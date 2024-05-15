@@ -638,7 +638,7 @@ class Column(Sequence[T_co]):
 
         return self._from_polars_series(series)
 
-    def from_str_to_temporal(self, format_string: str)->Column:
+    def from_str_to_temporal(self, format_string: str) -> Column:
         """
         Return a new column with the string values converted to temporal data.
 
@@ -670,6 +670,7 @@ class Column(Sequence[T_co]):
         +------------+
         """
         from polars import Date
+
         return Column._from_polars_series(self._series.str.strptime(Date, format_string))
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -1043,14 +1044,7 @@ class Column(Sequence[T_co]):
         >>> from safeds.data.tabular.containers import Column
         >>> column = Column("test", [3, 1, 2, 1, 3])
         >>> column.mode()
-        +------+
-        | test |
-        |  --- |
-        |  i64 |
-        +======+
-        |    1 |
-        |    3 |
-        +------+
+        [1, 3]
         """
         import polars as pl
 

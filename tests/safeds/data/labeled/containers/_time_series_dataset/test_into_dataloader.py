@@ -216,6 +216,7 @@ def test_should_create_dataloader_predict_invalid(
             batch_size=1,
         )
 
+
 def test_continues_dataloader() -> None:
     ts = Table(
         {"a": [1, 2, 3, 4, 5, 6, 7], "b": [1, 2, 3, 4, 5, 6, 7], "c": [1, 2, 3, 4, 5, 6, 7]}

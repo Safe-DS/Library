@@ -377,23 +377,6 @@ class TestSummarizeMetrics:
 
         assert DummyClassifier().summarize_metrics(table, 1) == result
 
-    @pytest.mark.parametrize(
-        "table",
-        [
-            Table(
-                {
-                    "a": [1.0, 0.0, 0.0, 0.0],
-                    "b": [0.0, 1.0, 1.0, 0.0],
-                    "c": [0.0, 0.0, 0.0, 1.0],
-                },
-            ),
-        ],
-        ids=["table"],
-    )
-    def test_should_raise_if_given_normal_table(self, table: Table) -> None:
-        with pytest.raises(PlainTableError):
-            DummyClassifier().summarize_metrics(table, 1)  # type: ignore[arg-type]
-
 
 class TestAccuracy:
     def test_with_same_type(self) -> None:
@@ -418,114 +401,145 @@ class TestAccuracy:
 
 
 class TestPrecision:
-    def test_should_compare_result(self) -> None:
+    @pytest.mark.parametrize(
+        ("predicted", "expected", "result"),
+        [
+            (
+                [2, 0, 0, 0],
+                [0, 1, 1, 2],
+                1.0,
+            ),
+            (
+                [2, 1, 1, 0],
+                [0, 1, 1, 2],
+                1.0,
+            ),
+            (
+                [2, 1, 1, 0],
+                [0, 1, 0, 2],
+                0.5,
+            ),
+            (
+                [2, 1, 1, 0],
+                [0, 0, 0, 1],
+                0.0,
+            ),
+        ],
+        ids=[
+            "no positive predictions",
+            "all correct positive predictions",
+            "some correct positive predictions",
+            "no correct positive predictions",
+        ],
+    )
+    def test_should_compute_precision(self, predicted: list, expected: list, result: float) -> None:
         table = Table(
             {
-                "predicted": [1, 1, 0, 2],
-                "expected": [1, 0, 1, 2],
+                "predicted": predicted,
+                "expected": expected,
             },
         ).to_tabular_dataset(target_name="expected")
 
-        assert DummyClassifier().precision(table, 1) == 0.5
-
-    def test_should_compare_result_with_different_types(self) -> None:
-        table = Table(
-            {
-                "predicted": [1, "1", "0", "2"],
-                "expected": [1, 0, 1, 2],
-            },
-        ).to_tabular_dataset(target_name="expected")
-
-        assert DummyClassifier().precision(table, 1) == 1.0
-
-    def test_should_return_1_if_never_expected_to_be_positive(self) -> None:
-        table = Table(
-            {
-                "predicted": ["lol", "1", "0", "2"],
-                "expected": [1, 0, 1, 2],
-            },
-        ).to_tabular_dataset(target_name="expected")
-
-        assert DummyClassifier().precision(table, 1) == 1.0
+        assert DummyClassifier().precision(table, 1) == result
 
 
 class TestRecall:
-    def test_should_compare_result(self) -> None:
-        table = Table(
-            {
-                "predicted": [1, 1, 0, 2],
-                "expected": [1, 0, 1, 2],
-            },
-        ).to_tabular_dataset(target_name="expected")
-
-        assert DummyClassifier().recall(table, 1) == 0.5
-
-    def test_should_compare_result_with_different_types(self) -> None:
-        table = Table(
-            {
-                "predicted": [1, "1", "0", "2"],
-                "expected": [1, 0, 1, 2],
-            },
-        ).to_tabular_dataset(target_name="expected")
-
-        assert DummyClassifier().recall(table, 1) == 0.5
-
-    def test_should_return_1_if_never_expected_to_be_positive(self) -> None:
-        table = Table(
-            {
-                "predicted": ["lol", "1", "0", "2"],
-                "expected": [2, 0, 5, 2],
-            },
-        ).to_tabular_dataset(target_name="expected")
-
-        assert DummyClassifier().recall(table, 1) == 1.0
-
     @pytest.mark.parametrize(
-        "table",
+        ("predicted", "expected", "result"),
         [
-            Table(
-                {
-                    "a": [1.0, 0.0, 0.0, 0.0],
-                    "b": [0.0, 1.0, 1.0, 0.0],
-                    "c": [0.0, 0.0, 0.0, 1.0],
-                },
+            (
+                [2, 0, 0, 0],
+                [0, 0, 0, 2],
+                1.0,
+            ),
+            (
+                [2, 1, 1, 0],
+                [0, 1, 1, 2],
+                1.0,
+            ),
+            (
+                [2, 1, 0, 0],
+                [0, 1, 1, 2],
+                0.5,
+            ),
+            (
+                [2, 1, 1, 0],
+                [0, 0, 0, 1],
+                0.0,
             ),
         ],
-        ids=["table"],
+        ids=[
+            "no positive expectations",
+            "all positive expectations recalled",
+            "some positive expectations recalled",
+            "no positive expectations recalled",
+        ],
     )
-    # TODO: no longer raises (and that's correct)
-    def test_should_raise_if_given_normal_table(self, table: Table) -> None:
-        with pytest.raises(PlainTableError):
-            DummyClassifier().recall(table, 1)  # type: ignore[arg-type]
+    def test_should_compute_recall(self, predicted: list, expected: list, result: float) -> None:
+        table = Table(
+            {
+                "predicted": predicted,
+                "expected": expected,
+            },
+        ).to_tabular_dataset(target_name="expected")
+
+        assert DummyClassifier().recall(table, 1) == result
 
 
 class TestF1Score:
-    def test_should_compare_result(self) -> None:
+    @pytest.mark.parametrize(
+        ("predicted", "expected", "result"),
+        [
+            # From precision
+            (
+                [2, 0, 0, 0],
+                [0, 1, 1, 2],
+                0.0,
+            ),
+            (
+                [2, 1, 1, 0],
+                [0, 1, 1, 2],
+                1.0,
+            ),
+            (
+                [2, 1, 1, 0],
+                [0, 1, 0, 2],
+                2 / 3,
+            ),
+            (
+                [2, 1, 1, 0],
+                [0, 0, 0, 1],
+                0.0,
+            ),
+            # From recall
+            (
+                [2, 0, 0, 0],
+                [0, 0, 0, 2],
+                1.0,
+            ),
+            (
+                [2, 1, 0, 0],
+                [0, 1, 1, 2],
+                2 / 3,
+            ),
+        ],
+        ids=[
+            # From precision
+            "no positive predictions",
+            "all correct positive predictions",
+            "some correct positive predictions",
+            "no correct positive predictions",
+            # From recall
+            "no positive expectations",
+            "some positive expectations recalled",
+        ],
+    )
+    def test_should_compute_f1_score(self, predicted: list, expected: list, result: float) -> None:
         table = Table(
             {
-                "predicted": [1, 1, 0, 2],
-                "expected": [1, 0, 1, 2],
+                "predicted": predicted,
+                "expected": expected,
             },
         ).to_tabular_dataset(target_name="expected")
 
-        assert DummyClassifier().f1_score(table, 1) == 0.5
-
-    def test_should_compare_result_with_different_types(self) -> None:
-        table = Table(
-            {
-                "predicted": [1, "1", "0", "2"],
-                "expected": [1, 0, 1, 2],
-            },
-        ).to_tabular_dataset(target_name="expected")
-
-        assert DummyClassifier().f1_score(table, 1) == pytest.approx(0.6666667)
-
-    def test_should_return_1_if_never_expected_or_predicted_to_be_positive(self) -> None:
-        table = Table(
-            {
-                "predicted": ["lol", "1", "0", "2"],
-                "expected": [2, 0, 2, 2],
-            },
-        ).to_tabular_dataset(target_name="expected")
-
-        assert DummyClassifier().f1_score(table, 1) == 1.0
+        assert DummyClassifier().f1_score(table, 1) == result

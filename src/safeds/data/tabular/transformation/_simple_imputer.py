@@ -1,21 +1,16 @@
 from __future__ import annotations
 
 import sys
-import warnings
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Any
-
-import pandas as pd
+from typing import Any
 
 from safeds._utils import _structural_hash
 from safeds._validation import _check_columns_exist
+from safeds._validation._check_columns_are_numeric import _check_columns_are_numeric
 from safeds.data.tabular.containers import Table
-from safeds.exceptions import NonNumericColumnError, TransformerNotFittedError
+from safeds.exceptions import TransformerNotFittedError
 
 from ._table_transformer import TableTransformer
-
-if TYPE_CHECKING:
-    from sklearn.impute import SimpleImputer as sk_SimpleImputer
 
 
 class SimpleImputer(TableTransformer):
@@ -61,8 +56,8 @@ class SimpleImputer(TableTransformer):
         def __str__(self) -> str: ...
 
         @abstractmethod
-        def _apply(self, imputer: sk_SimpleImputer) -> None:
-            """Set the imputer strategy of the given imputer."""
+        def _get_replacement(self, table: Table) -> dict[str, Any]:
+            """Return a polars expression to compute the replacement value for each column of a data frame."""
 
         @staticmethod
         def constant(value: Any) -> SimpleImputer.Strategy:
@@ -98,19 +93,19 @@ class SimpleImputer(TableTransformer):
     def __init__(self, strategy: SimpleImputer.Strategy, *, value_to_replace: float | str | None = None) -> None:
         super().__init__()
 
-        if value_to_replace is None:
-            value_to_replace = pd.NA
-
+        # Parameters
         self._strategy = strategy
         self._value_to_replace = value_to_replace
 
-        self._wrapped_transformer: sk_SimpleImputer | None = None
+        # Internal state
+        self._replacement: dict[str, Any] | None = None
 
     def __hash__(self) -> int:
         return _structural_hash(
             super().__hash__(),
             self._strategy,
             self._value_to_replace,
+            # Leave out the internal state for faster hashing
         )
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -159,56 +154,28 @@ class SimpleImputer(TableTransformer):
             If the strategy is set to either Mean or Median and the specified columns of the table contain non-numerical
             data.
         """
-        from sklearn.impute import SimpleImputer as sk_SimpleImputer
-
-        if column_names is None:
-            column_names = table.column_names
-        else:
-            _check_columns_exist(table, column_names)
+        if isinstance(self._strategy, _Mean | _Median):
+            if column_names is None:
+                column_names = [name for name in table.column_names if table.get_column_type(name).is_numeric]
+            else:
+                _check_columns_exist(table, column_names)
+                _check_columns_are_numeric(table, column_names, operation="fit a SimpleImputer")
+        else:  # noqa: PLR5501
+            if column_names is None:
+                column_names = table.column_names
+            else:
+                _check_columns_exist(table, column_names)
 
         if table.number_of_rows == 0:
             raise ValueError("The SimpleImputer cannot be fitted because the table contains 0 rows")
 
-        if (isinstance(self._strategy, _Mean | _Median)) and table.remove_columns_except(
-            column_names,
-        ).remove_non_numeric_columns().number_of_columns < len(
-            column_names,
-        ):
-            raise NonNumericColumnError(
-                str(
-                    sorted(
-                        set(table.remove_columns_except(column_names).column_names)
-                        - set(
-                            table.remove_columns_except(column_names).remove_non_numeric_columns().column_names,
-                        ),
-                    ),
-                ),
-            )
+        # Learn the transformation
+        replacement = self._strategy._get_replacement(table)
 
-        if isinstance(self._strategy, _Mode):
-            multiple_most_frequent = {}
-            for name in column_names:
-                if len(table.get_column(name).mode()) > 1:
-                    multiple_most_frequent[name] = table.get_column(name).mode()
-            if len(multiple_most_frequent) > 0:
-                warnings.warn(
-                    "There are multiple most frequent values in a column given to the Imputer.\nThe lowest values"
-                    " are being chosen in this cases. The following columns have multiple most frequent"
-                    f" values:\n{multiple_most_frequent}",
-                    UserWarning,
-                    stacklevel=2,
-                )
-
-        wrapped_transformer = sk_SimpleImputer(missing_values=self._value_to_replace)
-        self._strategy._apply(wrapped_transformer)
-        wrapped_transformer.set_output(transform="polars")
-        wrapped_transformer.fit(
-            table.remove_columns_except(column_names)._data_frame,
-        )
-
-        result = SimpleImputer(self._strategy)
-        result._wrapped_transformer = wrapped_transformer
+        # Create a copy with the learned transformation
+        result = SimpleImputer(self._strategy, value_to_replace=self._value_to_replace)
         result._column_names = column_names
+        result._replacement = replacement
 
         return result
 
@@ -234,22 +201,22 @@ class SimpleImputer(TableTransformer):
             If the transformer has not been fitted yet.
         ColumnNotFoundError
             If the input table does not contain all columns used to fit the transformer.
-        ValueError
-            If the table contains 0 rows.
         """
-        # Transformer has not been fitted yet
-        if self._wrapped_transformer is None or self._column_names is None:
+        import polars as pl
+
+        # Used in favor of is_fitted, so the type checker is happy
+        if self._column_names is None or self._replacement is None:
             raise TransformerNotFittedError
 
-        # Input table does not contain all columns used to fit the transformer
         _check_columns_exist(table, self._column_names)
 
-        if table.number_of_rows == 0:
-            raise ValueError("The Imputer cannot transform the table because it contains 0 rows")
+        columns = [
+            (pl.col(name).replace(old=self._value_to_replace, new=self._replacement[name]))
+            for name in self._column_names
+        ]
 
-        new_data = self._wrapped_transformer.transform(table.remove_columns_except(self._column_names)._data_frame)
         return Table._from_polars_lazy_frame(
-            table._lazy_frame.update(new_data.lazy()),
+            table._lazy_frame.with_columns(columns),
         )
 
 
@@ -282,9 +249,8 @@ class _Constant(SimpleImputer.Strategy):
     def __str__(self) -> str:
         return f"Constant({self._value})"
 
-    def _apply(self, imputer: sk_SimpleImputer) -> None:
-        imputer.strategy = "constant"
-        imputer.fill_value = self._value
+    def _get_replacement(self, table: Table) -> dict[str, Any]:
+        return {name: self._value for name in table.column_names}
 
 
 class _Mean(SimpleImputer.Strategy):
@@ -299,8 +265,8 @@ class _Mean(SimpleImputer.Strategy):
     def __str__(self) -> str:
         return "Mean"
 
-    def _apply(self, imputer: sk_SimpleImputer) -> None:
-        imputer.strategy = "mean"
+    def _get_replacement(self, table: Table) -> dict[str, Any]:
+        return table._lazy_frame.mean().collect().to_dict()
 
 
 class _Median(SimpleImputer.Strategy):
@@ -315,8 +281,8 @@ class _Median(SimpleImputer.Strategy):
     def __str__(self) -> str:
         return "Median"
 
-    def _apply(self, imputer: sk_SimpleImputer) -> None:
-        imputer.strategy = "median"
+    def _get_replacement(self, table: Table) -> dict[str, Any]:
+        return table._lazy_frame.median().collect().to_dict()
 
 
 class _Mode(SimpleImputer.Strategy):
@@ -331,8 +297,8 @@ class _Mode(SimpleImputer.Strategy):
     def __str__(self) -> str:
         return "Mode"
 
-    def _apply(self, imputer: sk_SimpleImputer) -> None:
-        imputer.strategy = "most_frequent"
+    def _get_replacement(self, table: Table) -> dict[str, Any]:
+        return {name: table.get_column(name).mode()[0] for name in table.column_names}
 
 
 # Override the methods with classes, so they can be used in `isinstance` calls. Unlike methods, classes define a type.

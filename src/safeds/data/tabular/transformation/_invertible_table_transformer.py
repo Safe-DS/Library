@@ -15,9 +15,11 @@ class InvertibleTableTransformer(TableTransformer):
     @abstractmethod
     def inverse_transform(self, transformed_table: Table) -> Table:
         """
-        Undo the learned transformation.
+        Undo the learned transformation as well as possible.
 
-        The table is not modified.
+        Column order and types may differ from the original table. Likewise, some values might not be restored.
+
+        **Note:** The given table is not modified.
 
         Parameters
         ----------
