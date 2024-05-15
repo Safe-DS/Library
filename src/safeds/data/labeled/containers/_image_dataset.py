@@ -227,8 +227,14 @@ class ImageDataset(Generic[T], Dataset):
     def _sort_image_list_with_shuffle_tensor_indices(self, image_list: _SingleSizeImageList) -> _SingleSizeImageList:
         shuffled_image_list = _SingleSizeImageList()
         shuffled_image_list._tensor = image_list._tensor
-        shuffled_image_list._indices_to_tensor_positions = {index: self._shuffle_tensor_indices[tensor_position].item() for index, tensor_position in image_list._indices_to_tensor_positions.items()}
-        shuffled_image_list._tensor_positions_to_indices = [index for index, _ in sorted(shuffled_image_list._indices_to_tensor_positions.items(), key=lambda item: item[1])]
+        shuffled_image_list._indices_to_tensor_positions = {
+            index: self._shuffle_tensor_indices[tensor_position].item()
+            for index, tensor_position in image_list._indices_to_tensor_positions.items()
+        }
+        shuffled_image_list._tensor_positions_to_indices = [
+            index
+            for index, _ in sorted(shuffled_image_list._indices_to_tensor_positions.items(), key=lambda item: item[1])
+        ]
         return shuffled_image_list
 
     def _get_batch(self, batch_number: int, batch_size: int | None = None) -> tuple[Tensor, Tensor]:
@@ -415,6 +421,12 @@ class _ColumnAsTensor:
 
     def _to_column(self, shuffled_indices: Tensor) -> Column:
         table = Table(
-            dict(zip(self._one_hot_encoder._get_names_of_added_columns(), self._tensor[shuffled_indices].T.tolist(), strict=False)),
+            dict(
+                zip(
+                    self._one_hot_encoder._get_names_of_added_columns(),
+                    self._tensor[shuffled_indices].T.tolist(),
+                    strict=False,
+                ),
+            ),
         )
         return self._one_hot_encoder.inverse_transform(table).get_column(self._column_name)
