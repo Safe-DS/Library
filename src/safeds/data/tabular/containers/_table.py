@@ -331,7 +331,7 @@ class Table:
         if self is other:
             return True
 
-        return self._data_frame.frame_equal(other._data_frame)
+        return self._data_frame.equals(other._data_frame)
 
     def __hash__(self) -> int:
         return _structural_hash(self.schema, self.number_of_rows)
