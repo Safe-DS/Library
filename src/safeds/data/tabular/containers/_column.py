@@ -638,6 +638,40 @@ class Column(Sequence[T_co]):
 
         return self._from_polars_series(series)
 
+    def from_str_to_temporal(self, format_string: str):
+        """
+        Return a new column with the string values converted to temporal data.
+
+        The original column is not modified.
+
+        Parameters
+        ----------
+        format_string :
+            The used format string to convert the string into temporal data.
+
+        Returns
+        -------
+        transformed_column:
+            A new column with temporal data.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("dates", ["01:01:2021", "01:01:2022", "01:01:2023", "01:01:2024"])
+        >>> column.from_str_to_temporal("%d:%m:%Y")
+        | dates      |
+        | ---        |
+        | date       |
+        +============+
+        | 2021-01-01 |
+        | 2022-01-01 |
+        | 2023-01-01 |
+        | 2024-01-01 |
+        +------------+
+        """
+        from polars import Date
+        return Column._from_polars_series(self._series.str.strptime(Date, format_string))
+
     # ------------------------------------------------------------------------------------------------------------------
     # Statistics
     # ------------------------------------------------------------------------------------------------------------------

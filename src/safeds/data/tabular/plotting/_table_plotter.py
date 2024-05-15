@@ -246,7 +246,7 @@ class TablePlotter:
         _check_columns_exist(self._table, [x_name, y_name])
 
         # TODO: pass list of columns names + extract validation
-        if not self._table.get_column(x_name).is_numeric:
+        if not self._table.get_column(x_name).is_numeric and not self._table.get_column(x_name).is_temporal:
             raise NonNumericColumnError(x_name)
         if not self._table.get_column(y_name).is_numeric:
             raise NonNumericColumnError(y_name)
@@ -309,7 +309,7 @@ class TablePlotter:
         _check_columns_exist(self._table, [x_name, y_name])
 
         # TODO: pass list of columns names + extract validation
-        if not self._table.get_column(x_name).is_numeric:
+        if not self._table.get_column(x_name).is_numeric and not self._table.get_column(x_name).is_temporal:
             raise NonNumericColumnError(x_name)
         if not self._table.get_column(y_name).is_numeric:
             raise NonNumericColumnError(y_name)
