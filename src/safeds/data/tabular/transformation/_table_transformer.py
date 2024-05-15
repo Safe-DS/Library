@@ -47,7 +47,7 @@ class TableTransformer(ABC):
         """
         Learn a transformation for a set of columns in a table.
 
-        This transformer is not modified.
+        **Note:** This transformer is not modified.
 
         Parameters
         ----------
@@ -67,7 +67,7 @@ class TableTransformer(ABC):
         """
         Apply the learned transformation to a table.
 
-        The table is not modified.
+        **Note:** The given table is not modified.
 
         Parameters
         ----------
@@ -93,7 +93,7 @@ class TableTransformer(ABC):
         """
         Learn a transformation for a set of columns in a table and apply the learned transformation to the same table.
 
-        Neither the transformer nor the table are modified.
+        **Note:** Neither this transformer nor the given table are modified.
 
         Parameters
         ----------

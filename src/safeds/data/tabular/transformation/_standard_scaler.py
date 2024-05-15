@@ -28,6 +28,7 @@ class StandardScaler(InvertibleTableTransformer):
         self._data_standard_deviation: pl.DataFrame | None = None
 
     def __hash__(self) -> int:
+        # Leave out the internal state for faster hashing
         return super().__hash__()
 
     # ------------------------------------------------------------------------------------------------------------------

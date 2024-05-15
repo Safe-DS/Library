@@ -1,16 +1,14 @@
 from __future__ import annotations
 
 import warnings
-from collections import Counter
 from typing import Any
 
 from safeds._utils import _structural_hash
 from safeds._validation import _check_columns_exist
-from safeds.data.tabular.containers import Column, Table
+from safeds._validation._check_columns_are_numeric import _check_columns_are_numeric
+from safeds.data.tabular.containers import Table
 from safeds.exceptions import (
-    NonNumericColumnError,
     TransformerNotFittedError,
-    ValueNotPresentWhenFittedError,
 )
 
 from ._invertible_table_transformer import InvertibleTableTransformer
@@ -43,6 +41,11 @@ class OneHotEncoder(InvertibleTableTransformer):
     The name "one-hot" comes from the fact that each row has exactly one 1 in it, and the rest of the values are 0s.
     One-hot encoding is closely related to dummy variable / indicator variables, which are used in statistics.
 
+    Parameters
+    ----------
+    separator:
+        The separator used to separate the original column name from the value in the new column names.
+
     Examples
     --------
     >>> from safeds.data.tabular.containers import Table
@@ -50,42 +53,50 @@ class OneHotEncoder(InvertibleTableTransformer):
     >>> table = Table({"col1": ["a", "b", "c", "a"]})
     >>> transformer = OneHotEncoder()
     >>> transformer.fit_and_transform(table, ["col1"])[1]
-       col1__a  col1__b  col1__c
-    0      1.0      0.0      0.0
-    1      0.0      1.0      0.0
-    2      0.0      0.0      1.0
-    3      1.0      0.0      0.0
+    +---------+---------+---------+
+    | col1__a | col1__b | col1__c |
+    |     --- |     --- |     --- |
+    |      u8 |      u8 |      u8 |
+    +=============================+
+    |       1 |       0 |       0 |
+    |       0 |       1 |       0 |
+    |       0 |       0 |       1 |
+    |       1 |       0 |       0 |
+    +---------+---------+---------+
     """
 
     # ------------------------------------------------------------------------------------------------------------------
     # Dunder methods
     # ------------------------------------------------------------------------------------------------------------------
 
-    def __init__(self) -> None:
+    def __init__(
+        self,
+        *,
+        separator: str = "__",
+    ) -> None:
         super().__init__()
 
-        # Maps each old column to (list of) new columns created from it:
-        self._column_map: dict[str, list[str]] | None = None
-        # Maps concrete values (tuples of old column and value) to corresponding new column names:
-        self._value_to_column: dict[tuple[str, Any], str] | None = None
-        # Maps nan values (str of old column) to corresponding new column name
-        self._value_to_column_nans: dict[str, str] | None = None
+        # Parameters
+        self._separator = separator
+
+        # Internal state
+        self._new_column_names: list[str] | None = None
+        self._mapping: dict[str, list[tuple[str, Any]]] | None = None  # Column name -> (new column name, value)[]
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, OneHotEncoder):
             return NotImplemented
-        return (
-            self._column_map == other._column_map
-            and self._value_to_column == other._value_to_column
-            and self._value_to_column_nans == other._value_to_column_nans
-        )
+        elif self is other:
+            return True
+
+        return self._separator == other._separator and self._mapping == other._mapping
 
     def __hash__(self) -> int:
         return _structural_hash(
             super().__hash__(),
-            self._column_map,
-            self._value_to_column,
-            self._value_to_column_nans,
+            self._separator,
+            # TODO: Leave out the internal state for faster hashing
+            self._mapping,
         )
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -117,51 +128,42 @@ class OneHotEncoder(InvertibleTableTransformer):
         ValueError
             If the table contains 0 rows.
         """
-        import numpy as np
-
         if column_names is None:
-            column_names = table.column_names
+            column_names = [name for name in table.column_names if not table.get_column_type(name).is_numeric]
         else:
             _check_columns_exist(table, column_names)
+            _warn_if_columns_are_numeric(table, column_names)
 
         if table.number_of_rows == 0:
             raise ValueError("The OneHotEncoder cannot be fitted because the table contains 0 rows")
 
-        if table.remove_columns_except(column_names).remove_non_numeric_columns().number_of_columns > 0:
-            warnings.warn(
-                "The columns"
-                f" {table.remove_columns_except(column_names).remove_non_numeric_columns().column_names} contain"
-                " numerical data. The OneHotEncoder is designed to encode non-numerical values into numerical values",
-                UserWarning,
-                stacklevel=2,
-            )
+        # Learn the transformation
+        new_column_names: list[str] = []
+        mapping: dict[str, list[tuple[str, Any]]] = {}
 
+        known_names = set(table.column_names)
+
+        for name in column_names:
+            mapping[name] = []
+            for value in table.get_column(name).get_distinct_values():
+                base_name = f"{name}{self._separator}{value}"
+                new_name = base_name
+
+                # Ensure that the new column name is unique
+                counter = 2
+                while new_name in known_names:
+                    new_name = f"{base_name}#{counter}"
+                    counter += 1
+
+                known_names.add(new_name)
+                new_column_names.append(new_name)
+                mapping[name].append((new_name, value))
+
+        # Create a copy with the learned transformation
         result = OneHotEncoder()
         result._column_names = column_names
-        result._column_map = {}
-        result._value_to_column = {}
-        result._value_to_column_nans = {}
-
-        # Keep track of number of occurrences of column names;
-        # initially all old column names appear exactly once:
-        name_counter = Counter(table.column_names)
-
-        # Iterate through all columns to-be-changed:
-        for column in column_names:
-            result._column_map[column] = []
-            for element in table.get_column(column).get_distinct_values():
-                base_name = f"{column}__{element}"
-                name_counter[base_name] += 1
-                new_column_name = base_name
-                # Check if newly created name matches some other existing column name:
-                if name_counter[base_name] > 1:
-                    new_column_name += f"#{name_counter[base_name]}"
-                # Update dictionary entries:
-                result._column_map[column] += [new_column_name]
-                if isinstance(element, float) and np.isnan(element):
-                    result._value_to_column_nans[column] = new_column_name
-                else:
-                    result._value_to_column[(column, element)] = new_column_name
+        result._new_column_names = new_column_names
+        result._mapping = mapping
 
         return result
 
@@ -187,66 +189,25 @@ class OneHotEncoder(InvertibleTableTransformer):
             If the transformer has not been fitted yet.
         ColumnNotFoundError
             If the input table does not contain all columns used to fit the transformer.
-        ValueError
-            If the table contains 0 rows.
-        ValueNotPresentWhenFittedError
-            If a column in the to-be-transformed table contains a new value that was not already present in the table
-            the OneHotEncoder was fitted on.
         """
-        import numpy as np
+        import polars as pl
 
-        # Transformer has not been fitted yet
-        if self._column_map is None or self._value_to_column is None or self._value_to_column_nans is None:
+        # Used in favor of is_fitted, so the type checker is happy
+        if self._column_names is None or self._mapping is None:
             raise TransformerNotFittedError
 
-        # Input table does not contain all columns used to fit the transformer
-        _check_columns_exist(table, list(self._column_map.keys()))
+        _check_columns_exist(table, self._column_names)
 
-        if table.number_of_rows == 0:
-            raise ValueError("The LabelEncoder cannot transform the table because it contains 0 rows")
+        expressions = [
+            # UInt8 can be used without conversion in scikit-learn
+            pl.col(column_name).eq_missing(value).alias(new_name).cast(pl.UInt8)
+            for column_name in self._column_names
+            for new_name, value in self._mapping[column_name]
+        ]
 
-        encoded_values = {}
-        for new_column_name in self._value_to_column.values():
-            encoded_values[new_column_name] = [0.0 for _ in range(table.number_of_rows)]
-        for new_column_name in self._value_to_column_nans.values():
-            encoded_values[new_column_name] = [0.0 for _ in range(table.number_of_rows)]
-
-        values_not_present_when_fitted = []
-        for old_column_name in self._column_map:
-            for i in range(table.number_of_rows):
-                value = table.get_column(old_column_name).get_value(i)
-                try:
-                    if isinstance(value, float) and np.isnan(value):
-                        new_column_name = self._value_to_column_nans[old_column_name]
-                    else:
-                        new_column_name = self._value_to_column[(old_column_name, value)]
-                    encoded_values[new_column_name][i] = 1.0
-                except KeyError:
-                    # This happens when a column in the to-be-transformed table contains a new value that was not
-                    # already present in the table the OneHotEncoder was fitted on.
-                    values_not_present_when_fitted.append((value, old_column_name))
-
-            for new_column in self._column_map[old_column_name]:
-                table = table.add_columns([Column(new_column, encoded_values[new_column])])
-
-        if len(values_not_present_when_fitted) > 0:
-            raise ValueNotPresentWhenFittedError(values_not_present_when_fitted)
-
-        # New columns may not be sorted:
-        column_names = []
-        for name in table.column_names:
-            if name not in self._column_map:
-                column_names.append(name)
-            else:
-                column_names.extend(
-                    [f_name for f_name in self._value_to_column.values() if f_name.startswith(name)]
-                    + [f_name for f_name in self._value_to_column_nans.values() if f_name.startswith(name)],
-                )
-
-        # Drop old, non-encoded columns:
-        # (Don't do this earlier - we need the old column nams for sorting,
-        # plus we need to prevent the table from possibly having 0 columns temporarily.)
-        return table.remove_columns(list(self._column_map.keys()))
+        return Table._from_polars_lazy_frame(
+            table._lazy_frame.with_columns(expressions).drop(self._column_names),
+        )
 
     def inverse_transform(self, transformed_table: Table) -> Table:
         """
@@ -272,63 +233,48 @@ class OneHotEncoder(InvertibleTableTransformer):
             If the input table does not contain all columns used to fit the transformer.
         NonNumericColumnError
             If the transformed columns of the input table contain non-numerical data.
-        ValueError
-            If the table contains 0 rows.
         """
-        # Transformer has not been fitted yet
-        if self._column_map is None or self._value_to_column is None or self._value_to_column_nans is None:
+        import polars as pl
+
+        # Used in favor of is_fitted, so the type checker is happy
+        if self._column_names is None or self._new_column_names is None or self._mapping is None:
             raise TransformerNotFittedError
 
-        _transformed_column_names = [item for sublist in self._column_map.values() for item in sublist]
+        _check_columns_exist(transformed_table, self._new_column_names)
+        _check_columns_are_numeric(
+            transformed_table,
+            self._new_column_names,
+            operation="inverse-transform with a OneHotEncoder",
+        )
 
-        _check_columns_exist(transformed_table, _transformed_column_names)
+        expressions = [
+            pl.coalesce(
+                [
+                    # The pl.lit is needed, so strings are not interpreted as column names
+                    pl.when(pl.col(new_column_name) == 1).then(pl.lit(value))
+                    for new_column_name, value in self._mapping[column_name]
+                ],
+            ).alias(column_name)
+            for column_name in self._mapping
+        ]
 
-        if transformed_table.number_of_rows == 0:
-            raise ValueError("The OneHotEncoder cannot inverse transform the table because it contains 0 rows")
-
-        if transformed_table.remove_columns_except(
-            _transformed_column_names,
-        ).remove_non_numeric_columns().number_of_columns < len(_transformed_column_names):
-            raise NonNumericColumnError(
-                str(
-                    sorted(
-                        set(_transformed_column_names)
-                        - set(
-                            transformed_table.remove_columns_except(_transformed_column_names)
-                            .remove_non_numeric_columns()
-                            .column_names,
-                        ),
-                    ),
-                ),
-            )
-
-        original_columns = {}
-        for original_column_name in self._column_map:
-            original_columns[original_column_name] = [None for _ in range(transformed_table.number_of_rows)]
-
-        for original_column_name, value in self._value_to_column:
-            constructed_column = self._value_to_column[(original_column_name, value)]
-            for i in range(transformed_table.number_of_rows):
-                if transformed_table.get_column(constructed_column)[i] == 1.0:
-                    original_columns[original_column_name][i] = value
-
-        for original_column_name in self._value_to_column_nans:
-            constructed_column = self._value_to_column_nans[original_column_name]
-            for i in range(transformed_table.number_of_rows):
-                if transformed_table.get_column(constructed_column)[i] == 1.0:
-                    original_columns[original_column_name][i] = None
-
-        table = transformed_table
-
-        for column_name, encoded_column in original_columns.items():
-            table = table.add_columns(Column(column_name, encoded_column))
-
-        # Drop old column names:
-        table = table.remove_columns(list(self._value_to_column.values()))
-        return table.remove_columns(list(self._value_to_column_nans.values()))
+        return Table._from_polars_lazy_frame(
+            transformed_table._lazy_frame.with_columns(expressions).drop(self._new_column_names),
+        )
 
     # TODO: remove / replace with consistent introspection methods across all transformers
     def _get_names_of_added_columns(self) -> list[str]:
-        if self._column_map is None:
+        if self._new_column_names is None:
             raise TransformerNotFittedError
-        return [name for column_names in self._column_map.values() for name in column_names]
+        return list(self._new_column_names)  # defensive copy
+
+
+def _warn_if_columns_are_numeric(table: Table, column_names: list[str]) -> None:
+    numeric_columns = table.remove_columns_except(column_names).remove_non_numeric_columns().column_names
+    if numeric_columns:
+        warnings.warn(
+            f"The columns {numeric_columns} contain numerical data. "
+            "The OneHotEncoder is designed to encode non-numerical values into numerical values",
+            UserWarning,
+            stacklevel=2,
+        )
