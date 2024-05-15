@@ -35,7 +35,14 @@ def test_lstm_model(device: Device) -> None:
         [ForwardLayer(input_size=7, output_size=256), LSTMLayer(input_size=256, output_size=1)],
         OutputConversionTimeSeries("predicted"),
     )
+    model_2 = NeuralNetworkRegressor(
+        InputConversionTimeSeries(window_size=7, forecast_horizon=12, continues=True),
+        [ForwardLayer(input_size=7, output_size=256), LSTMLayer(input_size=256, output_size=12)],
+        OutputConversionTimeSeries("predicted"),
+    )
     trained_model = model.fit(train_table.to_time_series_dataset("value", "date"), epoch_size=1)
+    trained_model_2 = model_2.fit(train_table.to_time_series_dataset("value", "date"), epoch_size=1)
 
     trained_model.predict(test_table.to_time_series_dataset("value", "date"))
+    trained_model_2.predict(test_table.to_time_series_dataset("value", "date"))
     assert model._model.state_dict()["_pytorch_layers.0._layer.weight"].device == _get_device()

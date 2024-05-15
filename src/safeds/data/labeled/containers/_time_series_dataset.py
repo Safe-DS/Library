@@ -182,7 +182,9 @@ class TimeSeriesDataset:
         """
         return self._table
 
-    def _into_dataloader_with_window(self, window_size: int, forecast_horizon: int, batch_size: int) -> DataLoader:
+    def _into_dataloader_with_window(
+        self, window_size: int, forecast_horizon: int, batch_size: int, continues: bool = False
+    ) -> DataLoader:
         """
         Return a Dataloader for the data stored in this time series, used for training neural networks.
 
@@ -197,6 +199,8 @@ class TimeSeriesDataset:
             The length of the forecast horizon, where all datapoints are collected until the given lag.
         batch_size:
             The size of data batches that should be loaded at one time.
+        continues:
+            Whether or not to continue the forecast in the steps before forecast horizon.
 
         Raises
         ------
@@ -231,7 +235,10 @@ class TimeSeriesDataset:
         feature_cols = self.features.to_columns()
         for i in range(size - (forecast_horizon + window_size)):
             window = target_tensor[i : i + window_size]
-            label = target_tensor[i + window_size + forecast_horizon]
+            if continues:
+                label = target_tensor[i + window_size : i + window_size + forecast_horizon]
+            else:
+                label = target_tensor[i + window_size + forecast_horizon]
             for col in feature_cols:
                 data = torch.tensor(col._series.to_numpy(), dtype=torch.float32)
                 window = torch.cat((window, data[i : i + window_size]), dim=0)
