@@ -51,7 +51,7 @@ class ImageDataset(Generic[T], Dataset):
 
         _init_default_device()
 
-        self._shuffle_tensor_indices: torch.LongTensor = torch.LongTensor(list(range(len(input_data))))
+        self._shuffle_tensor_indices: torch.Tensor = torch.tensor(list(range(len(input_data))), dtype=torch.int64)
         self._shuffle_after_epoch: bool = shuffle
         self._batch_size: int = batch_size
         self._next_batch_index: int = 0
@@ -205,7 +205,7 @@ class ImageDataset(Generic[T], Dataset):
         input:
             the input data of this dataset
         """
-        return self._input
+        return self._sort_image_list_with_shuffle_tensor_indices(self._input)
 
     def get_output(self) -> T:
         """
@@ -218,11 +218,18 @@ class ImageDataset(Generic[T], Dataset):
         """
         output = self._output
         if isinstance(output, _TableAsTensor):
-            return output._to_table()  # type: ignore[return-value]
+            return output._to_table(self._shuffle_tensor_indices)  # type: ignore[return-value]
         elif isinstance(output, _ColumnAsTensor):
-            return output._to_column()  # type: ignore[return-value]
+            return output._to_column(self._shuffle_tensor_indices)  # type: ignore[return-value]
         else:
-            return output  # type: ignore[return-value]
+            return self._sort_image_list_with_shuffle_tensor_indices(self._output)  # type: ignore[return-value]
+
+    def _sort_image_list_with_shuffle_tensor_indices(self, image_list: _SingleSizeImageList) -> _SingleSizeImageList:
+        shuffled_image_list = _SingleSizeImageList()
+        shuffled_image_list._tensor = image_list._tensor
+        shuffled_image_list._indices_to_tensor_positions = {index: self._shuffle_tensor_indices[tensor_position].item() for index, tensor_position in image_list._indices_to_tensor_positions.items()}
+        shuffled_image_list._tensor_positions_to_indices = [index for index, _ in sorted(shuffled_image_list._indices_to_tensor_positions.items(), key=lambda item: item[1])]
+        return shuffled_image_list
 
     def _get_batch(self, batch_number: int, batch_size: int | None = None) -> tuple[Tensor, Tensor]:
         import torch
@@ -263,7 +270,7 @@ class ImageDataset(Generic[T], Dataset):
                 ].to(torch.float32)
                 / 255
             )
-        else:  # _output is instance of _TableAsTensor
+        else:  # _output is instance of _TableAsTensor or _ColumnAsTensor
             output_tensor = self._output._tensor[self._shuffle_tensor_indices[batch_size * batch_number : max_index]]
         return input_tensor, output_tensor
 
@@ -340,8 +347,8 @@ class _TableAsTensor:
         table_as_tensor._column_names = column_names
         return table_as_tensor
 
-    def _to_table(self) -> Table:
-        return Table(dict(zip(self._column_names, self._tensor.T.tolist(), strict=False)))
+    def _to_table(self, shuffled_indices: Tensor) -> Table:
+        return Table(dict(zip(self._column_names, self._tensor[shuffled_indices].T.tolist(), strict=False)))
 
 
 class _ColumnAsTensor:
@@ -406,8 +413,8 @@ class _ColumnAsTensor:
         table_as_tensor._one_hot_encoder = one_hot_encoder
         return table_as_tensor
 
-    def _to_column(self) -> Column:
+    def _to_column(self, shuffled_indices: Tensor) -> Column:
         table = Table(
-            dict(zip(self._one_hot_encoder._get_names_of_added_columns(), self._tensor.T.tolist(), strict=False)),
+            dict(zip(self._one_hot_encoder._get_names_of_added_columns(), self._tensor[shuffled_indices].T.tolist(), strict=False)),
         )
         return self._one_hot_encoder.inverse_transform(table).get_column(self._column_name)
