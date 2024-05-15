@@ -3,7 +3,7 @@ from safeds.data.tabular.containers import Table
 from safeds.exceptions import ColumnNotFoundError
 from syrupy import SnapshotAssertion
 
-from tests.helpers import  resolve_resource_path
+from tests.helpers import resolve_resource_path
 
 
 def test_should_match_snapshot(snapshot_png_image: SnapshotAssertion) -> None:
