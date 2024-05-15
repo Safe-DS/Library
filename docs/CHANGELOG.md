@@ -1,3 +1,24 @@
+## [0.25.0](https://github.com/Safe-DS/Library/compare/v0.24.0...v0.25.0) (2024-05-15)
+
+
+### Features
+
+* major API redesign (WIP) ([#752](https://github.com/Safe-DS/Library/issues/752)) ([8e781f9](https://github.com/Safe-DS/Library/commit/8e781f9728c09b8f94fcb22294bca41eea269d8a)), closes [#694](https://github.com/Safe-DS/Library/issues/694) [#699](https://github.com/Safe-DS/Library/issues/699) [#714](https://github.com/Safe-DS/Library/issues/714) [#748](https://github.com/Safe-DS/Library/issues/748)
+* move NN converters and layers to separate packages ([#759](https://github.com/Safe-DS/Library/issues/759)) ([c6a4073](https://github.com/Safe-DS/Library/commit/c6a40731094cc8649280843063ca0a8cf51ac256))
+* remove operations without replacement from tabular containers ([#747](https://github.com/Safe-DS/Library/issues/747)) ([0e5a54b](https://github.com/Safe-DS/Library/commit/0e5a54b0e02d3cce427728f8adf3717176340b8b))
+* specify partial order in label encoder ([#763](https://github.com/Safe-DS/Library/issues/763)) ([6fbe537](https://github.com/Safe-DS/Library/commit/6fbe5379ae7676906bf8d0f21fe00926d792c60f)), closes [#639](https://github.com/Safe-DS/Library/issues/639)
+
+
+### Bug Fixes
+
+* Conversion of tabular dataset to tensors ([#757](https://github.com/Safe-DS/Library/issues/757)) ([9e40b65](https://github.com/Safe-DS/Library/commit/9e40b65e9f18f7af3a376fbc2e8ee0b5435541aa))
+* fixed devices with new polars implementation ([#756](https://github.com/Safe-DS/Library/issues/756)) ([e72339e](https://github.com/Safe-DS/Library/commit/e72339e370836bdd285a4746a203f4e91b10436c))
+
+
+### Performance Improvements
+
+* implement one hot encoder and imputer using polars ([#768](https://github.com/Safe-DS/Library/issues/768)) ([e993c17](https://github.com/Safe-DS/Library/commit/e993c17725c51c03a4cd9630603298ad3c385765))
+
 ## [0.24.0](https://github.com/Safe-DS/Library/compare/v0.23.0...v0.24.0) (2024-05-09)
 
 

@@ -12,8 +12,9 @@ common tasks on small to moderately sized datasets. As such, a major focus is to
 
 Instead of implementing DS methods from scratch, we use established DS libraries under the hood such as:
 
-* [pandas](https://pandas.pydata.org) for manipulation of tabular data,
-* [scikit-learn](https://scikit-learn.org) for machine learning, and
+* [polars](https://docs.pola.rs/) for manipulation of tabular data,
+* [scikit-learn](https://scikit-learn.org) for classical machine learning,
+* [torch](https://pytorch.org) for deep learning, and
 * [seaborn](https://seaborn.pydata.org) for visualization.
 
 For more specialized tasks, we recommend using these or other DS libraries directly.

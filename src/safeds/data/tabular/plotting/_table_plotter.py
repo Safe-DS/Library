@@ -51,7 +51,7 @@ class TablePlotter:
         >>> table = Table({"a":[1, 2], "b": [3, 42]})
         >>> image = table.plot.box_plots()
         """
-        # TOOD: implement using matplotlib and polars
+        # TODO: implement using matplotlib and polars
         import matplotlib.pyplot as plt
         import seaborn as sns
 
@@ -98,7 +98,7 @@ class TablePlotter:
         import matplotlib.pyplot as plt
         import seaborn as sns
 
-        only_numerical = self._table.remove_non_numeric_columns()
+        only_numerical = self._table.remove_non_numeric_columns()._data_frame.fill_null(0)
 
         if self._table.number_of_rows == 0:
             warnings.warn(
@@ -106,46 +106,35 @@ class TablePlotter:
                 stacklevel=2,
             )
 
-            with warnings.catch_warnings():
-                warnings.filterwarnings(
-                    "ignore",
-                    message=(
-                        "Attempting to set identical low and high (xlims|ylims) makes transformation singular;"
-                        " automatically expanding."
-                    ),
-                )
-                fig = plt.figure()
-                sns.heatmap(
-                    data=only_numerical._data_frame.corr(),
-                    vmin=-1,
-                    vmax=1,
-                    xticklabels=only_numerical.column_names,
-                    yticklabels=only_numerical.column_names,
-                    cmap="vlag",
-                )
-                plt.tight_layout()
-        else:
+        with warnings.catch_warnings():
+            warnings.filterwarnings(
+                "ignore",
+                message=(
+                    "Attempting to set identical low and high (xlims|ylims) makes transformation singular;"
+                    " automatically expanding."
+                ),
+            )
             fig = plt.figure()
             sns.heatmap(
-                data=only_numerical._data_frame.corr(),
+                data=only_numerical.corr().to_numpy(),
                 vmin=-1,
                 vmax=1,
-                xticklabels=only_numerical.column_names,
-                yticklabels=only_numerical.column_names,
+                xticklabels=only_numerical.columns,
+                yticklabels=only_numerical.columns,
                 cmap="vlag",
             )
             plt.tight_layout()
 
         return _figure_to_image(fig)
 
-    def histograms(self, *, number_of_bins: int = 10) -> Image:
+    def histograms(self, *, maximum_number_of_bins: int = 10) -> Image:
         """
         Plot a histogram for every column.
 
         Parameters
         ----------
-        number_of_bins:
-            The number of bins to use in the histogram. Default is 10.
+        maximum_number_of_bins:
+            The maximum number of bins to use in the histogram. Default is 10.
 
         Returns
         -------
@@ -158,10 +147,8 @@ class TablePlotter:
         >>> table = Table({"a": [2, 3, 5, 1], "b": [54, 74, 90, 2014]})
         >>> image = table.plot.histograms()
         """
-        # TODO: implement using polars
         import matplotlib.pyplot as plt
-        import numpy as np
-        import pandas as pd
+        import polars as pl
 
         n_cols = min(3, self._table.number_of_columns)
         n_rows = 1 + (self._table.number_of_columns - 1) // n_cols
@@ -175,34 +162,39 @@ class TablePlotter:
 
         col_names = self._table.column_names
         for col_name, ax in zip(col_names, axs.flatten() if not one_col else [axs], strict=False):
-            np_col = np.array(self._table.get_column(col_name))
-            bins = min(number_of_bins, len(pd.unique(np_col)))
+            column = self._table.get_column(col_name)
+            distinct_values = column.get_distinct_values()
 
             ax.set_title(col_name)
             ax.set_xlabel("")
             ax.set_ylabel("")
 
-            if self._table.get_column(col_name).type.is_numeric:
-                np_col = np_col[~np.isnan(np_col)]
+            if column.is_numeric and len(distinct_values) > maximum_number_of_bins:
+                min_val = (column.min() or 0) - 1e-6  # Otherwise the minimum value is not included in the first bin
+                max_val = column.max() or 0
+                bin_count = min(maximum_number_of_bins, len(distinct_values))
+                bins = [
+                    *(pl.Series(range(bin_count + 1)) / bin_count * (max_val - min_val) + min_val),
+                ]
 
-                if bins < len(pd.unique(np_col)):
-                    min_val = np.min(np_col)
-                    max_val = np.max(np_col)
-                    hist, bin_edges = np.histogram(self._table.get_column(col_name), bins, range=(min_val, max_val))
+                bars = [f"{round((bins[i] + bins[i + 1]) / 2, 2)}" for i in range(len(bins) - 1)]
+                hist = (
+                    column._series.hist(bins=bins)
+                    .slice(1, length=maximum_number_of_bins)
+                    .get_column("count")
+                    .to_numpy()
+                )
 
-                    bars = np.array([])
-                    for i in range(len(hist)):
-                        bars = np.append(bars, f"{round(bin_edges[i], 2)}-{round(bin_edges[i + 1], 2)}")
-
-                    ax.bar(bars, hist, edgecolor="black")
-                    ax.set_xticks(np.arange(len(hist)), bars, rotation=45, horizontalalignment="right")
-                    continue
-
-            np_col = np_col.astype(str)
-            unique_values = np.unique(np_col)
-            hist = np.array([np.sum(np_col == value) for value in unique_values])
-            ax.bar(unique_values, hist, edgecolor="black")
-            ax.set_xticks(np.arange(len(unique_values)), unique_values, rotation=45, horizontalalignment="right")
+                ax.bar(bars, hist, edgecolor="black")
+                ax.set_xticks(range(len(hist)), bars, rotation=45, horizontalalignment="right")
+            else:
+                value_counts = (
+                    column._series.drop_nulls().value_counts().sort(column.name).slice(0, length=maximum_number_of_bins)
+                )
+                distinct_values = value_counts.get_column(column.name).cast(pl.String).to_numpy()
+                hist = value_counts.get_column("count").to_numpy()
+                ax.bar(distinct_values, hist, edgecolor="black")
+                ax.set_xticks(range(len(distinct_values)), distinct_values, rotation=45, horizontalalignment="right")
 
         for i in range(len(col_names), n_rows * n_cols):
             fig.delaxes(axs.flatten()[i])  # Remove empty subplots
@@ -252,11 +244,33 @@ class TablePlotter:
             raise NonNumericColumnError(y_name)
 
         import matplotlib.pyplot as plt
+        import polars as pl
+
+        grouped = (
+            self._table._lazy_frame.group_by(x_name, maintain_order=True)
+            .agg(
+                mean=pl.mean(y_name),
+                count=pl.count(y_name),
+                standard_deviation=pl.std(y_name, ddof=0),
+            )
+            .collect()
+        )
+
+        x = grouped.get_column(x_name)
+        y = grouped.get_column("mean")
+        confidence_interval = 1.96 * grouped.get_column("standard_deviation") / grouped.get_column("count").sqrt()
 
         fig, ax = plt.subplots()
         ax.plot(
-            self._table.get_column(x_name)._series,
-            self._table.get_column(y_name)._series,
+            x,
+            y,
+        )
+        ax.fill_between(
+            x,
+            y - confidence_interval,
+            y + confidence_interval,
+            color="lightblue",
+            alpha=0.15,
         )
         ax.set(
             xlabel=x_name,

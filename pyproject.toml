@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "safe-ds"
-version = "0.24.0"
+version = "0.25.0"
 description = "A user-friendly library for Data Science in Python."
 authors = ["Lars Reimann <mail@larsreimann.com>"]
 license = "MIT"
@@ -16,7 +16,6 @@ packages = [
 python = "^3.11,<3.13"
 apipkg = "^3.0.2"
 matplotlib = "^3.6.3"
-pandas = "^2.0.0"
 pillow = ">=9.5,<11.0"
 polars = {extras = ["numpy", "pyarrow"], version = "^0.20.25"}
 scikit-learn = "^1.2.0"
