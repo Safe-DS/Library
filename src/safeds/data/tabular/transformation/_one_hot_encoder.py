@@ -78,7 +78,7 @@ class OneHotEncoder(InvertibleTableTransformer):
         self._new_column_names: list[str] | None = None
         self._mapping: dict[str, list[tuple[str, Any]]] | None = None  # Column name -> (new column name, value)[]
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
         if not isinstance(other, OneHotEncoder):
             return NotImplemented
         elif self is other:
