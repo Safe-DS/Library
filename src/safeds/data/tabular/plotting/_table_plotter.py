@@ -98,7 +98,7 @@ class TablePlotter:
         import matplotlib.pyplot as plt
         import seaborn as sns
 
-        only_numerical = self._table.remove_non_numeric_columns()._data_frame
+        only_numerical = self._table.remove_non_numeric_columns()._data_frame.fill_null(0)
 
         if self._table.number_of_rows == 0:
             warnings.warn(
@@ -127,14 +127,14 @@ class TablePlotter:
 
         return _figure_to_image(fig)
 
-    def histograms(self, *, number_of_bins: int = 10) -> Image:
+    def histograms(self, *, maximum_number_of_bins: int = 10) -> Image:
         """
         Plot a histogram for every column.
 
         Parameters
         ----------
-        number_of_bins:
-            The number of bins to use in the histogram. Default is 10.
+        maximum_number_of_bins:
+            The maximum number of bins to use in the histogram. Default is 10.
 
         Returns
         -------
@@ -147,10 +147,8 @@ class TablePlotter:
         >>> table = Table({"a": [2, 3, 5, 1], "b": [54, 74, 90, 2014]})
         >>> image = table.plot.histograms()
         """
-        # TODO: implement using polars
         import matplotlib.pyplot as plt
-        import numpy as np
-        import pandas as pd
+        import polars as pl
 
         n_cols = min(3, self._table.number_of_columns)
         n_rows = 1 + (self._table.number_of_columns - 1) // n_cols
@@ -164,34 +162,37 @@ class TablePlotter:
 
         col_names = self._table.column_names
         for col_name, ax in zip(col_names, axs.flatten() if not one_col else [axs], strict=False):
-            np_col = np.array(self._table.get_column(col_name))
-            bins = min(number_of_bins, len(pd.unique(np_col)))
+            column = self._table.get_column(col_name)
+            distinct_values = column.get_distinct_values()
 
             ax.set_title(col_name)
             ax.set_xlabel("")
             ax.set_ylabel("")
 
-            if self._table.get_column(col_name).type.is_numeric:
-                np_col = np_col[~np.isnan(np_col)]
+            if column.is_numeric and len(distinct_values) > maximum_number_of_bins:
+                min_val = column.min() - 1e-6  # Otherwise the minimum value is not included in the first bin
+                max_val = column.max()
+                bin_count = min(maximum_number_of_bins, len(distinct_values))
+                bins = [
+                    *(pl.Series(range(bin_count + 1)) / bin_count * (max_val - min_val) + min_val),
+                ]
 
-                if bins < len(pd.unique(np_col)):
-                    min_val = np.min(np_col)
-                    max_val = np.max(np_col)
-                    hist, bin_edges = np.histogram(self._table.get_column(col_name), bins, range=(min_val, max_val))
+                bars = [
+                    f"{round((bins[i] + bins[i + 1]) / 2, 2)}"
+                    for i in range(len(bins) - 1)
+                ]
+                hist = column._series.hist(bins=bins).slice(1, length=maximum_number_of_bins).get_column("count")
 
-                    bars = np.array([])
-                    for i in range(len(hist)):
-                        bars = np.append(bars, f"{round(bin_edges[i], 2)}-{round(bin_edges[i + 1], 2)}")
-
-                    ax.bar(bars, hist, edgecolor="black")
-                    ax.set_xticks(np.arange(len(hist)), bars, rotation=45, horizontalalignment="right")
-                    continue
-
-            np_col = np_col.astype(str)
-            unique_values = np.unique(np_col)
-            hist = np.array([np.sum(np_col == value) for value in unique_values])
-            ax.bar(unique_values, hist, edgecolor="black")
-            ax.set_xticks(np.arange(len(unique_values)), unique_values, rotation=45, horizontalalignment="right")
+                ax.bar(bars, hist, edgecolor="black")
+                ax.set_xticks(range(len(hist)), bars, rotation=45, horizontalalignment="right")
+            else:
+                value_counts = (
+                    column._series.drop_nulls().value_counts().sort(column.name).slice(0, length=maximum_number_of_bins)
+                )
+                distinct_values = value_counts.get_column(column.name).cast(pl.String)
+                hist = value_counts.get_column("count")
+                ax.bar(distinct_values, hist, edgecolor="black")
+                ax.set_xticks(range(len(distinct_values)), distinct_values, rotation=45, horizontalalignment="right")
 
         for i in range(len(col_names), n_rows * n_cols):
             fig.delaxes(axs.flatten()[i])  # Remove empty subplots
