@@ -384,8 +384,10 @@ def _predict_with_sklearn_model(
     if dataset.number_of_rows == 0:
         raise DatasetMissesDataError
 
-    non_numerical_column_names = set(dataset.column_names) - set(
-        dataset.remove_non_numeric_columns().column_names,
+    features = dataset.remove_columns_except(feature_names)
+
+    non_numerical_column_names = set(features.column_names) - set(
+        features.remove_non_numeric_columns().column_names,
     )
     if len(non_numerical_column_names) != 0:
         raise NonNumericColumnError(
@@ -395,8 +397,8 @@ def _predict_with_sklearn_model(
             " different values\nor is ordinal, you should use the LabelEncoder.\n",
         )
 
-    null_containing_column_names = set(dataset.column_names) - set(
-        dataset.remove_columns_with_missing_values().column_names,
+    null_containing_column_names = set(features.column_names) - set(
+        features.remove_columns_with_missing_values().column_names,
     )
     if len(null_containing_column_names) != 0:
         raise MissingValuesColumnError(
@@ -405,12 +407,10 @@ def _predict_with_sklearn_model(
             " remove the missing values entirely you can use the method `Table.remove_rows_with_missing_values`.",
         )
 
-    dataset_df = dataset.remove_columns_except(feature_names)
-
     try:
         with warnings.catch_warnings():
             warnings.filterwarnings("ignore", message="X does not have valid feature names")
-            predicted_target_vector = model.predict(dataset_df._data_frame)
+            predicted_target_vector = model.predict(features._data_frame)
         output = dataset.remove_columns(target_name).add_columns(
             Column(target_name, predicted_target_vector),
         )

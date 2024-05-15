@@ -57,7 +57,7 @@ class ColumnPlotter:
 
         fig, ax = plt.subplots()
         ax.boxplot(
-            self._column._series,
+            self._column._series.drop_nulls(),
             patch_artist=True,
         )
 
@@ -68,14 +68,14 @@ class ColumnPlotter:
 
         return _figure_to_image(fig)
 
-    def histogram(self, *, number_of_bins: int = 10) -> Image:
+    def histogram(self, *, maximum_number_of_bins: int = 10) -> Image:
         """
         Create a histogram for the values in the column.
 
         Parameters
         ----------
-        number_of_bins:
-            The number of bins to use in the histogram. Default is 10.
+        maximum_number_of_bins:
+            The maximum number of bins to use in the histogram. Default is 10.
 
         Returns
         -------
@@ -88,7 +88,7 @@ class ColumnPlotter:
         >>> column = Column("test", [1, 2, 3])
         >>> histogram = column.plot.histogram()
         """
-        return self._column.to_table().plot.histograms(number_of_bins=number_of_bins)
+        return self._column.to_table().plot.histograms(maximum_number_of_bins=maximum_number_of_bins)
 
     def lag_plot(self, lag: int) -> Image:
         """
