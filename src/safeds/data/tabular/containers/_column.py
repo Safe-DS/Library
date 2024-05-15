@@ -638,7 +638,7 @@ class Column(Sequence[T_co]):
 
         return self._from_polars_series(series)
 
-    def from_str_to_temporal(self, format_string: str):
+    def from_str_to_temporal(self, format_string: str)->Column:
         """
         Return a new column with the string values converted to temporal data.
 
