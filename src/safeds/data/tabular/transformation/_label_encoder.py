@@ -37,13 +37,14 @@ class LabelEncoder(InvertibleTableTransformer):
         self._partial_order = partial_order
 
         # Internal state
-        self._mapping: dict[str, dict[Any, int]] | None = None
-        self._inverse_mapping: dict[str, dict[int, Any]] | None = None
+        self._mapping: dict[str, dict[Any, int]] | None = None  # Column name -> value -> label
+        self._inverse_mapping: dict[str, dict[int, Any]] | None = None  # Column name -> label -> value
 
     def __hash__(self) -> int:
         return _structural_hash(
             super().__hash__(),
             self._partial_order,
+            # Leave out the internal state for faster hashing
         )
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -61,7 +62,7 @@ class LabelEncoder(InvertibleTableTransformer):
         table:
             The table used to fit the transformer.
         column_names:
-            The list of columns from the table used to fit the transformer. If `None`, all columns are used.
+            The list of columns from the table used to fit the transformer. If `None`, all non-numeric columns are used.
 
         Returns
         -------
@@ -76,14 +77,13 @@ class LabelEncoder(InvertibleTableTransformer):
             If the table contains 0 rows.
         """
         if column_names is None:
-            column_names = table.column_names
+            column_names = [name for name in table.column_names if not table.get_column_type(name).is_numeric]
         else:
             _check_columns_exist(table, column_names)
+            _warn_if_columns_are_numeric(table, column_names)
 
         if table.number_of_rows == 0:
-            raise ValueError("The LabelEncoder cannot transform the table because it contains 0 rows")
-
-        _warn_if_columns_are_numeric(table, column_names)
+            raise ValueError("The LabelEncoder cannot be fitted because the table contains 0 rows")
 
         # Learn the transformation
         mapping = {}
@@ -142,7 +142,10 @@ class LabelEncoder(InvertibleTableTransformer):
 
         _check_columns_exist(table, self._column_names)
 
-        columns = [pl.col(name).replace(self._mapping[name], return_dtype=pl.UInt32) for name in self._column_names]
+        columns = [
+            pl.col(name).replace(self._mapping[name], default=None, return_dtype=pl.UInt32)
+            for name in self._column_names
+        ]
 
         return Table._from_polars_lazy_frame(
             table._lazy_frame.with_columns(columns),
@@ -186,7 +189,7 @@ class LabelEncoder(InvertibleTableTransformer):
             operation="inverse-transform with a LabelEncoder",
         )
 
-        columns = [pl.col(name).replace(self._inverse_mapping[name]) for name in self._column_names]
+        columns = [pl.col(name).replace(self._inverse_mapping[name], default=None) for name in self._column_names]
 
         return Table._from_polars_lazy_frame(
             transformed_table._lazy_frame.with_columns(columns),
