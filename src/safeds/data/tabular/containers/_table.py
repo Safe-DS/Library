@@ -859,7 +859,7 @@ class Table:
     def replace_column(
         self,
         old_name: str,
-        new_columns: Column | list[Column],
+        new_columns: Column | list[Column] | Table,
     ) -> Table:
         """
         Return a new table with a column replaced by zero or more columns.
@@ -871,7 +871,7 @@ class Table:
         old_name:
             The name of the column to replace.
         new_columns:
-            The new column or columns.
+            The new columns.
 
         Returns
         -------
@@ -922,11 +922,13 @@ class Table:
         |   9 |  12 |   6 |
         +-----+-----+-----+
         """
-        _check_columns_exist(self, old_name)
-        _check_columns_dont_exist(self, [column.name for column in new_columns], old_name=old_name)
-
         if isinstance(new_columns, Column):
             new_columns = [new_columns]
+        elif isinstance(new_columns, Table):
+            new_columns = new_columns.to_columns()
+
+        _check_columns_exist(self, old_name)
+        _check_columns_dont_exist(self, [column.name for column in new_columns], old_name=old_name)
 
         if len(new_columns) == 0:
             return self.remove_columns(old_name)
