@@ -242,11 +242,29 @@ class TablePlotter:
             raise NonNumericColumnError(y_name)
 
         import matplotlib.pyplot as plt
+        import polars as pl
+
+        grouped = self._table._lazy_frame.group_by(x_name, maintain_order=True).agg(
+            mean=pl.mean(y_name),
+            count=pl.count(y_name),
+            standard_deviation=pl.std(y_name, ddof=0),
+        ).collect()
+
+        x = grouped.get_column(x_name)
+        y = grouped.get_column("mean")
+        confidence_interval = 1.96 * grouped.get_column("standard_deviation") / grouped.get_column("count").sqrt()
 
         fig, ax = plt.subplots()
         ax.plot(
-            self._table.get_column(x_name)._series,
-            self._table.get_column(y_name)._series,
+            x,
+            y,
+        )
+        ax.fill_between(
+            x,
+            y - confidence_interval,
+            y + confidence_interval,
+            color="lightblue",
+            alpha=0.15,
         )
         ax.set(
             xlabel=x_name,
