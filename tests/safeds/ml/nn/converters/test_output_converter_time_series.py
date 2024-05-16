@@ -1,7 +1,7 @@
 import sys
 
 import pytest
-from safeds.data.tabular.containers import Table
+from safeds.data.tabular.containers import Table, Column
 from safeds.ml.nn.converters import OutputConversionTimeSeries
 
 
@@ -57,7 +57,7 @@ class TestEq:
         ("output_conversion_ts1", "output_conversion_ts2"),
         [
             (OutputConversionTimeSeries(), Table()),
-            (OutputConversionTimeSeries("2"), OutputConversionTimeSeries("1")),
+            (OutputConversionTimeSeries("2"), Column("test")),
         ],
     )
     def test_should_not_be_equal(
@@ -83,14 +83,6 @@ class TestHash:
         output_conversion_ts2: OutputConversionTimeSeries,
     ) -> None:
         assert hash(output_conversion_ts1) == hash(output_conversion_ts2)
-
-    def test_hash_should_not_be_equal(self) -> None:
-        output_conversion_ts1 = OutputConversionTimeSeries("1")
-        output_conversion_ts2 = OutputConversionTimeSeries("2")
-        output_conversion_ts3 = OutputConversionTimeSeries("3")
-        assert hash(output_conversion_ts1) != hash(output_conversion_ts3)
-        assert hash(output_conversion_ts2) != hash(output_conversion_ts1)
-        assert hash(output_conversion_ts3) != hash(output_conversion_ts2)
 
 
 class TestSizeOf:

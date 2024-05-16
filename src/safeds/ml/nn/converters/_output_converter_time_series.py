@@ -25,7 +25,7 @@ class OutputConversionTimeSeries(OutputConversion[TimeSeriesDataset, TimeSeriesD
         hash:
             the hash value
         """
-        return _structural_hash(self.__class__.__name__ + self._prediction_name)
+        return _structural_hash(self.__class__.__name__)
 
     def __eq__(self, other: object) -> bool:
         """
@@ -43,7 +43,7 @@ class OutputConversionTimeSeries(OutputConversion[TimeSeriesDataset, TimeSeriesD
         """
         if not isinstance(other, OutputConversionTimeSeries):
             return False
-        return self._prediction_name == other._prediction_name
+        return True
 
     def __sizeof__(self) -> int:
         """
@@ -54,7 +54,7 @@ class OutputConversionTimeSeries(OutputConversion[TimeSeriesDataset, TimeSeriesD
         size:
             Size of this object in bytes.
         """
-        return sys.getsizeof(self._prediction_name)
+        return sys.getsizeof(self.__class__.__name__)
 
     def __init__(self, prediction_name: str = "prediction_nn") -> None:
         """
@@ -81,10 +81,10 @@ class OutputConversionTimeSeries(OutputConversion[TimeSeriesDataset, TimeSeriesD
         input_data_table = input_data.to_table()
         input_data_table = input_data_table.slice_rows(start=window_size + forecast_horizon)
 
-        return input_data_table.add_columns(
-            [Column(self._prediction_name, output_data.tolist())],
+        return input_data_table.replace_column(
+            input_data.target.name, [Column(input_data.target.name, output_data.tolist())],
         ).to_time_series_dataset(
-            target_name=self._prediction_name,
+            target_name=input_data.target.name,
             time_name=input_data.time.name,
             extra_names=input_data.extras.column_names,
         )

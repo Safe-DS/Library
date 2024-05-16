@@ -201,7 +201,7 @@ class TablePlotter:
 
         return _figure_to_image(fig)
 
-    def line_plot(self, x_name: str, y_name: str) -> Image:
+    def line_plot(self, x_name: str, y_names: list[str]) -> Image:
         """
         Create a line plot for two columns in the table.
 
@@ -209,8 +209,8 @@ class TablePlotter:
         ----------
         x_name:
             The name of the column to be plotted on the x-axis.
-        y_name:
-            The name of the column to be plotted on the y-axis.
+        y_names:
+            The name(s) of the column(s) to be plotted on the y-axis.
 
         Returns
         -------
@@ -235,13 +235,15 @@ class TablePlotter:
         ... )
         >>> image = table.plot.line_plot("a", "b")
         """
-        _check_columns_exist(self._table, [x_name, y_name])
+        y_names.append(x_name)
+        _check_columns_exist(self._table, y_names)
 
         # TODO: pass list of columns names + extract validation
         if not self._table.get_column(x_name).is_numeric and not self._table.get_column(x_name).is_temporal:
             raise NonNumericColumnError(x_name)
-        if not self._table.get_column(y_name).is_numeric:
-            raise NonNumericColumnError(y_name)
+        for col_name in y_names:
+            if not self._table.get_column(col_name).is_numeric:
+                raise NonNumericColumnError(col_name)
 
         import matplotlib.pyplot as plt
         import polars as pl
@@ -249,9 +251,9 @@ class TablePlotter:
         grouped = (
             self._table._lazy_frame.group_by(x_name, maintain_order=True)
             .agg(
-                mean=pl.mean(y_name),
-                count=pl.count(y_name),
-                standard_deviation=pl.std(y_name, ddof=0),
+                mean=pl.mean(y_names),
+                count=pl.count(y_names),
+                standard_deviation=pl.std(y_names, ddof=0),
             )
             .collect()
         )
@@ -350,3 +352,47 @@ class TablePlotter:
         return _figure_to_image(fig)
 
     # TODO: equivalent to Column.plot_compare_columns that takes a list of column names (index_plot)?
+    def compare_columns(self, column_list: list[str]) -> Image:
+        """
+        Create a plot comparing the numerical values of columns using IDs as the x-axis.
+        Parameters
+        ----------
+        column_list:
+            A list of time columns to be plotted.
+        Returns
+        -------
+        plot:
+            A plot with all the Columns plotted by the ID on the x-axis.
+        Raises
+        ------
+        NonNumericColumnError
+            if the target column contains non numerical values
+        ValueError
+            if the columns do not have the same size
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> col1 =Column("target", [4, 5, 6, 7, 8, 9, 10, 11, 12, 13])
+        >>> col2 =Column("target", [42, 51, 63, 71, 83, 91, 10, 11, 12, 13])
+        >>> image = col1.plot.plot_compare_columns([col2])
+        """
+        import matplotlib.pyplot as plt
+        import pandas as pd
+        import seaborn as sns
+
+        data = pd.DataFrame()
+        for index, col in enumerate(column_list):
+            if not col.type.is_numeric:
+                raise NonNumericColumnError("The time series plotted column contains non-numerical columns.")
+            if len(col) != size:
+                raise ValueError("The columns must have the same size.")
+            data[col.name + " " + str(index)] = col._series
+
+        fig = plt.figure()
+        data = pd.melt(data, ["INDEX"])
+        sns.lineplot(x="INDEX", y="value", hue="variable", data=data)
+        plt.title("Multiple Series Plot")
+        plt.xlabel("Time")
+
+        plt.tight_layout()
+        return _figure_to_image(fig)

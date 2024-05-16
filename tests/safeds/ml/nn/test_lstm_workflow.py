@@ -27,11 +27,11 @@ def test_lstm_model(device: Device) -> None:
     table = Table.from_csv_file(path=resolve_resource_path(_inflation_path))
     table = table.replace_column("date", [table.get_column("date").from_str_to_temporal("%Y-%m-%d")])
     rs = RangeScaler()
-    trained_scaler, table = rs.fit_and_transform(table, ["value"])
+    trained_scaler, table = rs.fit_and_transform(table)
     train_table, test_table = table.split_rows(0.8, shuffle=False)
 
     model = NeuralNetworkRegressor(
-        InputConversionTimeSeries(window_size=7, forecast_horizon=12, continues= False),
+        InputConversionTimeSeries(window_size=7, forecast_horizon=12, continues=False),
         [ForwardLayer(input_size=7, output_size=256), LSTMLayer(input_size=256, output_size=1)],
         OutputConversionTimeSeries("predicted"),
     )
@@ -46,6 +46,5 @@ def test_lstm_model(device: Device) -> None:
     pred = trained_model.predict(test_table.to_time_series_dataset("value", "date"))
     trained_model_2.predict(test_table.to_time_series_dataset("value", "date"))
     pred = pred.to_table()
-    trained_scaler.inverse_transform_predictions(pred, "value", "predicted")
-    assert False
+    trained_scaler.inverse_transform(pred)
     assert model._model.state_dict()["_pytorch_layers.0._layer.weight"].device == _get_device()
