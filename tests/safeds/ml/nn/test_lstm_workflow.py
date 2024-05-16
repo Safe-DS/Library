@@ -18,7 +18,7 @@ from torch.types import Device
 from tests.helpers import configure_test_with_device, get_devices, get_devices_ids, resolve_resource_path
 
 
-@pytest.mark.parametrize("device", [get_devices()[0]], ids=[get_devices_ids()[0]])
+@pytest.mark.parametrize("device", get_devices(), ids=get_devices_ids())
 def test_lstm_model(device: Device) -> None:
     configure_test_with_device(device)
 
@@ -44,10 +44,8 @@ def test_lstm_model(device: Device) -> None:
     trained_model_2 = model_2.fit(train_table.to_time_series_dataset("value", "date"), epoch_size=1)
 
     pred = trained_model.predict(test_table.to_time_series_dataset("value", "date"))
-    pred_list = trained_model_2.predict(test_table.to_time_series_dataset("value", "date"))
-    pred_list = pred_list.to_table()
+    trained_model_2.predict(test_table.to_time_series_dataset("value", "date"))
     pred = pred.to_table()
-    print(pred)
-    print(trained_scaler.inverse_transform_predictions(pred, "value", "predicted"))
+    trained_scaler.inverse_transform_predictions(pred, "value", "predicted")
     assert False
     assert model._model.state_dict()["_pytorch_layers.0._layer.weight"].device == _get_device()
