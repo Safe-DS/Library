@@ -222,3 +222,37 @@ class RangeScaler(InvertibleTableTransformer):
         return Table._from_polars_lazy_frame(
             transformed_table._lazy_frame.with_columns(columns),
         )
+
+    def inverse_transform_predictions(self, transformed_table: Table, target_name:str, prediction_name:str):
+
+        import polars as pl
+
+        # Used in favor of is_fitted, so the type checker is happy
+        if self._column_names is None or self._data_min is None or self._data_max is None:
+            raise TransformerNotFittedError
+
+        _check_columns_exist(transformed_table, self._column_names)
+        _check_columns_are_numeric(
+            transformed_table,
+            self._column_names,
+            operation="inverse-transform with a RangeScaler",
+        )
+
+        columns = [
+            (
+                (pl.col(name) - self._min)
+                / (self._max - self._min)
+                * (self._data_max.get_column(name) - self._data_min.get_column(name))
+                + self._data_min.get_column(name)
+            )
+            for name in self._column_names
+        ]
+        columns.append(
+            (pl.col(prediction_name) - self._min)
+            / (self._max - self._min)
+            * (self._data_max.get_column(target_name) - self._data_min.get_column(target_name))
+            + self._data_min.get_column(target_name)
+        )
+        return Table._from_polars_lazy_frame(
+            transformed_table._lazy_frame.with_columns(columns),
+        )
