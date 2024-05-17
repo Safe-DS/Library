@@ -4,6 +4,7 @@ from collections.abc import Callable, Iterator, Sequence
 from typing import TYPE_CHECKING, Any, Literal, TypeVar, overload
 
 from safeds._utils import _structural_hash
+from safeds._validation._check_columns_are_numeric import _check_column_is_numeric
 from safeds.data.tabular.plotting import ColumnPlotter
 from safeds.data.tabular.typing._polars_data_type import _PolarsDataType
 from safeds.exceptions import (
@@ -764,8 +765,9 @@ class Column(Sequence[T_co]):
         """
         import polars as pl
 
-        if not self.is_numeric or not other.is_numeric:
-            raise NonNumericColumnError("")  # TODO: Add column names to error message
+        _check_column_is_numeric(self, operation="calculate the correlation")
+        _check_column_is_numeric(other, operation="calculate the correlation")
+
         if self.row_count != other.row_count:
             raise ColumnLengthMismatchError("")  # TODO: Add column names to error message
         if self.missing_value_count() > 0 or other.missing_value_count() > 0:
@@ -881,8 +883,7 @@ class Column(Sequence[T_co]):
         >>> column.mean()
         2.0
         """
-        if not self.is_numeric:
-            raise NonNumericColumnError("")  # TODO: Add column name to error message
+        _check_column_is_numeric(self, operation="calculate the mean")
 
         return self._series.mean()
 
@@ -910,8 +911,7 @@ class Column(Sequence[T_co]):
         >>> column.median()
         2.0
         """
-        if not self.is_numeric:
-            raise NonNumericColumnError("")  # TODO: Add column name to error message
+        _check_column_is_numeric(self, operation="calculate the median")
 
         return self._series.median()
 
@@ -1087,8 +1087,7 @@ class Column(Sequence[T_co]):
         >>> column.standard_deviation()
         1.0
         """
-        if not self.is_numeric:
-            raise NonNumericColumnError("")  # TODO: Add column name to error message
+        _check_column_is_numeric(self, operation="calculate the standard deviation")
 
         return self._series.std()
 
@@ -1116,8 +1115,7 @@ class Column(Sequence[T_co]):
         >>> column.variance()
         1.0
         """
-        if not self.is_numeric:
-            raise NonNumericColumnError("")  # TODO: Add column name to error message
+        _check_column_is_numeric(self, operation="calculate the variance")
 
         return self._series.var()
 

@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from safeds._utils import _figure_to_image
-from safeds.exceptions import NonNumericColumnError
+from safeds._validation._check_columns_are_numeric import _check_column_is_numeric
 
 if TYPE_CHECKING:
     from safeds.data.image.containers import Image
@@ -49,9 +49,8 @@ class ColumnPlotter:
         >>> column = Column("test", [1, 2, 3])
         >>> boxplot = column.plot.box_plot()
         """
-        if self._column.row_count > 0 and not self._column.is_numeric:
-            # TODO better error message
-            raise NonNumericColumnError(f"{self._column.name} is of type {self._column.type}.")
+        if self._column.row_count > 0:
+            _check_column_is_numeric(self._column, operation="create a box plot")
 
         import matplotlib.pyplot as plt
 
@@ -115,9 +114,8 @@ class ColumnPlotter:
         >>> column = Column("values", [1, 2, 3, 4])
         >>> image = column.plot.lag_plot(2)
         """
-        if self._column.row_count > 0 and not self._column.is_numeric:
-            # TODO better error message
-            raise NonNumericColumnError("This time series target contains non-numerical columns.")
+        if self._column.row_count > 0:
+            _check_column_is_numeric(self._column, operation="create a lag plot")
 
         import matplotlib.pyplot as plt
 
