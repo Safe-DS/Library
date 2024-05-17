@@ -4,8 +4,8 @@ from safeds.data.tabular.containers import Table
 
 
 def create_synthetic_table(
-    number_of_rows: int,
-    number_of_columns: int,
+    row_count: int,
+    column_count: int,
     *,
     min_value: int = 0,
     max_value: int = 1000,
@@ -15,9 +15,9 @@ def create_synthetic_table(
 
     Parameters
     ----------
-    number_of_rows:
+    row_count:
         Number of rows in the Table.
-    number_of_columns:
+    column_count:
         Number of columns in the Table.
     min_value:
         Minimum value of the random data.
@@ -31,7 +31,7 @@ def create_synthetic_table(
     """
     return Table(
         {
-            f"column_{i}": [randrange(min_value, max_value) for _ in range(number_of_rows)]
-            for i in range(number_of_columns)
+            f"column_{i}": [randrange(min_value, max_value) for _ in range(row_count)]
+            for i in range(column_count)
         }
     )

@@ -334,7 +334,7 @@ class Table:
         return self._data_frame.equals(other._data_frame)
 
     def __hash__(self) -> int:
-        return _structural_hash(self.schema, self.number_of_rows)
+        return _structural_hash(self.schema, self.row_count)
 
     def __repr__(self) -> str:
         with _get_polars_config():
@@ -379,7 +379,7 @@ class Table:
         return self.schema.column_names
 
     @property
-    def number_of_columns(self) -> int:
+    def column_count(self) -> int:
         """
         The number of columns in the table.
 
@@ -387,7 +387,7 @@ class Table:
         --------
         >>> from safeds.data.tabular.containers import Table
         >>> table = Table({"a": [1, 2, 3], "b": [4, 5, 6]})
-        >>> table.number_of_columns
+        >>> table.column_count
         2
         """
         import polars as pl
@@ -399,7 +399,7 @@ class Table:
             return 0
 
     @property
-    def number_of_rows(self) -> int:
+    def row_count(self) -> int:
         """
         The number of rows in the table.
 
@@ -409,7 +409,7 @@ class Table:
         --------
         >>> from safeds.data.tabular.containers import Table
         >>> table = Table({"a": [1, 2, 3], "b": [4, 5, 6]})
-        >>> table.number_of_rows
+        >>> table.row_count
         3
         """
         return self._data_frame.height
@@ -1223,7 +1223,7 @@ class Table:
         | null |   8 |
         +------+-----+
         """
-        if self.number_of_rows == 0:
+        if self.row_count == 0:
             return self  # polars raises a ComputeError for tables without rows
         if column_names is None:
             column_names = self.column_names
@@ -1366,7 +1366,7 @@ class Table:
         |   3 |   2 |
         +-----+-----+
         """
-        if self.number_of_rows == 0:
+        if self.row_count == 0:
             return self
 
         key = key_selector(_LazyVectorizedRow(self))
@@ -1501,11 +1501,11 @@ class Table:
         )
 
         input_table = self.shuffle_rows() if shuffle else self
-        number_of_rows_in_first = round(percentage_in_first * input_table.number_of_rows)
+        row_count_in_first = round(percentage_in_first * input_table.row_count)
 
         return (
-            input_table.slice_rows(length=number_of_rows_in_first),
-            input_table.slice_rows(start=number_of_rows_in_first),
+            input_table.slice_rows(length=row_count_in_first),
+            input_table.slice_rows(start=row_count_in_first),
         )
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -1707,7 +1707,7 @@ class Table:
         | stability            | 0.50000 |
         +----------------------+---------+
         """
-        if self.number_of_columns == 0:
+        if self.column_count == 0:
             return Table()
 
         head = self.get_column(self.column_names[0]).summarize_statistics()

@@ -14,20 +14,20 @@ class _GradientBoostingBase(ABC):
     @abstractmethod
     def __init__(
         self,
-        number_of_trees: int,
+        tree_count: int,
         learning_rate: float,
     ) -> None:
         # Validation
-        _check_bounds("number_of_trees", number_of_trees, lower_bound=_ClosedBound(1))
+        _check_bounds("tree_count", tree_count, lower_bound=_ClosedBound(1))
         _check_bounds("learning_rate", learning_rate, lower_bound=_OpenBound(0))
 
         # Hyperparameters
-        self._number_of_trees = number_of_trees
+        self._tree_count = tree_count
         self._learning_rate = learning_rate
 
     def __hash__(self) -> int:
         return _structural_hash(
-            self._number_of_trees,
+            self._tree_count,
             self._learning_rate,
         )
 
@@ -36,9 +36,9 @@ class _GradientBoostingBase(ABC):
     # ------------------------------------------------------------------------------------------------------------------
 
     @property
-    def number_of_trees(self) -> int:
+    def tree_count(self) -> int:
         """The number of trees (estimators) in the ensemble."""
-        return self._number_of_trees
+        return self._tree_count
 
     @property
     def learning_rate(self) -> float:

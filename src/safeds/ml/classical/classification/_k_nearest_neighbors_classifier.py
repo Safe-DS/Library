@@ -19,14 +19,14 @@ class KNearestNeighborsClassifier(Classifier, _KNearestNeighborsBase):
 
     Parameters
     ----------
-    number_of_neighbors:
+    neighbor_count:
         The number of neighbors to use for interpolation. Has to be greater than 0 (validated in the constructor) and
         less than or equal to the sample size (validated when calling `fit`).
 
     Raises
     ------
     OutOfBoundsError
-        If `number_of_neighbors` is less than 1.
+        If `neighbor_count` is less than 1.
     """
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -35,13 +35,13 @@ class KNearestNeighborsClassifier(Classifier, _KNearestNeighborsBase):
 
     def __init__(
         self,
-        number_of_neighbors: int,
+        neighbor_count: int,
     ) -> None:
         # Initialize superclasses
         Classifier.__init__(self)
         _KNearestNeighborsBase.__init__(
             self,
-            number_of_neighbors=number_of_neighbors,
+            neighbor_count=neighbor_count,
         )
 
     def __hash__(self) -> int:
@@ -55,23 +55,23 @@ class KNearestNeighborsClassifier(Classifier, _KNearestNeighborsBase):
     # ------------------------------------------------------------------------------------------------------------------
 
     def _check_additional_fit_preconditions(self, training_set: TabularDataset) -> None:
-        if self._number_of_neighbors > training_set._table.number_of_rows:
+        if self._neighbor_count > training_set._table.row_count:
             raise ValueError(
                 (
-                    f"The parameter 'number_of_neighbors' ({self._number_of_neighbors}) has to be less than or equal to"
-                    f" the sample size ({training_set._table.number_of_rows})."
+                    f"The parameter 'neighbor_count' ({self._neighbor_count}) has to be less than or equal to"
+                    f" the sample size ({training_set._table.row_count})."
                 ),
             )
 
     def _clone(self) -> KNearestNeighborsClassifier:
         return KNearestNeighborsClassifier(
-            number_of_neighbors=self._number_of_neighbors,
+            neighbor_count=self._neighbor_count,
         )
 
     def _get_sklearn_model(self) -> ClassifierMixin:
         from sklearn.neighbors import KNeighborsClassifier as SklearnKNeighborsClassifier
 
         return SklearnKNeighborsClassifier(
-            n_neighbors=self._number_of_neighbors,
+            n_neighbors=self._neighbor_count,
             n_jobs=-1,
         )

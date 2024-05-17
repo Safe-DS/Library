@@ -77,7 +77,7 @@ class _EmptyImageList(ImageList):
         return 0
 
     @property
-    def number_of_images(self) -> int:
+    def image_count(self) -> int:
         return 0
 
     @property
@@ -97,7 +97,7 @@ class _EmptyImageList(ImageList):
         return []
 
     @property
-    def number_of_sizes(self) -> int:
+    def size_count(self) -> int:
         return 0
 
     def get_image(self, index: int) -> Image:

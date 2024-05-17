@@ -14,25 +14,25 @@ class _DecisionTreeBase(ABC):
     @abstractmethod
     def __init__(
         self,
-        maximum_depth: int | None,
-        minimum_number_of_samples_in_leaves: int,
+        max_depth: int | None,
+        min_sample_count_in_leaves: int,
     ) -> None:
         # Validation
-        _check_bounds("maximum_depth", maximum_depth, lower_bound=_ClosedBound(1))
+        _check_bounds("max_depth", max_depth, lower_bound=_ClosedBound(1))
         _check_bounds(
-            "minimum_number_of_samples_in_leaves",
-            minimum_number_of_samples_in_leaves,
+            "min_sample_count_in_leaves",
+            min_sample_count_in_leaves,
             lower_bound=_ClosedBound(1),
         )
 
         # Hyperparameters
-        self._maximum_depth: int | None = maximum_depth
-        self._minimum_number_of_samples_in_leaves: int = minimum_number_of_samples_in_leaves
+        self._max_depth: int | None = max_depth
+        self._min_sample_count_in_leaves: int = min_sample_count_in_leaves
 
     def __hash__(self) -> int:
         return _structural_hash(
-            self._maximum_depth,
-            self._minimum_number_of_samples_in_leaves,
+            self._max_depth,
+            self._min_sample_count_in_leaves,
         )
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -40,11 +40,11 @@ class _DecisionTreeBase(ABC):
     # ------------------------------------------------------------------------------------------------------------------
 
     @property
-    def maximum_depth(self) -> int | None:
+    def max_depth(self) -> int | None:
         """The maximum depth of the tree."""
-        return self._maximum_depth
+        return self._max_depth
 
     @property
-    def minimum_number_of_samples_in_leaves(self) -> int:
+    def min_sample_count_in_leaves(self) -> int:
         """The minimum number of samples that must remain in the leaves of the tree."""
-        return self._minimum_number_of_samples_in_leaves
+        return self._min_sample_count_in_leaves

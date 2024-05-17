@@ -63,7 +63,7 @@ class _SingleSizeImageList(ImageList):
     @staticmethod
     def _create_image_list_from_files(
         images: dict[int, list[str]],
-        number_of_images: int,
+        image_count: int,
         max_channel: int,
         width: int,
         height: int,
@@ -76,13 +76,13 @@ class _SingleSizeImageList(ImageList):
 
         from safeds.data.image.containers._empty_image_list import _EmptyImageList
 
-        if len(images) == 0 or number_of_images == 0:
+        if len(images) == 0 or image_count == 0:
             return _EmptyImageList(), []
 
         image_list = _SingleSizeImageList()
 
         images_tensor = torch.empty(
-            number_of_images,
+            image_count,
             max_channel,
             height,
             width,
@@ -94,8 +94,8 @@ class _SingleSizeImageList(ImageList):
         current_thread_channel: int | None = None
         current_thread_channel_files: list[str] = []
         current_thread_start_index: int = 0
-        while number_of_images - current_thread_start_index > 0:
-            num_of_files = min(max_files_per_thread_package, number_of_images - current_thread_start_index)
+        while image_count - current_thread_start_index > 0:
+            num_of_files = min(max_files_per_thread_package, image_count - current_thread_start_index)
             while num_of_files > 0:
                 if current_thread_channel is None or len(current_thread_channel_files) == 0:
                     current_thread_channel = next(iter(images.keys()))
@@ -265,7 +265,7 @@ class _SingleSizeImageList(ImageList):
             self.widths[0],
             self.heights[0],
             self.channel,
-            self.number_of_images,
+            self.image_count,
             self._tensor_positions_to_indices,
         )
 
@@ -281,16 +281,16 @@ class _SingleSizeImageList(ImageList):
         )
 
     @property
-    def number_of_images(self) -> int:
+    def image_count(self) -> int:
         return self._tensor.size(dim=0)
 
     @property
     def widths(self) -> list[int]:
-        return [self._tensor.size(dim=3)] * self.number_of_images
+        return [self._tensor.size(dim=3)] * self.image_count
 
     @property
     def heights(self) -> list[int]:
-        return [self._tensor.size(dim=2)] * self.number_of_images
+        return [self._tensor.size(dim=2)] * self.image_count
 
     @property
     def channel(self) -> int:
@@ -300,10 +300,10 @@ class _SingleSizeImageList(ImageList):
     def sizes(self) -> list[ImageSize]:
         return [
             ImageSize(self._tensor.size(dim=3), self._tensor.size(dim=2), self._tensor.size(dim=1)),
-        ] * self.number_of_images
+        ] * self.image_count
 
     @property
-    def number_of_sizes(self) -> int:
+    def size_count(self) -> int:
         return 1
 
     def get_image(self, index: int) -> Image:
@@ -336,7 +336,7 @@ class _SingleSizeImageList(ImageList):
             raise IllegalFormatError("png")
         path_str: str | Path
         if isinstance(path, list):
-            if len(path) == self.number_of_images:
+            if len(path) == self.image_count:
                 for image_path, index in zip(path, sorted(self._tensor_positions_to_indices), strict=False):
                     Path(image_path).parent.mkdir(parents=True, exist_ok=True)
                     if self.channel == 1:
@@ -383,7 +383,7 @@ class _SingleSizeImageList(ImageList):
 
         path_str: str | Path
         if isinstance(path, list):
-            if len(path) == self.number_of_images:
+            if len(path) == self.image_count:
                 for image_path, index in zip(path, sorted(self._tensor_positions_to_indices), strict=False):
                     Path(image_path).parent.mkdir(parents=True, exist_ok=True)
                     if self.channel == 1:

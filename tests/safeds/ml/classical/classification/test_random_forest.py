@@ -11,49 +11,49 @@ def training_set() -> TabularDataset:
     return table.to_tabular_dataset(target_name="col1")
 
 
-class TestNumberOfTrees:
+class TestTreeCount:
     def test_should_be_passed_to_fitted_model(self, training_set: TabularDataset) -> None:
-        fitted_model = RandomForestClassifier(number_of_trees=2).fit(training_set)
-        assert fitted_model.number_of_trees == 2
+        fitted_model = RandomForestClassifier(tree_count=2).fit(training_set)
+        assert fitted_model.tree_count == 2
 
     def test_should_be_passed_to_sklearn(self, training_set: TabularDataset) -> None:
-        fitted_model = RandomForestClassifier(number_of_trees=2).fit(training_set)
+        fitted_model = RandomForestClassifier(tree_count=2).fit(training_set)
         assert fitted_model._wrapped_model is not None
         assert fitted_model._wrapped_model.n_estimators == 2
 
-    @pytest.mark.parametrize("number_of_trees", [-1, 0], ids=["minus_one", "zero"])
-    def test_should_raise_if_less_than_or_equal_to_0(self, number_of_trees: int) -> None:
+    @pytest.mark.parametrize("tree_count", [-1, 0], ids=["minus_one", "zero"])
+    def test_should_raise_if_less_than_or_equal_to_0(self, tree_count: int) -> None:
         with pytest.raises(OutOfBoundsError):
-            RandomForestClassifier(number_of_trees=number_of_trees)
+            RandomForestClassifier(tree_count=tree_count)
 
 
-class TestMaximumDepth:
+class TestMaxDepth:
     def test_should_be_passed_to_fitted_model(self, training_set: TabularDataset) -> None:
-        fitted_model = RandomForestClassifier(maximum_depth=2).fit(training_set)
-        assert fitted_model.maximum_depth == 2
+        fitted_model = RandomForestClassifier(max_depth=2).fit(training_set)
+        assert fitted_model.max_depth == 2
 
     def test_should_be_passed_to_sklearn(self, training_set: TabularDataset) -> None:
-        fitted_model = RandomForestClassifier(maximum_depth=2).fit(training_set)
+        fitted_model = RandomForestClassifier(max_depth=2).fit(training_set)
         assert fitted_model._wrapped_model is not None
         assert fitted_model._wrapped_model.max_depth == 2
 
-    @pytest.mark.parametrize("maximum_depth", [-1, 0], ids=["minus_one", "zero"])
-    def test_should_raise_if_less_than_or_equal_to_0(self, maximum_depth: int) -> None:
+    @pytest.mark.parametrize("max_depth", [-1, 0], ids=["minus_one", "zero"])
+    def test_should_raise_if_less_than_or_equal_to_0(self, max_depth: int) -> None:
         with pytest.raises(OutOfBoundsError):
-            RandomForestClassifier(maximum_depth=maximum_depth)
+            RandomForestClassifier(max_depth=max_depth)
 
 
-class TestMinimumNumberOfSamplesInLeaves:
+class TestMinSampleCountInLeaves:
     def test_should_be_passed_to_fitted_model(self, training_set: TabularDataset) -> None:
-        fitted_model = RandomForestClassifier(minimum_number_of_samples_in_leaves=2).fit(training_set)
-        assert fitted_model.minimum_number_of_samples_in_leaves == 2
+        fitted_model = RandomForestClassifier(min_sample_count_in_leaves=2).fit(training_set)
+        assert fitted_model.min_sample_count_in_leaves == 2
 
     def test_should_be_passed_to_sklearn(self, training_set: TabularDataset) -> None:
-        fitted_model = RandomForestClassifier(minimum_number_of_samples_in_leaves=2).fit(training_set)
+        fitted_model = RandomForestClassifier(min_sample_count_in_leaves=2).fit(training_set)
         assert fitted_model._wrapped_model is not None
         assert fitted_model._wrapped_model.min_samples_leaf == 2
 
-    @pytest.mark.parametrize("minimum_number_of_samples_in_leaves", [-1, 0], ids=["minus_one", "zero"])
-    def test_should_raise_if_less_than_or_equal_to_0(self, minimum_number_of_samples_in_leaves: int) -> None:
+    @pytest.mark.parametrize("min_sample_count_in_leaves", [-1, 0], ids=["minus_one", "zero"])
+    def test_should_raise_if_less_than_or_equal_to_0(self, min_sample_count_in_leaves: int) -> None:
         with pytest.raises(OutOfBoundsError):
-            RandomForestClassifier(minimum_number_of_samples_in_leaves=minimum_number_of_samples_in_leaves)
+            RandomForestClassifier(min_sample_count_in_leaves=min_sample_count_in_leaves)

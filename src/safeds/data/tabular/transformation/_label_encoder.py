@@ -82,7 +82,7 @@ class LabelEncoder(InvertibleTableTransformer):
             _check_columns_exist(table, column_names)
             _warn_if_columns_are_numeric(table, column_names)
 
-        if table.number_of_rows == 0:
+        if table.row_count == 0:
             raise ValueError("The LabelEncoder cannot be fitted because the table contains 0 rows")
 
         # Learn the transformation

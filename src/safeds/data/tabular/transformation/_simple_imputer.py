@@ -166,7 +166,7 @@ class SimpleImputer(TableTransformer):
             else:
                 _check_columns_exist(table, column_names)
 
-        if table.number_of_rows == 0:
+        if table.row_count == 0:
             raise ValueError("The SimpleImputer cannot be fitted because the table contains 0 rows")
 
         # Learn the transformation

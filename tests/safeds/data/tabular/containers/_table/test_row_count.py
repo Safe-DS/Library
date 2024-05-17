@@ -12,4 +12,4 @@ from safeds.data.tabular.containers import Table
     ids=["empty", "a row", "2 rows"],
 )
 def test_should_return_number_of_rows(table: Table, expected: int) -> None:
-    assert table.number_of_rows == expected
+    assert table.row_count == expected

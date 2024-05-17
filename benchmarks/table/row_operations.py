@@ -34,7 +34,7 @@ def _run_shuffle_rows() -> None:
 
 
 def _run_slice_rows() -> None:
-    table.slice_rows(length=table.number_of_rows // 2)._lazy_frame.collect()
+    table.slice_rows(length=table.row_count // 2)._lazy_frame.collect()
 
 
 def _run_sort_rows() -> None:
