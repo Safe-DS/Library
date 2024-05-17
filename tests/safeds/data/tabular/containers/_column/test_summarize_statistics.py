@@ -7,7 +7,36 @@ from safeds.data.tabular.containers import Column, Table
 @pytest.mark.parametrize(
     ("column", "expected"),
     [
-        (
+        (  # boolean
+            Column("col", [True, False, True]),
+            Table(
+                {
+                    "metric": [
+                        "min",
+                        "max",
+                        "mean",
+                        "median",
+                        "standard deviation",
+                        "distinct value count",
+                        "idness",
+                        "missing value ratio",
+                        "stability",
+                    ],
+                    "col": [
+                        "False",
+                        "True",
+                        "-",
+                        "-",
+                        "-",
+                        "2",
+                        str(2 / 3),
+                        "0.0",
+                        str(2 / 3),
+                    ],
+                },
+            ),
+        ),
+        (  # ints
             Column("col", [1, 2, 1]),
             Table(
                 {
@@ -25,18 +54,18 @@ from safeds.data.tabular.containers import Column, Table
                     "col": [
                         1,
                         2,
-                        4.0 / 3,
-                        1.0,
+                        4 / 3,
+                        1,
                         stdev([1, 2, 1]),
                         2,
-                        2.0 / 3,
-                        0.0,
-                        2.0 / 3,
+                        2 / 3,
+                        0,
+                        2 / 3,
                     ],
                 },
             ),
         ),
-        (
+        (  # strings
             Column("col", ["a", "b", "c"]),
             Table(
                 {
@@ -65,7 +94,7 @@ from safeds.data.tabular.containers import Column, Table
                 },
             ),
         ),
-        (
+        (  # only missing
             Column("col", [None, None]),
             Table(
                 {
@@ -96,9 +125,10 @@ from safeds.data.tabular.containers import Column, Table
         ),
     ],
     ids=[
-        "Column of ints",
-        "Column of strings",
-        "Column of None",
+        "boolean",
+        "ints",
+        "strings",
+        "only missing",
     ],
 )
 def test_should_summarize_statistics(column: Column, expected: Table) -> None:
