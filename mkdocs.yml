@@ -8,7 +8,7 @@ strict: true
 nav:
   - Home:
     - README.md
-    - Changelog: CHANGELOG.md
+    - CHANGELOG.md
   - Tutorials:
     - Data Processing: tutorials/data_processing.ipynb
     - Image processing: tutorials/image_processing.ipynb
@@ -20,9 +20,14 @@ nav:
   - Glossary: glossary.md
   - Development:
     - Environment: development/environment.md
-    - Project Guidelines: development/project_guidelines.md
-    - Code Review Guide: development/code_review.md
-    - Contributing 🌐: https://github.com/Safe-DS/Library/contribute
+    - Guidelines:
+      - Design: development/guidelines/design.md
+      - Documentation: development/guidelines/documentation.md
+      - Tests: development/guidelines/tests.md
+      - Code Style: development/guidelines/code_style.md
+      - Code Review: development/guidelines/code_review.md
+    - External:
+      - Contributing 🌐: https://github.com/Safe-DS/Library/contribute
 
 # Configuration of MkDocs & Material for MkDocs --------------------------------
 
