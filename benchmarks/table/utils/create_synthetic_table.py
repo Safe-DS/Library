@@ -33,5 +33,5 @@ def create_synthetic_table(
         {
             f"column_{i}": [randrange(min_value, max_value) for _ in range(row_count)]
             for i in range(column_count)
-        }
+        },
     )
