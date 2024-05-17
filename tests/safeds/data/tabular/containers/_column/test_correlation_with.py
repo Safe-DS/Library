@@ -1,6 +1,10 @@
 import pytest
 from safeds.data.tabular.containers import Column
-from safeds.exceptions import ColumnLengthMismatchError, MissingValuesColumnError, NonNumericColumnError
+from safeds.exceptions import (
+    ColumnLengthMismatchError,
+    ColumnTypeError,
+    MissingValuesColumnError,
+)
 
 
 @pytest.mark.parametrize(
@@ -38,7 +42,7 @@ def test_should_return_correlation_between_two_columns(values1: list, values2: l
 def test_should_raise_if_columns_are_not_numeric(values1: list, values2: list) -> None:
     column1 = Column("A", values1)
     column2 = Column("B", values2)
-    with pytest.raises(NonNumericColumnError):
+    with pytest.raises(ColumnTypeError):
         column1.correlation_with(column2)
 
 

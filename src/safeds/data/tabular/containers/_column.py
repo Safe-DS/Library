@@ -4,13 +4,13 @@ from collections.abc import Callable, Iterator, Sequence
 from typing import TYPE_CHECKING, Any, Literal, TypeVar, overload
 
 from safeds._utils import _structural_hash
+from safeds._validation._check_columns_are_numeric import _check_column_is_numeric
 from safeds.data.tabular.plotting import ColumnPlotter
 from safeds.data.tabular.typing._polars_data_type import _PolarsDataType
 from safeds.exceptions import (
     ColumnLengthMismatchError,
     IndexOutOfBoundsError,
     MissingValuesColumnError,
-    NonNumericColumnError,
 )
 
 from ._lazy_cell import _LazyCell
@@ -223,7 +223,7 @@ class Column(Sequence[T_co]):
 
     def get_value(self, index: int) -> T_co:
         """
-        Return the column value at specified index.
+        Return the column value at specified index. Equivalent to the `[]` operator (indexed access).
 
         Nonnegative indices are counted from the beginning (starting at 0), negative indices from the end (starting at
         -1).
@@ -248,6 +248,9 @@ class Column(Sequence[T_co]):
         >>> from safeds.data.tabular.containers import Column
         >>> column = Column("test", [1, 2, 3])
         >>> column.get_value(1)
+        2
+
+        >>> column[1]
         2
         """
         if index < -self.row_count or index >= self.row_count:
@@ -434,7 +437,7 @@ class Column(Sequence[T_co]):
         """
         Return how many values in the column satisfy the predicate.
 
-        The predicate can return one of three values:
+        The predicate can return one of three results:
 
         * True, if the value satisfies the predicate.
         * False, if the value does not satisfy the predicate.
@@ -457,11 +460,6 @@ class Column(Sequence[T_co]):
         -------
         count:
             The number of values in the column that satisfy the predicate.
-
-        Raises
-        ------
-        TypeError
-            If the predicate does not return a boolean cell.
 
         Examples
         --------
@@ -764,8 +762,9 @@ class Column(Sequence[T_co]):
         """
         import polars as pl
 
-        if not self.is_numeric or not other.is_numeric:
-            raise NonNumericColumnError("")  # TODO: Add column names to error message
+        _check_column_is_numeric(self, operation="calculate the correlation")
+        _check_column_is_numeric(other, operation="calculate the correlation")
+
         if self.row_count != other.row_count:
             raise ColumnLengthMismatchError("")  # TODO: Add column names to error message
         if self.missing_value_count() > 0 or other.missing_value_count() > 0:
@@ -881,8 +880,7 @@ class Column(Sequence[T_co]):
         >>> column.mean()
         2.0
         """
-        if not self.is_numeric:
-            raise NonNumericColumnError("")  # TODO: Add column name to error message
+        _check_column_is_numeric(self, operation="calculate the mean")
 
         return self._series.mean()
 
@@ -910,8 +908,7 @@ class Column(Sequence[T_co]):
         >>> column.median()
         2.0
         """
-        if not self.is_numeric:
-            raise NonNumericColumnError("")  # TODO: Add column name to error message
+        _check_column_is_numeric(self, operation="calculate the median")
 
         return self._series.median()
 
@@ -1087,8 +1084,7 @@ class Column(Sequence[T_co]):
         >>> column.standard_deviation()
         1.0
         """
-        if not self.is_numeric:
-            raise NonNumericColumnError("")  # TODO: Add column name to error message
+        _check_column_is_numeric(self, operation="calculate the standard deviation")
 
         return self._series.std()
 
@@ -1116,8 +1112,7 @@ class Column(Sequence[T_co]):
         >>> column.variance()
         1.0
         """
-        if not self.is_numeric:
-            raise NonNumericColumnError("")  # TODO: Add column name to error message
+        _check_column_is_numeric(self, operation="calculate the variance")
 
         return self._series.var()
 

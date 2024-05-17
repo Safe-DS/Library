@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Literal
+from typing import TYPE_CHECKING, Any, Literal, overload
 
 from safeds._config import _get_device, _init_default_device
 from safeds._config._polars import _get_polars_config
@@ -1007,6 +1007,73 @@ class Table:
     # ------------------------------------------------------------------------------------------------------------------
     # Row operations
     # ------------------------------------------------------------------------------------------------------------------
+
+    @overload
+    def count_row_if(
+        self,
+        predicate: Callable[[Row], Cell[bool | None]],
+        *,
+        ignore_unknown: Literal[True] = ...,
+    ) -> int: ...
+
+    @overload
+    def count_row_if(
+        self,
+        predicate: Callable[[Row], Cell[bool | None]],
+        *,
+        ignore_unknown: bool,
+    ) -> int | None: ...
+
+    def count_row_if(
+        self,
+        predicate: Callable[[Row], Cell[bool | None]],
+        *,
+        ignore_unknown: bool = True,
+    ) -> int | None:
+        """
+        Return how many rows in the table satisfy the predicate.
+
+        The predicate can return one of three results:
+
+        * True, if the row satisfies the predicate.
+        * False, if the row does not satisfy the predicate.
+        * None, if the truthiness of the predicate is unknown, e.g. due to missing values.
+
+        By default, cases where the truthiness of the predicate is unknown are ignored and this method returns how
+        often the predicate returns True.
+
+        You can instead enable Kleene logic by setting `ignore_unknown=False`. In this case, this method returns None if
+        the predicate returns None at least once. Otherwise, it still returns how often the predicate returns True.
+
+        Parameters
+        ----------
+        predicate:
+            The predicate to apply to each row.
+        ignore_unknown:
+            Whether to ignore cases where the truthiness of the predicate is unknown.
+
+        Returns
+        -------
+        count:
+            The number of rows in the table that satisfy the predicate.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table
+        >>> table = Table({"col1": [1, 2, 3], "col2": [1, 3, 3]})
+        >>> table.count_row_if(lambda row: row["col1"] == row["col2"])
+        2
+
+        >>> table.count_row_if(lambda row: row["col1"] > row["col2"])
+        0
+        """
+        expression = predicate(_LazyVectorizedRow(self))._polars_expression
+        series = self._lazy_frame.select(expression.alias("count")).collect().get_column("count")
+
+        if ignore_unknown or series.null_count() == 0:
+            return series.sum()
+        else:
+            return None
 
     # TODO: Rethink group_rows/group_rows_by_column. They should not return a dict.
 
