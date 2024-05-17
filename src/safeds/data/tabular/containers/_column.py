@@ -688,9 +688,12 @@ class Column(Sequence[T_co]):
                 self.stability(),
             ]
         else:
+            min_ = self.min()
+            max_ = self.max()
+
             values = [
-                str(self.min() or "-"),
-                str(self.max() or "-"),
+                str("-" if min_ is None else min_),
+                str("-" if max_ is None else max_),
                 "-",
                 "-",
                 "-",
