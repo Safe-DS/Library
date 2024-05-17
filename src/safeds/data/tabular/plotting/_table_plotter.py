@@ -179,12 +179,7 @@ class TablePlotter:
                 ]
 
                 bars = [f"{round((bins[i] + bins[i + 1]) / 2, 2)}" for i in range(len(bins) - 1)]
-                hist = (
-                    column._series.hist(bins=bins)
-                    .slice(1, length=max_bin_count)
-                    .get_column("count")
-                    .to_numpy()
-                )
+                hist = column._series.hist(bins=bins).slice(1, length=max_bin_count).get_column("count").to_numpy()
 
                 ax.bar(bars, hist, edgecolor="black")
                 ax.set_xticks(range(len(hist)), bars, rotation=45, horizontalalignment="right")
