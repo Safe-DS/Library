@@ -68,7 +68,7 @@ class Row(ABC, Mapping[str, Any]):
     @abstractmethod
     def get_value(self, name: str) -> Cell:
         """
-        Get the value of the specified column.
+        Get the value of the specified column. This is equivalent to using the `[]` operator (indexed access).
 
         Parameters
         ----------
@@ -84,6 +84,29 @@ class Row(ABC, Mapping[str, Any]):
         ------
         ColumnNotFoundError
             If the column name does not exist.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table
+        >>> table = Table({"col1": [1, 2], "col2": [3, 4]})
+        >>> table.remove_rows(lambda row: row.get_value("col1") == 1)
+        +------+------+
+        | col1 | col2 |
+        |  --- |  --- |
+        |  i64 |  i64 |
+        +=============+
+        |    2 |    4 |
+        +------+------+
+
+
+        >>> table.remove_rows(lambda row: row["col1"] == 1)
+        +------+------+
+        | col1 | col2 |
+        |  --- |  --- |
+        |  i64 |  i64 |
+        +=============+
+        |    2 |    4 |
+        +------+------+
         """
 
     @abstractmethod

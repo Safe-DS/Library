@@ -11,7 +11,6 @@ from safeds.exceptions import (
     ColumnLengthMismatchError,
     IndexOutOfBoundsError,
     MissingValuesColumnError,
-    NonNumericColumnError,
 )
 
 from ._lazy_cell import _LazyCell
@@ -224,7 +223,7 @@ class Column(Sequence[T_co]):
 
     def get_value(self, index: int) -> T_co:
         """
-        Return the column value at specified index.
+        Return the column value at specified index. Equivalent to the `[]` operator (indexed access).
 
         Nonnegative indices are counted from the beginning (starting at 0), negative indices from the end (starting at
         -1).
@@ -249,6 +248,9 @@ class Column(Sequence[T_co]):
         >>> from safeds.data.tabular.containers import Column
         >>> column = Column("test", [1, 2, 3])
         >>> column.get_value(1)
+        2
+
+        >>> column[1]
         2
         """
         if index < -self.row_count or index >= self.row_count:
@@ -435,7 +437,7 @@ class Column(Sequence[T_co]):
         """
         Return how many values in the column satisfy the predicate.
 
-        The predicate can return one of three values:
+        The predicate can return one of three results:
 
         * True, if the value satisfies the predicate.
         * False, if the value does not satisfy the predicate.
@@ -458,11 +460,6 @@ class Column(Sequence[T_co]):
         -------
         count:
             The number of values in the column that satisfy the predicate.
-
-        Raises
-        ------
-        TypeError
-            If the predicate does not return a boolean cell.
 
         Examples
         --------
