@@ -110,12 +110,43 @@ from safeds.data.tabular.containers import Table
                 },
             ),
         ),
+        (
+            Table({"col": [True, False, True]}),
+            Table(
+                {
+                    "metric": [
+                        "min",
+                        "max",
+                        "mean",
+                        "median",
+                        "standard deviation",
+                        "distinct value count",
+                        "idness",
+                        "missing value ratio",
+                        "stability",
+                    ],
+                    "col": [
+                        "-",
+                        "True",
+                        "-",
+                        "-",
+                        "-",
+                        "2",
+                        "0.6666666666666666",
+                        "0.0",
+                        "0.6666666666666666",
+                    ],
+                },
+            ),
+
+        )
     ],
     ids=[
         "Column of integers and Column of characters",
         "empty",
         "empty with columns",
         "Column of None",
+        "Column of booleans",
     ],
 )
 def test_should_summarize_statistics(table: Table, expected: Table) -> None:
