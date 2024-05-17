@@ -18,20 +18,20 @@ class _AdaBoostBase(ABC):
     @abstractmethod
     def __init__(
         self,
-        maximum_number_of_learners: int,
+        max_learner_count: int,
         learning_rate: float,
     ) -> None:
         # Validation
-        _check_bounds("maximum_number_of_learners", maximum_number_of_learners, lower_bound=_ClosedBound(1))
+        _check_bounds("max_learner_count", max_learner_count, lower_bound=_ClosedBound(1))
         _check_bounds("learning_rate", learning_rate, lower_bound=_OpenBound(0))
 
         # Hyperparameters
-        self._maximum_number_of_learners: int = maximum_number_of_learners
+        self._max_learner_count: int = max_learner_count
         self._learning_rate: float = learning_rate
 
     def __hash__(self) -> int:
         return _structural_hash(
-            self._maximum_number_of_learners,
+            self._max_learner_count,
             self._learning_rate,
         )
 
@@ -40,9 +40,9 @@ class _AdaBoostBase(ABC):
     # ------------------------------------------------------------------------------------------------------------------
 
     @property
-    def maximum_number_of_learners(self) -> int:
+    def max_learner_count(self) -> int:
         """The maximum number of learners in the ensemble."""
-        return self._maximum_number_of_learners
+        return self._max_learner_count
 
     @property
     def learning_rate(self) -> float:

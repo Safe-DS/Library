@@ -57,7 +57,7 @@ class Choice(Collection[T]):
 
         Returns
         -------
-        number_of_values:
+        value_count:
             The number of values in this choice.
         """
         return len(self.elements)

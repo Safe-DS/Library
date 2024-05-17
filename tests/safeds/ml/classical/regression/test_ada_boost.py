@@ -24,20 +24,20 @@ class TestLearner:
         assert isinstance(fitted_model._wrapped_model.estimator, type(learner._get_sklearn_model()))
 
 
-class TestMaximumNumberOfLearners:
+class TestMaxLearnerCount:
     def test_should_be_passed_to_fitted_model(self, training_set: TabularDataset) -> None:
-        fitted_model = AdaBoostRegressor(maximum_number_of_learners=2).fit(training_set)
-        assert fitted_model.maximum_number_of_learners == 2
+        fitted_model = AdaBoostRegressor(max_learner_count=2).fit(training_set)
+        assert fitted_model.max_learner_count == 2
 
     def test_should_be_passed_to_sklearn(self, training_set: TabularDataset) -> None:
-        fitted_model = AdaBoostRegressor(maximum_number_of_learners=2).fit(training_set)
+        fitted_model = AdaBoostRegressor(max_learner_count=2).fit(training_set)
         assert fitted_model._wrapped_model is not None
         assert fitted_model._wrapped_model.n_estimators == 2
 
-    @pytest.mark.parametrize("maximum_number_of_learners", [-1, 0], ids=["minus_one", "zero"])
-    def test_should_raise_if_less_than_or_equal_to_0(self, maximum_number_of_learners: int) -> None:
+    @pytest.mark.parametrize("max_learner_count", [-1, 0], ids=["minus_one", "zero"])
+    def test_should_raise_if_less_than_or_equal_to_0(self, max_learner_count: int) -> None:
         with pytest.raises(OutOfBoundsError):
-            AdaBoostRegressor(maximum_number_of_learners=maximum_number_of_learners)
+            AdaBoostRegressor(max_learner_count=max_learner_count)
 
 
 class TestLearningRate:

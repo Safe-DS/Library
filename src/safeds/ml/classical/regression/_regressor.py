@@ -237,12 +237,12 @@ def _check_metrics_preconditions(actual: Column, expected: Column) -> None:  # p
     if not expected.type.is_numeric:
         raise TypeError(f"Column 'expected' is not numerical but {expected.type}.")
 
-    if actual.number_of_rows != expected.number_of_rows:
+    if actual.row_count != expected.row_count:
         raise ColumnLengthMismatchError(
             "\n".join(
                 [
-                    f"{actual.name}: {actual.number_of_rows}",
-                    f"{expected.name}: {expected.number_of_rows}",
+                    f"{actual.name}: {actual.row_count}",
+                    f"{expected.name}: {expected.row_count}",
                 ],
             ),
         )

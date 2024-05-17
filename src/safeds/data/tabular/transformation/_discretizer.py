@@ -22,31 +22,31 @@ class Discretizer(TableTransformer):
 
     Parameters
     ----------
-    number_of_bins:
+    bin_count:
         The number of bins to be created.
 
     Raises
     ------
     OutOfBoundsError
-        If the given number_of_bins is less than 2.
+        If the given `bin_count` is less than 2.
     """
 
     # ------------------------------------------------------------------------------------------------------------------
     # Dunder methods
     # ------------------------------------------------------------------------------------------------------------------
 
-    def __init__(self, number_of_bins: int = 5) -> None:
+    def __init__(self, bin_count: int = 5) -> None:
         TableTransformer.__init__(self)
 
-        _check_bounds("number_of_bins", number_of_bins, lower_bound=_ClosedBound(2))
+        _check_bounds("bin_count", bin_count, lower_bound=_ClosedBound(2))
 
         self._wrapped_transformer: sk_KBinsDiscretizer | None = None
-        self._number_of_bins = number_of_bins
+        self._bin_count = bin_count
 
     def __hash__(self) -> int:
         return _structural_hash(
             TableTransformer.__hash__(self),
-            self._number_of_bins,
+            self._bin_count,
         )
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -54,8 +54,8 @@ class Discretizer(TableTransformer):
     # ------------------------------------------------------------------------------------------------------------------
 
     @property
-    def number_of_bins(self) -> int:
-        return self._number_of_bins
+    def bin_count(self) -> int:
+        return self._bin_count
 
     # ------------------------------------------------------------------------------------------------------------------
     # Learning and transformation
@@ -90,7 +90,7 @@ class Discretizer(TableTransformer):
         """
         from sklearn.preprocessing import KBinsDiscretizer as sk_KBinsDiscretizer
 
-        if table.number_of_rows == 0:
+        if table.row_count == 0:
             raise ValueError("The Discretizer cannot be fitted because the table contains 0 rows")
 
         if column_names is None:
@@ -102,13 +102,13 @@ class Discretizer(TableTransformer):
                 if not table.get_column(column).type.is_numeric:
                     raise NonNumericColumnError(f"{column} is of type {table.get_column(column).type}.")
 
-        wrapped_transformer = sk_KBinsDiscretizer(n_bins=self._number_of_bins, encode="ordinal")
+        wrapped_transformer = sk_KBinsDiscretizer(n_bins=self._bin_count, encode="ordinal")
         wrapped_transformer.set_output(transform="polars")
         wrapped_transformer.fit(
             table.remove_columns_except(column_names)._data_frame,
         )
 
-        result = Discretizer(self._number_of_bins)
+        result = Discretizer(self._bin_count)
         result._wrapped_transformer = wrapped_transformer
         result._column_names = column_names
 
@@ -145,7 +145,7 @@ class Discretizer(TableTransformer):
         if self._wrapped_transformer is None or self._column_names is None:
             raise TransformerNotFittedError
 
-        if table.number_of_rows == 0:
+        if table.row_count == 0:
             raise ValueError("The table cannot be transformed because it contains 0 rows")
 
         # Input table does not contain all columns used to fit the transformer

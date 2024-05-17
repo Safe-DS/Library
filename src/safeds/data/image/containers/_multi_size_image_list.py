@@ -173,7 +173,7 @@ class _MultiSizeImageList(ImageList):
         )
 
     @property
-    def number_of_images(self) -> int:
+    def image_count(self) -> int:
         length = 0
         for image_list in self._image_list_dict.values():
             length += len(image_list)
@@ -211,7 +211,7 @@ class _MultiSizeImageList(ImageList):
         return [sizes[index] for index in sorted(sizes)]
 
     @property
-    def number_of_sizes(self) -> int:
+    def size_count(self) -> int:
         return len(self._image_list_dict)
 
     def get_image(self, index: int) -> Image:
@@ -235,12 +235,12 @@ class _MultiSizeImageList(ImageList):
         if self.channel == 4:
             raise IllegalFormatError("png")
         if isinstance(path, list):
-            if len(path) == self.number_of_images:
+            if len(path) == self.image_count:
                 for image_size, image_list in self._image_list_dict.items():
                     image_list.to_jpeg_files(
                         [p for i, p in enumerate(path) if self._indices_to_image_size_dict[i] == image_size],
                     )
-            elif len(path) == self.number_of_sizes:
+            elif len(path) == self.size_count:
                 image_list_path: str | Path
                 for image_list_path, image_list in zip(path, self._image_list_dict.values(), strict=False):
                     image_list.to_jpeg_files(image_list_path)
@@ -254,12 +254,12 @@ class _MultiSizeImageList(ImageList):
 
     def to_png_files(self, path: str | Path | list[str | Path]) -> None:
         if isinstance(path, list):
-            if len(path) == self.number_of_images:
+            if len(path) == self.image_count:
                 for image_size, image_list in self._image_list_dict.items():
                     image_list.to_png_files(
                         [p for i, p in enumerate(path) if self._indices_to_image_size_dict[i] == image_size],
                     )
-            elif len(path) == self.number_of_sizes:
+            elif len(path) == self.size_count:
                 image_list_path: str | Path
                 for image_list_path, image_list in zip(path, self._image_list_dict.values(), strict=False):
                     image_list.to_png_files(image_list_path)
@@ -326,7 +326,7 @@ class _MultiSizeImageList(ImageList):
         image_list_with_size: dict[tuple[int, int], _SingleSizeImageList] = {}
         images_with_size: dict[tuple[int, int], list[Image]] = {}
         if isinstance(images, ImageList):
-            if images.number_of_sizes == 1:
+            if images.size_count == 1:
                 image_list_with_size[(images.widths[0], images.heights[0])] = images._as_single_size_image_list()
                 indices_for_images_with_size[(images.widths[0], images.heights[0])] = [
                     index + current_index for index in images._as_single_size_image_list()._tensor_positions_to_indices

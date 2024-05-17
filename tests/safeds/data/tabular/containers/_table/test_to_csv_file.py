@@ -27,7 +27,7 @@ def test_should_create_csv_file_from_table_by_str(table: Table) -> None:
     # We test all since polars might raise if files are empty
     # TODO: extract to tests for schema, number of columns etc.
     assert table.schema == table_r.schema
-    assert table.number_of_columns == table_r.number_of_columns
+    assert table.column_count == table_r.column_count
     assert table_r == table
 
 
@@ -47,7 +47,7 @@ def test_should_create_csv_file_from_table_by_path(table: Table) -> None:
         with Path(tmp_table_file.name).open("r", encoding="utf-8") as tmp_file:
             table_r = Table.from_csv_file(Path(tmp_file.name))
     assert table.schema == table_r.schema
-    assert table.number_of_columns == table_r.number_of_columns
+    assert table.column_count == table_r.column_count
     assert table == table_r
 
 

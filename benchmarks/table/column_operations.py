@@ -45,6 +45,6 @@ if __name__ == "__main__":
             {
                 "method": list(timings.keys()),
                 "timing": list(timings.values()),
-            }
-        )
+            },
+        ),
     )

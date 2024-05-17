@@ -37,7 +37,7 @@ class Row(ABC, Mapping[str, Any]):
         return iter(self.column_names)
 
     def __len__(self) -> int:
-        return self.number_of_columns
+        return self.column_count
 
     @abstractmethod
     def __sizeof__(self) -> int: ...
@@ -53,7 +53,7 @@ class Row(ABC, Mapping[str, Any]):
 
     @property
     @abstractmethod
-    def number_of_columns(self) -> int:
+    def column_count(self) -> int:
         """The number of columns in the row."""
 
     @property

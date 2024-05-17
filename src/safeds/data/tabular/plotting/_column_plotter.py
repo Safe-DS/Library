@@ -49,7 +49,7 @@ class ColumnPlotter:
         >>> column = Column("test", [1, 2, 3])
         >>> boxplot = column.plot.box_plot()
         """
-        if self._column.number_of_rows > 0 and not self._column.is_numeric:
+        if self._column.row_count > 0 and not self._column.is_numeric:
             # TODO better error message
             raise NonNumericColumnError(f"{self._column.name} is of type {self._column.type}.")
 
@@ -68,13 +68,13 @@ class ColumnPlotter:
 
         return _figure_to_image(fig)
 
-    def histogram(self, *, maximum_number_of_bins: int = 10) -> Image:
+    def histogram(self, *, max_bin_count: int = 10) -> Image:
         """
         Create a histogram for the values in the column.
 
         Parameters
         ----------
-        maximum_number_of_bins:
+        max_bin_count:
             The maximum number of bins to use in the histogram. Default is 10.
 
         Returns
@@ -88,7 +88,7 @@ class ColumnPlotter:
         >>> column = Column("test", [1, 2, 3])
         >>> histogram = column.plot.histogram()
         """
-        return self._column.to_table().plot.histograms(maximum_number_of_bins=maximum_number_of_bins)
+        return self._column.to_table().plot.histograms(max_bin_count=max_bin_count)
 
     def lag_plot(self, lag: int) -> Image:
         """
@@ -115,7 +115,7 @@ class ColumnPlotter:
         >>> column = Column("values", [1, 2, 3, 4])
         >>> image = column.plot.lag_plot(2)
         """
-        if self._column.number_of_rows > 0 and not self._column.is_numeric:
+        if self._column.row_count > 0 and not self._column.is_numeric:
             # TODO better error message
             raise NonNumericColumnError("This time series target contains non-numerical columns.")
 
