@@ -55,7 +55,7 @@ class DataType(ABC):
     @abstractmethod
     def is_temporal(self) -> bool:
         """
-        Whether the column type is temporal.
+        Whether the column type is operator.
 
         Examples
         --------

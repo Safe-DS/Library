@@ -137,7 +137,7 @@ class Column(Sequence[T_co]):
 
     @property
     def is_temporal(self) -> bool:
-        """Whether the column is temporal."""
+        """Whether the column is operator."""
         return self._series.dtype.is_temporal()
 
     @property
@@ -640,19 +640,19 @@ class Column(Sequence[T_co]):
 
     def from_str_to_temporal(self, format_string: str) -> Column:
         """
-        Return a new column with the string values converted to temporal data.
+        Return a new column with the string values converted to operator data.
 
         The original column is not modified.
 
         Parameters
         ----------
         format_string :
-            The used format string to convert the string into temporal data.
+            The used format string to convert the string into operator data.
 
         Returns
         -------
         transformed_column:
-            A new column with temporal data.
+            A new column with operator data.
 
         Examples
         --------
