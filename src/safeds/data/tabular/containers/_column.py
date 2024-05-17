@@ -1057,7 +1057,6 @@ class Column(Sequence[T_co]):
             return 1.0  # All non-null values are the same (since there is are none)
         if type(non_missing.dtype)==pl.datatypes.Boolean: 
             non_missing = non_missing.cast(str)
-            print(non_missing)
         mode_count = non_missing.unique_counts().max()
 
         return mode_count / non_missing.len()
