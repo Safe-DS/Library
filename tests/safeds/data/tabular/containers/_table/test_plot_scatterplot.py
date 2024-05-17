@@ -13,7 +13,8 @@ from syrupy import SnapshotAssertion
                 {
                     "A": [1, 0.99, 0.99, 2],
                     "B": [1, 0.99, 1.01, 2],
-                 }),
+                },
+            ),
             "A",
             "B",
         ),
@@ -41,6 +42,7 @@ def test_should_match_snapshot(table: Table, x_name: str, y_name: str, snapshot_
 def test_should_raise_if_column_does_not_exist(table: Table, col1: str, col2: str) -> None:
     with pytest.raises(ColumnNotFoundError):
         table.plot.scatter_plot(col1, col2)
+
 
 @pytest.mark.parametrize(
     ("table", "x_name", "y_name"),
