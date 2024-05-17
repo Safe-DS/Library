@@ -1058,7 +1058,8 @@ class Column(Sequence[T_co]):
         if non_missing.len() == 0:
             return 1.0  # All non-null values are the same (since there is are none)
 
-        mode_count = non_missing.unique_counts().max()
+        # `unique_counts` crashes in polars for boolean columns
+        mode_count = non_missing.value_counts().get_column("count").max()
 
         return mode_count / non_missing.len()
 
