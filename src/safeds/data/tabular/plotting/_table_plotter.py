@@ -247,8 +247,7 @@ class TablePlotter:
         import polars as pl
 
         grouped = (
-            self._table._lazy_frame
-            .sort(x_name)
+            self._table._lazy_frame.sort(x_name)
             .group_by(x_name)
             .agg(
                 mean=pl.mean(y_name),
