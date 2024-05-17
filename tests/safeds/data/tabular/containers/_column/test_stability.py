@@ -12,6 +12,7 @@ from safeds.data.tabular.containers import Column
         ([None], 1),
         ([1, 2, 3, 4], 1 / 4),
         (["b", "a", "abc", "abc", "abc"], 3 / 5),
+        ([True, False, True, True, None], 3 / 4),
     ],
     ids=[
         "empty",
@@ -19,6 +20,7 @@ from safeds.data.tabular.containers import Column
         "only missing values",
         "numeric",
         "non-numeric",
+        "boolean",  # caused a crash in previous implementation
     ],
 )
 def test_should_return_stability_of_column(values: list[Any], expected: float) -> None:
