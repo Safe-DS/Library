@@ -63,11 +63,11 @@ class ImageDataset(Generic[T], Dataset):
         else:
             self._input_size: ImageSize = ImageSize(input_data.widths[0], input_data.heights[0], input_data.channel)
             self._input: _SingleSizeImageList = input_data._as_single_size_image_list()
-        if ((isinstance(output_data, Column | Table)) and len(input_data) != output_data.number_of_rows) or (
+        if ((isinstance(output_data, Column | Table)) and len(input_data) != output_data.row_count) or (
             isinstance(output_data, ImageList) and len(input_data) != len(output_data)
         ):
             if isinstance(output_data, Table):
-                output_len = output_data.number_of_rows
+                output_len = output_data.row_count
             else:
                 output_len = len(output_data)
             raise OutputLengthMismatchError(f"{len(input_data)} != {output_len}")
@@ -86,7 +86,7 @@ class ImageDataset(Generic[T], Dataset):
             if len(wrong_interval_columns) > 0:
                 raise ValueError(f"Columns {wrong_interval_columns} have values outside of the interval [0, 1].")
             _output: _TableAsTensor | _ColumnAsTensor | _SingleSizeImageList = _TableAsTensor(output_data)
-            _output_size: int | ImageSize = output_data.number_of_columns
+            _output_size: int | ImageSize = output_data.column_count
         elif isinstance(output_data, Column):
             _column_as_tensor = _ColumnAsTensor(output_data)
             _output_size = len(_column_as_tensor._one_hot_encoder._get_names_of_added_columns())
@@ -114,7 +114,7 @@ class ImageDataset(Generic[T], Dataset):
         return self._get_batch(self._next_batch_index - 1)
 
     def __len__(self) -> int:
-        return self._input.number_of_images
+        return self._input.image_count
 
     def __eq__(self, other: object) -> bool:
         """
@@ -309,8 +309,8 @@ class _TableAsTensor:
         _init_default_device()
 
         self._column_names = table.column_names
-        if table.number_of_rows == 0:
-            self._tensor = torch.empty((0, table.number_of_columns), dtype=torch.float32).to(_get_device())
+        if table.row_count == 0:
+            self._tensor = torch.empty((0, table.column_count), dtype=torch.float32).to(_get_device())
         else:
             self._tensor = table._data_frame.to_torch(dtype=pl.Float32).to(_get_device())
 

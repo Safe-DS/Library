@@ -108,7 +108,7 @@ class RangeScaler(InvertibleTableTransformer):
             _check_columns_exist(table, column_names)
             _check_columns_are_numeric(table, column_names, operation="fit a RangeScaler")
 
-        if table.number_of_rows == 0:
+        if table.row_count == 0:
             raise ValueError("The RangeScaler cannot be fitted because the table contains 0 rows")
 
         # Learn the transformation

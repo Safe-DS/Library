@@ -85,7 +85,7 @@ class SupervisedModel(ABC):
         """
         if not isinstance(training_set, TabularDataset) and isinstance(training_set, Table):
             raise PlainTableError
-        if training_set.to_table().number_of_rows == 0:
+        if training_set.to_table().row_count == 0:
             raise DatasetMissesDataError
 
         self._check_additional_fit_preconditions(training_set)
@@ -381,7 +381,7 @@ def _predict_with_sklearn_model(
     if missing_feature_names:
         raise DatasetMissesFeaturesError(missing_feature_names)
 
-    if dataset.number_of_rows == 0:
+    if dataset.row_count == 0:
         raise DatasetMissesDataError
 
     features = dataset.remove_columns_except(feature_names)

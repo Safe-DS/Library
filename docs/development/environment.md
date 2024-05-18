@@ -6,14 +6,14 @@ This document describes how to configure and use your development environment.
 
 You must complete these steps once before you can start setting up the project itself:
 
-1. Install [Python 3.11](https://www.python.org/downloads/).
+1. Install [Python 3.12](https://www.python.org/downloads/).
 2. Verify that `python` can be launched by running this command in a **new** terminal:
     ```shell
     python --version
     ```
     If this fails, add the directory that contains the `python` executable to your `PATH` environment variable.
 
-3. Install [Poetry](https://python-poetry.org/docs/master/#installing-with-the-official-installer) with the official installer. Follow the instructions for your operating system in the linked document.
+3. Install [Poetry](https://python-poetry.org/docs/#installation) with the official installer. Follow the instructions for your operating system in the linked document.
 4. Verify that `poetry` can be launched by running this command in a **new** terminal:
     ```shell
     poetry --version

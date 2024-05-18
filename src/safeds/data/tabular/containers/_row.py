@@ -37,7 +37,7 @@ class Row(ABC, Mapping[str, Any]):
         return iter(self.column_names)
 
     def __len__(self) -> int:
-        return self.number_of_columns
+        return self.column_count
 
     @abstractmethod
     def __sizeof__(self) -> int: ...
@@ -53,7 +53,7 @@ class Row(ABC, Mapping[str, Any]):
 
     @property
     @abstractmethod
-    def number_of_columns(self) -> int:
+    def column_count(self) -> int:
         """The number of columns in the row."""
 
     @property
@@ -68,7 +68,7 @@ class Row(ABC, Mapping[str, Any]):
     @abstractmethod
     def get_value(self, name: str) -> Cell:
         """
-        Get the value of the specified column.
+        Get the value of the specified column. This is equivalent to using the `[]` operator (indexed access).
 
         Parameters
         ----------
@@ -84,6 +84,29 @@ class Row(ABC, Mapping[str, Any]):
         ------
         ColumnNotFoundError
             If the column name does not exist.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table
+        >>> table = Table({"col1": [1, 2], "col2": [3, 4]})
+        >>> table.remove_rows(lambda row: row.get_value("col1") == 1)
+        +------+------+
+        | col1 | col2 |
+        |  --- |  --- |
+        |  i64 |  i64 |
+        +=============+
+        |    2 |    4 |
+        +------+------+
+
+
+        >>> table.remove_rows(lambda row: row["col1"] == 1)
+        +------+------+
+        | col1 | col2 |
+        |  --- |  --- |
+        |  i64 |  i64 |
+        +=============+
+        |    2 |    4 |
+        +------+------+
         """
 
     @abstractmethod

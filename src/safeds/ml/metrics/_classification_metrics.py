@@ -74,7 +74,7 @@ class ClassificationMetrics:
 
         from polars.exceptions import ComputeError
 
-        if expected.number_of_rows == 0:
+        if expected.row_count == 0:
             return 1.0  # Everything was predicted correctly (since there is nothing to predict)
 
         try:
@@ -211,5 +211,5 @@ def _check_equal_length(column1: Column, column2: Column) -> None:
     ValueError
         If the columns have different lengths.
     """
-    if column1.number_of_rows != column2.number_of_rows:
+    if column1.row_count != column2.row_count:
         ColumnLengthMismatchError("")  # TODO: pass list of columns to exception, let it handle the formatting

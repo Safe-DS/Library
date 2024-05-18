@@ -7,8 +7,33 @@ from safeds.exceptions import ColumnTypeError
 if TYPE_CHECKING:
     from collections.abc import Container
 
-    from safeds.data.tabular.containers import Table
+    from safeds.data.tabular.containers import Column, Table
     from safeds.data.tabular.typing import Schema
+
+
+def _check_column_is_numeric(
+    column: Column,
+    *,
+    operation: str = "do a numeric operation",
+) -> None:
+    """
+    Check if the column is numeric and raise an error if it is not.
+
+    Parameters
+    ----------
+    column:
+        The column to check.
+    operation:
+        The operation that is performed on the column. This is used in the error message.
+
+    Raises
+    ------
+    ColumnTypeError
+        If the column is not numeric.
+    """
+    if not column.type.is_numeric:
+        message = _build_error_message([column.name], operation)
+        raise ColumnTypeError(message)
 
 
 def _check_columns_are_numeric(
