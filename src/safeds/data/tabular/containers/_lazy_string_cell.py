@@ -34,6 +34,12 @@ class _LazyStringCell(StringCell):
     def contains(self, substring: str) -> Cell[bool]:
         return _LazyCell(self._expression.str.contains(substring, literal=True))
 
+    def starts_with(self, prefix: str) -> Cell[bool]:
+        return _LazyCell(self._expression.str.starts_with(prefix))
+
+    def ends_with(self, suffix: str) -> Cell[bool]:
+        return _LazyCell(self._expression.str.ends_with(suffix))
+
     # ------------------------------------------------------------------------------------------------------------------
     # Internal
     # ------------------------------------------------------------------------------------------------------------------
