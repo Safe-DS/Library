@@ -9,6 +9,8 @@ from ._cell import Cell
 if TYPE_CHECKING:
     import polars as pl
 
+    from ._string_cell import StringCell
+
 T = TypeVar("T")
 P = TypeVar("P")
 R = TypeVar("R")
@@ -165,6 +167,16 @@ class _LazyCell(Cell[T]):
 
     def __sizeof__(self) -> int:
         return self._expression.__sizeof__()
+
+    # ------------------------------------------------------------------------------------------------------------------
+    # Properties
+    # ------------------------------------------------------------------------------------------------------------------
+
+    @property
+    def string(self) -> StringCell:
+        from ._lazy_string_cell import _LazyStringCell  # circular import
+
+        return _LazyStringCell(self._expression)
 
     # ------------------------------------------------------------------------------------------------------------------
     # Internal

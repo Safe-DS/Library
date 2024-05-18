@@ -6,8 +6,10 @@ from typing import TYPE_CHECKING, Any, Generic, TypeVar
 if TYPE_CHECKING:
     import polars as pl
 
+    from ._string_cell import StringCell
+
 T_co = TypeVar("T_co", covariant=True)
-P = TypeVar("P")
+P_contra = TypeVar("P_contra", contravariant=True)
 R_co = TypeVar("R_co", covariant=True)
 
 
@@ -109,10 +111,10 @@ class Cell(ABC, Generic[T_co]):
     def __rmul__(self, other: Any) -> Cell[R_co]: ...
 
     @abstractmethod
-    def __pow__(self, other: float | Cell[P]) -> Cell[R_co]: ...
+    def __pow__(self, other: float | Cell[P_contra]) -> Cell[R_co]: ...
 
     @abstractmethod
-    def __rpow__(self, other: float | Cell[P]) -> Cell[R_co]: ...
+    def __rpow__(self, other: float | Cell[P_contra]) -> Cell[R_co]: ...
 
     @abstractmethod
     def __sub__(self, other: Any) -> Cell[R_co]: ...
@@ -133,6 +135,15 @@ class Cell(ABC, Generic[T_co]):
 
     @abstractmethod
     def __sizeof__(self) -> int: ...
+
+    # ------------------------------------------------------------------------------------------------------------------
+    # Properties
+    # ------------------------------------------------------------------------------------------------------------------
+
+    @property
+    @abstractmethod
+    def string(self) -> StringCell:
+        """These operations only make sense for string cells."""
 
     # ------------------------------------------------------------------------------------------------------------------
     # Boolean operations
@@ -432,7 +443,7 @@ class Cell(ABC, Generic[T_co]):
         """
         return self.__mul__(other)
 
-    def pow(self, other: float | Cell[P]) -> Cell[R_co]:
+    def pow(self, other: float | Cell[P_contra]) -> Cell[R_co]:
         """
         Raise to a power. This is equivalent to the `**` operator.
 
