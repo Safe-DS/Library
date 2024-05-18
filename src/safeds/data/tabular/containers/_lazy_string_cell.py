@@ -34,11 +34,17 @@ class _LazyStringCell(StringCell):
     def contains(self, substring: str) -> Cell[bool]:
         return _LazyCell(self._expression.str.contains(substring, literal=True))
 
-    def starts_with(self, prefix: str) -> Cell[bool]:
-        return _LazyCell(self._expression.str.starts_with(prefix))
+    def length(self, optimize_for_ascii: bool = False) -> Cell[int]:
+        if optimize_for_ascii:
+            return _LazyCell(self._expression.str.len_bytes())
+        else:
+            return _LazyCell(self._expression.str.len_chars())
 
     def ends_with(self, suffix: str) -> Cell[bool]:
         return _LazyCell(self._expression.str.ends_with(suffix))
+
+    def starts_with(self, prefix: str) -> Cell[bool]:
+        return _LazyCell(self._expression.str.starts_with(prefix))
 
     # ------------------------------------------------------------------------------------------------------------------
     # Internal

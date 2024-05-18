@@ -57,6 +57,30 @@ class StringCell(ABC):
         """
 
     @abstractmethod
+    def length(self, *, optimize_for_ascii: bool = False) -> Cell[int]:
+        """
+        Get the number of characters of the string value in the cell.
+
+        Parameters
+        ----------
+        optimize_for_ascii:
+            Greatly speed up this operation if the string is ASCII-only. If the string contains non-ASCII characters,
+            this option will return incorrect results, though.
+
+        Returns
+        -------
+        length:
+            The length of the string value.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("example", ["", "a", "abc"])
+        >>> column.transform(lambda cell: cell.string.length())
+        [0, 1, 3]
+        """
+
+    @abstractmethod
     def starts_with(self, prefix: str) -> Cell[bool]:
         """
         Check if the string value in the cell starts with the prefix.
@@ -82,7 +106,6 @@ class StringCell(ABC):
 
     # indexOf
     # lastIndexOf
-    # length
     # replace
     # split
     # substring
