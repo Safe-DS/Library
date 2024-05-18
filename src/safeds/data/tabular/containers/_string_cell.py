@@ -8,7 +8,18 @@ if TYPE_CHECKING:
 
 
 class StringCell(ABC):
-    """These operations only make sense for string cells."""
+    """
+    Namespace for operations on strings.
+
+    This class cannot be instantiated directly. It can only be accessed using the `string` attribute of a cell.
+
+    Examples
+    --------
+    >>> from safeds.data.tabular.containers import Column
+    >>> column = Column("example", ["ab", "bc", "cd"])
+    >>> column.transform(lambda cell: cell.string.to_uppercase())
+    ["AB", "BC", "CD"]
+    """
 
     @abstractmethod
     def contains(self, substring: str) -> Cell[bool]:
@@ -22,7 +33,7 @@ class StringCell(ABC):
 
         Returns
         -------
-        result:
+        contains:
             Whether the string value contains the substring.
 
         Examples
@@ -45,7 +56,7 @@ class StringCell(ABC):
 
         Returns
         -------
-        result:
+        ends_with:
             Whether the string value ends with the suffix.
 
         Examples
@@ -92,7 +103,7 @@ class StringCell(ABC):
 
         Returns
         -------
-        result:
+        starts_with:
             Whether the string value starts with the prefix.
 
         Examples
@@ -110,7 +121,7 @@ class StringCell(ABC):
 
         Returns
         -------
-        result:
+        lowercase:
             The string value in lowercase.
 
         Examples
@@ -128,7 +139,7 @@ class StringCell(ABC):
 
         Returns
         -------
-        result:
+        uppercase:
             The string value in uppercase.
 
         Examples
@@ -146,7 +157,7 @@ class StringCell(ABC):
 
         Returns
         -------
-        result:
+        trimmed:
             The string value without whitespace at the start and end.
 
         Examples
@@ -164,7 +175,7 @@ class StringCell(ABC):
 
         Returns
         -------
-        result:
+        trimmed:
             The string value without whitespace at the end.
 
         Examples
@@ -182,7 +193,7 @@ class StringCell(ABC):
 
         Returns
         -------
-        result:
+        trimmed:
             The string value without whitespace at the start.
 
         Examples

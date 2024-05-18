@@ -143,7 +143,7 @@ class Cell(ABC, Generic[T_co]):
     @property
     @abstractmethod
     def string(self) -> StringCell:
-        """These operations only make sense for string cells."""
+        """Namespace for operations on strings."""
 
     # ------------------------------------------------------------------------------------------------------------------
     # Boolean operations
