@@ -139,6 +139,60 @@ class StringCell(ABC):
         ["AB", "BC", "CD"]
         """
 
+    @abstractmethod
+    def trim(self) -> Cell[str]:
+        """
+        Remove whitespace from the start and end of the string value in the cell.
+
+        Returns
+        -------
+        result:
+            The string value without whitespace at the start and end.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("example", ["", " abc", "abc ", " abc "])
+        >>> column.transform(lambda cell: cell.string.trim())
+        ["", "abc", "abc", "abc"]
+        """
+
+    @abstractmethod
+    def trim_end(self) -> Cell[str]:
+        """
+        Remove whitespace from the end of the string value in the cell.
+
+        Returns
+        -------
+        result:
+            The string value without whitespace at the end.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("example", ["", " abc", "abc ", " abc "])
+        >>> column.transform(lambda cell: cell.string.trim_end())
+        ["", " abc", "abc", " abc"]
+        """
+
+    @abstractmethod
+    def trim_start(self) -> Cell[str]:
+        """
+        Remove whitespace from the start of the string value in the cell.
+
+        Returns
+        -------
+        result:
+            The string value without whitespace at the start.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("example", ["", " abc", "abc ", " abc "])
+        >>> column.transform(lambda cell: cell.string.trim_start())
+        ["", "abc", "abc ", "abc "]
+        """
+
     # indexOf
     # lastIndexOf
     # replace
@@ -146,9 +200,6 @@ class StringCell(ABC):
     # substring
     # toFloat
     # toInt
-    # trim
-    # trimEnd
-    # trimStart
     # toDate
     # toTime
     # toDatetime

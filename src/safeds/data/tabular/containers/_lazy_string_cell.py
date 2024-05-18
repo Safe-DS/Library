@@ -52,6 +52,15 @@ class _LazyStringCell(StringCell):
     def to_uppercase(self) -> Cell[str]:
         return _LazyCell(self._expression.str.to_uppercase())
 
+    def trim(self) -> Cell[str]:
+        return _LazyCell(self._expression.str.strip_chars())
+
+    def trim_end(self) -> Cell[str]:
+        return _LazyCell(self._expression.str.strip_chars_end())
+
+    def trim_start(self) -> Cell[str]:
+        return _LazyCell(self._expression.str.strip_chars_start())
+
     # ------------------------------------------------------------------------------------------------------------------
     # Internal
     # ------------------------------------------------------------------------------------------------------------------
