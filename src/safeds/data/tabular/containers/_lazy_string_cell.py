@@ -46,6 +46,12 @@ class _LazyStringCell(StringCell):
     def starts_with(self, prefix: str) -> Cell[bool]:
         return _LazyCell(self._expression.str.starts_with(prefix))
 
+    def to_lowercase(self) -> Cell[str]:
+        return _LazyCell(self._expression.str.to_lowercase())
+
+    def to_uppercase(self) -> Cell[str]:
+        return _LazyCell(self._expression.str.to_uppercase())
+
     # ------------------------------------------------------------------------------------------------------------------
     # Internal
     # ------------------------------------------------------------------------------------------------------------------

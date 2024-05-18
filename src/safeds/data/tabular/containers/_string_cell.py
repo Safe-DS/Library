@@ -103,6 +103,41 @@ class StringCell(ABC):
         1
         """
 
+    @abstractmethod
+    def to_lowercase(self) -> Cell[str]:
+        """
+        Convert the string value in the cell to lowercase.
+
+        Returns
+        -------
+        result:
+            The string value in lowercase.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("example", ["AB", "BC", "CD"])
+        >>> column.transform(lambda cell: cell.string.to_lowercase())
+        ["ab", "bc", "cd"]
+        """
+
+    @abstractmethod
+    def to_uppercase(self) -> Cell[str]:
+        """
+        Convert the string value in the cell to uppercase.
+
+        Returns
+        -------
+        result:
+            The string value in uppercase.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("example", ["ab", "bc", "cd"])
+        >>> column.transform(lambda cell: cell.string.to_uppercase())
+        ["AB", "BC", "CD"]
+        """
 
     # indexOf
     # lastIndexOf
@@ -111,8 +146,6 @@ class StringCell(ABC):
     # substring
     # toFloat
     # toInt
-    # toLowercase
-    # toUppercase
     # trim
     # trimEnd
     # trimStart
