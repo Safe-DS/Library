@@ -62,7 +62,12 @@ class TestEq:
         ids=["ConstantImageSize", "VariableImageSize"],
     )
     def test_should_be_equal(
-        self, image_size: ModelImageSize, width: int, height: int, channel: int, image_size_class: type[ModelImageSize],
+        self,
+        image_size: ModelImageSize,
+        width: int,
+        height: int,
+        channel: int,
+        image_size_class: type[ModelImageSize],
     ) -> None:
         assert image_size == image_size_class(width, height, channel)
 
@@ -82,7 +87,12 @@ class TestEq:
         ids=["ConstantImageSize", "VariableImageSize"],
     )
     def test_should_not_be_equal(
-        self, image_size: ModelImageSize, width: int, height: int, channel: int, image_size_class: type[ModelImageSize],
+        self,
+        image_size: ModelImageSize,
+        width: int,
+        height: int,
+        channel: int,
+        image_size_class: type[ModelImageSize],
     ) -> None:
         assert image_size != image_size_class(width, height, channel)
 
@@ -136,7 +146,9 @@ class TestHash:
         ids=["ConstantImageSize", "VariableImageSize"],
     )
     def test_hash_should_not_be_equal(
-        self, image_size_class1: type[ModelImageSize], image_size_class2: type[ModelImageSize],
+        self,
+        image_size_class1: type[ModelImageSize],
+        image_size_class2: type[ModelImageSize],
     ) -> None:
         assert hash(image_size_class1(1, 2, 3)) != hash(image_size_class2(3, 2, 1))
 
@@ -189,7 +201,11 @@ class TestProperties:
         ids=["ConstantImageSize", "VariableImageSize"],
     )
     def test_width_height_channel(
-        self, width: int, height: int, channel: int, image_size_class: type[ModelImageSize],
+        self,
+        width: int,
+        height: int,
+        channel: int,
+        image_size_class: type[ModelImageSize],
     ) -> None:
         image_size = image_size_class(width, height, channel)
         assert image_size.width == width
@@ -235,7 +251,9 @@ class TestErrors:
 
     @pytest.mark.parametrize("channel", [-1, 0])
     def test_should_raise_negative_channel_ignore_invalid_channel(
-        self, channel: int, image_size_class: type[ModelImageSize],
+        self,
+        channel: int,
+        image_size_class: type[ModelImageSize],
     ) -> None:
         with pytest.raises(OutOfBoundsError):
             image_size_class(1, 1, channel, _ignore_invalid_channel=True)

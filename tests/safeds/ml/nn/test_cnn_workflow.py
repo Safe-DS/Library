@@ -262,7 +262,8 @@ class TestImageToImageRegressor:
         ).item()
         prediction = nn.predict(
             image_dataset.get_input().resize(
-                image_dataset.input_size.width * multi_width, image_dataset.input_size.height * multi_height,
+                image_dataset.input_size.width * multi_width,
+                image_dataset.input_size.height * multi_height,
             ),
         )
         pred_output = prediction.get_output()

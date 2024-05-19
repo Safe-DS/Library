@@ -107,7 +107,10 @@ class _Pooling2DLayer(Layer):
                 (self.input_size.height + self._padding * 2 - self._kernel_size + 1) / (1.0 * self._stride),
             )
             self._output_size = self._input_size.__class__(
-                new_width, new_height, self._input_size.channel, _ignore_invalid_channel=True,
+                new_width,
+                new_height,
+                self._input_size.channel,
+                _ignore_invalid_channel=True,
             )
         return self._output_size
 

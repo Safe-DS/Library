@@ -176,7 +176,10 @@ class Convolutional2DLayer(Layer):
                 (self._input_size.height + self._padding * 2 - self._kernel_size + 1) / (1.0 * self._stride),
             )
             self._output_size = self._input_size.__class__(
-                new_width, new_height, self._output_channel, _ignore_invalid_channel=True,
+                new_width,
+                new_height,
+                self._output_channel,
+                _ignore_invalid_channel=True,
             )
         return self._output_size
 
@@ -323,7 +326,10 @@ class ConvolutionalTranspose2DLayer(Convolutional2DLayer):
                 + self._output_padding
             )
             self._output_size = self._input_size.__class__(
-                new_width, new_height, self._output_channel, _ignore_invalid_channel=True,
+                new_width,
+                new_height,
+                self._output_channel,
+                _ignore_invalid_channel=True,
             )
         return self._output_size
 

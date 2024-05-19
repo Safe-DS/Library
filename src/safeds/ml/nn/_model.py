@@ -340,7 +340,8 @@ class NeuralNetworkClassifier(Generic[IFT, IPT, OT]):
         if isinstance(output_conversion, OutputConversionImageToImage):
             raise InvalidModelStructureError("A NeuralNetworkClassifier cannot be used with images as output.")
         if isinstance(input_conversion, InputConversionImage) and isinstance(
-            input_conversion._input_size, VariableImageSize,
+            input_conversion._input_size,
+            VariableImageSize,
         ):
             raise InvalidModelStructureError(
                 "A NeuralNetworkClassifier cannot be used with a InputConversionImage that uses a VariableImageSize.",
@@ -417,7 +418,9 @@ class NeuralNetworkClassifier(Generic[IFT, IPT, OT]):
                 )
             else:
                 input_size = ConstantImageSize(
-                    image_processor.size.get("width"), image_processor.size.get("height"), config.num_channels,
+                    image_processor.size.get("width"),
+                    image_processor.size.get("height"),
+                    config.num_channels,
                 )
         else:  # Should never happen due to model check
             raise ValueError("This model is not supported")  # pragma: no cover
