@@ -23,6 +23,8 @@ class Regressor(SupervisedModel, ABC):
         """
         Summarize the regressor's metrics on the given data.
 
+        **Note:** The model must be fitted.
+
         Parameters
         ----------
         validation_or_test_set:
@@ -65,7 +67,10 @@ class Regressor(SupervisedModel, ABC):
         | 0.0        | The model is as good as predicting the mean of the target values. Try something else.      |
         | (-∞, 0.0)  | The model is worse than predicting the mean of the target values. Something is very wrong. |
 
-        **Note:** Some other libraries call this metric `r2_score`.
+        **Notes:**
+
+        - The model must be fitted.
+        - Some other libraries call this metric `r2_score`.
 
         Parameters
         ----------
@@ -99,6 +104,8 @@ class Regressor(SupervisedModel, ABC):
         The mean absolute error is the average of the absolute differences between the predicted and expected target
         values. The **lower** the mean absolute error, the better the regressor. Results range from 0.0 to positive
         infinity.
+
+        **Note:** The model must be fitted.
 
         Parameters
         ----------
@@ -137,6 +144,8 @@ class Regressor(SupervisedModel, ABC):
         This metric is useful for time series data, where the order of the target values has a meaning. It is not useful
         for other types of data. Because of this, it is not included in the `summarize_metrics` method.
 
+        **Note:** The model must be fitted.
+
         Parameters
         ----------
         validation_or_test_set:
@@ -170,7 +179,10 @@ class Regressor(SupervisedModel, ABC):
         values. The **lower** the mean squared error, the better the regressor. Results range from 0.0 to positive
         infinity.
 
-        **Note:** To get the root mean squared error (RMSE), take the square root of the result.
+        **NoteS:**
+
+        - The model must be fitted.
+        - To get the root mean squared error (RMSE), take the square root of the result.
 
         Parameters
         ----------
@@ -204,6 +216,8 @@ class Regressor(SupervisedModel, ABC):
         The median absolute deviation is the median of the absolute differences between the predicted and expected
         target values. The **lower** the median absolute deviation, the better the regressor. Results range from 0.0 to
         positive infinity.
+
+        **Note:** The model must be fitted.
 
         Parameters
         ----------
