@@ -11,7 +11,7 @@ if TYPE_CHECKING:
     from torch.utils.data import DataLoader
 
     from safeds.data.image.containers._single_size_image_list import _SingleSizeImageList
-    from safeds.data.image.typing import ImageSize
+    from safeds.ml.nn.typing import ModelImageSize
 
 FT = TypeVar("FT", TabularDataset, TimeSeriesDataset, ImageDataset)
 PT = TypeVar("PT", Table, TimeSeriesDataset, ImageList)
@@ -22,7 +22,7 @@ class InputConversion(Generic[FT, PT], ABC):
 
     @property
     @abstractmethod
-    def _data_size(self) -> int | ImageSize:
+    def _data_size(self) -> int | ModelImageSize:
         pass  # pragma: no cover
 
     @abstractmethod

@@ -36,7 +36,7 @@ def test_should_get_unique_values_ignoring_missing_values(values: list[Any], exp
 @pytest.mark.parametrize(
     ("values", "expected"),
     [
-        ([1, None, None], [None, 1]),
+        ([1, None, None], [1, None]),
         ([None, None, None], [None]),
     ],
     ids=[

@@ -35,11 +35,27 @@ from safeds.ml.nn.layers import (
 )
 from torch.types import Device
 
+from safeds.ml.nn.typing import ModelImageSize, VariableImageSize, ConstantImageSize
 from tests.helpers import configure_test_with_device, get_devices, get_devices_ids
 
 
 @pytest.mark.parametrize("device", get_devices(), ids=get_devices_ids())
 class TestClassificationModel:
+
+    @pytest.mark.parametrize(
+        "input_size",
+        [
+            1,
+        ]
+    )
+    def test_should_return_input_size(self, input_size: int | ModelImageSize, device: Device) -> None:
+        configure_test_with_device(device)
+        assert NeuralNetworkClassifier(
+                InputConversionTable(),
+                [ForwardLayer(1, input_size)],
+                OutputConversionTable(),
+            ).input_size == input_size
+
     @pytest.mark.parametrize(
         "epoch_size",
         [
@@ -483,6 +499,12 @@ class TestClassificationModel:
                 OutputConversionImageToColumn(),
                 r"You need to provide at least one layer to a neural network.",
             ),
+            (
+                InputConversionImage(VariableImageSize(1, 1, 1)),
+                [FlattenLayer()],
+                OutputConversionImageToColumn(),
+                r"A NeuralNetworkClassifier cannot be used with a InputConversionImage that uses a VariableImageSize.",
+            ),
         ],
     )
     def test_should_raise_if_model_has_invalid_structure(
@@ -500,6 +522,21 @@ class TestClassificationModel:
 
 @pytest.mark.parametrize("device", get_devices(), ids=get_devices_ids())
 class TestRegressionModel:
+
+    @pytest.mark.parametrize(
+        "input_size",
+        [
+            1,
+        ]
+    )
+    def test_should_return_input_size(self, input_size: int | ModelImageSize, device: Device) -> None:
+        configure_test_with_device(device)
+        assert NeuralNetworkRegressor(
+                InputConversionTable(),
+                [ForwardLayer(1, input_size)],
+                OutputConversionTable(),
+            ).input_size == input_size
+
     @pytest.mark.parametrize(
         "epoch_size",
         [

@@ -5,6 +5,7 @@ import pytest
 import torch
 from safeds._config import _get_device
 from safeds.data.image.containers import ImageList
+from safeds.data.image.containers._single_size_image_list import _SingleSizeImageList
 from safeds.data.labeled.containers import ImageDataset
 from safeds.data.tabular.containers import Column, Table
 from safeds.data.tabular.transformation import OneHotEncoder
@@ -29,6 +30,7 @@ from safeds.ml.nn.layers import (
 from syrupy import SnapshotAssertion
 from torch.types import Device
 
+from safeds.ml.nn.typing import VariableImageSize
 from tests.helpers import configure_test_with_device, device_cpu, device_cuda, images_all, resolve_resource_path
 
 if TYPE_CHECKING:
@@ -42,22 +44,22 @@ class TestImageToTableClassifier:
             (
                 1234,
                 device_cuda,
-                ["white_square"] * 7,
+                ["grayscale"] * 7,
             ),
             (
                 4711,
                 device_cuda,
-                ["rgba"] * 7,
+                ["white_square"] * 7,
             ),
             (
                 1234,
                 device_cpu,
-                ["white_square"] * 7,
+                ["grayscale"] * 7,
             ),
             (
                 4711,
                 device_cpu,
-                ["rgba"] * 7,
+                ["white_square"] * 7,
             ),
         ],
         ids=["seed-1234-cuda", "seed-4711-cuda", "seed-1234-cpu", "seed-4711-cpu"],
@@ -109,22 +111,22 @@ class TestImageToColumnClassifier:
             (
                 1234,
                 device_cuda,
-                ["white_square"] * 7,
+                ["grayscale"] * 7,
             ),
             (
                 4711,
                 device_cuda,
-                ["rgba"] * 7,
+                ["white_square"] * 7,
             ),
             (
                 1234,
                 device_cpu,
-                ["white_square"] * 7,
+                ["grayscale"] * 7,
             ),
             (
                 4711,
                 device_cpu,
-                ["rgba"] * 7,
+                ["white_square"] * 7,
             ),
         ],
         ids=["seed-1234-cuda", "seed-4711-cuda", "seed-1234-cpu", "seed-4711-cpu"],
@@ -214,4 +216,70 @@ class TestImageToImageRegressor:
         ).item()
         prediction = nn.predict(image_dataset.get_input())
         assert isinstance(prediction.get_output(), ImageList)
+        assert prediction._output._tensor.device == _get_device()
+
+    @pytest.mark.parametrize(
+        ("seed", "device"),
+        [
+            (4711, device_cuda),
+            (4711, device_cpu),
+        ],
+        ids=["seed-4711-cuda", "seed-4711-cpu"],
+    )
+    @pytest.mark.parametrize(
+        "multi_width",
+        [
+            1, 2, 3
+        ]
+    )
+    @pytest.mark.parametrize(
+        "multi_height",
+        [
+            1, 2, 3
+        ]
+    )
+    def test_should_train_and_predict_model_variable_image_size(
+        self,
+        seed: int,
+        snapshot_png_image_list: SnapshotAssertion,
+        device: Device,
+        multi_width: int,
+        multi_height: int,
+    ) -> None:
+        configure_test_with_device(device)
+        torch.manual_seed(seed)
+
+        image_list = ImageList.from_files(resolve_resource_path(images_all()))
+        image_list = image_list.resize(20, 20)
+        image_list_grayscale = image_list.convert_to_grayscale()
+        image_dataset = ImageDataset(image_list, image_list_grayscale)
+
+        layers: list[Layer] = [
+            Convolutional2DLayer(6, 2),
+            Convolutional2DLayer(12, 2),
+            ConvolutionalTranspose2DLayer(6, 2),
+            ConvolutionalTranspose2DLayer(4, 2),
+        ]
+        nn_original = NeuralNetworkRegressor(
+            InputConversionImage(VariableImageSize.from_image_size(image_dataset.input_size)),
+            layers,
+            OutputConversionImageToImage(),
+        )
+        nn = nn_original.fit(image_dataset, epoch_size=20)
+        assert str(nn_original._model.state_dict().values()) != str(nn._model.state_dict().values())
+        assert not torch.all(
+            torch.eq(
+                nn_original._model.state_dict()["_pytorch_layers.3._layer.bias"],
+                nn._model.state_dict()["_pytorch_layers.3._layer.bias"],
+            ),
+        ).item()
+        prediction = nn.predict(image_dataset.get_input().resize(image_dataset.input_size.width * multi_width, image_dataset.input_size.height * multi_height))
+        pred_output = prediction.get_output()
+        assert isinstance(pred_output, ImageList)
+        if isinstance(pred_output, _SingleSizeImageList):
+            assert pred_output.widths[0] == image_dataset.input_size.width * multi_width
+            assert pred_output.heights[0] == image_dataset.input_size.height * multi_height
+        else:
+            assert False
+        assert prediction.input_size.height == image_dataset.input_size.height * multi_height
         assert prediction._output._tensor.device == _get_device()

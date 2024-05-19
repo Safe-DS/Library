@@ -12,14 +12,14 @@ from safeds.data.labeled.containers._image_dataset import _ColumnAsTensor, _Tabl
 from ._input_converter import InputConversion
 
 if TYPE_CHECKING:
-    from safeds.data.image.typing import ImageSize
+    from safeds.data.image.typing import ModelImageSize
     from safeds.data.tabular.transformation import OneHotEncoder
 
 
 class InputConversionImage(InputConversion[ImageDataset, ImageList]):
     """The input conversion for a neural network, defines the input parameters for the neural network."""
 
-    def __init__(self, image_size: ImageSize) -> None:
+    def __init__(self, image_size: ModelImageSize) -> None:
         """
         Define the input parameters for the neural network in the input conversion.
 
@@ -29,14 +29,14 @@ class InputConversionImage(InputConversion[ImageDataset, ImageList]):
             the size of the input images
         """
         self._input_size = image_size
-        self._output_size: ImageSize | int | None = None
+        self._output_size: ModelImageSize | int | None = None
         self._one_hot_encoder: OneHotEncoder | None = None
         self._column_name: str | None = None
         self._column_names: list[str] | None = None
         self._output_type: type | None = None
 
     @property
-    def _data_size(self) -> ImageSize:
+    def _data_size(self) -> ModelImageSize:
         return self._input_size
 
     def _data_conversion_fit(
