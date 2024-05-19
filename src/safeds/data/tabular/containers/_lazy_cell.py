@@ -9,6 +9,8 @@ from ._cell import Cell
 if TYPE_CHECKING:
     import polars as pl
 
+    from ._string_cell import StringCell
+
 T = TypeVar("T")
 P = TypeVar("P")
 R = TypeVar("R")
@@ -31,7 +33,9 @@ class _LazyCell(Cell[T]):
     # "Boolean" operators (actually bitwise) -----------------------------------
 
     def __invert__(self) -> Cell[bool]:
-        return _wrap(self._expression.__invert__())
+        import polars as pl
+
+        return _wrap(self._expression.cast(pl.Boolean).__invert__())
 
     def __and__(self, other: bool | Cell[bool]) -> Cell[bool]:
         return _wrap(self._expression.__and__(other))
@@ -83,10 +87,16 @@ class _LazyCell(Cell[T]):
         return _wrap(self._expression.__abs__())
 
     def __ceil__(self) -> Cell[R]:
-        return _wrap(self._expression.ceil())
+        import polars as pl
+
+        # polars does not yet implement floor for integers
+        return _wrap(self._expression.cast(pl.Float64).ceil())
 
     def __floor__(self) -> Cell[R]:
-        return _wrap(self._expression.floor())
+        import polars as pl
+
+        # polars does not yet implement floor for integers
+        return _wrap(self._expression.cast(pl.Float64).floor())
 
     def __neg__(self) -> Cell[R]:
         return _wrap(self._expression.__neg__())
@@ -165,6 +175,16 @@ class _LazyCell(Cell[T]):
 
     def __sizeof__(self) -> int:
         return self._expression.__sizeof__()
+
+    # ------------------------------------------------------------------------------------------------------------------
+    # Properties
+    # ------------------------------------------------------------------------------------------------------------------
+
+    @property
+    def str(self) -> StringCell:
+        from ._lazy_string_cell import _LazyStringCell  # circular import
+
+        return _LazyStringCell(self._expression)
 
     # ------------------------------------------------------------------------------------------------------------------
     # Internal

@@ -31,8 +31,9 @@ def _create_internal_model() -> nn.Module:
 
 
 class FlattenLayer(Layer):
+    """A flatten layer."""
+
     def __init__(self) -> None:
-        """Create a Flatten Layer."""
         self._input_size: ImageSize | None = None
         self._output_size: int | None = None
 

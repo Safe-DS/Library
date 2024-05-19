@@ -82,21 +82,22 @@ def _create_internal_model(
 
 
 class Convolutional2DLayer(Layer):
-    def __init__(self, output_channel: int, kernel_size: int, *, stride: int = 1, padding: int = 0):
-        """
-        Create a Convolutional 2D Layer.
+    """
+    A convolutional 2D Layer.
 
-        Parameters
-        ----------
-        output_channel:
-            the amount of output channels
-        kernel_size:
-            the size of the kernel
-        stride:
-            the stride of the convolution
-        padding:
-            the padding of the convolution
-        """
+    Parameters
+    ----------
+    output_channel:
+        the amount of output channels
+    kernel_size:
+        the size of the kernel
+    stride:
+        the stride of the convolution
+    padding:
+        the padding of the convolution
+    """
+
+    def __init__(self, output_channel: int, kernel_size: int, *, stride: int = 1, padding: int = 0):
         self._output_channel = output_channel
         self._kernel_size = kernel_size
         self._stride = stride
@@ -246,6 +247,23 @@ class Convolutional2DLayer(Layer):
 
 
 class ConvolutionalTranspose2DLayer(Convolutional2DLayer):
+    """
+    A convolutional transpose 2D Layer.
+
+    Parameters
+    ----------
+    output_channel:
+        the amount of output channels
+    kernel_size:
+        the size of the kernel
+    stride:
+        the stride of the transposed convolution
+    padding:
+        the padding of the transposed convolution
+    output_padding:
+        the output padding of the transposed convolution
+    """
+
     def __init__(
         self,
         output_channel: int,
@@ -255,22 +273,6 @@ class ConvolutionalTranspose2DLayer(Convolutional2DLayer):
         padding: int = 0,
         output_padding: int = 0,
     ):
-        """
-        Create a Convolutional Transpose 2D Layer.
-
-        Parameters
-        ----------
-        output_channel:
-            the amount of output channels
-        kernel_size:
-            the size of the kernel
-        stride:
-            the stride of the transposed convolution
-        padding:
-            the padding of the transposed convolution
-        output_padding:
-            the output padding of the transposed convolution
-        """
         super().__init__(output_channel, kernel_size, stride=stride, padding=padding)
         self._output_padding = output_padding
 
