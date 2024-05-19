@@ -310,5 +310,17 @@ class StringCell(ABC):
         ["", "abc", "abc ", "abc "]
         """
 
+    # ------------------------------------------------------------------------------------------------------------------
+    # Internal
+    # ------------------------------------------------------------------------------------------------------------------
+
+    @abstractmethod
+    def _equals(self, other: object) -> bool:
+        """
+        Check if this cell is equal to another object.
+
+        This method is needed because the `__eq__` method is used for element-wise comparisons.
+        """
+
     # replace -> replace/replace_many/replace_all
     # substring -> slice
