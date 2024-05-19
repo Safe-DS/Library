@@ -33,7 +33,9 @@ class _LazyCell(Cell[T]):
     # "Boolean" operators (actually bitwise) -----------------------------------
 
     def __invert__(self) -> Cell[bool]:
-        return _wrap(self._expression.__invert__())
+        import polars as pl
+
+        return _wrap(self._expression.cast(pl.Boolean).__invert__())
 
     def __and__(self, other: bool | Cell[bool]) -> Cell[bool]:
         return _wrap(self._expression.__and__(other))
