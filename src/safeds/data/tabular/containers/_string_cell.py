@@ -4,6 +4,8 @@ from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
+    import datetime
+
     from safeds.data.tabular.containers import Cell
 
 
@@ -135,6 +137,42 @@ class StringCell(ABC):
         >>> column = Column("example", ["ab", "bc", "cd"])
         >>> column.count_if(lambda cell: cell.string.starts_with("a"))
         1
+        """
+
+    @abstractmethod
+    def to_date(self) -> Cell[datetime.date | None]:
+        """
+        Convert the string value in the cell to a date. Requires the string to be in the ISO 8601 format.
+
+        Returns
+        -------
+        date:
+            The date value. If the string cannot be converted to a date, None is returned.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("example", ["2021-01-01", "2021-02-01", "abc"])
+        >>> column.transform(lambda cell: cell.string.to_date())
+        ["2021-01-01", "2021-02-01", None]
+        """
+
+    @abstractmethod
+    def to_datetime(self) -> Cell[datetime.datetime | None]:
+        """
+        Convert the string value in the cell to a datetime. Requires the string to be in the ISO 8601 format.
+
+        Returns
+        -------
+        datetime:
+            The datetime value. If the string cannot be converted to a datetime, None is returned.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("example", ["2021-01-01T00:00:00", "2021-02-01T00:00:00", "abc"])
+        >>> column.transform(lambda cell: cell.string.to_datetime())
+        ["2021-01-01 00:00:00", "2021-02-01 00:00:00", None]
         """
 
     @abstractmethod
@@ -274,6 +312,3 @@ class StringCell(ABC):
 
     # replace -> replace/replace_many/replace_all
     # substring -> slice
-    # toDate -> to_date
-    # toTime -> to_time
-    # toDatetime -> to_datetime

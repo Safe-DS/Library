@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import datetime
 from typing import TYPE_CHECKING
 
 from safeds._utils import _structural_hash
@@ -48,6 +49,12 @@ class _LazyStringCell(StringCell):
 
     def starts_with(self, prefix: str) -> Cell[bool]:
         return _LazyCell(self._expression.str.starts_with(prefix))
+
+    def to_date(self) -> Cell[datetime.date | None]:
+        return _LazyCell(self._expression.str.to_date(format="%F", strict=False))
+
+    def to_datetime(self) -> Cell[datetime.datetime | None]:
+        return _LazyCell(self._expression.str.to_datetime(format="%+", strict=False))
 
     def to_int(self, *, base: int = 10) -> Cell[int | None]:
         return _LazyCell(self._expression.str.to_integer(base=base, strict=False))
