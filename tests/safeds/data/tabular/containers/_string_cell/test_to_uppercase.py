@@ -1,5 +1,6 @@
 import pytest
-from helpers import assert_cell_operation_works
+
+from tests.helpers import assert_cell_operation_works
 
 
 @pytest.mark.parametrize(
@@ -14,4 +15,4 @@ from helpers import assert_cell_operation_works
     ],
 )
 def test_should_uppercase_a_string(string: str, expected: str) -> None:
-    assert_cell_operation_works([string], lambda cell: cell.string.to_uppercase(), [expected])
+    assert_cell_operation_works(string, lambda cell: cell.string.to_uppercase(), expected)

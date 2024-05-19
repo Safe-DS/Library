@@ -383,6 +383,36 @@ class Cell(ABC, Generic[T_co]):
         """
         return self.__add__(other)
 
+    def div(self, other: Any) -> Cell[R_co]:
+        """
+        Divide by a value. This is equivalent to the `/` operator.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("example", [6, 8])
+        >>> column.transform(lambda cell: cell.div(2))
+        +---------+
+        | example |
+        |     --- |
+        |     f64 |
+        +=========+
+        | 3.00000 |
+        | 4.00000 |
+        +---------+
+
+        >>> column.transform(lambda cell: cell / 2)
+        +---------+
+        | example |
+        |     --- |
+        |     f64 |
+        +=========+
+        | 3.00000 |
+        | 4.00000 |
+        +---------+
+        """
+        return self.__truediv__(other)
+
     def mod(self, other: Any) -> Cell[R_co]:
         """
         Perform a modulo operation. This is equivalent to the `%` operator.
@@ -502,36 +532,6 @@ class Cell(ABC, Generic[T_co]):
         +---------+
         """
         return self.__sub__(other)
-
-    def div(self, other: Any) -> Cell[R_co]:
-        """
-        Divide by a value. This is equivalent to the `/` operator.
-
-        Examples
-        --------
-        >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("example", [6, 8])
-        >>> column.transform(lambda cell: cell.div(2))
-        +---------+
-        | example |
-        |     --- |
-        |     f64 |
-        +=========+
-        | 3.00000 |
-        | 4.00000 |
-        +---------+
-
-        >>> column.transform(lambda cell: cell / 2)
-        +---------+
-        | example |
-        |     --- |
-        |     f64 |
-        +=========+
-        | 3.00000 |
-        | 4.00000 |
-        +---------+
-        """
-        return self.__truediv__(other)
 
     # ------------------------------------------------------------------------------------------------------------------
     # Comparison operations

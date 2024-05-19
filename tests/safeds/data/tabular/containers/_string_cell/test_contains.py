@@ -1,5 +1,6 @@
 import pytest
-from helpers import assert_cell_operation_works
+
+from tests.helpers import assert_cell_operation_works
 
 
 @pytest.mark.parametrize(
@@ -18,4 +19,4 @@ from helpers import assert_cell_operation_works
     ],
 )
 def test_should_check_whether_string_contains_substring(string: str, substring: str, expected: bool) -> None:
-    assert_cell_operation_works([string], lambda cell: cell.string.contains(substring), [expected])
+    assert_cell_operation_works(string, lambda cell: cell.string.contains(substring), expected)

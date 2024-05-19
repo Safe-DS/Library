@@ -1,5 +1,6 @@
 import pytest
-from helpers import assert_cell_operation_works
+
+from tests.helpers import assert_cell_operation_works
 
 
 @pytest.mark.parametrize(
@@ -19,7 +20,7 @@ from helpers import assert_cell_operation_works
 )
 def test_should_return_number_of_characters(string: str, optimize_for_ascii: bool, expected: bool) -> None:
     assert_cell_operation_works(
-        [string],
+        string,
         lambda cell: cell.string.length(optimize_for_ascii=optimize_for_ascii),
-        [expected],
+        expected,
     )

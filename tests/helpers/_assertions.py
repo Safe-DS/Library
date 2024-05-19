@@ -38,22 +38,22 @@ def assert_that_tabular_datasets_are_equal(table1: TabularDataset, table2: Tabul
 
 
 def assert_cell_operation_works(
-    input_data: list[Any],
+    input_value: Any,
     transformer: Callable[[Cell], Cell],
-    expected_data: list[Any],
+    expected_value: Any,
 ) -> None:
     """
     Assert that a cell operation works as expected.
 
     Parameters
     ----------
-    input_data:
-        The input data.
+    input_value:
+        The value in the input cell.
     transformer:
         The transformer to apply to the cells.
-    expected_data:
-        The expected data.
+    expected_value:
+        The expected value of the transformed cell.
     """
-    column = Column("A", input_data)
+    column = Column("A", [input_value])
     transformed_column = column.transform(transformer)
-    assert transformed_column == Column("A", expected_data)
+    assert transformed_column == Column("A", [expected_value])
