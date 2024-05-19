@@ -210,7 +210,7 @@ class TablePlotter:
 
         Returns
         -------
-        line_plot:
+        plot:
             The plot as an image.
 
         Raises
@@ -296,7 +296,7 @@ class TablePlotter:
 
         Returns
         -------
-        scatter_plot:
+        plot:
             The plot as an image.
 
         Raises

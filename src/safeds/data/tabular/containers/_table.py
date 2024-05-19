@@ -225,7 +225,7 @@ class Table:
         Examples
         --------
         >>> from safeds.data.tabular.containers import Table
-        >>> Table.from_json_file("./src/resources/from_json_file_2.json")
+        >>> Table.from_json_file("./src/resources/from_json_file.json")
         +-----+-----+
         |   a |   b |
         | --- | --- |
@@ -1883,7 +1883,7 @@ class Table:
         --------
         >>> from safeds.data.tabular.containers import Table
         >>> table = Table({"a": [1, 2, 3], "b": [4, 5, 6]})
-        >>> table.to_json_file("./src/resources/to_json_file_2.json")
+        >>> table.to_json_file("./src/resources/to_json_file.json")
         """
         path = _normalize_and_check_file_path(path, ".json", [".json"])
         path.parent.mkdir(parents=True, exist_ok=True)

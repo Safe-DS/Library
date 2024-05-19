@@ -13,52 +13,25 @@ if TYPE_CHECKING:
     from torch import Tensor, nn
 
 
-def _create_internal_model(input_size: int, output_size: int, activation_function: str) -> nn.Module:
-    from torch import nn
-
-    _init_default_device()
-
-    class _InternalLayer(nn.Module):
-        def __init__(self, input_size: int, output_size: int, activation_function: str):
-            super().__init__()
-            self._layer = nn.Linear(input_size, output_size)
-            match activation_function:
-                case "sigmoid":
-                    self._fn = nn.Sigmoid()
-                case "relu":
-                    self._fn = nn.ReLU()
-                case "softmax":
-                    self._fn = nn.Softmax()
-                case "none":
-                    self._fn = None
-                case _:
-                    raise ValueError("Unknown Activation Function: " + activation_function)
-
-        def forward(self, x: Tensor) -> Tensor:
-            return self._fn(self._layer(x)) if self._fn is not None else self._layer(x)
-
-    return _InternalLayer(input_size, output_size, activation_function)
-
-
 class ForwardLayer(Layer):
+    """
+    Create a forward Layer.
+
+    Parameters
+    ----------
+    output_size:
+        The number of neurons in this layer
+    input_size:
+        The number of neurons in the previous layer
+
+    Raises
+    ------
+    OutOfBoundsError
+        If input_size < 1
+        If output_size < 1
+    """
+
     def __init__(self, output_size: int, input_size: int | None = None):
-        """
-        Create a Feed Forward Layer.
-
-        Parameters
-        ----------
-        input_size:
-            The number of neurons in the previous layer
-        output_size:
-            The number of neurons in this layer
-
-        Raises
-        ------
-        OutOfBoundsError
-            If input_size < 1
-            If output_size < 1
-
-        """
         if input_size is not None:
             self._set_input_size(input_size=input_size)
 
@@ -145,3 +118,30 @@ class ForwardLayer(Layer):
         import sys
 
         return sys.getsizeof(self._input_size) + sys.getsizeof(self._output_size)
+
+
+def _create_internal_model(input_size: int, output_size: int, activation_function: str) -> nn.Module:
+    from torch import nn
+
+    _init_default_device()
+
+    class _InternalLayer(nn.Module):
+        def __init__(self, input_size: int, output_size: int, activation_function: str):
+            super().__init__()
+            self._layer = nn.Linear(input_size, output_size)
+            match activation_function:
+                case "sigmoid":
+                    self._fn = nn.Sigmoid()
+                case "relu":
+                    self._fn = nn.ReLU()
+                case "softmax":
+                    self._fn = nn.Softmax()
+                case "none":
+                    self._fn = None
+                case _:
+                    raise ValueError("Unknown Activation Function: " + activation_function)
+
+        def forward(self, x: Tensor) -> Tensor:
+            return self._fn(self._layer(x)) if self._fn is not None else self._layer(x)
+
+    return _InternalLayer(input_size, output_size, activation_function)

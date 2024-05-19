@@ -6,8 +6,10 @@ from typing import TYPE_CHECKING, Any, Generic, TypeVar
 if TYPE_CHECKING:
     import polars as pl
 
+    from ._string_cell import StringCell
+
 T_co = TypeVar("T_co", covariant=True)
-P = TypeVar("P")
+P_contra = TypeVar("P_contra", contravariant=True)
 R_co = TypeVar("R_co", covariant=True)
 
 
@@ -109,10 +111,10 @@ class Cell(ABC, Generic[T_co]):
     def __rmul__(self, other: Any) -> Cell[R_co]: ...
 
     @abstractmethod
-    def __pow__(self, other: float | Cell[P]) -> Cell[R_co]: ...
+    def __pow__(self, other: float | Cell[P_contra]) -> Cell[R_co]: ...
 
     @abstractmethod
-    def __rpow__(self, other: float | Cell[P]) -> Cell[R_co]: ...
+    def __rpow__(self, other: float | Cell[P_contra]) -> Cell[R_co]: ...
 
     @abstractmethod
     def __sub__(self, other: Any) -> Cell[R_co]: ...
@@ -133,6 +135,15 @@ class Cell(ABC, Generic[T_co]):
 
     @abstractmethod
     def __sizeof__(self) -> int: ...
+
+    # ------------------------------------------------------------------------------------------------------------------
+    # Properties
+    # ------------------------------------------------------------------------------------------------------------------
+
+    @property
+    @abstractmethod
+    def str(self) -> StringCell:
+        """Namespace for operations on strings."""
 
     # ------------------------------------------------------------------------------------------------------------------
     # Boolean operations
@@ -372,6 +383,36 @@ class Cell(ABC, Generic[T_co]):
         """
         return self.__add__(other)
 
+    def div(self, other: Any) -> Cell[R_co]:
+        """
+        Divide by a value. This is equivalent to the `/` operator.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("example", [6, 8])
+        >>> column.transform(lambda cell: cell.div(2))
+        +---------+
+        | example |
+        |     --- |
+        |     f64 |
+        +=========+
+        | 3.00000 |
+        | 4.00000 |
+        +---------+
+
+        >>> column.transform(lambda cell: cell / 2)
+        +---------+
+        | example |
+        |     --- |
+        |     f64 |
+        +=========+
+        | 3.00000 |
+        | 4.00000 |
+        +---------+
+        """
+        return self.__truediv__(other)
+
     def mod(self, other: Any) -> Cell[R_co]:
         """
         Perform a modulo operation. This is equivalent to the `%` operator.
@@ -432,7 +473,7 @@ class Cell(ABC, Generic[T_co]):
         """
         return self.__mul__(other)
 
-    def pow(self, other: float | Cell[P]) -> Cell[R_co]:
+    def pow(self, other: float | Cell[P_contra]) -> Cell[R_co]:
         """
         Raise to a power. This is equivalent to the `**` operator.
 
@@ -491,36 +532,6 @@ class Cell(ABC, Generic[T_co]):
         +---------+
         """
         return self.__sub__(other)
-
-    def div(self, other: Any) -> Cell[R_co]:
-        """
-        Divide by a value. This is equivalent to the `/` operator.
-
-        Examples
-        --------
-        >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("example", [6, 8])
-        >>> column.transform(lambda cell: cell.div(2))
-        +---------+
-        | example |
-        |     --- |
-        |     f64 |
-        +=========+
-        | 3.00000 |
-        | 4.00000 |
-        +---------+
-
-        >>> column.transform(lambda cell: cell / 2)
-        +---------+
-        | example |
-        |     --- |
-        |     f64 |
-        +=========+
-        | 3.00000 |
-        | 4.00000 |
-        +---------+
-        """
-        return self.__truediv__(other)
 
     # ------------------------------------------------------------------------------------------------------------------
     # Comparison operations
