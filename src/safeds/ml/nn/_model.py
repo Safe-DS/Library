@@ -121,7 +121,7 @@ class NeuralNetworkRegressor(Generic[IFT, IPT, OT]):
         self._total_number_of_epochs_done = 0
 
     @staticmethod
-    def load_pretrained_model(huggingface_repo: str) -> NeuralNetworkRegressor:
+    def load_pretrained_model(huggingface_repo: str) -> NeuralNetworkRegressor:  # pragma: no cover
         from transformers import (
             AutoConfig,
             AutoImageProcessor,
@@ -289,7 +289,7 @@ class NeuralNetworkRegressor(Generic[IFT, IPT, OT]):
             for x in dataloader:
                 elem = self._model(x)
                 if not isinstance(elem, torch.Tensor) and hasattr(elem, "reconstruction"):
-                    elem = elem.reconstruction
+                    elem = elem.reconstruction  # pragma: no cover
                 elif not isinstance(elem, torch.Tensor):
                     raise ValueError(f"Output of model has unsupported type: {type(elem)}")  # pragma: no cover
                 predictions.append(elem.squeeze(dim=1))
@@ -395,7 +395,7 @@ class NeuralNetworkClassifier(Generic[IFT, IPT, OT]):
         self._total_number_of_epochs_done = 0
 
     @staticmethod
-    def load_pretrained_model(huggingface_repo: str) -> NeuralNetworkClassifier:
+    def load_pretrained_model(huggingface_repo: str) -> NeuralNetworkClassifier:  # pragma: no cover
         from transformers import AutoConfig, AutoImageProcessor, AutoModelForImageClassification, PretrainedConfig
         from transformers.models.auto.modeling_auto import MODEL_FOR_IMAGE_CLASSIFICATION_MAPPING_NAMES
 
@@ -586,7 +586,7 @@ class NeuralNetworkClassifier(Generic[IFT, IPT, OT]):
             for x in dataloader:
                 elem = self._model(x)
                 if not isinstance(elem, torch.Tensor) and hasattr(elem, "logits"):
-                    elem = elem.logits
+                    elem = elem.logits  # pragma: no cover
                 elif not isinstance(elem, torch.Tensor):
                     raise ValueError(f"Output of model has unsupported type: {type(elem)}")  # pragma: no cover
                 if self._num_of_classes > 1:
