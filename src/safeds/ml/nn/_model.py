@@ -122,6 +122,19 @@ class NeuralNetworkRegressor(Generic[IFT, IPT, OT]):
 
     @staticmethod
     def load_pretrained_model(huggingface_repo: str) -> NeuralNetworkRegressor:  # pragma: no cover
+        """
+        Load a pretrained model from a [Huggingface repository](https://huggingface.co/models/).
+
+        Parameters
+        ----------
+        huggingface_repo:
+            the name of the huggingface repository
+
+        Returns
+        -------
+        pretrained_model:
+            the pretrained model as a NeuralNetworkRegressor
+        """
         from transformers import (
             AutoConfig,
             AutoImageProcessor,
@@ -396,6 +409,19 @@ class NeuralNetworkClassifier(Generic[IFT, IPT, OT]):
 
     @staticmethod
     def load_pretrained_model(huggingface_repo: str) -> NeuralNetworkClassifier:  # pragma: no cover
+        """
+        Load a pretrained model from a [Huggingface repository](https://huggingface.co/models/).
+
+        Parameters
+        ----------
+        huggingface_repo:
+            the name of the huggingface repository
+
+        Returns
+        -------
+        pretrained_model:
+            the pretrained model as a NeuralNetworkClassifier
+        """
         from transformers import AutoConfig, AutoImageProcessor, AutoModelForImageClassification, PretrainedConfig
         from transformers.models.auto.modeling_auto import MODEL_FOR_IMAGE_CLASSIFICATION_MAPPING_NAMES
 
