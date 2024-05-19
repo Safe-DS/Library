@@ -138,6 +138,51 @@ class StringCell(ABC):
         """
 
     @abstractmethod
+    def to_float(self) -> Cell[float | None]:
+        """
+        Convert the string value in the cell to a float.
+
+        Returns
+        -------
+        float:
+            The float value. If the string cannot be converted to a float, None is returned.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("example", ["1", "3.4", "5.6", "abc"])
+        >>> column.transform(lambda cell: cell.string.to_float())
+        [1.0, 3.4, 5.6, None]
+        """
+
+    @abstractmethod
+    def to_int(self, *, base: int = 10) -> Cell[int | None]:
+        """
+        Convert the string value in the cell to an integer.
+
+        Parameters
+        ----------
+        base:
+            The base of the integer.
+
+        Returns
+        -------
+        int:
+            The integer value. If the string cannot be converted to an integer, None is returned.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> column1 = Column("example", ["1", "2", "3", "abc"])
+        >>> column1.transform(lambda cell: cell.string.to_int())
+        [1, 2, 3, None]
+
+        >>> column2 = Column("example", ["1", "10", "11", "abc"])
+        >>> column2.transform(lambda cell: cell.string.to_int(base=2))
+        [1, 2, 3, None]
+        """
+
+    @abstractmethod
     def to_lowercase(self) -> Cell[str]:
         """
         Convert the string value in the cell to lowercase.
@@ -229,8 +274,6 @@ class StringCell(ABC):
 
     # replace -> replace/replace_many/replace_all
     # substring -> slice
-    # toFloat -> to_decimal
-    # toInt -> to_integer
     # toDate -> to_date
     # toTime -> to_time
     # toDatetime -> to_datetime

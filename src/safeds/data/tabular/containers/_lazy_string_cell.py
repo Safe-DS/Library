@@ -49,6 +49,14 @@ class _LazyStringCell(StringCell):
     def starts_with(self, prefix: str) -> Cell[bool]:
         return _LazyCell(self._expression.str.starts_with(prefix))
 
+    def to_int(self, *, base: int = 10) -> Cell[int | None]:
+        return _LazyCell(self._expression.str.to_integer(base=base, strict=False))
+
+    def to_float(self) -> Cell[float | None]:
+        import polars as pl
+
+        return _LazyCell(self._expression.cast(pl.Float64, strict=False))
+
     def to_lowercase(self) -> Cell[str]:
         return _LazyCell(self._expression.str.to_lowercase())
 
