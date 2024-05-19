@@ -756,8 +756,8 @@ class Column(Sequence[T_co]):
         >>> column1.correlation_with(column2)
         1.0
 
-        >>> column4 = Column("test", [3, 2, 1])
-        >>> column1.correlation_with(column4)
+        >>> column3 = Column("test", [3, 2, 1])
+        >>> column1.correlation_with(column3)
         -1.0
         """
         import polars as pl
