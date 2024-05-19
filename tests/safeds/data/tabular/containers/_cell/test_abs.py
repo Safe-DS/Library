@@ -23,8 +23,8 @@ from tests.helpers import assert_cell_operation_works
     ],
 )
 class TestShouldReturnAbsoluteValueOfCell:
-    def test_dunder_method(self, value: float, expected: float):
+    def test_dunder_method(self, value: float, expected: float) -> None:
         assert_cell_operation_works(value, lambda cell: abs(cell), expected)
 
-    def test_named_method(self, value: float, expected: float):
+    def test_named_method(self, value: float, expected: float) -> None:
         assert_cell_operation_works(value, lambda cell: cell.abs(), expected)

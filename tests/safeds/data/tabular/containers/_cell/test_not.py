@@ -21,8 +21,8 @@ from tests.helpers import assert_cell_operation_works
     ],
 )
 class TestShouldInvertValueOfCell:
-    def test_dunder_method(self, value: Any, expected: bool):
+    def test_dunder_method(self, value: Any, expected: bool) -> None:
         assert_cell_operation_works(value, lambda cell: ~cell, expected)
 
-    def test_named_method(self, value: Any, expected: bool):
+    def test_named_method(self, value: Any, expected: bool) -> None:
         assert_cell_operation_works(value, lambda cell: cell.not_(), expected)

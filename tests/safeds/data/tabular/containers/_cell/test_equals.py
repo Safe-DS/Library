@@ -22,7 +22,7 @@ def test_should_return_whether_two_cells_are_equal(cell1: Cell, cell2: Cell, exp
 
 
 def test_should_return_true_if_objects_are_identical() -> None:
-    cell = _LazyCell(pl.col("a"))
+    cell: Cell[Any] = _LazyCell(pl.col("a"))
     assert (cell._equals(cell)) is True
 
 

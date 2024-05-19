@@ -1,3 +1,5 @@
+from typing import Any
+
 import polars as pl
 import pytest
 from safeds.data.tabular.containers import Cell
@@ -5,7 +7,7 @@ from safeds.data.tabular.containers._lazy_cell import _LazyCell
 
 
 def test_should_be_deterministic() -> None:
-    cell = _LazyCell(pl.col("a"))
+    cell: Cell[Any] = _LazyCell(pl.col("a"))
     assert hash(cell) == 7139977585477665635
 
 

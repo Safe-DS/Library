@@ -23,8 +23,8 @@ from tests.helpers import assert_cell_operation_works
     ],
 )
 class TestShouldNegateValueOfCell:
-    def test_dunder_method(self, value: float, expected: float):
+    def test_dunder_method(self, value: float, expected: float) -> None:
         assert_cell_operation_works(value, lambda cell: -cell, expected)
 
-    def test_named_method(self, value: float, expected: float):
+    def test_named_method(self, value: float, expected: float) -> None:
         assert_cell_operation_works(value, lambda cell: cell.neg(), expected)

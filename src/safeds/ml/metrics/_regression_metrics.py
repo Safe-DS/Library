@@ -11,7 +11,7 @@ class RegressionMetrics(ABC):
     """A collection of regression metrics."""
 
     @abstractmethod
-    def __init__(self): ...
+    def __init__(self) -> None: ...
 
     @staticmethod
     def summarize(predicted: Column | TabularDataset, expected: Column | TabularDataset) -> Table:

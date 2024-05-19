@@ -19,8 +19,8 @@ from tests.helpers import assert_cell_operation_works
     ],
 )
 class TestShouldComputeNegatedEquality:
-    def test_dunder_method(self, value1: float, value2: float, expected: bool):
+    def test_dunder_method(self, value1: float, value2: float, expected: bool) -> None:
         assert_cell_operation_works(value1, lambda cell: cell != value2, expected)
 
-    def test_dunder_method_inverted_order(self, value1: float, value2: float, expected: bool):
-        assert_cell_operation_works(value1, lambda cell: value2 != cell, expected)
+    def test_dunder_method_inverted_order(self, value1: float, value2: float, expected: bool) -> None:
+        assert_cell_operation_works(value1, lambda cell: value2 != cell, expected)  # type: ignore[arg-type,return-value]

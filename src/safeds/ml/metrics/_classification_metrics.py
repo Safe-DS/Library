@@ -15,7 +15,7 @@ class ClassificationMetrics(ABC):
     """A collection of classification metrics."""
 
     @abstractmethod
-    def __init__(self): ...
+    def __init__(self) -> None: ...
 
     @staticmethod
     def summarize(predicted: Column | TabularDataset, expected: Column | TabularDataset, positive_class: Any) -> Table:
