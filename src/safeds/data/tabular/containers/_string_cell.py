@@ -68,6 +68,29 @@ class StringCell(ABC):
         """
 
     @abstractmethod
+    def index_of(self, substring: str) -> Cell[int | None]:
+        """
+        Get the index of the first occurrence of the substring in the string value in the cell.
+
+        Parameters
+        ----------
+        substring:
+            The substring to search for.
+
+        Returns
+        -------
+        index_of:
+            The index of the first occurrence of the substring. If the substring is not found, None is returned.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("example", ["ab", "bc", "cd"])
+        >>> column.transform(lambda cell: cell.string.index_of("b"))
+        [1, 0, None]
+        """
+
+    @abstractmethod
     def length(self, *, optimize_for_ascii: bool = False) -> Cell[int]:
         """
         Get the number of characters of the string value in the cell.
@@ -204,13 +227,10 @@ class StringCell(ABC):
         ["", "abc", "abc ", "abc "]
         """
 
-    # indexOf
-    # lastIndexOf
-    # replace
-    # split
-    # substring
-    # toFloat
-    # toInt
-    # toDate
-    # toTime
-    # toDatetime
+    # replace -> replace/replace_many/replace_all
+    # substring -> slice
+    # toFloat -> to_decimal
+    # toInt -> to_integer
+    # toDate -> to_date
+    # toTime -> to_time
+    # toDatetime -> to_datetime

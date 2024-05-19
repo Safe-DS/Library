@@ -43,6 +43,9 @@ class _LazyStringCell(StringCell):
     def ends_with(self, suffix: str) -> Cell[bool]:
         return _LazyCell(self._expression.str.ends_with(suffix))
 
+    def index_of(self, substring: str) -> Cell[int | None]:
+        return _LazyCell(self._expression.str.find(substring, literal=True))
+
     def starts_with(self, prefix: str) -> Cell[bool]:
         return _LazyCell(self._expression.str.starts_with(prefix))
 
