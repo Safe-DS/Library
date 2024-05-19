@@ -35,7 +35,7 @@ class ColumnPlotter:
 
         Returns
         -------
-        box_plot:
+        plot:
             The box plot as an image.
 
         Raises
@@ -78,7 +78,7 @@ class ColumnPlotter:
 
         Returns
         -------
-        histogram:
+        plot:
             The plot as an image.
 
         Examples
@@ -100,7 +100,7 @@ class ColumnPlotter:
 
         Returns
         -------
-        lag_plot:
+        plot:
             The plot as an image.
 
         Raises
