@@ -56,4 +56,4 @@ def assert_cell_operation_works(
     """
     column = Column("A", [input_value])
     transformed_column = column.transform(transformer)
-    assert transformed_column == Column("A", [expected_value])
+    assert transformed_column == Column("A", [expected_value]), f"Expected: {expected_value}\nGot: {transformed_column}"
