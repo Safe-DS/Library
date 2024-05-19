@@ -13,14 +13,22 @@ class StringCell(ABC):
     """
     Namespace for operations on strings.
 
-    This class cannot be instantiated directly. It can only be accessed using the `string` attribute of a cell.
+    This class cannot be instantiated directly. It can only be accessed using the `str` attribute of a cell.
 
     Examples
     --------
     >>> from safeds.data.tabular.containers import Column
     >>> column = Column("example", ["ab", "bc", "cd"])
     >>> column.transform(lambda cell: cell.str.to_uppercase())
-    ["AB", "BC", "CD"]
+    +---------+
+    | example |
+    | ---     |
+    | str     |
+    +=========+
+    | AB      |
+    | BC      |
+    | CD      |
+    +---------+
     """
 
     @abstractmethod
@@ -89,7 +97,15 @@ class StringCell(ABC):
         >>> from safeds.data.tabular.containers import Column
         >>> column = Column("example", ["ab", "bc", "cd"])
         >>> column.transform(lambda cell: cell.str.index_of("b"))
-        [1, 0, None]
+        +---------+
+        | example |
+        |     --- |
+        |     u32 |
+        +=========+
+        |       1 |
+        |       0 |
+        |    null |
+        +---------+
         """
 
     @abstractmethod
@@ -113,7 +129,15 @@ class StringCell(ABC):
         >>> from safeds.data.tabular.containers import Column
         >>> column = Column("example", ["", "a", "abc"])
         >>> column.transform(lambda cell: cell.str.length())
-        [0, 1, 3]
+        +---------+
+        | example |
+        |     --- |
+        |     u32 |
+        +=========+
+        |       0 |
+        |       1 |
+        |       3 |
+        +---------+
         """
 
     @abstractmethod
@@ -138,7 +162,15 @@ class StringCell(ABC):
         >>> from safeds.data.tabular.containers import Column
         >>> column = Column("example", ["ab", "bc", "cd"])
         >>> column.transform(lambda cell: cell.str.replace("b", "z"))
-        ["az", "zc", "cd"]
+        +---------+
+        | example |
+        | ---     |
+        | str     |
+        +=========+
+        | az      |
+        | zc      |
+        | cd      |
+        +---------+
         """
 
     @abstractmethod
@@ -192,7 +224,15 @@ class StringCell(ABC):
         >>> from safeds.data.tabular.containers import Column
         >>> column = Column("example", ["abc", "def", "ghi"])
         >>> column.transform(lambda cell: cell.str.substring(1, 2))
-        ["bc", "ef", "hi"]
+        +---------+
+        | example |
+        | ---     |
+        | str     |
+        +=========+
+        | bc      |
+        | ef      |
+        | hi      |
+        +---------+
         """
 
     @abstractmethod
@@ -210,7 +250,15 @@ class StringCell(ABC):
         >>> from safeds.data.tabular.containers import Column
         >>> column = Column("example", ["2021-01-01", "2021-02-01", "abc"])
         >>> column.transform(lambda cell: cell.str.to_date())
-        ["2021-01-01", "2021-02-01", None]
+        +------------+
+        | example    |
+        | ---        |
+        | date       |
+        +============+
+        | 2021-01-01 |
+        | 2021-02-01 |
+        | null       |
+        +------------+
         """
 
     @abstractmethod
@@ -226,9 +274,17 @@ class StringCell(ABC):
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("example", ["2021-01-01T00:00:00", "2021-02-01T00:00:00", "abc"])
+        >>> column = Column("example", ["2021-01-01T00:00:00z", "2021-02-01T00:00:00z", "abc"])
         >>> column.transform(lambda cell: cell.str.to_datetime())
-        ["2021-01-01 00:00:00", "2021-02-01 00:00:00", None]
+        +-------------------------+
+        | example                 |
+        | ---                     |
+        | datetime[μs, UTC]       |
+        +=========================+
+        | 2021-01-01 00:00:00 UTC |
+        | 2021-02-01 00:00:00 UTC |
+        | null                    |
+        +-------------------------+
         """
 
     @abstractmethod
@@ -246,7 +302,16 @@ class StringCell(ABC):
         >>> from safeds.data.tabular.containers import Column
         >>> column = Column("example", ["1", "3.4", "5.6", "abc"])
         >>> column.transform(lambda cell: cell.str.to_float())
-        [1.0, 3.4, 5.6, None]
+        +---------+
+        | example |
+        |     --- |
+        |     f64 |
+        +=========+
+        | 1.00000 |
+        | 3.40000 |
+        | 5.60000 |
+        |    null |
+        +---------+
         """
 
     @abstractmethod
@@ -269,11 +334,29 @@ class StringCell(ABC):
         >>> from safeds.data.tabular.containers import Column
         >>> column1 = Column("example", ["1", "2", "3", "abc"])
         >>> column1.transform(lambda cell: cell.str.to_int())
-        [1, 2, 3, None]
+        +---------+
+        | example |
+        |     --- |
+        |     i64 |
+        +=========+
+        |       1 |
+        |       2 |
+        |       3 |
+        |    null |
+        +---------+
 
         >>> column2 = Column("example", ["1", "10", "11", "abc"])
         >>> column2.transform(lambda cell: cell.str.to_int(base=2))
-        [1, 2, 3, None]
+        +---------+
+        | example |
+        |     --- |
+        |     i64 |
+        +=========+
+        |       1 |
+        |       2 |
+        |       3 |
+        |    null |
+        +---------+
         """
 
     @abstractmethod
@@ -291,7 +374,15 @@ class StringCell(ABC):
         >>> from safeds.data.tabular.containers import Column
         >>> column = Column("example", ["AB", "BC", "CD"])
         >>> column.transform(lambda cell: cell.str.to_lowercase())
-        ["ab", "bc", "cd"]
+        +---------+
+        | example |
+        | ---     |
+        | str     |
+        +=========+
+        | ab      |
+        | bc      |
+        | cd      |
+        +---------+
         """
 
     @abstractmethod
@@ -309,7 +400,15 @@ class StringCell(ABC):
         >>> from safeds.data.tabular.containers import Column
         >>> column = Column("example", ["ab", "bc", "cd"])
         >>> column.transform(lambda cell: cell.str.to_uppercase())
-        ["AB", "BC", "CD"]
+        +---------+
+        | example |
+        | ---     |
+        | str     |
+        +=========+
+        | AB      |
+        | BC      |
+        | CD      |
+        +---------+
         """
 
     @abstractmethod
@@ -327,7 +426,16 @@ class StringCell(ABC):
         >>> from safeds.data.tabular.containers import Column
         >>> column = Column("example", ["", " abc", "abc ", " abc "])
         >>> column.transform(lambda cell: cell.str.trim())
-        ["", "abc", "abc", "abc"]
+        +---------+
+        | example |
+        | ---     |
+        | str     |
+        +=========+
+        |         |
+        | abc     |
+        | abc     |
+        | abc     |
+        +---------+
         """
 
     @abstractmethod
@@ -345,7 +453,16 @@ class StringCell(ABC):
         >>> from safeds.data.tabular.containers import Column
         >>> column = Column("example", ["", " abc", "abc ", " abc "])
         >>> column.transform(lambda cell: cell.str.trim_end())
-        ["", " abc", "abc", " abc"]
+        +---------+
+        | example |
+        | ---     |
+        | str     |
+        +=========+
+        |         |
+        |  abc    |
+        | abc     |
+        |  abc    |
+        +---------+
         """
 
     @abstractmethod
@@ -363,7 +480,16 @@ class StringCell(ABC):
         >>> from safeds.data.tabular.containers import Column
         >>> column = Column("example", ["", " abc", "abc ", " abc "])
         >>> column.transform(lambda cell: cell.str.trim_start())
-        ["", "abc", "abc ", "abc "]
+        +---------+
+        | example |
+        | ---     |
+        | str     |
+        +=========+
+        |         |
+        | abc     |
+        | abc     |
+        | abc     |
+        +---------+
         """
 
     # ------------------------------------------------------------------------------------------------------------------
