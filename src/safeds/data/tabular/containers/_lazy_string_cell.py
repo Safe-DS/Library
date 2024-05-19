@@ -4,6 +4,7 @@ import datetime
 from typing import TYPE_CHECKING
 
 from safeds._utils import _structural_hash
+from safeds._validation import _check_bounds, _ClosedBound
 
 from ._lazy_cell import _LazyCell
 from ._string_cell import StringCell
@@ -47,8 +48,16 @@ class _LazyStringCell(StringCell):
     def index_of(self, substring: str) -> Cell[int | None]:
         return _LazyCell(self._expression.str.find(substring, literal=True))
 
+    def replace(self, old: str, new: str) -> Cell[str]:
+        return _LazyCell(self._expression.str.replace_all(old, new, literal=True))
+
     def starts_with(self, prefix: str) -> Cell[bool]:
         return _LazyCell(self._expression.str.starts_with(prefix))
+
+    def substring(self, start: int = 0, length: int | None = None) -> Cell[str]:
+        _check_bounds("length", length, lower_bound=_ClosedBound(0))
+
+        return _LazyCell(self._expression.str.slice(start, length))
 
     def to_date(self) -> Cell[datetime.date | None]:
         return _LazyCell(self._expression.str.to_date(format="%F", strict=False))

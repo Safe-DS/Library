@@ -117,6 +117,31 @@ class StringCell(ABC):
         """
 
     @abstractmethod
+    def replace(self, old: str, new: str) -> Cell[str]:
+        """
+        Replace occurrences of the old substring with the new substring in the string value in the cell.
+
+        Parameters
+        ----------
+        old:
+            The substring to replace.
+        new:
+            The substring to replace with.
+
+        Returns
+        -------
+        replaced_string:
+            The string value with the occurrences replaced.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("example", ["ab", "bc", "cd"])
+        >>> column.transform(lambda cell: cell.string.replace("b", "z"))
+        ["az", "zc", "cd"]
+        """
+
+    @abstractmethod
     def starts_with(self, prefix: str) -> Cell[bool]:
         """
         Check if the string value in the cell starts with the prefix.
@@ -137,6 +162,37 @@ class StringCell(ABC):
         >>> column = Column("example", ["ab", "bc", "cd"])
         >>> column.count_if(lambda cell: cell.string.starts_with("a"))
         1
+        """
+
+    @abstractmethod
+    def substring(self, start: int = 0, length: int | None = None) -> Cell[str]:
+        """
+        Get a substring of the string value in the cell.
+
+        Parameters
+        ----------
+        start:
+            The start index of the substring.
+        length:
+            The length of the substring. If None, the slice contains all rows starting from `start`. Must greater than
+            or equal to 0.
+
+        Returns
+        -------
+        substring:
+            The substring of the string value.
+
+        Raises
+        ------
+        OutOfBoundsError
+            If length is less than 0.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("example", ["abc", "def", "ghi"])
+        >>> column.transform(lambda cell: cell.string.substring(1, 2))
+        ["bc", "ef", "hi"]
         """
 
     @abstractmethod
@@ -321,6 +377,3 @@ class StringCell(ABC):
 
         This method is needed because the `__eq__` method is used for element-wise comparisons.
         """
-
-    # replace -> replace/replace_many/replace_all
-    # substring -> slice
