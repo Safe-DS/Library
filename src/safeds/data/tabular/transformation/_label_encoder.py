@@ -20,7 +20,7 @@ class LabelEncoder(InvertibleTableTransformer):
     ----------
     partial_order:
         The partial order of the labels. The labels are encoded in the order of the given list. Additional values are
-        encoded as the next integer after the last value in the list in the order they appear in the data.
+        assigned labels in the order they are encountered during fitting.
     """
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -46,6 +46,15 @@ class LabelEncoder(InvertibleTableTransformer):
             self._partial_order,
             # Leave out the internal state for faster hashing
         )
+
+    # ------------------------------------------------------------------------------------------------------------------
+    # Properties
+    # ------------------------------------------------------------------------------------------------------------------
+
+    @property
+    def partial_order(self) -> list[Any]:
+        """The partial order of the labels."""
+        return list(self._partial_order)  # defensive copy
 
     # ------------------------------------------------------------------------------------------------------------------
     # Learning and transformation
