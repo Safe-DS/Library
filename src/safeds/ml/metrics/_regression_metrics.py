@@ -1,12 +1,17 @@
 from __future__ import annotations
 
+from abc import ABC, abstractmethod
+
 from safeds.data.labeled.containers import TabularDataset
 from safeds.data.tabular.containers import Column, Table
 from safeds.exceptions import ColumnLengthMismatchError
 
 
-class RegressionMetrics:
+class RegressionMetrics(ABC):
     """A collection of regression metrics."""
+
+    @abstractmethod
+    def __init__(self): ...
 
     @staticmethod
     def summarize(predicted: Column | TabularDataset, expected: Column | TabularDataset) -> Table:

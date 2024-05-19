@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Any
 
 from safeds.data.labeled.containers import TabularDataset
@@ -10,8 +11,11 @@ if TYPE_CHECKING:
     from safeds.data.tabular.containers import Column
 
 
-class ClassificationMetrics:
+class ClassificationMetrics(ABC):
     """A collection of classification metrics."""
+
+    @abstractmethod
+    def __init__(self): ...
 
     @staticmethod
     def summarize(predicted: Column | TabularDataset, expected: Column | TabularDataset, positive_class: Any) -> Table:
