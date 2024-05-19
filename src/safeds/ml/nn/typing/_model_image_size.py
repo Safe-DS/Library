@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import sys
-from abc import ABC
+from abc import ABC, abstractmethod
 from typing import Self, Type, TYPE_CHECKING
 
 from safeds._utils import _structural_hash
@@ -77,6 +77,7 @@ class ModelImageSize(ABC):
         """
         return cls(image_size.width, image_size.height, image_size.channel)
 
+    @abstractmethod
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, ModelImageSize):
             return NotImplemented
@@ -84,6 +85,7 @@ class ModelImageSize(ABC):
             self._width == other._width and self._height == other._height and self._channel == other._channel
         )
 
+    @abstractmethod
     def __hash__(self) -> int:
         return _structural_hash(self.__class__.__name__, self._width, self._height, self._channel)
 

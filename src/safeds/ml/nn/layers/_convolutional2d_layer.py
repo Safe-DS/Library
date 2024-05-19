@@ -6,12 +6,12 @@ from typing import TYPE_CHECKING, Any, Literal
 
 from safeds._config import _init_default_device
 from safeds._utils import _structural_hash
-from safeds.ml.nn.typing import ModelImageSize
 
 from ._layer import Layer
 
 if TYPE_CHECKING:
     from torch import Tensor, nn
+    from safeds.ml.nn.typing import ModelImageSize
 
 
 def _create_internal_model(

@@ -12,7 +12,7 @@ from safeds.data.labeled.containers._image_dataset import _ColumnAsTensor, _Tabl
 from ._input_converter import InputConversion
 
 if TYPE_CHECKING:
-    from safeds.data.image.typing import ModelImageSize
+    from safeds.ml.nn.typing import ModelImageSize
     from safeds.data.tabular.transformation import OneHotEncoder
 
 

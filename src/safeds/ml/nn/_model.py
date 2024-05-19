@@ -35,9 +35,11 @@ if TYPE_CHECKING:
     from collections.abc import Callable
 
     from torch import Tensor, nn
+    from torch.nn import Module
+    from transformers.image_processing_utils import BaseImageProcessor
+
     from safeds.ml.nn.converters import InputConversion, OutputConversion
     from safeds.ml.nn.layers import Layer
-
 
 IFT = TypeVar("IFT", TabularDataset, TimeSeriesDataset, ImageDataset)  # InputFitType
 IPT = TypeVar("IPT", Table, TimeSeriesDataset, ImageList)  # InputPredictType
@@ -119,7 +121,7 @@ class NeuralNetworkRegressor(Generic[IFT, IPT, OT]):
         self._total_number_of_epochs_done = 0
 
     @staticmethod
-    def load_pretrained_model(huggingface_repo: str) -> NeuralNetworkRegressor[ImageDataset[ImageList], ImageList, ImageDataset[ImageList]]:
+    def load_pretrained_model(huggingface_repo: str) -> NeuralNetworkRegressor:
         from transformers import AutoConfig, AutoImageProcessor, AutoModelForImageToImage, PretrainedConfig, Swin2SRImageProcessor, Swin2SRForImageSuperResolution
 
         _init_default_device()
@@ -132,7 +134,6 @@ class NeuralNetworkRegressor(Generic[IFT, IPT, OT]):
         model: Swin2SRForImageSuperResolution = AutoModelForImageToImage.from_pretrained(huggingface_repo)
 
         image_processor: Swin2SRImageProcessor = AutoImageProcessor.from_pretrained(huggingface_repo)
-        print(image_processor)
 
         if hasattr(config, "num_channels"):
             input_size = VariableImageSize(image_processor.pad_size, image_processor.pad_size, config.num_channels)
@@ -382,11 +383,9 @@ class NeuralNetworkClassifier(Generic[IFT, IPT, OT]):
         self._total_number_of_epochs_done = 0
 
     @staticmethod
-    def load_pretrained_model(huggingface_repo: str) -> NeuralNetworkClassifier[ImageDataset[Column], ImageList, ImageDataset[Column]]:
+    def load_pretrained_model(huggingface_repo: str) -> NeuralNetworkClassifier:
         from transformers import AutoConfig, AutoImageProcessor, AutoModelForImageClassification, PretrainedConfig
-        from transformers.image_processing_utils import BaseImageProcessor
         from transformers.models.auto.modeling_auto import MODEL_FOR_IMAGE_CLASSIFICATION_MAPPING_NAMES
-        from torch.nn import Module
 
         _init_default_device()
 
@@ -418,7 +417,7 @@ class NeuralNetworkClassifier(Generic[IFT, IPT, OT]):
         in_conversion._one_hot_encoder = one_hot_encoder
         in_conversion._input_size = input_size
         in_conversion._output_type = _ColumnAsTensor
-        num_of_classes = labels_table.number_of_rows
+        num_of_classes = labels_table.row_count
 
         network = NeuralNetworkClassifier.__new__(NeuralNetworkClassifier)
         network._input_conversion = in_conversion

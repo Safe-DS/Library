@@ -35,7 +35,7 @@ from safeds.ml.nn.layers import (
 )
 from torch.types import Device
 
-from safeds.ml.nn.typing import ModelImageSize, VariableImageSize, ConstantImageSize
+from safeds.ml.nn.typing import VariableImageSize
 from tests.helpers import configure_test_with_device, get_devices, get_devices_ids
 
 
@@ -48,7 +48,7 @@ class TestClassificationModel:
             1,
         ]
     )
-    def test_should_return_input_size(self, input_size: int | ModelImageSize, device: Device) -> None:
+    def test_should_return_input_size(self, input_size: int, device: Device) -> None:
         configure_test_with_device(device)
         assert NeuralNetworkClassifier(
                 InputConversionTable(),
@@ -241,13 +241,13 @@ class TestClassificationModel:
             [ForwardLayer(input_size=1, output_size=1), ForwardLayer(output_size=1)],
             OutputConversionTable(),
         )
+        learned_model = model.fit(
+            Table.from_dict({"a": [0.1, 0, 0.2], "b": [0, 0.15, 0.5]}).to_tabular_dataset("b"),
+        )
         with pytest.raises(
             FeatureDataMismatchError,
             match="The features in the given table do not match with the specified feature columns names of the neural network.",
         ):
-            learned_model = model.fit(
-                Table.from_dict({"a": [0.1, 0, 0.2], "b": [0, 0.15, 0.5]}).to_tabular_dataset("b"),
-            )
             learned_model.fit(Table.from_dict({"k": [0.1, 0, 0.2], "l": [0, 0.15, 0.5]}).to_tabular_dataset("k"))
 
     def test_should_raise_if_table_size_and_input_size_mismatch(self, device: Device) -> None:
@@ -529,7 +529,7 @@ class TestRegressionModel:
             1,
         ]
     )
-    def test_should_return_input_size(self, input_size: int | ModelImageSize, device: Device) -> None:
+    def test_should_return_input_size(self, input_size: int, device: Device) -> None:
         configure_test_with_device(device)
         assert NeuralNetworkRegressor(
                 InputConversionTable(),
@@ -665,13 +665,13 @@ class TestRegressionModel:
             [ForwardLayer(input_size=1, output_size=1)],
             OutputConversionTable(),
         )
+        trained_model = model.fit(
+            Table.from_dict({"a": [1, 0, 2], "b": [0, 15, 5]}).to_tabular_dataset("b"),
+        )
         with pytest.raises(
             FeatureDataMismatchError,
             match="The features in the given table do not match with the specified feature columns names of the neural network.",
         ):
-            trained_model = model.fit(
-                Table.from_dict({"a": [1, 0, 2], "b": [0, 15, 5]}).to_tabular_dataset("b"),
-            )
             trained_model.fit(
                 Table.from_dict({"k": [1, 0, 2], "l": [0, 15, 5]}).to_tabular_dataset("l"),
             )

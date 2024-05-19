@@ -184,7 +184,6 @@ class TestImageToImageRegressor:
     def test_should_train_and_predict_model(
         self,
         seed: int,
-        snapshot_png_image_list: SnapshotAssertion,
         device: Device,
     ) -> None:
         configure_test_with_device(device)
@@ -241,7 +240,6 @@ class TestImageToImageRegressor:
     def test_should_train_and_predict_model_variable_image_size(
         self,
         seed: int,
-        snapshot_png_image_list: SnapshotAssertion,
         device: Device,
         multi_width: int,
         multi_height: int,
@@ -279,7 +277,5 @@ class TestImageToImageRegressor:
         if isinstance(pred_output, _SingleSizeImageList):
             assert pred_output.widths[0] == image_dataset.input_size.width * multi_width
             assert pred_output.heights[0] == image_dataset.input_size.height * multi_height
-        else:
-            assert False
         assert prediction.input_size.height == image_dataset.input_size.height * multi_height
         assert prediction._output._tensor.device == _get_device()
