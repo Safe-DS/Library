@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import datetime
 from typing import TYPE_CHECKING
 
 from safeds._utils import _structural_hash
@@ -10,6 +9,8 @@ from ._lazy_cell import _LazyCell
 from ._string_cell import StringCell
 
 if TYPE_CHECKING:
+    import datetime
+
     import polars as pl
 
     from ._cell import Cell
