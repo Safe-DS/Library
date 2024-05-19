@@ -21,4 +21,4 @@ from tests.helpers import assert_cell_operation_works
     ],
 )
 def test_should_parse_float(string: str, expected: bool) -> None:
-    assert_cell_operation_works(string, lambda cell: cell.string.to_float(), expected)
+    assert_cell_operation_works(string, lambda cell: cell.str.to_float(), expected)

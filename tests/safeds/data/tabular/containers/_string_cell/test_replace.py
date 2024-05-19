@@ -21,4 +21,4 @@ from tests.helpers import assert_cell_operation_works
     ],
 )
 def test_should_replace_all_occurrences_of_old_with_new(string: str, old: str, new: str, expected: str) -> None:
-    assert_cell_operation_works(string, lambda cell: cell.string.replace(old, new), expected)
+    assert_cell_operation_works(string, lambda cell: cell.str.replace(old, new), expected)

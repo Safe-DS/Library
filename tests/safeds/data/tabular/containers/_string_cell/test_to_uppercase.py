@@ -15,4 +15,4 @@ from tests.helpers import assert_cell_operation_works
     ],
 )
 def test_should_uppercase_a_string(string: str, expected: str) -> None:
-    assert_cell_operation_works(string, lambda cell: cell.string.to_uppercase(), expected)
+    assert_cell_operation_works(string, lambda cell: cell.str.to_uppercase(), expected)

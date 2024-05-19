@@ -142,7 +142,7 @@ class Cell(ABC, Generic[T_co]):
 
     @property
     @abstractmethod
-    def string(self) -> StringCell:
+    def str(self) -> StringCell:
         """Namespace for operations on strings."""
 
     # ------------------------------------------------------------------------------------------------------------------

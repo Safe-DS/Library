@@ -19,7 +19,7 @@ class StringCell(ABC):
     --------
     >>> from safeds.data.tabular.containers import Column
     >>> column = Column("example", ["ab", "bc", "cd"])
-    >>> column.transform(lambda cell: cell.string.to_uppercase())
+    >>> column.transform(lambda cell: cell.str.to_uppercase())
     ["AB", "BC", "CD"]
     """
 
@@ -42,7 +42,7 @@ class StringCell(ABC):
         --------
         >>> from safeds.data.tabular.containers import Column
         >>> column = Column("example", ["ab", "bc", "cd"])
-        >>> column.count_if(lambda cell: cell.string.contains("b"))
+        >>> column.count_if(lambda cell: cell.str.contains("b"))
         2
         """
 
@@ -65,7 +65,7 @@ class StringCell(ABC):
         --------
         >>> from safeds.data.tabular.containers import Column
         >>> column = Column("example", ["ab", "bc", "cd"])
-        >>> column.count_if(lambda cell: cell.string.ends_with("c"))
+        >>> column.count_if(lambda cell: cell.str.ends_with("c"))
         1
         """
 
@@ -88,7 +88,7 @@ class StringCell(ABC):
         --------
         >>> from safeds.data.tabular.containers import Column
         >>> column = Column("example", ["ab", "bc", "cd"])
-        >>> column.transform(lambda cell: cell.string.index_of("b"))
+        >>> column.transform(lambda cell: cell.str.index_of("b"))
         [1, 0, None]
         """
 
@@ -112,7 +112,7 @@ class StringCell(ABC):
         --------
         >>> from safeds.data.tabular.containers import Column
         >>> column = Column("example", ["", "a", "abc"])
-        >>> column.transform(lambda cell: cell.string.length())
+        >>> column.transform(lambda cell: cell.str.length())
         [0, 1, 3]
         """
 
@@ -137,7 +137,7 @@ class StringCell(ABC):
         --------
         >>> from safeds.data.tabular.containers import Column
         >>> column = Column("example", ["ab", "bc", "cd"])
-        >>> column.transform(lambda cell: cell.string.replace("b", "z"))
+        >>> column.transform(lambda cell: cell.str.replace("b", "z"))
         ["az", "zc", "cd"]
         """
 
@@ -160,7 +160,7 @@ class StringCell(ABC):
         --------
         >>> from safeds.data.tabular.containers import Column
         >>> column = Column("example", ["ab", "bc", "cd"])
-        >>> column.count_if(lambda cell: cell.string.starts_with("a"))
+        >>> column.count_if(lambda cell: cell.str.starts_with("a"))
         1
         """
 
@@ -191,7 +191,7 @@ class StringCell(ABC):
         --------
         >>> from safeds.data.tabular.containers import Column
         >>> column = Column("example", ["abc", "def", "ghi"])
-        >>> column.transform(lambda cell: cell.string.substring(1, 2))
+        >>> column.transform(lambda cell: cell.str.substring(1, 2))
         ["bc", "ef", "hi"]
         """
 
@@ -209,7 +209,7 @@ class StringCell(ABC):
         --------
         >>> from safeds.data.tabular.containers import Column
         >>> column = Column("example", ["2021-01-01", "2021-02-01", "abc"])
-        >>> column.transform(lambda cell: cell.string.to_date())
+        >>> column.transform(lambda cell: cell.str.to_date())
         ["2021-01-01", "2021-02-01", None]
         """
 
@@ -227,7 +227,7 @@ class StringCell(ABC):
         --------
         >>> from safeds.data.tabular.containers import Column
         >>> column = Column("example", ["2021-01-01T00:00:00", "2021-02-01T00:00:00", "abc"])
-        >>> column.transform(lambda cell: cell.string.to_datetime())
+        >>> column.transform(lambda cell: cell.str.to_datetime())
         ["2021-01-01 00:00:00", "2021-02-01 00:00:00", None]
         """
 
@@ -245,7 +245,7 @@ class StringCell(ABC):
         --------
         >>> from safeds.data.tabular.containers import Column
         >>> column = Column("example", ["1", "3.4", "5.6", "abc"])
-        >>> column.transform(lambda cell: cell.string.to_float())
+        >>> column.transform(lambda cell: cell.str.to_float())
         [1.0, 3.4, 5.6, None]
         """
 
@@ -268,11 +268,11 @@ class StringCell(ABC):
         --------
         >>> from safeds.data.tabular.containers import Column
         >>> column1 = Column("example", ["1", "2", "3", "abc"])
-        >>> column1.transform(lambda cell: cell.string.to_int())
+        >>> column1.transform(lambda cell: cell.str.to_int())
         [1, 2, 3, None]
 
         >>> column2 = Column("example", ["1", "10", "11", "abc"])
-        >>> column2.transform(lambda cell: cell.string.to_int(base=2))
+        >>> column2.transform(lambda cell: cell.str.to_int(base=2))
         [1, 2, 3, None]
         """
 
@@ -290,7 +290,7 @@ class StringCell(ABC):
         --------
         >>> from safeds.data.tabular.containers import Column
         >>> column = Column("example", ["AB", "BC", "CD"])
-        >>> column.transform(lambda cell: cell.string.to_lowercase())
+        >>> column.transform(lambda cell: cell.str.to_lowercase())
         ["ab", "bc", "cd"]
         """
 
@@ -308,7 +308,7 @@ class StringCell(ABC):
         --------
         >>> from safeds.data.tabular.containers import Column
         >>> column = Column("example", ["ab", "bc", "cd"])
-        >>> column.transform(lambda cell: cell.string.to_uppercase())
+        >>> column.transform(lambda cell: cell.str.to_uppercase())
         ["AB", "BC", "CD"]
         """
 
@@ -326,7 +326,7 @@ class StringCell(ABC):
         --------
         >>> from safeds.data.tabular.containers import Column
         >>> column = Column("example", ["", " abc", "abc ", " abc "])
-        >>> column.transform(lambda cell: cell.string.trim())
+        >>> column.transform(lambda cell: cell.str.trim())
         ["", "abc", "abc", "abc"]
         """
 
@@ -344,7 +344,7 @@ class StringCell(ABC):
         --------
         >>> from safeds.data.tabular.containers import Column
         >>> column = Column("example", ["", " abc", "abc ", " abc "])
-        >>> column.transform(lambda cell: cell.string.trim_end())
+        >>> column.transform(lambda cell: cell.str.trim_end())
         ["", " abc", "abc", " abc"]
         """
 
@@ -362,7 +362,7 @@ class StringCell(ABC):
         --------
         >>> from safeds.data.tabular.containers import Column
         >>> column = Column("example", ["", " abc", "abc ", " abc "])
-        >>> column.transform(lambda cell: cell.string.trim_start())
+        >>> column.transform(lambda cell: cell.str.trim_start())
         ["", "abc", "abc ", "abc "]
         """
 

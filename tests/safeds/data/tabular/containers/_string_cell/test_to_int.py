@@ -21,6 +21,6 @@ from tests.helpers import assert_cell_operation_works
 def test_should_parse_integer(string: str, base: int, expected: bool) -> None:
     assert_cell_operation_works(
         string,
-        lambda cell: cell.string.to_int(base=base),
+        lambda cell: cell.str.to_int(base=base),
         expected,
     )

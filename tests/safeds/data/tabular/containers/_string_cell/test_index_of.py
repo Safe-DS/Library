@@ -19,4 +19,4 @@ from tests.helpers import assert_cell_operation_works
     ],
 )
 def test_should_return_index_of_first_occurrence_of_substring(string: str, substring: str, expected: bool) -> None:
-    assert_cell_operation_works(string, lambda cell: cell.string.index_of(substring), expected)
+    assert_cell_operation_works(string, lambda cell: cell.str.index_of(substring), expected)

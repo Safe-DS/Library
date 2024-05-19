@@ -21,6 +21,6 @@ from tests.helpers import assert_cell_operation_works
 def test_should_return_number_of_characters(string: str, optimize_for_ascii: bool, expected: bool) -> None:
     assert_cell_operation_works(
         string,
-        lambda cell: cell.string.length(optimize_for_ascii=optimize_for_ascii),
+        lambda cell: cell.str.length(optimize_for_ascii=optimize_for_ascii),
         expected,
     )

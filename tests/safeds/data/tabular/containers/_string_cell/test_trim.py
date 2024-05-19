@@ -21,4 +21,4 @@ from tests.helpers import assert_cell_operation_works
     ],
 )
 def test_should_remove_whitespace_prefix_and_suffix(string: str, expected: str) -> None:
-    assert_cell_operation_works(string, lambda cell: cell.string.trim(), expected)
+    assert_cell_operation_works(string, lambda cell: cell.str.trim(), expected)

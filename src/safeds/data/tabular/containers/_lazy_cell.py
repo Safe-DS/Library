@@ -181,7 +181,7 @@ class _LazyCell(Cell[T]):
     # ------------------------------------------------------------------------------------------------------------------
 
     @property
-    def string(self) -> StringCell:
+    def str(self) -> StringCell:
         from ._lazy_string_cell import _LazyStringCell  # circular import
 
         return _LazyStringCell(self._expression)

@@ -19,4 +19,4 @@ from tests.helpers import assert_cell_operation_works
     ],
 )
 def test_should_parse_datetimes(string: str, expected: bool) -> None:
-    assert_cell_operation_works(string, lambda cell: cell.string.to_datetime(), expected)
+    assert_cell_operation_works(string, lambda cell: cell.str.to_datetime(), expected)
