@@ -27,10 +27,9 @@ from safeds.ml.nn.layers import (
     ForwardLayer,
     MaxPooling2DLayer,
 )
-from syrupy import SnapshotAssertion
+from safeds.ml.nn.typing import VariableImageSize
 from torch.types import Device
 
-from safeds.ml.nn.typing import VariableImageSize
 from tests.helpers import configure_test_with_device, device_cpu, device_cuda, images_all, resolve_resource_path
 
 if TYPE_CHECKING:
@@ -225,18 +224,8 @@ class TestImageToImageRegressor:
         ],
         ids=["seed-4711-cuda", "seed-4711-cpu"],
     )
-    @pytest.mark.parametrize(
-        "multi_width",
-        [
-            1, 2, 3
-        ]
-    )
-    @pytest.mark.parametrize(
-        "multi_height",
-        [
-            1, 2, 3
-        ]
-    )
+    @pytest.mark.parametrize("multi_width", [1, 2, 3])
+    @pytest.mark.parametrize("multi_height", [1, 2, 3])
     def test_should_train_and_predict_model_variable_image_size(
         self,
         seed: int,
@@ -271,7 +260,11 @@ class TestImageToImageRegressor:
                 nn._model.state_dict()["_pytorch_layers.3._layer.bias"],
             ),
         ).item()
-        prediction = nn.predict(image_dataset.get_input().resize(image_dataset.input_size.width * multi_width, image_dataset.input_size.height * multi_height))
+        prediction = nn.predict(
+            image_dataset.get_input().resize(
+                image_dataset.input_size.width * multi_width, image_dataset.input_size.height * multi_height,
+            ),
+        )
         pred_output = prediction.get_output()
         assert isinstance(pred_output, ImageList)
         if isinstance(pred_output, _SingleSizeImageList):

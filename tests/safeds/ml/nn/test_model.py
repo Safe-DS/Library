@@ -33,9 +33,9 @@ from safeds.ml.nn.layers import (
     LSTMLayer,
     MaxPooling2DLayer,
 )
+from safeds.ml.nn.typing import VariableImageSize
 from torch.types import Device
 
-from safeds.ml.nn.typing import VariableImageSize
 from tests.helpers import configure_test_with_device, get_devices, get_devices_ids
 
 
@@ -46,15 +46,18 @@ class TestClassificationModel:
         "input_size",
         [
             1,
-        ]
+        ],
     )
     def test_should_return_input_size(self, input_size: int, device: Device) -> None:
         configure_test_with_device(device)
-        assert NeuralNetworkClassifier(
+        assert (
+            NeuralNetworkClassifier(
                 InputConversionTable(),
                 [ForwardLayer(1, input_size)],
                 OutputConversionTable(),
-            ).input_size == input_size
+            ).input_size
+            == input_size
+        )
 
     @pytest.mark.parametrize(
         "epoch_size",
@@ -527,15 +530,18 @@ class TestRegressionModel:
         "input_size",
         [
             1,
-        ]
+        ],
     )
     def test_should_return_input_size(self, input_size: int, device: Device) -> None:
         configure_test_with_device(device)
-        assert NeuralNetworkRegressor(
+        assert (
+            NeuralNetworkRegressor(
                 InputConversionTable(),
                 [ForwardLayer(1, input_size)],
                 OutputConversionTable(),
-            ).input_size == input_size
+            ).input_size
+            == input_size
+        )
 
     @pytest.mark.parametrize(
         "epoch_size",

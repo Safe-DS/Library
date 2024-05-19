@@ -5,10 +5,9 @@ from typing import TYPE_CHECKING, Any
 
 from safeds._config import _init_default_device
 from safeds._utils import _structural_hash
+from safeds.ml.nn.typing import ConstantImageSize
 
 from ._layer import Layer
-
-from safeds.ml.nn.typing import ConstantImageSize
 
 if TYPE_CHECKING:
     from torch import Tensor, nn

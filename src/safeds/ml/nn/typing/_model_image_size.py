@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import sys
 from abc import ABC, abstractmethod
-from typing import Self, Type, TYPE_CHECKING
+from typing import TYPE_CHECKING, Self
 
 from safeds._utils import _structural_hash
 from safeds._validation import _check_bounds, _ClosedBound
@@ -44,7 +44,7 @@ class ModelImageSize(ABC):
         self._channel = channel
 
     @classmethod
-    def from_image(cls: Type[Self], image: Image) -> Self:
+    def from_image(cls: type[Self], image: Image) -> Self:
         """
         Create a `ModelImageSize` of a given image.
 
@@ -61,7 +61,7 @@ class ModelImageSize(ABC):
         return cls(image.width, image.height, image.channel)
 
     @classmethod
-    def from_image_size(cls: Type[Self], image_size: ModelImageSize) -> Self:
+    def from_image_size(cls: type[Self], image_size: ModelImageSize) -> Self:
         """
         Create a `ModelImageSize` of a given image size.
 

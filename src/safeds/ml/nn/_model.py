@@ -8,7 +8,7 @@ from safeds._validation import _check_bounds, _ClosedBound
 from safeds.data.image.containers import ImageList
 from safeds.data.labeled.containers import ImageDataset, TabularDataset, TimeSeriesDataset
 from safeds.data.labeled.containers._image_dataset import _ColumnAsTensor
-from safeds.data.tabular.containers import Table, Column
+from safeds.data.tabular.containers import Table
 from safeds.data.tabular.transformation import OneHotEncoder
 from safeds.exceptions import (
     FeatureDataMismatchError,
@@ -29,7 +29,7 @@ from safeds.ml.nn.layers import (
     ForwardLayer,
 )
 from safeds.ml.nn.layers._pooling2d_layer import _Pooling2DLayer
-from safeds.ml.nn.typing import ModelImageSize, ConstantImageSize, VariableImageSize
+from safeds.ml.nn.typing import ConstantImageSize, ModelImageSize, VariableImageSize
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -122,7 +122,14 @@ class NeuralNetworkRegressor(Generic[IFT, IPT, OT]):
 
     @staticmethod
     def load_pretrained_model(huggingface_repo: str) -> NeuralNetworkRegressor:
-        from transformers import AutoConfig, AutoImageProcessor, AutoModelForImageToImage, PretrainedConfig, Swin2SRImageProcessor, Swin2SRForImageSuperResolution
+        from transformers import (
+            AutoConfig,
+            AutoImageProcessor,
+            AutoModelForImageToImage,
+            PretrainedConfig,
+            Swin2SRForImageSuperResolution,
+            Swin2SRImageProcessor,
+        )
 
         _init_default_device()
 
@@ -332,8 +339,12 @@ class NeuralNetworkClassifier(Generic[IFT, IPT, OT]):
             raise InvalidModelStructureError("You need to provide at least one layer to a neural network.")
         if isinstance(output_conversion, OutputConversionImageToImage):
             raise InvalidModelStructureError("A NeuralNetworkClassifier cannot be used with images as output.")
-        if isinstance(input_conversion, InputConversionImage) and isinstance(input_conversion._input_size, VariableImageSize):
-            raise InvalidModelStructureError("A NeuralNetworkClassifier cannot be used with a InputConversionImage that uses a VariableImageSize.")
+        if isinstance(input_conversion, InputConversionImage) and isinstance(
+            input_conversion._input_size, VariableImageSize,
+        ):
+            raise InvalidModelStructureError(
+                "A NeuralNetworkClassifier cannot be used with a InputConversionImage that uses a VariableImageSize.",
+            )
         elif isinstance(input_conversion, InputConversionImage):
             if not isinstance(output_conversion, _OutputConversionImage):
                 raise InvalidModelStructureError(
@@ -399,9 +410,15 @@ class NeuralNetworkClassifier(Generic[IFT, IPT, OT]):
         image_processor: BaseImageProcessor = AutoImageProcessor.from_pretrained(huggingface_repo)
         if hasattr(image_processor, "size") and hasattr(config, "num_channels"):
             if "shortest_edge" in image_processor.size:
-                input_size = ConstantImageSize(image_processor.size.get("shortest_edge"), image_processor.size.get("shortest_edge"), config.num_channels)
+                input_size = ConstantImageSize(
+                    image_processor.size.get("shortest_edge"),
+                    image_processor.size.get("shortest_edge"),
+                    config.num_channels,
+                )
             else:
-                input_size = ConstantImageSize(image_processor.size.get("width"), image_processor.size.get("height"), config.num_channels)
+                input_size = ConstantImageSize(
+                    image_processor.size.get("width"), image_processor.size.get("height"), config.num_channels,
+                )
         else:  # Should never happen due to model check
             raise ValueError("This model is not supported")  # pragma: no cover
 
