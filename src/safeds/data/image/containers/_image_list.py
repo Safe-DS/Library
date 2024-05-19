@@ -390,7 +390,7 @@ class ImageList(metaclass=ABCMeta):
         length:
             The number of images
         """
-        return self.number_of_images
+        return self.image_count
 
     def __contains__(self, item: object) -> bool:
         """
@@ -445,75 +445,33 @@ class ImageList(metaclass=ABCMeta):
 
     @property
     @abstractmethod
-    def number_of_images(self) -> int:
-        """
-        Return the number of images in this image list.
-
-        Returns
-        -------
-        length:
-            The number of images
-        """
+    def image_count(self) -> int:
+        """The number of images in this image list."""
 
     @property
     @abstractmethod
     def widths(self) -> list[int]:
-        """
-        Return a list of all widths in this image list.
-
-        Returns
-        -------
-        widths:
-            A list of all widths
-        """
+        """A list of all widths in this image list."""
 
     @property
     @abstractmethod
     def heights(self) -> list[int]:
-        """
-        Return a list of all heights in this image list.
-
-        Returns
-        -------
-        heights:
-            A list of all widths
-        """
+        """A list of all heights in this image list."""
 
     @property
     @abstractmethod
     def channel(self) -> int:
-        """
-        Return the channel of all images.
-
-        Returns
-        -------
-        channel:
-            The channel of all images
-        """
+        """The channel of all images."""
 
     @property
     @abstractmethod
     def sizes(self) -> list[ImageSize]:
-        """
-        Return the sizes of all images.
-
-        Returns
-        -------
-        sizes:
-            The sizes of all images
-        """
+        """The sizes of all images."""
 
     @property
     @abstractmethod
-    def number_of_sizes(self) -> int:
-        """
-        Return the number of different sizes of images in this image list.
-
-        Returns
-        -------
-        number_of_sizes:
-            The number of different sizes
-        """
+    def size_count(self) -> int:
+        """The number of different sizes of images in this image list."""
 
     # ------------------------------------------------------------------------------------------------------------------
     # Getters
@@ -729,7 +687,7 @@ class ImageList(metaclass=ABCMeta):
         image_list:
             the image list with the new image added
         """
-        return self._add_image_tensor(image._image_tensor, self.number_of_images)
+        return self._add_image_tensor(image._image_tensor, self.image_count)
 
     @abstractmethod
     def add_images(self, images: list[Image] | ImageList) -> ImageList:

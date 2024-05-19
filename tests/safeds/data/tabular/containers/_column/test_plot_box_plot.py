@@ -1,6 +1,6 @@
 import pytest
 from safeds.data.tabular.containers import Column
-from safeds.exceptions import NonNumericColumnError
+from safeds.exceptions import ColumnTypeError
 from syrupy import SnapshotAssertion
 
 
@@ -24,5 +24,5 @@ def test_should_match_snapshot(column: Column, snapshot_png_image: SnapshotAsser
 
 def test_should_raise_if_column_contains_non_numerical_values() -> None:
     column = Column("a", ["A", "B", "C"])
-    with pytest.raises(NonNumericColumnError):
+    with pytest.raises(ColumnTypeError):
         column.plot.box_plot()

@@ -23,4 +23,4 @@ def test_should_remove_table_columns(table: Table, expected: Table, columns: lis
     table = table.remove_columns(columns)
     assert table.schema == expected.schema
     assert table == expected
-    assert table.number_of_rows == expected.number_of_rows
+    assert table.row_count == expected.row_count

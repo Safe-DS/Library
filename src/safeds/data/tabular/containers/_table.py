@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Literal
+from typing import TYPE_CHECKING, Any, Literal, overload
 
 from safeds._config import _get_device, _init_default_device
 from safeds._config._polars import _get_polars_config
@@ -334,7 +334,7 @@ class Table:
         return self._data_frame.equals(other._data_frame)
 
     def __hash__(self) -> int:
-        return _structural_hash(self.schema, self.number_of_rows)
+        return _structural_hash(self.schema, self.row_count)
 
     def __repr__(self) -> str:
         with _get_polars_config():
@@ -379,7 +379,7 @@ class Table:
         return self.schema.column_names
 
     @property
-    def number_of_columns(self) -> int:
+    def column_count(self) -> int:
         """
         The number of columns in the table.
 
@@ -387,7 +387,7 @@ class Table:
         --------
         >>> from safeds.data.tabular.containers import Table
         >>> table = Table({"a": [1, 2, 3], "b": [4, 5, 6]})
-        >>> table.number_of_columns
+        >>> table.column_count
         2
         """
         import polars as pl
@@ -399,7 +399,7 @@ class Table:
             return 0
 
     @property
-    def number_of_rows(self) -> int:
+    def row_count(self) -> int:
         """
         The number of rows in the table.
 
@@ -409,7 +409,7 @@ class Table:
         --------
         >>> from safeds.data.tabular.containers import Table
         >>> table = Table({"a": [1, 2, 3], "b": [4, 5, 6]})
-        >>> table.number_of_rows
+        >>> table.row_count
         3
         """
         return self._data_frame.height
@@ -1008,6 +1008,73 @@ class Table:
     # Row operations
     # ------------------------------------------------------------------------------------------------------------------
 
+    @overload
+    def count_row_if(
+        self,
+        predicate: Callable[[Row], Cell[bool | None]],
+        *,
+        ignore_unknown: Literal[True] = ...,
+    ) -> int: ...
+
+    @overload
+    def count_row_if(
+        self,
+        predicate: Callable[[Row], Cell[bool | None]],
+        *,
+        ignore_unknown: bool,
+    ) -> int | None: ...
+
+    def count_row_if(
+        self,
+        predicate: Callable[[Row], Cell[bool | None]],
+        *,
+        ignore_unknown: bool = True,
+    ) -> int | None:
+        """
+        Return how many rows in the table satisfy the predicate.
+
+        The predicate can return one of three results:
+
+        * True, if the row satisfies the predicate.
+        * False, if the row does not satisfy the predicate.
+        * None, if the truthiness of the predicate is unknown, e.g. due to missing values.
+
+        By default, cases where the truthiness of the predicate is unknown are ignored and this method returns how
+        often the predicate returns True.
+
+        You can instead enable Kleene logic by setting `ignore_unknown=False`. In this case, this method returns None if
+        the predicate returns None at least once. Otherwise, it still returns how often the predicate returns True.
+
+        Parameters
+        ----------
+        predicate:
+            The predicate to apply to each row.
+        ignore_unknown:
+            Whether to ignore cases where the truthiness of the predicate is unknown.
+
+        Returns
+        -------
+        count:
+            The number of rows in the table that satisfy the predicate.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table
+        >>> table = Table({"col1": [1, 2, 3], "col2": [1, 3, 3]})
+        >>> table.count_row_if(lambda row: row["col1"] == row["col2"])
+        2
+
+        >>> table.count_row_if(lambda row: row["col1"] > row["col2"])
+        0
+        """
+        expression = predicate(_LazyVectorizedRow(self))._polars_expression
+        series = self._lazy_frame.select(expression.alias("count")).collect().get_column("count")
+
+        if ignore_unknown or series.null_count() == 0:
+            return series.sum()
+        else:
+            return None
+
     # TODO: Rethink group_rows/group_rows_by_column. They should not return a dict.
 
     def remove_duplicate_rows(self) -> Table:
@@ -1223,7 +1290,7 @@ class Table:
         | null |   8 |
         +------+-----+
         """
-        if self.number_of_rows == 0:
+        if self.row_count == 0:
             return self  # polars raises a ComputeError for tables without rows
         if column_names is None:
             column_names = self.column_names
@@ -1366,7 +1433,7 @@ class Table:
         |   3 |   2 |
         +-----+-----+
         """
-        if self.number_of_rows == 0:
+        if self.row_count == 0:
             return self
 
         key = key_selector(_LazyVectorizedRow(self))
@@ -1501,11 +1568,11 @@ class Table:
         )
 
         input_table = self.shuffle_rows() if shuffle else self
-        number_of_rows_in_first = round(percentage_in_first * input_table.number_of_rows)
+        row_count_in_first = round(percentage_in_first * input_table.row_count)
 
         return (
-            input_table.slice_rows(length=number_of_rows_in_first),
-            input_table.slice_rows(start=number_of_rows_in_first),
+            input_table.slice_rows(length=row_count_in_first),
+            input_table.slice_rows(start=row_count_in_first),
         )
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -1707,7 +1774,7 @@ class Table:
         | stability            | 0.50000 |
         +----------------------+---------+
         """
-        if self.number_of_columns == 0:
+        if self.column_count == 0:
             return Table()
 
         head = self.get_column(self.column_names[0]).summarize_statistics()

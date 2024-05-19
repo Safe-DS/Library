@@ -146,8 +146,8 @@ class TestAllImageCombinations:
         for image in images_not_included:
             assert image not in image_list
 
-        # Test number_of_images
-        assert image_list.number_of_images == 3
+        # Test image_count
+        assert image_list.image_count == 3
 
         # Test widths
         assert image_list.widths == [image1.width, image2.width, image3.width]
@@ -165,8 +165,8 @@ class TestAllImageCombinations:
             image3_with_expected_channel.size,
         ]
 
-        # Test number_of_sizes
-        assert image_list.number_of_sizes == len({(image.width, image.height) for image in [image1, image2, image3]})
+        # Test size_count
+        assert image_list.size_count == len({(image.width, image.height) for image in [image1, image2, image3]})
 
         # Test has_image
         assert image_list.has_image(image1_with_expected_channel)
@@ -672,7 +672,7 @@ class TestToJpegFiles:
             image_list.to_jpeg_files(tmpdir)
             image_list_loaded = ImageList.from_files(tmpdir)
             assert len(image_list) == len(image_list_loaded)
-            assert image_list.number_of_sizes == image_list_loaded.number_of_sizes
+            assert image_list.size_count == image_list_loaded.size_count
             assert isinstance(image_list_loaded, type(image_list))
             for index in range(len(image_list)):
                 im_saved = image_list.get_image(index)
@@ -707,12 +707,12 @@ class TestToJpegFiles:
         image_list = ImageList.from_files(resolve_resource_path(resource_path))
 
         with tempfile.TemporaryDirectory() as tmp_parent_dir:
-            tmp_dirs = [tempfile.TemporaryDirectory(dir=tmp_parent_dir) for _ in range(image_list.number_of_sizes)]
+            tmp_dirs = [tempfile.TemporaryDirectory(dir=tmp_parent_dir) for _ in range(image_list.size_count)]
 
             image_list.to_jpeg_files([tmp_dir.name for tmp_dir in tmp_dirs])
             image_list_loaded = ImageList.from_files(tmp_parent_dir)
             assert len(image_list) == len(image_list_loaded)
-            assert image_list.number_of_sizes == image_list_loaded.number_of_sizes
+            assert image_list.size_count == image_list_loaded.size_count
             assert isinstance(image_list_loaded, type(image_list))
             assert set(image_list.widths) == set(image_list_loaded.widths)
             assert set(image_list.heights) == set(image_list_loaded.heights)
@@ -754,7 +754,7 @@ class TestToJpegFiles:
             image_list.to_jpeg_files([tmp_file.name for tmp_file in tmp_files])
             image_list_loaded = ImageList.from_files(tmp_parent_dir)
             assert len(image_list) == len(image_list_loaded)
-            assert image_list.number_of_sizes == image_list_loaded.number_of_sizes
+            assert image_list.size_count == image_list_loaded.size_count
             assert isinstance(image_list_loaded, type(image_list))
             for index in range(len(image_list)):
                 im_saved = image_list.get_image(index)
@@ -792,7 +792,7 @@ class TestToPngFiles:
             image_list.to_png_files(tmpdir)
             image_list_loaded = ImageList.from_files(tmpdir)
             assert len(image_list) == len(image_list_loaded)
-            assert image_list.number_of_sizes == image_list_loaded.number_of_sizes
+            assert image_list.size_count == image_list_loaded.size_count
             assert isinstance(image_list_loaded, type(image_list))
             assert image_list == image_list_loaded
 
@@ -810,12 +810,12 @@ class TestToPngFiles:
         image_list = ImageList.from_files(resolve_resource_path(resource_path))
 
         with tempfile.TemporaryDirectory() as tmp_parent_dir:
-            tmp_dirs = [tempfile.TemporaryDirectory(dir=tmp_parent_dir) for _ in range(image_list.number_of_sizes)]
+            tmp_dirs = [tempfile.TemporaryDirectory(dir=tmp_parent_dir) for _ in range(image_list.size_count)]
 
             image_list.to_png_files([tmp_dir.name for tmp_dir in tmp_dirs])
             image_list_loaded = ImageList.from_files(tmp_parent_dir)
             assert len(image_list) == len(image_list_loaded)
-            assert image_list.number_of_sizes == image_list_loaded.number_of_sizes
+            assert image_list.size_count == image_list_loaded.size_count
             assert isinstance(image_list_loaded, type(image_list))
             assert set(image_list.widths) == set(image_list_loaded.widths)
             assert set(image_list.heights) == set(image_list_loaded.heights)
@@ -845,7 +845,7 @@ class TestToPngFiles:
             image_list.to_png_files([tmp_file.name for tmp_file in tmp_files])
             image_list_loaded = ImageList.from_files(tmp_parent_dir)
             assert len(image_list) == len(image_list_loaded)
-            assert image_list.number_of_sizes == image_list_loaded.number_of_sizes
+            assert image_list.size_count == image_list_loaded.size_count
             assert isinstance(image_list_loaded, type(image_list))
             assert image_list == image_list_loaded
 
@@ -1055,7 +1055,7 @@ class TestErrorsAndWarningsWithoutEmptyImageList:
         ) -> None:
             configure_test_with_device(device)
             image_list = ImageList.from_files(resolve_resource_path(resource_path))
-            image_blank_tensor = torch.zeros((image_list.number_of_images, image_list.channel, 1, 1))
+            image_blank_tensor = torch.zeros((image_list.image_count, image_list.channel, 1, 1))
             with pytest.warns(
                 UserWarning,
                 match=r"The specified bounding rectangle does not contain any content of at least one image. Therefore these images will be blank.",
@@ -1547,9 +1547,9 @@ class TestEmptyImageList:
         assert sys.getsizeof(_EmptyImageList()) >= 0
         assert _EmptyImageList().__sizeof__() == 0
 
-    def test_number_of_images(self, device: Device) -> None:
+    def test_image_count(self, device: Device) -> None:
         configure_test_with_device(device)
-        assert _EmptyImageList().number_of_images == 0
+        assert _EmptyImageList().image_count == 0
 
     def test_widths(self, device: Device) -> None:
         configure_test_with_device(device)
@@ -1567,9 +1567,9 @@ class TestEmptyImageList:
         configure_test_with_device(device)
         assert _EmptyImageList().sizes == []
 
-    def test_number_of_sizes(self, device: Device) -> None:
+    def test_size_count(self, device: Device) -> None:
         configure_test_with_device(device)
-        assert _EmptyImageList().number_of_sizes == 0
+        assert _EmptyImageList().size_count == 0
 
     def test_get_image(self, device: Device) -> None:
         configure_test_with_device(device)

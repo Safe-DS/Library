@@ -4,10 +4,22 @@ from safeds.exceptions import ColumnNotFoundError
 from syrupy import SnapshotAssertion
 
 
-def test_should_match_snapshot(snapshot_png_image: SnapshotAssertion) -> None:
-    table = Table({"A": [1, 2, 3], "B": [2, 4, 7]})
-    lineplot = table.plot.line_plot("A", "B")
-    assert lineplot == snapshot_png_image
+@pytest.mark.parametrize(
+    ("table", "x_name", "y_name"),
+    [
+        (Table({"A": [1, 2, 3], "B": [2, 4, 7]}), "A", "B"),
+        (Table({"A": [1, 1, 2, 2], "B": [2, 4, 6, 8]}), "A", "B"),
+        (Table({"A": [2, 1, 3, 3, 1, 2], "B": [6, 2, 5, 5, 4, 8]}), "A", "B"),
+    ],
+    ids=[
+        "functional",
+        "sorted grouped",
+        "unsorted grouped",
+    ],
+)
+def test_should_match_snapshot(table: Table, x_name: str, y_name: str, snapshot_png_image: SnapshotAssertion) -> None:
+    line_plot = table.plot.line_plot(x_name, y_name)
+    assert line_plot == snapshot_png_image
 
 
 @pytest.mark.parametrize(

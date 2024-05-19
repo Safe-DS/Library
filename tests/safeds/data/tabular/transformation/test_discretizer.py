@@ -208,7 +208,7 @@ class TestFitAndTransform:
         assert transformed_table == expected
 
     @pytest.mark.parametrize(
-        ("table", "number_of_bins", "expected"),
+        ("table", "bin_count", "expected"),
         [
             (
                 Table(
@@ -242,10 +242,10 @@ class TestFitAndTransform:
     def test_should_return_transformed_table_with_correct_number_of_bins(
         self,
         table: Table,
-        number_of_bins: int,
+        bin_count: int,
         expected: Table,
     ) -> None:
-        fitted_transformer, transformed_table = Discretizer(number_of_bins).fit_and_transform(table, ["col1"])
+        fitted_transformer, transformed_table = Discretizer(bin_count).fit_and_transform(table, ["col1"])
         assert fitted_transformer.is_fitted
         assert transformed_table == expected
 

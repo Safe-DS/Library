@@ -53,8 +53,8 @@ class _LazyVectorizedRow(Row):
         return self._table.column_names
 
     @property
-    def number_of_columns(self) -> int:
-        return self._table.number_of_columns
+    def column_count(self) -> int:
+        return self._table.column_count
 
     @property
     def schema(self) -> Schema:

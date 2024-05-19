@@ -72,7 +72,7 @@ class ArimaModelRegressor:
         from statsmodels.tsa.arima.model import ARIMA
 
         table = time_series.to_table()
-        if table.number_of_rows == 0:
+        if table.row_count == 0:
             raise DatasetMissesDataError
         if not time_series.target.type.is_numeric:
             raise NonNumericColumnError(time_series.target.name)

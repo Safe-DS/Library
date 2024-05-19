@@ -17,7 +17,7 @@ class GradientBoostingClassifier(Classifier, _GradientBoostingBase):
 
     Parameters
     ----------
-    number_of_trees:
+    tree_count:
         The number of boosting stages to perform. Gradient boosting is fairly robust to over-fitting so a large
         number usually results in better performance.
     learning_rate:
@@ -27,7 +27,7 @@ class GradientBoostingClassifier(Classifier, _GradientBoostingBase):
     Raises
     ------
     OutOfBoundsError
-        If `number_of_trees` or `learning_rate` is less than or equal to 0.
+        If `tree_count` or `learning_rate` is less than or equal to 0.
     """
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -37,14 +37,14 @@ class GradientBoostingClassifier(Classifier, _GradientBoostingBase):
     def __init__(
         self,
         *,
-        number_of_trees: int = 100,
+        tree_count: int = 100,
         learning_rate: float = 0.1,
     ) -> None:
         # Initialize superclasses
         Classifier.__init__(self)
         _GradientBoostingBase.__init__(
             self,
-            number_of_trees=number_of_trees,
+            tree_count=tree_count,
             learning_rate=learning_rate,
         )
 
@@ -60,7 +60,7 @@ class GradientBoostingClassifier(Classifier, _GradientBoostingBase):
 
     def _clone(self) -> GradientBoostingClassifier:
         return GradientBoostingClassifier(
-            number_of_trees=self._number_of_trees,
+            tree_count=self._tree_count,
             learning_rate=self._learning_rate,
         )
 
@@ -68,6 +68,6 @@ class GradientBoostingClassifier(Classifier, _GradientBoostingBase):
         from sklearn.ensemble import GradientBoostingClassifier as SklearnGradientBoostingClassifier
 
         return SklearnGradientBoostingClassifier(
-            n_estimators=self._number_of_trees,
+            n_estimators=self._tree_count,
             learning_rate=self._learning_rate,
         )

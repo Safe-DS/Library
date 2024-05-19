@@ -332,7 +332,7 @@
 #         assert row.column_names == expected
 #
 #
-# class TestNumberOfColumns:
+# class TestColumnCount:
 #     @pytest.mark.parametrize(
 #         ("row", "expected"),
 #         [
@@ -345,7 +345,7 @@
 #         ],
 #     )
 #     def test_should_return_the_number_of_columns(self, row: Row, expected: int) -> None:
-#         assert row.number_of_columns == expected
+#         assert row.column_count == expected
 #
 #
 # class TestGetValue:

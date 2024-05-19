@@ -17,17 +17,17 @@ class DecisionTreeRegressor(Regressor, _DecisionTreeBase):
 
     Parameters
     ----------
-    maximum_depth:
+    max_depth:
         The maximum depth of each tree. If None, the depth is not limited. Has to be greater than 0.
-    minimum_number_of_samples_in_leaves:
+    min_sample_count_in_leaves:
         The minimum number of samples that must remain in the leaves of each tree. Has to be greater than 0.
 
     Raises
     ------
     OutOfBoundsError
-        If `maximum_depth` is less than 1.
+        If `max_depth` is less than 1.
     OutOfBoundsError
-        If `minimum_number_of_samples_in_leaves` is less than 1.
+        If `min_sample_count_in_leaves` is less than 1.
     """
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -37,15 +37,15 @@ class DecisionTreeRegressor(Regressor, _DecisionTreeBase):
     def __init__(
         self,
         *,
-        maximum_depth: int | None = None,
-        minimum_number_of_samples_in_leaves: int = 5,
+        max_depth: int | None = None,
+        min_sample_count_in_leaves: int = 5,
     ) -> None:
         # Initialize superclasses
         Regressor.__init__(self)
         _DecisionTreeBase.__init__(
             self,
-            maximum_depth=maximum_depth,
-            minimum_number_of_samples_in_leaves=minimum_number_of_samples_in_leaves,
+            max_depth=max_depth,
+            min_sample_count_in_leaves=min_sample_count_in_leaves,
         )
 
     def __hash__(self) -> int:
@@ -60,14 +60,14 @@ class DecisionTreeRegressor(Regressor, _DecisionTreeBase):
 
     def _clone(self) -> DecisionTreeRegressor:
         return DecisionTreeRegressor(
-            maximum_depth=self._maximum_depth,
-            minimum_number_of_samples_in_leaves=self._minimum_number_of_samples_in_leaves,
+            max_depth=self._max_depth,
+            min_sample_count_in_leaves=self._min_sample_count_in_leaves,
         )
 
     def _get_sklearn_model(self) -> RegressorMixin:
         from sklearn.tree import DecisionTreeRegressor as SklearnDecisionTreeRegressor
 
         return SklearnDecisionTreeRegressor(
-            max_depth=self._maximum_depth,
-            min_samples_leaf=self._minimum_number_of_samples_in_leaves,
+            max_depth=self._max_depth,
+            min_samples_leaf=self._min_sample_count_in_leaves,
         )
