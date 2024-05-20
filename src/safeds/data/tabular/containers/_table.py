@@ -161,7 +161,7 @@ class Table:
 
         path = _normalize_and_check_file_path(path, ".csv", [".csv"], check_if_file_exists=True)
 
-        return Table._from_polars_lazy_frame(pl.scan_csv(path, separator=separator))
+        return Table._from_polars_lazy_frame(pl.scan_csv(path, separator=separator, raise_if_empty=False))
 
     @staticmethod
     def from_dict(data: dict[str, list[Any]]) -> Table:
