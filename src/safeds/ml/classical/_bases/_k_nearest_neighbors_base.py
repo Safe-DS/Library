@@ -14,17 +14,17 @@ class _KNearestNeighborsBase(ABC):
     @abstractmethod
     def __init__(
         self,
-        number_of_neighbors: int,
+        neighbor_count: int,
     ) -> None:
         # Validation
-        _check_bounds("number_of_neighbors", number_of_neighbors, lower_bound=_ClosedBound(1))
+        _check_bounds("neighbor_count", neighbor_count, lower_bound=_ClosedBound(1))
 
         # Hyperparameters
-        self._number_of_neighbors = number_of_neighbors
+        self._neighbor_count = neighbor_count
 
     def __hash__(self) -> int:
         return _structural_hash(
-            self._number_of_neighbors,
+            self._neighbor_count,
         )
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -32,6 +32,6 @@ class _KNearestNeighborsBase(ABC):
     # ------------------------------------------------------------------------------------------------------------------
 
     @property
-    def number_of_neighbors(self) -> int:
+    def neighbor_count(self) -> int:
         """The number of neighbors used for interpolation."""
-        return self._number_of_neighbors
+        return self._neighbor_count

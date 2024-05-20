@@ -14,29 +14,29 @@ class _RandomForestBase(ABC):
     @abstractmethod
     def __init__(
         self,
-        number_of_trees: int,
-        maximum_depth: int | None,
-        minimum_number_of_samples_in_leaves: int,
+        tree_count: int,
+        max_depth: int | None,
+        min_sample_count_in_leaves: int,
     ) -> None:
         # Validation
-        _check_bounds("number_of_trees", number_of_trees, lower_bound=_ClosedBound(1))
-        _check_bounds("maximum_depth", maximum_depth, lower_bound=_ClosedBound(1))
+        _check_bounds("tree_count", tree_count, lower_bound=_ClosedBound(1))
+        _check_bounds("max_depth", max_depth, lower_bound=_ClosedBound(1))
         _check_bounds(
-            "minimum_number_of_samples_in_leaves",
-            minimum_number_of_samples_in_leaves,
+            "min_sample_count_in_leaves",
+            min_sample_count_in_leaves,
             lower_bound=_ClosedBound(1),
         )
 
         # Hyperparameters
-        self._number_of_trees: int = number_of_trees
-        self._maximum_depth: int | None = maximum_depth
-        self._minimum_number_of_samples_in_leaves: int = minimum_number_of_samples_in_leaves
+        self._tree_count: int = tree_count
+        self._max_depth: int | None = max_depth
+        self._min_sample_count_in_leaves: int = min_sample_count_in_leaves
 
     def __hash__(self) -> int:
         return _structural_hash(
-            self._number_of_trees,
-            self._maximum_depth,
-            self._minimum_number_of_samples_in_leaves,
+            self._tree_count,
+            self._max_depth,
+            self._min_sample_count_in_leaves,
         )
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -44,16 +44,16 @@ class _RandomForestBase(ABC):
     # ------------------------------------------------------------------------------------------------------------------
 
     @property
-    def number_of_trees(self) -> int:
+    def tree_count(self) -> int:
         """The number of trees used in the random forest."""
-        return self._number_of_trees
+        return self._tree_count
 
     @property
-    def maximum_depth(self) -> int | None:
+    def max_depth(self) -> int | None:
         """The maximum depth of each tree."""
-        return self._maximum_depth
+        return self._max_depth
 
     @property
-    def minimum_number_of_samples_in_leaves(self) -> int:
+    def min_sample_count_in_leaves(self) -> int:
         """The minimum number of samples that must remain in the leaves of each tree."""
-        return self._minimum_number_of_samples_in_leaves
+        return self._min_sample_count_in_leaves

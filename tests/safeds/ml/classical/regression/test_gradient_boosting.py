@@ -11,20 +11,20 @@ def training_set() -> TabularDataset:
     return table.to_tabular_dataset(target_name="col1")
 
 
-class TestNumberOfTrees:
+class TestTreeCount:
     def test_should_be_passed_to_fitted_model(self, training_set: TabularDataset) -> None:
-        fitted_model = GradientBoostingRegressor(number_of_trees=2).fit(training_set)
-        assert fitted_model.number_of_trees == 2
+        fitted_model = GradientBoostingRegressor(tree_count=2).fit(training_set)
+        assert fitted_model.tree_count == 2
 
     def test_should_be_passed_to_sklearn(self, training_set: TabularDataset) -> None:
-        fitted_model = GradientBoostingRegressor(number_of_trees=2).fit(training_set)
+        fitted_model = GradientBoostingRegressor(tree_count=2).fit(training_set)
         assert fitted_model._wrapped_model is not None
         assert fitted_model._wrapped_model.n_estimators == 2
 
-    @pytest.mark.parametrize("number_of_trees", [-1, 0], ids=["minus_one", "zero"])
-    def test_should_raise_if_less_than_1(self, number_of_trees: int) -> None:
+    @pytest.mark.parametrize("tree_count", [-1, 0], ids=["minus_one", "zero"])
+    def test_should_raise_if_less_than_1(self, tree_count: int) -> None:
         with pytest.raises(OutOfBoundsError):
-            GradientBoostingRegressor(number_of_trees=number_of_trees)
+            GradientBoostingRegressor(tree_count=tree_count)
 
 
 class TestLearningRate:

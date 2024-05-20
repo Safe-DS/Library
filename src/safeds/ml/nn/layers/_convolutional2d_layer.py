@@ -6,12 +6,13 @@ from typing import TYPE_CHECKING, Any, Literal
 
 from safeds._config import _init_default_device
 from safeds._utils import _structural_hash
-from safeds.data.image.typing import ImageSize
 
 from ._layer import Layer
 
 if TYPE_CHECKING:
     from torch import Tensor, nn
+
+    from safeds.ml.nn.typing import ModelImageSize
 
 
 def _create_internal_model(
@@ -82,27 +83,28 @@ def _create_internal_model(
 
 
 class Convolutional2DLayer(Layer):
-    def __init__(self, output_channel: int, kernel_size: int, *, stride: int = 1, padding: int = 0):
-        """
-        Create a Convolutional 2D Layer.
+    """
+    A convolutional 2D Layer.
 
-        Parameters
-        ----------
-        output_channel:
-            the amount of output channels
-        kernel_size:
-            the size of the kernel
-        stride:
-            the stride of the convolution
-        padding:
-            the padding of the convolution
-        """
+    Parameters
+    ----------
+    output_channel:
+        the amount of output channels
+    kernel_size:
+        the size of the kernel
+    stride:
+        the stride of the convolution
+    padding:
+        the padding of the convolution
+    """
+
+    def __init__(self, output_channel: int, kernel_size: int, *, stride: int = 1, padding: int = 0):
         self._output_channel = output_channel
         self._kernel_size = kernel_size
         self._stride = stride
         self._padding = padding
-        self._input_size: ImageSize | None = None
-        self._output_size: ImageSize | None = None
+        self._input_size: ModelImageSize | None = None
+        self._output_size: ModelImageSize | None = None
 
     def _get_internal_layer(self, **kwargs: Any) -> nn.Module:
         if self._input_size is None:
@@ -130,7 +132,7 @@ class Convolutional2DLayer(Layer):
         )
 
     @property
-    def input_size(self) -> ImageSize:
+    def input_size(self) -> ModelImageSize:
         """
         Get the input_size of this layer.
 
@@ -149,7 +151,7 @@ class Convolutional2DLayer(Layer):
         return self._input_size
 
     @property
-    def output_size(self) -> ImageSize:
+    def output_size(self) -> ModelImageSize:
         """
         Get the output_size of this layer.
 
@@ -174,10 +176,15 @@ class Convolutional2DLayer(Layer):
             new_height = math.ceil(
                 (self._input_size.height + self._padding * 2 - self._kernel_size + 1) / (1.0 * self._stride),
             )
-            self._output_size = ImageSize(new_width, new_height, self._output_channel, _ignore_invalid_channel=True)
+            self._output_size = self._input_size.__class__(
+                new_width,
+                new_height,
+                self._output_channel,
+                _ignore_invalid_channel=True,
+            )
         return self._output_size
 
-    def _set_input_size(self, input_size: int | ImageSize) -> None:
+    def _set_input_size(self, input_size: int | ModelImageSize) -> None:
         if isinstance(input_size, int):
             raise TypeError("The input_size of a convolution layer has to be of type ImageSize.")
         self._input_size = input_size
@@ -246,6 +253,23 @@ class Convolutional2DLayer(Layer):
 
 
 class ConvolutionalTranspose2DLayer(Convolutional2DLayer):
+    """
+    A convolutional transpose 2D Layer.
+
+    Parameters
+    ----------
+    output_channel:
+        the amount of output channels
+    kernel_size:
+        the size of the kernel
+    stride:
+        the stride of the transposed convolution
+    padding:
+        the padding of the transposed convolution
+    output_padding:
+        the output padding of the transposed convolution
+    """
+
     def __init__(
         self,
         output_channel: int,
@@ -255,22 +279,6 @@ class ConvolutionalTranspose2DLayer(Convolutional2DLayer):
         padding: int = 0,
         output_padding: int = 0,
     ):
-        """
-        Create a Convolutional Transpose 2D Layer.
-
-        Parameters
-        ----------
-        output_channel:
-            the amount of output channels
-        kernel_size:
-            the size of the kernel
-        stride:
-            the stride of the transposed convolution
-        padding:
-            the padding of the transposed convolution
-        output_padding:
-            the output padding of the transposed convolution
-        """
         super().__init__(output_channel, kernel_size, stride=stride, padding=padding)
         self._output_padding = output_padding
 
@@ -301,7 +309,7 @@ class ConvolutionalTranspose2DLayer(Convolutional2DLayer):
         )
 
     @property
-    def output_size(self) -> ImageSize:
+    def output_size(self) -> ModelImageSize:
         if self._input_size is None:
             raise ValueError(
                 "The input_size is not yet set. The layer cannot compute the output_size if the input_size is not set.",
@@ -319,7 +327,12 @@ class ConvolutionalTranspose2DLayer(Convolutional2DLayer):
                 + self._kernel_size
                 + self._output_padding
             )
-            self._output_size = ImageSize(new_width, new_height, self._output_channel, _ignore_invalid_channel=True)
+            self._output_size = self._input_size.__class__(
+                new_width,
+                new_height,
+                self._output_channel,
+                _ignore_invalid_channel=True,
+            )
         return self._output_size
 
     def __hash__(self) -> int:

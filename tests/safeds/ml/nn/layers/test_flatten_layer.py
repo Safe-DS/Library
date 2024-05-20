@@ -4,6 +4,7 @@ import pytest
 from safeds.data.image.typing import ImageSize
 from safeds.data.tabular.containers import Table
 from safeds.ml.nn.layers import FlattenLayer
+from safeds.ml.nn.typing import VariableImageSize
 from torch import nn
 
 
@@ -30,6 +31,11 @@ class TestFlattenLayer:
         layer = FlattenLayer()
         with pytest.raises(TypeError, match=r"The input_size of a flatten layer has to be of type ImageSize."):
             layer._set_input_size(1)
+
+    def test_should_raise_if_input_size_is_set_with_variable_image_size(self) -> None:
+        layer = FlattenLayer()
+        with pytest.raises(TypeError, match=r"The input_size of a flatten layer has to be a ConstantImageSize."):
+            layer._set_input_size(VariableImageSize(1, 2, 3))
 
     class TestEq:
         def test_should_be_equal(self) -> None:

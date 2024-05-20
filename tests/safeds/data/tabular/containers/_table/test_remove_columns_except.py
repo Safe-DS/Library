@@ -45,7 +45,7 @@ def test_should_remove_all_except_listed_columns(table: Table, column_names: lis
     assert transformed_table.schema == expected.schema
     assert transformed_table == expected
     if len(column_names) == 0:
-        assert expected.number_of_rows == 0
+        assert expected.row_count == 0
 
 
 @pytest.mark.parametrize("table", [Table({"A": [1], "B": [2]}), Table()], ids=["table", "empty"])

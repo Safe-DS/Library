@@ -1,6 +1,6 @@
 import pytest
 from safeds.data.tabular.containers import Column
-from safeds.exceptions import NonNumericColumnError
+from safeds.exceptions import ColumnTypeError
 
 
 @pytest.mark.parametrize(
@@ -34,5 +34,5 @@ def test_should_return_standard_deviation(values: list, expected: int) -> None:
 )
 def test_should_raise_if_column_is_not_numeric(values: list) -> None:
     column = Column("A", values)
-    with pytest.raises(NonNumericColumnError):
+    with pytest.raises(ColumnTypeError):
         column.standard_deviation()

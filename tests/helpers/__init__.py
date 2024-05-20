@@ -1,4 +1,5 @@
 from ._assertions import (
+    assert_cell_operation_works,
     assert_tables_equal,
     assert_that_tabular_datasets_are_equal,
 )
@@ -36,6 +37,7 @@ from ._operating_systems import os_linux, os_mac, os_windows, skip_if_os
 from ._resources import resolve_resource_path
 
 __all__ = [
+    "assert_cell_operation_works",
     "assert_tables_equal",
     "assert_that_tabular_datasets_are_equal",
     "configure_test_with_device",

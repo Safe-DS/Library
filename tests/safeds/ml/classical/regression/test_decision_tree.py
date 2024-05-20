@@ -11,33 +11,33 @@ def training_set() -> TabularDataset:
     return table.to_tabular_dataset(target_name="col1")
 
 
-class TestMaximumDepth:
+class TestMaxDepth:
     def test_should_be_passed_to_fitted_model(self, training_set: TabularDataset) -> None:
-        fitted_model = DecisionTreeRegressor(maximum_depth=2).fit(training_set)
-        assert fitted_model.maximum_depth == 2
+        fitted_model = DecisionTreeRegressor(max_depth=2).fit(training_set)
+        assert fitted_model.max_depth == 2
 
     def test_should_be_passed_to_sklearn(self, training_set: TabularDataset) -> None:
-        fitted_model = DecisionTreeRegressor(maximum_depth=2).fit(training_set)
+        fitted_model = DecisionTreeRegressor(max_depth=2).fit(training_set)
         assert fitted_model._wrapped_model is not None
         assert fitted_model._wrapped_model.max_depth == 2
 
-    @pytest.mark.parametrize("maximum_depth", [-1, 0], ids=["minus_one", "zero"])
-    def test_should_raise_if_less_than_or_equal_to_0(self, maximum_depth: int) -> None:
+    @pytest.mark.parametrize("max_depth", [-1, 0], ids=["minus_one", "zero"])
+    def test_should_raise_if_less_than_or_equal_to_0(self, max_depth: int) -> None:
         with pytest.raises(OutOfBoundsError):
-            DecisionTreeRegressor(maximum_depth=maximum_depth)
+            DecisionTreeRegressor(max_depth=max_depth)
 
 
-class TestMinimumNumberOfSamplesInLeaves:
+class TestMinSampleCountInLeaves:
     def test_should_be_passed_to_fitted_model(self, training_set: TabularDataset) -> None:
-        fitted_model = DecisionTreeRegressor(minimum_number_of_samples_in_leaves=2).fit(training_set)
-        assert fitted_model.minimum_number_of_samples_in_leaves == 2
+        fitted_model = DecisionTreeRegressor(min_sample_count_in_leaves=2).fit(training_set)
+        assert fitted_model.min_sample_count_in_leaves == 2
 
     def test_should_be_passed_to_sklearn(self, training_set: TabularDataset) -> None:
-        fitted_model = DecisionTreeRegressor(minimum_number_of_samples_in_leaves=2).fit(training_set)
+        fitted_model = DecisionTreeRegressor(min_sample_count_in_leaves=2).fit(training_set)
         assert fitted_model._wrapped_model is not None
         assert fitted_model._wrapped_model.min_samples_leaf == 2
 
-    @pytest.mark.parametrize("minimum_number_of_samples_in_leaves", [-1, 0], ids=["minus_one", "zero"])
-    def test_should_raise_if_less_than_or_equal_to_0(self, minimum_number_of_samples_in_leaves: int) -> None:
+    @pytest.mark.parametrize("min_sample_count_in_leaves", [-1, 0], ids=["minus_one", "zero"])
+    def test_should_raise_if_less_than_or_equal_to_0(self, min_sample_count_in_leaves: int) -> None:
         with pytest.raises(OutOfBoundsError):
-            DecisionTreeRegressor(minimum_number_of_samples_in_leaves=minimum_number_of_samples_in_leaves)
+            DecisionTreeRegressor(min_sample_count_in_leaves=min_sample_count_in_leaves)

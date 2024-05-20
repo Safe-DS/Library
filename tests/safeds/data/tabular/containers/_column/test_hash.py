@@ -18,33 +18,22 @@ def test_should_be_deterministic(column: Column, expected: int) -> None:
 
 
 @pytest.mark.parametrize(
-    ("column1", "column2"),
+    ("column1", "column2", "expected"),
     [
-        (Column("a"), Column("a")),
-        (Column("a", [1, 2, 3]), Column("a", [1, 2, 3])),
-    ],
-    ids=[
-        "empty",
-        "non-empty",
-    ],
-)
-def test_should_return_same_hash_for_equal_columns(column1: Column, column2: Column) -> None:
-    assert hash(column1) == hash(column2)
-
-
-@pytest.mark.parametrize(
-    ("column1", "column2"),
-    [
-        (Column("a"), Column("b")),
-        (Column("a", [1, 2, 3]), Column("a", [1, 2])),
-        (Column("a", [1, 2, 3]), Column("a", ["1", "2", "3"])),
+        (Column("a"), Column("a"), True),
+        (Column("a", [1, 2, 3]), Column("a", [1, 2, 3]), True),
+        (Column("a"), Column("b"), False),
+        (Column("a", [1, 2, 3]), Column("a", [1, 2]), False),
+        (Column("a", [1, 2, 3]), Column("a", ["1", "2", "3"]), False),
         # We don't use the column values in the hash calculation
     ],
     ids=[
+        "equal empty",
+        "equal non-empty",
         "different names",
         "different lengths",
         "different types",
     ],
 )
-def test_should_ideally_return_different_hash_for_unequal_columns(column1: Column, column2: Column) -> None:
-    assert hash(column1) != hash(column2)
+def test_should_be_good_hash(column1: Column, column2: Column, expected: bool) -> None:
+    assert (hash(column1) == hash(column2)) == expected

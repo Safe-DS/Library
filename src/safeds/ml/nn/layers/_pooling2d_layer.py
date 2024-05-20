@@ -6,62 +6,44 @@ from typing import TYPE_CHECKING, Any, Literal
 
 from safeds._config import _init_default_device
 from safeds._utils import _structural_hash
-from safeds.data.image.typing import ImageSize
 
 from ._layer import Layer
 
 if TYPE_CHECKING:
     from torch import Tensor, nn
 
-
-def _create_internal_model(strategy: Literal["max", "avg"], kernel_size: int, padding: int, stride: int) -> nn.Module:
-    from torch import nn
-
-    _init_default_device()
-
-    class _InternalLayer(nn.Module):
-        def __init__(self, strategy: Literal["max", "avg"], kernel_size: int, padding: int, stride: int):
-            super().__init__()
-            match strategy:
-                case "max":
-                    self._layer = nn.MaxPool2d(kernel_size=kernel_size, padding=padding, stride=stride)
-                case "avg":
-                    self._layer = nn.AvgPool2d(kernel_size=kernel_size, padding=padding, stride=stride)
-
-        def forward(self, x: Tensor) -> Tensor:
-            return self._layer(x)
-
-    return _InternalLayer(strategy, kernel_size, padding, stride)
+    from safeds.ml.nn.typing import ModelImageSize
 
 
 class _Pooling2DLayer(Layer):
-    def __init__(self, strategy: Literal["max", "avg"], kernel_size: int, *, stride: int = -1, padding: int = 0):
-        """
-        Create a Pooling 2D Layer.
+    """
+    A pooling 2D Layer.
 
-        Parameters
-        ----------
-        strategy:
-            the strategy of the pooling
-        kernel_size:
-            the size of the kernel
-        stride:
-            the stride of the pooling
-        padding:
-            the padding of the pooling
-        """
+    Parameters
+    ----------
+    strategy:
+        the strategy of the pooling
+    kernel_size:
+        the size of the kernel
+    stride:
+        the stride of the pooling
+    padding:
+        the padding of the pooling
+    """
+
+    def __init__(self, strategy: Literal["max", "avg"], kernel_size: int, *, stride: int = -1, padding: int = 0):
         self._strategy = strategy
         self._kernel_size = kernel_size
         self._stride = stride if stride != -1 else kernel_size
         self._padding = padding
-        self._input_size: ImageSize | None = None
-        self._output_size: ImageSize | None = None
+        self._input_size: ModelImageSize | None = None
+        self._output_size: ModelImageSize | None = None
 
     def _get_internal_layer(self, **kwargs: Any) -> nn.Module:  # noqa: ARG002
         return _create_internal_model(self._strategy, self._kernel_size, self._padding, self._stride)
 
     @property
-    def input_size(self) -> ImageSize:
+    def input_size(self) -> ModelImageSize:
         """
         Get the input_size of this layer.
 
@@ -80,7 +62,7 @@ class _Pooling2DLayer(Layer):
         return self._input_size
 
     @property
-    def output_size(self) -> ImageSize:
+    def output_size(self) -> ModelImageSize:
         """
         Get the output_size of this layer.
 
@@ -105,10 +87,15 @@ class _Pooling2DLayer(Layer):
             new_height = math.ceil(
                 (self.input_size.height + self._padding * 2 - self._kernel_size + 1) / (1.0 * self._stride),
             )
-            self._output_size = ImageSize(new_width, new_height, self._input_size.channel, _ignore_invalid_channel=True)
+            self._output_size = self._input_size.__class__(
+                new_width,
+                new_height,
+                self._input_size.channel,
+                _ignore_invalid_channel=True,
+            )
         return self._output_size
 
-    def _set_input_size(self, input_size: int | ImageSize) -> None:
+    def _set_input_size(self, input_size: int | ModelImageSize) -> None:
         if isinstance(input_size, int):
             raise TypeError("The input_size of a pooling layer has to be of type ImageSize.")
         self._input_size = input_size
@@ -177,34 +164,56 @@ class _Pooling2DLayer(Layer):
 
 
 class MaxPooling2DLayer(_Pooling2DLayer):
-    def __init__(self, kernel_size: int, *, stride: int = -1, padding: int = 0) -> None:
-        """
-        Create a maximum Pooling 2D Layer.
+    """
+    A maximum Pooling 2D Layer.
 
-        Parameters
-        ----------
-        kernel_size:
-            the size of the kernel
-        stride:
-            the stride of the pooling
-        padding:
-            the padding of the pooling
-        """
+    Parameters
+    ----------
+    kernel_size:
+        the size of the kernel
+    stride:
+        the stride of the pooling
+    padding:
+        the padding of the pooling
+    """
+
+    def __init__(self, kernel_size: int, *, stride: int = -1, padding: int = 0) -> None:
         super().__init__("max", kernel_size, stride=stride, padding=padding)
 
 
 class AveragePooling2DLayer(_Pooling2DLayer):
-    def __init__(self, kernel_size: int, *, stride: int = -1, padding: int = 0) -> None:
-        """
-        Create a average Pooling 2D Layer.
+    """
+    An average pooling 2D Layer.
 
-        Parameters
-        ----------
-        kernel_size:
-            the size of the kernel
-        stride:
-            the stride of the pooling
-        padding:
-            the padding of the pooling
-        """
+    Parameters
+    ----------
+    kernel_size:
+        the size of the kernel
+    stride:
+        the stride of the pooling
+    padding:
+        the padding of the pooling
+    """
+
+    def __init__(self, kernel_size: int, *, stride: int = -1, padding: int = 0) -> None:
         super().__init__("avg", kernel_size, stride=stride, padding=padding)
+
+
+def _create_internal_model(strategy: Literal["max", "avg"], kernel_size: int, padding: int, stride: int) -> nn.Module:
+    from torch import nn
+
+    _init_default_device()
+
+    class _InternalLayer(nn.Module):
+        def __init__(self, strategy: Literal["max", "avg"], kernel_size: int, padding: int, stride: int):
+            super().__init__()
+            match strategy:
+                case "max":
+                    self._layer = nn.MaxPool2d(kernel_size=kernel_size, padding=padding, stride=stride)
+                case "avg":
+                    self._layer = nn.AvgPool2d(kernel_size=kernel_size, padding=padding, stride=stride)
+
+        def forward(self, x: Tensor) -> Tensor:
+            return self._layer(x)
+
+    return _InternalLayer(strategy, kernel_size, padding, stride)

@@ -17,21 +17,21 @@ class RandomForestClassifier(Classifier, _RandomForestBase):
 
     Parameters
     ----------
-    number_of_trees:
+    tree_count:
         The number of trees to be used in the random forest. Has to be greater than 0.
-    maximum_depth:
+    max_depth:
         The maximum depth of each tree. If None, the depth is not limited. Has to be greater than 0.
-    minimum_number_of_samples_in_leaves:
+    min_sample_count_in_leaves:
         The minimum number of samples that must remain in the leaves of each tree. Has to be greater than 0.
 
     Raises
     ------
     OutOfBoundsError
-        If `number_of_trees` is less than 1.
+        If `tree_count` is less than 1.
     OutOfBoundsError
-        If `maximum_depth` is less than 1.
+        If `max_depth` is less than 1.
     OutOfBoundsError
-        If `minimum_number_of_samples_in_leaves` is less than 1.
+        If `min_sample_count_in_leaves` is less than 1.
     """
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -41,17 +41,17 @@ class RandomForestClassifier(Classifier, _RandomForestBase):
     def __init__(
         self,
         *,
-        number_of_trees: int = 100,
-        maximum_depth: int | None = None,
-        minimum_number_of_samples_in_leaves: int = 1,
+        tree_count: int = 100,
+        max_depth: int | None = None,
+        min_sample_count_in_leaves: int = 1,
     ) -> None:
         # Initialize superclasses
         Classifier.__init__(self)
         _RandomForestBase.__init__(
             self,
-            number_of_trees=number_of_trees,
-            maximum_depth=maximum_depth,
-            minimum_number_of_samples_in_leaves=minimum_number_of_samples_in_leaves,
+            tree_count=tree_count,
+            max_depth=max_depth,
+            min_sample_count_in_leaves=min_sample_count_in_leaves,
         )
 
     def __hash__(self) -> int:
@@ -66,18 +66,18 @@ class RandomForestClassifier(Classifier, _RandomForestBase):
 
     def _clone(self) -> RandomForestClassifier:
         return RandomForestClassifier(
-            number_of_trees=self._number_of_trees,
-            maximum_depth=self._maximum_depth,
-            minimum_number_of_samples_in_leaves=self._minimum_number_of_samples_in_leaves,
+            tree_count=self._tree_count,
+            max_depth=self._max_depth,
+            min_sample_count_in_leaves=self._min_sample_count_in_leaves,
         )
 
     def _get_sklearn_model(self) -> ClassifierMixin:
         from sklearn.ensemble import RandomForestClassifier as SklearnRandomForestClassifier
 
         return SklearnRandomForestClassifier(
-            n_estimators=self._number_of_trees,
-            max_depth=self._maximum_depth,
-            min_samples_leaf=self._minimum_number_of_samples_in_leaves,
+            n_estimators=self._tree_count,
+            max_depth=self._max_depth,
+            min_samples_leaf=self._min_sample_count_in_leaves,
             random_state=_get_random_seed(),
             n_jobs=-1,
         )

@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING
 
 from safeds._utils import _figure_to_image
 from safeds._validation import _check_columns_exist
+from safeds._validation._check_columns_are_numeric import _check_columns_are_numeric
 from safeds.exceptions import NonNumericColumnError
 
 if TYPE_CHECKING:
@@ -56,9 +57,9 @@ class TablePlotter:
         import seaborn as sns
 
         numerical_table = self._table.remove_non_numeric_columns()
-        if numerical_table.number_of_columns == 0:
+        if numerical_table.column_count == 0:
             raise NonNumericColumnError("This table contains only non-numerical columns.")
-        col_wrap = min(numerical_table.number_of_columns, 3)
+        col_wrap = min(numerical_table.column_count, 3)
 
         data = numerical_table._lazy_frame.melt(value_vars=numerical_table.column_names).collect()
         grid = sns.FacetGrid(data, col="variable", col_wrap=col_wrap, sharex=False, sharey=False)
@@ -100,7 +101,7 @@ class TablePlotter:
 
         only_numerical = self._table.remove_non_numeric_columns()._data_frame.fill_null(0)
 
-        if self._table.number_of_rows == 0:
+        if self._table.row_count == 0:
             warnings.warn(
                 "An empty table has been used. A correlation heatmap on an empty table will show nothing.",
                 stacklevel=2,
@@ -127,13 +128,13 @@ class TablePlotter:
 
         return _figure_to_image(fig)
 
-    def histograms(self, *, maximum_number_of_bins: int = 10) -> Image:
+    def histograms(self, *, max_bin_count: int = 10) -> Image:
         """
         Plot a histogram for every column.
 
         Parameters
         ----------
-        maximum_number_of_bins:
+        max_bin_count:
             The maximum number of bins to use in the histogram. Default is 10.
 
         Returns
@@ -150,8 +151,8 @@ class TablePlotter:
         import matplotlib.pyplot as plt
         import polars as pl
 
-        n_cols = min(3, self._table.number_of_columns)
-        n_rows = 1 + (self._table.number_of_columns - 1) // n_cols
+        n_cols = min(3, self._table.column_count)
+        n_rows = 1 + (self._table.column_count - 1) // n_cols
 
         if n_cols == 1 and n_rows == 1:
             fig, axs = plt.subplots(1, 1, tight_layout=True)
@@ -169,27 +170,22 @@ class TablePlotter:
             ax.set_xlabel("")
             ax.set_ylabel("")
 
-            if column.is_numeric and len(distinct_values) > maximum_number_of_bins:
+            if column.is_numeric and len(distinct_values) > max_bin_count:
                 min_val = (column.min() or 0) - 1e-6  # Otherwise the minimum value is not included in the first bin
                 max_val = column.max() or 0
-                bin_count = min(maximum_number_of_bins, len(distinct_values))
+                bin_count = min(max_bin_count, len(distinct_values))
                 bins = [
                     *(pl.Series(range(bin_count + 1)) / bin_count * (max_val - min_val) + min_val),
                 ]
 
                 bars = [f"{round((bins[i] + bins[i + 1]) / 2, 2)}" for i in range(len(bins) - 1)]
-                hist = (
-                    column._series.hist(bins=bins)
-                    .slice(1, length=maximum_number_of_bins)
-                    .get_column("count")
-                    .to_numpy()
-                )
+                hist = column._series.hist(bins=bins).slice(1, length=max_bin_count).get_column("count").to_numpy()
 
                 ax.bar(bars, hist, edgecolor="black")
                 ax.set_xticks(range(len(hist)), bars, rotation=45, horizontalalignment="right")
             else:
                 value_counts = (
-                    column._series.drop_nulls().value_counts().sort(column.name).slice(0, length=maximum_number_of_bins)
+                    column._series.drop_nulls().value_counts().sort(column.name).slice(0, length=max_bin_count)
                 )
                 distinct_values = value_counts.get_column(column.name).cast(pl.String).to_numpy()
                 hist = value_counts.get_column("count").to_numpy()
@@ -215,7 +211,7 @@ class TablePlotter:
             If the confidence interval is shown, per default True.
         Returns
         -------
-        line_plot:
+        plot:
             The plot as an image.
 
         Raises
@@ -236,9 +232,7 @@ class TablePlotter:
         ... )
         >>> image = table.plot.line_plot("a", "b")
         """
-        #y_name = y_names[0]
-        #y_names = y_names[1:]
-        #_check_columns_exist(self._table, y_name)
+        _check_columns_exist(self._table, [x_name, y_name])
 
         # TODO: pass list of columns names + extract validation
         _plot_validation(self._table, x_name, y_names)
@@ -302,7 +296,7 @@ class TablePlotter:
 
         Returns
         -------
-        scatter_plot:
+        plot:
             The plot as an image.
 
         Raises
@@ -324,6 +318,7 @@ class TablePlotter:
         >>> image = table.plot.scatter_plot("a", "b")
         """
         _check_columns_exist(self._table, [x_name, y_name])
+        _check_columns_are_numeric(self._table, [x_name, y_name])
 
         # TODO: pass list of columns names + extract validation
         _plot_validation(self._table, x_name, [y_name])
@@ -334,6 +329,9 @@ class TablePlotter:
         ax.scatter(
             x=self._table.get_column(x_name)._series,
             y=self._table.get_column(y_name)._series,
+            s=64,  # marker size
+            linewidth=1,
+            edgecolor="white",
         )
         ax.set(
             xlabel=x_name,

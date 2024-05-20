@@ -1,7 +1,6 @@
 from timeit import timeit
 
 import polars as pl
-
 from safeds.data.tabular.containers import Table
 
 from benchmarks.table.utils import create_synthetic_table
@@ -34,7 +33,7 @@ def _run_shuffle_rows() -> None:
 
 
 def _run_slice_rows() -> None:
-    table.slice_rows(length=table.number_of_rows // 2)._lazy_frame.collect()
+    table.slice_rows(length=table.row_count // 2)._lazy_frame.collect()
 
 
 def _run_sort_rows() -> None:
@@ -116,6 +115,6 @@ if __name__ == "__main__":
                 {
                     "method": list(timings.keys()),
                     "timing": list(timings.values()),
-                }
-            )
+                },
+            ),
         )
