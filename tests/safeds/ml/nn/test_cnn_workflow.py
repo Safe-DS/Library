@@ -91,13 +91,7 @@ class TestImageToTableClassifier:
             OutputConversionImageToTable(),
         )
         nn = nn_original.fit(image_dataset, epoch_size=2)
-        assert str(nn_original._model.state_dict().values()) != str(nn._model.state_dict().values())
-        assert not torch.all(
-            torch.eq(
-                nn_original._model.state_dict()["_pytorch_layers.3._layer.bias"],
-                nn._model.state_dict()["_pytorch_layers.3._layer.bias"],
-            ),
-        ).item()
+        assert nn_original._model is not nn._model
         prediction: ImageDataset = nn.predict(image_dataset.get_input())
         assert one_hot_encoder.inverse_transform(prediction.get_output()) == Table({"class": prediction_label})
         assert prediction._output._tensor.device == _get_device()
@@ -157,13 +151,7 @@ class TestImageToColumnClassifier:
             OutputConversionImageToColumn(),
         )
         nn = nn_original.fit(image_dataset, epoch_size=2)
-        assert str(nn_original._model.state_dict().values()) != str(nn._model.state_dict().values())
-        assert not torch.all(
-            torch.eq(
-                nn_original._model.state_dict()["_pytorch_layers.3._layer.bias"],
-                nn._model.state_dict()["_pytorch_layers.3._layer.bias"],
-            ),
-        ).item()
+        assert nn_original._model is not nn._model
         prediction: ImageDataset = nn.predict(image_dataset.get_input())
         assert prediction.get_output() == Column("class", prediction_label)
         assert prediction._output._tensor.device == _get_device()
@@ -205,13 +193,7 @@ class TestImageToImageRegressor:
             OutputConversionImageToImage(),
         )
         nn = nn_original.fit(image_dataset, epoch_size=20)
-        assert str(nn_original._model.state_dict().values()) != str(nn._model.state_dict().values())
-        assert not torch.all(
-            torch.eq(
-                nn_original._model.state_dict()["_pytorch_layers.3._layer.bias"],
-                nn._model.state_dict()["_pytorch_layers.3._layer.bias"],
-            ),
-        ).item()
+        assert nn_original._model is not nn._model
         prediction = nn.predict(image_dataset.get_input())
         assert isinstance(prediction.get_output(), ImageList)
         assert prediction._output._tensor.device == _get_device()
@@ -253,13 +235,7 @@ class TestImageToImageRegressor:
             OutputConversionImageToImage(),
         )
         nn = nn_original.fit(image_dataset, epoch_size=20)
-        assert str(nn_original._model.state_dict().values()) != str(nn._model.state_dict().values())
-        assert not torch.all(
-            torch.eq(
-                nn_original._model.state_dict()["_pytorch_layers.3._layer.bias"],
-                nn._model.state_dict()["_pytorch_layers.3._layer.bias"],
-            ),
-        ).item()
+        assert nn_original._model is not nn._model
         prediction = nn.predict(
             image_dataset.get_input().resize(
                 image_dataset.input_size.width * multi_width,

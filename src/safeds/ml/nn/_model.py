@@ -112,9 +112,10 @@ class NeuralNetworkRegressor(Generic[IFT, IPT, OT]):
                     raise InvalidModelStructureError("You cannot use a 2-dimensional layer with 1-dimensional data.")
 
         self._input_conversion: InputConversion[IFT, IPT] = input_conversion
-        self._model = _create_internal_model(input_conversion, layers, is_for_classification=False)
+        self._model: Module | None = None
+        self._layers: list[Layer] = layers
         self._output_conversion: OutputConversion[IPT, OT] = output_conversion
-        self._input_size = self._model.input_size
+        self._input_size: int | ModelImageSize | None = None
         self._batch_size = 1
         self._is_fitted = False
         self._total_number_of_batches_done = 0
@@ -226,12 +227,13 @@ class NeuralNetworkRegressor(Generic[IFT, IPT, OT]):
         _check_bounds("epoch_size", epoch_size, lower_bound=_ClosedBound(1))
         _check_bounds("batch_size", batch_size, lower_bound=_ClosedBound(1))
 
-        if self._input_conversion._data_size is not self._input_size:
-            raise InputSizeError(self._input_conversion._data_size, self._input_size)
-
         copied_model = copy.deepcopy(self)
-
+        copied_model._model = _create_internal_model(self._input_conversion, self._layers, is_for_classification=False)
+        copied_model._input_size = copied_model._model.input_size
         copied_model._batch_size = batch_size
+
+        if copied_model._input_conversion._data_size != copied_model._input_size:
+            raise InputSizeError(copied_model._input_conversion._data_size, copied_model._input_size)
 
         dataloader = copied_model._input_conversion._data_conversion_fit(train_data, copied_model._batch_size)
 
@@ -396,9 +398,10 @@ class NeuralNetworkClassifier(Generic[IFT, IPT, OT]):
                     raise InvalidModelStructureError("You cannot use a 2-dimensional layer with 1-dimensional data.")
 
         self._input_conversion: InputConversion[IFT, IPT] = input_conversion
-        self._model = _create_internal_model(input_conversion, layers, is_for_classification=True)
+        self._model: nn.Module | None = None
+        self._layers: list[Layer] = layers
         self._output_conversion: OutputConversion[IPT, OT] = output_conversion
-        self._input_size: int | ModelImageSize = self._model.input_size
+        self._input_size: int | ModelImageSize | None = None
         self._batch_size = 1
         self._is_fitted = False
         self._num_of_classes = (
@@ -529,12 +532,13 @@ class NeuralNetworkClassifier(Generic[IFT, IPT, OT]):
         _check_bounds("epoch_size", epoch_size, lower_bound=_ClosedBound(1))
         _check_bounds("batch_size", batch_size, lower_bound=_ClosedBound(1))
 
-        if self._input_conversion._data_size is not self._input_size:
-            raise InputSizeError(self._input_conversion._data_size, self._input_size)
-
         copied_model = copy.deepcopy(self)
-
+        copied_model._model = _create_internal_model(self._input_conversion, self._layers, is_for_classification=True)
         copied_model._batch_size = batch_size
+        copied_model._input_size = copied_model._model.input_size
+
+        if copied_model._input_conversion._data_size != copied_model._input_size:
+            raise InputSizeError(copied_model._input_conversion._data_size, copied_model._input_size)
 
         dataloader = copied_model._input_conversion._data_conversion_fit(
             train_data,
@@ -680,4 +684,7 @@ def _create_internal_model(
                 x = layer(x)
             return x
 
+    # Use torch.compile once the following issues are resolved:
+    # - https://github.com/pytorch/pytorch/issues/120233 (Python 3.12 support)
+    # - https://github.com/triton-lang/triton/issues/1640 (Windows support)
     return _InternalModel(layers, is_for_classification)

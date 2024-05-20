@@ -45,7 +45,7 @@ class TestClassificationModel:
     @pytest.mark.parametrize(
         "input_size",
         [
-            1,
+            None,
         ],
     )
     def test_should_return_input_size(self, input_size: int, device: Device) -> None:
@@ -529,7 +529,7 @@ class TestRegressionModel:
     @pytest.mark.parametrize(
         "input_size",
         [
-            1,
+            None,
         ],
     )
     def test_should_return_input_size(self, input_size: int, device: Device) -> None:
