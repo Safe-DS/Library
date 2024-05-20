@@ -565,7 +565,7 @@ class Column(Sequence[T_co]):
         """
         Return a new column with a new name.
 
-        The original column is not modified.
+        **Note:** The original column is not modified.
 
         Parameters
         ----------
@@ -601,7 +601,7 @@ class Column(Sequence[T_co]):
         """
         Return a new column with values transformed by the transformer.
 
-        The original column is not modified.
+        **Note:** The original column is not modified.
 
         Parameters
         ----------
