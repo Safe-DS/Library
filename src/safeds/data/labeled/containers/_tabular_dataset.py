@@ -37,7 +37,7 @@ class TabularDataset(Dataset):
     data:
         The data.
     target_name:
-        Name of the target column.
+        The name of the target column.
     extra_names:
         Names of the columns that are neither features nor target. If None, no extra columns are used, i.e. all but
         the target column are used as features.
@@ -72,6 +72,7 @@ class TabularDataset(Dataset):
         self,
         data: Table | Mapping[str, Sequence[Any]],
         target_name: str,
+        *,
         extra_names: list[str] | None = None,
     ):
         from safeds.data.tabular.containers import Table

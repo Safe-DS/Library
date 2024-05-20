@@ -18,12 +18,35 @@ FT = TypeVar("FT", TabularDataset, TimeSeriesDataset, ImageDataset)
 PT = TypeVar("PT", Table, TimeSeriesDataset, ImageList)
 
 
-class InputConversion(Generic[FT, PT], ABC):
+class _Converter(Generic[FT, PT], ABC):
     """The input conversion for a neural network, defines the input parameters for the neural network."""
+
+    # TODO: add docstring for properties and template methods
+
+    # ------------------------------------------------------------------------------------------------------------------
+    # Dunder methods
+    # ------------------------------------------------------------------------------------------------------------------
+
+    @abstractmethod
+    def __eq__(self, other: object) -> bool: ...
+
+    @abstractmethod
+    def __hash__(self) -> int: ...
+
+    @abstractmethod
+    def __sizeof__(self) -> int: ...
+
+    # ------------------------------------------------------------------------------------------------------------------
+    # Properties
+    # ------------------------------------------------------------------------------------------------------------------
 
     @property
     @abstractmethod
     def _data_size(self) -> int | ModelImageSize: ...
+
+    # ------------------------------------------------------------------------------------------------------------------
+    # Template methods
+    # ------------------------------------------------------------------------------------------------------------------
 
     @abstractmethod
     def _data_conversion_fit(
@@ -31,12 +54,13 @@ class InputConversion(Generic[FT, PT], ABC):
         input_data: FT,
         batch_size: int,
         num_of_classes: int = 1,
-    ) -> DataLoader | ImageDataset: ...
+    ) -> DataLoader | ImageDataset: ...  # TODO: unify return type (data loader)
 
     @abstractmethod
     def _data_conversion_predict(self, input_data: PT, batch_size: int) -> DataLoader | _SingleSizeImageList: ...
 
     @abstractmethod
+    # TODO: unify return type (data loader)
     def _data_conversion_output(self, input_data: PT, output_data: Tensor) -> FT: ...
 
     @abstractmethod
