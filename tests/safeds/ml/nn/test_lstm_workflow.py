@@ -7,7 +7,6 @@ from safeds.ml.nn import (
 )
 from safeds.ml.nn.converters import (
     InputConversionTimeSeries,
-    OutputConversionTimeSeries,
 )
 from safeds.ml.nn.layers import (
     ForwardLayer,
@@ -30,11 +29,11 @@ def test_lstm_model(device: Device) -> None:
     train_table, test_table = table.split_rows(0.8)
 
     model = NeuralNetworkRegressor(
-        InputConversionTimeSeries(window_size=7, forecast_horizon=12),
+        InputConversionTimeSeries(window_size=7, forecast_horizon=12, prediction_name="predicted"),
         [ForwardLayer(input_size=7, output_size=256), LSTMLayer(input_size=256, output_size=1)],
-        OutputConversionTimeSeries("predicted"),
     )
     trained_model = model.fit(train_table.to_time_series_dataset("value", "date"), epoch_size=1)
 
     trained_model.predict(test_table.to_time_series_dataset("value", "date"))
+    assert trained_model._model is not None
     assert trained_model._model.state_dict()["_pytorch_layers.0._layer.weight"].device == _get_device()

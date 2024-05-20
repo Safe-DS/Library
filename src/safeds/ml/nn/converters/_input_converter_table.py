@@ -3,23 +3,29 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 
 from safeds.data.labeled.containers import TabularDataset
-from safeds.data.tabular.containers import Table
+from safeds.data.tabular.containers import Column, Table
 
 from ._input_converter import InputConversion
 
 if TYPE_CHECKING:
+    from torch import Tensor
     from torch.utils.data import DataLoader
 
 
 class InputConversionTable(InputConversion[TabularDataset, Table]):
-    """The input conversion for a neural network, defines the input parameters for the neural network."""
+    """
+    The input conversion for a neural network, defines the input parameters for the neural network.
 
-    def __init__(self) -> None:
-        """Define the input parameters for the neural network in the input conversion."""
+    prediction_name:
+        The name of the new column where the prediction will be stored.
+    """
+
+    def __init__(self, *, prediction_name: str = "prediction") -> None:
         self._target_name = ""
         self._time_name = ""
         self._feature_names: list[str] = []
         self._first = True
+        self._prediction_name = prediction_name  # TODO: use target name, override existing column
 
     @property
     def _data_size(self) -> int:
@@ -33,6 +39,11 @@ class InputConversionTable(InputConversion[TabularDataset, Table]):
 
     def _data_conversion_predict(self, input_data: Table, batch_size: int) -> DataLoader:
         return input_data._into_dataloader(batch_size)
+
+    def _data_conversion_output(self, input_data: Table, output_data: Tensor, **_kwargs: Any) -> TabularDataset:
+        return input_data.add_columns([Column(self._prediction_name, output_data.tolist())]).to_tabular_dataset(
+            self._prediction_name,
+        )
 
     def _is_fit_data_valid(self, input_data: TabularDataset) -> bool:
         if self._first:

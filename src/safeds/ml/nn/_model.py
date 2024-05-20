@@ -17,12 +17,11 @@ from safeds.exceptions import (
     ModelNotFittedError,
 )
 from safeds.ml.nn.converters import (
-    InputConversionImage,
-    OutputConversionImageToColumn,
-    OutputConversionImageToImage,
-    OutputConversionImageToTable,
+    InputConversionImageToColumn,
+    InputConversionImageToImage,
+    InputConversionImageToTable,
 )
-from safeds.ml.nn.converters._output_converter_image import _OutputConversionImage
+from safeds.ml.nn.converters._input_converter_image import _InputConversionImage
 from safeds.ml.nn.layers import (
     Convolutional2DLayer,
     FlattenLayer,
@@ -38,15 +37,14 @@ if TYPE_CHECKING:
     from torch.nn import Module
     from transformers.image_processing_utils import BaseImageProcessor
 
-    from safeds.ml.nn.converters import InputConversion, OutputConversion
+    from safeds.ml.nn.converters import InputConversion
     from safeds.ml.nn.layers import Layer
 
 IFT = TypeVar("IFT", TabularDataset, TimeSeriesDataset, ImageDataset)  # InputFitType
 IPT = TypeVar("IPT", Table, TimeSeriesDataset, ImageList)  # InputPredictType
-OT = TypeVar("OT", TabularDataset, TimeSeriesDataset, ImageDataset)  # OutputType
 
 
-class NeuralNetworkRegressor(Generic[IFT, IPT, OT]):
+class NeuralNetworkRegressor(Generic[IFT, IPT]):
     """
     A NeuralNetworkRegressor is a neural network that is used for regression tasks.
 
@@ -56,8 +54,6 @@ class NeuralNetworkRegressor(Generic[IFT, IPT, OT]):
         to convert the input data for the neural network
     layers:
         a list of layers for the neural network to learn
-    output_conversion:
-        to convert the output data of the neural network back
 
     Raises
     ------
@@ -69,16 +65,13 @@ class NeuralNetworkRegressor(Generic[IFT, IPT, OT]):
         self,
         input_conversion: InputConversion[IFT, IPT],
         layers: list[Layer],
-        output_conversion: OutputConversion[IPT, OT],
     ):
         if len(layers) == 0:
             raise InvalidModelStructureError("You need to provide at least one layer to a neural network.")
-        if isinstance(input_conversion, InputConversionImage):
-            if not isinstance(output_conversion, _OutputConversionImage):
-                raise InvalidModelStructureError(
-                    "The defined model uses an input conversion for images but no output conversion for images.",
-                )
-            elif isinstance(output_conversion, OutputConversionImageToColumn | OutputConversionImageToTable):
+        if isinstance(input_conversion, _InputConversionImage):
+            # TODO: why is this limitation needed? we might want to output the probability that an image shows a certain
+            #  object, which would be a 1-dimensional output.
+            if isinstance(input_conversion, InputConversionImageToColumn | InputConversionImageToTable):
                 raise InvalidModelStructureError(
                     "A NeuralNetworkRegressor cannot be used with images as input and 1-dimensional data as output.",
                 )
@@ -98,14 +91,10 @@ class NeuralNetworkRegressor(Generic[IFT, IPT, OT]):
                             else "You cannot use a 2-dimensional layer with 1-dimensional data."
                         ),
                     )
-            if data_dimensions == 1 and isinstance(output_conversion, OutputConversionImageToImage):
+            if data_dimensions == 1 and isinstance(input_conversion, InputConversionImageToImage):
                 raise InvalidModelStructureError(
                     "The output data would be 1-dimensional but the provided output conversion uses 2-dimensional data.",
                 )
-        elif isinstance(output_conversion, _OutputConversionImage):
-            raise InvalidModelStructureError(
-                "The defined model uses an output conversion for images but no input conversion for images.",
-            )
         else:
             for layer in layers:
                 if isinstance(layer, Convolutional2DLayer | FlattenLayer | _Pooling2DLayer):
@@ -114,7 +103,6 @@ class NeuralNetworkRegressor(Generic[IFT, IPT, OT]):
         self._input_conversion: InputConversion[IFT, IPT] = input_conversion
         self._model: Module | None = None
         self._layers: list[Layer] = layers
-        self._output_conversion: OutputConversion[IPT, OT] = output_conversion
         self._input_size: int | ModelImageSize | None = None
         self._batch_size = 1
         self._is_fitted = False
@@ -161,13 +149,11 @@ class NeuralNetworkRegressor(Generic[IFT, IPT, OT]):
         else:  # Should never happen due to model check
             raise ValueError("This model is not supported")  # pragma: no cover
 
-        in_conversion = InputConversionImage(input_size)
-        out_conversion = OutputConversionImageToImage()
+        in_conversion = InputConversionImageToImage(input_size)
 
         network = NeuralNetworkRegressor.__new__(NeuralNetworkRegressor)
         network._input_conversion = in_conversion
         network._model = model
-        network._output_conversion = out_conversion
         network._input_size = input_size
         network._batch_size = 1
         network._is_fitted = True
@@ -201,9 +187,11 @@ class NeuralNetworkRegressor(Generic[IFT, IPT, OT]):
         learning_rate:
             The learning rate of the neural network.
         callback_on_batch_completion:
-            Function used to view metrics while training. Gets called after a batch is completed with the index of the last batch and the overall loss average.
+            Function used to view metrics while training. Gets called after a batch is completed with the index of the
+            last batch and the overall loss average.
         callback_on_epoch_completion:
-            Function used to view metrics while training. Gets called after an epoch is completed with the index of the last epoch and the overall loss average.
+            Function used to view metrics while training. Gets called after an epoch is completed with the index of the
+            last epoch and the overall loss average.
 
         Returns
         -------
@@ -269,7 +257,7 @@ class NeuralNetworkRegressor(Generic[IFT, IPT, OT]):
         copied_model._model.eval()
         return copied_model
 
-    def predict(self, test_data: IPT) -> OT:
+    def predict(self, test_data: IPT) -> IFT:
         """
         Make a prediction for the given test data.
 
@@ -294,7 +282,7 @@ class NeuralNetworkRegressor(Generic[IFT, IPT, OT]):
 
         _init_default_device()
 
-        if not self._is_fitted:
+        if not self._is_fitted or self._model is None:
             raise ModelNotFittedError
         if not self._input_conversion._is_predict_data_valid(test_data):
             raise FeatureDataMismatchError
@@ -308,7 +296,7 @@ class NeuralNetworkRegressor(Generic[IFT, IPT, OT]):
                 elif not isinstance(elem, torch.Tensor):
                     raise ValueError(f"Output of model has unsupported type: {type(elem)}")  # pragma: no cover
                 predictions.append(elem.squeeze(dim=1))
-        return self._output_conversion._data_conversion(
+        return self._input_conversion._data_conversion_output(
             test_data,
             torch.cat(predictions, dim=0),
             **self._input_conversion._get_output_configuration(),
@@ -320,12 +308,13 @@ class NeuralNetworkRegressor(Generic[IFT, IPT, OT]):
         return self._is_fitted
 
     @property
-    def input_size(self) -> int | ModelImageSize:
+    def input_size(self) -> int | ModelImageSize | None:
         """The input size of the model."""
+        # TODO: raise if not fitted, don't return None
         return self._input_size
 
 
-class NeuralNetworkClassifier(Generic[IFT, IPT, OT]):
+class NeuralNetworkClassifier(Generic[IFT, IPT]):
     """
     A NeuralNetworkClassifier is a neural network that is used for classification tasks.
 
@@ -335,8 +324,6 @@ class NeuralNetworkClassifier(Generic[IFT, IPT, OT]):
         to convert the input data for the neural network
     layers:
         a list of layers for the neural network to learn
-    output_conversion:
-        to convert the output data of the neural network back
 
     Raises
     ------
@@ -348,24 +335,19 @@ class NeuralNetworkClassifier(Generic[IFT, IPT, OT]):
         self,
         input_conversion: InputConversion[IFT, IPT],
         layers: list[Layer],
-        output_conversion: OutputConversion[IPT, OT],
     ):
         if len(layers) == 0:
             raise InvalidModelStructureError("You need to provide at least one layer to a neural network.")
-        if isinstance(output_conversion, OutputConversionImageToImage):
+        if isinstance(input_conversion, InputConversionImageToImage):
             raise InvalidModelStructureError("A NeuralNetworkClassifier cannot be used with images as output.")
-        if isinstance(input_conversion, InputConversionImage) and isinstance(
+        if isinstance(input_conversion, _InputConversionImage) and isinstance(
             input_conversion._input_size,
             VariableImageSize,
         ):
             raise InvalidModelStructureError(
                 "A NeuralNetworkClassifier cannot be used with a InputConversionImage that uses a VariableImageSize.",
             )
-        elif isinstance(input_conversion, InputConversionImage):
-            if not isinstance(output_conversion, _OutputConversionImage):
-                raise InvalidModelStructureError(
-                    "The defined model uses an input conversion for images but no output conversion for images.",
-                )
+        elif isinstance(input_conversion, _InputConversionImage):
             data_dimensions = 2
             for layer in layers:
                 if data_dimensions == 2 and (isinstance(layer, Convolutional2DLayer | _Pooling2DLayer)):
@@ -383,15 +365,11 @@ class NeuralNetworkClassifier(Generic[IFT, IPT, OT]):
                         ),
                     )
             if data_dimensions == 2 and (
-                isinstance(output_conversion, OutputConversionImageToColumn | OutputConversionImageToTable)
+                isinstance(input_conversion, InputConversionImageToColumn | InputConversionImageToTable)
             ):
                 raise InvalidModelStructureError(
                     "The output data would be 2-dimensional but the provided output conversion uses 1-dimensional data.",
                 )
-        elif isinstance(output_conversion, _OutputConversionImage):
-            raise InvalidModelStructureError(
-                "The defined model uses an output conversion for images but no input conversion for images.",
-            )
         else:
             for layer in layers:
                 if isinstance(layer, Convolutional2DLayer | FlattenLayer | _Pooling2DLayer):
@@ -400,7 +378,6 @@ class NeuralNetworkClassifier(Generic[IFT, IPT, OT]):
         self._input_conversion: InputConversion[IFT, IPT] = input_conversion
         self._model: nn.Module | None = None
         self._layers: list[Layer] = layers
-        self._output_conversion: OutputConversion[IPT, OT] = output_conversion
         self._input_size: int | ModelImageSize | None = None
         self._batch_size = 1
         self._is_fitted = False
@@ -459,8 +436,7 @@ class NeuralNetworkClassifier(Generic[IFT, IPT, OT]):
         labels_table = Table({column_name: [label for _, label in label_dict.items()]})
         one_hot_encoder = OneHotEncoder().fit(labels_table, [column_name])
 
-        in_conversion = InputConversionImage(input_size)
-        out_conversion = OutputConversionImageToColumn()
+        in_conversion = InputConversionImageToColumn(input_size)
 
         in_conversion._column_name = column_name
         in_conversion._one_hot_encoder = one_hot_encoder
@@ -471,7 +447,6 @@ class NeuralNetworkClassifier(Generic[IFT, IPT, OT]):
         network = NeuralNetworkClassifier.__new__(NeuralNetworkClassifier)
         network._input_conversion = in_conversion
         network._model = model
-        network._output_conversion = out_conversion
         network._input_size = input_size
         network._batch_size = 1
         network._is_fitted = True
@@ -506,9 +481,11 @@ class NeuralNetworkClassifier(Generic[IFT, IPT, OT]):
         learning_rate:
             The learning rate of the neural network.
         callback_on_batch_completion:
-            Function used to view metrics while training. Gets called after a batch is completed with the index of the last batch and the overall loss average.
+            Function used to view metrics while training. Gets called after a batch is completed with the index of the
+            last batch and the overall loss average.
         callback_on_epoch_completion:
-            Function used to view metrics while training. Gets called after an epoch is completed with the index of the last epoch and the overall loss average.
+            Function used to view metrics while training. Gets called after an epoch is completed with the index of the
+            last epoch and the overall loss average.
 
         Returns
         -------
@@ -581,7 +558,7 @@ class NeuralNetworkClassifier(Generic[IFT, IPT, OT]):
         copied_model._model.eval()
         return copied_model
 
-    def predict(self, test_data: IPT) -> OT:
+    def predict(self, test_data: IPT) -> IFT:
         """
         Make a prediction for the given test data.
 
@@ -606,7 +583,7 @@ class NeuralNetworkClassifier(Generic[IFT, IPT, OT]):
 
         _init_default_device()
 
-        if not self._is_fitted:
+        if not self._is_fitted or self._model is None:
             raise ModelNotFittedError
         if not self._input_conversion._is_predict_data_valid(test_data):
             raise FeatureDataMismatchError
@@ -623,7 +600,7 @@ class NeuralNetworkClassifier(Generic[IFT, IPT, OT]):
                     predictions.append(torch.argmax(elem, dim=1))
                 else:
                     predictions.append(elem.squeeze(dim=1).round())
-        return self._output_conversion._data_conversion(
+        return self._input_conversion._data_conversion_output(
             test_data,
             torch.cat(predictions, dim=0),
             **self._input_conversion._get_output_configuration(),
@@ -635,8 +612,9 @@ class NeuralNetworkClassifier(Generic[IFT, IPT, OT]):
         return self._is_fitted
 
     @property
-    def input_size(self) -> int | ModelImageSize:
+    def input_size(self) -> int | ModelImageSize | None:
         """The input size of the model."""
+        # TODO: raise if not fitted, don't return None
         return self._input_size
 
 
@@ -659,7 +637,7 @@ def _create_internal_model(
             for layer in layers:
                 if previous_output_size is not None:
                     layer._set_input_size(previous_output_size)
-                elif isinstance(input_conversion, InputConversionImage):
+                elif isinstance(input_conversion, _InputConversionImage):
                     layer._set_input_size(input_conversion._data_size)
                 if isinstance(layer, FlattenLayer | _Pooling2DLayer):
                     internal_layers.append(layer._get_internal_layer())

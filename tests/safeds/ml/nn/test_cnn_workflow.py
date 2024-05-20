@@ -14,10 +14,9 @@ from safeds.ml.nn import (
     NeuralNetworkRegressor,
 )
 from safeds.ml.nn.converters import (
-    InputConversionImage,
-    OutputConversionImageToColumn,
-    OutputConversionImageToImage,
-    OutputConversionImageToTable,
+    InputConversionImageToColumn,
+    InputConversionImageToImage,
+    InputConversionImageToTable,
 )
 from safeds.ml.nn.layers import (
     AveragePooling2DLayer,
@@ -86,9 +85,8 @@ class TestImageToTableClassifier:
         num_of_classes: int = image_dataset.output_size if isinstance(image_dataset.output_size, int) else 0
         layers = [Convolutional2DLayer(1, 2), MaxPooling2DLayer(10), FlattenLayer(), ForwardLayer(num_of_classes)]
         nn_original = NeuralNetworkClassifier(
-            InputConversionImage(image_dataset.input_size),
+            InputConversionImageToTable(image_dataset.input_size),
             layers,
-            OutputConversionImageToTable(),
         )
         nn = nn_original.fit(image_dataset, epoch_size=2)
         assert nn_original._model is not nn._model
@@ -146,9 +144,8 @@ class TestImageToColumnClassifier:
 
         layers = [Convolutional2DLayer(1, 2), AveragePooling2DLayer(10), FlattenLayer(), ForwardLayer(num_of_classes)]
         nn_original = NeuralNetworkClassifier(
-            InputConversionImage(image_dataset.input_size),
+            InputConversionImageToColumn(image_dataset.input_size),
             layers,
-            OutputConversionImageToColumn(),
         )
         nn = nn_original.fit(image_dataset, epoch_size=2)
         assert nn_original._model is not nn._model
@@ -188,9 +185,8 @@ class TestImageToImageRegressor:
             ConvolutionalTranspose2DLayer(4, 2),
         ]
         nn_original = NeuralNetworkRegressor(
-            InputConversionImage(image_dataset.input_size),
+            InputConversionImageToImage(image_dataset.input_size),
             layers,
-            OutputConversionImageToImage(),
         )
         nn = nn_original.fit(image_dataset, epoch_size=20)
         assert nn_original._model is not nn._model
@@ -230,9 +226,8 @@ class TestImageToImageRegressor:
             ConvolutionalTranspose2DLayer(4, 2),
         ]
         nn_original = NeuralNetworkRegressor(
-            InputConversionImage(VariableImageSize.from_image_size(image_dataset.input_size)),
+            InputConversionImageToImage(VariableImageSize.from_image_size(image_dataset.input_size)),
             layers,
-            OutputConversionImageToImage(),
         )
         nn = nn_original.fit(image_dataset, epoch_size=20)
         assert nn_original._model is not nn._model

@@ -19,9 +19,9 @@ if TYPE_CHECKING:
 
 class TimeSeriesDataset:
     """
-    A time series dataset maps feature and time columns to a target column. Not like the TabularDataset a TimeSeries needs to contain one target and one time column, but can have empty features.
+    A time series dataset maps feature and time columns to a target column.
 
-    Create a time series dataset from a mapping of column names to their values.
+    Unlike a TabularDataset, a TimeSeries needs to contain one target and one time column, but can have empty features.
 
     Parameters
     ----------
