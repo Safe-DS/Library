@@ -219,7 +219,7 @@ class Column(Sequence[T_co]):
         else:
             series = self._series
 
-        return series.unique().sort().to_list()
+        return series.unique(maintain_order=True).to_list()
 
     def get_value(self, index: int) -> T_co:
         """
