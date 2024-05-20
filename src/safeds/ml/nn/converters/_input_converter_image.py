@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import sys
 from abc import ABC
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 from safeds._utils import _structural_hash
 from safeds.data.image.containers import ImageList
@@ -107,10 +107,3 @@ class _InputConversionImage(InputConversion[ImageDataset, ImageList], ABC):
 
     def _is_predict_data_valid(self, input_data: ImageList) -> bool:
         return isinstance(input_data, _SingleSizeImageList) and input_data.sizes[0] == self._input_size
-
-    def _get_output_configuration(self) -> dict[str, Any]:
-        return {
-            "column_names": self._column_names,
-            "column_name": self._column_name,
-            "one_hot_encoder": self._one_hot_encoder,
-        }
