@@ -37,7 +37,6 @@ class TestFromImage:
 
 
 class TestFromImageSize:
-
     def test_should_create(self) -> None:
         constant_image_size = ConstantImageSize(1, 2, 3)
         variable_image_size = VariableImageSize(1, 2, 3)
@@ -157,7 +156,6 @@ class TestHash:
 
 
 class TestSizeOf:
-
     @pytest.mark.parametrize(
         "image_size_class",
         [
@@ -171,7 +169,6 @@ class TestSizeOf:
 
 
 class TestStr:
-
     @pytest.mark.parametrize(
         "image_size_class",
         [

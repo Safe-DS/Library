@@ -38,7 +38,6 @@ from tests.helpers import configure_test_with_device, get_devices, get_devices_i
 
 @pytest.mark.parametrize("device", get_devices(), ids=get_devices_ids())
 class TestClassificationModel:
-
     @pytest.mark.parametrize(
         "input_size",
         [
@@ -452,7 +451,6 @@ class TestClassificationModel:
 
 @pytest.mark.parametrize("device", get_devices(), ids=get_devices_ids())
 class TestRegressionModel:
-
     @pytest.mark.parametrize(
         "input_size",
         [

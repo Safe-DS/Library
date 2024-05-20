@@ -19,7 +19,10 @@ class TestDataConversionImage:
     @pytest.mark.parametrize(
         ("input_conversion", "kwargs"),
         [
-            (InputConversionImageToColumn(ImageSize(1, 1, 1)), {"column_name": "a", "one_hot_encoder": OneHotEncoder()}),
+            (
+                InputConversionImageToColumn(ImageSize(1, 1, 1)),
+                {"column_name": "a", "one_hot_encoder": OneHotEncoder()},
+            ),
             (InputConversionImageToTable(ImageSize(1, 1, 1)), {"column_names": ["a"]}),
             (InputConversionImageToImage(ImageSize(1, 1, 1)), {}),
         ],

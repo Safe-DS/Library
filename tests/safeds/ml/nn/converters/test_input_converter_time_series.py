@@ -35,6 +35,7 @@ def test_get_output_config() -> None:
     di = it._get_output_configuration()
     assert di == test_val
 
+
 def test_output_conversion_time_series() -> None:
     ot = InputConversionTimeSeries(1, 1)
 

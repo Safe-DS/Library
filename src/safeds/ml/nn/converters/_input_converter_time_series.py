@@ -83,7 +83,8 @@ class InputConversionTimeSeries(InputConversion[TimeSeriesDataset, TimeSeriesDat
     def _data_conversion_output(
         self,
         input_data: TimeSeriesDataset,
-        output_data: Tensor, **kwargs: Any,
+        output_data: Tensor,
+        **kwargs: Any,
     ) -> TimeSeriesDataset:
         if "window_size" not in kwargs or not isinstance(kwargs.get("window_size"), int):
             raise ValueError(

@@ -18,7 +18,9 @@ if TYPE_CHECKING:
 
 
 class InputConversionImageToColumn(_InputConversionImage):
-    def _data_conversion_output(self, input_data: ImageList, output_data: Tensor, **kwargs: Any) -> ImageDataset[Column]:
+    def _data_conversion_output(
+        self, input_data: ImageList, output_data: Tensor, **kwargs: Any,
+    ) -> ImageDataset[Column]:
         import torch
 
         _init_default_device()
