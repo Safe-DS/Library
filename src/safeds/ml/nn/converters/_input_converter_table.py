@@ -22,7 +22,6 @@ class InputConversionTable(InputConversion[TabularDataset, Table]):
 
     def __init__(self, *, prediction_name: str = "prediction") -> None:
         self._target_name = ""
-        self._time_name = ""
         self._feature_names: list[str] = []
         self._first = True
         self._prediction_name = prediction_name  # TODO: use target name, override existing column
