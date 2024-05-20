@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import sys
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 from safeds._utils import _structural_hash
 from safeds.data.labeled.containers import TimeSeriesDataset
@@ -84,20 +84,9 @@ class InputConversionTimeSeries(InputConversion[TimeSeriesDataset, TimeSeriesDat
         self,
         input_data: TimeSeriesDataset,
         output_data: Tensor,
-        **kwargs: Any,
     ) -> TimeSeriesDataset:
-        if "window_size" not in kwargs or not isinstance(kwargs.get("window_size"), int):
-            raise ValueError(
-                "The window_size is not set. "
-                "The data can only be converted if the window_size is provided as `int` in the kwargs.",
-            )
-        if "forecast_horizon" not in kwargs or not isinstance(kwargs.get("forecast_horizon"), int):
-            raise ValueError(
-                "The forecast_horizon is not set. "
-                "The data can only be converted if the forecast_horizon is provided as `int` in the kwargs.",
-            )
-        window_size: int = kwargs["window_size"]
-        forecast_horizon: int = kwargs["forecast_horizon"]
+        window_size: int = self._window_size
+        forecast_horizon: int = self._forecast_horizon
         input_data_table = input_data.to_table()
         input_data_table = input_data_table.slice_rows(start=window_size + forecast_horizon)
 
@@ -123,6 +112,3 @@ class InputConversionTimeSeries(InputConversion[TimeSeriesDataset, TimeSeriesDat
 
     def _is_predict_data_valid(self, input_data: TimeSeriesDataset) -> bool:
         return self._is_fit_data_valid(input_data)
-
-    def _get_output_configuration(self) -> dict[str, Any]:
-        return {"window_size": self._window_size, "forecast_horizon": self._forecast_horizon}
