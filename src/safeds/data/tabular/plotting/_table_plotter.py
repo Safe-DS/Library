@@ -91,7 +91,7 @@ class TablePlotter:
         Examples
         --------
         >>> from safeds.data.tabular.containers import Table
-        >>> table = Table.from_dict({"temperature": [10, 15, 20, 25, 30], "sales": [54, 74, 90, 206, 210]})
+        >>> table = Table({"temperature": [10, 15, 20, 25, 30], "sales": [54, 74, 90, 206, 210]})
         >>> image = table.plot.correlation_heatmap()
         """
         # TODO: implement using matplotlib and polars
