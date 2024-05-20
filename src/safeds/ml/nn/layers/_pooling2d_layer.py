@@ -6,12 +6,13 @@ from typing import TYPE_CHECKING, Any, Literal
 
 from safeds._config import _init_default_device
 from safeds._utils import _structural_hash
-from safeds.data.image.typing import ImageSize
 
 from ._layer import Layer
 
 if TYPE_CHECKING:
     from torch import Tensor, nn
+
+    from safeds.ml.nn.typing import ModelImageSize
 
 
 class _Pooling2DLayer(Layer):
@@ -35,14 +36,14 @@ class _Pooling2DLayer(Layer):
         self._kernel_size = kernel_size
         self._stride = stride if stride != -1 else kernel_size
         self._padding = padding
-        self._input_size: ImageSize | None = None
-        self._output_size: ImageSize | None = None
+        self._input_size: ModelImageSize | None = None
+        self._output_size: ModelImageSize | None = None
 
     def _get_internal_layer(self, **kwargs: Any) -> nn.Module:  # noqa: ARG002
         return _create_internal_model(self._strategy, self._kernel_size, self._padding, self._stride)
 
     @property
-    def input_size(self) -> ImageSize:
+    def input_size(self) -> ModelImageSize:
         """
         Get the input_size of this layer.
 
@@ -61,7 +62,7 @@ class _Pooling2DLayer(Layer):
         return self._input_size
 
     @property
-    def output_size(self) -> ImageSize:
+    def output_size(self) -> ModelImageSize:
         """
         Get the output_size of this layer.
 
@@ -86,10 +87,15 @@ class _Pooling2DLayer(Layer):
             new_height = math.ceil(
                 (self.input_size.height + self._padding * 2 - self._kernel_size + 1) / (1.0 * self._stride),
             )
-            self._output_size = ImageSize(new_width, new_height, self._input_size.channel, _ignore_invalid_channel=True)
+            self._output_size = self._input_size.__class__(
+                new_width,
+                new_height,
+                self._input_size.channel,
+                _ignore_invalid_channel=True,
+            )
         return self._output_size
 
-    def _set_input_size(self, input_size: int | ImageSize) -> None:
+    def _set_input_size(self, input_size: int | ModelImageSize) -> None:
         if isinstance(input_size, int):
             raise TypeError("The input_size of a pooling layer has to be of type ImageSize.")
         self._input_size = input_size

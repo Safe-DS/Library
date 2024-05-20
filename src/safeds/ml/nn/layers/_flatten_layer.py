@@ -5,13 +5,14 @@ from typing import TYPE_CHECKING, Any
 
 from safeds._config import _init_default_device
 from safeds._utils import _structural_hash
+from safeds.ml.nn.typing import ConstantImageSize
 
 from ._layer import Layer
 
 if TYPE_CHECKING:
     from torch import Tensor, nn
 
-    from safeds.data.image.typing import ImageSize
+    from safeds.ml.nn.typing import ModelImageSize
 
 
 def _create_internal_model() -> nn.Module:
@@ -34,14 +35,14 @@ class FlattenLayer(Layer):
     """A flatten layer."""
 
     def __init__(self) -> None:
-        self._input_size: ImageSize | None = None
+        self._input_size: ModelImageSize | None = None
         self._output_size: int | None = None
 
     def _get_internal_layer(self, **kwargs: Any) -> nn.Module:  # noqa: ARG002
         return _create_internal_model()
 
     @property
-    def input_size(self) -> ImageSize:
+    def input_size(self) -> ModelImageSize:
         """
         Get the input_size of this layer.
 
@@ -82,9 +83,11 @@ class FlattenLayer(Layer):
             self._output_size = self._input_size.width * self._input_size.height * self._input_size.channel
         return self._output_size
 
-    def _set_input_size(self, input_size: int | ImageSize) -> None:
+    def _set_input_size(self, input_size: int | ModelImageSize) -> None:
         if isinstance(input_size, int):
             raise TypeError("The input_size of a flatten layer has to be of type ImageSize.")
+        if not isinstance(input_size, ConstantImageSize):
+            raise TypeError("The input_size of a flatten layer has to be a ConstantImageSize.")
         self._input_size = input_size
         self._output_size = None
 

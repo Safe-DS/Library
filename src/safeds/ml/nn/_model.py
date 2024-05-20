@@ -7,7 +7,9 @@ from safeds._config import _init_default_device
 from safeds._validation import _check_bounds, _ClosedBound
 from safeds.data.image.containers import ImageList
 from safeds.data.labeled.containers import ImageDataset, TabularDataset, TimeSeriesDataset
+from safeds.data.labeled.containers._image_dataset import _ColumnAsTensor
 from safeds.data.tabular.containers import Table
+from safeds.data.tabular.transformation import OneHotEncoder
 from safeds.exceptions import (
     FeatureDataMismatchError,
     InputSizeError,
@@ -27,16 +29,17 @@ from safeds.ml.nn.layers import (
     ForwardLayer,
 )
 from safeds.ml.nn.layers._pooling2d_layer import _Pooling2DLayer
+from safeds.ml.nn.typing import ConstantImageSize, ModelImageSize, VariableImageSize
 
 if TYPE_CHECKING:
     from collections.abc import Callable
 
     from torch import Tensor, nn
+    from torch.nn import Module
+    from transformers.image_processing_utils import BaseImageProcessor
 
-    from safeds.data.image.typing import ImageSize
     from safeds.ml.nn.converters import InputConversion, OutputConversion
     from safeds.ml.nn.layers import Layer
-
 
 IFT = TypeVar("IFT", TabularDataset, TimeSeriesDataset, ImageDataset)  # InputFitType
 IPT = TypeVar("IPT", Table, TimeSeriesDataset, ImageList)  # InputPredictType
@@ -116,6 +119,61 @@ class NeuralNetworkRegressor(Generic[IFT, IPT, OT]):
         self._is_fitted = False
         self._total_number_of_batches_done = 0
         self._total_number_of_epochs_done = 0
+
+    @staticmethod
+    def load_pretrained_model(huggingface_repo: str) -> NeuralNetworkRegressor:  # pragma: no cover
+        """
+        Load a pretrained model from a [Huggingface repository](https://huggingface.co/models/).
+
+        Parameters
+        ----------
+        huggingface_repo:
+            the name of the huggingface repository
+
+        Returns
+        -------
+        pretrained_model:
+            the pretrained model as a NeuralNetworkRegressor
+        """
+        from transformers import (
+            AutoConfig,
+            AutoImageProcessor,
+            AutoModelForImageToImage,
+            PretrainedConfig,
+            Swin2SRForImageSuperResolution,
+            Swin2SRImageProcessor,
+        )
+
+        _init_default_device()
+
+        config: PretrainedConfig = AutoConfig.from_pretrained(huggingface_repo)
+
+        if config.model_type != "swin2sr":
+            raise ValueError("This model is not supported")
+
+        model: Swin2SRForImageSuperResolution = AutoModelForImageToImage.from_pretrained(huggingface_repo)
+
+        image_processor: Swin2SRImageProcessor = AutoImageProcessor.from_pretrained(huggingface_repo)
+
+        if hasattr(config, "num_channels"):
+            input_size = VariableImageSize(image_processor.pad_size, image_processor.pad_size, config.num_channels)
+        else:  # Should never happen due to model check
+            raise ValueError("This model is not supported")  # pragma: no cover
+
+        in_conversion = InputConversionImage(input_size)
+        out_conversion = OutputConversionImageToImage()
+
+        network = NeuralNetworkRegressor.__new__(NeuralNetworkRegressor)
+        network._input_conversion = in_conversion
+        network._model = model
+        network._output_conversion = out_conversion
+        network._input_size = input_size
+        network._batch_size = 1
+        network._is_fitted = True
+        network._total_number_of_epochs_done = 0
+        network._total_number_of_batches_done = 0
+
+        return network
 
     def fit(
         self,
@@ -243,6 +301,10 @@ class NeuralNetworkRegressor(Generic[IFT, IPT, OT]):
         with torch.no_grad():
             for x in dataloader:
                 elem = self._model(x)
+                if not isinstance(elem, torch.Tensor) and hasattr(elem, "reconstruction"):
+                    elem = elem.reconstruction  # pragma: no cover
+                elif not isinstance(elem, torch.Tensor):
+                    raise ValueError(f"Output of model has unsupported type: {type(elem)}")  # pragma: no cover
                 predictions.append(elem.squeeze(dim=1))
         return self._output_conversion._data_conversion(
             test_data,
@@ -254,6 +316,11 @@ class NeuralNetworkRegressor(Generic[IFT, IPT, OT]):
     def is_fitted(self) -> bool:
         """Whether the model is fitted."""
         return self._is_fitted
+
+    @property
+    def input_size(self) -> int | ModelImageSize:
+        """The input size of the model."""
+        return self._input_size
 
 
 class NeuralNetworkClassifier(Generic[IFT, IPT, OT]):
@@ -285,6 +352,13 @@ class NeuralNetworkClassifier(Generic[IFT, IPT, OT]):
             raise InvalidModelStructureError("You need to provide at least one layer to a neural network.")
         if isinstance(output_conversion, OutputConversionImageToImage):
             raise InvalidModelStructureError("A NeuralNetworkClassifier cannot be used with images as output.")
+        if isinstance(input_conversion, InputConversionImage) and isinstance(
+            input_conversion._input_size,
+            VariableImageSize,
+        ):
+            raise InvalidModelStructureError(
+                "A NeuralNetworkClassifier cannot be used with a InputConversionImage that uses a VariableImageSize.",
+            )
         elif isinstance(input_conversion, InputConversionImage):
             if not isinstance(output_conversion, _OutputConversionImage):
                 raise InvalidModelStructureError(
@@ -324,7 +398,7 @@ class NeuralNetworkClassifier(Generic[IFT, IPT, OT]):
         self._input_conversion: InputConversion[IFT, IPT] = input_conversion
         self._model = _create_internal_model(input_conversion, layers, is_for_classification=True)
         self._output_conversion: OutputConversion[IPT, OT] = output_conversion
-        self._input_size = self._model.input_size
+        self._input_size: int | ModelImageSize = self._model.input_size
         self._batch_size = 1
         self._is_fitted = False
         self._num_of_classes = (
@@ -332,6 +406,77 @@ class NeuralNetworkClassifier(Generic[IFT, IPT, OT]):
         )  # Is always int but linter doesn't know
         self._total_number_of_batches_done = 0
         self._total_number_of_epochs_done = 0
+
+    @staticmethod
+    def load_pretrained_model(huggingface_repo: str) -> NeuralNetworkClassifier:  # pragma: no cover
+        """
+        Load a pretrained model from a [Huggingface repository](https://huggingface.co/models/).
+
+        Parameters
+        ----------
+        huggingface_repo:
+            the name of the huggingface repository
+
+        Returns
+        -------
+        pretrained_model:
+            the pretrained model as a NeuralNetworkClassifier
+        """
+        from transformers import AutoConfig, AutoImageProcessor, AutoModelForImageClassification, PretrainedConfig
+        from transformers.models.auto.modeling_auto import MODEL_FOR_IMAGE_CLASSIFICATION_MAPPING_NAMES
+
+        _init_default_device()
+
+        config: PretrainedConfig = AutoConfig.from_pretrained(huggingface_repo)
+
+        if config.model_type not in MODEL_FOR_IMAGE_CLASSIFICATION_MAPPING_NAMES:
+            raise ValueError("This model is not supported")
+
+        model: Module = AutoModelForImageClassification.from_pretrained(huggingface_repo)
+
+        image_processor: BaseImageProcessor = AutoImageProcessor.from_pretrained(huggingface_repo)
+        if hasattr(image_processor, "size") and hasattr(config, "num_channels"):
+            if "shortest_edge" in image_processor.size:
+                input_size = ConstantImageSize(
+                    image_processor.size.get("shortest_edge"),
+                    image_processor.size.get("shortest_edge"),
+                    config.num_channels,
+                )
+            else:
+                input_size = ConstantImageSize(
+                    image_processor.size.get("width"),
+                    image_processor.size.get("height"),
+                    config.num_channels,
+                )
+        else:  # Should never happen due to model check
+            raise ValueError("This model is not supported")  # pragma: no cover
+
+        label_dict: dict[str, str] = config.id2label
+        column_name = "label"
+        labels_table = Table({column_name: [label for _, label in label_dict.items()]})
+        one_hot_encoder = OneHotEncoder().fit(labels_table, [column_name])
+
+        in_conversion = InputConversionImage(input_size)
+        out_conversion = OutputConversionImageToColumn()
+
+        in_conversion._column_name = column_name
+        in_conversion._one_hot_encoder = one_hot_encoder
+        in_conversion._input_size = input_size
+        in_conversion._output_type = _ColumnAsTensor
+        num_of_classes = labels_table.row_count
+
+        network = NeuralNetworkClassifier.__new__(NeuralNetworkClassifier)
+        network._input_conversion = in_conversion
+        network._model = model
+        network._output_conversion = out_conversion
+        network._input_size = input_size
+        network._batch_size = 1
+        network._is_fitted = True
+        network._num_of_classes = num_of_classes
+        network._total_number_of_epochs_done = 0
+        network._total_number_of_batches_done = 0
+
+        return network
 
     def fit(
         self,
@@ -466,6 +611,10 @@ class NeuralNetworkClassifier(Generic[IFT, IPT, OT]):
         with torch.no_grad():
             for x in dataloader:
                 elem = self._model(x)
+                if not isinstance(elem, torch.Tensor) and hasattr(elem, "logits"):
+                    elem = elem.logits  # pragma: no cover
+                elif not isinstance(elem, torch.Tensor):
+                    raise ValueError(f"Output of model has unsupported type: {type(elem)}")  # pragma: no cover
                 if self._num_of_classes > 1:
                     predictions.append(torch.argmax(elem, dim=1))
                 else:
@@ -480,6 +629,11 @@ class NeuralNetworkClassifier(Generic[IFT, IPT, OT]):
     def is_fitted(self) -> bool:
         """Whether the model is fitted."""
         return self._is_fitted
+
+    @property
+    def input_size(self) -> int | ModelImageSize:
+        """The input size of the model."""
+        return self._input_size
 
 
 def _create_internal_model(
@@ -518,7 +672,7 @@ def _create_internal_model(
             self._pytorch_layers = nn.Sequential(*internal_layers)
 
         @property
-        def input_size(self) -> int | ImageSize:
+        def input_size(self) -> int | ModelImageSize:
             return self._layer_list[0].input_size
 
         def forward(self, x: Tensor) -> Tensor:

@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, Any
 from safeds._config import _init_default_device
 from safeds._utils import _structural_hash
 from safeds._validation import _check_bounds, _ClosedBound
-from safeds.data.image.typing import ImageSize
+from safeds.ml.nn.typing import ModelImageSize
 
 from ._layer import Layer
 
@@ -72,8 +72,8 @@ class ForwardLayer(Layer):
         """
         return self._output_size
 
-    def _set_input_size(self, input_size: int | ImageSize) -> None:
-        if isinstance(input_size, ImageSize):
+    def _set_input_size(self, input_size: int | ModelImageSize) -> None:
+        if isinstance(input_size, ModelImageSize):
             raise TypeError("The input_size of a forward layer has to be of type int.")
 
         _check_bounds("input_size", input_size, lower_bound=_ClosedBound(1))
