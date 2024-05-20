@@ -13,11 +13,6 @@ from safeds.ml.nn import (
     NeuralNetworkClassifier,
     NeuralNetworkRegressor,
 )
-from safeds.ml.nn.converters import (
-    InputConversionImageToColumn,
-    InputConversionImageToImage,
-    InputConversionImageToTable,
-)
 from safeds.ml.nn.layers import (
     AveragePooling2DLayer,
     Convolutional2DLayer,
@@ -26,7 +21,6 @@ from safeds.ml.nn.layers import (
     ForwardLayer,
     MaxPooling2DLayer,
 )
-from safeds.ml.nn.typing import VariableImageSize
 from torch.types import Device
 
 from tests.helpers import configure_test_with_device, device_cpu, device_cuda, images_all, resolve_resource_path
@@ -84,10 +78,7 @@ class TestImageToTableClassifier:
         image_dataset = ImageDataset(image_list, image_classes_one_hot_encoded)
         num_of_classes: int = image_dataset.output_size if isinstance(image_dataset.output_size, int) else 0
         layers = [Convolutional2DLayer(1, 2), MaxPooling2DLayer(10), FlattenLayer(), ForwardLayer(num_of_classes)]
-        nn_original = NeuralNetworkClassifier(
-            InputConversionImageToTable(image_dataset.input_size),
-            layers,
-        )
+        nn_original = NeuralNetworkClassifier(layers)
         nn = nn_original.fit(image_dataset, epoch_size=2)
         assert nn_original._model is not nn._model
         prediction: ImageDataset = nn.predict(image_dataset.get_input())
@@ -143,10 +134,7 @@ class TestImageToColumnClassifier:
         num_of_classes: int = image_dataset.output_size if isinstance(image_dataset.output_size, int) else 0
 
         layers = [Convolutional2DLayer(1, 2), AveragePooling2DLayer(10), FlattenLayer(), ForwardLayer(num_of_classes)]
-        nn_original = NeuralNetworkClassifier(
-            InputConversionImageToColumn(image_dataset.input_size),
-            layers,
-        )
+        nn_original = NeuralNetworkClassifier(layers)
         nn = nn_original.fit(image_dataset, epoch_size=2)
         assert nn_original._model is not nn._model
         prediction: ImageDataset = nn.predict(image_dataset.get_input())
@@ -184,10 +172,7 @@ class TestImageToImageRegressor:
             ConvolutionalTranspose2DLayer(6, 2),
             ConvolutionalTranspose2DLayer(4, 2),
         ]
-        nn_original = NeuralNetworkRegressor(
-            InputConversionImageToImage(image_dataset.input_size),
-            layers,
-        )
+        nn_original = NeuralNetworkRegressor(layers)
         nn = nn_original.fit(image_dataset, epoch_size=20)
         assert nn_original._model is not nn._model
         prediction = nn.predict(image_dataset.get_input())
@@ -225,10 +210,7 @@ class TestImageToImageRegressor:
             ConvolutionalTranspose2DLayer(6, 2),
             ConvolutionalTranspose2DLayer(4, 2),
         ]
-        nn_original = NeuralNetworkRegressor(
-            InputConversionImageToImage(VariableImageSize.from_image_size(image_dataset.input_size)),
-            layers,
-        )
+        nn_original = NeuralNetworkRegressor(layers)
         nn = nn_original.fit(image_dataset, epoch_size=20)
         assert nn_original._model is not nn._model
         prediction = nn.predict(
