@@ -30,6 +30,7 @@ class InputConversionTimeSeries(InputConversion[TimeSeriesDataset, TimeSeriesDat
         self,
         window_size: int,
         forecast_horizon: int,
+        continues: bool = False,
         *,
         prediction_name: str = "prediction_nn",
     ) -> None:
