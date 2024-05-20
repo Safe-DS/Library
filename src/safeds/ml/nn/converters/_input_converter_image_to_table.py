@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 from safeds._config import _init_default_device
 from safeds.data.image.containers._single_size_image_list import _SingleSizeImageList
@@ -17,22 +17,18 @@ if TYPE_CHECKING:
 
 
 class InputConversionImageToTable(_InputConversionImage):
-    def _data_conversion_output(self, input_data: ImageList, output_data: Tensor, **kwargs: Any) -> ImageDataset[Table]:
+    def _data_conversion_output(self, input_data: ImageList, output_data: Tensor) -> ImageDataset[Table]:
         import torch
 
         _init_default_device()
 
         if not isinstance(input_data, _SingleSizeImageList):
             raise ValueError("The given input ImageList contains images of different sizes.")  # noqa: TRY004
-        if (
-            "column_names" not in kwargs
-            or not isinstance(kwargs.get("column_names"), list)
-            and all(isinstance(element, str) for element in kwargs["column_names"])
-        ):
+        if self._column_names is None:
             raise ValueError(
                 "The column_names are not set. The data can only be converted if the column_names are provided as `list[str]` in the kwargs.",
             )
-        column_names: list[str] = kwargs["column_names"]
+        column_names: list[str] = self._column_names
 
         output = torch.zeros(len(input_data), len(column_names))
         output[torch.arange(len(input_data)), output_data] = 1

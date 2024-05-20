@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Any, Generic, TypeVar
+from typing import TYPE_CHECKING, Generic, TypeVar
 
 from safeds.data.image.containers import ImageList
 from safeds.data.labeled.containers import ImageDataset, TabularDataset, TimeSeriesDataset
@@ -37,13 +37,10 @@ class InputConversion(Generic[FT, PT], ABC):
     def _data_conversion_predict(self, input_data: PT, batch_size: int) -> DataLoader | _SingleSizeImageList: ...
 
     @abstractmethod
-    def _data_conversion_output(self, input_data: PT, output_data: Tensor, **kwargs: Any) -> FT: ...
+    def _data_conversion_output(self, input_data: PT, output_data: Tensor) -> FT: ...
 
     @abstractmethod
     def _is_fit_data_valid(self, input_data: FT) -> bool: ...
 
     @abstractmethod
     def _is_predict_data_valid(self, input_data: PT) -> bool: ...
-
-    @abstractmethod
-    def _get_output_configuration(self) -> dict[str, Any]: ...

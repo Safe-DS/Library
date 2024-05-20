@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 from safeds._config import _init_default_device
 from safeds.data.image.containers import ImageList
@@ -18,7 +18,6 @@ class InputConversionImageToImage(_InputConversionImage):
         self,
         input_data: ImageList,
         output_data: Tensor,
-        **_kwargs: Any,
     ) -> ImageDataset[ImageList]:
         import torch
 

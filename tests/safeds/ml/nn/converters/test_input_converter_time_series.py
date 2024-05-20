@@ -29,43 +29,6 @@ def test_should_raise_if_is_fitted_is_set_correctly_lstm() -> None:
     assert model.is_fitted
 
 
-def test_get_output_config() -> None:
-    test_val = {"window_size": 1, "forecast_horizon": 1}
-    it = InputConversionTimeSeries(1, 1)
-    di = it._get_output_configuration()
-    assert di == test_val
-
-
-def test_output_conversion_time_series() -> None:
-    ot = InputConversionTimeSeries(1, 1)
-
-    with pytest.raises(
-        ValueError,
-        match=r"The window_size is not set. The data can only be converted if the window_size is provided as `int` in the kwargs.",
-    ):
-        ot._data_conversion_output(
-            input_data=Table({"a": [1], "c": [1], "b": [1]}).to_time_series_dataset("a", "b"),
-            output_data=torch.Tensor([0]),
-            win=2,
-            kappa=3,
-        )
-
-
-def test_output_conversion_time_series_2() -> None:
-    ot = InputConversionTimeSeries(1, 1)
-
-    with pytest.raises(
-        ValueError,
-        match=r"The forecast_horizon is not set. The data can only be converted if the forecast_horizon is provided as `int` in the kwargs.",
-    ):
-        ot._data_conversion_output(
-            input_data=Table({"a": [1], "c": [1], "b": [1]}).to_time_series_dataset("a", "b"),
-            output_data=torch.Tensor([0]),
-            window_size=2,
-            kappa=3,
-        )
-
-
 class TestEq:
     @pytest.mark.parametrize(
         ("output_conversion_ts1", "output_conversion_ts2"),
