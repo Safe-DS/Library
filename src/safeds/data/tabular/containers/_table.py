@@ -551,8 +551,6 @@ class Table:
         """
         Get a column from the table.
 
-        **Note:** This operation must fully load the data into memory, which can be expensive.
-
         Parameters
         ----------
         name:
@@ -584,7 +582,9 @@ class Table:
         +-----+
         """
         _check_columns_exist(self, name)
-        return Column._from_polars_series(self._data_frame.get_column(name))
+        return Column._from_polars_series(
+            self._lazy_frame.select(name).collect().get_column(name),
+        )
 
     def get_column_type(self, name: str) -> DataType:
         """

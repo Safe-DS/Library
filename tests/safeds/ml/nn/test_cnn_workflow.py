@@ -14,10 +14,9 @@ from safeds.ml.nn import (
     NeuralNetworkRegressor,
 )
 from safeds.ml.nn.converters import (
-    InputConversionImage,
-    OutputConversionImageToColumn,
-    OutputConversionImageToImage,
-    OutputConversionImageToTable,
+    InputConversionImageToColumn,
+    InputConversionImageToImage,
+    InputConversionImageToTable,
 )
 from safeds.ml.nn.layers import (
     AveragePooling2DLayer,
@@ -86,18 +85,11 @@ class TestImageToTableClassifier:
         num_of_classes: int = image_dataset.output_size if isinstance(image_dataset.output_size, int) else 0
         layers = [Convolutional2DLayer(1, 2), MaxPooling2DLayer(10), FlattenLayer(), ForwardLayer(num_of_classes)]
         nn_original = NeuralNetworkClassifier(
-            InputConversionImage(image_dataset.input_size),
+            InputConversionImageToTable(image_dataset.input_size),
             layers,
-            OutputConversionImageToTable(),
         )
         nn = nn_original.fit(image_dataset, epoch_size=2)
-        assert str(nn_original._model.state_dict().values()) != str(nn._model.state_dict().values())
-        assert not torch.all(
-            torch.eq(
-                nn_original._model.state_dict()["_pytorch_layers.3._layer.bias"],
-                nn._model.state_dict()["_pytorch_layers.3._layer.bias"],
-            ),
-        ).item()
+        assert nn_original._model is not nn._model
         prediction: ImageDataset = nn.predict(image_dataset.get_input())
         assert one_hot_encoder.inverse_transform(prediction.get_output()) == Table({"class": prediction_label})
         assert prediction._output._tensor.device == _get_device()
@@ -152,18 +144,11 @@ class TestImageToColumnClassifier:
 
         layers = [Convolutional2DLayer(1, 2), AveragePooling2DLayer(10), FlattenLayer(), ForwardLayer(num_of_classes)]
         nn_original = NeuralNetworkClassifier(
-            InputConversionImage(image_dataset.input_size),
+            InputConversionImageToColumn(image_dataset.input_size),
             layers,
-            OutputConversionImageToColumn(),
         )
         nn = nn_original.fit(image_dataset, epoch_size=2)
-        assert str(nn_original._model.state_dict().values()) != str(nn._model.state_dict().values())
-        assert not torch.all(
-            torch.eq(
-                nn_original._model.state_dict()["_pytorch_layers.3._layer.bias"],
-                nn._model.state_dict()["_pytorch_layers.3._layer.bias"],
-            ),
-        ).item()
+        assert nn_original._model is not nn._model
         prediction: ImageDataset = nn.predict(image_dataset.get_input())
         assert prediction.get_output() == Column("class", prediction_label)
         assert prediction._output._tensor.device == _get_device()
@@ -200,18 +185,11 @@ class TestImageToImageRegressor:
             ConvolutionalTranspose2DLayer(4, 2),
         ]
         nn_original = NeuralNetworkRegressor(
-            InputConversionImage(image_dataset.input_size),
+            InputConversionImageToImage(image_dataset.input_size),
             layers,
-            OutputConversionImageToImage(),
         )
         nn = nn_original.fit(image_dataset, epoch_size=20)
-        assert str(nn_original._model.state_dict().values()) != str(nn._model.state_dict().values())
-        assert not torch.all(
-            torch.eq(
-                nn_original._model.state_dict()["_pytorch_layers.3._layer.bias"],
-                nn._model.state_dict()["_pytorch_layers.3._layer.bias"],
-            ),
-        ).item()
+        assert nn_original._model is not nn._model
         prediction = nn.predict(image_dataset.get_input())
         assert isinstance(prediction.get_output(), ImageList)
         assert prediction._output._tensor.device == _get_device()
@@ -248,18 +226,11 @@ class TestImageToImageRegressor:
             ConvolutionalTranspose2DLayer(4, 2),
         ]
         nn_original = NeuralNetworkRegressor(
-            InputConversionImage(VariableImageSize.from_image_size(image_dataset.input_size)),
+            InputConversionImageToImage(VariableImageSize.from_image_size(image_dataset.input_size)),
             layers,
-            OutputConversionImageToImage(),
         )
         nn = nn_original.fit(image_dataset, epoch_size=20)
-        assert str(nn_original._model.state_dict().values()) != str(nn._model.state_dict().values())
-        assert not torch.all(
-            torch.eq(
-                nn_original._model.state_dict()["_pytorch_layers.3._layer.bias"],
-                nn._model.state_dict()["_pytorch_layers.3._layer.bias"],
-            ),
-        ).item()
+        assert nn_original._model is not nn._model
         prediction = nn.predict(
             image_dataset.get_input().resize(
                 image_dataset.input_size.width * multi_width,

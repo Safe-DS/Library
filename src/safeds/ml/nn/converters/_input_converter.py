@@ -8,6 +8,7 @@ from safeds.data.labeled.containers import ImageDataset, TabularDataset, TimeSer
 from safeds.data.tabular.containers import Table
 
 if TYPE_CHECKING:
+    from torch import Tensor
     from torch.utils.data import DataLoader
 
     from safeds.data.image.containers._single_size_image_list import _SingleSizeImageList
@@ -22,8 +23,7 @@ class InputConversion(Generic[FT, PT], ABC):
 
     @property
     @abstractmethod
-    def _data_size(self) -> int | ModelImageSize:
-        pass  # pragma: no cover
+    def _data_size(self) -> int | ModelImageSize: ...
 
     @abstractmethod
     def _data_conversion_fit(
@@ -31,21 +31,19 @@ class InputConversion(Generic[FT, PT], ABC):
         input_data: FT,
         batch_size: int,
         num_of_classes: int = 1,
-    ) -> DataLoader | ImageDataset:
-        pass  # pragma: no cover
+    ) -> DataLoader | ImageDataset: ...
 
     @abstractmethod
-    def _data_conversion_predict(self, input_data: PT, batch_size: int) -> DataLoader | _SingleSizeImageList:
-        pass  # pragma: no cover
+    def _data_conversion_predict(self, input_data: PT, batch_size: int) -> DataLoader | _SingleSizeImageList: ...
 
     @abstractmethod
-    def _is_fit_data_valid(self, input_data: FT) -> bool:
-        pass  # pragma: no cover
+    def _data_conversion_output(self, input_data: PT, output_data: Tensor, **kwargs: Any) -> FT: ...
 
     @abstractmethod
-    def _is_predict_data_valid(self, input_data: PT) -> bool:
-        pass  # pragma: no cover
+    def _is_fit_data_valid(self, input_data: FT) -> bool: ...
 
     @abstractmethod
-    def _get_output_configuration(self) -> dict[str, Any]:
-        pass  # pragma: no cover
+    def _is_predict_data_valid(self, input_data: PT) -> bool: ...
+
+    @abstractmethod
+    def _get_output_configuration(self) -> dict[str, Any]: ...

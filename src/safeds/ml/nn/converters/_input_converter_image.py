@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import sys
+from abc import ABC
 from typing import TYPE_CHECKING, Any
 
 from safeds._utils import _structural_hash
@@ -16,24 +17,56 @@ if TYPE_CHECKING:
     from safeds.ml.nn.typing import ModelImageSize
 
 
-class InputConversionImage(InputConversion[ImageDataset, ImageList]):
-    """The input conversion for a neural network, defines the input parameters for the neural network."""
+class _InputConversionImage(InputConversion[ImageDataset, ImageList], ABC):
+    """
+    The input conversion for a neural network, defines the input parameters for the neural network.
+
+    Parameters
+    ----------
+    image_size:
+        the size of the input images
+    """
 
     def __init__(self, image_size: ModelImageSize) -> None:
-        """
-        Define the input parameters for the neural network in the input conversion.
-
-        Parameters
-        ----------
-        image_size:
-            the size of the input images
-        """
         self._input_size = image_size
         self._output_size: ModelImageSize | int | None = None
         self._one_hot_encoder: OneHotEncoder | None = None
         self._column_name: str | None = None
         self._column_names: list[str] | None = None
         self._output_type: type | None = None
+
+    def __hash__(self) -> int:
+        return _structural_hash(
+            self.__class__.__name__,
+            self._input_size,
+            self._output_size,
+            self._one_hot_encoder,
+            self._column_name,
+            self._column_names,
+            self._output_type,
+        )
+
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, type(self)):
+            return NotImplemented
+        return (self is other) or (
+            self._input_size == other._input_size
+            and self._output_size == other._output_size
+            and self._one_hot_encoder == other._one_hot_encoder
+            and self._column_name == other._column_name
+            and self._column_names == other._column_names
+            and self._output_type == other._output_type
+        )
+
+    def __sizeof__(self) -> int:
+        return (
+            sys.getsizeof(self._input_size)
+            + sys.getsizeof(self._output_size)
+            + sys.getsizeof(self._one_hot_encoder)
+            + sys.getsizeof(self._column_name)
+            + sys.getsizeof(self._column_names)
+            + sys.getsizeof(self._output_type)
+        )
 
     @property
     def _data_size(self) -> ModelImageSize:
@@ -81,64 +114,3 @@ class InputConversionImage(InputConversion[ImageDataset, ImageList]):
             "column_name": self._column_name,
             "one_hot_encoder": self._one_hot_encoder,
         }
-
-    def __hash__(self) -> int:
-        """
-        Return a deterministic hash value for this InputConversionImage.
-
-        Returns
-        -------
-        hash:
-            the hash value
-        """
-        return _structural_hash(
-            self._input_size,
-            self._output_size,
-            self._one_hot_encoder,
-            self._column_name,
-            self._column_names,
-            self._output_type,
-        )
-
-    def __eq__(self, other: object) -> bool:
-        """
-        Compare two InputConversionImage instances.
-
-        Parameters
-        ----------
-        other:
-            The InputConversionImage instance to compare to.
-
-        Returns
-        -------
-        equals:
-            Whether the instances are the same.
-        """
-        if not isinstance(other, InputConversionImage):
-            return NotImplemented
-        return (self is other) or (
-            self._input_size == other._input_size
-            and self._output_size == other._output_size
-            and self._one_hot_encoder == other._one_hot_encoder
-            and self._column_name == other._column_name
-            and self._column_names == other._column_names
-            and self._output_type == other._output_type
-        )
-
-    def __sizeof__(self) -> int:
-        """
-        Return the complete size of this object.
-
-        Returns
-        -------
-        size:
-            Size of this object in bytes.
-        """
-        return (
-            sys.getsizeof(self._input_size)
-            + sys.getsizeof(self._output_size)
-            + sys.getsizeof(self._one_hot_encoder)
-            + sys.getsizeof(self._column_name)
-            + sys.getsizeof(self._column_names)
-            + sys.getsizeof(self._output_type)
-        )
