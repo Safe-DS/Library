@@ -8,7 +8,7 @@ from tests.helpers import resolve_resource_path
 
 def test_should_match_snapshot(snapshot_png_image: SnapshotAssertion) -> None:
     table = Table({"A": [1, 2, 3], "B": [2, 4, 7]})
-    lineplot = table.plot.line_plot("A", "B")
+    lineplot = table.plot.line_plot("A", ["B"])
 
     # Create a DataFrame
     assert lineplot == snapshot_png_image

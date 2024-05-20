@@ -201,7 +201,7 @@ class TablePlotter:
 
         return _figure_to_image(fig)
 
-    def line_plot(self, x_name: str, y_name: str) -> Image:
+    def line_plot(self, x_name: str, y_names: list[str], show_confidence_interval: bool = True) -> Image:
         """
         Create a line plot for two columns in the table.
 
@@ -211,7 +211,8 @@ class TablePlotter:
             The name of the column to be plotted on the x-axis.
         y_names:
             The name(s) of the column(s) to be plotted on the y-axis.
-
+        show_confidence_interval:
+            If the confidence interval is shown, per default True.
         Returns
         -------
         line_plot:
@@ -235,43 +236,47 @@ class TablePlotter:
         ... )
         >>> image = table.plot.line_plot("a", "b")
         """
-        _check_columns_exist(self._table, y_name)
+        #y_name = y_names[0]
+        #y_names = y_names[1:]
+        #_check_columns_exist(self._table, y_name)
 
         # TODO: pass list of columns names + extract validation
-        _plot_validation(self._table, x_name, y_name)
+        _plot_validation(self._table, x_name, y_names)
 
         import matplotlib.pyplot as plt
         import polars as pl
+        import numpy as np
+        agg_list = []
+        for name in y_names:
+            agg_list.append(pl.col(name).mean().alias(f"{name}_mean"))
+            agg_list.append(pl.count(name).alias(f"{name}_count"))
+            agg_list.append(pl.std(name, ddof=0).alias(f"{name}_std"))
+        grouped = self._table._lazy_frame.sort(x_name).group_by(x_name).agg(agg_list).collect()
 
-        grouped = (
-            self._table._lazy_frame.group_by(x_name, maintain_order=True)
-            .agg(
-                mean=pl.mean(y_name),
-                count=pl.count(y_name),
-                standard_deviation=pl.std(y_name, ddof=0),
-            )
-            .collect()
-        )
-
+        print(grouped)
         x = grouped.get_column(x_name)
-        y = grouped.get_column("mean")
-        confidence_interval = 1.96 * grouped.get_column("standard_deviation") / grouped.get_column("count").sqrt()
+        y_s = []
+        confidence_intervals = []
+        for name in y_names:
+            y_s.append(grouped.get_column(name+"_mean"))
+            confidence_intervals.append(1.96 * grouped.get_column(name+"_std") / grouped.get_column(name+"_count").sqrt())
 
         fig, ax = plt.subplots()
-        ax.plot(
-            x,
-            y,
-        )
-        ax.fill_between(
-            x,
-            y - confidence_interval,
-            y + confidence_interval,
-            color="lightblue",
-            alpha=0.15,
-        )
+        for y in y_s:
+            ax.plot(x, y)
+        print(confidence_intervals)
+        if show_confidence_interval:
+            for y, conf in zip(y_s, confidence_intervals):
+                ax.fill_between(
+                    x,
+                    y - conf,
+                    y + conf,
+                    color="lightblue",
+                    alpha=0.15,
+                )
         ax.set(
             xlabel=x_name,
-            ylabel=y_name,
+            ylabel=y_names,
         )
         ax.set_xticks(ax.get_xticks())
         ax.set_xticklabels(
@@ -282,6 +287,7 @@ class TablePlotter:
         fig.tight_layout()
 
         return _figure_to_image(fig)
+
 
     def scatter_plot(self, x_name: str, y_name: str) -> Image:
         """
