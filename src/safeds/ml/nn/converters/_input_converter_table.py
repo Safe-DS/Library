@@ -5,14 +5,14 @@ from typing import TYPE_CHECKING
 from safeds.data.labeled.containers import TabularDataset
 from safeds.data.tabular.containers import Column, Table
 
-from ._input_converter import InputConversion
+from ._input_converter import _Converter
 
 if TYPE_CHECKING:
     from torch import Tensor
     from torch.utils.data import DataLoader
 
 
-class InputConversionTable(InputConversion[TabularDataset, Table]):
+class _TableConverter(_Converter[TabularDataset, Table]):
     """
     The input conversion for a neural network, defines the input parameters for the neural network.
 

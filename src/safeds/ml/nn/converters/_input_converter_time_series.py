@@ -7,14 +7,14 @@ from safeds._utils import _structural_hash
 from safeds.data.labeled.containers import TimeSeriesDataset
 from safeds.data.tabular.containers import Column
 
-from ._input_converter import InputConversion
+from ._input_converter import _Converter
 
 if TYPE_CHECKING:
     from torch import Tensor
     from torch.utils.data import DataLoader
 
 
-class InputConversionTimeSeries(InputConversion[TimeSeriesDataset, TimeSeriesDataset]):
+class _TimeSeriesConverter(_Converter[TimeSeriesDataset, TimeSeriesDataset]):
     """The input conversion for a neural network, defines the input parameters for the neural network."""
 
     def __init__(
@@ -31,7 +31,7 @@ class InputConversionTimeSeries(InputConversion[TimeSeriesDataset, TimeSeriesDat
         self._prediction_name = prediction_name  # TODO: use target name, override existing column
 
     def __eq__(self, other: object) -> bool:
-        if not isinstance(other, InputConversionTimeSeries):
+        if not isinstance(other, _TimeSeriesConverter):
             return False
         return self._prediction_name == other._prediction_name
 

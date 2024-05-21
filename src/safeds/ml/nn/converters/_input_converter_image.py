@@ -10,14 +10,14 @@ from safeds.data.image.containers._single_size_image_list import _SingleSizeImag
 from safeds.data.labeled.containers import ImageDataset
 from safeds.data.labeled.containers._image_dataset import _ColumnAsTensor, _TableAsTensor
 
-from ._input_converter import InputConversion
+from ._input_converter import _Converter
 
 if TYPE_CHECKING:
     from safeds.data.tabular.transformation import OneHotEncoder
     from safeds.ml.nn.typing import ModelImageSize
 
 
-class _InputConversionImage(InputConversion[ImageDataset, ImageList], ABC):
+class _ImageConverter(_Converter[ImageDataset, ImageList], ABC):
     """
     The input conversion for a neural network, defines the input parameters for the neural network.
 

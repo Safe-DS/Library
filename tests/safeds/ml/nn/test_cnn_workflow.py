@@ -14,9 +14,9 @@ from safeds.ml.nn import (
     NeuralNetworkRegressor,
 )
 from safeds.ml.nn.converters import (
-    InputConversionImageToColumn,
-    InputConversionImageToImage,
-    InputConversionImageToTable,
+    _ImageToColumnConverter,
+    _ImageToImageConverter,
+    _ImageToTableConverter,
 )
 from safeds.ml.nn.layers import (
     AveragePooling2DLayer,
@@ -85,7 +85,7 @@ class TestImageToTableClassifier:
         num_of_classes: int = image_dataset.output_size if isinstance(image_dataset.output_size, int) else 0
         layers = [Convolutional2DLayer(1, 2), MaxPooling2DLayer(10), FlattenLayer(), ForwardLayer(num_of_classes)]
         nn_original = NeuralNetworkClassifier(
-            InputConversionImageToTable(image_dataset.input_size),
+            _ImageToTableConverter(image_dataset.input_size),
             layers,
         )
         nn = nn_original.fit(image_dataset, epoch_size=2)
@@ -144,7 +144,7 @@ class TestImageToColumnClassifier:
 
         layers = [Convolutional2DLayer(1, 2), AveragePooling2DLayer(10), FlattenLayer(), ForwardLayer(num_of_classes)]
         nn_original = NeuralNetworkClassifier(
-            InputConversionImageToColumn(image_dataset.input_size),
+            _ImageToColumnConverter(image_dataset.input_size),
             layers,
         )
         nn = nn_original.fit(image_dataset, epoch_size=2)
@@ -185,7 +185,7 @@ class TestImageToImageRegressor:
             ConvolutionalTranspose2DLayer(4, 2),
         ]
         nn_original = NeuralNetworkRegressor(
-            InputConversionImageToImage(image_dataset.input_size),
+            _ImageToImageConverter(image_dataset.input_size),
             layers,
         )
         nn = nn_original.fit(image_dataset, epoch_size=20)
@@ -226,7 +226,7 @@ class TestImageToImageRegressor:
             ConvolutionalTranspose2DLayer(4, 2),
         ]
         nn_original = NeuralNetworkRegressor(
-            InputConversionImageToImage(VariableImageSize.from_image_size(image_dataset.input_size)),
+            _ImageToImageConverter(VariableImageSize.from_image_size(image_dataset.input_size)),
             layers,
         )
         nn = nn_original.fit(image_dataset, epoch_size=20)

@@ -6,7 +6,7 @@ from safeds.ml.nn import (
     NeuralNetworkRegressor,
 )
 from safeds.ml.nn.converters import (
-    InputConversionTimeSeries,
+    _TimeSeriesConverter,
 )
 from safeds.ml.nn.layers import (
     ForwardLayer,
@@ -29,7 +29,7 @@ def test_lstm_model(device: Device) -> None:
     train_table, test_table = table.split_rows(0.8)
 
     model = NeuralNetworkRegressor(
-        InputConversionTimeSeries(prediction_name="predicted"),
+        _TimeSeriesConverter(prediction_name="predicted"),
         [ForwardLayer(input_size=7, output_size=256), LSTMLayer(input_size=256, output_size=1)],
     )
     trained_model = model.fit(

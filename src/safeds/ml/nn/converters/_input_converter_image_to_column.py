@@ -8,7 +8,7 @@ from safeds.data.labeled.containers import ImageDataset
 from safeds.data.labeled.containers._image_dataset import _ColumnAsTensor
 from safeds.data.tabular.containers import Column
 
-from ._input_converter_image import _InputConversionImage
+from ._input_converter_image import _ImageConverter
 
 if TYPE_CHECKING:
     from torch import Tensor
@@ -17,7 +17,7 @@ if TYPE_CHECKING:
     from safeds.data.tabular.transformation import OneHotEncoder
 
 
-class InputConversionImageToColumn(_InputConversionImage):
+class _ImageToColumnConverter(_ImageConverter):
     def _data_conversion_output(
         self,
         input_data: ImageList,

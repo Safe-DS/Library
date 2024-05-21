@@ -7,13 +7,13 @@ from safeds.data.image.containers import ImageList
 from safeds.data.image.containers._single_size_image_list import _SingleSizeImageList
 from safeds.data.labeled.containers import ImageDataset
 
-from ._input_converter_image import _InputConversionImage
+from ._input_converter_image import _ImageConverter
 
 if TYPE_CHECKING:
     from torch import Tensor
 
 
-class InputConversionImageToImage(_InputConversionImage):
+class _ImageToImageConverter(_ImageConverter):
     def _data_conversion_output(
         self,
         input_data: ImageList,

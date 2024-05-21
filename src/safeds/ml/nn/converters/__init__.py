@@ -5,30 +5,33 @@ from typing import TYPE_CHECKING
 import apipkg
 
 if TYPE_CHECKING:
-    from ._input_converter import InputConversion
-    from ._input_converter_image_to_column import InputConversionImageToColumn
-    from ._input_converter_image_to_image import InputConversionImageToImage
-    from ._input_converter_image_to_table import InputConversionImageToTable
-    from ._input_converter_table import InputConversionTable
-    from ._input_converter_time_series import InputConversionTimeSeries
+    from ._input_converter import _Converter
+    from ._input_converter_image import _ImageConverter
+    from ._input_converter_image_to_column import _ImageToColumnConverter
+    from ._input_converter_image_to_image import _ImageToImageConverter
+    from ._input_converter_image_to_table import _ImageToTableConverter
+    from ._input_converter_table import _TableConverter
+    from ._input_converter_time_series import _TimeSeriesConverter
 
 apipkg.initpkg(
     __name__,
     {
-        "InputConversion": "._input_converter:InputConversion",
-        "InputConversionImageToColumn": "._input_converter_image_to_column:InputConversionImageToColumn",
-        "InputConversionImageToImage": "._input_converter_image_to_image:InputConversionImageToImage",
-        "InputConversionImageToTable": "._input_converter_image_to_table:InputConversionImageToTable",
-        "InputConversionTable": "._input_converter_table:InputConversionTable",
-        "InputConversionTimeSeries": "._input_converter_time_series:InputConversionTimeSeries",
+        "_Converter": "._input_converter:_Converter",
+        "_ImageConverter": "._input_converter_image:_ImageConverter",
+        "_ImageToColumnConverter": "._input_converter_image_to_column:_ImageToColumnConverter",
+        "_ImageToImageConverter": "._input_converter_image_to_image:_ImageToImageConverter",
+        "_ImageToTableConverter": "._input_converter_image_to_table:_ImageToTableConverter",
+        "_TableConverter": "._input_converter_table:_TableConverter",
+        "_TimeSeriesConverter": "._input_converter_time_series:_TimeSeriesConverter",
     },
 )
 
 __all__ = [
-    "InputConversion",
-    "InputConversionImageToColumn",
-    "InputConversionImageToImage",
-    "InputConversionImageToTable",
-    "InputConversionTable",
-    "InputConversionTimeSeries",
+    "_Converter",
+    "_ImageConverter",
+    "_ImageToColumnConverter",
+    "_ImageToImageConverter",
+    "_ImageToTableConverter",
+    "_TableConverter",
+    "_TimeSeriesConverter",
 ]

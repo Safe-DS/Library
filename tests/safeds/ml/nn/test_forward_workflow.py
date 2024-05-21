@@ -6,7 +6,7 @@ from safeds.ml.nn import (
     NeuralNetworkRegressor,
 )
 from safeds.ml.nn.converters import (
-    InputConversionTable,
+    _TableConverter,
 )
 from safeds.ml.nn.layers import (
     ForwardLayer,
@@ -34,7 +34,7 @@ def test_forward_model(device: Device) -> None:
     _, train_table = ss.fit_and_transform(train_table)
     _, test_table = ss.fit_and_transform(test_table)
     model = NeuralNetworkRegressor(
-        InputConversionTable(prediction_name="predicted"),
+        _TableConverter(prediction_name="predicted"),
         [ForwardLayer(input_size=1, output_size=1)],
     )
 

@@ -8,7 +8,7 @@ from safeds.data.labeled.containers import ImageDataset
 from safeds.data.labeled.containers._image_dataset import _TableAsTensor
 from safeds.data.tabular.containers import Table
 
-from ._input_converter_image import _InputConversionImage
+from ._input_converter_image import _ImageConverter
 
 if TYPE_CHECKING:
     from torch import Tensor
@@ -16,7 +16,7 @@ if TYPE_CHECKING:
     from safeds.data.image.containers import ImageList
 
 
-class InputConversionImageToTable(_InputConversionImage):
+class _ImageToTableConverter(_ImageConverter):
     def _data_conversion_output(self, input_data: ImageList, output_data: Tensor) -> ImageDataset[Table]:
         import torch
 

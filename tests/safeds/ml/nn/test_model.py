@@ -14,11 +14,11 @@ from safeds.ml.nn import (
     NeuralNetworkRegressor,
 )
 from safeds.ml.nn.converters import (
-    InputConversion,
-    InputConversionImageToColumn,
-    InputConversionImageToImage,
-    InputConversionImageToTable,
-    InputConversionTable,
+    _Converter,
+    _ImageToColumnConverter,
+    _ImageToImageConverter,
+    _ImageToTableConverter,
+    _TableConverter,
 )
 from safeds.ml.nn.layers import (
     AveragePooling2DLayer,
@@ -48,7 +48,7 @@ class TestClassificationModel:
         configure_test_with_device(device)
         assert (
             NeuralNetworkClassifier(
-                InputConversionTable(),
+                _TableConverter(),
                 [ForwardLayer(1, input_size)],
             ).input_size
             == input_size
@@ -65,7 +65,7 @@ class TestClassificationModel:
         configure_test_with_device(device)
         with pytest.raises(OutOfBoundsError):
             NeuralNetworkClassifier(
-                InputConversionTable(),
+                _TableConverter(),
                 [ForwardLayer(1, 1)],
             ).fit(
                 Table.from_dict({"a": [1], "b": [2]}).to_tabular_dataset("a"),
@@ -83,7 +83,7 @@ class TestClassificationModel:
         configure_test_with_device(device)
         with pytest.raises(OutOfBoundsError):
             NeuralNetworkClassifier(
-                InputConversionTable(),
+                _TableConverter(),
                 [ForwardLayer(input_size=1, output_size=1)],
             ).fit(
                 Table.from_dict({"a": [1], "b": [2]}).to_tabular_dataset("a"),
@@ -93,7 +93,7 @@ class TestClassificationModel:
     def test_should_raise_if_fit_function_returns_wrong_datatype(self, device: Device) -> None:
         configure_test_with_device(device)
         fitted_model = NeuralNetworkClassifier(
-            InputConversionTable(),
+            _TableConverter(),
             [ForwardLayer(input_size=1, output_size=8), ForwardLayer(output_size=1)],
         ).fit(
             Table.from_dict({"a": [1], "b": [0]}).to_tabular_dataset("a"),
@@ -111,7 +111,7 @@ class TestClassificationModel:
     def test_should_raise_if_predict_function_returns_wrong_datatype(self, batch_size: int, device: Device) -> None:
         configure_test_with_device(device)
         fitted_model = NeuralNetworkClassifier(
-            InputConversionTable(),
+            _TableConverter(),
             [ForwardLayer(input_size=1, output_size=8), ForwardLayer(output_size=1)],
         ).fit(
             Table.from_dict({"a": [1, 0, 1, 0, 1, 0], "b": [0, 1, 0, 12, 3, 3]}).to_tabular_dataset("a"),
@@ -135,14 +135,14 @@ class TestClassificationModel:
     ) -> None:
         configure_test_with_device(device)
         fitted_model = NeuralNetworkClassifier(
-            InputConversionTable(),
+            _TableConverter(),
             [ForwardLayer(input_size=1, output_size=8), ForwardLayer(output_size=3)],
         ).fit(
             Table.from_dict({"a": [0, 1, 2], "b": [0, 15, 51]}).to_tabular_dataset("a"),
             batch_size=batch_size,
         )
         NeuralNetworkClassifier(
-            InputConversionTable(),
+            _TableConverter(),
             [ForwardLayer(input_size=1, output_size=8), LSTMLayer(output_size=3)],
         ).fit(
             Table.from_dict({"a": [0, 1, 2], "b": [0, 15, 51]}).to_tabular_dataset("a"),
@@ -155,7 +155,7 @@ class TestClassificationModel:
         configure_test_with_device(device)
         with pytest.raises(ModelNotFittedError, match="The model has not been fitted yet."):
             NeuralNetworkClassifier(
-                InputConversionTable(),
+                _TableConverter(),
                 [ForwardLayer(input_size=1, output_size=1)],
             ).predict(
                 Table.from_dict({"a": [1]}),
@@ -164,11 +164,11 @@ class TestClassificationModel:
     def test_should_raise_if_is_fitted_is_set_correctly_for_binary_classification(self, device: Device) -> None:
         configure_test_with_device(device)
         model = NeuralNetworkClassifier(
-            InputConversionTable(),
+            _TableConverter(),
             [ForwardLayer(input_size=1, output_size=1)],
         )
         model_2 = NeuralNetworkClassifier(
-            InputConversionTable(),
+            _TableConverter(),
             [LSTMLayer(input_size=1, output_size=1)],
         )
         assert not model.is_fitted
@@ -185,11 +185,11 @@ class TestClassificationModel:
     def test_should_raise_if_is_fitted_is_set_correctly_for_multiclass_classification(self, device: Device) -> None:
         configure_test_with_device(device)
         model = NeuralNetworkClassifier(
-            InputConversionTable(),
+            _TableConverter(),
             [ForwardLayer(input_size=1, output_size=1), ForwardLayer(output_size=3)],
         )
         model_2 = NeuralNetworkClassifier(
-            InputConversionTable(),
+            _TableConverter(),
             [ForwardLayer(input_size=1, output_size=1), LSTMLayer(output_size=3)],
         )
         assert not model.is_fitted
@@ -206,7 +206,7 @@ class TestClassificationModel:
     def test_should_raise_if_test_features_mismatch(self, device: Device) -> None:
         configure_test_with_device(device)
         model = NeuralNetworkClassifier(
-            InputConversionTable(),
+            _TableConverter(),
             [ForwardLayer(input_size=1, output_size=1), ForwardLayer(output_size=3)],
         )
         model = model.fit(
@@ -223,7 +223,7 @@ class TestClassificationModel:
     def test_should_raise_if_train_features_mismatch(self, device: Device) -> None:
         configure_test_with_device(device)
         model = NeuralNetworkClassifier(
-            InputConversionTable(),
+            _TableConverter(),
             [ForwardLayer(input_size=1, output_size=1), ForwardLayer(output_size=1)],
         )
         learned_model = model.fit(
@@ -238,7 +238,7 @@ class TestClassificationModel:
     def test_should_raise_if_table_size_and_input_size_mismatch(self, device: Device) -> None:
         configure_test_with_device(device)
         model = NeuralNetworkClassifier(
-            InputConversionTable(),
+            _TableConverter(),
             [ForwardLayer(input_size=1, output_size=1), ForwardLayer(output_size=3)],
         )
         with pytest.raises(
@@ -251,7 +251,7 @@ class TestClassificationModel:
     def test_should_raise_if_fit_doesnt_batch_callback(self, device: Device) -> None:
         configure_test_with_device(device)
         model = NeuralNetworkClassifier(
-            InputConversionTable(),
+            _TableConverter(),
             [ForwardLayer(input_size=1, output_size=1)],
         )
 
@@ -273,7 +273,7 @@ class TestClassificationModel:
     def test_should_raise_if_fit_doesnt_epoch_callback(self, device: Device) -> None:
         configure_test_with_device(device)
         model = NeuralNetworkClassifier(
-            InputConversionTable(),
+            _TableConverter(),
             [ForwardLayer(input_size=1, output_size=1)],
         )
 
@@ -296,142 +296,142 @@ class TestClassificationModel:
         ("input_conversion", "layers", "error_msg"),
         [
             (
-                InputConversionTable(),
+                _TableConverter(),
                 [Convolutional2DLayer(1, 1)],
                 r"You cannot use a 2-dimensional layer with 1-dimensional data.",
             ),
             (
-                InputConversionTable(),
+                _TableConverter(),
                 [ConvolutionalTranspose2DLayer(1, 1)],
                 r"You cannot use a 2-dimensional layer with 1-dimensional data.",
             ),
             (
-                InputConversionTable(),
+                _TableConverter(),
                 [MaxPooling2DLayer(1)],
                 r"You cannot use a 2-dimensional layer with 1-dimensional data.",
             ),
             (
-                InputConversionTable(),
+                _TableConverter(),
                 [AveragePooling2DLayer(1)],
                 r"You cannot use a 2-dimensional layer with 1-dimensional data.",
             ),
             (
-                InputConversionTable(),
+                _TableConverter(),
                 [FlattenLayer()],
                 r"You cannot use a 2-dimensional layer with 1-dimensional data.",
             ),
             (
-                InputConversionImageToTable(ImageSize(1, 1, 1)),
+                _ImageToTableConverter(ImageSize(1, 1, 1)),
                 [Convolutional2DLayer(1, 1)],
                 r"The output data would be 2-dimensional but the provided output conversion uses 1-dimensional data.",
             ),
             (
-                InputConversionImageToColumn(ImageSize(1, 1, 1)),
+                _ImageToColumnConverter(ImageSize(1, 1, 1)),
                 [Convolutional2DLayer(1, 1)],
                 r"The output data would be 2-dimensional but the provided output conversion uses 1-dimensional data.",
             ),
             (
-                InputConversionImageToTable(ImageSize(1, 1, 1)),
+                _ImageToTableConverter(ImageSize(1, 1, 1)),
                 [ConvolutionalTranspose2DLayer(1, 1)],
                 r"The output data would be 2-dimensional but the provided output conversion uses 1-dimensional data.",
             ),
             (
-                InputConversionImageToColumn(ImageSize(1, 1, 1)),
+                _ImageToColumnConverter(ImageSize(1, 1, 1)),
                 [ConvolutionalTranspose2DLayer(1, 1)],
                 r"The output data would be 2-dimensional but the provided output conversion uses 1-dimensional data.",
             ),
             (
-                InputConversionImageToTable(ImageSize(1, 1, 1)),
+                _ImageToTableConverter(ImageSize(1, 1, 1)),
                 [MaxPooling2DLayer(1)],
                 r"The output data would be 2-dimensional but the provided output conversion uses 1-dimensional data.",
             ),
             (
-                InputConversionImageToColumn(ImageSize(1, 1, 1)),
+                _ImageToColumnConverter(ImageSize(1, 1, 1)),
                 [MaxPooling2DLayer(1)],
                 r"The output data would be 2-dimensional but the provided output conversion uses 1-dimensional data.",
             ),
             (
-                InputConversionImageToTable(ImageSize(1, 1, 1)),
+                _ImageToTableConverter(ImageSize(1, 1, 1)),
                 [AveragePooling2DLayer(1)],
                 r"The output data would be 2-dimensional but the provided output conversion uses 1-dimensional data.",
             ),
             (
-                InputConversionImageToColumn(ImageSize(1, 1, 1)),
+                _ImageToColumnConverter(ImageSize(1, 1, 1)),
                 [AveragePooling2DLayer(1)],
                 r"The output data would be 2-dimensional but the provided output conversion uses 1-dimensional data.",
             ),
             (
-                InputConversionImageToTable(ImageSize(1, 1, 1)),
+                _ImageToTableConverter(ImageSize(1, 1, 1)),
                 [FlattenLayer(), Convolutional2DLayer(1, 1)],
                 r"You cannot use a 2-dimensional layer with 1-dimensional data.",
             ),
             (
-                InputConversionImageToColumn(ImageSize(1, 1, 1)),
+                _ImageToColumnConverter(ImageSize(1, 1, 1)),
                 [FlattenLayer(), Convolutional2DLayer(1, 1)],
                 r"You cannot use a 2-dimensional layer with 1-dimensional data.",
             ),
             (
-                InputConversionImageToTable(ImageSize(1, 1, 1)),
+                _ImageToTableConverter(ImageSize(1, 1, 1)),
                 [FlattenLayer(), ConvolutionalTranspose2DLayer(1, 1)],
                 r"You cannot use a 2-dimensional layer with 1-dimensional data.",
             ),
             (
-                InputConversionImageToColumn(ImageSize(1, 1, 1)),
+                _ImageToColumnConverter(ImageSize(1, 1, 1)),
                 [FlattenLayer(), ConvolutionalTranspose2DLayer(1, 1)],
                 r"You cannot use a 2-dimensional layer with 1-dimensional data.",
             ),
             (
-                InputConversionImageToTable(ImageSize(1, 1, 1)),
+                _ImageToTableConverter(ImageSize(1, 1, 1)),
                 [FlattenLayer(), MaxPooling2DLayer(1)],
                 r"You cannot use a 2-dimensional layer with 1-dimensional data.",
             ),
             (
-                InputConversionImageToColumn(ImageSize(1, 1, 1)),
+                _ImageToColumnConverter(ImageSize(1, 1, 1)),
                 [FlattenLayer(), MaxPooling2DLayer(1)],
                 r"You cannot use a 2-dimensional layer with 1-dimensional data.",
             ),
             (
-                InputConversionImageToTable(ImageSize(1, 1, 1)),
+                _ImageToTableConverter(ImageSize(1, 1, 1)),
                 [FlattenLayer(), AveragePooling2DLayer(1)],
                 r"You cannot use a 2-dimensional layer with 1-dimensional data.",
             ),
             (
-                InputConversionImageToColumn(ImageSize(1, 1, 1)),
+                _ImageToColumnConverter(ImageSize(1, 1, 1)),
                 [FlattenLayer(), AveragePooling2DLayer(1)],
                 r"You cannot use a 2-dimensional layer with 1-dimensional data.",
             ),
             (
-                InputConversionImageToTable(ImageSize(1, 1, 1)),
+                _ImageToTableConverter(ImageSize(1, 1, 1)),
                 [FlattenLayer(), FlattenLayer()],
                 r"You cannot use a 2-dimensional layer with 1-dimensional data.",
             ),
             (
-                InputConversionImageToColumn(ImageSize(1, 1, 1)),
+                _ImageToColumnConverter(ImageSize(1, 1, 1)),
                 [FlattenLayer(), FlattenLayer()],
                 r"You cannot use a 2-dimensional layer with 1-dimensional data.",
             ),
             (
-                InputConversionImageToTable(ImageSize(1, 1, 1)),
+                _ImageToTableConverter(ImageSize(1, 1, 1)),
                 [ForwardLayer(1)],
                 r"The 2-dimensional data has to be flattened before using a 1-dimensional layer.",
             ),
             (
-                InputConversionImageToColumn(ImageSize(1, 1, 1)),
+                _ImageToColumnConverter(ImageSize(1, 1, 1)),
                 [ForwardLayer(1)],
                 r"The 2-dimensional data has to be flattened before using a 1-dimensional layer.",
             ),
             (
-                InputConversionImageToTable(ImageSize(1, 1, 1)),
+                _ImageToTableConverter(ImageSize(1, 1, 1)),
                 [],
                 r"You need to provide at least one layer to a neural network.",
             ),
             (
-                InputConversionImageToColumn(ImageSize(1, 1, 1)),
+                _ImageToColumnConverter(ImageSize(1, 1, 1)),
                 [],
                 r"You need to provide at least one layer to a neural network.",
             ),
             (
-                InputConversionImageToColumn(VariableImageSize(1, 1, 1)),
+                _ImageToColumnConverter(VariableImageSize(1, 1, 1)),
                 [FlattenLayer()],
                 r"A NeuralNetworkClassifier cannot be used with a InputConversionImage that uses a VariableImageSize.",
             ),
@@ -439,7 +439,7 @@ class TestClassificationModel:
     )
     def test_should_raise_if_model_has_invalid_structure(
         self,
-        input_conversion: InputConversion,
+        input_conversion: _Converter,
         layers: list[Layer],
         error_msg: str,
         device: Device,
@@ -461,7 +461,7 @@ class TestRegressionModel:
         configure_test_with_device(device)
         assert (
             NeuralNetworkRegressor(
-                InputConversionTable(),
+                _TableConverter(),
                 [ForwardLayer(1, input_size)],
             ).input_size
             == input_size
@@ -478,7 +478,7 @@ class TestRegressionModel:
         configure_test_with_device(device)
         with pytest.raises(OutOfBoundsError):
             NeuralNetworkRegressor(
-                InputConversionTable(),
+                _TableConverter(),
                 [ForwardLayer(input_size=1, output_size=1)],
             ).fit(
                 Table.from_dict({"a": [1], "b": [2]}).to_tabular_dataset("a"),
@@ -496,7 +496,7 @@ class TestRegressionModel:
         configure_test_with_device(device)
         with pytest.raises(OutOfBoundsError):
             NeuralNetworkRegressor(
-                InputConversionTable(),
+                _TableConverter(),
                 [ForwardLayer(input_size=1, output_size=1)],
             ).fit(
                 Table.from_dict({"a": [1], "b": [2]}).to_tabular_dataset("a"),
@@ -514,7 +514,7 @@ class TestRegressionModel:
     def test_should_raise_if_fit_function_returns_wrong_datatype(self, batch_size: int, device: Device) -> None:
         configure_test_with_device(device)
         fitted_model = NeuralNetworkRegressor(
-            InputConversionTable(),
+            _TableConverter(),
             [ForwardLayer(input_size=1, output_size=1)],
         ).fit(
             Table.from_dict({"a": [1, 0, 1], "b": [2, 3, 4]}).to_tabular_dataset("a"),
@@ -533,7 +533,7 @@ class TestRegressionModel:
     def test_should_raise_if_predict_function_returns_wrong_datatype(self, batch_size: int, device: Device) -> None:
         configure_test_with_device(device)
         fitted_model = NeuralNetworkRegressor(
-            InputConversionTable(),
+            _TableConverter(),
             [ForwardLayer(input_size=1, output_size=1)],
         ).fit(
             Table.from_dict({"a": [1, 0, 1], "b": [2, 3, 4]}).to_tabular_dataset("a"),
@@ -546,7 +546,7 @@ class TestRegressionModel:
         configure_test_with_device(device)
         with pytest.raises(ModelNotFittedError, match="The model has not been fitted yet."):
             NeuralNetworkRegressor(
-                InputConversionTable(),
+                _TableConverter(),
                 [ForwardLayer(input_size=1, output_size=1)],
             ).predict(
                 Table.from_dict({"a": [1]}),
@@ -555,7 +555,7 @@ class TestRegressionModel:
     def test_should_raise_if_is_fitted_is_set_correctly(self, device: Device) -> None:
         configure_test_with_device(device)
         model = NeuralNetworkRegressor(
-            InputConversionTable(),
+            _TableConverter(),
             [ForwardLayer(input_size=1, output_size=1)],
         )
         assert not model.is_fitted
@@ -567,7 +567,7 @@ class TestRegressionModel:
     def test_should_raise_if_test_features_mismatch(self, device: Device) -> None:
         configure_test_with_device(device)
         model = NeuralNetworkRegressor(
-            InputConversionTable(),
+            _TableConverter(),
             [ForwardLayer(input_size=1, output_size=1)],
         )
         model = model.fit(
@@ -584,7 +584,7 @@ class TestRegressionModel:
     def test_should_raise_if_train_features_mismatch(self, device: Device) -> None:
         configure_test_with_device(device)
         model = NeuralNetworkRegressor(
-            InputConversionTable(),
+            _TableConverter(),
             [ForwardLayer(input_size=1, output_size=1)],
         )
         trained_model = model.fit(
@@ -601,7 +601,7 @@ class TestRegressionModel:
     def test_should_raise_if_table_size_and_input_size_mismatch(self, device: Device) -> None:
         configure_test_with_device(device)
         model = NeuralNetworkRegressor(
-            InputConversionTable(),
+            _TableConverter(),
             [ForwardLayer(input_size=1, output_size=1), ForwardLayer(output_size=3)],
         )
         with pytest.raises(
@@ -614,7 +614,7 @@ class TestRegressionModel:
     def test_should_raise_if_fit_doesnt_batch_callback(self, device: Device) -> None:
         configure_test_with_device(device)
         model = NeuralNetworkRegressor(
-            InputConversionTable(),
+            _TableConverter(),
             [ForwardLayer(input_size=1, output_size=1)],
         )
 
@@ -636,7 +636,7 @@ class TestRegressionModel:
     def test_should_raise_if_fit_doesnt_epoch_callback(self, device: Device) -> None:
         configure_test_with_device(device)
         model = NeuralNetworkRegressor(
-            InputConversionTable(),
+            _TableConverter(),
             [ForwardLayer(input_size=1, output_size=1)],
         )
 
@@ -659,82 +659,82 @@ class TestRegressionModel:
         ("input_conversion", "layers", "error_msg"),
         [
             (
-                InputConversionTable(),
+                _TableConverter(),
                 [Convolutional2DLayer(1, 1)],
                 r"You cannot use a 2-dimensional layer with 1-dimensional data.",
             ),
             (
-                InputConversionTable(),
+                _TableConverter(),
                 [ConvolutionalTranspose2DLayer(1, 1)],
                 r"You cannot use a 2-dimensional layer with 1-dimensional data.",
             ),
             (
-                InputConversionTable(),
+                _TableConverter(),
                 [MaxPooling2DLayer(1)],
                 r"You cannot use a 2-dimensional layer with 1-dimensional data.",
             ),
             (
-                InputConversionTable(),
+                _TableConverter(),
                 [AveragePooling2DLayer(1)],
                 r"You cannot use a 2-dimensional layer with 1-dimensional data.",
             ),
             (
-                InputConversionTable(),
+                _TableConverter(),
                 [FlattenLayer()],
                 r"You cannot use a 2-dimensional layer with 1-dimensional data.",
             ),
             (
-                InputConversionImageToImage(ImageSize(1, 1, 1)),
+                _ImageToImageConverter(ImageSize(1, 1, 1)),
                 [FlattenLayer()],
                 r"The output data would be 1-dimensional but the provided output conversion uses 2-dimensional data.",
             ),
             (
-                InputConversionImageToImage(ImageSize(1, 1, 1)),
+                _ImageToImageConverter(ImageSize(1, 1, 1)),
                 [FlattenLayer(), ForwardLayer(1)],
                 r"The output data would be 1-dimensional but the provided output conversion uses 2-dimensional data.",
             ),
             (
-                InputConversionImageToImage(ImageSize(1, 1, 1)),
+                _ImageToImageConverter(ImageSize(1, 1, 1)),
                 [FlattenLayer(), Convolutional2DLayer(1, 1)],
                 r"You cannot use a 2-dimensional layer with 1-dimensional data.",
             ),
             (
-                InputConversionImageToImage(ImageSize(1, 1, 1)),
+                _ImageToImageConverter(ImageSize(1, 1, 1)),
                 [FlattenLayer(), ConvolutionalTranspose2DLayer(1, 1)],
                 r"You cannot use a 2-dimensional layer with 1-dimensional data.",
             ),
             (
-                InputConversionImageToImage(ImageSize(1, 1, 1)),
+                _ImageToImageConverter(ImageSize(1, 1, 1)),
                 [FlattenLayer(), MaxPooling2DLayer(1)],
                 r"You cannot use a 2-dimensional layer with 1-dimensional data.",
             ),
             (
-                InputConversionImageToImage(ImageSize(1, 1, 1)),
+                _ImageToImageConverter(ImageSize(1, 1, 1)),
                 [FlattenLayer(), AveragePooling2DLayer(1)],
                 r"You cannot use a 2-dimensional layer with 1-dimensional data.",
             ),
             (
-                InputConversionImageToImage(ImageSize(1, 1, 1)),
+                _ImageToImageConverter(ImageSize(1, 1, 1)),
                 [FlattenLayer(), FlattenLayer()],
                 r"You cannot use a 2-dimensional layer with 1-dimensional data.",
             ),
             (
-                InputConversionImageToImage(ImageSize(1, 1, 1)),
+                _ImageToImageConverter(ImageSize(1, 1, 1)),
                 [ForwardLayer(1)],
                 r"The 2-dimensional data has to be flattened before using a 1-dimensional layer.",
             ),
             (
-                InputConversionImageToImage(ImageSize(1, 1, 1)),
+                _ImageToImageConverter(ImageSize(1, 1, 1)),
                 [],
                 r"You need to provide at least one layer to a neural network.",
             ),
             (
-                InputConversionImageToTable(ImageSize(1, 1, 1)),
+                _ImageToTableConverter(ImageSize(1, 1, 1)),
                 [FlattenLayer()],
                 r"A NeuralNetworkRegressor cannot be used with images as input and 1-dimensional data as output.",
             ),
             (
-                InputConversionImageToColumn(ImageSize(1, 1, 1)),
+                _ImageToColumnConverter(ImageSize(1, 1, 1)),
                 [FlattenLayer()],
                 r"A NeuralNetworkRegressor cannot be used with images as input and 1-dimensional data as output.",
             ),
@@ -742,7 +742,7 @@ class TestRegressionModel:
     )
     def test_should_raise_if_model_has_invalid_structure(
         self,
-        input_conversion: InputConversion,
+        input_conversion: _Converter,
         layers: list[Layer],
         error_msg: str,
         device: Device,

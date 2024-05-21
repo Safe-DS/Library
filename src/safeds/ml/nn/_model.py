@@ -17,11 +17,11 @@ from safeds.exceptions import (
     ModelNotFittedError,
 )
 from safeds.ml.nn.converters import (
-    InputConversionImageToColumn,
-    InputConversionImageToImage,
-    InputConversionImageToTable,
+    _ImageConverter,
+    _ImageToColumnConverter,
+    _ImageToImageConverter,
+    _ImageToTableConverter,
 )
-from safeds.ml.nn.converters._input_converter_image import _InputConversionImage
 from safeds.ml.nn.layers import (
     Convolutional2DLayer,
     FlattenLayer,
@@ -37,7 +37,7 @@ if TYPE_CHECKING:
     from torch.nn import Module
     from transformers.image_processing_utils import BaseImageProcessor
 
-    from safeds.ml.nn.converters import InputConversion
+    from safeds.ml.nn.converters import _Converter
     from safeds.ml.nn.layers import Layer
 
 IFT = TypeVar("IFT", TabularDataset, TimeSeriesDataset, ImageDataset)  # InputFitType
@@ -63,15 +63,15 @@ class NeuralNetworkRegressor(Generic[IFT, IPT]):
 
     def __init__(
         self,
-        input_conversion: InputConversion[IFT, IPT],
+        input_conversion: _Converter[IFT, IPT],
         layers: list[Layer],
     ):
         if len(layers) == 0:
             raise InvalidModelStructureError("You need to provide at least one layer to a neural network.")
-        if isinstance(input_conversion, _InputConversionImage):
+        if isinstance(input_conversion, _ImageConverter):
             # TODO: why is this limitation needed? we might want to output the probability that an image shows a certain
             #  object, which would be a 1-dimensional output.
-            if isinstance(input_conversion, InputConversionImageToColumn | InputConversionImageToTable):
+            if isinstance(input_conversion, _ImageToColumnConverter | _ImageToTableConverter):
                 raise InvalidModelStructureError(
                     "A NeuralNetworkRegressor cannot be used with images as input and 1-dimensional data as output.",
                 )
@@ -91,7 +91,7 @@ class NeuralNetworkRegressor(Generic[IFT, IPT]):
                             else "You cannot use a 2-dimensional layer with 1-dimensional data."
                         ),
                     )
-            if data_dimensions == 1 and isinstance(input_conversion, InputConversionImageToImage):
+            if data_dimensions == 1 and isinstance(input_conversion, _ImageToImageConverter):
                 raise InvalidModelStructureError(
                     "The output data would be 1-dimensional but the provided output conversion uses 2-dimensional data.",
                 )
@@ -100,7 +100,7 @@ class NeuralNetworkRegressor(Generic[IFT, IPT]):
                 if isinstance(layer, Convolutional2DLayer | FlattenLayer | _Pooling2DLayer):
                     raise InvalidModelStructureError("You cannot use a 2-dimensional layer with 1-dimensional data.")
 
-        self._input_conversion: InputConversion[IFT, IPT] = input_conversion
+        self._input_conversion: _Converter[IFT, IPT] = input_conversion
         self._model: Module | None = None
         self._layers: list[Layer] = layers
         self._input_size: int | ModelImageSize | None = None
@@ -149,7 +149,7 @@ class NeuralNetworkRegressor(Generic[IFT, IPT]):
         else:  # Should never happen due to model check
             raise ValueError("This model is not supported")  # pragma: no cover
 
-        in_conversion = InputConversionImageToImage(input_size)
+        in_conversion = _ImageToImageConverter(input_size)
 
         network = NeuralNetworkRegressor.__new__(NeuralNetworkRegressor)
         network._input_conversion = in_conversion
@@ -332,21 +332,21 @@ class NeuralNetworkClassifier(Generic[IFT, IPT]):
 
     def __init__(
         self,
-        input_conversion: InputConversion[IFT, IPT],
+        input_conversion: _Converter[IFT, IPT],
         layers: list[Layer],
     ):
         if len(layers) == 0:
             raise InvalidModelStructureError("You need to provide at least one layer to a neural network.")
-        if isinstance(input_conversion, InputConversionImageToImage):
+        if isinstance(input_conversion, _ImageToImageConverter):
             raise InvalidModelStructureError("A NeuralNetworkClassifier cannot be used with images as output.")
-        if isinstance(input_conversion, _InputConversionImage) and isinstance(
+        if isinstance(input_conversion, _ImageConverter) and isinstance(
             input_conversion._input_size,
             VariableImageSize,
         ):
             raise InvalidModelStructureError(
                 "A NeuralNetworkClassifier cannot be used with a InputConversionImage that uses a VariableImageSize.",
             )
-        elif isinstance(input_conversion, _InputConversionImage):
+        elif isinstance(input_conversion, _ImageConverter):
             data_dimensions = 2
             for layer in layers:
                 if data_dimensions == 2 and (isinstance(layer, Convolutional2DLayer | _Pooling2DLayer)):
@@ -364,7 +364,7 @@ class NeuralNetworkClassifier(Generic[IFT, IPT]):
                         ),
                     )
             if data_dimensions == 2 and (
-                isinstance(input_conversion, InputConversionImageToColumn | InputConversionImageToTable)
+                isinstance(input_conversion, _ImageToColumnConverter | _ImageToTableConverter)
             ):
                 raise InvalidModelStructureError(
                     "The output data would be 2-dimensional but the provided output conversion uses 1-dimensional data.",
@@ -374,7 +374,7 @@ class NeuralNetworkClassifier(Generic[IFT, IPT]):
                 if isinstance(layer, Convolutional2DLayer | FlattenLayer | _Pooling2DLayer):
                     raise InvalidModelStructureError("You cannot use a 2-dimensional layer with 1-dimensional data.")
 
-        self._input_conversion: InputConversion[IFT, IPT] = input_conversion
+        self._input_conversion: _Converter[IFT, IPT] = input_conversion
         self._model: nn.Module | None = None
         self._layers: list[Layer] = layers
         self._input_size: int | ModelImageSize | None = None
@@ -435,7 +435,7 @@ class NeuralNetworkClassifier(Generic[IFT, IPT]):
         labels_table = Table({column_name: [label for _, label in label_dict.items()]})
         one_hot_encoder = OneHotEncoder(column_names=[column_name]).fit(labels_table)
 
-        in_conversion = InputConversionImageToColumn(input_size)
+        in_conversion = _ImageToColumnConverter(input_size)
 
         in_conversion._column_name = column_name
         in_conversion._one_hot_encoder = one_hot_encoder
@@ -617,7 +617,7 @@ class NeuralNetworkClassifier(Generic[IFT, IPT]):
 
 
 def _create_internal_model(
-    input_conversion: InputConversion[IFT, IPT],
+    input_conversion: _Converter[IFT, IPT],
     layers: list[Layer],
     is_for_classification: bool,
 ) -> nn.Module:
@@ -635,7 +635,7 @@ def _create_internal_model(
             for layer in layers:
                 if previous_output_size is not None:
                     layer._set_input_size(previous_output_size)
-                elif isinstance(input_conversion, _InputConversionImage):
+                elif isinstance(input_conversion, _ImageConverter):
                     layer._set_input_size(input_conversion._data_size)
                 if isinstance(layer, FlattenLayer | _Pooling2DLayer):
                     internal_layers.append(layer._get_internal_layer())

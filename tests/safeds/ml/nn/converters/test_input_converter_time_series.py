@@ -6,7 +6,7 @@ from safeds.ml.nn import (
     NeuralNetworkRegressor,
 )
 from safeds.ml.nn.converters import (
-    InputConversionTimeSeries,
+    _TimeSeriesConverter,
 )
 from safeds.ml.nn.layers import (
     LSTMLayer,
@@ -15,7 +15,7 @@ from safeds.ml.nn.layers import (
 
 def test_should_raise_if_is_fitted_is_set_correctly_lstm() -> None:
     model = NeuralNetworkRegressor(
-        InputConversionTimeSeries(prediction_name="predicted"),
+        _TimeSeriesConverter(prediction_name="predicted"),
         [LSTMLayer(input_size=2, output_size=1)],
     )
     ts = Table.from_dict({"target": [1, 1, 1, 1], "time": [0, 0, 0, 0], "feat": [0, 0, 0, 0]}).to_time_series_dataset(
@@ -33,13 +33,13 @@ class TestEq:
     @pytest.mark.parametrize(
         ("output_conversion_ts1", "output_conversion_ts2"),
         [
-            (InputConversionTimeSeries(), InputConversionTimeSeries()),
+            (_TimeSeriesConverter(), _TimeSeriesConverter()),
         ],
     )
     def test_should_be_equal(
         self,
-        output_conversion_ts1: InputConversionTimeSeries,
-        output_conversion_ts2: InputConversionTimeSeries,
+        output_conversion_ts1: _TimeSeriesConverter,
+        output_conversion_ts2: _TimeSeriesConverter,
     ) -> None:
         assert output_conversion_ts1 == output_conversion_ts2
 
@@ -47,19 +47,19 @@ class TestEq:
         ("output_conversion_ts1", "output_conversion_ts2"),
         [
             (
-                InputConversionTimeSeries(),
+                _TimeSeriesConverter(),
                 Table(),
             ),
             (
-                InputConversionTimeSeries(prediction_name="2"),
-                InputConversionTimeSeries(prediction_name="1"),
+                _TimeSeriesConverter(prediction_name="2"),
+                _TimeSeriesConverter(prediction_name="1"),
             ),
         ],
     )
     def test_should_not_be_equal(
         self,
-        output_conversion_ts1: InputConversionTimeSeries,
-        output_conversion_ts2: InputConversionTimeSeries,
+        output_conversion_ts1: _TimeSeriesConverter,
+        output_conversion_ts2: _TimeSeriesConverter,
     ) -> None:
         assert output_conversion_ts1 != output_conversion_ts2
 
@@ -68,20 +68,20 @@ class TestHash:
     @pytest.mark.parametrize(
         ("output_conversion_ts1", "output_conversion_ts2"),
         [
-            (InputConversionTimeSeries(), InputConversionTimeSeries()),
+            (_TimeSeriesConverter(), _TimeSeriesConverter()),
         ],
     )
     def test_hash_should_be_equal(
         self,
-        output_conversion_ts1: InputConversionTimeSeries,
-        output_conversion_ts2: InputConversionTimeSeries,
+        output_conversion_ts1: _TimeSeriesConverter,
+        output_conversion_ts2: _TimeSeriesConverter,
     ) -> None:
         assert hash(output_conversion_ts1) == hash(output_conversion_ts2)
 
     def test_hash_should_not_be_equal(self) -> None:
-        output_conversion_ts1 = InputConversionTimeSeries(prediction_name="1")
-        output_conversion_ts2 = InputConversionTimeSeries(prediction_name="2")
-        output_conversion_ts3 = InputConversionTimeSeries(prediction_name="3")
+        output_conversion_ts1 = _TimeSeriesConverter(prediction_name="1")
+        output_conversion_ts2 = _TimeSeriesConverter(prediction_name="2")
+        output_conversion_ts3 = _TimeSeriesConverter(prediction_name="3")
         assert hash(output_conversion_ts1) != hash(output_conversion_ts3)
         assert hash(output_conversion_ts2) != hash(output_conversion_ts1)
         assert hash(output_conversion_ts3) != hash(output_conversion_ts2)
@@ -91,13 +91,13 @@ class TestSizeOf:
     @pytest.mark.parametrize(
         "output_conversion_ts",
         [
-            InputConversionTimeSeries(prediction_name="1"),
-            InputConversionTimeSeries(prediction_name="2"),
-            InputConversionTimeSeries(prediction_name="3"),
+            _TimeSeriesConverter(prediction_name="1"),
+            _TimeSeriesConverter(prediction_name="2"),
+            _TimeSeriesConverter(prediction_name="3"),
         ],
     )
     def test_should_size_be_greater_than_normal_object(
         self,
-        output_conversion_ts: InputConversionTimeSeries,
+        output_conversion_ts: _TimeSeriesConverter,
     ) -> None:
         assert sys.getsizeof(output_conversion_ts) > sys.getsizeof(object())
