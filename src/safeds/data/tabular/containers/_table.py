@@ -1919,7 +1919,7 @@ class Table:
 
         self._lazy_frame.sink_parquet(path)
 
-    def to_tabular_dataset(self, target_name: str, extra_names: list[str] | None = None) -> TabularDataset:
+    def to_tabular_dataset(self, target_name: str, *, extra_names: list[str] | None = None) -> TabularDataset:
         """
         Return a new `TabularDataset` with columns marked as a target, feature, or extra.
 
@@ -1934,7 +1934,7 @@ class Table:
         Parameters
         ----------
         target_name:
-            Name of the target column.
+            The name of the target column.
         extra_names:
             Names of the columns that are neither feature nor target. If None, no extra columns are used, i.e. all but
             the target column are used as features.
@@ -1963,13 +1963,20 @@ class Table:
         ... )
         >>> dataset = table.to_tabular_dataset(target_name="amount_bought", extra_names=["item"])
         """
-        return TabularDataset(self, target_name, extra_names)
+        return TabularDataset(
+            self,
+            target_name=target_name,
+            extra_names=extra_names,
+        )
 
     def to_time_series_dataset(
         self,
         target_name: str,
         time_name: str,
+        window_size: int,
+        *,
         extra_names: list[str] | None = None,
+        forecast_horizon: int = 1,
     ) -> TimeSeriesDataset:
         """
         Return a new `TimeSeriesDataset` with columns marked as a target column, time or feature columns.
@@ -1979,12 +1986,16 @@ class Table:
         Parameters
         ----------
         target_name:
-            Name of the target column.
+            The name of the target column.
         time_name:
-            Name of the time column.
+            The name of the time column.
+        window_size:
+            The number of consecutive sample to use as input for prediction.
         extra_names:
             Names of the columns that are neither features nor target. If None, no extra columns are used, i.e. all but
             the target column are used as features.
+        forecast_horizon:
+            The number of time steps to predict into the future.
 
         Returns
         -------
@@ -2002,11 +2013,18 @@ class Table:
         --------
         >>> from safeds.data.tabular.containers import Table
         >>> table = Table({"day": [0, 1, 2], "price": [1.10, 1.19, 1.79], "amount_bought": [74, 72, 51]})
-        >>> dataset = table.to_time_series_dataset(target_name="amount_bought", time_name= "day")
+        >>> dataset = table.to_time_series_dataset(target_name="amount_bought", time_name= "day", window_size=2)
         """
         from safeds.data.labeled.containers import TimeSeriesDataset
 
-        return TimeSeriesDataset(self, target_name, time_name, extra_names)
+        return TimeSeriesDataset(
+            self,
+            target_name=target_name,
+            time_name=time_name,
+            window_size=window_size,
+            extra_names=extra_names,
+            forecast_horizon=forecast_horizon,
+        )
 
     # ------------------------------------------------------------------------------------------------------------------
     # Dataframe interchange protocol

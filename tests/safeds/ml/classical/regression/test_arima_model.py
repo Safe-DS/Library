@@ -22,8 +22,8 @@ def test_arima_model() -> None:
     )
     train_ts, test_ts = time_series.split_rows(0.8)
     model = ArimaModelRegressor()
-    trained_model = model.fit(train_ts.to_time_series_dataset("value", "date"))
-    trained_model.predict(test_ts.to_time_series_dataset("value", "date"))
+    trained_model = model.fit(train_ts.to_time_series_dataset("value", "date", window_size=1))
+    trained_model.predict(test_ts.to_time_series_dataset("value", "date", window_size=1))
     # suggest it ran through
     assert True
 
@@ -33,6 +33,7 @@ def create_test_data() -> TimeSeriesDataset:
         {"time": [1, 2, 3, 4, 5, 6, 7, 8, 9], "value": [1, 2, 3, 4, 5, 6, 7, 8, 9]},
         time_name="time",
         target_name="value",
+        window_size=1,
     )
 
 
@@ -45,6 +46,7 @@ def create_test_data_with_feature() -> TimeSeriesDataset:
         },
         time_name="time",
         target_name="value",
+        window_size=1,
     )
 
 
@@ -89,7 +91,7 @@ def test_should_succeed_on_valid_data_plot() -> None:
                     "feat2": [3, 6],
                     "target": ["0", 1],
                 },
-            ).to_time_series_dataset(target_name="target", time_name="id"),
+            ).to_time_series_dataset(target_name="target", time_name="id", window_size=1),
             NonNumericColumnError,
             r"Tried to do a numerical operation on one or multiple non-numerical columns: \ntarget",
         ),
@@ -101,7 +103,7 @@ def test_should_succeed_on_valid_data_plot() -> None:
                     "feat2": [3, 6],
                     "target": [None, 1],
                 },
-            ).to_time_series_dataset(target_name="target", time_name="id"),
+            ).to_time_series_dataset(target_name="target", time_name="id", window_size=1),
             MissingValuesColumnError,
             r"Tried to do an operation on one or multiple columns containing missing values: \ntarget\nYou can use the Imputer to replace the missing values based on different strategies.\nIf you want toremove the missing values entirely you can use the method `TimeSeries.remove_rows_with_missing_values`.",
         ),
@@ -113,7 +115,7 @@ def test_should_succeed_on_valid_data_plot() -> None:
                     "feat2": [],
                     "target": [],
                 },
-            ).to_time_series_dataset(target_name="target", time_name="id"),
+            ).to_time_series_dataset(target_name="target", time_name="id", window_size=1),
             DatasetMissesDataError,
             r"Dataset contains no rows",
         ),

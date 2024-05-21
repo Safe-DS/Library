@@ -1,7 +1,6 @@
 import sys
 
 import pytest
-import torch
 from safeds.data.tabular.containers import Table
 from safeds.ml.nn import (
     NeuralNetworkRegressor,
@@ -20,8 +19,9 @@ def test_should_raise_if_is_fitted_is_set_correctly_lstm() -> None:
         [LSTMLayer(input_size=2, output_size=1)],
     )
     ts = Table.from_dict({"target": [1, 1, 1, 1], "time": [0, 0, 0, 0], "feat": [0, 0, 0, 0]}).to_time_series_dataset(
-        "target",
-        "time",
+        target_name="target",
+        time_name="time",
+        window_size=1,
     )
     assert not model.is_fitted
     model = model.fit(ts)

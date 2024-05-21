@@ -96,6 +96,7 @@ class InputConversionTimeSeries(InputConversion[TimeSeriesDataset, TimeSeriesDat
             target_name=self._prediction_name,
             time_name=input_data.time.name,
             extra_names=input_data.extras.column_names,
+            window_size=window_size,
         )
 
     def _is_fit_data_valid(self, input_data: TimeSeriesDataset) -> bool:

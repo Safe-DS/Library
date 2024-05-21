@@ -23,7 +23,7 @@ from safeds.data.labeled.containers import TabularDataset
                 "target": [1, 3, 2],
             },
             "target",
-            ["other"],
+            extra_names=["other"],
         ),
     ],
     ids=["normal", "table_with_extra_column"],

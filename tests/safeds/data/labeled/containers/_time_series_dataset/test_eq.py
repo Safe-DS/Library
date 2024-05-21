@@ -9,38 +9,50 @@ from safeds.data.tabular.containers import Table
     ("table1", "table2", "expected"),
     [
         (
-            TimeSeriesDataset({"a": [], "b": [], "c": []}, "b", "c"),
-            TimeSeriesDataset({"a": [], "b": [], "c": []}, "b", "c"),
+            TimeSeriesDataset({"a": [], "b": [], "c": []}, "b", "c", window_size=1),
+            TimeSeriesDataset({"a": [], "b": [], "c": []}, "b", "c", window_size=1),
             True,
         ),
         (
-            TimeSeriesDataset({"a": [1, 2, 3], "b": [4, 5, 6], "c": [4, 5, 6]}, "b", "c"),
-            TimeSeriesDataset({"a": [1, 2, 3], "b": [4, 5, 6], "c": [4, 5, 6]}, "b", "c"),
+            TimeSeriesDataset({"a": [1, 2, 3], "b": [4, 5, 6], "c": [4, 5, 6]}, "b", "c", window_size=1),
+            TimeSeriesDataset({"a": [1, 2, 3], "b": [4, 5, 6], "c": [4, 5, 6]}, "b", "c", window_size=1),
             True,
         ),
         (
-            TimeSeriesDataset({"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9]}, "b", "a", ["c"]),
-            TimeSeriesDataset({"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9]}, "c", "a", ["b"]),
+            TimeSeriesDataset(
+                {"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9]}, "b", "a", window_size=1, extra_names=["c"]
+            ),
+            TimeSeriesDataset(
+                {"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9]}, "c", "a", window_size=1, extra_names=["b"]
+            ),
             False,
         ),
         (
-            TimeSeriesDataset({"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9]}, "b", "a", ["c"]),
-            TimeSeriesDataset({"a": [1, 2, 3], "b": [4, 5, 6], "d": [7, 8, 9]}, "b", "a", ["d"]),
+            TimeSeriesDataset(
+                {"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9]}, "b", "a", window_size=1, extra_names=["c"]
+            ),
+            TimeSeriesDataset(
+                {"a": [1, 2, 3], "b": [4, 5, 6], "d": [7, 8, 9]}, "b", "a", window_size=1, extra_names=["d"]
+            ),
             False,
         ),
         (
-            TimeSeriesDataset({"a": [1, 2, 3], "b": [4, 5, 6]}, "b", "a"),
-            TimeSeriesDataset({"a": [1, 1, 3], "b": [4, 5, 6]}, "b", "a"),
+            TimeSeriesDataset({"a": [1, 2, 3], "b": [4, 5, 6]}, "b", "a", window_size=1),
+            TimeSeriesDataset({"a": [1, 1, 3], "b": [4, 5, 6]}, "b", "a", window_size=1),
             False,
         ),
         (
-            TimeSeriesDataset({"a": [1, 2, 3], "b": [4, 5, 6]}, "b", "a"),
-            TimeSeriesDataset({"a": ["1", "2", "3"], "b": [4, 5, 6]}, "b", "a"),
+            TimeSeriesDataset({"a": [1, 2, 3], "b": [4, 5, 6]}, "b", "a", window_size=1),
+            TimeSeriesDataset({"a": ["1", "2", "3"], "b": [4, 5, 6]}, "b", "a", window_size=1),
             False,
         ),
         (
-            TimeSeriesDataset({"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9]}, "b", "a", ["c"]),
-            TimeSeriesDataset({"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9]}, "b", "c", ["a"]),
+            TimeSeriesDataset(
+                {"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9]}, "b", "a", window_size=1, extra_names=["c"]
+            ),
+            TimeSeriesDataset(
+                {"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9]}, "b", "c", window_size=1, extra_names=["a"]
+            ),
             False,
         ),
     ],
@@ -65,8 +77,14 @@ def test_should_return_whether_two_tabular_datasets_are_equal(
 @pytest.mark.parametrize(
     ("table", "other"),
     [
-        (TimeSeriesDataset({"a": [1, 2, 3], "b": [4, 5, 6], "c": [0, 0, 0]}, "b", "c"), None),
-        (TimeSeriesDataset({"a": [1, 2, 3], "b": [4, 5, 6], "c": [0, 0, 0]}, "b", "c"), Table()),
+        (
+            TimeSeriesDataset({"a": [1, 2, 3], "b": [4, 5, 6], "c": [0, 0, 0]}, "b", "c", window_size=1),
+            None,
+        ),
+        (
+            TimeSeriesDataset({"a": [1, 2, 3], "b": [4, 5, 6], "c": [0, 0, 0]}, "b", "c", window_size=1),
+            Table(),
+        ),
     ],
     ids=[
         "TabularDataset vs. None",
