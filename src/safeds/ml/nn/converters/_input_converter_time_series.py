@@ -19,8 +19,6 @@ class InputConversionTimeSeries(InputConversion[TimeSeriesDataset, TimeSeriesDat
 
     def __init__(
         self,
-        *,
-        continuous: bool = False,
     ) -> None:
         self._window_size = 0
         self._forecast_horizon = 0
@@ -28,7 +26,7 @@ class InputConversionTimeSeries(InputConversion[TimeSeriesDataset, TimeSeriesDat
         self._target_name: str = ""
         self._time_name: str = ""
         self._feature_names: list[str] = []
-        self._continuous: bool = continuous,
+        self._continuous: bool = False
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, type(self)):
@@ -116,6 +114,7 @@ class InputConversionTimeSeries(InputConversion[TimeSeriesDataset, TimeSeriesDat
             self._time_name = input_data.time.name
             self._feature_names = input_data.features.column_names
             self._target_name = input_data.target.name
+            self._continuous = input_data._continuous
             self._first = False
         return (
             (sorted(input_data.features.column_names)).__eq__(sorted(self._feature_names))

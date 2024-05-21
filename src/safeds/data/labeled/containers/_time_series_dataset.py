@@ -73,6 +73,7 @@ class TimeSeriesDataset(Dataset[Table, Column]):
         *,
         extra_names: list[str] | None = None,
         forecast_horizon: int = 1,
+        continuous: bool = False,
     ):
         from safeds.data.tabular.containers import Table
 
@@ -102,6 +103,7 @@ class TimeSeriesDataset(Dataset[Table, Column]):
         self._window_size: int = window_size
         self._forecast_horizon: int = forecast_horizon
         self._extras: Table = data.remove_columns_except(extra_names)
+        self._continuous: bool = continuous,
 
     def __eq__(self, other: object) -> bool:
         """
@@ -187,6 +189,11 @@ class TimeSeriesDataset(Dataset[Table, Column]):
     def forecast_horizon(self) -> int:
         """The number of time steps to predict into the future."""
         return self._forecast_horizon
+
+    @property
+    def continuous(self) -> bool:
+        """True if the time series will make a continuous prediction."""
+        return self._continuous
 
     @property
     def extras(self) -> Table:

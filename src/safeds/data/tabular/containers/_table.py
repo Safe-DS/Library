@@ -1979,6 +1979,7 @@ class Table:
         *,
         extra_names: list[str] | None = None,
         forecast_horizon: int = 1,
+        continuous: bool = False
     ) -> TimeSeriesDataset:
         """
         Return a new `TimeSeriesDataset` with columns marked as a target column, time or feature columns.
@@ -2026,6 +2027,7 @@ class Table:
             window_size=window_size,
             extra_names=extra_names,
             forecast_horizon=forecast_horizon,
+            continuous=continuous
         )
 
     # ------------------------------------------------------------------------------------------------------------------

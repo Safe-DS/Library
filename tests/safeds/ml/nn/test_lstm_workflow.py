@@ -33,7 +33,7 @@ def test_lstm_model(device: Device) -> None:
         [ForwardLayer(input_size=7, output_size=256), LSTMLayer(input_size=256, output_size=1)],
     )
     model_2 = NeuralNetworkRegressor(
-        InputConversionTimeSeries(continuous=True),
+        InputConversionTimeSeries(),
         [ForwardLayer(input_size=7, output_size=256), LSTMLayer(input_size=256, output_size=12)],
     )
     trained_model_2 = model.fit(
@@ -42,6 +42,8 @@ def test_lstm_model(device: Device) -> None:
             "date",
             window_size=7,
             forecast_horizon=12,
+            continuous=True,
+
         ),
         epoch_size=1,
     )

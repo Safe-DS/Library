@@ -50,10 +50,6 @@ class TestEq:
                 InputConversionTimeSeries(),
                 Table(),
             ),
-            (
-                InputConversionTimeSeries(),
-                InputConversionTimeSeries(continuous=True),
-            ),
         ],
     )
     def test_should_not_be_equal(
