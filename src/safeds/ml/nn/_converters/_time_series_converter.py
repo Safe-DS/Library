@@ -17,6 +17,10 @@ if TYPE_CHECKING:
 class _TimeSeriesConverter(_Converter[TimeSeriesDataset, TimeSeriesDataset]):
     """The input conversion for a neural network, defines the input parameters for the neural network."""
 
+    # ------------------------------------------------------------------------------------------------------------------
+    # Dunder methods
+    # ------------------------------------------------------------------------------------------------------------------
+
     def __init__(
         self,
         *,
@@ -41,6 +45,10 @@ class _TimeSeriesConverter(_Converter[TimeSeriesDataset, TimeSeriesDataset]):
     def __sizeof__(self) -> int:
         return sys.getsizeof(self._prediction_name)
 
+    # ------------------------------------------------------------------------------------------------------------------
+    # Properties
+    # ------------------------------------------------------------------------------------------------------------------
+
     @property
     def _data_size(self) -> int:
         """
@@ -52,6 +60,10 @@ class _TimeSeriesConverter(_Converter[TimeSeriesDataset, TimeSeriesDataset]):
             The size of the input for the neural network
         """
         return (len(self._feature_names) + 1) * self._window_size
+
+    # ------------------------------------------------------------------------------------------------------------------
+    # Template methods
+    # ------------------------------------------------------------------------------------------------------------------
 
     def _data_conversion_fit(
         self,

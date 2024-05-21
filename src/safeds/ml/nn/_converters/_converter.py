@@ -19,11 +19,34 @@ PT = TypeVar("PT", Table, TimeSeriesDataset, ImageList)
 
 
 class _Converter(Generic[FT, PT], ABC):
-    """The input conversion for a neural network, defines the input parameters for the neural network."""
+    """A converter for input and output data of a neural network."""
+
+    # TODO: docstrings for named abstract methods
+
+    # ------------------------------------------------------------------------------------------------------------------
+    # Dunder methods
+    # ------------------------------------------------------------------------------------------------------------------
+
+    @abstractmethod
+    def __eq__(self, other: object) -> bool: ...
+
+    @abstractmethod
+    def __hash__(self) -> int: ...
+
+    @abstractmethod
+    def __sizeof__(self) -> int: ...
+
+    # ------------------------------------------------------------------------------------------------------------------
+    # Properties
+    # ------------------------------------------------------------------------------------------------------------------
 
     @property
     @abstractmethod
-    def _data_size(self) -> int | ModelImageSize: ...
+    def _data_size(self) -> int | ModelImageSize: ...  # TODO: unify return type (shape)
+
+    # ------------------------------------------------------------------------------------------------------------------
+    # Template methods
+    # ------------------------------------------------------------------------------------------------------------------
 
     @abstractmethod
     def _data_conversion_fit(
@@ -31,9 +54,10 @@ class _Converter(Generic[FT, PT], ABC):
         input_data: FT,
         batch_size: int,
         num_of_classes: int = 1,
-    ) -> DataLoader | ImageDataset: ...
+    ) -> DataLoader | ImageDataset: ...  # TODO: unify return type (data loader)
 
     @abstractmethod
+    # TODO: unify return type (data loader)
     def _data_conversion_predict(self, input_data: PT, batch_size: int) -> DataLoader | _SingleSizeImageList: ...
 
     @abstractmethod
