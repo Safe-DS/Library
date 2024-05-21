@@ -25,16 +25,14 @@ class _ImageToImageConverter(_ImageConverter):
     # ------------------------------------------------------------------------------------------------------------------
 
     def __init__(self, image_size: ModelImageSize) -> None:
-        super().__init__(image_size)
+        super().__init__(image_size, None, None)
 
-        self._output_size: ModelImageSize | int | None = None
-        self._output_type: type | None = None
         self._one_hot_encoder: OneHotEncoder | None = None
         self._column_name: str | None = None
         self._column_names: list[str] | None = None
 
     def __eq__(self, other: object) -> bool:
-        if not isinstance(other, type(self)):
+        if not isinstance(other, _ImageToImageConverter):
             return NotImplemented
         if self is other:
             return True
@@ -50,8 +48,6 @@ class _ImageToImageConverter(_ImageConverter):
     def __hash__(self) -> int:
         return _structural_hash(
             super().__hash__(),
-            self._output_size,
-            self._output_type,
             self._one_hot_encoder,
             self._column_name,
             self._column_names,
@@ -60,8 +56,6 @@ class _ImageToImageConverter(_ImageConverter):
     def __sizeof__(self) -> int:
         return (
             super().__sizeof__()
-            + sys.getsizeof(self._output_size)
-            + sys.getsizeof(self._output_type)
             + sys.getsizeof(self._one_hot_encoder)
             + sys.getsizeof(self._column_name)
             + sys.getsizeof(self._column_names)

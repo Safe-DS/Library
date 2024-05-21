@@ -30,20 +30,31 @@ class _ImageConverter(_Converter[ImageDataset, ImageList], ABC):
     # ------------------------------------------------------------------------------------------------------------------
 
     @abstractmethod
-    def __init__(self, image_size: ModelImageSize) -> None:
-        self._input_size = image_size
+    def __init__(
+        self,
+        image_size: ModelImageSize,
+        output_size: int | ModelImageSize | None,
+        output_type: type | None,
+    ) -> None:
+        self._input_size: ModelImageSize = image_size
+        self._output_size: int | ModelImageSize | None = None
+        self._output_type: type | None = None
 
     @abstractmethod
     def __hash__(self) -> int:
         return _structural_hash(
             self.__class__.__name__,
             self._input_size,
+            self._output_size,
+            self._output_type,
         )
 
     @abstractmethod
     def __sizeof__(self) -> int:
         return (
             sys.getsizeof(self._input_size)
+            + sys.getsizeof(self._output_size)
+            + sys.getsizeof(self._output_type)
         )
 
     # ------------------------------------------------------------------------------------------------------------------
