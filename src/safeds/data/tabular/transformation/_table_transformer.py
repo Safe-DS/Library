@@ -37,6 +37,7 @@ class TableTransformer(ABC):
         return _structural_hash(
             self.__class__.__qualname__,
             self._column_names,
+            self.is_fitted,
         )
 
     # ------------------------------------------------------------------------------------------------------------------
