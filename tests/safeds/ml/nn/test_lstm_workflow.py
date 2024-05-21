@@ -36,7 +36,7 @@ def test_lstm_model(device: Device) -> None:
         InputConversionTimeSeries(),
         [ForwardLayer(input_size=7, output_size=256), LSTMLayer(input_size=256, output_size=12)],
     )
-    trained_model_2 = model.fit(
+    trained_model_2 = model_2.fit(
         train_table.to_time_series_dataset(
             "value",
             "date",
@@ -53,6 +53,7 @@ def test_lstm_model(device: Device) -> None:
             "date",
             window_size=7,
             forecast_horizon=12,
+            continuous=False,
         ),
         epoch_size=1,
     )

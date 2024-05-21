@@ -103,7 +103,7 @@ class TimeSeriesDataset(Dataset[Table, Column]):
         self._window_size: int = window_size
         self._forecast_horizon: int = forecast_horizon
         self._extras: Table = data.remove_columns_except(extra_names)
-        self._continuous: bool = continuous,
+        self._continuous: bool = continuous
 
     def __eq__(self, other: object) -> bool:
         """
@@ -238,7 +238,7 @@ class TimeSeriesDataset(Dataset[Table, Column]):
             The length of the forecast horizon, where all datapoints are collected until the given lag.
         batch_size:
             The size of data batches that should be loaded at one time.
-        continues:
+        continuous:
             Whether or not to continue the forecast in the steps before forecast horizon.
 
         Raises
@@ -275,7 +275,7 @@ class TimeSeriesDataset(Dataset[Table, Column]):
         for i in range(size - (forecast_horizon + window_size)):
             window = target_tensor[i : i + window_size]
             if continuous:
-                label = target_tensor[i + window_size : i + window_size + forecast_horizon]
+                label = target_tensor[i + window_size: i + window_size + forecast_horizon]
             else:
                 label = target_tensor[i + window_size + forecast_horizon]
             for col in feature_cols:
