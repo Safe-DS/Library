@@ -7,7 +7,6 @@ from safeds._config import _init_default_device
 from safeds._validation import _check_bounds, _ClosedBound
 from safeds.data.image.containers import ImageList
 from safeds.data.labeled.containers import ImageDataset, TabularDataset, TimeSeriesDataset
-from safeds.data.labeled.containers._image_dataset import _ColumnAsTensor
 from safeds.data.tabular.containers import Table
 from safeds.data.tabular.transformation import OneHotEncoder
 from safeds.exceptions import (
@@ -440,7 +439,6 @@ class NeuralNetworkClassifier(Generic[IFT, IPT]):
         in_conversion._column_name = column_name
         in_conversion._one_hot_encoder = one_hot_encoder
         in_conversion._input_size = input_size
-        in_conversion._output_type = _ColumnAsTensor
         num_of_classes = labels_table.row_count
 
         network = NeuralNetworkClassifier.__new__(NeuralNetworkClassifier)
