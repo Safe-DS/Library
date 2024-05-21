@@ -15,26 +15,15 @@ if TYPE_CHECKING:
 
 
 class InputConversionTimeSeries(InputConversion[TimeSeriesDataset, TimeSeriesDataset]):
-    """
-    The input conversion for a neural network, defines the input parameters for the neural network.
-
-    Parameters
-    ----------
-    window_size:
-        The size of the created windows
-    forecast_horizon:
-        The forecast horizon defines the future lag of the predicted values
-    """
+    """The input conversion for a neural network, defines the input parameters for the neural network."""
 
     def __init__(
         self,
-        window_size: int,
-        forecast_horizon: int,
         *,
         prediction_name: str = "prediction_nn",
     ) -> None:
-        self._window_size = window_size
-        self._forecast_horizon = forecast_horizon
+        self._window_size = 0
+        self._forecast_horizon = 0
         self._first = True
         self._target_name: str = ""
         self._time_name: str = ""
@@ -101,6 +90,8 @@ class InputConversionTimeSeries(InputConversion[TimeSeriesDataset, TimeSeriesDat
 
     def _is_fit_data_valid(self, input_data: TimeSeriesDataset) -> bool:
         if self._first:
+            self._window_size = input_data.window_size
+            self._forecast_horizon = input_data.forecast_horizon
             self._time_name = input_data.time.name
             self._feature_names = input_data.features.column_names
             self._target_name = input_data.target.name

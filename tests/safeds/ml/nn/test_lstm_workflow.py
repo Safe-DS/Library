@@ -29,7 +29,7 @@ def test_lstm_model(device: Device) -> None:
     train_table, test_table = table.split_rows(0.8)
 
     model = NeuralNetworkRegressor(
-        InputConversionTimeSeries(window_size=7, forecast_horizon=12, prediction_name="predicted"),
+        InputConversionTimeSeries(prediction_name="predicted"),
         [ForwardLayer(input_size=7, output_size=256), LSTMLayer(input_size=256, output_size=1)],
     )
     trained_model = model.fit(
