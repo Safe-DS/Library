@@ -5,9 +5,9 @@ from syrupy import SnapshotAssertion
 
 
 @pytest.mark.parametrize(
-    ("table", "x_name", "y_name"),
+    ("table", "x_name", "y_names"),
     [
-        (Table({"A": [1, 2, 3], "B": [2, 4, 7]}), "A", "B"),
+        (Table({"A": [1, 2, 3], "B": [2, 4, 7]}), "A", ["B"]),
         (
             Table(
                 {
@@ -16,16 +16,28 @@ from syrupy import SnapshotAssertion
                 },
             ),
             "A",
-            "B",
+            ["B"],
+        ),
+        (
+            Table(
+                {
+                    "A": [1, 0.99, 0.99, 2],
+                    "B": [1, 0.99, 1.01, 2],
+                    "C": [2, 2.99, 2.01, 3]
+                },
+            ),
+            "A",
+            ["B","C"],
         ),
     ],
     ids=[
         "functional",
         "overlapping",
+        "multiple",
     ],
 )
-def test_should_match_snapshot(table: Table, x_name: str, y_name: str, snapshot_png_image: SnapshotAssertion) -> None:
-    scatterplot = table.plot.scatter_plot(x_name, y_name)
+def test_should_match_snapshot(table: Table, x_name: str, y_names: list[str], snapshot_png_image: SnapshotAssertion) -> None:
+    scatterplot = table.plot.scatter_plot(x_name, y_names)
     assert scatterplot == snapshot_png_image
 
 
@@ -41,7 +53,7 @@ def test_should_match_snapshot(table: Table, x_name: str, y_name: str, snapshot_
 )
 def test_should_raise_if_column_does_not_exist(table: Table, col1: str, col2: str) -> None:
     with pytest.raises(ColumnNotFoundError):
-        table.plot.scatter_plot(col1, col2)
+        table.plot.scatter_plot(col1, [col2])
 
 
 @pytest.mark.parametrize(
@@ -53,4 +65,4 @@ def test_should_raise_if_column_does_not_exist(table: Table, col1: str, col2: st
 )
 def test_should_raise_if_columns_are_not_numeric(table: Table, x_name: str, y_name: str) -> None:
     with pytest.raises(ColumnTypeError):
-        table.plot.scatter_plot(x_name, y_name)
+        table.plot.scatter_plot(x_name, [y_name])

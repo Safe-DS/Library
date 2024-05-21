@@ -215,7 +215,7 @@ class TimeSeriesDataset(Dataset[Table, Column]):
         return self._table
 
     def _into_dataloader_with_window(
-        self, window_size: int, forecast_horizon: int, batch_size: int, continues: bool = False
+        self, window_size: int, forecast_horizon: int, batch_size: int, continuous: bool = False
     ) -> DataLoader:
         """
         Return a Dataloader for the data stored in this time series, used for training neural networks.
@@ -267,7 +267,7 @@ class TimeSeriesDataset(Dataset[Table, Column]):
         feature_cols = self.features.to_columns()
         for i in range(size - (forecast_horizon + window_size)):
             window = target_tensor[i : i + window_size]
-            if continues:
+            if continuous:
                 label = target_tensor[i + window_size : i + window_size + forecast_horizon]
             else:
                 label = target_tensor[i + window_size + forecast_horizon]

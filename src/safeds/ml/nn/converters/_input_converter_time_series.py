@@ -21,6 +21,7 @@ class InputConversionTimeSeries(InputConversion[TimeSeriesDataset, TimeSeriesDat
         self,
         *,
         prediction_name: str = "prediction_nn",
+        continuous: bool = False,
     ) -> None:
         self._window_size = 0
         self._forecast_horizon = 0
@@ -28,7 +29,7 @@ class InputConversionTimeSeries(InputConversion[TimeSeriesDataset, TimeSeriesDat
         self._target_name: str = ""
         self._time_name: str = ""
         self._feature_names: list[str] = []
-        self._continues: bool = False,
+        self._continuous: bool = continuous,
         self._prediction_name = prediction_name  # TODO: use target name, override existing column
 
     def __eq__(self, other: object) -> bool:
@@ -65,7 +66,7 @@ class InputConversionTimeSeries(InputConversion[TimeSeriesDataset, TimeSeriesDat
             self._window_size,
             self._forecast_horizon,
             batch_size,
-            continues=self._continues,
+            continuous=self._continuous,
         )
 
     def _data_conversion_predict(self, input_data: TimeSeriesDataset, batch_size: int) -> DataLoader:

@@ -232,9 +232,6 @@ class TablePlotter:
         ... )
         >>> image = table.plot.line_plot("a", "b")
         """
-        _check_columns_exist(self._table, [x_name, y_name])
-
-        # TODO: pass list of columns names + extract validation
         _plot_validation(self._table, x_name, y_names)
 
         import matplotlib.pyplot as plt
@@ -247,18 +244,18 @@ class TablePlotter:
             agg_list.append(pl.std(name, ddof=0).alias(f"{name}_std"))
         grouped = self._table._lazy_frame.sort(x_name).group_by(x_name).agg(agg_list).collect()
 
-        print(grouped)
         x = grouped.get_column(x_name)
         y_s = []
         confidence_intervals = []
         for name in y_names:
-            y_s.append(grouped.get_column(name+"_mean"))
-            confidence_intervals.append(1.96 * grouped.get_column(name+"_std") / grouped.get_column(name+"_count").sqrt())
+            y_s.append(grouped.get_column(name + "_mean"))
+            confidence_intervals.append(
+                1.96 * grouped.get_column(name + "_std") / grouped.get_column(name + "_count").sqrt())
 
         fig, ax = plt.subplots()
         for y in y_s:
             ax.plot(x, y)
-        print(confidence_intervals)
+
         if show_confidence_interval:
             for y, conf in zip(y_s, confidence_intervals):
                 ax.fill_between(
@@ -282,8 +279,7 @@ class TablePlotter:
 
         return _figure_to_image(fig)
 
-
-    def scatter_plot(self, x_name: str, y_name: str) -> Image:
+    def scatter_plot(self, x_name: str, y_names: list[str]) -> Image:
         """
         Create a scatter plot for two columns in the table.
 
@@ -317,26 +313,25 @@ class TablePlotter:
         ... )
         >>> image = table.plot.scatter_plot("a", "b")
         """
-        _check_columns_exist(self._table, [x_name, y_name])
-        _check_columns_are_numeric(self._table, [x_name, y_name])
 
         # TODO: pass list of columns names + extract validation
-        _plot_validation(self._table, x_name, [y_name])
+        _plot_validation(self._table, x_name, y_names)
 
         import matplotlib.pyplot as plt
 
         fig, ax = plt.subplots()
-        ax.scatter(
-            x=self._table.get_column(x_name)._series,
-            y=self._table.get_column(y_name)._series,
-            s=64,  # marker size
-            linewidth=1,
-            edgecolor="white",
-        )
-        ax.set(
-            xlabel=x_name,
-            ylabel=y_name,
-        )
+        for y_name in y_names:
+            ax.scatter(
+                x=self._table.get_column(x_name)._series,
+                y=self._table.get_column(y_name)._series,
+                s=64,  # marker size
+                linewidth=1,
+                edgecolor="white",
+            )
+            ax.set(
+                xlabel=x_name,
+                ylabel=y_names,
+            )
         ax.set_xticks(ax.get_xticks())
         ax.set_xticklabels(
             ax.get_xticklabels(),
@@ -349,37 +344,14 @@ class TablePlotter:
 
     # TODO: equivalent to Column.plot_compare_columns that takes a list of column names (index_plot)?
 
-    def compare_plot(self, x_name: str, y_names: list[str]) -> Image:
-        y_names.append(x_name)
-        _check_columns_exist(self._table, y_names)
-        y_names.remove(x_name)
-
-        _plot_validation(self._table, x_name, y_names)
-        import matplotlib.pyplot as plt
-
-        fig, ax = plt.subplots()
-        x_values = self._table.get_column(x_name)._series
-
-        for name in y_names:
-            y_values = self._table.get_column(name)._series
-            ax.plot(x_values, y_values, label=name)
-        ax.set(
-            ylabel= y_names,
-            xlabel=x_name,
-        )
-        ax.set_xticks(ax.get_xticks())
-        ax.set_xticklabels(
-            ax.get_xticklabels(),
-            rotation=45,
-            horizontalalignment="right",
-        )  # rotate the labels of the x Axis to prevent the chance of overlapping of the labels
-        fig.tight_layout()
-
-        return _figure_to_image(fig)
-
 
 
 def _plot_validation(table: Table, x_name: str, y_names: list[str]) -> None:
+    y_names.append(x_name)
+    _check_columns_exist(table, y_names)
+    _check_columns_are_numeric(table, y_names)
+    y_names.remove(x_name)
+
     if not table.get_column(x_name).is_numeric and not table.get_column(x_name).is_temporal:
         raise NonNumericColumnError(x_name)
     for col_name in y_names:

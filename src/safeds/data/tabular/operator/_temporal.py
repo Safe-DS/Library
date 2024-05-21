@@ -1,3 +1,9 @@
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from safeds.data.tabular.containers import Table
+
+
 class Temporal:
     """
     A class that contains temporal methods for a column.
@@ -11,3 +17,4 @@ class Temporal:
     --------
 
     """
+    def __init__(self, table: Table):

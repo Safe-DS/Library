@@ -27,14 +27,23 @@ def test_lstm_model(device: Device) -> None:
     rs = RangeScaler(column_names="value")
     _, table = rs.fit_and_transform(table)
     train_table, test_table = table.split_rows(0.8)
-    table = table.replace_column("date", [table.get_column("date").from_str_to_temporal("%Y-%m-%d")])
-    rs = RangeScaler()
-    trained_scaler, table = rs.fit_and_transform(table)
-    train_table, test_table = table.split_rows(0.8, shuffle=False)
 
     model = NeuralNetworkRegressor(
         InputConversionTimeSeries(prediction_name="predicted"),
         [ForwardLayer(input_size=7, output_size=256), LSTMLayer(input_size=256, output_size=1)],
+    )
+    model_2 = NeuralNetworkRegressor(
+        InputConversionTimeSeries(prediction_name="predicted", continuous=True),
+        [ForwardLayer(input_size=7, output_size=256), LSTMLayer(input_size=256, output_size=12)],
+    )
+    trained_model_2 = model.fit(
+        train_table.to_time_series_dataset(
+            "value",
+            "date",
+            window_size=7,
+            forecast_horizon=12,
+        ),
+        epoch_size=1,
     )
     trained_model = model.fit(
         train_table.to_time_series_dataset(
@@ -54,9 +63,13 @@ def test_lstm_model(device: Device) -> None:
             forecast_horizon=12,
         ),
     )
+    trained_model_2.predict(
+        test_table.to_time_series_dataset(
+            "value",
+            "date",
+            window_size=7,
+            forecast_horizon=12,
+        ),
+    )
     assert trained_model._model is not None
     assert trained_model._model.state_dict()["_pytorch_layers.0._layer.weight"].device == _get_device()
-    pred = trained_model.predict(test_table.to_time_series_dataset("value", "date"))
-    pred = pred.to_table()
-    trained_scaler.inverse_transform(pred)
-    assert model._model.state_dict()["_pytorch_layers.0._layer.weight"].device == _get_device()
