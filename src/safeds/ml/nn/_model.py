@@ -6,7 +6,8 @@ from typing import TYPE_CHECKING, Generic, Self, TypeVar
 from safeds._config import _init_default_device
 from safeds._validation import _check_bounds, _ClosedBound
 from safeds.data.image.containers import ImageList
-from safeds.data.labeled.containers import ImageDataset, TabularDataset, TimeSeriesDataset
+from safeds.data.labeled.containers import Dataset, ImageDataset, TabularDataset, TimeSeriesDataset
+from safeds.data.labeled.containers._image_dataset import _ColumnAsTensor, _TableAsTensor
 from safeds.data.tabular.containers import Table
 from safeds.data.tabular.transformation import OneHotEncoder
 from safeds.exceptions import (
@@ -20,6 +21,8 @@ from safeds.ml.nn._converters import (
     _ImageToColumnConverter,
     _ImageToImageConverter,
     _ImageToTableConverter,
+    _TableConverter,
+    _TimeSeriesConverter,
 )
 from safeds.ml.nn.layers import (
     Convolutional2DLayer,
@@ -658,3 +661,31 @@ def _create_internal_model(
     # - https://github.com/pytorch/pytorch/issues/120233 (Python 3.12 support)
     # - https://github.com/triton-lang/triton/issues/1640 (Windows support)
     return _InternalModel(layers, is_for_classification)
+
+
+def _create_input_conversion(train_data: Dataset) -> _Converter:
+    if isinstance(train_data, ImageDataset):
+        if isinstance(train_data._output, _ColumnAsTensor):
+            return _ImageToColumnConverter(
+                ConstantImageSize.from_image_size(train_data.input_size),
+                column_name=train_data._output._column_name,
+                one_hot_encoder=train_data._output._one_hot_encoder,
+                output_size=train_data.output_size,
+            )
+        elif isinstance(train_data._output, _TableAsTensor):
+            return _ImageToTableConverter(
+                ConstantImageSize.from_image_size(train_data.input_size),
+                column_names=train_data._output._column_names,
+                output_size=train_data.output_size,
+            )
+        elif isinstance(train_data._output, ImageList):
+            return _ImageToImageConverter(
+                ConstantImageSize.from_image_size(train_data.input_size),
+                output_size=ConstantImageSize.from_image_size(train_data._output.sizes[0]),
+            )
+    elif isinstance(train_data, TabularDataset):
+        return _TableConverter()
+    elif isinstance(train_data, TimeSeriesDataset):
+        return _TimeSeriesConverter()
+
+    raise TypeError(f"Unsupported training data type: {type(train_data)}")
