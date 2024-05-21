@@ -54,7 +54,7 @@ class OneHotEncoder(InvertibleTableTransformer):
     >>> from safeds.data.tabular.transformation import OneHotEncoder
     >>> table = Table({"col1": ["a", "b", "c", "a"]})
     >>> transformer = OneHotEncoder()
-    >>> transformer.fit_and_transform(table, ["col1"])[1]
+    >>> transformer.fit_and_transform(table)[1]
     +---------+---------+---------+
     | col1__a | col1__b | col1__c |
     |     --- |     --- |     --- |
