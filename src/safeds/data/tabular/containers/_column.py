@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING, Any, Literal, TypeVar, overload
 from safeds._utils import _structural_hash
 from safeds._validation._check_columns_are_numeric import _check_column_is_numeric
 from safeds.data.tabular.plotting import ColumnPlotter
+from safeds.data.tabular.operator import Temporal
 from safeds.data.tabular.typing._polars_data_type import _PolarsDataType
 from safeds.exceptions import (
     ColumnLengthMismatchError,
@@ -154,6 +155,12 @@ class Column(Sequence[T_co]):
     def plot(self) -> ColumnPlotter:
         """The plotter for the column."""
         return ColumnPlotter(self)
+
+    @property
+    def temporal(self):
+        """Temporal operation for a column"""
+        return Temporal(self)
+
 
     @property
     def type(self) -> DataType:
@@ -636,40 +643,6 @@ class Column(Sequence[T_co]):
 
         return self._from_polars_series(series)
 
-    def from_str_to_temporal(self, format_string: str) -> Column:
-        """
-        Return a new column with the string values converted to operator data.
-
-        The original column is not modified.
-
-        Parameters
-        ----------
-        format_string :
-            The used format string to convert the string into operator data.
-
-        Returns
-        -------
-        transformed_column:
-            A new column with operator data.
-
-        Examples
-        --------
-        >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("dates", ["01:01:2021", "01:01:2022", "01:01:2023", "01:01:2024"])
-        >>> column.from_str_to_temporal("%d:%m:%Y")
-        | dates      |
-        | ---        |
-        | date       |
-        +============+
-        | 2021-01-01 |
-        | 2022-01-01 |
-        | 2023-01-01 |
-        | 2024-01-01 |
-        +------------+
-        """
-        from polars import Date
-
-        return Column._from_polars_series(self._series.str.strptime(Date, format_string))
 
     # ------------------------------------------------------------------------------------------------------------------
     # Statistics
