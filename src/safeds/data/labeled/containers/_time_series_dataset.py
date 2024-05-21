@@ -6,6 +6,9 @@ from typing import TYPE_CHECKING, Any
 from safeds._config import _get_device, _init_default_device
 from safeds._utils import _structural_hash
 from safeds._validation import _check_bounds, _ClosedBound
+from safeds.data.tabular.containers import Column, Table
+
+from ._dataset import Dataset
 
 if TYPE_CHECKING:
     from collections.abc import Mapping, Sequence
@@ -14,10 +17,8 @@ if TYPE_CHECKING:
     from torch.utils.data import DataLoader
     from torch.utils.data import Dataset as TorchDataset
 
-    from safeds.data.tabular.containers import Column, Table
 
-
-class TimeSeriesDataset:
+class TimeSeriesDataset(Dataset[Table, Column]):
     """
     A time series dataset maps feature and time columns to a target column.
 

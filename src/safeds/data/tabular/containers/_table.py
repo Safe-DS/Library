@@ -8,7 +8,6 @@ from safeds._utils import _structural_hash
 from safeds._utils._random import _get_random_seed
 from safeds._validation import _check_bounds, _check_columns_exist, _ClosedBound, _normalize_and_check_file_path
 from safeds._validation._check_columns_dont_exist import _check_columns_dont_exist
-from safeds.data.labeled.containers import TabularDataset, TimeSeriesDataset
 from safeds.data.tabular.plotting import TablePlotter
 from safeds.data.tabular.typing._polars_data_type import _PolarsDataType
 from safeds.data.tabular.typing._polars_schema import _PolarsSchema
@@ -30,6 +29,7 @@ if TYPE_CHECKING:
     from torch import Tensor
     from torch.utils.data import DataLoader, Dataset
 
+    from safeds.data.labeled.containers import TabularDataset, TimeSeriesDataset
     from safeds.data.tabular.transformation import (
         InvertibleTableTransformer,
         TableTransformer,
@@ -1963,6 +1963,8 @@ class Table:
         ... )
         >>> dataset = table.to_tabular_dataset(target_name="amount_bought", extra_names=["item"])
         """
+        from safeds.data.labeled.containers import TabularDataset  # circular import
+
         return TabularDataset(
             self,
             target_name=target_name,
@@ -2015,7 +2017,7 @@ class Table:
         >>> table = Table({"day": [0, 1, 2], "price": [1.10, 1.19, 1.79], "amount_bought": [74, 72, 51]})
         >>> dataset = table.to_time_series_dataset(target_name="amount_bought", time_name= "day", window_size=2)
         """
-        from safeds.data.labeled.containers import TimeSeriesDataset
+        from safeds.data.labeled.containers import TimeSeriesDataset  # circular import
 
         return TimeSeriesDataset(
             self,

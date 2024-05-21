@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING, Any
 
 from safeds._config import _get_device, _init_default_device
 from safeds._utils import _structural_hash
+from safeds.data.tabular.containers import Column, Table
 
 from ._dataset import Dataset
 
@@ -15,10 +16,8 @@ if TYPE_CHECKING:
     from torch.utils.data import DataLoader
     from torch.utils.data import Dataset as TorchDataset
 
-    from safeds.data.tabular.containers import Column, Table
 
-
-class TabularDataset(Dataset):
+class TabularDataset(Dataset[Table, Column]):
     """
     A dataset containing tabular data. It can be used to train machine learning models.
 
