@@ -10,7 +10,14 @@ if TYPE_CHECKING:
 
 
 class TableTransformer(ABC):
-    """Learn a transformation for a set of columns in a `Table` and transform another `Table` with the same columns."""
+    """
+    Learn a transformation for a set of columns in a `Table` and transform another `Table` with the same columns.
+
+    Parameters
+    ----------
+    column_names:
+        The list of columns used to fit the transformer. If `None`, all suitable columns are used.
+    """
 
     # ------------------------------------------------------------------------------------------------------------------
     # Dunder methods
@@ -18,8 +25,11 @@ class TableTransformer(ABC):
 
     # The decorator is needed so the class really cannot be instantiated
     @abstractmethod
-    def __init__(self) -> None:
-        self._column_names: list[str] | None = None
+    def __init__(self, column_names: str | list[str] | None) -> None:
+        if isinstance(column_names, str):
+            column_names = [column_names]
+
+        self._column_names: list[str] | None = column_names
 
     # The decorator ensures that the method is overridden in all subclasses
     @abstractmethod
@@ -34,16 +44,16 @@ class TableTransformer(ABC):
     # ------------------------------------------------------------------------------------------------------------------
 
     @property
+    @abstractmethod
     def is_fitted(self) -> bool:
         """Whether the transformer is fitted."""
-        return self._column_names is not None
 
     # ------------------------------------------------------------------------------------------------------------------
     # Learning and transformation
     # ------------------------------------------------------------------------------------------------------------------
 
     @abstractmethod
-    def fit(self, table: Table, column_names: list[str] | None) -> Self:
+    def fit(self, table: Table) -> Self:
         """
         Learn a transformation for a set of columns in a table.
 
@@ -53,8 +63,6 @@ class TableTransformer(ABC):
         ----------
         table:
             The table used to fit the transformer.
-        column_names:
-            The list of columns from the table used to fit the transformer. If `None`, all columns are used.
 
         Returns
         -------
@@ -85,11 +93,7 @@ class TableTransformer(ABC):
             If the transformer has not been fitted yet.
         """
 
-    def fit_and_transform(
-        self,
-        table: Table,
-        column_names: list[str] | None = None,
-    ) -> tuple[Self, Table]:
+    def fit_and_transform(self, table: Table) -> tuple[Self, Table]:
         """
         Learn a transformation for a set of columns in a table and apply the learned transformation to the same table.
 
@@ -99,8 +103,6 @@ class TableTransformer(ABC):
         ----------
         table:
             The table used to fit the transformer. The transformer is then applied to this table.
-        column_names:
-            The list of columns from the table used to fit the transformer. If `None`, all columns are used.
 
         Returns
         -------
@@ -109,6 +111,6 @@ class TableTransformer(ABC):
         transformed_table:
             The transformed table.
         """
-        fitted_transformer = self.fit(table, column_names)
+        fitted_transformer = self.fit(table)
         transformed_table = fitted_transformer.transform(table)
         return fitted_transformer, transformed_table

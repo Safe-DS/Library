@@ -79,7 +79,7 @@ class TestImageToTableClassifier:
             if groups is not None:
                 classes.append(groups.group(2))
         image_classes = Table({"class": classes})
-        one_hot_encoder = OneHotEncoder().fit(image_classes, ["class"])
+        one_hot_encoder = OneHotEncoder(column_names="class").fit(image_classes)
         image_classes_one_hot_encoded = one_hot_encoder.transform(image_classes)
         image_dataset = ImageDataset(image_list, image_classes_one_hot_encoded)
         num_of_classes: int = image_dataset.output_size if isinstance(image_dataset.output_size, int) else 0

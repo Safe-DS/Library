@@ -174,12 +174,12 @@ class TestFit:
         )
 
         with pytest.raises(ColumnNotFoundError):
-            SimpleImputer(strategy).fit(table, ["b", "c"])
+            SimpleImputer(strategy, column_names=["b", "c"]).fit(table)
 
     @pytest.mark.parametrize("strategy", strategies(), ids=lambda x: x.__class__.__name__)
     def test_should_raise_if_table_contains_no_rows(self, strategy: SimpleImputer.Strategy) -> None:
         with pytest.raises(ValueError, match=r"The SimpleImputer cannot be fitted because the table contains 0 rows"):
-            SimpleImputer(strategy).fit(Table({"col1": []}), None)
+            SimpleImputer(strategy).fit(Table({"col1": []}))
 
     @pytest.mark.parametrize(
         ("table", "col_names", "strategy"),
@@ -196,7 +196,7 @@ class TestFit:
         strategy: SimpleImputer.Strategy,
     ) -> None:
         with pytest.raises(ColumnTypeError):
-            SimpleImputer(strategy).fit(table, col_names)
+            SimpleImputer(strategy, column_names=col_names).fit(table)
 
     @pytest.mark.parametrize("strategy", strategies(), ids=lambda x: x.__class__.__name__)
     def test_should_not_change_original_transformer(self, strategy: SimpleImputer.Strategy) -> None:
@@ -207,7 +207,7 @@ class TestFit:
         )
 
         transformer = SimpleImputer(strategy)
-        transformer.fit(table, None)
+        transformer.fit(table)
 
         assert transformer._column_names is None
         assert transformer._replacement is None
@@ -230,9 +230,9 @@ class TestTransform:
                     message=r"There are multiple most frequent values in a column given to the Imputer\..*",
                     category=UserWarning,
                 )
-                transformer = SimpleImputer(strategy).fit(table_to_fit, None)
+                transformer = SimpleImputer(strategy).fit(table_to_fit)
         else:
-            transformer = SimpleImputer(strategy).fit(table_to_fit, None)
+            transformer = SimpleImputer(strategy).fit(table_to_fit)
 
         table_to_transform = Table(
             {
@@ -272,7 +272,7 @@ class TestIsFitted:
         )
 
         transformer = SimpleImputer(strategy)
-        fitted_transformer = transformer.fit(table, None)
+        fitted_transformer = transformer.fit(table)
         assert fitted_transformer.is_fitted
 
 
@@ -410,8 +410,9 @@ class TestFitAndTransform:
             )
             fitted_transformer, transformed_table = SimpleImputer(
                 strategy,
+                column_names=column_names,
                 value_to_replace=value_to_replace,
-            ).fit_and_transform(table, column_names)
+            ).fit_and_transform(table)
 
         assert fitted_transformer.is_fitted
         assert transformed_table == expected

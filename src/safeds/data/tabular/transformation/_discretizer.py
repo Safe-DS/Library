@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING
 
 from safeds._utils import _structural_hash
 from safeds._validation import _check_bounds, _check_columns_exist, _ClosedBound
+from safeds._validation._check_columns_are_numeric import _check_columns_are_numeric
 from safeds.data.tabular.containers import Table
 from safeds.exceptions import (
     NonNumericColumnError,
@@ -24,6 +25,8 @@ class Discretizer(TableTransformer):
     ----------
     bin_count:
         The number of bins to be created.
+    column_names:
+        The list of columns used to fit the transformer. If `None`, all numeric columns are used.
 
     Raises
     ------
@@ -35,8 +38,13 @@ class Discretizer(TableTransformer):
     # Dunder methods
     # ------------------------------------------------------------------------------------------------------------------
 
-    def __init__(self, bin_count: int = 5) -> None:
-        TableTransformer.__init__(self)
+    def __init__(
+        self,
+        bin_count: int = 5,
+        *,
+        column_names: str | list[str] | None = None,
+    ) -> None:
+        TableTransformer.__init__(self, column_names)
 
         _check_bounds("bin_count", bin_count, lower_bound=_ClosedBound(2))
 
@@ -54,6 +62,10 @@ class Discretizer(TableTransformer):
     # ------------------------------------------------------------------------------------------------------------------
 
     @property
+    def is_fitted(self) -> bool:
+        return self._wrapped_transformer is not None
+
+    @property
     def bin_count(self) -> int:
         return self._bin_count
 
@@ -61,7 +73,7 @@ class Discretizer(TableTransformer):
     # Learning and transformation
     # ------------------------------------------------------------------------------------------------------------------
 
-    def fit(self, table: Table, column_names: list[str] | None) -> Discretizer:
+    def fit(self, table: Table) -> Discretizer:
         """
         Learn a transformation for a set of columns in a table.
 
@@ -71,8 +83,6 @@ class Discretizer(TableTransformer):
         ----------
         table:
             The table used to fit the transformer.
-        column_names:
-            The list of columns from the table used to fit the transformer. If `None`, all columns are used.
 
         Returns
         -------
@@ -93,14 +103,12 @@ class Discretizer(TableTransformer):
         if table.row_count == 0:
             raise ValueError("The Discretizer cannot be fitted because the table contains 0 rows")
 
-        if column_names is None:
-            column_names = table.column_names
+        if self._column_names is None:
+            column_names = [name for name in table.column_names if table.get_column_type(name).is_numeric]
         else:
+            column_names = self._column_names
             _check_columns_exist(table, column_names)
-
-            for column in column_names:
-                if not table.get_column(column).type.is_numeric:
-                    raise NonNumericColumnError(f"{column} is of type {table.get_column(column).type}.")
+            _check_columns_are_numeric(table, column_names, operation="fit a Discretizer")
 
         wrapped_transformer = sk_KBinsDiscretizer(n_bins=self._bin_count, encode="ordinal")
         wrapped_transformer.set_output(transform="polars")
@@ -108,9 +116,8 @@ class Discretizer(TableTransformer):
             table.remove_columns_except(column_names)._data_frame,
         )
 
-        result = Discretizer(self._bin_count)
+        result = Discretizer(self._bin_count, column_names=column_names)
         result._wrapped_transformer = wrapped_transformer
-        result._column_names = column_names
 
         return result
 

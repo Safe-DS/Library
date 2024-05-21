@@ -430,7 +430,7 @@ class TestColumnAsTensor:
             (torch.randn(10, 10), OneHotEncoder(), TransformerNotFittedError, r""),
             (
                 torch.randn(10, 10),
-                OneHotEncoder().fit(Table({"b": ["a", "b", "c"]}), None),
+                OneHotEncoder().fit(Table({"b": ["a", "b", "c"]})),
                 ValueError,
                 r"Tensor and one_hot_encoder have different amounts of classes \(10!=3\).",
             ),
