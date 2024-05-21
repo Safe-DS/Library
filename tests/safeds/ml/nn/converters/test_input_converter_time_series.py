@@ -15,7 +15,7 @@ from safeds.ml.nn.layers import (
 
 def test_should_raise_if_is_fitted_is_set_correctly_lstm() -> None:
     model = NeuralNetworkRegressor(
-        InputConversionTimeSeries(prediction_name="predicted"),
+        InputConversionTimeSeries(),
         [LSTMLayer(input_size=2, output_size=1)],
     )
     ts = Table.from_dict({"target": [1, 1, 1, 1], "time": [0, 0, 0, 0], "feat": [0, 0, 0, 0]}).to_time_series_dataset(
@@ -51,8 +51,8 @@ class TestEq:
                 Table(),
             ),
             (
-                InputConversionTimeSeries(prediction_name="2"),
-                InputConversionTimeSeries(prediction_name="1"),
+                InputConversionTimeSeries(),
+                InputConversionTimeSeries(continuous=True),
             ),
         ],
     )
@@ -79,21 +79,21 @@ class TestHash:
         assert hash(output_conversion_ts1) == hash(output_conversion_ts2)
 
     def test_hash_should_not_be_equal(self) -> None:
-        output_conversion_ts1 = InputConversionTimeSeries(prediction_name="1")
-        output_conversion_ts2 = InputConversionTimeSeries(prediction_name="2")
-        output_conversion_ts3 = InputConversionTimeSeries(prediction_name="3")
-        assert hash(output_conversion_ts1) != hash(output_conversion_ts3)
-        assert hash(output_conversion_ts2) != hash(output_conversion_ts1)
-        assert hash(output_conversion_ts3) != hash(output_conversion_ts2)
+        output_conversion_ts1 = InputConversionTimeSeries()
+        output_conversion_ts2 = InputConversionTimeSeries()
+        output_conversion_ts3 = InputConversionTimeSeries()
+        assert hash(output_conversion_ts1) == hash(output_conversion_ts3)
+        assert hash(output_conversion_ts2) == hash(output_conversion_ts1)
+        assert hash(output_conversion_ts3) == hash(output_conversion_ts2)
 
 
 class TestSizeOf:
     @pytest.mark.parametrize(
         "output_conversion_ts",
         [
-            InputConversionTimeSeries(prediction_name="1"),
-            InputConversionTimeSeries(prediction_name="2"),
-            InputConversionTimeSeries(prediction_name="3"),
+            InputConversionTimeSeries(),
+            InputConversionTimeSeries(),
+            InputConversionTimeSeries(),
         ],
     )
     def test_should_size_be_greater_than_normal_object(

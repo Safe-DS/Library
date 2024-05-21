@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 from safeds._utils import _figure_to_image
 from safeds._validation import _check_columns_exist
 from safeds._validation._check_columns_are_numeric import _check_columns_are_numeric
-from safeds.exceptions import NonNumericColumnError
+from safeds.exceptions import ColumnTypeError, NonNumericColumnError
 
 if TYPE_CHECKING:
     from safeds.data.image.containers import Image
@@ -349,11 +349,11 @@ class TablePlotter:
 def _plot_validation(table: Table, x_name: str, y_names: list[str]) -> None:
     y_names.append(x_name)
     _check_columns_exist(table, y_names)
-    _check_columns_are_numeric(table, y_names)
     y_names.remove(x_name)
+    _check_columns_are_numeric(table, y_names)
 
     if not table.get_column(x_name).is_numeric and not table.get_column(x_name).is_temporal:
-        raise NonNumericColumnError(x_name)
+        raise ColumnTypeError(x_name)
     for col_name in y_names:
         if not table.get_column(col_name).is_numeric:
-            raise NonNumericColumnError(col_name)
+            raise ColumnTypeError(col_name)

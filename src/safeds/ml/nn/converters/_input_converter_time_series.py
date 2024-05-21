@@ -20,7 +20,6 @@ class InputConversionTimeSeries(InputConversion[TimeSeriesDataset, TimeSeriesDat
     def __init__(
         self,
         *,
-        prediction_name: str = "prediction_nn",
         continuous: bool = False,
     ) -> None:
         self._window_size = 0
@@ -30,18 +29,36 @@ class InputConversionTimeSeries(InputConversion[TimeSeriesDataset, TimeSeriesDat
         self._time_name: str = ""
         self._feature_names: list[str] = []
         self._continuous: bool = continuous,
-        self._prediction_name = prediction_name  # TODO: use target name, override existing column
 
     def __eq__(self, other: object) -> bool:
-        if not isinstance(other, InputConversionTimeSeries):
-            return False
-        return self._prediction_name == other._prediction_name
+        if not isinstance(other, type(self)):
+            return NotImplemented
+        return (self is other) or (
+            self._window_size == other._window_size
+            and self._forecast_horizon == other._forecast_horizon
+            and self._first == other._first
+            and self._target_name == other._target_name
+            and self._feature_names == other._feature_names
+            and self._continuous == other._continuous)
 
     def __hash__(self) -> int:
-        return _structural_hash(self.__class__.__name__ + self._prediction_name)
+        return _structural_hash(self.__class__.__name__,
+                                self._window_size,
+                                self._forecast_horizon,
+                                self._target_name,
+                                self._time_name,
+                                self._feature_names,
+                                self._continuous)
 
     def __sizeof__(self) -> int:
-        return sys.getsizeof(self._prediction_name)
+        return (
+            sys.getsizeof(self._window_size)
+            + sys.getsizeof(self._forecast_horizon)
+            + sys.getsizeof(self._target_name)
+            + sys.getsizeof(self._time_name)
+            + sys.getsizeof(self._feature_names)
+            + sys.getsizeof(self._continuous)
+        )
 
     @property
     def _data_size(self) -> int:
@@ -82,10 +99,11 @@ class InputConversionTimeSeries(InputConversion[TimeSeriesDataset, TimeSeriesDat
         input_data_table = input_data.to_table()
         input_data_table = input_data_table.slice_rows(start=window_size + forecast_horizon)
 
-        return input_data_table.add_columns(
-            [Column(self._prediction_name, output_data.tolist())],
+        return input_data_table.replace_column(
+            self._target_name,
+            [Column(self._target_name, output_data.tolist())],
         ).to_time_series_dataset(
-            target_name=self._prediction_name,
+            target_name=self._target_name,
             time_name=input_data.time.name,
             extra_names=input_data.extras.column_names,
             window_size=window_size,
