@@ -13,11 +13,11 @@ class TestFit:
         )
 
         with pytest.raises(ColumnNotFoundError):
-            LabelEncoder().fit(table, ["col2", "col3"])
+            LabelEncoder(column_names=["col2", "col3"]).fit(table)
 
     def test_should_raise_if_table_contains_no_rows(self) -> None:
         with pytest.raises(ValueError, match=r"The LabelEncoder cannot be fitted because the table contains 0 rows"):
-            LabelEncoder().fit(Table({"col1": []}), ["col1"])
+            LabelEncoder(column_names="col1").fit(Table({"col1": []}))
 
     def test_should_warn_if_table_contains_numerical_data(self) -> None:
         with pytest.warns(
@@ -27,7 +27,7 @@ class TestFit:
                 r" values into numerical values"
             ),
         ):
-            LabelEncoder().fit(Table({"col1": [1, 2]}), ["col1"])
+            LabelEncoder(column_names="col1").fit(Table({"col1": [1, 2]}))
 
     def test_should_not_change_original_transformer(self) -> None:
         table = Table(
@@ -37,7 +37,7 @@ class TestFit:
         )
 
         transformer = LabelEncoder()
-        transformer.fit(table, None)
+        transformer.fit(table)
 
         assert transformer._column_names is None
         assert transformer._mapping is None
@@ -53,7 +53,7 @@ class TestTransform:
             },
         )
 
-        transformer = LabelEncoder().fit(table_to_fit, None)
+        transformer = LabelEncoder().fit(table_to_fit)
 
         table_to_transform = Table(
             {
@@ -90,7 +90,7 @@ class TestIsFitted:
         )
 
         transformer = LabelEncoder()
-        fitted_transformer = transformer.fit(table, None)
+        fitted_transformer = transformer.fit(table)
         assert fitted_transformer.is_fitted
 
 
@@ -135,7 +135,7 @@ class TestFitAndTransform:
         column_names: list[str] | None,
         expected: Table,
     ) -> None:
-        fitted_transformer, transformed_table = LabelEncoder().fit_and_transform(table, column_names)
+        fitted_transformer, transformed_table = LabelEncoder(column_names=column_names).fit_and_transform(table)
         assert fitted_transformer.is_fitted
         assert transformed_table == expected
 
@@ -170,7 +170,7 @@ class TestInverseTransform:
         ids=["no_column_names"],
     )
     def test_should_return_original_table(self, table: Table) -> None:
-        transformer = LabelEncoder().fit(table, None)
+        transformer = LabelEncoder().fit(table)
 
         assert transformer.inverse_transform(transformer.transform(table)) == table
 
@@ -181,7 +181,7 @@ class TestInverseTransform:
             },
         )
 
-        transformer = LabelEncoder().fit(table, None)
+        transformer = LabelEncoder().fit(table)
         transformed_table = transformer.transform(table)
         transformer.inverse_transform(transformed_table)
 
@@ -207,14 +207,12 @@ class TestInverseTransform:
 
     def test_should_raise_if_column_not_found(self) -> None:
         with pytest.raises(ColumnNotFoundError):
-            LabelEncoder().fit(
+            LabelEncoder(column_names=["col1", "col2"]).fit(
                 Table({"col1": ["one", "two"], "col2": ["three", "four"]}),
-                ["col1", "col2"],
             ).inverse_transform(Table({"col3": [1.0, 0.0]}))
 
     def test_should_raise_if_table_contains_non_numerical_data(self) -> None:
         with pytest.raises(ColumnTypeError):
-            LabelEncoder().fit(
+            LabelEncoder(column_names=["col1", "col2"]).fit(
                 Table({"col1": ["one", "two"], "col2": ["three", "four"]}),
-                ["col1", "col2"],
             ).inverse_transform(Table({"col1": ["1", "null"], "col2": ["2", "apple"]}))

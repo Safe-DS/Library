@@ -43,6 +43,8 @@ class OneHotEncoder(InvertibleTableTransformer):
 
     Parameters
     ----------
+    column_names:
+        The list of columns used to fit the transformer. If `None`, all non-numeric columns are used.
     separator:
         The separator used to separate the original column name from the value in the new column names.
 
@@ -52,7 +54,7 @@ class OneHotEncoder(InvertibleTableTransformer):
     >>> from safeds.data.tabular.transformation import OneHotEncoder
     >>> table = Table({"col1": ["a", "b", "c", "a"]})
     >>> transformer = OneHotEncoder()
-    >>> transformer.fit_and_transform(table, ["col1"])[1]
+    >>> transformer.fit_and_transform(table)[1]
     +---------+---------+---------+
     | col1__a | col1__b | col1__c |
     |     --- |     --- |     --- |
@@ -72,9 +74,10 @@ class OneHotEncoder(InvertibleTableTransformer):
     def __init__(
         self,
         *,
+        column_names: str | list[str] | None = None,
         separator: str = "__",
     ) -> None:
-        super().__init__()
+        super().__init__(column_names)
 
         # Parameters
         self._separator = separator
@@ -104,6 +107,10 @@ class OneHotEncoder(InvertibleTableTransformer):
     # ------------------------------------------------------------------------------------------------------------------
 
     @property
+    def is_fitted(self) -> bool:
+        return self._mapping is not None
+
+    @property
     def separator(self) -> str:
         """The separator used to separate the original column name from the value in the new column names."""
         return self._separator
@@ -112,7 +119,7 @@ class OneHotEncoder(InvertibleTableTransformer):
     # Learning and transformation
     # ------------------------------------------------------------------------------------------------------------------
 
-    def fit(self, table: Table, column_names: list[str] | None) -> OneHotEncoder:
+    def fit(self, table: Table) -> OneHotEncoder:
         """
         Learn a transformation for a set of columns in a table.
 
@@ -122,8 +129,6 @@ class OneHotEncoder(InvertibleTableTransformer):
         ----------
         table:
             The table used to fit the transformer.
-        column_names:
-            The list of columns from the table used to fit the transformer. If `None`, all columns are used.
 
         Returns
         -------
@@ -137,9 +142,10 @@ class OneHotEncoder(InvertibleTableTransformer):
         ValueError
             If the table contains 0 rows.
         """
-        if column_names is None:
+        if self._column_names is None:
             column_names = [name for name in table.column_names if not table.get_column_type(name).is_numeric]
         else:
+            column_names = self._column_names
             _check_columns_exist(table, column_names)
             _warn_if_columns_are_numeric(table, column_names)
 
@@ -169,8 +175,7 @@ class OneHotEncoder(InvertibleTableTransformer):
                 mapping[name].append((new_name, value))
 
         # Create a copy with the learned transformation
-        result = OneHotEncoder()
-        result._column_names = column_names
+        result = OneHotEncoder(column_names=column_names, separator=self._separator)
         result._new_column_names = new_column_names
         result._mapping = mapping
 

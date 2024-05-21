@@ -24,8 +24,8 @@ def test_lstm_model(device: Device) -> None:
     # Create a DataFrame
     _inflation_path = "_datas/US_Inflation_rates.csv"
     table = Table.from_csv_file(path=resolve_resource_path(_inflation_path))
-    rs = RangeScaler()
-    _, table = rs.fit_and_transform(table, ["value"])
+    rs = RangeScaler(column_names="value")
+    _, table = rs.fit_and_transform(table)
     train_table, test_table = table.split_rows(0.8)
 
     model = NeuralNetworkRegressor(

@@ -18,6 +18,8 @@ class LabelEncoder(InvertibleTableTransformer):
 
     Parameters
     ----------
+    column_names:
+        The list of columns used to fit the transformer. If `None`, all non-numeric columns are used.
     partial_order:
         The partial order of the labels. The labels are encoded in the order of the given list. Additional values are
         assigned labels in the order they are encountered during fitting.
@@ -27,8 +29,13 @@ class LabelEncoder(InvertibleTableTransformer):
     # Dunder methods
     # ------------------------------------------------------------------------------------------------------------------
 
-    def __init__(self, *, partial_order: list[Any] | None = None) -> None:
-        super().__init__()
+    def __init__(
+        self,
+        *,
+        column_names: str | list[str] | None = None,
+        partial_order: list[Any] | None = None,
+    ) -> None:
+        super().__init__(column_names)
 
         if partial_order is None:
             partial_order = []
@@ -52,6 +59,10 @@ class LabelEncoder(InvertibleTableTransformer):
     # ------------------------------------------------------------------------------------------------------------------
 
     @property
+    def is_fitted(self) -> bool:
+        return self._mapping is not None and self._inverse_mapping is not None
+
+    @property
     def partial_order(self) -> list[Any]:
         """The partial order of the labels."""
         return list(self._partial_order)  # defensive copy
@@ -60,7 +71,7 @@ class LabelEncoder(InvertibleTableTransformer):
     # Learning and transformation
     # ------------------------------------------------------------------------------------------------------------------
 
-    def fit(self, table: Table, column_names: list[str] | None) -> LabelEncoder:
+    def fit(self, table: Table) -> LabelEncoder:
         """
         Learn a transformation for a set of columns in a table.
 
@@ -70,8 +81,6 @@ class LabelEncoder(InvertibleTableTransformer):
         ----------
         table:
             The table used to fit the transformer.
-        column_names:
-            The list of columns from the table used to fit the transformer. If `None`, all non-numeric columns are used.
 
         Returns
         -------
@@ -85,9 +94,10 @@ class LabelEncoder(InvertibleTableTransformer):
         ValueError
             If the table contains 0 rows.
         """
-        if column_names is None:
+        if self._column_names is None:
             column_names = [name for name in table.column_names if not table.get_column_type(name).is_numeric]
         else:
+            column_names = self._column_names
             _check_columns_exist(table, column_names)
             _warn_if_columns_are_numeric(table, column_names)
 
@@ -111,8 +121,7 @@ class LabelEncoder(InvertibleTableTransformer):
                     reverse_mapping[name][label] = value
 
         # Create a copy with the learned transformation
-        result = LabelEncoder(partial_order=self._partial_order)
-        result._column_names = column_names
+        result = LabelEncoder(column_names=column_names, partial_order=self._partial_order)
         result._mapping = mapping
         result._inverse_mapping = reverse_mapping
 

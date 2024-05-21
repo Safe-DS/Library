@@ -79,7 +79,7 @@ def test_should_return_transformed_table(
     column_names: list[str] | None,
     expected: Table,
 ) -> None:
-    transformer = OneHotEncoder().fit(table, column_names)
+    transformer = OneHotEncoder(column_names=column_names).fit(table)
     assert table.transform_table(transformer) == expected
 
 
@@ -102,7 +102,7 @@ def test_should_raise_if_column_not_found(table_to_fit: Table) -> None:
         },
     )
 
-    transformer = OneHotEncoder().fit(table_to_fit, None)
+    transformer = OneHotEncoder().fit(table_to_fit)
 
     table_to_transform = Table(
         {

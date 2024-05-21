@@ -21,11 +21,11 @@ class TestFit:
         )
 
         with pytest.raises(ColumnNotFoundError):
-            OneHotEncoder().fit(table, ["col2", "col3"])
+            OneHotEncoder(column_names=["col2", "col3"]).fit(table)
 
     def test_should_raise_if_table_contains_no_rows(self) -> None:
         with pytest.raises(ValueError, match=r"The OneHotEncoder cannot be fitted because the table contains 0 rows"):
-            OneHotEncoder().fit(Table({"col1": []}), ["col1"])
+            OneHotEncoder(column_names="col1").fit(Table({"col1": []}))
 
     def test_should_warn_if_table_contains_numerical_data(self) -> None:
         with pytest.warns(
@@ -35,7 +35,7 @@ class TestFit:
                 r" values into numerical values"
             ),
         ):
-            OneHotEncoder().fit(Table({"col1": [1, 2, 3]}), ["col1"])
+            OneHotEncoder(column_names="col1").fit(Table({"col1": [1, 2, 3]}))
 
     @pytest.mark.parametrize(
         "table",
@@ -55,7 +55,7 @@ class TestFit:
     )
     def test_should_not_change_original_transformer(self, table: Table) -> None:
         transformer = OneHotEncoder()
-        transformer.fit(table, None)
+        transformer.fit(table)
 
         assert transformer._column_names is None
         assert transformer._new_column_names is None
@@ -71,7 +71,7 @@ class TestTransform:
             },
         )
 
-        transformer = OneHotEncoder().fit(table_to_fit, None)
+        transformer = OneHotEncoder().fit(table_to_fit)
 
         table_to_transform = Table(
             {
@@ -127,7 +127,7 @@ class TestIsFitted:
                 ),
                 category=UserWarning,
             )
-            fitted_transformer = transformer.fit(table, None)
+            fitted_transformer = transformer.fit(table)
         assert fitted_transformer.is_fitted
 
 
@@ -247,7 +247,7 @@ class TestFitAndTransform:
         column_names: list[str] | None,
         expected: Table,
     ) -> None:
-        fitted_transformer, transformed_table = OneHotEncoder().fit_and_transform(table, column_names)
+        fitted_transformer, transformed_table = OneHotEncoder(column_names=column_names).fit_and_transform(table)
         assert fitted_transformer.is_fitted
         assert transformed_table == expected
 
@@ -339,7 +339,7 @@ class TestInverseTransform:
         column_names: list[str],
         table_to_transform: Table,
     ) -> None:
-        transformer = OneHotEncoder().fit(table_to_fit, column_names)
+        transformer = OneHotEncoder(column_names=column_names).fit(table_to_fit)
 
         result = transformer.inverse_transform(transformer.transform(table_to_transform))
 
@@ -357,7 +357,7 @@ class TestInverseTransform:
             },
         )
 
-        transformer = OneHotEncoder().fit(table, None)
+        transformer = OneHotEncoder().fit(table)
         transformed_table = transformer.transform(table)
         transformer.inverse_transform(transformed_table)
 
@@ -387,12 +387,12 @@ class TestInverseTransform:
 
     def test_should_raise_if_column_not_found(self) -> None:
         with pytest.raises(ColumnNotFoundError):
-            OneHotEncoder().fit(Table({"col1": ["one", "two"]}), ["col1"]).inverse_transform(
+            OneHotEncoder(column_names="col1").fit(Table({"col1": ["one", "two"]})).inverse_transform(
                 Table({"col1": [1.0, 0.0]}),
             )
 
     def test_should_raise_if_table_contains_non_numerical_data(self) -> None:
         with pytest.raises(ColumnTypeError):
-            OneHotEncoder().fit(Table({"col1": ["one", "two"]}), ["col1"]).inverse_transform(
+            OneHotEncoder(column_names="col1").fit(Table({"col1": ["one", "two"]})).inverse_transform(
                 Table({"col1__one": ["1", "null"], "col1__two": ["2", "ok"]}),
             )
