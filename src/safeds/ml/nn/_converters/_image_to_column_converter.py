@@ -31,7 +31,7 @@ class _ImageToColumnConverter(_ImageConverter):
         column_name: str,
         one_hot_encoder: OneHotEncoder,
         *,
-        output_size: int | None = None,
+        output_size: int | ModelImageSize | None = None,
     ) -> None:
         super().__init__(input_size, output_size)
 
@@ -58,11 +58,7 @@ class _ImageToColumnConverter(_ImageConverter):
         )
 
     def __sizeof__(self) -> int:
-        return (
-            super().__sizeof__()
-            + sys.getsizeof(self._one_hot_encoder)
-            + sys.getsizeof(self._column_name)
-        )
+        return super().__sizeof__() + sys.getsizeof(self._one_hot_encoder) + sys.getsizeof(self._column_name)
 
     # ------------------------------------------------------------------------------------------------------------------
     # Template methods

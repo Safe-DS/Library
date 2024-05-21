@@ -6,6 +6,7 @@ from safeds.data.image.containers._multi_size_image_list import _MultiSizeImageL
 from safeds.data.image.containers._single_size_image_list import _SingleSizeImageList
 from safeds.data.image.typing import ImageSize
 from safeds.data.tabular.containers import Table
+from safeds.data.tabular.transformation import OneHotEncoder
 from safeds.ml.nn._converters import (
     _ImageConverter,
     _ImageToColumnConverter,
@@ -18,7 +19,7 @@ class TestDataConversionImage:
     @pytest.mark.parametrize(
         "input_conversion",
         [
-            _ImageToColumnConverter(ImageSize(1, 1, 1)),
+            _ImageToColumnConverter(ImageSize(1, 1, 1), "", OneHotEncoder()),
         ],
     )
     def test_should_raise_if_input_data_is_multi_size(
@@ -35,9 +36,18 @@ class TestDataConversionImage:
         @pytest.mark.parametrize(
             ("output_conversion_image1", "output_conversion_image2"),
             [
-                (_ImageToColumnConverter(ImageSize(1, 1, 1)), _ImageToColumnConverter(ImageSize(1, 1, 1))),
-                (_ImageToTableConverter(ImageSize(1, 1, 1)), _ImageToTableConverter(ImageSize(1, 1, 1))),
-                (_ImageToImageConverter(ImageSize(1, 1, 1)), _ImageToImageConverter(ImageSize(1, 1, 1))),
+                (
+                    _ImageToColumnConverter(ImageSize(1, 1, 1), "", OneHotEncoder()),
+                    _ImageToColumnConverter(ImageSize(1, 1, 1), "", OneHotEncoder()),
+                ),
+                (
+                    _ImageToTableConverter(ImageSize(1, 1, 1), []),
+                    _ImageToTableConverter(ImageSize(1, 1, 1), []),
+                ),
+                (
+                    _ImageToImageConverter(ImageSize(1, 1, 1)),
+                    _ImageToImageConverter(ImageSize(1, 1, 1)),
+                ),
             ],
         )
         def test_should_be_equal(
@@ -49,8 +59,8 @@ class TestDataConversionImage:
 
         def test_should_be_not_implemented(self) -> None:
             output_conversion_image_to_image = _ImageToImageConverter(ImageSize(1, 1, 1))
-            output_conversion_image_to_table = _ImageToTableConverter(ImageSize(1, 1, 1))
-            output_conversion_image_to_column = _ImageToColumnConverter(ImageSize(1, 1, 1))
+            output_conversion_image_to_table = _ImageToTableConverter(ImageSize(1, 1, 1), [])
+            output_conversion_image_to_column = _ImageToColumnConverter(ImageSize(1, 1, 1), "", OneHotEncoder())
             other = Table()
             assert output_conversion_image_to_image.__eq__(other) is NotImplemented
             assert output_conversion_image_to_image.__eq__(output_conversion_image_to_table) is NotImplemented
@@ -66,9 +76,18 @@ class TestDataConversionImage:
         @pytest.mark.parametrize(
             ("output_conversion_image1", "output_conversion_image2"),
             [
-                (_ImageToColumnConverter(ImageSize(1, 1, 1)), _ImageToColumnConverter(ImageSize(1, 1, 1))),
-                (_ImageToTableConverter(ImageSize(1, 1, 1)), _ImageToTableConverter(ImageSize(1, 1, 1))),
-                (_ImageToImageConverter(ImageSize(1, 1, 1)), _ImageToImageConverter(ImageSize(1, 1, 1))),
+                (
+                    _ImageToColumnConverter(ImageSize(1, 1, 1), "", OneHotEncoder()),
+                    _ImageToColumnConverter(ImageSize(1, 1, 1), "", OneHotEncoder()),
+                ),
+                (
+                    _ImageToTableConverter(ImageSize(1, 1, 1), []),
+                    _ImageToTableConverter(ImageSize(1, 1, 1), []),
+                ),
+                (
+                    _ImageToImageConverter(ImageSize(1, 1, 1)),
+                    _ImageToImageConverter(ImageSize(1, 1, 1)),
+                ),
             ],
         )
         def test_hash_should_be_equal(
@@ -80,8 +99,8 @@ class TestDataConversionImage:
 
         def test_hash_should_not_be_equal(self) -> None:
             output_conversion_image_to_image = _ImageToImageConverter(ImageSize(1, 1, 1))
-            output_conversion_image_to_table = _ImageToTableConverter(ImageSize(1, 1, 1))
-            output_conversion_image_to_column = _ImageToColumnConverter(ImageSize(1, 1, 1))
+            output_conversion_image_to_table = _ImageToTableConverter(ImageSize(1, 1, 1), [])
+            output_conversion_image_to_column = _ImageToColumnConverter(ImageSize(1, 1, 1), "", OneHotEncoder())
             assert hash(output_conversion_image_to_image) != hash(output_conversion_image_to_table)
             assert hash(output_conversion_image_to_image) != hash(output_conversion_image_to_column)
             assert hash(output_conversion_image_to_table) != hash(output_conversion_image_to_column)
@@ -90,8 +109,8 @@ class TestDataConversionImage:
         @pytest.mark.parametrize(
             "output_conversion_image",
             [
-                _ImageToColumnConverter(ImageSize(1, 1, 1)),
-                _ImageToTableConverter(ImageSize(1, 1, 1)),
+                _ImageToColumnConverter(ImageSize(1, 1, 1), "", OneHotEncoder()),
+                _ImageToTableConverter(ImageSize(1, 1, 1), []),
                 _ImageToImageConverter(ImageSize(1, 1, 1)),
             ],
         )
@@ -108,7 +127,7 @@ class TestInputConversionImageToTable:
             ValueError,
             match=r"The column_names are not set. The data can only be converted if the column_names are provided as `list\[str\]` in the kwargs.",
         ):
-            _ImageToTableConverter(ImageSize(1, 1, 1))._data_conversion_output(
+            _ImageToTableConverter(ImageSize(1, 1, 1), [])._data_conversion_output(
                 input_data=_SingleSizeImageList(),
                 output_data=torch.empty(1),
             )

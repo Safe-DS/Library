@@ -25,7 +25,7 @@ class _ImageToImageConverter(_ImageConverter):
         self,
         input_size: ModelImageSize,
         *,
-        output_size: ModelImageSize | None = None,
+        output_size: int | ModelImageSize | None = None,
     ) -> None:
         super().__init__(input_size, output_size)
 
@@ -34,10 +34,7 @@ class _ImageToImageConverter(_ImageConverter):
             return NotImplemented
         if self is other:
             return True
-        return (
-            self._input_size == other._input_size
-            and self._output_size == other._output_size
-        )
+        return self._input_size == other._input_size and self._output_size == other._output_size
 
     def __hash__(self) -> int:
         return _structural_hash(
@@ -45,9 +42,7 @@ class _ImageToImageConverter(_ImageConverter):
         )
 
     def __sizeof__(self) -> int:
-        return (
-            super().__sizeof__()
-        )
+        return super().__sizeof__()
 
     # ------------------------------------------------------------------------------------------------------------------
     # Template methods

@@ -2,6 +2,7 @@ import pytest
 from safeds.data.image.typing import ImageSize
 from safeds.data.labeled.containers import TabularDataset
 from safeds.data.tabular.containers import Table
+from safeds.data.tabular.transformation import OneHotEncoder
 from safeds.exceptions import (
     FeatureDataMismatchError,
     InputSizeError,
@@ -321,117 +322,117 @@ class TestClassificationModel:
                 r"You cannot use a 2-dimensional layer with 1-dimensional data.",
             ),
             (
-                _ImageToTableConverter(ImageSize(1, 1, 1)),
+                _ImageToTableConverter(ImageSize(1, 1, 1), []),
                 [Convolutional2DLayer(1, 1)],
                 r"The output data would be 2-dimensional but the provided output conversion uses 1-dimensional data.",
             ),
             (
-                _ImageToColumnConverter(ImageSize(1, 1, 1)),
+                _ImageToColumnConverter(ImageSize(1, 1, 1), "", OneHotEncoder()),
                 [Convolutional2DLayer(1, 1)],
                 r"The output data would be 2-dimensional but the provided output conversion uses 1-dimensional data.",
             ),
             (
-                _ImageToTableConverter(ImageSize(1, 1, 1)),
+                _ImageToTableConverter(ImageSize(1, 1, 1), []),
                 [ConvolutionalTranspose2DLayer(1, 1)],
                 r"The output data would be 2-dimensional but the provided output conversion uses 1-dimensional data.",
             ),
             (
-                _ImageToColumnConverter(ImageSize(1, 1, 1)),
+                _ImageToColumnConverter(ImageSize(1, 1, 1), "", OneHotEncoder()),
                 [ConvolutionalTranspose2DLayer(1, 1)],
                 r"The output data would be 2-dimensional but the provided output conversion uses 1-dimensional data.",
             ),
             (
-                _ImageToTableConverter(ImageSize(1, 1, 1)),
+                _ImageToTableConverter(ImageSize(1, 1, 1), []),
                 [MaxPooling2DLayer(1)],
                 r"The output data would be 2-dimensional but the provided output conversion uses 1-dimensional data.",
             ),
             (
-                _ImageToColumnConverter(ImageSize(1, 1, 1)),
+                _ImageToColumnConverter(ImageSize(1, 1, 1), "", OneHotEncoder()),
                 [MaxPooling2DLayer(1)],
                 r"The output data would be 2-dimensional but the provided output conversion uses 1-dimensional data.",
             ),
             (
-                _ImageToTableConverter(ImageSize(1, 1, 1)),
+                _ImageToTableConverter(ImageSize(1, 1, 1), []),
                 [AveragePooling2DLayer(1)],
                 r"The output data would be 2-dimensional but the provided output conversion uses 1-dimensional data.",
             ),
             (
-                _ImageToColumnConverter(ImageSize(1, 1, 1)),
+                _ImageToColumnConverter(ImageSize(1, 1, 1), "", OneHotEncoder()),
                 [AveragePooling2DLayer(1)],
                 r"The output data would be 2-dimensional but the provided output conversion uses 1-dimensional data.",
             ),
             (
-                _ImageToTableConverter(ImageSize(1, 1, 1)),
+                _ImageToTableConverter(ImageSize(1, 1, 1), []),
                 [FlattenLayer(), Convolutional2DLayer(1, 1)],
                 r"You cannot use a 2-dimensional layer with 1-dimensional data.",
             ),
             (
-                _ImageToColumnConverter(ImageSize(1, 1, 1)),
+                _ImageToColumnConverter(ImageSize(1, 1, 1), "", OneHotEncoder()),
                 [FlattenLayer(), Convolutional2DLayer(1, 1)],
                 r"You cannot use a 2-dimensional layer with 1-dimensional data.",
             ),
             (
-                _ImageToTableConverter(ImageSize(1, 1, 1)),
+                _ImageToTableConverter(ImageSize(1, 1, 1), []),
                 [FlattenLayer(), ConvolutionalTranspose2DLayer(1, 1)],
                 r"You cannot use a 2-dimensional layer with 1-dimensional data.",
             ),
             (
-                _ImageToColumnConverter(ImageSize(1, 1, 1)),
+                _ImageToColumnConverter(ImageSize(1, 1, 1), "", OneHotEncoder()),
                 [FlattenLayer(), ConvolutionalTranspose2DLayer(1, 1)],
                 r"You cannot use a 2-dimensional layer with 1-dimensional data.",
             ),
             (
-                _ImageToTableConverter(ImageSize(1, 1, 1)),
+                _ImageToTableConverter(ImageSize(1, 1, 1), []),
                 [FlattenLayer(), MaxPooling2DLayer(1)],
                 r"You cannot use a 2-dimensional layer with 1-dimensional data.",
             ),
             (
-                _ImageToColumnConverter(ImageSize(1, 1, 1)),
+                _ImageToColumnConverter(ImageSize(1, 1, 1), "", OneHotEncoder()),
                 [FlattenLayer(), MaxPooling2DLayer(1)],
                 r"You cannot use a 2-dimensional layer with 1-dimensional data.",
             ),
             (
-                _ImageToTableConverter(ImageSize(1, 1, 1)),
+                _ImageToTableConverter(ImageSize(1, 1, 1), []),
                 [FlattenLayer(), AveragePooling2DLayer(1)],
                 r"You cannot use a 2-dimensional layer with 1-dimensional data.",
             ),
             (
-                _ImageToColumnConverter(ImageSize(1, 1, 1)),
+                _ImageToColumnConverter(ImageSize(1, 1, 1), "", OneHotEncoder()),
                 [FlattenLayer(), AveragePooling2DLayer(1)],
                 r"You cannot use a 2-dimensional layer with 1-dimensional data.",
             ),
             (
-                _ImageToTableConverter(ImageSize(1, 1, 1)),
+                _ImageToTableConverter(ImageSize(1, 1, 1), []),
                 [FlattenLayer(), FlattenLayer()],
                 r"You cannot use a 2-dimensional layer with 1-dimensional data.",
             ),
             (
-                _ImageToColumnConverter(ImageSize(1, 1, 1)),
+                _ImageToColumnConverter(ImageSize(1, 1, 1), "", OneHotEncoder()),
                 [FlattenLayer(), FlattenLayer()],
                 r"You cannot use a 2-dimensional layer with 1-dimensional data.",
             ),
             (
-                _ImageToTableConverter(ImageSize(1, 1, 1)),
+                _ImageToTableConverter(ImageSize(1, 1, 1), []),
                 [ForwardLayer(1)],
                 r"The 2-dimensional data has to be flattened before using a 1-dimensional layer.",
             ),
             (
-                _ImageToColumnConverter(ImageSize(1, 1, 1)),
+                _ImageToColumnConverter(ImageSize(1, 1, 1), "", OneHotEncoder()),
                 [ForwardLayer(1)],
                 r"The 2-dimensional data has to be flattened before using a 1-dimensional layer.",
             ),
             (
-                _ImageToTableConverter(ImageSize(1, 1, 1)),
+                _ImageToTableConverter(ImageSize(1, 1, 1), []),
                 [],
                 r"You need to provide at least one layer to a neural network.",
             ),
             (
-                _ImageToColumnConverter(ImageSize(1, 1, 1)),
+                _ImageToColumnConverter(ImageSize(1, 1, 1), "", OneHotEncoder()),
                 [],
                 r"You need to provide at least one layer to a neural network.",
             ),
             (
-                _ImageToColumnConverter(VariableImageSize(1, 1, 1)),
+                _ImageToColumnConverter(VariableImageSize(1, 1, 1), "", OneHotEncoder()),
                 [FlattenLayer()],
                 r"A NeuralNetworkClassifier cannot be used with a InputConversionImage that uses a VariableImageSize.",
             ),
@@ -729,12 +730,12 @@ class TestRegressionModel:
                 r"You need to provide at least one layer to a neural network.",
             ),
             (
-                _ImageToTableConverter(ImageSize(1, 1, 1)),
+                _ImageToTableConverter(ImageSize(1, 1, 1), []),
                 [FlattenLayer()],
                 r"A NeuralNetworkRegressor cannot be used with images as input and 1-dimensional data as output.",
             ),
             (
-                _ImageToColumnConverter(ImageSize(1, 1, 1)),
+                _ImageToColumnConverter(ImageSize(1, 1, 1), "", OneHotEncoder()),
                 [FlattenLayer()],
                 r"A NeuralNetworkRegressor cannot be used with images as input and 1-dimensional data as output.",
             ),

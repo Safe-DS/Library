@@ -53,10 +53,7 @@ class _ImageToTableConverter(_ImageConverter):
         )
 
     def __sizeof__(self) -> int:
-        return (
-            super().__sizeof__()
-            + sys.getsizeof(self._column_names)
-        )
+        return super().__sizeof__() + sys.getsizeof(self._column_names)
 
     # ------------------------------------------------------------------------------------------------------------------
     # Template methods

@@ -48,10 +48,7 @@ class _ImageConverter(_Converter[ImageDataset, ImageList], ABC):
 
     @abstractmethod
     def __sizeof__(self) -> int:
-        return (
-            sys.getsizeof(self._input_size)
-            + sys.getsizeof(self._output_size)
-        )
+        return sys.getsizeof(self._input_size) + sys.getsizeof(self._output_size)
 
     # ------------------------------------------------------------------------------------------------------------------
     # Properties
