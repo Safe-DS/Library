@@ -1,7 +1,6 @@
 import sys
 
 import pytest
-import torch
 from safeds.data.tabular.containers import Table
 from safeds.ml.nn import (
     NeuralNetworkRegressor,
@@ -16,12 +15,13 @@ from safeds.ml.nn.layers import (
 
 def test_should_raise_if_is_fitted_is_set_correctly_lstm() -> None:
     model = NeuralNetworkRegressor(
-        InputConversionTimeSeries(1, 1, prediction_name="predicted"),
+        InputConversionTimeSeries(prediction_name="predicted"),
         [LSTMLayer(input_size=2, output_size=1)],
     )
     ts = Table.from_dict({"target": [1, 1, 1, 1], "time": [0, 0, 0, 0], "feat": [0, 0, 0, 0]}).to_time_series_dataset(
-        "target",
-        "time",
+        target_name="target",
+        time_name="time",
+        window_size=1,
     )
     assert not model.is_fitted
     model = model.fit(ts)
@@ -29,48 +29,11 @@ def test_should_raise_if_is_fitted_is_set_correctly_lstm() -> None:
     assert model.is_fitted
 
 
-def test_get_output_config() -> None:
-    test_val = {"window_size": 1, "forecast_horizon": 1}
-    it = InputConversionTimeSeries(1, 1)
-    di = it._get_output_configuration()
-    assert di == test_val
-
-
-def test_output_conversion_time_series() -> None:
-    ot = InputConversionTimeSeries(1, 1)
-
-    with pytest.raises(
-        ValueError,
-        match=r"The window_size is not set. The data can only be converted if the window_size is provided as `int` in the kwargs.",
-    ):
-        ot._data_conversion_output(
-            input_data=Table({"a": [1], "c": [1], "b": [1]}).to_time_series_dataset("a", "b"),
-            output_data=torch.Tensor([0]),
-            win=2,
-            kappa=3,
-        )
-
-
-def test_output_conversion_time_series_2() -> None:
-    ot = InputConversionTimeSeries(1, 1)
-
-    with pytest.raises(
-        ValueError,
-        match=r"The forecast_horizon is not set. The data can only be converted if the forecast_horizon is provided as `int` in the kwargs.",
-    ):
-        ot._data_conversion_output(
-            input_data=Table({"a": [1], "c": [1], "b": [1]}).to_time_series_dataset("a", "b"),
-            output_data=torch.Tensor([0]),
-            window_size=2,
-            kappa=3,
-        )
-
-
 class TestEq:
     @pytest.mark.parametrize(
         ("output_conversion_ts1", "output_conversion_ts2"),
         [
-            (InputConversionTimeSeries(1, 1), InputConversionTimeSeries(1, 1)),
+            (InputConversionTimeSeries(), InputConversionTimeSeries()),
         ],
     )
     def test_should_be_equal(
@@ -84,12 +47,12 @@ class TestEq:
         ("output_conversion_ts1", "output_conversion_ts2"),
         [
             (
-                InputConversionTimeSeries(1, 1),
+                InputConversionTimeSeries(),
                 Table(),
             ),
             (
-                InputConversionTimeSeries(1, 1, prediction_name="2"),
-                InputConversionTimeSeries(1, 1, prediction_name="1"),
+                InputConversionTimeSeries(prediction_name="2"),
+                InputConversionTimeSeries(prediction_name="1"),
             ),
         ],
     )
@@ -105,7 +68,7 @@ class TestHash:
     @pytest.mark.parametrize(
         ("output_conversion_ts1", "output_conversion_ts2"),
         [
-            (InputConversionTimeSeries(1, 1), InputConversionTimeSeries(1, 1)),
+            (InputConversionTimeSeries(), InputConversionTimeSeries()),
         ],
     )
     def test_hash_should_be_equal(
@@ -116,9 +79,9 @@ class TestHash:
         assert hash(output_conversion_ts1) == hash(output_conversion_ts2)
 
     def test_hash_should_not_be_equal(self) -> None:
-        output_conversion_ts1 = InputConversionTimeSeries(1, 1, prediction_name="1")
-        output_conversion_ts2 = InputConversionTimeSeries(1, 1, prediction_name="2")
-        output_conversion_ts3 = InputConversionTimeSeries(1, 1, prediction_name="3")
+        output_conversion_ts1 = InputConversionTimeSeries(prediction_name="1")
+        output_conversion_ts2 = InputConversionTimeSeries(prediction_name="2")
+        output_conversion_ts3 = InputConversionTimeSeries(prediction_name="3")
         assert hash(output_conversion_ts1) != hash(output_conversion_ts3)
         assert hash(output_conversion_ts2) != hash(output_conversion_ts1)
         assert hash(output_conversion_ts3) != hash(output_conversion_ts2)
@@ -128,9 +91,9 @@ class TestSizeOf:
     @pytest.mark.parametrize(
         "output_conversion_ts",
         [
-            InputConversionTimeSeries(1, 1, prediction_name="1"),
-            InputConversionTimeSeries(1, 1, prediction_name="2"),
-            InputConversionTimeSeries(1, 1, prediction_name="3"),
+            InputConversionTimeSeries(prediction_name="1"),
+            InputConversionTimeSeries(prediction_name="2"),
+            InputConversionTimeSeries(prediction_name="3"),
         ],
     )
     def test_should_size_be_greater_than_normal_object(

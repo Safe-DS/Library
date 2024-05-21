@@ -32,12 +32,12 @@ def test_should_return_same_hash_for_equal_tabular_datasets(table1: TabularDatas
     ("table1", "table2"),
     [
         (
-            TabularDataset({"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9]}, "b", ["c"]),
-            TabularDataset({"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9]}, "c", ["b"]),
+            TabularDataset({"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9]}, "b", extra_names=["c"]),
+            TabularDataset({"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9]}, "c", extra_names=["b"]),
         ),
         (
-            TabularDataset({"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9]}, "b", ["c"]),
-            TabularDataset({"a": [1, 2, 3], "b": [4, 5, 6], "d": [7, 8, 9]}, "b", ["d"]),
+            TabularDataset({"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9]}, "b", extra_names=["c"]),
+            TabularDataset({"a": [1, 2, 3], "b": [4, 5, 6], "d": [7, 8, 9]}, "b", extra_names=["d"]),
         ),
         (
             TabularDataset(
@@ -47,8 +47,8 @@ def test_should_return_same_hash_for_equal_tabular_datasets(table1: TabularDatas
             TabularDataset({"a": ["1", "2", "3"], "b": [4, 5, 6]}, "b"),
         ),
         (
-            TabularDataset({"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9]}, "b", ["c"]),
-            TabularDataset({"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9]}, "b", ["a"]),
+            TabularDataset({"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9]}, "b", extra_names=["c"]),
+            TabularDataset({"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9]}, "b", extra_names=["a"]),
         ),
     ],
     ids=[

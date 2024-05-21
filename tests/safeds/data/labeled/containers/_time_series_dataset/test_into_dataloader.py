@@ -37,7 +37,12 @@ def test_should_create_dataloader(
     device: Device,
 ) -> None:
     configure_test_with_device(device)
-    tabular_dataset = Table.from_dict(data).to_time_series_dataset(target_name, time_name, extra_names)
+    tabular_dataset = Table.from_dict(data).to_time_series_dataset(
+        target_name,
+        time_name,
+        window_size=1,
+        extra_names=extra_names,
+    )
     data_loader = tabular_dataset._into_dataloader_with_window(1, 1, 1)
     batch = next(iter(data_loader))
     assert batch[0].device == _get_device()
@@ -73,7 +78,12 @@ def test_should_create_dataloader_predict(
     device: Device,
 ) -> None:
     configure_test_with_device(device)
-    tabular_dataset = Table.from_dict(data).to_time_series_dataset(target_name, time_name, extra_names)
+    tabular_dataset = Table.from_dict(data).to_time_series_dataset(
+        target_name,
+        time_name,
+        window_size=1,
+        extra_names=extra_names,
+    )
     data_loader = tabular_dataset._into_dataloader_with_window_predict(1, 1, 1)
     batch = next(iter(data_loader))
     assert batch[0].device == _get_device()
@@ -91,7 +101,7 @@ def test_should_create_dataloader_predict(
                     "C": [3, 6],
                     "T": [0, 1],
                 },
-            ).to_time_series_dataset("T", "B"),
+            ).to_time_series_dataset(target_name="T", time_name="B", window_size=1),
             1,
             2,
             ValueError,
@@ -105,7 +115,7 @@ def test_should_create_dataloader_predict(
                     "C": [3, 6],
                     "T": [0, 1],
                 },
-            ).to_time_series_dataset("T", "B"),
+            ).to_time_series_dataset(target_name="T", time_name="B", window_size=1),
             1,
             0,
             OutOfBoundsError,
@@ -119,7 +129,7 @@ def test_should_create_dataloader_predict(
                     "C": [3, 6],
                     "T": [0, 1],
                 },
-            ).to_time_series_dataset("T", "B"),
+            ).to_time_series_dataset(target_name="T", time_name="B", window_size=1),
             0,
             1,
             OutOfBoundsError,
@@ -157,7 +167,7 @@ def test_should_create_dataloader_invalid(
                     "C": [3, 6],
                     "T": [0, 1],
                 },
-            ).to_time_series_dataset("T", "B"),
+            ).to_time_series_dataset(target_name="T", time_name="B", window_size=1),
             1,
             2,
             ValueError,
@@ -171,7 +181,7 @@ def test_should_create_dataloader_invalid(
                     "C": [3, 6],
                     "T": [0, 1],
                 },
-            ).to_time_series_dataset("T", "B"),
+            ).to_time_series_dataset(target_name="T", time_name="B", window_size=1),
             1,
             0,
             OutOfBoundsError,
@@ -185,7 +195,11 @@ def test_should_create_dataloader_invalid(
                     "C": [3, 6],
                     "T": [0, 1],
                 },
-            ).to_time_series_dataset("T", "B"),
+            ).to_time_series_dataset(
+                target_name="T",
+                time_name="B",
+                window_size=1,
+            ),
             0,
             1,
             OutOfBoundsError,

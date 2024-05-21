@@ -8,7 +8,6 @@ from safeds._utils import _structural_hash
 from safeds._utils._random import _get_random_seed
 from safeds._validation import _check_bounds, _check_columns_exist, _ClosedBound, _normalize_and_check_file_path
 from safeds._validation._check_columns_dont_exist import _check_columns_dont_exist
-from safeds.data.labeled.containers import TabularDataset, TimeSeriesDataset
 from safeds.data.tabular.plotting import TablePlotter
 from safeds.data.tabular.typing._polars_data_type import _PolarsDataType
 from safeds.data.tabular.typing._polars_schema import _PolarsSchema
@@ -30,6 +29,7 @@ if TYPE_CHECKING:
     from torch import Tensor
     from torch.utils.data import DataLoader, Dataset
 
+    from safeds.data.labeled.containers import TabularDataset, TimeSeriesDataset
     from safeds.data.tabular.transformation import (
         InvertibleTableTransformer,
         TableTransformer,
@@ -161,7 +161,7 @@ class Table:
 
         path = _normalize_and_check_file_path(path, ".csv", [".csv"], check_if_file_exists=True)
 
-        return Table._from_polars_lazy_frame(pl.scan_csv(path, separator=separator))
+        return Table._from_polars_lazy_frame(pl.scan_csv(path, separator=separator, raise_if_empty=False))
 
     @staticmethod
     def from_dict(data: dict[str, list[Any]]) -> Table:
@@ -1919,7 +1919,7 @@ class Table:
 
         self._lazy_frame.sink_parquet(path)
 
-    def to_tabular_dataset(self, target_name: str, extra_names: list[str] | None = None) -> TabularDataset:
+    def to_tabular_dataset(self, target_name: str, *, extra_names: list[str] | None = None) -> TabularDataset:
         """
         Return a new `TabularDataset` with columns marked as a target, feature, or extra.
 
@@ -1934,7 +1934,7 @@ class Table:
         Parameters
         ----------
         target_name:
-            Name of the target column.
+            The name of the target column.
         extra_names:
             Names of the columns that are neither feature nor target. If None, no extra columns are used, i.e. all but
             the target column are used as features.
@@ -1963,13 +1963,22 @@ class Table:
         ... )
         >>> dataset = table.to_tabular_dataset(target_name="amount_bought", extra_names=["item"])
         """
-        return TabularDataset(self, target_name, extra_names)
+        from safeds.data.labeled.containers import TabularDataset  # circular import
+
+        return TabularDataset(
+            self,
+            target_name=target_name,
+            extra_names=extra_names,
+        )
 
     def to_time_series_dataset(
         self,
         target_name: str,
         time_name: str,
+        window_size: int,
+        *,
         extra_names: list[str] | None = None,
+        forecast_horizon: int = 1,
     ) -> TimeSeriesDataset:
         """
         Return a new `TimeSeriesDataset` with columns marked as a target column, time or feature columns.
@@ -1979,12 +1988,16 @@ class Table:
         Parameters
         ----------
         target_name:
-            Name of the target column.
+            The name of the target column.
         time_name:
-            Name of the time column.
+            The name of the time column.
+        window_size:
+            The number of consecutive sample to use as input for prediction.
         extra_names:
             Names of the columns that are neither features nor target. If None, no extra columns are used, i.e. all but
             the target column are used as features.
+        forecast_horizon:
+            The number of time steps to predict into the future.
 
         Returns
         -------
@@ -2002,11 +2015,18 @@ class Table:
         --------
         >>> from safeds.data.tabular.containers import Table
         >>> table = Table({"day": [0, 1, 2], "price": [1.10, 1.19, 1.79], "amount_bought": [74, 72, 51]})
-        >>> dataset = table.to_time_series_dataset(target_name="amount_bought", time_name= "day")
+        >>> dataset = table.to_time_series_dataset(target_name="amount_bought", time_name= "day", window_size=2)
         """
-        from safeds.data.labeled.containers import TimeSeriesDataset
+        from safeds.data.labeled.containers import TimeSeriesDataset  # circular import
 
-        return TimeSeriesDataset(self, target_name, time_name, extra_names)
+        return TimeSeriesDataset(
+            self,
+            target_name=target_name,
+            time_name=time_name,
+            window_size=window_size,
+            extra_names=extra_names,
+            forecast_horizon=forecast_horizon,
+        )
 
     # ------------------------------------------------------------------------------------------------------------------
     # Dataframe interchange protocol

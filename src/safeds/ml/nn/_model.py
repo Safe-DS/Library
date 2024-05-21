@@ -299,7 +299,6 @@ class NeuralNetworkRegressor(Generic[IFT, IPT]):
         return self._input_conversion._data_conversion_output(
             test_data,
             torch.cat(predictions, dim=0),
-            **self._input_conversion._get_output_configuration(),
         )
 
     @property
@@ -603,7 +602,6 @@ class NeuralNetworkClassifier(Generic[IFT, IPT]):
         return self._input_conversion._data_conversion_output(
             test_data,
             torch.cat(predictions, dim=0),
-            **self._input_conversion._get_output_configuration(),
         )
 
     @property

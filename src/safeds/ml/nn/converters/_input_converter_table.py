@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 from safeds.data.labeled.containers import TabularDataset
 from safeds.data.tabular.containers import Column, Table
@@ -22,7 +22,6 @@ class InputConversionTable(InputConversion[TabularDataset, Table]):
 
     def __init__(self, *, prediction_name: str = "prediction") -> None:
         self._target_name = ""
-        self._time_name = ""
         self._feature_names: list[str] = []
         self._first = True
         self._prediction_name = prediction_name  # TODO: use target name, override existing column
@@ -40,7 +39,7 @@ class InputConversionTable(InputConversion[TabularDataset, Table]):
     def _data_conversion_predict(self, input_data: Table, batch_size: int) -> DataLoader:
         return input_data._into_dataloader(batch_size)
 
-    def _data_conversion_output(self, input_data: Table, output_data: Tensor, **_kwargs: Any) -> TabularDataset:
+    def _data_conversion_output(self, input_data: Table, output_data: Tensor) -> TabularDataset:
         return input_data.add_columns([Column(self._prediction_name, output_data.tolist())]).to_tabular_dataset(
             self._prediction_name,
         )
@@ -54,6 +53,3 @@ class InputConversionTable(InputConversion[TabularDataset, Table]):
 
     def _is_predict_data_valid(self, input_data: Table) -> bool:
         return (sorted(input_data.column_names)).__eq__(sorted(self._feature_names))
-
-    def _get_output_configuration(self) -> dict[str, Any]:
-        return {}
