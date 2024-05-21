@@ -26,9 +26,9 @@ def transformers_numeric() -> list[TableTransformer]:
         The list of numeric transformers to test.
     """
     return [
-        StandardScaler(),
-        RangeScaler(),
-        Discretizer(),
+        StandardScaler(column_names="col1"),
+        RangeScaler(column_names="col1"),
+        Discretizer(column_names="col1"),
     ]
 
 
@@ -45,8 +45,8 @@ def transformers_non_numeric() -> list[TableTransformer]:
         The list of non-numeric transformers to test.
     """
     return [
-        OneHotEncoder(),
-        LabelEncoder(),
+        OneHotEncoder(column_names="col1"),
+        LabelEncoder(column_names="col1"),
     ]
 
 
@@ -129,7 +129,7 @@ class TestHash:
         transformer1: TableTransformer,
         valid_data_numeric: Table,
     ) -> None:
-        transformer1_fit = transformer1.fit(valid_data_numeric, ["col1"])
+        transformer1_fit = transformer1.fit(valid_data_numeric)
         assert hash(transformer1) != hash(transformer1_fit)
 
     @pytest.mark.parametrize("transformer1", transformers_non_numeric(), ids=lambda x: x.__class__.__name__)
@@ -138,7 +138,7 @@ class TestHash:
         transformer1: TableTransformer,
         valid_data_non_numeric: Table,
     ) -> None:
-        transformer1_fit = transformer1.fit(valid_data_non_numeric, ["col1"])
+        transformer1_fit = transformer1.fit(valid_data_non_numeric)
         assert hash(transformer1) != hash(transformer1_fit)
 
     @pytest.mark.parametrize(
@@ -152,7 +152,7 @@ class TestHash:
         transformer2: TableTransformer,
         valid_data_numeric: Table,
     ) -> None:
-        transformer1_fit = transformer1.fit(valid_data_numeric, ["col1"])
+        transformer1_fit = transformer1.fit(valid_data_numeric)
         assert hash(transformer2) != hash(transformer1_fit)
 
     @pytest.mark.parametrize(
@@ -166,7 +166,7 @@ class TestHash:
         transformer2: TableTransformer,
         valid_data_non_numeric: Table,
     ) -> None:
-        transformer1_fit = transformer1.fit(valid_data_non_numeric, ["col1"])
+        transformer1_fit = transformer1.fit(valid_data_non_numeric)
         assert hash(transformer2) != hash(transformer1_fit)
 
     @pytest.mark.parametrize("transformer2", transformers(), ids=lambda x: x.__class__.__name__)
@@ -176,5 +176,5 @@ class TestHash:
         valid_data_imputer: Table,
     ) -> None:
         transformer1 = SimpleImputer(strategy=SimpleImputer.Strategy.mode())
-        transformer1_fit = transformer1.fit(valid_data_imputer, ["col1"])
+        transformer1_fit = transformer1.fit(valid_data_imputer)
         assert hash(transformer2) != hash(transformer1_fit)

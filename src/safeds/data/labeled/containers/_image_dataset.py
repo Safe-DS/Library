@@ -3,7 +3,7 @@ from __future__ import annotations
 import copy
 import sys
 import warnings
-from typing import TYPE_CHECKING, Generic, TypeVar
+from typing import TYPE_CHECKING, TypeVar
 
 from safeds._config import _get_device, _init_default_device
 from safeds._utils import _structural_hash
@@ -27,10 +27,10 @@ from ._dataset import Dataset
 if TYPE_CHECKING:
     from torch import Tensor
 
-T = TypeVar("T", Column, Table, ImageList)
+Out_co = TypeVar("Out_co", Column, ImageList, Table, covariant=True)
 
 
-class ImageDataset(Generic[T], Dataset):
+class ImageDataset(Dataset[ImageList, Out_co]):
     """
     A Dataset for ImageLists as input and ImageLists, Tables or Columns as output.
 
@@ -46,7 +46,7 @@ class ImageDataset(Generic[T], Dataset):
         weather the data should be shuffled after each epoch of training
     """
 
-    def __init__(self, input_data: ImageList, output_data: T, batch_size: int = 1, shuffle: bool = False) -> None:
+    def __init__(self, input_data: ImageList, output_data: Out_co, batch_size: int = 1, shuffle: bool = False) -> None:
         import torch
 
         _init_default_device()
@@ -207,7 +207,7 @@ class ImageDataset(Generic[T], Dataset):
         """
         return self._sort_image_list_with_shuffle_tensor_indices(self._input)
 
-    def get_output(self) -> T:
+    def get_output(self) -> Out_co:
         """
         Get the output data of this dataset.
 
@@ -280,7 +280,7 @@ class ImageDataset(Generic[T], Dataset):
             output_tensor = self._output._tensor[self._shuffle_tensor_indices[batch_size * batch_number : max_index]]
         return input_tensor, output_tensor
 
-    def shuffle(self) -> ImageDataset[T]:
+    def shuffle(self) -> ImageDataset[Out_co]:
         """
         Return a new `ImageDataset` with shuffled data.
 
@@ -295,7 +295,7 @@ class ImageDataset(Generic[T], Dataset):
 
         _init_default_device()
 
-        im_dataset: ImageDataset[T] = copy.copy(self)
+        im_dataset: ImageDataset[Out_co] = copy.copy(self)
         im_dataset._shuffle_tensor_indices = torch.randperm(len(self))
         im_dataset._next_batch_index = 0
         return im_dataset
@@ -374,7 +374,7 @@ class _ColumnAsTensor:
             )
             # TODO: should not one-hot-encode the target. label encoding without order is sufficient. should also not
             #  be done automatically?
-            self._one_hot_encoder = OneHotEncoder().fit(column_as_table, [self._column_name])
+            self._one_hot_encoder = OneHotEncoder(column_names=self._column_name).fit(column_as_table)
         self._tensor = torch.Tensor(
             self._one_hot_encoder.transform(column_as_table)._data_frame.to_torch(dtype=pl.Float32),
         ).to(_get_device())

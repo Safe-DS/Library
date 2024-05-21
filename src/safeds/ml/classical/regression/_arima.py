@@ -151,6 +151,7 @@ class ArimaModelRegressor:
             target_name=time_series.target.name + " " + "forecasted",
             time_name=time_series.time.name,
             extra_names=time_series.extras.column_names,
+            window_size=1,
         )
 
     def plot_predictions(self, test_series: TimeSeriesDataset) -> Image:

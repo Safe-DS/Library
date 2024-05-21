@@ -23,6 +23,8 @@ class SimpleImputer(TableTransformer):
         How to replace missing values.
     value_to_replace:
         The value that should be replaced.
+    column_names:
+        The list of columns used to fit the transformer. If `None`, all columns are used.
 
     Examples
     --------
@@ -90,8 +92,14 @@ class SimpleImputer(TableTransformer):
     # Dunder methods
     # ------------------------------------------------------------------------------------------------------------------
 
-    def __init__(self, strategy: SimpleImputer.Strategy, *, value_to_replace: float | str | None = None) -> None:
-        super().__init__()
+    def __init__(
+        self,
+        strategy: SimpleImputer.Strategy,
+        *,
+        column_names: str | list[str] | None = None,
+        value_to_replace: float | str | None = None,
+    ) -> None:
+        super().__init__(column_names)
 
         # Parameters
         self._strategy = strategy
@@ -113,6 +121,10 @@ class SimpleImputer(TableTransformer):
     # ------------------------------------------------------------------------------------------------------------------
 
     @property
+    def is_fitted(self) -> bool:
+        return self._replacement is not None
+
+    @property
     def strategy(self) -> SimpleImputer.Strategy:
         """The strategy used to replace missing values."""
         return self._strategy
@@ -126,7 +138,7 @@ class SimpleImputer(TableTransformer):
     # Learning and transformation
     # ------------------------------------------------------------------------------------------------------------------
 
-    def fit(self, table: Table, column_names: list[str] | None) -> SimpleImputer:
+    def fit(self, table: Table) -> SimpleImputer:
         """
         Learn a transformation for a set of columns in a table.
 
@@ -136,8 +148,6 @@ class SimpleImputer(TableTransformer):
         ----------
         table:
             The table used to fit the transformer.
-        column_names:
-            The list of columns from the table used to fit the transformer. If `None`, all columns are used.
 
         Returns
         -------
@@ -155,15 +165,17 @@ class SimpleImputer(TableTransformer):
             data.
         """
         if isinstance(self._strategy, _Mean | _Median):
-            if column_names is None:
+            if self._column_names is None:
                 column_names = [name for name in table.column_names if table.get_column_type(name).is_numeric]
             else:
+                column_names = self._column_names
                 _check_columns_exist(table, column_names)
                 _check_columns_are_numeric(table, column_names, operation="fit a SimpleImputer")
         else:  # noqa: PLR5501
-            if column_names is None:
+            if self._column_names is None:
                 column_names = table.column_names
             else:
+                column_names = self._column_names
                 _check_columns_exist(table, column_names)
 
         if table.row_count == 0:
@@ -173,8 +185,7 @@ class SimpleImputer(TableTransformer):
         replacement = self._strategy._get_replacement(table)
 
         # Create a copy with the learned transformation
-        result = SimpleImputer(self._strategy, value_to_replace=self._value_to_replace)
-        result._column_names = column_names
+        result = SimpleImputer(self._strategy, column_names=column_names, value_to_replace=self._value_to_replace)
         result._replacement = replacement
 
         return result

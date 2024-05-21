@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import sys
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 from safeds._utils import _structural_hash
 from safeds.data.labeled.containers import TimeSeriesDataset
@@ -15,33 +15,33 @@ if TYPE_CHECKING:
 
 
 class InputConversionTimeSeries(InputConversion[TimeSeriesDataset, TimeSeriesDataset]):
-    """
-    The input conversion for a neural network, defines the input parameters for the neural network.
-
-    Parameters
-    ----------
-    window_size:
-        The size of the created windows
-    forecast_horizon:
-        The forecast horizon defines the future lag of the predicted values
-    """
+    """The input conversion for a neural network, defines the input parameters for the neural network."""
 
     def __init__(
         self,
-        window_size: int,
-        forecast_horizon: int,
-        continues: bool = False,
         *,
         prediction_name: str = "prediction_nn",
     ) -> None:
-        self._window_size = window_size
-        self._forecast_horizon = forecast_horizon
+        self._window_size = 0
+        self._forecast_horizon = 0
         self._first = True
         self._target_name: str = ""
         self._time_name: str = ""
         self._feature_names: list[str] = []
+        self._continues: bool = False,
+        self._prediction_name = prediction_name  # TODO: use target name, override existing column
 
-        self._continues: bool = continues
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, InputConversionTimeSeries):
+            return False
+        return self._prediction_name == other._prediction_name
+
+    def __hash__(self) -> int:
+        return _structural_hash(self.__class__.__name__ + self._prediction_name)
+
+    def __sizeof__(self) -> int:
+        return sys.getsizeof(self._prediction_name)
+
     @property
     def _data_size(self) -> int:
         """
@@ -62,7 +62,10 @@ class InputConversionTimeSeries(InputConversion[TimeSeriesDataset, TimeSeriesDat
     ) -> DataLoader:
         self._num_of_classes = num_of_classes
         return input_data._into_dataloader_with_window(
-            self._window_size, self._forecast_horizon, batch_size, continues=self._continues
+            self._window_size,
+            self._forecast_horizon,
+            batch_size,
+            continues=self._continues,
         )
 
     def _data_conversion_predict(self, input_data: TimeSeriesDataset, batch_size: int) -> DataLoader:
@@ -72,20 +75,9 @@ class InputConversionTimeSeries(InputConversion[TimeSeriesDataset, TimeSeriesDat
         self,
         input_data: TimeSeriesDataset,
         output_data: Tensor,
-        **kwargs: Any,
     ) -> TimeSeriesDataset:
-        if "window_size" not in kwargs or not isinstance(kwargs.get("window_size"), int):
-            raise ValueError(
-                "The window_size is not set. "
-                "The data can only be converted if the window_size is provided as `int` in the kwargs.",
-            )
-        if "forecast_horizon" not in kwargs or not isinstance(kwargs.get("forecast_horizon"), int):
-            raise ValueError(
-                "The forecast_horizon is not set. "
-                "The data can only be converted if the forecast_horizon is provided as `int` in the kwargs.",
-            )
-        window_size: int = kwargs["window_size"]
-        forecast_horizon: int = kwargs["forecast_horizon"]
+        window_size: int = self._window_size
+        forecast_horizon: int = self._forecast_horizon
         input_data_table = input_data.to_table()
         input_data_table = input_data_table.slice_rows(start=window_size + forecast_horizon)
 
@@ -95,10 +87,13 @@ class InputConversionTimeSeries(InputConversion[TimeSeriesDataset, TimeSeriesDat
             target_name=self._prediction_name,
             time_name=input_data.time.name,
             extra_names=input_data.extras.column_names,
+            window_size=window_size,
         )
 
     def _is_fit_data_valid(self, input_data: TimeSeriesDataset) -> bool:
         if self._first:
+            self._window_size = input_data.window_size
+            self._forecast_horizon = input_data.forecast_horizon
             self._time_name = input_data.time.name
             self._feature_names = input_data.features.column_names
             self._target_name = input_data.target.name
@@ -111,6 +106,3 @@ class InputConversionTimeSeries(InputConversion[TimeSeriesDataset, TimeSeriesDat
 
     def _is_predict_data_valid(self, input_data: TimeSeriesDataset) -> bool:
         return self._is_fit_data_valid(input_data)
-
-    def _get_output_configuration(self) -> dict[str, Any]:
-        return {"window_size": self._window_size, "forecast_horizon": self._forecast_horizon}

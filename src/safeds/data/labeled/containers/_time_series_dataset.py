@@ -6,6 +6,9 @@ from typing import TYPE_CHECKING, Any
 from safeds._config import _get_device, _init_default_device
 from safeds._utils import _structural_hash
 from safeds._validation import _check_bounds, _ClosedBound
+from safeds.data.tabular.containers import Column, Table
+
+from ._dataset import Dataset
 
 if TYPE_CHECKING:
     from collections.abc import Mapping, Sequence
@@ -14,10 +17,8 @@ if TYPE_CHECKING:
     from torch.utils.data import DataLoader
     from torch.utils.data import Dataset as TorchDataset
 
-    from safeds.data.tabular.containers import Column, Table
 
-
-class TimeSeriesDataset:
+class TimeSeriesDataset(Dataset[Table, Column]):
     """
     A time series dataset maps feature and time columns to a target column.
 
@@ -28,12 +29,16 @@ class TimeSeriesDataset:
     data:
         The data.
     target_name:
-        Name of the target column.
+        The name of the target column.
     time_name:
-        Name of the time column.
+        The name of the time column.
+    window_size:
+        The number of consecutive sample to use as input for prediction.
     extra_names:
         Names of the columns that are neither features nor target. If None, no extra columns are used, i.e. all but
         the target column are used as features.
+    forecast_horizon:
+        The number of time steps to predict into the future.
 
     Raises
     ------
@@ -51,7 +56,8 @@ class TimeSeriesDataset:
     ...     {"id": [1, 2, 3], "feature": [4, 5, 6], "target": [1, 2, 3], "error":[0,0,1]},
     ...     target_name="target",
     ...     time_name = "id",
-    ...     extra_names=["error"]
+    ...     window_size=1,
+    ...     extra_names=["error"],
     ... )
     """
 
@@ -63,7 +69,10 @@ class TimeSeriesDataset:
         data: Table | Mapping[str, Sequence[Any]],
         target_name: str,
         time_name: str,
+        window_size: int,
+        *,
         extra_names: list[str] | None = None,
+        forecast_horizon: int = 1,
     ):
         from safeds.data.tabular.containers import Table
 
@@ -90,6 +99,8 @@ class TimeSeriesDataset:
         self._features: Table = data.remove_columns_except(feature_names)
         self._target: Column = data.get_column(target_name)
         self._time: Column = data.get_column(time_name)
+        self._window_size: int = window_size
+        self._forecast_horizon: int = forecast_horizon
         self._extras: Table = data.remove_columns_except(extra_names)
 
     def __eq__(self, other: object) -> bool:
@@ -104,7 +115,9 @@ class TimeSeriesDataset:
         if not isinstance(other, TimeSeriesDataset):
             return NotImplemented
         return (self is other) or (
-            self.target == other.target
+            self._window_size == other._window_size
+            and self._forecast_horizon == other._forecast_horizon
+            and self.target == other.target
             and self.features == other.features
             and self.extras == other.extras
             and self.time == other.time
@@ -119,7 +132,14 @@ class TimeSeriesDataset:
         hash:
             The hash value.
         """
-        return _structural_hash(self.target, self.features, self.extras, self.time)
+        return _structural_hash(
+            self.target,
+            self.features,
+            self.extras,
+            self.time,
+            self._window_size,
+            self._forecast_horizon,
+        )
 
     def __sizeof__(self) -> int:
         """
@@ -135,6 +155,8 @@ class TimeSeriesDataset:
             + sys.getsizeof(self._features)
             + sys.getsizeof(self.extras)
             + sys.getsizeof(self._time)
+            + sys.getsizeof(self._window_size)
+            + sys.getsizeof(self._forecast_horizon)
         )
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -155,6 +177,16 @@ class TimeSeriesDataset:
     def time(self) -> Column:
         """The time column of the time series dataset."""
         return self._time
+
+    @property
+    def window_size(self) -> int:
+        """The number of consecutive sample to use as input for prediction."""
+        return self._window_size
+
+    @property
+    def forecast_horizon(self) -> int:
+        """The number of time steps to predict into the future."""
+        return self._forecast_horizon
 
     @property
     def extras(self) -> Table:

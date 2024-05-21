@@ -1,7 +1,13 @@
 import pytest
 from safeds.data.tabular.containers import Table
 from safeds.data.tabular.transformation import Discretizer
-from safeds.exceptions import ColumnNotFoundError, NonNumericColumnError, OutOfBoundsError, TransformerNotFittedError
+from safeds.exceptions import (
+    ColumnNotFoundError,
+    ColumnTypeError,
+    NonNumericColumnError,
+    OutOfBoundsError,
+    TransformerNotFittedError,
+)
 
 
 class TestInit:
@@ -45,8 +51,8 @@ class TestFit:
                     },
                 ),
                 ["col2"],
-                NonNumericColumnError,
-                "Tried to do a numerical operation on one or multiple non-numerical columns: \ncol2 is of type String.",
+                ColumnTypeError,
+                None,
             ),
         ],
         ids=["ColumnNotFoundError", "multiple missing columns", "ValueError", "NonNumericColumnError"],
@@ -59,7 +65,7 @@ class TestFit:
         error_message: str | None,
     ) -> None:
         with pytest.raises(error, match=error_message):
-            Discretizer().fit(table, columns)
+            Discretizer(column_names=columns).fit(table)
 
     def test_should_not_change_original_transformer(self) -> None:
         table = Table(
@@ -69,7 +75,7 @@ class TestFit:
         )
 
         transformer = Discretizer()
-        transformer.fit(table, None)
+        transformer.fit(table)
 
         assert transformer._wrapped_transformer is None
         assert transformer._column_names is None
@@ -127,7 +133,7 @@ class TestTransform:
             },
         )
 
-        transformer = Discretizer().fit(table_to_fit, columns)
+        transformer = Discretizer(column_names=columns).fit(table_to_fit)
 
         with pytest.raises(error, match=error_message):
             transformer.transform(table_to_transform)
@@ -158,7 +164,7 @@ class TestIsFitted:
         )
 
         transformer = Discretizer()
-        fitted_transformer = transformer.fit(table, None)
+        fitted_transformer = transformer.fit(table)
         assert fitted_transformer.is_fitted
 
 
@@ -203,7 +209,7 @@ class TestFitAndTransform:
         column_names: list[str] | None,
         expected: Table,
     ) -> None:
-        fitted_transformer, transformed_table = Discretizer().fit_and_transform(table, column_names)
+        fitted_transformer, transformed_table = Discretizer(column_names=column_names).fit_and_transform(table)
         assert fitted_transformer.is_fitted
         assert transformed_table == expected
 
@@ -245,7 +251,7 @@ class TestFitAndTransform:
         bin_count: int,
         expected: Table,
     ) -> None:
-        fitted_transformer, transformed_table = Discretizer(bin_count).fit_and_transform(table, ["col1"])
+        fitted_transformer, transformed_table = Discretizer(bin_count, column_names="col1").fit_and_transform(table)
         assert fitted_transformer.is_fitted
         assert transformed_table == expected
 

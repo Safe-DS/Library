@@ -7,7 +7,7 @@ from safeds.data.labeled.containers import TimeSeriesDataset
 @pytest.mark.parametrize(
     "tabular_dataset",
     [
-        TimeSeriesDataset({"a": [1, 2], "b": [3, 4]}, target_name="b", time_name="a"),
+        TimeSeriesDataset({"a": [1, 2], "b": [3, 4]}, target_name="b", time_name="a", window_size=1),
     ],
     ids=[
         "non-empty",
@@ -21,7 +21,7 @@ def test_should_contain_tabular_dataset_element(tabular_dataset: TimeSeriesDatas
 @pytest.mark.parametrize(
     "tabular_dataset",
     [
-        TimeSeriesDataset({"a": [1, 2], "b": [3, 4]}, target_name="b", time_name="a"),
+        TimeSeriesDataset({"a": [1, 2], "b": [3, 4]}, target_name="b", time_name="a", window_size=1),
     ],
     ids=[
         "non-empty",
@@ -35,7 +35,7 @@ def test_should_contain_th_element_for_each_column_name(tabular_dataset: TimeSer
 @pytest.mark.parametrize(
     "tabular_dataset",
     [
-        TimeSeriesDataset({"a": [1, 2], "b": [3, 4]}, target_name="b", time_name="a"),
+        TimeSeriesDataset({"a": [1, 2], "b": [3, 4]}, target_name="b", time_name="a", window_size=1),
     ],
     ids=[
         "non-empty",

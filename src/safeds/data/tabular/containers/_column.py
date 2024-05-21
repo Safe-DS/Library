@@ -565,7 +565,7 @@ class Column(Sequence[T_co]):
         """
         Return a new column with a new name.
 
-        The original column is not modified.
+        **Note:** The original column is not modified.
 
         Parameters
         ----------
@@ -601,7 +601,7 @@ class Column(Sequence[T_co]):
         """
         Return a new column with values transformed by the transformer.
 
-        The original column is not modified.
+        **Note:** The original column is not modified.
 
         Parameters
         ----------
@@ -1003,6 +1003,13 @@ class Column(Sequence[T_co]):
         -------
         missing_value_ratio:
             The ratio of missing values in the column.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("test", [1, None, 3, None])
+        >>> column.missing_value_ratio()
+        0.5
         """
         if self.row_count == 0:
             return 1.0  # All values are missing (since there are none)

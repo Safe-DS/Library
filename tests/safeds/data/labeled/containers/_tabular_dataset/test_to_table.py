@@ -32,7 +32,7 @@ from safeds.data.tabular.containers import Table
                     "target": [1, 3, 2],
                 },
                 "target",
-                ["other"],
+                extra_names=["other"],
             ),
             Table(
                 {

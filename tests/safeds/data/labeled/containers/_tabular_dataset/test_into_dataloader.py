@@ -33,7 +33,7 @@ def test_should_create_dataloader(
     device: Device,
 ) -> None:
     configure_test_with_device(device)
-    tabular_dataset = Table.from_dict(data).to_tabular_dataset(target_name, extra_names)
+    tabular_dataset = Table.from_dict(data).to_tabular_dataset(target_name, extra_names=extra_names)
     data_loader = tabular_dataset._into_dataloader_with_classes(1, 2)
     batch = next(iter(data_loader))
     assert batch[0].device == _get_device()

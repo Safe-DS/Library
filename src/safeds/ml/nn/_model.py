@@ -299,7 +299,6 @@ class NeuralNetworkRegressor(Generic[IFT, IPT]):
         return self._input_conversion._data_conversion_output(
             test_data,
             torch.cat(predictions, dim=0),
-            **self._input_conversion._get_output_configuration(),
         )
 
     @property
@@ -434,7 +433,7 @@ class NeuralNetworkClassifier(Generic[IFT, IPT]):
         label_dict: dict[str, str] = config.id2label
         column_name = "label"
         labels_table = Table({column_name: [label for _, label in label_dict.items()]})
-        one_hot_encoder = OneHotEncoder().fit(labels_table, [column_name])
+        one_hot_encoder = OneHotEncoder(column_names=[column_name]).fit(labels_table)
 
         in_conversion = InputConversionImageToColumn(input_size)
 
@@ -603,7 +602,6 @@ class NeuralNetworkClassifier(Generic[IFT, IPT]):
         return self._input_conversion._data_conversion_output(
             test_data,
             torch.cat(predictions, dim=0),
-            **self._input_conversion._get_output_configuration(),
         )
 
     @property

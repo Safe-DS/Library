@@ -16,6 +16,7 @@ from safeds.data.tabular.containers import Column
                 },
                 target_name="T",
                 time_name="A",
+                window_size=1,
             ),
             Column("T", [0, 1]),
         ),

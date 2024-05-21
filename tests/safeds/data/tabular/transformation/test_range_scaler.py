@@ -19,15 +19,15 @@ class TestFit:
         )
 
         with pytest.raises(ColumnNotFoundError):
-            RangeScaler().fit(table, ["col2", "col3"])
+            RangeScaler(column_names=["col2", "col3"]).fit(table)
 
     def test_should_raise_if_table_contains_non_numerical_data(self) -> None:
         with pytest.raises(ColumnTypeError):
-            RangeScaler().fit(Table({"col1": ["a", "b"], "col2": [1, "c"]}), ["col1", "col2"])
+            RangeScaler(column_names=["col1", "col2"]).fit(Table({"col1": ["a", "b"], "col2": [1, "c"]}))
 
     def test_should_raise_if_table_contains_no_rows(self) -> None:
         with pytest.raises(ValueError, match=r"The RangeScaler cannot be fitted because the table contains 0 rows"):
-            RangeScaler().fit(Table({"col1": []}), None)
+            RangeScaler().fit(Table({"col1": []}))
 
     def test_should_not_change_original_transformer(self) -> None:
         table = Table(
@@ -37,7 +37,7 @@ class TestFit:
         )
 
         transformer = RangeScaler()
-        transformer.fit(table, None)
+        transformer.fit(table)
 
         assert transformer._column_names is None
         assert transformer._data_min is None
@@ -53,7 +53,7 @@ class TestTransform:
             },
         )
 
-        transformer = RangeScaler().fit(table_to_fit, None)
+        transformer = RangeScaler().fit(table_to_fit)
 
         table_to_transform = Table(
             {
@@ -78,7 +78,7 @@ class TestTransform:
 
     def test_should_raise_if_table_contains_non_numerical_data(self) -> None:
         with pytest.raises(ColumnTypeError):
-            RangeScaler().fit(Table({"col1": [1, 2, 3], "col2": [2, 3, 4]}), ["col1", "col2"]).transform(
+            RangeScaler(column_names=["col1", "col2"]).fit(Table({"col1": [1, 2, 3], "col2": [2, 3, 4]})).transform(
                 Table({"col1": ["a", "b", "c"], "col2": ["c", "d", "e"]}),
             )
 
@@ -96,7 +96,7 @@ class TestIsFitted:
         )
 
         transformer = RangeScaler()
-        fitted_transformer = transformer.fit(table, None)
+        fitted_transformer = transformer.fit(table)
         assert fitted_transformer.is_fitted
 
 
@@ -141,7 +141,7 @@ class TestFitAndTransform:
         column_names: list[str] | None,
         expected: Table,
     ) -> None:
-        fitted_transformer, transformed_table = RangeScaler().fit_and_transform(table, column_names)
+        fitted_transformer, transformed_table = RangeScaler(column_names=column_names).fit_and_transform(table)
         assert fitted_transformer.is_fitted
         assert transformed_table == expected
 
@@ -185,9 +185,12 @@ class TestFitAndTransform:
         column_names: list[str] | None,
         expected: Table,
     ) -> None:
-        fitted_transformer, transformed_table = RangeScaler(min_=-10.0, max_=10.0).fit_and_transform(
+        fitted_transformer, transformed_table = RangeScaler(
+            min_=-10.0,
+            max_=10.0,
+            column_names=column_names,
+        ).fit_and_transform(
             table,
-            column_names,
         )
         assert fitted_transformer.is_fitted
         assert transformed_table == expected
@@ -222,7 +225,7 @@ class TestInverseTransform:
         ],
     )
     def test_should_return_original_table(self, table: Table) -> None:
-        transformer = RangeScaler().fit(table, None)
+        transformer = RangeScaler().fit(table)
 
         assert transformer.inverse_transform(transformer.transform(table)) == table
 
@@ -233,7 +236,7 @@ class TestInverseTransform:
             },
         )
 
-        transformer = RangeScaler().fit(table, None)
+        transformer = RangeScaler().fit(table)
         transformed_table = transformer.transform(table)
         transformer.inverse_transform(transformed_table)
 
@@ -259,12 +262,16 @@ class TestInverseTransform:
 
     def test_should_raise_if_column_not_found(self) -> None:
         with pytest.raises(ColumnNotFoundError):
-            RangeScaler().fit(Table({"col1": [1, 2, 3], "col2": [2, 3, 4]}), ["col1", "col2"]).inverse_transform(
+            RangeScaler(column_names=["col1", "col2"]).fit(
+                Table({"col1": [1, 2, 3], "col2": [2, 3, 4]}),
+            ).inverse_transform(
                 Table({"col3": [1, 2, 3]}),
             )
 
     def test_should_raise_if_table_contains_non_numerical_data(self) -> None:
         with pytest.raises(ColumnTypeError):
-            RangeScaler().fit(Table({"col1": [1, 2, 3], "col2": [2, 3, 4]}), ["col1", "col2"]).inverse_transform(
+            RangeScaler(column_names=["col1", "col2"]).fit(
+                Table({"col1": [1, 2, 3], "col2": [2, 3, 4]}),
+            ).inverse_transform(
                 Table({"col1": ["1", "2", "three"], "col2": [1, 2, "four"]}),
             )

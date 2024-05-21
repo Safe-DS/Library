@@ -24,6 +24,8 @@ class RangeScaler(InvertibleTableTransformer):
         The minimum of the new range after the transformation
     max_:
         The maximum of the new range after the transformation
+    column_names:
+        The list of columns used to fit the transformer. If `None`, all numeric columns are used.
 
     Raises
     ------
@@ -35,8 +37,14 @@ class RangeScaler(InvertibleTableTransformer):
     # Dunder methods
     # ------------------------------------------------------------------------------------------------------------------
 
-    def __init__(self, min_: float = 0.0, max_: float = 1.0) -> None:
-        super().__init__()
+    def __init__(
+        self,
+        min_: float = 0.0,
+        max_: float = 1.0,
+        *,
+        column_names: str | list[str] | None = None,
+    ) -> None:
+        super().__init__(column_names)
 
         if min_ >= max_:
             raise ValueError('Parameter "max_" must be greater than parameter "min_".')
@@ -62,6 +70,10 @@ class RangeScaler(InvertibleTableTransformer):
     # ------------------------------------------------------------------------------------------------------------------
 
     @property
+    def is_fitted(self) -> bool:
+        return self._data_min is not None and self._data_max is not None
+
+    @property
     def min(self) -> float:
         """The minimum of the new range after the transformation."""
         return self._min
@@ -75,7 +87,7 @@ class RangeScaler(InvertibleTableTransformer):
     # Learning and transformation
     # ------------------------------------------------------------------------------------------------------------------
 
-    def fit(self, table: Table, column_names: list[str] | None) -> RangeScaler:
+    def fit(self, table: Table) -> RangeScaler:
         """
         Learn a transformation for a set of columns in a table.
 
@@ -85,8 +97,6 @@ class RangeScaler(InvertibleTableTransformer):
         ----------
         table:
             The table used to fit the transformer.
-        column_names:
-            The list of columns from the table used to fit the transformer. If None, all numeric columns are used.
 
         Returns
         -------
@@ -102,9 +112,10 @@ class RangeScaler(InvertibleTableTransformer):
         ValueError
             If the table contains 0 rows.
         """
-        if column_names is None:
+        if self._column_names is None:
             column_names = [name for name in table.column_names if table.get_column_type(name).is_numeric]
         else:
+            column_names = self._column_names
             _check_columns_exist(table, column_names)
             _check_columns_are_numeric(table, column_names, operation="fit a RangeScaler")
 
@@ -116,8 +127,7 @@ class RangeScaler(InvertibleTableTransformer):
         _data_max = table._lazy_frame.select(column_names).max().collect()
 
         # Create a copy with the learned transformation
-        result = RangeScaler(min_=self._min, max_=self._max)
-        result._column_names = column_names
+        result = RangeScaler(min_=self._min, max_=self._max, column_names=column_names)
         result._data_min = _data_min
         result._data_max = _data_max
 

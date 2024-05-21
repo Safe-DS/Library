@@ -71,7 +71,7 @@ def test_should_return_original_table(
     column_names: list[str],
     table_to_transform: Table,
 ) -> None:
-    transformer = OneHotEncoder().fit(table_to_fit, column_names)
+    transformer = OneHotEncoder(column_names=column_names).fit(table_to_fit)
     transformed_table = transformer.transform(table_to_transform)
 
     result = transformed_table.inverse_transform_table(transformer)
@@ -91,7 +91,7 @@ def test_should_not_change_transformed_table() -> None:
         },
     )
 
-    transformer = OneHotEncoder().fit(table, None)
+    transformer = OneHotEncoder().fit(table)
     transformed_table = transformer.transform(table)
     transformed_table.inverse_transform_table(transformer)
 
