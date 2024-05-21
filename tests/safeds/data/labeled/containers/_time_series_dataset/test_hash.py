@@ -36,18 +36,18 @@ def test_should_return_same_hash_for_equal_tabular_datasets(
     [
         (
             TimeSeriesDataset(
-                {"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9]}, "b", "a", window_size=1, extra_names=["c"]
+                {"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9]}, "b", "a", window_size=1, extra_names=["c"],
             ),
             TimeSeriesDataset(
-                {"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9]}, "c", "a", window_size=1, extra_names=["b"]
+                {"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9]}, "c", "a", window_size=1, extra_names=["b"],
             ),
         ),
         (
             TimeSeriesDataset(
-                {"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9]}, "b", "a", window_size=1, extra_names=["c"]
+                {"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9]}, "b", "a", window_size=1, extra_names=["c"],
             ),
             TimeSeriesDataset(
-                {"a": [1, 2, 3], "b": [4, 5, 6], "d": [7, 8, 9]}, "b", "a", window_size=1, extra_names=["d"]
+                {"a": [1, 2, 3], "b": [4, 5, 6], "d": [7, 8, 9]}, "b", "a", window_size=1, extra_names=["d"],
             ),
         ),
         (
@@ -56,10 +56,10 @@ def test_should_return_same_hash_for_equal_tabular_datasets(
         ),
         (
             TimeSeriesDataset(
-                {"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9]}, "b", "a", window_size=1, extra_names=["c"]
+                {"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9]}, "b", "a", window_size=1, extra_names=["c"],
             ),
             TimeSeriesDataset(
-                {"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9]}, "b", "c", window_size=1, extra_names=["a"]
+                {"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9]}, "b", "c", window_size=1, extra_names=["a"],
             ),
         ),
     ],
