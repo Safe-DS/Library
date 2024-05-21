@@ -1,8 +1,10 @@
 from __future__ import annotations
 
+import sys
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
+from safeds._utils import _structural_hash
 from safeds.data.image.containers import ImageList
 from safeds.data.image.containers._single_size_image_list import _SingleSizeImageList
 from safeds.data.labeled.containers import ImageDataset
@@ -30,6 +32,19 @@ class _ImageConverter(_Converter[ImageDataset, ImageList], ABC):
     @abstractmethod
     def __init__(self, image_size: ModelImageSize) -> None:
         self._input_size = image_size
+
+    @abstractmethod
+    def __hash__(self) -> int:
+        return _structural_hash(
+            self.__class__.__name__,
+            self._input_size,
+        )
+
+    @abstractmethod
+    def __sizeof__(self) -> int:
+        return (
+            sys.getsizeof(self._input_size)
+        )
 
     # ------------------------------------------------------------------------------------------------------------------
     # Properties

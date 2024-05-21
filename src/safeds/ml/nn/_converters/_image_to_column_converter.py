@@ -26,44 +26,46 @@ class _ImageToColumnConverter(_ImageConverter):
     # ------------------------------------------------------------------------------------------------------------------
 
     def __init__(self, image_size: ModelImageSize) -> None:
-        self._input_size = image_size
+        super().__init__(image_size)
+
         self._output_size: ModelImageSize | int | None = None
+        self._output_type: type | None = None
         self._one_hot_encoder: OneHotEncoder | None = None
         self._column_name: str | None = None
         self._column_names: list[str] | None = None
-        self._output_type: type | None = None
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, type(self)):
             return NotImplemented
-        return (self is other) or (
+        if self is other:
+            return True
+        return (
             self._input_size == other._input_size
             and self._output_size == other._output_size
+            and self._output_type == other._output_type
             and self._one_hot_encoder == other._one_hot_encoder
             and self._column_name == other._column_name
             and self._column_names == other._column_names
-            and self._output_type == other._output_type
         )
 
     def __hash__(self) -> int:
         return _structural_hash(
-            self.__class__.__name__,
-            self._input_size,
+            super().__hash__(),
             self._output_size,
+            self._output_type,
             self._one_hot_encoder,
             self._column_name,
             self._column_names,
-            self._output_type,
         )
 
     def __sizeof__(self) -> int:
         return (
-            sys.getsizeof(self._input_size)
+            super().__sizeof__()
             + sys.getsizeof(self._output_size)
+            + sys.getsizeof(self._output_type)
             + sys.getsizeof(self._one_hot_encoder)
             + sys.getsizeof(self._column_name)
             + sys.getsizeof(self._column_names)
-            + sys.getsizeof(self._output_type)
         )
 
     # ------------------------------------------------------------------------------------------------------------------
