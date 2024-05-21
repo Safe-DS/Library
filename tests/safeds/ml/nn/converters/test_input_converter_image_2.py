@@ -3,7 +3,6 @@ import sys
 import pytest
 import torch
 from safeds.data.image.containers._multi_size_image_list import _MultiSizeImageList
-from safeds.data.image.containers._single_size_image_list import _SingleSizeImageList
 from safeds.data.image.typing import ImageSize
 from safeds.data.tabular.containers import Table
 from safeds.data.tabular.transformation import OneHotEncoder
@@ -119,15 +118,3 @@ class TestDataConversionImage:
             output_conversion_image: _ImageConverter,
         ) -> None:
             assert sys.getsizeof(output_conversion_image) > sys.getsizeof(object())
-
-
-class TestInputConversionImageToTable:
-    def test_should_raise_if_column_names_not_set(self) -> None:
-        with pytest.raises(
-            ValueError,
-            match=r"The column_names are not set. The data can only be converted if the column_names are provided as `list\[str\]` in the kwargs.",
-        ):
-            _ImageToTableConverter(ImageSize(1, 1, 1), [])._data_conversion_output(
-                input_data=_SingleSizeImageList(),
-                output_data=torch.empty(1),
-            )

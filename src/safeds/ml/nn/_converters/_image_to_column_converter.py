@@ -101,5 +101,5 @@ class _ImageToColumnConverter(_ImageConverter):
             self._column_name == input_data._output._column_name
             and self._one_hot_encoder == input_data._output._one_hot_encoder
             and self._input_size == input_data.input_size
-            and self._output_size == input_data.output_size
+            and (self._output_size is None or self._output_size == input_data.output_size)
         )

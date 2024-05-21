@@ -29,7 +29,7 @@ class _ImageToTableConverter(_ImageConverter):
         image_size: ModelImageSize,
         column_names: list[str],
         *,
-        output_size: int | None = None,
+        output_size: int | ModelImageSize | None = None,
     ) -> None:
         super().__init__(image_size, output_size)
 
@@ -90,5 +90,5 @@ class _ImageToTableConverter(_ImageConverter):
         return (
             self._column_names == input_data._output._column_names
             and input_data.input_size == self._input_size
-            and input_data.output_size == self._output_size
+            and (self._output_size is None or self._output_size == input_data.output_size)
         )

@@ -72,4 +72,6 @@ class _ImageToImageConverter(_ImageConverter):
         if not isinstance(input_data._output, ImageList):
             return False
 
-        return input_data.input_size == self._input_size and input_data.output_size == self._output_size
+        return input_data.input_size == self._input_size and (
+            self._output_size is None or self._output_size == input_data.output_size
+        )

@@ -85,7 +85,11 @@ class TestImageToTableClassifier:
         num_of_classes: int = image_dataset.output_size if isinstance(image_dataset.output_size, int) else 0
         layers = [Convolutional2DLayer(1, 2), MaxPooling2DLayer(10), FlattenLayer(), ForwardLayer(num_of_classes)]
         nn_original = NeuralNetworkClassifier(
-            _ImageToTableConverter(image_dataset.input_size, image_classes.column_names),
+            _ImageToTableConverter(
+                image_dataset.input_size,
+                image_classes_one_hot_encoded.column_names,
+                output_size=image_dataset.output_size,
+            ),
             layers,
         )
         nn = nn_original.fit(image_dataset, epoch_size=2)
@@ -146,7 +150,7 @@ class TestImageToColumnClassifier:
         nn_original = NeuralNetworkClassifier(
             _ImageToColumnConverter(
                 image_dataset.input_size,
-                "class",
+                image_dataset._output._column_name,
                 image_dataset._output._one_hot_encoder,
             ),
             layers,
