@@ -1,7 +1,8 @@
 import pytest
 from safeds.data.tabular.containers import Table
 from safeds.data.tabular.transformation import Discretizer
-from safeds.exceptions import ColumnNotFoundError, NonNumericColumnError, OutOfBoundsError, TransformerNotFittedError
+from safeds.exceptions import ColumnNotFoundError, NonNumericColumnError, OutOfBoundsError, TransformerNotFittedError, \
+    ColumnTypeError
 
 
 class TestInit:
@@ -45,8 +46,8 @@ class TestFit:
                     },
                 ),
                 ["col2"],
-                NonNumericColumnError,
-                "Tried to do a numerical operation on one or multiple non-numerical columns: \ncol2 is of type String.",
+                ColumnTypeError,
+                None,
             ),
         ],
         ids=["ColumnNotFoundError", "multiple missing columns", "ValueError", "NonNumericColumnError"],
