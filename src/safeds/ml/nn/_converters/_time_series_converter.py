@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING
 
 from safeds._utils import _structural_hash
 from safeds.data.labeled.containers import TimeSeriesDataset
-from safeds.data.tabular.containers import Column
+from safeds.data.tabular.containers import Column, Table
 
 from ._converter import _Converter
 
@@ -15,7 +15,7 @@ if TYPE_CHECKING:
 
 
 # TODO: second type argument should allow TimeSeriesDataset, Table, TabularDataset
-class _TimeSeriesConverter(_Converter[TimeSeriesDataset, TimeSeriesDataset]):
+class _TimeSeriesConverter(_Converter[Table, Column]):
     """
     The input conversion for a neural network, defines the input parameters for the neural network.
 

@@ -19,7 +19,7 @@ if TYPE_CHECKING:
     from safeds.data.image.containers import ImageList
 
 
-class _ImageToTableConverter(_ImageConverter):
+class _ImageToTableConverter(_ImageConverter[Table]):
     # ------------------------------------------------------------------------------------------------------------------
     # Dunder methods
     # ------------------------------------------------------------------------------------------------------------------

@@ -1,19 +1,22 @@
 from __future__ import annotations
 
 from abc import ABC
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, TypeVar
 
 from safeds.data.image.containers import ImageList
 from safeds.data.image.containers._single_size_image_list import _SingleSizeImageList
-from safeds.data.labeled.containers import ImageDataset
+from safeds.data.tabular.containers import Column, Table
 
 from ._converter import _Converter
 
 if TYPE_CHECKING:
+    from safeds.data.labeled.containers import ImageDataset
     from safeds.ml.nn.typing import ModelImageSize
 
+Out = TypeVar("Out", Column, ImageList, Table)
 
-class _ImageConverter(_Converter[ImageDataset, ImageList], ABC):
+
+class _ImageConverter(_Converter[ImageList, Out], ABC):
     """
     The input conversion for a neural network, defines the input parameters for the neural network.
 

@@ -20,7 +20,7 @@ if TYPE_CHECKING:
     from safeds.data.tabular.transformation import OneHotEncoder
 
 
-class _ImageToColumnConverter(_ImageConverter):
+class _ImageToColumnConverter(_ImageConverter[Column]):
     # ------------------------------------------------------------------------------------------------------------------
     # Dunder methods
     # ------------------------------------------------------------------------------------------------------------------

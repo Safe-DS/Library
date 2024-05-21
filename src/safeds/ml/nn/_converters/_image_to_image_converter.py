@@ -16,7 +16,7 @@ if TYPE_CHECKING:
     from torch import Tensor
 
 
-class _ImageToImageConverter(_ImageConverter):
+class _ImageToImageConverter(_ImageConverter[Image]):
     # ------------------------------------------------------------------------------------------------------------------
     # Dunder methods
     # ------------------------------------------------------------------------------------------------------------------

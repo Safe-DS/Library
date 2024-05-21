@@ -4,7 +4,6 @@ import sys
 from typing import TYPE_CHECKING
 
 from safeds._utils import _structural_hash
-from safeds.data.labeled.containers import TabularDataset
 from safeds.data.tabular.containers import Column, Table
 
 from ._converter import _Converter
@@ -13,8 +12,10 @@ if TYPE_CHECKING:
     from torch import Tensor
     from torch.utils.data import DataLoader
 
+    from safeds.data.labeled.containers import TabularDataset
 
-class _TableConverter(_Converter[TabularDataset, Table]):
+
+class _TableConverter(_Converter[Table, Column]):
     """
     The input conversion for a neural network, defines the input parameters for the neural network.
 

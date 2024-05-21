@@ -6,9 +6,9 @@ from typing import TYPE_CHECKING, Generic, Self, TypeVar
 from safeds._config import _init_default_device
 from safeds._validation import _check_bounds, _ClosedBound
 from safeds.data.image.containers import ImageList
-from safeds.data.labeled.containers import ImageDataset, TabularDataset, TimeSeriesDataset
+from safeds.data.labeled.containers import Dataset, ImageDataset, TabularDataset, TimeSeriesDataset
 from safeds.data.labeled.containers._image_dataset import _ColumnAsTensor, _TableAsTensor
-from safeds.data.tabular.containers import Table
+from safeds.data.tabular.containers import Column, Table
 from safeds.data.tabular.transformation import OneHotEncoder
 from safeds.exceptions import (
     FeatureDataMismatchError,
@@ -42,11 +42,11 @@ if TYPE_CHECKING:
     from safeds.ml.nn._converters import _Converter
     from safeds.ml.nn.layers import Layer
 
-IFT = TypeVar("IFT", TabularDataset, TimeSeriesDataset, ImageDataset)  # InputFitType
-IPT = TypeVar("IPT", Table, TimeSeriesDataset, ImageList)  # InputPredictType
+In = TypeVar("In", ImageList, Table)
+Out = TypeVar("Out", Column, ImageList, Table)
 
 
-class NeuralNetworkRegressor(Generic[IFT, IPT]):
+class NeuralNetworkRegressor(Generic[In, Out]):
     """
     A NeuralNetworkRegressor is a neural network that is used for regression tasks.
 
@@ -68,7 +68,7 @@ class NeuralNetworkRegressor(Generic[IFT, IPT]):
         if len(layers) == 0:
             raise InvalidModelStructureError("You need to provide at least one layer to a neural network.")
 
-        self._input_conversion: _Converter[IFT, IPT] | None = None
+        self._input_conversion: _Converter[In, Out] | None = None
         self._model: Module | None = None
         self._layers: list[Layer] = layers
         self._input_size: int | ModelImageSize | None = None
@@ -133,13 +133,13 @@ class NeuralNetworkRegressor(Generic[IFT, IPT]):
 
     def fit(
         self,
-        train_data: IFT,
+        train_data: Dataset[In, Out],
         epoch_size: int = 25,
         batch_size: int = 1,
         learning_rate: float = 0.001,
         callback_on_batch_completion: Callable[[int, float], None] | None = None,
         callback_on_epoch_completion: Callable[[int, float], None] | None = None,
-    ) -> Self:
+    ) -> NeuralNetworkRegressor[In, Out]:
         """
         Train the neural network with given training data.
 
@@ -266,7 +266,7 @@ class NeuralNetworkRegressor(Generic[IFT, IPT]):
         copied_model._model.eval()
         return copied_model
 
-    def predict(self, test_data: IPT) -> IFT:
+    def predict(self, test_data: In | Dataset[In, Out]) -> Dataset[In, Out]:
         """
         Make a prediction for the given test data.
 
@@ -322,7 +322,7 @@ class NeuralNetworkRegressor(Generic[IFT, IPT]):
         return self._input_size
 
 
-class NeuralNetworkClassifier(Generic[IFT, IPT]):
+class NeuralNetworkClassifier(Generic[In, Out]):
     """
     A NeuralNetworkClassifier is a neural network that is used for classification tasks.
 
@@ -344,7 +344,7 @@ class NeuralNetworkClassifier(Generic[IFT, IPT]):
         if len(layers) == 0:
             raise InvalidModelStructureError("You need to provide at least one layer to a neural network.")
 
-        self._input_conversion: _Converter[IFT, IPT] | None = None
+        self._input_conversion: _Converter[In, Out] | None = None
         self._model: nn.Module | None = None
         self._layers: list[Layer] = layers
         self._input_size: int | ModelImageSize | None = None
@@ -428,7 +428,7 @@ class NeuralNetworkClassifier(Generic[IFT, IPT]):
 
     def fit(
         self,
-        train_data: IFT,
+        train_data: Dataset[In, Out],
         epoch_size: int = 25,
         batch_size: int = 1,
         learning_rate: float = 0.001,
@@ -573,7 +573,7 @@ class NeuralNetworkClassifier(Generic[IFT, IPT]):
         copied_model._model.eval()
         return copied_model
 
-    def predict(self, test_data: IPT) -> IFT:
+    def predict(self, test_data: In | Dataset[In, Out]) -> Dataset[In, Out]:
         """
         Make a prediction for the given test data.
 
@@ -633,7 +633,7 @@ class NeuralNetworkClassifier(Generic[IFT, IPT]):
 
 
 def _create_internal_model(
-    input_conversion: _Converter[IFT, IPT],
+    input_conversion: _Converter[In, Out],
     layers: list[Layer],
     is_for_classification: bool,
 ) -> nn.Module:
@@ -682,7 +682,7 @@ def _create_internal_model(
     return _InternalModel(layers, is_for_classification)
 
 
-def _create_input_conversion(train_data: IFT, is_for_classification: bool) -> _Converter[IFT, IPT]:
+def _create_input_conversion(train_data: Dataset[In, Out], is_for_classification: bool) -> _Converter[In, Out]:
     if isinstance(train_data, ImageDataset):
         if isinstance(train_data._output, _ColumnAsTensor):
             return _ImageToColumnConverter(train_data, is_for_classification)
