@@ -5,24 +5,24 @@ from typing import TYPE_CHECKING
 import apipkg
 
 if TYPE_CHECKING:
-    from ._input_converter import _Converter
-    from ._input_converter_image import _ImageConverter
-    from ._input_converter_image_to_column import _ImageToColumnConverter
-    from ._input_converter_image_to_image import _ImageToImageConverter
-    from ._input_converter_image_to_table import _ImageToTableConverter
-    from ._input_converter_table import _TableConverter
-    from ._input_converter_time_series import _TimeSeriesConverter
+    from ._converter import _Converter
+    from ._image_converter import _ImageConverter
+    from ._image_to_column_converter import _ImageToColumnConverter
+    from ._image_to_image_converter import _ImageToImageConverter
+    from ._image_to_table_converter import _ImageToTableConverter
+    from ._table_converter import _TableConverter
+    from ._time_series_converter import _TimeSeriesConverter
 
 apipkg.initpkg(
     __name__,
     {
-        "_Converter": "._input_converter:_Converter",
-        "_ImageConverter": "._input_converter_image:_ImageConverter",
-        "_ImageToColumnConverter": "._input_converter_image_to_column:_ImageToColumnConverter",
-        "_ImageToImageConverter": "._input_converter_image_to_image:_ImageToImageConverter",
-        "_ImageToTableConverter": "._input_converter_image_to_table:_ImageToTableConverter",
-        "_TableConverter": "._input_converter_table:_TableConverter",
-        "_TimeSeriesConverter": "._input_converter_time_series:_TimeSeriesConverter",
+        "_Converter": "._converter:_Converter",
+        "_ImageConverter": "._image_converter:_ImageConverter",
+        "_ImageToColumnConverter": "._image_to_column_converter:_ImageToColumnConverter",
+        "_ImageToImageConverter": "._image_to_image_converter:_ImageToImageConverter",
+        "_ImageToTableConverter": "._image_to_table_converter:_ImageToTableConverter",
+        "_TableConverter": "._table_converter:_TableConverter",
+        "_TimeSeriesConverter": "._time_series_converter:_TimeSeriesConverter",
     },
 )
 

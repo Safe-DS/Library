@@ -7,7 +7,7 @@ from safeds.data.image.containers import ImageList
 from safeds.data.image.containers._single_size_image_list import _SingleSizeImageList
 from safeds.data.labeled.containers import ImageDataset
 
-from ._input_converter_image import _ImageConverter
+from ._image_converter import _ImageConverter
 
 if TYPE_CHECKING:
     from torch import Tensor

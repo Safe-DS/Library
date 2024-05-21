@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING
 from safeds.data.labeled.containers import TabularDataset
 from safeds.data.tabular.containers import Column, Table
 
-from ._input_converter import _Converter
+from ._converter import _Converter
 
 if TYPE_CHECKING:
     from torch import Tensor
