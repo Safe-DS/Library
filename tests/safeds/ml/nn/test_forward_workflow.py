@@ -5,7 +5,7 @@ from safeds.data.tabular.transformation import StandardScaler
 from safeds.ml.nn import (
     NeuralNetworkRegressor,
 )
-from safeds.ml.nn.converters import (
+from safeds.ml.nn._converters import (
     _TableConverter,
 )
 from safeds.ml.nn.layers import (

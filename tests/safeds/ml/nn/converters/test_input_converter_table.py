@@ -1,5 +1,5 @@
 from safeds.data.labeled.containers import TabularDataset
-from safeds.ml.nn.converters import (
+from safeds.ml.nn._converters import (
     _TableConverter,
 )
 

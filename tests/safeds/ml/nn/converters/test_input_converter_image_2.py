@@ -6,12 +6,12 @@ from safeds.data.image.containers._multi_size_image_list import _MultiSizeImageL
 from safeds.data.image.containers._single_size_image_list import _SingleSizeImageList
 from safeds.data.image.typing import ImageSize
 from safeds.data.tabular.containers import Table
-from safeds.ml.nn.converters import (
+from safeds.ml.nn._converters import (
+    _ImageConverter,
     _ImageToColumnConverter,
     _ImageToImageConverter,
     _ImageToTableConverter,
 )
-from safeds.ml.nn.converters._input_converter_image import _ImageConverter
 
 
 class TestDataConversionImage:

@@ -5,7 +5,7 @@ from safeds.data.tabular.containers import Table
 from safeds.ml.nn import (
     NeuralNetworkRegressor,
 )
-from safeds.ml.nn.converters import (
+from safeds.ml.nn._converters import (
     _TimeSeriesConverter,
 )
 from safeds.ml.nn.layers import (

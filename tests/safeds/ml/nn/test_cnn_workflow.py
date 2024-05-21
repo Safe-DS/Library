@@ -13,7 +13,7 @@ from safeds.ml.nn import (
     NeuralNetworkClassifier,
     NeuralNetworkRegressor,
 )
-from safeds.ml.nn.converters import (
+from safeds.ml.nn._converters import (
     _ImageToColumnConverter,
     _ImageToImageConverter,
     _ImageToTableConverter,

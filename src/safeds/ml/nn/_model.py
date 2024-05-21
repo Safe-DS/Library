@@ -16,7 +16,7 @@ from safeds.exceptions import (
     InvalidModelStructureError,
     ModelNotFittedError,
 )
-from safeds.ml.nn.converters import (
+from safeds.ml.nn._converters import (
     _ImageConverter,
     _ImageToColumnConverter,
     _ImageToImageConverter,
@@ -37,7 +37,7 @@ if TYPE_CHECKING:
     from torch.nn import Module
     from transformers.image_processing_utils import BaseImageProcessor
 
-    from safeds.ml.nn.converters import _Converter
+    from safeds.ml.nn._converters import _Converter
     from safeds.ml.nn.layers import Layer
 
 IFT = TypeVar("IFT", TabularDataset, TimeSeriesDataset, ImageDataset)  # InputFitType
