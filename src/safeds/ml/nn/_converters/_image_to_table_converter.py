@@ -27,13 +27,13 @@ class _ImageToTableConverter(_ImageConverter):
     def __init__(
         self,
         image_size: ModelImageSize,
+        column_names: list[str],
         *,
         output_size: int | None = None,
-        column_names: list[str] | None = None,
     ) -> None:
         super().__init__(image_size, output_size)
 
-        self._column_names: list[str] | None = column_names
+        self._column_names: list[str] = column_names
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, _ImageToTableConverter):
@@ -69,11 +69,7 @@ class _ImageToTableConverter(_ImageConverter):
 
         if not isinstance(input_data, _SingleSizeImageList):
             raise ValueError("The given input ImageList contains images of different sizes.")  # noqa: TRY004
-        if self._column_names is None:
-            raise ValueError(
-                "The column_names are not set. "
-                "The data can only be converted if the column_names are provided as `list[str]` in the kwargs.",
-            )
+
         column_names: list[str] = self._column_names
 
         output = torch.zeros(len(input_data), len(column_names))

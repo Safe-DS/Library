@@ -434,11 +434,7 @@ class NeuralNetworkClassifier(Generic[IFT, IPT]):
         labels_table = Table({column_name: [label for _, label in label_dict.items()]})
         one_hot_encoder = OneHotEncoder(column_names=[column_name]).fit(labels_table)
 
-        in_conversion = _ImageToColumnConverter(input_size)
-
-        in_conversion._column_name = column_name
-        in_conversion._one_hot_encoder = one_hot_encoder
-        in_conversion._input_size = input_size
+        in_conversion = _ImageToColumnConverter(input_size, column_name, one_hot_encoder)
         num_of_classes = labels_table.row_count
 
         network = NeuralNetworkClassifier.__new__(NeuralNetworkClassifier)

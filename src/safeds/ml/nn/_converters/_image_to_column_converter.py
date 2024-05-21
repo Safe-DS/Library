@@ -28,15 +28,15 @@ class _ImageToColumnConverter(_ImageConverter):
     def __init__(
         self,
         input_size: ModelImageSize,
+        column_name: str,
+        one_hot_encoder: OneHotEncoder,
         *,
         output_size: int | None = None,
-        one_hot_encoder: OneHotEncoder | None = None,
-        column_name: str | None = None,
     ) -> None:
         super().__init__(input_size, output_size)
 
-        self._one_hot_encoder: OneHotEncoder | None = one_hot_encoder
-        self._column_name: str | None = column_name
+        self._column_name: str = column_name
+        self._one_hot_encoder: OneHotEncoder = one_hot_encoder
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, _ImageToColumnConverter):
@@ -79,16 +79,7 @@ class _ImageToColumnConverter(_ImageConverter):
 
         if not isinstance(input_data, _SingleSizeImageList):
             raise ValueError("The given input ImageList contains images of different sizes.")  # noqa: TRY004
-        if self._column_name is None:
-            raise ValueError(
-                "The column_name is not set. "
-                "The data can only be converted if the column_name is provided as `str` in the kwargs.",
-            )
-        if self._one_hot_encoder is None:
-            raise ValueError(
-                "The one_hot_encoder is not set. "
-                "The data can only be converted if the one_hot_encoder is provided as `OneHotEncoder` in the kwargs.",
-            )
+
         one_hot_encoder: OneHotEncoder = self._one_hot_encoder
         column_name = self._column_name
 
