@@ -315,7 +315,6 @@ class TablePlotter:
         ... )
         >>> image = table.plot.scatter_plot("a", ["b"])
         """
-
         _plot_validation(self._table, x_name, y_names)
 
         import matplotlib.pyplot as plt
