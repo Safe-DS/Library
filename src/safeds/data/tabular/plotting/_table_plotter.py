@@ -230,7 +230,7 @@ class TablePlotter:
         ...         "b": [2, 3, 4, 5, 6],
         ...     }
         ... )
-        >>> image = table.plot.line_plot("a", "b")
+        >>> image = table.plot.line_plot("a", ["b"])
         """
         _plot_validation(self._table, x_name, y_names)
 
@@ -287,8 +287,8 @@ class TablePlotter:
         ----------
         x_name:
             The name of the column to be plotted on the x-axis.
-        y_name:
-            The name of the column to be plotted on the y-axis.
+        y_names:
+            The name(s) of the column(s) to be plotted on the y-axis.
 
         Returns
         -------
@@ -311,10 +311,9 @@ class TablePlotter:
         ...         "b": [2, 3, 4, 5, 6],
         ...     }
         ... )
-        >>> image = table.plot.scatter_plot("a", "b")
+        >>> image = table.plot.scatter_plot("a", ["b"])
         """
 
-        # TODO: pass list of columns names + extract validation
         _plot_validation(self._table, x_name, y_names)
 
         import matplotlib.pyplot as plt
