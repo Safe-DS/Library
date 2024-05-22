@@ -222,7 +222,11 @@ class TimeSeriesDataset(Dataset[Table, Column]):
         return self._table
 
     def _into_dataloader_with_window(
-        self, window_size: int, forecast_horizon: int, batch_size: int, continuous: bool = False,
+        self,
+        window_size: int,
+        forecast_horizon: int,
+        batch_size: int,
+        continuous: bool = False,
     ) -> DataLoader:
         """
         Return a Dataloader for the data stored in this time series, used for training neural networks.

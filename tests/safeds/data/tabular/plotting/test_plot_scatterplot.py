@@ -33,7 +33,10 @@ from syrupy import SnapshotAssertion
     ],
 )
 def test_should_match_snapshot(
-    table: Table, x_name: str, y_names: list[str], snapshot_png_image: SnapshotAssertion,
+    table: Table,
+    x_name: str,
+    y_names: list[str],
+    snapshot_png_image: SnapshotAssertion,
 ) -> None:
     scatterplot = table.plot.scatter_plot(x_name, y_names)
     assert scatterplot == snapshot_png_image

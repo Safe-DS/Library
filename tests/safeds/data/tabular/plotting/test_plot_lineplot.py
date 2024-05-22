@@ -24,7 +24,10 @@ from syrupy import SnapshotAssertion
     ],
 )
 def test_should_match_snapshot(
-    table: Table, x_name: str, y_names: list[str], snapshot_png_image: SnapshotAssertion,
+    table: Table,
+    x_name: str,
+    y_names: list[str],
+    snapshot_png_image: SnapshotAssertion,
 ) -> None:
     line_plot = table.plot.line_plot(x_name, y_names)
     assert line_plot == snapshot_png_image
