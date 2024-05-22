@@ -5,7 +5,6 @@ from typing import TYPE_CHECKING, Any, Literal, TypeVar, overload
 
 from safeds._utils import _structural_hash
 from safeds._validation._check_columns_are_numeric import _check_column_is_numeric
-from safeds.data.tabular.operator import Temporal
 from safeds.data.tabular.plotting import ColumnPlotter
 from safeds.data.tabular.typing._polars_data_type import _PolarsDataType
 from safeds.exceptions import (
@@ -156,10 +155,6 @@ class Column(Sequence[T_co]):
         """The plotter for the column."""
         return ColumnPlotter(self)
 
-    @property
-    def temporal(self) -> Temporal:
-        """Temporal operation for a column."""
-        return Temporal(self)
 
     @property
     def type(self) -> DataType:

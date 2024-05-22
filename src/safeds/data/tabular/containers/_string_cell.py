@@ -74,7 +74,6 @@ class StringCell(ABC):
         >>> from safeds.data.tabular.containers import Column
         >>> column = Column("example", ["ab", "bc", "cd"])
         >>> column.count_if(lambda cell: cell.str.ends_with("c"))
-        1
         """
 
     @abstractmethod

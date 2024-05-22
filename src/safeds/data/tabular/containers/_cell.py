@@ -7,6 +7,7 @@ if TYPE_CHECKING:
     import polars as pl
 
     from ._string_cell import StringCell
+    from ._temporal_cell import TemporalCell
 
 T_co = TypeVar("T_co", covariant=True)
 P_contra = TypeVar("P_contra", contravariant=True)
@@ -144,6 +145,11 @@ class Cell(ABC, Generic[T_co]):
     @abstractmethod
     def str(self) -> StringCell:
         """Namespace for operations on strings."""
+
+    @property
+    @abstractmethod
+    def dt(self) -> TemporalCell:
+        """Namespace for operations on date time values."""
 
     # ------------------------------------------------------------------------------------------------------------------
     # Boolean operations
