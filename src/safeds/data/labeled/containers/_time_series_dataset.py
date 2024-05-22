@@ -282,7 +282,7 @@ class TimeSeriesDataset(Dataset[Table, Column]):
                 label = target_tensor[i + window_size : i + window_size + forecast_horizon]
 
             else:
-                label = target_tensor[i + window_size + forecast_horizon]
+                label = target_tensor[i + window_size + forecast_horizon].unsqueeze(0)
             for col in feature_cols:
                 data = torch.tensor(col._series.to_numpy(), dtype=torch.float32)
                 window = torch.cat((window, data[i : i + window_size]), dim=0)

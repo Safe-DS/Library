@@ -233,7 +233,6 @@ class NeuralNetworkRegressor(Generic[IFT, IPT]):
             amount_of_loss_values_calculated = 0
             for x, y in iter(dataloader):
                 optimizer.zero_grad()
-
                 pred = copied_model._model(x)
                 loss = loss_fn(pred, y)
                 loss_sum += loss.item()

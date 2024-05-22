@@ -46,6 +46,15 @@ def test_lstm_model(device: Device) -> None:
         ),
         epoch_size=1,
     )
+    trained_model_2.predict(
+        test_table.to_time_series_dataset(
+            "value",
+            "date",
+            window_size=7,
+            forecast_horizon=12,
+            continuous=True,
+        ),
+    )
     trained_model = model.fit(
         train_table.to_time_series_dataset(
             "value",
@@ -63,14 +72,7 @@ def test_lstm_model(device: Device) -> None:
             "date",
             window_size=7,
             forecast_horizon=12,
-        ),
-    )
-    trained_model_2.predict(
-        test_table.to_time_series_dataset(
-            "value",
-            "date",
-            window_size=7,
-            forecast_horizon=12,
+            continuous=False
         ),
     )
     assert trained_model._model is not None
