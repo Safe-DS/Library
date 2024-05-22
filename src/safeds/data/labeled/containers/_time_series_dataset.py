@@ -280,6 +280,7 @@ class TimeSeriesDataset(Dataset[Table, Column]):
             window = target_tensor[i : i + window_size]
             if continuous:
                 label = target_tensor[i + window_size : i + window_size + forecast_horizon]
+
             else:
                 label = target_tensor[i + window_size + forecast_horizon]
             for col in feature_cols:
@@ -374,7 +375,7 @@ def _create_dataset(features: torch.Tensor, target: torch.Tensor) -> TorchDatase
     class _CustomDataset(TorchDataset):
         def __init__(self, features_dataset: torch.Tensor, target_dataset: torch.Tensor):
             self.X = features_dataset.float()
-            self.Y = target_dataset.unsqueeze(-1).float()
+            self.Y = target_dataset.float()
             self.len = self.X.shape[0]
 
         def __getitem__(self, item: int) -> tuple[torch.Tensor, torch.Tensor]:

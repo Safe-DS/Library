@@ -239,4 +239,4 @@ def test_continues_dataloader() -> None:
     dl_2 = ts._into_dataloader_with_window(1, 2, 1, continuous=False)
     assert len(dl_2.dataset.Y) == len(dl.dataset.Y)
     # 4mal 2er Arrays mit 1er Einträgen
-    assert dl.dataset.Y.shape == torch.Size([4, 2, 1])
+    assert dl.dataset.Y.shape == torch.Size([4, 2])
