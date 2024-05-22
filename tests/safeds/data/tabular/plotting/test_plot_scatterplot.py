@@ -20,14 +20,10 @@ from syrupy import SnapshotAssertion
         ),
         (
             Table(
-                {
-                    "A": [1, 0.99, 0.99, 2],
-                    "B": [1, 0.99, 1.01, 2],
-                    "C": [2, 2.99, 2.01, 3]
-                },
+                {"A": [1, 0.99, 0.99, 2], "B": [1, 0.99, 1.01, 2], "C": [2, 2.99, 2.01, 3]},
             ),
             "A",
-            ["B","C"],
+            ["B", "C"],
         ),
     ],
     ids=[
@@ -36,7 +32,12 @@ from syrupy import SnapshotAssertion
         "multiple",
     ],
 )
-def test_should_match_snapshot(table: Table, x_name: str, y_names: list[str], snapshot_png_image: SnapshotAssertion) -> None:
+def test_should_match_snapshot(
+    table: Table,
+    x_name: str,
+    y_names: list[str],
+    snapshot_png_image: SnapshotAssertion,
+) -> None:
     scatterplot = table.plot.scatter_plot(x_name, y_names)
     assert scatterplot == snapshot_png_image
 

@@ -5,8 +5,8 @@ from typing import TYPE_CHECKING, Any, Literal, TypeVar, overload
 
 from safeds._utils import _structural_hash
 from safeds._validation._check_columns_are_numeric import _check_column_is_numeric
-from safeds.data.tabular.plotting import ColumnPlotter
 from safeds.data.tabular.operator import Temporal
+from safeds.data.tabular.plotting import ColumnPlotter
 from safeds.data.tabular.typing._polars_data_type import _PolarsDataType
 from safeds.exceptions import (
     ColumnLengthMismatchError,
@@ -157,10 +157,9 @@ class Column(Sequence[T_co]):
         return ColumnPlotter(self)
 
     @property
-    def temporal(self)->Temporal:
+    def temporal(self) -> Temporal:
         """Temporal operation for a column."""
         return Temporal(self)
-
 
     @property
     def type(self) -> DataType:
@@ -642,7 +641,6 @@ class Column(Sequence[T_co]):
         series = self._series.to_frame().select(expression.alias(self.name)).get_column(self.name)
 
         return self._from_polars_series(series)
-
 
     # ------------------------------------------------------------------------------------------------------------------
     # Statistics

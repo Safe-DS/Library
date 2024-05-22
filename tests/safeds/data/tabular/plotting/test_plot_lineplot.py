@@ -3,8 +3,6 @@ from safeds.data.tabular.containers import Table
 from safeds.exceptions import ColumnNotFoundError
 from syrupy import SnapshotAssertion
 
-from tests.helpers import resolve_resource_path
-
 
 @pytest.mark.parametrize(
     ("table", "x_name", "y_names"),
@@ -25,8 +23,12 @@ from tests.helpers import resolve_resource_path
         "unsorted grouped multiple columns",
     ],
 )
-def test_should_match_snapshot(table: Table, x_name: str, y_names: list[str],
-                               snapshot_png_image: SnapshotAssertion) -> None:
+def test_should_match_snapshot(
+    table: Table,
+    x_name: str,
+    y_names: list[str],
+    snapshot_png_image: SnapshotAssertion,
+) -> None:
     line_plot = table.plot.line_plot(x_name, y_names)
     assert line_plot == snapshot_png_image
 
