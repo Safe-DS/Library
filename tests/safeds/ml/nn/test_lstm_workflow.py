@@ -67,13 +67,7 @@ def test_lstm_model(device: Device) -> None:
     )
 
     trained_model.predict(
-        test_table.to_time_series_dataset(
-            "value",
-            "date",
-            window_size=7,
-            forecast_horizon=12,
-            continuous=False
-        ),
+        test_table.to_time_series_dataset("value", "date", window_size=7, forecast_horizon=12, continuous=False),
     )
     assert trained_model._model is not None
     assert trained_model._model.state_dict()["_pytorch_layers.0._layer.weight"].device == _get_device()
