@@ -157,8 +157,8 @@ class Column(Sequence[T_co]):
         return ColumnPlotter(self)
 
     @property
-    def temporal(self):
-        """Temporal operation for a column"""
+    def temporal(self)->Temporal:
+        """Temporal operation for a column."""
         return Temporal(self)
 
 

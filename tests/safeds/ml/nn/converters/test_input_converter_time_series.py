@@ -88,8 +88,6 @@ class TestSizeOf:
         "output_conversion_ts",
         [
             InputConversionTimeSeries(),
-            InputConversionTimeSeries(),
-            InputConversionTimeSeries(),
         ],
     )
     def test_should_size_be_greater_than_normal_object(

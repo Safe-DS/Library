@@ -16,6 +16,9 @@ class Temporal:
 
     Examples
     --------
+    >>> from safeds.data.tabular.containers import Column
+    >>> column = Column("test", [1, 2, 3])
+    >>> temporal = column.temporal
 
     """
 

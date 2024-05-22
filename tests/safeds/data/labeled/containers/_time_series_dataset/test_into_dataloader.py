@@ -235,8 +235,8 @@ def test_continues_dataloader() -> None:
     ts = Table(
         {"a": [1, 2, 3, 4, 5, 6, 7], "b": [1, 2, 3, 4, 5, 6, 7], "c": [1, 2, 3, 4, 5, 6, 7]}
     ).to_time_series_dataset("a", "b", window_size=1, forecast_horizon=2)
-    dl = ts._into_dataloader_with_window(1, 2, 1, True)
-    dl_2 = ts._into_dataloader_with_window(1, 2, 1, False)
+    dl = ts._into_dataloader_with_window(1, 2, 1, continuous=True)
+    dl_2 = ts._into_dataloader_with_window(1, 2, 1, continuous=False)
     assert len(dl_2.dataset.Y) == len(dl.dataset.Y)
     # 4mal 2er Arrays mit 1er Einträgen
     assert dl.dataset.Y.shape == torch.Size([4, 2, 1])
