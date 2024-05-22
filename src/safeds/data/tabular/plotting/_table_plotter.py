@@ -209,6 +209,7 @@ class TablePlotter:
             The name(s) of the column(s) to be plotted on the y-axis.
         show_confidence_interval:
             If the confidence interval is shown, per default True.
+
         Returns
         -------
         plot:
@@ -236,7 +237,7 @@ class TablePlotter:
 
         import matplotlib.pyplot as plt
         import polars as pl
-        import numpy as np
+
         agg_list = []
         for name in y_names:
             agg_list.append(pl.col(name).mean().alias(f"{name}_mean"))
@@ -250,14 +251,15 @@ class TablePlotter:
         for name in y_names:
             y_s.append(grouped.get_column(name + "_mean"))
             confidence_intervals.append(
-                1.96 * grouped.get_column(name + "_std") / grouped.get_column(name + "_count").sqrt())
+                1.96 * grouped.get_column(name + "_std") / grouped.get_column(name + "_count").sqrt(),
+            )
 
         fig, ax = plt.subplots()
         for y in y_s:
             ax.plot(x, y)
 
         if show_confidence_interval:
-            for y, conf in zip(y_s, confidence_intervals):
+            for y, conf in zip(y_s, confidence_intervals, strict=False):
                 ax.fill_between(
                     x,
                     y - conf,
@@ -313,7 +315,6 @@ class TablePlotter:
         ... )
         >>> image = table.plot.scatter_plot("a", "b")
         """
-
         # TODO: pass list of columns names + extract validation
         _plot_validation(self._table, x_name, y_names)
 
@@ -343,7 +344,6 @@ class TablePlotter:
         return _figure_to_image(fig)
 
     # TODO: equivalent to Column.plot_compare_columns that takes a list of column names (index_plot)?
-
 
 
 def _plot_validation(table: Table, x_name: str, y_names: list[str]) -> None:

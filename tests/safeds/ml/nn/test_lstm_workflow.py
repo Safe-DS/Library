@@ -43,7 +43,6 @@ def test_lstm_model(device: Device) -> None:
             window_size=7,
             forecast_horizon=12,
             continuous=True,
-
         ),
         epoch_size=1,
     )

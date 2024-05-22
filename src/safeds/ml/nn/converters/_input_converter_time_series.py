@@ -37,16 +37,19 @@ class InputConversionTimeSeries(InputConversion[TimeSeriesDataset, TimeSeriesDat
             and self._first == other._first
             and self._target_name == other._target_name
             and self._feature_names == other._feature_names
-            and self._continuous == other._continuous)
+            and self._continuous == other._continuous
+        )
 
     def __hash__(self) -> int:
-        return _structural_hash(self.__class__.__name__,
-                                self._window_size,
-                                self._forecast_horizon,
-                                self._target_name,
-                                self._time_name,
-                                self._feature_names,
-                                self._continuous)
+        return _structural_hash(
+            self.__class__.__name__,
+            self._window_size,
+            self._forecast_horizon,
+            self._target_name,
+            self._time_name,
+            self._feature_names,
+            self._continuous,
+        )
 
     def __sizeof__(self) -> int:
         return (

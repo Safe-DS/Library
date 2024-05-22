@@ -1,11 +1,11 @@
 import pytest
+import torch
 from safeds._config import _get_device
 from safeds.data.labeled.containers import TimeSeriesDataset
 from safeds.data.tabular.containers import Table
 from safeds.exceptions import OutOfBoundsError
 from torch.types import Device
 from torch.utils.data import DataLoader
-import torch
 
 from tests.helpers import configure_test_with_device, get_devices, get_devices_ids
 
@@ -233,7 +233,7 @@ def test_should_create_dataloader_predict_invalid(
 
 def test_continues_dataloader() -> None:
     ts = Table(
-        {"a": [1, 2, 3, 4, 5, 6, 7], "b": [1, 2, 3, 4, 5, 6, 7], "c": [1, 2, 3, 4, 5, 6, 7]}
+        {"a": [1, 2, 3, 4, 5, 6, 7], "b": [1, 2, 3, 4, 5, 6, 7], "c": [1, 2, 3, 4, 5, 6, 7]},
     ).to_time_series_dataset("a", "b", window_size=1, forecast_horizon=2)
     dl = ts._into_dataloader_with_window(1, 2, 1, continuous=True)
     dl_2 = ts._into_dataloader_with_window(1, 2, 1, continuous=False)

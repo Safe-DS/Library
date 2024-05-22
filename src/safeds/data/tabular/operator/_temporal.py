@@ -1,4 +1,5 @@
 from __future__ import annotations
+
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -55,6 +56,7 @@ class Temporal:
         +------------+
         """
         from polars import Date
+
         from safeds.data.tabular.containers import Column
 
         temp = self._column._series.str.strptime(Date, format_string)
@@ -94,4 +96,3 @@ class Temporal:
         from safeds.data.tabular.containers import Column
 
         return Column._from_polars_series(self._column._series.dt.to_string(format_string))
-
