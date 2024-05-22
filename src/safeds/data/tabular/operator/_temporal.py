@@ -82,10 +82,10 @@ class Temporal:
         >>> from safeds.data.tabular.containers import Column
         >>> column = Column("dates", ["01:01:2021", "01:01:2022", "01:01:2023", "01:01:2024"])
         >>> column = column.temporal.from_string("%d:%m:%Y")
-        >>> column.temporal.to_string("%Y/%m:%d")
+        >>> column.temporal.to_string("%Y/%m/%d")
         | dates      |
         | ---        |
-        | str       |
+        | str        |
         +============+
         | "2021/01/01" |
         | "2022/01/01" |
