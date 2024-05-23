@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-import polars.exceptions
 
 from safeds._utils import _structural_hash
 
@@ -37,7 +36,7 @@ class _LazyTemporalCell(TemporalCell):
     def datetime_to_string(self, format_string: str = "%Y/%m/%d %H:%M:%S") -> Cell[str | None]:
         import datetime
         try:
-            datetime.datetime.now().strftime(format_string)
+            datetime.datetime.now(tz=datetime.UTC).strftime(format_string)
         except ValueError as e:
             raise ValueError(f"{e}") from None
         return _LazyCell(self._expression.dt.to_string(format=format_string))
@@ -45,7 +44,7 @@ class _LazyTemporalCell(TemporalCell):
     def date_to_string(self, format_string: str = "%F") -> Cell[str | None]:
         import datetime
         try:
-            datetime.datetime.now().strftime(format_string)
+            datetime.datetime.now(tz=datetime.UTC).strftime(format_string)
         except ValueError as e:
             raise ValueError(f"{e}") from None
         return _LazyCell(self._expression.dt.to_string(format=format_string))
