@@ -19,8 +19,9 @@ class TemporalCell(ABC):
     Examples
     --------
     >>> from safeds.data.tabular.containers import Column
-    >>> column = Column("example", ["2021-01-01", "2021-02-01", "abc"])
-    >>> column.transform(lambda cell: cell.str.to_string())
+    >>> import datetime
+    >>> column = Column("example",  [ datetime.datetime(2022, 1, 9, 23, 29, 1, tzinfo=datetime.UTC)])
+    >>> column.transform(lambda cell: cell.dt.datetime_to_string())
     +------------+
     | example    |
     | ---        |
@@ -40,12 +41,13 @@ class TemporalCell(ABC):
         Returns
         -------
         date:
-            The string value. If the date cannot be converted to a date, None is returned.
+            The string value.
 
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("example", [ datetime.datetime(2022, 1, 9, 23, 29, 1, tzinfo=datetime.UTC))])
+        >>> import datetime
+        >>> column = Column("example", [ datetime.datetime(2022, 1, 9, 23, 29, 1, tzinfo=datetime.UTC)])
         >>> column.transform(lambda cell: cell.dt.datetime_to_string())
         +----------------------+
         | example             |
@@ -64,11 +66,12 @@ class TemporalCell(ABC):
         Returns
         -------
         date:
-            The string value. If the date cannot be converted to a date, None is returned.
+            The string value.
 
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
+        >>> import datetime
         >>> column = Column("example", [datetime.date(2022, 1, 9)])
         >>> column.transform(lambda cell: cell.str.date_to_string())
         +------------+
