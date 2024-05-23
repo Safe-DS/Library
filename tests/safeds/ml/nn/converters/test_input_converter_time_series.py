@@ -95,3 +95,5 @@ class TestSizeOf:
         output_conversion_ts: InputConversionTimeSeries,
     ) -> None:
         assert sys.getsizeof(output_conversion_ts) > sys.getsizeof(object())
+
+
