@@ -70,8 +70,8 @@ class TemporalCell(ABC):
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("example", [datetime.date(2022, 1, 9))])
-        >>> column.transform(lambda cell: cell.str.to_string())
+        >>> column = Column("example", [datetime.date(2022, 1, 9)])
+        >>> column.transform(lambda cell: cell.str.date_to_string())
         +------------+
         | example    |
         | ---        |
