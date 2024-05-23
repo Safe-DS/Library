@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+import polars.exceptions
+
 from safeds._utils import _structural_hash
 
 from ._lazy_cell import _LazyCell
@@ -32,12 +34,21 @@ class _LazyTemporalCell(TemporalCell):
     # Temporal operations
     # ------------------------------------------------------------------------------------------------------------------
 
-    def date_to_string(self) -> Cell[str | None]:
-        return _LazyCell(self._expression.dt.to_string(format="%F"))
+    def datetime_to_string(self, format_string: str = "%Y/%m/%d %H:%M:%S") -> Cell[str | None]:
+        import datetime
+        try:
+            datetime.datetime.now().strftime(format_string)
+        except ValueError as e:
+            raise ValueError(f"{e}") from None
+        return _LazyCell(self._expression.dt.to_string(format=format_string))
 
-    def datetime_to_string(self) -> Cell[str | None]:
-
-        return _LazyCell(self._expression.dt.to_string(format="%Y/%m/%d %H:%M:%S"))
+    def date_to_string(self, format_string: str = "%F") -> Cell[str | None]:
+        import datetime
+        try:
+            datetime.datetime.now().strftime(format_string)
+        except ValueError as e:
+            raise ValueError(f"{e}") from None
+        return _LazyCell(self._expression.dt.to_string(format=format_string))
 
     # ------------------------------------------------------------------------------------------------------------------
     # Internal

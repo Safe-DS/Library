@@ -21,25 +21,35 @@ class TemporalCell(ABC):
     >>> from safeds.data.tabular.containers import Column
     >>> import datetime
     >>> column = Column("example", [datetime.date(2022, 1, 9)])
-    >>> column.transform(lambda cell: cell.dt.date_to_string())
+    >>> column.transform(lambda cell: cell.dt.date_to_string("%Y/%m/%d"))
     +------------+
     | example    |
     | ---        |
     | str        |
     +============+
-    | 2022-01-09 |
+    | 2022/01/09 |
     +------------+
     """
 
     @abstractmethod
-    def datetime_to_string(self) -> Cell[str | None]:
+    def datetime_to_string(self, format_string: str = "%Y/%m/%d %H:%M:%S") -> Cell[str | None]:
         """
         Convert the date value in the cell to a string.
+
+        Parameters
+        ----------
+        format_string:
+            The format string it will be used to convert the data into the string.
 
         Returns
         -------
         date:
             The string value.
+
+        Raises
+        ------
+        ValueError
+            If the formatstring is invalid.
 
         Examples
         --------
@@ -57,14 +67,24 @@ class TemporalCell(ABC):
         """
 
     @abstractmethod
-    def date_to_string(self) -> Cell[str | None]:
+    def date_to_string(self, format_string: str = "%F") -> Cell[str | None]:
         """
         Convert the date value in the cell to a string.
+
+        Parameters
+        ----------
+        format_string:
+            The format string it will be used to convert the data into the string.
 
         Returns
         -------
         date:
             The string value.
+
+        Raises
+        ------
+        ValueError
+            If the formatstring is invalid.
 
         Examples
         --------
