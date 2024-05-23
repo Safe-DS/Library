@@ -18,10 +18,12 @@ from tests.helpers import assert_cell_operation_works
 )
 def test_should_parse_date_to_string(input_date: datetime.date, expected: bool, format_string: str) -> None:
     assert_cell_operation_works(input_date, lambda cell: cell.dt.date_to_string(format_string), expected)
+
+
 @pytest.mark.parametrize(
     ("expected", "input_date"),
     [
-        (f"Invalid format string", datetime.date(2022, 1, 9)),
+        ("Invalid format string", datetime.date(2022, 1, 9)),
     ],
     ids=[
         "ISO datetime",
