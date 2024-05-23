@@ -80,3 +80,15 @@ class TemporalCell(ABC):
         | 2022-01-09 |
         +------------+
         """
+
+    # ------------------------------------------------------------------------------------------------------------------
+    # Internal
+    # ------------------------------------------------------------------------------------------------------------------
+
+    @abstractmethod
+    def _equals(self, other: object) -> bool:
+        """
+        Check if this cell is equal to another object.
+
+        This method is needed because the `__eq__` method is used for element-wise comparisons.
+        """
