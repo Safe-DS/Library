@@ -8,7 +8,6 @@ from ._lazy_cell import _LazyCell
 from ._temporal_cell import TemporalCell
 
 if TYPE_CHECKING:
-
     import polars as pl
 
     from ._cell import Cell
@@ -33,21 +32,11 @@ class _LazyTemporalCell(TemporalCell):
     # ------------------------------------------------------------------------------------------------------------------
 
     def datetime_to_string(self, format_string: str = "%Y/%m/%d %H:%M:%S") -> Cell[str | None]:
-        import datetime
-
-        try:
-            datetime.datetime.now(tz=datetime.UTC).strftime(format_string)
-        except ValueError as e:
-            raise ValueError(f"{e}") from None
+        _check_format_string(format_string)
         return _LazyCell(self._expression.dt.to_string(format=format_string))
 
     def date_to_string(self, format_string: str = "%F") -> Cell[str | None]:
-        import datetime
-
-        try:
-            datetime.datetime.now(tz=datetime.UTC).strftime(format_string)
-        except ValueError as e:
-            raise ValueError(f"{e}") from None
+        _check_format_string(format_string)
         return _LazyCell(self._expression.dt.to_string(format=format_string))
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -60,3 +49,12 @@ class _LazyTemporalCell(TemporalCell):
         if self is other:
             return True
         return self._expression.meta.eq(other._expression.meta)
+
+
+def _check_format_string(format_string: str) -> None:
+    import datetime
+
+    try:
+        datetime.datetime.now(tz=datetime.UTC).strftime(format_string)
+    except ValueError as e:
+        raise ValueError(f"{e}") from None

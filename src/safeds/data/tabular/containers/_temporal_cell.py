@@ -81,8 +81,7 @@ class TemporalCell(ABC):
         date:
             The string value.
 
-        Raises
-        ------
+
         ValueError
             If the formatstring is invalid.
 
