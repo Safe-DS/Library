@@ -18,18 +18,17 @@ class TemporalCell(ABC):
 
     Examples
     --------
+
     >>> from safeds.data.tabular.containers import Column
     >>> import datetime
-    >>> column = Column("example",  [ datetime.datetime(2022, 1, 9, 23, 29, 1, tzinfo=datetime.UTC)])
-    >>> column.transform(lambda cell: cell.dt.datetime_to_string())
+    >>> column = Column("example", [datetime.date(2022, 1, 9)])
+    >>> column.transform(lambda cell: cell.str.date_to_string())
     +------------+
     | example    |
     | ---        |
-    | date       |
+    | str       |
     +============+
-    | 2021-01-01 |
-    | 2021-02-01 |
-    | null       |
+    | 2022-01-09 |
     +------------+
     """
 
@@ -52,7 +51,7 @@ class TemporalCell(ABC):
         +----------------------+
         | example             |
         | ---                 |
-        | date                |
+        | str                |
         +=====================+
         | 2022/01/09 23:29:01 |
         +---------------------+
