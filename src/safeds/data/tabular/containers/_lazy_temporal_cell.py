@@ -1,16 +1,13 @@
 from __future__ import annotations
 
-from abc import ABC
 from typing import TYPE_CHECKING
 
 from safeds._utils import _structural_hash
-from safeds._validation import _check_bounds, _ClosedBound
 
 from ._lazy_cell import _LazyCell
 from ._temporal_cell import TemporalCell
 
 if TYPE_CHECKING:
-    import datetime
 
     import polars as pl
 
@@ -41,6 +38,7 @@ class _LazyTemporalCell(TemporalCell):
     def datetime_to_string(self) -> Cell[str | None]:
 
         return _LazyCell(self._expression.dt.to_string(format="%Y/%m/%d %H:%M:%S"))
+
     # ------------------------------------------------------------------------------------------------------------------
     # Internal
     # ------------------------------------------------------------------------------------------------------------------

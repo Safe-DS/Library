@@ -9,8 +9,8 @@ if TYPE_CHECKING:
     from ._column import Column
     from ._row import Row
     from ._string_cell import StringCell
-    from ._temporal_cell import TemporalCell
     from ._table import Table
+    from ._temporal_cell import TemporalCell
 
 apipkg.initpkg(
     __name__,

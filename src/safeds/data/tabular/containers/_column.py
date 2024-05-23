@@ -155,7 +155,6 @@ class Column(Sequence[T_co]):
         """The plotter for the column."""
         return ColumnPlotter(self)
 
-
     @property
     def type(self) -> DataType:
         """The type of the column."""
