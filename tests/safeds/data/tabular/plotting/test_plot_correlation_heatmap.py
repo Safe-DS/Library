@@ -15,10 +15,10 @@ def test_should_match_snapshot(table: Table, snapshot_png_image: SnapshotAsserti
     assert correlation_heatmap == snapshot_png_image
 
 
-#  TODO
-# def test_should_warn_about_empty_table() -> None:
-#     with pytest.warns(
-#         UserWarning,
-#         match=r"An empty table has been used. A correlation heatmap on an empty table will show nothing.",
-#     ):
-#         Table().plot.correlation_heatmap()
+
+def test_should_warn_about_empty_table() -> None:
+    with pytest.warns(
+        UserWarning,
+        match=r"An empty table has been used. A correlation heatmap on an empty table will show nothing.",
+    ):
+        Table().plot.correlation_heatmap()
