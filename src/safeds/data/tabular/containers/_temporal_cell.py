@@ -21,7 +21,7 @@ class TemporalCell(ABC):
     >>> from safeds.data.tabular.containers import Column
     >>> import datetime
     >>> column = Column("example", [datetime.date(2022, 1, 9)])
-    >>> column.transform(lambda cell: cell.str.date_to_string())
+    >>> column.transform(lambda cell: cell.dt.date_to_string())
     +------------+
     | example    |
     | ---        |
@@ -47,7 +47,7 @@ class TemporalCell(ABC):
         >>> import datetime
         >>> column = Column("example", [ datetime.datetime(2022, 1, 9, 23, 29, 1, tzinfo=datetime.UTC)])
         >>> column.transform(lambda cell: cell.dt.datetime_to_string())
-        +----------------------+
+        +---------------------+
         | example             |
         | ---                 |
         | str                 |
@@ -71,7 +71,7 @@ class TemporalCell(ABC):
         >>> from safeds.data.tabular.containers import Column
         >>> import datetime
         >>> column = Column("example", [datetime.date(2022, 1, 9)])
-        >>> column.transform(lambda cell: cell.str.date_to_string())
+        >>> column.transform(lambda cell: cell.dt.date_to_string())
         +------------+
         | example    |
         | ---        |
