@@ -66,4 +66,3 @@ def test_should_raise_if_column_does_not_exist_error_message(x: str, y: str) -> 
     table = Table({"A": [1, 2, 3], "B": [2, 4, 7]})
     with pytest.raises(ColumnNotFoundError):
         table.plot.line_plot(x, [y])
-
