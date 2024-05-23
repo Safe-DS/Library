@@ -18,7 +18,6 @@ class TemporalCell(ABC):
 
     Examples
     --------
-
     >>> from safeds.data.tabular.containers import Column
     >>> import datetime
     >>> column = Column("example", [datetime.date(2022, 1, 9)])
