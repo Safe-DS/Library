@@ -38,9 +38,6 @@ class TemporalCell(ABC):
         """
         Convert the date value in the cell to a string.
 
-        Parameters
-        ----------
-
         Returns
         -------
         date:
@@ -49,17 +46,15 @@ class TemporalCell(ABC):
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("example", ["2021-01-01", "2021-02-01", "abc"])
-        >>> column.transform(lambda cell: cell.str.to_string())
-        +------------+
-        | example    |
-        | ---        |
-        | date       |
-        +============+
-        | 2021-01-01 |
-        | 2021-02-01 |
-        | null       |
-        +------------+
+        >>> column = Column("example", [ datetime.datetime(2022, 1, 9, 23, 29, 1, tzinfo=datetime.UTC))])
+        >>> column.transform(lambda cell: cell.dt.datetime_to_string())
+        +----------------------+
+        | example             |
+        | ---                 |
+        | date                |
+        +=====================+
+        | 2022/01/09 23:29:01 |
+        +---------------------+
         """
 
     @abstractmethod
@@ -67,9 +62,6 @@ class TemporalCell(ABC):
         """
         Convert the date value in the cell to a string.
 
-        Parameters
-        ----------
-
         Returns
         -------
         date:
@@ -78,15 +70,13 @@ class TemporalCell(ABC):
         Examples
         --------
         >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("example", ["2021-01-01", "2021-02-01", "abc"])
+        >>> column = Column("example", [datetime.date(2022, 1, 9))])
         >>> column.transform(lambda cell: cell.str.to_string())
         +------------+
         | example    |
         | ---        |
-        | date       |
+        | str       |
         +============+
-        | 2021-01-01 |
-        | 2021-02-01 |
-        | null       |
+        | 2022-01-09 |
         +------------+
         """
