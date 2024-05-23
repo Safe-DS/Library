@@ -1,6 +1,5 @@
 import pytest
 from safeds.data.labeled.containers import TimeSeriesDataset
-from safeds.data.tabular.containers import Table
 
 
 @pytest.mark.parametrize(
@@ -34,7 +33,6 @@ from safeds.data.tabular.containers import Table
                 window_size=1,
                 extra_names=["A", "C"],
                 continuous=False,
-
             ),
             False,
         ),
