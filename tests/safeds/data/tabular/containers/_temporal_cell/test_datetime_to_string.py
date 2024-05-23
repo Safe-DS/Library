@@ -26,7 +26,7 @@ def test_should_parse_date_to_string(input_date: datetime.date, expected: bool, 
         ("Invalid format string", datetime.datetime(2022, 1, 9, 23, 29, 1, tzinfo=datetime.UTC)),
     ],
     ids=[
-        "ISO datetime",
+        "ISO datetime false",
     ],
 )
 def test_should_raise_value_error_when_input_date_is_invalid(input_date: datetime.date, expected: str) -> None:
