@@ -55,6 +55,6 @@ def _check_format_string(format_string: str) -> None:
     import datetime
 
     try:
-        datetime.datetime.now().strftime(format_string)
+        datetime.datetime.now(tz=datetime.timezone.utc).strftime(format_string)
     except ValueError as e:
         raise ValueError(f"{e}") from None
