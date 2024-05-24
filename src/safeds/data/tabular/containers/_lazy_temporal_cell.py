@@ -53,7 +53,7 @@ class _LazyTemporalCell(TemporalCell):
         return self._expression.meta.eq(other._expression.meta)
 
 
-def _check_format_string(format_string: str) -> None:
+def _check_format_string(format_string: str) -> bool:
     valid_format_codes = {
         "F": "the standard",
         "a": "abbreviated weekday name",
@@ -67,7 +67,7 @@ def _check_format_string(format_string: str) -> None:
         "Y": "year with century as a decimal number",
         "H": "hour (24-hour clock) as a zero-padded decimal number",
         "I": "hour (12-hour clock) as a zero-padded decimal number",
-        "p": "locale’s equivalent of either AM or PM",
+        "p": "locale's equivalent of either AM or PM",
         "M": "minute as a zero-padded decimal number",
         "S": "second as a zero-padded decimal number",
         "f": "microsecond as a zero-padded decimal number",
@@ -76,9 +76,9 @@ def _check_format_string(format_string: str) -> None:
         "j": "day of the year as a zero-padded decimal number",
         "U": "week number of the year (Sunday as the first day of the week)",
         "W": "week number of the year (Monday as the first day of the week)",
-        "c": "locale’s appropriate date and time representation",
-        "x": "locale’s appropriate date representation",
-        "X": "locale’s appropriate time representation",
+        "c": "locale's appropriate date and time representation",
+        "x": "locale's appropriate date representation",
+        "X": "locale's appropriate time representation",
         "%": "a literal '%' character"
     }
 
