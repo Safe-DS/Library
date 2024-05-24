@@ -79,7 +79,7 @@ def _check_format_string(format_string: str) -> bool:
         "c": "locale's appropriate date and time representation",
         "x": "locale's appropriate date representation",
         "X": "locale's appropriate time representation",
-        "%": "a literal '%' character"
+        "%": "a literal '%' character",
     }
 
     # Keep track of the positions in the string
@@ -88,7 +88,7 @@ def _check_format_string(format_string: str) -> bool:
 
     # Iterate over each character in the format string
     while i < n:
-        if format_string[i] == '%':
+        if format_string[i] == "%":
             # Make sure there's at least one character following the '%'
             if i + 1 < n:
                 code = format_string[i + 1]
