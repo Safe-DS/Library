@@ -13,11 +13,13 @@ if TYPE_CHECKING:
     from ._logistic_classifier import LogisticClassifier
     from ._random_forest_classifier import RandomForestClassifier
     from ._support_vector_classifier import SupportVectorClassifier
+    from ._baseline_classifier import BaselineClassifier
 
 apipkg.initpkg(
     __name__,
     {
         "AdaBoostClassifier": "._ada_boost_classifier:AdaBoostClassifier",
+        "BaselineClassifier": "._baseline_classifier:BaselineClassifier",
         "Classifier": "._classifier:Classifier",
         "DecisionTreeClassifier": "._decision_tree_classifier:DecisionTreeClassifier",
         "GradientBoostingClassifier": "._gradient_boosting_classifier:GradientBoostingClassifier",
@@ -30,6 +32,7 @@ apipkg.initpkg(
 
 __all__ = [
     "AdaBoostClassifier",
+    "BaselineClassifier",
     "Classifier",
     "DecisionTreeClassifier",
     "GradientBoostingClassifier",
