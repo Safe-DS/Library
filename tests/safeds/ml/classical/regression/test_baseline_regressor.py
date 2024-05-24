@@ -3,6 +3,7 @@ from safeds.data.labeled.containers import TabularDataset
 from safeds.data.tabular.containers import Table
 from safeds.exceptions import OutOfBoundsError
 from safeds.ml.classical.classification import AdaBoostClassifier, BaselineClassifier
+from safeds.ml.classical.regression import BaselineRegressor
 
 
 @pytest.fixture()
@@ -11,7 +12,7 @@ def training_set() -> TabularDataset:
     return table.to_tabular_dataset(target_name="col1")
 
 
-class TestBaselineClassifier:
+class TestBaselineRegressor:
 
     def test_workflow(self, training_set):
         input = Table.from_csv_file("D:\\Library_jetzt_aber_wirklich\\src\\safeds\\ml\\classical\\classification\\avocado.csv")
@@ -21,8 +22,8 @@ class TestBaselineClassifier:
         train = train.to_tabular_dataset(target_name="type")
         test = test.to_tabular_dataset(target_name="type")
 
-        classifier = BaselineClassifier()
-        fitted = classifier.fit(train)
+        regressor = BaselineRegressor()
+        fitted = regressor.fit(train)
         fitted.predict(test)
         assert fitted is not None
 
