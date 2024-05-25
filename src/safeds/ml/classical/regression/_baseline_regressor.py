@@ -1,8 +1,12 @@
 import copy
+import time
+from concurrent.futures import as_completed, FIRST_COMPLETED, wait
 from typing import Self
 
 from safeds.data.labeled.containers import TabularDataset
-from safeds.exceptions import ModelNotFittedError
+from safeds.data.tabular.containers import Table
+from safeds.data.tabular.transformation import StandardScaler
+from safeds.exceptions import ModelNotFittedError, NonNumericColumnError, DatasetMissesDataError
 from safeds.ml.classical.regression import AdaBoostRegressor, DecisionTreeRegressor, ElasticNetRegressor, GradientBoostingRegressor, KNearestNeighborsRegressor, LassoRegressor, LinearRegressor, RandomForestRegressor, RidgeRegressor, SupportVectorRegressor
 from safeds.ml.classical.regression import Regressor
 
@@ -18,20 +22,40 @@ def _predict_single_model(model: Regressor, test_data: TabularDataset) -> Tabula
 class BaselineRegressor:
     def __init__(self):
         self._is_fitted = False
-        self._list_of_model_types = [AdaBoostRegressor(), DecisionTreeRegressor(), ElasticNetRegressor(), GradientBoostingRegressor(), KNearestNeighborsRegressor(5), LassoRegressor(), LinearRegressor(), RandomForestRegressor(), RidgeRegressor(), SupportVectorRegressor()]
+        #self._list_of_model_types = [AdaBoostRegressor(), DecisionTreeRegressor(), ElasticNetRegressor(), GradientBoostingRegressor(), KNearestNeighborsRegressor(5), LassoRegressor(), LinearRegressor(), RandomForestRegressor(), RidgeRegressor(), SupportVectorRegressor()]
+        self._list_of_model_types = [AdaBoostRegressor(), DecisionTreeRegressor(),
+                                     GradientBoostingRegressor(), KNearestNeighborsRegressor(5),
+                                     RandomForestRegressor(),
+                                     SupportVectorRegressor()]
+
         self._fitted_models = []
+        self._feature_names = None
 
     def fit(self, train_data: TabularDataset) -> Self:
         from concurrent.futures import ProcessPoolExecutor
 
-        #Todo Validate data
+        #Remove Invalid Data
+        #target_name = train_data.target.name
+        #table = train_data.to_table()
+        #table = table.remove_non_numeric_columns()
+        #table = table.remove_rows_with_missing_values()
+        #table = table.remove_duplicate_rows()
+
+        #if table.row_count == 0:
+        #    raise TODO Decide which Error to Raise, as DatasetMissesDataError might confuse Users as we might remove some data ourselfs
+
+        # Scale features
+        #train_data = table.to_tabular_dataset(target_name)
+        train_data = self._standard_scale_tabular_dataset(train_data)
+
         copied_model = copy.deepcopy(self)
 
         with ProcessPoolExecutor(max_workers=len(self._list_of_model_types)) as executor:
             futures = []
             for model in self._list_of_model_types:
                 futures.append(executor.submit(_fit_single_model, model, train_data))
-            for future in futures:
+            [done, _] = wait(futures, timeout=10)
+            for future in done:
                 copied_model._fitted_models.append(future.result())
         executor.shutdown()
 
@@ -45,25 +69,28 @@ class BaselineRegressor:
         if not self._is_fitted:
             raise ModelNotFittedError
 
-        #Todo Validate data
+        # Todo Validate data
+        test_data = self._standard_scale_tabular_dataset(test_data)
+
 
         with ProcessPoolExecutor(max_workers=len(self._list_of_model_types)) as executor:
             results = []
             futures = []
             for model in self._fitted_models:
                 futures.append(executor.submit(_predict_single_model, model, test_data))
-            for future in futures:
+            [done, _] = wait(futures, timeout=20, return_when=FIRST_COMPLETED)
+            for future in done:
                 results.append(future.result())
         executor.shutdown()
 
-        max_metrics = {"coefficient_of_determination": 10000000000000000000000.0, "mean_absolute_error": 10000000000000000000000.0, "mean_squared_error": 10000000000000000000000.0, "median_absolute_deviation": 10000000000000000000000.0}
+        max_metrics = {"coefficient_of_determination": float('-inf'), "mean_absolute_error": float('inf'), "mean_squared_error": float('inf'), "median_absolute_deviation": float('inf')}
         for result in results:
             coefficient_of_determination = RegressionMetrics.coefficient_of_determination(result, test_data)
-            mean_absolute_error = RegressionMetrics.mean_squared_error(result, test_data)
-            mean_squared_error = RegressionMetrics.mean_absolute_error(result, test_data)
+            mean_absolute_error = RegressionMetrics.mean_absolute_error(result, test_data)
+            mean_squared_error = RegressionMetrics.mean_squared_error(result, test_data)
             median_absolute_deviation = RegressionMetrics.median_absolute_deviation(result, test_data)
 
-            if max_metrics.get("coefficient_of_determination") > coefficient_of_determination:
+            if max_metrics.get("coefficient_of_determination") < coefficient_of_determination:
                 max_metrics.update({"coefficient_of_determination": coefficient_of_determination})
 
             if max_metrics.get("mean_absolute_error") > mean_absolute_error:
@@ -75,9 +102,31 @@ class BaselineRegressor:
             if max_metrics.get("median_absolute_deviation") > median_absolute_deviation:
                 max_metrics.update({"median_absolute_deviation": median_absolute_deviation})
 
-        print(max_metrics)
+        print(Table(
+            {
+                "best metrics achieved": [
+                    "coefficient_of_determination",
+                    "mean_absolute_error",
+                    "mean_squared_error",
+                    "median_absolute_deviation",
+                ],
+                "value": [
+                    max_metrics.get("coefficient_of_determination"),
+                    max_metrics.get("mean_absolute_error"),
+                    max_metrics.get("mean_squared_error"),
+                    max_metrics.get("median_absolute_deviation"),
+                ],
+            },
+        ))
         return max_metrics
 
     @property
     def is_fitted(self) -> bool:
         return self._is_fitted
+
+    def _standard_scale_tabular_dataset(self, data: TabularDataset) -> TabularDataset:
+        target = data.target
+        ss = StandardScaler()
+        [_, scaled_features] = ss.fit_and_transform(data.features)
+        return scaled_features.add_columns([target]).to_tabular_dataset(target.name)
+

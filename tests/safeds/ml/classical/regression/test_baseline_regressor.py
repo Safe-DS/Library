@@ -1,9 +1,10 @@
 import pytest
 from safeds.data.labeled.containers import TabularDataset
 from safeds.data.tabular.containers import Table
+from safeds.data.tabular.transformation import LabelEncoder, StandardScaler
 from safeds.exceptions import OutOfBoundsError
 from safeds.ml.classical.classification import AdaBoostClassifier, BaselineClassifier
-from safeds.ml.classical.regression import BaselineRegressor
+from safeds.ml.classical.regression import BaselineRegressor, ElasticNetRegressor, LassoRegressor, LinearRegressor
 
 
 @pytest.fixture()
@@ -15,12 +16,13 @@ def training_set() -> TabularDataset:
 class TestBaselineRegressor:
 
     def test_workflow(self, training_set):
-        input = Table.from_csv_file("D:\\Library_jetzt_aber_wirklich\\src\\safeds\\ml\\classical\\classification\\avocado.csv")
-        table = input.remove_columns_except(["AveragePrice", "Total Volume", "4046", "4225", "4770", "Total Bags", "Small Bags", "Large Bags",
-             "type"])
+        input = Table.from_csv_file("D:\\Library_jetzt_aber_wirklich\\src\\safeds\\ml\\classical\\regression\\houses.csv")
+        table = input.remove_columns(["id", "lat", "long", "zipcode", "condition", "grade", "date"])
+        #TODO Not scaling the data makes the Regressor take 10 Minutes instead of 20 Seconds
+
         [train, test] = table.split_rows(0.8)
-        train = train.to_tabular_dataset(target_name="type")
-        test = test.to_tabular_dataset(target_name="type")
+        train = train.to_tabular_dataset(target_name="price")
+        test = test.to_tabular_dataset(target_name="price")
 
         regressor = BaselineRegressor()
         fitted = regressor.fit(train)
