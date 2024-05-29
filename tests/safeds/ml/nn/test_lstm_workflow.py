@@ -42,7 +42,7 @@ def test_lstm_model(device: Device) -> None:
             window_size=7,
             forecast_horizon=12,
             continuous=True,
-            extra_names=["date"]
+            extra_names=["date"],
         ),
         epoch_size=1,
     )
@@ -53,7 +53,7 @@ def test_lstm_model(device: Device) -> None:
             window_size=7,
             forecast_horizon=12,
             continuous=True,
-            extra_names=["date"]
+            extra_names=["date"],
         ),
     )
     trained_model_2 = model_2.fit(
@@ -62,7 +62,7 @@ def test_lstm_model(device: Device) -> None:
             window_size=7,
             forecast_horizon=12,
             continuous=False,
-            extra_names=["date"]
+            extra_names=["date"],
         ),
         epoch_size=1,
     )
@@ -73,7 +73,7 @@ def test_lstm_model(device: Device) -> None:
             window_size=7,
             forecast_horizon=12,
             continuous=False,
-            extra_names=["date"]
+            extra_names=["date"],
         ),
     )
     assert trained_model._model is not None

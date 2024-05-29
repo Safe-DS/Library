@@ -165,7 +165,6 @@ class TimeSeriesDataset(Dataset[Table, Column]):
         """The target column of the time series dataset."""
         return self._target
 
-
     @property
     def window_size(self) -> int:
         """The number of consecutive sample to use as input for prediction."""

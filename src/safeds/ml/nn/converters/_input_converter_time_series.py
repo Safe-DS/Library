@@ -15,7 +15,14 @@ if TYPE_CHECKING:
 
 
 class InputConversionTimeSeries(InputConversion[TimeSeriesDataset, TimeSeriesDataset]):
-    """The input conversion for a neural network, defines the input parameters for the neural network."""
+    """
+    The input conversion for a neural network, defines the input parameters for the neural network.
+
+    Parameters
+    ----------
+    prediction_name:
+        The name of the new column where the prediction will be stored.
+    """
 
     def __init__(
         self,
@@ -117,10 +124,9 @@ class InputConversionTimeSeries(InputConversion[TimeSeriesDataset, TimeSeriesDat
             self._target_name = input_data.target.name
             self._continuous = input_data._continuous
             self._first = False
-        return (
-            (sorted(input_data.features.column_names)).__eq__(sorted(self._feature_names))
-            and input_data.target.name == self._target_name
-        )
+        return (sorted(input_data.features.column_names)).__eq__(
+            sorted(self._feature_names),
+        ) and input_data.target.name == self._target_name
 
     def _is_predict_data_valid(self, input_data: TimeSeriesDataset) -> bool:
         return self._is_fit_data_valid(input_data)
