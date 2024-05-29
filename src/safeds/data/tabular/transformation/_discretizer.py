@@ -68,6 +68,7 @@ class Discretizer(TableTransformer):
 
     @property
     def bin_count(self) -> int:
+        """The number of bins to be created."""
         return self._bin_count
 
     # ------------------------------------------------------------------------------------------------------------------
