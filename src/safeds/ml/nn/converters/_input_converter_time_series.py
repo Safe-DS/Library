@@ -15,10 +15,7 @@ if TYPE_CHECKING:
 
 
 class InputConversionTimeSeries(InputConversion[TimeSeriesDataset, TimeSeriesDataset]):
-    """
-    The input conversion for a neural network, defines the input parameters for the neural network.
-
-    """
+    """The input conversion for a neural network, defines the input parameters for the neural network."""
 
     def __init__(
         self,

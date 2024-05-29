@@ -13,10 +13,7 @@ if TYPE_CHECKING:
 
 
 class InputConversionTable(InputConversion[TabularDataset, Table]):
-    """
-    The input conversion for a neural network, defines the input parameters for the neural network.
-
-    """
+    """The input conversion for a neural network, defines the input parameters for the neural network."""
 
     def __init__(self) -> None:
         self._target_name = ""
