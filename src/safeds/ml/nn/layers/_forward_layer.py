@@ -19,7 +19,7 @@ class ForwardLayer(Layer):
 
     Parameters
     ----------
-    output_size:
+    neuron_count:
         The number of neurons in this layer
 
     Raises
@@ -29,11 +29,11 @@ class ForwardLayer(Layer):
         If output_size < 1
     """
 
-    def __init__(self, output_size: int):
-        _check_bounds("output_size", output_size, lower_bound=_ClosedBound(1))
+    def __init__(self, neuron_count: int):
+        _check_bounds("neuron_count", neuron_count, lower_bound=_ClosedBound(1))
 
         self._input_size: int | None = None
-        self._output_size = output_size
+        self._output_size = neuron_count
 
     def _get_internal_layer(self, **kwargs: Any) -> nn.Module:
         if "activation_function" not in kwargs:

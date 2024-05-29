@@ -17,7 +17,7 @@ from torch import nn
 #     ids=["one", "twenty"],
 # )
 # def test_should_return_input_size(input_size: int) -> None:
-#     assert ForwardLayer(output_size=1).input_size == input_size
+#     assert ForwardLayer(neuron_count=1).input_size == input_size
 
 
 @pytest.mark.parametrize(
@@ -31,7 +31,7 @@ from torch import nn
     ids=["sigmoid", "relu", "softmax", "none"],
 )
 def test_should_accept_activation_function(activation_function: str, expected_activation_function: type | None) -> None:
-    forward_layer = ForwardLayer(output_size=1)
+    forward_layer = ForwardLayer(neuron_count=1)
     forward_layer._input_size = 1
     internal_layer = forward_layer._get_internal_layer(
         activation_function=activation_function,
@@ -51,7 +51,7 @@ def test_should_accept_activation_function(activation_function: str, expected_ac
     ids=["unknown"],
 )
 def test_should_raise_if_unknown_activation_function_is_passed(activation_function: str) -> None:
-    forward_layer = ForwardLayer(output_size=1)
+    forward_layer = ForwardLayer(neuron_count=1)
     forward_layer._input_size = 1
     with pytest.raises(
         ValueError,
@@ -71,7 +71,7 @@ def test_should_raise_if_unknown_activation_function_is_passed(activation_functi
 )
 def test_should_raise_if_output_size_out_of_bounds(output_size: int) -> None:
     with pytest.raises(OutOfBoundsError):
-        ForwardLayer(output_size=output_size)
+        ForwardLayer(neuron_count=output_size)
 
 
 @pytest.mark.parametrize(
@@ -83,7 +83,7 @@ def test_should_raise_if_output_size_out_of_bounds(output_size: int) -> None:
     ids=["one", "twenty"],
 )
 def test_should_return_output_size(output_size: int) -> None:
-    assert ForwardLayer(output_size=output_size).output_size == output_size
+    assert ForwardLayer(neuron_count=output_size).output_size == output_size
 
 
 def test_should_raise_if_input_size_is_set_with_image_size() -> None:
@@ -105,13 +105,13 @@ def test_should_raise_if_activation_function_not_set() -> None:
     ("layer1", "layer2", "equal"),
     [
         (
-            ForwardLayer(output_size=2),
-            ForwardLayer(output_size=2),
+            ForwardLayer(neuron_count=2),
+            ForwardLayer(neuron_count=2),
             True,
         ),
         (
-            ForwardLayer(output_size=2),
-            ForwardLayer(output_size=1),
+            ForwardLayer(neuron_count=2),
+            ForwardLayer(neuron_count=1),
             False,
         ),
     ],
@@ -122,14 +122,14 @@ def test_should_compare_forward_layers(layer1: ForwardLayer, layer2: ForwardLaye
 
 
 def test_should_assert_that_forward_layer_is_equal_to_itself() -> None:
-    layer = ForwardLayer(output_size=1)
+    layer = ForwardLayer(neuron_count=1)
     assert layer.__eq__(layer)
 
 
 @pytest.mark.parametrize(
     ("layer", "other"),
     [
-        (ForwardLayer(output_size=1), None),
+        (ForwardLayer(neuron_count=1), None),
     ],
     ids=["ForwardLayer vs. None"],
 )
@@ -141,8 +141,8 @@ def test_should_return_not_implemented_if_other_is_not_forward_layer(layer: Forw
     ("layer1", "layer2"),
     [
         (
-            ForwardLayer(output_size=2),
-            ForwardLayer(output_size=2),
+            ForwardLayer(neuron_count=2),
+            ForwardLayer(neuron_count=2),
         ),
     ],
     ids=["equal"],
@@ -155,8 +155,8 @@ def test_should_assert_that_equal_forward_layers_have_equal_hash(layer1: Forward
     ("layer1", "layer2"),
     [
         (
-            ForwardLayer(output_size=2),
-            ForwardLayer(output_size=1),
+            ForwardLayer(neuron_count=2),
+            ForwardLayer(neuron_count=1),
         ),
     ],
     ids=["not equal"],
@@ -171,7 +171,7 @@ def test_should_assert_that_different_forward_layers_have_different_hash(
 @pytest.mark.parametrize(
     "layer",
     [
-        ForwardLayer(output_size=1),
+        ForwardLayer(neuron_count=1),
     ],
     ids=["one"],
 )

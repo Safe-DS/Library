@@ -17,7 +17,7 @@ from torch import nn
 #     ids=["one", "twenty"],
 # )
 # def test_should_return_input_size(input_size: int) -> None:
-#     assert LSTMLayer(output_size=1).input_size == input_size
+#     assert LSTMLayer(neuron_count=1).input_size == input_size
 
 
 @pytest.mark.parametrize(
@@ -31,7 +31,7 @@ from torch import nn
     ids=["sigmoid", "relu", "softmax", "none"],
 )
 def test_should_accept_activation_function(activation_function: str, expected_activation_function: type | None) -> None:
-    lstm_layer = LSTMLayer(output_size=1)
+    lstm_layer = LSTMLayer(neuron_count=1)
     lstm_layer._input_size = 1
     internal_layer = lstm_layer._get_internal_layer(
         activation_function=activation_function,
@@ -51,7 +51,7 @@ def test_should_accept_activation_function(activation_function: str, expected_ac
     ids=["unknown"],
 )
 def test_should_raise_if_unknown_activation_function_is_passed(activation_function: str) -> None:
-    lstm_layer = LSTMLayer(output_size=1)
+    lstm_layer = LSTMLayer(neuron_count=1)
     lstm_layer._input_size = 1
     with pytest.raises(
         ValueError,
@@ -71,7 +71,7 @@ def test_should_raise_if_unknown_activation_function_is_passed(activation_functi
 )
 def test_should_raise_if_output_size_out_of_bounds(output_size: int) -> None:
     with pytest.raises(OutOfBoundsError):
-        LSTMLayer(output_size=output_size)
+        LSTMLayer(neuron_count=output_size)
 
 
 @pytest.mark.parametrize(
@@ -83,7 +83,7 @@ def test_should_raise_if_output_size_out_of_bounds(output_size: int) -> None:
     ids=["one", "twenty"],
 )
 def test_should_raise_if_output_size_doesnt_match(output_size: int) -> None:
-    assert LSTMLayer(output_size=output_size).output_size == output_size
+    assert LSTMLayer(neuron_count=output_size).output_size == output_size
 
 
 def test_should_raise_if_input_size_is_set_with_image_size() -> None:
@@ -105,13 +105,13 @@ def test_should_raise_if_activation_function_not_set() -> None:
     ("layer1", "layer2", "equal"),
     [
         (
-            LSTMLayer(output_size=2),
-            LSTMLayer(output_size=2),
+            LSTMLayer(neuron_count=2),
+            LSTMLayer(neuron_count=2),
             True,
         ),
         (
-            LSTMLayer(output_size=2),
-            LSTMLayer(output_size=1),
+            LSTMLayer(neuron_count=2),
+            LSTMLayer(neuron_count=1),
             False,
         ),
     ],
@@ -122,14 +122,14 @@ def test_should_compare_forward_layers(layer1: LSTMLayer, layer2: LSTMLayer, equ
 
 
 def test_should_assert_that_forward_layer_is_equal_to_itself() -> None:
-    layer = LSTMLayer(output_size=1)
+    layer = LSTMLayer(neuron_count=1)
     assert layer.__eq__(layer)
 
 
 @pytest.mark.parametrize(
     ("layer", "other"),
     [
-        (LSTMLayer(output_size=1), None),
+        (LSTMLayer(neuron_count=1), None),
     ],
     ids=["ForwardLayer vs. None"],
 )
@@ -141,8 +141,8 @@ def test_should_return_not_implemented_if_other_is_not_forward_layer(layer: LSTM
     ("layer1", "layer2"),
     [
         (
-            LSTMLayer(output_size=2),
-            LSTMLayer(output_size=2),
+            LSTMLayer(neuron_count=2),
+            LSTMLayer(neuron_count=2),
         ),
     ],
     ids=["equal"],
@@ -155,8 +155,8 @@ def test_should_assert_that_equal_forward_layers_have_equal_hash(layer1: LSTMLay
     ("layer1", "layer2"),
     [
         (
-            LSTMLayer(output_size=2),
-            LSTMLayer(output_size=1),
+            LSTMLayer(neuron_count=2),
+            LSTMLayer(neuron_count=1),
         ),
     ],
     ids=["not equal"],
@@ -171,7 +171,7 @@ def test_should_assert_that_different_forward_layers_have_different_hash(
 @pytest.mark.parametrize(
     "layer",
     [
-        LSTMLayer(output_size=1),
+        LSTMLayer(neuron_count=1),
     ],
     ids=["one"],
 )
