@@ -44,6 +44,7 @@ class StandardScaler(InvertibleTableTransformer):
 
     @property
     def is_fitted(self) -> bool:
+        """Whether the transformer is fitted."""
         return self._data_mean is not None and self._data_standard_deviation is not None
 
     # ------------------------------------------------------------------------------------------------------------------

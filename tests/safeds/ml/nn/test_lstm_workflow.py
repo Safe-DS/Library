@@ -30,7 +30,7 @@ def test_lstm_model(device: Device) -> None:
 
     model = NeuralNetworkRegressor(
         InputConversionTimeSeries(prediction_name="predicted"),
-        [ForwardLayer(input_size=7, output_size=256), LSTMLayer(input_size=256, output_size=1)],
+        [ForwardLayer(neuron_count=256), LSTMLayer(neuron_count=1)],
     )
     trained_model = model.fit(
         train_table.to_time_series_dataset(

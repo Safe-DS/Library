@@ -1,10 +1,11 @@
+import pickle
+
 import pytest
 from safeds.data.image.typing import ImageSize
 from safeds.data.labeled.containers import TabularDataset
 from safeds.data.tabular.containers import Table
 from safeds.exceptions import (
     FeatureDataMismatchError,
-    InputSizeError,
     InvalidModelStructureError,
     ModelNotFittedError,
     OutOfBoundsError,
@@ -38,21 +39,16 @@ from tests.helpers import configure_test_with_device, get_devices, get_devices_i
 
 @pytest.mark.parametrize("device", get_devices(), ids=get_devices_ids())
 class TestClassificationModel:
-    @pytest.mark.parametrize(
-        "input_size",
-        [
-            None,
-        ],
-    )
-    def test_should_return_input_size(self, input_size: int, device: Device) -> None:
+    def test_should_return_input_size(self, device: Device) -> None:
         configure_test_with_device(device)
-        assert (
-            NeuralNetworkClassifier(
-                InputConversionTable(),
-                [ForwardLayer(1, input_size)],
-            ).input_size
-            == input_size
+        model = NeuralNetworkClassifier(
+            InputConversionTable(),
+            [ForwardLayer(neuron_count=1)],
+        ).fit(
+            Table.from_dict({"a": [1], "b": [2]}).to_tabular_dataset("a"),
         )
+
+        assert model.input_size == 1
 
     @pytest.mark.parametrize(
         "epoch_size",
@@ -66,7 +62,7 @@ class TestClassificationModel:
         with pytest.raises(OutOfBoundsError):
             NeuralNetworkClassifier(
                 InputConversionTable(),
-                [ForwardLayer(1, 1)],
+                [ForwardLayer(1)],
             ).fit(
                 Table.from_dict({"a": [1], "b": [2]}).to_tabular_dataset("a"),
                 epoch_size=epoch_size,
@@ -84,7 +80,7 @@ class TestClassificationModel:
         with pytest.raises(OutOfBoundsError):
             NeuralNetworkClassifier(
                 InputConversionTable(),
-                [ForwardLayer(input_size=1, output_size=1)],
+                [ForwardLayer(neuron_count=1)],
             ).fit(
                 Table.from_dict({"a": [1], "b": [2]}).to_tabular_dataset("a"),
                 batch_size=batch_size,
@@ -94,7 +90,7 @@ class TestClassificationModel:
         configure_test_with_device(device)
         fitted_model = NeuralNetworkClassifier(
             InputConversionTable(),
-            [ForwardLayer(input_size=1, output_size=8), ForwardLayer(output_size=1)],
+            [ForwardLayer(neuron_count=8), ForwardLayer(neuron_count=1)],
         ).fit(
             Table.from_dict({"a": [1], "b": [0]}).to_tabular_dataset("a"),
         )
@@ -112,7 +108,7 @@ class TestClassificationModel:
         configure_test_with_device(device)
         fitted_model = NeuralNetworkClassifier(
             InputConversionTable(),
-            [ForwardLayer(input_size=1, output_size=8), ForwardLayer(output_size=1)],
+            [ForwardLayer(neuron_count=8), ForwardLayer(neuron_count=1)],
         ).fit(
             Table.from_dict({"a": [1, 0, 1, 0, 1, 0], "b": [0, 1, 0, 12, 3, 3]}).to_tabular_dataset("a"),
             batch_size=batch_size,
@@ -136,14 +132,14 @@ class TestClassificationModel:
         configure_test_with_device(device)
         fitted_model = NeuralNetworkClassifier(
             InputConversionTable(),
-            [ForwardLayer(input_size=1, output_size=8), ForwardLayer(output_size=3)],
+            [ForwardLayer(neuron_count=8), ForwardLayer(neuron_count=3)],
         ).fit(
             Table.from_dict({"a": [0, 1, 2], "b": [0, 15, 51]}).to_tabular_dataset("a"),
             batch_size=batch_size,
         )
         NeuralNetworkClassifier(
             InputConversionTable(),
-            [ForwardLayer(input_size=1, output_size=8), LSTMLayer(output_size=3)],
+            [ForwardLayer(neuron_count=8), LSTMLayer(neuron_count=3)],
         ).fit(
             Table.from_dict({"a": [0, 1, 2], "b": [0, 15, 51]}).to_tabular_dataset("a"),
             batch_size=batch_size,
@@ -156,7 +152,7 @@ class TestClassificationModel:
         with pytest.raises(ModelNotFittedError, match="The model has not been fitted yet."):
             NeuralNetworkClassifier(
                 InputConversionTable(),
-                [ForwardLayer(input_size=1, output_size=1)],
+                [ForwardLayer(neuron_count=1)],
             ).predict(
                 Table.from_dict({"a": [1]}),
             )
@@ -165,11 +161,11 @@ class TestClassificationModel:
         configure_test_with_device(device)
         model = NeuralNetworkClassifier(
             InputConversionTable(),
-            [ForwardLayer(input_size=1, output_size=1)],
+            [ForwardLayer(neuron_count=1)],
         )
         model_2 = NeuralNetworkClassifier(
             InputConversionTable(),
-            [LSTMLayer(input_size=1, output_size=1)],
+            [LSTMLayer(neuron_count=1)],
         )
         assert not model.is_fitted
         assert not model_2.is_fitted
@@ -186,11 +182,11 @@ class TestClassificationModel:
         configure_test_with_device(device)
         model = NeuralNetworkClassifier(
             InputConversionTable(),
-            [ForwardLayer(input_size=1, output_size=1), ForwardLayer(output_size=3)],
+            [ForwardLayer(neuron_count=1), ForwardLayer(neuron_count=3)],
         )
         model_2 = NeuralNetworkClassifier(
             InputConversionTable(),
-            [ForwardLayer(input_size=1, output_size=1), LSTMLayer(output_size=3)],
+            [ForwardLayer(neuron_count=1), LSTMLayer(neuron_count=3)],
         )
         assert not model.is_fitted
         assert not model_2.is_fitted
@@ -207,7 +203,7 @@ class TestClassificationModel:
         configure_test_with_device(device)
         model = NeuralNetworkClassifier(
             InputConversionTable(),
-            [ForwardLayer(input_size=1, output_size=1), ForwardLayer(output_size=3)],
+            [ForwardLayer(neuron_count=1), ForwardLayer(neuron_count=3)],
         )
         model = model.fit(
             Table.from_dict({"a": [1, 0, 2], "b": [0, 15, 5]}).to_tabular_dataset("a"),
@@ -224,7 +220,7 @@ class TestClassificationModel:
         configure_test_with_device(device)
         model = NeuralNetworkClassifier(
             InputConversionTable(),
-            [ForwardLayer(input_size=1, output_size=1), ForwardLayer(output_size=1)],
+            [ForwardLayer(neuron_count=1), ForwardLayer(neuron_count=1)],
         )
         learned_model = model.fit(
             Table.from_dict({"a": [0.1, 0, 0.2], "b": [0, 0.15, 0.5]}).to_tabular_dataset("b"),
@@ -235,24 +231,24 @@ class TestClassificationModel:
         ):
             learned_model.fit(Table.from_dict({"k": [0.1, 0, 0.2], "l": [0, 0.15, 0.5]}).to_tabular_dataset("k"))
 
-    def test_should_raise_if_table_size_and_input_size_mismatch(self, device: Device) -> None:
-        configure_test_with_device(device)
-        model = NeuralNetworkClassifier(
-            InputConversionTable(),
-            [ForwardLayer(input_size=1, output_size=1), ForwardLayer(output_size=3)],
-        )
-        with pytest.raises(
-            InputSizeError,
-        ):
-            model.fit(
-                Table.from_dict({"a": [1, 0, 2], "b": [0, 15, 5], "c": [3, 33, 333]}).to_tabular_dataset("a"),
-            )
+    # def test_should_raise_if_table_size_and_input_size_mismatch(self, device: Device) -> None:
+    #     configure_test_with_device(device)
+    #     model = NeuralNetworkClassifier(
+    #         InputConversionTable(),
+    #         [ForwardLayer(neuron_count=1), ForwardLayer(neuron_count=3)],
+    #     )
+    #     with pytest.raises(
+    #         InputSizeError,
+    #     ):
+    #         model.fit(
+    #             Table.from_dict({"a": [1, 0, 2], "b": [0, 15, 5], "c": [3, 33, 333]}).to_tabular_dataset("a"),
+    #         )
 
     def test_should_raise_if_fit_doesnt_batch_callback(self, device: Device) -> None:
         configure_test_with_device(device)
         model = NeuralNetworkClassifier(
             InputConversionTable(),
-            [ForwardLayer(input_size=1, output_size=1)],
+            [ForwardLayer(neuron_count=1)],
         )
 
         class Test:
@@ -274,7 +270,7 @@ class TestClassificationModel:
         configure_test_with_device(device)
         model = NeuralNetworkClassifier(
             InputConversionTable(),
-            [ForwardLayer(input_size=1, output_size=1)],
+            [ForwardLayer(neuron_count=1)],
         )
 
         class Test:
@@ -448,24 +444,39 @@ class TestClassificationModel:
         with pytest.raises(InvalidModelStructureError, match=error_msg):
             NeuralNetworkClassifier(input_conversion, layers)
 
+    def test_should_be_pickleable(self, device: Device) -> None:
+        configure_test_with_device(device)
+        model = NeuralNetworkClassifier(
+            InputConversionTable(),
+            [
+                ForwardLayer(1),
+            ],
+        )
+        fitted_model = model.fit(
+            Table(
+                {
+                    "a": [0],
+                    "b": [0],
+                },
+            ).to_tabular_dataset("a"),
+        )
+
+        # Should not raise
+        pickle.dumps(fitted_model)
+
 
 @pytest.mark.parametrize("device", get_devices(), ids=get_devices_ids())
 class TestRegressionModel:
-    @pytest.mark.parametrize(
-        "input_size",
-        [
-            None,
-        ],
-    )
-    def test_should_return_input_size(self, input_size: int, device: Device) -> None:
+    def test_should_return_input_size(self, device: Device) -> None:
         configure_test_with_device(device)
-        assert (
-            NeuralNetworkRegressor(
-                InputConversionTable(),
-                [ForwardLayer(1, input_size)],
-            ).input_size
-            == input_size
+        model = NeuralNetworkRegressor(
+            InputConversionTable(),
+            [ForwardLayer(neuron_count=1)],
+        ).fit(
+            Table.from_dict({"a": [1], "b": [2]}).to_tabular_dataset("a"),
         )
+
+        assert model.input_size == 1
 
     @pytest.mark.parametrize(
         "epoch_size",
@@ -479,7 +490,7 @@ class TestRegressionModel:
         with pytest.raises(OutOfBoundsError):
             NeuralNetworkRegressor(
                 InputConversionTable(),
-                [ForwardLayer(input_size=1, output_size=1)],
+                [ForwardLayer(neuron_count=1)],
             ).fit(
                 Table.from_dict({"a": [1], "b": [2]}).to_tabular_dataset("a"),
                 epoch_size=epoch_size,
@@ -497,7 +508,7 @@ class TestRegressionModel:
         with pytest.raises(OutOfBoundsError):
             NeuralNetworkRegressor(
                 InputConversionTable(),
-                [ForwardLayer(input_size=1, output_size=1)],
+                [ForwardLayer(neuron_count=1)],
             ).fit(
                 Table.from_dict({"a": [1], "b": [2]}).to_tabular_dataset("a"),
                 batch_size=batch_size,
@@ -515,7 +526,7 @@ class TestRegressionModel:
         configure_test_with_device(device)
         fitted_model = NeuralNetworkRegressor(
             InputConversionTable(),
-            [ForwardLayer(input_size=1, output_size=1)],
+            [ForwardLayer(neuron_count=1)],
         ).fit(
             Table.from_dict({"a": [1, 0, 1], "b": [2, 3, 4]}).to_tabular_dataset("a"),
             batch_size=batch_size,
@@ -534,7 +545,7 @@ class TestRegressionModel:
         configure_test_with_device(device)
         fitted_model = NeuralNetworkRegressor(
             InputConversionTable(),
-            [ForwardLayer(input_size=1, output_size=1)],
+            [ForwardLayer(neuron_count=1)],
         ).fit(
             Table.from_dict({"a": [1, 0, 1], "b": [2, 3, 4]}).to_tabular_dataset("a"),
             batch_size=batch_size,
@@ -547,7 +558,7 @@ class TestRegressionModel:
         with pytest.raises(ModelNotFittedError, match="The model has not been fitted yet."):
             NeuralNetworkRegressor(
                 InputConversionTable(),
-                [ForwardLayer(input_size=1, output_size=1)],
+                [ForwardLayer(neuron_count=1)],
             ).predict(
                 Table.from_dict({"a": [1]}),
             )
@@ -556,7 +567,7 @@ class TestRegressionModel:
         configure_test_with_device(device)
         model = NeuralNetworkRegressor(
             InputConversionTable(),
-            [ForwardLayer(input_size=1, output_size=1)],
+            [ForwardLayer(neuron_count=1)],
         )
         assert not model.is_fitted
         model = model.fit(
@@ -568,7 +579,7 @@ class TestRegressionModel:
         configure_test_with_device(device)
         model = NeuralNetworkRegressor(
             InputConversionTable(),
-            [ForwardLayer(input_size=1, output_size=1)],
+            [ForwardLayer(neuron_count=1)],
         )
         model = model.fit(
             Table.from_dict({"a": [1, 0, 2], "b": [0, 15, 5]}).to_tabular_dataset("a"),
@@ -585,7 +596,7 @@ class TestRegressionModel:
         configure_test_with_device(device)
         model = NeuralNetworkRegressor(
             InputConversionTable(),
-            [ForwardLayer(input_size=1, output_size=1)],
+            [ForwardLayer(neuron_count=1)],
         )
         trained_model = model.fit(
             Table.from_dict({"a": [1, 0, 2], "b": [0, 15, 5]}).to_tabular_dataset("b"),
@@ -598,24 +609,24 @@ class TestRegressionModel:
                 Table.from_dict({"k": [1, 0, 2], "l": [0, 15, 5]}).to_tabular_dataset("l"),
             )
 
-    def test_should_raise_if_table_size_and_input_size_mismatch(self, device: Device) -> None:
-        configure_test_with_device(device)
-        model = NeuralNetworkRegressor(
-            InputConversionTable(),
-            [ForwardLayer(input_size=1, output_size=1), ForwardLayer(output_size=3)],
-        )
-        with pytest.raises(
-            InputSizeError,
-        ):
-            model.fit(
-                Table.from_dict({"a": [1, 0, 2], "b": [0, 15, 5], "c": [3, 33, 333]}).to_tabular_dataset("a"),
-            )
+    # def test_should_raise_if_table_size_and_input_size_mismatch(self, device: Device) -> None:
+    #     configure_test_with_device(device)
+    #     model = NeuralNetworkRegressor(
+    #         InputConversionTable(),
+    #         [ForwardLayer(neuron_count=1), ForwardLayer(neuron_count=3)],
+    #     )
+    #     with pytest.raises(
+    #         InputSizeError,
+    #     ):
+    #         model.fit(
+    #             Table.from_dict({"a": [1, 0, 2], "b": [0, 15, 5], "c": [3, 33, 333]}).to_tabular_dataset("a"),
+    #         )
 
     def test_should_raise_if_fit_doesnt_batch_callback(self, device: Device) -> None:
         configure_test_with_device(device)
         model = NeuralNetworkRegressor(
             InputConversionTable(),
-            [ForwardLayer(input_size=1, output_size=1)],
+            [ForwardLayer(neuron_count=1)],
         )
 
         class Test:
@@ -637,7 +648,7 @@ class TestRegressionModel:
         configure_test_with_device(device)
         model = NeuralNetworkRegressor(
             InputConversionTable(),
-            [ForwardLayer(input_size=1, output_size=1)],
+            [ForwardLayer(neuron_count=1)],
         )
 
         class Test:
@@ -750,3 +761,23 @@ class TestRegressionModel:
         configure_test_with_device(device)
         with pytest.raises(InvalidModelStructureError, match=error_msg):
             NeuralNetworkRegressor(input_conversion, layers)
+
+    def test_should_be_pickleable(self, device: Device) -> None:
+        configure_test_with_device(device)
+        model = NeuralNetworkRegressor(
+            InputConversionTable(),
+            [
+                ForwardLayer(1),
+            ],
+        )
+        fitted_model = model.fit(
+            Table(
+                {
+                    "a": [0],
+                    "b": [0],
+                },
+            ).to_tabular_dataset("a"),
+        )
+
+        # Should not raise
+        pickle.dumps(fitted_model)

@@ -18,7 +18,7 @@ apipkg.initpkg(
     __name__,
     {
         "Discretizer": "._discretizer:Discretizer",
-        "InvertibleTableTransformer": "._table_transformer:InvertibleTableTransformer",
+        "InvertibleTableTransformer": "._invertible_table_transformer:InvertibleTableTransformer",
         "LabelEncoder": "._label_encoder:LabelEncoder",
         "OneHotEncoder": "._one_hot_encoder:OneHotEncoder",
         "RangeScaler": "._range_scaler:RangeScaler",

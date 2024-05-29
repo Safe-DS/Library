@@ -12,7 +12,6 @@ from safeds.data.tabular.containers import Table
 from safeds.data.tabular.transformation import OneHotEncoder
 from safeds.exceptions import (
     FeatureDataMismatchError,
-    InputSizeError,
     InvalidModelStructureError,
     ModelNotFittedError,
 )
@@ -33,7 +32,7 @@ from safeds.ml.nn.typing import ConstantImageSize, ModelImageSize, VariableImage
 if TYPE_CHECKING:
     from collections.abc import Callable
 
-    from torch import Tensor, nn
+    from torch import nn
     from torch.nn import Module
     from transformers.image_processing_utils import BaseImageProcessor
 
@@ -207,6 +206,8 @@ class NeuralNetworkRegressor(Generic[IFT, IPT]):
         import torch
         from torch import nn
 
+        from ._internal_model import _InternalModel  # Slow import on global level
+
         _init_default_device()
 
         if not self._input_conversion._is_fit_data_valid(train_data):
@@ -216,12 +217,14 @@ class NeuralNetworkRegressor(Generic[IFT, IPT]):
         _check_bounds("batch_size", batch_size, lower_bound=_ClosedBound(1))
 
         copied_model = copy.deepcopy(self)
-        copied_model._model = _create_internal_model(self._input_conversion, self._layers, is_for_classification=False)
+        # TODO: How is this supposed to work with pre-trained models? Should the old weights be kept or discarded?
+        copied_model._model = _InternalModel(self._input_conversion, self._layers, is_for_classification=False)
         copied_model._input_size = copied_model._model.input_size
         copied_model._batch_size = batch_size
 
-        if copied_model._input_conversion._data_size != copied_model._input_size:
-            raise InputSizeError(copied_model._input_conversion._data_size, copied_model._input_size)
+        # TODO: Re-enable or remove depending on how the above TODO is resolved
+        # if copied_model._input_conversion._data_size != copied_model._input_size:
+        #     raise InputSizeError(copied_model._input_conversion._data_size, copied_model._input_size)
 
         dataloader = copied_model._input_conversion._data_conversion_fit(train_data, copied_model._batch_size)
 
@@ -500,6 +503,8 @@ class NeuralNetworkClassifier(Generic[IFT, IPT]):
         import torch
         from torch import nn
 
+        from ._internal_model import _InternalModel  # Slow import on global level
+
         _init_default_device()
 
         if not self._input_conversion._is_fit_data_valid(train_data):
@@ -509,12 +514,14 @@ class NeuralNetworkClassifier(Generic[IFT, IPT]):
         _check_bounds("batch_size", batch_size, lower_bound=_ClosedBound(1))
 
         copied_model = copy.deepcopy(self)
-        copied_model._model = _create_internal_model(self._input_conversion, self._layers, is_for_classification=True)
+        # TODO: How is this supposed to work with pre-trained models? Should the old weights be kept or discarded?
+        copied_model._model = _InternalModel(self._input_conversion, self._layers, is_for_classification=True)
         copied_model._batch_size = batch_size
         copied_model._input_size = copied_model._model.input_size
 
-        if copied_model._input_conversion._data_size != copied_model._input_size:
-            raise InputSizeError(copied_model._input_conversion._data_size, copied_model._input_size)
+        # TODO: Re-enable or remove depending on how the above TODO is resolved
+        # if copied_model._input_conversion._data_size != copied_model._input_size:
+        #     raise InputSizeError(copied_model._input_conversion._data_size, copied_model._input_size)
 
         dataloader = copied_model._input_conversion._data_conversion_fit(
             train_data,
@@ -614,53 +621,3 @@ class NeuralNetworkClassifier(Generic[IFT, IPT]):
         """The input size of the model."""
         # TODO: raise if not fitted, don't return None
         return self._input_size
-
-
-def _create_internal_model(
-    input_conversion: InputConversion[IFT, IPT],
-    layers: list[Layer],
-    is_for_classification: bool,
-) -> nn.Module:
-    from torch import nn
-
-    _init_default_device()
-
-    class _InternalModel(nn.Module):
-        def __init__(self, layers: list[Layer], is_for_classification: bool) -> None:
-            super().__init__()
-            self._layer_list = layers
-            internal_layers = []
-            previous_output_size = None
-
-            for layer in layers:
-                if previous_output_size is not None:
-                    layer._set_input_size(previous_output_size)
-                elif isinstance(input_conversion, _InputConversionImage):
-                    layer._set_input_size(input_conversion._data_size)
-                if isinstance(layer, FlattenLayer | _Pooling2DLayer):
-                    internal_layers.append(layer._get_internal_layer())
-                else:
-                    internal_layers.append(layer._get_internal_layer(activation_function="relu"))
-                previous_output_size = layer.output_size
-
-            if is_for_classification:
-                internal_layers.pop()
-                if isinstance(layers[-1].output_size, int) and layers[-1].output_size > 2:
-                    internal_layers.append(layers[-1]._get_internal_layer(activation_function="none"))
-                else:
-                    internal_layers.append(layers[-1]._get_internal_layer(activation_function="sigmoid"))
-            self._pytorch_layers = nn.Sequential(*internal_layers)
-
-        @property
-        def input_size(self) -> int | ModelImageSize:
-            return self._layer_list[0].input_size
-
-        def forward(self, x: Tensor) -> Tensor:
-            for layer in self._pytorch_layers:
-                x = layer(x)
-            return x
-
-    # Use torch.compile once the following issues are resolved:
-    # - https://github.com/pytorch/pytorch/issues/120233 (Python 3.12 support)
-    # - https://github.com/triton-lang/triton/issues/1640 (Windows support)
-    return _InternalModel(layers, is_for_classification)
