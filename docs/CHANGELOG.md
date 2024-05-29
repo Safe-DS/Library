@@ -1,3 +1,24 @@
+## [0.26.0](https://github.com/Safe-DS/Library/compare/v0.25.0...v0.26.0) (2024-05-29)
+
+
+### Features
+
+* `Table.count_row_if` ([#788](https://github.com/Safe-DS/Library/issues/788)) ([4137131](https://github.com/Safe-DS/Library/commit/41371310bede90ed79133f5d5601ead4e4a5660e)), closes [#786](https://github.com/Safe-DS/Library/issues/786)
+* added method to load pretrained models from huggingface ([#790](https://github.com/Safe-DS/Library/issues/790)) ([dd8394b](https://github.com/Safe-DS/Library/commit/dd8394bd6e2a22ddcaebbd34e3e80da48fe65102))
+* infer input size of forward and LSTM layers ([#808](https://github.com/Safe-DS/Library/issues/808)) ([098a07f](https://github.com/Safe-DS/Library/commit/098a07fc3bd658f1d48005a5585741c94efa7475))
+* outline around dots of scatterplot ([#785](https://github.com/Safe-DS/Library/issues/785)) ([ee8acf7](https://github.com/Safe-DS/Library/commit/ee8acf762cef001a111c2d19c8f640ca6790de0c))
+* remove output conversions ([#792](https://github.com/Safe-DS/Library/issues/792)) ([46f2f5d](https://github.com/Safe-DS/Library/commit/46f2f5d23c38cd011b1097a08b00b9229586abe5)), closes [#732](https://github.com/Safe-DS/Library/issues/732)
+* shorten some excessively long names ([#787](https://github.com/Safe-DS/Library/issues/787)) ([1c3ea59](https://github.com/Safe-DS/Library/commit/1c3ea599150d4a94cb41b5fcae5d1364c7f5915c)), closes [#772](https://github.com/Safe-DS/Library/issues/772)
+* specify column names in constructor of table transformers ([#795](https://github.com/Safe-DS/Library/issues/795)) ([69a780c](https://github.com/Safe-DS/Library/commit/69a780cab1a5dcab33c8c7a36f03bd2eb3367683))
+* store window size and forecast horizon in dataset ([#794](https://github.com/Safe-DS/Library/issues/794)) ([f07bc5a](https://github.com/Safe-DS/Library/commit/f07bc5a51c737ce47fb1c90e6ca68b837cdd6989))
+* string operations on cells ([#791](https://github.com/Safe-DS/Library/issues/791)) ([4a17f76](https://github.com/Safe-DS/Library/commit/4a17f76845683eb5493b6c177ed25638217b24e0))
+
+
+### Bug Fixes
+
+* handling of boolean columns in column statistics ([#778](https://github.com/Safe-DS/Library/issues/778)) ([f61cceb](https://github.com/Safe-DS/Library/commit/f61cceb0e6dba534ae940046efc75555648bccda))
+* sort x values of line plot ([#782](https://github.com/Safe-DS/Library/issues/782)) ([74d8649](https://github.com/Safe-DS/Library/commit/74d8649dd4d84b8a1eb89b404146a240e8c69b91))
+
 ## [0.25.0](https://github.com/Safe-DS/Library/compare/v0.24.0...v0.25.0) (2024-05-15)
 
 
