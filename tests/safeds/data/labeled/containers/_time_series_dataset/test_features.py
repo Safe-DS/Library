@@ -33,7 +33,7 @@ from safeds.data.tabular.containers import Table
                 window_size=1,
                 extra_names=["B"],
             ),
-            Table({"A": [1, 4], "C": [3, 6], "time":[0,0]}),
+            Table({"A": [1, 4], "C": [3, 6], "time": [0, 0]}),
         ),
     ],
     ids=["only_target_and_features", "target_features_and_other"],

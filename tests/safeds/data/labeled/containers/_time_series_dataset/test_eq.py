@@ -9,13 +9,13 @@ from safeds.data.tabular.containers import Table
     ("table1", "table2", "expected"),
     [
         (
-            TimeSeriesDataset({"a": [], "b": [], "c": []}, "b",  window_size=1),
-            TimeSeriesDataset({"a": [], "b": [], "c": []}, "b",  window_size=1),
+            TimeSeriesDataset({"a": [], "b": [], "c": []}, "b", window_size=1),
+            TimeSeriesDataset({"a": [], "b": [], "c": []}, "b", window_size=1),
             True,
         ),
         (
-            TimeSeriesDataset({"a": [1, 2, 3], "b": [4, 5, 6], "c": [4, 5, 6]}, "b",  window_size=1),
-            TimeSeriesDataset({"a": [1, 2, 3], "b": [4, 5, 6], "c": [4, 5, 6]}, "b",  window_size=1),
+            TimeSeriesDataset({"a": [1, 2, 3], "b": [4, 5, 6], "c": [4, 5, 6]}, "b", window_size=1),
+            TimeSeriesDataset({"a": [1, 2, 3], "b": [4, 5, 6], "c": [4, 5, 6]}, "b", window_size=1),
             True,
         ),
         (
@@ -49,13 +49,13 @@ from safeds.data.tabular.containers import Table
             False,
         ),
         (
-            TimeSeriesDataset({"a": [1, 2, 3], "b": [4, 5, 6]}, "b",  window_size=1),
-            TimeSeriesDataset({"a": [1, 1, 3], "b": [4, 5, 6]}, "b",  window_size=1),
+            TimeSeriesDataset({"a": [1, 2, 3], "b": [4, 5, 6]}, "b", window_size=1),
+            TimeSeriesDataset({"a": [1, 1, 3], "b": [4, 5, 6]}, "b", window_size=1),
             False,
         ),
         (
             TimeSeriesDataset({"a": [1, 2, 3], "b": [4, 5, 6]}, "b", window_size=1),
-            TimeSeriesDataset({"a": ["1", "2", "3"], "b": [4, 5, 6]}, "b",  window_size=1),
+            TimeSeriesDataset({"a": ["1", "2", "3"], "b": [4, 5, 6]}, "b", window_size=1),
             False,
         ),
         (
@@ -100,7 +100,7 @@ def test_should_return_whether_two_tabular_datasets_are_equal(
             None,
         ),
         (
-            TimeSeriesDataset({"a": [1, 2, 3], "b": [4, 5, 6], "c": [0, 0, 0]}, "b",  window_size=1),
+            TimeSeriesDataset({"a": [1, 2, 3], "b": [4, 5, 6], "c": [0, 0, 0]}, "b", window_size=1),
             Table(),
         ),
     ],

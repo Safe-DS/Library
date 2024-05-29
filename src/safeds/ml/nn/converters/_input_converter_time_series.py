@@ -124,10 +124,9 @@ class InputConversionTimeSeries(InputConversion[TimeSeriesDataset, TimeSeriesDat
             self._target_name = input_data.target.name
             self._continuous = input_data._continuous
             self._first = False
-        return (
-            (sorted(input_data.features.column_names)).__eq__(sorted(self._feature_names))
-            and input_data.target.name == self._target_name
-        )
+        return (sorted(input_data.features.column_names)).__eq__(
+            sorted(self._feature_names),
+        ) and input_data.target.name == self._target_name
 
     def _is_predict_data_valid(self, input_data: TimeSeriesDataset) -> bool:
         return self._is_fit_data_valid(input_data)

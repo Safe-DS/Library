@@ -255,7 +255,7 @@ class TablePlotter:
             )
 
         fig, ax = plt.subplots()
-        for name, y in zip(y_names, y_s):
+        for name, y in zip(y_names, y_s, strict=False):
             ax.plot(x, y, label=name)
 
         if show_confidence_interval:
@@ -332,7 +332,7 @@ class TablePlotter:
                 s=64,  # marker size
                 linewidth=1,
                 edgecolor="white",
-                label = y_name,
+                label=y_name,
             )
         if len(y_names) > 1:
             name = "values"
@@ -352,7 +352,6 @@ class TablePlotter:
         fig.tight_layout()
 
         return _figure_to_image(fig)
-
 
 
 def _plot_validation(table: Table, x_name: str, y_names: list[str]) -> None:

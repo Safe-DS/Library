@@ -7,15 +7,15 @@ from safeds.data.labeled.containers import TimeSeriesDataset
     [
         (
             TimeSeriesDataset({"a": [], "b": []}, "b", window_size=1),
-            TimeSeriesDataset({"a": [], "b": []}, "b",  window_size=1),
+            TimeSeriesDataset({"a": [], "b": []}, "b", window_size=1),
         ),
         (
-            TimeSeriesDataset({"a": [1, 2, 3], "b": [4, 5, 6]}, "b",  window_size=1),
-            TimeSeriesDataset({"a": [1, 2, 3], "b": [4, 5, 6]}, "b",  window_size=1),
+            TimeSeriesDataset({"a": [1, 2, 3], "b": [4, 5, 6]}, "b", window_size=1),
+            TimeSeriesDataset({"a": [1, 2, 3], "b": [4, 5, 6]}, "b", window_size=1),
         ),
         (
-            TimeSeriesDataset({"a": [1, 2, 3], "b": [4, 5, 6]}, "b",  window_size=1),
-            TimeSeriesDataset({"a": [1, 1, 3], "b": [4, 5, 6]}, "b",  window_size=1),
+            TimeSeriesDataset({"a": [1, 2, 3], "b": [4, 5, 6]}, "b", window_size=1),
+            TimeSeriesDataset({"a": [1, 1, 3], "b": [4, 5, 6]}, "b", window_size=1),
         ),
     ],
     ids=[
@@ -64,7 +64,7 @@ def test_should_return_same_hash_for_equal_tabular_datasets(
         ),
         (
             TimeSeriesDataset({"a": [1, 2, 3], "b": [4, 5, 6]}, "b", window_size=1),
-            TimeSeriesDataset({"a": ["1", "2", "3"], "b": [4, 5, 6]}, "b",  window_size=1),
+            TimeSeriesDataset({"a": ["1", "2", "3"], "b": [4, 5, 6]}, "b", window_size=1),
         ),
         (
             TimeSeriesDataset(

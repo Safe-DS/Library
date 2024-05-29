@@ -145,6 +145,7 @@ def test_correct_structure_of_time_series() -> None:
     pred_table = model.predict(data)
     assert pred_table.column_names.sort() == data.features.column_names.sort()
 
+
 def test_should_raise_if_not_fitted() -> None:
     model = ArimaModelRegressor()
     with pytest.raises(ModelNotFittedError):
