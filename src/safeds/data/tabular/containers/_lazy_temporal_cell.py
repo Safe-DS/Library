@@ -31,12 +31,12 @@ class _LazyTemporalCell(TemporalCell):
     # Temporal operations
     # ------------------------------------------------------------------------------------------------------------------
 
-    def datetime_to_string(self, format_string: str = "%Y/%m/%d %H:%M:%S") -> Cell[str | None]:
+    def datetime_to_string(self, format_string: str = "%Y/%m/%d %H:%M:%S") -> Cell[str]:
         if not _check_format_string(format_string):
             raise ValueError("Invalid format string")
         return _LazyCell(self._expression.dt.to_string(format=format_string))
 
-    def date_to_string(self, format_string: str = "%F") -> Cell[str | None]:
+    def date_to_string(self, format_string: str = "%F") -> Cell[str]:
         if not _check_format_string(format_string):
             #Fehler in _check_format_string
             raise ValueError("Invalid format string")
