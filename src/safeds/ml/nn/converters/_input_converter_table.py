@@ -20,11 +20,10 @@ class InputConversionTable(InputConversion[TabularDataset, Table]):
         The name of the new column where the prediction will be stored.
     """
 
-    def __init__(self, *, prediction_name: str = "prediction") -> None:
+    def __init__(self) -> None:
         self._target_name = ""
         self._feature_names: list[str] = []
         self._first = True
-        self._prediction_name = prediction_name  # TODO: use target name, override existing column
 
     @property
     def _data_size(self) -> int:
@@ -40,8 +39,8 @@ class InputConversionTable(InputConversion[TabularDataset, Table]):
         return input_data._into_dataloader(batch_size)
 
     def _data_conversion_output(self, input_data: Table, output_data: Tensor) -> TabularDataset:
-        return input_data.add_columns([Column(self._prediction_name, output_data.tolist())]).to_tabular_dataset(
-            self._prediction_name,
+        return input_data.add_columns([Column(self._target_name, output_data.tolist())]).to_tabular_dataset(
+            self._target_name,
         )
 
     def _is_fit_data_valid(self, input_data: TabularDataset) -> bool:

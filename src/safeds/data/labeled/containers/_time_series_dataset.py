@@ -30,8 +30,6 @@ class TimeSeriesDataset(Dataset[Table, Column]):
         The data.
     target_name:
         The name of the target column.
-    time_name:
-        The name of the time column.
     window_size:
         The number of consecutive sample to use as input for prediction.
     extra_names:

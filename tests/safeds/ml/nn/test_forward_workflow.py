@@ -34,7 +34,7 @@ def test_forward_model(device: Device) -> None:
     _, train_table = ss.fit_and_transform(train_table)
     _, test_table = ss.fit_and_transform(test_table)
     model = NeuralNetworkRegressor(
-        InputConversionTable(prediction_name="predicted"),
+        InputConversionTable(),
         [ForwardLayer(neuron_count=1)],
     )
 
