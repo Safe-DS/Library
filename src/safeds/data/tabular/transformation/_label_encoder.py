@@ -60,6 +60,7 @@ class LabelEncoder(InvertibleTableTransformer):
 
     @property
     def is_fitted(self) -> bool:
+        """Whether the transformer is fitted."""
         return self._mapping is not None and self._inverse_mapping is not None
 
     @property

@@ -63,6 +63,7 @@ class Discretizer(TableTransformer):
 
     @property
     def is_fitted(self) -> bool:
+        """Whether the transformer is fitted."""
         return self._wrapped_transformer is not None
 
     @property
