@@ -16,10 +16,6 @@ class InputConversionTable(InputConversion[TabularDataset, Table]):
     """
     The input conversion for a neural network, defines the input parameters for the neural network.
 
-    Parameters
-    ----------
-    prediction_name:
-        The name of the new column where the prediction will be stored.
     """
 
     def __init__(self) -> None:
