@@ -196,8 +196,8 @@ class TabularDataset(Dataset[Table, Column]):
         if num_of_classes <= 2:
             return DataLoader(
                 dataset=_create_dataset(
-                    torch.Tensor(self.features._data_frame.to_numpy()).to(_get_device()),
-                    torch.Tensor(self.target._series.to_numpy()).to(_get_device()).unsqueeze(dim=-1),
+                    self.features._data_frame.to_torch().to(_get_device()),
+                    self.target._series.to_torch().to(_get_device()).unsqueeze(dim=-1),
                 ),
                 batch_size=batch_size,
                 shuffle=True,
@@ -206,9 +206,9 @@ class TabularDataset(Dataset[Table, Column]):
         else:
             return DataLoader(
                 dataset=_create_dataset(
-                    torch.Tensor(self.features._data_frame.to_numpy()).to(_get_device()),
+                    self.features._data_frame.to_torch().to(_get_device()),
                     torch.nn.functional.one_hot(
-                        torch.LongTensor(self.target._series.to_numpy()).to(_get_device()),
+                        self.target._series.to_torch().to(_get_device()),
                         num_classes=num_of_classes,
                     ),
                 ),
