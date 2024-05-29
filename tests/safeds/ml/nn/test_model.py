@@ -1,3 +1,5 @@
+import pickle
+
 import pytest
 from safeds.data.image.typing import ImageSize
 from safeds.data.labeled.containers import TabularDataset
@@ -442,6 +444,26 @@ class TestClassificationModel:
         with pytest.raises(InvalidModelStructureError, match=error_msg):
             NeuralNetworkClassifier(input_conversion, layers)
 
+    def test_should_be_pickleable(self, device: Device) -> None:
+        configure_test_with_device(device)
+        model = NeuralNetworkClassifier(
+            InputConversionTable(),
+            [
+                ForwardLayer(1),
+            ],
+        )
+        fitted_model = model.fit(
+            Table(
+                {
+                    "a": [0],
+                    "b": [0],
+                },
+            ).to_tabular_dataset("a"),
+        )
+
+        # Should not raise
+        pickle.dumps(fitted_model)
+
 
 @pytest.mark.parametrize("device", get_devices(), ids=get_devices_ids())
 class TestRegressionModel:
@@ -739,3 +761,23 @@ class TestRegressionModel:
         configure_test_with_device(device)
         with pytest.raises(InvalidModelStructureError, match=error_msg):
             NeuralNetworkRegressor(input_conversion, layers)
+
+    def test_should_be_pickleable(self, device: Device) -> None:
+        configure_test_with_device(device)
+        model = NeuralNetworkRegressor(
+            InputConversionTable(),
+            [
+                ForwardLayer(1),
+            ],
+        )
+        fitted_model = model.fit(
+            Table(
+                {
+                    "a": [0],
+                    "b": [0],
+                },
+            ).to_tabular_dataset("a"),
+        )
+
+        # Should not raise
+        pickle.dumps(fitted_model)

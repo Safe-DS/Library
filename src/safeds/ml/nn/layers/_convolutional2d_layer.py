@@ -4,82 +4,14 @@ import math
 import sys
 from typing import TYPE_CHECKING, Any, Literal
 
-from safeds._config import _init_default_device
 from safeds._utils import _structural_hash
 
 from ._layer import Layer
 
 if TYPE_CHECKING:
-    from torch import Tensor, nn
-
-    from safeds.ml.nn.typing import ModelImageSize
-
-
-def _create_internal_model(
-    input_size: int,
-    output_size: int,
-    kernel_size: int,
-    activation_function: Literal["sigmoid", "relu", "softmax"],
-    padding: int,
-    stride: int,
-    transpose: bool,
-    output_padding: int = 0,
-) -> nn.Module:
     from torch import nn
 
-    _init_default_device()
-
-    class _InternalLayer(nn.Module):
-        def __init__(
-            self,
-            input_size: int,
-            output_size: int,
-            kernel_size: int,
-            activation_function: Literal["sigmoid", "relu", "softmax"],
-            padding: int,
-            stride: int,
-            transpose: bool,
-            output_padding: int,
-        ):
-            super().__init__()
-            if transpose:
-                self._layer = nn.ConvTranspose2d(
-                    in_channels=input_size,
-                    out_channels=output_size,
-                    kernel_size=kernel_size,
-                    padding=padding,
-                    stride=stride,
-                    output_padding=output_padding,
-                )
-            else:
-                self._layer = nn.Conv2d(
-                    in_channels=input_size,
-                    out_channels=output_size,
-                    kernel_size=kernel_size,
-                    padding=padding,
-                    stride=stride,
-                )
-            match activation_function:
-                case "sigmoid":
-                    self._fn = nn.Sigmoid()
-                case "relu":
-                    self._fn = nn.ReLU()
-                case "softmax":
-                    self._fn = nn.Softmax()
-
-        def forward(self, x: Tensor) -> Tensor:
-            return self._fn(self._layer(x))
-
-    return _InternalLayer(
-        input_size,
-        output_size,
-        kernel_size,
-        activation_function,
-        padding,
-        stride,
-        transpose,
-        output_padding,
-    )
+    from safeds.ml.nn.typing import ModelImageSize
 
 
 class Convolutional2DLayer(Layer):
@@ -107,6 +39,8 @@ class Convolutional2DLayer(Layer):
         self._output_size: ModelImageSize | None = None
 
     def _get_internal_layer(self, **kwargs: Any) -> nn.Module:
+        from ._internal_layers import _InternalConvolutional2DLayer  # slow import on global level
+
         if self._input_size is None:
             raise ValueError(
                 "The input_size is not yet set. The internal layer can only be created when the input_size is set.",
@@ -121,7 +55,7 @@ class Convolutional2DLayer(Layer):
             )
         else:
             activation_function: Literal["sigmoid", "relu", "softmax"] = kwargs["activation_function"]
-        return _create_internal_model(
+        return _InternalConvolutional2DLayer(
             self._input_size.channel,
             self._output_channel,
             self._kernel_size,
@@ -129,6 +63,7 @@ class Convolutional2DLayer(Layer):
             self._padding,
             self._stride,
             transpose=False,
+            output_padding=0,
         )
 
     @property
@@ -254,6 +189,8 @@ class ConvolutionalTranspose2DLayer(Convolutional2DLayer):
         self._output_padding = output_padding
 
     def _get_internal_layer(self, **kwargs: Any) -> nn.Module:
+        from ._internal_layers import _InternalConvolutional2DLayer  # slow import on global level
+
         if self._input_size is None:
             raise ValueError(
                 "The input_size is not yet set. The internal layer can only be created when the input_size is set.",
@@ -268,7 +205,7 @@ class ConvolutionalTranspose2DLayer(Convolutional2DLayer):
             )
         else:
             activation_function: Literal["sigmoid", "relu", "softmax"] = kwargs["activation_function"]
-        return _create_internal_model(
+        return _InternalConvolutional2DLayer(
             self._input_size.channel,
             self._output_channel,
             self._kernel_size,

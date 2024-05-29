@@ -4,13 +4,12 @@ import math
 import sys
 from typing import TYPE_CHECKING, Any, Literal
 
-from safeds._config import _init_default_device
 from safeds._utils import _structural_hash
 
 from ._layer import Layer
 
 if TYPE_CHECKING:
-    from torch import Tensor, nn
+    from torch import nn
 
     from safeds.ml.nn.typing import ModelImageSize
 
@@ -40,7 +39,9 @@ class _Pooling2DLayer(Layer):
         self._output_size: ModelImageSize | None = None
 
     def _get_internal_layer(self, **kwargs: Any) -> nn.Module:  # noqa: ARG002
-        return _create_internal_model(self._strategy, self._kernel_size, self._padding, self._stride)
+        from ._internal_layers import _InternalPooling2DLayer  # Slow import on global level
+
+        return _InternalPooling2DLayer(self._strategy, self._kernel_size, self._padding, self._stride)
 
     @property
     def input_size(self) -> ModelImageSize:
@@ -168,23 +169,3 @@ class AveragePooling2DLayer(_Pooling2DLayer):
 
     def __init__(self, kernel_size: int, *, stride: int = -1, padding: int = 0) -> None:
         super().__init__("avg", kernel_size, stride=stride, padding=padding)
-
-
-def _create_internal_model(strategy: Literal["max", "avg"], kernel_size: int, padding: int, stride: int) -> nn.Module:
-    from torch import nn
-
-    _init_default_device()
-
-    class _InternalLayer(nn.Module):
-        def __init__(self, strategy: Literal["max", "avg"], kernel_size: int, padding: int, stride: int):
-            super().__init__()
-            match strategy:
-                case "max":
-                    self._layer = nn.MaxPool2d(kernel_size=kernel_size, padding=padding, stride=stride)
-                case "avg":
-                    self._layer = nn.AvgPool2d(kernel_size=kernel_size, padding=padding, stride=stride)
-
-        def forward(self, x: Tensor) -> Tensor:
-            return self._layer(x)
-
-    return _InternalLayer(strategy, kernel_size, padding, stride)

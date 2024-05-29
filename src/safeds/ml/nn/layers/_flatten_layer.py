@@ -3,32 +3,15 @@ from __future__ import annotations
 import sys
 from typing import TYPE_CHECKING, Any
 
-from safeds._config import _init_default_device
 from safeds._utils import _structural_hash
 from safeds.ml.nn.typing import ConstantImageSize
 
 from ._layer import Layer
 
 if TYPE_CHECKING:
-    from torch import Tensor, nn
-
-    from safeds.ml.nn.typing import ModelImageSize
-
-
-def _create_internal_model() -> nn.Module:
     from torch import nn
 
-    _init_default_device()
-
-    class _InternalLayer(nn.Module):
-        def __init__(self) -> None:
-            super().__init__()
-            self._layer = nn.Flatten()
-
-        def forward(self, x: Tensor) -> Tensor:
-            return self._layer(x)
-
-    return _InternalLayer()
+    from safeds.ml.nn.typing import ModelImageSize
 
 
 class FlattenLayer(Layer):
@@ -39,7 +22,9 @@ class FlattenLayer(Layer):
         self._output_size: int | None = None
 
     def _get_internal_layer(self, **kwargs: Any) -> nn.Module:  # noqa: ARG002
-        return _create_internal_model()
+        from ._internal_layers import _InternalFlattenLayer  # Slow import on global level
+
+        return _InternalFlattenLayer()
 
     @property
     def input_size(self) -> ModelImageSize:
