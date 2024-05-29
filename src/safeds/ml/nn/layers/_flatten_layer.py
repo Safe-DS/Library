@@ -3,32 +3,15 @@ from __future__ import annotations
 import sys
 from typing import TYPE_CHECKING, Any
 
-from safeds._config import _init_default_device
 from safeds._utils import _structural_hash
 from safeds.ml.nn.typing import ConstantImageSize
 
 from ._layer import Layer
 
 if TYPE_CHECKING:
-    from torch import Tensor, nn
-
-    from safeds.ml.nn.typing import ModelImageSize
-
-
-def _create_internal_model() -> nn.Module:
     from torch import nn
 
-    _init_default_device()
-
-    class _InternalLayer(nn.Module):
-        def __init__(self) -> None:
-            super().__init__()
-            self._layer = nn.Flatten()
-
-        def forward(self, x: Tensor) -> Tensor:
-            return self._layer(x)
-
-    return _InternalLayer()
+    from safeds.ml.nn.typing import ModelImageSize
 
 
 class FlattenLayer(Layer):
@@ -39,7 +22,9 @@ class FlattenLayer(Layer):
         self._output_size: int | None = None
 
     def _get_internal_layer(self, **kwargs: Any) -> nn.Module:  # noqa: ARG002
-        return _create_internal_model()
+        from ._internal_layers import _InternalFlattenLayer  # Slow import on global level
+
+        return _InternalFlattenLayer()
 
     @property
     def input_size(self) -> ModelImageSize:
@@ -48,7 +33,7 @@ class FlattenLayer(Layer):
 
         Returns
         -------
-        result :
+        result:
             The amount of values being passed into this layer.
 
         Raises
@@ -67,8 +52,8 @@ class FlattenLayer(Layer):
 
         Returns
         -------
-        result :
-            The Number of Neurons in this layer.
+        result:
+            The number of neurons in this layer.
 
         Raises
         ------
@@ -92,41 +77,12 @@ class FlattenLayer(Layer):
         self._output_size = None
 
     def __hash__(self) -> int:
-        """
-        Return a deterministic hash value for this flatten layer.
-
-        Returns
-        -------
-        hash:
-            the hash value
-        """
         return _structural_hash(self._input_size, self._output_size)
 
     def __eq__(self, other: object) -> bool:
-        """
-        Compare two flatten layer.
-
-        Parameters
-        ----------
-        other:
-            The flatten layer to compare to.
-
-        Returns
-        -------
-        equals:
-            Whether the two flatten layer are the same.
-        """
         if not isinstance(other, FlattenLayer):
             return NotImplemented
         return (self is other) or (self._input_size == other._input_size and self._output_size == other._output_size)
 
     def __sizeof__(self) -> int:
-        """
-        Return the complete size of this object.
-
-        Returns
-        -------
-        size:
-            Size of this object in bytes.
-        """
         return sys.getsizeof(self._input_size) + sys.getsizeof(self._output_size)

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from abc import abstractmethod
+from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
 from ._table_transformer import TableTransformer
@@ -9,7 +9,7 @@ if TYPE_CHECKING:
     from safeds.data.tabular.containers import Table
 
 
-class InvertibleTableTransformer(TableTransformer):
+class InvertibleTableTransformer(TableTransformer, ABC):
     """A `TableTransformer` that can also undo the learned transformation after it has been applied."""
 
     @abstractmethod

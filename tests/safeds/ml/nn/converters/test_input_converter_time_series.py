@@ -16,7 +16,7 @@ from safeds.ml.nn.layers import (
 def test_should_raise_if_is_fitted_is_set_correctly_lstm() -> None:
     model = NeuralNetworkRegressor(
         InputConversionTimeSeries(),
-        [LSTMLayer(input_size=2, output_size=1)],
+        [LSTMLayer(neuron_count=1)],
     )
     ts = Table.from_dict({"target": [1, 1, 1, 1], "time": [0, 0, 0, 0], "feat": [0, 0, 0, 0]}).to_time_series_dataset(
         target_name="target",

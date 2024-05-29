@@ -108,6 +108,7 @@ class OneHotEncoder(InvertibleTableTransformer):
 
     @property
     def is_fitted(self) -> bool:
+        """Whether the transformer is fitted."""
         return self._mapping is not None
 
     @property

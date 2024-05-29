@@ -63,10 +63,12 @@ class Discretizer(TableTransformer):
 
     @property
     def is_fitted(self) -> bool:
+        """Whether the transformer is fitted."""
         return self._wrapped_transformer is not None
 
     @property
     def bin_count(self) -> int:
+        """The number of bins to be created."""
         return self._bin_count
 
     # ------------------------------------------------------------------------------------------------------------------
