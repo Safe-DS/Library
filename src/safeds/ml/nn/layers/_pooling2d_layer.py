@@ -69,7 +69,7 @@ class _Pooling2DLayer(Layer):
         Returns
         -------
         result:
-            The Number of Neurons in this layer.
+            The number of neurons in this layer.
 
         Raises
         ------

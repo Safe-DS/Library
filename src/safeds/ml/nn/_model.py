@@ -12,7 +12,6 @@ from safeds.data.tabular.containers import Table
 from safeds.data.tabular.transformation import OneHotEncoder
 from safeds.exceptions import (
     FeatureDataMismatchError,
-    InputSizeError,
     InvalidModelStructureError,
     ModelNotFittedError,
 )
@@ -216,12 +215,14 @@ class NeuralNetworkRegressor(Generic[IFT, IPT]):
         _check_bounds("batch_size", batch_size, lower_bound=_ClosedBound(1))
 
         copied_model = copy.deepcopy(self)
+        # TODO: How is this supposed to work with pre-trained models? Should the old weights be kept or discarded?
         copied_model._model = _create_internal_model(self._input_conversion, self._layers, is_for_classification=False)
         copied_model._input_size = copied_model._model.input_size
         copied_model._batch_size = batch_size
 
-        if copied_model._input_conversion._data_size != copied_model._input_size:
-            raise InputSizeError(copied_model._input_conversion._data_size, copied_model._input_size)
+        # TODO: Re-enable or remove depending on how the above TODO is resolved
+        # if copied_model._input_conversion._data_size != copied_model._input_size:
+        #     raise InputSizeError(copied_model._input_conversion._data_size, copied_model._input_size)
 
         dataloader = copied_model._input_conversion._data_conversion_fit(train_data, copied_model._batch_size)
 
@@ -509,12 +510,14 @@ class NeuralNetworkClassifier(Generic[IFT, IPT]):
         _check_bounds("batch_size", batch_size, lower_bound=_ClosedBound(1))
 
         copied_model = copy.deepcopy(self)
+        # TODO: How is this supposed to work with pre-trained models? Should the old weights be kept or discarded?
         copied_model._model = _create_internal_model(self._input_conversion, self._layers, is_for_classification=True)
         copied_model._batch_size = batch_size
         copied_model._input_size = copied_model._model.input_size
 
-        if copied_model._input_conversion._data_size != copied_model._input_size:
-            raise InputSizeError(copied_model._input_conversion._data_size, copied_model._input_size)
+        # TODO: Re-enable or remove depending on how the above TODO is resolved
+        # if copied_model._input_conversion._data_size != copied_model._input_size:
+        #     raise InputSizeError(copied_model._input_conversion._data_size, copied_model._input_size)
 
         dataloader = copied_model._input_conversion._data_conversion_fit(
             train_data,
@@ -630,7 +633,7 @@ def _create_internal_model(
             super().__init__()
             self._layer_list = layers
             internal_layers = []
-            previous_output_size = None
+            previous_output_size = input_conversion._data_size
 
             for layer in layers:
                 if previous_output_size is not None:

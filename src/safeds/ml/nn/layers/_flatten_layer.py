@@ -48,7 +48,7 @@ class FlattenLayer(Layer):
 
         Returns
         -------
-        result :
+        result:
             The amount of values being passed into this layer.
 
         Raises
@@ -67,8 +67,8 @@ class FlattenLayer(Layer):
 
         Returns
         -------
-        result :
-            The Number of Neurons in this layer.
+        result:
+            The number of neurons in this layer.
 
         Raises
         ------

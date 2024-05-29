@@ -21,8 +21,6 @@ class ForwardLayer(Layer):
     ----------
     output_size:
         The number of neurons in this layer
-    input_size:
-        The number of neurons in the previous layer
 
     Raises
     ------
@@ -31,12 +29,10 @@ class ForwardLayer(Layer):
         If output_size < 1
     """
 
-    def __init__(self, output_size: int, input_size: int | None = None):
-        if input_size is not None:
-            self._set_input_size(input_size=input_size)
-
+    def __init__(self, output_size: int):
         _check_bounds("output_size", output_size, lower_bound=_ClosedBound(1))
 
+        self._input_size: int | None = None
         self._output_size = output_size
 
     def _get_internal_layer(self, **kwargs: Any) -> nn.Module:
@@ -46,6 +42,10 @@ class ForwardLayer(Layer):
             )
         else:
             activation_function: str = kwargs["activation_function"]
+
+        if self._input_size is None:
+            raise ValueError("The input_size is not yet set.")
+
         return _create_internal_model(self._input_size, self._output_size, activation_function)
 
     @property
@@ -58,6 +58,9 @@ class ForwardLayer(Layer):
         result:
             The amount of values being passed into this layer.
         """
+        if self._input_size is None:
+            raise ValueError("The input_size is not yet set.")
+
         return self._input_size
 
     @property
@@ -68,15 +71,13 @@ class ForwardLayer(Layer):
         Returns
         -------
         result:
-            The Number of Neurons in this layer.
+            The number of neurons in this layer.
         """
         return self._output_size
 
     def _set_input_size(self, input_size: int | ModelImageSize) -> None:
         if isinstance(input_size, ModelImageSize):
             raise TypeError("The input_size of a forward layer has to be of type int.")
-
-        _check_bounds("input_size", input_size, lower_bound=_ClosedBound(1))
 
         self._input_size = input_size
 
