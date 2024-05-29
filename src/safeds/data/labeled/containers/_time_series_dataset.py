@@ -68,7 +68,6 @@ class TimeSeriesDataset(Dataset[Table, Column]):
         self,
         data: Table | Mapping[str, Sequence[Any]],
         target_name: str,
-        time_name: str,
         window_size: int,
         *,
         extra_names: list[str] | None = None,
@@ -84,12 +83,10 @@ class TimeSeriesDataset(Dataset[Table, Column]):
             extra_names = []
 
         # Derive feature names (build the set once, since comprehensions evaluate their condition every iteration)
-        non_feature_names = {target_name, time_name, *extra_names}
+        non_feature_names = {target_name, *extra_names}
         feature_names = [name for name in data.column_names if name not in non_feature_names]
 
         # Validate inputs
-        if time_name in extra_names:
-            raise ValueError(f"Column '{time_name}' cannot be both time and extra.")
         if target_name in extra_names:
             raise ValueError(f"Column '{target_name}' cannot be both target and extra.")
         if len(feature_names) == 0:
@@ -99,7 +96,6 @@ class TimeSeriesDataset(Dataset[Table, Column]):
         self._table: Table = data
         self._features: Table = data.remove_columns_except(feature_names)
         self._target: Column = data.get_column(target_name)
-        self._time: Column = data.get_column(time_name)
         self._window_size: int = window_size
         self._forecast_horizon: int = forecast_horizon
         self._extras: Table = data.remove_columns_except(extra_names)
@@ -122,7 +118,6 @@ class TimeSeriesDataset(Dataset[Table, Column]):
             and self.target == other.target
             and self.features == other.features
             and self.extras == other.extras
-            and self.time == other.time
         )
 
     def __hash__(self) -> int:
@@ -138,7 +133,6 @@ class TimeSeriesDataset(Dataset[Table, Column]):
             self.target,
             self.features,
             self.extras,
-            self.time,
             self._window_size,
             self._forecast_horizon,
         )
@@ -156,7 +150,6 @@ class TimeSeriesDataset(Dataset[Table, Column]):
             sys.getsizeof(self._target)
             + sys.getsizeof(self._features)
             + sys.getsizeof(self.extras)
-            + sys.getsizeof(self._time)
             + sys.getsizeof(self._window_size)
             + sys.getsizeof(self._forecast_horizon)
         )
@@ -175,10 +168,6 @@ class TimeSeriesDataset(Dataset[Table, Column]):
         """The target column of the time series dataset."""
         return self._target
 
-    @property
-    def time(self) -> Column:
-        """The time column of the time series dataset."""
-        return self._time
 
     @property
     def window_size(self) -> int:

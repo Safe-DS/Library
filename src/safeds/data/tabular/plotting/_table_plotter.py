@@ -255,8 +255,8 @@ class TablePlotter:
             )
 
         fig, ax = plt.subplots()
-        for y in y_s:
-            ax.plot(x, y)
+        for name, y in zip(y_names, y_s):
+            ax.plot(x, y, label=name)
 
         if show_confidence_interval:
             for y, conf in zip(y_s, confidence_intervals, strict=False):
@@ -267,10 +267,15 @@ class TablePlotter:
                     color="lightblue",
                     alpha=0.15,
                 )
+        if len(y_names) > 1:
+            name = "values"
+        else:
+            name = y_names[0]
         ax.set(
             xlabel=x_name,
-            ylabel=y_names,
+            ylabel=name,
         )
+        ax.legend()
         ax.set_xticks(ax.get_xticks())
         ax.set_xticklabels(
             ax.get_xticklabels(),
@@ -327,11 +332,17 @@ class TablePlotter:
                 s=64,  # marker size
                 linewidth=1,
                 edgecolor="white",
+                label = y_name,
             )
-            ax.set(
-                xlabel=x_name,
-                ylabel=y_names,
-            )
+        if len(y_names) > 1:
+            name = "values"
+        else:
+            name = y_names[0]
+        ax.set(
+            xlabel=x_name,
+            ylabel=name,
+        )
+        ax.legend()
         ax.set_xticks(ax.get_xticks())
         ax.set_xticklabels(
             ax.get_xticklabels(),
@@ -342,7 +353,6 @@ class TablePlotter:
 
         return _figure_to_image(fig)
 
-    # TODO: equivalent to Column.plot_compare_columns that takes a list of column names (index_plot)?
 
 
 def _plot_validation(table: Table, x_name: str, y_names: list[str]) -> None:

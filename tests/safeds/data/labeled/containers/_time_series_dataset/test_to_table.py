@@ -14,7 +14,6 @@ from safeds.data.tabular.containers import Table
                     "target": [1, 3, 2],
                 },
                 target_name="target",
-                time_name="feature_1",
                 window_size=1,
             ),
             Table(
@@ -34,7 +33,6 @@ from safeds.data.tabular.containers import Table
                     "target": [1, 3, 2],
                 },
                 target_name="target",
-                time_name="feature_1",
                 window_size=1,
                 extra_names=["other"],
             ),

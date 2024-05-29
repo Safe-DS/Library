@@ -38,6 +38,7 @@ class _LazyTemporalCell(TemporalCell):
 
     def date_to_string(self, format_string: str = "%F") -> Cell[str | None]:
         if not _check_format_string(format_string):
+            #Fehler in _check_format_string
             raise ValueError("Invalid format string")
         return _LazyCell(self._expression.dt.to_string(format=format_string))
 

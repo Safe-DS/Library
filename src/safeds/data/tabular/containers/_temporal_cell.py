@@ -32,7 +32,7 @@ class TemporalCell(ABC):
     """
 
     @abstractmethod
-    def datetime_to_string(self, format_string: str = "%Y/%m/%d %H:%M:%S") -> Cell[str | None]:
+    def datetime_to_string(self, format_string: str = "%Y/%m/%d %H:%M:%S") -> Cell[str]:
         """
         Convert the date value in the cell to a string.
 
@@ -67,7 +67,7 @@ class TemporalCell(ABC):
         """
 
     @abstractmethod
-    def date_to_string(self, format_string: str = "%F") -> Cell[str | None]:
+    def date_to_string(self, format_string: str = "%F") -> Cell[str]:
         """
         Convert the date value in the cell to a string.
 

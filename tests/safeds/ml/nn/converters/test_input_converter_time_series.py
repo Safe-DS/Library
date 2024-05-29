@@ -20,7 +20,6 @@ def test_should_raise_if_is_fitted_is_set_correctly_lstm() -> None:
     )
     ts = Table.from_dict({"target": [1, 1, 1, 1], "time": [0, 0, 0, 0], "feat": [0, 0, 0, 0]}).to_time_series_dataset(
         target_name="target",
-        time_name="time",
         window_size=1,
     )
     assert not model.is_fitted

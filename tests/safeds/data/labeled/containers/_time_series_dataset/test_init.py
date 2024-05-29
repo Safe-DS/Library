@@ -5,7 +5,7 @@ from safeds.exceptions import ColumnNotFoundError
 
 
 @pytest.mark.parametrize(
-    ("data", "target_name", "time_name", "extra_names", "error", "error_msg"),
+    ("data", "target_name", "extra_names", "error", "error_msg"),
     [
         (
             {
@@ -16,7 +16,6 @@ from safeds.exceptions import ColumnNotFoundError
                 "time": [9, 9],
             },
             "T",
-            "time",
             ["D", "E"],
             ColumnNotFoundError,
             None,
@@ -30,7 +29,6 @@ from safeds.exceptions import ColumnNotFoundError
                 "time": [9, 9],
             },
             "D",
-            "time",
             [],
             ColumnNotFoundError,
             None,
@@ -44,26 +42,11 @@ from safeds.exceptions import ColumnNotFoundError
                 "time": [9, 9],
             },
             "A",
-            "time",
             ["A"],
             ValueError,
             r"Column 'A' cannot be both target and extra.",
         ),
         (
-            {
-                "A": [1, 4],
-                "B": [2, 5],
-                "C": [3, 6],
-                "T": [0, 1],
-                "time": [9, 9],
-            },
-            "T",
-            "time",
-            ["A", "time", "C"],
-            ValueError,
-            r"Column 'time' cannot be both time and extra.",
-        ),
-        (
             Table(
                 {
                     "A": [1, 4],
@@ -74,7 +57,6 @@ from safeds.exceptions import ColumnNotFoundError
                 },
             ),
             "T",
-            "time",
             ["D", "E"],
             ColumnNotFoundError,
             None,
@@ -90,7 +72,6 @@ from safeds.exceptions import ColumnNotFoundError
                 },
             ),
             "D",
-            "time",
             [],
             ColumnNotFoundError,
             None,
@@ -106,7 +87,6 @@ from safeds.exceptions import ColumnNotFoundError
                 },
             ),
             "A",
-            "time",
             ["A"],
             ValueError,
             r"Column 'A' cannot be both target and extra.",
@@ -116,7 +96,6 @@ from safeds.exceptions import ColumnNotFoundError
         "dict_extra_does_not_exist",
         "dict_target_does_not_exist",
         "dict_target_and_extra_overlap",
-        "dict_features_are_empty_explicitly",
         "table_extra_does_not_exist",
         "table_target_does_not_exist",
         "table_target_and_extra_overlap",
@@ -125,17 +104,16 @@ from safeds.exceptions import ColumnNotFoundError
 def test_should_raise_error(
     data: dict[str, list[int]],
     target_name: str,
-    time_name: str,
     extra_names: list[str] | None,
     error: type[Exception],
     error_msg: str | None,
 ) -> None:
     with pytest.raises(error, match=error_msg):
-        TimeSeriesDataset(data, target_name=target_name, time_name=time_name, window_size=1, extra_names=extra_names)
+        TimeSeriesDataset(data, target_name=target_name, window_size=1, extra_names=extra_names)
 
 
 @pytest.mark.parametrize(
-    ("data", "target_name", "time_name", "extra_names"),
+    ("data", "target_name", "extra_names"),
     [
         (
             {
@@ -146,7 +124,6 @@ def test_should_raise_error(
                 "time": [9, 9],
             },
             "T",
-            "time",
             [],
         ),
         (
@@ -158,7 +135,6 @@ def test_should_raise_error(
                 "time": [9, 9],
             },
             "T",
-            "time",
             ["A", "C"],
         ),
         (
@@ -170,7 +146,6 @@ def test_should_raise_error(
                 "time": [9, 9],
             },
             "T",
-            "time",
             None,
         ),
         (
@@ -184,7 +159,6 @@ def test_should_raise_error(
                 },
             ),
             "T",
-            "time",
             [],
         ),
         (
@@ -198,7 +172,6 @@ def test_should_raise_error(
                 },
             ),
             "T",
-            "time",
             ["A", "C"],
         ),
         (
@@ -212,7 +185,6 @@ def test_should_raise_error(
                 },
             ),
             "T",
-            "time",
             None,
         ),
     ],
@@ -228,13 +200,11 @@ def test_should_raise_error(
 def test_should_create_a_tabular_dataset(
     data: Table | dict[str, list[int]],
     target_name: str,
-    time_name: str,
     extra_names: list[str] | None,
 ) -> None:
     tabular_dataset = TimeSeriesDataset(
         data,
         target_name=target_name,
-        time_name=time_name,
         window_size=1,
         extra_names=extra_names,
     )

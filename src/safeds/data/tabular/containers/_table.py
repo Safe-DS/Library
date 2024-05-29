@@ -1974,7 +1974,6 @@ class Table:
     def to_time_series_dataset(
         self,
         target_name: str,
-        time_name: str,
         window_size: int,
         *,
         extra_names: list[str] | None = None,
@@ -1990,8 +1989,6 @@ class Table:
         ----------
         target_name:
             The name of the target column.
-        time_name:
-            The name of the time column.
         window_size:
             The number of consecutive sample to use as input for prediction.
         extra_names:
@@ -2023,7 +2020,6 @@ class Table:
         return TimeSeriesDataset(
             self,
             target_name=target_name,
-            time_name=time_name,
             window_size=window_size,
             extra_names=extra_names,
             forecast_horizon=forecast_horizon,

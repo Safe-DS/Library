@@ -105,7 +105,6 @@ class InputConversionTimeSeries(InputConversion[TimeSeriesDataset, TimeSeriesDat
             [Column(self._target_name, output_data.tolist())],
         ).to_time_series_dataset(
             target_name=self._target_name,
-            time_name=input_data.time.name,
             extra_names=input_data.extras.column_names,
             window_size=window_size,
         )
@@ -114,7 +113,6 @@ class InputConversionTimeSeries(InputConversion[TimeSeriesDataset, TimeSeriesDat
         if self._first:
             self._window_size = input_data.window_size
             self._forecast_horizon = input_data.forecast_horizon
-            self._time_name = input_data.time.name
             self._feature_names = input_data.features.column_names
             self._target_name = input_data.target.name
             self._continuous = input_data._continuous
@@ -122,7 +120,6 @@ class InputConversionTimeSeries(InputConversion[TimeSeriesDataset, TimeSeriesDat
         return (
             (sorted(input_data.features.column_names)).__eq__(sorted(self._feature_names))
             and input_data.target.name == self._target_name
-            and input_data.time.name == self._time_name
         )
 
     def _is_predict_data_valid(self, input_data: TimeSeriesDataset) -> bool:
