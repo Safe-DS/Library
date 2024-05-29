@@ -82,25 +82,9 @@ class ForwardLayer(Layer):
         self._input_size = input_size
 
     def __hash__(self) -> int:
-        """
-        Return a deterministic hash value for this forward layer.
-
-        Returns
-        -------
-        hash:
-            the hash value
-        """
         return _structural_hash(self._input_size, self._output_size)
 
     def __eq__(self, other: object) -> bool:
-        """
-        Compare two forward layer instances.
-
-        Returns
-        -------
-        equals:
-            'True' if input and output size are equal, 'False' otherwise.
-        """
         if not isinstance(other, ForwardLayer):
             return NotImplemented
         if self is other:
@@ -108,14 +92,6 @@ class ForwardLayer(Layer):
         return self._input_size == other._input_size and self._output_size == other._output_size
 
     def __sizeof__(self) -> int:
-        """
-        Return the complete size of this object.
-
-        Returns
-        -------
-        size:
-            Size of this object in bytes.
-        """
         import sys
 
         return sys.getsizeof(self._input_size) + sys.getsizeof(self._output_size)

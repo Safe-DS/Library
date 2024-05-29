@@ -191,14 +191,6 @@ class Convolutional2DLayer(Layer):
         self._output_size = None
 
     def __hash__(self) -> int:
-        """
-        Return a deterministic hash value for this convolutional 2d layer.
-
-        Returns
-        -------
-        hash:
-            the hash value
-        """
         return _structural_hash(
             self._output_channel,
             self._kernel_size,
@@ -209,19 +201,6 @@ class Convolutional2DLayer(Layer):
         )
 
     def __eq__(self, other: object) -> bool:
-        """
-        Compare two convolutional 2d layer.
-
-        Parameters
-        ----------
-        other:
-            The convolutional 2d layer to compare to.
-
-        Returns
-        -------
-        equals:
-            Whether the two convolutional 2d layer are the same.
-        """
         if not isinstance(other, Convolutional2DLayer) or isinstance(other, ConvolutionalTranspose2DLayer):
             return NotImplemented
         return (self is other) or (
@@ -234,14 +213,6 @@ class Convolutional2DLayer(Layer):
         )
 
     def __sizeof__(self) -> int:
-        """
-        Return the complete size of this object.
-
-        Returns
-        -------
-        size:
-            Size of this object in bytes.
-        """
         return (
             sys.getsizeof(self._output_channel)
             + sys.getsizeof(self._kernel_size)
@@ -336,30 +307,9 @@ class ConvolutionalTranspose2DLayer(Convolutional2DLayer):
         return self._output_size
 
     def __hash__(self) -> int:
-        """
-        Return a deterministic hash value for this convolutional transpose 2d layer.
-
-        Returns
-        -------
-        hash:
-            the hash value
-        """
         return _structural_hash(super().__hash__(), self._output_padding)
 
     def __eq__(self, other: object) -> bool:
-        """
-        Compare two convolutional transpose 2d layer.
-
-        Parameters
-        ----------
-        other:
-            The convolutional transpose 2d layer to compare to.
-
-        Returns
-        -------
-        equals:
-            Whether the two convolutional transpose 2d layer are the same.
-        """
         if not isinstance(other, ConvolutionalTranspose2DLayer):
             return NotImplemented
         return (self is other) or (
@@ -373,12 +323,4 @@ class ConvolutionalTranspose2DLayer(Convolutional2DLayer):
         )
 
     def __sizeof__(self) -> int:
-        """
-        Return the complete size of this object.
-
-        Returns
-        -------
-        size:
-            Size of this object in bytes.
-        """
         return sys.getsizeof(self._output_padding) + super().__sizeof__()

@@ -92,41 +92,12 @@ class FlattenLayer(Layer):
         self._output_size = None
 
     def __hash__(self) -> int:
-        """
-        Return a deterministic hash value for this flatten layer.
-
-        Returns
-        -------
-        hash:
-            the hash value
-        """
         return _structural_hash(self._input_size, self._output_size)
 
     def __eq__(self, other: object) -> bool:
-        """
-        Compare two flatten layer.
-
-        Parameters
-        ----------
-        other:
-            The flatten layer to compare to.
-
-        Returns
-        -------
-        equals:
-            Whether the two flatten layer are the same.
-        """
         if not isinstance(other, FlattenLayer):
             return NotImplemented
         return (self is other) or (self._input_size == other._input_size and self._output_size == other._output_size)
 
     def __sizeof__(self) -> int:
-        """
-        Return the complete size of this object.
-
-        Returns
-        -------
-        size:
-            Size of this object in bytes.
-        """
         return sys.getsizeof(self._input_size) + sys.getsizeof(self._output_size)
