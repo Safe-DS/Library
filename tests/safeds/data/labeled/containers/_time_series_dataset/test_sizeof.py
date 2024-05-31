@@ -15,7 +15,6 @@ from safeds.data.labeled.containers import TimeSeriesDataset
                 "time": [1, 2, 3],
             },
             "target",
-            "time",
             window_size=1,
         ),
         TimeSeriesDataset(
@@ -27,7 +26,6 @@ from safeds.data.labeled.containers import TimeSeriesDataset
                 "time": [1, 2, 3],
             },
             "target",
-            "time",
             window_size=1,
             extra_names=["other"],
         ),

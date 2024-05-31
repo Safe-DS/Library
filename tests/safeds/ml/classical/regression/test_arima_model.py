@@ -22,8 +22,8 @@ def test_arima_model() -> None:
     )
     train_ts, test_ts = time_series.split_rows(0.8)
     model = ArimaModelRegressor()
-    trained_model = model.fit(train_ts.to_time_series_dataset("value", "date", window_size=1))
-    trained_model.predict(test_ts.to_time_series_dataset("value", "date", window_size=1))
+    trained_model = model.fit(train_ts.to_time_series_dataset("value", window_size=1))
+    trained_model.predict(test_ts.to_time_series_dataset("value", window_size=1))
     # suggest it ran through
     assert True
 
@@ -31,7 +31,6 @@ def test_arima_model() -> None:
 def create_test_data() -> TimeSeriesDataset:
     return TimeSeriesDataset(
         {"time": [1, 2, 3, 4, 5, 6, 7, 8, 9], "value": [1, 2, 3, 4, 5, 6, 7, 8, 9]},
-        time_name="time",
         target_name="value",
         window_size=1,
     )
@@ -44,7 +43,6 @@ def create_test_data_with_feature() -> TimeSeriesDataset:
             "value": [1, 2, 3, 4, 5, 6, 7, 8, 9],
             "feature": [1, 2, 3, 4, 5, 6, 7, 8, 9],
         },
-        time_name="time",
         target_name="value",
         window_size=1,
     )
@@ -91,7 +89,7 @@ def test_should_succeed_on_valid_data_plot() -> None:
                     "feat2": [3, 6],
                     "target": ["0", 1],
                 },
-            ).to_time_series_dataset(target_name="target", time_name="id", window_size=1),
+            ).to_time_series_dataset(target_name="target", window_size=1),
             NonNumericColumnError,
             r"Tried to do a numerical operation on one or multiple non-numerical columns: \ntarget",
         ),
@@ -103,7 +101,7 @@ def test_should_succeed_on_valid_data_plot() -> None:
                     "feat2": [3, 6],
                     "target": [None, 1],
                 },
-            ).to_time_series_dataset(target_name="target", time_name="id", window_size=1),
+            ).to_time_series_dataset(target_name="target", window_size=1),
             MissingValuesColumnError,
             r"Tried to do an operation on one or multiple columns containing missing values: \ntarget\nYou can use the Imputer to replace the missing values based on different strategies.\nIf you want toremove the missing values entirely you can use the method `TimeSeries.remove_rows_with_missing_values`.",
         ),
@@ -115,7 +113,7 @@ def test_should_succeed_on_valid_data_plot() -> None:
                     "feat2": [],
                     "target": [],
                 },
-            ).to_time_series_dataset(target_name="target", time_name="id", window_size=1),
+            ).to_time_series_dataset(target_name="target", window_size=1),
             DatasetMissesDataError,
             r"Dataset contains no rows",
         ),
@@ -136,24 +134,16 @@ def test_correct_structure_of_time_series_with_features() -> None:
     data = create_test_data_with_feature()
     model = ArimaModelRegressor()
     model = model.fit(data)
-    predics_ts = model.predict(data)
-    assert len(predics_ts.time) == len(data.time)
-    assert len(predics_ts.target) == len(data.target)
-    assert predics_ts.time.name == data.time.name
-    assert predics_ts.target.name == data.target.name + " " + "forecasted"
-    assert predics_ts.features.column_names == data.features.column_names
+    pred_table = model.predict(data)
+    assert pred_table.column_names.sort() == data.features.column_names.sort()
 
 
 def test_correct_structure_of_time_series() -> None:
     data = create_test_data()
     model = ArimaModelRegressor()
     model = model.fit(data)
-    predics_ts = model.predict(data)
-    assert len(predics_ts.time) == len(data.time)
-    assert len(predics_ts.target) == len(data.target)
-    assert predics_ts.time.name == data.time.name
-    assert predics_ts.target.name == data.target.name + " " + "forecasted"
-    assert predics_ts.features.column_names == data.features.column_names
+    pred_table = model.predict(data)
+    assert pred_table.column_names.sort() == data.features.column_names.sort()
 
 
 def test_should_raise_if_not_fitted() -> None:

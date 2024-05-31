@@ -29,15 +29,20 @@ def test_lstm_model(device: Device) -> None:
     train_table, test_table = table.split_rows(0.8)
 
     model = NeuralNetworkRegressor(
-        InputConversionTimeSeries(prediction_name="predicted"),
+        InputConversionTimeSeries(),
+        [ForwardLayer(neuron_count=256), LSTMLayer(neuron_count=12)],
+    )
+    model_2 = NeuralNetworkRegressor(
+        InputConversionTimeSeries(),
         [ForwardLayer(neuron_count=256), LSTMLayer(neuron_count=1)],
     )
     trained_model = model.fit(
         train_table.to_time_series_dataset(
             "value",
-            "date",
             window_size=7,
             forecast_horizon=12,
+            continuous=True,
+            extra_names=["date"],
         ),
         epoch_size=1,
     )
@@ -45,9 +50,30 @@ def test_lstm_model(device: Device) -> None:
     trained_model.predict(
         test_table.to_time_series_dataset(
             "value",
-            "date",
             window_size=7,
             forecast_horizon=12,
+            continuous=True,
+            extra_names=["date"],
+        ),
+    )
+    trained_model_2 = model_2.fit(
+        train_table.to_time_series_dataset(
+            "value",
+            window_size=7,
+            forecast_horizon=12,
+            continuous=False,
+            extra_names=["date"],
+        ),
+        epoch_size=1,
+    )
+
+    trained_model_2.predict(
+        test_table.to_time_series_dataset(
+            "value",
+            window_size=7,
+            forecast_horizon=12,
+            continuous=False,
+            extra_names=["date"],
         ),
     )
     assert trained_model._model is not None

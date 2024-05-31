@@ -137,7 +137,7 @@ class Column(Sequence[T_co]):
 
     @property
     def is_temporal(self) -> bool:
-        """Whether the column is temporal."""
+        """Whether the column is operator."""
         return self._series.dtype.is_temporal()
 
     @property

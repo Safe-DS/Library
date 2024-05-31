@@ -1,4 +1,5 @@
 import pytest
+import torch
 from safeds._config import _get_device
 from safeds.data.labeled.containers import TimeSeriesDataset
 from safeds.data.tabular.containers import Table
@@ -10,7 +11,7 @@ from tests.helpers import configure_test_with_device, get_devices, get_devices_i
 
 
 @pytest.mark.parametrize(
-    ("data", "target_name", "time_name", "extra_names"),
+    ("data", "target_name", "extra_names"),
     [
         (
             {
@@ -20,7 +21,6 @@ from tests.helpers import configure_test_with_device, get_devices, get_devices_i
                 "T": [0, 1, 6],
             },
             "T",
-            "B",
             [],
         ),
     ],
@@ -32,14 +32,12 @@ from tests.helpers import configure_test_with_device, get_devices, get_devices_i
 def test_should_create_dataloader(
     data: dict[str, list[int]],
     target_name: str,
-    time_name: str,
     extra_names: list[str] | None,
     device: Device,
 ) -> None:
     configure_test_with_device(device)
     tabular_dataset = Table.from_dict(data).to_time_series_dataset(
         target_name,
-        time_name,
         window_size=1,
         extra_names=extra_names,
     )
@@ -51,7 +49,7 @@ def test_should_create_dataloader(
 
 
 @pytest.mark.parametrize(
-    ("data", "target_name", "time_name", "extra_names"),
+    ("data", "target_name", "extra_names"),
     [
         (
             {
@@ -61,7 +59,6 @@ def test_should_create_dataloader(
                 "T": [0, 1, 6],
             },
             "T",
-            "B",
             [],
         ),
     ],
@@ -73,14 +70,12 @@ def test_should_create_dataloader(
 def test_should_create_dataloader_predict(
     data: dict[str, list[int]],
     target_name: str,
-    time_name: str,
     extra_names: list[str] | None,
     device: Device,
 ) -> None:
     configure_test_with_device(device)
     tabular_dataset = Table.from_dict(data).to_time_series_dataset(
         target_name,
-        time_name,
         window_size=1,
         extra_names=extra_names,
     )
@@ -101,7 +96,7 @@ def test_should_create_dataloader_predict(
                     "C": [3, 6],
                     "T": [0, 1],
                 },
-            ).to_time_series_dataset(target_name="T", time_name="B", window_size=1),
+            ).to_time_series_dataset(target_name="T", window_size=1),
             1,
             2,
             ValueError,
@@ -115,7 +110,7 @@ def test_should_create_dataloader_predict(
                     "C": [3, 6],
                     "T": [0, 1],
                 },
-            ).to_time_series_dataset(target_name="T", time_name="B", window_size=1),
+            ).to_time_series_dataset(target_name="T", window_size=1),
             1,
             0,
             OutOfBoundsError,
@@ -129,7 +124,7 @@ def test_should_create_dataloader_predict(
                     "C": [3, 6],
                     "T": [0, 1],
                 },
-            ).to_time_series_dataset(target_name="T", time_name="B", window_size=1),
+            ).to_time_series_dataset(target_name="T", window_size=1),
             0,
             1,
             OutOfBoundsError,
@@ -167,7 +162,7 @@ def test_should_create_dataloader_invalid(
                     "C": [3, 6],
                     "T": [0, 1],
                 },
-            ).to_time_series_dataset(target_name="T", time_name="B", window_size=1),
+            ).to_time_series_dataset(target_name="T", window_size=1),
             1,
             2,
             ValueError,
@@ -181,7 +176,7 @@ def test_should_create_dataloader_invalid(
                     "C": [3, 6],
                     "T": [0, 1],
                 },
-            ).to_time_series_dataset(target_name="T", time_name="B", window_size=1),
+            ).to_time_series_dataset(target_name="T", window_size=1),
             1,
             0,
             OutOfBoundsError,
@@ -197,7 +192,6 @@ def test_should_create_dataloader_invalid(
                 },
             ).to_time_series_dataset(
                 target_name="T",
-                time_name="B",
                 window_size=1,
             ),
             0,
@@ -228,3 +222,14 @@ def test_should_create_dataloader_predict_invalid(
             forecast_horizon=forecast_horizon,
             batch_size=1,
         )
+
+
+def test_continues_dataloader() -> None:
+    ts = Table(
+        {"a": [1, 2, 3, 4, 5, 6, 7], "b": [1, 2, 3, 4, 5, 6, 7], "c": [1, 2, 3, 4, 5, 6, 7]},
+    ).to_time_series_dataset("a", window_size=1, forecast_horizon=2)
+    dl = ts._into_dataloader_with_window(1, 2, 1, continuous=True)
+    dl_2 = ts._into_dataloader_with_window(1, 2, 1, continuous=False)
+    assert len(dl_2.dataset.Y) == len(dl.dataset.Y)
+    # 4mal 2er Arrays mit 1er Einträgen
+    assert dl.dataset.Y.shape == torch.Size([4, 2])
