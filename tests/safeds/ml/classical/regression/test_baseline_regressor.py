@@ -1,38 +1,67 @@
 import pytest
-from safeds.data.labeled.containers import TabularDataset
 from safeds.data.tabular.containers import Table
-from safeds.data.tabular.transformation import StandardScaler
+from safeds.exceptions import DatasetMissesDataError, ColumnTypeError, FeatureDataMismatchError
 from safeds.ml.classical.regression import BaselineRegressor
 
 
-@pytest.fixture()
-def training_set() -> TabularDataset:
-    table = Table({"col1": [1, 2, 3, 4], "col2": [1, 2, 3, 4]})
-    return table.to_tabular_dataset(target_name="col1")
-
-
+# TODO To test predict cases, we have to fit the model first which takes a couple seconds each time. Find a way to
+# TODO only fit a model once and pass it to all predict test cases.
 class TestBaselineRegressor:
+    def test_should_raise_if_fit_dataset_contains_no_data(self):
+        model = BaselineRegressor()
+        data = Table({"feat": [], "target": []}).to_tabular_dataset("target")
+        with pytest.raises(DatasetMissesDataError):
+            model.fit(data)
 
-    def test_workflow(self, training_set):
-        import time
-        input = Table.from_csv_file("D:\\Library_jetzt_aber_wirklich\\src\\safeds\\ml\\classical\\regression\\houses.csv")
-        table = input.remove_columns(["id", "lat", "long", "zipcode", "condition", "grade", "date"])
-        #TODO Not scaling the data makes the Regressor take 10 Minutes instead of 20 Seconds
-        target = table.get_column("price")
-        ss = StandardScaler(column_names=table.column_names.remove("price"))
-        [_, scaled_features] = ss.fit_and_transform(table.remove_columns(["price"]))
-        table = scaled_features.add_columns([target])
+    def test_should_raise_if_predict_dataset_contains_no_data(self):
+        model = BaselineRegressor()
+        fit_data = Table({"feat": [0, 1], "target": [0, 1]}).to_tabular_dataset("target")
+        predict_data = Table({"feat": [], "target": []}).to_tabular_dataset("target")
+        model = model.fit(fit_data)
+        with pytest.raises(DatasetMissesDataError):
+            model.predict(predict_data)
 
-        [train, test] = table.split_rows(0.8)
-        train = train.to_tabular_dataset(target_name="price")
-        test = test.to_tabular_dataset(target_name="price")
+    def test_should_raise_if_fit_dataset_contains_non_numerical_columns(self) -> None:
+        model = BaselineRegressor()
+        data = Table({"feat": ["a", "b"], "target": [0, 1]}).to_tabular_dataset("target")
+        with pytest.raises(ColumnTypeError):
+            model.fit(data)
 
-        start_time = time.time()
-        regressor = BaselineRegressor(include_slower_models=False)
-        fitted = regressor.fit(train)
-        results = fitted.predict(test)
-        end_time = time.time()
+    def test_should_raise_if_predict_dataset_contains_non_numerical_columns(self):
+        model = BaselineRegressor()
+        fit_data = Table({"feat": [0, 1], "target": [0, 1]}).to_tabular_dataset("target")
+        predict_data = Table({"feat": ["zero", "one"], "target": [0, 1]}).to_tabular_dataset("target")
+        model = model.fit(fit_data)
+        with pytest.raises(ColumnTypeError):
+            model.predict(predict_data)
 
-        print(f"Time needed: {end_time-start_time}")
-        assert fitted is not None
+    def test_should_check_that_fit_returns_baseline_classifier(self) -> None:
+        model = BaselineRegressor()
+        data = Table({"feat": [0, 1], "target": [0, 1]}).to_tabular_dataset("target")
+        assert type(model.fit(data)) == BaselineRegressor
 
+    def test_should_raise_if_is_fitted_is_set_correctly(self) -> None:
+        model = BaselineRegressor()
+        data = Table({"feat": [0, 1], "target": [0, 1]}).to_tabular_dataset("target")
+        assert not model.is_fitted
+        model = model.fit(data)
+        assert model.is_fitted
+
+    def test_should_raise_if_predict_data_has_differing_features(self) -> None:
+        model = BaselineRegressor()
+        fit_data = Table({"feat": [0, 1], "target": [0, 1]}).to_tabular_dataset("target")
+        predict_data = Table({"other": [0, 1], "target": [0, 1]}).to_tabular_dataset("target")
+        model = model.fit(fit_data)
+        with pytest.raises(FeatureDataMismatchError):
+            model.predict(predict_data)
+
+    def test_check_predict_return_type_and_values(self) -> None:
+        model = BaselineRegressor()
+        data = Table({"feat": [0, 1], "target": [0, 1]}).to_tabular_dataset("target")
+        model = model.fit(data)
+        result = model.predict(data)
+        assert isinstance(result, dict)
+        assert result.get("coefficient_of_determination") >= float("-inf")
+        assert result.get("mean_absolute_error") <= float("inf")
+        assert result.get("mean_squared_error") <= float("inf")
+        assert result.get("median_absolute_deviation") <= float("inf")

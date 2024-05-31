@@ -48,7 +48,7 @@ class BaselineClassifier:
             for model in self._list_of_model_types:
                 futures.append(executor.submit(_fit_single_model, model, train_data))
             [done, _] = wait(futures, return_when=ALL_COMPLETED)
-            for future in futures:
+            for future in done:
                 copied_model._fitted_models.append(future.result())
         executor.shutdown()
 
@@ -80,7 +80,8 @@ class BaselineClassifier:
             futures = []
             for model in self._fitted_models:
                 futures.append(executor.submit(_predict_single_model, model, test_data))
-            for future in futures:
+            [done, _] = wait(futures, return_when=ALL_COMPLETED)
+            for future in done:
                 results.append(future.result())
         executor.shutdown()
 

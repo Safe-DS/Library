@@ -1,28 +1,67 @@
 import pytest
-from safeds.data.labeled.containers import TabularDataset
 from safeds.data.tabular.containers import Table
-from safeds.exceptions import OutOfBoundsError
-from safeds.ml.classical.classification import AdaBoostClassifier, BaselineClassifier
+from safeds.exceptions import DatasetMissesDataError, ColumnTypeError, FeatureDataMismatchError
+from safeds.ml.classical.classification import BaselineClassifier
 
 
-@pytest.fixture()
-def training_set() -> TabularDataset:
-    table = Table({"col1": [1, 2, 3, 4], "col2": [1, 2, 3, 4]})
-    return table.to_tabular_dataset(target_name="col1")
-
-
+#TODO To test predict cases, we have to fit the model first which takes a couple seconds each time. Find a way to
+#TODO only fit a model once and pass it to all predict test cases.
 class TestBaselineClassifier:
+    def test_should_raise_if_fit_dataset_contains_no_data(self):
+        model = BaselineClassifier()
+        data = Table({"feat": [], "target": []}).to_tabular_dataset("target")
+        with pytest.raises(DatasetMissesDataError):
+            model.fit(data)
 
-    def test_workflow(self, training_set):
-        input = Table.from_csv_file("D:\\Library_jetzt_aber_wirklich\\src\\safeds\\ml\\classical\\classification\\avocado.csv")
-        table = input.remove_columns_except(["AveragePrice", "Total Volume", "4046", "4225", "4770", "Total Bags", "Small Bags", "Large Bags",
-             "type"])
-        [train, test] = table.split_rows(0.8)
-        train = train.to_tabular_dataset(target_name="type")
-        test = test.to_tabular_dataset(target_name="type")
+    def test_should_raise_if_predict_dataset_contains_no_data(self):
+        model = BaselineClassifier()
+        fit_data = Table({"feat": [0, 1], "target": [0, 1]}).to_tabular_dataset("target")
+        predict_data = Table({"feat": [], "target": []}).to_tabular_dataset("target")
+        model = model.fit(fit_data)
+        with pytest.raises(DatasetMissesDataError):
+            model.predict(predict_data)
 
-        classifier = BaselineClassifier()
-        fitted = classifier.fit(train)
-        fitted.predict(test)
-        assert fitted is not None
+    def test_should_raise_if_fit_dataset_contains_non_numerical_columns(self) -> None:
+        model = BaselineClassifier()
+        data = Table({"feat": ["a", "b"], "target": [0, 1]}).to_tabular_dataset("target")
+        with pytest.raises(ColumnTypeError):
+            model.fit(data)
 
+    def test_should_raise_if_predict_dataset_contains_non_numerical_columns(self):
+        model = BaselineClassifier()
+        fit_data = Table({"feat": [0, 1], "target": [0, 1]}).to_tabular_dataset("target")
+        predict_data = Table({"feat": ["zero", "one"], "target": [0, 1]}).to_tabular_dataset("target")
+        model = model.fit(fit_data)
+        with pytest.raises(ColumnTypeError):
+            model.predict(predict_data)
+
+    def test_should_check_that_fit_returns_baseline_classifier(self) -> None:
+        model = BaselineClassifier()
+        data = Table({"feat": [0, 1], "target": [0, 1]}).to_tabular_dataset("target")
+        assert type(model.fit(data)) == BaselineClassifier
+
+    def test_should_raise_if_is_fitted_is_set_correctly(self) -> None:
+        model = BaselineClassifier()
+        data = Table({"feat": [0, 1], "target": [0, 1]}).to_tabular_dataset("target")
+        assert not model.is_fitted
+        model = model.fit(data)
+        assert model.is_fitted
+
+    def test_should_raise_if_predict_data_has_differing_features(self) -> None:
+        model = BaselineClassifier()
+        fit_data = Table({"feat": [0, 1], "target": [0, 1]}).to_tabular_dataset("target")
+        predict_data = Table({"other": [0, 1], "target": [0, 1]}).to_tabular_dataset("target")
+        model = model.fit(fit_data)
+        with pytest.raises(FeatureDataMismatchError):
+            model.predict(predict_data)
+
+    def test_check_predict_return_type_and_values(self) -> None:
+        model = BaselineClassifier()
+        data = Table({"feat": [0, 1], "target": [0, 1]}).to_tabular_dataset("target")
+        model = model.fit(data)
+        result = model.predict(data)
+        assert isinstance(result, dict)
+        assert result.get("accuracy") >= 0.0
+        assert result.get("f1score") >= 0.0
+        assert result.get("precision") >= 0.0
+        assert result.get("recall") >= 0.0
