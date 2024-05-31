@@ -65,16 +65,16 @@ class PredictionError(Exception):
 
 
 class FeatureDataMismatchError(Exception):
-    """Raised when the columns of the table passed to the predict or fit method do not match with the specified features of the neural network."""
+    """Raised when the columns of the table passed to the predict or fit method do not match with the specified features of the model."""
 
     def __init__(self) -> None:
         super().__init__(
-            "The features in the given table do not match with the specified feature columns names of the neural network.",
+            "The features in the given table do not match with the specified feature columns names of model.",
         )
 
 
 class InputSizeError(Exception):
-    """Raised when the amount of features being passed to a network does not match with its input size."""
+    """Raised when the amount of features being passed to a model does not match with its input size."""
 
     def __init__(self, data_size: int | ModelImageSize, input_layer_size: int | ModelImageSize | None) -> None:
         # TODO: remove input_layer_size type None again
