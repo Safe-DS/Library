@@ -67,4 +67,3 @@ def test_should_raise_if_column_does_not_exist(table: Table, col1: str, col2: st
 def test_should_raise_if_columns_are_not_numeric(table: Table, x_name: str, y_name: str) -> None:
     with pytest.raises(ColumnTypeError):
         table.plot.scatter_plot(x_name, [y_name])
-        assert False
