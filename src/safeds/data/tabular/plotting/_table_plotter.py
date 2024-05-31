@@ -362,6 +362,3 @@ def _plot_validation(table: Table, x_name: str, y_names: list[str]) -> None:
 
     if not table.get_column(x_name).is_numeric and not table.get_column(x_name).is_temporal:
         raise ColumnTypeError(x_name)
-    for col_name in y_names:
-        if not table.get_column(col_name).is_numeric:
-            raise ColumnTypeError(col_name)
