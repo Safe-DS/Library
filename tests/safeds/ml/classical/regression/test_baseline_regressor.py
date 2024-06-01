@@ -1,6 +1,7 @@
 import pytest
 from safeds.data.tabular.containers import Table
-from safeds.exceptions import DatasetMissesDataError, ColumnTypeError, FeatureDataMismatchError
+from safeds.exceptions import DatasetMissesDataError, ColumnTypeError, FeatureDataMismatchError, \
+    DatasetMissesTargetError
 from safeds.ml.classical.regression import BaselineRegressor
 
 
@@ -53,6 +54,15 @@ class TestBaselineRegressor:
         predict_data = Table({"other": [0, 1], "target": [0, 1]}).to_tabular_dataset("target")
         model = model.fit(fit_data)
         with pytest.raises(FeatureDataMismatchError):
+            model.predict(predict_data)
+
+
+    def test_should_raise_if_predict_data_misses_target_column(self) -> None:
+        model = BaselineRegressor()
+        fit_data = Table({"feat": [0, 1], "target": [0, 1]}).to_tabular_dataset("target")
+        predict_data = Table({"feat": [0, 1], "other": [0, 1]}).to_tabular_dataset("other")
+        model = model.fit(fit_data)
+        with pytest.raises(DatasetMissesTargetError):
             model.predict(predict_data)
 
     def test_check_predict_return_type_and_values(self) -> None:

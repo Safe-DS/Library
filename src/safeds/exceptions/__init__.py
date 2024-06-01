@@ -22,7 +22,7 @@ from ._ml import (
     LearningError,
     ModelNotFittedError,
     PlainTableError,
-    PredictionError,
+    PredictionError, DatasetMissesTargetError,
 )
 
 
@@ -68,6 +68,7 @@ __all__ = [
     # ML exceptions
     "DatasetMissesDataError",
     "DatasetMissesFeaturesError",
+    "DatasetMissesTargetError",
     "FeatureDataMismatchError",
     "InputSizeError",
     "InvalidModelStructureError",

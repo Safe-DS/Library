@@ -5,7 +5,7 @@ from typing import Self, List
 from safeds._validation._check_columns_are_numeric import _check_columns_are_numeric
 from safeds.data.labeled.containers import TabularDataset
 from safeds.exceptions import ModelNotFittedError, DatasetMissesDataError, \
-    FeatureDataMismatchError
+    FeatureDataMismatchError, DatasetMissesTargetError
 from safeds.ml.classical.regression import AdaBoostRegressor, DecisionTreeRegressor, ElasticNetRegressor, \
     GradientBoostingRegressor, LassoRegressor, LinearRegressor, RandomForestRegressor, \
     RidgeRegressor, SupportVectorRegressor
@@ -113,10 +113,11 @@ class BaselineRegressor:
             If the features of the test data do not match with the features of the trained Regressor.
         DatasetMissesDataError
             If the given test_data contains no data.
+        DatasetMissesTargetError
+            If the given test_data misses the target column.
         ColumnTypeError
             If one or more columns contain non-numeric values.
         """
-        #TODO Think about combining fit and predict into one method
         from concurrent.futures import ProcessPoolExecutor
         from safeds.ml.metrics import RegressionMetrics
 
@@ -126,8 +127,8 @@ class BaselineRegressor:
         # Validate data
         if not self._feature_names == test_data.features.column_names:
             raise FeatureDataMismatchError
-        #if not self._target_name == test_data.target.name:
-        #    raise TODO Create new Error for this Case?
+        if not self._target_name == test_data.target.name:
+            raise DatasetMissesTargetError(self._target_name)
         test_data_as_table = test_data.to_table()
         if test_data_as_table.row_count == 0:
             raise DatasetMissesDataError
