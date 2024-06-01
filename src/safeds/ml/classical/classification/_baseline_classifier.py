@@ -1,14 +1,13 @@
 import copy
-from concurrent.futures import wait, ALL_COMPLETED, ProcessPoolExecutor
+from concurrent.futures import wait, ALL_COMPLETED
 from typing import Self
 
 from safeds._validation._check_columns_are_numeric import _check_columns_are_numeric
 from safeds.data.labeled.containers import TabularDataset
-from safeds.data.tabular.containers import Table
 from safeds.exceptions import ModelNotFittedError, DatasetMissesDataError, FeatureDataMismatchError
 from safeds.ml.classical.classification import Classifier
 from safeds.ml.classical.classification import RandomForestClassifier, AdaBoostClassifier, \
-            DecisionTreeClassifier, GradientBoostingClassifier, KNearestNeighborsClassifier, SupportVectorClassifier
+            DecisionTreeClassifier, GradientBoostingClassifier, SupportVectorClassifier
 
 
 def _fit_single_model(model: Classifier, train_data: TabularDataset) -> Classifier:
@@ -106,22 +105,6 @@ class BaselineClassifier:
             if max_metrics.get("recall") < recall:
                 max_metrics.update({"recall": recall})
 
-        print(Table(
-            {
-                "Metric": [
-                    "accuracy",
-                    "f1score",
-                    "precision",
-                    "recall",
-                ],
-                "Best value": [
-                    max_metrics.get("accuracy"),
-                    max_metrics.get("f1score"),
-                    max_metrics.get("precision"),
-                    max_metrics.get("recall"),
-                ],
-            },
-        ))
         return max_metrics
 
     @property

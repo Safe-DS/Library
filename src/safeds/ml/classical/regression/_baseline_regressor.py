@@ -1,15 +1,13 @@
 import copy
-import time
-from concurrent.futures import as_completed, FIRST_COMPLETED, wait, ALL_COMPLETED
-from typing import Self
+from concurrent.futures import  wait, ALL_COMPLETED
+from typing import Self, List
 
 from safeds._validation._check_columns_are_numeric import _check_columns_are_numeric
 from safeds.data.labeled.containers import TabularDataset
-from safeds.data.tabular.containers import Table
-from safeds.exceptions import ModelNotFittedError, NonNumericColumnError, DatasetMissesDataError, \
+from safeds.exceptions import ModelNotFittedError, DatasetMissesDataError, \
     FeatureDataMismatchError
 from safeds.ml.classical.regression import AdaBoostRegressor, DecisionTreeRegressor, ElasticNetRegressor, \
-    GradientBoostingRegressor, KNearestNeighborsRegressor, LassoRegressor, LinearRegressor, RandomForestRegressor, \
+    GradientBoostingRegressor, LassoRegressor, LinearRegressor, RandomForestRegressor, \
     RidgeRegressor, SupportVectorRegressor
 from safeds.ml.classical.regression import Regressor
 
@@ -33,9 +31,9 @@ class BaselineRegressor:
         if include_slower_models:
             self._list_of_model_types.extend([ElasticNetRegressor(), LassoRegressor(), GradientBoostingRegressor()])
 
-        self._fitted_models = []
-        self._feature_names = None
-        self._target_name = None
+        self._fitted_models: List[Regressor] = []
+        self._feature_names: List[str] | None = None
+        self._target_name: str | None = None
 
     def fit(self, train_data: TabularDataset) -> Self:
         from concurrent.futures import ProcessPoolExecutor
@@ -112,22 +110,6 @@ class BaselineRegressor:
             if max_metrics.get("median_absolute_deviation") > median_absolute_deviation:
                 max_metrics.update({"median_absolute_deviation": median_absolute_deviation})
 
-        print(Table(
-            {
-                "Metric": [
-                    "coefficient_of_determination",
-                    "mean_absolute_error",
-                    "mean_squared_error",
-                    "median_absolute_deviation",
-                ],
-                "Best value": [
-                    max_metrics.get("coefficient_of_determination"),
-                    max_metrics.get("mean_absolute_error"),
-                    max_metrics.get("mean_squared_error"),
-                    max_metrics.get("median_absolute_deviation"),
-                ],
-            },
-        ))
         return max_metrics
 
     @property

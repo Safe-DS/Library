@@ -38,7 +38,7 @@ class TestBaselineClassifier:
     def test_should_check_that_fit_returns_baseline_classifier(self) -> None:
         model = BaselineClassifier()
         data = Table({"feat": [0, 1], "target": [0, 1]}).to_tabular_dataset("target")
-        assert type(model.fit(data)) == BaselineClassifier
+        assert isinstance(model.fit(data), BaselineClassifier)
 
     def test_should_raise_if_is_fitted_is_set_correctly(self) -> None:
         model = BaselineClassifier()

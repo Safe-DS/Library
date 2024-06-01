@@ -38,7 +38,7 @@ class TestBaselineRegressor:
     def test_should_check_that_fit_returns_baseline_classifier(self) -> None:
         model = BaselineRegressor()
         data = Table({"feat": [0, 1], "target": [0, 1]}).to_tabular_dataset("target")
-        assert type(model.fit(data)) == BaselineRegressor
+        assert isinstance(model.fit(data), BaselineRegressor)
 
     def test_should_raise_if_is_fitted_is_set_correctly(self) -> None:
         model = BaselineRegressor()
