@@ -124,11 +124,12 @@ class BaselineClassifier:
             If the features of the test data do not match with the features of the trained Classifier.
         DatasetMissesDataError
             If the given test_data contains no data.
+        DatasetMissesTargetError
+            If the given test_data misses the target column.
         ColumnTypeError
             If one or more columns contain non-numeric values.
         """
         from concurrent.futures import ProcessPoolExecutor
-
         from safeds.ml.metrics import ClassificationMetrics
 
         if not self._is_fitted:
