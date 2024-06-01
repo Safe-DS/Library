@@ -61,6 +61,10 @@ class TestBaselineClassifier:
         model = model.fit(data)
         result = model.predict(data)
         assert isinstance(result, dict)
+        assert result.get("accuracy") is not None
+        assert result.get("f1score") is not None
+        assert result.get("precision") is not None
+        assert result.get("recall") is not None
         assert result.get("accuracy") >= 0.0
         assert result.get("f1score") >= 0.0
         assert result.get("precision") >= 0.0
