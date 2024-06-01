@@ -1,7 +1,6 @@
 import pytest
 from safeds.data.tabular.containers import Table
-from safeds.exceptions import DatasetMissesDataError, ColumnTypeError, FeatureDataMismatchError, \
-    DatasetMissesTargetError
+from safeds.exceptions import DatasetMissesTargetError
 from safeds.exceptions import ColumnTypeError, DatasetMissesDataError, FeatureDataMismatchError
 from safeds.ml.classical.regression import BaselineRegressor
 

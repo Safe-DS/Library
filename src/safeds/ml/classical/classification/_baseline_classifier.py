@@ -4,15 +4,6 @@ from typing import Self
 
 from safeds._validation._check_columns_are_numeric import _check_columns_are_numeric
 from safeds.data.labeled.containers import TabularDataset
-from safeds.exceptions import DatasetMissesDataError, FeatureDataMismatchError, ModelNotFittedError
-from safeds.ml.classical.classification import (
-    AdaBoostClassifier,
-    Classifier,
-    DecisionTreeClassifier,
-    GradientBoostingClassifier,
-    RandomForestClassifier,
-    SupportVectorClassifier,
-)
 from safeds.exceptions import ModelNotFittedError, DatasetMissesDataError, FeatureDataMismatchError, \
     DatasetMissesTargetError
 from safeds.ml.classical.classification import Classifier
@@ -51,7 +42,7 @@ class BaselineClassifier:
 
         self._fitted_models: list[Classifier] = []
         self._feature_names: list[str] | None = None
-        self._target_name: str | None = None
+        self._target_name: str = "none"
 
     def fit(self, train_data: TabularDataset) -> Self:
         """

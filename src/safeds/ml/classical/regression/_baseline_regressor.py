@@ -4,19 +4,6 @@ from typing import Self
 
 from safeds._validation._check_columns_are_numeric import _check_columns_are_numeric
 from safeds.data.labeled.containers import TabularDataset
-from safeds.exceptions import DatasetMissesDataError, FeatureDataMismatchError, ModelNotFittedError
-from safeds.ml.classical.regression import (
-    AdaBoostRegressor,
-    DecisionTreeRegressor,
-    ElasticNetRegressor,
-    GradientBoostingRegressor,
-    LassoRegressor,
-    LinearRegressor,
-    RandomForestRegressor,
-    Regressor,
-    RidgeRegressor,
-    SupportVectorRegressor,
-)
 from safeds.exceptions import ModelNotFittedError, DatasetMissesDataError, \
     FeatureDataMismatchError, DatasetMissesTargetError
 from safeds.ml.classical.regression import AdaBoostRegressor, DecisionTreeRegressor, ElasticNetRegressor, \
@@ -59,7 +46,7 @@ class BaselineRegressor:
 
         self._fitted_models: list[Regressor] = []
         self._feature_names: list[str] | None = None
-        self._target_name: str | None = None
+        self._target_name: str = "none"
 
     def fit(self, train_data: TabularDataset) -> Self:
         """
