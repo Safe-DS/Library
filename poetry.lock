@@ -2175,17 +2175,17 @@ testing = ["pytest", "pytest-benchmark"]
 
 [[package]]
 name = "polars"
-version = "0.20.26"
+version = "0.20.30"
 description = "Blazingly fast DataFrame library"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "polars-0.20.26-cp38-abi3-macosx_10_12_x86_64.whl", hash = "sha256:97d0e4b6ab6b47fa07798b447189ee9505d2085ec1a64a6aa8a65fdd429cd49f"},
-    {file = "polars-0.20.26-cp38-abi3-macosx_11_0_arm64.whl", hash = "sha256:c270e366b4d8b672b204e7d48e39d255641d3d2b7bdc3a0ccd968cf53934657f"},
-    {file = "polars-0.20.26-cp38-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:db35d6eed508256a797c7f1b8e9dec4aae9c11b891797b2d38fac5627d072d34"},
-    {file = "polars-0.20.26-cp38-abi3-manylinux_2_24_aarch64.whl", hash = "sha256:25b00bd5cf44929722aa6389706559c5e8cedd6db2cfc38b27b706ed37e1b2af"},
-    {file = "polars-0.20.26-cp38-abi3-win_amd64.whl", hash = "sha256:b22063acc815bc5c6d2e24292ff771ca0df306ecf97e8f6899924a1ec6d3f136"},
-    {file = "polars-0.20.26.tar.gz", hash = "sha256:fa83d130562a5180a47f8763a7bb9f408dbbf51eafc1380e8a2951be8ce05a2c"},
+    {file = "polars-0.20.30-cp38-abi3-macosx_10_12_x86_64.whl", hash = "sha256:7802cb8a6d3fa0fadf446bf19b61ef8450b81229766f1817980bc6e0b2488c03"},
+    {file = "polars-0.20.30-cp38-abi3-macosx_11_0_arm64.whl", hash = "sha256:0d7278f6e12e6623c8ee6e637d866b96b69f960b358125c955ac76abeb942192"},
+    {file = "polars-0.20.30-cp38-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:510f708332a0e0d563a5bac266c11ccd12932606c7331bf28f7173cf669d0c69"},
+    {file = "polars-0.20.30-cp38-abi3-manylinux_2_24_aarch64.whl", hash = "sha256:70d58b89cf9902fb5c3506afef76c5c2b247581d0991b082bcdc6d73d983aa2b"},
+    {file = "polars-0.20.30-cp38-abi3-win_amd64.whl", hash = "sha256:039c84f7a294aa71438048e14899d59ce005f213872e27fe6bf6ce3ae8730d7d"},
+    {file = "polars-0.20.30.tar.gz", hash = "sha256:b9fd2c6b5100caa7c26496ce17ec289cae23c2db6c41713bc52c54c76d4451ae"},
 ]
 
 [package.dependencies]
@@ -2194,7 +2194,7 @@ pyarrow = {version = ">=7.0.0", optional = true, markers = "extra == \"pyarrow\"
 
 [package.extras]
 adbc = ["adbc-driver-manager", "adbc-driver-sqlite"]
-all = ["polars[adbc,async,cloudpickle,connectorx,deltalake,fastexcel,fsspec,gevent,iceberg,numpy,pandas,plot,pyarrow,pydantic,sqlalchemy,timezone,torch,xlsx2csv,xlsxwriter]"]
+all = ["polars[adbc,async,cloudpickle,connectorx,deltalake,fastexcel,fsspec,gevent,iceberg,numpy,pandas,plot,pyarrow,pydantic,sqlalchemy,timezone,xlsx2csv,xlsxwriter]"]
 async = ["nest-asyncio"]
 cloudpickle = ["cloudpickle"]
 connectorx = ["connectorx (>=0.3.2)"]
@@ -2213,7 +2213,6 @@ pydantic = ["pydantic"]
 pyxlsb = ["pyxlsb (>=1.0)"]
 sqlalchemy = ["pandas", "sqlalchemy"]
 timezone = ["backports-zoneinfo", "tzdata"]
-torch = ["torch"]
 xlsx2csv = ["xlsx2csv (>=0.8.0)"]
 xlsxwriter = ["xlsxwriter"]
 
