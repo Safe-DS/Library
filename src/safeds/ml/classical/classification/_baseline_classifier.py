@@ -4,11 +4,20 @@ from typing import Self
 
 from safeds._validation._check_columns_are_numeric import _check_columns_are_numeric
 from safeds.data.labeled.containers import TabularDataset
-from safeds.exceptions import ModelNotFittedError, DatasetMissesDataError, FeatureDataMismatchError, \
-    DatasetMissesTargetError
-from safeds.ml.classical.classification import Classifier
-from safeds.ml.classical.classification import RandomForestClassifier, AdaBoostClassifier, \
-    DecisionTreeClassifier, GradientBoostingClassifier, SupportVectorClassifier
+from safeds.exceptions import (
+    DatasetMissesDataError,
+    DatasetMissesTargetError,
+    FeatureDataMismatchError,
+    ModelNotFittedError,
+)
+from safeds.ml.classical.classification import (
+    AdaBoostClassifier,
+    Classifier,
+    DecisionTreeClassifier,
+    GradientBoostingClassifier,
+    RandomForestClassifier,
+    SupportVectorClassifier,
+)
 
 
 def _fit_single_model(model: Classifier, train_data: TabularDataset) -> Classifier:
@@ -121,6 +130,7 @@ class BaselineClassifier:
             If one or more columns contain non-numeric values.
         """
         from concurrent.futures import ProcessPoolExecutor
+
         from safeds.ml.metrics import ClassificationMetrics
 
         if not self._is_fitted:

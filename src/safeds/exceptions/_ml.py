@@ -14,6 +14,7 @@ class DatasetMissesFeaturesError(ValueError):
     def __init__(self, missing_feature_names: list[str]):
         super().__init__(f"Dataset misses the feature columns '{missing_feature_names}'.")
 
+
 class DatasetMissesTargetError(ValueError):
     """
     Raised when a dataset misses the target column.

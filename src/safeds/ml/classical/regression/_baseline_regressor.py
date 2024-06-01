@@ -4,12 +4,24 @@ from typing import Self
 
 from safeds._validation._check_columns_are_numeric import _check_columns_are_numeric
 from safeds.data.labeled.containers import TabularDataset
-from safeds.exceptions import ModelNotFittedError, DatasetMissesDataError, \
-    FeatureDataMismatchError, DatasetMissesTargetError
-from safeds.ml.classical.regression import AdaBoostRegressor, DecisionTreeRegressor, ElasticNetRegressor, \
-    GradientBoostingRegressor, LassoRegressor, LinearRegressor, RandomForestRegressor, \
-    RidgeRegressor, SupportVectorRegressor
-from safeds.ml.classical.regression import Regressor
+from safeds.exceptions import (
+    DatasetMissesDataError,
+    DatasetMissesTargetError,
+    FeatureDataMismatchError,
+    ModelNotFittedError,
+)
+from safeds.ml.classical.regression import (
+    AdaBoostRegressor,
+    DecisionTreeRegressor,
+    ElasticNetRegressor,
+    GradientBoostingRegressor,
+    LassoRegressor,
+    LinearRegressor,
+    RandomForestRegressor,
+    Regressor,
+    RidgeRegressor,
+    SupportVectorRegressor,
+)
 
 
 def _fit_single_model(model: Regressor, train_data: TabularDataset) -> Regressor:
