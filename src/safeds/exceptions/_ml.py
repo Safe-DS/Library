@@ -82,7 +82,7 @@ class FeatureDataMismatchError(Exception):
 
     def __init__(self) -> None:
         super().__init__(
-            "The features in the given table do not match with the specified feature columns names of model.",
+            "The features in the given table do not match with the specified feature columns names of the model.",
         )
 
 
