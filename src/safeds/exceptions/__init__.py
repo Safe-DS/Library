@@ -16,13 +16,14 @@ from ._data import (
 from ._ml import (
     DatasetMissesDataError,
     DatasetMissesFeaturesError,
+    DatasetMissesTargetError,
     FeatureDataMismatchError,
     InputSizeError,
     InvalidModelStructureError,
     LearningError,
     ModelNotFittedError,
     PlainTableError,
-    PredictionError, DatasetMissesTargetError,
+    PredictionError,
 )
 
 

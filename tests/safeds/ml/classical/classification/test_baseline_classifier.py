@@ -1,7 +1,11 @@
 import pytest
 from safeds.data.tabular.containers import Table
-from safeds.exceptions import DatasetMissesDataError, ColumnTypeError, FeatureDataMismatchError, \
-    DatasetMissesTargetError
+from safeds.exceptions import (
+    ColumnTypeError,
+    DatasetMissesDataError,
+    DatasetMissesTargetError,
+    FeatureDataMismatchError,
+)
 from safeds.ml.classical.classification import BaselineClassifier
 
 
