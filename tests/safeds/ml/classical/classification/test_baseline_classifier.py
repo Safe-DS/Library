@@ -7,13 +7,13 @@ from safeds.ml.classical.classification import BaselineClassifier
 #TODO To test predict cases, we have to fit the model first which takes a couple seconds each time. Find a way to
 #TODO only fit a model once and pass it to all predict test cases.
 class TestBaselineClassifier:
-    def test_should_raise_if_fit_dataset_contains_no_data(self):
+    def test_should_raise_if_fit_dataset_contains_no_data(self) -> None:
         model = BaselineClassifier()
         data = Table({"feat": [], "target": []}).to_tabular_dataset("target")
         with pytest.raises(DatasetMissesDataError):
             model.fit(data)
 
-    def test_should_raise_if_predict_dataset_contains_no_data(self):
+    def test_should_raise_if_predict_dataset_contains_no_data(self) -> None:
         model = BaselineClassifier()
         fit_data = Table({"feat": [0, 1], "target": [0, 1]}).to_tabular_dataset("target")
         predict_data = Table({"feat": [], "target": []}).to_tabular_dataset("target")
@@ -27,7 +27,7 @@ class TestBaselineClassifier:
         with pytest.raises(ColumnTypeError):
             model.fit(data)
 
-    def test_should_raise_if_predict_dataset_contains_non_numerical_columns(self):
+    def test_should_raise_if_predict_dataset_contains_non_numerical_columns(self) -> None:
         model = BaselineClassifier()
         fit_data = Table({"feat": [0, 1], "target": [0, 1]}).to_tabular_dataset("target")
         predict_data = Table({"feat": ["zero", "one"], "target": [0, 1]}).to_tabular_dataset("target")

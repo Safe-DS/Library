@@ -1,6 +1,6 @@
 import copy
 from concurrent.futures import wait, ALL_COMPLETED
-from typing import Self
+from typing import Self, List
 
 from safeds._validation._check_columns_are_numeric import _check_columns_are_numeric
 from safeds.data.labeled.containers import TabularDataset
@@ -27,9 +27,9 @@ class BaselineClassifier:
         if include_slower_models:
             self._list_of_model_types.extend([GradientBoostingClassifier()])
 
-        self._fitted_models = []
-        self._feature_names = None
-        self._target_name = None
+        self._fitted_models: List[Classifier] = []
+        self._feature_names: List[str] | None = None
+        self._target_name: str | None = None
 
     def fit(self, train_data: TabularDataset) -> Self:
         from concurrent.futures import ProcessPoolExecutor
@@ -93,16 +93,16 @@ class BaselineClassifier:
             precision = ClassificationMetrics.precision(result, test_data, positive_class)
             recall = ClassificationMetrics.recall(result, test_data, positive_class)
 
-            if max_metrics.get("accuracy") < accuracy:
+            if max_metrics.get("accuracy") is not None and max_metrics.get("accuracy") < accuracy:
                 max_metrics.update({"accuracy": accuracy})
 
-            if max_metrics.get("f1score") < f1score:
+            if max_metrics.get("f1score") is not None and max_metrics.get("f1score") < f1score:
                 max_metrics.update({"f1score": f1score})
 
-            if max_metrics.get("precision") < precision:
+            if max_metrics.get("precision") is not None and max_metrics.get("precision") < precision:
                 max_metrics.update({"precision": precision})
 
-            if max_metrics.get("recall") < recall:
+            if max_metrics.get("recall") is not None and max_metrics.get("recall") < recall:
                 max_metrics.update({"recall": recall})
 
         return max_metrics
