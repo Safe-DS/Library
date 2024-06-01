@@ -1,13 +1,18 @@
 import copy
-from concurrent.futures import wait, ALL_COMPLETED
-from typing import Self, List
+from concurrent.futures import ALL_COMPLETED, wait
+from typing import Self
 
 from safeds._validation._check_columns_are_numeric import _check_columns_are_numeric
 from safeds.data.labeled.containers import TabularDataset
-from safeds.exceptions import ModelNotFittedError, DatasetMissesDataError, FeatureDataMismatchError
-from safeds.ml.classical.classification import Classifier
-from safeds.ml.classical.classification import RandomForestClassifier, AdaBoostClassifier, \
-    DecisionTreeClassifier, GradientBoostingClassifier, SupportVectorClassifier
+from safeds.exceptions import DatasetMissesDataError, FeatureDataMismatchError, ModelNotFittedError
+from safeds.ml.classical.classification import (
+    AdaBoostClassifier,
+    Classifier,
+    DecisionTreeClassifier,
+    GradientBoostingClassifier,
+    RandomForestClassifier,
+    SupportVectorClassifier,
+)
 
 
 def _fit_single_model(model: Classifier, train_data: TabularDataset) -> Classifier:
@@ -27,15 +32,20 @@ class BaselineClassifier:
     Parameters ---------- extended_search: If set to true, an extended set of models will be used to fit the
     classifier. This might result in significantly higher runtime.
     """
+
     def __init__(self, extended_search: bool = False):
         self._is_fitted = False
-        self._list_of_model_types = [AdaBoostClassifier(), DecisionTreeClassifier(),
-                                     SupportVectorClassifier(), RandomForestClassifier()]
+        self._list_of_model_types = [
+            AdaBoostClassifier(),
+            DecisionTreeClassifier(),
+            SupportVectorClassifier(),
+            RandomForestClassifier(),
+        ]
         if extended_search:
             self._list_of_model_types.extend([GradientBoostingClassifier()])
 
-        self._fitted_models: List[Classifier] = []
-        self._feature_names: List[str] | None = None
+        self._fitted_models: list[Classifier] = []
+        self._feature_names: list[str] | None = None
         self._target_name: str | None = None
 
     def fit(self, train_data: TabularDataset) -> Self:
@@ -114,6 +124,7 @@ class BaselineClassifier:
         """
         # TODO Think about combining fit and predict into one method
         from concurrent.futures import ProcessPoolExecutor
+
         from safeds.ml.metrics import ClassificationMetrics
 
         if not self._is_fitted:

@@ -1,11 +1,11 @@
 import pytest
 from safeds.data.tabular.containers import Table
-from safeds.exceptions import DatasetMissesDataError, ColumnTypeError, FeatureDataMismatchError
+from safeds.exceptions import ColumnTypeError, DatasetMissesDataError, FeatureDataMismatchError
 from safeds.ml.classical.classification import BaselineClassifier
 
 
-#TODO To test predict cases, we have to fit the model first which takes a couple seconds each time. Find a way to
-#TODO only fit a model once and pass it to all predict test cases.
+# TODO To test predict cases, we have to fit the model first which takes a couple seconds each time. Find a way to
+# TODO only fit a model once and pass it to all predict test cases.
 class TestBaselineClassifier:
     def test_should_raise_if_fit_dataset_contains_no_data(self) -> None:
         model = BaselineClassifier()
