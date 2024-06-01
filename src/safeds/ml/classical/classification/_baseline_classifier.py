@@ -7,7 +7,7 @@ from safeds.data.labeled.containers import TabularDataset
 from safeds.exceptions import ModelNotFittedError, DatasetMissesDataError, FeatureDataMismatchError
 from safeds.ml.classical.classification import Classifier
 from safeds.ml.classical.classification import RandomForestClassifier, AdaBoostClassifier, \
-            DecisionTreeClassifier, GradientBoostingClassifier, SupportVectorClassifier
+    DecisionTreeClassifier, GradientBoostingClassifier, SupportVectorClassifier
 
 
 def _fit_single_model(model: Classifier, train_data: TabularDataset) -> Classifier:
@@ -19,12 +19,19 @@ def _predict_single_model(model: Classifier, test_data: TabularDataset) -> Tabul
 
 
 class BaselineClassifier:
-    def __init__(self, include_slower_models: bool = False):
+    """
+    Baseline Classifier.
+
+    Get a baseline by fitting data on multiple different models and comparing the best metrics.
+
+    Parameters ---------- extended_search: If set to true, an extended set of models will be used to fit the
+    classifier. This might result in significantly higher runtime.
+    """
+    def __init__(self, extended_search: bool = False):
         self._is_fitted = False
         self._list_of_model_types = [AdaBoostClassifier(), DecisionTreeClassifier(),
-                          SupportVectorClassifier(), RandomForestClassifier()]
-        # TODO maybe add KNearestNeighbors to extended models
-        if include_slower_models:
+                                     SupportVectorClassifier(), RandomForestClassifier()]
+        if extended_search:
             self._list_of_model_types.extend([GradientBoostingClassifier()])
 
         self._fitted_models: List[Classifier] = []
@@ -32,6 +39,28 @@ class BaselineClassifier:
         self._target_name: str | None = None
 
     def fit(self, train_data: TabularDataset) -> Self:
+        """
+        Train the Classifier with given training data.
+
+        The original model is not modified.
+
+        Parameters
+        ----------
+        train_data:
+            The data the network should be trained on.
+
+        Returns
+        -------
+        trained_classifier:
+            The trained Classifier
+
+        Raises
+        ------
+        DatasetMissesDataError
+            If the given train_data contains no data.
+        ColumnTypeError
+            If one or more columns contain non-numeric values.
+        """
         from concurrent.futures import ProcessPoolExecutor
 
         # Validate Data
@@ -57,6 +86,32 @@ class BaselineClassifier:
         return copied_model
 
     def predict(self, test_data: TabularDataset) -> dict[str, float]:
+        """
+        Make a prediction for the given test data and calculate the best metrics.
+
+        The original Model is not modified.
+
+        Parameters
+        ----------
+        test_data:
+            The data the Classifier should predict.
+
+        Returns
+        -------
+        best_metrics:
+            A dictionary with the best metrics that were achieved.
+
+        Raises
+        ------
+        ModelNotFittedError
+            If the model has not been fitted yet
+        FeatureDataMismatchError
+            If the features of the test data do not match with the features of the trained Classifier.
+        DatasetMissesDataError
+            If the given test_data contains no data.
+        ColumnTypeError
+            If one or more columns contain non-numeric values.
+        """
         # TODO Think about combining fit and predict into one method
         from concurrent.futures import ProcessPoolExecutor
         from safeds.ml.metrics import ClassificationMetrics
@@ -109,4 +164,5 @@ class BaselineClassifier:
 
     @property
     def is_fitted(self) -> bool:
+        """Whether the model is fitted."""
         return self._is_fitted

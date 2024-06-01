@@ -21,9 +21,16 @@ def _predict_single_model(model: Regressor, test_data: TabularDataset) -> Tabula
 
 
 class BaselineRegressor:
+    """
+    Baseline Regressor.
+
+    Get a baseline by fitting data on multiple different models and comparing the best metrics.
+
+    Parameters ---------- extended_search: If set to true, an extended set of models will be used to fit the
+    classifier. This might result in significantly higher runtime.
+    """
     def __init__(self, include_slower_models: bool = False):
         self._is_fitted = False
-        #TODO maybe add KNearestNeighbors
         self._list_of_model_types = [AdaBoostRegressor(), DecisionTreeRegressor(),
                                      LinearRegressor(), RandomForestRegressor(), RidgeRegressor(),
                                      SupportVectorRegressor()]
@@ -36,6 +43,28 @@ class BaselineRegressor:
         self._target_name: str | None = None
 
     def fit(self, train_data: TabularDataset) -> Self:
+        """
+        Train the Regressor with given training data.
+
+        The original model is not modified.
+
+        Parameters
+        ----------
+        train_data:
+            The data the network should be trained on.
+
+        Returns
+        -------
+        trained_classifier:
+            The trained Regressor
+
+        Raises
+        ------
+        DatasetMissesDataError
+            If the given train_data contains no data.
+        ColumnTypeError
+            If one or more columns contain non-numeric values.
+        """
         from concurrent.futures import ProcessPoolExecutor
 
         #Validate Data
@@ -61,6 +90,32 @@ class BaselineRegressor:
         return copied_model
 
     def predict(self, test_data: TabularDataset) -> dict[str, float]:
+        """
+        Make a prediction for the given test data and calculate the best metrics.
+
+        The original Model is not modified.
+
+        Parameters
+        ----------
+        test_data:
+            The data the Regressor should predict.
+
+        Returns
+        -------
+        best_metrics:
+            A dictionary with the best metrics that were achieved.
+
+        Raises
+        ------
+        ModelNotFittedError
+            If the model has not been fitted yet
+        FeatureDataMismatchError
+            If the features of the test data do not match with the features of the trained Regressor.
+        DatasetMissesDataError
+            If the given test_data contains no data.
+        ColumnTypeError
+            If one or more columns contain non-numeric values.
+        """
         #TODO Think about combining fit and predict into one method
         from concurrent.futures import ProcessPoolExecutor
         from safeds.ml.metrics import RegressionMetrics
@@ -114,4 +169,5 @@ class BaselineRegressor:
 
     @property
     def is_fitted(self) -> bool:
+        """Whether the model is fitted."""
         return self._is_fitted
