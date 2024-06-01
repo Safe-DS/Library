@@ -1,9 +1,22 @@
 import copy
-from concurrent.futures import  wait, ALL_COMPLETED
-from typing import Self, List
+from concurrent.futures import ALL_COMPLETED, wait
+from typing import Self
 
 from safeds._validation._check_columns_are_numeric import _check_columns_are_numeric
 from safeds.data.labeled.containers import TabularDataset
+from safeds.exceptions import DatasetMissesDataError, FeatureDataMismatchError, ModelNotFittedError
+from safeds.ml.classical.regression import (
+    AdaBoostRegressor,
+    DecisionTreeRegressor,
+    ElasticNetRegressor,
+    GradientBoostingRegressor,
+    LassoRegressor,
+    LinearRegressor,
+    RandomForestRegressor,
+    Regressor,
+    RidgeRegressor,
+    SupportVectorRegressor,
+)
 from safeds.exceptions import ModelNotFittedError, DatasetMissesDataError, \
     FeatureDataMismatchError, DatasetMissesTargetError
 from safeds.ml.classical.regression import AdaBoostRegressor, DecisionTreeRegressor, ElasticNetRegressor, \
@@ -29,17 +42,23 @@ class BaselineRegressor:
     Parameters ---------- extended_search: If set to true, an extended set of models will be used to fit the
     classifier. This might result in significantly higher runtime.
     """
+
     def __init__(self, include_slower_models: bool = False):
         self._is_fitted = False
-        self._list_of_model_types = [AdaBoostRegressor(), DecisionTreeRegressor(),
-                                     LinearRegressor(), RandomForestRegressor(), RidgeRegressor(),
-                                     SupportVectorRegressor()]
+        self._list_of_model_types = [
+            AdaBoostRegressor(),
+            DecisionTreeRegressor(),
+            LinearRegressor(),
+            RandomForestRegressor(),
+            RidgeRegressor(),
+            SupportVectorRegressor(),
+        ]
 
         if include_slower_models:
             self._list_of_model_types.extend([ElasticNetRegressor(), LassoRegressor(), GradientBoostingRegressor()])
 
-        self._fitted_models: List[Regressor] = []
-        self._feature_names: List[str] | None = None
+        self._fitted_models: list[Regressor] = []
+        self._feature_names: list[str] | None = None
         self._target_name: str | None = None
 
     def fit(self, train_data: TabularDataset) -> Self:
@@ -67,7 +86,7 @@ class BaselineRegressor:
         """
         from concurrent.futures import ProcessPoolExecutor
 
-        #Validate Data
+        # Validate Data
         train_data_as_table = train_data.to_table()
         if train_data_as_table.row_count == 0:
             raise DatasetMissesDataError
@@ -119,6 +138,7 @@ class BaselineRegressor:
             If one or more columns contain non-numeric values.
         """
         from concurrent.futures import ProcessPoolExecutor
+
         from safeds.ml.metrics import RegressionMetrics
 
         if not self._is_fitted:
@@ -146,24 +166,28 @@ class BaselineRegressor:
         executor.shutdown()
 
         # Calculate Metrics
-        max_metrics = {"coefficient_of_determination": float('-inf'), "mean_absolute_error": float('inf'),
-                       "mean_squared_error": float('inf'), "median_absolute_deviation": float('inf')}
+        max_metrics = {
+            "coefficient_of_determination": float("-inf"),
+            "mean_absolute_error": float("inf"),
+            "mean_squared_error": float("inf"),
+            "median_absolute_deviation": float("inf"),
+        }
         for result in results:
             coefficient_of_determination = RegressionMetrics.coefficient_of_determination(result, test_data)
             mean_absolute_error = RegressionMetrics.mean_absolute_error(result, test_data)
             mean_squared_error = RegressionMetrics.mean_squared_error(result, test_data)
             median_absolute_deviation = RegressionMetrics.median_absolute_deviation(result, test_data)
 
-            if max_metrics.get("coefficient_of_determination", float('-inf')) < coefficient_of_determination:
+            if max_metrics.get("coefficient_of_determination", float("-inf")) < coefficient_of_determination:
                 max_metrics.update({"coefficient_of_determination": coefficient_of_determination})
 
-            if max_metrics.get("mean_absolute_error", float('inf')) > mean_absolute_error:
+            if max_metrics.get("mean_absolute_error", float("inf")) > mean_absolute_error:
                 max_metrics.update({"mean_absolute_error": mean_absolute_error})
 
-            if max_metrics.get("mean_squared_error", float('inf')) > mean_squared_error:
+            if max_metrics.get("mean_squared_error", float("inf")) > mean_squared_error:
                 max_metrics.update({"mean_squared_error": mean_squared_error})
 
-            if max_metrics.get("median_absolute_deviation", float('inf')) > median_absolute_deviation:
+            if max_metrics.get("median_absolute_deviation", float("inf")) > median_absolute_deviation:
                 max_metrics.update({"median_absolute_deviation": median_absolute_deviation})
 
         return max_metrics

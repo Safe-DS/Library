@@ -6,6 +6,7 @@ import apipkg
 
 if TYPE_CHECKING:
     from ._ada_boost_classifier import AdaBoostClassifier
+    from ._baseline_classifier import BaselineClassifier
     from ._classifier import Classifier
     from ._decision_tree_classifier import DecisionTreeClassifier
     from ._gradient_boosting_classifier import GradientBoostingClassifier
@@ -13,7 +14,6 @@ if TYPE_CHECKING:
     from ._logistic_classifier import LogisticClassifier
     from ._random_forest_classifier import RandomForestClassifier
     from ._support_vector_classifier import SupportVectorClassifier
-    from ._baseline_classifier import BaselineClassifier
 
 apipkg.initpkg(
     __name__,
