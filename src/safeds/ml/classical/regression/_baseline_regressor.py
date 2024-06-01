@@ -153,8 +153,9 @@ class BaselineRegressor:
             mean_squared_error = RegressionMetrics.mean_squared_error(result, test_data)
             median_absolute_deviation = RegressionMetrics.median_absolute_deviation(result, test_data)
 
-            if max_metrics.get("coefficient_of_determination") is not None and max_metrics.get("coefficient_of_determination") < coefficient_of_determination:
-                max_metrics.update({"coefficient_of_determination": coefficient_of_determination})
+            if max_metrics.get("coefficient_of_determination") is not None:
+                if max_metrics.get("coefficient_of_determination") < coefficient_of_determination:
+                    max_metrics.update({"coefficient_of_determination": coefficient_of_determination})
 
             if max_metrics.get("mean_absolute_error") is not None and max_metrics.get("mean_absolute_error") > mean_absolute_error:
                 max_metrics.update({"mean_absolute_error": mean_absolute_error})
