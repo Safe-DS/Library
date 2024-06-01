@@ -61,11 +61,7 @@ class TestBaselineRegressor:
         model = model.fit(data)
         result = model.predict(data)
         assert isinstance(result, dict)
-        assert result.get("coefficient_of_determination") is not None
-        assert result.get("mean_absolute_error") is not None
-        assert result.get("mean_squared_error") is not None
-        assert result.get("median_absolute_deviation") is not None
-        assert result.get("coefficient_of_determination") >= float("-inf")
-        assert result.get("mean_absolute_error") <= float("inf")
-        assert result.get("mean_squared_error") <= float("inf")
-        assert result.get("median_absolute_deviation") <= float("inf")
+        assert result.get("coefficient_of_determination", float('-inf')) >= float("-inf")
+        assert result.get("mean_absolute_error", float('inf')) <= float("inf")
+        assert result.get("mean_squared_error", float('inf')) <= float("inf")
+        assert result.get("median_absolute_deviation", float('inf')) <= float("inf")

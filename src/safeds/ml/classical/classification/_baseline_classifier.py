@@ -148,16 +148,16 @@ class BaselineClassifier:
             precision = ClassificationMetrics.precision(result, test_data, positive_class)
             recall = ClassificationMetrics.recall(result, test_data, positive_class)
 
-            if max_metrics.get("accuracy") is not None and max_metrics.get("accuracy") < accuracy:
+            if max_metrics.get("accuracy", 0.0) < accuracy:
                 max_metrics.update({"accuracy": accuracy})
 
-            if max_metrics.get("f1score") is not None and max_metrics.get("f1score") < f1score:
+            if max_metrics.get("f1score", 0.0) < f1score:
                 max_metrics.update({"f1score": f1score})
 
-            if max_metrics.get("precision") is not None and max_metrics.get("precision") < precision:
+            if max_metrics.get("precision", 0.0) < precision:
                 max_metrics.update({"precision": precision})
 
-            if max_metrics.get("recall") is not None and max_metrics.get("recall") < recall:
+            if max_metrics.get("recall", 0.0) < recall:
                 max_metrics.update({"recall": recall})
 
         return max_metrics
