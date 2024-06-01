@@ -10,6 +10,7 @@ if TYPE_CHECKING:
     import polars as pl
 
     from ._string_cell import StringCell
+    from ._temporal_cell import TemporalCell
 
 T = TypeVar("T")
 P = TypeVar("P")
@@ -185,6 +186,12 @@ class _LazyCell(Cell[T]):
         from ._lazy_string_cell import _LazyStringCell  # circular import
 
         return _LazyStringCell(self._expression)
+
+    @property
+    def dt(self) -> TemporalCell:
+        from ._lazy_temporal_cell import _LazyTemporalCell  # circular import
+
+        return _LazyTemporalCell(self._expression)
 
     # ------------------------------------------------------------------------------------------------------------------
     # Internal

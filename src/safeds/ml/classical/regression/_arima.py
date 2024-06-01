@@ -18,6 +18,7 @@ if TYPE_CHECKING:
     from statsmodels.tsa.arima.model import ARIMA
 
     from safeds.data.labeled.containers import TimeSeriesDataset
+    from safeds.data.tabular.containers import Table
 
 
 class ArimaModelRegressor:
@@ -109,7 +110,7 @@ class ArimaModelRegressor:
         fitted_arima._fitted = True
         return fitted_arima
 
-    def predict(self, time_series: TimeSeriesDataset) -> TimeSeriesDataset:
+    def predict(self, time_series: TimeSeriesDataset) -> Table:
         """
         Predict a target vector using a time series target column. The model has to be trained first.
 
@@ -143,16 +144,10 @@ class ArimaModelRegressor:
         # forecast
         # couldn't invoke prediction error, will be added when found
         forecast_results = self._arima.forecast(steps=forecast_horizon)
-        target_column: Column = Column(name=time_series.target.name + " " + "forecasted", data=forecast_results)
+        target_column: Column = Column(name=time_series.target.name, data=forecast_results)
 
         # create new TimeSeries
-        result_table = result_table.add_columns(target_column)
-        return result_table.to_time_series_dataset(
-            target_name=time_series.target.name + " " + "forecasted",
-            time_name=time_series.time.name,
-            extra_names=time_series.extras.column_names,
-            window_size=1,
-        )
+        return result_table.add_columns(target_column)
 
     def plot_predictions(self, test_series: TimeSeriesDataset) -> Image:
         """

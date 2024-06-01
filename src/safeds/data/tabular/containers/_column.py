@@ -137,7 +137,7 @@ class Column(Sequence[T_co]):
 
     @property
     def is_temporal(self) -> bool:
-        """Whether the column is temporal."""
+        """Whether the column is operator."""
         return self._series.dtype.is_temporal()
 
     @property
@@ -1005,6 +1005,11 @@ class Column(Sequence[T_co]):
 
         The mode is the value that appears most frequently in the column. If multiple values occur equally often, all
         of them are returned. The values are sorted in ascending order.
+
+        Parameters
+        ----------
+        ignore_missing_values:
+            Whether to ignore missing values.
 
         Returns
         -------

@@ -71,6 +71,7 @@ class RangeScaler(InvertibleTableTransformer):
 
     @property
     def is_fitted(self) -> bool:
+        """Whether the transformer is fitted."""
         return self._data_min is not None and self._data_max is not None
 
     @property

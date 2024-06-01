@@ -30,8 +30,6 @@ class TimeSeriesDataset(Dataset[Table, Column]):
         The data.
     target_name:
         The name of the target column.
-    time_name:
-        The name of the time column.
     window_size:
         The number of consecutive sample to use as input for prediction.
     extra_names:
@@ -55,7 +53,6 @@ class TimeSeriesDataset(Dataset[Table, Column]):
     >>> dataset = TimeSeriesDataset(
     ...     {"id": [1, 2, 3], "feature": [4, 5, 6], "target": [1, 2, 3], "error":[0,0,1]},
     ...     target_name="target",
-    ...     time_name = "id",
     ...     window_size=1,
     ...     extra_names=["error"],
     ... )
@@ -68,11 +65,11 @@ class TimeSeriesDataset(Dataset[Table, Column]):
         self,
         data: Table | Mapping[str, Sequence[Any]],
         target_name: str,
-        time_name: str,
         window_size: int,
         *,
         extra_names: list[str] | None = None,
         forecast_horizon: int = 1,
+        continuous: bool = False,
     ):
         from safeds.data.tabular.containers import Table
 
@@ -83,12 +80,10 @@ class TimeSeriesDataset(Dataset[Table, Column]):
             extra_names = []
 
         # Derive feature names (build the set once, since comprehensions evaluate their condition every iteration)
-        non_feature_names = {target_name, time_name, *extra_names}
+        non_feature_names = {target_name, *extra_names}
         feature_names = [name for name in data.column_names if name not in non_feature_names]
 
         # Validate inputs
-        if time_name in extra_names:
-            raise ValueError(f"Column '{time_name}' cannot be both time and extra.")
         if target_name in extra_names:
             raise ValueError(f"Column '{target_name}' cannot be both target and extra.")
         if len(feature_names) == 0:
@@ -98,10 +93,10 @@ class TimeSeriesDataset(Dataset[Table, Column]):
         self._table: Table = data
         self._features: Table = data.remove_columns_except(feature_names)
         self._target: Column = data.get_column(target_name)
-        self._time: Column = data.get_column(time_name)
         self._window_size: int = window_size
         self._forecast_horizon: int = forecast_horizon
         self._extras: Table = data.remove_columns_except(extra_names)
+        self._continuous: bool = continuous
 
     def __eq__(self, other: object) -> bool:
         """
@@ -120,7 +115,6 @@ class TimeSeriesDataset(Dataset[Table, Column]):
             and self.target == other.target
             and self.features == other.features
             and self.extras == other.extras
-            and self.time == other.time
         )
 
     def __hash__(self) -> int:
@@ -136,7 +130,6 @@ class TimeSeriesDataset(Dataset[Table, Column]):
             self.target,
             self.features,
             self.extras,
-            self.time,
             self._window_size,
             self._forecast_horizon,
         )
@@ -154,7 +147,6 @@ class TimeSeriesDataset(Dataset[Table, Column]):
             sys.getsizeof(self._target)
             + sys.getsizeof(self._features)
             + sys.getsizeof(self.extras)
-            + sys.getsizeof(self._time)
             + sys.getsizeof(self._window_size)
             + sys.getsizeof(self._forecast_horizon)
         )
@@ -174,11 +166,6 @@ class TimeSeriesDataset(Dataset[Table, Column]):
         return self._target
 
     @property
-    def time(self) -> Column:
-        """The time column of the time series dataset."""
-        return self._time
-
-    @property
     def window_size(self) -> int:
         """The number of consecutive sample to use as input for prediction."""
         return self._window_size
@@ -187,6 +174,11 @@ class TimeSeriesDataset(Dataset[Table, Column]):
     def forecast_horizon(self) -> int:
         """The number of time steps to predict into the future."""
         return self._forecast_horizon
+
+    @property
+    def continuous(self) -> bool:
+        """True if the time series will make a continuous prediction."""
+        return self._continuous
 
     @property
     def extras(self) -> Table:
@@ -214,7 +206,13 @@ class TimeSeriesDataset(Dataset[Table, Column]):
         """
         return self._table
 
-    def _into_dataloader_with_window(self, window_size: int, forecast_horizon: int, batch_size: int) -> DataLoader:
+    def _into_dataloader_with_window(
+        self,
+        window_size: int,
+        forecast_horizon: int,
+        batch_size: int,
+        continuous: bool = False,
+    ) -> DataLoader:
         """
         Return a Dataloader for the data stored in this time series, used for training neural networks.
 
@@ -229,6 +227,8 @@ class TimeSeriesDataset(Dataset[Table, Column]):
             The length of the forecast horizon, where all datapoints are collected until the given lag.
         batch_size:
             The size of data batches that should be loaded at one time.
+        continuous:
+            Whether or not to continue the forecast in the steps before forecast horizon.
 
         Raises
         ------
@@ -263,7 +263,11 @@ class TimeSeriesDataset(Dataset[Table, Column]):
         feature_cols = self.features.to_columns()
         for i in range(size - (forecast_horizon + window_size)):
             window = target_tensor[i : i + window_size]
-            label = target_tensor[i + window_size + forecast_horizon]
+            if continuous:
+                label = target_tensor[i + window_size : i + window_size + forecast_horizon]
+
+            else:
+                label = target_tensor[i + window_size + forecast_horizon].unsqueeze(0)
             for col in feature_cols:
                 data = torch.tensor(col._series.to_numpy(), dtype=torch.float32)
                 window = torch.cat((window, data[i : i + window_size]), dim=0)
@@ -356,7 +360,7 @@ def _create_dataset(features: torch.Tensor, target: torch.Tensor) -> TorchDatase
     class _CustomDataset(TorchDataset):
         def __init__(self, features_dataset: torch.Tensor, target_dataset: torch.Tensor):
             self.X = features_dataset.float()
-            self.Y = target_dataset.unsqueeze(-1).float()
+            self.Y = target_dataset.float()
             self.len = self.X.shape[0]
 
         def __getitem__(self, item: int) -> tuple[torch.Tensor, torch.Tensor]:

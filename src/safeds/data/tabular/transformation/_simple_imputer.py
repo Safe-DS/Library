@@ -122,6 +122,7 @@ class SimpleImputer(TableTransformer):
 
     @property
     def is_fitted(self) -> bool:
+        """Whether the transformer is fitted."""
         return self._replacement is not None
 
     @property

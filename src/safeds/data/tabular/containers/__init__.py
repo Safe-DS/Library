@@ -10,6 +10,7 @@ if TYPE_CHECKING:
     from ._row import Row
     from ._string_cell import StringCell
     from ._table import Table
+    from ._temporal_cell import TemporalCell
 
 apipkg.initpkg(
     __name__,
@@ -18,6 +19,7 @@ apipkg.initpkg(
         "Column": "._column:Column",
         "Row": "._row:Row",
         "StringCell": "._string_cell:StringCell",
+        "TemporalCell": "._temporal_cell:",
         "Table": "._table:Table",
     },
 )
@@ -27,5 +29,6 @@ __all__ = [
     "Column",
     "Row",
     "StringCell",
+    "TemporalCell",
     "Table",
 ]

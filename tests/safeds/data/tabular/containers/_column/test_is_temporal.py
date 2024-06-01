@@ -21,8 +21,8 @@ now = datetime.now(UTC)
         "datetime",
         "date",
         "time",
-        "temporal with missing",
-        "non-temporal",
+        "operator with missing",
+        "non-operator",
     ],
 )
 def test_should_return_whether_column_is_temporal(column: Column, expected: bool) -> None:

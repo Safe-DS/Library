@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 from safeds._utils import _figure_to_image
 from safeds._validation import _check_columns_exist
 from safeds._validation._check_columns_are_numeric import _check_columns_are_numeric
-from safeds.exceptions import NonNumericColumnError
+from safeds.exceptions import ColumnTypeError, NonNumericColumnError
 
 if TYPE_CHECKING:
     from safeds.data.image.containers import Image
@@ -197,7 +197,7 @@ class TablePlotter:
 
         return _figure_to_image(fig)
 
-    def line_plot(self, x_name: str, y_name: str) -> Image:
+    def line_plot(self, x_name: str, y_names: list[str], show_confidence_interval: bool = True) -> Image:
         """
         Create a line plot for two columns in the table.
 
@@ -205,8 +205,10 @@ class TablePlotter:
         ----------
         x_name:
             The name of the column to be plotted on the x-axis.
-        y_name:
-            The name of the column to be plotted on the y-axis.
+        y_names:
+            The name(s) of the column(s) to be plotted on the y-axis.
+        show_confidence_interval:
+            If the confidence interval is shown, per default True.
 
         Returns
         -------
@@ -229,50 +231,51 @@ class TablePlotter:
         ...         "b": [2, 3, 4, 5, 6],
         ...     }
         ... )
-        >>> image = table.plot.line_plot("a", "b")
+        >>> image = table.plot.line_plot("a", ["b"])
         """
-        _check_columns_exist(self._table, [x_name, y_name])
-
-        # TODO: pass list of columns names + extract validation
-        if not self._table.get_column(x_name).is_numeric:
-            raise NonNumericColumnError(x_name)
-        if not self._table.get_column(y_name).is_numeric:
-            raise NonNumericColumnError(y_name)
+        _plot_validation(self._table, x_name, y_names)
 
         import matplotlib.pyplot as plt
         import polars as pl
 
-        grouped = (
-            self._table._lazy_frame.sort(x_name)
-            .group_by(x_name)
-            .agg(
-                mean=pl.mean(y_name),
-                count=pl.count(y_name),
-                standard_deviation=pl.std(y_name, ddof=0),
-            )
-            .collect()
-        )
+        agg_list = []
+        for name in y_names:
+            agg_list.append(pl.col(name).mean().alias(f"{name}_mean"))
+            agg_list.append(pl.count(name).alias(f"{name}_count"))
+            agg_list.append(pl.std(name, ddof=0).alias(f"{name}_std"))
+        grouped = self._table._lazy_frame.sort(x_name).group_by(x_name).agg(agg_list).collect()
 
         x = grouped.get_column(x_name)
-        y = grouped.get_column("mean")
-        confidence_interval = 1.96 * grouped.get_column("standard_deviation") / grouped.get_column("count").sqrt()
+        y_s = []
+        confidence_intervals = []
+        for name in y_names:
+            y_s.append(grouped.get_column(name + "_mean"))
+            confidence_intervals.append(
+                1.96 * grouped.get_column(name + "_std") / grouped.get_column(name + "_count").sqrt(),
+            )
 
         fig, ax = plt.subplots()
-        ax.plot(
-            x,
-            y,
-        )
-        ax.fill_between(
-            x,
-            y - confidence_interval,
-            y + confidence_interval,
-            color="lightblue",
-            alpha=0.15,
-        )
+        for name, y in zip(y_names, y_s, strict=False):
+            ax.plot(x, y, label=name)
+
+        if show_confidence_interval:
+            for y, conf in zip(y_s, confidence_intervals, strict=False):
+                ax.fill_between(
+                    x,
+                    y - conf,
+                    y + conf,
+                    color="lightblue",
+                    alpha=0.15,
+                )
+        if len(y_names) > 1:
+            name = "values"
+        else:
+            name = y_names[0]
         ax.set(
             xlabel=x_name,
-            ylabel=y_name,
+            ylabel=name,
         )
+        ax.legend()
         ax.set_xticks(ax.get_xticks())
         ax.set_xticklabels(
             ax.get_xticklabels(),
@@ -283,7 +286,7 @@ class TablePlotter:
 
         return _figure_to_image(fig)
 
-    def scatter_plot(self, x_name: str, y_name: str) -> Image:
+    def scatter_plot(self, x_name: str, y_names: list[str]) -> Image:
         """
         Create a scatter plot for two columns in the table.
 
@@ -291,8 +294,8 @@ class TablePlotter:
         ----------
         x_name:
             The name of the column to be plotted on the x-axis.
-        y_name:
-            The name of the column to be plotted on the y-axis.
+        y_names:
+            The name(s) of the column(s) to be plotted on the y-axis.
 
         Returns
         -------
@@ -315,25 +318,31 @@ class TablePlotter:
         ...         "b": [2, 3, 4, 5, 6],
         ...     }
         ... )
-        >>> image = table.plot.scatter_plot("a", "b")
+        >>> image = table.plot.scatter_plot("a", ["b"])
         """
-        _check_columns_exist(self._table, [x_name, y_name])
-        _check_columns_are_numeric(self._table, [x_name, y_name])
+        _plot_validation(self._table, x_name, y_names)
 
         import matplotlib.pyplot as plt
 
         fig, ax = plt.subplots()
-        ax.scatter(
-            x=self._table.get_column(x_name)._series,
-            y=self._table.get_column(y_name)._series,
-            s=64,  # marker size
-            linewidth=1,
-            edgecolor="white",
-        )
+        for y_name in y_names:
+            ax.scatter(
+                x=self._table.get_column(x_name)._series,
+                y=self._table.get_column(y_name)._series,
+                s=64,  # marker size
+                linewidth=1,
+                edgecolor="white",
+                label=y_name,
+            )
+        if len(y_names) > 1:
+            name = "values"
+        else:
+            name = y_names[0]
         ax.set(
             xlabel=x_name,
-            ylabel=y_name,
+            ylabel=name,
         )
+        ax.legend()
         ax.set_xticks(ax.get_xticks())
         ax.set_xticklabels(
             ax.get_xticklabels(),
@@ -344,4 +353,12 @@ class TablePlotter:
 
         return _figure_to_image(fig)
 
-    # TODO: equivalent to Column.plot_compare_columns that takes a list of column names (index_plot)?
+
+def _plot_validation(table: Table, x_name: str, y_names: list[str]) -> None:
+    y_names.append(x_name)
+    _check_columns_exist(table, y_names)
+    y_names.remove(x_name)
+    _check_columns_are_numeric(table, y_names)
+
+    if not table.get_column(x_name).is_numeric and not table.get_column(x_name).is_temporal:
+        raise ColumnTypeError(x_name)
