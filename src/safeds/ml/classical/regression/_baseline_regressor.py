@@ -54,7 +54,9 @@ class BaselineRegressor:
         ]
 
         if include_slower_models:
-            self._list_of_model_types.extend([ElasticNetRegressor(), LassoRegressor(), GradientBoostingRegressor()])  # pragma: no cover
+            self._list_of_model_types.extend(
+                [ElasticNetRegressor(), LassoRegressor(), GradientBoostingRegressor()],
+            )  # pragma: no cover
 
         self._fitted_models: list[Regressor] = []
         self._feature_names: list[str] | None = None

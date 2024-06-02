@@ -4,7 +4,8 @@ from safeds.exceptions import (
     ColumnTypeError,
     DatasetMissesDataError,
     DatasetMissesTargetError,
-    FeatureDataMismatchError, ModelNotFittedError,
+    FeatureDataMismatchError,
+    ModelNotFittedError,
 )
 from safeds.ml.classical.regression import BaselineRegressor
 
