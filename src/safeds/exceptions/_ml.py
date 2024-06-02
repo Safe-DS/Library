@@ -29,7 +29,6 @@ class InvalidFitDataError(Exception):
         super().__init__(f"The given Fit Data is invalid:\n{reason}")
 
 
-
 class LearningError(Exception):
     """
     Raised when an error occurred while training a model.

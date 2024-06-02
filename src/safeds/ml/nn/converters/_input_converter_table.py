@@ -59,7 +59,7 @@ class InputConversionTable(InputConversion[TabularDataset, Table]):
                 reason += f"The following Columns contain missing values: {columns_with_missing_values}\n"
             if len(columns_with_non_numerical_data) > 0:
                 reason += f"The following Columns contain non-numerical data: {columns_with_non_numerical_data}"
-            if reason is not "":
+            if reason != "":
                 raise InvalidFitDataError(reason)
 
         return (sorted(input_data.features.column_names)).__eq__(sorted(self._feature_names))

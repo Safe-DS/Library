@@ -7,9 +7,10 @@ from safeds.data.labeled.containers import TabularDataset
 from safeds.data.tabular.containers import Table
 from safeds.exceptions import (
     FeatureDataMismatchError,
+    InvalidFitDataError,
     InvalidModelStructureError,
     ModelNotFittedError,
-    OutOfBoundsError, InvalidFitDataError,
+    OutOfBoundsError,
 )
 from safeds.ml.nn import (
     NeuralNetworkClassifier,
@@ -298,8 +299,6 @@ class TestClassificationModel:
             match=reason,
         ):
             model.fit(table)
-
-
 
     # def test_should_raise_if_table_size_and_input_size_mismatch(self, device: Device) -> None:
     #     configure_test_with_device(device)
@@ -679,7 +678,6 @@ class TestRegressionModel:
                 Table.from_dict({"k": [1, 0, 2], "l": [0, 15, 5]}).to_tabular_dataset("l"),
             )
 
-
     @pytest.mark.parametrize(
         ("table", "reason"),
         [
@@ -919,4 +917,3 @@ class TestRegressionModel:
 
         # Should not raise
         pickle.dumps(fitted_model)
-
