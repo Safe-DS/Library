@@ -1,4 +1,5 @@
 import pickle
+import re
 
 import pytest
 from safeds.data.image.typing import ImageSize
@@ -8,7 +9,7 @@ from safeds.exceptions import (
     FeatureDataMismatchError,
     InvalidModelStructureError,
     ModelNotFittedError,
-    OutOfBoundsError,
+    OutOfBoundsError, InvalidFitDataError,
 )
 from safeds.ml.nn import (
     NeuralNetworkClassifier,
@@ -230,6 +231,75 @@ class TestClassificationModel:
             match="The features in the given table do not match with the specified feature columns names of the neural network.",
         ):
             learned_model.fit(Table.from_dict({"k": [0.1, 0, 0.2], "l": [0, 0.15, 0.5]}).to_tabular_dataset("k"))
+
+    @pytest.mark.parametrize(
+        ("table", "reason"),
+        [
+            (
+                Table.from_dict({"a": [1, 2, 3], "b": [1, 2, None], "c": [0, 15, 5]}).to_tabular_dataset("c"),
+                re.escape("The given Fit Data is invalid:\nThe following Columns contain missing values: ['b']\n"),
+            ),
+            (
+                Table.from_dict({"a": [1, 2, "a"], "b": [1, 2, 3], "c": [0, 15, 5]}).to_tabular_dataset("c"),
+                re.escape("The given Fit Data is invalid:\nThe following Columns contain non-numerical data: ['a']"),
+            ),
+            (
+                Table.from_dict({"a": [1, 2, "a"], "b": [1, 2, None], "c": [0, 15, 5]}).to_tabular_dataset("c"),
+                re.escape(
+                    "The given Fit Data is invalid:\nThe following Columns contain missing values: ['b']\nThe following Columns contain non-numerical data: ['a']",
+                ),
+            ),
+            (
+                Table.from_dict({"a": [1, 2, "a"], "b": [1, "b", None], "c": [0, 15, 5]}).to_tabular_dataset("c"),
+                re.escape(
+                    "The given Fit Data is invalid:\nThe following Columns contain missing values: ['b']\nThe following Columns contain non-numerical data: ['a', 'b']",
+                ),
+            ),
+            (
+                Table.from_dict({"a": [1, 2, 3], "b": [1, 2, 3], "c": [0, None, 5]}).to_tabular_dataset("c"),
+                re.escape("The given Fit Data is invalid:\nThe following Columns contain missing values: ['c']\n"),
+            ),
+            (
+                Table.from_dict({"a": [1, 2, 3], "b": [1, 2, 3], "c": [0, "c", 5]}).to_tabular_dataset("c"),
+                re.escape("The given Fit Data is invalid:\nThe following Columns contain non-numerical data: ['c']"),
+            ),
+            (
+                Table.from_dict({"a": [1, 2, 3], "b": [1, 2, 3], "c": [0, "c", None]}).to_tabular_dataset("c"),
+                re.escape(
+                    "The given Fit Data is invalid:\nThe following Columns contain missing values: ['c']\nThe following Columns contain non-numerical data: ['c']",
+                ),
+            ),
+            (
+                Table.from_dict({"a": [1, 2, "a"], "b": [1, "b", None], "c": [0, "c", None]}).to_tabular_dataset("c"),
+                re.escape(
+                    "The given Fit Data is invalid:\nThe following Columns contain missing values: ['b', 'c']\nThe following Columns contain non-numerical data: ['a', 'b', 'c']",
+                ),
+            ),
+        ],
+        ids=[
+            "missing value feature",
+            "non-numerical feature",
+            "missing value and non-numerical features",
+            "mixed missing and non-numerical features",
+            "missing value target",
+            "non-numerical target",
+            "missing value and non-numerical target",
+            "mixed missing and non-numerical features and target",
+        ],
+    )
+    def test_should_catch_invalid_fit_data(self, device: Device, table: TabularDataset, reason: str) -> None:
+        configure_test_with_device(device)
+        model = NeuralNetworkClassifier(
+            InputConversionTable(),
+            [ForwardLayer(neuron_count=4), ForwardLayer(1)],
+        )
+        with pytest.raises(
+            InvalidFitDataError,
+            match=reason,
+        ):
+            model.fit(table)
+
+
 
     # def test_should_raise_if_table_size_and_input_size_mismatch(self, device: Device) -> None:
     #     configure_test_with_device(device)
@@ -609,6 +679,73 @@ class TestRegressionModel:
                 Table.from_dict({"k": [1, 0, 2], "l": [0, 15, 5]}).to_tabular_dataset("l"),
             )
 
+
+    @pytest.mark.parametrize(
+        ("table", "reason"),
+        [
+            (
+                Table.from_dict({"a": [1, 2, 3], "b": [1, 2, None], "c": [0, 15, 5]}).to_tabular_dataset("c"),
+                re.escape("The given Fit Data is invalid:\nThe following Columns contain missing values: ['b']\n"),
+            ),
+            (
+                Table.from_dict({"a": [1, 2, "a"], "b": [1, 2, 3], "c": [0, 15, 5]}).to_tabular_dataset("c"),
+                re.escape("The given Fit Data is invalid:\nThe following Columns contain non-numerical data: ['a']"),
+            ),
+            (
+                Table.from_dict({"a": [1, 2, "a"], "b": [1, 2, None], "c": [0, 15, 5]}).to_tabular_dataset("c"),
+                re.escape(
+                    "The given Fit Data is invalid:\nThe following Columns contain missing values: ['b']\nThe following Columns contain non-numerical data: ['a']",
+                ),
+            ),
+            (
+                Table.from_dict({"a": [1, 2, "a"], "b": [1, "b", None], "c": [0, 15, 5]}).to_tabular_dataset("c"),
+                re.escape(
+                    "The given Fit Data is invalid:\nThe following Columns contain missing values: ['b']\nThe following Columns contain non-numerical data: ['a', 'b']",
+                ),
+            ),
+            (
+                Table.from_dict({"a": [1, 2, 3], "b": [1, 2, 3], "c": [0, None, 5]}).to_tabular_dataset("c"),
+                re.escape("The given Fit Data is invalid:\nThe following Columns contain missing values: ['c']\n"),
+            ),
+            (
+                Table.from_dict({"a": [1, 2, 3], "b": [1, 2, 3], "c": [0, "c", 5]}).to_tabular_dataset("c"),
+                re.escape("The given Fit Data is invalid:\nThe following Columns contain non-numerical data: ['c']"),
+            ),
+            (
+                Table.from_dict({"a": [1, 2, 3], "b": [1, 2, 3], "c": [0, "c", None]}).to_tabular_dataset("c"),
+                re.escape(
+                    "The given Fit Data is invalid:\nThe following Columns contain missing values: ['c']\nThe following Columns contain non-numerical data: ['c']",
+                ),
+            ),
+            (
+                Table.from_dict({"a": [1, 2, "a"], "b": [1, "b", None], "c": [0, "c", None]}).to_tabular_dataset("c"),
+                re.escape(
+                    "The given Fit Data is invalid:\nThe following Columns contain missing values: ['b', 'c']\nThe following Columns contain non-numerical data: ['a', 'b', 'c']",
+                ),
+            ),
+        ],
+        ids=[
+            "missing value feature",
+            "non-numerical feature",
+            "missing value and non-numerical features",
+            "mixed missing and non-numerical features",
+            "missing value target",
+            "non-numerical target",
+            "missing value and non-numerical target",
+            "mixed missing and non-numerical features and target",
+        ],
+    )
+    def test_should_catch_invalid_fit_data(self, device: Device, table: TabularDataset, reason: str) -> None:
+        model = NeuralNetworkRegressor(
+            InputConversionTable(),
+            [ForwardLayer(neuron_count=4), ForwardLayer(1)],
+        )
+        with pytest.raises(
+            InvalidFitDataError,
+            match=reason,
+        ):
+            model.fit(table)
+
     # def test_should_raise_if_table_size_and_input_size_mismatch(self, device: Device) -> None:
     #     configure_test_with_device(device)
     #     model = NeuralNetworkRegressor(
@@ -781,3 +918,4 @@ class TestRegressionModel:
 
         # Should not raise
         pickle.dumps(fitted_model)
+

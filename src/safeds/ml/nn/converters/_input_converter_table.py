@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING
 
 from safeds.data.labeled.containers import TabularDataset
 from safeds.data.tabular.containers import Column, Table
+from safeds.exceptions import InvalidFitDataError
 
 from ._input_converter import InputConversion
 
@@ -43,6 +44,24 @@ class InputConversionTable(InputConversion[TabularDataset, Table]):
             self._feature_names = input_data.features.column_names
             self._target_name = input_data.target.name
             self._first = False
+
+            columns_with_missing_values = []
+            columns_with_non_numerical_data = []
+
+            for col in input_data.features.add_columns([input_data.target]).to_columns():
+                if col.missing_value_count() > 0:
+                    columns_with_missing_values.append(col.name)
+                if not col.type.is_numeric:
+                    columns_with_non_numerical_data.append(col.name)
+
+            reason = ""
+            if len(columns_with_missing_values) > 0:
+                reason += f"The following Columns contain missing values: {columns_with_missing_values}\n"
+            if len(columns_with_non_numerical_data) > 0:
+                reason += f"The following Columns contain non-numerical data: {columns_with_non_numerical_data}"
+            if reason is not "":
+                raise InvalidFitDataError(reason)
+
         return (sorted(input_data.features.column_names)).__eq__(sorted(self._feature_names))
 
     def _is_predict_data_valid(self, input_data: Table) -> bool:
