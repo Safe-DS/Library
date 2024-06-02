@@ -25,11 +25,11 @@ from safeds.ml.classical.regression import (
 
 
 def _fit_single_model(model: Regressor, train_data: TabularDataset) -> Regressor:
-    return model.fit(train_data)
+    return model.fit(train_data)  # pragma: no cover
 
 
 def _predict_single_model(model: Regressor, test_data: TabularDataset) -> TabularDataset:
-    return model.predict(test_data)
+    return model.predict(test_data)  # pragma: no cover
 
 
 class BaselineRegressor:
@@ -54,7 +54,7 @@ class BaselineRegressor:
         ]
 
         if include_slower_models:
-            self._list_of_model_types.extend([ElasticNetRegressor(), LassoRegressor(), GradientBoostingRegressor()])
+            self._list_of_model_types.extend([ElasticNetRegressor(), LassoRegressor(), GradientBoostingRegressor()])  # pragma: no cover
 
         self._fitted_models: list[Regressor] = []
         self._feature_names: list[str] | None = None

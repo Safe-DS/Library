@@ -21,11 +21,11 @@ from safeds.ml.classical.classification import (
 
 
 def _fit_single_model(model: Classifier, train_data: TabularDataset) -> Classifier:
-    return model.fit(train_data)
+    return model.fit(train_data)  # pragma: no cover
 
 
 def _predict_single_model(model: Classifier, test_data: TabularDataset) -> TabularDataset:
-    return model.predict(test_data)
+    return model.predict(test_data)  # pragma: no cover
 
 
 class BaselineClassifier:
@@ -47,7 +47,7 @@ class BaselineClassifier:
             RandomForestClassifier(),
         ]
         if extended_search:
-            self._list_of_model_types.extend([GradientBoostingClassifier()])
+            self._list_of_model_types.extend([GradientBoostingClassifier()])  # pragma: no cover
 
         self._fitted_models: list[Classifier] = []
         self._feature_names: list[str] | None = None

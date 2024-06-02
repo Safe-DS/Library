@@ -4,7 +4,7 @@ from safeds.exceptions import (
     ColumnTypeError,
     DatasetMissesDataError,
     DatasetMissesTargetError,
-    FeatureDataMismatchError,
+    FeatureDataMismatchError, ModelNotFittedError,
 )
 from safeds.ml.classical.regression import BaselineRegressor
 
@@ -51,6 +51,12 @@ class TestBaselineRegressor:
         assert not model.is_fitted
         model = model.fit(data)
         assert model.is_fitted
+
+    def test_should_raise_if_model_not_fitted(self) -> None:
+        model = BaselineRegressor()
+        predict_data = Table({"feat": [0, 1], "target": [0, 1]}).to_tabular_dataset("target")
+        with pytest.raises(ModelNotFittedError):
+            model.predict(predict_data)
 
     def test_should_raise_if_predict_data_has_differing_features(self) -> None:
         model = BaselineRegressor()
