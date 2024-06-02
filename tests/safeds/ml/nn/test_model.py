@@ -736,6 +736,7 @@ class TestRegressionModel:
         ],
     )
     def test_should_catch_invalid_fit_data(self, device: Device, table: TabularDataset, reason: str) -> None:
+        configure_test_with_device(device)
         model = NeuralNetworkRegressor(
             InputConversionTable(),
             [ForwardLayer(neuron_count=4), ForwardLayer(1)],
