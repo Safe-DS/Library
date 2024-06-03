@@ -16,7 +16,6 @@ from ._data import (
 from ._ml import (
     DatasetMissesDataError,
     DatasetMissesFeaturesError,
-    TargetDataMismatchError,
     FeatureDataMismatchError,
     InputSizeError,
     InvalidModelStructureError,
@@ -24,6 +23,7 @@ from ._ml import (
     ModelNotFittedError,
     PlainTableError,
     PredictionError,
+    TargetDataMismatchError,
 )
 
 

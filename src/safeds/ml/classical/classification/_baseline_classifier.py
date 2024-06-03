@@ -6,9 +6,9 @@ from safeds._validation._check_columns_are_numeric import _check_columns_are_num
 from safeds.data.labeled.containers import TabularDataset
 from safeds.exceptions import (
     DatasetMissesDataError,
-    TargetDataMismatchError,
     FeatureDataMismatchError,
     ModelNotFittedError,
+    TargetDataMismatchError,
 )
 from safeds.ml.classical.classification import (
     AdaBoostClassifier,
@@ -140,7 +140,9 @@ class BaselineClassifier:
         if not self._feature_names == test_data.features.column_names:
             raise FeatureDataMismatchError
         if not self._target_name == test_data.target.name:
-            raise TargetDataMismatchError(actual_target_name=test_data.target.name, missing_target_name=self._target_name)
+            raise TargetDataMismatchError(
+                actual_target_name=test_data.target.name, missing_target_name=self._target_name,
+            )
         test_data_as_table = test_data.to_table()
         if test_data_as_table.row_count == 0:
             raise DatasetMissesDataError

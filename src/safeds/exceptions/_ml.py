@@ -30,7 +30,9 @@ class TargetDataMismatchError(ValueError):
     """
 
     def __init__(self, actual_target_name: str, missing_target_name: str):
-        super().__init__(f"The provided target column '{actual_target_name}' does not match the target column of the training set '{missing_target_name}'.")
+        super().__init__(
+            f"The provided target column '{actual_target_name}' does not match the target column of the training set '{missing_target_name}'.",
+        )
 
 
 class DatasetMissesDataError(ValueError):
