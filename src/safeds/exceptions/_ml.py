@@ -15,18 +15,22 @@ class DatasetMissesFeaturesError(ValueError):
         super().__init__(f"Dataset misses the feature columns '{missing_feature_names}'.")
 
 
-class DatasetMissesTargetError(ValueError):
+class TargetDataMismatchError(ValueError):
     """
-    Raised when a dataset misses the target column.
+    Raised when the target column of a test dataset mismatches with the target column of the training dataset.
+
+    Currently only used in the Baseline Models.
 
     Parameters
     ----------
+    actual_target_name:
+        The actual target column of the dataset.
     missing_target_name:
-        The names of the missing target column.
+        The name of the missing target column.
     """
 
-    def __init__(self, missing_target_name: str):
-        super().__init__(f"Dataset misses the target column '{missing_target_name}'.")
+    def __init__(self, actual_target_name: str, missing_target_name: str):
+        super().__init__(f"The provided target column '{actual_target_name}' does not match the target column of the training set '{missing_target_name}'.")
 
 
 class DatasetMissesDataError(ValueError):

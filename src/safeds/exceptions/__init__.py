@@ -16,7 +16,7 @@ from ._data import (
 from ._ml import (
     DatasetMissesDataError,
     DatasetMissesFeaturesError,
-    DatasetMissesTargetError,
+    TargetDataMismatchError,
     FeatureDataMismatchError,
     InputSizeError,
     InvalidModelStructureError,
@@ -69,7 +69,7 @@ __all__ = [
     # ML exceptions
     "DatasetMissesDataError",
     "DatasetMissesFeaturesError",
-    "DatasetMissesTargetError",
+    "TargetDataMismatchError",
     "FeatureDataMismatchError",
     "InputSizeError",
     "InvalidModelStructureError",

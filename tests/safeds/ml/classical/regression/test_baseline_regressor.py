@@ -3,7 +3,7 @@ from safeds.data.tabular.containers import Table
 from safeds.exceptions import (
     ColumnTypeError,
     DatasetMissesDataError,
-    DatasetMissesTargetError,
+    TargetDataMismatchError,
     FeatureDataMismatchError,
     ModelNotFittedError,
 )
@@ -72,7 +72,7 @@ class TestBaselineRegressor:
         fit_data = Table({"feat": [0, 1], "target": [0, 1]}).to_tabular_dataset("target")
         predict_data = Table({"feat": [0, 1], "other": [0, 1]}).to_tabular_dataset("other")
         model = model.fit(fit_data)
-        with pytest.raises(DatasetMissesTargetError):
+        with pytest.raises(TargetDataMismatchError):
             model.predict(predict_data)
 
     def test_check_predict_return_type_and_values(self) -> None:

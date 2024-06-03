@@ -6,7 +6,7 @@ from safeds._validation._check_columns_are_numeric import _check_columns_are_num
 from safeds.data.labeled.containers import TabularDataset
 from safeds.exceptions import (
     DatasetMissesDataError,
-    DatasetMissesTargetError,
+    TargetDataMismatchError,
     FeatureDataMismatchError,
     ModelNotFittedError,
 )
@@ -133,8 +133,8 @@ class BaselineRegressor:
             If the features of the test data do not match with the features of the trained Regressor.
         DatasetMissesDataError
             If the given test_data contains no data.
-        DatasetMissesTargetError
-            If the given test_data misses the target column.
+        TargetDataMismatchError
+            If the target column of the test data does not match the target column of the training data.
         ColumnTypeError
             If one or more columns contain non-numeric values.
         """
@@ -149,7 +149,7 @@ class BaselineRegressor:
         if not self._feature_names == test_data.features.column_names:
             raise FeatureDataMismatchError
         if not self._target_name == test_data.target.name:
-            raise DatasetMissesTargetError(self._target_name)
+            raise TargetDataMismatchError(actual_target_name=test_data.target.name, missing_target_name=self._target_name)
         test_data_as_table = test_data.to_table()
         if test_data_as_table.row_count == 0:
             raise DatasetMissesDataError
