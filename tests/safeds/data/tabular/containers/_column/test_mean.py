@@ -1,4 +1,3 @@
-
 import pytest
 from safeds.data.tabular.containers import Column
 from safeds.exceptions import ColumnTypeError
