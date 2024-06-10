@@ -31,7 +31,7 @@ class TemporalCell(ABC):
     @abstractmethod
     def century(self) -> Cell[int]:
         """
-        Get the weekday of the underlying date(time) data.
+        Get the century of the underlying date(time) data.
 
         Returns
         -------
