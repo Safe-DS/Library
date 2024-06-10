@@ -51,6 +51,7 @@ class TemporalCell(ABC):
         |      21 |
         +---------+
         """
+
     @abstractmethod
     def weekday(self) -> Cell[int]:
         """
@@ -73,6 +74,7 @@ class TemporalCell(ABC):
         +=========+
         |       6 |
         """
+
     @abstractmethod
     def week(self) -> Cell[int]:
         """
@@ -165,7 +167,6 @@ class TemporalCell(ABC):
         +=========+
         |       9 |
         """
-
 
     @abstractmethod
     def datetime_to_string(self, format_string: str = "%Y/%m/%d %H:%M:%S") -> Cell[str]:
