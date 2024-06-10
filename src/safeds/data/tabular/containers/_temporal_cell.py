@@ -35,7 +35,7 @@ class TemporalCell(ABC):
 
         Returns
         -------
-            A cell containing the weekday as integer.
+            A cell containing the century as integer.
 
         Examples
         --------
