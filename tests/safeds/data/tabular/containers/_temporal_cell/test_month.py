@@ -8,7 +8,7 @@ from tests.helpers import assert_cell_operation_works
 @pytest.mark.parametrize(
     ("expected", "input_date"),
     [
-        (3, datetime.datetime(2022, 3, 9, 23, 29, 1,)),
+        (3, datetime.datetime(2022, 3, 9, 23, 29, 1,tzinfo=datetime.timezone.utc)),
         (1, datetime.date(2022, 1, 1)),
     ],
     ids=[
