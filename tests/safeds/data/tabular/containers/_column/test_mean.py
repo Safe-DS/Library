@@ -1,5 +1,5 @@
+
 import pytest
-from datetime import date
 from safeds.data.tabular.containers import Column
 from safeds.exceptions import ColumnTypeError
 
