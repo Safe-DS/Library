@@ -73,6 +73,7 @@ class TemporalCell(ABC):
         |      i8 |
         +=========+
         |       6 |
+        +---------+
         """
 
     @abstractmethod
@@ -96,6 +97,7 @@ class TemporalCell(ABC):
         |      i8 |
         +=========+
         |      52 |
+        +---------+
         """
 
     @abstractmethod
@@ -143,6 +145,7 @@ class TemporalCell(ABC):
         |      i8 |
         +=========+
         |       1 |
+        +---------+
         """
 
     @abstractmethod
@@ -166,6 +169,7 @@ class TemporalCell(ABC):
         |      i8 |
         +=========+
         |       9 |
+        +---------+
         """
 
     @abstractmethod
