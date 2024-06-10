@@ -66,13 +66,12 @@ class TemporalCell(ABC):
         >>> import datetime
         >>> column = Column("example", [datetime.date(2022, 1, 1)])
         >>> column.transform(lambda cell: cell.dt.weekday())
-        +--------+
-        | example|
-        |    --- |
-        |     i8 |
-        +========+
-        |      6 |
-        +--------+
+        +---------+
+        | example |
+        |     --- |
+        |      i8 |
+        +=========+
+        |       6 |
         """
     @abstractmethod
     def week(self) -> Cell[int]:
@@ -89,13 +88,12 @@ class TemporalCell(ABC):
         >>> import datetime
         >>> column = Column("example", [datetime.date(2022, 1, 1)])
         >>> column.transform(lambda cell: cell.dt.week())
-        +--------+
-        | example|
-        |    --- |
-        |     i8 |
-        +========+
-        |      1 |
-        +--------+
+        +---------+
+        | example |
+        |     --- |
+        |      i8 |
+        +=========+
+        |      52 |
         """
 
     @abstractmethod
@@ -118,7 +116,7 @@ class TemporalCell(ABC):
         |     --- |
         |     i32 |
         +=========+
-        |      22 |
+        |    2022 |
         +---------+
         """
 
@@ -137,13 +135,12 @@ class TemporalCell(ABC):
         >>> import datetime
         >>> column = Column("example", [datetime.date(2022, 1, 9)])
         >>> column.transform(lambda cell: cell.dt.month())
-        +--------+
-        | example|
-        |    --- |
-        |     i8 |
-        +========+
-        |      1 |
-        +--------+
+        +---------+
+        | example |
+        |     --- |
+        |      i8 |
+        +=========+
+        |       1 |
         """
 
     @abstractmethod
@@ -161,13 +158,12 @@ class TemporalCell(ABC):
         >>> import datetime
         >>> column = Column("example", [datetime.date(2022, 1, 9)])
         >>> column.transform(lambda cell: cell.dt.day())
-        +--------+
-        | example|
-        |    --- |
-        |     i8 |
-        +========+
-        |      9 |
-        +--------+
+        +---------+
+        | example |
+        |     --- |
+        |      i8 |
+        +=========+
+        |       9 |
         """
 
 
