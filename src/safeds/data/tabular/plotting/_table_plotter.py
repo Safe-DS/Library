@@ -358,11 +358,11 @@ class TablePlotter:
         # Calculate the moving average
         mean_col = pl.col(y_name).mean().alias(y_name)
         grouped = self._table._lazy_frame.sort(x_name).group_by(x_name).agg(mean_col).collect()
-        df = grouped
-        moving_average = df.select([
+        data = grouped
+        moving_average = data.select([
             pl.col(y_name).rolling_mean(window_size).alias("moving_average")
         ])
-        x_data = df[x_name].to_numpy()
+        x_data = data[x_name].to_numpy()
         fig, ax = plt.subplots()
 
         ax.plot(x_data, moving_average['moving_average'].to_numpy(), label="moving average")
