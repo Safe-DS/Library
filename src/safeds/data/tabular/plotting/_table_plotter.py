@@ -237,6 +237,7 @@ class TablePlotter:
 
         import matplotlib.pyplot as plt
         import polars as pl
+
         agg_list = []
         for name in y_names:
             agg_list.append(pl.col(name).mean().alias(f"{name}_mean"))
@@ -322,6 +323,7 @@ class TablePlotter:
         _plot_validation(self._table, x_name, y_names)
 
         import matplotlib.pyplot as plt
+
         fig, ax = plt.subplots()
         for y_name in y_names:
             ax.scatter(
@@ -351,21 +353,20 @@ class TablePlotter:
 
         return _figure_to_image(fig)
 
-    def moving_average_plot(self, x_name: str, y_name: str, window_size: int)->Image:
-        import polars as pl
+    def moving_average_plot(self, x_name: str, y_name: str, window_size: int) -> Image:
         import matplotlib.pyplot as plt
+        import polars as pl
+
         _plot_validation(self._table, x_name, [y_name])
         # Calculate the moving average
         mean_col = pl.col(y_name).mean().alias(y_name)
         grouped = self._table._lazy_frame.sort(x_name).group_by(x_name).agg(mean_col).collect()
         data = grouped
-        moving_average = data.select([
-            pl.col(y_name).rolling_mean(window_size).alias("moving_average")
-        ])
+        moving_average = data.select([pl.col(y_name).rolling_mean(window_size).alias("moving_average")])
         x_data = data[x_name].to_numpy()
         fig, ax = plt.subplots()
 
-        ax.plot(x_data, moving_average['moving_average'].to_numpy(), label="moving average")
+        ax.plot(x_data, moving_average["moving_average"].to_numpy(), label="moving average")
         ax.set(
             xlabel=x_name,
             ylabel=y_name,
@@ -380,7 +381,6 @@ class TablePlotter:
         fig.tight_layout()
 
         return _figure_to_image(fig)
-
 
 
 def _plot_validation(table: Table, x_name: str, y_names: list[str]) -> None:
