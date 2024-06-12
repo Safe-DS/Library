@@ -24,7 +24,7 @@ def test_should_raise_if_is_fitted_is_set_correctly_lstm() -> None:
     )
     assert not model.is_fitted
     model = model.fit(ts)
-    model.predict(ts)
+    model.predict(ts.to_table())
     assert model.is_fitted
 
 
