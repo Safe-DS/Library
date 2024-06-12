@@ -89,12 +89,16 @@ class InputConversionTimeSeries(InputConversion[TimeSeriesDataset, Table]):
         )
 
     def _data_conversion_predict(self, input_data: Table, batch_size: int) -> DataLoader:
-        input_data_time_series = input_data.to_time_series_dataset(target_name=self._target_name,
-                                                       window_size=self._window_size,
-                                                       extra_names=self._extra_names,
-                                                       forecast_horizon=self._forecast_horizon,
-                                                       continuous=self._continuous)
-        return input_data_time_series._into_dataloader_with_window_predict(self._window_size, self._forecast_horizon, batch_size)
+        input_data_time_series = input_data.to_time_series_dataset(
+            target_name=self._target_name,
+            window_size=self._window_size,
+            extra_names=self._extra_names,
+            forecast_horizon=self._forecast_horizon,
+            continuous=self._continuous,
+        )
+        return input_data_time_series._into_dataloader_with_window_predict(
+            self._window_size, self._forecast_horizon, batch_size,
+        )
 
     def _data_conversion_output(
         self,
@@ -109,11 +113,13 @@ class InputConversionTimeSeries(InputConversion[TimeSeriesDataset, Table]):
         return input_data_table.replace_column(
             self._target_name,
             [Column(self._target_name, output_data.tolist())],
-        ).to_time_series_dataset(target_name=self._target_name,
-                                 window_size=self._window_size,
-                                 extra_names=self._extra_names,
-                                 forecast_horizon=self._forecast_horizon,
-                                 continuous=self._continuous)
+        ).to_time_series_dataset(
+            target_name=self._target_name,
+            window_size=self._window_size,
+            extra_names=self._extra_names,
+            forecast_horizon=self._forecast_horizon,
+            continuous=self._continuous,
+        )
 
     def _is_fit_data_valid(self, input_data: TimeSeriesDataset) -> bool:
         if self._first:
