@@ -97,7 +97,9 @@ class InputConversionTimeSeries(InputConversion[TimeSeriesDataset, Table]):
             continuous=self._continuous,
         )
         return input_data_time_series._into_dataloader_with_window_predict(
-            self._window_size, self._forecast_horizon, batch_size,
+            self._window_size,
+            self._forecast_horizon,
+            batch_size,
         )
 
     def _data_conversion_output(
