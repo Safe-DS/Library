@@ -89,7 +89,7 @@ class InputConversionTimeSeries(InputConversion[TimeSeriesDataset, Table]):
         )
 
     def _data_conversion_predict(self, input_data: Table, batch_size: int) -> DataLoader:
-        input_data_time_series: TimeSeriesDataset = input_data.to_time_series_dataset(target_name=self._target_name,
+        input_data_time_series = input_data.to_time_series_dataset(target_name=self._target_name,
                                                        window_size=self._window_size,
                                                        extra_names=self._extra_names,
                                                        forecast_horizon=self._forecast_horizon,
@@ -100,7 +100,7 @@ class InputConversionTimeSeries(InputConversion[TimeSeriesDataset, Table]):
         self,
         input_data: Table,
         output_data: Tensor,
-    ) -> Table:
+    ) -> TimeSeriesDataset:
         window_size: int = self._window_size
         forecast_horizon: int = self._forecast_horizon
         input_data_table = input_data
@@ -109,7 +109,11 @@ class InputConversionTimeSeries(InputConversion[TimeSeriesDataset, Table]):
         return input_data_table.replace_column(
             self._target_name,
             [Column(self._target_name, output_data.tolist())],
-        )
+        ).to_time_series_dataset(target_name=self._target_name,
+                                 window_size=self._window_size,
+                                 extra_names=self._extra_names,
+                                 forecast_horizon=self._forecast_horizon,
+                                 continuous=self._continuous)
 
     def _is_fit_data_valid(self, input_data: TimeSeriesDataset) -> bool:
         if self._first:
