@@ -1,12 +1,12 @@
 from __future__ import annotations
 
 from abc import ABC
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Self
 
 from safeds.data.labeled.containers import TabularDataset
-from safeds.exceptions import ModelNotFittedError
+from safeds.exceptions import ModelNotFittedError, PlainTableError, DatasetMissesDataError
 from safeds.ml.classical import SupervisedModel
-from safeds.ml.metrics import ClassificationMetrics
+from safeds.ml.metrics import ClassificationMetrics, ClassifierMetric
 
 if TYPE_CHECKING:
     from typing import Any
@@ -211,6 +211,42 @@ class Classifier(SupervisedModel, ABC):
             validation_or_test_set.get_column(self.get_target_name()),
             positive_class,
         )
+
+    def fit_by_exhaustive_search(self, training_set: TabularDataset, optimization_metric: ClassifierMetric,
+                                 positive_class: Any = None) -> Self:
+        if not isinstance(training_set, TabularDataset) and isinstance(training_set, Table):
+            raise PlainTableError
+        if training_set.to_table().row_count == 0:
+            raise DatasetMissesDataError
+
+        self._check_additional_fit_by_exhaustive_search_preconditions(training_set, optimization_metric, positive_class)
+
+        #TODO Cross Validation
+
+        list_of_models = self._get_models_for_all_choices()
+        list_of_fitted_models = []
+        for model in list_of_models:
+            list_of_fitted_models.append(model.fit(training_set))
+
+        best_model = None
+        for fitted_model in list_of_fitted_models:
+            if best_model is None:
+                best_model = fitted_model
+            else:
+                match optimization_metric.value:
+                    case "accuracy":
+                        if fitted_model.accuracy(training_set) > best_model.accuracy(training_set):
+                            best_model = fitted_model
+                    case "precision":
+                        if fitted_model.precision(training_set, positive_class) > best_model.precision(training_set, positive_class):
+                            best_model = fitted_model
+                    case "recall":
+                        if fitted_model.recall(training_set, positive_class) > best_model.recall(training_set, positive_class):
+                            best_model = fitted_model
+                    case "f1score":
+                        if fitted_model.f1_score(training_set, positive_class) > best_model.f1_score(training_set, positive_class):
+                            best_model = fitted_model
+        return best_model
 
 
 def _extract_table(table_or_dataset: Table | TabularDataset) -> Table:

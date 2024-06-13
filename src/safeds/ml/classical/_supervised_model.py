@@ -17,6 +17,7 @@ from safeds.exceptions import (
     PlainTableError,
     PredictionError,
 )
+from safeds.ml.metrics import ClassifierMetric, RegressorMetric
 
 if TYPE_CHECKING:
     from sklearn.base import ClassifierMixin, RegressorMixin
@@ -244,6 +245,18 @@ class SupervisedModel(ABC):
             The training data containing the features and target.
         """
 
+    def _check_additional_fit_by_exhaustive_search_preconditions(self,
+                                                                 training_set: TabularDataset, optimization_metric: ClassifierMetric | RegressorMetric, positive_class: Any = None) -> None:  # noqa: B027
+        """
+        Check additional preconditions for fitting the model by exhaustive search and raise an error if any are
+        violated.
+
+        Parameters
+        ----------
+        training_set:
+            The training data containing the features and target.
+        """
+
     def _check_additional_predict_preconditions(self, dataset: Table | TabularDataset) -> None:  # noqa: B027
         """
         Check additional preconditions for predicting with the model and raise an error if any are violated.
@@ -252,6 +265,16 @@ class SupervisedModel(ABC):
         ----------
         dataset:
             The dataset containing at least the features.
+        """
+
+    def _get_models_for_all_choices(self) -> list[Self]:  # noqa: B027
+        """
+        Check additional preconditions for predicting with the model and raise an error if any are violated.
+
+        Returns
+        -------
+        model_list:
+            A list of every possible model, given all Choice Parameters
         """
 
     @abstractmethod

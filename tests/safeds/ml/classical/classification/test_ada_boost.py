@@ -3,6 +3,8 @@ from safeds.data.labeled.containers import TabularDataset
 from safeds.data.tabular.containers import Table
 from safeds.exceptions import OutOfBoundsError
 from safeds.ml.classical.classification import AdaBoostClassifier
+from safeds.ml.hyperparameters import Choice
+from safeds.ml.metrics import ClassifierMetric
 
 
 @pytest.fixture()
@@ -39,6 +41,12 @@ class TestMaxLearnerCount:
         with pytest.raises(OutOfBoundsError):
             AdaBoostClassifier(max_learner_count=max_learner_count)
 
+    def test_choice_(self):
+        model = AdaBoostClassifier(max_learner_count=Choice(10, 20, 300, 413, 2000, 1456, 6666, 81, 9321, 2422))
+        model = model.fit_by_exhaustive_search(Table.from_dict({"col1": [1, 2, 3, 4], "col2": [1, 2, 3, 4]}).to_tabular_dataset("col1"), ClassifierMetric.PRECISION, 2)
+        print(model.max_learner_count)
+        pred = model.predict(Table.from_dict({"col2": [10, 20, 30, -40]}))
+        print(pred)
 
 class TestLearningRate:
     def test_should_be_passed_to_fitted_model(self, training_set: TabularDataset) -> None:

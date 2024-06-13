@@ -1,11 +1,15 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Self, Any
 
 from safeds._utils import _structural_hash
+from safeds.data.labeled.containers import TabularDataset
+from safeds.exceptions import FittingWithChoiceError, FittingWithoutChoiceError, LearningError
 from safeds.ml.classical._bases import _AdaBoostBase
 
 from ._classifier import Classifier
+from ...hyperparameters import Choice
+from ...metrics import ClassifierMetric
 
 if TYPE_CHECKING:
     from sklearn.base import ClassifierMixin
@@ -40,7 +44,7 @@ class AdaBoostClassifier(Classifier, _AdaBoostBase):
         self,
         *,
         learner: Classifier | None = None,
-        max_learner_count: int = 50,
+        max_learner_count: int | Choice[int] = 50,
         learning_rate: float = 1.0,
     ) -> None:
         # Initialize superclasses
@@ -83,10 +87,25 @@ class AdaBoostClassifier(Classifier, _AdaBoostBase):
 
     def _get_sklearn_model(self) -> ClassifierMixin:
         from sklearn.ensemble import AdaBoostClassifier as SklearnAdaBoostClassifier
-
         learner = self.learner._get_sklearn_model() if self.learner is not None else None
         return SklearnAdaBoostClassifier(
             estimator=learner,
             n_estimators=self._max_learner_count,
             learning_rate=self._learning_rate,
         )
+
+    def _check_additional_fit_preconditions(self, training_set: TabularDataset) -> None:
+        if isinstance(self._max_learner_count, Choice):
+            raise FittingWithChoiceError
+
+    def _check_additional_fit_by_exhaustive_search_preconditions(self, training_set: TabularDataset, optimization_metric: ClassifierMetric, positive_class: Any = None) -> None:
+        if isinstance(self._max_learner_count, int):
+            raise FittingWithoutChoiceError
+        if optimization_metric in {"precision", "recall", "f1score"} and positive_class is None:
+            raise LearningError(f"Please provide a positive class when using optimization metric {optimization_metric.value}.")
+
+    def _get_models_for_all_choices(self) -> list[Self]:
+        models = []
+        for value in self.max_learner_count:
+            models.append(AdaBoostClassifier(learner=self.learner, max_learner_count=value, learning_rate=self.learning_rate))
+        return models
