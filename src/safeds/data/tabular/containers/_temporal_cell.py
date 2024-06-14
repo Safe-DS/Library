@@ -9,12 +9,9 @@ if TYPE_CHECKING:
 
 class TemporalCell(ABC):
     """
-    A class that contains temporal methods for a column.
+    Namespace for operations on temporal data.
 
-    Parameters
-    ----------
-    column:
-        The column to be operated on.
+    This class cannot be instantiated directly. It can only be accessed using the `dt` attribute of a cell.
 
     Examples
     --------
@@ -30,6 +27,150 @@ class TemporalCell(ABC):
     | 2022/01/09 |
     +------------+
     """
+
+    @abstractmethod
+    def century(self) -> Cell[int]:
+        """
+        Get the century of the underlying date(time) data.
+
+        Returns
+        -------
+            A cell containing the century as integer.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> import datetime
+        >>> column = Column("example", [datetime.date(2022, 1, 1)])
+        >>> column.transform(lambda cell: cell.dt.century())
+        +---------+
+        | example |
+        |     --- |
+        |     i32 |
+        +=========+
+        |      21 |
+        +---------+
+        """
+
+    @abstractmethod
+    def weekday(self) -> Cell[int]:
+        """
+        Get the weekday of the underlying date(time) data.
+
+        Returns
+        -------
+            A cell containing the weekday as integer.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> import datetime
+        >>> column = Column("example", [datetime.date(2022, 1, 1)])
+        >>> column.transform(lambda cell: cell.dt.weekday())
+        +---------+
+        | example |
+        |     --- |
+        |      i8 |
+        +=========+
+        |       6 |
+        +---------+
+        """
+
+    @abstractmethod
+    def week(self) -> Cell[int]:
+        """
+        Get the week of the underlying date(time) data.
+
+        Returns
+        -------
+            A cell containing the week as integer.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> import datetime
+        >>> column = Column("example", [datetime.date(2022, 1, 1)])
+        >>> column.transform(lambda cell: cell.dt.week())
+        +---------+
+        | example |
+        |     --- |
+        |      i8 |
+        +=========+
+        |      52 |
+        +---------+
+        """
+
+    @abstractmethod
+    def year(self) -> Cell[int]:
+        """
+        Get the year of the underlying date(time) data.
+
+        Returns
+        -------
+            A cell containing the year as integer.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> import datetime
+        >>> column = Column("example", [datetime.date(2022, 1, 9)])
+        >>> column.transform(lambda cell: cell.dt.year())
+        +---------+
+        | example |
+        |     --- |
+        |     i32 |
+        +=========+
+        |    2022 |
+        +---------+
+        """
+
+    @abstractmethod
+    def month(self) -> Cell[int]:
+        """
+        Get the month of the underlying date(time) data.
+
+        Returns
+        -------
+            A cell containing the month as integer.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> import datetime
+        >>> column = Column("example", [datetime.date(2022, 1, 9)])
+        >>> column.transform(lambda cell: cell.dt.month())
+        +---------+
+        | example |
+        |     --- |
+        |      i8 |
+        +=========+
+        |       1 |
+        +---------+
+        """
+
+    @abstractmethod
+    def day(self) -> Cell[int]:
+        """
+        Get the day of the underlying date(time) data.
+
+        Returns
+        -------
+            A cell containing the day as integer.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> import datetime
+        >>> column = Column("example", [datetime.date(2022, 1, 9)])
+        >>> column.transform(lambda cell: cell.dt.day())
+        +---------+
+        | example |
+        |     --- |
+        |      i8 |
+        +=========+
+        |       9 |
+        +---------+
+        """
 
     @abstractmethod
     def datetime_to_string(self, format_string: str = "%Y/%m/%d %H:%M:%S") -> Cell[str]:
