@@ -98,11 +98,10 @@ class AdaBoostClassifier(Classifier, _AdaBoostBase):
         if isinstance(self._max_learner_count, Choice):
             raise FittingWithChoiceError
 
-    def _check_additional_fit_by_exhaustive_search_preconditions(self, training_set: TabularDataset, optimization_metric: ClassifierMetric, positive_class: Any = None) -> None:
+    def _check_additional_fit_by_exhaustive_search_preconditions(self, training_set: TabularDataset) -> None:
         if isinstance(self._max_learner_count, int):
             raise FittingWithoutChoiceError
-        if optimization_metric in {"precision", "recall", "f1score"} and positive_class is None:
-            raise LearningError(f"Please provide a positive class when using optimization metric {optimization_metric.value}.")
+
 
     def _get_models_for_all_choices(self) -> list[Self]:
         models = []

@@ -4,7 +4,7 @@ from abc import ABC
 from typing import TYPE_CHECKING, Self
 
 from safeds.data.labeled.containers import TabularDataset
-from safeds.exceptions import ModelNotFittedError, PlainTableError, DatasetMissesDataError
+from safeds.exceptions import ModelNotFittedError, PlainTableError, DatasetMissesDataError, LearningError
 from safeds.ml.classical import SupervisedModel
 from safeds.ml.metrics import ClassificationMetrics, ClassifierMetric
 
@@ -218,11 +218,14 @@ class Classifier(SupervisedModel, ABC):
             raise PlainTableError
         if training_set.to_table().row_count == 0:
             raise DatasetMissesDataError
+        if optimization_metric in {"precision", "recall", "f1score"} and positive_class is None:
+            raise LearningError(f"Please provide a positive class when using optimization metric {optimization_metric.value}.")
 
-        self._check_additional_fit_by_exhaustive_search_preconditions(training_set, optimization_metric, positive_class)
+        self._check_additional_fit_by_exhaustive_search_preconditions(training_set)
 
         #TODO Cross Validation
 
+        #TODO Multiprocessing
         list_of_models = self._get_models_for_all_choices()
         list_of_fitted_models = []
         for model in list_of_models:
