@@ -105,6 +105,6 @@ class AdaBoostClassifier(Classifier, _AdaBoostBase):
 
     def _get_models_for_all_choices(self) -> list[Self]:
         models = []
-        for value in self.max_learner_count:
+        for value in self._max_learner_count:
             models.append(AdaBoostClassifier(learner=self.learner, max_learner_count=value, learning_rate=self.learning_rate))
         return models

@@ -218,8 +218,8 @@ class Classifier(SupervisedModel, ABC):
             raise PlainTableError
         if training_set.to_table().row_count == 0:
             raise DatasetMissesDataError
-        if optimization_metric in {"precision", "recall", "f1score"} and positive_class is None:
-            raise LearningError(f"Please provide a positive class when using optimization metric {optimization_metric.value}.")
+        if optimization_metric.value in {"precision", "recall", "f1score"} and positive_class is None:
+            raise LearningError(f"Please provide a positive class when using optimization metric '{optimization_metric.value}'")
 
         self._check_additional_fit_by_exhaustive_search_preconditions(training_set)
 
