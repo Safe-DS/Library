@@ -3,6 +3,7 @@ from safeds.data.labeled.containers import TabularDataset
 from safeds.data.tabular.containers import Table
 from safeds.exceptions import OutOfBoundsError
 from safeds.ml.classical.classification import DecisionTreeClassifier
+from safeds.ml.hyperparameters import Choice
 
 
 @pytest.fixture()
@@ -21,8 +22,8 @@ class TestMaxDepth:
         assert fitted_model._wrapped_model is not None
         assert fitted_model._wrapped_model.max_depth == 2
 
-    @pytest.mark.parametrize("max_depth", [-1, 0], ids=["minus_one", "zero"])
-    def test_should_raise_if_less_than_or_equal_to_0(self, max_depth: int) -> None:
+    @pytest.mark.parametrize("max_depth", [-1, 0, Choice(-1)], ids=["minus_one", "zero", "invalid_choice"])
+    def test_should_raise_if_less_than_or_equal_to_0(self, max_depth: int | Choice[int]) -> None:
         with pytest.raises(OutOfBoundsError):
             DecisionTreeClassifier(max_depth=max_depth)
 
@@ -37,7 +38,9 @@ class TestMinSampleCountInLeaves:
         assert fitted_model._wrapped_model is not None
         assert fitted_model._wrapped_model.min_samples_leaf == 2
 
-    @pytest.mark.parametrize("min_sample_count_in_leaves", [-1, 0], ids=["minus_one", "zero"])
-    def test_should_raise_if_less_than_or_equal_to_0(self, min_sample_count_in_leaves: int) -> None:
+    @pytest.mark.parametrize("min_sample_count_in_leaves", [-1, 0, Choice(-1)], ids=["minus_one", "zero", "invalid_choice"])
+    def test_should_raise_if_less_than_or_equal_to_0(self, min_sample_count_in_leaves: int | Choice[int]) -> None:
         with pytest.raises(OutOfBoundsError):
             DecisionTreeClassifier(min_sample_count_in_leaves=min_sample_count_in_leaves)
+
+
