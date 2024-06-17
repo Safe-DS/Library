@@ -45,7 +45,7 @@ class AdaBoostClassifier(Classifier, _AdaBoostBase):
         *,
         learner: Classifier | None = None,
         max_learner_count: int | Choice[int] = 50,
-        learning_rate: float = 1.0,
+        learning_rate: float | Choice[float] = 1.0,
     ) -> None:
         # Initialize superclasses
         Classifier.__init__(self)
@@ -95,16 +95,21 @@ class AdaBoostClassifier(Classifier, _AdaBoostBase):
         )
 
     def _check_additional_fit_preconditions(self, training_set: TabularDataset) -> None:
-        if isinstance(self._max_learner_count, Choice):
+        if isinstance(self._max_learner_count, Choice) or isinstance(self._learning_rate, Choice):
             raise FittingWithChoiceError
 
     def _check_additional_fit_by_exhaustive_search_preconditions(self, training_set: TabularDataset) -> None:
-        if isinstance(self._max_learner_count, int):
+        if not isinstance(self._max_learner_count, Choice) and not isinstance(self._learning_rate, Choice):
             raise FittingWithoutChoiceError
 
-
     def _get_models_for_all_choices(self) -> list[Self]:
+        max_learner_count_choices = self._max_learner_count if isinstance(self._max_learner_count, Choice) else [
+            self._max_learner_count]
+        learning_rate_choices = self._learning_rate if isinstance(self._learning_rate, Choice) else [
+            self._learning_rate]
+
         models = []
-        for value in self._max_learner_count:
-            models.append(AdaBoostClassifier(learner=self.learner, max_learner_count=value, learning_rate=self.learning_rate))
+        for mlc in max_learner_count_choices:
+            for lr in learning_rate_choices:
+                models.append(AdaBoostClassifier(max_learner_count=mlc, learning_rate=lr))
         return models

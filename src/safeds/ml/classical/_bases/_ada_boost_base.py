@@ -21,7 +21,7 @@ class _AdaBoostBase(ABC):
     def __init__(
         self,
         max_learner_count: int | Choice[int],
-        learning_rate: float,
+        learning_rate: float | Choice[float],
     ) -> None:
         # Validation
         if isinstance(max_learner_count, Choice):
@@ -29,11 +29,16 @@ class _AdaBoostBase(ABC):
                 _check_bounds("max_learner_count", value, lower_bound=_ClosedBound(1))
         else:
             _check_bounds("max_learner_count", max_learner_count, lower_bound=_ClosedBound(1))
-        _check_bounds("learning_rate", learning_rate, lower_bound=_OpenBound(0))
+
+        if isinstance(learning_rate, Choice):
+            for value in learning_rate:
+                _check_bounds("learning_rate", value, lower_bound=_OpenBound(0))
+        else:
+            _check_bounds("learning_rate", learning_rate, lower_bound=_OpenBound(0))
 
         # Hyperparameters
         self._max_learner_count: int | Choice[int] = max_learner_count
-        self._learning_rate: float = learning_rate
+        self._learning_rate: float | Choice[float] = learning_rate
 
     def __hash__(self) -> int:
         return _structural_hash(
@@ -51,7 +56,7 @@ class _AdaBoostBase(ABC):
         return self._max_learner_count
 
     @property
-    def learning_rate(self) -> float:
+    def learning_rate(self) -> float | Choice[float]:
         """The learning rate."""
         return self._learning_rate
 

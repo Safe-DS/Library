@@ -80,19 +80,17 @@ class DecisionTreeClassifier(Classifier, _DecisionTreeBase):
             raise FittingWithChoiceError
 
     def _check_additional_fit_by_exhaustive_search_preconditions(self, training_set: TabularDataset) -> None:
-        if isinstance(self._max_depth, int) or isinstance(self._min_sample_count_in_leaves, int):
-            raise FittingWithChoiceError
+        if not isinstance(self._max_depth, Choice) and not isinstance(self._min_sample_count_in_leaves, Choice):
+            raise FittingWithoutChoiceError
 
     def _get_models_for_all_choices(self) -> list[Self]:
+        max_depth_choices = self._max_depth if isinstance(self._max_depth, Choice) else [
+            self._max_depth]
+        min_sample_count_choices = self._min_sample_count_in_leaves if isinstance(self._min_sample_count_in_leaves, Choice) else [
+            self._min_sample_count_in_leaves]
+
         models = []
-        if isinstance(self._max_depth, Choice) and isinstance(self._min_sample_count_in_leaves, Choice):
-            for max_depth in self._max_depth:
-                for min_sample in self._min_sample_count_in_leaves:
-                    models.append(DecisionTreeClassifier(max_depth=max_depth, min_sample_count_in_leaves=min_sample))
-        elif isinstance(self._max_depth, Choice):
-            for max_depth in self._max_depth:
-                models.append(DecisionTreeClassifier(max_depth=max_depth, min_sample_count_in_leaves=self._min_sample_count_in_leaves))
-        else:  # _min_sample_count_in_leaves is a Choice
-            for min_sample in self._min_sample_count_in_leaves:
-                models.append(DecisionTreeClassifier(max_depth=self._max_depth, min_sample_count_in_leaves=min_sample))
+        for md in max_depth_choices:
+            for msc in min_sample_count_choices:
+                models.append(DecisionTreeClassifier(max_depth=md, min_sample_count_in_leaves=msc))
         return models
