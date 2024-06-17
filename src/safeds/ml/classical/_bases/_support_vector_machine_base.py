@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING
 
 from safeds._utils import _structural_hash
 from safeds._validation import _check_bounds, _ClosedBound, _OpenBound
+from safeds.ml.hyperparameters import Choice
 
 if TYPE_CHECKING:
     from sklearn.svm import SVC as SklearnSVC  # noqa: N811
@@ -76,17 +77,21 @@ class _SupportVectorMachineBase(ABC):
     @abstractmethod
     def __init__(
         self,
-        c: float,
+        c: float | Choice[float],
         kernel: _SupportVectorMachineBase.Kernel | None,
     ) -> None:
         if kernel is None:
             kernel = _SupportVectorMachineBase.Kernel.radial_basis_function()
 
         # Validation
-        _check_bounds("c", c, lower_bound=_OpenBound(0))
+        if isinstance(c, Choice):
+            for value in c:
+                _check_bounds("c", value, lower_bound=_OpenBound(0))
+        else:
+            _check_bounds("c", c, lower_bound=_OpenBound(0))
 
         # Hyperparameters
-        self._c: float = c
+        self._c: float | Choice[float] = c
         self._kernel: _SupportVectorMachineBase.Kernel = kernel
 
     def __hash__(self) -> int:
@@ -100,7 +105,7 @@ class _SupportVectorMachineBase(ABC):
     # ------------------------------------------------------------------------------------------------------------------
 
     @property
-    def c(self) -> float:
+    def c(self) -> float | Choice[float]:
         """The regularization strength."""
         return self._c
 

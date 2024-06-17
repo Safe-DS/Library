@@ -1,10 +1,13 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Self
 
 from safeds._utils import _get_random_seed, _structural_hash
+from safeds.data.labeled.containers import TabularDataset
+from safeds.exceptions import FittingWithChoiceError, FittingWithoutChoiceError
 from safeds.ml.classical._bases import _SupportVectorMachineBase
 from safeds.ml.classical.classification import Classifier
+from safeds.ml.hyperparameters import Choice
 
 if TYPE_CHECKING:
     from sklearn.base import ClassifierMixin
@@ -34,7 +37,7 @@ class SupportVectorClassifier(Classifier, _SupportVectorMachineBase):
     def __init__(
         self,
         *,
-        c: float = 1.0,
+        c: float | Choice[float] = 1.0,
         kernel: SupportVectorClassifier.Kernel | None = None,
     ) -> None:
         # Initialize superclasses
@@ -79,3 +82,17 @@ class SupportVectorClassifier(Classifier, _SupportVectorMachineBase):
         )
         self._kernel._apply(result)
         return result
+
+    def _check_additional_fit_preconditions(self, training_set: TabularDataset) -> None:
+        if isinstance(self._c, Choice):
+            raise FittingWithChoiceError
+
+    def _check_additional_fit_by_exhaustive_search_preconditions(self, training_set: TabularDataset) -> None:
+        if not isinstance(self._c, Choice):
+            raise FittingWithoutChoiceError
+
+    def _get_models_for_all_choices(self) -> list[Self]:
+        models = []
+        for c in self._c:
+            models.append(SupportVectorClassifier(c=c))
+        return models
