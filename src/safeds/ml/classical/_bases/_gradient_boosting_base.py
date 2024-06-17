@@ -4,6 +4,7 @@ from abc import ABC, abstractmethod
 
 from safeds._utils import _structural_hash
 from safeds._validation import _check_bounds, _ClosedBound, _OpenBound
+from safeds.ml.hyperparameters import Choice
 
 
 class _GradientBoostingBase(ABC):
@@ -14,12 +15,21 @@ class _GradientBoostingBase(ABC):
     @abstractmethod
     def __init__(
         self,
-        tree_count: int,
-        learning_rate: float,
+        tree_count: int | Choice[int],
+        learning_rate: float | Choice[float],
     ) -> None:
         # Validation
-        _check_bounds("tree_count", tree_count, lower_bound=_ClosedBound(1))
-        _check_bounds("learning_rate", learning_rate, lower_bound=_OpenBound(0))
+        if isinstance(tree_count, Choice):
+            for value in tree_count:
+                _check_bounds("tree_count", value, lower_bound=_ClosedBound(1))
+        else:
+            _check_bounds("tree_count", tree_count, lower_bound=_ClosedBound(1))
+
+        if isinstance(learning_rate, Choice):
+            for value in learning_rate:
+                _check_bounds("learning_rate", value, lower_bound=_OpenBound(0))
+        else:
+            _check_bounds("learning_rate", learning_rate, lower_bound=_OpenBound(0))
 
         # Hyperparameters
         self._tree_count = tree_count
@@ -36,11 +46,11 @@ class _GradientBoostingBase(ABC):
     # ------------------------------------------------------------------------------------------------------------------
 
     @property
-    def tree_count(self) -> int:
+    def tree_count(self) -> int | Choice[int]:
         """The number of trees (estimators) in the ensemble."""
         return self._tree_count
 
     @property
-    def learning_rate(self) -> float:
+    def learning_rate(self) -> float | Choice[float]:
         """The learning rate."""
         return self._learning_rate
