@@ -3,9 +3,12 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from safeds._utils import _get_random_seed, _structural_hash
+from safeds.data.labeled.containers import TabularDataset
+from safeds.exceptions import FittingWithChoiceError, FittingWithoutChoiceError
 from safeds.ml.classical._bases import _RandomForestBase
 
 from ._classifier import Classifier
+from ...hyperparameters import Choice
 
 if TYPE_CHECKING:
     from sklearn.base import ClassifierMixin
@@ -41,9 +44,9 @@ class RandomForestClassifier(Classifier, _RandomForestBase):
     def __init__(
         self,
         *,
-        tree_count: int = 100,
-        max_depth: int | None = None,
-        min_sample_count_in_leaves: int = 1,
+        tree_count: int | Choice[int] = 100,
+        max_depth: int | Choice[int] | None = None,
+        min_sample_count_in_leaves: int | Choice[int] = 1,
     ) -> None:
         # Initialize superclasses
         Classifier.__init__(self)
@@ -81,3 +84,27 @@ class RandomForestClassifier(Classifier, _RandomForestBase):
             random_state=_get_random_seed(),
             n_jobs=-1,
         )
+
+    def _check_additional_fit_preconditions(self, training_set: TabularDataset) -> None:
+        if isinstance(self._tree_count, Choice) or isinstance(self._max_depth, Choice) or isinstance(
+            self._min_sample_count_in_leaves, Choice):
+            raise FittingWithChoiceError
+
+    def _check_additional_fit_by_exhaustive_search_preconditions(self, training_set: TabularDataset) -> None:
+        if not isinstance(self._tree_count, Choice) and not isinstance(self._max_depth, Choice) and not isinstance(
+            self._min_sample_count_in_leaves, Choice):
+            raise FittingWithoutChoiceError
+
+    def _get_models_for_all_choices(self) -> list[Self]:
+        tree_count_choices = self._tree_count if isinstance(self._tree_count, Choice) else [
+            self._tree_count]
+        max_depth_choices = self._max_depth if isinstance(self._max_depth, Choice) else [
+            self._max_depth]
+        min_sample_count_choices = self._min_sample_count_in_leaves if isinstance(self._min_sample_count_in_leaves, Choice) else [self._min_sample_count_in_leaves]
+
+        models = []
+        for tc in tree_count_choices:
+            for md in max_depth_choices:
+                for msc in min_sample_count_choices:
+                    models.append(RandomForestClassifier(tree_count=tc, max_depth=md, min_sample_count_in_leaves=msc))
+        return models

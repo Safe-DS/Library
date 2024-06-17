@@ -72,7 +72,7 @@ def classifiers_with_choices() -> list[Classifier]:
         DecisionTreeClassifier(max_depth=Choice(1, 2), min_sample_count_in_leaves=Choice(1, 2)),
         GradientBoostingClassifier(tree_count=Choice(1, 2), learning_rate=Choice(0.1, 0.2)),
         KNearestNeighborsClassifier(neighbor_count=Choice(2, 5)),
-        RandomForestClassifier(),  #TODO
+        RandomForestClassifier(tree_count=Choice(1, 2), max_depth=Choice(1, 2), min_sample_count_in_leaves=Choice(1, 2)),
         SupportVectorClassifier(),  #TODO
     ]
 
