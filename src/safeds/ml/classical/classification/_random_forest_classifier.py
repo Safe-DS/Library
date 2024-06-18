@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Self
 
 from safeds._utils import _get_random_seed, _structural_hash
 from safeds.data.labeled.containers import TabularDataset
