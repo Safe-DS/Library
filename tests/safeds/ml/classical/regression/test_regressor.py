@@ -78,7 +78,7 @@ def regressors_with_choices() -> list[Regressor]:
         AdaBoostRegressor(max_learner_count=Choice(1, 2), learning_rate=Choice(0.1, 0.2)),
         DecisionTreeRegressor(max_depth=Choice(1, 2), min_sample_count_in_leaves=Choice(1, 2)),
         GradientBoostingRegressor(tree_count=Choice(1, 2), learning_rate=Choice(0.1, 0.2)),
-        KNearestNeighborsRegressor(neighbor_count=Choice(2, 5)),
+        KNearestNeighborsRegressor(neighbor_count=Choice(1, 2)),
         RandomForestRegressor(tree_count=Choice(1, 2), max_depth=Choice(1, 2), min_sample_count_in_leaves=Choice(1, 2)),
         SupportVectorRegressor(c=Choice(0.5, 1.0)),
     ]
