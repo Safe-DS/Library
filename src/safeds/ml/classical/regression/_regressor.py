@@ -1,12 +1,13 @@
 from __future__ import annotations
 
 from abc import ABC
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Self
 
 from safeds.data.labeled.containers import TabularDataset
-from safeds.exceptions import ColumnLengthMismatchError, ModelNotFittedError
+from safeds.exceptions import ColumnLengthMismatchError, ModelNotFittedError, PlainTableError, LearningError, \
+    DatasetMissesDataError
 from safeds.ml.classical import SupervisedModel
-from safeds.ml.metrics import RegressionMetrics
+from safeds.ml.metrics import RegressionMetrics, RegressorMetric
 
 if TYPE_CHECKING:
     from safeds.data.tabular.containers import Column, Table
@@ -244,6 +245,41 @@ class Regressor(SupervisedModel, ABC):
             validation_or_test_set.get_column(self.get_target_name()),
         )
 
+    def fit_by_exhaustive_search(self, training_set: TabularDataset, optimization_metric: RegressorMetric) -> Self:
+        if not isinstance(training_set, TabularDataset) and isinstance(training_set, Table):
+            raise PlainTableError
+        if training_set.to_table().row_count == 0:
+            raise DatasetMissesDataError
+
+        self._check_additional_fit_by_exhaustive_search_preconditions(training_set)
+
+        # TODO Cross Validation
+
+        # TODO Multiprocessing
+        list_of_models = self._get_models_for_all_choices()
+        list_of_fitted_models = []
+        for model in list_of_models:
+            list_of_fitted_models.append(model.fit(training_set))
+
+        best_model = None
+        for fitted_model in list_of_fitted_models:
+            if best_model is None:
+                best_model = fitted_model
+            else:
+                match optimization_metric.value:
+                    case "mean_squared_error":
+                        if fitted_model.mean_squared_error(training_set) < best_model.mean_squared_error(training_set):
+                            best_model = fitted_model
+                    case "mean_absolute_error":
+                        if fitted_model.mean_absolute_error(training_set) < best_model.mean_absolute_error(training_set):
+                            best_model = fitted_model
+                    case "median_absolute_deviation":
+                        if fitted_model.median_absolute_deviation(training_set) < best_model.median_absolute_deviation(training_set):
+                            best_model = fitted_model
+                    case "coefficient_of_determination":
+                        if fitted_model.coefficient_of_determination(training_set) > best_model.coefficient_of_determination(training_set):
+                            best_model = fitted_model
+        return best_model
 
 def _check_metrics_preconditions(actual: Column, expected: Column) -> None:  # pragma: no cover
     if not actual.type.is_numeric:
@@ -260,6 +296,7 @@ def _check_metrics_preconditions(actual: Column, expected: Column) -> None:  # p
                 ],
             ),
         )
+
 
 
 def _extract_table(table_or_dataset: Table | TabularDataset) -> Table:

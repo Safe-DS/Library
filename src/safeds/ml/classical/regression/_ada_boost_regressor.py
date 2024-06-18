@@ -1,11 +1,14 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Self
 
 from safeds._utils import _structural_hash
+from safeds.data.labeled.containers import TabularDataset
+from safeds.exceptions import FittingWithChoiceError, FittingWithoutChoiceError
 from safeds.ml.classical._bases import _AdaBoostBase
 
 from ._regressor import Regressor
+from ...hyperparameters import Choice
 
 if TYPE_CHECKING:
     from sklearn.base import RegressorMixin
@@ -40,8 +43,8 @@ class AdaBoostRegressor(Regressor, _AdaBoostBase):
         self,
         *,
         learner: Regressor | None = None,
-        max_learner_count: int = 50,
-        learning_rate: float = 1.0,
+        max_learner_count: int | Choice[int] = 50 ,
+        learning_rate: float | Choice[float] = 1.0,
     ) -> None:
         # Initialize superclasses
         Regressor.__init__(self)
@@ -90,3 +93,23 @@ class AdaBoostRegressor(Regressor, _AdaBoostBase):
             n_estimators=self._max_learner_count,
             learning_rate=self._learning_rate,
         )
+
+    def _check_additional_fit_preconditions(self, training_set: TabularDataset) -> None:
+        if isinstance(self._max_learner_count, Choice) or isinstance(self._learning_rate, Choice):
+            raise FittingWithChoiceError
+
+    def _check_additional_fit_by_exhaustive_search_preconditions(self, training_set: TabularDataset) -> None:
+        if not isinstance(self._max_learner_count, Choice) and not isinstance(self._learning_rate, Choice):
+            raise FittingWithoutChoiceError
+
+    def _get_models_for_all_choices(self) -> list[Self]:
+        max_learner_count_choices = self._max_learner_count if isinstance(self._max_learner_count, Choice) else [
+            self._max_learner_count]
+        learning_rate_choices = self._learning_rate if isinstance(self._learning_rate, Choice) else [
+            self._learning_rate]
+
+        models = []
+        for mlc in max_learner_count_choices:
+            for lr in learning_rate_choices:
+                models.append(AdaBoostRegressor(max_learner_count=mlc, learning_rate=lr))
+        return models
