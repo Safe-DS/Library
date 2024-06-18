@@ -91,11 +91,6 @@ def valid_data() -> TabularDataset:
 
 @pytest.mark.parametrize("classifier_with_choice", classifiers_with_choices(), ids=lambda x: x.__class__.__name__)
 class TestChoiceClassifiers:
-    def test_should_raise_if_model_is_fitted_by_exhaustive_search_without_choice(self,
-                                                                                 classifier_with_choice: Classifier,
-                                                                                 valid_data: TabularDataset) -> None:
-        with pytest.raises(FittingWithoutChoiceError):
-            classifier_with_choice.fit_by_exhaustive_search(valid_data, optimization_metric=ClassifierMetric.ACCURACY)
 
     def test_should_raise_if_no_positive_class_is_provided(self, classifier_with_choice: Classifier,
                                                            valid_data: TabularDataset) -> None:
@@ -113,6 +108,14 @@ class TestChoiceClassifiers:
         with pytest.raises(FittingWithChoiceError):
             classifier_with_choice.fit(valid_data)
 
+
+@pytest.mark.parametrize("classifier", classifiers(), ids=lambda x: x.__class__.__name__)
+class TestFitByExhaustiveSearch:
+    def test_should_raise_if_model_is_fitted_by_exhaustive_search_without_choice(self,
+                                                                                 classifier: Classifier,
+                                                                                 valid_data: TabularDataset) -> None:
+        with pytest.raises(FittingWithoutChoiceError):
+            classifier.fit_by_exhaustive_search(valid_data, optimization_metric=ClassifierMetric.ACCURACY)
 
 @pytest.mark.parametrize("classifier", classifiers(), ids=lambda x: x.__class__.__name__)
 class TestFit:

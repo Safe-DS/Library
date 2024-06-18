@@ -62,6 +62,7 @@ def regressors() -> list[Regressor]:
         SupportVectorRegressor(),
     ]
 
+
 def regressors_with_choices() -> list[Regressor]:
     """
     Return the list of regressors with Choices as Parameters to test choice functionality.
@@ -83,6 +84,7 @@ def regressors_with_choices() -> list[Regressor]:
         SupportVectorRegressor(c=Choice(0.5, 1.0)),
     ]
 
+
 @pytest.fixture()
 def valid_data() -> TabularDataset:
     return Table(
@@ -97,12 +99,6 @@ def valid_data() -> TabularDataset:
 
 @pytest.mark.parametrize("regressor_with_choice", regressors_with_choices(), ids=lambda x: x.__class__.__name__)
 class TestChoiceRegressors:
-    def test_should_raise_if_model_is_fitted_by_exhaustive_search_without_choice(self,
-                                                                                 regressor_with_choice: Regressor,
-                                                                                 valid_data: TabularDataset) -> None:
-        with pytest.raises(FittingWithoutChoiceError):
-            regressor_with_choice.fit_by_exhaustive_search(valid_data, optimization_metric=RegressorMetric.MEAN_SQUARED_ERROR)
-
 
     def test_workflow_with_choice_parameter(self, regressor_with_choice: Regressor, valid_data: TabularDataset):
         model = (regressor_with_choice.fit_by_exhaustive_search(valid_data, RegressorMetric.MEAN_SQUARED_ERROR))
@@ -114,6 +110,15 @@ class TestChoiceRegressors:
                                                          valid_data: TabularDataset) -> None:
         with pytest.raises(FittingWithChoiceError):
             regressor_with_choice.fit(valid_data)
+
+
+@pytest.mark.parametrize("regressor", regressors(), ids=lambda x: x.__class__.__name__)
+class TestFitByExhaustiveSearch:
+    def test_should_raise_if_model_is_fitted_by_exhaustive_search_without_choice(self,
+                                                                                 regressor: Regressor,
+                                                                                 valid_data: TabularDataset) -> None:
+        with pytest.raises(FittingWithoutChoiceError):
+            regressor.fit_by_exhaustive_search(valid_data, optimization_metric=RegressorMetric.MEAN_SQUARED_ERROR)
 
 
 @pytest.mark.parametrize("regressor", regressors(), ids=lambda x: x.__class__.__name__)
