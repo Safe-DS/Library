@@ -6,6 +6,7 @@ from safeds.data.tabular.containers import Table
 from safeds.exceptions import OutOfBoundsError
 from safeds.ml.classical._bases._support_vector_machine_base import _Linear, _Polynomial
 from safeds.ml.classical.regression import SupportVectorRegressor
+from safeds.ml.hyperparameters import Choice
 
 
 def kernels() -> list[SupportVectorRegressor.Kernel]:
@@ -44,8 +45,8 @@ class TestC:
         assert fitted_model._wrapped_model is not None
         assert fitted_model._wrapped_model.C == 2
 
-    @pytest.mark.parametrize("c", [-1.0, 0.0], ids=["minus_one", "zero"])
-    def test_should_raise_if_less_than_or_equal_to_0(self, c: float) -> None:
+    @pytest.mark.parametrize("c", [-1.0, 0.0, Choice(-1.0)], ids=["minus_one", "zero", "invalid_choice"])
+    def test_should_raise_if_less_than_or_equal_to_0(self, c: float | Choice[float]) -> None:
         with pytest.raises(OutOfBoundsError):
             SupportVectorRegressor(c=c)
 
