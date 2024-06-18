@@ -3,6 +3,8 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from safeds._utils import _get_random_seed, _structural_hash
+from safeds.data.labeled.containers import TabularDataset
+from safeds.exceptions import FittingWithoutChoiceError
 
 from ._classifier import Classifier
 
@@ -39,3 +41,6 @@ class LogisticClassifier(Classifier):
             random_state=_get_random_seed(),
             n_jobs=-1,
         )
+
+    def _check_additional_fit_by_exhaustive_search_preconditions(self, training_set: TabularDataset) -> None:
+        raise FittingWithoutChoiceError
