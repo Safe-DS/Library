@@ -81,10 +81,10 @@ def classifiers_with_choices() -> list[Classifier]:
 def valid_data() -> TabularDataset:
     return Table(
         {
-            "id": [1, 4],
-            "feat1": [2, 5],
-            "feat2": [3, 6],
-            "target": [0, 1],
+            "id": [1, 4, 7, 10],
+            "feat1": [2, 5, 8, 11],
+            "feat2": [3, 6, 9, 12],
+            "target": [0, 1, 0, 1],
         },
     ).to_tabular_dataset(target_name="target", extra_names=["id"])
 

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from abc import ABC
+from concurrent.futures import ProcessPoolExecutor, wait, ALL_COMPLETED
 from typing import TYPE_CHECKING, Self
 
 from safeds.data.labeled.containers import TabularDataset
@@ -254,12 +255,22 @@ class Regressor(SupervisedModel, ABC):
         self._check_additional_fit_by_exhaustive_search_preconditions(training_set)
 
         [train_split, test_split] = training_set.to_table().split_rows(0.75)
+        train_split = train_split.to_tabular_dataset(target_name=training_set.target.name,
+                                                     extra_names=training_set.extras.column_names)
+        test_split = test_split.to_tabular_dataset(target_name=training_set.target.name,
+                                                   extra_names=training_set.extras.column_names)
 
-        # TODO Multiprocessing
         list_of_models = self._get_models_for_all_choices()
         list_of_fitted_models = []
-        for model in list_of_models:
-            list_of_fitted_models.append(model.fit(train_split))
+
+        with ProcessPoolExecutor(max_workers=len(list_of_models)) as executor:
+            futures = []
+            for model in list_of_models:
+                futures.append(executor.submit(model.fit, train_split))
+            [done, _] = wait(futures, return_when=ALL_COMPLETED)
+            for future in done:
+                list_of_fitted_models.append(future.result())
+        executor.shutdown()
 
         best_model = None
         best_metric_value = None
