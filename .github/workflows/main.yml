@@ -15,6 +15,11 @@ jobs:
         python-version:
           - "3.11"
           - "3.12"
+        exclude:
+          - platform: "macos-latest"
+            python-version: "3.11"
+          - platform: "windows-latest"
+            python-version: "3.11"
     uses: lars-reimann/.github/.github/workflows/poetry-codecov-reusable.yml@main
     with:
       working-directory: .
