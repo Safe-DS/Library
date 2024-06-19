@@ -223,31 +223,41 @@ class Classifier(SupervisedModel, ABC):
 
         self._check_additional_fit_by_exhaustive_search_preconditions(training_set)
 
-        #TODO Cross Validation
+        [train_split, test_split] = training_set.to_table().split_rows(0.75)
 
         #TODO Multiprocessing
         list_of_models = self._get_models_for_all_choices()
         list_of_fitted_models = []
         for model in list_of_models:
-            list_of_fitted_models.append(model.fit(training_set))
+            list_of_fitted_models.append(model.fit(train_split))
 
         best_model = None
+        best_metric_value = None
         for fitted_model in list_of_fitted_models:
             if best_model is None:
                 best_model = fitted_model
+                match optimization_metric.value:
+                    case "accuracy":
+                        best_metric_value = fitted_model.accuracy(test_split)
+                    case "precision":
+                        best_metric_value = fitted_model.precision(test_split, positive_class)
+                    case "recall":
+                        best_metric_value = fitted_model.recall(test_split, positive_class)
+                    case "f1score":
+                        best_metric_value = fitted_model.recall(test_split, positive_class)
             else:
                 match optimization_metric.value:
                     case "accuracy":
-                        if fitted_model.accuracy(training_set) > best_model.accuracy(training_set):
+                        if fitted_model.accuracy(test_split) > best_metric_value:
                             best_model = fitted_model
                     case "precision":
-                        if fitted_model.precision(training_set, positive_class) > best_model.precision(training_set, positive_class):
+                        if fitted_model.precision(test_split, positive_class) > best_metric_value:
                             best_model = fitted_model
                     case "recall":
-                        if fitted_model.recall(training_set, positive_class) > best_model.recall(training_set, positive_class):
+                        if fitted_model.recall(test_split, positive_class) > best_metric_value:
                             best_model = fitted_model
                     case "f1score":
-                        if fitted_model.f1_score(training_set, positive_class) > best_model.f1_score(training_set, positive_class):
+                        if fitted_model.f1_score(test_split, positive_class) > best_metric_value:
                             best_model = fitted_model
         return best_model
 
