@@ -354,6 +354,39 @@ class TablePlotter:
         return _figure_to_image(fig)
 
     def moving_average_plot(self, x_name: str, y_name: str, window_size: int) -> Image:
+        """
+        Create a moving average plot for the y column and plot it by the x column in the table.
+
+        Parameters
+        ----------
+        x_name:
+            The name of the column to be plotted on the x-axis.
+        y_name:
+            The name of the column to be plotted on the y-axis.
+
+        Returns
+        -------
+        plot:
+            The plot as an image.
+
+        Raises
+        ------
+        ColumnNotFoundError
+            If a column does not exist.
+        TypeError
+            If a column is not numeric.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table
+        >>> table = Table(
+        ...     {
+        ...         "a": [1, 2, 3, 4, 5],
+        ...         "b": [2, 3, 4, 5, 6],
+        ...     }
+        ... )
+        >>> image = table.plot.scatter_plot("a", "b", window_size = 2)
+        """
         import matplotlib.pyplot as plt
         import numpy as np
         import polars as pl
