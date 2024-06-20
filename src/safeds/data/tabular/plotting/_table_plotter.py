@@ -392,6 +392,8 @@ class TablePlotter:
         import polars as pl
 
         _plot_validation(self._table, x_name, [y_name])
+
+
         # Calculate the moving average
         mean_col = pl.col(y_name).mean().alias(y_name)
         grouped = self._table._lazy_frame.sort(x_name).group_by(x_name).agg(mean_col).collect()
@@ -427,6 +429,10 @@ def _plot_validation(table: Table, x_name: str, y_names: list[str]) -> None:
     _check_columns_exist(table, y_names)
     y_names.remove(x_name)
     _check_columns_are_numeric(table, y_names)
+    y_names.append(x_name)
 
     if not table.get_column(x_name).is_numeric and not table.get_column(x_name).is_temporal:
         raise ColumnTypeError(x_name)
+    for name in y_names:
+        if table.get_column(name).missing_value_count() >= 1:
+            raise ValueError("for plotting there should be no missing values")
