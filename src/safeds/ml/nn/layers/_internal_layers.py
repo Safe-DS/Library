@@ -128,3 +128,25 @@ class _InternalPooling2DLayer(nn.Module):
 
     def forward(self, x: Tensor) -> Tensor:
         return self._layer(x)
+
+class _InternalGRULayer(nn.Module):
+    def __init__(self, input_size: int, output_size: int, activation_function: str):
+        super().__init__()
+
+        _init_default_device()
+
+        self._layer = nn.GRU(input_size, output_size)
+        match activation_function:
+            case "sigmoid":
+                self._fn = nn.Sigmoid()
+            case "relu":
+                self._fn = nn.ReLU()
+            case "softmax":
+                self._fn = nn.Softmax()
+            case "none":
+                self._fn = None
+            case _:
+                raise ValueError("Unknown Activation Function: " + activation_function)
+
+    def forward(self, x: Tensor) -> Tensor:
+        return self._fn(self._layer(x)[0]) if self._fn is not None else self._layer(x)[0]
