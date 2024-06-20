@@ -247,8 +247,7 @@ class SupervisedModel(ABC):
 
     def _check_additional_fit_by_exhaustive_search_preconditions(self, training_set: TabularDataset) -> None:  # noqa: B027
         """
-        Check additional preconditions for fitting the model by exhaustive search and raise an error if any are
-        violated.
+        Check additional preconditions for fitting the model by exhaustive search and raise an error if any are violated.
 
         Parameters
         ----------

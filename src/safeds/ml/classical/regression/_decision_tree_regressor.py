@@ -3,15 +3,15 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Self
 
 from safeds._utils import _structural_hash
-from safeds.data.labeled.containers import TabularDataset
 from safeds.exceptions import FittingWithChoiceError, FittingWithoutChoiceError
 from safeds.ml.classical._bases import _DecisionTreeBase
 
 from ._regressor import Regressor
-from ...hyperparameters import Choice
+from safeds.ml.hyperparameters import Choice
 
 if TYPE_CHECKING:
     from sklearn.base import RegressorMixin
+    from safeds.data.labeled.containers import TabularDataset
 
 
 class DecisionTreeRegressor(Regressor, _DecisionTreeBase):

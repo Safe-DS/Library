@@ -7,7 +7,7 @@ from safeds.exceptions import FittingWithChoiceError, FittingWithoutChoiceError
 from safeds.ml.classical._bases import _KNearestNeighborsBase
 
 from ._regressor import Regressor
-from ...hyperparameters import Choice
+from safeds.ml.hyperparameters import Choice
 
 if TYPE_CHECKING:
     from sklearn.base import RegressorMixin

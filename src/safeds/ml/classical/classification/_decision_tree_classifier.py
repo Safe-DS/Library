@@ -8,7 +8,7 @@ from safeds.exceptions import FittingWithChoiceError, FittingWithoutChoiceError
 from safeds.ml.classical._bases import _DecisionTreeBase
 
 from ._classifier import Classifier
-from ...hyperparameters import Choice
+from safeds.ml.hyperparameters import Choice
 
 if TYPE_CHECKING:
     from sklearn.base import ClassifierMixin

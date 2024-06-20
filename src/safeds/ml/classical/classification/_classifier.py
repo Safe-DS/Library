@@ -4,6 +4,7 @@ from abc import ABC
 from concurrent.futures import ProcessPoolExecutor, wait, ALL_COMPLETED
 from typing import TYPE_CHECKING, Self
 
+from safeds.data.tabular.containers import Table
 from safeds.data.labeled.containers import TabularDataset
 from safeds.exceptions import ModelNotFittedError, PlainTableError, DatasetMissesDataError, LearningError
 from safeds.ml.classical import SupervisedModel
@@ -11,8 +12,6 @@ from safeds.ml.metrics import ClassificationMetrics, ClassifierMetric
 
 if TYPE_CHECKING:
     from typing import Any
-
-    from safeds.data.tabular.containers import Table
 
 
 class Classifier(SupervisedModel, ABC):
@@ -220,13 +219,16 @@ class Classifier(SupervisedModel, ABC):
         if training_set.to_table().row_count == 0:
             raise DatasetMissesDataError
         if optimization_metric.value in {"precision", "recall", "f1score"} and positive_class is None:
-            raise LearningError(f"Please provide a positive class when using optimization metric '{optimization_metric.value}'")
+            raise LearningError(
+                f"Please provide a positive class when using optimization metric '{optimization_metric.value}'")
 
         self._check_additional_fit_by_exhaustive_search_preconditions(training_set)
 
         [train_split, test_split] = training_set.to_table().split_rows(0.75)
-        train_split = train_split.to_tabular_dataset(target_name=training_set.target.name, extra_names=training_set.extras.column_names)
-        test_split = test_split.to_tabular_dataset(target_name=training_set.target.name, extra_names=training_set.extras.column_names)
+        train_split = train_split.to_tabular_dataset(target_name=training_set.target.name,
+                                                     extra_names=training_set.extras.column_names)
+        test_split = test_split.to_tabular_dataset(target_name=training_set.target.name,
+                                                   extra_names=training_set.extras.column_names)
 
         list_of_models = self._get_models_for_all_choices()
         list_of_fitted_models = []
