@@ -405,18 +405,20 @@ class TestSplit:
         image_list = ImageList.from_files(resolve_resource_path(images_all())).remove_duplicate_images().resize(10, 10)
         if isinstance(output, _EmptyImageList):
             output = image_list
-        image_dataset = ImageDataset(image_list, output)
+        image_dataset = ImageDataset(image_list, output)  # type: ignore[type-var]
         image_dataset1, image_dataset2 = image_dataset.split(0.4, shuffle=shuffle)
         offset = len(image_dataset1)
         assert len(image_dataset1) == round(0.4 * len(image_dataset))
         assert len(image_dataset2) == len(image_dataset) - offset
         assert len(image_dataset1.get_input()) == round(0.4 * len(image_dataset))
         assert len(image_dataset2.get_input()) == len(image_dataset) - offset
-        if isinstance(image_dataset.get_output(), Table):
+        if isinstance(image_dataset1.get_output(), Table):
             assert image_dataset1.get_output().row_count == round(0.4 * len(image_dataset))
-            assert image_dataset2.get_output().row_count == len(image_dataset) - offset
         else:
             assert len(image_dataset1.get_output()) == round(0.4 * len(image_dataset))
+        if isinstance(image_dataset2.get_output(), Table):
+            assert image_dataset2.get_output().row_count == len(image_dataset) - offset
+        else:
             assert len(image_dataset2.get_output()) == len(image_dataset) - offset
 
         assert image_dataset != image_dataset1
@@ -427,22 +429,24 @@ class TestSplit:
             index = image_list.index(image)[0]
             if not shuffle:
                 assert index == i
-            if isinstance(image_dataset1.get_output(), ImageList):
-                assert image_list.index(image_dataset1.get_output().get_image(i))[0] == index
-            elif isinstance(image_dataset1.get_output(), Column):
-                assert output.to_list().index(image_dataset1.get_output().to_list()[i]) == index
-            elif isinstance(image_dataset1.get_output(), Table):
+            out = image_dataset1.get_output()
+            if isinstance(out, ImageList):
+                assert image_list.index(out.get_image(i))[0] == index
+            elif isinstance(out, Column):
+                assert output.to_list().index(out.to_list()[i]) == index
+            elif isinstance(out, Table):
                 assert output.get_column(str(index)).to_list()[index] == 1
 
         for i, image in enumerate(image_dataset2.get_input().to_images()):
             index = image_list.index(image)[0]
             if not shuffle:
                 assert index == i + offset
-            if isinstance(image_dataset2.get_output(), ImageList):
-                assert image_list.index(image_dataset2.get_output().get_image(i))[0] == index
-            elif isinstance(image_dataset2.get_output(), Column):
-                assert output.to_list().index(image_dataset2.get_output().to_list()[i]) == index
-            elif isinstance(image_dataset2.get_output(), Table):
+            out = image_dataset2.get_output()
+            if isinstance(out, ImageList):
+                assert image_list.index(out.get_image(i))[0] == index
+            elif isinstance(out, Column):
+                assert output.to_list().index(out.to_list()[i]) == index
+            elif isinstance(out, Table):
                 assert output.get_column(str(index)).to_list()[index] == 1
 
         image_dataset._batch_size = len(image_dataset)
@@ -470,7 +474,7 @@ class TestSplit:
         "percentage",
         [-1, -0.1, 1.1, 2]
     )
-    def test_should_raise(self, device: Device, shuffle: bool, percentage: float):
+    def test_should_raise(self, device: Device, shuffle: bool, percentage: float) -> None:
         configure_test_with_device(device)
         image_list = ImageList.from_files(resolve_resource_path(images_all())).resize(10, 10)
         image_dataset = ImageDataset(image_list, Column("images", images_all()))
