@@ -258,7 +258,7 @@ class NeuralNetworkRegressor(Generic[IFT, IPT]):
         copied_model._model.eval()
         return copied_model
 
-    def predict(self, test_data: IPT | IFT) -> IFT:
+    def predict(self, test_data: IPT) -> IFT:
         """
         Make a prediction for the given test data.
 
