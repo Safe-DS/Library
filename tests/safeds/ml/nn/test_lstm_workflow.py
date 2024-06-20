@@ -10,8 +10,8 @@ from safeds.ml.nn.converters import (
 )
 from safeds.ml.nn.layers import (
     ForwardLayer,
-    LSTMLayer,
     GRULayer,
+    LSTMLayer,
 )
 from torch.types import Device
 
