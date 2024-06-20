@@ -87,11 +87,18 @@ def test_should_raise_if_column_is_not_numerical(table: Table) -> None:
         table.plot.moving_average_plot("A", "B", window_size=2)
 
 
-def test_should_raise_if_column_has_missing_value() -> None:
-    table = Table({"A": [None, 2, 3], "B": [2, 4, 7]})
+@pytest.mark.parametrize(
+    ("table", "column_name"),
+    [
+        (Table({"A": [1, 2, 3], "B": [None, 4, 7]}), 'B'),
+        (Table({"A": [None, 2, 3], "B": [2, 4, 7]}), 'A'),
+    ],
+    ids=["x column", "y column"],
+)
+def test_should_raise_if_column_has_missing_value(table: Table, column_name: str) -> None:
     with pytest.raises(
         ValueError,
-        match=r"there are missing values in column 'A', use transformation to fill missing "
-        r"values or drop the missing values",
+        match=f"there are missing values in column '{column_name}', use transformation to fill missing "
+        f"values or drop the missing values",
     ):
         table.plot.moving_average_plot("A", "B", window_size=2)
