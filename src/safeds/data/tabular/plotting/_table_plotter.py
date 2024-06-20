@@ -393,7 +393,6 @@ class TablePlotter:
 
         _plot_validation(self._table, x_name, [y_name])
 
-
         # Calculate the moving average
         mean_col = pl.col(y_name).mean().alias(y_name)
         grouped = self._table._lazy_frame.sort(x_name).group_by(x_name).agg(mean_col).collect()
@@ -435,6 +434,8 @@ def _plot_validation(table: Table, x_name: str, y_names: list[str]) -> None:
     y_names.append(x_name)
     for name in y_names:
         if table.get_column(name).missing_value_count() >= 1:
-            raise ValueError(f"there are missing values in column '{name}', use transformation to fill missing values "
-                             f"or drop the missing values")
+            raise ValueError(
+                f"there are missing values in column '{name}', use transformation to fill missing values "
+                f"or drop the missing values",
+            )
     y_names.remove(x_name)
