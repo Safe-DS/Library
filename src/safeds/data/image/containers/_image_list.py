@@ -876,6 +876,9 @@ class ImageList(metaclass=ABCMeta):
         """
         Return a new `ImageList` with all images converted to grayscale.
 
+        The new image list will have the same amount of channels as the original image list.
+        If you want to change the amount of channels used, please use the method [change_channel][safeds.data.image.containers._image_list.ImageList.change_channel].
+
         The original image list is not modified.
 
         Returns
