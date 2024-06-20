@@ -385,7 +385,7 @@ class TablePlotter:
         ...         "b": [2, 3, 4, 5, 6],
         ...     }
         ... )
-        >>> image = table.plot.scatter_plot("a", "b", window_size = 2)
+        >>> image = table.plot.moving_average_plot("a", "b", window_size = 2)
         """
         import matplotlib.pyplot as plt
         import numpy as np
