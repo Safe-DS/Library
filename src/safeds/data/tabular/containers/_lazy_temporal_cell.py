@@ -31,6 +31,24 @@ class _LazyTemporalCell(TemporalCell):
     # Temporal operations
     # ------------------------------------------------------------------------------------------------------------------
 
+    def century(self) -> Cell[int]:
+        return _LazyCell(self._expression.dt.century())
+
+    def weekday(self) -> Cell[int]:
+        return _LazyCell(self._expression.dt.weekday())
+
+    def week(self) -> Cell[int]:
+        return _LazyCell(self._expression.dt.week())
+
+    def year(self) -> Cell[int]:
+        return _LazyCell(self._expression.dt.year())
+
+    def month(self) -> Cell[int]:
+        return _LazyCell(self._expression.dt.month())
+
+    def day(self) -> Cell[int]:
+        return _LazyCell(self._expression.dt.day())
+
     def datetime_to_string(self, format_string: str = "%Y/%m/%d %H:%M:%S") -> Cell[str]:
         if not _check_format_string(format_string):
             raise ValueError("Invalid format string")

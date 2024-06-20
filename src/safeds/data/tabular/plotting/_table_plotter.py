@@ -237,6 +237,7 @@ class TablePlotter:
 
         import matplotlib.pyplot as plt
         import polars as pl
+
         agg_list = []
         for name in y_names:
             agg_list.append(pl.col(name).mean().alias(f"{name}_mean"))
@@ -322,6 +323,7 @@ class TablePlotter:
         _plot_validation(self._table, x_name, y_names)
 
         import matplotlib.pyplot as plt
+
         fig, ax = plt.subplots()
         for y_name in y_names:
             ax.scatter(
@@ -351,10 +353,11 @@ class TablePlotter:
 
         return _figure_to_image(fig)
 
-    def moving_average_plot(self, x_name: str, y_name: str, window_size: int)->Image:
-        import numpy as np
-        import polars as pl
+    def moving_average_plot(self, x_name: str, y_name: str, window_size: int) -> Image:
         import matplotlib.pyplot as plt
+        import polars as pl
+        import numpy as np
+
         _plot_validation(self._table, x_name, [y_name])
         # Calculate the moving average
         mean_col = pl.col(y_name).mean().alias(y_name)
@@ -375,7 +378,6 @@ class TablePlotter:
             ylabel=y_name,
         )
         ax.legend()
-        print(self._table.get_column(x_name).is_temporal)
         if self._table.get_column(x_name).is_temporal:
             ax.set_xticks(x_data)  # Set x-ticks to the x data points
         ax.set_xticks(ax.get_xticks())
@@ -387,7 +389,6 @@ class TablePlotter:
         fig.tight_layout()
 
         return _figure_to_image(fig)
-
 
 
 def _plot_validation(table: Table, x_name: str, y_names: list[str]) -> None:
