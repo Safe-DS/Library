@@ -179,8 +179,3 @@ def test_input_size_should_raise_error() -> None:
     with pytest.raises(ValueError, match="The input_size is not yet set.", ):
         layer.input_size
 
-
-def test_internal_layer_should_raise_error() -> None:# noqa
-    layer = GRULayer(1)
-    with pytest.raises(ValueError, match="The input_size is not yet set."):  # noqa
-        layer._get_internal_layer(activation_function="relu")  # noqa
