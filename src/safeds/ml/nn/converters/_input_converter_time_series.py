@@ -86,16 +86,18 @@ class InputConversionTimeSeries(InputConversion[TimeSeriesDataset, Table]):
         )
 
     def _data_conversion_predict(self, input_data: Table | TimeSeriesDataset, batch_size: int) -> DataLoader:
-        if type(input_data) == Table:
-            input_data = input_data.to_time_series_dataset(
+        if isinstance(input_data, Table):
+            data: TimeSeriesDataset = input_data.to_time_series_dataset(
                 target_name=self._target_name,
                 window_size=self._window_size,
                 extra_names=self._extra_names,
                 forecast_horizon=self._forecast_horizon,
                 continuous=self._continuous,
             )
+        else:
+            data: TimeSeriesDataset = input_data
 
-        return input_data._into_dataloader_with_window_predict(
+        return data._into_dataloader_with_window_predict(
             self._window_size,
             self._forecast_horizon,
             batch_size,
@@ -108,10 +110,12 @@ class InputConversionTimeSeries(InputConversion[TimeSeriesDataset, Table]):
     ) -> TimeSeriesDataset:
         window_size: int = self._window_size
         forecast_horizon: int = self._forecast_horizon
-        if type(input_data) == TimeSeriesDataset:
-            input_data = input_data.to_table()
+        if isinstance(input_data, TimeSeriesDataset):
+            table_data: Table = input_data.to_table()
+        else:
+            table_data: Table = input_data
 
-        input_data_table = input_data.slice_rows(start=window_size + forecast_horizon)
+        input_data_table = table_data.slice_rows(start=window_size + forecast_horizon)
 
         return input_data_table.replace_column(
             self._target_name,
@@ -133,19 +137,18 @@ class InputConversionTimeSeries(InputConversion[TimeSeriesDataset, Table]):
             self._continuous = input_data._continuous
             self._first = False
             self._extra_names = input_data.extras.column_names
-        return (sorted(input_data.features.column_names)).__eq__(
-            sorted(self._feature_names),
-        ) and input_data.target.name == self._target_name
+        return (sorted(input_data.features.column_names).__eq__(
+            sorted(self._feature_names), ) and input_data.target.name == self._target_name)
 
     def _is_predict_data_valid(self, input_data: Table | TimeSeriesDataset) -> bool:
-        if type(input_data) == Table:
+        if isinstance(input_data, Table):
             for name in self._feature_names:
                 if name not in input_data.column_names:
                     return False
             if self._target_name not in input_data.column_names:
                 return False
             return True
-        if type(input_data) == TimeSeriesDataset:
+        if isinstance(input_data, TimeSeriesDataset):
             return (self._target_name == input_data.target.name
                     and self._feature_names == input_data.features.column_names
                     and self._extra_names == input_data.extras.column_names
