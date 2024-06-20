@@ -14,7 +14,7 @@ if TYPE_CHECKING:
     from torch.utils.data import DataLoader
 
 
-class InputConversionTimeSeries(InputConversion[TimeSeriesDataset, Table]):
+class InputConversionTimeSeries(InputConversion[TimeSeriesDataset, Table | TimeSeriesDataset]):
     """The input conversion for a neural network, defines the input parameters for the neural network."""
 
     def __init__(
@@ -86,8 +86,9 @@ class InputConversionTimeSeries(InputConversion[TimeSeriesDataset, Table]):
         )
 
     def _data_conversion_predict(self, input_data: Table | TimeSeriesDataset, batch_size: int) -> DataLoader:
+        data: TimeSeriesDataset
         if isinstance(input_data, Table):
-            data: TimeSeriesDataset = input_data.to_time_series_dataset(
+            data = input_data.to_time_series_dataset(
                 target_name=self._target_name,
                 window_size=self._window_size,
                 extra_names=self._extra_names,
@@ -95,7 +96,7 @@ class InputConversionTimeSeries(InputConversion[TimeSeriesDataset, Table]):
                 continuous=self._continuous,
             )
         else:
-            data: TimeSeriesDataset = input_data
+            data = input_data
 
         return data._into_dataloader_with_window_predict(
             self._window_size,
@@ -108,12 +109,13 @@ class InputConversionTimeSeries(InputConversion[TimeSeriesDataset, Table]):
         input_data: Table | TimeSeriesDataset,
         output_data: Tensor,
     ) -> TimeSeriesDataset:
+        table_data: Table
         window_size: int = self._window_size
         forecast_horizon: int = self._forecast_horizon
         if isinstance(input_data, TimeSeriesDataset):
-            table_data: Table = input_data.to_table()
+            table_data = input_data.to_table()
         else:
-            table_data: Table = input_data
+            table_data = input_data
 
         input_data_table = table_data.slice_rows(start=window_size + forecast_horizon)
 
