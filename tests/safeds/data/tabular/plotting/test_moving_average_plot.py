@@ -95,6 +95,7 @@ def test_should_raise_if_column_is_not_numerical(table: Table) -> None:
     ],
     ids=["x column", "y column"],
 )
+
 def test_should_raise_if_column_has_missing_value(table: Table, column_name: str) -> None:
     with pytest.raises(
         ValueError,
