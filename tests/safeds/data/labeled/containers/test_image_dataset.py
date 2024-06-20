@@ -382,23 +382,26 @@ class TestBatch:
 
 
 @pytest.mark.parametrize("device", get_devices(), ids=get_devices_ids())
-@pytest.mark.parametrize(
-    "shuffle",
-    [
-        True,
-        False
-    ]
-)
+@pytest.mark.parametrize("shuffle", [True, False])
 class TestSplit:
 
     @pytest.mark.parametrize(
         "output",
         [
             Column("images", images_all()[:4] + images_all()[5:]),
-            Table({"0": [1, 0, 0, 0, 0, 0], "1": [0, 1, 0, 0, 0, 0], "2": [0, 0, 1, 0, 0, 0], "3": [0, 0, 0, 1, 0, 0], "4": [0, 0, 0, 0, 1, 0], "5": [0, 0, 0, 0, 0, 1]}),
+            Table(
+                {
+                    "0": [1, 0, 0, 0, 0, 0],
+                    "1": [0, 1, 0, 0, 0, 0],
+                    "2": [0, 0, 1, 0, 0, 0],
+                    "3": [0, 0, 0, 1, 0, 0],
+                    "4": [0, 0, 0, 0, 1, 0],
+                    "5": [0, 0, 0, 0, 0, 1],
+                },
+            ),
             _EmptyImageList(),
         ],
-        ids=["Column", "Table", "ImageList"]
+        ids=["Column", "Table", "ImageList"],
     )
     def test_should_split(self, device: Device, shuffle: bool, output: Column | Table | ImageList) -> None:
         configure_test_with_device(device)
@@ -472,17 +475,13 @@ class TestSplit:
             assert torch.all(torch.eq(b[0], image_dataset_batch[0][index]))
             assert torch.all(torch.eq(b[1], image_dataset_batch[1][index]))
 
-    @pytest.mark.parametrize(
-        "percentage",
-        [-1, -0.1, 1.1, 2]
-    )
+    @pytest.mark.parametrize("percentage", [-1, -0.1, 1.1, 2])
     def test_should_raise(self, device: Device, shuffle: bool, percentage: float) -> None:
         configure_test_with_device(device)
         image_list = ImageList.from_files(resolve_resource_path(images_all())).resize(10, 10)
         image_dataset = ImageDataset(image_list, Column("images", images_all()))
         with pytest.raises(OutOfBoundsError):
             image_dataset.split(percentage, shuffle=shuffle)
-
 
 
 @pytest.mark.parametrize("device", get_devices(), ids=get_devices_ids())

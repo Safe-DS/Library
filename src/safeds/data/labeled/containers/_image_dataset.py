@@ -150,7 +150,13 @@ class ImageDataset(Dataset[ImageList, Out_co]):
         hash:
             the hash value
         """
-        return _structural_hash(self._input, self._output, self._shuffle_after_epoch, self._batch_size, self._shuffle_tensor_indices.tolist())
+        return _structural_hash(
+            self._input,
+            self._output,
+            self._shuffle_after_epoch,
+            self._batch_size,
+            self._shuffle_tensor_indices.tolist(),
+        )
 
     def __sizeof__(self) -> int:
         """
@@ -225,7 +231,9 @@ class ImageDataset(Dataset[ImageList, Out_co]):
         else:
             return self._sort_image_list_with_shuffle_tensor_indices_reduce_if_necessary(self._output)  # type: ignore[return-value]
 
-    def _sort_image_list_with_shuffle_tensor_indices_reduce_if_necessary(self, image_list: _SingleSizeImageList) -> _SingleSizeImageList:
+    def _sort_image_list_with_shuffle_tensor_indices_reduce_if_necessary(
+        self, image_list: _SingleSizeImageList,
+    ) -> _SingleSizeImageList:
         shuffled_image_list = _SingleSizeImageList()
         tensor_pos = [
             image_list._indices_to_tensor_positions[shuffled_index]
@@ -254,13 +262,15 @@ class ImageDataset(Dataset[ImageList, Out_co]):
         if batch_number < 0 or batch_size * batch_number >= len(self._shuffle_tensor_indices):
             raise IndexOutOfBoundsError(batch_size * batch_number)
         max_index = (
-            batch_size * (batch_number + 1) if batch_size * (batch_number + 1) < len(self._shuffle_tensor_indices) else len(self._shuffle_tensor_indices)
+            batch_size * (batch_number + 1)
+            if batch_size * (batch_number + 1) < len(self._shuffle_tensor_indices)
+            else len(self._shuffle_tensor_indices)
         )
         input_tensor = (
             self._input._tensor[
                 [
                     self._input._indices_to_tensor_positions[index]
-                    for index in self._shuffle_tensor_indices[batch_size * batch_number: max_index].tolist()
+                    for index in self._shuffle_tensor_indices[batch_size * batch_number : max_index].tolist()
                 ]
             ].to(torch.float32)
             / 255
@@ -271,13 +281,13 @@ class ImageDataset(Dataset[ImageList, Out_co]):
                 self._output._tensor[
                     [
                         self._input._indices_to_tensor_positions[index]
-                        for index in self._shuffle_tensor_indices[batch_size * batch_number: max_index].tolist()
+                        for index in self._shuffle_tensor_indices[batch_size * batch_number : max_index].tolist()
                     ]
                 ].to(torch.float32)
                 / 255
             )
         else:  # _output is instance of _TableAsTensor or _ColumnAsTensor
-            output_tensor = self._output._tensor[self._shuffle_tensor_indices[batch_size * batch_number: max_index]]
+            output_tensor = self._output._tensor[self._shuffle_tensor_indices[batch_size * batch_number : max_index]]
         return input_tensor, output_tensor
 
     def shuffle(self) -> ImageDataset[Out_co]:
@@ -296,11 +306,15 @@ class ImageDataset(Dataset[ImageList, Out_co]):
         _init_default_device()
 
         im_dataset: ImageDataset[Out_co] = copy.copy(self)
-        im_dataset._shuffle_tensor_indices = self._shuffle_tensor_indices[torch.randperm(len(self._shuffle_tensor_indices))]
+        im_dataset._shuffle_tensor_indices = self._shuffle_tensor_indices[
+            torch.randperm(len(self._shuffle_tensor_indices))
+        ]
         im_dataset._next_batch_index = 0
         return im_dataset
 
-    def split(self, percentage_in_first: float, *, shuffle: bool = True) -> tuple[ImageDataset[Out_co], ImageDataset[Out_co]]:
+    def split(
+        self, percentage_in_first: float, *, shuffle: bool = True,
+    ) -> tuple[ImageDataset[Out_co], ImageDataset[Out_co]]:
         """
         Create two image datasets by splitting the data of the current dataset.
 
@@ -350,7 +364,7 @@ class ImageDataset(Dataset[ImageList, Out_co]):
             [
                 round(percentage_in_first * len(self)),
                 len(self) - round(percentage_in_first * len(self)),
-            ]
+            ],
         )
         return first_dataset, second_dataset
 
