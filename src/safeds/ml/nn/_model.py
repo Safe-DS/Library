@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Generic, Self, TypeVar
 from safeds._config import _init_default_device
 from safeds._validation import _check_bounds, _ClosedBound
 from safeds.data.image.containers import ImageList
-from safeds.data.labeled.containers import ImageDataset, TabularDataset, TimeSeriesDataset, Dataset
+from safeds.data.labeled.containers import ImageDataset, TabularDataset, TimeSeriesDataset
 from safeds.data.labeled.containers._image_dataset import _ColumnAsTensor
 from safeds.data.tabular.containers import Table
 from safeds.data.tabular.transformation import OneHotEncoder
@@ -258,7 +258,7 @@ class NeuralNetworkRegressor(Generic[IFT, IPT]):
         copied_model._model.eval()
         return copied_model
 
-    def predict(self, test_data: IPT | Dataset) -> IFT:
+    def predict(self, test_data: IPT) -> IFT:
         """
         Make a prediction for the given test data.
 
@@ -562,7 +562,7 @@ class NeuralNetworkClassifier(Generic[IFT, IPT]):
         copied_model._model.eval()
         return copied_model
 
-    def predict(self, test_data: IPT | Dataset) -> IFT:
+    def predict(self, test_data: IPT) -> IFT:
         """
         Make a prediction for the given test data.
 
