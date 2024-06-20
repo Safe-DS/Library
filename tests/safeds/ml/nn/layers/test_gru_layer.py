@@ -7,6 +7,7 @@ from safeds.exceptions import OutOfBoundsError
 from safeds.ml.nn.layers import GRULayer
 from torch import nn
 
+
 @pytest.mark.parametrize(
     ("activation_function", "expected_activation_function"),
     [

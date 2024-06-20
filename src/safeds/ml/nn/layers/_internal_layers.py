@@ -129,6 +129,7 @@ class _InternalPooling2DLayer(nn.Module):
     def forward(self, x: Tensor) -> Tensor:
         return self._layer(x)
 
+
 class _InternalGRULayer(nn.Module):
     def __init__(self, input_size: int, output_size: int, activation_function: str):
         super().__init__()

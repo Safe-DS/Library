@@ -8,10 +8,10 @@ if TYPE_CHECKING:
     from ._convolutional2d_layer import Convolutional2DLayer, ConvolutionalTranspose2DLayer
     from ._flatten_layer import FlattenLayer
     from ._forward_layer import ForwardLayer
+    from ._gru_layer import GRULayer
     from ._layer import Layer
     from ._lstm_layer import LSTMLayer
     from ._pooling2d_layer import AveragePooling2DLayer, MaxPooling2DLayer
-    from ._gru_layer import GRULayer
 
 apipkg.initpkg(
     __name__,
