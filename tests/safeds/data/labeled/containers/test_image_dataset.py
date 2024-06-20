@@ -412,14 +412,16 @@ class TestSplit:
         assert len(image_dataset2) == len(image_dataset) - offset
         assert len(image_dataset1.get_input()) == round(0.4 * len(image_dataset))
         assert len(image_dataset2.get_input()) == len(image_dataset) - offset
-        if isinstance(image_dataset1.get_output(), Table):
-            assert image_dataset1.get_output().row_count == round(0.4 * len(image_dataset))
+        im1_output = image_dataset1.get_output()
+        im2_output = image_dataset2.get_output()
+        if isinstance(im1_output, Table):
+            assert im1_output.row_count == round(0.4 * len(image_dataset))
         else:
-            assert len(image_dataset1.get_output()) == round(0.4 * len(image_dataset))
-        if isinstance(image_dataset2.get_output(), Table):
-            assert image_dataset2.get_output().row_count == len(image_dataset) - offset
+            assert len(im1_output) == round(0.4 * len(image_dataset))
+        if isinstance(im2_output, Table):
+            assert im2_output.row_count == len(image_dataset) - offset
         else:
-            assert len(image_dataset2.get_output()) == len(image_dataset) - offset
+            assert len(im2_output) == len(image_dataset) - offset
 
         assert image_dataset != image_dataset1
         assert image_dataset != image_dataset2
@@ -432,9 +434,9 @@ class TestSplit:
             out = image_dataset1.get_output()
             if isinstance(out, ImageList):
                 assert image_list.index(out.get_image(i))[0] == index
-            elif isinstance(out, Column):
+            elif isinstance(out, Column) and isinstance(output, Column):
                 assert output.to_list().index(out.to_list()[i]) == index
-            elif isinstance(out, Table):
+            elif isinstance(out, Table) and isinstance(output, Table):
                 assert output.get_column(str(index)).to_list()[index] == 1
 
         for i, image in enumerate(image_dataset2.get_input().to_images()):
@@ -444,9 +446,9 @@ class TestSplit:
             out = image_dataset2.get_output()
             if isinstance(out, ImageList):
                 assert image_list.index(out.get_image(i))[0] == index
-            elif isinstance(out, Column):
+            elif isinstance(out, Column) and isinstance(output, Column):
                 assert output.to_list().index(out.to_list()[i]) == index
-            elif isinstance(out, Table):
+            elif isinstance(out, Table) and isinstance(output, Table):
                 assert output.get_column(str(index)).to_list()[index] == 1
 
         image_dataset._batch_size = len(image_dataset)
