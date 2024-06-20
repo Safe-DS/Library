@@ -87,12 +87,12 @@ def test_should_raise_if_column_does_not_exist_error_message(x: str, y: str) -> 
 )
 
 def test_should_raise_if_column_is_not_numerical(table: Table) -> None:
-    print(table)
     with pytest.raises(ColumnTypeError):
         table.plot.moving_average_plot("A", "B", window_size=2)
 
 
 def test_should_raise_if_column_has_missing_value() -> None:
     table = Table({"A": [None, 2, 3], "B": [2, 4, 7]})
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match=r"there are missing values in column 'A', use transformation to fill missing "
+                                         r"values or drop the missing values"):
         table.plot.moving_average_plot("A", "B", window_size=2)

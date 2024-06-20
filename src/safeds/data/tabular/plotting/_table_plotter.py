@@ -435,4 +435,5 @@ def _plot_validation(table: Table, x_name: str, y_names: list[str]) -> None:
         raise ColumnTypeError(x_name)
     for name in y_names:
         if table.get_column(name).missing_value_count() >= 1:
-            raise ValueError("for plotting there should be no missing values")
+            raise ValueError(f"there are missing values in column '{name}', use transformation to fill missing values "
+                             f"or drop the missing values")
