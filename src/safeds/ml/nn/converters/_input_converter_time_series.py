@@ -92,7 +92,8 @@ class InputConversionTimeSeries(InputConversion[TimeSeriesDataset, Table]):
             window_size=self._window_size,
             extra_names=self._extra_names,
             forecast_horizon=self._forecast_horizon,
-            continuous=self._continuous)
+            continuous=self._continuous,
+        )
         return data._into_dataloader_with_window_predict(
             self._window_size,
             self._forecast_horizon,
@@ -130,8 +131,12 @@ class InputConversionTimeSeries(InputConversion[TimeSeriesDataset, Table]):
             self._continuous = input_data._continuous
             self._first = False
             self._extra_names = input_data.extras.column_names
-        return (sorted(input_data.features.column_names).__eq__(
-            sorted(self._feature_names), ) and input_data.target.name == self._target_name)
+        return (
+            sorted(input_data.features.column_names).__eq__(
+                sorted(self._feature_names),
+            )
+            and input_data.target.name == self._target_name
+        )
 
     def _is_predict_data_valid(self, input_data: Table) -> bool:
         for name in self._feature_names:
@@ -140,4 +145,3 @@ class InputConversionTimeSeries(InputConversion[TimeSeriesDataset, Table]):
         if self._target_name not in input_data.column_names:
             return False
         return True
-
