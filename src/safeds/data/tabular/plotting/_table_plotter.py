@@ -386,7 +386,6 @@ class TablePlotter:
         )  # rotate the labels of the x Axis to prevent the chance of overlapping of the labels
         fig.tight_layout()
 
-
         return _figure_to_image(fig)
 
 
