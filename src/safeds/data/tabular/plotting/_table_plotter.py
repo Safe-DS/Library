@@ -355,19 +355,17 @@ class TablePlotter:
 
     def moving_average_plot(self, x_name: str, y_name: str, window_size: int) -> Image:
         import matplotlib.pyplot as plt
-        import polars as pl
         import numpy as np
+        import polars as pl
 
         _plot_validation(self._table, x_name, [y_name])
         # Calculate the moving average
         mean_col = pl.col(y_name).mean().alias(y_name)
         grouped = self._table._lazy_frame.sort(x_name).group_by(x_name).agg(mean_col).collect()
         data = grouped
-        moving_average = data.select([
-            pl.col(y_name).rolling_mean(window_size).alias("moving_average")
-        ])
-        #set up the arrays for plotting
-        y_data_with_nan = moving_average['moving_average'].to_numpy()
+        moving_average = data.select([pl.col(y_name).rolling_mean(window_size).alias("moving_average")])
+        # set up the arrays for plotting
+        y_data_with_nan = moving_average["moving_average"].to_numpy()
         nan_mask = ~np.isnan(y_data_with_nan)
         y_data = y_data_with_nan[nan_mask]
         x_data = data[x_name].to_numpy()[nan_mask]
