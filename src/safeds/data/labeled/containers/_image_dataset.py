@@ -232,7 +232,8 @@ class ImageDataset(Dataset[ImageList, Out_co]):
             return self._sort_image_list_with_shuffle_tensor_indices_reduce_if_necessary(self._output)  # type: ignore[return-value]
 
     def _sort_image_list_with_shuffle_tensor_indices_reduce_if_necessary(
-        self, image_list: _SingleSizeImageList,
+        self,
+        image_list: _SingleSizeImageList,
     ) -> _SingleSizeImageList:
         shuffled_image_list = _SingleSizeImageList()
         tensor_pos = [
@@ -313,7 +314,10 @@ class ImageDataset(Dataset[ImageList, Out_co]):
         return im_dataset
 
     def split(
-        self, percentage_in_first: float, *, shuffle: bool = True,
+        self,
+        percentage_in_first: float,
+        *,
+        shuffle: bool = True,
     ) -> tuple[ImageDataset[Out_co], ImageDataset[Out_co]]:
         """
         Create two image datasets by splitting the data of the current dataset.
