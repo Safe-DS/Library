@@ -24,7 +24,6 @@ class InputConversionTimeSeries(InputConversion[TimeSeriesDataset, Table]):
         self._forecast_horizon = 0
         self._first = True
         self._target_name: str = ""
-        self._time_name: str = ""
         self._feature_names: list[str] = []
         self._continuous: bool = False
         self._extra_names: list[str] = []
@@ -47,7 +46,6 @@ class InputConversionTimeSeries(InputConversion[TimeSeriesDataset, Table]):
             self._window_size,
             self._forecast_horizon,
             self._target_name,
-            self._time_name,
             self._feature_names,
             self._continuous,
         )
@@ -57,7 +55,6 @@ class InputConversionTimeSeries(InputConversion[TimeSeriesDataset, Table]):
             sys.getsizeof(self._window_size)
             + sys.getsizeof(self._forecast_horizon)
             + sys.getsizeof(self._target_name)
-            + sys.getsizeof(self._time_name)
             + sys.getsizeof(self._feature_names)
             + sys.getsizeof(self._continuous)
         )
@@ -88,15 +85,17 @@ class InputConversionTimeSeries(InputConversion[TimeSeriesDataset, Table]):
             continuous=self._continuous,
         )
 
-    def _data_conversion_predict(self, input_data: Table, batch_size: int) -> DataLoader:
-        input_data_time_series = input_data.to_time_series_dataset(
-            target_name=self._target_name,
-            window_size=self._window_size,
-            extra_names=self._extra_names,
-            forecast_horizon=self._forecast_horizon,
-            continuous=self._continuous,
-        )
-        return input_data_time_series._into_dataloader_with_window_predict(
+    def _data_conversion_predict(self, input_data: Table | TimeSeriesDataset, batch_size: int) -> DataLoader:
+        if type(input_data) == Table:
+            input_data = input_data.to_time_series_dataset(
+                target_name=self._target_name,
+                window_size=self._window_size,
+                extra_names=self._extra_names,
+                forecast_horizon=self._forecast_horizon,
+                continuous=self._continuous,
+            )
+
+        return input_data._into_dataloader_with_window_predict(
             self._window_size,
             self._forecast_horizon,
             batch_size,
@@ -104,13 +103,15 @@ class InputConversionTimeSeries(InputConversion[TimeSeriesDataset, Table]):
 
     def _data_conversion_output(
         self,
-        input_data: Table,
+        input_data: Table | TimeSeriesDataset,
         output_data: Tensor,
     ) -> TimeSeriesDataset:
         window_size: int = self._window_size
         forecast_horizon: int = self._forecast_horizon
-        input_data_table = input_data
-        input_data_table = input_data_table.slice_rows(start=window_size + forecast_horizon)
+        if type(input_data) == TimeSeriesDataset:
+            input_data = input_data.to_table()
+
+        input_data_table = input_data.slice_rows(start=window_size + forecast_horizon)
 
         return input_data_table.replace_column(
             self._target_name,
@@ -136,10 +137,18 @@ class InputConversionTimeSeries(InputConversion[TimeSeriesDataset, Table]):
             sorted(self._feature_names),
         ) and input_data.target.name == self._target_name
 
-    def _is_predict_data_valid(self, input_data: Table) -> bool:
-        for name in self._feature_names:
-            if name not in input_data.column_names:
+    def _is_predict_data_valid(self, input_data: Table | TimeSeriesDataset) -> bool:
+        if type(input_data) == Table:
+            for name in self._feature_names:
+                if name not in input_data.column_names:
+                    return False
+            if self._target_name not in input_data.column_names:
                 return False
-        if self._target_name not in input_data.column_names:
-            return False
-        return True
+            return True
+        if type(input_data) == TimeSeriesDataset:
+            return (self._target_name == input_data.target.name
+                    and self._feature_names == input_data.features.column_names
+                    and self._extra_names == input_data.extras.column_names
+                    and self._forecast_horizon == input_data.forecast_horizon
+                    and self._window_size == input_data.window_size
+                    and self._continuous == input_data.continuous)
