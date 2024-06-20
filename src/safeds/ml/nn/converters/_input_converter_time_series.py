@@ -14,7 +14,7 @@ if TYPE_CHECKING:
     from torch.utils.data import DataLoader
 
 
-class InputConversionTimeSeries(InputConversion[TimeSeriesDataset, Table | TimeSeriesDataset]):
+class InputConversionTimeSeries(InputConversion[TimeSeriesDataset, Table]):
     """The input conversion for a neural network, defines the input parameters for the neural network."""
 
     def __init__(
