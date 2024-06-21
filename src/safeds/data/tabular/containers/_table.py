@@ -642,6 +642,8 @@ class Table:
         self,
         names: str | list[str],
         /,
+        *,
+        ignore_unknown_names: bool = False,
     ) -> Table:
         """
         Return a new table without the specified columns.
@@ -690,6 +692,10 @@ class Table:
         """
         if isinstance(names, str):
             names = [names]
+        
+        if not ignore_unknown_names:
+            existing_columns = _check_columns_exist(self, names)
+
 
         return Table._from_polars_lazy_frame(
             self._lazy_frame.drop(names),
