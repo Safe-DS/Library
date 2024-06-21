@@ -97,8 +97,8 @@ class TablePlotter:
         # TODO: implement using matplotlib and polars
         #  https://stackoverflow.com/questions/33282368/plotting-a-2d-heatmap
         import matplotlib.pyplot as plt
-        import seaborn as sns
-
+        import numpy as np
+        
         only_numerical = self._table.remove_non_numeric_columns()._data_frame.fill_null(0)
 
         if self._table.row_count == 0:
@@ -115,15 +115,18 @@ class TablePlotter:
                     " automatically expanding."
                 ),
             )
-            fig = plt.figure()
-            sns.heatmap(
-                data=only_numerical.corr().to_numpy(),
-                vmin=-1,
+            
+            fig, ax = plt.subplots()
+            heatmap = plt.imshow(
+                only_numerical.corr().to_numpy(), 
+                vmin=-1, 
                 vmax=1,
-                xticklabels=only_numerical.columns,
-                yticklabels=only_numerical.columns,
-                cmap="vlag",
+                cmap="coolwarm",
             )
+            ax.set_xticks(np.arange(len(only_numerical.columns)), labels=only_numerical.columns)
+            ax.set_yticks(np.arange(len(only_numerical.columns)), labels=only_numerical.columns)
+            fig.colorbar(heatmap)
+
             plt.tight_layout()
 
         return _figure_to_image(fig)
