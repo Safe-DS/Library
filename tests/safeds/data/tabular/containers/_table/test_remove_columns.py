@@ -38,7 +38,11 @@ from safeds.exceptions import ColumnNotFoundError
     ],
 )
 def test_should_remove_table_columns(
-    table: Table, expected: Table, columns: list[str], ignore_unknown_names: bool, should_raise: bool,
+    table: Table,
+    expected: Table,
+    columns: list[str],
+    ignore_unknown_names: bool,
+    should_raise: bool,
 ) -> None:
     if should_raise:
         with pytest.raises(ColumnNotFoundError):
