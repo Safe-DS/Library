@@ -98,7 +98,7 @@ class TablePlotter:
         #  https://stackoverflow.com/questions/33282368/plotting-a-2d-heatmap
         import matplotlib.pyplot as plt
         import numpy as np
-        
+
         only_numerical = self._table.remove_non_numeric_columns()._data_frame.fill_null(0)
 
         if self._table.row_count == 0:
@@ -115,11 +115,11 @@ class TablePlotter:
                     " automatically expanding."
                 ),
             )
-            
+
             fig, ax = plt.subplots()
             heatmap = plt.imshow(
-                only_numerical.corr().to_numpy(), 
-                vmin=-1, 
+                only_numerical.corr().to_numpy(),
+                vmin=-1,
                 vmax=1,
                 cmap="coolwarm",
             )
