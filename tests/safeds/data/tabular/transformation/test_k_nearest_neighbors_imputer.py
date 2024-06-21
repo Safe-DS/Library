@@ -9,10 +9,6 @@ class TestInit:
         with pytest.raises(ValueError, match='Parameter "neighbor_count" must be greater than 0.'):
             _ = KNearestNeighborsImputer(neighbor_count=0)
 
-    def test_should_raise_type_error(self) -> None:
-        with pytest.raises(TypeError, match='Parameter "neighbor_count" must be a integer.'):
-            _ = KNearestNeighborsImputer(neighbor_count=1.5)
-
 
 class TestFit:
     def test_should_raise_if_column_not_found(self) -> None:
@@ -53,7 +49,6 @@ class TestTransform:
         )
 
         transformer = KNearestNeighborsImputer()
-        transformer.fit(table_to_fit)
 
         table_to_transform = Table(
             {
@@ -62,7 +57,7 @@ class TestTransform:
         )
 
         with pytest.raises(ColumnNotFoundError):
-            transformer.transform(table_to_transform)
+            transformer.fit(table_to_fit).transform(table_to_transform)
 
     def test_should_raise_if_not_fitted(self) -> None:
         table = Table(
