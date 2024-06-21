@@ -353,6 +353,81 @@ class TablePlotter:
 
         return _figure_to_image(fig)
 
+    def moving_average_plot(self, x_name: str, y_name: str, window_size: int) -> Image:
+        """
+        Create a moving average plot for the y column and plot it by the x column in the table.
+
+        Parameters
+        ----------
+        x_name:
+            The name of the column to be plotted on the x-axis.
+        y_name:
+            The name of the column to be plotted on the y-axis.
+
+        Returns
+        -------
+        plot:
+            The plot as an image.
+
+        Raises
+        ------
+        ColumnNotFoundError
+            If a column does not exist.
+        TypeError
+            If a column is not numeric.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table
+        >>> table = Table(
+        ...     {
+        ...         "a": [1, 2, 3, 4, 5],
+        ...         "b": [2, 3, 4, 5, 6],
+        ...     }
+        ... )
+        >>> image = table.plot.moving_average_plot("a", "b", window_size = 2)
+        """
+        import matplotlib.pyplot as plt
+        import numpy as np
+        import polars as pl
+
+        _plot_validation(self._table, x_name, [y_name])
+        for name in [x_name, y_name]:
+            if self._table.get_column(name).missing_value_count() >= 1:
+                raise ValueError(
+                    f"there are missing values in column '{name}', use transformation to fill missing values "
+                    f"or drop the missing values. For a moving average no missing values are allowed.",
+                )
+
+        # Calculate the moving average
+        mean_col = pl.col(y_name).mean().alias(y_name)
+        grouped = self._table._lazy_frame.sort(x_name).group_by(x_name).agg(mean_col).collect()
+        data = grouped
+        moving_average = data.select([pl.col(y_name).rolling_mean(window_size).alias("moving_average")])
+        # set up the arrays for plotting
+        y_data_with_nan = moving_average["moving_average"].to_numpy()
+        nan_mask = ~np.isnan(y_data_with_nan)
+        y_data = y_data_with_nan[nan_mask]
+        x_data = data[x_name].to_numpy()[nan_mask]
+        fig, ax = plt.subplots()
+        ax.plot(x_data, y_data, label="moving average")
+        ax.set(
+            xlabel=x_name,
+            ylabel=y_name,
+        )
+        ax.legend()
+        if self._table.get_column(x_name).is_temporal:
+            ax.set_xticks(x_data)  # Set x-ticks to the x data points
+        ax.set_xticks(ax.get_xticks())
+        ax.set_xticklabels(
+            ax.get_xticklabels(),
+            rotation=45,
+            horizontalalignment="right",
+        )  # rotate the labels of the x Axis to prevent the chance of overlapping of the labels
+        fig.tight_layout()
+
+        return _figure_to_image(fig)
+
 
 def _plot_validation(table: Table, x_name: str, y_names: list[str]) -> None:
     y_names.append(x_name)
