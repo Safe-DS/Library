@@ -13,7 +13,13 @@ from safeds.exceptions import ColumnNotFoundError
         (Table(), Table(), ["col1"], True, False),
         (Table({"col1": [1, 2, 1], "col2": ["a", "b", "c"]}), Table({"col1": [1, 2, 1]}), ["col2"], False, False),
         (Table({"col1": [1, 2, 1], "col2": [1, 2, 4]}), Table(), ["col1", "col2"], False, False),
-        (Table({"col1": [1, 2, 1], "col2": [1, 2, 4]}), Table({"col1": [1, 2, 1], "col2": [1, 2, 4]}), [], False, False),
+        (
+            Table({"col1": [1, 2, 1], "col2": [1, 2, 4]}),
+            Table({"col1": [1, 2, 1], "col2": [1, 2, 4]}),
+            [],
+            False,
+            False,
+        ),
         (Table(), Table(), [], False, False),
         (Table(), Table(), ["col1"], True, True),
         (Table(), Table(), ["col12"], False, True),
@@ -31,7 +37,9 @@ from safeds.exceptions import ColumnNotFoundError
         "missing columns",
     ],
 )
-def test_should_remove_table_columns(table: Table, expected: Table, columns: list[str], ignore_unknown_names: bool, should_raise: bool) -> None:
+def test_should_remove_table_columns(
+    table: Table, expected: Table, columns: list[str], ignore_unknown_names: bool, should_raise: bool,
+) -> None:
     if should_raise:
         with pytest.raises(ColumnNotFoundError):
             table.remove_columns(columns)
@@ -40,4 +48,3 @@ def test_should_remove_table_columns(table: Table, expected: Table, columns: lis
         assert table.schema == expected.schema
         assert table == expected
         assert table.row_count == expected.row_count
-

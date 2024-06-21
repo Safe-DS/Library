@@ -690,10 +690,9 @@ class Table:
         """
         if isinstance(names, str):
             names = [names]
-        
+
         if not ignore_unknown_names:
             _check_columns_exist(self, names)
-
 
         return Table._from_polars_lazy_frame(
             self._lazy_frame.drop(names),
