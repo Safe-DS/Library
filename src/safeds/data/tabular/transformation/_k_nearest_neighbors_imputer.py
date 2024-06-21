@@ -37,8 +37,6 @@ class KNearestNeighborsImputer(TableTransformer):
     ) -> None:
         super().__init__(column_names)
 
-        if not isinstance(neighbor_count, int):
-            raise TypeError('Parameter "neighbor_count" must be a integer.')
         if neighbor_count <= 0:
             raise ValueError('Parameter "neighbor_count" must be greater than 0.')
 
@@ -101,13 +99,13 @@ class KNearestNeighborsImputer(TableTransformer):
             column_names = self._column_names
             _check_columns_exist(table, column_names)
         
-        wrapped_transformer = sk_KNNImputer(missing_values=self._value_to_replace, n_neighbors=self._neighbor_count)
+        wrapped_transformer = sk_KNNImputer(n_neighbors=self._neighbor_count, missing_values=self._value_to_replace)
         wrapped_transformer.set_output(transform="polars")
         wrapped_transformer.fit(
             table.remove_columns_except(column_names)._data_frame,
         )
 
-        result = KNearestNeighborsImputer(self._neighbor_count, column_names=column_names, value_to_replace=self._value_to_replace)
+        result = KNearestNeighborsImputer(self._neighbor_count, column_names=column_names)
         result._wrapped_transformer = wrapped_transformer
 
         return result
