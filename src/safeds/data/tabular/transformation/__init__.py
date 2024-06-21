@@ -7,6 +7,7 @@ import apipkg
 if TYPE_CHECKING:
     from ._discretizer import Discretizer
     from ._invertible_table_transformer import InvertibleTableTransformer
+    from ._k_nearest_neighbors_imputer import KNearestNeighborsImputer
     from ._label_encoder import LabelEncoder
     from ._one_hot_encoder import OneHotEncoder
     from ._range_scaler import RangeScaler
@@ -25,6 +26,7 @@ apipkg.initpkg(
         "SimpleImputer": "._simple_imputer:SimpleImputer",
         "StandardScaler": "._standard_scaler:StandardScaler",
         "TableTransformer": "._table_transformer:TableTransformer",
+        "KNearestNeighborsImputer": "._k_nearest_neighbors_imputer:KNearestNeighborsImputer",
     },
 )
 
@@ -37,4 +39,5 @@ __all__ = [
     "SimpleImputer",
     "StandardScaler",
     "TableTransformer",
+    "KNearestNeighborsImputer",
 ]
