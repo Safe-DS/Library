@@ -70,3 +70,68 @@ class TestTransform:
 
         with pytest.raises(TransformerNotFittedError):
             transformer.transform(table)
+
+
+class TestIsFitted:
+    def test_should_return_false_before_fitting(self) -> None:
+        transformer = KNearestNeighborsImputer()
+        assert not transformer.is_fitted
+
+    def test_should_return_true_after_fitting(self) -> None:
+        table = Table(
+            {
+                "col1": [0.0, 5.0, 10.0],
+            },
+        )
+
+        transformer = KNearestNeighborsImputer()
+        fitted_transformer = transformer.fit(table)
+        assert fitted_transformer.is_fitted
+
+
+class TestFitAndTransform:
+    @pytest.mark.parametrize(
+        ("table", "column_names", "expected"),
+        [
+            (
+                Table(
+                    {
+                        "col1": [0.0, 5.0, 5.0, 10.0],
+                    },
+                ),
+                None,
+                Table(
+                    {
+                        "col1": [0.0, 0.5, 0.5, 1.0],
+                    },
+                ),
+            ),
+            (
+                Table(
+                    {
+                        "col1": [0.0, 5.0, 5.0, 10.0],
+                        "col2": [0.0, 5.0, 5.0, 10.0],
+                    },
+                ),
+                ["col1"],
+                Table(
+                    {
+                        "col1": [0.0, 0.5, 0.5, 1.0],
+                        "col2": [0.0, 5.0, 5.0, 10.0],
+                    },
+                ),
+            ),
+        ],
+        ids=["one_column", "two_columns"],
+    )
+    def test_should_return_fitted_transformer_and_transformed_table(
+        self,
+        table: Table,
+        column_names: list[str] | None,
+        expected: Table,
+    ) -> None:
+        fitted_transformer, transformed_table = KNearestNeighborsImputer(column_names=column_names).fit_and_transform(table)
+        assert fitted_transformer.is_fitted
+        assert transformed_table == expected
+
+        
