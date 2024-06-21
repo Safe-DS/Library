@@ -37,13 +37,7 @@ class RangeScaler(InvertibleTableTransformer):
     # Dunder methods
     # ------------------------------------------------------------------------------------------------------------------
 
-    def __init__(
-        self,
-        *,
-        column_names: str | list[str] | None = None,
-        min_: float = 0.0,
-        max_: float = 1.0
-    ) -> None:
+    def __init__(self, *, column_names: str | list[str] | None = None, min_: float = 0.0, max_: float = 1.0) -> None:
         super().__init__(column_names)
 
         if min_ >= max_:
