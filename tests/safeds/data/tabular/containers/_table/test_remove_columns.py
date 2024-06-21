@@ -16,7 +16,7 @@ from safeds.exceptions import ColumnNotFoundError
         (Table({"col1": [1, 2, 1], "col2": [1, 2, 4]}), Table({"col1": [1, 2, 1], "col2": [1, 2, 4]}), [], False, False),
         (Table(), Table(), [], False, False),
         (Table(), Table(), ["col1"], True, True),
-        (Table(), Table(), ["col12"], False, True)
+        (Table(), Table(), ["col12"], False, True),
     ],
     ids=[
         "one column, ignore unknown names",

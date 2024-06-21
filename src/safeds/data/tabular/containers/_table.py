@@ -651,8 +651,6 @@ class Table:
         **Notes:**
 
         - The original table is not modified.
-        - This method does not raise if a column does not exist. You can use it to ensure that the resulting table does
-          not contain certain columns.
 
         Parameters
         ----------
@@ -694,7 +692,7 @@ class Table:
             names = [names]
         
         if not ignore_unknown_names:
-            existing_columns = _check_columns_exist(self, names)
+            _check_columns_exist(self, names)
 
 
         return Table._from_polars_lazy_frame(
