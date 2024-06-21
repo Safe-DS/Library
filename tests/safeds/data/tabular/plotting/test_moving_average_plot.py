@@ -90,12 +90,11 @@ def test_should_raise_if_column_is_not_numerical(table: Table) -> None:
 @pytest.mark.parametrize(
     ("table", "column_name"),
     [
-        (Table({"A": [1, 2, 3], "B": [None, 4, 7]}), 'B'),
-        (Table({"A": [None, 2, 3], "B": [2, 4, 7]}), 'A'),
+        (Table({"A": [1, 2, 3], "B": [None, 4, 7]}), "B"),
+        (Table({"A": [None, 2, 3], "B": [2, 4, 7]}), "A"),
     ],
     ids=["x column", "y column"],
 )
-
 def test_should_raise_if_column_has_missing_value(table: Table, column_name: str) -> None:
     with pytest.raises(
         ValueError,

@@ -397,7 +397,7 @@ class TablePlotter:
                 raise ValueError(
                     f"there are missing values in column '{name}', use transformation to fill missing values "
                     f"or drop the missing values. For a moving average no missing values are allowed.",
-                    )
+                )
 
         # Calculate the moving average
         mean_col = pl.col(y_name).mean().alias(y_name)
@@ -437,4 +437,3 @@ def _plot_validation(table: Table, x_name: str, y_names: list[str]) -> None:
 
     if not table.get_column(x_name).is_numeric and not table.get_column(x_name).is_temporal:
         raise ColumnTypeError(x_name)
-
