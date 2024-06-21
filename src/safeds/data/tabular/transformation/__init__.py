@@ -10,6 +10,7 @@ if TYPE_CHECKING:
     from ._label_encoder import LabelEncoder
     from ._one_hot_encoder import OneHotEncoder
     from ._range_scaler import RangeScaler
+    from ._sequential_table_transformer import SequentialTableTransformer
     from ._simple_imputer import SimpleImputer
     from ._standard_scaler import StandardScaler
     from ._table_transformer import TableTransformer
@@ -22,6 +23,7 @@ apipkg.initpkg(
         "LabelEncoder": "._label_encoder:LabelEncoder",
         "OneHotEncoder": "._one_hot_encoder:OneHotEncoder",
         "RangeScaler": "._range_scaler:RangeScaler",
+        "SequentialTableTransformer": "._sequential_table_transformer:SequentialTableTransformer",
         "SimpleImputer": "._simple_imputer:SimpleImputer",
         "StandardScaler": "._standard_scaler:StandardScaler",
         "TableTransformer": "._table_transformer:TableTransformer",
@@ -34,6 +36,7 @@ __all__ = [
     "LabelEncoder",
     "OneHotEncoder",
     "RangeScaler",
+    "SequentialTableTransformer",
     "SimpleImputer",
     "StandardScaler",
     "TableTransformer",
