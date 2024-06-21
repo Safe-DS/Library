@@ -13,7 +13,6 @@ if TYPE_CHECKING:
     import polars as pl
 
 class RobustScaler(InvertibleTableTransformer):
-    # Does it actually transform values to a range?
     """
     The RobustScaler transforms column values to a range by removing the median and scaling to the interquartile range.
 
@@ -90,7 +89,7 @@ class RobustScaler(InvertibleTableTransformer):
         _data_median = table._lazy_frame.select(column_names).median().collect()
         q1 = table._lazy_frame.select(column_names).quantile(0.25).collect()
         q3 = table._lazy_frame.select(column_names).quantile(0.75).collect()
-        _data_scale = q3 - q1 # TODO: Check if this works
+        _data_scale = q3 - q1
 
         # Create a copy with the learned transformation
         result = RobustScaler(column_names=column_names)

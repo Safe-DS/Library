@@ -41,6 +41,17 @@ class TestFit:
         assert transformer._data_median is None
         assert transformer._data_scale is None
 
+    # TODO: fix this
+    def test_should_not_divide_by_zero(self) -> None:
+        table = Table(
+            {
+                "col1": [1.0, 1.0, 2.0, 1.0],
+            },
+        )
+        
+        transformer = RobustScaler()
+        transformer.fit(table)
+
 
 class TestTransform:
     def test_should_raise_if_column_not_found(self) -> None:
@@ -97,7 +108,6 @@ class TestIsFitted:
         fitted_transformer = transformer.fit(table)
         assert fitted_transformer.is_fitted
 
-# TODO: Replace values
 class TestFitAndTransform:
     @pytest.mark.parametrize(
         ("table", "column_names", "expected"),
