@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from safeds._utils import _structural_hash
 from safeds._validation import _check_columns_exist
 from safeds.data.tabular.containers import Table
 from safeds.exceptions import TransformerNotFittedError
@@ -29,12 +30,17 @@ class KNearestNeighborsImputer(TableTransformer):
 
     def __init__(
             self,
-            neighbor_count: int, 
+            neighbor_count: int = 5, 
             *,
             column_names: str | list[str] | None = None,
             value_to_replace: float | str | None = None,
     ) -> None:
         super().__init__(column_names)
+
+        if not isinstance(neighbor_count, int):
+            raise TypeError('Parameter "neighbor_count" must be a integer.')
+        if neighbor_count <= 0:
+            raise ValueError('Parameter "neighbor_count" must be greater than 0.')
 
         # parameter
         self._neighbor_count: int = neighbor_count
@@ -43,6 +49,8 @@ class KNearestNeighborsImputer(TableTransformer):
         # attributes
         self._wrapped_transformer: sk_KNNImputer | None = None
 
+    def __hash__(self) -> int:
+        return _structural_hash(self)
     # ------------------------------------------------------------------------------------------------------------------
     # Properties
     # ------------------------------------------------------------------------------------------------------------------
@@ -88,10 +96,10 @@ class KNearestNeighborsImputer(TableTransformer):
             raise ValueError("The KNearestNeighborsImputer cannot be fitted because the table contains 0 rows.")
         
         if self._column_names is None:
-            self._column_names = table.column_names
+            column_names = table.column_names
         else:
             column_names = self._column_names
-            _check_columns_exist(Table, column_names)
+            _check_columns_exist(table, column_names)
         
         wrapped_transformer = sk_KNNImputer(missing_values=self._value_to_replace, n_neighbors=self._neighbor_count)
         wrapped_transformer.set_output(transform="polars")
@@ -99,7 +107,7 @@ class KNearestNeighborsImputer(TableTransformer):
             table.remove_columns_except(column_names)._data_frame,
         )
 
-        result = KNearestNeighborsImputer(self._neighbor_count, column_names=self._column_names, value_to_replace=self._value_to_replace)
+        result = KNearestNeighborsImputer(self._neighbor_count, column_names=column_names, value_to_replace=self._value_to_replace)
         result._wrapped_transformer = wrapped_transformer
 
         return result
@@ -127,7 +135,7 @@ class KNearestNeighborsImputer(TableTransformer):
         ColumnNotFoundError
             If one of the columns, that should be transformed is not in the table.
         """
-        if self._column_names is None or self._neighbor_count is None or self._wrapped_transformer is None:
+        if self._column_names is None or self._wrapped_transformer is None:
             raise TransformerNotFittedError
 
         _check_columns_exist(table, self._column_names)
