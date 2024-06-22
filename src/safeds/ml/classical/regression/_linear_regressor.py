@@ -3,7 +3,6 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from safeds._utils import _structural_hash
-from safeds.data.labeled.containers import TabularDataset
 from safeds.exceptions import FittingWithoutChoiceError
 
 from ._regressor import Regressor
@@ -39,5 +38,5 @@ class LinearRegressor(Regressor):
 
         return sk_LinearRegression(n_jobs=-1)
 
-    def _check_additional_fit_by_exhaustive_search_preconditions(self, training_set: TabularDataset) -> None:
+    def _check_additional_fit_by_exhaustive_search_preconditions(self) -> None:
         raise FittingWithoutChoiceError

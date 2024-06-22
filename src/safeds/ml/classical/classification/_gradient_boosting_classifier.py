@@ -11,7 +11,6 @@ from safeds.ml.hyperparameters import Choice
 
 if TYPE_CHECKING:
     from sklearn.base import ClassifierMixin
-    from safeds.data.labeled.containers import TabularDataset
 
 
 class GradientBoostingClassifier(Classifier, _GradientBoostingBase):
@@ -75,7 +74,7 @@ class GradientBoostingClassifier(Classifier, _GradientBoostingBase):
             learning_rate=self._learning_rate,
         )
 
-    def _check_additional_fit_preconditions(self, training_set: TabularDataset) -> None:
+    def _check_additional_fit_preconditions(self) -> None:
         if isinstance(self._tree_count, Choice) or isinstance(self._learning_rate, Choice):
             raise FittingWithChoiceError
 

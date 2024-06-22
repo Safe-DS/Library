@@ -3,7 +3,6 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Self
 
 from safeds._utils import _structural_hash
-from safeds.data.labeled.containers import TabularDataset
 from safeds.exceptions import FittingWithChoiceError, FittingWithoutChoiceError
 from safeds.ml.classical._bases import _DecisionTreeBase
 
@@ -75,7 +74,7 @@ class DecisionTreeClassifier(Classifier, _DecisionTreeBase):
             min_samples_leaf=self._min_sample_count_in_leaves,
         )
 
-    def _check_additional_fit_preconditions(self, training_set: TabularDataset) -> None:
+    def _check_additional_fit_preconditions(self) -> None:
         if isinstance(self._max_depth, Choice) or isinstance(self._min_sample_count_in_leaves, Choice):
             raise FittingWithChoiceError
 

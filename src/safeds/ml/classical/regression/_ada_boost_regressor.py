@@ -3,7 +3,6 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Self
 
 from safeds._utils import _structural_hash
-from safeds.data.labeled.containers import TabularDataset
 from safeds.exceptions import FittingWithChoiceError, FittingWithoutChoiceError
 from safeds.ml.classical._bases import _AdaBoostBase
 
@@ -94,11 +93,11 @@ class AdaBoostRegressor(Regressor, _AdaBoostBase):
             learning_rate=self._learning_rate,
         )
 
-    def _check_additional_fit_preconditions(self, training_set: TabularDataset) -> None:
+    def _check_additional_fit_preconditions(self) -> None:
         if isinstance(self._max_learner_count, Choice) or isinstance(self._learning_rate, Choice):
             raise FittingWithChoiceError
 
-    def _check_additional_fit_by_exhaustive_search_preconditions(self, training_set: TabularDataset) -> None:
+    def _check_additional_fit_by_exhaustive_search_preconditions(self) -> None:
         if not isinstance(self._max_learner_count, Choice) and not isinstance(self._learning_rate, Choice):
             raise FittingWithoutChoiceError
 

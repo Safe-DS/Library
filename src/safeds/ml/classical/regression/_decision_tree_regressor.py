@@ -11,7 +11,6 @@ from safeds.ml.hyperparameters import Choice
 
 if TYPE_CHECKING:
     from sklearn.base import RegressorMixin
-    from safeds.data.labeled.containers import TabularDataset
 
 
 class DecisionTreeRegressor(Regressor, _DecisionTreeBase):
@@ -75,11 +74,11 @@ class DecisionTreeRegressor(Regressor, _DecisionTreeBase):
             min_samples_leaf=self._min_sample_count_in_leaves,
         )
 
-    def _check_additional_fit_preconditions(self, training_set: TabularDataset) -> None:
+    def _check_additional_fit_preconditions(self) -> None:
         if isinstance(self._max_depth, Choice) or isinstance(self._min_sample_count_in_leaves, Choice):
             raise FittingWithChoiceError
 
-    def _check_additional_fit_by_exhaustive_search_preconditions(self, training_set: TabularDataset) -> None:
+    def _check_additional_fit_by_exhaustive_search_preconditions(self) -> None:
         if not isinstance(self._max_depth, Choice) and not isinstance(self._min_sample_count_in_leaves, Choice):
             raise FittingWithoutChoiceError
 

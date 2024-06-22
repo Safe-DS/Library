@@ -3,7 +3,6 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Self
 
 from safeds._utils import _get_random_seed, _structural_hash
-from safeds.data.labeled.containers import TabularDataset
 from safeds.exceptions import FittingWithChoiceError, FittingWithoutChoiceError
 from safeds.ml.classical._bases import _RandomForestBase
 
@@ -85,12 +84,12 @@ class RandomForestRegressor(Regressor, _RandomForestBase):
             n_jobs=-1,
         )
 
-    def _check_additional_fit_preconditions(self, training_set: TabularDataset) -> None:
+    def _check_additional_fit_preconditions(self) -> None:
         if isinstance(self._tree_count, Choice) or isinstance(self._max_depth, Choice) or isinstance(
             self._min_sample_count_in_leaves, Choice):
             raise FittingWithChoiceError
 
-    def _check_additional_fit_by_exhaustive_search_preconditions(self, training_set: TabularDataset) -> None:
+    def _check_additional_fit_by_exhaustive_search_preconditions(self) -> None:
         if not isinstance(self._tree_count, Choice) and not isinstance(self._max_depth, Choice) and not isinstance(
             self._min_sample_count_in_leaves, Choice):
             raise FittingWithoutChoiceError

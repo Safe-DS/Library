@@ -3,7 +3,6 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Self
 
 from safeds._utils import _get_random_seed, _structural_hash
-from safeds.data.labeled.containers import TabularDataset
 from safeds.exceptions import FittingWithChoiceError, FittingWithoutChoiceError
 from safeds.ml.classical._bases import _SupportVectorMachineBase
 from safeds.ml.classical.classification import Classifier
@@ -83,7 +82,7 @@ class SupportVectorClassifier(Classifier, _SupportVectorMachineBase):
         self._kernel._apply(result)
         return result
 
-    def _check_additional_fit_preconditions(self, training_set: TabularDataset) -> None:
+    def _check_additional_fit_preconditions(self) -> None:
         if isinstance(self._c, Choice):
             raise FittingWithChoiceError
 
