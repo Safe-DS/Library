@@ -34,6 +34,13 @@ class FittingWithoutChoiceError(Exception):
         super().__init__(f"Error occurred while fitting: Trying to fit by exhaustive search without a Choice "
                          f"Parameter. Please use fit() instead.")
 
+class InvalidFitDataError(Exception):
+    """Raised when a Neural Network is fitted on invalid data."""
+
+    def __init__(self, reason: str) -> None:
+        super().__init__(f"The given Fit Data is invalid:\n{reason}")
+
+
 
 class LearningError(Exception):
     """
