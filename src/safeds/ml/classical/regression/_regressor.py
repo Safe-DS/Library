@@ -5,13 +5,13 @@ from concurrent.futures import ProcessPoolExecutor, wait, ALL_COMPLETED
 from typing import TYPE_CHECKING, Self
 
 from safeds.data.labeled.containers import TabularDataset
-from safeds.exceptions import ColumnLengthMismatchError, ModelNotFittedError, PlainTableError, LearningError, \
-    DatasetMissesDataError
+from safeds.data.tabular.containers import Table
+from safeds.exceptions import ColumnLengthMismatchError, ModelNotFittedError, PlainTableError, DatasetMissesDataError
 from safeds.ml.classical import SupervisedModel
 from safeds.ml.metrics import RegressionMetrics, RegressorMetric
 
 if TYPE_CHECKING:
-    from safeds.data.tabular.containers import Column, Table
+    from safeds.data.tabular.containers import Column
 
 
 class Regressor(SupervisedModel, ABC):
@@ -252,7 +252,7 @@ class Regressor(SupervisedModel, ABC):
         if training_set.to_table().row_count == 0:
             raise DatasetMissesDataError
 
-        self._check_additional_fit_by_exhaustive_search_preconditions(training_set)
+        self._check_additional_fit_by_exhaustive_search_preconditions()
 
         [train_split, test_split] = training_set.to_table().split_rows(0.75)
         train_split = train_split.to_tabular_dataset(target_name=training_set.target.name,
@@ -302,6 +302,7 @@ class Regressor(SupervisedModel, ABC):
                             best_model = fitted_model
         return best_model
 
+
 def _check_metrics_preconditions(actual: Column, expected: Column) -> None:  # pragma: no cover
     if not actual.type.is_numeric:
         raise TypeError(f"Column 'actual' is not numerical but {actual.type}.")
@@ -317,7 +318,6 @@ def _check_metrics_preconditions(actual: Column, expected: Column) -> None:  # p
                 ],
             ),
         )
-
 
 
 def _extract_table(table_or_dataset: Table | TabularDataset) -> Table:
