@@ -2,6 +2,7 @@ import pytest
 from safeds.data.tabular.containers import Table
 from safeds.exceptions import ColumnNotFoundError
 
+
 # Test cases where no exception is expected
 @pytest.mark.parametrize(
     ("table", "expected", "columns", "ignore_unknown_names"),
@@ -43,6 +44,7 @@ def test_should_remove_table_columns_no_exception(
     assert table.schema == expected.schema
     assert table == expected
     assert table.row_count == expected.row_count
+
 
 # Test cases where an exception is expected
 @pytest.mark.parametrize(
