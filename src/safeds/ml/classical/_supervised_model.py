@@ -17,11 +17,11 @@ from safeds.exceptions import (
     PlainTableError,
     PredictionError,
 )
-from safeds.ml.metrics import ClassifierMetric, RegressorMetric
 
 if TYPE_CHECKING:
     from sklearn.base import ClassifierMixin, RegressorMixin
-
+    from safeds.ml.classical.classification import KNearestNeighborsClassifier
+    from safeds.ml.classical.regression import KNearestNeighborsRegressor
     from safeds.data.tabular.typing import DataType, Schema
 
 
@@ -89,7 +89,10 @@ class SupervisedModel(ABC):
         if training_set.to_table().row_count == 0:
             raise DatasetMissesDataError
 
-        self._check_additional_fit_preconditions(training_set)
+        if isinstance(self, KNearestNeighborsClassifier) or isinstance(self, KNearestNeighborsRegressor):
+            self._check_additional_fit_preconditions(training_set)
+        else:
+            self._check_additional_fit_preconditions()
 
         wrapped_model = self._get_sklearn_model()
         _fit_sklearn_model_in_place(wrapped_model, training_set)

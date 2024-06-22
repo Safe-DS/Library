@@ -255,9 +255,9 @@ class Regressor(SupervisedModel, ABC):
         self._check_additional_fit_by_exhaustive_search_preconditions()
 
         [train_split, test_split] = training_set.to_table().split_rows(0.75)
-        train_split = train_split.to_tabular_dataset(target_name=training_set.target.name,
+        train_data = train_split.to_tabular_dataset(target_name=training_set.target.name,
                                                      extra_names=training_set.extras.column_names)
-        test_split = test_split.to_tabular_dataset(target_name=training_set.target.name,
+        test_data = test_split.to_tabular_dataset(target_name=training_set.target.name,
                                                    extra_names=training_set.extras.column_names)
 
         list_of_models = self._get_models_for_all_choices()
@@ -266,7 +266,7 @@ class Regressor(SupervisedModel, ABC):
         with ProcessPoolExecutor(max_workers=len(list_of_models)) as executor:
             futures = []
             for model in list_of_models:
-                futures.append(executor.submit(model.fit, train_split))
+                futures.append(executor.submit(model.fit, train_data))
             [done, _] = wait(futures, return_when=ALL_COMPLETED)
             for future in done:
                 list_of_fitted_models.append(future.result())
@@ -279,26 +279,26 @@ class Regressor(SupervisedModel, ABC):
                 best_model = fitted_model
                 match optimization_metric.value:
                     case "mean_squared_error":
-                        best_metric_value = fitted_model.mean_squared_error(test_split)
+                        best_metric_value = fitted_model.mean_squared_error(test_data)
                     case "mean_absolute_error":
-                        best_metric_value = fitted_model.mean_absolute_error(test_split)
+                        best_metric_value = fitted_model.mean_absolute_error(test_data)
                     case "median_absolute_deviation":
-                        best_metric_value = fitted_model.median_absolute_deviation(test_split)
+                        best_metric_value = fitted_model.median_absolute_deviation(test_data)
                     case "coefficient_of_determination":
-                        best_metric_value = fitted_model.coefficient_of_determination(test_split)
+                        best_metric_value = fitted_model.coefficient_of_determination(test_data)
             else:
                 match optimization_metric.value:
                     case "mean_squared_error":
-                        if fitted_model.mean_squared_error(test_split) < best_metric_value:
+                        if fitted_model.mean_squared_error(test_data) < best_metric_value:
                             best_model = fitted_model
                     case "mean_absolute_error":
-                        if fitted_model.mean_absolute_error(test_split) < best_metric_value:
+                        if fitted_model.mean_absolute_error(test_data) < best_metric_value:
                             best_model = fitted_model
                     case "median_absolute_deviation":
-                        if fitted_model.median_absolute_deviation(test_split) < best_metric_value:
+                        if fitted_model.median_absolute_deviation(test_data) < best_metric_value:
                             best_model = fitted_model
                     case "coefficient_of_determination":
-                        if fitted_model.coefficient_of_determination(test_split) > best_metric_value:
+                        if fitted_model.coefficient_of_determination(test_data) > best_metric_value:
                             best_model = fitted_model
         return best_model
 

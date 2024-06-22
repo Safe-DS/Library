@@ -222,12 +222,12 @@ class Classifier(SupervisedModel, ABC):
             raise LearningError(
                 f"Please provide a positive class when using optimization metric '{optimization_metric.value}'")
 
-        self._check_additional_fit_by_exhaustive_search_preconditions(training_set)
+        self._check_additional_fit_by_exhaustive_search_preconditions()
 
         [train_split, test_split] = training_set.to_table().split_rows(0.75)
-        train_split = train_split.to_tabular_dataset(target_name=training_set.target.name,
+        train_data = train_split.to_tabular_dataset(target_name=training_set.target.name,
                                                      extra_names=training_set.extras.column_names)
-        test_split = test_split.to_tabular_dataset(target_name=training_set.target.name,
+        test_data = test_split.to_tabular_dataset(target_name=training_set.target.name,
                                                    extra_names=training_set.extras.column_names)
 
         list_of_models = self._get_models_for_all_choices()
@@ -236,7 +236,7 @@ class Classifier(SupervisedModel, ABC):
         with ProcessPoolExecutor(max_workers=len(list_of_models)) as executor:
             futures = []
             for model in list_of_models:
-                futures.append(executor.submit(model.fit, train_split))
+                futures.append(executor.submit(model.fit, train_data))
             [done, _] = wait(futures, return_when=ALL_COMPLETED)
             for future in done:
                 list_of_fitted_models.append(future.result())
@@ -249,26 +249,26 @@ class Classifier(SupervisedModel, ABC):
                 best_model = fitted_model
                 match optimization_metric.value:
                     case "accuracy":
-                        best_metric_value = fitted_model.accuracy(test_split)
+                        best_metric_value = fitted_model.accuracy(test_data)
                     case "precision":
-                        best_metric_value = fitted_model.precision(test_split, positive_class)
+                        best_metric_value = fitted_model.precision(test_data, positive_class)
                     case "recall":
-                        best_metric_value = fitted_model.recall(test_split, positive_class)
+                        best_metric_value = fitted_model.recall(test_data, positive_class)
                     case "f1score":
-                        best_metric_value = fitted_model.recall(test_split, positive_class)
+                        best_metric_value = fitted_model.recall(test_data, positive_class)
             else:
                 match optimization_metric.value:
                     case "accuracy":
-                        if fitted_model.accuracy(test_split) > best_metric_value:
+                        if fitted_model.accuracy(test_data) > best_metric_value:
                             best_model = fitted_model
                     case "precision":
-                        if fitted_model.precision(test_split, positive_class) > best_metric_value:
+                        if fitted_model.precision(test_data, positive_class) > best_metric_value:
                             best_model = fitted_model
                     case "recall":
-                        if fitted_model.recall(test_split, positive_class) > best_metric_value:
+                        if fitted_model.recall(test_data, positive_class) > best_metric_value:
                             best_model = fitted_model
                     case "f1score":
-                        if fitted_model.f1_score(test_split, positive_class) > best_metric_value:
+                        if fitted_model.f1_score(test_data, positive_class) > best_metric_value:
                             best_model = fitted_model
         return best_model
 

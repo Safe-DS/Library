@@ -24,13 +24,13 @@ class DatasetMissesDataError(ValueError):
 
 class FittingWithChoiceError(Exception):
     """Raised when a model is fitted with a choice object as a parameter."""
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__(f"Error occurred while fitting: Trying to fit with a Choice Parameter. Please use "
                          f"fit_by_exhaustive_search() instead.")
 
 class FittingWithoutChoiceError(Exception):
     """Raised when a model is fitted by exhaustive search without a choice object as a parameter."""
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__(f"Error occurred while fitting: Trying to fit by exhaustive search without a Choice "
                          f"Parameter. Please use fit() instead.")
 
