@@ -97,7 +97,7 @@ class AdaBoostClassifier(Classifier, _AdaBoostBase):
         if isinstance(self._max_learner_count, Choice) or isinstance(self._learning_rate, Choice):
             raise FittingWithChoiceError
 
-    def _check_additional_fit_by_exhaustive_search_preconditions(self, training_set: TabularDataset) -> None:
+    def _check_additional_fit_by_exhaustive_search_preconditions(self) -> None:
         if not isinstance(self._max_learner_count, Choice) and not isinstance(self._learning_rate, Choice):
             raise FittingWithoutChoiceError
 

@@ -80,7 +80,7 @@ class KNearestNeighborsClassifier(Classifier, _KNearestNeighborsBase):
                 ),
             )
 
-    def _check_additional_fit_by_exhaustive_search_preconditions(self, training_set: TabularDataset) -> None:
+    def _check_additional_fit_by_exhaustive_search_preconditions(self) -> None:
         if not isinstance(self._neighbor_count, Choice):
             raise FittingWithoutChoiceError
 

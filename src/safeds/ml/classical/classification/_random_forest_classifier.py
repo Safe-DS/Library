@@ -90,9 +90,8 @@ class RandomForestClassifier(Classifier, _RandomForestBase):
             self._min_sample_count_in_leaves, Choice):
             raise FittingWithChoiceError
 
-    def _check_additional_fit_by_exhaustive_search_preconditions(self, training_set: TabularDataset) -> None:
-        if not isinstance(self._tree_count, Choice) and not isinstance(self._max_depth, Choice) and not isinstance(
-            self._min_sample_count_in_leaves, Choice):
+    def _check_additional_fit_by_exhaustive_search_preconditions(self) -> None:
+        if not isinstance(self._tree_count, Choice) and not isinstance(self._max_depth, Choice) and not isinstance(self._min_sample_count_in_leaves, Choice):
             raise FittingWithoutChoiceError
 
     def _get_models_for_all_choices(self) -> list[Self]:
@@ -100,7 +99,9 @@ class RandomForestClassifier(Classifier, _RandomForestBase):
             self._tree_count]
         max_depth_choices = self._max_depth if isinstance(self._max_depth, Choice) else [
             self._max_depth]
-        min_sample_count_choices = self._min_sample_count_in_leaves if isinstance(self._min_sample_count_in_leaves, Choice) else [self._min_sample_count_in_leaves]
+        min_sample_count_choices = self._min_sample_count_in_leaves if isinstance(self._min_sample_count_in_leaves,
+                                                                                  Choice) else [
+            self._min_sample_count_in_leaves]
 
         models = []
         for tc in tree_count_choices:

@@ -79,7 +79,7 @@ class DecisionTreeClassifier(Classifier, _DecisionTreeBase):
         if isinstance(self._max_depth, Choice) or isinstance(self._min_sample_count_in_leaves, Choice):
             raise FittingWithChoiceError
 
-    def _check_additional_fit_by_exhaustive_search_preconditions(self, training_set: TabularDataset) -> None:
+    def _check_additional_fit_by_exhaustive_search_preconditions(self) -> None:
         if not isinstance(self._max_depth, Choice) and not isinstance(self._min_sample_count_in_leaves, Choice):
             raise FittingWithoutChoiceError
 

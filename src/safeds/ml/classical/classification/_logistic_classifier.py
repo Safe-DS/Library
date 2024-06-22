@@ -42,5 +42,5 @@ class LogisticClassifier(Classifier):
             n_jobs=-1,
         )
 
-    def _check_additional_fit_by_exhaustive_search_preconditions(self, training_set: TabularDataset) -> None:
+    def _check_additional_fit_by_exhaustive_search_preconditions(self) -> None:
         raise FittingWithoutChoiceError

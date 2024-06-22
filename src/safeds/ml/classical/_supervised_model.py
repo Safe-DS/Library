@@ -245,14 +245,9 @@ class SupervisedModel(ABC):
             The training data containing the features and target.
         """
 
-    def _check_additional_fit_by_exhaustive_search_preconditions(self, training_set: TabularDataset) -> None:  # noqa: B027
+    def _check_additional_fit_by_exhaustive_search_preconditions(self) -> None:  # noqa: B027
         """
         Check additional preconditions for fitting the model by exhaustive search and raise an error if any are violated.
-
-        Parameters
-        ----------
-        training_set:
-            The training data containing the features and target.
         """
 
     def _check_additional_predict_preconditions(self, dataset: Table | TabularDataset) -> None:  # noqa: B027

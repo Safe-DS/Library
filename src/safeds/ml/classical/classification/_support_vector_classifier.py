@@ -87,7 +87,7 @@ class SupportVectorClassifier(Classifier, _SupportVectorMachineBase):
         if isinstance(self._c, Choice):
             raise FittingWithChoiceError
 
-    def _check_additional_fit_by_exhaustive_search_preconditions(self, training_set: TabularDataset) -> None:
+    def _check_additional_fit_by_exhaustive_search_preconditions(self) -> None:
         if not isinstance(self._c, Choice):
             raise FittingWithoutChoiceError
 
