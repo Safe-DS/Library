@@ -26,8 +26,8 @@ class _GradientBoostingBase(ABC):
             _check_bounds("tree_count", tree_count, lower_bound=_ClosedBound(1))
 
         if isinstance(learning_rate, Choice):
-            for value in learning_rate:
-                _check_bounds("learning_rate", value, lower_bound=_OpenBound(0))
+            for lr in learning_rate:
+                _check_bounds("learning_rate", lr, lower_bound=_OpenBound(0))
         else:
             _check_bounds("learning_rate", learning_rate, lower_bound=_OpenBound(0))
 
