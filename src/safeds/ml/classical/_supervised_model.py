@@ -88,6 +88,7 @@ class SupervisedModel(ABC):
             raise DatasetMissesDataError
 
         self._check_additional_fit_preconditions()
+        self._check_more_additional_fit_preconditions(training_set)
 
         wrapped_model = self._get_sklearn_model()
         _fit_sklearn_model_in_place(wrapped_model, training_set)
@@ -234,6 +235,9 @@ class SupervisedModel(ABC):
     # ------------------------------------------------------------------------------------------------------------------
 
     def _check_additional_fit_preconditions(self) -> None:  # noqa: B027
+        """Check additional preconditions for fitting the model and raise an error if any are violated."""
+
+    def _check_more_additional_fit_preconditions(self, training_set: TabularDataset) -> None:  # noqa: B027
         """Check additional preconditions for fitting the model and raise an error if any are violated."""
 
     def _check_additional_fit_by_exhaustive_search_preconditions(self) -> None:  # noqa: B027

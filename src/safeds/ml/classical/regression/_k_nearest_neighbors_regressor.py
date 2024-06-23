@@ -66,7 +66,7 @@ class KNearestNeighborsRegressor(Regressor, _KNearestNeighborsBase):
             n_jobs=-1,
         )
 
-    def _check_additional_fit_preconditions(self, training_set: TabularDataset) -> None:
+    def _check_more_additional_fit_preconditions(self, training_set: TabularDataset) -> None:
         if isinstance(self._neighbor_count, Choice):
             raise FittingWithChoiceError
         if self._neighbor_count > training_set._table.row_count:

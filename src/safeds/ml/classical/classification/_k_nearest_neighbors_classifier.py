@@ -52,7 +52,6 @@ class KNearestNeighborsClassifier(Classifier, _KNearestNeighborsBase):
             _KNearestNeighborsBase.__hash__(self),
         )
 
-
     # ------------------------------------------------------------------------------------------------------------------
     # Template methods
     # ------------------------------------------------------------------------------------------------------------------
@@ -70,7 +69,7 @@ class KNearestNeighborsClassifier(Classifier, _KNearestNeighborsBase):
             n_jobs=-1,
         )
 
-    def _check_additional_fit_preconditions(self, training_set: TabularDataset) -> None:
+    def _check_more_additional_fit_preconditions(self, training_set: TabularDataset) -> None:
         if isinstance(self._neighbor_count, Choice):
             raise FittingWithChoiceError
         if self._neighbor_count > training_set._table.row_count:
@@ -86,7 +85,7 @@ class KNearestNeighborsClassifier(Classifier, _KNearestNeighborsBase):
             raise FittingWithoutChoiceError
 
     def _get_models_for_all_choices(self) -> list[KNearestNeighborsClassifier]:
-        assert isinstance(self._neighbor_count, Choice)     # this is always true and just here for linting
+        assert isinstance(self._neighbor_count, Choice)  # this is always true and just here for linting
         models = []
         for nc in self._neighbor_count:
             models.append(KNearestNeighborsClassifier(neighbor_count=nc))
