@@ -74,7 +74,7 @@ class DecisionTreeClassifier(Classifier, _DecisionTreeBase):
             min_samples_leaf=self._min_sample_count_in_leaves,
         )
 
-    def _check_additional_fit_preconditions(self, **kwargs) -> None:
+    def _check_additional_fit_preconditions(self) -> None:
         if isinstance(self._max_depth, Choice) or isinstance(self._min_sample_count_in_leaves, Choice):
             raise FittingWithChoiceError
 

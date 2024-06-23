@@ -84,7 +84,7 @@ class RandomForestClassifier(Classifier, _RandomForestBase):
             n_jobs=-1,
         )
 
-    def _check_additional_fit_preconditions(self, **kwargs) -> None:
+    def _check_additional_fit_preconditions(self) -> None:
         if isinstance(self._tree_count, Choice) or isinstance(self._max_depth, Choice) or isinstance(
             self._min_sample_count_in_leaves, Choice):
             raise FittingWithChoiceError
