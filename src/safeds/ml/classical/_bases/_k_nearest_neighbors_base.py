@@ -19,8 +19,8 @@ class _KNearestNeighborsBase(ABC):
     ) -> None:
         # Validation
         if isinstance(neighbor_count, Choice):
-            for value in neighbor_count:
-                _check_bounds("neighbor_count", value, lower_bound=_ClosedBound(1))
+            for nc in neighbor_count:
+                _check_bounds("neighbor_count", nc, lower_bound=_ClosedBound(1))
         else:
             _check_bounds("neighbor_count", neighbor_count, lower_bound=_ClosedBound(1))
 

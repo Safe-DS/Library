@@ -20,8 +20,8 @@ class _GradientBoostingBase(ABC):
     ) -> None:
         # Validation
         if isinstance(tree_count, Choice):
-            for value in tree_count:
-                _check_bounds("tree_count", value, lower_bound=_ClosedBound(1))
+            for tc in tree_count:
+                _check_bounds("tree_count", tc, lower_bound=_ClosedBound(1))
         else:
             _check_bounds("tree_count", tree_count, lower_bound=_ClosedBound(1))
 

@@ -25,14 +25,14 @@ class _AdaBoostBase(ABC):
     ) -> None:
         # Validation
         if isinstance(max_learner_count, Choice):
-            for value in max_learner_count:
-                _check_bounds("max_learner_count", value, lower_bound=_ClosedBound(1))
+            for mlc in max_learner_count:
+                _check_bounds("max_learner_count", mlc, lower_bound=_ClosedBound(1))
         else:
             _check_bounds("max_learner_count", max_learner_count, lower_bound=_ClosedBound(1))
 
         if isinstance(learning_rate, Choice):
-            for value in learning_rate:
-                _check_bounds("learning_rate", value, lower_bound=_OpenBound(0))
+            for lr in learning_rate:
+                _check_bounds("learning_rate", lr, lower_bound=_OpenBound(0))
         else:
             _check_bounds("learning_rate", learning_rate, lower_bound=_OpenBound(0))
 

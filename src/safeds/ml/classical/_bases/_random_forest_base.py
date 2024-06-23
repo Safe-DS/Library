@@ -21,20 +21,20 @@ class _RandomForestBase(ABC):
     ) -> None:
         # Validation
         if isinstance(tree_count, Choice):
-            for value in tree_count:
-                _check_bounds("tree_count", value, lower_bound=_ClosedBound(1))
+            for tc in tree_count:
+                _check_bounds("tree_count", tc, lower_bound=_ClosedBound(1))
         else:
             _check_bounds("tree_count", tree_count, lower_bound=_ClosedBound(1))
 
         if isinstance(max_depth, Choice):
-            for value in max_depth:
-                _check_bounds("max_depth", value, lower_bound=_ClosedBound(1))
+            for md in max_depth:
+                _check_bounds("max_depth", md, lower_bound=_ClosedBound(1))
         else:
             _check_bounds("max_depth", max_depth, lower_bound=_ClosedBound(1))
 
         if isinstance(min_sample_count_in_leaves, Choice):
-            for value in min_sample_count_in_leaves:
-                _check_bounds("min_sample_count_in_leaves", value, lower_bound=_ClosedBound(1))
+            for msc in min_sample_count_in_leaves:
+                _check_bounds("min_sample_count_in_leaves", msc, lower_bound=_ClosedBound(1))
         else:
             _check_bounds("min_sample_count_in_leaves", min_sample_count_in_leaves, lower_bound=_ClosedBound(1))
 
