@@ -7,6 +7,8 @@ from typing import TYPE_CHECKING, Any, Self
 from safeds._utils import _structural_hash
 from safeds.data.labeled.containers import TabularDataset
 from safeds.data.tabular.containers import Column, Table
+from safeds.ml.classical.classification import KNearestNeighborsClassifier
+from safeds.ml.classical.regression import KNearestNeighborsRegressor
 from safeds.exceptions import (
     DatasetMissesDataError,
     DatasetMissesFeaturesError,
@@ -20,8 +22,6 @@ from safeds.exceptions import (
 
 if TYPE_CHECKING:
     from sklearn.base import ClassifierMixin, RegressorMixin
-    from safeds.ml.classical.classification import KNearestNeighborsClassifier
-    from safeds.ml.classical.regression import KNearestNeighborsRegressor
     from safeds.data.tabular.typing import DataType, Schema
 
 
@@ -238,15 +238,8 @@ class SupervisedModel(ABC):
     # Template methods
     # ------------------------------------------------------------------------------------------------------------------
 
-    def _check_additional_fit_preconditions(self, **kwargs) -> None:  # noqa: B027
-        """
-        Check additional preconditions for fitting the model and raise an error if any are violated.
-
-        Parameters
-        ----------
-        training_set:
-            The training data containing the features and target.
-        """
+    def _check_additional_fit_preconditions(self) -> None:  # noqa: B027
+        """Check additional preconditions for fitting the model and raise an error if any are violated."""
 
     def _check_additional_fit_by_exhaustive_search_preconditions(self) -> None:  # noqa: B027
         """Check additional preconditions for fitting by exhaustive search and raise an error if any are violated."""
@@ -262,14 +255,7 @@ class SupervisedModel(ABC):
         """
 
     def _get_models_for_all_choices(self) -> list[Self]:  # noqa: B027
-        """
-        Check additional preconditions for predicting with the model and raise an error if any are violated.
-
-        Returns
-        -------
-        model_list:
-            A list of every possible model, given all Choice Parameters
-        """
+        """Get a list of all possible models, given the Parameter Choices"""
 
     @abstractmethod
     def _clone(self) -> Self:

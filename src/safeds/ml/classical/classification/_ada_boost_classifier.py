@@ -92,7 +92,7 @@ class AdaBoostClassifier(Classifier, _AdaBoostBase):
             learning_rate=self._learning_rate,
         )
 
-    def _check_additional_fit_preconditions(self, **kwargs) -> None:
+    def _check_additional_fit_preconditions(self) -> None:
         if isinstance(self._max_learner_count, Choice) or isinstance(self._learning_rate, Choice):
             raise FittingWithChoiceError
 
