@@ -7,8 +7,6 @@ from typing import TYPE_CHECKING, Any, Self
 from safeds._utils import _structural_hash
 from safeds.data.labeled.containers import TabularDataset
 from safeds.data.tabular.containers import Column, Table
-from safeds.ml.classical.classification import KNearestNeighborsClassifier
-from safeds.ml.classical.regression import KNearestNeighborsRegressor
 from safeds.exceptions import (
     DatasetMissesDataError,
     DatasetMissesFeaturesError,
@@ -89,10 +87,7 @@ class SupervisedModel(ABC):
         if training_set.to_table().row_count == 0:
             raise DatasetMissesDataError
 
-        if isinstance(self, KNearestNeighborsClassifier) or isinstance(self, KNearestNeighborsRegressor):
-            self._check_additional_fit_preconditions(training_set)
-        else:
-            self._check_additional_fit_preconditions()
+        self._check_additional_fit_preconditions()
 
         wrapped_model = self._get_sklearn_model()
         _fit_sklearn_model_in_place(wrapped_model, training_set)

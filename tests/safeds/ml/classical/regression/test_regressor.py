@@ -13,7 +13,7 @@ from safeds.exceptions import (
     MissingValuesColumnError,
     ModelNotFittedError,
     NonNumericColumnError,
-    PlainTableError, FittingWithoutChoiceError, FittingWithChoiceError,
+    PlainTableError, FittingWithoutChoiceError, FittingWithChoiceError, LearningError,
 )
 from safeds.ml.classical.regression import (
     AdaBoostRegressor,
@@ -112,13 +112,17 @@ class TestChoiceRegressors:
             regressor_with_choice.fit(valid_data)
 
 
-@pytest.mark.parametrize("regressor", regressors(), ids=lambda x: x.__class__.__name__)
 class TestFitByExhaustiveSearch:
+    @pytest.mark.parametrize("regressor", regressors(), ids=lambda x: x.__class__.__name__)
     def test_should_raise_if_model_is_fitted_by_exhaustive_search_without_choice(self,
                                                                                  regressor: Regressor,
                                                                                  valid_data: TabularDataset) -> None:
         with pytest.raises(FittingWithoutChoiceError):
             regressor.fit_by_exhaustive_search(valid_data, optimization_metric=RegressorMetric.MEAN_SQUARED_ERROR)
+
+    def test_should_raise_if_model_is_fitted_by_exhaustive_search_with_empty_choice(self, valid_data: TabularDataset) -> None:
+        with pytest.raises(LearningError):
+            AdaBoostRegressor(max_learner_count=Choice(), learning_rate=Choice()).fit_by_exhaustive_search(valid_data, optimization_metric=RegressorMetric.MEAN_SQUARED_ERROR)
 
 
 @pytest.mark.parametrize("regressor", regressors(), ids=lambda x: x.__class__.__name__)

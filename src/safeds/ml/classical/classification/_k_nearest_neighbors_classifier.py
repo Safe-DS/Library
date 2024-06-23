@@ -1,12 +1,12 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Self
+from typing import TYPE_CHECKING
 
 from safeds._utils import _structural_hash
 from safeds.exceptions import FittingWithChoiceError, FittingWithoutChoiceError
 from safeds.ml.classical._bases import _KNearestNeighborsBase
+from safeds.ml.classical.classification import Classifier
 
-from ._classifier import Classifier
 from safeds.ml.hyperparameters import Choice
 
 if TYPE_CHECKING:
@@ -51,6 +51,7 @@ class KNearestNeighborsClassifier(Classifier, _KNearestNeighborsBase):
             Classifier.__hash__(self),
             _KNearestNeighborsBase.__hash__(self),
         )
+
 
     # ------------------------------------------------------------------------------------------------------------------
     # Template methods

@@ -231,6 +231,8 @@ class Classifier(SupervisedModel, ABC):
                                                    extra_names=training_set.extras.column_names)
 
         list_of_models = self._get_models_for_all_choices()
+        if len(list_of_models) < 1:
+            raise LearningError("Please provide at least one Value in a Choice Parameter")
         list_of_fitted_models = []
 
         with ProcessPoolExecutor(max_workers=len(list_of_models)) as executor:
