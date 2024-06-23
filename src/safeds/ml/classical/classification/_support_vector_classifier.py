@@ -91,6 +91,7 @@ class SupportVectorClassifier(Classifier, _SupportVectorMachineBase):
             raise FittingWithoutChoiceError
 
     def _get_models_for_all_choices(self) -> list[SupportVectorClassifier]:
+        assert isinstance(self._c, Choice)     # this is always true and just here for linting
         models = []
         for c in self._c:
             models.append(SupportVectorClassifier(c=c))

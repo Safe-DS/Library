@@ -98,7 +98,7 @@ class TestChoiceClassifiers:
         with pytest.raises(LearningError):
             classifier_with_choice.fit_by_exhaustive_search(valid_data, optimization_metric=ClassifierMetric.PRECISION)
 
-    def test_workflow_with_choice_parameter(self, classifier_with_choice: Classifier, valid_data: TabularDataset):
+    def test_workflow_with_choice_parameter(self, classifier_with_choice: Classifier, valid_data: TabularDataset) -> None:
         model = classifier_with_choice.fit_by_exhaustive_search(valid_data, ClassifierMetric.ACCURACY)
         assert isinstance(model, type(classifier_with_choice))
         pred = model.predict(valid_data)

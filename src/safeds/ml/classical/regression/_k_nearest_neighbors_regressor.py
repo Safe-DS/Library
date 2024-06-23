@@ -82,6 +82,7 @@ class KNearestNeighborsRegressor(Regressor, _KNearestNeighborsBase):
             raise FittingWithoutChoiceError
 
     def _get_models_for_all_choices(self) -> list[KNearestNeighborsRegressor]:
+        assert isinstance(self._neighbor_count, Choice)     # this is always true and just here for linting
         models = []
         for nc in self._neighbor_count:
             models.append(KNearestNeighborsRegressor(neighbor_count=nc))

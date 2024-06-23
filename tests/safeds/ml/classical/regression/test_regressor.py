@@ -100,7 +100,7 @@ def valid_data() -> TabularDataset:
 @pytest.mark.parametrize("regressor_with_choice", regressors_with_choices(), ids=lambda x: x.__class__.__name__)
 class TestChoiceRegressors:
 
-    def test_workflow_with_choice_parameter(self, regressor_with_choice: Regressor, valid_data: TabularDataset):
+    def test_workflow_with_choice_parameter(self, regressor_with_choice: Regressor, valid_data: TabularDataset) -> None:
         model = (regressor_with_choice.fit_by_exhaustive_search(valid_data, RegressorMetric.MEAN_SQUARED_ERROR))
         assert isinstance(model, type(regressor_with_choice))
         pred = model.predict(valid_data)

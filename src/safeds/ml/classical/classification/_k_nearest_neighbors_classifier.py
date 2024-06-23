@@ -86,6 +86,7 @@ class KNearestNeighborsClassifier(Classifier, _KNearestNeighborsBase):
             raise FittingWithoutChoiceError
 
     def _get_models_for_all_choices(self) -> list[KNearestNeighborsClassifier]:
+        assert isinstance(self._neighbor_count, Choice)     # this is always true and just here for linting
         models = []
         for nc in self._neighbor_count:
             models.append(KNearestNeighborsClassifier(neighbor_count=nc))
