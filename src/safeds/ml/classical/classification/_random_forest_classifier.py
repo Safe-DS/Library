@@ -93,7 +93,7 @@ class RandomForestClassifier(Classifier, _RandomForestBase):
         if not isinstance(self._tree_count, Choice) and not isinstance(self._max_depth, Choice) and not isinstance(self._min_sample_count_in_leaves, Choice):
             raise FittingWithoutChoiceError
 
-    def _get_models_for_all_choices(self) -> list[Self]:
+    def _get_models_for_all_choices(self) -> list[RandomForestClassifier]:
         tree_count_choices = self._tree_count if isinstance(self._tree_count, Choice) else [
             self._tree_count]
         max_depth_choices = self._max_depth if isinstance(self._max_depth, Choice) else [

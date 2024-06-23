@@ -81,7 +81,7 @@ class KNearestNeighborsRegressor(Regressor, _KNearestNeighborsBase):
         if not isinstance(self._neighbor_count, Choice):
             raise FittingWithoutChoiceError
 
-    def _get_models_for_all_choices(self) -> list[Self]:
+    def _get_models_for_all_choices(self) -> list[KNearestNeighborsRegressor]:
         models = []
         for nc in self._neighbor_count:
             models.append(KNearestNeighborsRegressor(neighbor_count=nc))

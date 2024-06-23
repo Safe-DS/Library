@@ -82,7 +82,7 @@ class DecisionTreeClassifier(Classifier, _DecisionTreeBase):
         if not isinstance(self._max_depth, Choice) and not isinstance(self._min_sample_count_in_leaves, Choice):
             raise FittingWithoutChoiceError
 
-    def _get_models_for_all_choices(self) -> list[Self]:
+    def _get_models_for_all_choices(self) -> list[DecisionTreeClassifier]:
         max_depth_choices = self._max_depth if isinstance(self._max_depth, Choice) else [
             self._max_depth]
         min_sample_count_choices = self._min_sample_count_in_leaves if isinstance(self._min_sample_count_in_leaves, Choice) else [

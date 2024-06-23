@@ -82,7 +82,7 @@ class GradientBoostingClassifier(Classifier, _GradientBoostingBase):
         if not isinstance(self._tree_count, Choice) and not isinstance(self._learning_rate, Choice):
             raise FittingWithoutChoiceError
 
-    def _get_models_for_all_choices(self) -> list[Self]:
+    def _get_models_for_all_choices(self) -> list[GradientBoostingClassifier]:
         tree_count_choices = self._tree_count if isinstance(self._tree_count, Choice) else [
             self._tree_count]
         learning_rate_choices = self._learning_rate if isinstance(self._learning_rate, Choice) else [

@@ -90,7 +90,7 @@ class SupportVectorClassifier(Classifier, _SupportVectorMachineBase):
         if not isinstance(self._c, Choice):
             raise FittingWithoutChoiceError
 
-    def _get_models_for_all_choices(self) -> list[Self]:
+    def _get_models_for_all_choices(self) -> list[SupportVectorClassifier]:
         models = []
         for c in self._c:
             models.append(SupportVectorClassifier(c=c))
