@@ -272,6 +272,7 @@ class Classifier(SupervisedModel, ABC):
                     case "f1score":
                         if fitted_model.f1_score(test_data, positive_class) > best_metric_value:
                             best_model = fitted_model
+        assert best_model is not None
         return best_model
 
 

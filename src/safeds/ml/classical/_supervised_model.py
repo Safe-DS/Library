@@ -253,6 +253,7 @@ class SupervisedModel(ABC):
             The dataset containing at least the features.
         """
 
+    @abstractmethod
     def _get_models_for_all_choices(self) -> list[Self]:  # noqa: B027
         """Get a list of all possible models, given the Parameter Choices."""
 

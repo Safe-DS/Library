@@ -303,6 +303,7 @@ class Regressor(SupervisedModel, ABC):
                     case "coefficient_of_determination":
                         if fitted_model.coefficient_of_determination(test_data) > best_metric_value:
                             best_model = fitted_model
+        assert best_model is not None
         return best_model
 
 
