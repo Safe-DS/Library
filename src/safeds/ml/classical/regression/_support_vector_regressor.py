@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Self
+from typing import TYPE_CHECKING
 
 from safeds._utils import _structural_hash
 from safeds.exceptions import FittingWithChoiceError, FittingWithoutChoiceError
@@ -89,7 +89,8 @@ class SupportVectorRegressor(Regressor, _SupportVectorMachineBase):
         if not isinstance(self._c, Choice):
             raise FittingWithoutChoiceError
 
-    def _get_models_for_all_choices(self) -> list[Self]:
+    def _get_models_for_all_choices(self) -> list[SupportVectorRegressor]:
+        assert isinstance(self._c, Choice)
         models = []
         for c in self._c:
             models.append(SupportVectorRegressor(c=c))

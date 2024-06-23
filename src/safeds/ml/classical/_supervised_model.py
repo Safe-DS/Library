@@ -255,7 +255,7 @@ class SupervisedModel(ABC):
         """
 
     def _get_models_for_all_choices(self) -> list[Self]:  # noqa: B027
-        """Get a list of all possible models, given the Parameter Choices"""
+        """Get a list of all possible models, given the Parameter Choices."""
 
     @abstractmethod
     def _clone(self) -> Self:
