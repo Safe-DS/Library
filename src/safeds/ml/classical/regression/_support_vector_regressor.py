@@ -81,7 +81,7 @@ class SupportVectorRegressor(Regressor, _SupportVectorMachineBase):
         self._kernel._apply(result)
         return result
 
-    def _check_additional_fit_preconditions(self) -> None:
+    def _check_additional_fit_preconditions(self, **kwargs) -> None:
         if isinstance(self._c, Choice):
             raise FittingWithChoiceError
 
