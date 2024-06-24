@@ -54,7 +54,9 @@ class TestMinSampleCountInLeaves:
         assert fitted_model._wrapped_model is not None
         assert fitted_model._wrapped_model.min_samples_leaf == 2
 
-    @pytest.mark.parametrize("min_sample_count_in_leaves", [-1, 0, Choice(-1)], ids=["minus_one", "zero", "invalid_choice"])
+    @pytest.mark.parametrize(
+        "min_sample_count_in_leaves", [-1, 0, Choice(-1)], ids=["minus_one", "zero", "invalid_choice"],
+    )
     def test_should_raise_if_less_than_or_equal_to_0(self, min_sample_count_in_leaves: int | Choice[int]) -> None:
         with pytest.raises(OutOfBoundsError):
             RandomForestRegressor(min_sample_count_in_leaves=min_sample_count_in_leaves)

@@ -1,13 +1,13 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Self
+from typing import TYPE_CHECKING
 
 from safeds._utils import _structural_hash
 from safeds.exceptions import FittingWithChoiceError, FittingWithoutChoiceError
 from safeds.ml.classical._bases import _GradientBoostingBase
+from safeds.ml.hyperparameters import Choice
 
 from ._regressor import Regressor
-from safeds.ml.hyperparameters import Choice
 
 if TYPE_CHECKING:
     from sklearn.base import RegressorMixin
@@ -83,10 +83,10 @@ class GradientBoostingRegressor(Regressor, _GradientBoostingBase):
             raise FittingWithoutChoiceError
 
     def _get_models_for_all_choices(self) -> list[GradientBoostingRegressor]:
-        tree_count_choices = self._tree_count if isinstance(self._tree_count, Choice) else [
-            self._tree_count]
-        learning_rate_choices = self._learning_rate if isinstance(self._learning_rate, Choice) else [
-            self._learning_rate]
+        tree_count_choices = self._tree_count if isinstance(self._tree_count, Choice) else [self._tree_count]
+        learning_rate_choices = (
+            self._learning_rate if isinstance(self._learning_rate, Choice) else [self._learning_rate]
+        )
 
         models = []
         for tc in tree_count_choices:

@@ -6,7 +6,6 @@ from safeds._utils import _structural_hash
 from safeds.exceptions import FittingWithChoiceError, FittingWithoutChoiceError
 from safeds.ml.classical._bases import _KNearestNeighborsBase
 from safeds.ml.classical.classification import Classifier
-
 from safeds.ml.hyperparameters import Choice
 
 if TYPE_CHECKING:

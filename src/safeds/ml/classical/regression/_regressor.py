@@ -1,13 +1,18 @@
 from __future__ import annotations
 
 from abc import ABC
-from concurrent.futures import ProcessPoolExecutor, wait, ALL_COMPLETED
+from concurrent.futures import ALL_COMPLETED, ProcessPoolExecutor, wait
 from typing import TYPE_CHECKING, Self
 
 from safeds.data.labeled.containers import TabularDataset
 from safeds.data.tabular.containers import Table
-from safeds.exceptions import ColumnLengthMismatchError, ModelNotFittedError, PlainTableError, DatasetMissesDataError, \
-    LearningError
+from safeds.exceptions import (
+    ColumnLengthMismatchError,
+    DatasetMissesDataError,
+    LearningError,
+    ModelNotFittedError,
+    PlainTableError,
+)
 from safeds.ml.classical import SupervisedModel
 from safeds.ml.metrics import RegressionMetrics, RegressorMetric
 
@@ -256,10 +261,12 @@ class Regressor(SupervisedModel, ABC):
         self._check_additional_fit_by_exhaustive_search_preconditions()
 
         [train_split, test_split] = training_set.to_table().split_rows(0.75)
-        train_data = train_split.to_tabular_dataset(target_name=training_set.target.name,
-                                                     extra_names=training_set.extras.column_names)
-        test_data = test_split.to_tabular_dataset(target_name=training_set.target.name,
-                                                   extra_names=training_set.extras.column_names)
+        train_data = train_split.to_tabular_dataset(
+            target_name=training_set.target.name, extra_names=training_set.extras.column_names,
+        )
+        test_data = test_split.to_tabular_dataset(
+            target_name=training_set.target.name, extra_names=training_set.extras.column_names,
+        )
 
         list_of_models = self._get_models_for_all_choices()
         if len(list_of_models) < 1:

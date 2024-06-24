@@ -1,8 +1,7 @@
 from __future__ import annotations
 
-import types
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Collection
+from typing import TYPE_CHECKING
 
 from safeds._utils import _structural_hash
 from safeds._validation import _check_bounds, _ClosedBound, _OpenBound

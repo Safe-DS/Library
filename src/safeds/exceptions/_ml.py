@@ -24,22 +24,29 @@ class DatasetMissesDataError(ValueError):
 
 class FittingWithChoiceError(Exception):
     """Raised when a model is fitted with a choice object as a parameter."""
+
     def __init__(self) -> None:
-        super().__init__(f"Error occurred while fitting: Trying to fit with a Choice Parameter. Please use "
-                         f"fit_by_exhaustive_search() instead.")
+        super().__init__(
+            "Error occurred while fitting: Trying to fit with a Choice Parameter. Please use "
+            "fit_by_exhaustive_search() instead.",
+        )
+
 
 class FittingWithoutChoiceError(Exception):
     """Raised when a model is fitted by exhaustive search without a choice object as a parameter."""
+
     def __init__(self) -> None:
-        super().__init__(f"Error occurred while fitting: Trying to fit by exhaustive search without a Choice "
-                         f"Parameter. Please use fit() instead.")
+        super().__init__(
+            "Error occurred while fitting: Trying to fit by exhaustive search without a Choice "
+            "Parameter. Please use fit() instead.",
+        )
+
 
 class InvalidFitDataError(Exception):
     """Raised when a Neural Network is fitted on invalid data."""
 
     def __init__(self, reason: str) -> None:
         super().__init__(f"The given Fit Data is invalid:\n{reason}")
-
 
 
 class LearningError(Exception):

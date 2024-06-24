@@ -1,13 +1,13 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Self
+from typing import TYPE_CHECKING
 
 from safeds._utils import _get_random_seed, _structural_hash
 from safeds.exceptions import FittingWithChoiceError, FittingWithoutChoiceError
 from safeds.ml.classical._bases import _RandomForestBase
+from safeds.ml.hyperparameters import Choice
 
 from ._classifier import Classifier
-from safeds.ml.hyperparameters import Choice
 
 if TYPE_CHECKING:
     from sklearn.base import ClassifierMixin
@@ -85,22 +85,29 @@ class RandomForestClassifier(Classifier, _RandomForestBase):
         )
 
     def _check_additional_fit_preconditions(self) -> None:
-        if isinstance(self._tree_count, Choice) or isinstance(self._max_depth, Choice) or isinstance(
-            self._min_sample_count_in_leaves, Choice):
+        if (
+            isinstance(self._tree_count, Choice)
+            or isinstance(self._max_depth, Choice)
+            or isinstance(self._min_sample_count_in_leaves, Choice)
+        ):
             raise FittingWithChoiceError
 
     def _check_additional_fit_by_exhaustive_search_preconditions(self) -> None:
-        if not isinstance(self._tree_count, Choice) and not isinstance(self._max_depth, Choice) and not isinstance(self._min_sample_count_in_leaves, Choice):
+        if (
+            not isinstance(self._tree_count, Choice)
+            and not isinstance(self._max_depth, Choice)
+            and not isinstance(self._min_sample_count_in_leaves, Choice)
+        ):
             raise FittingWithoutChoiceError
 
     def _get_models_for_all_choices(self) -> list[RandomForestClassifier]:
-        tree_count_choices = self._tree_count if isinstance(self._tree_count, Choice) else [
-            self._tree_count]
-        max_depth_choices = self._max_depth if isinstance(self._max_depth, Choice) else [
-            self._max_depth]
-        min_sample_count_choices = self._min_sample_count_in_leaves if isinstance(self._min_sample_count_in_leaves,
-                                                                                  Choice) else [
-            self._min_sample_count_in_leaves]
+        tree_count_choices = self._tree_count if isinstance(self._tree_count, Choice) else [self._tree_count]
+        max_depth_choices = self._max_depth if isinstance(self._max_depth, Choice) else [self._max_depth]
+        min_sample_count_choices = (
+            self._min_sample_count_in_leaves
+            if isinstance(self._min_sample_count_in_leaves, Choice)
+            else [self._min_sample_count_in_leaves]
+        )
 
         models = []
         for tc in tree_count_choices:

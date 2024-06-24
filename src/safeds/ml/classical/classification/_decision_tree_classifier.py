@@ -1,13 +1,13 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Self
+from typing import TYPE_CHECKING
 
 from safeds._utils import _structural_hash
 from safeds.exceptions import FittingWithChoiceError, FittingWithoutChoiceError
 from safeds.ml.classical._bases import _DecisionTreeBase
+from safeds.ml.hyperparameters import Choice
 
 from ._classifier import Classifier
-from safeds.ml.hyperparameters import Choice
 
 if TYPE_CHECKING:
     from sklearn.base import ClassifierMixin
@@ -83,10 +83,12 @@ class DecisionTreeClassifier(Classifier, _DecisionTreeBase):
             raise FittingWithoutChoiceError
 
     def _get_models_for_all_choices(self) -> list[DecisionTreeClassifier]:
-        max_depth_choices = self._max_depth if isinstance(self._max_depth, Choice) else [
-            self._max_depth]
-        min_sample_count_choices = self._min_sample_count_in_leaves if isinstance(self._min_sample_count_in_leaves, Choice) else [
-            self._min_sample_count_in_leaves]
+        max_depth_choices = self._max_depth if isinstance(self._max_depth, Choice) else [self._max_depth]
+        min_sample_count_choices = (
+            self._min_sample_count_in_leaves
+            if isinstance(self._min_sample_count_in_leaves, Choice)
+            else [self._min_sample_count_in_leaves]
+        )
 
         models = []
         for md in max_depth_choices:
