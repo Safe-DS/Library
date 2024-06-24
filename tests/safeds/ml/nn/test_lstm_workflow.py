@@ -10,6 +10,7 @@ from safeds.ml.nn.converters import (
 )
 from safeds.ml.nn.layers import (
     ForwardLayer,
+    GRULayer,
     LSTMLayer,
 )
 from torch.types import Device
@@ -34,7 +35,7 @@ def test_lstm_model(device: Device) -> None:
     )
     model_2 = NeuralNetworkRegressor(
         InputConversionTimeSeries(),
-        [ForwardLayer(neuron_count=256), LSTMLayer(neuron_count=1)],
+        [ForwardLayer(neuron_count=256), GRULayer(128), LSTMLayer(neuron_count=1)],
     )
     trained_model = model.fit(
         train_table.to_time_series_dataset(

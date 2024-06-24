@@ -8,6 +8,7 @@ if TYPE_CHECKING:
     from ._convolutional2d_layer import Convolutional2DLayer, ConvolutionalTranspose2DLayer
     from ._flatten_layer import FlattenLayer
     from ._forward_layer import ForwardLayer
+    from ._gru_layer import GRULayer
     from ._layer import Layer
     from ._lstm_layer import LSTMLayer
     from ._pooling2d_layer import AveragePooling2DLayer, MaxPooling2DLayer
@@ -21,6 +22,7 @@ apipkg.initpkg(
         "ForwardLayer": "._forward_layer:ForwardLayer",
         "Layer": "._layer:Layer",
         "LSTMLayer": "._lstm_layer:LSTMLayer",
+        "GRULayer": "._gru_layer:GRULayer",
         "AveragePooling2DLayer": "._pooling2d_layer:AveragePooling2DLayer",
         "MaxPooling2DLayer": "._pooling2d_layer:MaxPooling2DLayer",
     },
@@ -33,6 +35,7 @@ __all__ = [
     "ForwardLayer",
     "Layer",
     "LSTMLayer",
+    "GRULayer",
     "AveragePooling2DLayer",
     "MaxPooling2DLayer",
 ]
