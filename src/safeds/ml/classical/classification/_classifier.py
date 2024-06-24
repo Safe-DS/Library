@@ -213,7 +213,10 @@ class Classifier(SupervisedModel, ABC):
         )
 
     def fit_by_exhaustive_search(
-        self, training_set: TabularDataset, optimization_metric: ClassifierMetric, positive_class: Any = None,
+        self,
+        training_set: TabularDataset,
+        optimization_metric: ClassifierMetric,
+        positive_class: Any = None,
     ) -> Self:
         if not isinstance(training_set, TabularDataset) and isinstance(training_set, Table):
             raise PlainTableError
@@ -228,10 +231,12 @@ class Classifier(SupervisedModel, ABC):
 
         [train_split, test_split] = training_set.to_table().split_rows(0.75)
         train_data = train_split.to_tabular_dataset(
-            target_name=training_set.target.name, extra_names=training_set.extras.column_names,
+            target_name=training_set.target.name,
+            extra_names=training_set.extras.column_names,
         )
         test_data = test_split.to_tabular_dataset(
-            target_name=training_set.target.name, extra_names=training_set.extras.column_names,
+            target_name=training_set.target.name,
+            extra_names=training_set.extras.column_names,
         )
 
         list_of_models = self._get_models_for_all_choices()

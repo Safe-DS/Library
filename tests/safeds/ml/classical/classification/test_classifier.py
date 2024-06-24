@@ -76,7 +76,9 @@ def classifiers_with_choices() -> list[Classifier]:
         GradientBoostingClassifier(tree_count=Choice(1, 2), learning_rate=Choice(0.1, 0.2)),
         KNearestNeighborsClassifier(neighbor_count=Choice(1, 2)),
         RandomForestClassifier(
-            tree_count=Choice(1, 2), max_depth=Choice(1, 2), min_sample_count_in_leaves=Choice(1, 2),
+            tree_count=Choice(1, 2),
+            max_depth=Choice(1, 2),
+            min_sample_count_in_leaves=Choice(1, 2),
         ),
         SupportVectorClassifier(c=Choice(0.5, 1.0)),
     ]
@@ -98,13 +100,17 @@ def valid_data() -> TabularDataset:
 class TestChoiceClassifiers:
 
     def test_should_raise_if_no_positive_class_is_provided(
-        self, classifier_with_choice: Classifier, valid_data: TabularDataset,
+        self,
+        classifier_with_choice: Classifier,
+        valid_data: TabularDataset,
     ) -> None:
         with pytest.raises(LearningError):
             classifier_with_choice.fit_by_exhaustive_search(valid_data, optimization_metric=ClassifierMetric.PRECISION)
 
     def test_workflow_with_choice_parameter(
-        self, classifier_with_choice: Classifier, valid_data: TabularDataset,
+        self,
+        classifier_with_choice: Classifier,
+        valid_data: TabularDataset,
     ) -> None:
         model = classifier_with_choice.fit_by_exhaustive_search(valid_data, ClassifierMetric.ACCURACY)
         assert isinstance(model, type(classifier_with_choice))
@@ -112,7 +118,9 @@ class TestChoiceClassifiers:
         assert isinstance(pred, TabularDataset)
 
     def test_should_raise_if_model_is_fitted_with_choice(
-        self, classifier_with_choice: Classifier, valid_data: TabularDataset,
+        self,
+        classifier_with_choice: Classifier,
+        valid_data: TabularDataset,
     ) -> None:
         with pytest.raises(FittingWithChoiceError):
             classifier_with_choice.fit(valid_data)
@@ -122,17 +130,21 @@ class TestFitByExhaustiveSearch:
 
     @pytest.mark.parametrize("classifier", classifiers(), ids=lambda x: x.__class__.__name__)
     def test_should_raise_if_model_is_fitted_by_exhaustive_search_without_choice(
-        self, classifier: Classifier, valid_data: TabularDataset,
+        self,
+        classifier: Classifier,
+        valid_data: TabularDataset,
     ) -> None:
         with pytest.raises(FittingWithoutChoiceError):
             classifier.fit_by_exhaustive_search(valid_data, optimization_metric=ClassifierMetric.ACCURACY)
 
     def test_should_raise_if_model_is_fitted_by_exhaustive_search_with_empty_choice(
-        self, valid_data: TabularDataset,
+        self,
+        valid_data: TabularDataset,
     ) -> None:
         with pytest.raises(LearningError):
             AdaBoostClassifier(max_learner_count=Choice(), learning_rate=Choice()).fit_by_exhaustive_search(
-                valid_data, optimization_metric=ClassifierMetric.ACCURACY,
+                valid_data,
+                optimization_metric=ClassifierMetric.ACCURACY,
             )
 
 
