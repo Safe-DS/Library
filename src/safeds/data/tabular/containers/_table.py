@@ -656,6 +656,9 @@ class Table:
         ----------
         names:
             The names of the columns to remove.
+        ignore_unknown_names:
+            If set to True, columns that are not present in the table will be ignored.
+            If set to False, an error will be raised if any of the specified columns do not exist.
 
         Returns
         -------
@@ -666,7 +669,7 @@ class Table:
         --------
         >>> from safeds.data.tabular.containers import Table
         >>> table = Table({"a": [1, 2, 3], "b": [4, 5, 6]})
-        >>> table.remove_columns("a")
+        >>> table.remove_columns("a", ignore_unknown_names=True)
         +-----+
         |   b |
         | --- |
@@ -677,7 +680,7 @@ class Table:
         |   6 |
         +-----+
 
-        >>> table.remove_columns(["c"])
+        >>> table.remove_columns(["c"], ignore_unknown_names=True)
         +-----+-----+
         |   a |   b |
         | --- | --- |
@@ -934,7 +937,7 @@ class Table:
         _check_columns_dont_exist(self, [column.name for column in new_columns], old_name=old_name)
 
         if len(new_columns) == 0:
-            return self.remove_columns(old_name)
+            return self.remove_columns(old_name, ignore_unknown_names=True)
 
         if len(new_columns) == 1:
             new_column = new_columns[0]
