@@ -9,7 +9,7 @@ from safeds.exceptions import (
     ModelNotFittedError,
     NonNumericColumnError,
 )
-from safeds.ml.classical.regression import ArimaModelRegressor, AdaBoostRegressor
+from safeds.ml.classical.regression import AdaBoostRegressor, ArimaModelRegressor
 
 from tests.helpers import resolve_resource_path
 
