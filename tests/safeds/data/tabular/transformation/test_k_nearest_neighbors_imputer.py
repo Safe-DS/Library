@@ -1,3 +1,4 @@
+import numpy as np
 import pytest
 from safeds.data.tabular.containers import Table
 from safeds.data.tabular.transformation import KNearestNeighborsImputer
@@ -96,28 +97,30 @@ class TestFitAndTransform:
             (
                 Table(
                     {
-                        "col1": [0.0, 5.0, 5.0, 10.0],
+                        "col1": [1, 2, np.nan],
+                        "col2": [1, 2, 3],
                     },
                 ),
-                None,
+                ["col1"],
                 Table(
                     {
-                        "col1": [0.0, 0.5, 0.5, 1.0],
+                        "col1": [1, 2, 2],  # Assuming k=1, the nearest neighbor for the missing value is 2.
+                        "col2": [1, 2, 3],
                     },
                 ),
             ),
             (
                 Table(
                     {
-                        "col1": [0.0, 5.0, 5.0, 10.0],
-                        "col2": [0.0, 5.0, 5.0, 10.0],
+                        "col1": [1, 2, np.nan, 4],
+                        "col2": [1, 2, 3, 4],
                     },
                 ),
                 ["col1"],
                 Table(
                     {
-                        "col1": [0.0, 0.5, 0.5, 1.0],
-                        "col2": [0.0, 5.0, 5.0, 10.0],
+                        "col1": [1, 2, 2, 4],  # Assuming k=1, the nearest neighbor for the missing value is 2.
+                        "col2": [1, 2, 3, 4],
                     },
                 ),
             ),
@@ -127,11 +130,74 @@ class TestFitAndTransform:
     def test_should_return_fitted_transformer_and_transformed_table(
         self,
         table: Table,
-        column_names: list[str] | None,
+        column_names: list[str] | None,  # noqa: ARG002
         expected: Table,
     ) -> None:
-        fitted_transformer, transformed_table = KNearestNeighborsImputer(column_names=column_names).fit_and_transform(table)
+        fitted_transformer, transformed_table = KNearestNeighborsImputer(neighbor_count=1,column_names=None, value_to_replace=np.nan).fit_and_transform(table)
         assert fitted_transformer.is_fitted
         assert transformed_table == expected
 
-        
+    @pytest.mark.parametrize(
+        ("table", "column_names", "expected"),
+        [
+            (
+                Table(
+                    {
+                        "col1": [1, 2, np.nan],
+                        "col2": [1, 2, 3],
+                    },
+                ),
+                ["col1"],
+                Table(
+                    {
+                        "col1": [1, 2, 3/2],  # Assuming k=1, the nearest neighbor for the missing value is 1.5
+                        "col2": [1, 2, 3],
+                    },
+                ),
+            ),
+            (
+                Table(
+                    {
+                        "col1": [1, 2, np.nan, 4],
+                        "col2": [1, np.nan, 3, 4],
+                    },
+                ),
+                ["col1"],
+                Table(
+                    {
+                        "col1": [1, 2, 7/3, 4],  # Assuming k=1, the nearest neighbor for the missing value is 2.
+                        "col2": [1, 8/3, 3, 4],
+                    },
+                ),
+            ),
+        ],
+        ids=["one_column", "two_columns"],
+    )
+
+
+    def test_should_return_fitted_transformer_and_transformed_table_with_correct_range(
+        self,
+        table: Table,
+        column_names: list[str] | None,  # noqa: ARG002
+        expected: Table,
+    ) -> None:
+        fitted_transformer, transformed_table = KNearestNeighborsImputer(neighbor_count=3, value_to_replace=np.nan).fit_and_transform(table)
+        assert fitted_transformer.is_fitted
+        assert transformed_table == expected
+
+    def test_should_not_change_original_table(self) -> None:
+        table = Table(
+            {
+                "col1": [0.0, 5.0, 10.0],
+            },
+        )
+
+        KNearestNeighborsImputer().fit_and_transform(table)
+
+        expected = Table(
+            {
+                "col1": [0.0, 5.0, 10.0],
+            },
+        )
+
+        assert table == expected

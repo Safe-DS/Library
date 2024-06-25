@@ -14,7 +14,7 @@ if TYPE_CHECKING:
 
 class KNearestNeighborsImputer(TableTransformer):
     """
-    The KNearestNeighborsImputer replaces missing values in a table with the mean value of the K-nearest neighbors.
+    The KNearestNeighborsImputer replaces missing values in a   with the mean value of the K-nearest neighbors.
 
     Parameters
     ----------
@@ -98,6 +98,8 @@ class KNearestNeighborsImputer(TableTransformer):
         else:
             column_names = self._column_names
             _check_columns_exist(table, column_names)
+
+        # TODO maybe add a check which tests if the value to replace is even in the tabel 
         
         wrapped_transformer = sk_KNNImputer(n_neighbors=self._neighbor_count, missing_values=self._value_to_replace)
         wrapped_transformer.set_output(transform="polars")
