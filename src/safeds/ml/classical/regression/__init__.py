@@ -11,11 +11,8 @@ if TYPE_CHECKING:
     from ._elastic_net_regressor import ElasticNetRegressor
     from ._gradient_boosting_regressor import GradientBoostingRegressor
     from ._k_nearest_neighbors_regressor import KNearestNeighborsRegressor
-    from ._lasso_regressor import LassoRegressor
-    from ._linear_regressor import LinearRegressor
     from ._random_forest_regressor import RandomForestRegressor
     from ._regressor import Regressor
-    from ._ridge_regressor import RidgeRegressor
     from ._support_vector_regressor import SupportVectorRegressor
 
 apipkg.initpkg(
@@ -27,11 +24,8 @@ apipkg.initpkg(
         "ElasticNetRegressor": "._elastic_net_regressor:ElasticNetRegressor",
         "GradientBoostingRegressor": "._gradient_boosting_regressor:GradientBoostingRegressor",
         "KNearestNeighborsRegressor": "._k_nearest_neighbors_regressor:KNearestNeighborsRegressor",
-        "LassoRegressor": "._lasso_regressor:LassoRegressor",
-        "LinearRegressor": "._linear_regressor:LinearRegressor",
         "RandomForestRegressor": "._random_forest_regressor:RandomForestRegressor",
         "Regressor": "._regressor:Regressor",
-        "RidgeRegressor": "._ridge_regressor:RidgeRegressor",
         "SupportVectorRegressor": "._support_vector_regressor:SupportVectorRegressor",
     },
 )
@@ -43,10 +37,7 @@ __all__ = [
     "ElasticNetRegressor",
     "GradientBoostingRegressor",
     "KNearestNeighborsRegressor",
-    "LassoRegressor",
-    "LinearRegressor",
     "RandomForestRegressor",
     "Regressor",
-    "RidgeRegressor",
     "SupportVectorRegressor",
 ]

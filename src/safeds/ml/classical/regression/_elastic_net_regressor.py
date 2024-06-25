@@ -20,6 +20,7 @@ class ElasticNetRegressor(Regressor):
     ----------
     alpha:
         Controls the regularization of the model. The higher the value, the more regularized it becomes.
+        If 0, a linear model is used.
     lasso_ratio:
         Number between 0 and 1 that controls the ratio between Lasso and Ridge regularization. If 0, only Ridge
         regularization is used. If 1, only Lasso regularization is used.
@@ -39,33 +40,7 @@ class ElasticNetRegressor(Regressor):
 
         # Validation
         _check_bounds("alpha", alpha, lower_bound=_ClosedBound(0))
-        if alpha == 0:
-            warn(
-                (
-                    "Setting alpha to zero makes this model equivalent to LinearRegression. You should use "
-                    "LinearRegression instead for better numerical stability."
-                ),
-                UserWarning,
-                stacklevel=2,
-            )
-
         _check_bounds("lasso_ratio", lasso_ratio, lower_bound=_ClosedBound(0), upper_bound=_ClosedBound(1))
-        if lasso_ratio == 0:
-            warnings.warn(
-                (
-                    "ElasticNetRegression with lasso_ratio = 0 is essentially RidgeRegression."
-                    " Use RidgeRegression instead for better numerical stability."
-                ),
-                stacklevel=2,
-            )
-        elif lasso_ratio == 1:
-            warnings.warn(
-                (
-                    "ElasticNetRegression with lasso_ratio = 0 is essentially LassoRegression."
-                    " Use LassoRegression instead for better numerical stability."
-                ),
-                stacklevel=2,
-            )
 
         # Hyperparameters
         self._alpha = alpha
@@ -104,8 +79,22 @@ class ElasticNetRegressor(Regressor):
 
     def _get_sklearn_model(self) -> RegressorMixin:
         from sklearn.linear_model import ElasticNet as SklearnElasticNet
+        from sklearn.linear_model import LinearRegression as sk_LinearRegression
+        from sklearn.linear_model import Ridge as SklearnRidge
+        from sklearn.linear_model import Lasso as SklearnLasso
 
-        return SklearnElasticNet(
+
+        #TODO Does Linear Regression have priority over other models? Should this always be a linear model if alpha is zero or does the lasso ratio still mater in that case? Might have do modify the order of model creation here.
+        if self._alpha == 0:    # Linear Regression
+            return sk_LinearRegression(n_jobs=-1)
+
+        if self._lasso_ratio == 0:      # Ridge Regression
+            return SklearnRidge(alpha=self._alpha)
+
+        if self._lasso_ratio == 1:      # Lasso Regression
+            return SklearnLasso(alpha=self._alpha)
+
+        return SklearnElasticNet(       # Elastic Net Regression
             alpha=self._alpha,
             l1_ratio=self._lasso_ratio,
         )
