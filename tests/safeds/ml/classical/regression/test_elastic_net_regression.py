@@ -38,8 +38,11 @@ class TestLassoRatio:
         assert fitted_model._wrapped_model is not None
         assert fitted_model._wrapped_model.l1_ratio == 0.3
 
-    @pytest.mark.parametrize("lasso_ratio", [-0.5, 1.5, Choice(-0.5)], ids=["minus_zero_point_5", "one_point_5", "invalid_choice"])
+    @pytest.mark.parametrize(
+        "lasso_ratio",
+        [-0.5, 1.5, Choice(-0.5)],
+        ids=["minus_zero_point_5", "one_point_5", "invalid_choice"],
+    )
     def test_should_raise_if_not_between_0_and_1(self, lasso_ratio: float | Choice[float]) -> None:
         with pytest.raises(OutOfBoundsError):
             ElasticNetRegressor(lasso_ratio=lasso_ratio)
-
