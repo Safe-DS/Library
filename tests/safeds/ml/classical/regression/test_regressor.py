@@ -10,10 +10,13 @@ from safeds.exceptions import (
     ColumnLengthMismatchError,
     DatasetMissesDataError,
     DatasetMissesFeaturesError,
+    FittingWithChoiceError,
+    FittingWithoutChoiceError,
+    LearningError,
     MissingValuesColumnError,
     ModelNotFittedError,
     NonNumericColumnError,
-    PlainTableError, FittingWithoutChoiceError, FittingWithChoiceError, LearningError,
+    PlainTableError,
 )
 from safeds.ml.classical.regression import (
     AdaBoostRegressor,
@@ -101,28 +104,39 @@ def valid_data() -> TabularDataset:
 class TestChoiceRegressors:
 
     def test_workflow_with_choice_parameter(self, regressor_with_choice: Regressor, valid_data: TabularDataset) -> None:
-        model = (regressor_with_choice.fit_by_exhaustive_search(valid_data, RegressorMetric.MEAN_SQUARED_ERROR))
+        model = regressor_with_choice.fit_by_exhaustive_search(valid_data, RegressorMetric.MEAN_SQUARED_ERROR)
         assert isinstance(model, type(regressor_with_choice))
         pred = model.predict(valid_data)
         assert isinstance(pred, TabularDataset)
 
-    def test_should_raise_if_model_is_fitted_with_choice(self, regressor_with_choice: Regressor,
-                                                         valid_data: TabularDataset) -> None:
+    def test_should_raise_if_model_is_fitted_with_choice(
+        self,
+        regressor_with_choice: Regressor,
+        valid_data: TabularDataset,
+    ) -> None:
         with pytest.raises(FittingWithChoiceError):
             regressor_with_choice.fit(valid_data)
 
 
 class TestFitByExhaustiveSearch:
     @pytest.mark.parametrize("regressor", regressors(), ids=lambda x: x.__class__.__name__)
-    def test_should_raise_if_model_is_fitted_by_exhaustive_search_without_choice(self,
-                                                                                 regressor: Regressor,
-                                                                                 valid_data: TabularDataset) -> None:
+    def test_should_raise_if_model_is_fitted_by_exhaustive_search_without_choice(
+        self,
+        regressor: Regressor,
+        valid_data: TabularDataset,
+    ) -> None:
         with pytest.raises(FittingWithoutChoiceError):
             regressor.fit_by_exhaustive_search(valid_data, optimization_metric=RegressorMetric.MEAN_SQUARED_ERROR)
 
-    def test_should_raise_if_model_is_fitted_by_exhaustive_search_with_empty_choice(self, valid_data: TabularDataset) -> None:
+    def test_should_raise_if_model_is_fitted_by_exhaustive_search_with_empty_choice(
+        self,
+        valid_data: TabularDataset,
+    ) -> None:
         with pytest.raises(LearningError):
-            AdaBoostRegressor(max_learner_count=Choice(), learning_rate=Choice()).fit_by_exhaustive_search(valid_data, optimization_metric=RegressorMetric.MEAN_SQUARED_ERROR)
+            AdaBoostRegressor(max_learner_count=Choice(), learning_rate=Choice()).fit_by_exhaustive_search(
+                valid_data,
+                optimization_metric=RegressorMetric.MEAN_SQUARED_ERROR,
+            )
 
 
 @pytest.mark.parametrize("regressor", regressors(), ids=lambda x: x.__class__.__name__)

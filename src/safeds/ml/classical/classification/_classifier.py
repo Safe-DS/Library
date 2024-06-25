@@ -1,12 +1,12 @@
 from __future__ import annotations
 
 from abc import ABC
-from concurrent.futures import ProcessPoolExecutor, wait, ALL_COMPLETED
+from concurrent.futures import ALL_COMPLETED, ProcessPoolExecutor, wait
 from typing import TYPE_CHECKING, Self
 
-from safeds.data.tabular.containers import Table
 from safeds.data.labeled.containers import TabularDataset
-from safeds.exceptions import ModelNotFittedError, PlainTableError, DatasetMissesDataError, LearningError
+from safeds.data.tabular.containers import Table
+from safeds.exceptions import DatasetMissesDataError, LearningError, ModelNotFittedError, PlainTableError
 from safeds.ml.classical import SupervisedModel
 from safeds.ml.metrics import ClassificationMetrics, ClassifierMetric
 
@@ -212,23 +212,32 @@ class Classifier(SupervisedModel, ABC):
             positive_class,
         )
 
-    def fit_by_exhaustive_search(self, training_set: TabularDataset, optimization_metric: ClassifierMetric,
-                                 positive_class: Any = None) -> Self:
+    def fit_by_exhaustive_search(
+        self,
+        training_set: TabularDataset,
+        optimization_metric: ClassifierMetric,
+        positive_class: Any = None,
+    ) -> Self:
         if not isinstance(training_set, TabularDataset) and isinstance(training_set, Table):
             raise PlainTableError
         if training_set.to_table().row_count == 0:
             raise DatasetMissesDataError
         if optimization_metric.value in {"precision", "recall", "f1score"} and positive_class is None:
             raise LearningError(
-                f"Please provide a positive class when using optimization metric '{optimization_metric.value}'")
+                f"Please provide a positive class when using optimization metric '{optimization_metric.value}'",
+            )
 
         self._check_additional_fit_by_exhaustive_search_preconditions()
 
         [train_split, test_split] = training_set.to_table().split_rows(0.75)
-        train_data = train_split.to_tabular_dataset(target_name=training_set.target.name,
-                                                     extra_names=training_set.extras.column_names)
-        test_data = test_split.to_tabular_dataset(target_name=training_set.target.name,
-                                                   extra_names=training_set.extras.column_names)
+        train_data = train_split.to_tabular_dataset(
+            target_name=training_set.target.name,
+            extra_names=training_set.extras.column_names,
+        )
+        test_data = test_split.to_tabular_dataset(
+            target_name=training_set.target.name,
+            extra_names=training_set.extras.column_names,
+        )
 
         list_of_models = self._get_models_for_all_choices()
         if len(list_of_models) < 1:

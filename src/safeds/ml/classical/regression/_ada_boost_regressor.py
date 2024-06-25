@@ -1,13 +1,13 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Self
+from typing import TYPE_CHECKING
 
 from safeds._utils import _structural_hash
 from safeds.exceptions import FittingWithChoiceError, FittingWithoutChoiceError
 from safeds.ml.classical._bases import _AdaBoostBase
+from safeds.ml.hyperparameters import Choice
 
 from ._regressor import Regressor
-from safeds.ml.hyperparameters import Choice
 
 if TYPE_CHECKING:
     from sklearn.base import RegressorMixin
@@ -42,7 +42,7 @@ class AdaBoostRegressor(Regressor, _AdaBoostBase):
         self,
         *,
         learner: Regressor | None = None,
-        max_learner_count: int | Choice[int] = 50 ,
+        max_learner_count: int | Choice[int] = 50,
         learning_rate: float | Choice[float] = 1.0,
     ) -> None:
         # Initialize superclasses
@@ -102,10 +102,12 @@ class AdaBoostRegressor(Regressor, _AdaBoostBase):
             raise FittingWithoutChoiceError
 
     def _get_models_for_all_choices(self) -> list[AdaBoostRegressor]:
-        max_learner_count_choices = self._max_learner_count if isinstance(self._max_learner_count, Choice) else [
-            self._max_learner_count]
-        learning_rate_choices = self._learning_rate if isinstance(self._learning_rate, Choice) else [
-            self._learning_rate]
+        max_learner_count_choices = (
+            self._max_learner_count if isinstance(self._max_learner_count, Choice) else [self._max_learner_count]
+        )
+        learning_rate_choices = (
+            self._learning_rate if isinstance(self._learning_rate, Choice) else [self._learning_rate]
+        )
 
         models = []
         for mlc in max_learner_count_choices:

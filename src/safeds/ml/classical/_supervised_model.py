@@ -20,6 +20,7 @@ from safeds.exceptions import (
 
 if TYPE_CHECKING:
     from sklearn.base import ClassifierMixin, RegressorMixin
+
     from safeds.data.tabular.typing import DataType, Schema
 
 
@@ -253,7 +254,7 @@ class SupervisedModel(ABC):
             The dataset containing at least the features.
         """
 
-    def _get_models_for_all_choices(self) -> list[Self]:  # noqa: B027
+    def _get_models_for_all_choices(self) -> list[Self]:
         """Get a list of all possible models, given the Parameter Choices."""
         raise NotImplementedError  # pragma: no cover
 

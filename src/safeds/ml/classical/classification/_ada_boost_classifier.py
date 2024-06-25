@@ -1,13 +1,13 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Self
+from typing import TYPE_CHECKING
 
 from safeds._utils import _structural_hash
 from safeds.exceptions import FittingWithChoiceError, FittingWithoutChoiceError
 from safeds.ml.classical._bases import _AdaBoostBase
+from safeds.ml.hyperparameters import Choice
 
 from ._classifier import Classifier
-from safeds.ml.hyperparameters import Choice
 
 if TYPE_CHECKING:
     from sklearn.base import ClassifierMixin
@@ -85,6 +85,7 @@ class AdaBoostClassifier(Classifier, _AdaBoostBase):
 
     def _get_sklearn_model(self) -> ClassifierMixin:
         from sklearn.ensemble import AdaBoostClassifier as SklearnAdaBoostClassifier
+
         learner = self.learner._get_sklearn_model() if self.learner is not None else None
         return SklearnAdaBoostClassifier(
             estimator=learner,
@@ -101,10 +102,12 @@ class AdaBoostClassifier(Classifier, _AdaBoostBase):
             raise FittingWithoutChoiceError
 
     def _get_models_for_all_choices(self) -> list[AdaBoostClassifier]:
-        max_learner_count_choices = self._max_learner_count if isinstance(self._max_learner_count, Choice) else [
-            self._max_learner_count]
-        learning_rate_choices = self._learning_rate if isinstance(self._learning_rate, Choice) else [
-            self._learning_rate]
+        max_learner_count_choices = (
+            self._max_learner_count if isinstance(self._max_learner_count, Choice) else [self._max_learner_count]
+        )
+        learning_rate_choices = (
+            self._learning_rate if isinstance(self._learning_rate, Choice) else [self._learning_rate]
+        )
 
         models = []
         for mlc in max_learner_count_choices:

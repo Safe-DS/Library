@@ -1,13 +1,13 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Self
+from typing import TYPE_CHECKING
 
 from safeds._utils import _structural_hash
 from safeds.exceptions import FittingWithChoiceError, FittingWithoutChoiceError
 from safeds.ml.classical._bases import _KNearestNeighborsBase
+from safeds.ml.hyperparameters import Choice
 
 from ._regressor import Regressor
-from safeds.ml.hyperparameters import Choice
 
 if TYPE_CHECKING:
     from sklearn.base import RegressorMixin
@@ -82,7 +82,7 @@ class KNearestNeighborsRegressor(Regressor, _KNearestNeighborsBase):
             raise FittingWithoutChoiceError
 
     def _get_models_for_all_choices(self) -> list[KNearestNeighborsRegressor]:
-        assert isinstance(self._neighbor_count, Choice)     # this is always true and just here for linting
+        assert isinstance(self._neighbor_count, Choice)  # this is always true and just here for linting
         models = []
         for nc in self._neighbor_count:
             models.append(KNearestNeighborsRegressor(neighbor_count=nc))
