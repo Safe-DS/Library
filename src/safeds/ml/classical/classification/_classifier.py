@@ -218,6 +218,37 @@ class Classifier(SupervisedModel, ABC):
         optimization_metric: ClassifierMetric,
         positive_class: Any = None,
     ) -> Self:
+        """
+        Use the hyperparameter choices to create multiple models and fit them.
+
+        **Note:** This model is not modified.
+
+        Parameters
+        ----------
+        training_set:
+            The training data containing the features and target.
+        optimization_metric:
+            The metric that should be used for determining the performance of a model.
+        positive_class:
+            The class to be considered positive. All other classes are considered negative.
+            Needs to be provided when choosing precision, f1score or recall as optimization metric.
+
+        Returns
+        -------
+        best_model:
+            The model that performed the best out of all possible models given the Choices of hyperparameters.
+
+        Raises
+        ------
+        PlainTableError
+            If a table is passed instead of a TabularDataset.
+        DatasetMissesDataError
+            If the given training set contains no data.
+        FittingWithoutChoiceError
+            When trying to call this method on a model without hyperparameter choices.
+        LearningError
+            If the training data contains invalid values or if the training failed.
+        """
         if not isinstance(training_set, TabularDataset) and isinstance(training_set, Table):
             raise PlainTableError
         if training_set.to_table().row_count == 0:

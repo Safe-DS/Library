@@ -80,6 +80,12 @@ class SupervisedModel(ABC):
 
         Raises
         ------
+        PlainTableError
+            If a table is passed instead of a TabularDataset.
+        DatasetMissesDataError
+            If the given training set contains no data.
+        FittingWithChoiceError
+            When trying to call this method on a model with hyperparameter choices.
         LearningError
             If the training data contains invalid values or if the training failed.
         """
