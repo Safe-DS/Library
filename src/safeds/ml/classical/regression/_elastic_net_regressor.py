@@ -1,14 +1,12 @@
 from __future__ import annotations
-
-import warnings
 from typing import TYPE_CHECKING
-from warnings import warn
 
 from safeds._utils import _structural_hash
 from safeds._validation import _check_bounds, _ClosedBound
+from safeds.exceptions import FittingWithChoiceError, FittingWithoutChoiceError
 
 from ._regressor import Regressor
-from ...hyperparameters import Choice
+from safeds.ml.hyperparameters import Choice
 
 if TYPE_CHECKING:
     from sklearn.base import RegressorMixin
@@ -108,6 +106,14 @@ class ElasticNetRegressor(Regressor):
             alpha=self._alpha,
             l1_ratio=self._lasso_ratio,
         )
+
+    def _check_additional_fit_preconditions(self) -> None:
+        if isinstance(self._alpha, Choice) or isinstance(self._lasso_ratio, Choice):
+            raise FittingWithChoiceError
+
+    def _check_additional_fit_by_exhaustive_search_preconditions(self) -> None:
+        if not isinstance(self._alpha, Choice) and not isinstance(self._lasso_ratio, Choice):
+            raise FittingWithoutChoiceError
 
     def _get_models_for_all_choices(self) -> list[ElasticNetRegressor]:
         alpha_choices = self._alpha if isinstance(self._alpha, Choice) else [self._alpha]
