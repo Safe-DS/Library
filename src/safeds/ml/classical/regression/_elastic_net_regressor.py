@@ -8,6 +8,7 @@ from safeds._utils import _structural_hash
 from safeds._validation import _check_bounds, _ClosedBound
 
 from ._regressor import Regressor
+from ...hyperparameters import Choice
 
 if TYPE_CHECKING:
     from sklearn.base import RegressorMixin
@@ -35,12 +36,21 @@ class ElasticNetRegressor(Regressor):
     # Dunder methods
     # ------------------------------------------------------------------------------------------------------------------
 
-    def __init__(self, *, alpha: float = 1.0, lasso_ratio: float = 0.5) -> None:
+    def __init__(self, *, alpha: float | Choice[float] = 1.0, lasso_ratio: float | Choice[float] = 0.5) -> None:
         super().__init__()
 
         # Validation
-        _check_bounds("alpha", alpha, lower_bound=_ClosedBound(0))
-        _check_bounds("lasso_ratio", lasso_ratio, lower_bound=_ClosedBound(0), upper_bound=_ClosedBound(1))
+        if isinstance(alpha, Choice):
+            for a in alpha:
+                _check_bounds("alpha", a, lower_bound=_ClosedBound(0))
+        else:
+            _check_bounds("alpha", alpha, lower_bound=_ClosedBound(0))
+
+        if isinstance(lasso_ratio, Choice):
+            for lr in lasso_ratio:
+                _check_bounds("lasso_ratio", lr, lower_bound=_ClosedBound(0), upper_bound=_ClosedBound(1))
+        else:
+            _check_bounds("lasso_ratio", lasso_ratio, lower_bound=_ClosedBound(0), upper_bound=_ClosedBound(1))
 
         # Hyperparameters
         self._alpha = alpha
@@ -58,12 +68,12 @@ class ElasticNetRegressor(Regressor):
     # ------------------------------------------------------------------------------------------------------------------
 
     @property
-    def alpha(self) -> float:
+    def alpha(self) -> float | Choice[float]:
         """The regularization of the model."""
         return self._alpha
 
     @property
-    def lasso_ratio(self) -> float:
+    def lasso_ratio(self) -> float | Choice[float]:
         """Rhe ratio between Lasso and Ridge regularization."""
         return self._lasso_ratio
 
@@ -85,7 +95,7 @@ class ElasticNetRegressor(Regressor):
 
 
         #TODO Does Linear Regression have priority over other models? Should this always be a linear model if alpha is zero or does the lasso ratio still mater in that case? Might have do modify the order of model creation here.
-        if self._alpha == 0:    # Linear Regression
+        if self._alpha == 0:            # Linear Regression
             return sk_LinearRegression(n_jobs=-1)
 
         if self._lasso_ratio == 0:      # Ridge Regression
@@ -98,3 +108,13 @@ class ElasticNetRegressor(Regressor):
             alpha=self._alpha,
             l1_ratio=self._lasso_ratio,
         )
+
+    def _get_models_for_all_choices(self) -> list[ElasticNetRegressor]:
+        alpha_choices = self._alpha if isinstance(self._alpha, Choice) else [self._alpha]
+        lasso_choices = self._lasso_ratio if isinstance(self._lasso_ratio, Choice) else [self._lasso_ratio]
+
+        models = []
+        for a in alpha_choices:
+            for lasso in lasso_choices:
+                models.append(ElasticNetRegressor(alpha=a, lasso_ratio=lasso))
+        return models
