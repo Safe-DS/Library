@@ -3,6 +3,8 @@ from safeds.data.tabular.containers import Table
 from safeds.exceptions import ColumnNotFoundError
 from syrupy import SnapshotAssertion
 
+from tests.helpers import os_mac, skip_if_os
+
 
 @pytest.mark.parametrize(
     ("table", "x_name", "y_names"),
@@ -29,6 +31,8 @@ def test_should_match_snapshot(
     y_names: list[str],
     snapshot_png_image: SnapshotAssertion,
 ) -> None:
+    skip_if_os([os_mac])
+
     line_plot = table.plot.line_plot(x_name, y_names)
     assert line_plot == snapshot_png_image
 

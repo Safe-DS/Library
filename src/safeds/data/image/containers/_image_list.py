@@ -404,7 +404,7 @@ class ImageList(metaclass=ABCMeta):
         Returns
         -------
         has_item:
-            Weather the given item is in this image list
+            Whether the given item is in this image list
         """
         return isinstance(item, Image) and self.has_image(item)
 
@@ -524,7 +524,7 @@ class ImageList(metaclass=ABCMeta):
         Returns
         -------
         has_image:
-            Weather the given image is in this image list
+            Whether the given image is in this image list
         """
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -875,6 +875,9 @@ class ImageList(metaclass=ABCMeta):
     def convert_to_grayscale(self) -> ImageList:
         """
         Return a new `ImageList` with all images converted to grayscale.
+
+        The new image list will have the same amount of channels as the original image list.
+        If you want to change the amount of channels used, please use the method [change_channel][safeds.data.image.containers._image_list.ImageList.change_channel].
 
         The original image list is not modified.
 

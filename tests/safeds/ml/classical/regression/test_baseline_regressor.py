@@ -3,9 +3,9 @@ from safeds.data.tabular.containers import Table
 from safeds.exceptions import (
     ColumnTypeError,
     DatasetMissesDataError,
-    TargetDataMismatchError,
     FeatureDataMismatchError,
     ModelNotFittedError,
+    TargetDataMismatchError,
 )
 from safeds.ml.classical.regression import BaselineRegressor
 

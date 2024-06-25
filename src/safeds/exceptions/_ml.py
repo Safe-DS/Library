@@ -30,7 +30,9 @@ class TargetDataMismatchError(ValueError):
     """
 
     def __init__(self, actual_target_name: str, missing_target_name: str):
-        super().__init__(f"The provided target column '{actual_target_name}' does not match the target column of the training set '{missing_target_name}'.")
+        super().__init__(
+            f"The provided target column '{actual_target_name}' does not match the target column of the training set '{missing_target_name}'.",
+        )
 
 
 class DatasetMissesDataError(ValueError):
@@ -38,6 +40,13 @@ class DatasetMissesDataError(ValueError):
 
     def __init__(self) -> None:
         super().__init__("Dataset contains no rows")
+
+
+class InvalidFitDataError(Exception):
+    """Raised when a Neural Network is fitted on invalid data."""
+
+    def __init__(self, reason: str) -> None:
+        super().__init__(f"The given Fit Data is invalid:\n{reason}")
 
 
 class LearningError(Exception):

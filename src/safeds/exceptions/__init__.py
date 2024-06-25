@@ -16,14 +16,15 @@ from ._data import (
 from ._ml import (
     DatasetMissesDataError,
     DatasetMissesFeaturesError,
-    TargetDataMismatchError,
     FeatureDataMismatchError,
     InputSizeError,
+    InvalidFitDataError,
     InvalidModelStructureError,
     LearningError,
     ModelNotFittedError,
     PlainTableError,
     PredictionError,
+    TargetDataMismatchError,
 )
 
 
@@ -71,6 +72,7 @@ __all__ = [
     "DatasetMissesFeaturesError",
     "TargetDataMismatchError",
     "FeatureDataMismatchError",
+    "InvalidFitDataError",
     "InputSizeError",
     "InvalidModelStructureError",
     "LearningError",
