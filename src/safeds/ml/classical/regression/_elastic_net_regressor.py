@@ -1,12 +1,13 @@
 from __future__ import annotations
+
 from typing import TYPE_CHECKING
 
 from safeds._utils import _structural_hash
 from safeds._validation import _check_bounds, _ClosedBound
 from safeds.exceptions import FittingWithChoiceError, FittingWithoutChoiceError
+from safeds.ml.hyperparameters import Choice
 
 from ._regressor import Regressor
-from safeds.ml.hyperparameters import Choice
 
 if TYPE_CHECKING:
     from sklearn.base import RegressorMixin
@@ -87,22 +88,21 @@ class ElasticNetRegressor(Regressor):
 
     def _get_sklearn_model(self) -> RegressorMixin:
         from sklearn.linear_model import ElasticNet as SklearnElasticNet
+        from sklearn.linear_model import Lasso as SklearnLasso
         from sklearn.linear_model import LinearRegression as sk_LinearRegression
         from sklearn.linear_model import Ridge as SklearnRidge
-        from sklearn.linear_model import Lasso as SklearnLasso
 
-
-        #TODO Does Linear Regression have priority over other models? Should this always be a linear model if alpha is zero or does the lasso ratio still mater in that case? Might have do modify the order of model creation here.
-        if self._alpha == 0:            # Linear Regression
+        # TODO Does Linear Regression have priority over other models? Should this always be a linear model if alpha is zero or does the lasso ratio still mater in that case? Might have do modify the order of model creation here.
+        if self._alpha == 0:  # Linear Regression
             return sk_LinearRegression(n_jobs=-1)
 
-        if self._lasso_ratio == 0:      # Ridge Regression
+        if self._lasso_ratio == 0:  # Ridge Regression
             return SklearnRidge(alpha=self._alpha)
 
-        if self._lasso_ratio == 1:      # Lasso Regression
+        if self._lasso_ratio == 1:  # Lasso Regression
             return SklearnLasso(alpha=self._alpha)
 
-        return SklearnElasticNet(       # Elastic Net Regression
+        return SklearnElasticNet(  # Elastic Net Regression
             alpha=self._alpha,
             l1_ratio=self._lasso_ratio,
         )
