@@ -9,7 +9,7 @@ from safeds.exceptions import (
     ModelNotFittedError,
     NonNumericColumnError,
 )
-from safeds.ml.classical.regression import ArimaModelRegressor, LassoRegressor
+from safeds.ml.classical.regression import ArimaModelRegressor, AdaBoostRegressor
 
 from tests.helpers import resolve_resource_path
 
@@ -177,7 +177,7 @@ def test_should_return_same_hash_for_equal_regressor() -> None:
 
 def test_should_return_different_hash_for_unequal_regressor() -> None:
     regressor1 = ArimaModelRegressor()
-    regressor2 = LassoRegressor()
+    regressor2 = AdaBoostRegressor()
     assert hash(regressor1) != hash(regressor2)
 
 
