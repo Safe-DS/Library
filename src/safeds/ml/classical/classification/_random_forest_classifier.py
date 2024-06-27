@@ -44,7 +44,7 @@ class RandomForestClassifier(Classifier, _RandomForestBase):
         self,
         *,
         tree_count: int | Choice[int] = 100,
-        max_depth: int | Choice[int] | None = None,
+        max_depth: int | None | Choice[int | None] = None,
         min_sample_count_in_leaves: int | Choice[int] = 1,
     ) -> None:
         # Initialize superclasses

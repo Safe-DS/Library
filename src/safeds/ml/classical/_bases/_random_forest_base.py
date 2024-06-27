@@ -16,7 +16,7 @@ class _RandomForestBase(ABC):
     def __init__(
         self,
         tree_count: int | Choice[int],
-        max_depth: int | Choice[int] | None,
+        max_depth: int | None | Choice[int | None],
         min_sample_count_in_leaves: int | Choice[int],
     ) -> None:
         # Validation
@@ -40,7 +40,7 @@ class _RandomForestBase(ABC):
 
         # Hyperparameters
         self._tree_count: int | Choice[int] = tree_count
-        self._max_depth: int | Choice[int] | None = max_depth
+        self._max_depth: int | None | Choice[int | None] = max_depth
         self._min_sample_count_in_leaves: int | Choice[int] = min_sample_count_in_leaves
 
     def __hash__(self) -> int:
@@ -60,7 +60,7 @@ class _RandomForestBase(ABC):
         return self._tree_count
 
     @property
-    def max_depth(self) -> int | Choice[int] | None:
+    def max_depth(self) -> int | None | Choice[int | None]:
         """The maximum depth of each tree."""
         return self._max_depth
 
