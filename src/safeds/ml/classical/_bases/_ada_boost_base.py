@@ -61,5 +61,5 @@ class _AdaBoostBase(ABC):
 
     @property
     @abstractmethod
-    def learner(self) -> SupervisedModel | None:
+    def learner(self) -> SupervisedModel | None | Choice[SupervisedModel | None]:
         """The base learner used for training the ensemble."""

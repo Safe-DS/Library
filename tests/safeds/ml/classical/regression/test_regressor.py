@@ -73,7 +73,7 @@ def regressors_with_choices() -> list[Regressor]:
         The list of regressors to test.
     """
     return [
-        AdaBoostRegressor(max_learner_count=Choice(1, 2), learning_rate=Choice(0.1, 0.2)),
+        AdaBoostRegressor(learner=Choice(AdaBoostRegressor(), None), max_learner_count=Choice(1, 2), learning_rate=Choice(0.1, 0.2)),
         DecisionTreeRegressor(max_depth=Choice(1, 2), min_sample_count_in_leaves=Choice(1, 2)),
         ElasticNetRegressor(alpha=Choice(0, 0.5, 1), lasso_ratio=Choice(0, 0.5, 1)),
         GradientBoostingRegressor(tree_count=Choice(1, 2), learning_rate=Choice(0.1, 0.2)),

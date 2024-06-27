@@ -71,7 +71,7 @@ def classifiers_with_choices() -> list[Classifier]:
         The list of classifiers to test.
     """
     return [
-        AdaBoostClassifier(max_learner_count=Choice(1, 2), learning_rate=Choice(0.1, 0.2)),
+        AdaBoostClassifier(learner=Choice(AdaBoostClassifier(), None), max_learner_count=Choice(1, 2), learning_rate=Choice(0.1, 0.2)),
         DecisionTreeClassifier(max_depth=Choice(1, 2), min_sample_count_in_leaves=Choice(1, 2)),
         GradientBoostingClassifier(tree_count=Choice(1, 2), learning_rate=Choice(0.1, 0.2)),
         KNearestNeighborsClassifier(neighbor_count=Choice(1, 2)),

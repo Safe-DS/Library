@@ -41,7 +41,7 @@ class AdaBoostClassifier(Classifier, _AdaBoostBase):
     def __init__(
         self,
         *,
-        learner: Classifier | None = None,
+        learner: Classifier | None | Choice[Classifier | None] = None,
         max_learner_count: int | Choice[int] = 50,
         learning_rate: float | Choice[float] = 1.0,
     ) -> None:
@@ -54,7 +54,7 @@ class AdaBoostClassifier(Classifier, _AdaBoostBase):
         )
 
         # Hyperparameters
-        self._learner: Classifier | None = learner
+        self._learner: Classifier | None | Choice[Classifier | None] = learner
 
     def __hash__(self) -> int:
         return _structural_hash(
@@ -68,7 +68,7 @@ class AdaBoostClassifier(Classifier, _AdaBoostBase):
     # ------------------------------------------------------------------------------------------------------------------
 
     @property
-    def learner(self) -> Classifier | None:
+    def learner(self) -> Classifier | None | Choice[Classifier | None]:
         """The base learner used for training the ensemble."""
         return self._learner
 
@@ -91,17 +91,21 @@ class AdaBoostClassifier(Classifier, _AdaBoostBase):
             estimator=learner,
             n_estimators=self._max_learner_count,
             learning_rate=self._learning_rate,
+            algorithm="SAMME"   #   Will be the default in sklearn 1.6, remove this line then
         )
 
     def _check_additional_fit_preconditions(self) -> None:
-        if isinstance(self._max_learner_count, Choice) or isinstance(self._learning_rate, Choice):
+        if isinstance(self._max_learner_count, Choice) or isinstance(self._learning_rate, Choice) or isinstance(self._learner, Choice):
             raise FittingWithChoiceError
 
     def _check_additional_fit_by_exhaustive_search_preconditions(self) -> None:
-        if not isinstance(self._max_learner_count, Choice) and not isinstance(self._learning_rate, Choice):
+        if not isinstance(self._max_learner_count, Choice) and not isinstance(self._learning_rate, Choice) and not isinstance(self._learner, Choice):
             raise FittingWithoutChoiceError
 
     def _get_models_for_all_choices(self) -> list[AdaBoostClassifier]:
+        learner_choices = (
+            self._learner if isinstance(self._learner, Choice) else [self._learner]
+        )
         max_learner_count_choices = (
             self._max_learner_count if isinstance(self._max_learner_count, Choice) else [self._max_learner_count]
         )
@@ -110,7 +114,8 @@ class AdaBoostClassifier(Classifier, _AdaBoostBase):
         )
 
         models = []
-        for mlc in max_learner_count_choices:
-            for lr in learning_rate_choices:
-                models.append(AdaBoostClassifier(max_learner_count=mlc, learning_rate=lr))
+        for learner in learner_choices:
+            for mlc in max_learner_count_choices:
+                for lr in learning_rate_choices:
+                    models.append(AdaBoostClassifier(learner=learner, max_learner_count=mlc, learning_rate=lr))
         return models
