@@ -15,7 +15,7 @@ class _DecisionTreeBase(ABC):
     @abstractmethod
     def __init__(
         self,
-        max_depth: int | Choice[int] | None,
+        max_depth: int | None | Choice[int | None],
         min_sample_count_in_leaves: int | Choice[int],
     ) -> None:
         # Validation
@@ -31,7 +31,7 @@ class _DecisionTreeBase(ABC):
             _check_bounds("min_sample_count_in_leaves", min_sample_count_in_leaves, lower_bound=_ClosedBound(1))
 
         # Hyperparameters
-        self._max_depth: int | Choice[int] | None = max_depth
+        self._max_depth: int | None | Choice[int | None] = max_depth
         self._min_sample_count_in_leaves: int | Choice[int] = min_sample_count_in_leaves
 
     def __hash__(self) -> int:
@@ -45,7 +45,7 @@ class _DecisionTreeBase(ABC):
     # ------------------------------------------------------------------------------------------------------------------
 
     @property
-    def max_depth(self) -> int | Choice[int] | None:
+    def max_depth(self) -> int | None | Choice[int | None]:
         """The maximum depth of the tree."""
         return self._max_depth
 

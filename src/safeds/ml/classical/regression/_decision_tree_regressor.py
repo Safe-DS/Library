@@ -39,7 +39,7 @@ class DecisionTreeRegressor(Regressor, _DecisionTreeBase):
     def __init__(
         self,
         *,
-        max_depth: int | Choice[int] | None = None,
+        max_depth: int | None | Choice[int | None],
         min_sample_count_in_leaves: int | Choice[int] = 5,
     ) -> None:
         # Initialize superclasses

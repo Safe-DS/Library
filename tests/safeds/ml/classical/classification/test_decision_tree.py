@@ -23,7 +23,7 @@ class TestMaxDepth:
         assert fitted_model._wrapped_model.max_depth == 2
 
     @pytest.mark.parametrize("max_depth", [-1, 0, Choice(-1)], ids=["minus_one", "zero", "invalid_choice"])
-    def test_should_raise_if_less_than_or_equal_to_0(self, max_depth: int | Choice[int]) -> None:
+    def test_should_raise_if_less_than_or_equal_to_0(self, max_depth: int | None | Choice[int | None]) -> None:
         with pytest.raises(OutOfBoundsError):
             DecisionTreeClassifier(max_depth=max_depth)
 
