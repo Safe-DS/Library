@@ -37,7 +37,7 @@ class SupportVectorRegressor(Regressor, _SupportVectorMachineBase):
         self,
         *,
         c: float | Choice[float] = 1.0,
-        kernel: SupportVectorRegressor.Kernel | None = None,
+        kernel: SupportVectorRegressor.Kernel | None | Choice[SupportVectorRegressor.Kernel | None] = None,
     ) -> None:
         # Initialize superclasses
         Regressor.__init__(self)
@@ -58,7 +58,7 @@ class SupportVectorRegressor(Regressor, _SupportVectorMachineBase):
     # ------------------------------------------------------------------------------------------------------------------
 
     @property
-    def kernel(self) -> SupportVectorRegressor.Kernel:
+    def kernel(self) -> SupportVectorRegressor.Kernel | Choice[SupportVectorRegressor.Kernel | None]:
         """The type of kernel used."""
         return self._kernel
 
@@ -82,16 +82,20 @@ class SupportVectorRegressor(Regressor, _SupportVectorMachineBase):
         return result
 
     def _check_additional_fit_preconditions(self) -> None:
-        if isinstance(self._c, Choice):
+        if isinstance(self._c, Choice) or isinstance(self.kernel, Choice):
             raise FittingWithChoiceError
 
     def _check_additional_fit_by_exhaustive_search_preconditions(self) -> None:
-        if not isinstance(self._c, Choice):
+        if not isinstance(self._c, Choice) and not isinstance(self.kernel, Choice):
             raise FittingWithoutChoiceError
 
     def _get_models_for_all_choices(self) -> list[SupportVectorRegressor]:
-        assert isinstance(self._c, Choice)  # this is always true and just here for linting
+        #assert isinstance(self._c, Choice)  # this is always true and just here for linting
+        c_choices = (self._c if isinstance(self._c, Choice) else [self._c])
+        kernel_choices = (self.kernel if isinstance(self.kernel, Choice) else [self.kernel])
+
         models = []
-        for c in self._c:
-            models.append(SupportVectorRegressor(c=c))
+        for c in c_choices:
+            for kernel in kernel_choices:
+                models.append(SupportVectorRegressor(c=c, kernel=kernel))
         return models

@@ -37,7 +37,7 @@ class SupportVectorClassifier(Classifier, _SupportVectorMachineBase):
         self,
         *,
         c: float | Choice[float] = 1.0,
-        kernel: SupportVectorClassifier.Kernel | None = None,
+        kernel: SupportVectorClassifier.Kernel | None | Choice[SupportVectorClassifier.Kernel | None] = None,
     ) -> None:
         # Initialize superclasses
         Classifier.__init__(self)
@@ -58,7 +58,7 @@ class SupportVectorClassifier(Classifier, _SupportVectorMachineBase):
     # ------------------------------------------------------------------------------------------------------------------
 
     @property
-    def kernel(self) -> SupportVectorClassifier.Kernel:
+    def kernel(self) -> SupportVectorClassifier.Kernel | Choice[SupportVectorClassifier.Kernel | None]:
         """The type of kernel used."""
         return self._kernel
 
@@ -83,16 +83,20 @@ class SupportVectorClassifier(Classifier, _SupportVectorMachineBase):
         return result
 
     def _check_additional_fit_preconditions(self) -> None:
-        if isinstance(self._c, Choice):
+        if isinstance(self._c, Choice) or isinstance(self._kernel, Choice):
             raise FittingWithChoiceError
 
     def _check_additional_fit_by_exhaustive_search_preconditions(self) -> None:
-        if not isinstance(self._c, Choice):
+        if not isinstance(self._c, Choice) and not isinstance(self._kernel, Choice):
             raise FittingWithoutChoiceError
 
     def _get_models_for_all_choices(self) -> list[SupportVectorClassifier]:
-        assert isinstance(self._c, Choice)  # this is always true and just here for linting
+        #assert isinstance(self._c, Choice)  # this is always true and just here for linting
+        c_choices = (self._c if isinstance(self._c, Choice) else [self._c])
+        kernel_choices = (self.kernel if isinstance(self.kernel, Choice) else [self.kernel])
+
         models = []
-        for c in self._c:
-            models.append(SupportVectorClassifier(c=c))
+        for c in c_choices:
+            for kernel in kernel_choices:
+                models.append(SupportVectorClassifier(c=c, kernel=kernel))
         return models

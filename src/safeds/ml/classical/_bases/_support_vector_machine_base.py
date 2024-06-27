@@ -78,7 +78,7 @@ class _SupportVectorMachineBase(ABC):
     def __init__(
         self,
         c: float | Choice[float],
-        kernel: _SupportVectorMachineBase.Kernel | None,
+        kernel: _SupportVectorMachineBase.Kernel | None | Choice[_SupportVectorMachineBase.Kernel | None],
     ) -> None:
         if kernel is None:
             kernel = _SupportVectorMachineBase.Kernel.radial_basis_function()
@@ -92,7 +92,7 @@ class _SupportVectorMachineBase(ABC):
 
         # Hyperparameters
         self._c: float | Choice[float] = c
-        self._kernel: _SupportVectorMachineBase.Kernel = kernel
+        self._kernel: _SupportVectorMachineBase.Kernel | Choice[_SupportVectorMachineBase.Kernel | None] = kernel
 
     def __hash__(self) -> int:
         return _structural_hash(
@@ -112,7 +112,7 @@ class _SupportVectorMachineBase(ABC):
     # This property is abstract, so subclasses must declare a public return type.
     @property
     @abstractmethod
-    def kernel(self) -> _SupportVectorMachineBase.Kernel:
+    def kernel(self) -> _SupportVectorMachineBase.Kernel | Choice[_SupportVectorMachineBase.Kernel | None]:
         """The type of kernel used."""
 
 

@@ -60,6 +60,7 @@ def regressors() -> list[Regressor]:
     ]
 
 
+
 def regressors_with_choices() -> list[Regressor]:
     """
     Return the list of regressors with Choices as Parameters to test choice functionality.
@@ -79,7 +80,7 @@ def regressors_with_choices() -> list[Regressor]:
         GradientBoostingRegressor(tree_count=Choice(1, 2), learning_rate=Choice(0.1, 0.2)),
         KNearestNeighborsRegressor(neighbor_count=Choice(1, 2)),
         RandomForestRegressor(tree_count=Choice(1, 2), max_depth=Choice(1, 2), min_sample_count_in_leaves=Choice(1, 2)),
-        SupportVectorRegressor(c=Choice(0.5, 1.0)),
+        SupportVectorRegressor(kernel=Choice(None, SupportVectorRegressor.Kernel.linear()), c=Choice(0.5, 1.0)),
     ]
 
 

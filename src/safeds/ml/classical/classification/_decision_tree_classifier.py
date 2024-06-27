@@ -39,7 +39,7 @@ class DecisionTreeClassifier(Classifier, _DecisionTreeBase):
     def __init__(
         self,
         *,
-        max_depth: int | None | Choice[int | None],
+        max_depth: int | None | Choice[int | None] = None,
         min_sample_count_in_leaves: int | Choice[int] = 1,
     ) -> None:
         # Initialize superclasses

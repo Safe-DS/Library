@@ -80,7 +80,7 @@ def classifiers_with_choices() -> list[Classifier]:
             max_depth=Choice(1, 2),
             min_sample_count_in_leaves=Choice(1, 2),
         ),
-        SupportVectorClassifier(c=Choice(0.5, 1.0)),
+        SupportVectorClassifier(kernel=Choice(None, SupportVectorClassifier.Kernel.linear()) ,c=Choice(0.5, 1.0)),
     ]
 
 
@@ -99,6 +99,14 @@ def valid_data() -> TabularDataset:
 @pytest.mark.parametrize("classifier_with_choice", classifiers_with_choices(), ids=lambda x: x.__class__.__name__)
 class TestChoiceClassifiers:
 
+    def test_should_raise_if_model_is_fitted_with_choice(
+        self,
+        classifier_with_choice: Classifier,
+        valid_data: TabularDataset,
+    ) -> None:
+        with pytest.raises(FittingWithChoiceError):
+            classifier_with_choice.fit(valid_data)
+
     def test_should_raise_if_no_positive_class_is_provided(
         self,
         classifier_with_choice: Classifier,
@@ -116,14 +124,6 @@ class TestChoiceClassifiers:
         assert isinstance(model, type(classifier_with_choice))
         pred = model.predict(valid_data)
         assert isinstance(pred, TabularDataset)
-
-    def test_should_raise_if_model_is_fitted_with_choice(
-        self,
-        classifier_with_choice: Classifier,
-        valid_data: TabularDataset,
-    ) -> None:
-        with pytest.raises(FittingWithChoiceError):
-            classifier_with_choice.fit(valid_data)
 
 
 class TestFitByExhaustiveSearch:
