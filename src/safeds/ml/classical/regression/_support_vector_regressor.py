@@ -78,6 +78,7 @@ class SupportVectorRegressor(Regressor, _SupportVectorMachineBase):
         result = SklearnSVR(
             C=self._c,
         )
+        assert not isinstance(self._kernel, Choice)
         self._kernel._apply(result)
         return result
 

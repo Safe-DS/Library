@@ -79,6 +79,7 @@ class SupportVectorClassifier(Classifier, _SupportVectorMachineBase):
             C=self._c,
             random_state=_get_random_seed(),
         )
+        assert not isinstance(self._kernel, Choice)
         self._kernel._apply(result)
         return result
 
