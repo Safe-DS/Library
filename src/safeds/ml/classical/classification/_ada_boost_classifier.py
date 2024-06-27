@@ -86,6 +86,7 @@ class AdaBoostClassifier(Classifier, _AdaBoostBase):
     def _get_sklearn_model(self) -> ClassifierMixin:
         from sklearn.ensemble import AdaBoostClassifier as SklearnAdaBoostClassifier
 
+        assert not isinstance(self.learner, Choice)
         learner = self.learner._get_sklearn_model() if self.learner is not None else None
         return SklearnAdaBoostClassifier(
             estimator=learner,

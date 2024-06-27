@@ -68,7 +68,7 @@ class AdaBoostRegressor(Regressor, _AdaBoostBase):
     # ------------------------------------------------------------------------------------------------------------------
 
     @property
-    def learner(self) -> Regressor | None | Choice[Regressor | None]:
+    def learner(self) -> Regressor | None | Choice[Regressor | None]:   #pragma: no cover
         """The base learner used for training the ensemble."""
         return self._learner
 
@@ -86,6 +86,7 @@ class AdaBoostRegressor(Regressor, _AdaBoostBase):
     def _get_sklearn_model(self) -> RegressorMixin:
         from sklearn.ensemble import AdaBoostRegressor as SklearnAdaBoostRegressor
 
+        assert not isinstance(self.learner, Choice)
         learner = self.learner._get_sklearn_model() if self.learner is not None else None
         return SklearnAdaBoostRegressor(
             estimator=learner,
