@@ -7,6 +7,7 @@ import apipkg
 if TYPE_CHECKING:
     from ._ada_boost_regressor import AdaBoostRegressor
     from ._arima import ArimaModelRegressor
+    from ._baseline_regressor import BaselineRegressor
     from ._decision_tree_regressor import DecisionTreeRegressor
     from ._elastic_net_regressor import ElasticNetRegressor
     from ._gradient_boosting_regressor import GradientBoostingRegressor
@@ -20,6 +21,7 @@ apipkg.initpkg(
     {
         "AdaBoostRegressor": "._ada_boost_regressor:AdaBoostRegressor",
         "ArimaModelRegressor": "._arima:ArimaModelRegressor",
+        "BaselineRegressor": "._baseline_regressor:BaselineRegressor",
         "DecisionTreeRegressor": "._decision_tree_regressor:DecisionTreeRegressor",
         "ElasticNetRegressor": "._elastic_net_regressor:ElasticNetRegressor",
         "GradientBoostingRegressor": "._gradient_boosting_regressor:GradientBoostingRegressor",
@@ -33,6 +35,7 @@ apipkg.initpkg(
 __all__ = [
     "AdaBoostRegressor",
     "ArimaModelRegressor",
+    "BaselineRegressor",
     "DecisionTreeRegressor",
     "ElasticNetRegressor",
     "GradientBoostingRegressor",
