@@ -15,11 +15,8 @@ from safeds.ml.classical.regression import (
     DecisionTreeRegressor,
     ElasticNetRegressor,
     GradientBoostingRegressor,
-    LassoRegressor,
-    LinearRegressor,
     RandomForestRegressor,
     Regressor,
-    RidgeRegressor,
     SupportVectorRegressor,
 )
 
@@ -47,15 +44,15 @@ class BaselineRegressor:
         self._list_of_model_types = [
             AdaBoostRegressor(),
             DecisionTreeRegressor(),
-            LinearRegressor(),
+            ElasticNetRegressor(alpha=0.0),
+            ElasticNetRegressor(lasso_ratio=0),
             RandomForestRegressor(),
-            RidgeRegressor(),
             SupportVectorRegressor(),
         ]
 
         if include_slower_models:
             self._list_of_model_types.extend(
-                [ElasticNetRegressor(), LassoRegressor(), GradientBoostingRegressor()],
+                [ElasticNetRegressor(), ElasticNetRegressor(lasso_ratio=1), GradientBoostingRegressor()],
             )  # pragma: no cover
 
         self._fitted_models: list[Regressor] = []
