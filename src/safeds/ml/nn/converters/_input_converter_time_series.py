@@ -38,6 +38,7 @@ class InputConversionTimeSeries(InputConversion[TimeSeriesDataset, Table]):
             and self._target_name == other._target_name
             and self._feature_names == other._feature_names
             and self._continuous == other._continuous
+            and self._extra_names == other._extra_names
         )
 
     def __hash__(self) -> int:
@@ -48,6 +49,7 @@ class InputConversionTimeSeries(InputConversion[TimeSeriesDataset, Table]):
             self._target_name,
             self._feature_names,
             self._continuous,
+            self._extra_names,
         )
 
     def __sizeof__(self) -> int:
@@ -57,6 +59,7 @@ class InputConversionTimeSeries(InputConversion[TimeSeriesDataset, Table]):
             + sys.getsizeof(self._target_name)
             + sys.getsizeof(self._feature_names)
             + sys.getsizeof(self._continuous)
+            + sys.getsizeof(self._extra_names)
         )
 
     @property
