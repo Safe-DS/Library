@@ -1,6 +1,7 @@
 import pytest
 from safeds.data.labeled.containers import TabularDataset
 from safeds.data.tabular.containers import Table
+from safeds.exceptions import OutOfBoundsError
 from safeds.ml.classical.classification import LogisticClassifier
 
 
@@ -25,3 +26,8 @@ class TestC:
         cloned_classifier = fitted_model._clone()
         assert isinstance(cloned_classifier, LogisticClassifier)
         assert cloned_classifier.c == fitted_model.c
+
+    @pytest.mark.parametrize("c", [-1.0, 0.0], ids=["minus_one", "zero"])
+    def test_should_raise_if_less_than_or_equal_to_0(self, c: float) -> None:
+        with pytest.raises(OutOfBoundsError):
+            LogisticClassifier(c=c)
