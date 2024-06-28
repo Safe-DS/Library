@@ -3,9 +3,9 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from safeds._utils import _structural_hash
-from safeds.ml.classical._bases import _DecisionTreeBase
 from safeds.data.image.containers import Image
 from safeds.exceptions._ml import ModelNotFittedError
+from safeds.ml.classical._bases import _DecisionTreeBase
 
 from ._classifier import Classifier
 
@@ -77,21 +77,21 @@ class DecisionTreeClassifier(Classifier, _DecisionTreeBase):
     # ------------------------------------------------------------------------------------------------------------------
     # Plot
     # ------------------------------------------------------------------------------------------------------------------
-    
+
     def plot(self) -> Image:
         if not self.is_fitted:
-                raise ModelNotFittedError
-            
-        import matplotlib.pyplot as plt
-        from sklearn.tree import plot_tree
+            raise ModelNotFittedError
+
         from io import BytesIO
 
-        plot_tree(self._wrapped_model) 
-        
+        import matplotlib.pyplot as plt
+        from sklearn.tree import plot_tree
+
+        plot_tree(self._wrapped_model)
+
         # safe plot fig bytes in buffer
         with BytesIO() as buffer:
             plt.savefig(buffer)
             image = buffer.getvalue()
-        
+
         return Image.from_bytes(image)
-       
