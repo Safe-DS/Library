@@ -111,6 +111,13 @@ class TransformerNotFittedError(Exception):
         super().__init__("The transformer has not been fitted yet.")
 
 
+class TransformerNotInvertableError(Exception):
+    """Raised when a function tries to invert a non-invertable transformer."""
+
+    def __init__(self, transformer_type: str) -> None:
+        super().__init__(f"{transformer_type} is not invertable.")
+
+
 class ValueNotPresentWhenFittedError(Exception):
     """Exception raised when attempting to one-hot-encode a table containing values not present in the fitting phase."""
 
