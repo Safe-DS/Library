@@ -61,16 +61,23 @@ class TablePlotter:
 
         columns = numerical_table.to_columns()
         columns = [column._series.drop_nulls() for column in columns]
-        number_of_columns = 3
+        max_width = 3
+        number_of_columns = len(columns) if len(columns) <= max_width else max_width
         number_of_rows = ceil(len(columns) / number_of_columns)
 
         fig, axs = plt.subplots(nrows=number_of_rows, ncols=number_of_columns)
-        fig.set_size_inches(10, 6)
-
         line = 0
         for i, column in enumerate(columns):
             if i % number_of_columns == 0 and i != 0:
                 line += 1
+
+            if number_of_columns == 1:
+                axs.boxplot(
+                    column,
+                    patch_artist=True,
+                    labels=[numerical_table.column_names[i]],
+                )
+                break
 
             if number_of_rows == 1:
                 axs[i].boxplot(
@@ -89,13 +96,11 @@ class TablePlotter:
         # removes unused ax indices, so there wont be empty plots
         last_filled_ax_index = len(columns) % number_of_columns
         for i in range(last_filled_ax_index, number_of_columns):
-            if number_of_rows == 1:
-                fig.delaxes(axs[i])
-            else:
+            if number_of_rows != 1 and last_filled_ax_index != 0:
                 fig.delaxes(axs[number_of_rows - 1, i])
 
         fig.tight_layout()
-
+        _figure_to_image(fig).to_png_file("C:/Users/patri/Desktop/test.png")
         return _figure_to_image(fig)
 
     def correlation_heatmap(self) -> Image:
