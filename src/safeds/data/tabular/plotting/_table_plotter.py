@@ -100,7 +100,6 @@ class TablePlotter:
                 fig.delaxes(axs[number_of_rows - 1, i])
 
         fig.tight_layout()
-        _figure_to_image(fig).to_png_file("C:/Users/patri/Desktop/test.png")
         return _figure_to_image(fig)
 
     def correlation_heatmap(self) -> Image:
