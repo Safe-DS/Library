@@ -15,7 +15,7 @@ if TYPE_CHECKING:
 
 class KNearestNeighborsImputer(TableTransformer):
     """
-    The KNearestNeighborsImputer replaces missing values in a   with the mean value of the K-nearest neighbors.
+    The KNearestNeighborsImputer replaces missing values in given Columns with the mean value of the K-nearest neighbors.
 
     Parameters
     ----------
