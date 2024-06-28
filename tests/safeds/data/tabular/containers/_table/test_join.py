@@ -47,10 +47,4 @@ from safeds.data.tabular.containers import Table
     ],
 )
 def test_join(table_left, table_right, left_names, right_names, mode, table_expected):
-    print("expected")
-    print(table_expected)
-
-    print("got")
-    print(table_left.join(table_right, left_names, right_names, mode=mode))
-
     assert table_left.join(table_right, left_names, right_names, mode=mode) == table_expected
