@@ -8,7 +8,7 @@ from safeds.exceptions import ColumnNotFoundError, TransformerNotFittedError
 class TestInit:
     def test_should_raise_value_error(self) -> None:
         with pytest.raises(ValueError, match='Parameter "neighbor_count" must be greater than 0.'):
-            _ = KNearestNeighborsImputer(neighbor_count=0)
+            KNearestNeighborsImputer(neighbor_count=0)
 
     def test_neighbor_count(self) -> None:
         knn = KNearestNeighborsImputer(neighbor_count=5)
