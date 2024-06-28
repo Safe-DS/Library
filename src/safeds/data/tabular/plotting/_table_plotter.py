@@ -34,12 +34,12 @@ class TablePlotter:
 
     def box_plots(self) -> Image:
         """
-        Plot a boxplot for every numerical column.
+        Create a box plot for every numerical column.
 
         Returns
         -------
         plot:
-            The plot as an image.
+            The box plot(s) as an image.
 
         Raises
         ------
@@ -52,31 +52,54 @@ class TablePlotter:
         >>> table = Table({"a":[1, 2], "b": [3, 42]})
         >>> image = table.plot.box_plots()
         """
-        # TODO: implement using matplotlib and polars
-        import matplotlib.pyplot as plt
-        import seaborn as sns
-
         numerical_table = self._table.remove_non_numeric_columns()
         if numerical_table.column_count == 0:
             raise NonNumericColumnError("This table contains only non-numerical columns.")
-        col_wrap = min(numerical_table.column_count, 3)
+        from math import ceil
 
-        data = numerical_table._lazy_frame.melt(value_vars=numerical_table.column_names).collect()
-        grid = sns.FacetGrid(data, col="variable", col_wrap=col_wrap, sharex=False, sharey=False)
-        with warnings.catch_warnings():
-            warnings.filterwarnings(
-                "ignore",
-                message="Using the boxplot function without specifying `order` is likely to produce an incorrect plot.",
-            )
-            grid.map(sns.boxplot, "variable", "value")
-        grid.set_xlabels("")
-        grid.set_ylabels("")
-        grid.set_titles("{col_name}")
-        for axes in grid.axes.flat:
-            axes.set_xticks([])
-        plt.tight_layout()
-        fig = grid.fig
+        import matplotlib.pyplot as plt
 
+        columns = numerical_table.to_columns()
+        columns = [column._series.drop_nulls() for column in columns]
+        max_width = 3
+        number_of_columns = len(columns) if len(columns) <= max_width else max_width
+        number_of_rows = ceil(len(columns) / number_of_columns)
+
+        fig, axs = plt.subplots(nrows=number_of_rows, ncols=number_of_columns)
+        line = 0
+        for i, column in enumerate(columns):
+            if i % number_of_columns == 0 and i != 0:
+                line += 1
+
+            if number_of_columns == 1:
+                axs.boxplot(
+                    column,
+                    patch_artist=True,
+                    labels=[numerical_table.column_names[i]],
+                )
+                break
+
+            if number_of_rows == 1:
+                axs[i].boxplot(
+                    column,
+                    patch_artist=True,
+                    labels=[numerical_table.column_names[i]],
+                )
+
+            else:
+                axs[line, i % number_of_columns].boxplot(
+                    column,
+                    patch_artist=True,
+                    labels=[numerical_table.column_names[i]],
+                )
+
+        # removes unused ax indices, so there wont be empty plots
+        last_filled_ax_index = len(columns) % number_of_columns
+        for i in range(last_filled_ax_index, number_of_columns):
+            if number_of_rows != 1 and last_filled_ax_index != 0:
+                fig.delaxes(axs[number_of_rows - 1, i])
+
+        fig.tight_layout()
         return _figure_to_image(fig)
 
     def correlation_heatmap(self) -> Image:
