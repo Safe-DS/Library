@@ -1,3 +1,5 @@
+from typing import Literal
+
 import pytest
 from safeds.data.tabular.containers import Table
 
@@ -52,6 +54,6 @@ def test_join(
     table_right: Table,
     left_names: list[str],
     right_names: list[str],
-    mode: str,
+    mode: Literal["inner", "left", "outer"],
     table_expected: Table,
 ) -> None:    assert table_left.join(table_right, left_names, right_names, mode=mode) == table_expected
