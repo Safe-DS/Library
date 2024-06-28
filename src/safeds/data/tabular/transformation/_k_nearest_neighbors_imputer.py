@@ -71,7 +71,7 @@ class KNearestNeighborsImputer(TableTransformer):
 
     def fit(self, table: Table) -> KNearestNeighborsImputer:
         """
-        Learn a trandformation for a set of columns in a table.
+        Learn a transformation for a set of columns in a table.
 
         This transformer is not modified.
 
