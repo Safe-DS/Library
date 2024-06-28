@@ -37,11 +37,11 @@ class TestDropoutLayer:
         with pytest.raises(ValueError, match=r"The input_size is not yet set."):
             layer.__sizeof__()
 
-
     def test_probability_is_set(self) -> None:
         probability_to_set = 0.5
         layer = DropoutLayer(probability_to_set)
         assert layer.probability == probability_to_set
+
 
 class TestEq:
     def test_should_be_equal(self) -> None:
@@ -50,9 +50,11 @@ class TestEq:
     def test_should_be_not_implemented(self) -> None:
         assert DropoutLayer(0.5).__eq__(Table()) is NotImplemented
 
+
 class TestHash:
     def test_hash_should_be_equal(self) -> None:
         assert hash(DropoutLayer(0.5)) == hash(DropoutLayer(0.5))
+
 
 class TestSizeOf:
     def test_should_int_size_be_greater_than_normal_object(self) -> None:
@@ -62,5 +64,5 @@ class TestSizeOf:
 
     def test_should_model_image_size_be_greater_than_normal_object(self) -> None:
         layer = DropoutLayer(0.5)
-        layer._set_input_size(ConstantImageSize(1,1,1))
+        layer._set_input_size(ConstantImageSize(1, 1, 1))
         assert sys.getsizeof(layer) > sys.getsizeof(object())
