@@ -692,6 +692,21 @@ class Cell(ABC, Generic[T_co]):
         +---------+
         """
         return self.__lt__(other)
+    
+    @staticmethod
+    def first_not_none(cells: list[Cell])-> Cell:
+        """Return the first cell that is not None."""
+        from polars import coalesce
+
+        from ._column import Column
+        from ._lazy_cell import _LazyCell, _unwrap,_wrap
+        # we tryed lots of different aproaches and thats the last one
+        cell = coalesce([_unwrap(cell) for cell in cells])
+    
+        return cell
+
+        
+
 
     # ------------------------------------------------------------------------------------------------------------------
     # Internal
