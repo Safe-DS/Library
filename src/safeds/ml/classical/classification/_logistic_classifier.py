@@ -12,7 +12,14 @@ if TYPE_CHECKING:
 
 
 class LogisticClassifier(Classifier):
-    """Regularized logistic regression for classification."""
+    """
+    Regularized logistic regression for classification.
+    
+    Parameters
+    ----------
+    c:
+        The regularization strength. Lower values imply stronger regularization. Must be greater than 0.
+    """
 
     # ------------------------------------------------------------------------------------------------------------------
     # Dunder methods
