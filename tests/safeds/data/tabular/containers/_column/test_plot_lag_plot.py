@@ -26,3 +26,4 @@ def test_should_raise_if_column_contains_non_numerical_values() -> None:
     column = Column("a", ["A", "B", "C"])
     with pytest.raises(ColumnTypeError):
         column.plot.lag_plot(1)
+
