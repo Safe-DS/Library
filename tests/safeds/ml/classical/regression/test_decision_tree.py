@@ -51,7 +51,9 @@ class TestPlot:
             model.plot()
 
     def test_should_check_that_plot_image_is_same_as_plt_figure(
-        self, training_set: TabularDataset, snapshot_png_image: SnapshotAssertion,
+        self,
+        training_set: TabularDataset,
+        snapshot_png_image: SnapshotAssertion,
     ) -> None:
         fitted_model = DecisionTreeRegressor().fit(training_set)
         image = fitted_model.plot()
