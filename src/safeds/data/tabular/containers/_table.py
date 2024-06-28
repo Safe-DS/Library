@@ -669,7 +669,7 @@ class Table:
         --------
         >>> from safeds.data.tabular.containers import Table
         >>> table = Table({"a": [1, 2, 3], "b": [4, 5, 6]})
-        >>> table.remove_columns("a", ignore_unknown_names=True)
+        >>> table.remove_columns("a")
         +-----+
         |   b |
         | --- |
