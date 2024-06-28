@@ -45,7 +45,6 @@ def test_should_remove_table_columns_no_exception(
     assert table == expected
     assert table.row_count == expected.row_count
 
-
 # Test cases where an exception is expected
 @pytest.mark.parametrize(
     ("table", "columns", "ignore_unknown_names"),
