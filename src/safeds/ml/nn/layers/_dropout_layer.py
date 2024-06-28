@@ -39,10 +39,6 @@ class DropoutLayer(Layer):
             raise ValueError(
                 "The input_size is not yet set. The internal layer can only be created when the input_size is set.",
             )
-        if self._output_size is None:
-            raise ValueError(
-                "The output_size is not yet set. The internal layer can only be created when the output_size is set.",
-            )
         return _InternalDropoutLayer(self.propability)
     
     @property

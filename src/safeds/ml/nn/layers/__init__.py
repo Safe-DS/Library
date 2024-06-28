@@ -12,6 +12,7 @@ if TYPE_CHECKING:
     from ._layer import Layer
     from ._lstm_layer import LSTMLayer
     from ._pooling2d_layer import AveragePooling2DLayer, MaxPooling2DLayer
+    from ._dropout_layer import DropoutLayer
 
 apipkg.initpkg(
     __name__,
@@ -25,6 +26,7 @@ apipkg.initpkg(
         "GRULayer": "._gru_layer:GRULayer",
         "AveragePooling2DLayer": "._pooling2d_layer:AveragePooling2DLayer",
         "MaxPooling2DLayer": "._pooling2d_layer:MaxPooling2DLayer",
+        "DropoutLayer": "._dropout_layer:DropoutLayer",
     },
 )
 
@@ -38,4 +40,5 @@ __all__ = [
     "GRULayer",
     "AveragePooling2DLayer",
     "MaxPooling2DLayer",
+    "DropoutLayer",
 ]
