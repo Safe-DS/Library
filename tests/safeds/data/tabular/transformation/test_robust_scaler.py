@@ -49,10 +49,16 @@ class TestFit:
                 "col2": [3.0, 3.0, 3.0, 3.0],
             },
         )
-        
+        target = Table(
+            {
+                "col1": [0.0, 0.0, 1.0, 0.0],
+                "col2": [0.0, 0.0, 0.0, 0.0],
+            }
+        )
         transformer = RobustScaler()
         f_transformer = transformer.fit(table)
         table = f_transformer.transform(table)
+        assert(table == target)
 
 
 
