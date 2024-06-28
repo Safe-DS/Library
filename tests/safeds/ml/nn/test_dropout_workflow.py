@@ -22,24 +22,16 @@ def test_forward_model(device: Device) -> None:
     configure_test_with_device(device)
 
     # Create a DataFrame
-    _inflation_path = "_datas/US_Inflation_rates.csv"
     table_1 = Table.from_csv_file(
-        path=resolve_resource_path(_inflation_path),
+        path="docs/tutorials/data/US_Inflation_rates_prepared.csv",
     )
-    table_1 = table_1.remove_columns(["date"])
-    table_2 = table_1.slice_rows(start=0, length=table_1.row_count - 14)
-    table_2 = table_2.add_columns([(table_1.slice_rows(start=14)).get_column("value").rename("target")])
-    train_table, test_table = table_2.split_rows(0.8)
+    train_table, _ = table_1.split_rows(0.8)
 
-    ss = StandardScaler(column_names="value")
-    _, train_table = ss.fit_and_transform(train_table)
-    _, test_table = ss.fit_and_transform(test_table)
     model = NeuralNetworkRegressor(
         InputConversionTable(),
         [ForwardLayer(neuron_count=1), DropoutLayer(probability=0.5)],
     )
 
-    fitted_model = model.fit(train_table.to_tabular_dataset("target"), epoch_size=1, learning_rate=0.01)
-    fitted_model.predict(test_table.remove_columns_except(["value"]))
+    fitted_model = model.fit(train_table.to_tabular_dataset("value"), epoch_size=1, learning_rate=0.01)
     assert fitted_model._model is not None
     assert fitted_model._model.state_dict()["_pytorch_layers.0._layer.weight"].device == _get_device()
