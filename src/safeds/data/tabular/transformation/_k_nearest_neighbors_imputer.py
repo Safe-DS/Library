@@ -138,9 +138,6 @@ class KNearestNeighborsImputer(TableTransformer):
         if self._column_names is None or self._wrapped_transformer is None:
             raise TransformerNotFittedError
 
-        if table.row_count == 0:
-            raise ValueError("The table cannot be transformed because it contains 0 rows")
-
         _check_columns_exist(table, self._column_names)
 
         new_data = self._wrapped_transformer.transform(
