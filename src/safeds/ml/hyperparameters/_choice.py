@@ -17,12 +17,14 @@ class Choice(Collection[T]):
         """
         Create a new choice.
 
+        Duplicate values will be removed.
+
         Parameters
         ----------
         *args:
             The values to choose from.
         """
-        self.elements = list(args)
+        self.elements = list(dict.fromkeys(args))
 
     def __contains__(self, value: Any) -> bool:
         """

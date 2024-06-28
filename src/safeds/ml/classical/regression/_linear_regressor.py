@@ -3,7 +3,6 @@ from __future__ import annotations
 import sys
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
-
 from safeds._utils import _structural_hash
 from safeds._validation import _check_bounds, _ClosedBound
 from safeds.exceptions import FittingWithChoiceError, FittingWithoutChoiceError
@@ -63,23 +62,31 @@ class LinearRegressor(Regressor):
         def _get_sklearn_model(self) -> RegressorMixin:
             """Get the model of a penalty."""
 
+        @abstractmethod
+        def _get_models_for_all_choices(self) -> list[LinearRegressor]:
+            """Get a list of all possible models, given the choices."""
+
+        @abstractmethod
+        def _contains_choice_parameters(self) -> bool:
+            """Return if any parameters of this penalty are choice instances"""
+
         @staticmethod
         def linear() -> LinearRegressor.Penalty:
             """Create a linear penalty."""
             raise NotImplementedError  # pragma: no cover
 
         @staticmethod
-        def ridge(alpha: float = 1.0) -> LinearRegressor.Penalty:
+        def ridge(alpha: float | Choice[float] = 1.0) -> LinearRegressor.Penalty:
             """Create a ridge penalty."""
             raise NotImplementedError  # pragma: no cover
 
         @staticmethod
-        def lasso(alpha: float = 1.0) -> LinearRegressor.Penalty:
+        def lasso(alpha: float | Choice[float] = 1.0) -> LinearRegressor.Penalty:
             """Create a lasso penalty."""
             raise NotImplementedError  # pragma: no cover
 
         @staticmethod
-        def elastic_net(alpha: float = 1.0, lasso_ratio: float = 0.5) -> LinearRegressor.Penalty:
+        def elastic_net(alpha: float | Choice[float] = 1.0, lasso_ratio: float | Choice[float] = 0.5) -> LinearRegressor.Penalty:
             """Create an elastic net penalty."""
             raise NotImplementedError  # pragma: no cover
 
@@ -89,7 +96,10 @@ class LinearRegressor(Regressor):
 
     def __init__(self, penalty: LinearRegressor.Penalty | None | Choice[LinearRegressor.Penalty | None] = None) -> None:
         Regressor.__init__(self)
-        self._penalty = penalty
+        if penalty is None:
+            self._penalty = LinearRegressor.Penalty.linear()
+        else:
+            self._penalty = penalty
 
     def __hash__(self) -> int:
         return _structural_hash(
@@ -102,7 +112,7 @@ class LinearRegressor(Regressor):
     # ------------------------------------------------------------------------------------------------------------------
 
     @property
-    def penalty(self) -> LinearRegressor.Penalty | None | Choice[LinearRegressor.Penalty | None]:
+    def penalty(self) -> LinearRegressor.Penalty | Choice[LinearRegressor.Penalty | None]:
         """The regularization of the model."""
         return self._penalty
 
@@ -113,11 +123,11 @@ class LinearRegressor(Regressor):
         return self._penalty._get_sklearn_model()
 
     def _check_additional_fit_preconditions(self) -> None:
-        if isinstance(self._penalty, Choice):
+        if isinstance(self._penalty, Choice) or self._penalty._contains_choice_parameters():
             raise FittingWithChoiceError
 
     def _check_additional_fit_by_exhaustive_search_preconditions(self) -> None:
-        if not isinstance(self._penalty, Choice):
+        if not isinstance(self._penalty, Choice) and not self._penalty._contains_choice_parameters():
             raise FittingWithoutChoiceError
 
     def _get_models_for_all_choices(self) -> list[LinearRegressor]:
@@ -125,7 +135,12 @@ class LinearRegressor(Regressor):
 
         models = []
         for pen in penalty_choices:
-            models.append(LinearRegressor(penalty=pen))
+            if pen is None:
+                models.append(LinearRegressor())
+            elif pen._contains_choice_parameters():
+                models.extend(pen._get_models_for_all_choices())
+            else:
+                models.append(LinearRegressor(penalty=pen))
         return models
 
 
@@ -149,12 +164,18 @@ class _Linear(LinearRegressor.Penalty):
     def __str__(self) -> str:
         return "Linear"
 
+    def _contains_choice_parameters(self) -> bool:
+        return False
+
     # ------------------------------------------------------------------------------------------------------------------
     # Template methods
     # ------------------------------------------------------------------------------------------------------------------
 
     def _get_sklearn_model(self) -> SklearnLinear:
         return SklearnLinear(n_jobs=-1)
+
+    def _get_models_for_all_choices(self) -> list[LinearRegressor]:
+        raise NotImplementedError   # pragma: no cover
 
 
 class _Ridge(LinearRegressor.Penalty):
@@ -189,12 +210,15 @@ class _Ridge(LinearRegressor.Penalty):
     def __str__(self) -> str:
         return f"Ridge(alpha={self._alpha})"
 
+    def _contains_choice_parameters(self) -> bool:
+        return isinstance(self._alpha, Choice)
+
     # ------------------------------------------------------------------------------------------------------------------
     # Properties
     # ------------------------------------------------------------------------------------------------------------------
 
     @property
-    def alpha(self) -> float:
+    def alpha(self) -> float | Choice[float]:
         """The regularization of the linear penalty."""
         return self._alpha
 
@@ -204,6 +228,13 @@ class _Ridge(LinearRegressor.Penalty):
 
     def _get_sklearn_model(self) -> SklearnRidge:
         return SklearnRidge(alpha=self._alpha)
+
+    def _get_models_for_all_choices(self) -> list[LinearRegressor]:
+        assert isinstance(self._alpha, Choice)
+        models = []
+        for alpha in self._alpha:
+            models.append(LinearRegressor(penalty=LinearRegressor.Penalty.ridge(alpha=alpha)))
+        return models
 
 
 class _Lasso(LinearRegressor.Penalty):
@@ -234,12 +265,15 @@ class _Lasso(LinearRegressor.Penalty):
     def __str__(self) -> str:
         return f"Lasso(alpha={self._alpha})"
 
+    def _contains_choice_parameters(self) -> bool:
+        return isinstance(self._alpha, Choice)
+
     # ------------------------------------------------------------------------------------------------------------------
     # Properties
     # ------------------------------------------------------------------------------------------------------------------
 
     @property
-    def alpha(self) -> float:
+    def alpha(self) -> float | Choice[float]:
         """The regularization of the linear penalty."""
         return self._alpha
 
@@ -249,6 +283,13 @@ class _Lasso(LinearRegressor.Penalty):
 
     def _get_sklearn_model(self) -> SklearnLasso:
         return SklearnLasso(alpha=self._alpha)
+
+    def _get_models_for_all_choices(self) -> list[LinearRegressor]:
+        assert isinstance(self._alpha, Choice)
+        models = []
+        for alpha in self._alpha:
+            models.append(LinearRegressor(penalty=LinearRegressor.Penalty.lasso(alpha=alpha)))
+        return models
 
 
 class _ElasticNet(LinearRegressor.Penalty):
@@ -287,19 +328,22 @@ class _ElasticNet(LinearRegressor.Penalty):
     def __str__(self) -> str:
         return f"ElasticNet(alpha={self._alpha}, lasso_ratio={self._lasso_ratio})"
 
+    def _contains_choice_parameters(self) -> bool:
+        return isinstance(self._alpha, Choice) or isinstance(self._lasso_ratio, Choice)
+
     # ------------------------------------------------------------------------------------------------------------------
     # Properties
     # ------------------------------------------------------------------------------------------------------------------
 
     @property
-    def alpha(self) -> float:
+    def alpha(self) -> float | Choice[float]:
         """The regularization of the linear penalty."""
         return self._alpha
 
     @property
-    def lasso_ratio(self) -> float:
+    def lasso_ratio(self) -> float | Choice[float]:
         """The regularization of the linear penalty."""
-        return self._alpha
+        return self._lasso_ratio
 
     # ------------------------------------------------------------------------------------------------------------------
     # Template methods
@@ -307,6 +351,16 @@ class _ElasticNet(LinearRegressor.Penalty):
 
     def _get_sklearn_model(self) -> SklearnElasticNet:
         return SklearnElasticNet(alpha=self._alpha, l1_ratio=self._lasso_ratio)
+
+    def _get_models_for_all_choices(self) -> list[LinearRegressor]:
+        alpha_choices = self._alpha if isinstance(self._alpha, Choice) else [self._alpha]
+        lasso_choices = self._lasso_ratio if isinstance(self._lasso_ratio, Choice) else [self._lasso_ratio]
+
+        models = []
+        for alpha in self._alpha:
+            for lasso in lasso_choices:
+                models.append(LinearRegressor(penalty=LinearRegressor.Penalty.elastic_net(alpha=alpha, lasso_ratio=lasso)))
+        return models
 
 
 # Override the methods with classes, so they can be used in `isinstance` calls. Unlike methods, classes define a type.
