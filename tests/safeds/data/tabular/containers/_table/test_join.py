@@ -1,5 +1,6 @@
-import pytest  # noqa: I001
+import pytest
 from safeds.data.tabular.containers import Table
+
 
 @pytest.mark.parametrize(
     ("table_left", "table_right", "left_names", "right_names", "mode", "table_expected"), 
@@ -46,5 +47,11 @@ from safeds.data.tabular.containers import Table
         ),
     ],
 )
-def test_join(table_left: Table, table_right: Table, left_names: str | list[str], right_names: str | list[str], mode: str, table_expected: Table)-> None:
-    assert table_left.join(table_right, left_names, right_names, mode=mode) == table_expected
+def test_join(
+    table_left: Table,
+    table_right: Table,
+    left_names: list[str],
+    right_names: list[str],
+    mode: str,
+    table_expected: Table,
+) -> None:    assert table_left.join(table_right, left_names, right_names, mode=mode) == table_expected
