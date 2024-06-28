@@ -175,7 +175,7 @@ class TestFitAndTransform:
     )
 
 
-    def test_should_return_fitted_transformer_and_transformed_table_with_correct_range(
+    def test_should_return_fitted_transformer_and_transformed_table_with_correct_values(
         self,
         table: Table,
         column_names: list[str] | None,  # noqa: ARG002
