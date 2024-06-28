@@ -32,50 +32,85 @@ class TablePlotter:
     def __init__(self, table: Table):
         self._table: Table = table
 
+    # def box_plots(self) -> Image:
+    #     """
+    #     Plot a boxplot for every numerical column.
+
+    #     Returns
+    #     -------
+    #     plot:
+    #         The plot as an image.
+
+    #     Raises
+    #     ------
+    #     NonNumericColumnError
+    #         If the table contains only non-numerical columns.
+
+    #     Examples
+    #     --------
+    #     >>> from safeds.data.tabular.containers import Table
+    #     >>> table = Table({"a":[1, 2], "b": [3, 42]})
+    #     >>> image = table.plot.box_plots()
+    #     """
+    #     # TODO: implement using matplotlib and polars
+    #     import matplotlib.pyplot as plt
+    #     import seaborn as sns
+
+    #     numerical_table = self._table.remove_non_numeric_columns()
+    #     if numerical_table.column_count == 0:
+    #         raise NonNumericColumnError("This table contains only non-numerical columns.")
+    #     col_wrap = min(numerical_table.column_count, 3)
+
+    #     data = numerical_table._lazy_frame.melt(value_vars=numerical_table.column_names).collect()
+    #     grid = sns.FacetGrid(data, col="variable", col_wrap=col_wrap, sharex=False, sharey=False)
+    #     with warnings.catch_warnings():
+    #         warnings.filterwarnings(
+    #             "ignore",
+    #             message="Using the boxplot function without specifying `order` is likely to produce an incorrect plot.",
+    #         )
+    #         grid.map(sns.boxplot, "variable", "value")
+    #     grid.set_xlabels("")
+    #     grid.set_ylabels("")
+    #     grid.set_titles("{col_name}")
+    #     for axes in grid.axes.flat:
+    #         axes.set_xticks([])
+    #     plt.tight_layout()
+    #     fig = grid.fig
+
+    #     return _figure_to_image(fig)
     def box_plots(self) -> Image:
         """
-        Plot a boxplot for every numerical column.
+        Create a box plot for the values in the column. This is only possible for numeric columns.
 
         Returns
         -------
         plot:
-            The plot as an image.
+            The box plot as an image.
 
         Raises
         ------
-        NonNumericColumnError
-            If the table contains only non-numerical columns.
+        TypeError
+            If the column is not numeric.
 
         Examples
         --------
-        >>> from safeds.data.tabular.containers import Table
-        >>> table = Table({"a":[1, 2], "b": [3, 42]})
-        >>> image = table.plot.box_plots()
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("test", [1, 2, 3])
+        >>> boxplot = column.plot.box_plot()
         """
-        # TODO: implement using matplotlib and polars
-        import matplotlib.pyplot as plt
-        import seaborn as sns
-
         numerical_table = self._table.remove_non_numeric_columns()
         if numerical_table.column_count == 0:
-            raise NonNumericColumnError("This table contains only non-numerical columns.")
-        col_wrap = min(numerical_table.column_count, 3)
+            raise NonNumericColumnError("This table contains only non-numerical columns.")        
+        import matplotlib.pyplot as plt
 
-        data = numerical_table._lazy_frame.melt(value_vars=numerical_table.column_names).collect()
-        grid = sns.FacetGrid(data, col="variable", col_wrap=col_wrap, sharex=False, sharey=False)
-        with warnings.catch_warnings():
-            warnings.filterwarnings(
-                "ignore",
-                message="Using the boxplot function without specifying `order` is likely to produce an incorrect plot.",
-            )
-            grid.map(sns.boxplot, "variable", "value")
-        grid.set_xlabels("")
-        grid.set_ylabels("")
-        grid.set_titles("{col_name}")
-        for axes in grid.axes.flat:
-            axes.set_xticks([])
-        plt.tight_layout()
-        fig = grid.fig
+        fig, ax = plt.subplots()
+        ax.boxplot(
+            numerical_table.to_columns(),
+            patch_artist=True,
+            labels=numerical_table.column_names,
+        )
+        fig.tight_layout()
+        
 
         return _figure_to_image(fig)
 
