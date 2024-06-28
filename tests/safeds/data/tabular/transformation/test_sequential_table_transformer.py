@@ -151,12 +151,12 @@ class TestInverseTransform:
         with pytest.raises(TransformerNotInvertableError, match=r".*is not invertable."):
             sequentialTableTransformer.inverse_transform(transformed_table)
 
-    # Currently doesn't work as StandardScaler changes int to float and OneHotEncoder changes column order.
+    # Fails because of floating point inprecision. 1.0000000000000004 != 1
     # @pytest.mark.parametrize(
     #         "transformers",[
     #             [OneHotEncoder()],
-    #             [OneHotEncoder(),StandardScaler()],
-    #             [LabelEncoder(column_names="col2", partial_order=["a","b","c"]), OneHotEncoder(), StandardScaler()],
+    #             [OneHotEncoder(),StandardScaler(column_names=["col1","col3"])],
+    #             [LabelEncoder(column_names="col2", partial_order=["a","b","c"]), OneHotEncoder(), StandardScaler(column_names=["col1","col3"])],
     #             [LabelEncoder(),LabelEncoder()],
     #             ],
     #         ids=["1 Transformer", "2 Transformers", "3 Transformers", "Duplicate Transformers"],
@@ -174,7 +174,7 @@ class TestInverseTransform:
     #     sequentialTableTransformer = sequentialTableTransformer.fit(test_table)
     #     transformed_table = sequentialTableTransformer.transform(test_table)
     #     inverse_transformed_table = sequentialTableTransformer.inverse_transform(transformed_table)
-    #     assert_tables_equal(test_table, inverse_transformed_table)
+    #     assert_tables_equal(test_table, inverse_transformed_table, ignore_column_order=True, ignore_types=True)
 
     def test_should_raise_TransformerNotFittedError_if_not_fited(self):
         one_hot = OneHotEncoder()
