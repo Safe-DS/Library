@@ -96,9 +96,10 @@ class LinearRegressor(Regressor):
 
     def __init__(self, penalty: LinearRegressor.Penalty | None | Choice[LinearRegressor.Penalty | None] = None) -> None:
         Regressor.__init__(self)
-        self._penalty = penalty
         if penalty is None:
-            self._penalty = LinearRegressor.Penalty.linear()
+            self._penalty: LinearRegressor.Penalty | None | Choice[LinearRegressor.Penalty | None] = LinearRegressor.Penalty.linear()
+        else:
+            self._penalty: LinearRegressor.Penalty | None | Choice[LinearRegressor.Penalty | None] = penalty
 
 
     def __hash__(self) -> int:
@@ -120,14 +121,15 @@ class LinearRegressor(Regressor):
         return LinearRegressor(penalty=self._penalty)
 
     def _get_sklearn_model(self) -> RegressorMixin:
-        return self._penalty._get_sklearn_model()
+        assert not isinstance(self.penalty, Choice)
+        return self.penalty._get_sklearn_model()
 
     def _check_additional_fit_preconditions(self) -> None:
-        if isinstance(self._penalty, Choice) or self._penalty._contains_choice_parameters():
+        if isinstance(self._penalty, Choice) or self.penalty._contains_choice_parameters():
             raise FittingWithChoiceError
 
     def _check_additional_fit_by_exhaustive_search_preconditions(self) -> None:
-        if not isinstance(self._penalty, Choice) and not self._penalty._contains_choice_parameters():
+        if not isinstance(self._penalty, Choice) and not self.penalty._contains_choice_parameters():
             raise FittingWithoutChoiceError
 
     def _get_models_for_all_choices(self) -> list[LinearRegressor]:
