@@ -55,7 +55,7 @@ class TablePlotter:
         """
         numerical_table = self._table.remove_non_numeric_columns()
         if numerical_table.column_count == 0:
-            raise NonNumericColumnError("This table contains only non-numerical columns.")        
+            raise NonNumericColumnError("This table contains only non-numerical columns.")
         import matplotlib.pyplot as plt
 
         fig, ax = plt.subplots()
@@ -65,7 +65,6 @@ class TablePlotter:
             labels=numerical_table.column_names,
         )
         fig.tight_layout()
-        
 
         return _figure_to_image(fig)
 
