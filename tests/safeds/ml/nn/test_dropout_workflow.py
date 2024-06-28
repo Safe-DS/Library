@@ -1,7 +1,6 @@
 import pytest
 from safeds._config import _get_device
 from safeds.data.tabular.containers import Table
-from safeds.data.tabular.transformation import StandardScaler
 from safeds.ml.nn import (
     NeuralNetworkRegressor,
 )
@@ -14,7 +13,7 @@ from safeds.ml.nn.layers import (
 )
 from torch.types import Device
 
-from tests.helpers import configure_test_with_device, get_devices, get_devices_ids, resolve_resource_path
+from tests.helpers import configure_test_with_device, get_devices, get_devices_ids
 
 
 @pytest.mark.parametrize("device", get_devices(), ids=get_devices_ids())
