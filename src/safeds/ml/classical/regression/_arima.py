@@ -136,7 +136,7 @@ class ArimaModelRegressor:
         # make a table without
         forecast_horizon = len(time_series.target._series.to_numpy())
         result_table = time_series.to_table()
-        result_table = result_table.remove_columns([time_series.target.name], ignore_unknown_names= True)
+        result_table = result_table.remove_columns([time_series.target.name], ignore_unknown_names=True)
         # Validation
         if not self.is_fitted or self._arima is None:
             raise ModelNotFittedError

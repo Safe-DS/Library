@@ -192,7 +192,7 @@ class TestPredict:
     def test_should_raise_if_dataset_misses_features(self, classifier: Classifier, valid_data: TabularDataset) -> None:
         fitted_classifier = classifier.fit(valid_data)
         with pytest.raises(DatasetMissesFeaturesError, match="[feat1, feat2]"):
-            fitted_classifier.predict(valid_data.features.remove_columns(["feat1", "feat2"], ignore_unknown_names= True))
+            fitted_classifier.predict(valid_data.features.remove_columns(["feat1", "feat2"], ignore_unknown_names=True))
 
     @pytest.mark.parametrize(
         ("invalid_data", "expected_error", "expected_error_msg"),
