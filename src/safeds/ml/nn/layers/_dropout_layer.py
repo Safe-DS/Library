@@ -91,4 +91,6 @@ class DropoutLayer(Layer):
         return (self is other) or (self._input_size == other._input_size)
 
     def __sizeof__(self) -> int:
+        if self._input_size is None:
+            raise ValueError("The input_size is not yet set.")
         return self._input_size

@@ -1,14 +1,20 @@
 import sys
 
 import pytest
-from safeds.data.image.typing import ImageSize
-from safeds.data.tabular.containers import Table
 from safeds.ml.nn.layers import DropoutLayer
-from torch import nn
+from safeds.data.tabular.containers import Table
 from safeds.exceptions import OutOfBoundsError
-
+from torch import nn
 
 class TestDropoutLayer:
+    def test_should_create_dropout_layer(self) -> None:
+        size = 10
+        layer = DropoutLayer(0.5)
+        layer._set_input_size(size)
+        assert layer.input_size == size
+        assert layer.output_size == size
+        assert isinstance(next(next(layer._get_internal_layer().modules()).children()), nn.Dropout)
+
     def test_should_check_bounds(self) -> None:
         with pytest.raises(OutOfBoundsError, match="propability must be in \(0, 1\) but was 2."):
             DropoutLayer(2)
@@ -18,10 +24,35 @@ class TestDropoutLayer:
     def test_input_size_should_be_set(self) -> None:
         with pytest.raises(ValueError, match="The input_size is not yet set."):
             layer = DropoutLayer(0.5)
-            layer.input_size()
+            layer.input_size
         with pytest.raises(ValueError, match="The input_size is not yet set."):
             layer = DropoutLayer(0.5)
-            layer.output_size()
+            layer.output_size
         with pytest.raises(ValueError, match="The input_size is not yet set."):
             layer = DropoutLayer(0.5)
             layer._get_internal_layer()
+        with pytest.raises(ValueError, match="The input_size is not yet set."):
+            layer = DropoutLayer(0.5)
+            layer.__sizeof__()
+
+    def test_propability_is_set(self) -> None:
+        propabilityToSet = 0.5
+        layer = DropoutLayer(propabilityToSet)
+        assert layer.propability == propabilityToSet
+
+class TestEq:
+    def test_should_be_equal(self) -> None:
+        assert DropoutLayer(0.5) == DropoutLayer(0.5)
+
+    def test_should_be_not_implemented(self) -> None:
+        assert DropoutLayer(0.5).__eq__(Table()) is NotImplemented
+
+class TestHash:
+    def test_hash_should_be_equal(self) -> None:
+        assert hash(DropoutLayer(0.5)) == hash(DropoutLayer(0.5))
+
+class TestSizeOf:
+    def test_should_size_be_greater_than_normal_object(self) -> None:
+        layer = DropoutLayer(0.5)
+        layer._set_input_size(10)
+        assert sys.getsizeof(layer) > sys.getsizeof(object())
