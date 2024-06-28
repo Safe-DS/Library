@@ -28,14 +28,14 @@ class TestFit:
         )
 
         with pytest.raises(ColumnNotFoundError):
-            KNearestNeighborsImputer(column_names=["col2", "col3"]).fit(table)
+            KNearestNeighborsImputer(neighbor_count=5, column_names=["col2", "col3"]).fit(table)
 
     def test_should_raise_if_table_contains_no_rows(self) -> None:
         with pytest.raises(
             ValueError,
             match=r"The KNearestNeighborsImputer cannot be fitted because the table contains 0 rows",
         ):
-            KNearestNeighborsImputer().fit(Table({"col1": []}))
+            KNearestNeighborsImputer(neighbor_count=5).fit(Table({"col1": []}))
 
     def test_should_not_change_original_transformer(self) -> None:
         table = Table(
@@ -44,7 +44,7 @@ class TestFit:
             },
         )
 
-        transformer = KNearestNeighborsImputer()
+        transformer = KNearestNeighborsImputer(neighbor_count=5)
         transformer.fit(table)
 
         assert transformer._column_names is None
@@ -60,7 +60,7 @@ class TestTransform:
             },
         )
 
-        transformer = KNearestNeighborsImputer()
+        transformer = KNearestNeighborsImputer(neighbor_count=5)
 
         table_to_transform = Table(
             {
@@ -78,7 +78,7 @@ class TestTransform:
             },
         )
 
-        transformer = KNearestNeighborsImputer()
+        transformer = KNearestNeighborsImputer(neighbor_count=5)
 
         with pytest.raises(TransformerNotFittedError):
             transformer.transform(table)
@@ -86,7 +86,7 @@ class TestTransform:
 
 class TestIsFitted:
     def test_should_return_false_before_fitting(self) -> None:
-        transformer = KNearestNeighborsImputer()
+        transformer = KNearestNeighborsImputer(neighbor_count=5)
         assert not transformer.is_fitted
 
     def test_should_return_true_after_fitting(self) -> None:
@@ -96,7 +96,7 @@ class TestIsFitted:
             },
         )
 
-        transformer = KNearestNeighborsImputer()
+        transformer = KNearestNeighborsImputer(neighbor_count=5)
         fitted_transformer = transformer.fit(table)
         assert fitted_transformer.is_fitted
 
@@ -193,7 +193,7 @@ class TestFitAndTransform:
             },
         )
 
-        KNearestNeighborsImputer().fit_and_transform(table)
+        KNearestNeighborsImputer(neighbor_count=5).fit_and_transform(table)
 
         expected = Table(
             {
