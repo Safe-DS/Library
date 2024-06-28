@@ -1,7 +1,5 @@
-import pytest
+import pytest  # noqa: I001
 from safeds.data.tabular.containers import Table
-from safeds.exceptions import ColumnNotFoundError
-
 
 @pytest.mark.parametrize(
     ("table_left", "table_right", "left_names", "right_names", "mode", "table_expected"), 
