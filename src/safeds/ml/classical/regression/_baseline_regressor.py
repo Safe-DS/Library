@@ -13,8 +13,8 @@ from safeds.exceptions import (
 from safeds.ml.classical.regression import (
     AdaBoostRegressor,
     DecisionTreeRegressor,
-    ElasticNetRegressor,
     GradientBoostingRegressor,
+    LinearRegressor,
     RandomForestRegressor,
     Regressor,
     SupportVectorRegressor,
@@ -44,15 +44,15 @@ class BaselineRegressor:
         self._list_of_model_types = [
             AdaBoostRegressor(),
             DecisionTreeRegressor(),
-            ElasticNetRegressor(alpha=0.0),
-            ElasticNetRegressor(lasso_ratio=0),
+            LinearRegressor(),
+            LinearRegressor(LinearRegressor.Penalty.ridge()),
             RandomForestRegressor(),
             SupportVectorRegressor(),
         ]
 
         if include_slower_models:
             self._list_of_model_types.extend(
-                [ElasticNetRegressor(), ElasticNetRegressor(lasso_ratio=1), GradientBoostingRegressor()],
+                [LinearRegressor(LinearRegressor.Penalty.elastic_net()), LinearRegressor(LinearRegressor.Penalty.lasso()), GradientBoostingRegressor()],
             )  # pragma: no cover
 
         self._fitted_models: list[Regressor] = []

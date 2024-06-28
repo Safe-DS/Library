@@ -21,7 +21,7 @@ from safeds.exceptions import (
 from safeds.ml.classical.regression import (
     AdaBoostRegressor,
     DecisionTreeRegressor,
-    ElasticNetRegressor,
+    LinearRegressor,
     GradientBoostingRegressor,
     KNearestNeighborsRegressor,
     RandomForestRegressor,
@@ -52,9 +52,9 @@ def regressors() -> list[Regressor]:
     return [
         AdaBoostRegressor(),
         DecisionTreeRegressor(),
-        ElasticNetRegressor(),
         GradientBoostingRegressor(),
         KNearestNeighborsRegressor(2),
+        LinearRegressor(),
         RandomForestRegressor(),
         SupportVectorRegressor(),
     ]
@@ -76,7 +76,7 @@ def regressors_with_choices() -> list[Regressor]:
     return [
         AdaBoostRegressor(learner=Choice(AdaBoostRegressor(), None), max_learner_count=Choice(1, 2), learning_rate=Choice(0.1, 0.2)),
         DecisionTreeRegressor(max_depth=Choice(1, 2), min_sample_count_in_leaves=Choice(1, 2)),
-        ElasticNetRegressor(alpha=Choice(0, 0.5, 1), lasso_ratio=Choice(0, 0.5, 1)),
+        LinearRegressor(penalty=Choice(LinearRegressor.Penalty.ridge(), LinearRegressor.Penalty.lasso())),
         GradientBoostingRegressor(tree_count=Choice(1, 2), learning_rate=Choice(0.1, 0.2)),
         KNearestNeighborsRegressor(neighbor_count=Choice(1, 2)),
         RandomForestRegressor(tree_count=Choice(1, 2), max_depth=Choice(1, 2), min_sample_count_in_leaves=Choice(1, 2)),
