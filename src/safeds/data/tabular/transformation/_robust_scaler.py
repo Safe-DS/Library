@@ -86,10 +86,23 @@ class RobustScaler(InvertibleTableTransformer):
             raise ValueError("The RobustScaler cannot be fitted because the table contains 0 rows")
 
         # Learn the transformation (ddof=0 is used to match the behavior of scikit-learn)
+        # n-tiles = [0.25, 0.125, 0.0675]
         _data_median = table._lazy_frame.select(column_names).median().collect()
         q1 = table._lazy_frame.select(column_names).quantile(0.25).collect()
         q3 = table._lazy_frame.select(column_names).quantile(0.75).collect()
         _data_scale = q3 - q1
+
+        for col in column_names:
+            if _data_scale.select(col).value(0) == 0:
+                q1 = table._lazy_frame.select(column_names).quantile(0.125).collect()
+                q3 = table._lazy_frame.select(column_names).quantile(0.875).collect()
+                _data_scale.get_column(col).value(0) = q3 - q1
+                if _data_scale.select(col).first() == 0:
+                    q1 = table._lazy_frame.select(column_names).quantile(0.0675).collect()
+                    q3 = table._lazy_frame.select(column_names).quantile(0.9325).collect()
+                    _data_scale.get_column(col).first = q3 - q1
+                    if _data_scale.select(col).first() == 0:
+                        _data_scale.get_column(col).first = 10 ** 5
 
         # Create a copy with the learned transformation
         result = RobustScaler(column_names=column_names)
