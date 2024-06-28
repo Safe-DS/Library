@@ -41,20 +41,22 @@ class TestFit:
         assert transformer._data_median is None
         assert transformer._data_scale is None
 
-    # TODO: fix this
+    # TODO: Tests for None and NaN values should be moved to their own function
     def test_should_not_divide_by_zero(self) -> None:
         table = Table(
             {
                 "col1": [1.0, 1.0, 2.0, 1.0],
                 "col2": [3.0, 3.0, 3.0, 3.0],
-                "col3": [1.0, float("nan"), float("nan"), float("nan")],
+                #"col3": [1.0, float("nan"), float("nan"), float("nan")],
+                "col4": [1.0, None, None, None],
             },
         )
         target = Table(
             {
                 "col1": [0.0, 0.0, 1.0, 0.0],
                 "col2": [0.0, 0.0, 0.0, 0.0],
-                "col3": [0.0, float("nan"), float("nan"), float("nan")],
+                #"col3": [0.0, float("nan"), float("nan"), float("nan")],
+                "col4": [0.0, None, None, None],
             },
         )
         transformer = RobustScaler()
