@@ -4,12 +4,13 @@ from typing import TYPE_CHECKING, Any
 
 from safeds._utils import _structural_hash
 from safeds._validation import _check_bounds, _OpenBound
+from safeds.ml.nn.typing import ModelImageSize
 
 from ._layer import Layer
 
 if TYPE_CHECKING:
     from torch import nn
-    from safeds.ml.nn.typing import ModelImageSize
+
 
 class DropoutLayer(Layer):
     """
@@ -32,7 +33,7 @@ class DropoutLayer(Layer):
         self.propability = propability
         self._input_size: int | ModelImageSize | None = None
 
-    def _get_internal_layer(self, **kwargs: Any) -> nn.Module:
+    def _get_internal_layer(self, **kwargs: Any) -> nn.Module:  # noqa: ARG002
         from ._internal_layers import _InternalDropoutLayer  # slow import on global level
 
         if self._input_size is None:
@@ -40,7 +41,7 @@ class DropoutLayer(Layer):
                 "The input_size is not yet set. The internal layer can only be created when the input_size is set.",
             )
         return _InternalDropoutLayer(self.propability)
-    
+
     @property
     def input_size(self) -> int | ModelImageSize:
         """
@@ -59,7 +60,7 @@ class DropoutLayer(Layer):
         if self._input_size is None:
             raise ValueError("The input_size is not yet set.")
         return self._input_size
-    
+
     @property
     def output_size(self) -> int | ModelImageSize:
         """
@@ -78,7 +79,7 @@ class DropoutLayer(Layer):
         if self._input_size is None:
             raise ValueError("The input_size is not yet set.")
         return self._input_size
-    
+
     def _set_input_size(self, input_size: int | ModelImageSize) -> None:
         self._input_size = input_size
 

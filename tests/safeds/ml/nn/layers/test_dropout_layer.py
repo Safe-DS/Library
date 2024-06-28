@@ -1,10 +1,11 @@
 import sys
 
 import pytest
-from safeds.ml.nn.layers import DropoutLayer
 from safeds.data.tabular.containers import Table
 from safeds.exceptions import OutOfBoundsError
+from safeds.ml.nn.layers import DropoutLayer
 from torch import nn
+
 
 class TestDropoutLayer:
     def test_should_create_dropout_layer(self) -> None:
@@ -24,14 +25,14 @@ class TestDropoutLayer:
     def test_input_size_should_be_set(self) -> None:
         layer = DropoutLayer(0.5)
         with pytest.raises(ValueError, match=r"The input_size is not yet set."):
-            layer.input_size
-        
+            layer.input_size  # noqa: B018
+
         with pytest.raises(ValueError, match=r"The input_size is not yet set."):
-            layer.output_size
-        
+            layer.output_size  # noqa: B018
+
         with pytest.raises(ValueError, match=r"The input_size is not yet set."):
             layer._get_internal_layer()
-        
+
         with pytest.raises(ValueError, match=r"The input_size is not yet set."):
             layer.__sizeof__()
 
