@@ -1707,7 +1707,8 @@ class Table:
         rightNames: str | list[str], 
         *, mode: Literal["inner", "left", "outer"] = "inner",
         ) -> Table:
-        self._data_frame().join(rightTable )  
+        joined_dataframe = self._data_frame.join(rightTable._data_frame, left_on=left_names, right_on=rightNames, how=mode)
+        return self._from_polars_data_frame(joined_dataframe)
 
     def transform_table(self, fitted_transformer: TableTransformer) -> Table:
         """
