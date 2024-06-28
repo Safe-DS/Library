@@ -30,7 +30,7 @@ class DropoutLayer(Layer):
     def __init__(self, propability: float):
         _check_bounds("propability", propability, lower_bound=_OpenBound(0), upper_bound=_OpenBound(1))
         self.propability = propability
-        self._input_size: int | None = None
+        self._input_size: int | ModelImageSize | None = None
 
     def _get_internal_layer(self, **kwargs: Any) -> nn.Module:
         from ._internal_layers import _InternalDropoutLayer  # slow import on global level
@@ -42,7 +42,7 @@ class DropoutLayer(Layer):
         return _InternalDropoutLayer(self.propability)
     
     @property
-    def input_size(self) -> int:
+    def input_size(self) -> int | ModelImageSize:
         """
         Get the input_size of this layer.
 
@@ -61,7 +61,7 @@ class DropoutLayer(Layer):
         return self._input_size
     
     @property
-    def output_size(self) -> int:
+    def output_size(self) -> int | ModelImageSize:
         """
         Get the output_size of this layer.
 
@@ -79,7 +79,7 @@ class DropoutLayer(Layer):
             raise ValueError("The input_size is not yet set.")
         return self._input_size
     
-    def _set_input_size(self, input_size: int) -> None:
+    def _set_input_size(self, input_size: int | ModelImageSize) -> None:
         self._input_size = input_size
 
     def __hash__(self) -> int:

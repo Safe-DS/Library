@@ -16,29 +16,26 @@ class TestDropoutLayer:
         assert isinstance(next(next(layer._get_internal_layer().modules()).children()), nn.Dropout)
 
     def test_should_check_bounds(self) -> None:
-        with pytest.raises(OutOfBoundsError, match="propability must be in \(0, 1\) but was 2."):
+        with pytest.raises(OutOfBoundsError, match=r"propability must be in \(0, 1\) but was 2."):
             DropoutLayer(2)
-        with pytest.raises(OutOfBoundsError, match="propability must be in \(0, 1\) but was -1."):
+        with pytest.raises(OutOfBoundsError, match=r"propability must be in \(0, 1\) but was -1."):
             DropoutLayer(-1)
 
     def test_input_size_should_be_set(self) -> None:
-        with pytest.raises(ValueError, match="The input_size is not yet set."):
-            layer = DropoutLayer(0.5)
+        layer = DropoutLayer(0.5)
+        with pytest.raises(ValueError, match=r"The input_size is not yet set."):
             layer.input_size
-        with pytest.raises(ValueError, match="The input_size is not yet set."):
-            layer = DropoutLayer(0.5)
+        with pytest.raises(ValueError, match=r"The input_size is not yet set."):
             layer.output_size
-        with pytest.raises(ValueError, match="The input_size is not yet set."):
-            layer = DropoutLayer(0.5)
+        with pytest.raises(ValueError, match=r"The input_size is not yet set."):
             layer._get_internal_layer()
-        with pytest.raises(ValueError, match="The input_size is not yet set."):
-            layer = DropoutLayer(0.5)
+        with pytest.raises(ValueError, match=r"The input_size is not yet set."):
             layer.__sizeof__()
 
     def test_propability_is_set(self) -> None:
-        propabilityToSet = 0.5
-        layer = DropoutLayer(propabilityToSet)
-        assert layer.propability == propabilityToSet
+        propability_to_set = 0.5
+        layer = DropoutLayer(propability_to_set)
+        assert layer.propability == propability_to_set
 
 class TestEq:
     def test_should_be_equal(self) -> None:
