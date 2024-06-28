@@ -9,7 +9,8 @@ def training_set() -> TabularDataset:
     table = Table({"col1": [1, 2, 3, 4], "col2": [1, 2, 3, 4]})
     return table.to_tabular_dataset(target_name="col1")
 
-class TestC: 
+
+class TestC:
     def test_should_be_passed_to_fitted_model(self, training_set: TabularDataset) -> None:
         fitted_model = LogisticClassifier(c=2).fit(training_set)
         assert fitted_model.c == 2

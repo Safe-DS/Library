@@ -17,9 +17,10 @@ class LogisticClassifier(Classifier):
     # Dunder methods
     # ------------------------------------------------------------------------------------------------------------------
 
-    def __init__(self, c: float=1.0) -> None:
+    def __init__(self, c: float = 1.0) -> None:
         super().__init__()
         self.c = c
+
     def __hash__(self) -> int:
         return _structural_hash(
             super().__hash__(),
@@ -30,13 +31,13 @@ class LogisticClassifier(Classifier):
     # ------------------------------------------------------------------------------------------------------------------
 
     def _clone(self) -> LogisticClassifier:
-        return LogisticClassifier(c=self.c)  
-        
+        return LogisticClassifier(c=self.c)
+
     def _get_sklearn_model(self) -> ClassifierMixin:
         from sklearn.linear_model import LogisticRegression as SklearnLogisticRegression
 
         return SklearnLogisticRegression(
             random_state=_get_random_seed(),
             n_jobs=-1,
-            C=self.c, 
+            C=self.c,
         )
