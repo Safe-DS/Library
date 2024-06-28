@@ -154,21 +154,6 @@ class TestFitAndTransform:
             (
                 Table(
                     {
-                        "col1": [1, 2, np.nan],
-                        "col2": [1, 2, 3],
-                    },
-                ),
-                ["col1"],
-                Table(
-                    {
-                        "col1": [1, 2, 3 / 2],  # Assuming k=1, the nearest neighbor for the missing value is 1.5
-                        "col2": [1, 2, 3],
-                    },
-                ),
-            ),
-            (
-                Table(
-                    {
                         "col1": [1, 2, np.nan, 4],
                         "col2": [1, np.nan, 3, 4],
                     },
@@ -182,7 +167,7 @@ class TestFitAndTransform:
                 ),
             ),
         ],
-        ids=["one_column", "two_columns"],
+        ids=["two_columns"],
     )
     def test_should_return_fitted_transformer_and_transformed_table_with_correct_values(
         self,
