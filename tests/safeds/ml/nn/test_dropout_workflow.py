@@ -9,7 +9,8 @@ from safeds.ml.nn.converters import (
     InputConversionTable,
 )
 from safeds.ml.nn.layers import (
-    DropoutLayer,ForwardLayer,
+    DropoutLayer,
+    ForwardLayer,
 )
 from torch.types import Device
 
