@@ -31,7 +31,7 @@ class KNearestNeighborsImputer(TableTransformer):
 
     def __init__(
         self,
-        neighbor_count: int = 5,
+        neighbor_count: int,
         *,
         column_names: str | list[str] | None = None,
         value_to_replace: float | str | None = None,
