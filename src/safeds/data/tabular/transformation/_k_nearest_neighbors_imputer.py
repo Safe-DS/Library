@@ -116,7 +116,7 @@ class KNearestNeighborsImputer(TableTransformer):
         """
         Apply the learned transformation to a table.
 
-        The Table is not modified.
+        **Note:** The given table is not modified.
 
         Parameters
         ----------
