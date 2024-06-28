@@ -32,7 +32,6 @@ class TablePlotter:
     def __init__(self, table: Table):
         self._table: Table = table
 
-    
     def box_plots(self) -> Image:
         """
         Create a box plot for the values in the column. This is only possible for numeric columns.
