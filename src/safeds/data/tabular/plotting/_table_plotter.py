@@ -62,30 +62,30 @@ class TablePlotter:
         columns = numerical_table.to_columns()
         columns = [column._series.drop_nulls() for column in columns]
         number_of_columns = 3
-        number_of_rows = ceil(len(columns)/number_of_columns)
-        
+        number_of_rows = ceil(len(columns) / number_of_columns)
+
         fig, axs = plt.subplots(nrows=number_of_rows, ncols=number_of_columns)
         fig.set_size_inches(10, 6)
-        
+
         line = 0
         for i, column in enumerate(columns):
             if i % number_of_columns == 0 and i != 0:
                 line += 1
-            
+
             if number_of_rows == 1:
                 axs[i].boxplot(
                     column,
                     patch_artist=True,
                     labels=[numerical_table.column_names[i]],
                 )
-                
+
             else:
                 axs[line, i % number_of_columns].boxplot(
                     column,
                     patch_artist=True,
                     labels=[numerical_table.column_names[i]],
                 )
-        
+
         # removes unused ax indices, so there wont be empty plots
         last_filled_ax_index = len(columns) % number_of_columns
         for i in range(last_filled_ax_index, number_of_columns):
