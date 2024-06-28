@@ -4,6 +4,7 @@ import pytest
 from safeds.data.tabular.containers import Table
 from safeds.exceptions import OutOfBoundsError
 from safeds.ml.nn.layers import DropoutLayer
+from safeds.ml.nn.typing import ConstantImageSize
 from torch import nn
 
 
@@ -54,7 +55,12 @@ class TestHash:
         assert hash(DropoutLayer(0.5)) == hash(DropoutLayer(0.5))
 
 class TestSizeOf:
-    def test_should_size_be_greater_than_normal_object(self) -> None:
+    def test_should_int_size_be_greater_than_normal_object(self) -> None:
         layer = DropoutLayer(0.5)
         layer._set_input_size(10)
+        assert sys.getsizeof(layer) > sys.getsizeof(object())
+
+    def test_should_model_image_size_be_greater_than_normal_object(self) -> None:
+        layer = DropoutLayer(0.5)
+        layer._set_input_size(ConstantImageSize(1,1,1))
         assert sys.getsizeof(layer) > sys.getsizeof(object())

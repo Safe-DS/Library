@@ -95,6 +95,6 @@ class DropoutLayer(Layer):
         if self._input_size is None:
             raise ValueError("The input_size is not yet set.")
         if isinstance(self.input_size, int):
-            return self._input_size
+            return int(self._input_size)
         if isinstance(self.input_size, ModelImageSize):
             return self._input_size.__sizeof__()
