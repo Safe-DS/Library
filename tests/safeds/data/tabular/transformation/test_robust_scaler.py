@@ -47,7 +47,7 @@ class TestFit:
             {
                 "col1": [1.0, 1.0, 2.0, 1.0],
                 "col2": [3.0, 3.0, 3.0, 3.0],
-                #"col3": [1.0, float("nan"), float("nan"), float("nan")],
+                # "col3": [1.0, float("nan"), float("nan"), float("nan")],
                 "col4": [1.0, None, None, None],
             },
         )
@@ -55,15 +55,14 @@ class TestFit:
             {
                 "col1": [0.0, 0.0, 1.0, 0.0],
                 "col2": [0.0, 0.0, 0.0, 0.0],
-                #"col3": [0.0, float("nan"), float("nan"), float("nan")],
+                # "col3": [0.0, float("nan"), float("nan"), float("nan")],
                 "col4": [0.0, None, None, None],
             },
         )
         transformer = RobustScaler()
         f_transformer = transformer.fit(table)
         table = f_transformer.transform(table)
-        assert(table == target)
-
+        assert table == target
 
 
 class TestTransform:
@@ -120,6 +119,7 @@ class TestIsFitted:
         transformer = RobustScaler()
         fitted_transformer = transformer.fit(table)
         assert fitted_transformer.is_fitted
+
 
 class TestFitAndTransform:
     @pytest.mark.parametrize(
