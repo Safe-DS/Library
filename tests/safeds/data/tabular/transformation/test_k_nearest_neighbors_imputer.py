@@ -28,7 +28,8 @@ class TestFit:
 
     def test_should_raise_if_table_contains_no_rows(self) -> None:
         with pytest.raises(
-            ValueError, match=r"The KNearestNeighborsImputer cannot be fitted because the table contains 0 rows",
+            ValueError,
+            match=r"The KNearestNeighborsImputer cannot be fitted because the table contains 0 rows",
         ):
             KNearestNeighborsImputer().fit(Table({"col1": []}))
 
@@ -140,7 +141,9 @@ class TestFitAndTransform:
         expected: Table,
     ) -> None:
         fitted_transformer, transformed_table = KNearestNeighborsImputer(
-            neighbor_count=1, column_names=None, value_to_replace=np.nan,
+            neighbor_count=1,
+            column_names=None,
+            value_to_replace=np.nan,
         ).fit_and_transform(table)
         assert fitted_transformer.is_fitted
         assert transformed_table == expected
@@ -188,7 +191,8 @@ class TestFitAndTransform:
         expected: Table,
     ) -> None:
         fitted_transformer, transformed_table = KNearestNeighborsImputer(
-            neighbor_count=3, value_to_replace=np.nan,
+            neighbor_count=3,
+            value_to_replace=np.nan,
         ).fit_and_transform(table)
         assert fitted_transformer.is_fitted
         assert transformed_table == expected
