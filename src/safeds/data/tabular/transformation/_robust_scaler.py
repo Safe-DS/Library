@@ -92,8 +92,11 @@ class RobustScaler(InvertibleTableTransformer):
         q3 = table._lazy_frame.select(column_names).quantile(0.75).collect()
         _data_scale = q3 - q1
 
+        # 
+
         for col in column_names:
-            if _data_scale.select(col).value(0) == 0:
+            #if 0 in _data_scale.select(col).to_list()
+            if _data_scale.select(col).to_list() == [0]:
                 q1 = table._lazy_frame.select(column_names).quantile(0.125).collect()
                 q3 = table._lazy_frame.select(column_names).quantile(0.875).collect()
                 _data_scale.get_column(col).value(0) = q3 - q1
