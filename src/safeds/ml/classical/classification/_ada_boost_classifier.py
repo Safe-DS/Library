@@ -68,7 +68,7 @@ class AdaBoostClassifier(Classifier, _AdaBoostBase):
     # ------------------------------------------------------------------------------------------------------------------
 
     @property
-    def learner(self) -> Classifier | None | Choice[Classifier | None]:
+    def learner(self) -> Classifier | None | Choice[Classifier | None]:     # type: ignore[override]
         """The base learner used for training the ensemble."""
         return self._learner
 

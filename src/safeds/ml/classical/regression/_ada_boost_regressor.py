@@ -68,7 +68,7 @@ class AdaBoostRegressor(Regressor, _AdaBoostBase):
     # ------------------------------------------------------------------------------------------------------------------
 
     @property
-    def learner(self) -> Regressor | None | Choice[Regressor | None]:   #pragma: no cover
+    def learner(self) -> Regressor | None | Choice[Regressor | None]:   # type: ignore[override]
         """The base learner used for training the ensemble."""
         return self._learner
 

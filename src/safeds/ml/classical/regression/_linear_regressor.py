@@ -68,7 +68,7 @@ class LinearRegressor(Regressor):
 
         @abstractmethod
         def _contains_choice_parameters(self) -> bool:
-            """Return if any parameters of this penalty are choice instances"""
+            """Return if any parameters of this penalty are choice instances."""
 
         @staticmethod
         def linear() -> LinearRegressor.Penalty:
@@ -96,10 +96,10 @@ class LinearRegressor(Regressor):
 
     def __init__(self, penalty: LinearRegressor.Penalty | None | Choice[LinearRegressor.Penalty | None] = None) -> None:
         Regressor.__init__(self)
+        self._penalty = penalty
         if penalty is None:
             self._penalty = LinearRegressor.Penalty.linear()
-        else:
-            self._penalty = penalty
+
 
     def __hash__(self) -> int:
         return _structural_hash(
@@ -353,11 +353,15 @@ class _ElasticNet(LinearRegressor.Penalty):
         return SklearnElasticNet(alpha=self._alpha, l1_ratio=self._lasso_ratio)
 
     def _get_models_for_all_choices(self) -> list[LinearRegressor]:
-        alpha_choices = self._alpha if isinstance(self._alpha, Choice) else [self._alpha]
-        lasso_choices = self._lasso_ratio if isinstance(self._lasso_ratio, Choice) else [self._lasso_ratio]
+        alpha_choices = (
+            self._alpha if isinstance(self._alpha, Choice) else [self._alpha]
+        )
+        lasso_choices = (
+            self._lasso_ratio if isinstance(self._lasso_ratio, Choice) else [self._lasso_ratio]
+        )
 
         models = []
-        for alpha in self._alpha:
+        for alpha in alpha_choices:
             for lasso in lasso_choices:
                 models.append(LinearRegressor(penalty=LinearRegressor.Penalty.elastic_net(alpha=alpha, lasso_ratio=lasso)))
         return models
