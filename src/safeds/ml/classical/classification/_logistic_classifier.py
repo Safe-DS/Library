@@ -14,7 +14,7 @@ if TYPE_CHECKING:
 class LogisticClassifier(Classifier):
     """
     Regularized logistic regression for classification.
-    
+
     Parameters
     ----------
     c:
