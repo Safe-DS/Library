@@ -57,12 +57,12 @@ class _InternalConvolutional2DLayer(nn.Module):
 
 
 class _InternalDropoutLayer(nn.Module):
-    def __init__(self, propability: float) -> None:
+    def __init__(self, probability: float) -> None:
         super().__init__()
 
         _init_default_device()
 
-        self._layer = nn.Dropout(propability)
+        self._layer = nn.Dropout(probability)
 
     def forward(self, x: Tensor) -> Tensor:
         return self._layer(x)

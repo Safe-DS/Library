@@ -19,7 +19,7 @@ class DropoutLayer(Layer):
     Parameters
     ----------
     probability:
-        The probability of which the input neuron becomes an output neuron
+        The probability of which the input gets replaced with 0.
 
     Raises
     ------
@@ -30,8 +30,20 @@ class DropoutLayer(Layer):
 
     def __init__(self, probability: float):
         _check_bounds("probability", probability, lower_bound=_OpenBound(0), upper_bound=_OpenBound(1))
-        self.probability = probability
+        self._probability = probability
         self._input_size: int | ModelImageSize | None = None
+
+    @property
+    def probability(self) -> float:
+        """
+        Get the probability of this layer.
+
+        Returns
+        -------
+        result:
+            The probability being passed into this layer.
+        """
+        return self._probability
 
     def _get_internal_layer(self, **_kwargs: Any) -> nn.Module:
         from ._internal_layers import _InternalDropoutLayer  # slow import on global level
