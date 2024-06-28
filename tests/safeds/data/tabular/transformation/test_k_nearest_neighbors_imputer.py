@@ -2,12 +2,16 @@ import numpy as np
 import pytest
 from safeds.data.tabular.containers import Table
 from safeds.data.tabular.transformation import KNearestNeighborsImputer
-from safeds.exceptions import ColumnNotFoundError, TransformerNotFittedError
+from safeds.exceptions import (
+    ColumnNotFoundError,
+    OutOfBoundsError,
+    TransformerNotFittedError,
+)
 
 
 class TestInit:
     def test_should_raise_value_error(self) -> None:
-        with pytest.raises(ValueError, match='Parameter "neighbor_count" must be greater than 0.'):
+        with pytest.raises(OutOfBoundsError):
             KNearestNeighborsImputer(neighbor_count=0)
 
     def test_neighbor_count(self) -> None:

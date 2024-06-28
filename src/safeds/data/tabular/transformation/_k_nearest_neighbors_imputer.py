@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from safeds._utils import _structural_hash
-from safeds._validation import _check_columns_exist
+from safeds._validation import _check_bounds, _check_columns_exist, _ClosedBound
 from safeds.data.tabular.containers import Table
 from safeds.exceptions import TransformerNotFittedError
 
@@ -38,8 +38,7 @@ class KNearestNeighborsImputer(TableTransformer):
     ) -> None:
         super().__init__(column_names)
 
-        if neighbor_count <= 0:
-            raise ValueError('Parameter "neighbor_count" must be greater than 0.')
+        _check_bounds(name="neighbor_count", actual=neighbor_count, lower_bound=_ClosedBound(1))
 
         # parameter
         self._neighbor_count: int = neighbor_count
