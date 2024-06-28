@@ -14,7 +14,7 @@ if TYPE_CHECKING:
 
 class RobustScaler(InvertibleTableTransformer):
     """
-    The RobustScaler transforms column values to a range by removing the median and scaling to the interquartile range.
+    The RobustScaler transforms column values to a range by removing the median and scaling to the interquartile range, though for columns with high stability it might only substract the median.
 
     Parameters
     ----------

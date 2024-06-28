@@ -47,13 +47,15 @@ class TestFit:
             {
                 "col1": [1.0, 1.0, 2.0, 1.0],
                 "col2": [3.0, 3.0, 3.0, 3.0],
+                "col3": [1.0, float("nan"), float("nan"), float("nan")],
             },
         )
         target = Table(
             {
                 "col1": [0.0, 0.0, 1.0, 0.0],
                 "col2": [0.0, 0.0, 0.0, 0.0],
-            }
+                "col3": [0.0, float("nan"), float("nan"), float("nan")],
+            },
         )
         transformer = RobustScaler()
         f_transformer = transformer.fit(table)
