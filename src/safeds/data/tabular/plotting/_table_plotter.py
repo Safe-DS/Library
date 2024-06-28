@@ -34,23 +34,23 @@ class TablePlotter:
 
     def box_plots(self) -> Image:
         """
-        Create a box plot for the values in the column. This is only possible for numeric columns.
+        Create a box plot for every numerical column.
 
         Returns
         -------
         plot:
-            The box plot as an image.
+            The box plot(s) as an image.
 
         Raises
         ------
-        TypeError
-            If the column is not numeric.
+        NonNumericColumnError
+            If the table contains only non-numerical columns.
 
         Examples
         --------
-        >>> from safeds.data.tabular.containers import Column
-        >>> column = Column("test", [1, 2, 3])
-        >>> boxplot = column.plot.box_plot()
+        >>> from safeds.data.tabular.containers import Table
+        >>> table = Table({"a":[1, 2], "b": [3, 42]})
+        >>> image = table.plot.box_plots()
         """
         numerical_table = self._table.remove_non_numeric_columns()
         if numerical_table.column_count == 0:
