@@ -1702,6 +1702,13 @@ class Table:
         """
         return fitted_transformer.inverse_transform(self)
 
+    def join(self, rightTable : Table, 
+        left_names: str | list[str], 
+        rightNames: str | list[str], 
+        *, mode: Literal["inner", "left", "outer"] = "inner",
+        ) -> Table:
+        self._data_frame().join(rightTable )  
+
     def transform_table(self, fitted_transformer: TableTransformer) -> Table:
         """
         Return a new table transformed by a **fitted** transformer.
