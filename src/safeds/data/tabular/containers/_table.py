@@ -1717,7 +1717,10 @@ class Table:
         mode: Literal["inner", "left", "outer"] = "inner",
     ) -> Table:
         joined_dataframe = self._data_frame.join(
-            right_table._data_frame, left_on=left_names, right_on=right_names, how=mode,
+            right_table._data_frame,
+            left_on=left_names,
+            right_on=right_names,
+            how=mode,
         )
         return self._from_polars_data_frame(joined_dataframe)
 
