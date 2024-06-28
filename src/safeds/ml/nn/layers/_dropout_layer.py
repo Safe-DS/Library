@@ -4,12 +4,12 @@ from typing import TYPE_CHECKING, Any
 
 from safeds._utils import _structural_hash
 from safeds._validation import _check_bounds, _OpenBound
-from safeds.ml.nn.typing import ModelImageSize
 
 from ._layer import Layer
 
 if TYPE_CHECKING:
     from torch import nn
+    from safeds.ml.nn.typing import ModelImageSize
 
 class DropoutLayer(Layer):
     """
@@ -93,4 +93,7 @@ class DropoutLayer(Layer):
     def __sizeof__(self) -> int:
         if self._input_size is None:
             raise ValueError("The input_size is not yet set.")
-        return self._input_size
+        if isinstance(self.input_size, int):
+            return self._input_size
+        if isinstance(self.input_size, ModelImageSize):
+            return self._input_size.__sizeof__()

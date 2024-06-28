@@ -25,12 +25,16 @@ class TestDropoutLayer:
         layer = DropoutLayer(0.5)
         with pytest.raises(ValueError, match=r"The input_size is not yet set."):
             layer.input_size
+        
         with pytest.raises(ValueError, match=r"The input_size is not yet set."):
             layer.output_size
+        
         with pytest.raises(ValueError, match=r"The input_size is not yet set."):
             layer._get_internal_layer()
+        
         with pytest.raises(ValueError, match=r"The input_size is not yet set."):
             layer.__sizeof__()
+
 
     def test_propability_is_set(self) -> None:
         propability_to_set = 0.5
