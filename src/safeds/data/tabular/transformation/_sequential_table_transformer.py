@@ -11,7 +11,7 @@ from  ._invertible_table_transformer import InvertibleTableTransformer
 
 class SequentialTableTransformer(InvertibleTableTransformer):
     """
-    The SequentialTableTransforrmer transforms a table using multiple trnasformers in sequence.
+    The SequentialTableTransforrmer transforms a table using multiple transformers in sequence.
 
     Parameters
     ----------
@@ -24,10 +24,11 @@ class SequentialTableTransformer(InvertibleTableTransformer):
         Raises a ValueError if the list of Transformers is None or contains no transformers.
     """
 
-    def _init_(
-        self, 
-        *, 
-        transformers: list[TableTransformer]
+    def __init__(
+        self,
+        transformers: list[TableTransformer],
+        *,
+        column_names: str | list[str] | None = None
     ) -> None:
         super().__init__(None)
 
@@ -47,6 +48,16 @@ class SequentialTableTransformer(InvertibleTableTransformer):
             self._transformers,
             self._is_fitted
         )
+    
+    def is_fitted(self) -> bool:
+        """
+        Whether the transformer is fitted.
+
+        Returns
+        -------
+        True, if the transformer is fitted, False otherwise.
+        """
+        return self._is_fitted
 
     def fit(self, table: Table) -> SequentialTableTransformer:
         """
@@ -67,16 +78,19 @@ class SequentialTableTransformer(InvertibleTableTransformer):
             Raises a ValueError if the table has no rows.
         """
         if table.row_count == 0:
-            raise ValueError("The SequentialTable cannot be fitted because the table contains 0 rows")
+            raise ValueError("The SequentialTableTransformer cannot be fitted because the table contains 0 rows.")
 
         current_table: Table = table
-        result: SequentialTableTransformer = SequentialTableTransformer(
-            transformer=self._transformers, column_names=self._column_names)
+        fitted_transformers: list[TableTransformer] = []
 
-        for transformer in result._transformers:
-            transformer = transformer.fit(current_table)
-            current_table = transformer.transform(current_table)
+        for transformer in self._transformers:
+            fitted_transformer = transformer.fit(current_table)
+            fitted_transformers.append(fitted_transformer)
+            current_table = fitted_transformer.transform(current_table)
         
+        result: SequentialTableTransformer = SequentialTableTransformer(
+            transformers=fitted_transformers, column_names=self._column_names)
+
         result._is_fitted = True
         return result
     
@@ -125,8 +139,8 @@ class SequentialTableTransformer(InvertibleTableTransformer):
         ------
         TransformerNotFittedError:
             Raises a TransformerNotFittedError if the transformer isn't fitted.
-        SafeDsError:
-            Raises a SafeDsError if one of the transformers isn't invertable.
+        TransformerNotInvertableError:
+            Raises a TransformerNotInvertableError if one of the transformers isn't invertable.
         """
         if not self._is_fitted:
             raise TransformerNotFittedError
