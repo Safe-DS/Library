@@ -55,6 +55,7 @@ class TestFit:
         table = f_transformer.transform(table)
 
 
+
 class TestTransform:
     def test_should_raise_if_column_not_found(self) -> None:
         table_to_fit = Table(

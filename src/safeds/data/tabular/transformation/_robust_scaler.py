@@ -75,6 +75,7 @@ class RobustScaler(InvertibleTableTransformer):
         ValueError
             If the table contains 0 rows.
         """
+        import polars as pl
         if self._column_names is None:
             column_names = [name for name in table.column_names if table.get_column_type(name).is_numeric]
         else:
@@ -91,9 +92,10 @@ class RobustScaler(InvertibleTableTransformer):
         q1 = table._lazy_frame.select(column_names).quantile(0.25).collect()
         q3 = table._lazy_frame.select(column_names).quantile(0.75).collect()
         _data_scale = q3 - q1
+
         # To make sure there is no division by zero
-        for col in column_names:
-            _data_scale.with_columns(col = pl.when(pl.int_range(1) == 0).then(1).otherwise(pl.col(col)))
+        for col_e in column_names:
+            _data_scale = _data_scale.with_columns(pl.when(pl.col(col_e) == 0).then(1).otherwise(pl.col(col_e)).alias(col_e))
 
         # Create a copy with the learned transformation
         result = RobustScaler(column_names=column_names)
