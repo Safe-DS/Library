@@ -6,6 +6,7 @@ import apipkg
 
 if TYPE_CHECKING:
     from ._ada_boost_classifier import AdaBoostClassifier
+    from ._baseline_classifier import BaselineClassifier
     from ._classifier import Classifier
     from ._decision_tree_classifier import DecisionTreeClassifier
     from ._gradient_boosting_classifier import GradientBoostingClassifier
@@ -18,6 +19,7 @@ apipkg.initpkg(
     __name__,
     {
         "AdaBoostClassifier": "._ada_boost_classifier:AdaBoostClassifier",
+        "BaselineClassifier": "._baseline_classifier:BaselineClassifier",
         "Classifier": "._classifier:Classifier",
         "DecisionTreeClassifier": "._decision_tree_classifier:DecisionTreeClassifier",
         "GradientBoostingClassifier": "._gradient_boosting_classifier:GradientBoostingClassifier",
@@ -30,6 +32,7 @@ apipkg.initpkg(
 
 __all__ = [
     "AdaBoostClassifier",
+    "BaselineClassifier",
     "Classifier",
     "DecisionTreeClassifier",
     "GradientBoostingClassifier",

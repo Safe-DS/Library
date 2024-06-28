@@ -642,6 +642,8 @@ class Table:
         self,
         names: str | list[str],
         /,
+        *,
+        ignore_unknown_names: bool = False,
     ) -> Table:
         """
         Return a new table without the specified columns.
@@ -649,13 +651,14 @@ class Table:
         **Notes:**
 
         - The original table is not modified.
-        - This method does not raise if a column does not exist. You can use it to ensure that the resulting table does
-          not contain certain columns.
 
         Parameters
         ----------
         names:
             The names of the columns to remove.
+        ignore_unknown_names:
+            If set to True, columns that are not present in the table will be ignored.
+            If set to False, an error will be raised if any of the specified columns do not exist.
 
         Returns
         -------
@@ -677,7 +680,7 @@ class Table:
         |   6 |
         +-----+
 
-        >>> table.remove_columns(["c"])
+        >>> table.remove_columns(["c"], ignore_unknown_names=True)
         +-----+-----+
         |   a |   b |
         | --- | --- |
@@ -690,6 +693,9 @@ class Table:
         """
         if isinstance(names, str):
             names = [names]
+
+        if not ignore_unknown_names:
+            _check_columns_exist(self, names)
 
         return Table._from_polars_lazy_frame(
             self._lazy_frame.drop(names),
@@ -931,7 +937,7 @@ class Table:
         _check_columns_dont_exist(self, [column.name for column in new_columns], old_name=old_name)
 
         if len(new_columns) == 0:
-            return self.remove_columns(old_name)
+            return self.remove_columns(old_name, ignore_unknown_names=True)
 
         if len(new_columns) == 1:
             new_column = new_columns[0]
