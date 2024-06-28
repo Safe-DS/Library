@@ -20,10 +20,12 @@ class TestFit:
         )
 
         with pytest.raises(ColumnNotFoundError):
-            KNearestNeighborsImputer(column_names=["col2", "col3"]).fit(table) 
-    
+            KNearestNeighborsImputer(column_names=["col2", "col3"]).fit(table)
+
     def test_should_raise_if_table_contains_no_rows(self) -> None:
-        with pytest.raises(ValueError, match=r"The KNearestNeighborsImputer cannot be fitted because the table contains 0 rows"):
+        with pytest.raises(
+            ValueError, match=r"The KNearestNeighborsImputer cannot be fitted because the table contains 0 rows",
+        ):
             KNearestNeighborsImputer().fit(Table({"col1": []}))
 
     def test_should_not_change_original_transformer(self) -> None:
@@ -133,7 +135,9 @@ class TestFitAndTransform:
         column_names: list[str] | None,  # noqa: ARG002
         expected: Table,
     ) -> None:
-        fitted_transformer, transformed_table = KNearestNeighborsImputer(neighbor_count=1,column_names=None, value_to_replace=np.nan).fit_and_transform(table)
+        fitted_transformer, transformed_table = KNearestNeighborsImputer(
+            neighbor_count=1, column_names=None, value_to_replace=np.nan,
+        ).fit_and_transform(table)
         assert fitted_transformer.is_fitted
         assert transformed_table == expected
 
@@ -150,7 +154,7 @@ class TestFitAndTransform:
                 ["col1"],
                 Table(
                     {
-                        "col1": [1, 2, 3/2],  # Assuming k=1, the nearest neighbor for the missing value is 1.5
+                        "col1": [1, 2, 3 / 2],  # Assuming k=1, the nearest neighbor for the missing value is 1.5
                         "col2": [1, 2, 3],
                     },
                 ),
@@ -165,23 +169,23 @@ class TestFitAndTransform:
                 ["col1"],
                 Table(
                     {
-                        "col1": [1, 2, 7/3, 4],  # Assuming k=1, the nearest neighbor for the missing value is 2.
-                        "col2": [1, 8/3, 3, 4],
+                        "col1": [1, 2, 7 / 3, 4],  # Assuming k=1, the nearest neighbor for the missing value is 2.
+                        "col2": [1, 8 / 3, 3, 4],
                     },
                 ),
             ),
         ],
         ids=["one_column", "two_columns"],
     )
-
-
     def test_should_return_fitted_transformer_and_transformed_table_with_correct_values(
         self,
         table: Table,
         column_names: list[str] | None,  # noqa: ARG002
         expected: Table,
     ) -> None:
-        fitted_transformer, transformed_table = KNearestNeighborsImputer(neighbor_count=3, value_to_replace=np.nan).fit_and_transform(table)
+        fitted_transformer, transformed_table = KNearestNeighborsImputer(
+            neighbor_count=3, value_to_replace=np.nan,
+        ).fit_and_transform(table)
         assert fitted_transformer.is_fitted
         assert transformed_table == expected
 

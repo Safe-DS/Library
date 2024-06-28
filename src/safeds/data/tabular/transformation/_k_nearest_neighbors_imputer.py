@@ -12,6 +12,7 @@ from ._table_transformer import TableTransformer
 if TYPE_CHECKING:
     from sklearn.impute import KNNImputer as sk_KNNImputer
 
+
 class KNearestNeighborsImputer(TableTransformer):
     """
     The KNearestNeighborsImputer replaces missing values in a   with the mean value of the K-nearest neighbors.
@@ -21,7 +22,7 @@ class KNearestNeighborsImputer(TableTransformer):
     neighbor_count:
         The number of neighbors to consider when imputing missing values.
     column_names:
-        The list of columns used to impute missing values. If 'None', all columns are used. 
+        The list of columns used to impute missing values. If 'None', all columns are used.
     """
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -29,11 +30,11 @@ class KNearestNeighborsImputer(TableTransformer):
     # ------------------------------------------------------------------------------------------------------------------
 
     def __init__(
-            self,
-            neighbor_count: int = 5, 
-            *,
-            column_names: str | list[str] | None = None,
-            value_to_replace: float | str | None = None,
+        self,
+        neighbor_count: int = 5,
+        *,
+        column_names: str | list[str] | None = None,
+        value_to_replace: float | str | None = None,
     ) -> None:
         super().__init__(column_names)
 
@@ -49,6 +50,7 @@ class KNearestNeighborsImputer(TableTransformer):
 
     def __hash__(self) -> int:
         return _structural_hash(self)
+
     # ------------------------------------------------------------------------------------------------------------------
     # Properties
     # ------------------------------------------------------------------------------------------------------------------
@@ -57,7 +59,7 @@ class KNearestNeighborsImputer(TableTransformer):
     def is_fitted(self) -> bool:
         """Whether the transformer is fitted."""
         return self._wrapped_transformer is not None
-    
+
     @property
     def neighbor_count(self) -> int:
         """The number of neighbors to consider when imputing missing values."""
@@ -92,13 +94,13 @@ class KNearestNeighborsImputer(TableTransformer):
 
         if table.row_count == 0:
             raise ValueError("The KNearestNeighborsImputer cannot be fitted because the table contains 0 rows.")
-        
+
         if self._column_names is None:
             column_names = table.column_names
         else:
             column_names = self._column_names
             _check_columns_exist(table, column_names)
-        
+
         wrapped_transformer = sk_KNNImputer(n_neighbors=self._neighbor_count, missing_values=self._value_to_replace)
         wrapped_transformer.set_output(transform="polars")
         wrapped_transformer.fit(
@@ -109,7 +111,7 @@ class KNearestNeighborsImputer(TableTransformer):
         result._wrapped_transformer = wrapped_transformer
 
         return result
-    
+
     def transform(self, table: Table) -> Table:
         """
         Apply the learned transformation to a table.
