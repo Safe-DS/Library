@@ -567,7 +567,7 @@ class _SingleSizeImageList(ImageList):
         self_size = (self.widths[0], self.heights[0])
 
         if isinstance(images, list):
-            new_image_lists: dict[tuple[int, int], _SingleSizeImageList] = {}
+            new_image_lists: dict[tuple[int, int], ImageList] = {}
 
             images_with_sizes_with_channel: dict[tuple[int, int], dict[int, list[Image]]] = {}
             images_with_sizes_count: dict[tuple[int, int], int] = {}
@@ -592,7 +592,7 @@ class _SingleSizeImageList(ImageList):
                 next_index += 1
             if self_size not in images_with_sizes_with_channel:
                 if self.channel != max_channel:
-                    new_image_lists[self_size] = self.change_channel(max_channel)._as_single_size_image_list()
+                    new_image_lists[self_size] = self.change_channel(max_channel)
                 else:
                     new_image_lists[self_size] = self
             for size in images_with_sizes_with_channel:
@@ -604,7 +604,7 @@ class _SingleSizeImageList(ImageList):
                     else:
                         new_tensor[0:len(self)] = self._tensor
                     current_index = len(self)
-                    for channel in images_with_sizes_with_channel[size].keys():
+                    for channel in images_with_sizes_with_channel[size]:
                         new_indices += indices_with_sizes_with_channel[size][channel]
                         number_in_current_channel = len(images_with_sizes_with_channel[size][channel])
                         end_index = current_index + number_in_current_channel
@@ -629,7 +629,7 @@ class _SingleSizeImageList(ImageList):
                     new_tensor = torch.empty(images_with_sizes_count[size], max_channel, size[1], size[0], dtype=torch.uint8)
                     new_indices = []
                     current_index = 0
-                    for channel in images_with_sizes_with_channel[size].keys():
+                    for channel in images_with_sizes_with_channel[size]:
                         new_indices += indices_with_sizes_with_channel[size][channel]
                         number_in_current_channel = len(images_with_sizes_with_channel[size][channel])
                         end_index = current_index + number_in_current_channel
@@ -667,7 +667,7 @@ class _SingleSizeImageList(ImageList):
                 multi_image_list._image_list_dict = new_image_lists
                 multi_image_list._indices_to_image_size_dict = {}
                 for size, im_list in new_image_lists.items():
-                    for index in im_list._tensor_positions_to_indices:
+                    for index in im_list._as_single_size_image_list()._tensor_positions_to_indices:
                         multi_image_list._indices_to_image_size_dict[index] = size
                 return multi_image_list
         else:  # images is of type ImageList
@@ -687,13 +687,13 @@ class _SingleSizeImageList(ImageList):
                 else:
                     new_self_im_list = self
                 multi_image_list._image_list_dict[self_size] = new_self_im_list
-                for index in new_self_im_list._tensor_positions_to_indices:
+                for index in new_self_im_list._as_single_size_image_list()._tensor_positions_to_indices:
                     multi_image_list._indices_to_image_size_dict[index] = self_size
                 for im_size, im_list in images._image_list_dict.items():
                     if im_size == self_size:
                         continue
                     if im_list.channel != max_channel:
-                        new_im_list = im_list.change_channel(max_channel)
+                        new_im_list = im_list.change_channel(max_channel)._as_single_size_image_list()
                     else:
                         new_im_list = im_list._as_single_size_image_list()
                     new_im_list._tensor_positions_to_indices = [old_index + index_offset for old_index in im_list._as_single_size_image_list()._tensor_positions_to_indices]
