@@ -8,6 +8,18 @@ from safeds.ml.nn.typing import ConstantImageSize
 from torch import nn
 
 
+class TestProbability:
+    def test_should_be_accessible(self) -> None:
+        probability = 0.5
+        layer = DropoutLayer(probability)
+        assert layer.probability == probability
+
+    @pytest.mark.parametrize("probability", [-1, 2], ids=["too low", "too high"])
+    def test_should_raise_if_out_of_bounds(self, probability: int) -> None:
+        with pytest.raises(OutOfBoundsError):
+            DropoutLayer(probability)
+
+
 class TestDropoutLayer:
     def test_should_create_dropout_layer(self) -> None:
         size = 10
@@ -16,12 +28,6 @@ class TestDropoutLayer:
         assert layer.input_size == size
         assert layer.output_size == size
         assert isinstance(next(next(layer._get_internal_layer().modules()).children()), nn.Dropout)
-
-    def test_should_check_bounds(self) -> None:
-        with pytest.raises(OutOfBoundsError, match=r"probability must be in \(0, 1\) but was 2."):
-            DropoutLayer(2)
-        with pytest.raises(OutOfBoundsError, match=r"probability must be in \(0, 1\) but was -1."):
-            DropoutLayer(-1)
 
     def test_input_size_should_be_set(self) -> None:
         layer = DropoutLayer(0.5)
@@ -36,11 +42,6 @@ class TestDropoutLayer:
 
         with pytest.raises(ValueError, match=r"The input_size is not yet set."):
             layer.__sizeof__()
-
-    def test_probability_is_set(self) -> None:
-        probability_to_set = 0.5
-        layer = DropoutLayer(probability_to_set)
-        assert layer.probability == probability_to_set
 
 
 class TestEq:

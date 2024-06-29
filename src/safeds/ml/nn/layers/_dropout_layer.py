@@ -88,12 +88,14 @@ class DropoutLayer(Layer):
         self._input_size = input_size
 
     def __hash__(self) -> int:
-        return _structural_hash(self._input_size)
+        return _structural_hash(self._input_size, self._probability)
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, DropoutLayer):
             return NotImplemented
-        return (self is other) or (self._input_size == other._input_size)
+        if self is other:
+            return True
+        return self._input_size == other._input_size and self._probability == other._probability
 
     def __sizeof__(self) -> int:
         if self._input_size is None:
