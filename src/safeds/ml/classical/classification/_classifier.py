@@ -283,8 +283,6 @@ class Classifier(SupervisedModel, ABC):
             for future in done:
                 list_of_fitted_models.append(future.result())
         executor.shutdown()
-        if __name__ == "__main__":      # For pytest
-            executor.shutdown(True)     # For pytest
         best_model = None
         best_metric_value = None
         for fitted_model in list_of_fitted_models:
