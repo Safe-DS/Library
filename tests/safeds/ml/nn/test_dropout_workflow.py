@@ -20,11 +20,12 @@ from tests.helpers import configure_test_with_device, get_devices, get_devices_i
 def test_forward_model(device: Device) -> None:
     configure_test_with_device(device)
 
-    # Create a DataFrame
-    table_1 = Table.from_csv_file(
-        path="docs/tutorials/data/US_Inflation_rates_prepared.csv",
+    train_table = Table(
+        {
+            "feature": [1, 2, 3],
+            "value": [1, 2, 3],
+        },
     )
-    train_table, _ = table_1.split_rows(0.8)
 
     model = NeuralNetworkRegressor(
         InputConversionTable(),
