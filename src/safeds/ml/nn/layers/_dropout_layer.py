@@ -14,18 +14,17 @@ if TYPE_CHECKING:
 
 class DropoutLayer(Layer):
     """
-    Create a dropout Layer.
+    A dropout layer.
 
     Parameters
     ----------
     probability:
-        The probability of which the input gets replaced with 0.
+        The probability that an input element gets zeroed out.
 
     Raises
     ------
     OutOfBoundsError
-        If probability < 0
-        If probability > 1
+        If probability is not in the range [0, 1].
     """
 
     def __init__(self, probability: float):
@@ -35,14 +34,7 @@ class DropoutLayer(Layer):
 
     @property
     def probability(self) -> float:
-        """
-        Get the probability of this layer.
-
-        Returns
-        -------
-        result:
-            The probability being passed into this layer.
-        """
+        """The probability that an input element gets zeroed out."""
         return self._probability
 
     def _get_internal_layer(self, **_kwargs: Any) -> nn.Module:
