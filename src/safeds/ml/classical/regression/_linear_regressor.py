@@ -25,17 +25,8 @@ class LinearRegressor(Regressor):
 
     Parameters
     ----------
-    alpha:
-        Controls the regularization of the model. The higher the value, the more regularized it becomes.
-        If 0, a linear model is used.
-    lasso_ratio:
-        Number between 0 and 1 that controls the ratio between Lasso and Ridge regularization. If 0, only Ridge
-        regularization is used. If 1, only Lasso regularization is used.
-
-    Raises
-    ------
-    OutOfBoundsError
-        If `alpha` is negative or `lasso_ratio` is not between 0 and 1.
+    penalty:
+        The type of penalty to be used. Defaults to a simple linear regression.
     """
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -86,7 +77,8 @@ class LinearRegressor(Regressor):
             raise NotImplementedError  # pragma: no cover
 
         @staticmethod
-        def elastic_net(alpha: float | Choice[float] = 1.0, lasso_ratio: float | Choice[float] = 0.5) -> LinearRegressor.Penalty:
+        def elastic_net(alpha: float | Choice[float] = 1.0,
+                        lasso_ratio: float | Choice[float] = 0.5) -> LinearRegressor.Penalty:
             """Create an elastic net penalty."""
             raise NotImplementedError  # pragma: no cover
 
@@ -97,9 +89,10 @@ class LinearRegressor(Regressor):
     def __init__(self, penalty: LinearRegressor.Penalty | None | Choice[LinearRegressor.Penalty | None] = None) -> None:
         Regressor.__init__(self)
         if penalty is None:
-            penalty: LinearRegressor.Penalty | Choice[LinearRegressor.Penalty | None] = LinearRegressor.Penalty.linear()
-        self._penalty: LinearRegressor.Penalty | Choice[LinearRegressor.Penalty | None] = penalty
+            penalty = LinearRegressor.Penalty.linear()
 
+        # Hyperparameters
+        self._penalty: LinearRegressor.Penalty | Choice[LinearRegressor.Penalty | None] = penalty
 
     def __hash__(self) -> int:
         return _structural_hash(
@@ -124,15 +117,12 @@ class LinearRegressor(Regressor):
         return self.penalty._get_sklearn_model()
 
     def _check_additional_fit_preconditions(self) -> None:
-        if isinstance(self._penalty, Choice):
+        if isinstance(self._penalty, Choice) or self.penalty._contains_choice_parameters():     # type: ignore[assignment]
             raise FittingWithChoiceError
-        elif self.penalty._contains_choice_parameters():
-            raise FittingWithoutChoiceError
 
     def _check_additional_fit_by_exhaustive_search_preconditions(self) -> None:
-        if not isinstance(self._penalty, Choice):
-            if not self.penalty._contains_choice_parameters():
-                raise FittingWithoutChoiceError
+        if not isinstance(self._penalty, Choice) and not self.penalty._contains_choice_parameters():    # type: ignore[assignment]
+            raise FittingWithoutChoiceError
 
     def _get_models_for_all_choices(self) -> list[LinearRegressor]:
         penalty_choices = self._penalty if isinstance(self._penalty, Choice) else [self._penalty]
@@ -163,7 +153,7 @@ class _Linear(LinearRegressor.Penalty):
         return True
 
     def __hash__(self) -> int:
-        return _structural_hash(self.__class__.__qualname__,)
+        return _structural_hash(self.__class__.__qualname__, )
 
     def __str__(self) -> str:
         return "Linear"
@@ -179,7 +169,7 @@ class _Linear(LinearRegressor.Penalty):
         return SklearnLinear(n_jobs=-1)
 
     def _get_models_for_all_choices(self) -> list[LinearRegressor]:
-        raise NotImplementedError   # pragma: no cover
+        raise NotImplementedError  # pragma: no cover
 
 
 class _Ridge(LinearRegressor.Penalty):
@@ -367,7 +357,8 @@ class _ElasticNet(LinearRegressor.Penalty):
         models = []
         for alpha in alpha_choices:
             for lasso in lasso_choices:
-                models.append(LinearRegressor(penalty=LinearRegressor.Penalty.elastic_net(alpha=alpha, lasso_ratio=lasso)))
+                models.append(
+                    LinearRegressor(penalty=LinearRegressor.Penalty.elastic_net(alpha=alpha, lasso_ratio=lasso)))
         return models
 
 
