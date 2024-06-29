@@ -74,14 +74,17 @@ def regressors_with_choices() -> list[Regressor]:
     """
     return [
         AdaBoostRegressor(
-            learner=Choice(AdaBoostRegressor(), None), max_learner_count=Choice(1, 2), learning_rate=Choice(0.1, 0.2),
+            learner=Choice(AdaBoostRegressor(), None),
+            max_learner_count=Choice(1, 2),
+            learning_rate=Choice(0.1, 0.2),
         ),
         DecisionTreeRegressor(max_depth=Choice(1, 2), min_sample_count_in_leaves=Choice(1, 2)),
         GradientBoostingRegressor(tree_count=Choice(1, 2), learning_rate=Choice(0.1, 0.2)),
         KNearestNeighborsRegressor(neighbor_count=Choice(1, 2)),
         LinearRegressor(
             penalty=Choice(
-                None, LinearRegressor.Penalty.elastic_net(alpha=Choice(1.0, 2.0), lasso_ratio=Choice(0.1, 0.9)),
+                None,
+                LinearRegressor.Penalty.elastic_net(alpha=Choice(1.0, 2.0), lasso_ratio=Choice(0.1, 0.9)),
             ),
         ),
         RandomForestRegressor(tree_count=Choice(1, 2), max_depth=Choice(1, 2), min_sample_count_in_leaves=Choice(1, 2)),

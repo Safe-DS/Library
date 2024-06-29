@@ -79,7 +79,8 @@ class LinearRegressor(Regressor):
 
         @staticmethod
         def elastic_net(
-            alpha: float | Choice[float] = 1.0, lasso_ratio: float | Choice[float] = 0.5,
+            alpha: float | Choice[float] = 1.0,
+            lasso_ratio: float | Choice[float] = 0.5,
         ) -> LinearRegressor.Penalty:
             """Create an elastic net penalty."""
             raise NotImplementedError  # pragma: no cover
