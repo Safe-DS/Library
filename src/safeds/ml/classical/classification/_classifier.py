@@ -283,7 +283,8 @@ class Classifier(SupervisedModel, ABC):
             for future in done:
                 list_of_fitted_models.append(future.result())
         executor.shutdown()
-
+        if __name__ == "__main__":      # For pytest
+            executor.shutdown(True)     # For pytest
         best_model = None
         best_metric_value = None
         for fitted_model in list_of_fitted_models:
@@ -314,7 +315,6 @@ class Classifier(SupervisedModel, ABC):
                             best_model = fitted_model
         assert best_model is not None
         return best_model
-
 
 def _extract_table(table_or_dataset: Table | TabularDataset) -> Table:
     """Extract the table from the given table or dataset."""
