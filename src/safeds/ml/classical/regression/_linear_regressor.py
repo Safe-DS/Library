@@ -117,11 +117,11 @@ class LinearRegressor(Regressor):
         return self.penalty._get_sklearn_model()
 
     def _check_additional_fit_preconditions(self) -> None:
-        if isinstance(self._penalty, Choice) or self.penalty._contains_choice_parameters():     # type: ignore[assignment]
+        if isinstance(self._penalty, Choice) or self.penalty._contains_choice_parameters():     # type: ignore[union-attr]
             raise FittingWithChoiceError
 
     def _check_additional_fit_by_exhaustive_search_preconditions(self) -> None:
-        if not isinstance(self._penalty, Choice) and not self.penalty._contains_choice_parameters():    # type: ignore[assignment]
+        if not isinstance(self._penalty, Choice) and not self.penalty._contains_choice_parameters():    # type: ignore[union-attr]
             raise FittingWithoutChoiceError
 
     def _get_models_for_all_choices(self) -> list[LinearRegressor]:
