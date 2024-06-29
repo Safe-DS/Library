@@ -137,7 +137,7 @@ class _SingleSizeImageList(ImageList):
         images_with_channels: dict[int, list[Tensor]] = {}
         indices_with_channels: dict[int, list[int]] = {}
         max_channel = 0
-        for image, index in zip(images, indices):
+        for image, index in zip(images, indices, strict=False):
             current_channel = image.size(dim=-3)
             if max_channel < current_channel:
                 max_channel = current_channel
@@ -154,12 +154,12 @@ class _SingleSizeImageList(ImageList):
         current_start_index = 0
         for current_channel, ims in images_with_channels.items():
             for index, image in enumerate(ims):
-                image_list._tensor[index + current_start_index, 0:max(current_channel, min(max_channel, 3))] = image
+                image_list._tensor[index + current_start_index, 0 : max(current_channel, min(max_channel, 3))] = image
             if max_channel == 4 and current_channel != 4:
                 torch.full(
                     (len(ims), 1, height, width),
                     255,
-                    out=image_list._tensor[current_start_index:current_start_index + len(ims), 3:4]
+                    out=image_list._tensor[current_start_index : current_start_index + len(ims), 3:4],
                 )
             current_start_index += len(ims)
             image_list._tensor_positions_to_indices += indices_with_channels[current_channel]
@@ -505,8 +505,7 @@ class _SingleSizeImageList(ImageList):
             if image_tensor.size(dim=0) < tensor.size(dim=1):
                 if tensor.size(dim=1) == 3:  # image_tensor channel == 1
                     image_list_single._tensor = torch.cat(
-                        [tensor,
-                         torch.stack([image_tensor, image_tensor, image_tensor], dim=1)],
+                        [tensor, torch.stack([image_tensor, image_tensor, image_tensor], dim=1)],
                     )
                 elif image_tensor.size(dim=0) == 1:  # tensor channel == 4
                     image_list_single._tensor = torch.cat(
@@ -597,12 +596,16 @@ class _SingleSizeImageList(ImageList):
                     new_image_lists[self_size] = self
             for size in images_with_sizes_with_channel:
                 if size == self_size:
-                    new_tensor = torch.empty(len(self) + images_with_sizes_count[size], max_channel, size[1], size[0], dtype=torch.uint8)
+                    new_tensor = torch.empty(
+                        len(self) + images_with_sizes_count[size], max_channel, size[1], size[0], dtype=torch.uint8,
+                    )
                     new_indices = self._tensor_positions_to_indices
                     if self.channel != max_channel:
-                        new_tensor[0:len(self)] = _SingleSizeImageList._change_channel_of_tensor(self._tensor, max_channel)
+                        new_tensor[0 : len(self)] = _SingleSizeImageList._change_channel_of_tensor(
+                            self._tensor, max_channel,
+                        )
                     else:
-                        new_tensor[0:len(self)] = self._tensor
+                        new_tensor[0 : len(self)] = self._tensor
                     current_index = len(self)
                     for channel in images_with_sizes_with_channel[size]:
                         new_indices += indices_with_sizes_with_channel[size][channel]
@@ -610,15 +613,40 @@ class _SingleSizeImageList(ImageList):
                         end_index = current_index + number_in_current_channel
                         if channel < max_channel:
                             if channel == 3:
-                                torch.stack([img._image_tensor for img in images_with_sizes_with_channel[size][channel]], dim=0, out=new_tensor[current_index:end_index, 0:3])
+                                torch.stack(
+                                    [img._image_tensor for img in images_with_sizes_with_channel[size][channel]],
+                                    dim=0,
+                                    out=new_tensor[current_index:end_index, 0:3],
+                                )
                             else:  # channel == 1
-                                torch.stack([img._image_tensor for img in images_with_sizes_with_channel[size][channel]], dim=0, out=new_tensor[current_index:end_index, 0:1])
-                                torch.stack([img._image_tensor for img in images_with_sizes_with_channel[size][channel]], dim=0, out=new_tensor[current_index:end_index, 1:2])
-                                torch.stack([img._image_tensor for img in images_with_sizes_with_channel[size][channel]], dim=0, out=new_tensor[current_index:end_index, 2:3])
+                                torch.stack(
+                                    [img._image_tensor for img in images_with_sizes_with_channel[size][channel]],
+                                    dim=0,
+                                    out=new_tensor[current_index:end_index, 0:1],
+                                )
+                                torch.stack(
+                                    [img._image_tensor for img in images_with_sizes_with_channel[size][channel]],
+                                    dim=0,
+                                    out=new_tensor[current_index:end_index, 1:2],
+                                )
+                                torch.stack(
+                                    [img._image_tensor for img in images_with_sizes_with_channel[size][channel]],
+                                    dim=0,
+                                    out=new_tensor[current_index:end_index, 2:3],
+                                )
                             if max_channel == 4:
-                                torch.full((number_in_current_channel, 1, size[1], size[0]), 255, dtype=torch.uint8, out=new_tensor[current_index:end_index, 3:4])
+                                torch.full(
+                                    (number_in_current_channel, 1, size[1], size[0]),
+                                    255,
+                                    dtype=torch.uint8,
+                                    out=new_tensor[current_index:end_index, 3:4],
+                                )
                         else:
-                            torch.stack([img._image_tensor for img in images_with_sizes_with_channel[size][channel]], dim=0, out=new_tensor[current_index:end_index, :])
+                            torch.stack(
+                                [img._image_tensor for img in images_with_sizes_with_channel[size][channel]],
+                                dim=0,
+                                out=new_tensor[current_index:end_index, :],
+                            )
                         current_index = end_index
                     new_image_list = _SingleSizeImageList()
                     new_image_list._tensor = new_tensor
@@ -626,7 +654,9 @@ class _SingleSizeImageList(ImageList):
                     new_image_list._indices_to_tensor_positions = new_image_list._calc_new_indices_to_tensor_positions()
                     new_image_lists[size] = new_image_list
                 else:
-                    new_tensor = torch.empty(images_with_sizes_count[size], max_channel, size[1], size[0], dtype=torch.uint8)
+                    new_tensor = torch.empty(
+                        images_with_sizes_count[size], max_channel, size[1], size[0], dtype=torch.uint8,
+                    )
                     new_indices = []
                     current_index = 0
                     for channel in images_with_sizes_with_channel[size]:
@@ -636,24 +666,39 @@ class _SingleSizeImageList(ImageList):
                         if channel < max_channel:
                             if channel == 3:
                                 torch.stack(
-                                    [img._image_tensor for img in images_with_sizes_with_channel[size][channel]], dim=0,
-                                    out=new_tensor[current_index:end_index, 0:3])
+                                    [img._image_tensor for img in images_with_sizes_with_channel[size][channel]],
+                                    dim=0,
+                                    out=new_tensor[current_index:end_index, 0:3],
+                                )
                             else:  # channel == 1
                                 torch.stack(
-                                    [img._image_tensor for img in images_with_sizes_with_channel[size][channel]], dim=0,
-                                    out=new_tensor[current_index:end_index, 0:1])
+                                    [img._image_tensor for img in images_with_sizes_with_channel[size][channel]],
+                                    dim=0,
+                                    out=new_tensor[current_index:end_index, 0:1],
+                                )
                                 torch.stack(
-                                    [img._image_tensor for img in images_with_sizes_with_channel[size][channel]], dim=0,
-                                    out=new_tensor[current_index:end_index, 1:2])
+                                    [img._image_tensor for img in images_with_sizes_with_channel[size][channel]],
+                                    dim=0,
+                                    out=new_tensor[current_index:end_index, 1:2],
+                                )
                                 torch.stack(
-                                    [img._image_tensor for img in images_with_sizes_with_channel[size][channel]], dim=0,
-                                    out=new_tensor[current_index:end_index, 2:3])
+                                    [img._image_tensor for img in images_with_sizes_with_channel[size][channel]],
+                                    dim=0,
+                                    out=new_tensor[current_index:end_index, 2:3],
+                                )
                             if max_channel == 4:
-                                torch.full((number_in_current_channel, 1, size[1], size[0]), 255, dtype=torch.uint8,
-                                           out=new_tensor[current_index:end_index, 3:4])
+                                torch.full(
+                                    (number_in_current_channel, 1, size[1], size[0]),
+                                    255,
+                                    dtype=torch.uint8,
+                                    out=new_tensor[current_index:end_index, 3:4],
+                                )
                         else:
-                            torch.stack([img._image_tensor for img in images_with_sizes_with_channel[size][channel]],
-                                        dim=0, out=new_tensor[current_index:end_index, :])
+                            torch.stack(
+                                [img._image_tensor for img in images_with_sizes_with_channel[size][channel]],
+                                dim=0,
+                                out=new_tensor[current_index:end_index, :],
+                            )
                         current_index = end_index
                     new_image_list = _SingleSizeImageList()
                     new_image_list._tensor = new_tensor
@@ -681,7 +726,9 @@ class _SingleSizeImageList(ImageList):
                 multi_image_list._image_list_dict = {}
                 multi_image_list._indices_to_image_size_dict = {}
                 if self_size in images._image_list_dict:
-                    new_self_im_list = _SingleSizeImageList._combine_two_single_size_image_lists(self, images._image_list_dict[self_size]._as_single_size_image_list())
+                    new_self_im_list = _SingleSizeImageList._combine_two_single_size_image_lists(
+                        self, images._image_list_dict[self_size]._as_single_size_image_list(),
+                    )
                 elif self.channel != max_channel:
                     new_self_im_list = self.change_channel(max_channel)
                 else:
@@ -696,7 +743,10 @@ class _SingleSizeImageList(ImageList):
                         new_im_list = im_list.change_channel(max_channel)._as_single_size_image_list()
                     else:
                         new_im_list = im_list._as_single_size_image_list()
-                    new_im_list._tensor_positions_to_indices = [old_index + index_offset for old_index in im_list._as_single_size_image_list()._tensor_positions_to_indices]
+                    new_im_list._tensor_positions_to_indices = [
+                        old_index + index_offset
+                        for old_index in im_list._as_single_size_image_list()._tensor_positions_to_indices
+                    ]
                     new_im_list._indices_to_tensor_positions = new_im_list._calc_new_indices_to_tensor_positions()
                     multi_image_list._image_list_dict[im_size] = new_im_list
                     for new_index in new_im_list._tensor_positions_to_indices:
@@ -704,8 +754,11 @@ class _SingleSizeImageList(ImageList):
                 return multi_image_list
 
     @staticmethod
-    def _combine_two_single_size_image_lists(image_list_1: _SingleSizeImageList, image_list_2: _SingleSizeImageList) -> ImageList:
+    def _combine_two_single_size_image_lists(
+        image_list_1: _SingleSizeImageList, image_list_2: _SingleSizeImageList,
+    ) -> ImageList:
         import torch
+
         from safeds.data.image.containers._multi_size_image_list import _MultiSizeImageList
 
         max_channel = max(image_list_1.channel, image_list_2.channel)
@@ -717,20 +770,32 @@ class _SingleSizeImageList(ImageList):
             if image_list_2.channel == image_list_1.channel:
                 new_image_list = _SingleSizeImageList()
                 new_image_list._tensor = torch.cat([image_list_1._tensor, image_list_2._tensor], dim=0)
-                new_image_list._tensor_positions_to_indices = image_list_1._tensor_positions_to_indices + [old_index + index_offset for old_index in image_list_2._tensor_positions_to_indices]
+                new_image_list._tensor_positions_to_indices = image_list_1._tensor_positions_to_indices + [
+                    old_index + index_offset for old_index in image_list_2._tensor_positions_to_indices
+                ]
                 new_image_list._indices_to_tensor_positions = new_image_list._calc_new_indices_to_tensor_positions()
                 return new_image_list
             else:
                 new_image_list = _SingleSizeImageList()
                 if image_list_2.channel < max_channel:
                     new_image_list._tensor = torch.cat(
-                        [image_list_1._tensor, _SingleSizeImageList._change_channel_of_tensor(image_list_2._tensor, max_channel)],
-                        dim=0)
+                        [
+                            image_list_1._tensor,
+                            _SingleSizeImageList._change_channel_of_tensor(image_list_2._tensor, max_channel),
+                        ],
+                        dim=0,
+                    )
                 else:
                     new_image_list._tensor = torch.cat(
-                        [_SingleSizeImageList._change_channel_of_tensor(image_list_1._tensor, max_channel), image_list_2._tensor],
-                        dim=0)
-                new_image_list._tensor_positions_to_indices = image_list_1._tensor_positions_to_indices + [old_index + index_offset for old_index in image_list_2._tensor_positions_to_indices]
+                        [
+                            _SingleSizeImageList._change_channel_of_tensor(image_list_1._tensor, max_channel),
+                            image_list_2._tensor,
+                        ],
+                        dim=0,
+                    )
+                new_image_list._tensor_positions_to_indices = image_list_1._tensor_positions_to_indices + [
+                    old_index + index_offset for old_index in image_list_2._tensor_positions_to_indices
+                ]
                 new_image_list._indices_to_tensor_positions = new_image_list._calc_new_indices_to_tensor_positions()
                 return new_image_list
         else:
@@ -746,7 +811,9 @@ class _SingleSizeImageList(ImageList):
             else:
                 multi_image_list._image_list_dict[im1_size] = image_list_1.change_channel(max_channel)
                 im_l_2._tensor = image_list_2._tensor
-            im_l_2._tensor_positions_to_indices = [old_index + index_offset for old_index in image_list_2._tensor_positions_to_indices]
+            im_l_2._tensor_positions_to_indices = [
+                old_index + index_offset for old_index in image_list_2._tensor_positions_to_indices
+            ]
             im_l_2._indices_to_tensor_positions = im_l_2._calc_new_indices_to_tensor_positions()
             multi_image_list._image_list_dict[im2_size] = im_l_2
             multi_image_list._indices_to_image_size_dict = {}
@@ -960,7 +1027,9 @@ class _SingleSizeImageList(ImageList):
         else:
             adjusted_factor = (1 - factor) / factor
             image_list._tensor = torch.empty(self._tensor.size(), dtype=torch.uint8)
-            adjusted_tensor = _SingleSizeImageList._convert_tensor_to_grayscale(self._tensor) * torch.tensor(adjusted_factor, dtype=torch.float16)
+            adjusted_tensor = _SingleSizeImageList._convert_tensor_to_grayscale(self._tensor) * torch.tensor(
+                adjusted_factor, dtype=torch.float16,
+            )
             adjusted_tensor += self._tensor
             adjusted_tensor *= factor
             torch.clamp(adjusted_tensor, 0, 255, out=adjusted_tensor)
@@ -979,15 +1048,21 @@ class _SingleSizeImageList(ImageList):
 
         image_list._tensor = torch.empty(self._tensor.size(), dtype=torch.uint8)
 
-        kernel = torch.full((self._tensor.size(dim=-3), 1, radius * 2 + 1, radius * 2 + 1), 1 / (radius * 2 + 1) ** 2, dtype=float_dtype)
-        image_tensor_size = self._tensor.size(dim=1) * (self._tensor.size(dim=2) + radius * 2) * (self._tensor.size(dim=3) + radius * 2)
+        kernel = torch.full(
+            (self._tensor.size(dim=-3), 1, radius * 2 + 1, radius * 2 + 1), 1 / (radius * 2 + 1) ** 2, dtype=float_dtype,
+        )
+        image_tensor_size = (
+            self._tensor.size(dim=1) * (self._tensor.size(dim=2) + radius * 2) * (self._tensor.size(dim=3) + radius * 2)
+        )
         number_of_executions = math.ceil(self._tensor.size(dim=0) / (2**31 / image_tensor_size))
         number_of_images_per_execution = math.ceil(self._tensor.size(dim=0) / number_of_executions)
         start = 0
         for i in range(number_of_executions):
             end = min((i + 1) * number_of_images_per_execution, self._tensor.size(dim=0)) + 1
             image_list._tensor[start:end] = torch.nn.functional.conv2d(
-                torch.nn.functional.pad(self._tensor[start:end].to(float_dtype), (radius, radius, radius, radius), mode='replicate'),
+                torch.nn.functional.pad(
+                    self._tensor[start:end].to(float_dtype), (radius, radius, radius, radius), mode="replicate",
+                ),
                 kernel,
                 padding="valid",
                 groups=self._tensor.size(dim=-3),

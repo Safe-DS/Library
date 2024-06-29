@@ -706,18 +706,25 @@ class Image:
             If radius is smaller than 0 or equal or greater than the smaller size of the image.
         """
         import torch
+
         _init_default_device()
 
         float_dtype = torch.float32 if _get_device() != torch.device("cuda") else torch.float16
 
         _check_blur_errors_and_warnings(radius, min(self.width, self.height), plural=False)
 
-        kernel = torch.full((self._image_tensor.size(dim=-3), 1, radius * 2 + 1, radius * 2 + 1), 1 / (radius * 2 + 1) ** 2, dtype=float_dtype)
+        kernel = torch.full(
+            (self._image_tensor.size(dim=-3), 1, radius * 2 + 1, radius * 2 + 1),
+            1 / (radius * 2 + 1) ** 2,
+            dtype=float_dtype,
+        )
         tensor = torch.nn.functional.conv2d(
-            torch.nn.functional.pad(self._image_tensor.to(float_dtype), (radius, radius, radius, radius), mode='replicate'),
+            torch.nn.functional.pad(
+                self._image_tensor.to(float_dtype), (radius, radius, radius, radius), mode="replicate",
+            ),
             kernel,
             padding="valid",
-            groups=self._image_tensor.size(dim=-3)
+            groups=self._image_tensor.size(dim=-3),
         ).to(torch.uint8)
         return Image(tensor)
 
