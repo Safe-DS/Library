@@ -10,6 +10,8 @@ from safeds._utils import _structural_hash
 from safeds.data.image._utils._image_transformation_error_and_warning_checks import (
     _check_blur_errors_and_warnings,
     _check_remove_images_with_size_errors,
+    _check_resize_errors,
+    _check_crop_errors_and_warnings,
 )
 from safeds.data.image.containers import Image, ImageList
 from safeds.exceptions import (
@@ -374,7 +376,7 @@ class _MultiSizeImageList(ImageList):
                         key=sorted(range(len(new_indices)), key=old_indices.__getitem__).__getitem__,
                     )
                 ]
-                fixed_ims._calc_new_indices_to_tensor_positions()
+                fixed_ims._indices_to_tensor_positions = fixed_ims._calc_new_indices_to_tensor_positions()
                 image_list._image_list_dict[size] = fixed_ims
             else:
                 image_list._image_list_dict[size] = _SingleSizeImageList._create_image_list(
@@ -437,7 +439,7 @@ class _MultiSizeImageList(ImageList):
         if len(self._image_list_dict) == 2:
             single_size_image_list = self._image_list_dict[
                 next(iter([key for key in list(self._image_list_dict.keys()) if key != (width, height)]))
-            ]._as_single_size_image_list()
+            ]._clone()._as_single_size_image_list()
             single_size_image_list._tensor_positions_to_indices = torch.sort(
                 torch.Tensor(single_size_image_list._tensor_positions_to_indices),
             )[1].tolist()
@@ -506,14 +508,18 @@ class _MultiSizeImageList(ImageList):
 
         from safeds.data.image.containers._single_size_image_list import _SingleSizeImageList
 
-        image_list_tensors = []
+        _check_resize_errors(new_width, new_height)
+
         image_list_indices = []
+        image_list = _SingleSizeImageList()
+        image_list._tensor = torch.empty(len(self), self.channel, new_height, new_width, dtype=torch.uint8)
+        current_start_index = 0
         for image_list_original in self._image_list_dict.values():
             image_list_new = image_list_original.resize(new_width, new_height)._as_single_size_image_list()
-            image_list_tensors.append(image_list_new._tensor)
+            end = current_start_index + len(image_list_original)
+            image_list._tensor[current_start_index:end] = image_list_new._tensor
             image_list_indices += image_list_new._tensor_positions_to_indices
-        image_list = _SingleSizeImageList()
-        image_list._tensor = torch.cat(image_list_tensors, dim=0)
+            current_start_index = end
         image_list._tensor_positions_to_indices = image_list_indices
         image_list._indices_to_tensor_positions = image_list._calc_new_indices_to_tensor_positions()
         return image_list
@@ -531,14 +537,18 @@ class _MultiSizeImageList(ImageList):
 
         from safeds.data.image.containers._single_size_image_list import _SingleSizeImageList
 
-        image_list_tensors = []
+        _check_crop_errors_and_warnings(x, y, width, height, self.widths[0], self.heights[0], plural=True)
+
         image_list_indices = []
+        image_list = _SingleSizeImageList()
+        image_list._tensor = torch.empty(len(self), self.channel, width, height, dtype=torch.uint8)
+        current_start_index = 0
         for image_list_original in self._image_list_dict.values():
             image_list_new = image_list_original.crop(x, y, width, height)._as_single_size_image_list()
-            image_list_tensors.append(image_list_new._tensor)
+            end = current_start_index + len(image_list_original)
+            image_list._tensor[current_start_index:end] = image_list_new._tensor
             image_list_indices += image_list_new._tensor_positions_to_indices
-        image_list = _SingleSizeImageList()
-        image_list._tensor = torch.cat(image_list_tensors, dim=0)
+            current_start_index = end
         image_list._tensor_positions_to_indices = image_list_indices
         image_list._indices_to_tensor_positions = image_list._calc_new_indices_to_tensor_positions()
         return image_list

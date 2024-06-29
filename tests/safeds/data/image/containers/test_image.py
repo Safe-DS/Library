@@ -762,7 +762,7 @@ class TestAdjustContrast:
 
 @pytest.mark.parametrize("device", get_devices(), ids=get_devices_ids())
 class TestAdjustColor:
-    @pytest.mark.parametrize("factor", [2, 0.5, 0], ids=["add color", "remove color", "gray"])
+    @pytest.mark.parametrize("factor", [0.5, 0], ids=["remove color", "gray"])
     @pytest.mark.parametrize(
         "resource_path",
         [plane_jpg_path, plane_png_path, rgba_png_path, white_square_jpg_path, white_square_png_path],
@@ -778,6 +778,23 @@ class TestAdjustColor:
         configure_test_with_device(device)
         image = Image.from_file(resolve_resource_path(resource_path))
         image_adjusted_color_balance = image.adjust_color_balance(factor)
+        assert image != image_adjusted_color_balance
+        assert image_adjusted_color_balance == snapshot_png_image
+
+    @pytest.mark.parametrize(
+        "resource_path",
+        [plane_jpg_path, plane_png_path],
+        ids=[plane_jpg_id, plane_png_id],
+    )
+    def test_should_adjust_colors_add_color(
+        self,
+        resource_path: str,
+        snapshot_png_image: SnapshotAssertion,
+        device: Device,
+    ) -> None:
+        configure_test_with_device(device)
+        image = Image.from_file(resolve_resource_path(resource_path))
+        image_adjusted_color_balance = image.adjust_color_balance(2)
         assert image != image_adjusted_color_balance
         assert image_adjusted_color_balance == snapshot_png_image
 
@@ -810,6 +827,17 @@ class TestAdjustColor:
             image = Image.from_file(resolve_resource_path(resource_path))
             image_adjusted_color_balance = image.adjust_color_balance(0.5)
             assert image == image_adjusted_color_balance
+
+    @pytest.mark.parametrize(
+        "resource_path",
+        [rgba_png_path, white_square_png_path, white_square_jpg_path],
+        ids=[rgba_png_id, white_square_png_id, white_square_jpg_id],
+    )
+    def test_should_not_adjust_colors_value_255(self, resource_path: str, device: Device) -> None:
+        configure_test_with_device(device)
+        image = Image.from_file(resolve_resource_path(resource_path))
+        image_adjusted_color_balance = image.adjust_color_balance(2)
+        assert image == image_adjusted_color_balance
 
     @pytest.mark.parametrize(
         "resource_path",
