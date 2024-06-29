@@ -25,7 +25,7 @@ class LogisticClassifier(Classifier):
     # Dunder methods
     # ------------------------------------------------------------------------------------------------------------------
 
-    def __init__(self, c: float = 1.0) -> None:
+    def __init__(self, *, c: float = 1.0) -> None:
         super().__init__()
 
         # Validation
