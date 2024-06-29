@@ -34,12 +34,12 @@ class TablePlotter:
 
     def box_plots(self) -> Image:
         """
-        Plot a boxplot for every numerical column.
+        Create a box plot for every numerical column.
 
         Returns
         -------
         plot:
-            The plot as an image.
+            The box plot(s) as an image.
 
         Raises
         ------
@@ -52,31 +52,54 @@ class TablePlotter:
         >>> table = Table({"a":[1, 2], "b": [3, 42]})
         >>> image = table.plot.box_plots()
         """
-        # TODO: implement using matplotlib and polars
-        import matplotlib.pyplot as plt
-        import seaborn as sns
-
         numerical_table = self._table.remove_non_numeric_columns()
         if numerical_table.column_count == 0:
             raise NonNumericColumnError("This table contains only non-numerical columns.")
-        col_wrap = min(numerical_table.column_count, 3)
+        from math import ceil
 
-        data = numerical_table._lazy_frame.melt(value_vars=numerical_table.column_names).collect()
-        grid = sns.FacetGrid(data, col="variable", col_wrap=col_wrap, sharex=False, sharey=False)
-        with warnings.catch_warnings():
-            warnings.filterwarnings(
-                "ignore",
-                message="Using the boxplot function without specifying `order` is likely to produce an incorrect plot.",
-            )
-            grid.map(sns.boxplot, "variable", "value")
-        grid.set_xlabels("")
-        grid.set_ylabels("")
-        grid.set_titles("{col_name}")
-        for axes in grid.axes.flat:
-            axes.set_xticks([])
-        plt.tight_layout()
-        fig = grid.fig
+        import matplotlib.pyplot as plt
 
+        columns = numerical_table.to_columns()
+        columns = [column._series.drop_nulls() for column in columns]
+        max_width = 3
+        number_of_columns = len(columns) if len(columns) <= max_width else max_width
+        number_of_rows = ceil(len(columns) / number_of_columns)
+
+        fig, axs = plt.subplots(nrows=number_of_rows, ncols=number_of_columns)
+        line = 0
+        for i, column in enumerate(columns):
+            if i % number_of_columns == 0 and i != 0:
+                line += 1
+
+            if number_of_columns == 1:
+                axs.boxplot(
+                    column,
+                    patch_artist=True,
+                    labels=[numerical_table.column_names[i]],
+                )
+                break
+
+            if number_of_rows == 1:
+                axs[i].boxplot(
+                    column,
+                    patch_artist=True,
+                    labels=[numerical_table.column_names[i]],
+                )
+
+            else:
+                axs[line, i % number_of_columns].boxplot(
+                    column,
+                    patch_artist=True,
+                    labels=[numerical_table.column_names[i]],
+                )
+
+        # removes unused ax indices, so there wont be empty plots
+        last_filled_ax_index = len(columns) % number_of_columns
+        for i in range(last_filled_ax_index, number_of_columns):
+            if number_of_rows != 1 and last_filled_ax_index != 0:
+                fig.delaxes(axs[number_of_rows - 1, i])
+
+        fig.tight_layout()
         return _figure_to_image(fig)
 
     def correlation_heatmap(self) -> Image:
@@ -97,7 +120,7 @@ class TablePlotter:
         # TODO: implement using matplotlib and polars
         #  https://stackoverflow.com/questions/33282368/plotting-a-2d-heatmap
         import matplotlib.pyplot as plt
-        import seaborn as sns
+        import numpy as np
 
         only_numerical = self._table.remove_non_numeric_columns()._data_frame.fill_null(0)
 
@@ -115,15 +138,18 @@ class TablePlotter:
                     " automatically expanding."
                 ),
             )
-            fig = plt.figure()
-            sns.heatmap(
-                data=only_numerical.corr().to_numpy(),
+
+            fig, ax = plt.subplots()
+            heatmap = plt.imshow(
+                only_numerical.corr().to_numpy(),
                 vmin=-1,
                 vmax=1,
-                xticklabels=only_numerical.columns,
-                yticklabels=only_numerical.columns,
-                cmap="vlag",
+                cmap="coolwarm",
             )
+            ax.set_xticks(np.arange(len(only_numerical.columns)), labels=only_numerical.columns)
+            ax.set_yticks(np.arange(len(only_numerical.columns)), labels=only_numerical.columns)
+            fig.colorbar(heatmap)
+
             plt.tight_layout()
 
         return _figure_to_image(fig)
@@ -343,6 +369,81 @@ class TablePlotter:
             ylabel=name,
         )
         ax.legend()
+        ax.set_xticks(ax.get_xticks())
+        ax.set_xticklabels(
+            ax.get_xticklabels(),
+            rotation=45,
+            horizontalalignment="right",
+        )  # rotate the labels of the x Axis to prevent the chance of overlapping of the labels
+        fig.tight_layout()
+
+        return _figure_to_image(fig)
+
+    def moving_average_plot(self, x_name: str, y_name: str, window_size: int) -> Image:
+        """
+        Create a moving average plot for the y column and plot it by the x column in the table.
+
+        Parameters
+        ----------
+        x_name:
+            The name of the column to be plotted on the x-axis.
+        y_name:
+            The name of the column to be plotted on the y-axis.
+
+        Returns
+        -------
+        plot:
+            The plot as an image.
+
+        Raises
+        ------
+        ColumnNotFoundError
+            If a column does not exist.
+        TypeError
+            If a column is not numeric.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table
+        >>> table = Table(
+        ...     {
+        ...         "a": [1, 2, 3, 4, 5],
+        ...         "b": [2, 3, 4, 5, 6],
+        ...     }
+        ... )
+        >>> image = table.plot.moving_average_plot("a", "b", window_size = 2)
+        """
+        import matplotlib.pyplot as plt
+        import numpy as np
+        import polars as pl
+
+        _plot_validation(self._table, x_name, [y_name])
+        for name in [x_name, y_name]:
+            if self._table.get_column(name).missing_value_count() >= 1:
+                raise ValueError(
+                    f"there are missing values in column '{name}', use transformation to fill missing values "
+                    f"or drop the missing values. For a moving average no missing values are allowed.",
+                )
+
+        # Calculate the moving average
+        mean_col = pl.col(y_name).mean().alias(y_name)
+        grouped = self._table._lazy_frame.sort(x_name).group_by(x_name).agg(mean_col).collect()
+        data = grouped
+        moving_average = data.select([pl.col(y_name).rolling_mean(window_size).alias("moving_average")])
+        # set up the arrays for plotting
+        y_data_with_nan = moving_average["moving_average"].to_numpy()
+        nan_mask = ~np.isnan(y_data_with_nan)
+        y_data = y_data_with_nan[nan_mask]
+        x_data = data[x_name].to_numpy()[nan_mask]
+        fig, ax = plt.subplots()
+        ax.plot(x_data, y_data, label="moving average")
+        ax.set(
+            xlabel=x_name,
+            ylabel=y_name,
+        )
+        ax.legend()
+        if self._table.get_column(x_name).is_temporal:
+            ax.set_xticks(x_data)  # Set x-ticks to the x data points
         ax.set_xticks(ax.get_xticks())
         ax.set_xticklabels(
             ax.get_xticklabels(),
