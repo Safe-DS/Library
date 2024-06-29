@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 
 from safeds._utils import _structural_hash
-from safeds._validation import _check_bounds, _OpenBound
+from safeds._validation import _check_bounds, _ClosedBound
 from safeds.ml.nn.typing import ModelImageSize
 
 from ._layer import Layer
@@ -28,7 +28,7 @@ class DropoutLayer(Layer):
     """
 
     def __init__(self, probability: float):
-        _check_bounds("probability", probability, lower_bound=_OpenBound(0), upper_bound=_OpenBound(1))
+        _check_bounds("probability", probability, lower_bound=_ClosedBound(0), upper_bound=_ClosedBound(1))
         self._probability = probability
         self._input_size: int | ModelImageSize | None = None
 
