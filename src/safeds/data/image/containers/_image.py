@@ -720,7 +720,9 @@ class Image:
         )
         tensor = torch.nn.functional.conv2d(
             torch.nn.functional.pad(
-                self._image_tensor.to(float_dtype), (radius, radius, radius, radius), mode="replicate",
+                self._image_tensor.to(float_dtype),
+                (radius, radius, radius, radius),
+                mode="replicate",
             ),
             kernel,
             padding="valid",

@@ -597,12 +597,17 @@ class _SingleSizeImageList(ImageList):
             for size in images_with_sizes_with_channel:
                 if size == self_size:
                     new_tensor = torch.empty(
-                        len(self) + images_with_sizes_count[size], max_channel, size[1], size[0], dtype=torch.uint8,
+                        len(self) + images_with_sizes_count[size],
+                        max_channel,
+                        size[1],
+                        size[0],
+                        dtype=torch.uint8,
                     )
                     new_indices = self._tensor_positions_to_indices
                     if self.channel != max_channel:
                         new_tensor[0 : len(self)] = _SingleSizeImageList._change_channel_of_tensor(
-                            self._tensor, max_channel,
+                            self._tensor,
+                            max_channel,
                         )
                     else:
                         new_tensor[0 : len(self)] = self._tensor
@@ -655,7 +660,11 @@ class _SingleSizeImageList(ImageList):
                     new_image_lists[size] = new_image_list
                 else:
                     new_tensor = torch.empty(
-                        images_with_sizes_count[size], max_channel, size[1], size[0], dtype=torch.uint8,
+                        images_with_sizes_count[size],
+                        max_channel,
+                        size[1],
+                        size[0],
+                        dtype=torch.uint8,
                     )
                     new_indices = []
                     current_index = 0
@@ -727,7 +736,8 @@ class _SingleSizeImageList(ImageList):
                 multi_image_list._indices_to_image_size_dict = {}
                 if self_size in images._image_list_dict:
                     new_self_im_list = _SingleSizeImageList._combine_two_single_size_image_lists(
-                        self, images._image_list_dict[self_size]._as_single_size_image_list(),
+                        self,
+                        images._image_list_dict[self_size]._as_single_size_image_list(),
                     )
                 elif self.channel != max_channel:
                     new_self_im_list = self.change_channel(max_channel)
@@ -755,7 +765,8 @@ class _SingleSizeImageList(ImageList):
 
     @staticmethod
     def _combine_two_single_size_image_lists(
-        image_list_1: _SingleSizeImageList, image_list_2: _SingleSizeImageList,
+        image_list_1: _SingleSizeImageList,
+        image_list_2: _SingleSizeImageList,
     ) -> ImageList:
         import torch
 
@@ -1028,7 +1039,8 @@ class _SingleSizeImageList(ImageList):
             adjusted_factor = (1 - factor) / factor
             image_list._tensor = torch.empty(self._tensor.size(), dtype=torch.uint8)
             adjusted_tensor = _SingleSizeImageList._convert_tensor_to_grayscale(self._tensor) * torch.tensor(
-                adjusted_factor, dtype=torch.float16,
+                adjusted_factor,
+                dtype=torch.float16,
             )
             adjusted_tensor += self._tensor
             adjusted_tensor *= factor
@@ -1049,7 +1061,9 @@ class _SingleSizeImageList(ImageList):
         image_list._tensor = torch.empty(self._tensor.size(), dtype=torch.uint8)
 
         kernel = torch.full(
-            (self._tensor.size(dim=-3), 1, radius * 2 + 1, radius * 2 + 1), 1 / (radius * 2 + 1) ** 2, dtype=float_dtype,
+            (self._tensor.size(dim=-3), 1, radius * 2 + 1, radius * 2 + 1),
+            1 / (radius * 2 + 1) ** 2,
+            dtype=float_dtype,
         )
         image_tensor_size = (
             self._tensor.size(dim=1) * (self._tensor.size(dim=2) + radius * 2) * (self._tensor.size(dim=3) + radius * 2)
@@ -1061,7 +1075,9 @@ class _SingleSizeImageList(ImageList):
             end = min((i + 1) * number_of_images_per_execution, self._tensor.size(dim=0)) + 1
             image_list._tensor[start:end] = torch.nn.functional.conv2d(
                 torch.nn.functional.pad(
-                    self._tensor[start:end].to(float_dtype), (radius, radius, radius, radius), mode="replicate",
+                    self._tensor[start:end].to(float_dtype),
+                    (radius, radius, radius, radius),
+                    mode="replicate",
                 ),
                 kernel,
                 padding="valid",
