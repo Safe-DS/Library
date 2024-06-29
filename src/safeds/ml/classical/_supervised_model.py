@@ -421,7 +421,7 @@ def _predict_with_sklearn_model(
         with warnings.catch_warnings():
             warnings.filterwarnings("ignore", message="X does not have valid feature names")
             predicted_target_vector = model.predict(features._data_frame)
-        output = dataset.remove_columns(target_name).add_columns(
+        output = dataset.remove_columns(target_name, ignore_unknown_names=True).add_columns(
             Column(target_name, predicted_target_vector),
         )
 
