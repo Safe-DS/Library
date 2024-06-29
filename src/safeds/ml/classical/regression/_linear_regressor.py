@@ -3,15 +3,16 @@ from __future__ import annotations
 import sys
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
+
+from sklearn.linear_model import ElasticNet as SklearnElasticNet
+from sklearn.linear_model import Lasso as SklearnLasso
+from sklearn.linear_model import LinearRegression as SklearnLinear
+from sklearn.linear_model import Ridge as SklearnRidge
+
 from safeds._utils import _structural_hash
 from safeds._validation import _check_bounds, _ClosedBound
 from safeds.exceptions import FittingWithChoiceError, FittingWithoutChoiceError
 from safeds.ml.hyperparameters import Choice
-
-from sklearn.linear_model import LinearRegression as SklearnLinear
-from sklearn.linear_model import Ridge as SklearnRidge
-from sklearn.linear_model import Lasso as SklearnLasso
-from sklearn.linear_model import ElasticNet as SklearnElasticNet
 
 from ._regressor import Regressor
 
@@ -77,8 +78,10 @@ class LinearRegressor(Regressor):
             raise NotImplementedError  # pragma: no cover
 
         @staticmethod
-        def elastic_net(alpha: float | Choice[float] = 1.0,
-                        lasso_ratio: float | Choice[float] = 0.5) -> LinearRegressor.Penalty:
+        def elastic_net(
+            alpha: float | Choice[float] = 1.0,
+            lasso_ratio: float | Choice[float] = 0.5,
+        ) -> LinearRegressor.Penalty:
             """Create an elastic net penalty."""
             raise NotImplementedError  # pragma: no cover
 
@@ -117,11 +120,11 @@ class LinearRegressor(Regressor):
         return self.penalty._get_sklearn_model()
 
     def _check_additional_fit_preconditions(self) -> None:
-        if isinstance(self._penalty, Choice) or self.penalty._contains_choice_parameters():     # type: ignore[union-attr]
+        if isinstance(self._penalty, Choice) or self.penalty._contains_choice_parameters():  # type: ignore[union-attr]
             raise FittingWithChoiceError
 
     def _check_additional_fit_by_exhaustive_search_preconditions(self) -> None:
-        if not isinstance(self._penalty, Choice) and not self.penalty._contains_choice_parameters():    # type: ignore[union-attr]
+        if not isinstance(self._penalty, Choice) and not self.penalty._contains_choice_parameters():  # type: ignore[union-attr]
             raise FittingWithoutChoiceError
 
     def _get_models_for_all_choices(self) -> list[LinearRegressor]:
@@ -142,6 +145,7 @@ class LinearRegressor(Regressor):
 # Kernels
 # ----------------------------------------------------------------------------------------------------------------------
 
+
 class _Linear(LinearRegressor.Penalty):
     # ------------------------------------------------------------------------------------------------------------------
     # Dunder methods
@@ -153,7 +157,9 @@ class _Linear(LinearRegressor.Penalty):
         return True
 
     def __hash__(self) -> int:
-        return _structural_hash(self.__class__.__qualname__, )
+        return _structural_hash(
+            self.__class__.__qualname__,
+        )
 
     def __str__(self) -> str:
         return "Linear"
@@ -347,18 +353,15 @@ class _ElasticNet(LinearRegressor.Penalty):
         return SklearnElasticNet(alpha=self._alpha, l1_ratio=self._lasso_ratio)
 
     def _get_models_for_all_choices(self) -> list[LinearRegressor]:
-        alpha_choices = (
-            self._alpha if isinstance(self._alpha, Choice) else [self._alpha]
-        )
-        lasso_choices = (
-            self._lasso_ratio if isinstance(self._lasso_ratio, Choice) else [self._lasso_ratio]
-        )
+        alpha_choices = self._alpha if isinstance(self._alpha, Choice) else [self._alpha]
+        lasso_choices = self._lasso_ratio if isinstance(self._lasso_ratio, Choice) else [self._lasso_ratio]
 
         models = []
         for alpha in alpha_choices:
             for lasso in lasso_choices:
                 models.append(
-                    LinearRegressor(penalty=LinearRegressor.Penalty.elastic_net(alpha=alpha, lasso_ratio=lasso)))
+                    LinearRegressor(penalty=LinearRegressor.Penalty.elastic_net(alpha=alpha, lasso_ratio=lasso)),
+                )
         return models
 
 

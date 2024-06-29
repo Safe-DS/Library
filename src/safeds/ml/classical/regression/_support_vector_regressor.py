@@ -91,9 +91,9 @@ class SupportVectorRegressor(Regressor, _SupportVectorMachineBase):
             raise FittingWithoutChoiceError
 
     def _get_models_for_all_choices(self) -> list[SupportVectorRegressor]:
-        #assert isinstance(self._c, Choice)  # this is always true and just here for linting
-        c_choices = (self._c if isinstance(self._c, Choice) else [self._c])
-        kernel_choices = (self.kernel if isinstance(self.kernel, Choice) else [self.kernel])
+        # assert isinstance(self._c, Choice)  # this is always true and just here for linting
+        c_choices = self._c if isinstance(self._c, Choice) else [self._c]
+        kernel_choices = self.kernel if isinstance(self.kernel, Choice) else [self.kernel]
 
         models = []
         for c in c_choices:

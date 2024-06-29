@@ -21,9 +21,9 @@ from safeds.exceptions import (
 from safeds.ml.classical.regression import (
     AdaBoostRegressor,
     DecisionTreeRegressor,
-    LinearRegressor,
     GradientBoostingRegressor,
     KNearestNeighborsRegressor,
+    LinearRegressor,
     RandomForestRegressor,
     Regressor,
     SupportVectorRegressor,
@@ -60,7 +60,6 @@ def regressors() -> list[Regressor]:
     ]
 
 
-
 def regressors_with_choices() -> list[Regressor]:
     """
     Return the list of regressors with Choices as Parameters to test choice functionality.
@@ -74,11 +73,20 @@ def regressors_with_choices() -> list[Regressor]:
         The list of regressors to test.
     """
     return [
-        AdaBoostRegressor(learner=Choice(AdaBoostRegressor(), None), max_learner_count=Choice(1, 2), learning_rate=Choice(0.1, 0.2)),
+        AdaBoostRegressor(
+            learner=Choice(AdaBoostRegressor(), None),
+            max_learner_count=Choice(1, 2),
+            learning_rate=Choice(0.1, 0.2),
+        ),
         DecisionTreeRegressor(max_depth=Choice(1, 2), min_sample_count_in_leaves=Choice(1, 2)),
         GradientBoostingRegressor(tree_count=Choice(1, 2), learning_rate=Choice(0.1, 0.2)),
         KNearestNeighborsRegressor(neighbor_count=Choice(1, 2)),
-        LinearRegressor(penalty=Choice(None, LinearRegressor.Penalty.elastic_net(alpha=Choice(1.0, 2.0), lasso_ratio=Choice(0.1, 0.9)))),
+        LinearRegressor(
+            penalty=Choice(
+                None,
+                LinearRegressor.Penalty.elastic_net(alpha=Choice(1.0, 2.0), lasso_ratio=Choice(0.1, 0.9)),
+            ),
+        ),
         RandomForestRegressor(tree_count=Choice(1, 2), max_depth=Choice(1, 2), min_sample_count_in_leaves=Choice(1, 2)),
         SupportVectorRegressor(kernel=Choice(None, SupportVectorRegressor.Kernel.linear()), c=Choice(0.5, 1.0)),
     ]
