@@ -68,7 +68,7 @@ class AdaBoostRegressor(Regressor, _AdaBoostBase):
     # ------------------------------------------------------------------------------------------------------------------
 
     @property
-    def learner(self) -> Regressor | None | Choice[Regressor | None]:   # type: ignore[override]
+    def learner(self) -> Regressor | None | Choice[Regressor | None]:  # type: ignore[override]
         """The base learner used for training the ensemble."""
         return self._learner
 
@@ -95,17 +95,23 @@ class AdaBoostRegressor(Regressor, _AdaBoostBase):
         )
 
     def _check_additional_fit_preconditions(self) -> None:
-        if isinstance(self._max_learner_count, Choice) or isinstance(self._learning_rate, Choice) or isinstance(self._learner, Choice):
+        if (
+            isinstance(self._max_learner_count, Choice)
+            or isinstance(self._learning_rate, Choice)
+            or isinstance(self._learner, Choice)
+        ):
             raise FittingWithChoiceError
 
     def _check_additional_fit_by_exhaustive_search_preconditions(self) -> None:
-        if not isinstance(self._max_learner_count, Choice) and not isinstance(self._learning_rate, Choice) and not isinstance(self._learner, Choice):
+        if (
+            not isinstance(self._max_learner_count, Choice)
+            and not isinstance(self._learning_rate, Choice)
+            and not isinstance(self._learner, Choice)
+        ):
             raise FittingWithoutChoiceError
 
     def _get_models_for_all_choices(self) -> list[AdaBoostRegressor]:
-        learner_choices = (
-            self._learner if isinstance(self._learner, Choice) else [self._learner]
-        )
+        learner_choices = self._learner if isinstance(self._learner, Choice) else [self._learner]
         max_learner_count_choices = (
             self._max_learner_count if isinstance(self._max_learner_count, Choice) else [self._max_learner_count]
         )

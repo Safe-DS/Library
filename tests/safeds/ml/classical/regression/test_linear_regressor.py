@@ -54,7 +54,9 @@ class TestPenalty:
         with pytest.raises(OutOfBoundsError):
             LinearRegressor(penalty=LinearRegressor.Penalty.elastic_net(alpha=alpha))
 
-    @pytest.mark.parametrize("lasso_ratio", [-0.5, 1.5, Choice(-0.5)], ids=["minus_0_point_5", "one_point_five", "invalid_choice"])
+    @pytest.mark.parametrize(
+        "lasso_ratio", [-0.5, 1.5, Choice(-0.5)], ids=["minus_0_point_5", "one_point_five", "invalid_choice"],
+    )
     def test_should_raise_if_lasso_ratio_out_of_bounds_elastic_net(self, lasso_ratio: float | Choice[float]) -> None:
         with pytest.raises(OutOfBoundsError):
             LinearRegressor(penalty=LinearRegressor.Penalty.elastic_net(lasso_ratio=lasso_ratio))

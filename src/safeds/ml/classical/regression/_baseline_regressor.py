@@ -52,7 +52,11 @@ class BaselineRegressor:
 
         if include_slower_models:
             self._list_of_model_types.extend(
-                [LinearRegressor(LinearRegressor.Penalty.elastic_net()), LinearRegressor(LinearRegressor.Penalty.lasso()), GradientBoostingRegressor()],
+                [
+                    LinearRegressor(LinearRegressor.Penalty.elastic_net()),
+                    LinearRegressor(LinearRegressor.Penalty.lasso()),
+                    GradientBoostingRegressor(),
+                ],
             )  # pragma: no cover
 
         self._fitted_models: list[Regressor] = []
