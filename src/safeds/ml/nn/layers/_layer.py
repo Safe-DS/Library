@@ -33,6 +33,14 @@ class Layer(ABC):
         pass  # pragma: no cover
 
     @abstractmethod
+    def _contains_choices(self) -> bool:
+        pass  # pragma: no cover
+
+    @abstractmethod
+    def _get_layers_for_all_choices(self) -> list[Layer]:
+        pass  # pragme: no cover
+
+    @abstractmethod
     def __hash__(self) -> int:
         pass  # pragma: no cover
 

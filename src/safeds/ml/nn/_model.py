@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 import copy
-from typing import TYPE_CHECKING, Generic, Self, TypeVar
+from concurrent.futures import ProcessPoolExecutor, wait, ALL_COMPLETED
+from typing import TYPE_CHECKING, Generic, Self, TypeVar, Any
 
 from safeds._config import _init_default_device
 from safeds._validation import _check_bounds, _ClosedBound
@@ -13,8 +14,9 @@ from safeds.data.tabular.transformation import OneHotEncoder
 from safeds.exceptions import (
     FeatureDataMismatchError,
     InvalidModelStructureError,
-    ModelNotFittedError,
+    ModelNotFittedError, LearningError,
 )
+from safeds.ml.metrics import ClassifierMetric, RegressorMetric
 from safeds.ml.nn.converters import (
     InputConversionImageToColumn,
     InputConversionImageToImage,
@@ -210,6 +212,8 @@ class NeuralNetworkRegressor(Generic[IFT, IPT]):
 
         _init_default_device()
 
+        # TODO Raise FittingWithChoice if Choices
+
         if not self._input_conversion._is_fit_data_valid(train_data):
             raise FeatureDataMismatchError
 
@@ -257,6 +261,55 @@ class NeuralNetworkRegressor(Generic[IFT, IPT]):
         copied_model._is_fitted = True
         copied_model._model.eval()
         return copied_model
+
+    def fit_by_exhaustive_search(
+        self,
+        train_data: IFT,
+        optimization_metric: RegressorMetric,
+        epoch_size: int = 25,
+        batch_size: int = 1,
+        learning_rate: float = 0.001,
+    ) -> Self:
+
+        # TODO Raise FittingWithoutChoice if no Choices
+        # TODO get models for all choices
+        if isinstance(train_data, TabularDataset):
+            [train_split, test_split] = train_data.to_table().split_rows(0.75)
+            train_data_splitted = train_split.to_tabular_dataset(
+                target_name=train_data.target.name,
+                extra_names=train_data.extras.column_names,
+            )
+            test_data_splitted = test_split.to_tabular_dataset(
+                target_name=train_data.target.name,
+                extra_names=train_data.extras.column_names,
+            )
+
+        list_of_models = self._get_models_for_all_choices()
+        if len(list_of_models) < 1:
+            raise LearningError("Please provide at least one Value in a Choice Parameter")
+        list_of_fitted_models = []
+
+        with ProcessPoolExecutor(max_workers=len(list_of_models)) as executor:
+            futures = []
+            for model in list_of_models:
+                futures.append(
+                    executor.submit())
+            [done, _] = wait(futures, return_when=ALL_COMPLETED)
+            for future in done:
+                list_of_fitted_models.append(future.result())
+        executor.shutdown()
+        # TODO fit models and determine the best one
+        # TODO multi-processing
+        # TODO cross validation
+        # TODO return best model
+
+        pass
+
+    def _get_models_for_all_choices(self) -> list[NeuralNetworkRegressor]:
+        models = []
+
+
+        # TODO construct all possible models of layer choices
 
     def predict(self, test_data: IPT) -> IFT:
         """

@@ -7,6 +7,7 @@ from safeds._validation import _check_bounds, _ClosedBound
 from safeds.ml.nn.typing import ModelImageSize
 
 from ._layer import Layer
+from ...hyperparameters import Choice
 
 if TYPE_CHECKING:
     from torch import nn
@@ -28,13 +29,18 @@ class ForwardLayer(Layer):
         If output_size < 1
     """
 
-    def __init__(self, neuron_count: int):
-        _check_bounds("neuron_count", neuron_count, lower_bound=_ClosedBound(1))
+    def __init__(self, neuron_count: int | Choice[int]) -> None:
+        if isinstance(neuron_count, Choice):
+            for val in neuron_count:
+                _check_bounds("neuron_count", val, lower_bound=_ClosedBound(1))
+        else:
+            _check_bounds("neuron_count", neuron_count, lower_bound=_ClosedBound(1))
 
         self._input_size: int | None = None
         self._output_size = neuron_count
 
     def _get_internal_layer(self, **kwargs: Any) -> nn.Module:
+        assert not self._contains_choices()
         from ._internal_layers import _InternalForwardLayer  # Slow import on global level
 
         if "activation_function" not in kwargs:
@@ -65,7 +71,7 @@ class ForwardLayer(Layer):
         return self._input_size
 
     @property
-    def output_size(self) -> int:
+    def output_size(self) -> int | Choice[int]:
         """
         Get the output_size of this layer.
 
@@ -81,6 +87,17 @@ class ForwardLayer(Layer):
             raise TypeError("The input_size of a forward layer has to be of type int.")
 
         self._input_size = input_size
+
+    def _contains_choices(self) -> bool:
+        return isinstance(self._output_size, Choice)
+
+    def _get_layers_for_all_choices(self) -> list[ForwardLayer]:
+        assert self._contains_choices()
+        layers = []
+        for val in self._output_size:
+            layers.append(ForwardLayer(neuron_count=val))
+        return layers
+
 
     def __hash__(self) -> int:
         return _structural_hash(self._input_size, self._output_size)

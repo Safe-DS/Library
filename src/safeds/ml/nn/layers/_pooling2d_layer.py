@@ -39,6 +39,7 @@ class _Pooling2DLayer(Layer):
         self._output_size: ModelImageSize | None = None
 
     def _get_internal_layer(self, **kwargs: Any) -> nn.Module:  # noqa: ARG002
+        assert not self._contains_choices()
         from ._internal_layers import _InternalPooling2DLayer  # Slow import on global level
 
         return _InternalPooling2DLayer(self._strategy, self._kernel_size, self._padding, self._stride)
@@ -101,6 +102,12 @@ class _Pooling2DLayer(Layer):
             raise TypeError("The input_size of a pooling layer has to be of type ImageSize.")
         self._input_size = input_size
         self._output_size = None
+
+    def _contains_choices(self) -> bool:
+        return False
+
+    def _get_layers_for_all_choices(self) -> list[_Pooling2DLayer]:
+        raise NotImplementedError # pragma: no cover
 
     def __hash__(self) -> int:
         return _structural_hash(

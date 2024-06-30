@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING, Any, Literal
 from safeds._utils import _structural_hash
 
 from ._layer import Layer
+from ...hyperparameters import Choice
 
 if TYPE_CHECKING:
     from torch import nn
@@ -39,6 +40,7 @@ class Convolutional2DLayer(Layer):
         self._output_size: ModelImageSize | None = None
 
     def _get_internal_layer(self, **kwargs: Any) -> nn.Module:
+        assert not self._contains_choices()
         from ._internal_layers import _InternalConvolutional2DLayer  # slow import on global level
 
         if self._input_size is None:
@@ -124,6 +126,12 @@ class Convolutional2DLayer(Layer):
             raise TypeError("The input_size of a convolution layer has to be of type ImageSize.")
         self._input_size = input_size
         self._output_size = None
+
+    def _contains_choices(self) -> bool:
+        return False
+
+    def _get_layers_for_all_choices(self) -> list[Convolutional2DLayer]:
+        raise NotImplementedError   # pragma: no cover
 
     def __hash__(self) -> int:
         return _structural_hash(

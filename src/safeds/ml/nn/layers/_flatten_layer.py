@@ -22,6 +22,7 @@ class FlattenLayer(Layer):
         self._output_size: int | None = None
 
     def _get_internal_layer(self, **kwargs: Any) -> nn.Module:  # noqa: ARG002
+        assert not self._contains_choices()
         from ._internal_layers import _InternalFlattenLayer  # Slow import on global level
 
         return _InternalFlattenLayer()
@@ -75,6 +76,12 @@ class FlattenLayer(Layer):
             raise TypeError("The input_size of a flatten layer has to be a ConstantImageSize.")
         self._input_size = input_size
         self._output_size = None
+
+    def _contains_choices(self) -> bool:
+        return False
+
+    def _get_layers_for_all_choices(self) -> list[FlattenLayer]:
+        raise NotImplementedError # pragma: no cover
 
     def __hash__(self) -> int:
         return _structural_hash(self._input_size, self._output_size)
