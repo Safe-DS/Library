@@ -3,8 +3,8 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from safeds._utils import _get_random_seed, _structural_hash
-from safeds.exceptions import FittingWithoutChoiceError
 from safeds._validation import _check_bounds, _OpenBound
+from safeds.exceptions import FittingWithoutChoiceError
 
 from ._classifier import Classifier
 

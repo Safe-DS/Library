@@ -314,6 +314,7 @@ class Classifier(SupervisedModel, ABC):
         assert best_model is not None
         return best_model
 
+
 def _extract_table(table_or_dataset: Table | TabularDataset) -> Table:
     """Extract the table from the given table or dataset."""
     if isinstance(table_or_dataset, TabularDataset):
