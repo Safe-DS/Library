@@ -25,7 +25,7 @@ class KNearestNeighborsImputer(TableTransformer):
         The number of neighbors to consider when imputing missing values.
     column_names:
         The list of columns used to impute missing values. If 'None', all columns are used.
-    value_to_replace: 
+    value_to_replace:
         The placeholder for the missing values. All occurrences of`missing_values` will be imputed.
     """
 
@@ -58,7 +58,6 @@ class KNearestNeighborsImputer(TableTransformer):
             self._value_to_replace,
             # Leave out the internal state for faster hashing
         )
-
 
     # ------------------------------------------------------------------------------------------------------------------
     # Properties

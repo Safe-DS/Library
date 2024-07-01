@@ -68,8 +68,7 @@ def transformers() -> list[TableTransformer]:
         + transformers_non_numeric()
         + [
             SimpleImputer(strategy=SimpleImputer.Strategy.mode()),
-            KNearestNeighborsImputer(neighbor_count=3,value_to_replace=None),
-            
+            KNearestNeighborsImputer(neighbor_count=3, value_to_replace=None),
         ]
     )
 

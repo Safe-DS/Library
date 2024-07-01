@@ -1,4 +1,3 @@
-import numpy as np
 import pytest
 from safeds.data.tabular.containers import Table
 from safeds.data.tabular.transformation import KNearestNeighborsImputer
@@ -17,6 +16,8 @@ class TestInit:
     def test_neighbor_count(self) -> None:
         knn = KNearestNeighborsImputer(neighbor_count=5)
         assert knn.neighbor_count == 5
+
+
 class TestFit:
     def test_should_raise_if_column_not_found(self) -> None:
         table = Table(
