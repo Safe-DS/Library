@@ -17,7 +17,7 @@ class RobustScaler(InvertibleTableTransformer):
     """
     The RobustScaler transforms column values to a range by removing the median and scaling to the interquartile range.
 
-    Currently for columns with high stability (IQR == 0) it will only substract the median and not scale to avoid dividing by zero.
+    Currently, for columns with high stability (IQR == 0), it will only substract the median and not scale to avoid dividing by zero.
 
     Parameters
     ----------
@@ -57,7 +57,7 @@ class RobustScaler(InvertibleTableTransformer):
         """
         Learn a transformation for a set of columns in a table.
 
-        This transformer is not modified.
+        **Note:** This transformer is not modified.
 
         Parameters
         ----------
@@ -90,7 +90,6 @@ class RobustScaler(InvertibleTableTransformer):
         if table.row_count == 0:
             raise ValueError("The RobustScaler cannot be fitted because the table contains 0 rows")
 
-        # n-tiles = [0.25, 0.125, 0.0675]
         _data_median = table._lazy_frame.select(column_names).median().collect()
         q1 = table._lazy_frame.select(column_names).quantile(0.25).collect()
         q3 = table._lazy_frame.select(column_names).quantile(0.75).collect()
@@ -113,7 +112,7 @@ class RobustScaler(InvertibleTableTransformer):
         """
         Apply the learned transformation to a table.
 
-        The table is not modified.
+        **Note:** The given table is not modified.
 
         Parameters
         ----------
@@ -156,7 +155,7 @@ class RobustScaler(InvertibleTableTransformer):
         """
         Undo the learned transformation.
 
-        The table is not modified.
+        **Note:** The given table is not modified.
 
         Parameters
         ----------
