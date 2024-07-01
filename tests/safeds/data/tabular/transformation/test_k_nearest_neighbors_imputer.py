@@ -17,8 +17,6 @@ class TestInit:
     def test_neighbor_count(self) -> None:
         knn = KNearestNeighborsImputer(neighbor_count=5)
         assert knn.neighbor_count == 5
-
-
 class TestFit:
     def test_should_raise_if_column_not_found(self) -> None:
         table = Table(
@@ -108,7 +106,7 @@ class TestFitAndTransform:
             (
                 Table(
                     {
-                        "col1": [1, 2, np.nan],
+                        "col1": [1, 2, None],
                         "col2": [1, 2, 3],
                     },
                 ),
@@ -123,7 +121,7 @@ class TestFitAndTransform:
             (
                 Table(
                     {
-                        "col1": [1, 2, np.nan, 4],
+                        "col1": [1, 2, None, 4],
                         "col2": [1, 2, 3, 4],
                     },
                 ),
@@ -147,7 +145,7 @@ class TestFitAndTransform:
         fitted_transformer, transformed_table = KNearestNeighborsImputer(
             neighbor_count=1,
             column_names=None,
-            value_to_replace=np.nan,
+            value_to_replace=None,
         ).fit_and_transform(table)
         assert fitted_transformer.is_fitted
         assert transformed_table == expected
@@ -158,8 +156,8 @@ class TestFitAndTransform:
             (
                 Table(
                     {
-                        "col1": [1, 2, np.nan, 4],
-                        "col2": [1, np.nan, 3, 4],
+                        "col1": [1, 2, None, 4],
+                        "col2": [1, None, 3, 4],
                     },
                 ),
                 ["col1"],
@@ -181,7 +179,7 @@ class TestFitAndTransform:
     ) -> None:
         fitted_transformer, transformed_table = KNearestNeighborsImputer(
             neighbor_count=3,
-            value_to_replace=np.nan,
+            value_to_replace=None,
         ).fit_and_transform(table)
         assert fitted_transformer.is_fitted
         assert transformed_table == expected

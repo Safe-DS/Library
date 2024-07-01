@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from numpy import nan
+
 from safeds._utils import _structural_hash
 from safeds._validation import _check_bounds, _check_columns_exist, _ClosedBound
 from safeds.data.tabular.containers import Table
@@ -23,6 +25,8 @@ class KNearestNeighborsImputer(TableTransformer):
         The number of neighbors to consider when imputing missing values.
     column_names:
         The list of columns used to impute missing values. If 'None', all columns are used.
+    value_to_replace: 
+        The placeholder for the missing values. All occurrences of`missing_values` will be imputed.
     """
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -34,7 +38,7 @@ class KNearestNeighborsImputer(TableTransformer):
         neighbor_count: int,
         *,
         column_names: str | list[str] | None = None,
-        value_to_replace: float | str | None = None,
+        value_to_replace: float | str | None = nan,
     ) -> None:
         super().__init__(column_names)
 
@@ -42,13 +46,19 @@ class KNearestNeighborsImputer(TableTransformer):
 
         # parameter
         self._neighbor_count: int = neighbor_count
-        self._value_to_replace: float | str | None = value_to_replace
+        self._value_to_replace: float | str | None = value_to_replace if value_to_replace is not None else nan
 
         # attributes
         self._wrapped_transformer: sk_KNNImputer | None = None
 
     def __hash__(self) -> int:
-        return _structural_hash(self)
+        return _structural_hash(
+            super().__hash__(),
+            self._neighbor_count,
+            self._value_to_replace,
+            # Leave out the internal state for faster hashing
+        )
+
 
     # ------------------------------------------------------------------------------------------------------------------
     # Properties
