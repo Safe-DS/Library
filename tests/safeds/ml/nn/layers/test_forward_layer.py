@@ -7,6 +7,7 @@ from safeds.exceptions import OutOfBoundsError
 from safeds.ml.nn.layers import ForwardLayer
 from torch import nn
 
+
 # TODO: Should be tested on a model, not a layer, since input size gets inferred
 # @pytest.mark.parametrize(
 #     "input_size",
@@ -195,30 +196,31 @@ def test_should_set_activation_function(activation_function: str, expected_activ
     internal_layer = forward_layer._get_internal_layer(
         activation_function="relu",
     )
-    #check if the type gets overwritten by constructor
+    # check if the type gets overwritten by constructor
     assert (
         internal_layer._fn is None
         if expected_activation_function is None
         else isinstance(internal_layer._fn, expected_activation_function)
     )
 
+
 @pytest.mark.parametrize(
-    ("activation_function", "expected_activation_function"),
+    "activation_function",
     [
-        ("a", nn.Sigmoid),
-        ("b", nn.ReLU),
-        ("c", nn.Softmax),
-        ("d", None),
+        "a",
+        "b",
+        "c",
+        "d",
     ],
     ids=["sigmoid", "relu", "softmax", "none"],
 )
-def test_should_set_activation_function(activation_function: str, expected_activation_function: type | None) -> None:
+def test_should_raise_unknown_function_constructor(activation_function: str) -> None:
     forward_layer = ForwardLayer(neuron_count=1, activation_function=activation_function)
     forward_layer._input_size = 1
     with pytest.raises(
         ValueError,
         match=rf"Unknown Activation Function: {activation_function}",
     ):
-        internal_layer = forward_layer._get_internal_layer(
+        forward_layer._get_internal_layer(
             activation_function="relu",
         )
