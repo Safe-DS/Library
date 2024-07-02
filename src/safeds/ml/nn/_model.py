@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import copy
 from concurrent.futures import ProcessPoolExecutor, wait, ALL_COMPLETED
-from typing import TYPE_CHECKING, Generic, Self, TypeVar, Any
+from typing import TYPE_CHECKING, Generic, Self, TypeVar
 
 from safeds._config import _init_default_device
 from safeds._validation import _check_bounds, _ClosedBound
@@ -14,9 +14,9 @@ from safeds.data.tabular.transformation import OneHotEncoder
 from safeds.exceptions import (
     FeatureDataMismatchError,
     InvalidModelStructureError,
-    ModelNotFittedError, LearningError,
+    ModelNotFittedError, LearningError, FittingWithoutChoiceError, FittingWithChoiceError,
 )
-from safeds.ml.metrics import ClassifierMetric, RegressorMetric
+from safeds.ml.metrics import ClassifierMetric, RegressorMetric, RegressionMetrics
 from safeds.ml.nn.converters import (
     InputConversionImageToColumn,
     InputConversionImageToImage,
@@ -212,7 +212,8 @@ class NeuralNetworkRegressor(Generic[IFT, IPT]):
 
         _init_default_device()
 
-        # TODO Raise FittingWithChoice if Choices
+        if self._contains_choices():
+            raise FittingWithChoiceError
 
         if not self._input_conversion._is_fit_data_valid(train_data):
             raise FeatureDataMismatchError
@@ -270,19 +271,9 @@ class NeuralNetworkRegressor(Generic[IFT, IPT]):
         batch_size: int = 1,
         learning_rate: float = 0.001,
     ) -> Self:
-
-        # TODO Raise FittingWithoutChoice if no Choices
-        # TODO get models for all choices
-        if isinstance(train_data, TabularDataset):
-            [train_split, test_split] = train_data.to_table().split_rows(0.75)
-            train_data_splitted = train_split.to_tabular_dataset(
-                target_name=train_data.target.name,
-                extra_names=train_data.extras.column_names,
-            )
-            test_data_splitted = test_split.to_tabular_dataset(
-                target_name=train_data.target.name,
-                extra_names=train_data.extras.column_names,
-            )
+        if not self._contains_choices():
+            raise FittingWithoutChoiceError
+        assert not isinstance(IFT, ImageDataset)
 
         list_of_models = self._get_models_for_all_choices()
         if len(list_of_models) < 1:
@@ -293,23 +284,85 @@ class NeuralNetworkRegressor(Generic[IFT, IPT]):
             futures = []
             for model in list_of_models:
                 futures.append(
-                    executor.submit())
+                    executor.submit(model.fit, train_data, epoch_size, batch_size, learning_rate))
             [done, _] = wait(futures, return_when=ALL_COMPLETED)
             for future in done:
                 list_of_fitted_models.append(future.result())
         executor.shutdown()
-        # TODO fit models and determine the best one
-        # TODO multi-processing
-        # TODO cross validation
-        # TODO return best model
 
-        pass
+        #Make this work with TimeSeriesDataset as well
+        target_col = train_data.target
+        test_data = train_data.to_table().remove_columns([target_col.name])
 
-    def _get_models_for_all_choices(self) -> list[NeuralNetworkRegressor]:
+        best_model = None
+        best_metric_value = None
+        for fitted_model in list_of_fitted_models:
+            if best_model is None:
+                best_model = fitted_model
+                match optimization_metric.value:
+                    case "mean_squared_error":
+                        best_metric_value = RegressionMetrics.mean_squared_error(predicted=fitted_model.predict(test_data),expected=target_col)
+                    case "mean_absolute_error":
+                        best_metric_value = RegressionMetrics.mean_absolute_error(predicted=fitted_model.predict(test_data),expected=target_col)
+                    case "median_absolute_deviation":
+                        best_metric_value = RegressionMetrics.median_absolute_deviation(predicted=fitted_model.predict(test_data),expected=target_col)
+                    case "coefficient_of_determination":
+                        best_metric_value = RegressionMetrics.coefficient_of_determination(predicted=fitted_model.predict(test_data),expected=target_col)
+            else:
+                match optimization_metric.value:
+                    case "mean_squared_error":
+                        error_of_fitted_model = RegressionMetrics.mean_squared_error(predicted=fitted_model.predict(test_data),expected=target_col)
+                        if error_of_fitted_model < best_metric_value:
+                            best_model = fitted_model
+                            best_metric_value = error_of_fitted_model
+                    case "mean_absolute_error":
+                        error_of_fitted_model = RegressionMetrics.mean_absolute_error(predicted=fitted_model.predict(test_data),expected=target_col)
+                        if error_of_fitted_model < best_metric_value:
+                            best_model = fitted_model
+                            best_metric_value = error_of_fitted_model
+                    case "median_absolute_deviation":
+                        error_of_fitted_model = RegressionMetrics.median_absolute_deviation(predicted=fitted_model.predict(test_data),expected=target_col)
+                        if error_of_fitted_model < best_metric_value:
+                            best_model = fitted_model
+                            best_metric_value = error_of_fitted_model
+                    case "coefficient_of_determination":
+                        error_of_fitted_model = RegressionMetrics.coefficient_of_determination(predicted=fitted_model.predict(test_data),expected=target_col)
+                        if error_of_fitted_model > best_metric_value:
+                            best_model = fitted_model
+                            best_metric_value = error_of_fitted_model
+        #for layer in best_model._layers:
+        #    print(layer.output_size)
+        return best_model
+
+    def _get_models_for_all_choices(self) -> list[Self]:
+
+        all_possible_layer_combinations: list[list] = [[]]
+        for layer in self._layers:
+            if not layer._contains_choices():
+                for item in all_possible_layer_combinations:
+                    item.append(layer)
+            else:
+                updated_combinations = []
+                versions_of_one_layer = layer._get_layers_for_all_choices()
+                for version in versions_of_one_layer:
+                    copy_of_all_current_possible_combinations = copy.deepcopy(all_possible_layer_combinations)
+                    for combination in copy_of_all_current_possible_combinations:
+                        combination.append(version)
+                        updated_combinations.append(combination)
+                all_possible_layer_combinations = updated_combinations
+
         models = []
+        for combination in all_possible_layer_combinations:
+            copied_model = copy.deepcopy(self)
+            copied_model._layers = combination
+            models.append(copied_model)
+        return models
 
-
-        # TODO construct all possible models of layer choices
+    def _contains_choices(self) -> bool:
+        for layer in self._layers:
+            if layer._contains_choices():
+                return True
+        return False
 
     def predict(self, test_data: IPT) -> IFT:
         """

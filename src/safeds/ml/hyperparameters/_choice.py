@@ -3,6 +3,8 @@ from __future__ import annotations
 from collections.abc import Collection
 from typing import TYPE_CHECKING, TypeVar
 
+from safeds.exceptions._ml import EmptyChoiceError
+
 if TYPE_CHECKING:
     from collections.abc import Iterator
     from typing import Any
@@ -24,7 +26,10 @@ class Choice(Collection[T]):
         *args:
             The values to choose from.
         """
+        if len(args) < 1:
+            raise EmptyChoiceError()
         self.elements = list(dict.fromkeys(args))
+
 
     def __contains__(self, value: Any) -> bool:
         """
