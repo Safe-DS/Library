@@ -177,3 +177,48 @@ def test_should_assert_that_different_forward_layers_have_different_hash(
 )
 def test_should_assert_that_layer_size_is_greater_than_normal_object(layer: ForwardLayer) -> None:
     assert sys.getsizeof(layer) > sys.getsizeof(object())
+
+
+@pytest.mark.parametrize(
+    ("activation_function", "expected_activation_function"),
+    [
+        ("sigmoid", nn.Sigmoid),
+        ("relu", nn.ReLU),
+        ("softmax", nn.Softmax),
+        ("none", None),
+    ],
+    ids=["sigmoid", "relu", "softmax", "none"],
+)
+def test_should_set_activation_function(activation_function: str, expected_activation_function: type | None) -> None:
+    forward_layer = ForwardLayer(neuron_count=1, activation_function=activation_function)
+    forward_layer._input_size = 1
+    internal_layer = forward_layer._get_internal_layer(
+        activation_function="relu",
+    )
+    #check if the type gets overwritten by constructor
+    assert (
+        internal_layer._fn is None
+        if expected_activation_function is None
+        else isinstance(internal_layer._fn, expected_activation_function)
+    )
+
+@pytest.mark.parametrize(
+    ("activation_function", "expected_activation_function"),
+    [
+        ("a", nn.Sigmoid),
+        ("b", nn.ReLU),
+        ("c", nn.Softmax),
+        ("d", None),
+    ],
+    ids=["sigmoid", "relu", "softmax", "none"],
+)
+def test_should_set_activation_function(activation_function: str, expected_activation_function: type | None) -> None:
+    forward_layer = ForwardLayer(neuron_count=1, activation_function=activation_function)
+    forward_layer._input_size = 1
+    with pytest.raises(
+        ValueError,
+        match=rf"Unknown Activation Function: {activation_function}",
+    ):
+        internal_layer = forward_layer._get_internal_layer(
+            activation_function="relu",
+        )

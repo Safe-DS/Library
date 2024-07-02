@@ -28,11 +28,12 @@ class ForwardLayer(Layer):
         If output_size < 1
     """
 
-    def __init__(self, neuron_count: int):
+    def __init__(self, neuron_count: int, activation_function: str = "notset"):
         _check_bounds("neuron_count", neuron_count, lower_bound=_ClosedBound(1))
 
         self._input_size: int | None = None
         self._output_size = neuron_count
+        self._activation_function : str = activation_function
 
     def _get_internal_layer(self, **kwargs: Any) -> nn.Module:
         from ._internal_layers import _InternalForwardLayer  # Slow import on global level
@@ -41,8 +42,10 @@ class ForwardLayer(Layer):
             raise ValueError(
                 "The activation_function is not set. The internal layer can only be created when the activation_function is provided in the kwargs.",
             )
-        else:
+        elif self._activation_function == "notset":
             activation_function: str = kwargs["activation_function"]
+        else:
+            activation_function = self._activation_function
 
         if self._input_size is None:
             raise ValueError("The input_size is not yet set.")
