@@ -2,8 +2,6 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from numpy import nan
-
 from safeds._utils import _structural_hash
 from safeds._validation import _check_bounds, _check_columns_exist, _ClosedBound
 from safeds.data.tabular.containers import Table
@@ -38,7 +36,7 @@ class KNearestNeighborsImputer(TableTransformer):
         neighbor_count: int,
         *,
         column_names: str | list[str] | None = None,
-        value_to_replace: float | str | None = nan,
+        value_to_replace: float | str | None = None,
     ) -> None:
         super().__init__(column_names)
 
@@ -46,7 +44,7 @@ class KNearestNeighborsImputer(TableTransformer):
 
         # parameter
         self._neighbor_count: int = neighbor_count
-        self._value_to_replace: float | str | None = value_to_replace if value_to_replace is not None else nan
+        self._value_to_replace: float | str | None = value_to_replace
 
         # attributes
         self._wrapped_transformer: sk_KNNImputer | None = None
@@ -73,6 +71,10 @@ class KNearestNeighborsImputer(TableTransformer):
         """The number of neighbors to consider when imputing missing values."""
         return self._neighbor_count
 
+    @property
+    def value_to_replace(self) -> float | str | None:
+        """The value to replace."""
+        return self._value_to_replace
     # ------------------------------------------------------------------------------------------------------------------
     # Learning and transformation
     # ------------------------------------------------------------------------------------------------------------------
@@ -98,6 +100,7 @@ class KNearestNeighborsImputer(TableTransformer):
         ColumnNotFoundError
             If one of the columns, that should be fitted is not in the table.
         """
+        from numpy import nan
         from sklearn.impute import KNNImputer as sk_KNNImputer
 
         if table.row_count == 0:
@@ -108,6 +111,9 @@ class KNearestNeighborsImputer(TableTransformer):
         else:
             column_names = self._column_names
             _check_columns_exist(table, column_names)
+        
+        if self._value_to_replace is None:
+            self._value_to_replace = nan
 
         wrapped_transformer = sk_KNNImputer(n_neighbors=self._neighbor_count, missing_values=self._value_to_replace)
         wrapped_transformer.set_output(transform="polars")

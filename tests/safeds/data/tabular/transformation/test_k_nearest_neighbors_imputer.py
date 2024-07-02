@@ -17,6 +17,14 @@ class TestInit:
         knn = KNearestNeighborsImputer(neighbor_count=5)
         assert knn.neighbor_count == 5
 
+    def test_value_to_replace_none(self)->None:
+        knn = KNearestNeighborsImputer(neighbor_count=5)
+        assert knn.value_to_replace is None
+    
+    def test_value_to_replace_number(self)->None:
+        knn = KNearestNeighborsImputer(neighbor_count=5, value_to_replace=1)
+        assert knn.value_to_replace == 1
+
 
 class TestFit:
     def test_should_raise_if_column_not_found(self) -> None:
