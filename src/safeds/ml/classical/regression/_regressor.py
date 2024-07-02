@@ -1,15 +1,23 @@
 from __future__ import annotations
 
 from abc import ABC
-from typing import TYPE_CHECKING
+from concurrent.futures import ALL_COMPLETED, ProcessPoolExecutor, wait
+from typing import TYPE_CHECKING, Self
 
 from safeds.data.labeled.containers import TabularDataset
-from safeds.exceptions import ColumnLengthMismatchError, ModelNotFittedError
+from safeds.data.tabular.containers import Table
+from safeds.exceptions import (
+    ColumnLengthMismatchError,
+    DatasetMissesDataError,
+    LearningError,
+    ModelNotFittedError,
+    PlainTableError,
+)
 from safeds.ml.classical import SupervisedModel
-from safeds.ml.metrics import RegressionMetrics
+from safeds.ml.metrics import RegressionMetrics, RegressorMetric
 
 if TYPE_CHECKING:
-    from safeds.data.tabular.containers import Column, Table
+    from safeds.data.tabular.containers import Column
 
 
 class Regressor(SupervisedModel, ABC):
@@ -243,6 +251,97 @@ class Regressor(SupervisedModel, ABC):
             self.predict(validation_or_test_set),
             validation_or_test_set.get_column(self.get_target_name()),
         )
+
+    def fit_by_exhaustive_search(self, training_set: TabularDataset, optimization_metric: RegressorMetric) -> Self:
+        """
+        Use the hyperparameter choices to create multiple models and fit them.
+
+        **Note:** This model is not modified.
+
+        Parameters
+        ----------
+        training_set:
+            The training data containing the features and target.
+        optimization_metric:
+            The metric that should be used for determining the performance of a model.
+
+        Returns
+        -------
+        best_model:
+            The model that performed the best out of all possible models given the Choices of hyperparameters.
+
+        Raises
+        ------
+        PlainTableError
+            If a table is passed instead of a TabularDataset.
+        DatasetMissesDataError
+            If the given training set contains no data.
+        FittingWithoutChoiceError
+            When trying to call this method on a model without hyperparameter choices.
+        LearningError
+            If the training data contains invalid values or if the training failed.
+        """
+        if not isinstance(training_set, TabularDataset) and isinstance(training_set, Table):
+            raise PlainTableError
+        if training_set.to_table().row_count == 0:
+            raise DatasetMissesDataError
+
+        self._check_additional_fit_by_exhaustive_search_preconditions()
+
+        [train_split, test_split] = training_set.to_table().split_rows(0.75)
+        train_data = train_split.to_tabular_dataset(
+            target_name=training_set.target.name,
+            extra_names=training_set.extras.column_names,
+        )
+        test_data = test_split.to_tabular_dataset(
+            target_name=training_set.target.name,
+            extra_names=training_set.extras.column_names,
+        )
+
+        list_of_models = self._get_models_for_all_choices()
+        if len(list_of_models) < 1:
+            raise LearningError("Please provide at least one Value in a Choice Parameter")
+        list_of_fitted_models = []
+
+        with ProcessPoolExecutor(max_workers=len(list_of_models)) as executor:
+            futures = []
+            for model in list_of_models:
+                futures.append(executor.submit(model.fit, train_data))
+            [done, _] = wait(futures, return_when=ALL_COMPLETED)
+            for future in done:
+                list_of_fitted_models.append(future.result())
+        executor.shutdown()
+
+        best_model = None
+        best_metric_value = None
+        for fitted_model in list_of_fitted_models:
+            if best_model is None:
+                best_model = fitted_model
+                match optimization_metric.value:
+                    case "mean_squared_error":
+                        best_metric_value = fitted_model.mean_squared_error(test_data)
+                    case "mean_absolute_error":
+                        best_metric_value = fitted_model.mean_absolute_error(test_data)
+                    case "median_absolute_deviation":
+                        best_metric_value = fitted_model.median_absolute_deviation(test_data)
+                    case "coefficient_of_determination":
+                        best_metric_value = fitted_model.coefficient_of_determination(test_data)
+            else:
+                match optimization_metric.value:
+                    case "mean_squared_error":
+                        if fitted_model.mean_squared_error(test_data) < best_metric_value:
+                            best_model = fitted_model
+                    case "mean_absolute_error":
+                        if fitted_model.mean_absolute_error(test_data) < best_metric_value:
+                            best_model = fitted_model
+                    case "median_absolute_deviation":
+                        if fitted_model.median_absolute_deviation(test_data) < best_metric_value:
+                            best_model = fitted_model
+                    case "coefficient_of_determination":
+                        if fitted_model.coefficient_of_determination(test_data) > best_metric_value:
+                            best_model = fitted_model
+        assert best_model is not None
+        return best_model
 
 
 def _check_metrics_preconditions(actual: Column, expected: Column) -> None:  # pragma: no cover

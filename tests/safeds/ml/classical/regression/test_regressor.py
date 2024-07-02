@@ -10,6 +10,9 @@ from safeds.exceptions import (
     ColumnLengthMismatchError,
     DatasetMissesDataError,
     DatasetMissesFeaturesError,
+    FittingWithChoiceError,
+    FittingWithoutChoiceError,
+    LearningError,
     MissingValuesColumnError,
     ModelNotFittedError,
     NonNumericColumnError,
@@ -18,17 +21,16 @@ from safeds.exceptions import (
 from safeds.ml.classical.regression import (
     AdaBoostRegressor,
     DecisionTreeRegressor,
-    ElasticNetRegressor,
     GradientBoostingRegressor,
     KNearestNeighborsRegressor,
-    LassoRegressor,
     LinearRegressor,
     RandomForestRegressor,
     Regressor,
-    RidgeRegressor,
     SupportVectorRegressor,
 )
 from safeds.ml.classical.regression._regressor import _check_metrics_preconditions
+from safeds.ml.hyperparameters import Choice
+from safeds.ml.metrics import RegressorMetric
 
 if TYPE_CHECKING:
     from _pytest.fixtures import FixtureRequest
@@ -50,14 +52,43 @@ def regressors() -> list[Regressor]:
     return [
         AdaBoostRegressor(),
         DecisionTreeRegressor(),
-        ElasticNetRegressor(),
         GradientBoostingRegressor(),
         KNearestNeighborsRegressor(2),
-        LassoRegressor(),
         LinearRegressor(),
         RandomForestRegressor(),
-        RidgeRegressor(),
         SupportVectorRegressor(),
+    ]
+
+
+def regressors_with_choices() -> list[Regressor]:
+    """
+    Return the list of regressors with Choices as Parameters to test choice functionality.
+
+    After you implemented a new regressor, add it to this list to ensure its `fit_by_exhaustive_search` method works as
+    expected. Place tests of methods that are specific to your regressor in a separate test file.
+
+    Returns
+    -------
+    regressors : list[Regressor]
+        The list of regressors to test.
+    """
+    return [
+        AdaBoostRegressor(
+            learner=Choice(AdaBoostRegressor(), None),
+            max_learner_count=Choice(1, 2),
+            learning_rate=Choice(0.1, 0.2),
+        ),
+        DecisionTreeRegressor(max_depth=Choice(1, 2), min_sample_count_in_leaves=Choice(1, 2)),
+        GradientBoostingRegressor(tree_count=Choice(1, 2), learning_rate=Choice(0.1, 0.2)),
+        KNearestNeighborsRegressor(neighbor_count=Choice(1, 2)),
+        LinearRegressor(
+            penalty=Choice(
+                None,
+                LinearRegressor.Penalty.elastic_net(alpha=Choice(1.0, 2.0), lasso_ratio=Choice(0.1, 0.9)),
+            ),
+        ),
+        RandomForestRegressor(tree_count=Choice(1, 2), max_depth=Choice(1, 2), min_sample_count_in_leaves=Choice(1, 2)),
+        SupportVectorRegressor(kernel=Choice(None, SupportVectorRegressor.Kernel.linear()), c=Choice(0.5, 1.0)),
     ]
 
 
@@ -65,12 +96,51 @@ def regressors() -> list[Regressor]:
 def valid_data() -> TabularDataset:
     return Table(
         {
-            "id": [1, 4],
-            "feat1": [2, 5],
-            "feat2": [3, 6],
-            "target": [0, 1],
+            "id": [1, 4, 7, 10],
+            "feat1": [2, 5, 8, 11],
+            "feat2": [3, 6, 9, 12],
+            "target": [0, 1, 0, 1],
         },
     ).to_tabular_dataset(target_name="target", extra_names=["id"])
+
+
+@pytest.mark.parametrize("regressor_with_choice", regressors_with_choices(), ids=lambda x: x.__class__.__name__)
+class TestChoiceRegressors:
+
+    def test_workflow_with_choice_parameter(self, regressor_with_choice: Regressor, valid_data: TabularDataset) -> None:
+        model = regressor_with_choice.fit_by_exhaustive_search(valid_data, RegressorMetric.MEAN_SQUARED_ERROR)
+        assert isinstance(model, type(regressor_with_choice))
+        pred = model.predict(valid_data)
+        assert isinstance(pred, TabularDataset)
+
+    def test_should_raise_if_model_is_fitted_with_choice(
+        self,
+        regressor_with_choice: Regressor,
+        valid_data: TabularDataset,
+    ) -> None:
+        with pytest.raises(FittingWithChoiceError):
+            regressor_with_choice.fit(valid_data)
+
+
+class TestFitByExhaustiveSearch:
+    @pytest.mark.parametrize("regressor", regressors(), ids=lambda x: x.__class__.__name__)
+    def test_should_raise_if_model_is_fitted_by_exhaustive_search_without_choice(
+        self,
+        regressor: Regressor,
+        valid_data: TabularDataset,
+    ) -> None:
+        with pytest.raises(FittingWithoutChoiceError):
+            regressor.fit_by_exhaustive_search(valid_data, optimization_metric=RegressorMetric.MEAN_SQUARED_ERROR)
+
+    def test_should_raise_if_model_is_fitted_by_exhaustive_search_with_empty_choice(
+        self,
+        valid_data: TabularDataset,
+    ) -> None:
+        with pytest.raises(LearningError):
+            AdaBoostRegressor(max_learner_count=Choice(), learning_rate=Choice()).fit_by_exhaustive_search(
+                valid_data,
+                optimization_metric=RegressorMetric.MEAN_SQUARED_ERROR,
+            )
 
 
 @pytest.mark.parametrize("regressor", regressors(), ids=lambda x: x.__class__.__name__)
