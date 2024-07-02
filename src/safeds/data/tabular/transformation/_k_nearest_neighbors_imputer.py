@@ -112,12 +112,13 @@ class KNearestNeighborsImputer(TableTransformer):
             column_names = self._column_names
             _check_columns_exist(table, column_names)
 
+        value_to_replace = self._value_to_replace
+        
         if self._value_to_replace is None:
             from numpy import nan
+            value_to_replace = nan
 
-            self._value_to_replace = nan
-
-        wrapped_transformer = sk_KNNImputer(n_neighbors=self._neighbor_count, missing_values=self._value_to_replace)
+        wrapped_transformer = sk_KNNImputer(n_neighbors=self._neighbor_count, missing_values=value_to_replace)
         wrapped_transformer.set_output(transform="polars")
         wrapped_transformer.fit(
             table.remove_columns_except(column_names)._data_frame,
