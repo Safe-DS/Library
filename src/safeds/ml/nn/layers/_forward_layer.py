@@ -33,7 +33,7 @@ class ForwardLayer(Layer):
 
         self._input_size: int | None = None
         self._output_size = neuron_count
-        self._activation_function : str = activation_function
+        self._activation_function: str = activation_function
 
     def _get_internal_layer(self, **kwargs: Any) -> nn.Module:
         from ._internal_layers import _InternalForwardLayer  # Slow import on global level
