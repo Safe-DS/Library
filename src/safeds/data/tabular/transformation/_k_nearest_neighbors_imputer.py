@@ -100,7 +100,6 @@ class KNearestNeighborsImputer(TableTransformer):
         ColumnNotFoundError
             If one of the columns, that should be fitted is not in the table.
         """
-        from numpy import nan
         from sklearn.impute import KNNImputer as sk_KNNImputer
 
         if table.row_count == 0:
@@ -113,6 +112,7 @@ class KNearestNeighborsImputer(TableTransformer):
             _check_columns_exist(table, column_names)
         
         if self._value_to_replace is None:
+            from numpy import nan
             self._value_to_replace = nan
 
         wrapped_transformer = sk_KNNImputer(n_neighbors=self._neighbor_count, missing_values=self._value_to_replace)
