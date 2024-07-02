@@ -1708,6 +1708,23 @@ class Table:
         """
         return fitted_transformer.inverse_transform(self)
 
+    def join(
+        self,
+        right_table: Table,
+        left_names: str | list[str],
+        right_names: str | list[str],
+        *,
+        mode: Literal["inner", "left", "outer"] = "inner",
+    ) -> Table:
+        return self._from_polars_lazy_frame(
+            self._lazy_frame.join(
+                right_table._lazy_frame,
+                left_on=left_names,
+                right_on=right_names,
+                how=mode,
+            ),
+        )
+
     def transform_table(self, fitted_transformer: TableTransformer) -> Table:
         """
         Return a new table transformed by a **fitted** transformer.
