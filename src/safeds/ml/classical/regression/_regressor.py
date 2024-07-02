@@ -9,7 +9,6 @@ from safeds.data.tabular.containers import Table
 from safeds.exceptions import (
     ColumnLengthMismatchError,
     DatasetMissesDataError,
-    LearningError,
     ModelNotFittedError,
     PlainTableError,
 )
@@ -299,8 +298,6 @@ class Regressor(SupervisedModel, ABC):
         )
 
         list_of_models = self._get_models_for_all_choices()
-        if len(list_of_models) < 1:
-            raise LearningError("Please provide at least one Value in a Choice Parameter")
         list_of_fitted_models = []
 
         with ProcessPoolExecutor(max_workers=len(list_of_models)) as executor:
@@ -329,17 +326,25 @@ class Regressor(SupervisedModel, ABC):
             else:
                 match optimization_metric.value:
                     case "mean_squared_error":
-                        if fitted_model.mean_squared_error(test_data) < best_metric_value:
+                        error_of_fitted_model = fitted_model.mean_squared_error(test_data)
+                        if error_of_fitted_model < best_metric_value:
                             best_model = fitted_model
+                            best_metric_value = error_of_fitted_model
                     case "mean_absolute_error":
-                        if fitted_model.mean_absolute_error(test_data) < best_metric_value:
+                        error_of_fitted_model = fitted_model.mean_absolute_error(test_data)
+                        if error_of_fitted_model < best_metric_value:
                             best_model = fitted_model
+                            best_metric_value = error_of_fitted_model
                     case "median_absolute_deviation":
-                        if fitted_model.median_absolute_deviation(test_data) < best_metric_value:
+                        error_of_fitted_model = fitted_model.median_absolute_deviation(test_data)
+                        if error_of_fitted_model < best_metric_value:
                             best_model = fitted_model
+                            best_metric_value = error_of_fitted_model
                     case "coefficient_of_determination":
-                        if fitted_model.coefficient_of_determination(test_data) > best_metric_value:
+                        error_of_fitted_model = fitted_model.coefficient_of_determination(test_data)
+                        if error_of_fitted_model > best_metric_value:
                             best_model = fitted_model
+                            best_metric_value = error_of_fitted_model
         assert best_model is not None
         return best_model
 

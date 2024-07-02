@@ -271,8 +271,6 @@ class Classifier(SupervisedModel, ABC):
         )
 
         list_of_models = self._get_models_for_all_choices()
-        if len(list_of_models) < 1:
-            raise LearningError("Please provide at least one Value in a Choice Parameter")
         list_of_fitted_models = []
 
         with ProcessPoolExecutor(max_workers=len(list_of_models)) as executor:
@@ -300,17 +298,25 @@ class Classifier(SupervisedModel, ABC):
             else:
                 match optimization_metric.value:
                     case "accuracy":
-                        if fitted_model.accuracy(test_data) > best_metric_value:
+                        accuracy_of_fitted_model = fitted_model.accuracy(test_data)
+                        if accuracy_of_fitted_model > best_metric_value:
                             best_model = fitted_model
+                            best_metric_value = accuracy_of_fitted_model
                     case "precision":
-                        if fitted_model.precision(test_data, positive_class) > best_metric_value:
+                        precision_of_fitted_model = fitted_model.precision(test_data, positive_class)
+                        if precision_of_fitted_model > best_metric_value:
                             best_model = fitted_model
+                            best_metric_value = precision_of_fitted_model
                     case "recall":
-                        if fitted_model.recall(test_data, positive_class) > best_metric_value:
+                        recall_of_fitted_model = fitted_model.recall(test_data, positive_class)
+                        if recall_of_fitted_model > best_metric_value:
                             best_model = fitted_model
+                            best_metric_value = recall_of_fitted_model
                     case "f1score":
-                        if fitted_model.f1_score(test_data, positive_class) > best_metric_value:
+                        f1score_of_fitted_model = fitted_model.f1score(test_data, positive_class)
+                        if f1score_of_fitted_model > best_metric_value:
                             best_model = fitted_model
+                            best_metric_value = f1score_of_fitted_model
         assert best_model is not None
         return best_model
 
