@@ -75,6 +75,7 @@ class KNearestNeighborsImputer(TableTransformer):
     def value_to_replace(self) -> float | str | None:
         """The value to replace."""
         return self._value_to_replace
+
     # ------------------------------------------------------------------------------------------------------------------
     # Learning and transformation
     # ------------------------------------------------------------------------------------------------------------------
@@ -110,9 +111,10 @@ class KNearestNeighborsImputer(TableTransformer):
         else:
             column_names = self._column_names
             _check_columns_exist(table, column_names)
-        
+
         if self._value_to_replace is None:
             from numpy import nan
+
             self._value_to_replace = nan
 
         wrapped_transformer = sk_KNNImputer(n_neighbors=self._neighbor_count, missing_values=self._value_to_replace)
