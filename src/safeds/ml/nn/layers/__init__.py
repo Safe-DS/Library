@@ -6,6 +6,7 @@ import apipkg
 
 if TYPE_CHECKING:
     from ._convolutional2d_layer import Convolutional2DLayer, ConvolutionalTranspose2DLayer
+    from ._dropout_layer import DropoutLayer
     from ._flatten_layer import FlattenLayer
     from ._forward_layer import ForwardLayer
     from ._gru_layer import GRULayer
@@ -25,6 +26,7 @@ apipkg.initpkg(
         "GRULayer": "._gru_layer:GRULayer",
         "AveragePooling2DLayer": "._pooling2d_layer:AveragePooling2DLayer",
         "MaxPooling2DLayer": "._pooling2d_layer:MaxPooling2DLayer",
+        "DropoutLayer": "._dropout_layer:DropoutLayer",
     },
 )
 
@@ -38,4 +40,5 @@ __all__ = [
     "GRULayer",
     "AveragePooling2DLayer",
     "MaxPooling2DLayer",
+    "DropoutLayer",
 ]
