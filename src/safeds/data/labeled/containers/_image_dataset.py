@@ -43,7 +43,7 @@ class ImageDataset(Dataset[ImageList, Out_co]):
     batch_size:
         the batch size used for training
     shuffle:
-        weather the data should be shuffled after each epoch of training
+        whether the data should be shuffled after each epoch of training
     """
 
     def __init__(self, input_data: ImageList, output_data: Out_co, batch_size: int = 1, shuffle: bool = False) -> None:
@@ -108,13 +108,13 @@ class ImageDataset(Dataset[ImageList, Out_co]):
         return im_ds
 
     def __next__(self) -> tuple[Tensor, Tensor]:
-        if self._next_batch_index * self._batch_size >= len(self._input):
+        if self._next_batch_index * self._batch_size >= len(self._shuffle_tensor_indices):
             raise StopIteration
         self._next_batch_index += 1
         return self._get_batch(self._next_batch_index - 1)
 
     def __len__(self) -> int:
-        return self._input.image_count
+        return len(self._shuffle_tensor_indices)
 
     def __eq__(self, other: object) -> bool:
         """
@@ -138,6 +138,7 @@ class ImageDataset(Dataset[ImageList, Out_co]):
             and isinstance(other._output, type(self._output))
             and (self._input == other._input)
             and (self._output == other._output)
+            and (self._shuffle_tensor_indices.tolist() == other._shuffle_tensor_indices.tolist())
         )
 
     def __hash__(self) -> int:
@@ -149,7 +150,13 @@ class ImageDataset(Dataset[ImageList, Out_co]):
         hash:
             the hash value
         """
-        return _structural_hash(self._input, self._output, self._shuffle_after_epoch, self._batch_size)
+        return _structural_hash(
+            self._input,
+            self._output,
+            self._shuffle_after_epoch,
+            self._batch_size,
+            self._shuffle_tensor_indices.tolist(),
+        )
 
     def __sizeof__(self) -> int:
         """
@@ -205,7 +212,7 @@ class ImageDataset(Dataset[ImageList, Out_co]):
         input:
             the input data of this dataset
         """
-        return self._sort_image_list_with_shuffle_tensor_indices(self._input)
+        return self._sort_image_list_with_shuffle_tensor_indices_reduce_if_necessary(self._input)
 
     def get_output(self) -> Out_co:
         """
@@ -222,19 +229,25 @@ class ImageDataset(Dataset[ImageList, Out_co]):
         elif isinstance(output, _ColumnAsTensor):
             return output._to_column(self._shuffle_tensor_indices)  # type: ignore[return-value]
         else:
-            return self._sort_image_list_with_shuffle_tensor_indices(self._output)  # type: ignore[return-value]
+            return self._sort_image_list_with_shuffle_tensor_indices_reduce_if_necessary(self._output)  # type: ignore[return-value]
 
-    def _sort_image_list_with_shuffle_tensor_indices(self, image_list: _SingleSizeImageList) -> _SingleSizeImageList:
+    def _sort_image_list_with_shuffle_tensor_indices_reduce_if_necessary(
+        self,
+        image_list: _SingleSizeImageList,
+    ) -> _SingleSizeImageList:
         shuffled_image_list = _SingleSizeImageList()
-        shuffled_image_list._tensor = image_list._tensor
-        shuffled_image_list._indices_to_tensor_positions = {
-            index: self._shuffle_tensor_indices[tensor_position].item()
-            for index, tensor_position in image_list._indices_to_tensor_positions.items()
-        }
-        shuffled_image_list._tensor_positions_to_indices = [
-            index
-            for index, _ in sorted(shuffled_image_list._indices_to_tensor_positions.items(), key=lambda item: item[1])
+        tensor_pos = [
+            image_list._indices_to_tensor_positions[shuffled_index]
+            for shuffled_index in sorted(self._shuffle_tensor_indices.tolist())
         ]
+        temp_pos = {
+            shuffled_index: new_index for new_index, shuffled_index in enumerate(self._shuffle_tensor_indices.tolist())
+        }
+        shuffled_image_list._tensor = image_list._tensor[tensor_pos]
+        shuffled_image_list._tensor_positions_to_indices = [
+            new_index for _, new_index in sorted(temp_pos.items(), key=lambda item: item[0])
+        ]
+        shuffled_image_list._indices_to_tensor_positions = shuffled_image_list._calc_new_indices_to_tensor_positions()
         return shuffled_image_list
 
     def _get_batch(self, batch_number: int, batch_size: int | None = None) -> tuple[Tensor, Tensor]:
@@ -247,18 +260,18 @@ class ImageDataset(Dataset[ImageList, Out_co]):
 
         _check_bounds("batch_size", batch_size, lower_bound=_ClosedBound(1))
 
-        if batch_number < 0 or batch_size * batch_number >= len(self._input):
+        if batch_number < 0 or batch_size * batch_number >= len(self._shuffle_tensor_indices):
             raise IndexOutOfBoundsError(batch_size * batch_number)
         max_index = (
-            batch_size * (batch_number + 1) if batch_size * (batch_number + 1) < len(self._input) else len(self._input)
+            batch_size * (batch_number + 1)
+            if batch_size * (batch_number + 1) < len(self._shuffle_tensor_indices)
+            else len(self._shuffle_tensor_indices)
         )
         input_tensor = (
             self._input._tensor[
-                self._shuffle_tensor_indices[
-                    [
-                        self._input._indices_to_tensor_positions[index]
-                        for index in range(batch_size * batch_number, max_index)
-                    ]
+                [
+                    self._input._indices_to_tensor_positions[index]
+                    for index in self._shuffle_tensor_indices[batch_size * batch_number : max_index].tolist()
                 ]
             ].to(torch.float32)
             / 255
@@ -267,11 +280,9 @@ class ImageDataset(Dataset[ImageList, Out_co]):
         if isinstance(self._output, _SingleSizeImageList):
             output_tensor = (
                 self._output._tensor[
-                    self._shuffle_tensor_indices[
-                        [
-                            self._output._indices_to_tensor_positions[index]
-                            for index in range(batch_size * batch_number, max_index)
-                        ]
+                    [
+                        self._input._indices_to_tensor_positions[index]
+                        for index in self._shuffle_tensor_indices[batch_size * batch_number : max_index].tolist()
                     ]
                 ].to(torch.float32)
                 / 255
@@ -284,7 +295,7 @@ class ImageDataset(Dataset[ImageList, Out_co]):
         """
         Return a new `ImageDataset` with shuffled data.
 
-        The original dataset list is not modified.
+        The original dataset is not modified.
 
         Returns
         -------
@@ -296,9 +307,70 @@ class ImageDataset(Dataset[ImageList, Out_co]):
         _init_default_device()
 
         im_dataset: ImageDataset[Out_co] = copy.copy(self)
-        im_dataset._shuffle_tensor_indices = torch.randperm(len(self))
+        im_dataset._shuffle_tensor_indices = self._shuffle_tensor_indices[
+            torch.randperm(len(self._shuffle_tensor_indices))
+        ]
         im_dataset._next_batch_index = 0
         return im_dataset
+
+    def split(
+        self,
+        percentage_in_first: float,
+        *,
+        shuffle: bool = True,
+    ) -> tuple[ImageDataset[Out_co], ImageDataset[Out_co]]:
+        """
+        Create two image datasets by splitting the data of the current dataset.
+
+        The first dataset contains a percentage of the data specified by `percentage_in_first`, and the second dataset
+        contains the remaining data.
+
+        The original dataset is not modified.
+        By default, the data is shuffled before splitting. You can disable this by setting `shuffle` to False.
+
+        Parameters
+        ----------
+        percentage_in_first:
+            The percentage of data to include in the first dataset. Must be between 0 and 1.
+        shuffle:
+            Whether to shuffle the data before splitting.
+
+        Returns
+        -------
+        first_dataset:
+            The first dataset.
+        second_dataset:
+            The second dataset.
+
+        Raises
+        ------
+        OutOfBoundsError
+            If `percentage_in_first` is not between 0 and 1.
+        """
+        import torch
+
+        _check_bounds(
+            "percentage_in_first",
+            percentage_in_first,
+            lower_bound=_ClosedBound(0),
+            upper_bound=_ClosedBound(1),
+        )
+
+        first_dataset: ImageDataset[Out_co] = copy.copy(self)
+        second_dataset: ImageDataset[Out_co] = copy.copy(self)
+
+        if shuffle:
+            shuffled_indices = torch.randperm(len(self._shuffle_tensor_indices))
+        else:
+            shuffled_indices = torch.arange(len(self._shuffle_tensor_indices))
+
+        first_dataset._shuffle_tensor_indices, second_dataset._shuffle_tensor_indices = shuffled_indices.split(
+            [
+                round(percentage_in_first * len(self)),
+                len(self) - round(percentage_in_first * len(self)),
+            ],
+        )
+        return first_dataset, second_dataset
 
 
 class _TableAsTensor:

@@ -25,6 +25,7 @@ from ._ml import (
     ModelNotFittedError,
     PlainTableError,
     PredictionError,
+    TargetDataMismatchError,
 )
 
 
@@ -71,6 +72,7 @@ __all__ = [
     # ML exceptions
     "DatasetMissesDataError",
     "DatasetMissesFeaturesError",
+    "TargetDataMismatchError",
     "FeatureDataMismatchError",
     "InvalidFitDataError",
     "InputSizeError",
