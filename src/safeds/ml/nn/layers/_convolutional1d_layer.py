@@ -103,7 +103,7 @@ class Convolutional1DLayer(Layer):
             )
         if self._output_size is None:
             new_size = math.ceil(
-                (self._input_size.width + self._padding * 2 - self._kernel_size + 1) / (1.0 * self._stride),
+                (self._input_size + self._padding * 2 - self._kernel_size + 1) / (1.0 * self._stride),
             )
             self._output_size = new_size
         return self._output_size
