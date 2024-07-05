@@ -1728,7 +1728,7 @@ class Table:
         right_names:
             Name or list of names of collumns from right_table on which to join current table
         mode:
-            Specify which type of join you want to use 
+            Specify which type of join you want to use
 
         Returns
         -------
