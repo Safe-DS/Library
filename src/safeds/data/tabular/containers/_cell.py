@@ -279,9 +279,9 @@ class Cell(ABC, Generic[T_co]):
     # Numeric operations
     # ------------------------------------------------------------------------------------------------------------------
 
-    def abs(self) -> Cell[R_co]:
+    def abs(self: Cell[R_co]) -> Cell[R_co]:
         """
-        Get the absolute value.
+        Get the absolute value. 
 
         Examples
         --------
@@ -299,7 +299,7 @@ class Cell(ABC, Generic[T_co]):
         """
         return self.__abs__()
 
-    def ceil(self) -> Cell[R_co]:
+    def ceil(self: Cell[R_co]) -> Cell[R_co]:
         """
         Round up to the nearest integer.
 
@@ -319,7 +319,7 @@ class Cell(ABC, Generic[T_co]):
         """
         return self.__ceil__()
 
-    def floor(self) -> Cell[R_co]:
+    def floor(self: Cell[R_co]) -> Cell[R_co]:
         """
         Round down to the nearest integer.
 
@@ -339,7 +339,7 @@ class Cell(ABC, Generic[T_co]):
         """
         return self.__floor__()
 
-    def neg(self) -> Cell[R_co]:
+    def neg(self: Cell[R_co]) -> Cell[R_co]:
         """
         Negate the value.
 
@@ -359,7 +359,7 @@ class Cell(ABC, Generic[T_co]):
         """
         return self.__neg__()
 
-    def add(self, other: Any) -> Cell[R_co]:
+    def add(self: Cell[R_co], other: Cell[R_co]) -> Cell[R_co]:
         """
         Add a value. This is equivalent to the `+` operator.
 
@@ -389,7 +389,7 @@ class Cell(ABC, Generic[T_co]):
         """
         return self.__add__(other)
 
-    def div(self, other: Any) -> Cell[R_co]:
+    def div(self: Cell[R_co], other: Cell[R_co]) -> Cell[R_co]:
         """
         Divide by a value. This is equivalent to the `/` operator.
 
@@ -419,7 +419,7 @@ class Cell(ABC, Generic[T_co]):
         """
         return self.__truediv__(other)
 
-    def mod(self, other: Any) -> Cell[R_co]:
+    def mod(self: Cell[R_co], other: Cell[R_co]) -> Cell[R_co]:
         """
         Perform a modulo operation. This is equivalent to the `%` operator.
 
@@ -449,7 +449,7 @@ class Cell(ABC, Generic[T_co]):
         """
         return self.__mod__(other)
 
-    def mul(self, other: Any) -> Cell[R_co]:
+    def mul(self: Cell[R_co], other: Cell[R_co]) -> Cell[R_co]:
         """
         Multiply by a value. This is equivalent to the `*` operator.
 
@@ -479,7 +479,7 @@ class Cell(ABC, Generic[T_co]):
         """
         return self.__mul__(other)
 
-    def pow(self, other: float | Cell[P_contra]) -> Cell[R_co]:
+    def pow(self: Cell[R_co], other: float | Cell[P_contra]) -> Cell[R_co]:
         """
         Raise to a power. This is equivalent to the `**` operator.
 
@@ -509,7 +509,7 @@ class Cell(ABC, Generic[T_co]):
         """
         return self.__pow__(other)
 
-    def sub(self, other: Any) -> Cell[R_co]:
+    def sub(self: Cell[R_co], other: Cell[R_co]) -> Cell[R_co]:
         """
         Subtract a value. This is equivalent to the `-` operator.
 
@@ -543,7 +543,7 @@ class Cell(ABC, Generic[T_co]):
     # Comparison operations
     # ------------------------------------------------------------------------------------------------------------------
 
-    def eq(self, other: Any) -> Cell[bool]:
+    def eq(self: Cell[T_co], other: Cell[T_co]) -> Cell[bool]:
         """
         Check if equal to a value. This is equivalent to the `==` operator.
 
