@@ -190,7 +190,7 @@ class TestPredict:
     def test_should_raise_if_dataset_misses_features(self, regressor: Regressor, valid_data: TabularDataset) -> None:
         fitted_regressor = regressor.fit(valid_data)
         with pytest.raises(DatasetMissesFeaturesError, match="[feat1, feat2]"):
-            fitted_regressor.predict(valid_data.features.remove_columns(["feat1", "feat2"]))
+            fitted_regressor.predict(valid_data.features.remove_columns(["feat1", "feat2"], ignore_unknown_names=True))
 
     @pytest.mark.parametrize(
         ("invalid_data", "expected_error", "expected_error_msg"),

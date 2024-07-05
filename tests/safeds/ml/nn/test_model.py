@@ -212,7 +212,7 @@ class TestClassificationModel:
         )
         with pytest.raises(
             FeatureDataMismatchError,
-            match="The features in the given table do not match with the specified feature columns names of the neural network.",
+            match="The features in the given table do not match with the specified feature columns names of the model.",
         ):
             model.predict(
                 Table.from_dict({"a": [1], "c": [2]}),
@@ -229,7 +229,7 @@ class TestClassificationModel:
         )
         with pytest.raises(
             FeatureDataMismatchError,
-            match="The features in the given table do not match with the specified feature columns names of the neural network.",
+            match="The features in the given table do not match with the specified feature columns names of the model.",
         ):
             learned_model.fit(Table.from_dict({"k": [0.1, 0, 0.2], "l": [0, 0.15, 0.5]}).to_tabular_dataset("k"))
 
@@ -636,7 +636,7 @@ class TestRegressionModel:
         )
         with pytest.raises(
             FeatureDataMismatchError,
-            match="The features in the given table do not match with the specified feature columns names of the neural network.",
+            match="The features in the given table do not match with the specified feature columns names of the model.",
         ):
             model.predict(
                 Table.from_dict({"a": [1], "c": [2]}),
@@ -653,7 +653,7 @@ class TestRegressionModel:
         )
         with pytest.raises(
             FeatureDataMismatchError,
-            match="The features in the given table do not match with the specified feature columns names of the neural network.",
+            match="The features in the given table do not match with the specified feature columns names of the model.",
         ):
             trained_model.fit(
                 Table.from_dict({"k": [1, 0, 2], "l": [0, 15, 5]}).to_tabular_dataset("l"),

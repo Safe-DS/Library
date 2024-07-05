@@ -404,7 +404,7 @@ class ImageList(metaclass=ABCMeta):
         Returns
         -------
         has_item:
-            Weather the given item is in this image list
+            Whether the given item is in this image list
         """
         return isinstance(item, Image) and self.has_image(item)
 
@@ -524,7 +524,7 @@ class ImageList(metaclass=ABCMeta):
         Returns
         -------
         has_image:
-            Weather the given image is in this image list
+            Whether the given image is in this image list
         """
 
     # ------------------------------------------------------------------------------------------------------------------
