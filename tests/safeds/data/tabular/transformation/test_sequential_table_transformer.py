@@ -2,7 +2,7 @@ import pytest
 from safeds.data.tabular.containers import Table
 from safeds.data.tabular.transformation import *
 from safeds.exceptions import TransformerNotFittedError
-from safeds.exceptions import TransformerNotInvertableError
+from safeds.exceptions import TransformerNotInvertibleError
 
 from tests.helpers import assert_tables_equal
 
@@ -135,9 +135,9 @@ class TestInverseTransform:
                 [SimpleImputer(SimpleImputer.Strategy.constant(0)), Discretizer(bin_count=3)],
                 [LabelEncoder(column_names="col2", partial_order=["a","b","c"]), SimpleImputer(SimpleImputer.Strategy.mean())],
                 ],
-            ids=["Discretizer", "SimpleImputer", "Multiple non-invertable", "invertable and non-invertable"],
+            ids=["Discretizer", "SimpleImputer", "Multiple non-invertible", "invertible and non-invertible"],
     )
-    def test_should_raise_TransformerNotInvertableError_on_non_invertable_transformers(self,transformers):
+    def test_should_raise_TransformerNotInvertibleError_on_non_invertible_transformers(self,transformers):
         test_table = Table(
             {
                 "col1": [0.1,0.113,0.232,1.199,2.33,2.01,2.99],
@@ -148,7 +148,7 @@ class TestInverseTransform:
         sequentialTableTransformer = SequentialTableTransformer(transformers)
         sequentialTableTransformer = sequentialTableTransformer.fit(test_table)
         transformed_table = sequentialTableTransformer.transform(test_table)
-        with pytest.raises(TransformerNotInvertableError, match=r".*is not invertable."):
+        with pytest.raises(TransformerNotInvertibleError, match=r".*is not invertible."):
             sequentialTableTransformer.inverse_transform(transformed_table)
 
     @pytest.mark.parametrize(

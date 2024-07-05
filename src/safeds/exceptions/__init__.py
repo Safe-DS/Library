@@ -11,7 +11,7 @@ from ._data import (
     NonNumericColumnError,
     OutputLengthMismatchError,
     TransformerNotFittedError,
-    TransformerNotInvertableError,
+    TransformerNotInvertibleError,
     ValueNotPresentWhenFittedError,
 )
 from ._ml import (
@@ -66,7 +66,7 @@ __all__ = [
     "NonNumericColumnError",
     "OutputLengthMismatchError",
     "TransformerNotFittedError",
-    "TransformerNotInvertableError",
+    "TransformerNotInvertibleError",
     "ValueNotPresentWhenFittedError",
     # ML exceptions
     "DatasetMissesDataError",

@@ -5,7 +5,7 @@ from typing import Any
 from safeds._utils import _structural_hash
 from safeds.data.tabular.containers import Table
 from ._table_transformer import TableTransformer
-from safeds.exceptions import TransformerNotFittedError, TransformerNotInvertableError
+from safeds.exceptions import TransformerNotFittedError, TransformerNotInvertibleError
 
 from  ._invertible_table_transformer import InvertibleTableTransformer
 
@@ -141,16 +141,16 @@ class SequentialTableTransformer(InvertibleTableTransformer):
         ------
         TransformerNotFittedError:
             Raises a TransformerNotFittedError if the transformer isn't fitted.
-        TransformerNotInvertableError:
-            Raises a TransformerNotInvertableError if one of the transformers isn't invertable.
+        TransformerNotInvertibleError:
+            Raises a TransformerNotInvertibleError if one of the transformers isn't invertible.
         """
         if not self._is_fitted:
             raise TransformerNotFittedError
         
-        #check if transformer is invertable
+        #check if transformer is invertible
         for transformer in self._transformers:
             if not (hasattr(transformer, "inverse_transform") and callable(getattr(transformer, "inverse_transform"))):
-                raise TransformerNotInvertableError(str(type(transformer)))
+                raise TransformerNotInvertibleError(str(type(transformer)))
 
         #sequentially inverse transform the table with all transformers, working from the back of the list forwards.
         current_table: Table = transformed_table
