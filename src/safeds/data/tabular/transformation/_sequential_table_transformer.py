@@ -130,7 +130,7 @@ class SequentialTableTransformer(InvertibleTableTransformer):
 
         Parameters
         ----------
-        table: 
+        transformed_table: 
             The table to be transformed back.
         
         Returns
