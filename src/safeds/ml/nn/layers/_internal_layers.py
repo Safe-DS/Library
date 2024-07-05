@@ -10,6 +10,7 @@ from torch import Tensor, nn  # slow import
 
 from safeds._config import _init_default_device
 
+
 class _InternalConvolutional1DLayer(nn.Module):
     def __init__(
         self,
