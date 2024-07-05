@@ -10,6 +10,39 @@ from torch import Tensor, nn  # slow import
 
 from safeds._config import _init_default_device
 
+class _InternalConvolutional1DLayer(nn.Module):
+    def __init__(
+        self,
+        input_size: int,
+        output_size: int,
+        kernel_size: int,
+        activation_function: Literal["sigmoid", "relu", "softmax"],
+        padding: int,
+        stride: int,
+    ):
+        super().__init__()
+
+        _init_default_device()
+
+        self._layer = nn.Conv1d(
+            in_channels=input_size,
+            out_channels=output_size,
+            kernel_size=kernel_size,
+            padding=padding,
+            stride=stride)
+        
+        match activation_function:
+            case "sigmoid":
+                self._fn = nn.Sigmoid()
+            case "relu":
+                self._fn = nn.ReLU()
+            case "softmax":
+                self._fn = nn.Softmax()
+            case _:
+                raise ValueError("The given Activation-Function '" + activation_function + "' does not exist.")
+
+    def forward(self, x: Tensor) -> Tensor:
+        return self._fn(self._layer(x))
 
 class _InternalConvolutional2DLayer(nn.Module):
     def __init__(
@@ -51,6 +84,8 @@ class _InternalConvolutional2DLayer(nn.Module):
                 self._fn = nn.ReLU()
             case "softmax":
                 self._fn = nn.Softmax()
+            case _:
+                raise ValueError("The given Activation-Function '" + activation_function + "' does not exist.")
 
     def forward(self, x: Tensor) -> Tensor:
         return self._fn(self._layer(x))
