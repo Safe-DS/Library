@@ -5,6 +5,7 @@ import sys
 from typing import TYPE_CHECKING, Any, Literal
 
 from safeds._utils import _structural_hash
+from safeds.ml.nn.typing import ConstantImageSize
 
 from ._layer import Layer
 
@@ -158,8 +159,13 @@ class Convolutional2DLayer(Layer):
         )
 
     def get_parameter_count(self) -> int:
+        if self._input_size is None:
+            raise ValueError(
+                "The input_size is not yet set. The layer cannot compute the parameter_count if the input_size is not set.",
+            )
+        internal_layer = self._get_internal_layer(activation_function="sigmoid")
         return(
-            self._get_internal_layer({"activation_function": "Sigmoid"}).parameters()
+            sum(p.numel() for p in internal_layer.parameters())
         )
 
 
