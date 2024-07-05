@@ -573,7 +573,7 @@ class Cell(ABC, Generic[T_co]):
         """
         return self.__eq__(other)
 
-    def ge(self, other: Any) -> Cell[bool]:
+    def ge(self: Cell[R_co], other: Cell[R_co]) -> Cell[bool]:
         """
         Check if greater than or equal to a value. This is equivalent to the `>=` operator.
 
@@ -603,7 +603,7 @@ class Cell(ABC, Generic[T_co]):
         """
         return self.__ge__(other)
 
-    def gt(self, other: Any) -> Cell[bool]:
+    def gt(self: Cell[R_co], other: Cell[R_co]) -> Cell[bool]:
         """
         Check if greater than a value. This is equivalent to the `>` operator.
 
@@ -633,7 +633,7 @@ class Cell(ABC, Generic[T_co]):
         """
         return self.__gt__(other)
 
-    def le(self, other: Any) -> Cell[bool]:
+    def le(self: Cell[R_co], other: Cell[R_co]) -> Cell[bool]:
         """
         Check if less than or equal to a value. This is equivalent to the `<=` operator.
 
@@ -663,7 +663,7 @@ class Cell(ABC, Generic[T_co]):
         """
         return self.__le__(other)
 
-    def lt(self, other: Any) -> Cell[bool]:
+    def lt(self: Cell[R_co], other: Cell[R_co]) -> Cell[bool]:
         """
         Check if less than a value. This is equivalent to the `<` operator.
 
@@ -699,11 +699,11 @@ class Cell(ABC, Generic[T_co]):
 
     @property
     @abstractmethod
-    def _polars_expression(self) -> pl.Expr:
+    def _polars_expression(self: Cell[R_co]) -> pl.Expr:
         """The Polars expression that corresponds to this cell."""
 
     @abstractmethod
-    def _equals(self, other: object) -> bool:
+    def _equals(self: Cell[T_co], other: object) -> bool:
         """
         Check if this cell is equal to another object.
 
