@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING
 import apipkg
 
 if TYPE_CHECKING:
+    from ._convolutional1d_layer import Convolutional1DLayer
     from ._convolutional2d_layer import Convolutional2DLayer, ConvolutionalTranspose2DLayer
     from ._dropout_layer import DropoutLayer
     from ._flatten_layer import FlattenLayer
@@ -17,6 +18,7 @@ if TYPE_CHECKING:
 apipkg.initpkg(
     __name__,
     {
+        "Convolutional1DLayer": "._convolutional1d_layer:Convolutional1DLayer",
         "Convolutional2DLayer": "._convolutional2d_layer:Convolutional2DLayer",
         "ConvolutionalTranspose2DLayer": "._convolutional2d_layer:ConvolutionalTranspose2DLayer",
         "FlattenLayer": "._flatten_layer:FlattenLayer",
@@ -31,6 +33,7 @@ apipkg.initpkg(
 )
 
 __all__ = [
+    "Convolutional1DLayer",
     "Convolutional2DLayer",
     "ConvolutionalTranspose2DLayer",
     "FlattenLayer",
