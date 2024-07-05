@@ -1716,6 +1716,41 @@ class Table:
         *,
         mode: Literal["inner", "left", "outer"] = "inner",
     ) -> Table:
+        """
+        Join a table with current table and return the result.
+
+        Parameters
+        ----------
+        right_table:
+            The other table which is to be joined to the current table
+        left_names:
+            Name or list of names of collumns from current table on which to join right_table
+        right_names:
+            Name or list of names of collumns from right_table on which to join current table
+        mode:
+            Specify which type of join you want to use 
+
+        Returns
+        -------
+        new_table:
+            The table with the joined table.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table
+        >>> table1 = Table({"a": [1, 2], "b": [3, 4]})
+        >>> table2 = Table({"d": [1, 5], "e": [5, 6]})
+        >>> table1.join(table2, "a", "d", mode = "left")
+
+        +-----+-----+-----+
+        |   a |   b |   e |
+        | --- | --- | --- |
+        | i64 | i64 | i64 |
+        +=====+=====|=====|
+        |   1 |   3 |   5 |
+        |   2 |   4 | None|
+        +-----+-----+-----+
+        """
         return self._from_polars_lazy_frame(
             self._lazy_frame.join(
                 right_table._lazy_frame,
