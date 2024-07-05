@@ -1,13 +1,17 @@
 from __future__ import annotations
 
-from typing import Any
+from typing import TYPE_CHECKING
 
 from safeds._utils import _structural_hash
-from safeds.data.tabular.containers import Table
-from ._table_transformer import TableTransformer
 from safeds.exceptions import TransformerNotFittedError, TransformerNotInvertibleError
 
-from  ._invertible_table_transformer import InvertibleTableTransformer
+from ._invertible_table_transformer import InvertibleTableTransformer
+
+if TYPE_CHECKING:
+    from safeds.data.tabular.containers import Table
+
+    from ._table_transformer import TableTransformer
+
 
 class SequentialTableTransformer(InvertibleTableTransformer):
     """
@@ -28,12 +32,12 @@ class SequentialTableTransformer(InvertibleTableTransformer):
         self,
         transformers: list[TableTransformer],
         *,
-        column_names: str | list[str] | None = None
+        column_names: str | list[str] | None = None,  # noqa: ARG002
     ) -> None:
         super().__init__(None)
 
         #Check if transformers actually contains any transformers.
-        if transformers == None or len(transformers) == 0:
+        if transformers is None or len(transformers) == 0:
             raise ValueError("transformers must contain at least 1 transformer")
 
         # Parameters
@@ -46,7 +50,7 @@ class SequentialTableTransformer(InvertibleTableTransformer):
         return _structural_hash(
             super().__hash__(),
             self._transformers,
-            self._is_fitted
+            self._is_fitted,
         )
     
     def is_fitted(self) -> bool:
@@ -96,7 +100,8 @@ class SequentialTableTransformer(InvertibleTableTransformer):
     
     def transform(self, table:Table) -> Table:
         """
-        Transforms the table using all the transformers sequentially.
+        Transform the table using all the transformers sequentially.
+
         Might change the order and type of columns base on the transformers used.
 
         Parameters
@@ -113,7 +118,6 @@ class SequentialTableTransformer(InvertibleTableTransformer):
         TransformerNotFittedError:
             Raises a TransformerNotFittedError if the transformer isn't fitted.
         """
-        
         if not self._is_fitted:
             raise TransformerNotFittedError
 
@@ -126,6 +130,7 @@ class SequentialTableTransformer(InvertibleTableTransformer):
     def inverse_transform(self, transformed_table:Table) -> Table:
         """
         Inversely transforms the table using all the transformers sequentially in inverse order.
+        
         Might change the order and type of columns base on the transformers used.
 
         Parameters
@@ -149,7 +154,7 @@ class SequentialTableTransformer(InvertibleTableTransformer):
         
         #check if transformer is invertible
         for transformer in self._transformers:
-            if not (hasattr(transformer, "inverse_transform") and callable(getattr(transformer, "inverse_transform"))):
+            if not (hasattr(transformer, "inverse_transform") and callable(transformer.inverse_transform)):
                 raise TransformerNotInvertibleError(str(type(transformer)))
 
         #sequentially inverse transform the table with all transformers, working from the back of the list forwards.

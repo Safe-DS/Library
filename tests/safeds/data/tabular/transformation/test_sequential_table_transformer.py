@@ -1,10 +1,17 @@
 import pytest
 from safeds.data.tabular.containers import Table
-from safeds.data.tabular.transformation import *
-from safeds.exceptions import TransformerNotFittedError
-from safeds.exceptions import TransformerNotInvertibleError
+from safeds.data.tabular.transformation import (
+    Discretizer,
+    LabelEncoder,
+    OneHotEncoder,
+    SequentialTableTransformer,
+    SimpleImputer,
+    StandardScaler,
+)
+from safeds.exceptions import TransformerNotFittedError, TransformerNotInvertibleError
 
 from tests.helpers import assert_tables_equal
+from tests.safeds.data.tabular.transformation import test_table_transformer
 
 
 class TestInit:
@@ -27,11 +34,11 @@ class TestFit:
                 "col2": [],
             },
         )
-        sequentialTableTransformer = SequentialTableTransformer(transformers)
+        sequential_table_transformer = SequentialTableTransformer(transformers)
         with pytest.raises(ValueError, match=("The SequentialTableTransformer cannot be fitted because the table contains 0 rows.")):
-            sequentialTableTransformer.fit(test_table)
+            sequential_table_transformer.fit(test_table)
     
-    def test_fit_does_not_change_original_transformer(self):
+    def test_fit_does_not_change_original_transformer(self) -> None:
         one_hot = OneHotEncoder()
         imputer = SimpleImputer(SimpleImputer.Strategy.constant(0))
         transformer_list = [one_hot, imputer]
@@ -41,13 +48,13 @@ class TestFit:
                 "col2": ["a", "b", "a"],
             },
         )
-        sequentialTableTransformer = SequentialTableTransformer(transformers=transformer_list)
-        old_hash = hash(sequentialTableTransformer)
-        sequentialTableTransformer.fit(test_table)
-        assert old_hash == hash(sequentialTableTransformer)
+        sequential_table_transformer = SequentialTableTransformer(transformers=transformer_list)
+        old_hash = hash(sequential_table_transformer)
+        sequential_table_transformer.fit(test_table)
+        assert old_hash == hash(sequential_table_transformer)
 
 class TestTransform:
-    def test_should_raise_if_not_fitted(self):
+    def test_should_raise_if_not_fitted(self) -> None:
         one_hot = OneHotEncoder()
         imputer = SimpleImputer(SimpleImputer.Strategy.constant(0))
         transformers = [one_hot, imputer]
@@ -57,9 +64,9 @@ class TestTransform:
                 "col2": ["a", "b", "a"],
             },
         )
-        sequentialTableTransformer = SequentialTableTransformer(transformers)
+        sequential_table_transformer = SequentialTableTransformer(transformers)
         with pytest.raises(TransformerNotFittedError, match=r"The transformer has not been fitted yet."):
-            sequentialTableTransformer.transform(test_table)
+            sequential_table_transformer.transform(test_table)
     
     @pytest.mark.parametrize(
             "transformer",[
@@ -69,7 +76,7 @@ class TestTransform:
                 SimpleImputer(SimpleImputer.Strategy.mean())],
             ids=["OneHotEncoder", "Imputer with Constant", "LabelEncoder", "Mean Imputer"],
     )
-    def test_should_do_same_as_transformer_with_single_transformer(self, transformer: TableTransformer):
+    def test_should_do_same_as_transformer_with_single_transformer(self, transformer: test_table_transformer) -> None:
         sequential_transformer = SequentialTableTransformer([transformer])
         test_table = Table(
             {
@@ -83,7 +90,7 @@ class TestTransform:
         test_table_sequential = sequential_transformer.transform(test_table)
         assert_tables_equal(test_table_normal, test_table_sequential)
 
-    def test_transforms_correctly_with_multiple_transformers(self):
+    def test_transforms_correctly_with_multiple_transformers(self) -> None:
         one_hot = OneHotEncoder()
         imputer = SimpleImputer(SimpleImputer.Strategy.constant(0))
         transformers = [one_hot, imputer]
@@ -93,9 +100,9 @@ class TestTransform:
                 "col2": ["a", "b", "a"],
             },
         )
-        sequentialTableTransformer = SequentialTableTransformer(transformers)
-        fitted_sequentialTableTransformer = sequentialTableTransformer.fit(test_table)
-        transfromed_table_sequential = fitted_sequentialTableTransformer.transform(test_table)
+        sequential_table_transformer = SequentialTableTransformer(transformers)
+        fitted_sequential_table_transformer = sequential_table_transformer.fit(test_table)
+        transfromed_table_sequential = fitted_sequential_table_transformer.transform(test_table)
 
         one_hot = one_hot.fit(test_table)
         transormed_table_individual = one_hot.transform(test_table)
@@ -105,14 +112,14 @@ class TestTransform:
         assert_tables_equal(transfromed_table_sequential, transormed_table_individual)
 
 class TestIsFitted:
-    def test_should_return_false_before_fiting(self):
+    def test_should_return_false_before_fiting(self) -> None:
         one_hot = OneHotEncoder()
         imputer = SimpleImputer(SimpleImputer.Strategy.constant(0))
         transformers = [one_hot, imputer]
-        sequentialTableTransformer = SequentialTableTransformer(transformers)
-        assert sequentialTableTransformer.is_fitted() == False
+        sequential_table_transformer = SequentialTableTransformer(transformers)
+        assert sequential_table_transformer.is_fitted() is False
     
-    def test_should_return_true_after_fiting(self):
+    def test_should_return_true_after_fiting(self) -> None:
         one_hot = OneHotEncoder()
         imputer = SimpleImputer(SimpleImputer.Strategy.constant(0))
         transformers = [one_hot, imputer]
@@ -122,9 +129,9 @@ class TestIsFitted:
                 "col2": ["a", "b", "a"],
             },
         )
-        sequentialTableTransformer = SequentialTableTransformer(transformers)
-        sequentialTableTransformer = sequentialTableTransformer.fit(test_table)
-        assert sequentialTableTransformer.is_fitted() == True
+        sequential_table_transformer = SequentialTableTransformer(transformers)
+        sequential_table_transformer = sequential_table_transformer.fit(test_table)
+        assert sequential_table_transformer.is_fitted() is True
 
 class TestInverseTransform:
 
@@ -137,7 +144,7 @@ class TestInverseTransform:
                 ],
             ids=["Discretizer", "SimpleImputer", "Multiple non-invertible", "invertible and non-invertible"],
     )
-    def test_should_raise_TransformerNotInvertibleError_on_non_invertible_transformers(self,transformers):
+    def test_should_raise_transformer_not_invertible_error_on_non_invertible_transformers(self,transformers) -> None:
         test_table = Table(
             {
                 "col1": [0.1,0.113,0.232,1.199,2.33,2.01,2.99],
@@ -145,11 +152,11 @@ class TestInverseTransform:
                 "col3": [1,1,None,3,14,None,7],
             },
         )
-        sequentialTableTransformer = SequentialTableTransformer(transformers)
-        sequentialTableTransformer = sequentialTableTransformer.fit(test_table)
-        transformed_table = sequentialTableTransformer.transform(test_table)
+        sequential_table_transformer = SequentialTableTransformer(transformers)
+        sequential_table_transformer = sequential_table_transformer.fit(test_table)
+        transformed_table = sequential_table_transformer.transform(test_table)
         with pytest.raises(TransformerNotInvertibleError, match=r".*is not invertible."):
-            sequentialTableTransformer.inverse_transform(transformed_table)
+            sequential_table_transformer.inverse_transform(transformed_table)
 
     @pytest.mark.parametrize(
             "transformers",[
@@ -160,7 +167,7 @@ class TestInverseTransform:
                 ],
             ids=["1 Transformer", "2 Transformers", "3 Transformers", "Duplicate Transformers"],
     )
-    def test_should_return_original_table(self,transformers):
+    def test_should_return_original_table(self,transformers) -> None:
         test_table = Table(
             {
                 "col1": [0.1,0.113,0.232,1.199,2.33,2.01,2.99],
@@ -169,23 +176,23 @@ class TestInverseTransform:
                 "col4": ["one", "two", "one", "two", "one", "two", "one"],
             },
         )
-        sequentialTableTransformer = SequentialTableTransformer(transformers)
-        sequentialTableTransformer = sequentialTableTransformer.fit(test_table)
-        transformed_table = sequentialTableTransformer.transform(test_table)
-        inverse_transformed_table = sequentialTableTransformer.inverse_transform(transformed_table)
+        sequential_table_transformer = SequentialTableTransformer(transformers)
+        sequential_table_transformer = sequential_table_transformer.fit(test_table)
+        transformed_table = sequential_table_transformer.transform(test_table)
+        inverse_transformed_table = sequential_table_transformer.inverse_transform(transformed_table)
         assert_tables_equal(test_table, inverse_transformed_table, ignore_column_order=True, ignore_types=True)
 
-    def test_should_raise_TransformerNotFittedError_if_not_fited(self):
+    def test_should_raise_transformer_not_fitted_error_if_not_fited(self) -> None:
         one_hot = OneHotEncoder()
         imputer = SimpleImputer(SimpleImputer.Strategy.constant(0))
         transformers = [one_hot, imputer]
-        sequentialTableTransformer = SequentialTableTransformer(transformers)
+        sequential_table_transformer = SequentialTableTransformer(transformers)
         test_table = Table(
             {
                 "col1": [1,2,None],
                 "col2": ["a", "b", "a"],
-            }
+            },
         )
         with pytest.raises(TransformerNotFittedError, match=r"The transformer has not been fitted yet."):
-            sequentialTableTransformer.inverse_transform(test_table)
+            sequential_table_transformer.inverse_transform(test_table)
 
