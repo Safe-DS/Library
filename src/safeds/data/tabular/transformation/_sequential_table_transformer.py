@@ -97,6 +97,7 @@ class SequentialTableTransformer(InvertibleTableTransformer):
     def transform(self, table:Table) -> Table:
         """
         Transforms the table using all the transformers sequentially.
+        Might change the order and type of columns base on the transformers used.
 
         Parameters
         ----------
