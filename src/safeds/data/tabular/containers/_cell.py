@@ -155,7 +155,7 @@ class Cell(ABC, Generic[T_co]):
     # Boolean operations
     # ------------------------------------------------------------------------------------------------------------------
 
-    def not_(self: Cell[bool]) -> Cell[bool]:
+    def not_(self) -> Cell[bool]:
         """
         Negate a boolean. This is equivalent to the `~` operator.
 
@@ -185,7 +185,7 @@ class Cell(ABC, Generic[T_co]):
         """
         return self.__invert__()
 
-    def and_(self: Cell[bool], other: bool | Cell[bool]) -> Cell[bool]:
+    def and_(self, other: bool | Cell[bool]) -> Cell[bool]:
         """
         Perform a boolean AND operation. This is equivalent to the `&` operator.
 
@@ -215,7 +215,7 @@ class Cell(ABC, Generic[T_co]):
         """
         return self.__and__(other)
 
-    def or_(self: Cell[bool], other: bool | Cell[bool]) -> Cell[bool]:
+    def or_(self, other: bool | Cell[bool]) -> Cell[bool]:
         """
         Perform a boolean OR operation. This is equivalent to the `|` operator.
 
@@ -245,7 +245,7 @@ class Cell(ABC, Generic[T_co]):
         """
         return self.__or__(other)
 
-    def xor(self: Cell[bool], other: bool | Cell[bool]) -> Cell[bool]:
+    def xor(self, other: bool | Cell[bool]) -> Cell[bool]:
         """
         Perform a boolean XOR operation. This is equivalent to the `^` operator.
 
@@ -279,7 +279,7 @@ class Cell(ABC, Generic[T_co]):
     # Numeric operations
     # ------------------------------------------------------------------------------------------------------------------
 
-    def abs(self: Cell[R_co]) -> Cell[R_co]:
+    def abs(self: Cell[T_co]) -> Cell[R_co]:
         """
         Get the absolute value. 
 
@@ -299,7 +299,7 @@ class Cell(ABC, Generic[T_co]):
         """
         return self.__abs__()
 
-    def ceil(self: Cell[R_co]) -> Cell[R_co]:
+    def ceil(self: Cell[T_co]) -> Cell[R_co]:
         """
         Round up to the nearest integer.
 
@@ -319,7 +319,7 @@ class Cell(ABC, Generic[T_co]):
         """
         return self.__ceil__()
 
-    def floor(self: Cell[R_co]) -> Cell[R_co]:
+    def floor(self: Cell[T_co]) -> Cell[R_co]:
         """
         Round down to the nearest integer.
 
@@ -339,7 +339,7 @@ class Cell(ABC, Generic[T_co]):
         """
         return self.__floor__()
 
-    def neg(self: Cell[R_co]) -> Cell[R_co]:
+    def neg(self: Cell[T_co]) -> Cell[R_co]:
         """
         Negate the value.
 
@@ -359,7 +359,7 @@ class Cell(ABC, Generic[T_co]):
         """
         return self.__neg__()
 
-    def add(self: Cell[R_co], other: Cell[R_co]) -> Cell[R_co]:
+    def add(self: Cell[T_co], other: Cell[T_co]) -> Cell[R_co]:
         """
         Add a value. This is equivalent to the `+` operator.
 
@@ -389,7 +389,7 @@ class Cell(ABC, Generic[T_co]):
         """
         return self.__add__(other)
 
-    def div(self: Cell[R_co], other: Cell[R_co]) -> Cell[R_co]:
+    def div(self: Cell[T_co], other: Cell[T_co]) -> Cell[R_co]:
         """
         Divide by a value. This is equivalent to the `/` operator.
 
@@ -419,7 +419,7 @@ class Cell(ABC, Generic[T_co]):
         """
         return self.__truediv__(other)
 
-    def mod(self: Cell[R_co], other: Cell[R_co]) -> Cell[R_co]:
+    def mod(self: Cell[T_co], other: Cell[T_co]) -> Cell[R_co]:
         """
         Perform a modulo operation. This is equivalent to the `%` operator.
 
@@ -449,7 +449,7 @@ class Cell(ABC, Generic[T_co]):
         """
         return self.__mod__(other)
 
-    def mul(self: Cell[R_co], other: Cell[R_co]) -> Cell[R_co]:
+    def mul(self: Cell[T_co], other: Cell[T_co]) -> Cell[R_co]:
         """
         Multiply by a value. This is equivalent to the `*` operator.
 
@@ -479,7 +479,7 @@ class Cell(ABC, Generic[T_co]):
         """
         return self.__mul__(other)
 
-    def pow(self: Cell[R_co], other: float | Cell[P_contra]) -> Cell[R_co]:
+    def pow(self: Cell[T_co], other: float | Cell[P_contra]) -> Cell[R_co]:
         """
         Raise to a power. This is equivalent to the `**` operator.
 
@@ -509,7 +509,7 @@ class Cell(ABC, Generic[T_co]):
         """
         return self.__pow__(other)
 
-    def sub(self: Cell[R_co], other: Cell[R_co]) -> Cell[R_co]:
+    def sub(self: Cell[T_co], other: Cell[T_co]) -> Cell[R_co]:
         """
         Subtract a value. This is equivalent to the `-` operator.
 
@@ -573,7 +573,7 @@ class Cell(ABC, Generic[T_co]):
         """
         return self.__eq__(other)
 
-    def ge(self: Cell[T_co], other: Cell[T_co]) -> Cell[bool]:
+    def ge(self, other: Any) -> Cell[bool]:
         """
         Check if greater than or equal to a value. This is equivalent to the `>=` operator.
 
@@ -603,7 +603,7 @@ class Cell(ABC, Generic[T_co]):
         """
         return self.__ge__(other)
 
-    def gt(self: Cell[T_co], other: Cell[T_co]) -> Cell[bool]:
+    def gt(self, other: Any) -> Cell[bool]:
         """
         Check if greater than a value. This is equivalent to the `>` operator.
 
@@ -633,7 +633,7 @@ class Cell(ABC, Generic[T_co]):
         """
         return self.__gt__(other)
 
-    def le(self: Cell[T_co], other: Cell[T_co]) -> Cell[bool]:
+    def le(self, other: Any) -> Cell[bool]:
         """
         Check if less than or equal to a value. This is equivalent to the `<=` operator.
 
@@ -663,7 +663,7 @@ class Cell(ABC, Generic[T_co]):
         """
         return self.__le__(other)
 
-    def lt(self: Cell[T_co], other: Cell[T_co]) -> Cell[bool]:
+    def lt(self, other: Any) -> Cell[bool]:
         """
         Check if less than a value. This is equivalent to the `<` operator.
 
@@ -703,7 +703,7 @@ class Cell(ABC, Generic[T_co]):
         """The Polars expression that corresponds to this cell."""
 
     @abstractmethod
-    def _equals(self: Cell[T_co], other: object) -> bool:
+    def _equals(self: Cell[T], other: object) -> bool:
         """
         Check if this cell is equal to another object.
 
