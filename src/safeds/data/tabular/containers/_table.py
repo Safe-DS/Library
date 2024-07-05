@@ -1741,7 +1741,6 @@ class Table:
         >>> table1 = Table({"a": [1, 2], "b": [3, 4]})
         >>> table2 = Table({"d": [1, 5], "e": [5, 6]})
         >>> table1.join(table2, "a", "d", mode = "left")
-
         +-----+-----+-----+
         |   a |   b |   e |
         | --- | --- | --- |
