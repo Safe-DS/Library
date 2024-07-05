@@ -157,6 +157,12 @@ class Convolutional2DLayer(Layer):
             + sys.getsizeof(self._output_size)
         )
 
+    def get_parameter_count(self) -> int:
+        return(
+            self._get_internal_layer({"activation_function": "Sigmoid"}).parameters()
+        )
+
+
 
 class ConvolutionalTranspose2DLayer(Convolutional2DLayer):
     """

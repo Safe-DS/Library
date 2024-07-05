@@ -43,3 +43,7 @@ class Layer(ABC):
     @abstractmethod
     def __sizeof__(self) -> int:
         pass  # pragma: no cover
+
+    @abstractmethod
+    def get_parameter_count(self) -> int:
+        pass # pragma: no cover 
