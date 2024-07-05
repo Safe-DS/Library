@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Literal
 
 from safeds._utils import _figure_to_image
 from safeds._validation._check_columns_are_numeric import _check_column_is_numeric
@@ -29,7 +29,7 @@ class ColumnPlotter:
     def __init__(self, column: Column):
         self._column: Column = column
 
-    def box_plot(self) -> Image:
+    def box_plot(self, *, theme: Literal["dark", "light"] = "light") -> Image:
         """
         Create a box plot for the values in the column. This is only possible for numeric columns.
 
@@ -53,6 +53,18 @@ class ColumnPlotter:
             _check_column_is_numeric(self._column, operation="create a box plot")
 
         import matplotlib.pyplot as plt
+        if theme == "dark":
+            plt.style.use("dark_background")
+            plt.rcParams.update({
+                "text.color": "white",
+                "axes.labelcolor": "white",
+                "axes.edgecolor": "white",
+                "xtick.color": "white",
+                "ytick.color": "white",
+            })
+        else:
+            plt.style.use("default")
+        
 
         fig, ax = plt.subplots()
         ax.boxplot(
@@ -67,7 +79,7 @@ class ColumnPlotter:
 
         return _figure_to_image(fig)
 
-    def histogram(self, *, max_bin_count: int = 10) -> Image:
+    def histogram(self, *, max_bin_count: int = 10, theme: Literal["dark", "light"] = "light") -> Image:
         """
         Create a histogram for the values in the column.
 
@@ -87,9 +99,22 @@ class ColumnPlotter:
         >>> column = Column("test", [1, 2, 3])
         >>> histogram = column.plot.histogram()
         """
+        import matplotlib.pyplot as plt
+        if theme == "dark":
+            plt.style.use("dark_background")
+            plt.rcParams.update({
+                "text.color": "white",
+                "axes.labelcolor": "white",
+                "axes.edgecolor": "white",
+                "xtick.color": "white",
+                "ytick.color": "white",
+            })
+        else:
+            plt.style.use("default")
         return self._column.to_table().plot.histograms(max_bin_count=max_bin_count)
 
-    def lag_plot(self, lag: int) -> Image:
+
+    def lag_plot(self, lag: int, *, theme: Literal["dark", "light"] = "light") -> Image:
         """
         Create a lag plot for the values in the column.
 
@@ -114,6 +139,29 @@ class ColumnPlotter:
         >>> column = Column("values", [1, 2, 3, 4])
         >>> image = column.plot.lag_plot(2)
         """
+        import matplotlib.pyplot as plt
+        if theme == "dark":
+            plt.style.use("dark_background")
+            plt.rcParams.update({
+                "text.color": "white",
+                "axes.labelcolor": "white",
+                "axes.edgecolor": "white",
+                "xtick.color": "white",
+                "ytick.color": "white",
+            })
+        else:
+            plt.style.use("default")
+        if theme == "dark":
+            plt.style.use("dark_background")
+            plt.rcParams.update({
+                "text.color": "white",
+                "axes.labelcolor": "white",
+                "axes.edgecolor": "white",
+                "xtick.color": "white",
+                "ytick.color": "white",
+            })
+        else:
+            plt.style.use("default")
         if self._column.row_count > 0:
             _check_column_is_numeric(self._column, operation="create a lag plot")
 
