@@ -51,13 +51,35 @@ class ColumnPlotter:
         """
         if self._column.row_count > 0:
             _check_column_is_numeric(self._column, operation="create a box plot")
-
         import matplotlib.pyplot as plt
 
         fig, ax = plt.subplots()
         ax.boxplot(
             self._column._series.drop_nulls(),
             patch_artist=True,
+        )
+
+        ax.set(title=self._column.name)
+        ax.set_xticks([])
+        ax.yaxis.grid(visible=True)
+        fig.tight_layout()
+
+        return _figure_to_image(fig)
+    
+    def violin_plot(self) -> Image:
+        # Todo docs
+        if self._column.row_count > 0:
+            _check_column_is_numeric(self._column, operation="create a violin plot")
+        from math import nan
+
+        import matplotlib.pyplot as plt
+
+        fig, ax = plt.subplots()
+        data = self._column._series.drop_nulls()
+        if len(data) == 0:
+            data = [nan, nan]
+        ax.violinplot(
+            data,
         )
 
         ax.set(title=self._column.name)
