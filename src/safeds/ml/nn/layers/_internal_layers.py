@@ -38,8 +38,6 @@ class _InternalConvolutional1DLayer(nn.Module):
                 self._fn = nn.ReLU()
             case "softmax":
                 self._fn = nn.Softmax()
-            case _:
-                raise ValueError("The given Activation-Function '" + activation_function + "' does not exist.")
 
     def forward(self, x: Tensor) -> Tensor:
         return self._fn(self._layer(x))
@@ -84,8 +82,6 @@ class _InternalConvolutional2DLayer(nn.Module):
                 self._fn = nn.ReLU()
             case "softmax":
                 self._fn = nn.Softmax()
-            case _:
-                raise ValueError("The given Activation-Function '" + activation_function + "' does not exist.")
 
     def forward(self, x: Tensor) -> Tensor:
         return self._fn(self._layer(x))
