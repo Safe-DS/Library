@@ -155,7 +155,7 @@ class Cell(ABC, Generic[T_co]):
     # Boolean operations
     # ------------------------------------------------------------------------------------------------------------------
 
-    def not_(self) -> Cell[bool]:
+    def not_(self: Cell[bool]) -> Cell[bool]:
         """
         Negate a boolean. This is equivalent to the `~` operator.
 
@@ -185,7 +185,7 @@ class Cell(ABC, Generic[T_co]):
         """
         return self.__invert__()
 
-    def and_(self, other: bool | Cell[bool]) -> Cell[bool]:
+    def and_(self: Cell[bool], other: bool | Cell[bool]) -> Cell[bool]:
         """
         Perform a boolean AND operation. This is equivalent to the `&` operator.
 
@@ -215,7 +215,7 @@ class Cell(ABC, Generic[T_co]):
         """
         return self.__and__(other)
 
-    def or_(self, other: bool | Cell[bool]) -> Cell[bool]:
+    def or_(self: Cell[bool], other: bool | Cell[bool]) -> Cell[bool]:
         """
         Perform a boolean OR operation. This is equivalent to the `|` operator.
 
@@ -245,7 +245,7 @@ class Cell(ABC, Generic[T_co]):
         """
         return self.__or__(other)
 
-    def xor(self, other: bool | Cell[bool]) -> Cell[bool]:
+    def xor(self: Cell[bool], other: bool | Cell[bool]) -> Cell[bool]:
         """
         Perform a boolean XOR operation. This is equivalent to the `^` operator.
 
@@ -573,7 +573,7 @@ class Cell(ABC, Generic[T_co]):
         """
         return self.__eq__(other)
 
-    def ge(self: Cell[R_co], other: Cell[R_co]) -> Cell[bool]:
+    def ge(self: Cell[T_co], other: Cell[T_co]) -> Cell[bool]:
         """
         Check if greater than or equal to a value. This is equivalent to the `>=` operator.
 
@@ -603,7 +603,7 @@ class Cell(ABC, Generic[T_co]):
         """
         return self.__ge__(other)
 
-    def gt(self: Cell[R_co], other: Cell[R_co]) -> Cell[bool]:
+    def gt(self: Cell[T_co], other: Cell[T_co]) -> Cell[bool]:
         """
         Check if greater than a value. This is equivalent to the `>` operator.
 
@@ -633,7 +633,7 @@ class Cell(ABC, Generic[T_co]):
         """
         return self.__gt__(other)
 
-    def le(self: Cell[R_co], other: Cell[R_co]) -> Cell[bool]:
+    def le(self: Cell[T_co], other: Cell[T_co]) -> Cell[bool]:
         """
         Check if less than or equal to a value. This is equivalent to the `<=` operator.
 
@@ -663,7 +663,7 @@ class Cell(ABC, Generic[T_co]):
         """
         return self.__le__(other)
 
-    def lt(self: Cell[R_co], other: Cell[R_co]) -> Cell[bool]:
+    def lt(self: Cell[T_co], other: Cell[T_co]) -> Cell[bool]:
         """
         Check if less than a value. This is equivalent to the `<` operator.
 
@@ -699,7 +699,7 @@ class Cell(ABC, Generic[T_co]):
 
     @property
     @abstractmethod
-    def _polars_expression(self: Cell[R_co]) -> pl.Expr:
+    def _polars_expression(self: Cell[T_co]) -> pl.Expr:
         """The Polars expression that corresponds to this cell."""
 
     @abstractmethod
