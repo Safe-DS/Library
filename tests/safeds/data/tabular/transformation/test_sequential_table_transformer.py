@@ -62,8 +62,8 @@ class TestTransform:
             sequentialTableTransformer.transform(test_table)
     
     @pytest.mark.parametrize(
-            "transformers",[
-                OneHotEncoder,
+            "transformer",[
+                OneHotEncoder(),
                 SimpleImputer(SimpleImputer.Strategy.constant(0)),
                 LabelEncoder(),
                 SimpleImputer(SimpleImputer.Strategy.mean())],
