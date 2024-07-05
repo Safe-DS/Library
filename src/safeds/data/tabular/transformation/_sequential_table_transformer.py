@@ -125,6 +125,7 @@ class SequentialTableTransformer(InvertibleTableTransformer):
     def inverse_transform(self, transformed_table:Table) -> Table:
         """
         Inversely transforms the table using all the transformers sequentially in inverse order.
+        Might change the order and type of columns base on the transformers used.
 
         Parameters
         ----------
