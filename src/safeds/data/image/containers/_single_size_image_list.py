@@ -15,9 +15,11 @@ from safeds.data.image._utils._image_transformation_error_and_warning_checks imp
     _check_adjust_color_balance_errors_and_warnings,
     _check_adjust_contrast_errors_and_warnings,
     _check_blur_errors_and_warnings,
+    _check_crop_errors,
+    _check_crop_warnings,
     _check_remove_images_with_size_errors,
     _check_resize_errors,
-    _check_sharpen_errors_and_warnings, _check_crop_errors, _check_crop_warnings,
+    _check_sharpen_errors_and_warnings,
 )
 from safeds.data.image.containers._image import Image
 from safeds.data.image.containers._image_list import ImageList
@@ -991,11 +993,15 @@ class _SingleSizeImageList(ImageList):
         image_list._tensor = torch.empty(self._tensor.size(), dtype=torch.uint8)
         channel = self._tensor.size(dim=-3)
         if factor == 0:
-            torch.zeros((self._tensor.size(dim=-4), min(3, channel), self._tensor.size(dim=-2), self._tensor.size(dim=-1)), dtype=torch.uint8, out=image_list._tensor[:, 0:min(self._tensor.size(dim=-3), 3)])
+            torch.zeros(
+                (self._tensor.size(dim=-4), min(3, channel), self._tensor.size(dim=-2), self._tensor.size(dim=-1)),
+                dtype=torch.uint8,
+                out=image_list._tensor[:, 0 : min(self._tensor.size(dim=-3), 3)],
+            )
         else:
-            temp_tensor = self._tensor[:, 0:min(channel, 3)] * torch.tensor([factor * 1.0], dtype=torch.float16)
+            temp_tensor = self._tensor[:, 0 : min(channel, 3)] * torch.tensor([factor * 1.0], dtype=torch.float16)
             torch.clamp(temp_tensor, 0, 255, out=temp_tensor)
-            image_list._tensor[:, 0:min(channel, 3)] = temp_tensor[:, :]
+            image_list._tensor[:, 0 : min(channel, 3)] = temp_tensor[:, :]
         if channel == 4:
             image_list._tensor[:, 3] = self._tensor[:, 3]
 
@@ -1030,15 +1036,15 @@ class _SingleSizeImageList(ImageList):
         factor *= 1.0
         adjusted_factor = (1 - factor) / factor
 
-        gray_tensor = _SingleSizeImageList._convert_tensor_to_grayscale(self._tensor[:, 0:min(channel, 3)])
+        gray_tensor = _SingleSizeImageList._convert_tensor_to_grayscale(self._tensor[:, 0 : min(channel, 3)])
         mean = torch.mean(gray_tensor, dim=(-3, -2, -1), keepdim=True, dtype=torch.float16)
         del gray_tensor
         mean *= torch.tensor(adjusted_factor, dtype=torch.float16)
         adjusted_tensor = mean.repeat(1, min(channel, 3), self._tensor.size(dim=-2), self._tensor.size(dim=-1))
-        adjusted_tensor += self._tensor[:, 0:min(channel, 3)]
+        adjusted_tensor += self._tensor[:, 0 : min(channel, 3)]
         adjusted_tensor *= factor
         torch.clamp(adjusted_tensor, 0, 255, out=adjusted_tensor)
-        image_list._tensor[:, 0:min(channel, 3)] = adjusted_tensor[:, :]
+        image_list._tensor[:, 0 : min(channel, 3)] = adjusted_tensor[:, :]
 
         if channel == 4:
             image_list._tensor[:, 3] = self._tensor[:, 3]

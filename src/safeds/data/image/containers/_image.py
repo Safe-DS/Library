@@ -14,8 +14,10 @@ from safeds.data.image._utils._image_transformation_error_and_warning_checks imp
     _check_adjust_color_balance_errors_and_warnings,
     _check_adjust_contrast_errors_and_warnings,
     _check_blur_errors_and_warnings,
+    _check_crop_errors,
+    _check_crop_warnings,
     _check_resize_errors,
-    _check_sharpen_errors_and_warnings, _check_crop_errors, _check_crop_warnings,
+    _check_sharpen_errors_and_warnings,
 )
 from safeds.data.image.typing import ImageSize
 from safeds.exceptions import IllegalFormatError
@@ -575,13 +577,16 @@ class Image:
             img_tensor = torch.empty(self._image_tensor.size(), dtype=torch.uint8)
             img_tensor[3] = self._image_tensor[3]
             if factor == 0:
-                torch.zeros((3, self._image_tensor.size(dim=-2), self._image_tensor.size(dim=-1)), dtype=torch.uint8, out=img_tensor[:, 0:3])
+                torch.zeros(
+                    (3, self._image_tensor.size(dim=-2), self._image_tensor.size(dim=-1)),
+                    dtype=torch.uint8,
+                    out=img_tensor[:, 0:3],
+                )
             else:
                 temp_tensor = self._image_tensor[0:3] * torch.tensor([factor * 1.0], dtype=torch.float16)
                 torch.clamp(temp_tensor, 0, 255, out=temp_tensor)
                 img_tensor[0:3] = temp_tensor[:]
             return Image(img_tensor)
-
 
     def add_noise(self, standard_deviation: float) -> Image:
         """
@@ -653,7 +658,7 @@ class Image:
         del gray_tensor
         mean *= torch.tensor(adjusted_factor, dtype=torch.float16)
         tensor = mean.repeat(min(self.channel, 3), self._image_tensor.size(dim=-2), self._image_tensor.size(dim=-1))
-        tensor += self._image_tensor[0:min(self.channel, 3)]
+        tensor += self._image_tensor[0 : min(self.channel, 3)]
         tensor *= factor
         torch.clamp(tensor, 0, 255, out=tensor)
 
