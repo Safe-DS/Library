@@ -15,7 +15,7 @@ from safeds.exceptions import (
     MissingValuesColumnError,
     ModelNotFittedError,
     NonNumericColumnError,
-    PlainTableError,
+    PlainTableError, EmptyChoiceError,
 )
 from safeds.ml.classical.classification import (
     AdaBoostClassifier,
@@ -145,7 +145,7 @@ class TestFitByExhaustiveSearch:
         self,
         valid_data: TabularDataset,
     ) -> None:
-        with pytest.raises(LearningError):
+        with pytest.raises(EmptyChoiceError):
             AdaBoostClassifier(max_learner_count=Choice(), learning_rate=Choice()).fit_by_exhaustive_search(
                 valid_data,
                 optimization_metric=ClassifierMetric.ACCURACY,

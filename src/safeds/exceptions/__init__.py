@@ -16,6 +16,7 @@ from ._data import (
 from ._ml import (
     DatasetMissesDataError,
     DatasetMissesFeaturesError,
+    EmptyChoiceError,
     FeatureDataMismatchError,
     FittingWithChoiceError,
     FittingWithoutChoiceError,
@@ -73,6 +74,7 @@ __all__ = [
     "DatasetMissesDataError",
     "DatasetMissesFeaturesError",
     "TargetDataMismatchError",
+    "EmptyChoiceError",
     "FeatureDataMismatchError",
     "FittingWithChoiceError",
     "FittingWithoutChoiceError",

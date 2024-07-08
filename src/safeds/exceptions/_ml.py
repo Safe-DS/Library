@@ -42,6 +42,12 @@ class DatasetMissesDataError(ValueError):
         super().__init__("Dataset contains no rows")
 
 
+class EmptyChoiceError(ValueError):
+    """Raised when a choice object is created, but no arguments are provided."""
+
+    def __init__(self) -> None:
+        super().__init__("Please provide at least one Value in a Choice Parameter")
+
 class FittingWithChoiceError(Exception):
     """Raised when a model is fitted with a choice object as a parameter."""
 
