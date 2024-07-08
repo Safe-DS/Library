@@ -10,9 +10,10 @@ from safeds.data.image._utils._image_transformation_error_and_warning_checks imp
     _check_adjust_color_balance_errors_and_warnings,
     _check_adjust_contrast_errors_and_warnings,
     _check_blur_errors_and_warnings,
+    _check_crop_errors,
     _check_remove_images_with_size_errors,
     _check_resize_errors,
-    _check_sharpen_errors_and_warnings, _check_crop_errors,
+    _check_sharpen_errors_and_warnings,
 )
 from safeds.data.image.containers._image_list import ImageList
 from safeds.data.image.containers._single_size_image_list import _SingleSizeImageList
