@@ -10,13 +10,13 @@ from safeds.exceptions import (
     ColumnLengthMismatchError,
     DatasetMissesDataError,
     DatasetMissesFeaturesError,
+    EmptyChoiceError,
     FittingWithChoiceError,
     FittingWithoutChoiceError,
-    LearningError,
     MissingValuesColumnError,
     ModelNotFittedError,
     NonNumericColumnError,
-    PlainTableError, EmptyChoiceError,
+    PlainTableError,
 )
 from safeds.ml.classical.regression import (
     AdaBoostRegressor,

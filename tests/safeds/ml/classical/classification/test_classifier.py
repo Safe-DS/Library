@@ -9,13 +9,14 @@ from safeds.data.tabular.containers import Table
 from safeds.exceptions import (
     DatasetMissesDataError,
     DatasetMissesFeaturesError,
+    EmptyChoiceError,
     FittingWithChoiceError,
     FittingWithoutChoiceError,
     LearningError,
     MissingValuesColumnError,
     ModelNotFittedError,
     NonNumericColumnError,
-    PlainTableError, EmptyChoiceError,
+    PlainTableError,
 )
 from safeds.ml.classical.classification import (
     AdaBoostClassifier,
