@@ -30,7 +30,6 @@ class Choice(Collection[T]):
             raise EmptyChoiceError()
         self.elements = list(dict.fromkeys(args))
 
-
     def __contains__(self, value: Any) -> bool:
         """
         Check if a value is in this choice.
