@@ -437,9 +437,13 @@ class _MultiSizeImageList(ImageList):
         if (width, height) not in self._image_list_dict:
             return self
         if len(self._image_list_dict) == 2:
-            single_size_image_list = self._image_list_dict[
-                next(iter([key for key in list(self._image_list_dict.keys()) if key != (width, height)]))
-            ]._clone()._as_single_size_image_list()
+            single_size_image_list = (
+                self._image_list_dict[
+                    next(iter([key for key in list(self._image_list_dict.keys()) if key != (width, height)]))
+                ]
+                ._clone()
+                ._as_single_size_image_list()
+            )
             single_size_image_list._tensor_positions_to_indices = torch.sort(
                 torch.Tensor(single_size_image_list._tensor_positions_to_indices),
             )[1].tolist()
