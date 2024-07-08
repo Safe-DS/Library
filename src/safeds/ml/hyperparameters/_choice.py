@@ -27,7 +27,7 @@ class Choice(Collection[T]):
             The values to choose from.
         """
         if len(args) < 1:
-            raise EmptyChoiceError()
+            raise EmptyChoiceError
         self.elements = list(dict.fromkeys(args))
 
     def __contains__(self, value: Any) -> bool:
