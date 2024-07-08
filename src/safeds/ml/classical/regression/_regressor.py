@@ -4,6 +4,8 @@ from abc import ABC
 from concurrent.futures import ALL_COMPLETED, ProcessPoolExecutor, wait
 from typing import TYPE_CHECKING, Self
 
+from joblib._multiprocessing_helpers import mp
+
 from safeds.data.labeled.containers import TabularDataset
 from safeds.data.tabular.containers import Table
 from safeds.exceptions import (
@@ -300,7 +302,7 @@ class Regressor(SupervisedModel, ABC):
         list_of_models = self._get_models_for_all_choices()
         list_of_fitted_models = []
 
-        with ProcessPoolExecutor(max_workers=len(list_of_models)) as executor:
+        with ProcessPoolExecutor(max_workers=len(list_of_models), mp_context=mp.get_context('fork')) as executor:
             futures = []
             for model in list_of_models:
                 futures.append(executor.submit(model.fit, train_data))
