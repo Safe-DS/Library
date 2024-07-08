@@ -612,7 +612,7 @@ class TestFlipHorizontally:
 
 @pytest.mark.parametrize("device", get_devices(), ids=get_devices_ids())
 class TestBrightness:
-    @pytest.mark.parametrize("factor", [0.5, 10], ids=["small factor", "large factor"])
+    @pytest.mark.parametrize("factor", [0, 0.5, 10], ids=["zero factor", "small factor", "large factor"])
     @pytest.mark.parametrize(
         "resource_path",
         [plane_jpg_path, plane_png_path, grayscale_png_path, grayscale_jpg_path],
