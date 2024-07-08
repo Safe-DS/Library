@@ -14,9 +14,8 @@ from safeds.data.image._utils._image_transformation_error_and_warning_checks imp
     _check_adjust_color_balance_errors_and_warnings,
     _check_adjust_contrast_errors_and_warnings,
     _check_blur_errors_and_warnings,
-    _check_crop_errors_and_warnings,
     _check_resize_errors,
-    _check_sharpen_errors_and_warnings,
+    _check_sharpen_errors_and_warnings, _check_crop_errors, _check_crop_warnings,
 )
 from safeds.data.image.typing import ImageSize
 from safeds.exceptions import IllegalFormatError
@@ -118,7 +117,13 @@ class Image:
         return Image(image_tensor=torchvision.io.decode_image(input_tensor).to(_get_device()))
 
     def __init__(self, image_tensor: Tensor) -> None:
-        self._image_tensor: Tensor = image_tensor
+        import torch
+
+        self._image_tensor: Tensor
+        if image_tensor.dtype != torch.uint8:
+            self._image_tensor = torch.clamp(image_tensor, 0, 255).to(torch.uint8)
+        else:
+            self._image_tensor = image_tensor
 
     def __eq__(self, other: object) -> bool:
         """
@@ -444,7 +449,9 @@ class Image:
 
         _init_default_device()
 
-        if self.channel == 4:
+        if self.channel == 1:
+            return self
+        elif self.channel == 4:
             return Image(
                 torch.cat(
                     [
@@ -453,9 +460,9 @@ class Image:
                     ],
                 ),
             )
-        else:
+        else:  # channel == 3
             return Image(
-                func2.rgb_to_grayscale(self._image_tensor[0:3], num_output_channels=self.channel),
+                func2.rgb_to_grayscale(self._image_tensor[0:3], num_output_channels=3),
             )
 
     def crop(self, x: int, y: int, width: int, height: int) -> Image:
@@ -489,7 +496,8 @@ class Image:
 
         _init_default_device()
 
-        _check_crop_errors_and_warnings(x, y, width, height, self.width, self.height, plural=False)
+        _check_crop_errors(x, y, width, height)
+        _check_crop_warnings(x, y, self.width, self.height, plural=False)
         return Image(func2.crop(self._image_tensor, y, x, height, width))
 
     def flip_vertically(self) -> Image:
@@ -552,22 +560,28 @@ class Image:
             If factor is smaller than 0.
         """
         import torch
-        from torchvision.transforms.v2 import functional as func2
 
         _init_default_device()
 
         _check_adjust_brightness_errors_and_warnings(factor, plural=False)
-        if self.channel == 4:
-            return Image(
-                torch.cat(
-                    [
-                        func2.adjust_brightness(self._image_tensor[0:3], factor * 1.0),
-                        self._image_tensor[3:4],
-                    ],
-                ),
-            )
+        if self._image_tensor.size(dim=-3) != 4:
+            if factor == 0:
+                return Image(torch.zeros(self._image_tensor.size(), dtype=torch.uint8))
+            else:
+                temp_tensor = self._image_tensor * torch.tensor([factor * 1.0], dtype=torch.float16)
+                torch.clamp(temp_tensor, 0, 255, out=temp_tensor)
+                return Image(temp_tensor.to(torch.uint8))
         else:
-            return Image(func2.adjust_brightness(self._image_tensor, factor * 1.0))
+            img_tensor = torch.empty(self._image_tensor.size(), dtype=torch.uint8)
+            img_tensor[3] = self._image_tensor[3]
+            if factor == 0:
+                torch.zeros((3, self._image_tensor.size(dim=-2), self._image_tensor.size(dim=-1)), dtype=torch.uint8, out=img_tensor[:, 0:3])
+            else:
+                temp_tensor = self._image_tensor[0:3] * torch.tensor([factor * 1.0], dtype=torch.float16)
+                torch.clamp(temp_tensor, 0, 255, out=temp_tensor)
+                img_tensor[0:3] = temp_tensor[:]
+            return Image(img_tensor)
+
 
     def add_noise(self, standard_deviation: float) -> Image:
         """
@@ -627,22 +641,26 @@ class Image:
             If factor is smaller than 0.
         """
         import torch
-        from torchvision.transforms.v2 import functional as func2
 
         _init_default_device()
 
         _check_adjust_contrast_errors_and_warnings(factor, plural=False)
+
+        factor *= 1.0
+        adjusted_factor = (1 - factor) / factor
+        gray_tensor = self.convert_to_grayscale()._image_tensor[0]
+        mean = torch.mean(gray_tensor, dim=(-2, -1), dtype=torch.float16)
+        del gray_tensor
+        mean *= torch.tensor(adjusted_factor, dtype=torch.float16)
+        tensor = mean.repeat(min(self.channel, 3), self._image_tensor.size(dim=-2), self._image_tensor.size(dim=-1))
+        tensor += self._image_tensor[0:min(self.channel, 3)]
+        tensor *= factor
+        torch.clamp(tensor, 0, 255, out=tensor)
+
         if self.channel == 4:
-            return Image(
-                torch.cat(
-                    [
-                        func2.adjust_contrast(self._image_tensor[0:3], factor * 1.0),
-                        self._image_tensor[3:4],
-                    ],
-                ),
-            )
+            return Image(torch.cat([tensor.to(torch.uint8), self._image_tensor[3:4]], dim=0))
         else:
-            return Image(func2.adjust_contrast(self._image_tensor, factor * 1.0))
+            return Image(tensor.to(torch.uint8))
 
     def adjust_color_balance(self, factor: float) -> Image:
         """

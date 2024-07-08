@@ -11,7 +11,7 @@ from safeds.data.image._utils._image_transformation_error_and_warning_checks imp
     _check_blur_errors_and_warnings,
     _check_remove_images_with_size_errors,
     _check_resize_errors,
-    _check_crop_errors_and_warnings,
+    _check_crop_errors,
 )
 from safeds.data.image.containers import Image, ImageList
 from safeds.exceptions import (
@@ -537,7 +537,7 @@ class _MultiSizeImageList(ImageList):
 
         from safeds.data.image.containers._single_size_image_list import _SingleSizeImageList
 
-        _check_crop_errors_and_warnings(x, y, width, height, self.widths[0], self.heights[0], plural=True)
+        _check_crop_errors(x, y, width, height)
 
         image_list_indices = []
         image_list = _SingleSizeImageList()

@@ -15,10 +15,9 @@ from safeds.data.image._utils._image_transformation_error_and_warning_checks imp
     _check_adjust_color_balance_errors_and_warnings,
     _check_adjust_contrast_errors_and_warnings,
     _check_blur_errors_and_warnings,
-    _check_crop_errors_and_warnings,
     _check_remove_images_with_size_errors,
     _check_resize_errors,
-    _check_sharpen_errors_and_warnings,
+    _check_sharpen_errors_and_warnings, _check_crop_errors, _check_crop_warnings,
 )
 from safeds.data.image.containers._image import Image
 from safeds.data.image.containers._image_list import ImageList
@@ -852,6 +851,8 @@ class _SingleSizeImageList(ImageList):
         return image_list
 
     def convert_to_grayscale(self) -> ImageList:
+        if self.channel == 1:
+            return self
         image_list = self._clone_without_tensor()
         image_list._tensor = _SingleSizeImageList._convert_tensor_to_grayscale(self._tensor)
         return image_list
@@ -863,20 +864,23 @@ class _SingleSizeImageList(ImageList):
 
         _init_default_device()
 
-        if tensor.size(dim=-3) == 4:
+        if tensor.size(dim=-3) == 1:
+            return tensor
+        elif tensor.size(dim=-3) == 4:
             return torch.cat(
                 [func2.rgb_to_grayscale(tensor[:, 0:3], num_output_channels=3), tensor[:, 3:4]],
                 dim=1,
             )
-        else:
-            return func2.rgb_to_grayscale(tensor[:, 0:3], num_output_channels=tensor.size(dim=-3))
+        else:  # channel == 3
+            return func2.rgb_to_grayscale(tensor[:, 0:3], num_output_channels=3)
 
     def crop(self, x: int, y: int, width: int, height: int) -> ImageList:
         from torchvision.transforms.v2 import functional as func2
 
         _init_default_device()
 
-        _check_crop_errors_and_warnings(x, y, width, height, self.widths[0], self.heights[0], plural=True)
+        _check_crop_errors(x, y, width, height)
+        _check_crop_warnings(x, y, self.widths[0], self.heights[0], plural=True)
         image_list = self._clone_without_tensor()
         image_list._tensor = func2.crop(self._tensor, x, y, height, width)
         return image_list
@@ -901,19 +905,22 @@ class _SingleSizeImageList(ImageList):
 
     def adjust_brightness(self, factor: float) -> ImageList:
         import torch
-        from torchvision.transforms.v2 import functional as func2
 
         _init_default_device()
 
         _check_adjust_brightness_errors_and_warnings(factor, plural=True)
         image_list = self._clone_without_tensor()
-        if self.channel == 4:
-            image_list._tensor = torch.cat(
-                [func2.adjust_brightness(self._tensor[:, 0:3], factor * 1.0), self._tensor[:, 3:4]],
-                dim=1,
-            )
+        image_list._tensor = torch.empty(self._tensor.size(), dtype=torch.uint8)
+        channel = self._tensor.size(dim=-3)
+        if factor == 0:
+            torch.zeros((self._tensor.size(dim=-4), min(3, channel), self._tensor.size(dim=-2), self._tensor.size(dim=-1)), dtype=torch.uint8, out=image_list._tensor[:, 0:min(self._tensor.size(dim=-3), 3)])
         else:
-            image_list._tensor = func2.adjust_brightness(self._tensor, factor * 1.0)
+            temp_tensor = self._tensor[:, 0:min(channel, 3)] * torch.tensor([factor * 1.0], dtype=torch.float16)
+            torch.clamp(temp_tensor, 0, 255, out=temp_tensor)
+            image_list._tensor[:, 0:min(channel, 3)] = temp_tensor[:, :]
+        if channel == 4:
+            image_list._tensor[:, 3] = self._tensor[:, 3]
+
         return image_list
 
     def add_noise(self, standard_deviation: float) -> ImageList:
@@ -934,19 +941,30 @@ class _SingleSizeImageList(ImageList):
 
     def adjust_contrast(self, factor: float) -> ImageList:
         import torch
-        from torchvision.transforms.v2 import functional as func2
 
         _init_default_device()
 
         _check_adjust_contrast_errors_and_warnings(factor, plural=True)
         image_list = self._clone_without_tensor()
-        if self.channel == 4:
-            image_list._tensor = torch.cat(
-                [func2.adjust_contrast(self._tensor[:, 0:3], factor * 1.0), self._tensor[:, 3:4]],
-                dim=1,
-            )
-        else:
-            image_list._tensor = func2.adjust_contrast(self._tensor, factor * 1.0)
+        image_list._tensor = torch.empty(self._tensor.size(), dtype=torch.uint8)
+
+        channel = self._tensor.size(dim=-3)
+        factor *= 1.0
+        adjusted_factor = (1 - factor) / factor
+
+        gray_tensor = _SingleSizeImageList._convert_tensor_to_grayscale(self._tensor[:, 0:min(channel, 3)])
+        mean = torch.mean(gray_tensor, dim=(-3, -2, -1), keepdim=True, dtype=torch.float16)
+        del gray_tensor
+        mean *= torch.tensor(adjusted_factor, dtype=torch.float16)
+        adjusted_tensor = mean.repeat(1, min(channel, 3), self._tensor.size(dim=-2), self._tensor.size(dim=-1))
+        adjusted_tensor += self._tensor[:, 0:min(channel, 3)]
+        adjusted_tensor *= factor
+        torch.clamp(adjusted_tensor, 0, 255, out=adjusted_tensor)
+        image_list._tensor[:, 0:min(channel, 3)] = adjusted_tensor[:, :]
+
+        if channel == 4:
+            image_list._tensor[:, 3] = self._tensor[:, 3]
+
         return image_list
 
     def adjust_color_balance(self, factor: float) -> ImageList:
