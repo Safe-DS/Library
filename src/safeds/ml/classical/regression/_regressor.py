@@ -302,7 +302,7 @@ class Regressor(SupervisedModel, ABC):
         list_of_models = self._get_models_for_all_choices()
         list_of_fitted_models = []
 
-        with ProcessPoolExecutor(max_workers=len(list_of_models), mp_context=mp.get_context('spawn')) as executor:
+        with ProcessPoolExecutor(max_workers=len(list_of_models), mp_context=mp.get_context("spawn")) as executor:
             futures = []
             for model in list_of_models:
                 futures.append(executor.submit(model.fit, train_data))
