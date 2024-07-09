@@ -15,7 +15,7 @@ Instead of implementing DS methods from scratch, we use established DS libraries
 * [polars](https://docs.pola.rs/) for manipulation of tabular data,
 * [scikit-learn](https://scikit-learn.org) for classical machine learning,
 * [torch](https://pytorch.org) for deep learning, and
-* [seaborn](https://seaborn.pydata.org) for visualization.
+* [matplotlib](https://matplotlib.org/) for visualization.
 
 For more specialized tasks, we recommend using these or other DS libraries directly.
 
@@ -48,7 +48,7 @@ You can find the full documentation [here](https://library.safeds.com).
 We welcome contributions from everyone. As a starting point, check the following resources:
 
 * [Setting up a development environment](https://library.safeds.com/en/latest/development/environment/)
-* [Project guidelines](https://library.safeds.com/en/latest/development/project_guidelines/)
+* [Project guidelines](https://library.safeds.com/en/latest/development/guidelines/design/)
 * [Contributing page](https://github.com/Safe-DS/Library/contribute)
 
 If you need further help, please [use our discussion forum][forum].
