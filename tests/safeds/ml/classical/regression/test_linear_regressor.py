@@ -113,7 +113,6 @@ class TestPenalty:
     ) -> None:
         assert hash(penalty1) != hash(penalty2)
 
-
     @pytest.mark.parametrize(
         "penalty",
         ([LinearRegressor.Penalty.ridge(), LinearRegressor.Penalty.lasso(), LinearRegressor.Penalty.elastic_net()]),
