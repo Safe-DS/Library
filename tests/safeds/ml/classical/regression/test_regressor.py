@@ -85,6 +85,7 @@ def regressors_with_choices() -> list[Regressor]:
             penalty=Choice(
                 None,
                 LinearRegressor.Penalty.elastic_net(alpha=Choice(1.0, 2.0), lasso_ratio=Choice(0.1, 0.9)),
+                LinearRegressor.Penalty.ridge(),
             ),
         ),
         RandomForestRegressor(tree_count=Choice(1, 2), max_depth=Choice(1, 2), min_sample_count_in_leaves=Choice(1, 2)),

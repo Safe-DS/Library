@@ -1,3 +1,5 @@
+import sys
+
 import pytest
 from safeds.data.labeled.containers import TabularDataset
 from safeds.data.tabular.containers import Table
@@ -6,7 +8,7 @@ from safeds.ml.classical.regression._linear_regressor import LinearRegressor, _L
 from safeds.ml.hyperparameters import Choice
 
 
-def kernels() -> list[LinearRegressor.Penalty]:
+def penalties() -> list[LinearRegressor.Penalty]:
     """
     Return the list of penalties to test.
 
@@ -62,3 +64,63 @@ class TestPenalty:
     def test_should_raise_if_lasso_ratio_out_of_bounds_elastic_net(self, lasso_ratio: float | Choice[float]) -> None:
         with pytest.raises(OutOfBoundsError):
             LinearRegressor(penalty=LinearRegressor.Penalty.elastic_net(lasso_ratio=lasso_ratio))
+
+    @pytest.mark.parametrize(
+        ("penalty1", "penalty2"),
+        ([(x, y) for x in penalties() for y in penalties() if x.__class__ == y.__class__]),
+        ids=lambda x: x.__class__.__name__,
+    )
+    def test_equal_penalties(
+        self,
+        penalty1: LinearRegressor.Penalty,
+        penalty2: LinearRegressor.Penalty,
+    ) -> None:
+        assert penalty1 == penalty2
+
+    @pytest.mark.parametrize(
+        ("penalty1", "penalty2"),
+        ([(x, y) for x in penalties() for y in penalties() if x.__class__ != y.__class__]),
+        ids=lambda x: x.__class__.__name__,
+    )
+    def test_unequal_penalties(
+        self,
+        penalty1: LinearRegressor.Penalty,
+        penalty2: LinearRegressor.Penalty,
+    ) -> None:
+        assert penalty1 != penalty2
+
+    @pytest.mark.parametrize(
+        ("penalty1", "penalty2"),
+        ([(x, y) for x in penalties() for y in penalties() if x.__class__ == y.__class__]),
+        ids=lambda x: x.__class__.__name__,
+    )
+    def test_should_return_same_hash_for_equal_penalties(
+        self,
+        penalty1: LinearRegressor.Penalty,
+        penalty2: LinearRegressor.Penalty,
+    ) -> None:
+        assert hash(penalty1) == hash(penalty2)
+
+    @pytest.mark.parametrize(
+        ("penalty1", "penalty2"),
+        ([(x, y) for x in penalties() for y in penalties() if x.__class__ != y.__class__]),
+        ids=lambda x: x.__class__.__name__,
+    )
+    def test_should_return_different_hash_for_unequal_penalties(
+        self,
+        penalty1: LinearRegressor.Penalty,
+        penalty2: LinearRegressor.Penalty,
+    ) -> None:
+        assert hash(penalty1) != hash(penalty2)
+
+
+    @pytest.mark.parametrize(
+        "penalty",
+        ([LinearRegressor.Penalty.ridge(), LinearRegressor.Penalty.lasso(), LinearRegressor.Penalty.elastic_net()]),
+        ids=lambda x: x.__class__.__name__,
+    )
+    def test_sizeof_kernel(
+        self,
+        penalty: LinearRegressor.Penalty,
+    ) -> None:
+        assert sys.getsizeof(penalty) > sys.getsizeof(object())

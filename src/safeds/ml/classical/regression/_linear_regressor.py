@@ -314,7 +314,7 @@ class _ElasticNet(LinearRegressor.Penalty):
         self._lasso_ratio = lasso_ratio
 
     def __eq__(self, other: object) -> bool:
-        if not isinstance(other, _Lasso):
+        if not isinstance(other, _ElasticNet):
             return NotImplemented
         return True
 
