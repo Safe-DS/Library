@@ -14,9 +14,9 @@ from safeds.data.tabular.transformation import OneHotEncoder
 from safeds.exceptions import (
     FeatureDataMismatchError,
     InvalidModelStructureError,
-    ModelNotFittedError, LearningError,
+    ModelNotFittedError, LearningError, FittingWithoutChoiceError, FittingWithChoiceError,
 )
-from safeds.ml.metrics import ClassificationMetrics, RegressionMetrics
+from safeds.ml.metrics import ClassificationMetrics, RegressionMetrics, RegressorMetric, ClassifierMetric
 from safeds.ml.nn.converters import (
     InputConversionImageToColumn,
     InputConversionImageToImage,
@@ -211,6 +211,9 @@ class NeuralNetworkRegressor(Generic[IFT, IPT]):
         from ._internal_model import _InternalModel  # Slow import on global level
 
         _init_default_device()
+
+        if self._contains_choices():
+            raise FittingWithChoiceError
 
         if not self._input_conversion._is_fit_data_valid(train_data):
             raise FeatureDataMismatchError
@@ -412,6 +415,13 @@ class NeuralNetworkRegressor(Generic[IFT, IPT]):
         # TODO: raise if not fitted, don't return None
         return self._input_size
 
+    def _contains_choices(self) -> bool:
+        """Whether the model contains choices in any layer."""
+        for layer in self._layers:
+            if layer._contains_choices():
+                return True
+        return False
+
 
 class NeuralNetworkClassifier(Generic[IFT, IPT]):
     """
@@ -603,6 +613,9 @@ class NeuralNetworkClassifier(Generic[IFT, IPT]):
         from ._internal_model import _InternalModel  # Slow import on global level
 
         _init_default_device()
+
+        if self._contains_choices():
+            raise FittingWithChoiceError
 
         if not self._input_conversion._is_fit_data_valid(train_data):
             raise FeatureDataMismatchError
@@ -815,3 +828,10 @@ class NeuralNetworkClassifier(Generic[IFT, IPT]):
         """The input size of the model."""
         # TODO: raise if not fitted, don't return None
         return self._input_size
+
+    def _contains_choices(self) -> bool:
+        """Whether the model contains choices in any layer."""
+        for layer in self._layers:
+            if layer._contains_choices():
+                return True
+        return False
