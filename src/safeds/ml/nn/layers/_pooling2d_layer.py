@@ -102,6 +102,12 @@ class _Pooling2DLayer(Layer):
         self._input_size = input_size
         self._output_size = None
 
+    def _contains_choices(self) -> bool:
+        return False
+
+    def _get_layers_for_all_choices(self) -> list[_Pooling2DLayer]:
+        raise NotImplementedError # pragma: no cover
+
     def __hash__(self) -> int:
         return _structural_hash(
             self._strategy,
