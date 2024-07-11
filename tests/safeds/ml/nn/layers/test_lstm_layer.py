@@ -4,6 +4,7 @@ from typing import Any
 import pytest
 from safeds.data.image.typing import ImageSize
 from safeds.exceptions import OutOfBoundsError
+from safeds.ml.hyperparameters import Choice
 from safeds.ml.nn.layers import LSTMLayer
 from torch import nn
 
@@ -66,10 +67,11 @@ def test_should_raise_if_unknown_activation_function_is_passed(activation_functi
     "output_size",
     [
         0,
+        Choice(0),
     ],
-    ids=["output_size_out_of_bounds"],
+    ids=["invalid_int", "invalid_choice"],
 )
-def test_should_raise_if_output_size_out_of_bounds(output_size: int) -> None:
+def test_should_raise_if_output_size_out_of_bounds(output_size: int | Choice[int]) -> None:
     with pytest.raises(OutOfBoundsError):
         LSTMLayer(neuron_count=output_size)
 
