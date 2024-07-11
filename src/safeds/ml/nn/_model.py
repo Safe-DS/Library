@@ -275,7 +275,7 @@ class NeuralNetworkRegressor(Generic[IFT, IPT]):
             raise FittingWithoutChoiceError
 
         list_of_models = self._get_models_for_all_choices()
-        list_of_fitted_models = []
+        list_of_fitted_models: list[Self] = []
 
         if isinstance(train_data, TimeSeriesDataset):
             raise LearningError("RNN-Hyperparameter optimization is currently not supported.")  # pragma: no cover
@@ -302,32 +302,32 @@ class NeuralNetworkRegressor(Generic[IFT, IPT]):
                 best_model = fitted_model
                 match optimization_metric.value:
                     case "mean_squared_error":
-                        best_metric_value = RegressionMetrics.mean_squared_error(predicted=fitted_model.predict(test_data),expected=target_col)
+                        best_metric_value = RegressionMetrics.mean_squared_error(predicted=fitted_model.predict(test_data),expected=target_col)  # type: ignore[arg-type]
                     case "mean_absolute_error":
-                        best_metric_value = RegressionMetrics.mean_absolute_error(predicted=fitted_model.predict(test_data),expected=target_col)
+                        best_metric_value = RegressionMetrics.mean_absolute_error(predicted=fitted_model.predict(test_data),expected=target_col)    # type: ignore[arg-type]
                     case "median_absolute_deviation":
-                        best_metric_value = RegressionMetrics.median_absolute_deviation(predicted=fitted_model.predict(test_data),expected=target_col)
+                        best_metric_value = RegressionMetrics.median_absolute_deviation(predicted=fitted_model.predict(test_data),expected=target_col)  # type: ignore[arg-type]
                     case "coefficient_of_determination":
-                        best_metric_value = RegressionMetrics.coefficient_of_determination(predicted=fitted_model.predict(test_data),expected=target_col)
+                        best_metric_value = RegressionMetrics.coefficient_of_determination(predicted=fitted_model.predict(test_data),expected=target_col)   # type: ignore[arg-type]
             else:
                 match optimization_metric.value:
                     case "mean_squared_error":
-                        error_of_fitted_model = RegressionMetrics.mean_squared_error(predicted=fitted_model.predict(test_data),expected=target_col)
+                        error_of_fitted_model = RegressionMetrics.mean_squared_error(predicted=fitted_model.predict(test_data),expected=target_col) # type: ignore[arg-type]
                         if error_of_fitted_model < best_metric_value:
                             best_model = fitted_model
                             best_metric_value = error_of_fitted_model
                     case "mean_absolute_error":
-                        error_of_fitted_model = RegressionMetrics.mean_absolute_error(predicted=fitted_model.predict(test_data),expected=target_col)
+                        error_of_fitted_model = RegressionMetrics.mean_absolute_error(predicted=fitted_model.predict(test_data),expected=target_col)    # type: ignore[arg-type]
                         if error_of_fitted_model < best_metric_value:
                             best_model = fitted_model
                             best_metric_value = error_of_fitted_model
                     case "median_absolute_deviation":
-                        error_of_fitted_model = RegressionMetrics.median_absolute_deviation(predicted=fitted_model.predict(test_data),expected=target_col)
+                        error_of_fitted_model = RegressionMetrics.median_absolute_deviation(predicted=fitted_model.predict(test_data),expected=target_col)  # type: ignore[arg-type]
                         if error_of_fitted_model < best_metric_value:
                             best_model = fitted_model
                             best_metric_value = error_of_fitted_model
                     case "coefficient_of_determination":
-                        error_of_fitted_model = RegressionMetrics.coefficient_of_determination(predicted=fitted_model.predict(test_data),expected=target_col)
+                        error_of_fitted_model = RegressionMetrics.coefficient_of_determination(predicted=fitted_model.predict(test_data),expected=target_col)   # type: ignore[arg-type]
                         if error_of_fitted_model > best_metric_value:
                             best_model = fitted_model
                             best_metric_value = error_of_fitted_model

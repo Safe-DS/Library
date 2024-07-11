@@ -3,11 +3,10 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Any, Self
 
-from safeds.ml.hyperparameters import Choice
 
 if TYPE_CHECKING:
     from torch import nn
-
+    from safeds.ml.hyperparameters import Choice
     from safeds.ml.nn.typing import ModelImageSize
 
 
