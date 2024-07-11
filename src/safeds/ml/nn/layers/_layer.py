@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Self
+
+from safeds.ml.hyperparameters import Choice
 
 if TYPE_CHECKING:
     from torch import nn
@@ -25,7 +27,7 @@ class Layer(ABC):
 
     @property
     @abstractmethod
-    def output_size(self) -> int | ModelImageSize:
+    def output_size(self) -> int | ModelImageSize | Choice[int]:
         pass  # pragma: no cover
 
     @abstractmethod
@@ -37,7 +39,7 @@ class Layer(ABC):
         pass  # pragma: no cover
 
     @abstractmethod
-    def _get_layers_for_all_choices(self) -> list[Layer]:
+    def _get_layers_for_all_choices(self) -> list[Self]:
         pass  # pragma: no cover
 
     @abstractmethod

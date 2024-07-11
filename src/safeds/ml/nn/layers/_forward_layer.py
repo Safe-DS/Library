@@ -41,6 +41,7 @@ class ForwardLayer(Layer):
 
     def _get_internal_layer(self, **kwargs: Any) -> nn.Module:
         assert not self._contains_choices()
+        assert not isinstance(self._output_size, Choice)
         from ._internal_layers import _InternalForwardLayer  # Slow import on global level
 
         if "activation_function" not in kwargs:
@@ -93,6 +94,7 @@ class ForwardLayer(Layer):
 
     def _get_layers_for_all_choices(self) -> list[ForwardLayer]:
         assert self._contains_choices()
+        assert isinstance(self._output_size, Choice)    # just for linter
         layers = []
         for val in self._output_size:
             layers.append(ForwardLayer(neuron_count=val))

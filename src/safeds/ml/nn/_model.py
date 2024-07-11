@@ -277,11 +277,10 @@ class NeuralNetworkRegressor(Generic[IFT, IPT]):
         list_of_models = self._get_models_for_all_choices()
         list_of_fitted_models = []
 
-        if isinstance(IFT, TimeSeriesDataset):
+        if isinstance(train_data, TimeSeriesDataset):
             raise LearningError("RNN-Hyperparameter optimization is currently not supported.")  # pragma: no cover
-        if isinstance(IFT, ImageDataset):
+        if isinstance(train_data, ImageDataset):
             raise LearningError("CNN-Hyperparameter optimization is currently not supported.")  # pragma: no cover
-
         with ProcessPoolExecutor(max_workers=len(list_of_models)) as executor:
             futures = []
             for model in list_of_models:
@@ -332,6 +331,7 @@ class NeuralNetworkRegressor(Generic[IFT, IPT]):
                         if error_of_fitted_model > best_metric_value:
                             best_model = fitted_model
                             best_metric_value = error_of_fitted_model
+        assert best_model is not None   # just for linter
         best_model._is_fitted = True
         return best_model
 
@@ -686,9 +686,9 @@ class NeuralNetworkClassifier(Generic[IFT, IPT]):
         list_of_models = self._get_models_for_all_choices()
         list_of_fitted_models = []
 
-        if isinstance(IFT, TimeSeriesDataset):
+        if isinstance(train_data, TimeSeriesDataset):
             raise LearningError("RNN-Hyperparameter optimization is currently not supported.")  # pragma: no cover
-        if isinstance(IFT, ImageDataset):
+        if isinstance(train_data, ImageDataset):
             raise LearningError("CNN-Hyperparameter optimization is currently not supported.")  # pragma: no cover
 
         with ProcessPoolExecutor(max_workers=len(list_of_models)) as executor:
@@ -741,6 +741,7 @@ class NeuralNetworkClassifier(Generic[IFT, IPT]):
                         if error_of_fitted_model > best_metric_value:
                             best_model = fitted_model
                             best_metric_value = error_of_fitted_model
+        assert best_model is not None   # just for linter
         best_model._is_fitted = True
         return best_model
 
