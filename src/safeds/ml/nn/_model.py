@@ -16,7 +16,7 @@ from safeds.exceptions import (
     InvalidModelStructureError,
     ModelNotFittedError, LearningError,
 )
-from safeds.ml.metrics import ClassificationMetrics
+from safeds.ml.metrics import ClassificationMetrics, RegressionMetrics
 from safeds.ml.nn.converters import (
     InputConversionImageToColumn,
     InputConversionImageToImage,
@@ -259,6 +259,103 @@ class NeuralNetworkRegressor(Generic[IFT, IPT]):
         copied_model._is_fitted = True
         copied_model._model.eval()
         return copied_model
+
+    def fit_by_exhaustive_search(
+        self,
+        train_data: IFT,
+        optimization_metric: RegressorMetric,
+        epoch_size: int = 25,
+        batch_size: int = 1,
+        learning_rate: float = 0.001,
+    ) -> Self:
+        if not self._contains_choices():
+            raise FittingWithoutChoiceError
+
+        list_of_models = self._get_models_for_all_choices()
+        list_of_fitted_models = []
+
+        if isinstance(IFT, TimeSeriesDataset):
+            raise LearningError("RNN-Hyperparameter optimization is currently not supported.")  # pragma: no cover
+        if isinstance(IFT, ImageDataset):
+            raise LearningError("CNN-Hyperparameter optimization is currently not supported.")  # pragma: no cover
+
+        with ProcessPoolExecutor(max_workers=len(list_of_models)) as executor:
+            futures = []
+            for model in list_of_models:
+                futures.append(
+                    executor.submit(model.fit, train_data, epoch_size, batch_size, learning_rate))
+            [done, _] = wait(futures, return_when=ALL_COMPLETED)
+            for future in done:
+                list_of_fitted_models.append(future.result())
+        executor.shutdown()
+
+
+        target_col = train_data.target
+        test_data = train_data.to_table().remove_columns([target_col.name])
+
+        best_model = None
+        best_metric_value = None
+        for fitted_model in list_of_fitted_models:
+            if best_model is None:
+                best_model = fitted_model
+                match optimization_metric.value:
+                    case "mean_squared_error":
+                        best_metric_value = RegressionMetrics.mean_squared_error(predicted=fitted_model.predict(test_data),expected=target_col)
+                    case "mean_absolute_error":
+                        best_metric_value = RegressionMetrics.mean_absolute_error(predicted=fitted_model.predict(test_data),expected=target_col)
+                    case "median_absolute_deviation":
+                        best_metric_value = RegressionMetrics.median_absolute_deviation(predicted=fitted_model.predict(test_data),expected=target_col)
+                    case "coefficient_of_determination":
+                        best_metric_value = RegressionMetrics.coefficient_of_determination(predicted=fitted_model.predict(test_data),expected=target_col)
+            else:
+                match optimization_metric.value:
+                    case "mean_squared_error":
+                        error_of_fitted_model = RegressionMetrics.mean_squared_error(predicted=fitted_model.predict(test_data),expected=target_col)
+                        if error_of_fitted_model < best_metric_value:
+                            best_model = fitted_model
+                            best_metric_value = error_of_fitted_model
+                    case "mean_absolute_error":
+                        error_of_fitted_model = RegressionMetrics.mean_absolute_error(predicted=fitted_model.predict(test_data),expected=target_col)
+                        if error_of_fitted_model < best_metric_value:
+                            best_model = fitted_model
+                            best_metric_value = error_of_fitted_model
+                    case "median_absolute_deviation":
+                        error_of_fitted_model = RegressionMetrics.median_absolute_deviation(predicted=fitted_model.predict(test_data),expected=target_col)
+                        if error_of_fitted_model < best_metric_value:
+                            best_model = fitted_model
+                            best_metric_value = error_of_fitted_model
+                    case "coefficient_of_determination":
+                        error_of_fitted_model = RegressionMetrics.coefficient_of_determination(predicted=fitted_model.predict(test_data),expected=target_col)
+                        if error_of_fitted_model > best_metric_value:
+                            best_model = fitted_model
+                            best_metric_value = error_of_fitted_model
+        best_model._is_fitted = True
+        return best_model
+
+    def _get_models_for_all_choices(self) -> list[Self]:
+
+        all_possible_layer_combinations: list[list] = [[]]
+        for layer in self._layers:
+            if not layer._contains_choices():
+                for item in all_possible_layer_combinations:
+                    item.append(layer)
+            else:
+                updated_combinations = []
+                versions_of_one_layer = layer._get_layers_for_all_choices()
+                for version in versions_of_one_layer:
+                    copy_of_all_current_possible_combinations = copy.deepcopy(all_possible_layer_combinations)
+                    for combination in copy_of_all_current_possible_combinations:
+                        combination.append(version)
+                        updated_combinations.append(combination)
+                all_possible_layer_combinations = updated_combinations
+
+        models = []
+        for combination in all_possible_layer_combinations:
+            copied_model = copy.deepcopy(self)
+            copied_model._layers = combination
+            models.append(copied_model)
+        return models
+
 
     def predict(self, test_data: IPT) -> IFT:
         """
