@@ -22,7 +22,7 @@ apipkg.initpkg(
     __name__,
     {
         "Discretizer": "._discretizer:Discretizer",
-        "FunctionalTableTransformer": "._functional_table_transformer",
+        "FunctionalTableTransformer": "._functional_table_transformer:FunctionalTableTransformer",
         "InvertibleTableTransformer": "._invertible_table_transformer:InvertibleTableTransformer",
         "LabelEncoder": "._label_encoder:LabelEncoder",
         "OneHotEncoder": "._one_hot_encoder:OneHotEncoder",

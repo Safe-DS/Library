@@ -5,9 +5,10 @@ from typing import TYPE_CHECKING, Self
 from safeds._utils import _structural_hash
 
 from ._table_transformer import TableTransformer
+from safeds.data.tabular.containers import Table
 
-if TYPE_CHECKING:
-    from safeds.data.tabular.containers import Table
+#if TYPE_CHECKING:
+#    from safeds.data.tabular.containers import Table
 
 class FunctionalTableTransformer(TableTransformer):
     """
@@ -24,10 +25,10 @@ class FunctionalTableTransformer(TableTransformer):
     # ------------------------------------------------------------------------------------------------------------------
 
     def __init__(self,
-                 func: callable[[Table], Table],
+                 funct,
                  ) -> None:
         super().__init__(None)
-        self._func: callable[[Table], Table] = func
+        self._func = funct
 
         
 
@@ -50,7 +51,7 @@ class FunctionalTableTransformer(TableTransformer):
     # Learning and transformation
     # ------------------------------------------------------------------------------------------------------------------
 
-    def fit(self, table: Table) -> Self:
+    def fit(self, table: Table) -> FunctionalTableTransformer:
         """
         **Note:** For FunctionalTableTransformer this is a no-OP.
 
@@ -92,12 +93,12 @@ class FunctionalTableTransformer(TableTransformer):
         
         """
         try:
-            transformed_table = self._func.__call__(table)
+            transformed_table = self._func(table)
             return transformed_table
         except Exception as e:
             raise Exception("The underlying function encountered an error") from e
 
-    def fit_and_transform(self, table: Table) -> tuple[Self, Table]:
+    def fit_and_transform(self, table: Table) -> tuple[FunctionalTableTransformer, Table]:
         """
         **Note:** For the FunctionalTableTransformer this is the same as transform().
 
