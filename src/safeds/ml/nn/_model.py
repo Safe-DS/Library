@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import copy
 from concurrent.futures import ProcessPoolExecutor, wait, ALL_COMPLETED
-from typing import TYPE_CHECKING, Generic, Self, TypeVar
+from typing import TYPE_CHECKING, Generic, Self, TypeVar, Any
 
 from safeds._config import _init_default_device
 from safeds._validation import _check_bounds, _ClosedBound
@@ -675,7 +675,7 @@ class NeuralNetworkClassifier(Generic[IFT, IPT]):
         self,
         train_data: IFT,
         optimization_metric: ClassifierMetric,
-        positive_class = None,
+        positive_class: Any = None,
         epoch_size: int = 25,
         batch_size: int = 1,
         learning_rate: float = 0.001,
@@ -684,7 +684,7 @@ class NeuralNetworkClassifier(Generic[IFT, IPT]):
             raise FittingWithoutChoiceError
 
         list_of_models = self._get_models_for_all_choices()
-        list_of_fitted_models = []
+        list_of_fitted_models: list[Self] = []
 
         if isinstance(train_data, TimeSeriesDataset):
             raise LearningError("RNN-Hyperparameter optimization is currently not supported.")  # pragma: no cover
@@ -712,32 +712,32 @@ class NeuralNetworkClassifier(Generic[IFT, IPT]):
                 best_model = fitted_model
                 match optimization_metric.value:
                     case "accuracy":
-                        best_metric_value = ClassificationMetrics.accuracy(predicted=fitted_model.predict(test_data),expected=target_col)
+                        best_metric_value = ClassificationMetrics.accuracy(predicted=fitted_model.predict(test_data),expected=target_col)   # type: ignore[arg-type]
                     case "precision":
-                        best_metric_value = ClassificationMetrics.precision(predicted=fitted_model.predict(test_data),expected=target_col, positive_class=positive_class)
+                        best_metric_value = ClassificationMetrics.precision(predicted=fitted_model.predict(test_data),expected=target_col, positive_class=positive_class)   # type: ignore[arg-type]
                     case "recall":
-                        best_metric_value = ClassificationMetrics.recall(predicted=fitted_model.predict(test_data),expected=target_col, positive_class=positive_class)
+                        best_metric_value = ClassificationMetrics.recall(predicted=fitted_model.predict(test_data),expected=target_col, positive_class=positive_class)  # type: ignore[arg-type]
                     case "f1score":
-                        best_metric_value = ClassificationMetrics.f1_score(predicted=fitted_model.predict(test_data),expected=target_col, positive_class=positive_class)
+                        best_metric_value = ClassificationMetrics.f1_score(predicted=fitted_model.predict(test_data),expected=target_col, positive_class=positive_class)    # type: ignore[arg-type]
             else:
                 match optimization_metric.value:
                     case "accuracy":
-                        error_of_fitted_model = ClassificationMetrics.accuracy(predicted=fitted_model.predict(test_data),expected=target_col)
+                        error_of_fitted_model = ClassificationMetrics.accuracy(predicted=fitted_model.predict(test_data),expected=target_col)   # type: ignore[arg-type]
                         if error_of_fitted_model > best_metric_value:
                             best_model = fitted_model
                             best_metric_value = error_of_fitted_model
                     case "precision":
-                        error_of_fitted_model = ClassificationMetrics.precision(predicted=fitted_model.predict(test_data),expected=target_col, positive_class=positive_class)
+                        error_of_fitted_model = ClassificationMetrics.precision(predicted=fitted_model.predict(test_data),expected=target_col, positive_class=positive_class)   # type: ignore[arg-type]
                         if error_of_fitted_model > best_metric_value:
                             best_model = fitted_model
                             best_metric_value = error_of_fitted_model
                     case "recall":
-                        error_of_fitted_model = ClassificationMetrics.recall(predicted=fitted_model.predict(test_data), expected=target_col, positive_class=positive_class)
+                        error_of_fitted_model = ClassificationMetrics.recall(predicted=fitted_model.predict(test_data), expected=target_col, positive_class=positive_class)     # type: ignore[arg-type]
                         if error_of_fitted_model > best_metric_value:
                             best_model = fitted_model
                             best_metric_value = error_of_fitted_model
                     case "f1score":
-                        error_of_fitted_model = ClassificationMetrics.f1_score(predicted=fitted_model.predict(test_data), expected=target_col, positive_class=positive_class)
+                        error_of_fitted_model = ClassificationMetrics.f1_score(predicted=fitted_model.predict(test_data), expected=target_col, positive_class=positive_class)   # type: ignore[arg-type]
                         if error_of_fitted_model > best_metric_value:
                             best_model = fitted_model
                             best_metric_value = error_of_fitted_model
