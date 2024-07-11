@@ -277,7 +277,10 @@ class NeuralNetworkRegressor(Generic[IFT, IPT]):
         list_of_models = self._get_models_for_all_choices()
         list_of_fitted_models = []
 
-        # TODO Add Cross Validation to TimeSeries, as Block Validation
+        if isinstance(IFT, TimeSeriesDataset):
+            raise LearningError("RNN-Hyperparameter optimization is currently not supported.")  # pragma: no cover
+        if isinstance(IFT, ImageDataset):
+            raise LearningError("CNN-Hyperparameter optimization is currently not supported.")  # pragma: no cover
 
         with ProcessPoolExecutor(max_workers=len(list_of_models)) as executor:
             futures = []
@@ -686,7 +689,10 @@ class NeuralNetworkClassifier(Generic[IFT, IPT]):
         list_of_models = self._get_models_for_all_choices()
         list_of_fitted_models = []
 
-        # TODO Add Cross Validation to TimeSeries, as Block Validation
+        if isinstance(IFT, TimeSeriesDataset):
+            raise LearningError("RNN-Hyperparameter optimization is currently not supported.")  # pragma: no cover
+        if isinstance(IFT, ImageDataset):
+            raise LearningError("CNN-Hyperparameter optimization is currently not supported.")  # pragma: no cover
 
         with ProcessPoolExecutor(max_workers=len(list_of_models)) as executor:
             futures = []
