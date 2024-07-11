@@ -106,7 +106,7 @@ class _Pooling2DLayer(Layer):
         return False
 
     def _get_layers_for_all_choices(self) -> list[_Pooling2DLayer]:
-        raise NotImplementedError # pragma: no cover
+        raise NotImplementedError  # pragma: no cover
 
     def __hash__(self) -> int:
         return _structural_hash(

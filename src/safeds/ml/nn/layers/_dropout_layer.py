@@ -91,7 +91,7 @@ class DropoutLayer(Layer):
         return False
 
     def _get_layers_for_all_choices(self) -> list[DropoutLayer]:
-        raise NotImplementedError # pragma: no cover
+        raise NotImplementedError  # pragma: no cover
 
     def __hash__(self) -> int:
         return _structural_hash(self._input_size, self._probability)

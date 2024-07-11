@@ -5,10 +5,10 @@ from typing import TYPE_CHECKING, Any
 
 from safeds._utils import _structural_hash
 from safeds._validation import _check_bounds, _ClosedBound
+from safeds.ml.hyperparameters import Choice
 from safeds.ml.nn.typing import ModelImageSize
 
 from ._layer import Layer
-from safeds.ml.hyperparameters import Choice
 
 if TYPE_CHECKING:
     from torch import nn
@@ -42,7 +42,7 @@ class GRULayer(Layer):
 
     def _get_internal_layer(self, **kwargs: Any) -> nn.Module:
         assert not self._contains_choices()
-        assert not isinstance(self._output_size, Choice)    # just for linter
+        assert not isinstance(self._output_size, Choice)  # just for linter
         from ._internal_layers import _InternalGRULayer  # Slow import on global level
 
         if "activation_function" not in kwargs:
@@ -94,7 +94,7 @@ class GRULayer(Layer):
 
     def _get_layers_for_all_choices(self) -> list[GRULayer]:
         assert self._contains_choices()
-        assert isinstance(self._output_size, Choice)    # just for linter
+        assert isinstance(self._output_size, Choice)  # just for linter
         layers = []
         for val in self._output_size:
             layers.append(GRULayer(neuron_count=val))
