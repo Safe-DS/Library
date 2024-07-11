@@ -15,7 +15,7 @@ apipkg.initpkg(
     __name__,
     {
         "ClassificationMetrics": "._classification_metrics:ClassificationMetrics",
-        "ClassifierMetric": "._classifier_metrics:ClassifierMetric",
+        "ClassifierMetric": "._classifier_metric:ClassifierMetric",
         "RegressionMetrics": "._regression_metrics:RegressionMetrics",
         "RegressorMetric": "._regressor_metric:RegressorMetric",
     },

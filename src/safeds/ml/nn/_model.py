@@ -417,10 +417,7 @@ class NeuralNetworkRegressor(Generic[IFT, IPT]):
 
     def _contains_choices(self) -> bool:
         """Whether the model contains choices in any layer."""
-        for layer in self._layers:
-            if layer._contains_choices():
-                return True
-        return False
+        return any(layer._contains_choices() for layer in self._layers)
 
 
 class NeuralNetworkClassifier(Generic[IFT, IPT]):
@@ -831,7 +828,5 @@ class NeuralNetworkClassifier(Generic[IFT, IPT]):
 
     def _contains_choices(self) -> bool:
         """Whether the model contains choices in any layer."""
-        for layer in self._layers:
-            if layer._contains_choices():
-                return True
-        return False
+        return any(layer._contains_choices() for layer in self._layers)
+
