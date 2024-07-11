@@ -5,10 +5,10 @@ from typing import TYPE_CHECKING, Any
 
 from safeds._utils import _structural_hash
 from safeds._validation import _check_bounds, _ClosedBound
+from safeds.ml.hyperparameters import Choice
 from safeds.ml.nn.typing import ModelImageSize
 
 from ._layer import Layer
-from safeds.ml.hyperparameters import Choice
 
 if TYPE_CHECKING:
     from torch import nn

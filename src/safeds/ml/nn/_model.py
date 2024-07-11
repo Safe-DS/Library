@@ -1,8 +1,8 @@
 from __future__ import annotations
 
 import copy
-from concurrent.futures import ProcessPoolExecutor, wait, ALL_COMPLETED
-from typing import TYPE_CHECKING, Generic, Self, TypeVar, Any
+from concurrent.futures import ALL_COMPLETED, ProcessPoolExecutor, wait
+from typing import TYPE_CHECKING, Any, Generic, Self, TypeVar
 
 from safeds._config import _init_default_device
 from safeds._validation import _check_bounds, _ClosedBound
@@ -13,10 +13,13 @@ from safeds.data.tabular.containers import Table
 from safeds.data.tabular.transformation import OneHotEncoder
 from safeds.exceptions import (
     FeatureDataMismatchError,
+    FittingWithChoiceError,
+    FittingWithoutChoiceError,
     InvalidModelStructureError,
-    ModelNotFittedError, LearningError, FittingWithoutChoiceError, FittingWithChoiceError,
+    LearningError,
+    ModelNotFittedError,
 )
-from safeds.ml.metrics import ClassificationMetrics, RegressionMetrics, RegressorMetric, ClassifierMetric
+from safeds.ml.metrics import ClassificationMetrics, ClassifierMetric, RegressionMetrics, RegressorMetric
 from safeds.ml.nn.converters import (
     InputConversionImageToColumn,
     InputConversionImageToImage,
@@ -284,13 +287,11 @@ class NeuralNetworkRegressor(Generic[IFT, IPT]):
         with ProcessPoolExecutor(max_workers=len(list_of_models)) as executor:
             futures = []
             for model in list_of_models:
-                futures.append(
-                    executor.submit(model.fit, train_data, epoch_size, batch_size, learning_rate))
+                futures.append(executor.submit(model.fit, train_data, epoch_size, batch_size, learning_rate))
             [done, _] = wait(futures, return_when=ALL_COMPLETED)
             for future in done:
                 list_of_fitted_models.append(future.result())
         executor.shutdown()
-
 
         target_col = train_data.target
         test_data = train_data.to_table().remove_columns([target_col.name])
@@ -302,36 +303,36 @@ class NeuralNetworkRegressor(Generic[IFT, IPT]):
                 best_model = fitted_model
                 match optimization_metric.value:
                     case "mean_squared_error":
-                        best_metric_value = RegressionMetrics.mean_squared_error(predicted=fitted_model.predict(test_data),expected=target_col)  # type: ignore[arg-type]
+                        best_metric_value = RegressionMetrics.mean_squared_error(predicted=fitted_model.predict(test_data), expected=target_col)  # type: ignore[arg-type]
                     case "mean_absolute_error":
-                        best_metric_value = RegressionMetrics.mean_absolute_error(predicted=fitted_model.predict(test_data),expected=target_col)    # type: ignore[arg-type]
+                        best_metric_value = RegressionMetrics.mean_absolute_error(predicted=fitted_model.predict(test_data), expected=target_col)  # type: ignore[arg-type]
                     case "median_absolute_deviation":
-                        best_metric_value = RegressionMetrics.median_absolute_deviation(predicted=fitted_model.predict(test_data),expected=target_col)  # type: ignore[arg-type]
+                        best_metric_value = RegressionMetrics.median_absolute_deviation(predicted=fitted_model.predict(test_data), expected=target_col)  # type: ignore[arg-type]
                     case "coefficient_of_determination":
-                        best_metric_value = RegressionMetrics.coefficient_of_determination(predicted=fitted_model.predict(test_data),expected=target_col)   # type: ignore[arg-type]
+                        best_metric_value = RegressionMetrics.coefficient_of_determination(predicted=fitted_model.predict(test_data), expected=target_col)  # type: ignore[arg-type]
             else:
                 match optimization_metric.value:
                     case "mean_squared_error":
-                        error_of_fitted_model = RegressionMetrics.mean_squared_error(predicted=fitted_model.predict(test_data),expected=target_col) # type: ignore[arg-type]
+                        error_of_fitted_model = RegressionMetrics.mean_squared_error(predicted=fitted_model.predict(test_data), expected=target_col)  # type: ignore[arg-type]
                         if error_of_fitted_model < best_metric_value:
                             best_model = fitted_model
                             best_metric_value = error_of_fitted_model
                     case "mean_absolute_error":
-                        error_of_fitted_model = RegressionMetrics.mean_absolute_error(predicted=fitted_model.predict(test_data),expected=target_col)    # type: ignore[arg-type]
+                        error_of_fitted_model = RegressionMetrics.mean_absolute_error(predicted=fitted_model.predict(test_data), expected=target_col)  # type: ignore[arg-type]
                         if error_of_fitted_model < best_metric_value:
                             best_model = fitted_model
                             best_metric_value = error_of_fitted_model
                     case "median_absolute_deviation":
-                        error_of_fitted_model = RegressionMetrics.median_absolute_deviation(predicted=fitted_model.predict(test_data),expected=target_col)  # type: ignore[arg-type]
+                        error_of_fitted_model = RegressionMetrics.median_absolute_deviation(predicted=fitted_model.predict(test_data), expected=target_col)  # type: ignore[arg-type]
                         if error_of_fitted_model < best_metric_value:
                             best_model = fitted_model
                             best_metric_value = error_of_fitted_model
                     case "coefficient_of_determination":
-                        error_of_fitted_model = RegressionMetrics.coefficient_of_determination(predicted=fitted_model.predict(test_data),expected=target_col)   # type: ignore[arg-type]
+                        error_of_fitted_model = RegressionMetrics.coefficient_of_determination(predicted=fitted_model.predict(test_data), expected=target_col)  # type: ignore[arg-type]
                         if error_of_fitted_model > best_metric_value:
                             best_model = fitted_model
                             best_metric_value = error_of_fitted_model
-        assert best_model is not None   # just for linter
+        assert best_model is not None  # just for linter
         best_model._is_fitted = True
         return best_model
 
@@ -358,7 +359,6 @@ class NeuralNetworkRegressor(Generic[IFT, IPT]):
             copied_model._layers = combination
             models.append(copied_model)
         return models
-
 
     def predict(self, test_data: IPT) -> IFT:
         """
@@ -694,13 +694,11 @@ class NeuralNetworkClassifier(Generic[IFT, IPT]):
         with ProcessPoolExecutor(max_workers=len(list_of_models)) as executor:
             futures = []
             for model in list_of_models:
-                futures.append(
-                    executor.submit(model.fit, train_data, epoch_size, batch_size, learning_rate))
+                futures.append(executor.submit(model.fit, train_data, epoch_size, batch_size, learning_rate))
             [done, _] = wait(futures, return_when=ALL_COMPLETED)
             for future in done:
                 list_of_fitted_models.append(future.result())
         executor.shutdown()
-
 
         target_col = train_data.target
         test_data = train_data.to_table().remove_columns([target_col.name])
@@ -712,36 +710,36 @@ class NeuralNetworkClassifier(Generic[IFT, IPT]):
                 best_model = fitted_model
                 match optimization_metric.value:
                     case "accuracy":
-                        best_metric_value = ClassificationMetrics.accuracy(predicted=fitted_model.predict(test_data),expected=target_col)   # type: ignore[arg-type]
+                        best_metric_value = ClassificationMetrics.accuracy(predicted=fitted_model.predict(test_data), expected=target_col)  # type: ignore[arg-type]
                     case "precision":
-                        best_metric_value = ClassificationMetrics.precision(predicted=fitted_model.predict(test_data),expected=target_col, positive_class=positive_class)   # type: ignore[arg-type]
+                        best_metric_value = ClassificationMetrics.precision(predicted=fitted_model.predict(test_data), expected=target_col, positive_class=positive_class)  # type: ignore[arg-type]
                     case "recall":
-                        best_metric_value = ClassificationMetrics.recall(predicted=fitted_model.predict(test_data),expected=target_col, positive_class=positive_class)  # type: ignore[arg-type]
+                        best_metric_value = ClassificationMetrics.recall(predicted=fitted_model.predict(test_data), expected=target_col, positive_class=positive_class)  # type: ignore[arg-type]
                     case "f1score":
-                        best_metric_value = ClassificationMetrics.f1_score(predicted=fitted_model.predict(test_data),expected=target_col, positive_class=positive_class)    # type: ignore[arg-type]
+                        best_metric_value = ClassificationMetrics.f1_score(predicted=fitted_model.predict(test_data), expected=target_col, positive_class=positive_class)  # type: ignore[arg-type]
             else:
                 match optimization_metric.value:
                     case "accuracy":
-                        error_of_fitted_model = ClassificationMetrics.accuracy(predicted=fitted_model.predict(test_data),expected=target_col)   # type: ignore[arg-type]
+                        error_of_fitted_model = ClassificationMetrics.accuracy(predicted=fitted_model.predict(test_data), expected=target_col)  # type: ignore[arg-type]
                         if error_of_fitted_model > best_metric_value:
                             best_model = fitted_model
                             best_metric_value = error_of_fitted_model
                     case "precision":
-                        error_of_fitted_model = ClassificationMetrics.precision(predicted=fitted_model.predict(test_data),expected=target_col, positive_class=positive_class)   # type: ignore[arg-type]
+                        error_of_fitted_model = ClassificationMetrics.precision(predicted=fitted_model.predict(test_data), expected=target_col, positive_class=positive_class)  # type: ignore[arg-type]
                         if error_of_fitted_model > best_metric_value:
                             best_model = fitted_model
                             best_metric_value = error_of_fitted_model
                     case "recall":
-                        error_of_fitted_model = ClassificationMetrics.recall(predicted=fitted_model.predict(test_data), expected=target_col, positive_class=positive_class)     # type: ignore[arg-type]
+                        error_of_fitted_model = ClassificationMetrics.recall(predicted=fitted_model.predict(test_data), expected=target_col, positive_class=positive_class)  # type: ignore[arg-type]
                         if error_of_fitted_model > best_metric_value:
                             best_model = fitted_model
                             best_metric_value = error_of_fitted_model
                     case "f1score":
-                        error_of_fitted_model = ClassificationMetrics.f1_score(predicted=fitted_model.predict(test_data), expected=target_col, positive_class=positive_class)   # type: ignore[arg-type]
+                        error_of_fitted_model = ClassificationMetrics.f1_score(predicted=fitted_model.predict(test_data), expected=target_col, positive_class=positive_class)  # type: ignore[arg-type]
                         if error_of_fitted_model > best_metric_value:
                             best_model = fitted_model
                             best_metric_value = error_of_fitted_model
-        assert best_model is not None   # just for linter
+        assert best_model is not None  # just for linter
         best_model._is_fitted = True
         return best_model
 
@@ -830,4 +828,3 @@ class NeuralNetworkClassifier(Generic[IFT, IPT]):
     def _contains_choices(self) -> bool:
         """Whether the model contains choices in any layer."""
         return any(layer._contains_choices() for layer in self._layers)
-
