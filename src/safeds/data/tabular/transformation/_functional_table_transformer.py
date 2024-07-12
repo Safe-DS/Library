@@ -14,12 +14,12 @@ from ._table_transformer import TableTransformer
 
 class FunctionalTableTransformer(TableTransformer):
     """
-    Wraps a Callable[[Table], Table] so that it can be used in a SequentialTableTransformer.
+    Wraps a callable so that it conforms to the TableTransformer interface.
 
     Parameters
     ----------
     transformer:
-        The Callable that receives a table and returns a table.
+        A callable that receives a table and returns a table.
     """
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -65,7 +65,6 @@ class FunctionalTableTransformer(TableTransformer):
         -------
         fitted_transformer:
             Returns self, because this transformer is always fitted.
-
         """
         return self
 
@@ -89,7 +88,6 @@ class FunctionalTableTransformer(TableTransformer):
         ------
         Exception:
             Raised when the wrapped callable encounters an error.
-
         """
         return self._transformer(table)
 
