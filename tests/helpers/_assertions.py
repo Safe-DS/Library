@@ -3,7 +3,7 @@ from typing import Any
 
 from polars.testing import assert_frame_equal
 from safeds.data.labeled.containers import TabularDataset
-from safeds.data.tabular.containers import Cell, Column, Table
+from safeds.data.tabular.containers import Cell, Column, Row, Table
 
 
 def assert_tables_equal(table1: Table, table2: Table) -> None:
@@ -57,3 +57,24 @@ def assert_cell_operation_works(
     column = Column("A", [input_value])
     transformed_column = column.transform(transformer)
     assert transformed_column == Column("A", [expected_value]), f"Expected: {expected_value}\nGot: {transformed_column}"
+
+def assert_row_operation_works(
+    input_value: Any,
+    transformer: Callable[[Row], Row],
+    expected_value: Any,
+) -> None:
+    """
+    Assert that a row operation works as expected.
+
+    Parameters
+    ----------
+    input_value:
+        The value in the input row.
+    transformer:
+        The transformer to apply to the rows.
+    expected_value:
+        The expected value of the transformed row.
+    """
+    row = Row("A", [input_value])
+    transformed_row = row.transform(transformer)
+    assert transformed_row == Row("A", [expected_value]), f"Expected: {expected_value}\nGot: {transformed_row}"
