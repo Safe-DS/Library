@@ -74,7 +74,7 @@ class ForwardLayer(Layer):
         result:
             A 1D TensorShape object containing the number of neurons in this layer.
         """
-        return self._output_size
+        return TensorShape([self._output_size])
 
     def _set_input_size(self, input_size: int | ModelImageSize) -> None:
         if isinstance(input_size, ModelImageSize):

@@ -58,7 +58,7 @@ class LSTMLayer(Layer):
         Returns
         -------
         result:
-            The amount of values being passed into this layer.
+            A 1D TensorShape object containing the amount of values being passed into this layer.
         """
         if self._input_size is None:
             raise ValueError("The input_size is not yet set.")
@@ -72,7 +72,7 @@ class LSTMLayer(Layer):
         Returns
         -------
         result:
-            The number of neurons in this layer.
+            A 1D TensorShape object containing the number of neurons in this layer.
         """
         return TensorShape([self._output_size])
 
