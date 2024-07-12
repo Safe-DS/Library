@@ -146,7 +146,7 @@ class TablePlotter:
                 vmax=1,
                 cmap="coolwarm",
             )
-            ax.set_xticks(np.arange(len(only_numerical.columns)), labels=only_numerical.columns)
+            ax.set_xticks(np.arange(len(only_numerical.columns)), rotation="vertical", labels=only_numerical.columns)
             ax.set_yticks(np.arange(len(only_numerical.columns)), labels=only_numerical.columns)
             fig.colorbar(heatmap)
 
