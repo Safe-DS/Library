@@ -5,7 +5,7 @@ from safeds.exceptions import ModelNotFittedError, OutOfBoundsError
 from safeds.ml.classical.classification import DecisionTreeClassifier
 from syrupy import SnapshotAssertion
 
-from tests.helpers import os_linux, os_mac, skip_if_os
+from tests.helpers import os_mac, skip_if_os
 
 
 @pytest.fixture()
