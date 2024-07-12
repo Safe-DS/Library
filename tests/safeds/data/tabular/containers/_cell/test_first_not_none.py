@@ -6,7 +6,7 @@ from safeds.data.tabular.containers._lazy_cell import _LazyCell
 
 
 class TestFirstNotNone:
-    def test_should_return_none():
+    def test_should_return_none() -> None:
         to_eval = [_LazyCell(None) for i in range(5)]
         res = Cell.first_not_none(to_eval)
         assert(res.eq(_LazyCell(None)))
@@ -38,11 +38,11 @@ class TestFirstNotNone:
             "mixed_no_null",
         ],
     )
-    def test_should_not_return_none(self, list_of_cells: list[Cell], expected: Cell):
+    def test_should_not_return_none(self, list_of_cells: list[Cell], expected: Cell) -> None:
         res = Cell.first_not_none(list_of_cells)
         assert(res.eq(expected))
 
-    def test_given_empty_list():
+    def test_given_empty_list() -> None:
         to_eval = []
         res = Cell.first_not_none(to_eval)
         assert(res.eq(_LazyCell(None)))
