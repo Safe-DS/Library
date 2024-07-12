@@ -489,7 +489,7 @@ class TablePlotter:
         ColumnNotFoundError
             If a column does not exist.
         OutOfBoundsError:
-            If the actual value is outside its expected range (x_max_bin_count, y_max_bin_count).
+            If x_max_bin_count or y_max_bin_count is less than 1.
         TypeError
             If a column is not numeric.
 
