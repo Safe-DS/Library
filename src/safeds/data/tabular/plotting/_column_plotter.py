@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Literal
 
 from safeds._utils import _figure_to_image
 from safeds._validation._check_columns_are_numeric import _check_column_is_numeric
@@ -66,7 +66,7 @@ class ColumnPlotter:
 
         return _figure_to_image(fig)
 
-    def violin_plot(self) -> Image:
+    def violin_plot(self, theme: Literal["dark", "light"] = "light") -> Image:
         """
         Create a violin plot for the values in the column. This is only possible for numeric columns.
 
@@ -92,19 +92,37 @@ class ColumnPlotter:
 
         import matplotlib.pyplot as plt
 
-        fig, ax = plt.subplots()
-        data = self._column._series.drop_nulls()
-        if len(data) == 0:
-            data = [nan, nan]
-        ax.violinplot(
-            data,
-        )
+        style = "dark_background" if theme == "dark" else "default"
+        with plt.style.context(style):
+            if theme == "dark":
+                plt.rcParams.update({
+                    "text.color": "white",
+                    "axes.labelcolor": "white",
+                    "axes.edgecolor": "white",
+                    "xtick.color": "white",
+                    "ytick.color": "white",
+                    "grid.color": "gray",
+                    "grid.linewidth": 0.5,
+                })
+            else:
+                plt.rcParams.update({
+                    "grid.linewidth": 0.5,
+                })
 
-        ax.set(title=self._column.name)
-        ax.yaxis.grid(visible=True)
-        fig.tight_layout()
+            fig, ax = plt.subplots()
+            
+            data = self._column._series.drop_nulls()
+            if len(data) == 0:
+                data = [nan, nan]
+            ax.violinplot(
+                data,
+            )
 
-        return _figure_to_image(fig)
+            ax.set(title=self._column.name)
+            ax.yaxis.grid(visible=True)
+            fig.tight_layout()
+
+            return _figure_to_image(fig)
 
     def histogram(self, *, max_bin_count: int = 10) -> Image:
         """

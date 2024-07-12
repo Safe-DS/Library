@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import warnings
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Literal
 
 from safeds._utils import _figure_to_image
 from safeds._validation import _check_columns_exist
@@ -102,7 +102,7 @@ class TablePlotter:
         fig.tight_layout()
         return _figure_to_image(fig)
 
-    def violin_plots(self) -> Image:
+    def violin_plots(self, theme: Literal["dark", "light"] = "light") -> Image:
         """
         Create a violin plot for every numerical column.
 
@@ -129,48 +129,65 @@ class TablePlotter:
 
         import matplotlib.pyplot as plt
 
-        columns = numerical_table.to_columns()
-        columns = [column._series.drop_nulls() for column in columns]
-        max_width = 3
-        number_of_columns = len(columns) if len(columns) <= max_width else max_width
-        number_of_rows = ceil(len(columns) / number_of_columns)
-
-        fig, axs = plt.subplots(nrows=number_of_rows, ncols=number_of_columns)
-        line = 0
-        for i, column in enumerate(columns):
-            data = column.to_list()
-            if len(column) == 0:
-                data = [nan, nan]
-            if i % number_of_columns == 0 and i != 0:
-                line += 1
-
-            if number_of_columns == 1:
-                axs.violinplot(
-                    data,
-                )
-                axs.set_title(numerical_table.column_names[i])
-                break
-
-            if number_of_rows == 1:
-                axs[i].violinplot(
-                    data,
-                )
-                axs[i].set_title(numerical_table.column_names[i])
-
+        style = "dark_background" if theme == "dark" else "default"
+        with plt.style.context(style):
+            if theme == "dark":
+                plt.rcParams.update({
+                    "text.color": "white",
+                    "axes.labelcolor": "white",
+                    "axes.edgecolor": "white",
+                    "xtick.color": "white",
+                    "ytick.color": "white",
+                    "grid.color": "gray",
+                    "grid.linewidth": 0.5,
+                })
             else:
-                axs[line, i % number_of_columns].violinplot(
-                    data,
-                )
-                axs[line, i % number_of_columns].set_title(numerical_table.column_names[i])
+                plt.rcParams.update({
+                    "grid.linewidth": 0.5,
+                })
 
-        # removes unused ax indices, so there wont be empty plots
-        last_filled_ax_index = len(columns) % number_of_columns
-        for i in range(last_filled_ax_index, number_of_columns):
-            if number_of_rows != 1 and last_filled_ax_index != 0:
-                fig.delaxes(axs[number_of_rows - 1, i])
+            columns = numerical_table.to_columns()
+            columns = [column._series.drop_nulls() for column in columns]
+            max_width = 3
+            number_of_columns = len(columns) if len(columns) <= max_width else max_width
+            number_of_rows = ceil(len(columns) / number_of_columns)
 
-        fig.tight_layout()
-        return _figure_to_image(fig)
+            fig, axs = plt.subplots(nrows=number_of_rows, ncols=number_of_columns)
+            line = 0
+            for i, column in enumerate(columns):
+                data = column.to_list()
+                if len(column) == 0:
+                    data = [nan, nan]
+                if i % number_of_columns == 0 and i != 0:
+                    line += 1
+
+                if number_of_columns == 1:
+                    axs.violinplot(
+                        data,
+                    )
+                    axs.set_title(numerical_table.column_names[i])
+                    break
+
+                if number_of_rows == 1:
+                    axs[i].violinplot(
+                        data,
+                    )
+                    axs[i].set_title(numerical_table.column_names[i])
+
+                else:
+                    axs[line, i % number_of_columns].violinplot(
+                        data,
+                    )
+                    axs[line, i % number_of_columns].set_title(numerical_table.column_names[i])
+
+            # removes unused ax indices, so there wont be empty plots
+            last_filled_ax_index = len(columns) % number_of_columns
+            for i in range(last_filled_ax_index, number_of_columns):
+                if number_of_rows != 1 and last_filled_ax_index != 0:
+                    fig.delaxes(axs[number_of_rows - 1, i])
+
+            fig.tight_layout()
+            return _figure_to_image(fig)
 
     def correlation_heatmap(self) -> Image:
         """
