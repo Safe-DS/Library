@@ -32,7 +32,7 @@ def test_should_get_the_item_at_index(index: int, expected: Any) -> None:
     ],
 )
 def test_should_raise_if_index_is_out_of_bounds(index: int) -> None:
-    column = Column("a", [0, "1"])
+    column = Column("a", ["a", "b"])
 
     with pytest.raises(IndexOutOfBoundsError):
         column.get_value(index)
