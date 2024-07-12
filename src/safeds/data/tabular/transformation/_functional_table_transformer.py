@@ -26,13 +26,12 @@ class FunctionalTableTransformer(TableTransformer):
     # Dunder methods
     # ------------------------------------------------------------------------------------------------------------------
 
-    def __init__(self,
-                 funct: Callable[[Table], Table],
-                 ) -> None:
+    def __init__(
+        self,
+        funct: Callable[[Table], Table],
+    ) -> None:
         super().__init__(None)
         self._func = funct
-
-        
 
     def __hash__(self) -> int:
         return _structural_hash(
@@ -53,7 +52,7 @@ class FunctionalTableTransformer(TableTransformer):
     # Learning and transformation
     # ------------------------------------------------------------------------------------------------------------------
 
-    def fit(self, table: Table) -> FunctionalTableTransformer:   # noqa: ARG002
+    def fit(self, table: Table) -> FunctionalTableTransformer:  # noqa: ARG002
         """
         **Note:** For FunctionalTableTransformer this is a no-OP.
 
@@ -66,7 +65,7 @@ class FunctionalTableTransformer(TableTransformer):
         -------
         fitted_transformer:
             Returns self, because this transformer is always fitted.
-            
+
         """
         return self
 
@@ -90,12 +89,12 @@ class FunctionalTableTransformer(TableTransformer):
         ------
         Exception:
             Raised when the wrapped callable encounters an error.
-        
+
         """
         try:
             return self._func(table)
         except Exception as e:
-            #TODO Evaluate if switch to non-generic exception is useful, as _func can be any callable
+            # TODO Evaluate if switch to non-generic exception is useful, as _func can be any callable
             raise Exception("The underlying function encountered an error") from e  # noqa: TRY002
 
     def fit_and_transform(self, table: Table) -> tuple[FunctionalTableTransformer, Table]:
