@@ -478,6 +478,8 @@ class TablePlotter:
             The maximum number of bins to use in the histogram for the x-axis. Default is 10.
         y_max_bin_count:
             The maximum number of bins to use in the histogram for the y-axis. Default is 10.
+        theme:
+            The color theme of the plot. Default is "light".
 
         Returns
         -------
