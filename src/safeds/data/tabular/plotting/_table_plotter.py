@@ -294,8 +294,8 @@ class TablePlotter:
         self,
         x_name: str,
         y_names: list[str],
-        show_confidence_interval: bool = True,
         *,
+        show_confidence_interval: bool = True,
         theme: Literal["dark", "light"] = "light",
     ) -> Image:
         """
