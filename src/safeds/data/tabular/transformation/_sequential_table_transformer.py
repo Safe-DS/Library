@@ -41,9 +41,7 @@ class SequentialTableTransformer(InvertibleTableTransformer):
         # Check if transformers actually contains any transformers.
         if transformers is None or len(transformers) == 0:
             warn(
-                (
-                    "transformers should contain at least 1 transformer"
-                ),
+                ("transformers should contain at least 1 transformer"),
                 UserWarning,
                 stacklevel=2,
             )
