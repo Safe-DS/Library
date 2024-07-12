@@ -698,7 +698,7 @@ class Table:
             _check_columns_exist(self, names)
 
         return Table._from_polars_lazy_frame(
-            self._lazy_frame.drop(names),
+            self._lazy_frame.drop(names, strict=not ignore_unknown_names),
         )
 
     def remove_columns_except(
