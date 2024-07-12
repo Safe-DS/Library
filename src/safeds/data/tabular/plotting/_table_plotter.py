@@ -455,8 +455,16 @@ class TablePlotter:
         fig.tight_layout()
 
         return _figure_to_image(fig)
-    
-    def histogram_2d(self, x_name: str, y_name: str, *, x_max_bin_count: int = 10, y_max_bin_count: int = 10, theme: Literal["dark", "light"] = "light") -> Image:
+
+    def histogram_2d(
+        self,
+        x_name: str,
+        y_name: str,
+        *,
+        x_max_bin_count: int = 10,
+        y_max_bin_count: int = 10,
+        theme: Literal["dark", "light"] = "light",
+    ) -> Image:
         """
         Create a 2D histogram for two columns in the table.
 
@@ -510,13 +518,14 @@ class TablePlotter:
                     f"there are missing values in column '{name}', use transformation to fill missing values "
                     f"or drop the missing values. For a moving average no missing values are allowed.",
                 )
-            
+
         import matplotlib.pyplot as plt
+
         if theme == "dark":
             plt.style.use("dark_background")
 
         fig, ax = plt.subplots()
-        
+
         ax.hist2d(
             x=self._table.get_column(x_name)._series,
             y=self._table.get_column(y_name)._series,
@@ -526,8 +535,8 @@ class TablePlotter:
         ax.set_ylabel(y_name)
         ax.tick_params(
             axis="x",
-            labelrotation=45,       
-            )
+            labelrotation=45,
+        )
 
         fig.tight_layout()
 
