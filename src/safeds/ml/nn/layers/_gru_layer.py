@@ -85,7 +85,7 @@ class GRULayer(Layer):
 
     def _set_input_size(self, input_size: int | ModelImageSize) -> None:
         if isinstance(input_size, ModelImageSize):
-            raise TypeError("The input_size of a forward layer has to be of type int.")
+            raise TypeError("The input_size of a gru layer has to be of type int.")
 
         self._input_size = input_size
 

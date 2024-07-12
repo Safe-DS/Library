@@ -69,16 +69,17 @@ def test_should_raise_if_output_size_out_of_bounds(output_size: int | Choice[int
     [
         1,
         20,
+        Choice(1, 20)
     ],
-    ids=["one", "twenty"],
+    ids=["one", "twenty", "choice"],
 )
-def test_should_raise_if_output_size_doesnt_match(output_size: int) -> None:
+def test_should_raise_if_output_size_doesnt_match(output_size: int | Choice[int]) -> None:
     assert GRULayer(neuron_count=output_size).output_size == output_size
 
 
 def test_should_raise_if_input_size_is_set_with_image_size() -> None:
     layer = GRULayer(1)
-    with pytest.raises(TypeError, match=r"The input_size of a forward layer has to be of type int."):
+    with pytest.raises(TypeError, match=r"The input_size of a gru layer has to be of type int."):
         layer._set_input_size(ImageSize(1, 2, 3))
 
 
@@ -104,14 +105,29 @@ def test_should_raise_if_activation_function_not_set() -> None:
             GRULayer(neuron_count=1),
             False,
         ),
+        (
+            GRULayer(neuron_count=Choice(2)),
+            GRULayer(neuron_count=Choice(2)),
+            True,
+        ),
+        (
+            GRULayer(neuron_count=Choice(2)),
+            GRULayer(neuron_count=Choice(1)),
+            False,
+        ),
+        (
+            GRULayer(neuron_count=Choice(2)),
+            GRULayer(neuron_count=2),
+            False,
+        ),
     ],
-    ids=["equal", "not equal"],
+    ids=["equal", "not equal", "equal choices", "not equal choices", "choice and int"],
 )
-def test_should_compare_forward_layers(layer1: GRULayer, layer2: GRULayer, equal: bool) -> None:
+def test_should_compare_gru_layers(layer1: GRULayer, layer2: GRULayer, equal: bool) -> None:
     assert (layer1.__eq__(layer2)) == equal
 
 
-def test_should_assert_that_forward_layer_is_equal_to_itself() -> None:
+def test_should_assert_that_gru_layer_is_equal_to_itself() -> None:
     layer = GRULayer(neuron_count=1)
     assert layer.__eq__(layer)
 
@@ -121,9 +137,9 @@ def test_should_assert_that_forward_layer_is_equal_to_itself() -> None:
     [
         (GRULayer(neuron_count=1), None),
     ],
-    ids=["ForwardLayer vs. None"],
+    ids=["GRULayer vs. None"],
 )
-def test_should_return_not_implemented_if_other_is_not_forward_layer(layer: GRULayer, other: Any) -> None:
+def test_should_return_not_implemented_if_other_is_not_gru_layer(layer: GRULayer, other: Any) -> None:
     assert (layer.__eq__(other)) is NotImplemented
 
 
@@ -137,7 +153,7 @@ def test_should_return_not_implemented_if_other_is_not_forward_layer(layer: GRUL
     ],
     ids=["equal"],
 )
-def test_should_assert_that_equal_forward_layers_have_equal_hash(layer1: GRULayer, layer2: GRULayer) -> None:
+def test_should_assert_that_equal_gru_layers_have_equal_hash(layer1: GRULayer, layer2: GRULayer) -> None:
     assert layer1.__hash__() == layer2.__hash__()
 
 
@@ -151,7 +167,7 @@ def test_should_assert_that_equal_forward_layers_have_equal_hash(layer1: GRULaye
     ],
     ids=["not equal"],
 )
-def test_should_assert_that_different_forward_layers_have_different_hash(
+def test_should_assert_that_different_gru_layers_have_different_hash(
     layer1: GRULayer,
     layer2: GRULayer,
 ) -> None:
@@ -189,3 +205,10 @@ def test_internal_layer_should_raise_error() -> None:
     layer = GRULayer(1)
     with pytest.raises(ValueError, match="The input_size is not yet set."):
         layer._get_internal_layer(activation_function="relu")
+
+
+def test_should_get_all_possible_combinations_of_gru_layer() -> None:
+    layer = GRULayer(Choice(1, 2))
+    possible_layers = layer._get_layers_for_all_choices()
+    assert possible_layers[0] == GRULayer(1)
+    assert possible_layers[1] == GRULayer(2)
