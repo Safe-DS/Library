@@ -13,26 +13,31 @@ def _check_resize_errors(new_width: int, new_height: int) -> None:
     _check_bounds("new_height", new_height, lower_bound=_ClosedBound(1))
 
 
-def _check_crop_errors_and_warnings(
+def _check_crop_warnings(
     x: int,
     y: int,
-    width: int,
-    height: int,
     min_width: int,
     min_height: int,
     plural: bool,
 ) -> None:
-    _check_bounds("x", x, lower_bound=_ClosedBound(0))
-    _check_bounds("y", y, lower_bound=_ClosedBound(0))
-    _check_bounds("width", width, lower_bound=_ClosedBound(1))
-    _check_bounds("height", height, lower_bound=_ClosedBound(1))
-
     if x >= min_width or y >= min_height:
         warnings.warn(
             f"The specified bounding rectangle does not contain any content of {'at least one' if plural else 'the'} image. Therefore {'these images' if plural else 'the image'} will be blank.",
             UserWarning,
             stacklevel=2,
         )
+
+
+def _check_crop_errors(
+    x: int,
+    y: int,
+    width: int,
+    height: int,
+) -> None:
+    _check_bounds("x", x, lower_bound=_ClosedBound(0))
+    _check_bounds("y", y, lower_bound=_ClosedBound(0))
+    _check_bounds("width", width, lower_bound=_ClosedBound(1))
+    _check_bounds("height", height, lower_bound=_ClosedBound(1))
 
 
 def _check_adjust_brightness_errors_and_warnings(factor: float, plural: bool) -> None:
