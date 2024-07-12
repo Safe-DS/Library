@@ -74,7 +74,7 @@ class Column(Sequence[T_co]):
         if data is None:
             data = []
 
-        self._series: pl.Series = pl.Series(name, data)
+        self._series: pl.Series = pl.Series(name, data, strict=False)
 
     def __contains__(self, item: Any) -> bool:
         return self._series.__contains__(item)
@@ -84,7 +84,7 @@ class Column(Sequence[T_co]):
             return NotImplemented
         if self is other:
             return True
-        return self._series.equals(other._series)
+        return self.name == other.name and self._series.equals(other._series)
 
     @overload
     def __getitem__(self, index: int) -> T_co: ...

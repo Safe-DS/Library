@@ -9,7 +9,7 @@ from safeds.data.tabular.containers import Column
     [
         Column("a", []),
         Column("a", [0]),
-        Column("a", [0, "1"]),
+        Column("a", ["a", "b"]),
     ],
     ids=[
         "empty",
