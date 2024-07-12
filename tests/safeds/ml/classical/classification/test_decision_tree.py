@@ -47,7 +47,7 @@ class TestMinSampleCountInLeaves:
 
 
 class TestPlot:
-    def test_should_raise_if_model_is_not_fittet(self) -> None:
+    def test_should_raise_if_model_is_not_fitted(self) -> None:
         model = DecisionTreeClassifier()
         with pytest.raises(ModelNotFittedError):
             model.plot()
