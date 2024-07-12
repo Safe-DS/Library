@@ -242,7 +242,7 @@ class Table:
 
         try:
             return Table._from_polars_data_frame(pl.read_json(path))
-        except pl.exceptions.PanicException:
+        except (pl.exceptions.PanicException, pl.exceptions.ComputeError):
             # Can happen if the JSON file is empty (https://github.com/pola-rs/polars/issues/10234)
             return Table()
 
