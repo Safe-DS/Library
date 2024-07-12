@@ -5,7 +5,7 @@ from syrupy import SnapshotAssertion
 
 
 @pytest.mark.parametrize(
-    ("table", "x_name", "y_name"),
+    ("table", "col1", "col2"),
     [
         (Table({"A": [1, 2, 3], "B": [2, 4, 7]}), "A", "B"),
         (
@@ -34,11 +34,11 @@ from syrupy import SnapshotAssertion
 )
 def test_should_match_snapshot(
     table: Table,
-    x_name: str,
-    y_name: str,
+    col1: str,
+    col2: str,
     snapshot_png_image: SnapshotAssertion,
 ) -> None:
-    histogram_2d = table.plot.histogram_2d(x_name, y_name)
+    histogram_2d = table.plot.histogram_2d(col1, col2)
     assert histogram_2d == snapshot_png_image
 
 @pytest.mark.parametrize(
@@ -52,7 +52,8 @@ def test_should_match_snapshot(
     ids=[
         "First argument doesn't exist",
         "Second argument doesn't exist",
-        "Both arguments do not exist", "empty",
+        "Both arguments do not exist",
+        "empty",
         ],
 )
 def test_should_raise_if_column_does_not_exist(table: Table, col1: str, col2: str) -> None:
@@ -68,11 +69,11 @@ def test_should_raise_if_column_does_not_exist(table: Table, col1: str, col2: st
 )
 def test_should_match_snapshot_dark_theme(
     table: Table,
-    x_name: str,
-    y_name: str,
+    col1: str,
+    col2: str,
     snapshot_png_image: SnapshotAssertion,
 ) -> None:
-    histogram_2d = table.plot.histogram_2d(x_name, y_name, theme="dark")
+    histogram_2d = table.plot.histogram_2d(col1, col2, theme="dark")
     assert histogram_2d == snapshot_png_image
 
 def test_should_raise_if_value_not_in_range_x() -> None:
