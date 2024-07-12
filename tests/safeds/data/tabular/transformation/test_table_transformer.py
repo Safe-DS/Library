@@ -8,6 +8,7 @@ from safeds.data.tabular.transformation import (
     KNearestNeighborsImputer,
     LabelEncoder,
     OneHotEncoder,
+    ParallelTableTransformer,
     RangeScaler,
     SimpleImputer,
     StandardScaler,

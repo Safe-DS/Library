@@ -25,13 +25,16 @@ class TestInit:
     def test_should_pass():
         tf = ParallelTableTransformer(transformers=[RobustScaler("a"), StandardScaler("b")])
 
-class TestHash:
-    def test_should_compute_hash(): #TODO: Elaborate
-        tf = ParallelTableTransformer(transformers=[RobustScaler("a")])
-
 class TestFit:
     def test_should_pass():
-        pass
+        tf = ParallelTableTransformer(transformers=[RobustScaler(column_names=["a", "b"]), RangeScaler(column_names=["c", "d"])])
+        t = Table.from_dict({
+            "a": [1, 2, 3],
+            "b": [4, 5, 6],
+            "c": [7, 8, 9],
+            "d": [9, 10, 11],
+        })
+        ftf = tf.fit(t)
 
 
 @pytest.mark.parametrize(
@@ -68,6 +71,8 @@ class TestFit:
     ],
 )
 class TestTransform:
-    pass
+    def test_should_pass():
+        pass
+    def test_should_raise_if
 
 class TestInverseTransform:
