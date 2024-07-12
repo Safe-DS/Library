@@ -65,7 +65,7 @@ class ColumnPlotter:
         fig.tight_layout()
 
         return _figure_to_image(fig)
-    
+
     def violin_plot(self) -> Image:
         """
         Create a violin plot for the values in the column. This is only possible for numeric columns.

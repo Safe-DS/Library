@@ -101,7 +101,7 @@ class TablePlotter:
 
         fig.tight_layout()
         return _figure_to_image(fig)
-    
+
     def violin_plots(self) -> Image:
         """
         Create a violin plot for every numerical column.
