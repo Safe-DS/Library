@@ -7,13 +7,14 @@ from safeds.data.tabular.containers import Cell, Column, Table
 
 
 def assert_tables_equal(
-        table1: Table, 
-        table2: Table, 
-        *, 
-        ignore_column_order: bool = False,
-        ignore_row_order: bool = False, 
-        ignore_types: bool = False,
-        check_exact: bool = False) -> None:
+    table1: Table,
+    table2: Table,
+    *,
+    ignore_column_order: bool = False,
+    ignore_row_order: bool = False,
+    ignore_types: bool = False,
+    check_exact: bool = False,
+) -> None:
     """
     Assert that two tables are almost equal.
 
@@ -33,12 +34,13 @@ def assert_tables_equal(
         If True, check, if floating point values match EXACTLY.
     """
     assert_frame_equal(
-        table1._data_frame, 
-        table2._data_frame, 
-        check_row_order = not ignore_row_order,
-        check_column_order = not ignore_column_order,
-        check_dtypes = not ignore_types,
-        check_exact=check_exact)
+        table1._data_frame,
+        table2._data_frame,
+        check_row_order=not ignore_row_order,
+        check_column_order=not ignore_column_order,
+        check_dtypes=not ignore_types,
+        check_exact=check_exact,
+    )
 
 
 def assert_that_tabular_datasets_are_equal(table1: TabularDataset, table2: TabularDataset) -> None:

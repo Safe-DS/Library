@@ -11,8 +11,8 @@ if TYPE_CHECKING:
     from ._label_encoder import LabelEncoder
     from ._one_hot_encoder import OneHotEncoder
     from ._range_scaler import RangeScaler
-    from ._sequential_table_transformer import SequentialTableTransformer
     from ._robust_scaler import RobustScaler
+    from ._sequential_table_transformer import SequentialTableTransformer
     from ._simple_imputer import SimpleImputer
     from ._standard_scaler import StandardScaler
     from ._table_transformer import TableTransformer
