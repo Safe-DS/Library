@@ -60,16 +60,19 @@ class TablePlotter:
         from math import ceil
 
         import matplotlib.pyplot as plt
+
         style = "dark_background" if theme == "dark" else "default"
         with plt.style.context(style):
             if theme == "dark":
-                plt.rcParams.update({
-                    "text.color": "white",
-                    "axes.labelcolor": "white",
-                    "axes.edgecolor": "white",
-                    "xtick.color": "white",
-                    "ytick.color": "white",
-                })
+                plt.rcParams.update(
+                    {
+                        "text.color": "white",
+                        "axes.labelcolor": "white",
+                        "axes.edgecolor": "white",
+                        "xtick.color": "white",
+                        "ytick.color": "white",
+                    },
+                )
             columns = numerical_table.to_columns()
             columns = [column._series.drop_nulls() for column in columns]
             max_width = 3
@@ -111,20 +114,20 @@ class TablePlotter:
                     fig.delaxes(axs[number_of_rows - 1, i])
 
             fig.tight_layout()
-            
 
             style = "dark_background" if theme == "dark" else "default"
             with plt.style.context(style):
                 if theme == "dark":
-                    plt.rcParams.update({
-                        "text.color": "white",
-                        "axes.labelcolor": "white",
-                        "axes.edgecolor": "white",
-                        "xtick.color": "white",
-                        "ytick.color": "white",
-                    })
+                    plt.rcParams.update(
+                        {
+                            "text.color": "white",
+                            "axes.labelcolor": "white",
+                            "axes.edgecolor": "white",
+                            "xtick.color": "white",
+                            "ytick.color": "white",
+                        },
+                    )
                 return _figure_to_image(fig)
-
 
     def correlation_heatmap(self, *, theme: Literal["dark", "light"] = "light") -> Image:
         """
@@ -144,16 +147,19 @@ class TablePlotter:
         # TODO: implement using matplotlib and polars
         #  https://stackoverflow.com/questions/33282368/plotting-a-2d-heatmap
         import matplotlib.pyplot as plt
+
         style = "dark_background" if theme == "dark" else "default"
         with plt.style.context(style):
             if theme == "dark":
-                plt.rcParams.update({
-                    "text.color": "white",
-                    "axes.labelcolor": "white",
-                    "axes.edgecolor": "white",
-                    "xtick.color": "white",
-                    "ytick.color": "white",
-                })
+                plt.rcParams.update(
+                    {
+                        "text.color": "white",
+                        "axes.labelcolor": "white",
+                        "axes.edgecolor": "white",
+                        "xtick.color": "white",
+                        "ytick.color": "white",
+                    },
+                )
             import numpy as np
 
             only_numerical = self._table.remove_non_numeric_columns()._data_frame.fill_null(0)
@@ -180,12 +186,15 @@ class TablePlotter:
                     vmax=1,
                     cmap="coolwarm",
                 )
-                ax.set_xticks(np.arange(len(only_numerical.columns)), rotation="vertical", labels=only_numerical.columns)
+                ax.set_xticks(
+                    np.arange(len(only_numerical.columns)),
+                    rotation="vertical",
+                    labels=only_numerical.columns,
+                )
                 ax.set_yticks(np.arange(len(only_numerical.columns)), labels=only_numerical.columns)
                 fig.colorbar(heatmap)
 
                 plt.tight_layout()
-            
 
             return _figure_to_image(fig)
 
@@ -210,16 +219,19 @@ class TablePlotter:
         >>> image = table.plot.histograms()
         """
         import matplotlib.pyplot as plt
+
         style = "dark_background" if theme == "dark" else "default"
         with plt.style.context(style):
             if theme == "dark":
-                plt.rcParams.update({
-                    "text.color": "white",
-                    "axes.labelcolor": "white",
-                    "axes.edgecolor": "white",
-                    "xtick.color": "white",
-                    "ytick.color": "white",
-                })
+                plt.rcParams.update(
+                    {
+                        "text.color": "white",
+                        "axes.labelcolor": "white",
+                        "axes.edgecolor": "white",
+                        "xtick.color": "white",
+                        "ytick.color": "white",
+                    },
+                )
             import polars as pl
 
             n_cols = min(3, self._table.column_count)
@@ -261,14 +273,26 @@ class TablePlotter:
                     distinct_values = value_counts.get_column(column.name).cast(pl.String).to_numpy()
                     hist = value_counts.get_column("count").to_numpy()
                     ax.bar(distinct_values, hist, edgecolor="black")
-                    ax.set_xticks(range(len(distinct_values)), distinct_values, rotation=45, horizontalalignment="right")
+                    ax.set_xticks(
+                        range(len(distinct_values)),
+                        distinct_values,
+                        rotation=45,
+                        horizontalalignment="right",
+                    )
 
             for i in range(len(col_names), n_rows * n_cols):
                 fig.delaxes(axs.flatten()[i])  # Remove empty subplots
 
             return _figure_to_image(fig)
 
-    def line_plot(self, x_name: str, y_names: list[str], show_confidence_interval: bool = True, *, theme: Literal["dark", "light"] = "light") -> Image:
+    def line_plot(
+        self,
+        x_name: str,
+        y_names: list[str],
+        show_confidence_interval: bool = True,
+        *,
+        theme: Literal["dark", "light"] = "light",
+    ) -> Image:
         """
         Create a line plot for two columns in the table.
 
@@ -307,16 +331,19 @@ class TablePlotter:
         _plot_validation(self._table, x_name, y_names)
 
         import matplotlib.pyplot as plt
+
         style = "dark_background" if theme == "dark" else "default"
         with plt.style.context(style):
             if theme == "dark":
-                plt.rcParams.update({
-                    "text.color": "white",
-                    "axes.labelcolor": "white",
-                    "axes.edgecolor": "white",
-                    "xtick.color": "white",
-                    "ytick.color": "white",
-                })
+                plt.rcParams.update(
+                    {
+                        "text.color": "white",
+                        "axes.labelcolor": "white",
+                        "axes.edgecolor": "white",
+                        "xtick.color": "white",
+                        "ytick.color": "white",
+                    },
+                )
             import polars as pl
 
             agg_list = []
@@ -404,16 +431,19 @@ class TablePlotter:
         _plot_validation(self._table, x_name, y_names)
 
         import matplotlib.pyplot as plt
+
         style = "dark_background" if theme == "dark" else "default"
         with plt.style.context(style):
             if theme == "dark":
-                plt.rcParams.update({
-                    "text.color": "white",
-                    "axes.labelcolor": "white",
-                    "axes.edgecolor": "white",
-                    "xtick.color": "white",
-                    "ytick.color": "white",
-                })
+                plt.rcParams.update(
+                    {
+                        "text.color": "white",
+                        "axes.labelcolor": "white",
+                        "axes.edgecolor": "white",
+                        "xtick.color": "white",
+                        "ytick.color": "white",
+                    },
+                )
             fig, ax = plt.subplots()
             for y_name in y_names:
                 ax.scatter(
@@ -443,7 +473,14 @@ class TablePlotter:
 
             return _figure_to_image(fig)
 
-    def moving_average_plot(self, x_name: str, y_name: str, window_size: int, *, theme: Literal["dark", "light"] = "light") -> Image:
+    def moving_average_plot(
+        self,
+        x_name: str,
+        y_name: str,
+        window_size: int,
+        *,
+        theme: Literal["dark", "light"] = "light",
+    ) -> Image:
         """
         Create a moving average plot for the y column and plot it by the x column in the table.
 
@@ -478,16 +515,19 @@ class TablePlotter:
         >>> image = table.plot.moving_average_plot("a", "b", window_size = 2)
         """
         import matplotlib.pyplot as plt
+
         style = "dark_background" if theme == "dark" else "default"
         with plt.style.context(style):
             if theme == "dark":
-                plt.rcParams.update({
-                    "text.color": "white",
-                    "axes.labelcolor": "white",
-                    "axes.edgecolor": "white",
-                    "xtick.color": "white",
-                    "ytick.color": "white",
-                })
+                plt.rcParams.update(
+                    {
+                        "text.color": "white",
+                        "axes.labelcolor": "white",
+                        "axes.edgecolor": "white",
+                        "xtick.color": "white",
+                        "ytick.color": "white",
+                    },
+                )
             import numpy as np
             import polars as pl
 

@@ -54,7 +54,7 @@ class ColumnPlotter:
 
         import matplotlib.pyplot as plt
 
-        def _set_boxplot_colors(box:dict, theme: str) -> None:
+        def _set_boxplot_colors(box: dict, theme: str) -> None:
             if theme == "dark":
                 for median in box["medians"]:
                     median.set(color="orange", linewidth=1.5)
@@ -73,7 +73,7 @@ class ColumnPlotter:
             else:
                 for median in box["medians"]:
                     median.set(color="orange", linewidth=1.5)
-                
+
                 for box_part in box["boxes"]:
                     box_part.set(color="black", linewidth=1.5, facecolor="blue")
 
@@ -89,19 +89,23 @@ class ColumnPlotter:
         style = "dark_background" if theme == "dark" else "default"
         with plt.style.context(style):
             if theme == "dark":
-                plt.rcParams.update({
-                    "text.color": "white",
-                    "axes.labelcolor": "white",
-                    "axes.edgecolor": "white",
-                    "xtick.color": "white",
-                    "ytick.color": "white",
-                    "grid.color": "gray",
-                    "grid.linewidth": 0.5,
-                })
+                plt.rcParams.update(
+                    {
+                        "text.color": "white",
+                        "axes.labelcolor": "white",
+                        "axes.edgecolor": "white",
+                        "xtick.color": "white",
+                        "ytick.color": "white",
+                        "grid.color": "gray",
+                        "grid.linewidth": 0.5,
+                    },
+                )
             else:
-                plt.rcParams.update({
-                    "grid.linewidth": 0.5,
-                })
+                plt.rcParams.update(
+                    {
+                        "grid.linewidth": 0.5,
+                    },
+                )
 
             fig, ax = plt.subplots()
             box = ax.boxplot(
@@ -118,7 +122,6 @@ class ColumnPlotter:
 
             return _figure_to_image(fig)
 
-
     def histogram(self, *, max_bin_count: int = 10, theme: Literal["dark", "light"] = "light") -> Image:
         """
         Create a histogram for the values in the column.
@@ -128,7 +131,7 @@ class ColumnPlotter:
         max_bin_count:
             The maximum number of bins to use in the histogram. Default is 10.
         theme:
-            The theme for the plot, either "dark" or "light". Default is "light"        
+            The theme for the plot, either "dark" or "light". Default is "light"
 
         Returns
         -------
@@ -146,17 +149,17 @@ class ColumnPlotter:
         style = "dark_background" if theme == "dark" else "default"
         with plt.style.context(style):
             if theme == "dark":
-                plt.rcParams.update({
-                    "text.color": "white",
-                    "axes.labelcolor": "white",
-                    "axes.edgecolor": "white",
-                    "xtick.color": "white",
-                    "ytick.color": "white",
-                })
-        
+                plt.rcParams.update(
+                    {
+                        "text.color": "white",
+                        "axes.labelcolor": "white",
+                        "axes.edgecolor": "white",
+                        "xtick.color": "white",
+                        "ytick.color": "white",
+                    },
+                )
+
             return self._column.to_table().plot.histograms(max_bin_count=max_bin_count)
-
-
 
     def lag_plot(self, lag: int, *, theme: Literal["dark", "light"] = "light") -> Image:
         """
@@ -188,13 +191,15 @@ class ColumnPlotter:
         style = "dark_background" if theme == "dark" else "default"
         with plt.style.context(style):
             if theme == "dark":
-                plt.rcParams.update({
-                    "text.color": "white",
-                    "axes.labelcolor": "white",
-                    "axes.edgecolor": "white",
-                    "xtick.color": "white",
-                    "ytick.color": "white",
-                })
+                plt.rcParams.update(
+                    {
+                        "text.color": "white",
+                        "axes.labelcolor": "white",
+                        "axes.edgecolor": "white",
+                        "xtick.color": "white",
+                        "ytick.color": "white",
+                    },
+                )
 
             if self._column.row_count > 0:
                 _check_column_is_numeric(self._column, operation="create a lag plot")

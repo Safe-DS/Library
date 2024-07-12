@@ -58,6 +58,7 @@ def test_should_match_snapshot(
     line_plot = table.plot.moving_average_plot(x_name, y_name, window_size)
     assert line_plot == snapshot_png_image
 
+
 @pytest.mark.parametrize(
     ("table", "x_name", "y_name", "window_size"),
     [

@@ -41,6 +41,7 @@ def test_should_match_snapshot(
     scatterplot = table.plot.scatter_plot(x_name, y_names)
     assert scatterplot == snapshot_png_image
 
+
 @pytest.mark.parametrize(
     ("table", "x_name", "y_names"),
     [
@@ -69,7 +70,6 @@ def test_should_match_snapshot(
         "multiple",
     ],
 )
-
 def test_should_match_snapshot_dark(
     table: Table,
     x_name: str,
