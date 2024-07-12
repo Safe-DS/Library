@@ -89,7 +89,8 @@ class StandardScaler(InvertibleTableTransformer):
         
         # Check for NaN values in the columns to be transformed
         for name in column_names:
-            table.select(pl.col(name=name).fill_nan(None))
+            # table.select(pl.col(name=name).fill_nan(None))
+            table._lazy_frame.with_columns(pl.col(name=name).fill_nan(None))
         
         # Learn the transformation (ddof=0 is used to match the behavior of scikit-learn)
         _data_mean = table._lazy_frame.select(column_names).mean().collect()
@@ -135,7 +136,7 @@ class StandardScaler(InvertibleTableTransformer):
 
         # Check for NaN values in the columns to be transformed
         for name in self._column_names: 
-            table.select(pl.col(name=name).fill_nan(None))
+            table._lazy_frame.with_columns(pl.col(name=name).fill_nan(None))
             
         _check_columns_exist(table, self._column_names)
         _check_columns_are_numeric(table, self._column_names, operation="transform with a StandardScaler")
@@ -182,7 +183,7 @@ class StandardScaler(InvertibleTableTransformer):
 
         # Check for NaN values in the columns to be transformed
         for name in self._column_names: 
-            transformed_table.select(pl.col(name=name).fill_nan(None))
+            transformed_table._lazy_frame.with_columns(pl.col(name=name).fill_nan(None))
 
         _check_columns_exist(transformed_table, self._column_names)
         _check_columns_are_numeric(
