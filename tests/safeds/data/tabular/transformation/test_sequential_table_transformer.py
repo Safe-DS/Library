@@ -16,30 +16,27 @@ from tests.helpers import assert_tables_equal
 
 class TestInit:
 
-    def test_should_raise_value_error_on_empty_list(self) -> None:
-        with pytest.raises(ValueError, match=("transformers must contain at least 1 transformer")):
-            SequentialTableTransformer(transformers=[])  # type: ignore  # noqa: PGH003
+    def test_should_warn_on_empty_list(self) -> None:
+        with pytest.warns(UserWarning, match=("transformers should contain at least 1 transformer")):
+            SequentialTableTransformer(transformers=[])  # type: ignore[attr-defined]
 
 
 class TestFit:
     def test_should_raise_value_error_on_empty_table(self) -> None:
-        one_hot = OneHotEncoder()
-        imputer = SimpleImputer(SimpleImputer.Strategy.constant(0))
-        transformers = [one_hot, imputer]
         test_table = Table(
             {
                 "col1": [],
                 "col2": [],
             },
         )
-        sequential_table_transformer = SequentialTableTransformer(transformers)
+        sequential_table_transformer = SequentialTableTransformer([SimpleImputer(SimpleImputer.Strategy.constant(0))])
         with pytest.raises(
             ValueError,
             match=("The SequentialTableTransformer cannot be fitted because the table contains 0 rows."),
         ):
             sequential_table_transformer.fit(test_table)
 
-    def test_fit_does_not_change_original_transformer(self) -> None:
+    def test_should_not_change_original_transformer(self) -> None:
         one_hot = OneHotEncoder()
         imputer = SimpleImputer(SimpleImputer.Strategy.constant(0))
         transformer_list = [one_hot, imputer]
@@ -94,7 +91,7 @@ class TestTransform:
         test_table_sequential = sequential_transformer.transform(test_table)
         assert_tables_equal(test_table_normal, test_table_sequential)
 
-    def test_transforms_correctly_with_multiple_transformers(self) -> None:
+    def test_should_transform_with_multiple_transformers(self) -> None:
         one_hot = OneHotEncoder()
         imputer = SimpleImputer(SimpleImputer.Strategy.constant(0))
         transformers = [one_hot, imputer]
@@ -106,25 +103,25 @@ class TestTransform:
         )
         sequential_table_transformer = SequentialTableTransformer(transformers)
         fitted_sequential_table_transformer = sequential_table_transformer.fit(test_table)
-        transfromed_table_sequential = fitted_sequential_table_transformer.transform(test_table)
+        transformed_table_sequential = fitted_sequential_table_transformer.transform(test_table)
 
         one_hot = one_hot.fit(test_table)
-        transormed_table_individual = one_hot.transform(test_table)
-        imputer = imputer.fit(transormed_table_individual)
-        transormed_table_individual = imputer.transform(transormed_table_individual)
+        transformed_table_individual = one_hot.transform(test_table)
+        imputer = imputer.fit(transformed_table_individual)
+        transformed_table_individual = imputer.transform(transformed_table_individual)
 
-        assert_tables_equal(transfromed_table_sequential, transormed_table_individual)
+        assert_tables_equal(transformed_table_sequential, transformed_table_individual)
 
 
 class TestIsFitted:
-    def test_should_return_false_before_fiting(self) -> None:
+    def test_should_return_false_before_fitting(self) -> None:
         one_hot = OneHotEncoder()
         imputer = SimpleImputer(SimpleImputer.Strategy.constant(0))
         transformers = [one_hot, imputer]
         sequential_table_transformer = SequentialTableTransformer(transformers)
         assert sequential_table_transformer.is_fitted is False
 
-    def test_should_return_true_after_fiting(self) -> None:
+    def test_should_return_true_after_fitting(self) -> None:
         one_hot = OneHotEncoder()
         imputer = SimpleImputer(SimpleImputer.Strategy.constant(0))
         transformers = [one_hot, imputer]

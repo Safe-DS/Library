@@ -13,7 +13,7 @@ def assert_tables_equal(
     ignore_column_order: bool = False,
     ignore_row_order: bool = False,
     ignore_types: bool = False,
-    check_exact: bool = False,
+    ignore_float_imprecision: bool = True,
 ) -> None:
     """
     Assert that two tables are almost equal.
@@ -30,8 +30,8 @@ def assert_tables_equal(
         Ignore the column order when True. Will return true, even when the row order is different.
     ignore_types:
         Ignore differing data Types. Will return true, even when columns have differing data types.
-    check_exact:
-        If True, check, if floating point values match EXACTLY.
+    ignore_float_imprecision:
+        If False, check if floating point values match EXACTLY.
     """
     assert_frame_equal(
         table1._data_frame,
@@ -39,7 +39,7 @@ def assert_tables_equal(
         check_row_order=not ignore_row_order,
         check_column_order=not ignore_column_order,
         check_dtypes=not ignore_types,
-        check_exact=check_exact,
+        check_exact=not ignore_float_imprecision,
     )
 
 

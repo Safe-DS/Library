@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
+from warnings import warn
 
 from safeds._utils import _structural_hash
 from safeds.exceptions import TransformerNotFittedError, TransformerNotInvertibleError
@@ -25,20 +26,27 @@ class SequentialTableTransformer(InvertibleTableTransformer):
     Raises
     ------
     ValueError:
-        Raises a ValueError if the list of Transformers is None or contains no transformers.
+        Raises a ValueError if the list of Transformers is None.
     """
 
     def __init__(
         self,
         transformers: list[TableTransformer],
-        *,
-        column_names: str | list[str] | None = None,  # noqa: ARG002
     ) -> None:
         super().__init__(None)
 
+        if transformers is None:
+            raise ValueError("transformers can't be None")
+
         # Check if transformers actually contains any transformers.
         if transformers is None or len(transformers) == 0:
-            raise ValueError("transformers must contain at least 1 transformer")
+            warn(
+                (
+                    "transformers should contain at least 1 transformer"
+                ),
+                UserWarning,
+                stacklevel=2,
+            )
 
         # Parameters
         self._transformers: list[TableTransformer] = transformers
@@ -95,7 +103,6 @@ class SequentialTableTransformer(InvertibleTableTransformer):
 
         result: SequentialTableTransformer = SequentialTableTransformer(
             transformers=fitted_transformers,
-            column_names=self._column_names,
         )
 
         result._is_fitted = True
