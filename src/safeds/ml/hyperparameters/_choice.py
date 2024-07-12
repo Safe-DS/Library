@@ -61,3 +61,10 @@ class Choice(Collection[T]):
             The number of values in this choice.
         """
         return len(self.elements)
+
+    def __eq__(self, other):
+        if not isinstance(other, Choice):
+            return NotImplemented
+        if self is other:
+            return True
+        return (self is other) or (self.elements == other.elements)
