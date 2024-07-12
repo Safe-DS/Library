@@ -131,7 +131,7 @@ class ColumnPlotter:
         max_bin_count:
             The maximum number of bins to use in the histogram. Default is 10.
         theme:
-            The theme for the plot, either "dark" or "light". Default is "light"
+            The theme for the plot, either "dark" or "light". Default is "light".
 
         Returns
         -------
