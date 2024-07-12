@@ -197,7 +197,7 @@ def test_should_assert_that_layer_size_is_greater_than_normal_object(layer: LSTM
     assert sys.getsizeof(layer) > sys.getsizeof(object())
 
 
-def test_should_get_all_possible_combinations_of_gru_layer() -> None:
+def test_should_get_all_possible_combinations_of_lstm_layer() -> None:
     layer = LSTMLayer(Choice(1, 2))
     possible_layers = layer._get_layers_for_all_choices()
     assert possible_layers[0] == LSTMLayer(1)

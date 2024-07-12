@@ -194,3 +194,10 @@ def test_should_assert_that_different_forward_layers_have_different_hash(
 )
 def test_should_assert_that_layer_size_is_greater_than_normal_object(layer: ForwardLayer) -> None:
     assert sys.getsizeof(layer) > sys.getsizeof(object())
+
+
+def test_should_get_all_possible_combinations_of_forward_layer() -> None:
+    layer = ForwardLayer(Choice(1, 2))
+    possible_layers = layer._get_layers_for_all_choices()
+    assert possible_layers[0] == ForwardLayer(1)
+    assert possible_layers[1] == ForwardLayer(2)
