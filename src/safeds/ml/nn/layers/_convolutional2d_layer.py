@@ -5,7 +5,6 @@ import sys
 from typing import TYPE_CHECKING, Any, Literal
 
 from safeds._utils import _structural_hash
-from safeds.ml.nn.typing import ConstantImageSize
 
 from ._layer import Layer
 
@@ -167,6 +166,12 @@ class Convolutional2DLayer(Layer):
         return(
             sum(p.numel() for p in internal_layer.parameters())
         )
+    """from safeds.ml.nn.layers import Convolutional2DLayer
+from safeds.ml.nn.typing import ConstantImageSize
+layer = Convolutional2DLayer(3, 1)
+layer._set_input_size(ConstantImageSize(10,10,3))
+
+print(layer.get_parameter_count())"""
 
 
 
