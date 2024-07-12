@@ -27,7 +27,7 @@ class Cell(ABC, Generic[T_co]):
 
     @staticmethod
     def first_not_none(cells: list[Cell]) -> Cell:
-        """Return the first cell that is not None."""
+        """Return the first cell from the given list that is not None."""
         import polars as pl
 
         from ._lazy_cell import _LazyCell  # circular import
