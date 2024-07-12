@@ -37,7 +37,7 @@ class ColumnPlotter:
         ----------
         theme:
             The theme to use for the plot. Either "dark" or "light".
-            
+
         Returns
         -------
         plot:
