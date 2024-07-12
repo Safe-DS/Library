@@ -39,7 +39,7 @@ class ModelImageSize(TensorShape):
         if not _ignore_invalid_channel and channel not in (1, 3, 4):
             raise ValueError(f"Channel {channel} is not a valid channel option. Use either 1, 3 or 4")
         _check_bounds("channel", channel, lower_bound=_ClosedBound(1))
-        super().__init__(dims = [width, height, channel])
+        super().__init__(dims=[width, height, channel])
 
         self._width = width
         self._height = height

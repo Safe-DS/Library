@@ -5,7 +5,6 @@ import pytest
 from safeds.data.image.typing import ImageSize
 from safeds.exceptions import OutOfBoundsError
 from safeds.ml.nn.layers import ForwardLayer
-from safeds.ml.nn.typing import TensorShape
 from torch import nn
 
 # TODO: Should be tested on a model, not a layer, since input size gets inferred

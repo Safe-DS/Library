@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from typing import Self
-
 from safeds._utils import _structural_hash
 from safeds._validation import _check_bounds, _ClosedBound
 
@@ -12,13 +10,13 @@ class TensorShape:
 
     Parameters
     ----------
-    dims: 
-        A list of integers where each integer represents 
+    dims:
+        A list of integers where each integer represents
         the size of the tensor in a particular dimension.
     """
-    
+
     def __init__(self, dims: list[int]) -> None:
-        self._dims = dims 
+        self._dims = dims
 
     def get_size(self, dimension: int | None = None) -> int | list[int]:
         """
@@ -38,17 +36,17 @@ class TensorShape:
         OutOfBoundsError:
             If the actual value is outside its expected range.
         """
-        _check_bounds("dimension",dimension, lower_bound=_ClosedBound(0))
+        _check_bounds("dimension", dimension, lower_bound=_ClosedBound(0))
         if dimension is not None and dimension >= self.dimensionality:
-            #TODO maybe add error message indicating that the dimension is out of range
-            return 0        
-        if(dimension is None):
+            # TODO maybe add error message indicating that the dimension is out of range
+            return 0
+        if dimension is None:
             return self._dims
         return self._dims[dimension]
-    
+
     def __hash__(self) -> int:
         return _structural_hash(self._dims)
-     
+
     @property
     def dimensionality(self) -> int:
         """
