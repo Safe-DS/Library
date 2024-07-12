@@ -59,6 +59,7 @@ def test_join(
 ) -> None:
     assert table_left.join(table_right, left_names, right_names, mode=mode) == table_expected
 
+
 def test_join_mismatched_columns() -> None:
     table_left = Table({"a": [1, 2], "b": [3, 4]})
     table_right = Table({"d": [1, 5], "e": [5, 6]})
