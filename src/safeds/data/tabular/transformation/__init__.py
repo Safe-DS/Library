@@ -6,6 +6,7 @@ import apipkg
 
 if TYPE_CHECKING:
     from ._discretizer import Discretizer
+    from ._functional_table_transformer import FunctionalTableTransformer
     from ._invertible_table_transformer import InvertibleTableTransformer
     from ._k_nearest_neighbors_imputer import KNearestNeighborsImputer
     from ._label_encoder import LabelEncoder
@@ -16,10 +17,12 @@ if TYPE_CHECKING:
     from ._standard_scaler import StandardScaler
     from ._table_transformer import TableTransformer
 
+
 apipkg.initpkg(
     __name__,
     {
         "Discretizer": "._discretizer:Discretizer",
+        "FunctionalTableTransformer": "._functional_table_transformer:FunctionalTableTransformer",
         "InvertibleTableTransformer": "._invertible_table_transformer:InvertibleTableTransformer",
         "LabelEncoder": "._label_encoder:LabelEncoder",
         "OneHotEncoder": "._one_hot_encoder:OneHotEncoder",
@@ -34,6 +37,7 @@ apipkg.initpkg(
 
 __all__ = [
     "Discretizer",
+    "FunctionalTableTransformer",
     "InvertibleTableTransformer",
     "LabelEncoder",
     "OneHotEncoder",
