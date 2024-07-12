@@ -76,8 +76,8 @@ class LSTMLayer(Layer):
         """
         return TensorShape([self._output_size])
 
-    def _set_input_size(self, input_size: int | ModelImageSize) -> None:
-        if isinstance(input_size, ModelImageSize):
+    def _set_input_size(self, input_size: int | TensorShape) -> None:
+        if isinstance(input_size, TensorShape):
             raise TypeError("The input_size of a forward layer has to be of type int.")
 
         self._input_size = input_size

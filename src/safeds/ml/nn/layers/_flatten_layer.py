@@ -68,7 +68,7 @@ class FlattenLayer(Layer):
             self._output_size = self._input_size.width * self._input_size.height * self._input_size.channel
         return TensorShape([self._output_size])
 
-    def _set_input_size(self, input_size: int | ModelImageSize) -> None:
+    def _set_input_size(self, input_size: int | TensorShapegi) -> None:
         if isinstance(input_size, int):
             raise TypeError("The input_size of a flatten layer has to be of type ImageSize.")
         if not isinstance(input_size, ConstantImageSize):
