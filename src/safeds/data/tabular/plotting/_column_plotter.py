@@ -33,6 +33,11 @@ class ColumnPlotter:
         """
         Create a box plot for the values in the column. This is only possible for numeric columns.
 
+        Parameters
+        ----------
+        theme:
+            The theme to use for the plot. Either "dark" or "light".
+            
         Returns
         -------
         plot:
@@ -169,6 +174,8 @@ class ColumnPlotter:
         ----------
         lag:
             The amount of lag.
+        theme:
+            The theme for the plot, either "dark" or "light". Default is "light
 
         Returns
         -------

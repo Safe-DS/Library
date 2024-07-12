@@ -38,6 +38,11 @@ class TablePlotter:
         """
         Create a box plot for every numerical column.
 
+        Parameters
+        ----------
+        theme:
+            The theme to use for the plot. Either "dark" or "light".
+
         Returns
         -------
         plot:
