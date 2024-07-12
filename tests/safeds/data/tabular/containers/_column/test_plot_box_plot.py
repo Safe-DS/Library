@@ -3,7 +3,6 @@ from safeds.data.tabular.containers import Column
 from safeds.exceptions import ColumnTypeError
 from syrupy import SnapshotAssertion
 
-
 @pytest.mark.parametrize(
     "column",
     [

@@ -137,7 +137,7 @@ class ColumnPlotter:
 
         Examples
         --------
-        from safeds.data.tabular.containers import Column
+        >>> from safeds.data.tabular.containers import Column
         >>> column = Column("test", [1, 2, 3])
         >>> histogram = column.plot.histogram()
         """
