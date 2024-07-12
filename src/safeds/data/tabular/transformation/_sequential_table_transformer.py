@@ -94,7 +94,8 @@ class SequentialTableTransformer(InvertibleTableTransformer):
             current_table = fitted_transformer.transform(current_table)
 
         result: SequentialTableTransformer = SequentialTableTransformer(
-            transformers=fitted_transformers, column_names=self._column_names,
+            transformers=fitted_transformers,
+            column_names=self._column_names,
         )
 
         result._is_fitted = True

@@ -34,7 +34,8 @@ class TestFit:
         )
         sequential_table_transformer = SequentialTableTransformer(transformers)
         with pytest.raises(
-            ValueError, match=("The SequentialTableTransformer cannot be fitted because the table contains 0 rows."),
+            ValueError,
+            match=("The SequentialTableTransformer cannot be fitted because the table contains 0 rows."),
         ):
             sequential_table_transformer.fit(test_table)
 
@@ -154,7 +155,8 @@ class TestInverseTransform:
         ids=["Discretizer", "SimpleImputer", "Multiple non-invertible", "invertible and non-invertible"],
     )
     def test_should_raise_transformer_not_invertible_error_on_non_invertible_transformers(
-        self, transformers: list[TableTransformer],
+        self,
+        transformers: list[TableTransformer],
     ) -> None:
         test_table = Table(
             {
