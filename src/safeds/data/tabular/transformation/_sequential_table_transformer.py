@@ -53,6 +53,7 @@ class SequentialTableTransformer(InvertibleTableTransformer):
             self._is_fitted,
         )
     
+    @property
     def is_fitted(self) -> bool:
         """
         Whether the transformer is fitted.
@@ -151,15 +152,13 @@ class SequentialTableTransformer(InvertibleTableTransformer):
         """
         if not self._is_fitted:
             raise TransformerNotFittedError
-        
-        #check if transformer is invertible
-        for transformer in self._transformers:
-            if not (hasattr(transformer, "inverse_transform") and callable(transformer.inverse_transform)):
-                raise TransformerNotInvertibleError(str(type(transformer)))
 
         #sequentially inverse transform the table with all transformers, working from the back of the list forwards.
         current_table: Table = transformed_table
         for transformer in reversed(self._transformers):
+            #check if transformer is invertable
+            if not (isinstance(transformer, InvertibleTableTransformer)):
+                raise TransformerNotInvertibleError(str(type(transformer)))
             current_table = transformer.inverse_transform(current_table)
             
         return current_table
