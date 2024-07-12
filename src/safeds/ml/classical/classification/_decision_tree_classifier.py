@@ -86,6 +86,11 @@ class DecisionTreeClassifier(Classifier, _DecisionTreeBase):
         -------
         Image:
             The decision tree figure as an image.
+            
+        Raises
+        ------
+        ModelNotFittedError:
+            If model is not fitted.
         """
         if not self.is_fitted:
             raise ModelNotFittedError
