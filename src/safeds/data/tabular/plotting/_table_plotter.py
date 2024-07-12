@@ -154,7 +154,6 @@ class TablePlotter:
         >>> table = Table({"temperature": [10, 15, 20, 25, 30], "sales": [54, 74, 90, 206, 210]})
         >>> image = table.plot.correlation_heatmap()
         """
-
         import matplotlib.pyplot as plt
         import numpy as np
 
@@ -170,7 +169,6 @@ class TablePlotter:
                         "ytick.color": "white",
                     },
                 )
-            
 
             only_numerical = self._table.remove_non_numeric_columns()._data_frame.fill_null(0)
 
