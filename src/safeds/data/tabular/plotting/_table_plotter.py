@@ -138,6 +138,11 @@ class TablePlotter:
         """
         Plot a correlation heatmap for all numerical columns of this `Table`.
 
+        Parameters
+        ----------
+        theme:
+            The color theme of the plot. Default is "light".
+
         Returns
         -------
         plot:
@@ -149,9 +154,9 @@ class TablePlotter:
         >>> table = Table({"temperature": [10, 15, 20, 25, 30], "sales": [54, 74, 90, 206, 210]})
         >>> image = table.plot.correlation_heatmap()
         """
-        # TODO: implement using matplotlib and polars
-        #  https://stackoverflow.com/questions/33282368/plotting-a-2d-heatmap
+
         import matplotlib.pyplot as plt
+        import numpy as np
 
         style = "dark_background" if theme == "dark" else "default"
         with plt.style.context(style):
@@ -165,7 +170,7 @@ class TablePlotter:
                         "ytick.color": "white",
                     },
                 )
-            import numpy as np
+            
 
             only_numerical = self._table.remove_non_numeric_columns()._data_frame.fill_null(0)
 
@@ -211,6 +216,8 @@ class TablePlotter:
         ----------
         max_bin_count:
             The maximum number of bins to use in the histogram. Default is 10.
+        theme:
+            The color theme of the plot. Default is "light".
 
         Returns
         -------
@@ -309,6 +316,8 @@ class TablePlotter:
             The name(s) of the column(s) to be plotted on the y-axis.
         show_confidence_interval:
             If the confidence interval is shown, per default True.
+        theme:
+            The color theme of the plot. Default is "light".
 
         Returns
         -------
@@ -409,6 +418,8 @@ class TablePlotter:
             The name of the column to be plotted on the x-axis.
         y_names:
             The name(s) of the column(s) to be plotted on the y-axis.
+        theme:
+            The color theme of the plot. Default is "light".
 
         Returns
         -------
@@ -495,6 +506,8 @@ class TablePlotter:
             The name of the column to be plotted on the x-axis.
         y_name:
             The name of the column to be plotted on the y-axis.
+        theme:
+            The color theme of the plot. Default is "light".
 
         Returns
         -------
