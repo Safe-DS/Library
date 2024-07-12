@@ -322,7 +322,7 @@ class Table:
                 )
 
         # Implementation
-        self._lazy_frame: pl.LazyFrame = pl.LazyFrame(data)
+        self._lazy_frame: pl.LazyFrame = pl.LazyFrame(data, strict=False)
         self.__data_frame_cache: pl.DataFrame | None = None  # Scramble the name to prevent access from outside
 
     def __eq__(self, other: object) -> bool:
