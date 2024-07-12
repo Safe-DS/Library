@@ -2,7 +2,7 @@ import pytest
 from safeds.data.tabular.containers import Table
 from safeds.data.tabular.transformation import StandardScaler
 from safeds.exceptions import ColumnNotFoundError, ColumnTypeError, TransformerNotFittedError
-
+import numpy as np
 from tests.helpers import assert_tables_equal
 
 
@@ -16,6 +16,17 @@ class TestFit:
 
         with pytest.raises(ColumnNotFoundError):
             StandardScaler(column_names=["col2", "col3"]).fit(table)
+            
+    def test_should_raise_if_column_cotains_nan_values(self) -> None:
+        table = Table(
+             {
+                "col1": [0.0, 5.0, 10.0],
+                "col2": [float('nan'), 5.0, 10.0],
+                "col3": [np.nan, 5.0, 10.0],
+            },
+        )        
+        with pytest.raises(ValueError):
+            StandardScaler(column_names=["col1", "col2"]).fit(table)
 
     def test_should_raise_if_table_contains_non_numerical_data(self) -> None:
         with pytest.raises(ColumnTypeError):
@@ -96,7 +107,7 @@ class TestIsFitted:
         transformer = StandardScaler()
         fitted_transformer = transformer.fit(table)
         assert fitted_transformer.is_fitted
-
+        
 
 class TestFitAndTransform:
     @pytest.mark.parametrize(

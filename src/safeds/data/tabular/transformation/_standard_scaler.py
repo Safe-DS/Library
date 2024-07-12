@@ -1,11 +1,12 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
-
+import numpy as np
 from safeds._validation import _check_columns_exist
 from safeds._validation._check_columns_are_numeric import _check_columns_are_numeric
-from safeds.data.tabular.containers import Table
+from safeds.data.tabular.containers import Table, Column
 from safeds.exceptions import TransformerNotFittedError
+
 
 from ._invertible_table_transformer import InvertibleTableTransformer
 
@@ -85,7 +86,11 @@ class StandardScaler(InvertibleTableTransformer):
 
         if table.row_count == 0:
             raise ValueError("The StandardScaler cannot be fitted because the table contains 0 rows")
-
+        
+        # Check for NaN values in the columns to be transformed
+        for name in column_names:
+            table.select(pl.col(name=name).fill_nan(None))
+        
         # Learn the transformation (ddof=0 is used to match the behavior of scikit-learn)
         _data_mean = table._lazy_frame.select(column_names).mean().collect()
         _data_standard_deviation = table._lazy_frame.select(column_names).std(ddof=0).collect()
@@ -128,6 +133,10 @@ class StandardScaler(InvertibleTableTransformer):
         if self._column_names is None or self._data_mean is None or self._data_standard_deviation is None:
             raise TransformerNotFittedError
 
+        # Check for NaN values in the columns to be transformed
+        for name in self._column_names: 
+            table.select(pl.col(name=name).fill_nan(None))
+            
         _check_columns_exist(table, self._column_names)
         _check_columns_are_numeric(table, self._column_names, operation="transform with a StandardScaler")
 
@@ -170,6 +179,10 @@ class StandardScaler(InvertibleTableTransformer):
         # Used in favor of is_fitted, so the type checker is happy
         if self._column_names is None or self._data_mean is None or self._data_standard_deviation is None:
             raise TransformerNotFittedError
+
+        # Check for NaN values in the columns to be transformed
+        for name in self._column_names: 
+            transformed_table.select(pl.col(name=name).fill_nan(None))
 
         _check_columns_exist(transformed_table, self._column_names)
         _check_columns_are_numeric(
