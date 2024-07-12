@@ -86,3 +86,13 @@ class FlattenLayer(Layer):
 
     def __sizeof__(self) -> int:
         return sys.getsizeof(self._input_size) + sys.getsizeof(self._output_size)
+    
+    def get_parameter_count(self) -> int:
+        if self._input_size is None:
+            raise ValueError(
+                "The input_size is not yet set. The layer cannot compute the parameter_count if the input_size is not set.",
+            )
+        internal_layer = self._get_internal_layer()
+        return(
+            sum(p.numel() for p in internal_layer.parameters())
+        )

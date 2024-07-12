@@ -56,6 +56,31 @@ class TestPooling2DLayer:
         with pytest.raises(TypeError, match=r"The input_size of a pooling layer has to be of type ImageSize."):
             layer._set_input_size(1)
 
+    @pytest.mark.parametrize(
+            "strategy",
+        [
+            "max",
+            "avg",
+        ],
+    )
+    def test_get_parameter_count_right_output(self, strategy: Literal["max", "avg"]) -> None:
+        layer = _Pooling2DLayer(strategy, 2, stride=2, padding=2)
+        input_size = ImageSize(10, 20, 30, _ignore_invalid_channel=True)
+        layer._set_input_size(input_size)
+        assert layer.get_parameter_count() == 0
+
+    @pytest.mark.parametrize(
+            "strategy",
+        [
+            "max",
+            "avg",
+        ],
+    )
+    def test_get_parameter_count_returns_value_error(self, strategy: Literal["max", "avg"]) -> None:
+        layer = _Pooling2DLayer(strategy, 2, stride=2, padding=2)
+        with pytest.raises(ValueError, match=r"The input_size is not yet set."):
+            layer.get_parameter_count()
+
     class TestEq:
         @pytest.mark.parametrize(
             ("pooling_2d_layer_1", "pooling_2d_layer_2"),

@@ -37,6 +37,17 @@ class TestFlattenLayer:
         with pytest.raises(TypeError, match=r"The input_size of a flatten layer has to be a ConstantImageSize."):
             layer._set_input_size(VariableImageSize(1, 2, 3))
 
+    def test_get_parameter_count_right_output(self) -> None:
+        layer = FlattenLayer()
+        input_size = ImageSize(10, 20, 30, _ignore_invalid_channel=True)
+        layer._set_input_size(input_size)
+        assert layer.get_parameter_count() == 0
+
+    def test_get_parameter_count_returns_value_error(self) -> None:
+        layer = FlattenLayer()
+        with pytest.raises(ValueError, match=r"The input_size is not yet set."):
+            layer.get_parameter_count()
+
     class TestEq:
         def test_should_be_equal(self) -> None:
             assert FlattenLayer() == FlattenLayer()
