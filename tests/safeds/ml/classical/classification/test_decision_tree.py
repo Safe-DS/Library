@@ -58,7 +58,7 @@ class TestPlot:
         snapshot_png_image: SnapshotAssertion,
     ) -> None:
         skip_if_os([os_mac, os_linux])
-        
+
         fitted_model = DecisionTreeClassifier().fit(training_set)
         image = fitted_model.plot()
         assert image == snapshot_png_image
