@@ -515,23 +515,26 @@ class TablePlotter:
         import matplotlib.pyplot as plt
 
         if theme == "dark":
-            plt.style.use("dark_background")
+            context = "dark_background"
+        else:
+            context = "default"
 
-        fig, ax = plt.subplots()
+        with plt.style.context(context):
+            fig, ax = plt.subplots()
 
-        ax.hist2d(
-            x=self._table.get_column(x_name)._series,
-            y=self._table.get_column(y_name)._series,
-            bins=(x_max_bin_count, y_max_bin_count),
-        )
-        ax.set_xlabel(x_name)
-        ax.set_ylabel(y_name)
-        ax.tick_params(
-            axis="x",
-            labelrotation=45,
-        )
+            ax.hist2d(
+                x=self._table.get_column(x_name)._series,
+                y=self._table.get_column(y_name)._series,
+                bins=(x_max_bin_count, y_max_bin_count),
+            )
+            ax.set_xlabel(x_name)
+            ax.set_ylabel(y_name)
+            ax.tick_params(
+                axis="x",
+                labelrotation=45,
+            )
 
-        fig.tight_layout()
+            fig.tight_layout()
 
         return _figure_to_image(fig)
 
