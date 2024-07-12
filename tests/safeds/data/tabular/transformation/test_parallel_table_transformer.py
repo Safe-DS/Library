@@ -73,6 +73,5 @@ class TestFit:
 class TestTransform:
     def test_should_pass():
         pass
-    def test_should_raise_if
 
 class TestInverseTransform:

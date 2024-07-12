@@ -76,6 +76,7 @@ def transformers() -> list[TableTransformer]:
             SimpleImputer(strategy=SimpleImputer.Strategy.mode()),
             KNearestNeighborsImputer(neighbor_count=3, value_to_replace=None),
             FunctionalTableTransformer(valid_callable_for_functional_table_transformer),
+            ParallelTableTransformer(transformers=[RangeScaler(column_names="col1")]),
         ]
     )
 

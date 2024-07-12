@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING
 from safeds._utils import _structural_hash
 from safeds.data.tabular.containers import Table
 from safeds.data.tabular.transformation import InvertibleTableTransformer, TableTransformer
+from safeds.exceptions import TransformerNotInvertibleError
 
 if TYPE_CHECKING:
     from safeds.data.tabular.containers import Column
@@ -97,5 +98,29 @@ class ParallelTableTransformer(InvertibleTableTransformer):
         return Table.from_columns(cols)
 
     def inverse_transform(self, table: Table) -> Table:
-        pass
+        # Initialize lists for return values and processes
+        cols: list[Column] = []
+        procs: list[Process] = []
+
+        # Start a process for every transformer; TODO: Replace with pool later
+        for tf in self._transformers:
+            if not isinstance(tf, InvertibleTableTransformer):
+                raise TransformerNotInvertibleError()
+        for tf in self._transformers:
+            p = Process(target=self._worker_transform, args=(tf.inverse_transform, table, tf._column_names))
+            p.start()
+            procs.append(p)
+        
+        for proc in procs:
+            cols.extend(self._q.get())
+            proc.join()
+
+        col_names = [col.name for col in cols]
+        for name_in_table in table.column_names:
+            if name_in_table in col_names:
+                pass
+            else:
+                cols.append(table.get_column(name_in_table))
+
+        return Table.from_columns(cols)
 
