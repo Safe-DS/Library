@@ -10,7 +10,7 @@ from safeds.data.image._utils._image_transformation_error_and_warning_checks imp
     _check_adjust_color_balance_errors_and_warnings,
     _check_adjust_contrast_errors_and_warnings,
     _check_blur_errors_and_warnings,
-    _check_crop_errors_and_warnings,
+    _check_crop_errors,
     _check_remove_images_with_size_errors,
     _check_resize_errors,
     _check_sharpen_errors_and_warnings,
@@ -161,15 +161,7 @@ class _EmptyImageList(ImageList):
 
     def crop(self, x: int, y: int, width: int, height: int) -> ImageList:
         _EmptyImageList._warn_empty_image_list()
-        _check_crop_errors_and_warnings(
-            x,
-            y,
-            width,
-            height,
-            x + 1,
-            y + 1,
-            plural=True,
-        )  # Disable x|y >= min_width|min_height check with min_width|min_height=x|y+1
+        _check_crop_errors(x, y, width, height)
         return _EmptyImageList()
 
     def flip_vertically(self) -> ImageList:
