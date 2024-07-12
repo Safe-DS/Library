@@ -50,7 +50,7 @@ class TestPlot:
         with pytest.raises(ModelNotFittedError):
             model.plot()
 
-    def test_should_check_that_plot_image_is_same_as_plt_figure(
+    def test_should_check_that_plot_image_is_same_as_snapshot(
         self,
         training_set: TabularDataset,
         snapshot_png_image: SnapshotAssertion,
