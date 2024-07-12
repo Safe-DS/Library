@@ -6,12 +6,13 @@ from typing import TYPE_CHECKING, Self
 
 from safeds._utils import _structural_hash
 from safeds._validation import _check_bounds, _ClosedBound
+from safeds.ml.nn.typing._tensor_shape import TensorShape
 
 if TYPE_CHECKING:
     from safeds.data.image.containers import Image
 
 
-class ModelImageSize(ABC):
+class ModelImageSize(TensorShape):
     """
     A container for image size in neural networks.
 
@@ -38,6 +39,7 @@ class ModelImageSize(ABC):
         if not _ignore_invalid_channel and channel not in (1, 3, 4):
             raise ValueError(f"Channel {channel} is not a valid channel option. Use either 1, 3 or 4")
         _check_bounds("channel", channel, lower_bound=_ClosedBound(1))
+        super.__init__(dims = [width, height, channel])
 
         self._width = width
         self._height = height
