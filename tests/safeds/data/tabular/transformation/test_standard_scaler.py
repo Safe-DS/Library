@@ -24,7 +24,7 @@ class TestFit:
                 "col2": [float('nan'), 5.0, 10.0],
                 "col3": [np.nan, 5.0, 10.0],
             },
-        )        
+        )
         with pytest.raises(ValueError):
             StandardScaler(column_names=["col1", "col2"]).fit(table)
 

@@ -116,7 +116,11 @@ class RangeScaler(InvertibleTableTransformer):
 
         if table.row_count == 0:
             raise ValueError("The RangeScaler cannot be fitted because the table contains 0 rows")
-
+        
+        # Check for NaN values in the columns to be transformed
+        for name in column_names:
+            table._lazy_frame.with_columns(pl.col(name=name).fill_nan(None))
+        
         # Learn the transformation
         _data_min = table._lazy_frame.select(column_names).min().collect()
         _data_max = table._lazy_frame.select(column_names).max().collect()
@@ -162,6 +166,10 @@ class RangeScaler(InvertibleTableTransformer):
         _check_columns_exist(table, self._column_names)
         _check_columns_are_numeric(table, self._column_names, operation="transform with a RangeScaler")
 
+        # Check for NaN values in the columns to be transformed
+        for name in self._column_names: 
+            table._lazy_frame.with_columns(pl.col(name=name).fill_nan(None))
+       
         columns = [
             (
                 (pl.col(name) - self._data_min.get_column(name))
@@ -213,7 +221,11 @@ class RangeScaler(InvertibleTableTransformer):
             self._column_names,
             operation="inverse-transform with a RangeScaler",
         )
-
+            
+        # Check for NaN values in the columns to be transformed
+        for name in self._column_names: 
+            transformed_table._lazy_frame.with_columns(pl.col(name=name).fill_nan(None))
+        
         columns = [
             (
                 (pl.col(name) - self._min)

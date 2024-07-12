@@ -89,7 +89,11 @@ class RobustScaler(InvertibleTableTransformer):
 
         if table.row_count == 0:
             raise ValueError("The RobustScaler cannot be fitted because the table contains 0 rows")
-
+        
+        # Check for NaN values in the columns to be transformed
+        for name in column_names:
+            table._lazy_frame.with_columns(pl.col(name=name).fill_nan(None))
+        
         _data_median = table._lazy_frame.select(column_names).median().collect()
         q1 = table._lazy_frame.select(column_names).quantile(0.25).collect()
         q3 = table._lazy_frame.select(column_names).quantile(0.75).collect()
@@ -142,6 +146,10 @@ class RobustScaler(InvertibleTableTransformer):
         _check_columns_exist(table, self._column_names)
         _check_columns_are_numeric(table, self._column_names, operation="transform with a RobustScaler")
 
+        # Check for NaN values in the columns to be transformed
+        for name in self._column_names: 
+            table._lazy_frame.with_columns(pl.col(name=name).fill_nan(None))
+        
         columns = [
             (pl.col(name) - self._data_median.get_column(name)) / self._data_scale.get_column(name)
             for name in self._column_names
@@ -188,7 +196,11 @@ class RobustScaler(InvertibleTableTransformer):
             self._column_names,
             operation="inverse-transform with a RobustScaler",
         )
-
+            
+        # Check for NaN values in the columns to be transformed
+        for name in self._column_names: 
+            transformed_table._lazy_frame.with_columns(pl.col(name=name).fill_nan(None))
+        
         columns = [
             pl.col(name) * self._data_scale.get_column(name) + self._data_median.get_column(name)
             for name in self._column_names

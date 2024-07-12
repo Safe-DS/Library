@@ -89,7 +89,6 @@ class StandardScaler(InvertibleTableTransformer):
         
         # Check for NaN values in the columns to be transformed
         for name in column_names:
-            # table.select(pl.col(name=name).fill_nan(None))
             table._lazy_frame.with_columns(pl.col(name=name).fill_nan(None))
         
         # Learn the transformation (ddof=0 is used to match the behavior of scikit-learn)
@@ -134,13 +133,13 @@ class StandardScaler(InvertibleTableTransformer):
         if self._column_names is None or self._data_mean is None or self._data_standard_deviation is None:
             raise TransformerNotFittedError
 
+        _check_columns_exist(table, self._column_names)
+        _check_columns_are_numeric(table, self._column_names, operation="transform with a StandardScaler")
+
         # Check for NaN values in the columns to be transformed
         for name in self._column_names: 
             table._lazy_frame.with_columns(pl.col(name=name).fill_nan(None))
             
-        _check_columns_exist(table, self._column_names)
-        _check_columns_are_numeric(table, self._column_names, operation="transform with a StandardScaler")
-
         columns = [
             (pl.col(name) - self._data_mean.get_column(name)) / self._data_standard_deviation.get_column(name)
             for name in self._column_names
@@ -181,9 +180,6 @@ class StandardScaler(InvertibleTableTransformer):
         if self._column_names is None or self._data_mean is None or self._data_standard_deviation is None:
             raise TransformerNotFittedError
 
-        # Check for NaN values in the columns to be transformed
-        for name in self._column_names: 
-            transformed_table._lazy_frame.with_columns(pl.col(name=name).fill_nan(None))
 
         _check_columns_exist(transformed_table, self._column_names)
         _check_columns_are_numeric(
@@ -191,6 +187,11 @@ class StandardScaler(InvertibleTableTransformer):
             self._column_names,
             operation="inverse-transform with a StandardScaler",
         )
+            
+        # Check for NaN values in the columns to be transformed
+        for name in self._column_names: 
+            transformed_table._lazy_frame.with_columns(pl.col(name=name).fill_nan(None))
+            
 
         columns = [
             pl.col(name) * self._data_standard_deviation.get_column(name) + self._data_mean.get_column(name)
