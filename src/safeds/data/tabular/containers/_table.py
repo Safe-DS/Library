@@ -1750,15 +1750,14 @@ class Table:
         |   2 |   4 | null |
         +-----+-----+------+
         """
- 
-        #Validation
+        # Validation
         _check_columns_exist(self, left_names)
         _check_columns_exist(right_table, right_names)
 
         if len(left_names) != len(right_names):
             raise ValueError("The number of columns to join on must be the same in both tables.")
 
-        #Implementation
+        # Implementation
         return self._from_polars_lazy_frame(
             self._lazy_frame.join(
                 right_table._lazy_frame,
