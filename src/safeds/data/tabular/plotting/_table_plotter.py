@@ -4,11 +4,13 @@ import warnings
 from typing import TYPE_CHECKING
 
 from safeds._utils import _figure_to_image
-from safeds._validation import _check_columns_exist
+from safeds._validation import _check_bounds, _check_columns_exist, _ClosedBound
 from safeds._validation._check_columns_are_numeric import _check_columns_are_numeric
 from safeds.exceptions import ColumnTypeError, NonNumericColumnError
 
 if TYPE_CHECKING:
+    from typing import Literal
+
     from safeds.data.image.containers import Image
     from safeds.data.tabular.containers import Table
 
@@ -453,6 +455,86 @@ class TablePlotter:
         fig.tight_layout()
 
         return _figure_to_image(fig)
+
+    def histogram_2d(
+        self,
+        x_name: str,
+        y_name: str,
+        *,
+        x_max_bin_count: int = 10,
+        y_max_bin_count: int = 10,
+        theme: Literal["dark", "light"] = "light",
+    ) -> Image:
+        """
+        Create a 2D histogram for two columns in the table.
+
+        Parameters
+        ----------
+        x_name:
+            The name of the column to be plotted on the x-axis.
+        y_name:
+            The name of the column to be plotted on the y-axis.
+        x_max_bin_count:
+            The maximum number of bins to use in the histogram for the x-axis. Default is 10.
+        y_max_bin_count:
+            The maximum number of bins to use in the histogram for the y-axis. Default is 10.
+        theme:
+            The color theme of the plot. Default is "light".
+
+        Returns
+        -------
+        plot:
+            The plot as an image.
+
+        Raises
+        ------
+        ColumnNotFoundError
+            If a column does not exist.
+        OutOfBoundsError:
+            If x_max_bin_count or y_max_bin_count is less than 1.
+        TypeError
+            If a column is not numeric.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table
+        >>> table = Table(
+        ...     {
+        ...         "a": [1, 2, 3, 4, 5],
+        ...         "b": [2, 3, 4, 5, 6],
+        ...     }
+        ... )
+        >>> image = table.plot.histogram_2d("a", "b")
+        """
+        _check_bounds("x_max_bin_count", x_max_bin_count, lower_bound=_ClosedBound(1))
+        _check_bounds("y_max_bin_count", y_max_bin_count, lower_bound=_ClosedBound(1))
+        _plot_validation(self._table, x_name, [y_name])
+
+        import matplotlib.pyplot as plt
+
+        if theme == "dark":
+            context = "dark_background"
+        else:
+            context = "default"
+
+        with plt.style.context(context):
+            fig, ax = plt.subplots()
+
+            ax.hist2d(
+                x=self._table.get_column(x_name)._series,
+                y=self._table.get_column(y_name)._series,
+                bins=(x_max_bin_count, y_max_bin_count),
+            )
+            ax.set_xlabel(x_name)
+            ax.set_ylabel(y_name)
+            ax.tick_params(
+                axis="x",
+                labelrotation=45,
+            )
+
+            fig.tight_layout()
+
+            return _figure_to_image(fig)
 
 
 def _plot_validation(table: Table, x_name: str, y_names: list[str]) -> None:
