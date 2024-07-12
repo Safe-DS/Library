@@ -20,7 +20,7 @@ class TensorShape:
     def __init__(self, dims: list[int]) -> None:
         self._dims = dims 
 
-    def get_size(self, dimension: int | None = None) -> int:
+    def get_size(self, dimension: int | None = None) -> int | list[int]:
         """
         Return the size of the tensor in the specified dimension.
 

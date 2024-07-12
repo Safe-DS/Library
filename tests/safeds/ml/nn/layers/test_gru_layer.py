@@ -71,7 +71,7 @@ def test_should_raise_if_output_size_out_of_bounds(output_size: int) -> None:
     ids=["one", "twenty"],
 )
 def test_should_raise_if_output_size_doesnt_match(output_size: int) -> None:
-    assert GRULayer(neuron_count=output_size).output_size.get_size[0] == output_size
+    assert GRULayer(neuron_count=output_size).output_size.get_size(dimension=0) == output_size
 
 
 def test_should_raise_if_input_size_is_set_with_image_size() -> None:
@@ -170,7 +170,7 @@ def test_should_assert_that_layer_size_is_greater_than_normal_object(layer: GRUL
 def test_set_input_size() -> None:
     layer = GRULayer(1)
     layer._set_input_size(3)
-    assert layer.input_size.get_size[0] == 3
+    assert layer.input_size.get_size(dimension=0) == 3
 
 
 def test_input_size_should_raise_error() -> None:
