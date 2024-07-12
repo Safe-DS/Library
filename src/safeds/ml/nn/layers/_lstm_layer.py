@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, Any
 
 from safeds._utils import _structural_hash
 from safeds._validation import _check_bounds, _ClosedBound
-from safeds.ml.nn.typing import ModelImageSize
+from safeds.ml.nn.typing import ModelImageSize, TensorShape
 
 from ._layer import Layer
 
@@ -51,7 +51,7 @@ class LSTMLayer(Layer):
         return _InternalLSTMLayer(self._input_size, self._output_size, activation_function)
 
     @property
-    def input_size(self) -> int:
+    def input_size(self) -> TensorShape:
         """
         Get the input_size of this layer.
 
@@ -62,10 +62,10 @@ class LSTMLayer(Layer):
         """
         if self._input_size is None:
             raise ValueError("The input_size is not yet set.")
-        return self._input_size
+        return TensorShape([self._input_size])
 
     @property
-    def output_size(self) -> int:
+    def output_size(self) -> TensorShape:
         """
         Get the output_size of this layer.
 
@@ -74,7 +74,7 @@ class LSTMLayer(Layer):
         result:
             The number of neurons in this layer.
         """
-        return self._output_size
+        return TensorShape([self._output_size])
 
     def _set_input_size(self, input_size: int | ModelImageSize) -> None:
         if isinstance(input_size, ModelImageSize):

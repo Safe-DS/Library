@@ -5,6 +5,7 @@ import pytest
 from safeds.data.image.typing import ImageSize
 from safeds.exceptions import OutOfBoundsError
 from safeds.ml.nn.layers import ForwardLayer
+from safeds.ml.nn.typing import TensorShape
 from torch import nn
 
 # TODO: Should be tested on a model, not a layer, since input size gets inferred
@@ -83,7 +84,7 @@ def test_should_raise_if_output_size_out_of_bounds(output_size: int) -> None:
     ids=["one", "twenty"],
 )
 def test_should_return_output_size(output_size: int) -> None:
-    assert ForwardLayer(neuron_count=output_size).output_size == output_size
+    assert ForwardLayer(neuron_count=output_size).output_size.get_size[0] == output_size
 
 
 def test_should_raise_if_input_size_is_set_with_image_size() -> None:
