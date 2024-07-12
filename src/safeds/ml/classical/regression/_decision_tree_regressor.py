@@ -97,7 +97,7 @@ class DecisionTreeRegressor(Regressor, _DecisionTreeBase):
 
         plot_tree(self._wrapped_model)
 
-        # safe plot fig bytes in buffer
+        # save plot fig bytes in buffer
         with BytesIO() as buffer:
             plt.savefig(buffer)
             image = buffer.getvalue()
