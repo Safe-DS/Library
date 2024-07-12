@@ -21,11 +21,17 @@ class ForwardLayer(Layer):
     neuron_count:
         The number of neurons in this layer
 
+    activation_function:
+        The activation function used in the forward layer
+
     Raises
     ------
     OutOfBoundsError
         If input_size < 1
         If output_size < 1
+
+    ValueError
+        If the given activation function does not exist
     """
 
     def __init__(self, neuron_count: int, activation_function: str = "notset"):
