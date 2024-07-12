@@ -108,6 +108,9 @@ class NeuralNetworkRegressor(Generic[IFT, IPT]):
         self._total_number_of_batches_done = 0
         self._total_number_of_epochs_done = 0
 
+    def get_parameter_count(self) -> int:
+        sum([layer.get_parameter_count() for layer in self._layers])
+
     @staticmethod
     def load_pretrained_model(huggingface_repo: str) -> NeuralNetworkRegressor:  # pragma: no cover
         """
@@ -386,6 +389,9 @@ class NeuralNetworkClassifier(Generic[IFT, IPT]):
         )  # Is always int but linter doesn't know
         self._total_number_of_batches_done = 0
         self._total_number_of_epochs_done = 0
+
+    def get_parameter_count(self) -> int:
+        sum([layer.get_parameter_count() for layer in self._layers])
 
     @staticmethod
     def load_pretrained_model(huggingface_repo: str) -> NeuralNetworkClassifier:  # pragma: no cover

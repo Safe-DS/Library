@@ -3,6 +3,8 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Any
 
+from safeds.ml.nn.typing import TensorShape
+
 if TYPE_CHECKING:
     from torch import nn
 
@@ -45,5 +47,5 @@ class Layer(ABC):
         pass  # pragma: no cover
 
     @abstractmethod
-    def get_parameter_count(self) -> int:
+    def get_parameter_count(self, input_size: TensorShape) -> int:
         pass # pragma: no cover 

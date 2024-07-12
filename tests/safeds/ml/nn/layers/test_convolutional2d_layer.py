@@ -4,7 +4,7 @@ from typing import Literal
 import pytest
 from safeds.data.image.typing import ImageSize
 from safeds.ml.nn.layers import Convolutional2DLayer, ConvolutionalTranspose2DLayer
-from safeds.ml.nn.typing._model_image_size import ConstantImageSize
+from safeds.ml.nn.typing import ConstantImageSize, TensorShape
 from torch import nn
 
 
@@ -158,11 +158,6 @@ class TestConvolutional2DLayer:
         with pytest.raises(TypeError, match=r"The input_size of a convolution layer has to be of type ImageSize."):
             layer._set_input_size(1)
     
-    def test_conv_get_parameter_count_returns_value_error(self) -> None:
-        layer = Convolutional2DLayer(3, 1)
-        with pytest.raises(ValueError, match=r"The input_size is not yet set. The layer cannot compute the parameter_count if the input_size is not set."):
-            layer.get_parameter_count()
-
     def test_conv_get_parameter_count_returns_right_amount(self) -> None:
         kernel_size=5
         input_channels=3
@@ -170,12 +165,7 @@ class TestConvolutional2DLayer:
         expected_output = int((kernel_size*kernel_size*input_channels+1)*output_channels)
         layer = Convolutional2DLayer(input_channels, kernel_size)
         layer._set_input_size(ConstantImageSize(10,10,output_channels))
-        assert layer.get_parameter_count() == expected_output
-
-    def test_conv_transposed_get_parameter_count_returns_value_error(self) -> None:
-        layer = ConvolutionalTranspose2DLayer(3, 1)
-        with pytest.raises(ValueError, match=r"The input_size is not yet set. The layer cannot compute the parameter_count if the input_size is not set."):
-            layer.get_parameter_count()
+        assert layer.get_parameter_count(TensorShape([1,input_channels])) == expected_output
 
     def test_conv_transposed_get_parameter_count_returns_right_amount(self) -> None:
         kernel_size=5
@@ -184,7 +174,7 @@ class TestConvolutional2DLayer:
         expected_output = int((kernel_size*kernel_size*input_channels+1)*output_channels)
         layer = ConvolutionalTranspose2DLayer(input_channels, kernel_size)
         layer._set_input_size(ConstantImageSize(10,10,output_channels))
-        assert layer.get_parameter_count() == expected_output
+        assert layer.get_parameter_count(TensorShape([1,input_channels])) == expected_output
 
     class TestEq:
         @pytest.mark.parametrize(
