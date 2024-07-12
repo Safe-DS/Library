@@ -1919,8 +1919,6 @@ class Table:
     def to_json_file(
         self,
         path: str | Path,
-        *,
-        orientation: Literal["column", "row"] = "column",
     ) -> None:
         """
         Write the table to a JSON file.
@@ -1934,10 +1932,6 @@ class Table:
         ----------
         path:
             The path to the JSON file. If the file extension is omitted, it is assumed to be ".json".
-        orientation:
-            The orientation of the JSON file. If "column", the JSON file will be structured as a list of columns. If
-            "row", the JSON file will be structured as a list of rows. Row orientation is more human-readable, but
-            slower and less memory-efficient.
 
         Raises
         ------
@@ -1954,7 +1948,7 @@ class Table:
         path.parent.mkdir(parents=True, exist_ok=True)
 
         # Write JSON to file
-        self._data_frame.write_json(path, row_oriented=(orientation == "row"))
+        self._data_frame.write_json(path)
 
     def to_parquet_file(self, path: str | Path) -> None:
         """
