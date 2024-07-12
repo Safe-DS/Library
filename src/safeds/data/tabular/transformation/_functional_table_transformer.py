@@ -30,14 +30,14 @@ class FunctionalTableTransformer(TableTransformer):
                  transformer: Callable[[Table], Table],
                  ) -> None:
         super().__init__(None)
-        self._func = transformer
+        self._transformer = transformer
 
         
 
     def __hash__(self) -> int:
         return _structural_hash(
             super().__hash__(),
-            self._func,
+            self._transformer,
         )
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -93,7 +93,7 @@ class FunctionalTableTransformer(TableTransformer):
         
         """
         try:
-            return self._func(table)
+            return self._transformer(table)
         except Exception as e:
             #TODO Evaluate if switch to non-generic exception is useful, as _func can be any callable
             raise Exception("The underlying function encountered an error") from e  # noqa: TRY002
