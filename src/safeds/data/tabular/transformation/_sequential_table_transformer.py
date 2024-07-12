@@ -22,11 +22,6 @@ class SequentialTableTransformer(InvertibleTableTransformer):
     ----------
     transformers:
         The list of transformers used to transform the table. Used in the order as they are supplied in the list.
-
-    Raises
-    ------
-    ValueError:
-        Raises a ValueError if the list of Transformers is None.
     """
 
     def __init__(
@@ -34,9 +29,6 @@ class SequentialTableTransformer(InvertibleTableTransformer):
         transformers: list[TableTransformer],
     ) -> None:
         super().__init__(None)
-
-        if transformers is None:
-            raise ValueError("transformers can't be None")
 
         # Check if transformers actually contains any transformers.
         if transformers is None or len(transformers) == 0:
