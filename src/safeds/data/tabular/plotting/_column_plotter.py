@@ -73,7 +73,7 @@ class ColumnPlotter:
             else:
                 for median in box["medians"]:
                     median.set(color="orange", linewidth=1.5)
-
+                
                 for box_part in box["boxes"]:
                     box_part.set(color="black", linewidth=1.5, facecolor="blue")
 
@@ -153,6 +153,7 @@ class ColumnPlotter:
                     "xtick.color": "white",
                     "ytick.color": "white",
                 })
+        
             return self._column.to_table().plot.histograms(max_bin_count=max_bin_count)
 
 
