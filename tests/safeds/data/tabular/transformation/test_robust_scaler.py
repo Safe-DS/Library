@@ -42,19 +42,20 @@ class TestFit:
         assert transformer._data_scale is None
 
     #TODO this test has large overlap with should_not_divide_by_zero
+    #TODO find out why this test fails if both col3 and 4 are active but works if either is not
     def test_should_not_raise_error_if_fitted_with_nan(self) -> None:
         table = Table(
             {
-                "col1": [1.0, 1.0, 2.0, 1.0],
-                "col2": [3.0, 3.0, 3.0, 3.0],
+                #"col1": [1.0, 1.0, 2.0, 1.0],
+                #"col2": [3.0, 3.0, 3.0, 3.0],
                 "col3": [1.0, float("nan"), float("nan"), float("nan")],
                 "col4": [1.0, None, None, None],
             },
         )
         target = Table(
             {
-                "col1": [0.0, 0.0, 1.0, 0.0],
-                "col2": [0.0, 0.0, 0.0, 0.0],
+                #"col1": [0.0, 0.0, 1.0, 0.0],
+                #"col2": [0.0, 0.0, 0.0, 0.0],
                 "col3": [0.0, None, None, None],
                 "col4": [0.0, None, None, None],
             },

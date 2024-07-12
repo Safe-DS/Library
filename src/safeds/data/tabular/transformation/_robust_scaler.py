@@ -92,11 +92,11 @@ class RobustScaler(InvertibleTableTransformer):
         
         # Check for NaN values in the columns to be transformed
         for name in column_names:
-            table._lazy_frame.with_columns(pl.col(name=name).fill_nan(None))
+            no_nan_table = table._lazy_frame.with_columns(pl.col(name).fill_nan(None))
         
-        _data_median = table._lazy_frame.select(column_names).median().collect()
-        q1 = table._lazy_frame.select(column_names).quantile(0.25).collect()
-        q3 = table._lazy_frame.select(column_names).quantile(0.75).collect()
+        _data_median = no_nan_table.select(column_names).median().collect()
+        q1 = no_nan_table.select(column_names).quantile(0.25).collect()
+        q3 = no_nan_table.select(column_names).quantile(0.75).collect()
         _data_scale = q3 - q1
 
         # To make sure there is no division by zero
@@ -148,7 +148,7 @@ class RobustScaler(InvertibleTableTransformer):
 
         # Check for NaN values in the columns to be transformed
         for name in self._column_names: 
-            table._lazy_frame.with_columns(pl.col(name=name).fill_nan(None))
+            no_nan_table = table._lazy_frame.with_columns(pl.col(name).fill_nan(None))
         
         columns = [
             (pl.col(name) - self._data_median.get_column(name)) / self._data_scale.get_column(name)
@@ -156,7 +156,7 @@ class RobustScaler(InvertibleTableTransformer):
         ]
 
         return Table._from_polars_lazy_frame(
-            table._lazy_frame.with_columns(columns),
+            no_nan_table.with_columns(columns),
         )
 
     def inverse_transform(self, transformed_table: Table) -> Table:

@@ -88,7 +88,7 @@ class StandardScaler(InvertibleTableTransformer):
             raise ValueError("The StandardScaler cannot be fitted because the table contains 0 rows")
         
         import polars as pl
-        
+
         # Check for NaN values in the columns to be transformed
         for name in column_names:
             table._lazy_frame.with_columns(pl.col(name=name).fill_nan(None))
@@ -192,7 +192,7 @@ class StandardScaler(InvertibleTableTransformer):
             
         # Check for NaN values in the columns to be transformed
         for name in self._column_names: 
-            transformed_table._lazy_frame.with_columns(pl.col(name=name).fill_nan(None))
+            transformed_table = transformed_table._lazy_frame.with_columns(pl.col(name=name).fill_nan(None))
             
 
         columns = [
