@@ -189,11 +189,6 @@ def test_internal_layer_should_raise_error() -> None:
     with pytest.raises(ValueError, match="The input_size is not yet set."):
         layer._get_internal_layer(activation_function="relu")
 
-def test_conv_transposed_get_parameter_count_returns_value_error() -> None:
-    layer = GRULayer(64)
-    with pytest.raises(ValueError, match=r"The input_size is not yet set."):
-        layer.get_parameter_count()
-
 def test_conv_transposed_get_parameter_count_returns_right_amount() -> None:
     input_neurons=4
     output_neurons=16

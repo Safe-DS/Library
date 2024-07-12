@@ -1,11 +1,11 @@
 from __future__ import annotations
 
-from safeds.ml.nn.typing import TensorShape
 import math
 import sys
 from typing import TYPE_CHECKING, Any, Literal
 
 from safeds._utils import _structural_hash
+from safeds.ml.nn.typing import TensorShape
 
 from ._layer import Layer
 
