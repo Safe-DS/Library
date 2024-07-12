@@ -95,22 +95,26 @@ class ColumnPlotter:
         style = "dark_background" if theme == "dark" else "default"
         with plt.style.context(style):
             if theme == "dark":
-                plt.rcParams.update({
-                    "text.color": "white",
-                    "axes.labelcolor": "white",
-                    "axes.edgecolor": "white",
-                    "xtick.color": "white",
-                    "ytick.color": "white",
-                    "grid.color": "gray",
-                    "grid.linewidth": 0.5,
-                })
+                plt.rcParams.update(
+                    {
+                        "text.color": "white",
+                        "axes.labelcolor": "white",
+                        "axes.edgecolor": "white",
+                        "xtick.color": "white",
+                        "ytick.color": "white",
+                        "grid.color": "gray",
+                        "grid.linewidth": 0.5,
+                    },
+                )
             else:
-                plt.rcParams.update({
-                    "grid.linewidth": 0.5,
-                })
+                plt.rcParams.update(
+                    {
+                        "grid.linewidth": 0.5,
+                    },
+                )
 
             fig, ax = plt.subplots()
-            
+
             data = self._column._series.drop_nulls()
             if len(data) == 0:
                 data = [nan, nan]
