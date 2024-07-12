@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, Any
 
 from safeds._utils import _structural_hash
 from safeds._validation import _check_bounds, _ClosedBound
-from safeds.ml.nn.typing import ModelImageSize
+from safeds.ml.nn.typing import ModelImageSize, TensorShape
 
 from ._layer import Layer
 
@@ -96,13 +96,6 @@ class LSTMLayer(Layer):
     def __sizeof__(self) -> int:
         return sys.getsizeof(self._input_size) + sys.getsizeof(self._output_size)
 
-    def get_parameter_count(self) -> int:
-        if self._input_size is None:
-            raise ValueError(
-                "The input_size is not yet set. The layer cannot compute the parameter_count if the input_size is not set.",
-            )
-        internal_layer = self._get_internal_layer(activation_function="sigmoid")
-        return(
-            sum(p.numel() for p in internal_layer.parameters())
-        )
+    def get_parameter_count(self, input_size: TensorShape) -> int:
+        return (input_size._dims[0]+self._output_size+2)*self._output_size*4
     

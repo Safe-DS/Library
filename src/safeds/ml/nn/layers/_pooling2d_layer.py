@@ -11,7 +11,7 @@ from ._layer import Layer
 if TYPE_CHECKING:
     from torch import nn
 
-    from safeds.ml.nn.typing import ModelImageSize
+    from safeds.ml.nn.typing import ModelImageSize, TensorShape
 
 
 class _Pooling2DLayer(Layer):
@@ -134,15 +134,8 @@ class _Pooling2DLayer(Layer):
             + sys.getsizeof(self._padding)
         )
     
-    def get_parameter_count(self) -> int:
-        if self._input_size is None:
-            raise ValueError(
-                "The input_size is not yet set. The layer cannot compute the parameter_count if the input_size is not set.",
-            )
-        internal_layer = self._get_internal_layer()
-        return(
-            sum(p.numel() for p in internal_layer.parameters())
-        )
+    def get_parameter_count(self, input_size: TensorShape) -> int:
+        return 0
 
 
 class MaxPooling2DLayer(_Pooling2DLayer):

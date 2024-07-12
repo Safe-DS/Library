@@ -4,7 +4,7 @@ import pytest
 from safeds.data.image.typing import ImageSize
 from safeds.data.tabular.containers import Table
 from safeds.ml.nn.layers import FlattenLayer
-from safeds.ml.nn.typing import VariableImageSize
+from safeds.ml.nn.typing import TensorShape, VariableImageSize
 from torch import nn
 
 
@@ -39,14 +39,8 @@ class TestFlattenLayer:
 
     def test_get_parameter_count_right_output(self) -> None:
         layer = FlattenLayer()
-        input_size = ImageSize(10, 20, 30, _ignore_invalid_channel=True)
-        layer._set_input_size(input_size)
-        assert layer.get_parameter_count() == 0
+        assert layer.get_parameter_count(TensorShape([1])) == 0
 
-    def test_get_parameter_count_returns_value_error(self) -> None:
-        layer = FlattenLayer()
-        with pytest.raises(ValueError, match=r"The input_size is not yet set."):
-            layer.get_parameter_count()
 
     class TestEq:
         def test_should_be_equal(self) -> None:

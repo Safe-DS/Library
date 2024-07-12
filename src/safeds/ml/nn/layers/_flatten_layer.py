@@ -4,7 +4,7 @@ import sys
 from typing import TYPE_CHECKING, Any
 
 from safeds._utils import _structural_hash
-from safeds.ml.nn.typing import ConstantImageSize
+from safeds.ml.nn.typing import ConstantImageSize, TensorShape
 
 from ._layer import Layer
 
@@ -87,12 +87,5 @@ class FlattenLayer(Layer):
     def __sizeof__(self) -> int:
         return sys.getsizeof(self._input_size) + sys.getsizeof(self._output_size)
     
-    def get_parameter_count(self) -> int:
-        if self._input_size is None:
-            raise ValueError(
-                "The input_size is not yet set. The layer cannot compute the parameter_count if the input_size is not set.",
-            )
-        internal_layer = self._get_internal_layer()
-        return(
-            sum(p.numel() for p in internal_layer.parameters())
-        )
+    def get_parameter_count(self, input_size: TensorShape) -> int:  # noqa: ARG002
+        return 0

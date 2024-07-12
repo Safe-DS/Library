@@ -164,7 +164,6 @@ class TestConvolutional2DLayer:
         output_channels=3
         expected_output = int((kernel_size*kernel_size*input_channels+1)*output_channels)
         layer = Convolutional2DLayer(input_channels, kernel_size)
-        layer._set_input_size(ConstantImageSize(10,10,output_channels))
         assert layer.get_parameter_count(TensorShape([1,input_channels])) == expected_output
 
     def test_conv_transposed_get_parameter_count_returns_right_amount(self) -> None:
@@ -173,7 +172,6 @@ class TestConvolutional2DLayer:
         output_channels=3
         expected_output = int((kernel_size*kernel_size*input_channels+1)*output_channels)
         layer = ConvolutionalTranspose2DLayer(input_channels, kernel_size)
-        layer._set_input_size(ConstantImageSize(10,10,output_channels))
         assert layer.get_parameter_count(TensorShape([1,input_channels])) == expected_output
 
     class TestEq:
