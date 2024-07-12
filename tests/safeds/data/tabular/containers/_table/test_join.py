@@ -74,9 +74,10 @@ def test_join_check_columns_exist() -> None:
     table_right = Table({"d": [1, 5], "e": [5, 6]})
     left_names = ["a", "c"]
     right_names = ["d", "e"]
-    with pytest.raises(KeyError):
-        table_left.join(table_right, left_names, right_names)
+    mode: Literal["inner", "left", "outer"] = "inner"
+    with pytest.raises(ColumnNotFoundError):
+        table_left.join(table_right, left_names=left_names, right_names=right_names, mode=mode)
     left_names = ["a"]
     right_names = ["d", "f"]
-    with pytest.raises(KeyError):
-        table_left.join(table_right, left_names, right_names)
+    with pytest.raises(ColumnNotFoundError):
+        table_left.join(table_right, left_names=left_names, right_names=right_names, mode=mode)
