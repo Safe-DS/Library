@@ -57,8 +57,6 @@ class TestPlot:
         training_set: TabularDataset,
         snapshot_png_image: SnapshotAssertion,
     ) -> None:
-        skip_if_os([os_mac])
-
         fitted_model = DecisionTreeRegressor().fit(training_set)
         image = fitted_model.plot()
         assert image == snapshot_png_image
