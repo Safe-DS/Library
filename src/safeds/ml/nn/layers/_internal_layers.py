@@ -56,6 +56,18 @@ class _InternalConvolutional2DLayer(nn.Module):
         return self._fn(self._layer(x))
 
 
+class _InternalDropoutLayer(nn.Module):
+    def __init__(self, probability: float) -> None:
+        super().__init__()
+
+        _init_default_device()
+
+        self._layer = nn.Dropout(probability)
+
+    def forward(self, x: Tensor) -> Tensor:
+        return self._layer(x)
+
+
 class _InternalFlattenLayer(nn.Module):
     def __init__(self) -> None:
         super().__init__()

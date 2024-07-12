@@ -19,7 +19,7 @@ apipkg.initpkg(
         "Column": "._column:Column",
         "Row": "._row:Row",
         "StringCell": "._string_cell:StringCell",
-        "TemporalCell": "._temporal_cell:",
+        "TemporalCell": "._temporal_cell:TemporalCell",
         "Table": "._table:Table",
     },
 )
