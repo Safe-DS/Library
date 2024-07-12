@@ -98,7 +98,8 @@ class BaselineRegressor:
         copied_model = copy.deepcopy(self)
 
         with ProcessPoolExecutor(
-            max_workers=len(self._list_of_model_types), mp_context=mp.get_context("spawn"),
+            max_workers=len(self._list_of_model_types),
+            mp_context=mp.get_context("spawn"),
         ) as executor:
             futures = []
             for model in self._list_of_model_types:
@@ -164,7 +165,8 @@ class BaselineRegressor:
 
         # Start Processes
         with ProcessPoolExecutor(
-            max_workers=len(self._list_of_model_types), mp_context=mp.get_context("spawn"),
+            max_workers=len(self._list_of_model_types),
+            mp_context=mp.get_context("spawn"),
         ) as executor:
             results = []
             futures = []

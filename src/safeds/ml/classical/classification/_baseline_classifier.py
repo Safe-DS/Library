@@ -89,7 +89,8 @@ class BaselineClassifier:
         copied_model = copy.deepcopy(self)
 
         with ProcessPoolExecutor(
-            max_workers=len(self._list_of_model_types), mp_context=mp.get_context("spawn"),
+            max_workers=len(self._list_of_model_types),
+            mp_context=mp.get_context("spawn"),
         ) as executor:
             futures = []
             for model in self._list_of_model_types:
@@ -154,7 +155,8 @@ class BaselineClassifier:
         _check_columns_are_numeric(test_data_as_table, test_data.features.add_columns(test_data.target).column_names)
 
         with ProcessPoolExecutor(
-            max_workers=len(self._list_of_model_types), mp_context=mp.get_context("spawn"),
+            max_workers=len(self._list_of_model_types),
+            mp_context=mp.get_context("spawn"),
         ) as executor:
             results = []
             futures = []
