@@ -80,7 +80,7 @@ class DecisionTreeRegressor(Regressor, _DecisionTreeBase):
 
     def plot(self) -> Image:
         """
-        Get the image of the decision tree
+        Get the image of the decision tree.
 
         Returns
         -------

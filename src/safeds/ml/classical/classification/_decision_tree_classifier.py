@@ -80,7 +80,7 @@ class DecisionTreeClassifier(Classifier, _DecisionTreeBase):
 
     def plot(self) -> Image:
         """
-        Get the image of the decision tree
+        Get the image of the decision tree.
 
         Returns
         -------
