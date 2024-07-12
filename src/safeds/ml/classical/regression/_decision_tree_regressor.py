@@ -90,7 +90,7 @@ class DecisionTreeRegressor(Regressor, _DecisionTreeBase):
         Raises
         ------
         ModelNotFittedError:
-            If model is not fitted.
+            If model is not fitted. 
         """
         if not self.is_fitted:
             raise ModelNotFittedError
