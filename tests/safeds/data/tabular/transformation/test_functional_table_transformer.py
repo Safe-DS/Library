@@ -1,6 +1,7 @@
 import pytest
 from safeds.data.tabular.containers import Table
 from safeds.data.tabular.transformation import FunctionalTableTransformer
+from safeds.exceptions import ColumnNotFoundError
 
 
 def valid_callable(table: Table) -> Table:
@@ -27,7 +28,7 @@ class TestIsFitted:
         assert transformer.is_fitted
 
 class TestTransform:
-    def test_should_raise_generic_error_when_error_in_method(self) -> None:
+    def test_should_raise_specific_error_when_error_in_method(self) -> None:
         table = Table(
             {
                 "col2": [1, 2, 3],
@@ -35,7 +36,7 @@ class TestTransform:
             },
         )
         transformer = FunctionalTableTransformer(valid_callable)
-        with pytest.raises(Exception, match=r"The underlying function encountered an error"):
+        with pytest.raises(ColumnNotFoundError):
             transformer.transform(table)
 
     def test_should_not_modify_original_table(self) -> None:

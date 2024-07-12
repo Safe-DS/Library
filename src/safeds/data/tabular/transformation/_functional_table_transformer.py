@@ -92,11 +92,7 @@ class FunctionalTableTransformer(TableTransformer):
             Raised when the wrapped callable encounters an error.
         
         """
-        try:
-            return self._transformer(table)
-        except Exception as e:
-            #TODO Evaluate if switch to non-generic exception is useful, as _func can be any callable
-            raise Exception("The underlying function encountered an error") from e  # noqa: TRY002
+        return self._transformer(table)
 
     def fit_and_transform(self, table: Table) -> tuple[FunctionalTableTransformer, Table]:
         """
