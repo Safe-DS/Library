@@ -4,9 +4,12 @@ import pytest
 from safeds.data.tabular.containers import Table
 from safeds.data.tabular.transformation import (
     Discretizer,
+    FunctionalTableTransformer,
+    KNearestNeighborsImputer,
     LabelEncoder,
     OneHotEncoder,
     RangeScaler,
+    RobustScaler,
     SimpleImputer,
     StandardScaler,
     TableTransformer,
@@ -29,6 +32,7 @@ def transformers_numeric() -> list[TableTransformer]:
         StandardScaler(column_names="col1"),
         RangeScaler(column_names="col1"),
         Discretizer(column_names="col1"),
+        RobustScaler(column_names="col1"),
     ]
 
 
@@ -50,6 +54,10 @@ def transformers_non_numeric() -> list[TableTransformer]:
     ]
 
 
+def valid_callable_for_functional_table_transformer(table: Table) -> Table:
+    return table.remove_columns(["col1"])
+
+
 def transformers() -> list[TableTransformer]:
     """
     Return the list of all transformers to test.
@@ -67,6 +75,8 @@ def transformers() -> list[TableTransformer]:
         + transformers_non_numeric()
         + [
             SimpleImputer(strategy=SimpleImputer.Strategy.mode()),
+            KNearestNeighborsImputer(neighbor_count=3, value_to_replace=None),
+            FunctionalTableTransformer(valid_callable_for_functional_table_transformer),
         ]
     )
 

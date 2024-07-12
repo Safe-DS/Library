@@ -4,11 +4,13 @@ import warnings
 from typing import TYPE_CHECKING
 
 from safeds._utils import _figure_to_image
-from safeds._validation import _check_columns_exist
+from safeds._validation import _check_bounds, _check_columns_exist, _ClosedBound
 from safeds._validation._check_columns_are_numeric import _check_columns_are_numeric
 from safeds.exceptions import ColumnTypeError, NonNumericColumnError
 
 if TYPE_CHECKING:
+    from typing import Literal
+
     from safeds.data.image.containers import Image
     from safeds.data.tabular.containers import Table
 
@@ -34,12 +36,12 @@ class TablePlotter:
 
     def box_plots(self) -> Image:
         """
-        Plot a boxplot for every numerical column.
+        Create a box plot for every numerical column.
 
         Returns
         -------
         plot:
-            The plot as an image.
+            The box plot(s) as an image.
 
         Raises
         ------
@@ -52,31 +54,54 @@ class TablePlotter:
         >>> table = Table({"a":[1, 2], "b": [3, 42]})
         >>> image = table.plot.box_plots()
         """
-        # TODO: implement using matplotlib and polars
-        import matplotlib.pyplot as plt
-        import seaborn as sns
-
         numerical_table = self._table.remove_non_numeric_columns()
         if numerical_table.column_count == 0:
             raise NonNumericColumnError("This table contains only non-numerical columns.")
-        col_wrap = min(numerical_table.column_count, 3)
+        from math import ceil
 
-        data = numerical_table._lazy_frame.melt(value_vars=numerical_table.column_names).collect()
-        grid = sns.FacetGrid(data, col="variable", col_wrap=col_wrap, sharex=False, sharey=False)
-        with warnings.catch_warnings():
-            warnings.filterwarnings(
-                "ignore",
-                message="Using the boxplot function without specifying `order` is likely to produce an incorrect plot.",
-            )
-            grid.map(sns.boxplot, "variable", "value")
-        grid.set_xlabels("")
-        grid.set_ylabels("")
-        grid.set_titles("{col_name}")
-        for axes in grid.axes.flat:
-            axes.set_xticks([])
-        plt.tight_layout()
-        fig = grid.fig
+        import matplotlib.pyplot as plt
 
+        columns = numerical_table.to_columns()
+        columns = [column._series.drop_nulls() for column in columns]
+        max_width = 3
+        number_of_columns = len(columns) if len(columns) <= max_width else max_width
+        number_of_rows = ceil(len(columns) / number_of_columns)
+
+        fig, axs = plt.subplots(nrows=number_of_rows, ncols=number_of_columns)
+        line = 0
+        for i, column in enumerate(columns):
+            if i % number_of_columns == 0 and i != 0:
+                line += 1
+
+            if number_of_columns == 1:
+                axs.boxplot(
+                    column,
+                    patch_artist=True,
+                    labels=[numerical_table.column_names[i]],
+                )
+                break
+
+            if number_of_rows == 1:
+                axs[i].boxplot(
+                    column,
+                    patch_artist=True,
+                    labels=[numerical_table.column_names[i]],
+                )
+
+            else:
+                axs[line, i % number_of_columns].boxplot(
+                    column,
+                    patch_artist=True,
+                    labels=[numerical_table.column_names[i]],
+                )
+
+        # removes unused ax indices, so there wont be empty plots
+        last_filled_ax_index = len(columns) % number_of_columns
+        for i in range(last_filled_ax_index, number_of_columns):
+            if number_of_rows != 1 and last_filled_ax_index != 0:
+                fig.delaxes(axs[number_of_rows - 1, i])
+
+        fig.tight_layout()
         return _figure_to_image(fig)
 
     def correlation_heatmap(self) -> Image:
@@ -123,7 +148,7 @@ class TablePlotter:
                 vmax=1,
                 cmap="coolwarm",
             )
-            ax.set_xticks(np.arange(len(only_numerical.columns)), labels=only_numerical.columns)
+            ax.set_xticks(np.arange(len(only_numerical.columns)), rotation="vertical", labels=only_numerical.columns)
             ax.set_yticks(np.arange(len(only_numerical.columns)), labels=only_numerical.columns)
             fig.colorbar(heatmap)
 
@@ -430,6 +455,86 @@ class TablePlotter:
         fig.tight_layout()
 
         return _figure_to_image(fig)
+
+    def histogram_2d(
+        self,
+        x_name: str,
+        y_name: str,
+        *,
+        x_max_bin_count: int = 10,
+        y_max_bin_count: int = 10,
+        theme: Literal["dark", "light"] = "light",
+    ) -> Image:
+        """
+        Create a 2D histogram for two columns in the table.
+
+        Parameters
+        ----------
+        x_name:
+            The name of the column to be plotted on the x-axis.
+        y_name:
+            The name of the column to be plotted on the y-axis.
+        x_max_bin_count:
+            The maximum number of bins to use in the histogram for the x-axis. Default is 10.
+        y_max_bin_count:
+            The maximum number of bins to use in the histogram for the y-axis. Default is 10.
+        theme:
+            The color theme of the plot. Default is "light".
+
+        Returns
+        -------
+        plot:
+            The plot as an image.
+
+        Raises
+        ------
+        ColumnNotFoundError
+            If a column does not exist.
+        OutOfBoundsError:
+            If x_max_bin_count or y_max_bin_count is less than 1.
+        TypeError
+            If a column is not numeric.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table
+        >>> table = Table(
+        ...     {
+        ...         "a": [1, 2, 3, 4, 5],
+        ...         "b": [2, 3, 4, 5, 6],
+        ...     }
+        ... )
+        >>> image = table.plot.histogram_2d("a", "b")
+        """
+        _check_bounds("x_max_bin_count", x_max_bin_count, lower_bound=_ClosedBound(1))
+        _check_bounds("y_max_bin_count", y_max_bin_count, lower_bound=_ClosedBound(1))
+        _plot_validation(self._table, x_name, [y_name])
+
+        import matplotlib.pyplot as plt
+
+        if theme == "dark":
+            context = "dark_background"
+        else:
+            context = "default"
+
+        with plt.style.context(context):
+            fig, ax = plt.subplots()
+
+            ax.hist2d(
+                x=self._table.get_column(x_name)._series,
+                y=self._table.get_column(y_name)._series,
+                bins=(x_max_bin_count, y_max_bin_count),
+            )
+            ax.set_xlabel(x_name)
+            ax.set_ylabel(y_name)
+            ax.tick_params(
+                axis="x",
+                labelrotation=45,
+            )
+
+            fig.tight_layout()
+
+            return _figure_to_image(fig)
 
 
 def _plot_validation(table: Table, x_name: str, y_names: list[str]) -> None:
