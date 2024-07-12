@@ -51,8 +51,10 @@ def transformers_non_numeric() -> list[TableTransformer]:
         LabelEncoder(column_names="col1"),
     ]
 
+
 def valid_callable_for_functional_table_transformer(table: Table) -> Table:
     return table.remove_columns(["col1"])
+
 
 def transformers() -> list[TableTransformer]:
     """

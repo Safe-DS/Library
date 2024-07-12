@@ -26,13 +26,12 @@ class FunctionalTableTransformer(TableTransformer):
     # Dunder methods
     # ------------------------------------------------------------------------------------------------------------------
 
-    def __init__(self,
-                 transformer: Callable[[Table], Table],
-                 ) -> None:
+    def __init__(
+        self,
+        transformer: Callable[[Table], Table],
+    ) -> None:
         super().__init__(None)
         self._transformer = transformer
-
-        
 
     def __hash__(self) -> int:
         return _structural_hash(
