@@ -425,10 +425,10 @@ class Table:
         import polars as pl
 
         try:
-            return _PolarsSchema(self._lazy_frame.schema)
+            return _PolarsSchema(self._lazy_frame.collect_schema())
         except (pl.exceptions.NoDataError, pl.exceptions.PanicException):
             # Can happen for some operations on empty tables (e.g. https://github.com/pola-rs/polars/issues/16202)
-            return _PolarsSchema({})
+            return _PolarsSchema(pl.Schema({}))
 
     # ------------------------------------------------------------------------------------------------------------------
     # Column operations
