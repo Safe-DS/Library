@@ -103,7 +103,25 @@ class TablePlotter:
         return _figure_to_image(fig)
     
     def violin_plots(self) -> Image:
-        # todo docs
+        """
+        Create a violin plot for every numerical column.
+
+        Returns
+        -------
+        plot:
+            The violin plot(s) as an image.
+
+        Raises
+        ------
+        NonNumericColumnError
+            If the table contains only non-numerical columns.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Table
+        >>> table = Table({"a":[1, 2], "b": [3, 42]})
+        >>> image = table.plot.violin_plots()
+        """
         numerical_table = self._table.remove_non_numeric_columns()
         if numerical_table.column_count == 0:
             raise NonNumericColumnError("This table contains only non-numerical columns.")

@@ -67,7 +67,25 @@ class ColumnPlotter:
         return _figure_to_image(fig)
     
     def violin_plot(self) -> Image:
-        # Todo docs
+        """
+        Create a violin plot for the values in the column. This is only possible for numeric columns.
+
+        Returns
+        -------
+        plot:
+            The violin plot as an image.
+
+        Raises
+        ------
+        TypeError
+            If the column is not numeric.
+
+        Examples
+        --------
+        >>> from safeds.data.tabular.containers import Column
+        >>> column = Column("test", [1, 2, 3])
+        >>> violinplot = column.plot.violin_plot()
+        """
         if self._column.row_count > 0:
             _check_column_is_numeric(self._column, operation="create a violin plot")
         from math import nan
@@ -83,7 +101,6 @@ class ColumnPlotter:
         )
 
         ax.set(title=self._column.name)
-        ax.set_xticks([])
         ax.yaxis.grid(visible=True)
         fig.tight_layout()
 
