@@ -2,7 +2,7 @@ from typing import Literal
 
 import pytest
 from safeds.data.tabular.containers import Table
-from safeds.exceptions import ColumnNotFoundError 
+from safeds.exceptions import ColumnNotFoundError
 
 
 @pytest.mark.parametrize(
