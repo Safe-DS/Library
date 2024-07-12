@@ -21,10 +21,11 @@ from tests.helpers import assert_row_operation_works
 )
 def test_should_get_correct_item(table_data: dict, column_name: str, target: int, expected: dict) -> None:
     assert_row_operation_works(
-        table_data, 
-        lambda table: table.remove_rows(lambda row: row[column_name].eq(target)), 
+        table_data,
+        lambda table: table.remove_rows(lambda row: row[column_name].eq(target)),
         expected,
-    )    
+    )
+
 
 @pytest.mark.parametrize(
     ("table", "column_name"),

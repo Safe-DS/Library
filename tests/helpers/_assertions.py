@@ -58,6 +58,7 @@ def assert_cell_operation_works(
     transformed_column = column.transform(transformer)
     assert transformed_column == Column("A", [expected_value]), f"Expected: {expected_value}\nGot: {transformed_column}"
 
+
 def assert_row_operation_works(
     input_value: Any,
     transformer: Callable[[Table], Table],

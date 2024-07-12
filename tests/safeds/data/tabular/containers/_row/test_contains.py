@@ -6,7 +6,7 @@ from safeds.data.tabular.containers._lazy_vectorized_row import _LazyVectorizedR
 @pytest.mark.parametrize(
     ("table", "column_name", "expected"),
     [
-        (Table ({}), "A", False), 
+        (Table({}), "A", False),
         (Table({"A": [1, 2, 3]}), "A", True),
         (Table({"A": [1, 2, 3], "B": ["A", "A", "Bla"]}), "C", False),
         (Table({"col1": [1, 2, 3], "B": ["A", "A", "Bla"]}), 1, False),
@@ -19,5 +19,5 @@ from safeds.data.tabular.containers._lazy_vectorized_row import _LazyVectorizedR
     ],
 )
 def test_should_return_whether_the_row_has_the_column(table: Table, column_name: str, expected: bool) -> None:
-    row: Row[any]=_LazyVectorizedRow(table=table)
+    row: Row[any] = _LazyVectorizedRow(table=table)
     assert (column_name in row) == expected
