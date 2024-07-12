@@ -93,5 +93,8 @@ class DecisionTreeClassifier(Classifier, _DecisionTreeBase):
         with BytesIO() as buffer:
             plt.savefig(buffer)
             image = buffer.getvalue()
+        
+        # prevent forced plot from sklearn showing
+        plt.close()
 
         return Image.from_bytes(image)
