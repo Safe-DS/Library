@@ -4,7 +4,7 @@ import sys
 from typing import TYPE_CHECKING, Any
 
 from safeds._utils import _structural_hash
-from safeds.ml.nn.typing import ConstantImageSize
+from safeds.ml.nn.typing import ConstantImageSize, TensorShape
 
 from ._layer import Layer
 
@@ -46,14 +46,14 @@ class FlattenLayer(Layer):
         return self._input_size
 
     @property
-    def output_size(self) -> int:
+    def output_size(self) -> TensorShape:
         """
         Get the output_size of this layer.
 
         Returns
         -------
         result:
-            The number of neurons in this layer.
+            A 1D TensorShape object containing the number of neurons in this layer.
 
         Raises
         ------
@@ -66,7 +66,7 @@ class FlattenLayer(Layer):
             )
         if self._output_size is None:
             self._output_size = self._input_size.width * self._input_size.height * self._input_size.channel
-        return self._output_size
+        return TensorShape([self._output_size])
 
     def _set_input_size(self, input_size: int | ModelImageSize) -> None:
         if isinstance(input_size, int):
