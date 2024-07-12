@@ -5,6 +5,7 @@ import pytest
 from safeds.data.image.typing import ImageSize
 from safeds.exceptions import OutOfBoundsError
 from safeds.ml.nn.layers import GRULayer
+from safeds.ml.nn.typing import TensorShape
 from torch import nn
 
 
@@ -187,3 +188,11 @@ def test_internal_layer_should_raise_error() -> None:
     layer = GRULayer(1)
     with pytest.raises(ValueError, match="The input_size is not yet set."):
         layer._get_internal_layer(activation_function="relu")
+
+
+def test_conv_transposed_get_parameter_count_returns_right_amount() -> None:
+    input_neurons = 4
+    output_neurons = 16
+    expected_output = int((input_neurons + output_neurons + 2) * output_neurons * 3)
+    layer = GRULayer(output_neurons)
+    assert layer.get_parameter_count(TensorShape([input_neurons])) == expected_output

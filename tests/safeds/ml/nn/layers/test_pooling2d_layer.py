@@ -6,6 +6,7 @@ from safeds.data.image.typing import ImageSize
 from safeds.data.tabular.containers import Table
 from safeds.ml.nn.layers import AveragePooling2DLayer, MaxPooling2DLayer
 from safeds.ml.nn.layers._pooling2d_layer import _Pooling2DLayer
+from safeds.ml.nn.typing import TensorShape
 from torch import nn
 
 
@@ -55,6 +56,17 @@ class TestPooling2DLayer:
         layer = _Pooling2DLayer(strategy, 2, stride=2, padding=2)
         with pytest.raises(TypeError, match=r"The input_size of a pooling layer has to be of type ImageSize."):
             layer._set_input_size(1)
+
+    @pytest.mark.parametrize(
+        "strategy",
+        [
+            "max",
+            "avg",
+        ],
+    )
+    def test_get_parameter_count_right_output(self, strategy: Literal["max", "avg"]) -> None:
+        layer = _Pooling2DLayer(strategy, 2, stride=2, padding=2)
+        assert layer.get_parameter_count(TensorShape([1])) == 0
 
     class TestEq:
         @pytest.mark.parametrize(

@@ -11,7 +11,7 @@ from ._layer import Layer
 if TYPE_CHECKING:
     from torch import nn
 
-    from safeds.ml.nn.typing import ModelImageSize
+    from safeds.ml.nn.typing import ModelImageSize, TensorShape
 
 
 class Convolutional2DLayer(Layer):
@@ -157,6 +157,9 @@ class Convolutional2DLayer(Layer):
             + sys.getsizeof(self._output_size)
         )
 
+    def get_parameter_count(self, input_size: TensorShape) -> int:
+        return int((self._kernel_size * self._kernel_size * input_size._dims[1] + 1) * self._output_channel)
+
 
 class ConvolutionalTranspose2DLayer(Convolutional2DLayer):
     """
@@ -261,3 +264,6 @@ class ConvolutionalTranspose2DLayer(Convolutional2DLayer):
 
     def __sizeof__(self) -> int:
         return sys.getsizeof(self._output_padding) + super().__sizeof__()
+
+    def get_parameter_count(self, input_size: TensorShape) -> int:
+        return int((self._kernel_size * self._kernel_size * input_size._dims[1] + 1) * self._output_channel)

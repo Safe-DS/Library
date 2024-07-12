@@ -4,7 +4,7 @@ import sys
 from typing import TYPE_CHECKING, Any
 
 from safeds._utils import _structural_hash
-from safeds.ml.nn.typing import ConstantImageSize
+from safeds.ml.nn.typing import ConstantImageSize, TensorShape
 
 from ._layer import Layer
 
@@ -86,3 +86,6 @@ class FlattenLayer(Layer):
 
     def __sizeof__(self) -> int:
         return sys.getsizeof(self._input_size) + sys.getsizeof(self._output_size)
+
+    def get_parameter_count(self, input_size: TensorShape) -> int:  # noqa: ARG002
+        return 0

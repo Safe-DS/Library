@@ -4,7 +4,7 @@ import pytest
 from safeds.data.tabular.containers import Table
 from safeds.exceptions import OutOfBoundsError
 from safeds.ml.nn.layers import DropoutLayer
-from safeds.ml.nn.typing import ConstantImageSize
+from safeds.ml.nn.typing import ConstantImageSize, TensorShape
 from torch import nn
 
 
@@ -42,6 +42,10 @@ class TestDropoutLayer:
 
         with pytest.raises(ValueError, match=r"The input_size is not yet set."):
             layer.__sizeof__()
+
+    def test_get_parameter_count_right_output(self) -> None:
+        layer = DropoutLayer(0.5)
+        assert layer.get_parameter_count(TensorShape([1])) == 0
 
 
 class TestEq:

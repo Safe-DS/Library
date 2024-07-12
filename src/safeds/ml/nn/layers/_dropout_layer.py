@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING, Any
 
 from safeds._utils import _structural_hash
 from safeds._validation import _check_bounds, _ClosedBound
-from safeds.ml.nn.typing import ModelImageSize
+from safeds.ml.nn.typing import ModelImageSize, TensorShape
 
 from ._layer import Layer
 
@@ -104,3 +104,6 @@ class DropoutLayer(Layer):
             return int(self._input_size)
         elif isinstance(self._input_size, ModelImageSize):
             return self._input_size.__sizeof__()
+
+    def get_parameter_count(self, input_size: TensorShape) -> int:  # noqa: ARG002
+        return 0

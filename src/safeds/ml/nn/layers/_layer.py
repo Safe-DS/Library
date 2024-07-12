@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Any
 if TYPE_CHECKING:
     from torch import nn
 
-    from safeds.ml.nn.typing import ModelImageSize
+    from safeds.ml.nn.typing import ModelImageSize, TensorShape
 
 
 class Layer(ABC):
@@ -42,4 +42,8 @@ class Layer(ABC):
 
     @abstractmethod
     def __sizeof__(self) -> int:
+        pass  # pragma: no cover
+
+    @abstractmethod
+    def get_parameter_count(self, input_size: TensorShape) -> int:
         pass  # pragma: no cover

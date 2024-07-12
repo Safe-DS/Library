@@ -27,6 +27,7 @@ from safeds.ml.nn.layers import (
     AveragePooling2DLayer,
     Convolutional2DLayer,
     ConvolutionalTranspose2DLayer,
+    DropoutLayer,
     FlattenLayer,
     ForwardLayer,
     Layer,
@@ -514,6 +515,27 @@ class TestClassificationModel:
         # Should not raise
         pickle.dumps(fitted_model)
 
+    def test_parameters_model_not_fitted(self, device: Device) -> None:
+        configure_test_with_device(device)
+        model = NeuralNetworkClassifier(
+            InputConversionTable(),
+            [ForwardLayer(neuron_count=8), DropoutLayer(0.5), ForwardLayer(neuron_count=1)],
+        )
+        with pytest.raises(ValueError, match=r"The input_size is not yet set."):
+            model.get_parameter_count()
+
+    def test_should_sum_parameters(self, device: Device) -> None:
+        configure_test_with_device(device)
+        expected_output = 16 + 0 + 9
+        model_fitted = NeuralNetworkClassifier(
+            InputConversionTable(),
+            [ForwardLayer(neuron_count=8), DropoutLayer(0.5), ForwardLayer(neuron_count=1)],
+        ).fit(
+            Table.from_dict({"a": [1, 1, 1], "b": [2, 2, 2]}).to_tabular_dataset("a"),
+            epoch_size=3,
+        )
+        assert expected_output == model_fitted.get_parameter_count()
+
 
 @pytest.mark.parametrize("device", get_devices(), ids=get_devices_ids())
 class TestRegressionModel:
@@ -879,3 +901,24 @@ class TestRegressionModel:
 
         # Should not raise
         pickle.dumps(fitted_model)
+
+    def test_parameters_model_not_fitted(self, device: Device) -> None:
+        configure_test_with_device(device)
+        model = NeuralNetworkRegressor(
+            InputConversionTable(),
+            [ForwardLayer(neuron_count=8), DropoutLayer(0.5), ForwardLayer(neuron_count=1)],
+        )
+        with pytest.raises(ValueError, match=r"The input_size is not yet set."):
+            model.get_parameter_count()
+
+    def test_should_sum_parameters(self, device: Device) -> None:
+        configure_test_with_device(device)
+        expected_output = 16 + 0 + 9
+        model_fitted = NeuralNetworkRegressor(
+            InputConversionTable(),
+            [ForwardLayer(neuron_count=8), DropoutLayer(0.5), ForwardLayer(neuron_count=1)],
+        ).fit(
+            Table.from_dict({"a": [1, 1, 1], "b": [2, 2, 2]}).to_tabular_dataset("a"),
+            epoch_size=3,
+        )
+        assert expected_output == model_fitted.get_parameter_count()

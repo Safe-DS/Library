@@ -4,7 +4,7 @@ import pytest
 from safeds.data.image.typing import ImageSize
 from safeds.data.tabular.containers import Table
 from safeds.ml.nn.layers import FlattenLayer
-from safeds.ml.nn.typing import VariableImageSize
+from safeds.ml.nn.typing import TensorShape, VariableImageSize
 from torch import nn
 
 
@@ -36,6 +36,10 @@ class TestFlattenLayer:
         layer = FlattenLayer()
         with pytest.raises(TypeError, match=r"The input_size of a flatten layer has to be a ConstantImageSize."):
             layer._set_input_size(VariableImageSize(1, 2, 3))
+
+    def test_get_parameter_count_right_output(self) -> None:
+        layer = FlattenLayer()
+        assert layer.get_parameter_count(TensorShape([1])) == 0
 
     class TestEq:
         def test_should_be_equal(self) -> None:
