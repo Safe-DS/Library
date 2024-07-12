@@ -18,12 +18,13 @@ class TestFit:
         with pytest.raises(ColumnNotFoundError):
             StandardScaler(column_names=["col2", "col3"]).fit(table)
             
-    def test_should_not_raise_if_column_cotains_nan_values(self) -> None:
+    def test_should_not_raise_error_if_column_cotains_nan_values(self) -> None:
         table = Table(
              {
                 "col1": [0.0, 5.0, 10.0],
                 "col2": [float("nan"), 5.0, 10.0],
                 "col3": [np.nan, 5.0, 10.0],
+                "col4": [float("nan"), float("nan"), float("nan")],
             },
         )
         StandardScaler(column_names=["col1", "col2"]).fit(table)
@@ -90,6 +91,25 @@ class TestTransform:
             StandardScaler(column_names=["col1", "col2"]).fit(Table({"col1": [1, 2, 3], "col2": [2, 3, 4]})).transform(
                 Table({"col1": ["a", "b", "c"], "col2": ["b", "c", "e"]}),
             )
+    
+    def test_should_not_raise_if_target_column_contains_nan(self) -> None:
+        table_to_fit = Table(
+            {
+                "col1": [0.0, 5.0, 10.0],
+                "col2": [5.0, 50.0, 100.0],
+            },
+        )
+
+        transformer = StandardScaler().fit(table_to_fit)
+
+        table_to_transform = Table(
+            {
+                "col1": [np.nan, 5.0, 10.0],
+                "col2": [float("nan"), float("nan"), float("nan")],
+            },
+        )
+
+        transformer.transform(table_to_transform)
 
 
 class TestIsFitted:
