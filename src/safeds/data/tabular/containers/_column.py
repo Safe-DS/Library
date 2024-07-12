@@ -84,7 +84,7 @@ class Column(Sequence[T_co]):
             return NotImplemented
         if self is other:
             return True
-        return self._series.equals(other._series)
+        return self.name == other.name and self._series.equals(other._series)
 
     @overload
     def __getitem__(self, index: int) -> T_co: ...
