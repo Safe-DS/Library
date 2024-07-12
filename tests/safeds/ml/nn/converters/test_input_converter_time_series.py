@@ -24,8 +24,16 @@ def test_should_raise_if_is_fitted_is_set_correctly_lstm() -> None:
     )
     assert not model.is_fitted
     model = model.fit(ts)
-    model.predict(ts)
+    model.predict(ts.to_table())
     assert model.is_fitted
+
+
+def test_is_predict_data_valid() -> None:
+    input_conv = InputConversionTimeSeries()
+    data = Table({"target": [1, 1, 1, 1], "time": [0, 0, 0, 0], "feat": [0, 0, 0, 0]})
+    assert not input_conv._is_predict_data_valid(data)
+    input_conv._feature_names = ["XYZ"]
+    assert not input_conv._is_predict_data_valid(data)
 
 
 class TestEq:
