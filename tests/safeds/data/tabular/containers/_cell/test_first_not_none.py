@@ -43,6 +43,6 @@ class TestFirstNotNone:
         assert(res.eq(expected))
 
     def test_given_empty_list(self) -> None:
-        to_eval = []
+        to_eval: list[Cell] = []
         res = Cell.first_not_none(to_eval)
         assert(res.eq(_LazyCell(None)))
