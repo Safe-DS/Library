@@ -5,6 +5,8 @@ from safeds.exceptions import ModelNotFittedError, OutOfBoundsError
 from safeds.ml.classical.regression import DecisionTreeRegressor
 from syrupy import SnapshotAssertion
 
+from tests.helpers import os_mac, skip_if_os
+
 
 @pytest.fixture()
 def training_set() -> TabularDataset:
@@ -55,6 +57,8 @@ class TestPlot:
         training_set: TabularDataset,
         snapshot_png_image: SnapshotAssertion,
     ) -> None:
+        skip_if_os([os_mac])
+
         fitted_model = DecisionTreeRegressor().fit(training_set)
         image = fitted_model.plot()
         assert image == snapshot_png_image
