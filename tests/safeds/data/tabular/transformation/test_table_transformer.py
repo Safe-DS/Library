@@ -8,6 +8,7 @@ from safeds.data.tabular.transformation import (
     LabelEncoder,
     OneHotEncoder,
     RangeScaler,
+    RobustScaler,
     SimpleImputer,
     StandardScaler,
     TableTransformer,
@@ -30,6 +31,7 @@ def transformers_numeric() -> list[TableTransformer]:
         StandardScaler(column_names="col1"),
         RangeScaler(column_names="col1"),
         Discretizer(column_names="col1"),
+        RobustScaler(column_names="col1"),
     ]
 
 
