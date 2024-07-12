@@ -5,8 +5,6 @@ from safeds.exceptions import ModelNotFittedError, OutOfBoundsError
 from safeds.ml.classical.regression import DecisionTreeRegressor
 from syrupy import SnapshotAssertion
 
-from tests.helpers import os_mac, skip_if_os
-
 
 @pytest.fixture()
 def training_set() -> TabularDataset:
