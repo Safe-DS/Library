@@ -83,7 +83,7 @@ def test_should_raise_if_output_size_out_of_bounds(output_size: int) -> None:
     ids=["one", "twenty"],
 )
 def test_should_raise_if_output_size_doesnt_match(output_size: int) -> None:
-    assert LSTMLayer(neuron_count=output_size).output_size == output_size
+    assert LSTMLayer(neuron_count=output_size).output_size.get_size(dimension=0) == output_size
 
 
 def test_should_raise_if_input_size_is_set_with_image_size() -> None:

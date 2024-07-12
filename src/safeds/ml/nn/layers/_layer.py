@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Any
 if TYPE_CHECKING:
     from torch import nn
 
-    from safeds.ml.nn.typing import ModelImageSize
+    from safeds.ml.nn.typing import TensorShape
 
 
 class Layer(ABC):
@@ -20,16 +20,16 @@ class Layer(ABC):
 
     @property
     @abstractmethod
-    def input_size(self) -> int | ModelImageSize:
+    def input_size(self) -> TensorShape:
         pass  # pragma: no cover
 
     @property
     @abstractmethod
-    def output_size(self) -> int | ModelImageSize:
+    def output_size(self) -> TensorShape:
         pass  # pragma: no cover
 
     @abstractmethod
-    def _set_input_size(self, input_size: int | ModelImageSize) -> None:
+    def _set_input_size(self, input_size: TensorShape) -> None:
         pass  # pragma: no cover
 
     @abstractmethod
