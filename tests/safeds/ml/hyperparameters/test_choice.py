@@ -3,10 +3,18 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 import pytest
+
+from safeds.exceptions import EmptyChoiceError
 from safeds.ml.hyperparameters import Choice
 
 if TYPE_CHECKING:
     from typing import Any
+
+
+class TestInit:
+    def test_should_iterate_values(self) -> None:
+        with pytest.raises(EmptyChoiceError):
+            Choice()
 
 
 class TestContains:
@@ -35,11 +43,9 @@ class TestIter:
     @pytest.mark.parametrize(
         ("choice", "expected"),
         [
-            (Choice(), []),
             (Choice(1, 2, 3), [1, 2, 3]),
         ],
         ids=[
-            "empty",
             "non-empty",
         ],
     )
@@ -51,11 +57,9 @@ class TestLen:
     @pytest.mark.parametrize(
         ("choice", "expected"),
         [
-            (Choice(), 0),
             (Choice(1, 2, 3), 3),
         ],
         ids=[
-            "empty",
             "non-empty",
         ],
     )
