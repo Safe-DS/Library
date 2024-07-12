@@ -16,13 +16,16 @@ class Choice(Collection[T]):
     def __init__(self, *args: T) -> None:
         """
         Create a new choice.
-
+        Duplicate values will be removed.
         Parameters
         ----------
         *args:
             The values to choose from.
         """
         self.elements = list(args)
+        if len(args) < 1:
+            raise EmptyChoiceError
+        self.elements = list(dict.fromkeys(args))
 
     def __contains__(self, value: Any) -> bool:
         """
