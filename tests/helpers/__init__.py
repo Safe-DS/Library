@@ -39,6 +39,7 @@ from ._resources import resolve_resource_path
 
 __all__ = [
     "assert_cell_operation_works",
+    "assert_row_operation_works",
     "assert_tables_equal",
     "assert_that_tabular_datasets_are_equal",
     "configure_test_with_device",
