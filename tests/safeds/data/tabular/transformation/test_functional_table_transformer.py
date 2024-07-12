@@ -6,7 +6,7 @@ from safeds.data.tabular.transformation import FunctionalTableTransformer
 def invalid_callable(i: int) -> float:
     return float(i)
     
-def valid_callable(table) -> Table:
+def valid_callable(table: Table) -> Table:
     return table.remove_columns(["col1"])
 
 class TestInit:
