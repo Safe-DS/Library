@@ -16,7 +16,7 @@ if TYPE_CHECKING:
 
 class SequentialTableTransformer(InvertibleTableTransformer):
     """
-    The SequentialTableTransforrmer transforms a table using multiple transformers in sequence.
+    The SequentialTableTransformer transforms a table using multiple transformers in sequence.
 
     Parameters
     ----------
@@ -33,7 +33,7 @@ class SequentialTableTransformer(InvertibleTableTransformer):
         # Check if transformers actually contains any transformers.
         if transformers is None or len(transformers) == 0:
             warn(
-                ("transformers should contain at least 1 transformer"),
+                "transformers should contain at least 1 transformer",
                 UserWarning,
                 stacklevel=2,
             )
@@ -53,18 +53,12 @@ class SequentialTableTransformer(InvertibleTableTransformer):
 
     @property
     def is_fitted(self) -> bool:
-        """
-        Whether the transformer is fitted.
-
-        Returns
-        -------
-        True, if the transformer is fitted, False otherwise.
-        """
+        """Whether the transformer is fitted."""
         return self._is_fitted
 
     def fit(self, table: Table) -> SequentialTableTransformer:
         """
-        Fits all of the transformers in order.
+        Fits all the transformers in order.
 
         Parameters
         ----------
@@ -73,7 +67,8 @@ class SequentialTableTransformer(InvertibleTableTransformer):
 
         Returns
         -------
-        The fitted transformer.
+        fitted_transformer:
+            The fitted transformer.
 
         Raises
         ------
@@ -111,7 +106,8 @@ class SequentialTableTransformer(InvertibleTableTransformer):
 
         Returns
         -------
-        The transformed table.
+        transformed_table:
+            The transformed table.
 
         Raises
         ------
@@ -140,7 +136,8 @@ class SequentialTableTransformer(InvertibleTableTransformer):
 
         Returns
         -------
-        The untranformed table.
+        original_table:
+            The original table.
 
         Raises
         ------
@@ -155,7 +152,7 @@ class SequentialTableTransformer(InvertibleTableTransformer):
         # sequentially inverse transform the table with all transformers, working from the back of the list forwards.
         current_table: Table = transformed_table
         for transformer in reversed(self._transformers):
-            # check if transformer is invertable
+            # check if transformer is invertible
             if not (isinstance(transformer, InvertibleTableTransformer)):
                 raise TransformerNotInvertibleError(str(type(transformer)))
             current_table = transformer.inverse_transform(current_table)
