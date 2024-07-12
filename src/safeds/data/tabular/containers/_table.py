@@ -242,7 +242,7 @@ class Table:
 
         try:
             return Table._from_polars_data_frame(pl.read_json(path))
-        except pl.PolarsPanicError:
+        except pl.exceptions.PanicException:
             # Can happen if the JSON file is empty (https://github.com/pola-rs/polars/issues/10234)
             return Table()
 
@@ -426,7 +426,7 @@ class Table:
 
         try:
             return _PolarsSchema(self._lazy_frame.schema)
-        except (pl.NoDataError, pl.PolarsPanicError):
+        except (pl.exceptions.NoDataError, pl.exceptions.PanicException):
             # Can happen for some operations on empty tables (e.g. https://github.com/pola-rs/polars/issues/16202)
             return _PolarsSchema({})
 
