@@ -41,7 +41,7 @@ class TensorShape:
             #TODO maybe add error message indicating that the dimension is out of range
             return 0        
         if(dimension is None):
-            return self._dims
+            return self._dims[0]
         return self._dims[dimension]
     
     def __hash__(self) -> int:

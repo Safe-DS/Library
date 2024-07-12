@@ -134,7 +134,7 @@ class _Pooling2DLayer(Layer):
             + sys.getsizeof(self._padding)
         )
     
-    def get_parameter_count(self, input_size: TensorShape) -> int:
+    def get_parameter_count(self, input_size: TensorShape) -> int:  # noqa: ARG002
         return 0
 
 

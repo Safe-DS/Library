@@ -5,14 +5,13 @@ import sys
 from typing import TYPE_CHECKING, Any, Literal
 
 from safeds._utils import _structural_hash
-from safeds.ml.nn.typing import TensorShape
 
 from ._layer import Layer
 
 if TYPE_CHECKING:
     from torch import nn
 
-    from safeds.ml.nn.typing import ModelImageSize
+    from safeds.ml.nn.typing import ModelImageSize, TensorShape
 
 
 class Convolutional2DLayer(Layer):
