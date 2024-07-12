@@ -17,8 +17,8 @@ class Choice(Collection[T]):
 
     def __init__(self, *args: T) -> None:
         """
-        Create a new choice.
-        Duplicate values will be removed.
+        Create a new choice. Duplicate values will be removed.
+
         Parameters
         ----------
         *args:
@@ -67,7 +67,7 @@ class Choice(Collection[T]):
         """
         return len(self.elements)
 
-    def __eq__(self, other):
+    def __eq__(self, other) -> bool:
         if not isinstance(other, Choice):
             return NotImplemented
         if self is other:
