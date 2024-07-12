@@ -9,6 +9,8 @@ from safeds._validation._check_columns_are_numeric import _check_columns_are_num
 from safeds.exceptions import ColumnTypeError, NonNumericColumnError
 
 if TYPE_CHECKING:
+    from typing import Literal
+
     from safeds.data.image.containers import Image
     from safeds.data.tabular.containers import Table
 
@@ -454,7 +456,7 @@ class TablePlotter:
 
         return _figure_to_image(fig)
     
-    def histogram_2d(self, x_name: str, y_name: str, *, x_max_bin_count: int = 10, y_max_bin_count: int = 10) -> Image:
+    def histogram_2d(self, x_name: str, y_name: str, *, x_max_bin_count: int = 10, y_max_bin_count: int = 10, theme: Literal["dark", "light"] = "light") -> Image:
         """
         Create a 2D histogram for two columns in the table.
 
@@ -510,7 +512,9 @@ class TablePlotter:
                 )
             
         import matplotlib.pyplot as plt
-        
+        if theme == "dark":
+            plt.style.use("dark_background")
+
         fig, ax = plt.subplots()
         
         ax.hist2d(
