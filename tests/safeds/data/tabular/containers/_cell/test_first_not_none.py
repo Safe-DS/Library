@@ -7,7 +7,7 @@ from safeds.data.tabular.containers._lazy_cell import _LazyCell
 
 class TestFirstNotNone:
     def test_should_return_none(self) -> None:
-        to_eval = [_LazyCell(None) for i in range(5)]
+        to_eval: list[Cell] = [_LazyCell(None) for i in range(5)]
         res = Cell.first_not_none(to_eval)
         assert(res.eq(_LazyCell(None)))
 
