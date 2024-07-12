@@ -91,7 +91,6 @@ def test_should_raise_if_column_does_not_exist_error_message(x: str, y: str) -> 
         "unsorted grouped multiple columns",
     ],
 )
-
 def test_should_match_snapshot_dark(
     table: Table,
     x_name: str,

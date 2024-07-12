@@ -27,6 +27,7 @@ def test_should_raise_if_column_contains_non_numerical_values() -> None:
     with pytest.raises(ColumnTypeError):
         column.plot.lag_plot(1)
 
+
 @pytest.mark.parametrize(
     "column",
     [

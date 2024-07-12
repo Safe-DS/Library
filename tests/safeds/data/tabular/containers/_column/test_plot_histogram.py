@@ -18,10 +18,10 @@ from syrupy import SnapshotAssertion
         "non-numeric",
     ],
 )
-
 def test_should_match_snapshot(column: Column, snapshot_png_image: SnapshotAssertion) -> None:
     histogram = column.plot.histogram()
     assert histogram == snapshot_png_image
+
 
 @pytest.mark.parametrize(
     "column",
@@ -38,7 +38,6 @@ def test_should_match_snapshot(column: Column, snapshot_png_image: SnapshotAsser
         "non-numeric",
     ],
 )
-
 def test_should_match_snapshot_dark(column: Column, snapshot_png_image: SnapshotAssertion) -> None:
     histogram = column.plot.histogram(theme="dark")
     assert histogram == snapshot_png_image
