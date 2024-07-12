@@ -187,7 +187,9 @@ class TablePlotter:
                     cmap="coolwarm",
                 )
                 ax.set_xticks(
-                    np.arange(len(only_numerical.columns)), rotation="vertical", labels=only_numerical.columns,
+                    np.arange(len(only_numerical.columns)),
+                    rotation="vertical",
+                    labels=only_numerical.columns,
                 )
                 ax.set_yticks(np.arange(len(only_numerical.columns)), labels=only_numerical.columns)
                 fig.colorbar(heatmap)
@@ -272,7 +274,10 @@ class TablePlotter:
                     hist = value_counts.get_column("count").to_numpy()
                     ax.bar(distinct_values, hist, edgecolor="black")
                     ax.set_xticks(
-                        range(len(distinct_values)), distinct_values, rotation=45, horizontalalignment="right",
+                        range(len(distinct_values)),
+                        distinct_values,
+                        rotation=45,
+                        horizontalalignment="right",
                     )
 
             for i in range(len(col_names), n_rows * n_cols):
@@ -469,7 +474,12 @@ class TablePlotter:
             return _figure_to_image(fig)
 
     def moving_average_plot(
-        self, x_name: str, y_name: str, window_size: int, *, theme: Literal["dark", "light"] = "light",
+        self,
+        x_name: str,
+        y_name: str,
+        window_size: int,
+        *,
+        theme: Literal["dark", "light"] = "light",
     ) -> Image:
         """
         Create a moving average plot for the y column and plot it by the x column in the table.
