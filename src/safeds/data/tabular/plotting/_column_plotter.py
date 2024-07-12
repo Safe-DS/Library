@@ -54,7 +54,7 @@ class ColumnPlotter:
 
         import matplotlib.pyplot as plt
 
-        def _set_boxplot_colors(box, theme):
+        def _set_boxplot_colors(box, theme) -> None:
             if theme == "dark":
                 for median in box["medians"]:
                     median.set(color="orange", linewidth=1.5)
