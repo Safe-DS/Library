@@ -1,36 +1,19 @@
 import pytest
 from safeds.data.tabular.containers import Table
 from safeds.data.tabular.transformation import FunctionalTableTransformer
-from safeds.exceptions import ColumnNotFoundError, ColumnTypeError, TransformerNotFittedError
 
 
-#def invalid_callable(i: int) -> float:
-#    return float(i)
+def invalid_callable(i: int) -> float:
+    return float(i)
     
-#def valid_callable(table) -> Table:
-#    new_table = table.remove_columns(["col1"])
-#    return new_table
+def valid_callable(table) -> Table:
+    return table.remove_columns(["col1"])
 
 class TestInit:
-    def invalid_callable(self, i: int) -> float:
-        return float(i)
-    
-    def valid_callable(self, table) -> Table:
-        new_table = table.remove_columns(self, ["col1"])
-        return new_table
-
-    #def test_should_raise_type_error(self) -> None:
-    #    with pytest.raises(TypeError):
-    #        transformer = FunctionalTableTransformer(invalid_callable)
-    
     def test_should_not_raise_type_error(self) -> None:
-            transformer = FunctionalTableTransformer(self.valid_callable)
+            FunctionalTableTransformer(valid_callable)
 
 class TestFit:
-    def valid_callable(self, table: Table) -> Table:
-        new_table = table.remove_columns(["col1"])
-        return new_table
-    
     def test_should_return_self(self) -> None:
         table = Table(
             {
@@ -38,31 +21,34 @@ class TestFit:
                 "col2": [1, 2, 3],
             },
         )
-        transformer = FunctionalTableTransformer(self.valid_callable)
+        transformer = FunctionalTableTransformer(valid_callable)
         assert transformer.fit(table) is transformer
 
 class TestIsFitted:
-    def valid_callable(self, table: Table) -> Table:
-        new_table = table.remove_columns(["col1"])
-        return new_table
-    
     def test_should_always_be_fitted(self) -> None:
-        transformer = FunctionalTableTransformer(self.valid_callable)
+        transformer = FunctionalTableTransformer(valid_callable)
         assert transformer.is_fitted
 
 class TestTransform:
-    def valid_callable(self, table: Table) -> Table:
-        new_table = table.remove_columns(["col1"])
-        return new_table
-    
-    def test_should_raise_generic_error(self) -> None:
+    def test_should_raise_generic_error_when_error_in_method(self) -> None:
         table = Table(
             {
                 "col2": [1, 2, 3],
             
             },
         )
-        transformer = FunctionalTableTransformer(self.valid_callable)
+        transformer = FunctionalTableTransformer(valid_callable)
+        with pytest.raises(Exception, match=r"The underlying function encountered an error"):
+            transformer.transform(table)
+
+    def test_should_raise_generic_error_when_callable_wrong_type(self) -> None:
+        table = Table(
+            {
+                "col2": [1, 2, 3],
+            
+            },
+        )
+        transformer = FunctionalTableTransformer(invalid_callable)
         with pytest.raises(Exception, match=r"The underlying function encountered an error"):
             transformer.transform(table)
 
@@ -74,7 +60,7 @@ class TestTransform:
             
             },
         )
-        transformer = FunctionalTableTransformer(self.valid_callable)
+        transformer = FunctionalTableTransformer(valid_callable)
         transformer.transform(table)
         assert table == Table(
             {
@@ -92,7 +78,7 @@ class TestTransform:
             
             },
         )
-        transformer = FunctionalTableTransformer(self.valid_callable)
+        transformer = FunctionalTableTransformer(valid_callable)
         transformed_table = transformer.transform(table)
         assert transformed_table == Table(
             {
@@ -102,10 +88,6 @@ class TestTransform:
         )
 
 class TestFitAndTransform:
-    def valid_callable(self, table: Table) -> Table:
-        new_table = table.remove_columns(["col1"])
-        return new_table
-
     def test_should_return_self(self) -> None:
         table = Table(
             {
@@ -114,7 +96,7 @@ class TestFitAndTransform:
             
             },
         )
-        transformer = FunctionalTableTransformer(self.valid_callable)
+        transformer = FunctionalTableTransformer(valid_callable)
         assert transformer.fit_and_transform(table)[0] is transformer
 
     def test_should_not_modify_original_table(self) -> None:
@@ -125,7 +107,7 @@ class TestFitAndTransform:
             
             },
         )
-        transformer = FunctionalTableTransformer(self.valid_callable)
+        transformer = FunctionalTableTransformer(valid_callable)
         transformer.fit_and_transform(table)
         assert table == Table(
             {

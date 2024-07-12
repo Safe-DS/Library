@@ -1,14 +1,16 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Self
+from typing import TYPE_CHECKING
 
 from safeds._utils import _structural_hash
 
-from ._table_transformer import TableTransformer
-from safeds.data.tabular.containers import Table
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
-#if TYPE_CHECKING:
-#    from safeds.data.tabular.containers import Table
+    from safeds.data.tabular.containers import Table
+
+from ._table_transformer import TableTransformer
+
 
 class FunctionalTableTransformer(TableTransformer):
     """
@@ -16,8 +18,8 @@ class FunctionalTableTransformer(TableTransformer):
 
     Parameters
     ----------
-    column_names:
-        The list of columns used to fit the transformer. If `None`, all suitable columns are used.
+    funct:
+        The Callable that receives a table and returns a table that is to be wrapped.
     """
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -25,7 +27,7 @@ class FunctionalTableTransformer(TableTransformer):
     # ------------------------------------------------------------------------------------------------------------------
 
     def __init__(self,
-                 funct,
+                 funct: Callable[[Table], Table],
                  ) -> None:
         super().__init__(None)
         self._func = funct
@@ -51,7 +53,7 @@ class FunctionalTableTransformer(TableTransformer):
     # Learning and transformation
     # ------------------------------------------------------------------------------------------------------------------
 
-    def fit(self, table: Table) -> FunctionalTableTransformer:
+    def fit(self, table: Table) -> FunctionalTableTransformer:   # noqa: ARG002
         """
         **Note:** For FunctionalTableTransformer this is a no-OP.
 
@@ -63,11 +65,10 @@ class FunctionalTableTransformer(TableTransformer):
         Returns
         -------
         fitted_transformer:
-            self is always fitted.
+            Returns self, because this transformer is always fitted.
             
         """
-        fitted_transformer = self
-        return fitted_transformer
+        return self
 
     def transform(self, table: Table) -> Table:
         """
@@ -88,15 +89,14 @@ class FunctionalTableTransformer(TableTransformer):
         Raises
         ------
         Exception:
-            Raised when the called _func encounters an error.
-        #TODO Switch to non-generic exception
+            Raised when the wrapped callable encounters an error.
         
         """
         try:
-            transformed_table = self._func(table)
-            return transformed_table
+            return self._func(table)
         except Exception as e:
-            raise Exception("The underlying function encountered an error") from e
+            #TODO Evaluate if switch to non-generic exception is useful, as _func can be any callable
+            raise Exception("The underlying function encountered an error") from e  # noqa: TRY002
 
     def fit_and_transform(self, table: Table) -> tuple[FunctionalTableTransformer, Table]:
         """
@@ -105,12 +105,12 @@ class FunctionalTableTransformer(TableTransformer):
         Parameters
         ----------
         table:
-            The table on which the callable .
+            The table on which the callable is to be executed.
 
         Returns
         -------
         fitted_transformer:
-            self is always fitted.
+            Return self because the transformer is always fitted.
         transformed_table:
             The transformed table.
         """
