@@ -66,7 +66,7 @@ def test_join_mismatched_columns() -> None:
     right_names = ["d", "e"]
     mode = "inner"
     with pytest.raises(ValueError, match="The number of columns to join on must be the same in both tables."):
-        table_left.join(table_right, left_names, right_names, mode)
+        table_left.join(table_right, left_names, right_names, mode=mode)
 
 
 def test_join_check_columns_exist() -> None:
@@ -76,8 +76,8 @@ def test_join_check_columns_exist() -> None:
     right_names = ["d", "e"]
     mode = "inner"
     with pytest.raises(KeyError):
-        table_left.join(table_right, left_names, right_names, mode)
+        table_left.join(table_right, left_names, right_names, mode=mode)
     left_names = ["a"]
     right_names = ["d", "f"]
     with pytest.raises(KeyError):
-        table_left.join(table_right, left_names, right_names, mode)
+        table_left.join(table_right, left_names, right_names, mode=mode)
