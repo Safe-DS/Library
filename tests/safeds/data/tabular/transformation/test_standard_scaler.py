@@ -22,7 +22,7 @@ class TestFit:
         table = Table(
              {
                 "col1": [0.0, 5.0, 10.0],
-                "col2": [float('nan'), 5.0, 10.0],
+                "col2": [float("nan"), 5.0, 10.0],
                 "col3": [np.nan, 5.0, 10.0],
             },
         )
