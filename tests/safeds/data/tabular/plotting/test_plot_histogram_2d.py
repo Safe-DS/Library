@@ -3,7 +3,7 @@ from safeds.data.tabular.containers import Table
 from safeds.exceptions import ColumnNotFoundError, ColumnTypeError, OutOfBoundsError
 from syrupy import SnapshotAssertion
 
-from tests.helpers import os_mac, skip_if_os
+from tests.helpers import os_linux, os_mac, skip_if_os
 
 
 @pytest.mark.parametrize(
@@ -40,7 +40,7 @@ def test_should_match_snapshot(
     col2: str,
     snapshot_png_image: SnapshotAssertion,
 ) -> None:
-    skip_if_os(os_mac)
+    skip_if_os([os_linux, os_mac])
     histogram_2d = table.plot.histogram_2d(col1, col2)
     assert histogram_2d == snapshot_png_image
 
@@ -78,7 +78,7 @@ def test_should_match_snapshot_dark_theme(
     col2: str,
     snapshot_png_image: SnapshotAssertion,
 ) -> None:
-    skip_if_os(os_mac)
+    skip_if_os([os_linux, os_mac])
     histogram_2d = table.plot.histogram_2d(col1, col2, theme="dark")
     assert histogram_2d == snapshot_png_image
 
