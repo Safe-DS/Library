@@ -442,14 +442,13 @@ class TablePlotter:
             ylabel=y_name,
         )
         ax.legend()
-        if self._table.get_column(x_name).is_temporal:
-            ax.set_xticks(x_data)  # Set x-ticks to the x data points
         ax.set_xticks(ax.get_xticks())
         ax.set_xticklabels(
             ax.get_xticklabels(),
             rotation=45,
             horizontalalignment="right",
         )  # rotate the labels of the x Axis to prevent the chance of overlapping of the labels
+
         fig.tight_layout()
 
         return _figure_to_image(fig)
