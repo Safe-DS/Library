@@ -496,17 +496,13 @@ class TablePlotter:
         Examples
         --------
         >>> from safeds.data.tabular.containers import Table
-        >>> import numpy as np
-        >>> np.random.seed(1)
-        >>> x = np.random.randn(5000)
-        >>> y = 1.2 * x + np.random.randn(5000) / 3
         >>> table = Table(
         ...     {
-        ...         "a": x,
-        ...         "b": y,
+        ...         "a": [1, 2, 3, 4, 5],
+        ...         "b": [2, 3, 4, 5, 6],
         ...     }
         ... )
-        >>> image = table.plot.histogram_2d("a", "b", x_max_bin_count=50, y_max_bin_count=50)
+        >>> image = table.plot.histogram_2d("a", "b")
         """
         _check_bounds("x_max_bin_count", x_max_bin_count, lower_bound=_ClosedBound(1))
         _check_bounds("y_max_bin_count", y_max_bin_count, lower_bound=_ClosedBound(1))
@@ -536,7 +532,7 @@ class TablePlotter:
 
             fig.tight_layout()
 
-        return _figure_to_image(fig)
+            return _figure_to_image(fig)
 
 
 def _plot_validation(table: Table, x_name: str, y_names: list[str]) -> None:
