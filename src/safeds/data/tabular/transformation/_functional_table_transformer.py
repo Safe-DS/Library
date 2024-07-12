@@ -18,7 +18,7 @@ class FunctionalTableTransformer(TableTransformer):
 
     Parameters
     ----------
-    funct:
+    transformer:
         The Callable that receives a table and returns a table that is to be wrapped.
     """
 
@@ -27,10 +27,10 @@ class FunctionalTableTransformer(TableTransformer):
     # ------------------------------------------------------------------------------------------------------------------
 
     def __init__(self,
-                 funct: Callable[[Table], Table],
+                 transformer: Callable[[Table], Table],
                  ) -> None:
         super().__init__(None)
-        self._func = funct
+        self._func = transformer
 
         
 
