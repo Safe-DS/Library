@@ -526,13 +526,13 @@ class TestClassificationModel:
 
     def test_should_sum_parameters(self, device: Device) -> None:
         configure_test_with_device(device)
-        expected_output = 16+0+9
+        expected_output = 16 + 0 + 9
         model_fitted = NeuralNetworkClassifier(
             InputConversionTable(),
             [ForwardLayer(neuron_count=8), DropoutLayer(0.5), ForwardLayer(neuron_count=1)],
         ).fit(
-                Table.from_dict({"a": [1, 1, 1], "b": [2, 2, 2]}).to_tabular_dataset("a"),
-                epoch_size=3,
+            Table.from_dict({"a": [1, 1, 1], "b": [2, 2, 2]}).to_tabular_dataset("a"),
+            epoch_size=3,
         )
         assert expected_output == model_fitted.get_parameter_count()
 
@@ -913,12 +913,12 @@ class TestRegressionModel:
 
     def test_should_sum_parameters(self, device: Device) -> None:
         configure_test_with_device(device)
-        expected_output = 16+0+9
+        expected_output = 16 + 0 + 9
         model_fitted = NeuralNetworkRegressor(
             InputConversionTable(),
             [ForwardLayer(neuron_count=8), DropoutLayer(0.5), ForwardLayer(neuron_count=1)],
         ).fit(
-                Table.from_dict({"a": [1, 1, 1], "b": [2, 2, 2]}).to_tabular_dataset("a"),
-                epoch_size=3,
+            Table.from_dict({"a": [1, 1, 1], "b": [2, 2, 2]}).to_tabular_dataset("a"),
+            epoch_size=3,
         )
         assert expected_output == model_fitted.get_parameter_count()

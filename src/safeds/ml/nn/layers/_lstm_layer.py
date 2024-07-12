@@ -97,5 +97,4 @@ class LSTMLayer(Layer):
         return sys.getsizeof(self._input_size) + sys.getsizeof(self._output_size)
 
     def get_parameter_count(self, input_size: TensorShape) -> int:
-        return (input_size._dims[0]+self._output_size+2)*self._output_size*4
-    
+        return (input_size._dims[0] + self._output_size + 2) * self._output_size * 4

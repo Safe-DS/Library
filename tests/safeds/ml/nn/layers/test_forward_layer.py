@@ -179,9 +179,10 @@ def test_should_assert_that_different_forward_layers_have_different_hash(
 def test_should_assert_that_layer_size_is_greater_than_normal_object(layer: ForwardLayer) -> None:
     assert sys.getsizeof(layer) > sys.getsizeof(object())
 
+
 def test_conv_transposed_get_parameter_count_returns_right_amount() -> None:
-    input_neurons=3
-    output_neurons=3
-    expected_output = int((input_neurons+1)*output_neurons)
+    input_neurons = 3
+    output_neurons = 3
+    expected_output = int((input_neurons + 1) * output_neurons)
     layer = ForwardLayer(output_neurons)
     assert layer.get_parameter_count(TensorShape([input_neurons])) == expected_output

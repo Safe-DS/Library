@@ -117,7 +117,7 @@ class NeuralNetworkRegressor(Generic[IFT, IPT]):
         last_input_neurons = self.input_size if isinstance(self.input_size, int) else 0
         last_input_channels = self.input_size.channel if isinstance(self.input_size, ModelImageSize) else 0
         for layer in self._layers:
-            layer._set_input_size(last_input_neurons if last_type=="int" else last_input_channels)
+            layer._set_input_size(last_input_neurons if last_type == "int" else last_input_channels)
             summand += layer.get_parameter_count(TensorShape([last_input_neurons, last_input_channels]))
             last_input_neurons = layer.output_size if isinstance(layer.output_size, int) else 0
             last_input_channels = layer.output_size.channel if isinstance(layer.output_size, ModelImageSize) else 0
@@ -411,7 +411,7 @@ class NeuralNetworkClassifier(Generic[IFT, IPT]):
         last_input_neurons = self.input_size if isinstance(self.input_size, int) else 0
         last_input_channels = self.input_size.channel if isinstance(self.input_size, ModelImageSize) else 0
         for layer in self._layers:
-            layer._set_input_size(last_input_neurons if last_type=="int" else last_input_channels)
+            layer._set_input_size(last_input_neurons if last_type == "int" else last_input_channels)
             summand += layer.get_parameter_count(TensorShape([last_input_neurons, last_input_channels]))
             last_input_neurons = layer.output_size if isinstance(layer.output_size, int) else 0
             last_input_channels = layer.output_size.channel if isinstance(layer.output_size, ModelImageSize) else 0

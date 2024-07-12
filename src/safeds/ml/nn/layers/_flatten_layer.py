@@ -86,6 +86,6 @@ class FlattenLayer(Layer):
 
     def __sizeof__(self) -> int:
         return sys.getsizeof(self._input_size) + sys.getsizeof(self._output_size)
-    
+
     def get_parameter_count(self, input_size: TensorShape) -> int:  # noqa: ARG002
         return 0

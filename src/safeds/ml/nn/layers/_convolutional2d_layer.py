@@ -158,7 +158,7 @@ class Convolutional2DLayer(Layer):
         )
 
     def get_parameter_count(self, input_size: TensorShape) -> int:
-        return int((self._kernel_size*self._kernel_size*input_size._dims[1]+1)*self._output_channel)
+        return int((self._kernel_size * self._kernel_size * input_size._dims[1] + 1) * self._output_channel)
 
 
 class ConvolutionalTranspose2DLayer(Convolutional2DLayer):
@@ -266,4 +266,4 @@ class ConvolutionalTranspose2DLayer(Convolutional2DLayer):
         return sys.getsizeof(self._output_padding) + super().__sizeof__()
 
     def get_parameter_count(self, input_size: TensorShape) -> int:
-        return int((self._kernel_size*self._kernel_size*input_size._dims[1]+1)*self._output_channel)
+        return int((self._kernel_size * self._kernel_size * input_size._dims[1] + 1) * self._output_channel)

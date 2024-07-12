@@ -41,7 +41,6 @@ class TestFlattenLayer:
         layer = FlattenLayer()
         assert layer.get_parameter_count(TensorShape([1])) == 0
 
-
     class TestEq:
         def test_should_be_equal(self) -> None:
             assert FlattenLayer() == FlattenLayer()

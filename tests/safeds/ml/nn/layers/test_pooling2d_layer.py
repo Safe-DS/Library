@@ -58,7 +58,7 @@ class TestPooling2DLayer:
             layer._set_input_size(1)
 
     @pytest.mark.parametrize(
-            "strategy",
+        "strategy",
         [
             "max",
             "avg",

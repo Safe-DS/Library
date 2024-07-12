@@ -46,4 +46,4 @@ class Layer(ABC):
 
     @abstractmethod
     def get_parameter_count(self, input_size: TensorShape) -> int:
-        pass # pragma: no cover 
+        pass  # pragma: no cover
