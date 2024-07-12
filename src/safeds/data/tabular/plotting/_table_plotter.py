@@ -138,7 +138,7 @@ class TablePlotter:
         fig, axs = plt.subplots(nrows=number_of_rows, ncols=number_of_columns)
         line = 0
         for i, column in enumerate(columns):
-            data = column
+            data = column.to_list()
             if len(column) == 0:
                 data = [nan, nan]
             if i % number_of_columns == 0 and i != 0:
