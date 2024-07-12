@@ -117,7 +117,7 @@ def test_should_raise_if_activation_function_not_set() -> None:
             LSTMLayer(neuron_count=1),
             False,
         ),
-(
+        (
             LSTMLayer(neuron_count=Choice(2)),
             LSTMLayer(neuron_count=Choice(2)),
             True,
