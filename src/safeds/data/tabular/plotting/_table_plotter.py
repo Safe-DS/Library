@@ -512,13 +512,6 @@ class TablePlotter:
         _check_bounds("y_max_bin_count", y_max_bin_count, lower_bound=_ClosedBound(1))
         _plot_validation(self._table, x_name, [y_name])
 
-        for name in [x_name, y_name]:
-            if self._table.get_column(name).missing_value_count() >= 1:
-                raise ValueError(
-                    f"there are missing values in column '{name}', use transformation to fill missing values "
-                    f"or drop the missing values. For a moving average no missing values are allowed.",
-                )
-
         import matplotlib.pyplot as plt
 
         if theme == "dark":
