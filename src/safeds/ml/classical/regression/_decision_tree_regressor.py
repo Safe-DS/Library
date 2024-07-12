@@ -79,6 +79,14 @@ class DecisionTreeRegressor(Regressor, _DecisionTreeBase):
     # ------------------------------------------------------------------------------------------------------------------
 
     def plot(self) -> Image:
+        """
+        Get the image of the decision tree
+
+        Returns
+        -------
+        Image:
+            The decision tree figure as an image.
+        """
         if not self.is_fitted:
             raise ModelNotFittedError
 
