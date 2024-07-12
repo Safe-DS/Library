@@ -10,7 +10,7 @@ from torch import Tensor, nn  # slow import
 
 from safeds._config import _init_default_device
 from safeds.ml.nn.converters._input_converter_image import _InputConversionImage
-from safeds.ml.nn.layers import FlattenLayer, Layer
+from safeds.ml.nn.layers import DropoutLayer, FlattenLayer, Layer
 from safeds.ml.nn.layers._pooling2d_layer import _Pooling2DLayer
 
 if TYPE_CHECKING:
@@ -36,7 +36,7 @@ class _InternalModel(nn.Module):
                 layer._set_input_size(previous_output_size)
             elif isinstance(input_conversion, _InputConversionImage):
                 layer._set_input_size(input_conversion._data_size)
-            if isinstance(layer, FlattenLayer | _Pooling2DLayer):
+            if isinstance(layer, FlattenLayer | _Pooling2DLayer | DropoutLayer):
                 internal_layers.append(layer._get_internal_layer())
             else:
                 internal_layers.append(layer._get_internal_layer(activation_function="relu"))

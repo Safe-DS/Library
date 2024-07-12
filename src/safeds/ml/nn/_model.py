@@ -27,7 +27,7 @@ from safeds.ml.nn.layers import (
     ForwardLayer,
 )
 from safeds.ml.nn.layers._pooling2d_layer import _Pooling2DLayer
-from safeds.ml.nn.typing import ConstantImageSize, ModelImageSize, VariableImageSize
+from safeds.ml.nn.typing import ConstantImageSize, ModelImageSize, TensorShape, VariableImageSize
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -391,7 +391,19 @@ class NeuralNetworkClassifier(Generic[IFT, IPT]):
         self._total_number_of_epochs_done = 0
 
     def get_parameter_count(self) -> int:
-        sum([layer.get_parameter_count() for layer in self._layers])
+        if self._input_size is None:
+            raise ValueError("The input_size is not yet set.")
+
+        summand = 0
+        last_type = "int" if isinstance(self.input_size, int) else "ImageSize"
+        last_input_neurons = self.input_size if isinstance(self.input_size, int) else 0
+        last_input_channels = ConstantImageSize(self.input_size).channel if isinstance(self.input_size, ModelImageSize) else 0
+        for layer in self._layers:
+            layer._set_input_size(last_input_neurons if last_type=="int" else last_input_channels)
+            summand += layer.get_parameter_count(TensorShape([last_input_neurons, last_input_channels]))
+            last_input_neurons = layer.output_size if isinstance(layer.output_size, int) else 0
+            last_input_channels = ConstantImageSize(layer.output_size).channel if isinstance(layer.output_size, ModelImageSize) else 0
+        return summand
 
     @staticmethod
     def load_pretrained_model(huggingface_repo: str) -> NeuralNetworkClassifier:  # pragma: no cover
