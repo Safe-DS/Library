@@ -74,7 +74,7 @@ class Column(Sequence[T_co]):
         if data is None:
             data = []
 
-        self._series: pl.Series = pl.Series(name, data)
+        self._series: pl.Series = pl.Series(name, data, strict=False)
 
     def __contains__(self, item: Any) -> bool:
         return self._series.__contains__(item)
