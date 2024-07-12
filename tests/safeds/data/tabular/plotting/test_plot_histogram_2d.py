@@ -96,6 +96,6 @@ def test_should_raise_if_value_not_in_range_y() -> None:
 
 
 def test_should_raise_if_column_is_not_numeric() -> None:
-    table = Table({"col1": "a", "col2": "b"})
+    table = Table({"col1": ["a"], "col2": ["b"]})
     with pytest.raises(ColumnTypeError):
         table.plot.histogram_2d("col1", "col2")
