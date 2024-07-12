@@ -1,6 +1,7 @@
 import copy
 from concurrent.futures import ALL_COMPLETED, wait
 from typing import Self
+
 from joblib._multiprocessing_helpers import mp
 
 from safeds._validation._check_columns_are_numeric import _check_columns_are_numeric
@@ -96,7 +97,9 @@ class BaselineRegressor:
 
         copied_model = copy.deepcopy(self)
 
-        with ProcessPoolExecutor(max_workers=len(self._list_of_model_types), mp_context=mp.get_context("spawn")) as executor:
+        with ProcessPoolExecutor(
+            max_workers=len(self._list_of_model_types), mp_context=mp.get_context("spawn"),
+        ) as executor:
             futures = []
             for model in self._list_of_model_types:
                 futures.append(executor.submit(_fit_single_model, model, train_data))
@@ -160,7 +163,9 @@ class BaselineRegressor:
         _check_columns_are_numeric(test_data_as_table, test_data.features.add_columns(test_data.target).column_names)
 
         # Start Processes
-        with ProcessPoolExecutor(max_workers=len(self._list_of_model_types), mp_context=mp.get_context("spawn")) as executor:
+        with ProcessPoolExecutor(
+            max_workers=len(self._list_of_model_types), mp_context=mp.get_context("spawn"),
+        ) as executor:
             results = []
             futures = []
             for model in self._fitted_models:
