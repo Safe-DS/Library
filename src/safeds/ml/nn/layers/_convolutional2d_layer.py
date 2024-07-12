@@ -166,12 +166,6 @@ class Convolutional2DLayer(Layer):
         return(
             sum(p.numel() for p in internal_layer.parameters())
         )
-    """from safeds.ml.nn.layers import Convolutional2DLayer
-from safeds.ml.nn.typing import ConstantImageSize
-layer = Convolutional2DLayer(3, 1)
-layer._set_input_size(ConstantImageSize(10,10,3))
-
-print(layer.get_parameter_count())"""
 
 
 
@@ -278,3 +272,13 @@ class ConvolutionalTranspose2DLayer(Convolutional2DLayer):
 
     def __sizeof__(self) -> int:
         return sys.getsizeof(self._output_padding) + super().__sizeof__()
+
+    def get_parameter_count(self) -> int:
+        if self._input_size is None:
+            raise ValueError(
+                "The input_size is not yet set. The layer cannot compute the parameter_count if the input_size is not set.",
+            )
+        internal_layer = self._get_internal_layer(activation_function="sigmoid")
+        return(
+            sum(p.numel() for p in internal_layer.parameters())
+        )
