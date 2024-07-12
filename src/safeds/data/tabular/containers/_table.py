@@ -1756,7 +1756,7 @@ class Table:
         _check_columns_exist(right_table, right_names)
 
         if len(left_names) != len(right_names):
-        raise ValueError("The number of columns to join on must be the same in both tables.")
+            raise ValueError("The number of columns to join on must be the same in both tables.")
 
         #Implementation
         return self._from_polars_lazy_frame(
