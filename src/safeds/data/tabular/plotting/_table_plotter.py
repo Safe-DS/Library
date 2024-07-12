@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import warnings
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING
 
 from safeds._utils import _figure_to_image
 from safeds._validation import _check_columns_exist
@@ -32,7 +32,7 @@ class TablePlotter:
     def __init__(self, table: Table):
         self._table: Table = table
 
-    def box_plots(self, *, theme: Literal["dark", "light"] = "light") -> Image:
+    def box_plots(self) -> Image:
         """
         Create a box plot for every numerical column.
 
@@ -58,18 +58,6 @@ class TablePlotter:
         from math import ceil
 
         import matplotlib.pyplot as plt
-
-        if theme == "dark":
-            plt.style.use("dark_background")
-            plt.rcParams.update({
-                "text.color": "white",
-                "axes.labelcolor": "white",
-                "axes.edgecolor": "white",
-                "xtick.color": "white",
-                "ytick.color": "white",
-            })
-        else:
-            plt.style.use("default")
 
         columns = numerical_table.to_columns()
         columns = [column._series.drop_nulls() for column in columns]
@@ -114,7 +102,7 @@ class TablePlotter:
         fig.tight_layout()
         return _figure_to_image(fig)
 
-    def correlation_heatmap(self, *, theme: Literal["dark", "light"] = "light") -> Image:
+    def correlation_heatmap(self) -> Image:
         """
         Plot a correlation heatmap for all numerical columns of this `Table`.
 
@@ -133,18 +121,6 @@ class TablePlotter:
         #  https://stackoverflow.com/questions/33282368/plotting-a-2d-heatmap
         import matplotlib.pyplot as plt
         import numpy as np
-
-        if theme == "dark":
-            plt.style.use("dark_background")
-            plt.rcParams.update({
-                "text.color": "white",
-                "axes.labelcolor": "white",
-                "axes.edgecolor": "white",
-                "xtick.color": "white",
-                "ytick.color": "white",
-            })
-        else:
-            plt.style.use("default")
 
         only_numerical = self._table.remove_non_numeric_columns()._data_frame.fill_null(0)
 
@@ -170,7 +146,7 @@ class TablePlotter:
                 vmax=1,
                 cmap="coolwarm",
             )
-            ax.set_xticks(np.arange(len(only_numerical.columns)), labels=only_numerical.columns)
+            ax.set_xticks(np.arange(len(only_numerical.columns)), rotation="vertical", labels=only_numerical.columns)
             ax.set_yticks(np.arange(len(only_numerical.columns)), labels=only_numerical.columns)
             fig.colorbar(heatmap)
 
@@ -178,7 +154,7 @@ class TablePlotter:
 
         return _figure_to_image(fig)
 
-    def histograms(self, *, max_bin_count: int = 10, theme: Literal["dark", "light"] = "light") -> Image:
+    def histograms(self, *, max_bin_count: int = 10) -> Image:
         """
         Plot a histogram for every column.
 
