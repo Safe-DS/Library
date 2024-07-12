@@ -84,7 +84,7 @@ class DecisionTreeClassifier(Classifier, _DecisionTreeBase):
 
         Returns
         -------
-        Image:
+        plot:
             The decision tree figure as an image.
 
         Raises
