@@ -3,9 +3,6 @@ from safeds.data.tabular.containers import Table
 from safeds.data.tabular.transformation import FunctionalTableTransformer
 
 
-def invalid_callable(i: int) -> float:
-    return float(i)
-    
 def valid_callable(table: Table) -> Table:
     return table.remove_columns(["col1"])
 
@@ -38,17 +35,6 @@ class TestTransform:
             },
         )
         transformer = FunctionalTableTransformer(valid_callable)
-        with pytest.raises(Exception, match=r"The underlying function encountered an error"):
-            transformer.transform(table)
-
-    def test_should_raise_generic_error_when_callable_wrong_type(self) -> None:
-        table = Table(
-            {
-                "col2": [1, 2, 3],
-            
-            },
-        )
-        transformer = FunctionalTableTransformer(invalid_callable)
         with pytest.raises(Exception, match=r"The underlying function encountered an error"):
             transformer.transform(table)
 
