@@ -35,8 +35,11 @@ class BaselineClassifier:
 
     Get a baseline by fitting data on multiple different models and comparing the best metrics.
 
-    Parameters ---------- extended_search: If set to true, an extended set of models will be used to fit the
-    classifier. This might result in significantly higher runtime.
+    Parameters
+    ----------
+    extended_search:
+        If set to true, an extended set of models will be used to fit the classifier.
+        This might result in significantly higher runtime.
     """
 
     def __init__(self, extended_search: bool = False):

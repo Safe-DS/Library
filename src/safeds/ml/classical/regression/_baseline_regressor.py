@@ -39,11 +39,14 @@ class BaselineRegressor:
 
     Get a baseline by fitting data on multiple different models and comparing the best metrics.
 
-    Parameters ---------- extended_search: If set to true, an extended set of models will be used to fit the
-    classifier. This might result in significantly higher runtime.
+    Parameters
+    ----------
+    extended_search:
+        If set to true, an extended set of models will be used to fit the classifier.
+        This might result in significantly higher runtime.
     """
 
-    def __init__(self, include_slower_models: bool = False):
+    def __init__(self, extended_search: bool = False):
         self._is_fitted = False
         self._list_of_model_types = [
             AdaBoostRegressor(),
@@ -54,7 +57,7 @@ class BaselineRegressor:
             SupportVectorRegressor(),
         ]
 
-        if include_slower_models:
+        if extended_search:
             self._list_of_model_types.extend(
                 [ElasticNetRegressor(), LassoRegressor(), GradientBoostingRegressor()],
             )  # pragma: no cover
