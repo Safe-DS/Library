@@ -3,6 +3,8 @@ from __future__ import annotations
 from collections.abc import Collection
 from typing import TYPE_CHECKING, TypeVar
 
+from safeds.exceptions import EmptyChoiceError
+
 if TYPE_CHECKING:
     from collections.abc import Iterator
     from typing import Any
