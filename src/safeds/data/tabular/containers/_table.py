@@ -1747,7 +1747,7 @@ class Table:
         | i64 | i64 | i64 |
         +=====+=====+=====+
         |   1 |   3 |   5 |
-        |   2 |   4 | None|
+        |   2 |   4 | null|
         +-----+-----+-----+
         """
         return self._from_polars_lazy_frame(
