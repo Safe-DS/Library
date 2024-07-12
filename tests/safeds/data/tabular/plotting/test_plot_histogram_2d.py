@@ -2,7 +2,8 @@ import pytest
 from safeds.data.tabular.containers import Table
 from safeds.exceptions import ColumnNotFoundError, ColumnTypeError, OutOfBoundsError
 from syrupy import SnapshotAssertion
-from tests.helpers import os_linux, os_mac, skip_if_os
+
+from tests.helpers import os_mac, skip_if_os
 
 
 @pytest.mark.parametrize(
