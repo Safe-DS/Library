@@ -53,7 +53,7 @@ class FunctionalTableTransformer(TableTransformer):
     # Learning and transformation
     # ------------------------------------------------------------------------------------------------------------------
 
-    def fit(self, table: Table) -> FunctionalTableTransformer:   # noqa: ARG002
+    def fit(self, table: Table) -> FunctionalTableTransformer:  # noqa: ARG002
         """
         **Note:** For FunctionalTableTransformer this is a no-OP.
 
@@ -66,7 +66,7 @@ class FunctionalTableTransformer(TableTransformer):
         -------
         fitted_transformer:
             Returns self, because this transformer is always fitted.
-            
+
         """
         return self
 
@@ -90,7 +90,7 @@ class FunctionalTableTransformer(TableTransformer):
         ------
         Exception:
             Raised when the wrapped callable encounters an error.
-        
+
         """
         return self._transformer(table)
 

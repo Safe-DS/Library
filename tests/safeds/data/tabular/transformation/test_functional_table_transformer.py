@@ -7,9 +7,11 @@ from safeds.exceptions import ColumnNotFoundError
 def valid_callable(table: Table) -> Table:
     return table.remove_columns(["col1"])
 
+
 class TestInit:
     def test_should_not_raise_type_error(self) -> None:
-            FunctionalTableTransformer(valid_callable)
+        FunctionalTableTransformer(valid_callable)
+
 
 class TestFit:
     def test_should_return_self(self) -> None:
@@ -22,17 +24,18 @@ class TestFit:
         transformer = FunctionalTableTransformer(valid_callable)
         assert transformer.fit(table) is transformer
 
+
 class TestIsFitted:
     def test_should_always_be_fitted(self) -> None:
         transformer = FunctionalTableTransformer(valid_callable)
         assert transformer.is_fitted
+
 
 class TestTransform:
     def test_should_raise_specific_error_when_error_in_method(self) -> None:
         table = Table(
             {
                 "col2": [1, 2, 3],
-            
             },
         )
         transformer = FunctionalTableTransformer(valid_callable)
@@ -44,7 +47,6 @@ class TestTransform:
             {
                 "col1": [1, 2, 3],
                 "col2": [1, 2, 3],
-            
             },
         )
         transformer = FunctionalTableTransformer(valid_callable)
@@ -53,7 +55,6 @@ class TestTransform:
             {
                 "col1": [1, 2, 3],
                 "col2": [1, 2, 3],
-            
             },
         )
 
@@ -62,7 +63,6 @@ class TestTransform:
             {
                 "col1": [1, 2, 3],
                 "col2": [1, 2, 3],
-            
             },
         )
         transformer = FunctionalTableTransformer(valid_callable)
@@ -70,9 +70,9 @@ class TestTransform:
         assert transformed_table == Table(
             {
                 "col2": [1, 2, 3],
-            
             },
         )
+
 
 class TestFitAndTransform:
     def test_should_return_self(self) -> None:
@@ -80,7 +80,6 @@ class TestFitAndTransform:
             {
                 "col1": [1, 2, 3],
                 "col2": [1, 2, 3],
-            
             },
         )
         transformer = FunctionalTableTransformer(valid_callable)
@@ -91,7 +90,6 @@ class TestFitAndTransform:
             {
                 "col1": [1, 2, 3],
                 "col2": [1, 2, 3],
-            
             },
         )
         transformer = FunctionalTableTransformer(valid_callable)
@@ -100,6 +98,5 @@ class TestFitAndTransform:
             {
                 "col1": [1, 2, 3],
                 "col2": [1, 2, 3],
-            
             },
         )
