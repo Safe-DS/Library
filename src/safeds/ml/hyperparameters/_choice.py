@@ -67,7 +67,7 @@ class Choice(Collection[T]):
         """
         return len(self.elements)
 
-    def __eq__(self, other) -> bool:
+    def __eq__(self, other: object) -> bool:
         if not isinstance(other, Choice):
             return NotImplemented
         if self is other:
