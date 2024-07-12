@@ -14,12 +14,12 @@ from ._table_transformer import TableTransformer
 
 class FunctionalTableTransformer(TableTransformer):
     """
-    Learn a transformation for a set of columns in a `Table` and transform another `Table` with the same columns.
+    Wraps a Callable[[Table], Table] so that it can be used in a SequentialTableTransformer.
 
     Parameters
     ----------
     transformer:
-        The Callable that receives a table and returns a table that is to be wrapped.
+        The Callable that receives a table and returns a table.
     """
 
     # ------------------------------------------------------------------------------------------------------------------
