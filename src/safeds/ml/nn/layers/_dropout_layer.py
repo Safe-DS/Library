@@ -104,3 +104,13 @@ class DropoutLayer(Layer):
             return int(self._input_size)
         elif isinstance(self._input_size, ModelImageSize):
             return self._input_size.__sizeof__()
+
+    def get_parameter_count(self) -> int:
+        if self._input_size is None:
+            raise ValueError(
+                "The input_size is not yet set. The layer cannot compute the parameter_count if the input_size is not set.",
+            )
+        internal_layer = self._get_internal_layer()
+        return(
+            sum(p.numel() for p in internal_layer.parameters())
+        )

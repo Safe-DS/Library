@@ -43,6 +43,17 @@ class TestDropoutLayer:
         with pytest.raises(ValueError, match=r"The input_size is not yet set."):
             layer.__sizeof__()
 
+    def test_get_parameter_count_right_output(self) -> None:
+        size = 10
+        layer = DropoutLayer(0.5)
+        layer._set_input_size(size)
+        assert layer.get_parameter_count() == 0
+
+    def test_get_parameter_count_returns_value_error(self) -> None:
+        layer = DropoutLayer(0.5)
+        with pytest.raises(ValueError, match=r"The input_size is not yet set."):
+            layer.get_parameter_count()
+
 
 class TestEq:
     def test_should_be_equal(self) -> None:
