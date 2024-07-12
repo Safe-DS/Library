@@ -1,6 +1,7 @@
 import pytest
-from safeds.data.tabular.containers import Table, Row
+from safeds.data.tabular.containers import Row, Table
 from safeds.data.tabular.containers._lazy_vectorized_row import _LazyVectorizedRow
+
 
 @pytest.mark.parametrize(
             ("table", "expected"),
