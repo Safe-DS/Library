@@ -177,3 +177,16 @@ def test_should_assert_that_different_forward_layers_have_different_hash(
 )
 def test_should_assert_that_layer_size_is_greater_than_normal_object(layer: LSTMLayer) -> None:
     assert sys.getsizeof(layer) > sys.getsizeof(object())
+
+def test_conv_transposed_get_parameter_count_returns_value_error() -> None:
+    layer = LSTMLayer(64)
+    with pytest.raises(ValueError, match=r"The input_size is not yet set."):
+        layer.get_parameter_count()
+
+def test_conv_transposed_get_parameter_count_returns_right_amount() -> None:
+    input_neurons=4
+    output_neurons=16
+    expected_output = int((input_neurons+output_neurons+2)*output_neurons*4)
+    layer = LSTMLayer(output_neurons)
+    layer._set_input_size(input_neurons)
+    assert layer.get_parameter_count() == expected_output
