@@ -1,5 +1,6 @@
 import pickle
 import re
+from typing import Any
 
 import pytest
 from safeds.data.image.typing import ImageSize
@@ -309,23 +310,38 @@ class TestClassificationModel:
                     ClassifierMetric.ACCURACY,
                 )
 
-        def test_should_assert_that_is_fitted_is_set_correctly(self, device: Device) -> None:
+        @pytest.mark.parametrize(
+            ["metric", "positive_class"],
+            [
+                (
+                    ClassifierMetric.ACCURACY,
+                    None,
+                ),
+                (
+                    ClassifierMetric.PRECISION,
+                    0,
+                ),
+                (
+                    ClassifierMetric.F1_SCORE,
+                    0,
+                ),
+                (
+                    ClassifierMetric.RECALL,
+                    0,
+                ),
+            ],
+            ids=["accuracy", "precision", "f1score", "recall"]
+        )
+        def test_should_assert_that_is_fitted_is_set_correctly_and_check_return_type(self, metric: ClassifierMetric, positive_class: Any, device: Device) -> None:
             configure_test_with_device(device)
             model = NeuralNetworkClassifier(InputConversionTable(), [ForwardLayer(Choice(2, 4)), ForwardLayer(1)])
             assert not model.is_fitted
             fitted_model = model.fit_by_exhaustive_search(
                 Table.from_dict({"a": [1, 2, 3, 4], "b": [0, 1, 0, 1]}).to_tabular_dataset("b"),
-                ClassifierMetric.ACCURACY,
+                optimization_metric=metric,
+                positive_class=positive_class,
             )
             assert fitted_model.is_fitted
-
-        def test_should_raise_if_fit_by_exhaustive_search_function_returns_wrong_datatype(self, device: Device) -> None:
-            configure_test_with_device(device)
-            model = NeuralNetworkClassifier(InputConversionTable(), [ForwardLayer(Choice(2, 4)), ForwardLayer(1)])
-            fitted_model = model.fit_by_exhaustive_search(
-                Table.from_dict({"a": [1, 2, 3, 4], "b": [0, 1, 0, 1]}).to_tabular_dataset("b"),
-                ClassifierMetric.ACCURACY,
-            )
             assert isinstance(fitted_model, NeuralNetworkClassifier)
 
     class TestPredict:
@@ -803,7 +819,7 @@ class TestRegressionModel:
                     [ForwardLayer(Choice(1, 3))],
                 ).fit_by_exhaustive_search(
                     Table.from_dict({"a": [1], "b": [1.0]}).to_tabular_dataset("b"),
-                    RegressorMetric.MEAN_ABSOLUTE_ERROR,
+                    RegressorMetric.MEAN_SQUARED_ERROR,
                     epoch_size=invalid_epoch_size,
                 )
 
@@ -819,7 +835,7 @@ class TestRegressionModel:
                     [ForwardLayer(neuron_count=Choice(1, 3))],
                 ).fit_by_exhaustive_search(
                     Table.from_dict({"a": [1], "b": [1.0]}).to_tabular_dataset("b"),
-                    RegressorMetric.MEDIAN_ABSOLUTE_DEVIATION,
+                    RegressorMetric.MEAN_SQUARED_ERROR,
                     batch_size=invalid_batch_size,
                 )
 
@@ -829,26 +845,28 @@ class TestRegressionModel:
             with pytest.raises(FittingWithoutChoiceError):
                 model.fit_by_exhaustive_search(
                     Table.from_dict({"a": [1], "b": [1.0]}).to_tabular_dataset("b"),
-                    RegressorMetric.COEFFICIENT_OF_DETERMINATION,
+                    RegressorMetric.MEAN_SQUARED_ERROR,
                 )
 
-        def test_should_assert_that_is_fitted_is_set_correctly(self, device: Device) -> None:
+        @pytest.mark.parametrize(
+            "metric",
+            [
+                RegressorMetric.MEAN_SQUARED_ERROR,
+                RegressorMetric.MEAN_ABSOLUTE_ERROR,
+                RegressorMetric.MEDIAN_ABSOLUTE_DEVIATION,
+                RegressorMetric.COEFFICIENT_OF_DETERMINATION,
+            ],
+            ids=["mean_squared_error", "mean_absolute_error", "median_absolute_deviation", "coefficient_of_determination"],
+        )
+        def test_should_assert_that_is_fitted_is_set_correctly_and_check_return_type(self, metric: RegressorMetric, device: Device) -> None:
             configure_test_with_device(device)
             model = NeuralNetworkRegressor(InputConversionTable(), [ForwardLayer(Choice(2, 4)), ForwardLayer(1)])
             assert not model.is_fitted
             fitted_model = model.fit_by_exhaustive_search(
                 Table.from_dict({"a": [1, 2, 3, 4], "b": [1.0, 2.0, 3.0, 4.0]}).to_tabular_dataset("b"),
-                RegressorMetric.MEAN_ABSOLUTE_ERROR,
+                optimization_metric=metric,
             )
             assert fitted_model.is_fitted
-
-        def test_should_raise_if_fit_by_exhaustive_search_function_returns_wrong_datatype(self, device: Device) -> None:
-            configure_test_with_device(device)
-            model = NeuralNetworkRegressor(InputConversionTable(), [ForwardLayer(Choice(2, 4)), ForwardLayer(1)])
-            fitted_model = model.fit_by_exhaustive_search(
-                Table.from_dict({"a": [1, 2, 3, 4], "b": [1.0, 2.0, 3.0, 4.0]}).to_tabular_dataset("b"),
-                RegressorMetric.MEAN_ABSOLUTE_ERROR,
-            )
             assert isinstance(fitted_model, NeuralNetworkRegressor)
 
     class TestPredict:
