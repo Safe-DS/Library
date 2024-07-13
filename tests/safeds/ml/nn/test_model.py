@@ -567,6 +567,11 @@ class TestClassificationModel:
                 [FlattenLayer()],
                 r"A NeuralNetworkClassifier cannot be used with a InputConversionImage that uses a VariableImageSize.",
             ),
+            (
+                InputConversionImageToImage(VariableImageSize(1, 1, 1)),
+                [FlattenLayer()],
+                r"A NeuralNetworkClassifier cannot be used with images as output.",
+            ),
         ],
     )
     def test_should_raise_if_model_has_invalid_structure(
