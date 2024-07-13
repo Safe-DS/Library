@@ -225,7 +225,8 @@ class TestClassificationModel:
 
             obj = Test()
             model.fit(
-                Table.from_dict({"a": [1], "b": [0]}).to_tabular_dataset("a"), callback_on_batch_completion=obj.cb,
+                Table.from_dict({"a": [1], "b": [0]}).to_tabular_dataset("a"),
+                callback_on_batch_completion=obj.cb,
             )
 
             assert obj.callback_was_called() is True
@@ -249,7 +250,8 @@ class TestClassificationModel:
 
             obj = Test()
             model.fit(
-                Table.from_dict({"a": [1], "b": [0]}).to_tabular_dataset("a"), callback_on_epoch_completion=obj.cb,
+                Table.from_dict({"a": [1], "b": [0]}).to_tabular_dataset("a"),
+                callback_on_epoch_completion=obj.cb,
             )
 
             assert obj.callback_was_called() is True
@@ -267,7 +269,8 @@ class TestClassificationModel:
             assert model.input_size == 1
 
         def test_should_raise_if_epoch_size_out_of_bounds_when_fitting_by_exhaustive_search(
-            self, device: Device,
+            self,
+            device: Device,
         ) -> None:
             invalid_epoch_size = 0
             configure_test_with_device(device)
@@ -282,7 +285,8 @@ class TestClassificationModel:
                 )
 
         def test_should_raise_if_batch_size_out_of_bounds_when_fitting_by_exhaustive_search(
-            self, device: Device,
+            self,
+            device: Device,
         ) -> None:
             invalid_batch_size = 0
             configure_test_with_device(device)
@@ -301,7 +305,8 @@ class TestClassificationModel:
             model = NeuralNetworkClassifier(InputConversionTable(), [ForwardLayer(1)])
             with pytest.raises(FittingWithoutChoiceError):
                 model.fit_by_exhaustive_search(
-                    Table.from_dict({"a": [1], "b": [0]}).to_tabular_dataset("b"), ClassifierMetric.ACCURACY,
+                    Table.from_dict({"a": [1], "b": [0]}).to_tabular_dataset("b"),
+                    ClassifierMetric.ACCURACY,
                 )
 
         def test_should_assert_that_is_fitted_is_set_correctly(self, device: Device) -> None:
@@ -743,7 +748,8 @@ class TestRegressionModel:
 
             obj = Test()
             model.fit(
-                Table.from_dict({"a": [1], "b": [0]}).to_tabular_dataset("a"), callback_on_batch_completion=obj.cb,
+                Table.from_dict({"a": [1], "b": [0]}).to_tabular_dataset("a"),
+                callback_on_batch_completion=obj.cb,
             )
 
             assert obj.callback_was_called() is True
@@ -767,7 +773,8 @@ class TestRegressionModel:
 
             obj = Test()
             model.fit(
-                Table.from_dict({"a": [1], "b": [0]}).to_tabular_dataset("a"), callback_on_epoch_completion=obj.cb,
+                Table.from_dict({"a": [1], "b": [0]}).to_tabular_dataset("a"),
+                callback_on_epoch_completion=obj.cb,
             )
 
             assert obj.callback_was_called() is True
@@ -785,7 +792,8 @@ class TestRegressionModel:
             assert model.input_size == 1
 
         def test_should_raise_if_epoch_size_out_of_bounds_when_fitting_by_exhaustive_search(
-            self, device: Device,
+            self,
+            device: Device,
         ) -> None:
             invalid_epoch_size = 0
             configure_test_with_device(device)
@@ -800,7 +808,8 @@ class TestRegressionModel:
                 )
 
         def test_should_raise_if_batch_size_out_of_bounds_when_fitting_by_exhaustive_search(
-            self, device: Device,
+            self,
+            device: Device,
         ) -> None:
             invalid_batch_size = 0
             configure_test_with_device(device)
