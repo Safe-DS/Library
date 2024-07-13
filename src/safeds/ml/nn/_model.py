@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import copy
+import multiprocessing as mp
 from concurrent.futures import ALL_COMPLETED, ProcessPoolExecutor, wait
 from typing import TYPE_CHECKING, Any, Generic, Self, TypeVar
 
@@ -291,7 +292,7 @@ class NeuralNetworkRegressor(Generic[IFT, IPT]):
         list_of_models = self._get_models_for_all_choices()
         list_of_fitted_models: list[Self] = []
 
-        with ProcessPoolExecutor(max_workers=len(list_of_models)) as executor:
+        with ProcessPoolExecutor(max_workers=len(list_of_models), mp_context=mp.get_context("spawn")) as executor:
             futures = []
             for model in list_of_models:
                 futures.append(executor.submit(model.fit, train_data, epoch_size, batch_size, learning_rate))
@@ -712,7 +713,7 @@ class NeuralNetworkClassifier(Generic[IFT, IPT]):
         list_of_models = self._get_models_for_all_choices()
         list_of_fitted_models: list[Self] = []
 
-        with ProcessPoolExecutor(max_workers=len(list_of_models)) as executor:
+        with ProcessPoolExecutor(max_workers=len(list_of_models), mp_context=mp.get_context("spawn")) as executor:
             futures = []
             for model in list_of_models:
                 futures.append(executor.submit(model.fit, train_data, epoch_size, batch_size, learning_rate))
